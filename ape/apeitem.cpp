@@ -121,7 +121,7 @@ bool APE::Item::isEmpty() const
     case 1:
       if(d->text.isEmpty())
         return true;
-      if(d->text.size() == 1 && d->text.front() == "")
+      if(d->text.size() == 1 && d->text.front().isEmpty())
         return true;
       return false;
     case 2:
