@@ -175,7 +175,7 @@ void ID3v1::Tag::setYear(uint i)
 
 void ID3v1::Tag::setTrack(uint i)
 {
-  d->track = i;
+  d->track = i < 256 ? i : 0;
 }
 
 void ID3v1::Tag::setStringHandler(const StringHandler *handler)
