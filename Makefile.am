@@ -14,7 +14,7 @@ libtag_la_SOURCES = tag.cpp fileref.cpp audioproperties.cpp
 taglib_include_HEADERS = tag.h fileref.h audioproperties.h
 taglib_includedir = $(includedir)/taglib
 
-libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 1:0:0
+libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 2:0:1
 libtag_la_LIBADD = ./mpeg/libmpeg.la ./ogg/libogg.la ./flac/libflac.la ./toolkit/libtoolkit.la 
 
 bin_SCRIPTS = taglib-config
@@ -34,7 +34,7 @@ apidox:
 	fi; \
 	cp $(top_srcdir)/admin/Doxyfile.global taglib.doxyfile; \
 	echo "PROJECT_NAME        = TagLib" >> taglib.doxyfile; \
-	echo "PROJECT_NUMBER      = \"Version 1.0\"" >> taglib.doxyfile; \
+	echo "PROJECT_NUMBER      = \"Version 1.1\"" >> taglib.doxyfile; \
 	echo "INPUT               = $(srcdir)" >> taglib.doxyfile; \
 	echo "OUTPUT_DIRECTORY    = doc/api" >> taglib.doxyfile; \
 	echo "HTML_OUTPUT         = html" >> taglib.doxyfile; \

@@ -100,7 +100,6 @@ FileRef &FileRef::operator=(const FileRef &ref)
     delete d;
 
   d = ref.d;
-
   d->ref();
 
   return *this;
