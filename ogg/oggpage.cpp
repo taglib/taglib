@@ -116,7 +116,7 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
 
   else if((flags & BeginsWithPacket && !d->header.firstPacketContinued()) ||
           (flags & EndsWithPacket && d->header.lastPacketCompleted()) ||
-          (!flags & BeginsWithPacket && !flags & EndsWithPacket))
+          (!(flags & BeginsWithPacket) && !(flags & EndsWithPacket)))
   {
     flags = ContainsPacketFlags(flags | CompletePacket);
   }
