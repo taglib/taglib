@@ -147,11 +147,6 @@ void APE::Item::parse(const ByteVector &data)
     d->text = StringList(ByteVectorList::split(d->value, '\0'), String::UTF8);
 }
 
-ByteVector APE::Item::render()
-{
-  return const_cast<const Item *>(this)->render();
-}
-
 ByteVector APE::Item::render() const
 {
   ByteVector data;

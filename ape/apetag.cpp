@@ -238,11 +238,6 @@ ByteVector APE::Tag::render() const
   return d->footer.renderHeader() + data + d->footer.renderFooter();
 }
 
-void APE::Tag::parse(const ByteVector &data, uint)
-{
-  parse(data);
-}
-
 void APE::Tag::parse(const ByteVector &data)
 {
   uint pos = 0;

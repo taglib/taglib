@@ -101,11 +101,6 @@ namespace TagLib {
       StringList toStringList() const;
 
       /*!
-       * \deprecated Use the const version.
-       */
-      ByteVector render();
-
-      /*!
        * Render the item to a ByteVector.
        */
       ByteVector render() const;
