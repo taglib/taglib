@@ -299,11 +299,11 @@ namespace TagLib {
       bool tagAlterPreservation() const;
 
       /*!
-       * Returns true if the flag for frame alter preservation is set.
+       * Returns true if the flag for file alter preservation is set.
        *
        * \note This flag is currently ignored internally in TagLib.
        */
-      bool frameAlterPreservation() const;
+      bool fileAlterPreservation() const;
 
       /*!
        * Returns true if the frame is meant to be read only.
@@ -349,6 +349,11 @@ namespace TagLib {
        * Render the Header back to binary format in a ByteVector.
        */
       ByteVector render() const;
+
+      /*!
+       * @deprecated
+       */
+      bool frameAlterPreservation() const;
 
     private:
       Header(const Header &);

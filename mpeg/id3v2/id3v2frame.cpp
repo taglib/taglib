@@ -175,7 +175,7 @@ public:
     frameSize(0),
     version(4),
     tagAlterPreservation(false),
-    frameAlterPreservation(false),
+    fileAlterPreservation(false),
     readOnly(false),
     groupingIdentity(false),
     compression(false),
@@ -191,7 +191,7 @@ public:
   // flags
 
   bool tagAlterPreservation;
-  bool frameAlterPreservation;
+  bool fileAlterPreservation;
   bool readOnly;
   bool groupingIdentity;
   bool compression;
@@ -258,7 +258,6 @@ void Frame::Header::setData(const ByteVector &data, uint version)
   case 1:
   case 2:
   {
-
     // ID3v2.2 
 
     if(data.size() < 3) {
@@ -283,10 +282,8 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     break;
   }
   case 3:
-  case 4:
-  default:
   {
-    // ID3v2.3 / ID3v2.4
+    // ID3v2.3
 
     if(data.size() < 4) {
       debug("You must at least specify a frame ID.");
@@ -308,16 +305,55 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // Set the size -- the frame size is the four bytes starting at byte four in
     // the frame header (structure 4)
 
-    if(version >= 4)
-      d->frameSize = SynchData::toUInt(data.mid(4, 4));
-    else
-      d->frameSize = data.mid(4, 4).toUInt();
+    d->frameSize = data.mid(4, 4).toUInt();
 
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
-      d->tagAlterPreservation   = flags[6]; // (structure 4.1.1.a)
-      d->frameAlterPreservation = flags[5]; // (structure 4.1.1.b)
-      d->readOnly               = flags[4]; // (structure 4.1.1.c)
+      d->tagAlterPreservation  = flags[7]; // (structure 3.3.1.a)
+      d->fileAlterPreservation = flags[6]; // (structure 3.3.1.b)
+      d->readOnly              = flags[5]; // (structure 3.3.1.c)
+    }
+
+    { // read the second byte of flags
+      std::bitset<8> flags(data[9]);
+      d->compression         = flags[7]; // (structure 3.3.1.i)
+      d->encryption          = flags[6]; // (structure 3.3.1.j)
+      d->groupingIdentity    = flags[5]; // (structure 3.3.1.k)
+    }
+    break;
+  }
+  case 4:
+  default:
+  {
+    // ID3v2.4
+
+    if(data.size() < 4) {
+      debug("You must at least specify a frame ID.");
+      return;
+    }
+
+    // Set the frame ID -- the first four bytes
+
+    d->frameID = data.mid(0, 4);
+
+    // If the full header information was not passed in, do not continue to the
+    // steps to parse the frame size and flags.
+
+    if(data.size() < 10) {
+      d->frameSize = 0;
+      return;
+    }
+
+    // Set the size -- the frame size is the four bytes starting at byte four in
+    // the frame header (structure 4)
+
+    d->frameSize = SynchData::toUInt(data.mid(4, 4));
+
+    { // read the first byte of flags
+      std::bitset<8> flags(data[8]);
+      d->tagAlterPreservation  = flags[6]; // (structure 4.1.1.a)
+      d->fileAlterPreservation = flags[5]; // (structure 4.1.1.b)
+      d->readOnly              = flags[4]; // (structure 4.1.1.c)
     }
 
     { // read the second byte of flags
@@ -363,9 +399,9 @@ bool Frame::Header::tagAlterPreservation() const
   return d->tagAlterPreservation;
 }
 
-bool Frame::Header::frameAlterPreservation() const
+bool Frame::Header::fileAlterPreservation() const
 {
-  return d->frameAlterPreservation;
+  return d->fileAlterPreservation;
 }
 
 bool Frame::Header::readOnly() const
@@ -405,4 +441,9 @@ ByteVector Frame::Header::render() const
   ByteVector v = d->frameID + SynchData::fromUInt(d->frameSize) + flags;
 
   return v;
+}
+
+bool Frame::Header::frameAlterPreservation() const // deprecated
+{
+  return fileAlterPreservation();
 }

@@ -65,6 +65,18 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 {
   Frame::Header *header = new Frame::Header(data, version);
 
+  // TagLib doesn't mess with encrypted or compressed frames, so just treat them
+  // as unknown frames.
+
+  if(header->compression()) {
+      debug("Compressed frames are currently not supported.");
+      return new UnknownFrame(data, header);
+  }
+  if(header->encryption()) {
+      debug("Entrypted frames are currently not supported.");
+      return new UnknownFrame(data, header);
+  }
+
   TagLib::ByteVector frameID = header->frameID();
 
   // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
