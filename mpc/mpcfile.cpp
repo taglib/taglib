@@ -74,6 +74,9 @@ public:
   Properties *properties;
   bool scanned;
 
+  // These indicate whether the file *on disk* has these tags, not if
+  // this data structure does.  This is used in computing offsets.
+
   bool hasAPE;
   bool hasID3v1;
   bool hasID3v2;
@@ -268,6 +271,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   if(d->APELocation >= 0) {
     d->APETag = new APE::Tag(this, d->APELocation);
     d->APESize = d->APETag->footer()->completeTagSize();
+    d->APELocation = d->APELocation + d->APETag->footer()->size() - d->APESize;
     d->hasAPE = true;
   }
 
