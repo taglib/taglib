@@ -76,12 +76,12 @@ Ogg::FLAC::File::~File()
   delete d;
 }
 
-TagLib::Tag* Ogg::FLAC::File::tag() const
+Ogg::XiphComment *Ogg::FLAC::File::tag() const
 {
   return d->comment;
 }
 
-Properties* Ogg::FLAC::File::audioProperties() const
+Properties *Ogg::FLAC::File::audioProperties() const
 {
   return d->properties;
 }

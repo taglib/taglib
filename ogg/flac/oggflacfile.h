@@ -73,7 +73,7 @@ namespace TagLib {
       /*!
        * Returns the Tag for this file.  This will always be a XiphComment.
        */
-      virtual TagLib::Tag *tag() const;
+      virtual XiphComment *tag() const;
 
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties
