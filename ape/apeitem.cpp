@@ -22,9 +22,6 @@
 #include "apeitem.h"
 #include "tbytevectorlist.h"
 #include "tstringlist.h"
-#include <iostream>
-
-using std::cout;
 
 using namespace TagLib;
 using namespace APE;
@@ -130,7 +127,6 @@ void APE::Item::parse(const ByteVector& data) {
   if ((int)(d->type) < 2) {
     ByteVectorList bl = ByteVectorList::split(d->value, '\0');
     d->text = StringList(bl, String::UTF8);
-    cout << d->text.toString(",") << "\n";
   }
 
 }
