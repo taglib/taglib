@@ -154,19 +154,19 @@ void FLAC::File::save()
 
     // Search through the remaining metadata
 
-    char blocktype = header[0] & 0x7f;
-    bool lastblock = header[0] & 0x80;
+    char blockType = header[0] & 0x7f;
+    bool lastBlock = header[0] & 0x80;
 
-    while(!lastblock) {
+    while(!lastBlock) {
       seek(nextPageOffset);
 
       header = readBlock(4);
-      blocktype = header[0] & 0x7f;
-      lastblock = header[0] & 0x80;
+      blockType = header[0] & 0x7f;
+      lastBlock = header[0] & 0x80;
       length = header.mid(1, 3).toUInt();
 
       // Type is vorbiscomment
-      if( blocktype == 4 ) {
+      if(blockType == 4) {
         v[0] = header[0];
         insert(v, nextPageOffset, length + 4);
         break;
