@@ -68,6 +68,18 @@ namespace TagLib {
     String toString(const String &separator = " ") const;
 
     /*!
+     * Appends \a s to the end of the list and returns a reference to the
+     * list.
+     */
+    StringList &append(const String &s);
+
+    /*!
+     * Appends all of the values in \a l to the end of the list and returns a
+     * reference to the list.
+     */
+    StringList &append(const StringList &l);
+
+    /*!
      * Splits the String \a s into several strings at \a pattern.  This will not include
      * the pattern in the returned strings.
      */

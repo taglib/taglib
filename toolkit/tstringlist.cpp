@@ -87,6 +87,18 @@ String StringList::toString(const String &separator) const
   return s;
 }
 
+StringList &StringList::append(const String &s)
+{
+  List<String>::append(s);
+  return *this;
+}
+
+StringList &StringList::append(const StringList &l)
+{
+  List<String>::append(l);
+  return *this;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // related functions
 ////////////////////////////////////////////////////////////////////////////////
