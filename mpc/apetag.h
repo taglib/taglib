@@ -22,8 +22,8 @@
 #ifndef TAGLIB_APETAG_H
 #define TAGLIB_APETAG_H
 
-#include <tag.h>
-#include <tbytevector.h>
+#include "tag.h"
+#include "tbytevector.h"
 
 namespace TagLib {
 
