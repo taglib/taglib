@@ -79,9 +79,9 @@ namespace TagLib {
 
     /*!
      * Save the file and its associated tags.  This should be reimplemented in
-     * the concrete subclasses.
+     * the concrete subclasses.  Returns true if the save succeeds.
      */
-    virtual void save() = 0;
+    virtual bool save() = 0;
 
     /*!
      * Reads a block of size \a length at the current get pointer.

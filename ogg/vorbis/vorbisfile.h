@@ -83,7 +83,7 @@ namespace TagLib {
        */
       virtual Properties *audioProperties() const;
 
-      virtual void save();
+      virtual bool save();
 
     private:
       File(const File &);

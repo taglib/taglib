@@ -79,7 +79,7 @@ Vorbis::Properties *Vorbis::File::audioProperties() const
   return d->properties;
 }
 
-void Vorbis::File::save()
+bool Vorbis::File::save()
 {
   ByteVector v(vorbisCommentHeaderID);
 
@@ -89,7 +89,7 @@ void Vorbis::File::save()
 
   setPacket(1, v);
 
-  Ogg::File::save();
+  return Ogg::File::save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

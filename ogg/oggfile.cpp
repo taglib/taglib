@@ -176,8 +176,13 @@ const Ogg::PageHeader *Ogg::File::lastPageHeader()
   return d->lastPageHeader->isValid() ? d->lastPageHeader : 0;
 }
 
-void Ogg::File::save()
+bool Ogg::File::save()
 {
+  if(readOnly()) {
+    debug("Ogg::File::save() - Cannot save to a read only file.");
+    return false;
+  }
+
   List<int> pageGroup;
 
   for(List<int>::ConstIterator it = d->dirtyPages.begin(); it != d->dirtyPages.end(); ++it) {
@@ -191,6 +196,8 @@ void Ogg::File::save()
   writePageGroup(pageGroup);
   d->dirtyPages.clear();
   d->dirtyPackets.clear();
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -245,29 +245,27 @@ MPEG::Properties *MPEG::File::audioProperties() const
   return d->properties;
 }
 
-void MPEG::File::save()
+bool MPEG::File::save()
 {
-  save(ID3v1 | ID3v2);
+  return save(ID3v1 | ID3v2);
 }
 
-void MPEG::File::save(int tags)
+bool MPEG::File::save(int tags)
 {
-  if(tags == NoTags) {
-    strip(AllTags);
-    return;
-  }
+  if(tags == NoTags)
+    return strip(AllTags);
 
   if(!d->ID3v2Tag && !d->ID3v1Tag) {
 
     if(d->hasID3v1 || d->hasID3v2)
-      strip(AllTags);
+      return strip(AllTags);
 
-    return;
+    return true;
   }
 
   if(readOnly()) {
     debug("MPEG::File::save() -- File is read only.");
-    return;
+    return false;
   }
 
   // Create the tags if we've been asked to.  Copy the values from the tag that
@@ -279,6 +277,7 @@ void MPEG::File::save(int tags)
   if(tags & ID3v1 && d->ID3v2Tag)
     Tag::duplicate(d->ID3v2Tag, ID3v1Tag(true), false);
 
+  bool success = true;
 
   if(ID3v2 & tags) {
 
@@ -290,10 +289,10 @@ void MPEG::File::save(int tags)
       insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
     }
     else
-      strip(ID3v2);
+      success = strip(ID3v2) && success;
   }
   else if(d->hasID3v2)
-    strip(ID3v2);
+    success = strip(ID3v2) && success;
 
   if(ID3v1 & tags) {
     if(d->ID3v1Tag && !d->ID3v1Tag->isEmpty()) {
@@ -302,10 +301,12 @@ void MPEG::File::save(int tags)
       writeBlock(d->ID3v1Tag->render());
     }
     else
-      strip(ID3v1);
+      success = strip(ID3v1) && success;
   }
   else if(d->hasID3v1)
-    strip(ID3v1);
+    success = strip(ID3v1) && success;
+
+  return success;
 }
 
 ID3v2::Tag *MPEG::File::ID3v2Tag(bool create)
@@ -330,11 +331,11 @@ ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
   return d->ID3v1Tag;
 }
 
-void MPEG::File::strip(int tags)
+bool MPEG::File::strip(int tags)
 {
   if(readOnly()) {
     debug("MPEG::File::strip() - Cannot strip tags from a read only file.");
-    return;
+    return false;
   }
 
   if(tags & ID3v2 && d->hasID3v2)
@@ -345,6 +346,8 @@ void MPEG::File::strip(int tags)
     d->ID3v1Location = -1;
     d->hasID3v1 = false;
   }
+
+  return true;
 }
 
 void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)

@@ -73,7 +73,7 @@ namespace TagLib {
        */
       const PageHeader *lastPageHeader();
 
-      virtual void save();
+      virtual bool save();
 
     protected:
       /*!

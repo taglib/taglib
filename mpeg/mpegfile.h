@@ -114,7 +114,8 @@ namespace TagLib {
 
       /*!
        * Save the file.  If at least one tag -- ID3v1 or ID3v2 -- exists this
-       * will duplicate its content into the other tag.
+       * will duplicate its content into the other tag.  This returns true
+       * if saving was successful.
        *
        * If neither exists or if both tags are empty, this will strip the tags
        * from the file.
@@ -126,18 +127,18 @@ namespace TagLib {
        *
        * \see save(int tags)
        */
-      virtual void save();
+      virtual bool save();
 
       /*!
        * Save the file.  This will attempt to save all of the tag types that are
        * specified by OR-ing together TagTypes values.  The save() method above
-       * uses AllTags.
+       * uses AllTags.  This returns true if saving was successful.
        *
        * This strips all tags not included in the mask, but does not modify them
        * in memory, so later calls to save() which make use of these tags will
        * remain valid.  This also strips empty tags.
        */
-      void save(int tags);
+      bool save(int tags);
 
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
@@ -169,7 +170,7 @@ namespace TagLib {
        * This will strip the tags that match the OR-ed together TagTypes from the
        * file.  By default it strips all tags.
        */
-      void strip(int tags = AllTags);
+      bool strip(int tags = AllTags);
 
       /*!
        * Set the ID3v2::FrameFactory to something other than the default.
