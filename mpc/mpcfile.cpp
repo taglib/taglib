@@ -112,7 +112,7 @@ MPC::Properties *MPC::File::audioProperties() const
 }
 
 
-void MPC::File::save()
+bool MPC::File::save()
 {
 
   // Update APE tag
@@ -130,6 +130,8 @@ void MPC::File::save()
     seek(-128, End);
     writeBlock(d->ID3v1Tag->render());
   }
+
+  return true;
 
 }
 

@@ -127,7 +127,7 @@ ByteVector APE::Tag::render() const
   }
 
   { Map<String,ByteVector>::Iterator i = d->unknowns.begin();
-    while (i != d->unknown.end()) {
+    while (i != d->unknowns.end()) {
       if (!i->second.isEmpty()) {
           data.append(i->second);
           itemCount++;
@@ -316,7 +316,7 @@ void APE::Tag::parse(const ByteVector &data, uint count)
           value = String(data.mid(pos+8+key.size()+1, vallen), String::UTF8);
           d->items.insert(key,value);
         } else {
-          d->unknown.insert(data.mid(pos, 8+key.size()+1+vallen));
+          d->unknowns.insert(key,data.mid(pos, 8+key.size()+1+vallen));
         }
 
         pos += 8+key.size()+1+vallen;

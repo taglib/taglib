@@ -81,7 +81,7 @@ namespace TagLib {
       /*!
        * Save the file.
        */
-      virtual void save();
+      virtual bool save();
 
     private:
       File(const File &);
