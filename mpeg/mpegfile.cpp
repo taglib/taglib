@@ -289,7 +289,7 @@ bool MPEG::File::save(int tags)
       insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
     }
     else
-      success = strip(ID3v2) && success;
+      success = strip(ID3v2, false) && success;
   }
   else if(d->hasID3v2)
     success = strip(ID3v2) && success;
@@ -304,7 +304,7 @@ bool MPEG::File::save(int tags)
       success = strip(ID3v1) && success;
   }
   else if(d->hasID3v1)
-    success = strip(ID3v1) && success;
+    success = strip(ID3v1, false) && success;
 
   return success;
 }
@@ -333,6 +333,11 @@ ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
 
 bool MPEG::File::strip(int tags)
 {
+  return strip(tags, true);
+}
+
+bool MPEG::File::strip(int tags, bool freeMemory)
+{
   if(readOnly()) {
     debug("MPEG::File::strip() - Cannot strip tags from a read only file.");
     return false;
@@ -343,8 +348,10 @@ bool MPEG::File::strip(int tags)
     d->ID3v2Location = -1;
     d->ID3v2OriginalSize = 0;
     d->hasID3v2 = false;
-    delete d->ID3v2Tag;
-    d->ID3v2Tag = 0;
+    if(freeMemory) {
+      delete d->ID3v2Tag;
+      d->ID3v2Tag = 0;
+    }
 
     // v1 tag location has changed, update if it exists
     if(d->ID3v1Tag)
@@ -355,8 +362,10 @@ bool MPEG::File::strip(int tags)
     truncate(d->ID3v1Location);
     d->ID3v1Location = -1;
     d->hasID3v1 = false;
-    delete d->ID3v1Tag;
-    d->ID3v1Tag = 0;
+    if(freeMemory) {
+      delete d->ID3v1Tag;
+      d->ID3v1Tag = 0;
+    }
   }
 
   return true;

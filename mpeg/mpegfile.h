@@ -171,10 +171,23 @@ namespace TagLib {
        * file.  By default it strips all tags.  It returns true if the tags are
        * successfully stripped.
        *
+       * This is equivalent to strip(tags, true)
+       *
        * \note This will also invalidate pointers to the ID3v2 and ID3v1 tags
        * as their memory will be freed.
        */
       bool strip(int tags = AllTags);
+
+      /*!
+       * This will strip the tags that match the OR-ed together TagTypes from the
+       * file.  By default it strips all tags.  It returns true if the tags are
+       * successfully stripped.
+       *
+       * If \a freeMemory is true the ID3v1 and ID3v2 tags will be deleted and
+       * pointers to them will be invalidated.
+       */
+      // BIC: merge with the method above
+      bool strip(int tags, bool freeMemory);
 
       /*!
        * Set the ID3v2::FrameFactory to something other than the default.
