@@ -43,9 +43,14 @@ namespace TagLib {
       /*!
        * Create an instance of FLAC::Properties with the data read from the
        * ByteVector \a data.
-       * BIC: API changed since last stable release
        */
       Properties(ByteVector data, long streamLength, ReadStyle style = Average);
+
+      /*!
+       * Create an instance of FLAC::Properties with the data read from the
+       * FLAC::File \a file.
+       */
+      Properties(File *file, ReadStyle style = Average); // BIC: remove
 
       /*!
        * Destroys this FLAC::Properties instance.

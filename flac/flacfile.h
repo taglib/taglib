@@ -98,10 +98,16 @@ namespace TagLib {
       void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
       /*!
+       * Returns the block of data used by FLAC::Properties for parsing the
+       * stream properties.
+       */
+      ByteVector streamInfoData(); // BIC: remove
+
+      /*!
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
        */
-      long streamLength();
+      long streamLength();  // BIC: remove
 
     private:
       File(const File &);
@@ -111,7 +117,6 @@ namespace TagLib {
       void scan();
       long findID3v2();
       long findID3v1();
-      ByteVector streamInfoData();
       ByteVector xiphCommentData();
 
       class FilePrivate;
