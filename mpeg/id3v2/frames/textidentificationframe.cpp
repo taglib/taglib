@@ -38,15 +38,15 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TextIdentificationFrame::TextIdentificationFrame(const ByteVector &type, String::Type encoding)
-    : Frame(type)
+TextIdentificationFrame::TextIdentificationFrame(const ByteVector &type, String::Type encoding) :
+  Frame(type)
 {
   d = new TextIdentificationFramePrivate;
   d->textEncoding = encoding;
 }
 
-TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data)
-    : Frame(data)
+TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data) :
+  Frame(data)
 {
   d = new TextIdentificationFramePrivate;
   setData(data);
