@@ -19,6 +19,8 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#include <config.h>
+
 #include <tdebug.h>
 
 #include "id3v2framefactory.h"
@@ -66,16 +68,18 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 {
   Frame::Header *header = new Frame::Header(data, version);
 
-  // TagLib doesn't mess with encrypted or compressed frames, so just treat them
+  // TagLib doesn't mess with encrypted frames, so just treat them
   // as unknown frames.
 
+#if HAVE_ZLIB == 0
   if(header->compression()) {
-      debug("Compressed frames are currently not supported.");
-      return new UnknownFrame(data, header);
+    debug("Compressed frames are currently not supported.");
+    return new UnknownFrame(data, header);
   }
+#endif
   if(header->encryption()) {
-      debug("Entrypted frames are currently not supported.");
-      return new UnknownFrame(data, header);
+    debug("Encrypted frames are currently not supported.");
+    return new UnknownFrame(data, header);
   }
 
   TagLib::ByteVector frameID = header->frameID();
@@ -84,7 +88,7 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
   // characters.  Also make sure that there is data in the frame.
 
   if(!frameID.size() == (version < 3 ? 3 : 4) || header->frameSize() <= 0)
-      return 0;
+    return 0;
 
   for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
     if( (*it < 'A' || *it > 'Z') && (*it < '1' || *it > '9') ) {

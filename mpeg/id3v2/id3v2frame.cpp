@@ -19,7 +19,13 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#include <config.h>
+
 #include <bitset>
+
+#if HAVE_ZLIB
+#include <zlib.h>
+#endif
 
 #include <tdebug.h>
 
@@ -156,12 +162,26 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
   uint frameDataOffset = headerSize;
   uint frameDataLength = size();
 
-  if(d->header->dataLengthIndicator()) {
+  if(d->header->compression() || d->header->dataLengthIndicator()) {
     frameDataLength = frameData.mid(headerSize, 4).toUInt();
     frameDataOffset += 4;
   }
 
-  return frameData.mid(frameDataOffset, frameDataLength);  
+#if HAVE_ZLIB
+  if(d->header->compression()) {
+    ByteVector data(frameDataLength);
+    uLongf uLongTmp = frameDataLength;
+    ::uncompress((Bytef *) data.data(),
+                 (uLongf *) &uLongTmp,
+                 (Bytef *) frameData.data() + frameDataOffset,
+                 size());
+    return data;
+#else
+    return frameData.mid(frameDataOffset, frameDataLength);
+#endif
+  }
+  else
+    return frameData.mid(frameDataOffset, frameDataLength);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -258,7 +278,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
   case 1:
   case 2:
   {
-    // ID3v2.2 
+    // ID3v2.2
 
     if(data.size() < 3) {
       debug("You must at least specify a frame ID.");
