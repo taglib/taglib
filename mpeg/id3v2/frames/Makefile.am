@@ -11,6 +11,7 @@ libframes_la_SOURCES = \
 	commentsframe.cpp \
 	relativevolumeframe.cpp \
 	textidentificationframe.cpp \
+	uniquefileidentifierframe.cpp \
 	unknownframe.cpp
 
 taglib_include_HEADERS = \
@@ -18,6 +19,7 @@ taglib_include_HEADERS = \
 	commentsframe.h \
 	relativevolumeframe.h \
 	textidentificationframe.h \
+	uniquefileidentifierframe.h \
 	unknownframe.h
 
 taglib_includedir = $(includedir)/taglib

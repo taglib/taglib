@@ -27,6 +27,7 @@
 #include "frames/commentsframe.h"
 #include "frames/relativevolumeframe.h"
 #include "frames/textidentificationframe.h"
+#include "frames/uniquefileidentifierframe.h"
 #include "frames/unknownframe.h"
 
 using namespace TagLib;
@@ -134,8 +135,15 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
     return f;
   }
 
+  // Relative Volume Adjustment (frames 4.11)
+
   if(frameID == "RVA2")
     return new RelativeVolumeFrame(data, header);
+
+  // Unique File Identifier (frames 4.1)
+
+  if(frameID == "UFID")
+    return new UniqueFileIdentifierFrame(data, header);
 
   return new UnknownFrame(data, header);
 }
