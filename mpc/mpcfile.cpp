@@ -54,6 +54,9 @@ public:
   ~FilePrivate()
   {
     delete ID3v1Tag;
+    delete APETag;
+    delete tag;
+    delete ID3v2Header;
     delete properties;
   }
 
@@ -227,7 +230,7 @@ void MPC::File::remove(int tags)
     if(d->APETag)
       d->tag = d->APETag;
     else
-      d->tag = d->APETag = new APE::Tag();
+      d->tag = d->APETag = new APE::Tag;
   }
 
   if(tags & ID3v2) {
@@ -242,7 +245,7 @@ void MPC::File::remove(int tags)
     if(d->ID3v1Tag)
       d->tag = d->ID3v1Tag;
     else
-      d->tag = d->APETag = new APE::Tag();
+      d->tag = d->APETag = new APE::Tag;
   }
 }
 
@@ -284,7 +287,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
       if(d->hasAPE)
         d->tag = d->APETag;
       else
-        d->tag = d->APETag = new APE::Tag();
+        d->tag = d->APETag = new APE::Tag;
     }
   }
 

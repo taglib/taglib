@@ -11,6 +11,8 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/mpeg \
 	-I$(top_srcdir)/taglib/mpeg/id3v1 \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 \
+	-I$(top_srcdir)/taglib/ogg \
+	-I$(top_srcdir)/taglib/ogg/vorbis \
 	-I$(top_srcdir)/taglib/bindings/c
 
 LDADD = ../libtag.la

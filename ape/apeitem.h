@@ -70,6 +70,11 @@ namespace TagLib {
       Item(const Item &item);
 
       /*!
+       * Destroys the item.
+       */
+      virtual ~Item();
+
+      /*!
        * Copies the contents of \a item into this item.
        */
       Item &operator=(const Item &item);
