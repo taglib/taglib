@@ -31,7 +31,7 @@ using namespace TagLib;
 class MPC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(ByteVector d, long st, ReadStyle s) :
+  PropertiesPrivate(const ByteVector &d, long st, ReadStyle s) :
     data(d),
     streamLength(st),
     style(s),
@@ -106,7 +106,7 @@ static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 
 void MPC::Properties::read()
 {
-  if(d->data.mid(0,3) != "MP+")
+  if(d->data.mid(0, 3) != "MP+")
     return;
 
   d->version = d->data[3] & 15;
@@ -137,5 +137,4 @@ void MPC::Properties::read()
 
   if(!d->bitrate)
     d->bitrate = ((d->streamLength * 8L) / d->length) / 1000;
-
 }

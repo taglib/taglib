@@ -133,7 +133,7 @@ bool MPC::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
 {
   // Look for an APE tag
 

@@ -247,7 +247,7 @@ void APE::Tag::setYear(uint i)
 
 void APE::Tag::setTrack(uint i)
 {
-  if(i <=0 )
+  if(i <= 0)
     removeComment("Track");
   else
     d->items["Track"] = String::number(i);
@@ -255,7 +255,7 @@ void APE::Tag::setTrack(uint i)
 
 void APE::Tag::removeComment(const String &key) {
   Map<String,String>::Iterator it = d->items.find(key);
-  if (it != d->items.end())
+  if(it != d->items.end())
     d->items.erase(it);
 }
 
@@ -267,7 +267,7 @@ void APE::Tag::addComment(const String &key, const String &value)
     d->items[key] = value;
 }
 
-TagLib::uint APE::Tag::tagSize(ByteVector footer)
+TagLib::uint APE::Tag::tagSize(const ByteVector &footer)
 {
   // The reported length (excl. header)
 
@@ -293,11 +293,11 @@ void APE::Tag::read()
 
     // parse footer and some initial sanity checking
     if(footer.size() == 32 && footer.mid(0, 8) == "APETAGEX") {
-      uint length = footer.mid(12,4).toUInt(false);
-      uint count = footer.mid(16,4).toUInt(false);
+      uint length = footer.mid(12, 4).toUInt(false);
+      uint count = footer.mid(16, 4).toUInt(false);
       d->tagLength = length;
-      d->file->seek(d->tagOffset + 32 -length);
-      ByteVector data = d->file->readBlock(length-32);
+      d->file->seek(d->tagOffset + 32 - length);
+      ByteVector data = d->file->readBlock(length - 32);
       parse(data, count);
     }
     else

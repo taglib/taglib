@@ -67,7 +67,7 @@ namespace TagLib {
       /*!
        * Returns the size of the tag calculated based on the footer.
        */
-      static uint tagSize(ByteVector footer);
+      static uint tagSize(const ByteVector &footer);
 
       // Reimplementations.
 
