@@ -677,7 +677,7 @@ void String::prepare(Type t)
       debug("String::prepare() - Unicode conversion error.");
 
 
-    int newSize = target - targetBuffer - 1;
+    int newSize = target != targetBuffer ? target - targetBuffer - 1 : 0;
     d->data.resize(newSize);
 
     for(int i = 0; i < newSize; i++)
