@@ -41,7 +41,7 @@ public:
 
   ~FilePrivate()
   {
-    delete [] name;
+    free((void *)name);
   }
 
   FILE *file;
@@ -57,7 +57,7 @@ public:
 
 File::File(const char *file)
 {
-  d = new FilePrivate(strdup(file));
+  d = new FilePrivate(::strdup(file));
 
   d->readOnly = !isWritable(file);
   d->file = fopen(file, d->readOnly ? "r" : "r+");

@@ -71,18 +71,6 @@ namespace TagLib {
     uint refCount;
   };
 
-  /*!
-   * A simple strdup implementation since the standard one creates some wierdness
-   * with delete.
-   */
-  static inline char *strdup(const char *s)
-  {
-    const int l = ::strlen(s);
-    char *buffer = new char[l];
-    ::memcpy(buffer, s, l);
-    return buffer;
-  }
-
 #endif // DO_NOT_DOCUMENT
 
 }
