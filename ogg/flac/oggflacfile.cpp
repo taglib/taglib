@@ -189,7 +189,7 @@ void Ogg::FLAC::File::scan()
 
   if (!metadataHeader.startsWith("fLaC"))  {
     // FLAC 1.1.2+
-    if (metadataHeader.startsWith("\x7fFLAC")) return;
+    if (metadataHeader.mid(1,4) != "FLAC") return;
 
     if (metadataHeader[5] != 1) return; // not version 1
 
