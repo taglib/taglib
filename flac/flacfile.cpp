@@ -132,7 +132,7 @@ void FLAC::File::save()
       Tag::duplicate(d->tag, d->comment, true);
   }
 
-  d->xiphCommentData = d->comment->render();
+  d->xiphCommentData = d->comment->render(false);
 
   ByteVector v = ByteVector::fromUInt(d->xiphCommentData.size());
 

@@ -198,6 +198,11 @@ void Ogg::XiphComment::removeField(const String &key, const String &value)
 
 ByteVector Ogg::XiphComment::render() const
 {
+  return render(true);
+}
+
+ByteVector Ogg::XiphComment::render(bool addFramingBit) const
+{
   ByteVector data;
 
   // Add the vendor ID length and the vendor ID.  It's important to use the
@@ -238,8 +243,9 @@ ByteVector Ogg::XiphComment::render() const
   }
 
   // Append the "framing bit".
-
-  data.append(char(1));
+ 
+  if(addFramingBit)
+    data.append(char(1));
 
   return data;
 }
