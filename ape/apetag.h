@@ -39,14 +39,18 @@ namespace TagLib {
     /*!
      * A non-binary APE-item.
      */
-    struct Item {
-        Item() {};
-        explicit Item(const String&);
-        explicit Item(const StringList&);
-        bool readOnly;
-        bool locator; // URL to external data
-        StringList value;
-        bool isEmpty() const;
+    struct Item
+    {
+      Item() {};
+      explicit Item(const String &);
+      explicit Item(const StringList &);
+      bool readOnly;
+      /*!
+       * The value is a URL to external data
+       */
+      bool locator;
+      StringList value;
+      bool isEmpty() const;
     };
 
     /*!
@@ -57,7 +61,7 @@ namespace TagLib {
     typedef Map<const String, Item> ItemListMap;
 
 
-  //! An APE tag implementation
+    //! An APE tag implementation
 
     class Tag : public TagLib::Tag
     {

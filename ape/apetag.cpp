@@ -30,6 +30,49 @@
 using namespace TagLib;
 using namespace APE;
 
+static ByteVector renderAPEItem(const String &key, const Item &item)
+{
+  ByteVector data;
+  TagLib::uint flags = ((item.readOnly) ? 1 : 0) | ((item.locator) ? 2 : 0);
+  ByteVector value;
+
+  if(item.value.isEmpty())
+    return data;
+
+  StringList::ConstIterator it = item.value.begin();
+  value.append(it->data(String::UTF8));
+  it++;
+  while(it != item.value.end()) {
+    value.append('\0');
+    value.append(it->data(String::UTF8));
+    it++;
+  }
+
+  data.append(ByteVector::fromUInt(value.size(), false));
+  data.append(ByteVector::fromUInt(flags, false));
+  data.append(key.data(String::UTF8));
+  data.append(ByteVector('\0'));
+  data.append(value);
+
+  return data;
+}
+
+static StringList parseAPEString(const ByteVector &data)
+{
+  StringList value;
+  int pOld = 0;
+  int p = data.find('\0');
+
+  while (p != -1) {
+    value.append(String(data.mid(pOld, p), String::UTF8));
+    pOld = p + 1;
+    p = data.find('\0', pOld);
+  }
+  value.append(String(data.mid(pOld), String::UTF8));
+
+  return value;
+}
+
 class APE::Tag::TagPrivate
 {
 public:
@@ -45,11 +88,13 @@ public:
   Map<const String, ByteVector> binaries;
 };
 
-APE::Item::Item(const String& str) : readOnly(false), locator(false) {
+APE::Item::Item(const String& str) : readOnly(false), locator(false)
+{
   value.append(str);
 }
 
-APE::Item::Item(const StringList& values) : readOnly(false), locator(false) {
+APE::Item::Item(const StringList& values) : readOnly(false), locator(false)
+{
   value.append(values);
 }
 
@@ -81,54 +126,28 @@ APE::Tag::~Tag()
   delete d;
 }
 
-using TagLib::uint;
-
-static ByteVector _render_APEItem(String key, Item item)
-{
-  ByteVector data;
-  uint flags = ((item.readOnly) ? 1 : 0) | ((item.locator) ? 2 : 0);
-  ByteVector value;
-
-  if (item.value.isEmpty()) return data;
-
-  StringList::Iterator it = item.value.begin();
-  value.append(it->data(String::UTF8));
-  it++;
-  while (it != item.value.end()) {
-    value.append('\0');
-    value.append(it->data(String::UTF8));
-    it++;
-  }
-
-  data.append(ByteVector::fromUInt(value.size(), false));
-  data.append(ByteVector::fromUInt(flags, false));
-  data.append(key.data(String::UTF8));
-  data.append(ByteVector('\0'));
-  data.append(value);
-
-  return data;
-}
-
 ByteVector APE::Tag::render() const
 {
   ByteVector data;
   uint itemCount = 0;
 
-  { Map<const String,Item>::Iterator i = d->itemListMap.begin();
-    while (i != d->itemListMap.end()) {
-      if (!i->second.value.isEmpty()) {
-        data.append(_render_APEItem(i->first, i->second));
+  {
+    Map<const String,Item>::Iterator i = d->itemListMap.begin();
+    while(i != d->itemListMap.end()) {
+      if(!i->second.value.isEmpty()) {
+        data.append(renderAPEItem(i->first, i->second));
         itemCount++;
       }
       i++;
     }
   }
 
-  { Map<String,ByteVector>::Iterator i = d->binaries.begin();
-    while (i != d->binaries.end()) {
-      if (!i->second.isEmpty()) {
-          data.append(i->second);
-          itemCount++;
+  {
+    Map<String,ByteVector>::Iterator i = d->binaries.begin();
+    while(i != d->binaries.end()) {
+      if(!i->second.isEmpty()) {
+        data.append(i->second);
+        itemCount++;
       }
       i++;
     }
@@ -235,7 +254,7 @@ void APE::Tag::setTrack(uint i)
     addValue("TRACK", String::number(i), true);
 }
 
-APE::Footer* APE::Tag::footer() const
+APE::Footer *APE::Tag::footer() const
 {
   return &d->footer;
 }
@@ -245,7 +264,8 @@ const APE::ItemListMap& APE::Tag::itemListMap() const
   return d->itemListMap;
 }
 
-void APE::Tag::removeItem(const String &key) {
+void APE::Tag::removeItem(const String &key)
+{
   Map<const String, Item>::Iterator it = d->itemListMap.find(key.upper());
   if(it != d->itemListMap.end())
     d->itemListMap.erase(it);
@@ -257,7 +277,7 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
     removeItem(key);
   if(!value.isEmpty()) {
     Map<const String, Item>::Iterator it = d->itemListMap.find(key.upper());
-    if (it != d->itemListMap.end())
+    if(it != d->itemListMap.end())
       d->itemListMap[key].value.append(value);
     else
       setItem(key, Item(value));
@@ -280,7 +300,8 @@ void APE::Tag::read()
     d->file->seek(d->tagOffset);
     d->footer.setData(d->file->readBlock(Footer::size()));
 
-    if(d->footer.tagSize() == 0 || d->footer.tagSize() > d->file->length())
+    if(d->footer.tagSize() == 0 ||
+       d->footer.tagSize() > uint(d->file->length()))
       return;
 
     d->file->seek(d->tagOffset + Footer::size() - d->footer.tagSize());
@@ -288,41 +309,25 @@ void APE::Tag::read()
   }
 }
 
-static StringList _parse_APEString(ByteVector val)
-{
-    StringList value;
-    int pold = 0;
-    int p = val.find('\0');
-    while (p != -1) {
-        value.append(String(val.mid(pold, p), String::UTF8));
-        pold = p+1;
-        p = val.find('\0', pold);
-    };
-    value.append(String(val.mid(pold), String::UTF8));
-
-    return value;
-}
-
 void APE::Tag::parse(const ByteVector &data, uint count)
 {
   uint pos = 0;
-  uint vallen, flags;
-  String key, value;
+
   while(count > 0) {
-    vallen = data.mid(pos+0,4).toUInt(false);
-    flags = data.mid(pos+4,4).toUInt(false);
-    key = String(data.mid(pos+8), String::UTF8);
+    uint valueLength = data.mid(pos + 0, 4).toUInt(false);
+    uint flags = data.mid(pos + 4, 4).toUInt(false);
+    String key = String(data.mid(pos + 8), String::UTF8);
     key = key.upper();
     APE::Item item;
 
-    if (flags < 4 ) {
-      ByteVector val = data.mid(pos+8+key.size()+1, vallen);
-      d->itemListMap.insert(key, Item(_parse_APEString(val)));
-    } else {
-      d->binaries.insert(key,data.mid(pos, 8+key.size()+1+vallen));
+    if(flags < 4 ) {
+      ByteVector val = data.mid(pos + 8 + key.size() + 1, valueLength);
+      d->itemListMap.insert(key, Item(parseAPEString(val)));
     }
+    else
+      d->binaries.insert(key, data.mid(pos, 8 + key.size() + 1 + valueLength));
 
-    pos += 8 + key.size() + 1 + vallen;
+    pos += 8 + key.size() + 1 + valueLength;
     count--;
   }
 }

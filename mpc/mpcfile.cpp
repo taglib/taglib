@@ -58,7 +58,7 @@ public:
   }
 
   APE::Tag *APETag;
-  long APEFooter;
+  // long APEFooter;
   long APELocation;
   uint APESize;
 
@@ -110,39 +110,32 @@ bool MPC::File::save()
 
   // Update ID3v1 tag
 
-  if(d->ID3v1Tag)
-  {
-    if(d->hasID3v1)
-    {
-        seek(-128, End);
-        writeBlock(d->ID3v1Tag->render());
+  if(d->ID3v1Tag) {
+    if(d->hasID3v1) {
+      seek(-128, End);
+      writeBlock(d->ID3v1Tag->render());
     }
-    else
-    {
-        seek(0, End);
-        writeBlock(d->ID3v1Tag->render());
+    else {
+      seek(0, End);
+      writeBlock(d->ID3v1Tag->render());
     }
   }
 
   // Update APE tag
 
-  if(d->APETag)
-  {
+  if(d->APETag) {
     if(d->hasAPE)
-    {
-        insert(d->APETag->render(), d->APELocation, d->APESize);
-    }
-    else
-      if (d->hasID3v1)
-      {
+      insert(d->APETag->render(), d->APELocation, d->APESize);
+    else {
+      if(d->hasID3v1)  {
         seek(-128, End);
         insert(d->APETag->render(), tell(), 0);
       }
-      else
-      {
+      else {
         seek(0, End);
         writeBlock(d->APETag->render());
       }
+    }
   }
 
   return true;
@@ -156,10 +149,12 @@ ID3v1::Tag *MPC::File::ID3v1Tag(bool create)
   // no ID3v1 tag exists and we've been asked to create one
 
   d->ID3v1Tag = new ID3v1::Tag;
-  if (d->APETag)
+
+  if(d->APETag)
     d->tag = new CombinedTag(d->APETag, d->ID3v1Tag);
   else
     d->tag = d->ID3v1Tag;
+
   return d->ID3v1Tag;
 }
 
@@ -171,10 +166,12 @@ APE::Tag *MPC::File::APETag(bool create)
   // no APE tag exists and we've been asked to create one
 
   d->APETag = new APE::Tag;
-  if (d->ID3v1Tag)
+
+  if(d->ID3v1Tag)
     d->tag = new CombinedTag(d->APETag, d->ID3v1Tag);
   else
     d->tag = d->APETag;
+
   return d->APETag;
 }
 
@@ -207,16 +204,18 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
     d->hasAPE = true;
   }
 
-  if (d->hasID3v1 && d->hasAPE)
+  if(d->hasID3v1 && d->hasAPE)
     d->tag = new CombinedTag(d->APETag, d->ID3v1Tag);
-  else
-  if (d->hasID3v1)
-    d->tag = d->ID3v1Tag;
-  else
-  if (d->hasAPE)
-    d->tag = d->APETag;
-  else
-    d->tag = d->APETag = new APE::Tag();
+  else {
+    if(d->hasID3v1)
+      d->tag = d->ID3v1Tag;
+    else {
+      if(d->hasAPE)
+        d->tag = d->APETag;
+      else
+        d->tag = d->APETag = new APE::Tag();
+    }
+  }
 
   // Look for and skip an ID3v2 tag
 
@@ -244,11 +243,11 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
 
 long MPC::File::findAPE()
 {
-    if(isValid()) {
-    if (d->hasID3v1)
-        seek(-160, End);
+  if(isValid()) {
+    if(d->hasID3v1)
+      seek(-160, End);
     else
-        seek(-32, End);
+      seek(-32, End);
 
     long p = tell();
 
