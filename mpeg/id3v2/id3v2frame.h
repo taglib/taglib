@@ -170,6 +170,13 @@ namespace TagLib {
        */
       virtual ByteVector renderFields() const = 0;
 
+      /*!
+       * Returns a ByteVector containing the field data given the frame data.
+       * This correctly adjusts for the header size plus any additional frame
+       * data that's specified in the frame header flags.
+       */
+      ByteVector fieldData(const ByteVector &frameData) const;
+
     private:
       Frame(const Frame &);
       Frame &operator=(const Frame &);
@@ -283,6 +290,60 @@ namespace TagLib {
        * \deprecated Please see the explanation in the version above.
        */
       static uint size(uint version);
+
+      /*!
+       * Returns true if the flag for tag alter preservation is set.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool tagAlterPreservation() const;
+
+      /*!
+       * Returns true if the flag for frame alter preservation is set.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool frameAlterPreservation() const;
+
+      /*!
+       * Returns true if the frame is meant to be read only.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool readOnly() const;
+
+      /*!
+       * Returns true if the flag for the grouping identifity is set.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool groupingIdentity() const;
+
+      /*!
+       * Returns true if compression is enabled for this frame.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool compression() const;
+
+      /*!
+       * Returns true if encryption is enabled for this frame.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool encryption() const;
+
+      /*!
+       * Returns true if unsyncronisation is enabled for this frame.
+       *
+       * \note This flag is currently ignored internally in TagLib.
+       */
+      bool unsycronisation() const;
+
+      /*!
+       * Returns true if the flag for a data lenght indicator is set.
+       */
+      bool dataLengthIndicator() const;
 
       /*!
        * Render the Header back to binary format in a ByteVector.

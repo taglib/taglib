@@ -76,5 +76,5 @@ ByteVector UnknownFrame::renderFields() const
 UnknownFrame::UnknownFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new UnknownFramePrivate;
-  parseFields(data.mid(Header::size(h->version()), size()));
+  parseFields(fieldData(data));
 }

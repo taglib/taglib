@@ -146,5 +146,5 @@ ByteVector TextIdentificationFrame::renderFields() const
 TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new TextIdentificationFramePrivate;
-  parseFields(data.mid(Header::size(h->version()), size()));
+  parseFields(fieldData(data));
 }

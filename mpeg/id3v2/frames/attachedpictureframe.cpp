@@ -161,5 +161,5 @@ ByteVector AttachedPictureFrame::renderFields() const
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new AttachedPictureFramePrivate;
-  parseFields(data.mid(Header::size(h->version()), size()));
+  parseFields(fieldData(data));
 }

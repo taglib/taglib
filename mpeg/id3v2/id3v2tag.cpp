@@ -386,7 +386,7 @@ void ID3v2::Tag::read()
 
 void ID3v2::Tag::parse(const ByteVector &data)
 {
-  uint frameDataOffset = 0;
+  uint frameDataPosition = 0;
   uint frameDataLength = data.size();
 
   // check for extended header
@@ -396,7 +396,7 @@ void ID3v2::Tag::parse(const ByteVector &data)
       d->extendedHeader = new ExtendedHeader;
     d->extendedHeader->setData(data);
     if(d->extendedHeader->size() <= data.size()) {
-      frameDataOffset += d->extendedHeader->size();
+      frameDataPosition += d->extendedHeader->size();
       frameDataLength -= d->extendedHeader->size();
     }
   }
@@ -410,8 +410,6 @@ void ID3v2::Tag::parse(const ByteVector &data)
 
   // parse frames
 
-  uint frameDataPosition = 0;
-
   // Make sure that there is at least enough room in the remaining frame data for
   // a frame header.
 
@@ -421,7 +419,6 @@ void ID3v2::Tag::parse(const ByteVector &data)
     // portion of the frame data.
 
     if(data.at(frameDataPosition) == 0) {
-
       if(d->header.footerPresent())
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
 
@@ -429,7 +426,7 @@ void ID3v2::Tag::parse(const ByteVector &data)
       return;
     }
 
-    Frame *frame = d->factory->createFrame(data.mid(frameDataOffset + frameDataPosition),
+    Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
                                            d->header.majorVersion());
 
     if(!frame)

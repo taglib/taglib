@@ -133,5 +133,5 @@ ByteVector RelativeVolumeFrame::renderFields() const
 RelativeVolumeFrame::RelativeVolumeFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new RelativeVolumeFramePrivate;
-  parseFields(data.mid(Header::size(h->version()), size()));
+  parseFields(fieldData(data));
 }

@@ -148,5 +148,5 @@ ByteVector CommentsFrame::renderFields() const
 CommentsFrame::CommentsFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new CommentsFramePrivate();
-  parseFields(data.mid(Header::size(h->version()), size()));
+  parseFields(fieldData(data));
 }

@@ -19,6 +19,8 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#include <bitset>
+
 #include <tdebug.h>
 
 #include "id3v2frame.h"
@@ -30,11 +32,12 @@ using namespace ID3v2;
 class Frame::FramePrivate
 {
 public:
-  FramePrivate() {
-    header = 0;
-  }
+  FramePrivate() :
+    header(0)
+    {}
 
-  ~FramePrivate() {
+  ~FramePrivate()
+  {
     delete header;
   }
 
@@ -143,9 +146,22 @@ void Frame::parse(const ByteVector &data)
   else
     d->header = new Header(data);
 
-  // size() is the lenght of the field data
+  parseFields(fieldData(data));
+}
 
-  parseFields(data.mid(Header::size(d->header->version()), size()));
+ByteVector Frame::fieldData(const ByteVector &frameData) const
+{
+  uint headerSize = Header::size(d->header->version());
+
+  uint frameDataOffset = headerSize;
+  uint frameDataLength = size();
+
+  if(d->header->dataLengthIndicator()) {
+    frameDataLength = frameData.mid(headerSize, 4).toUInt();
+    frameDataOffset += 4;
+  }
+
+  return frameData.mid(frameDataOffset, frameDataLength);  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,11 +171,33 @@ void Frame::parse(const ByteVector &data)
 class Frame::Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() : frameSize(0), version(4) {}
+  HeaderPrivate() :
+    frameSize(0),
+    version(4),
+    tagAlterPreservation(false),
+    frameAlterPreservation(false),
+    readOnly(false),
+    groupingIdentity(false),
+    compression(false),
+    encryption(false),
+    unsyncronisation(false),
+    dataLengthIndicator(false)
+    {}
 
   ByteVector frameID;
   uint frameSize;
   uint version;
+
+  // flags
+
+  bool tagAlterPreservation;
+  bool frameAlterPreservation;
+  bool readOnly;
+  bool groupingIdentity;
+  bool compression;
+  bool encryption;
+  bool unsyncronisation;
+  bool dataLengthIndicator;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +251,7 @@ void Frame::Header::setData(const ByteVector &data, bool synchSafeInts)
 
 void Frame::Header::setData(const ByteVector &data, uint version)
 {
-  d->version = version;
+ d->version = version;
 
   switch(version) {
   case 0:
@@ -275,8 +313,21 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     else
       d->frameSize = data.mid(4, 4).toUInt();
 
-    // TODO: read flags
+    { // read the first byte of flags
+      std::bitset<8> flags(data[8]);
+      d->tagAlterPreservation   = flags[6]; // (structure 4.1.1.a)
+      d->frameAlterPreservation = flags[5]; // (structure 4.1.1.b)
+      d->readOnly               = flags[4]; // (structure 4.1.1.c)
+    }
 
+    { // read the second byte of flags
+      std::bitset<8> flags(data[9]);
+      d->groupingIdentity    = flags[6]; // (structure 4.1.2.h)
+      d->compression         = flags[3]; // (structure 4.1.2.k)
+      d->encryption          = flags[2]; // (structure 4.1.2.m)
+      d->unsyncronisation    = flags[1]; // (structure 4.1.2.n)
+      d->dataLengthIndicator = flags[0]; // (structure 4.1.2.p)
+    }
     break;
   }
   }
@@ -305,6 +356,46 @@ void Frame::Header::setFrameSize(uint size)
 TagLib::uint Frame::Header::version() const
 {
   return d->version;
+}
+
+bool Frame::Header::tagAlterPreservation() const
+{
+  return d->tagAlterPreservation;
+}
+
+bool Frame::Header::frameAlterPreservation() const
+{
+  return d->frameAlterPreservation;
+}
+
+bool Frame::Header::readOnly() const
+{
+  return d->readOnly;
+}
+
+bool Frame::Header::groupingIdentity() const
+{
+  return d->groupingIdentity;
+}
+
+bool Frame::Header::compression() const
+{
+  return d->compression;
+}
+
+bool Frame::Header::encryption() const
+{
+  return d->encryption;
+}
+
+bool Frame::Header::unsycronisation() const
+{
+  return d->unsyncronisation;
+}
+
+bool Frame::Header::dataLengthIndicator() const
+{
+  return d->dataLengthIndicator;
 }
 
 ByteVector Frame::Header::render() const
