@@ -101,6 +101,8 @@ FileRef &FileRef::operator=(const FileRef &ref)
 
   d = ref.d;
 
+  d->ref();
+
   return *this;
 }
 
