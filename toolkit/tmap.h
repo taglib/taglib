@@ -112,9 +112,24 @@ namespace TagLib {
     bool isEmpty() const;
 
     /*!
+     * Find the first occurance of \a key.
+     */
+    Iterator find(const Key &key);
+
+    /*!
+     * Find the first occurance of \a key.
+     */
+    ConstIterator find(const Key &key) const;
+
+    /*!
      * Returns true if the map contains an instance of \a key.
      */
     bool contains(const Key &key) const;
+
+    /*!
+     * Erase the item at \a it from the list.
+     */
+    void erase(Iterator it);
 
     /*!
      * Returns a reference to the value associated with \a key.

@@ -102,9 +102,27 @@ bool Map<Key, T>::isEmpty() const
 }
 
 template <class Key, class T>
+typename Map<Key, T>::Iterator Map<Key, T>::find(const Key &key)
+{
+  return d->map.find(key);
+}
+
+template <class Key, class T>
+typename Map<Key,T>::ConstIterator Map<Key, T>::find(const Key &key) const
+{
+  return d->map.find(key);
+}
+
+template <class Key, class T>
 bool Map<Key, T>::contains(const Key &key) const
 {
   return d->map.find(key) != d->map.end();
+}
+
+template <class Key, class T>
+void Map<Key,T>::erase(Iterator it)
+{
+  d->map.erase(it);
 }
 
 template <class Key, class T>
