@@ -22,6 +22,8 @@
 #include <id3v2tag.h>
 #include <id3v2header.h>
 #include <id3v1tag.h>
+#include <apefooter.h>
+#include <apetag.h>
 #include <tdebug.h>
 
 #include <bitset>
@@ -172,11 +174,15 @@ public:
     ID3v2Tag(0),
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
+    APETag(0),
+    APELocation(-1),
+    APEOriginalSize(0),
     ID3v1Tag(0),
     ID3v1Location(-1),
     tag(0),
     hasID3v2(false),
     hasID3v1(false),
+    hasAPE(false),
     properties(0) {}
 
   ~FilePrivate() {
@@ -191,16 +197,21 @@ public:
   long ID3v2Location;
   uint ID3v2OriginalSize;
 
+  APE::Tag *APETag;
+  long APELocation;
+  uint APEOriginalSize;
+
   ID3v1::Tag *ID3v1Tag;
   long ID3v1Location;
 
   MPEGTag *tag;
 
-  // These indicate whether the file *on disk* has an ID3v[1/2] tag, not if
+  // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
 
   bool hasID3v2;
   bool hasID3v1;
+  bool hasAPE;
 
   Properties *properties;
 };
@@ -247,7 +258,7 @@ MPEG::Properties *MPEG::File::audioProperties() const
 
 bool MPEG::File::save()
 {
-  return save(ID3v1 | ID3v2);
+  return save(AllTags);
 }
 
 bool MPEG::File::save(int tags)
@@ -255,9 +266,9 @@ bool MPEG::File::save(int tags)
   if(tags == NoTags)
     return strip(AllTags);
 
-  if(!d->ID3v2Tag && !d->ID3v1Tag) {
+  if(!d->ID3v2Tag && !d->ID3v1Tag && !d->APETag) {
 
-    if(d->hasID3v1 || d->hasID3v2)
+    if(d->hasID3v1 || d->hasID3v2 || d->hasAPE)
       return strip(AllTags);
 
     return true;
@@ -271,10 +282,10 @@ bool MPEG::File::save(int tags)
   // Create the tags if we've been asked to.  Copy the values from the tag that
   // does exist into the new tag.
 
-  if(tags & ID3v2 && d->ID3v1Tag)
+  if((tags & ID3v2) && d->ID3v1Tag)
     Tag::duplicate(d->ID3v1Tag, ID3v2Tag(true), false);
 
-  if(tags & ID3v1 && d->ID3v2Tag)
+  if((tags & ID3v1) && d->ID3v2Tag)
     Tag::duplicate(d->ID3v2Tag, ID3v1Tag(true), false);
 
   bool success = true;
@@ -306,6 +317,30 @@ bool MPEG::File::save(int tags)
   else if(d->hasID3v1)
     success = strip(ID3v1, false) && success;
 
+  // Dont save an APE-tag unless one has been created
+  if((APE & tags) && d->APETag) {
+    if(d->hasAPE)
+      insert(d->APETag->render(), d->APELocation, d->APEOriginalSize);
+    else {
+      if(d->hasID3v1)  {
+        insert(d->APETag->render(), d->ID3v1Location, 0);
+        d->APEOriginalSize = d->APETag->footer()->completeTagSize();
+        d->hasAPE = true;
+        d->APELocation = d->ID3v1Location;
+        d->ID3v1Location += d->APEOriginalSize;
+      }
+      else {
+        seek(0, End);
+        d->APELocation = tell();
+        writeBlock(d->APETag->render());
+        d->APEOriginalSize = d->APETag->footer()->completeTagSize();
+        d->hasAPE = true;
+      }
+    }
+  }
+  else if(d->hasAPE)
+    success = strip(APE, false) && success;
+
   return success;
 }
 
@@ -331,6 +366,17 @@ ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
   return d->ID3v1Tag;
 }
 
+APE::Tag *MPEG::File::APETag(bool create)
+{
+  if(!create || d->APETag)
+    return d->APETag;
+
+  // no APE tag exists and we've been asked to create one
+
+  d->APETag = new APE::Tag;
+  return d->APETag;
+}
+
 bool MPEG::File::strip(int tags)
 {
   return strip(tags, true);
@@ -343,7 +389,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     return false;
   }
 
-  if(tags & ID3v2 && d->hasID3v2) {
+  if((tags & ID3v2) && d->hasID3v2) {
     removeBlock(d->ID3v2Location, d->ID3v2OriginalSize);
     d->ID3v2Location = -1;
     d->ID3v2OriginalSize = 0;
@@ -358,13 +404,27 @@ bool MPEG::File::strip(int tags, bool freeMemory)
       d->ID3v1Location = findID3v1();
   }
 
-  if(tags & ID3v1 && d->hasID3v1) {
+  if((tags & ID3v1) && d->hasID3v1) {
     truncate(d->ID3v1Location);
     d->ID3v1Location = -1;
     d->hasID3v1 = false;
     if(freeMemory) {
       delete d->ID3v1Tag;
       d->ID3v1Tag = 0;
+    }
+  }
+
+  if((tags & APE) && d->hasAPE) {
+    removeBlock(d->APELocation, d->APEOriginalSize);
+    d->APELocation = -1;
+    d->hasAPE = false;
+    if(d->hasID3v1) {
+      if (d->ID3v1Location > d->APELocation)
+        d->ID3v1Location -= d->APEOriginalSize;
+    }
+    if(freeMemory) {
+      delete d->APETag;
+      d->APETag = 0;
     }
   }
 
@@ -466,6 +526,19 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   if(d->ID3v1Location >= 0) {
     d->ID3v1Tag = new ID3v1::Tag(this, d->ID3v1Location);
     d->hasID3v1 = true;
+  }
+
+  // Look for an APE tag
+
+  d->APELocation = findAPE();
+
+  if(d->APELocation >= 0) {
+
+    d->APETag = new APE::Tag(this, d->APELocation);
+
+    d->APEOriginalSize = d->APETag->footer()->completeTagSize();
+
+    d->hasAPE = true;
   }
 
   if(readProperties)
@@ -590,6 +663,22 @@ long MPEG::File::findID3v1()
     long p = tell();
 
     if(readBlock(3) == ID3v1::Tag::fileIdentifier())
+      return p;
+  }
+  return -1;
+}
+
+long MPEG::File::findAPE()
+{
+  if(isValid()) {
+    if (d->hasID3v1)
+        seek(-160, End);
+    else
+        seek(-32, End);
+
+    long p = tell();
+
+    if(readBlock(8) == APE::Tag::fileIdentifier())
       return p;
   }
   return -1;

@@ -2,6 +2,7 @@ SUBDIRS = id3v1 id3v2
 INCLUDES = \
 	-I$(top_srcdir)/taglib\
 	-I$(top_srcdir)/taglib/toolkit \
+        -I$(top_srcdir)/taglib/ape \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 -I./id3v2 \
 	-I$(top_srcdir)/taglib/mpeg/id3v1 -I./id3v1 \
 	$(all_includes)
