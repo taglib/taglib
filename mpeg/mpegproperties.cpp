@@ -192,7 +192,7 @@ void MPEG::Properties::read()
       double timePerFrame = blockSize[firstHeader.layer()];
       timePerFrame = timePerFrame / firstHeader.sampleRate();
       d->length = int(timePerFrame * xingHeader.totalFrames());
-      d->bitrate = xingHeader.totalSize() * 8 / d->length / 1000;
+      d->bitrate = d->length == 0 ? 0 : xingHeader.totalSize() * 8 / d->length / 1000;
   }
 
   // Since there was no valid Xing header found, we hope that we're in a constant
