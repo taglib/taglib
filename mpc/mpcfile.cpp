@@ -144,7 +144,7 @@ bool MPC::File::save()
       removeBlock(d->ID3v1Location, 128);
       d->hasID3v1 = false;
       if(d->hasAPE) {
-        if(d->APELocation < d->ID3v1Location)
+        if(d->APELocation > d->ID3v1Location)
           d->APELocation -= 128;
       }
     }
