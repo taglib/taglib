@@ -155,12 +155,10 @@ void testByteVector()
   ByteVector intVector(2, 0);
   intVector[0] = char(0xfc);
   intVector[1] = char(0x00);
-  printResult(intVector.toUInt() == 64512);
-  printResult(intVector.toInt() == -1024);
+  printResult(intVector.toShort() == -1024);
   intVector[0] = char(0x04);
   intVector[1] = char(0x00);
-  printResult(intVector.toUInt() == 1024);
-  printResult(intVector.toInt() == 1024);
+  printResult(intVector.toShort() == 1024);
   
   ByteVector r0("**************");
   ByteVector r1("OggS**********");
