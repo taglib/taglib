@@ -87,7 +87,7 @@ Properties *Ogg::FLAC::File::audioProperties() const
 }
 
 
-void Ogg::FLAC::File::save()
+bool Ogg::FLAC::File::save()
 {
   d->xiphCommentData = d->comment->render();
 
@@ -110,7 +110,7 @@ void Ogg::FLAC::File::save()
 
   setPacket(d->commentPacket, v);
 
-  Ogg::File::save();
+  return Ogg::File::save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

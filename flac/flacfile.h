@@ -108,8 +108,10 @@ namespace TagLib {
        * Save the file.  This will primarily save the XiphComment, but
        * will also keep any old ID3-tags up to date. If the file
        * has no XiphComment, one will be constructed from the ID3-tags.
+       *
+       * This returns true if the save was successful.
        */
-      virtual void save();
+      virtual bool save();
 
       /*!
        * Returns a pointer to the ID3v2 tag of the file.

@@ -122,8 +122,13 @@ FLAC::Properties *FLAC::File::audioProperties() const
 }
 
 
-void FLAC::File::save()
+bool FLAC::File::save()
 {
+  if(readOnly()) {
+    debug("FLAC::File::save() - Cannot save to a read only file.");
+    return false;
+  }
+
   // Create new vorbis comments
 
   if(!d->comment) {
@@ -214,6 +219,7 @@ void FLAC::File::save()
     writeBlock(d->ID3v1Tag->render());
   }
 
+  return true;
 }
 
 ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)

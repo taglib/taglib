@@ -83,8 +83,9 @@ namespace TagLib {
 
       /*!
        * Save the file.  This will primarily save and update the XiphComment.
+       * Returns true if the save is successful.
        */
-      virtual void save();
+      virtual bool save();
 
       /*!
        * Returns the length of the audio-stream, used by FLAC::Properties for
