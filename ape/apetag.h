@@ -103,6 +103,15 @@ namespace TagLib {
        */
       Footer *footer() const;
 
+      /*!
+       * Returns a reference to the item list map.  This is an ItemListMap of
+       * all of the items in the tag.
+       *
+       * This is the most powerfull structure for accessing the items of the tag.
+       *
+       * \warning You should not modify this data structure directly, instead
+       * use setItem() and removeItem().
+       */
       const ItemListMap &itemListMap() const;
 
       /*!
@@ -118,7 +127,8 @@ namespace TagLib {
       void addValue(const String &key, const String &value, bool replace = true);
 
       /*!
-       * Sets the \a key comment to \a item.
+       * Sets the \a key item to the value of \a item. If an item with the \a key is already
+       * present, it will be replaced.
        */
       void setItem(const String &key, const Item &item);
 

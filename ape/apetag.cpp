@@ -30,22 +30,6 @@
 
 using namespace TagLib;
 using namespace APE;
-/*
-static StringList parseAPEString(const ByteVector &data)
-{
-  StringList value;
-  int pOld = 0;
-  int p = data.find('\0');
-
-  while (p != -1) {
-    value.append(String(data.mid(pOld, p), String::UTF8));
-    pOld = p + 1;
-    p = data.find('\0', pOld);
-  }
-  value.append(String(data.mid(pOld), String::UTF8));
-
-  return value;
-}*/
 
 class APE::Tag::TagPrivate
 {
