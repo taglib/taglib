@@ -187,11 +187,15 @@ using namespace TagLib;
 class ByteVector::ByteVectorPrivate : public RefCounter
 {
 public:
-  ByteVectorPrivate() : RefCounter() {}
-  ByteVectorPrivate(const std::vector<char> &v) : RefCounter(), data(v) {}
-  ByteVectorPrivate(TagLib::uint size, char value) : RefCounter(), data(size, value) {}
+  ByteVectorPrivate() : RefCounter(), size(0) {}
+  ByteVectorPrivate(const std::vector<char> &v) : RefCounter(), data(v), size(v.size()) {}
+  ByteVectorPrivate(TagLib::uint len, char value) : RefCounter(), data(len, value), size(len) {}
 
   std::vector<char> data;
+
+  // std::vector<T>::size() is very slow, so we'll cache the value
+
+  uint size;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,6 +259,7 @@ ByteVector::ByteVector(char c)
 {
   d = new ByteVectorPrivate;
   d->data.push_back(c);
+  d->size = 1;
 }
 
 ByteVector::ByteVector(const char *data, uint length)
@@ -279,16 +284,13 @@ void ByteVector::setData(const char *data, uint length)
 {
   detach();
 
-  for(uint i = 0; i < length; i++)
-    d->data.push_back(data[i]);
+  resize(length);
+  ::memcpy(&(d->data[0]), data, length);
 }
 
 void ByteVector::setData(const char *data)
 {
-  detach();
-
-  for(uint i = 0; data[i] != 0; i++)
-    d->data.push_back(data[i]);
+  setData(data, ::strlen(data));
 }
 
 char *ByteVector::data()
@@ -319,6 +321,7 @@ ByteVector ByteVector::mid(uint index, uint length) const
     endIt = d->data.end();
 
   v.d->data.insert(v.d->data.begin(), ConstIterator(d->data.begin() + index), endIt);
+  v.d->size = v.d->data.size();
 
   return v;
 }
@@ -397,8 +400,9 @@ void ByteVector::append(const ByteVector &v)
 {
   detach();
 
-  for(uint i = 0; i < v.size(); i++)
-    d->data.push_back(v[i]);
+  uint originalSize = d->size;
+  resize(d->size + v.d->size);
+  ::memcpy(&(d->data[0]) + originalSize, v.data(), v.size());
 }
 
 void ByteVector::clear()
@@ -409,11 +413,13 @@ void ByteVector::clear()
 
 TagLib::uint ByteVector::size() const
 {
-  return d->data.size();
+  return d->size;
 }
 
 ByteVector &ByteVector::resize(uint size, char padding)
 {
+  d->size = size;
+
   if(d->data.size() < size) {
     d->data.reserve(size);
     d->data.insert(d->data.end(), size - d->data.size(), padding);
@@ -529,14 +535,12 @@ bool ByteVector::operator!=(const char *s) const
 
 bool ByteVector::operator<(const ByteVector &v) const
 {
-  for(uint i = 0; i < size() && i < v.size(); i++) {
-    if(at(i) < v.at(i))
-      return true;
-    else if(at(i) > v.at(i))
-      return false;
-  }
+  int result = ::memcmp(data(), v.data(), d->size < v.d->size ? d->size : v.d->size);
 
-  return size() < v.size();
+  if(result != 0)
+    return result < 0;
+  else
+    return size() < v.size();
 }
 
 bool ByteVector::operator>(const ByteVector &v) const
