@@ -1,5 +1,5 @@
 /***************************************************************************
-    copyright            : (C) 2004 by Allan Sandfeld Jensen
+    copyright            : (C) 2004-2005 by Allan Sandfeld Jensen
     email                : kde@carewolf.org
  ***************************************************************************/
 
@@ -178,16 +178,33 @@ void Ogg::FLAC::File::scan()
   if(!isValid())
     return;
 
-  int ipacket = 1;
+  int ipacket = 0;
   long overhead = 0;
 
-  ByteVector metadataHeader = packet(ipacket);
-
+  ByteVector metadataHeader = packet(ipacket++);
   if(metadataHeader.isNull())
     return;
 
-  ByteVector header = metadataHeader.mid(0,4);
+  ByteVector header;
 
+  if (!metadataHeader.startsWith("fLaC"))  {
+    // FLAC 1.1.2+
+    if (metadataHeader.startsWith("\x7fFLAC")) return;
+
+    if (metadataHeader[5] != 1) return; // not version 1
+
+    metadataHeader = metadataHeader.mid(13);
+  }
+  else {
+    // FLAC 1.1.0 & 1.1.1
+    metadataHeader = packet(ipacket++);
+
+    if(metadataHeader.isNull())
+      return;
+
+  }
+
+  header = metadataHeader.mid(0,4);
   // Header format (from spec):
   // <1> Last-metadata-block flag
   // <7> BLOCK_TYPE
@@ -215,7 +232,10 @@ void Ogg::FLAC::File::scan()
   // Search through the remaining metadata
 
   while(!lastBlock) {
-    metadataHeader = packet(++ipacket);
+    metadataHeader = packet(ipacket++);
+
+    if(metadataHeader.isNull())
+      return;
 
     header = metadataHeader.mid(0, 4);
     blockType = header[0] & 0x7f;
