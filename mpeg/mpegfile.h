@@ -170,6 +170,9 @@ namespace TagLib {
        * This will strip the tags that match the OR-ed together TagTypes from the
        * file.  By default it strips all tags.  It returns true if the tags are
        * successfully stripped.
+       *
+       * \note This will also invalidate pointers to the ID3v2 and ID3v1 tags
+       * as their memory will be freed.
        */
       bool strip(int tags = AllTags);
 
