@@ -199,6 +199,8 @@ namespace TagLib {
        *
        * \warning You should not modify this data structure directly, instead
        * use addFrame() and removeFrame().
+       *
+       * \see frameList()
        */
       const FrameListMap &frameListMap() const;
 
@@ -213,6 +215,19 @@ namespace TagLib {
        * use addFrame() and removeFrame().
        */
       const FrameList &frameList() const;
+
+      /*!
+       * Returns the frame list for frames with the id \a frameID or an empty
+       * list if there are no frames of that type.  This is just a convenience
+       * and is equivalent to:
+       *
+       * \code
+       * frameListMap()[frameID];
+       * \endcode
+       *
+       * \see frameListMap()
+       */
+      const FrameList &frameList(const ByteVector &frameID);
 
       /*!
        * Add a frame to the tag.  At this point the tag takes ownership of

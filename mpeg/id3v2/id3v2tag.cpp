@@ -250,6 +250,11 @@ const FrameList &ID3v2::Tag::frameList() const
   return d->frameList;
 }
 
+const FrameList &ID3v2::Tag::frameList(const ByteVector &frameID)
+{
+  return d->frameListMap[frameID];
+}
+
 void ID3v2::Tag::addFrame(Frame *frame)
 {
   d->frameList.append(frame);
