@@ -278,6 +278,16 @@ namespace TagLib {
     static ByteVector fromUInt(uint value, bool mostSignificantByteFirst = true);
 
     /*!
+     * Creates a 2 byte ByteVector based on \a value.  If
+     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * in building the ByteVector.  For example if \a mostSignificantByteFirst is
+     * true then $00 01 == 0x0001 == 1, if false, $01 00 == 0x0100 == 1.
+     *
+     * \see toShort()
+     */
+    static ByteVector fromShort(short value, bool mostSignificantByteFirst = true);
+
+    /*!
      * Creates a 8 byte ByteVector based on \a value.  If
      * \a mostSignificantByteFirst is true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is

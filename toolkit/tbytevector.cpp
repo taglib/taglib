@@ -197,6 +197,19 @@ namespace TagLib {
 
     return sum;
   }
+
+  template <class T>
+  ByteVector fromNumber(T value, bool mostSignificantByteFirst)
+  {
+    int size = sizeof(T);
+
+    ByteVector v(size, 0);
+
+    for(int i = 0; i < size; i++)
+      v[i] = uchar(value >> ((mostSignificantByteFirst ? size - 1 - i : i) * 8) & 0xff);
+
+    return v;
+  }
 }
 
 using namespace TagLib;
@@ -235,22 +248,17 @@ ByteVector ByteVector::fromCString(const char *s, uint length)
 
 ByteVector ByteVector::fromUInt(uint value, bool mostSignificantByteFirst)
 {
-  ByteVector v(4, 0);
+  return fromNumber<uint>(value, mostSignificantByteFirst);
+}
 
-  for(int i = 0; i < 4; i++)
-    v[i] = uchar(value >> ((mostSignificantByteFirst ? 3 - i : i) * 8) & 0xff);
-
-  return v;
+ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
+{
+  return fromNumber<short>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)
 {
-  ByteVector v(8, 0);
-
-  for(int i = 0; i < 8; i++)
-    v[i] = uchar(value >> ((mostSignificantByteFirst ? 7 - i : i) * 8) & 0xff);
-
-  return v;
+  return fromNumber<long long>(value, mostSignificantByteFirst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
