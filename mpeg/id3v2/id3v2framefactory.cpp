@@ -23,10 +23,11 @@
 
 #include "id3v2framefactory.h"
 
-#include "frames/unknownframe.h"
-#include "frames/textidentificationframe.h"
-#include "frames/commentsframe.h"
 #include "frames/attachedpictureframe.h"
+#include "frames/commentsframe.h"
+#include "frames/relativevolumeframe.h"
+#include "frames/textidentificationframe.h"
+#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -117,6 +118,9 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
       f->setTextEncoding(d->defaultEncoding);
     return f;
   }
+
+  if(frameID == "RVA2")
+    return new RelativeVolumeFrame(data, header);
 
   return new UnknownFrame(data, header);
 }

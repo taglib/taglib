@@ -8,12 +8,14 @@ noinst_LTLIBRARIES = libframes.la
 libframes_la_SOURCES = \
 	attachedpictureframe.cpp \
 	commentsframe.cpp \
+	relativevolumeframe.cpp \
 	textidentificationframe.cpp \
 	unknownframe.cpp
 
 taglib_include_HEADERS = \
 	attachedpictureframe.h \
 	commentsframe.h \
+	relativevolumeframe.h \
 	textidentificationframe.h \
 	unknownframe.h
 
