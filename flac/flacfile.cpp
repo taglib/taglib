@@ -256,7 +256,7 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     d->tag = new FLAC::Tag(new Ogg::XiphComment);
 
   if(readProperties)
-    d->properties = new Properties(this, propertiesStyle);
+    d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
 }
 
 ByteVector FLAC::File::streamInfoData()

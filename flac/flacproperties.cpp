@@ -30,8 +30,9 @@ using namespace TagLib;
 class FLAC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
+  PropertiesPrivate(ByteVector d, long st, ReadStyle s) :
+    data(d),
+    streamLength(st),
     style(s),
     length(0),
     bitrate(0),
@@ -39,7 +40,8 @@ public:
     sampleWidth(0),
     channels(0) {}
 
-  File *file;
+  ByteVector data;
+  long streamLength;
   ReadStyle style;
   int length;
   int bitrate;
@@ -52,9 +54,9 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+FLAC::Properties::Properties(ByteVector data, long streamLength, ReadStyle style) : AudioProperties(style)
 {
-  d = new PropertiesPrivate(file, style);
+  d = new PropertiesPrivate(data, streamLength, style);
   read();
 }
 
@@ -94,10 +96,6 @@ int FLAC::Properties::channels() const
 
 void FLAC::Properties::read()
 {
-  // Get the identification header.
-
-  ByteVector data = d->file->streamInfoData();
-
   int pos = 0;
 
   // Minimum block size (in samples)
@@ -112,7 +110,7 @@ void FLAC::Properties::read()
   // Maximum frame size (in bytes)
   pos += 3;
 
-  uint flags = data.mid(pos, 4).toUInt(true);
+  uint flags = d->data.mid(pos, 4).toUInt(true);
   d->sampleRate = flags >> 12;
   d->channels = ((flags >> 9) & 7) + 1;
   d->sampleWidth = ((flags >> 4) & 31) + 1;
@@ -123,16 +121,18 @@ void FLAC::Properties::read()
   uint highlength = (((flags & 0xf) << 28) / d->sampleRate) << 4;
   pos += 4;
 
-  d->length = (data.mid(pos, 4).toUInt(true)) / d->sampleRate + highlength;
+  d->length = (d->data.mid(pos, 4).toUInt(true)) / d->sampleRate + highlength;
   pos += 4;
 
   // Uncompressed bitrate:
   
-  // d->bitrate = ((d->sampleRate * d->channels) / 1000) * d->sampleWidth;
+  //d->bitrate = ((d->sampleRate * d->channels) / 1000) * d->sampleWidth;
   
   // Real bitrate:
   
-  d->bitrate = ((d->file->streamLength()*8L) / d->length)/1000;
-  
+  if (d->length)
+    d->bitrate = ((d->streamLength*8L) / d->length)/1000;
+  else
+    d->bitrate = 0;
   
 }
