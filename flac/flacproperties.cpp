@@ -102,6 +102,11 @@ int FLAC::Properties::channels() const
 
 void FLAC::Properties::read()
 {
+  if(d->data.size() < 18) {
+    debug("FLAC::Properties::read() - FLAC properties must contain at least 18 bytes.");
+    return;
+  }
+
   int pos = 0;
 
   // Minimum block size (in samples)
@@ -121,13 +126,13 @@ void FLAC::Properties::read()
   d->channels = ((flags >> 9) & 7) + 1;
   d->sampleWidth = ((flags >> 4) & 31) + 1;
 
-  // The last 4 bit are the most significant 4 bits for the 36bit
-  // streamlength in samples. (Audio files measured in days)
+  // The last 4 bits are the most significant 4 bits for the 36 bit
+  // stream length in samples. (Audio files measured in days)
 
-  uint highlength = (((flags & 0xf) << 28) / d->sampleRate) << 4;
+  uint highLength = (((flags & 0xf) << 28) / d->sampleRate) << 4;
   pos += 4;
 
-  d->length = (d->data.mid(pos, 4).toUInt(true)) / d->sampleRate + highlength;
+  d->length = (d->data.mid(pos, 4).toUInt(true)) / d->sampleRate + highLength;
   pos += 4;
 
   // Uncompressed bitrate:
@@ -136,8 +141,8 @@ void FLAC::Properties::read()
   
   // Real bitrate:
   
-  if (d->length)
-    d->bitrate = ((d->streamLength*8L) / d->length)/1000;
+  if(d->length)
+    d->bitrate = ((d->streamLength * 8L) / d->length) / 1000;
   else
     d->bitrate = 0;
   
