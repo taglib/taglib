@@ -81,6 +81,9 @@ typedef enum {
 /*!
  * Creates a TagLib file based on \a filename.  TagLib will try to guess the file
  * type.
+ * 
+ * \returns NULL if the file type cannot be determined or the file cannot
+ * be opened.
  */
 TagLib_File *taglib_file_new(const char *filename);
 
