@@ -203,7 +203,7 @@ namespace TagLib {
        * \deprecated Please use the constructor below that accepts a version
        * number.
        */
-      explicit Header(const ByteVector &data, bool synchSafeInts);
+      Header(const ByteVector &data, bool synchSafeInts);
 
       /*!
        * Construct a Frame Header based on \a data.  \a data must at least
