@@ -172,20 +172,24 @@ void Footer::parse(const ByteVector &data)
   // The first eight bytes, data[0..7], are the File Identifier, "APETAGEX".
 
   // Read the version number
+
   d->version = data.mid(8, 4).toUInt(false);
 
   // Read the tag size
+
   d->tagSize = data.mid(12, 4).toUInt(false);
 
   // Read the item count
+
   d->itemCount = data.mid(16, 4).toUInt(false);
 
   // Read the flags
+
   std::bitset<32> flags(data.mid(20, 4).toUInt(false));
 
-  d->headerPresent         = flags[31];
-  d->footerPresent         = !flags[30];
-  d->isHeader              = flags[29];
+  d->headerPresent = flags[31];
+  d->footerPresent = !flags[30];
+  d->isHeader = flags[29];
 
 }
 
@@ -194,6 +198,7 @@ ByteVector Footer::render(bool isHeader) const
   ByteVector v;
 
   // add the file identifier -- "APETAGEX"
+
   v.append(fileIdentifier());
 
   // add the version number -- we always render a 2.000 tag regardless of what
@@ -202,12 +207,15 @@ ByteVector Footer::render(bool isHeader) const
   v.append(ByteVector::fromUInt(2000, false));
 
   // add the tag size
+
   v.append(ByteVector::fromUInt(d->tagSize, false));
 
   // add the item count
+
   v.append(ByteVector::fromUInt(d->itemCount, false));
 
   // render and add the flags
+
   std::bitset<32> flags;
 
   flags[31] = d->headerPresent;
@@ -217,6 +225,7 @@ ByteVector Footer::render(bool isHeader) const
   v.append(ByteVector::fromUInt(flags.to_ulong(), false));
 
   // add the reserved 64bit
+
   v.append(ByteVector::fromLongLong(0));
 
   return v;

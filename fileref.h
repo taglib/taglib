@@ -69,6 +69,8 @@ namespace TagLib {
   {
   public:
 
+    FileRef();
+
     /*!
      * Create a FileRef from \a fileName.  If \a readAudioProperties is true then
      * the audio properties will be read using \a audioPropertiesStyle.  If

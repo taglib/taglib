@@ -31,9 +31,9 @@ using namespace TagLib;
 class MPC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(const ByteVector &d, long st, ReadStyle s) :
+  PropertiesPrivate(const ByteVector &d, long length, ReadStyle s) :
     data(d),
-    streamLength(st),
+    streamLength(length),
     style(s),
     version(0),
     length(0),
@@ -114,7 +114,7 @@ void MPC::Properties::read()
   unsigned int frames;
 
   if(d->version >= 7) {
-    frames = d->data.mid(4,4).toUInt(false);
+    frames = d->data.mid(4, 4).toUInt(false);
 
     std::bitset<32> flags = d->data.mid(8, 4).toUInt(true);
     d->sampleRate = sftable[flags[17] * 2 + flags[16]];

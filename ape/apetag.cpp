@@ -149,7 +149,7 @@ void APE::Tag::setGenre(const String &s)
 
 void APE::Tag::setYear(uint i)
 {
-  if(i <=0 )
+  if(i <= 0)
     removeItem("YEAR");
   else
     addValue("YEAR", String::number(i), true);
@@ -157,7 +157,7 @@ void APE::Tag::setYear(uint i)
 
 void APE::Tag::setTrack(uint i)
 {
-  if(i <=0 )
+  if(i <= 0)
     removeItem("TRACK");
   else
     addValue("TRACK", String::number(i), true);

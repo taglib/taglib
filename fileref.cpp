@@ -45,6 +45,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+FileRef::FileRef()
+{
+    d = new FileRefPrivate(0);
+}
+
 FileRef::FileRef(const char *fileName, bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle)
 {
