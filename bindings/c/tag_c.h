@@ -74,7 +74,8 @@ void taglib_set_string_management_enabled(BOOL management);
 typedef enum {
   TagLib_File_MPEG,
   TagLib_File_OggVorbis,
-  TagLib_File_FLAC
+  TagLib_File_FLAC,
+  TagLib_File_MPC
 } TagLib_File_Type;
 
 /*!

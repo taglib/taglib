@@ -26,6 +26,7 @@
 #include <vorbisfile.h>
 #include <mpegfile.h>
 #include <flacfile.h>
+#include <mpcfile.h>
 #include <tag.h>
 
 namespace TagLib
@@ -65,6 +66,8 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     return reinterpret_cast<TagLib_File *>(new Vorbis::File(filename));
   case TagLib_File_FLAC:
     return reinterpret_cast<TagLib_File *>(new FLAC::File(filename));
+  case TagLib_File_MPC:
+    return reinterpret_cast<TagLib_File *>(new MPC::File(filename));
   }
 
   return 0;
