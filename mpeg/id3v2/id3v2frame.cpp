@@ -176,11 +176,9 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
                  (Bytef *) frameData.data() + frameDataOffset,
                  size());
     return data;
-#else
-    return frameData.mid(frameDataOffset, frameDataLength);
-#endif
   }
   else
+#endif
     return frameData.mid(frameDataOffset, frameDataLength);
 }
 
