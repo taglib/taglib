@@ -320,7 +320,7 @@ void ID3v2::Tag::removeFrame(Frame *frame, bool del)
 
   // ...and delete as desired
   if(del)
-    delete *it;
+    delete frame;
 }
 
 void ID3v2::Tag::removeFrames(const ByteVector &id)
