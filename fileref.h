@@ -133,9 +133,9 @@ namespace TagLib {
     File *file() const;
 
     /*!
-     * Saves the file.
+     * Saves the file.  Returns true on success.
      */
-    void save();
+    bool save();
 
     /*!
      * Returns true if the file (and as such other pointers) are null.

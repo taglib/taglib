@@ -82,9 +82,9 @@ File *FileRef::file() const
   return d->file;
 }
 
-void FileRef::save()
+bool FileRef::save()
 {
-  d->file->save();
+  return d->file->save();
 }
 
 bool FileRef::isNull() const
