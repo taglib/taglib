@@ -139,10 +139,7 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
        *
-       * This method will return a null pointer if either the file can not be
-       * read from.
-       *
-       * If \a create is false (the default) it will also return a null pointer
+       * If \a create is false (the default) this will return a null pointer
        * if there is no valid ID3v2 tag.  If \a create is true it will create
        * an ID3v2 tag if one does not exist.
        *
@@ -155,10 +152,7 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * This method will return a null pointer if either the file can not be
-       * read from.
-       *
-       * If \a create is false (the default) it will also return a null pointer
+       * If \a create is false (the default) this will return a null pointer
        * if there is no valid ID3v1 tag.  If \a create is true it will create
        * an ID3v1 tag if one does not exist.
        *
