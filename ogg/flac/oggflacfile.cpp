@@ -65,7 +65,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::FLAC::File::File(const char *file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+                      Properties::ReadStyle propertiesStyle) : Ogg::File(file)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
@@ -93,7 +93,7 @@ void Ogg::FLAC::File::save()
 
   // Create FLAC metadata-block:
 
-  // Put the size in the first 32 bit ( I assume no more than 24 bit are used )
+  // Put the size in the first 32 bit (I assume no more than 24 bit are used)
 
   ByteVector v = ByteVector::fromUInt(d->xiphCommentData.size());
 
@@ -142,9 +142,8 @@ void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle properties
 
   if(d->hasXiphComment)
     d->comment = new Ogg::XiphComment(xiphCommentData());
-  else {
-    d->comment = new Ogg::XiphComment();
-  }
+  else
+    d->comment = new Ogg::XiphComment;
 
 
   if(readProperties)
@@ -184,7 +183,7 @@ void Ogg::FLAC::File::scan()
 
   ByteVector metadataHeader = packet(ipacket);
 
-  if (metadataHeader == ByteVector::null)
+  if(metadataHeader.isNull())
     return;
 
   ByteVector header = metadataHeader.mid(0,4);
@@ -192,7 +191,7 @@ void Ogg::FLAC::File::scan()
   // Header format (from spec):
   // <1> Last-metadata-block flag
   // <7> BLOCK_TYPE
-  //	0 : STREAMINFO
+  //    0 : STREAMINFO
   //    1 : PADDING
   //    ..
   //    4 : VORBIS_COMMENT
@@ -225,17 +224,16 @@ void Ogg::FLAC::File::scan()
     overhead += length;
 
     if(blockType == 1) {
-//      debug("Ogg::FLAC::File::scan() -- Padding found");
-    } else
-    if(blockType == 4) {
-//      debug("Ogg::FLAC::File::scan() -- Vorbis-comments found");
+      // debug("Ogg::FLAC::File::scan() -- Padding found");
+    }
+    else if(blockType == 4) {
+      // debug("Ogg::FLAC::File::scan() -- Vorbis-comments found");
       d->xiphCommentData = metadataHeader.mid(4, length);
       d->hasXiphComment = true;
       d->commentPacket = ipacket;
-    } else
-    if(blockType > 5) {
-      debug("Ogg::FLAC::File::scan() -- Unknown metadata block");
     }
+    else if(blockType > 5)
+      debug("Ogg::FLAC::File::scan() -- Unknown metadata block");
 
   }
 
