@@ -88,8 +88,14 @@ String::String(const std::string &s, Type t)
     return;
   }
 
-  for(std::string::const_iterator it = s.begin(); it != s.end(); it++)
-    d->data += uchar(*it);
+  int length = s.length();
+  d->data.resize(length);
+  wstring::iterator targetIt = d->data.begin();
+
+  for(std::string::const_iterator it = s.begin(); it != s.end(); it++) {
+    *targetIt = uchar(*it);
+    ++targetIt;
+  }
 
   prepare(t);
 }
@@ -115,8 +121,15 @@ String::String(const char *s, Type t)
     return;
   }
 
-  for(int i = 0; s[i] != 0; i++)
-    d->data += uchar(s[i]);
+  int length = ::strlen(s);
+  d->data.resize(length);
+
+  wstring::iterator targetIt = d->data.begin();
+
+  for(int i = 0; i < length; i++) {
+    *targetIt = uchar(s[i]);
+    ++targetIt;
+  }
 
   prepare(t);
 }
@@ -146,12 +159,25 @@ String::String(const ByteVector &v, Type t)
   d = new StringPrivate;
 
   if(t == Latin1 || t == UTF8) {
-    for(uint i = 0; i < v.size() && v[i]; i++)
-      d->data += uchar(v[i]);
+
+    d->data.resize(v.size());
+    wstring::iterator targetIt = d->data.begin();
+    for(ByteVector::ConstIterator it = v.begin(); it != v.end() && (*it); ++it) {
+      *targetIt = uchar(*it);
+      ++targetIt;
+    }
   }
   else  {
-    for(uint i = 0; i + 1 < v.size() && combine(v[i], v[i + 1]); i += 2)
-      d->data += combine(v[i], v[i + 1]);
+    d->data.resize(v.size() / 2);
+    wstring::iterator targetIt = d->data.begin();
+
+    for(ByteVector::ConstIterator it = v.begin();
+        it + 1 != v.end() && combine(*it, *(it + 1));
+        it += 2)
+    {
+      *targetIt = combine(*it, *(it + 1));
+      ++targetIt;
+    }
   }
   prepare(t);
 }
@@ -516,8 +542,14 @@ String &String::operator=(const char *s)
 
   d = new StringPrivate;
 
-  for(int i = 0; s[i] != 0; i++)
-    d->data += uchar(s[i]);
+  int length = ::strlen(s);
+  d->data.resize(length);
+
+  wstring::iterator targetIt = d->data.begin();
+  for(int i = 0; i < length; i++) {
+    *targetIt = uchar(s[i]);
+    ++targetIt;
+  }
 
   return *this;
 }
@@ -532,9 +564,11 @@ String &String::operator=(const ByteVector &v)
   wstring::iterator targetIt = d->data.begin();
 
   uint i = 0;
-  for(; i < v.size() && v[i]; i++) {
-    *targetIt = uchar(v[i]);
+
+  for(ByteVector::ConstIterator it = v.begin(); it != v.end() && (*it); ++it) {
+    *targetIt = uchar(*it);
     ++targetIt;
+    ++i;
   }
 
   // If we hit a null in the ByteVector, shrink the string again.

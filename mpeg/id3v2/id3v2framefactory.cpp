@@ -252,7 +252,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FrameFactory::convertFrame(const ByteVector &from, const ByteVector &to,
+void FrameFactory::convertFrame(const char *from, const char *to,
                                 Frame::Header *header) const
 {
   if(header->frameID() != from)

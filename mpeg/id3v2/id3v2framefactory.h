@@ -124,7 +124,7 @@ namespace TagLib {
        * \a to.  If the frame matches the \a from pattern and converts the frame
        * ID in the \a header or simply does nothing if the frame ID does not match.
        */
-      void convertFrame(const ByteVector &from, const ByteVector &to,
+      void convertFrame(const char *from, const char *to,
                         Frame::Header *header) const;
 
       static FrameFactory *factory;

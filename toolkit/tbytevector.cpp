@@ -26,6 +26,10 @@
 
 #include "tbytevector.h"
 
+// This is a bit ugly to keep writing over and over again.
+
+#define DATA(x) (&(x->data[0]))
+
 namespace TagLib {
   static const uint crcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
@@ -285,7 +289,7 @@ void ByteVector::setData(const char *data, uint length)
   detach();
 
   resize(length);
-  ::memcpy(&(d->data[0]), data, length);
+  ::memcpy(DATA(d), data, length);
 }
 
 void ByteVector::setData(const char *data)
@@ -301,12 +305,12 @@ char *ByteVector::data()
   // http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
 
   detach();
-  return &(d->data[0]);
+  return DATA(d);
 }
 
 const char *ByteVector::data() const
 {
-  return &(d->data[0]);
+  return DATA(d);
 }
 
 ByteVector ByteVector::mid(uint index, uint length) const
@@ -402,7 +406,7 @@ void ByteVector::append(const ByteVector &v)
 
   uint originalSize = d->size;
   resize(d->size + v.d->size);
-  ::memcpy(&(d->data[0]) + originalSize, v.data(), v.size());
+  ::memcpy(DATA(d) + originalSize, DATA(v.d), v.size());
 }
 
 void ByteVector::clear()
@@ -418,14 +422,14 @@ TagLib::uint ByteVector::size() const
 
 ByteVector &ByteVector::resize(uint size, char padding)
 {
-  d->size = size;
-
-  if(d->data.size() < size) {
+  if(d->size < size) {
     d->data.reserve(size);
-    d->data.insert(d->data.end(), size - d->data.size(), padding);
+    ::memset(DATA(d), padding, size - d->size);
   }
   else
     d->data.erase(d->data.begin() + size, d->data.end());
+
+  d->size = size;
 
   return *this;
 }
@@ -507,15 +511,10 @@ char &ByteVector::operator[](int index)
 
 bool ByteVector::operator==(const ByteVector &v) const
 {
-  if(size() != v.size())
+  if(d->size != v.d->size)
     return false;
 
-  for(uint i = 0; i < size(); i++) {
-    if(at(i) != v.at(i))
-      return false;
-  }
-
-  return true;
+  return ::memcmp(data(), v.data(), size()) == 0;
 }
 
 bool ByteVector::operator!=(const ByteVector &v) const
@@ -525,7 +524,10 @@ bool ByteVector::operator!=(const ByteVector &v) const
 
 bool ByteVector::operator==(const char *s) const
 {
-  return operator==(fromCString(s));
+  if(d->size != ::strlen(s))
+    return false;
+
+  return ::memcmp(data(), s, d->size) == 0;
 }
 
 bool ByteVector::operator!=(const char *s) const
