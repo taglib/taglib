@@ -172,6 +172,31 @@ namespace TagLib {
        * Returns a reference to the frame list map.  This is an FrameListMap of
        * all of the frames in the tag.
        *
+       * This is the most convenient structure for accessing the tag's frames.
+       * Many frame types allow multiple instances of the same frame type so this
+       * is a map of lists.  In most cases however there will only be a single
+       * frame of a certain type.
+       *
+       * Let's say for instance that you wanted to access the frame for total
+       * beats per minute -- the TBPM frame.
+       *
+       * \code
+       * TagLib::MPEG::File f("foo.mp3");
+       *
+       * // Check to make sure that it has an ID3v2 tag
+       *
+       * if(f.ID3v2Tag()) {
+       *
+       *   // Get the list of frames for a specific frame type
+       *
+       *   TagLib::ID3v2::FrameList l = f.ID3v2Tag()->frameListMap()["TBPM"];
+       *
+       *   if(!l.isEmpty())
+       *     std::cout << l.front().toString() << std::endl;
+       * }
+       *
+       * \endcode
+       *
        * \warning You should not modify this data structure directly, instead
        * use addFrame() and removeFrame().
        */
@@ -180,6 +205,9 @@ namespace TagLib {
       /*!
        * Returns a reference to the frame list.  This is an FrameList of all of
        * the frames in the tag in the order that they were parsed.
+       *
+       * This can be useful if for example you want iterate over the tag's frames
+       * in the order that they occur in the tag.
        *
        * \warning You should not modify this data structure directly, instead
        * use addFrame() and removeFrame().
