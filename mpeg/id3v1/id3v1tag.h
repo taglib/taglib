@@ -81,6 +81,13 @@ namespace TagLib {
      * fields that it provides, the generic TagLib::Tag API is a mirror of what is
      * provided by ID3v1.
      *
+     * ID3v1 tags should generally only contain Latin1 information.  However because
+     * many applications do not follow this rule there is now support for overriding
+     * the ID3v1 string handling using the ID3v1::StringHandler class.  Please see
+     * the documentation for that class for more information.
+     *
+     * \see StringHandler
+     *
      * \note Most fields are truncated to a maximum of 28-30 bytes.  The
      * truncation happens automatically when the tag is rendered.
      */
