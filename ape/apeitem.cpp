@@ -123,8 +123,13 @@ bool APE::Item::isEmpty() const
   }
 }
 
-void APE::Item::parse(const ByteVector& data)
+void APE::Item::parse(const ByteVector &data)
 {
+  if(data.size() < 10) {
+    debug("APE::Item::parse() -- no data in item");
+    return;
+  }
+
   uint valueLength  = data.mid(0, 4).toUInt(false);
   uint flags        = data.mid(4, 4).toUInt(false);
 
