@@ -50,7 +50,7 @@ CommentsFrame::CommentsFrame(String::Type encoding) : Frame("COMM")
 CommentsFrame::CommentsFrame(const ByteVector &data) : Frame(data)
 {
   d = new CommentsFramePrivate;
-  parseFields(data.mid(Header::size(header()->version()), size()));
+  setData(data);
 }
 
 CommentsFrame::~CommentsFrame()
