@@ -29,7 +29,10 @@
 namespace TagLib {
 
   class Tag;
-  namespace ID3v2 { class FrameFactory; }
+
+  namespace ID3v2 { class FrameFactory; class Tag; }
+  namespace ID3v1 { class Tag; }
+  namespace Ogg { class XiphComment; }
 
   //! An implementation of FLAC metadata
 
@@ -83,8 +86,12 @@ namespace TagLib {
       virtual ~File();
 
       /*!
-       * Returns the Tag for this file.  This will be a union of XiphComment
-       * with ID3v1 and ID3v2 tags.
+       * Returns the Tag for this file.  This will be a union of XiphComment,
+       * ID3v1 and ID3v2 tags.
+       *
+       * \see ID3v2Tag()
+       * \see ID3v1Tag()
+       * \see XiphComment()
        */
       virtual TagLib::Tag *tag() const;
 
@@ -100,6 +107,45 @@ namespace TagLib {
        * has no XiphComment, one will be constructed from the ID3-tags.
        */
       virtual void save();
+
+      /*!
+       * Returns a pointer to the ID3v2 tag of the file.
+       *
+       * If \a create is false (the default) this will return a null pointer
+       * if there is no valid ID3v2 tag.  If \a create is true it will create
+       * an ID3v2 tag if one does not exist.
+       *
+       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
+       * deleted by the user.  It will be deleted when the file (object) is
+       * destroyed.
+       */
+      ID3v2::Tag *ID3v2Tag(bool create = false);
+
+      /*!
+       * Returns a pointer to the ID3v1 tag of the file.
+       *
+       * If \a create is false (the default) this will return a null pointer
+       * if there is no valid ID3v1 tag.  If \a create is true it will create
+       * an ID3v1 tag if one does not exist.
+       *
+       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
+       * deleted by the user.  It will be deleted when the file (object) is
+       * destroyed.
+       */
+      ID3v1::Tag *ID3v1Tag(bool create = false);
+
+      /*!
+       * Returns a pointer to the XiphComment for the file.
+       *
+       * If \a create is false (the default) this will return a null pointer
+       * if there is no valid XiphComment.  If \a create is true it will create
+       * a XiphComment if one does not exist.
+       *
+       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
+       * deleted by the user.  It will be deleted when the file (object) is
+       * destroyed.
+       */
+      Ogg::XiphComment *xiphComment(bool create = false);
 
       /*!
        * Set the ID3v2::FrameFactory to something other than the default.  This

@@ -24,6 +24,8 @@
 #include <tdebug.h>
 
 #include <id3v2header.h>
+#include <id3v2tag.h>
+#include <id3v1tag.h>
 
 #include "flacfile.h"
 #include "flactag.h"
@@ -214,6 +216,38 @@ void FLAC::File::save()
 
 }
 
+ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
+{
+  if(!create || d->ID3v2Tag)
+    return d->ID3v2Tag;
+
+  // no ID3v2 tag exists and we've been asked to create one
+
+  d->ID3v2Tag = new ID3v2::Tag;
+  return d->ID3v2Tag;
+}
+
+ID3v1::Tag *FLAC::File::ID3v1Tag(bool create)
+{
+  if(!create || d->ID3v1Tag)
+    return d->ID3v1Tag;
+
+  // no ID3v1 tag exists and we've been asked to create one
+
+  d->ID3v1Tag = new ID3v1::Tag;
+  return d->ID3v1Tag;
+}
+
+Ogg::XiphComment *FLAC::File::xiphComment(bool create)
+{
+  if(!create || d->comment)
+    return d->comment;
+
+  // no XiphComment exists and we've been asked to create one
+
+  d->comment = new Ogg::XiphComment;
+  return d->comment;
+}
 void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 {
   d->ID3v2FrameFactory = factory;
