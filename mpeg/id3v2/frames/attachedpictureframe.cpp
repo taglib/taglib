@@ -43,6 +43,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+AttachedPictureFrame::AttachedPictureFrame() : Frame("APIC")
+{
+    d = new AttachedPictureFramePrivate;
+}
+
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data) : Frame(data)
 {
   setData(data);
