@@ -169,7 +169,7 @@ namespace TagLib {
       Footer *footer() const;
 
       /*!
-       * Returns a pointer to the frame list map.  This is an FrameListMap of
+       * Returns a reference to the frame list map.  This is an FrameListMap of
        * all of the frames in the tag.
        *
        * \warning You should not modify this data structure directly, instead
@@ -178,7 +178,7 @@ namespace TagLib {
       const FrameListMap &frameListMap() const;
 
       /*!
-       * Returns a pointer to the frame list.  This is an FrameList of all of
+       * Returns a reference to the frame list.  This is an FrameList of all of
        * the frames in the tag in the order that they were parsed.
        *
        * \warning You should not modify this data structure directly, instead
