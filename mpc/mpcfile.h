@@ -30,13 +30,17 @@ namespace TagLib {
 
   class Tag;
 
+  namespace ID3v1 { class Tag; }
+  namespace APE { class Tag; }
+
   //! An implementation of MPC metadata
 
   /*!
    * This is implementation of MPC metadata.
    *
    * This supports ID3v1 and APE (v1 and v2) style comments as well as reading stream
-   * properties from the file. ID3v2 tags will be skipped and ignored.
+   * properties from the file. ID3v2 tags are invalid in MPC-files, but will be skipped
+   * and ignored.
    */
 
   namespace MPC {
@@ -48,11 +52,27 @@ namespace TagLib {
      * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
      * the abstract TagLib::File API as well as providing some additional
      * information specific to MPC files.
+     * The only invalid tag combination supported is an ID3v1 tag after an APE tag.
      */
 
     class File : public TagLib::File
     {
     public:
+      /*!
+       * This set of flags is used for various operations and is suitable for
+       * being OR-ed together.
+       */
+      enum TagTypes {
+        //! Empty set.  Matches no tag types.
+        NoTags  = 0x0000,
+        //! Matches ID3v1 tags.
+        ID3v1   = 0x0001,
+        //! Matches APE tags.
+        APE     = 0x0004,
+        //! Matches APE behind ID3v1
+        APEID3  = 0x0005
+      };
+
       /*!
        * Contructs an MPC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
@@ -67,8 +87,8 @@ namespace TagLib {
       virtual ~File();
 
       /*!
-       * Returns the Tag for this file.  This will be either an APE or
-       * ID3v1 tag.
+       * Returns the Tag for this file.  This will be an APE tag, an ID3v1 tag
+       * or a combination of the two.
        */
       virtual TagLib::Tag *tag() const;
 
@@ -82,6 +102,34 @@ namespace TagLib {
        * Save the file.
        */
       virtual bool save();
+
+      /*!
+       * Returns a pointer to the ID3v1 tag of the file.
+       *
+       * If \a create is false (the default) this will return a null pointer
+       * if there is no valid ID3v1 tag.  If \a create is true it will create
+       * an ID3v1 tag if one does not exist. If there is already an APE tag, the
+       * new ID3v1 tag will be placed after it.
+       *
+       * \note The Tag <b>is still</b> owned by the APE::File and should not be
+       * deleted by the user.  It will be deleted when the file (object) is
+       * destroyed.
+       */
+      ID3v1::Tag *ID3v1Tag(bool create = false);
+
+      /*!
+       * Returns a pointer to the APE tag of the file.
+       *
+       * If \a create is false (the default) this will return a null pointer
+       * if there is no valid APE tag.  If \a create is true it will create
+       * a APE tag if one does not exist. If there is already an ID3v1 tag, thes
+       * new APE tag will be placed before it.
+       *
+       * \note The Tag <b>is still</b> owned by the APE::File and should not be
+       * deleted by the user.  It will be deleted when the file (object) is
+       * destroyed.
+       */
+      APE::Tag *APETag(bool create = false);
 
     private:
       File(const File &);

@@ -24,14 +24,38 @@
 
 #include "tag.h"
 #include "tbytevector.h"
+#include "tmap.h"
+#include "tstring.h"
+#include "tstringlist.h"
 
 namespace TagLib {
 
   class File;
 
-  //! An APE tag implementation
-
   namespace APE {
+
+    /*!
+     * A non-binary APE-item.
+     */
+    struct Item {
+        Item() {};
+        explicit Item(const String&);
+        explicit Item(const StringList&);
+        bool readOnly;
+        bool locator; // URL to external data
+        StringList value;
+        bool isEmpty() const;
+    };
+
+    /*!
+     * A mapping between a list of item names, or keys, and the associated item.
+     *
+     * \see APE::Tag::itemListMap()
+     */
+    typedef Map<const String, Item> FieldListMap;
+
+
+  //! An APE tag implementation
 
     class Tag : public TagLib::Tag
     {
@@ -87,17 +111,29 @@ namespace TagLib {
       virtual void setYear(uint i);
       virtual void setTrack(uint i);
 
+      const FieldListMap &fieldListMap() const;
+
       /*!
        * Removes the \a key comment from the tag
        */
-      void removeComment(const String &key);
+      void removeField(const String &key);
 
       /*!
        * Adds the \a key comment with \a value
        */
-      void addComment(const String &key, const String &value);
+      void addField(const String &key, const String &value, bool replace = true);
+
+      /*!
+       * Adds the \a key comment with \a values
+       */
+      void addField(const String &key, const StringList &values);
 
     protected:
+      /*!
+       * Adds the \a key comment with \a item
+       */
+      void addItem(const String &key, const Item &item);
+
       /*!
        * Reads from the file specified in the constructor.
        */

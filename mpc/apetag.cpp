@@ -38,24 +38,22 @@ public:
   long tagOffset;
   long tagLength;
 
-  Map<const String, String> items;
-  Map<const String, ByteVector> unknowns;
+  FieldListMap fieldListMap;
+  Map<const String, ByteVector> binaries;
 };
 
-/*
-struct APE::Tag::Item
-{
-  Item(String key) : key(key), type(STRING), value.str(String::null), readOnly(false) {};
-  const String key;
-  enum Type{ STRING, BINARY, URL, RESERVED } type;
-  union value{
-    String str;
-    ByteVector bin;
-  }
-  bool readOnly;
+APE::Item::Item(const String& str) : readOnly(false), locator(false) {
+  value.append(str);
 }
-*/
 
+APE::Item::Item(const StringList& values) : readOnly(false), locator(false) {
+  value.append(values);
+}
+
+bool APE::Item::isEmpty() const
+{
+  return value.isEmpty();
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
@@ -80,22 +78,35 @@ APE::Tag::~Tag()
   delete d;
 }
 
-static ByteVector APEItem(String key, String value)
+using TagLib::uint;
+
+static ByteVector _render_APEItem(String key, Item item)
 {
   ByteVector data;
-  TagLib::uint flags = 0;
+  uint flags = ((item.readOnly) ? 1 : 0) | ((item.locator) ? 2 : 0);
+  ByteVector value;
+
+  if (item.value.isEmpty()) return data;
+
+  StringList::Iterator it = item.value.begin();
+  value.append(it->data(String::UTF8));
+  it++;
+  while (it != item.value.end()) {
+    value.append('\0');
+    value.append(it->data(String::UTF8));
+    it++;
+  }
 
   data.append(ByteVector::fromUInt(value.size(), false));
   data.append(ByteVector::fromUInt(flags, false));
   data.append(key.data(String::UTF8));
-  data.append(char(0));
-  data.append(value.data(String::UTF8));
+  data.append(ByteVector('\0'));
+  data.append(value);
 
   return data;
 }
 
-static ByteVector APEFrame(bool isHeader, TagLib::uint dataSize, TagLib::uint itemCount)
-{
+static ByteVector _render_APEFrame(bool isHeader, uint dataSize, uint itemCount) {
   ByteVector header;
   TagLib::uint tagSize = 32 + dataSize;
   // bit 31: Has a header
@@ -117,32 +128,30 @@ ByteVector APE::Tag::render() const
   ByteVector data;
   uint itemCount = 0;
 
-  {
-    Map<String,String>::Iterator i = d->items.begin();
-    while(i != d->items.end()) {
-      if(!i->second.isEmpty()) {
-        data.append(APEItem(i->first, i->second));
+  { Map<const String,Item>::Iterator i = d->fieldListMap.begin();
+    while (i != d->fieldListMap.end()) {
+      if (!i->second.value.isEmpty()) {
+        data.append(_render_APEItem(i->first, i->second));
         itemCount++;
       }
       i++;
     }
   }
 
-  {
-    Map<String,ByteVector>::Iterator i = d->unknowns.begin();
-    while(i != d->unknowns.end()) {
-      if(!i->second.isEmpty()) {
-	data.append(i->second);
-	itemCount++;
+  { Map<String,ByteVector>::Iterator i = d->binaries.begin();
+    while (i != d->binaries.end()) {
+      if (!i->second.isEmpty()) {
+          data.append(i->second);
+          itemCount++;
       }
       i++;
     }
   }
 
   ByteVector tag;
-  tag.append(APEFrame(true, data.size(), itemCount));
+  tag.append(_render_APEFrame(true, data.size(), itemCount));
   tag.append(data);
-  tag.append(APEFrame(false, data.size(), itemCount));
+  tag.append(_render_APEFrame(false, data.size(), itemCount));
 
   return tag;
 }
@@ -154,117 +163,124 @@ ByteVector APE::Tag::fileIdentifier()
 
 String APE::Tag::title() const
 {
-  if(d->items.contains("Title"))
-    return d->items["Title"];
-  else
+  if(d->fieldListMap["TITLE"].isEmpty())
     return String::null;
+  return d->fieldListMap["TITLE"].value.front();
 }
 
 String APE::Tag::artist() const
 {
-  if(d->items.contains("Artist"))
-    return d->items["Artist"];
-  else
+  if(d->fieldListMap["ARTIST"].isEmpty())
     return String::null;
+  return d->fieldListMap["ARTIST"].value.front();
 }
 
 String APE::Tag::album() const
 {
-  if(d->items.contains("Album"))
-    return d->items["Album"];
-  else
+  if(d->fieldListMap["ALBUM"].isEmpty())
     return String::null;
+  return d->fieldListMap["ALBUM"].value.front();
 }
 
 String APE::Tag::comment() const
 {
-  if(d->items.contains("Comment"))
-    return d->items["Comment"];
-  else
+  if(d->fieldListMap["COMMENT"].isEmpty())
     return String::null;
+  return d->fieldListMap["COMMENT"].value.front();
 }
 
 String APE::Tag::genre() const
 {
-  if(d->items.contains("Genre"))
-    return d->items["Genre"];
-  else
+  if(d->fieldListMap["GENRE"].isEmpty())
     return String::null;
+  return d->fieldListMap["GENRE"].value.front();
 }
 
 TagLib::uint APE::Tag::year() const
 {
-  if(d->items.contains("Year"))
-    return (d->items["Year"]).toInt();
-  return 0;
+  if(d->fieldListMap["YEAR"].isEmpty())
+    return 0;
+  return d->fieldListMap["YEAR"].value.front().toInt();
 }
 
 TagLib::uint APE::Tag::track() const
 {
-  if(d->items.contains("Track"))
-    return (d->items["Track"]).toInt();
-  return 0;
+  if(d->fieldListMap["TRACK"].isEmpty())
+    return 0;
+  return d->fieldListMap["TRACK"].value.front().toInt();
 }
 
 void APE::Tag::setTitle(const String &s)
 {
-  d->items["Title"] = s;
+  addField("TITLE", s, true);
 }
 
 void APE::Tag::setArtist(const String &s)
 {
-  d->items["Artist"] = s;
+  addField("ARTIST", s, true);
 }
 
 void APE::Tag::setAlbum(const String &s)
 {
-  d->items["Album"] = s;
+  addField("ALBUM", s, true);
 }
 
 void APE::Tag::setComment(const String &s)
 {
-  if(s.isEmpty())
-    removeComment("Comment");
-  else
-    d->items["Comment"] = s;
+  addField("COMMENT", s, true);
 }
 
 void APE::Tag::setGenre(const String &s)
 {
-  if(s.isEmpty())
-    removeComment("Genre");
-  else
-    d->items["Genre"] = s;
+  addField("GENRE", s, true);
 }
 
 void APE::Tag::setYear(uint i)
 {
-  if(i <= 0)
-    removeComment("Year");
+  if(i <=0 )
+    removeField("YEAR");
   else
-    d->items["Year"] = String::number(i);
+    addField("YEAR", String::number(i), true);
 }
 
 void APE::Tag::setTrack(uint i)
 {
-  if(i <= 0)
-    removeComment("Track");
+  if(i <=0 )
+    removeField("TRACK");
   else
-    d->items["Track"] = String::number(i);
+    addField("TRACK", String::number(i), true);
 }
 
-void APE::Tag::removeComment(const String &key) {
-  Map<String,String>::Iterator it = d->items.find(key);
-  if(it != d->items.end())
-    d->items.erase(it);
-}
-
-void APE::Tag::addComment(const String &key, const String &value)
+const APE::FieldListMap& APE::Tag::fieldListMap() const
 {
-  if(value.isEmpty())
-    removeComment(key);
-  else
-    d->items[key] = value;
+  return d->fieldListMap;
+}
+
+void APE::Tag::removeField(const String &key) {
+  Map<const String, Item>::Iterator it = d->fieldListMap.find(key.upper());
+  if(it != d->fieldListMap.end())
+    d->fieldListMap.erase(it);
+}
+
+void APE::Tag::addField(const String &key, const String &value, bool replace) {
+  if(replace)
+    removeField(key);
+  if(!value.isEmpty()) {
+    Map<const String, Item>::Iterator it = d->fieldListMap.find(key.upper());
+    if (it != d->fieldListMap.end())
+      d->fieldListMap[key].value.append(value);
+    else
+      addItem(key, Item(value));
+  }
+}
+
+void APE::Tag::addField(const String &key, const StringList &values) {
+  removeField(key);
+
+  if(values.isEmpty()) return;
+  else {
+    addItem(key, Item(values));
+  }
 }
 
 TagLib::uint APE::Tag::tagSize(const ByteVector &footer)
@@ -277,12 +293,19 @@ TagLib::uint APE::Tag::tagSize(const ByteVector &footer)
 
   uint flags = footer.mid(20, 4).toUInt(false);
 
-  return length + (flags & (1U << 31) ? 32 : 0);
+  return length + ((flags & (1U << 31)) ? 32 : 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
+
+void APE::Tag::addItem(const String &key, const Item &item) {
+  removeField(key);
+
+  Map<const String, Item>::Iterator it = d->fieldListMap.find(key.upper());
+  d->fieldListMap.insert(key, item);
+}
 
 void APE::Tag::read()
 {
@@ -305,67 +328,41 @@ void APE::Tag::read()
   }
 }
 
+static StringList _parse_APEString(ByteVector val)
+{
+    StringList value;
+    int pold = 0;
+    int p = val.find('\0');
+    while (p != -1) {
+        value.append(String(val.mid(pold, p), String::UTF8));
+        pold = p+1;
+        p = val.find('\0', pold);
+    };
+    value.append(String(val.mid(pold), String::UTF8));
+
+    return value;
+}
+
 void APE::Tag::parse(const ByteVector &data, uint count)
 {
   uint pos = 0;
   uint vallen, flags;
   String key, value;
   while(count > 0) {
-    vallen = data.mid(pos + 0, 4).toUInt(false);
-    flags = data.mid(pos + 4, 4).toUInt(false);
-    key = String(data.mid(pos + 8), String::UTF8);
+    vallen = data.mid(pos+0,4).toUInt(false);
+    flags = data.mid(pos+4,4).toUInt(false);
+    key = String(data.mid(pos+8), String::UTF8);
+    key = key.upper();
+    APE::Item item;
 
-    if(flags == 0) {
-      value = String(data.mid(pos + 8 + key.size() + 1, vallen), String::UTF8);
-      d->items.insert(key, value);
-    }
-    else {
-      d->unknowns.insert(key, data.mid(pos, 8 + key.size() + 1 + vallen));
+    if (flags < 4 ) {
+      ByteVector val = data.mid(pos+8+key.size()+1, vallen);
+      d->fieldListMap.insert(key, Item(_parse_APEString(val)));
+    } else {
+      d->binaries.insert(key,data.mid(pos, 8+key.size()+1+vallen));
     }
 
     pos += 8 + key.size() + 1 + vallen;
     count--;
   }
 }
-
-/*
-void APE::Tag::parse(const ByteVector &data, uint count)
-{
-  uint pos = 0;
-  uint vallen, flags;
-  String key;
-  while(count > 0) {
-    vallen = data.mid(pos + 0, 4).toUInt(false);
-    flags = data.mid(pos + 4, 4).toUInt(false);
-    key = String(data.mid(pos + 8), String::UTF8);
-    Item item(key);
-
-    ByteVector value = data.mid(pos+8+key.size()+1, vallen);
-
-    switch ((flags >> 1) & 3) {
-    case 0:
-      item.value.str = String(value, String::UTF8);
-      item.type = Item::STRING;
-      break;
-    case 1:
-      item.value.bin = value;
-      item.type = Item::BINARY;
-      break;
-    case 2:
-      item.value.str = String(value, String::UTF8);
-      item.type = Item::URL;
-      break;
-    case 3:
-      item.value.bin = value;
-      item.type = Item::RESERVED;
-      break;
-    }
-    item.readOnly = (flags & 1);
-
-    d->items.insert(key,item);
-
-    pos += 8 + key.size() + 1 + vallen;
-    count--;
-  }
-}
-*/
