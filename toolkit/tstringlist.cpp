@@ -66,6 +66,14 @@ StringList::StringList(const String &s) : List<String>()
   append(s);
 }
 
+StringList::StringList(const ByteVectorList &bl, String::Type t) : List<String>()
+{
+  ByteVectorList::ConstIterator i = bl.begin();
+  for(;i != bl.end(); i++) {
+    append(String(*i, t));
+  }
+}
+
 StringList::~StringList()
 {
 
