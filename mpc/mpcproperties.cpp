@@ -55,7 +55,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::Properties::Properties(ByteVector data, long streamLength, ReadStyle style) : AudioProperties(style)
+MPC::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
   read();
@@ -80,11 +80,13 @@ int MPC::Properties::sampleRate() const
 {
   return d->sampleRate;
 }
+
 /*
 int MPC::Properties::sampleWidth() const
 {
   return d->sampleWidth;
-}*/
+}
+*/
 
 int MPC::Properties::channels() const
 {
@@ -104,34 +106,36 @@ static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 
 void MPC::Properties::read()
 {
-  if (d->data.mid(0,3) != "MP+") return;
+  if(d->data.mid(0,3) != "MP+")
+    return;
 
   d->version = d->data[3] & 15;
 
   unsigned int frames;
-  if (d->version >= 7) {
+
+  if(d->version >= 7) {
     frames = d->data.mid(4,4).toUInt(false);
 
-    std::bitset<32> flags = d->data.mid(8,4).toUInt(true);
-    d->sampleRate = sftable[flags[17]*2+flags[16]];
+    std::bitset<32> flags = d->data.mid(8, 4).toUInt(true);
+    d->sampleRate = sftable[flags[17] * 2 + flags[16]];
     d->channels = 2;
-
-  } else {
-    unsigned int headerData = d->data.mid(0,4).toUInt(false);
+  }
+  else {
+    unsigned int headerData = d->data.mid(0, 4).toUInt(false);
     d->bitrate = (headerData >> 23) & 0x01ff;
     d->version = (headerData >> 11) & 0x03ff;
     d->sampleRate = 44100;
     d->channels = 2;
-    if (d->version >= 5)
-        frames = d->data.mid(4,4).toUInt(false);
+    if(d->version >= 5)
+      frames = d->data.mid(4, 4).toUInt(false);
     else
-        frames = d->data.mid(4,2).toUInt(false);
+      frames = d->data.mid(4, 2).toUInt(false);
   }
 
   unsigned int samples = frames * 1152 - 576;
-  d->length = (samples+(d->sampleRate/2)) / d->sampleRate;
+  d->length = (samples + (d->sampleRate / 2)) / d->sampleRate;
 
-  if (!d->bitrate)
-      d->bitrate = ((d->streamLength*8L) / d->length)/1000;
+  if(!d->bitrate)
+    d->bitrate = ((d->streamLength * 8L) / d->length) / 1000;
 
 }

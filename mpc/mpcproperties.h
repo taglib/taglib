@@ -32,7 +32,6 @@ namespace TagLib {
 
     static const uint HeaderSize = 8*7;
 
-
     //! An implementation of audio property reading for MPC
 
     /*!
@@ -47,7 +46,7 @@ namespace TagLib {
        * Create an instance of MPC::Properties with the data read from the
        * ByteVector \a data.
        */
-      Properties(ByteVector data, long streamLength, ReadStyle style = Average);
+      Properties(const ByteVector &data, long streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this MPC::Properties instance.

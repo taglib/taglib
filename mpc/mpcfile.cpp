@@ -82,7 +82,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPC::File::File(const char *file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
@@ -95,14 +95,15 @@ MPC::File::~File()
 
 TagLib::Tag *MPC::File::tag() const
 {
-  if (d->APETag)
-      return d->APETag;
-  else
-  if (d->ID3v1Tag)
-    return d->ID3v1Tag;
-  else {
-    d->APETag = new APE::Tag;
+  if(d->APETag)
     return d->APETag;
+  else {
+    if(d->ID3v1Tag)
+      return d->ID3v1Tag;
+    else {
+      d->APETag = new APE::Tag;
+      return d->APETag;
+    }
   }
 }
 
@@ -111,28 +112,21 @@ MPC::Properties *MPC::File::audioProperties() const
   return d->properties;
 }
 
-
 bool MPC::File::save()
 {
-
   // Update APE tag
 
   if(d->hasAPE && d->APETag)
-  {
     insert(d->APETag->render(), d->APELocation, d->APESize);
+  else {
+    // Update ID3v1 tag
+
+    if(d->hasID3v1 && d->ID3v1Tag) {
+      seek(-128, End);
+      writeBlock(d->ID3v1Tag->render());
+    }
   }
-  else
-
-  // Update ID3v1 tag
-
-  if(d->hasID3v1 && d->ID3v1Tag)
-  {
-    seek(-128, End);
-    writeBlock(d->ID3v1Tag->render());
-  }
-
   return true;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +146,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 
   // Look for an ID3v1 tag
 
-  if (!d->hasAPE) {
+  if(!d->hasAPE) {
     d->ID3v1Location = findID3v1();
 
     if(d->ID3v1Location >= 0) {
@@ -172,7 +166,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
     d->hasID3v2 = true;
   }
 
-  if (d->hasID3v2)
+  if(d->hasID3v2)
     seek(d->ID3v2Location + d->ID3v2Size);
   else
     seek(0);
@@ -187,7 +181,6 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 
 bool MPC::File::findAPE()
 {
-
   if(!isValid())
     return false;
 
@@ -195,8 +188,7 @@ bool MPC::File::findAPE()
   long p = tell();
 
   ByteVector footer = readBlock(32);
-  if(footer.mid(0,8) == APE::Tag::fileIdentifier())
-  {
+  if(footer.mid(0,8) == APE::Tag::fileIdentifier()) {
      d->APEFooter = p;
      d->APESize = APE::Tag::tagSize(footer);
      d->APELocation = p + 32 - d->APESize;
