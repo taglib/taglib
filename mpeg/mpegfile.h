@@ -168,7 +168,8 @@ namespace TagLib {
 
       /*!
        * This will strip the tags that match the OR-ed together TagTypes from the
-       * file.  By default it strips all tags.
+       * file.  By default it strips all tags.  It returns true if the tags are
+       * successfully stripped.
        */
       bool strip(int tags = AllTags);
 
