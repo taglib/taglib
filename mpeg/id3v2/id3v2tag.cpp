@@ -120,10 +120,55 @@ String ID3v2::Tag::comment() const
 
 String ID3v2::Tag::genre() const
 {
-  if(!d->frameListMap["TCON"].isEmpty()) {
-    String s = d->frameListMap["TCON"].front()->toString();
+  // TODO: In the next major version (TagLib 2.0) a list of multiple genres
+  // should be separated by " / " instead of " ".  For the moment to keep
+  // the behavior the same as released versions it is being left with " ".
 
-    // ID3v2 "content type" can contain a ID3v1 genre number in parenthesis at
+  if(!d->frameListMap["TCON"].isEmpty()) {
+    Frame *frame = d->frameListMap["TCON"].front();
+
+    // ID3v2.4 lists genres as the fields in its frames field list.  If the field
+    // is simply a number it can be assumed that it is an ID3v1 genre number.
+    // Here was assume that if an ID3v1 string is present that it should be
+    // appended to the genre string.  Multiple fields will be appended as the
+    // string is built.
+
+    if(d->header.majorVersion() == 4) {
+      TextIdentificationFrame *f = static_cast<TextIdentificationFrame *>(frame);
+      StringList fields = f->fieldList();
+
+      String genreString;
+      bool hasNumber;
+
+      for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
+        bool isNumber = true;
+        for(String::ConstIterator charIt = (*it).begin();
+            isNumber && charIt != (*it).end();
+            ++charIt)
+        {
+          isNumber = *charIt >= '0' && *charIt <= '9';
+        }
+
+        if(!genreString.isEmpty())
+          genreString.append(' ');
+
+        if(isNumber) {
+          int number = (*it).toInt();
+          if(number >= 0 && number <= 255) {
+            hasNumber = true;
+            genreString.append(ID3v1::genre(number));
+          }
+        }
+        else
+          genreString.append(*it);
+      }
+      if(hasNumber)
+        return genreString;
+    }
+
+    String s = frame->toString();
+
+    // ID3v2.3 "content type" can contain a ID3v1 genre number in parenthesis at
     // the beginning of the field.  If this is all that the field contains, do a
     // translation from that number to the name and return that.  If there is a
     // string folloing the ID3v1 genre number, that is considered to be
@@ -197,7 +242,7 @@ void ID3v2::Tag::setGenre(const String &s)
   int index = ID3v1::genreIndex(s);
 
   if(index != 255)
-    setTextFrame("TCON", "(" + String::number(index) + ")");
+    setTextFrame("TCON", String::number(index));
   else
     setTextFrame("TCON", s);
 }
