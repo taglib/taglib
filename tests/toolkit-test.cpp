@@ -152,6 +152,16 @@ void testByteVector()
   testConversion(0x000000a0, 0x00, 0x00, 0x00, 0xa0);
   testConversion(0xd50bf072, 0xd5, 0x0b, 0xf0, 0x72);
 
+  ByteVector intVector(2, 0);
+  intVector[0] = char(0xfc);
+  intVector[1] = char(0x00);
+  printResult(intVector.toUInt() == 64512);
+  printResult(intVector.toInt() == -1024);
+  intVector[0] = char(0x04);
+  intVector[1] = char(0x00);
+  printResult(intVector.toUInt() == 1024);
+  printResult(intVector.toInt() == 1024);
+  
   ByteVector r0("**************");
   ByteVector r1("OggS**********");
   ByteVector r2("**********OggS");
