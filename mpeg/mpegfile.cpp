@@ -167,8 +167,8 @@ namespace TagLib {
 class MPEG::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    ID3v2FrameFactory(ID3v2::FrameFactory::instance()),
+  FilePrivate(ID3v2::FrameFactory *frameFactory = ID3v2::FrameFactory::instance()) :
+    ID3v2FrameFactory(frameFactory),
     ID3v2Tag(0),
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
@@ -213,6 +213,17 @@ MPEG::File::File(const char *file, bool readProperties,
                  Properties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
+  if(isOpen()) {
+    d->tag = new MPEGTag(this);
+    read(readProperties, propertiesStyle);
+  }
+}
+
+MPEG::File::File(const char *file, ID3v2::FrameFactory *frameFactory,
+                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(file)
+{
+  d = new FilePrivate(frameFactory);
   if(isOpen()) {
     d->tag = new MPEGTag(this);
     read(readProperties, propertiesStyle);

@@ -70,6 +70,17 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
+       * Contructs an MPEG file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read using \a propertiesStyle.  If
+       * false, \a propertiesStyle is ignored.  The frames will be created using
+       * \a frameFactory.
+       */
+      // BIC: merge with the above constructor
+      File(const char *file, ID3v2::FrameFactory *frameFactory,
+           bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average);
+
+      /*!
        * Destroys this instance of the File.
        */
       virtual ~File();
