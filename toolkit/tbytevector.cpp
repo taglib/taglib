@@ -28,6 +28,11 @@
 
 // This is a bit ugly to keep writing over and over again.
 
+// A rather obscure feature of the C++ spec that I hadn't thought of that makes
+// working with C libs much more effecient.  There's more here:
+//
+// http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
+
 #define DATA(x) (&(x->data[0]))
 
 namespace TagLib {
@@ -326,11 +331,6 @@ void ByteVector::setData(const char *data)
 
 char *ByteVector::data()
 {
-  // A rather obscure feature of the C++ spec that I hadn't thought of that makes
-  // working with C libs much more effecient.  There's more here:
-  //
-  // http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
-
   detach();
   return DATA(d);
 }
