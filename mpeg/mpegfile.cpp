@@ -345,6 +345,10 @@ bool MPEG::File::strip(int tags)
     d->hasID3v2 = false;
     delete d->ID3v2Tag;
     d->ID3v2Tag = 0;
+
+    // v1 tag location has changed, update if it exists
+    if(d->ID3v1Tag)
+      d->ID3v1Location = findID3v1();
   }
 
   if(tags & ID3v1 && d->hasID3v1) {
