@@ -138,7 +138,7 @@ String ID3v2::Tag::genre() const
       StringList fields = f->fieldList();
 
       String genreString;
-      bool hasNumber;
+      bool hasNumber = false;
 
       for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
         bool isNumber = true;
