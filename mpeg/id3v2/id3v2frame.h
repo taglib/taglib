@@ -65,8 +65,20 @@ namespace TagLib {
 
       /*!
        * Returns the size of the frame header
+       *
+       * \deprecated This is only accurate for ID3v2.3 or ID3v2.4.  Please use
+       * the call below which accepts an ID3v2 version number.  In the next
+       * non-binary compatible release this will be made into a non-static
+       * member that checks the internal ID3v2 version.
        */
-      static uint headerSize();
+      static uint headerSize(); // BIC: remove and make non-static
+
+      /*!
+       * Returns the size of the frame header for the given ID3v2 version.
+       *
+       * \deprecated Please see the explanation above.
+       */
+      static uint headerSize(uint version); // BIC: remove and make non-static
 
       /*!
        * Sets the data that will be used as the frame.  Since the length is not
@@ -187,8 +199,20 @@ namespace TagLib {
        * Construct a Frame Header based on \a data.  \a data must at least
        * contain a 4 byte frame ID, and optionally can contain flag data and the
        * frame size.  i.e. Just the frame id -- "TALB" -- is a valid value.
+       *
+       * \deprecated Please use the constructor below that accepts a version
+       * number.
        */
-      explicit Header(const ByteVector &data, bool synchSafeInts = true);
+      explicit Header(const ByteVector &data, bool synchSafeInts);
+
+      /*!
+       * Construct a Frame Header based on \a data.  \a data must at least
+       * contain a 4 byte frame ID, and optionally can contain flag data and the
+       * frame size.  i.e. Just the frame id -- "TALB" -- is a valid value.
+       *
+       * \a version should be the ID3v2 version of the tag.
+       */
+      explicit Header(const ByteVector &data, uint version = 4);
 
       /*!
        * Destroys this Header instance.
@@ -197,8 +221,17 @@ namespace TagLib {
 
       /*!
        * Sets the data for the Header.
+       *
+       * \deprecated Please use the version below that accepts an ID3v2 version
+       * number.
        */
-      void setData(const ByteVector &data, bool synchSafeInts = true);
+      void setData(const ByteVector &data, bool synchSafeInts);
+
+      /*!
+       * Sets the data for the Header.  \a version should indicate the ID3v2
+       * version number of the tag that this frame is contained in.
+       */
+      void setData(const ByteVector &data, uint version = 4);
 
       /*!
        * Returns the Frame ID (Structure, <a href="id3v2-structure.html#4">4</a>)
@@ -228,10 +261,28 @@ namespace TagLib {
       void setFrameSize(uint size);
 
       /*!
-       * Returns the size of the frame header in bytes.  Currently this is
-       * always 10.
+       * Returns the ID3v2 version of the header (as passed in from the
+       * construction of the header).
+       */
+      uint version() const;
+
+      /*!
+       * Returns the size of the frame header in bytes.
+       *
+       * \deprecated Please use the version of this method that accepts a
+       * version.  This is only accurate for ID3v2.3 and ID3v2.4.  This will be
+       * removed in the next binary incompatible release (2.0) and will be
+       * replaced with a non-static method that checks the frame version.
        */
       static uint size();
+
+      /*!
+       * Returns the size of the frame header in bytes for the ID3v2 version
+       * that's given.
+       *
+       * \deprecated Please see the explanation in the version above.
+       */
+      static uint size(uint version);
 
       /*!
        * Render the Header back to binary format in a ByteVector.

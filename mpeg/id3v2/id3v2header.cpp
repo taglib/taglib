@@ -78,12 +78,12 @@ ByteVector Header::fileIdentifier()
 
 Header::Header()
 {
-  d = new HeaderPrivate();
+  d = new HeaderPrivate;
 }
 
 Header::Header(const ByteVector &data)
 {
-  d = new HeaderPrivate();
+  d = new HeaderPrivate;
   parse(data);
 }
 

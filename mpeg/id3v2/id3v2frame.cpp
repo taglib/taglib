@@ -50,6 +50,11 @@ TagLib::uint Frame::headerSize()
   return Header::size();
 }
 
+TagLib::uint Frame::headerSize(uint version)
+{
+  return Header::size(version);
+}
+
 ByteVector Frame::textDelimiter(String::Type t)
 {
   ByteVector d = char(0);
@@ -108,13 +113,13 @@ ByteVector Frame::render() const
 
 Frame::Frame(const ByteVector &data)
 {
-  d = new FramePrivate();
+  d = new FramePrivate;
   d->header = new Header(data);
 }
 
 Frame::Frame(Header *h)
 {
-  d = new FramePrivate();
+  d = new FramePrivate;
   d->header = h;
 }
 
@@ -139,7 +144,8 @@ void Frame::parse(const ByteVector &data)
     d->header = new Header(data);
 
   // size() is the lenght of the field data
-  parseFields(data.mid(Header::size(), size()));
+
+  parseFields(data.mid(Header::size(d->header->version()), size()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,11 +155,11 @@ void Frame::parse(const ByteVector &data)
 class Frame::Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() : frameSize(0) {}
+  HeaderPrivate() : frameSize(0), version(4) {}
 
   ByteVector frameID;
   uint frameSize;
-  static const unsigned int size = 10;
+  uint version;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +168,21 @@ public:
 
 TagLib::uint Frame::Header::size()
 {
-  return HeaderPrivate::size;
+  return size(4);
+}
+
+TagLib::uint Frame::Header::size(uint version)
+{
+  switch(version) {
+  case 0:
+  case 1:
+  case 2:
+    return 6;
+  case 3:
+  case 4:
+  default:
+    return 10;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +195,12 @@ Frame::Header::Header(const ByteVector &data, bool synchSafeInts)
   setData(data, synchSafeInts);
 }
 
+Frame::Header::Header(const ByteVector &data, uint version)
+{
+  d = new HeaderPrivate;
+  setData(data, version);
+}
+
 Frame::Header::~Header()
 {
   delete d;
@@ -182,33 +208,78 @@ Frame::Header::~Header()
 
 void Frame::Header::setData(const ByteVector &data, bool synchSafeInts)
 {
-  if(data.size() < 4) {
-    debug("You must at least specify a frame ID.");
-    return;
+  setData(data, uint(synchSafeInts ? 4 : 3));
+}
+
+void Frame::Header::setData(const ByteVector &data, uint version)
+{
+  d->version = version;
+
+  switch(version) {
+  case 0:
+  case 1:
+  case 2:
+  {
+
+    // ID3v2.2 
+
+    if(data.size() < 3) {
+      debug("You must at least specify a frame ID.");
+      return;
+    }
+
+    // Set the frame ID -- the first three bytes
+
+    d->frameID = data.mid(0, 3);
+
+    // If the full header information was not passed in, do not continue to the
+    // steps to parse the frame size and flags.
+
+    if(data.size() < 6) {
+      d->frameSize = 0;
+      return;
+    }
+
+    d->frameSize = data.mid(3, 3).toUInt();
+
+    break;
   }
+  case 3:
+  case 4:
+  default:
+  {
+    // ID3v2.3 / ID3v2.4
 
-  // set the frame ID -- the first four bytes
+    if(data.size() < 4) {
+      debug("You must at least specify a frame ID.");
+      return;
+    }
 
-  d->frameID = data.mid(0, 4);
+    // Set the frame ID -- the first four bytes
 
-  // If the full header information was not passed in, do not continue to the
-  // steps to parse the frame size and flags.
+    d->frameID = data.mid(0, 4);
 
-  if(data.size() < 10) {
-    d->frameSize = 0;
-    return;
+    // If the full header information was not passed in, do not continue to the
+    // steps to parse the frame size and flags.
+
+    if(data.size() < 10) {
+      d->frameSize = 0;
+      return;
+    }
+
+    // Set the size -- the frame size is the four bytes starting at byte four in
+    // the frame header (structure 4)
+
+    if(version >= 4)
+      d->frameSize = SynchData::toUInt(data.mid(4, 4));
+    else
+      d->frameSize = data.mid(4, 4).toUInt();
+
+    // TODO: read flags
+
+    break;
   }
-
-  // Set the size -- the frame size is the four bytes starting at byte four in
-  // the frame header (structure 4)
-
-  if(synchSafeInts)
-    d->frameSize = SynchData::toUInt(data.mid(4, 4));
-  else
-    d->frameSize = data.mid(4, 4).toUInt();
-
-  // read flags
-  // ...
+  }
 }
 
 ByteVector Frame::Header::frameID() const
@@ -229,6 +300,11 @@ TagLib::uint Frame::Header::frameSize() const
 void Frame::Header::setFrameSize(uint size)
 {
   d->frameSize = size;
+}
+
+TagLib::uint Frame::Header::version() const
+{
+  return d->version;
 }
 
 ByteVector Frame::Header::render() const

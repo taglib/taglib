@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
     copyright            : (C) 2002, 2003 by Scott Wheeler
     email                : wheeler@kde.org
  ***************************************************************************/
@@ -56,8 +56,18 @@ namespace TagLib {
        * Create a frame based on \a data.  \a synchSafeInts should only be set
        * false if we are parsing an old tag (v2.3 or older) that does not support
        * synchsafe ints.
+       *
+       * \deprecated Please use the method below that accepts an ID3 version
+       * number in new code.
        */
-      Frame *createFrame(const ByteVector &data, bool synchSafeInts = true) const;
+      Frame *createFrame(const ByteVector &data, bool synchSafeInts) const;
+
+      /*!
+       * Create a frame based on \a data.  \a version should indicate the ID3v2
+       * version of the tag.  As ID3v2.4 is the most current version of the
+       * standard 4 is the default.
+       */
+      Frame *createFrame(const ByteVector &data, uint version = 4) const;
 
       /*!
        * Returns the default text encoding for text frames.  If setTextEncoding()

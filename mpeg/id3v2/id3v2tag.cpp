@@ -365,7 +365,7 @@ void ID3v2::Tag::parse(const ByteVector &data)
   // Make sure that there is at least enough room in the remaining frame data for
   // a frame header.
 
-  while(frameDataPosition < frameDataLength - Frame::headerSize()) {
+  while(frameDataPosition < frameDataLength - Frame::headerSize(d->header.majorVersion())) {
 
     // If the next data is position is 0, assume that we've hit the padding
     // portion of the frame data.
@@ -379,10 +379,8 @@ void ID3v2::Tag::parse(const ByteVector &data)
       return;
     }
 
-    bool synchSafeInts = d->header.majorVersion() >= 4;
-
     Frame *frame = d->factory->createFrame(data.mid(frameDataOffset + frameDataPosition),
-                                           synchSafeInts);
+                                           d->header.majorVersion());
 
     if(!frame)
       return;
@@ -394,7 +392,7 @@ void ID3v2::Tag::parse(const ByteVector &data)
       return;
     }
 
-    frameDataPosition += frame->size() + Frame::headerSize();
+    frameDataPosition += frame->size() + Frame::headerSize(d->header.majorVersion());
     addFrame(frame);
   }
 }

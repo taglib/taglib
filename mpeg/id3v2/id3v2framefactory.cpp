@@ -56,15 +56,20 @@ FrameFactory *FrameFactory::instance()
 
 Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) const
 {
-  Frame::Header *header = new Frame::Header(data, synchSafeInts);
+  return createFrame(data, uint(synchSafeInts ? 4 : 3));
+}
+
+Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
+{
+  Frame::Header *header = new Frame::Header(data, version);
 
   TagLib::ByteVector frameID = header->frameID();
 
   // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
   // characters.  Also make sure that there is data in the frame.
 
-  if(!frameID.size() == 4 || header->frameSize() <= 0)
-    return 0;
+  if(!frameID.size() == (version < 3 ? 3 : 4) || header->frameSize() <= 0)
+      return 0;
 
   for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
     if( (*it < 'A' || *it > 'Z') && (*it < '1' || *it > '9') ) {

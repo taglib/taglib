@@ -43,14 +43,14 @@ public:
 
 CommentsFrame::CommentsFrame(String::Type encoding) : Frame("COMM")
 {
-  d = new CommentsFramePrivate();
+  d = new CommentsFramePrivate;
   d->textEncoding = encoding;
 }
 
 CommentsFrame::CommentsFrame(const ByteVector &data) : Frame(data)
 {
-  d = new CommentsFramePrivate();
-  parseFields(data.mid(Header::size(), size()));
+  d = new CommentsFramePrivate;
+  parseFields(data.mid(Header::size(header()->version()), size()));
 }
 
 CommentsFrame::~CommentsFrame()
@@ -148,5 +148,5 @@ ByteVector CommentsFrame::renderFields() const
 CommentsFrame::CommentsFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new CommentsFramePrivate();
-  parseFields(data.mid(Header::size(), size()));
+  parseFields(data.mid(Header::size(h->version()), size()));
 }

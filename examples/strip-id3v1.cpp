@@ -35,6 +35,6 @@ int main(int argc, char *argv[])
     std::cout << "******************** Stripping ID3v1 Tag From: \"" << argv[i] << "\"********************" << std::endl;
 
     MPEG::File f(argv[i]);
-    f.strip(MPEG::File::ID3v1);
+    f.strip();
   }
 }
