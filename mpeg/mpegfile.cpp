@@ -338,13 +338,21 @@ bool MPEG::File::strip(int tags)
     return false;
   }
 
-  if(tags & ID3v2 && d->hasID3v2)
+  if(tags & ID3v2 && d->hasID3v2) {
     removeBlock(d->ID3v2Location, d->ID3v2OriginalSize);
+    d->ID3v2Location = -1;
+    d->ID3v2OriginalSize = 0;
+    d->hasID3v2 = false;
+    delete d->ID3v2Tag;
+    d->ID3v2Tag = 0;
+  }
 
   if(tags & ID3v1 && d->hasID3v1) {
     truncate(d->ID3v1Location);
     d->ID3v1Location = -1;
     d->hasID3v1 = false;
+    delete d->ID3v1Tag;
+    d->ID3v1Tag = 0;
   }
 
   return true;
