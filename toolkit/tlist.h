@@ -109,14 +109,16 @@ namespace TagLib {
     void sortedInsert(const T &value, bool unique = false);
 
     /*!
-     * Appends \a item to the end of the list.
+     * Appends \a item to the end of the list and returns a reference to the
+     * list.
      */
-    void append(const T &item);
+    List<T> &append(const T &item);
 
     /*!
-     * Appends all of the values in \a l to the end of the list.
+     * Appends all of the values in \a l to the end of the list and returns a
+     * reference to the list.
      */
-    void append(const List<T> &l);
+    List<T> &append(const List<T> &l);
 
     /*!
      * Clears the list.  If auto deletion is enabled and this list contains a

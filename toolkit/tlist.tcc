@@ -149,17 +149,19 @@ void List<T>::sortedInsert(const T &value, bool unique)
 }
 
 template <class T>
-void List<T>::append(const T &item)
+List<T> &List<T>::append(const T &item)
 {
   detach();
   d->list.push_back(item);
+  return *this;
 }
 
 template <class T>
-void List<T>::append(const List<T> &l)
+List<T> &List<T>::append(const List<T> &l)
 {
   detach();
   d->list.insert(d->list.end(), l.begin(), l.end());
+  return *this;
 }
 
 template <class T>
