@@ -1,0 +1,3 @@
+#AM_INIT_AUTOMAKE(taglib,1.0)
+dnl don't remove the below
+dnl AC_OUTPUT(taglib/taglib-config)

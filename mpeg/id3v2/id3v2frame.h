@@ -1,0 +1,252 @@
+/***************************************************************************
+    copyright            : (C) 2002, 2003 by Scott Wheeler
+    email                : wheeler@kde.org
+ ***************************************************************************/
+
+/***************************************************************************
+ *   This library is free software; you can redistribute it and/or modify  *
+ *   it  under the terms of the GNU Lesser General Public License version  *
+ *   2.1 as published by the Free Software Foundation.                     *
+ *                                                                         *
+ *   This library is distributed in the hope that it will be useful, but   *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   Lesser General Public License for more details.                       *
+ *                                                                         *
+ *   You should have received a copy of the GNU Lesser General Public      *
+ *   License along with this library; if not, write to the Free Software   *
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+ *   USA                                                                   *
+ ***************************************************************************/
+
+#ifndef TAGLIB_ID3V2FRAME_H
+#define TAGLIB_ID3V2FRAME_H
+
+#include <tstring.h>
+#include <tbytevector.h>
+
+namespace TagLib {
+
+  namespace ID3v2 {
+
+    class FrameFactory;
+
+    //! ID3v2 frame implementation
+
+    /*!
+     * This class is the main ID3v2 frame implementation.  In ID3v2, a tag is
+     * split between a collection of frames (which are in turn split into fields
+     * (Structure, <a href="id3v2-structure.html#4">4</a>)
+     * (<a href="id3v2-frames.html">Frames</a>).  This class provides an API for
+     * gathering information about and modifying ID3v2 frames.  Funtionallity
+     * specific to a given frame type is handed in one of the many subclasses.
+     */
+
+    class Frame
+    {
+      friend class FrameFactory;
+
+    public:
+      /*!
+       * Destroys this Frame instance.
+       */
+      virtual ~Frame();
+
+      /*!
+       * Returns the Frame ID (Structure, <a href="id3v2-structure.html#4">4</a>)
+       * (Frames, <a href="id3v2-frames.html#4">4</a>)
+       */
+      ByteVector frameID() const;
+
+      /*!
+       * Returns the size of the frame.
+       */
+      uint size() const;
+
+      /*!
+       * Returns the size of the frame header
+       */
+      static uint headerSize();
+
+      /*!
+       * Sets the data that will be used as the frame.  Since the length is not
+       * known before the frame has been parsed, this should just be a pointer to
+       * the first byte of the frame.  It will determine the length internally
+       * and make that available through size().
+       */
+      void setData(const ByteVector &data);
+
+      /*!
+       * Set the text of frame in the sanest way possible.  This should only be
+       * reimplemented in frames where there is some logical mapping to text.
+       *
+       * \note If the frame type supports multiple text encodings, this will not
+       * change the text encoding of the frame; the string will be converted to
+       * that frame's encoding.  Please use the specific APIs of the frame types
+       * to set the encoding if that is desired.
+       */
+      virtual void setText(const String &text);
+
+      /*!
+       * This returns the textual representation of the data in the frame.
+       * Subclasses must reimplement this method to provide a string
+       * representation of the frame's data.
+       */
+      virtual String toString() const = 0;
+
+      /*!
+       * Render the frame back to its binary format in a ByteVector.
+       */
+      ByteVector render() const;
+
+      /*!
+       * Returns the text delimiter that is used between fields for the string
+       * type \a t.
+       */
+      static ByteVector textDelimiter(String::Type t);
+
+    protected:
+      class Header;
+
+      /*!
+       * Constructs an ID3v2 frame using \a data to read the header information.
+       * All other processing of \a data should be handled in a subclass.
+       *
+       * \note This need not contain anything more than a frame ID, but
+       * \e must constain at least that.
+       */
+      explicit Frame(const ByteVector &data);
+
+      /*!
+       * This creates an Frame using the header \a h.
+       *
+       * The ownership of this header will be assigned to the frame and the
+       * header will be deleted when the frame is destroyed.
+       */
+      Frame(Header *h);
+
+      /*!
+       * Returns a pointer to the frame header.
+       */
+      Header *header() const;
+
+      /*!
+       * Sets the header to \a h.  If \a deleteCurrent is true, this will free
+       * the memory of the current header.
+       *
+       * The ownership of this header will be assigned to the frame and the
+       * header will be deleted when the frame is destroyed.
+       */
+      void setHeader(Header *h, bool deleteCurrent = true);
+
+      /*!
+       * Called by setData() to parse the frame data.  It makes this information
+       * available through the public API.
+       */
+      void parse(const ByteVector &data);
+
+      /*!
+       * Called by parse() to parse the field data.  It makes this information
+       * available through the public API.  This must be overridden by the
+       * subclasses.
+       */
+      virtual void parseFields(const ByteVector &data) = 0;
+
+      /*!
+       * Render the field data back to a binary format in a ByteVector.  This
+       * must be overridden by subclasses.
+       */
+      virtual ByteVector renderFields() const = 0;
+
+    private:
+      Frame(const Frame &);
+      Frame &operator=(const Frame &);
+
+      class FramePrivate;
+      FramePrivate *d;
+    };
+
+    //! ID3v2 frame header implementation
+
+    /*!
+     * The ID3v2 Frame Header (Structure, <a href="id3v2-structure.html#4">4</a>)
+     *
+     * Every ID3v2::Frame has an associated header that gives some general
+     * properties of the frame and also makes it possible to identify the frame
+     * type.
+     *
+     * As such when reading an ID3v2 tag ID3v2::FrameFactory first creates the
+     * frame headers and then creates the appropriate Frame subclass based on
+     * the type and attaches the header.
+     */
+
+    class Frame::Header
+    {
+    public:
+      /*!
+       * Construct a Frame Header based on \a data.  \a data must at least
+       * contain a 4 byte frame ID, and optionally can contain flag data and the
+       * frame size.  i.e. Just the frame id -- "TALB" -- is a valid value.
+       */
+      explicit Header(const ByteVector &data, bool synchSafeInts = true);
+
+      /*!
+       * Destroys this Header instance.
+       */
+      virtual ~Header();
+
+      /*!
+       * Sets the data for the Header.
+       */
+      void setData(const ByteVector &data, bool synchSafeInts = true);
+
+      /*!
+       * Returns the Frame ID (Structure, <a href="id3v2-structure.html#4">4</a>)
+       * (Frames, <a href="id3v2-frames.html#4">4</a>)
+       */
+      ByteVector frameID() const;
+
+      /*!
+       * Sets the frame's ID to \a id.  Only the first four bytes of \a id will
+       * be used.
+       *
+       * \warning This method should in general be avoided.  It exists simply to
+       * provide a mechanism for transforming frames from a deprecated frame type
+       * to a newer one -- i.e. TYER to TDRC from ID3v2.3 to ID3v2.4.
+       */
+      void setFrameID(const ByteVector &id);
+
+      /*!
+       * Returns the size of the frame data portion, as set when setData() was
+       * called or set explicity via setFrameSize().
+       */
+      uint frameSize() const;
+
+      /*!
+       * Sets the size of the frame data portion.
+       */
+      void setFrameSize(uint size);
+
+      /*!
+       * Returns the size of the frame header in bytes.  Currently this is
+       * always 10.
+       */
+      static uint size();
+
+      /*!
+       * Render the Header back to binary format in a ByteVector.
+       */
+      ByteVector render() const;
+
+    private:
+      Header(const Header &);
+      Header &operator=(const Header &);
+
+      class HeaderPrivate;
+      HeaderPrivate *d;
+    };
+
+  }
+}
+
+#endif
