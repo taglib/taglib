@@ -44,6 +44,10 @@ int main(int argc, char *argv[])
     printf("******************** \"%s\" ********************\n", argv[i]);
 
     file = taglib_file_new(argv[i]);
+
+    if(file == NULL)
+      break;
+
     tag = taglib_file_tag(file);
     properties = taglib_file_audioproperties(file);
 
