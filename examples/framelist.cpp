@@ -27,7 +27,6 @@
 #include <unistd.h>
 
 #include <tbytevector.h>
-#include <fileref.h>
 
 #include <mpegfile.h>
 
@@ -37,9 +36,6 @@
 
 #include <id3v1tag.h>
 
-#include <vorbisfile.h>
-#include <xiphcomment.h>
-
 using namespace std;
 using namespace TagLib;
 
@@ -47,66 +43,49 @@ int main(int argc, char *argv[])
 {
   // process the command line args
 
+
   for(int i = 1; i < argc; i++) {
 
     cout << "******************** \"" << argv[i] << "\"********************" << endl;
 
-    FileRef file(argv[i]);
+    MPEG::File f(argv[i]);
 
-    if(dynamic_cast<MPEG::File *>(file.file())) {
-      MPEG::File *f = static_cast<MPEG::File *>(file.file());
+    ID3v2::Tag *id3v2tag = f.ID3v2Tag();
 
-      ID3v2::Tag *id3v2tag = f->ID3v2Tag();
+    if(id3v2tag) {
 
-      if(id3v2tag) {
+      cout << "ID3v2."
+           << id3v2tag->header()->majorVersion()
+           << "."
+           << id3v2tag->header()->revisionNumber()
+           << ", "
+           << id3v2tag->header()->tagSize()
+           << " bytes in tag"
+           << endl;
 
-        cout << "ID3v2."
-             << id3v2tag->header()->majorVersion()
-             << "."
-             << id3v2tag->header()->revisionNumber()
-             << ", "
-             << id3v2tag->header()->tagSize()
-             << " bytes in tag"
-             << endl;
-
-        ID3v2::FrameList::ConstIterator it = id3v2tag->frameList().begin();
-        for(; it != id3v2tag->frameList().end(); it++)
-          cout << (*it)->frameID() << " - \"" << (*it)->toString() << "\"" << endl;
-      }
-      else
-        cout << "file does not have a valid id3v2 tag" << endl;
-
-      cout << endl << "ID3v1" << endl;
-
-      ID3v1::Tag *id3v1tag = f->ID3v1Tag();
-
-      if(id3v1tag) {
-        cout << "title   - \"" << id3v1tag->title()   << "\"" << endl;
-        cout << "artist  - \"" << id3v1tag->artist()  << "\"" << endl;
-        cout << "album   - \"" << id3v1tag->album()   << "\"" << endl;
-        cout << "year    - \"" << id3v1tag->year()    << "\"" << endl;
-        cout << "comment - \"" << id3v1tag->comment() << "\"" << endl;
-        cout << "track   - \"" << id3v1tag->track()   << "\"" << endl;
-        cout << "genre   - \"" << id3v1tag->genre()   << "\"" << endl;
-      }
-      else
-        cout << "file does not have a valid id3v1 tag" << endl;
-
+      ID3v2::FrameList::ConstIterator it = id3v2tag->frameList().begin();
+      for(; it != id3v2tag->frameList().end(); it++)
+        cout << (*it)->frameID() << " - \"" << (*it)->toString() << "\"" << endl;
     }
-    else if(dynamic_cast<Ogg::Vorbis::File *>(file.file())) {
-      Ogg::Vorbis::File *f = static_cast<Ogg::Vorbis::File *>(file.file());
-      Ogg::XiphComment *tag = f->tag();
+    else
+      cout << "file does not have a valid id3v2 tag" << endl;
 
-      const Ogg::FieldListMap fields = tag->fieldListMap();
-      for(Ogg::FieldListMap::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
-        cout << (*it).first << " -";
-        StringList values = (*it).second;
-        for(StringList::ConstIterator valueIt = values.begin(); valueIt != values.end(); ++valueIt)
-          cout << " \"" << *valueIt << '"';
-        cout << endl;
-      }
+    cout << endl << "ID3v1" << endl;
+
+    ID3v1::Tag *id3v1tag = f.ID3v1Tag();
+
+    if(id3v1tag) {
+      cout << "title   - \"" << id3v1tag->title()   << "\"" << endl;
+      cout << "artist  - \"" << id3v1tag->artist()  << "\"" << endl;
+      cout << "album   - \"" << id3v1tag->album()   << "\"" << endl;
+      cout << "year    - \"" << id3v1tag->year()    << "\"" << endl;
+      cout << "comment - \"" << id3v1tag->comment() << "\"" << endl;
+      cout << "track   - \"" << id3v1tag->track()   << "\"" << endl;
+      cout << "genre   - \"" << id3v1tag->genre()   << "\"" << endl;
     }
-    
+    else
+      cout << "file does not have a valid id3v1 tag" << endl;
+
     cout << endl;
   }
 }
