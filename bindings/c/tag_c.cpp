@@ -87,9 +87,9 @@ const TagLib_AudioProperties *taglib_file_audioproperties(const TagLib_File *fil
   return reinterpret_cast<const TagLib_AudioProperties *>(f->audioProperties());
 }
 
-void taglib_file_save(TagLib_File *file)
+BOOL taglib_file_save(TagLib_File *file)
 {
-  reinterpret_cast<File *>(file)->save();
+  return reinterpret_cast<File *>(file)->save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

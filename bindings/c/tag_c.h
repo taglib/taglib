@@ -109,7 +109,7 @@ const TagLib_AudioProperties *taglib_file_audioproperties(const TagLib_File *fil
 /*!
  * Saves the \a file to disk.
  */
-void taglib_file_save(TagLib_File *file);
+BOOL taglib_file_save(TagLib_File *file);
 
 /******************************************************************************
  * Tag API
