@@ -67,6 +67,22 @@ Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) con
 Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 {
   Frame::Header *header = new Frame::Header(data, version);
+  ByteVector frameID = header->frameID();
+
+  // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
+  // characters.  Also make sure that there is data in the frame.
+
+  if(!frameID.size() == (version < 3 ? 3 : 4) || header->frameSize() <= 0) {
+    delete header;
+    return 0;
+  }
+
+  for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
+    if( (*it < 'A' || *it > 'Z') && (*it < '1' || *it > '9') ) {
+      delete header;
+      return 0;
+    }
+  }
 
   // TagLib doesn't mess with encrypted frames, so just treat them
   // as unknown frames.
@@ -80,21 +96,6 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
   if(header->encryption()) {
     debug("Encrypted frames are currently not supported.");
     return new UnknownFrame(data, header);
-  }
-
-  TagLib::ByteVector frameID = header->frameID();
-
-  // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
-  // characters.  Also make sure that there is data in the frame.
-
-  if(!frameID.size() == (version < 3 ? 3 : 4) || header->frameSize() <= 0)
-    return 0;
-
-  for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
-    if( (*it < 'A' || *it > 'Z') && (*it < '1' || *it > '9') ) {
-      delete header;
-      return 0;
-    }
   }
 
   if(!updateFrame(header)) {
