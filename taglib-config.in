@@ -35,14 +35,14 @@ do
 	  flags="$flags -I$includedir/taglib"
 	  ;;
     --version)
-	  echo 1.1
+	  echo 1.2
 	  ;;
     --prefix)
 	  echo $prefix
 	  ;;
 	*)
 	  echo "$0: unknown option $1"
-	  echo 
+	  echo
 	  usage
 	  ;;
   esac
