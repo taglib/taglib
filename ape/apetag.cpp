@@ -155,6 +155,7 @@ ByteVector APE::Tag::render() const
 
   d->footer.setItemCount(itemCount);
   d->footer.setTagSize(data.size()+Footer::size());
+  d->footer.setHeaderPresent(true);
 
   return d->footer.renderHeader() + data + d->footer.renderFooter();
 }
@@ -276,9 +277,8 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
   if(replace)
     removeItem(key);
   if(!value.isEmpty()) {
-    Map<const String, Item>::Iterator it = d->itemListMap.find(key.upper());
-    if(it != d->itemListMap.end())
-      d->itemListMap[key].value.append(value);
+    if(d->itemListMap.contains(key) || !replace)
+      d->itemListMap[key.upper()].value.append(value);
     else
       setItem(key, Item(value));
   }
@@ -286,7 +286,7 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
 
 void APE::Tag::setItem(const String &key, const Item &item)
 {
-  d->itemListMap.insert(key, item);
+  d->itemListMap.insert(key.upper(), item);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,15 +317,14 @@ void APE::Tag::parse(const ByteVector &data, uint count)
     uint valueLength = data.mid(pos + 0, 4).toUInt(false);
     uint flags = data.mid(pos + 4, 4).toUInt(false);
     String key = String(data.mid(pos + 8), String::UTF8);
-    key = key.upper();
     APE::Item item;
 
     if(flags < 4 ) {
       ByteVector val = data.mid(pos + 8 + key.size() + 1, valueLength);
-      d->itemListMap.insert(key, Item(parseAPEString(val)));
+      d->itemListMap.insert(key.upper(), Item(parseAPEString(val)));
     }
     else
-      d->binaries.insert(key, data.mid(pos, 8 + key.size() + 1 + valueLength));
+      d->binaries.insert(key.upper(), data.mid(pos, 8 + key.size() + 1 + valueLength));
 
     pos += 8 + key.size() + 1 + valueLength;
     count--;
