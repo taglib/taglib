@@ -28,7 +28,7 @@
 #include "id3v2header.h"
 #include "apetag.h"
 #include "apefooter.h"
-#include "mpctag.h"
+#include "combinedtag.h"
 
 using namespace TagLib;
 
@@ -107,19 +107,44 @@ MPC::Properties *MPC::File::audioProperties() const
 
 bool MPC::File::save()
 {
+  if(readOnly()) {
+    debug("MPC::File::save() -- File is read only.");
+    return false;
+  }
+
+  // Possibly strip ID3v2 tag
+
+  if(d->hasID3v2 && !d->ID3v2Header) {
+    removeBlock(d->ID3v2Location, d->ID3v2Size);
+    d->hasID3v2 = false;
+    if(d->hasID3v1)
+      d->ID3v1Location -= d->ID3v2Size;
+    if(d->hasAPE)
+      d->APELocation -= d->ID3v2Size;
+  }
 
   // Update ID3v1 tag
 
   if(d->ID3v1Tag) {
     if(d->hasID3v1) {
-      seek(-128, End);
+      seek(d->ID3v1Location);
       writeBlock(d->ID3v1Tag->render());
     }
     else {
       seek(0, End);
+      d->ID3v1Location = tell();
       writeBlock(d->ID3v1Tag->render());
+      d->hasID3v1 = true;
     }
-  }
+  } else
+    if(d->hasID3v1) {
+      removeBlock(d->ID3v1Location, 128);
+      d->hasID3v1 = false;
+      if(d->hasAPE) {
+        if(d->APELocation < d->ID3v1Location)
+          d->APELocation -= 128;
+      }
+    }
 
   // Update APE tag
 
@@ -128,15 +153,30 @@ bool MPC::File::save()
       insert(d->APETag->render(), d->APELocation, d->APESize);
     else {
       if(d->hasID3v1)  {
-        seek(-128, End);
-        insert(d->APETag->render(), tell(), 0);
+        insert(d->APETag->render(), d->ID3v1Location, 0);
+        d->APESize = d->APETag->footer()->completeTagSize();
+        d->hasAPE = true;
+        d->APELocation = d->ID3v1Location;
+        d->ID3v1Location += d->APESize;
       }
       else {
         seek(0, End);
+        d->APELocation = tell();
         writeBlock(d->APETag->render());
+        d->APESize = d->APETag->footer()->completeTagSize();
+        d->hasAPE = true;
       }
     }
   }
+  else
+    if(d->hasAPE) {
+      removeBlock(d->APELocation, d->APESize);
+      d->hasAPE = false;
+      if(d->hasID3v1) {
+        if (d->ID3v1Location > d->APELocation)
+          d->ID3v1Location -= d->APESize;
+      }
+    }
 
   return true;
 }
@@ -175,6 +215,35 @@ APE::Tag *MPC::File::APETag(bool create)
   return d->APETag;
 }
 
+void MPC::File::remove(int tags)
+{
+  if(tags & ID3v1) {
+    delete d->ID3v1Tag;
+    d->ID3v1Tag = 0;
+
+    if(d->APETag)
+      d->tag = d->APETag;
+    else
+      d->tag = d->APETag = new APE::Tag();
+  }
+
+  if(tags & ID3v2) {
+    delete d->ID3v2Header;
+    d->ID3v2Header = 0;
+  }
+
+  if(tags & APE) {
+    delete d->APETag;
+    d->APETag = 0;
+
+    if(d->ID3v1Tag)
+      d->tag = d->ID3v1Tag;
+    else
+      d->tag = d->APETag = new APE::Tag();
+  }
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,8 +262,6 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for an APE tag
 
   findAPE();
-
-  // Look for an APE tag
 
   d->APELocation = findAPE();
 
@@ -243,17 +310,19 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
 
 long MPC::File::findAPE()
 {
-  if(isValid()) {
-    if(d->hasID3v1)
-      seek(-160, End);
-    else
-      seek(-32, End);
+  if(!isValid())
+    return -1;
 
-    long p = tell();
+  if(d->hasID3v1)
+    seek(-160, End);
+  else
+    seek(-32, End);
 
-    if(readBlock(8) == APE::Tag::fileIdentifier())
-      return p;
-  }
+  long p = tell();
+
+  if(readBlock(8) == APE::Tag::fileIdentifier())
+    return p;
+
   return -1;
 }
 

@@ -67,10 +67,12 @@ namespace TagLib {
         NoTags  = 0x0000,
         //! Matches ID3v1 tags.
         ID3v1   = 0x0001,
+        //! Matches ID3v2 tags.
+        ID3v2   = 0x0002,
         //! Matches APE tags.
         APE     = 0x0004,
-        //! Matches APE behind ID3v1
-        APEID3  = 0x0005
+        //! Matches all tag types.
+        AllTags = 0xffff
       };
 
       /*!
@@ -99,7 +101,7 @@ namespace TagLib {
       virtual Properties *audioProperties() const;
 
       /*!
-       * Save the file.
+       * Saves the file.
        */
       virtual bool save();
 
@@ -130,6 +132,16 @@ namespace TagLib {
        * destroyed.
        */
       APE::Tag *APETag(bool create = false);
+
+      /*!
+       * This will remove the tags that match the OR-ed together TagTypes from the
+       * file.  By default it removes all tags.
+       *
+       * \note This will also invalidate pointers to the tags
+       * as their memory will be freed.
+       * \note In order to make the removal permanent save() still needs to be called
+       */
+      void remove(int tags = AllTags);
 
     private:
       File(const File &);
