@@ -36,7 +36,7 @@ public:
 
 UnknownFrame::UnknownFrame(const ByteVector &data) : Frame(data)
 {
-  d = new UnknownFramePrivate();
+  d = new UnknownFramePrivate;
   setData(data);
 }
 
@@ -76,5 +76,5 @@ ByteVector UnknownFrame::renderFields() const
 UnknownFrame::UnknownFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new UnknownFramePrivate;
-  parseFields(data.mid(Header::size(), size()));
+  parseFields(data.mid(Header::size(h->version()), size()));
 }
