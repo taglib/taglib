@@ -184,6 +184,19 @@ namespace TagLib {
   private:
     const ByteVector v;
   };
+
+  template <class T>
+  T toNumber(const std::vector<char> &data, bool mostSignificantByteFirst)
+  {
+    T sum = 0;
+    uint size = sizeof(T);
+    uint last = data.size() > size ? size - 1 : data.size() - 1;
+
+    for(uint i = 0; i <= last; i++)
+      sum |= (T) uchar(data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
+
+    return sum;
+  }
 }
 
 using namespace TagLib;
@@ -474,47 +487,17 @@ TagLib::uint ByteVector::checksum() const
 
 TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  uint sum = 0;
-  int last = d->data.size() > 4 ? 3 : d->data.size() - 1;
-
-  for(int i = 0; i <= last; i++)
-    sum |= uchar(d->data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
-
-  return sum;
+  return toNumber<uint>(d->data, mostSignificantByteFirst);
 }
 
-int ByteVector::toInt(bool mostSignificantByteFirst) const
+short ByteVector::toShort(bool mostSignificantByteFirst) const
 {
-  int sum = 0;
-  int last = d->data.size() > 4 ? 3 : d->data.size() - 1;
-
-  bool negative = uchar(d->data[mostSignificantByteFirst ? 0 : last]) & 0x80;
-
-  if(negative) {
-    for(int i = 0; i <= last; i++)
-      sum |= uchar(d->data[i] ^ 0xff) << ((mostSignificantByteFirst ? last - i : i) * 8);
-    sum = (sum + 1) * -1;
-  }
-  else {
-    for(int i = 0; i <= last; i++)
-      sum |= uchar(d->data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
-  }
-
-  return sum;
+  return toNumber<unsigned short>(d->data, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
-  // Just do all of the bit operations on the unsigned value and use an implicit
-  // cast on the way out.
-
-  unsigned long long sum = 0;
-  int last = d->data.size() > 8 ? 7 : d->data.size() - 1;
-
-  for(int i = 0; i <= last; i++)
-    sum |= (unsigned long long) uchar(d->data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
-
-  return sum;
+  return toNumber<unsigned long long>(d->data, mostSignificantByteFirst);
 }
 
 const char &ByteVector::operator[](int index) const

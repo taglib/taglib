@@ -244,20 +244,16 @@ namespace TagLib {
     uint toUInt(bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the first 4 bytes of the vector to an integer.
+     * Converts the first 2 bytes of the vector to a short.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
      * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
      * 0x01000000 == 1.
      *
-     * This will correctly adjust for the bit indicated signedness being the most
-     * significant bit of the most significant byte.
-     *
-     * \see fromUInt()
+     * \see fromShort()
      */
-    int toInt(bool mostSignificantByteFirst = true) const;
-
+    short toShort(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 8 bytes of the vector to a (signed) long long.
