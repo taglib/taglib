@@ -65,6 +65,9 @@ namespace TagLib {
        * Contructs an MPEG file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
+       *
+       * \deprecated This constructor will be dropped in favor of the one below
+       * in a future version.
        */
       File(const char *file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);

@@ -63,6 +63,9 @@ namespace TagLib {
        * Contructs a FLAC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
+       *
+       * \deprecated This constructor will be dropped in favor of the one below
+       * in a future version.
        */
       File(const char *file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
@@ -159,12 +162,16 @@ namespace TagLib {
       /*!
        * Returns the block of data used by FLAC::Properties for parsing the
        * stream properties.
+       *
+       * \deprecated This method will not be public in a future release.
        */
       ByteVector streamInfoData(); // BIC: remove
 
       /*!
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
+       *
+       * \deprecated This method will not be public in a future release.
        */
       long streamLength();  // BIC: remove
 
