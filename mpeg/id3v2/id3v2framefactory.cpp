@@ -139,21 +139,105 @@ FrameFactory::~FrameFactory()
 bool FrameFactory::updateFrame(Frame::Header *header) const
 {
   TagLib::ByteVector frameID = header->frameID();
-  if(frameID == "EQUA" ||
-     frameID == "RVAD" ||
-     frameID == "TIME" ||
-     frameID == "TRDA" ||
-     frameID == "TSIZ")
+
+  switch(header->version()) {
+
+  case 2: // ID3v2.2
   {
-    debug("ID3v2.4 no longer supports the frame type " + String(frameID) +
-          ".  It will be discarded from the tag.");
-    return false;
+    if(frameID == "CRM" ||
+       frameID == "EQU" ||
+       frameID == "LNK" ||
+       frameID == "RVA" ||
+       frameID == "TIM" ||
+       frameID == "TSI")
+    {
+      debug("ID3v2.4 no longer supports the frame type " + String(frameID) +
+            ".  It will be discarded from the tag.");
+      return false;
+    }
+
+    // ID3v2.2 only used 3 bytes for the frame ID, so we need to convert all of
+    // the frames to their 4 byte ID3v2.4 equivalent.
+
+    convertFrame("BUF", "RBUF", header);
+    convertFrame("CNT", "PCNT", header);
+    convertFrame("COM", "COMM", header);
+    convertFrame("CRA", "AENC", header);
+    convertFrame("ETC", "ETCO", header);
+    convertFrame("GEO", "GEOB", header);
+    convertFrame("IPL", "TIPL", header);
+    convertFrame("MCI", "MCDI", header);
+    convertFrame("MLL", "MLLT", header);
+    convertFrame("PIC", "APIC", header);
+    convertFrame("POP", "POPM", header);
+    convertFrame("REV", "RVRB", header);
+    convertFrame("SLT", "SYLT", header);
+    convertFrame("STC", "SYTC", header);
+    convertFrame("TAL", "TALB", header);
+    convertFrame("TBP", "TBPM", header);
+    convertFrame("TCM", "TCOM", header);
+    convertFrame("TCO", "TCON", header);
+    convertFrame("TCR", "TCOP", header);
+    convertFrame("TDA", "TRDC", header);
+    convertFrame("TDY", "TDLY", header);
+    convertFrame("TEN", "TENC", header);
+    convertFrame("TFT", "TFLT", header);
+    convertFrame("TKE", "TKEY", header);
+    convertFrame("TLA", "TLAN", header);
+    convertFrame("TLE", "TLEN", header);
+    convertFrame("TMT", "TMED", header);
+    convertFrame("TOA", "TOAL", header);
+    convertFrame("TOF", "TOFN", header);
+    convertFrame("TOL", "TOLY", header);
+    convertFrame("TOR", "TDOR", header);
+    convertFrame("TOT", "TOAL", header);
+    convertFrame("TP1", "TPE1", header);
+    convertFrame("TP2", "TPE2", header);
+    convertFrame("TP3", "TPE3", header);
+    convertFrame("TP4", "TPE4", header);
+    convertFrame("TPA", "TPOS", header);
+    convertFrame("TPB", "TPUB", header);
+    convertFrame("TRC", "TSRC", header);
+    convertFrame("TRD", "TRDC", header);
+    convertFrame("TRK", "TRCK", header);
+    convertFrame("TSS", "TSSE", header);
+    convertFrame("TT1", "TIT1", header);
+    convertFrame("TT2", "TIT2", header);
+    convertFrame("TT3", "TIT3", header);
+    convertFrame("TXT", "TOLY", header);
+    convertFrame("TXX", "TXXX", header);
+    convertFrame("TYE", "TRDC", header);
+    convertFrame("UFI", "UFID", header);
+    convertFrame("ULT", "USLT", header);
+    convertFrame("WAF", "WOAF", header);
+    convertFrame("WAR", "WOAR", header);
+    convertFrame("WAS", "WOAS", header);
+    convertFrame("WCM", "WCOM", header);
+    convertFrame("WCP", "WCOP", header);
+    convertFrame("WPB", "WPUB", header);
+    convertFrame("WXX", "WXXX", header);
   }
 
-  convertFrame("TDAT", "TRDC", header);
-  convertFrame("TORY", "TDOR", header);
-  convertFrame("TYER", "TRDC", header);
+  case 3: // ID3v2.3
+  {
+    if(frameID == "EQUA" ||
+       frameID == "RVAD" ||
+       frameID == "TIME" ||
+       frameID == "TRDA" ||
+       frameID == "TSIZ")
+    {
+      debug("ID3v2.4 no longer supports the frame type " + String(frameID) +
+            ".  It will be discarded from the tag.");
+      return false;
+    }
 
+    convertFrame("TDAT", "TRDC", header);
+    convertFrame("TORY", "TDOR", header);
+    convertFrame("TYER", "TRDC", header);
+
+    break;
+  }
+  }
   return true;
 }
 
