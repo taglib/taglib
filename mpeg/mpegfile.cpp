@@ -538,6 +538,8 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
     d->APEOriginalSize = d->APETag->footer()->completeTagSize();
 
+    d->APELocation = d->APELocation + d->APETag->footer()->size() - d->APEOriginalSize;
+
     d->hasAPE = true;
   }
 
