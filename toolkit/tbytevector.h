@@ -248,8 +248,7 @@ namespace TagLib {
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
-     * 0x01000000 == 1.
+     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
      *
      * \see fromShort()
      */
