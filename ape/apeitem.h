@@ -42,11 +42,11 @@ namespace TagLib {
        * Enum of types an Item can have. The value of 3 is reserved.
        */
       enum ItemTypes {
-        //! item contains text information coded in UTF-8
+        //! Item contains text information coded in UTF-8
         Text = 0,
-        //! item contains binary information
+        //! Item contains binary information
         Binary = 1,
-        //! item is a locator of external stored information
+        //! Item is a locator of external stored information
         Locator = 2
       };
       /*!
@@ -57,28 +57,35 @@ namespace TagLib {
       /*!
        * Constructs an item with \a key and \a value.
        */
-      Item(const String& key, const String& value);
+      Item(const String &key, const String &value);
 
       /*!
        * Constructs an item with \a key and \a values.
        */
-      Item(const String& key, const StringList& values);
-
-      Item(const Item&);
-      Item& operator=(const Item&);
+      Item(const String &key, const StringList &values);
 
       /*!
-       * Returns the key
+       * Construct an item as a copy of \a item.
+       */
+      Item(const Item &item);
+
+      /*!
+       * Copies the contents of \a item into this item.
+       */
+      Item &operator=(const Item &item);
+
+      /*!
+       * Returns the key.
        */
       String key() const;
 
       /*!
-       * Returns the binary value
+       * Returns the binary value.
        */
       ByteVector value() const;
 
       /*!
-       * Returns the size of the full item
+       * Returns the size of the full item.
        */
       int size() const;
 
@@ -99,22 +106,22 @@ namespace TagLib {
       ByteVector render();
 
       /*!
-       * Render the item to a ByteVector
+       * Render the item to a ByteVector.
        */
       ByteVector render() const;
 
       /*!
-       * Parse the item from the ByteVector \a data
+       * Parse the item from the ByteVector \a data.
        */
       void parse(const ByteVector& data);
 
       /*!
-       * Set the item to read-only
+       * Set the item to read-only.
        */
-      void setReadOnly(bool);
+      void setReadOnly(bool readOnly);
 
       /*!
-       * Returns if the item is read-only
+       * Return true if the item is read-only.
        */
       bool isReadOnly() const;
 

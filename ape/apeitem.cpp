@@ -44,28 +44,28 @@ APE::Item::Item()
   d = new ItemPrivate;
 }
 
-APE::Item::Item(const String& key, const String& str)
+APE::Item::Item(const String &key, const String &s)
 {
   d = new ItemPrivate;
   d->key = key;
-  d->text.append(str);
+  d->text.append(s);
 }
 
-APE::Item::Item(const Item& item)
+APE::Item::Item(const Item &item)
 {
   d = new ItemPrivate(*item.d);
 }
 
-Item &APE::Item::operator=(const Item& item)
+Item &APE::Item::operator=(const Item &item)
 {
   delete d;
   d = new ItemPrivate(*item.d);
   return *this;
 }
 
-void APE::Item::setReadOnly(bool val)
+void APE::Item::setReadOnly(bool readOnly)
 {
-  d->readOnly = val;
+  d->readOnly = readOnly;
 }
 
 bool APE::Item::isReadOnly() const
@@ -135,10 +135,8 @@ void APE::Item::parse(const ByteVector& data)
   setReadOnly(flags & 1);
   setType(ItemTypes((flags >> 1) & 3));
 
-  if(int(d->type) < 2) {
-    ByteVectorList bl = ByteVectorList::split(d->value, '\0');
-    d->text = StringList(bl, String::UTF8);
-  }
+  if(int(d->type) < 2)
+    d->text = StringList(ByteVectorList::split(d->value, '\0'), String::UTF8);
 }
 
 ByteVector APE::Item::render()
@@ -164,7 +162,8 @@ ByteVector APE::Item::render() const
       value.append(it->data(String::UTF8));
     }
     d->value = value;
-  } else
+  }
+  else
     value.append(d->value);
 
   data.append(ByteVector::fromUInt(value.size(), false));
