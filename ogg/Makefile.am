@@ -1,4 +1,4 @@
-SUBDIRS = vorbis
+SUBDIRS = vorbis flac
 
 INCLUDES = -I$(top_srcdir)/taglib -I$(top_srcdir)/taglib/toolkit $(all_includes)
 
@@ -18,6 +18,6 @@ taglib_include_HEADERS = \
 
 taglib_includedir = $(includedir)/taglib
 
-libogg_la_LIBADD = ./vorbis/libvorbis.la
+libogg_la_LIBADD = ./vorbis/libvorbis.la ./flac/liboggflac.la
 
 EXTRA_DIST = $(libogg_la_SOURCES) $(taglib_include_HEADERS)
