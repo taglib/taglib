@@ -43,11 +43,18 @@ APE::Item::Item()
   d = new ItemPrivate;
 }
 
-APE::Item::Item(const String &key, const String &s)
+APE::Item::Item(const String &key, const String &value)
 {
   d = new ItemPrivate;
   d->key = key;
-  d->text.append(s);
+  d->text.append(value);
+}
+
+APE::Item::Item(const String &key, const StringList &values)
+{
+  d = new ItemPrivate;
+  d->key = key;
+  d->text = values;
 }
 
 APE::Item::Item(const Item &item)
