@@ -53,9 +53,9 @@ public:
 
   ~FilePrivate()
   {
+    if (tag != ID3v1Tag && tag != APETag) delete tag;
     delete ID3v1Tag;
     delete APETag;
-    delete tag;
     delete ID3v2Header;
     delete properties;
   }
