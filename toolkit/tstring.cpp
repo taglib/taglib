@@ -158,6 +158,9 @@ String::String(const ByteVector &v, Type t)
 {
   d = new StringPrivate;
 
+  if(v.isEmpty())
+    return;
+
   if(t == Latin1 || t == UTF8) {
 
     int length = 0;
@@ -175,7 +178,7 @@ String::String(const ByteVector &v, Type t)
     wstring::iterator targetIt = d->data.begin();
 
     for(ByteVector::ConstIterator it = v.begin();
-        it + 1 != v.end() && combine(*it, *(it + 1));
+        it != v.end() && it + 1 != v.end() && combine(*it, *(it + 1));
         it += 2)
     {
       *targetIt = combine(*it, *(it + 1));
