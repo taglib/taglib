@@ -34,6 +34,8 @@ namespace TagLib {
 
   class File;
 
+  //! An implementation of the APE tagging format
+
   namespace APE {
 
     class Footer;
