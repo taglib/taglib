@@ -84,7 +84,7 @@ void testString()
 
   String unicode2(unicode.to8Bit(true), String::UTF8);
   printResult(unicode == unicode2);
-
+  
   printResult(strcmp(String::number(0).toCString(), "0") == 0);
   printResult(strcmp(String::number(12345678).toCString(), "12345678") == 0);
   printResult(strcmp(String::number(-12345678).toCString(), "-12345678") == 0);
@@ -104,6 +104,14 @@ void testString()
 
   printResult(memcmp(String("foo").data(String::Latin1).data(), "foo", 3) == 0);
   printResult(memcmp(String("f").data(String::Latin1).data(), "f", 1) == 0);
+
+  ByteVector utf16 = unicode.data(String::UTF16);
+
+  // Check to make sure that the BOM is there and that the data size is correct
+
+  printResult(utf16.size() == 2 + (unicode.size() * 2));
+
+  printResult(unicode == String(utf16, String::UTF16));
 }
 
 void testConversion(unsigned int i, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
