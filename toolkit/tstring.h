@@ -28,11 +28,15 @@
 #include <string>
 
 /*!
+ * \relates TagLib::String
+ *
  * Converts a TagLib::String to a QString without a requirement to link to Qt.
  */
 #define QStringToTString(s) TagLib::String(s.utf8().data(), TagLib::String::UTF8)
 
 /*!
+ * \relates TagLib::String
+ *
  * Converts a TagLib::String to a QString without a requirement to link to Qt.
  */
 #define TStringToQString(s) QString::fromUtf8(s.toCString(true))
@@ -325,7 +329,7 @@ namespace TagLib {
     static String null;
 
   protected:
-    /*
+    /*!
      * If this String is being shared via implicit sharing, do a deep copy of the
      * data and separate from the shared members.  This should be called by all
      * non-const subclass members.

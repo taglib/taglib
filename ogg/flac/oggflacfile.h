@@ -30,17 +30,17 @@ namespace TagLib {
 
   class Tag;
 
-  //! An implementation of Ogg/FLAC metadata
+  namespace Ogg {
+
+  //! An implementation of Ogg FLAC metadata
 
   /*!
-   * This is implementation of FLAC metadata for Ogg/FLAC files.  For native
+   * This is implementation of FLAC metadata for Ogg FLAC files.  For "pure"
    * FLAC files look under the FLAC hiearchy.
    *
-   * Unlike native FLAC-files, Ogg/FLAC only supports Xiph-comments, 
+   * Unlike "pure" FLAC-files, Ogg FLAC only supports Xiph-comments, 
    * while the audio-properties are the same.
    */
-
-  namespace Ogg {
   namespace FLAC {
 
     using TagLib::FLAC::Properties;
@@ -51,7 +51,7 @@ namespace TagLib {
      * This implements and provides an interface for Ogg/FLAC files to the
      * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
      * the abstract TagLib::File API as well as providing some additional
-     * information specific to Ogg/FLAC files.
+     * information specific to Ogg FLAC files.
      */
 
     class File : public TagLib::Ogg::File
