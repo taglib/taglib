@@ -160,12 +160,15 @@ String::String(const ByteVector &v, Type t)
 
   if(t == Latin1 || t == UTF8) {
 
+    int length = 0;
     d->data.resize(v.size());
     wstring::iterator targetIt = d->data.begin();
     for(ByteVector::ConstIterator it = v.begin(); it != v.end() && (*it); ++it) {
       *targetIt = uchar(*it);
       ++targetIt;
+      ++length;
     }
+    d->data.resize(length);
   }
   else  {
     d->data.resize(v.size() / 2);
