@@ -252,6 +252,26 @@ const char *String::toCString(bool unicode) const
   return d->CString;
 }
 
+String::Iterator String::begin()
+{
+  return d->data.begin();
+}
+
+String::ConstIterator String::begin() const
+{
+  return d->data.begin();
+}
+
+String::Iterator String::end()
+{
+  return d->data.end();
+}
+
+String::ConstIterator String::end() const
+{
+  return d->data.end();
+}
+
 int String::find(const String &s, int offset) const
 {
   wstring::size_type position = d->data.find(s.d->data, offset);
@@ -431,6 +451,16 @@ String String::number(int n) // static
     s += charStack.d->data[i];
 
   return s;
+}
+
+TagLib::wchar &String::operator[](int i)
+{
+  return d->data[i];
+}
+
+const TagLib::wchar &String::operator[](int i) const
+{
+  return d->data[i];
 }
 
 bool String::operator==(const String &s) const

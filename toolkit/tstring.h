@@ -63,6 +63,12 @@ namespace TagLib {
   class String
   {
   public:
+
+#ifndef DO_NOT_DOCUMENT
+    typedef std::basic_string<wchar>::iterator Iterator;
+    typedef std::basic_string<wchar>::const_iterator ConstIterator;
+#endif
+
     /**
      * The four types of string encodings supported by the ID3v2 specification.
      * ID3v1 is assumed to be Latin1 and Ogg Vorbis comments use UTF8.
@@ -177,6 +183,28 @@ namespace TagLib {
     const char *toCString(bool unicode = false) const;
 
     /*!
+     * Returns an iterator pointing to the beginning of the string.
+     */
+    Iterator begin();
+
+    /*!
+     * Returns a const iterator pointing to the beginning of the string.
+     */
+    ConstIterator begin() const;
+
+    /*!
+     * Returns an iterator pointing to the end of the string (the position
+     * after the last character).
+     */
+    Iterator end();
+
+    /*!
+     * Returns a const iterator pointing to the end of the string (the position
+     * after the last character).
+     */
+    ConstIterator end() const;
+
+    /*!
      * Finds the first occurance of pattern \a s in this string starting from
      * \a offset.  If the pattern is not found, -1 is returned.
      */
@@ -243,6 +271,16 @@ namespace TagLib {
      * Converts the base-10 integer \a n to a string.
      */
     static String number(int n);
+
+    /*!
+     * Returns a reference to the character at position \a i.
+     */
+    wchar &operator[](int i);
+
+    /*!
+     * Returns a const reference to the character at position \a i.
+     */
+    const wchar &operator[](int i) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
