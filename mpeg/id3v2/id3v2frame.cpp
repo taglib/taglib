@@ -251,7 +251,7 @@ void Frame::Header::setData(const ByteVector &data, bool synchSafeInts)
 
 void Frame::Header::setData(const ByteVector &data, uint version)
 {
- d->version = version;
+  d->version = version;
 
   switch(version) {
   case 0:
