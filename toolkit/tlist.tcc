@@ -141,7 +141,7 @@ void List<T>::sortedInsert(const T &value, bool unique)
 {
   detach();
   Iterator it = begin();
-  while(*it < value && it != end())
+  while(it != end() && *it < value)
     ++it;
   if(unique && it != end() && *it == value)
     return;
