@@ -28,6 +28,8 @@
 #include "tstring.h"
 #include "tstringlist.h"
 
+#include "apeitem.h"
+
 namespace TagLib {
 
   class File;
@@ -36,22 +38,6 @@ namespace TagLib {
 
     class Footer;
 
-    /*!
-     * A non-binary APE-item.
-     */
-    struct Item
-    {
-      Item() {};
-      explicit Item(const String &);
-      explicit Item(const StringList &);
-      bool readOnly;
-      /*!
-       * The value is a URL to external data
-       */
-      bool locator;
-      StringList value;
-      bool isEmpty() const;
-    };
 
     /*!
      * A mapping between a list of item names, or keys, and the associated item.
@@ -120,7 +106,7 @@ namespace TagLib {
       const ItemListMap &itemListMap() const;
 
       /*!
-       * Removes the \a key comment from the tag
+       * Removes the \a key item from the tag
        */
       void removeItem(const String &key);
 
