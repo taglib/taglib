@@ -26,7 +26,6 @@
 using namespace TagLib;
 using namespace APE;
 
-
 class APE::Item::ItemPrivate
 {
 public:
@@ -113,8 +112,10 @@ bool APE::Item::isEmpty() const
   switch(d->type) {
     case 0:
     case 1:
-      if(d->text.isEmpty()) return true;
-      if(d->text.size() == 1 && d->text.front() == "") return true;
+      if(d->text.isEmpty())
+        return true;
+      if(d->text.size() == 1 && d->text.front() == "")
+        return true;
       return false;
     case 2:
       return d->value.isEmpty();
@@ -146,7 +147,7 @@ void APE::Item::parse(const ByteVector &data)
 
 ByteVector APE::Item::render()
 {
-    return const_cast<const Item *>(this)->render();
+  return const_cast<const Item *>(this)->render();
 }
 
 ByteVector APE::Item::render() const
