@@ -23,6 +23,7 @@
 #define TAGLIB_OGGFLACFILE_H
 
 #include <oggfile.h>
+#include <xiphcomment.h>
 
 #include <flacproperties.h>
 
@@ -38,13 +39,13 @@ namespace TagLib {
    * This is implementation of FLAC metadata for Ogg FLAC files.  For "pure"
    * FLAC files look under the FLAC hiearchy.
    *
-   * Unlike "pure" FLAC-files, Ogg FLAC only supports Xiph-comments, 
+   * Unlike "pure" FLAC-files, Ogg FLAC only supports Xiph-comments,
    * while the audio-properties are the same.
    */
   namespace FLAC {
 
     using TagLib::FLAC::Properties;
-    
+
     //! An implementation of TagLib::File with Ogg/FLAC specific methods
 
     /*!
