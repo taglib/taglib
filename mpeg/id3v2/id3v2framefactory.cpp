@@ -26,6 +26,7 @@
 #include "frames/unknownframe.h"
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
+#include "frames/attachedpictureframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -103,6 +104,15 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 
   if(frameID == "COMM") {
     CommentsFrame *f = new CommentsFrame(data, header);
+    if(d->useDefaultEncoding)
+      f->setTextEncoding(d->defaultEncoding);
+    return f;
+  }
+
+  // Attached Picture (frames 4.14)
+
+  if(frameID == "APIC") {
+    AttachedPictureFrame *f = new AttachedPictureFrame(data, header);
     if(d->useDefaultEncoding)
       f->setTextEncoding(d->defaultEncoding);
     return f;

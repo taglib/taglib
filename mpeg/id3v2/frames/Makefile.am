@@ -5,9 +5,18 @@ INCLUDES = \
 
 noinst_LTLIBRARIES = libframes.la
 
-libframes_la_SOURCES = unknownframe.cpp textidentificationframe.cpp commentsframe.cpp
+libframes_la_SOURCES = \
+	attachedpictureframe.cpp \
+	commentsframe.cpp \
+	textidentificationframe.cpp \
+	unknownframe.cpp
 
-taglib_include_HEADERS = unknownframe.h textidentificationframe.h commentsframe.h
+taglib_include_HEADERS = \
+	attachedpictureframe.h \
+	commentsframe.h \
+	textidentificationframe.h \
+	unknownframe.h
+
 taglib_includedir = $(includedir)/taglib
 
 EXTRA_DIST = $(libframes_la_SOURCES) $(taglib_include_HEADERS)
