@@ -96,9 +96,7 @@ namespace TagLib {
  * \section why Why TagLib?
  *
  * TagLib was written to fill a gap in the Open Source/Free Software community.  Currently there is a lack in the
- * OSS/FS for a homogenous API to the most common music types.  In fact the only semi-portable implementation of the
- * ID3v2 standard available on Linux is id3lib, which unfortunately is poorly written, poorly documented and which
- * cycles through maintainers at least once a year (I took my turn some time ago.).
+ * OSS/FS for a homogenous API to the most common music types.
  *
  * As TagLib will be initially injected into the KDE community, while I am not linking to any of the KDE or Qt libraries
  * I have tried to follow the coding style of those libraries.  Again, this is in sharp contrast to id3lib, which
@@ -127,10 +125,30 @@ namespace TagLib {
  *
  * \endcode
  *
- * Notice that these high level functions work for both Ogg \e and MP3.  For this high level API, which is suitable for
- * most applications, the differences between ID3v2, ID3v1, MPEG and Ogg Vorbis can all be ignored.
+ * Note that these high level functions work for Ogg, FLAC, MPC \e and MP3 (or any other formats supported in the
+ * future).  For this high level API, which is suitable for most applications, the differences between tag and file
+ * formats can all be ignored.
+ *
+ * \section Building
+ *
+ * TagLib provides a script called taglib-config that returns the necessary compiler and linker flags, as well as the
+ * version number.  To build a small sample program one would use:
+ *
+ * <tt>g++ taglib-test.cpp `taglib-config --cflags --libs` -o taglib-test</tt>
+ *
+ * This should generally be integrated into the configure check for TagLib in your project.
+ *
+ * \note TagLib includes assume that you have the TagLib include path specified in the compile line, by default
+ * <tt>-I/usr/local/include/taglib</tt>.  Using <tt>#include <taglib/tag.h></tt> <b>will not work</b>.  (Though this
+ * is usually handled by the taglib-config script mentioned above.)
+ *
+ * \section Contact
+ *
+ *  - <a href="http://developer.kde.org/~wheeler/taglib/">TagLib Homepage</a>
+ *  - <a href="https://mail.kde.org/mailman/listinfo/taglib-devel">TagLib Mailing List (taglib-devel@kde.org)</a>
  *
  * \author Scott Wheeler <wheeler@kde.org>
+ *
  */
 
 #endif
