@@ -216,6 +216,8 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     convertFrame("WCP", "WCOP", header);
     convertFrame("WPB", "WPUB", header);
     convertFrame("WXX", "WXXX", header);
+
+    break;
   }
 
   case 3: // ID3v2.3
@@ -237,7 +239,12 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 
     break;
   }
+
+  default:
+    break;
+
   }
+
   return true;
 }
 
