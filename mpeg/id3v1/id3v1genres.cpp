@@ -26,7 +26,7 @@ using namespace TagLib;
 namespace TagLib {
   namespace ID3v1 {
 
-    static const int genresSize = 147;
+    static const int genresSize = 148;
     static const String genres[] = {
       "Blues",
       "Classic Rock",

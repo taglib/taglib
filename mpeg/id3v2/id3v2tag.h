@@ -232,17 +232,26 @@ namespace TagLib {
       /*!
        * Add a frame to the tag.  At this point the tag takes ownership of
        * the frame and will handle freeing its memory.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by frameList()
        */
       void addFrame(Frame *frame);
 
       /*!
        * Remove a frame from the tag.  If \a del is true the frame's memory
        * will be freed; if it is false, it must be deleted by the user.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by frameList()
        */
       void removeFrame(Frame *frame, bool del = true);
 
       /*!
        * Remove all frames of type \a id from the tag and free their memory.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by frameList()
        */
       void removeFrames(const ByteVector &id);
 
