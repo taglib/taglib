@@ -130,7 +130,7 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 5, 5).upper() == ".FLAC")
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 5, 4).upper() == ".MPC")
+    if(s.substr(s.size() - 4, 4).upper() == ".MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
