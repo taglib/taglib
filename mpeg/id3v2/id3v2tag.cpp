@@ -295,7 +295,7 @@ const FrameList &ID3v2::Tag::frameList() const
   return d->frameList;
 }
 
-const FrameList &ID3v2::Tag::frameList(const ByteVector &frameID)
+const FrameList &ID3v2::Tag::frameList(const ByteVector &frameID) const
 {
   return d->frameListMap[frameID];
 }

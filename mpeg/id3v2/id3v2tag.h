@@ -227,7 +227,7 @@ namespace TagLib {
        *
        * \see frameListMap()
        */
-      const FrameList &frameList(const ByteVector &frameID);
+      const FrameList &frameList(const ByteVector &frameID) const;
 
       /*!
        * Add a frame to the tag.  At this point the tag takes ownership of
