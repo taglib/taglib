@@ -30,6 +30,8 @@ namespace TagLib {
 
   namespace ID3v2 {
 
+    class Tag;
+
     //! An ID3v2 text identification frame implementation
 
     /*!
@@ -162,16 +164,74 @@ namespace TagLib {
       virtual void parseFields(const ByteVector &data);
       virtual ByteVector renderFields() const;
 
-    private:
       /*!
        * The constructor used by the FrameFactory.
        */
       TextIdentificationFrame(const ByteVector &data, Header *h);
+
+    private:
       TextIdentificationFrame(const TextIdentificationFrame &);
       TextIdentificationFrame &operator=(const TextIdentificationFrame &);
 
       class TextIdentificationFramePrivate;
       TextIdentificationFramePrivate *d;
+    };
+
+    /*!
+     * This is a specialization of text identification frames that allows for
+     * user defined entries.  Each entry has a description in addition to the
+     * normal list of fields that a text identification frame has.
+     *
+     * This description identifies the frame and must be unique.
+     */
+
+    class UserTextIdentificationFrame : public TextIdentificationFrame
+    {
+      friend class FrameFactory;
+
+    public:
+      /*!
+       * Constructs an empty user defined text identification frame.  For this to be
+       * a useful frame both a description and text must be set.
+       */
+      explicit UserTextIdentificationFrame(String::Type encoding = String::Latin1);
+
+      /*!
+       * Creates a frame based on \a data.
+       */
+      explicit UserTextIdentificationFrame(const ByteVector &data);
+
+      virtual String toString() const;
+
+      /*!
+       * Returns the description for this frame.
+       */
+      String description() const;
+
+      /*!
+       * Sets the description of the frame to \a s.  \a s must be unique.  You can
+       * check for the presense of another user defined text frame of the same type
+       * using find() and testing for null.
+       */
+      void setDescription(const String &s);
+
+      StringList fieldList() const;
+      void setText(const String &text);
+      void setText(const StringList &fields);
+
+      /*!
+       * Searches for the user defined text frame with the description \a description
+       * in \a tag.  This returns null if no matching frames were found.
+       */
+      static UserTextIdentificationFrame *find(Tag *tag, const String &description);
+
+    private:
+      UserTextIdentificationFrame(const ByteVector &data, Header *h);
+      UserTextIdentificationFrame(const TextIdentificationFrame &);
+      UserTextIdentificationFrame &operator=(const UserTextIdentificationFrame &);
+
+      class UserTextIdentificationFramePrivate;
+      UserTextIdentificationFramePrivate *d;
     };
 
   }

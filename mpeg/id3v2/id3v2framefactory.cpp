@@ -106,8 +106,11 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 
   // Text Identification (frames 4.2)
 
-  if(frameID.startsWith("T") && frameID != "TXXX") {
-    TextIdentificationFrame *f = new TextIdentificationFrame(data, header);
+  if(frameID.startsWith("T")) {
+    TextIdentificationFrame *f = frameID != "TXXX"
+      ? new TextIdentificationFrame(data, header)
+      : new UserTextIdentificationFrame(data, header);
+
     if(d->useDefaultEncoding)
       f->setTextEncoding(d->defaultEncoding);
     return f;

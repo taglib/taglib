@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <tbytevectorlist.h>
+#include <id3v2tag.h>
 
 #include "textidentificationframe.h"
 
@@ -35,7 +36,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// public members
+// TextIdentificationFrame public members
 ////////////////////////////////////////////////////////////////////////////////
 
 TextIdentificationFrame::TextIdentificationFrame(const ByteVector &type, String::Type encoding) :
@@ -88,7 +89,7 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// protected members
+// TextIdentificationFrame protected members
 ////////////////////////////////////////////////////////////////////////////////
 
 void TextIdentificationFrame::parseFields(const ByteVector &data)
@@ -140,11 +141,105 @@ ByteVector TextIdentificationFrame::renderFields() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// private members
+// TextIdentificationFrame private members
 ////////////////////////////////////////////////////////////////////////////////
 
 TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data, Header *h) : Frame(h)
 {
   d = new TextIdentificationFramePrivate;
   parseFields(fieldData(data));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// UserTextIdentificationFrame public members
+////////////////////////////////////////////////////////////////////////////////
+
+UserTextIdentificationFrame::UserTextIdentificationFrame(String::Type encoding) :
+  TextIdentificationFrame("TXXX", encoding),
+  d(0)
+{
+  StringList l;
+  l.append(String::null);
+  l.append(String::null);
+  setText(l);
+}
+
+
+UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data) :
+  TextIdentificationFrame(data)
+{
+
+}
+
+String UserTextIdentificationFrame::toString() const
+{
+  return "[" + description() + "] " + fieldList().toString();
+}
+
+String UserTextIdentificationFrame::description() const
+{
+  return !TextIdentificationFrame::fieldList().isEmpty()
+    ? TextIdentificationFrame::fieldList().front()
+    : String::null;
+}
+
+StringList UserTextIdentificationFrame::fieldList() const
+{
+  StringList l = TextIdentificationFrame::fieldList();
+
+  if(!l.isEmpty()) {
+    StringList::Iterator it = l.begin();
+    l.erase(it);
+  }
+
+  return l;
+}
+
+void UserTextIdentificationFrame::setText(const String &text)
+{
+  if(description().isEmpty())
+    setDescription(String::null);
+
+  TextIdentificationFrame::setText(StringList(description()).append(text));
+}
+
+void UserTextIdentificationFrame::setText(const StringList &fields)
+{
+  if(description().isEmpty())
+    setDescription(String::null);
+
+  TextIdentificationFrame::setText(StringList(description()).append(fields));
+}
+
+void UserTextIdentificationFrame::setDescription(const String &s)
+{
+  StringList l = fieldList();
+
+  if(l.isEmpty())
+    l.append(s);
+  else
+    l[0] = s;
+
+  TextIdentificationFrame::setText(l);
+}
+
+UserTextIdentificationFrame *find(ID3v2::Tag *tag, const String &description) // static
+{
+  FrameList l = tag->frameList("TXXX");
+  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it) {
+    UserTextIdentificationFrame *f = dynamic_cast<UserTextIdentificationFrame *>(*it);
+    if(f && f->description() == description)
+      return f;
+  }
+  return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// UserTextIdentificationFrame private members
+////////////////////////////////////////////////////////////////////////////////
+
+UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data, Header *h) :
+  TextIdentificationFrame(data, h)
+{
+  
 }
