@@ -545,7 +545,7 @@ bool ByteVector::operator<(const ByteVector &v) const
 
 bool ByteVector::operator>(const ByteVector &v) const
 {
-  return !operator<(v);
+  return v < *this;
 }
 
 ByteVector ByteVector::operator+(const ByteVector &v) const
