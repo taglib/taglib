@@ -223,11 +223,11 @@ ByteVector APE::Tag::render() const
   uint itemCount = 0;
 
   {
-    Map<const String,Item>::Iterator i = d->itemListMap.begin();
-    while(i != d->itemListMap.end()) {
-      data.append(i->second.render());
+    for(Map<const String, Item>::ConstIterator it = d->itemListMap.begin();
+        it != d->itemListMap.end(); ++it)
+    {
+      data.append(it->second.render());
       itemCount++;
-      i++;
     }
   }
 

@@ -56,50 +56,60 @@ APE::Item::Item(const Item& item)
   d = new ItemPrivate(*item.d);
 }
 
-Item& APE::Item::operator=(const Item& item)
+Item &APE::Item::operator=(const Item& item)
 {
   delete d;
   d = new ItemPrivate(*item.d);
   return *this;
 }
 
-void APE::Item::setReadOnly(bool val) {
+void APE::Item::setReadOnly(bool val)
+{
   d->readOnly = val;
 }
 
-bool APE::Item::isReadOnly() const {
+bool APE::Item::isReadOnly() const
+{
   return d->readOnly;
 }
 
-void APE::Item::setType(APE::Item::ItemTypes val) {
+void APE::Item::setType(APE::Item::ItemTypes val)
+{
   d->type = val;
 }
 
-APE::Item::ItemTypes APE::Item::type() const {
+APE::Item::ItemTypes APE::Item::type() const
+{
   return d->type;
 }
 
-String APE::Item::key() const {
+String APE::Item::key() const
+{
   return d->key;
 }
 
-ByteVector APE::Item::value() const {
+ByteVector APE::Item::value() const
+{
   return d->value;
 }
 
-int APE::Item::size() const {
-  return  8 + d->key.size() + 1 + d->value.size();
+int APE::Item::size() const
+{
+  return 8 + d->key.size() + 1 + d->value.size();
 }
 
-StringList APE::Item::toStringList() const {
+StringList APE::Item::toStringList() const
+{
   return d->text;
 }
 
-String APE::Item::toString() const {
+String APE::Item::toString() const
+{
   return d->text.front();
 }
 
-bool APE::Item::isEmpty() const {
+bool APE::Item::isEmpty() const
+{
   switch(d->type) {
     case 0:
     case 1:
@@ -113,7 +123,8 @@ bool APE::Item::isEmpty() const {
   }
 }
 
-void APE::Item::parse(const ByteVector& data) {
+void APE::Item::parse(const ByteVector& data)
+{
   uint valueLength  = data.mid(0, 4).toUInt(false);
   uint flags        = data.mid(4, 4).toUInt(false);
 
@@ -124,14 +135,18 @@ void APE::Item::parse(const ByteVector& data) {
   setReadOnly(flags & 1);
   setType(ItemTypes((flags >> 1) & 3));
 
-  if ((int)(d->type) < 2) {
+  if(int(d->type) < 2) {
     ByteVectorList bl = ByteVectorList::split(d->value, '\0');
     d->text = StringList(bl, String::UTF8);
   }
-
 }
 
 ByteVector APE::Item::render()
+{
+    return const_cast<const Item *>(this)->render();
+}
+
+ByteVector APE::Item::render() const
 {
   ByteVector data;
   TagLib::uint flags = ((d->readOnly) ? 1 : 0) | (d->type << 1);
@@ -144,10 +159,9 @@ ByteVector APE::Item::render()
     StringList::ConstIterator it = d->text.begin();
     value.append(it->data(String::UTF8));
     it++;
-    while(it != d->text.end()) {
+    for(; it != d->text.end(); ++it) {
       value.append('\0');
       value.append(it->data(String::UTF8));
-      it++;
     }
     d->value = value;
   } else

@@ -35,8 +35,9 @@ namespace TagLib {
     /*!
      * This class provides the features of items in the APEv2 standard.
      */
-    struct Item
+    class Item
     {
+    public:
       /*!
        * Enum of types an Item can have. The value of 3 is reserved.
        */
@@ -93,9 +94,14 @@ namespace TagLib {
       StringList toStringList() const;
 
       /*!
-       * Render the item to a ByteVector
+       * \deprecated Use the const version.
        */
       ByteVector render();
+
+      /*!
+       * Render the item to a ByteVector
+       */
+      ByteVector render() const;
 
       /*!
        * Parse the item from the ByteVector \a data
