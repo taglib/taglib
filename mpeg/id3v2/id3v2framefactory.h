@@ -67,6 +67,7 @@ namespace TagLib {
        * version of the tag.  As ID3v2.4 is the most current version of the
        * standard 4 is the default.
        */
+      // BIC: make virtual
       Frame *createFrame(const ByteVector &data, uint version = 4) const;
 
       /*!
