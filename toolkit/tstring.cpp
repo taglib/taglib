@@ -312,6 +312,7 @@ ByteVector String::data(Type t) const
       v.append(c1);
       v.append(c2);
     }
+    break;
   }
   case UTF16BE:
   {
