@@ -43,7 +43,25 @@ public:
   String comment;
   uchar track;
   uchar genre;
+
+  static const StringHandler *stringHandler;
 };
+
+const ID3v1::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = new StringHandler;
+
+////////////////////////////////////////////////////////////////////////////////
+// StringHandler implementation
+////////////////////////////////////////////////////////////////////////////////
+
+String ID3v1::StringHandler::parse(const ByteVector &data) const
+{
+  return String(data, String::Latin1);
+}
+
+ByteVector ID3v1::StringHandler::render(const String &s) const
+{
+  return s.data(String::Latin1);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
@@ -73,11 +91,11 @@ ByteVector ID3v1::Tag::render() const
   ByteVector data;
 
   data.append(fileIdentifier());
-  data.append(d->title.data(String::Latin1).resize(30));
-  data.append(d->artist.data(String::Latin1).resize(30));
-  data.append(d->album.data(String::Latin1).resize(30));
-  data.append(d->year.data(String::Latin1).resize(4));
-  data.append(d->comment.data(String::Latin1).resize(28));
+  data.append(TagPrivate::stringHandler->render(d->title).resize(30));
+  data.append(TagPrivate::stringHandler->render(d->artist).resize(30));
+  data.append(TagPrivate::stringHandler->render(d->album).resize(30));
+  data.append(TagPrivate::stringHandler->render(d->year).resize(4));
+  data.append(TagPrivate::stringHandler->render(d->comment).resize(28));
   data.append(char(0));
   data.append(char(d->track));
   data.append(char(d->genre));
@@ -160,6 +178,12 @@ void ID3v1::Tag::setTrack(uint i)
   d->track = i;
 }
 
+void ID3v1::Tag::setStringHandler(const StringHandler *handler)
+{
+  delete TagPrivate::stringHandler;
+  TagPrivate::stringHandler = handler;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,16 +207,16 @@ void ID3v1::Tag::parse(const ByteVector &data)
 {
   int offset = 3;
 
-  d->title = data.mid(offset, 30);
+  d->title = TagPrivate::stringHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->artist = data.mid(offset, 30);
+  d->artist = TagPrivate::stringHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->album = data.mid(offset, 30);
+  d->album = TagPrivate::stringHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->year = data.mid(offset, 4);
+  d->year = TagPrivate::stringHandler->parse(data.mid(offset, 4));
   offset += 4;
 
   // Check for ID3v1.1 -- Note that ID3v1 *does not* support "track zero" -- this
@@ -203,7 +227,7 @@ void ID3v1::Tag::parse(const ByteVector &data)
   if(data[offset + 28] == 0 && data[offset + 29] != 0) {
     // ID3v1.1 detected
 
-    d->comment = data.mid(offset, 28);
+    d->comment = TagPrivate::stringHandler->parse(data.mid(offset, 28));
     d->track = uchar(data[offset + 29]);
   }
   else
