@@ -185,6 +185,8 @@ namespace TagLib {
      * This description identifies the frame and must be unique.
      */
 
+    //! An ID3v2 custom text identification frame implementationx
+
     class UserTextIdentificationFrame : public TextIdentificationFrame
     {
       friend class FrameFactory;
