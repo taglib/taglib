@@ -37,44 +37,96 @@ namespace TagLib {
      */
     struct Item
     {
+      /*!
+       * Enum of types an Item can have. The value of 3 is reserved.
+       */
       enum ItemTypes {
-        //! Item contains text information coded in UTF-8
+        //! item contains text information coded in UTF-8
         Text = 0,
-        //! Item contains binary information
+        //! item contains binary information
         Binary = 1,
-        //! Item is a locator of external stored information
+        //! item is a locator of external stored information
         Locator = 2
       };
+      /*!
+       * Constructs an empty item.
+       */
       Item();
-      explicit Item(ByteVector& bin);
-      explicit Item(const String&, const String&);
-      explicit Item(const String&, const StringList &);
+
+      /*!
+       * Constructs an item with \a key and \a value.
+       */
+      Item(const String& key, const String& value);
+
+      /*!
+       * Constructs an item with \a key and \a values.
+       */
+      Item(const String& key, const StringList& values);
+
       Item(const Item&);
       Item& operator=(const Item&);
 
+      /*!
+       * Returns the key
+       */
       String key() const;
+
+      /*!
+       * Returns the binary value
+       */
       ByteVector value() const;
 
+      /*!
+       * Returns the size of the full item
+       */
       int size() const;
 
+      /*!
+       * Returns the value as a single string. In case of multiple strings,
+       * the first is returned.
+       */
       String toString() const;
+
+      /*!
+       * Returns the value as a string list.
+       */
       StringList toStringList() const;
 
+      /*!
+       * Render the item to a ByteVector
+       */
       ByteVector render();
-      void parse(const ByteVector&);
 
+      /*!
+       * Parse the item from the ByteVector \a data
+       */
+      void parse(const ByteVector& data);
+
+      /*!
+       * Set the item to read-only
+       */
       void setReadOnly(bool);
 
+      /*!
+       * Returns if the item is read-only
+       */
       bool isReadOnly() const;
 
+      /*!
+       * Sets the type of the item to \a type.
+       *
+       * \see ItemTypes
+       */
       void setType(ItemTypes type);
 
+      /*!
+       * Returns the type of the item.
+       */
       ItemTypes type() const;
-/*
-      void setValue(ByteVector);
-      void setValue(const String&);
-      void setValue(const StringList&);
- */
+
+      /*!
+       * Returns if the item has any real content.
+       */
       bool isEmpty() const;
 
     private:
