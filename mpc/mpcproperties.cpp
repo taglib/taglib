@@ -133,8 +133,8 @@ void MPC::Properties::read()
   }
 
   unsigned int samples = frames * 1152 - 576;
-  d->length = (samples + (d->sampleRate / 2)) / d->sampleRate;
+  d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
 
   if(!d->bitrate)
-    d->bitrate = ((d->streamLength * 8L) / d->length) / 1000;
+    d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
 }

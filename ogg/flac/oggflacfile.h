@@ -55,7 +55,7 @@ namespace TagLib {
      * information specific to Ogg FLAC files.
      */
 
-    class File : public TagLib::Ogg::File
+    class File : public Ogg::File
     {
     public:
       /*!

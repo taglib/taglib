@@ -190,9 +190,9 @@ void MPEG::Properties::read()
       static const int blockSize[] = { 0, 384, 1152, 1152 };
 
       double timePerFrame = blockSize[firstHeader.layer()];
-      timePerFrame = timePerFrame / firstHeader.sampleRate();
+      timePerFrame = firstHeader.sampleRate() > 0 ? timePerFrame / firstHeader.sampleRate() : 0;
       d->length = int(timePerFrame * xingHeader.totalFrames());
-      d->bitrate = d->length == 0 ? 0 : xingHeader.totalSize() * 8 / d->length / 1000;
+      d->bitrate = d->length > 0 ? xingHeader.totalSize() * 8 / d->length / 1000 : 0;
   }
 
   // Since there was no valid Xing header found, we hope that we're in a constant

@@ -129,10 +129,11 @@ void FLAC::Properties::read()
   // The last 4 bits are the most significant 4 bits for the 36 bit
   // stream length in samples. (Audio files measured in days)
 
-  uint highLength = (((flags & 0xf) << 28) / d->sampleRate) << 4;
+  uint highLength =d->sampleRate > 0 ? (((flags & 0xf) << 28) / d->sampleRate) << 4 : 0;
   pos += 4;
 
-  d->length = (d->data.mid(pos, 4).toUInt(true)) / d->sampleRate + highLength;
+  d->length = d->sampleRate > 0 ?
+      (d->data.mid(pos, 4).toUInt(true)) / d->sampleRate + highLength : 0;
   pos += 4;
 
   // Uncompressed bitrate:
@@ -141,9 +142,5 @@ void FLAC::Properties::read()
   
   // Real bitrate:
   
-  if(d->length)
-    d->bitrate = ((d->streamLength * 8L) / d->length) / 1000;
-  else
-    d->bitrate = 0;
-  
+  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
 }
