@@ -137,7 +137,7 @@ namespace TagLib {
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       void scan();
-      bool findAPE();
+      long findAPE();
       long findID3v1();
       long findID3v2();
 

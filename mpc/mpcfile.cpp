@@ -27,6 +27,7 @@
 #include "id3v1tag.h"
 #include "id3v2header.h"
 #include "apetag.h"
+#include "apefooter.h"
 #include "mpctag.h"
 
 using namespace TagLib;
@@ -36,7 +37,6 @@ class MPC::File::FilePrivate
 public:
   FilePrivate() :
     APETag(0),
-    APEFooter(-1),
     APELocation(-1),
     APESize(0),
     ID3v1Tag(0),
@@ -197,8 +197,13 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
 
   findAPE();
 
+  // Look for an APE tag
+
+  d->APELocation = findAPE();
+
   if(d->APELocation >= 0) {
-    d->APETag = new APE::Tag(this, d->APEFooter);
+    d->APETag = new APE::Tag(this, d->APELocation);
+    d->APESize = d->APETag->footer()->completeTagSize();
     d->hasAPE = true;
   }
 
@@ -237,26 +242,20 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   }
 }
 
-bool MPC::File::findAPE()
+long MPC::File::findAPE()
 {
-  if(!isValid())
-    return false;
+    if(isValid()) {
+    if (d->hasID3v1)
+        seek(-160, End);
+    else
+        seek(-32, End);
 
-  if (d->hasID3v1)
-    seek(-160, End);
-  else
-    seek(-32, End);
-  long p = tell();
+    long p = tell();
 
-  ByteVector footer = readBlock(32);
-  if(footer.mid(0,8) == APE::Tag::fileIdentifier()) {
-     d->APEFooter = p;
-     d->APESize = APE::Tag::tagSize(footer);
-     d->APELocation = p + 32 - d->APESize;
-     return true;
+    if(readBlock(8) == APE::Tag::fileIdentifier())
+      return p;
   }
-
-  return false;
+  return -1;
 }
 
 long MPC::File::findID3v1()
