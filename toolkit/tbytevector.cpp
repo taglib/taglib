@@ -1,5 +1,5 @@
 /***************************************************************************
-    copyright            : (C) 2002, 2003 by Scott Wheeler
+    copyright            : (C) 2002 - 2004 by Scott Wheeler
     email                : wheeler@kde.org
  ***************************************************************************/
 
@@ -424,7 +424,7 @@ ByteVector &ByteVector::resize(uint size, char padding)
 {
   if(d->size < size) {
     d->data.reserve(size);
-    ::memset(DATA(d), padding, size - d->size);
+    d->data.insert(d->data.end(), size - d->size, padding);
   }
   else
     d->data.erase(d->data.begin() + size, d->data.end());
