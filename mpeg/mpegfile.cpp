@@ -40,7 +40,8 @@ namespace TagLib {
   public:
     MPEGTag(MPEG::File *f) : TagLib::Tag(), file(f) {}
 
-    virtual String title() const {
+    virtual String title() const
+    {
       if(file->ID3v2Tag() && !file->ID3v2Tag()->title().isEmpty())
         return file->ID3v2Tag()->title();
 
@@ -50,7 +51,8 @@ namespace TagLib {
       return String::null;
     }
 
-    virtual String artist() const {
+    virtual String artist() const
+    {
       if(file->ID3v2Tag() && !file->ID3v2Tag()->artist().isEmpty())
         return file->ID3v2Tag()->artist();
 
@@ -60,7 +62,8 @@ namespace TagLib {
       return String::null;
     }
 
-    virtual String album() const {
+    virtual String album() const
+    {
       if(file->ID3v2Tag() && !file->ID3v2Tag()->album().isEmpty())
         return file->ID3v2Tag()->album();
 
@@ -70,7 +73,8 @@ namespace TagLib {
       return String::null;
     }
 
-    virtual String comment() const {
+    virtual String comment() const
+    {
       if(file->ID3v2Tag() && !file->ID3v2Tag()->comment().isEmpty())
         return file->ID3v2Tag()->comment();
 
@@ -80,7 +84,8 @@ namespace TagLib {
       return String::null;
     }
 
-    virtual String genre() const {
+    virtual String genre() const
+    {
       if(file->ID3v2Tag() && !file->ID3v2Tag()->genre().isEmpty())
         return file->ID3v2Tag()->genre();
 
@@ -90,7 +95,8 @@ namespace TagLib {
       return String::null;
     }
 
-    virtual uint year() const {
+    virtual uint year() const
+    {
       if(file->ID3v2Tag() && file->ID3v2Tag()->year() > 0)
         return file->ID3v2Tag()->year();
 
@@ -100,7 +106,8 @@ namespace TagLib {
       return 0;
     }
 
-    virtual uint track() const {
+    virtual uint track() const
+    {
       if(file->ID3v2Tag() && file->ID3v2Tag()->track() > 0)
         return file->ID3v2Tag()->track();
 
@@ -110,37 +117,44 @@ namespace TagLib {
       return 0;
     }
 
-    virtual void setTitle(const String &s) {
+    virtual void setTitle(const String &s)
+    {
       file->ID3v2Tag(true)->setTitle(s);
       file->ID3v1Tag(true)->setTitle(s);
     }
 
-    virtual void setArtist(const String &s) {
+    virtual void setArtist(const String &s)
+    {
       file->ID3v2Tag(true)->setArtist(s);
       file->ID3v1Tag(true)->setArtist(s);
     }
 
-    virtual void setAlbum(const String &s) {
+    virtual void setAlbum(const String &s)
+    {
       file->ID3v2Tag(true)->setAlbum(s);
       file->ID3v1Tag(true)->setAlbum(s);
     }
 
-    virtual void setComment(const String &s) {
+    virtual void setComment(const String &s)
+    {
       file->ID3v2Tag(true)->setComment(s);
       file->ID3v1Tag(true)->setComment(s);
     }
 
-    virtual void setGenre(const String &s) {
+    virtual void setGenre(const String &s)
+    {
       file->ID3v2Tag(true)->setGenre(s);
       file->ID3v1Tag(true)->setGenre(s);
     }
 
-    virtual void setYear(uint i) {
+    virtual void setYear(uint i)
+    {
       file->ID3v2Tag(true)->setYear(i);
       file->ID3v1Tag(true)->setYear(i);
     }
 
-    virtual void setTrack(uint i) {
+    virtual void setTrack(uint i)
+    {
       file->ID3v2Tag(true)->setTrack(i);
       file->ID3v1Tag(true)->setTrack(i);
     }
