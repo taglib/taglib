@@ -182,6 +182,7 @@ namespace TagLib {
       Frame &operator=(const Frame &);
 
       class FramePrivate;
+      friend class FramePrivate;
       FramePrivate *d;
     };
 
