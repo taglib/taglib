@@ -45,7 +45,6 @@ apidox:
 	echo "HTML_FOOTER         = doc/common/footer.html" >> taglib.doxyfile ; \
 	echo "HTML_STYLESHEET     = doc/common/doxygen.css" >> taglib.doxyfile ; \
 	echo "FILE_PATTERNS       = *.h" >> taglib.doxyfile ; \
-	echo "PREDEFINED          = DO_NOT_DOCUMENT" >> taglib.doxyfile ; \
-	echo "PREDEFINED          = DOXYGEN" >> taglib.doxyfile ; \
+	echo "PREDEFINED          = DO_NOT_DOCUMENT DOXYGEN" >> taglib.doxyfile ; \
 	echo "EXTRACT_ALL         = YES" >> taglib.doxyfile ; \
 	doxygen taglib.doxyfile
