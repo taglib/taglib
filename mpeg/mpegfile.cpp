@@ -315,7 +315,7 @@ ID3v2::Tag *MPEG::File::ID3v2Tag(bool create)
 
   // no ID3v2 tag exists and we've been asked to create one
 
-  d->ID3v2Tag = new ID3v2::Tag();
+  d->ID3v2Tag = new ID3v2::Tag;
   return d->ID3v2Tag;
 }
 

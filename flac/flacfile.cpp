@@ -88,9 +88,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 FLAC::File::File(const char *file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                 Properties::ReadStyle propertiesStyle) :
+  TagLib::File(file)
 {
   d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+
+FLAC::File::File(const char *file, ID3v2::FrameFactory *frameFactory,
+                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(file)
+{
+  d = new FilePrivate;
+  d->ID3v2FrameFactory = frameFactory;
   read(readProperties, propertiesStyle);
 }
 
