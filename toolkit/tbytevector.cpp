@@ -483,6 +483,26 @@ TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
   return sum;
 }
 
+int ByteVector::toInt(bool mostSignificantByteFirst) const
+{
+  int sum = 0;
+  int last = d->data.size() > 4 ? 3 : d->data.size() - 1;
+
+  bool negative = uchar(d->data[mostSignificantByteFirst ? 0 : last]) & 0x80;
+
+  if(negative) {
+    for(int i = 0; i <= last; i++)
+      sum |= uchar(d->data[i] ^ 0xff) << ((mostSignificantByteFirst ? last - i : i) * 8);
+    sum = (sum + 1) * -1;
+  }
+  else {
+    for(int i = 0; i <= last; i++)
+      sum |= uchar(d->data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
+  }
+
+  return sum;
+}
+
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
   // Just do all of the bit operations on the unsigned value and use an implicit
