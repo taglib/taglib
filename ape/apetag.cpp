@@ -213,7 +213,7 @@ void APE::Tag::read()
       return;
 
     d->file->seek(d->tagOffset + Footer::size() - d->footer.tagSize());
-    parse(d->file->readBlock(d->footer.tagSize() - Footer::size()), d->footer.itemCount());
+    parse(d->file->readBlock(d->footer.tagSize() - Footer::size()));
   }
 }
 
@@ -238,17 +238,23 @@ ByteVector APE::Tag::render() const
   return d->footer.renderHeader() + data + d->footer.renderFooter();
 }
 
-void APE::Tag::parse(const ByteVector &data, uint count)
+void APE::Tag::parse(const ByteVector &data, uint)
+{
+  parse(data);
+}
+
+void APE::Tag::parse(const ByteVector &data)
 {
   uint pos = 0;
 
-  while(count > 0) {
+  // 11 bytes is the minimum size for an APE item
+
+  for(uint i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
     APE::Item item;
     item.parse(data.mid(pos));
 
     d->itemListMap.insert(item.key().upper(), item);
 
     pos += item.size();
-    count--;
   }
 }

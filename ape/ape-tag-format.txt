@@ -87,7 +87,7 @@ Member of APE Tag 2.0
 |                |         | items excluding the header (for 1.000          |
 |                |         | compatibility)                                 |
 |----------------|---------|------------------------------------------------|
-|Item Count      | 4 bytes | Number of items in the tag                     |
+| Item Count     | 4 bytes | Number of items in the tag                     |
 |----------------|---------|------------------------------------------------|
 | Tag Flags      | 4 bytes | Global flags                                   |
 |----------------|---------|------------------------------------------------|

@@ -142,8 +142,14 @@ namespace TagLib {
       void read();
       /*!
        * Parses the body of the tag in \a data with \a count items.
+       * \deprecated Please use the version that doesn't require an item count.
        */
       void parse(const ByteVector &data, uint count);
+
+      /*!
+       * Parses the body of the tag in \a data.
+       */
+      void parse(const ByteVector &data);
 
     private:
       Tag(const Tag &);

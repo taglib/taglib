@@ -126,7 +126,9 @@ bool APE::Item::isEmpty() const
 
 void APE::Item::parse(const ByteVector &data)
 {
-  if(data.size() < 10) {
+  // 11 bytes is the minimum size for an APE item
+
+  if(data.size() < 11) {
     debug("APE::Item::parse() -- no data in item");
     return;
   }
