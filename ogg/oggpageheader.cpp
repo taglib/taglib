@@ -238,7 +238,7 @@ void Ogg::PageHeader::read()
   // Sanity check -- make sure that we were in fact able to read as much data as
   // we asked for and that the page begins with "OggS".
 
-  if(data.size() != 27 || data.mid(0, 4) != "OggS") {
+  if(data.size() != 27 || !data.startsWith("OggS")) {
     debug("Ogg::PageHeader::read() -- error reading page header");
     return;
   }

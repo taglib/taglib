@@ -88,7 +88,7 @@ void MPEG::XingHeader::parse(const ByteVector &data)
 {
   // Check to see if a valid Xing header is available.
 
-  if(data.mid(0, 4) != "Xing")
+  if(!data.startsWith("Xing"))
     return;
 
   // If the XingHeader doesn't contain the number of frames and the total stream

@@ -106,7 +106,7 @@ static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 
 void MPC::Properties::read()
 {
-  if(d->data.mid(0, 3) != "MP+")
+  if(!d->data.startsWith("MP+"))
     return;
 
   d->version = d->data[3] & 15;

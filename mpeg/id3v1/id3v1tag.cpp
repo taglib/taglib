@@ -196,7 +196,7 @@ void ID3v1::Tag::read()
     ByteVector data = d->file->readBlock(128);
 
     // some initial sanity checking
-    if(data.size() == 128 && data.mid(0, 3) == "TAG")
+    if(data.size() == 128 && data.startsWith("TAG"))
       parse(data);
     else
       debug("ID3v1 tag is not valid or could not be read at the specified offset.");
