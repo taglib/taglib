@@ -192,7 +192,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     convertFrame("TCM", "TCOM", header);
     convertFrame("TCO", "TCON", header);
     convertFrame("TCR", "TCOP", header);
-    convertFrame("TDA", "TRDC", header);
+    convertFrame("TDA", "TDRC", header);
     convertFrame("TDY", "TDLY", header);
     convertFrame("TEN", "TENC", header);
     convertFrame("TFT", "TFLT", header);
@@ -212,7 +212,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     convertFrame("TPA", "TPOS", header);
     convertFrame("TPB", "TPUB", header);
     convertFrame("TRC", "TSRC", header);
-    convertFrame("TRD", "TRDC", header);
+    convertFrame("TRD", "TDRC", header);
     convertFrame("TRK", "TRCK", header);
     convertFrame("TSS", "TSSE", header);
     convertFrame("TT1", "TIT1", header);
@@ -220,7 +220,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     convertFrame("TT3", "TIT3", header);
     convertFrame("TXT", "TOLY", header);
     convertFrame("TXX", "TXXX", header);
-    convertFrame("TYE", "TRDC", header);
+    convertFrame("TYE", "TDRC", header);
     convertFrame("UFI", "UFID", header);
     convertFrame("ULT", "USLT", header);
     convertFrame("WAF", "WOAF", header);
@@ -247,16 +247,20 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
       return false;
     }
 
-    convertFrame("TDAT", "TRDC", header);
+    convertFrame("TDAT", "TDRC", header);
     convertFrame("TORY", "TDOR", header);
-    convertFrame("TYER", "TRDC", header);
+    convertFrame("TYER", "TDRC", header);
 
     break;
   }
 
   default:
-    break;
 
+    // This should catch a typo that existed in TagLib up to and including
+    // version 1.1 where TRDC was used for the year rather than TDRC.
+
+    convertFrame("TRDC", "TDRC", header);
+    break;
   }
 
   return true;

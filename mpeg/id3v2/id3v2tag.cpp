@@ -144,8 +144,8 @@ String ID3v2::Tag::genre() const
 
 TagLib::uint ID3v2::Tag::year() const
 {
-  if(!d->frameListMap["TRDC"].isEmpty())
-    return d->frameListMap["TRDC"].front()->toString().substr(0, 4).toInt();
+  if(!d->frameListMap["TDRC"].isEmpty())
+    return d->frameListMap["TDRC"].front()->toString().substr(0, 4).toInt();
   return 0;
 }
 
@@ -205,10 +205,10 @@ void ID3v2::Tag::setGenre(const String &s)
 void ID3v2::Tag::setYear(uint i)
 {
   if(i <= 0) {
-    removeFrames("TRDC");
+    removeFrames("TDRC");
     return;
   }
-  setTextFrame("TRDC", String::number(i));
+  setTextFrame("TDRC", String::number(i));
 }
 
 void ID3v2::Tag::setTrack(uint i)
