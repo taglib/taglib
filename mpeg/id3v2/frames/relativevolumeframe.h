@@ -70,6 +70,8 @@ namespace TagLib {
         Subwoofer    = 0x08
       };
 
+      //! Struct that stores the relevant values for ID3v2 peak volume
+
       /*!
        * The peak volume is described as a series of bits that is padded to fill
        * a block of bytes.  These two values should always be updated in tandem.
