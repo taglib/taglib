@@ -19,9 +19,9 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#include <tbytevectorlist.h>
+
 #include "apeitem.h"
-#include "tbytevectorlist.h"
-#include "tstringlist.h"
 
 using namespace TagLib;
 using namespace APE;
