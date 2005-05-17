@@ -344,6 +344,9 @@ ByteVector ByteVector::mid(uint index, uint length) const
 {
   ByteVector v;
 
+  if(index > size())
+    return v;
+
   ConstIterator endIt;
 
   if(length < 0xffffffff && length + index < size())
