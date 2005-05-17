@@ -29,6 +29,7 @@ namespace TagLib {
 
   namespace ID3v2 {
 
+    class Tag;
     class FrameFactory;
 
     //! ID3v2 frame implementation
@@ -44,6 +45,7 @@ namespace TagLib {
 
     class Frame
     {
+      friend class Tag;
       friend class FrameFactory;
 
     public:
@@ -295,9 +297,26 @@ namespace TagLib {
       /*!
        * Returns true if the flag for tag alter preservation is set.
        *
-       * \note This flag is currently ignored internally in TagLib.
+       * The semantics are a little backwards from what would seem natural
+       * (setting the preservation flag to throw away the frame), but this
+       * follows the ID3v2 standard.
+       *
+       * \see setTagAlterPreservation()
        */
       bool tagAlterPreservation() const;
+
+      /*!
+       * Sets the flag for preservation of this frame if the tag is set.  If
+       * this is set to true the frame will not be written when the tag is
+       * saved.
+       *
+       * The semantics are a little backwards from what would seem natural
+       * (setting the preservation flag to throw away the frame), but this
+       * follows the ID3v2 standard.
+       *
+       * \see tagAlterPreservation()
+       */
+      void setTagAlterPreservation(bool discard);
 
       /*!
        * Returns true if the flag for file alter preservation is set.

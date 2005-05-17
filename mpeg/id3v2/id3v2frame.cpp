@@ -417,6 +417,11 @@ bool Frame::Header::tagAlterPreservation() const
   return d->tagAlterPreservation;
 }
 
+void Frame::Header::setTagAlterPreservation(bool preserve)
+{
+  d->tagAlterPreservation = preserve;
+}
+
 bool Frame::Header::fileAlterPreservation() const
 {
   return d->fileAlterPreservation;

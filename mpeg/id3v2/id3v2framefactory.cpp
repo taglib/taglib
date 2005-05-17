@@ -99,8 +99,8 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
   }
 
   if(!updateFrame(header)) {
-    delete header;
-    return 0;
+    header->setTagAlterPreservation(true);
+    return new UnknownFrame(data, header);
   }
 
   // updateFrame() might have updated the frame ID.

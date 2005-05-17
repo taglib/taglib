@@ -343,8 +343,10 @@ ByteVector ID3v2::Tag::render() const
 
   // Loop through the frames rendering them and adding them to the tagData.
 
-  for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++)
-    tagData.append((*it)->render());
+  for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
+    if(!(*it)->header()->tagAlterPreservation())
+      tagData.append((*it)->render());
+  }
 
   // Compute the amount of padding, and append that to tagData.
 
