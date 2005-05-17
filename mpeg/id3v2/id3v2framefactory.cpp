@@ -103,6 +103,10 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
     return 0;
   }
 
+  // updateFrame() might have updated the frame ID.
+
+  frameID = header->frameID();
+
   // This is where things get necissarily nasty.  Here we determine which
   // Frame subclass (or if none is found simply an Frame) based
   // on the frame ID.  Since there are a lot of possibilities, that means
