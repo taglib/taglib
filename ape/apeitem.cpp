@@ -116,7 +116,7 @@ StringList APE::Item::toStringList() const
 
 String APE::Item::toString() const
 {
-  return d->text.front();
+  return isEmpty() ? String::null : d->text.front();
 }
 
 bool APE::Item::isEmpty() const
