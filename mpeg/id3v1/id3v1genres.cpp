@@ -151,7 +151,7 @@ namespace TagLib {
       "Duet",
       "Punk Rock",
       "Drum Solo",
-      "A Capella",
+      "A Cappella",
       "Euro-House",
       "Dance Hall",
       "Goa",
