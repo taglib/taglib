@@ -19,6 +19,8 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#include <tdebug.h>
+
 #include "relativevolumeframe.h"
 
 using namespace TagLib;
@@ -101,8 +103,16 @@ void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak)
 
 void RelativeVolumeFrame::parseFields(const ByteVector &data)
 {
+  if(data.size() < 6) {
+    debug("A relative volume frame must contain at least 6 bytes.");
+    return;
+  }
+
   int pos = data.find(textDelimiter(String::Latin1));
   d->identification = String(data.mid(0, pos), String::Latin1);
+
+  d->channelType = ChannelType(data[pos]);
+  pos += 1;
 
   d->volumeAdjustment = data.mid(pos, 2).toShort();
   pos += 2;
@@ -119,6 +129,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
 
   data.append(d->identification.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
+  data.append(char(d->channelType));
   data.append(ByteVector::fromShort(d->volumeAdjustment));
   data.append(char(d->peakVolume.bitsRepresentingPeak));
   data.append(d->peakVolume.peakVolume);
