@@ -165,6 +165,22 @@ List<T> &List<T>::append(const List<T> &l)
 }
 
 template <class T>
+List<T> &List<T>::prepend(const T &item)
+{
+  detach();
+  d->list.push_front(item);
+  return *this;
+}
+
+template <class T>
+List<T> &List<T>::prepend(const List<T> &l)
+{
+  detach();
+  d->list.insert(d->list.begin(), l.begin(), l.end());
+  return *this;
+}
+
+template <class T>
 void List<T>::clear()
 {
   detach();

@@ -120,6 +120,9 @@ namespace TagLib {
      */
     List<T> &append(const List<T> &l);
 
+    List<T> &prepend(const T &item);
+    List<T> &prepend(const List<T> &l);
+
     /*!
      * Clears the list.  If auto deletion is enabled and this list contains a
      * pointer type the members are also deleted.

@@ -39,7 +39,10 @@ public:
   }
 
   File *file;
+  static List<const FileTypeResolver *> fileTypeResolvers;
 };
+
+List<const FileRef::FileTypeResolver *> FileRef::FileRefPrivate::fileTypeResolvers;
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -90,6 +93,11 @@ File *FileRef::file() const
 bool FileRef::save()
 {
   return d->file->save();
+}
+
+void FileRef::addFileTypeResolver(const FileTypeResolver *resolver) // static
+{
+  FileRefPrivate::fileTypeResolvers.prepend(resolver);
 }
 
 bool FileRef::isNull() const

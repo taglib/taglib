@@ -233,11 +233,11 @@ void testList()
   List<int> l1;
   List<int> l2;
   List<int> l3;
-  l1.append(1);
   l1.append(2);
   l2.append(3);
   l2.append(4);
   l1.append(l2);
+  l1.prepend(1);
   l3.append(1);
   l3.append(2);
   l3.append(3);
