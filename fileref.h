@@ -95,7 +95,10 @@ namespace TagLib {
        * deleted.  Deletion will happen automatically when the FileRef passes
        * out of scope.
        */
-      virtual File *createFile(const char *fileName) = 0;
+      virtual File *createFile(const char *fileName,
+                               bool readAudioProperties = true,
+                               AudioProperties::ReadStyle
+                               audioPropertiesStyle = AudioProperties::Average) const = 0;
     };
 
     FileRef();

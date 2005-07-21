@@ -132,6 +132,15 @@ bool FileRef::operator!=(const FileRef &ref) const
 File *FileRef::create(const char *fileName, bool readAudioProperties,
                       AudioProperties::ReadStyle audioPropertiesStyle) // static
 {
+
+  List<const FileTypeResolver *>::ConstIterator it = FileRefPrivate::fileTypeResolvers.begin();
+
+  for(; it != FileRefPrivate::fileTypeResolvers.end(); ++it) {
+    File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
+    if(file)
+      return file;
+  }
+
   // Ok, this is really dumb for now, but it works for testing.
 
   String s = fileName;
@@ -145,7 +154,7 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
-  }
+  }  
 
   return 0;
 }
