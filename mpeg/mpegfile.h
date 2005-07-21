@@ -145,6 +145,18 @@ namespace TagLib {
       bool save(int tags);
 
       /*!
+       * Save the file.  This will attempt to save all of the tag types that are
+       * specified by OR-ing together TagTypes values.  The save() method above
+       * uses AllTags.  This returns true if saving was successful.
+       *
+       * If \a stripOthers is true this strips all tags not included in the mask,
+       * but does not modify them in memory, so later calls to save() which make
+       * use of these tags will remain valid.  This also strips empty tags.
+       */
+      // BIC: combine with the above method
+      bool save(int tags, bool stripOthers);
+
+      /*!
        * Returns a pointer to the ID3v2 tag of the file.
        *
        * If \a create is false (the default) this will return a null pointer

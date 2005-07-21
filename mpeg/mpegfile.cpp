@@ -263,12 +263,17 @@ bool MPEG::File::save()
 
 bool MPEG::File::save(int tags)
 {
-  if(tags == NoTags)
+  return save(tags, true);
+}
+
+bool MPEG::File::save(int tags, bool stripOthers)
+{
+  if(tags == NoTags && stripOthers)
     return strip(AllTags);
 
   if(!d->ID3v2Tag && !d->ID3v1Tag && !d->APETag) {
 
-    if(d->hasID3v1 || d->hasID3v2 || d->hasAPE)
+    if((d->hasID3v1 || d->hasID3v2 || d->hasAPE) && stripOthers)
       return strip(AllTags);
 
     return true;
@@ -299,10 +304,10 @@ bool MPEG::File::save(int tags)
 
       insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
     }
-    else
+    else if(stripOthers)
       success = strip(ID3v2, false) && success;
   }
-  else if(d->hasID3v2)
+  else if(d->hasID3v2 && stripOthers)
     success = strip(ID3v2) && success;
 
   if(ID3v1 & tags) {
@@ -311,13 +316,14 @@ bool MPEG::File::save(int tags)
       seek(offset, End);
       writeBlock(d->ID3v1Tag->render());
     }
-    else
+    else if(stripOthers)
       success = strip(ID3v1) && success;
   }
-  else if(d->hasID3v1)
+  else if(d->hasID3v1 && stripOthers)
     success = strip(ID3v1, false) && success;
 
   // Dont save an APE-tag unless one has been created
+
   if((APE & tags) && d->APETag) {
     if(d->hasAPE)
       insert(d->APETag->render(), d->APELocation, d->APEOriginalSize);
@@ -338,7 +344,7 @@ bool MPEG::File::save(int tags)
       }
     }
   }
-  else if(d->hasAPE)
+  else if(d->hasAPE && stripOthers)
     success = strip(APE, false) && success;
 
   return success;
