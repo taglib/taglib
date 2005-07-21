@@ -90,7 +90,11 @@ namespace TagLib {
       /*!
        * UTF8 encoding.  Characters are usually 8 bits but can be up to 32.
        */
-      UTF8 = 3
+      UTF8 = 3,
+      /*!
+       * UTF16 <i>little endian</i>.  16 bit characters.
+       */
+      UTF16LE = 4
     };
 
     /*!

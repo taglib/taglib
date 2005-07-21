@@ -83,7 +83,7 @@ String::String(const std::string &s, Type t)
 {
   d = new StringPrivate;
 
-  if(t == UTF16 || t == UTF16BE) {
+  if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     debug("String::String() -- A std::string should not contain UTF16.");
     return;
   }
@@ -116,7 +116,7 @@ String::String(const char *s, Type t)
 {
   d = new StringPrivate;
 
-  if(t == UTF16 || t == UTF16BE) {
+  if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     debug("String::String() -- A const char * should not contain UTF16.");
     return;
   }
@@ -145,7 +145,7 @@ String::String(char c, Type t)
 {
   d = new StringPrivate;
 
-  if(t == UTF16 || t == UTF16BE) {
+  if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     debug("String::String() -- A std::string should not contain UTF16.");
     return;
   }
@@ -375,6 +375,18 @@ ByteVector String::data(Type t) const
 
       v.append(c2);
       v.append(c1);
+    }
+    break;
+  }
+  case UTF16LE:
+  {
+    for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+
+      char c1 = *it & 0xff;
+      char c2 = *it >> 8;
+
+      v.append(c1);
+      v.append(c2);
     }
     break;
   }
@@ -685,6 +697,12 @@ void String::prepare(Type t)
 
     delete [] sourceBuffer;
     delete [] targetBuffer;
+  }
+  case UTF16LE:
+  {
+    for(uint i = 0; i < d->data.size(); i++)
+      d->data[i] = byteSwap((unsigned short)d->data[i]);
+    break;
   }
   default:
     break;
