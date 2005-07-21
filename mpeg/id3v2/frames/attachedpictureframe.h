@@ -157,6 +157,26 @@ namespace TagLib {
       void setType(Type t);
 
       /*!
+       * Returns a text description of the image.
+       *
+       * \see setDescription()
+       * \see textEncoding()
+       * \see setTextEncoding()
+       */
+
+      String description() const;
+
+      /*!
+       * Sets a textual description of the image to \a desc.
+       *
+       * \see description()
+       * \see textEncoding()
+       * \see setTextEncoding()
+       */
+
+      void setDescription(const String &desc);
+
+      /*!
        * Returns the image data as a ByteVector.
        *
        * \note ByteVector has a data() method that returns a const char * which
