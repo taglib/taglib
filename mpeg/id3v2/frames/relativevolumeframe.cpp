@@ -20,21 +20,32 @@
  ***************************************************************************/
 
 #include <tdebug.h>
+#include <tmap.h>
 
 #include "relativevolumeframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
 
+static inline int bitsToBytes(int i)
+{
+  return i % 8 == 0 ? i / 8 : (i - i % 8) / 8 + 1;
+}
+
+struct ChannelData
+{
+  ChannelData() : channelType(RelativeVolumeFrame::Other), volumeAdjustment(0) {}
+
+  RelativeVolumeFrame::ChannelType channelType;
+  short volumeAdjustment;
+  RelativeVolumeFrame::PeakVolume peakVolume;
+};
+
 class RelativeVolumeFrame::RelativeVolumeFramePrivate
 {
 public:
-  RelativeVolumeFramePrivate() : channelType(Other), volumeAdjustment(0) {}
-
   String identification;
-  ChannelType channelType;
-  short volumeAdjustment;
-  PeakVolume peakVolume;
+  Map<ChannelType, ChannelData> channels;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,44 +68,89 @@ String RelativeVolumeFrame::toString() const
   return d->identification;
 }
 
-RelativeVolumeFrame::ChannelType RelativeVolumeFrame::channelType() const
+List<RelativeVolumeFrame::ChannelType> RelativeVolumeFrame::channels() const
 {
-  return d->channelType;
+  List<ChannelType> l;
+
+  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.begin();
+  for(; it != d->channels.end(); ++it)
+    l.append((*it).first);
+
+  return l;
 }
 
-void RelativeVolumeFrame::setChannelType(ChannelType t)
+// deprecated
+
+RelativeVolumeFrame::ChannelType RelativeVolumeFrame::channelType() const
 {
-  d->channelType = t;
+  return MasterVolume;
+}
+
+// deprecated
+
+void RelativeVolumeFrame::setChannelType(ChannelType)
+{
+
+}
+
+short RelativeVolumeFrame::volumeAdjustmentIndex(ChannelType type) const
+{
+  return d->channels.contains(type) ? d->channels[type].volumeAdjustment : 0;
 }
 
 short RelativeVolumeFrame::volumeAdjustmentIndex() const
 {
-  return d->volumeAdjustment;
+  return volumeAdjustmentIndex(MasterVolume);
+}
+
+void RelativeVolumeFrame::setVolumeAdjustmentIndex(short index, ChannelType type)
+{
+  d->channels[type].volumeAdjustment = index;
 }
 
 void RelativeVolumeFrame::setVolumeAdjustmentIndex(short index)
 {
-  d->volumeAdjustment = index;
+  setVolumeAdjustmentIndex(index, MasterVolume);
+}
+
+float RelativeVolumeFrame::volumeAdjustment(ChannelType type) const
+{
+  return d->channels.contains(type) ? float(d->channels[type].volumeAdjustment) / float(512) : 0;
 }
 
 float RelativeVolumeFrame::volumeAdjustment() const
 {
-  return float(d->volumeAdjustment) / float(512);
+  return volumeAdjustment(MasterVolume);
+}
+
+void RelativeVolumeFrame::setVolumeAdjustment(float adjustment, ChannelType type)
+{
+  d->channels[type].volumeAdjustment = short(adjustment / float(512));
 }
 
 void RelativeVolumeFrame::setVolumeAdjustment(float adjustment)
 {
-  d->volumeAdjustment = short(adjustment / float(512));
+  setVolumeAdjustment(adjustment, MasterVolume);
+}
+
+RelativeVolumeFrame::PeakVolume RelativeVolumeFrame::peakVolume(ChannelType type) const
+{
+  return d->channels.contains(type) ? d->channels[type].peakVolume : PeakVolume();
 }
 
 RelativeVolumeFrame::PeakVolume RelativeVolumeFrame::peakVolume() const
 {
-  return d->peakVolume;
+  return peakVolume(MasterVolume);
+}
+
+void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak, ChannelType type)
+{
+  d->channels[type].peakVolume = peak;
 }
 
 void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak)
 {
-  d->peakVolume = peak;
+  setPeakVolume(peak, MasterVolume);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,24 +159,29 @@ void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak)
 
 void RelativeVolumeFrame::parseFields(const ByteVector &data)
 {
-  if(data.size() < 6) {
-    debug("A relative volume frame must contain at least 6 bytes.");
-    return;
-  }
-
-  int pos = data.find(textDelimiter(String::Latin1));
+  uint pos = data.find(textDelimiter(String::Latin1));
   d->identification = String(data.mid(0, pos), String::Latin1);
 
-  d->channelType = ChannelType(data[pos]);
-  pos += 1;
+  // Each channel is at least 4 bytes.
 
-  d->volumeAdjustment = data.mid(pos, 2).toShort();
-  pos += 2;
+  while(pos <= data.size() - 4) {
 
-  d->peakVolume.bitsRepresentingPeak = data[pos];
-  pos += 1;
 
-  d->peakVolume.peakVolume = data.mid(pos, d->peakVolume.bitsRepresentingPeak);
+    ChannelType type = ChannelType(data[pos]);
+    pos += 1;
+
+    ChannelData &channel = d->channels[type];
+
+    channel.volumeAdjustment = data.mid(pos, 2).toShort();
+    pos += 2;
+
+    channel.peakVolume.bitsRepresentingPeak = data[pos];
+    pos += 1;
+
+    int bytes = bitsToBytes(channel.peakVolume.bitsRepresentingPeak);
+    channel.peakVolume.peakVolume = data.mid(pos, bytes);
+    pos += bytes;
+  }
 }
 
 ByteVector RelativeVolumeFrame::renderFields() const
@@ -129,10 +190,18 @@ ByteVector RelativeVolumeFrame::renderFields() const
 
   data.append(d->identification.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
-  data.append(char(d->channelType));
-  data.append(ByteVector::fromShort(d->volumeAdjustment));
-  data.append(char(d->peakVolume.bitsRepresentingPeak));
-  data.append(d->peakVolume.peakVolume);
+
+  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.begin();
+  
+  for(; it != d->channels.end(); ++it) {
+    ChannelType type = (*it).first;
+    const ChannelData &channel = (*it).second;
+
+    data.append(char(type));
+    data.append(ByteVector::fromShort(channel.volumeAdjustment));
+    data.append(char(channel.peakVolume.bitsRepresentingPeak));
+    data.append(channel.peakVolume.peakVolume);
+  }
 
   return data;
 }

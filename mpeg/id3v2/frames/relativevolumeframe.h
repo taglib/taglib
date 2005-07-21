@@ -22,6 +22,7 @@
 #ifndef TAGLIB_RELATIVEVOLUMEFRAME_H
 #define TAGLIB_RELATIVEVOLUMEFRAME_H
 
+#include <tlist.h>
 #include <id3v2frame.h>
 
 namespace TagLib {
@@ -118,38 +119,52 @@ namespace TagLib {
       virtual String toString() const;
 
       /*!
-       * Returns the channel type that this frame refers to.
-       *
-       * \see setChannelType()
+       * Returns a list of channels with information currently in the frame.
+       */        
+      List<ChannelType> channels() const;
+
+      /*!
+       * \deprecated Always returns master volume.
        */
       ChannelType channelType() const;
 
       /*!
-       * Sets the channel type that this frame refers to.
-       *
-       * \see channelType()
+       * \deprecated This method no longer has any effect.
        */
       void setChannelType(ChannelType t);
+
+      /*
+       * There was a terrible API goof here, and while this can't be changed to
+       * the way it appears below for binary compaibility reasons, let's at
+       * least pretend that it looks clean.
+       */
+
+#ifdef DOXYGEN
 
       /*!
        * Returns the relative volume adjustment "index".  As indicated by the
        * ID3v2 standard this is a 16-bit signed integer that reflects the
        * decibils of adjustment when divided by 512.
        *
+       * This defaults to returning the value for the master volume channel if
+       * available and returns 0 if the specified channel does not exist.
+       *
        * \see setVolumeAdjustmentIndex()
        * \see volumeAjustment()
        */
-      short volumeAdjustmentIndex() const;
+      short volumeAdjustmentIndex(ChannelType type = MasterVolume) const;
 
       /*!
        * Set the volume adjustment to \a index.  As indicated by the ID3v2
        * standard this is a 16-bit signed integer that reflects the decibils of
        * adjustment when divided by 512.
        *
+       * By default this sets the value for the master volume.
+       *
        * \see volumeAdjustmentIndex()
        * \see setVolumeAjustment()
        */
-      void setVolumeAdjustmentIndex(short index);
+      void setVolumeAdjustmentIndex(short index, ChannelType type = MasterVolume);
 
       /*!
        * Returns the relative volume adjustment in decibels.
@@ -158,13 +173,18 @@ namespace TagLib {
        * value the value returned by this method may not be identical to the
        * value set using setVolumeAdjustment().
        *
+       * This defaults to returning the value for the master volume channel if
+       * available and returns 0 if the specified channel does not exist.
+       *
        * \see setVolumeAdjustment()
        * \see volumeAdjustmentIndex()
        */
-      float volumeAdjustment() const;
+      float volumeAdjustment(ChannelType type = MasterVolume) const;
 
       /*!
        * Set the relative volume adjustment in decibels to \a adjustment.
+       *
+       * By default this sets the value for the master volume.
        *
        * \note Because this is actually stored internally as an "index" to this
        * value the value set by this method may not be identical to the one
@@ -173,21 +193,51 @@ namespace TagLib {
        * \see setVolumeAdjustment()
        * \see volumeAdjustmentIndex()
        */
-      void setVolumeAdjustment(float adjustment);
+      void setVolumeAdjustment(float adjustment, ChannelType type = MasterVolume);
 
       /*!
        * Returns the peak volume (represented as a length and a string of bits).
        *
+       * This defaults to returning the value for the master volume channel if
+       * available and returns 0 if the specified channel does not exist.
+       *
        * \see setPeakVolume()
        */
-      PeakVolume peakVolume() const;
+      PeakVolume peakVolume(ChannelType type = MasterVolume) const;
 
       /*!
        * Sets the peak volume to \a peak.
        *
+       * By default this sets the value for the master volume.
+       *
        * \see peakVolume()
        */
+      void setPeakVolume(const PeakVolume &peak, ChannelType type = MasterVolume);
+
+#else
+
+      // BIC: Combine each of the following pairs of functions (or maybe just
+      // rework this junk altogether).
+
+      short volumeAdjustmentIndex(ChannelType type) const;
+      short volumeAdjustmentIndex() const;
+
+      void setVolumeAdjustmentIndex(short index, ChannelType type);
+      void setVolumeAdjustmentIndex(short index);
+
+      float volumeAdjustment(ChannelType type) const;
+      float volumeAdjustment() const;
+
+      void setVolumeAdjustment(float adjustment, ChannelType type);
+      void setVolumeAdjustment(float adjustment);
+
+      PeakVolume peakVolume(ChannelType type) const;
+      PeakVolume peakVolume() const;
+
+      void setPeakVolume(const PeakVolume &peak, ChannelType type);
       void setPeakVolume(const PeakVolume &peak);
+
+#endif
 
     protected:
       virtual void parseFields(const ByteVector &data);
