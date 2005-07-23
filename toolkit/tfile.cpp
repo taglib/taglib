@@ -36,7 +36,8 @@ public:
     file(0),
     name(fileName),
     readOnly(true),
-    valid(true)
+    valid(true),
+    size(0)
     {}
 
   ~FilePrivate()
@@ -48,6 +49,7 @@ public:
   const char *name;
   bool readOnly;
   bool valid;
+  ulong size;
   static const uint bufferSize = 1024;
 };
 
@@ -83,6 +85,12 @@ ByteVector File::readBlock(ulong length)
   if(!d->file) {
     debug("File::readBlock() -- Invalid File");
     return ByteVector::null;
+  }
+
+  if(length > FilePrivate::bufferSize &&
+     length > ulong(File::length()))
+  {
+    length = File::length();
   }
 
   ByteVector v(static_cast<uint>(length));
@@ -446,8 +454,13 @@ long File::tell() const
 
 long File::length()
 {
+  // Do some caching in case we do multiple calls.
+
+  if(d->size > 0)
+    return d->size;
+
   if(!d->file)
-    return 0;	  
+    return 0;
 
   long curpos = tell();
   
@@ -455,7 +468,8 @@ long File::length()
   long endpos = tell();
   
   seek(curpos, Beginning);
-  
+
+  d->size = endpos;
   return endpos;
 }
 
