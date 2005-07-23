@@ -20,7 +20,10 @@ libtag_la_LIBADD = ./mpeg/libmpeg.la ./ogg/libogg.la ./flac/libflac.la ./mpc/lib
 
 bin_SCRIPTS = taglib-config
 
-EXTRA_DIST = $(libtag_la_SOURCES) $(taglib_include_HEADERS)
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = taglib.pc
+
+EXTRA_DIST = $(libtag_la_SOURCES) $(taglib_include_HEADERS) $(pkgconfig_DATA)
 
 examples: examples-all
 
