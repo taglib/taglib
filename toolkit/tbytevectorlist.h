@@ -66,7 +66,16 @@ namespace TagLib {
      */
     static ByteVectorList split(const ByteVector &v, const ByteVector &pattern,
                                 int byteAlign = 1);
-
+    /*!
+     * Splits the ByteVector \a v into several strings at \a pattern.  This will
+     * not include the pattern in the returned ByteVectors.  \a max is the
+     * maximum number of entries that will be separated.  If \a max for instance
+     * is 2 then a maximum of 1 match will be found and the vector will be split
+     * on that match.
+     */
+    // BIC: merge with the function above
+    static ByteVectorList split(const ByteVector &v, const ByteVector &pattern,
+                                int byteAlign, int max);
   private:
     class ByteVectorListPrivate;
     ByteVectorListPrivate *d;

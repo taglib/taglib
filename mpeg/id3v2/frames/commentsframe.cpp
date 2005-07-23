@@ -120,7 +120,7 @@ void CommentsFrame::parseFields(const ByteVector &data)
 
   int byteAlign = d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8 ? 1 : 2;
 
-  ByteVectorList l = ByteVectorList::split(data.mid(4), textDelimiter(d->textEncoding), byteAlign);
+  ByteVectorList l = ByteVectorList::split(data.mid(4), textDelimiter(d->textEncoding), byteAlign, 2);
 
   if(l.size() == 2) {
     d->description = String(l.front(), d->textEncoding);
