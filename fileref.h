@@ -22,6 +22,8 @@
 #ifndef TAGLIB_FILEREF_H
 #define TAGLIB_FILEREF_H
 
+#include <tstringlist.h>
+
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -101,6 +103,9 @@ namespace TagLib {
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
     };
 
+    /*!
+     * Creates a null FileRef.
+     */
     FileRef();
 
     /*!
@@ -176,8 +181,28 @@ namespace TagLib {
      * additional FileTypeResolver is added to the front of a list of resolvers
      * that are tried.  If the FileTypeResolver returns zero the next resolver
      * is tried.
+     *
+     * \see FileTypeResolver
      */
     static void addFileTypeResolver(const FileTypeResolver *resolver);
+
+    /*!
+     * As is mentioned elsewhere in this class's documentation, the default file
+     * type resolution code provided by TagLib only works by comparing file
+     * extensions.
+     *
+     * This method returns the list of file extensions that are used by default.
+     *
+     * The extensions are all returned in lowercase, though the comparison used
+     * by TagLib for resolution is case-insensitive.
+     *
+     * \note This does not account for any additional file type resolvers that
+     * are plugged in.  Also note that this is not intended to replace a propper
+     * mime-type resolution system, but is just here for reference.
+     *
+     * \see FileTypeResolver
+     */
+    static StringList defaultFileExtensions();
 
     /*!
      * Returns true if the file (and as such other pointers) are null.
@@ -208,10 +233,13 @@ namespace TagLib {
      *
      * \note You generally shouldn't use this method, but instead the constructor
      * directly.
+     *
+     * \deprecated
      */
     static File *create(const char *fileName,
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
+
 
   private:
     class FileRefPrivate;

@@ -100,6 +100,18 @@ void FileRef::addFileTypeResolver(const FileTypeResolver *resolver) // static
   FileRefPrivate::fileTypeResolvers.prepend(resolver);
 }
 
+StringList FileRef::defaultFileExtensions()
+{
+  StringList l;
+
+  l.append("ogg");
+  l.append("flac");
+  l.append("mp3");
+  l.append("mpc");
+
+  return l;
+}
+
 bool FileRef::isNull() const
 {
   return !d->file || !d->file->isValid();
@@ -144,6 +156,10 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
   // Ok, this is really dumb for now, but it works for testing.
 
   String s = fileName;
+
+  // If this list is updated, the method defaultFileExtensions() should also be
+  // updated.  However at some point that list should be created at the same time
+  // that a default file type resolver is created.
 
   if(s.size() > 4) {
     if(s.substr(s.size() - 4, 4).upper() == ".OGG")
