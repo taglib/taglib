@@ -23,8 +23,8 @@
 #define TAGLIB_H
 
 #define TAGLIB_MAJOR_VERSION 1
-#define TAGLIB_MINOR_VERSION 3
-#define TAGLIB_PATCH_VERSION 1
+#define TAGLIB_MINOR_VERSION 4
+#define TAGLIB_PATCH_VERSION 0
 
 #include <string>
 
