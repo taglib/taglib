@@ -8,7 +8,7 @@ libtoolkit_la_SOURCES = \
 
 taglib_include_HEADERS = \
 	taglib.h tstring.h tlist.h tlist.tcc tstringlist.h \
-	tbytevector.h tbytevectorlist.h tfile.h tdebug.h \
+	tbytevector.h tbytevectorlist.h tfile.h \
 	tmap.h tmap.tcc
 
 taglib_includedir = $(includedir)/taglib
