@@ -697,6 +697,8 @@ void String::prepare(Type t)
 
     delete [] sourceBuffer;
     delete [] targetBuffer;
+
+    break;
   }
   case UTF16LE:
   {
