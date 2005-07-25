@@ -19,8 +19,6 @@
  *   USA                                                                   *
  ***************************************************************************/
 
-#include <tdebug.h>
-
 #include <algorithm>
 
 namespace TagLib {

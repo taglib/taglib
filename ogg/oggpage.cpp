@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <tstring.h>
+#include <tdebug.h>
 
 #include "oggpage.h"
 #include "oggpageheader.h"

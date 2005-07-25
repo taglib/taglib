@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <tbytevectorlist.h>
+#include <tdebug.h>
 
 #include "apeitem.h"
 
