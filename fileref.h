@@ -55,7 +55,7 @@ namespace TagLib {
   class FileRef
   {
   public:
-
+    
   //! A class for pluggable file type resolution.
 
   /*!
@@ -182,9 +182,13 @@ namespace TagLib {
      * that are tried.  If the FileTypeResolver returns zero the next resolver
      * is tried.
      *
+     * Returns a pointer to the added resolver (the same one that's passed in --
+     * this is mostly so that static inialializers have something to use for
+     * assignment).
+     *
      * \see FileTypeResolver
      */
-    static void addFileTypeResolver(const FileTypeResolver *resolver);
+    static const FileTypeResolver *addFileTypeResolver(const FileTypeResolver *resolver);
 
     /*!
      * As is mentioned elsewhere in this class's documentation, the default file

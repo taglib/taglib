@@ -95,9 +95,10 @@ bool FileRef::save()
   return d->file->save();
 }
 
-void FileRef::addFileTypeResolver(const FileTypeResolver *resolver) // static
+const FileRef::FileTypeResolver *FileRef::addFileTypeResolver(const FileRef::FileTypeResolver *resolver) // static
 {
   FileRefPrivate::fileTypeResolvers.prepend(resolver);
+  return resolver;
 }
 
 StringList FileRef::defaultFileExtensions()
