@@ -170,7 +170,7 @@ void ID3v1::Tag::setGenre(const String &s)
 
 void ID3v1::Tag::setYear(uint i)
 {
-  d->year = String::number(i);
+  d->year = i > 0 ? String::number(i) : String::null;
 }
 
 void ID3v1::Tag::setTrack(uint i)
