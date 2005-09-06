@@ -86,9 +86,9 @@ namespace TagLib {
  * - Support for at least ID3v1, ID3v2 and Ogg Vorbis \e comments.
  * - A generic, \e simple API for the most common tagging related functions.
  * - Binary compatibility between minor releases using the standard KDE/Qt techniques for C++ binary compatibility.
- * - Make the tagging framework extensible by library users; i.e. it will be possible for libarary users to implement
+ * - Make the tagging framework extensible by library users; i.e. it is possible for libarary users to implement
  *   additional ID3v2 frames, without modifying the TagLib source (through the use of <i>Abstract Factories</i> and
- *   such.
+ *   such).
  *
  * Because TagLib desires to be toolkit agnostic, in hope of being widely adopted and the most flexible in licensing
  * TagLib provides many of its own toolkit classes; in fact the only external dependancy that TagLib has, it a
@@ -96,19 +96,15 @@ namespace TagLib {
  *
  * \section why Why TagLib?
  *
- * TagLib was written to fill a gap in the Open Source/Free Software community.  Currently there is a lack in the
+ * TagLib was written to fill a gap in the Open Source / Free Software community.  Currently there is a lack in the
  * OSS/FS for a homogenous API to the most common music types.
  *
- * As TagLib will be initially injected into the KDE community, while I am not linking to any of the KDE or Qt libraries
- * I have tried to follow the coding style of those libraries.  Again, this is in sharp contrast to id3lib, which
- * basically provides a hybrid C/C++ API and uses a dubious object model.
- *
- * I get asked rather frequently why I am replacing id3lib (mostly by people that have never worked with id3lib), if
- * you are concerned about this please email me; I can provide my lengthy standard rant.  :-)
+ * As TagLib was initially injected into the KDE community, while I am not linking to any of the KDE or Qt libraries
+ * I have tried to follow the coding style of those libraries.
  *
  * \section examples Examples:
  *
- * I've talked a lot about the \e homogenous API to common music formats.  Here's an example of how things (will) work:
+ * I've talked a lot about the \e homogenous API to common music formats.  Here's an example:
  *
  * \code
  *
@@ -129,6 +125,10 @@ namespace TagLib {
  * Note that these high level functions work for Ogg, FLAC, MPC \e and MP3 (or any other formats supported in the
  * future).  For this high level API, which is suitable for most applications, the differences between tag and file
  * formats can all be ignored.
+ *
+ * In addition to the high-level abstract APIs, there are also additional format specific APIs which allow users
+ * of the library to work with tags and audio properties in more powerful ways.  See specifically the subclasses of
+ * TagLib::File, TagLib::Tag and TagLib::AudioProperties.
  *
  * \section Building
  *
