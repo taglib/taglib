@@ -316,17 +316,19 @@ ByteVector::~ByteVector()
     delete d;
 }
 
-void ByteVector::setData(const char *data, uint length)
+ByteVector &ByteVector::setData(const char *data, uint length)
 {
   detach();
 
   resize(length);
   ::memcpy(DATA(d), data, length);
+
+  return *this;
 }
 
-void ByteVector::setData(const char *data)
+ByteVector &ByteVector::setData(const char *data)
 {
-  setData(data, ::strlen(data));
+  return setData(data, ::strlen(data));
 }
 
 char *ByteVector::data()
@@ -430,19 +432,24 @@ int ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
   return -1;
 }
 
-void ByteVector::append(const ByteVector &v)
+ByteVector &ByteVector::append(const ByteVector &v)
 {
   detach();
 
   uint originalSize = d->size;
   resize(d->size + v.d->size);
   ::memcpy(DATA(d) + originalSize, DATA(v.d), v.size());
+
+  return *this;
 }
 
-void ByteVector::clear()
+ByteVector &ByteVector::clear()
 {
   detach();
   d->data.clear();
+  d->size = 0;
+
+  return *this;
 }
 
 TagLib::uint ByteVector::size() const

@@ -128,22 +128,24 @@ typename List<T>::ConstIterator List<T>::end() const
 }
 
 template <class T>
-void List<T>::insert(Iterator it, const T &item)
+List<T> &List<T>::insert(Iterator it, const T &item)
 {
   detach();
   d->list.insert(it, item);
+  return *this;
 }
 
 template <class T>
-void List<T>::sortedInsert(const T &value, bool unique)
+List<T> &List<T>::sortedInsert(const T &value, bool unique)
 {
   detach();
   Iterator it = begin();
   while(it != end() && *it < value)
     ++it;
   if(unique && it != end() && *it == value)
-    return;
+    return *this;
   insert(it, value);
+  return *this;
 }
 
 template <class T>
@@ -179,10 +181,11 @@ List<T> &List<T>::prepend(const List<T> &l)
 }
 
 template <class T>
-void List<T>::clear()
+List<T> &List<T>::clear()
 {
   detach();
   d->clear();
+  return *this;
 }
 
 template <class T>
@@ -216,9 +219,10 @@ bool List<T>::contains(const T &value) const
 }
 
 template <class T>
-void List<T>::erase(Iterator it)
+List<T> &List<T>::erase(Iterator it)
 {
   d->list.erase(it);
+  return *this;
 }
 
 template <class T>

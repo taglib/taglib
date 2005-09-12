@@ -86,13 +86,13 @@ namespace TagLib {
     /*!
      * Sets the data for the byte array using the first \a length bytes of \a data
      */
-    void setData(const char *data, uint length);
+    ByteVector &setData(const char *data, uint length);
 
     /*!
      * Sets the data for the byte array copies \a data up to the first null
      * byte.  The behavior is undefined if \a data is not null terminated.
      */
-    void setData(const char *data);
+    ByteVector &setData(const char *data);
 
     /*!
      * Returns a pointer to the internal data structure.
@@ -171,12 +171,12 @@ namespace TagLib {
     /*!
      * Appends \a v to the end of the ByteVector.
      */
-    void append(const ByteVector &v);
+    ByteVector &append(const ByteVector &v);
 
     /*!
      * Clears the data.
      */
-    void clear();
+    ByteVector &clear();
 
     /*!
      * Returns the size of the array.

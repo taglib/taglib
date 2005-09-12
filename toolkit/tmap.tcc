@@ -81,18 +81,20 @@ typename Map<Key, T>::ConstIterator Map<Key, T>::end() const
 }
 
 template <class Key, class T>
-void Map<Key, T>::insert(const Key &key, const T &value)
+Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
 {
   detach();
   std::pair<Key, T> item(key, value);
   d->map.insert(item);
+  return *this;
 }
 
 template <class Key, class T>
-void Map<Key, T>::clear()
+Map<Key, T> &Map<Key, T>::clear()
 {
   detach();
   d->map.clear();
+  return *this;
 }
 
 template <class Key, class T>
@@ -120,9 +122,10 @@ bool Map<Key, T>::contains(const Key &key) const
 }
 
 template <class Key, class T>
-void Map<Key,T>::erase(Iterator it)
+Map<Key, T> &Map<Key,T>::erase(Iterator it)
 {
   d->map.erase(it);
+  return *this;
 }
 
 template <class Key, class T>

@@ -198,6 +198,11 @@ void testByteVector()
 
   ByteVector s2("f");
   printResult(ByteVectorList::split(s2, " ").size() == 1);
+
+
+  printResult(ByteVector().size() == 0);
+  printResult(ByteVector("asdf").clear().size() == 0);
+  printResult(ByteVector("asdf").clear() == ByteVector());
 }
 
 void testSynchData()
