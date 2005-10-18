@@ -395,22 +395,29 @@ namespace TagLib {
 
 /*!
  * \relates TagLib::String
+ *
+ * Concatenates \a s1 and \a s2 and returns the result as a string.
  */
 const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2);
 
 /*!
  * \relates TagLib::String
+ *
+ * Concatenates \a s1 and \a s2 and returns the result as a string.
  */
 const TagLib::String operator+(const char *s1, const TagLib::String &s2);
 
 /*!
  * \relates TagLib::String
+ *
+ * Concatenates \a s1 and \a s2 and returns the result as a string.
  */
 const TagLib::String operator+(const TagLib::String &s1, const char *s2);
 
 
 /*!
  * \relates TagLib::String
+ *
  * Send the string to an output stream.
  */
 std::ostream &operator<<(std::ostream &s, const TagLib::String &str);
