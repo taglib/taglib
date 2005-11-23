@@ -52,6 +52,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+RelativeVolumeFrame::RelativeVolumeFrame() : Frame("RVA2")
+{
+  d = new RelativeVolumeFramePrivate;
+}
+
 RelativeVolumeFrame::RelativeVolumeFrame(const ByteVector &data) : Frame(data)
 {
   d = new RelativeVolumeFramePrivate;
