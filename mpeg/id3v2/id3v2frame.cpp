@@ -168,7 +168,9 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
   }
 
 #if HAVE_ZLIB
-  if(d->header->compression()) {
+  if(d->header->compression() &&
+     !d->header->encryption())
+  {
     ByteVector data(frameDataLength);
     uLongf uLongTmp = frameDataLength;
     ::uncompress((Bytef *) data.data(),
