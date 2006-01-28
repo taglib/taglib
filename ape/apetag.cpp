@@ -186,7 +186,7 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
     removeItem(key);
   if(!value.isEmpty()) {
     if(d->itemListMap.contains(key) || !replace)
-      d->itemListMap[key.upper()].toStringList().append(value);
+      d->itemListMap[key.upper()].appendValue(value);
     else
       setItem(key, Item(key, value));
   }

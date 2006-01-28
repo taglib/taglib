@@ -102,7 +102,35 @@ String APE::Item::key() const
 
 ByteVector APE::Item::value() const
 {
+  // This seems incorrect as it won't be actually rendering the value to keep it
+  // up to date.
+
   return d->value;
+}
+
+void APE::Item::setKey(const String &key)
+{
+    d->key = key;
+}
+
+void APE::Item::setValue(const String &value)
+{
+    d->text = value;
+}
+
+void APE::Item::setValues(const StringList &value)
+{
+    d->text = value;
+}
+
+void APE::Item::appendValue(const String &value)
+{
+    d->text.append(value);
+}
+
+void APE::Item::appendValues(const StringList &values)
+{
+    d->text.append(values);
 }
 
 int APE::Item::size() const
