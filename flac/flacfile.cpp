@@ -34,9 +34,10 @@
 using namespace TagLib;
 
 namespace TagLib {
-namespace FLAC {
-  enum BLOCK_TYPE { STREAMINFO = 0, PADDING, APPLICATION, SEEKTABLE, VORBISCOMMENT, CUESHEET };
-}}
+  namespace FLAC {
+    enum BlockType { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
+  }
+}
 
 class FLAC::File::FilePrivate
 {
@@ -79,9 +80,9 @@ public:
   FLAC::Tag *tag;
 
   Properties *properties;
-//  Map<BLOCK_TYPE, ByteVector> metaData;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
+
   long flacStart;
   long streamStart;
   long streamLength;
@@ -180,7 +181,7 @@ bool FLAC::File::save()
       length = header.mid(1, 3).toUInt();
 
       // Type is vorbiscomment
-      if(blockType == 4) {
+      if(blockType == VorbisComment) {
         v[0] = header[0];
         insert(v, nextPageOffset, length + 4);
         break;
@@ -330,7 +331,6 @@ ByteVector FLAC::File::streamInfoData()
 {
   if (isValid())
     return d->streamInfoData;
-//    return d->metaData[STREAMINFO];
   else
     return ByteVector();
 }
@@ -339,7 +339,6 @@ ByteVector FLAC::File::xiphCommentData()
 {
   if (isValid() && d->hasXiphComment)
     return d->xiphCommentData;
-//    return d->metaData[VORBISCOMMENT];
   else
     return ByteVector();
 }
@@ -395,13 +394,13 @@ void FLAC::File::scan()
   uint length = header.mid(1, 3).toUInt();
 
   // First block should be the stream_info metadata
-  if(blockType != 0) {
+
+  if(blockType != StreamInfo) {
     debug("FLAC::File::scan() -- invalid FLAC stream");
     setValid(false);
     return;
   }
   d->streamInfoData = readBlock(length);
-//  d->metadata.insert(STREAMINFO, readBlock(length));
   nextPageOffset += length + 4;
 
   // Search through the remaining metadata
@@ -412,13 +411,12 @@ void FLAC::File::scan()
     lastBlock = header[0] & 0x80;
     length = header.mid(1, 3).toUInt();
 
-    if(blockType == 1) {
+    if(blockType == Padding) {
       // debug("FLAC::File::scan() -- Padding found");
     }
     // Found the vorbis-comment
-    else if(blockType == 4) {
+    else if(blockType == VorbisComment) {
       d->xiphCommentData = readBlock(length);
-//      d->metadata.insert(VORBISCOMMENT, readBlock(length));
       d->hasXiphComment = true;
     }
 
