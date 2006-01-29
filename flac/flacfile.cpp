@@ -159,73 +159,66 @@ bool FLAC::File::save()
 
    // If file already have comment => find and update it
    // if not => insert one
+
    // TODO: Search for padding and use that
 
   if(d->hasXiphComment) {
-    long nextPageOffset = d->flacStart;
-    seek(nextPageOffset);
-    ByteVector header = readBlock(4);
 
-    uint length = header.mid(1, 3).toUInt();
+    long nextBlockOffset = d->flacStart;
+    bool isLastBlock = false;
 
-    nextPageOffset += length + 4;
+    while(!isLastBlock) {
+      seek(nextBlockOffset);
 
-    // Search through the remaining metadata
-
-    char blockType = header[0] & 0x7f;
-    bool lastBlock = header[0] & 0x80;
-
-    while(!lastBlock) {
-      seek(nextPageOffset);
-
-      header = readBlock(4);
-      blockType = header[0] & 0x7f;
-      lastBlock = header[0] & 0x80;
-      length = header.mid(1, 3).toUInt();
-
-      // Type is vorbiscomment
+      ByteVector header = readBlock(4);
+      char blockType = header[0] & 0x7f;
+      isLastBlock = header[0] & 0x80;
+      uint blockLength = header.mid(1, 3).toUInt();
 
       if(blockType == VorbisComment) {
         data[0] = header[0];
-        insert(data, nextPageOffset, length + 4);
+        insert(data, nextBlockOffset, blockLength + 4);
         break;
       }
 
-      nextPageOffset += length + 4;
+      nextBlockOffset += blockLength + 4;
     }
   }
   else {
-    long nextPageOffset = d->flacStart;
 
-    seek(nextPageOffset);
+    const long firstBlockOffset = d->flacStart;
+    seek(firstBlockOffset);
 
     ByteVector header = readBlock(4);
-    // char blockType = header[0] & 0x7f;
-    bool lastBlock = header[0] & 0x80;
-    uint length = header.mid(1, 3).toUInt();
+    bool isLastBlock = header[0] & 0x80;
+    uint blockLength = header.mid(1, 3).toUInt();
 
-    // If last block was last, make this one last
+    if(isLastBlock) {
 
-    if(lastBlock) {
+      // If the first block was previously also the last block, then we want to
+      // mark it as no longer being the first block (the writeBlock() call) and
+      // then set the data for the block that we're about to write to mark our
+      // new block as the last block.
 
-      // Copy the bottom seven bits into the new value
-
-      ByteVector h(static_cast<char>(header[0] & 0x7F));
-      insert(h, nextPageOffset, 1);
-
-      // Set the last bit
+      seek(firstBlockOffset);
+      writeBlock(static_cast<char>(header[0] & 0x7F));
       data[0] |= 0x80;
     }
 
-    insert(data, nextPageOffset + length + 4, 0);
+    insert(data, firstBlockOffset + blockLength + 4, 0);
     d->hasXiphComment = true;
   }
 
   // Update ID3 tags
 
   if(d->ID3v2Tag) {
-    if(d->hasID3v2)
-      insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+    if(d->hasID3v2) {
+      if(d->ID3v2Location < d->flacStart)
+        debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
+              "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
+      else
+        insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+    }
     else
       insert(d->ID3v2Tag->render(), 0, 0);
   }
@@ -359,23 +352,23 @@ void FLAC::File::scan()
   if(!isValid())
     return;
 
-  long nextPageOffset;
+  long nextBlockOffset;
 
   if(d->hasID3v2)
-    nextPageOffset = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize);
+    nextBlockOffset = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize);
   else
-    nextPageOffset = find("fLaC");
+    nextBlockOffset = find("fLaC");
 
-  if(nextPageOffset < 0) {
+  if(nextBlockOffset < 0) {
     debug("FLAC::File::scan() -- FLAC stream not found");
     setValid(false);
     return;
   }
 
-  nextPageOffset += 4;
-  d->flacStart = nextPageOffset;
+  nextBlockOffset += 4;
+  d->flacStart = nextBlockOffset;
 
-  seek(nextPageOffset);
+  seek(nextBlockOffset);
 
   ByteVector header = readBlock(4);
 
@@ -390,7 +383,7 @@ void FLAC::File::scan()
   // <24> Length of metadata to follow
 
   char blockType = header[0] & 0x7f;
-  bool lastBlock = header[0] & 0x80;
+  bool isLastBlock = header[0] & 0x80;
   uint length = header.mid(1, 3).toUInt();
 
   // First block should be the stream_info metadata
@@ -402,14 +395,14 @@ void FLAC::File::scan()
   }
 
   d->streamInfoData = readBlock(length);
-  nextPageOffset += length + 4;
+  nextBlockOffset += length + 4;
 
   // Search through the remaining metadata
 
-  while(!lastBlock) {
+  while(!isLastBlock) {
     header = readBlock(4);
     blockType = header[0] & 0x7f;
-    lastBlock = header[0] & 0x80;
+    isLastBlock = header[0] & 0x80;
     length = header.mid(1, 3).toUInt();
 
     if(blockType == Padding) {
@@ -421,18 +414,18 @@ void FLAC::File::scan()
       d->hasXiphComment = true;
     }
 
-    nextPageOffset += length + 4;
+    nextBlockOffset += length + 4;
 
-    if(nextPageOffset >= File::length()) {
+    if(nextBlockOffset >= File::length()) {
       debug("FLAC::File::scan() -- FLAC stream corrupted");
       setValid(false);
       return;
     }
-    seek(nextPageOffset);
+    seek(nextBlockOffset);
   }
 
   // End of metadata, now comes the datastream
-  d->streamStart = nextPageOffset;
+  d->streamStart = nextBlockOffset;
   d->streamLength = File::length() - d->streamStart;
   if (d->hasID3v1)
     d->streamLength -= 128;
