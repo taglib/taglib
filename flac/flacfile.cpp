@@ -147,22 +147,25 @@ bool FLAC::File::save()
 
   d->xiphCommentData = d->comment->render(false);
 
-  ByteVector v = ByteVector::fromUInt(d->xiphCommentData.size());
+  // A Xiph comment portion of the data stream starts with a 4-byte descriptor.
+  // The first byte indicates the frame type.  The last three bytes are used
+  // to give the lenght of the data segment.  Here we start 
 
-  // Set the type of the comment to be a Xiph / Vorbis comment
-  // (See scan() for comments on header-format)
-  v[0] = 4;
-  v.append(d->xiphCommentData);
+  ByteVector data = ByteVector::fromUInt(d->xiphCommentData.size());
+
+  data[0] = char(VorbisComment);
+  data.append(d->xiphCommentData);
 
 
    // If file already have comment => find and update it
-   //                       if not => insert one
+   // if not => insert one
    // TODO: Search for padding and use that
 
   if(d->hasXiphComment) {
     long nextPageOffset = d->flacStart;
     seek(nextPageOffset);
     ByteVector header = readBlock(4);
+
     uint length = header.mid(1, 3).toUInt();
 
     nextPageOffset += length + 4;
@@ -181,9 +184,10 @@ bool FLAC::File::save()
       length = header.mid(1, 3).toUInt();
 
       // Type is vorbiscomment
+
       if(blockType == VorbisComment) {
-        v[0] = header[0];
-        insert(v, nextPageOffset, length + 4);
+        data[0] = header[0];
+        insert(data, nextPageOffset, length + 4);
         break;
       }
 
@@ -210,10 +214,10 @@ bool FLAC::File::save()
       insert(h, nextPageOffset, 1);
 
       // Set the last bit
-      v[0] |= 0x80;
+      data[0] |= 0x80;
     }
 
-    insert(v, nextPageOffset + length + 4, 0);
+    insert(data, nextPageOffset + length + 4, 0);
     d->hasXiphComment = true;
   }
 
@@ -227,10 +231,7 @@ bool FLAC::File::save()
   }
 
   if(d->ID3v1Tag) {
-    if(d->hasID3v1)
-      seek(-128, End);
-    else
-      seek(0, End);
+    seek(d->ID3v1Tag ? -128 : 0, End);
     writeBlock(d->ID3v1Tag->render());
   }
 
@@ -359,10 +360,9 @@ void FLAC::File::scan()
     return;
 
   long nextPageOffset;
-  long fileSize = length();
 
-  if (d->hasID3v2)
-    nextPageOffset = find("fLaC", d->ID3v2Location+d->ID3v2OriginalSize);
+  if(d->hasID3v2)
+    nextPageOffset = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize);
   else
     nextPageOffset = find("fLaC");
 
@@ -400,6 +400,7 @@ void FLAC::File::scan()
     setValid(false);
     return;
   }
+
   d->streamInfoData = readBlock(length);
   nextPageOffset += length + 4;
 
@@ -421,7 +422,8 @@ void FLAC::File::scan()
     }
 
     nextPageOffset += length + 4;
-    if (nextPageOffset >= fileSize) {
+
+    if(nextPageOffset >= File::length()) {
       debug("FLAC::File::scan() -- FLAC stream corrupted");
       setValid(false);
       return;
