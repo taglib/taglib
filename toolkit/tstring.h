@@ -170,6 +170,11 @@ namespace TagLib {
     std::string to8Bit(bool unicode = false) const;
 
     /*!
+     * Returns a wstring version of the TagLib string as a wide string.
+     */
+    wstring to32Bit() const;
+
+    /*!
      * Creates and returns a C-String based on the data.  This string is still
      * owned by the String (class) and as such should not be deleted by the user.
      *

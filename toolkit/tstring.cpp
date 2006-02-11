@@ -241,6 +241,11 @@ std::string String::to8Bit(bool unicode) const
   return s;
 }
 
+TagLib::wstring String::to32Bit() const
+{
+  return d->data;
+}
+
 const char *String::toCString(bool unicode) const
 {
   delete [] d->CString;
