@@ -131,6 +131,13 @@ namespace TagLib {
        */
       void setTextEncoding(String::Type encoding);
 
+      /*!
+       * Comments each have a unique description.  This searches for a comment
+       * frame with the decription \a d and returns a pointer to it.  If no
+       * frame is found that matches the given description null is returned.
+       *
+       * \see description()
+       */
       static CommentsFrame *findByDescription(const Tag *tag, const String &d);
 
     protected:
