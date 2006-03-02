@@ -233,12 +233,12 @@ void MPEG::Header::parse(const ByteVector &data)
   // The channel mode is encoded as a 2 bit value at the end of the 3nd byte,
   // i.e. xxxxxx11
 
-  d->channelMode = ChannelMode(uchar(data[2]) & 0x3);
+  d->channelMode = ChannelMode((uchar(data[3]) & 0xC0) >> 6);
 
   // TODO: Add mode extension for completeness
 
-  d->isCopyrighted = flags[0];
-  d->isOriginal = flags[1];
+  d->isOriginal = flags[2];
+  d->isCopyrighted = flags[3];
 
   // Calculate the frame length
 

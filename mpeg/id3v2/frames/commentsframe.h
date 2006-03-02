@@ -131,6 +131,8 @@ namespace TagLib {
        */
       void setTextEncoding(String::Type encoding);
 
+      static CommentsFrame *findByDescription(const Tag *tag, const String &d);
+
     protected:
       // Reimplementations.
 

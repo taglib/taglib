@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <tbytevectorlist.h>
+#include <id3v2tag.h>
 #include <tdebug.h>
 
 #include "commentsframe.h"
@@ -102,6 +103,22 @@ String::Type CommentsFrame::textEncoding() const
 void CommentsFrame::setTextEncoding(String::Type encoding)
 {
   d->textEncoding = encoding;
+}
+
+CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
+{
+  ID3v2::FrameList comments = tag->frameList("COMM");
+
+  for(ID3v2::FrameList::ConstIterator it = comments.begin();
+      it != comments.end();
+      ++it)
+  {
+    CommentsFrame *frame = dynamic_cast<CommentsFrame *>(*it);
+    if(frame && frame->description() == d)
+      return frame;
+  }
+
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
