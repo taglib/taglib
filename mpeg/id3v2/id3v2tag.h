@@ -192,7 +192,7 @@ namespace TagLib {
        *   TagLib::ID3v2::FrameList l = f.ID3v2Tag()->frameListMap()["TBPM"];
        *
        *   if(!l.isEmpty())
-       *     std::cout << l.front().toString() << std::endl;
+       *     std::cout << l.front()->toString() << std::endl;
        * }
        *
        * \endcode
