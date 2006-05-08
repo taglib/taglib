@@ -249,10 +249,10 @@ int taglib_audioproperties_channels(const TagLib_AudioProperties *audioPropertie
  *******************************************************************************/
 
 typedef enum {
-	TagLib_ID3v2_Latin1,
-	TagLib_ID3v2_UTF16,
-	TagLib_ID3v2_UTF16BE,
-	TagLib_ID3v2_UTF8
+  TagLib_ID3v2_Latin1,
+  TagLib_ID3v2_UTF16,
+  TagLib_ID3v2_UTF16BE,
+  TagLib_ID3v2_UTF8
 } TagLib_ID3v2_Encoding;
 
 /*!
