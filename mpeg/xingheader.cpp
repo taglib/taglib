@@ -94,12 +94,12 @@ void MPEG::XingHeader::parse(const ByteVector &data)
   // If the XingHeader doesn't contain the number of frames and the total stream
   // info it's invalid.
 
-  if(!(data[7] & 0x02)) {
+  if(!(data[7] & 0x01)) {
     debug("MPEG::XingHeader::parse() -- Xing header doesn't contain the total number of frames.");
     return;
   }
 
-  if(!(data[7] & 0x04)) {
+  if(!(data[7] & 0x02)) {
     debug("MPEG::XingHeader::parse() -- Xing header doesn't contain the total stream size.");
     return;
   }
