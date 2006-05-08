@@ -26,17 +26,16 @@
 #include <vorbisfile.h>
 #include <mpegfile.h>
 #include <flacfile.h>
+#include <oggflacfile.h>
 #include <mpcfile.h>
 #include <tag.h>
-
-namespace TagLib
-{
-  static List<char *> strings;
-  static bool unicodeStrings = true;
-  static bool stringManagementEnabled = true;
-}
+#include <id3v2framefactory.h>
 
 using namespace TagLib;
+
+static List<char *> strings;
+static bool unicodeStrings = true;
+static bool stringManagementEnabled = true;
 
 void taglib_set_strings_unicode(BOOL unicode)
 {
@@ -68,6 +67,8 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     return reinterpret_cast<TagLib_File *>(new FLAC::File(filename));
   case TagLib_File_MPC:
     return reinterpret_cast<TagLib_File *>(new MPC::File(filename));
+  case TagLib_File_OggFlac:
+    return reinterpret_cast<TagLib_File *>(new Ogg::FLAC::File(filename));
   }
 
   return 0;
@@ -234,4 +235,27 @@ int taglib_audioproperties_channels(const TagLib_AudioProperties *audioPropertie
 {
   const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->channels();
+}
+
+void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding)
+{
+  String::Type type = String::Latin1;
+
+  switch(encoding)
+  {
+  case TagLib_ID3v2_Latin1:
+    type = String::Latin1;
+    break;
+  case TagLib_ID3v2_UTF16:
+    type = String::UTF16;
+    break;
+  case TagLib_ID3v2_UTF16BE:
+    type = String::UTF16BE;
+    break;
+  case TagLib_ID3v2_UTF8:
+    type = String::UTF8;
+    break;
+  }
+
+  ID3v2::FrameFactory::instance()->setDefaultTextEncoding(type);
 }

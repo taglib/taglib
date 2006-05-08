@@ -75,7 +75,8 @@ typedef enum {
   TagLib_File_MPEG,
   TagLib_File_OggVorbis,
   TagLib_File_FLAC,
-  TagLib_File_MPC
+  TagLib_File_MPC,
+  TagLib_File_OggFlac,
 } TagLib_File_Type;
 
 /*!
@@ -242,6 +243,23 @@ int taglib_audioproperties_samplerate(const TagLib_AudioProperties *audioPropert
  * Returns the number of channels in the audio stream.
  */
 int taglib_audioproperties_channels(const TagLib_AudioProperties *audioProperties);
+
+/*******************************************************************************
+ * Special convenience ID3v2 functions
+ *******************************************************************************/
+
+typedef enum {
+	TagLib_ID3v2_Latin1,
+	TagLib_ID3v2_UTF16,
+	TagLib_ID3v2_UTF16BE,
+	TagLib_ID3v2_UTF8
+} TagLib_ID3v2_Encoding;
+
+/*!
+ * This sets the default encoding for ID3v2 frames that are written to tags.
+ */
+
+void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding);
 
 #ifdef __cplusplus
 }
