@@ -50,6 +50,7 @@ public:
     ID3v1Tag(0),
     ID3v1Location(-1),
     comment(0),
+    tag(0),
     properties(0),
     flacStart(0),
     streamStart(0),
