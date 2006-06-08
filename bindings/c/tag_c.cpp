@@ -205,7 +205,7 @@ void taglib_tag_free_strings()
     return;
 
   for(List<char *>::Iterator it = strings.begin(); it != strings.end(); ++it)
-    delete [] *it;
+    free(*it);
   strings.clear();
 }
 
