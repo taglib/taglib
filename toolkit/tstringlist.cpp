@@ -84,11 +84,12 @@ String StringList::toString(const String &separator) const
   String s;
 
   ConstIterator it = begin();
+  ConstIterator itEnd = end();
 
-  while(it != end()) {
+  while(it != itEnd) {
     s += *it;
     it++;
-    if(it != end())
+    if(it != itEnd)
       s += separator;
   }
 
