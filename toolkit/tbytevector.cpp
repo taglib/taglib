@@ -92,21 +92,7 @@ namespace TagLib {
     if(pattern.size() > v.size() || offset >= v.size() - 1)
       return -1;
 
-    // if an offset was specified, just do a recursive call on the substring
-
-    if(offset > 0) {
-
-      // start at the next byte aligned block
-
-      Vector section = v.mid(offset + byteAlign - 1 - offset % byteAlign);
-      int match = section.find(pattern, 0, byteAlign);
-      return match >= 0 ? int(match + offset) : -1;
-    }
-
-    // this is a simplified Boyer-Moore string searching algorithm
-
     uchar lastOccurrence[256];
-
 
     for(uint i = 0; i < 256; ++i)
       lastOccurrence[i] = uchar(pattern.size());
@@ -114,7 +100,7 @@ namespace TagLib {
     for(uint i = 0; i < pattern.size() - 1; ++i)
       lastOccurrence[unsigned(pattern[i])] = uchar(pattern.size() - i - 1);
 
-    for(uint i = pattern.size() - 1; i < v.size(); i += lastOccurrence[uchar(v.at(i))]) {
+    for(uint i = pattern.size() - 1 + offset; i < v.size(); i += lastOccurrence[uchar(v.at(i))]) {
       int iBuffer = i;
       int iPattern = pattern.size() - 1;
 
