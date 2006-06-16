@@ -101,7 +101,7 @@ namespace TagLib {
 	if(v[i] == p && i % byteAlign == 0)
 	  return i;
       }
-      return 0;
+      return -1;
     }
 
     uchar lastOccurrence[256];
