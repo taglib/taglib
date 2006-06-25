@@ -35,7 +35,7 @@ using namespace ID3v2;
 class Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() : majorVersion(0),
+  HeaderPrivate() : majorVersion(4),
                     revisionNumber(0),
                     unsynchronisation(false),
                     extendedHeader(false),
