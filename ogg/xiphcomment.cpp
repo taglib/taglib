@@ -202,7 +202,7 @@ void Ogg::XiphComment::removeField(const String &key, const String &value)
     }
   }
   else
-    d->fieldListMap[key].clear();
+    d->fieldListMap.erase(key);
 }
 
 bool Ogg::XiphComment::contains(const String &key) const

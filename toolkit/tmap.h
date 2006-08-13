@@ -132,6 +132,11 @@ namespace TagLib {
     Map<Key, T> &erase(Iterator it);
 
     /*!
+     * Erase the item with \a key from the list.
+     */
+    Map<Key, T> &erase(const Key &key);
+
+    /*!
      * Returns a reference to the value associated with \a key.
      *
      * \note This has undefined behavior if the key is not present in the map.

@@ -131,6 +131,14 @@ Map<Key, T> &Map<Key,T>::erase(Iterator it)
 }
 
 template <class Key, class T>
+Map<Key, T> &Map<Key,T>::erase(const Key &key)
+{
+  detach();
+  d->map.erase(find(key));
+  return *this;
+}
+
+template <class Key, class T>
 TagLib::uint Map<Key, T>::size() const
 {
   return d->map.size();
