@@ -157,6 +157,13 @@ namespace TagLib {
       void removeField(const String &key, const String &value = String::null);
 
       /*!
+       * Returns true if the field is contained within the comment.
+       *
+       * \note This is safer than checking for membership in the FieldListMap. 
+       */
+      bool contains(const String &key) const;
+
+      /*!
        * Renders the comment to a ByteVector suitable for inserting into a file.
        */
       ByteVector render() const; // BIC: remove and merge with below

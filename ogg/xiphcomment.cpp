@@ -205,6 +205,11 @@ void Ogg::XiphComment::removeField(const String &key, const String &value)
     d->fieldListMap[key].clear();
 }
 
+bool Ogg::XiphComment::contains(const String &key) const
+{
+  return d->fieldListMap.contains(key) && !d->fieldListMap[key].isEmpty();
+}
+
 ByteVector Ogg::XiphComment::render() const
 {
   return render(true);
