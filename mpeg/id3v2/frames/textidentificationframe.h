@@ -232,6 +232,8 @@ namespace TagLib {
       UserTextIdentificationFrame(const TextIdentificationFrame &);
       UserTextIdentificationFrame &operator=(const UserTextIdentificationFrame &);
 
+      void checkFields();
+
       class UserTextIdentificationFramePrivate;
       UserTextIdentificationFramePrivate *d;
     };

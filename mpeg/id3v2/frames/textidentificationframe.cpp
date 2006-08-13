@@ -165,7 +165,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(String::Type encoding) 
 UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data) :
   TextIdentificationFrame(data)
 {
-
+  checkFields();
 }
 
 String UserTextIdentificationFrame::toString() const
@@ -182,14 +182,9 @@ String UserTextIdentificationFrame::description() const
 
 StringList UserTextIdentificationFrame::fieldList() const
 {
-  StringList l = TextIdentificationFrame::fieldList();
+  // TODO: remove this function
 
-  if(!l.isEmpty()) {
-    StringList::Iterator it = l.begin();
-    l.erase(it);
-  }
-
-  return l;
+  return TextIdentificationFrame::fieldList();
 }
 
 void UserTextIdentificationFrame::setText(const String &text)
@@ -238,5 +233,15 @@ UserTextIdentificationFrame *UserTextIdentificationFrame::find(ID3v2::Tag *tag, 
 UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data, Header *h) :
   TextIdentificationFrame(data, h)
 {
-  
+  checkFields();
+}
+
+void UserTextIdentificationFrame::checkFields()
+{
+  int fields = fieldList().size();
+
+  if(fields == 0)
+    setDescription(String::null);
+  if(fields <= 1)
+    setText(String::null);
 }
