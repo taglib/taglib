@@ -120,21 +120,18 @@ ByteVector TextIdentificationFrame::renderFields() const
 {
   ByteVector v;
 
-  if(d->fieldList.size() > 0) {
+  v.append(char(d->textEncoding));
 
-    v.append(char(d->textEncoding));
+  for(StringList::Iterator it = d->fieldList.begin(); it != d->fieldList.end(); it++) {
 
-    for(StringList::Iterator it = d->fieldList.begin(); it != d->fieldList.end(); it++) {
+    // Since the field list is null delimited, if this is not the first
+    // element in the list, append the appropriate delimiter for this
+    // encoding.
 
-      // Since the field list is null delimited, if this is not the first
-      // element in the list, append the appropriate delimiter for this
-      // encoding.
+    if(it != d->fieldList.begin())
+      v.append(textDelimiter(d->textEncoding));
 
-      if(it != d->fieldList.begin())
-        v.append(textDelimiter(d->textEncoding));
-
-      v.append((*it).data(d->textEncoding));
-    }
+    v.append((*it).data(d->textEncoding));
   }
 
   return v;
