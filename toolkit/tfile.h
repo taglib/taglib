@@ -80,6 +80,12 @@ namespace TagLib {
     /*!
      * Save the file and its associated tags.  This should be reimplemented in
      * the concrete subclasses.  Returns true if the save succeeds.
+     *
+     * \warning On UNIX multiple processes are able to write to the same file at
+     * the same time.  This can result in serious file corruption.  If you are
+     * developing a program that makes use of TagLib from multiple processes you
+     * must insure that you are only doing writes to a particular file from one
+     * of them.
      */
     virtual bool save() = 0;
 
