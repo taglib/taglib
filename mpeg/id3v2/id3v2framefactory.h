@@ -29,6 +29,8 @@ namespace TagLib {
 
   namespace ID3v2 {
 
+    class TextIdentificationFrame;
+
     //! A factory for creating ID3v2 frames
 
     /*!
@@ -127,6 +129,8 @@ namespace TagLib {
        */
       void convertFrame(const char *from, const char *to,
                         Frame::Header *header) const;
+
+      void updateGenre(TextIdentificationFrame *frame) const;
 
       static FrameFactory *factory;
 

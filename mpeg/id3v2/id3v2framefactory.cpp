@@ -121,6 +121,10 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 
     if(d->useDefaultEncoding)
       f->setTextEncoding(d->defaultEncoding);
+
+    if(frameID == "TCON")
+      updateGenre(f);
+
     return f;
   }
 
@@ -310,4 +314,30 @@ void FrameFactory::convertFrame(const char *from, const char *to,
   //       "been converted to the type " + String(to) + ".");
 
   header->setFrameID(to);
+}
+
+void FrameFactory::updateGenre(TextIdentificationFrame *frame) const
+{
+  StringList fields;
+  String s = frame->toString();
+
+  while(s.startsWith("(")) {
+
+    int closing = s.find(")");
+
+    if(closing < 0)
+      break;
+
+    fields.append(s.substr(1, closing - 1));
+
+    s = s.substr(closing + 1);
+  }
+
+  if(!s.isEmpty())
+    fields.append(s);
+
+  if(fields.isEmpty())
+    fields.append(String::null);
+
+  frame->setText(fields);
 }

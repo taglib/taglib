@@ -220,6 +220,11 @@ namespace TagLib {
     int find(const String &s, int offset = 0) const;
 
     /*!
+     * Returns true if the strings starts with the substring \a s.
+     */
+    bool startsWith(const String &s) const;
+
+    /*!
      * Extract a substring from this string starting at \a position and
      * continuing for \a n characters.
      */
@@ -242,6 +247,11 @@ namespace TagLib {
      * Returns the size of the string.
      */
     uint size() const;
+
+    /*!
+     * Returns the length of the string.  Equivalent to size().
+     */
+    uint length() const;
 
     /*!
      * Returns true if the string is empty.

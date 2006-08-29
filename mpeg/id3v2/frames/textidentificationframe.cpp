@@ -215,7 +215,8 @@ void UserTextIdentificationFrame::setDescription(const String &s)
   TextIdentificationFrame::setText(l);
 }
 
-UserTextIdentificationFrame *UserTextIdentificationFrame::find(ID3v2::Tag *tag, const String &description) // static
+UserTextIdentificationFrame *UserTextIdentificationFrame::find(
+  ID3v2::Tag *tag, const String &description) // static
 {
   FrameList l = tag->frameList("TXXX");
   for(FrameList::Iterator it = l.begin(); it != l.end(); ++it) {
@@ -239,7 +240,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data,
 void UserTextIdentificationFrame::checkFields()
 {
   int fields = fieldList().size();
-
+    
   if(fields == 0)
     setDescription(String::null);
   if(fields <= 1)

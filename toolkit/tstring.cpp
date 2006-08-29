@@ -287,6 +287,14 @@ int String::find(const String &s, int offset) const
     return -1;
 }
 
+bool String::startsWith(const String &s) const
+{
+  if(s.length() > length())
+    return false;
+
+  return substr(0, s.length()) == s;
+}
+
 String String::substr(uint position, uint n) const
 {
   if(n > position + d->data.size())
@@ -323,6 +331,11 @@ String String::upper() const
 TagLib::uint String::size() const
 {
   return d->data.size();
+}
+
+TagLib::uint String::length() const
+{
+  return size();
 }
 
 bool String::isEmpty() const
