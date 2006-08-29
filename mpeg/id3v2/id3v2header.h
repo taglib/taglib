@@ -128,8 +128,8 @@ namespace TagLib {
       static ByteVector fileIdentifier();
 
       /*!
-       * Sets the data that will be used as the extended header.  10 bytes,
-       * starting from \a data will be used.
+       * Sets the data that will be used as the header.  10 bytes, starting from
+       * the beginning of \a data are used.
        */
       void setData(const ByteVector &data);
 
