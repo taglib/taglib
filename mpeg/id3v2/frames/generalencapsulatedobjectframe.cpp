@@ -68,7 +68,7 @@ String GeneralEncapsulatedObjectFrame::toString() const
     text += " " + d->fileName;
 
   if(!d->description.isEmpty())
-    text += " \"" + d->description + "\" ";
+    text += " \"" + d->description + "\"";
 
   return text;
 }
