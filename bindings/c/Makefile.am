@@ -19,4 +19,7 @@ taglib_includedir = $(includedir)/taglib
 libtag_c_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 0:0
 libtag_c_la_LIBADD = ../../libtag.la
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = taglib_c.pc
+
 EXTRA_DIST = $(libtag_c_la_SOURCES) $(taglib_include_HEADERS)
