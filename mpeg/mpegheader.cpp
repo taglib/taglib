@@ -239,6 +239,7 @@ void MPEG::Header::parse(const ByteVector &data)
 
   d->isOriginal = flags[2];
   d->isCopyrighted = flags[3];
+  d->isPadded = flags[9];
 
   // Calculate the frame length
 
