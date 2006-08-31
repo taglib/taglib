@@ -160,7 +160,7 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
   // General Encapsulated Object (frames 4.15)
 
   if(frameID == "GEOB")
-      return new GeneralEncapsulatedObjectFrame(data, header);
+    return new GeneralEncapsulatedObjectFrame(data, header);
 
   return new UnknownFrame(data, header);
 }
