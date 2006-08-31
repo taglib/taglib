@@ -122,7 +122,7 @@ ByteVector TextIdentificationFrame::renderFields() const
 
   v.append(char(d->textEncoding));
 
-  for(StringList::Iterator it = d->fieldList.begin(); it != d->fieldList.end(); it++) {
+  for(StringList::ConstIterator it = d->fieldList.begin(); it != d->fieldList.end(); it++) {
 
     // Since the field list is null delimited, if this is not the first
     // element in the list, append the appropriate delimiter for this
