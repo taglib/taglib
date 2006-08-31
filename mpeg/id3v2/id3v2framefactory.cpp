@@ -274,14 +274,14 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
        frameID == "RVAD" ||
        frameID == "TIME" ||
        frameID == "TRDA" ||
-       frameID == "TSIZ")
+       frameID == "TSIZ" ||
+       frameID == "TDAT")
     {
       debug("ID3v2.4 no longer supports the frame type " + String(frameID) +
             ".  It will be discarded from the tag.");
       return false;
     }
 
-    convertFrame("TDAT", "TDRC", header);
     convertFrame("TORY", "TDOR", header);
     convertFrame("TYER", "TDRC", header);
 
