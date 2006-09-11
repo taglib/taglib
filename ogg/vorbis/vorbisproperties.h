@@ -22,7 +22,7 @@
 #ifndef TAGLIB_VORBISPROPERTIES_H
 #define TAGLIB_VORBISPROPERTIES_H
 
-#include <audioproperties.h>
+#include "audioproperties.h"
 
 namespace TagLib {
 

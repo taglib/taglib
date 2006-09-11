@@ -22,7 +22,7 @@
 #ifndef TAGLIB_FLACPROPERTIES_H
 #define TAGLIB_FLACPROPERTIES_H
 
-#include <audioproperties.h>
+#include "audioproperties.h"
 
 namespace TagLib {
 

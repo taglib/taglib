@@ -22,7 +22,7 @@
 #ifndef TAGLIB_MPEGFILE_H
 #define TAGLIB_MPEGFILE_H
 
-#include <tfile.h>
+#include "tfile.h"
 
 #include "mpegproperties.h"
 

@@ -22,7 +22,7 @@
 #ifndef TAGLIB_TAG_H
 #define TAGLIB_TAG_H
 
-#include <tstring.h>
+#include <taglib/tstring.h>
 
 namespace TagLib {
 

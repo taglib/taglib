@@ -22,10 +22,10 @@
 #ifndef TAGLIB_OGGFLACFILE_H
 #define TAGLIB_OGGFLACFILE_H
 
-#include <oggfile.h>
-#include <xiphcomment.h>
+#include "oggfile.h"
+#include "xiphcomment.h"
 
-#include <flacproperties.h>
+#include "flacproperties.h"
 
 namespace TagLib {
 

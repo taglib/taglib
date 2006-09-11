@@ -19,8 +19,8 @@
  *   USA                                                                   *
  ***************************************************************************/
 
-#include <tfile.h>
-#include <tbytevectorlist.h>
+#include "tfile.h"
+#include "tbytevectorlist.h"
 
 #ifndef TAGLIB_OGGFILE_H
 #define TAGLIB_OGGFILE_H

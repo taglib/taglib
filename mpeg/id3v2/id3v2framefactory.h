@@ -22,7 +22,7 @@
 #ifndef TAGLIB_ID3V2FRAMEFACTORY_H
 #define TAGLIB_ID3V2FRAMEFACTORY_H
 
-#include <tbytevector.h>
+#include "tbytevector.h"
 #include "id3v2frame.h"
 
 namespace TagLib {

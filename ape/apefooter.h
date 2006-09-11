@@ -22,7 +22,7 @@
 #ifndef TAGLIB_APEFOOTER_H
 #define TAGLIB_APEFOOTER_H
 
-#include <tbytevector.h>
+#include "tbytevector.h"
 
 namespace TagLib {
 

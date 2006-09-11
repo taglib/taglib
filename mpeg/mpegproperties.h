@@ -22,7 +22,7 @@
 #ifndef TAGLIB_MPEGPROPERTIES_H
 #define TAGLIB_MPEGPROPERTIES_H
 
-#include <audioproperties.h>
+#include "audioproperties.h"
 
 #include "mpegheader.h"
 

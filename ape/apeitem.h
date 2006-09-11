@@ -22,9 +22,9 @@
 #ifndef TAGLIB_APEITEM_H
 #define TAGLIB_APEITEM_H
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tstringlist.h>
+#include "tbytevector.h"
+#include "tstring.h"
+#include "tstringlist.h"
 
 namespace TagLib {
 

@@ -22,7 +22,7 @@
 #ifndef TAGLIB_FLACFILE_H
 #define TAGLIB_FLACFILE_H
 
-#include <tfile.h>
+#include "tfile.h"
 
 #include "flacproperties.h"
 

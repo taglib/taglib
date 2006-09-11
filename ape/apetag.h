@@ -22,10 +22,10 @@
 #ifndef TAGLIB_APETAG_H
 #define TAGLIB_APETAG_H
 
-#include <tag.h>
-#include <tbytevector.h>
-#include <tmap.h>
-#include <tstring.h>
+#include "tag.h"
+#include "tbytevector.h"
+#include "tmap.h"
+#include "tstring.h"
 
 #include "apeitem.h"
 

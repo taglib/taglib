@@ -22,8 +22,8 @@
 #ifndef TAGLIB_VORBISFILE_H
 #define TAGLIB_VORBISFILE_H
 
-#include <oggfile.h>
-#include <xiphcomment.h>
+#include "oggfile.h"
+#include "xiphcomment.h"
 
 #include "vorbisproperties.h"
 

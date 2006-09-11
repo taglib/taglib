@@ -22,11 +22,11 @@
 #ifndef TAGLIB_ID3V2TAG_H
 #define TAGLIB_ID3V2TAG_H
 
-#include <tag.h>
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tlist.h>
-#include <tmap.h>
+#include "tag.h"
+#include "tbytevector.h"
+#include "tstring.h"
+#include "tlist.h"
+#include "tmap.h"
 
 #include "id3v2framefactory.h"
 

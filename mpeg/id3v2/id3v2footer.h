@@ -22,7 +22,7 @@
 #ifndef TAGLIB_ID3V2FOOTER_H
 #define TAGLIB_ID3V2FOOTER_H
 
-#include <tbytevector.h>
+#include "tbytevector.h"
 
 namespace TagLib {
 

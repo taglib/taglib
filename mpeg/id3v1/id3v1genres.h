@@ -22,8 +22,8 @@
 #ifndef TAGLIB_ID3V1GENRE_H
 #define TAGLIB_ID3V1GENRE_H
 
-#include <tmap.h>
-#include <tstringlist.h>
+#include "tmap.h"
+#include "tstringlist.h"
 
 namespace TagLib {
   namespace ID3v1 {

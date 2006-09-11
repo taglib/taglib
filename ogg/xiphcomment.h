@@ -22,12 +22,12 @@
 #ifndef TAGLIB_VORBISCOMMENT_H
 #define TAGLIB_VORBISCOMMENT_H
 
-#include <tag.h>
-#include <tlist.h>
-#include <tmap.h>
-#include <tstring.h>
-#include <tstringlist.h>
-#include <tbytevector.h>
+#include "tag.h"
+#include "tlist.h"
+#include "tmap.h"
+#include "tstring.h"
+#include "tstringlist.h"
+#include "tbytevector.h"
 
 namespace TagLib {
 

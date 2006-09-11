@@ -22,7 +22,7 @@
 #ifndef TAGLIB_OGGPAGE_H
 #define TAGLIB_OGGPAGE_H
 
-#include <tbytevectorlist.h>
+#include "tbytevectorlist.h"
 
 namespace TagLib {
 
