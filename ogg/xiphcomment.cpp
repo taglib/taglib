@@ -196,9 +196,11 @@ void Ogg::XiphComment::removeField(const String &key, const String &value)
 {
   if(!value.isNull()) {
     StringList::Iterator it = d->fieldListMap[key].begin();
-    for(; it != d->fieldListMap[key].end(); ++it) {
+    while(it != d->fieldListMap[key].end()) {
       if(value == *it)
-        d->fieldListMap[key].erase(it);
+        it = d->fieldListMap[key].erase(it);
+      else
+        it++;
     }
   }
   else
