@@ -128,11 +128,10 @@ typename List<T>::ConstIterator List<T>::end() const
 }
 
 template <class T>
-List<T> &List<T>::insert(Iterator it, const T &item)
+typename List<T>::Iterator List<T>::insert(Iterator it, const T &item)
 {
   detach();
-  d->list.insert(it, item);
-  return *this;
+  return d->list.insert(it, item);
 }
 
 template <class T>
@@ -219,10 +218,9 @@ bool List<T>::contains(const T &value) const
 }
 
 template <class T>
-List<T> &List<T>::erase(Iterator it)
+typename List<T>::Iterator List<T>::erase(Iterator it)
 {
-  d->list.erase(it);
-  return *this;
+  return d->list.erase(it);
 }
 
 template <class T>

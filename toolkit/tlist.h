@@ -99,7 +99,7 @@ namespace TagLib {
     /*!
      * Inserts a copy of \a value before \a it.
      */
-    List<T> &insert(Iterator it, const T &value);
+    Iterator insert(Iterator it, const T &value);
 
     /*!
      * Inserts the \a value into the list.  This assumes that the list is
@@ -164,7 +164,7 @@ namespace TagLib {
     /*!
      * Erase the item at \a it from the list.
      */
-    List<T> &erase(Iterator it);
+    Iterator erase(Iterator it);
 
     /*!
      * Returns a reference to the first item in the list.
