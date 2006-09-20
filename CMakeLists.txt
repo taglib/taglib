@@ -14,8 +14,8 @@ set(INCLUDE_INSTALL_DIR      "${CMAKE_INSTALL_PREFIX}/include"             CACHE
 include(ConfigureChecks.cmake)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/toolkit ${CMAKE_SOURCE_DIR}//mpeg ${CMAKE_SOURCE_DIR}/ogg ${CMAKE_SOURCE_DIR}/flac ${CMAKE_SOURCE_DIR}/mpc ${CMAKE_SOURCE_DIR}/ogg/vorbis ${CMAKE_SOURCE_DIR}/mpeg/id3v2/ ${CMAKE_SOURCE_DIR}/mpeg/id3v1 ${CMAKE_SOURCE_DIR}/ ${CMAKE_SOURCE_DIR}/ape ${CMAKE_CURRENT_BINARY_DIR})
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc )
 configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-taglib.h )
 
 ADD_SUBDIRECTORY( toolkit ) 
