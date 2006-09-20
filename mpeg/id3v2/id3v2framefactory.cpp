@@ -19,7 +19,7 @@
  *   USA                                                                   *
  ***************************************************************************/
 
-#include <config.h>
+#include <config-taglib.h>
 
 #include <tdebug.h>
 
