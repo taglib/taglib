@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/taglib ${CMAKE_SOURCE_DIR}/taglib/toolkit ${CMAKE_SOURCE_DIR}/taglib/mpeg ${CMAKE_SOURCE_DIR}/taglib/ogg ${CMAKE_SOURCE_DIR}/taglib/ogg/vorbis ${CMAKE_SOURCE_DIR}/taglib/ogg/flac ${CMAKE_SOURCE_DIR}/taglib/flac ${CMAKE_SOURCE_DIR}/taglib/mpc ${CMAKE_SOURCE_DIR}/taglib/mpeg/id3v2  )
 
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc )
 ########### next target ###############
 
 SET(tag_c_LIB_SRCS
