@@ -24,5 +24,3 @@ zlib = -lz
 endif
 
 libid3v2_la_LIBADD = ./frames/libframes.la $(zlib)
-
-EXTRA_DIST = $(libid3v2_la_SOURCES) $(taglib_include_HEADERS) id3v2.4.0-frames.txt id3v2.4.0-structure.txt

@@ -10,5 +10,3 @@ libvorbis_la_SOURCES = vorbisfile.cpp vorbisproperties.cpp
 
 taglib_include_HEADERS = vorbisfile.h vorbisproperties.h
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libvorbis_la_SOURCES) $(taglib_include_HEADERS)

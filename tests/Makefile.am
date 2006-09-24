@@ -3,7 +3,7 @@ INCLUDES = \
         -I$(top_srcdir)/taglib/toolkit \
         -I$(top_srcdir)/taglib/mpeg/id3v2
 
-LDADD = ../libtag.la
+LDADD = ../taglib/libtag.la
 
 check_PROGRAMS = toolkit-test
 

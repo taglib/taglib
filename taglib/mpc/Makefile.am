@@ -12,5 +12,3 @@ libmpc_la_SOURCES = mpcfile.cpp mpcproperties.cpp
 
 taglib_include_HEADERS = mpcfile.h mpcproperties.h
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libmpc_la_SOURCES) $(taglib_include_HEADERS)

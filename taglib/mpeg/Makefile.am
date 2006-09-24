@@ -15,5 +15,3 @@ taglib_include_HEADERS = mpegfile.h mpegproperties.h mpegheader.h xingheader.h
 taglib_includedir = $(includedir)/taglib
 
 libmpeg_la_LIBADD = ./id3v2/libid3v2.la ./id3v1/libid3v1.la
-
-EXTRA_DIST = $(libmpeg_la_SOURCES) $(taglib_include_HEADERS)

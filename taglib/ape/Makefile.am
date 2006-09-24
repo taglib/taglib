@@ -9,5 +9,3 @@ libape_la_SOURCES = apetag.cpp apefooter.cpp apeitem.cpp
 
 taglib_include_HEADERS = apetag.h apefooter.h apeitem.h
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libape_la_SOURCES) $(taglib_include_HEADERS)

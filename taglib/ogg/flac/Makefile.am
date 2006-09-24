@@ -11,5 +11,3 @@ liboggflac_la_SOURCES = oggflacfile.cpp
 
 taglib_include_HEADERS = oggflacfile.h
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(liboggflac_la_SOURCES) $(taglib_include_HEADERS)

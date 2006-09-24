@@ -12,5 +12,3 @@ libflac_la_SOURCES = flacfile.cpp flacproperties.cpp
 
 taglib_include_HEADERS = flacfile.h flacproperties.h
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libflac_la_SOURCES) $(taglib_include_HEADERS)

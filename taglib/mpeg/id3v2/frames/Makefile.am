@@ -25,5 +25,3 @@ taglib_include_HEADERS = \
 	unknownframe.h
 
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libframes_la_SOURCES) $(taglib_include_HEADERS)

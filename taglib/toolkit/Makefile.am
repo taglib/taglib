@@ -12,5 +12,3 @@ taglib_include_HEADERS = \
 	tmap.h tmap.tcc
 
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libtoolkit_la_SOURCES) $(taglib_include_HEADERS)

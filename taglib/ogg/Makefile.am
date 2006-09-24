@@ -19,5 +19,3 @@ taglib_include_HEADERS = \
 taglib_includedir = $(includedir)/taglib
 
 libogg_la_LIBADD = ./vorbis/libvorbis.la ./flac/liboggflac.la
-
-EXTRA_DIST = $(libogg_la_SOURCES) $(taglib_include_HEADERS)

@@ -10,5 +10,3 @@ libid3v1_la_SOURCES = id3v1tag.cpp id3v1genres.cpp
 
 taglib_include_HEADERS = id3v1tag.h id3v1genres.h
 taglib_includedir = $(includedir)/taglib
-
-EXTRA_DIST = $(libid3v1_la_SOURCES) $(taglib_include_HEADERS)
