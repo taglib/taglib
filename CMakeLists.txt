@@ -75,7 +75,13 @@ ogg/vorbis/vorbisfile.cpp
 ogg/vorbis/vorbisproperties.cpp
 )
 
-SET(oggflac_SRCS
+
+SET(flacs_SRCS
+flac/flacfile.cpp
+flac/flacproperties.cpp
+)
+
+SET(oggflacs_SRCS
 ogg/flac/oggflacfile.cpp
 )
 
@@ -101,7 +107,7 @@ toolkit/unicode.cpp
 )
 
 SET(tag_LIB_SRCS ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS} 
-		 ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS}
+		 ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
 		 tag.cpp
 		 fileref.cpp
 		 audioproperties.cpp
