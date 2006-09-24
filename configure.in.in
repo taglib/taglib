@@ -1,0 +1,19 @@
+#AM_INIT_AUTOMAKE(taglib,1.0)
+dnl don't remove the below
+dnl AC_OUTPUT(taglib/taglib-config)
+dnl AC_OUTPUT(taglib/taglib.pc)
+
+AC_DEFUN([AC_HAVE_ZLIB],
+[
+	AC_DEFINE(HAVE_ZLIB, 1, [have zlib])
+	have_zlib=true
+])
+
+AC_DEFUN([AC_NO_ZLIB],
+[
+	AC_DEFINE(HAVE_ZLIB, 0, [have zlib])
+	have_zlib=false
+])
+
+AC_CHECK_HEADER(zlib.h, AC_HAVE_ZLIB, AC_NO_ZLIB)
+AM_CONDITIONAL(link_zlib, test x$have_zlib = xtrue)
