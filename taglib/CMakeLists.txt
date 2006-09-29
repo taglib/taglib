@@ -1,12 +1,13 @@
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/taglib/toolkit ${CMAKE_SOURCE_DIR}/taglib/mpeg ${CMAKE_SOURCE_DIR}/taglib/ogg ${CMAKE_SOURCE_DIR}/taglib/flac ${CMAKE_SOURCE_DIR}/taglib/mpc ${CMAKE_SOURCE_DIR}/taglib/ogg/vorbis ${CMAKE_SOURCE_DIR}/taglib/mpeg/id3v2/ ${CMAKE_SOURCE_DIR}/taglib/mpeg/id3v1 ${CMAKE_SOURCE_DIR}/taglib/ ${CMAKE_SOURCE_DIR}/taglib/ape ${CMAKE_CURRENT_BINARY_DIR}/taglib/ ${CMAKE_BINARY_DIR}/)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/toolkit ${CMAKE_CURRENT_SOURCE_DIR}/mpeg ${CMAKE_CURRENT_SOURCE_DIR}/ogg ${CMAKE_CURRENT_SOURCE_DIR}/flac ${CMAKE_CURRENT_SOURCE_DIR}/mpc ${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/ ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1 ${CMAKE_CURRENT_SOURCE_DIR}/ape ${CMAKE_CURRENT_BINARY_DIR}/taglib/ ${CMAKE_CURRENT_BINARY_DIR}/.. )
 
-ADD_SUBDIRECTORY( toolkit ) 
-ADD_SUBDIRECTORY( mpeg ) 
-ADD_SUBDIRECTORY( ogg ) 
-ADD_SUBDIRECTORY( flac ) 
-ADD_SUBDIRECTORY( ape ) 
-ADD_SUBDIRECTORY( mpc ) 
+ADD_SUBDIRECTORY( toolkit )
+ADD_SUBDIRECTORY( mpeg )
+ADD_SUBDIRECTORY( ogg )
+ADD_SUBDIRECTORY( flac )
+ADD_SUBDIRECTORY( ape )
+ADD_SUBDIRECTORY( mpc )
 
 
 
@@ -89,7 +90,7 @@ toolkit/tdebug.cpp
 toolkit/unicode.cpp
 )
 
-SET(tag_LIB_SRCS ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS} 
+SET(tag_LIB_SRCS ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
 		 ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
 		 tag.cpp
 		 fileref.cpp
