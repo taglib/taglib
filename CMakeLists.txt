@@ -2,6 +2,8 @@ project(taglib)
 
 find_package(ZLIB)
 
+OPTION(BUILD_TESTS "Create test" OFF)
+
 #add some KDE specific stuff
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set(EXEC_INSTALL_PREFIX  ${CMAKE_INSTALL_PREFIX}       CACHE PATH  "Base directory for executables and libraries" FORCE)
@@ -20,6 +22,7 @@ configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
 ADD_SUBDIRECTORY( taglib ) 
 
+ADD_SUBDIRECTORY(tests)
 
 
 INSTALL( FILES  ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )

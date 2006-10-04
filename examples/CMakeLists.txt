@@ -72,28 +72,3 @@ TARGET_LINK_LIBRARIES(strip-id3v1  tag )
 
 INSTALL(PROGRAMS strip-id3v1 DESTINATION ${BIN_INSTALL_DIR})
 
-
-########### install files ###############
-
-
-
-
-#original Makefile.am contents follow:
-
-#bin_PROGRAMS = tagreader tagreader_c tagwriter framelist strip-id3v1
-#tagreader_SOURCES = tagreader.cpp
-#tagreader_c_SOURCES = tagreader_c.c
-#tagwriter_SOURCES = tagwriter.cpp
-#framelist_SOURCES = framelist.cpp
-#strip_id3v1_SOURCES = strip-id3v1.cpp
-#
-#INCLUDES = \
-#	-I$(top_srcdir)/taglib \
-#	-I$(top_srcdir)/taglib/toolkit \
-#	-I$(top_srcdir)/taglib/mpeg \
-#	-I$(top_srcdir)/taglib/mpeg/id3v1 \
-#	-I$(top_srcdir)/taglib/mpeg/id3v2 \
-#	-I$(top_srcdir)/taglib/bindings/c
-#
-#LDADD = ../libtag.la
-#tagreader_c_LDADD = ../bindings/c/libtag_c.la
