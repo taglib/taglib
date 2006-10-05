@@ -19,6 +19,6 @@ INSTALL(TARGETS tag_c DESTINATION ${LIB_INSTALL_DIR} )
 
 ########### install files ###############
 
-INSTALL( FILES  taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+INSTALL( FILES  ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 INSTALL( FILES  tag_c.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
 
