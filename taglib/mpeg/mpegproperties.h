@@ -31,6 +31,7 @@ namespace TagLib {
   namespace MPEG {
 
     class File;
+    class XingHeader;
 
     //! An implementation of audio property reading for MP3
 
@@ -59,6 +60,13 @@ namespace TagLib {
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
+
+      /*!
+       * Returns a pointer to the XingHeader if one exists or null if no
+       * XingHeader was found.
+       */
+
+      const XingHeader *xingHeader() const;
 
       /*!
        * Returns the MPEG Version of the file.

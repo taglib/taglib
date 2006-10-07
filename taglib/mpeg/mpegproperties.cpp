@@ -33,28 +33,35 @@ class MPEG::Properties::PropertiesPrivate
 public:
   PropertiesPrivate(File *f, ReadStyle s) :
     file(f),
+    xingHeader(0),
     style(s),
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
-    version(Header::Version1),
     layer(0),
-    protectionEnabled(false),
+    version(Header::Version1),
     channelMode(Header::Stereo),
+    protectionEnabled(false),
     isCopyrighted(false),
     isOriginal(false) {}
 
+  ~PropertiesPrivate()
+  {
+    delete xingHeader;
+  }
+
   File *file;
+  XingHeader *xingHeader;
   ReadStyle style;
   int length;
   int bitrate;
   int sampleRate;
   int channels;
-  Header::Version version;
   int layer;
-  bool protectionEnabled;
+  Header::Version version;
   Header::ChannelMode channelMode;
+  bool protectionEnabled;
   bool isCopyrighted;
   bool isOriginal;
 };
@@ -94,6 +101,11 @@ int MPEG::Properties::sampleRate() const
 int MPEG::Properties::channels() const
 {
   return d->channels;
+}
+
+const MPEG::XingHeader *MPEG::Properties::xingHeader() const
+{
+  return d->xingHeader;
 }
 
 MPEG::Header::Version MPEG::Properties::version() const
@@ -191,34 +203,38 @@ void MPEG::Properties::read()
 							    firstHeader.channelMode());
 
   d->file->seek(first + xingHeaderOffset);
-  XingHeader xingHeader(d->file->readBlock(16));
+  d->xingHeader = new XingHeader(d->file->readBlock(16));
 
   // Read the length and the bitrate from the Xing header.
 
-  if(xingHeader.isValid() &&
+  if(d->xingHeader->isValid() &&
      firstHeader.sampleRate() > 0 &&
-     xingHeader.totalFrames() > 0)
+     d->xingHeader->totalFrames() > 0)
   {
       static const int blockSize[] = { 0, 384, 1152, 1152 };
 
       double timePerFrame = blockSize[firstHeader.layer()];
       timePerFrame = firstHeader.sampleRate() > 0 ? timePerFrame / firstHeader.sampleRate() : 0;
-      d->length = int(timePerFrame * xingHeader.totalFrames());
-      d->bitrate = d->length > 0 ? xingHeader.totalSize() * 8 / d->length / 1000 : 0;
+      d->length = int(timePerFrame * d->xingHeader->totalFrames());
+      d->bitrate = d->length > 0 ? d->xingHeader->totalSize() * 8 / d->length / 1000 : 0;
   }
+  else {
+    // Since there was no valid Xing header found, we hope that we're in a constant
+    // bitrate file.
 
-  // Since there was no valid Xing header found, we hope that we're in a constant
-  // bitrate file.
+    delete d->xingHeader;
+    d->xingHeader = 0;
 
-  // TODO: Make this more robust with audio property detection for VBR without a
-  // Xing header.
+    // TODO: Make this more robust with audio property detection for VBR without a
+    // Xing header.
 
-  else if(firstHeader.frameLength() > 0 && firstHeader.bitrate() > 0) {
-    int frames = (last - first) / firstHeader.frameLength() + 1;
+    if(firstHeader.frameLength() > 0 && firstHeader.bitrate() > 0) {
+      int frames = (last - first) / firstHeader.frameLength() + 1;
 
-    d->length = int(float(firstHeader.frameLength() * frames) /
-                    float(firstHeader.bitrate() * 125) + 0.5);
-    d->bitrate = firstHeader.bitrate();
+      d->length = int(float(firstHeader.frameLength() * frames) /
+                      float(firstHeader.bitrate() * 125) + 0.5);
+      d->bitrate = firstHeader.bitrate();
+    }
   }
 
 
