@@ -1,4 +1,12 @@
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/taglib ${CMAKE_SOURCE_DIR}/taglib/toolkit ${CMAKE_SOURCE_DIR}/taglib/mpeg ${CMAKE_SOURCE_DIR}/taglib/ogg ${CMAKE_SOURCE_DIR}/taglib/ogg/vorbis ${CMAKE_SOURCE_DIR}/taglib/ogg/flac ${CMAKE_SOURCE_DIR}/taglib/flac ${CMAKE_SOURCE_DIR}/taglib/mpc ${CMAKE_SOURCE_DIR}/taglib/mpeg/id3v2  )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/taglib/taglib
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/toolkit
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/mpeg
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/ogg
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/ogg/vorbis
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/ogg/flac
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/flac
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/mpc
+		     ${CMAKE_SOURCE_DIR}/taglib/taglib/mpeg/id3v2  )
 
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc )
