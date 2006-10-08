@@ -1,5 +1,7 @@
 if(BUILD_TESTS)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/taglib ${CMAKE_SOURCE_DIR}/taglib/toolkit ${CMAKE_SOURCE_DIR}/taglib/mpeg/id3v2  )
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2  )
 
 
 ########### next target ###############
