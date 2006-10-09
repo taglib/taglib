@@ -136,7 +136,7 @@ Map<Key, T> &Map<Key,T>::erase(const Key &key)
   detach();
   Iterator it = d->map.find(key);
   if(it != d->map.end())
-      d->map.erase(it);
+    d->map.erase(it);
   return *this;
 }
 
