@@ -434,8 +434,9 @@ String String::stripWhiteSpace() const
   wstring::const_iterator begin = d->data.begin();
   wstring::const_iterator end = d->data.end();
 
-  while(*begin == '\t' || *begin == '\n' || *begin == '\f' ||
-        *begin == '\r' || *begin == ' ' && begin != end)
+  while(begin != end &&
+        (*begin == '\t' || *begin == '\n' || *begin == '\f' ||
+         *begin == '\r' || *begin == ' '))
   {
     ++begin;
   }
