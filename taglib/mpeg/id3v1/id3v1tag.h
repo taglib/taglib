@@ -55,6 +55,7 @@ namespace TagLib {
     class StringHandler
     {
     public:
+      virtual ~StringHandler(){}
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.

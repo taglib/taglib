@@ -4,4 +4,4 @@
    Otherwise please prefer adding to the relevant config-foo.h.cmake file,
    to minimize recompilations and increase modularity. */
 /* Define if you have libz */
-#cmakedefine   HAVE_LIBZ 1
+#cmakedefine   HAVE_ZLIB 1

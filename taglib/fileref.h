@@ -88,6 +88,7 @@ namespace TagLib {
     class FileTypeResolver
     {
     public:
+      virtual ~FileTypeResolver() {}
       /*!
        * This method must be overriden to provide an additional file type
        * resolver.  If the resolver is able to determine the file type it should
