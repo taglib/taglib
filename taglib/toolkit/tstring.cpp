@@ -444,7 +444,7 @@ String String::stripWhiteSpace() const
   if(begin == end)
     return null;
 
-  // There must be at least one non-whitespace charater here for us to have
+  // There must be at least one non-whitespace character here for us to have
   // gotten this far, so we should be safe not doing bounds checking.
 
   do {

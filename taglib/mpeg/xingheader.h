@@ -57,7 +57,7 @@ namespace TagLib {
         virtual ~XingHeader();
 
         /*!
-         * Returns true if the data was parsed properly and if there is a vaild
+         * Returns true if the data was parsed properly and if there is a valid
 	 * Xing header present.
          */
         bool isValid() const;

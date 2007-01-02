@@ -59,7 +59,7 @@ namespace TagLib {
     virtual ~AudioProperties();
 
     /*!
-     * Returns the lenght of the file in seconds.
+     * Returns the length of the file in seconds.
      */
     virtual int length() const = 0;
 

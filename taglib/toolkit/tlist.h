@@ -147,12 +147,12 @@ namespace TagLib {
     bool isEmpty() const;
 
     /*!
-     * Find the first occurance of \a value.
+     * Find the first occurrence of \a value.
      */
     Iterator find(const T &value);
 
     /*!
-     * Find the first occurance of \a value.
+     * Find the first occurrence of \a value.
      */
     ConstIterator find(const T &value) const;
 

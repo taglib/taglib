@@ -44,7 +44,7 @@ extern "C" {
 
 /*
  * These are used for type provide some type safety to the C API (as opposed to
- * using void *, but pointers to them are simply cast to the coresponding C++
+ * using void *, but pointers to them are simply cast to the corresponding C++
  * types in the implementation.
  */
 
@@ -225,7 +225,7 @@ void taglib_tag_free_strings();
  ******************************************************************************/
 
 /*!
- * Returns the lenght of the file in seconds.
+ * Returns the length of the file in seconds.
  */
 int taglib_audioproperties_length(const TagLib_AudioProperties *audioProperties);
 

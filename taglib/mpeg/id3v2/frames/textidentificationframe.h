@@ -212,7 +212,7 @@ namespace TagLib {
 
       /*!
        * Sets the description of the frame to \a s.  \a s must be unique.  You can
-       * check for the presense of another user defined text frame of the same type
+       * check for the presence of another user defined text frame of the same type
        * using find() and testing for null.
        */
       void setDescription(const String &s);

@@ -255,7 +255,7 @@ void Ogg::PageHeader::read()
 
   // Byte number 27 is the number of page segments, which is the only variable
   // length portion of the page header.  After reading the number of page
-  // segments we'll then read in the coresponding data for this count.
+  // segments we'll then read in the corresponding data for this count.
 
   int pageSegmentCount = uchar(data[26]);
 

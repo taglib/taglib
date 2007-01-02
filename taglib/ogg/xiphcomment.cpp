@@ -222,7 +222,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   ByteVector data;
 
   // Add the vendor ID length and the vendor ID.  It's important to use the
-  // lenght of the data(String::UTF8) rather than the lenght of the the string
+  // length of the data(String::UTF8) rather than the length of the the string
   // since this is UTF8 text and there may be more characters in the data than
   // in the UTF16 string.
 

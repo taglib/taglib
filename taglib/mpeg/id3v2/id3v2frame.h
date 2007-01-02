@@ -261,7 +261,7 @@ namespace TagLib {
 
       /*!
        * Returns the size of the frame data portion, as set when setData() was
-       * called or set explicity via setFrameSize().
+       * called or set explicitly via setFrameSize().
        */
       uint frameSize() const;
 
@@ -361,7 +361,7 @@ namespace TagLib {
       bool unsycronisation() const;
 
       /*!
-       * Returns true if the flag for a data lenght indicator is set.
+       * Returns true if the flag for a data length indicator is set.
        */
       bool dataLengthIndicator() const;
 

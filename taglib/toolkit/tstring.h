@@ -214,7 +214,7 @@ namespace TagLib {
     ConstIterator end() const;
 
     /*!
-     * Finds the first occurance of pattern \a s in this string starting from
+     * Finds the first occurrence of pattern \a s in this string starting from
      * \a offset.  If the pattern is not found, -1 is returned.
      */
     int find(const String &s, int offset = 0) const;

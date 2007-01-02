@@ -150,7 +150,7 @@ bool FLAC::File::save()
 
   // A Xiph comment portion of the data stream starts with a 4-byte descriptor.
   // The first byte indicates the frame type.  The last three bytes are used
-  // to give the lenght of the data segment.  Here we start 
+  // to give the length of the data segment.  Here we start 
 
   ByteVector data = ByteVector::fromUInt(d->xiphCommentData.size());
 

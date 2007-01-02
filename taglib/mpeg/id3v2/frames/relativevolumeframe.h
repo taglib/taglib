@@ -33,7 +33,7 @@ namespace TagLib {
 
     /*!
      * This is an implementation of ID3v2 relative volume adjustment.  The
-     * presense of this frame makes it possible to specify an increase in volume
+     * presence of this frame makes it possible to specify an increase in volume
      * for an audio file or specific audio tracks in that file.
      *
      * Multiple relative volume adjustment frames may be present in the tag

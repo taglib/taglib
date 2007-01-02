@@ -112,12 +112,12 @@ namespace TagLib {
     bool isEmpty() const;
 
     /*!
-     * Find the first occurance of \a key.
+     * Find the first occurrence of \a key.
      */
     Iterator find(const Key &key);
 
     /*!
-     * Find the first occurance of \a key.
+     * Find the first occurrence of \a key.
      */
     ConstIterator find(const Key &key) const;
 
