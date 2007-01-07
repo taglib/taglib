@@ -105,7 +105,7 @@ namespace TagLib {
     virtual void setAlbum(const String &s) = 0;
 
     /*!
-     * Sets the album to \a s.  If \a s is String::null then this value will be
+     * Sets the comment to \a s.  If \a s is String::null then this value will be
      * cleared.
      */
     virtual void setComment(const String &s) = 0;
