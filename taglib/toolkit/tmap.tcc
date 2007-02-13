@@ -84,8 +84,7 @@ template <class Key, class T>
 Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
 {
   detach();
-  std::pair<Key, T> item(key, value);
-  d->map.insert(item);
+  d->map[key] = value;
   return *this;
 }
 
