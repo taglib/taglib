@@ -94,6 +94,11 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 
 void TextIdentificationFrame::parseFields(const ByteVector &data)
 {
+  // Don't try to parse invalid frames
+
+  if(data.size() < 2)
+    return;
+
   // read the string data type (the first byte of the field data)
 
   d->textEncoding = String::Type(data[0]);
