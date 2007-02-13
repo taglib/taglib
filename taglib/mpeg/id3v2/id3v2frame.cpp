@@ -163,7 +163,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
   uint frameDataLength = size();
 
   if(d->header->compression() || d->header->dataLengthIndicator()) {
-    frameDataLength = SynchData::toUInt(frameData.mid(headerSize, 4);
+    frameDataLength = SynchData::toUInt(frameData.mid(headerSize, 4));
     frameDataOffset += 4;
   }
 
