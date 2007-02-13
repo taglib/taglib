@@ -391,8 +391,8 @@ ByteVector String::data(Type t) const
       char c1 = *it >> 8;
       char c2 = *it & 0xff;
 
-      v.append(c2);
       v.append(c1);
+      v.append(c2);
     }
     break;
   }
