@@ -61,8 +61,15 @@ File::File(const char *file)
 {
   d = new FilePrivate(::strdup(file));
 
-  d->readOnly = !isWritable(file);
-  d->file = fopen(file, d->readOnly ? "rb" : "rb+");
+  // First try with read/write mode, if that fails, fall back to read only.
+  // We can't use ::access() since that works in odd ways on some file systems.
+
+  d->file = fopen(file, "rb+");
+
+  if(d->file)
+    d->readOnly = false;
+  else
+    d->file = fopen(file,"rb");
 
   if(!d->file)
     debug("Could not open file " + String(file));
