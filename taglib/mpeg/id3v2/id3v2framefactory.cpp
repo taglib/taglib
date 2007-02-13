@@ -73,7 +73,10 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
   // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
   // characters.  Also make sure that there is data in the frame.
 
-  if(!frameID.size() == (version < 3 ? 3 : 4) || header->frameSize() <= 0) {
+  if(!frameID.size() == (version < 3 ? 3 : 4) ||
+     header->frameSize() <= 0 ||
+     header->frameSize() > data.size())
+  {
     delete header;
     return 0;
   }
