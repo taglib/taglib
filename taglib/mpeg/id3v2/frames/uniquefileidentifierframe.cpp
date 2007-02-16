@@ -54,7 +54,7 @@ UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const String &owner, const 
 
 UniqueFileIdentifierFrame::~UniqueFileIdentifierFrame()
 {
-	delete d;
+  delete d;
 }
 
 String UniqueFileIdentifierFrame::owner() const
