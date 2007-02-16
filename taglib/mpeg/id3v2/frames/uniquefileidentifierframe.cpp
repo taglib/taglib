@@ -52,6 +52,11 @@ UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const String &owner, const 
   d->identifier = id;
 }
 
+UniqueFileIdentifierFrame::~UniqueFileIdentifierFrame()
+{
+	delete d;
+}
+
 String UniqueFileIdentifierFrame::owner() const
 {
     return d->owner;

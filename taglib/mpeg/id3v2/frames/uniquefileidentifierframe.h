@@ -52,6 +52,11 @@ namespace TagLib {
        */
       UniqueFileIdentifierFrame(const String &owner, const ByteVector &id);
 
+			/*!
+			 * Destroys the frame.
+			 */
+			~UniqueFileIdentifierFrame();
+
       /*!
        * Returns the owner for the frame; essentially this is the key for
        * determining which identification scheme this key belongs to.  This
