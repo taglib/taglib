@@ -98,8 +98,8 @@ namespace TagLib {
     if(pattern.size() == 1) {
       char p = pattern[0];
       for(uint i = offset; i < v.size(); i++) {
-	if(v[i] == p && i % byteAlign == 0)
-	  return i;
+        if(v[i] == p && i % byteAlign == 0)
+          return i;
       }
       return -1;
     }
