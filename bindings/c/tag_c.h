@@ -218,7 +218,7 @@ void taglib_tag_set_track(TagLib_Tag *tag, unsigned int track);
 /*!
  * Frees all of the strings that have been created by the tag.
  */
-void taglib_tag_free_strings();
+void taglib_tag_free_strings(void);
 
 /******************************************************************************
  * Audio Properties API
