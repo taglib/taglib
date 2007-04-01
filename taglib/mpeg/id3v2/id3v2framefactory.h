@@ -88,6 +88,8 @@ namespace TagLib {
        * \a encoding.  If no value is set the frames with either default to the
        * encoding type that was parsed and new frames default to Latin1.
        *
+       * Valid string types for ID3v2 tags are Latin1, UTF8, UTF16 and UTF16BE.
+       *
        * \see defaultTextEncoding()
        */
       void setDefaultTextEncoding(String::Type encoding);
