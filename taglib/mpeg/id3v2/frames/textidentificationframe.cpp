@@ -108,7 +108,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
   int byteAlign = d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8 ? 1 : 2;
 
-	// build a small counter to strip nulls off the end of the field
+  // build a small counter to strip nulls off the end of the field
 
   int dataLength = data.size() - 1;
 
