@@ -188,7 +188,7 @@ public:
   ~FilePrivate() {
     delete ID3v2Tag;
     delete ID3v1Tag;
-		delete APETag;
+    delete APETag;
     delete tag;
     delete properties;
   }
@@ -455,7 +455,7 @@ long MPEG::File::nextFrameOffset(long position)
 
     for(uint i = 0; i < buffer.size() - 1; i++) {
       if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
-    	return position + i;
+        return position + i;
     }
     position += bufferSize();
   }
