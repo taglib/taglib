@@ -188,6 +188,7 @@ public:
   ~FilePrivate() {
     delete ID3v2Tag;
     delete ID3v1Tag;
+		delete APETag;
     delete tag;
     delete properties;
   }
