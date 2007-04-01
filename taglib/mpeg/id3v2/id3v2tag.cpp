@@ -141,10 +141,9 @@ String ID3v2::Tag::genre() const
 
   StringList fields = f->fieldList();
 
-  String genreString;
-  bool hasNumber = false;
+  StringList genres;
 
-  for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
+  for(StringList::Iterator it = fields.begin(); it != fields.end(); ++it) {
 
     bool isNumber = true;
 
@@ -155,22 +154,17 @@ String ID3v2::Tag::genre() const
       isNumber = *charIt >= '0' && *charIt <= '9';
     }
 
-    if(!genreString.isEmpty())
-      genreString.append(' ');
-
     if(isNumber) {
       int number = (*it).toInt();
-      if(number >= 0 && number <= 255) {
-        hasNumber = true;
-        genreString.append(ID3v1::genre(number));
-      }
+      if(number >= 0 && number <= 255)
+        *it = ID3v1::genre(number);
     }
-    else {
-      genreString.append(*it);
-    }
+
+    if(std::find(genres.begin(), genres.end(), *it) == genres.end())
+      genres.append(*it);
   }
 
-  return genreString;
+  return genres.toString();
 }
 
 TagLib::uint ID3v2::Tag::year() const
