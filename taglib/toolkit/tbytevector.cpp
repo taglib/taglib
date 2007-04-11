@@ -597,8 +597,6 @@ ByteVector &ByteVector::operator=(const ByteVector &v)
 
 ByteVector &ByteVector::operator=(char c)
 {
-  if(d->deref())
-    delete d;
   *this = ByteVector(c);
   return *this;
 }
