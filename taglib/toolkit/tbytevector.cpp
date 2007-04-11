@@ -603,8 +603,6 @@ ByteVector &ByteVector::operator=(char c)
 
 ByteVector &ByteVector::operator=(const char *data)
 {
-  if(d->deref())
-    delete d;
   *this = ByteVector(data);
   return *this;
 }
