@@ -216,7 +216,7 @@ void Ogg::FLAC::File::scan()
   // <24> Length of metadata to follow
 
   char blockType = header[0] & 0x7f;
-  bool lastBlock = header[0] & 0x80;
+  bool lastBlock = (header[0] & 0x80) != 0;
   uint length = header.mid(1, 3).toUInt();
   overhead += length;
 
@@ -239,7 +239,7 @@ void Ogg::FLAC::File::scan()
 
     header = metadataHeader.mid(0, 4);
     blockType = header[0] & 0x7f;
-    lastBlock = header[0] & 0x80;
+    lastBlock = (header[0] & 0x80) != 0;
     length = header.mid(1, 3).toUInt();
     overhead += length;
 

@@ -173,7 +173,7 @@ bool FLAC::File::save()
 
       ByteVector header = readBlock(4);
       char blockType = header[0] & 0x7f;
-      isLastBlock = header[0] & 0x80;
+      isLastBlock = (header[0] & 0x80) != 0;
       uint blockLength = header.mid(1, 3).toUInt();
 
       if(blockType == VorbisComment) {
@@ -191,7 +191,7 @@ bool FLAC::File::save()
     seek(firstBlockOffset);
 
     ByteVector header = readBlock(4);
-    bool isLastBlock = header[0] & 0x80;
+    bool isLastBlock = (header[0] & 0x80) != 0;
     uint blockLength = header.mid(1, 3).toUInt();
 
     if(isLastBlock) {
@@ -384,7 +384,7 @@ void FLAC::File::scan()
   // <24> Length of metadata to follow
 
   char blockType = header[0] & 0x7f;
-  bool isLastBlock = header[0] & 0x80;
+  bool isLastBlock = (header[0] & 0x80) != 0;
   uint length = header.mid(1, 3).toUInt();
 
   // First block should be the stream_info metadata
@@ -403,7 +403,7 @@ void FLAC::File::scan()
   while(!isLastBlock) {
     header = readBlock(4);
     blockType = header[0] & 0x7f;
-    isLastBlock = header[0] & 0x80;
+    isLastBlock = (header[0] & 0x80) != 0;
     length = header.mid(1, 3).toUInt();
 
     if(blockType == Padding) {
