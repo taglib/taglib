@@ -19,6 +19,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
      set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor -Wno-long-long -ansi -Wundef -Wcast-align -Wchar-subscripts -Wall -W -Wpointer-arith -Wwrite-strings -Wformat-security -fno-exceptions -fno-check-new -fno-common")
    endif (CMAKE_SYSTEM_NAME MATCHES Linux)
 endif (CMAKE_COMPILER_IS_GNUCXX)
+if(MSVC)
+  add_definitions( -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE )
+endif(MSVC)
 
 include(ConfigureChecks.cmake)
 

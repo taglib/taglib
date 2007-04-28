@@ -25,7 +25,19 @@
 
 #include <stdio.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#ifdef _WIN32
+# include <io.h>
+# define ftruncate _chsize
+#else
+ #include <unistd.h>
+#endif
+
+#ifndef R_OK
+# define R_OK 4
+#endif
+#ifndef W_OK
+# define W_OK 2
+#endif
 
 using namespace TagLib;
 
@@ -421,12 +433,12 @@ bool File::isReadable(const char *file)
 
 bool File::isOpen() const
 {
-  return d->file;
+  return (d->file != NULL);
 }
 
 bool File::isValid() const
 {
-  return d->file && d->valid;
+  return isOpen() && d->valid;
 }
 
 void File::seek(long offset, Position p)
