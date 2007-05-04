@@ -31,6 +31,7 @@
 #else
  #include <unistd.h>
 #endif
+#include <stdlib.h>
 
 #ifndef R_OK
 # define R_OK 4
