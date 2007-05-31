@@ -23,6 +23,7 @@
  */
 
 #include <iostream>
+#include <string.h>
 
 #include <tbytevector.h>
 #include <tbytevectorlist.h>

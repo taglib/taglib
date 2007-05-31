@@ -24,6 +24,8 @@
 #include <tstring.h>
 #include <tdebug.h>
 
+#include <string.h>
+
 #include "tbytevector.h"
 
 // This is a bit ugly to keep writing over and over again.

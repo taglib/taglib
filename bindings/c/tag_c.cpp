@@ -29,6 +29,7 @@
 #include <oggflacfile.h>
 #include <mpcfile.h>
 #include <tag.h>
+#include <string.h>
 #include <id3v2framefactory.h>
 
 using namespace TagLib;

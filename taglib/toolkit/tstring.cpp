@@ -25,6 +25,8 @@
 
 #include <iostream>
 
+#include <string.h>
+
 namespace TagLib {
 
   inline unsigned short byteSwap(unsigned short x)
