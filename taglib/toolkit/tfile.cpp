@@ -260,7 +260,7 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
   }
   else {
     seek(fromOffset + -1 * int(d->bufferSize), Beginning);
-    bufferOffset = tell();    
+    bufferOffset = tell();
   }
 
   // See the notes in find() for an explanation of this algorithm.
@@ -402,12 +402,11 @@ void File::removeBlock(ulong start, ulong length)
 
   ByteVector buffer(static_cast<uint>(bufferLength));
 
-  ulong bytesRead = true;
+  ulong bytesRead = 1;
 
   while(bytesRead != 0) {
     seek(readPosition);
     bytesRead = fread(buffer.data(), sizeof(char), bufferLength, d->file);
-    buffer.resize(bytesRead);
     readPosition += bytesRead;
 
     // Check to see if we just read the last block.  We need to call clear()
