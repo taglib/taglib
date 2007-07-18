@@ -126,29 +126,12 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int pos = 0;
+  d->textEncoding = String::Type(data[0]);
 
-  d->textEncoding = String::Type(data[pos]);
-  pos += 1;
+	int pos = 1;
 
-  int offset = data.find(textDelimiter(String::Latin1), pos);
-
-  if(offset < pos)
-    return;
-
-  d->mimeType = String(data.mid(pos, offset - pos), String::Latin1);
-  pos = offset + 1;
-
-  d->type = Type(data[pos]);
-  pos += 1;
-
-  offset = data.find(textDelimiter(d->textEncoding), pos);
-
-  if(offset < pos)
-    return;  
-
-  d->description = String(data.mid(pos, offset - pos), d->textEncoding);
-  pos = offset + 1;
+	d->mimeType = readStringField(data, String::Latin1, &pos);
+  d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);
 }

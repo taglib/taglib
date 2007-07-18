@@ -134,36 +134,15 @@ void GeneralEncapsulatedObjectFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int fieldStart = 0;
+  d->textEncoding = String::Type(data[0]);
 
-  d->textEncoding = String::Type(data[fieldStart]);
-  fieldStart += 1;
+	int pos = 1;
 
-  int fieldEnd = data.find(textDelimiter(String::Latin1), fieldStart);
+  d->mimeType = readStringField(data, String::Latin1, &pos);
+  d->fileName = readStringField(data, d->textEncoding, &pos);
+  d->description = readStringField(data, d->textEncoding, &pos);
 
-  if(fieldEnd < fieldStart)
-    return;
-
-  d->mimeType = String(data.mid(fieldStart, fieldEnd - fieldStart), String::Latin1);
-  fieldStart = fieldEnd + 1;
-
-  fieldEnd = data.find(textDelimiter(d->textEncoding), fieldStart);
-
-  if(fieldEnd < fieldStart)
-    return;
-
-  d->fileName = String(data.mid(fieldStart, fieldEnd - fieldStart), d->textEncoding);
-  fieldStart = fieldEnd + 1;
-
-  fieldEnd = data.find(textDelimiter(d->textEncoding), fieldStart);
-
-  if(fieldEnd < fieldStart)
-    return;
-
-  d->description = String(data.mid(fieldStart, fieldEnd - fieldStart), d->textEncoding);
-  fieldStart = fieldEnd + 1;
-
-  d->data = data.mid(fieldStart);
+  d->data = data.mid(pos);
 }
 
 ByteVector GeneralEncapsulatedObjectFrame::renderFields() const

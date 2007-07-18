@@ -184,6 +184,26 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     return frameData.mid(frameDataOffset, frameDataLength);
 }
 
+String Frame::readStringField(const ByteVector &data, String::Type encoding, int *position)
+{
+  int start = 0;
+
+  if(!position)
+    position = &start;
+
+  ByteVector delimiter = textDelimiter(encoding);
+
+  int end = data.find(delimiter, *position, delimiter.size());
+
+  if(end < *position)
+    return String::null;
+
+  *position = end + delimiter.size();
+
+  return String(data.mid(*position, end - *position), encoding);
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Frame::Header class
 ////////////////////////////////////////////////////////////////////////////////
