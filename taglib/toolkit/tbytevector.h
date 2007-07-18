@@ -124,8 +124,8 @@ namespace TagLib {
     /*!
      * Searches the ByteVector for \a pattern starting at \a offset and returns
      * the offset.  Returns -1 if the pattern was not found.  If \a byteAlign is
-     * specified the pattern will only be matched if it starts on a byteDivisible
-     * by \a byteAlign.
+     * specified the pattern will only be matched if it starts on a byte divisible
+     * by \a byteAlign (starting from \a offset).
      */
     int find(const ByteVector &pattern, uint offset = 0, int byteAlign = 1) const;
 
@@ -133,7 +133,7 @@ namespace TagLib {
      * Searches the ByteVector for \a pattern starting from either the end of the
      * vector or \a offset and returns the offset.  Returns -1 if the pattern was
      * not found.  If \a byteAlign is specified the pattern will only be matched
-     * if it starts on a byteDivisible by \a byteAlign.
+     * if it starts on a byte divisible by \a byteAlign (starting from \a offset).
      */
     int rfind(const ByteVector &pattern, uint offset = 0, int byteAlign = 1) const;
 

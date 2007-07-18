@@ -100,7 +100,7 @@ namespace TagLib {
     if(pattern.size() == 1) {
       char p = pattern[0];
       for(uint i = offset; i < v.size(); i++) {
-        if(v[i] == p && i % byteAlign == 0)
+        if(v[i] == p && (i - offset) % byteAlign == 0)
           return i;
       }
       return -1;
@@ -123,7 +123,7 @@ namespace TagLib {
         --iPattern;
       }
 
-      if(-1 == iPattern && (iBuffer + 1) % byteAlign == 0)
+      if(-1 == iPattern && (iBuffer + 1 - offset) % byteAlign == 0)
         return iBuffer + 1;
     }
 
