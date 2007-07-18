@@ -200,7 +200,7 @@ public:
     groupingIdentity(false),
     compression(false),
     encryption(false),
-    unsyncronisation(false),
+    unsynchronisation(false),
     dataLengthIndicator(false)
     {}
 
@@ -216,7 +216,7 @@ public:
   bool groupingIdentity;
   bool compression;
   bool encryption;
-  bool unsyncronisation;
+  bool unsynchronisation;
   bool dataLengthIndicator;
 };
 
@@ -381,7 +381,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
       d->groupingIdentity    = flags[6]; // (structure 4.1.2.h)
       d->compression         = flags[3]; // (structure 4.1.2.k)
       d->encryption          = flags[2]; // (structure 4.1.2.m)
-      d->unsyncronisation    = flags[1]; // (structure 4.1.2.n)
+      d->unsynchronisation   = flags[1]; // (structure 4.1.2.n)
       d->dataLengthIndicator = flags[0]; // (structure 4.1.2.p)
     }
     break;
@@ -451,7 +451,12 @@ bool Frame::Header::encryption() const
 
 bool Frame::Header::unsycronisation() const
 {
-  return d->unsyncronisation;
+  return unsynchronisation();
+}
+
+bool Frame::Header::unsynchronisation() const
+{
+  return d->unsynchronisation;
 }
 
 bool Frame::Header::dataLengthIndicator() const

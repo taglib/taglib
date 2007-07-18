@@ -353,12 +353,14 @@ namespace TagLib {
        */
       bool encryption() const;
 
+#ifndef DO_NOT_DOCUMENT			
+			bool unsycronisation() const;
+#endif
+
       /*!
        * Returns true if unsyncronisation is enabled for this frame.
-       *
-       * \note This flag is currently ignored internally in TagLib.
        */
-      bool unsycronisation() const;
+      bool unsynchronisation() const;
 
       /*!
        * Returns true if the flag for a data length indicator is set.
