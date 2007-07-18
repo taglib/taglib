@@ -130,7 +130,7 @@ float RelativeVolumeFrame::volumeAdjustment() const
 
 void RelativeVolumeFrame::setVolumeAdjustment(float adjustment, ChannelType type)
 {
-  d->channels[type].volumeAdjustment = short(adjustment / float(512));
+  d->channels[type].volumeAdjustment = short(adjustment * float(512));
 }
 
 void RelativeVolumeFrame::setVolumeAdjustment(float adjustment)
@@ -164,8 +164,10 @@ void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak)
 
 void RelativeVolumeFrame::parseFields(const ByteVector &data)
 {
-  uint pos = data.find(textDelimiter(String::Latin1));
+  ByteVector delimiter = textDelimiter(String::Latin1);
+  uint pos = data.find(delimiter);
   d->identification = String(data.mid(0, pos), String::Latin1);
+  pos += delimiter.size();
 
   // Each channel is at least 4 bytes.
 
