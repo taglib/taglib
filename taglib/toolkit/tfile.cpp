@@ -325,6 +325,7 @@ void File::insert(const ByteVector &data, ulong start, ulong replace)
   // that aren't yet in memory, so this is necessary.
 
   ulong bufferLength = bufferSize();
+
   while(data.size() - replace > bufferLength)
     bufferLength += bufferSize();
 
@@ -352,10 +353,14 @@ void File::insert(const ByteVector &data, ulong start, ulong replace)
 
   buffer = aboutToOverwrite;
 
+  // In case we've already reached the end of file...
+
+  buffer.resize(bytesRead);
+
   // Ok, here's the main loop.  We want to loop until the read fails, which
   // means that we hit the end of the file.
 
-  while(bytesRead != 0) {
+  while(!buffer.isEmpty()) {
 
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
@@ -375,8 +380,8 @@ void File::insert(const ByteVector &data, ulong start, ulong replace)
     // writePosition.
 
     seek(writePosition);
-    fwrite(buffer.data(), sizeof(char), bufferLength, d->file);
-    writePosition += bufferLength;
+    fwrite(buffer.data(), sizeof(char), buffer.size(), d->file);
+    writePosition += buffer.size();
 
     // Make the current buffer the data that we read in the beginning.
 
