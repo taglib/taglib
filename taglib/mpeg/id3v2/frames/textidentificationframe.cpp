@@ -126,8 +126,10 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
   // type is the same specified for this frame
 
   for(ByteVectorList::Iterator it = l.begin(); it != l.end(); it++) {
-    String s(*it, d->textEncoding);
-    d->fieldList.append(s);
+    if(!(*it).isEmpty()) {
+      String s(*it, d->textEncoding);
+      d->fieldList.append(s);
+    }
   }
 }
 
