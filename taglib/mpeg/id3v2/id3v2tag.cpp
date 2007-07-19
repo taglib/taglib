@@ -219,12 +219,23 @@ void ID3v2::Tag::setGenre(const String &s)
     return;
   }
 
+  // iTunes can't handle correctly encoded ID3v2.4 numerical genres.  Just use
+  // strings until iTunes sucks less.
+
+#ifdef NO_ITUNES_HACKS
+
   int index = ID3v1::genreIndex(s);
 
   if(index != 255)
     setTextFrame("TCON", String::number(index));
   else
     setTextFrame("TCON", s);
+
+#else
+
+  setTextFrame("TCON", s);
+
+#endif
 }
 
 void ID3v2::Tag::setYear(uint i)
