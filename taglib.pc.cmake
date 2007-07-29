@@ -7,5 +7,5 @@ Name: TagLib
 Description: Audio meta-data library
 Requires: 
 Version: 1.4
-Libs: -L${libdir} -ltag
-Cflags: -I${includedir}/taglib 
+Libs: -L${LIB_INSTALL_DIR} -ltag
+Cflags: -I${INCLUDE_INSTALL_DIR}/taglib 
