@@ -22,6 +22,8 @@
 #ifndef TAGLIB_AUDIOPROPERTIES_H
 #define TAGLIB_AUDIOPROPERTIES_H
 
+#include "taglib_export.h"
+
 namespace TagLib {
 
   //! A simple, abstract interface to common audio properties
@@ -33,7 +35,7 @@ namespace TagLib {
    * interface that is sufficient for most applications.
    */
 
-  class AudioProperties
+  class TAGLIB_EXPORT AudioProperties
   {
   public:
 

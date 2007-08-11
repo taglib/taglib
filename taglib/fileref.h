@@ -24,6 +24,7 @@
 
 #include <tstringlist.h>
 
+#include "taglib_export.h"
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -52,7 +53,7 @@ namespace TagLib {
    * \see addFileTypeResolver()
    */
 
-  class FileRef
+  class TAGLIB_EXPORT FileRef
   {
   public:
     

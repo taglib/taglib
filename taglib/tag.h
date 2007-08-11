@@ -22,6 +22,7 @@
 #ifndef TAGLIB_TAG_H
 #define TAGLIB_TAG_H
 
+#include "taglib_export.h"
 #include "tstring.h"
 
 namespace TagLib {
@@ -36,7 +37,7 @@ namespace TagLib {
    * in TagLib::AudioProperties, TagLib::File and TagLib::FileRef.
    */
 
-  class Tag
+  class TAGLIB_EXPORT Tag
   {
   public:
 
