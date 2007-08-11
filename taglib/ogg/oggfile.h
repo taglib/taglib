@@ -19,6 +19,7 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#include "taglib_export.h"
 #include "tfile.h"
 #include "tbytevectorlist.h"
 
@@ -42,7 +43,7 @@ namespace TagLib {
      * these available (via subclassing) to the codec meta data implementations.
      */
 
-    class File : public TagLib::File
+    class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
       virtual ~File();

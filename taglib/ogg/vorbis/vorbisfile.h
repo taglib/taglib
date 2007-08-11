@@ -22,6 +22,7 @@
 #ifndef TAGLIB_VORBISFILE_H
 #define TAGLIB_VORBISFILE_H
 
+#include "taglib_export.h"
 #include "oggfile.h"
 #include "xiphcomment.h"
 
@@ -54,7 +55,7 @@ namespace TagLib {
      * the codec implementations, in this case Vorbis specifically.
      */
 
-    class File : public Ogg::File
+    class TAGLIB_EXPORT File : public Ogg::File
     {
     public:
       /*!

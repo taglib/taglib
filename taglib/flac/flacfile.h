@@ -22,6 +22,7 @@
 #ifndef TAGLIB_FLACFILE_H
 #define TAGLIB_FLACFILE_H
 
+#include "taglib_export.h"
 #include "tfile.h"
 
 #include "flacproperties.h"
@@ -56,7 +57,7 @@ namespace TagLib {
      * information specific to FLAC files.
      */
 
-    class File : public TagLib::File
+    class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
       /*!

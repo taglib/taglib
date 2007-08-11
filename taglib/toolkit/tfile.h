@@ -22,6 +22,7 @@
 #ifndef TAGLIB_FILE_H
 #define TAGLIB_FILE_H
 
+#include "taglib_export.h"
 #include "taglib.h"
 #include "tbytevector.h"
 
@@ -39,7 +40,7 @@ namespace TagLib {
    * ByteVector and a binary search method for finding patterns in a file.
    */
 
-  class File
+  class TAGLIB_EXPORT File
   {
   public:
     /*!

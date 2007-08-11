@@ -22,6 +22,7 @@
 #ifndef TAGLIB_STRING_H
 #define TAGLIB_STRING_H
 
+#include "taglib_export.h"
 #include "taglib.h"
 #include "tbytevector.h"
 
@@ -60,7 +61,7 @@ namespace TagLib {
    * possible encodings, which are the four supported by the ID3v2 standard.
    */
 
-  class String
+  class TAGLIB_EXPORT String
   {
   public:
 

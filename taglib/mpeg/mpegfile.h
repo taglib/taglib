@@ -22,6 +22,7 @@
 #ifndef TAGLIB_MPEGFILE_H
 #define TAGLIB_MPEGFILE_H
 
+#include "taglib_export.h"
 #include "tfile.h"
 
 #include "mpegproperties.h"
@@ -44,7 +45,7 @@ namespace TagLib {
      * to the different ID3 tags.
      */
 
-    class File : public TagLib::File
+    class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
       /*!
