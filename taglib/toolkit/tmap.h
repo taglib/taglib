@@ -22,9 +22,10 @@
 #ifndef TAGLIB_MAP_H
 #define TAGLIB_MAP_H
 
-#include "taglib.h"
-
 #include <map>
+using namespace std;
+
+#include "taglib.h"
 
 namespace TagLib {
 
@@ -40,8 +41,21 @@ namespace TagLib {
   {
   public:
 #ifndef DO_NOT_DOCUMENT
+#ifdef WANT_CLASS_INSTANTIATION_OF_MAP
+    // Some STL implementations get snippy over the use of the
+    // class keyword to distinguish different templates; Sun Studio
+    // in particular finds multiple specializations in certain rare
+    // cases and complains about that. GCC doesn't seem to mind,
+    // and uses the typedefs further below without the class keyword.
+    // Not all the specializations of Map can use the class keyword
+    // (when T is not actually a class type), so don't apply this
+    // generally.
+    typedef typename std::map<class Key, class T>::iterator Iterator;
+    typedef typename std::map<class Key, class T>::const_iterator ConstIterator;
+#else
     typedef typename std::map<Key, T>::iterator Iterator;
     typedef typename std::map<Key, T>::const_iterator ConstIterator;
+#endif
 #endif
 
     /*!

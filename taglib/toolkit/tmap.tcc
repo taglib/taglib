@@ -26,13 +26,18 @@ namespace TagLib {
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class Key, class T>
-template <class KeyP, class TP> class Map<Key, T>::MapPrivate : public RefCounter
+template <class KeyP, class TP>
+class Map<Key, T>::MapPrivate : public RefCounter
 {
 public:
   MapPrivate() : RefCounter() {}
-  MapPrivate(const std::map<KeyP, TP> &m) : RefCounter(), map(m) {}
-
+#ifdef WANT_CLASS_INSTANTIATION_OF_MAP
+  MapPrivate(const std::map<class KeyP, class TP>& m) : RefCounter(), map(m) {}
+  std::map<class KeyP, class TP> map;
+#else
+  MapPrivate(const std::map<KeyP, TP>& m) : RefCounter(), map(m) {}
   std::map<KeyP, TP> map;
+#endif
 };
 
 template <class Key, class T>
