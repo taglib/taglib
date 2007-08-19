@@ -436,6 +436,6 @@ const TagLib::String operator+(const TagLib::String &s1, const char *s2);
  *
  * Send the string to an output stream.
  */
-std::ostream &operator<<(std::ostream &s, const TagLib::String &str);
+TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::String &str);
 
 #endif

@@ -25,6 +25,7 @@
 #include "tstring.h"
 #include "tlist.h"
 #include "tbytevectorlist.h"
+#include "taglib_export.h"
 
 #include <iostream>
 
@@ -37,7 +38,7 @@ namespace TagLib {
    * string operations.
    */
 
-  class StringList : public List<String>
+  class TAGLIB_EXPORT StringList : public List<String>
   {
   public:
 

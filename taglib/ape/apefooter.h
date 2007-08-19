@@ -23,6 +23,7 @@
 #define TAGLIB_APEFOOTER_H
 
 #include "tbytevector.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -37,7 +38,7 @@ namespace TagLib {
      * headers specified there.
      */
 
-    class Footer
+    class TAGLIB_EXPORT Footer
     {
     public:
       /*!

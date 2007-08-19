@@ -28,6 +28,7 @@
 #include "tstring.h"
 #include "tstringlist.h"
 #include "tbytevector.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -56,7 +57,7 @@ namespace TagLib {
      * \see fieldListMap()
      */
 
-    class XiphComment : public TagLib::Tag
+    class TAGLIB_EXPORT XiphComment : public TagLib::Tag
     {
     public:
       /*!

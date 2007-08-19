@@ -25,12 +25,13 @@
 #include "taglib_export.h"
 #include "tbytevector.h"
 #include "id3v2frame.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
   namespace ID3v2 {
 
-    class TextIdentificationFrame;
+    class TAGLIB_EXPORT TextIdentificationFrame;
 
     //! A factory for creating ID3v2 frames
 

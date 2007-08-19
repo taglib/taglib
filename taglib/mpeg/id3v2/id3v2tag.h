@@ -27,6 +27,7 @@
 #include "tstring.h"
 #include "tlist.h"
 #include "tmap.h"
+#include "taglib_export.h"
 
 #include "id3v2framefactory.h"
 
@@ -97,7 +98,7 @@ namespace TagLib {
      * working knowledge of ID3v2 structure.  You're been warned.
      */
 
-    class Tag : public TagLib::Tag
+    class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
     public:
       /*!

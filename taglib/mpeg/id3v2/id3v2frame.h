@@ -24,6 +24,7 @@
 
 #include "tstring.h"
 #include "tbytevector.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -43,7 +44,7 @@ namespace TagLib {
      * specific to a given frame type is handed in one of the many subclasses.
      */
 
-    class Frame
+    class TAGLIB_EXPORT Frame
     {
       friend class Tag;
       friend class FrameFactory;

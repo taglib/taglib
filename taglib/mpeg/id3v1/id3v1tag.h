@@ -24,6 +24,7 @@
 
 #include "tag.h"
 #include "tbytevector.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -92,7 +93,7 @@ namespace TagLib {
      * truncation happens automatically when the tag is rendered.
      */
 
-    class Tag : public TagLib::Tag
+    class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
     public:
       /*!

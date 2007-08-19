@@ -24,6 +24,7 @@
 
 #include <id3v2frame.h>
 #include <id3v2header.h>
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -38,7 +39,7 @@ namespace TagLib {
      * PNG format.
      */
 
-    class AttachedPictureFrame : public Frame
+    class TAGLIB_EXPORT AttachedPictureFrame : public Frame
     {
       friend class FrameFactory;
 

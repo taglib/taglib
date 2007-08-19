@@ -23,6 +23,7 @@
 #define TAGLIB_TEXTIDENTIFICATIONFRAME_H
 
 #include <tstringlist.h>
+#include "taglib_export.h"
 
 #include <id3v2frame.h>
 
@@ -92,7 +93,7 @@ namespace TagLib {
      * be used to determine the frame type.
      */
 
-    class TextIdentificationFrame : public Frame
+    class TAGLIB_EXPORT TextIdentificationFrame : public Frame
     {
       friend class FrameFactory;
 

@@ -24,6 +24,7 @@
 
 #include "tlist.h"
 #include "tbytevector.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -39,7 +40,7 @@ namespace TagLib {
      * to the codecs.
      */
 
-    class PageHeader
+    class TAGLIB_EXPORT PageHeader
     {
     public:
       /*!
