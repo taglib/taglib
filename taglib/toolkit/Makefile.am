@@ -1,4 +1,6 @@
-INCLUDES = $(all_includes)
+INCLUDES = \
+	-I$(top_srcdir)/taglib \
+	$(all_includes)
 
 noinst_LTLIBRARIES = libtoolkit.la
 
