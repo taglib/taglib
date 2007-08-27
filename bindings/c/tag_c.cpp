@@ -21,6 +21,7 @@
 
 #include "tag_c.h"
 
+#include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>
 #include <vorbisfile.h>
