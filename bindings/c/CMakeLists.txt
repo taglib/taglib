@@ -26,7 +26,14 @@ TARGET_LINK_LIBRARIES(tag_c  tag )
 # using these bindings.
 CHECK_LIBRARY_EXISTS(Crun __RTTI___ "" HAVE_CRUN_LIB)
 IF(HAVE_CRUN_LIB)
-  TARGET_LINK_LIBRARIES(tag_c Cstd Crun)
+  # Which libraries to link depends critically on which
+  # STL version is going to be used by your application
+  # and which runtime is in use. While Crun is pretty much
+  # the only game in town, the three available STLs -- Cstd,
+  # stlport4 and stdcxx -- make this a mess. We really only
+  # support stdcxx, but won't force the issue here.
+  #
+  # TARGET_LINK_LIBRARIES(tag_c Cstd Crun)
 ENDIF(HAVE_CRUN_LIB)
 
 SET_TARGET_PROPERTIES(tag_c PROPERTIES VERSION 0.0.0 SOVERSION 0 )
