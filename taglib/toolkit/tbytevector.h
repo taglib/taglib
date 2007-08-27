@@ -26,6 +26,7 @@
 #include "taglib_export.h"
 
 #include <vector>
+#include <ostream>
 
 namespace TagLib {
 

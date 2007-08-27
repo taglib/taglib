@@ -27,6 +27,7 @@
 #include "tbytevector.h"
 
 #include <string>
+#include <ostream>
 
 /*!
  * \relates TagLib::String
