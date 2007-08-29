@@ -56,10 +56,12 @@ namespace TagLib {
     class StringHandler
     {
     public:
+      // do not fix compiler warning about missing virtual destructor
+      // since this would not be binary compatible
+      // let Scott fix it whenever he thinks BIC changes can next be applied
       /*!
        * Destroys this StringHandler instance.
        */
-      virtual ~StringHandler();
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.

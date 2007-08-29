@@ -89,10 +89,9 @@ namespace TagLib {
     class FileTypeResolver
     {
     public:
-      /*!
-       * Destroys this FileTypeResolver instance.
-       */
-      virtual ~FileTypeResolver();
+      // do not fix compiler warning about missing virtual destructor
+      // since this would not be binary compatible
+      // let Scott fix it whenever he thinks BIC changes can next be applied
       /*!
        * This method must be overridden to provide an additional file type
        * resolver.  If the resolver is able to determine the file type it should

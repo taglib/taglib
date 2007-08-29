@@ -48,10 +48,6 @@ List<const FileRef::FileTypeResolver *> FileRef::FileRefPrivate::fileTypeResolve
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileRef::FileTypeResolver::~FileTypeResolver()
-{
-}
-
 FileRef::FileRef()
 {
     d = new FileRefPrivate(0);
