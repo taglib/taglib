@@ -56,7 +56,7 @@ namespace TagLib {
   class TAGLIB_EXPORT FileRef
   {
   public:
-    
+
   //! A class for pluggable file type resolution.
 
   /*!
@@ -89,6 +89,10 @@ namespace TagLib {
     class FileTypeResolver
     {
     public:
+      /*!
+       * Destroys this FileTypeResolver instance.
+       */
+      virtual ~FileTypeResolver();
       /*!
        * This method must be overridden to provide an additional file type
        * resolver.  If the resolver is able to determine the file type it should

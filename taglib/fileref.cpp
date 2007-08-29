@@ -48,6 +48,10 @@ List<const FileRef::FileTypeResolver *> FileRef::FileRefPrivate::fileTypeResolve
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+FileRef::FileTypeResolver::~FileTypeResolver()
+{
+}
+
 FileRef::FileRef()
 {
     d = new FileRefPrivate(0);
@@ -171,7 +175,7 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
-  }  
+  }
 
   return 0;
 }
