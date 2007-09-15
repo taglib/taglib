@@ -35,10 +35,7 @@ include(ConfigureChecks.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc )
 
-if(NOT WIN32)
-  #For the future rename it as config-taglib.h
-  configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
-endif(NOT WIN32)
+configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
 ADD_SUBDIRECTORY( taglib ) 
 
