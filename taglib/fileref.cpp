@@ -26,6 +26,7 @@
 #include "mpegfile.h"
 #include "vorbisfile.h"
 #include "flacfile.h"
+#include "oggflacfile.h"
 #include "mpcfile.h"
 
 using namespace TagLib;
@@ -107,6 +108,7 @@ StringList FileRef::defaultFileExtensions()
 
   l.append("ogg");
   l.append("flac");
+  l.append("oga");
   l.append("mp3");
   l.append("mpc");
 
@@ -167,6 +169,8 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
       return new Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(s.substr(s.size() - 4, 4).upper() == ".OGA")
+      return new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 5, 5).upper() == ".FLAC")
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MPC")

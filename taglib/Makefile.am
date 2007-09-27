@@ -5,6 +5,7 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/toolkit \
 	-I$(top_srcdir)/taglib/mpeg \
 	-I$(top_srcdir)/taglib/ogg \
+	-I$(top_srcdir)/taglib/ogg/flac \
 	-I$(top_srcdir)/taglib/flac \
 	-I$(top_srcdir)/taglib/mpc \
 	-I$(top_srcdir)/taglib/ogg/vorbis \
