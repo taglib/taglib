@@ -108,6 +108,9 @@ ByteVector File::readBlock(ulong length)
     return ByteVector::null;
   }
 
+  if(length == 0)
+    return ByteVector::null;
+
   if(length > FilePrivate::bufferSize &&
      length > ulong(File::length()))
   {

@@ -216,7 +216,7 @@ void APE::Tag::read()
     d->file->seek(d->tagOffset);
     d->footer.setData(d->file->readBlock(Footer::size()));
 
-    if(d->footer.tagSize() == 0 ||
+    if(d->footer.tagSize() <= Footer::size() ||
        d->footer.tagSize() > uint(d->file->length()))
       return;
 

@@ -321,7 +321,9 @@ ByteVector &ByteVector::setData(const char *data, uint length)
   detach();
 
   resize(length);
-  ::memcpy(DATA(d), data, length);
+
+  if(length > 0)
+    ::memcpy(DATA(d), data, length);
 
   return *this;
 }
@@ -334,12 +336,12 @@ ByteVector &ByteVector::setData(const char *data)
 char *ByteVector::data()
 {
   detach();
-  return DATA(d);
+  return size() > 0 ? DATA(d) : 0;
 }
 
 const char *ByteVector::data() const
 {
-  return DATA(d);
+  return size() > 0 ? DATA(d) : 0;
 }
 
 ByteVector ByteVector::mid(uint index, uint length) const
