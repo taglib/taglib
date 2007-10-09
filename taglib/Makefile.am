@@ -14,7 +14,7 @@ INCLUDES = \
 lib_LTLIBRARIES = libtag.la
 
 libtag_la_SOURCES = tag.cpp fileref.cpp audioproperties.cpp
-taglib_include_HEADERS = tag.h fileref.h audioproperties.h
+taglib_include_HEADERS = tag.h fileref.h audioproperties.h taglib_export.h
 taglib_includedir = $(includedir)/taglib
 
 libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 5:0:4
