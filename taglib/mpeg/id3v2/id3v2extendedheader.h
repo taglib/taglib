@@ -26,6 +26,7 @@
 #ifndef TAGLIB_ID3V2EXTENDEDHEADER_H
 #define TAGLIB_ID3V2EXTENDEDHEADER_H
 
+#include "taglib_export.h"
 #include "tbytevector.h"
 #include "taglib.h"
 
@@ -44,7 +45,7 @@ namespace TagLib {
      * (Structure, <a href="id3v2-structure.html#3.2">3.2</a>)
      */
 
-    class ExtendedHeader
+    class TAGLIB_EXPORT ExtendedHeader
     {
     public:
       /*!

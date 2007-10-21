@@ -26,6 +26,7 @@
 #ifndef TAGLIB_VORBISPROPERTIES_H
 #define TAGLIB_VORBISPROPERTIES_H
 
+#include "taglib_export.h"
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -52,7 +53,7 @@ namespace TagLib {
      * API.
      */
 
-    class Properties : public AudioProperties
+    class TAGLIB_EXPORT Properties : public AudioProperties
     {
     public:
       /*!

@@ -30,6 +30,7 @@
 
 #include <id3v2frame.h>
 #include <id3v2header.h>
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -46,7 +47,7 @@ namespace TagLib {
      * uniquely identifies the GEOB frame in the tag.
      */
 
-    class GeneralEncapsulatedObjectFrame : public Frame
+    class TAGLIB_EXPORT GeneralEncapsulatedObjectFrame : public Frame
     {
       friend class FrameFactory;
 

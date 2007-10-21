@@ -27,6 +27,7 @@
 #define TAGLIB_UNKNOWNFRAME_H
 
 #include <id3v2frame.h>
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -45,7 +46,7 @@ namespace TagLib {
      * to have your frame type supported through the standard ID3v2 mechanism.
      */
 
-    class UnknownFrame : public Frame
+    class TAGLIB_EXPORT UnknownFrame : public Frame
     {
       friend class FrameFactory;
 

@@ -27,6 +27,7 @@
 #define TAGLIB_COMMENTSFRAME_H
 
 #include <id3v2frame.h>
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -39,7 +40,7 @@ namespace TagLib {
      * a language encoding, a description and a single text field.
      */
 
-    class CommentsFrame : public Frame
+    class TAGLIB_EXPORT CommentsFrame : public Frame
     {
       friend class FrameFactory;
 

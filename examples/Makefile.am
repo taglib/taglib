@@ -1,9 +1,10 @@
-bin_PROGRAMS = tagreader tagreader_c tagwriter framelist strip-id3v1
+bin_PROGRAMS = tagreader tagreader_c tagwriter framelist strip-id3v1 taglib-image
 tagreader_SOURCES = tagreader.cpp
 tagreader_c_SOURCES = tagreader_c.c
 tagwriter_SOURCES = tagwriter.cpp
 framelist_SOURCES = framelist.cpp
 strip_id3v1_SOURCES = strip-id3v1.cpp
+taglib_image_SOURCES = taglib-image.cpp
 
 INCLUDES = \
 	-I$(top_srcdir)/taglib \
@@ -11,6 +12,7 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/mpeg \
 	-I$(top_srcdir)/taglib/mpeg/id3v1 \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 \
+	-I$(top_srcdir)/taglib/mpeg/id3v2/frames \
 	-I$(top_srcdir)/bindings/c
 
 LDADD = ../taglib/libtag.la

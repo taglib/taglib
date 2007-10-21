@@ -26,6 +26,7 @@
 #ifndef TAGLIB_OGGPAGE_H
 #define TAGLIB_OGGPAGE_H
 
+#include "taglib_export.h"
 #include "tbytevectorlist.h"
 
 namespace TagLib {
@@ -48,7 +49,7 @@ namespace TagLib {
      * could potentially be useful for non-meta data purposes.
      */
 
-    class Page
+    class TAGLIB_EXPORT Page
     {
     public:
       /*!

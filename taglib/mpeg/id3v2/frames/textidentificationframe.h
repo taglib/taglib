@@ -192,7 +192,7 @@ namespace TagLib {
 
     //! An ID3v2 custom text identification frame implementationx
 
-    class UserTextIdentificationFrame : public TextIdentificationFrame
+    class TAGLIB_EXPORT UserTextIdentificationFrame : public TextIdentificationFrame
     {
       friend class FrameFactory;
 

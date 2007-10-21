@@ -27,6 +27,7 @@
 #define TAGLIB_XINGHEADER_H
 
 #include "mpegheader.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -46,7 +47,7 @@ namespace TagLib {
      * and the XMMS sources as references.
      */
 
-    class XingHeader
+    class TAGLIB_EXPORT XingHeader
     {
       public:
         /*!

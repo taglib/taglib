@@ -26,6 +26,8 @@
 #ifndef TAGLIB_MPEGHEADER_H
 #define TAGLIB_MPEGHEADER_H
 
+#include "taglib_export.h"
+
 namespace TagLib {
 
   class ByteVector;
@@ -41,7 +43,7 @@ namespace TagLib {
      * document as a reference.
      */
 
-    class Header
+    class TAGLIB_EXPORT Header
     {
     public:
       /*!

@@ -398,6 +398,6 @@ namespace TagLib {
  * \relates TagLib::ByteVector
  * Streams the ByteVector \a v to the output stream \a s.
  */
-std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v);
+TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v);
 
 #endif

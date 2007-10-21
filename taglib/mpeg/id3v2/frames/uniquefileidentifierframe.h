@@ -40,7 +40,7 @@ namespace TagLib {
 
     //! An implementation of ID3v2 unique identifier frames
 
-    class UniqueFileIdentifierFrame : public ID3v2::Frame
+    class TAGLIB_EXPORT UniqueFileIdentifierFrame : public ID3v2::Frame
     {
       friend class FrameFactory;
 

@@ -57,7 +57,7 @@ namespace TagLib {
      * \see ID3v1::Tag::setStringHandler()
      */
 
-    class StringHandler
+    class TAGLIB_EXPORT StringHandler
     {
     public:
       // do not fix compiler warning about missing virtual destructor

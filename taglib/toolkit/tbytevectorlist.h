@@ -26,6 +26,7 @@
 #ifndef TAGLIB_BYTEVECTORLIST_H
 #define TAGLIB_BYTEVECTORLIST_H
 
+#include "taglib_export.h"
 #include "tbytevector.h"
 #include "tlist.h"
 
@@ -37,7 +38,7 @@ namespace TagLib {
    * A List specialization with some handy features useful for ByteVectors.
    */
 
-  class ByteVectorList : public List<ByteVector>
+  class TAGLIB_EXPORT ByteVectorList : public List<ByteVector>
   {
   public:
 
