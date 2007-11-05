@@ -1,7 +1,5 @@
 project(taglib)
 
-find_package(ZLIB)
-
 OPTION(BUILD_TESTS "Create tests and examples"  OFF)
 
 #add some KDE specific stuff
