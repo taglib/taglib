@@ -8,6 +8,7 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/flac \
 	-I$(top_srcdir)/taglib/mpc \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 \
+	-I$(top_srcdir)/taglib/wavpack \
 	$(all_includes)
 
 lib_LTLIBRARIES = libtag_c.la

@@ -32,6 +32,7 @@
 #include "flacfile.h"
 #include "oggflacfile.h"
 #include "mpcfile.h"
+#include "wavpackfile.h"
 
 using namespace TagLib;
 
@@ -115,6 +116,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("oga");
   l.append("mp3");
   l.append("mpc");
+  l.append("wv");
 
   return l;
 }
@@ -179,6 +181,8 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(s.substr(s.size() - 4, 4).upper() == ".WV")
+      return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
   return 0;

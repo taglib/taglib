@@ -6,7 +6,9 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/flac
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/flac
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpc
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2  )
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
+)
 
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc )
