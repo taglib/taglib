@@ -50,3 +50,23 @@ ByteVector SynchData::fromUInt(uint value)
 
   return v;
 }
+
+void SynchData::decode(ByteVector &data)
+{
+  char *n = data.data();
+  const char *o = data.data();
+  const char *end = o + data.size();
+
+  if(data.size() <= 0)
+    return;
+
+  while(o < end - 1) {
+    *n++ = *o;
+    if(o[0] == '\xFF' && o[1] == '\x00')
+      o++;
+    o++;
+  }
+  *n++ = *o;
+
+  data.resize(n - data.data());
+}

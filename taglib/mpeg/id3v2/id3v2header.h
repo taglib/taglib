@@ -70,6 +70,13 @@ namespace TagLib {
       uint majorVersion() const;
 
       /*!
+       * Set the the major version number to \a version.  (Note: This is
+       * the 4, not the 2 in ID3v2.4.0.  The 2 is implied.)
+       * \see majorVersion()
+       */
+      void setMajorVersion(uint version);
+
+      /*!
        * Returns the revision number.  (Note: This is the 0, not the 4 in
        * ID3v2.4.0.  The 2 is implied.)
        */

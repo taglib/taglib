@@ -57,6 +57,11 @@ namespace TagLib {
        * Returns a 4 byte (32 bit) synchsafe integer based on \a value.
        */
       ByteVector fromUInt(uint value);
+
+      /*!
+       * Deunsynchronize the data (in-place).
+       */
+      void decode(ByteVector &data);
     }
 
   }

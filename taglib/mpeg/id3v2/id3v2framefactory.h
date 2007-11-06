@@ -29,6 +29,7 @@
 #include "taglib_export.h"
 #include "tbytevector.h"
 #include "id3v2frame.h"
+#include "id3v2header.h"
 
 namespace TagLib {
 
@@ -64,8 +65,8 @@ namespace TagLib {
        * false if we are parsing an old tag (v2.3 or older) that does not support
        * synchsafe ints.
        *
-       * \deprecated Please use the method below that accepts an ID3 version
-       * number in new code.
+       * \deprecated Please use the method below that accepts a ID3v2::Header
+       * instance in new code.
        */
       Frame *createFrame(const ByteVector &data, bool synchSafeInts) const;
 
@@ -73,9 +74,18 @@ namespace TagLib {
        * Create a frame based on \a data.  \a version should indicate the ID3v2
        * version of the tag.  As ID3v2.4 is the most current version of the
        * standard 4 is the default.
+       *
+       * \deprecated Please use the method below that accepts a ID3v2::Header
+       * instance in new code.
+       */
+      Frame *createFrame(const ByteVector &data, uint version = 4) const;
+
+      /*!
+       * Create a frame based on \a data.  \a tagHeader should be a valid
+       * ID3v2::Header instance.
        */
       // BIC: make virtual
-      Frame *createFrame(const ByteVector &data, uint version = 4) const;
+      Frame *createFrame(const ByteVector &data, Header *tagHeader) const;
 
       /*!
        * Returns the default text encoding for text frames.  If setTextEncoding()

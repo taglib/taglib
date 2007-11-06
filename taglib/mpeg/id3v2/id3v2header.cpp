@@ -101,6 +101,11 @@ TagLib::uint Header::majorVersion() const
   return d->majorVersion;
 }
 
+void Header::setMajorVersion(TagLib::uint version)
+{
+  d->majorVersion = version;
+}
+
 TagLib::uint Header::revisionNumber() const
 {
   return d->revisionNumber;

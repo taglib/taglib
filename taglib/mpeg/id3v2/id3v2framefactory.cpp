@@ -28,6 +28,7 @@
 #include <tdebug.h>
 
 #include "id3v2framefactory.h"
+#include "id3v2synchdata.h"
 
 #include "frames/attachedpictureframe.h"
 #include "frames/commentsframe.h"
@@ -71,6 +72,15 @@ Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) con
 
 Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 {
+  Header tagHeader;
+  tagHeader.setMajorVersion(version);
+  return createFrame(data, &tagHeader);
+}
+
+Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) const
+{
+  ByteVector data = origData;
+  uint version = tagHeader->majorVersion();
   Frame::Header *header = new Frame::Header(data, version);
   ByteVector frameID = header->frameID();
 
@@ -78,7 +88,7 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
   // characters.  Also make sure that there is data in the frame.
 
   if(!frameID.size() == (version < 3 ? 3 : 4) ||
-     header->frameSize() <= 0 ||
+     header->frameSize() <= (header->dataLengthIndicator() ? 4 : 0) ||
      header->frameSize() > data.size())
   {
     delete header;
@@ -90,6 +100,14 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
       delete header;
       return 0;
     }
+  }
+
+  if(version > 3 && (tagHeader->unsynchronisation() || header->unsynchronisation())) {
+    // Data lengths are not part of the encoded data, but since they are synch-safe
+    // integers they will be never actually encoded.
+    ByteVector frameData = data.mid(Frame::Header::size(version), header->frameSize());
+    SynchData::decode(frameData);
+    data = data.mid(0, Frame::Header::size(version)) + frameData;
   }
 
   // TagLib doesn't mess with encrypted frames, so just treat them

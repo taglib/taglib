@@ -30,6 +30,7 @@
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
+#include "id3v2synchdata.h"
 
 #include "id3v1genres.h"
 
@@ -381,8 +382,14 @@ void ID3v2::Tag::read()
   }
 }
 
-void ID3v2::Tag::parse(const ByteVector &data)
+void ID3v2::Tag::parse(const ByteVector &origData)
 {
+  ByteVector data = origData;
+
+  if(d->header.unsynchronisation() && d->header.majorVersion() <= 3) {
+    SynchData::decode(data);
+  }
+
   uint frameDataPosition = 0;
   uint frameDataLength = data.size();
 
@@ -424,7 +431,7 @@ void ID3v2::Tag::parse(const ByteVector &data)
     }
 
     Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
-                                           d->header.majorVersion());
+                                           &d->header);
 
     if(!frame)
       return;
