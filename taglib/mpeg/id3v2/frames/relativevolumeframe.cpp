@@ -162,20 +162,28 @@ void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak)
   setPeakVolume(peak, MasterVolume);
 }
 
+String RelativeVolumeFrame::identification() const
+{
+  return d->identification;
+}
+
+void RelativeVolumeFrame::setIdentification(const String &s)
+{
+  d->identification = s;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
 void RelativeVolumeFrame::parseFields(const ByteVector &data)
 {
-  ByteVector delimiter = textDelimiter(String::Latin1);
-  uint pos = data.find(delimiter);
-  d->identification = String(data.mid(0, pos), String::Latin1);
-  pos += delimiter.size();
+  int pos = 0;
+  d->identification = readStringField(data, String::Latin1, &pos);
 
   // Each channel is at least 4 bytes.
 
-  while(pos <= data.size() - 4) {
+  while(pos <= (int)data.size() - 4) {
 
 
     ChannelType type = ChannelType(data[pos]);

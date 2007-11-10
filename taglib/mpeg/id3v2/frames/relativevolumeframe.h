@@ -244,6 +244,18 @@ namespace TagLib {
 
 #endif
 
+      /*!
+       * Returns the identification for this frame.
+       */
+      String identification() const;
+
+      /*!
+       * Sets the identification of the frame to \a s. The string
+       * is used to identify the situation and/or device where this
+       * adjustment should apply.
+       */
+      void setIdentification(const String &s);
+
     protected:
       virtual void parseFields(const ByteVector &data);
       virtual ByteVector renderFields() const;

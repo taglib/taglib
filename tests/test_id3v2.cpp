@@ -7,6 +7,7 @@
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
 #include <generalencapsulatedobjectframe.h>
+#include <relativevolumeframe.h>
 
 using namespace std;
 using namespace TagLib;
@@ -32,6 +33,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testReadStringField);
   CPPUNIT_TEST(testParseAPIC);
   CPPUNIT_TEST(testParseGEOB);
+  CPPUNIT_TEST(testParseRelativeVolumeFrame);
   CPPUNIT_TEST(testBrokenFrame1);
   //CPPUNIT_TEST(testItunes24FrameSize);
   CPPUNIT_TEST_SUITE_END();
@@ -112,6 +114,26 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("d"), f.description());
   }
 
+  // http://bugs.kde.org/show_bug.cgi?id=150481
+  void testParseRelativeVolumeFrame()
+  {
+    ID3v2::RelativeVolumeFrame f(
+      ByteVector("RVA2"              // Frame ID
+                 "\x00\x00\x00\x0B"  // Frame size
+                 "\x00\x00"          // Frame flags
+                 "ident\x00"         // Identification
+                 "\x02"              // Type of channel
+                 "\x00\x0F"          // Volume adjustment
+                 "\x08"              // Bits representing peak
+                 "\x45", 21));       // Peak volume
+    CPPUNIT_ASSERT_EQUAL(String("ident"), f.identification());
+    CPPUNIT_ASSERT_EQUAL(15.0f / 512.0f,
+                         f.volumeAdjustment(ID3v2::RelativeVolumeFrame::FrontRight));
+    CPPUNIT_ASSERT_EQUAL((uchar)8,
+                         f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).bitsRepresentingPeak);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x45"),
+                         f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).peakVolume);
+  }
 
   /*void testItunes24FrameSize()
   {
