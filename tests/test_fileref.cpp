@@ -16,6 +16,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
   CPPUNIT_TEST(testMP3);
+  CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -88,6 +89,11 @@ public:
   void testMP3()
   {
     fileRefSave("xing", ".mp3");
+  }
+
+  void testTrueAudio()
+  {
+    fileRefSave("empty", ".tta");
   }
 
 };

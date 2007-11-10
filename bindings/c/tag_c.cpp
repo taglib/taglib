@@ -31,6 +31,7 @@
 #include <mpcfile.h>
 #include <wavpackfile.h>
 #include <speexfile.h>
+#include <trueaudiofile.h>
 #include <tag.h>
 #include <string.h>
 #include <id3v2framefactory.h>
@@ -77,6 +78,8 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     return reinterpret_cast<TagLib_File *>(new WavPack::File(filename));
   case TagLib_File_Speex:
     return reinterpret_cast<TagLib_File *>(new Speex::File(filename));
+  case TagLib_File_TrueAudio:
+    return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
   }
 
   return 0;
