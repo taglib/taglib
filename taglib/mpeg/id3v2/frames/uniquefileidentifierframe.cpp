@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include <tbytevectorlist.h>
+#include <tdebug.h>
 
 #include "uniquefileidentifierframe.h"
 
@@ -88,13 +89,14 @@ String UniqueFileIdentifierFrame::toString() const
 
 void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
 {
-  ByteVectorList fields = ByteVectorList::split(data, char(0));
-
-  if(fields.size() != 2)
+  if(data.size() < 1) {
+    debug("An UFID frame must contain at least 1 byte.");
     return;
+  }
 
-  d->owner = fields.front();
-  d->identifier = fields.back();
+  int pos = 0;
+  d->owner = readStringField(data, String::Latin1, &pos);
+  d->identifier = data.mid(pos);
 }
 
 ByteVector UniqueFileIdentifierFrame::renderFields() const

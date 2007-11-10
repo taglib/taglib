@@ -4,6 +4,7 @@
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <id3v2frame.h>
+#include <uniquefileidentifierframe.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
 #include <generalencapsulatedobjectframe.h>
@@ -34,6 +35,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseAPIC);
   CPPUNIT_TEST(testParseGEOB);
   CPPUNIT_TEST(testParseRelativeVolumeFrame);
+  CPPUNIT_TEST(testParseUniqueFileIdentifierFrame);
+  CPPUNIT_TEST(testParseEmptyUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testBrokenFrame1);
   //CPPUNIT_TEST(testItunes24FrameSize);
   CPPUNIT_TEST_SUITE_END();
@@ -133,6 +136,34 @@ public:
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).bitsRepresentingPeak);
     CPPUNIT_ASSERT_EQUAL(ByteVector("\x45"),
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).peakVolume);
+  }
+
+  void testParseUniqueFileIdentifierFrame()
+  {
+    ID3v2::UniqueFileIdentifierFrame f(
+      ByteVector("UFID"                 // Frame ID
+                 "\x00\x00\x00\x09"     // Frame size
+                 "\x00\x00"             // Frame flags
+                 "owner\x00"            // Owner identifier
+                 "\x00\x01\x02", 19));  // Identifier
+    CPPUNIT_ASSERT_EQUAL(String("owner"),
+                         f.owner());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x00\x01\x02", 3),
+                         f.identifier());
+  }
+
+  void testParseEmptyUniqueFileIdentifierFrame()
+  {
+    ID3v2::UniqueFileIdentifierFrame f(
+      ByteVector("UFID"                 // Frame ID
+                 "\x00\x00\x00\x01"     // Frame size
+                 "\x00\x00"             // Frame flags
+                 "\x00"                 // Owner identifier
+                 "", 11));              // Identifier
+    CPPUNIT_ASSERT_EQUAL(String(),
+                         f.owner());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(),
+                         f.identifier());
   }
 
   /*void testItunes24FrameSize()
