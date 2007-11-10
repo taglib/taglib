@@ -55,8 +55,8 @@ GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame() : Frame("GEOB")
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame(const ByteVector &data) : Frame(data)
 {
-  setData(data);
   d = new GeneralEncapsulatedObjectFramePrivate;
+  setData(data);
 }
 
 GeneralEncapsulatedObjectFrame::~GeneralEncapsulatedObjectFrame()

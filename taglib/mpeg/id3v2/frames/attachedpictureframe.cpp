@@ -54,8 +54,8 @@ AttachedPictureFrame::AttachedPictureFrame() : Frame("APIC")
 
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data) : Frame(data)
 {
-  setData(data);
   d = new AttachedPictureFramePrivate;
+  setData(data);
 }
 
 AttachedPictureFrame::~AttachedPictureFrame()
@@ -132,9 +132,10 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
 
   d->textEncoding = String::Type(data[0]);
 
-	int pos = 1;
+  int pos = 1;
 
-	d->mimeType = readStringField(data, String::Latin1, &pos);
+  d->mimeType = readStringField(data, String::Latin1, &pos);
+  d->type = (TagLib::ID3v2::AttachedPictureFrame::Type)data[pos++];
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);

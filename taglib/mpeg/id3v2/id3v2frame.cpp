@@ -202,9 +202,11 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   if(end < *position)
     return String::null;
 
+  String str = String(data.mid(*position, end - *position), encoding);
+
   *position = end + delimiter.size();
 
-  return String(data.mid(*position, end - *position), encoding);
+  return str;
 }
 
 

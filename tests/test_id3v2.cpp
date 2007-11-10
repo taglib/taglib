@@ -3,10 +3,25 @@
 #include <stdio.h>
 #include <id3v2tag.h>
 #include <mpegfile.h>
+#include <id3v2frame.h>
 #include <textidentificationframe.h>
+#include <attachedpictureframe.h>
+#include <generalencapsulatedobjectframe.h>
 
 using namespace std;
 using namespace TagLib;
+
+class PublicFrame : public ID3v2::Frame
+{
+  public:
+    PublicFrame() : ID3v2::Frame(ByteVector("XXXX\0\0\0\0\0\0", 10)) {}
+    String readStringField(const ByteVector &data, String::Type encoding,
+                           int *positon = 0)
+      { return ID3v2::Frame::readStringField(data, encoding, positon); }
+    virtual String toString() const { return String::null; }
+    virtual void parseFields(const ByteVector &) {}
+    virtual ByteVector renderFields() const { return ByteVector::null; }
+};
 
 class TestID3v2 : public CppUnit::TestFixture
 {
@@ -14,6 +29,9 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUnsynchDecode);
   CPPUNIT_TEST(testUTF16BEDelimiter);
   CPPUNIT_TEST(testUTF16Delimiter);
+  CPPUNIT_TEST(testReadStringField);
+  CPPUNIT_TEST(testParseAPIC);
+  CPPUNIT_TEST(testParseGEOB);
   CPPUNIT_TEST(testBrokenFrame1);
   //CPPUNIT_TEST(testItunes24FrameSize);
   CPPUNIT_TEST_SUITE_END();
@@ -53,6 +71,47 @@ public:
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TENC"));
   }
+
+  void testReadStringField()
+  {
+    PublicFrame f;
+    ByteVector data("abc\0", 4);
+    String str = f.readStringField(data, String::Latin1);
+    CPPUNIT_ASSERT_EQUAL(String("abc"), str);
+  }
+
+  // http://bugs.kde.org/show_bug.cgi?id=151078
+  void testParseAPIC()
+  {
+    ID3v2::AttachedPictureFrame f(ByteVector("APIC"
+                                             "\x00\x00\x00\x07"
+                                             "\x00\x00"
+                                             "\x00"
+                                             "m\x00"
+                                             "\x01"
+                                             "d\x00"
+                                             "\x00", 17));
+    CPPUNIT_ASSERT_EQUAL(String("m"), f.mimeType());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FileIcon, f.type());
+    CPPUNIT_ASSERT_EQUAL(String("d"), f.description());
+  }
+
+  // http://bugs.kde.org/show_bug.cgi?id=151078
+  void testParseGEOB()
+  {
+    ID3v2::GeneralEncapsulatedObjectFrame f(ByteVector("GEOB"
+                                             "\x00\x00\x00\x08"
+                                             "\x00\x00"
+                                             "\x00"
+                                             "m\x00"
+                                             "f\x00"
+                                             "d\x00"
+                                             "\x00", 18));
+    CPPUNIT_ASSERT_EQUAL(String("m"), f.mimeType());
+    CPPUNIT_ASSERT_EQUAL(String("f"), f.fileName());
+    CPPUNIT_ASSERT_EQUAL(String("d"), f.description());
+  }
+
 
   /*void testItunes24FrameSize()
   {
