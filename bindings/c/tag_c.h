@@ -87,7 +87,8 @@ typedef enum {
   TagLib_File_FLAC,
   TagLib_File_MPC,
   TagLib_File_OggFlac,
-  TagLib_File_WavPack
+  TagLib_File_WavPack,
+  TagLib_File_Speex
 } TagLib_File_Type;
 
 /*!

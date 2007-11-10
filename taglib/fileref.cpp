@@ -33,6 +33,7 @@
 #include "oggflacfile.h"
 #include "mpcfile.h"
 #include "wavpackfile.h"
+#include "speexfile.h"
 
 using namespace TagLib;
 
@@ -117,6 +118,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("mp3");
   l.append("mpc");
   l.append("wv");
+  l.append("spx");
 
   return l;
 }
@@ -189,7 +191,9 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".WV")
+    if(s.substr(s.size() - 3, 3).upper() == ".WV")
+      return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(s.substr(s.size() - 4, 4).upper() == ".SPX")
       return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
