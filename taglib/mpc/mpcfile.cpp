@@ -100,6 +100,15 @@ MPC::File::File(const char *file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
+#ifdef TAGLIB_UNICODE_FILENAMES
+MPC::File::File(const wchar_t *file, bool readProperties,
+                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+#endif
+
 MPC::File::~File()
 {
   delete d;

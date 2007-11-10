@@ -70,6 +70,16 @@ namespace TagLib {
       File(const char *file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
+#ifdef TAGLIB_UNICODE_FILENAMES
+      /*!
+       * Contructs a Vorbis file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read using \a propertiesStyle.  If
+       * false, \a propertiesStyle is ignored.
+       */
+      File(const wchar_t *file, bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average);
+#endif
+
       /*!
        * Destroys this instance of the File.
        */

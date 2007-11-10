@@ -45,6 +45,15 @@
 # define W_OK 2
 #endif
 
+#ifdef TAGLIB_UNICODE_FILENAMES
+# ifdef _WIN32
+#  include <wchar.h>
+#  include <windows.h>
+# else
+#  error "Unicode filenames are not supported on this platform."
+# endif
+#endif
+
 using namespace TagLib;
 
 class File::FilePrivate
@@ -53,6 +62,9 @@ public:
   FilePrivate(const char *fileName) :
     file(0),
     name(fileName),
+#ifdef TAGLIB_UNICODE_FILENAMES
+    wname(0),
+#endif
     readOnly(true),
     valid(true),
     size(0)
@@ -61,10 +73,16 @@ public:
   ~FilePrivate()
   {
     free((void *)name);
+#ifdef TAGLIB_UNICODE_FILENAMES
+    free((void *)wname);
+#endif
   }
 
   FILE *file;
   const char *name;
+#ifdef TAGLIB_UNICODE_FILENAMES
+  const wchar_t *wname;
+#endif
   bool readOnly;
   bool valid;
   ulong size;
@@ -87,11 +105,44 @@ File::File(const char *file)
   if(d->file)
     d->readOnly = false;
   else
-    d->file = fopen(file,"rb");
+    d->file = fopen(file, "rb");
 
   if(!d->file)
     debug("Could not open file " + String(file));
 }
+
+#ifdef TAGLIB_UNICODE_FILENAMES
+File::File(const wchar_t *file)
+{
+#ifdef _WIN32
+  d = new FilePrivate(0);
+  d->wname = _wcsdup(file);
+
+  if(GetVersion() < 0x80000000) {
+    d->file = _wfopen(file, L"rb+");
+    if(d->file)
+      d->readOnly = false;
+    else
+      d->file = _wfopen(file, L"rb");
+  }
+  else {
+    size_t size = wcslen(file) + 1;
+    d->name = (char *)malloc(size);
+    if(WideCharToMultiByte(CP_ACP, 0, file, -1, (CHAR*)d->name, size,
+                           NULL, NULL) > 0) {
+      d->file = fopen(d->name, "rb+");
+      if(d->file)
+        d->readOnly = false;
+      else
+        d->file = fopen(d->name, "rb");
+    }
+  }
+
+  if(!d->file)
+    debug("Could not open file " + String(file, String::UTF16LE));
+#endif
+}
+#endif
 
 File::~File()
 {
@@ -104,6 +155,13 @@ const char *File::name() const
 {
   return d->name;
 }
+
+#ifdef TAGLIB_UNICODE_FILENAMES
+const wchar_t *File::unicodeName() const
+{
+  return d->wname;
+}
+#endif
 
 ByteVector File::readBlock(ulong length)
 {

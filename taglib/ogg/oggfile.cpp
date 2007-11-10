@@ -213,6 +213,13 @@ Ogg::File::File(const char *file) : TagLib::File(file)
   d = new FilePrivate;
 }
 
+#ifdef TAGLIB_UNICODE_FILENAMES
+Ogg::File::File(const wchar_t *file) : TagLib::File(file)
+{
+  d = new FilePrivate;
+}
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////

@@ -246,6 +246,19 @@ MPEG::File::File(const char *file, ID3v2::FrameFactory *frameFactory,
   }
 }
 
+#ifdef TAGLIB_UNICODE_FILENAMES
+MPEG::File::File(const wchar_t *file, ID3v2::FrameFactory *frameFactory,
+                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(file)
+{
+  d = new FilePrivate(frameFactory);
+  if(isOpen()) {
+    d->tag = new MPEGTag(this);
+    read(readProperties, propertiesStyle);
+  }
+}
+#endif
+
 MPEG::File::~File()
 {
   delete d;

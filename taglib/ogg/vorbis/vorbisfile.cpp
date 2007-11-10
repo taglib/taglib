@@ -68,6 +68,15 @@ Vorbis::File::File(const char *file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
+#ifdef TAGLIB_UNICODE_FILENAMES
+Vorbis::File::File(const wchar_t *file, bool readProperties,
+                   Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+#endif
+
 Vorbis::File::~File()
 {
   delete d;
