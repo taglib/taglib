@@ -34,6 +34,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestByteVector);
   CPPUNIT_TEST(testByteVector);
   CPPUNIT_TEST(testFind1);
+  CPPUNIT_TEST(testFind2);
   CPPUNIT_TEST(testRfind1);
   CPPUNIT_TEST(testRfind2);
   CPPUNIT_TEST_SUITE_END();
@@ -126,6 +127,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 6));
     CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 7));
     CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 8));
+  }
+
+  void testFind2()
+  {
+    CPPUNIT_ASSERT_EQUAL(0, ByteVector("\x01", 1).find("\x01"));
+    CPPUNIT_ASSERT_EQUAL(0, ByteVector("\x01\x02", 2).find("\x01\x02"));
+    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("\x01", 1).find("\x02"));
+    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("\x01\x02", 2).find("\x01\x03"));
   }
 
   void testRfind1()

@@ -95,7 +95,7 @@ namespace TagLib {
   template <class Vector>
   int vectorFind(const Vector &v, const Vector &pattern, uint offset, int byteAlign)
   {
-    if(pattern.size() > v.size() || offset >= v.size() - 1)
+    if(pattern.size() > v.size() || offset > v.size() - 1)
       return -1;
 
     // Let's go ahead and special case a pattern of size one since that's common
