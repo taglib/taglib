@@ -93,7 +93,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::File::File(const char *file, bool readProperties,
+MPC::File::File(FileName file, bool readProperties,
                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;

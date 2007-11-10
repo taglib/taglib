@@ -26,6 +26,7 @@
 #ifndef TAGLIB_FILEREF_H
 #define TAGLIB_FILEREF_H
 
+#include <tfile.h>
 #include <tstringlist.h>
 
 #include "taglib_export.h"
@@ -33,8 +34,6 @@
 
 namespace TagLib {
 
-  class String;
-  class File;
   class Tag;
 
   //! This class provides a simple abstraction for creating and handling files
@@ -105,7 +104,7 @@ namespace TagLib {
        * deleted.  Deletion will happen automatically when the FileRef passes
        * out of scope.
        */
-      virtual File *createFile(const char *fileName,
+      virtual File *createFile(FileName fileName,
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
@@ -125,7 +124,7 @@ namespace TagLib {
      * Also see the note in the class documentation about why you may not want to
      * use this method in your application.
      */
-    explicit FileRef(const char *fileName,
+    explicit FileRef(FileName fileName,
                      bool readAudioProperties = true,
                      AudioProperties::ReadStyle
                      audioPropertiesStyle = AudioProperties::Average);
@@ -248,7 +247,7 @@ namespace TagLib {
      *
      * \deprecated
      */
-    static File *create(const char *fileName,
+    static File *create(FileName fileName,
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 

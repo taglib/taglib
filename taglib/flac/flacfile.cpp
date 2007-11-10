@@ -102,7 +102,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(const char *file, bool readProperties,
+FLAC::File::File(FileName file, bool readProperties,
                  Properties::ReadStyle propertiesStyle) :
   TagLib::File(file)
 {
@@ -110,7 +110,7 @@ FLAC::File::File(const char *file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
-FLAC::File::File(const char *file, ID3v2::FrameFactory *frameFactory,
+FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle propertiesStyle) :
   TagLib::File(file)
 {

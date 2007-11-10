@@ -71,7 +71,7 @@ TagLib::uint Frame::headerSize(uint version)
 ByteVector Frame::textDelimiter(String::Type t)
 {
   ByteVector d = char(0);
-  if(t == String::UTF16 || t == String::UTF16BE)
+  if(t == String::UTF16 || t == String::UTF16BE || t == String::UTF16LE)
     d.append(char(0));
   return d;
 }

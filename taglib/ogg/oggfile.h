@@ -90,7 +90,7 @@ namespace TagLib {
        * instantiated directly but rather should be used through the codec
        * specific subclasses.
        */
-      File(const char *file);
+      File(FileName file);
 
     private:
       File(const File &);

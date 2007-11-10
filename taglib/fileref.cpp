@@ -59,7 +59,7 @@ FileRef::FileRef()
     d = new FileRefPrivate(0);
 }
 
-FileRef::FileRef(const char *fileName, bool readAudioProperties,
+FileRef::FileRef(FileName fileName, bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle)
 {
   d = new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle));
@@ -150,7 +150,7 @@ bool FileRef::operator!=(const FileRef &ref) const
   return ref.d->file != d->file;
 }
 
-File *FileRef::create(const char *fileName, bool readAudioProperties,
+File *FileRef::create(FileName fileName, bool readAudioProperties,
                       AudioProperties::ReadStyle audioPropertiesStyle) // static
 {
 
@@ -164,7 +164,15 @@ File *FileRef::create(const char *fileName, bool readAudioProperties,
 
   // Ok, this is really dumb for now, but it works for testing.
 
-  String s = fileName;
+  String s;
+#ifdef _WIN32
+  if((const wchar_t *)fileName)
+    s = (const wchar_t *)fileName;
+  else
+    s = (const char *)fileName;
+#else
+  s = fileName;
+#endif
 
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time

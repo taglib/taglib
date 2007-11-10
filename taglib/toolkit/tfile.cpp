@@ -31,6 +31,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #ifdef _WIN32
+# include <wchar.h>
+# include <windows.h>
 # include <io.h>
 # define ftruncate _chsize
 #else
@@ -50,7 +52,7 @@ using namespace TagLib;
 class File::FilePrivate
 {
 public:
-  FilePrivate(const char *fileName) :
+  FilePrivate(FileName fileName) :
     file(0),
     name(fileName),
     readOnly(true),
@@ -60,37 +62,96 @@ public:
 
   ~FilePrivate()
   {
+#ifdef _WIN32
+    free((void *)((const char *)name));
+    free((void *)((const wchar_t *)name));
+#else
     free((void *)name);
+#endif
   }
 
+  void openFile(const char *file, bool printError = true);
+#ifdef _WIN32
+  void openFile(const wchar_t *file);
+#endif
+
   FILE *file;
-  const char *name;
+  FileName name;
   bool readOnly;
   bool valid;
   ulong size;
   static const uint bufferSize = 1024;
 };
 
+void File::FilePrivate::openFile(const char *name, bool printError)
+{
+  // First try with read/write mode, if that fails, fall back to read only.
+  // We can't use ::access() since that works in odd ways on some file systems.
+
+  file = fopen(name, "rb+");
+
+  if(file)
+    readOnly = false;
+  else
+    file = fopen(name, "rb");
+
+  if(!file && printError)
+    debug("Could not open file " + String(name));
+}
+
+#ifdef _WIN32
+
+void File::FilePrivate::openFile(const wchar_t *name)
+{
+  // Windows NT/2000/XP/Vista
+
+  if(GetVersion() < 0x80000000) {
+    file = _wfopen(name, L"rb+");
+    if(file)
+      readOnly = false;
+    else
+      file = _wfopen(name, L"rb");
+  }
+
+  // Windows 9x/ME
+
+  else {
+    size_t length = wcslen(name) + 1;
+    char *tmpname = (char *)malloc(length);
+    if(tmpname) {
+      if(WideCharToMultiByte(CP_ACP, 0, name, -1, tmpname, length, NULL, NULL))
+        openFile(tmpname, false);
+      free(tmpname);
+    }
+  }
+
+  if(!file)
+    debug("Could not open file " + String(name));
+}
+
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(const char *file)
+File::File(FileName file)
 {
+#ifdef _WIN32
+  const char *name = (const char *)file;
+  const wchar_t *wname = (const wchar_t *)file;
+  if(wname) {
+    d = new FilePrivate(::_wcsdup(wname));
+    d->openFile(wname);
+  }
+  else {
+    d = new FilePrivate(::strdup(name));
+    d->openFile(name);
+  }
+#else
   d = new FilePrivate(::strdup(file));
-
-  // First try with read/write mode, if that fails, fall back to read only.
-  // We can't use ::access() since that works in odd ways on some file systems.
-
-  d->file = fopen(file, "rb+");
-
-  if(d->file)
-    d->readOnly = false;
-  else
-    d->file = fopen(file,"rb");
-
-  if(!d->file)
-    debug("Could not open file " + String(file));
+  d->openFile(d->name);
+#endif
 }
 
 File::~File()
@@ -100,7 +161,7 @@ File::~File()
   delete d;
 }
 
-const char *File::name() const
+FileName File::name() const
 {
   return d->name;
 }

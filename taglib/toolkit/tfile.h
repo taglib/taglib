@@ -36,6 +36,23 @@ namespace TagLib {
   class Tag;
   class AudioProperties;
 
+
+#ifdef _WIN32
+  class TAGLIB_EXPORT FileName
+  {
+  public:
+    FileName(const wchar_t *name) : name(0), wname(name) {}
+    FileName(const char *name) : name(name), wname(0) {}
+    operator const wchar_t *() { return wname; }
+    operator const char *() { return name; }
+  protected:
+    const char *name;
+    const wchar_t *wname;
+  };
+#else
+  typedef const char *FileName;
+#endif
+
   //! A file class with some useful methods for tag manipulation
 
   /*!
@@ -67,7 +84,7 @@ namespace TagLib {
     /*!
      * Returns the file name in the local file system encoding.
      */
-    const char *name() const;
+    FileName name() const;
 
     /*!
      * Returns a pointer to this file's tag.  This should be reimplemented in
@@ -223,7 +240,7 @@ namespace TagLib {
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */
-    File(const char *file);
+    File(FileName file);
 
     /*!
      * Marks the file as valid or invalid.
