@@ -75,15 +75,6 @@ Ogg::FLAC::File::File(const char *file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
-#ifdef TAGLIB_UNICODE_FILENAMES
-Ogg::FLAC::File::File(const wchar_t *file, bool readProperties,
-                      Properties::ReadStyle propertiesStyle) : Ogg::File(file)
-{
-  d = new FilePrivate;
-  read(readProperties, propertiesStyle);
-}
-#endif
-
 Ogg::FLAC::File::~File()
 {
   delete d;

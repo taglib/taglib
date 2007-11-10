@@ -30,10 +30,6 @@
 #define TAGLIB_MINOR_VERSION 4
 #define TAGLIB_PATCH_VERSION 0
 
-#ifdef _WIN32
-#define TAGLIB_UNICODE_FILENAMES 1
-#endif
-
 #include <string>
 
 //! A namespace for all TagLib related classes and functions

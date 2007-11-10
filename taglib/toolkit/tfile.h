@@ -69,13 +69,6 @@ namespace TagLib {
      */
     const char *name() const;
 
-#ifdef TAGLIB_UNICODE_FILENAMES
-    /*!
-     * Returns the file name in UTF-16.
-     */
-    const wchar_t *unicodeName() const;
-#endif
-
     /*!
      * Returns a pointer to this file's tag.  This should be reimplemented in
      * the concrete subclasses.
@@ -231,17 +224,6 @@ namespace TagLib {
      * instantiated through subclasses.
      */
     File(const char *file);
-
-#ifdef TAGLIB_UNICODE_FILENAMES
-    /*!
-     * Construct a File object and opens the \a file.  \a file should be a
-     * be a null-terminated Unicode string in UTF-16.
-     *
-     * \note Constructor is protected since this class should only be
-     * instantiated through subclasses.
-     */
-    File(const wchar_t *file);
-#endif
 
     /*!
      * Marks the file as valid or invalid.

@@ -119,17 +119,6 @@ FLAC::File::File(const char *file, ID3v2::FrameFactory *frameFactory,
   read(readProperties, propertiesStyle);
 }
 
-#ifdef TAGLIB_UNICODE_FILENAMES
-FLAC::File::File(const wchar_t *file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
-{
-  d = new FilePrivate;
-  d->ID3v2FrameFactory = frameFactory;
-  read(readProperties, propertiesStyle);
-}
-#endif
-
 FLAC::File::~File()
 {
   delete d;
