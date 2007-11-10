@@ -1,10 +1,24 @@
 INCLUDES = \
         -I$(top_srcdir)/taglib\
         -I$(top_srcdir)/taglib/toolkit \
-        -I$(top_srcdir)/taglib/mpeg/id3v2
+        -I$(top_srcdir)/taglib/mpeg \
+        -I$(top_srcdir)/taglib/mpeg/id3v1 \
+        -I$(top_srcdir)/taglib/mpeg/id3v2 \
+        -I$(top_srcdir)/taglib/mpeg/id3v2/frames
 
-LDADD = ../taglib/libtag.la
+test_runner_SOURCES = \
+	main.cpp \
+	test_list.cpp \
+	test_map.cpp \
+	test_synchdata.cpp \
+	test_bytevector.cpp \
+	test_string.cpp \
+	test_fileref.cpp \
+	test_id3v1.cpp \
+	test_id3v2.cpp
 
-check_PROGRAMS = toolkit-test
-
-toolkit_test_SOURCES = toolkit-test.cpp
+if build_tests
+TESTS = test_runner
+check_PROGRAMS = test_runner
+LDADD = ../taglib/libtag.la -lcppunit
+endif

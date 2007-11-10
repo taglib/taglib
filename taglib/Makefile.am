@@ -1,4 +1,4 @@
-SUBDIRS = toolkit mpeg ogg flac ape mpc wavpack
+SUBDIRS = toolkit mpeg ogg flac ape mpc wavpack speex
 
 INCLUDES = \
 	-I$(top_srcdir)/taglib \

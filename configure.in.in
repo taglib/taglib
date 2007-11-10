@@ -63,7 +63,7 @@ AC_CHECK_COMPILERS
 
 dnl CXXFLAGS="$NOOPT_CXXFLAGS" dnl __kdevelop[noopt]__
 dnl CFLAGS="$NOOPT_CFLAGS" dnl __kdevelop[noopt]__
-dnl CXXFLAGS="$CXXFLAGS $USE_EXCEPTIONS" dnl __kdevelop[exc]__
+CXXFLAGS="$CXXFLAGS $USE_EXCEPTIONS" dnl __kdevelop[exc]__
 
 dnl create only shared libtool-libraries
 AC_ENABLE_SHARED(yes)
@@ -113,3 +113,21 @@ AC_DEFUN([AC_NO_ZLIB],
 
 AC_CHECK_HEADER(zlib.h, AC_HAVE_ZLIB, AC_NO_ZLIB)
 AM_CONDITIONAL(link_zlib, test x$have_zlib = xtrue)
+
+AC_DEFUN([AC_HAVE_CPPUNIT],
+[
+        AC_DEFINE(HAVE_CPPUNIT, 1, [have cppunit])
+        have_cppunit=true
+])
+
+AC_DEFUN([AC_NO_CPPUNIT],
+[
+        AC_DEFINE(HAVE_CPPUNIT, 0, [have cppunit])
+        have_cppunit=false
+])
+
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+AC_CHECK_HEADER(cppunit/extensions/HelperMacros.h, AC_HAVE_CPPUNIT, AC_NO_CPPUNIT)
+AC_LANG_RESTORE
+AM_CONDITIONAL(build_tests, test x$have_cppunit = xtrue)

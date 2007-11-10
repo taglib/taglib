@@ -1,5 +1,6 @@
 INCLUDES = \
 	-I$(top_srcdir)/taglib \
+	-I$(top_srcdir)/taglib/toolkit \
 	-I$(top_srcdir)/taglib/ogg \
 	$(all_includes)
 
