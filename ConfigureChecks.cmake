@@ -20,5 +20,6 @@ ELSE(ZLIB_FOUND)
 	SET(HAVE_ZLIB 0)
 ENDIF(ZLIB_FOUND)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
-FIND_PACKAGE(CppUnit)
+# Currently breaks CMake when CppUnit is not present.
+#SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+#FIND_PACKAGE(CppUnit)
