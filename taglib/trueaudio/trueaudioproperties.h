@@ -79,6 +79,9 @@ namespace TagLib {
       int ttaVersion() const;
 
     private:
+      Properties(const Properties &);
+      Properties &operator=(const Properties &);
+
       void read();
 
       class PropertiesPrivate;

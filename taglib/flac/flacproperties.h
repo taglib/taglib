@@ -78,6 +78,9 @@ namespace TagLib {
       int sampleWidth() const;
 
     private:
+      Properties(const Properties &);
+      Properties &operator=(const Properties &);
+
       void read();
 
       class PropertiesPrivate;

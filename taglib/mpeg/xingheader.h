@@ -49,47 +49,50 @@ namespace TagLib {
 
     class TAGLIB_EXPORT XingHeader
     {
-      public:
-        /*!
-	 * Parses a Xing header based on \a data.  The data must be at least 16
-	 * bytes long (anything longer than this is discarded).
-	 */
-        XingHeader(const ByteVector &data);
+    public:
+      /*!
+       * Parses a Xing header based on \a data.  The data must be at least 16
+       * bytes long (anything longer than this is discarded).
+       */
+      XingHeader(const ByteVector &data);
 
-        /*!
-         * Destroy this XingHeader instance.
-         */
-        virtual ~XingHeader();
+      /*!
+       * Destroy this XingHeader instance.
+       */
+      virtual ~XingHeader();
 
-        /*!
-         * Returns true if the data was parsed properly and if there is a valid
-	 * Xing header present.
-         */
-        bool isValid() const;
+      /*!
+       * Returns true if the data was parsed properly and if there is a valid
+       * Xing header present.
+       */
+      bool isValid() const;
 
-        /*!
-         * Returns the total number of frames.
-         */
-        uint totalFrames() const;
+      /*!
+       * Returns the total number of frames.
+       */
+      uint totalFrames() const;
 
-        /*!
-         * Returns the total size of stream in bytes.
-         */
-        uint totalSize() const;
+      /*!
+       * Returns the total size of stream in bytes.
+       */
+      uint totalSize() const;
 
-        /*!
-         * Returns the offset for the start of this Xing header, given the
-	 * version and channels of the frame
-         */
-        // BIC: rename to offset()
-        static int xingHeaderOffset(TagLib::MPEG::Header::Version v,
-                                    TagLib::MPEG::Header::ChannelMode c);
+      /*!
+       * Returns the offset for the start of this Xing header, given the
+       * version and channels of the frame
+       */
+      // BIC: rename to offset()
+      static int xingHeaderOffset(TagLib::MPEG::Header::Version v,
+                                  TagLib::MPEG::Header::ChannelMode c);
 
-      private:
-        void parse(const ByteVector &data);
+    private:
+      XingHeader(const XingHeader &);
+      XingHeader &operator=(const XingHeader &);
 
-	class XingHeaderPrivate;
-	XingHeaderPrivate *d;
+      void parse(const ByteVector &data);
+
+      class XingHeaderPrivate;
+      XingHeaderPrivate *d;
     };
   }
 }

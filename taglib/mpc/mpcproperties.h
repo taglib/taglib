@@ -71,6 +71,9 @@ namespace TagLib {
       int mpcVersion() const;
 
     private:
+      Properties(const Properties &);
+      Properties &operator=(const Properties &);
+
       void read();
 
       class PropertiesPrivate;

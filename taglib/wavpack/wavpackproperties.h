@@ -80,6 +80,9 @@ namespace TagLib {
       int version() const;
 
     private:
+      Properties(const Properties &);
+      Properties &operator=(const Properties &);
+
       void read();
 
       class PropertiesPrivate;
