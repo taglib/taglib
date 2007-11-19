@@ -1,7 +1,7 @@
 /***************************************************************************
     copyright            : (C) 2006 by Lukáš Lalinský
     email                : lalinsky@gmail.com
-    
+
     copyright            : (C) 2004 by Allan Sandfeld Jensen
     email                : kde@carewolf.org
                            (original MPC implementation)
@@ -46,7 +46,7 @@ namespace TagLib {
    * This is implementation of TrueAudio metadata.
    *
    * This supports ID3v1 and ID3v2 tags as well as reading stream
-   * properties from the file. 
+   * properties from the file.
    */
 
   namespace TrueAudio {
@@ -90,7 +90,7 @@ namespace TagLib {
        * Contructs an TrueAudio file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored. The frames will be created using
-       * \a frameFactory. 
+       * \a frameFactory.
        */
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
@@ -117,7 +117,7 @@ namespace TagLib {
        *
        * \see ID3v2FrameFactory
        */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory); 
+      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
       /*!
        * Saves the file.

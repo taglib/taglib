@@ -111,7 +111,7 @@ namespace TagLib {
 /*
  * To keep compatibility with the current version put Vorbis in the Ogg namespace
  * only in the docs and provide a typedef to make it work.  In the next BIC
- * version this will be removed and it will only exist in the Ogg namespace. 
+ * version this will be removed and it will only exist in the Ogg namespace.
  */
 
 #ifdef DOXYGEN

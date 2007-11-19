@@ -160,7 +160,7 @@ namespace TagLib {
       /*!
        * Set the ID3v2::FrameFactory to something other than the default.  This
        * can be used to specify the way that ID3v2 frames will be interpreted
-       * when 
+       * when
        *
        * \see ID3v2FrameFactory
        */

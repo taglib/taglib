@@ -45,7 +45,7 @@ public:
   bool valid;
 };
 
-MPEG::XingHeader::XingHeader(const ByteVector &data) 
+MPEG::XingHeader::XingHeader(const ByteVector &data)
 {
   d = new XingHeaderPrivate;
   parse(data);

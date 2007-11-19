@@ -2,8 +2,8 @@
     copyright            : (C) 2006 by Lukáš Lalinský
     email                : lalinsky@gmail.com
 
-    copyright            : (C) 2004 by Allan Sandfeld Jensen 
-    email                : kde@carewolf.org 
+    copyright            : (C) 2004 by Allan Sandfeld Jensen
+    email                : kde@carewolf.org
                            (original MPC implementation)
  ***************************************************************************/
 
@@ -41,7 +41,7 @@ class WavPack::Properties::PropertiesPrivate
 public:
   PropertiesPrivate(const ByteVector &d, long length, ReadStyle s) :
     data(d),
-    streamLength(length), 
+    streamLength(length),
     style(s),
     length(0),
     bitrate(0),
@@ -51,7 +51,7 @@ public:
     bitsPerSample(0) {}
 
   ByteVector data;
-  long streamLength; 
+  long streamLength;
   ReadStyle style;
   int length;
   int bitrate;

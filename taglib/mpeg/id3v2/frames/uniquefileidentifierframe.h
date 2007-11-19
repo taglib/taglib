@@ -99,8 +99,8 @@ namespace TagLib {
       virtual ByteVector renderFields() const;
 
     private:
-			UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &);
-			UniqueFileIdentifierFrame &operator=(UniqueFileIdentifierFrame &);
+      UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &);
+      UniqueFileIdentifierFrame &operator=(UniqueFileIdentifierFrame &);
 
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);
 

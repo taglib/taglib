@@ -2,8 +2,8 @@
     copyright            : (C) 2006 by Lukáš Lalinský
     email                : lalinsky@gmail.com
 
-    copyright            : (C) 2004 by Allan Sandfeld Jensen 
-    email                : kde@carewolf.org 
+    copyright            : (C) 2004 by Allan Sandfeld Jensen
+    email                : kde@carewolf.org
                            (original MPC implementation)
  ***************************************************************************/
 
@@ -33,10 +33,10 @@
 
 #include "wavpackfile.h"
 #include "id3v1tag.h"
-#include "id3v2header.h" 
+#include "id3v2header.h"
 #include "apetag.h"
 #include "apefooter.h"
-#include "combinedtag.h" 
+#include "combinedtag.h"
 
 using namespace TagLib;
 
@@ -49,7 +49,7 @@ public:
     APESize(0),
     ID3v1Tag(0),
     ID3v1Location(-1),
-    tag(0),     
+    tag(0),
     properties(0),
     scanned(false),
     hasAPE(false),
@@ -58,7 +58,7 @@ public:
   ~FilePrivate()
   {
     if (tag != ID3v1Tag && tag != APETag) delete tag;
-    delete ID3v1Tag; 
+    delete ID3v1Tag;
     delete APETag;
     delete properties;
   }
@@ -68,7 +68,7 @@ public:
   uint APESize;
 
   ID3v1::Tag *ID3v1Tag;
-  long ID3v1Location; 
+  long ID3v1Location;
 
   Tag *tag;
 
@@ -79,7 +79,7 @@ public:
   // this data structure does.  This is used in computing offsets.
 
   bool hasAPE;
-  bool hasID3v1; 
+  bool hasID3v1;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ bool WavPack::File::save()
           d->ID3v1Location -= d->APESize;
       }
     }
-    
+
    return true;
 }
 
@@ -228,7 +228,7 @@ void WavPack::File::remove(int tags)
     else
       d->tag = d->APETag = new APE::Tag;
   }
-} 
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
@@ -244,7 +244,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
     d->ID3v1Tag = new ID3v1::Tag(this, d->ID3v1Location);
     d->hasID3v1 = true;
   }
-  
+
   // Look for an APE tag
 
   d->APELocation = findAPE();
@@ -267,7 +267,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
       else
         d->tag = d->APETag = new APE::Tag;
     }
-  } 
+  }
 
   // Look for WavPack audio properties
 
@@ -308,4 +308,4 @@ long WavPack::File::findID3v1()
     return p;
 
   return -1;
-} 
+}

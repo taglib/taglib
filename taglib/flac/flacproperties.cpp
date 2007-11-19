@@ -68,7 +68,7 @@ FLAC::Properties::Properties(File *file, ReadStyle style) : AudioProperties(styl
 {
   d = new PropertiesPrivate(file->streamInfoData(), file->streamLength(), style);
   read();
-}	
+}
 
 FLAC::Properties::~Properties()
 {
@@ -141,10 +141,10 @@ void FLAC::Properties::read()
   pos += 4;
 
   // Uncompressed bitrate:
-  
+
   //d->bitrate = ((d->sampleRate * d->channels) / 1000) * d->sampleWidth;
-  
+
   // Real bitrate:
-  
+
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
 }

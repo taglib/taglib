@@ -83,12 +83,12 @@ String Ogg::XiphComment::comment() const
 {
   if(!d->fieldListMap["DESCRIPTION"].isEmpty()) {
     d->commentField = "DESCRIPTION";
-    return d->fieldListMap["DESCRIPTION"].front();    
+    return d->fieldListMap["DESCRIPTION"].front();
   }
 
   if(!d->fieldListMap["COMMENT"].isEmpty()) {
     d->commentField = "COMMENT";
-    return d->fieldListMap["COMMENT"].front();    
+    return d->fieldListMap["COMMENT"].front();
   }
 
   return String::null;
@@ -263,7 +263,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   }
 
   // Append the "framing bit".
- 
+
   if(addFramingBit)
     data.append(char(1));
 

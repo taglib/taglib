@@ -40,7 +40,7 @@ namespace TagLib {
 
     /*!
      * This class implements Ogg page headers which contain the information
-     * about Ogg pages needed to break them into packets which can be passed on 
+     * about Ogg pages needed to break them into packets which can be passed on
      * to the codecs.
      */
 

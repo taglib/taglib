@@ -1,9 +1,9 @@
 /***************************************************************************
     copyright            : (C) 2006 by Lukáš Lalinský
     email                : lalinsky@gmail.com
-    
+
     copyright            : (C) 2002 by Scott Wheeler
-    email                : wheeler@kde.org 
+    email                : wheeler@kde.org
                            (original Vorbis implementation)
  ***************************************************************************/
 
@@ -114,41 +114,41 @@ void Speex::Properties::read()
 
   int pos = 28;
 
-  // speex_version_id;       /**< Version for Speex (for checking compatibility) */ 
+  // speex_version_id;       /**< Version for Speex (for checking compatibility) */
   d->speexVersion = data.mid(pos, 4).toUInt(false);
   pos += 4;
-  
-  // header_size;            /**< Total size of the header ( sizeof(SpeexHeader) ) */ 
+
+  // header_size;            /**< Total size of the header ( sizeof(SpeexHeader) ) */
   pos += 4;
-  
-  // rate;                   /**< Sampling rate used */ 
+
+  // rate;                   /**< Sampling rate used */
   d->sampleRate = data.mid(pos, 4).toUInt(false);
   pos += 4;
 
-  // mode;                   /**< Mode used (0 for narrowband, 1 for wideband) */ 
+  // mode;                   /**< Mode used (0 for narrowband, 1 for wideband) */
   d->mode = data.mid(pos, 4).toUInt(false);
   pos += 4;
 
-  // mode_bitstream_version; /**< Version ID of the bit-stream */ 
+  // mode_bitstream_version; /**< Version ID of the bit-stream */
   pos += 4;
 
-  // nb_channels;            /**< Number of channels encoded */ 
+  // nb_channels;            /**< Number of channels encoded */
   d->channels = data.mid(pos, 4).toUInt(false);
   pos += 4;
 
-  // bitrate;                /**< Bit-rate used */ 
+  // bitrate;                /**< Bit-rate used */
   d->bitrate = data.mid(pos, 4).toUInt(false);
   pos += 4;
-  
+
   // frame_size;             /**< Size of frames */
   //unsigned int frameSize = data.mid(pos, 4).toUInt(false);
   pos += 4;
-  
-  // vbr;                    /**< 1 for a VBR encoding, 0 otherwise */  
+
+  // vbr;                    /**< 1 for a VBR encoding, 0 otherwise */
   d->vbr = data.mid(pos, 4).toUInt(false) == 1;
   pos += 4;
 
-  // frames_per_packet;      /**< Number of frames stored per Ogg packet */ 
+  // frames_per_packet;      /**< Number of frames stored per Ogg packet */
   //unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
 
   const Ogg::PageHeader *first = d->file->firstPageHeader();

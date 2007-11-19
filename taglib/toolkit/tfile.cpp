@@ -556,10 +556,10 @@ long File::length()
     return 0;
 
   long curpos = tell();
-  
+
   seek(0, End);
   long endpos = tell();
-  
+
   seek(curpos, Beginning);
 
   d->size = endpos;

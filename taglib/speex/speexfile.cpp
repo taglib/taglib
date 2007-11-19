@@ -1,9 +1,9 @@
 /***************************************************************************
     copyright            : (C) 2006 by Lukáš Lalinský
     email                : lalinsky@gmail.com
-    
+
     copyright            : (C) 2002 by Scott Wheeler
-    email                : wheeler@kde.org 
+    email                : wheeler@kde.org
                            (original Vorbis implementation)
  ***************************************************************************/
 
@@ -96,12 +96,12 @@ bool Speex::File::save()
 void Speex::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   ByteVector speexHeaderData = packet(0);
-  
+
   if(!speexHeaderData.startsWith("Speex   ")) {
     debug("Speex::File::read() -- invalid Speex identification header");
     return;
   }
-  
+
   ByteVector commentHeaderData = packet(1);
 
   d->comment = new Ogg::XiphComment(commentHeaderData);

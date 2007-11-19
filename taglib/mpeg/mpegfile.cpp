@@ -430,7 +430,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
       d->ID3v1Location = findID3v1();
 
     // APE tag location has changed, update if it exists
- 
+
    if(d->APETag)
       d->APELocation = findAPE();
   }

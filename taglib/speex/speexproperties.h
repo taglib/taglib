@@ -1,9 +1,9 @@
 /***************************************************************************
     copyright            : (C) 2006 by Lukáš Lalinský
     email                : lalinsky@gmail.com
-    
+
     copyright            : (C) 2002 by Scott Wheeler
-    email                : wheeler@kde.org 
+    email                : wheeler@kde.org
                            (original Vorbis implementation)
  ***************************************************************************/
 

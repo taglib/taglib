@@ -125,7 +125,7 @@ namespace TagLib {
 
       /*!
        * Returns a list of channels with information currently in the frame.
-       */        
+       */
       List<ChannelType> channels() const;
 
       /*!

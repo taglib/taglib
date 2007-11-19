@@ -261,7 +261,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data,
 void UserTextIdentificationFrame::checkFields()
 {
   int fields = fieldList().size();
-    
+
   if(fields == 0)
     setDescription(String::null);
   if(fields <= 1)

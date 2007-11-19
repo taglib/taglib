@@ -163,7 +163,7 @@ const T &Map<Key, T>::operator[](const Key &key) const
 template <class Key, class T>
 T &Map<Key, T>::operator[](const Key &key)
 {
-  detach();  
+  detach();
   return d->map[key];
 }
 

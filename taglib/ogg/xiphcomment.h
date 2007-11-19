@@ -164,7 +164,7 @@ namespace TagLib {
       /*!
        * Returns true if the field is contained within the comment.
        *
-       * \note This is safer than checking for membership in the FieldListMap. 
+       * \note This is safer than checking for membership in the FieldListMap.
        */
       bool contains(const String &key) const;
 

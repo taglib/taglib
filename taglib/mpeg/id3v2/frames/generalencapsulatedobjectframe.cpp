@@ -140,7 +140,7 @@ void GeneralEncapsulatedObjectFrame::parseFields(const ByteVector &data)
 
   d->textEncoding = String::Type(data[0]);
 
-	int pos = 1;
+  int pos = 1;
 
   d->mimeType = readStringField(data, String::Latin1, &pos);
   d->fileName = readStringField(data, d->textEncoding, &pos);

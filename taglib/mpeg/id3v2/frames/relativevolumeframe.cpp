@@ -211,7 +211,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
   data.append(textDelimiter(String::Latin1));
 
   Map<ChannelType, ChannelData>::ConstIterator it = d->channels.begin();
-  
+
   for(; it != d->channels.end(); ++it) {
     ChannelType type = (*it).first;
     const ChannelData &channel = (*it).second;
