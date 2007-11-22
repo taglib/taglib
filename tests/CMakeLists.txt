@@ -13,6 +13,7 @@ SET(test_runner_SRCS
   main.cpp
   test_list.cpp
   test_map.cpp
+  test_mpeg.cpp
   test_synchdata.cpp
   test_bytevector.cpp
   test_string.cpp
