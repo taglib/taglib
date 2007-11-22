@@ -37,6 +37,7 @@
 #include "frames/uniquefileidentifierframe.h"
 #include "frames/unknownframe.h"
 #include "frames/generalencapsulatedobjectframe.h"
+#include "frames/urllinkframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -186,6 +187,19 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   if(frameID == "GEOB")
     return new GeneralEncapsulatedObjectFrame(data, header);
+
+  // URL link (frames 4.3)
+
+  if(frameID.startsWith("W")) {
+    if(frameID != "WXXX") {
+      return new UrlLinkFrame(data, header);
+    } else {
+      UserUrlLinkFrame *f = new UserUrlLinkFrame(data, header);
+      if(d->useDefaultEncoding)
+        f->setTextEncoding(d->defaultEncoding);
+      return f;
+    }
+  }
 
   return new UnknownFrame(data, header);
 }

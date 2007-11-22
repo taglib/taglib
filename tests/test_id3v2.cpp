@@ -9,6 +9,7 @@
 #include <attachedpictureframe.h>
 #include <generalencapsulatedobjectframe.h>
 #include <relativevolumeframe.h>
+#include <urllinkframe.h>
 
 using namespace std;
 using namespace TagLib;
@@ -39,6 +40,10 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseEmptyUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testBrokenFrame1);
   //CPPUNIT_TEST(testItunes24FrameSize);
+  CPPUNIT_TEST(testParseUrlLinkFrame);
+  CPPUNIT_TEST(testRenderUrlLinkFrame);
+  CPPUNIT_TEST(testParseUserUrlLinkFrame);
+  CPPUNIT_TEST(testRenderUserUrlLinkFrame);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -164,6 +169,56 @@ public:
                          f.owner());
     CPPUNIT_ASSERT_EQUAL(ByteVector(),
                          f.identifier());
+  }
+
+  void testParseUrlLinkFrame()
+  {
+    ID3v2::UrlLinkFrame f(
+      ByteVector("WOAF"                      // Frame ID
+                 "\x00\x00\x00\x12"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "http://example.com", 28)); // URL
+    CPPUNIT_ASSERT_EQUAL(String("http://example.com"), f.url());
+  }
+
+  void testRenderUrlLinkFrame()
+  {
+    ID3v2::UrlLinkFrame f("WOAF");
+    f.setUrl("http://example.com");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("WOAF"                      // Frame ID
+                 "\x00\x00\x00\x12"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "http://example.com", 28),  // URL
+      f.render());
+  }
+
+  void testParseUserUrlLinkFrame()
+  {
+    ID3v2::UserUrlLinkFrame f(
+      ByteVector("WXXX"                      // Frame ID
+                 "\x00\x00\x00\x17"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "\x00"                      // Text encoding
+                 "foo\x00"                   // Description
+                 "http://example.com", 33)); // URL
+    CPPUNIT_ASSERT_EQUAL(String("foo"), f.description());
+    CPPUNIT_ASSERT_EQUAL(String("http://example.com"), f.url());
+  }
+
+  void testRenderUserUrlLinkFrame()
+  {
+    ID3v2::UserUrlLinkFrame f;
+    f.setDescription("foo");
+    f.setUrl("http://example.com");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("WXXX"                      // Frame ID
+                 "\x00\x00\x00\x17"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "\x00"                      // Text encoding
+                 "foo\x00"                   // Description
+                 "http://example.com", 33),  // URL
+      f.render());
   }
 
   /*void testItunes24FrameSize()

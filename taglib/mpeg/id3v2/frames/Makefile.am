@@ -13,7 +13,8 @@ libframes_la_SOURCES = \
 	relativevolumeframe.cpp \
 	textidentificationframe.cpp \
 	uniquefileidentifierframe.cpp \
-	unknownframe.cpp
+	unknownframe.cpp \
+	urllinkframe.cpp
 
 taglib_include_HEADERS = \
 	attachedpictureframe.h \
@@ -22,6 +23,7 @@ taglib_include_HEADERS = \
 	relativevolumeframe.h \
 	textidentificationframe.h \
 	uniquefileidentifierframe.h \
-	unknownframe.h
+	unknownframe.h \
+	urllinkframe.h
 
 taglib_includedir = $(includedir)/taglib
