@@ -1,6 +1,7 @@
 project(taglib)
 
-OPTION(BUILD_TESTS "Create tests and examples"  OFF)
+OPTION(BUILD_TESTS "Build the test suite"  OFF)
+OPTION(BUILD_EXAMPLES "Build the examples"  OFF)
 
 #add some KDE specific stuff
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
