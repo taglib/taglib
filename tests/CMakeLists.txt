@@ -21,15 +21,12 @@ SET(test_runner_SRCS
   test_id3v2.cpp
 )
 
-# Fails without CppUnit.  These can be uncommented (with an appropriate guard
-# checking for CppUnit availability) after the CppUnit configure check has
-# also been fixed).
-#ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
-#TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
+ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
+TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
 
-#ADD_CUSTOM_TARGET(check
-#    ./test_runner
-#    DEPENDS test_runner
-#)
+ADD_CUSTOM_TARGET(check
+    ./test_runner
+    DEPENDS test_runner
+)
 
 endif(BUILD_TESTS)
