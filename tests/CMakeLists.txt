@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2/frames
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
 )
 
 SET(test_runner_SRCS
@@ -15,6 +16,7 @@ SET(test_runner_SRCS
   test_map.cpp
   test_mpeg.cpp
   test_synchdata.cpp
+  test_trueaudio.cpp
   test_bytevector.cpp
   test_string.cpp
   test_fileref.cpp

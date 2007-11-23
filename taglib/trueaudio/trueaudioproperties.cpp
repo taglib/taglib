@@ -112,7 +112,7 @@ int TrueAudio::Properties::ttaVersion() const
 
 void TrueAudio::Properties::read()
 {
-  if(!d->data.startsWith("TrueAudio"))
+  if(!d->data.startsWith("TTA"))
     return;
 
   int pos = 3;
