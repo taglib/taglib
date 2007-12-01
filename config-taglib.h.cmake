@@ -5,3 +5,5 @@
    to minimize recompilations and increase modularity. */
 /* Define if you have libz */
 #cmakedefine   HAVE_ZLIB 1
+
+#cmakedefine   NO_ITUNES_HACKS 1

@@ -3,6 +3,8 @@ project(taglib)
 OPTION(BUILD_TESTS "Build the test suite"  OFF)
 OPTION(BUILD_EXAMPLES "Build the examples"  OFF)
 
+OPTION(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
+
 #add some KDE specific stuff
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set(EXEC_INSTALL_PREFIX  ${CMAKE_INSTALL_PREFIX}       CACHE PATH  "Base directory for executables and libraries" FORCE)
