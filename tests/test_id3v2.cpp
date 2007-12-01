@@ -39,7 +39,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testParseEmptyUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testBrokenFrame1);
-  //CPPUNIT_TEST(testItunes24FrameSize);
+  CPPUNIT_TEST(testItunes24FrameSize);
   CPPUNIT_TEST(testParseUrlLinkFrame);
   CPPUNIT_TEST(testRenderUrlLinkFrame);
   CPPUNIT_TEST(testParseUserUrlLinkFrame);
@@ -221,13 +221,13 @@ public:
       f.render());
   }
 
-  /*void testItunes24FrameSize()
+  void testItunes24FrameSize()
   {
     MPEG::File f("data/005411.id3", false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("TIT2"));
     CPPUNIT_ASSERT_EQUAL(String("Sunshine Superman"), f.ID3v2Tag()->frameListMap()["TIT2"].front()->toString());
-  }*/
+  }
 
 };
 
