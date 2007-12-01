@@ -133,22 +133,28 @@ bool TrueAudio::File::save()
 
   // Update ID3v2 tag
 
-  if(d->ID3v2Tag) {
+  if(d->ID3v2Tag && !d->ID3v2Tag->isEmpty()) {
     if(!d->hasID3v2) {
       d->ID3v2Location = 0;
       d->ID3v2OriginalSize = 0;
     }
-    insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+    ByteVector data = d->ID3v2Tag->render();
+    insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
+    d->ID3v1Location -= d->ID3v2OriginalSize - data.size();
+    d->ID3v2OriginalSize = data.size();
     d->hasID3v2 = true;
   }
   else if(d->hasID3v2) {
     removeBlock(d->ID3v2Location, d->ID3v2OriginalSize);
+    d->ID3v1Location -= d->ID3v2OriginalSize;
+    d->ID3v2Location = -1;
+    d->ID3v2OriginalSize = 0; 
     d->hasID3v2 = false;
   }
 
   // Update ID3v1 tag
 
-  if(d->ID3v1Tag) {
+  if(d->ID3v1Tag && !d->ID3v1Tag->isEmpty()) {
     if(!d->hasID3v1) {
       seek(0, End);
       d->ID3v1Location = tell();
@@ -160,6 +166,7 @@ bool TrueAudio::File::save()
   }
   else if(d->hasID3v1) {
     removeBlock(d->ID3v1Location, 128);
+    d->ID3v1Location = -1;
     d->hasID3v1 = false;
   }
 
