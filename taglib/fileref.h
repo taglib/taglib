@@ -72,7 +72,7 @@ namespace TagLib {
    *
    * class MyFileTypeResolver : FileTypeResolver
    * {
-   *   TagLib::File *createFile(const char *fileName, bool, AudioProperties::ReadStyle)
+   *   TagLib::File *createFile(TagLib::FileName *fileName, bool, AudioProperties::ReadStyle)
    *   {
    *     if(someCheckForAnMP3File(fileName))
    *       return new TagLib::MPEG::File(fileName);
