@@ -34,6 +34,8 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testString);
   CPPUNIT_TEST(testUTF16Encode);
   CPPUNIT_TEST(testUTF16Decode);
+  CPPUNIT_TEST(testUTF16DecodeInvalidBOM);
+  CPPUNIT_TEST(testUTF16DecodeEmptyWithBOM);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -106,6 +108,26 @@ public:
     CPPUNIT_ASSERT_EQUAL(a, String(b, String::UTF16BE));
     CPPUNIT_ASSERT_EQUAL(a, String(c, String::UTF16LE));
     CPPUNIT_ASSERT_EQUAL(a, String(d, String::UTF16));
+  }
+
+  // this test is expected to print "TagLib: String::prepare() -
+  // Invalid UTF16 string." on the console 3 times
+  void testUTF16DecodeInvalidBOM()
+  {
+    ByteVector b(" ", 1);
+    ByteVector c("  ", 2);
+    ByteVector d("  \0f\0o\0o", 8);
+    CPPUNIT_ASSERT_EQUAL(String(), String(b, String::UTF16));
+    CPPUNIT_ASSERT_EQUAL(String(), String(c, String::UTF16));
+    CPPUNIT_ASSERT_EQUAL(String(), String(d, String::UTF16));
+  }
+
+  void testUTF16DecodeEmptyWithBOM()
+  {
+    ByteVector a("\377\376", 2);
+    ByteVector b("\376\377", 2);
+    CPPUNIT_ASSERT_EQUAL(String(), String(a, String::UTF16));
+    CPPUNIT_ASSERT_EQUAL(String(), String(b, String::UTF16));
   }
 
 };

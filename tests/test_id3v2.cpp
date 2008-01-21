@@ -10,6 +10,7 @@
 #include <generalencapsulatedobjectframe.h>
 #include <relativevolumeframe.h>
 #include <urllinkframe.h>
+#include "utils.h"
 
 using namespace std;
 using namespace TagLib;
@@ -45,6 +46,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderUrlLinkFrame);
   CPPUNIT_TEST(testParseUserUrlLinkFrame);
   CPPUNIT_TEST(testRenderUserUrlLinkFrame);
+  CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -241,6 +243,21 @@ public:
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("TIT2"));
     CPPUNIT_ASSERT_EQUAL(String("Sunshine Superman"), f.ID3v2Tag()->frameListMap()["TIT2"].front()->toString());
+  }
+
+  void testSaveUTF16Comment()
+  {
+    String::Type defaultEncoding = ID3v2::FrameFactory::instance()->defaultTextEncoding();
+    string newname = copyFile("xing", ".mp3");
+    ID3v2::FrameFactory::instance()->setDefaultTextEncoding(String::UTF16);
+    MPEG::File foo(newname.c_str());
+    foo.strip();
+    foo.tag()->setComment("Test comment!");
+    foo.save();
+    MPEG::File bar(newname.c_str());
+    CPPUNIT_ASSERT_EQUAL(String("Test comment!"), bar.tag()->comment());
+    deleteFile(newname);
+    ID3v2::FrameFactory::instance()->setDefaultTextEncoding(defaultEncoding);
   }
 
 };

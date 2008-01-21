@@ -677,7 +677,7 @@ void String::prepare(Type t)
   switch(t) {
   case UTF16:
   {
-    if(d->data.size() > 1) {
+    if(d->data.size() >= 1 && (d->data[0] == 0xfeff || d->data[0] == 0xfffe)) {
       bool swap = d->data[0] != 0xfeff;
       d->data.erase(d->data.begin(), d->data.begin() + 1);
       if(swap) {
