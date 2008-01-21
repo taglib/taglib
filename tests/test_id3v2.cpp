@@ -34,6 +34,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUTF16Delimiter);
   CPPUNIT_TEST(testReadStringField);
   CPPUNIT_TEST(testParseAPIC);
+  CPPUNIT_TEST(testParseAPIC_UTF16_BOM);
   CPPUNIT_TEST(testParseGEOB);
   CPPUNIT_TEST(testParseRelativeVolumeFrame);
   CPPUNIT_TEST(testParseUniqueFileIdentifierFrame);
@@ -104,6 +105,19 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("m"), f.mimeType());
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FileIcon, f.type());
     CPPUNIT_ASSERT_EQUAL(String("d"), f.description());
+  }
+
+  void testParseAPIC_UTF16_BOM()
+  {
+    ID3v2::AttachedPictureFrame f(ByteVector(
+      "\x41\x50\x49\x43\x00\x02\x0c\x59\x00\x00\x01\x69\x6d\x61\x67\x65"
+      "\x2f\x6a\x70\x65\x67\x00\x00\xfe\xff\x00\x63\x00\x6f\x00\x76\x00"
+      "\x65\x00\x72\x00\x2e\x00\x6a\x00\x70\x00\x67\x00\x00\xff\xd8\xff",
+      16 * 3));
+    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), f.mimeType());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, f.type());
+    CPPUNIT_ASSERT_EQUAL(String("cover.jpg"), f.description());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xd8\xff", 3), f.picture());
   }
 
   // http://bugs.kde.org/show_bug.cgi?id=151078
