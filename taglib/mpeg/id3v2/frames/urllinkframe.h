@@ -37,7 +37,8 @@ namespace TagLib {
     /*!
      * An implementation of ID3v2 URL link frames.
      */
-    class UrlLinkFrame : public Frame {
+    class UrlLinkFrame : public Frame
+    {
       friend class FrameFactory;
 
     public:
@@ -91,7 +92,8 @@ namespace TagLib {
      *
      * This description identifies the frame and must be unique.
      */
-    class UserUrlLinkFrame : public UrlLinkFrame {
+    class UserUrlLinkFrame : public UrlLinkFrame
+    {
       friend class FrameFactory;
 
     public:

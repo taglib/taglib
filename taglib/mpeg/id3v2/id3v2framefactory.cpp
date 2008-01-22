@@ -193,7 +193,8 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   if(frameID.startsWith("W")) {
     if(frameID != "WXXX") {
       return new UrlLinkFrame(data, header);
-    } else {
+    }
+    else {
       UserUrlLinkFrame *f = new UserUrlLinkFrame(data, header);
       if(d->useDefaultEncoding)
         f->setTextEncoding(d->defaultEncoding);
