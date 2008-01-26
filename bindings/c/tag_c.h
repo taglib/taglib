@@ -113,6 +113,13 @@ TAGLIB_C_EXPORT TagLib_File *taglib_file_new_type(const char *filename, TagLib_F
 TAGLIB_C_EXPORT void taglib_file_free(TagLib_File *file);
 
 /*!
+ * Returns true if the file is open and readble and valid information for
+ * the Tag and / or AudioProperties was found.
+ */
+
+TAGLIB_C_EXPORT BOOL taglib_file_is_valid(const TagLib_File *file);
+
+/*!
  * Returns a pointer to the tag associated with this file.  This will be freed
  * automatically when the file is freed.
  */
