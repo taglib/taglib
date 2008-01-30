@@ -141,7 +141,7 @@ void Speex::Properties::read()
   pos += 4;
 
   // frame_size;             /**< Size of frames */
-  //unsigned int frameSize = data.mid(pos, 4).toUInt(false);
+  // unsigned int frameSize = data.mid(pos, 4).toUInt(false);
   pos += 4;
 
   // vbr;                    /**< 1 for a VBR encoding, 0 otherwise */
@@ -149,7 +149,7 @@ void Speex::Properties::read()
   pos += 4;
 
   // frames_per_packet;      /**< Number of frames stored per Ogg packet */
-  //unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
+  // unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
 
   const Ogg::PageHeader *first = d->file->firstPageHeader();
   const Ogg::PageHeader *last = d->file->lastPageHeader();
