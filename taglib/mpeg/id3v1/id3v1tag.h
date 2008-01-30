@@ -70,7 +70,8 @@ namespace TagLib {
 
       /*!
        * Encode a ByteVector with the data from \a s.  The default implementation
-       * assumes that \a s is an ISO-8859-1 (Latin1) string.
+       * assumes that \a s is an ISO-8859-1 (Latin1) string.  If the string is
+       * does not conform to ISO-8859-1, no value is written.
        *
        * \warning It is recommended that you <b>not</b> override this method, but
        * instead do not write an ID3v1 tag in the case that the data is not
