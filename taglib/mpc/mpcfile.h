@@ -142,11 +142,19 @@ namespace TagLib {
        * This will remove the tags that match the OR-ed together TagTypes from the
        * file.  By default it removes all tags.
        *
-       * \note This will also invalidate pointers to the tags
+       * \warning This will also invalidate pointers to the tags
        * as their memory will be freed.
-       * \note In order to make the removal permanent save() still needs to be called
+       *
+       * \note In order to make the removal permanent save() still needs to be called.
+       */
+      void strip(int tags = AllTags);
+
+      /*!
+       * \deprecated
+       * \see strip
        */
       void remove(int tags = AllTags);
+
 
     private:
       File(const File &);

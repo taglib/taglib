@@ -207,7 +207,7 @@ ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
   return d->ID3v2Tag;
 }
 
-void TrueAudio::File::remove(int tags)
+void TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1) {
     delete d->ID3v1Tag;

@@ -207,7 +207,7 @@ APE::Tag *WavPack::File::APETag(bool create)
   return d->APETag;
 }
 
-void WavPack::File::remove(int tags)
+void WavPack::File::strip(int tags)
 {
   if(tags & ID3v1) {
     delete d->ID3v1Tag;

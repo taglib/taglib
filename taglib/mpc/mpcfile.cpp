@@ -225,7 +225,7 @@ APE::Tag *MPC::File::APETag(bool create)
   return d->APETag;
 }
 
-void MPC::File::remove(int tags)
+void MPC::File::strip(int tags)
 {
   if(tags & ID3v1) {
     delete d->ID3v1Tag;
@@ -251,6 +251,11 @@ void MPC::File::remove(int tags)
     else
       d->tag = d->APETag = new APE::Tag;
   }
+}
+
+void MPC::File::remove(int tags)
+{
+  strip(tags);
 }
 
 
