@@ -69,6 +69,7 @@ public:
     delete ID3v2Tag;
     delete ID3v1Tag;
     delete comment;
+    delete tag;
     delete properties;
   }
 
