@@ -293,6 +293,16 @@ namespace TagLib {
     String stripWhiteSpace() const;
 
     /*!
+     * Returns true if the file only uses characters required by Latin1.
+     */
+    bool isLatin1() const;
+
+    /*!
+     * Returns true if the file only uses characters required by (7-bit) ASCII.
+     */
+    bool isAscii() const;
+
+    /*!
      * Converts the base-10 integer \a n to a string.
      */
     static String number(int n);

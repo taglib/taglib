@@ -461,6 +461,24 @@ String String::stripWhiteSpace() const
   return String(wstring(begin, end + 1));
 }
 
+bool String::isLatin1() const
+{
+  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    if(*it >= 256)
+      return false;
+  }
+  return true;
+}
+
+bool String::isAscii() const
+{
+  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    if(*it >= 128)
+      return false;
+  }
+  return true;
+}
+
 String String::number(int n) // static
 {
   if(n == 0)
