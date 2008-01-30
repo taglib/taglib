@@ -118,9 +118,18 @@ String ID3v2::Tag::album() const
 
 String ID3v2::Tag::comment() const
 {
-  if(!d->frameListMap["COMM"].isEmpty())
-    return d->frameListMap["COMM"].front()->toString();
-  return String::null;
+  const FrameList &comments = d->frameListMap["COMM"];
+
+  if(comments.isEmpty())
+    return String::null;
+
+  for(FrameList::ConstIterator it = comments.begin(); it != comments.end(); ++it)
+  {
+    if(static_cast<CommentsFrame *>(*it)->description().isEmpty())
+      return (*it)->toString();
+  }
+
+  return comments.front()->toString();
 }
 
 String ID3v2::Tag::genre() const
