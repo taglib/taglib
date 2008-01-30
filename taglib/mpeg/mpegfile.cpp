@@ -37,6 +37,37 @@
 
 using namespace TagLib;
 
+#define combine(method)                                          \
+  if(file->ID3v2Tag() && !file->ID3v2Tag()->method().isEmpty())  \
+    return file->ID3v2Tag()->method();                           \
+                                                                 \
+  if(file->APETag() && !file->APETag()->method().isEmpty())      \
+    return file->APETag()->method();                             \
+                                                                 \
+  if(file->ID3v1Tag())                                           \
+    return file->ID3v1Tag()->method();                           \
+                                                                 \
+  return String::null                                            \
+
+#define combineNumber(method)                                    \
+  if(file->ID3v2Tag() && file->ID3v2Tag()->method() > 0)         \
+    return file->ID3v2Tag()->method();                           \
+                                                                 \
+  if(file->APETag() && file->APETag()->method() > 0)             \
+    return file->APETag()->method();                             \
+  if(file->ID3v1Tag())                                           \
+    return file->ID3v1Tag()->method();                           \
+                                                                 \
+  return 0
+
+#define setCombined(method, value)                               \
+  file->ID3v2Tag(true)->set##method(value);                      \
+  file->ID3v1Tag(true)->set##method(value);                      \
+  if(file->APETag(false))                                        \
+    file->APETag(false)->set##method(value)
+
+
+
 namespace TagLib {
   /*!
    * A union of the ID3v2 and ID3v1 tags.
@@ -48,121 +79,72 @@ namespace TagLib {
 
     virtual String title() const
     {
-      if(file->ID3v2Tag() && !file->ID3v2Tag()->title().isEmpty())
-        return file->ID3v2Tag()->title();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->title();
-
-      return String::null;
+      combine(title);
     }
 
     virtual String artist() const
     {
-      if(file->ID3v2Tag() && !file->ID3v2Tag()->artist().isEmpty())
-        return file->ID3v2Tag()->artist();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->artist();
-
-      return String::null;
+      combine(artist);
     }
 
     virtual String album() const
     {
-      if(file->ID3v2Tag() && !file->ID3v2Tag()->album().isEmpty())
-        return file->ID3v2Tag()->album();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->album();
-
-      return String::null;
+      combine(album);
     }
 
     virtual String comment() const
     {
-      if(file->ID3v2Tag() && !file->ID3v2Tag()->comment().isEmpty())
-        return file->ID3v2Tag()->comment();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->comment();
-
-      return String::null;
+      combine(comment);
     }
 
     virtual String genre() const
     {
-      if(file->ID3v2Tag() && !file->ID3v2Tag()->genre().isEmpty())
-        return file->ID3v2Tag()->genre();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->genre();
-
-      return String::null;
+      combine(genre);
     }
 
     virtual uint year() const
     {
-      if(file->ID3v2Tag() && file->ID3v2Tag()->year() > 0)
-        return file->ID3v2Tag()->year();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->year();
-
-      return 0;
+      combineNumber(year);
     }
 
     virtual uint track() const
     {
-      if(file->ID3v2Tag() && file->ID3v2Tag()->track() > 0)
-        return file->ID3v2Tag()->track();
-
-      if(file->ID3v1Tag())
-        return file->ID3v1Tag()->track();
-
-      return 0;
+      combineNumber(track);
     }
 
     virtual void setTitle(const String &s)
     {
-      file->ID3v2Tag(true)->setTitle(s);
-      file->ID3v1Tag(true)->setTitle(s);
+      setCombined(Title, s);
     }
 
     virtual void setArtist(const String &s)
     {
-      file->ID3v2Tag(true)->setArtist(s);
-      file->ID3v1Tag(true)->setArtist(s);
+      setCombined(Artist, s);
     }
 
     virtual void setAlbum(const String &s)
     {
-      file->ID3v2Tag(true)->setAlbum(s);
-      file->ID3v1Tag(true)->setAlbum(s);
+      setCombined(Album, s);
     }
 
     virtual void setComment(const String &s)
     {
-      file->ID3v2Tag(true)->setComment(s);
-      file->ID3v1Tag(true)->setComment(s);
+      setCombined(Comment, s);
     }
 
     virtual void setGenre(const String &s)
     {
-      file->ID3v2Tag(true)->setGenre(s);
-      file->ID3v1Tag(true)->setGenre(s);
+      setCombined(Genre, s);
     }
 
     virtual void setYear(uint i)
     {
-      file->ID3v2Tag(true)->setYear(i);
-      file->ID3v1Tag(true)->setYear(i);
+      setCombined(Year, i);
     }
 
     virtual void setTrack(uint i)
     {
-      file->ID3v2Tag(true)->setTrack(i);
-      file->ID3v1Tag(true)->setTrack(i);
+      setCombined(Track, i);
     }
 
   private:
