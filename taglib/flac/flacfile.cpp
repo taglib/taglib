@@ -37,10 +37,9 @@
 
 using namespace TagLib;
 
-namespace TagLib {
-  namespace FLAC {
-    enum BlockType { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
-  }
+namespace
+{
+  enum BlockType { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
 }
 
 class FLAC::File::FilePrivate
