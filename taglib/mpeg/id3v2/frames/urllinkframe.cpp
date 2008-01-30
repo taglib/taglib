@@ -27,6 +27,7 @@
 
 #include "urllinkframe.h"
 #include <tdebug.h>
+#include <tstringlist.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -174,9 +175,11 @@ ByteVector UserUrlLinkFrame::renderFields() const
 {
   ByteVector v;
 
-  v.append(char(d->textEncoding));
-  v.append(d->description.data(d->textEncoding));
-  v.append(textDelimiter(d->textEncoding));
+  String::Type encoding = checkEncoding(d->description, d->textEncoding);
+
+  v.append(char(encoding));
+  v.append(d->description.data(encoding));
+  v.append(textDelimiter(encoding));
   v.append(url().data(String::Latin1));
 
   return v;

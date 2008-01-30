@@ -139,9 +139,11 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
 ByteVector TextIdentificationFrame::renderFields() const
 {
+  String::Type encoding = checkEncoding(d->fieldList, d->textEncoding);
+
   ByteVector v;
 
-  v.append(char(d->textEncoding));
+  v.append(char(encoding));
 
   for(StringList::ConstIterator it = d->fieldList.begin(); it != d->fieldList.end(); it++) {
 
@@ -150,9 +152,9 @@ ByteVector TextIdentificationFrame::renderFields() const
     // encoding.
 
     if(it != d->fieldList.begin())
-      v.append(textDelimiter(d->textEncoding));
+      v.append(textDelimiter(encoding));
 
-    v.append((*it).data(d->textEncoding));
+    v.append((*it).data(encoding));
   }
 
   return v;

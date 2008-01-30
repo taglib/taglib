@@ -32,6 +32,8 @@
 
 namespace TagLib {
 
+  class StringList;
+
   namespace ID3v2 {
 
     class Tag;
@@ -192,6 +194,13 @@ namespace TagLib {
        */
       String readStringField(const ByteVector &data, String::Type encoding,
                              int *positon = 0);
+
+      /*!
+       * Checks a the list of string values to see if they can be used with the
+       * specified encoding and returns the recommended encoding.
+       */
+      static String::Type checkEncoding(const StringList &fields,
+                                        String::Type encoding);
 
     private:
       Frame(const Frame &);
@@ -387,7 +396,7 @@ namespace TagLib {
       ByteVector render() const;
 
       /*!
-       * @deprecated
+       * \deprecated
        */
       bool frameAlterPreservation() const;
 

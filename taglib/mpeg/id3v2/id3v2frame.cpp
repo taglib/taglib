@@ -32,6 +32,7 @@
 #endif
 
 #include <tdebug.h>
+#include <tstringlist.h>
 
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
@@ -222,6 +223,20 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   return str;
 }
 
+String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding) // static
+{
+  if(encoding != String::Latin1)
+    return encoding;
+
+  for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
+    if(!(*it).isLatin1()) {
+      debug("Frame::checkEncoding() -- Rendering using UTF8.");
+      return String::UTF8;
+    }
+  }
+
+  return String::Latin1;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Frame::Header class
@@ -523,7 +538,7 @@ ByteVector Frame::Header::render() const
   return v;
 }
 
-bool Frame::Header::frameAlterPreservation() const // deprecated
+bool Frame::Header::frameAlterPreservation() const
 {
   return fileAlterPreservation();
 }

@@ -95,6 +95,10 @@ namespace TagLib {
      * The ID3v2 Frames document gives a description of each of these formats
      * and the expected order of strings in each.  ID3v2::Header::frameID() can
      * be used to determine the frame type.
+     *
+     * \note If non-Latin1 compatible strings are used with this class, even if
+     * the text encoding is set to Latin1, the frame will be written using UTF8
+     * (with the encoding flag appropriately set in the output).
      */
 
     class TAGLIB_EXPORT TextIdentificationFrame : public Frame
@@ -108,6 +112,8 @@ namespace TagLib {
        *
        * \note In this case you must specify the text encoding as it
        * resolves the ambiguity between constructors.
+       *
+       * \note Please see the note in the class description regarding Latin1.
        */
       TextIdentificationFrame(const ByteVector &type, String::Type encoding);
 
@@ -144,6 +150,8 @@ namespace TagLib {
        * This defaults to the type that was either specified in the constructor
        * or read from the frame when parsed.
        *
+       * \note Please see the note in the class description regarding Latin1.
+       *
        * \see setTextEncoding()
        * \see render()
        */
@@ -152,6 +160,8 @@ namespace TagLib {
       /*!
        * Sets the text encoding to be used when rendering this frame to
        * \a encoding.
+       *
+       * \note Please see the note in the class description regarding Latin1.
        *
        * \see textEncoding()
        * \see render()

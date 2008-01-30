@@ -23,9 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-
 #include "attachedpictureframe.h"
+
+#include <tstringlist.h>
+#include <tdebug.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -145,12 +146,14 @@ ByteVector AttachedPictureFrame::renderFields() const
 {
   ByteVector data;
 
-  data.append(char(d->textEncoding));
+  String::Type encoding = checkEncoding(d->description, d->textEncoding);
+
+  data.append(char(encoding));
   data.append(d->mimeType.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
   data.append(char(d->type));
-  data.append(d->description.data(d->textEncoding));
-  data.append(textDelimiter(d->textEncoding));
+  data.append(d->description.data(encoding));
+  data.append(textDelimiter(encoding));
   data.append(d->data);
 
   return data;
