@@ -166,7 +166,7 @@ bool WavPack::File::save()
       if(d->hasID3v1) {
         if(d->ID3v1Location > d->APELocation) {
           d->ID3v1Location -= d->APESize;
-	}
+        }
       }
     }
   }

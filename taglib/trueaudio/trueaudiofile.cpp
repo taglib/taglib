@@ -145,7 +145,7 @@ bool TrueAudio::File::save()
     removeBlock(d->ID3v2Location, d->ID3v2OriginalSize);
     d->ID3v1Location -= d->ID3v2OriginalSize;
     d->ID3v2Location = -1;
-    d->ID3v2OriginalSize = 0; 
+    d->ID3v2OriginalSize = 0;
     d->hasID3v2 = false;
   }
 

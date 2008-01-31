@@ -76,12 +76,12 @@ namespace TagLib {
     template <class T> T *access(int index, bool create)
     {
       if(!create || tag(index))
-	return static_cast<T *>(tag(index));
+        return static_cast<T *>(tag(index));
 
       set(index, new T);
       return static_cast<T *>(tag(index));
     }
-    
+
   private:
     TagUnion(const Tag &);
     TagUnion &operator=(const Tag &);
