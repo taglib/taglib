@@ -215,17 +215,9 @@ void MPEG::Properties::read()
      firstHeader.sampleRate() > 0 &&
      d->xingHeader->totalFrames() > 0)
   {
-      static const int blockSize[2][4] = {
-        // Version 1
-        { 0, 384, 1152, 1152 },
-        // Version 2 or 2.5
-        { 0, 384, 1152, 576 }
-      };
-
-      int versionIndex = firstHeader.version() == Header::Version1 ? 0 : 1;
       double timePerFrame =
-        double(blockSize[versionIndex][firstHeader.layer()]) /
-        firstHeader.sampleRate();
+        double(firstHeader.samplesPerFrame()) / firstHeader.sampleRate();
+
       d->length = int(timePerFrame * d->xingHeader->totalFrames());
       d->bitrate = d->length > 0 ? d->xingHeader->totalSize() * 8 / d->length / 1000 : 0;
   }

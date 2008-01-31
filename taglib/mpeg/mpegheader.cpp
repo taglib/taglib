@@ -46,7 +46,8 @@ public:
     channelMode(Stereo),
     isCopyrighted(false),
     isOriginal(false),
-    frameLength(0) {}
+    frameLength(0),
+    samplesPerFrame(0) {}
 
   bool isValid;
   Version version;
@@ -59,6 +60,7 @@ public:
   bool isCopyrighted;
   bool isOriginal;
   int frameLength;
+  int samplesPerFrame;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,6 +137,11 @@ bool MPEG::Header::isOriginal() const
 int MPEG::Header::frameLength() const
 {
   return d->frameLength;
+}
+
+int MPEG::Header::samplesPerFrame() const
+{
+  return d->samplesPerFrame;
 }
 
 MPEG::Header &MPEG::Header::operator=(const Header &h)
@@ -251,6 +258,17 @@ void MPEG::Header::parse(const ByteVector &data)
     d->frameLength = 24000 * 2 * d->bitrate / d->sampleRate + int(d->isPadded);
   else
     d->frameLength = 72000 * d->bitrate / d->sampleRate + int(d->isPadded);
+
+  // Samples per frame
+
+  static const int samplesPerFrame[3][2] = {
+    // MPEG1, 2/2.5
+    {  384,   384 }, // Layer I
+    { 1152,  1152 }, // Layer II
+    { 1152,   576 }  // Layer III
+  };
+  
+  d->samplesPerFrame = samplesPerFrame[layerIndex][versionIndex];
 
   // Now that we're done parsing, set this to be a valid frame.
 

@@ -145,6 +145,11 @@ namespace TagLib {
       int frameLength() const;
 
       /*!
+       * Returns the number of frames per sample.
+       */
+      int samplesPerFrame() const;
+
+      /*!
        * Makes a shallow copy of the header.
        */
       Header &operator=(const Header &h);
