@@ -38,7 +38,7 @@ apidox:
 	fi; \
 	cp $(top_srcdir)/admin/Doxyfile.global taglib.doxyfile; \
 	echo "PROJECT_NAME        = TagLib" >> taglib.doxyfile; \
-	echo "PROJECT_NUMBER      = \"Version 1.1\"" >> taglib.doxyfile; \
+	echo "PROJECT_NUMBER      = \"Version 1.5\"" >> taglib.doxyfile; \
 	echo "INPUT               = $(srcdir)" >> taglib.doxyfile; \
 	echo "OUTPUT_DIRECTORY    = doc/api" >> taglib.doxyfile; \
 	echo "HTML_OUTPUT         = html" >> taglib.doxyfile; \
