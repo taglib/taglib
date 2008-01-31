@@ -49,22 +49,10 @@ namespace TagLib {
 
     virtual ~TagUnion();
 
-    /*!
-     * Simply returns the value for the the tag at \a index.
-     *
-     * \note This does not call tag()
-     *
-     * \see tag()
-     */
     Tag *operator[](int index) const;
+    Tag *tag(int index) const;
 
-    /*!
-     * By default just a call to operator[], but may be overridden if, for
-     * instance, it is desirable to create frames on write.
-     */
-    virtual Tag *tag(int index, AccessType type = Read) const;
-
-    void setTag(int index, Tag *tag);
+    void set(int index, Tag *tag);
 
     virtual String title() const;
     virtual String artist() const;
@@ -83,6 +71,15 @@ namespace TagLib {
     virtual void setTrack(uint i);
     virtual bool isEmpty() const;
 
+    template <class T> T *access(int index, bool create)
+    {
+      if(!create || tag(index))
+	return static_cast<T *>(tag(index));
+
+      set(index, new T);
+      return static_cast<T *>(tag(index));
+    }
+    
   private:
     TagUnion(const Tag &);
     TagUnion &operator=(const Tag &);

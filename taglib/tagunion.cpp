@@ -28,30 +28,30 @@
 using namespace TagLib;
 
 #define stringUnion(method)                                      \
-  if(tag(0, Read) && !tag(0, Read)->method().isEmpty())          \
-    return tag(0, Read)->method();                               \
-  if(tag(1, Read) && !tag(1, Read)->method().isEmpty())          \
-    return tag(1, Read)->method();                               \
-  if(tag(2, Read) && !tag(2, Read)->method().isEmpty())          \
-    return tag(2, Read)->method();                               \
+  if(tag(0) && !tag(0)->method().isEmpty())			 \
+    return tag(0)->method();					 \
+  if(tag(1) && !tag(1)->method().isEmpty())			 \
+    return tag(1)->method();					 \
+  if(tag(2) && !tag(2)->method().isEmpty())			 \
+    return tag(2)->method();					 \
   return String::null                                            \
 
 #define numberUnion(method)                                      \
-  if(tag(0, Read) && tag(0, Read)->method() > 0)                 \
-    return tag(0, Read)->method();                               \
-  if(tag(1, Read) && tag(1, Read)->method() > 0)                 \
-    return tag(1, Read)->method();                               \
-  if(tag(2, Read) && tag(2, Read)->method() > 0)                 \
-    return tag(2, Read)->method();                               \
+  if(tag(0) && tag(0)->method() > 0)				 \
+    return tag(0)->method();					 \
+  if(tag(1) && tag(1)->method() > 0)				 \
+    return tag(1)->method();					 \
+  if(tag(2) && tag(2)->method() > 0)				 \
+    return tag(2)->method();					 \
   return 0
 
 #define setUnion(method, value)                                  \
-  if(tag(0, Write))                                              \
-    tag(0, Write)->set##method(value);                           \
-  if(tag(1, Write))                                              \
-    tag(1, Write)->set##method(value);                           \
-  if(tag(2, Write))                                              \
-    tag(2, Write)->set##method(value);                           \
+  if(tag(0))							 \
+    tag(0)->set##method(value);					 \
+  if(tag(1))							 \
+    tag(1)->set##method(value);					 \
+  if(tag(2))							 \
+    tag(2)->set##method(value);					 \
 
 class TagUnion::TagUnionPrivate
 {
@@ -87,15 +87,15 @@ TagUnion::~TagUnion()
 
 Tag *TagUnion::operator[](int index) const
 {
+  return tag(index);
+}
+
+Tag *TagUnion::tag(int index) const
+{
   return d->tags[index];
 }
 
-Tag *TagUnion::tag(int index, AccessType) const
-{
-  return (*this)[index];
-}
-
-void TagUnion::setTag(int index, Tag *tag)
+void TagUnion::set(int index, Tag *tag)
 {
   delete d->tags[index];
   d->tags[index] = tag;

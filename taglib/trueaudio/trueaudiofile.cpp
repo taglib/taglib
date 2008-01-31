@@ -30,26 +30,28 @@
 #include <tbytevector.h>
 #include <tstring.h>
 #include <tdebug.h>
+#include <tagunion.h>
 
 #include "trueaudiofile.h"
 #include "id3v1tag.h"
 #include "id3v2tag.h"
 #include "id3v2header.h"
-#include "combinedtag.h"
 
 using namespace TagLib;
+
+namespace
+{
+  enum { ID3v2Index = 0, ID3v1Index = 1 };
+}
 
 class TrueAudio::File::FilePrivate
 {
 public:
   FilePrivate(const ID3v2::FrameFactory *frameFactory = ID3v2::FrameFactory::instance()) :
     ID3v2FrameFactory(frameFactory),
-    ID3v2Tag(0),
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
-    ID3v1Tag(0),
     ID3v1Location(-1),
-    tag(0),
     properties(0),
     scanned(false),
     hasID3v1(false),
@@ -57,21 +59,16 @@ public:
 
   ~FilePrivate()
   {
-    if (tag != ID3v1Tag && tag != ID3v2Tag) delete tag;
-    delete ID3v1Tag;
-    delete ID3v2Tag;
     delete properties;
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  ID3v2::Tag *ID3v2Tag;
   long ID3v2Location;
   uint ID3v2OriginalSize;
 
-  ID3v1::Tag *ID3v1Tag;
   long ID3v1Location;
 
-  Tag *tag;
+  TagUnion tag;
 
   Properties *properties;
   bool scanned;
@@ -111,7 +108,7 @@ TrueAudio::File::~File()
 
 TagLib::Tag *TrueAudio::File::tag() const
 {
-  return d->tag;
+  return &d->tag;
 }
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const
@@ -133,12 +130,12 @@ bool TrueAudio::File::save()
 
   // Update ID3v2 tag
 
-  if(d->ID3v2Tag && !d->ID3v2Tag->isEmpty()) {
+  if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
     if(!d->hasID3v2) {
       d->ID3v2Location = 0;
       d->ID3v2OriginalSize = 0;
     }
-    ByteVector data = d->ID3v2Tag->render();
+    ByteVector data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
     d->ID3v1Location -= d->ID3v2OriginalSize - data.size();
     d->ID3v2OriginalSize = data.size();
@@ -154,14 +151,14 @@ bool TrueAudio::File::save()
 
   // Update ID3v1 tag
 
-  if(d->ID3v1Tag && !d->ID3v1Tag->isEmpty()) {
+  if(ID3v1Tag() && !ID3v1Tag()->isEmpty()) {
     if(!d->hasID3v1) {
       seek(0, End);
       d->ID3v1Location = tell();
     }
     else
       seek(d->ID3v1Location);
-    writeBlock(d->ID3v1Tag->render());
+    writeBlock(ID3v1Tag()->render());
     d->hasID3v1 = true;
   }
   else if(d->hasID3v1) {
@@ -175,58 +172,26 @@ bool TrueAudio::File::save()
 
 ID3v1::Tag *TrueAudio::File::ID3v1Tag(bool create)
 {
-  if(!create || d->ID3v1Tag)
-    return d->ID3v1Tag;
-
-  // no ID3v1 tag exists and we've been asked to create one
-
-  d->ID3v1Tag = new ID3v1::Tag;
-
-  if(d->ID3v2Tag)
-    d->tag = new CombinedTag(d->ID3v2Tag, d->ID3v1Tag);
-  else
-    d->tag = d->ID3v1Tag;
-
-  return d->ID3v1Tag;
+  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
 ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
 {
-  if(!create || d->ID3v2Tag)
-    return d->ID3v2Tag;
-
-  // no ID3v2 tag exists and we've been asked to create one
-
-  d->ID3v2Tag = new ID3v2::Tag;
-
-  if(d->ID3v1Tag)
-    d->tag = new CombinedTag(d->ID3v2Tag, d->ID3v1Tag);
-  else
-    d->tag = d->ID3v2Tag;
-
-  return d->ID3v2Tag;
+  return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
 }
 
 void TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1) {
-    delete d->ID3v1Tag;
-    d->ID3v1Tag = 0;
-
-    if(d->ID3v2Tag)
-      d->tag = d->ID3v2Tag;
-    else
-      d->tag = d->ID3v2Tag = new ID3v2::Tag;
+    d->tag.set(ID3v1Index, 0);
+    ID3v2Tag(true);
   }
 
   if(tags & ID3v2) {
-    delete d->ID3v2Tag;
-    d->ID3v2Tag = 0;
+    d->tag.set(ID3v2Index, 0);
 
-    if(d->ID3v1Tag)
-      d->tag = d->ID3v1Tag;
-    else
-      d->tag = d->ID3v2Tag = new ID3v2::Tag;
+    if(!ID3v1Tag())
+      ID3v2Tag(true);
   }
 }
 
@@ -243,14 +208,12 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
 
   if(d->ID3v2Location >= 0) {
 
-    d->ID3v2Tag = new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory);
+    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
-    d->ID3v2OriginalSize = d->ID3v2Tag->header()->completeTagSize();
+    d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
-    if(d->ID3v2Tag->header()->tagSize() <= 0) {
-      delete d->ID3v2Tag;
-      d->ID3v2Tag = 0;
-    }
+    if(ID3v2Tag()->header()->tagSize() <= 0)
+      d->tag.set(ID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -260,22 +223,12 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->ID3v1Tag = new ID3v1::Tag(this, d->ID3v1Location);
+    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
-  if(d->hasID3v1 && d->hasID3v2)
-    d->tag = new CombinedTag(d->ID3v2Tag, d->ID3v1Tag);
-  else {
-    if(d->hasID3v1)
-      d->tag = d->ID3v1Tag;
-    else {
-      if(d->hasID3v2)
-        d->tag = d->ID3v2Tag;
-      else
-        d->tag = d->ID3v2Tag = new ID3v2::Tag;
-    }
-  }
+  if(!d->hasID3v1)
+    ID3v2Tag(true);
 
   // Look for TrueAudio metadata
 

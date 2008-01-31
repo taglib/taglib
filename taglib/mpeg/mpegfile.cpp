@@ -41,27 +41,6 @@ using namespace TagLib;
 namespace
 {
   enum { ID3v2Index = 0, APEIndex = 1, ID3v1Index = 2 };
-
-  class MPEGTag : public TagUnion
-  {
-  public:
-    virtual Tag *tag(int index, AccessType type) const
-    {
-      if(type == Write)
-      {
-	if(index == ID3v2Index && !(*this)[ID3v2Index])
-	{
-	  const_cast<MPEGTag *>(this)->setTag(ID3v2Index, new ID3v2::Tag);
-	}
-	else if(index == ID3v1Index && !(*this)[ID3v1Index])
-	{
-	  const_cast<MPEGTag *>(this)->setTag(ID3v1Index, new ID3v1::Tag);
-	}
-      }
-
-      return TagUnion::tag(index);
-    }
-  };
 }
 
 class MPEG::File::FilePrivate
@@ -97,7 +76,7 @@ public:
 
   long ID3v1Location;
 
-  MPEGTag tag;
+  TagUnion tag;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -257,25 +236,17 @@ bool MPEG::File::save(int tags, bool stripOthers)
 
 ID3v2::Tag *MPEG::File::ID3v2Tag(bool create)
 {
-  return static_cast<ID3v2::Tag *>(
-    d->tag.tag(ID3v2Index, create ? MPEGTag::Write : MPEGTag::Read));
+  return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
 }
 
 ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
 {
-  return static_cast<ID3v1::Tag *>(
-    d->tag.tag(ID3v1Index, create ? MPEGTag::Write : MPEGTag::Read));
+  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
 APE::Tag *MPEG::File::APETag(bool create)
 {
-  if(!create || d->tag[APEIndex])
-    return static_cast<APE::Tag *>(d->tag[APEIndex]);
-
-  debug("Creating APE Tag.");
-
-  d->tag.setTag(APEIndex, new APE::Tag);
-  return static_cast<APE::Tag *>(d->tag[APEIndex]);
+  return d->tag.access<APE::Tag>(APEIndex, create);
 }
 
 bool MPEG::File::strip(int tags)
@@ -297,7 +268,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     d->hasID3v2 = false;
 
     if(freeMemory)
-      d->tag.setTag(ID3v2Index, 0);
+      d->tag.set(ID3v2Index, 0);
 
     // v1 tag location has changed, update if it exists
 
@@ -316,7 +287,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     d->hasID3v1 = false;
 
     if(freeMemory)
-      d->tag.setTag(ID3v1Index, 0);
+      d->tag.set(ID3v1Index, 0);
   }
 
   if((tags & APE) && d->hasAPE) {
@@ -329,7 +300,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     }
 
     if(freeMemory)
-      d->tag.setTag(APEIndex, 0);
+      d->tag.set(APEIndex, 0);
   }
 
   return true;
@@ -411,12 +382,12 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.setTag(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
     if(ID3v2Tag()->header()->tagSize() <= 0)
-      d->tag.setTag(ID3v2Index, 0);
+      d->tag.set(ID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -426,7 +397,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.setTag(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -436,9 +407,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   if(d->APELocation >= 0) {
 
-    debug("Found APE");
-
-    d->tag.setTag(APEIndex, new APE::Tag(this, d->APELocation));
+    d->tag.set(APEIndex, new APE::Tag(this, d->APELocation));
 
     d->APEOriginalSize = APETag()->footer()->completeTagSize();
 
@@ -449,6 +418,11 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   if(readProperties)
     d->properties = new Properties(this, propertiesStyle);
+
+  // Make sure that we have our default tag types available.
+
+  ID3v2Tag(true);
+  ID3v1Tag(true);
 }
 
 long MPEG::File::findID3v2()

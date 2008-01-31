@@ -227,26 +227,18 @@ ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
   if(!create || d->tag[ID3v2Index])
     return static_cast<ID3v2::Tag *>(d->tag[ID3v2Index]);
 
-  d->tag.setTag(ID3v2Index, new ID3v2::Tag);
+  d->tag.set(ID3v2Index, new ID3v2::Tag);
   return static_cast<ID3v2::Tag *>(d->tag[ID3v2Index]);
 }
 
 ID3v1::Tag *FLAC::File::ID3v1Tag(bool create)
 {
-  if(!create || d->tag[ID3v1Index])
-    return static_cast<ID3v1::Tag *>(d->tag[ID3v1Index]);
-
-  d->tag.setTag(ID3v1Index, new ID3v1::Tag);
-  return static_cast<ID3v1::Tag *>(d->tag[ID3v1Index]);
+  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
 Ogg::XiphComment *FLAC::File::xiphComment(bool create)
 {
-  if(!create || d->tag[XiphIndex])
-    return static_cast<Ogg::XiphComment *>(d->tag[XiphIndex]);
-
-  d->tag.setTag(XiphIndex, new Ogg::XiphComment);
-  return static_cast<Ogg::XiphComment *>(d->tag[XiphIndex]);
+  return d->tag.access<Ogg::XiphComment>(XiphIndex, create);
 }
 
 void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
@@ -267,12 +259,12 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.setTag(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
     if(ID3v2Tag()->header()->tagSize() <= 0)
-      d->tag.setTag(ID3v2Index, 0);
+      d->tag.set(ID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -282,7 +274,7 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.setTag(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -294,9 +286,9 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     return;
 
   if(d->hasXiphComment)
-    d->tag.setTag(XiphIndex, new Ogg::XiphComment(xiphCommentData()));
+    d->tag.set(XiphIndex, new Ogg::XiphComment(xiphCommentData()));
   else
-    d->tag.setTag(XiphIndex, new Ogg::XiphComment);
+    d->tag.set(XiphIndex, new Ogg::XiphComment);
 
   if(readProperties)
     d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
