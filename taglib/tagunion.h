@@ -28,6 +28,8 @@
 
 #include "tag.h"
 
+#ifndef DO_NOT_DOCUMENT
+
 namespace TagLib {
 
   /*!
@@ -89,4 +91,5 @@ namespace TagLib {
   };
 }
 
+#endif
 #endif
