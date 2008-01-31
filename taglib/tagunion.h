@@ -38,10 +38,32 @@ namespace TagLib {
   {
   public:
 
+    enum AccessType { Read, Write };
+
+    /*!
+     * Creates a TagLib::Tag that is the union of \a first, \a second, and
+     * \a third.  The TagUnion takes ownership of these tags and will handle
+     * their deletion.
+     */
     TagUnion(Tag *first = 0, Tag *second = 0, Tag *third = 0);
+
     virtual ~TagUnion();
 
-    Tag *tag(int index) const;
+    /*!
+     * Simply returns the value for the the tag at \a index.
+     *
+     * \note This does not call tag()
+     *
+     * \see tag()
+     */
+    Tag *operator[](int index) const;
+
+    /*!
+     * By default just a call to operator[], but may be overridden if, for
+     * instance, it is desirable to create frames on write.
+     */
+    virtual Tag *tag(int index, AccessType type = Read) const;
+
     void setTag(int index, Tag *tag);
 
     virtual String title() const;
