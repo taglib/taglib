@@ -190,7 +190,7 @@ namespace TagLib {
       void scan();
       long findID3v2();
       long findID3v1();
-      ByteVector xiphCommentData();
+      ByteVector xiphCommentData() const;
 
       class FilePrivate;
       FilePrivate *d;

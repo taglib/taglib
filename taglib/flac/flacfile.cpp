@@ -27,19 +27,21 @@
 #include <tstring.h>
 #include <tlist.h>
 #include <tdebug.h>
+#include <tagunion.h>
 
 #include <id3v2header.h>
 #include <id3v2tag.h>
 #include <id3v1tag.h>
+#include <xiphcomment.h>
 
 #include "flacfile.h"
-#include "flactag.h"
 
 using namespace TagLib;
 
 namespace
 {
-  enum BlockType { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
+  enum { XiphIndex = 0, ID3v2Index = 1, ID3v1Index = 2 };
+  enum { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
 }
 
 class FLAC::File::FilePrivate
@@ -47,13 +49,9 @@ class FLAC::File::FilePrivate
 public:
   FilePrivate() :
     ID3v2FrameFactory(ID3v2::FrameFactory::instance()),
-    ID3v2Tag(0),
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
-    ID3v1Tag(0),
     ID3v1Location(-1),
-    comment(0),
-    tag(0),
     properties(0),
     flacStart(0),
     streamStart(0),
@@ -65,24 +63,16 @@ public:
 
   ~FilePrivate()
   {
-    delete ID3v2Tag;
-    delete ID3v1Tag;
-    delete comment;
-    delete tag;
     delete properties;
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  ID3v2::Tag *ID3v2Tag;
   long ID3v2Location;
   uint ID3v2OriginalSize;
 
-  ID3v1::Tag *ID3v1Tag;
   long ID3v1Location;
 
-  Ogg::XiphComment *comment;
-
-  FLAC::Tag *tag;
+  TagUnion tag;
 
   Properties *properties;
   ByteVector streamInfoData;
@@ -126,7 +116,7 @@ FLAC::File::~File()
 
 TagLib::Tag *FLAC::File::tag() const
 {
-  return d->tag;
+  return &d->tag;
 }
 
 FLAC::Properties *FLAC::File::audioProperties() const
@@ -144,13 +134,9 @@ bool FLAC::File::save()
 
   // Create new vorbis comments
 
-  if(!d->comment) {
-    d->comment = new Ogg::XiphComment;
-    if(d->tag)
-      Tag::duplicate(d->tag, d->comment, true);
-  }
+  Tag::duplicate(&d->tag, xiphComment(true), true);
 
-  d->xiphCommentData = d->comment->render(false);
+  d->xiphCommentData = xiphComment()->render(false);
 
   // A Xiph comment portion of the data stream starts with a 4-byte descriptor.
   // The first byte indicates the frame type.  The last three bytes are used
@@ -216,21 +202,21 @@ bool FLAC::File::save()
 
   // Update ID3 tags
 
-  if(d->ID3v2Tag) {
+  if(ID3v2Tag()) {
     if(d->hasID3v2) {
       if(d->ID3v2Location < d->flacStart)
         debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
               "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
       else
-        insert(d->ID3v2Tag->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+        insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
     }
     else
-      insert(d->ID3v2Tag->render(), 0, 0);
+      insert(ID3v2Tag()->render(), 0, 0);
   }
 
-  if(d->ID3v1Tag) {
-    seek(d->ID3v1Tag ? -128 : 0, End);
-    writeBlock(d->ID3v1Tag->render());
+  if(ID3v1Tag()) {
+    seek(-128, End);
+    writeBlock(ID3v1Tag()->render());
   }
 
   return true;
@@ -238,35 +224,29 @@ bool FLAC::File::save()
 
 ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
 {
-  if(!create || d->ID3v2Tag)
-    return d->ID3v2Tag;
+  if(!create || d->tag[ID3v2Index])
+    return static_cast<ID3v2::Tag *>(d->tag[ID3v2Index]);
 
-  // no ID3v2 tag exists and we've been asked to create one
-
-  d->ID3v2Tag = new ID3v2::Tag;
-  return d->ID3v2Tag;
+  d->tag.setTag(ID3v2Index, new ID3v2::Tag);
+  return static_cast<ID3v2::Tag *>(d->tag[ID3v2Index]);
 }
 
 ID3v1::Tag *FLAC::File::ID3v1Tag(bool create)
 {
-  if(!create || d->ID3v1Tag)
-    return d->ID3v1Tag;
+  if(!create || d->tag[ID3v1Index])
+    return static_cast<ID3v1::Tag *>(d->tag[ID3v1Index]);
 
-  // no ID3v1 tag exists and we've been asked to create one
-
-  d->ID3v1Tag = new ID3v1::Tag;
-  return d->ID3v1Tag;
+  d->tag.setTag(ID3v1Index, new ID3v1::Tag);
+  return static_cast<ID3v1::Tag *>(d->tag[ID3v1Index]);
 }
 
 Ogg::XiphComment *FLAC::File::xiphComment(bool create)
 {
-  if(!create || d->comment)
-    return d->comment;
+  if(!create || d->tag[XiphIndex])
+    return static_cast<Ogg::XiphComment *>(d->tag[XiphIndex]);
 
-  // no XiphComment exists and we've been asked to create one
-
-  d->comment = new Ogg::XiphComment;
-  return d->comment;
+  d->tag.setTag(XiphIndex, new Ogg::XiphComment);
+  return static_cast<Ogg::XiphComment *>(d->tag[XiphIndex]);
 }
 
 void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
@@ -287,14 +267,12 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   if(d->ID3v2Location >= 0) {
 
-    d->ID3v2Tag = new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory);
+    d->tag.setTag(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
-    d->ID3v2OriginalSize = d->ID3v2Tag->header()->completeTagSize();
+    d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
-    if(d->ID3v2Tag->header()->tagSize() <= 0) {
-      delete d->ID3v2Tag;
-      d->ID3v2Tag = 0;
-    }
+    if(ID3v2Tag()->header()->tagSize() <= 0)
+      d->tag.setTag(ID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -304,7 +282,7 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->ID3v1Tag = new ID3v1::Tag(this, d->ID3v1Location);
+    d->tag.setTag(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -312,15 +290,13 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   scan();
 
-  if (!isValid()) return;
+  if(!isValid())
+    return;
 
   if(d->hasXiphComment)
-    d->comment = new Ogg::XiphComment(xiphCommentData());
-
-  if(d->hasXiphComment || d->hasID3v2 || d->hasID3v1)
-    d->tag = new FLAC::Tag(d->comment, d->ID3v2Tag, d->ID3v1Tag);
+    d->tag.setTag(XiphIndex, new Ogg::XiphComment(xiphCommentData()));
   else
-    d->tag = new FLAC::Tag(new Ogg::XiphComment);
+    d->tag.setTag(XiphIndex, new Ogg::XiphComment);
 
   if(readProperties)
     d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
@@ -328,18 +304,12 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
 ByteVector FLAC::File::streamInfoData()
 {
-  if (isValid())
-    return d->streamInfoData;
-  else
-    return ByteVector();
+  return isValid() ? d->streamInfoData : ByteVector();
 }
 
-ByteVector FLAC::File::xiphCommentData()
+ByteVector FLAC::File::xiphCommentData() const
 {
-  if (isValid() && d->hasXiphComment)
-    return d->xiphCommentData;
-  else
-    return ByteVector();
+  return (isValid() && d->hasXiphComment) ? d->xiphCommentData : ByteVector();
 }
 
 long FLAC::File::streamLength()
@@ -405,6 +375,7 @@ void FLAC::File::scan()
   // Search through the remaining metadata
 
   while(!isLastBlock) {
+
     header = readBlock(4);
     blockType = header[0] & 0x7f;
     isLastBlock = (header[0] & 0x80) != 0;
@@ -430,9 +401,11 @@ void FLAC::File::scan()
   }
 
   // End of metadata, now comes the datastream
+
   d->streamStart = nextBlockOffset;
   d->streamLength = File::length() - d->streamStart;
-  if (d->hasID3v1)
+
+  if(d->hasID3v1)
     d->streamLength -= 128;
 
   d->scanned = true;
