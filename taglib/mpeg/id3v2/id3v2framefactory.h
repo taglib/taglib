@@ -37,7 +37,7 @@ namespace TagLib {
 
     class TAGLIB_EXPORT TextIdentificationFrame;
 
-    //! A factory for creating ID3v2 frames
+    //! A factory for creating ID3v2 frames during parsing
 
     /*!
      * This factory abstracts away the frame creation process and instantiates
@@ -54,6 +54,12 @@ namespace TagLib {
      * This implements both <i>abstract factory</i> and <i>singleton</i> patterns
      * of which more information is available on the web and in software design
      * textbooks (Notably <i>Design Patters</i>).
+     *
+     * \note You do not need to use this factory to create new frames to add to
+     * an ID3v2::Tag.  You can instantiate frame subclasses directly (with new)
+     * and add them to a tag using ID3v2::Tag::addFrame()
+     *
+     * \see ID3v2::Tag::addFrame()
      */
 
     class TAGLIB_EXPORT FrameFactory
