@@ -38,6 +38,7 @@
 #include "frames/unknownframe.h"
 #include "frames/generalencapsulatedobjectframe.h"
 #include "frames/urllinkframe.h"
+#include "frames/unsynchronizedlyricsframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -206,6 +207,15 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
       d->setTextEncoding(f);
       return f;
     }
+  }
+
+  // Unsynchronized lyric/text transcription (frames 4.8)
+
+  if(frameID == "USLT") {
+    UnsynchronizedLyricsFrame *f = new UnsynchronizedLyricsFrame(data, header);
+    if(d->useDefaultEncoding)
+      f->setTextEncoding(d->defaultEncoding);
+    return f;
   }
 
   return new UnknownFrame(data, header);

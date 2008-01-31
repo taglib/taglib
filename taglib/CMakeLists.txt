@@ -67,6 +67,7 @@ mpeg/id3v2/frames/relativevolumeframe.cpp
 mpeg/id3v2/frames/textidentificationframe.cpp
 mpeg/id3v2/frames/uniquefileidentifierframe.cpp
 mpeg/id3v2/frames/unknownframe.cpp
+mpeg/id3v2/frames/unsynchronizedlyricsframe.cpp
 mpeg/id3v2/frames/urllinkframe.cpp
 )
 

@@ -14,6 +14,7 @@ libframes_la_SOURCES = \
 	textidentificationframe.cpp \
 	uniquefileidentifierframe.cpp \
 	unknownframe.cpp \
+	unsynchronizedlyricsframe.cpp \
 	urllinkframe.cpp
 
 taglib_include_HEADERS = \
@@ -24,6 +25,7 @@ taglib_include_HEADERS = \
 	textidentificationframe.h \
 	uniquefileidentifierframe.h \
 	unknownframe.h \
+	unsynchronizedlyricsframe.h \
 	urllinkframe.h
 
 taglib_includedir = $(includedir)/taglib
