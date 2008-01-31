@@ -247,7 +247,7 @@ std::string String::to8Bit(bool unicode) const
   return s;
 }
 
-TagLib::wstring String::to32Bit() const
+TagLib::wstring String::toWString() const
 {
   return d->data;
 }

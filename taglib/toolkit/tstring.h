@@ -47,6 +47,16 @@
  */
 #define TStringToQString(s) QString::fromUtf8(s.toCString(true))
 
+
+#if defined(QT_VERSION_CHECK)
+# if QT_VERSION_CHECK(4, 0, 0))
+#  undef QStringToTSTring
+#  undef TStringToQString
+#  define QStringToTString(s) TagLib::String(s.toStdWString())
+#  define TStringToQString(s) QString::fromStdWString(s.toWString())
+# endif
+#endif
+
 namespace TagLib {
 
   //! A \e wide string class suitable for unicode.
@@ -178,7 +188,7 @@ namespace TagLib {
     /*!
      * Returns a wstring version of the TagLib string as a wide string.
      */
-    wstring to32Bit() const;
+    wstring toWString() const;
 
     /*!
      * Creates and returns a C-String based on the data.  This string is still
