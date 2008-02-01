@@ -36,6 +36,8 @@
 
 #include <id3v1tag.h>
 
+#include <apetag.h>
+
 using namespace std;
 using namespace TagLib;
 
@@ -85,6 +87,20 @@ int main(int argc, char *argv[])
     }
     else
       cout << "file does not have a valid id3v1 tag" << endl;
+
+    APE::Tag *ape = f.APETag();
+
+    cout << endl << "APE" << endl;
+
+    if(ape) {
+      for(APE::ItemListMap::ConstIterator it = ape->itemListMap().begin();
+          it != ape->itemListMap().end(); ++it)
+      {
+        cout << (*it).first << " - \"" << (*it).second.toString() << "\"" << endl;
+      }
+    }
+    else
+      cout << "file does not have a valid APE tag" << endl;
 
     cout << endl;
   }
