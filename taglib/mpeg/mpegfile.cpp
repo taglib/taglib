@@ -313,45 +313,55 @@ void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 
 long MPEG::File::nextFrameOffset(long position)
 {
-  // TODO: This will miss syncs spanning buffer read boundaries.
+  bool foundLastSyncPattern = false;
 
-  ByteVector buffer = readBlock(bufferSize());
-
-  while(buffer.size() > 0) {
+  ByteVector buffer;
+ 
+  while(true) {
     seek(position);
     buffer = readBlock(bufferSize());
 
-    for(int i = 0; i < int(buffer.size()) - 1; i++) {
+    if(buffer.size() <= 0)
+      return -1;
+
+    if(foundLastSyncPattern && secondSynchByte(buffer[0]))
+      return position - 1;
+ 
+    for(uint i = 0; i < buffer.size() - 1; i++) {
       if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
-    position += bufferSize();
-  }
 
-  return -1;
+    foundLastSyncPattern = uchar(buffer[buffer.size() - 1]) == 0xff;
+    position += buffer.size();
+  }
 }
 
 long MPEG::File::previousFrameOffset(long position)
 {
-  // TODO: This will miss syncs spanning buffer read boundaries.
+  bool foundFirstSyncPattern = false;
+  ByteVector buffer;
 
-  while(int(position - bufferSize()) > int(bufferSize())) {
-    position -= bufferSize();
+  while (position > 0) {
+    long size = ulong(position) < bufferSize() ? position : bufferSize();
+    position -= size;
+ 
     seek(position);
-    ByteVector buffer = readBlock(bufferSize());
+    buffer = readBlock(size);
 
-    // If the amount of data is smaller than an MPEG header (4 bytes) there's no
-    // chance of this being valid.
-
-    if(buffer.size() < 4)
-      return -1;
-
+    if(buffer.size() <= 0)
+      break;
+ 
+    if(foundFirstSyncPattern && uchar(buffer[buffer.size() - 1]) == 0xff)
+      return position + buffer.size() - 1;
+ 
     for(int i = buffer.size() - 2; i >= 0; i--) {
       if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
-  }
 
+    foundFirstSyncPattern = secondSynchByte(buffer[0]);
+  }
   return -1;
 }
 
