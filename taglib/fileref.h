@@ -89,7 +89,7 @@ namespace TagLib {
    * to TagLib.
    */
 
-    class FileTypeResolver
+    class TAGLIB_EXPORT FileTypeResolver
     {
     public:
       // do not fix compiler warning about missing virtual destructor

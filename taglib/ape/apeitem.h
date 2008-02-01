@@ -39,7 +39,7 @@ namespace TagLib {
     /*!
      * This class provides the features of items in the APEv2 standard.
      */
-    class Item
+    class TAGLIB_EXPORT Item
     {
     public:
       /*!

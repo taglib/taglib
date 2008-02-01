@@ -37,7 +37,7 @@ namespace TagLib {
     /*!
      * An implementation of ID3v2 unsynchronized lyrics.
      */
-    class UnsynchronizedLyricsFrame : public Frame
+    class TAGLIB_EXPORT UnsynchronizedLyricsFrame : public Frame
     {
       friend class FrameFactory;
 

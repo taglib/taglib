@@ -225,7 +225,7 @@ namespace TagLib {
      * the type and attaches the header.
      */
 
-    class Frame::Header
+    class TAGLIB_EXPORT Frame::Header
     {
     public:
       /*!
