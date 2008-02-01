@@ -3,9 +3,10 @@
 ######################################################################
 
 TEMPLATE = lib
-CONFIG += lib_bundle staticlib
+CONFIG += lib_bundle
 CONFIG += x86 ppc
 CONFIG -= qt
+DEFINES += HAVE_ZLIB=1
 LIBS += -lz
 TARGET = TagLib
 VERSION = 1.5

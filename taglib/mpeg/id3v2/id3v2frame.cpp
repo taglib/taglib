@@ -23,13 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifndef HAVE_ZLIB
 #include <config.h>
-
-#include <bitset>
+#endif
 
 #if HAVE_ZLIB
 #include <zlib.h>
 #endif
+
+#include <bitset>
 
 #include <tdebug.h>
 #include <tstringlist.h>
