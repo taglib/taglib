@@ -49,7 +49,7 @@
 
 
 #if defined(QT_VERSION_CHECK)
-# if QT_VERSION_CHECK(4, 0, 0)
+# if (QT_VERSION >= QT_VERSION_CHECK(4, 0, 0))
 #  undef QStringToTSTring
 #  undef TStringToQString
 #  define QStringToTString(s) TagLib::String(s.toStdWString())
