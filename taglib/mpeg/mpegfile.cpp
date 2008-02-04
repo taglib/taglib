@@ -316,7 +316,7 @@ long MPEG::File::nextFrameOffset(long position)
   bool foundLastSyncPattern = false;
 
   ByteVector buffer;
- 
+
   while(true) {
     seek(position);
     buffer = readBlock(bufferSize());
@@ -326,7 +326,7 @@ long MPEG::File::nextFrameOffset(long position)
 
     if(foundLastSyncPattern && secondSynchByte(buffer[0]))
       return position - 1;
- 
+
     for(uint i = 0; i < buffer.size() - 1; i++) {
       if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;
@@ -345,16 +345,16 @@ long MPEG::File::previousFrameOffset(long position)
   while (position > 0) {
     long size = ulong(position) < bufferSize() ? position : bufferSize();
     position -= size;
- 
+
     seek(position);
     buffer = readBlock(size);
 
     if(buffer.size() <= 0)
       break;
- 
+
     if(foundFirstSyncPattern && uchar(buffer[buffer.size() - 1]) == 0xff)
       return position + buffer.size() - 1;
- 
+
     for(int i = buffer.size() - 2; i >= 0; i--) {
       if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;

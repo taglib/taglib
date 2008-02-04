@@ -66,7 +66,7 @@ namespace
 
     for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
       if( (*it < 'A' || *it > 'Z') && (*it < '1' || *it > '9') ) {
-	return false;
+        return false;
       }
     }
     return true;

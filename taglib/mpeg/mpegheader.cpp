@@ -267,7 +267,7 @@ void MPEG::Header::parse(const ByteVector &data)
     { 1152,  1152 }, // Layer II
     { 1152,   576 }  // Layer III
   };
-  
+
   d->samplesPerFrame = samplesPerFrame[layerIndex][versionIndex];
 
   // Now that we're done parsing, set this to be a valid frame.
