@@ -30,14 +30,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+
 #ifdef _WIN32
 # include <wchar.h>
 # include <windows.h>
 # include <io.h>
 # define ftruncate _chsize
 #else
- #include <unistd.h>
+# include <unistd.h>
 #endif
+
 #include <stdlib.h>
 
 #ifndef R_OK
@@ -49,44 +51,57 @@
 
 using namespace TagLib;
 
+#ifdef _WIN32
+
+typedef FileName FileNameHandle;
+
+#else
+
+struct FileNameHandle : public std::string
+{
+  FileNameHandle(FileName name) : std::string(name) {}
+  operator FileName () const { return c_str(); }
+};
+
+#endif
+
 class File::FilePrivate
 {
 public:
-  FilePrivate(FileName fileName) :
-    file(0),
-    name(fileName),
-    readOnly(true),
-    valid(true),
-    size(0)
-    {}
-
-  ~FilePrivate()
-  {
-#ifdef _WIN32
-    free((void *)((const char *)name));
-    free((void *)((const wchar_t *)name));
-#else
-    free((void *)name);
-#endif
-  }
-
-  void openFile(const char *file, bool printError = true);
-#ifdef _WIN32
-  void openFile(const wchar_t *file);
-#endif
+  FilePrivate(FileName fileName);
 
   FILE *file;
-  FileName name;
+
+  FileNameHandle name;
+
   bool readOnly;
   bool valid;
   ulong size;
   static const uint bufferSize = 1024;
 };
 
-void File::FilePrivate::openFile(const char *name, bool printError)
+File::FilePrivate::FilePrivate(FileName fileName) :
+  file(0),
+  name(fileName),
+  readOnly(true),
+  valid(true),
+  size(0)
 {
-  // First try with read/write mode, if that fails, fall back to read only.
-  // We can't use ::access() since that works in odd ways on some file systems.
+  // First try with read / write mode, if that fails, fall back to read only.
+
+#ifdef _WIN32
+
+  file = _wfopen(name, L"rb+");
+
+  if(file)
+    readOnly = false;
+  else
+    file = _wfopen(name, L"rb");
+
+  if(file)
+    return;
+
+#endif
 
   file = fopen(name, "rb+");
 
@@ -95,41 +110,9 @@ void File::FilePrivate::openFile(const char *name, bool printError)
   else
     file = fopen(name, "rb");
 
-  if(!file && printError)
-    debug("Could not open file " + String(name));
-}
-
-#ifdef _WIN32
-
-void File::FilePrivate::openFile(const wchar_t *name)
-{
-  // Windows NT/2000/XP/Vista
-
-  if(GetVersion() < 0x80000000) {
-    file = _wfopen(name, L"rb+");
-    if(file)
-      readOnly = false;
-    else
-      file = _wfopen(name, L"rb");
-  }
-
-  // Windows 9x/ME
-
-  else {
-    size_t length = wcslen(name) + 1;
-    char *tmpname = (char *)malloc(length);
-    if(tmpname) {
-      if(WideCharToMultiByte(CP_ACP, 0, name, -1, tmpname, length, NULL, NULL))
-        openFile(tmpname, false);
-      free(tmpname);
-    }
-  }
-
   if(!file)
-    debug("Could not open file " + String(name));
+    debug("Could not open file " + String((const char *) name));
 }
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -137,21 +120,7 @@ void File::FilePrivate::openFile(const wchar_t *name)
 
 File::File(FileName file)
 {
-#ifdef _WIN32
-  const char *name = (const char *)file;
-  const wchar_t *wname = (const wchar_t *)file;
-  if(wname) {
-    d = new FilePrivate(::_wcsdup(wname));
-    d->openFile(wname);
-  }
-  else {
-    d = new FilePrivate(::strdup(name));
-    d->openFile(name);
-  }
-#else
-  d = new FilePrivate(::strdup(file));
-  d->openFile(d->name);
-#endif
+  d = new FilePrivate(file);
 }
 
 File::~File()
