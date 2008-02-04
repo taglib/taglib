@@ -1,6 +1,6 @@
 /***************************************************************************
     copyright            : (C) 2004 by Allan Sandfeld Jensen
-                           (C) 2002, 2003 by Scott Wheeler (id3v2header.cpp)
+                           (C) 2002 - 2008 by Scott Wheeler (id3v2header.cpp)
     email                : kde@carewolf.org
  ***************************************************************************/
 
