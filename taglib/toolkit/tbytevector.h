@@ -163,6 +163,12 @@ namespace TagLib {
     bool endsWith(const ByteVector &pattern) const;
 
     /*!
+     * Replaces \a pattern with \a with and returns a reference to the ByteVector
+     * after the operation.  This \e does modify the vector.
+     */
+    ByteVector &replace(const ByteVector &pattern, const ByteVector &with);
+
+    /*!
      * Checks for a partial match of \a pattern at the end of the vector.  It
      * returns the offset of the partial match within the vector, or -1 if the
      * pattern is not found.  This method is particularly useful when searching for
