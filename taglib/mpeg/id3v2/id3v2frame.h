@@ -381,7 +381,7 @@ namespace TagLib {
 #endif
 
       /*!
-       * Returns true if unsyncronisation is enabled for this frame.
+       * Returns true if unsynchronisation is enabled for this frame.
        */
       bool unsynchronisation() const;
 
