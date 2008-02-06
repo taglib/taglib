@@ -59,9 +59,9 @@ namespace TagLib {
       TAGLIB_EXPORT ByteVector fromUInt(uint value);
 
       /*!
-       * Deunsynchronize the data (in-place).
+       * Convert the data from unsynchronized data to its original format.
        */
-      TAGLIB_EXPORT void decode(ByteVector &data);
+      TAGLIB_EXPORT ByteVector decode(const ByteVector &input);
     }
 
   }

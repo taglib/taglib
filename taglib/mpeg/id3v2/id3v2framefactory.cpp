@@ -116,7 +116,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
     // Data lengths are not part of the encoded data, but since they are synch-safe
     // integers they will be never actually encoded.
     ByteVector frameData = data.mid(Frame::Header::size(version), header->frameSize());
-    SynchData::decode(frameData);
+    frameData = SynchData::decode(frameData);
     data = data.mid(0, Frame::Header::size(version)) + frameData;
   }
 

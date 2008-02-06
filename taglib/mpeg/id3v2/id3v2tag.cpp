@@ -395,9 +395,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
 {
   ByteVector data = origData;
 
-  if(d->header.unsynchronisation() && d->header.majorVersion() <= 3) {
-    SynchData::decode(data);
-  }
+  if(d->header.unsynchronisation() && d->header.majorVersion() <= 3)
+    data = SynchData::decode(data);
 
   uint frameDataPosition = 0;
   uint frameDataLength = data.size();
