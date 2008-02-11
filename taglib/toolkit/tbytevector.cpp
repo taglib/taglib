@@ -116,7 +116,7 @@ namespace TagLib {
       lastOccurrence[i] = uchar(pattern.size());
 
     for(uint i = 0; i < pattern.size() - 1; ++i)
-      lastOccurrence[unsigned(pattern[i])] = uchar(pattern.size() - i - 1);
+      lastOccurrence[uchar(pattern[i])] = uchar(pattern.size() - i - 1);
 
     for(uint i = pattern.size() - 1 + offset; i < v.size(); i += lastOccurrence[uchar(v.at(i))]) {
       int iBuffer = i;
@@ -430,8 +430,8 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
 
   int offset = find(pattern);
 
-  while(offset >= 0)
-  {
+  while(offset >= 0) {
+
     const int originalSize = size();
 
     if(withSize > patternSize)
