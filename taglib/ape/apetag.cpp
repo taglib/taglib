@@ -31,7 +31,6 @@
 #define WANT_CLASS_INSTANTIATION_OF_MAP (1)
 #endif
 
-#include <tdebug.h>
 #include <tfile.h>
 #include <tstring.h>
 #include <tmap.h>
@@ -46,10 +45,10 @@ using namespace APE;
 class APE::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), tagOffset(-1), tagLength(0) {}
+  TagPrivate() : file(0), footerLocation(-1), tagLength(0) {}
 
   File *file;
-  long tagOffset;
+  long footerLocation;
   long tagLength;
 
   Footer footer;
@@ -66,11 +65,11 @@ APE::Tag::Tag() : TagLib::Tag()
   d = new TagPrivate;
 }
 
-APE::Tag::Tag(File *file, long tagOffset) : TagLib::Tag()
+APE::Tag::Tag(File *file, long footerLocation) : TagLib::Tag()
 {
   d = new TagPrivate;
   d->file = file;
-  d->tagOffset = tagOffset;
+  d->footerLocation = footerLocation;
 
   read();
 }
@@ -217,14 +216,14 @@ void APE::Tag::read()
 {
   if(d->file && d->file->isValid()) {
 
-    d->file->seek(d->tagOffset);
+    d->file->seek(d->footerLocation);
     d->footer.setData(d->file->readBlock(Footer::size()));
 
     if(d->footer.tagSize() <= Footer::size() ||
        d->footer.tagSize() > uint(d->file->length()))
       return;
 
-    d->file->seek(d->tagOffset + Footer::size() - d->footer.tagSize());
+    d->file->seek(d->footerLocation + Footer::size() - d->footer.tagSize());
     parse(d->file->readBlock(d->footer.tagSize() - Footer::size()));
   }
 }
