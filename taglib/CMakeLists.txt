@@ -8,11 +8,11 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/flac
     ${CMAKE_CURRENT_SOURCE_DIR}/mpc
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis
+    ${CMAKE_CURRENT_SOURCE_DIR}/ogg/speex
     ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
     ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1
     ${CMAKE_CURRENT_SOURCE_DIR}/ape
     ${CMAKE_CURRENT_SOURCE_DIR}/wavpack
-    ${CMAKE_CURRENT_SOURCE_DIR}/speex
     ${CMAKE_CURRENT_SOURCE_DIR}/trueaudio
     ${CMAKE_CURRENT_BINARY_DIR}/taglib
     ${CMAKE_CURRENT_BINARY_DIR}/..
@@ -28,7 +28,6 @@ ADD_SUBDIRECTORY( flac )
 ADD_SUBDIRECTORY( ape )
 ADD_SUBDIRECTORY( mpc )
 ADD_SUBDIRECTORY( wavpack )
-ADD_SUBDIRECTORY( speex )
 ADD_SUBDIRECTORY( trueaudio )
 
 
@@ -110,8 +109,8 @@ wavpack/wavpackproperties.cpp
 )
 
 SET(speex_SRCS
-speex/speexfile.cpp
-speex/speexproperties.cpp
+ogg/speex/speexfile.cpp
+ogg/speex/speexproperties.cpp
 )
 
 SET(trueaudio_SRCS

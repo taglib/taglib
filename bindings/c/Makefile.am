@@ -4,12 +4,12 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/mpeg \
 	-I$(top_srcdir)/taglib/ogg \
 	-I$(top_srcdir)/taglib/ogg/vorbis \
+	-I$(top_srcdir)/taglib/ogg/speex \
 	-I$(top_srcdir)/taglib/ogg/flac \
 	-I$(top_srcdir)/taglib/flac \
 	-I$(top_srcdir)/taglib/mpc \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 \
 	-I$(top_srcdir)/taglib/wavpack \
-	-I$(top_srcdir)/taglib/speex \
 	-I$(top_srcdir)/taglib/trueaudio \
 	$(all_includes)
 
