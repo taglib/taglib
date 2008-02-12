@@ -16,7 +16,7 @@ DEPENDPATH += . \
               mpc \
               mpeg \
               ogg \
-              speex \
+              ogg/speex \
               toolkit \
               trueaudio \
               wavpack \
@@ -34,7 +34,7 @@ INCLUDEPATH += . \
                ogg/flac \
                mpc \
                wavpack \
-               speex \
+               ogg/speex \
                trueaudio \
                ape \
                mpeg/id3v2 \
@@ -62,8 +62,8 @@ HEADERS += audioproperties.h \
            ogg/oggpage.h \
            ogg/oggpageheader.h \
            ogg/xiphcomment.h \
-           speex/speexfile.h \
-           speex/speexproperties.h \
+           ogg/speex/speexfile.h \
+           ogg/speex/speexproperties.h \
            toolkit/taglib.h \
            toolkit/tbytevector.h \
            toolkit/tbytevectorlist.h \
@@ -120,8 +120,8 @@ SOURCES += audioproperties.cpp \
            ogg/oggpage.cpp \
            ogg/oggpageheader.cpp \
            ogg/xiphcomment.cpp \
-           speex/speexfile.cpp \
-           speex/speexproperties.cpp \
+           ogg/speex/speexfile.cpp \
+           ogg/speex/speexproperties.cpp \
            toolkit/tbytevector.cpp \
            toolkit/tbytevectorlist.cpp \
            toolkit/tdebug.cpp \
@@ -176,8 +176,8 @@ SOURCES += audioproperties.cpp \
            ogg/oggpage.h \
            ogg/oggpageheader.h \
            ogg/xiphcomment.h \
-           speex/speexfile.h \
-           speex/speexproperties.h \
+           ogg/speex/speexfile.h \
+           ogg/speex/speexproperties.h \
            toolkit/taglib.h \
            toolkit/tbytevector.h \
            toolkit/tbytevectorlist.h \
