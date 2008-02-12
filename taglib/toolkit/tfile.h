@@ -36,7 +36,6 @@ namespace TagLib {
   class Tag;
   class AudioProperties;
 
-
 #ifdef _WIN32
   class TAGLIB_EXPORT FileName
   {

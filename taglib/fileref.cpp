@@ -169,11 +169,9 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   // Ok, this is really dumb for now, but it works for testing.
 
   String s;
+
 #ifdef _WIN32
-  if((const wchar_t *)fileName)
-    s = (const wchar_t *)fileName;
-  else
-    s = (const char *)fileName;
+  s = (wcslen((const wchar_t *) fileName) > 0) ? (const wchar_t) fileName : (const char *) fileName;
 #else
   s = fileName;
 #endif
