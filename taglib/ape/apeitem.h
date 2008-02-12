@@ -61,6 +61,7 @@ namespace TagLib {
       /*!
        * Constructs an item with \a key and \a value.
        */
+      // BIC: Remove this, StringList has a constructor from a single string
       Item(const String &key, const String &value);
 
       /*!
@@ -143,9 +144,15 @@ namespace TagLib {
       String toString() const;
 
       /*!
-       * Returns the value as a string list.
+       * \deprecated
+       * \see values
        */
       StringList toStringList() const;
+
+      /*!
+       * Returns the list of values.
+       */
+      StringList values() const;
 
       /*!
        * Render the item to a ByteVector.

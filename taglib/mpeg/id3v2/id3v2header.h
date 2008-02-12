@@ -73,6 +73,10 @@ namespace TagLib {
        * Set the the major version number to \a version.  (Note: This is
        * the 4, not the 2 in ID3v2.4.0.  The 2 is implied.)
        * \see majorVersion()
+       *
+       * \note This is used by the internal parser; this will not change the
+       * version which is written and in general should not be called by API
+       * users.
        */
       void setMajorVersion(uint version);
 

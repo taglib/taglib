@@ -147,6 +147,11 @@ StringList APE::Item::toStringList() const
   return d->text;
 }
 
+StringList APE::Item::values() const
+{
+  return d->text;
+}
+
 String APE::Item::toString() const
 {
   return isEmpty() ? String::null : d->text.front();
