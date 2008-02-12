@@ -180,22 +180,31 @@ div.ah {
   margin-top: 3px
 }
 
-td.md {
-  background-color: #f2f2ff;
-  font-weight: bold;
+#text td {
+  width: auto;
 }
 
-td.mdname1 {
+div.memdoc {
+  margin-top: 0px;
+  margin-bottom: 20px;
+  padding: 10px 10px 10px 40px;
+}
+
+div.memproto {
+  border: thin solid black;
   background-color: #f2f2ff;
-  font-weight: bold;
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+td.paramtype {
   color: #602020;
 }
 
-td.mdname {
-  background-color: #f2f2ff;
+table.memname {
   font-weight: bold;
-  color: #602020;
-  width: 600px;
 }
 
 div.groupHeader {
