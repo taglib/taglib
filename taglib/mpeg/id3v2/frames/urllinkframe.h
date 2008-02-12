@@ -34,6 +34,7 @@ namespace TagLib {
 
   namespace ID3v2 {
 
+    //! ID3v2 URL frame
     /*!
      * An implementation of ID3v2 URL link frames.
      */
@@ -84,6 +85,8 @@ namespace TagLib {
       class UrlLinkFramePrivate;
       UrlLinkFramePrivate *d;
     };
+
+    //! ID3v2 User defined URL frame
 
     /*!
      * This is a specialization of URL link frames that allows for

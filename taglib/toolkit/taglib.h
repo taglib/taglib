@@ -117,7 +117,7 @@ namespace TagLib {
  * software.  Note that you may choose either the MPL or the LGPL, you do not have to fulfill the
  * requirements of both.
  *
- * \section installing
+ * \section installing Installing TagLib
  *
  * Please see the <a href="http://developer.kde.org/~wheeler/taglib.html">TagLib website</a> for the latest
  * downloads.

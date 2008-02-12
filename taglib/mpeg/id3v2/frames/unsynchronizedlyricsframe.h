@@ -34,6 +34,7 @@ namespace TagLib {
 
   namespace ID3v2 {
 
+    //! ID3v2 unsynchronized lyrics frame
     /*!
      * An implementation of ID3v2 unsynchronized lyrics.
      */
