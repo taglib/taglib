@@ -36,6 +36,7 @@
 #include "speexfile.h"
 
 using namespace TagLib;
+using namespace TagLib::Ogg;
 
 class Speex::Properties::PropertiesPrivate
 {

@@ -184,7 +184,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 
   if(s.size() > 4) {
     if(s.substr(s.size() - 4, 4).upper() == ".OGG")
-      return new Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
+      return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".OGA")
@@ -196,7 +196,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
     if(s.substr(s.size() - 3, 3).upper() == ".WV")
       return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".SPX")
-      return new Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
+      return new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".TTA")
       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
   }

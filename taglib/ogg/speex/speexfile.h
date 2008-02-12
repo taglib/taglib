@@ -5,7 +5,7 @@
     copyright            : (C) 2002 - 2008 by Scott Wheeler
     email                : wheeler@kde.org
                            (original Vorbis implementation)
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -37,61 +37,63 @@
 
 namespace TagLib {
 
-  //! A namespace containing classes for Speex metadata
+  namespace Ogg {
 
-  namespace Speex {
+    //! A namespace containing classes for Speex metadata
 
-    //! An implementation of Ogg::File with Speex specific methods
+    namespace Speex {
 
-    /*!
-     * This is the central class in the Ogg Speex metadata processing collection
-     * of classes.  It's built upon Ogg::File which handles processing of the Ogg
-     * logical bitstream and breaking it down into pages which are handled by
-     * the codec implementations, in this case Speex specifically.
-     */
-
-    class TAGLIB_EXPORT File : public Ogg::File
-    {
-    public:
-      /*!
-       * Contructs a Speex file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
-       */
-      File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+      //! An implementation of Ogg::File with Speex specific methods
 
       /*!
-       * Destroys this instance of the File.
+       * This is the central class in the Ogg Speex metadata processing collection
+       * of classes.  It's built upon Ogg::File which handles processing of the Ogg
+       * logical bitstream and breaking it down into pages which are handled by
+       * the codec implementations, in this case Speex specifically.
        */
-      virtual ~File();
 
-      /*!
-       * Returns the XiphComment for this file.  XiphComment implements the tag
-       * interface, so this serves as the reimplementation of
-       * TagLib::File::tag().
-       */
-      virtual Ogg::XiphComment *tag() const;
+      class TAGLIB_EXPORT File : public Ogg::File
+      {
+      public:
+        /*!
+         * Contructs a Speex file from \a file.  If \a readProperties is true the
+         * file's audio properties will also be read using \a propertiesStyle.  If
+         * false, \a propertiesStyle is ignored.
+         */
+        File(FileName file, bool readProperties = true,
+             Properties::ReadStyle propertiesStyle = Properties::Average);
 
-      /*!
-       * Returns the Speex::Properties for this file.  If no audio properties
-       * were read then this will return a null pointer.
-       */
-      virtual Properties *audioProperties() const;
+        /*!
+         * Destroys this instance of the File.
+         */
+        virtual ~File();
 
-      virtual bool save();
+        /*!
+         * Returns the XiphComment for this file.  XiphComment implements the tag
+         * interface, so this serves as the reimplementation of
+         * TagLib::File::tag().
+         */
+        virtual Ogg::XiphComment *tag() const;
 
-    private:
-      File(const File &);
-      File &operator=(const File &);
+        /*!
+         * Returns the Speex::Properties for this file.  If no audio properties
+         * were read then this will return a null pointer.
+         */
+        virtual Properties *audioProperties() const;
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+        virtual bool save();
 
-      class FilePrivate;
-      FilePrivate *d;
-    };
+      private:
+        File(const File &);
+        File &operator=(const File &);
+
+        void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+
+        class FilePrivate;
+        FilePrivate *d;
+      };
+    }
   }
-
 }
 
 #endif

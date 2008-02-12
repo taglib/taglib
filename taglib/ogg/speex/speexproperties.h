@@ -5,7 +5,7 @@
     copyright            : (C) 2002 - 2008 by Scott Wheeler
     email                : wheeler@kde.org
                            (original Vorbis implementation)
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -34,54 +34,56 @@
 
 namespace TagLib {
 
-  namespace Speex {
+  namespace Ogg {
 
-    class File;
+    namespace Speex {
 
-    //! An implementation of audio property reading for Ogg Speex
+      class File;
 
-    /*!
-     * This reads the data from an Ogg Speex stream found in the AudioProperties
-     * API.
-     */
-
-    class TAGLIB_EXPORT Properties : public AudioProperties
-    {
-    public:
-      /*!
-       * Create an instance of Speex::Properties with the data read from the
-       * Speex::File \a file.
-       */
-      Properties(File *file, ReadStyle style = Average);
+      //! An implementation of audio property reading for Ogg Speex
 
       /*!
-       * Destroys this Speex::Properties instance.
+       * This reads the data from an Ogg Speex stream found in the AudioProperties
+       * API.
        */
-      virtual ~Properties();
 
-      // Reimplementations.
+      class TAGLIB_EXPORT Properties : public AudioProperties
+      {
+      public:
+        /*!
+         * Create an instance of Speex::Properties with the data read from the
+         * Speex::File \a file.
+         */
+        Properties(File *file, ReadStyle style = Average);
 
-      virtual int length() const;
-      virtual int bitrate() const;
-      virtual int sampleRate() const;
-      virtual int channels() const;
+        /*!
+         * Destroys this Speex::Properties instance.
+         */
+        virtual ~Properties();
 
-      /*!
-       * Returns the Speex version, currently "0" (as specified by the spec).
-       */
-      int speexVersion() const;
+        // Reimplementations.
 
-    private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+        virtual int length() const;
+        virtual int bitrate() const;
+        virtual int sampleRate() const;
+        virtual int channels() const;
 
-      void read();
+        /*!
+         * Returns the Speex version, currently "0" (as specified by the spec).
+         */
+        int speexVersion() const;
 
-      class PropertiesPrivate;
-      PropertiesPrivate *d;
-    };
+      private:
+        Properties(const Properties &);
+        Properties &operator=(const Properties &);
+
+        void read();
+
+        class PropertiesPrivate;
+        PropertiesPrivate *d;
+      };
+    }
   }
-
 }
 
 #endif

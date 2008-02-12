@@ -161,6 +161,8 @@ namespace TagLib {
  *
  * \endcode
  *
+ * More examples can be found in the \e examples directory of the source distribution.
+ *
  * \section Contact
  *
  * Questions about TagLib should be directed to the TagLib mailing list, not directly to the author.

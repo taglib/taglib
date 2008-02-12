@@ -67,7 +67,7 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   case TagLib_File_MPEG:
     return reinterpret_cast<TagLib_File *>(new MPEG::File(filename));
   case TagLib_File_OggVorbis:
-    return reinterpret_cast<TagLib_File *>(new Vorbis::File(filename));
+    return reinterpret_cast<TagLib_File *>(new Ogg::Vorbis::File(filename));
   case TagLib_File_FLAC:
     return reinterpret_cast<TagLib_File *>(new FLAC::File(filename));
   case TagLib_File_MPC:
@@ -77,7 +77,7 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   case TagLib_File_WavPack:
     return reinterpret_cast<TagLib_File *>(new WavPack::File(filename));
   case TagLib_File_Speex:
-    return reinterpret_cast<TagLib_File *>(new Speex::File(filename));
+    return reinterpret_cast<TagLib_File *>(new Ogg::Speex::File(filename));
   case TagLib_File_TrueAudio:
     return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
   }
