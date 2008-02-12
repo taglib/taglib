@@ -82,33 +82,68 @@ namespace TagLib {
 
 /*!
  * \mainpage TagLib
+ *
  * \section intro Introduction
- * TagLib, is well, a library for reading and editing audio meta data, commonly know as \e tags.
  *
- * Some goals of TagLib:
+ * TagLib is a library for reading and editing audio meta data, commonly know as \e tags.
+ *
+ * Features:
  * - A clean, high level, C++ API to handling audio meta data.
- * - Support for at least ID3v1, ID3v2 and Ogg Vorbis \e comments.
- * - A generic, \e simple API for the most common tagging related functions.
- * - Binary compatibility between minor releases using the standard KDE/Qt techniques for C++ binary compatibility.
- * - Make the tagging framework extensible by library users; i.e. it is possible for libarary users to implement
- *   additional ID3v2 frames, without modifying the TagLib source (through the use of <i>Abstract Factories</i> and
- *   such).
- *
- * Because TagLib desires to be toolkit agnostic, in hope of being widely adopted and the most flexible in licensing
- * TagLib provides many of its own toolkit classes; in fact the only external dependancy that TagLib has, it a
- * semi-sane STL implementation.
+ * - Format specific APIs for advanced API users.
+ * - ID3v1, ID3v2, APE, FLAC and Xiph tag formats.
+ * - MP3, MPC, FLAC, Ogg FLAC, Ogg Vorbis and Speex file formats.
+ * - Basic audio file properties such as length, sample rate, etc.
+ * - Long term binary and source compatibility.
+ * - Extensible design, notably the ability to add other formats or extend current formats as a library user.
+ * - Full support for unicode and internationalized tags.
+ * - Dual <a href="http://www.mozilla.org/MPL/MPL-1.1.html">MPL</a> and
+ *   <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">LGPL</a> licenses.
+ * - No external toolkit dependancies.
  *
  * \section why Why TagLib?
  *
- * TagLib was written to fill a gap in the Open Source / Free Software community.  Currently there is a lack in the
- * OSS/FS for a homogenous API to the most common music types.
+ * TagLib originally was written to provide an updated and improved ID3v2 implementation in C++ for use
+ * in a variety of Open Source projects.  Since development began in 2002 and the 1.0 release in 2004
+ * it has expanded to cover a wide variety of tag and file formats and is used in a wide variety of
+ * Open Source and proprietary applications.  It now supports a variety of UNIXes, including Apple's OS
+ * X, as well as Microsoft Windows.
  *
- * As TagLib was initially injected into the KDE community, while I am not linking to any of the KDE or Qt libraries
- * I have tried to follow the coding style of those libraries.
+ * \section commercial Usage in Commercial Applications
  *
- * \section examples Examples:
+ * TagLib's licenses \e do allow usage within propriety (\e closed) applications, however TagLib is \e not
+ * public domain.  Please note the requirements of the LGPL or MPL, and adhere to at least one of them.
+ * In simple terms, you must at a minimum note your usage of TagLib, note the licensing terms of TagLib and
+ * if you make changes to TagLib publish them.  Please review the licenses above before using TagLib in your
+ * software.  Note that you may choose either the MPL or the LGPL, you do not have to fulfill the
+ * requirements of both.
  *
- * I've talked a lot about the \e homogenous API to common music formats.  Here's an example:
+ * \section installing
+ *
+ * Please see the <a href="http://developer.kde.org/~wheeler/taglib.html">TagLib website</a> for the latest
+ * downloads.
+ *
+ * Instructions for installing TagLib vary per platform, but generally speaking on UNIX standard configure and
+ * make commands are provided.  TagLib installs a taglib-config and package-config file to make it easier to
+ * integrate into various build systems.  Note that TagLib's include install directory \e must be included in
+ * the header include path.  Simply adding <taglib/tag.h> will \e not work.
+ *
+ * On Windows, TagLib can be built using the CMake build systems.
+ *
+ * \section start Getting Started
+ *
+ * TagLib provides both simple, abstract APIs which make it possible to ignore the differences between tagging
+ * formats and format specific APIs which allow programmers to work with the features of specific tagging
+ * schemes.  There is a similar abstraction mechanism for AudioProperties.
+ *
+ * The best place to start is with the <b>Class Hierarchy</b> linked at the top of the page.  The File and
+ * AudioProperties classes and their subclasses are the core of TagLib.  The FileRef class is also a convenient
+ * way for using a value-based handle.
+ *
+ * \note When working with FileRef please consider that it has only the most basic (extension-based) file
+ * type resolution.  Please see its documentation on how to plug in more advanced file type resolution.  (Such
+ * resolution may be part of later TagLib releases by default.)
+ *
+ * Here's a very simple example with TagLib:
  *
  * \code
  *
@@ -126,33 +161,14 @@ namespace TagLib {
  *
  * \endcode
  *
- * Note that these high level functions work for Ogg, FLAC, MPC \e and MP3 (or any other formats supported in the
- * future).  For this high level API, which is suitable for most applications, the differences between tag and file
- * formats can all be ignored.
- *
- * In addition to the high-level abstract APIs, there are also additional format specific APIs which allow users
- * of the library to work with tags and audio properties in more powerful ways.  See specifically the subclasses of
- * TagLib::File, TagLib::Tag and TagLib::AudioProperties.
- *
- * \section Building
- *
- * TagLib provides a script called taglib-config that returns the necessary compiler and linker flags, as well as the
- * version number.  To build a small sample program one would use:
- *
- * <tt>g++ taglib-test.cpp `taglib-config --cflags --libs` -o taglib-test</tt>
- *
- * This should generally be integrated into the configure check for TagLib in your project.
- *
- * \note TagLib includes assume that you have the TagLib include path specified in the compile line, by default
- * <tt>-I/usr/local/include/taglib</tt>.  Using <tt>#include <taglib/tag.h></tt> <b>will not work</b>.  (Though this
- * is usually handled by the taglib-config script mentioned above.)
- *
  * \section Contact
+ *
+ * Questions about TagLib should be directed to the TagLib mailing list, not directly to the author.
  *
  *  - <a href="http://developer.kde.org/~wheeler/taglib/">TagLib Homepage</a>
  *  - <a href="https://mail.kde.org/mailman/listinfo/taglib-devel">TagLib Mailing List (taglib-devel@kde.org)</a>
  *
- * \author Scott Wheeler <wheeler@kde.org>
+ * \author Scott Wheeler <wheeler@kde.org> et al.
  *
  */
 
