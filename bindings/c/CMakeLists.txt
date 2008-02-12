@@ -8,7 +8,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpc
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/speex
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/trueaudio
 )
 
