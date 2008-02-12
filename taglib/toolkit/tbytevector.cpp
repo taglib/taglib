@@ -89,7 +89,7 @@ namespace TagLib {
   };
 
   /*!
-   * A templatized find that works both with a ByteVector and a ByteVectorMirror.
+   * A templatized KMP find that works both with a ByteVector and a ByteVectorMirror.
    */
 
   template <class Vector>
@@ -146,6 +146,7 @@ namespace TagLib {
   {
   public:
     ByteVectorMirror(const ByteVector &source) : v(source) {}
+
     const char operator[](int index) const
     {
       return v[v.size() - index - 1];
@@ -170,6 +171,12 @@ namespace TagLib {
     {
       ByteVectorMirror v(*this);
 
+      if(offset > 0) {
+        offset = size() - offset - pattern.size();
+        if(offset >= size())
+          offset = 0;
+      }
+
       const int pos = vectorFind<ByteVectorMirror>(v, pattern, offset, byteAlign);
 
       // If the offset is zero then we need to adjust the location in the search
@@ -184,14 +191,11 @@ namespace TagLib {
       if(pos == -1)
         return -1;
 
-      if(offset == 0)
-        return size() - pos - pattern.size();
-      else
-        return pos - offset;
+      return size() - pos - pattern.size();
     }
 
   private:
-    const ByteVector v;
+    const ByteVector &v;
   };
 
   template <class T>

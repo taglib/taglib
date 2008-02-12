@@ -139,7 +139,7 @@ public:
 
   void testRfind1()
   {
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector(".OggS....").rfind("OggS", 0));
+    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 0));
     CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 1));
     CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 2));
     CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 3));
@@ -168,7 +168,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, r3.find("OggS"));
     CPPUNIT_ASSERT_EQUAL(10, r3.rfind("OggS"));
     CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS"));
-    CPPUNIT_ASSERT_EQUAL(0, r4.rfind("OggS", 0));
+    CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS", 0));
     CPPUNIT_ASSERT_EQUAL(5, r4.rfind("OggS", 7));
     CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS", 12));
   }

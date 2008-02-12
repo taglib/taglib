@@ -212,7 +212,8 @@ bool MPEG::File::save(int tags, bool stripOthers)
     if(d->hasAPE)
       insert(APETag()->render(), d->APELocation, d->APEOriginalSize);
     else {
-      if(d->hasID3v1)  {
+      if(d->hasID3v1) {
+        debug("inserting ape tag before id3v1 tag");
         insert(APETag()->render(), d->ID3v1Location, 0);
         d->APEOriginalSize = APETag()->footer()->completeTagSize();
         d->hasAPE = true;
@@ -561,15 +562,13 @@ long MPEG::File::findID3v1()
 long MPEG::File::findAPE()
 {
   if(isValid()) {
-    if (d->hasID3v1)
-        seek(-160, End);
-    else
-        seek(-32, End);
-
+    seek(d->hasID3v1 ? -160 : -32, End);
     long p = tell();
 
-    if(readBlock(8) == APE::Tag::fileIdentifier())
+    if(readBlock(8) == APE::Tag::fileIdentifier()) {
+      debug("found ape at " + String::number(int(p)));
       return p;
+    }
   }
   return -1;
 }
