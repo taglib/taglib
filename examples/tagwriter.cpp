@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 #include <tlist.h>
@@ -46,7 +45,11 @@ bool isArgument(const char *s)
 bool isFile(const char *s)
 {
   struct stat st;
+#ifdef _WIN32
+  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG));
+#else
   return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG | S_IFLNK));
+#endif
 }
 
 void usage()

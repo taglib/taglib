@@ -98,7 +98,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   // characters.  Also make sure that there is data in the frame.
 
   if(!frameID.size() == (version < 3 ? 3 : 4) ||
-     header->frameSize() <= (header->dataLengthIndicator() ? 4 : 0) ||
+     header->frameSize() <= uint(header->dataLengthIndicator() ? 4 : 0) ||
      header->frameSize() > data.size())
   {
     delete header;

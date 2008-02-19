@@ -91,18 +91,23 @@ File::FilePrivate::FilePrivate(FileName fileName) :
 
 #ifdef _WIN32
 
-  file = _wfopen(name, L"rb+");
+  if(wcslen((const wchar_t *) fileName) > 0) {
 
-  if(file)
-    readOnly = false;
-  else
-    file = _wfopen(name, L"rb");
+    file = _wfopen(name, L"rb+");
 
-  if(file)
-    return;
+    if(file)
+      readOnly = false;
+    else
+      file = _wfopen(name, L"rb");
+
+    if(file)
+      return;
+
+  }
 
 #endif
 
+  debug("trying ot use char");
   file = fopen(name, "rb+");
 
   if(file)

@@ -1,6 +1,7 @@
 if(BUILD_EXAMPLES)
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
