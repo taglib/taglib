@@ -107,7 +107,6 @@ File::FilePrivate::FilePrivate(FileName fileName) :
 
 #endif
 
-  debug("trying ot use char");
   file = fopen(name, "rb+");
 
   if(file)
