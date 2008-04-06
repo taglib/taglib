@@ -24,6 +24,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <tstring.h>
+#include <string.h>
 
 using namespace std;
 using namespace TagLib;
