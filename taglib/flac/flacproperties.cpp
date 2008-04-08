@@ -146,5 +146,5 @@ void FLAC::Properties::read()
 
   // Real bitrate:
 
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? ((d->streamLength * 8UL) / d->length) / 1000 : 0;
 }
