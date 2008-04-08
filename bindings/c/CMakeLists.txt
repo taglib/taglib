@@ -26,18 +26,19 @@ ADD_LIBRARY(tag_c SHARED ${tag_c_LIB_SRCS})
 TARGET_LINK_LIBRARIES(tag_c  tag )
 
 # On Solaris we need to explicitly add the C++ standard and runtime
-# libraries to the libs used by this library, to link them to apps
-# using these bindings.
+# libraries to the libs used by the C bindings, because those C bindings
+# themselves won't pull in the C++ libs -- and if a C application is
+# using the C bindings then we get link errors.
 CHECK_LIBRARY_EXISTS(Crun __RTTI___ "" HAVE_CRUN_LIB)
 IF(HAVE_CRUN_LIB)
   # Which libraries to link depends critically on which
   # STL version is going to be used by your application
   # and which runtime is in use. While Crun is pretty much
   # the only game in town, the three available STLs -- Cstd,
-  # stlport4 and stdcxx -- make this a mess. We really only
-  # support stdcxx, but won't force the issue here.
+  # stlport4 and stdcxx -- make this a mess. The KDE-Solaris
+  # team supports stdcxx (Apache RogueWave stdcxx 4.1.3).
   #
-  TARGET_LINK_LIBRARIES(tag_c Crun)
+  TARGET_LINK_LIBRARIES(tag_c stdcxx Crun)
 ENDIF(HAVE_CRUN_LIB)
 
 SET_TARGET_PROPERTIES(tag_c PROPERTIES
