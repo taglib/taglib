@@ -125,7 +125,9 @@ String ID3v2::Tag::comment() const
 
   for(FrameList::ConstIterator it = comments.begin(); it != comments.end(); ++it)
   {
-    if(static_cast<CommentsFrame *>(*it)->description().isEmpty())
+    CommentsFrame *frame = dynamic_cast<CommentsFrame *>(*it);
+
+    if(frame && frame->description().isEmpty())
       return (*it)->toString();
   }
 
