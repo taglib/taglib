@@ -123,7 +123,8 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 
       // First we update the global size
 
-      insert(ByteVector::fromUInt(d->size + sizeDifference, d->endianness == BigEndian), 4, 4);
+      insert(ByteVector::fromUInt(d->size + sizeDifference,
+                                  d->endianness == BigEndian), 4, 4);
 
       // Now update the specific chunk
 

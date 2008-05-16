@@ -35,6 +35,7 @@
 #include "wavpackfile.h"
 #include "speexfile.h"
 #include "trueaudiofile.h"
+#include "aifffile.h"
 
 using namespace TagLib;
 
@@ -58,7 +59,7 @@ List<const FileRef::FileTypeResolver *> FileRef::FileRefPrivate::fileTypeResolve
 
 FileRef::FileRef()
 {
-    d = new FileRefPrivate(0);
+  d = new FileRefPrivate(0);
 }
 
 FileRef::FileRef(FileName fileName, bool readAudioProperties,
@@ -121,6 +122,8 @@ StringList FileRef::defaultFileExtensions()
   l.append("wv");
   l.append("spx");
   l.append("tta");
+  l.append("aif");
+  l.append("aiff");
 
   return l;
 }
@@ -197,6 +200,12 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".TTA")
       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(s.substr(s.size() - 4, 4).upper() == ".AIF")
+      return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
+  }
+  if(s.size() > 5) {
+    if(s.substr(s.size() - 5, 5).upper() == ".AIFF")
+      return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
   return 0;
