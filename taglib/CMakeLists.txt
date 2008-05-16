@@ -125,6 +125,7 @@ riff/rifffile.cpp
 
 SET(aiff_SRCS
 riff/aiff/aifffile.cpp
+riff/aiff/aiffproperties.cpp
 )
 
 SET(toolkit_SRCS

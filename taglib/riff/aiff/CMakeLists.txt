@@ -1,1 +1,1 @@
-INSTALL( FILES  aifffile.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
+INSTALL( FILES  aifffile.h aiffproperties.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)

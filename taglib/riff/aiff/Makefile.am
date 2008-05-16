@@ -7,7 +7,7 @@ INCLUDES = \
 
 noinst_LTLIBRARIES = libaiff.la
 
-libaiff_la_SOURCES = aifffile.cpp
+libaiff_la_SOURCES = aifffile.cpp aiffproperties.cpp
 
-taglib_include_HEADERS = aifffile.h
+taglib_include_HEADERS = aifffile.h aiffproperties.h
 taglib_includedir = $(includedir)/taglib
