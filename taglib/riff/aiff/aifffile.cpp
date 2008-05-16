@@ -38,15 +38,18 @@ using namespace TagLib;
 class RIFF::AIFF::File::FilePrivate
 {
 public:
-  FilePrivate()
+  FilePrivate() :
+    tag(0)
   {
 
   }
 
   ~FilePrivate()
   {
-
+    delete tag;
   }
+
+  ID3v2::Tag *tag;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +71,7 @@ RIFF::AIFF::File::~File()
 
 ID3v2::Tag *RIFF::AIFF::File::tag() const
 {
-  return 0;
+  return d->tag;
 }
 
 RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
@@ -92,7 +95,11 @@ bool RIFF::AIFF::File::save()
 
 void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
 {
-  debug("Found " + String::number(chunkCount()) + " chunks.");
-  for(int i = 0; i < chunkCount(); i++)
-    debug("\t\"" + chunkName(i) + "\"");
+  for(uint i = 0; i < chunkCount(); i++) {
+    if(chunkName(i) == "ID3 ")
+      d->tag = new ID3v2::Tag(this, chunkOffset(i));
+  }
+
+  if(!d->tag)
+    d->tag = new ID3v2::Tag;
 }

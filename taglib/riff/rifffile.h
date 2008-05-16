@@ -58,6 +58,7 @@ namespace TagLib {
       File(FileName file, Endianness endianness);
 
       uint chunkCount() const;
+      uint chunkOffset(uint i) const;
       ByteVector chunkName(uint i) const;
       ByteVector chunkData(uint i);
 

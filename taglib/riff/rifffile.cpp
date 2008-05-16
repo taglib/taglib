@@ -43,6 +43,7 @@ public:
   ByteVector format;
 
   ByteVectorList chunkNames;
+  List<uint> chunkOffsets;
   List<uint> chunkSizes;
 };
 
@@ -71,6 +72,11 @@ RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
 uint RIFF::File::chunkCount() const
 {
   return d->chunkNames.size();
+}
+
+uint RIFF::File::chunkOffset(uint i) const
+{
+  return d->chunkOffsets[i];
 }
 
 ByteVector RIFF::File::chunkName(uint i) const
@@ -116,6 +122,8 @@ void RIFF::File::read()
 
     d->chunkNames.append(chunkName);
     d->chunkSizes.append(chunkSize);
+
+    d->chunkOffsets.append(tell());
 
     seek(chunkSize, Current);
   }
