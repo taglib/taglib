@@ -32,8 +32,6 @@
 
 namespace TagLib {
 
-  namespace ID3v2 { class Tag; }
-
   namespace RIFF {
 
     //! An implementation of AIFF metadata
