@@ -1,7 +1,8 @@
+SUBDIRS = aiff
+
 INCLUDES = \
 	-I$(top_srcdir)/taglib \
 	-I$(top_srcdir)/taglib/toolkit \
-	-I$(top_srcdir)/taglib/mpeg/id3v2 \
 	$(all_includes)
 
 noinst_LTLIBRARIES = libriff.la
