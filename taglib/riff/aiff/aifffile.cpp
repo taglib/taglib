@@ -86,6 +86,8 @@ bool RIFF::AIFF::File::save()
     return false;
   }
 
+  setChunkData("ID3 ", d->tag->render());
+
   return true;
 }
 

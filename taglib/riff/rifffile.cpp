@@ -127,7 +127,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 
       // Now update the specific chunk
 
-      writeChunk(name, data, d->chunkOffsets[i] - 8, d->chunkOffsets[i] + 8);
+      writeChunk(name, data, d->chunkOffsets[i] - 8, d->chunkSizes[i] + 8);
 
       // Now update the internal offsets
 
@@ -169,8 +169,10 @@ void RIFF::File::read()
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
                             ulong offset, ulong replace)
 {
-  ByteVector value = name;
-  value.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
-  value.append(data);
-  insert(data, offset, replace);
+  debug("Writting chunk at " + String::number(offset));
+
+  ByteVector combined = name;
+  combined.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
+  combined.append(data);
+  insert(combined, offset, replace);
 }
