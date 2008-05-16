@@ -39,6 +39,7 @@ class RIFF::AIFF::File::FilePrivate
 {
 public:
   FilePrivate() :
+    properties(0),
     tag(0)
   {
 
@@ -46,9 +47,11 @@ public:
 
   ~FilePrivate()
   {
+    delete properties;
     delete tag;
   }
 
+  Properties *properties;
   ID3v2::Tag *tag;
 };
 
@@ -76,7 +79,7 @@ ID3v2::Tag *RIFF::AIFF::File::tag() const
 
 RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
 {
-  return 0;
+  return d->properties;
 }
 
 bool RIFF::AIFF::File::save()
@@ -95,11 +98,13 @@ bool RIFF::AIFF::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   for(uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 ")
       d->tag = new ID3v2::Tag(this, chunkOffset(i));
+    else if(chunkName(i) == "COMM" && readProperties)
+      d->properties = new Properties(chunkData(i), propertiesStyle);
   }
 
   if(!d->tag)
