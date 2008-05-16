@@ -138,7 +138,11 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
     }
   }
 
-  debug("Could not find chunk.");
+  // Couldn't find an existing chunk, so let's create a new one.  First update
+  // the global size:
+
+  insert(ByteVector::fromUInt(d->size + data.size() + 8, d->endianness == BigEndian), 4, 4);
+  writeChunk(name, data, d->chunkOffsets.back() + d->chunkSizes.back());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,12 +169,10 @@ void RIFF::File::read()
     seek(chunkSize, Current);
   }
 }
-    
+
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
                             ulong offset, ulong replace)
 {
-  debug("Writting chunk at " + String::number(offset));
-
   ByteVector combined = name;
   combined.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
   combined.append(data);
