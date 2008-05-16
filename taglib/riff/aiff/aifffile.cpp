@@ -92,5 +92,7 @@ bool RIFF::AIFF::File::save()
 
 void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
 {
-
+  debug("Found " + String::number(chunkCount()) + " chunks.");
+  for(int i = 0; i < chunkCount(); i++)
+    debug("\t\"" + chunkName(i) + "\"");
 }

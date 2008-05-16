@@ -27,6 +27,7 @@
 #define TAGLIB_AIFFFILE_H
 
 #include <rifffile.h>
+#include <id3v2tag.h>
 #include <audioproperties.h>
 
 namespace TagLib {
