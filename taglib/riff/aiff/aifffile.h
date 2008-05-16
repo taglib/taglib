@@ -61,43 +61,43 @@ namespace TagLib {
       class TAGLIB_EXPORT File : public TagLib::RIFF::File
       {
       public:
-	/*!
-	 * Contructs an AIFF file from \a file.  If \a readProperties is true the
-	 * file's audio properties will also be read using \a propertiesStyle.  If
-	 * false, \a propertiesStyle is ignored.
-	 */
-	File(FileName file, bool readProperties = true,
-	     Properties::ReadStyle propertiesStyle = Properties::Average);
+        /*!
+         * Contructs an AIFF file from \a file.  If \a readProperties is true the
+         * file's audio properties will also be read using \a propertiesStyle.  If
+         * false, \a propertiesStyle is ignored.
+         */
+        File(FileName file, bool readProperties = true,
+             Properties::ReadStyle propertiesStyle = Properties::Average);
 
-	/*!
-	 * Destroys this instance of the File.
-	 */
-	virtual ~File();
+        /*!
+         * Destroys this instance of the File.
+         */
+        virtual ~File();
 
-	/*!
-	 * Returns the Tag for this file.
-	 */
-	virtual ID3v2::Tag *tag() const;
+        /*!
+         * Returns the Tag for this file.
+         */
+        virtual ID3v2::Tag *tag() const;
 
-	/*!
-	 * Returns the AIFF::Properties for this file.  If no audio properties
-	 * were read then this will return a null pointer.
-	 */
-	virtual Properties *audioProperties() const;
+        /*!
+         * Returns the AIFF::Properties for this file.  If no audio properties
+         * were read then this will return a null pointer.
+         */
+        virtual Properties *audioProperties() const;
 
-	/*!
-	 * Saves the file.
-	 */
-	virtual bool save();
+        /*!
+         * Saves the file.
+         */
+        virtual bool save();
 
       private:
-	File(const File &);
-	File &operator=(const File &);
+        File(const File &);
+        File &operator=(const File &);
 
-	void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+        void read(bool readProperties, Properties::ReadStyle propertiesStyle);
 
-	class FilePrivate;
-	FilePrivate *d;
+        class FilePrivate;
+        FilePrivate *d;
       };
     }
   }
