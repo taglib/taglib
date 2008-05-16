@@ -93,6 +93,8 @@ namespace TagLib {
       File &operator=(const File &);
 
       void read();
+      void writeChunk(const ByteVector &name, const ByteVector &data,
+                      ulong offset, ulong replace = 0);
 
       class FilePrivate;
       FilePrivate *d;
