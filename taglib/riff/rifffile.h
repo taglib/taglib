@@ -57,10 +57,36 @@ namespace TagLib {
 
       File(FileName file, Endianness endianness);
 
+      /*!
+       * \return The number of chunks in the file.
+       */
       uint chunkCount() const;
+
+      /*!
+       * \return The offset within the file for the selected chunk number.
+       */
       uint chunkOffset(uint i) const;
+
+      /*!
+       * \return The name of the specified chunk, for instance, "COMM" or "ID3 "
+       */
       ByteVector chunkName(uint i) const;
+
+      /*!
+       * Reads the chunk data from the file and returns it.
+       *
+       * \note This \e will move the read pointer for the file.
+       */
       ByteVector chunkData(uint i);
+
+      /*!
+       * Sets the data for the chunk \a name to \a data.  If a chunk with the
+       * given name already exists it will be overwritten, otherwise it will be
+       * created after the existing chunks.
+       *
+       * \warning This will update the file immediately.
+       */
+      void setChunkData(const ByteVector &name, const ByteVector &data);
 
     private:
       File(const File &);
