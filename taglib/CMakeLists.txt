@@ -14,6 +14,8 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/ape
     ${CMAKE_CURRENT_SOURCE_DIR}/wavpack
     ${CMAKE_CURRENT_SOURCE_DIR}/trueaudio
+    ${CMAKE_CURRENT_SOURCE_DIR}/riff
+    ${CMAKE_CURRENT_SOURCE_DIR}/riff/aiff
     ${CMAKE_CURRENT_BINARY_DIR}/taglib
     ${CMAKE_CURRENT_BINARY_DIR}/..
 )
@@ -29,8 +31,7 @@ ADD_SUBDIRECTORY( ape )
 ADD_SUBDIRECTORY( mpc )
 ADD_SUBDIRECTORY( wavpack )
 ADD_SUBDIRECTORY( trueaudio )
-
-
+ADD_SUBDIRECTORY( riff )
 
 ########### next target ###############
 
@@ -118,6 +119,14 @@ trueaudio/trueaudiofile.cpp
 trueaudio/trueaudioproperties.cpp
 )
 
+SET(riff_SRCS
+riff/rifffile.cpp
+)
+
+SET(aiff_SRCS
+riff/aiff/aifffile.cpp
+)
+
 SET(toolkit_SRCS
 toolkit/tstring.cpp
 toolkit/tstringlist.cpp
@@ -130,7 +139,7 @@ toolkit/unicode.cpp
 
 SET(tag_LIB_SRCS ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
 		 ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
-		 ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS}
+		 ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS}
 		 tag.cpp
 		 tagunion.cpp
 		 fileref.cpp

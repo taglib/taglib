@@ -73,12 +73,12 @@ RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
     read();
 }
 
-uint RIFF::File::chunkCount() const
+TagLib::uint RIFF::File::chunkCount() const
 {
   return d->chunkNames.size();
 }
 
-uint RIFF::File::chunkOffset(uint i) const
+TagLib::uint RIFF::File::chunkOffset(uint i) const
 {
   return d->chunkOffsets[i];
 }
