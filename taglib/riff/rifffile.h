@@ -52,7 +52,14 @@ namespace TagLib {
       virtual ~File();
 
     protected:
-      File(FileName file);
+
+      enum Endianness { BigEndian, LittleEndian };
+
+      File(FileName file, Endianness endianness);
+
+      uint chunkCount() const;
+      ByteVector chunkName(uint i) const;
+      ByteVector chunkData(uint i);
 
     private:
       File(const File &);

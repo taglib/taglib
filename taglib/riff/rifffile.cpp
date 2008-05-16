@@ -24,21 +24,26 @@
  ***************************************************************************/
 
 #include "rifffile.h"
+#include <tbytevectorlist.h>
 
 using namespace TagLib;
 
 class RIFF::File::FilePrivate
 {
 public:
-  FilePrivate()
+  FilePrivate() :
+    endianness(BigEndian),
+    size(0)
   {
 
   }
+  Endianness endianness;
+  ByteVector type;
+  uint size;
+  ByteVector format;
 
-  ~FilePrivate()
-  {
-
-  }
+  ByteVectorList chunkNames;
+  List<uint> chunkSizes;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,12 +59,43 @@ RIFF::File::~File()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::File::File(FileName file) : TagLib::File(file)
+RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
 {
   d = new FilePrivate;
+  d->endianness = endianness;
 
   if(isOpen())
     read();
+}
+
+uint RIFF::File::chunkCount() const
+{
+  return d->chunkNames.size();
+}
+
+ByteVector RIFF::File::chunkName(uint i) const
+{
+  if(i >= chunkCount())
+    return ByteVector::null;
+
+  return d->chunkNames[i];
+}
+
+ByteVector RIFF::File::chunkData(uint i)
+{
+  if(i >= chunkCount())
+    return ByteVector::null;
+
+  // Offset for the first subchunk's data
+
+  long begin = 12 + 8;
+
+  for(uint it = 0; it < i; it++)
+    begin += 8 + d->chunkSizes[it];
+
+  seek(begin);
+
+  return readBlock(d->chunkSizes[i]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,5 +104,19 @@ RIFF::File::File(FileName file) : TagLib::File(file)
 
 void RIFF::File::read()
 {
+  bool bigEndian = (d->endianness == BigEndian);
 
+  d->type = readBlock(4);
+  d->size = readBlock(4).toUInt(bigEndian);
+  d->format = readBlock(4);
+
+  while(tell() < length()) {
+    ByteVector chunkName = readBlock(4);
+    uint chunkSize = readBlock(4).toUInt(bigEndian);
+
+    d->chunkNames.append(chunkName);
+    d->chunkSizes.append(chunkSize);
+
+    seek(chunkSize, Current);
+  }
 }
