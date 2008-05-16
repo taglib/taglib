@@ -26,6 +26,10 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <cmath>
+// ldexp is a c99 function, which might not be defined in <cmath>
+// so we pull in math.h too and hope it does the right (wrong) thing
+// wrt. c99 functions in C++
+#include <math.h>
 
 #include "aiffproperties.h"
 
