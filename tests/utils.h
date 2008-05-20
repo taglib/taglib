@@ -1,6 +1,7 @@
 #include <string>
 #include <stdio.h>
 #include <sys/fcntl.h>
+#include <fcntl.h>
 
 using namespace std;
 
