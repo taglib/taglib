@@ -93,6 +93,7 @@ HEADERS += audioproperties.h \
            mpeg/id3v2/frames/attachedpictureframe.h \
            mpeg/id3v2/frames/commentsframe.h \
            mpeg/id3v2/frames/generalencapsulatedobjectframe.h \
+           mpeg/id3v2/frames/popularimeterframe.h \
            mpeg/id3v2/frames/relativevolumeframe.h \
            mpeg/id3v2/frames/textidentificationframe.h \
            mpeg/id3v2/frames/uniquefileidentifierframe.h \
@@ -148,6 +149,7 @@ SOURCES += audioproperties.cpp \
            mpeg/id3v2/frames/attachedpictureframe.cpp \
            mpeg/id3v2/frames/commentsframe.cpp \
            mpeg/id3v2/frames/generalencapsulatedobjectframe.cpp \
+           mpeg/id3v2/frames/popularimeterframe.cpp \
            mpeg/id3v2/frames/relativevolumeframe.cpp \
            mpeg/id3v2/frames/textidentificationframe.cpp \
            mpeg/id3v2/frames/uniquefileidentifierframe.cpp \

@@ -41,6 +41,7 @@
 #include "frames/generalencapsulatedobjectframe.h"
 #include "frames/urllinkframe.h"
 #include "frames/unsynchronizedlyricsframe.h"
+#include "frames/popularimeterframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -218,6 +219,12 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
     if(d->useDefaultEncoding)
       f->setTextEncoding(d->defaultEncoding);
     return f;
+  }
+
+  // Popularimeter (frames 4.17)
+
+  if(frameID == "POPM") {
+    return new PopularimeterFrame(data, header);
   }
 
   return new UnknownFrame(data, header);

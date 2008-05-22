@@ -10,6 +10,7 @@ libframes_la_SOURCES = \
 	attachedpictureframe.cpp \
 	commentsframe.cpp \
 	generalencapsulatedobjectframe.cpp \
+	popularimeterframe.cpp \
 	relativevolumeframe.cpp \
 	textidentificationframe.cpp \
 	uniquefileidentifierframe.cpp \
@@ -21,6 +22,7 @@ taglib_include_HEADERS = \
 	attachedpictureframe.h \
 	commentsframe.h \
 	generalencapsulatedobjectframe.h \
+	popularimeterframe.h \
 	relativevolumeframe.h \
 	textidentificationframe.h \
 	uniquefileidentifierframe.h \

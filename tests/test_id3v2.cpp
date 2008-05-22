@@ -9,6 +9,7 @@
 #include <attachedpictureframe.h>
 #include <generalencapsulatedobjectframe.h>
 #include <relativevolumeframe.h>
+#include <popularimeterframe.h>
 #include <urllinkframe.h>
 #include "utils.h"
 
@@ -37,6 +38,11 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseAPIC);
   CPPUNIT_TEST(testParseAPIC_UTF16_BOM);
   CPPUNIT_TEST(testParseGEOB);
+  CPPUNIT_TEST(testPOPMtoString);
+  CPPUNIT_TEST(testParsePOPM);
+  CPPUNIT_TEST(testParsePOPMWithoutCounter);
+  CPPUNIT_TEST(testRenderPOPM);
+  CPPUNIT_TEST(testPOPMFromFile);
   CPPUNIT_TEST(testParseRelativeVolumeFrame);
   CPPUNIT_TEST(testParseUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testParseEmptyUniqueFileIdentifierFrame);
@@ -136,6 +142,75 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("m"), f.mimeType());
     CPPUNIT_ASSERT_EQUAL(String("f"), f.fileName());
     CPPUNIT_ASSERT_EQUAL(String("d"), f.description());
+  }
+
+  void testParsePOPM()
+  {
+    ID3v2::PopularimeterFrame f(ByteVector("POPM"
+                                           "\x00\x00\x00\x17"
+                                           "\x00\x00"
+                                           "email@example.com\x00"
+                                           "\x02"
+                                           "\x00\x00\x00\x03", 33));
+    CPPUNIT_ASSERT_EQUAL(String("email@example.com"), f.email());
+    CPPUNIT_ASSERT_EQUAL(2, f.rating());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), f.counter());
+  }
+
+  void testParsePOPMWithoutCounter()
+  {
+    ID3v2::PopularimeterFrame f(ByteVector("POPM"
+                                           "\x00\x00\x00\x13"
+                                           "\x00\x00"
+                                           "email@example.com\x00"
+                                           "\x02", 29));
+    CPPUNIT_ASSERT_EQUAL(String("email@example.com"), f.email());
+    CPPUNIT_ASSERT_EQUAL(2, f.rating());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.counter());
+  }
+
+  void testRenderPOPM()
+  {
+    ID3v2::PopularimeterFrame f;
+    f.setEmail("email@example.com");
+    f.setRating(2);
+    f.setCounter(3);
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("POPM"
+                 "\x00\x00\x00\x17"
+                 "\x00\x00"
+                 "email@example.com\x00"
+                 "\x02"
+                 "\x00\x00\x00\x03", 33),
+      f.render());
+  }
+
+  void testPOPMtoString()
+  {
+    ID3v2::PopularimeterFrame f;
+    f.setEmail("email@example.com");
+    f.setRating(2);
+    f.setCounter(3);
+    CPPUNIT_ASSERT_EQUAL(
+      String("email@example.com rating=2 counter=3"), f.toString());
+  }
+
+  void testPOPMFromFile()
+  {
+    string newname = copyFile("xing", ".mp3");
+
+    ID3v2::PopularimeterFrame *f = new ID3v2::PopularimeterFrame();
+    f->setEmail("email@example.com");
+    f->setRating(2);
+    f->setCounter(3);
+
+    MPEG::File foo(newname.c_str());
+    foo.ID3v2Tag()->addFrame(f);
+    foo.save();
+
+    MPEG::File bar(newname.c_str());
+    CPPUNIT_ASSERT_EQUAL(String("email@example.com"), dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->email());
+    deleteFile(newname);
   }
 
   // http://bugs.kde.org/show_bug.cgi?id=150481
