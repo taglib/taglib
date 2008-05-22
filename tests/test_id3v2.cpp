@@ -201,7 +201,7 @@ public:
 
     ID3v2::PopularimeterFrame *f = new ID3v2::PopularimeterFrame();
     f->setEmail("email@example.com");
-    f->setRating(2);
+    f->setRating(200);
     f->setCounter(3);
 
     MPEG::File foo(newname.c_str());
@@ -210,6 +210,7 @@ public:
 
     MPEG::File bar(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("email@example.com"), dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->email());
+    CPPUNIT_ASSERT_EQUAL(200, dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->rating());
     deleteFile(newname);
   }
 
