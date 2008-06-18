@@ -1,10 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2006 by Lukáš Lalinský
-    email                : lalinsky@gmail.com
-
-    copyright            : (C) 2004 by Allan Sandfeld Jensen
-    email                : kde@carewolf.org
-                           (original MPC implementation)
+    copyright            : (C) 2008 by Scott Wheeler
+    email                : wheeler@kde.org
  ***************************************************************************/
 
 /***************************************************************************
