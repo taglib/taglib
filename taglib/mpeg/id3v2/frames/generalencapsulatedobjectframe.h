@@ -63,7 +63,7 @@ namespace TagLib {
        * Constructs a GeneralEncapsulatedObjectFrame frame based on \a data.
        *
        * \warning This is \em not data for the encapsulated object, for that use
-       * setObject().  This construcotr is used when reading the frame from the
+       * setObject().  This constructor is used when reading the frame from the
        * disk.
        */
       explicit GeneralEncapsulatedObjectFrame(const ByteVector &data);
