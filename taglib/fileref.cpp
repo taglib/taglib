@@ -36,6 +36,7 @@
 #include "speexfile.h"
 #include "trueaudiofile.h"
 #include "aifffile.h"
+#include "wavfile.h"
 
 using namespace TagLib;
 
@@ -124,6 +125,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("tta");
   l.append("aif");
   l.append("aiff");
+  l.append("wav");
 
   return l;
 }
@@ -202,6 +204,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(s.substr(s.size() - 4, 4).upper() == ".AIF")
       return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(s.substr(s.size() - 4, 4).upper() == ".WAV")
+      return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
   if(s.size() > 5) {
     if(s.substr(s.size() - 5, 5).upper() == ".AIFF")

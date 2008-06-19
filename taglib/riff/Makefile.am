@@ -1,4 +1,4 @@
-SUBDIRS = aiff
+SUBDIRS = aiff wav
 
 INCLUDES = \
 	-I$(top_srcdir)/taglib \
@@ -12,4 +12,4 @@ libriff_la_SOURCES = rifffile.cpp
 taglib_include_HEADERS = rifffile.h
 taglib_includedir = $(includedir)/taglib
 
-libriff_la_LIBADD = ./aiff/libaiff.la 
+libriff_la_LIBADD = ./aiff/libaiff.la ./wav/libwav.la

@@ -14,6 +14,7 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/trueaudio \
 	-I$(top_srcdir)/taglib/riff \
 	-I$(top_srcdir)/taglib/riff/aiff \
+	-I$(top_srcdir)/taglib/riff/wav \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 \
 	$(all_includes)
 
