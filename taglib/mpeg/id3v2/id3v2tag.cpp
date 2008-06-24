@@ -161,6 +161,9 @@ String ID3v2::Tag::genre() const
 
   for(StringList::Iterator it = fields.begin(); it != fields.end(); ++it) {
 
+    if((*it).isEmpty())
+      continue;
+
     bool isNumber = true;
 
     for(String::ConstIterator charIt = (*it).begin();
