@@ -65,6 +65,7 @@ mpeg/id3v2/frames/attachedpictureframe.cpp
 mpeg/id3v2/frames/commentsframe.cpp
 mpeg/id3v2/frames/generalencapsulatedobjectframe.cpp
 mpeg/id3v2/frames/popularimeterframe.cpp
+mpeg/id3v2/frames/privateframe.cpp
 mpeg/id3v2/frames/relativevolumeframe.cpp
 mpeg/id3v2/frames/textidentificationframe.cpp
 mpeg/id3v2/frames/uniquefileidentifierframe.cpp

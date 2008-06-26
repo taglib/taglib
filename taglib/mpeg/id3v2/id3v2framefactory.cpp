@@ -42,6 +42,7 @@
 #include "frames/urllinkframe.h"
 #include "frames/unsynchronizedlyricsframe.h"
 #include "frames/popularimeterframe.h"
+#include "frames/privateframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -223,9 +224,13 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   // Popularimeter (frames 4.17)
 
-  if(frameID == "POPM") {
+  if(frameID == "POPM")
     return new PopularimeterFrame(data, header);
-  }
+
+  // Private (frames 4.27)
+
+  if(frameID == "POPM")
+    return new PrivateFrame(data, header);
 
   return new UnknownFrame(data, header);
 }
