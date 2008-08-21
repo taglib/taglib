@@ -510,6 +510,8 @@ String String::number(int n) // static
 
 TagLib::wchar &String::operator[](int i)
 {
+  detach();
+
   return d->data[i];
 }
 
