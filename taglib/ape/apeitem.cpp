@@ -160,14 +160,14 @@ String APE::Item::toString() const
 bool APE::Item::isEmpty() const
 {
   switch(d->type) {
-    case 0:
-    case 1:
+    case Text:
+    case Binary:
       if(d->text.isEmpty())
         return true;
       if(d->text.size() == 1 && d->text.front().isEmpty())
         return true;
       return false;
-    case 2:
+    case Locator:
       return d->value.isEmpty();
     default:
       return false;
@@ -206,8 +206,9 @@ ByteVector APE::Item::render() const
   if(isEmpty())
     return data;
 
-  if(d->type != Item::Binary) {
+  if(d->type == Text) {
     StringList::ConstIterator it = d->text.begin();
+
     value.append(it->data(String::UTF8));
     it++;
     for(; it != d->text.end(); ++it) {
