@@ -229,7 +229,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   // Private (frames 4.27)
 
-  if(frameID == "POPM")
+  if(frameID == "PRIV")
     return new PrivateFrame(data, header);
 
   return new UnknownFrame(data, header);
