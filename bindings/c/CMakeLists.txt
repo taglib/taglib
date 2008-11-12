@@ -1,11 +1,13 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/toolkit
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/asf
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/vorbis
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/flac
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/flac
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpc
+		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mp4
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex

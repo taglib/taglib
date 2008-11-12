@@ -19,11 +19,16 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "../../config.h"
+#endif
+
 #include "tag_c.h"
 
 #include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>
+#include <asffile.h>
 #include <vorbisfile.h>
 #include <mpegfile.h>
 #include <flacfile.h>
@@ -32,6 +37,7 @@
 #include <wavpackfile.h>
 #include <speexfile.h>
 #include <trueaudiofile.h>
+#include <mp4file.h>
 #include <tag.h>
 #include <string.h>
 #include <id3v2framefactory.h>
@@ -80,6 +86,14 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     return reinterpret_cast<TagLib_File *>(new Ogg::Speex::File(filename));
   case TagLib_File_TrueAudio:
     return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
+#ifdef WITH_MP4
+  case TagLib_File_MP4:
+    return reinterpret_cast<TagLib_File *>(new MP4::File(filename));
+#endif
+#ifdef WITH_ASF
+  case TagLib_File_ASF:
+    return reinterpret_cast<TagLib_File *>(new ASF::File(filename));
+#endif
   }
 
   return 0;

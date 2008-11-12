@@ -2,11 +2,13 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/toolkit
+    ${CMAKE_CURRENT_SOURCE_DIR}/asf
     ${CMAKE_CURRENT_SOURCE_DIR}/mpeg
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/flac
     ${CMAKE_CURRENT_SOURCE_DIR}/flac
     ${CMAKE_CURRENT_SOURCE_DIR}/mpc
+    ${CMAKE_CURRENT_SOURCE_DIR}/mp4
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/speex
     ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
@@ -25,11 +27,13 @@ if(ZLIB_FOUND)
 endif(ZLIB_FOUND)
 
 ADD_SUBDIRECTORY( toolkit )
+ADD_SUBDIRECTORY( asf )
 ADD_SUBDIRECTORY( mpeg )
 ADD_SUBDIRECTORY( ogg )
 ADD_SUBDIRECTORY( flac )
 ADD_SUBDIRECTORY( ape )
 ADD_SUBDIRECTORY( mpc )
+ADD_SUBDIRECTORY( mp4 )
 ADD_SUBDIRECTORY( wavpack )
 ADD_SUBDIRECTORY( trueaudio )
 ADD_SUBDIRECTORY( riff )
@@ -101,6 +105,18 @@ mpc/mpcfile.cpp
 mpc/mpcproperties.cpp
 )
 
+IF(WITH_MP4)
+SET(mp4_SRCS
+mp4/mp4file.cpp
+mp4/mp4atom.cpp
+mp4/mp4tag.cpp
+mp4/mp4item.cpp
+mp4/mp4properties.cpp
+)
+ELSE(WITH_MP4)
+SET(mp4_SRCS)
+ENDIF(WITH_MP4)
+
 SET(ape_SRCS
 ape/apetag.cpp
 ape/apefooter.cpp
@@ -121,6 +137,17 @@ SET(trueaudio_SRCS
 trueaudio/trueaudiofile.cpp
 trueaudio/trueaudioproperties.cpp
 )
+
+IF(WITH_ASF)
+SET(asf_SRCS
+asf/asftag.cpp
+asf/asffile.cpp
+asf/asfproperties.cpp
+asf/asfattribute.cpp
+)
+ELSE(WITH_ASF)
+SET(asf_SRCS)
+ENDIF(WITH_ASF)
 
 SET(riff_SRCS
 riff/rifffile.cpp
@@ -149,6 +176,7 @@ toolkit/unicode.cpp
 SET(tag_LIB_SRCS ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
 		 ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
 		 ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
+		 ${mp4_SRCS} ${asf_SRCS}
 		 tag.cpp
 		 tagunion.cpp
 		 fileref.cpp

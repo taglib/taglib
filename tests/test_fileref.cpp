@@ -11,11 +11,15 @@ using namespace TagLib;
 class TestFileRef : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestFileRef);
+  CPPUNIT_TEST(testASF);
   CPPUNIT_TEST(testMusepack);
   CPPUNIT_TEST(testVorbis);
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
   CPPUNIT_TEST(testMP3);
+  CPPUNIT_TEST(testMP4_1);
+  CPPUNIT_TEST(testMP4_2);
+  CPPUNIT_TEST(testMP4_3);
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST_SUITE_END();
 
@@ -71,6 +75,11 @@ public:
     fileRefSave("click", ".mpc");
   }
 
+  void testASF()
+  {
+    fileRefSave("silence-1", ".wma");
+  }
+
   void testVorbis()
   {
     fileRefSave("empty", ".ogg");
@@ -94,6 +103,21 @@ public:
   void testTrueAudio()
   {
     fileRefSave("empty", ".tta");
+  }
+
+  void testMP4_1()
+  {
+    fileRefSave("has-tags", ".m4a");
+  }
+
+  void testMP4_2()
+  {
+    fileRefSave("no-tags", ".m4a");
+  }
+
+  void testMP4_3()
+  {
+    fileRefSave("no-tags", ".3g2");
   }
 
 };
