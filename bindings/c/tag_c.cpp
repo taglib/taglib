@@ -94,6 +94,8 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   case TagLib_File_ASF:
     return reinterpret_cast<TagLib_File *>(new ASF::File(filename));
 #endif
+  default:
+    return 0;
   }
 
   return 0;
