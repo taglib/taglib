@@ -7,7 +7,7 @@ OPTION(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
 OPTION(WITH_ASF "Enable ASF tag reading/writing code"  OFF)
 OPTION(WITH_MP4 "Enable MP4 tag reading/writing code"  OFF)
 
-add_definitions(-DHAVE_CONFIG_H)
+#add_definitions(-DHAVE_CONFIG_H)
 
 #add some KDE specific stuff
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
