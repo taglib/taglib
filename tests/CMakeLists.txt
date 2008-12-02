@@ -26,10 +26,11 @@ SET(test_runner_SRCS
   test_id3v2.cpp
 )
 IF(WITH_MP4)
-SET(test_runner_SRCS ${test_runner_SRCS} test_mp4.cpp)
+   SET(test_runner_SRCS ${test_runner_SRCS} test_mp4.cpp)
 ENDIF(WITH_MP4)
+
 IF(WITH_ASF)
-SET(test_runner_SRCS ${test_runner_SRCS} test_asf.cpp)
+   SET(test_runner_SRCS ${test_runner_SRCS} test_asf.cpp)
 ENDIF(WITH_ASF)
 
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})

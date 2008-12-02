@@ -9,70 +9,38 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
 
 ########### next target ###############
 
-SET(tagreader_SRCS
-tagreader.cpp
-)
-
-
-ADD_EXECUTABLE(tagreader ${tagreader_SRCS})
+ADD_EXECUTABLE(tagreader tagreader.cpp)
 
 TARGET_LINK_LIBRARIES(tagreader  tag )
 
-#INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/tagreader DESTINATION ${BIN_INSTALL_DIR} )
-
 
 ########### next target ###############
 
-SET(tagreader_c_SRCS
-tagreader_c.c
-)
-
-
-ADD_EXECUTABLE(tagreader_c ${tagreader_c_SRCS})
+ADD_EXECUTABLE(tagreader_c tagreader_c.c)
 
 TARGET_LINK_LIBRARIES(tagreader_c  tag_c )
 
-#INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/tagreader_c DESTINATION ${BIN_INSTALL_DIR})
-
 
 ########### next target ###############
 
-SET(tagwriter_SRCS
-tagwriter.cpp
-)
-
-
-ADD_EXECUTABLE(tagwriter ${tagwriter_SRCS})
+ADD_EXECUTABLE(tagwriter tagwriter.cpp)
 
 TARGET_LINK_LIBRARIES(tagwriter  tag )
 
-#INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/tagwriter DESTINATION ${BIN_INSTALL_DIR})
-
 
 ########### next target ###############
 
-SET(framelist_SRCS
-framelist.cpp
-)
-
-
-ADD_EXECUTABLE(framelist ${framelist_SRCS})
+ADD_EXECUTABLE(framelist framelist.cpp)
 
 TARGET_LINK_LIBRARIES(framelist  tag )
 
-#INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/framelist DESTINATION ${BIN_INSTALL_DIR})
-
 
 ########### next target ###############
 
-SET(strip-id3v1_SRCS
-	strip-id3v1.cpp)
-
-ADD_EXECUTABLE(strip-id3v1 ${strip-id3v1_SRCS})
+ADD_EXECUTABLE(strip-id3v1 strip-id3v1.cpp)
 
 TARGET_LINK_LIBRARIES(strip-id3v1  tag )
 
-#INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/strip-id3v1 DESTINATION ${BIN_INSTALL_DIR})
 
 endif(BUILD_EXAMPLES)
 
