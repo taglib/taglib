@@ -45,7 +45,7 @@ Footer::~Footer()
 
 }
 
-uint Footer::size()
+TagLib::uint Footer::size()
 {
   return FooterPrivate::size;
 }
