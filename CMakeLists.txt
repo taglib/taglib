@@ -1,5 +1,7 @@
 project(taglib)
 
+cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
+
 OPTION(BUILD_TESTS "Build the test suite"  OFF)
 OPTION(BUILD_EXAMPLES "Build the examples"  OFF)
 
