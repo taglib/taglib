@@ -164,7 +164,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 void MPEG::Header::parse(const ByteVector &data)
 {
   if(data.size() < 4 || uchar(data[0]) != 0xff) {
-    debug("MPEG::Header::parse() -- First byte did not mactch MPEG synch.");
+    debug("MPEG::Header::parse() -- First byte did not match MPEG synch.");
     return;
   }
 
@@ -173,7 +173,7 @@ void MPEG::Header::parse(const ByteVector &data)
   // Check for the second byte's part of the MPEG synch
 
   if(!flags[23] || !flags[22] || !flags[21]) {
-    debug("MPEG::Header::parse() -- Second byte did not mactch MPEG synch.");
+    debug("MPEG::Header::parse() -- Second byte did not match MPEG synch.");
     return;
   }
 
