@@ -9,7 +9,7 @@ OPTION(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
 OPTION(WITH_ASF "Enable ASF tag reading/writing code"  OFF)
 OPTION(WITH_MP4 "Enable MP4 tag reading/writing code"  OFF)
 
-#add_definitions(-DHAVE_CONFIG_H)
+add_definitions(-DHAVE_CONFIG_H)
 
 #add some KDE specific stuff
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
@@ -45,7 +45,7 @@ include(ConfigureChecks.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc )
 
-configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
+configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/config.h )
 
 ADD_SUBDIRECTORY( taglib ) 
 
