@@ -228,6 +228,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 #ifdef WITH_ASF
     if(s.substr(s.size() - 4, 4).upper() == ".WMA")
       return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(s.substr(s.size() - 4, 4).upper() == ".ASF")
+      return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
 #endif
     if(s.substr(s.size() - 4, 4).upper() == ".AIF")
       return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
