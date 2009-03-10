@@ -137,6 +137,7 @@ StringList FileRef::defaultFileExtensions()
 #endif
 #ifdef WITH_ASF
   l.append("wma");
+  l.append("asf");
 #endif
   l.append("aif");
   l.append("aiff");
