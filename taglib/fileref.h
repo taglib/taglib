@@ -91,6 +91,12 @@ namespace TagLib {
 
     class TAGLIB_EXPORT FileTypeResolver
     {
+#ifdef __GNUC__
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#endif
+#endif
+
     public:
       // do not fix compiler warning about missing virtual destructor
       // since this would not be binary compatible
