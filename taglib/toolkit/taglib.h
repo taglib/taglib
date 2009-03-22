@@ -30,6 +30,12 @@
 #define TAGLIB_MINOR_VERSION 5
 #define TAGLIB_PATCH_VERSION 0
 
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
+#define TAGLIB_IGNORE_MISSING_DESTRUCTOR pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+#else
+#define TAGLIB_IGNORE_MISSING_DESTRUCTOR
+#endif
+
 #include <string>
 
 //! A namespace for all TagLib related classes and functions

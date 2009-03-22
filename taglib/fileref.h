@@ -91,16 +91,8 @@ namespace TagLib {
 
     class TAGLIB_EXPORT FileTypeResolver
     {
-#ifdef __GNUC__
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-#endif
-
+      TAGLIB_IGNORE_MISSING_DESTRUCTOR
     public:
-      // do not fix compiler warning about missing virtual destructor
-      // since this would not be binary compatible
-      // let Scott fix it whenever he thinks BIC changes can next be applied
       /*!
        * This method must be overridden to provide an additional file type
        * resolver.  If the resolver is able to determine the file type it should
