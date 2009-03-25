@@ -37,6 +37,8 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testUTF16Decode);
   CPPUNIT_TEST(testUTF16DecodeInvalidBOM);
   CPPUNIT_TEST(testUTF16DecodeEmptyWithBOM);
+  CPPUNIT_TEST(testAppendCharDetach);
+  CPPUNIT_TEST(testAppendStringDetach);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -129,6 +131,24 @@ public:
     ByteVector b("\376\377", 2);
     CPPUNIT_ASSERT_EQUAL(String(), String(a, String::UTF16));
     CPPUNIT_ASSERT_EQUAL(String(), String(b, String::UTF16));
+  }
+
+  void testAppendStringDetach()
+  {
+    String a("a");
+    String b = a;
+    a += "b";
+    CPPUNIT_ASSERT_EQUAL(String("ab"), a);
+    CPPUNIT_ASSERT_EQUAL(String("a"), b);
+  }
+
+  void testAppendCharDetach()
+  {
+    String a("a");
+    String b = a;
+    a += 'b';
+    CPPUNIT_ASSERT_EQUAL(String("ab"), a);
+    CPPUNIT_ASSERT_EQUAL(String("a"), b);
   }
 
 };

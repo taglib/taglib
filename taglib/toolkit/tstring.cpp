@@ -560,6 +560,8 @@ String &String::operator+=(wchar_t c)
 
 String &String::operator+=(char c)
 {
+  detach();
+
   d->data += uchar(c);
   return *this;
 }
