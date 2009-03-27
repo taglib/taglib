@@ -4,6 +4,9 @@
 #include <tag.h>
 #include <fileref.h>
 #include "utils.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 using namespace std;
 using namespace TagLib;
@@ -11,15 +14,19 @@ using namespace TagLib;
 class TestFileRef : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestFileRef);
+#ifdef WITH_ASF
   CPPUNIT_TEST(testASF);
+#endif
   CPPUNIT_TEST(testMusepack);
   CPPUNIT_TEST(testVorbis);
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
   CPPUNIT_TEST(testMP3);
+#ifdef WITH_MP4
   CPPUNIT_TEST(testMP4_1);
   CPPUNIT_TEST(testMP4_2);
   CPPUNIT_TEST(testMP4_3);
+#endif
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST_SUITE_END();
 
@@ -75,10 +82,12 @@ public:
     fileRefSave("click", ".mpc");
   }
 
+#ifdef WITH_ASF
   void testASF()
   {
     fileRefSave("silence-1", ".wma");
   }
+#endif
 
   void testVorbis()
   {
@@ -105,6 +114,7 @@ public:
     fileRefSave("empty", ".tta");
   }
 
+#ifdef WITH_MP4
   void testMP4_1()
   {
     fileRefSave("has-tags", ".m4a");
@@ -119,6 +129,7 @@ public:
   {
     fileRefSave("no-tags", ".3g2");
   }
+#endif
 
 };
 
