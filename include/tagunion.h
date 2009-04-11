@@ -1,0 +1,1 @@
+#include "../taglib/tagunion.h"
