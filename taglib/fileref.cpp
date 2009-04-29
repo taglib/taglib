@@ -202,44 +202,38 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   // updated.  However at some point that list should be created at the same time
   // that a default file type resolver is created.
 
-  if(s.size() > 4) {
-    if(s.substr(s.size() - 4, 4).upper() == ".OGG")
+  int pos = s.rfind(".");
+  if(pos != -1) {
+    String ext = s.substr(pos + 1).upper();
+    if(ext == "OGG")
       return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".MP3")
+    if(ext == "MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".OGA")
+    if(ext == "OGA")
       return new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 5, 5).upper() == ".FLAC")
+    if(ext == "FLAC")
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".MPC")
+    if(ext == "MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 3, 3).upper() == ".WV")
+    if(ext == "WV")
       return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".SPX")
+    if(ext == "SPX")
       return new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".TTA")
+    if(ext == "TTA")
       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
 #ifdef WITH_MP4
-    if(s.substr(s.size() - 4, 4).upper() == ".M4A" ||
-       s.substr(s.size() - 4, 4).upper() == ".M4B" ||
-       s.substr(s.size() - 4, 4).upper() == ".M4P" ||
-       s.substr(s.size() - 4, 4).upper() == ".MP4" ||
-       s.substr(s.size() - 4, 4).upper() == ".3G2")
+    if(ext == "M4A" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
       return new MP4::File(fileName, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_ASF
-    if(s.substr(s.size() - 4, 4).upper() == ".WMA")
-      return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".ASF")
+    if(ext == "WMA" || ext == "ASF")
       return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
 #endif
-    if(s.substr(s.size() - 4, 4).upper() == ".AIF")
+    if(ext == "AIF")
       return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(s.substr(s.size() - 4, 4).upper() == ".WAV")
+    if(ext == "WAV")
       return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
-  }
-  if(s.size() > 5) {
-    if(s.substr(s.size() - 5, 5).upper() == ".AIFF")
+    if(ext == "AIFF")
       return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
