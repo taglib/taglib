@@ -134,6 +134,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("m4b");
   l.append("m4p");
   l.append("3g2");
+  l.append("mp4");
 #endif
 #ifdef WITH_ASF
   l.append("wma");
@@ -222,6 +223,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
     if(s.substr(s.size() - 4, 4).upper() == ".M4A" ||
        s.substr(s.size() - 4, 4).upper() == ".M4B" ||
        s.substr(s.size() - 4, 4).upper() == ".M4P" ||
+       s.substr(s.size() - 4, 4).upper() == ".MP4" ||
        s.substr(s.size() - 4, 4).upper() == ".3G2")
       return new MP4::File(fileName, readAudioProperties, audioPropertiesStyle);
 #endif
