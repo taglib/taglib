@@ -79,6 +79,11 @@ MP4::Tag::Tag(File *file, MP4::Atoms *atoms)
   }
 }
 
+MP4::Tag::~Tag()
+{
+  delete d;
+}
+
 ByteVectorList
 MP4::Tag::parseData(MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool freeForm)
 {
@@ -167,7 +172,7 @@ MP4::Tag::parseFreeForm(MP4::Atom *atom, TagLib::File *file)
     for(unsigned int i = 2; i < data.size(); i++) {
       value.append(String(data[i], String::UTF8));
     }
-    String name = "----:" + data[0] + ":" + data[1];
+    String name = "----:" + data[0] + ':' + data[1];
     d->items.insert(name, value);
   }
 }

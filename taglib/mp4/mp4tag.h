@@ -45,6 +45,7 @@ namespace TagLib {
     {
     public:
         Tag(TagLib::File *file, Atoms *atoms);
+        ~Tag();
         bool save();
 
         String title() const;
