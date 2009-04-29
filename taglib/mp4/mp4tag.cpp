@@ -420,6 +420,8 @@ MP4::Tag::saveExisting(ByteVector &data, AtomList &path)
 
   MP4::Atom *meta = path[path.size() - 2];
   AtomList::Iterator index = meta->children.find(ilst);
+
+  // check if there is an atom before 'ilst', and possibly use it as padding
   if(index != meta->children.begin()) {
     AtomList::Iterator prevIndex = index;
     prevIndex--;
@@ -429,9 +431,10 @@ MP4::Tag::saveExisting(ByteVector &data, AtomList &path)
       length += prev->length;
     }
   }
-  if(index != meta->children.end()) {
-    AtomList::Iterator nextIndex = index;
-    nextIndex++;
+  // check if there is an atom after 'ilst', and possibly use it as padding
+  AtomList::Iterator nextIndex = index;
+  nextIndex++;
+  if(nextIndex != meta->children.end()) {
     MP4::Atom *next = *nextIndex;
     if(next->name == "free") {
       length += next->length;

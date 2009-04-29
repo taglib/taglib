@@ -17,6 +17,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testUpdateStco);
+  CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -94,6 +95,25 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Bar"), f->tag()->itemListMap()["----:org.kde.TagLib:Foo"].toStringList()[0]);
     f->save();
     delete f;
+
+    deleteFile(filename);
+  }
+
+  void testSaveExisingWhenIlstIsLast()
+  {
+    string filename = copyFile("ilst-is-last", ".m4a");
+
+    MP4::File *f = new MP4::File(filename.c_str());
+    CPPUNIT_ASSERT_EQUAL(String("82,164"), f->tag()->itemListMap()["----:com.apple.iTunes:replaygain_track_minmax"].toStringList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
+    f->tag()->setComment("foo");
+    f->save();
+    delete f;
+
+    f = new MP4::File(filename.c_str());
+    CPPUNIT_ASSERT_EQUAL(String("82,164"), f->tag()->itemListMap()["----:com.apple.iTunes:replaygain_track_minmax"].toStringList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
+    CPPUNIT_ASSERT_EQUAL(String("foo"), f->tag()->comment());
 
     deleteFile(filename);
   }
