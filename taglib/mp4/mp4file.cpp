@@ -40,7 +40,7 @@ using namespace TagLib;
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() : tag(0), atoms(0)
+  FilePrivate() : tag(0), atoms(0), properties(0)
   {
   }
 
