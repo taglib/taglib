@@ -207,7 +207,7 @@ namespace TagLib {
     void clear();
 
     /*!
-     * Returns the current offset withing the file.
+     * Returns the current offset within the file.
      */
     long tell() const;
 
