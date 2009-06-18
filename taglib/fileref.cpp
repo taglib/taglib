@@ -205,7 +205,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   int pos = s.rfind(".");
   if(pos != -1) {
     String ext = s.substr(pos + 1).upper();
-    if(ext == "OGG")
+    if(ext == "OGG" || ext == "OGA")
       return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
