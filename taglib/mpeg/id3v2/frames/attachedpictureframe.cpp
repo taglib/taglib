@@ -136,6 +136,12 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
   int pos = 1;
 
   d->mimeType = readStringField(data, String::Latin1, &pos);
+  /* Now we need at least two more bytes available */	
+  if (pos + 1 >= data.size()) {
+    debug("Truncated picture frame.");
+    return;
+  }
+
   d->type = (TagLib::ID3v2::AttachedPictureFrame::Type)data[pos++];
   d->description = readStringField(data, d->textEncoding, &pos);
 
