@@ -52,7 +52,7 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
       offset != -1 && (max == 0 || max > int(l.size()) + 1);
       offset = v.find(pattern, offset + pattern.size(), byteAlign))
   {
-    if(offset - previousOffset > 1)
+    if(offset - previousOffset >= 1)
       l.append(v.mid(previousOffset, offset - previousOffset));
     else
       l.append(ByteVector::null);
