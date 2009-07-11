@@ -38,6 +38,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testReadStringField);
   CPPUNIT_TEST(testParseAPIC);
   CPPUNIT_TEST(testParseAPIC_UTF16_BOM);
+  CPPUNIT_TEST(testParseAPICv22);
   CPPUNIT_TEST(testParseGEOB);
   CPPUNIT_TEST(testPOPMtoString);
   CPPUNIT_TEST(testParsePOPM);
@@ -130,6 +131,25 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, f.type());
     CPPUNIT_ASSERT_EQUAL(String("cover.jpg"), f.description());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xd8\xff", 3), f.picture());
+  }
+
+  void testParseAPICv22()
+  {
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("PIC"
+                                 "\x00\x00\x08"
+                                 "\x00"
+                                 "JPG"
+                                 "\x01"
+                                 "d\x00"
+                                 "\x00", 18);
+    ID3v2::AttachedPictureFrame *frame =
+        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, TagLib::uint(2)));
+
+    CPPUNIT_ASSERT(frame);
+    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), frame->mimeType());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FileIcon, frame->type());
+    CPPUNIT_ASSERT_EQUAL(String("d"), frame->description());
   }
 
   // http://bugs.kde.org/show_bug.cgi?id=151078

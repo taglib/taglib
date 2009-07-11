@@ -183,7 +183,15 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
     return f;
   }
 
-  // Relative Volume Adjustment (frames 4.11)
+  // ID3v2.2 Attached Picture
+
+	if(frameID == "PIC") {
+    AttachedPictureFrame *f = new AttachedPictureFrameV22(data, header);
+    d->setTextEncoding(f);
+    return f;
+  }
+
+	// Relative Volume Adjustment (frames 4.11)
 
   if(frameID == "RVA2")
     return new RelativeVolumeFrame(data, header);
@@ -293,7 +301,6 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     convertFrame("IPL", "TIPL", header);
     convertFrame("MCI", "MCDI", header);
     convertFrame("MLL", "MLLT", header);
-    convertFrame("PIC", "APIC", header);
     convertFrame("POP", "POPM", header);
     convertFrame("REV", "RVRB", header);
     convertFrame("SLT", "SYLT", header);

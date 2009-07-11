@@ -205,14 +205,24 @@ namespace TagLib {
     protected:
       virtual void parseFields(const ByteVector &data);
       virtual ByteVector renderFields() const;
-
-    private:
-      AttachedPictureFrame(const ByteVector &data, Header *h);
-      AttachedPictureFrame(const AttachedPictureFrame &);
-      AttachedPictureFrame &operator=(const AttachedPictureFrame &);
-
       class AttachedPictureFramePrivate;
       AttachedPictureFramePrivate *d;
+
+    private:
+      AttachedPictureFrame(const AttachedPictureFrame &);
+      AttachedPictureFrame &operator=(const AttachedPictureFrame &);
+      AttachedPictureFrame(const ByteVector &data, Header *h);
+
+    };
+
+    //! support for ID3v2.2 PIC frames
+    class TAGLIB_EXPORT AttachedPictureFrameV22 : public AttachedPictureFrame
+    {
+    protected:
+      virtual void parseFields(const ByteVector &data);
+    private:
+      AttachedPictureFrameV22(const ByteVector &data, Header *h);
+      friend class FrameFactory;
     };
   }
 }
