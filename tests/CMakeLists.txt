@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
 )
 
 SET(test_runner_SRCS
@@ -24,6 +25,7 @@ SET(test_runner_SRCS
   test_fileref.cpp
   test_id3v1.cpp
   test_id3v2.cpp
+  test_xiphcomment.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS} test_mp4.cpp)
