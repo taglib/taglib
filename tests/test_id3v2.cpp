@@ -11,6 +11,7 @@
 #include <relativevolumeframe.h>
 #include <popularimeterframe.h>
 #include <urllinkframe.h>
+#include <tdebug.h>
 #include "utils.h"
 
 using namespace std;
@@ -53,6 +54,9 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseUserUrlLinkFrame);
   CPPUNIT_TEST(testRenderUserUrlLinkFrame);
   CPPUNIT_TEST(testSaveUTF16Comment);
+  CPPUNIT_TEST(testUpdateGenre23_1);
+  CPPUNIT_TEST(testUpdateGenre23_2);
+  CPPUNIT_TEST(testUpdateGenre24);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -334,6 +338,64 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Test comment!"), bar.tag()->comment());
     deleteFile(newname);
     ID3v2::FrameFactory::instance()->setDefaultTextEncoding(defaultEncoding);
+  }
+
+  void testUpdateGenre23_1()
+  {
+    // "Refinement" is the same as the ID3v1 genre - duplicate
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("TCON"                 // Frame ID
+                                 "\x00\x00\x00\x10"     // Frame size
+                                 "\x00\x00"             // Frame flags
+                                 "\x00"                 // Encoding
+                                 "(22)Death Metal", 26);     // Text
+    ID3v2::TextIdentificationFrame *frame =
+        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, TagLib::uint(3)));
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("Death Metal"), frame->fieldList()[0]);
+
+    ID3v2::Tag tag;
+    tag.addFrame(frame);
+    CPPUNIT_ASSERT_EQUAL(String("Death Metal"), tag.genre());
+  }
+
+  void testUpdateGenre23_2()
+  {
+    // "Refinement" is different from the ID3v1 genre
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("TCON"                 // Frame ID
+                                 "\x00\x00\x00\x13"     // Frame size
+                                 "\x00\x00"             // Frame flags
+                                 "\x00"                 // Encoding
+                                 "(4)Eurodisco", 23);   // Text
+    ID3v2::TextIdentificationFrame *frame =
+        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, TagLib::uint(3)));
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("4"), frame->fieldList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
+
+    ID3v2::Tag tag;
+    tag.addFrame(frame);
+    CPPUNIT_ASSERT_EQUAL(String("Disco Eurodisco"), tag.genre());
+  }
+
+  void testUpdateGenre24()
+  {
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("TCON"                   // Frame ID
+                                 "\x00\x00\x00\x0D"       // Frame size
+                                 "\x00\x00"               // Frame flags
+                                 "\0"                   // Encoding
+                                 "14\0Eurodisco", 23);     // Text
+    ID3v2::TextIdentificationFrame *frame =
+        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, TagLib::uint(4)));
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("14"), frame->fieldList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
+
+    ID3v2::Tag tag;
+    tag.addFrame(frame);
+    CPPUNIT_ASSERT_EQUAL(String("R&B Eurodisco"), tag.genre());
   }
 
 };

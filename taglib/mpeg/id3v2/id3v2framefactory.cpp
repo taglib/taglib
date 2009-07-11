@@ -31,6 +31,7 @@
 
 #include "id3v2framefactory.h"
 #include "id3v2synchdata.h"
+#include "id3v1genres.h"
 
 #include "frames/attachedpictureframe.h"
 #include "frames/commentsframe.h"
@@ -394,26 +395,31 @@ void FrameFactory::convertFrame(const char *from, const char *to,
 
 void FrameFactory::updateGenre(TextIdentificationFrame *frame) const
 {
-  StringList fields;
-  String s = frame->toString();
+  StringList fields = frame->fieldList();
+  StringList newfields;
 
-  while(s.startsWith("(")) {
+  for(StringList::Iterator it = fields.begin(); it != fields.end(); ++it) {
+    String s = *it;
+    int end = s.find(")");
 
-    int closing = s.find(")");
-
-    if(closing < 0)
-      break;
-
-    fields.append(s.substr(1, closing - 1));
-
-    s = s.substr(closing + 1);
+    if(s.startsWith("(") && end > 0) {
+      // "(12)Genre"
+      String text = s.substr(end + 1);
+      int number = s.substr(1, end - 1).toInt();
+      if (number > 0 && number <= 255 && !(ID3v1::genre(number) == text))
+        newfields.append(s.substr(1, end - 1));
+      if (!text.isEmpty())
+        newfields.append(text);
+    }
+    else {
+      // "Genre" or "12"
+      newfields.append(s);
+    }
   }
 
-  if(!s.isEmpty())
-    fields.append(s);
-
-  if(fields.isEmpty())
+  if(newfields.isEmpty())
     fields.append(String::null);
 
-  frame->setText(fields);
+  frame->setText(newfields);
+
 }
