@@ -42,6 +42,7 @@ namespace
 {
   enum { XiphIndex = 0, ID3v2Index = 1, ID3v1Index = 2 };
   enum { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
+  enum { MinPaddingLength = 4096 };
 }
 
 class FLAC::File::FilePrivate
@@ -167,9 +168,49 @@ bool FLAC::File::save()
       uint blockLength = header.mid(1, 3).toUInt();
 
       if(blockType == VorbisComment) {
-        data[0] = header[0];
-        insert(data, nextBlockOffset, blockLength + 4);
-        break;
+
+        long paddingBreak = 0;
+
+        if(!isLastBlock) {
+          paddingBreak = findPaddingBreak(nextBlockOffset + blockLength + 4,
+                                          nextBlockOffset + d->xiphCommentData.size() + 8,
+                                          &isLastBlock);
+        }
+
+        uint paddingLength = 0;
+
+         if(paddingBreak) {
+
+           // There is space for comment and padding blocks without rewriting the
+           // whole file.  Note: This cannot overflow.
+
+           paddingLength = paddingBreak - (nextBlockOffset + d->xiphCommentData.size() + 8);
+         }
+         else {
+
+           // Not enough space, so we will have to rewrite the whole file
+           // following this block
+
+           paddingLength = d->xiphCommentData.size();
+
+           if(paddingLength < MinPaddingLength)
+             paddingLength = MinPaddingLength;
+
+           paddingBreak = nextBlockOffset + blockLength + 4;
+         }
+
+         ByteVector padding = ByteVector::fromUInt(paddingLength);
+
+         padding[0] = 1;
+
+         if(isLastBlock)
+           padding[0] |= 0x80;
+
+         padding.resize(paddingLength + 4);
+         ByteVector pair(data);
+         pair.append(padding);
+         insert(pair, nextBlockOffset, paddingBreak - nextBlockOffset);
+         break;
       }
 
       nextBlockOffset += blockLength + 4;
@@ -373,11 +414,8 @@ void FLAC::File::scan()
     isLastBlock = (header[0] & 0x80) != 0;
     length = header.mid(1, 3).toUInt();
 
-    if(blockType == Padding) {
-      // debug("FLAC::File::scan() -- Padding found");
-    }
     // Found the vorbis-comment
-    else if(blockType == VorbisComment) {
+    if(blockType == VorbisComment) {
       d->xiphCommentData = readBlock(length);
       d->hasXiphComment = true;
     }
@@ -428,4 +466,35 @@ long FLAC::File::findID3v2()
     return 0;
 
   return -1;
+}
+
+long FLAC::File::findPaddingBreak(long nextBlockOffset, long targetOffset, bool *isLast)
+{
+  // Starting from nextBlockOffset, step over padding blocks to find the
+  // address of a block which is after targetOffset. Return zero if
+  // a non-padding block occurs before that point.
+
+  while(true) {
+    seek(nextBlockOffset);
+
+    ByteVector header = readBlock(4);
+    char blockType = header[0] & 0x7f;
+    bool isLastBlock = header[0] & 0x80;
+    uint length = header.mid(1, 3).toUInt();
+
+    if(blockType != Padding)
+      break;
+
+    nextBlockOffset += 4 + length;
+
+    if(nextBlockOffset >= targetOffset) {
+      *isLast = isLastBlock;
+      return nextBlockOffset;
+    }
+
+    if(isLastBlock)
+      break;
+  }
+
+  return 0;
 }
