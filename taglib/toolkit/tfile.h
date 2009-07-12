@@ -188,8 +188,7 @@ namespace TagLib {
     bool isOpen() const;
 
     /*!
-     * Returns true if the file is open and readble and valid information for
-     * the Tag and / or AudioProperties was found.
+     * Returns true if the file is open and readble.
      */
     bool isValid() const;
 
