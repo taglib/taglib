@@ -47,10 +47,17 @@ MP4::Atom::Atom(File *file)
   length = header.mid(0, 4).toUInt();
 
   if (length == 1) {
-    debug("MP4: 64-bit atoms are not supported");
-    length = 0;
-    file->seek(0, File::End);
-    return;
+    long long longLength = file->readBlock(8).toLongLong();
+    if (longLength >= 8 && longLength <= 0xFFFFFFFF) {
+        // The atom has a 64-bit length, but it's actually a 32-bit value
+        length = (long)longLength;
+    }
+    else {
+        debug("MP4: 64-bit atoms are not supported");
+        length = 0;
+        file->seek(0, File::End);
+        return;
+    }
   }
   if (length < 8) {
     debug("MP4: Invalid atom size");

@@ -314,9 +314,20 @@ MP4::Tag::updateParents(AtomList &path, long delta, int ignore)
 {
   for(unsigned int i = 0; i < path.size() - ignore; i++) {
     d->file->seek(path[i]->offset);
-    long size = d->file->readBlock(4).toUInt() + delta;
-    d->file->seek(path[i]->offset);
-    d->file->writeBlock(ByteVector::fromUInt(size));
+    long size = d->file->readBlock(4).toUInt();
+    // 64-bit
+    if (size == 1) {
+      d->file->seek(4, File::Current); // Skip name
+      long long longSize = d->file->readBlock(8).toLongLong();
+      // Seek the offset of the 64-bit size
+      d->file->seek(path[i]->offset + 8);
+      d->file->writeBlock(ByteVector::fromLongLong(longSize + delta));
+    }
+    // 32-bit
+    else {
+      d->file->seek(path[i]->offset);
+      d->file->writeBlock(ByteVector::fromUInt(size + delta));
+    }
   }
 }
 

@@ -18,6 +18,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
+  CPPUNIT_TEST(test64BitAtom);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -114,6 +115,32 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("82,164"), f->tag()->itemListMap()["----:com.apple.iTunes:replaygain_track_minmax"].toStringList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
     CPPUNIT_ASSERT_EQUAL(String("foo"), f->tag()->comment());
+
+    deleteFile(filename);
+  }
+
+  void test64BitAtom()
+  {
+    string filename = copyFile("64bit", ".mp4");
+
+    MP4::File *f = new MP4::File(filename.c_str());
+    CPPUNIT_ASSERT_EQUAL(true, f->tag()->itemListMap()["cpil"].toBool());
+
+    MP4::Atoms *atoms = new MP4::Atoms(f);
+    MP4::Atom *moov = atoms->atoms[0];
+    CPPUNIT_ASSERT_EQUAL(long(77), moov->length);
+
+    f->tag()->itemListMap()["pgap"] = 1;
+    f->save();
+
+    f = new MP4::File(filename.c_str());
+    CPPUNIT_ASSERT_EQUAL(true, f->tag()->itemListMap()["cpil"].toBool());
+    CPPUNIT_ASSERT_EQUAL(true, f->tag()->itemListMap()["pgap"].toBool());
+
+    atoms = new MP4::Atoms(f);
+    moov = atoms->atoms[0];
+    // original size + 'pgap' size + padding
+    CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
 
     deleteFile(filename);
   }
