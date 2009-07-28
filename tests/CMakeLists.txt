@@ -9,6 +9,8 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2/frames
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
 )
@@ -27,6 +29,8 @@ SET(test_runner_SRCS
   test_id3v1.cpp
   test_id3v2.cpp
   test_xiphcomment.cpp
+  test_aiff.cpp
+  test_riff.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS} test_mp4.cpp)

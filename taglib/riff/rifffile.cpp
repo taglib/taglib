@@ -49,6 +49,7 @@ public:
   std::vector<ByteVector> chunkNames;
   std::vector<uint> chunkOffsets;
   std::vector<uint> chunkSizes;
+  std::vector<char> chunkPadding;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +102,7 @@ ByteVector RIFF::File::chunkData(uint i)
   long begin = 12 + 8;
 
   for(uint it = 0; it < i; it++)
-    begin += 8 + d->chunkSizes[it];
+    begin += 8 + d->chunkSizes[it] + d->chunkPadding[it];
 
   seek(begin);
 
@@ -128,12 +129,15 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 
       // Now update the specific chunk
 
-      writeChunk(name, data, d->chunkOffsets[i] - 8, d->chunkSizes[i] + 8);
+      writeChunk(name, data, d->chunkOffsets[i] - 8, d->chunkSizes[i] + d->chunkPadding[i] + 8);
+
+      d->chunkSizes[i] = data.size();
+      d->chunkPadding[i] = (data.size() & 0x01) ? 1 : 0;
 
       // Now update the internal offsets
 
       for(i++; i < d->chunkNames.size(); i++)
-        d->chunkOffsets[i] += sizeDifference;
+        d->chunkOffsets[i] = d->chunkOffsets[i-1] + 8 + d->chunkSizes[i-1] + d->chunkPadding[i-1];
 
       return;
     }
@@ -158,9 +162,15 @@ void RIFF::File::read()
   d->size = readBlock(4).toUInt(bigEndian);
   d->format = readBlock(4);
 
-  while(tell() < length()) {
+  // + 8: chunk header at least, fix for additional junk bytes
+  while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
     uint chunkSize = readBlock(4).toUInt(bigEndian);
+
+    if(tell() + chunkSize > length()) {
+      // something wrong
+      break;
+    }
 
     d->chunkNames.push_back(chunkName);
     d->chunkSizes.push_back(chunkSize);
@@ -168,6 +178,22 @@ void RIFF::File::read()
     d->chunkOffsets.push_back(tell());
 
     seek(chunkSize, Current);
+
+    // check padding
+    char paddingSize = 0;
+    long uPosNotPadded = tell();
+    if((uPosNotPadded & 0x01) != 0) {
+      ByteVector iByte = readBlock(1);
+      if((iByte.size() != 1) || (iByte[0] != 0)) {
+        // not well formed, re-seek
+        seek(uPosNotPadded, Beginning);
+      }
+      else {
+        paddingSize = 1;
+      }
+    }
+    d->chunkPadding.push_back(paddingSize);
+
   }
 }
 
@@ -177,5 +203,9 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
   ByteVector combined = name;
   combined.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
   combined.append(data);
+  if((data.size() & 0x01) != 0) {
+    // padding
+    combined.append('\x00');
+  }
   insert(combined, offset, replace);
 }
