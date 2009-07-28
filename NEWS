@@ -1,0 +1,30 @@
+TagLib 1.6
+==========
+
+ * TagLib can now use FLAC padding block. (BUG:107659)
+ * ID3v2.2 frames are now not incorrectly saved. (BUG:176373)
+ * Support for ID3v2.2 PIC frames. (BUG:167786)
+ * Fixed a bug in ByteVectorList::split().
+ * XiphComment::year() now falls back to YEAR if DATE doesn't exist
+   and XiphComment::year() falls back to TRACKNUM if TRACKNUMBER doesn't
+   exist. (BUG:144396)
+ * Improved ID3v2.3 genre parsing. (BUG:188578)
+ * Better checking of corrupted ID3v2 APIC data. (BUG:168382)
+ * Bitrate calculating using the Xing header now uses floating point
+   numbers. (BUG:172556)
+ * New TagLib::String method rfind().
+ * Added support for MP4 file format with iTunes-style metadata [optional].
+ * Added support for ASF (WMA) file format [optional].
+ * Fixed crash when saving a Locator APEv2 tag. (BUG:169810)
+ * Fixed a possible crash in the non-const version of String::operator[]
+   and in String::operator+=. (BUG:169389)
+ * Added support for PRIV ID3v2 frames.
+ * Empty ID3v2 genres are no longer treated as numeric ID3v1 genres.
+ * Added support for the POPM (rating/playcount) ID3v2 frame.
+ * Generic RIFF file format support:
+   * Support for AIFF files with ID3v2 tags.
+   * Support for WAV files with ID3v2 tags.
+ * Fixed crash on handling unsupported ID3v2 frames, e.g. on encrypted
+   frames. (BUG:161721)
+ * Fixed overflow while calculating bitrate of FLAC files with a very
+   high bitrate.
