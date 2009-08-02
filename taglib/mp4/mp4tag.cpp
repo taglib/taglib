@@ -146,7 +146,8 @@ MP4::Tag::parseBool(MP4::Atom *atom, TagLib::File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
-    d->items.insert(atom->name, data[0][0] != '\0');
+    bool value = data[0].size() ? data[0][0] != '\0' : false;
+    d->items.insert(atom->name, value);
   }
 }
 
