@@ -126,6 +126,20 @@ AC_DEFUN([AC_NO_CPPUNIT],
         have_cppunit=false
 ])
 
+AC_ARG_ENABLE([mp4],
+    [AS_HELP_STRING([--enable-mp4], [add MP4 support])],
+    [
+        AC_DEFINE([WITH_MP4], [1],
+                  [With MP4 support])
+    ])
+
+AC_ARG_ENABLE([asf],
+    [AS_HELP_STRING([--enable-asf], [add ASF support])],
+    [
+        AC_DEFINE([WITH_ASF], [1],
+                  [With ASF support])
+    ])
+
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AC_CHECK_HEADER(cppunit/extensions/HelperMacros.h, AC_HAVE_CPPUNIT, AC_NO_CPPUNIT)
