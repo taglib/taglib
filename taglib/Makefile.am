@@ -26,7 +26,25 @@ libtag_la_SOURCES = tag.cpp tagunion.cpp fileref.cpp audioproperties.cpp
 taglib_include_HEADERS = tag.h fileref.h audioproperties.h taglib_export.h
 taglib_includedir = $(includedir)/taglib
 
-libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 6:0:5
+# Here are a set of rules to help you update your library version information:
+#  Scheme: current:revsion:age
+#  1. Start with version information of `0:0:0' for each libtool library.
+#  2. Update the version information only immediately before a public release 
+#     of your software. More frequent updates are unnecessary, and only 
+#     guarantee that the current interface number gets larger faster.
+#  3. If the library source code has changed at all since the last update, 
+#     then increment revision (`c:r:a' becomes `c:r+1:a').
+#  4. If any interfaces have been added, removed, or changed since the last 
+#     update, increment current, and set revision to 0.
+#  5. If any interfaces have been added since the last public release, then 
+#     increment age.
+#  6. If any interfaces have been removed since the last public release, then 
+#     set age to 0. 
+#  Version history:
+#  6:0:5 -- TagLib 1.5
+#  7:0:6 -- TagLib 1.6
+
+libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 7:0:6
 libtag_la_LIBADD = ./mpeg/libmpeg.la ./ogg/libogg.la ./flac/libflac.la ./mpc/libmpc.la \
 	./ape/libape.la ./toolkit/libtoolkit.la ./wavpack/libwavpack.la \
 	./trueaudio/libtrueaudio.la ./riff/libriff.la \

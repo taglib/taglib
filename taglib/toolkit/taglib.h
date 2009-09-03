@@ -27,7 +27,7 @@
 #define TAGLIB_H
 
 #define TAGLIB_MAJOR_VERSION 1
-#define TAGLIB_MINOR_VERSION 5
+#define TAGLIB_MINOR_VERSION 6
 #define TAGLIB_PATCH_VERSION 0
 
 #if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
@@ -96,8 +96,8 @@ namespace TagLib {
  * Features:
  * - A clean, high level, C++ API to handling audio meta data.
  * - Format specific APIs for advanced API users.
- * - ID3v1, ID3v2, APE, FLAC and Xiph tag formats.
- * - MP3, MPC, FLAC, Ogg FLAC, Ogg Vorbis and Speex file formats.
+ * - ID3v1, ID3v2, APE, FLAC, Xiph, iTunes-style MP4 and WMA tag formats.
+ * - MP3, MPC, FLAC, MP4, ASF, AIFF, WAV, TrueAudio, WavPack, Ogg FLAC, Ogg Vorbis and Speex file formats.
  * - Basic audio file properties such as length, sample rate, etc.
  * - Long term binary and source compatibility.
  * - Extensible design, notably the ability to add other formats or extend current formats as a library user.
