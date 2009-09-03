@@ -270,10 +270,27 @@ bool Ogg::File::nextPage()
   return true;
 }
 
-void Ogg::File::writePageGroup(const List<int> &pageGroup)
+void Ogg::File::writePageGroup(const List<int> &thePageGroup)
 {
-  if(pageGroup.isEmpty())
+  if(thePageGroup.isEmpty())
     return;
+
+
+  // pages in the pageGroup and packets must be equivalent 
+  // (originalSize and size of packets would not work together), 
+  // therefore we sometimes have to add pages to the group
+  List<int> pageGroup(thePageGroup);
+  while (!d->pages[pageGroup.back()]->header()->lastPacketCompleted()) {
+    if (d->currentPage->header()->pageSequenceNumber() == pageGroup.back()) {
+      if (nextPage() == false) {
+        debug("broken ogg file");
+        return;
+      }
+      pageGroup.append(d->currentPage->header()->pageSequenceNumber());
+    } else {
+      pageGroup.append(pageGroup.back() + 1);
+    }
+  }
 
   ByteVectorList packets;
 
@@ -313,6 +330,52 @@ void Ogg::File::writePageGroup(const List<int> &pageGroup)
                                       d->streamSerialNumber, pageGroup.front(),
                                       continued, completed);
 
+  List<Page *> renumberedPages;
+
+  // Correct the page numbering of following pages
+
+  if (pages.back()->header()->pageSequenceNumber() != pageGroup.back()) {
+
+    // TODO: change the internal data structure so that we don't need to hold the 
+    // complete file in memory (is unavoidable at the moment)
+
+    // read the complete stream
+    while(!d->currentPage->header()->lastPageOfStream()) {
+      if(nextPage() == false) {
+        debug("broken ogg file");
+        break;
+      }
+    }
+
+    // create a gap for the new pages
+    int numberOfNewPages = pages.back()->header()->pageSequenceNumber() - pageGroup.back();
+    List<Page *>::Iterator pageIter = d->pages.begin();
+    for(int i = 0; i < pageGroup.back(); i++) {
+      if(pageIter != d->pages.end()) {
+        ++pageIter;
+      }
+      else {
+        debug("Ogg::File::writePageGroup() -- Page sequence is broken in original file.");
+        break;
+      }
+    }
+
+    ++pageIter;
+    for(; pageIter != d->pages.end(); ++pageIter) {
+      Ogg::Page *newPage =
+        (*pageIter)->getCopyWithNewPageSequenceNumber(
+            (*pageIter)->header()->pageSequenceNumber() + numberOfNewPages);
+
+      ByteVector data;
+      data.append(newPage->render());
+      insert(data, newPage->fileOffset(), data.size());
+
+      renumberedPages.append(newPage);
+    }
+  }
+
+  // insert the new data
+
   ByteVector data;
   for(List<Page *>::ConstIterator it = pages.begin(); it != pages.end(); ++it)
     data.append((*it)->render());
@@ -328,9 +391,37 @@ void Ogg::File::writePageGroup(const List<int> &pageGroup)
   // Update the page index to include the pages we just created and to delete the
   // old pages.
 
+  // First step: Pages that contain the comment data
+
   for(List<Page *>::ConstIterator it = pages.begin(); it != pages.end(); ++it) {
     const int index = (*it)->header()->pageSequenceNumber();
-    delete d->pages[index];
-    d->pages[index] = *it;
+    if(index < static_cast<int>(d->pages.size())) {
+      delete d->pages[index];
+      d->pages[index] = *it;
+    }
+    else if(index == d->pages.size()) {
+      d->pages.append(*it);
+    }
+    else {
+      // oops - there's a hole in the sequence
+      debug("Ogg::File::writePageGroup() -- Page sequence is broken.");
+    }
+  }
+
+  // Second step: the renumbered pages
+
+  for(List<Page *>::ConstIterator it = renumberedPages.begin(); it != renumberedPages.end(); ++it) {
+    const int index = (*it)->header()->pageSequenceNumber();
+    if(index < static_cast<int>(d->pages.size())) {
+      delete d->pages[index];
+      d->pages[index] = *it;
+    }
+    else if(index == d->pages.size()) {
+      d->pages.append(*it);
+    }
+    else {
+      // oops - there's a hole in the sequence
+      debug("Ogg::File::writePageGroup() -- Page sequence is broken.");
+    }
   }
 }

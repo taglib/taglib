@@ -13,6 +13,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/vorbis
 )
 
 SET(test_runner_SRCS
@@ -31,6 +32,7 @@ SET(test_runner_SRCS
   test_xiphcomment.cpp
   test_aiff.cpp
   test_riff.cpp
+  test_ogg.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS} test_mp4.cpp)

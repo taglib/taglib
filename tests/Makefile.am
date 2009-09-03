@@ -6,6 +6,7 @@ INCLUDES = \
         -I$(top_srcdir)/taglib/mpeg/id3v1 \
         -I$(top_srcdir)/taglib/mpeg/id3v2 \
         -I$(top_srcdir)/taglib/ogg \
+        -I$(top_srcdir)/taglib/ogg/vorbis \
         -I$(top_srcdir)/taglib/riff \
         -I$(top_srcdir)/taglib/riff/aiff \
         -I$(top_srcdir)/taglib/mpeg/id3v2/frames
@@ -24,7 +25,8 @@ test_runner_SOURCES = \
 	test_id3v2.cpp \
 	test_xiphcomment.cpp \
 	test_riff.cpp \
-	test_aiff.cpp
+	test_aiff.cpp \
+	test_ogg.cpp
 
 if build_tests
 TESTS = test_runner

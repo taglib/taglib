@@ -70,6 +70,14 @@ namespace TagLib {
        */
       const PageHeader *header() const;
 
+      /*! 
+       * Returns a copy of the page with \a sequenceNumber set as sequence number.
+       * 
+       * \see header()
+       * \see PageHeader::setPageSequenceNumber()
+       */
+      Page* getCopyWithNewPageSequenceNumber(int sequenceNumber);
+
       /*!
        * Returns the index of the first packet wholly or partially contained in
        * this page.

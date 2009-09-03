@@ -1,6 +1,7 @@
 TagLib 1.6
 ==========
 
+ * Split Ogg packets larger than 64k into multiple pages. (BUG:171957)
  * TagLib can now use FLAC padding block. (BUG:107659)
  * ID3v2.2 frames are now not incorrectly saved. (BUG:176373)
  * Support for ID3v2.2 PIC frames. (BUG:167786)
