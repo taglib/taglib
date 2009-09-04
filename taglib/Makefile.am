@@ -1,5 +1,6 @@
 SUBDIRS = toolkit mpeg ogg flac ape mpc wavpack trueaudio riff asf mp4
 
+DEFS = -DMAKE_TAGLIB_LIB @DEFS@
 INCLUDES = \
 	-I$(top_srcdir)/taglib \
 	-I$(top_srcdir)/taglib/toolkit \

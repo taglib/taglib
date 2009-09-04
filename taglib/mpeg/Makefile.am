@@ -1,4 +1,5 @@
 SUBDIRS = id3v1 id3v2
+DEFS = -DMAKE_TAGLIB_LIB @DEFS@
 INCLUDES = \
 	-I$(top_srcdir)/taglib \
 	-I$(top_srcdir)/taglib/toolkit \
