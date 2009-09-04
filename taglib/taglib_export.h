@@ -36,4 +36,6 @@
 #define TAGLIB_EXPORT
 #endif
 
+#include "taglib_config.h"
+
 #endif

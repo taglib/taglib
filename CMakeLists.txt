@@ -53,6 +53,15 @@ endif(NOT WIN32)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
+if(WITH_ASF)
+    set(TAGLIB_WITH_ASF TRUE)
+endif(WITH_ASF)
+if(WITH_MP4)
+    set(TAGLIB_WITH_MP4 TRUE)
+endif(WITH_MP4)
+configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h )
+install( FILES  ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
+
 ADD_SUBDIRECTORY( taglib ) 
 
 ADD_SUBDIRECTORY(tests)

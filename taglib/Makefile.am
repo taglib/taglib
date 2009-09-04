@@ -24,7 +24,7 @@ INCLUDES = \
 lib_LTLIBRARIES = libtag.la
 
 libtag_la_SOURCES = tag.cpp tagunion.cpp fileref.cpp audioproperties.cpp
-taglib_include_HEADERS = tag.h fileref.h audioproperties.h taglib_export.h
+taglib_include_HEADERS = tag.h fileref.h audioproperties.h taglib_export.h taglib_config.h
 taglib_includedir = $(includedir)/taglib
 
 # Here are a set of rules to help you update your library version information:
