@@ -167,7 +167,7 @@ void RIFF::File::read()
     ByteVector chunkName = readBlock(4);
     uint chunkSize = readBlock(4).toUInt(bigEndian);
 
-    if(tell() + chunkSize > length()) {
+    if(tell() + chunkSize > uint(length())) {
       // something wrong
       break;
     }

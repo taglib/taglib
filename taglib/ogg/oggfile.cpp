@@ -394,8 +394,8 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
   // First step: Pages that contain the comment data
 
   for(List<Page *>::ConstIterator it = pages.begin(); it != pages.end(); ++it) {
-    const int index = (*it)->header()->pageSequenceNumber();
-    if(index < static_cast<int>(d->pages.size())) {
+    const unsigned int index = (*it)->header()->pageSequenceNumber();
+    if(index < d->pages.size()) {
       delete d->pages[index];
       d->pages[index] = *it;
     }
@@ -411,8 +411,8 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
   // Second step: the renumbered pages
 
   for(List<Page *>::ConstIterator it = renumberedPages.begin(); it != renumberedPages.end(); ++it) {
-    const int index = (*it)->header()->pageSequenceNumber();
-    if(index < static_cast<int>(d->pages.size())) {
+    const unsigned int index = (*it)->header()->pageSequenceNumber();
+    if(index < d->pages.size()) {
       delete d->pages[index];
       d->pages[index] = *it;
     }
