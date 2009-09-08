@@ -27,7 +27,7 @@
 #include <config.h>
 #endif
 
-#ifdef TAGLIB_WITH_MP4
+#ifdef WITH_MP4
 
 #include <tdebug.h>
 #include <tstring.h>

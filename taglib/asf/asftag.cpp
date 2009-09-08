@@ -27,7 +27,7 @@
 #include <config.h>
 #endif
 
-#ifdef TAGLIB_WITH_ASF
+#ifdef WITH_ASF
 
 #include "asftag.h"
 
