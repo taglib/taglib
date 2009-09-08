@@ -184,7 +184,12 @@ SET(tag_LIB_SRCS ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_S
 )
 
 
-ADD_LIBRARY(tag SHARED ${tag_LIB_SRCS})
+if(ENABLE_STATIC)
+    add_library(tag STATIC ${tag_LIB_SRCS})
+    set_target_properties(tag PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
+else(ENABLE_STATIC)
+    add_library(tag SHARED ${tag_LIB_SRCS})
+endif(ENABLE_STATIC)
 
 TARGET_LINK_LIBRARIES(tag )
 if(ZLIB_FOUND)
