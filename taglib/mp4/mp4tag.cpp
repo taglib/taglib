@@ -33,6 +33,7 @@
 #include <tstring.h>
 #include "mp4atom.h"
 #include "mp4tag.h"
+#include "id3v1genres.h"
 
 using namespace TagLib;
 
@@ -72,6 +73,9 @@ MP4::Tag::Tag(File *file, MP4::Atoms *atoms)
     }
     else if(atom->name == "tmpo") {
       parseInt(atom, file);
+    }
+    else if(atom->name == "gnre") {
+      parseGnre(atom, file);
     }
     else {
       parseText(atom, file);
@@ -127,6 +131,18 @@ MP4::Tag::parseInt(MP4::Atom *atom, TagLib::File *file)
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
     d->items.insert(atom->name, (int)data[0].toShort());
+  }
+}
+
+void
+MP4::Tag::parseGnre(MP4::Atom *atom, TagLib::File *file)
+{
+  ByteVectorList data = parseData(atom, file);
+  if(data.size()) {
+    int idx = (int)data[0].toShort();
+    if(!d->items.contains("\251gen")) {
+      d->items.insert("\251gen", StringList(ID3v1::genre(idx)));
+    }
   }
 }
 
