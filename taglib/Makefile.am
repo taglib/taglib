@@ -43,9 +43,10 @@ taglib_includedir = $(includedir)/taglib
 #     set age to 0. 
 #  Version history:
 #  6:0:5 -- TagLib 1.5
-#  7:0:6 -- TagLib 1.6
+#  7:0:6 -- TagLib 1.6 RC1
+#  7:1:6 -- TagLib 1.6
 
-libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 7:0:6
+libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 7:1:6
 libtag_la_LIBADD = ./mpeg/libmpeg.la ./ogg/libogg.la ./flac/libflac.la ./mpc/libmpc.la \
 	./ape/libape.la ./toolkit/libtoolkit.la ./wavpack/libwavpack.la \
 	./trueaudio/libtrueaudio.la ./riff/libriff.la \
