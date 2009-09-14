@@ -130,7 +130,7 @@ public:
     MP4::Atom *moov = atoms->atoms[0];
     CPPUNIT_ASSERT_EQUAL(long(77), moov->length);
 
-    f->tag()->itemListMap()["pgap"] = 1;
+    f->tag()->itemListMap()["pgap"] = true;
     f->save();
 
     f = new MP4::File(filename.c_str());
