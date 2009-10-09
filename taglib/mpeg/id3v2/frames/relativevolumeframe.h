@@ -26,8 +26,8 @@
 #ifndef TAGLIB_RELATIVEVOLUMEFRAME_H
 #define TAGLIB_RELATIVEVOLUMEFRAME_H
 
-#include <tlist.h>
-#include <id3v2frame.h>
+#include "tlist.h"
+#include "id3v2frame.h"
 #include "taglib_export.h"
 
 namespace TagLib {

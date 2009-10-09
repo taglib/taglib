@@ -26,7 +26,7 @@
 #ifndef TAGLIB_POPULARIMETERFRAME_H
 #define TAGLIB_POPULARIMETERFRAME_H
 
-#include <id3v2frame.h>
+#include "id3v2frame.h"
 #include "taglib_export.h"
 
 namespace TagLib {

@@ -28,7 +28,7 @@
 #ifndef TAGLIB_URLLINKFRAME_H
 #define TAGLIB_URLLINKFRAME_H
 
-#include <id3v2frame.h>
+#include "id3v2frame.h"
 
 namespace TagLib {
 

@@ -30,7 +30,7 @@
 #ifndef TAGLIB_TRUEAUDIOFILE_H
 #define TAGLIB_TRUEAUDIOFILE_H
 
-#include <tfile.h>
+#include "tfile.h"
 #include "trueaudioproperties.h"
 
 namespace TagLib {

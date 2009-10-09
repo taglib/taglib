@@ -26,8 +26,8 @@
 #ifndef TAGLIB_ASFATTRIBUTE_H
 #define TAGLIB_ASFATTRIBUTE_H
 
-#include <tstring.h>
-#include <tbytevector.h>
+#include "tstring.h"
+#include "tbytevector.h"
 #include "taglib_export.h"
 
 namespace TagLib

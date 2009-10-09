@@ -26,8 +26,8 @@
 #ifndef TAGLIB_ASFFILE_H
 #define TAGLIB_ASFFILE_H
 
-#include <tag.h>
-#include <tfile.h>
+#include "tag.h"
+#include "tfile.h"
 #include "taglib_export.h"
 #include "asfproperties.h"
 #include "asftag.h"

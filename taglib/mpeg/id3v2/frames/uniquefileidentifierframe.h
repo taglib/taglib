@@ -26,7 +26,7 @@
 #ifndef TAGLIB_UNIQUEFILEIDENTIFIERFRAME
 #define TAGLIB_UNIQUEFILEIDENTIFIERFRAME
 
-#include <id3v2frame.h>
+#include "id3v2frame.h"
 
 namespace TagLib {
 
