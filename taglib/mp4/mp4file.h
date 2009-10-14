@@ -49,7 +49,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Contructs an ASF file from \a file.  If \a readProperties is true the
+       * Contructs a MP4 file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
        *
@@ -69,7 +69,7 @@ namespace TagLib {
        * MP4::Tag implements the tag interface, so this serves as the
        * reimplementation of TagLib::File::tag().
        *
-       * \note The Tag <b>is still</b> owned by the ASF::File and should not be
+       * \note The Tag <b>is still</b> owned by the MP4::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        */
