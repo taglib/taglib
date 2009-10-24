@@ -93,7 +93,7 @@ Properties *Ogg::FLAC::File::audioProperties() const
 
 bool Ogg::FLAC::File::save()
 {
-  d->xiphCommentData = d->comment->render();
+  d->xiphCommentData = d->comment->render(false);
 
   // Create FLAC metadata-block:
 
