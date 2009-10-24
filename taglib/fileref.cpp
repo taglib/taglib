@@ -29,6 +29,7 @@
 
 #include <tfile.h>
 #include <tstring.h>
+#include <tdebug.h>
 
 #include "fileref.h"
 #include "asffile.h"
@@ -93,11 +94,19 @@ FileRef::~FileRef()
 
 Tag *FileRef::tag() const
 {
+  if(isNull()) {
+    debug("FileRef::tag() - Called without a valid file.");
+    return 0;
+  }
   return d->file->tag();
 }
 
 AudioProperties *FileRef::audioProperties() const
 {
+  if(isNull()) {
+    debug("FileRef::audioProperties() - Called without a valid file.");
+    return 0;
+  }
   return d->file->audioProperties();
 }
 
@@ -108,6 +117,10 @@ File *FileRef::file() const
 
 bool FileRef::save()
 {
+  if(isNull()) {
+    debug("FileRef::save() - Called without a valid file.");
+    return false;
+  }
   return d->file->save();
 }
 
