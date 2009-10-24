@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <tag.h>
 #include <fileref.h>
+#include <oggflacfile.h>
+#include <vorbisfile.h>
 #include "utils.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,6 +24,8 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
   CPPUNIT_TEST(testMP3);
+  CPPUNIT_TEST(testOGA_FLAC);
+  CPPUNIT_TEST(testOGA_Vorbis);
 #ifdef TAGLIB_WITH_MP4
   CPPUNIT_TEST(testMP4_1);
   CPPUNIT_TEST(testMP4_2);
@@ -130,6 +134,20 @@ public:
     fileRefSave("no-tags", ".3g2");
   }
 #endif
+
+  void testOGA_FLAC()
+  {
+      FileRef *f = new FileRef("data/empty_flac.oga");
+      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) == NULL);
+      CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) != NULL);
+  }
+
+  void testOGA_Vorbis()
+  {
+      FileRef *f = new FileRef("data/empty_vorbis.oga");
+      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) != NULL);
+      CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) == NULL);
+  }
 
 };
 

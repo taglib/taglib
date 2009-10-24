@@ -205,12 +205,17 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   int pos = s.rfind(".");
   if(pos != -1) {
     String ext = s.substr(pos + 1).upper();
-    if(ext == "OGG" || ext == "OGA")
-      return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "OGA")
-      return new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "OGG")
+      return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "OGA") {
+      /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
+      File *file = new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
+      if (file->isValid())
+        return file;
+      return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
+    }
     if(ext == "FLAC")
       return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "MPC")
