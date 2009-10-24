@@ -77,6 +77,9 @@ MP4::Tag::Tag(File *file, MP4::Atoms *atoms)
     else if(atom->name == "gnre") {
       parseGnre(atom, file);
     }
+    else if(atom->name == "covr") {
+      parseCovr(atom, file);
+    }
     else {
       parseText(atom, file);
     }
@@ -194,6 +197,30 @@ MP4::Tag::parseFreeForm(MP4::Atom *atom, TagLib::File *file)
   }
 }
 
+void
+MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
+{
+  MP4::CoverArtList value;
+  ByteVector data = file->readBlock(atom->length - 8);
+  unsigned int pos = 0;
+  while(pos < data.size()) {
+    int length = data.mid(pos, 4).toUInt();
+    ByteVector name = data.mid(pos + 4, 4);
+    int flags = data.mid(pos + 8, 4).toUInt();
+    if(name != "data") {
+      debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
+      return;
+    }
+    if(flags == MP4::CoverArt::PNG || flags == MP4::CoverArt::JPEG) {
+      value.append(MP4::CoverArt(MP4::CoverArt::Format(flags),
+                                 data.mid(pos + 16, length - 16)));
+    }
+    pos += length;
+  }
+  if(value.size() > 0)
+    d->items.insert(atom->name, value);
+}
+
 ByteVector
 MP4::Tag::padIlst(const ByteVector &data, int length)
 {
@@ -268,6 +295,18 @@ MP4::Tag::renderText(const ByteVector &name, MP4::Item &item, int flags)
 }
 
 ByteVector
+MP4::Tag::renderCovr(const ByteVector &name, MP4::Item &item)
+{
+  ByteVector data;
+  MP4::CoverArtList value = item.toCoverArtList();
+  for(unsigned int i = 0; i < value.size(); i++) {
+    data.append(renderAtom("data", ByteVector::fromUInt(value[i].format()) +
+                                   ByteVector(4, '\0') + value[i].data()));
+  }
+  return renderAtom(name, data);
+}
+
+ByteVector
 MP4::Tag::renderFreeForm(const String &name, MP4::Item &item)
 {
   StringList header = StringList::split(name, ":");
@@ -305,6 +344,9 @@ MP4::Tag::save()
     }
     else if(name == "tmpo") {
       data.append(renderInt(name.data(String::Latin1), i->second));
+    }
+    else if(name == "covr") {
+      data.append(renderCovr(name.data(String::Latin1), i->second));
     }
     else if(name.size() == 4){
       data.append(renderText(name.data(String::Latin1), i->second));

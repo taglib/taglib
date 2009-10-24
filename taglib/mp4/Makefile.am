@@ -7,7 +7,7 @@ INCLUDES = \
 
 noinst_LTLIBRARIES = libmp4.la
 
-libmp4_la_SOURCES = mp4atom.cpp mp4file.cpp mp4item.cpp mp4properties.cpp mp4tag.cpp
+libmp4_la_SOURCES = mp4atom.cpp mp4file.cpp mp4item.cpp mp4properties.cpp mp4tag.cpp mp4coverart.cpp
 
-taglib_include_HEADERS = mp4atom.h mp4file.h mp4item.h mp4properties.h mp4tag.h
+taglib_include_HEADERS = mp4atom.h mp4file.h mp4item.h mp4properties.h mp4tag.h mp4coverart.h
 taglib_includedir = $(includedir)/taglib

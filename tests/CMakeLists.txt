@@ -38,7 +38,11 @@ SET(test_runner_SRCS
   test_oggflac.cpp
 )
 IF(WITH_MP4)
-   SET(test_runner_SRCS ${test_runner_SRCS} test_mp4.cpp)
+   SET(test_runner_SRCS ${test_runner_SRCS}
+     test_mp4.cpp
+     test_mp4item.cpp
+     test_mp4coverart.cpp
+   )
 ENDIF(WITH_MP4)
 
 IF(WITH_ASF)

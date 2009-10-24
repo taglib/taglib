@@ -1,5 +1,5 @@
 /**************************************************************************
-    copyright            : (C) 2007 by Lukáš Lalinský
+    copyright            : (C) 2009 by Lukáš Lalinský
     email                : lalinsky@gmail.com
  **************************************************************************/
 
@@ -23,127 +23,49 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#ifndef TAGLIB_MP4COVERART_H
+#define TAGLIB_MP4COVERART_H
 
-#ifdef WITH_MP4
+#include "tlist.h"
+#include "tbytevector.h"
+#include "taglib_export.h"
 
-#include <taglib.h>
-#include <tdebug.h>
-#include "mp4item.h"
+namespace TagLib {
 
-using namespace TagLib;
+  namespace MP4 {
 
-class MP4::Item::ItemPrivate : public RefCounter
-{
-public:
-  ItemPrivate() : RefCounter(), valid(true) {}
+    class TAGLIB_EXPORT CoverArt
+    {
+    public:
+      /*!
+       * This describes the image type.
+       */
+      enum Format {
+        JPEG = 0x0D,
+        PNG  = 0x0E
+      };
 
-  bool valid;
-  union {
-    bool m_bool;
-    int m_int;
-    IntPair m_intPair;
-  };
-  StringList m_stringList;
-  MP4::CoverArtList m_coverArtList;
-};
+      CoverArt(Format format, const ByteVector &data);
+      ~CoverArt();
 
-MP4::Item::Item()
-{
-  d = new ItemPrivate;
-  d->valid = false;
-}
+      CoverArt(const CoverArt &item);
+      CoverArt &operator=(const CoverArt &item);
 
-MP4::Item::Item(const Item &item) : d(item.d)
-{
-  d->ref();
-}
+      //! Format of the image
+      Format format() const;
 
-MP4::Item &
-MP4::Item::operator=(const Item &item)
-{
-  if(d->deref()) {
-    delete d;
+      //! The image data
+      ByteVector data() const;
+
+    private:
+      class CoverArtPrivate;
+      CoverArtPrivate *d;
+    };
+
+    typedef List<CoverArt> CoverArtList;
+
   }
-  d = item.d;
-  d->ref();
-  return *this;
-}
 
-MP4::Item::~Item()
-{
-  if(d->deref()) {
-    delete d;
-  }
-}
-
-MP4::Item::Item(bool value)
-{
-  d = new ItemPrivate;
-  d->m_bool = value;
-}
-
-MP4::Item::Item(int value)
-{
-  d = new ItemPrivate;
-  d->m_int = value;
-}
-
-MP4::Item::Item(int value1, int value2)
-{
-  d = new ItemPrivate;
-  d->m_intPair.first = value1;
-  d->m_intPair.second = value2;
-}
-
-MP4::Item::Item(const StringList &value)
-{
-  d = new ItemPrivate;
-  d->m_stringList = value;
-}
-
-MP4::Item::Item(const MP4::CoverArtList &value)
-{
-  d = new ItemPrivate;
-  d->m_coverArtList = value;
-}
-
-bool
-MP4::Item::toBool() const
-{
-  return d->m_bool;
-}
-
-int
-MP4::Item::toInt() const
-{
-  return d->m_int;
-}
-
-MP4::Item::IntPair
-MP4::Item::toIntPair() const
-{
-  return d->m_intPair;
-}
-
-StringList
-MP4::Item::toStringList() const
-{
-  return d->m_stringList;
-}
-
-MP4::CoverArtList
-MP4::Item::toCoverArtList() const
-{
-  return d->m_coverArtList;
-}
-
-bool
-MP4::Item::isValid() const
-{
-  return d->valid;
 }
 
 #endif

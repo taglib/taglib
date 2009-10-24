@@ -19,6 +19,8 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
   CPPUNIT_TEST(test64BitAtom);
+  CPPUNIT_TEST(testCovrRead);
+  CPPUNIT_TEST(testCovrWrite);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -141,6 +143,45 @@ public:
     moov = atoms->atoms[0];
     // original size + 'pgap' size + padding
     CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
+
+    deleteFile(filename);
+  }
+
+  void testCovrRead()
+  {
+    MP4::File *f = new MP4::File("data/has-tags.m4a");
+    CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
+    MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), l.size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
+  }
+
+  void testCovrWrite()
+  {
+    string filename = copyFile("has-tags", ".m4a");
+
+    MP4::File *f = new MP4::File(filename.c_str());
+    CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
+    MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
+    l.append(MP4::CoverArt(MP4::CoverArt::PNG, "foo"));
+    f->tag()->itemListMap()["covr"] = l;
+    f->save();
+    delete f;
+
+    f = new MP4::File(filename.c_str());
+    CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
+    l = f->tag()->itemListMap()["covr"].toCoverArtList();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), l.size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), l[2].data().size());
+    delete f;
 
     deleteFile(filename);
   }
