@@ -10,6 +10,7 @@ TagLib 1.6.1
  * Fixed a failing test on ppc64.
  * Support for binary 'covr' atom in MP4 files. TagLib 1.6 treated them
    as text atoms, which corrupted them in some cases.
+ * Fixed ID3v1-style genre to string conversion in MP4 files.
 
 TagLib 1.6
 ==========

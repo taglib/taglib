@@ -19,6 +19,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
   CPPUNIT_TEST(test64BitAtom);
+  CPPUNIT_TEST(testGnre);
   CPPUNIT_TEST(testCovrRead);
   CPPUNIT_TEST(testCovrWrite);
   CPPUNIT_TEST_SUITE_END();
@@ -145,6 +146,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
 
     deleteFile(filename);
+  }
+
+  void testGnre()
+  {
+    MP4::File *f = new MP4::File("data/gnre.m4a");
+    CPPUNIT_ASSERT_EQUAL(TagLib::String("Ska"), f->tag()->genre());
   }
 
   void testCovrRead()

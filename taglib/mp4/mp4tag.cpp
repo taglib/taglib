@@ -143,8 +143,8 @@ MP4::Tag::parseGnre(MP4::Atom *atom, TagLib::File *file)
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
     int idx = (int)data[0].toShort();
-    if(!d->items.contains("\251gen")) {
-      d->items.insert("\251gen", StringList(ID3v1::genre(idx)));
+    if(!d->items.contains("\251gen") && idx > 0) {
+      d->items.insert("\251gen", StringList(ID3v1::genre(idx - 1)));
     }
   }
 }
