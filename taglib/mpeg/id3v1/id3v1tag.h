@@ -52,7 +52,7 @@ namespace TagLib {
      *
      * \warning It is advisable <b>not</b> to write non-ISO-8859-1 data to ID3v1
      * tags.  Please consider disabling the writing of ID3v1 tags in the case
-     * that the data is ISO-8859-1.
+     * that the data is not ISO-8859-1.
      *
      * \see ID3v1::Tag::setStringHandler()
      */
