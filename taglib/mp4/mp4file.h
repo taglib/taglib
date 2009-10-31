@@ -90,6 +90,7 @@ namespace TagLib {
     private:
 
       void read(bool readProperties, Properties::ReadStyle audioPropertiesStyle);
+      bool checkValid(const MP4::AtomList &list);
 
       class FilePrivate;
       FilePrivate *d;

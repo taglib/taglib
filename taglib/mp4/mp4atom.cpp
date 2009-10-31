@@ -47,7 +47,7 @@ MP4::Atom::Atom(File *file)
   if (header.size() != 8) {
     // The atom header must be 8 bytes long, otherwise there is either
     // trailing garbage or the file is truncated
-    debug("MP4: Expected 8 bytes of atom header");
+    debug("MP4: Couldn't read 8 bytes of data for atom header");
     length = 0;
     file->seek(0, File::End);
     return;
@@ -83,7 +83,10 @@ MP4::Atom::Atom(File *file)
         file->seek(4, File::Current);
       }
       while(file->tell() < offset + length) {
-        children.append(new MP4::Atom(file));
+        MP4::Atom *child = new MP4::Atom(file);
+        children.append(child);
+        if (child->length == 0)
+          return;
       }
       return;
     }
@@ -150,7 +153,10 @@ MP4::Atoms::Atoms(File *file)
   long end = file->tell();
   file->seek(0);
   while(file->tell() + 8 <= end) {
-    atoms.append(new MP4::Atom(file));
+    MP4::Atom *atom = new MP4::Atom(file);
+    atoms.append(atom);
+    if (atom->length == 0)
+      break;
   }
 }
 
