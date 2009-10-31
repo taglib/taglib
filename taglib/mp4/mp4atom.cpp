@@ -44,6 +44,15 @@ MP4::Atom::Atom(File *file)
 {
   offset = file->tell();
   ByteVector header = file->readBlock(8);
+  if (header.size() != 8) {
+    // The atom header must be 8 bytes long, otherwise there is either
+    // trailing garbage or the file is truncated
+    debug("MP4: Expected 8 bytes of atom header");
+    length = 0;
+    file->seek(0, File::End);
+    return;
+  }
+
   length = header.mid(0, 4).toUInt();
 
   if (length == 1) {
