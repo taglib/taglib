@@ -1,5 +1,5 @@
-TagLib 1.6.1
-============
+TagLib 1.6.1 (Oct 31, 2009)
+===========================
 
  * Better detection of the audio codec of .oga files in FileRef.
  * Fixed saving of Vorbis comments to Ogg FLAC files. TagLib tried to
@@ -12,8 +12,8 @@ TagLib 1.6.1
    as text atoms, which corrupted them in some cases.
  * Fixed ID3v1-style genre to string conversion in MP4 files.
 
-TagLib 1.6
-==========
+TagLib 1.6 (Sep 13, 2009)
+=========================
 
 1.6:
 
