@@ -29,7 +29,8 @@ test_runner_SOURCES = \
 	test_riff.cpp \
 	test_aiff.cpp \
 	test_ogg.cpp \
-	test_oggflac.cpp
+	test_oggflac.cpp \
+	test_flac.cpp
 
 if build_tests
 TESTS = test_runner
