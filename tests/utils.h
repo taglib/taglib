@@ -25,3 +25,25 @@ inline void deleteFile(const string &filename)
 {
   remove(filename.c_str());
 }
+
+class ScopedFileCopy
+{
+public:
+  ScopedFileCopy(const string &filename, const string &ext)
+  {
+    m_filename = copyFile(filename, ext);
+  }
+
+  ~ScopedFileCopy()
+  {
+    deleteFile(m_filename);
+  }
+
+  string fileName()
+  {
+    return m_filename;
+  }
+
+private:
+  string m_filename;
+};

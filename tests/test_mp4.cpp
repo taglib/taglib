@@ -38,7 +38,8 @@ public:
 
   void testUpdateStco()
   {
-    string filename = copyFile("no-tags", ".3g2");
+    ScopedFileCopy copy("no-tags", ".3g2");
+    string filename = copy.fileName();
 
     MP4::File *f = new MP4::File(filename.c_str());
     f->tag()->setArtist(ByteVector(3000, 'x'));
@@ -80,13 +81,12 @@ public:
     }
 
     delete f;
-
-    deleteFile(filename);
   }
 
   void testFreeForm()
   {
-    string filename = copyFile("has-tags", ".m4a");
+    ScopedFileCopy copy("has-tags", ".m4a");
+    string filename = copy.fileName();
 
     MP4::File *f = new MP4::File(filename.c_str());
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("----:com.apple.iTunes:iTunNORM"));
@@ -99,13 +99,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Bar"), f->tag()->itemListMap()["----:org.kde.TagLib:Foo"].toStringList()[0]);
     f->save();
     delete f;
-
-    deleteFile(filename);
   }
 
   void testSaveExisingWhenIlstIsLast()
   {
-    string filename = copyFile("ilst-is-last", ".m4a");
+    ScopedFileCopy copy("ilst-is-last", ".m4a");
+    string filename = copy.fileName();
 
     MP4::File *f = new MP4::File(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(String("82,164"), f->tag()->itemListMap()["----:com.apple.iTunes:replaygain_track_minmax"].toStringList()[0]);
@@ -118,13 +117,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("82,164"), f->tag()->itemListMap()["----:com.apple.iTunes:replaygain_track_minmax"].toStringList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
     CPPUNIT_ASSERT_EQUAL(String("foo"), f->tag()->comment());
-
-    deleteFile(filename);
   }
 
   void test64BitAtom()
   {
-    string filename = copyFile("64bit", ".mp4");
+    ScopedFileCopy copy("64bit", ".mp4");
+    string filename = copy.fileName();
 
     MP4::File *f = new MP4::File(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(true, f->tag()->itemListMap()["cpil"].toBool());
@@ -144,8 +142,6 @@ public:
     moov = atoms->atoms[0];
     // original size + 'pgap' size + padding
     CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
-
-    deleteFile(filename);
   }
 
   void testGnre()
@@ -168,7 +164,8 @@ public:
 
   void testCovrWrite()
   {
-    string filename = copyFile("has-tags", ".m4a");
+    ScopedFileCopy copy("has-tags", ".m4a");
+    string filename = copy.fileName();
 
     MP4::File *f = new MP4::File(filename.c_str());
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
@@ -189,8 +186,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), l[2].data().size());
     delete f;
-
-    deleteFile(filename);
   }
 
 };

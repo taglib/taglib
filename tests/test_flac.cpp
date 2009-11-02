@@ -20,7 +20,8 @@ public:
 
   void testMultipleCommentBlocks()
   {
-    string newname = copyFile("multiple-vc", ".flac");
+    ScopedFileCopy copy("multiple-vc", ".flac");
+    string newname = copy.fileName();
 
     FLAC::File *f = new FLAC::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("Artist 1"), f->tag()->artist());
@@ -31,8 +32,6 @@ public:
     f = new FLAC::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
     delete f;
-
-    deleteFile(newname);
   }
 
 };

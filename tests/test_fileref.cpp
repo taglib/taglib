@@ -38,7 +38,8 @@ public:
 
   void fileRefSave(const string &filename, const string &ext)
   {
-    string newname = copyFile(filename, ext);
+    ScopedFileCopy copy(filename, ext);
+    string newname = copy.fileName();
 
     FileRef *f = new FileRef(newname.c_str());
     CPPUNIT_ASSERT(!f->isNull());
@@ -77,8 +78,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(7));
     CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
     delete f;
-
-    deleteFile(newname);
   }
 
   void testMusepack()

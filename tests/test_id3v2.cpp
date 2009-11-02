@@ -242,7 +242,8 @@ public:
 
   void testPOPMFromFile()
   {
-    string newname = copyFile("xing", ".mp3");
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
 
     ID3v2::PopularimeterFrame *f = new ID3v2::PopularimeterFrame();
     f->setEmail("email@example.com");
@@ -256,7 +257,6 @@ public:
     MPEG::File bar(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("email@example.com"), dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->email());
     CPPUNIT_ASSERT_EQUAL(200, dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->rating());
-    deleteFile(newname);
   }
 
   // http://bugs.kde.org/show_bug.cgi?id=150481
@@ -369,7 +369,8 @@ public:
   void testSaveUTF16Comment()
   {
     String::Type defaultEncoding = ID3v2::FrameFactory::instance()->defaultTextEncoding();
-    string newname = copyFile("xing", ".mp3");
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
     ID3v2::FrameFactory::instance()->setDefaultTextEncoding(String::UTF16);
     MPEG::File foo(newname.c_str());
     foo.strip();
@@ -377,7 +378,6 @@ public:
     foo.save();
     MPEG::File bar(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("Test comment!"), bar.tag()->comment());
-    deleteFile(newname);
     ID3v2::FrameFactory::instance()->setDefaultTextEncoding(defaultEncoding);
   }
 

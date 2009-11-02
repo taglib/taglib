@@ -19,12 +19,11 @@ public:
 
   void testReading()
   {
-    string filename = copyFile("empty", ".aiff");
+    ScopedFileCopy copy("empty", ".aiff");
+    string filename = copy.fileName();
 
     RIFF::AIFF::File *f = new RIFF::AIFF::File(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(689, f->audioProperties()->bitrate());
-
-    deleteFile(filename);
   }
 
 };

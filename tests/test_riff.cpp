@@ -35,7 +35,8 @@ public:
 
   void testPadding()
   {
-    string filename = copyFile("empty", ".aiff");
+    ScopedFileCopy copy("empty", ".aiff");
+    string filename = copy.fileName();
 
     PublicRIFF *f = new PublicRIFF(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(2));
@@ -72,8 +73,6 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), f->chunkData(2));
-
-    deleteFile(filename);
   }
 
 };

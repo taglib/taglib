@@ -39,7 +39,8 @@ public:
 
   void testSaveMultipleValues()
   {
-    string newname = copyFile("silence-1", ".wma");
+    ScopedFileCopy copy("silence-1", ".wma");
+    string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
     ASF::AttributeList values;
@@ -52,13 +53,12 @@ public:
     f = new ASF::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(2, (int)f->tag()->attributeListMap()["WM/AlbumTitle"].size());
     delete f;
-
-    deleteFile(newname);
   }
 
   void testSaveStream()
   {
-    string newname = copyFile("silence-1", ".wma");
+    ScopedFileCopy copy("silence-1", ".wma");
+    string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
     ASF::AttributeList values;
@@ -72,13 +72,12 @@ public:
     f = new ASF::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(43, f->tag()->attributeListMap()["WM/AlbumTitle"][0].stream());
     delete f;
-
-    deleteFile(newname);
   }
 
   void testSaveLanguage()
   {
-    string newname = copyFile("silence-1", ".wma");
+    ScopedFileCopy copy("silence-1", ".wma");
+    string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
     ASF::AttributeList values;
@@ -94,8 +93,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(32, f->tag()->attributeListMap()["WM/AlbumTitle"][0].stream());
     CPPUNIT_ASSERT_EQUAL(56, f->tag()->attributeListMap()["WM/AlbumTitle"][0].language());
     delete f;
-
-    deleteFile(newname);
   }
 
 };

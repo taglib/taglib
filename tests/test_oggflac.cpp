@@ -21,7 +21,8 @@ public:
 
   void testFramingBit()
   {
-    string newname = copyFile("empty_flac", ".oga");
+    ScopedFileCopy copy("empty_flac", ".oga");
+    string newname = copy.fileName();
 
     Ogg::FLAC::File *f = new Ogg::FLAC::File(newname.c_str());
     f->tag()->setArtist("The Artist");
@@ -36,7 +37,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(9134, size);
 
     delete f;
-    //deleteFile(newname);
   }
 
 };
