@@ -406,7 +406,6 @@ void FLAC::File::scan()
   nextBlockOffset += length + 4;
 
   // Search through the remaining metadata
-
   while(!isLastBlock) {
 
     header = readBlock(4);
@@ -416,8 +415,13 @@ void FLAC::File::scan()
 
     // Found the vorbis-comment
     if(blockType == VorbisComment) {
-      d->xiphCommentData = readBlock(length);
-      d->hasXiphComment = true;
+      if(!d->hasXiphComment) {
+        d->xiphCommentData = readBlock(length);
+        d->hasXiphComment = true;
+      }
+      else {
+        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, using the first one");
+      }
     }
 
     nextBlockOffset += length + 4;

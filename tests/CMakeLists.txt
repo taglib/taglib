@@ -36,6 +36,7 @@ SET(test_runner_SRCS
   test_riff.cpp
   test_ogg.cpp
   test_oggflac.cpp
+  test_flac.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS}
