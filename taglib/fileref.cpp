@@ -227,6 +227,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       File *file = new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
       if (file->isValid())
         return file;
+      delete file;
       return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     }
     if(ext == "FLAC")
