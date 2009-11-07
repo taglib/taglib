@@ -42,12 +42,12 @@ class MP4::Tag::TagPrivate
 public:
   TagPrivate() : file(0), atoms(0) {}
   ~TagPrivate() {}
-  File *file;
+  TagLib::File *file;
   Atoms *atoms;
   ItemListMap items;
 };
 
-MP4::Tag::Tag(File *file, MP4::Atoms *atoms)
+MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms)
 {
   d = new TagPrivate;
   d->file = file;
