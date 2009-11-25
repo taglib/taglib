@@ -37,8 +37,13 @@ IF(HAVE_CRUN_LIB)
   # the only game in town, the three available STLs -- Cstd,
   # stlport4 and stdcxx -- make this a mess. The KDE-Solaris
   # team supports stdcxx (Apache RogueWave stdcxx 4.1.3).
-  #
-  TARGET_LINK_LIBRARIES(tag_c stdcxx Crun)
+  
+  # According to http://bugs.kde.org/show_bug.cgi?id=215225 the library can have the following two names:
+  FIND_LIBRARY(ROGUEWAVE_STDCXX_LIBRARY NAMES stdcxx4 stdcxx)
+  IF(NOT ROGUEWAVE_STDCXX_LIBRARY)
+    MESSAGE(FATAL_ERROR "Did not find supported STL library (tried stdcxx4 and stdcxx)")
+  ENDIF(NOT ROGUEWAVE_STDCXX_LIBRARY)
+  TARGET_LINK_LIBRARIES(tag_c ${ROGUEWAVE_STDCXX_LIBRARY} Crun)
 ENDIF(HAVE_CRUN_LIB)
 
 SET_TARGET_PROPERTIES(tag_c PROPERTIES
