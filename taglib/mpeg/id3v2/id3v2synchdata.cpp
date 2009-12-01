@@ -33,22 +33,24 @@ using namespace ID3v2;
 TagLib::uint SynchData::toUInt(const ByteVector &data)
 {
   uint sum = 0;
-  bool notsyncsafe = false;
+  bool notSynchSafe = false;
   int last = data.size() > 4 ? 3 : data.size() - 1;
 
   for(int i = 0; i <= last; i++) {
-    if (data[i] & 0x80) {
-      notsyncsafe = true;
+    if(data[i] & 0x80) {
+      notSynchSafe = true;
       break;
     }
 
     sum |= (data[i] & 0x7f) << ((last - i) * 7);
   }
 
-  if (notsyncsafe) {
-    /* Invalid data; assume this was created by some buggy software that just
-     * put normal integers here rather than syncsafe ones, and try it that 
-     * way... */
+  if(notSynchSafe) {
+    /*
+     * Invalid data; assume this was created by some buggy software that just
+     * put normal integers here rather than syncsafe ones, and try it that
+     * way.
+     */
     sum = 0;
     for(int i = 0; i <= last; i++)
       sum |= data[i] << ((last - i) * 8);
