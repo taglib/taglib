@@ -18,6 +18,7 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testSaveStream);
   CPPUNIT_TEST(testSaveLanguage);
+  CPPUNIT_TEST(testDWordTrackNumber);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -52,6 +53,32 @@ public:
 
     f = new ASF::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(2, (int)f->tag()->attributeListMap()["WM/AlbumTitle"].size());
+    delete f;
+  }
+
+  void testDWordTrackNumber()
+  {
+    ScopedFileCopy copy("silence-1", ".wma");
+    string newname = copy.fileName();
+
+    ASF::File *f = new ASF::File(newname.c_str());
+    CPPUNIT_ASSERT(!f->tag()->attributeListMap().contains("WM/TrackNumber"));
+    f->tag()->setAttribute("WM/TrackNumber", (unsigned int)(123));
+    f->save();
+    delete f;
+
+    f = new ASF::File(newname.c_str());
+    CPPUNIT_ASSERT(f->tag()->attributeListMap().contains("WM/TrackNumber"));
+    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType, f->tag()->attributeListMap()["WM/TrackNumber"].front().type());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(123), f->tag()->track());
+    f->tag()->setTrack(234);
+    f->save();
+    delete f;
+
+    f = new ASF::File(newname.c_str());
+    CPPUNIT_ASSERT(f->tag()->attributeListMap().contains("WM/TrackNumber"));
+    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType, f->tag()->attributeListMap()["WM/TrackNumber"].front().type());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(234), f->tag()->track());
     delete f;
   }
 
