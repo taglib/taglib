@@ -113,6 +113,13 @@ MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
     return;
   }
 
+  // must have a moov atom, otherwise consider it invalid
+  MP4::Atom *moov = d->atoms->find("moov");
+  if(!moov) {
+    setValid(false);
+    return;
+  }
+
   d->tag = new Tag(this, d->atoms);
   if(readProperties) {
     d->properties = new Properties(this, d->atoms, audioPropertiesStyle);

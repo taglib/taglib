@@ -16,6 +16,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestMP4);
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testFreeForm);
+  CPPUNIT_TEST(testCheckValid);
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
   CPPUNIT_TEST(test64BitAtom);
@@ -34,6 +35,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(16, ((MP4::Properties *)f.audioProperties())->bitsPerSample());
+  }
+
+  void testCheckValid()
+  {
+    MP4::File f("data/empty.aiff");
+    CPPUNIT_ASSERT(!f.isValid());
+    MP4::File f2("data/has-tags.m4a");
+    CPPUNIT_ASSERT(f2.isValid());
   }
 
   void testUpdateStco()
