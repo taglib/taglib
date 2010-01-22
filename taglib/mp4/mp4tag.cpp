@@ -270,7 +270,7 @@ MP4::Tag::renderIntPair(const ByteVector &name, MP4::Item &item)
               ByteVector::fromShort(item.toIntPair().first) +
               ByteVector::fromShort(item.toIntPair().second) +
               ByteVector(2, '\0'));
-  return renderData(name, 0x15, data);
+  return renderData(name, 0x00, data);
 }
 
 ByteVector
@@ -280,7 +280,7 @@ MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, MP4::Item &item)
   data.append(ByteVector(2, '\0') +
               ByteVector::fromShort(item.toIntPair().first) +
               ByteVector::fromShort(item.toIntPair().second));
-  return renderData(name, 0x15, data);
+  return renderData(name, 0x00, data);
 }
 
 ByteVector
