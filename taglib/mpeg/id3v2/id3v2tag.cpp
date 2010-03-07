@@ -352,7 +352,7 @@ ByteVector ID3v2::Tag::render() const
   // Loop through the frames rendering them and adding them to the tagData.
 
   for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
-    if ((*it)->header()->frameID().size() != 4) {
+    if((*it)->header()->frameID().size() != 4) {
       debug("A frame of unsupported or unknown type \'"
           + String((*it)->header()->frameID()) + "\' has been discarded");
       continue;
