@@ -480,11 +480,12 @@ bool ASF::File::save()
     bool inMetadataObject = false;
     for(unsigned int j = 0; j < attributes.size(); j++) {
       const Attribute &attribute = attributes[j];
-      if(!inExtendedContentDescriptionObject && attribute.language() == 0 && attribute.stream() == 0) {
+      bool largeValue = attribute.dataSize() > 65535;
+      if(!inExtendedContentDescriptionObject && !largeValue && attribute.language() == 0 && attribute.stream() == 0) {
         d->extendedContentDescriptionObject->attributeData.append(attribute.render(name));
         inExtendedContentDescriptionObject = true;
       }
-      else if(!inMetadataObject && attribute.language() == 0 && attribute.stream() != 0) {
+      else if(!inMetadataObject && !largeValue && attribute.language() == 0 && attribute.stream() != 0) {
         d->metadataObject->attributeData.append(attribute.render(name, 1));
         inMetadataObject = true;
       }

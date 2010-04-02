@@ -19,6 +19,7 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveStream);
   CPPUNIT_TEST(testSaveLanguage);
   CPPUNIT_TEST(testDWordTrackNumber);
+  CPPUNIT_TEST(testSaveLargeValue);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -119,6 +120,24 @@ public:
     f = new ASF::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(32, f->tag()->attributeListMap()["WM/AlbumTitle"][0].stream());
     CPPUNIT_ASSERT_EQUAL(56, f->tag()->attributeListMap()["WM/AlbumTitle"][0].language());
+    delete f;
+  }
+
+  void testSaveLargeValue()
+  {
+    ScopedFileCopy copy("silence-1", ".wma");
+    string newname = copy.fileName();
+
+    ASF::File *f = new ASF::File(newname.c_str());
+    ASF::AttributeList values;
+    ASF::Attribute attr(ByteVector(70000, 'x'));
+    values.append(attr);
+    f->tag()->attributeListMap()["WM/Blob"] = values;
+    f->save();
+    delete f;
+
+    f = new ASF::File(newname.c_str());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(70000, 'x'), f->tag()->attributeListMap()["WM/Blob"][0].toByteVector());
     delete f;
   }
 

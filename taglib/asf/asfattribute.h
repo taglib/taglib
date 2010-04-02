@@ -165,6 +165,9 @@ namespace TagLib
       String parse(ASF::File &file, int kind = 0);
 #endif
 
+      //! Returns the size of the stored data
+      int dataSize() const;
+
     private:
       friend class File;
 

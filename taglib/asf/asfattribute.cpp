@@ -30,6 +30,7 @@
 #ifdef WITH_ASF
 
 #include <taglib.h>
+#include <tdebug.h>
 #include "asfattribute.h"
 #include "asffile.h"
 
@@ -197,6 +198,10 @@ ASF::Attribute::parse(ASF::File &f, int kind)
     name = f.readString(nameLength);
   }
 
+  if(kind != 2 && size > 65535) {
+    debug("ASF::Attribute::parse() -- Value larger than 64kB");
+  }
+
   switch(d->type) {
   case WordType:
     d->shortValue = f.readWORD();
@@ -230,6 +235,27 @@ ASF::Attribute::parse(ASF::File &f, int kind)
   }
 
   return name;
+}
+
+int
+ASF::Attribute::dataSize() const
+{
+  switch (d->type) {
+  case WordType:
+    return 2;
+  case BoolType:
+    return 4;
+  case DWordType:
+    return 4;
+  case QWordType:
+    return 5;
+  case UnicodeType:
+    return d->stringValue.size() * 2 + 2;
+  case BytesType:
+  case GuidType:
+    return d->byteVectorValue.size();
+  }
+  return 0;
 }
 
 ByteVector
