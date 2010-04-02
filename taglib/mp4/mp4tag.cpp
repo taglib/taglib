@@ -209,7 +209,7 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
     int flags = data.mid(pos + 8, 4).toUInt();
     if(name != "data") {
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
-      return;
+      break;
     }
     if(flags == MP4::CoverArt::PNG || flags == MP4::CoverArt::JPEG) {
       value.append(MP4::CoverArt(MP4::CoverArt::Format(flags),

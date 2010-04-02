@@ -23,6 +23,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testGnre);
   CPPUNIT_TEST(testCovrRead);
   CPPUNIT_TEST(testCovrWrite);
+  CPPUNIT_TEST(testCovrRead2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -157,6 +158,7 @@ public:
   {
     MP4::File *f = new MP4::File("data/gnre.m4a");
     CPPUNIT_ASSERT_EQUAL(TagLib::String("Ska"), f->tag()->genre());
+    delete f;
   }
 
   void testCovrRead()
@@ -169,6 +171,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
+    delete f;
   }
 
   void testCovrWrite()
@@ -194,6 +197,19 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), l[2].data().size());
+    delete f;
+  }
+
+  void testCovrRead2()
+  {
+    MP4::File *f = new MP4::File("data/covr-junk.m4a");
+    CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
+    MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), l.size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
     delete f;
   }
 

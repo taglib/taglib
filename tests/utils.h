@@ -38,14 +38,16 @@ inline void deleteFile(const string &filename)
 class ScopedFileCopy
 {
 public:
-  ScopedFileCopy(const string &filename, const string &ext)
+  ScopedFileCopy(const string &filename, const string &ext, bool deleteFile=true)
   {
+    m_deleteFile = deleteFile;
     m_filename = copyFile(filename, ext);
   }
 
   ~ScopedFileCopy()
   {
-    deleteFile(m_filename);
+    if(m_deleteFile)
+      deleteFile(m_filename);
   }
 
   string fileName()
@@ -54,5 +56,6 @@ public:
   }
 
 private:
+  bool m_deleteFile;
   string m_filename;
 };
