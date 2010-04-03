@@ -1,3 +1,18 @@
+TagLib 1.6.2 (Apr 5, 2010)
+==========================
+
+ * Read Vorbis Comments from the first FLAC metadata block, if there are
+   multipe ones. (BUG:211089)
+ * Fixed a memory leak in FileRef's OGA format detection.
+ * Fixed compilation with the Sun Studio compiler. (BUG:215225)
+ * Handle WM/TrackNumber attributes with DWORD content in WMA files.
+   (BUG:218526)
+ * More strict check if something is a valid MP4 file. (BUG:216819)
+ * Correctly save MP4 int-pair atoms with flags set to 0.
+ * Fixed compilation of the test runner on Windows.
+ * Store ASF attributes larger than 64k in the metadata library object.
+ * Ignore trailing non-data atoms when parsing MP4 covr atoms.
+
 TagLib 1.6.1 (Oct 31, 2009)
 ===========================
 
