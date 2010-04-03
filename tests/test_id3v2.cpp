@@ -59,6 +59,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
   CPPUNIT_TEST(testUpdateGenre24);
+  CPPUNIT_TEST(testUpdateDate22);
+  // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -437,6 +439,20 @@ public:
     ID3v2::Tag tag;
     tag.addFrame(frame);
     CPPUNIT_ASSERT_EQUAL(String("R&B Eurodisco"), tag.genre());
+  }
+
+  void testUpdateDate22()
+  {
+    MPEG::File f("data/id3v22-tda.mp3", false);
+    CPPUNIT_ASSERT(f.tag());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2010), f.tag()->year());
+  }
+
+  void testUpdateFullDate22()
+  {
+    MPEG::File f("data/id3v22-tda.mp3", false);
+    CPPUNIT_ASSERT(f.tag());
+    CPPUNIT_ASSERT_EQUAL(String("2010-04-03"), f.ID3v2Tag()->frameListMap()["TDRC"].front()->toString());
   }
 
 };
