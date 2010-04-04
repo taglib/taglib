@@ -48,7 +48,7 @@ taglib_includedir = $(includedir)/taglib
 #  8:0:7 -- TagLib 1.6.1
 #  9:0:8 -- TagLib 1.6.2
 
-libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 8:1:7
+libtag_la_LDFLAGS = $(all_libraries) -no-undefined -version-info 9:0:8
 libtag_la_LIBADD = ./mpeg/libmpeg.la ./ogg/libogg.la ./flac/libflac.la ./mpc/libmpc.la \
 	./ape/libape.la ./toolkit/libtoolkit.la ./wavpack/libwavpack.la \
 	./trueaudio/libtrueaudio.la ./riff/libriff.la \
