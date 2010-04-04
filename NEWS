@@ -12,6 +12,7 @@ TagLib 1.6.2 (Apr 5, 2010)
  * Fixed compilation of the test runner on Windows.
  * Store ASF attributes larger than 64k in the metadata library object.
  * Ignore trailing non-data atoms when parsing MP4 covr atoms.
+ * Don't upgrade ID3v2.2 frame TDA to TDRC. (BUG:228968)
 
 TagLib 1.6.1 (Oct 31, 2009)
 ===========================
