@@ -35,7 +35,7 @@ namespace TagLib {
 
   namespace ID3v2 {
 
-    class TAGLIB_EXPORT TextIdentificationFrame;
+    class TextIdentificationFrame;
 
     //! A factory for creating ID3v2 frames during parsing
 
