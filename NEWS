@@ -1,4 +1,4 @@
-TagLib 1.6.2 (Apr 5, 2010)
+TagLib 1.6.2 (Apr 9, 2010)
 ==========================
 
  * Read Vorbis Comments from the first FLAC metadata block, if there are
