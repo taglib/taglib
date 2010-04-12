@@ -1,3 +1,9 @@
+TagLib 1.6.3 (Apr 13, 2010)
+===========================
+
+ * Fixed definitions of the TAGLIB_WITH_MP4 and TAGLIB_WITH_ASF macros.
+ * Fixed upgrading of ID3v2.3 genre frame with ID3v1 code 0 (Blues).
+
 TagLib 1.6.2 (Apr 9, 2010)
 ==========================
 
