@@ -38,7 +38,7 @@
 #define TAGLIB_EXPORT
 #endif
 
-#ifdef HAVE_CONFIG_H
+#ifndef TAGLIB_NO_CONFIG
 #include "taglib_config.h"
 #endif
 
