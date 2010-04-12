@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: TagLib C Bindings
 Description: Audio meta-data library (C bindings)
 Requires: taglib
-Version: 1.6.2
+Version: 1.6.3
 Libs: -L${libdir} -ltag_c
 Cflags: -I${includedir}/taglib 

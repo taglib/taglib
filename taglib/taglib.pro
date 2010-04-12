@@ -9,7 +9,7 @@ CONFIG -= qt
 DEFINES += HAVE_ZLIB=1 NDEBUG WITH_ASF WITH_MP4
 LIBS += -lz
 TARGET = TagLib
-VERSION = 1.6.2
+VERSION = 1.6.3
 DEPENDPATH += . \
            ape \
            asf \

@@ -38,7 +38,7 @@ dnl Perform program name transformation
 AC_ARG_PROGRAM
 
 dnl Automake doc recommends to do this only here. (Janos)
-AM_INIT_AUTOMAKE(taglib,1.6.2)
+AM_INIT_AUTOMAKE(taglib,1.6.3)
 
 dnl almost the same like KDE_SET_PEFIX but the path is /usr/local
 dnl
