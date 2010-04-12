@@ -164,19 +164,10 @@ String ID3v2::Tag::genre() const
     if((*it).isEmpty())
       continue;
 
-    bool isNumber = true;
-
-    for(String::ConstIterator charIt = (*it).begin();
-        isNumber && charIt != (*it).end();
-        ++charIt)
-    {
-      isNumber = *charIt >= '0' && *charIt <= '9';
-    }
-
-    if(isNumber) {
-      int number = (*it).toInt();
-      if(number >= 0 && number <= 255)
-        *it = ID3v1::genre(number);
+    bool ok;
+    int number = (*it).toInt(&ok);
+    if(ok && number >= 0 && number <= 255) {
+      *it = ID3v1::genre(number);
     }
 
     if(std::find(genres.begin(), genres.end(), *it) == genres.end())

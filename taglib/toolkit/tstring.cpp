@@ -432,16 +432,26 @@ ByteVector String::data(Type t) const
 
 int String::toInt() const
 {
+  return toInt(0);
+}
+
+int String::toInt(bool *ok) const
+{
   int value = 0;
 
-  bool negative = d->data[0] == '-';
-  uint i = negative ? 1 : 0;
+  uint size = d->data.size();
+  bool negative = size > 0 && d->data[0] == '-';
+  uint start = negative ? 1 : 0;
+  uint i = start;
 
-  for(; i < d->data.size() && d->data[i] >= '0' && d->data[i] <= '9'; i++)
+  for(; i < size && d->data[i] >= '0' && d->data[i] <= '9'; i++)
     value = value * 10 + (d->data[i] - '0');
 
   if(negative)
     value = value * -1;
+
+  if(ok)
+    *ok = (size > start && i == size);
 
   return value;
 }
