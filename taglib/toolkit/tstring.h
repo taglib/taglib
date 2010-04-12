@@ -295,6 +295,7 @@ namespace TagLib {
      * Returns the integer if the conversion was successfull or 0 if the
      * string does not represent a number.
      */
+    // BIC: merge with the method below
     int toInt() const;
 
     /*!
