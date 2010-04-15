@@ -46,14 +46,10 @@ TagLib::uint SynchData::toUInt(const ByteVector &data)
   }
 
   if(notSynchSafe) {
-    /*
-     * Invalid data; assume this was created by some buggy software that just
-     * put normal integers here rather than syncsafe ones, and try it that
-     * way.
-     */
-    sum = 0;
-    for(int i = 0; i <= last; i++)
-      sum |= data[i] << ((last - i) * 8);
+    // Invalid data; assume this was created by some buggy software that just
+    // put normal integers here rather than syncsafe ones, and try it that
+    // way.
+    sum = (data.size() > 4) ? data.mid(0, 4).toUInt() : data.toUInt();
   }
 
   return sum;

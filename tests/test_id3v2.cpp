@@ -61,6 +61,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateGenre24);
   CPPUNIT_TEST(testUpdateDate22);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
+  CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -453,6 +454,19 @@ public:
     MPEG::File f("data/id3v22-tda.mp3", false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("2010-04-03"), f.ID3v2Tag()->frameListMap()["TDRC"].front()->toString());
+  }
+
+  void testCompressedFrameWithBrokenLength()
+  {
+    MPEG::File f("data/compressed_id3_frame.mp3", false);
+    CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("APIC"));
+    ID3v2::AttachedPictureFrame *frame =
+        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
+    CPPUNIT_ASSERT(frame);
+    CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
+    CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
   }
 
 };
