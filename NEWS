@@ -1,4 +1,4 @@
-TagLib 1.6.3 (Apr 15, 2010)
+TagLib 1.6.3 (Apr 17, 2010)
 ===========================
 
  * Fixed definitions of the TAGLIB_WITH_MP4 and TAGLIB_WITH_ASF macros.

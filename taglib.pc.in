@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: TagLib
 Description: Audio meta-data library
 Requires: 
-Version: 1.6
+Version: 1.6.3
 Libs: -L${libdir} -ltag
 Cflags: -I${includedir}/taglib 
