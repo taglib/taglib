@@ -53,7 +53,6 @@ public:
     APESize(0),
     ID3v1Location(-1),
     properties(0),
-    scanned(false),
     hasAPE(false),
     hasID3v1(false) {}
 
@@ -70,7 +69,6 @@ public:
   TagUnion tag;
 
   Properties *properties;
-  bool scanned;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.

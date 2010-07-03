@@ -49,7 +49,6 @@ public:
     file(file),
     streamLength(streamLength) {}
 
-  long streamLength;
   int length;
   int bitrate;
   int sampleRate;
@@ -57,6 +56,7 @@ public:
   int version;
   int bitsPerSample;
   File *file;
+  long streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
