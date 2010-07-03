@@ -2,6 +2,7 @@ INCLUDES = \
         -I$(top_srcdir)/taglib\
         -I$(top_srcdir)/taglib/toolkit \
         -I$(top_srcdir)/taglib/trueaudio \
+        -I$(top_srcdir)/taglib/ape \
         -I$(top_srcdir)/taglib/mpeg \
         -I$(top_srcdir)/taglib/mpeg/id3v1 \
         -I$(top_srcdir)/taglib/mpeg/id3v2 \
@@ -19,6 +20,7 @@ test_runner_SOURCES = \
 	test_map.cpp \
 	test_mpeg.cpp \
 	test_synchdata.cpp \
+	test_ape.cpp \
 	test_trueaudio.cpp \
 	test_bytevector.cpp \
 	test_string.cpp \

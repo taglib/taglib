@@ -121,6 +121,8 @@ SET(ape_SRCS
 ape/apetag.cpp
 ape/apefooter.cpp
 ape/apeitem.cpp
+ape/apefile.cpp
+ape/apeproperties.cpp
 )
 
 SET(wavpack_SRCS

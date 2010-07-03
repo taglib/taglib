@@ -32,6 +32,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testMP4_3);
 #endif
   CPPUNIT_TEST(testTrueAudio);
+  CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -148,6 +149,10 @@ public:
       CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) == NULL);
   }
 
+  void testAPE()
+  {
+    fileRefSave("mac-399.ape", ".ape");
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestFileRef);

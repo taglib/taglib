@@ -66,7 +66,7 @@ namespace TagLib {
        * Create an APE tag and parse the data in \a file with APE footer at
        * \a tagOffset.
        */
-      Tag(File *file, long footerLocation);
+      Tag(TagLib::File *file, long footerLocation);
 
       /*!
        * Destroys this Tag instance.

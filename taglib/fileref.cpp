@@ -1,6 +1,10 @@
 /***************************************************************************
     copyright            : (C) 2002 - 2008 by Scott Wheeler
     email                : wheeler@kde.org
+    
+    copyright            : (C) 2010 by Alex Novichkov
+    email                : novichko@atnet.ru
+                           (added APE file support)
  ***************************************************************************/
 
 /***************************************************************************
@@ -44,6 +48,7 @@
 #include "trueaudiofile.h"
 #include "aifffile.h"
 #include "wavfile.h"
+#include "apefile.h"
 
 using namespace TagLib;
 
@@ -156,6 +161,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("aif");
   l.append("aiff");
   l.append("wav");
+  l.append("ape");
 
   return l;
 }
@@ -254,6 +260,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "AIFF")
       return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "APE")
+      return new APE::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
   return 0;

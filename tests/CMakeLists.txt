@@ -3,6 +3,7 @@ if(BUILD_TESTS)
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/asf
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
@@ -37,6 +38,7 @@ SET(test_runner_SRCS
   test_ogg.cpp
   test_oggflac.cpp
   test_flac.cpp
+  test_ape.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS}

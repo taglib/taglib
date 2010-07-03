@@ -6,7 +6,7 @@ INCLUDES = \
 
 noinst_LTLIBRARIES = libape.la
 
-libape_la_SOURCES = apetag.cpp apefooter.cpp apeitem.cpp
+libape_la_SOURCES = apetag.cpp apefooter.cpp apeitem.cpp apefile.cpp apeproperties.cpp
 
-taglib_include_HEADERS = apetag.h apefooter.h apeitem.h
+taglib_include_HEADERS = apetag.h apefooter.h apeitem.h apefile.h apeproperties.cpp
 taglib_includedir = $(includedir)/taglib
