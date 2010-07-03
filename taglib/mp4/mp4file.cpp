@@ -129,6 +129,11 @@ MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
 bool
 MP4::File::save()
 {
+  if(readOnly()) {
+    debug("MP4::File::save() -- File is read only.");
+    return false;
+  }
+
   if(!isValid())
     return false;
 
