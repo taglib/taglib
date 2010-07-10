@@ -137,6 +137,11 @@ namespace TagLib {
        */
       void setItem(const String &key, const Item &item);
 
+      /*!
+       * Returns true if the tag does not contain any data.
+       */
+      bool isEmpty() const;
+
     protected:
 
       /*!
