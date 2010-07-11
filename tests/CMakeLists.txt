@@ -41,7 +41,7 @@ SET(test_runner_SRCS
   test_flac.cpp
   test_ape.cpp
   test_apetag.cpp
-  #test_wav.cpp
+  test_wav.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS}
