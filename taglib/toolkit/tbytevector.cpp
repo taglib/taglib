@@ -42,6 +42,8 @@
 #define DATA(x) (&(x->data[0]))
 
 namespace TagLib {
+  static const char hexTable[17] = "0123456789abcdef";
+
   static const uint crcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
     0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
@@ -651,6 +653,20 @@ ByteVector &ByteVector::operator=(const char *data)
 {
   *this = ByteVector(data);
   return *this;
+}
+
+ByteVector ByteVector::toHex() const
+{
+  ByteVector encoded(size() * 2);
+
+  uint j = 0;
+  for(uint i = 0; i < size(); i++) {
+    unsigned char c = d->data[i];
+    encoded[j++] = hexTable[(c >> 4) & 0x0F];
+    encoded[j++] = hexTable[(c     ) & 0x0F];
+  }
+
+  return encoded;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -77,6 +77,12 @@ namespace TagLib {
        */
       int sampleWidth() const;
 
+      /*!
+       * Returns the MD5 signature of the uncompressed audio stream as read
+	   * from the stream info header header.
+       */
+      ByteVector signature() const;
+
     private:
       Properties(const Properties &);
       Properties &operator=(const Properties &);

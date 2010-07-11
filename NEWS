@@ -5,6 +5,9 @@ TagLib 1.7
  * Implemented APE::Tag::isEmpty() to check for all APE tags, not just the
    basic ones.
  * Added reading of WAV audio length. (BUG:116033)
+ * Exposed FLAC MD5 signature of the uncompressed audio stream via
+   FLAC::Properties::signature(). (BUG:160172)
+ * Added function ByteVector::toHex() for hex-encoding of byte vectors.
 
 TagLib 1.6.3 (Apr 17, 2010)
 ===========================

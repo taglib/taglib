@@ -52,6 +52,7 @@ public:
   int sampleRate;
   int sampleWidth;
   int channels;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +99,11 @@ int FLAC::Properties::sampleWidth() const
 int FLAC::Properties::channels() const
 {
   return d->channels;
+}
+
+ByteVector FLAC::Properties::signature() const
+{
+  return d->signature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,4 +153,6 @@ void FLAC::Properties::read()
   // Real bitrate:
 
   d->bitrate = d->length > 0 ? ((d->streamLength * 8UL) / d->length) / 1000 : 0;
+
+  d->signature = d->data.mid(pos, 32);
 }

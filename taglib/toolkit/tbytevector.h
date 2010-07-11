@@ -385,6 +385,11 @@ namespace TagLib {
      */
     static ByteVector null;
 
+    /*!
+	 * Returns a hex-encoded copy of the byte vector.
+	 */
+    ByteVector toHex() const;
+
   protected:
     /*
      * If this ByteVector is being shared via implicit sharing, do a deep copy

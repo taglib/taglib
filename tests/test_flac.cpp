@@ -13,10 +13,17 @@ using namespace TagLib;
 class TestFLAC : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestFLAC);
+  CPPUNIT_TEST(testSignature);
   CPPUNIT_TEST(testMultipleCommentBlocks);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+
+  void testSignature()
+  {
+    FLAC::File f("data/no-tags.flac");
+    CPPUNIT_ASSERT_EQUAL(ByteVector("a1b141f766e9849ac3db1030a20a3c77"), f.audioProperties()->signature().toHex());
+  }
 
   void testMultipleCommentBlocks()
   {
