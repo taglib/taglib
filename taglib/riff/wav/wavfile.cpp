@@ -96,12 +96,19 @@ bool RIFF::WAV::File::save()
 
 void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
+  ByteVector formatData;
+  uint streamLength = 0;
   for(uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 ")
       d->tag = new ID3v2::Tag(this, chunkOffset(i));
     else if(chunkName(i) == "fmt " && readProperties)
-      d->properties = new Properties(chunkData(i), propertiesStyle);
+      formatData = chunkData(i);
+    else if(chunkName(i) == "data" && readProperties)
+      streamLength = chunkDataSize(i);
   }
+
+  if(!formatData.isEmpty())
+    d->properties = new Properties(formatData, streamLength, propertiesStyle);
 
   if(!d->tag)
     d->tag = new ID3v2::Tag;

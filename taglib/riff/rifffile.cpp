@@ -79,6 +79,11 @@ TagLib::uint RIFF::File::chunkCount() const
   return d->chunkNames.size();
 }
 
+TagLib::uint RIFF::File::chunkDataSize(uint i) const
+{
+  return d->chunkSizes[i];
+}
+
 TagLib::uint RIFF::File::chunkOffset(uint i) const
 {
   return d->chunkOffsets[i];

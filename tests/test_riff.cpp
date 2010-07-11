@@ -15,6 +15,7 @@ public:
   PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
   TagLib::uint chunkCount() { return RIFF::File::chunkCount(); };
   TagLib::uint chunkOffset(TagLib::uint i) { return RIFF::File::chunkOffset(i); };
+  TagLib::uint chunkDataSize(TagLib::uint i) { return RIFF::File::chunkDataSize(i); };
   ByteVector chunkName(TagLib::uint i) { return RIFF::File::chunkName(i); };
   ByteVector chunkData(TagLib::uint i) { return RIFF::File::chunkData(i); };
   void setChunkData(const ByteVector &name, const ByteVector &data) {
@@ -48,6 +49,7 @@ public:
     f = new PublicRIFF(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), f->chunkData(2));
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), f->chunkDataSize(2));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x1728 + 8), f->chunkOffset(2));
 
     f->setChunkData("SSND", "abcd");

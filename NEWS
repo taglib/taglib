@@ -1,9 +1,10 @@
 TagLib 1.7
 ==========
 
- * Support for reading/writing tags from Monkey's Audio files.
+ * Support for reading/writing tags from Monkey's Audio files. (BUG:210404)
  * Implemented APE::Tag::isEmpty() to check for all APE tags, not just the
    basic ones.
+ * Added reading of WAV audio length. (BUG:116033)
 
 TagLib 1.6.3 (Apr 17, 2010)
 ===========================

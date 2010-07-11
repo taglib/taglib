@@ -68,6 +68,11 @@ namespace TagLib {
       uint chunkOffset(uint i) const;
 
       /*!
+       * \return The size of the chunk data.
+       */
+      uint chunkDataSize(uint i) const;
+
+      /*!
        * \return The name of the specified chunk, for instance, "COMM" or "ID3 "
        */
       ByteVector chunkName(uint i) const;

@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/wav
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/vorbis
@@ -40,6 +41,7 @@ SET(test_runner_SRCS
   test_flac.cpp
   test_ape.cpp
   test_apetag.cpp
+  test_wav.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS}

@@ -26,6 +26,7 @@
 #ifndef TAGLIB_WAVPROPERTIES_H
 #define TAGLIB_WAVPROPERTIES_H
 
+#include "taglib.h"
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -53,6 +54,12 @@ namespace TagLib {
 	 * ByteVector \a data.
 	 */
 	Properties(const ByteVector &data, ReadStyle style);
+
+	/*!
+	 * Create an instance of WAV::Properties with the data read from the
+	 * ByteVector \a data and the length calculated using \a streamLength.
+	 */
+	Properties(const ByteVector &data, uint streamLength, ReadStyle style);
 
 	/*!
 	 * Destroys this WAV::Properties instance.
