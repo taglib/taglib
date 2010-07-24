@@ -30,7 +30,7 @@
 #include "taglib_export.h"
 
 #include <vector>
-#include <iostream>
+#include <ostream>
 
 namespace TagLib {
 

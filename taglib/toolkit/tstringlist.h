@@ -31,7 +31,7 @@
 #include "tbytevectorlist.h"
 #include "taglib_export.h"
 
-#include <iostream>
+#include <ostream>
 
 namespace TagLib {
 

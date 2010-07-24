@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <iostream>
+#include <ostream>
 #include <bitset>
 
 #include <tstring.h>

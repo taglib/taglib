@@ -23,6 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifndef NDEBUG
 #include <iostream>
 #include <bitset>
 
@@ -31,7 +32,6 @@
 
 using namespace TagLib;
 
-#ifndef NDEBUG
 void TagLib::debug(const String &s)
 {
   std::cerr << "TagLib: " << s << std::endl;
