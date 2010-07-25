@@ -28,7 +28,9 @@
 
 #include "taglib_export.h"
 #include "tfile.h"
+#include "tlist.h"
 
+#include "flacpicture.h"
 #include "flacproperties.h"
 
 namespace TagLib {
@@ -181,6 +183,24 @@ namespace TagLib {
        * \deprecated This method will not be public in a future release.
        */
       long streamLength();  // BIC: remove
+
+      /*!
+       * Returns a list of pictures attached to the FLAC file.
+       */
+      List<Picture *> pictureList();
+
+      /*!
+       * Remove all attached images.
+       */
+      void removePictures();
+
+      /*!
+       * Add a new picture to the file. The file takes ownership of the
+       * picture and will handle freeing its memory.
+       *
+       * \note The file will be saved only after calling save().
+       */
+      void addPicture(Picture *picture);
 
     private:
       File(const File &);

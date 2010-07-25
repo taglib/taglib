@@ -15,6 +15,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestFLAC);
   CPPUNIT_TEST(testSignature);
   CPPUNIT_TEST(testMultipleCommentBlocks);
+  CPPUNIT_TEST(testPicture);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -39,6 +40,26 @@ public:
     f = new FLAC::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
     delete f;
+  }
+
+  void testPicture()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    string newname = copy.fileName();
+
+    FLAC::File *f = new FLAC::File(newname.c_str());
+    List<FLAC::Picture *> lst = f->pictureList();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+
+    FLAC::Picture *pic = lst.front();
+    CPPUNIT_ASSERT_EQUAL(3, int(pic->type()));
+    CPPUNIT_ASSERT_EQUAL(1, pic->width());
+    CPPUNIT_ASSERT_EQUAL(1, pic->height());
+    CPPUNIT_ASSERT_EQUAL(24, pic->colorDepth());
+    CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
+    CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
+    CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(150), pic->data().size());
   }
 
 };

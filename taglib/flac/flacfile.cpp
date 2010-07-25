@@ -34,6 +34,7 @@
 #include <id3v1tag.h>
 #include <xiphcomment.h>
 
+#include "flacpicture.h"
 #include "flacfile.h"
 
 using namespace TagLib;
@@ -41,7 +42,15 @@ using namespace TagLib;
 namespace
 {
   enum { XiphIndex = 0, ID3v2Index = 1, ID3v1Index = 2 };
-  enum { StreamInfo = 0, Padding, Application, SeekTable, VorbisComment, CueSheet };
+  enum {
+    StreamInfo = 0,
+    Padding,
+    Application,
+    SeekTable,
+    VorbisComment,
+    CueSheet,
+    PictureBlock
+  };
   enum { MinPaddingLength = 4096 };
 }
 
@@ -64,6 +73,9 @@ public:
 
   ~FilePrivate()
   {
+    for(uint i = 0; i < pictureList.size(); i++) {
+      delete pictureList[i];
+    }
     delete properties;
   }
 
@@ -78,6 +90,7 @@ public:
   Properties *properties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
+  List<Picture *> pictureList;
 
   long flacStart;
   long streamStart;
@@ -423,6 +436,16 @@ void FLAC::File::scan()
         debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, using the first one");
       }
     }
+    else if(blockType == PictureBlock) {
+      ByteVector pictureData = readBlock(length);
+      FLAC::Picture *picture = new FLAC::Picture();
+      if(picture->parse(pictureData)) {
+        addPicture(picture);
+      }
+      else {
+        debug("FLAC::File::scan() -- invalid picture found");
+      }
+    }
 
     nextBlockOffset += length + 4;
 
@@ -502,3 +525,21 @@ long FLAC::File::findPaddingBreak(long nextBlockOffset, long targetOffset, bool 
 
   return 0;
 }
+
+List<FLAC::Picture *> FLAC::File::pictureList()
+{
+  return d->pictureList;
+}
+
+void FLAC::File::addPicture(Picture *picture)
+{
+  d->pictureList.append(picture);
+}
+
+void FLAC::File::removePictures()
+{
+  for(uint i = 0; i < d->pictureList.size(); i++)
+    delete d->pictureList[i];
+  d->pictureList.clear();
+}
+

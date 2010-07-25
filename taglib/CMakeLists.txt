@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/speex
     ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
+    ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/frames
     ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1
     ${CMAKE_CURRENT_SOURCE_DIR}/ape
     ${CMAKE_CURRENT_SOURCE_DIR}/wavpack
@@ -92,6 +93,7 @@ ogg/vorbis/vorbisproperties.cpp
 
 SET(flacs_SRCS
 flac/flacfile.cpp
+flac/flacpicture.cpp
 flac/flacproperties.cpp
 )
 
