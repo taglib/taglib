@@ -18,7 +18,9 @@ INCLUDES = \
 	-I$(top_srcdir)/taglib/riff \
 	-I$(top_srcdir)/taglib/riff/aiff \
 	-I$(top_srcdir)/taglib/riff/wav \
+	-I$(top_srcdir)/taglib/ape \
 	-I$(top_srcdir)/taglib/mpeg/id3v2 \
+	-I$(top_srcdir)/taglib/mpeg/id3v2/frames \
 	$(all_includes)
 
 lib_LTLIBRARIES = libtag.la

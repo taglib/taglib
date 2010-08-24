@@ -35,9 +35,9 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tagunion.h>
+#include <id3v1tag.h>
 
 #include "apefile.h"
-#include "id3v1tag.h"
 
 #include "apetag.h"
 #include "apefooter.h"
