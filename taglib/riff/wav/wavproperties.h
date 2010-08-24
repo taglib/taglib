@@ -73,6 +73,8 @@ namespace TagLib {
 	virtual int sampleRate() const;
 	virtual int channels() const;
 
+	int sampleWidth() const;
+
       private:
 	Properties(const Properties &);
 	Properties &operator=(const Properties &);

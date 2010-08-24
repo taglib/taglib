@@ -84,7 +84,8 @@ public:
     length(0),
     bitrate(0),
     sampleRate(0),
-    channels(0)
+    channels(0),
+    sampleWidth(0)
   {
 
   }
@@ -93,6 +94,7 @@ public:
   int bitrate;
   int sampleRate;
   int channels;
+  int sampleWidth;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -130,6 +132,11 @@ int RIFF::AIFF::Properties::channels() const
   return d->channels;
 }
 
+int RIFF::AIFF::Properties::sampleWidth() const
+{
+  return d->sampleWidth;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -138,9 +145,9 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
 {
   d->channels       = data.mid(0, 2).toShort();
   uint sampleFrames = data.mid(2, 4).toUInt();
-  short sampleSize  = data.mid(6, 2).toShort();
+  d->sampleWidth    = data.mid(6, 2).toShort();
   double sampleRate = ConvertFromIeeeExtended(reinterpret_cast<unsigned char *>(data.mid(8, 10).data()));
   d->sampleRate     = sampleRate;
-  d->bitrate        = (sampleRate * sampleSize * d->channels) / 1024.0;
+  d->bitrate        = (sampleRate * d->sampleWidth * d->channels) / 1024.0;
   d->length         = sampleFrames / d->sampleRate;
 }
