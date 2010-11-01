@@ -36,7 +36,8 @@ class RIFF::WAV::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tag(0)
+    tag(0),
+    tagChunkID("ID3 ")
   {
 
   }
@@ -49,6 +50,7 @@ public:
 
   Properties *properties;
   ID3v2::Tag *tag;
+  ByteVector tagChunkID;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +87,7 @@ bool RIFF::WAV::File::save()
     return false;
   }
 
-  setChunkData("ID3 ", d->tag->render());
+  setChunkData(d->tagChunkID, d->tag->render());
 
   return true;
 }
@@ -99,8 +101,10 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
   ByteVector formatData;
   uint streamLength = 0;
   for(uint i = 0; i < chunkCount(); i++) {
-    if(chunkName(i) == "ID3 ")
+    if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
+      d->tagChunkID = chunkName(i);
       d->tag = new ID3v2::Tag(this, chunkOffset(i));
+    }
     else if(chunkName(i) == "fmt " && readProperties)
       formatData = chunkData(i);
     else if(chunkName(i) == "data" && readProperties)

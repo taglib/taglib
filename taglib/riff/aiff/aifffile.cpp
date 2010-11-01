@@ -36,7 +36,8 @@ class RIFF::AIFF::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tag(0)
+    tag(0),
+    tagChunkID("ID3 ")
   {
 
   }
@@ -49,6 +50,7 @@ public:
 
   Properties *properties;
   ID3v2::Tag *tag;
+  ByteVector tagChunkID;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +87,7 @@ bool RIFF::AIFF::File::save()
     return false;
   }
 
-  setChunkData("ID3 ", d->tag->render());
+  setChunkData(d->tagChunkID, d->tag->render());
 
   return true;
 }
@@ -97,8 +99,10 @@ bool RIFF::AIFF::File::save()
 void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   for(uint i = 0; i < chunkCount(); i++) {
-    if(chunkName(i) == "ID3 ")
+    if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
+      d->tagChunkID = chunkName(i);
       d->tag = new ID3v2::Tag(this, chunkOffset(i));
+    }
     else if(chunkName(i) == "COMM" && readProperties)
       d->properties = new Properties(chunkData(i), propertiesStyle);
   }
