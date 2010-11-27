@@ -12,15 +12,27 @@ using namespace TagLib;
 class TestWavPack : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestWavPack);
+  CPPUNIT_TEST(testBasic);
   CPPUNIT_TEST(testLengthScan);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
+  void testBasic()
+  {
+    WavPack::File f("data/no_length.wv");
+    WavPack::Properties *props = f.audioProperties();
+    CPPUNIT_ASSERT_EQUAL(44100, props->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(2, props->channels());
+    CPPUNIT_ASSERT_EQUAL(1, props->bitrate());
+    CPPUNIT_ASSERT_EQUAL(0x407, props->version());
+  }
+
   void testLengthScan()
   {
     WavPack::File f("data/no_length.wv");
-    CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->length());
+    WavPack::Properties *props = f.audioProperties();
+    CPPUNIT_ASSERT_EQUAL(4, props->length());
   }
 
 };
