@@ -230,8 +230,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
 
   if(readProperties) {
     seek(0);
-    d->properties = new Properties(readBlock(WavPack::HeaderSize),
-                                   length() - d->APESize);
+    d->properties = new Properties(this, length() - d->APESize);
   }
 }
 

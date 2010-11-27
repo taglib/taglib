@@ -8,6 +8,8 @@ TagLib 1.7
  * Exposed FLAC MD5 signature of the uncompressed audio stream via
    FLAC::Properties::signature(). (BUG:160172)
  * Added function ByteVector::toHex() for hex-encoding of byte vectors.
+ * WavPack reader now tries to get the audio length by finding the final
+   block, if the header doesn't have the information. (BUG:258016)
 
 TagLib 1.6.3 (Apr 17, 2010)
 ===========================

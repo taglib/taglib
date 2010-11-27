@@ -12,7 +12,8 @@ INCLUDES = \
         -I$(top_srcdir)/taglib/flac \
         -I$(top_srcdir)/taglib/riff \
         -I$(top_srcdir)/taglib/riff/aiff \
-        -I$(top_srcdir)/taglib/mpeg/id3v2/frames
+        -I$(top_srcdir)/taglib/mpeg/id3v2/frames \
+        -I$(top_srcdir)/taglib/wavpack
 
 test_runner_SOURCES = \
 	main.cpp \
@@ -32,7 +33,8 @@ test_runner_SOURCES = \
 	test_aiff.cpp \
 	test_ogg.cpp \
 	test_oggflac.cpp \
-	test_flac.cpp
+	test_flac.cpp \
+	test_wavpack.cpp
 
 if build_tests
 TESTS = test_runner

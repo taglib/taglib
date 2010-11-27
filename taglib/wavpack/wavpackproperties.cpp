@@ -48,7 +48,8 @@ public:
     sampleRate(0),
     channels(0),
     version(0),
-    bitsPerSample(0) {}
+    bitsPerSample(0),
+    file(0) {}
 
   ByteVector data;
   long streamLength;
@@ -59,6 +60,7 @@ public:
   int channels;
   int version;
   int bitsPerSample;
+  File *file;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,6 +70,14 @@ public:
 WavPack::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
+  read();
+}
+
+WavPack::Properties::Properties(File *file, long streamLength, ReadStyle style) : AudioProperties(style)
+{
+  ByteVector data = file->readBlock(32);
+  d = new PropertiesPrivate(data, streamLength, style);
+  d->file = file;
   read();
 }
 
@@ -122,12 +132,19 @@ static const unsigned int sample_rates[] = { 6000, 8000, 9600, 11025, 12000,
 #define SRATE_LSB       23
 #define SRATE_MASK      (0xfL << SRATE_LSB)
 
+#define MIN_STREAM_VERS     0x402
+#define MAX_STREAM_VERS     0x410
+
+#define FINAL_BLOCK     0x1000
+
 void WavPack::Properties::read()
 {
   if(!d->data.startsWith("wvpk"))
     return;
 
   d->version = d->data.mid(8, 2).toShort(false);
+  if(d->version < MIN_STREAM_VERS || d->version > MAX_STREAM_VERS)
+    return;
 
   unsigned int flags = d->data.mid(24, 4).toUInt(false);
   d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 -
@@ -136,11 +153,43 @@ void WavPack::Properties::read()
   d->channels = (flags & MONO_FLAG) ? 1 : 2;
 
   unsigned int samples = d->data.mid(12, 4).toUInt(false);
-  if (samples == ~0u) {
-    samples = 0;
+  if(samples == ~0u) {
+    if(d->file && d->style != Fast) {
+      samples = seekFinalIndex(); 
+    }
+    else {
+      samples = 0;
+    }
   }
   d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
 
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+}
+
+unsigned int WavPack::Properties::seekFinalIndex()
+{
+  ByteVector blockID("wvpk", 4);
+
+  long offset = d->streamLength;
+  while(offset > 0) {
+    offset = d->file->rfind(blockID, offset);
+    if(offset == -1)
+      return 0;
+    d->file->seek(offset);
+    ByteVector data = d->file->readBlock(32);
+    if(data.size() != 32)
+      return 0;
+    int version = data.mid(8, 2).toShort(false);
+    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
+      continue;
+    unsigned int flags = data.mid(24, 4).toUInt(false);
+    if(!(flags & FINAL_BLOCK))
+      return 0;
+    unsigned int blockIndex = data.mid(16, 4).toUInt(false);
+    unsigned int blockSamples = data.mid(20, 4).toUInt(false);
+    return blockIndex + blockSamples;
+  }
+
+  return 0;
 }
 
