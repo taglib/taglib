@@ -136,6 +136,9 @@ void WavPack::Properties::read()
   d->channels = (flags & MONO_FLAG) ? 1 : 2;
 
   unsigned int samples = d->data.mid(12, 4).toUInt(false);
+  if (samples == ~0u) {
+    samples = 0;
+  }
   d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
 
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
