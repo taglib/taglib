@@ -114,6 +114,9 @@ namespace TagLib {
        *
        * This is the most powerfull structure for accessing the items of the tag.
        *
+       * APE tags are case-insensitive, all keys in this map have been converted
+       * to upper case.
+       *
        * \warning You should not modify this data structure directly, instead
        * use setItem() and removeItem().
        */
