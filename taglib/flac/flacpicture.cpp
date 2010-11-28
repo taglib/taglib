@@ -70,6 +70,11 @@ FLAC::Picture::~Picture()
   delete d;
 }
 
+int FLAC::Picture::code() const
+{
+  return FLAC::MetadataBlock::Picture;
+}
+
 bool FLAC::Picture::parse(const ByteVector &data)
 {
   if(data.size() < 32) {
@@ -113,6 +118,25 @@ bool FLAC::Picture::parse(const ByteVector &data)
   d->data = data.mid(pos, dataLength);
 
   return true;  
+}
+
+ByteVector FLAC::Picture::render() const
+{
+  ByteVector result;
+  result.append(ByteVector::fromUInt(d->type));
+  ByteVector mimeTypeData = d->mimeType.data(String::UTF8);
+  result.append(ByteVector::fromUInt(mimeTypeData.size()));
+  result.append(mimeTypeData);
+  ByteVector descriptionData = d->description.data(String::UTF8);
+  result.append(ByteVector::fromUInt(descriptionData.size()));
+  result.append(descriptionData);
+  result.append(ByteVector::fromUInt(d->width));
+  result.append(ByteVector::fromUInt(d->height));
+  result.append(ByteVector::fromUInt(d->colorDepth));
+  result.append(ByteVector::fromUInt(d->numColors));
+  result.append(ByteVector::fromUInt(d->data.size()));
+  result.append(d->data);
+  return result;
 }
 
 FLAC::Picture::Type FLAC::Picture::type() const

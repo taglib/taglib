@@ -40,6 +40,9 @@ SET(test_runner_SRCS
   test_ogg.cpp
   test_oggflac.cpp
   test_flac.cpp
+  test_flacpicture.cpp
+  test_flacmetadatablocks.cpp
+  test_flacunknownmetadatablock.cpp
   test_ape.cpp
   test_apetag.cpp
   test_wav.cpp

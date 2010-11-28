@@ -30,12 +30,13 @@
 #include "tbytevector.h"
 #include "taglib_export.h"
 #include "attachedpictureframe.h"
+#include "flacmetadatablock.h"
 
 namespace TagLib {
 
   namespace FLAC {
 
-    class TAGLIB_EXPORT Picture
+    class TAGLIB_EXPORT Picture : public MetadataBlock
     {
     public:
       typedef ID3v2::AttachedPictureFrame::Type Type;
@@ -127,6 +128,16 @@ namespace TagLib {
        * Sets the image data.
        */
       void setData(const ByteVector &data);
+
+      /*!
+       * Returns the FLAC metadata block type.
+       */
+      int code() const;
+
+      /*!
+       * Render the content of the block.
+       */
+      ByteVector render() const;
 
       bool parse(const ByteVector &rawData);
 

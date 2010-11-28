@@ -36,6 +36,7 @@
 
 #include "flacpicture.h"
 #include "flacfile.h"
+#include "flacmetadatablock.h"
 
 using namespace TagLib;
 
