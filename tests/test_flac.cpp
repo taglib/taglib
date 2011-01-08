@@ -158,17 +158,7 @@ public:
     List<FLAC::Picture *> lst = f->pictureList();
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
 
-    FLAC::Picture *newpic = new FLAC::Picture();
-    newpic->setType(FLAC::Picture::BackCover);
-    newpic->setWidth(5);
-    newpic->setHeight(6);
-    newpic->setColorDepth(16);
-    newpic->setNumColors(7);
-    newpic->setMimeType("image/jpeg");
-    newpic->setDescription("new image");
-    newpic->setData("JPEG data");
     f->removePictures();
-    f->addPicture(newpic);
     f->save();
 
     f = new FLAC::File(newname.c_str());
