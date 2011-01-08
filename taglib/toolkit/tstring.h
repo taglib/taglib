@@ -36,7 +36,7 @@
 /*!
  * \relates TagLib::String
  *
- * Converts a TagLib::String to a QString without a requirement to link to Qt.
+ * Converts a QString to a TagLib::String without a requirement to link to Qt.
  */
 #define QStringToTString(s) TagLib::String(s.utf8().data(), TagLib::String::UTF8)
 
