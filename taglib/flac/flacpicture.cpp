@@ -37,7 +37,7 @@ class FLAC::Picture::PicturePrivate
 {
 public:
   PicturePrivate() :
-    type(ID3v2::AttachedPictureFrame::Other),
+    type(FLAC::Picture::Other),
     width(0),
     height(0),
     colorDepth(0),
@@ -83,7 +83,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
 
   int pos = 0;
-  d->type = TagLib::ID3v2::AttachedPictureFrame::Type(data.mid(pos, 4).toUInt());
+  d->type = FLAC::Picture::Type(data.mid(pos, 4).toUInt());
   pos += 4;
   uint mimeTypeLength = data.mid(pos, 4).toUInt();
   pos += 4;

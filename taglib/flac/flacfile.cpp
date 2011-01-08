@@ -37,22 +37,15 @@
 #include "flacpicture.h"
 #include "flacfile.h"
 #include "flacmetadatablock.h"
+#include "flacunknownmetadatablock.h"
 
 using namespace TagLib;
 
 namespace
 {
   enum { XiphIndex = 0, ID3v2Index = 1, ID3v1Index = 2 };
-  enum {
-    StreamInfo = 0,
-    Padding,
-    Application,
-    SeekTable,
-    VorbisComment,
-    CueSheet,
-    PictureBlock
-  };
   enum { MinPaddingLength = 4096 };
+  enum { LastBlockFlag = 0x80 };
 }
 
 class FLAC::File::FilePrivate
@@ -70,13 +63,15 @@ public:
     scanned(false),
     hasXiphComment(false),
     hasID3v2(false),
-    hasID3v1(false) {}
+    hasID3v1(false)
+  {
+    for(uint i = 0; i < blocks.size(); i++) {
+      delete blocks[i];
+    }
+  }
 
   ~FilePrivate()
   {
-    for(uint i = 0; i < pictureList.size(); i++) {
-      delete pictureList[i];
-    }
     delete properties;
   }
 
@@ -91,7 +86,7 @@ public:
   Properties *properties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
-  List<Picture *> pictureList;
+  List<MetadataBlock *> blocks;
 
   long flacStart;
   long streamStart;
@@ -147,113 +142,67 @@ bool FLAC::File::save()
     return false;
   }
 
+  if(!isValid()) {
+    debug("FLAC::File::save() -- Trying to save invalid file.");
+    return false;
+  }
+
   // Create new vorbis comments
 
   Tag::duplicate(&d->tag, xiphComment(true), true);
 
   d->xiphCommentData = xiphComment()->render(false);
 
-  // A Xiph comment portion of the data stream starts with a 4-byte descriptor.
-  // The first byte indicates the frame type.  The last three bytes are used
-  // to give the length of the data segment.  Here we start
+  // Replace metadata blocks
 
-  ByteVector data = ByteVector::fromUInt(d->xiphCommentData.size());
-
-  data[0] = char(VorbisComment);
-  data.append(d->xiphCommentData);
-
-
-   // If file already have comment => find and update it
-   // if not => insert one
-
-   // TODO: Search for padding and use that
-
-  if(d->hasXiphComment) {
-
-    long nextBlockOffset = d->flacStart;
-    bool isLastBlock = false;
-
-    while(!isLastBlock) {
-      seek(nextBlockOffset);
-
-      ByteVector header = readBlock(4);
-      char blockType = header[0] & 0x7f;
-      isLastBlock = (header[0] & 0x80) != 0;
-      uint blockLength = header.mid(1, 3).toUInt();
-
-      if(blockType == VorbisComment) {
-
-        long paddingBreak = 0;
-
-        if(!isLastBlock) {
-          paddingBreak = findPaddingBreak(nextBlockOffset + blockLength + 4,
-                                          nextBlockOffset + d->xiphCommentData.size() + 8,
-                                          &isLastBlock);
-        }
-
-        uint paddingLength = 0;
-
-         if(paddingBreak) {
-
-           // There is space for comment and padding blocks without rewriting the
-           // whole file.  Note: This cannot overflow.
-
-           paddingLength = paddingBreak - (nextBlockOffset + d->xiphCommentData.size() + 8);
-         }
-         else {
-
-           // Not enough space, so we will have to rewrite the whole file
-           // following this block
-
-           paddingLength = d->xiphCommentData.size();
-
-           if(paddingLength < MinPaddingLength)
-             paddingLength = MinPaddingLength;
-
-           paddingBreak = nextBlockOffset + blockLength + 4;
-         }
-
-         ByteVector padding = ByteVector::fromUInt(paddingLength);
-
-         padding[0] = 1;
-
-         if(isLastBlock)
-           padding[0] |= 0x80;
-
-         padding.resize(paddingLength + 4);
-         ByteVector pair(data);
-         pair.append(padding);
-         insert(pair, nextBlockOffset, paddingBreak - nextBlockOffset);
-         break;
-      }
-
-      nextBlockOffset += blockLength + 4;
+  bool foundVorbisCommentBlock = false;
+  List<MetadataBlock *> newBlocks;
+  for(uint i = 0; i < d->blocks.size(); i++) {
+    MetadataBlock *block = d->blocks[i];
+    if(block->code() == MetadataBlock::VorbisComment) {
+      // Set the new Vorbis Comment block
+      block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
+      foundVorbisCommentBlock = true;
     }
-  }
-  else {
-
-    const long firstBlockOffset = d->flacStart;
-    seek(firstBlockOffset);
-
-    ByteVector header = readBlock(4);
-    bool isLastBlock = (header[0] & 0x80) != 0;
-    uint blockLength = header.mid(1, 3).toUInt();
-
-    if(isLastBlock) {
-
-      // If the first block was previously also the last block, then we want to
-      // mark it as no longer being the first block (the writeBlock() call) and
-      // then set the data for the block that we're about to write to mark our
-      // new block as the last block.
-
-      seek(firstBlockOffset);
-      writeBlock(static_cast<char>(header[0] & 0x7F));
-      data[0] |= 0x80;
+    if(block->code() == MetadataBlock::Padding) {
+      continue;
     }
-
-    insert(data, firstBlockOffset + blockLength + 4, 0);
-    d->hasXiphComment = true;
+    newBlocks.append(block);
   }
+  if(!foundVorbisCommentBlock) {
+    newBlocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
+    foundVorbisCommentBlock = true;
+  }
+  d->blocks = newBlocks;
+
+  // Render data for the metadata blocks
+
+  ByteVector data;
+  for(uint i = 0; i < newBlocks.size(); i++) {
+    FLAC::MetadataBlock *block = newBlocks[i];
+    ByteVector blockData = block->render();
+    ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
+    blockHeader[0] = block->code();
+    data.append(blockHeader);
+    data.append(blockData);
+  }
+
+  // Adjust the padding block(s)
+
+  long originalLength = d->streamStart - d->flacStart;
+  int paddingLength = originalLength - data.size() - 4; 
+  if (paddingLength < 0) {
+    paddingLength = MinPaddingLength;
+  }
+  ByteVector padding = ByteVector::fromUInt(paddingLength);
+  padding.resize(paddingLength + 4);
+  padding[0] = FLAC::MetadataBlock::Padding | LastBlockFlag;
+  data.append(padding);
+
+  // Write the data to the file
+
+  insert(data, d->flacStart, originalLength);
+  d->hasXiphComment = true;
 
   // Update ID3 tags
 
@@ -410,13 +359,14 @@ void FLAC::File::scan()
 
   // First block should be the stream_info metadata
 
-  if(blockType != StreamInfo) {
+  if(blockType != MetadataBlock::StreamInfo) {
     debug("FLAC::File::scan() -- invalid FLAC stream");
     setValid(false);
     return;
   }
 
   d->streamInfoData = readBlock(length);
+  d->blocks.append(new UnknownMetadataBlock(blockType, d->streamInfoData));
   nextBlockOffset += length + 4;
 
   // Search through the remaining metadata
@@ -427,25 +377,40 @@ void FLAC::File::scan()
     isLastBlock = (header[0] & 0x80) != 0;
     length = header.mid(1, 3).toUInt();
 
+    ByteVector data = readBlock(length);
+    if(data.size() != length) {
+      debug("FLAC::File::scan() -- FLAC stream corrupted");
+      setValid(false);
+      return;
+    }
+
+    MetadataBlock *block = 0;
+
     // Found the vorbis-comment
-    if(blockType == VorbisComment) {
+    if(blockType == MetadataBlock::VorbisComment) {
       if(!d->hasXiphComment) {
-        d->xiphCommentData = readBlock(length);
+        d->xiphCommentData = data;
         d->hasXiphComment = true;
       }
       else {
         debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, using the first one");
       }
     }
-    else if(blockType == PictureBlock) {
-      ByteVector pictureData = readBlock(length);
+    else if(blockType == MetadataBlock::Picture) {
       FLAC::Picture *picture = new FLAC::Picture();
-      if(picture->parse(pictureData)) {
-        addPicture(picture);
+      if(picture->parse(data)) {
+        block = picture;
       }
       else {
-        debug("FLAC::File::scan() -- invalid picture found");
+        debug("FLAC::File::scan() -- invalid picture found, discarting");
       }
+    }
+
+    if(!block) {
+      block = new UnknownMetadataBlock(blockType, data);
+    }
+    if(block->code() != MetadataBlock::Padding) {
+      d->blocks.append(block);
     }
 
     nextBlockOffset += length + 4;
@@ -496,51 +461,35 @@ long FLAC::File::findID3v2()
   return -1;
 }
 
-long FLAC::File::findPaddingBreak(long nextBlockOffset, long targetOffset, bool *isLast)
-{
-  // Starting from nextBlockOffset, step over padding blocks to find the
-  // address of a block which is after targetOffset. Return zero if
-  // a non-padding block occurs before that point.
-
-  while(true) {
-    seek(nextBlockOffset);
-
-    ByteVector header = readBlock(4);
-    char blockType = header[0] & 0x7f;
-    bool isLastBlock = header[0] & 0x80;
-    uint length = header.mid(1, 3).toUInt();
-
-    if(blockType != Padding)
-      break;
-
-    nextBlockOffset += 4 + length;
-
-    if(nextBlockOffset >= targetOffset) {
-      *isLast = isLastBlock;
-      return nextBlockOffset;
-    }
-
-    if(isLastBlock)
-      break;
-  }
-
-  return 0;
-}
-
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
-  return d->pictureList;
+  List<Picture *> pictures;
+  for(uint i = 0; i < d->blocks.size(); i++) {
+    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
+    if(picture) {
+      pictures.append(picture);
+    }
+  }
+  return pictures;
 }
 
 void FLAC::File::addPicture(Picture *picture)
 {
-  d->pictureList.append(picture);
+  d->blocks.append(picture);
 }
 
 void FLAC::File::removePictures()
 {
-  for(uint i = 0; i < d->pictureList.size(); i++)
-    delete d->pictureList[i];
-  d->pictureList.clear();
+  List<MetadataBlock *> newBlocks;
+  for(uint i = 0; i < d->blocks.size(); i++) {
+    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
+    if(picture) {
+      delete picture;
+    }
+    else {
+      newBlocks.append(d->blocks[i]);
+    }
+  }
+  d->blocks = newBlocks;
 }
 

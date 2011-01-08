@@ -134,8 +134,10 @@ MP4::File::save()
     return false;
   }
 
-  if(!isValid())
+  if(!isValid()) {
+    debug("MP4::File::save() -- Trying to save invalid file.");
     return false;
+  }
 
   return d->tag->save();
 }

@@ -96,7 +96,6 @@ flac/flacfile.cpp
 flac/flacpicture.cpp
 flac/flacproperties.cpp
 flac/flacmetadatablock.cpp
-flac/flacmetadatablocks.cpp
 flac/flacunknownmetadatablock.cpp
 )
 

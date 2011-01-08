@@ -6,7 +6,6 @@
 #include <tbytevectorlist.h>
 #include <flacfile.h>
 #include <flacmetadatablock.h>
-#include <flacmetadatablocks.h>
 #include "utils.h"
 
 using namespace std;
