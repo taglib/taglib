@@ -210,8 +210,6 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
 
 AttachedPictureFrameV22::AttachedPictureFrameV22(const ByteVector &data, Header *h)
 {
-  d = new AttachedPictureFramePrivate;
-
   // set v2.2 header to make fieldData work correctly
   setHeader(h, true);
 
@@ -220,5 +218,5 @@ AttachedPictureFrameV22::AttachedPictureFrameV22(const ByteVector &data, Header 
   // now set the v2.4 header
   Frame::Header *newHeader = new Frame::Header("APIC");
   newHeader->setFrameSize(h->frameSize());
-  setHeader(newHeader, false);
+  setHeader(newHeader, true);
 }
