@@ -73,8 +73,7 @@ ASF::Attribute::Attribute(const ASF::Attribute &other)
   d->ref();
 }
 
-ASF::Attribute &
-ASF::Attribute::operator=(const ASF::Attribute &other)
+ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
 {
   if(d->deref())
     delete d;
@@ -138,58 +137,49 @@ ASF::Attribute::Attribute(bool value)
   d->boolValue = value;
 }
 
-ASF::Attribute::AttributeTypes
-ASF::Attribute::type() const
+ASF::Attribute::AttributeTypes ASF::Attribute::type() const
 {
   return d->type;
 }
 
-String
-ASF::Attribute::toString() const
+String ASF::Attribute::toString() const
 {
   return d->stringValue;
 }
 
-ByteVector
-ASF::Attribute::toByteVector() const
+ByteVector ASF::Attribute::toByteVector() const
 {
   if(d->pictureValue.isValid())
     return d->pictureValue.render();
   return d->byteVectorValue;
 }
 
-unsigned short
-ASF::Attribute::toBool() const
+unsigned short ASF::Attribute::toBool() const
 {
   return d->shortValue;
 }
 
-unsigned short
-ASF::Attribute::toUShort() const
+unsigned short ASF::Attribute::toUShort() const
 {
   return d->shortValue;
 }
 
-unsigned int
-ASF::Attribute::toUInt() const
+unsigned int ASF::Attribute::toUInt() const
 {
   return d->intValue;
 }
 
-unsigned long long
-ASF::Attribute::toULongLong() const
+unsigned long long ASF::Attribute::toULongLong() const
 {
   return d->longLongValue;
 }
 
-ASF::Picture
-ASF::Attribute::toPicture() const
+ASF::Picture ASF::Attribute::toPicture() const
 {
   return d->pictureValue;
 }
 
-String
-ASF::Attribute::parse(ASF::File &f, int kind)
+String ASF::Attribute::parse(ASF::File &f, int kind)
 {
   uint size, nameLength;
   String name;
@@ -261,8 +251,7 @@ ASF::Attribute::parse(ASF::File &f, int kind)
   return name;
 }
 
-int
-ASF::Attribute::dataSize() const
+int ASF::Attribute::dataSize() const
 {
   switch (d->type) {
   case WordType:
@@ -284,8 +273,7 @@ ASF::Attribute::dataSize() const
   return 0;
 }
 
-ByteVector
-ASF::Attribute::render(const String &name, int kind) const
+ByteVector ASF::Attribute::render(const String &name, int kind) const
 {
   ByteVector data;
 
@@ -345,26 +333,22 @@ ASF::Attribute::render(const String &name, int kind) const
   return data;
 }
 
-int
-ASF::Attribute::language() const
+int ASF::Attribute::language() const
 {
   return d->language;
 }
 
-void
-ASF::Attribute::setLanguage(int value)
+void ASF::Attribute::setLanguage(int value)
 {
   d->language = value;
 }
 
-int
-ASF::Attribute::stream() const
+int ASF::Attribute::stream() const
 {
   return d->stream;
 }
 
-void
-ASF::Attribute::setStream(int value)
+void ASF::Attribute::setStream(int value)
 {
   d->stream = value;
 }
