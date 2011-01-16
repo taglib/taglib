@@ -97,6 +97,7 @@ namespace TagLib {
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
 
       friend class Attribute;
+      friend class Picture;
 
       class BaseObject;
       class UnknownObject;

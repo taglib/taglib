@@ -267,6 +267,17 @@ namespace TagLib {
     short toShort(bool mostSignificantByteFirst = true) const;
 
     /*!
+     * Converts the first 2 bytes of the vector to a unsigned short.
+     *
+     * If \a mostSignificantByteFirst is true this will operate left to right
+     * evaluating the integer.  For example if \a mostSignificantByteFirst is
+     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
+     *
+     * \see fromShort()
+     */
+    unsigned short toUShort(bool mostSignificantByteFirst = true) const;
+
+    /*!
      * Converts the first 8 bytes of the vector to a (signed) long long.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right

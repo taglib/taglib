@@ -565,6 +565,11 @@ short ByteVector::toShort(bool mostSignificantByteFirst) const
   return toNumber<unsigned short>(d->data, mostSignificantByteFirst);
 }
 
+unsigned short ByteVector::toUShort(bool mostSignificantByteFirst) const
+{
+  return toNumber<unsigned short>(d->data, mostSignificantByteFirst);
+}
+
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned long long>(d->data, mostSignificantByteFirst);

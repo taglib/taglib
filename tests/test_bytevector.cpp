@@ -38,6 +38,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testRfind1);
   CPPUNIT_TEST(testRfind2);
   CPPUNIT_TEST(testToHex);
+  CPPUNIT_TEST(testToUShort);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -179,6 +180,15 @@ public:
     ByteVector v("\xf0\xe1\xd2\xc3\xb4\xa5\x96\x87\x78\x69\x5a\x4b\x3c\x2d\x1e\x0f", 16);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("f0e1d2c3b4a5968778695a4b3c2d1e0f"), v.toHex());
+  }
+
+  void testToUShort()
+  {
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFFFF, ByteVector("\xff\xff", 2).toUShort());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0001, ByteVector("\x00\x01", 2).toUShort());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0100, ByteVector("\x00\x01", 2).toUShort(false));
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFF01, ByteVector("\xFF\x01", 2).toUShort());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0x01FF, ByteVector("\xFF\x01", 2).toUShort(false));
   }
 
 };

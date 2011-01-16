@@ -63,6 +63,7 @@ HEADERS += audioproperties.h \
            ape/apetag.h \
            flac/flacfile.h \
            flac/flacproperties.h \
+           flac/flacpicture.h \
            mpc/mpcfile.h \
            mpc/mpcproperties.h \
            mp4/mp4atom.h \
@@ -124,10 +125,12 @@ SOURCES += ape/apefooter.cpp \
            asf/asffile.cpp \
            asf/asfproperties.cpp \
            asf/asftag.cpp \
+           asf/asfpicture.cpp \
            audioproperties.cpp \
            fileref.cpp \
            flac/flacfile.cpp \
            flac/flacproperties.cpp \
+           flac/flacpicture.cpp \
            mp4/mp4atom.cpp \
            mp4/mp4coverart.cpp \
            mp4/mp4file.cpp \
@@ -197,6 +200,7 @@ FRAMEWORK_HEADERS.files = \
            asf/asffile.h \
            asf/asfproperties.h \
            asf/asftag.h \
+           asf/asfpicture.h \
            audioproperties.h \
            fileref.h \
            flac/flacfile.h \

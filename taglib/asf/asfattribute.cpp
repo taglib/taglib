@@ -40,11 +40,13 @@ class ASF::Attribute::AttributePrivate : public RefCounter
 {
 public:
   AttributePrivate()
-    : stream(0),
+    : pictureValue(ASF::Picture::fromInvalid()),
+      stream(0),
       language(0) {}
   AttributeTypes type;
   String stringValue;
   ByteVector byteVectorValue;
+  ASF::Picture pictureValue;
   union {
     unsigned int intValue;
     unsigned short shortValue;
@@ -101,6 +103,13 @@ ASF::Attribute::Attribute(const ByteVector &value)
   d->byteVectorValue = value;
 }
 
+ASF::Attribute::Attribute(const ASF::Picture &value)
+{
+  d = new AttributePrivate;
+  d->type = BytesType;
+  d->pictureValue = value;
+}
+
 ASF::Attribute::Attribute(unsigned int value)
 {
   d = new AttributePrivate;
@@ -144,6 +153,8 @@ ASF::Attribute::toString() const
 ByteVector
 ASF::Attribute::toByteVector() const
 {
+  if(d->pictureValue.isValid())
+    return d->pictureValue.render();
   return d->byteVectorValue;
 }
 
@@ -171,12 +182,18 @@ ASF::Attribute::toULongLong() const
   return d->longLongValue;
 }
 
+ASF::Picture
+ASF::Attribute::toPicture() const
+{
+  return d->pictureValue;
+}
+
 String
 ASF::Attribute::parse(ASF::File &f, int kind)
 {
-  int size, nameLength;
+  uint size, nameLength;
   String name;
-
+  d->pictureValue = Picture::fromInvalid();
   // extended content descriptor
   if(kind == 0) {
     nameLength = f.readWORD();
@@ -234,6 +251,13 @@ ASF::Attribute::parse(ASF::File &f, int kind)
     break;
   }
 
+  if(d->type == BytesType && name == "WM/Picture") {
+    d->pictureValue.parse(d->byteVectorValue);
+    if(d->pictureValue.isValid()) {
+      d->byteVectorValue.clear();
+    }
+  }
+
   return name;
 }
 
@@ -252,6 +276,8 @@ ASF::Attribute::dataSize() const
   case UnicodeType:
     return d->stringValue.size() * 2 + 2;
   case BytesType:
+    if(d->pictureValue.isValid())
+      return d->pictureValue.dataSize();
   case GuidType:
     return d->byteVectorValue.size();
   }
@@ -290,6 +316,10 @@ ASF::Attribute::render(const String &name, int kind) const
     break;
 
   case BytesType:
+    if(d->pictureValue.isValid()) {
+      data.append(d->pictureValue.render());
+      break;
+    }
   case GuidType:
     data.append(d->byteVectorValue);
     break;

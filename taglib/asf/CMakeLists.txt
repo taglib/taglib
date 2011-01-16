@@ -1,1 +1,1 @@
-INSTALL( FILES  asffile.h asfproperties.h asftag.h asfattribute.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
+INSTALL( FILES  asffile.h asfproperties.h asftag.h asfattribute.h asfpicture.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)

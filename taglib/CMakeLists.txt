@@ -150,6 +150,7 @@ asf/asftag.cpp
 asf/asffile.cpp
 asf/asfproperties.cpp
 asf/asfattribute.cpp
+asf/asfpicture.cpp
 )
 ELSE(WITH_ASF)
 SET(asf_SRCS)

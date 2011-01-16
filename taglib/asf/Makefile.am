@@ -6,7 +6,7 @@ INCLUDES = \
 
 noinst_LTLIBRARIES = libasf.la
 
-libasf_la_SOURCES = asfattribute.cpp asffile.cpp asfproperties.cpp asftag.cpp
+libasf_la_SOURCES = asfattribute.cpp asffile.cpp asfproperties.cpp asftag.cpp asfpicture.cpp
 
-taglib_include_HEADERS = asfattribute.h asffile.h asfproperties.h asftag.h
+taglib_include_HEADERS = asfattribute.h asffile.h asfproperties.h asftag.h asfpicture.h
 taglib_includedir = $(includedir)/taglib

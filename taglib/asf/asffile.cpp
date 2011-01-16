@@ -518,7 +518,7 @@ int ASF::File::readBYTE()
 int ASF::File::readWORD()
 {
   ByteVector v = readBlock(2);
-  return v.toShort(false);
+  return v.toUShort(false);
 }
 
 unsigned int ASF::File::readDWORD()
