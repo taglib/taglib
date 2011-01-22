@@ -189,7 +189,7 @@ void Footer::parse(const ByteVector &data)
 
   // Read the flags
 
-  std::bitset<32> flags(data.mid(20, 4).toUInt(false));
+  std::bitset<32> flags(static_cast<unsigned long long>(data.mid(20, 4).toUInt(false)));
 
   d->headerPresent = flags[31];
   d->footerPresent = !flags[30];

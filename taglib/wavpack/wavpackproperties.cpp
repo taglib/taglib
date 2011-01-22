@@ -29,7 +29,6 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-#include <bitset>
 
 #include "wavpackproperties.h"
 #include "wavpackfile.h"
