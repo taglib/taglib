@@ -36,6 +36,12 @@
 #define TAGLIB_IGNORE_MISSING_DESTRUCTOR
 #endif
 
+#if (defined(_MSC_VER) && _MSC_VER >= 1600)
+#define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long long>(x)
+#else
+#define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
+#endif
+
 #include <string>
 
 //! A namespace for all TagLib related classes and functions
