@@ -168,7 +168,7 @@ void MPEG::Header::parse(const ByteVector &data)
     return;
   }
 
-  std::bitset<32> flags(static_cast<unsigned long long>(data.toUInt()));
+  std::bitset<32> flags(static_cast<unsigned long>(data.toUInt()));
 
   // Check for the second byte's part of the MPEG synch
 
