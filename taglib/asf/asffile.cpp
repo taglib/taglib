@@ -320,18 +320,23 @@ void ASF::File::HeaderExtensionObject::parse(ASF::File *file, uint /*size*/)
   while(dataPos < dataSize) {
     ByteVector guid = file->readBlock(16);
     long long size = file->readQWORD();
-    BaseObject *obj;
+    BaseObject *obj = 0;
     if(guid == metadataGuid) {
       obj = new MetadataObject();
     }
     else if(guid == metadataLibraryGuid) {
       obj = new MetadataLibraryObject();
     }
+//FIXME this UnknownObject can be as large as whole file, so i disable it for now --Nick Shaforostoff <shafff@ukr.net>
+/*
     else {
       obj = new UnknownObject(guid);
     }
-    obj->parse(file, size);
-    objects.append(obj);
+*/
+    if(obj) {
+      obj->parse(file, size);
+      objects.append(obj);
+    }
     dataPos += size;
   }
 }
@@ -360,6 +365,7 @@ ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle proper
 ASF::File::~File()
 {
   for(unsigned int i = 0; i < d->objects.size(); i++) {
+    d->objects[i]->data.clear();
     delete d->objects[i];
   }
   if(d->tag) {
