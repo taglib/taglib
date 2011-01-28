@@ -37,6 +37,9 @@
  * \relates TagLib::String
  *
  * Converts a QString to a TagLib::String without a requirement to link to Qt.
+ *
+ * \note consider conversion via usual char-by-char for loop to avoid UTF16->UTF8->UTF16
+ * conversion happening in the background
  */
 #define QStringToTString(s) TagLib::String(s.utf8().data(), TagLib::String::UTF8)
 
@@ -44,6 +47,10 @@
  * \relates TagLib::String
  *
  * Converts a TagLib::String to a QString without a requirement to link to Qt.
+ *
+ * \note consider conversion via usual char-by-char for loop to avoid UTF16->UTF8->UTF16
+ * conversion happening in the background
+ *
  */
 #define TStringToQString(s) QString::fromUtf8(s.toCString(true))
 

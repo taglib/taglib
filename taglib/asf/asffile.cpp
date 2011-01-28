@@ -148,7 +148,11 @@ public:
 
 void ASF::File::BaseObject::parse(ASF::File *file, unsigned int size)
 {
-  data = file->readBlock(size - 24);
+  data.clear();
+  if (size > 24 && size <= file->length())
+    data = file->readBlock(size - 24);
+  else
+    data = ByteVector::null;
 }
 
 ByteVector ASF::File::BaseObject::render(ASF::File * /*file*/)

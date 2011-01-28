@@ -149,6 +149,9 @@ namespace TagLib {
      * \warning This pointer will become invalid when this FileRef and all
      * copies pass out of scope.
      *
+     * \warning Do not cast it to any subclasses of \class Tag.
+     * Use tag returning methods of appropriate subclasses of \class File instead.
+     *
      * \see File::tag()
      */
     Tag *tag() const;
