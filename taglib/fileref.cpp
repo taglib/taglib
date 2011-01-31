@@ -254,12 +254,10 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
     if(ext == "WMA" || ext == "ASF")
       return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
 #endif
-    if(ext == "AIF")
+    if(ext == "AIF" || ext == "AIFF")
       return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "WAV")
       return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "AIFF")
-      return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "APE")
       return new APE::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
