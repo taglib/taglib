@@ -35,7 +35,7 @@ do
 	  flags="$flags -I$includedir/taglib"
 	  ;;
     --version)
-	  echo 1.6.3
+	  echo 1.7.0
 	  ;;
     --prefix)
 	  echo $prefix
