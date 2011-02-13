@@ -4,8 +4,8 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = TagLib
-PROJECT_NUMBER         = 
-OUTPUT_DIRECTORY       = .
+PROJECT_NUMBER         = ${TAGLIB_LIB_VERSION_STRING}
+OUTPUT_DIRECTORY       = doc
 OUTPUT_LANGUAGE        = English
 USE_WINDOWS_ENCODING   = NO
 BRIEF_MEMBER_DESC      = YES
@@ -61,7 +61,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ../taglib/
+INPUT                  = taglib
 FILE_PATTERNS          = *.h \
                          *.hh \
                          *.H
@@ -96,9 +96,9 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            = api-header.html
-HTML_FOOTER            = api-footer.html
-HTML_STYLESHEET        = taglib-api.css
+HTML_HEADER            = doc/api-header.html
+HTML_FOOTER            = doc/api-footer.html
+HTML_STYLESHEET        = doc/taglib-api.css
 HTML_ALIGN_MEMBERS     = YES
 GENERATE_HTMLHELP      = NO
 CHM_FILE               = 

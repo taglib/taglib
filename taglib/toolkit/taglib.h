@@ -134,12 +134,9 @@ namespace TagLib {
  * Please see the <a href="http://developer.kde.org/~wheeler/taglib.html">TagLib website</a> for the latest
  * downloads.
  *
- * Instructions for installing TagLib vary per platform, but generally speaking on UNIX standard configure and
- * make commands are provided.  TagLib installs a taglib-config and package-config file to make it easier to
- * integrate into various build systems.  Note that TagLib's include install directory \e must be included in
- * the header include path.  Simply adding <taglib/tag.h> will \e not work.
- *
- * On Windows, TagLib can be built using the CMake build systems.
+ * TagLib can be built using the CMake build system. TagLib installs a taglib-config and pkg-config file to
+ * make it easier to integrate into various build systems.  Note that TagLib's include install directory \e must
+ * be included in the header include path. Simply adding <taglib/tag.h> will \e not work.
  *
  * \section start Getting Started
  *
