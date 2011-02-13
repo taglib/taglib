@@ -58,6 +58,11 @@ namespace TagLib {
       File(FileName file, Endianness endianness);
 
       /*!
+       * \return The size of the main RIFF chunk.
+       */
+      uint riffSize() const;
+
+      /*!
        * \return The number of chunks in the file.
        */
       uint chunkCount() const;
@@ -71,6 +76,11 @@ namespace TagLib {
        * \return The size of the chunk data.
        */
       uint chunkDataSize(uint i) const;
+
+      /*!
+       * \return The size of the padding after the chunk (can be either 0 or 1).
+       */
+      uint chunkPadding(uint i) const;
 
       /*!
        * \return The name of the specified chunk, for instance, "COMM" or "ID3 "
@@ -99,7 +109,8 @@ namespace TagLib {
 
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,
-                      ulong offset, ulong replace = 0);
+                      ulong offset, ulong replace = 0,
+                      uint leadingPadding = 0);
 
       class FilePrivate;
       FilePrivate *d;

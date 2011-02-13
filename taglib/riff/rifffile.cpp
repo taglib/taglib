@@ -74,6 +74,11 @@ RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
     read();
 }
 
+TagLib::uint RIFF::File::riffSize() const
+{
+  return d->size;
+}
+
 TagLib::uint RIFF::File::chunkCount() const
 {
   return d->chunkNames.size();
@@ -87,6 +92,11 @@ TagLib::uint RIFF::File::chunkDataSize(uint i) const
 TagLib::uint RIFF::File::chunkOffset(uint i) const
 {
   return d->chunkOffsets[i];
+}
+
+TagLib::uint RIFF::File::chunkPadding(uint i) const
+{
+  return d->chunkPadding[i];
 }
 
 ByteVector RIFF::File::chunkName(uint i) const
@@ -116,8 +126,7 @@ ByteVector RIFF::File::chunkData(uint i)
 
 void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 {
-  if(d->chunkNames.size() == 0)
-  {
+  if(d->chunkNames.size() == 0) {
     debug("RIFF::File::setChunkData - No valid chunks found.");
     return;
   }
@@ -125,12 +134,10 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
   for(uint i = 0; i < d->chunkNames.size(); i++) {
     if(d->chunkNames[i] == name) {
 
-      int sizeDifference = data.size() - d->chunkSizes[i];
-
       // First we update the global size
 
-      insert(ByteVector::fromUInt(d->size + sizeDifference,
-                                  d->endianness == BigEndian), 4, 4);
+      d->size += ((data.size() + 1) & ~1) - (d->chunkSizes[i] + d->chunkPadding[i]);
+      insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
 
       // Now update the specific chunk
 
@@ -148,11 +155,30 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
     }
   }
 
-  // Couldn't find an existing chunk, so let's create a new one.  First update
-  // the global size:
+  // Couldn't find an existing chunk, so let's create a new one.
 
-  insert(ByteVector::fromUInt(d->size + data.size() + 8, d->endianness == BigEndian), 4, 4);
-  writeChunk(name, data, d->chunkOffsets.back() + d->chunkSizes.back());
+  uint i = d->chunkNames.size() - 1;
+  ulong offset = d->chunkOffsets[i] + d->chunkSizes[i];
+
+  // First we update the global size
+
+  d->size += (offset & 1) + data.size() + 8;
+  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
+
+  // Now add the chunk to the file
+
+  writeChunk(name, data, offset, std::max(ulong(0), length() - offset), (offset & 1) ? 1 : 0);
+
+  // And update our internal structure
+
+  if (offset & 1) {
+    d->chunkPadding[i] = 1;
+    offset++;
+  }
+  d->chunkNames.push_back(name);
+  d->chunkSizes.push_back(data.size());
+  d->chunkOffsets.push_back(offset + 8);
+  d->chunkPadding.push_back((data.size() & 0x01) ? 1 : 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -203,13 +229,16 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            ulong offset, ulong replace)
+                            ulong offset, ulong replace, uint leadingPadding)
 {
-  ByteVector combined = name;
+  ByteVector combined;
+  if(leadingPadding) {
+    combined.append(ByteVector(leadingPadding, '\x00'));
+  }
+  combined.append(name);
   combined.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
   combined.append(data);
   if((data.size() & 0x01) != 0) {
-    // padding
     combined.append('\x00');
   }
   insert(combined, offset, replace);
