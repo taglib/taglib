@@ -17,6 +17,8 @@ TagLib 1.7
  * Fixed a memory leak in the ID3v2.2 PIC frame parser. (BUG:257007)
  * Fixed writing of RIFF files with even chunk sizes. (BUG:243954)
  * Fixed compilation on MSVC 2010.
+ * Removed support for building using autoconf/automake.
+ * API docs can be now built using "make docs".
 
 TagLib 1.6.3 (Apr 17, 2010)
 ===========================
