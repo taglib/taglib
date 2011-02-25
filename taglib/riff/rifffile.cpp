@@ -213,8 +213,8 @@ void RIFF::File::read()
     }
 
     Chunk chunk;
-    chunk.name = readBlock(4);
-    chunk.size = readBlock(4).toUInt(bigEndian);
+    chunk.name = chunkName;
+    chunk.size = chunkSize;
     chunk.offset = tell();
 
     seek(chunk.size, Current);
