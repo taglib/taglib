@@ -35,8 +35,8 @@ using namespace TagLib;
 struct Chunk
 {
   ByteVector name;
-  uint offset;
-  uint size;
+  TagLib::uint offset;
+  TagLib::uint size;
   char padding;
 };
 
@@ -51,7 +51,7 @@ public:
   }
   Endianness endianness;
   ByteVector type;
-  uint size;
+  TagLib::uint size;
   ByteVector format;
 
   std::vector<Chunk> chunks;
