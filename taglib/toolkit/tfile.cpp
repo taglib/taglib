@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <iostream>
 
 #ifdef _WIN32
 # include <wchar.h>
@@ -115,7 +116,10 @@ File::FilePrivate::FilePrivate(FileName fileName) :
     file = fopen(name, "rb");
 
   if(!file)
+  {
     debug("Could not open file " + String((const char *) name));
+    std::cout<<"Could not open file"<<name<<std::endl;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

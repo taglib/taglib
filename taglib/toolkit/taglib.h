@@ -44,6 +44,12 @@
 
 #include <string>
 
+#ifdef __APPLE__
+#include <libkern/OSAtomic.h>
+#elif defined(_MSC_VER)
+#include <Windows.h>
+#endif
+
 //! A namespace for all TagLib related classes and functions
 
 /*!
@@ -81,11 +87,27 @@ namespace TagLib {
   {
   public:
     RefCounter() : refCount(1) {}
+
+#ifdef __APPLE__
+    void ref() { OSAtomicIncrement32(&refCount); }
+    bool deref() { return ! OSAtomicDecrement32(&refCount); }
+    int32_t count() { return refCount; }
+  private:
+    volatile int32_t refCount;
+#elif defined(_MSC_VER)
+    void ref() { InterlockedIncrement(&refCount); }
+    bool deref() { return ! InterlockedDecrement(&refCount); }
+    long count() { return refCount; }
+  private:
+    volatile long refCount;
+#else
     void ref() { refCount++; }
     bool deref() { return ! --refCount ; }
     int count() { return refCount; }
   private:
     uint refCount;
+#endif
+
   };
 
 #endif // DO_NOT_DOCUMENT
