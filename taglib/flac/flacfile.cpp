@@ -65,13 +65,13 @@ public:
     hasID3v2(false),
     hasID3v1(false)
   {
-    for(uint i = 0; i < blocks.size(); i++) {
-      delete blocks[i];
-    }
   }
 
   ~FilePrivate()
   {
+    for(uint i = 0; i < blocks.size(); i++) {
+      delete blocks[i];
+    }
     delete properties;
   }
 
@@ -403,6 +403,7 @@ void FLAC::File::scan()
       }
       else {
         debug("FLAC::File::scan() -- invalid picture found, discarting");
+        delete picture;
       }
     }
 
@@ -411,6 +412,9 @@ void FLAC::File::scan()
     }
     if(block->code() != MetadataBlock::Padding) {
       d->blocks.append(block);
+    }
+    else {
+      delete block;
     }
 
     nextBlockOffset += length + 4;
