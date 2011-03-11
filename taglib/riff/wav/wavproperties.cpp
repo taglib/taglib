@@ -114,7 +114,7 @@ void RIFF::WAV::Properties::read(const ByteVector &data)
   d->sampleWidth = data.mid(14, 2).toShort(false);
 
   uint byteRate = data.mid(8, 4).toUInt(false);
-  d->bitrate = byteRate * 8 / 1024;
+  d->bitrate = byteRate * 8 / 1000;
 
   d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
 }
