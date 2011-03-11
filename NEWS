@@ -1,5 +1,10 @@
-TagLib 1.7
-==========
+TagLib 1.7 (Mar 11, 2011)
+=========================
+
+1.7:
+
+ * Fixed memory leaks in the FLAC file format parser.
+ * Fixed bitrate calculation for WAV files.
 
 1.7 RC1:
 
