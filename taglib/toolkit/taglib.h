@@ -45,9 +45,19 @@
 #include <string>
 
 #ifdef __APPLE__
-#include <libkern/OSAtomic.h>
-#elif defined(_MSC_VER)
-#include <Windows.h>
+#  include <libkern/OSAtomic.h>
+#  define TAGLIB_ATOMIC_MAC
+#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
+#  include <windows.h>
+#  define TAGLIB_ATOMIC_WIN
+#elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
+      && (defined(__i386__) || defined(__i486__) || defined(__i586__) || \
+          defined(__i686__) || defined(__x86_64) || defined(__ia64)) \
+      && !defined(__INTEL_COMPILER)
+#  define TAGLIB_ATOMIC_GCC
+#elif defined(__ia64) && defined(__INTEL_COMPILER)
+#  include <ia64intrin.h>
+#  define TAGLIB_ATOMIC_GCC
 #endif
 
 //! A namespace for all TagLib related classes and functions
@@ -88,21 +98,27 @@ namespace TagLib {
   public:
     RefCounter() : refCount(1) {}
 
-#ifdef __APPLE__
+#ifdef TAGLIB_ATOMIC_MAC
     void ref() { OSAtomicIncrement32(&refCount); }
     bool deref() { return ! OSAtomicDecrement32(&refCount); }
     int32_t count() { return refCount; }
   private:
     volatile int32_t refCount;
-#elif defined(_MSC_VER)
+#elif defined(TAGLIB_ATOMIC_WIN)
     void ref() { InterlockedIncrement(&refCount); }
     bool deref() { return ! InterlockedDecrement(&refCount); }
     long count() { return refCount; }
   private:
     volatile long refCount;
+#elif defined(TAGLIB_ATOMIC_GCC)
+    void ref() { __sync_add_and_fetch(&refCount, 1); }
+    bool deref() { return ! __sync_sub_and_fetch(&refCount, 1); }
+    int count() { return refCount; }
+  private:
+    volatile int refCount;
 #else
     void ref() { refCount++; }
-    bool deref() { return ! --refCount ; }
+    bool deref() { return ! --refCount; }
     int count() { return refCount; }
   private:
     uint refCount;
