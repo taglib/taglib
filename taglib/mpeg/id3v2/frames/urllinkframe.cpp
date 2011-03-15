@@ -175,7 +175,7 @@ ByteVector UserUrlLinkFrame::renderFields() const
 {
   ByteVector v;
 
-  String::Type encoding = checkEncoding(d->description, d->textEncoding);
+  String::Type encoding = checkTextEncoding(d->description, d->textEncoding);
 
   v.append(char(encoding));
   v.append(d->description.data(encoding));

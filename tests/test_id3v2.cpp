@@ -1,9 +1,12 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
+// so evil :(
+#define protected public
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <id3v2frame.h>
+#undef protected
 #include <uniquefileidentifierframe.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
@@ -33,6 +36,7 @@ class TestID3v2 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v2);
   CPPUNIT_TEST(testUnsynchDecode);
+  CPPUNIT_TEST(testDowngradeUTF8ForID3v23);
   CPPUNIT_TEST(testUTF16BEDelimiter);
   CPPUNIT_TEST(testUTF16Delimiter);
   CPPUNIT_TEST(testReadStringField);
@@ -71,6 +75,20 @@ public:
     MPEG::File f("data/unsynch.id3", false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("My babe just cares for me"), f.tag()->title());
+  }
+
+  void testDowngradeUTF8ForID3v23()
+  {
+    ID3v2::TextIdentificationFrame f(ByteVector("TPE1"), String::UTF8);
+    StringList sl;
+    sl.append("Foo");
+    f.setText(sl);
+    f.header()->setVersion(3);
+    ByteVector data = f.render();
+    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+6+2), data.size());
+    ID3v2::TextIdentificationFrame f2(data);
+    CPPUNIT_ASSERT_EQUAL(sl, f2.fieldList());
+    CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
   }
 
   void testUTF16BEDelimiter()

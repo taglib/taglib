@@ -230,17 +230,36 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
 
 String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding) // static
 {
+  return checkEncoding(fields, encoding, 4);
+}
+
+String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding, uint version) // static
+{
+  if((encoding == String::UTF8 || encoding == String::UTF16BE) && version != 4)
+    return String::UTF16;
+
   if(encoding != String::Latin1)
     return encoding;
 
   for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
     if(!(*it).isLatin1()) {
-      debug("Frame::checkEncoding() -- Rendering using UTF8.");
-      return String::UTF8;
+      if(version == 4) {
+        debug("Frame::checkEncoding() -- Rendering using UTF8.");
+        return String::UTF8;
+      }
+      else {
+        debug("Frame::checkEncoding() -- Rendering using UTF16.");
+        return String::UTF16;
+      }
     }
   }
 
   return String::Latin1;
+}
+
+String::Type Frame::checkTextEncoding(const StringList &fields, String::Type encoding) const
+{
+  return checkEncoding(fields, encoding, header()->version());
 }
 
 ////////////////////////////////////////////////////////////////////////////////

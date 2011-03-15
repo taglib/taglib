@@ -155,8 +155,8 @@ ByteVector CommentsFrame::renderFields() const
 
   String::Type encoding = d->textEncoding;
 
-  encoding = checkEncoding(d->description, encoding);
-  encoding = checkEncoding(d->text, encoding);
+  encoding = checkTextEncoding(d->description, encoding);
+  encoding = checkTextEncoding(d->text, encoding);
 
   v.append(char(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");

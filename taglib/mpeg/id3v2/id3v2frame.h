@@ -199,8 +199,28 @@ namespace TagLib {
        * Checks a the list of string values to see if they can be used with the
        * specified encoding and returns the recommended encoding.
        */
+      // BIC: remove and make non-static
       static String::Type checkEncoding(const StringList &fields,
                                         String::Type encoding);
+
+      /*!
+       * Checks a the list of string values to see if they can be used with the
+       * specified encoding and returns the recommended encoding. This method
+       * also checks the ID3v2 version and makes sure the encoding can be used
+       * in the specified version.
+       */
+      // BIC: remove and make non-static
+      static String::Type checkEncoding(const StringList &fields,
+                                        String::Type encoding, uint version);
+
+      /*!
+       * Checks a the list of string values to see if they can be used with the
+       * specified encoding and returns the recommended encoding. This method
+       * also checks the ID3v2 version and makes sure the encoding can be used
+       * in the version specified by the frame's header.
+       */
+      String::Type checkTextEncoding(const StringList &fields,
+                                     String::Type encoding) const;
 
     private:
       Frame(const Frame &);

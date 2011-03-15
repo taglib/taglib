@@ -152,7 +152,7 @@ ByteVector AttachedPictureFrame::renderFields() const
 {
   ByteVector data;
 
-  String::Type encoding = checkEncoding(d->description, d->textEncoding);
+  String::Type encoding = checkTextEncoding(d->description, d->textEncoding);
 
   data.append(char(encoding));
   data.append(d->mimeType.data(String::Latin1));
