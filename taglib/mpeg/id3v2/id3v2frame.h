@@ -294,10 +294,16 @@ namespace TagLib {
       void setFrameSize(uint size);
 
       /*!
-       * Returns the ID3v2 version of the header (as passed in from the
-       * construction of the header).
+       * Returns the ID3v2 version of the header, as passed in from the
+       * construction of the header or set via setVersion().
        */
       uint version() const;
+
+      /*!
+       * Sets the ID3v2 version of the header, changing has impact on the
+       * correct parsing/rendering of frame data.
+       */
+      void setVersion(uint version);
 
       /*!
        * Returns the size of the frame header in bytes.

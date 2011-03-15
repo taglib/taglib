@@ -331,6 +331,11 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 
 ByteVector ID3v2::Tag::render() const
 {
+  return render(4);
+}
+
+ByteVector ID3v2::Tag::render(int version) const
+{
   // We need to render the "tag data" first so that we have to correct size to
   // render in the tag's header.  The "tag data" -- everything that is included
   // in ID3v2::Header::tagSize() -- includes the extended header, frames and
@@ -343,6 +348,7 @@ ByteVector ID3v2::Tag::render() const
   // Loop through the frames rendering them and adding them to the tagData.
 
   for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
+    (*it)->header()->setVersion(version);
     if((*it)->header()->frameID().size() != 4) {
       debug("A frame of unsupported or unknown type \'"
           + String((*it)->header()->frameID()) + "\' has been discarded");
@@ -364,7 +370,8 @@ ByteVector ID3v2::Tag::render() const
 
   tagData.append(ByteVector(paddingSize, char(0)));
 
-  // Set the tag size.
+  // Set the version and data size.
+  d->header.setMajorVersion(version);
   d->header.setTagSize(tagData.size());
 
   // TODO: This should eventually include d->footer->render().

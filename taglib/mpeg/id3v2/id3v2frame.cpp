@@ -484,6 +484,11 @@ TagLib::uint Frame::Header::version() const
   return d->version;
 }
 
+void Frame::Header::setVersion(TagLib::uint version)
+{
+  d->version = version;
+}
+
 bool Frame::Header::tagAlterPreservation() const
 {
   return d->tagAlterPreservation;
@@ -538,7 +543,11 @@ ByteVector Frame::Header::render() const
 {
   ByteVector flags(2, char(0)); // just blank for the moment
 
-  ByteVector v = d->frameID + SynchData::fromUInt(d->frameSize) + flags;
+  ByteVector v = d->frameID +
+    (d->version == 3
+      ? ByteVector::fromUInt(d->frameSize)
+      : SynchData::fromUInt(d->frameSize)) +
+    flags;
 
   return v;
 }
