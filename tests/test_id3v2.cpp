@@ -486,7 +486,7 @@ public:
     tf->setText("2011-03-16");
     foo.ID3v2Tag()->addFrame(tf);
     tf = new ID3v2::TextIdentificationFrame("TDRC", String::Latin1);
-    tf->setText("2012-04-17");
+    tf->setText("2012-04-17T12:01");
     foo.ID3v2Tag()->addFrame(tf);
     foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDRL", String::Latin1));
     foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDTG", String::Latin1));

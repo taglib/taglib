@@ -383,6 +383,18 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
       frameTYER->setText(content.substr(0, 4));
       frames->append(frameTYER);
       newFrames->append(frameTYER);
+      if(content.size() >= 10 && content[4] == '-' && content[7] == '-') {
+        ID3v2::TextIdentificationFrame *frameTDAT = new ID3v2::TextIdentificationFrame("TDAT", String::Latin1);
+        frameTDAT->setText(content.substr(8, 2) + content.substr(5, 2));
+        frames->append(frameTDAT);
+        newFrames->append(frameTDAT);
+        if(content.size() >= 16 && content[10] == 'T' && content[13] == ':') {
+          ID3v2::TextIdentificationFrame *frameTIME = new ID3v2::TextIdentificationFrame("TIME", String::Latin1);
+          frameTIME->setText(content.substr(11, 2) + content.substr(14, 2));
+          frames->append(frameTIME);
+          newFrames->append(frameTIME);
+        }
+      }
     }
   }
   // FIXME migrate TIPL and TMCL to IPLS
