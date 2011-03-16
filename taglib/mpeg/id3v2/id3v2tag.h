@@ -295,6 +295,8 @@ namespace TagLib {
        */
       void setTextFrame(const ByteVector &id, const String &value);
 
+      void downgradeFrames(FrameList *existingFrames, FrameList *newFrames) const;
+
     private:
       Tag(const Tag &);
       Tag &operator=(const Tag &);
