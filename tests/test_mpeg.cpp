@@ -26,7 +26,7 @@ public:
 
   void testSaveID3v24()
   {
-    ScopedFileCopy copy("xing", ".mp3", false);
+    ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
 
     String xxx = ByteVector(254, 'X');
@@ -42,7 +42,7 @@ public:
 
   void testSaveID3v23()
   {
-    ScopedFileCopy copy("xing", ".mp3", false);
+    ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
 
     String xxx = ByteVector(254, 'X');
