@@ -3,6 +3,7 @@ Makefile
 CMakeFiles/
 *.so
 *.so.*
+*.dylib
 /CMakeCache.txt
 /Doxyfile
 /config.h
@@ -16,4 +17,4 @@ CMakeFiles/
 /examples/tagreader
 /examples/tagreader_c
 /examples/tagwriter
-
+/doc/html
