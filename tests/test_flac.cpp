@@ -5,6 +5,7 @@
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <flacfile.h>
+#include <xiphcomment.h>
 #include "utils.h"
 
 using namespace std;
@@ -20,6 +21,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testReplacePicture);
   CPPUNIT_TEST(testRemoveAllPictures);
   CPPUNIT_TEST(testRepeatedSave);
+  CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -184,6 +186,26 @@ public:
     f = new FLAC::File(newname.c_str());
     tag = f->tag();
     CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), tag->title());
+  }
+
+  void testSaveMultipleValues()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac", false);
+    string newname = copy.fileName();
+
+    FLAC::File *f = new FLAC::File(newname.c_str());
+    Ogg::XiphComment* c = f->xiphComment(true);
+    c->addField("ARTIST", "artist 1", true);
+    c->addField("ARTIST", "artist 2", false);
+    f->save();
+    delete f;
+
+    f = new FLAC::File(newname.c_str());
+    c = f->xiphComment(true);
+    Ogg::FieldListMap m = c->fieldListMap();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), m["ARTIST"].size());
+    CPPUNIT_ASSERT_EQUAL(String("artist 1"), m["ARTIST"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("artist 2"), m["ARTIST"][1]);
   }
 
 };
