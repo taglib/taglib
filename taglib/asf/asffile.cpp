@@ -69,6 +69,8 @@ static ByteVector extendedContentDescriptionGuid("\x40\xA4\xD0\xD2\x07\xE3\xD2\x
 static ByteVector headerExtensionGuid("\xb5\x03\xbf_.\xa9\xcf\x11\x8e\xe3\x00\xc0\x0c Se", 16);
 static ByteVector metadataGuid("\xEA\xCB\xF8\xC5\xAF[wH\204g\xAA\214D\xFAL\xCA", 16);
 static ByteVector metadataLibraryGuid("\224\034#D\230\224\321I\241A\x1d\x13NEpT", 16);
+static ByteVector contentEncryptionGuid("\x22\x11\xB3\xFB\xBD\x23\x11\xD2\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E");
+static ByteVector extendedContentEncryptionGuid("\x29\x8A\xE6\x14\x26\x22\x4C\x17\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C");
 
 class ASF::File::BaseObject
 {
@@ -337,6 +339,9 @@ void ASF::File::HeaderExtensionObject::parse(ASF::File *file, uint /*size*/)
       obj = new MetadataLibraryObject();
     }
     else {
+      if(guid == contentEncryptionGuid || guid == extendedContentEncryptionGuid) {
+        file->d->properties->setEncrypted(true);
+      }
       obj = new UnknownObject(guid);
     }
     obj->parse(file, size);
