@@ -48,6 +48,7 @@ namespace TagLib {
       virtual int sampleRate() const;
       virtual int channels() const;
       virtual int bitsPerSample() const;
+      bool isEncrypted() const;
 
     private:
       class PropertiesPrivate;

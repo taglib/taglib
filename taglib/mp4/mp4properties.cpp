@@ -40,13 +40,14 @@ using namespace TagLib;
 class MP4::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0) {}
+  PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
   int bitsPerSample;
+  bool encrypted;
 };
 
 MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
@@ -129,6 +130,11 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
       }
     }
   }
+
+  MP4::Atom *drms = atom->find("drms");
+  if(drms) {
+    d->encrypted = true;
+  }
 }
 
 MP4::Properties::~Properties()
@@ -164,6 +170,12 @@ int
 MP4::Properties::bitsPerSample() const
 {
   return d->bitsPerSample;
+}
+
+bool
+MP4::Properties::isEncrypted() const
+{
+  return d->encrypted;
 }
 
 #endif
