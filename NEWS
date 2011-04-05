@@ -1,7 +1,9 @@
 TagLib 1.8 (In Development)
 ===========================
 
+ * Support for writing ID3v2.3 tags.
  * Added methods for checking if WMA and MP4 files are DRM-protected.
+ * Started using atomic int operations for reference counting.
 
 TagLib 1.7 (Mar 11, 2011)
 =========================
