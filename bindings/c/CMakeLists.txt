@@ -19,9 +19,11 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc )
 ########### next target ###############
 
-ADD_LIBRARY(tag_c SHARED tag_c.cpp)
 if(ENABLE_STATIC)
+    add_library(tag_c STATIC tag_c.cpp)
     set_target_properties(tag_c PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
+else(ENABLE_STATIC)
+    add_library(tag_c SHARED tag_c.cpp)
 endif(ENABLE_STATIC)
 
 TARGET_LINK_LIBRARIES(tag_c  tag )

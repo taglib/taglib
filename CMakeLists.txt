@@ -45,6 +45,19 @@ SET(TAGLIB_LIB_PATCH_VERSION "0")
 SET(TAGLIB_LIB_VERSION_STRING "${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}.${TAGLIB_LIB_PATCH_VERSION}")
 
 
+# 1. If the library source code has changed at all since the last update, then increment revision.
+# 2. If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
+# 3. If any interfaces have been added since the last public release, then increment age.
+# 4. If any interfaces have been removed since the last public release, then set age to 0. 
+SET(TAGLIB_SOVERSION_CURRENT  11)
+SET(TAGLIB_SOVERSION_REVISION 0)
+SET(TAGLIB_SOVERSION_AGE      10)
+
+MATH(EXPR TAGLIB_SOVERSION_MAJOR "${TAGLIB_SOVERSION_CURRENT} - ${TAGLIB_SOVERSION_AGE}")
+MATH(EXPR TAGLIB_SOVERSION_MINOR "${TAGLIB_SOVERSION_AGE}")
+MATH(EXPR TAGLIB_SOVERSION_PATCH "${TAGLIB_SOVERSION_REVISION}")
+
+
 include(ConfigureChecks.cmake)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )

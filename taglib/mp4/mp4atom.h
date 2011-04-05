@@ -53,8 +53,8 @@ namespace TagLib {
         TagLib::ByteVector name;
         AtomList children;
     private:
-        static const int numContainers = 10;
-        static const char *containers[10];
+        static const int numContainers = 11;
+        static const char *containers[11];
     };
 
     //! Root-level atoms

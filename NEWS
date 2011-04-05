@@ -1,3 +1,8 @@
+TagLib 1.8 (In Development)
+===========================
+
+ * Added methods for checking if WMA and MP4 files are DRM-protected.
+
 TagLib 1.7 (Mar 11, 2011)
 =========================
 
