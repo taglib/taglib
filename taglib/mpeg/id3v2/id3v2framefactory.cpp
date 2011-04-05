@@ -153,7 +153,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   // Text Identification (frames 4.2)
 
-  if(frameID.startsWith("T")) {
+  if(frameID.startsWith("T") || frameID == "IPLS") {
 
     TextIdentificationFrame *f = frameID != "TXXX"
       ? new TextIdentificationFrame(data, header)

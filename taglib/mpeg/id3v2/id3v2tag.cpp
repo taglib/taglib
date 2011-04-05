@@ -338,11 +338,12 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
 {
   const char *unsupportedFrames[] = {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
-    "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP", "TIPL",
-    "TMCL", 0
+    "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP", 0
   };
   ID3v2::TextIdentificationFrame *frameTDOR = 0;
   ID3v2::TextIdentificationFrame *frameTDRC = 0;
+  ID3v2::TextIdentificationFrame *frameTIPL = 0;
+  ID3v2::TextIdentificationFrame *frameTMCL = 0;
   for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
     ID3v2::Frame *frame = *it;
     ByteVector frameID = frame->header()->frameID();
@@ -362,6 +363,14 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
       frameTDRC = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
       frame = 0;
     }
+    if(frame && frameID == "TIPL") {
+      frameTIPL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+      frame = 0;
+    }
+    if(frame && frameID == "TMCL") {
+      frameTMCL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+      frame = 0;
+    }
     if(frame) {
       frames->append(frame);
     }
@@ -376,7 +385,6 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     }
   }
   if(frameTDRC) {
-    // FIXME we can do better here, define also TDAT and TIME
     String content = frameTDRC->toString();
     if(content.size() >= 4) {
       ID3v2::TextIdentificationFrame *frameTYER = new ID3v2::TextIdentificationFrame("TYER", String::Latin1);
@@ -397,7 +405,27 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
       }
     }
   }
-  // FIXME migrate TIPL and TMCL to IPLS
+  if(frameTIPL || frameTMCL) {
+    ID3v2::TextIdentificationFrame *frameIPLS = new ID3v2::TextIdentificationFrame("IPLS", String::Latin1);
+    StringList people;
+    if(frameTMCL) {
+      StringList v24People = frameTMCL->fieldList();
+      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+        people.append(v24People[i]);
+        people.append(v24People[i+1]);
+      }
+    }
+    if(frameTIPL) {
+      StringList v24People = frameTIPL->fieldList();
+      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+        people.append(v24People[i]);
+        people.append(v24People[i+1]);
+      }
+    }
+    frameIPLS->setText(people);
+    frames->append(frameIPLS);
+    newFrames->append(frameIPLS);
+  }
 }
 
 
