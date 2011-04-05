@@ -438,6 +438,11 @@ ByteVector ID3v2::Tag::render(int version) const
 
   ByteVector tagData;
 
+  if(version != 3 && version != 4) {
+    debug("Unknown ID3v2 version, using ID3v2.4");
+    version = 4;
+  }
+
   // TODO: Render the extended header.
 
   // Loop through the frames rendering them and adding them to the tagData.
