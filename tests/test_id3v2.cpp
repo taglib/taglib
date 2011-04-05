@@ -513,7 +513,7 @@ public:
     CPPUNIT_ASSERT(tf);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("2012"), tf->fieldList().front());
-    tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("IPLS").front());
+    tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TIPL").front());
     CPPUNIT_ASSERT(tf);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(8), tf->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("Guitar"), tf->fieldList()[0]);
