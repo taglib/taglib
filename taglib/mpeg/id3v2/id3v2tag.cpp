@@ -331,6 +331,106 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 
 ByteVector ID3v2::Tag::render() const
 {
+  return render(4);
+}
+
+void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
+{
+  const char *unsupportedFrames[] = {
+    "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
+    "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP", 0
+  };
+  ID3v2::TextIdentificationFrame *frameTDOR = 0;
+  ID3v2::TextIdentificationFrame *frameTDRC = 0;
+  ID3v2::TextIdentificationFrame *frameTIPL = 0;
+  ID3v2::TextIdentificationFrame *frameTMCL = 0;
+  for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
+    ID3v2::Frame *frame = *it;
+    ByteVector frameID = frame->header()->frameID();
+    for(int i = 0; unsupportedFrames[i]; i++) {
+      if(frameID == unsupportedFrames[i]) {
+        debug("A frame that is not supported in ID3v2.3 \'"
+          + String(frameID) + "\' has been discarded");
+        frame = 0;
+        break;
+      }
+    }
+    if(frame && frameID == "TDOR") {
+      frameTDOR = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+      frame = 0;
+    }
+    if(frame && frameID == "TDRC") {
+      frameTDRC = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+      frame = 0;
+    }
+    if(frame && frameID == "TIPL") {
+      frameTIPL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+      frame = 0;
+    }
+    if(frame && frameID == "TMCL") {
+      frameTMCL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+      frame = 0;
+    }
+    if(frame) {
+      frames->append(frame);
+    }
+  }
+  if(frameTDOR) {
+    String content = frameTDOR->toString();
+    if(content.size() >= 4) {
+      ID3v2::TextIdentificationFrame *frameTORY = new ID3v2::TextIdentificationFrame("TORY", String::Latin1);
+      frameTORY->setText(content.substr(0, 4));
+      frames->append(frameTORY);
+      newFrames->append(frameTORY);
+    }
+  }
+  if(frameTDRC) {
+    String content = frameTDRC->toString();
+    if(content.size() >= 4) {
+      ID3v2::TextIdentificationFrame *frameTYER = new ID3v2::TextIdentificationFrame("TYER", String::Latin1);
+      frameTYER->setText(content.substr(0, 4));
+      frames->append(frameTYER);
+      newFrames->append(frameTYER);
+      if(content.size() >= 10 && content[4] == '-' && content[7] == '-') {
+        ID3v2::TextIdentificationFrame *frameTDAT = new ID3v2::TextIdentificationFrame("TDAT", String::Latin1);
+        frameTDAT->setText(content.substr(8, 2) + content.substr(5, 2));
+        frames->append(frameTDAT);
+        newFrames->append(frameTDAT);
+        if(content.size() >= 16 && content[10] == 'T' && content[13] == ':') {
+          ID3v2::TextIdentificationFrame *frameTIME = new ID3v2::TextIdentificationFrame("TIME", String::Latin1);
+          frameTIME->setText(content.substr(11, 2) + content.substr(14, 2));
+          frames->append(frameTIME);
+          newFrames->append(frameTIME);
+        }
+      }
+    }
+  }
+  if(frameTIPL || frameTMCL) {
+    ID3v2::TextIdentificationFrame *frameIPLS = new ID3v2::TextIdentificationFrame("IPLS", String::Latin1);
+    StringList people;
+    if(frameTMCL) {
+      StringList v24People = frameTMCL->fieldList();
+      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+        people.append(v24People[i]);
+        people.append(v24People[i+1]);
+      }
+    }
+    if(frameTIPL) {
+      StringList v24People = frameTIPL->fieldList();
+      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+        people.append(v24People[i]);
+        people.append(v24People[i+1]);
+      }
+    }
+    frameIPLS->setText(people);
+    frames->append(frameIPLS);
+    newFrames->append(frameIPLS);
+  }
+}
+
+
+ByteVector ID3v2::Tag::render(int version) const
+{
   // We need to render the "tag data" first so that we have to correct size to
   // render in the tag's header.  The "tag data" -- everything that is included
   // in ID3v2::Header::tagSize() -- includes the extended header, frames and
@@ -338,11 +438,28 @@ ByteVector ID3v2::Tag::render() const
 
   ByteVector tagData;
 
+  if(version != 3 && version != 4) {
+    debug("Unknown ID3v2 version, using ID3v2.4");
+    version = 4;
+  }
+
   // TODO: Render the extended header.
 
   // Loop through the frames rendering them and adding them to the tagData.
 
-  for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
+  FrameList newFrames;
+  newFrames.setAutoDelete(true);
+
+  FrameList frameList;
+  if(version == 4) {
+    frameList = d->frameList;
+  }
+  else {
+    downgradeFrames(&frameList, &newFrames);
+  }
+
+  for(FrameList::Iterator it = frameList.begin(); it != frameList.end(); it++) {
+    (*it)->header()->setVersion(version);
     if((*it)->header()->frameID().size() != 4) {
       debug("A frame of unsupported or unknown type \'"
           + String((*it)->header()->frameID()) + "\' has been discarded");
@@ -364,7 +481,8 @@ ByteVector ID3v2::Tag::render() const
 
   tagData.append(ByteVector(paddingSize, char(0)));
 
-  // Set the tag size.
+  // Set the version and data size.
+  d->header.setMajorVersion(version);
   d->header.setTagSize(tagData.size());
 
   // TODO: This should eventually include d->footer->render().

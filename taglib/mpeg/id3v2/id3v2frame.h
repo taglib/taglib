@@ -199,8 +199,28 @@ namespace TagLib {
        * Checks a the list of string values to see if they can be used with the
        * specified encoding and returns the recommended encoding.
        */
+      // BIC: remove and make non-static
       static String::Type checkEncoding(const StringList &fields,
                                         String::Type encoding);
+
+      /*!
+       * Checks a the list of string values to see if they can be used with the
+       * specified encoding and returns the recommended encoding. This method
+       * also checks the ID3v2 version and makes sure the encoding can be used
+       * in the specified version.
+       */
+      // BIC: remove and make non-static
+      static String::Type checkEncoding(const StringList &fields,
+                                        String::Type encoding, uint version);
+
+      /*!
+       * Checks a the list of string values to see if they can be used with the
+       * specified encoding and returns the recommended encoding. This method
+       * also checks the ID3v2 version and makes sure the encoding can be used
+       * in the version specified by the frame's header.
+       */
+      String::Type checkTextEncoding(const StringList &fields,
+                                     String::Type encoding) const;
 
     private:
       Frame(const Frame &);
@@ -294,10 +314,16 @@ namespace TagLib {
       void setFrameSize(uint size);
 
       /*!
-       * Returns the ID3v2 version of the header (as passed in from the
-       * construction of the header).
+       * Returns the ID3v2 version of the header, as passed in from the
+       * construction of the header or set via setVersion().
        */
       uint version() const;
+
+      /*!
+       * Sets the ID3v2 version of the header, changing has impact on the
+       * correct parsing/rendering of frame data.
+       */
+      void setVersion(uint version);
 
       /*!
        * Returns the size of the frame header in bytes.

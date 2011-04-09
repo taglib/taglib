@@ -368,6 +368,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 
     convertFrame("TORY", "TDOR", header);
     convertFrame("TYER", "TDRC", header);
+    convertFrame("IPLS", "TIPL", header);
 
     break;
   }

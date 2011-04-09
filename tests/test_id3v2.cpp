@@ -1,9 +1,12 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
+// so evil :(
+#define protected public
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <id3v2frame.h>
+#undef protected
 #include <uniquefileidentifierframe.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
@@ -33,6 +36,7 @@ class TestID3v2 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v2);
   CPPUNIT_TEST(testUnsynchDecode);
+  CPPUNIT_TEST(testDowngradeUTF8ForID3v23);
   CPPUNIT_TEST(testUTF16BEDelimiter);
   CPPUNIT_TEST(testUTF16Delimiter);
   CPPUNIT_TEST(testReadStringField);
@@ -60,6 +64,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateGenre23_2);
   CPPUNIT_TEST(testUpdateGenre24);
   CPPUNIT_TEST(testUpdateDate22);
+  CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
   CPPUNIT_TEST_SUITE_END();
@@ -71,6 +76,20 @@ public:
     MPEG::File f("data/unsynch.id3", false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("My babe just cares for me"), f.tag()->title());
+  }
+
+  void testDowngradeUTF8ForID3v23()
+  {
+    ID3v2::TextIdentificationFrame f(ByteVector("TPE1"), String::UTF8);
+    StringList sl;
+    sl.append("Foo");
+    f.setText(sl);
+    f.header()->setVersion(3);
+    ByteVector data = f.render();
+    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+6+2), data.size());
+    ID3v2::TextIdentificationFrame f2(data);
+    CPPUNIT_ASSERT_EQUAL(sl, f2.fieldList());
+    CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
   }
 
   void testUTF16BEDelimiter()
@@ -454,6 +473,65 @@ public:
     MPEG::File f("data/id3v22-tda.mp3", false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("2010-04-03"), f.ID3v2Tag()->frameListMap()["TDRC"].front()->toString());
+  }
+
+  void testDowngradeTo23()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    ID3v2::TextIdentificationFrame *tf;
+    MPEG::File foo(newname.c_str());
+    tf = new ID3v2::TextIdentificationFrame("TDOR", String::Latin1);
+    tf->setText("2011-03-16");
+    foo.ID3v2Tag()->addFrame(tf);
+    tf = new ID3v2::TextIdentificationFrame("TDRC", String::Latin1);
+    tf->setText("2012-04-17T12:01");
+    foo.ID3v2Tag()->addFrame(tf);
+    tf = new ID3v2::TextIdentificationFrame("TMCL", String::Latin1);
+    tf->setText(StringList().append("Guitar").append("Artist 1").append("Drums").append("Artist 2"));
+    foo.ID3v2Tag()->addFrame(tf);
+    tf = new ID3v2::TextIdentificationFrame("TIPL", String::Latin1);
+    tf->setText(StringList().append("Producer").append("Artist 3").append("Mastering").append("Artist 4"));
+    foo.ID3v2Tag()->addFrame(tf);
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDRL", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDTG", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TMOO", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TPRO", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOA", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOT", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSST", String::Latin1));
+    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOP", String::Latin1));
+    foo.save(MPEG::File::AllTags, true, 3);
+
+    MPEG::File bar(newname.c_str());
+    tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
+    CPPUNIT_ASSERT(tf);
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("2011"), tf->fieldList().front());
+    tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
+    CPPUNIT_ASSERT(tf);
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("2012"), tf->fieldList().front());
+    tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TIPL").front());
+    CPPUNIT_ASSERT(tf);
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(8), tf->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("Guitar"), tf->fieldList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("Artist 1"), tf->fieldList()[1]);
+    CPPUNIT_ASSERT_EQUAL(String("Drums"), tf->fieldList()[2]);
+    CPPUNIT_ASSERT_EQUAL(String("Artist 2"), tf->fieldList()[3]);
+    CPPUNIT_ASSERT_EQUAL(String("Producer"), tf->fieldList()[4]);
+    CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[5]);
+    CPPUNIT_ASSERT_EQUAL(String("Mastering"), tf->fieldList()[6]);
+    CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[7]);
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDRL"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDTG"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TMOO"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TPRO"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOA"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOT"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
   }
 
   void testCompressedFrameWithBrokenLength()

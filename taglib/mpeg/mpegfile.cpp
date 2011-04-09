@@ -140,6 +140,11 @@ bool MPEG::File::save(int tags)
 
 bool MPEG::File::save(int tags, bool stripOthers)
 {
+  return save(tags, stripOthers, 4);
+}
+
+bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
+{
   if(tags == NoTags && stripOthers)
     return strip(AllTags);
 
@@ -174,7 +179,7 @@ bool MPEG::File::save(int tags, bool stripOthers)
       if(!d->hasID3v2)
         d->ID3v2Location = 0;
 
-      insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+      insert(ID3v2Tag()->render(id3v2Version), d->ID3v2Location, d->ID3v2OriginalSize);
 
       d->hasID3v2 = true;
 

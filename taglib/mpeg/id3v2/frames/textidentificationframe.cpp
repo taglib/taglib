@@ -139,7 +139,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
 ByteVector TextIdentificationFrame::renderFields() const
 {
-  String::Type encoding = checkEncoding(d->fieldList, d->textEncoding);
+  String::Type encoding = checkTextEncoding(d->fieldList, d->textEncoding);
 
   ByteVector v;
 

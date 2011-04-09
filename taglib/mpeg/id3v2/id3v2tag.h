@@ -265,6 +265,15 @@ namespace TagLib {
        */
       ByteVector render() const;
 
+      /*!
+       * Render the tag back to binary data, suitable to be written to disk.
+       *
+       * The \a version parameter specifies the version of the rendered
+       * ID3v2 tag. It can be either 4 or 3.
+       */
+      // BIC: combine with the above method
+      ByteVector render(int version) const;
+
     protected:
       /*!
        * Reads data from the file specified in the constructor.  It does basic
@@ -285,6 +294,8 @@ namespace TagLib {
        * If the frame does not exist, it is created.
        */
       void setTextFrame(const ByteVector &id, const String &value);
+
+      void downgradeFrames(FrameList *existingFrames, FrameList *newFrames) const;
 
     private:
       Tag(const Tag &);
