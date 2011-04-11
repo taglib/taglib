@@ -29,28 +29,13 @@
 #include "taglib_export.h"
 #include "taglib.h"
 #include "tbytevector.h"
+#include "tiostream.h"
 
 namespace TagLib {
 
   class String;
   class Tag;
   class AudioProperties;
-
-#ifdef _WIN32
-  class TAGLIB_EXPORT FileName
-  {
-  public:
-    FileName(const wchar_t *name) : m_wname(name) {}
-    FileName(const char *name) : m_name(name) {}
-    operator const wchar_t *() const { return m_wname.c_str(); }
-    operator const char *() const { return m_name.c_str(); }
-  private:
-    std::string m_name;
-    std::wstring m_wname;
-  };
-#else
-  typedef const char *FileName;
-#endif
 
   //! A file class with some useful methods for tag manipulation
 
@@ -239,6 +224,14 @@ namespace TagLib {
      * instantiated through subclasses.
      */
     File(FileName file);
+
+    /*!
+     * Construct a File object and use the \a stream instance.
+     *
+     * \note Constructor is protected since this class should only be
+     * instantiated through subclasses.
+     */
+    File(IOStream *stream);
 
     /*!
      * Marks the file as valid or invalid.

@@ -71,6 +71,7 @@ public:
   FilePrivate(FileName fileName);
 
   FILE *file;
+  IOStream *stream;
 
   FileNameHandle name;
 
@@ -127,6 +128,12 @@ File::FilePrivate::FilePrivate(FileName fileName) :
 File::File(FileName file)
 {
   d = new FilePrivate(file);
+}
+
+File::File(IOStream *stream)
+{
+  d = new FilePrivate(""); // TODO
+  d->stream = stream;
 }
 
 File::~File()
