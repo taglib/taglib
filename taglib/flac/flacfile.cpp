@@ -119,6 +119,15 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
   read(readProperties, propertiesStyle);
 }
 
+FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
+                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(stream)
+{
+  d = new FilePrivate;
+  d->ID3v2FrameFactory = frameFactory;
+  read(readProperties, propertiesStyle);
+}
+
 FLAC::File::~File()
 {
   delete d;

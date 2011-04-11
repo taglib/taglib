@@ -96,6 +96,13 @@ MPC::File::File(FileName file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
+MPC::File::File(IOStream *stream, bool readProperties,
+                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+
 MPC::File::~File()
 {
   delete d;

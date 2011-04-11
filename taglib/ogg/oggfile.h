@@ -92,6 +92,17 @@ namespace TagLib {
        */
       File(FileName file);
 
+      /*!
+       * Contructs an Ogg file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read using \a propertiesStyle.  If
+       * false, \a propertiesStyle is ignored.
+       *
+       * \note This constructor is protected since Ogg::File shouldn't be
+       * instantiated directly but rather should be used through the codec
+       * specific subclasses.
+       */
+      File(IOStream *stream);
+
     private:
       File(const File &);
       File &operator=(const File &);

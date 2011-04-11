@@ -68,6 +68,13 @@ Vorbis::File::File(FileName file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
+Vorbis::File::File(IOStream *stream, bool readProperties,
+                   Properties::ReadStyle propertiesStyle) : Ogg::File(stream)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+
 Vorbis::File::~File()
 {
   delete d;

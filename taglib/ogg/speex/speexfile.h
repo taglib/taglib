@@ -64,6 +64,14 @@ namespace TagLib {
              Properties::ReadStyle propertiesStyle = Properties::Average);
 
         /*!
+         * Contructs a Speex file from \a file.  If \a readProperties is true the
+         * file's audio properties will also be read using \a propertiesStyle.  If
+         * false, \a propertiesStyle is ignored.
+         */
+        File(IOStream *stream, bool readProperties = true,
+             Properties::ReadStyle propertiesStyle = Properties::Average);
+
+        /*!
          * Destroys this instance of the File.
          */
         virtual ~File();

@@ -75,6 +75,13 @@ Ogg::FLAC::File::File(FileName file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
+Ogg::FLAC::File::File(IOStream *stream, bool readProperties,
+                      Properties::ReadStyle propertiesStyle) : Ogg::File(stream)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+
 Ogg::FLAC::File::~File()
 {
   delete d;

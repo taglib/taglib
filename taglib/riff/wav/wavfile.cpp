@@ -65,6 +65,14 @@ RIFF::WAV::File::File(FileName file, bool readProperties,
     read(readProperties, propertiesStyle);
 }
 
+RIFF::WAV::File::File(IOStream *stream, bool readProperties,
+                       Properties::ReadStyle propertiesStyle) : RIFF::File(stream, LittleEndian)
+{
+  d = new FilePrivate;
+  if(isOpen())
+    read(readProperties, propertiesStyle);
+}
+
 RIFF::WAV::File::~File()
 {
   delete d;

@@ -99,6 +99,23 @@ TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
     read(readProperties, propertiesStyle);
 }
 
+TrueAudio::File::File(IOStream *stream, bool readProperties,
+                 Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+{
+  d = new FilePrivate;
+  if(isOpen())
+    read(readProperties, propertiesStyle);
+}
+
+TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
+                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(stream)
+{
+  d = new FilePrivate(frameFactory);
+  if(isOpen())
+    read(readProperties, propertiesStyle);
+}
+
 TrueAudio::File::~File()
 {
   delete d;

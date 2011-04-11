@@ -92,6 +92,13 @@ APE::File::File(FileName file, bool readProperties,
   read(readProperties, propertiesStyle);
 }
 
+APE::File::File(IOStream *stream, bool readProperties,
+                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+
 APE::File::~File()
 {
   delete d;

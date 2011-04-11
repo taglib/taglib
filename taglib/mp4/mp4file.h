@@ -59,6 +59,16 @@ namespace TagLib {
       File(FileName file, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
 
       /*!
+       * Contructs a MP4 file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read using \a propertiesStyle.  If
+       * false, \a propertiesStyle is ignored.
+       *
+       * \note In the current implementation, both \a readProperties and
+       * \a propertiesStyle are ignored.
+       */
+      File(IOStream *stream, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+
+      /*!
        * Destroys this instance of the File.
        */
       virtual ~File();
