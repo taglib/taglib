@@ -69,33 +69,32 @@ struct FileNameHandle : public std::string
 class File::FilePrivate
 {
 public:
-  FilePrivate(FileName fileName);
+  FilePrivate(IOStream *stream);
 
   IOStream *stream;
   bool valid;
   static const uint bufferSize = 1024;
 };
 
-File::FilePrivate::FilePrivate(FileName fileName) :
-  stream(0),
+File::FilePrivate::FilePrivate(IOStream *stream) :
+  stream(stream),
   valid(true)
 {
-  stream = new FileStream(fileName);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(FileName file)
+File::File(FileName fileName)
 {
-  d = new FilePrivate(file);
+  IOStream *stream = new FileStream(fileName);
+  d = new FilePrivate(stream);
 }
 
 File::File(IOStream *stream)
 {
-  d = new FilePrivate(""); // TODO
-  d->stream = stream;
+  d = new FilePrivate(stream);
 }
 
 File::~File()
