@@ -12,6 +12,7 @@ option(WITH_ASF "Enable ASF tag reading/writing code"  OFF)
 option(WITH_MP4 "Enable MP4 tag reading/writing code"  OFF)
 
 add_definitions(-DHAVE_CONFIG_H)
+set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
 ## the following are directories where stuff will be installed to
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")

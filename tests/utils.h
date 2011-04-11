@@ -1,3 +1,6 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -10,10 +13,17 @@
 
 using namespace std;
 
+inline string testFilePath(const string &filename)
+{
+  return string(TESTS_DIR "data/") + filename;
+}
+
+#define TEST_FILE_PATH_C(f) testFilePath(f).c_str()
+
 inline string copyFile(const string &filename, const string &ext)
 {
   string newname = string(tempnam(NULL, NULL)) + ext;
-  string oldname = string("data/") + filename + ext;
+  string oldname = testFilePath(filename) + ext;
 #ifdef _WIN32
   CopyFile(oldname.c_str(), newname.c_str(), FALSE);
   SetFileAttributes(newname.c_str(), GetFileAttributes(newname.c_str()) & ~FILE_ATTRIBUTE_READONLY);

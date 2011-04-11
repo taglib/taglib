@@ -21,7 +21,7 @@ public:
 
   void testVersion2DurationWithXingHeader()
   {
-    MPEG::File f("data/mpeg2.mp3");
+    MPEG::File f(TEST_FILE_PATH_C("mpeg2.mp3"));
     CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->length());
   }
 

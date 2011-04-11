@@ -73,7 +73,7 @@ public:
 
   void testUnsynchDecode()
   {
-    MPEG::File f("data/unsynch.id3", false);
+    MPEG::File f(TEST_FILE_PATH_C("unsynch.id3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("My babe just cares for me"), f.tag()->title());
   }
@@ -114,7 +114,7 @@ public:
 
   void testBrokenFrame1()
   {
-    MPEG::File f("data/broken-tenc.id3", false);
+    MPEG::File f(TEST_FILE_PATH_C("broken-tenc.id3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TENC"));
   }
@@ -382,7 +382,7 @@ public:
 
   void testItunes24FrameSize()
   {
-    MPEG::File f("data/005411.id3", false);
+    MPEG::File f(TEST_FILE_PATH_C("005411.id3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("TIT2"));
     CPPUNIT_ASSERT_EQUAL(String("Sunshine Superman"), f.ID3v2Tag()->frameListMap()["TIT2"].front()->toString());
@@ -463,14 +463,14 @@ public:
 
   void testUpdateDate22()
   {
-    MPEG::File f("data/id3v22-tda.mp3", false);
+    MPEG::File f(TEST_FILE_PATH_C("id3v22-tda.mp3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2010), f.tag()->year());
   }
 
   void testUpdateFullDate22()
   {
-    MPEG::File f("data/id3v22-tda.mp3", false);
+    MPEG::File f(TEST_FILE_PATH_C("id3v22-tda.mp3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("2010-04-03"), f.ID3v2Tag()->frameListMap()["TDRC"].front()->toString());
   }
@@ -536,7 +536,7 @@ public:
 
   void testCompressedFrameWithBrokenLength()
   {
-    MPEG::File f("data/compressed_id3_frame.mp3", false);
+    MPEG::File f(TEST_FILE_PATH_C("compressed_id3_frame.mp3"), false);
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("APIC"));
     ID3v2::AttachedPictureFrame *frame =
         static_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());

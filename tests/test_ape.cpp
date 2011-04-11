@@ -22,7 +22,7 @@ public:
 
   void testProperties399()
   {
-    APE::File f("data/mac-399.ape");
+    APE::File f(TEST_FILE_PATH_C("mac-399.ape"));
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
@@ -31,7 +31,7 @@ public:
 
   void testProperties396()
   {
-    APE::File f("data/mac-396.ape");
+    APE::File f(TEST_FILE_PATH_C("mac-396.ape"));
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
@@ -40,7 +40,7 @@ public:
 
   void testProperties390()
   {
-    APE::File f("data/mac-390-hdr.ape");
+    APE::File f(TEST_FILE_PATH_C("mac-390-hdr.ape"));
     CPPUNIT_ASSERT_EQUAL(15, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());

@@ -28,7 +28,7 @@ public:
 
   void testProperties()
   {
-    ASF::File f("data/silence-1.wma");
+    ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
     CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
@@ -37,7 +37,7 @@ public:
 
   void testRead()
   {
-    ASF::File f("data/silence-1.wma");
+    ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
     CPPUNIT_ASSERT_EQUAL(String("test"), f.tag()->title());
   }
 

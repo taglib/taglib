@@ -19,7 +19,7 @@ public:
 
   void testLength()
   {
-    RIFF::WAV::File f("data/empty.wav");
+    RIFF::WAV::File f(TEST_FILE_PATH_C("empty.wav"));
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
   }
 

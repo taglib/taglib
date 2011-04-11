@@ -30,7 +30,7 @@ public:
 
   void testProperties()
   {
-    MP4::File f("data/has-tags.m4a");
+    MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
@@ -40,9 +40,9 @@ public:
 
   void testCheckValid()
   {
-    MP4::File f("data/empty.aiff");
+    MP4::File f(TEST_FILE_PATH_C("empty.aiff"));
     CPPUNIT_ASSERT(!f.isValid());
-    MP4::File f2("data/has-tags.m4a");
+    MP4::File f2(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f2.isValid());
   }
 
@@ -156,14 +156,14 @@ public:
 
   void testGnre()
   {
-    MP4::File *f = new MP4::File("data/gnre.m4a");
+    MP4::File *f = new MP4::File(TEST_FILE_PATH_C("gnre.m4a"));
     CPPUNIT_ASSERT_EQUAL(TagLib::String("Ska"), f->tag()->genre());
     delete f;
   }
 
   void testCovrRead()
   {
-    MP4::File *f = new MP4::File("data/has-tags.m4a");
+    MP4::File *f = new MP4::File(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
     MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), l.size());
@@ -202,7 +202,7 @@ public:
 
   void testCovrRead2()
   {
-    MP4::File *f = new MP4::File("data/covr-junk.m4a");
+    MP4::File *f = new MP4::File(TEST_FILE_PATH_C("covr-junk.m4a"));
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
     MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), l.size());

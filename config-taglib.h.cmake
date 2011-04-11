@@ -6,3 +6,6 @@
 #cmakedefine   NO_ITUNES_HACKS 1
 #cmakedefine   WITH_ASF 1
 #cmakedefine   WITH_MP4 1
+
+#cmakedefine TESTS_DIR "@TESTS_DIR@"
+
