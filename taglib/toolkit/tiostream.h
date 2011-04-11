@@ -65,6 +65,8 @@ namespace TagLib {
       End
     };
 
+    IOStream();
+
     /*!
      * Destroys this IOStream instance.
      */
@@ -121,11 +123,6 @@ namespace TagLib {
     virtual bool isOpen() const = 0;
 
     /*!
-     * Returns true if the file is open and readble.
-     */
-    virtual bool isValid() const = 0;
-
-    /*!
      * Move the I/O pointer to \a offset in the stream from position \a p.  This
      * defaults to seeking from the beginning of the stream.
      *
@@ -147,6 +144,11 @@ namespace TagLib {
      * Returns the length of the stream.
      */
     virtual long length() = 0;
+
+    /*!
+     * Truncates the stream to a \a length.
+     */
+    virtual void truncate(long length) = 0;
 
   private:
     IOStream(const IOStream &);

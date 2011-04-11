@@ -31,7 +31,10 @@ using namespace TagLib;
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+IOStream::IOStream()
+{
+}
+
 IOStream::~IOStream()
 {
-  delete d;
 }
