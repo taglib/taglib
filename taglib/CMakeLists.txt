@@ -161,6 +161,7 @@ set(toolkit_SRCS
   toolkit/tstringlist.cpp
   toolkit/tbytevector.cpp
   toolkit/tbytevectorlist.cpp
+  toolkit/tbytevectorstream.cpp
   toolkit/tiostream.cpp
   toolkit/tfile.cpp
   toolkit/tfilestream.cpp

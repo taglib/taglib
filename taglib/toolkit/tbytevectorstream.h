@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2011 by Lukas Lalinsky
+    email                : lalinsky@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_FILESTREAM_H
-#define TAGLIB_FILESTREAM_H
+#ifndef TAGLIB_BYTEVECTORSTREAM_H
+#define TAGLIB_BYTEVECTORSTREAM_H
 
 #include "taglib_export.h"
 #include "taglib.h"
@@ -37,27 +37,21 @@ namespace TagLib {
   class Tag;
   class AudioProperties;
 
-  //! A file class with some useful methods for tag manipulation
+  //! In-memory Stream class using ByteVector for its storage.
 
-  /*!
-   * This class is a basic file class with some methods that are particularly
-   * useful for tag editors.  It has methods to take advantage of
-   * ByteVector and a binary search method for finding patterns in a file.
-   */
-
-  class TAGLIB_EXPORT FileStream : public IOStream
+  class TAGLIB_EXPORT ByteVectorStream : public IOStream
   {
   public:
     /*!
      * Construct a File object and opens the \a file.  \a file should be a
      * be a C-string in the local file system encoding.
      */
-    FileStream(FileName file);
+    ByteVectorStream(const ByteVector &data);
 
     /*!
-     * Destroys this FileStream instance.
+     * Destroys this ByteVectorStream instance.
      */
-    virtual ~FileStream();
+    virtual ~ByteVectorStream();
 
     /*!
      * Returns the file name in the local file system encoding.
@@ -137,16 +131,13 @@ namespace TagLib {
      */
     void truncate(long length);
 
+    ByteVector *data();
+
   protected:
 
-    /*!
-     * Returns the buffer size that is used for internal buffering.
-     */
-    static uint bufferSize();
-
   private:
-    class FileStreamPrivate;
-    FileStreamPrivate *d;
+    class ByteVectorStreamPrivate;
+    ByteVectorStreamPrivate *d;
   };
 
 }
