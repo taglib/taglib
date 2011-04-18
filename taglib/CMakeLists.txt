@@ -25,17 +25,95 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
 endif()
 
-add_subdirectory(toolkit)
-add_subdirectory(asf)
-add_subdirectory(mpeg)
-add_subdirectory(ogg)
-add_subdirectory(flac)
-add_subdirectory(ape)
-add_subdirectory(mpc)
-add_subdirectory(mp4)
-add_subdirectory(wavpack)
-add_subdirectory(trueaudio)
-add_subdirectory(riff)
+set(tag_HDRS
+  tag.h
+  fileref.h
+  audioproperties.h
+  taglib_export.h
+  ${CMAKE_BINARY_DIR}/taglib_config.h
+  toolkit/taglib.h
+  toolkit/tstring.h
+  toolkit/tlist.h
+  toolkit/tlist.tcc
+  toolkit/tstringlist.h
+  toolkit/tbytevector.h
+  toolkit/tbytevectorlist.h
+  toolkit/tfile.h
+  toolkit/tmap.h
+  toolkit/tmap.tcc
+  mpeg/mpegfile.h
+  mpeg/mpegproperties.h
+  mpeg/mpegheader.h
+  mpeg/xingheader.h
+  mpeg/id3v1/id3v1tag.h
+  mpeg/id3v1/id3v1genres.h
+  mpeg/id3v2/id3v2extendedheader.h
+  mpeg/id3v2/id3v2frame.h
+  mpeg/id3v2/id3v2header.h
+  mpeg/id3v2/id3v2synchdata.h
+  mpeg/id3v2/id3v2footer.h
+  mpeg/id3v2/id3v2framefactory.h
+  mpeg/id3v2/id3v2tag.h
+  mpeg/id3v2/frames/attachedpictureframe.h
+  mpeg/id3v2/frames/commentsframe.h
+  mpeg/id3v2/frames/generalencapsulatedobjectframe.h
+  mpeg/id3v2/frames/popularimeterframe.h
+  mpeg/id3v2/frames/privateframe.h
+  mpeg/id3v2/frames/relativevolumeframe.h
+  mpeg/id3v2/frames/textidentificationframe.h
+  mpeg/id3v2/frames/uniquefileidentifierframe.h
+  mpeg/id3v2/frames/unknownframe.h
+  mpeg/id3v2/frames/unsynchronizedlyricsframe.h
+  mpeg/id3v2/frames/urllinkframe.h
+  ogg/oggfile.h
+  ogg/oggpage.h
+  ogg/oggpageheader.h
+  ogg/xiphcomment.h
+  ogg/vorbis/vorbisfile.h
+  ogg/vorbis/vorbisproperties.h
+  ogg/flac/oggflacfile.h
+  ogg/speex/speexfile.h
+  ogg/speex/speexproperties.h
+  flac/flacfile.h
+  flac/flacpicture.h
+  flac/flacproperties.h
+  flac/flacmetadatablock.h
+  ape/apefile.h
+  ape/apeproperties.h
+  ape/apetag.h
+  ape/apefooter.h
+  ape/apeitem.h
+  mpc/mpcfile.h
+  mpc/mpcproperties.h
+  wavpack/wavpackfile.h
+  wavpack/wavpackproperties.h
+  trueaudio/trueaudiofile.h
+  trueaudio/trueaudioproperties.h
+  riff/rifffile.h
+  riff/aiff/aifffile.h
+  riff/aiff/aiffproperties.h
+  riff/wav/wavfile.h
+  riff/wav/wavproperties.h
+)
+if(WITH_ASF)
+  set(tag_HDRS ${tag_HDRS}
+    asf/asffile.h
+    asf/asfproperties.h
+    asf/asftag.h
+    asf/asfattribute.h
+    asf/asfpicture.h
+  )
+endif()
+if(WITH_MP4)
+  set(tag_HDRS ${tag_HDRS}
+    mp4/mp4file.h
+    mp4/mp4atom.h
+    mp4/mp4tag.h
+    mp4/mp4item.h
+    mp4/mp4properties.h
+    mp4/mp4coverart.h
+  )
+endif()
 
 set(mpeg_SRCS
   mpeg/mpegfile.cpp
@@ -199,13 +277,13 @@ set_target_properties(tag PROPERTIES
   INSTALL_NAME_DIR ${LIB_INSTALL_DIR}
   DEFINE_SYMBOL MAKE_TAGLIB_LIB
   LINK_INTERFACE_LIBRARIES ""
+  PUBLIC_HEADER "${tag_HDRS}"
 )
 
 install(TARGETS tag
 	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+	PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
 )
-
-install(FILES tag.h fileref.h audioproperties.h taglib_export.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
 

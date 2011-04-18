@@ -18,6 +18,8 @@ include_directories(
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc)
 
+set(tag_c_HDRS tag_c.h)
+
 if(ENABLE_STATIC)
   add_library(tag_c STATIC tag_c.cpp)
   set_target_properties(tag_c PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
@@ -26,6 +28,7 @@ else()
 endif()
 
 target_link_libraries(tag_c tag)
+set_target_properties(tag_c PROPERTIES PUBLIC_HEADER "${tag_c_HDRS}")
 
 # On Solaris we need to explicitly add the C++ standard and runtime
 # libraries to the libs used by the C bindings, because those C bindings
@@ -58,8 +61,8 @@ install(TARGETS tag_c
 	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+	PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-install(FILES tag_c.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
 

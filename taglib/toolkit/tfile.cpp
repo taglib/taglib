@@ -564,3 +564,4 @@ TagLib::uint File::bufferSize()
 {
   return FilePrivate::bufferSize;
 }
+

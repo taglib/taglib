@@ -65,7 +65,6 @@ if(WITH_MP4)
 endif()
 
 configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
 
 add_subdirectory(taglib) 
 add_subdirectory(bindings)
