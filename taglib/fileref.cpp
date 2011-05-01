@@ -171,6 +171,30 @@ bool FileRef::isNull() const
   return !d->file || !d->file->isValid();
 }
 
+ID3v1::Tag * FileRef::ID3v1Tag (bool create){
+  return d->file->ID3v1Tag(create);
+}
+
+ID3v2::Tag * FileRef::ID3v2Tag (bool create){
+  return d->file->ID3v2Tag(create);
+}
+
+APE::Tag * FileRef::APETag (bool create){
+  return d->file->APETag(create);
+}
+
+Ogg::XiphComment * FileRef::XiphComment (bool create){
+  return d->file->XiphComment(create);
+}
+
+bool FileRef::strip (int tags){
+  return d->file->strip(tags);
+}
+
+Type::Types FileRef::preferedType(){
+  return d->file->preferedType;
+}
+
 FileRef &FileRef::operator=(const FileRef &ref)
 {
   if(&ref == this)

@@ -70,6 +70,7 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle a
 {
   d = new FilePrivate;
   read(readProperties, audioPropertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 MP4::File::~File()

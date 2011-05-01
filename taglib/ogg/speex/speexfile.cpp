@@ -63,6 +63,7 @@ Speex::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 Speex::File::~File()

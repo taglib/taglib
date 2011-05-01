@@ -147,7 +147,7 @@ namespace TagLib {
        *
        * \note In order to make the removal permanent save() still needs to be called.
        */
-      void strip(int tags = AllTags);
+      bool strip(int tags = AllTags);
 
       /*!
        * \deprecated

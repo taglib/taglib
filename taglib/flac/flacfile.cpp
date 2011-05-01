@@ -108,6 +108,7 @@ FLAC::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -117,6 +118,7 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 FLAC::File::~File()

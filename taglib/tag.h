@@ -30,6 +30,16 @@
 #include "tstring.h"
 
 namespace TagLib {
+  class Type {
+    public:
+    enum Types{
+        APE,
+        ASF,
+        ID3v1,
+        ID3v2,
+        XiphComment
+    };
+  };
 
   //! A simple, generic interface to common audio meta data fields
 

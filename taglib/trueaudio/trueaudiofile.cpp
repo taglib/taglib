@@ -88,6 +88,7 @@ TrueAudio::File::File(FileName file, bool readProperties,
   d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -97,6 +98,7 @@ TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
   d = new FilePrivate(frameFactory);
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 TrueAudio::File::~File()
@@ -178,7 +180,7 @@ ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
   return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
 }
 
-void TrueAudio::File::strip(int tags)
+bool TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1) {
     d->tag.set(ID3v1Index, 0);
@@ -191,6 +193,7 @@ void TrueAudio::File::strip(int tags)
     if(!ID3v1Tag())
       ID3v2Tag(true);
   }
+  return true;
 }
 
 

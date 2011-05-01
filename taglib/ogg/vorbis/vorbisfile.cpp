@@ -66,6 +66,7 @@ Vorbis::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 Vorbis::File::~File()

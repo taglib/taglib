@@ -101,6 +101,7 @@ MPEG::File::File(FileName file, bool readProperties,
 
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -111,6 +112,7 @@ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 MPEG::File::~File()

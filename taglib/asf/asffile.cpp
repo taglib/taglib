@@ -367,6 +367,7 @@ ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle proper
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::ASF;
 }
 
 ASF::File::~File()

@@ -86,6 +86,7 @@ WavPack::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::APE;
 }
 
 WavPack::File::~File()
@@ -182,7 +183,7 @@ APE::Tag *WavPack::File::APETag(bool create)
   return d->tag.access<APE::Tag>(APEIndex, create);
 }
 
-void WavPack::File::strip(int tags)
+bool WavPack::File::strip(int tags)
 {
   if(tags & ID3v1) {
     d->tag.set(ID3v1Index, 0);
@@ -195,6 +196,7 @@ void WavPack::File::strip(int tags)
     if(!ID3v1Tag())
       APETag(true);
   }
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

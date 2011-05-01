@@ -73,6 +73,7 @@ Ogg::FLAC::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 Ogg::FLAC::File::~File()

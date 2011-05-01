@@ -63,6 +63,7 @@ RIFF::AIFF::File::File(FileName file, bool readProperties,
   d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 RIFF::AIFF::File::~File()

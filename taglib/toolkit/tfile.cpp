@@ -546,6 +546,26 @@ bool File::isWritable(const char *file)
   return access(file, W_OK) == 0;
 }
 
+ID3v1::Tag * File::ID3v1Tag (bool create){
+  return NULL;
+}
+
+ID3v2::Tag * File::ID3v2Tag (bool create){
+  return NULL;
+}
+
+APE::Tag * File::APETag (bool create){
+  return NULL;
+}
+
+Ogg::XiphComment * File::XiphComment (bool create){
+  return NULL;
+}
+
+bool File::strip (int tags){
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
