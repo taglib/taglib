@@ -199,6 +199,14 @@ bool WavPack::File::strip(int tags)
   return true;
 }
 
+bool WavPack::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool WavPack::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,12 +274,4 @@ long WavPack::File::findID3v1()
     return p;
 
   return -1;
-}
-
-bool WavPack::File::hasAPETag(){
-  return d->hasAPE;
-}
-
-bool WavPack::File::hasID3v1Tag(){
-  return d->hasID3v1;
 }

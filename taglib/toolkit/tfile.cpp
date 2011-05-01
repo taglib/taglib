@@ -546,15 +546,19 @@ bool File::isWritable(const char *file)
   return access(file, W_OK) == 0;
 }
 
+APE::Tag * File::APETag (bool create){
+  return NULL;
+}
+
+ASF::Tag * File::ASFTag (bool create){
+  return NULL;
+}
+
 ID3v1::Tag * File::ID3v1Tag (bool create){
   return NULL;
 }
 
 ID3v2::Tag * File::ID3v2Tag (bool create){
-  return NULL;
-}
-
-APE::Tag * File::APETag (bool create){
   return NULL;
 }
 

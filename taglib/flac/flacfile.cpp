@@ -252,6 +252,18 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
   d->ID3v2FrameFactory = factory;
 }
 
+bool FLAC::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool FLAC::File::hasID3v2Tag(){
+  return d->hasID3v2;
+}
+
+bool FLAC::File::hasXiphComment(){
+  return d->hasXiphComment;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
@@ -497,16 +509,4 @@ void FLAC::File::removePictures()
     }
   }
   d->blocks = newBlocks;
-}
-
-bool FLAC::File::hasID3v1Tag(){
-  return d->hasID3v1;
-}
-
-bool FLAC::File::hasID3v2Tag(){
-  return d->hasID3v2;
-}
-
-bool FLAC::File::hasXiphComment(){
-  return d->hasXiphComment;
 }
