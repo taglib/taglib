@@ -32,13 +32,16 @@
 #include "tbytevector.h"
 
 namespace TagLib {
+	namespace APE {
+		class Tag;
+	}
+	namespace ASF {
+		class Tag;
+	}
 	namespace ID3v1 {
 		class Tag;
 	}
 	namespace ID3v2 {
-		class Tag;
-	}
-	namespace APE {
 		class Tag;
 	}
 	namespace Ogg {
@@ -250,9 +253,10 @@ namespace TagLib {
     /*!
      * Merged from file classes
      */
+    virtual APE::Tag * APETag (bool create);
+    virtual ASF::Tag * ASFTag(bool create);
     virtual ID3v1::Tag * ID3v1Tag (bool create);
     virtual ID3v2::Tag * ID3v2Tag (bool create);
-    virtual APE::Tag * APETag (bool create);
     virtual Ogg::XiphComment * XiphComment (bool create);
     virtual bool strip (int tags);
 

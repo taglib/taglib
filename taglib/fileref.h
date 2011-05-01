@@ -34,13 +34,16 @@
 #include "audioproperties.h"
 
 namespace TagLib {
+	namespace APE {
+		class Tag;
+	}
+	namespace ASF {
+		class Tag;
+	}
 	namespace ID3v1 {
 		class Tag;
 	}
 	namespace ID3v2 {
-		class Tag;
-	}
-	namespace APE {
 		class Tag;
 	}
 	namespace Ogg {
@@ -269,9 +272,10 @@ namespace TagLib {
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
+    APE::Tag * APETag (bool create);
+    ASF::Tag * ASFTag(bool create);
     ID3v1::Tag * ID3v1Tag (bool create);
     ID3v2::Tag * ID3v2Tag (bool create);
-    APE::Tag * APETag (bool create);
     Ogg::XiphComment * XiphComment (bool create);
     bool strip (int tags);
 
