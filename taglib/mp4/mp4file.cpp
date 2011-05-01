@@ -70,6 +70,7 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle a
 {
   d = new FilePrivate;
   read(readProperties, audioPropertiesStyle);
+  preferedType=Type::None;
 }
 
 MP4::File::~File()
@@ -79,6 +80,12 @@ MP4::File::~File()
 
 MP4::Tag *
 MP4::File::tag() const
+{
+  return d->tag;
+}
+
+MP4::Tag *
+MP4::File::MP4Tag(bool create) const
 {
   return d->tag;
 }
@@ -142,4 +149,11 @@ MP4::File::save()
   return d->tag->save();
 }
 
+bool
+MP4::File::hasMP4Tag()
+{
+  if(d->tag)
+    return true;
+  return false;
+}
 #endif

@@ -267,6 +267,10 @@ namespace TagLib {
        */
       long lastFrameOffset();
 
+      bool hasAPETag();
+      bool hasID3v1Tag();
+      bool hasID3v2Tag();
+
     private:
       File(const File &);
       File &operator=(const File &);

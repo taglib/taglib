@@ -63,6 +63,7 @@ Speex::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 Speex::File::~File()
@@ -71,6 +72,11 @@ Speex::File::~File()
 }
 
 Ogg::XiphComment *Speex::File::tag() const
+{
+  return d->comment;
+}
+
+Ogg::XiphComment *Speex::File::XiphComment() const
 {
   return d->comment;
 }
@@ -88,6 +94,12 @@ bool Speex::File::save()
   setPacket(1, d->comment->render());
 
   return Ogg::File::save();
+}
+
+bool Speex::File::hasXiphComment(){
+  if(d->comment)
+    return true;
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

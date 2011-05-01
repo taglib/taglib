@@ -158,6 +158,7 @@ namespace TagLib {
        * destroyed.
        */
       Ogg::XiphComment *xiphComment(bool create = false);
+      Ogg::XiphComment *XiphComment(bool create = false);
 
       /*!
        * Set the ID3v2::FrameFactory to something other than the default.  This
@@ -201,6 +202,10 @@ namespace TagLib {
        * \note The file will be saved only after calling save().
        */
       void addPicture(Picture *picture);
+
+      bool hasID3v1Tag();
+      bool hasID3v2Tag();
+      bool hasXiphComment();
 
     private:
       File(const File &);

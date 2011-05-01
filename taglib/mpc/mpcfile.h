@@ -147,7 +147,7 @@ namespace TagLib {
        *
        * \note In order to make the removal permanent save() still needs to be called.
        */
-      void strip(int tags = AllTags);
+      bool strip(int tags = AllTags);
 
       /*!
        * \deprecated
@@ -155,6 +155,11 @@ namespace TagLib {
        */
       void remove(int tags = AllTags);
 
+      ID3v2::Tag *ID3v2Tag(bool create = false);
+
+      bool hasAPETag();
+      bool hasID3v1Tag();
+      bool hasID3v2Tag();
 
     private:
       File(const File &);

@@ -101,6 +101,7 @@ MPEG::File::File(FileName file, bool readProperties,
 
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -111,6 +112,7 @@ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 MPEG::File::~File()
@@ -389,6 +391,18 @@ long MPEG::File::firstFrameOffset()
 long MPEG::File::lastFrameOffset()
 {
   return previousFrameOffset(ID3v1Tag() ? d->ID3v1Location - 1 : length());
+}
+
+bool MPEG::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool MPEG::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool MPEG::File::hasID3v2Tag(){
+  return d->hasID3v2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

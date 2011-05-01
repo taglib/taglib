@@ -63,6 +63,7 @@ RIFF::WAV::File::File(FileName file, bool readProperties,
   d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 RIFF::WAV::File::~File()
@@ -71,6 +72,11 @@ RIFF::WAV::File::~File()
 }
 
 ID3v2::Tag *RIFF::WAV::File::tag() const
+{
+  return d->tag;
+}
+
+ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
 {
   return d->tag;
 }
@@ -90,6 +96,12 @@ bool RIFF::WAV::File::save()
   setChunkData(d->tagChunkID, d->tag->render());
 
   return true;
+}
+
+bool RIFF::WAV::File::hasID3v2Tag(){
+  if(d->tag)
+    return true;
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

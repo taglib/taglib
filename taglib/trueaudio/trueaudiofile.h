@@ -160,7 +160,10 @@ namespace TagLib {
        * as their memory will be freed.
        * \note In order to make the removal permanent save() still needs to be called
        */
-      void strip(int tags = AllTags);
+      bool strip(int tags = AllTags);
+
+      bool hasID3v1Tag();
+      bool hasID3v2Tag();
 
     private:
       File(const File &);

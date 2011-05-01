@@ -367,6 +367,7 @@ ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle proper
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::ASF;
 }
 
 ASF::File::~File()
@@ -384,6 +385,11 @@ ASF::File::~File()
 }
 
 ASF::Tag *ASF::File::tag() const
+{
+  return d->tag;
+}
+
+ASF::Tag *ASF::File::ASFTag() const
 {
   return d->tag;
 }
@@ -525,6 +531,12 @@ bool ASF::File::save()
   insert(data, 0, d->size);
 
   return true;
+}
+
+bool ASF::File::hasAPE(){
+  if(d->tag)
+    return true;
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

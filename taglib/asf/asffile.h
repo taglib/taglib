@@ -73,6 +73,7 @@ namespace TagLib {
        * destroyed.
        */
       virtual Tag *tag() const;
+      virtual ASF::Tag *ASFTag() const;
 
       /*!
        * Returns the ASF audio properties for this file.
@@ -85,6 +86,8 @@ namespace TagLib {
        * This returns true if the save was successful.
        */
       virtual bool save();
+
+      bool hasASF();
 
     private:
 

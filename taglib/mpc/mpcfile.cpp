@@ -94,6 +94,7 @@ MPC::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::APE;
 }
 
 MPC::File::~File()
@@ -192,12 +193,17 @@ ID3v1::Tag *MPC::File::ID3v1Tag(bool create)
   return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
+ID3v2::Tag *MPC::File::ID3v2Tag(bool create)
+{
+  return NULL;
+}
+
 APE::Tag *MPC::File::APETag(bool create)
 {
   return d->tag.access<APE::Tag>(APEIndex, create);
 }
 
-void MPC::File::strip(int tags)
+bool MPC::File::strip(int tags)
 {
   if(tags & ID3v1) {
     d->tag.set(ID3v1Index, 0);
@@ -215,6 +221,7 @@ void MPC::File::strip(int tags)
     if(!ID3v1Tag())
       APETag(true);
   }
+  return true;
 }
 
 void MPC::File::remove(int tags)
@@ -322,4 +329,16 @@ long MPC::File::findID3v2()
     return 0;
 
   return -1;
+}
+
+bool MPC::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool MPC::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool MPC::File::hasID3v2Tag(){
+  return d->hasID3v2;
 }

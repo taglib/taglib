@@ -66,6 +66,7 @@ Vorbis::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 Vorbis::File::~File()
@@ -74,6 +75,11 @@ Vorbis::File::~File()
 }
 
 Ogg::XiphComment *Vorbis::File::tag() const
+{
+  return d->comment;
+}
+
+Ogg::XiphComment *Vorbis::File::XiphComment() const
 {
   return d->comment;
 }
@@ -94,6 +100,12 @@ bool Vorbis::File::save()
   setPacket(1, v);
 
   return Ogg::File::save();
+}
+
+bool Vorbis::File::hasXiphComment(){
+  if(d->comment)
+    return true;
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

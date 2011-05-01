@@ -90,6 +90,7 @@ APE::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::APE;
 }
 
 APE::File::~File()
@@ -186,7 +187,7 @@ APE::Tag *APE::File::APETag(bool create)
   return d->tag.access<APE::Tag>(APEIndex, create);
 }
 
-void APE::File::strip(int tags)
+bool APE::File::strip(int tags)
 {
   if(tags & ID3v1) {
     d->tag.set(ID3v1Index, 0);
@@ -199,6 +200,15 @@ void APE::File::strip(int tags)
     if(!ID3v1Tag())
       APETag(true);
   }
+  return true;
+}
+
+bool APE::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool APE::File::hasID3v1Tag(){
+  return d->hasID3v1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -74,6 +74,7 @@ namespace TagLib {
          * Returns the Tag for this file.
          */
         virtual ID3v2::Tag *tag() const;
+        virtual ID3v2::Tag *ID3v2Tag() const;
 
         /*!
          * Returns the WAV::Properties for this file.  If no audio properties
@@ -85,6 +86,8 @@ namespace TagLib {
          * Saves the file.
          */
         virtual bool save();
+
+        virtual bool hasID3v2Tag();
 
       private:
         File(const File &);

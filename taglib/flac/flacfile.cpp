@@ -108,6 +108,7 @@ FLAC::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -117,6 +118,7 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   read(readProperties, propertiesStyle);
+  preferedType=Type::ID3v2;
 }
 
 FLAC::File::~File()
@@ -245,9 +247,26 @@ Ogg::XiphComment *FLAC::File::xiphComment(bool create)
   return d->tag.access<Ogg::XiphComment>(XiphIndex, create);
 }
 
+Ogg::XiphComment *FLAC::File::XiphComment(bool create)
+{
+  return d->tag.access<Ogg::XiphComment>(XiphIndex, create);
+}
+
 void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 {
   d->ID3v2FrameFactory = factory;
+}
+
+bool FLAC::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool FLAC::File::hasID3v2Tag(){
+  return d->hasID3v2;
+}
+
+bool FLAC::File::hasXiphComment(){
+  return d->hasXiphComment;
 }
 
 
@@ -496,4 +515,3 @@ void FLAC::File::removePictures()
   }
   d->blocks = newBlocks;
 }
-

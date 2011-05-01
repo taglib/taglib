@@ -26,9 +26,32 @@
 #ifndef TAGLIB_FILE_H
 #define TAGLIB_FILE_H
 
+#include "tag.h"
 #include "taglib_export.h"
 #include "taglib.h"
 #include "tbytevector.h"
+
+namespace TagLib {
+	namespace APE {
+		class Tag;
+	}
+	namespace ASF {
+		class Tag;
+	}
+	namespace ID3v1 {
+		class Tag;
+	}
+	namespace ID3v2 {
+		class Tag;
+	}
+	namespace MP4 {
+		class Tag;
+	}
+	namespace Ogg {
+		class XiphComment;
+	}
+}
+
 
 namespace TagLib {
 
@@ -229,6 +252,28 @@ namespace TagLib {
      * \deprecated
      */
     static bool isWritable(const char *name);
+
+    /*!
+     * Merged from file classes
+     */
+    virtual APE::Tag * APETag (bool create);
+    virtual ASF::Tag * ASFTag(bool create);
+    virtual ID3v1::Tag * ID3v1Tag (bool create);
+    virtual ID3v2::Tag * ID3v2Tag (bool create);
+    virtual MP4::Tag * MP4Tag (bool create);
+    virtual Ogg::XiphComment * XiphComment (bool create);
+    virtual bool strip (int tags);
+
+
+    virtual bool hasAPETag();
+    virtual bool hasASFTag();
+    virtual bool hasID3v1Tag();
+    virtual bool hasID3v2Tag();
+    virtual bool hasMP4Tag();
+    virtual bool hasXiphComment();
+    virtual bool hasTag();
+
+    Type::Types preferedType;
 
   protected:
     /*!

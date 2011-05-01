@@ -73,6 +73,7 @@ Ogg::FLAC::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
+  preferedType=Type::XiphComment;
 }
 
 Ogg::FLAC::File::~File()
@@ -81,6 +82,11 @@ Ogg::FLAC::File::~File()
 }
 
 Ogg::XiphComment *Ogg::FLAC::File::tag() const
+{
+  return d->comment;
+}
+
+Ogg::XiphComment *Ogg::FLAC::File::XiphComment() const
 {
   return d->comment;
 }
@@ -115,6 +121,10 @@ bool Ogg::FLAC::File::save()
   setPacket(d->commentPacket, v);
 
   return Ogg::File::save();
+}
+
+bool Ogg::FLAC::File::hasXiphComment(){
+  return d->hasXiphComment;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

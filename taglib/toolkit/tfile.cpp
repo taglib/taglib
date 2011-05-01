@@ -546,6 +546,62 @@ bool File::isWritable(const char *file)
   return access(file, W_OK) == 0;
 }
 
+APE::Tag * File::APETag (bool create){
+  return NULL;
+}
+
+ASF::Tag * File::ASFTag (bool create){
+  return NULL;
+}
+
+ID3v1::Tag * File::ID3v1Tag (bool create){
+  return NULL;
+}
+
+ID3v2::Tag * File::ID3v2Tag (bool create){
+  return NULL;
+}
+
+MP4::Tag * File::MP4Tag (bool create){
+  return NULL;
+}
+
+Ogg::XiphComment * File::XiphComment (bool create){
+  return NULL;
+}
+
+bool File::strip (int tags){
+  return false;
+}
+
+bool File::hasAPETag(){
+  return false;
+}
+
+bool File::hasASFTag(){
+  return false;
+}
+
+bool File::hasID3v1Tag(){
+  return false;
+}
+
+bool File::hasID3v2Tag(){
+  return false;
+}
+
+bool File::hasMP4Tag(){
+  return false;
+}
+
+bool File::hasXiphComment(){
+  return false;
+}
+
+bool File::hasTag(){
+  return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

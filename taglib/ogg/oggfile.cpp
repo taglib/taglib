@@ -211,6 +211,7 @@ bool Ogg::File::save()
 Ogg::File::File(FileName file) : TagLib::File(file)
 {
   d = new FilePrivate;
+  preferedType=Type::XiphComment;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

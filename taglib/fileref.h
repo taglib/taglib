@@ -26,11 +26,34 @@
 #ifndef TAGLIB_FILEREF_H
 #define TAGLIB_FILEREF_H
 
+#include "tag.h"
 #include "tfile.h"
 #include "tstringlist.h"
 
 #include "taglib_export.h"
 #include "audioproperties.h"
+
+namespace TagLib {
+	namespace APE {
+		class Tag;
+	}
+	namespace ASF {
+		class Tag;
+	}
+	namespace ID3v1 {
+		class Tag;
+	}
+	namespace ID3v2 {
+		class Tag;
+	}
+	namespace MP4 {
+		class Tag;
+	}
+	namespace Ogg {
+		class XiphComment;
+	}
+}
+
 
 namespace TagLib {
 
@@ -252,6 +275,23 @@ namespace TagLib {
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
+    APE::Tag * APETag (bool create);
+    ASF::Tag * ASFTag(bool create);
+    ID3v1::Tag * ID3v1Tag (bool create);
+    ID3v2::Tag * ID3v2Tag (bool create);
+    MP4::Tag * MP4Tag (bool create);
+    Ogg::XiphComment * XiphComment (bool create);
+    bool strip (int tags);
+
+    Type::Types preferedType();
+
+    bool hasAPETag();
+    bool hasASFTag();
+    bool hasID3v1Tag();
+    bool hasID3v2Tag();
+    bool hasMP4Tag();
+    bool hasXiphComment();
+    bool hasTag();
 
   private:
     class FileRefPrivate;

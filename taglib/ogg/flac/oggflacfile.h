@@ -79,7 +79,8 @@ namespace TagLib {
       /*!
        * Returns the Tag for this file.  This will always be a XiphComment.
        */
-      virtual XiphComment *tag() const;
+      virtual Ogg::XiphComment *tag() const;
+      virtual Ogg::XiphComment *XiphComment() const;
 
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties
@@ -98,6 +99,8 @@ namespace TagLib {
        * calculating the bitrate.
        */
       long streamLength();
+
+      bool hasXiphComment();
 
     private:
       File(const File &);
