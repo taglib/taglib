@@ -74,6 +74,7 @@ namespace TagLib {
          * TagLib::File::tag().
          */
         virtual Ogg::XiphComment *tag() const;
+        virtual Ogg::XiphComment *XiphComment() const;
 
         /*!
          * Returns the Speex::Properties for this file.  If no audio properties

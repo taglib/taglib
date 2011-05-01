@@ -247,6 +247,11 @@ Ogg::XiphComment *FLAC::File::xiphComment(bool create)
   return d->tag.access<Ogg::XiphComment>(XiphIndex, create);
 }
 
+Ogg::XiphComment *FLAC::File::XiphComment(bool create)
+{
+  return d->tag.access<Ogg::XiphComment>(XiphIndex, create);
+}
+
 void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 {
   d->ID3v2FrameFactory = factory;

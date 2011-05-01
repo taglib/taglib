@@ -389,6 +389,11 @@ ASF::Tag *ASF::File::tag() const
   return d->tag;
 }
 
+ASF::Tag *ASF::File::ASFTag() const
+{
+  return d->tag;
+}
+
 ASF::Properties *ASF::File::audioProperties() const
 {
   return d->properties;

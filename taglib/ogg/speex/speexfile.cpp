@@ -76,6 +76,11 @@ Ogg::XiphComment *Speex::File::tag() const
   return d->comment;
 }
 
+Ogg::XiphComment *Speex::File::XiphComment() const
+{
+  return d->comment;
+}
+
 Speex::Properties *Speex::File::audioProperties() const
 {
   return d->properties;

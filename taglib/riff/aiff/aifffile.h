@@ -74,6 +74,7 @@ namespace TagLib {
          * Returns the Tag for this file.
          */
         virtual ID3v2::Tag *tag() const;
+        virtual ID3v2::Tag *ID3v2Tag() const;
 
         /*!
          * Returns the AIFF::Properties for this file.  If no audio properties

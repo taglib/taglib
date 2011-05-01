@@ -76,6 +76,11 @@ ID3v2::Tag *RIFF::WAV::File::tag() const
   return d->tag;
 }
 
+ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
+{
+  return d->tag;
+}
+
 RIFF::WAV::Properties *RIFF::WAV::File::audioProperties() const
 {
   return d->properties;

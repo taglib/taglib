@@ -79,6 +79,11 @@ Ogg::XiphComment *Vorbis::File::tag() const
   return d->comment;
 }
 
+Ogg::XiphComment *Vorbis::File::XiphComment() const
+{
+  return d->comment;
+}
+
 Vorbis::Properties *Vorbis::File::audioProperties() const
 {
   return d->properties;

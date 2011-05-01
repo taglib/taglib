@@ -74,6 +74,7 @@ namespace TagLib {
        * destroyed.
        */
       Tag *tag() const;
+      MP4::Tag *MP4Tag(bool create) const;
 
       /*!
        * Returns the MP4 audio properties for this file.
@@ -87,7 +88,7 @@ namespace TagLib {
        */
       bool save();
 
-      bool hasTag();
+      bool hasMP4Tag();
 
     private:
 

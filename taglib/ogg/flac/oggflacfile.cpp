@@ -86,6 +86,11 @@ Ogg::XiphComment *Ogg::FLAC::File::tag() const
   return d->comment;
 }
 
+Ogg::XiphComment *Ogg::FLAC::File::XiphComment() const
+{
+  return d->comment;
+}
+
 Properties *Ogg::FLAC::File::audioProperties() const
 {
   return d->properties;

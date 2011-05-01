@@ -158,6 +158,7 @@ namespace TagLib {
        * destroyed.
        */
       Ogg::XiphComment *xiphComment(bool create = false);
+      Ogg::XiphComment *XiphComment(bool create = false);
 
       /*!
        * Set the ID3v2::FrameFactory to something other than the default.  This

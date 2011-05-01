@@ -76,6 +76,11 @@ ID3v2::Tag *RIFF::AIFF::File::tag() const
   return d->tag;
 }
 
+ID3v2::Tag *RIFF::AIFF::File::ID3v2Tag() const
+{
+  return d->tag;
+}
+
 RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
 {
   return d->properties;

@@ -155,6 +155,8 @@ namespace TagLib {
        */
       void remove(int tags = AllTags);
 
+      ID3v2::Tag *ID3v2Tag(bool create = false);
+
       bool hasAPETag();
       bool hasID3v1Tag();
       bool hasID3v2Tag();

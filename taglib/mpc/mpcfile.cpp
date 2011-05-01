@@ -193,6 +193,11 @@ ID3v1::Tag *MPC::File::ID3v1Tag(bool create)
   return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
+ID3v2::Tag *MPC::File::ID3v2Tag(bool create)
+{
+  return NULL;
+}
+
 APE::Tag *MPC::File::APETag(bool create)
 {
   return d->tag.access<APE::Tag>(APEIndex, create);

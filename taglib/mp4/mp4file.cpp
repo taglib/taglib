@@ -84,6 +84,12 @@ MP4::File::tag() const
   return d->tag;
 }
 
+MP4::Tag *
+MP4::File::MP4Tag(bool create) const
+{
+  return d->tag;
+}
+
 MP4::Properties *
 MP4::File::audioProperties() const
 {
@@ -144,7 +150,7 @@ MP4::File::save()
 }
 
 bool
-MP4::File::hasTag()
+MP4::File::hasMP4Tag()
 {
   if(d->tag)
     return true;
