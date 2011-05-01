@@ -598,3 +598,15 @@ bool MPEG::File::secondSynchByte(char byte)
   // check to see if the byte matches 111xxxxx
   return b.test(7) && b.test(6) && b.test(5);
 }
+
+bool MPEG::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool MPEG::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool MPEG::File::hasID3v2Tag(){
+  return d->hasID3v2;
+}

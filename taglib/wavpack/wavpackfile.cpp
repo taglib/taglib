@@ -267,3 +267,11 @@ long WavPack::File::findID3v1()
 
   return -1;
 }
+
+bool WavPack::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool WavPack::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}

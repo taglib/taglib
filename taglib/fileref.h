@@ -277,6 +277,13 @@ namespace TagLib {
 
     Type::Types preferedType();
 
+    bool hasAPETag();
+    bool hasASFTag();
+    bool hasID3v1Tag();
+    bool hasID3v2Tag();
+    bool hasXiphComment();
+    bool hasTag();
+
   private:
     class FileRefPrivate;
     FileRefPrivate *d;

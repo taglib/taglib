@@ -86,6 +86,8 @@ namespace TagLib {
          */
         virtual bool save();
 
+        virtual bool hasID3v2Tag();
+
       private:
         File(const File &);
         File &operator=(const File &);

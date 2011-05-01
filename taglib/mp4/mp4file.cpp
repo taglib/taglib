@@ -70,7 +70,7 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle a
 {
   d = new FilePrivate;
   read(readProperties, audioPropertiesStyle);
-  preferedType=Type::ID3v2;
+  preferedType=Type::None;
 }
 
 MP4::File::~File()
@@ -143,4 +143,11 @@ MP4::File::save()
   return d->tag->save();
 }
 
+bool
+MP4::File::hasTag()
+{
+  if(d->tag)
+    return true;
+  return false;
+}
 #endif

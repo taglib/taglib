@@ -202,6 +202,10 @@ namespace TagLib {
        */
       void addPicture(Picture *picture);
 
+      bool hasID3v1Tag();
+      bool hasID3v2Tag();
+      bool hasXiphComment();
+
     private:
       File(const File &);
       File &operator=(const File &);

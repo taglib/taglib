@@ -99,6 +99,8 @@ namespace TagLib {
        */
       long streamLength();
 
+      bool hasXiphComment();
+
     private:
       File(const File &);
       File &operator=(const File &);

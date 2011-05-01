@@ -325,3 +325,15 @@ long MPC::File::findID3v2()
 
   return -1;
 }
+
+bool MPC::File::hasAPETag(){
+  return d->hasAPE;
+}
+
+bool MPC::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool MPC::File::hasID3v2Tag(){
+  return d->hasID3v2;
+}

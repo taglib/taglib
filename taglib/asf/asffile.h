@@ -86,6 +86,8 @@ namespace TagLib {
        */
       virtual bool save();
 
+      bool hasASF();
+
     private:
 
       int readBYTE(bool *ok = 0);

@@ -195,6 +195,30 @@ Type::Types FileRef::preferedType(){
   return d->file->preferedType;
 }
 
+bool FileRef::hasAPETag(){
+  return d->file->hasAPETag();
+}
+
+bool FileRef::hasASFTag(){
+  return d->file->hasASFTag();
+}
+
+bool FileRef::hasID3v1Tag(){
+  return d->file->hasID3v1Tag();
+}
+
+bool FileRef::hasID3v2Tag(){
+  return d->file->hasID3v2Tag();
+}
+
+bool FileRef::hasXiphComment(){
+  return d->file->hasXiphComment();
+}
+
+bool FileRef::hasTag(){
+  return d->file->hasTag();
+}
+
 FileRef &FileRef::operator=(const FileRef &ref)
 {
   if(&ref == this)

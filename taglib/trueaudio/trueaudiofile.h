@@ -162,6 +162,9 @@ namespace TagLib {
        */
       bool strip(int tags = AllTags);
 
+      bool hasID3v1Tag();
+      bool hasID3v2Tag();
+
     private:
       File(const File &);
       File &operator=(const File &);

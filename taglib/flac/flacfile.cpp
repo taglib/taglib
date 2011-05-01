@@ -499,3 +499,14 @@ void FLAC::File::removePictures()
   d->blocks = newBlocks;
 }
 
+bool FLAC::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool FLAC::File::hasID3v2Tag(){
+  return d->hasID3v2;
+}
+
+bool FLAC::File::hasXiphComment(){
+  return d->hasXiphComment;
+}

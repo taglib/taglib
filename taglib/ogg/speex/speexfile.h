@@ -83,6 +83,8 @@ namespace TagLib {
 
         virtual bool save();
 
+        virtual bool hasXiphComment();
+
       private:
         File(const File &);
         File &operator=(const File &);

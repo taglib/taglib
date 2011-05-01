@@ -87,6 +87,8 @@ namespace TagLib {
        */
       bool save();
 
+      bool hasTag();
+
     private:
 
       void read(bool readProperties, Properties::ReadStyle audioPropertiesStyle);

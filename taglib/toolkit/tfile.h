@@ -250,11 +250,19 @@ namespace TagLib {
     /*!
      * Merged from file classes
      */
-    ID3v1::Tag * ID3v1Tag (bool create);
-    ID3v2::Tag * ID3v2Tag (bool create);
-    APE::Tag * APETag (bool create);
-    Ogg::XiphComment * XiphComment (bool create);
-    bool strip (int tags);
+    virtual ID3v1::Tag * ID3v1Tag (bool create);
+    virtual ID3v2::Tag * ID3v2Tag (bool create);
+    virtual APE::Tag * APETag (bool create);
+    virtual Ogg::XiphComment * XiphComment (bool create);
+    virtual bool strip (int tags);
+
+
+    virtual bool hasAPETag();
+    virtual bool hasASFTag();
+    virtual bool hasID3v1Tag();
+    virtual bool hasID3v2Tag();
+    virtual bool hasXiphComment();
+    virtual bool hasTag();
 
     Type::Types preferedType;
 

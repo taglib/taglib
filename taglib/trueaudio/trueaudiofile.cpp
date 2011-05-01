@@ -196,6 +196,14 @@ bool TrueAudio::File::strip(int tags)
   return true;
 }
 
+bool TrueAudio::File::hasID3v1Tag(){
+  return d->hasID3v1;
+}
+
+bool TrueAudio::File::hasID3v2Tag(){
+  return d->hasID3v2;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
