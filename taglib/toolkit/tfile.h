@@ -44,6 +44,9 @@ namespace TagLib {
 	namespace ID3v2 {
 		class Tag;
 	}
+	namespace MP4 {
+		class Tag;
+	}
 	namespace Ogg {
 		class XiphComment;
 	}
@@ -257,6 +260,7 @@ namespace TagLib {
     virtual ASF::Tag * ASFTag(bool create);
     virtual ID3v1::Tag * ID3v1Tag (bool create);
     virtual ID3v2::Tag * ID3v2Tag (bool create);
+    virtual MP4::Tag * MP4Tag (bool create);
     virtual Ogg::XiphComment * XiphComment (bool create);
     virtual bool strip (int tags);
 
@@ -265,6 +269,7 @@ namespace TagLib {
     virtual bool hasASFTag();
     virtual bool hasID3v1Tag();
     virtual bool hasID3v2Tag();
+    virtual bool hasMP4Tag();
     virtual bool hasXiphComment();
     virtual bool hasTag();
 

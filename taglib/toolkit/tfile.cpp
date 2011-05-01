@@ -562,6 +562,10 @@ ID3v2::Tag * File::ID3v2Tag (bool create){
   return NULL;
 }
 
+MP4::Tag * File::MP4Tag (bool create){
+  return NULL;
+}
+
 Ogg::XiphComment * File::XiphComment (bool create){
   return NULL;
 }
@@ -583,6 +587,10 @@ bool File::hasID3v1Tag(){
 }
 
 bool File::hasID3v2Tag(){
+  return false;
+}
+
+bool File::hasMP4Tag(){
   return false;
 }
 

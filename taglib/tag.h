@@ -38,6 +38,7 @@ namespace TagLib {
         ASF,
         ID3v1,
         ID3v2,
+        MP4,
         XiphComment,
         Tag
     };

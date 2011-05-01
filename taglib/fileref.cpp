@@ -187,6 +187,10 @@ ID3v2::Tag * FileRef::ID3v2Tag (bool create){
   return d->file->ID3v2Tag(create);
 }
 
+MP4::Tag * FileRef::MP4Tag (bool create){
+  return d->file->MP4Tag(create);
+}
+
 Ogg::XiphComment * FileRef::XiphComment (bool create){
   return d->file->XiphComment(create);
 }
@@ -213,6 +217,10 @@ bool FileRef::hasID3v1Tag(){
 
 bool FileRef::hasID3v2Tag(){
   return d->file->hasID3v2Tag();
+}
+
+bool FileRef::hasMP4Tag(){
+  return d->file->hasMP4Tag();
 }
 
 bool FileRef::hasXiphComment(){
