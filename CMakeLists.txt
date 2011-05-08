@@ -3,6 +3,12 @@ project(taglib)
 cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
 
 option(ENABLE_STATIC "Make static version of libtag"  OFF)
+if(ENABLE_STATIC)
+  add_definitions(-DTAGLIB_STATIC)
+  set(BUILD_SHARED_LIBS OFF)
+else()
+  set(BUILD_SHARED_LIBS ON)
+endif()
 
 option(BUILD_TESTS "Build the test suite"  OFF)
 option(BUILD_EXAMPLES "Build the examples"  OFF)

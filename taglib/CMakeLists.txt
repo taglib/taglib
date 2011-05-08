@@ -260,12 +260,7 @@ if(WITH_MP4)
   set(tag_LIB_SRCS ${tag_LIB_SRCS} ${mp4_SRCS})
 endif()
 
-if(ENABLE_STATIC)
-  add_library(tag STATIC ${tag_LIB_SRCS} ${tag_HDRS})
-  set_target_properties(tag PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
-else()
-  add_library(tag SHARED ${tag_LIB_SRCS} ${tag_HDRS})
-endif()
+add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
 	target_link_libraries(tag ${ZLIB_LIBRARIES})
