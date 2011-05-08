@@ -16,8 +16,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/trueaudio
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc)
-
 set(tag_c_HDRS tag_c.h)
 
 if(ENABLE_STATIC)
@@ -68,5 +66,8 @@ install(TARGETS tag_c
 	PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+endif()
 
