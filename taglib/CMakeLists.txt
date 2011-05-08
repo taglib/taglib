@@ -261,10 +261,10 @@ if(WITH_MP4)
 endif()
 
 if(ENABLE_STATIC)
-  add_library(tag STATIC ${tag_LIB_SRCS})
+  add_library(tag STATIC ${tag_LIB_SRCS} ${tag_HDRS})
   set_target_properties(tag PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
 else()
-  add_library(tag SHARED ${tag_LIB_SRCS})
+  add_library(tag SHARED ${tag_LIB_SRCS} ${tag_HDRS})
 endif()
 
 if(ZLIB_FOUND)
@@ -279,8 +279,12 @@ set_target_properties(tag PROPERTIES
   LINK_INTERFACE_LIBRARIES ""
   PUBLIC_HEADER "${tag_HDRS}"
 )
+if(BUILD_FRAMEWORK)
+  set_target_properties(tag PROPERTIES FRAMEWORK TRUE)
+endif()
 
 install(TARGETS tag
+	FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
 	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
