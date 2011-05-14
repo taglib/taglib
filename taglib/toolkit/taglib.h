@@ -100,8 +100,8 @@ namespace TagLib {
     RefCounter() : refCount(1) {}
 
 #ifdef TAGLIB_ATOMIC_MAC
-    void ref() { OSAtomicIncrement32Barrier(&refCount); }
-    bool deref() { return ! OSAtomicDecrement32Barrier(&refCount); }
+    void ref() { OSAtomicIncrement32Barrier(const_cast<int32_t*>(&refCount)); }
+    bool deref() { return ! OSAtomicDecrement32Barrier(const_cast<int32_t*>(&refCount)); }
     int32_t count() { return refCount; }
   private:
     volatile int32_t refCount;
