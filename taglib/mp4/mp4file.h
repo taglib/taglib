@@ -56,7 +56,7 @@ namespace TagLib {
        * \note In the current implementation, both \a readProperties and
        * \a propertiesStyle are ignored.
        */
-      File(FileName file, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+      File(FileName file, bool openReadOnly = false, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
 
       /*!
        * Destroys this instance of the File.

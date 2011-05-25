@@ -57,8 +57,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::File::File(FileName file, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(file, BigEndian)
+RIFF::AIFF::File::File(FileName file, bool openReadOnly, bool readProperties,
+                       Properties::ReadStyle propertiesStyle) : RIFF::File(file, openReadOnly, BigEndian)
 {
   d = new FilePrivate;
   if(isOpen())

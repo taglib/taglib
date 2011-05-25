@@ -102,17 +102,17 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(FileName file, bool readProperties,
+FLAC::File::File(FileName file, bool openReadOnly, bool readProperties,
                  Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+  TagLib::File(file, openReadOnly)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
 }
 
-FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
+FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory, bool openReadOnly, 
                  bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+  TagLib::File(file, openReadOnly)
 {
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;

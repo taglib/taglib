@@ -94,8 +94,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+MPEG::File::File(FileName file, bool openReadOnly, bool readProperties,
+                 Properties::ReadStyle propertiesStyle) : TagLib::File(file, openReadOnly)
 {
   d = new FilePrivate;
 
@@ -103,9 +103,9 @@ MPEG::File::File(FileName file, bool readProperties,
     read(readProperties, propertiesStyle);
 }
 
-MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
+MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory, bool openReadOnly,
                  bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+  TagLib::File(file, openReadOnly)
 {
   d = new FilePrivate(frameFactory);
 

@@ -55,7 +55,7 @@ namespace TagLib {
 
       enum Endianness { BigEndian, LittleEndian };
 
-      File(FileName file, Endianness endianness);
+      File(FileName file, bool openReadOnly, Endianness endianness);
 
       /*!
        * \return The size of the main RIFF chunk.

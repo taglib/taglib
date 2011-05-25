@@ -82,8 +82,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+TrueAudio::File::File(FileName file, bool openReadOnly, bool readProperties,
+                 Properties::ReadStyle propertiesStyle) : TagLib::File(file, openReadOnly)
 {
   d = new FilePrivate;
   if(isOpen())
