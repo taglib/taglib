@@ -61,8 +61,8 @@ namespace TagLib {
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Vorbis::File::File(FileName file, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+Vorbis::File::File(FileName file, bool openReadOnly, bool readProperties,
+                   Properties::ReadStyle propertiesStyle) : Ogg::File(file, openReadOnly)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);

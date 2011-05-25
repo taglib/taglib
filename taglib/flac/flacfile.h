@@ -74,7 +74,7 @@ namespace TagLib {
        * \deprecated This constructor will be dropped in favor of the one below
        * in a future version.
        */
-      File(FileName file, bool readProperties = true,
+      File(FileName file, bool openReadOnly = false, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
@@ -86,7 +86,7 @@ namespace TagLib {
        * \a frameFactory.
        */
       // BIC: merge with the above constructor
-      File(FileName file, ID3v2::FrameFactory *frameFactory,
+      File(FileName file, ID3v2::FrameFactory *frameFactory, bool openReadOnly = false, 
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 

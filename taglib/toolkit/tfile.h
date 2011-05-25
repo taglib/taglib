@@ -238,7 +238,7 @@ namespace TagLib {
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */
-    File(FileName file);
+    File(FileName file, bool openReadOnly = false);
 
     /*!
      * Marks the file as valid or invalid.

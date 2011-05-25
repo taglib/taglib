@@ -102,7 +102,7 @@ namespace TagLib {
        * deleted.  Deletion will happen automatically when the FileRef passes
        * out of scope.
        */
-      virtual File *createFile(FileName fileName,
+      virtual File *createFile(FileName fileName, bool openReadOnly = false,
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
@@ -122,7 +122,7 @@ namespace TagLib {
      * Also see the note in the class documentation about why you may not want to
      * use this method in your application.
      */
-    explicit FileRef(FileName fileName,
+    explicit FileRef(FileName fileName, bool openReadOnly = false,
                      bool readAudioProperties = true,
                      AudioProperties::ReadStyle
                      audioPropertiesStyle = AudioProperties::Average);
@@ -248,7 +248,7 @@ namespace TagLib {
      *
      * \deprecated
      */
-    static File *create(FileName fileName,
+    static File *create(FileName fileName, bool openReadOnly = false,
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 

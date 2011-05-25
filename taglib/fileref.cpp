@@ -75,10 +75,10 @@ FileRef::FileRef()
   d = new FileRefPrivate(0);
 }
 
-FileRef::FileRef(FileName fileName, bool readAudioProperties,
+FileRef::FileRef(FileName fileName, bool openReadOnly, bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle)
 {
-  d = new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle));
+  d = new FileRefPrivate(create(fileName, openReadOnly, readAudioProperties, audioPropertiesStyle));
 }
 
 FileRef::FileRef(File *file)
@@ -195,14 +195,14 @@ bool FileRef::operator!=(const FileRef &ref) const
   return ref.d->file != d->file;
 }
 
-File *FileRef::create(FileName fileName, bool readAudioProperties,
+File *FileRef::create(FileName fileName, bool openReadOnly, bool readAudioProperties,
                       AudioProperties::ReadStyle audioPropertiesStyle) // static
 {
 
   List<const FileTypeResolver *>::ConstIterator it = FileRefPrivate::fileTypeResolvers.begin();
 
   for(; it != FileRefPrivate::fileTypeResolvers.end(); ++it) {
-    File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
+    File *file = (*it)->createFile(fileName, openReadOnly, readAudioProperties, audioPropertiesStyle);
     if(file)
       return file;
   }
