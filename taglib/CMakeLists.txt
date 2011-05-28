@@ -38,7 +38,10 @@ set(tag_HDRS
   toolkit/tstringlist.h
   toolkit/tbytevector.h
   toolkit/tbytevectorlist.h
+  toolkit/tbytevectorstream.h
+  toolkit/tiostream.h
   toolkit/tfile.h
+  toolkit/tfilestream.h
   toolkit/tmap.h
   toolkit/tmap.tcc
   mpeg/mpegfile.h
