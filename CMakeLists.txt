@@ -3,6 +3,12 @@ project(taglib)
 cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
 
 option(ENABLE_STATIC "Make static version of libtag"  OFF)
+if(ENABLE_STATIC)
+  add_definitions(-DTAGLIB_STATIC)
+  set(BUILD_SHARED_LIBS OFF)
+else()
+  set(BUILD_SHARED_LIBS ON)
+endif()
 
 option(BUILD_TESTS "Build the test suite"  OFF)
 option(BUILD_EXAMPLES "Build the examples"  OFF)
@@ -20,6 +26,11 @@ set(EXEC_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Base directory for
 set(BIN_INSTALL_DIR "${EXEC_INSTALL_PREFIX}/bin" CACHE PATH "The subdirectory to the binaries prefix (default prefix/bin)" FORCE)
 set(LIB_INSTALL_DIR "${EXEC_INSTALL_PREFIX}/lib${LIB_SUFFIX}" CACHE PATH "The subdirectory relative to the install prefix where libraries will be installed (default is /lib${LIB_SUFFIX})" FORCE)
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The subdirectory to the header prefix" FORCE)
+
+if(APPLE)
+	option(BUILD_FRAMEWORK "Build an OS X framework" OFF)
+	set(FRAMEWORK_INSTALL_DIR "/Library/Frameworks" CACHE STRING "Directory to install frameworks to.")
+endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
@@ -49,7 +60,7 @@ include(ConfigureChecks.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/taglib-config DESTINATION ${BIN_INSTALL_DIR})
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc )
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
@@ -65,7 +76,6 @@ if(WITH_MP4)
 endif()
 
 configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
 
 add_subdirectory(taglib) 
 add_subdirectory(bindings)

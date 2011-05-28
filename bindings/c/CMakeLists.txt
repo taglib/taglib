@@ -16,16 +16,15 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/trueaudio
 )
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc)
+set(tag_c_HDRS tag_c.h)
 
-if(ENABLE_STATIC)
-  add_library(tag_c STATIC tag_c.cpp)
-  set_target_properties(tag_c PROPERTIES COMPILE_DEFINITIONS TAGLIB_STATIC)
-else()
-  add_library(tag_c SHARED tag_c.cpp)
-endif()
+add_library(tag_c tag_c.cpp ${tag_c_HDRS})
 
 target_link_libraries(tag_c tag)
+set_target_properties(tag_c PROPERTIES PUBLIC_HEADER "${tag_c_HDRS}")
+if(BUILD_FRAMEWORK)
+  set_target_properties(tag_c PROPERTIES FRAMEWORK TRUE)
+endif()
 
 # On Solaris we need to explicitly add the C++ standard and runtime
 # libraries to the libs used by the C bindings, because those C bindings
@@ -55,11 +54,15 @@ set_target_properties(tag_c PROPERTIES
   INSTALL_NAME_DIR ${LIB_INSTALL_DIR}
 )
 install(TARGETS tag_c
+	FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
 	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
 	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
 	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+	PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-install(FILES tag_c.h DESTINATION ${INCLUDE_INSTALL_DIR}/taglib)
+if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+endif()
 

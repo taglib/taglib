@@ -14,6 +14,10 @@ support for MP4 and WMA using the following options:
 
   cmake -DWITH_MP4=ON -DWITH_ASF=ON [...]
 
+In order to build the included examples, use the BUILD_EXAMPLES option:
+
+  cmake -DBUILD_EXAMPLES=ON [...]
+
 If you want to run the test suite to make sure TagLib works properly on your
 system, you need to have cppunit installed. The test suite has a custom target
 in the build system, so you can run the tests using make:

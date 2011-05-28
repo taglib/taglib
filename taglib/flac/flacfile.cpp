@@ -170,10 +170,12 @@ bool FLAC::File::save()
     MetadataBlock *block = d->blocks[i];
     if(block->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
+      delete block;
       block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
       foundVorbisCommentBlock = true;
     }
     if(block->code() == MetadataBlock::Padding) {
+      delete block;
       continue;
     }
     newBlocks.append(block);
@@ -199,7 +201,7 @@ bool FLAC::File::save()
   // Adjust the padding block(s)
 
   long originalLength = d->streamStart - d->flacStart;
-  int paddingLength = originalLength - data.size() - 4; 
+  int paddingLength = originalLength - data.size() - 4;
   if (paddingLength < 0) {
     paddingLength = MinPaddingLength;
   }

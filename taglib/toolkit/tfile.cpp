@@ -323,3 +323,4 @@ void File::setValid(bool valid)
 {
   d->valid = valid;
 }
+
