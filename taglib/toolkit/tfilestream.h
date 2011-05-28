@@ -52,7 +52,7 @@ namespace TagLib {
      * Construct a File object and opens the \a file.  \a file should be a
      * be a C-string in the local file system encoding.
      */
-    FileStream(FileName file);
+    FileStream(FileName file, bool openReadOnly = false);
 
     /*!
      * Destroys this FileStream instance.
