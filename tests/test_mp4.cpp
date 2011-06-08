@@ -14,7 +14,8 @@ using namespace TagLib;
 class TestMP4 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMP4);
-  CPPUNIT_TEST(testProperties);
+  CPPUNIT_TEST(testPropertiesAAC);
+  CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
   CPPUNIT_TEST(testUpdateStco);
@@ -28,9 +29,19 @@ class TestMP4 : public CppUnit::TestFixture
 
 public:
 
-  void testProperties()
+  void testPropertiesAAC()
   {
     MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, ((MP4::Properties *)f.audioProperties())->bitsPerSample());
+  }
+
+  void testPropertiesALAC()
+  {
+    MP4::File f(TEST_FILE_PATH_C("empty_alac.m4a"));
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
