@@ -85,9 +85,22 @@ namespace TagLib {
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.  The frames will be created using
        * \a frameFactory.
+       *
+       * \deprecated This constructor will be dropped in favor of the one below
+       * in a future version.
+       */
+      File(FileName file, ID3v2::FrameFactory *frameFactory,
+           bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average);
+
+      /*!
+       * Contructs an MPEG file from \a stream.  If \a readProperties is true the
+       * file's audio properties will also be read using \a propertiesStyle.  If
+       * false, \a propertiesStyle is ignored.  The frames will be created using
+       * \a frameFactory.
        */
       // BIC: merge with the above constructor
-      File(FileName file, ID3v2::FrameFactory *frameFactory,
+      File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 

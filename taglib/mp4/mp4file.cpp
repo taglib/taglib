@@ -72,6 +72,13 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle a
   read(readProperties, audioPropertiesStyle);
 }
 
+MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
+    : TagLib::File(stream)
+{
+  d = new FilePrivate;
+  read(readProperties, audioPropertiesStyle);
+}
+
 MP4::File::~File()
 {
   delete d;

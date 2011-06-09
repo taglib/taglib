@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_FILE_H
-#define TAGLIB_FILE_H
+#ifndef TAGLIB_FILESTREAM_H
+#define TAGLIB_FILESTREAM_H
 
 #include "taglib_export.h"
 #include "taglib.h"
@@ -45,55 +45,24 @@ namespace TagLib {
    * ByteVector and a binary search method for finding patterns in a file.
    */
 
-  class TAGLIB_EXPORT File
+  class TAGLIB_EXPORT FileStream : public IOStream
   {
   public:
     /*!
-     * Position in the file used for seeking.
+     * Construct a File object and opens the \a file.  \a file should be a
+     * be a C-string in the local file system encoding.
      */
-    enum Position {
-      //! Seek from the beginning of the file.
-      Beginning,
-      //! Seek from the current position in the file.
-      Current,
-      //! Seek from the end of the file.
-      End
-    };
+    FileStream(FileName file);
 
     /*!
-     * Destroys this File instance.
+     * Destroys this FileStream instance.
      */
-    virtual ~File();
+    virtual ~FileStream();
 
     /*!
      * Returns the file name in the local file system encoding.
      */
     FileName name() const;
-
-    /*!
-     * Returns a pointer to this file's tag.  This should be reimplemented in
-     * the concrete subclasses.
-     */
-    virtual Tag *tag() const = 0;
-
-    /*!
-     * Returns a pointer to this file's audio properties.  This should be
-     * reimplemented in the concrete subclasses.  If no audio properties were
-     * read then this will return a null pointer.
-     */
-    virtual AudioProperties *audioProperties() const = 0;
-
-    /*!
-     * Save the file and its associated tags.  This should be reimplemented in
-     * the concrete subclasses.  Returns true if the save succeeds.
-     *
-     * \warning On UNIX multiple processes are able to write to the same file at
-     * the same time.  This can result in serious file corruption.  If you are
-     * developing a program that makes use of TagLib from multiple processes you
-     * must insure that you are only doing writes to a particular file from one
-     * of them.
-     */
-    virtual bool save() = 0;
 
     /*!
      * Reads a block of size \a length at the current get pointer.
@@ -110,38 +79,6 @@ namespace TagLib {
      * doing output with a char[].
      */
     void writeBlock(const ByteVector &data);
-
-    /*!
-     * Returns the offset in the file that \a pattern occurs at or -1 if it can
-     * not be found.  If \a before is set, the search will only continue until the
-     * pattern \a before is found.  This is useful for tagging purposes to search
-     * for a tag before the synch frame.
-     *
-     * Searching starts at \a fromOffset, which defaults to the beginning of the
-     * file.
-     *
-     * \note This has the practial limitation that \a pattern can not be longer
-     * than the buffer size used by readBlock().  Currently this is 1024 bytes.
-     */
-    long find(const ByteVector &pattern,
-              long fromOffset = 0,
-              const ByteVector &before = ByteVector::null);
-
-    /*!
-     * Returns the offset in the file that \a pattern occurs at or -1 if it can
-     * not be found.  If \a before is set, the search will only continue until the
-     * pattern \a before is found.  This is useful for tagging purposes to search
-     * for a tag before the synch frame.
-     *
-     * Searching starts at \a fromOffset and proceeds from the that point to the
-     * beginning of the file and defaults to the end of the file.
-     *
-     * \note This has the practial limitation that \a pattern can not be longer
-     * than the buffer size used by readBlock().  Currently this is 1024 bytes.
-     */
-    long rfind(const ByteVector &pattern,
-               long fromOffset = 0,
-               const ByteVector &before = ByteVector::null);
 
     /*!
      * Insert \a data at position \a start in the file overwriting \a replace
@@ -173,11 +110,6 @@ namespace TagLib {
     bool isOpen() const;
 
     /*!
-     * Returns true if the file is open and readble.
-     */
-    bool isValid() const;
-
-    /*!
      * Move the I/O pointer to \a offset in the file from position \a p.  This
      * defaults to seeking from the beginning of the file.
      *
@@ -201,49 +133,11 @@ namespace TagLib {
     long length();
 
     /*!
-     * Returns true if \a file can be opened for reading.  If the file does not
-     * exist, this will return false.
-     *
-     * \deprecated
-     */
-    static bool isReadable(const char *file);
-
-    /*!
-     * Returns true if \a file can be opened for writing.
-     *
-     * \deprecated
-     */
-    static bool isWritable(const char *name);
-
-  protected:
-    /*!
-     * Construct a File object and opens the \a file.  \a file should be a
-     * be a C-string in the local file system encoding.
-     *
-     * \note Constructor is protected since this class should only be
-     * instantiated through subclasses.
-     */
-    File(FileName file);
-
-    /*!
-     * Construct a File object and use the \a stream instance.
-     *
-     * \note Constructor is protected since this class should only be
-     * instantiated through subclasses.
-     */
-    File(IOStream *stream);
-
-    /*!
-     * Marks the file as valid or invalid.
-     *
-     * \see isValid()
-     */
-    void setValid(bool valid);
-
-    /*!
      * Truncates the file to a \a length.
      */
     void truncate(long length);
+
+  protected:
 
     /*!
      * Returns the buffer size that is used for internal buffering.
@@ -251,11 +145,8 @@ namespace TagLib {
     static uint bufferSize();
 
   private:
-    File(const File &);
-    File &operator=(const File &);
-
-    class FilePrivate;
-    FilePrivate *d;
+    class FileStreamPrivate;
+    FileStreamPrivate *d;
   };
 
 }

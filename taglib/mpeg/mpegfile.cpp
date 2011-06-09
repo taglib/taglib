@@ -113,6 +113,16 @@ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
     read(readProperties, propertiesStyle);
 }
 
+MPEG::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
+                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(stream)
+{
+  d = new FilePrivate(frameFactory);
+
+  if(isOpen())
+    read(readProperties, propertiesStyle);
+}
+
 MPEG::File::~File()
 {
   delete d;

@@ -65,6 +65,14 @@ RIFF::AIFF::File::File(FileName file, bool readProperties,
     read(readProperties, propertiesStyle);
 }
 
+RIFF::AIFF::File::File(IOStream *stream, bool readProperties,
+                       Properties::ReadStyle propertiesStyle) : RIFF::File(stream, BigEndian)
+{
+  d = new FilePrivate;
+  if(isOpen())
+    read(readProperties, propertiesStyle);
+}
+
 RIFF::AIFF::File::~File()
 {
   delete d;

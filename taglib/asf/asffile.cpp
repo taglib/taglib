@@ -369,6 +369,13 @@ ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle proper
   read(readProperties, propertiesStyle);
 }
 
+ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) 
+  : TagLib::File(stream)
+{
+  d = new FilePrivate;
+  read(readProperties, propertiesStyle);
+}
+
 ASF::File::~File()
 {
   for(unsigned int i = 0; i < d->objects.size(); i++) {

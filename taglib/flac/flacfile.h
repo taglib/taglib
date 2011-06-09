@@ -91,6 +91,19 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
+       * Contructs a FLAC file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read using \a propertiesStyle.  If
+       * false, \a propertiesStyle is ignored.
+       *
+       * If this file contains and ID3v2 tag the frames will be created using
+       * \a frameFactory.
+       */
+      // BIC: merge with the above constructor
+      File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
+           bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average);
+
+      /*!
        * Destroys this instance of the File.
        */
       virtual ~File();
