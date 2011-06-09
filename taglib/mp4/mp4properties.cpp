@@ -130,6 +130,14 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
       }
     }
   }
+  else if (data.mid(20, 4) == "alac") {
+    if (atom->length == 88 && data.mid(56, 4) == "alac") {
+      d->bitsPerSample = data.at(69);
+      d->channels = data.at(73);
+      d->bitrate = data.mid(80, 4).toUInt() / 1000;
+      d->sampleRate = data.mid(84, 4).toUInt();
+    }
+  }
 
   MP4::Atom *drms = atom->find("drms");
   if(drms) {
