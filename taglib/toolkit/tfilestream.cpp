@@ -68,7 +68,7 @@ struct FileNameHandle : public std::string
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(FileName fileName);
+  FileStreamPrivate(FileName fileName, bool openReadOnly);
 
   FILE *file;
 
@@ -79,7 +79,7 @@ public:
   static const uint bufferSize = 1024;
 };
 
-FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName) :
+FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openReadOnly) :
   file(0),
   name(fileName),
   readOnly(true),
@@ -91,12 +91,16 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName) :
 
   if(wcslen((const wchar_t *) fileName) > 0) {
 
-    file = _wfopen(name, L"rb+");
-
-    if(file)
-      readOnly = false;
-    else
+    if(openReadOnly)
       file = _wfopen(name, L"rb");
+    else {
+      file = _wfopen(name, L"rb+");
+
+      if(file)
+        readOnly = false;
+      else
+        file = _wfopen(name, L"rb");
+	}
 
     if(file)
       return;
@@ -105,12 +109,16 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName) :
 
 #endif
 
-  file = fopen(name, "rb+");
-
-  if(file)
-    readOnly = false;
-  else
+  if(openReadOnly)
     file = fopen(name, "rb");
+  else {
+    file = fopen(name, "rb+");
+
+    if(file)
+      readOnly = false;
+    else
+      file = fopen(name, "rb");
+  }
 
   if(!file)
   {
@@ -122,9 +130,9 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName) :
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileStream::FileStream(FileName file)
+FileStream::FileStream(FileName file, bool openReadOnly)
 {
-  d = new FileStreamPrivate(file);
+  d = new FileStreamPrivate(file, openReadOnly);
 }
 
 FileStream::~FileStream()
