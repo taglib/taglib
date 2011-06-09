@@ -133,7 +133,7 @@ namespace TagLib {
     /*!
      * Reset the end-of-stream and error flags on the stream.
      */
-    virtual void clear() = 0;
+    virtual void clear();
 
     /*!
      * Returns the current offset within the stream.

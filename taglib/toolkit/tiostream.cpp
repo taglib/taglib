@@ -38,3 +38,8 @@ IOStream::IOStream()
 IOStream::~IOStream()
 {
 }
+
+void IOStream::clear()
+{
+}
+
