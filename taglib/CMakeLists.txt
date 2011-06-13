@@ -19,6 +19,10 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/riff
   ${CMAKE_CURRENT_SOURCE_DIR}/riff/aiff
   ${CMAKE_CURRENT_SOURCE_DIR}/riff/wav
+  ${CMAKE_CURRENT_SOURCE_DIR}/mod
+  ${CMAKE_CURRENT_SOURCE_DIR}/s3m
+  ${CMAKE_CURRENT_SOURCE_DIR}/it
+  ${CMAKE_CURRENT_SOURCE_DIR}/xm
 )
 
 if(ZLIB_FOUND)
@@ -97,6 +101,18 @@ set(tag_HDRS
   riff/aiff/aiffproperties.h
   riff/wav/wavfile.h
   riff/wav/wavproperties.h
+  mod/modfile.h
+  mod/modtag.h
+  it/itfile.h
+  it/itfiletyperesolver.h
+  it/itproperties.h
+  s3m/s3mfile.h
+  s3m/s3mfiletyperesolver.h
+  s3m/s3mproperties.h
+  xm/xmfile.h
+  xm/xmfiletyperesolver.h
+  xm/xmproperties.h
+  xm/xmtag.h
 )
 if(WITH_ASF)
   set(tag_HDRS ${tag_HDRS}
@@ -237,6 +253,25 @@ set(wav_SRCS
   riff/wav/wavproperties.cpp
 )
 
+set(mod_SRCS
+  mod/modfile.cpp
+)
+
+set(s3m_SRCS
+  s3m/s3mfile.cpp
+  s3m/s3mfiletyperesolver.cpp
+)
+
+set(it_SRCS
+  it/itfile.cpp
+  it/itfiletyperesolver.cpp
+)
+
+set(xm_SRCS
+  xm/xmfile.cpp
+  xm/xmfiletyperesolver.cpp
+)
+
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
@@ -254,6 +289,7 @@ set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
+  ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
