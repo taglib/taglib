@@ -26,54 +26,54 @@
 #include "audioproperties.h"
 
 namespace TagLib {
-	namespace IT {
-		class TAGLIB_EXPORT Properties : public AudioProperties {
-			friend class File;
-		public:
-			Properties(AudioProperties::ReadStyle propertiesStyle);
-			virtual ~Properties();
-			
-			int length()     const;
-			int bitrate()    const;
-			int sampleRate() const;
-			int channels()   const;
+  namespace IT {
+    class TAGLIB_EXPORT Properties : public AudioProperties {
+      friend class File;
+    public:
+      Properties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~Properties();
+      
+      int length()     const;
+      int bitrate()    const;
+      int sampleRate() const;
+      int channels()   const;
 
-			ushort sampleLength()    const;
-			bool   stereo()          const;
-			ushort instrumentCount() const;
-			ushort sampleCount()     const;
-			ushort patternCount()    const;
-			ushort version()         const;
-			ushort cmwt()            const;
-			ushort flags()           const;
-			ushort special()         const;
-			int    baseVolume()      const;
-			uchar  tempo()           const;
-			uchar  bpmSpeed()        const;
+      ushort sampleLength()    const;
+      bool   stereo()          const;
+      ushort instrumentCount() const;
+      ushort sampleCount()     const;
+      ushort patternCount()    const;
+      ushort version()         const;
+      ushort cmwt()            const;
+      ushort flags()           const;
+      ushort special()         const;
+      int    baseVolume()      const;
+      uchar  tempo()           const;
+      uchar  bpmSpeed()        const;
 
-		protected:
-			void setSampleLength(ushort sampleLength);
-			void setStereo(bool stereo);
+    protected:
+      void setSampleLength(ushort sampleLength);
+      void setStereo(bool stereo);
 
-			void setInstrumentCount(ushort instrumentCount);
-			void setSampleCount (ushort sampleCount);
-			void setPatternCount(ushort patternCount);
-			void setFlags       (ushort flags);
-			void setSpecial     (ushort special);
-			void setCmwt        (ushort cmwt);
-			void setVersion     (ushort version);
-			void setBaseVolume  (int baseVolume);
-			void setTempo       (uchar tempo);
-			void setBpmSpeed    (uchar bpmSpeed);
+      void setInstrumentCount(ushort instrumentCount);
+      void setSampleCount (ushort sampleCount);
+      void setPatternCount(ushort patternCount);
+      void setFlags       (ushort flags);
+      void setSpecial     (ushort special);
+      void setCmwt        (ushort cmwt);
+      void setVersion     (ushort version);
+      void setBaseVolume  (int baseVolume);
+      void setTempo       (uchar tempo);
+      void setBpmSpeed    (uchar bpmSpeed);
 
-		private:
-			Properties(const Properties&);
-			Properties &operator=(const Properties&);
+    private:
+      Properties(const Properties&);
+      Properties &operator=(const Properties&);
 
-			class PropertiesPrivate;
-			PropertiesPrivate *d;
-		};
-	}
+      class PropertiesPrivate;
+      PropertiesPrivate *d;
+    };
+  }
 }
 
 #endif

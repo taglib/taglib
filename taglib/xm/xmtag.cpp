@@ -27,66 +27,66 @@ using namespace XM;
 class XM::Tag::TagPrivate
 {
 public:
-	TagPrivate() {}
+  TagPrivate() {}
 
-	String title;
-	String comment;
-	String trackerName;
+  String title;
+  String comment;
+  String trackerName;
 };
 
 XM::Tag::Tag() : TagLib::Tag()
 {
-	d = new TagPrivate;
+  d = new TagPrivate;
 }
 
 XM::Tag::~Tag()
 {
-	delete d;
+  delete d;
 }
 
 String XM::Tag::title() const
 {
-	return d->title;
+  return d->title;
 }
 
 String XM::Tag::artist() const
 {
-	return String::null;
+  return String::null;
 }
 
 String XM::Tag::album() const
 {
-	return String::null;
+  return String::null;
 }
 
 String XM::Tag::comment() const
 {
-	return d->comment;
+  return d->comment;
 }
 
 String XM::Tag::genre() const
 {
-	return String::null;
+  return String::null;
 }
 
 uint XM::Tag::year() const
 {
-	return 0;
+  return 0;
 }
 
 uint XM::Tag::track() const
 {
-	return 0;
+  return 0;
 }
 
 String XM::Tag::trackerName() const
 {
-	return d->trackerName;
+  return d->trackerName;
 }
 
 void XM::Tag::setTitle(const String &title)
 {
-	d->title = title;
+  d->title = title;
 }
 
 void XM::Tag::setArtist(const String &)
@@ -99,7 +99,7 @@ void XM::Tag::setAlbum(const String &)
 
 void XM::Tag::setComment(const String &comment)
 {
-	d->comment = comment;
+  d->comment = comment;
 }
 
 void XM::Tag::setGenre(const String &)
@@ -116,5 +116,5 @@ void XM::Tag::setTrack(uint)
 
 void XM::Tag::setTrackerName(const String &trackerName)
 {
-	d->trackerName = trackerName;
+  d->trackerName = trackerName;
 }

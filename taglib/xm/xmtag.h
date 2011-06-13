@@ -25,38 +25,38 @@
 #include "modtag.h"
 
 namespace TagLib {
-	namespace XM {
-		class Tag : public TagLib::Tag {
-			public:
-				Tag();
-				virtual ~Tag();
+  namespace XM {
+    class Tag : public TagLib::Tag {
+      public:
+        Tag();
+        virtual ~Tag();
 
-				String title()   const;
-				String artist()  const;
-				String album()   const;
-				String comment() const;
-				String genre()   const;
-				uint   year()    const;
-				uint   track()   const;
-				String trackerName() const;
+        String title()   const;
+        String artist()  const;
+        String album()   const;
+        String comment() const;
+        String genre()   const;
+        uint   year()    const;
+        uint   track()   const;
+        String trackerName() const;
 
-				void setTitle  (const String &title);
-				void setArtist (const String &artist);
-				void setAlbum  (const String &album);
-				void setComment(const String &comment);
-				void setGenre  (const String &genre);
-				void setYear (uint year);
-				void setTrack(uint track);
-				void setTrackerName(const String &trackerName);
+        void setTitle  (const String &title);
+        void setArtist (const String &artist);
+        void setAlbum  (const String &album);
+        void setComment(const String &comment);
+        void setGenre  (const String &genre);
+        void setYear (uint year);
+        void setTrack(uint track);
+        void setTrackerName(const String &trackerName);
 
-			private:
-				Tag(const Tag &);
-				Tag &operator=(const Tag &);
+      private:
+        Tag(const Tag &);
+        Tag &operator=(const Tag &);
 
-				class TagPrivate;
-				TagPrivate *d;
-		};
-	}
+        class TagPrivate;
+        TagPrivate *d;
+    };
+  }
 }
 
 #endif

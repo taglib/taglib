@@ -27,47 +27,47 @@
 #include "audioproperties.h"
 
 namespace TagLib {
-	namespace XM {
-		class Properties : public AudioProperties {
-			friend class File;
-		public:
-			Properties(AudioProperties::ReadStyle propertiesStyle);
-			virtual ~Properties();
-			
-			int length()     const;
-			int bitrate()    const;
-			int sampleRate() const;
-			int channels()   const;
+  namespace XM {
+    class Properties : public AudioProperties {
+      friend class File;
+    public:
+      Properties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~Properties();
+      
+      int length()     const;
+      int bitrate()    const;
+      int sampleRate() const;
+      int channels()   const;
 
-			ushort sampleLength()    const;
-			ushort version()         const;
-			ushort restartPosition() const;
-			ushort patternCount()    const;
-			ushort instrumentCount() const;
-			ushort flags()           const;
-			ushort tempo()           const;
-			ushort bpmSpeed()        const;
+      ushort sampleLength()    const;
+      ushort version()         const;
+      ushort restartPosition() const;
+      ushort patternCount()    const;
+      ushort instrumentCount() const;
+      ushort flags()           const;
+      ushort tempo()           const;
+      ushort bpmSpeed()        const;
 
-		protected:
-			void setSampleLength(int sampleLength);
-			void setChannels(int channels);
+    protected:
+      void setSampleLength(int sampleLength);
+      void setChannels(int channels);
 
-			void setVersion(ushort version);
-			void setRestartPosition(ushort restartPosition);
-			void setPatternCount(ushort patternCount);
-			void setInstrumentCount(ushort instrumentCount);
-			void setFlags(ushort flags);
-			void setTempo(ushort tempo);
-			void setBpmSpeed(ushort bpmSpeed);
+      void setVersion(ushort version);
+      void setRestartPosition(ushort restartPosition);
+      void setPatternCount(ushort patternCount);
+      void setInstrumentCount(ushort instrumentCount);
+      void setFlags(ushort flags);
+      void setTempo(ushort tempo);
+      void setBpmSpeed(ushort bpmSpeed);
 
-		private:
-			Properties(const Properties&);
-			Properties &operator=(const Properties&);
+    private:
+      Properties(const Properties&);
+      Properties &operator=(const Properties&);
 
-			class PropertiesPrivate;
-			PropertiesPrivate *d;
-		};
-	}
+      class PropertiesPrivate;
+      PropertiesPrivate *d;
+    };
+  }
 }
 
 #endif

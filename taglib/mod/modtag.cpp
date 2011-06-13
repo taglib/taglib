@@ -27,60 +27,60 @@ using namespace Mod;
 class Mod::Tag::TagPrivate
 {
 public:
-	TagPrivate() {}
+  TagPrivate() {}
 
-	String title;
-	String comment;
+  String title;
+  String comment;
 };
 
 Mod::Tag::Tag() : TagLib::Tag()
 {
-	d = new TagPrivate;
+  d = new TagPrivate;
 }
 
 Mod::Tag::~Tag()
 {
-	delete d;
+  delete d;
 }
 
 String Mod::Tag::title() const
 {
-	return d->title;
+  return d->title;
 }
 
 String Mod::Tag::artist() const
 {
-	return String::null;
+  return String::null;
 }
 
 String Mod::Tag::album() const
 {
-	return String::null;
+  return String::null;
 }
 
 String Mod::Tag::comment() const
 {
-	return d->comment;
+  return d->comment;
 }
 
 String Mod::Tag::genre() const
 {
-	return String::null;
+  return String::null;
 }
 
 uint Mod::Tag::year() const
 {
-	return 0;
+  return 0;
 }
 
 uint Mod::Tag::track() const
 {
-	return 0;
+  return 0;
 }
 
 void Mod::Tag::setTitle(const String &title)
 {
-	d->title = title;
+  d->title = title;
 }
 
 void Mod::Tag::setArtist(const String &)
@@ -93,7 +93,7 @@ void Mod::Tag::setAlbum(const String &)
 
 void Mod::Tag::setComment(const String &comment)
 {
-	d->comment = comment;
+  d->comment = comment;
 }
 
 void Mod::Tag::setGenre(const String &)

@@ -28,19 +28,19 @@
 #include "taglib_export.h"
 
 namespace TagLib {
-	namespace Mod {
-		class TAGLIB_EXPORT File : public TagLib::File {
-			protected:
-				File(FileName file);
-				File(IOStream *stream);
+  namespace Mod {
+    class TAGLIB_EXPORT File : public TagLib::File {
+      protected:
+        File(FileName file);
+        File(IOStream *stream);
 
-				void writeString(const String &s, ulong size);
-				bool readString(String &s, ulong size);
-				bool readByte(uchar &byte);
-				bool readU16L(ushort &number);
-				bool readU32L(ulong &number);
-		};
-	}
+        void writeString(const String &s, ulong size);
+        bool readString(String &s, ulong size);
+        bool readByte(uchar &byte);
+        bool readU16L(ushort &number);
+        bool readU32L(ulong &number);
+    };
+  }
 }
 
 #endif

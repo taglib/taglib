@@ -26,55 +26,55 @@
 #include "audioproperties.h"
 
 namespace TagLib {
-	namespace S3M {
-		class TAGLIB_EXPORT Properties : public AudioProperties {
-			friend class File;
-		public:
-			Properties(AudioProperties::ReadStyle propertiesStyle);
-			virtual ~Properties();
-			
-			int length()     const;
-			int bitrate()    const;
-			int sampleRate() const;
-			int channels()   const;
+  namespace S3M {
+    class TAGLIB_EXPORT Properties : public AudioProperties {
+      friend class File;
+    public:
+      Properties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~Properties();
+      
+      int length()     const;
+      int bitrate()    const;
+      int sampleRate() const;
+      int channels()   const;
 
-			ushort sampleLength() const;
-			bool   stereo()       const;
-			ushort sampleCount()  const;
-			ushort patternCount() const;
-			ushort flags()        const;
-			ushort version()      const;
-			ushort samplesType()  const;
-			int    baseVolume()   const;
-			uchar  tempo()        const;
-			uchar  bpmSpeed()     const;
-			uchar  ultraClick()   const;
-			bool   usePanningValues() const;
+      ushort sampleLength() const;
+      bool   stereo()       const;
+      ushort sampleCount()  const;
+      ushort patternCount() const;
+      ushort flags()        const;
+      ushort version()      const;
+      ushort samplesType()  const;
+      int    baseVolume()   const;
+      uchar  tempo()        const;
+      uchar  bpmSpeed()     const;
+      uchar  ultraClick()   const;
+      bool   usePanningValues() const;
 
-		protected:
-			void setSampleLength(ushort sampleLength);
-			void setChannels(int channels);
+    protected:
+      void setSampleLength(ushort sampleLength);
+      void setChannels(int channels);
 
-			void setStereo      (bool stereo);
-			void setSampleCount (ushort sampleCount);
-			void setPatternCount(ushort patternCount);
-			void setFlags       (ushort flags);
-			void setVersion     (ushort version);
-			void setSamplesType (ushort samplesType);
-			void setBaseVolume  (int baseVolume);
-			void setTempo       (uchar tempo);
-			void setBpmSpeed    (uchar bpmSpeed);
-			void setUltraClick  (uchar ultraClick);
-			void setUsePanningValues(bool usePanningValues);
+      void setStereo      (bool stereo);
+      void setSampleCount (ushort sampleCount);
+      void setPatternCount(ushort patternCount);
+      void setFlags       (ushort flags);
+      void setVersion     (ushort version);
+      void setSamplesType (ushort samplesType);
+      void setBaseVolume  (int baseVolume);
+      void setTempo       (uchar tempo);
+      void setBpmSpeed    (uchar bpmSpeed);
+      void setUltraClick  (uchar ultraClick);
+      void setUsePanningValues(bool usePanningValues);
 
-		private:
-			Properties(const Properties&);
-			Properties &operator=(const Properties&);
+    private:
+      Properties(const Properties&);
+      Properties &operator=(const Properties&);
 
-			class PropertiesPrivate;
-			PropertiesPrivate *d;
-		};
-	}
+      class PropertiesPrivate;
+      PropertiesPrivate *d;
+    };
+  }
 }
 
 #endif

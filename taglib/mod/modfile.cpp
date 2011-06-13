@@ -34,45 +34,45 @@ Mod::File::File(IOStream *stream) : TagLib::File(stream)
 
 void Mod::File::writeString(const String &s, ulong size)
 {
-	ByteVector data(s.data(String::Latin1));
-	data.resize(size, 0);
-	writeBlock(data);
+  ByteVector data(s.data(String::Latin1));
+  data.resize(size, 0);
+  writeBlock(data);
 }
 
 bool Mod::File::readString(String &s, ulong size)
 {
-	ByteVector data(readBlock(size));
-	if(data.size() < size) return false;
-	int index = data.find((char) 0);
-	if(index > -1)
-	{
-		data.resize(index);
-	}
-	data.replace((char) 0xff, ' ');
+  ByteVector data(readBlock(size));
+  if(data.size() < size) return false;
+  int index = data.find((char) 0);
+  if(index > -1)
+  {
+    data.resize(index);
+  }
+  data.replace((char) 0xff, ' ');
 
-	s = data;
-	return true;
+  s = data;
+  return true;
 }
 
 bool Mod::File::readByte(uchar &byte)
 {
-	ByteVector data(readBlock(1));
-	if(data.size() < 1) return false;
-	byte = data[0];
-	return true;
+  ByteVector data(readBlock(1));
+  if(data.size() < 1) return false;
+  byte = data[0];
+  return true;
 }
 
 bool Mod::File::readU16L(ushort &number)
 {
-	ByteVector data(readBlock(2));
-	if(data.size() < 2) return false;
-	number = data.toUShort(false);
-	return true;
+  ByteVector data(readBlock(2));
+  if(data.size() < 2) return false;
+  number = data.toUShort(false);
+  return true;
 }
 
 bool Mod::File::readU32L(ulong &number) {
-	ByteVector data(readBlock(4));
-	if(data.size() < 4) return false;
-	number = data.toUInt(false);
-	return true;
+  ByteVector data(readBlock(4));
+  if(data.size() < 4) return false;
+  number = data.toUInt(false);
+  return true;
 }

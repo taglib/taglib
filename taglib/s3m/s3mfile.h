@@ -33,59 +33,59 @@
 
 namespace TagLib {
 
-	namespace S3M {
+  namespace S3M {
 
-		class TAGLIB_EXPORT File : public Mod::File {
-			public:
-				/*!
-				 * Contructs a ScreamTracker III file from \a file. If \a readProperties
-				 * is true the file's audio properties will also be read using
-				 * \a propertiesStyle. If false, \a propertiesStyle is ignored.
-				 */
-				File(FileName file, bool readProperties = true,
-				     AudioProperties::ReadStyle propertiesStyle =
-				     AudioProperties::Average);
+    class TAGLIB_EXPORT File : public Mod::File {
+      public:
+        /*!
+         * Contructs a ScreamTracker III file from \a file. If \a readProperties
+         * is true the file's audio properties will also be read using
+         * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+         */
+        File(FileName file, bool readProperties = true,
+             AudioProperties::ReadStyle propertiesStyle =
+             AudioProperties::Average);
 
-				/*!
-				 * Contructs a ScreamTracker III file from \a stream. If \a readProperties
-				 * is true the file's audio properties will also be read using
-				 * \a propertiesStyle. If false, \a propertiesStyle is ignored.
-				 */
-				File(IOStream *stream, bool readProperties = true,
-				     AudioProperties::ReadStyle propertiesStyle =
-				     AudioProperties::Average);
+        /*!
+         * Contructs a ScreamTracker III file from \a stream. If \a readProperties
+         * is true the file's audio properties will also be read using
+         * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+         */
+        File(IOStream *stream, bool readProperties = true,
+             AudioProperties::ReadStyle propertiesStyle =
+             AudioProperties::Average);
 
-				/*!
-				 * Destroys this instance of the File.
-				 */
-				virtual ~File();
+        /*!
+         * Destroys this instance of the File.
+         */
+        virtual ~File();
 
-				Mod::Tag *tag() const;
+        Mod::Tag *tag() const;
 
-				/*!
-				 * Returns the S3M::Properties for this file. If no audio properties
-				 * were read then this will return a null pointer.
-				 */
-				S3M::Properties *audioProperties() const;
+        /*!
+         * Returns the S3M::Properties for this file. If no audio properties
+         * were read then this will return a null pointer.
+         */
+        S3M::Properties *audioProperties() const;
 
-				/*!
-				 * Save the file.
-				 * This is the same as calling save(AllTags);
-				 *
-				 * \note Saving ScreamTracker III tags is not supported.
-				 */
-				bool save();
+        /*!
+         * Save the file.
+         * This is the same as calling save(AllTags);
+         *
+         * \note Saving ScreamTracker III tags is not supported.
+         */
+        bool save();
 
-			private:
-				File(const File &);
-				File &operator=(const File &);
+      private:
+        File(const File &);
+        File &operator=(const File &);
 
-				void read(bool readProperties);
+        void read(bool readProperties);
 
-				class FilePrivate;
-				FilePrivate *d;
-		};
-	}
+        class FilePrivate;
+        FilePrivate *d;
+    };
+  }
 }
 
 #endif

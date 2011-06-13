@@ -33,59 +33,59 @@
 
 namespace TagLib {
 
-	namespace IT {
+  namespace IT {
 
-		class TAGLIB_EXPORT File : public Mod::File {
-			public:
-				/*!
-				 * Contructs a Impulse Tracker file from \a file. If \a readProperties
-				 * is true the file's audio properties will also be read using
-				 * \a propertiesStyle. If false, \a propertiesStyle is ignored.
-				 */
-				File(FileName file, bool readProperties = true,
-				     AudioProperties::ReadStyle propertiesStyle =
-				     AudioProperties::Average);
+    class TAGLIB_EXPORT File : public Mod::File {
+      public:
+        /*!
+         * Contructs a Impulse Tracker file from \a file. If \a readProperties
+         * is true the file's audio properties will also be read using
+         * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+         */
+        File(FileName file, bool readProperties = true,
+             AudioProperties::ReadStyle propertiesStyle =
+             AudioProperties::Average);
 
-				/*!
-				 * Contructs a Impulse Tracker file from \a stream. If \a readProperties
-				 * is true the file's audio properties will also be read using
-				 * \a propertiesStyle. If false, \a propertiesStyle is ignored.
-				 */
-				File(IOStream *stram, bool readProperties = true,
-				     AudioProperties::ReadStyle propertiesStyle =
-				     AudioProperties::Average);
+        /*!
+         * Contructs a Impulse Tracker file from \a stream. If \a readProperties
+         * is true the file's audio properties will also be read using
+         * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+         */
+        File(IOStream *stram, bool readProperties = true,
+             AudioProperties::ReadStyle propertiesStyle =
+             AudioProperties::Average);
 
-				/*!
-				 * Destroys this instance of the File.
-				 */
-				virtual ~File();
+        /*!
+         * Destroys this instance of the File.
+         */
+        virtual ~File();
 
-				Mod::Tag *tag() const;
+        Mod::Tag *tag() const;
 
-				/*!
-				 * Returns the IT::Properties for this file. If no audio properties
-				 * were read then this will return a null pointer.
-				 */
-				IT::Properties *audioProperties() const;
+        /*!
+         * Returns the IT::Properties for this file. If no audio properties
+         * were read then this will return a null pointer.
+         */
+        IT::Properties *audioProperties() const;
 
-				/*!
-				 * Save the file.
-				 * This is the same as calling save(AllTags);
-				 *
-				 * \note Saving Impulse Tracker tags is not supported.
-				 */
-				bool save();
+        /*!
+         * Save the file.
+         * This is the same as calling save(AllTags);
+         *
+         * \note Saving Impulse Tracker tags is not supported.
+         */
+        bool save();
 
-			private:
-				File(const File &);
-				File &operator=(const File &);
+      private:
+        File(const File &);
+        File &operator=(const File &);
 
-				void read(bool readProperties);
+        void read(bool readProperties);
 
-				class FilePrivate;
-				FilePrivate *d;
-		};
-	}
+        class FilePrivate;
+        FilePrivate *d;
+    };
+  }
 }
 
 #endif
