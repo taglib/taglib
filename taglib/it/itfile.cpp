@@ -45,16 +45,16 @@ public:
 
 IT::File::File(FileName file, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-    Mod::File(file),
-    d(new FilePrivate(propertiesStyle))
+  Mod::File(file),
+  d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
 }
 
 IT::File::File(IOStream *stream, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-    Mod::File(stream),
-    d(new FilePrivate(propertiesStyle))
+  Mod::File(stream),
+  d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
 }
@@ -66,12 +66,12 @@ IT::File::~File()
 
 Mod::Tag *IT::File::tag() const
 {
-    return &d->tag;
+  return &d->tag;
 }
 
 IT::Properties *IT::File::audioProperties() const
 {
-    return &d->properties;
+  return &d->properties;
 }
 
 bool IT::File::save()
@@ -79,7 +79,7 @@ bool IT::File::save()
   seek(4);
   writeString(d->tag.title(), 26);
   // TODO: write comment as instrument and sample names
-    return true;
+  return true;
 }
 
 void IT::File::read(bool)

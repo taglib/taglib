@@ -42,16 +42,16 @@ public:
 
 XM::File::File(FileName file, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-               Mod::File(file),
-         d(new FilePrivate(propertiesStyle))
+  Mod::File(file),
+  d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
 }
 
 XM::File::File(IOStream *stream, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-               Mod::File(stream),
-         d(new FilePrivate(propertiesStyle))
+  Mod::File(stream),
+  d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
 }
@@ -63,12 +63,12 @@ XM::File::~File()
 
 XM::Tag *XM::File::tag() const
 {
-    return &d->tag;
+  return &d->tag;
 }
 
 XM::Properties *XM::File::audioProperties() const
 {
-    return &d->properties;
+  return &d->properties;
 }
 
 bool XM::File::save()
@@ -78,7 +78,7 @@ bool XM::File::save()
   seek(1, Current);
   writeString(d->tag.trackerName(), 20);
   // TODO: write comment as instrument and sample names
-    return true;
+  return true;
 }
 
 void XM::File::read(bool)

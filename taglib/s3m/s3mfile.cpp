@@ -39,18 +39,18 @@ public:
 };
 
 S3M::File::File(FileName file, bool readProperties,
-           AudioProperties::ReadStyle propertiesStyle) :
-           Mod::File(file)
+                AudioProperties::ReadStyle propertiesStyle) :
+  Mod::File(file),
+  d(new FilePrivate(propertiesStyle))
 {
-  d = new FilePrivate(propertiesStyle);
   read(readProperties);
 }
 
 S3M::File::File(IOStream *stream, bool readProperties,
-           AudioProperties::ReadStyle propertiesStyle) :
-           Mod::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) :
+  Mod::File(stream),
+  d(new FilePrivate(propertiesStyle))
 {
-  d = new FilePrivate(propertiesStyle);
   read(readProperties);
 }
 
@@ -61,12 +61,12 @@ S3M::File::~File()
 
 Mod::Tag *S3M::File::tag() const
 {
-    return &d->tag;
+  return &d->tag;
 }
 
 S3M::Properties *S3M::File::audioProperties() const
 {
-    return &d->properties;
+  return &d->properties;
 }
 
 bool S3M::File::save()
@@ -76,7 +76,7 @@ bool S3M::File::save()
   seek(0);
   writeString(d->tag.title(), 28);
   // TODO: write comment as sample names
-    return true;
+  return true;
 }
 
 void S3M::File::read(bool)
