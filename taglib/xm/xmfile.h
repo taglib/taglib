@@ -42,22 +42,31 @@ namespace TagLib {
 				 * is true the file's audio properties will also be read using
 				 * \a propertiesStyle. If false, \a propertiesStyle is ignored.
 				 */
-				explicit File(FileName file, bool readProperties = true,
-				              AudioProperties::ReadStyle propertiesStyle =
-							  AudioProperties::Average);
+				File(FileName file, bool readProperties = true,
+				     AudioProperties::ReadStyle propertiesStyle =
+				     AudioProperties::Average);
+
+				/*!
+				 * Contructs a Extended Module file from \a stream. If \a readProperties
+				 * is true the file's audio properties will also be read using
+				 * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+				 */
+				File(IOStream *stream, bool readProperties = true,
+				     AudioProperties::ReadStyle propertiesStyle =
+				     AudioProperties::Average);
 
 				/*!
 				 * Destroys this instance of the File.
 				 */
 				virtual ~File();
 
-				virtual XM::Tag *tag() const;
+				XM::Tag *tag() const;
 
 				/*!
 				 * Returns the XM::Properties for this file. If no audio properties
 				 * were read then this will return a null pointer.
 				 */
-				virtual XM::Properties *audioProperties() const;
+				XM::Properties *audioProperties() const;
 
 				/*!
 				 * Save the file.
@@ -65,16 +74,16 @@ namespace TagLib {
 				 *
 				 * \note Saving Extended Module tags is not supported.
 				 */
-				virtual bool save();
-
-				void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+				bool save();
 
 			private:
 				File(const File &);
 				File &operator=(const File &);
 
-				XM::Tag        *m_tag;
-				XM::Properties *m_properties;
+				void read(bool readProperties);
+
+				class FilePrivate;
+				FilePrivate *d;
 		};
 	}
 }

@@ -22,7 +22,7 @@
 #ifndef TAGLIB_S3MPROPERTIES_H
 #define TAGLIB_S3MPROPERTIES_H
 
-#include <stdint.h>
+#include "taglib.h"
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -30,72 +30,49 @@ namespace TagLib {
 		class TAGLIB_EXPORT Properties : public AudioProperties {
 			friend class File;
 		public:
-			Properties(AudioProperties::ReadStyle propertiesStyle) :
-				AudioProperties(propertiesStyle),
-				m_sampleLength(0),
-				m_channels(0),
-				m_stereo(false),
-				m_sampleCount(0),
-				m_patternCount(0),
-				m_flags(0),
-				m_version(0),
-				m_samplesType(0),
-				m_baseVolume(0),
-				m_tempo(0),
-				m_bpmSpeed(0),
-				m_ultraClick(0),
-				m_usePanningValues(false) {}
+			Properties(AudioProperties::ReadStyle propertiesStyle);
+			virtual ~Properties();
 			
-			int length()     const { return 0; }
-			int bitrate()    const { return 0; }
-			int sampleRate() const { return 0; }
-			int channels()   const { return m_channels; }
+			int length()     const;
+			int bitrate()    const;
+			int sampleRate() const;
+			int channels()   const;
 
-			uint16_t sampleLength() const { return m_sampleLength; }
-			bool     stereo()       const { return m_stereo; }
-			uint16_t sampleCount()  const { return m_sampleCount; }
-			uint16_t patternCount() const { return m_patternCount; }
-			uint16_t flags()        const { return m_flags; }
-			uint16_t version()      const { return m_version; }
-			uint16_t samplesType()  const { return m_samplesType; }
-			int      baseVolume()   const { return m_baseVolume; }
-			uint8_t  tempo()        const { return m_tempo; }
-			uint8_t  bpmSpeed()     const { return m_bpmSpeed; }
-			uint8_t  ultraClick()   const { return m_ultraClick; }
-			bool     usePanningValues() const { return m_usePanningValues; }
+			ushort sampleLength() const;
+			bool   stereo()       const;
+			ushort sampleCount()  const;
+			ushort patternCount() const;
+			ushort flags()        const;
+			ushort version()      const;
+			ushort samplesType()  const;
+			int    baseVolume()   const;
+			uchar  tempo()        const;
+			uchar  bpmSpeed()     const;
+			uchar  ultraClick()   const;
+			bool   usePanningValues() const;
 
 		protected:
-			void setSampleLength(uint16_t sampleLength) { m_sampleLength = sampleLength; }
-			void setChannels(int channels) { m_channels = channels; }
+			void setSampleLength(ushort sampleLength);
+			void setChannels(int channels);
 
-			void setStereo      (bool stereo) { m_stereo = stereo; }
-			void setSampleCount (uint16_t sampleCount)  { m_sampleCount = sampleCount; }
-			void setPatternCount(uint16_t patternCount) { m_patternCount = patternCount; }
-			void setFlags       (uint16_t flags)        { m_flags = flags; }
-			void setVersion     (uint16_t version)      { m_version = version; }
-			void setSamplesType (uint16_t samplesType)  { m_samplesType = samplesType; }
-			void setBaseVolume  (int baseVolume)     { m_baseVolume = baseVolume; }
-			void setTempo       (uint8_t tempo)      { m_tempo = tempo; }
-			void setBpmSpeed    (uint8_t bpmSpeed)   { m_bpmSpeed = bpmSpeed; }
-			void setUltraClick  (uint8_t ultraClick) { m_ultraClick = ultraClick; }
-			void setUsePanningValues(bool usePanningValues) {
-				m_usePanningValues = usePanningValues;
-			}
+			void setStereo      (bool stereo);
+			void setSampleCount (ushort sampleCount);
+			void setPatternCount(ushort patternCount);
+			void setFlags       (ushort flags);
+			void setVersion     (ushort version);
+			void setSamplesType (ushort samplesType);
+			void setBaseVolume  (int baseVolume);
+			void setTempo       (uchar tempo);
+			void setBpmSpeed    (uchar bpmSpeed);
+			void setUltraClick  (uchar ultraClick);
+			void setUsePanningValues(bool usePanningValues);
 
 		private:
-			uint16_t m_sampleLength;
-			int      m_channels;
-			bool     m_stereo;
-			uint16_t m_sampleCount;
-			uint16_t m_patternCount;
-			uint16_t m_flags;
-			uint16_t m_version;
-			uint16_t m_samplesType;
-			int      m_baseVolume;
-			uint8_t  m_tempo;
-			uint8_t  m_bpmSpeed;
-			uint8_t  m_ultraClick;
-			bool     m_usePanningValues;
+			Properties(const Properties&);
+			Properties &operator=(const Properties&);
+
+			class PropertiesPrivate;
+			PropertiesPrivate *d;
 		};
 	}
 }

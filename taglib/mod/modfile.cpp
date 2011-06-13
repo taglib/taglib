@@ -21,69 +21,58 @@
 
 #include "modfile.h"
 
-#ifdef HAVE_ENDIAN_H
-#include <endian.h>
-#endif
+using namespace TagLib;
+using namespace Mod;
 
-namespace TagLib {
-
-	namespace Mod {
-
-ByteVector File::readBytes(unsigned long size) {
-	ByteVector data(readBlock(size));
-	if (data.size() != size) throw ReadError();
-	return data;
+Mod::File::File(FileName file) : TagLib::File(file)
+{
 }
 
-String File::readString(unsigned long size) {
-	ByteVector data(readBytes(size));
+Mod::File::File(IOStream *stream) : TagLib::File(stream)
+{
+}
+
+void Mod::File::writeString(const String &s, ulong size)
+{
+	ByteVector data(s.data(String::Latin1));
+	data.resize(size, 0);
+	writeBlock(data);
+}
+
+bool Mod::File::readString(String &s, ulong size)
+{
+	ByteVector data(readBlock(size));
+	if(data.size() < size) return false;
 	int index = data.find((char) 0);
-	if (index > -1) {
+	if(index > -1)
+	{
 		data.resize(index);
 	}
 	data.replace((char) 0xff, ' ');
 
-	return String(data);
+	s = data;
+	return true;
 }
 
-uint8_t File::readByte() {
-	return readBytes(1)[0];
+bool Mod::File::readByte(uchar &byte)
+{
+	ByteVector data(readBlock(1));
+	if(data.size() < 1) return false;
+	byte = data[0];
+	return true;
 }
 
-#ifdef HAVE_ENDIAN_H
-uint16_t File::readU16B() {
-	return be16toh(*(uint16_t*) readBytes(2).data());
+bool Mod::File::readU16L(ushort &number)
+{
+	ByteVector data(readBlock(2));
+	if(data.size() < 2) return false;
+	number = data.toUShort(false);
+	return true;
 }
 
-uint16_t File::readU16L() {
-	return le16toh(*(uint16_t*) readBytes(2).data());
-}
-
-uint32_t File::readU32B() {
-	return be32toh(*(uint32_t*) readBytes(4).data());
-}
-
-uint32_t File::readU32L() {
-	return le32toh(*(uint32_t*) readBytes(4).data());
-}
-#else
-uint16_t File::readU16B() {
-	return readBytes(2).toUShort(true);
-}
-
-uint16_t File::readU16L() {
-	return readBytes(2).toUShort(false);
-}
-
-// XXX: who knows if this works if sizeof(int) > 4?
-uint32_t File::readU32B() {
-	return readBytes(4).toUInt(true);
-}
-
-uint32_t File::readU32L() {
-	return readBytes(4).toUInt(false);
-}
-#endif
-
-	}
+bool Mod::File::readU32L(ulong &number) {
+	ByteVector data(readBlock(4));
+	if(data.size() < 4) return false;
+	number = data.toUInt(false);
+	return true;
 }

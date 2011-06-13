@@ -22,28 +22,23 @@
 #ifndef TAGLIB_MODFILE_H
 #define TAGLIB_MODFILE_H
 
-#include <stdint.h>
-
+#include "taglib.h"
 #include "tfile.h"
 #include "tstring.h"
 #include "taglib_export.h"
 
 namespace TagLib {
 	namespace Mod {
-		class ReadError {
-		};
-
 		class TAGLIB_EXPORT File : public TagLib::File {
-			public:
-				File(FileName file) : TagLib::File(file) {}
+			protected:
+				File(FileName file);
+				File(IOStream *stream);
 
-				ByteVector readBytes(unsigned long size);
-				String readString(unsigned long size);
-				uint8_t  readByte();
-				uint16_t readU16B();
-				uint16_t readU16L();
-				uint32_t readU32B();
-				uint32_t readU32L();
+				void writeString(const String &s, ulong size);
+				bool readString(String &s, ulong size);
+				bool readByte(uchar &byte);
+				bool readU16L(ushort &number);
+				bool readU32L(ulong &number);
 		};
 	}
 }

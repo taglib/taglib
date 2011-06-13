@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2011 by Mathias Panzenböck
-    email                : grosser.meister.morti@gmx.net
+    copyright           : (C) 2011 by Mathias Panzenböck
+    email               : grosser.meister.morti@gmx.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,19 +19,45 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#include "xmfiletyperesolver.h"
-#include "xmfile.h"
+#ifndef TAGLIB_MODFILEPRIVATE_H
+#define TAGLIB_MODFILEPRIVATE_H
 
-TagLib::File *XMFileTypeResolver::createFile(
-		TagLib::FileName fileName,
-		bool readProperties,
-		TagLib::AudioProperties::ReadStyle propertiesStyle) const {
-	TagLib::XM::File *f = new TagLib::XM::File(fileName, readProperties, propertiesStyle);
-	if (f->isValid()) {
-		return f;
+// some helper-macros only used internally by (s3m|it|xm)file.cpp
+#define READ_ASSERT(cond) \
+	if(!(cond)) \
+	{ \
+		setValid(false); \
+		return; \
 	}
-	else {
-		delete f;
-		return 0;
+
+#define READ(setter,type,read) \
+	{ \
+		type number; \
+		READ_ASSERT(read(number)); \
+		setter(number); \
 	}
-}
+
+#define READ_BYTE(setter) READ(setter,uchar,readByte)
+#define READ_U16L(setter) READ(setter,ushort,readU16L)
+#define READ_U32L(setter) READ(setter,ulong,readU32L)
+
+#define READ_STRING(setter,size) \
+	{ \
+		String s; \
+		READ_ASSERT(readString(s, size)); \
+		setter(s); \
+	}
+
+#define READ_AS(type,name,read) \
+	type name = 0; \
+	READ_ASSERT(read(name));
+
+#define READ_BYTE_AS(name) READ_AS(uchar,name,readByte)
+#define READ_U16L_AS(name) READ_AS(ushort,name,readU16L)
+#define READ_U32L_AS(name) READ_AS(ulong,name,readU32L)
+
+#define READ_STRING_AS(name,size) \
+	String name; \
+	READ_ASSERT(readString(name, size));
+
+#endif

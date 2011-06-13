@@ -26,16 +26,35 @@
 
 namespace TagLib {
 	namespace XM {
-		class Tag : public Mod::Tag {
+		class Tag : public TagLib::Tag {
 			public:
-				String trackerName() const { return m_trackerName; }
+				Tag();
+				virtual ~Tag();
 
-				void setTrackerName(const String &trackerName) {
-					m_trackerName = trackerName;
-				}
+				String title()   const;
+				String artist()  const;
+				String album()   const;
+				String comment() const;
+				String genre()   const;
+				uint   year()    const;
+				uint   track()   const;
+				String trackerName() const;
+
+				void setTitle  (const String &title);
+				void setArtist (const String &artist);
+				void setAlbum  (const String &album);
+				void setComment(const String &comment);
+				void setGenre  (const String &genre);
+				void setYear (uint year);
+				void setTrack(uint track);
+				void setTrackerName(const String &trackerName);
 
 			private:
-				String m_trackerName;
+				Tag(const Tag &);
+				Tag &operator=(const Tag &);
+
+				class TagPrivate;
+				TagPrivate *d;
 		};
 	}
 }

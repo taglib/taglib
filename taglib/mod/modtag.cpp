@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2011 by Mathias Panzenböck
-    email                : grosser.meister.morti@gmx.net
+    copyright           : (C) 2011 by Mathias Panzenböck
+    email               : grosser.meister.morti@gmx.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,17 +19,91 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#ifndef TAGLIB_ITFILETYPERESOLVER_H
-#define TAGLIB_ITFILETYPERESOLVER_H
+#include "modtag.h"
 
-#include "fileref.h"
-#include "taglib_export.h"
+using namespace TagLib;
+using namespace Mod;
 
-class TAGLIB_EXPORT ITFileTypeResolver : public TagLib::FileRef::FileTypeResolver {
-	TagLib::File *createFile(TagLib::FileName fileName,
-	        bool readAudioProperties,
-	        TagLib::AudioProperties::ReadStyle audioPropertiesStyle) const;
-	~ITFileTypeResolver() {}
+class Mod::Tag::TagPrivate
+{
+public:
+	TagPrivate() {}
+
+	String title;
+	String comment;
 };
 
-#endif
+Mod::Tag::Tag() : TagLib::Tag()
+{
+	d = new TagPrivate;
+}
+
+Mod::Tag::~Tag()
+{
+	delete d;
+}
+
+String Mod::Tag::title() const
+{
+	return d->title;
+}
+
+String Mod::Tag::artist() const
+{
+	return String::null;
+}
+
+String Mod::Tag::album() const
+{
+	return String::null;
+}
+
+String Mod::Tag::comment() const
+{
+	return d->comment;
+}
+
+String Mod::Tag::genre() const
+{
+	return String::null;
+}
+
+uint Mod::Tag::year() const
+{
+	return 0;
+}
+
+uint Mod::Tag::track() const
+{
+	return 0;
+}
+
+void Mod::Tag::setTitle(const String &title)
+{
+	d->title = title;
+}
+
+void Mod::Tag::setArtist(const String &)
+{
+}
+
+void Mod::Tag::setAlbum(const String &)
+{
+}
+
+void Mod::Tag::setComment(const String &comment)
+{
+	d->comment = comment;
+}
+
+void Mod::Tag::setGenre(const String &)
+{
+}
+
+void Mod::Tag::setYear(uint)
+{
+}
+
+void Mod::Tag::setTrack(uint)
+{
+}

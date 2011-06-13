@@ -22,31 +22,37 @@
 #ifndef TAGLIB_MODTAG_H
 #define TAGLIB_MODTAG_H
 
-#include <taglib/tag.h>
+#include "tag.h"
 
 namespace TagLib {
 	namespace Mod {
 		class TAGLIB_EXPORT Tag : public TagLib::Tag {
 			public:
-				String title()   const { return m_title; }
-				String artist()  const { return String::null; }
-				String album()   const { return String::null; }
-				String comment() const { return m_comment; }
-				String genre()   const { return String::null; }
-				uint   year()    const { return 0; }
-				uint   track()   const { return 0; }
+				Tag();
+				virtual ~Tag();
 
-				void setTitle  (const String &title) { m_title = title; }
-				void setArtist (const String &) {}
-				void setAlbum  (const String &) {}
-				void setComment(const String &comment) { m_comment = comment; }
-				void setGenre  (const String &) {}
-				void setYear (uint) {}
-				void setTrack(uint) {}
+				String title()   const;
+				String artist()  const;
+				String album()   const;
+				String comment() const;
+				String genre()   const;
+				uint   year()    const;
+				uint   track()   const;
+
+				void setTitle  (const String &title);
+				void setArtist (const String &artist);
+				void setAlbum  (const String &album);
+				void setComment(const String &comment);
+				void setGenre  (const String &genre);
+				void setYear (uint year);
+				void setTrack(uint track);
 
 			private:
-				String m_title;
-				String m_comment;
+				Tag(const Tag &);
+				Tag &operator=(const Tag &);
+
+				class TagPrivate;
+				TagPrivate *d;
 		};
 	}
 }

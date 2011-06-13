@@ -20,124 +20,142 @@
  ***************************************************************************/
 
 #include "s3mfile.h"
-
 #include "tstringlist.h"
+#include "modfileprivate.h"
 
-namespace TagLib {
+using namespace TagLib;
+using namespace S3M;
 
-	namespace S3M {
+class S3M::File::FilePrivate
+{
+public:
+	FilePrivate(AudioProperties::ReadStyle propertiesStyle)
+		: properties(propertiesStyle)
+	{
+	}
 
-File::File(FileName file, bool readProperties,
+	Mod::Tag        tag;
+	S3M::Properties properties;
+};
+
+S3M::File::File(FileName file, bool readProperties,
            AudioProperties::ReadStyle propertiesStyle) :
-           Mod::File(file), m_tag(0), m_properties(0) {
-	read(readProperties, propertiesStyle);
+           Mod::File(file)
+{
+	d = new FilePrivate(propertiesStyle);
+	read(readProperties);
 }
 
-File::~File() {
-	delete m_tag;
-	delete m_properties;
+S3M::File::File(IOStream *stream, bool readProperties,
+           AudioProperties::ReadStyle propertiesStyle) :
+           Mod::File(stream)
+{
+	d = new FilePrivate(propertiesStyle);
+	read(readProperties);
 }
 
-Mod::Tag *File::tag() const {
-    return m_tag;
+S3M::File::~File()
+{
+	delete d;
 }
 
-S3M::Properties *File::audioProperties() const {
-    return m_properties;
+Mod::Tag *S3M::File::tag() const
+{
+    return &d->tag;
 }
 
-bool File::save() {
-    return false;
+S3M::Properties *S3M::File::audioProperties() const
+{
+    return &d->properties;
 }
 
-void File::read(bool, AudioProperties::ReadStyle propertiesStyle) {
-	delete m_tag;
-	delete m_properties;
+bool S3M::File::save()
+{
+	// note: if title starts with "Extended Module: "
+	// the file would look like an .xm file
+	seek(0);
+	writeString(d->tag.title(), 28);
+	// TODO: write comment as sample names
+    return true;
+}
 
-	m_tag        = new Mod::Tag();
-	m_properties = new S3M::Properties(propertiesStyle);
-
-	if (!isOpen())
+void S3M::File::read(bool)
+{
+	if(!isOpen())
 		return;
 
-	try {
-		m_tag->setTitle(readString(28));
+	READ_STRING(d->tag.setTitle, 28);
+	READ_BYTE_AS(mark);
+	READ_BYTE_AS(type);
 
-		uint8_t mark = readByte();
-		uint8_t type = readByte();
+	READ_ASSERT(mark == 0x1A && type == 0x10);
 
-		if (mark != 0x1A || type != 0x10) {
-			throw Mod::ReadError();
-		}
+	seek(32);
 
-		seek(32);
+	READ_U16L_AS(length);
+	READ_U16L_AS(sampleCount);
 
-		uint16_t length = readU16L();
-		uint16_t sampleCount = readU16L();
-		m_properties->setSampleLength(length);
-		m_properties->setSampleCount(sampleCount);
-		m_properties->setPatternCount(readU16L());
-		m_properties->setFlags(readU16L());
-		m_properties->setVersion(readU16L());
-		m_properties->setSamplesType(readU16L());
+	d->properties.setSampleLength(length);
+	d->properties.setSampleCount(sampleCount);
 
-		ByteVector mod_id(readBytes(4UL));
+	READ_U16L(d->properties.setPatternCount);
+	READ_U16L(d->properties.setFlags);
+	READ_U16L(d->properties.setVersion);
+	READ_U16L(d->properties.setSamplesType);
 
-		if (mod_id != "SCRM") {
-			throw Mod::ReadError();
-		}
+	READ_ASSERT(readBlock(4) == "SCRM");
 
-		m_properties->setBaseVolume(readByte() << 1);
-		m_properties->setTempo(readByte());
-		m_properties->setBpmSpeed(readByte());
-		m_properties->setStereo((readByte() & 0x80) != 0);
-		m_properties->setUltraClick(readByte());
-		m_properties->setUsePanningValues(readByte() == 0xFC);
+	READ_BYTE_AS(baseVolume);
+	d->properties.setBaseVolume(baseVolume << 1);
 
-		seek(10, Current);
+	READ_BYTE(d->properties.setTempo);
+	READ_BYTE(d->properties.setBpmSpeed);
 
-		int channels = 0;
-		for (int i = 0; i < 32; ++ i) {
-			if (readByte() != 0xff) ++ channels;
-		}
-		m_properties->setChannels(channels);
+	READ_BYTE_AS(stereo);
+	d->properties.setStereo((stereo & 0x80) != 0);
+	READ_BYTE(d->properties.setUltraClick);
 
-		seek(channels, Current);
+	READ_BYTE_AS(usePanningValues);
+	d->properties.setUsePanningValues(usePanningValues == 0xFC);
 
-		StringList comment;
-		for (uint16_t i = 0; i < sampleCount; ++ i) {
-			seek(96 + length + (i << 1));
+	seek(10, Current);
 
-			uint16_t instrumentOffset = readU16L();
-			seek(instrumentOffset << 4);
-
-			uint8_t sampleType = readByte();
-			String dosFileName = readString(13);
-
-			uint16_t sampleOffset = readU16L();
-			uint32_t sampleLength = readU32L();
-			uint32_t repeatStart  = readU32L();
-			uint32_t repeatStop   = readU32L();
-			uint8_t  sampleColume = readByte();
-
-			seek(2, Current);
-
-			uint8_t  sampleFlags   = readByte();
-			uint32_t baseFrequency = readU32L();
-
-			seek(12, Current);
-
-			String sampleName = readString(28);
-
-			comment.append(sampleName);
-		}
-
-		m_tag->setComment(comment.toString("\n"));
+	int channels = 0;
+	for(int i = 0; i < 32; ++ i)
+	{
+		READ_BYTE_AS(terminator);
+		if (terminator != 0xff) ++ channels;
 	}
-	catch (const Mod::ReadError&) {
-		setValid(false);
-	}
-}
+	d->properties.setChannels(channels);
 
+	seek(channels, Current);
+
+	StringList comment;
+	for(ushort i = 0; i < sampleCount; ++ i)
+	{
+		seek(96 + length + (i << 1));
+
+		READ_U16L_AS(instrumentOffset);
+		seek(instrumentOffset << 4);
+
+		READ_BYTE_AS(sampleType);
+		READ_STRING_AS(dosFileName, 13);
+		READ_U16L_AS(sampleOffset);
+		READ_U32L_AS(sampleLength);
+		READ_U32L_AS(repeatStart);
+		READ_U32L_AS(repeatStop);
+		READ_BYTE_AS(sampleVolume);
+
+		seek(2, Current);
+
+		READ_BYTE_AS(sampleFlags);
+		READ_U32L_AS(baseFrequency);
+
+		seek(12, Current);
+
+		READ_STRING_AS(sampleName, 28);
+		comment.append(sampleName);
 	}
+
+	d->tag.setComment(comment.toString("\n"));
 }

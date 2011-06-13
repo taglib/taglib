@@ -49,6 +49,9 @@
 #include "aifffile.h"
 #include "wavfile.h"
 #include "apefile.h"
+#include "s3mfile.h"
+#include "itfile.h"
+#include "xmfile.h"
 
 using namespace TagLib;
 
@@ -162,6 +165,9 @@ StringList FileRef::defaultFileExtensions()
   l.append("aiff");
   l.append("wav");
   l.append("ape");
+  l.append("s3m");
+  l.append("it");
+  l.append("xm");
 
   return l;
 }
@@ -260,6 +266,12 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "APE")
       return new APE::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "S3M")
+      return new S3M::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "IT")
+      return new IT::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "XM")
+      return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
   }
 
   return 0;

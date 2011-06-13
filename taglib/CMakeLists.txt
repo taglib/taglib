@@ -104,13 +104,10 @@ set(tag_HDRS
   mod/modfile.h
   mod/modtag.h
   it/itfile.h
-  it/itfiletyperesolver.h
   it/itproperties.h
   s3m/s3mfile.h
-  s3m/s3mfiletyperesolver.h
   s3m/s3mproperties.h
   xm/xmfile.h
-  xm/xmfiletyperesolver.h
   xm/xmproperties.h
   xm/xmtag.h
 )
@@ -255,21 +252,23 @@ set(wav_SRCS
 
 set(mod_SRCS
   mod/modfile.cpp
+  mod/modtag.cpp
 )
 
 set(s3m_SRCS
   s3m/s3mfile.cpp
-  s3m/s3mfiletyperesolver.cpp
+  s3m/s3mproperties.cpp
 )
 
 set(it_SRCS
   it/itfile.cpp
-  it/itfiletyperesolver.cpp
+  it/itproperties.cpp
 )
 
 set(xm_SRCS
   xm/xmfile.cpp
-  xm/xmfiletyperesolver.cpp
+  xm/xmtag.cpp
+  xm/xmproperties.cpp
 )
 
 set(toolkit_SRCS

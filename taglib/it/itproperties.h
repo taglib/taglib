@@ -22,8 +22,7 @@
 #ifndef TAGLIB_ITPROPERTIES_H
 #define TAGLIB_ITPROPERTIES_H
 
-#include <stdint.h>
-
+#include "taglib.h"
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -31,69 +30,48 @@ namespace TagLib {
 		class TAGLIB_EXPORT Properties : public AudioProperties {
 			friend class File;
 		public:
-			Properties(AudioProperties::ReadStyle propertiesStyle) :
-				AudioProperties(propertiesStyle),
-				m_sampleLength(0),
-				m_stereo(false),
-				m_instrumentCount(0),
-				m_sampleCount(0),
-				m_patternCount(0),
-				m_version(0),
-				m_cmwt(0),
-				m_flags(0),
-				m_special(0),
-				m_baseVolume(0),
-				m_tempo(0),
-				m_bpmSpeed(0) {}
+			Properties(AudioProperties::ReadStyle propertiesStyle);
+			virtual ~Properties();
 			
-			int length()     const { return 0; }
-			int bitrate()    const { return 0; }
-			int sampleRate() const { return 0; }
-			int channels()   const { return m_stereo ? 2 : 1; }
+			int length()     const;
+			int bitrate()    const;
+			int sampleRate() const;
+			int channels()   const;
 
-			uint16_t sampleLength()    const { return m_sampleLength; }
-			bool     stereo()          const { return m_stereo; }
-			uint16_t instrumentCount() const { return m_instrumentCount; }
-			uint16_t sampleCount()     const { return m_sampleCount; }
-			uint16_t patternCount()    const { return m_patternCount; }
-			uint16_t version()         const { return m_version; }
-			uint16_t cmwt()            const { return m_cmwt; }
-			uint16_t flags()           const { return m_flags; }
-			uint16_t special()         const { return m_special; }
-			int      baseVolume()      const { return m_baseVolume; }
-			uint8_t  tempo()           const { return m_tempo; }
-			uint8_t  bpmSpeed()        const { return m_bpmSpeed; }
+			ushort sampleLength()    const;
+			bool   stereo()          const;
+			ushort instrumentCount() const;
+			ushort sampleCount()     const;
+			ushort patternCount()    const;
+			ushort version()         const;
+			ushort cmwt()            const;
+			ushort flags()           const;
+			ushort special()         const;
+			int    baseVolume()      const;
+			uchar  tempo()           const;
+			uchar  bpmSpeed()        const;
 
 		protected:
-			void setSampleLength(uint16_t sampleLength) { m_sampleLength = sampleLength; }
-			void setStereo(bool stereo) { m_stereo = stereo; }
+			void setSampleLength(ushort sampleLength);
+			void setStereo(bool stereo);
 
-			void setInstrumentCount (uint16_t instrumentCount) {
-				m_instrumentCount = instrumentCount;
-			}
-			void setSampleCount (uint16_t sampleCount)  { m_sampleCount = sampleCount; }
-			void setPatternCount(uint16_t patternCount) { m_patternCount = patternCount; }
-			void setFlags       (uint16_t flags)        { m_flags = flags; }
-			void setSpecial     (uint16_t special)      { m_special = special; }
-			void setCmwt        (uint16_t cmwt)         { m_cmwt = cmwt; }
-			void setVersion     (uint16_t version)      { m_version = version; }
-			void setBaseVolume  (int baseVolume)        { m_baseVolume = baseVolume; }
-			void setTempo       (uint8_t tempo)         { m_tempo = tempo; }
-			void setBpmSpeed    (uint8_t bpmSpeed)      { m_bpmSpeed = bpmSpeed; }
+			void setInstrumentCount(ushort instrumentCount);
+			void setSampleCount (ushort sampleCount);
+			void setPatternCount(ushort patternCount);
+			void setFlags       (ushort flags);
+			void setSpecial     (ushort special);
+			void setCmwt        (ushort cmwt);
+			void setVersion     (ushort version);
+			void setBaseVolume  (int baseVolume);
+			void setTempo       (uchar tempo);
+			void setBpmSpeed    (uchar bpmSpeed);
 
 		private:
-			uint16_t m_sampleLength;
-			bool     m_stereo;
-			uint16_t m_instrumentCount;
-			uint16_t m_sampleCount;
-			uint16_t m_patternCount;
-			uint16_t m_version;
-			uint16_t m_cmwt;
-			uint16_t m_flags;
-			uint16_t m_special;
-			int      m_baseVolume;
-			uint8_t  m_tempo;
-			uint8_t  m_bpmSpeed;
+			Properties(const Properties&);
+			Properties &operator=(const Properties&);
+
+			class PropertiesPrivate;
+			PropertiesPrivate *d;
 		};
 	}
 }

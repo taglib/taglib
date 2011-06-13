@@ -22,8 +22,7 @@
 #ifndef TAGLIB_XMPROPERTIES_H
 #define TAGLIB_XMPROPERTIES_H
 
-#include <stdint.h>
-
+#include "taglib.h"
 #include "tstring.h"
 #include "audioproperties.h"
 
@@ -32,58 +31,41 @@ namespace TagLib {
 		class Properties : public AudioProperties {
 			friend class File;
 		public:
-			Properties(AudioProperties::ReadStyle propertiesStyle) :
-				AudioProperties(propertiesStyle),
-				m_sampleLength(0),
-				m_channels(0),
-				m_version(0),
-				m_restartPosition(0),
-				m_patternCount(0),
-				m_instrumentCount(0),
-				m_flags(0),
-				m_tempo(0),
-				m_bpmSpeed(0) {}
+			Properties(AudioProperties::ReadStyle propertiesStyle);
+			virtual ~Properties();
 			
-			int length()     const { return 0; }
-			int bitrate()    const { return 0; }
-			int sampleRate() const { return 0; }
-			int channels()   const { return m_channels; }
+			int length()     const;
+			int bitrate()    const;
+			int sampleRate() const;
+			int channels()   const;
 
-			uint16_t sampleLength()    const { return m_sampleLength; }
-			uint16_t version()         const { return m_version; }
-			uint16_t restartPosition() const { return m_restartPosition; }
-			uint16_t patternCount()    const { return m_patternCount; }
-			uint16_t instrumentCount() const { return m_instrumentCount; }
-			uint16_t flags()           const { return m_flags; }
-			uint16_t tempo()           const { return m_tempo; }
-			uint16_t bpmSpeed()        const { return m_bpmSpeed; }
+			ushort sampleLength()    const;
+			ushort version()         const;
+			ushort restartPosition() const;
+			ushort patternCount()    const;
+			ushort instrumentCount() const;
+			ushort flags()           const;
+			ushort tempo()           const;
+			ushort bpmSpeed()        const;
 
 		protected:
-			void setSampleLength(int sampleLength) { m_sampleLength = sampleLength; }
-			void setChannels(int channels) { m_channels = channels; }
+			void setSampleLength(int sampleLength);
+			void setChannels(int channels);
 
-			void setVersion(uint16_t version) { m_version = version; }
-			void setRestartPosition(uint16_t restartPosition) {
-				m_restartPosition = restartPosition;
-			}
-			void setPatternCount(uint16_t patternCount) { m_patternCount = patternCount; }
-			void setInstrumentCount(uint16_t instrumentCount) {
-				m_instrumentCount = instrumentCount;
-			}
-			void setFlags   (uint16_t flags)    { m_flags = flags; }
-			void setTempo   (uint16_t tempo)    { m_tempo = tempo; }
-			void setBpmSpeed(uint16_t bpmSpeed) { m_bpmSpeed = bpmSpeed; }
+			void setVersion(ushort version);
+			void setRestartPosition(ushort restartPosition);
+			void setPatternCount(ushort patternCount);
+			void setInstrumentCount(ushort instrumentCount);
+			void setFlags(ushort flags);
+			void setTempo(ushort tempo);
+			void setBpmSpeed(ushort bpmSpeed);
 
 		private:
-			uint16_t m_sampleLength;
-			int      m_channels;
-			uint16_t m_version;
-			uint16_t m_restartPosition;
-			uint16_t m_patternCount;
-			uint16_t m_instrumentCount;
-			uint16_t m_flags;
-			uint16_t m_tempo;
-			uint16_t m_bpmSpeed;
+			Properties(const Properties&);
+			Properties &operator=(const Properties&);
+
+			class PropertiesPrivate;
+			PropertiesPrivate *d;
 		};
 	}
 }

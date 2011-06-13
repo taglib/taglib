@@ -21,138 +21,175 @@
 
 #include "tstringlist.h"
 #include "xmfile.h"
+#include "modfileprivate.h"
 
 #include <algorithm>
 
-namespace TagLib {
+using namespace TagLib;
+using namespace XM;
 
-	namespace XM {
+class XM::File::FilePrivate
+{
+public:
+	FilePrivate(AudioProperties::ReadStyle propertiesStyle)
+		: tag(), properties(propertiesStyle)
+	{
+	}
 
-File::File(FileName file, bool readProperties,
-           AudioProperties::ReadStyle propertiesStyle) :
-           Mod::File(file), m_tag(0), m_properties(0) {
-	read(readProperties, propertiesStyle);
+	XM::Tag        tag;
+	XM::Properties properties;
+};
+
+XM::File::File(FileName file, bool readProperties,
+               AudioProperties::ReadStyle propertiesStyle) :
+               Mod::File(file),
+			   d(new FilePrivate(propertiesStyle))
+{
+	read(readProperties);
 }
 
-File::~File() {
-	delete m_tag;
-	delete m_properties;
+XM::File::File(IOStream *stream, bool readProperties,
+               AudioProperties::ReadStyle propertiesStyle) :
+               Mod::File(stream),
+			   d(new FilePrivate(propertiesStyle))
+{
+	read(readProperties);
 }
 
-XM::Tag *File::tag() const {
-    return m_tag;
+XM::File::~File()
+{
+	delete d;
 }
 
-XM::Properties *File::audioProperties() const {
-    return m_properties;
+XM::Tag *XM::File::tag() const
+{
+    return &d->tag;
 }
 
-bool File::save() {
-    return false;
+XM::Properties *XM::File::audioProperties() const
+{
+    return &d->properties;
 }
 
-void File::read(bool, AudioProperties::ReadStyle propertiesStyle) {
-	delete m_tag;
-	delete m_properties;
+bool XM::File::save()
+{
+	seek(17);
+	writeString(d->tag.title(), 20);
+	seek(1, Current);
+	writeString(d->tag.trackerName(), 20);
+	// TODO: write comment as instrument and sample names
+    return true;
+}
 
-	m_tag        = new XM::Tag();
-	m_properties = new XM::Properties(propertiesStyle);
-
-	if (!isOpen())
+void XM::File::read(bool)
+{
+	if(!isOpen())
 		return;
 
-	try {
-		if (readBytes(17) != "Extended Module: ") {
-			throw Mod::ReadError();
-		}
+	READ_ASSERT(readBlock(17) == "Extended Module: ");
 
-		m_tag->setTitle(readString(20));
+	READ_STRING(d->tag.setTitle, 20);
+	READ_BYTE_AS(mark);
+	READ_ASSERT(mark == 0x1A);
+	
+	READ_STRING(d->tag.setTrackerName, 20);
+	READ_U16L(d->properties.setVersion);
+	READ_U32L_AS(headerSize);
+	READ_U16L(d->properties.setSampleLength);
+	READ_U16L(d->properties.setRestartPosition);
+	READ_U16L(d->properties.setChannels);
+	READ_U16L_AS(patternCount);
+	d->properties.setPatternCount(patternCount);
+	READ_U16L_AS(instrumentCount);
+	d->properties.setInstrumentCount(instrumentCount);
+	READ_U16L(d->properties.setFlags);
+	READ_U16L(d->properties.setTempo);
+	READ_U16L(d->properties.setBpmSpeed);
 
-		if (readByte() != 0x1A) {
-			throw Mod::ReadError();
-		}
-
-		m_tag->setTrackerName(readString(20));
-		m_properties->setVersion(readU16L());
-		uint32_t headerSize = readU32L();
-		m_properties->setSampleLength(readU16L());
-		m_properties->setRestartPosition(readU16L());
-		m_properties->setChannels(readU16L());
-		uint32_t patternCount = readU16L();
-		m_properties->setPatternCount(patternCount);
-		uint32_t instrumentCount = readU16L();
-		m_properties->setInstrumentCount(instrumentCount);
-		m_properties->setFlags(readU16L());
-		m_properties->setTempo(readU16L());
-		m_properties->setBpmSpeed(readU16L());
-
-		seek(60 + headerSize);
+	seek(60 + headerSize);
 		
-		for (uint16_t i = 0; i < patternCount; ++ i) {
-			uint32_t patternHeaderLength = readU32L();
-			uint8_t  patternType = readByte();
-			uint16_t rowCount = readU16L();
-			uint16_t patternDataSize = readU16L();
+	for(ushort i = 0; i < patternCount; ++ i)
+	{
+		READ_U32L_AS(patternHeaderLength);
+		READ_BYTE_AS(patternType);
+		READ_U16L_AS(rowCount);
+		READ_U16L_AS(patternDataSize);
 
-			seek(patternHeaderLength - (4+1+2+2) + patternDataSize, Current);
-		}
+		seek(patternHeaderLength - (4+1+2+2) + patternDataSize, Current);
+	}
 		
-		StringList intrumentNames;
-		StringList sampleNames;
-		for (uint16_t i = 0; i < instrumentCount; ++ i) {
-			long pos = tell();
-			uint32_t instrumentSize = readU32L();
+	StringList intrumentNames;
+	StringList sampleNames;
+	for(ushort i = 0; i < instrumentCount; ++ i)
+	{
+		long pos = tell();
+		READ_U32L_AS(instrumentSize);
 
-			String instrumentName;
-			uint8_t instrumentType = 0;
-			uint16_t sampleCount = 0;
+		String instrumentName;
+		uchar instrumentType = 0;
+		ushort sampleCount = 0;
 			
-			if (instrumentSize > 4) {
-				instrumentName = readString(std::min((uint32_t)22,instrumentSize-4));
+		if(instrumentSize > 4)
+		{
+			if(!readString(instrumentName, std::min(22UL, instrumentSize-4)))
+			{
+				setValid(false);
+				return;
+			}
 
-				if (instrumentSize >= (4+22+1)) {
-					instrumentType = readByte();
+			if(instrumentSize >= (4+22+1))
+			{
+				if(!readByte(instrumentType))
+				{
+					setValid(false);
+					return;
+				}
 
-					if (instrumentSize >= (4+22+1+2)) {
-						sampleCount = readU16L();
+				if (instrumentSize >= (4+22+1+2))
+				{
+					if(!readU16L(sampleCount))
+					{
+						setValid(false);
+						return;
 					}
 				}
 			}
-
-			uint32_t sampleHeaderSize = 0;
-			uint32_t sumSampleLength = 0;
-			if (sampleCount > 0) {
-				sampleHeaderSize = readU32L();
-				seek(pos + instrumentSize);
-
-				long sampleheaderPos = tell();
-				for (uint16_t j = 0; j < sampleCount; ++ j) {
-					seek(sampleheaderPos + sampleHeaderSize * j);
-					uint32_t length = readU32L();
-					uint32_t loopStart = readU32L();
-					uint32_t loopLength = readU32L();
-					uint8_t  volume = readByte();
-					uint8_t  finetune = readByte();
-					uint8_t  sampleType = readByte();
-					uint8_t  panning = readByte();
-					uint8_t  noteNumber = readByte();
-					uint8_t  compression = readByte();
-					String sampleName = readString(22);
-					
-					sumSampleLength += length;
-					sampleNames.append(sampleName);
-				}
-			}
-			intrumentNames.append(instrumentName);
-			seek(pos + instrumentSize + sampleHeaderSize * sampleCount + sumSampleLength);
 		}
 
-		m_tag->setComment(intrumentNames.toString("\n") + "\n" + sampleNames.toString("\n"));
-	}
-	catch (const Mod::ReadError&) {
-		setValid(false);
-	}
-}
+		ulong sumSampleLength = 0;
+		ulong sampleHeaderSize = 0;
+		if (sampleCount > 0)
+		{
+			if(!readU32L(sampleHeaderSize))
+			{
+				setValid(false);
+				return;
+			}
 
+			seek(pos + instrumentSize);
+
+			long sampleheaderPos = tell();
+			for (ushort j = 0; j < sampleCount; ++ j)
+			{
+				seek(sampleheaderPos + sampleHeaderSize * j);
+				READ_U32L_AS(length);
+				READ_U32L_AS(loopStart);
+				READ_U32L_AS(loopLength);
+				READ_BYTE_AS(volume);
+				READ_BYTE_AS(finetune);
+				READ_BYTE_AS(sampleType);
+				READ_BYTE_AS(panning);
+				READ_BYTE_AS(noteNumber);
+				READ_BYTE_AS(compression);
+				READ_STRING_AS(sampleName, 22);
+				
+				sumSampleLength += length;
+				sampleNames.append(sampleName);
+			}
+		}
+		intrumentNames.append(instrumentName);
+		seek(pos + instrumentSize + sampleHeaderSize * sampleCount + sumSampleLength);
 	}
+
+	d->tag.setComment(intrumentNames.toString("\n") + "\n" + sampleNames.toString("\n"));
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2011 by Mathias Panzenböck
-    email                : grosser.meister.morti@gmx.net
+    copyright           : (C) 2011 by Mathias Panzenböck
+    email               : grosser.meister.morti@gmx.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,17 +19,102 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#ifndef TAGLIB_XMFILETYPERESOLVER_H
-#define TAGLIB_XMFILETYPERESOLVER_H
+#include "xmtag.h"
 
-#include "fileref.h"
-#include "taglib_export.h"
+using namespace TagLib;
+using namespace XM;
 
-class TAGLIB_EXPORT XMFileTypeResolver : public TagLib::FileRef::FileTypeResolver {
-	TagLib::File *createFile(TagLib::FileName fileName,
-	        bool readAudioProperties,
-	        TagLib::AudioProperties::ReadStyle audioPropertiesStyle) const;
-	~XMFileTypeResolver() {}
+class XM::Tag::TagPrivate
+{
+public:
+	TagPrivate() {}
+
+	String title;
+	String comment;
+	String trackerName;
 };
 
-#endif
+XM::Tag::Tag() : TagLib::Tag()
+{
+	d = new TagPrivate;
+}
+
+XM::Tag::~Tag()
+{
+	delete d;
+}
+
+String XM::Tag::title() const
+{
+	return d->title;
+}
+
+String XM::Tag::artist() const
+{
+	return String::null;
+}
+
+String XM::Tag::album() const
+{
+	return String::null;
+}
+
+String XM::Tag::comment() const
+{
+	return d->comment;
+}
+
+String XM::Tag::genre() const
+{
+	return String::null;
+}
+
+uint XM::Tag::year() const
+{
+	return 0;
+}
+
+uint XM::Tag::track() const
+{
+	return 0;
+}
+
+String XM::Tag::trackerName() const
+{
+	return d->trackerName;
+}
+
+void XM::Tag::setTitle(const String &title)
+{
+	d->title = title;
+}
+
+void XM::Tag::setArtist(const String &)
+{
+}
+
+void XM::Tag::setAlbum(const String &)
+{
+}
+
+void XM::Tag::setComment(const String &comment)
+{
+	d->comment = comment;
+}
+
+void XM::Tag::setGenre(const String &)
+{
+}
+
+void XM::Tag::setYear(uint)
+{
+}
+
+void XM::Tag::setTrack(uint)
+{
+}
+
+void XM::Tag::setTrackerName(const String &trackerName)
+{
+	d->trackerName = trackerName;
+}

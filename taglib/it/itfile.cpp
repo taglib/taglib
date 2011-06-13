@@ -21,147 +21,165 @@
 
 #include "tstringlist.h"
 #include "itfile.h"
+#include "modfileprivate.h"
 
-namespace TagLib {
+using namespace TagLib;
+using namespace IT;
 
-	namespace IT {
+// Just copied this array from some example code.
+// I think this might be unneccesarry and only needed if
+// you convert IT to XM to keep your mod player more simple.
+static const uchar AUTOVIB_IT_TO_XM[] = {0, 3, 1, 4, 2, 0, 0, 0};
 
-uint8_t AUTOVIB_IT_TO_XM[] = {0, 3, 1, 4, 2, 0, 0, 0};
+class IT::File::FilePrivate
+{
+public:
+	FilePrivate(AudioProperties::ReadStyle propertiesStyle)
+		: tag(), properties(propertiesStyle)
+	{
+	}
 
-File::File(FileName file, bool readProperties,
-           AudioProperties::ReadStyle propertiesStyle) :
-		   Mod::File(file), m_tag(0), m_properties(0) {
-	read(readProperties, propertiesStyle);
+	Mod::Tag       tag;
+	IT::Properties properties;
+};
+
+IT::File::File(FileName file, bool readProperties,
+               AudioProperties::ReadStyle propertiesStyle) :
+		Mod::File(file),
+		d(new FilePrivate(propertiesStyle))
+{
+	read(readProperties);
 }
 
-File::~File() {
-	delete m_tag;
-	delete m_properties;
+IT::File::File(IOStream *stream, bool readProperties,
+               AudioProperties::ReadStyle propertiesStyle) :
+		Mod::File(stream),
+		d(new FilePrivate(propertiesStyle))
+{
+	read(readProperties);
 }
 
-Mod::Tag *File::tag() const {
-    return m_tag;
+IT::File::~File()
+{
+	delete d;
 }
 
-IT::Properties *File::audioProperties() const {
-    return m_properties;
+Mod::Tag *IT::File::tag() const
+{
+    return &d->tag;
 }
 
-bool File::save() {
-    return false;
+IT::Properties *IT::File::audioProperties() const
+{
+    return &d->properties;
 }
 
-void File::read(bool, AudioProperties::ReadStyle propertiesStyle) {
-	delete m_tag;
-	delete m_properties;
+bool IT::File::save()
+{
+	seek(4);
+	writeString(d->tag.title(), 26);
+	// TODO: write comment as instrument and sample names
+    return true;
+}
 
-	m_tag        = new Mod::Tag();
-	m_properties = new IT::Properties(propertiesStyle);
-
-	if (!isOpen())
+void IT::File::read(bool)
+{
+	if(!isOpen())
 		return;
 
-	try {
-		ByteVector mod_id(readBytes(4UL));
-		if (mod_id != "IMPM") {
-			throw Mod::ReadError();
-		}
+	seek(0);
+	READ_ASSERT(readBlock(4) == "IMPM");
+	READ_STRING(d->tag.setTitle, 26);
 
-		m_tag->setTitle(readString(26));
-		seek(2, Current);
+	seek(2, Current);
 
-		uint16_t length = readU16L();
-		uint16_t instrumentCount = readU16L();
-		uint16_t sampleCount = readU16L();
+	READ_U16L_AS(length);
+	READ_U16L_AS(instrumentCount);
+	READ_U16L_AS(sampleCount);
 		
-		m_properties->setSampleLength(length);
-		m_properties->setInstrumentCount(instrumentCount);
-		m_properties->setSampleCount(sampleCount);
-		m_properties->setPatternCount(readU16L());
-		m_properties->setVersion(readU16L());
-		m_properties->setCmwt(readU16L());
-		m_properties->setFlags(readU16L());
+	d->properties.setSampleLength(length);
+	d->properties.setInstrumentCount(instrumentCount);
+	d->properties.setSampleCount(sampleCount);
+	READ_U16L(d->properties.setPatternCount);
+	READ_U16L(d->properties.setVersion);
+	READ_U16L(d->properties.setCmwt);
+	READ_U16L(d->properties.setFlags);
 
-		uint16_t special = readU16L();
+	READ_U16L_AS(special);
 
-		m_properties->setSpecial(special);
-		m_properties->setBaseVolume(readU16L());
+	d->properties.setSpecial(special);
+	READ_U16L(d->properties.setBaseVolume);
 
-		seek(1, Current);
+	seek(1, Current);
 
-		m_properties->setTempo(readByte());
-		m_properties->setBpmSpeed(readByte());
+	READ_BYTE(d->properties.setTempo);
+	READ_BYTE(d->properties.setBpmSpeed);
 
-		StringList comment;
+	StringList comment;
 
-		for (uint16_t i = 0; i < instrumentCount; ++ i) {
-			seek(192 + length + (i << 2));
-			uint32_t instrumentOffset = readU32L();
-			seek(instrumentOffset);
+	for(ushort i = 0; i < instrumentCount; ++ i)
+	{
+		seek(192 + length + (i << 2));
+		READ_U32L_AS(instrumentOffset);
+		seek(instrumentOffset);
 
-			ByteVector instrumentMagic = readBytes(4);
-			if (instrumentMagic != "IMPS" && instrumentMagic != "IMPI") {
-				throw Mod::ReadError();
-			}
+		ByteVector instrumentMagic = readBlock(4);
+		// TODO: find out if it can really be both here and not just IMPI
+		READ_ASSERT(instrumentMagic == "IMPS" || instrumentMagic == "IMPI");
 
-			String dosFileName = readString(13);
+		READ_STRING_AS(dosFileName, 13);
 
-			seek(15, Current);
+		seek(15, Current);
 
-			String instrumentName = readString(26);
-
-			comment.append(instrumentName);
-		}
+		READ_STRING_AS(instrumentName, 26);
+		comment.append(instrumentName);
+	}
 		
-		for (uint16_t i = 0; i < sampleCount; ++ i) {
-			seek(192 + length + (instrumentCount << 2) + (i << 2));
-			uint32_t sampleOffset = readU32L();
-			seek(sampleOffset);
+	for(ushort i = 0; i < sampleCount; ++ i)
+	{
+		seek(192 + length + (instrumentCount << 2) + (i << 2));
+		READ_U32L_AS(sampleOffset);
+		
+		seek(sampleOffset);
 
-			ByteVector sampleMagic = readBytes(4);
-			if (sampleMagic != "IMPS" && sampleMagic != "IMPI") {
-				throw Mod::ReadError();
-			}
+		ByteVector sampleMagic = readBlock(4);
+		// TODO: find out if it can really be both here and not just IMPS
+		READ_ASSERT(sampleMagic == "IMPS" || sampleMagic == "IMPI");
 
-			String dosFileName = readString(13);
-			uint8_t globalVolume = readByte();
-			uint8_t sampleFlags  = readByte();
-			uint8_t sampleValume = readByte();
-			String sampleName = readString(26);
-			uint8_t sampleCvt = readByte();
-			uint8_t samplePanning = readByte();
-			uint32_t sampleLength = readU32L();
-			uint32_t repeatStart = readU32L();
-			uint32_t repeatStop = readU32L();
-			uint32_t c4speed = readU32L();
-			uint32_t sustainLoopStart = readU32L();
-			uint32_t sustainLoopEnd = readU32L();
-			uint32_t sampleDataOffset = readU32L();
-			uint8_t vibratoRate = readByte();
-			uint8_t vibratoDepth = readByte();
-			uint8_t vibratoSweep = readByte();
-			uint8_t vibratoType = readByte();
+		READ_STRING_AS(dosFileName, 13);
+		READ_BYTE_AS(globalVolume);
+		READ_BYTE_AS(sampleFlags);
+		READ_BYTE_AS(sampleValume);
+		READ_STRING_AS(sampleName, 26);
+		READ_BYTE_AS(sampleCvt);
+		READ_BYTE_AS(samplePanning);
+		READ_U32L_AS(sampleLength);
+		READ_U32L_AS(repeatStart);
+		READ_U32L_AS(repeatStop);
+		READ_U32L_AS(c4speed);
+		READ_U32L_AS(sustainLoopStart);
+		READ_U32L_AS(sustainLoopEnd);
+		READ_U32L_AS(sampleDataOffset);
+		READ_BYTE_AS(vibratoRate);
+		READ_BYTE_AS(vibratoDepth);
+		READ_BYTE_AS(vibratoSweep);
+		READ_BYTE_AS(vibratoType);
 
-			if (c4speed == 0) {
-				c4speed = 8363;
-			}
-			else if (c4speed < 256) {
-				c4speed = 256;
-			}
+		if(c4speed == 0)
+		{
+			c4speed = 8363;
+		}
+		else if(c4speed < 256)
+		{
+			c4speed = 256;
+		}
 			
-			vibratoDepth = vibratoDepth & 0x7F;
-			vibratoSweep = (vibratoSweep + 3) >> 2;
-			vibratoType  = AUTOVIB_IT_TO_XM[vibratoType & 0x07];
+		vibratoDepth = vibratoDepth & 0x7F;
+		vibratoSweep = (vibratoSweep + 3) >> 2;
+		vibratoType  = AUTOVIB_IT_TO_XM[vibratoType & 0x07];
 
-			comment.append(sampleName);
-		}
+		comment.append(sampleName);
+	}
 
-		m_tag->setComment(comment.toString("\n"));
-	}
-	catch (const Mod::ReadError&) {
-		setValid(false);
-	}
-}
-
-	}
+	d->tag.setComment(comment.toString("\n"));
 }
