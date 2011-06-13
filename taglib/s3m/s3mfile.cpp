@@ -40,7 +40,7 @@ public:
 
 S3M::File::File(FileName file, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
-  Mod::File(file),
+  Mod::FileBase(file),
   d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
@@ -48,7 +48,7 @@ S3M::File::File(FileName file, bool readProperties,
 
 S3M::File::File(IOStream *stream, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
-  Mod::File(stream),
+  Mod::FileBase(stream),
   d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);

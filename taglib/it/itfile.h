@@ -27,7 +27,7 @@
 #include "tfile.h"
 #include "audioproperties.h"
 #include "taglib_export.h"
-#include "modfile.h"
+#include "modfilebase.h"
 #include "modtag.h"
 #include "itproperties.h"
 
@@ -35,7 +35,7 @@ namespace TagLib {
 
   namespace IT {
 
-    class TAGLIB_EXPORT File : public Mod::File {
+    class TAGLIB_EXPORT File : public Mod::FileBase {
       public:
         /*!
          * Contructs a Impulse Tracker file from \a file. If \a readProperties

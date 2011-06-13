@@ -45,7 +45,7 @@ public:
 
 IT::File::File(FileName file, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::File(file),
+  Mod::FileBase(file),
   d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
@@ -53,7 +53,7 @@ IT::File::File(FileName file, bool readProperties,
 
 IT::File::File(IOStream *stream, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::File(stream),
+  Mod::FileBase(stream),
   d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);

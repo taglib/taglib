@@ -27,7 +27,7 @@
 #include "tfile.h"
 #include "audioproperties.h"
 #include "taglib_export.h"
-#include "modfile.h"
+#include "modfilebase.h"
 #include "xmtag.h"
 #include "xmproperties.h"
 
@@ -35,7 +35,7 @@ namespace TagLib {
 
   namespace XM {
 
-    class TAGLIB_EXPORT File : public Mod::File {
+    class TAGLIB_EXPORT File : public Mod::FileBase {
       public:
         /*!
          * Contructs a Extended Module file from \a file. If \a readProperties

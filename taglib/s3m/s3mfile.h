@@ -27,7 +27,7 @@
 #include "tfile.h"
 #include "audioproperties.h"
 #include "taglib_export.h"
-#include "modfile.h"
+#include "modfilebase.h"
 #include "modtag.h"
 #include "s3mproperties.h"
 
@@ -35,7 +35,7 @@ namespace TagLib {
 
   namespace S3M {
 
-    class TAGLIB_EXPORT File : public Mod::File {
+    class TAGLIB_EXPORT File : public Mod::FileBase {
       public:
         /*!
          * Contructs a ScreamTracker III file from \a file. If \a readProperties

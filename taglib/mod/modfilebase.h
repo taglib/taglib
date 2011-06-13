@@ -29,10 +29,10 @@
 
 namespace TagLib {
   namespace Mod {
-    class TAGLIB_EXPORT File : public TagLib::File {
+    class TAGLIB_EXPORT FileBase : public TagLib::File {
       protected:
-        File(FileName file);
-        File(IOStream *stream);
+        FileBase(FileName file);
+        FileBase(IOStream *stream);
 
         void writeString(const String &s, ulong size);
         bool readString(String &s, ulong size);

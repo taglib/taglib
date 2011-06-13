@@ -42,7 +42,7 @@ public:
 
 XM::File::File(FileName file, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::File(file),
+  Mod::FileBase(file),
   d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);
@@ -50,7 +50,7 @@ XM::File::File(FileName file, bool readProperties,
 
 XM::File::File(IOStream *stream, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::File(stream),
+  Mod::FileBase(stream),
   d(new FilePrivate(propertiesStyle))
 {
   read(readProperties);

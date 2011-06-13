@@ -101,7 +101,7 @@ set(tag_HDRS
   riff/aiff/aiffproperties.h
   riff/wav/wavfile.h
   riff/wav/wavproperties.h
-  mod/modfile.h
+  mod/modfilebase.h
   mod/modtag.h
   it/itfile.h
   it/itproperties.h
@@ -251,7 +251,7 @@ set(wav_SRCS
 )
 
 set(mod_SRCS
-  mod/modfile.cpp
+  mod/modfilebase.cpp
   mod/modtag.cpp
 )
 

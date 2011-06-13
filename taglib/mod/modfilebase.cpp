@@ -19,27 +19,27 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#include "modfile.h"
+#include "modfilebase.h"
 
 using namespace TagLib;
 using namespace Mod;
 
-Mod::File::File(FileName file) : TagLib::File(file)
+Mod::FileBase::FileBase(FileName file) : TagLib::File(file)
 {
 }
 
-Mod::File::File(IOStream *stream) : TagLib::File(stream)
+Mod::FileBase::FileBase(IOStream *stream) : TagLib::File(stream)
 {
 }
 
-void Mod::File::writeString(const String &s, ulong size)
+void Mod::FileBase::writeString(const String &s, ulong size)
 {
   ByteVector data(s.data(String::Latin1));
   data.resize(size, 0);
   writeBlock(data);
 }
 
-bool Mod::File::readString(String &s, ulong size)
+bool Mod::FileBase::readString(String &s, ulong size)
 {
   ByteVector data(readBlock(size));
   if(data.size() < size) return false;
@@ -54,7 +54,7 @@ bool Mod::File::readString(String &s, ulong size)
   return true;
 }
 
-bool Mod::File::readByte(uchar &byte)
+bool Mod::FileBase::readByte(uchar &byte)
 {
   ByteVector data(readBlock(1));
   if(data.size() < 1) return false;
@@ -62,7 +62,7 @@ bool Mod::File::readByte(uchar &byte)
   return true;
 }
 
-bool Mod::File::readU16L(ushort &number)
+bool Mod::FileBase::readU16L(ushort &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;
@@ -70,7 +70,7 @@ bool Mod::File::readU16L(ushort &number)
   return true;
 }
 
-bool Mod::File::readU32L(ulong &number) {
+bool Mod::FileBase::readU32L(ulong &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
   number = data.toUInt(false);
