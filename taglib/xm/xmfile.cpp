@@ -145,7 +145,7 @@ void XM::File::read(bool)
           return;
         }
 
-        if (instrumentSize >= (4+22+1+2))
+        if(instrumentSize >= (4+22+1+2))
         {
           if(!readU16L(sampleCount))
           {
@@ -158,7 +158,7 @@ void XM::File::read(bool)
 
     ulong sumSampleLength = 0;
     ulong sampleHeaderSize = 0;
-    if (sampleCount > 0)
+    if(sampleCount > 0)
     {
       if(!readU32L(sampleHeaderSize))
       {
@@ -169,7 +169,7 @@ void XM::File::read(bool)
       seek(pos + instrumentSize);
 
       long sampleheaderPos = tell();
-      for (ushort j = 0; j < sampleCount; ++ j)
+      for(ushort j = 0; j < sampleCount; ++ j)
       {
         seek(sampleheaderPos + sampleHeaderSize * j);
         READ_U32L_AS(length);

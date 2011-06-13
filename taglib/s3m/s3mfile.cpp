@@ -124,7 +124,7 @@ void S3M::File::read(bool)
   for(int i = 0; i < 32; ++ i)
   {
     READ_BYTE_AS(terminator);
-    if (terminator != 0xff) ++ channels;
+    if(terminator != 0xff) ++ channels;
   }
   d->properties.setChannels(channels);
 
