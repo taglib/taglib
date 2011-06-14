@@ -166,6 +166,10 @@ StringList FileRef::defaultFileExtensions()
   l.append("aiff");
   l.append("wav");
   l.append("ape");
+  l.append("mod");
+  l.append("module"); // alias for "mod"
+  l.append("nst"); // alias for "mod"
+  l.append("wow"); // alias for "mod"
   l.append("s3m");
   l.append("it");
   l.append("xm");
