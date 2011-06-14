@@ -150,7 +150,7 @@ bool MPEG::File::save(int tags)
 
 bool MPEG::File::save(int tags, bool stripOthers)
 {
-  return save(tags, stripOthers, 4);
+  return save(tags, stripOthers, 0);
 }
 
 bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)

@@ -269,7 +269,8 @@ namespace TagLib {
        * Render the tag back to binary data, suitable to be written to disk.
        *
        * The \a version parameter specifies the version of the rendered
-       * ID3v2 tag. It can be either 4 or 3.
+       * ID3v2 tag. It can be either 4 or 3. Set it to zero to get version 
+       * from header
        */
       // BIC: combine with the above method
       ByteVector render(int version) const;

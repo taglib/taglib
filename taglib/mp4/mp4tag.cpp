@@ -47,6 +47,11 @@ public:
   ItemListMap items;
 };
 
+MP4::Tag::Tag()
+{
+  d = new TagPrivate;
+}
+
 MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms)
 {
   d = new TagPrivate;

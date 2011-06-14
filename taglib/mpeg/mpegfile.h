@@ -184,7 +184,7 @@ namespace TagLib {
        * use of these tags will remain valid.  This also strips empty tags.
        *
        * The \a id3v2Version parameter specifies the version of the saved
-       * ID3v2 tag. It can be either 4 or 3.
+       * ID3v2 tag. It can be either 4 or 3. Set it to zero to get version from header.
        */
       // BIC: combine with the above method
       bool save(int tags, bool stripOthers, int id3v2Version);

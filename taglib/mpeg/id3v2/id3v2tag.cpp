@@ -331,7 +331,7 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 
 ByteVector ID3v2::Tag::render() const
 {
-  return render(4);
+  return render(0);
 }
 
 void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
@@ -437,6 +437,9 @@ ByteVector ID3v2::Tag::render(int version) const
   // padding, but does not include the tag's header or footer.
 
   ByteVector tagData;
+	
+  if(version == 0)
+    version = header()->majorVersion();
 
   if(version != 3 && version != 4) {
     debug("Unknown ID3v2 version, using ID3v2.4");
