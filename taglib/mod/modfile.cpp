@@ -71,11 +71,9 @@ Mod::Properties *Mod::File::audioProperties() const
 
 bool Mod::File::save()
 {
-  // note: if title starts with "Extended Module: "
-  // the file would look like an .xm file
   seek(0);
   writeString(d->tag.title(), 20, ' ');
-  // TODO: write comment as sample names
+  // TODO: write comment as instrument names
   return true;
 }
 
