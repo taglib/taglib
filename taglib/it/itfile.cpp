@@ -21,6 +21,7 @@
 
 #include "tstringlist.h"
 #include "itfile.h"
+#include "tdebug.h"
 #include "modfileprivate.h"
 
 using namespace TagLib;
@@ -76,6 +77,11 @@ IT::Properties *IT::File::audioProperties() const
 
 bool IT::File::save()
 {
+  if(readOnly())
+  {
+    debug("IT::File::save() - Cannot save to a read only file.");
+    return false;
+  }
   seek(4);
   writeString(d->tag.title(), 26);
   // TODO: write comment as instrument and sample names

@@ -21,6 +21,7 @@
 
 #include "s3mfile.h"
 #include "tstringlist.h"
+#include "tdebug.h"
 #include "modfileprivate.h"
 
 using namespace TagLib;
@@ -71,6 +72,11 @@ S3M::Properties *S3M::File::audioProperties() const
 
 bool S3M::File::save()
 {
+  if(readOnly())
+  {
+    debug("S3M::File::save() - Cannot save to a read only file.");
+    return false;
+  }
   // note: if title starts with "Extended Module: "
   // the file would look like an .xm file
   seek(0);

@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include "tstringlist.h"
+#include "tdebug.h"
 #include "xmfile.h"
 #include "modfileprivate.h"
 
@@ -73,6 +74,11 @@ XM::Properties *XM::File::audioProperties() const
 
 bool XM::File::save()
 {
+  if(readOnly())
+  {
+    debug("XM::File::save() - Cannot save to a read only file.");
+    return false;
+  }
   seek(17);
   writeString(d->tag.title(), 20);
   seek(1, Current);
