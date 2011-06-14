@@ -32,10 +32,10 @@ Mod::FileBase::FileBase(IOStream *stream) : TagLib::File(stream)
 {
 }
 
-void Mod::FileBase::writeString(const String &s, ulong size)
+void Mod::FileBase::writeString(const String &s, ulong size, char padding)
 {
   ByteVector data(s.data(String::Latin1));
-  data.resize(size, 0);
+  data.resize(size, padding);
   writeBlock(data);
 }
 
@@ -74,5 +74,20 @@ bool Mod::FileBase::readU32L(ulong &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
   number = data.toUInt(false);
+  return true;
+}
+
+bool Mod::FileBase::readU16B(ushort &number)
+{
+  ByteVector data(readBlock(2));
+  if(data.size() < 2) return false;
+  number = data.toUShort(true);
+  return true;
+}
+
+bool Mod::FileBase::readU32B(ulong &number) {
+  ByteVector data(readBlock(4));
+  if(data.size() < 4) return false;
+  number = data.toUInt(true);
   return true;
 }

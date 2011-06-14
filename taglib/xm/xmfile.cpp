@@ -36,7 +36,7 @@ public:
   {
   }
 
-  XM::Tag        tag;
+  Mod::Tag       tag;
   XM::Properties properties;
 };
 
@@ -61,7 +61,7 @@ XM::File::~File()
   delete d;
 }
 
-XM::Tag *XM::File::tag() const
+Mod::Tag *XM::File::tag() const
 {
   return &d->tag;
 }
@@ -131,27 +131,15 @@ void XM::File::read(bool)
       
     if(instrumentSize > 4)
     {
-      if(!readString(instrumentName, std::min(22UL, instrumentSize-4)))
-      {
-        setValid(false);
-        return;
-      }
+      READ_ASSERT(readString(instrumentName, std::min(22UL, instrumentSize-4)));
 
       if(instrumentSize >= (4+22+1))
       {
-        if(!readByte(instrumentType))
-        {
-          setValid(false);
-          return;
-        }
+        READ_ASSERT(readByte(instrumentType));
 
         if(instrumentSize >= (4+22+1+2))
         {
-          if(!readU16L(sampleCount))
-          {
-            setValid(false);
-            return;
-          }
+          READ_ASSERT(readU16L(sampleCount));
         }
       }
     }

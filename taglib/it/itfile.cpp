@@ -119,7 +119,7 @@ void IT::File::read(bool)
 
   for(ushort i = 0; i < instrumentCount; ++ i)
   {
-    seek(192 + length + (i << 2));
+    seek(192L + length + ((long)i << 2));
     READ_U32L_AS(instrumentOffset);
     seek(instrumentOffset);
 
@@ -137,7 +137,7 @@ void IT::File::read(bool)
     
   for(ushort i = 0; i < sampleCount; ++ i)
   {
-    seek(192 + length + (instrumentCount << 2) + (i << 2));
+    seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     READ_U32L_AS(sampleOffset);
     
     seek(sampleOffset);
@@ -182,4 +182,5 @@ void IT::File::read(bool)
   }
 
   d->tag.setComment(comment.toString("\n"));
+  d->tag.setTrackerName("Impulse Tracker");
 }

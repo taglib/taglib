@@ -22,8 +22,6 @@
 #ifndef TAGLIB_ITFILE_H
 #define TAGLIB_ITFILE_H
 
-#include <stdint.h>
-
 #include "tfile.h"
 #include "audioproperties.h"
 #include "taglib_export.h"

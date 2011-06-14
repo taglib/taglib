@@ -19,42 +19,40 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#ifndef TAGLIB_XMTAG_H
-#define TAGLIB_XMTAG_H
+#ifndef TAGLIB_MODPROPERTIES_H
+#define TAGLIB_MODPROPERTIES_H
 
-#include "modtag.h"
+#include "taglib.h"
+#include "audioproperties.h"
 
 namespace TagLib {
-  namespace XM {
-    class Tag : public TagLib::Tag {
-      public:
-        Tag();
-        virtual ~Tag();
+  namespace Mod {
+    class TAGLIB_EXPORT Properties : public AudioProperties {
+      friend class File;
+    public:
+      Properties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~Properties();
+      
+      int length()     const;
+      int bitrate()    const;
+      int sampleRate() const;
+      int channels()   const;
 
-        String title()   const;
-        String artist()  const;
-        String album()   const;
-        String comment() const;
-        String genre()   const;
-        uint   year()    const;
-        uint   track()   const;
-        String trackerName() const;
+      uint instrumentCount() const;
+      uint patternCount()    const;
 
-        void setTitle  (const String &title);
-        void setArtist (const String &artist);
-        void setAlbum  (const String &album);
-        void setComment(const String &comment);
-        void setGenre  (const String &genre);
-        void setYear (uint year);
-        void setTrack(uint track);
-        void setTrackerName(const String &trackerName);
+    protected:
+      void setChannels(int channels);
 
-      private:
-        Tag(const Tag &);
-        Tag &operator=(const Tag &);
+      void setInstrumentCount(uint sampleCount);
+      void setPatternCount(uint patternCount);
 
-        class TagPrivate;
-        TagPrivate *d;
+    private:
+      Properties(const Properties&);
+      Properties &operator=(const Properties&);
+
+      class PropertiesPrivate;
+      PropertiesPrivate *d;
     };
   }
 }

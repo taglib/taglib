@@ -19,8 +19,8 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#ifndef TAGLIB_MODFILE_H
-#define TAGLIB_MODFILE_H
+#ifndef TAGLIB_MODFILEBASE_H
+#define TAGLIB_MODFILEBASE_H
 
 #include "taglib.h"
 #include "tfile.h"
@@ -34,11 +34,13 @@ namespace TagLib {
         FileBase(FileName file);
         FileBase(IOStream *stream);
 
-        void writeString(const String &s, ulong size);
+        void writeString(const String &s, ulong size, char padding = 0);
         bool readString(String &s, ulong size);
         bool readByte(uchar &byte);
         bool readU16L(ushort &number);
         bool readU32L(ulong &number);
+        bool readU16B(ushort &number);
+        bool readU32B(ulong &number);
     };
   }
 }

@@ -31,6 +31,7 @@ public:
 
   String title;
   String comment;
+  String trackerName;
 };
 
 Mod::Tag::Tag() : TagLib::Tag()
@@ -78,6 +79,11 @@ uint Mod::Tag::track() const
   return 0;
 }
 
+String Mod::Tag::trackerName() const
+{
+  return d->trackerName;
+}
+
 void Mod::Tag::setTitle(const String &title)
 {
   d->title = title;
@@ -106,4 +112,9 @@ void Mod::Tag::setYear(uint)
 
 void Mod::Tag::setTrack(uint)
 {
+}
+
+void Mod::Tag::setTrackerName(const String &trackerName)
+{
+  d->trackerName = trackerName;
 }

@@ -49,6 +49,7 @@
 #include "aifffile.h"
 #include "wavfile.h"
 #include "apefile.h"
+#include "modfile.h"
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
@@ -266,6 +267,9 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "APE")
       return new APE::File(fileName, readAudioProperties, audioPropertiesStyle);
+    // module, nst and wow are possible but uncommon extensions
+    if(ext == "MOD" || ext == "MODULE" || ext == "NST" || ext == "WOW")
+      return new Mod::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "S3M")
       return new S3M::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "IT")

@@ -22,13 +22,11 @@
 #ifndef TAGLIB_XMFILE_H
 #define TAGLIB_XMFILE_H
 
-#include <stdint.h>
-
 #include "tfile.h"
 #include "audioproperties.h"
 #include "taglib_export.h"
 #include "modfilebase.h"
-#include "xmtag.h"
+#include "modtag.h"
 #include "xmproperties.h"
 
 namespace TagLib {
@@ -60,7 +58,7 @@ namespace TagLib {
          */
         virtual ~File();
 
-        XM::Tag *tag() const;
+        Mod::Tag *tag() const;
 
         /*!
          * Returns the XM::Properties for this file. If no audio properties

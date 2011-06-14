@@ -38,6 +38,7 @@ namespace TagLib {
         String genre()   const;
         uint   year()    const;
         uint   track()   const;
+		String trackerName() const;
 
         void setTitle  (const String &title);
         void setArtist (const String &artist);
@@ -46,6 +47,7 @@ namespace TagLib {
         void setGenre  (const String &genre);
         void setYear (uint year);
         void setTrack(uint track);
+        void setTrackerName(const String &trackerName);
 
       private:
         Tag(const Tag &);

@@ -102,14 +102,15 @@ set(tag_HDRS
   riff/wav/wavfile.h
   riff/wav/wavproperties.h
   mod/modfilebase.h
+  mod/modfile.h
   mod/modtag.h
+  mod/modproperties.h
   it/itfile.h
   it/itproperties.h
   s3m/s3mfile.h
   s3m/s3mproperties.h
   xm/xmfile.h
   xm/xmproperties.h
-  xm/xmtag.h
 )
 if(WITH_ASF)
   set(tag_HDRS ${tag_HDRS}
@@ -252,7 +253,9 @@ set(wav_SRCS
 
 set(mod_SRCS
   mod/modfilebase.cpp
+  mod/modfile.cpp
   mod/modtag.cpp
+  mod/modproperties.cpp
 )
 
 set(s3m_SRCS
@@ -267,7 +270,6 @@ set(it_SRCS
 
 set(xm_SRCS
   xm/xmfile.cpp
-  xm/xmtag.cpp
   xm/xmproperties.cpp
 )
 

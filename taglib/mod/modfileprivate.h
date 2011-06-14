@@ -40,6 +40,8 @@
 #define READ_BYTE(setter) READ(setter,uchar,readByte)
 #define READ_U16L(setter) READ(setter,ushort,readU16L)
 #define READ_U32L(setter) READ(setter,ulong,readU32L)
+#define READ_U16B(setter) READ(setter,ushort,readU16B)
+#define READ_U32B(setter) READ(setter,ulong,readU32B)
 
 #define READ_STRING(setter,size) \
   { \
@@ -55,6 +57,8 @@
 #define READ_BYTE_AS(name) READ_AS(uchar,name,readByte)
 #define READ_U16L_AS(name) READ_AS(ushort,name,readU16L)
 #define READ_U32L_AS(name) READ_AS(ulong,name,readU32L)
+#define READ_U16B_AS(name) READ_AS(ushort,name,readU16B)
+#define READ_U32B_AS(name) READ_AS(ulong,name,readU32B)
 
 #define READ_STRING_AS(name,size) \
   String name; \

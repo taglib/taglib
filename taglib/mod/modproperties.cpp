@@ -19,102 +19,78 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#include "xmtag.h"
+#include "modproperties.h"
 
 using namespace TagLib;
-using namespace XM;
+using namespace Mod;
 
-class XM::Tag::TagPrivate
+class Mod::Properties::PropertiesPrivate
 {
 public:
-  TagPrivate() {}
-
-  String title;
-  String comment;
-  String trackerName;
+  PropertiesPrivate() :
+    channels(0),
+    instrumentCount(0),
+    patternCount(0)
+  {
+  }
+  
+  int  channels;
+  uint instrumentCount;
+  uint patternCount;
 };
 
-XM::Tag::Tag() : TagLib::Tag()
+Mod::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
+  AudioProperties(propertiesStyle),
+  d(new PropertiesPrivate)
 {
-  d = new TagPrivate;
 }
 
-XM::Tag::~Tag()
+Mod::Properties::~Properties()
 {
   delete d;
 }
 
-String XM::Tag::title() const
-{
-  return d->title;
-}
-
-String XM::Tag::artist() const
-{
-  return String::null;
-}
-
-String XM::Tag::album() const
-{
-  return String::null;
-}
-
-String XM::Tag::comment() const
-{
-  return d->comment;
-}
-
-String XM::Tag::genre() const
-{
-  return String::null;
-}
-
-uint XM::Tag::year() const
+int Mod::Properties::length() const
 {
   return 0;
 }
 
-uint XM::Tag::track() const
+int Mod::Properties::bitrate() const
 {
   return 0;
 }
 
-String XM::Tag::trackerName() const
+int Mod::Properties::sampleRate() const
 {
-  return d->trackerName;
+  return 0;
 }
 
-void XM::Tag::setTitle(const String &title)
+int Mod::Properties::channels() const
 {
-  d->title = title;
+  return d->channels;
 }
 
-void XM::Tag::setArtist(const String &)
+uint Mod::Properties::instrumentCount() const
 {
+  return d->instrumentCount;
 }
 
-void XM::Tag::setAlbum(const String &)
+uint Mod::Properties::patternCount() const
 {
+  return d->patternCount;
 }
 
-void XM::Tag::setComment(const String &comment)
+void Mod::Properties::setChannels(int channels)
 {
-  d->comment = comment;
+  d->channels = channels;
 }
 
-void XM::Tag::setGenre(const String &)
+void Mod::Properties::setInstrumentCount(uint instrumentCount)
 {
+  d->instrumentCount = instrumentCount;
 }
 
-void XM::Tag::setYear(uint)
+void Mod::Properties::setPatternCount(uint patternCount)
 {
-}
-
-void XM::Tag::setTrack(uint)
-{
-}
-
-void XM::Tag::setTrackerName(const String &trackerName)
-{
-  d->trackerName = trackerName;
+  d->patternCount = patternCount;
 }

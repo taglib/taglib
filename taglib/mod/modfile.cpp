@@ -19,14 +19,14 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#include "s3mfile.h"
+#include "modfile.h"
 #include "tstringlist.h"
 #include "modfileprivate.h"
 
 using namespace TagLib;
-using namespace S3M;
+using namespace Mod;
 
-class S3M::File::FilePrivate
+class Mod::File::FilePrivate
 {
 public:
   FilePrivate(AudioProperties::ReadStyle propertiesStyle)
@@ -35,10 +35,10 @@ public:
   }
 
   Mod::Tag        tag;
-  S3M::Properties properties;
+  Mod::Properties properties;
 };
 
-S3M::File::File(FileName file, bool readProperties,
+Mod::File::File(FileName file, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(file),
   d(new FilePrivate(propertiesStyle))
@@ -46,7 +46,7 @@ S3M::File::File(FileName file, bool readProperties,
   read(readProperties);
 }
 
-S3M::File::File(IOStream *stream, bool readProperties,
+Mod::File::File(IOStream *stream, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(stream),
   d(new FilePrivate(propertiesStyle))
@@ -54,109 +54,111 @@ S3M::File::File(IOStream *stream, bool readProperties,
   read(readProperties);
 }
 
-S3M::File::~File()
+Mod::File::~File()
 {
   delete d;
 }
 
-Mod::Tag *S3M::File::tag() const
+Mod::Tag *Mod::File::tag() const
 {
   return &d->tag;
 }
 
-S3M::Properties *S3M::File::audioProperties() const
+Mod::Properties *Mod::File::audioProperties() const
 {
   return &d->properties;
 }
 
-bool S3M::File::save()
+bool Mod::File::save()
 {
   // note: if title starts with "Extended Module: "
   // the file would look like an .xm file
   seek(0);
-  writeString(d->tag.title(), 28);
+  writeString(d->tag.title(), 20, ' ');
   // TODO: write comment as sample names
   return true;
 }
 
-void S3M::File::read(bool)
+void Mod::File::read(bool)
 {
   if(!isOpen())
     return;
 
-  READ_STRING(d->tag.setTitle, 28);
-  READ_BYTE_AS(mark);
-  READ_BYTE_AS(type);
+  seek(1080);
+  ByteVector modId = readBlock(4);
+  READ_ASSERT(modId.size() == 4);
 
-  READ_ASSERT(mark == 0x1A && type == 0x10);
-
-  seek(32);
-
-  READ_U16L_AS(length);
-  READ_U16L_AS(sampleCount);
-
-  d->properties.setSampleLength(length);
-  d->properties.setSampleCount(sampleCount);
-
-  READ_U16L(d->properties.setPatternCount);
-  READ_U16L(d->properties.setFlags);
-  READ_U16L(d->properties.setVersion);
-  READ_U16L(d->properties.setSamplesType);
-
-  READ_ASSERT(readBlock(4) == "SCRM");
-
-  READ_BYTE_AS(baseVolume);
-  d->properties.setBaseVolume((int)baseVolume << 1);
-
-  READ_BYTE(d->properties.setTempo);
-  READ_BYTE(d->properties.setBpmSpeed);
-
-  READ_BYTE_AS(stereo);
-  d->properties.setStereo((stereo & 0x80) != 0);
-  READ_BYTE(d->properties.setUltraClick);
-
-  READ_BYTE_AS(usePanningValues);
-  d->properties.setUsePanningValues(usePanningValues == 0xFC);
-
-  seek(10, Current);
-
-  int channels = 0;
-  for(int i = 0; i < 32; ++ i)
+  int channels    =  4;
+  int instruments = 31;
+  if(modId == "M.K." || modId == "M!K!" || modId == "M&K!" || modId == "N.T.")
   {
-    READ_BYTE_AS(terminator);
-    if(terminator != 0xff) ++ channels;
+    d->tag.setTrackerName("ProTracker");
+    channels = 4;
+  }
+  else if(modId.startsWith("FLT") || modId.startsWith("TDZ"))
+  {
+    d->tag.setTrackerName("StarTrekker");
+    char digit = modId[3];
+    READ_ASSERT(digit >= '0' && digit <= '9');
+    channels = digit - '0';
+  }
+  else if(modId.endsWith("CHN"))
+  {
+    d->tag.setTrackerName("StarTrekker");
+    char digit = modId[0];
+    READ_ASSERT(digit >= '0' && digit <= '9');
+    channels = digit - '0';
+  }
+  else if(modId == "CD81" || modId == "OKTA")
+  {
+    d->tag.setTrackerName("Atari Oktalyzer");
+    channels = 8;
+  }
+  else if(modId.endsWith("CH") || modId.endsWith("CN"))
+  {
+    d->tag.setTrackerName("TakeTracker");
+    char digit = modId[0];
+    READ_ASSERT(digit >= '0' && digit <= '9');
+    channels = (digit - '0') * 10;
+    digit = modId[1];
+    READ_ASSERT(digit >= '0' && digit <= '9');
+    channels += digit - '0';
+  }
+  else
+  {
+    d->tag.setTrackerName("NoiseTracker"); // probably
+    channels    =  4;
+    instruments = 15;
   }
   d->properties.setChannels(channels);
+  d->properties.setInstrumentCount(instruments);
 
-  seek(channels, Current);
+  seek(0);
+  READ_STRING(d->tag.setTitle, 20);
 
   StringList comment;
-  for(ushort i = 0; i < sampleCount; ++ i)
+  for(int i = 0; i < instruments; ++ i)
   {
-    seek(96L + length + ((long)i << 1));
+    READ_STRING_AS(instrumentName, 22);
+    READ_U16B_AS(instrumentLength);
 
-    READ_U16L_AS(instrumentOffset);
-    seek((long)instrumentOffset << 4);
+    READ_BYTE_AS(fineTuneByte);
+    int fineTune = fineTuneByte & 0xF;
+    // > 7 means nagative value
+    if(fineTune > 7) fineTune -= 16;
 
-    READ_BYTE_AS(sampleType);
-    READ_STRING_AS(dosFileName, 13);
-    READ_U16L_AS(sampleOffset);
-    READ_U32L_AS(sampleLength);
-    READ_U32L_AS(repeatStart);
-    READ_U32L_AS(repeatStop);
-    READ_BYTE_AS(sampleVolume);
+    READ_BYTE_AS(volume);
+    if(volume > 64) volume = 64;
 
-    seek(2, Current);
+    READ_U16B_AS(repeatStart);
+    // (int)repatStart << 1;
+    READ_U16B_AS(repatLength);
+    // (int)repatLength << 1;
 
-    READ_BYTE_AS(sampleFlags);
-    READ_U32L_AS(baseFrequency);
-
-    seek(12, Current);
-
-    READ_STRING_AS(sampleName, 28);
-    comment.append(sampleName);
+    comment.append(instrumentName);
   }
 
+  READ_BYTE(d->properties.setPatternCount);
+
   d->tag.setComment(comment.toString("\n"));
-  d->tag.setTrackerName("ScreamTracker III");
 }

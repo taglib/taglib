@@ -19,24 +19,24 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#ifndef TAGLIB_S3MFILE_H
-#define TAGLIB_S3MFILE_H
+#ifndef TAGLIB_MODFILE_H
+#define TAGLIB_MODFILE_H
 
 #include "tfile.h"
 #include "audioproperties.h"
 #include "taglib_export.h"
 #include "modfilebase.h"
 #include "modtag.h"
-#include "s3mproperties.h"
+#include "modproperties.h"
 
 namespace TagLib {
 
-  namespace S3M {
+  namespace Mod {
 
-    class TAGLIB_EXPORT File : public Mod::FileBase {
+    class TAGLIB_EXPORT File : public TagLib::Mod::FileBase {
       public:
         /*!
-         * Contructs a ScreamTracker III file from \a file. If \a readProperties
+         * Contructs a Protracker file from \a file. If \a readProperties
          * is true the file's audio properties will also be read using
          * \a propertiesStyle. If false, \a propertiesStyle is ignored.
          */
@@ -45,7 +45,7 @@ namespace TagLib {
              AudioProperties::Average);
 
         /*!
-         * Contructs a ScreamTracker III file from \a stream. If \a readProperties
+         * Contructs a Protracker file from \a stream. If \a readProperties
          * is true the file's audio properties will also be read using
          * \a propertiesStyle. If false, \a propertiesStyle is ignored.
          */
@@ -61,16 +61,16 @@ namespace TagLib {
         Mod::Tag *tag() const;
 
         /*!
-         * Returns the S3M::Properties for this file. If no audio properties
+         * Returns the Mod::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */
-        S3M::Properties *audioProperties() const;
+        Mod::Properties *audioProperties() const;
 
         /*!
          * Save the file.
          * This is the same as calling save(AllTags);
          *
-         * \note Saving ScreamTracker III tags is not supported.
+         * \note Saving Protracker tags is not supported.
          */
         bool save();
 
