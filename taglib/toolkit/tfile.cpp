@@ -30,6 +30,25 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+# include <wchar.h>
+# include <windows.h>
+# include <io.h>
+# define ftruncate _chsize
+#else
+# include <unistd.h>
+#endif
+
+#include <stdlib.h>
+
+#ifndef R_OK
+# define R_OK 4
+#endif
+#ifndef W_OK
+# define W_OK 2
+#endif
 
 using namespace TagLib;
 
