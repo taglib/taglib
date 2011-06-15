@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
 
 using namespace TagLib;
 
@@ -302,12 +303,14 @@ long File::length()
 
 bool File::isReadable(const char *file)
 {
-  return access(file, R_OK) == 0;
+  std::ofstream f(file, std::ios_base::binary|std::ios_base::out);
+  return f.is_open();
 }
 
 bool File::isWritable(const char *file)
 {
-  return access(file, W_OK) == 0;
+  std::ifstream f(file, std::ios_base::binary|std::ios_base::in);
+  return f.is_open();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
