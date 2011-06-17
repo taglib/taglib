@@ -19,6 +19,10 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/flac
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/flac
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/wavpack
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mod
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/s3m
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/it
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/xm
 )
 
 SET(test_runner_SRCS
@@ -47,6 +51,7 @@ SET(test_runner_SRCS
   test_apetag.cpp
   test_wav.cpp
   test_wavpack.cpp
+  test_mod.cpp
 )
 IF(WITH_MP4)
    SET(test_runner_SRCS ${test_runner_SRCS}
@@ -67,5 +72,4 @@ ADD_CUSTOM_TARGET(check
     ./test_runner
     DEPENDS test_runner
 )
-
 endif(BUILD_TESTS)

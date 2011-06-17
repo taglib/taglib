@@ -78,7 +78,9 @@ bool Mod::File::save()
     return false;
   }
   seek(0);
-  writeString(d->tag.title(), 20, ' ');
+  // Even though the spec says the title is padded with space
+  // common tracker padd with '\0', so why shouldn't I?
+  writeString(d->tag.title(), 20);
   // TODO: write comment as instrument names
   return true;
 }
@@ -130,6 +132,8 @@ void Mod::File::read(bool)
   }
   else
   {
+    // Not sure if this is correct. I'd need a file
+    // created with NoiseTracker to check this.
     d->tag.setTrackerName("NoiseTracker"); // probably
     channels    =  4;
     instruments = 15;

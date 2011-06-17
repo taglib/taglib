@@ -27,11 +27,6 @@
 using namespace TagLib;
 using namespace IT;
 
-// Just copied this array from some example code.
-// I think this might be unneccesarry and only needed if
-// you convert IT to XM to keep your mod player more simple.
-static const uchar AUTOVIB_IT_TO_XM[] = {0, 3, 1, 4, 2, 0, 0, 0};
-
 class IT::File::FilePrivate
 {
 public:
@@ -170,20 +165,7 @@ void IT::File::read(bool)
     READ_BYTE_AS(vibratoDepth);
     READ_BYTE_AS(vibratoSweep);
     READ_BYTE_AS(vibratoType);
-
-    if(c4speed == 0)
-    {
-      c4speed = 8363;
-    }
-    else if(c4speed < 256)
-    {
-      c4speed = 256;
-    }
-      
-    vibratoDepth = vibratoDepth & 0x7F;
-    vibratoSweep = (vibratoSweep + 3) >> 2;
-    vibratoType  = AUTOVIB_IT_TO_XM[vibratoType & 0x07];
-
+    
     comment.append(sampleName);
   }
 
