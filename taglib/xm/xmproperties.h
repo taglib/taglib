@@ -39,7 +39,7 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort sampleLength()    const;
+      ushort tableLength()     const;
       ushort version()         const;
       ushort restartPosition() const;
       ushort patternCount()    const;
@@ -49,7 +49,7 @@ namespace TagLib {
       ushort bpmSpeed()        const;
 
     protected:
-      void setSampleLength(int sampleLength);
+      void setTableLength(ushort tableLength);
       void setChannels(int channels);
 
       void setVersion(ushort version);

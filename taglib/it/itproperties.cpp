@@ -28,7 +28,7 @@ class IT::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    sampleLength(0),
+    tableLength(0),
     stereo(false),
     instrumentCount(0),
     sampleCount(0),
@@ -43,7 +43,7 @@ public:
   {
   }
 
-  ushort sampleLength;
+  ushort tableLength;
   bool   stereo;
   ushort instrumentCount;
   ushort sampleCount;
@@ -88,9 +88,9 @@ int IT::Properties::channels() const
   return d->stereo ? 2 : 1;
 }
 
-ushort IT::Properties::sampleLength() const
+ushort IT::Properties::tableLength() const
 {
-  return d->sampleLength;
+  return d->tableLength;
 }
 
 bool IT::Properties::stereo() const
@@ -148,9 +148,9 @@ uchar IT::Properties::bpmSpeed() const
   return d->bpmSpeed;
 }
 
-void IT::Properties::setSampleLength(ushort sampleLength)
+void IT::Properties::setTableLength(ushort tableLength)
 {
-  d->sampleLength = sampleLength;
+  d->tableLength = tableLength;
 }
 
 void IT::Properties::setStereo(bool stereo)

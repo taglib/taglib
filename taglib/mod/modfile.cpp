@@ -78,8 +78,6 @@ bool Mod::File::save()
     return false;
   }
   seek(0);
-  // Even though the spec says the title is padded with space
-  // common tracker padd with '\0', so why shouldn't I?
   writeString(d->tag.title(), 20);
   // TODO: write comment as instrument names
   return true;
@@ -148,7 +146,8 @@ void Mod::File::read(bool)
   for(int i = 0; i < instruments; ++ i)
   {
     READ_STRING_AS(instrumentName, 22);
-    READ_U16B_AS(instrumentLength);
+    // value in words, * 2 (<< 1) for bytes:
+    READ_U16B_AS(sampleLength);
 
     READ_BYTE_AS(fineTuneByte);
     int fineTune = fineTuneByte & 0xF;
@@ -157,16 +156,17 @@ void Mod::File::read(bool)
 
     READ_BYTE_AS(volume);
     if(volume > 64) volume = 64;
+    // volume in decibels: 20 * log10(volume / 64)
 
+    // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(repeatStart);
-    // (int)repatStart << 1;
+    // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(repatLength);
-    // (int)repatLength << 1;
 
     comment.append(instrumentName);
   }
 
-  READ_BYTE(d->properties.setPatternCount);
+  READ_BYTE(d->properties.setTableLength);
 
   d->tag.setComment(comment.toString("\n"));
 }

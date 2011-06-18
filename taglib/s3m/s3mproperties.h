@@ -38,7 +38,7 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort sampleLength() const;
+      ushort tableLength()  const;
       bool   stereo()       const;
       ushort sampleCount()  const;
       ushort patternCount() const;
@@ -52,7 +52,7 @@ namespace TagLib {
       bool   usePanningValues() const;
 
     protected:
-      void setSampleLength(ushort sampleLength);
+      void setTableLength(ushort tableLength);
       void setChannels(int channels);
 
       void setStereo      (bool stereo);

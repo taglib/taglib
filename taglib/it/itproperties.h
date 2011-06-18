@@ -38,7 +38,7 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort sampleLength()    const;
+      ushort tableLength()    const;
       bool   stereo()          const;
       ushort instrumentCount() const;
       ushort sampleCount()     const;
@@ -52,7 +52,7 @@ namespace TagLib {
       uchar  bpmSpeed()        const;
 
     protected:
-      void setSampleLength(ushort sampleLength);
+      void setTableLength(ushort tableLength);
       void setStereo(bool stereo);
 
       void setInstrumentCount(ushort instrumentCount);

@@ -98,7 +98,7 @@ void IT::File::read(bool)
   READ_U16L_AS(instrumentCount);
   READ_U16L_AS(sampleCount);
     
-  d->properties.setSampleLength(length);
+  d->properties.setTableLength(length);
   d->properties.setInstrumentCount(instrumentCount);
   d->properties.setSampleCount(sampleCount);
   READ_U16L(d->properties.setPatternCount);

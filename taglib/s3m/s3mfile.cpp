@@ -101,7 +101,7 @@ void S3M::File::read(bool)
   READ_U16L_AS(length);
   READ_U16L_AS(sampleCount);
 
-  d->properties.setSampleLength(length);
+  d->properties.setTableLength(length);
   d->properties.setSampleCount(sampleCount);
 
   READ_U16L(d->properties.setPatternCount);

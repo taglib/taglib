@@ -28,7 +28,7 @@ class XM::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    sampleLength(0),
+    tableLength(0),
     channels(0),
     version(0),
     restartPosition(0),
@@ -40,7 +40,7 @@ public:
   {
   }
   
-  ushort sampleLength;
+  ushort tableLength;
   int    channels;
   ushort version;
   ushort restartPosition;
@@ -82,9 +82,9 @@ int XM::Properties::channels() const
   return d->channels;
 }
 
-ushort XM::Properties::sampleLength() const
+ushort XM::Properties::tableLength() const
 {
-  return d->sampleLength;
+  return d->tableLength;
 }
 
 ushort XM::Properties::version() const
@@ -122,9 +122,9 @@ ushort XM::Properties::bpmSpeed() const
   return d->bpmSpeed;
 }
 
-void XM::Properties::setSampleLength(int sampleLength)
+void XM::Properties::setTableLength(ushort tableLength)
 {
-  d->sampleLength = sampleLength;
+  d->tableLength = tableLength;
 }
 
 void XM::Properties::setChannels(int channels)

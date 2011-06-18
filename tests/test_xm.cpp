@@ -21,15 +21,15 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <string>
-#include <modfile.h>
+#include <xmfile.h>
 #include "utils.h"
 
 using namespace std;
 using namespace TagLib;
 
-class TestMod : public CppUnit::TestFixture
+class TestXM : public CppUnit::TestFixture
 {
-  CPPUNIT_TEST_SUITE(TestMod);
+  CPPUNIT_TEST_SUITE(TestXM);
   CPPUNIT_TEST(testRead);
   CPPUNIT_TEST(testChangeTitle);
   CPPUNIT_TEST_SUITE_END();
@@ -37,14 +37,14 @@ class TestMod : public CppUnit::TestFixture
 public:
   void testRead()
   {
-    testRead(TEST_FILE_PATH_C("test.mod"), "title of song");
+    testRead(TEST_FILE_PATH_C("test.xm"), "title of song");
   }
 
   void testChangeTitle()
   {
-    ScopedFileCopy copy("test", ".mod");
+    ScopedFileCopy copy("test", ".xm");
     {
-      Mod::File file(copy.fileName().c_str());
+      XM::File file(copy.fileName().c_str());
       CPPUNIT_ASSERT(file.tag() != 0);
       file.tag()->setTitle("changed title");
       CPPUNIT_ASSERT(file.save());
@@ -52,17 +52,17 @@ public:
     testRead(copy.fileName().c_str(), "changed title");
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
-      TEST_FILE_PATH_C("changed_title.mod")));
+      TEST_FILE_PATH_C("changed_title.xm")));
   }
 
 private:
   void testRead(FileName fileName, const String &title)
   {
-    Mod::File file(fileName);
+    XM::File file(fileName);
 
     CPPUNIT_ASSERT(file.isValid());
 
-    Mod::Properties *p = file.audioProperties();
+    XM::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
     
     CPPUNIT_ASSERT(0 != p);
@@ -72,8 +72,14 @@ private:
     CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL(31U, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL(1U, p->tableLength());
+	CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->tableLength());
+	CPPUNIT_ASSERT_EQUAL((TagLib::ushort)260, p->version());
+	CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0, p->restartPosition());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->patternCount());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)128, p->instrumentCount());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->flags());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  6, p->tempo());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)125, p->bpmSpeed());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
     CPPUNIT_ASSERT_EQUAL(String::null, t->artist());
     CPPUNIT_ASSERT_EQUAL(String::null, t->album());
@@ -83,13 +89,22 @@ private:
       "comments in\n"
       "module file formats.\n"
       "-+-+-+-+-+-+-+-+-+-+-+\n"
-      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+	  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+	  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+	  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+	  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+	  "\n\n\n"
+	  "Sample\n"
+	  "names\n"
+	  "are sometimes\n"
+	  "also abused as\n"
+	  "comments."
     ), t->comment());
     CPPUNIT_ASSERT_EQUAL(String::null, t->genre());
     CPPUNIT_ASSERT_EQUAL(0U, t->year());
     CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String("StarTrekker"), t->trackerName());
+    CPPUNIT_ASSERT_EQUAL(String("MilkyTracker        "), t->trackerName());
   }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMod);
+CPPUNIT_TEST_SUITE_REGISTRATION(TestXM);

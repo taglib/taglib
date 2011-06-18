@@ -101,7 +101,7 @@ void XM::File::read(bool)
   READ_STRING(d->tag.setTrackerName, 20);
   READ_U16L(d->properties.setVersion);
   READ_U32L_AS(headerSize);
-  READ_U16L(d->properties.setSampleLength);
+  READ_U16L(d->properties.setTableLength);
   READ_U16L(d->properties.setRestartPosition);
   READ_U16L(d->properties.setChannels);
   READ_U16L_AS(patternCount);

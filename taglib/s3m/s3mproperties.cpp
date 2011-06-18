@@ -28,7 +28,7 @@ class S3M::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    sampleLength(0),
+    tableLength(0),
     channels(0),
     stereo(0),
     sampleCount(0),
@@ -42,7 +42,7 @@ public:
     ultraClick(0),
     usePanningValues(false) {}
   
-  ushort sampleLength;
+  ushort tableLength;
   int    channels;
   bool   stereo;
   ushort sampleCount;
@@ -88,9 +88,9 @@ int S3M::Properties::channels() const
   return d->channels;
 }
 
-ushort S3M::Properties::sampleLength() const
+ushort S3M::Properties::tableLength() const
 {
-  return d->sampleLength;
+  return d->tableLength;
 }
 
 bool S3M::Properties::stereo() const
@@ -148,9 +148,9 @@ bool S3M::Properties::usePanningValues() const
   return d->usePanningValues;
 }
 
-void S3M::Properties::setSampleLength(ushort sampleLength)
+void S3M::Properties::setTableLength(ushort tableLength)
 {
-  d->sampleLength = sampleLength;
+  d->tableLength = tableLength;
 }
 
 void S3M::Properties::setChannels(int channels)
