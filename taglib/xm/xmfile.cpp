@@ -185,5 +185,11 @@ void XM::File::read(bool)
     seek(pos + instrumentSize + sampleHeaderSize * sampleCount + sumSampleLength);
   }
 
-  d->tag.setComment(intrumentNames.toString("\n") + "\n" + sampleNames.toString("\n"));
+  String comment(intrumentNames.toString("\n"));
+  if(sampleNames.size() > 0)
+  {
+    comment += "\n";
+    comment += sampleNames.toString("\n");
+  }
+  d->tag.setComment(comment);
 }
