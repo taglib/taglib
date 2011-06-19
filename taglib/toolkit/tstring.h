@@ -56,6 +56,8 @@
 
 namespace TagLib {
 
+  class StringList;
+
   //! A \e wide string class suitable for unicode.
 
   /*!
@@ -238,6 +240,11 @@ namespace TagLib {
      * is not found, -1 is returned.
      */
     int rfind(const String &s, int offset = -1) const;
+
+    /*!
+     * Splits the string on each occurrence of \a separator.
+     */
+    StringList split(const String &separator = " ") const;
 
     /*!
      * Returns true if the strings starts with the substring \a s.

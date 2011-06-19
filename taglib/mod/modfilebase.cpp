@@ -19,6 +19,7 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
+#include "tdebug.h"
 #include "modfilebase.h"
 
 using namespace TagLib;

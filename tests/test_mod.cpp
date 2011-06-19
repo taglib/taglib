@@ -20,43 +20,63 @@
  ***************************************************************************/
 
 #include <cppunit/extensions/HelperMacros.h>
-#include <string>
 #include <modfile.h>
 #include "utils.h"
 
 using namespace std;
 using namespace TagLib;
 
+static const String titleBefore("title of song");
+static const String titleAfter("changed title");
+
+static const String commentBefore(
+  "Instrument names\n"
+  "are abused as\n"
+  "comments in\n"
+  "module file formats.\n"
+  "-+-+-+-+-+-+-+-+-+-+-+\n"
+  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
+static const String newComment(
+  "This line will be truncated because it is too long for a mod instrument name.\n"
+  "This line is ok.");
+
+static const String commentAfter(
+  "This line will be trun\n"
+  "This line is ok.\n"
+  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
 class TestMod : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMod);
-  CPPUNIT_TEST(testRead);
-  CPPUNIT_TEST(testChangeTitle);
+  CPPUNIT_TEST(testReadTags);
+  CPPUNIT_TEST(testWriteTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void testRead()
+  void testReadTags()
   {
-    testRead(TEST_FILE_PATH_C("test.mod"), "title of song");
+    testRead(TEST_FILE_PATH_C("test.mod"), titleBefore, commentBefore);
   }
 
-  void testChangeTitle()
+  void testWriteTags()
   {
     ScopedFileCopy copy("test", ".mod");
     {
       Mod::File file(copy.fileName().c_str());
       CPPUNIT_ASSERT(file.tag() != 0);
-      file.tag()->setTitle("changed title");
+      file.tag()->setTitle(titleAfter);
+      file.tag()->setComment(newComment);
       CPPUNIT_ASSERT(file.save());
     }
-    testRead(copy.fileName().c_str(), "changed title");
+    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
-      TEST_FILE_PATH_C("changed_title.mod")));
+      TEST_FILE_PATH_C("changed.mod")));
   }
 
 private:
-  void testRead(FileName fileName, const String &title)
+  void testRead(FileName fileName, const String &title, const String &comment)
   {
     Mod::File file(fileName);
 
@@ -77,14 +97,7 @@ private:
     CPPUNIT_ASSERT_EQUAL(title, t->title());
     CPPUNIT_ASSERT_EQUAL(String::null, t->artist());
     CPPUNIT_ASSERT_EQUAL(String::null, t->album());
-    CPPUNIT_ASSERT_EQUAL(String(
-      "Instrument names\n"
-      "are abused as\n"
-      "comments in\n"
-      "module file formats.\n"
-      "-+-+-+-+-+-+-+-+-+-+-+\n"
-      "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-    ), t->comment());
+    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
     CPPUNIT_ASSERT_EQUAL(String::null, t->genre());
     CPPUNIT_ASSERT_EQUAL(0U, t->year());
     CPPUNIT_ASSERT_EQUAL(0U, t->track());

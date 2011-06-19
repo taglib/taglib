@@ -25,22 +25,26 @@
 #include "taglib.h"
 #include "tfile.h"
 #include "tstring.h"
+#include "tlist.h"
 #include "taglib_export.h"
+
+#include <algorithm>
 
 namespace TagLib {
   namespace Mod {
-    class TAGLIB_EXPORT FileBase : public TagLib::File {
-      protected:
-        FileBase(FileName file);
-        FileBase(IOStream *stream);
+    class TAGLIB_EXPORT FileBase : public TagLib::File
+    {
+    protected:
+      FileBase(FileName file);
+      FileBase(IOStream *stream);
 
-        void writeString(const String &s, ulong size, char padding = 0);
-        bool readString(String &s, ulong size);
-        bool readByte(uchar &byte);
-        bool readU16L(ushort &number);
-        bool readU32L(ulong &number);
-        bool readU16B(ushort &number);
-        bool readU32B(ulong &number);
+      void writeString(const String &s, ulong size, char padding = 0);
+      bool readString(String &s, ulong size);
+      bool readByte(uchar &byte);
+      bool readU16L(ushort &number);
+      bool readU32L(ulong &number);
+      bool readU16B(ushort &number);
+      bool readU32B(ulong &number);
     };
   }
 }
