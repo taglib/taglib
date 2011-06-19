@@ -177,6 +177,12 @@ void IT::File::read(bool)
   */
 
   StringList comment;
+  // Note: I found files that have nil characters somewhere
+  //       in the instrument/sample names and more characters
+  //       afterwards. The spec does not mention such a case.
+  //       Currently I just discard anything after a nil, but
+  //       e.g. VLC seems to interprete a nil as a space. I
+  //       don't know what is the proper behaviour.
   for(ushort i = 0; i < instrumentCount; ++ i)
   {
     seek(192L + length + ((long)i << 2));
