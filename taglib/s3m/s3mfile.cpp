@@ -24,6 +24,8 @@
 #include "tdebug.h"
 #include "modfileprivate.h"
 
+#include <iostream>
+
 using namespace TagLib;
 using namespace S3M;
 
@@ -146,25 +148,24 @@ void S3M::File::read(bool)
 
   READ_U16L(d->properties.setPatternCount);
   READ_U16L(d->properties.setFlags);
-  READ_U16L(d->properties.setVersion);
-  READ_U16L(d->properties.setSamplesType);
+  READ_U16L(d->properties.setTrackerVersion);
+  READ_U16L(d->properties.setFileFormatVersion);
 
   READ_ASSERT(readBlock(4) == "SCRM");
 
-  READ_BYTE_AS(baseVolume);
-  d->properties.setBaseVolume((int)baseVolume << 1);
-
-  READ_BYTE(d->properties.setTempo);
+  READ_BYTE(d->properties.setGlobalVolume);
   READ_BYTE(d->properties.setBpmSpeed);
+  READ_BYTE(d->properties.setTempo);
 
-  READ_BYTE_AS(stereo);
-  d->properties.setStereo((stereo & 0x80) != 0);
-  READ_BYTE(d->properties.setUltraClick);
+  READ_BYTE_AS(masterVolume);
+  d->properties.setMasterVolume(masterVolume & 0x7f);
+  d->properties.setStereo((masterVolume & 0x80) != 0);
 
-  READ_BYTE_AS(usePanningValues);
-  d->properties.setUsePanningValues(usePanningValues == 0xFC);
+  // I've seen players who call the next two bytes
+  // "ultra click" and "use panning values" (if == 0xFC).
+  // I don't see them in any spec, though.
 
-  seek(10, Current);
+  seek(12, Current);
 
   int channels = 0;
   for(int i = 0; i < 32; ++ i)
@@ -179,30 +180,38 @@ void S3M::File::read(bool)
 
   seek(channels, Current);
 
+  // Note: The S3M spec mentions instruments, but I could
+  //       not figure out where these can be found. They are
+  //       similar to samples, though (SCRI instead of SCRS).
   StringList comment;
   for(ushort i = 0; i < sampleCount; ++ i)
   {
     seek(96L + length + ((long)i << 1));
 
-    READ_U16L_AS(instrumentOffset);
-    seek((long)instrumentOffset << 4);
+    READ_U16L_AS(sampleHeaderOffset);
+    seek((long)sampleHeaderOffset << 4);
 
     READ_BYTE_AS(sampleType);
     READ_STRING_AS(dosFileName, 13);
-    READ_U16L_AS(sampleOffset);
+    READ_U16L_AS(sampleDataOffset);
     READ_U32L_AS(sampleLength);
     READ_U32L_AS(repeatStart);
     READ_U32L_AS(repeatStop);
     READ_BYTE_AS(sampleVolume);
 
-    seek(2, Current);
+    seek(1, Current);
 
+    READ_BYTE_AS(packing);
     READ_BYTE_AS(sampleFlags);
     READ_U32L_AS(baseFrequency);
 
     seek(12, Current);
 
     READ_STRING_AS(sampleName, 28);
+    // The next 4 bytes should be "SCRS", but I've found
+    // otherwise ok files with 4 nils instead.
+    // READ_ASSERT(readBlock(4) == "SCRS");
+
     comment.append(sampleName);
   }
 

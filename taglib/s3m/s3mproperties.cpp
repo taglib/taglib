@@ -34,13 +34,14 @@ public:
     sampleCount(0),
     patternCount(0),
     flags(0),
-    version(0),
-    samplesType(0),
-    baseVolume(0),
+    trackerVersion(0),
+    fileFormatVersion(0),
+    globalVolume(0),
+    masterVolume(0),
     tempo(0),
-    bpmSpeed(0),
-    ultraClick(0),
-    usePanningValues(false) {}
+    bpmSpeed(0)
+  {
+  }
   
   ushort tableLength;
   int    channels;
@@ -48,13 +49,12 @@ public:
   ushort sampleCount;
   ushort patternCount;
   ushort flags;
-  ushort version;
-  ushort samplesType;
-  int    baseVolume;
+  ushort trackerVersion;
+  ushort fileFormatVersion;
+  uchar  globalVolume;
+  uchar  masterVolume;
   uchar  tempo;
   uchar  bpmSpeed;
-  uchar  ultraClick;
-  bool   usePanningValues;
 };
 
 S3M::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -113,19 +113,24 @@ ushort S3M::Properties::flags() const
   return d->flags;
 }
 
-ushort S3M::Properties::version() const
+ushort S3M::Properties::trackerVersion() const
 {
-  return d->version;
+  return d->trackerVersion;
 }
 
-ushort S3M::Properties::samplesType() const
+ushort S3M::Properties::fileFormatVersion() const
 {
-  return d->samplesType;
+  return d->fileFormatVersion;
 }
 
-int S3M::Properties::baseVolume() const
+uchar S3M::Properties::globalVolume() const
 {
-  return d->baseVolume;
+  return d->globalVolume;
+}
+
+uchar S3M::Properties::masterVolume() const
+{
+  return d->masterVolume;
 }
 
 uchar S3M::Properties::tempo() const
@@ -136,16 +141,6 @@ uchar S3M::Properties::tempo() const
 uchar S3M::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
-}
-
-uchar S3M::Properties::ultraClick() const
-{
-  return d->ultraClick;
-}
-
-bool S3M::Properties::usePanningValues() const
-{
-  return d->usePanningValues;
 }
 
 void S3M::Properties::setTableLength(ushort tableLength)
@@ -178,19 +173,24 @@ void S3M::Properties::setFlags(ushort flags)
   d->flags = flags;
 }
 
-void S3M::Properties::setVersion(ushort version)
+void S3M::Properties::setTrackerVersion(ushort trackerVersion)
 {
-  d->version = version;
+  d->trackerVersion = trackerVersion;
 }
 
-void S3M::Properties::setSamplesType(ushort samplesType)
+void S3M::Properties::setFileFormatVersion(ushort fileFormatVersion)
 {
-  d->samplesType = samplesType;
+  d->fileFormatVersion = fileFormatVersion;
 }
 
-void S3M::Properties::setBaseVolume(int baseVolume)
+void S3M::Properties::setGlobalVolume(uchar globalVolume)
 {
-  d->baseVolume = baseVolume;
+  d->globalVolume = globalVolume;
+}
+
+void S3M::Properties::setMasterVolume(uchar masterVolume)
+{
+  d->masterVolume = masterVolume;
 }
 
 void S3M::Properties::setTempo(uchar tempo)
@@ -201,14 +201,4 @@ void S3M::Properties::setTempo(uchar tempo)
 void S3M::Properties::setBpmSpeed(uchar bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
-}
-
-void S3M::Properties::setUltraClick(uchar ultraClick)
-{
-  d->ultraClick = ultraClick;
-}
-
-void S3M::Properties::setUsePanningValues(bool usePanningValues)
-{
-  d->usePanningValues = usePanningValues;
 }

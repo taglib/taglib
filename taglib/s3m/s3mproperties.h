@@ -38,34 +38,32 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort tableLength()  const;
-      bool   stereo()       const;
-      ushort sampleCount()  const;
-      ushort patternCount() const;
-      ushort flags()        const;
-      ushort version()      const;
-      ushort samplesType()  const;
-      int    baseVolume()   const;
-      uchar  tempo()        const;
-      uchar  bpmSpeed()     const;
-      uchar  ultraClick()   const;
-      bool   usePanningValues() const;
+      ushort tableLength()       const;
+      bool   stereo()            const;
+      ushort sampleCount()       const;
+      ushort patternCount()      const;
+      ushort flags()             const;
+      ushort trackerVersion()    const;
+      ushort fileFormatVersion() const;
+      uchar  globalVolume()      const;
+      uchar  masterVolume()      const;
+      uchar  tempo()             const;
+      uchar  bpmSpeed()          const;
 
     protected:
       void setTableLength(ushort tableLength);
       void setChannels(int channels);
 
-      void setStereo      (bool stereo);
-      void setSampleCount (ushort sampleCount);
-      void setPatternCount(ushort patternCount);
-      void setFlags       (ushort flags);
-      void setVersion     (ushort version);
-      void setSamplesType (ushort samplesType);
-      void setBaseVolume  (int baseVolume);
-      void setTempo       (uchar tempo);
-      void setBpmSpeed    (uchar bpmSpeed);
-      void setUltraClick  (uchar ultraClick);
-      void setUsePanningValues(bool usePanningValues);
+      void setStereo           (bool stereo);
+      void setSampleCount      (ushort sampleCount);
+      void setPatternCount     (ushort patternCount);
+      void setFlags            (ushort flags);
+      void setTrackerVersion   (ushort trackerVersion);
+      void setFileFormatVersion(ushort fileFormatVersion);
+      void setGlobalVolume     (uchar globalVolume);
+      void setMasterVolume     (uchar masterVolume);
+      void setTempo            (uchar tempo);
+      void setBpmSpeed         (uchar bpmSpeed);
 
     private:
       Properties(const Properties&);
