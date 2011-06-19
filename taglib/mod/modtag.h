@@ -27,17 +27,16 @@
 namespace TagLib {
   namespace Mod {
     /*!
-     * Tags for module files (mod, s3m, it, xm).
+     * Tags for module files (Mod, S3M, IT, XM).
      *
      * Note that only the \a title is supported as such by most
-     * module file formats.  Except for xm files the \a trackerName
+     * module file formats.  Except for XM files the \a trackerName
      * is derived from the file format or the flavour of the file
-     * format.  For xm files it is stored in the file.
+     * format.  For XM files it is stored in the file.
      *
      * The \a comment tag is not strictly supported by module files,
      * but it is common practice to abuse instrument/sample/pattern
-     * names as multiline comments.  TagLib does so as well, but
-     * currently does not support writing them.
+     * names as multiline comments.  TagLib does so as well.
      */
     class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
