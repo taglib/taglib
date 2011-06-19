@@ -81,7 +81,47 @@ bool S3M::File::save()
   // the file would look like an .xm file
   seek(0);
   writeString(d->tag.title(), 28);
-  // TODO: write comment as sample names
+
+  seek(32);
+
+  ushort length = 0;
+  ushort sampleCount = 0;
+
+  if(!readU16L(length) || !readU16L(sampleCount))
+    return false;
+
+  seek(28, Current);
+
+  int channels = 0;
+  for(int i = 0; i < 32; ++ i)
+  {
+    uchar setting = 0;
+    if(!readByte(setting))
+      return false;
+    // or if(setting >= 128)?
+    // or channels = i + 1;?
+    // need a better spec!
+    if(setting != 0xff) ++ channels;
+  }
+
+  seek(channels, Current);
+  
+  StringList lines = d->tag.comment().split("\n");
+  // write comment as sample names:
+  for(ushort i = 0; i < sampleCount; ++ i)
+  {
+    seek(96L + length + ((long)i << 1));
+
+    ushort instrumentOffset = 0;
+    if(!readU16L(instrumentOffset))
+      return false;
+    seek(((long)instrumentOffset << 4) + 48);
+
+    if(i < lines.size())
+      writeString(lines[i], 28);
+    else
+      writeString(String::null, 28);
+  }
   return true;
 }
 
@@ -129,8 +169,11 @@ void S3M::File::read(bool)
   int channels = 0;
   for(int i = 0; i < 32; ++ i)
   {
-    READ_BYTE_AS(terminator);
-    if(terminator != 0xff) ++ channels;
+    READ_BYTE_AS(setting);
+    // or if(setting >= 128)?
+    // or channels = i + 1;?
+    // need a better spec!
+    if(setting != 0xff) ++ channels;
   }
   d->properties.setChannels(channels);
 

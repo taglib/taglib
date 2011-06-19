@@ -79,7 +79,50 @@ bool IT::File::save()
   }
   seek(4);
   writeString(d->tag.title(), 26);
-  // TODO: write comment as instrument and sample names
+
+  seek(2, Current);
+
+  ushort length = 0;
+  ushort instrumentCount = 0;
+  ushort sampleCount = 0;
+
+  if(!readU16L(length) || !readU16L(instrumentCount) || !readU16L(sampleCount))
+    return false;
+
+  seek(15, Current);
+
+  // write comment as instrument and sample names:
+  StringList lines = d->tag.comment().split("\n");
+  for(ushort i = 0; i < instrumentCount; ++ i)
+  {
+    seek(192L + length + ((long)i << 2));
+    ulong instrumentOffset = 0;
+    if(!readU32L(instrumentOffset))
+      return false;
+
+    seek(instrumentOffset + 32);
+
+    if(i < lines.size())
+      writeString(lines[i], 26);
+    else
+      writeString(String::null, 26);
+  }
+
+  for(ushort i = 0; i < sampleCount; ++ i)
+  {
+    seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
+    ulong sampleOffset = 0;
+    if(!readU32L(sampleOffset))
+      return false;
+    
+    seek(sampleOffset + 20);
+
+    if((i + instrumentCount) < lines.size())
+      writeString(lines[i + instrumentCount], 26);
+    else
+      writeString(String::null, 26);
+  }
+
   return true;
 }
 
@@ -135,7 +178,7 @@ void IT::File::read(bool)
     READ_STRING_AS(instrumentName, 26);
     comment.append(instrumentName);
   }
-    
+  
   for(ushort i = 0; i < sampleCount; ++ i)
   {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
