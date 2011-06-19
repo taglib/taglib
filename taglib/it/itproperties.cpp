@@ -34,12 +34,15 @@ public:
     sampleCount(0),
     patternCount(0),
     version(0),
-    cmwt(0),
+    compatibleVersion(0),
     flags(0),
     special(0),
-    baseVolume(0),
+    globalVolume(0),
+    mixVolume(0),
     tempo(0),
-    bpmSpeed(0)
+    bpmSpeed(0),
+	panningSeparation(0),
+	pitchWheelDepth(0)
   {
   }
 
@@ -49,12 +52,15 @@ public:
   ushort sampleCount;
   ushort patternCount;
   ushort version;
-  ushort cmwt;
+  ushort compatibleVersion;
   ushort flags;
   ushort special;
-  int    baseVolume;
+  ushort globalVolume;
+  ushort mixVolume;
   uchar  tempo;
   uchar  bpmSpeed;
+  uchar  panningSeparation;
+  uchar  pitchWheelDepth;
 };
 
 IT::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -118,9 +124,9 @@ ushort IT::Properties::version() const
   return d->version;
 }
 
-ushort IT::Properties::cmwt() const
+ushort IT::Properties::compatibleVersion() const
 {
-  return d->cmwt;
+  return d->compatibleVersion;
 }
 
 ushort IT::Properties::flags() const
@@ -133,9 +139,14 @@ ushort IT::Properties::special() const
   return d->special;
 }
 
-int IT::Properties::baseVolume() const
+ushort IT::Properties::globalVolume() const
 {
-  return d->baseVolume;
+  return d->globalVolume;
+}
+
+ushort IT::Properties::mixVolume() const
+{
+  return d->mixVolume;
 }
 
 uchar IT::Properties::tempo() const
@@ -146,6 +157,16 @@ uchar IT::Properties::tempo() const
 uchar IT::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
+}
+
+uchar IT::Properties::panningSeparation() const
+{
+  return d->panningSeparation;
+}
+
+uchar IT::Properties::pitchWheelDepth() const
+{
+  return d->pitchWheelDepth;
 }
 
 void IT::Properties::setTableLength(ushort tableLength)
@@ -182,9 +203,9 @@ void IT::Properties::setSpecial(ushort special)
   d->special = special;
 }
 
-void IT::Properties::setCmwt(ushort cmwt)
+void IT::Properties::setCompatibleVersion(ushort compatibleVersion)
 {
-  d->cmwt = cmwt;
+  d->compatibleVersion = compatibleVersion;
 }
 
 void IT::Properties::setVersion(ushort version)
@@ -192,9 +213,14 @@ void IT::Properties::setVersion(ushort version)
   d->version = version;
 }
 
-void IT::Properties::setBaseVolume(int baseVolume)
+void IT::Properties::setGlobalVolume(ushort globalVolume)
 {
-  d->baseVolume = baseVolume;
+  d->globalVolume = globalVolume;
+}
+
+void IT::Properties::setMixVolume(ushort mixVolume)
+{
+  d->mixVolume = mixVolume;
 }
 
 void IT::Properties::setTempo(uchar tempo)
@@ -205,4 +231,14 @@ void IT::Properties::setTempo(uchar tempo)
 void IT::Properties::setBpmSpeed(uchar bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
+}
+
+void IT::Properties::setPanningSeparation(uchar panningSeparation)
+{
+  d->panningSeparation = panningSeparation;
+}
+
+void IT::Properties::setPitchWheelDepth(uchar pitchWheelDepth)
+{
+  d->pitchWheelDepth = pitchWheelDepth;
 }

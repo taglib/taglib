@@ -140,27 +140,43 @@ void IT::File::read(bool)
   READ_U16L_AS(length);
   READ_U16L_AS(instrumentCount);
   READ_U16L_AS(sampleCount);
-    
+  
   d->properties.setTableLength(length);
   d->properties.setInstrumentCount(instrumentCount);
   d->properties.setSampleCount(sampleCount);
   READ_U16L(d->properties.setPatternCount);
   READ_U16L(d->properties.setVersion);
-  READ_U16L(d->properties.setCmwt);
+  READ_U16L(d->properties.setCompatibleVersion);
   READ_U16L(d->properties.setFlags);
-
   READ_U16L_AS(special);
-
   d->properties.setSpecial(special);
-  READ_U16L(d->properties.setBaseVolume);
-
-  seek(1, Current);
-
-  READ_BYTE(d->properties.setTempo);
+  READ_U16L(d->properties.setGlobalVolume);
+  READ_U16L(d->properties.setMixVolume);
   READ_BYTE(d->properties.setBpmSpeed);
+  READ_BYTE(d->properties.setTempo);
+  READ_BYTE(d->properties.setPanningSeparation);
+  READ_BYTE(d->properties.setPitchWheelDepth);
+
+  /*
+   * While the message would be a sorta comment tag, I don't
+   * see any IT files in the wild that use this or set the
+   * offset/length to a correct value.
+   *
+   * In all files I found where the message bit was set the
+   * offset was either 0 or a ridiculous high value and the
+   * length wasn't much better.
+   *
+  if(special & 0x1)
+  {
+    READ_U16L_AS(messageLength);
+    READ_U32L_AS(messageOffset);
+    seek(messageOffset);
+    READ_STRING_AS(message, messageLength);
+    debug("Message: \""+message+"\"");
+  }
+  */
 
   StringList comment;
-
   for(ushort i = 0; i < instrumentCount; ++ i)
   {
     seek(192L + length + ((long)i << 2));
@@ -189,26 +205,22 @@ void IT::File::read(bool)
     READ_ASSERT(sampleMagic == "IMPS");
 
     READ_STRING_AS(dosFileName, 13);
-    // TODO: When cmwt < 0x200 (old format) there are different
-    //       (non-string) fileds, but they have the same cumulative
-    //       size. Because I don't save these fields to anything
-    //       (yet) it does not matter.
     READ_BYTE_AS(globalVolume);
     READ_BYTE_AS(sampleFlags);
-    READ_BYTE_AS(sampleValume);
+    READ_BYTE_AS(sampleVolume);
     READ_STRING_AS(sampleName, 26);
     READ_BYTE_AS(sampleCvt);
     READ_BYTE_AS(samplePanning);
     READ_U32L_AS(sampleLength);
-    READ_U32L_AS(repeatStart);
-    READ_U32L_AS(repeatStop);
-    READ_U32L_AS(c4speed);
+    READ_U32L_AS(loopStart);
+    READ_U32L_AS(loopStop);
+    READ_U32L_AS(c5speed);
     READ_U32L_AS(sustainLoopStart);
     READ_U32L_AS(sustainLoopEnd);
     READ_U32L_AS(sampleDataOffset);
-    READ_BYTE_AS(vibratoRate);
+    READ_BYTE_AS(vibratoSpeed);
     READ_BYTE_AS(vibratoDepth);
-    READ_BYTE_AS(vibratoSweep);
+    READ_BYTE_AS(vibratoRate);
     READ_BYTE_AS(vibratoType);
     
     comment.append(sampleName);

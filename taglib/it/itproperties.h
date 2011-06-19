@@ -38,18 +38,21 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort tableLength()    const;
-      bool   stereo()          const;
-      ushort instrumentCount() const;
-      ushort sampleCount()     const;
-      ushort patternCount()    const;
-      ushort version()         const;
-      ushort cmwt()            const;
-      ushort flags()           const;
-      ushort special()         const;
-      int    baseVolume()      const;
-      uchar  tempo()           const;
-      uchar  bpmSpeed()        const;
+      ushort tableLength()       const;
+      bool   stereo()            const;
+      ushort instrumentCount()   const;
+      ushort sampleCount()       const;
+      ushort patternCount()      const;
+      ushort version()           const;
+      ushort compatibleVersion() const;
+      ushort flags()             const;
+      ushort special()           const;
+      ushort globalVolume()      const;
+      ushort mixVolume()         const;
+      uchar  tempo()             const;
+      uchar  bpmSpeed()          const;
+	  uchar  panningSeparation() const;
+	  uchar  pitchWheelDepth()   const;
 
     protected:
       void setTableLength(ushort tableLength);
@@ -58,13 +61,16 @@ namespace TagLib {
       void setInstrumentCount(ushort instrumentCount);
       void setSampleCount (ushort sampleCount);
       void setPatternCount(ushort patternCount);
+      void setVersion     (ushort version);
+      void setCompatibleVersion(ushort compatibleVersion);
       void setFlags       (ushort flags);
       void setSpecial     (ushort special);
-      void setCmwt        (ushort cmwt);
-      void setVersion     (ushort version);
-      void setBaseVolume  (int baseVolume);
+      void setGlobalVolume(ushort globalVolume);
+      void setMixVolume   (ushort mixVolume);
       void setTempo       (uchar tempo);
       void setBpmSpeed    (uchar bpmSpeed);
+      void setPanningSeparation(uchar panningSeparation);
+      void setPitchWheelDepth  (uchar pitchWheelDepth);
 
     private:
       Properties(const Properties&);
