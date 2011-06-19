@@ -190,7 +190,7 @@ void IT::File::read(bool)
 
     READ_STRING_AS(dosFileName, 13);
     // TODO: When cmwt < 0x200 (old format) there are different
-    //       (non-string) fileds but they have the same cumulative
+    //       (non-string) fileds, but they have the same cumulative
     //       size. Because I don't save these fields to anything
     //       (yet) it does not matter.
     READ_BYTE_AS(globalVolume);

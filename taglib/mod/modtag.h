@@ -85,9 +85,9 @@ namespace TagLib {
 
       /*!
        * Returns the name of the tracker used to create/edit the module file.
-       * Only xm files store this tag to the file as such, for other formats
-       * (mod, s3m, it) this is derived from the file type or the flavour of
-       * the file type.  Therefore only xm file might have an empty
+       * Only XM files store this tag to the file as such, for other formats
+       * (Mod, S3M, IT) this is derived from the file type or the flavour of
+       * the file type.  Therefore only XM files might have an empty
        * (String::null) tracker name.
        */
       String trackerName() const;
@@ -95,6 +95,10 @@ namespace TagLib {
       /*!
        * Sets the title to \a title.  If \a title is String::null then this
        * value will be cleared.
+       *
+       * The length limits per file type are (1 characetr = 1 byte):
+       * Mod 20 characters, S3M 28 characters, IT 26 characters and XM 20
+       * characters.
        */
       void setTitle(const String &title);
 
@@ -109,7 +113,21 @@ namespace TagLib {
       void setAlbum(const String &album);
 
       /*!
-       * Not yet supported.
+       * Sets the comment to \a comment.  If \a comment is String::null then
+       * this value will be cleared.
+       *
+       * Note that module file formats don't actually support a comment tag.
+       * Instead the names of instruments/patterns/samples are abused as
+       * a multiline comment. Because of this the number of lines in a
+       * module file is fixed to the number of instruments/patterns/samples.
+       *
+       * Also note that the instrument/pattern/sample name length is limited
+       * an thus the line length in comments are limited. Too big comments
+       * will be truncated.
+       *
+       * The line length limits per file type are (1 characetr = 1 byte):
+       * Mod 22 characters, S3M 28 characters, IT 26 characters and XM 22
+       * characters.
        */
       void setComment(const String &comment);
 
@@ -132,8 +150,11 @@ namespace TagLib {
        * Sets the tracker name to \a trackerName.  If \a trackerName is
        * String::null then this value will be cleared.
        * 
-       * Note that only xm files support this tag.  Setting the
+       * Note that only XM files support this tag.  Setting the
        * tracker name for other module file formats will be ignored.
+       * 
+       * The length of this tag is limited to 20 characters (1 character
+       * = 1 byte).
        */
       void setTrackerName(const String &trackerName);
 
