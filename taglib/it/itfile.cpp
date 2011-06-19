@@ -168,8 +168,7 @@ void IT::File::read(bool)
     seek(instrumentOffset);
 
     ByteVector instrumentMagic = readBlock(4);
-    // TODO: find out if it can really be both here and not just IMPI
-    READ_ASSERT(instrumentMagic == "IMPS" || instrumentMagic == "IMPI");
+    READ_ASSERT(instrumentMagic == "IMPI");
 
     READ_STRING_AS(dosFileName, 13);
 
@@ -187,10 +186,13 @@ void IT::File::read(bool)
     seek(sampleOffset);
 
     ByteVector sampleMagic = readBlock(4);
-    // TODO: find out if it can really be both here and not just IMPS
-    READ_ASSERT(sampleMagic == "IMPS" || sampleMagic == "IMPI");
+    READ_ASSERT(sampleMagic == "IMPS");
 
     READ_STRING_AS(dosFileName, 13);
+    // TODO: When cmwt < 0x200 (old format) there are different
+    //       (non-string) fileds but they have the same cumulative
+    //       size. Because I don't save these fields to anything
+    //       (yet) it does not matter.
     READ_BYTE_AS(globalVolume);
     READ_BYTE_AS(sampleFlags);
     READ_BYTE_AS(sampleValume);
