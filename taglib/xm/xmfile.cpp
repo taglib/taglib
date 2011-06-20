@@ -445,10 +445,10 @@ bool XM::File::save()
     else
       writeString(lines[i], len);
 
-    ushort sampleCount = 0;
     long offset = 0;
     if(instrumentHeaderSize >= 29U)
     {
+      ushort sampleCount = 0;
       seek(1, Current);
       if(!readU16L(sampleCount))
         return false;
@@ -578,6 +578,7 @@ void XM::File::read(bool)
     
   StringList intrumentNames;
   StringList sampleNames;
+  uint sumSampleCount = 0;
 
   // read instruments:
   for(ushort i = 0; i < instrumentCount; ++ i)
@@ -600,6 +601,7 @@ void XM::File::read(bool)
     long offset = 0;
     if(sampleCount > 0)
     {
+      sumSampleCount += sampleCount;
       // wouldn't know which header size to assume otherwise:
       READ_ASSERT(instrumentHeaderSize >= count + 4 && readU32L(sampleHeaderSize));
       // skip unhandeled header proportion:
@@ -646,6 +648,7 @@ void XM::File::read(bool)
     seek(offset, Current);
   }
 
+  d->properties.setSampleCount(sumSampleCount);
   String comment(intrumentNames.toString("\n"));
   if(sampleNames.size() > 0)
   {

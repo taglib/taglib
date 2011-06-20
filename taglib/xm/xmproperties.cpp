@@ -34,6 +34,7 @@ public:
     restartPosition(0),
     patternCount(0),
     instrumentCount(0),
+    sampleCount(0),
     flags(0),
     tempo(0),
     bpmSpeed(0)
@@ -46,6 +47,7 @@ public:
   ushort restartPosition;
   ushort patternCount;
   ushort instrumentCount;
+  uint   sampleCount;
   ushort flags;
   ushort tempo;
   ushort bpmSpeed;
@@ -107,6 +109,11 @@ ushort XM::Properties::instrumentCount() const
   return d->instrumentCount;
 }
 
+uint XM::Properties::sampleCount() const
+{
+  return d->sampleCount;
+}
+
 ushort XM::Properties::flags() const
 {
   return d->flags;
@@ -150,6 +157,11 @@ void XM::Properties::setPatternCount(ushort patternCount)
 void XM::Properties::setInstrumentCount(ushort instrumentCount)
 {
   d->instrumentCount = instrumentCount;
+}
+
+void XM::Properties::setSampleCount(uint sampleCount)
+{
+  d->sampleCount = sampleCount;
 }
 
 void XM::Properties::setFlags(ushort flags)
