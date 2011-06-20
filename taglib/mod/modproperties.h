@@ -38,14 +38,14 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      uint instrumentCount() const;
-      uint tableLength()     const;
+      uint  instrumentCount() const;
+      uchar tableLength()     const;
 
     protected:
       void setChannels(int channels);
 
       void setInstrumentCount(uint sampleCount);
-      void setTableLength(uint tableLength);
+      void setTableLength(uchar tableLength);
 
     private:
       Properties(const Properties&);

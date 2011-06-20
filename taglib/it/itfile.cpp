@@ -176,6 +176,23 @@ void IT::File::read(bool)
   }
   */
 
+  seek(64);
+
+  ByteVector pannings = readBlock(64);
+  ByteVector volumes  = readBlock(64);
+  READ_ASSERT(pannings.size() == 64 && volumes.size() == 64);
+  int channels = 0;
+  for(int i = 0; i < 64; ++ i)
+  {
+    // Strictly speaking an IT file has always 64 channels, but
+    // I don't count disabled and muted channels.
+    // But this always gives 64 channels for all my files anyway.
+    // Strangely VLC does report other values. I wonder how VLC
+    // gets it's values.
+    if(pannings[i] < 128 && volumes[i] > 0) ++ channels;
+  }
+  d->properties.setChannels(channels);
+
   StringList comment;
   // Note: I found files that have nil characters somewhere
   //       in the instrument/sample names and more characters

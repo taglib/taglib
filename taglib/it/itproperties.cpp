@@ -28,6 +28,7 @@ class IT::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
+    channels(0),
     tableLength(0),
     stereo(false),
     instrumentCount(0),
@@ -41,11 +42,12 @@ public:
     mixVolume(0),
     tempo(0),
     bpmSpeed(0),
-	panningSeparation(0),
-	pitchWheelDepth(0)
+    panningSeparation(0),
+    pitchWheelDepth(0)
   {
   }
 
+  int    channels;
   ushort tableLength;
   bool   stereo;
   ushort instrumentCount;
@@ -91,7 +93,7 @@ int IT::Properties::sampleRate() const
 
 int IT::Properties::channels() const
 {
-  return d->stereo ? 2 : 1;
+  return d->channels;
 }
 
 ushort IT::Properties::tableLength() const
@@ -167,6 +169,11 @@ uchar IT::Properties::panningSeparation() const
 uchar IT::Properties::pitchWheelDepth() const
 {
   return d->pitchWheelDepth;
+}
+
+void IT::Properties::setChannels(int channels)
+{
+  d->channels = channels;
 }
 
 void IT::Properties::setTableLength(ushort tableLength)

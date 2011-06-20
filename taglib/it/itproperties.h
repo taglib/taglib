@@ -51,13 +51,14 @@ namespace TagLib {
       ushort mixVolume()         const;
       uchar  tempo()             const;
       uchar  bpmSpeed()          const;
-	  uchar  panningSeparation() const;
-	  uchar  pitchWheelDepth()   const;
+      uchar  panningSeparation() const;
+      uchar  pitchWheelDepth()   const;
 
     protected:
+      void setChannels(int channels);
+
       void setTableLength(ushort tableLength);
       void setStereo(bool stereo);
-
       void setInstrumentCount(ushort instrumentCount);
       void setSampleCount (ushort sampleCount);
       void setPatternCount(ushort patternCount);

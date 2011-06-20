@@ -34,9 +34,9 @@ public:
   {
   }
   
-  int  channels;
-  uint instrumentCount;
-  uint tableLength;
+  int   channels;
+  uint  instrumentCount;
+  uchar tableLength;
 };
 
 Mod::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -75,7 +75,7 @@ uint Mod::Properties::instrumentCount() const
   return d->instrumentCount;
 }
 
-uint Mod::Properties::tableLength() const
+uchar Mod::Properties::tableLength() const
 {
   return d->tableLength;
 }
@@ -90,7 +90,7 @@ void Mod::Properties::setInstrumentCount(uint instrumentCount)
   d->instrumentCount = instrumentCount;
 }
 
-void Mod::Properties::setTableLength(uint tableLength)
+void Mod::Properties::setTableLength(uchar tableLength)
 {
   d->tableLength = tableLength;
 }
