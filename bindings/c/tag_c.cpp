@@ -23,8 +23,6 @@
 #include "config.h"
 #endif
 
-#include "tag_c.h"
-
 #include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>
@@ -41,6 +39,8 @@
 #include <tag.h>
 #include <string.h>
 #include <id3v2framefactory.h>
+
+#include "tag_c.h"
 
 using namespace TagLib;
 

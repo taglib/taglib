@@ -44,6 +44,7 @@ namespace TagLib {
     class TAGLIB_EXPORT Tag: public TagLib::Tag
     {
     public:
+        Tag();
         Tag(TagLib::File *file, Atoms *atoms);
         ~Tag();
         bool save();
