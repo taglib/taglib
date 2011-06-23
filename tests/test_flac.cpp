@@ -190,7 +190,7 @@ public:
 
   void testSaveMultipleValues()
   {
-    ScopedFileCopy copy("silence-44-s", ".flac", false);
+    ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
     FLAC::File *f = new FLAC::File(newname.c_str());
