@@ -75,11 +75,6 @@ public:
       file.tag()->setTrackerName("won't be saved");
       CPPUNIT_ASSERT(file.save());
     }
-    String cmd("cp ");
-    cmd += copy.fileName();
-    cmd += " /tmp/copy.s3m";
-    CPPUNIT_ASSERT_EQUAL(0, system(cmd.data(String::Latin1).data()));
-
     testRead(copy.fileName().c_str(), titleAfter, commentAfter);
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
