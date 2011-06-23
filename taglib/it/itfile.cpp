@@ -134,9 +134,9 @@ bool IT::File::save()
 
   // it's actually not really stated if the message needs a
   // terminating NUL but it does not hurt to add one:
+  if(message.size() > 7999)
+    message.resize(7999);
   message.append((char)0);
-  if(message.size() > 8000)
-    message.resize(8000);
 
   ushort special = 0;
   ushort messageLength = 0;
