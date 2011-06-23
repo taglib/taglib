@@ -82,7 +82,9 @@ bool S3M::File::save()
   // note: if title starts with "Extended Module: "
   // the file would look like an .xm file
   seek(0);
-  writeString(d->tag.title(), 28);
+  writeString(d->tag.title(), 27);
+  // string terminating NUL is not optional:
+  writeByte(0);
 
   seek(32);
 
@@ -120,9 +122,11 @@ bool S3M::File::save()
     seek(((long)instrumentOffset << 4) + 48);
 
     if(i < lines.size())
-      writeString(lines[i], 28);
+      writeString(lines[i], 27);
     else
-      writeString(String::null, 28);
+      writeString(String::null, 27);
+    // string terminating NUL is not optional:
+    writeByte(0);
   }
   return true;
 }
@@ -163,6 +167,8 @@ void S3M::File::read(bool)
   // I've seen players who call the next two bytes
   // "ultra click" and "use panning values" (if == 0xFC).
   // I don't see them in any spec, though.
+  // Hm, but there is "UltraClick-removal" and some other
+  // variables in ScreamTracker IIIs GUI.
 
   seek(12, Current);
 

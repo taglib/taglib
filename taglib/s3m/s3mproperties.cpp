@@ -30,7 +30,7 @@ public:
   PropertiesPrivate() :
     tableLength(0),
     channels(0),
-    stereo(0),
+    stereo(false),
     sampleCount(0),
     patternCount(0),
     flags(0),
