@@ -130,7 +130,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->tableLength());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0, p->version());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0 , p->restartPosition());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->patternCount());
@@ -176,7 +176,7 @@ private:
     CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->tableLength());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)260, p->version());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0, p->restartPosition());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->patternCount());

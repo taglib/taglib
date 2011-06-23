@@ -93,7 +93,7 @@ private:
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
     CPPUNIT_ASSERT_EQUAL(31U, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL((uchar)1, p->tableLength());
+    CPPUNIT_ASSERT_EQUAL((uchar)1, p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
     CPPUNIT_ASSERT_EQUAL(String::null, t->artist());
     CPPUNIT_ASSERT_EQUAL(String::null, t->album());

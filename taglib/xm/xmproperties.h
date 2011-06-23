@@ -31,6 +31,11 @@ namespace TagLib {
     class Properties : public AudioProperties {
       friend class File;
     public:
+      /*! Flag bits. */
+      enum {
+        F_AMIGA_FREQ = 1
+      };
+
       Properties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~Properties();
       
@@ -39,20 +44,20 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort tableLength()     const;
-      ushort version()         const;
-      ushort restartPosition() const;
-      ushort patternCount()    const;
-      ushort instrumentCount() const;
-      uint   sampleCount()     const;
-      ushort flags()           const;
-      ushort tempo()           const;
-      ushort bpmSpeed()        const;
+      ushort lengthInPatterns() const;
+      ushort version()          const;
+      ushort restartPosition()  const;
+      ushort patternCount()     const;
+      ushort instrumentCount()  const;
+      uint   sampleCount()      const;
+      ushort flags()            const;
+      ushort tempo()            const;
+      ushort bpmSpeed()         const;
 
     protected:
       void setChannels(int channels);
 
-      void setTableLength(ushort tableLength);
+      void setLengthInPatterns(ushort lengthInPatterns);
       void setVersion(ushort version);
       void setRestartPosition(ushort restartPosition);
       void setPatternCount(ushort patternCount);

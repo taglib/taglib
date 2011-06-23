@@ -78,7 +78,8 @@ bool IT::File::save()
     return false;
   }
   seek(4);
-  writeString(d->tag.title(), 26);
+  writeString(d->tag.title(), 25);
+  writeByte(0);
 
   seek(2, Current);
 
@@ -103,9 +104,10 @@ bool IT::File::save()
     seek(instrumentOffset + 32);
 
     if(i < lines.size())
-      writeString(lines[i], 26);
+      writeString(lines[i], 25);
     else
-      writeString(String::null, 26);
+      writeString(String::null, 25);
+    writeByte(0);
   }
 
   for(ushort i = 0; i < sampleCount; ++ i)
@@ -118,9 +120,10 @@ bool IT::File::save()
     seek(sampleOffset + 20);
 
     if((i + instrumentCount) < lines.size())
-      writeString(lines[i + instrumentCount], 26);
+      writeString(lines[i + instrumentCount], 25);
     else
-      writeString(String::null, 26);
+      writeString(String::null, 25);
+    writeByte(0);
   }
 
   // write rest as message:
@@ -128,6 +131,9 @@ bool IT::File::save()
   for(uint i = instrumentCount + sampleCount; i < lines.size(); ++ i)
     messageLines.append(lines[i]);
   ByteVector message = messageLines.toString("\r").data(String::Latin1);
+  if(message.size() > 8000)
+    message.resize(8000);
+
   ushort special = 0;
   ushort messageLength = 0;
   ulong  messageOffset = 0;
@@ -249,7 +255,7 @@ void IT::File::read(bool)
     if(order == 255) break;
     if(order != 254) ++ realLength;
   }
-  d->properties.setTableLength(realLength);
+  d->properties.setLengthInPatterns(realLength);
 
   StringList comment;
   // Note: I found files that have nil characters somewhere
@@ -290,6 +296,7 @@ void IT::File::read(bool)
     READ_BYTE_AS(sampleFlags);
     READ_BYTE_AS(sampleVolume);
     READ_STRING_AS(sampleName, 26);
+    /*
     READ_BYTE_AS(sampleCvt);
     READ_BYTE_AS(samplePanning);
     READ_U32L_AS(sampleLength);
@@ -303,15 +310,13 @@ void IT::File::read(bool)
     READ_BYTE_AS(vibratoDepth);
     READ_BYTE_AS(vibratoRate);
     READ_BYTE_AS(vibratoType);
+    */
     
     comment.append(sampleName);
   }
 
-  if(comment.size() > 0 && message.size() > 0)
-    d->tag.setComment(comment.toString("\n") + "\n" + message);
-  else if(comment.size() > 0)
-    d->tag.setComment(comment.toString("\n"));
-  else
-    d->tag.setComment(message);
+  if(message.size() > 0)
+    comment.append(message);
+  d->tag.setComment(comment.toString("\n"));
   d->tag.setTrackerName("Impulse Tracker");
 }

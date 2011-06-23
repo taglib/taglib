@@ -465,10 +465,10 @@ bool XM::File::save()
         {
           if(sampleHeaderSize > 4U)
           {
-            ulong length = 0;
-            if(!readU32L(length))
+            ulong sampleLength = 0;
+            if(!readU32L(sampleLength))
               return false;
-            offset += length;
+            offset += sampleLength;
 
             seek(std::min(sampleHeaderSize, 14UL), Current);
             if(sampleHeaderSize > 18U)
@@ -523,7 +523,7 @@ void XM::File::read(bool)
   READ_U32L_AS(headerSize);
   READ_ASSERT(headerSize >= 4);
 
-  ushort tableLength     = 0;
+  ushort length          = 0;
   ushort restartPosition = 0;
   ushort channels        = 0;
   ushort patternCount    = 0;
@@ -533,7 +533,7 @@ void XM::File::read(bool)
   ushort bpmSpeed = 0;
 
   StructReader header;
-  header.u16L(tableLength)
+  header.u16L(length)
         .u16L(restartPosition)
         .u16L(channels)
         .u16L(patternCount)
@@ -547,7 +547,7 @@ void XM::File::read(bool)
   
   READ_ASSERT(count == size);
 
-  d->properties.setTableLength(tableLength);
+  d->properties.setLengthInPatterns(length);
   d->properties.setRestartPosition(restartPosition);
   d->properties.setChannels(channels);
   d->properties.setPatternCount(patternCount);
@@ -609,18 +609,18 @@ void XM::File::read(bool)
 
       for(ushort j = 0; j < sampleCount; ++ j)
       {
-        ulong length      = 0;
-        ulong loopStart   = 0;
-        ulong loopLength  = 0;
-        uchar volume      = 0;
-        uchar finetune    = 0;
-        uchar sampleType  = 0;
-        uchar panning     = 0;
-        uchar noteNumber  = 0;
-        uchar compression = 0;
+        ulong sampleLength = 0;
+        ulong loopStart    = 0;
+        ulong loopLength   = 0;
+        uchar volume       = 0;
+        uchar finetune     = 0;
+        uchar sampleType   = 0;
+        uchar panning      = 0;
+        uchar noteNumber   = 0;
+        uchar compression  = 0;
         String sampleName;
         StructReader sample;
-        sample.u32L(length)
+        sample.u32L(sampleLength)
               .u32L(loopStart)
               .u32L(loopLength)
               .byte(volume)
@@ -636,7 +636,7 @@ void XM::File::read(bool)
         // skip unhandeled header proportion:
         seek(sampleHeaderSize - count, Current);
 
-        offset += length;
+        offset += sampleLength;
         sampleNames.append(sampleName);
       }
     }

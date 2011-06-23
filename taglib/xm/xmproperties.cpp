@@ -28,7 +28,7 @@ class XM::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    tableLength(0),
+    lengthInPatterns(0),
     channels(0),
     version(0),
     restartPosition(0),
@@ -41,7 +41,7 @@ public:
   {
   }
   
-  ushort tableLength;
+  ushort lengthInPatterns;
   int    channels;
   ushort version;
   ushort restartPosition;
@@ -84,9 +84,9 @@ int XM::Properties::channels() const
   return d->channels;
 }
 
-ushort XM::Properties::tableLength() const
+ushort XM::Properties::lengthInPatterns() const
 {
-  return d->tableLength;
+  return d->lengthInPatterns;
 }
 
 ushort XM::Properties::version() const
@@ -129,9 +129,9 @@ ushort XM::Properties::bpmSpeed() const
   return d->bpmSpeed;
 }
 
-void XM::Properties::setTableLength(ushort tableLength)
+void XM::Properties::setLengthInPatterns(ushort lengthInPatterns)
 {
-  d->tableLength = tableLength;
+  d->lengthInPatterns = lengthInPatterns;
 }
 
 void XM::Properties::setChannels(int channels)

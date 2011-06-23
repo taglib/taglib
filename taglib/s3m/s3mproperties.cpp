@@ -28,7 +28,7 @@ class S3M::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    tableLength(0),
+    lengthInPatterns(0),
     channels(0),
     stereo(false),
     sampleCount(0),
@@ -43,7 +43,7 @@ public:
   {
   }
   
-  ushort tableLength;
+  ushort lengthInPatterns;
   int    channels;
   bool   stereo;
   ushort sampleCount;
@@ -88,9 +88,9 @@ int S3M::Properties::channels() const
   return d->channels;
 }
 
-ushort S3M::Properties::tableLength() const
+ushort S3M::Properties::lengthInPatterns() const
 {
-  return d->tableLength;
+  return d->lengthInPatterns;
 }
 
 bool S3M::Properties::stereo() const
@@ -143,9 +143,9 @@ uchar S3M::Properties::bpmSpeed() const
   return d->bpmSpeed;
 }
 
-void S3M::Properties::setTableLength(ushort tableLength)
+void S3M::Properties::setLengthInPatterns(ushort lengthInPatterns)
 {
-  d->tableLength = tableLength;
+  d->lengthInPatterns = lengthInPatterns;
 }
 
 void S3M::Properties::setChannels(int channels)

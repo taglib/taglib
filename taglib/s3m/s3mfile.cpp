@@ -191,7 +191,7 @@ void S3M::File::read(bool)
 	  if(order == 255) break;
 	  if(order != 254) ++ realLength;
   }
-  d->properties.setTableLength(realLength);
+  d->properties.setLengthInPatterns(realLength);
 
   seek(channels, Current);
 

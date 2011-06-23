@@ -29,8 +29,7 @@ class IT::Properties::PropertiesPrivate
 public:
   PropertiesPrivate() :
     channels(0),
-    tableLength(0),
-    stereo(false),
+    lengthInPatterns(0),
     instrumentCount(0),
     sampleCount(0),
     patternCount(0),
@@ -48,8 +47,7 @@ public:
   }
 
   int    channels;
-  ushort tableLength;
-  bool   stereo;
+  ushort lengthInPatterns;
   ushort instrumentCount;
   ushort sampleCount;
   ushort patternCount;
@@ -96,14 +94,14 @@ int IT::Properties::channels() const
   return d->channels;
 }
 
-ushort IT::Properties::tableLength() const
+ushort IT::Properties::lengthInPatterns() const
 {
-  return d->tableLength;
+  return d->lengthInPatterns;
 }
 
 bool IT::Properties::stereo() const
 {
-  return d->stereo;
+  return d->flags & F_STEREO;
 }
 
 ushort IT::Properties::instrumentCount() const
@@ -176,14 +174,9 @@ void IT::Properties::setChannels(int channels)
   d->channels = channels;
 }
 
-void IT::Properties::setTableLength(ushort tableLength)
+void IT::Properties::setLengthInPatterns(ushort lengthInPatterns)
 {
-  d->tableLength = tableLength;
-}
-
-void IT::Properties::setStereo(bool stereo)
-{
-  d->stereo = stereo;
+  d->lengthInPatterns = lengthInPatterns;
 }
 
 void IT::Properties::setInstrumentCount(ushort instrumentCount) {

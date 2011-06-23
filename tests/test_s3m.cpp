@@ -98,7 +98,7 @@ private:
     CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL( 0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(16, p->channels());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0, p->tableLength());
+    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)   0, p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL(false, p->stereo());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)   5, p->sampleCount());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)   1, p->patternCount());

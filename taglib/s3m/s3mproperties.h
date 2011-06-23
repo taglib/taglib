@@ -30,6 +30,17 @@ namespace TagLib {
     class TAGLIB_EXPORT Properties : public AudioProperties {
       friend class File;
     public:
+      /*! Flag bits. */
+      enum {
+        F_ST2_VIBRATO   =   1,
+        F_ST2_TEMPO     =   2,
+        F_AMIGA_SLIDES  =   4,
+        F_VOL0_MIX_OPT  =   8,
+        F_AMIGA_LIMITS  =  16,
+        F_ENABLE_FILTER =  32,
+        F_CUSTOM_DATA   = 128
+      };
+
       Properties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~Properties();
       
@@ -38,7 +49,7 @@ namespace TagLib {
       int sampleRate() const;
       int channels()   const;
 
-      ushort tableLength()       const;
+      ushort lengthInPatterns()  const;
       bool   stereo()            const;
       ushort sampleCount()       const;
       ushort patternCount()      const;
@@ -51,9 +62,9 @@ namespace TagLib {
       uchar  bpmSpeed()          const;
 
     protected:
-      void setTableLength(ushort tableLength);
       void setChannels(int channels);
 
+      void setLengthInPatterns (ushort lengthInPatterns);
       void setStereo           (bool stereo);
       void setSampleCount      (ushort sampleCount);
       void setPatternCount     (ushort patternCount);

@@ -178,7 +178,7 @@ void Mod::File::read(bool)
     comment.append(instrumentName);
   }
 
-  READ_BYTE(d->properties.setTableLength);
+  READ_BYTE(d->properties.setLengthInPatterns);
 
   d->tag.setComment(comment.toString("\n"));
 }
