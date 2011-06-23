@@ -20,8 +20,6 @@
  ***************************************************************************/
 
 #include <cppunit/extensions/HelperMacros.h>
-#include <string>
-#include <sstream>
 #include <xmfile.h>
 #include "utils.h"
 

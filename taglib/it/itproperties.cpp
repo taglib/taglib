@@ -57,8 +57,8 @@ public:
   ushort compatibleVersion;
   ushort flags;
   ushort special;
-  ushort globalVolume;
-  ushort mixVolume;
+  uchar  globalVolume;
+  uchar  mixVolume;
   uchar  tempo;
   uchar  bpmSpeed;
   uchar  panningSeparation;
@@ -141,12 +141,12 @@ ushort IT::Properties::special() const
   return d->special;
 }
 
-ushort IT::Properties::globalVolume() const
+uchar IT::Properties::globalVolume() const
 {
   return d->globalVolume;
 }
 
-ushort IT::Properties::mixVolume() const
+uchar IT::Properties::mixVolume() const
 {
   return d->mixVolume;
 }
@@ -220,12 +220,12 @@ void IT::Properties::setVersion(ushort version)
   d->version = version;
 }
 
-void IT::Properties::setGlobalVolume(ushort globalVolume)
+void IT::Properties::setGlobalVolume(uchar globalVolume)
 {
   d->globalVolume = globalVolume;
 }
 
-void IT::Properties::setMixVolume(ushort mixVolume)
+void IT::Properties::setMixVolume(uchar mixVolume)
 {
   d->mixVolume = mixVolume;
 }

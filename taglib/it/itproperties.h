@@ -47,8 +47,8 @@ namespace TagLib {
       ushort compatibleVersion() const;
       ushort flags()             const;
       ushort special()           const;
-      ushort globalVolume()      const;
-      ushort mixVolume()         const;
+      uchar  globalVolume()      const;
+      uchar  mixVolume()         const;
       uchar  tempo()             const;
       uchar  bpmSpeed()          const;
       uchar  panningSeparation() const;
@@ -66,8 +66,8 @@ namespace TagLib {
       void setCompatibleVersion(ushort compatibleVersion);
       void setFlags       (ushort flags);
       void setSpecial     (ushort special);
-      void setGlobalVolume(ushort globalVolume);
-      void setMixVolume   (ushort mixVolume);
+      void setGlobalVolume(uchar globalVolume);
+      void setMixVolume   (uchar mixVolume);
       void setTempo       (uchar tempo);
       void setBpmSpeed    (uchar bpmSpeed);
       void setPanningSeparation(uchar panningSeparation);
