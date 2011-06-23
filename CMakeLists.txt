@@ -14,8 +14,8 @@ option(BUILD_TESTS "Build the test suite"  OFF)
 option(BUILD_EXAMPLES "Build the examples"  OFF)
 
 option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
-option(WITH_ASF "Enable ASF tag reading/writing code"  OFF)
-option(WITH_MP4 "Enable MP4 tag reading/writing code"  OFF)
+option(WITH_ASF "Enable ASF tag reading/writing code"  ON)
+option(WITH_MP4 "Enable MP4 tag reading/writing code"  ON)
 
 add_definitions(-DHAVE_CONFIG_H)
 set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
