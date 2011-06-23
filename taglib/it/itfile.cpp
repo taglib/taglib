@@ -131,6 +131,10 @@ bool IT::File::save()
   for(uint i = instrumentCount + sampleCount; i < lines.size(); ++ i)
     messageLines.append(lines[i]);
   ByteVector message = messageLines.toString("\r").data(String::Latin1);
+
+  // it's actually not really stated if the message needs a
+  // terminating NUL but it does not hurt to add one:
+  message.append((char)0);
   if(message.size() > 8000)
     message.resize(8000);
 
