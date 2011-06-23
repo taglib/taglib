@@ -53,6 +53,7 @@ SET(test_runner_SRCS
   test_wavpack.cpp
   test_mod.cpp
   test_s3m.cpp
+  test_it.cpp
   test_xm.cpp
 )
 IF(WITH_MP4)
