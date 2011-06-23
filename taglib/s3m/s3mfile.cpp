@@ -143,7 +143,6 @@ void S3M::File::read(bool)
   READ_U16L_AS(length);
   READ_U16L_AS(sampleCount);
 
-  d->properties.setTableLength(length);
   d->properties.setSampleCount(sampleCount);
 
   READ_U16L(d->properties.setPatternCount);
@@ -177,12 +176,23 @@ void S3M::File::read(bool)
     if(setting != 0xff) ++ channels;
   }
   d->properties.setChannels(channels);
+  
+  seek(96);
+  ushort realLength = 0;
+  for(ushort i = 0; i < length; ++ i)
+  {
+	  READ_BYTE_AS(order);
+	  if(order == 255) break;
+	  if(order != 254) ++ realLength;
+  }
+  d->properties.setTableLength(realLength);
 
   seek(channels, Current);
 
-  // Note: The S3M spec mentions instruments, but I could
-  //       not figure out where these can be found. They are
-  //       similar to samples, though (SCRI instead of SCRS).
+  // Note: The S3M spec mentions samples and instruments, but in
+  //       the header there are only pointers to instruments.
+  //       However, there I never found instruments (SCRI) but
+  //       instead samples (SCRS).
   StringList comment;
   for(ushort i = 0; i < sampleCount; ++ i)
   {
@@ -209,7 +219,7 @@ void S3M::File::read(bool)
 
     READ_STRING_AS(sampleName, 28);
     // The next 4 bytes should be "SCRS", but I've found
-    // otherwise ok files with 4 nils instead.
+    // files that are otherwise ok with 4 nils instead.
     // READ_ASSERT(readBlock(4) == "SCRS");
 
     comment.append(sampleName);

@@ -50,9 +50,9 @@ namespace TagLib {
       ushort bpmSpeed()        const;
 
     protected:
-      void setTableLength(ushort tableLength);
       void setChannels(int channels);
 
+      void setTableLength(ushort tableLength);
       void setVersion(ushort version);
       void setRestartPosition(ushort restartPosition);
       void setPatternCount(ushort patternCount);

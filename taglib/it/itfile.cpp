@@ -123,6 +123,56 @@ bool IT::File::save()
       writeString(String::null, 26);
   }
 
+  // write rest as message:
+  StringList messageLines;
+  for(uint i = instrumentCount + sampleCount; i < lines.size(); ++ i)
+    messageLines.append(lines[i]);
+  ByteVector message = messageLines.toString("\r").data(String::Latin1);
+  ushort special = 0;
+  ushort messageLength = 0;
+  ulong  messageOffset = 0;
+
+  seek(46);
+  if(!readU16L(special))
+    return false;
+
+  long fileSize = this->length();
+  if(special & 0x1)
+  {
+    seek(54);
+    if(!readU16L(messageLength) || !readU32L(messageOffset))
+      return false;
+
+    if(messageLength == 0)
+      messageOffset = fileSize;
+  }
+  else
+  {
+    messageOffset = fileSize;
+    seek(46);
+    writeU16L(special | 0x1);
+  }
+
+  if((messageOffset + messageLength) >= fileSize)
+  {
+    // append new message
+    seek(54);
+    writeU16L(message.size());
+    writeU32L(messageOffset);
+    seek(messageOffset);
+    writeBlock(message);
+    truncate(messageOffset + message.size());
+  }
+  else
+  {
+    // Only overwrite existing message.
+    // I'd need to parse (understand!) the whole file for more.
+    // Although I could just move the message to the end of file
+    // and let the existing one be, but that would waste space.
+    message.resize(messageLength, 0);
+    seek(messageOffset);
+    writeBlock(message);
+  }
   return true;
 }
 
@@ -141,7 +191,6 @@ void IT::File::read(bool)
   READ_U16L_AS(instrumentCount);
   READ_U16L_AS(sampleCount);
   
-  d->properties.setTableLength(length);
   d->properties.setInstrumentCount(instrumentCount);
   d->properties.setSampleCount(sampleCount);
   READ_U16L(d->properties.setPatternCount);
@@ -150,31 +199,30 @@ void IT::File::read(bool)
   READ_U16L(d->properties.setFlags);
   READ_U16L_AS(special);
   d->properties.setSpecial(special);
-  READ_U16L(d->properties.setGlobalVolume);
-  READ_U16L(d->properties.setMixVolume);
+  READ_BYTE(d->properties.setGlobalVolume);
+  READ_BYTE(d->properties.setMixVolume);
   READ_BYTE(d->properties.setBpmSpeed);
   READ_BYTE(d->properties.setTempo);
   READ_BYTE(d->properties.setPanningSeparation);
   READ_BYTE(d->properties.setPitchWheelDepth);
 
-  /*
-   * While the message would be a sorta comment tag, I don't
-   * see any IT files in the wild that use this or set the
-   * offset/length to a correct value.
-   *
-   * In all files I found where the message bit was set the
-   * offset was either 0 or a ridiculous high value and the
-   * length wasn't much better.
-   *
+  // IT supports some kind of comment tag. Still, the
+  // sample/instrument names are abused as comments so
+  // I just add all together.
+  String message;
   if(special & 0x1)
   {
     READ_U16L_AS(messageLength);
     READ_U32L_AS(messageOffset);
     seek(messageOffset);
-    READ_STRING_AS(message, messageLength);
-    debug("Message: \""+message+"\"");
+    ByteVector messageBytes = readBlock(messageLength);
+    READ_ASSERT(messageBytes.size() == messageLength);
+    int index = messageBytes.find((char) 0);
+    if(index > -1)
+      messageBytes.resize(index, 0);
+    messageBytes.replace('\r', '\n');
+    message = messageBytes;
   }
-  */
 
   seek(64);
 
@@ -192,6 +240,16 @@ void IT::File::read(bool)
     if(pannings[i] < 128 && volumes[i] > 0) ++ channels;
   }
   d->properties.setChannels(channels);
+  
+  // real length might be shorter because of skips and terminator
+  ushort realLength = 0;
+  for(ushort i = 0; i < length; ++ i)
+  {
+    READ_BYTE_AS(order);
+    if(order == 255) break;
+    if(order != 254) ++ realLength;
+  }
+  d->properties.setTableLength(realLength);
 
   StringList comment;
   // Note: I found files that have nil characters somewhere
@@ -249,6 +307,11 @@ void IT::File::read(bool)
     comment.append(sampleName);
   }
 
-  d->tag.setComment(comment.toString("\n"));
+  if(comment.size() > 0 && message.size() > 0)
+    d->tag.setComment(comment.toString("\n") + "\n" + message);
+  else if(comment.size() > 0)
+    d->tag.setComment(comment.toString("\n"));
+  else
+    d->tag.setComment(message);
   d->tag.setTrackerName("Impulse Tracker");
 }

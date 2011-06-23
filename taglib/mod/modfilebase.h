@@ -39,6 +39,12 @@ namespace TagLib {
       FileBase(IOStream *stream);
 
       void writeString(const String &s, ulong size, char padding = 0);
+      void writeByte(uchar byte);
+      void writeU16L(ushort number);
+      void writeU32L(ulong number);
+      void writeU16B(ushort number);
+      void writeU32B(ulong number);
+
       bool readString(String &s, ulong size);
       bool readByte(uchar &byte);
       bool readU16L(ushort &number);
