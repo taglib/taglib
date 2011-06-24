@@ -101,7 +101,7 @@ ushort IT::Properties::lengthInPatterns() const
 
 bool IT::Properties::stereo() const
 {
-  return d->flags & F_STEREO;
+  return d->flags & Stereo;
 }
 
 ushort IT::Properties::instrumentCount() const

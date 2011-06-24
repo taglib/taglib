@@ -145,7 +145,7 @@ bool IT::File::save()
     return false;
 
   long fileSize = this->length();
-  if(special & Properties::S_MESSAGE) {
+  if(special & Properties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))
       return false;
@@ -215,7 +215,7 @@ void IT::File::read(bool)
   // sample/instrument names are abused as comments so
   // I just add all together.
   String message;
-  if(special & Properties::S_MESSAGE) {
+  if(special & Properties::MessageAttached) {
     READ_U16L_AS(messageLength);
     READ_U32L_AS(messageOffset);
     seek(messageOffset);

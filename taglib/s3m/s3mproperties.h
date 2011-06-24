@@ -32,13 +32,13 @@ namespace TagLib {
     public:
       /*! Flag bits. */
       enum {
-        F_ST2_VIBRATO   =   1,
-        F_ST2_TEMPO     =   2,
-        F_AMIGA_SLIDES  =   4,
-        F_VOL0_MIX_OPT  =   8,
-        F_AMIGA_LIMITS  =  16,
-        F_ENABLE_FILTER =  32,
-        F_CUSTOM_DATA   = 128
+        ST2Vibrato           =   1,
+        ST2Tempo             =   2,
+        AmigaSlides          =   4,
+        Vol0MixOptimizations =   8,
+        AmigaLimits          =  16,
+        EnableFilter         =  32,
+        CustomData           = 128
       };
 
       Properties(AudioProperties::ReadStyle propertiesStyle);

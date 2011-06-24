@@ -33,7 +33,7 @@ namespace TagLib {
     public:
       /*! Flag bits. */
       enum {
-        F_AMIGA_FREQ = 1
+        LinearFreqTable = 1 // otherwise its the amiga freq. table
       };
 
       Properties(AudioProperties::ReadStyle propertiesStyle);

@@ -32,20 +32,20 @@ namespace TagLib {
     public:
       /*! Flag bits. */
       enum {
-        F_STEREO             =   1,
-        F_VOL0_MIX_OPT       =   2,
-        F_INSTRUMENTS        =   4,
-        F_LINEAR_SLIDES      =   8,
-        F_OLD_EFFECTS        =  16,
-        F_LINK_EFFECT        =  32,
-        F_MIDI_PITCH_CTRL    =  64,
-        F_EMBEDDED_MIDI_CONF = 128
+        Stereo                  =   1,
+        Vol0MixOptimizations    =   2,
+        UseInstruments          =   4,
+        LinearSlides            =   8,
+        OldEffects              =  16,
+        LinkEffects             =  32,
+        UseMidiPitchController  =  64,
+        RequestEmbeddedMidiConf = 128
       };
 
       /*! Special bits. */
       enum {
-        S_MESSAGE            = 1,
-        S_EMBEDDED_MIDI_CONF = 8
+        MessageAttached  = 1,
+        MidiConfEmbedded = 8
       };
 
       Properties(AudioProperties::ReadStyle propertiesStyle);
