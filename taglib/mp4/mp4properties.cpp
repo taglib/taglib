@@ -27,8 +27,6 @@
 #include <config.h>
 #endif
 
-#ifdef WITH_MP4
-
 #include <tdebug.h>
 #include <tstring.h>
 #include "mp4file.h"
@@ -186,4 +184,3 @@ MP4::Properties::isEncrypted() const
   return d->encrypted;
 }
 
-#endif

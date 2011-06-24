@@ -27,8 +27,6 @@
 #include <config.h>
 #endif
 
-#ifdef WITH_ASF
-
 #include <tdebug.h>
 #include <tbytevectorlist.h>
 #include <tstring.h>
@@ -607,4 +605,3 @@ ByteVector ASF::File::renderString(const String &str, bool includeLength)
   return data;
 }
 
-#endif

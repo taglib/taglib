@@ -27,8 +27,6 @@
 #include <config.h>
 #endif
 
-#ifdef WITH_ASF
-
 #include <taglib.h>
 #include <tdebug.h>
 #include "asfattribute.h"
@@ -182,4 +180,3 @@ ASF::Picture ASF::Picture::fromInvalid()
   return ret;
 }
 
-#endif
