@@ -51,22 +51,15 @@ SET(test_runner_SRCS
   test_apetag.cpp
   test_wav.cpp
   test_wavpack.cpp
+  test_mp4.cpp
+  test_mp4item.cpp
+  test_mp4coverart.cpp
+  test_asf.cpp
   test_mod.cpp
   test_s3m.cpp
   test_it.cpp
   test_xm.cpp
 )
-IF(WITH_MP4)
-   SET(test_runner_SRCS ${test_runner_SRCS}
-     test_mp4.cpp
-     test_mp4item.cpp
-     test_mp4coverart.cpp
-   )
-ENDIF(WITH_MP4)
-
-IF(WITH_ASF)
-   SET(test_runner_SRCS ${test_runner_SRCS} test_asf.cpp)
-ENDIF(WITH_ASF)
 
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
 TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})

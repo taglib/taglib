@@ -27,8 +27,6 @@
 #include <config.h>
 #endif
 
-#ifdef WITH_ASF
-
 #include <tdebug.h>
 #include <tstring.h>
 #include "asfproperties.h"
@@ -115,4 +113,3 @@ void ASF::Properties::setEncrypted(bool encrypted)
   d->encrypted = encrypted;
 }
 
-#endif

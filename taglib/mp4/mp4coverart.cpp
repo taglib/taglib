@@ -27,8 +27,6 @@
 #include <config.h>
 #endif
 
-#ifdef WITH_MP4
-
 #include <taglib.h>
 #include <tdebug.h>
 #include "mp4coverart.h"
@@ -86,4 +84,3 @@ MP4::CoverArt::data() const
   return d->data;
 }
 
-#endif

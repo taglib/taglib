@@ -86,14 +86,10 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     return reinterpret_cast<TagLib_File *>(new Ogg::Speex::File(filename));
   case TagLib_File_TrueAudio:
     return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
-#ifdef TAGLIB_WITH_MP4
   case TagLib_File_MP4:
     return reinterpret_cast<TagLib_File *>(new MP4::File(filename));
-#endif
-#ifdef TAGLIB_WITH_ASF
   case TagLib_File_ASF:
     return reinterpret_cast<TagLib_File *>(new ASF::File(filename));
-#endif
   default:
     return 0;
   }

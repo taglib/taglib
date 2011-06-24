@@ -101,6 +101,17 @@ set(tag_HDRS
   riff/aiff/aiffproperties.h
   riff/wav/wavfile.h
   riff/wav/wavproperties.h
+  asf/asffile.h
+  asf/asfproperties.h
+  asf/asftag.h
+  asf/asfattribute.h
+  asf/asfpicture.h
+  mp4/mp4file.h
+  mp4/mp4atom.h
+  mp4/mp4tag.h
+  mp4/mp4item.h
+  mp4/mp4properties.h
+  mp4/mp4coverart.h
   mod/modfilebase.h
   mod/modfile.h
   mod/modtag.h
@@ -112,25 +123,6 @@ set(tag_HDRS
   xm/xmfile.h
   xm/xmproperties.h
 )
-if(WITH_ASF)
-  set(tag_HDRS ${tag_HDRS}
-    asf/asffile.h
-    asf/asfproperties.h
-    asf/asftag.h
-    asf/asfattribute.h
-    asf/asfpicture.h
-  )
-endif()
-if(WITH_MP4)
-  set(tag_HDRS ${tag_HDRS}
-    mp4/mp4file.h
-    mp4/mp4atom.h
-    mp4/mp4tag.h
-    mp4/mp4item.h
-    mp4/mp4properties.h
-    mp4/mp4coverart.h
-  )
-endif()
 
 set(mpeg_SRCS
   mpeg/mpegfile.cpp
@@ -290,18 +282,12 @@ set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
-  ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS}
+  ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
   audioproperties.cpp
 )
-if(WITH_ASF)
-  set(tag_LIB_SRCS ${tag_LIB_SRCS} ${asf_SRCS})
-endif()
-if(WITH_MP4)
-  set(tag_LIB_SRCS ${tag_LIB_SRCS} ${mp4_SRCS})
-endif()
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 

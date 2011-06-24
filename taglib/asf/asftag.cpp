@@ -27,8 +27,6 @@
 #include <config.h>
 #endif
 
-#ifdef WITH_ASF
-
 #include "asftag.h"
 
 using namespace TagLib;
@@ -198,4 +196,3 @@ bool ASF::Tag::isEmpty() const
          d->attributeListMap.isEmpty();
 }
 
-#endif
