@@ -94,8 +94,7 @@ bool IT::File::save()
 
   // write comment as instrument and sample names:
   StringList lines = d->tag.comment().split("\n");
-  for(ushort i = 0; i < instrumentCount; ++ i)
-  {
+  for(ushort i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
     ulong instrumentOffset = 0;
     if(!readU32L(instrumentOffset))
@@ -110,8 +109,7 @@ bool IT::File::save()
     writeByte(0);
   }
 
-  for(ushort i = 0; i < sampleCount; ++ i)
-  {
+  for(ushort i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     ulong sampleOffset = 0;
     if(!readU32L(sampleOffset))
@@ -147,8 +145,7 @@ bool IT::File::save()
     return false;
 
   long fileSize = this->length();
-  if(special & 0x1)
-  {
+  if(special & Properties::S_MESSAGE) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))
       return false;
@@ -163,8 +160,7 @@ bool IT::File::save()
     writeU16L(special | 0x1);
   }
 
-  if((messageOffset + messageLength) >= fileSize)
-  {
+  if((messageOffset + messageLength) >= fileSize) {
     // append new message
     seek(54);
     writeU16L(message.size());
@@ -173,8 +169,7 @@ bool IT::File::save()
     writeBlock(message);
     truncate(messageOffset + message.size());
   }
-  else
-  {
+  else {
     // Only overwrite existing message.
     // I'd need to parse (understand!) the whole file for more.
     // Although I could just move the message to the end of file
@@ -220,8 +215,7 @@ void IT::File::read(bool)
   // sample/instrument names are abused as comments so
   // I just add all together.
   String message;
-  if(special & 0x1)
-  {
+  if(special & Properties::S_MESSAGE) {
     READ_U16L_AS(messageLength);
     READ_U32L_AS(messageOffset);
     seek(messageOffset);
@@ -240,8 +234,7 @@ void IT::File::read(bool)
   ByteVector volumes  = readBlock(64);
   READ_ASSERT(pannings.size() == 64 && volumes.size() == 64);
   int channels = 0;
-  for(int i = 0; i < 64; ++ i)
-  {
+  for(int i = 0; i < 64; ++ i) {
     // Strictly speaking an IT file has always 64 channels, but
     // I don't count disabled and muted channels.
     // But this always gives 64 channels for all my files anyway.
@@ -253,8 +246,7 @@ void IT::File::read(bool)
   
   // real length might be shorter because of skips and terminator
   ushort realLength = 0;
-  for(ushort i = 0; i < length; ++ i)
-  {
+  for(ushort i = 0; i < length; ++ i) {
     READ_BYTE_AS(order);
     if(order == 255) break;
     if(order != 254) ++ realLength;
@@ -268,8 +260,7 @@ void IT::File::read(bool)
   //       Currently I just discard anything after a nil, but
   //       e.g. VLC seems to interprete a nil as a space. I
   //       don't know what is the proper behaviour.
-  for(ushort i = 0; i < instrumentCount; ++ i)
-  {
+  for(ushort i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
     READ_U32L_AS(instrumentOffset);
     seek(instrumentOffset);
@@ -285,8 +276,7 @@ void IT::File::read(bool)
     comment.append(instrumentName);
   }
   
-  for(ushort i = 0; i < sampleCount; ++ i)
-  {
+  for(ushort i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     READ_U32L_AS(sampleOffset);
     

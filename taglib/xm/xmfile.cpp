@@ -41,14 +41,11 @@ using TagLib::ulong;
  *
  * Using these classes this code:
  *
- *   if(headerSize >= 4)
- *   {
+ *   if(headerSize >= 4) {
  *     if(!readU16L(value1)) ERROR();
- *     if(headerSize >= 8)
- *     {
+ *     if(headerSize >= 8) {
  *       if(!readU16L(value2)) ERROR();
- *       if(headerSize >= 12)
- *       {
+ *       if(headerSize >= 12) {
  *         if(!readString(value3, 22)) ERROR();
  *         ...
  *       }
@@ -132,8 +129,7 @@ public:
     ByteVector data = file.readBlock(std::min(m_size,limit));
     uint count = data.size();
     int index = data.find((char) 0);
-    if(index > -1)
-    {
+    if(index > -1) {
       data.resize(index);
     }
     data.replace((char) 0xff, ' ');
@@ -158,8 +154,7 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     ByteVector data = file.readBlock(std::min(1U,limit));
-    if(data.size() > 0)
-    {
+    if(data.size() > 0) {
       value = data[0];
     }
     return data.size();
@@ -323,8 +318,8 @@ public:
   uint size() const
   {
     uint size = 0;
-    for(List<Reader*>::ConstIterator i = m_readers.begin(); i != m_readers.end(); ++ i)
-    {
+    for(List<Reader*>::ConstIterator i = m_readers.begin();
+        i != m_readers.end(); ++ i) {
       size += (*i)->size();
     }
     return size;
@@ -333,8 +328,8 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     uint sumcount = 0;
-    for(List<Reader*>::Iterator i = m_readers.begin(); limit > 0 && i != m_readers.end(); ++ i)
-    {
+    for(List<Reader*>::Iterator i = m_readers.begin();
+        limit > 0 && i != m_readers.end(); ++ i) {
       uint count = (*i)->read(file, limit);
       limit    -= count;
       sumcount += count;
@@ -391,8 +386,7 @@ XM::Properties *XM::File::audioProperties() const
 
 bool XM::File::save()
 {
-  if(readOnly())
-  {
+  if(readOnly()) {
     debug("XM::File::save() - Cannot save to a read only file.");
     return false;
   }
@@ -414,8 +408,7 @@ bool XM::File::save()
   seek(60 + headerSize);
 
   // need to read patterns again in order to seek to the instruments:
-  for(ushort i = 0; i < patternCount; ++ i)
-  {
+  for(ushort i = 0; i < patternCount; ++ i) {
     ulong patternHeaderLength = 0;
     if(!readU32L(patternHeaderLength) || patternHeaderLength < 4)
       return false;
@@ -433,8 +426,7 @@ bool XM::File::save()
 
   StringList lines = d->tag.comment().split("\n");  
   uint sampleNameIndex = instrumentCount;
-  for(ushort i = 0; i < instrumentCount; ++ i)
-  {
+  for(ushort i = 0; i < instrumentCount; ++ i) {
     ulong instrumentHeaderSize = 0;
     if(!readU32L(instrumentHeaderSize) || instrumentHeaderSize < 4)
       return false;
@@ -446,33 +438,28 @@ bool XM::File::save()
       writeString(lines[i], len);
 
     long offset = 0;
-    if(instrumentHeaderSize >= 29U)
-    {
+    if(instrumentHeaderSize >= 29U) {
       ushort sampleCount = 0;
       seek(1, Current);
       if(!readU16L(sampleCount))
         return false;
 
-      if(sampleCount > 0)
-      {
+      if(sampleCount > 0) {
         ulong sampleHeaderSize = 0;
         if(instrumentHeaderSize < 33U || !readU32L(sampleHeaderSize))
           return false;
         // skip unhandeled header proportion:
         seek(instrumentHeaderSize - 33, Current);
         
-        for(ushort j = 0; j < sampleCount; ++ j)
-        {
-          if(sampleHeaderSize > 4U)
-          {
+        for(ushort j = 0; j < sampleCount; ++ j) {
+          if(sampleHeaderSize > 4U) {
             ulong sampleLength = 0;
             if(!readU32L(sampleLength))
               return false;
             offset += sampleLength;
 
             seek(std::min(sampleHeaderSize, 14UL), Current);
-            if(sampleHeaderSize > 18U)
-            {
+            if(sampleHeaderSize > 18U) {
               uint len = std::min(sampleHeaderSize - 18U, 22UL);
               if(sampleNameIndex >= lines.size())
                 writeString(String::null, len);
@@ -481,19 +468,16 @@ bool XM::File::save()
               seek(sampleHeaderSize - (18U + len), Current);
             }
           }
-          else
-          {
+          else {
             seek(sampleHeaderSize, Current);
           }
         }
       }
-      else
-      {
+      else {
         offset = instrumentHeaderSize - 29;
       }
     }
-    else
-    {
+    else {
       offset = instrumentHeaderSize - (4 + len);
     }
     seek(offset, Current);
@@ -559,8 +543,7 @@ void XM::File::read(bool)
   seek(60 + headerSize);
   
   // read patterns:
-  for(ushort i = 0; i < patternCount; ++ i)
-  {
+  for(ushort i = 0; i < patternCount; ++ i) {
     READ_U32L_AS(patternHeaderLength);
     READ_ASSERT(patternHeaderLength >= 4);
     
@@ -581,8 +564,7 @@ void XM::File::read(bool)
   uint sumSampleCount = 0;
 
   // read instruments:
-  for(ushort i = 0; i < instrumentCount; ++ i)
-  {
+  for(ushort i = 0; i < instrumentCount; ++ i) {
     READ_U32L_AS(instrumentHeaderSize);
     READ_ASSERT(instrumentHeaderSize >= 4);
 
@@ -599,16 +581,14 @@ void XM::File::read(bool)
 
     ulong sampleHeaderSize = 0;
     long offset = 0;
-    if(sampleCount > 0)
-    {
+    if(sampleCount > 0) {
       sumSampleCount += sampleCount;
       // wouldn't know which header size to assume otherwise:
       READ_ASSERT(instrumentHeaderSize >= count + 4 && readU32L(sampleHeaderSize));
       // skip unhandeled header proportion:
       seek(instrumentHeaderSize - count - 4, Current);
 
-      for(ushort j = 0; j < sampleCount; ++ j)
-      {
+      for(ushort j = 0; j < sampleCount; ++ j) {
         ulong sampleLength = 0;
         ulong loopStart    = 0;
         ulong loopLength   = 0;
@@ -640,8 +620,7 @@ void XM::File::read(bool)
         sampleNames.append(sampleName);
       }
     }
-    else
-    {
+    else {
       offset = instrumentHeaderSize - count;
     }
     intrumentNames.append(instrumentName);
@@ -650,8 +629,7 @@ void XM::File::read(bool)
 
   d->properties.setSampleCount(sumSampleCount);
   String comment(intrumentNames.toString("\n"));
-  if(sampleNames.size() > 0)
-  {
+  if(sampleNames.size() > 0) {
     comment += "\n";
     comment += sampleNames.toString("\n");
   }

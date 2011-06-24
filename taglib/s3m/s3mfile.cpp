@@ -74,8 +74,7 @@ S3M::Properties *S3M::File::audioProperties() const
 
 bool S3M::File::save()
 {
-  if(readOnly())
-  {
+  if(readOnly()) {
     debug("S3M::File::save() - Cannot save to a read only file.");
     return false;
   }
@@ -97,8 +96,7 @@ bool S3M::File::save()
   seek(28, Current);
 
   int channels = 0;
-  for(int i = 0; i < 32; ++ i)
-  {
+  for(int i = 0; i < 32; ++ i) {
     uchar setting = 0;
     if(!readByte(setting))
       return false;
@@ -112,8 +110,7 @@ bool S3M::File::save()
   
   StringList lines = d->tag.comment().split("\n");
   // write comment as sample names:
-  for(ushort i = 0; i < sampleCount; ++ i)
-  {
+  for(ushort i = 0; i < sampleCount; ++ i) {
     seek(96L + length + ((long)i << 1));
 
     ushort instrumentOffset = 0;
@@ -173,8 +170,7 @@ void S3M::File::read(bool)
   seek(12, Current);
 
   int channels = 0;
-  for(int i = 0; i < 32; ++ i)
-  {
+  for(int i = 0; i < 32; ++ i) {
     READ_BYTE_AS(setting);
     // or if(setting >= 128)?
     // or channels = i + 1;?
@@ -185,8 +181,7 @@ void S3M::File::read(bool)
   
   seek(96);
   ushort realLength = 0;
-  for(ushort i = 0; i < length; ++ i)
-  {
+  for(ushort i = 0; i < length; ++ i) {
 	  READ_BYTE_AS(order);
 	  if(order == 255) break;
 	  if(order != 254) ++ realLength;
@@ -200,8 +195,7 @@ void S3M::File::read(bool)
   //       However, there I never found instruments (SCRI) but
   //       instead samples (SCRS).
   StringList comment;
-  for(ushort i = 0; i < sampleCount; ++ i)
-  {
+  for(ushort i = 0; i < sampleCount; ++ i) {
     seek(96L + length + ((long)i << 1));
 
     READ_U16L_AS(sampleHeaderOffset);

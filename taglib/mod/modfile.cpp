@@ -72,8 +72,7 @@ Mod::Properties *Mod::File::audioProperties() const
 
 bool Mod::File::save()
 {
-  if(readOnly())
-  {
+  if(readOnly()) {
     debug("Mod::File::save() - Cannot save to a read only file.");
     return false;
   }
@@ -81,14 +80,12 @@ bool Mod::File::save()
   writeString(d->tag.title(), 20);
   StringList lines = d->tag.comment().split("\n");
   uint n = std::min(lines.size(), d->properties.instrumentCount());
-  for(uint i = 0; i < n; ++ i)
-  {
+  for(uint i = 0; i < n; ++ i) {
     writeString(lines[i], 22);
     seek(8, Current);
   }
 
-  for(uint i = n; i < d->properties.instrumentCount(); ++ i)
-  {
+  for(uint i = n; i < d->properties.instrumentCount(); ++ i) {
     writeString(String::null, 22);
     seek(8, Current);
   }
@@ -106,32 +103,27 @@ void Mod::File::read(bool)
 
   int  channels    =  4;
   uint instruments = 31;
-  if(modId == "M.K." || modId == "M!K!" || modId == "M&K!" || modId == "N.T.")
-  {
+  if(modId == "M.K." || modId == "M!K!" || modId == "M&K!" || modId == "N.T.") {
     d->tag.setTrackerName("ProTracker");
     channels = 4;
   }
-  else if(modId.startsWith("FLT") || modId.startsWith("TDZ"))
-  {
+  else if(modId.startsWith("FLT") || modId.startsWith("TDZ")) {
     d->tag.setTrackerName("StarTrekker");
     char digit = modId[3];
     READ_ASSERT(digit >= '0' && digit <= '9');
     channels = digit - '0';
   }
-  else if(modId.endsWith("CHN"))
-  {
+  else if(modId.endsWith("CHN")) {
     d->tag.setTrackerName("StarTrekker");
     char digit = modId[0];
     READ_ASSERT(digit >= '0' && digit <= '9');
     channels = digit - '0';
   }
-  else if(modId == "CD81" || modId == "OKTA")
-  {
+  else if(modId == "CD81" || modId == "OKTA") {
     d->tag.setTrackerName("Atari Oktalyzer");
     channels = 8;
   }
-  else if(modId.endsWith("CH") || modId.endsWith("CN"))
-  {
+  else if(modId.endsWith("CH") || modId.endsWith("CN")) {
     d->tag.setTrackerName("TakeTracker");
     char digit = modId[0];
     READ_ASSERT(digit >= '0' && digit <= '9');
@@ -140,8 +132,7 @@ void Mod::File::read(bool)
     READ_ASSERT(digit >= '0' && digit <= '9');
     channels += digit - '0';
   }
-  else
-  {
+  else {
     // Not sure if this is correct. I'd need a file
     // created with NoiseTracker to check this.
     d->tag.setTrackerName("NoiseTracker"); // probably
@@ -155,8 +146,7 @@ void Mod::File::read(bool)
   READ_STRING(d->tag.setTitle, 20);
 
   StringList comment;
-  for(uint i = 0; i < instruments; ++ i)
-  {
+  for(uint i = 0; i < instruments; ++ i) {
     READ_STRING_AS(instrumentName, 22);
     // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(sampleLength);

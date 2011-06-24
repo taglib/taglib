@@ -179,7 +179,8 @@ void IT::Properties::setLengthInPatterns(ushort lengthInPatterns)
   d->lengthInPatterns = lengthInPatterns;
 }
 
-void IT::Properties::setInstrumentCount(ushort instrumentCount) {
+void IT::Properties::setInstrumentCount(ushort instrumentCount)
+{
   d->instrumentCount = instrumentCount;
 }
 

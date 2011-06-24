@@ -27,7 +27,9 @@ using namespace Mod;
 class Mod::Tag::TagPrivate
 {
 public:
-  TagPrivate() {}
+  TagPrivate()
+  {
+  }
 
   String title;
   String comment;
