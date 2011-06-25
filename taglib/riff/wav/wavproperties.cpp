@@ -42,7 +42,7 @@ public:
     sampleRate(0),
     channels(0),
     sampleWidth(0),
-	sampleFrames(0),
+    sampleFrames(0),
     streamLength(streamLength)
   {
 
