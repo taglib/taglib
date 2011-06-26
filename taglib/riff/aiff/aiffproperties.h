@@ -65,6 +65,7 @@ namespace TagLib {
 	virtual int channels() const;
 
 	int sampleWidth() const;
+	uint sampleFrames() const;
 
       private:
 	Properties(const Properties &);

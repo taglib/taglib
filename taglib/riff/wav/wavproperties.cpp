@@ -42,6 +42,7 @@ public:
     sampleRate(0),
     channels(0),
     sampleWidth(0),
+    sampleFrames(0),
     streamLength(streamLength)
   {
 
@@ -53,6 +54,7 @@ public:
   int sampleRate;
   int channels;
   int sampleWidth;
+  uint sampleFrames;
   uint streamLength;
 };
 
@@ -102,6 +104,11 @@ int RIFF::WAV::Properties::sampleWidth() const
   return d->sampleWidth;
 }
 
+uint RIFF::WAV::Properties::sampleFrames() const
+{
+	return d->sampleFrames;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,4 +124,5 @@ void RIFF::WAV::Properties::read(const ByteVector &data)
   d->bitrate = byteRate * 8 / 1000;
 
   d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
+  d->sampleFrames = d->streamLength / (d->channels * (d->sampleWidth / 8));
 }
