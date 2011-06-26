@@ -106,7 +106,7 @@ int RIFF::WAV::Properties::sampleWidth() const
 
 uint RIFF::WAV::Properties::sampleFrames() const
 {
-	return d->sampleFrames;
+  return d->sampleFrames;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

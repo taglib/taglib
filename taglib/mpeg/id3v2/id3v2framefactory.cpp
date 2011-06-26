@@ -185,13 +185,13 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   // ID3v2.2 Attached Picture
 
-	if(frameID == "PIC") {
+  if(frameID == "PIC") {
     AttachedPictureFrame *f = new AttachedPictureFrameV22(data, header);
     d->setTextEncoding(f);
     return f;
   }
 
-	// Relative Volume Adjustment (frames 4.11)
+  // Relative Volume Adjustment (frames 4.11)
 
   if(frameID == "RVA2")
     return new RelativeVolumeFrame(data, header);

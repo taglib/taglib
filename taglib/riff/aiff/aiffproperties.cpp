@@ -44,7 +44,7 @@ static double ConvertFromIeeeExtended(unsigned char *bytes)
   double f;
   int expon;
   unsigned long hiMant, loMant;
-    
+
   expon  = ((bytes[0] & 0x7F) << 8) | (bytes[1] & 0xFF);
 
   hiMant = ((unsigned long)(bytes[2] & 0xFF) << 24) |
@@ -141,7 +141,7 @@ int RIFF::AIFF::Properties::sampleWidth() const
 
 uint RIFF::AIFF::Properties::sampleFrames() const
 {
-	return d->sampleFrames;
+  return d->sampleFrames;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
