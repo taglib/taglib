@@ -397,8 +397,8 @@ namespace TagLib {
     static ByteVector null;
 
     /*!
-	   * Returns a hex-encoded copy of the byte vector.
-	   */
+     * Returns a hex-encoded copy of the byte vector.
+     */
     ByteVector toHex() const;
 
   protected:

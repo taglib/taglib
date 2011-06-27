@@ -100,7 +100,7 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
         readOnly = false;
       else
         file = _wfopen(name, L"rb");
-	}
+    }
 
     if(file)
       return;

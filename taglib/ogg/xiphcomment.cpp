@@ -285,7 +285,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
   // The first thing in the comment data is the vendor ID length, followed by a
   // UTF8 string with the vendor ID.
 
-  int pos = 0;
+  uint pos = 0;
 
   int vendorLength = data.mid(0, 4).toUInt(false);
   pos += 4;

@@ -79,7 +79,7 @@ namespace TagLib {
 
       /*!
        * Returns the MD5 signature of the uncompressed audio stream as read
-	   * from the stream info header header.
+       * from the stream info header header.
        */
       ByteVector signature() const;
 
