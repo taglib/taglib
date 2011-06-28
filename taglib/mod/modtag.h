@@ -96,7 +96,7 @@ namespace TagLib {
        * value will be cleared.
        *
        * The length limits per file type are (1 characetr = 1 byte):
-       * Mod 20 characters, S3M 28 characters, IT 26 characters and XM 20
+       * Mod 20 characters, S3M 27 characters, IT 25 characters and XM 20
        * characters.
        */
       void setTitle(const String &title);
@@ -125,7 +125,7 @@ namespace TagLib {
        * will be truncated.
        *
        * The line length limits per file type are (1 characetr = 1 byte):
-       * Mod 22 characters, S3M 28 characters, IT 26 characters and XM 22
+       * Mod 22 characters, S3M 27 characters, IT 25 characters and XM 22
        * characters.
        */
       void setComment(const String &comment);
