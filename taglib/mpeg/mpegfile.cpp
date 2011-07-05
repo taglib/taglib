@@ -56,7 +56,9 @@ public:
     ID3v1Location(-1),
     hasID3v2(false),
     hasID3v1(false),
+    hasLyrics3v2(false),
     hasAPE(false),
+    lyrics3v2Size(0),
     properties(0)
   {
 
@@ -85,7 +87,9 @@ public:
 
   bool hasID3v2;
   bool hasID3v1;
+  bool hasLyrics3v2;
   bool hasAPE;
+  long lyrics3v2Size;
 
   Properties *properties;
 };
@@ -198,6 +202,10 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
       if(ID3v1Tag())
         d->ID3v1Location = findID3v1();
 
+      // Lyrics3v2 tag location has changed, update if it exists
+      
+      findLyrics3v2();
+
       // APE tag location has changed, update if it exists
 
       if(APETag())
@@ -295,6 +303,10 @@ bool MPEG::File::strip(int tags, bool freeMemory)
 
     if(ID3v1Tag())
       d->ID3v1Location = findID3v1();
+
+    // Lyrics3v2 tag location has changed, update if it exists
+    
+    findLyrics3v2();
 
     // APE tag location has changed, update if it exists
 
@@ -432,6 +444,10 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
+  
+  // Look for a Lyrics3v2 tag
+  
+  findLyrics3v2();
 
   // Look for an APE tag
 
@@ -576,10 +592,87 @@ long MPEG::File::findID3v1()
   return -1;
 }
 
+void MPEG::File::findLyrics3v2()
+{
+  if(isValid()) {
+    long offset = -9;
+    if( d->hasID3v1 )
+      offset -= 128;
+    seek(offset, End);
+
+    if(readBlock(9) == "LYRICS200") {
+      d->hasLyrics3v2 = true;
+      
+      offset -= 6;
+      seek(offset, End);
+      
+      ByteVector sizeVector = readBlock(6);
+      long size = 15;
+      int exp = 1;
+      int value = 0;
+      for(int i=sizeVector.size(); i>0; i--) {
+        switch(sizeVector.at(i-1)) {
+          case '1': {
+            value = 1;
+            break;
+          }
+          case '2': {
+            value = 2;
+            break;
+          }
+          case '3': {
+            value = 3;
+            break;
+          }
+          case '4': {
+            value = 4;
+            break;
+          }
+          case '5': {
+            value = 5;
+            break;
+          }
+          case '6': {
+            value = 6;
+            break;
+          }
+          case '7': {
+            value = 7;
+            break;
+          }
+          case '8': {
+            value = 8;
+            break;
+          }
+          case '9': {
+            value = 9;
+            break;
+          }
+          default:
+            value = 0;
+        }
+        size += value * exp;
+        exp *= 10;
+      }
+      d->lyrics3v2Size = size;
+      return;
+    }
+  }
+  
+  d->hasLyrics3v2 = false;
+  d->lyrics3v2Size = 0;
+}
+
 void MPEG::File::findAPE()
 {
   if(isValid()) {
-    seek(d->hasID3v1 ? -160 : -32, End);
+    long offset = -32;
+    if(d->hasID3v1)
+      offset -= 128;
+    if(d->hasLyrics3v2)
+      offset -= d->lyrics3v2Size;
+    
+    seek(offset, End);
 
     long p = tell();
 

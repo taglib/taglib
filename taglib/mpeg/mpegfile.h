@@ -287,6 +287,7 @@ namespace TagLib {
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       long findID3v2();
       long findID3v1();
+      void findLyrics3v2();
       void findAPE();
 
       /*!
