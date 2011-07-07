@@ -607,54 +607,8 @@ void MPEG::File::findLyrics3v2()
       seek(offset, End);
       
       ByteVector sizeVector = readBlock(6);
-      long size = 15;
-      int exp = 1;
-      int value = 0;
-      for(int i=sizeVector.size(); i>0; i--) {
-        switch(sizeVector.at(i-1)) {
-          case '1': {
-            value = 1;
-            break;
-          }
-          case '2': {
-            value = 2;
-            break;
-          }
-          case '3': {
-            value = 3;
-            break;
-          }
-          case '4': {
-            value = 4;
-            break;
-          }
-          case '5': {
-            value = 5;
-            break;
-          }
-          case '6': {
-            value = 6;
-            break;
-          }
-          case '7': {
-            value = 7;
-            break;
-          }
-          case '8': {
-            value = 8;
-            break;
-          }
-          case '9': {
-            value = 9;
-            break;
-          }
-          default:
-            value = 0;
-        }
-        size += value * exp;
-        exp *= 10;
-      }
-      d->lyrics3v2Size = size;
+      d->lyrics3v2Size = 15 + readNumber(sizeVector);
+      
       return;
     }
   }
@@ -688,6 +642,58 @@ void MPEG::File::findAPE()
 
   d->APELocation = -1;
   d->APEFooterLocation = -1;
+}
+
+long MPEG::File::readNumber(ByteVector vector)
+{
+  long number = 0;
+  int exp = 1;
+  int value = 0;
+  for(int i=vector.size(); i>0; i--) {
+    switch(vector.at(i-1)) {
+      case '1': {
+        value = 1;
+        break;
+      }
+      case '2': {
+        value = 2;
+        break;
+      }
+      case '3': {
+        value = 3;
+        break;
+      }
+      case '4': {
+        value = 4;
+        break;
+      }
+      case '5': {
+        value = 5;
+        break;
+      }
+      case '6': {
+        value = 6;
+        break;
+      }
+      case '7': {
+        value = 7;
+        break;
+      }
+      case '8': {
+        value = 8;
+        break;
+      }
+      case '9': {
+        value = 9;
+        break;
+      }
+      default:
+        value = 0;
+    }
+    number += value * exp;
+    exp *= 10;
+  }
+  return number;
 }
 
 bool MPEG::File::secondSynchByte(char byte)
