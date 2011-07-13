@@ -76,9 +76,10 @@ namespace TagLib {
   class String;
 
   typedef wchar_t wchar;
-  typedef unsigned char uchar;
-  typedef unsigned int  uint;
-  typedef unsigned long ulong;
+  typedef unsigned char  uchar;
+  typedef unsigned short ushort;
+  typedef unsigned int   uint;
+  typedef unsigned long  ulong;
 
   /*!
    * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)

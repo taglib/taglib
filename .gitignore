@@ -9,6 +9,8 @@ CMakeFiles/
 *.sln
 *.suo
 *.user
+.*
+*~
 /CMakeCache.txt
 /Doxyfile
 /config.h
