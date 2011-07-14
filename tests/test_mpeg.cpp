@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
+#include <apetag.h>
 #include "utils.h"
 
 using namespace std;
@@ -15,6 +16,11 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v24);
   CPPUNIT_TEST(testSaveID3v24WrongParam);
   CPPUNIT_TEST(testSaveID3v23);
+  CPPUNIT_TEST(testReadAPEv2);
+  CPPUNIT_TEST(testReadAPEv2WithLyrics3v2);
+  CPPUNIT_TEST(testSaveAPEv2);
+  CPPUNIT_TEST(testSaveAPEv2WithLyrics3v2);
+  CPPUNIT_TEST(testSaveAPEv2EmptyWithLyrics3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -74,6 +80,75 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), f2.ID3v2Tag()->header()->majorVersion());
     CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
     CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
+  }
+
+  void testReadAPEv2()
+  {
+    ScopedFileCopy copy("apetag-replaygain", ".mp3");
+    string newname = copy.fileName();
+
+    MPEG::File f(newname.c_str());
+    String s = f.APETag()->itemListMap()["MP3GAIN_ALBUM_MINMAX"].toString();
+    CPPUNIT_ASSERT_EQUAL(String("129,170"), s);
+  }
+
+  void testReadAPEv2WithLyrics3v2()
+  {
+    ScopedFileCopy copy("apetag-replaygain-lyrics3v2", ".mp3");
+    string newname = copy.fileName();
+
+    MPEG::File f(newname.c_str());
+    String s = f.APETag()->itemListMap()["MP3GAIN_ALBUM_MINMAX"].toString();
+    CPPUNIT_ASSERT_EQUAL(String("129,170"), s);
+  }
+
+  void testSaveAPEv2()
+  {
+    ScopedFileCopy copy("apetag-replaygain", ".mp3");
+    string newname = copy.fileName();
+
+    MPEG::File f(newname.c_str());
+    f.APETag()->addValue("MP3GAIN_ALBUM_MINMAX", String("xxx"));
+    f.save();
+
+    MPEG::File f2(newname.c_str());
+    String s = f2.APETag()->itemListMap()["MP3GAIN_ALBUM_MINMAX"].toString();
+    CPPUNIT_ASSERT_EQUAL(String("xxx"), s);
+  }
+
+  void testSaveAPEv2WithLyrics3v2()
+  {
+    ScopedFileCopy copy("apetag-replaygain-lyrics3v2", ".mp3");
+    string newname = copy.fileName();
+
+    MPEG::File f(newname.c_str());
+    f.APETag()->addValue("MP3GAIN_ALBUM_MINMAX", String("xxx"));
+    f.save();
+
+    MPEG::File f2(newname.c_str());
+    String s = f2.APETag()->itemListMap()["MP3GAIN_ALBUM_MINMAX"].toString();
+    CPPUNIT_ASSERT_EQUAL(String("xxx"), s);
+    f2.seek(-9, File::End);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("LYRICS200"), f2.readBlock(9));
+  }
+
+  void testSaveAPEv2EmptyWithLyrics3v2()
+  {
+    ScopedFileCopy copy("lyrics3v2", ".mp3", false);
+    string newname = copy.fileName();
+
+    {
+      MPEG::File f(newname.c_str());
+      f.APETag(true)->addValue("MP3GAIN_ALBUM_MINMAX", String("xxx"));
+      f.save();
+    }
+
+    MPEG::File f2(newname.c_str());
+    CPPUNIT_ASSERT(f2.APETag());
+    String s = f2.APETag()->itemListMap()["MP3GAIN_ALBUM_MINMAX"].toString();
+    CPPUNIT_ASSERT_EQUAL(String("xxx"), s);
+    f2.seek(-9, File::End);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("LYRICS200"), f2.readBlock(9));
   }
 
 };

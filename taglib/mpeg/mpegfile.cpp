@@ -234,8 +234,9 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
   // Dont save an APE-tag unless one has been created
 
   if((APE & tags) && APETag()) {
-    if(d->hasAPE)
+    if(d->hasAPE) {
       insert(APETag()->render(), d->APELocation, d->APEOriginalSize);
+    }
     else {
       if(d->hasID3v1) {
         insert(APETag()->render(), d->ID3v1Location, 0);
@@ -257,8 +258,9 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
       }
     }
   }
-  else if(d->hasAPE && stripOthers)
+  else if(d->hasAPE && stripOthers) {
     success = strip(APE, false) && success;
+  }
 
   return success;
 }
