@@ -100,7 +100,7 @@ namespace TagLib {
 
     private:
       UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &);
-      UniqueFileIdentifierFrame &operator=(UniqueFileIdentifierFrame &);
+      UniqueFileIdentifierFrame &operator=(const UniqueFileIdentifierFrame &);
 
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);
 
