@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAVE_ZLIB
+#ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
