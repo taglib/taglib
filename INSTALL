@@ -32,14 +32,16 @@ an Universal Binary framework with Mac OS X 10.4 as the deployment target:
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.4 \
     -DCMAKE_OSX_ARCHITECTURES="ppc;i386;x86_64"
 
-For a 10.6 Snow Leopard take, use:
+For a 10.6 Snow Leopard static library with ASF and MP4 support, use:
   cmake -DCMAKE_BUILD_TYPE=Release \
-    -DBUILD_FRAMEWORK=ON \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
-    -DCMAKE_OSX_ARCHITECTURES="i386;x86_64"
+    -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
+    -DENABLE_STATIC=ON \
+    -DWITH_ASF=ON \
+    -DWITH_MP4=ON
 
-After 'make', taglib.framework will be found in taglib/tag.framework. Add this to
-your project in XCode, then #include <tag/taglib.h>, similarly for other headers.
+After 'make', libtag.a will be found in the taglib folder. Add this to
+your project in XCode, add taglib to your Xcode's User Header Search Paths.
 
 Unit Tests
 ----------
