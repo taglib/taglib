@@ -45,10 +45,12 @@ the include folder to the project's User Header Search Paths.
 For Windows with Visual Studio 2010, cd to the taglib folder then:
   md build
   cd build
-  cmake -DENABLE_STATIC=ON -G "Visual Studio 10" ..
+  cmake -DENABLE_STATIC=ON -DENABLE_STATIC_RUNTIME=ON -G "Visual Studio 10" ..
   
-That will create a Visual Studio solution file that you can open and build
-as normal.  
+Including ENABLE_STATIC_RUNTIME=ON indicates you want taglib built using the
+static runtime library, rather than the DLL form of the runtime.
+cmake will create a Visual Studio solution, taglib.sln that you can open and
+build as normal.  
 
 Unit Tests
 ----------
