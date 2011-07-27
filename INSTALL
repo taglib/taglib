@@ -32,16 +32,23 @@ an Universal Binary framework with Mac OS X 10.4 as the deployment target:
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.4 \
     -DCMAKE_OSX_ARCHITECTURES="ppc;i386;x86_64"
 
-For a 10.6 Snow Leopard static library with ASF and MP4 support, use:
+For a 10.6 Snow Leopard static library, use:
   cmake -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
     -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
     -DENABLE_STATIC=ON \
-    -DWITH_ASF=ON \
-    -DWITH_MP4=ON
+    -DCMAKE_INSTALL_PREFIX="<folder you want to build to>"
 
-After 'make', libtag.a will be found in the taglib folder. Add this to
-your project in XCode, add taglib to your Xcode's User Header Search Paths.
+After 'make', and 'make install', add libtag.a to your XCode project, and add
+the include folder to the project's User Header Search Paths.
+
+For Windows with Visual Studio 2010, cd to the taglib folder then:
+  md build
+  cd build
+  cmake -DENABLE_STATIC=ON -G "Visual Studio 10" ..
+  
+That will create a Visual Studio solution file that you can open and build
+as normal.  
 
 Unit Tests
 ----------
