@@ -144,7 +144,7 @@ bool IT::File::save()
   if(!readU16L(special))
     return false;
 
-  long fileSize = this->length();
+  ulong fileSize = File::length();
   if(special & Properties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))
@@ -160,7 +160,7 @@ bool IT::File::save()
     writeU16L(special | 0x1);
   }
 
-  if((messageOffset + messageLength) >= fileSize) {
+  if(messageOffset + messageLength >= fileSize) {
     // append new message
     seek(54);
     writeU16L(message.size());
