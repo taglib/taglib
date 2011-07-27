@@ -240,7 +240,8 @@ void IT::File::read(bool)
     // But this always gives 64 channels for all my files anyway.
     // Strangely VLC does report other values. I wonder how VLC
     // gets it's values.
-    if(pannings[i] < 128 && volumes[i] > 0) ++ channels;
+    if((unsigned char) pannings[i] < 128 && volumes[i] > 0)
+        ++channels;
   }
   d->properties.setChannels(channels);
   
