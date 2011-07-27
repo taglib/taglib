@@ -72,9 +72,7 @@ namespace TagLib {
       uchar  panningSeparation() const;
       uchar  pitchWheelDepth()   const;
 
-    protected:
       void setChannels(int channels);
-
       void setLengthInPatterns(ushort lengthInPatterns);
       void setInstrumentCount(ushort instrumentCount);
       void setSampleCount (ushort sampleCount);
