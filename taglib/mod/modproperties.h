@@ -41,7 +41,9 @@ namespace TagLib {
       uint  instrumentCount()  const;
       uchar lengthInPatterns() const;
 
+#if !defined(_MSC_VER)
     protected:
+#endif
       void setChannels(int channels);
 
       void setInstrumentCount(uint sampleCount);

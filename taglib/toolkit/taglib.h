@@ -65,7 +65,7 @@
 
 /*!
  * This namespace contains everything in TagLib.  For projects working with
- * TagLib extensively it may be conveniten to add a
+ * TagLib extensively it may be convenient to add a
  * \code
  * using namespace TagLib;
  * \endcode

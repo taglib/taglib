@@ -72,7 +72,10 @@ namespace TagLib {
       uchar  panningSeparation() const;
       uchar  pitchWheelDepth()   const;
 
+#if !defined(_MSC_VER)
     protected:
+#endif
+
       void setChannels(int channels);
 
       void setLengthInPatterns(ushort lengthInPatterns);

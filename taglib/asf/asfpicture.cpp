@@ -35,7 +35,7 @@
 
 using namespace TagLib;
 
-class ASF::Picture::PicturePriavte : public RefCounter
+class ASF::Picture::PicturePrivate : public RefCounter
 {
 public:
   bool valid;
@@ -51,7 +51,7 @@ public:
 
 ASF::Picture::Picture()
 {
-  d = new PicturePriavte();
+  d = new PicturePrivate();
   d->valid = true;
 }
 
