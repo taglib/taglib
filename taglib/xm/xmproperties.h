@@ -54,7 +54,9 @@ namespace TagLib {
       ushort tempo()            const;
       ushort bpmSpeed()         const;
 
+#if !defined(_MSC_VER)
     protected:
+#endif
       void setChannels(int channels);
 
       void setLengthInPatterns(ushort lengthInPatterns);
