@@ -16,8 +16,8 @@ In order to build the included examples, use the BUILD_EXAMPLES option:
 See http://www.cmake.org/cmake/help/runningcmake.html for generic help on
 running CMake.
 
-Mac OS X Framework
-------------------
+Mac OS X
+--------
 
 On Mac OS X, you might want to build a framework that can be easily integrated
 into your application. If you set the BUILD_FRAMEWORK option on, it will compile
@@ -32,7 +32,8 @@ an Universal Binary framework with Mac OS X 10.4 as the deployment target:
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.4 \
     -DCMAKE_OSX_ARCHITECTURES="ppc;i386;x86_64"
 
-For a 10.6 Snow Leopard static library, use:
+For a 10.6 Snow Leopard static library with both 32-bit and 64-bit code, use:
+
   cmake -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
     -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
@@ -42,14 +43,17 @@ For a 10.6 Snow Leopard static library, use:
 After 'make', and 'make install', add libtag.a to your XCode project, and add
 the include folder to the project's User Header Search Paths.
 
-For Windows with Visual Studio 2010, cd to the taglib folder then:
-  md build
-  cd build
-  cmake -DENABLE_STATIC=ON -DENABLE_STATIC_RUNTIME=ON -G "Visual Studio 10" ..
+Windows
+-------
+
+For building a static library on Windows with Visual Studio 2010, cd to
+the TagLib folder then:
+
+  cmake -DENABLE_STATIC=ON -DENABLE_STATIC_RUNTIME=ON -G "Visual Studio 10" ...
   
-Including ENABLE_STATIC_RUNTIME=ON indicates you want taglib built using the
+Including ENABLE_STATIC_RUNTIME=ON indicates you want TagLib built using the
 static runtime library, rather than the DLL form of the runtime.
-cmake will create a Visual Studio solution, taglib.sln that you can open and
+CMake will create a Visual Studio solution, taglib.sln that you can open and
 build as normal.  
 
 Unit Tests
