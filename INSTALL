@@ -30,7 +30,27 @@ an Universal Binary framework with Mac OS X 10.4 as the deployment target:
     -DCMAKE_CXX_COMPILER=/usr/bin/c++-4.0 \
     -DCMAKE_OSX_SYSROOT=/Developer/SDKs/MacOSX10.4u.sdk/ \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.4 \
-    -DCMAKE_OSX_ARCHITECTURES="ppc;i368;x86_64"
+    -DCMAKE_OSX_ARCHITECTURES="ppc;i386;x86_64"
+
+For a 10.6 Snow Leopard static library, use:
+  cmake -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
+    -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
+    -DENABLE_STATIC=ON \
+    -DCMAKE_INSTALL_PREFIX="<folder you want to build to>"
+
+After 'make', and 'make install', add libtag.a to your XCode project, and add
+the include folder to the project's User Header Search Paths.
+
+For Windows with Visual Studio 2010, cd to the taglib folder then:
+  md build
+  cd build
+  cmake -DENABLE_STATIC=ON -DENABLE_STATIC_RUNTIME=ON -G "Visual Studio 10" ..
+  
+Including ENABLE_STATIC_RUNTIME=ON indicates you want taglib built using the
+static runtime library, rather than the DLL form of the runtime.
+cmake will create a Visual Studio solution, taglib.sln that you can open and
+build as normal.  
 
 Unit Tests
 ----------
