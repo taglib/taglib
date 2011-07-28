@@ -26,19 +26,21 @@
 #include "audioproperties.h"
 
 namespace TagLib {
+
   namespace Mod {
-    class TAGLIB_EXPORT Properties : public AudioProperties {
-      friend class File;
+
+    class TAGLIB_EXPORT Properties : public AudioProperties
+    {
     public:
       Properties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~Properties();
       
-      int length()     const;
-      int bitrate()    const;
+      int length() const;
+      int bitrate() const;
       int sampleRate() const;
-      int channels()   const;
+      int channels() const;
 
-      uint  instrumentCount()  const;
+      uint instrumentCount() const;
       uchar lengthInPatterns() const;
 
       void setChannels(int channels);
@@ -47,13 +49,17 @@ namespace TagLib {
       void setLengthInPatterns(uchar lengthInPatterns);
 
     private:
+      friend class File;
+
       Properties(const Properties&);
       Properties &operator=(const Properties&);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
+
   }
+
 }
 
 #endif

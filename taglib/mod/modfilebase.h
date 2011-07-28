@@ -31,7 +31,9 @@
 #include <algorithm>
 
 namespace TagLib {
+
   namespace Mod {
+
     class TAGLIB_EXPORT FileBase : public TagLib::File
     {
     protected:
@@ -52,7 +54,9 @@ namespace TagLib {
       bool readU16B(ushort &number);
       bool readU32B(ulong &number);
     };
+
   }
+
 }
 
 #endif

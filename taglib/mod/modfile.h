@@ -33,57 +33,60 @@ namespace TagLib {
 
   namespace Mod {
 
-    class TAGLIB_EXPORT File : public TagLib::Mod::FileBase {
-      public:
-        /*!
-         * Contructs a Protracker file from \a file. If \a readProperties
-         * is true the file's audio properties will also be read using
-         * \a propertiesStyle. If false, \a propertiesStyle is ignored.
-         */
-        File(FileName file, bool readProperties = true,
-             AudioProperties::ReadStyle propertiesStyle =
-             AudioProperties::Average);
+    class TAGLIB_EXPORT File : public TagLib::Mod::FileBase
+    {
+    public:
+      /*!
+       * Contructs a Protracker file from \a file. If \a readProperties
+       * is true the file's audio properties will also be read using
+       * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+       */
+      File(FileName file, bool readProperties = true,
+           AudioProperties::ReadStyle propertiesStyle =
+           AudioProperties::Average);
 
-        /*!
-         * Contructs a Protracker file from \a stream. If \a readProperties
-         * is true the file's audio properties will also be read using
-         * \a propertiesStyle. If false, \a propertiesStyle is ignored.
-         */
-        File(IOStream *stream, bool readProperties = true,
-             AudioProperties::ReadStyle propertiesStyle =
-             AudioProperties::Average);
+      /*!
+       * Contructs a Protracker file from \a stream. If \a readProperties
+       * is true the file's audio properties will also be read using
+       * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+       */
+      File(IOStream *stream, bool readProperties = true,
+           AudioProperties::ReadStyle propertiesStyle =
+           AudioProperties::Average);
 
-        /*!
-         * Destroys this instance of the File.
-         */
-        virtual ~File();
+      /*!
+       * Destroys this instance of the File.
+       */
+      virtual ~File();
 
-        Mod::Tag *tag() const;
+      Mod::Tag *tag() const;
 
-        /*!
-         * Returns the Mod::Properties for this file. If no audio properties
-         * were read then this will return a null pointer.
-         */
-        Mod::Properties *audioProperties() const;
+      /*!
+       * Returns the Mod::Properties for this file. If no audio properties
+       * were read then this will return a null pointer.
+       */
+      Mod::Properties *audioProperties() const;
 
-        /*!
-         * Save the file.
-         * This is the same as calling save(AllTags);
-         *
-         * \note Saving Protracker tags is not supported.
-         */
-        bool save();
+      /*!
+       * Save the file.
+       * This is the same as calling save(AllTags);
+       *
+       * \note Saving Protracker tags is not supported.
+       */
+      bool save();
 
-      private:
-        File(const File &);
-        File &operator=(const File &);
+    private:
+      File(const File &);
+      File &operator=(const File &);
 
-        void read(bool readProperties);
+      void read(bool readProperties);
 
-        class FilePrivate;
-        FilePrivate *d;
+      class FilePrivate;
+      FilePrivate *d;
     };
+
   }
+
 }
 
 #endif
