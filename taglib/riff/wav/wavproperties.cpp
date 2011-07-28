@@ -124,5 +124,6 @@ void RIFF::WAV::Properties::read(const ByteVector &data)
   d->bitrate = byteRate * 8 / 1000;
 
   d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
-  d->sampleFrames = d->streamLength / (d->channels * (d->sampleWidth / 8));
+  if(d->channels > 0 && d->sampleWidth > 0)
+    d->sampleFrames = d->streamLength / (d->channels * (d->sampleWidth / 8));
 }
