@@ -35,9 +35,8 @@
 
 using namespace TagLib;
 
-class ASF::Picture::PicturePriavte : public RefCounter
+struct ASF::Picture::PicturePriavte : public RefCounter
 {
-public:
   bool valid;
   Type type;
   String mimeType;
