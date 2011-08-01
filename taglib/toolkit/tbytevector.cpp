@@ -436,25 +436,29 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   int offset = 0;
 
   if(withSize == patternSize) {
-      // I think this case might be common enough to optimize it
-      offset = find(pattern);
-      while(offset >= 0) {
-          ::memcpy(data() + offset, with.data(), withSize);
-          offset = find(pattern, offset + withSize);
-      }
-      return *this;
+    // I think this case might be common enough to optimize it
+    detach();
+    offset = find(pattern);
+    while(offset >= 0) {
+      ::memcpy(data() + offset, with.data(), withSize);
+      offset = find(pattern, offset + withSize);
+    }
+    return *this;
   }
 
   // calculate new size:
   uint newSize = 0;
   for(;;) {
-      int next = find(pattern, offset);
-      if(next < 0) {
-          newSize += size() - offset;
-          break;
-      }
-      newSize += (next - offset) + withSize;
-      offset = next + patternSize;
+    int next = find(pattern, offset);
+    if(next < 0) {
+      if(offset == 0)
+        // pattern not found, do nothing:
+        return *this;
+      newSize += size() - offset;
+      break;
+    }
+    newSize += (next - offset) + withSize;
+    offset = next + patternSize;
   }
 
   // new private data of appropriate size:
@@ -467,8 +471,8 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   for(;;) {
     int next = find(pattern, offset);
     if(next < 0) {
-        ::memcpy(target, source + offset, size() - offset);
-        break;
+      ::memcpy(target, source + offset, size() - offset);
+      break;
     }
     int chunkSize = next - offset;
     ::memcpy(target, source + offset, chunkSize);
