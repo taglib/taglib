@@ -463,7 +463,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
 
   // new private data of appropriate size:
   ByteVectorPrivate *newData = new ByteVectorPrivate(newSize, 0);
-  char *target = &newData->data[0];
+  char *target = DATA(newData);
   const char *source = data();
 
   // copy modified data into new private data:
