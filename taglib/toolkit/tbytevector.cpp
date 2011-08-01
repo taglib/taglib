@@ -431,28 +431,58 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
 
-  const int patternSize = pattern.size();
-  const int withSize = with.size();
+  const uint withSize = with.size();
+  const uint patternSize = pattern.size();
+  int offset = 0;
 
-  int offset = find(pattern);
-
-  while(offset >= 0) {
-
-    const int originalSize = size();
-
-    if(withSize > patternSize)
-      resize(originalSize + withSize - patternSize);
-
-    if(patternSize != withSize)
-      ::memcpy(data() + offset + withSize, mid(offset + patternSize).data(), originalSize - offset - patternSize);
-
-    if(withSize < patternSize)
-      resize(originalSize + withSize - patternSize);
-
-    ::memcpy(data() + offset, with.data(), withSize);
-
-    offset = find(pattern, offset + withSize);
+  if(withSize == patternSize) {
+      // I think this case might be common enough to optimize it
+      offset = find(pattern);
+      while(offset >= 0) {
+          ::memcpy(data() + offset, with.data(), withSize);
+          offset = find(pattern, offset + withSize);
+      }
+      return *this;
   }
+
+  // calculate new size:
+  uint newSize = 0;
+  for(;;) {
+      int next = find(pattern, offset);
+      if(next < 0) {
+          newSize += size() - offset;
+          break;
+      }
+      newSize += (next - offset) + withSize;
+      offset = next + patternSize;
+  }
+
+  // new private data of appropriate size:
+  ByteVectorPrivate *newData = new ByteVectorPrivate(newSize, 0);
+  char *target = &newData->data[0];
+  const char *source = data();
+
+  // copy modified data into new private data:
+  offset = 0;
+  for(;;) {
+    int next = find(pattern, offset);
+    if(next < 0) {
+        ::memcpy(target, source + offset, size() - offset);
+        break;
+    }
+    int chunkSize = next - offset;
+    ::memcpy(target, source + offset, chunkSize);
+    target += chunkSize;
+    ::memcpy(target, with.data(), withSize);
+    target += withSize;
+    offset += chunkSize + patternSize;
+  }
+  
+  // replace private data:
+  if(d->deref())
+    delete d;
+
+  d = newData;
 
   return *this;
 }
