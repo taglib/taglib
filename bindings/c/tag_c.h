@@ -79,6 +79,11 @@ TAGLIB_C_EXPORT void taglib_set_strings_unicode(BOOL unicode);
  */
 TAGLIB_C_EXPORT void taglib_set_string_management_enabled(BOOL management);
 
+/*!
+ * Explicitly free a string returned from TagLib
+ */
+TAGLIB_C_EXPORT void taglib_free(void* pointer);
+
 /*******************************************************************************
  * File API
  ******************************************************************************/
