@@ -39,6 +39,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testRfind2);
   CPPUNIT_TEST(testToHex);
   CPPUNIT_TEST(testToUShort);
+  CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -189,6 +190,40 @@ public:
     CPPUNIT_ASSERT_EQUAL((unsigned short)0x0100, ByteVector("\x00\x01", 2).toUShort(false));
     CPPUNIT_ASSERT_EQUAL((unsigned short)0xFF01, ByteVector("\xFF\x01", 2).toUShort());
     CPPUNIT_ASSERT_EQUAL((unsigned short)0x01FF, ByteVector("\xFF\x01", 2).toUShort(false));
+  }
+
+  void testReplace()
+  {
+    {
+      ByteVector a("abcdabf");
+      a.replace(ByteVector(""), ByteVector("<a>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
+    }
+    {
+      ByteVector a("abcdabf");
+      a.replace(ByteVector("foobartoolong"), ByteVector("<a>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
+    }
+    {
+      ByteVector a("abcdabf");
+      a.replace(ByteVector("xx"), ByteVector("yy"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
+    }
+    {
+      ByteVector a("abcdabf");
+      a.replace(ByteVector("a"), ByteVector("x"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("xbcdxbf"), a);
+    }
+    {
+      ByteVector a("abcdabf");
+      a.replace(ByteVector("ab"), ByteVector("xy"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("xycdxyf"), a);
+    }
+    {
+      ByteVector a("abcdabf");
+      a.replace(ByteVector("a"), ByteVector("<a>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("<a>bcd<a>bf"), a);
+    }
   }
 
 };
