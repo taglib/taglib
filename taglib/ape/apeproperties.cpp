@@ -137,7 +137,7 @@ long APE::Properties::findDescriptor()
   long ID3v2OriginalSize = 0;
   bool hasID3v2 = false;
   if(ID3v2Location >= 0) {
-    ID3v2::Tag tag(d->file, ID3v2Location, 0);
+    ID3v2::Tag tag(d->file, ID3v2Location);
     ID3v2OriginalSize = tag.header()->completeTagSize();
     if(tag.header()->tagSize() > 0)
       hasID3v2 = true;
