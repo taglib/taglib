@@ -71,11 +71,22 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms)
     else if(atom->name == "trkn" || atom->name == "disk") {
       parseIntPair(atom, file);
     }
-    else if(atom->name == "cpil" || atom->name == "pgap" || atom->name == "pcst") {
+    else if(atom->name == "cpil" || atom->name == "pgap" || atom->name == "pcst" ||
+            atom->name == "hdvd") {
       parseBool(atom, file);
     }
     else if(atom->name == "tmpo") {
       parseInt(atom, file);
+    }
+    else if(atom->name == "tvsn" || atom->name == "tves" || atom->name == "cnID" ||
+            atom->name == "sfID" || atom->name == "atID" || atom->name == "geID") {
+      parseUInt(atom, file);
+    }
+    else if(atom->name == "plID") {
+      parseLongLong(atom, file);
+    }
+    else if(atom->name == "stik" || atom->name == "rtng" || atom->name == "akID") {
+      parseByte(atom, file);
     }
     else if(atom->name == "gnre") {
       parseGnre(atom, file);
@@ -137,6 +148,33 @@ MP4::Tag::parseInt(MP4::Atom *atom, TagLib::File *file)
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
     d->items.insert(atom->name, (int)data[0].toShort());
+  }
+}
+
+void
+MP4::Tag::parseUInt(MP4::Atom *atom, TagLib::File *file)
+{
+  ByteVectorList data = parseData(atom, file);
+  if(data.size()) {
+    d->items.insert(atom->name, data[0].toUInt());
+  }
+}
+
+void
+MP4::Tag::parseLongLong(MP4::Atom *atom, TagLib::File *file)
+{
+  ByteVectorList data = parseData(atom, file);
+  if(data.size()) {
+    d->items.insert(atom->name, data[0].toLongLong());
+  }
+}
+
+void
+MP4::Tag::parseByte(MP4::Atom *atom, TagLib::File *file)
+{
+  ByteVectorList data = parseData(atom, file);
+  if(data.size()) {
+    d->items.insert(atom->name, (uchar)data[0].at(0));
   }
 }
 
@@ -266,6 +304,30 @@ MP4::Tag::renderInt(const ByteVector &name, MP4::Item &item)
 }
 
 ByteVector
+MP4::Tag::renderUInt(const ByteVector &name, MP4::Item &item)
+{
+  ByteVectorList data;
+  data.append(ByteVector::fromUInt(item.toUInt()));
+  return renderData(name, 0x15, data);
+}
+
+ByteVector
+MP4::Tag::renderLongLong(const ByteVector &name, MP4::Item &item)
+{
+  ByteVectorList data;
+  data.append(ByteVector::fromLongLong(item.toLongLong()));
+  return renderData(name, 0x15, data);
+}
+
+ByteVector
+MP4::Tag::renderByte(const ByteVector &name, MP4::Item &item)
+{
+  ByteVectorList data;
+  data.append(ByteVector(1, item.toByte()));
+  return renderData(name, 0x15, data);
+}
+
+ByteVector
 MP4::Tag::renderIntPair(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
@@ -342,11 +404,21 @@ MP4::Tag::save()
     else if(name == "disk") {
       data.append(renderIntPairNoTrailing(name.data(String::Latin1), i->second));
     }
-    else if(name == "cpil" || name == "pgap" || name == "pcst") {
+    else if(name == "cpil" || name == "pgap" || name == "pcst" || name == "hdvd") {
       data.append(renderBool(name.data(String::Latin1), i->second));
     }
     else if(name == "tmpo") {
       data.append(renderInt(name.data(String::Latin1), i->second));
+    }
+    else if(name == "tvsn" || name == "tves" || name == "cnID" ||
+            name == "sfID" || name == "atID" || name == "geID") {
+      data.append(renderUInt(name.data(String::Latin1), i->second));
+    }
+    else if(name == "plID") {
+      data.append(renderLongLong(name.data(String::Latin1), i->second));
+    }
+    else if(name == "stik" || name == "rtng" || name == "akID") {
+      data.append(renderByte(name.data(String::Latin1), i->second));
     }
     else if(name == "covr") {
       data.append(renderCovr(name.data(String::Latin1), i->second));

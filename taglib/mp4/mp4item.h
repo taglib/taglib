@@ -47,12 +47,18 @@ namespace TagLib {
       ~Item();
 
       Item(int value);
+      Item(uchar value);
+      Item(uint value);
+      Item(long long value);
       Item(bool value);
       Item(int first, int second);
       Item(const StringList &value);
       Item(const CoverArtList &value);
 
       int toInt() const;
+      uchar toByte() const;
+      uint toUInt() const;
+      long long toLongLong() const;
       bool toBool() const;
       IntPair toIntPair() const;
       StringList toStringList() const;

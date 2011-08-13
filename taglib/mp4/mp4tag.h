@@ -72,6 +72,9 @@ namespace TagLib {
         void parseText(Atom *atom, TagLib::File *file, int expectedFlags = 1);
         void parseFreeForm(Atom *atom, TagLib::File *file);
         void parseInt(Atom *atom, TagLib::File *file);
+        void parseByte(Atom *atom, TagLib::File *file);
+        void parseUInt(Atom *atom, TagLib::File *file);
+        void parseLongLong(Atom *atom, TagLib::File *file);
         void parseGnre(Atom *atom, TagLib::File *file);
         void parseIntPair(Atom *atom, TagLib::File *file);
         void parseBool(Atom *atom, TagLib::File *file);
@@ -84,6 +87,9 @@ namespace TagLib {
         TagLib::ByteVector renderFreeForm(const String &name, Item &item);
         TagLib::ByteVector renderBool(const ByteVector &name, Item &item);
         TagLib::ByteVector renderInt(const ByteVector &name, Item &item);
+        TagLib::ByteVector renderByte(const ByteVector &name, Item &item);
+        TagLib::ByteVector renderUInt(const ByteVector &name, Item &item);
+        TagLib::ByteVector renderLongLong(const ByteVector &name, Item &item);
         TagLib::ByteVector renderIntPair(const ByteVector &name, Item &item);
         TagLib::ByteVector renderIntPairNoTrailing(const ByteVector &name, Item &item);
         TagLib::ByteVector renderCovr(const ByteVector &name, Item &item);

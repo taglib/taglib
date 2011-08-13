@@ -43,6 +43,9 @@ public:
     bool m_bool;
     int m_int;
     IntPair m_intPair;
+    uchar m_byte;
+    uint m_uint;
+    long long m_longlong;
   };
   StringList m_stringList;
   MP4::CoverArtList m_coverArtList;
@@ -89,6 +92,24 @@ MP4::Item::Item(int value)
   d->m_int = value;
 }
 
+MP4::Item::Item(uchar value)
+{
+  d = new ItemPrivate;
+  d->m_byte = value;
+}
+
+MP4::Item::Item(uint value)
+{
+  d = new ItemPrivate;
+  d->m_uint = value;
+}
+
+MP4::Item::Item(long long value)
+{
+  d = new ItemPrivate;
+  d->m_longlong = value;
+}
+
 MP4::Item::Item(int value1, int value2)
 {
   d = new ItemPrivate;
@@ -118,6 +139,24 @@ int
 MP4::Item::toInt() const
 {
   return d->m_int;
+}
+
+uchar
+MP4::Item::toByte() const
+{
+  return d->m_byte;
+}
+
+TagLib::uint
+MP4::Item::toUInt() const
+{
+  return d->m_uint;
+}
+
+long long
+MP4::Item::toLongLong() const
+{
+  return d->m_longlong;
 }
 
 MP4::Item::IntPair
