@@ -493,6 +493,17 @@ void FLAC::File::addPicture(Picture *picture)
   d->blocks.append(picture);
 }
 
+void FLAC::File::removePicture(Picture *picture, bool del)
+{
+  MetadataBlock *block = picture;
+  List<MetadataBlock *>::Iterator it = d->blocks.find(block);
+  if(it != d->blocks.end())
+    d->blocks.erase(it);
+
+  if(del)
+    delete picture;
+}
+
 void FLAC::File::removePictures()
 {
   List<MetadataBlock *> newBlocks;
