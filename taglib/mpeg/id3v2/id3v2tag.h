@@ -263,12 +263,12 @@ namespace TagLib {
       /*!
        * Implements the unified tag dictionary interface -- export function.
        */
-      TagDict toDict() const;
+      virtual TagDict toDict() const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function.
        */
-      void fromDict(const TagDict &);
+      virtual void fromDict(const TagDict &);
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.

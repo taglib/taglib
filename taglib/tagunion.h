@@ -73,6 +73,9 @@ namespace TagLib {
     virtual void setTrack(uint i);
     virtual bool isEmpty() const;
 
+    virtual TagDict toDict() const;
+    virtual void fromDict(const TagDict &);
+
     template <class T> T *access(int index, bool create)
     {
       if(!create || tag(index))

@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include "tag.h"
-
+#include "tstringlist.h"
 using namespace TagLib;
 
 class Tag::TagPrivate
@@ -53,6 +53,75 @@ bool Tag::isEmpty() const
           track() == 0);
 }
 
+TagDict Tag::toDict() const
+{
+  TagDict dict;
+  if (!(title() == String::null))
+    dict["TITLE"].append(title());
+  if (!(artist() == String::null))
+    dict["ARTIST"].append(artist());
+  if (!(album() == String::null))
+    dict["ALBUM"].append(album());
+  if (!(comment() == String::null))
+    dict["COMMENT"].append(comment());
+  if (!(genre() == String::null))
+    dict["GENRE"].append(genre());
+  if (!(year() == 0))
+    dict["DATE"].append(String::number(year()));
+  if (!(track() == 0))
+    dict["TRACKNUMBER"].append(String::number(track()));
+  return dict;
+}
+
+void Tag::fromDict(const TagDict &dict)
+{
+  if (dict.contains("TITLE") and dict["TITLE"].size() >= 1)
+    setTitle(dict["TITLE"].front());
+  else
+    setTitle(String::null);
+
+  if (dict.contains("ARTIST") and dict["ARTIST"].size() >= 1)
+    setArtist(dict["ARTIST"].front());
+  else
+    setArtist(String::null);
+
+  if (dict.contains("ALBUM") and dict["ALBUM"].size() >= 1)
+      setAlbum(dict["ALBUM"].front());
+    else
+      setAlbum(String::null);
+
+  if (dict.contains("COMMENT") and dict["COMMENT"].size() >= 1)
+    setComment(dict["COMMENT"].front());
+  else
+    setComment(String::null);
+
+  if (dict.contains("GENRE") and dict["GENRE"].size() >=1)
+    setGenre(dict["GENRE"].front());
+  else
+    setGenre(String::null);
+
+  if (dict.contains("DATE") and dict["DATE"].size() >= 1) {
+    bool ok;
+    int date = dict["DATE"].front().toInt(&ok);
+    if (ok)
+      setYear(date);
+    else
+      setYear(0);
+  }
+  else
+    setYear(0);
+
+  if (dict.contains("TRACKNUMBER") and dict["TRACKNUMBER"].size() >= 1) {
+    bool ok;
+    int track = dict["TRACKNUMBER"].front().toInt(&ok);
+    if (ok)
+      setTrack(track);
+    else
+      setTrack(0);
+  }
+  else
+    setYear(0);
+}
 void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
 {
   if(overwrite) {

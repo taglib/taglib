@@ -59,6 +59,22 @@ namespace TagLib {
     virtual ~Tag();
 
     /*!
+     * Unified tag dictionary interface -- export function. Converts the tags
+     * of the specific metadata format into a "human-readable" map of strings
+     * to lists of strings, being as precise as possible.
+     */
+    virtual TagDict toDict() const;
+
+    /*!
+     * Unified tag dictionary interface -- import function. Converts a map
+     * of strings to stringslists into the specific metadata format. Note that
+     * not all formats can store arbitrary tags and values, so data might
+     * be lost by this operation. Especially the default implementation handles
+     * only single values of the default tags specified in this class.
+     */
+    virtual void fromDict(const TagDict &);
+
+    /*!
      * Returns the track name; if no track name is present in the tag
      * String::null will be returned.
      */

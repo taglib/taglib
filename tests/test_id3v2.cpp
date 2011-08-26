@@ -554,7 +554,7 @@ public:
     string newname = copy.fileName();
     MPEG::File f(newname.c_str());
     TagDict dict = f.ID3v2Tag(false)->toDict();
-    CPPUNIT_ASSERT_EQUAL(uint(7), dict.size());
+    CPPUNIT_ASSERT_EQUAL(uint(6), dict.size());
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION1"][0]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION1"][1]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION2"][0]);
@@ -565,8 +565,6 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["USERURL"][0]);
     CPPUNIT_ASSERT_EQUAL(String("http://a.user.url/with/empty/description"), dict["URL"][0]);
-
-    CPPUNIT_ASSERT_EQUAL(String("12345678 [supermihi@web.de]"), dict["UNIQUEIDENTIFIER"][0]);
 
     CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"][0]);
   }

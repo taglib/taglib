@@ -143,12 +143,12 @@ namespace TagLib {
       /*!
        * Implements the unified tag dictionary interface -- export function.
        */
-      TagDict toDict() const;
+      virtual TagDict toDict() const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function.
        */
-      void fromDict(const TagDict &);
+      virtual void fromDict(const TagDict &);
 
       /*!
        * Returns the vendor ID of the Ogg Vorbis encoder.  libvorbis 1.0 as the

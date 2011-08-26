@@ -38,7 +38,9 @@ namespace TagLib {
      */
     typedef Map<ByteVector, ByteVector> FrameIDMap;
 
-    String TAGLIB_EXPORT frameIDToTagName(const ByteVector &id);
+    ByteVector TAGLIB_EXPORT tagNameToFrameID(const String &);
+
+    String TAGLIB_EXPORT frameIDToTagName(const ByteVector &);
 
     bool TAGLIB_EXPORT isIgnored(const ByteVector &);
 

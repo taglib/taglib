@@ -31,7 +31,7 @@ namespace TagLib {
     /*!
      * A map of translations frameID <-> tag used by the unified dictionary interface.
      */
-    static const uint numid3frames = 55;
+    static const uint numid3frames = 54;
     static const char *id3frames[][2] = {
       // Text information frames
       { "TALB", "ALBUM"},
@@ -96,11 +96,10 @@ namespace TagLib {
       // Other frames
       { "COMM", "COMMENT" },
       { "USLT", "LYRICS" },
-      { "UFID", "UNIQUEIDENTIFIER" },
     };
 
     // list of frameIDs that are ignored by the unified dictionary interface
-    static const uint ignoredFramesSize = 6;
+    static const uint ignoredFramesSize = 7;
     static const char *ignoredFrames[] = {
       "TCMP", // illegal 'Part of Compilation' frame set by iTunes (see http://www.id3.org/Compliance_Issues)
       "GEOB", // no way to handle a general encapsulated object by the dict interface
@@ -108,6 +107,7 @@ namespace TagLib {
       "APIC", // attached picture -- TODO how could we do this?
       "POPM", // popularimeter
       "RVA2", // relative volume
+      "UFID", // unique file identifier
     };
 
     // list of deprecated frames and their successors
@@ -131,6 +131,16 @@ namespace TagLib {
         return m[deprecationMap()[id]];
       debug("unknown frame ID: " + id);
       return "UNKNOWNID3TAG"; //TODO: implement this nicer
+    }
+
+    ByteVector tagNameToFrameID(const String &s) {
+      static Map<String, ByteVector> m;
+      if (m.isEmpty())
+        for (size_t i = 0; i < numid3frames; ++i)
+          m[id3frames[i][1]] = id3frames[i][0];
+      if (m.contains(s.upper()))
+        return m[s];
+      return "TXXX";
     }
 
     bool isIgnored(const ByteVector& id) {
