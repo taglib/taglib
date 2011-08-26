@@ -28,8 +28,16 @@
 
 #include "taglib_export.h"
 #include "tstring.h"
+#include "tmap.h"
 
 namespace TagLib {
+
+  /*!
+   * This is used for the unified dictionary interface: the tags of a file are
+   * represented as a dictionary mapping a string (the tag name) to a list of
+   * strings (the values).
+   */
+  typedef Map<String, StringList> TagDict;
 
   //! A simple, generic interface to common audio meta data fields
 

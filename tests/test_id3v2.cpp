@@ -67,6 +67,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
+  CPPUNIT_TEST(testDictInterface);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -545,6 +546,29 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
     CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
+  }
+
+  void testDictInterface()
+  {
+    ScopedFileCopy copy("rare_frames", ".mp3");
+    string newname = copy.fileName();
+    MPEG::File f(newname.c_str());
+    TagDict dict = f.ID3v2Tag(false)->toDict();
+    CPPUNIT_ASSERT_EQUAL(uint(7), dict.size());
+    CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION1"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION1"][1]);
+    CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION2"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION2"][1]);
+
+    CPPUNIT_ASSERT_EQUAL(String("Pop"), dict["GENRE"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("Pop"), dict["GENRE"][0]);
+
+    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["USERURL"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url/with/empty/description"), dict["URL"][0]);
+
+    CPPUNIT_ASSERT_EQUAL(String("12345678 [supermihi@web.de]"), dict["UNIQUEIDENTIFIER"][0]);
+
+    CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"][0]);
   }
 
 };

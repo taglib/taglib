@@ -17,6 +17,8 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestOGG);
   CPPUNIT_TEST(testSimple);
   CPPUNIT_TEST(testSplitPackets);
+  CPPUNIT_TEST(testDictInterface1);
+  CPPUNIT_TEST(testDictInterface2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -48,6 +50,51 @@ public:
 
     f = new Vorbis::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
+    delete f;
+  }
+
+  void testDictInterface1()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    string newname = copy.fileName();
+
+    Vorbis::File *f = new Vorbis::File(newname.c_str());
+
+    CPPUNIT_ASSERT_EQUAL(uint(0), f->tag()->toDict().size());
+
+    TagDict newTags;
+    StringList values("value 1");
+    values.append("value 2");
+    newTags["ARTIST"] = values;
+    f->tag()->fromDict(newTags);
+
+    TagDict map = f->tag()->toDict();
+    CPPUNIT_ASSERT_EQUAL(uint(1), map.size());
+    CPPUNIT_ASSERT_EQUAL(uint(2), map["ARTIST"].size());
+    CPPUNIT_ASSERT_EQUAL(String("value 1"), map["ARTIST"][0]);
+    delete f;
+
+  }
+
+  void testDictInterface2()
+  {
+    ScopedFileCopy copy("test", ".ogg");
+    string newname = copy.fileName();
+
+    Vorbis::File *f = new Vorbis::File(newname.c_str());
+    TagDict tags = f->tag()->toDict();
+
+    CPPUNIT_ASSERT_EQUAL(uint(2), tags["UNUSUALTAG"].size());
+    CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("another value"), tags["UNUSUALTAG"][1]);
+    CPPUNIT_ASSERT_EQUAL(String(L"öäüoΣø"), tags["UNICODETAG"][0]);
+
+    tags["UNICODETAG"][0] = L"νεω ναλυε";
+    tags.erase("UNUSUALTAG");
+    f->tag()->fromDict(tags);
+    CPPUNIT_ASSERT_EQUAL(String(L"νεω ναλυε"), f->tag()->toDict()["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(false, f->tag()->toDict().contains("UNUSUALTAG"));
+
     delete f;
   }
 

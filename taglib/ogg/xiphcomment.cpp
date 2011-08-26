@@ -188,6 +188,47 @@ const Ogg::FieldListMap &Ogg::XiphComment::fieldListMap() const
   return d->fieldListMap;
 }
 
+TagDict Ogg::XiphComment::toDict() const
+{
+  return d->fieldListMap;
+}
+
+void Ogg::XiphComment::fromDict(const TagDict &tagDict)
+{
+  // check which keys are to be deleted
+  StringList toRemove;
+  FieldListMap::ConstIterator it = d->fieldListMap.begin();
+  for(; it != d->fieldListMap.end(); ++it) {
+      if (!tagDict.contains(it->first))
+          toRemove.append(it->first);
+  }
+
+  StringList::ConstIterator removeIt = toRemove.begin();
+  for (; removeIt != toRemove.end(); ++removeIt)
+      removeField(*removeIt);
+
+  /* now go through keys in tagDict and check that the values match those in the xiph comment */
+  TagDict::ConstIterator tagIt = tagDict.begin();
+  for (; tagIt != tagDict.end(); ++tagIt)
+  {
+    if (!d->fieldListMap.contains(tagIt->first) || !(tagIt->second == d->fieldListMap[tagIt->first])) {
+      const StringList &sl = tagIt->second;
+      if(sl.size() == 0) {
+        // zero size string list -> remove the tag with all values
+        removeField(tagIt->first);
+      }
+      else {
+        // replace all strings in the list for the tag
+        StringList::ConstIterator valueIterator = sl.begin();
+        addField(tagIt->first, *valueIterator, true);
+        ++valueIterator;
+        for(; valueIterator != sl.end(); ++valueIterator)
+          addField(tagIt->first, *valueIterator, false);
+      }
+    }
+  }
+}
+
 String Ogg::XiphComment::vendorID() const
 {
   return d->vendorID;

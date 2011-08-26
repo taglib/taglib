@@ -141,6 +141,16 @@ namespace TagLib {
       const FieldListMap &fieldListMap() const;
 
       /*!
+       * Implements the unified tag dictionary interface -- export function.
+       */
+      TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function.
+       */
+      void fromDict(const TagDict &);
+
+      /*!
        * Returns the vendor ID of the Ogg Vorbis encoder.  libvorbis 1.0 as the
        * most common case always returns "Xiph.Org libVorbis I 20020717".
        */

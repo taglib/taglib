@@ -31,11 +31,15 @@
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
-
+#include "id3v2dicttools.h"
+#include "tbytevector.h"
 #include "id3v1genres.h"
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
+#include "frames/urllinkframe.h"
+#include "frames/uniquefileidentifierframe.h"
+#include "frames/unsynchronizedlyricsframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -324,9 +328,115 @@ void ID3v2::Tag::removeFrame(Frame *frame, bool del)
 
 void ID3v2::Tag::removeFrames(const ByteVector &id)
 {
-    FrameList l = d->frameListMap[id];
-    for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
-      removeFrame(*it, true);
+  FrameList l = d->frameListMap[id];
+  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+    removeFrame(*it, true);
+}
+
+TagDict ID3v2::Tag::toDict() const
+{
+  TagDict dict;
+  FrameList::ConstIterator frameIt = frameList().begin();
+  for (; frameIt != frameList().end(); ++frameIt) {
+    ByteVector id = (*frameIt)->frameID();
+
+    if (isIgnored(id)) {
+      debug("found ignored id3 frame " + id);
+      continue;
+    }
+    if (isDeprecated(id)) {
+      debug("found deprecated id3 frame " + id);
+      continue;
+    }
+    if (id[0] == 'T') {
+      if (id == "TXXX") {
+        const UserTextIdentificationFrame *uframe
+                = dynamic_cast< const UserTextIdentificationFrame* >(*frameIt);
+        String tagName = uframe->description();
+        StringList l(uframe->fieldList());
+        // this is done because taglib stores the description also as first entry
+        // in the field list. (why?)
+        //
+        if (l.contains(tagName))
+           l.erase(l.find(tagName));
+        // handle user text frames set by the QuodLibet / exFalso package,
+        // which sets the description to QuodLibet::<tagName> instead of simply
+        // <tagName>.
+        int pos = tagName.find("::");
+        tagName = (pos != -1) ? tagName.substr(pos+2) : tagName;
+        dict[tagName.upper()].append(l);
+      }
+      else {
+        const TextIdentificationFrame* tframe
+                = dynamic_cast< const TextIdentificationFrame* >(*frameIt);
+        String tagName = frameIDToTagName(id);
+        StringList l = tframe->fieldList();
+        if (tagName == "GENRE") {
+          // Special case: Support ID3v1-style genre numbers. They are not officially supported in
+          // ID3v2, however it seems that still a lot of programs use them.
+          //
+          for (StringList::Iterator lit = l.begin(); lit != l.end(); ++lit) {
+            bool ok = false;
+            int test = lit->toInt(&ok); // test if the genre value is an integer
+            if (ok) {
+              *lit = ID3v1::genre(test);
+            }
+          }
+        }
+        else if (tagName == "DATE") {
+          for (StringList::Iterator lit = l.begin(); lit != l.end(); ++lit) {
+            // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
+            // Since this is unusual in other formats, the T is removed.
+            //
+            int tpos = lit->find("T");
+            if (tpos != -1)
+              (*lit)[tpos] = ' ';
+          }
+        }
+        dict[tagName].append(l);
+      }
+      continue;
+    }
+    if (id[0] == 'W') {
+      if (id == "WXXX") {
+        const UserUrlLinkFrame *uframe = dynamic_cast< const UserUrlLinkFrame* >(*frameIt);
+        String tagname = uframe->description().upper();
+        if (tagname == "")
+          tagname = "URL";
+        dict[tagname].append(uframe->url());
+      }
+      else {
+        const UrlLinkFrame* uframe = dynamic_cast< const UrlLinkFrame* >(*frameIt);
+        dict[frameIDToTagName(id)].append(uframe->url());
+      }
+      continue;
+    }
+    if (id == "COMM") {
+      const CommentsFrame *cframe = dynamic_cast< const CommentsFrame* >(*frameIt);
+      String tagName = cframe->description().upper();
+      if (tagName.isEmpty())
+        tagName = "COMMENT";
+      dict[tagName].append(cframe->text());
+      continue;
+    }
+    if (id == "USLT") {
+      const UnsynchronizedLyricsFrame *uframe
+              = dynamic_cast< const UnsynchronizedLyricsFrame* >(*frameIt);
+      dict["LYRICS"].append(uframe->text());
+      continue;
+    }
+    if (id == "UFID") {
+      const UniqueFileIdentifierFrame *uframe
+              = dynamic_cast< const UniqueFileIdentifierFrame* >(*frameIt);
+      String value = uframe->identifier();
+      if (!uframe->owner().isEmpty())
+        value.append(" [" + uframe->owner() + "]");
+      dict["UNIQUEIDENTIFIER"].append(value);
+      continue;
+    }
+    debug("unknown frame ID: " + id);
+  }
+  return dict;
 }
 
 ByteVector ID3v2::Tag::render() const

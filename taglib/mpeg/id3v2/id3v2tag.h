@@ -261,6 +261,16 @@ namespace TagLib {
       void removeFrames(const ByteVector &id);
 
       /*!
+       * Implements the unified tag dictionary interface -- export function.
+       */
+      TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function.
+       */
+      void fromDict(const TagDict &);
+
+      /*!
        * Render the tag back to binary data, suitable to be written to disk.
        */
       ByteVector render() const;

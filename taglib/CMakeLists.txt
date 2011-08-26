@@ -54,6 +54,7 @@ set(tag_HDRS
   mpeg/xingheader.h
   mpeg/id3v1/id3v1tag.h
   mpeg/id3v1/id3v1genres.h
+  mpeg/id3v2/id3v2dicttools.h
   mpeg/id3v2/id3v2extendedheader.h
   mpeg/id3v2/id3v2frame.h
   mpeg/id3v2/id3v2header.h
@@ -137,6 +138,7 @@ set(id3v1_SRCS
 )
 
 set(id3v2_SRCS
+  mpeg/id3v2/id3v2dicttools.cpp
   mpeg/id3v2/id3v2framefactory.cpp
   mpeg/id3v2/id3v2synchdata.cpp
   mpeg/id3v2/id3v2tag.cpp
