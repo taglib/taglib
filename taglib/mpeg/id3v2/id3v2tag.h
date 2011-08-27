@@ -262,11 +262,14 @@ namespace TagLib {
 
       /*!
        * Implements the unified tag dictionary interface -- export function.
+       * This function does some work to translate the hard-specified ID3v2
+       * frame types into a free-form string-to-stringlist dictionary.
        */
       virtual TagDict toDict() const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function.
+       * See the comments in toDict().
        */
       virtual void fromDict(const TagDict &);
 

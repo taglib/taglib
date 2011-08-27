@@ -174,6 +174,70 @@ void APE::Tag::setTrack(uint i)
     addValue("TRACK", String::number(i), true);
 }
 
+TagDict APE::Tag::toDict() const
+{
+  TagDict dict;
+  ItemListMap::ConstIterator it = itemListMap().begin();
+  for (; it != itemListMap().end(); ++it) {
+    String tagName = it->first.upper();
+    // These two tags need to be handled specially; in APE tags the track number is usually
+    // named TRACK instead of TRACKNUMBER, the date tag is YEAR instead of DATE
+    //
+    if (tagName == "TRACK")
+      tagName = "TRACKNUMBER";
+    else if (tagName == "YEAR")
+      tagName = "DATE";
+    if (it->second.type() == Item::Text)
+      dict[tagName].append(it->second.toStringList());
+  }
+  return dict;
+}
+
+void APE::Tag::fromDict(const TagDict &orig_dict)
+{
+  TagDict dict(orig_dict); // make a local copy that can be modified
+
+  if (dict.contains("TRACKNUMBER")) {
+    dict.insert("TRACK", dict["TRACKNUMBER"]);
+    dict.erase("TRACKNUMBER");
+  }
+  if (dict.contains("DATE")) {
+    dict.insert("YEAR", dict["DATE"]);
+    dict.erase("DATE");
+  }
+
+  // first check if tags need to be removed completely
+  StringList toRemove;
+  ItemListMap::ConstIterator remIt = itemListMap().begin();
+  for (; remIt != itemListMap().end(); ++remIt) {
+    if (remIt->second.type() != APE::Item::Text)
+      // ignore binary and locator APE items
+      continue;
+    if (!dict.contains(remIt->first.upper()))
+      toRemove.append(remIt->first);
+  }
+
+  for (StringList::Iterator removeIt = toRemove.begin(); removeIt != toRemove.end(); removeIt++)
+    removeItem(*removeIt);
+
+  // now sync in the "forward direction
+  TagDict::ConstIterator it = dict.begin();
+  for (; it != dict.end(); ++it) {
+    const String &tagName = it->first;
+    if (!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == it->second)) {
+      if (it->second.size() == 0)
+        removeItem(tagName);
+      else {
+        StringList::ConstIterator valueIt = it->second.begin();
+        addValue(tagName, *valueIt, true);
+        ++valueIt;
+        for(; valueIt != it->second.end(); ++valueIt)
+          addValue(tagName, *valueIt, false);
+      }
+    }
+  }
+}
+
 APE::Footer *APE::Tag::footer() const
 {
   return &d->footer;

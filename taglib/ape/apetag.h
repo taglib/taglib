@@ -104,6 +104,25 @@ namespace TagLib {
       virtual void setTrack(uint i);
 
       /*!
+       * Implements the unified tag dictionary interface -- export function.
+       * APE tags are perfectly compatible with the dictionary interface because they
+       * support both arbitrary tag names and multiple values. Currently only
+       * APE items of type *Text* are handled by the dictionary interface, while
+       * *Binary* and *Locator* items are simply ignored.
+       *
+       * The only conversion done by this export function is to rename the APE tags
+       * TRACK to TRACKNUMBER and YEAR to DATE, respectively, in order to be compliant
+       * with the names used in other formats.
+       */
+      virtual TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function. The same
+       * comments as for the export function apply.
+       */
+      virtual void fromDict(const TagDict &);
+
+      /*!
        * Returns a pointer to the tag's footer.
        */
       Footer *footer() const;

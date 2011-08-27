@@ -142,11 +142,16 @@ namespace TagLib {
 
       /*!
        * Implements the unified tag dictionary interface -- export function.
+       * The result is a one-to-one match of the Xiph comment, since it is
+       * completely compatible with the dictionary interface (in fact, a Xiph
+       * comment is nothing more than a map from tag names to list of values,
+       * as is the dict interface).
        */
       virtual TagDict toDict() const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function.
+       * The tags from the given dict will be stored one-to-one in the file.
        */
       virtual void fromDict(const TagDict &);
 
