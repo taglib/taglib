@@ -152,6 +152,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("spx");
   l.append("tta");
   l.append("m4a");
+  l.append("m4r");
   l.append("m4b");
   l.append("m4p");
   l.append("3g2");
@@ -253,7 +254,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "TTA")
       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "M4A" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
+    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
       return new MP4::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "WMA" || ext == "ASF")
       return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
