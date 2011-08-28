@@ -114,13 +114,13 @@ namespace TagLib {
        * TRACK to TRACKNUMBER and YEAR to DATE, respectively, in order to be compliant
        * with the names used in other formats.
        */
-      virtual TagDict toDict() const;
+      TagDict toDict() const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function. The same
        * comments as for the export function apply.
        */
-      virtual void fromDict(const TagDict &);
+      void fromDict(const TagDict &);
 
       /*!
        * Returns a pointer to the tag's footer.

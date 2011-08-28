@@ -63,7 +63,7 @@ namespace TagLib {
      * of the specific metadata format into a "human-readable" map of strings
      * to lists of strings, being as precise as possible.
      */
-    virtual TagDict toDict() const;
+    TagDict toDict() const;
 
     /*!
      * Unified tag dictionary interface -- import function. Converts a map
@@ -72,7 +72,7 @@ namespace TagLib {
      * be lost by this operation. Especially the default implementation handles
      * only single values of the default tags specified in this class.
      */
-    virtual void fromDict(const TagDict &);
+    void fromDict(const TagDict &);
 
     /*!
      * Returns the track name; if no track name is present in the tag

@@ -28,6 +28,7 @@
 
 #include "taglib_export.h"
 #include "tfile.h"
+#include "tag.h"
 
 #include "mpegproperties.h"
 
@@ -127,6 +128,21 @@ namespace TagLib {
        * \see APETag()
        */
       virtual Tag *tag() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- export function.
+       * If the file contains more than one tag (e.g. ID3v2 and v1), only the
+       * first one (in the order ID3v2, APE, ID3v1) will be converted to the
+       * TagDict.
+       */
+      TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function.
+       * As with the export, only one tag is taken into account. If the file
+       * has no tag at all, ID3v2 will be created.
+       */
+      void fromDict(const TagDict &);
 
       /*!
        * Returns the MPEG::Properties for this file.  If no audio properties

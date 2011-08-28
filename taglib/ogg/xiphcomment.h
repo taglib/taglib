@@ -147,13 +147,13 @@ namespace TagLib {
        * comment is nothing more than a map from tag names to list of values,
        * as is the dict interface).
        */
-      virtual TagDict toDict() const;
+      TagDict toDict() const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function.
        * The tags from the given dict will be stored one-to-one in the file.
        */
-      virtual void fromDict(const TagDict &);
+      void fromDict(const TagDict &);
 
       /*!
        * Returns the vendor ID of the Ogg Vorbis encoder.  libvorbis 1.0 as the

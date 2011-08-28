@@ -28,6 +28,7 @@
 
 #include "taglib_export.h"
 #include "tfile.h"
+#include "tag.h"
 
 #include "mpcproperties.h"
 
@@ -106,6 +107,20 @@ namespace TagLib {
        * or a combination of the two.
        */
       virtual TagLib::Tag *tag() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- export function.
+       * If the file contains both an APE and an ID3v1 tag, only the APE
+       * tag  will be converted to the TagDict.
+       */
+      TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function.
+       * As with the export, only one tag is taken into account. If the file
+       * has no tag at all, APE will be created.
+       */
+      void fromDict(const TagDict &);
 
       /*!
        * Returns the MPC::Properties for this file.  If no audio properties

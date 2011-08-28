@@ -29,6 +29,7 @@
 #include "taglib_export.h"
 #include "tfile.h"
 #include "tlist.h"
+#include "tag.h"
 
 #include "flacpicture.h"
 #include "flacproperties.h"
@@ -36,7 +37,6 @@
 namespace TagLib {
 
   class Tag;
-
   namespace ID3v2 { class FrameFactory; class Tag; }
   namespace ID3v1 { class Tag; }
   namespace Ogg { class XiphComment; }
@@ -117,6 +117,21 @@ namespace TagLib {
        * \see XiphComment()
        */
       virtual TagLib::Tag *tag() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- export function.
+       * If the file contains more than one tag (e.g. XiphComment and ID3v1),
+       * only the first one (in the order XiphComment, ID3v2, ID3v1) will be
+       * converted to the TagDict.
+       */
+      TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function.
+       * As with the export, only one tag is taken into account. If the file
+       * has no tag at all, a XiphComment will be created.
+       */
+      void fromDict(const TagDict &);
 
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties

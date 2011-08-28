@@ -91,6 +91,17 @@ namespace TagLib {
       virtual Ogg::XiphComment *tag() const;
 
       /*!
+       * Implements the unified tag dictionary interface -- export function.
+       * Returns the contents of the Ogg::XiphComment as TagDict.
+       */
+      TagDict toDict() const;
+
+      /*!
+       * Implements the unified tag dictionary interface -- import function.
+       * Matches the TagDict's contents to the XiphComment of the file.
+       */
+      void fromDict(const TagDict &);
+      /*!
        * Returns the Vorbis::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */

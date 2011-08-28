@@ -50,6 +50,24 @@
 # define W_OK 2
 #endif
 
+#include "asffile.h"
+#include "mpegfile.h"
+#include "vorbisfile.h"
+#include "flacfile.h"
+#include "oggflacfile.h"
+#include "mpcfile.h"
+#include "mp4file.h"
+#include "wavpackfile.h"
+#include "speexfile.h"
+#include "trueaudiofile.h"
+#include "aifffile.h"
+#include "wavfile.h"
+#include "apefile.h"
+#include "modfile.h"
+#include "s3mfile.h"
+#include "itfile.h"
+#include "xmfile.h"                                   \
+
 using namespace TagLib;
 
 class File::FilePrivate
@@ -93,6 +111,48 @@ File::~File()
 FileName File::name() const
 {
   return d->stream->name();
+}
+
+TagDict File::toDict() const
+{
+  // ugly workaround until this method is virtual
+  if (dynamic_cast<const APE::File* >(this))
+      return dynamic_cast<const APE::File* >(this)->toDict();
+  if (dynamic_cast<const FLAC::File* >(this))
+        return dynamic_cast<const FLAC::File* >(this)->toDict();
+  if (dynamic_cast<const MPC::File* >(this))
+        return dynamic_cast<const MPC::File* >(this)->toDict();
+  if (dynamic_cast<const MPEG::File* >(this))
+        return dynamic_cast<const MPEG::File* >(this)->toDict();
+  if (dynamic_cast<const Ogg::FLAC::File* >(this))
+    return dynamic_cast<const Ogg::FLAC::File* >(this)->toDict();
+  if (dynamic_cast<const Ogg::Speex::File* >(this))
+      return dynamic_cast<const Ogg::Speex::File* >(this)->toDict();
+  if (dynamic_cast<const Ogg::Vorbis::File* >(this))
+      return dynamic_cast<const Ogg::Vorbis::File* >(this)->toDict();
+  // no specialized implementation available -> use generic one
+  return tag()->toDict();
+}
+
+void File::fromDict(const TagDict &dict)
+{
+  if (dynamic_cast<const APE::File* >(this))
+    dynamic_cast< APE::File* >(this)->fromDict(dict);
+  else if (dynamic_cast<const FLAC::File* >(this))
+    dynamic_cast< FLAC::File* >(this)->fromDict(dict);
+  else if (dynamic_cast<const MPC::File* >(this))
+      dynamic_cast< MPC::File* >(this)->fromDict(dict);
+  else if (dynamic_cast<const MPEG::File* >(this))
+      dynamic_cast< MPEG::File* >(this)->fromDict(dict);
+  else if (dynamic_cast<const Ogg::FLAC::File* >(this))
+      dynamic_cast< Ogg::FLAC::File* >(this)->fromDict(dict);
+  else if (dynamic_cast<const Ogg::Speex::File* >(this))
+        dynamic_cast< Ogg::Speex::File* >(this)->fromDict(dict);
+  else if (dynamic_cast<const Ogg::Vorbis::File* >(this))
+        dynamic_cast< Ogg::Vorbis::File* >(this)->fromDict(dict);
+  else
+    tag()->fromDict(dict);
+
 }
 
 ByteVector File::readBlock(ulong length)

@@ -28,6 +28,7 @@
 
 #include "taglib_export.h"
 #include "taglib.h"
+#include "tag.h"
 #include "tbytevector.h"
 #include "tiostream.h"
 
@@ -76,6 +77,20 @@ namespace TagLib {
      */
     virtual Tag *tag() const = 0;
 
+    /*!
+     * Exports the tags of the file as dictionary mapping (human readable) tag
+     * names (Strings) to StringLists of tag values. Calls the according specialization
+     * in the File subclasses.
+     * Will be made virtual in future releases.
+     */
+    TagDict toDict() const;
+
+    /*!
+     * Sets the tags of this File to those specified by the given TagDict. Calls the
+     * according specialization method in the subclasses of File to do the translation
+     * into the format-specific details.
+     */
+    void fromDict(const TagDict &);
     /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were

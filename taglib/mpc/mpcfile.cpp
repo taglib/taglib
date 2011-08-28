@@ -113,6 +113,27 @@ TagLib::Tag *MPC::File::tag() const
   return &d->tag;
 }
 
+TagLib::TagDict MPC::File::toDict(void) const
+{
+  // once Tag::toDict() is virtual, this case distinction could actually be done
+  // within TagUnion.
+  if (d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->toDict();
+  if (d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->toDict();
+  return TagLib::TagDict();
+}
+
+void MPC::File::fromDict(const TagDict &dict)
+{
+  if (d->hasAPE)
+    d->tag.access<APE::Tag>(APEIndex, false)->fromDict(dict);
+  else if (d->hasID3v1)
+    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->fromDict(dict);
+  else
+    d->tag.access<APE::Tag>(APEIndex, true)->fromDict(dict);
+}
+
 MPC::Properties *MPC::File::audioProperties() const
 {
   return d->properties;

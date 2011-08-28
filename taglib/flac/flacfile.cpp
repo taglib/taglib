@@ -138,6 +138,31 @@ TagLib::Tag *FLAC::File::tag() const
   return &d->tag;
 }
 
+TagLib::TagDict FLAC::File::toDict(void) const
+{
+  // once Tag::toDict() is virtual, this case distinction could actually be done
+  // within TagUnion.
+  if (d->hasXiphComment)
+    return d->tag.access<Ogg::XiphComment>(XiphIndex, false)->toDict();
+  if (d->hasID3v2)
+    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->toDict();
+  if (d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->toDict();
+  return TagLib::TagDict();
+}
+
+void FLAC::File::fromDict(const TagDict &dict)
+{
+  if (d->hasXiphComment)
+    d->tag.access<Ogg::XiphComment>(XiphIndex, false)->fromDict(dict);
+  else if (d->hasID3v2)
+    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->fromDict(dict);
+  else if (d->hasID3v1)
+    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->fromDict(dict);
+  else
+    d->tag.access<Ogg::XiphComment>(XiphIndex, true)->fromDict(dict);
+}
+
 FLAC::Properties *FLAC::File::audioProperties() const
 {
   return d->properties;
