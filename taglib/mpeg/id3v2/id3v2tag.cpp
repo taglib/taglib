@@ -357,192 +357,24 @@ TagDict ID3v2::Tag::toDict() const
 void ID3v2::Tag::fromDict(const TagDict &dict)
 {
   FrameList toRemove;
-  // first record what frames to remove; we do not remove in-place
+  // first find out what frames to remove; we do not remove in-place
   // because that would invalidate FrameListMap iterators.
   //
-  for (FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it) {
-    // ignore empty map entries (does this ever happen?)
-    if (it->second.size() == 0)
-        continue;
+  for (FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it)
+    // Remove all frames which are not ignored
+    if (it->second.size() == 0 || !isIgnored(it->first))
+      toRemove.append(it->second);
 
-    // automatically remove deprecated frames
-    else if (isDeprecated(it->first))
-        toRemove.append(it->second);
-    else if (it->first == "TXXX") { // handle user text frames specially
-      for (FrameList::ConstIterator fit = it->second.begin(); fit != it->second.end(); ++fit) {
-        UserTextIdentificationFrame* frame
-            = dynamic_cast< UserTextIdentificationFrame* >(*fit);
-        String tagName = frame->description();
-        // handle user text frames set by the QuodLibet / exFalso package,
-        // which sets the description to QuodLibet::<tagName> instead of simply
-        // <tagName>.
-        int pos = tagName.find("::");
-        tagName = (pos == -1) ? tagName : tagName.substr(pos+2);
-        if (!dict.contains(tagName.upper()))
-          toRemove.append(frame);
-      }
-    }
-    else if (it->first == "WXXX") { // handle user URL frames specially
-      for (FrameList::ConstIterator fit = it->second.begin(); fit != it->second.end(); ++fit) {
-        UserUrlLinkFrame* frame = dynamic_cast<ID3v2::UserUrlLinkFrame* >(*fit);
-        String tagName = frame->description().upper();
-        if (!(tagName == "URL") || !dict.contains("URL") || dict["URL"].size() > 1)
-          toRemove.append(frame);
-      }
-    }
-    else if (it->first == "COMM") {
-      for (FrameList::ConstIterator fit = it->second.begin(); fit != it->second.end(); ++fit) {
-        CommentsFrame* frame = dynamic_cast< CommentsFrame* >(*fit);
-        String tagName = frame->description().upper();
-        // policy: use comment frame only with empty description and only if a comment tag
-        // is present in the dictionary and only if there's no more than one comment
-        // (COMM is not specified for multiple values)
-        if ( !(tagName == "") || !dict.contains("COMMENT") || dict["COMMENT"].size() > 1)
-          toRemove.append(frame);
-      }
-    }
-    else if (it->first == "USLT") {
-        for (FrameList::ConstIterator fit = it->second.begin(); fit != it->second.end(); ++fit) {
-          UnsynchronizedLyricsFrame *frame
-            = dynamic_cast< UnsynchronizedLyricsFrame* >(*fit);
-          String tagName = frame->description().upper();
-          if ( !(tagName == "") || !dict.contains("LYRICS") || dict["LYRICS"].size() > 1)
-            toRemove.append(frame);
-        }
-    }
-    else if (it->first[0] == 'T') { // a normal text frame
-      if (!dict.contains(frameIDToTagName(it->first)))
-        toRemove.append(it->second);
-
-    } else
-      debug("file contains unknown tag" + it->first + ", not touching it...");
-  }
-
-  // now remove the frames that have been determined above
   for (FrameList::ConstIterator it = toRemove.begin(); it != toRemove.end(); it++)
     removeFrame(*it);
 
-  // now sync in the "forward direction"
+  // now create new frames from the TagDict and add them.
   for (TagDict::ConstIterator it = dict.begin(); it != dict.end(); ++it) {
-    const String &tagName = it->first;
-    ByteVector id = tagNameToFrameID(tagName);
-    if (id[0] == 'T' && id != "TXXX") {
-      // the easiest case: a normal text frame
-      StringList values = it->second;
-      const FrameList &framelist = frameList(id);
-      if (tagName == "DATE") {
-        // Handle ISO8601 date format (see above)
-        for (StringList::Iterator lit = values.begin(); lit != values.end();  ++lit) {
-          if (lit->length() > 10 && (*lit)[10] == ' ')
-            (*lit)[10] = 'T';
-        }
-      }
-      if (framelist.size() > 0) { // there exists already a frame for this tag
-        const TextIdentificationFrame *frame = dynamic_cast<const TextIdentificationFrame *>(framelist[0]);
-        if (values == frame->fieldList())
-          continue; // equal tag values -> everything ok
-      }
-      // if there was no frame for this tag, or there was one but the values aren't equal,
-      // we start from scratch and create a new one
-      //
-      removeFrames(id);
-      TextIdentificationFrame *frame = new TextIdentificationFrame(id);
-      frame->setText(values);
-      addFrame(frame);
-    }
-    else if (id == "TXXX" ||
-             ((id == "WXXX" || id == "COMM" || id == "USLT") && it->second.size() > 1)) {
-      // In all those cases, we store the tag as TXXX frame.
-      // First we search for existing TXXX frames with correct description
-      FrameList existingFrames;
-      FrameList l = frameList("TXXX");
-
-      for (FrameList::ConstIterator fit = l.begin(); fit != l.end(); fit++) {
-        String desc= dynamic_cast< UserTextIdentificationFrame* >(*fit)->description();
-        int pos = desc.find("::");
-        String tagName = (pos == -1) ? desc.upper() : desc.substr(pos+2).upper();
-        if (tagName == it->first)
-          existingFrames.append(*fit);
-      }
-
-      bool needsInsert = false;
-      if (existingFrames.size() > 1) { //several tags with same key, remove all and reinsert
-        for (FrameList::ConstIterator it = existingFrames.begin(); it != existingFrames.end(); ++it)
-          removeFrame(*it);
-        needsInsert = true;
-      }
-      else if (existingFrames.isEmpty()) // no frame -> needs insert
-        needsInsert = true;
-      else {
-        if (!(dynamic_cast< UserTextIdentificationFrame*>(existingFrames[0])->fieldList() == it->second)) {
-          needsInsert = true;
-          removeFrame(existingFrames[0]);
-        }
-      }
-      if (needsInsert) { // create and insert new frame
-        UserTextIdentificationFrame* frame = new UserTextIdentificationFrame();
-        frame->setDescription(it->first);
-        frame->setText(it->second);
-        addFrame(frame);
-      }
-    }
-    else if (id == "WXXX") {
-      // we know that it->second.size()==1, since the other cases are handled above
-      bool needsInsert = true;
-      FrameList existingFrames = frameList(id);
-      if (existingFrames.size() > 1 ) // do not allow several WXXX frames
-        removeFrames(id);
-      else if (existingFrames.size() == 1) {
-        needsInsert = !(dynamic_cast< UserUrlLinkFrame* >(existingFrames[0])->url() == it->second[0]);
-        if (needsInsert)
-          removeFrames(id);
-      }
-      if (needsInsert) {
-        UserUrlLinkFrame* frame = new ID3v2::UserUrlLinkFrame();
-        frame->setDescription(it->first);
-        frame->setUrl(it->second[0]);
-        addFrame(frame);
-      }
-    }
-    else if (id == "COMM") {
-      FrameList existingFrames = frameList(id);
-      bool needsInsert = true;
-      if (existingFrames.size() > 1) // do not allow several COMM frames
-        removeFrames(id);
-      else if (existingFrames.size() == 1) {
-        needsInsert = !(dynamic_cast< CommentsFrame* >(existingFrames[0])->text() == it->second[0]);
-        if (needsInsert)
-          removeFrames(id);
-      }
-
-      if (needsInsert) {
-        CommentsFrame* frame = new CommentsFrame();
-        frame->setDescription(""); // most software players use empty description COMM frames for comments
-        frame->setText(it->second[0]);
-        addFrame(frame);
-      }
-    }
-    else if (id == "USLT") {
-      FrameList existingFrames = frameList(id);
-      bool needsInsert = true;
-      if (existingFrames.size() > 1) // do not allow several USLT frames
-          removeFrames(id);
-      else if (existingFrames.size() == 1) {
-          needsInsert = !(dynamic_cast< UnsynchronizedLyricsFrame* >(existingFrames[0])->text() == it->second[0]);
-          if (needsInsert)
-            removeFrames(id);
-      }
-
-      if (needsInsert) {
-        UnsynchronizedLyricsFrame* frame = new UnsynchronizedLyricsFrame();
-        frame->setDescription("");
-        frame->setText(it->second[0]);
-        addFrame(frame);
-      }
-    }
+    Frame *newFrame = createFrame(it->first, it->second);
+    if (newFrame)
+      addFrame(newFrame);
     else
       debug("ERROR: Don't know how to translate tag " + it->first + " to ID3v2!");
-
   }
 }
 

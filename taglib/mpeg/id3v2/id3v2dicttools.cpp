@@ -182,6 +182,10 @@ namespace TagLib {
       return deprecationMap().contains(id);
     }
 
+    String prepareTagName(const String &s) {
+      int pos = s.find("::");
+      return ((pos != -1) ? s.substr(pos+2) : s).upper();
+    }
     /*
      * The following _parseXXX functions are to be replaced by implementations of a virtual
      * function in ID3v2::Frame ASAP.
@@ -194,12 +198,15 @@ namespace TagLib {
       // in the field list. (why?)
       if (l.contains(tagName))
          l.erase(l.find(tagName));
-      // handle user text frames set by the QuodLibet / exFalso package,
-      // which sets the description to QuodLibet::<tagName> instead of simply
-      // <tagName>.
-      int pos = tagName.find("::");
-      tagName = (pos != -1) ? tagName.substr(pos+2) : tagName;
-      return KeyValuePair(tagName.upper(), l);
+      return KeyValuePair(prepareTagName(tagName), l);
+    }
+
+    Frame *_createUserTextIdentificationFrame(const String &tag, const StringList &values)
+    {
+      UserTextIdentificationFrame* frame = new UserTextIdentificationFrame();
+      frame->setDescription(tag);
+      frame->setText(values);
+      return frame;
     }
 
     KeyValuePair _parseTextIdentificationFrame(const TextIdentificationFrame *frame)
@@ -230,6 +237,21 @@ namespace TagLib {
       return KeyValuePair(tagName, l);
     }
 
+    Frame *_createTextIdentificationFrame(const String &tag, const StringList &values)
+    {
+      StringList newValues(values); // create a copy because the following might modify
+      // the easiest case: a normal text frame
+      if (tag == "DATE") {
+        // Handle ISO8601 date format
+        for (StringList::Iterator lit = newValues.begin(); lit != newValues.end();  ++lit)
+          if (lit->length() > 10 && (*lit)[10] == ' ')
+            (*lit)[10] = 'T';
+      }
+      TextIdentificationFrame *frame = new TextIdentificationFrame(tagNameToFrameID(tag));
+      frame->setText(newValues);
+      return frame;
+    }
+
     KeyValuePair _parseUserUrlLinkFrame(const UserUrlLinkFrame *frame)
     {
       String tagName = frame->description().upper();
@@ -238,9 +260,30 @@ namespace TagLib {
       return KeyValuePair(tagName, frame->url());
     }
 
+    /*!
+     * Create a UserUrlLinkFrame. Note that this is valid only if values.size() == 1.
+     */
+    Frame *_createUserUrlLinkFrame(const String &tag, const StringList &values)
+    {
+      UserUrlLinkFrame* frame = new UserUrlLinkFrame();
+      frame->setDescription(tag);
+      frame->setUrl(values[0]);
+      return frame;
+    }
+
     KeyValuePair _parseUrlLinkFrame(const UrlLinkFrame *frame)
     {
       return KeyValuePair(frameIDToTagName(frame->frameID()) , frame->url());
+    }
+
+    /*!
+     * Create a rUrlLinkFrame. Note that this is valid only if values.size() == 1.
+     */
+    Frame *_createUrlLinkFrame(const String &tag, const StringList &values)
+    {
+      UrlLinkFrame *frame = new UrlLinkFrame(tagNameToFrameID(tag));
+      frame->setUrl(values[0]);
+      return frame;
     }
 
     KeyValuePair _parseCommentsFrame(const CommentsFrame *frame)
@@ -251,9 +294,24 @@ namespace TagLib {
       return KeyValuePair(tagName, frame->text());
     }
 
+    Frame *_createCommentsFrame(const String &tag, const StringList &values)
+    {
+      CommentsFrame *frame = new CommentsFrame(String::UTF8);
+      frame->setText(values[0]);
+      return frame;
+    }
+
     KeyValuePair _parseUnsynchronizedLyricsFrame(const UnsynchronizedLyricsFrame *frame)
     {
       return KeyValuePair("LYRICS", frame->text());
+    }
+
+    Frame *_createUnsynchronizedLyricsFrame(const String &tag, const StringList &values)
+    {
+      UnsynchronizedLyricsFrame* frame = new UnsynchronizedLyricsFrame();
+      frame->setDescription("");
+      frame->setText(values[0]);
+      return frame;
     }
 
     KeyValuePair parseFrame(const Frame *frame)
@@ -275,6 +333,25 @@ namespace TagLib {
         debug("parsing unknown ID3 frame: " + id);
         return KeyValuePair("UNKNOWNID3TAG", frame->toString());
       }
+    }
+
+    Frame *createFrame(const String &tag, const StringList &values)
+    {
+      ByteVector id = tagNameToFrameID(tag);
+      if (id == "TXXX" ||
+               ((id[0] == 'W' || id == "COMM" || id == "USLT") && values.size() > 1))
+        return _createUserTextIdentificationFrame(tag, values);
+      else if (id[0] == 'T')
+        return _createTextIdentificationFrame(tag, values);
+      else if (id == "WXXX")
+        return _createUserUrlLinkFrame(tag, values);
+      else if (id[0] == 'W')
+        return _createUrlLinkFrame(tag, values);
+      else if (id == "COMM")
+        return _createCommentsFrame(tag, values);
+      else if (id == "USLT")
+        return _createUnsynchronizedLyricsFrame(tag, values);
+      return 0;
     }
   }
 }

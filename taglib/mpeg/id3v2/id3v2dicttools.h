@@ -44,7 +44,8 @@ namespace TagLib {
     // forward declaration
     class Frame;
     /*!
-     * Returns an appropriate ID3 frame ID for the given free-form tag name.
+     * Returns an appropriate ID3 frame ID for the given free-form tag name. This method
+     * will return TXXX if no specialized translation is found.
      */
     ByteVector TAGLIB_EXPORT tagNameToFrameID(const String &);
 
@@ -68,6 +69,16 @@ namespace TagLib {
      * a StringList containing the values.
      */
     KeyValuePair parseFrame(const Frame*);
+
+    /*!
+     * Create an appropriate ID3v2::Frame for the given tag name and values.
+     */
+    Frame *createFrame(const String &tag, const StringList &values);
+    /*!
+     * prepare the given tag name for use in a unified dictionary: make it uppercase and
+     * removes prefixes set by the ExFalso/QuodLibet package.
+     */
+    String prepareTagName(const String &);
 
 
   }
