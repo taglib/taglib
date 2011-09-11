@@ -340,92 +340,16 @@ TagDict ID3v2::Tag::toDict() const
   for (; frameIt != frameList().end(); ++frameIt) {
     ByteVector id = (*frameIt)->frameID();
 
-    if (isIgnored(id)) {
-      debug("found ignored id3 frame " + id);
-      continue;
+    if (isIgnored(id))
+      debug("toDict() found ignored id3 frame: " + id);
+    else if (isDeprecated(id))
+      debug("toDict() found deprecated id3 frame: " + id);
+    else {
+        // in the future, something like dict[frame->tagName()].append(frame->values())
+        // might replace the following lines.
+        KeyValuePair kvp = parseFrame(*frameIt);
+        dict[kvp.first].append(kvp.second);
     }
-    if (isDeprecated(id)) {
-      debug("found deprecated id3 frame " + id);
-      continue;
-    }
-    if (id[0] == 'T') {
-      if (id == "TXXX") {
-        const UserTextIdentificationFrame *uframe
-                = dynamic_cast< const UserTextIdentificationFrame* >(*frameIt);
-        String tagName = uframe->description();
-        StringList l(uframe->fieldList());
-        // this is done because taglib stores the description also as first entry
-        // in the field list. (why?)
-        //
-        if (l.contains(tagName))
-           l.erase(l.find(tagName));
-        // handle user text frames set by the QuodLibet / exFalso package,
-        // which sets the description to QuodLibet::<tagName> instead of simply
-        // <tagName>.
-        int pos = tagName.find("::");
-        tagName = (pos != -1) ? tagName.substr(pos+2) : tagName;
-        dict[tagName.upper()].append(l);
-      }
-      else {
-        const TextIdentificationFrame* tframe
-                = dynamic_cast< const TextIdentificationFrame* >(*frameIt);
-        String tagName = frameIDToTagName(id);
-        StringList l = tframe->fieldList();
-        if (tagName == "GENRE") {
-          // Special case: Support ID3v1-style genre numbers. They are not officially supported in
-          // ID3v2, however it seems that still a lot of programs use them.
-          //
-          for (StringList::Iterator lit = l.begin(); lit != l.end(); ++lit) {
-            bool ok = false;
-            int test = lit->toInt(&ok); // test if the genre value is an integer
-            if (ok) {
-              *lit = ID3v1::genre(test);
-            }
-          }
-        }
-        else if (tagName == "DATE") {
-          for (StringList::Iterator lit = l.begin(); lit != l.end(); ++lit) {
-            // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
-            // Since this is unusual in other formats, the T is removed.
-            //
-            int tpos = lit->find("T");
-            if (tpos != -1)
-              (*lit)[tpos] = ' ';
-          }
-        }
-        dict[tagName].append(l);
-      }
-      continue;
-    }
-    if (id[0] == 'W') {
-      if (id == "WXXX") {
-        const UserUrlLinkFrame *uframe = dynamic_cast< const UserUrlLinkFrame* >(*frameIt);
-        String tagname = uframe->description().upper();
-        if (tagname == "")
-          tagname = "URL";
-        dict[tagname].append(uframe->url());
-      }
-      else {
-        const UrlLinkFrame* uframe = dynamic_cast< const UrlLinkFrame* >(*frameIt);
-        dict[frameIDToTagName(id)].append(uframe->url());
-      }
-      continue;
-    }
-    if (id == "COMM") {
-      const CommentsFrame *cframe = dynamic_cast< const CommentsFrame* >(*frameIt);
-      String tagName = cframe->description().upper();
-      if (tagName.isEmpty())
-        tagName = "COMMENT";
-      dict[tagName].append(cframe->text());
-      continue;
-    }
-    if (id == "USLT") {
-      const UnsynchronizedLyricsFrame *uframe
-              = dynamic_cast< const UnsynchronizedLyricsFrame* >(*frameIt);
-      dict["LYRICS"].append(uframe->text());
-      continue;
-    }
-    debug("unknown frame ID: " + id);
   }
   return dict;
 }
@@ -437,15 +361,21 @@ void ID3v2::Tag::fromDict(const TagDict &dict)
   // because that would invalidate FrameListMap iterators.
   //
   for (FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it) {
-    if (it->second.size() == 0) // ignore empty map entries (does this ever happen?)
+    // ignore empty map entries (does this ever happen?)
+    if (it->second.size() == 0)
         continue;
-    if (isDeprecated(it->first))// automatically remove deprecated frames
+
+    // automatically remove deprecated frames
+    else if (isDeprecated(it->first))
         toRemove.append(it->second);
     else if (it->first == "TXXX") { // handle user text frames specially
       for (FrameList::ConstIterator fit = it->second.begin(); fit != it->second.end(); ++fit) {
         UserTextIdentificationFrame* frame
             = dynamic_cast< UserTextIdentificationFrame* >(*fit);
         String tagName = frame->description();
+        // handle user text frames set by the QuodLibet / exFalso package,
+        // which sets the description to QuodLibet::<tagName> instead of simply
+        // <tagName>.
         int pos = tagName.find("::");
         tagName = (pos == -1) ? tagName : tagName.substr(pos+2);
         if (!dict.contains(tagName.upper()))
