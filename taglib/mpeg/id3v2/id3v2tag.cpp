@@ -40,6 +40,7 @@
 #include "frames/urllinkframe.h"
 #include "frames/uniquefileidentifierframe.h"
 #include "frames/unsynchronizedlyricsframe.h"
+#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -340,9 +341,9 @@ TagDict ID3v2::Tag::toDict() const
   for (; frameIt != frameList().end(); ++frameIt) {
     ByteVector id = (*frameIt)->frameID();
 
-    if (isIgnored(id))
+    if (ignored(id))
       debug("toDict() found ignored id3 frame: " + id);
-    else if (isDeprecated(id))
+    else if (deprecated(id))
       debug("toDict() found deprecated id3 frame: " + id);
     else {
         // in the future, something like dict[frame->tagName()].append(frame->values())
@@ -362,7 +363,7 @@ void ID3v2::Tag::fromDict(const TagDict &dict)
   //
   for (FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it)
     // Remove all frames which are not ignored
-    if (it->second.size() == 0 || !isIgnored(it->first))
+    if (it->second.size() == 0 || !ignored(it->first) )
       toRemove.append(it->second);
 
   for (FrameList::ConstIterator it = toRemove.begin(); it != toRemove.end(); it++)

@@ -33,29 +33,26 @@
 #include "frames/unsynchronizedlyricsframe.h"
 #include "id3v1genres.h"
 
-using namespace TagLib;
-using namespace ID3v2;
-
-// list of deprecated frames and their successors
-static const uint deprecatedFramesSize = 4;
-static const char *deprecatedFrames[][2] = {
-  {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
-  {"TDAT", "TDRC"}, // 2.3 -> 2.4
-  {"TYER", "TDRC"}, // 2.3 -> 2.4
-  {"TIME", "TDRC"}, // 2.3 -> 2.4
-};
-
-FrameIDMap deprecationMap()
-{
-  static FrameIDMap depMap;
-  if (depMap.isEmpty())
-    for(uint i = 0; i < deprecatedFramesSize; ++i)
-      depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
-  return depMap;
-}
-
 namespace TagLib {
   namespace ID3v2 {
+
+    // list of deprecated frames and their successors
+    static const uint deprecatedFramesSize = 4;
+    static const char *deprecatedFrames[][2] = {
+      {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+      {"TDAT", "TDRC"}, // 2.3 -> 2.4
+      {"TYER", "TDRC"}, // 2.3 -> 2.4
+      {"TIME", "TDRC"}, // 2.3 -> 2.4
+    };
+
+    FrameIDMap &deprecationMap()
+    {
+      static FrameIDMap depMap;
+      if (depMap.isEmpty())
+        for(uint i = 0; i < deprecatedFramesSize; ++i)
+          depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
+      return depMap;
+    }
 
     /*!
      * A map of translations frameID <-> tag used by the unified dictionary interface.
@@ -127,32 +124,24 @@ namespace TagLib {
       { "USLT", "LYRICS" },
     };
 
-    // list of frameIDs that are ignored by the unified dictionary interface
-    static const uint ignoredFramesSize = 7;
-    static const char *ignoredFrames[] = {
-      "TCMP", // illegal 'Part of Compilation' frame set by iTunes (see http://www.id3.org/Compliance_Issues)
-      "GEOB", // no way to handle a general encapsulated object by the dict interface
-      "PRIV", // private frames
-      "APIC", // attached picture -- TODO how could we do this?
-      "POPM", // popularimeter
-      "RVA2", // relative volume
-      "UFID", // unique file identifier
-    };
-
+    Map<ByteVector, String> &idMap()
+    {
+      static Map<ByteVector, String> m;
+        if (m.isEmpty())
+          for (size_t i = 0; i < numid3frames; ++i)
+            m[id3frames[i][0]] = id3frames[i][1];
+      return m;
+    }
 
     String frameIDToTagName(const ByteVector &id)
     {
-      static Map<ByteVector, String> m;
-      if (m.isEmpty())
-        for (size_t i = 0; i < numid3frames; ++i)
-          m[id3frames[i][0]] = id3frames[i][1];
-
+      Map<ByteVector, String> &m = idMap();
       if (m.contains(id))
         return m[id];
       if (deprecationMap().contains(id))
         return m[deprecationMap()[id]];
-      debug("unknown frame ID: " + id);
-      return "UNKNOWNID3TAG"; //TODO: implement this nicer
+      debug("unknown frame ID in frameIDToTagName(): " + id);
+      return "UNKNOWNID3TAG#" + String(id) + "#"; //TODO: implement this nicer
     }
 
     ByteVector tagNameToFrameID(const String &s)
@@ -166,18 +155,12 @@ namespace TagLib {
       return "TXXX";
     }
 
-    bool isIgnored(const ByteVector& id)
+    bool ignored(const ByteVector& id)
     {
-      List<ByteVector> ignoredList;
-      if (ignoredList.isEmpty())
-        for (uint i = 0; i < ignoredFramesSize; ++i)
-          ignoredList.append(ignoredFrames[i]);
-      return ignoredList.contains(id);
+      return !(id == "TXXX") && !idMap().contains(id) && !deprecated(id);
     }
 
-
-
-    bool isDeprecated(const ByteVector& id)
+    bool deprecated(const ByteVector& id)
     {
       return deprecationMap().contains(id);
     }

@@ -41,7 +41,6 @@ namespace TagLib {
     typedef Map<ByteVector, ByteVector> FrameIDMap;
     typedef std::pair<String, StringList> KeyValuePair;
 
-    // forward declaration
     class Frame;
     /*!
      * Returns an appropriate ID3 frame ID for the given free-form tag name. This method
@@ -58,11 +57,27 @@ namespace TagLib {
     /*!
      * Tell if the given frame ID is ignored by the unified dictionary subsystem. This is true
      * for frames that don't admit a textual representation, such as pictures or other binary
-     * information.
+     * information, as well as invalid frames that violate the ID3 specification.
+     *
+     * These include:
+     * - illegal frames violating the specification but seem to be used by some applications, e.g.
+     * "TCMP", illegal 'Part of Compilation' frame set by iTunes (see http://www.id3.org/Compliance_Issues)
+     * "NCON", illegal MusicMatch frame (see http://www.id3.org/Compliance_Issues)
+     *
+     *  - frames without a meaningful textual representation -- might be implemented in some future release
+     * "GEOB", no way to handle a general encapsulated object by the dict interface
+     * "PRIV", private frames
+     * "APIC", attached picture
+     * "POPM", popularimeter
+     * "RVA2", relative volume
+     * "UFID", unique file identifier
      */
-    bool TAGLIB_EXPORT isIgnored(const ByteVector &);
+    bool TAGLIB_EXPORT ignored(const ByteVector &);
 
-    bool TAGLIB_EXPORT isDeprecated(const ByteVector&);
+    /*!
+     * Returns true if the given frame ID is deprecated according to the most recent ID3v2 standard.
+     */
+    bool TAGLIB_EXPORT deprecated(const ByteVector&);
 
     /*!
      * Parse the ID3v2::Frame *Frame* to a pair of a human-readable key (e.g. ARTIST) and
