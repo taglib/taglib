@@ -95,6 +95,11 @@ bool RIFF::WAV::File::save()
     return false;
   }
 
+  if(!isValid()) {
+    debug("RIFF::WAV::File::save() -- Trying to save invalid file.");
+    return false;
+  }
+
   setChunkData(d->tagChunkID, d->tag->render());
 
   return true;
