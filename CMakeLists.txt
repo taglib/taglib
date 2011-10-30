@@ -11,6 +11,11 @@ else()
 endif()
 OPTION(ENABLE_STATIC_RUNTIME "Visual Studio, link with runtime statically"  OFF)
 
+option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden"  OFF)
+if(VISIBILITY_HIDDEN)
+  add_definitions (-fvisibility=hidden)
+endif()
+
 option(BUILD_TESTS "Build the test suite"  OFF)
 option(BUILD_EXAMPLES "Build the examples"  OFF)
 
