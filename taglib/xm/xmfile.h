@@ -61,6 +61,18 @@ namespace TagLib {
         Mod::Tag *tag() const;
 
         /*!
+         * Implements the unified tag dictionary interface -- export function.
+         * Forwards to Mod::Tag::toDict().
+         */
+        TagDict toDict() const;
+
+        /*!
+         * Implements the unified tag dictionary interface -- import function.
+         * Forwards to Mod::Tag::fromDict().
+         */
+        void fromDict(const TagDict &);
+
+        /*!
          * Returns the XM::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */

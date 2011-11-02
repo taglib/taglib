@@ -20,7 +20,7 @@
  ***************************************************************************/
 
 #include "modtag.h"
-
+#include "tstringlist.h"
 using namespace TagLib;
 using namespace Mod;
 
@@ -119,4 +119,32 @@ void Mod::Tag::setTrack(uint)
 void Mod::Tag::setTrackerName(const String &trackerName)
 {
   d->trackerName = trackerName;
+}
+
+TagDict Mod::Tag::toDict() const
+{
+  TagDict dict;
+  dict["TITLE"] = d->title;
+  dict["COMMENT"] = d->comment;
+  if (!(d->trackerName == String::null))
+    dict["TRACKERNAME"] = d->trackerName;
+  return dict;
+}
+
+void Mod::Tag::fromDict(const TagDict &tagDict)
+{
+  if (tagDict.contains("TITLE") && !tagDict["TITILE"].isEmpty())
+    d->title = tagDict["TITLE"][0];
+  else
+    d->title = String::null;
+
+  if (tagDict.contains("COMMENT") && !tagDict["COMMENT"].isEmpty())
+    d->comment = tagDict["COMMENT"][0];
+  else
+    d->comment = String::null;
+
+  if (tagDict.contains("TRACKERNAME") && !tagDict["TRACKERNAME"].isEmpty())
+    d->trackerName = tagDict["TRACKERNAME"][0];
+  else
+    d->trackerName = String::null;
 }

@@ -26,6 +26,7 @@
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <id3v2tag.h>
+#include <tstringlist.h>
 
 #include "aifffile.h"
 
@@ -82,6 +83,18 @@ ID3v2::Tag *RIFF::AIFF::File::tag() const
 {
   return d->tag;
 }
+
+TagLib::TagDict RIFF::AIFF::File::toDict(void) const
+{
+  return d->tag->toDict();
+
+}
+
+void RIFF::AIFF::File::fromDict(const TagDict &dict)
+{
+  d->tag->fromDict(dict);
+}
+
 
 RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
 {

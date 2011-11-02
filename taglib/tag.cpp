@@ -75,32 +75,32 @@ TagDict Tag::toDict() const
 
 void Tag::fromDict(const TagDict &dict)
 {
-  if (dict.contains("TITLE") and dict["TITLE"].size() >= 1)
+  if (dict.contains("TITLE") && dict["TITLE"].size() >= 1)
     setTitle(dict["TITLE"].front());
   else
     setTitle(String::null);
 
-  if (dict.contains("ARTIST") and dict["ARTIST"].size() >= 1)
+  if (dict.contains("ARTIST") && !dict["ARTIST"].isEmpty())
     setArtist(dict["ARTIST"].front());
   else
     setArtist(String::null);
 
-  if (dict.contains("ALBUM") and dict["ALBUM"].size() >= 1)
+  if (dict.contains("ALBUM") && !dict["ALBUM"].isEmpty())
       setAlbum(dict["ALBUM"].front());
     else
       setAlbum(String::null);
 
-  if (dict.contains("COMMENT") and dict["COMMENT"].size() >= 1)
+  if (dict.contains("COMMENT") && !dict["COMMENT"].isEmpty())
     setComment(dict["COMMENT"].front());
   else
     setComment(String::null);
 
-  if (dict.contains("GENRE") and dict["GENRE"].size() >=1)
+  if (dict.contains("GENRE") && !dict["GENRE"].isEmpty())
     setGenre(dict["GENRE"].front());
   else
     setGenre(String::null);
 
-  if (dict.contains("DATE") and dict["DATE"].size() >= 1) {
+  if (dict.contains("DATE") && !dict["DATE"].isEmpty()) {
     bool ok;
     int date = dict["DATE"].front().toInt(&ok);
     if (ok)
@@ -111,7 +111,7 @@ void Tag::fromDict(const TagDict &dict)
   else
     setYear(0);
 
-  if (dict.contains("TRACKNUMBER") and dict["TRACKNUMBER"].size() >= 1) {
+  if (dict.contains("TRACKNUMBER") && !dict["TRACKNUMBER"].isEmpty()) {
     bool ok;
     int track = dict["TRACKNUMBER"].front().toInt(&ok);
     if (ok)

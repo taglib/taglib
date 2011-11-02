@@ -31,6 +31,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tagunion.h>
+#include <tstringlist.h>
 
 #include "trueaudiofile.h"
 #include "id3v1tag.h"
@@ -124,6 +125,27 @@ TrueAudio::File::~File()
 TagLib::Tag *TrueAudio::File::tag() const
 {
   return &d->tag;
+}
+
+TagLib::TagDict TrueAudio::File::toDict(void) const
+{
+  // once Tag::toDict() is virtual, this case distinction could actually be done
+  // within TagUnion.
+  if (d->hasID3v2)
+    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->toDict();
+  if (d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->toDict();
+  return TagLib::TagDict();
+}
+
+void TrueAudio::File::fromDict(const TagDict &dict)
+{
+  if (d->hasID3v2)
+    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->fromDict(dict);
+  else if (d->hasID3v1)
+    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->fromDict(dict);
+  else
+    d->tag.access<ID3v2::Tag>(ID3v2Index, true)->fromDict(dict);
 }
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const

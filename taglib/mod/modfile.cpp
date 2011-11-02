@@ -70,6 +70,16 @@ Mod::Properties *Mod::File::audioProperties() const
   return &d->properties;
 }
 
+TagDict Mod::File::toDict() const
+{
+  return d->tag.toDict();
+}
+
+void Mod::File::fromDict(const TagDict &tagDict)
+{
+  d->tag.fromDict(tagDict);
+}
+
 bool Mod::File::save()
 {
   if(readOnly()) {

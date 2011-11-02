@@ -26,6 +26,7 @@
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <id3v2tag.h>
+#include <tstringlist.h>
 
 #include "wavfile.h"
 
@@ -82,6 +83,17 @@ ID3v2::Tag *RIFF::WAV::File::tag() const
 {
   return d->tag;
 }
+
+TagLib::TagDict RIFF::WAV::File::toDict(void) const
+{
+  return d->tag->toDict();
+}
+
+void RIFF::WAV::File::fromDict(const TagDict &dict)
+{
+  d->tag->fromDict(dict);
+}
+
 
 RIFF::WAV::Properties *RIFF::WAV::File::audioProperties() const
 {
