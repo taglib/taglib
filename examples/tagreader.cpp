@@ -50,13 +50,15 @@ int main(int argc, char *argv[])
       TagLib::Tag *tag = f.tag();
 
       cout << "-- TAG --" << endl;
-      cout << "title   - \"" << tag->title()   << "\"" << endl;
-      cout << "artist  - \"" << tag->artist()  << "\"" << endl;
-      cout << "album   - \"" << tag->album()   << "\"" << endl;
-      cout << "year    - \"" << tag->year()    << "\"" << endl;
-      cout << "comment - \"" << tag->comment() << "\"" << endl;
-      cout << "track   - \"" << tag->track()   << "\"" << endl;
-      cout << "genre   - \"" << tag->genre()   << "\"" << endl;
+      cout << "title        - \"" << tag->title()   << "\"" << endl;
+      cout << "artist       - \"" << tag->artist()  << "\"" << endl;
+      cout << "album artist - \"" << tag->albumArtist()   << "\"" << endl;
+      cout << "album        - \"" << tag->album()   << "\"" << endl;
+      cout << "year         - \"" << tag->year()    << "\"" << endl;
+      cout << "comment      - \"" << tag->comment() << "\"" << endl;
+      cout << "track        - \"" << tag->track()   << "\"" << endl;
+      cout << "genre        - \"" << tag->genre()   << "\"" << endl;
+      cout << "grouping     - \"" << tag->grouping()   << "\"" << endl;
     }
 
     if(!f.isNull() && f.audioProperties()) {
