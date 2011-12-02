@@ -111,6 +111,11 @@ String TagUnion::artist() const
   stringUnion(artist);
 }
 
+String TagUnion::albumArtist() const
+{
+  stringUnion(albumArtist);
+}
+
 String TagUnion::album() const
 {
   stringUnion(album);
@@ -124,6 +129,11 @@ String TagUnion::comment() const
 String TagUnion::genre() const
 {
   stringUnion(genre);
+}
+
+String TagUnion::grouping() const
+{
+  stringUnion(grouping);
 }
 
 TagLib::uint TagUnion::year() const
@@ -146,6 +156,11 @@ void TagUnion::setArtist(const String &s)
   setUnion(Artist, s);
 }
 
+void TagUnion::setAlbumArtist(const String &s)
+{
+  setUnion(AlbumArtist, s);
+}
+
 void TagUnion::setAlbum(const String &s)
 {
   setUnion(Album, s);
@@ -159,6 +174,11 @@ void TagUnion::setComment(const String &s)
 void TagUnion::setGenre(const String &s)
 {
   setUnion(Genre, s);
+}
+
+void TagUnion::setGrouping(const String &s)
+{
+  setUnion(Grouping, s);
 }
 
 void TagUnion::setYear(uint i)

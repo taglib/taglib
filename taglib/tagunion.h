@@ -58,17 +58,21 @@ namespace TagLib {
 
     virtual String title() const;
     virtual String artist() const;
+    virtual String albumArtist() const;
     virtual String album() const;
     virtual String comment() const;
     virtual String genre() const;
+    virtual String grouping() const;
     virtual uint year() const;
     virtual uint track() const;
 
     virtual void setTitle(const String &s);
     virtual void setArtist(const String &s);
+    virtual void setAlbumArtist(const String &s);
     virtual void setAlbum(const String &s);
     virtual void setComment(const String &s);
     virtual void setGenre(const String &s);
+    virtual void setGrouping(const String &s);
     virtual void setYear(uint i);
     virtual void setTrack(uint i);
     virtual bool isEmpty() const;

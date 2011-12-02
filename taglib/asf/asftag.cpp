@@ -64,6 +64,13 @@ String ASF::Tag::artist() const
   return d->artist;
 }
 
+String ASF::Tag::albumArtist() const
+{
+  if(d->attributeListMap.contains("WM/AlbumArtist"))
+    return d->attributeListMap["WM/AlbumArtist"][0].toString();
+  return String::null;
+}
+
 String ASF::Tag::album() const
 {
   if(d->attributeListMap.contains("WM/AlbumTitle"))
@@ -114,6 +121,13 @@ String ASF::Tag::genre() const
   return String::null;
 }
 
+String ASF::Tag::grouping() const
+{
+  if(d->attributeListMap.contains("WM/ContentGroupDescription"))
+    return d->attributeListMap["WM/ContentGroupDescription"][0].toString();
+  return String::null;
+}
+
 void ASF::Tag::setTitle(const String &value)
 {
   d->title = value;
@@ -139,6 +153,11 @@ void ASF::Tag::setRating(const String &value)
   d->rating = value;
 }
 
+void ASF::Tag::setAlbumArtist(const String &value)
+{
+  setAttribute("WM/AlbumArtist", value);
+}
+
 void ASF::Tag::setAlbum(const String &value)
 {
   setAttribute("WM/AlbumTitle", value);
@@ -147,6 +166,11 @@ void ASF::Tag::setAlbum(const String &value)
 void ASF::Tag::setGenre(const String &value)
 {
   setAttribute("WM/Genre", value);
+}
+
+void ASF::Tag::setGrouping(const String &value)
+{
+  setAttribute("WM/ContentGroupDescription", value);
 }
 
 void ASF::Tag::setYear(uint value)

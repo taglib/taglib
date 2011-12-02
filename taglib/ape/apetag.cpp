@@ -98,6 +98,17 @@ String APE::Tag::artist() const
   return d->itemListMap["ARTIST"].toString();
 }
 
+String APE::Tag::albumArtist() const
+{
+  if(d->itemListMap["ALBUMARTIST"].isEmpty())
+  {
+    if(d->itemListMap["ALBUM ARTIST"].isEmpty())
+      return String::null;
+    return d->itemListMap["ALBUM ARTIST"].toString();
+  }
+  return d->itemListMap["ALBUMARTIST"].toString();
+}
+
 String APE::Tag::album() const
 {
   if(d->itemListMap["ALBUM"].isEmpty())
@@ -117,6 +128,13 @@ String APE::Tag::genre() const
   if(d->itemListMap["GENRE"].isEmpty())
     return String::null;
   return d->itemListMap["GENRE"].toString();
+}
+
+String APE::Tag::grouping() const
+{
+  if(d->itemListMap["GROUPING"].isEmpty())
+    return String::null;
+  return d->itemListMap["GROUPING"].toString();
 }
 
 TagLib::uint APE::Tag::year() const
@@ -143,6 +161,12 @@ void APE::Tag::setArtist(const String &s)
   addValue("ARTIST", s, true);
 }
 
+void APE::Tag::setAlbumArtist(const String &s)
+{
+  removeItem("ALBUM ARTIST");
+  addValue("ALBUMARTIST", s, true);
+}
+
 void APE::Tag::setAlbum(const String &s)
 {
   addValue("ALBUM", s, true);
@@ -156,6 +180,11 @@ void APE::Tag::setComment(const String &s)
 void APE::Tag::setGenre(const String &s)
 {
   addValue("GENRE", s, true);
+}
+
+void APE::Tag::setGrouping(const String &s)
+{
+  addValue("GROUPING", s, true);
 }
 
 void APE::Tag::setYear(uint i)

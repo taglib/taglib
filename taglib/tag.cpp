@@ -42,13 +42,33 @@ Tag::~Tag()
 
 }
 
+String Tag::albumArtist() const
+{
+  return String::null;
+}
+
+String Tag::grouping() const
+{
+  return String::null;
+}
+
+void Tag::setAlbumArtist(const String &value)
+{
+}
+
+void Tag::setGrouping(const String &value)
+{
+}
+
 bool Tag::isEmpty() const
 {
   return (title().isEmpty() &&
           artist().isEmpty() &&
+          albumArtist().isEmpty() &&
           album().isEmpty() &&
           comment().isEmpty() &&
           genre().isEmpty() &&
+          grouping().isEmpty() &&
           year() == 0 &&
           track() == 0);
 }
@@ -58,9 +78,11 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
   if(overwrite) {
     target->setTitle(source->title());
     target->setArtist(source->artist());
+    target->setAlbumArtist(source->albumArtist());
     target->setAlbum(source->album());
     target->setComment(source->comment());
     target->setGenre(source->genre());
+    target->setGrouping(source->grouping());
     target->setYear(source->year());
     target->setTrack(source->track());
   }
@@ -69,12 +91,16 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
       target->setTitle(source->title());
     if(target->artist().isEmpty())
       target->setArtist(source->artist());
+    if(target->albumArtist().isEmpty())
+      target->setAlbumArtist(source->albumArtist());
     if(target->album().isEmpty())
       target->setAlbum(source->album());
     if(target->comment().isEmpty())
       target->setComment(source->comment());
     if(target->genre().isEmpty())
       target->setGenre(source->genre());
+    if(target->grouping().isEmpty())
+      target->setGrouping(source->grouping());
     if(target->year() <= 0)
       target->setYear(source->year());
     if(target->track() <= 0)

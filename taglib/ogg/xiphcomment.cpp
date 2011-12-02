@@ -72,6 +72,17 @@ String Ogg::XiphComment::artist() const
   return d->fieldListMap["ARTIST"].front();
 }
 
+String Ogg::XiphComment::albumArtist() const
+{
+  if(d->fieldListMap["ALBUMARTIST"].isEmpty())
+  {
+    if(d->fieldListMap["ALBUM ARTIST"].isEmpty())
+      return String::null;
+    return d->fieldListMap["ALBUM ARTIST"].front();
+  }
+  return d->fieldListMap["ALBUMARTIST"].front();
+}
+
 String Ogg::XiphComment::album() const
 {
   if(d->fieldListMap["ALBUM"].isEmpty())
@@ -99,6 +110,13 @@ String Ogg::XiphComment::genre() const
   if(d->fieldListMap["GENRE"].isEmpty())
     return String::null;
   return d->fieldListMap["GENRE"].front();
+}
+
+String Ogg::XiphComment::grouping() const
+{
+  if(d->fieldListMap["GROUPING"].isEmpty())
+    return String::null;
+  return d->fieldListMap["GROUPING"].front();
 }
 
 TagLib::uint Ogg::XiphComment::year() const
@@ -129,6 +147,12 @@ void Ogg::XiphComment::setArtist(const String &s)
   addField("ARTIST", s);
 }
 
+void Ogg::XiphComment::setAlbumArtist(const String &s)
+{
+  removeField("ALBUM ARTIST");
+  addField("ALBUMARTIST", s);
+}
+
 void Ogg::XiphComment::setAlbum(const String &s)
 {
   addField("ALBUM", s);
@@ -142,6 +166,11 @@ void Ogg::XiphComment::setComment(const String &s)
 void Ogg::XiphComment::setGenre(const String &s)
 {
   addField("GENRE", s);
+}
+
+void Ogg::XiphComment::setGrouping(const String &s)
+{
+  addField("GROUPING", s);
 }
 
 void Ogg::XiphComment::setYear(uint i)

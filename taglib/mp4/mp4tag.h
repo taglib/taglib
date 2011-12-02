@@ -51,17 +51,21 @@ namespace TagLib {
 
         String title() const;
         String artist() const;
+        String albumArtist() const;
         String album() const;
         String comment() const;
         String genre() const;
+        String grouping() const;
         uint year() const;
         uint track() const;
 
         void setTitle(const String &value);
         void setArtist(const String &value);
+        void setAlbumArtist(const String &value);
         void setAlbum(const String &value);
         void setComment(const String &value);
         void setGenre(const String &value);
+        void setGrouping(const String &value);
         void setYear(uint value);
         void setTrack(uint value);
 
