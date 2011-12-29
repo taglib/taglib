@@ -41,16 +41,16 @@ public:
   {
   }
   
-  ushort lengthInPatterns;
+  TagLib::ushort lengthInPatterns;
   int    channels;
-  ushort version;
-  ushort restartPosition;
-  ushort patternCount;
-  ushort instrumentCount;
-  uint   sampleCount;
-  ushort flags;
-  ushort tempo;
-  ushort bpmSpeed;
+  TagLib::ushort version;
+  TagLib::ushort restartPosition;
+  TagLib::ushort patternCount;
+  TagLib::ushort instrumentCount;
+  TagLib::uint   sampleCount;
+  TagLib::ushort flags;
+  TagLib::ushort tempo;
+  TagLib::ushort bpmSpeed;
 };
 
 XM::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -84,52 +84,52 @@ int XM::Properties::channels() const
   return d->channels;
 }
 
-ushort XM::Properties::lengthInPatterns() const
+TagLib::ushort XM::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
 
-ushort XM::Properties::version() const
+TagLib::ushort XM::Properties::version() const
 {
   return d->version;
 }
 
-ushort XM::Properties::restartPosition() const
+TagLib::ushort XM::Properties::restartPosition() const
 {
   return d->restartPosition;
 }
 
-ushort XM::Properties::patternCount() const
+TagLib::ushort XM::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-ushort XM::Properties::instrumentCount() const
+TagLib::ushort XM::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-uint XM::Properties::sampleCount() const
+TagLib::uint XM::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-ushort XM::Properties::flags() const
+TagLib::ushort XM::Properties::flags() const
 {
   return d->flags;
 }
 
-ushort XM::Properties::tempo() const
+TagLib::ushort XM::Properties::tempo() const
 {
   return d->tempo;
 }
 
-ushort XM::Properties::bpmSpeed() const
+TagLib::ushort XM::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
 
-void XM::Properties::setLengthInPatterns(ushort lengthInPatterns)
+void XM::Properties::setLengthInPatterns(TagLib::ushort lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }
@@ -139,42 +139,42 @@ void XM::Properties::setChannels(int channels)
   d->channels = channels;
 }
 
-void XM::Properties::setVersion(ushort version)
+void XM::Properties::setVersion(TagLib::ushort version)
 {
   d->version = version;
 }
 
-void XM::Properties::setRestartPosition(ushort restartPosition)
+void XM::Properties::setRestartPosition(TagLib::ushort restartPosition)
 {
   d->restartPosition = restartPosition;
 }
 
-void XM::Properties::setPatternCount(ushort patternCount)
+void XM::Properties::setPatternCount(TagLib::ushort patternCount)
 {
   d->patternCount = patternCount;
 }
 
-void XM::Properties::setInstrumentCount(ushort instrumentCount)
+void XM::Properties::setInstrumentCount(TagLib::ushort instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void XM::Properties::setSampleCount(uint sampleCount)
+void XM::Properties::setSampleCount(TagLib::uint sampleCount)
 {
   d->sampleCount = sampleCount;
 }
 
-void XM::Properties::setFlags(ushort flags)
+void XM::Properties::setFlags(TagLib::ushort flags)
 {
   d->flags = flags;
 }
 
-void XM::Properties::setTempo(ushort tempo)
+void XM::Properties::setTempo(TagLib::ushort tempo)
 {
   d->tempo = tempo;
 }
 
-void XM::Properties::setBpmSpeed(ushort bpmSpeed)
+void XM::Properties::setBpmSpeed(TagLib::ushort bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
 }
