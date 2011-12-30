@@ -292,3 +292,26 @@ void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding)
 
   ID3v2::FrameFactory::instance()->setDefaultTextEncoding(type);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// TagLib::MPEG::File wrapper
+////////////////////////////////////////////////////////////////////////////////
+
+TagLib_Mpeg_File *taglib_mpeg_file(TagLib_File *file)
+{
+  return reinterpret_cast<TagLib_Mpeg_File *>(dynamic_cast<MPEG::File *>(reinterpret_cast<File *>(file)));
+}
+
+BOOL taglib_mpeg_file_save3(TagLib_Mpeg_File *file, int tags, BOOL stripOthers, int id3v2Version)
+{
+  MPEG::File *f=reinterpret_cast<MPEG::File *>(file);
+  return f->save(tags, (bool)stripOthers, id3v2Version);
+}
+
+BOOL taglib_mpeg_file_strip(TagLib_Mpeg_File *file, int tags)
+{
+  MPEG::File *f=reinterpret_cast<MPEG::File *>(file);
+  return f->strip(tags);
+
+}
