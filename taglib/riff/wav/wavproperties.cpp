@@ -35,7 +35,7 @@ using namespace TagLib;
 class RIFF::WAV::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(uint streamLength = 0) :
+  PropertiesPrivate(TagLib::uint streamLength = 0) :
     format(0),
     length(0),
     bitrate(0),
@@ -54,8 +54,8 @@ public:
   int sampleRate;
   int channels;
   int sampleWidth;
-  uint sampleFrames;
-  uint streamLength;
+  TagLib::uint sampleFrames;
+  TagLib::uint streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ RIFF::WAV::Properties::Properties(const ByteVector &data, ReadStyle style) : Aud
   read(data);
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::Properties::Properties(const ByteVector &data, TagLib::uint streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(streamLength);
   read(data);
@@ -104,7 +104,7 @@ int RIFF::WAV::Properties::sampleWidth() const
   return d->sampleWidth;
 }
 
-uint RIFF::WAV::Properties::sampleFrames() const
+TagLib::uint RIFF::WAV::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -120,7 +120,7 @@ void RIFF::WAV::Properties::read(const ByteVector &data)
   d->sampleRate = data.mid(4, 4).toUInt(false);
   d->sampleWidth = data.mid(14, 2).toShort(false);
 
-  uint byteRate = data.mid(8, 4).toUInt(false);
+  TagLib::uint byteRate = data.mid(8, 4).toUInt(false);
   d->bitrate = byteRate * 8 / 1000;
 
   d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
