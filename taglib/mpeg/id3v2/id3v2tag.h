@@ -264,8 +264,13 @@ namespace TagLib {
        * Implements the unified tag dictionary interface -- export function.
        * This function does some work to translate the hard-specified ID3v2
        * frame types into a free-form string-to-stringlist dictionary.
+       *
+       * If the optional pointer to a StringList is given, that list will
+       * be filled with a descriptive text for each ID3v2 frame that could
+       * not be incorporated into the dict interface (binary data, unsupported
+       * frames, ...).
        */
-      TagDict toDict() const;
+      TagDict toDict(StringList *ignoredInfo = 0) const;
 
       /*!
        * Implements the unified tag dictionary interface -- import function.

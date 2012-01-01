@@ -334,18 +334,22 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
     removeFrame(*it, true);
 }
 
-TagDict ID3v2::Tag::toDict() const
+TagDict ID3v2::Tag::toDict(StringList *ignoreInfo) const
 {
   TagDict dict;
   FrameList::ConstIterator frameIt = frameList().begin();
   for (; frameIt != frameList().end(); ++frameIt) {
     ByteVector id = (*frameIt)->frameID();
 
-    if (ignored(id))
+    if (ignored(id)) {
       debug("toDict() found ignored id3 frame: " + id);
-    else if (deprecated(id))
+      if (ignoreInfo)
+    	ignoreInfo->append(String(id) + " frame is not supported");
+    } else if (deprecated(id)) {
       debug("toDict() found deprecated id3 frame: " + id);
-    else {
+      if (ignoreInfo)
+        ignoreInfo->append(String(id) + " frame is deprecated");
+    } else {
         // in the future, something like dict[frame->tagName()].append(frame->values())
         // might replace the following lines.
         KeyValuePair kvp = parseFrame(*frameIt);

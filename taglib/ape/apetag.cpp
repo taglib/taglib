@@ -197,6 +197,7 @@ void APE::Tag::fromDict(const TagDict &orig_dict)
 {
   TagDict dict(orig_dict); // make a local copy that can be modified
 
+  // see comment in toDict() about TRACKNUMBER and YEAR
   if (dict.contains("TRACKNUMBER")) {
     dict.insert("TRACK", dict["TRACKNUMBER"]);
     dict.erase("TRACKNUMBER");
