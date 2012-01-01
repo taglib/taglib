@@ -32,7 +32,7 @@ using namespace ID3v2;
 class Footer::FooterPrivate
 {
 public:
-  static const uint size = 10;
+  static const TagLib::uint size = 10;
 };
 
 Footer::Footer()

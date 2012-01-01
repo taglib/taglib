@@ -161,12 +161,12 @@ void TagUnion::setGenre(const String &s)
   setUnion(Genre, s);
 }
 
-void TagUnion::setYear(uint i)
+void TagUnion::setYear(TagLib::uint i)
 {
   setUnion(Year, i);
 }
 
-void TagUnion::setTrack(uint i)
+void TagUnion::setTrack(TagLib::uint i)
 {
   setUnion(Track, i);
 }

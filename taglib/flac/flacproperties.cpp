@@ -131,7 +131,7 @@ void FLAC::Properties::read()
   // Maximum frame size (in bytes)
   pos += 3;
 
-  uint flags = d->data.mid(pos, 4).toUInt(true);
+  TagLib::uint flags = d->data.mid(pos, 4).toUInt(true);
   d->sampleRate = flags >> 12;
   d->channels = ((flags >> 9) & 7) + 1;
   d->sampleWidth = ((flags >> 4) & 31) + 1;
@@ -139,7 +139,7 @@ void FLAC::Properties::read()
   // The last 4 bits are the most significant 4 bits for the 36 bit
   // stream length in samples. (Audio files measured in days)
 
-  uint highLength =d->sampleRate > 0 ? (((flags & 0xf) << 28) / d->sampleRate) << 4 : 0;
+  TagLib::uint highLength =d->sampleRate > 0 ? (((flags & 0xf) << 28) / d->sampleRate) << 4 : 0;
   pos += 4;
 
   d->length = d->sampleRate > 0 ?

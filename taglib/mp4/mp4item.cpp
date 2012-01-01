@@ -43,8 +43,8 @@ public:
     bool m_bool;
     int m_int;
     IntPair m_intPair;
-    uchar m_byte;
-    uint m_uint;
+    TagLib::uchar m_byte;
+    TagLib::uint m_uint;
     long long m_longlong;
   };
   StringList m_stringList;
@@ -92,13 +92,13 @@ MP4::Item::Item(int value)
   d->m_int = value;
 }
 
-MP4::Item::Item(uchar value)
+MP4::Item::Item(TagLib::uchar value)
 {
   d = new ItemPrivate;
   d->m_byte = value;
 }
 
-MP4::Item::Item(uint value)
+MP4::Item::Item(TagLib::uint value)
 {
   d = new ItemPrivate;
   d->m_uint = value;
@@ -141,7 +141,7 @@ MP4::Item::toInt() const
   return d->m_int;
 }
 
-uchar
+TagLib::uchar
 MP4::Item::toByte() const
 {
   return d->m_byte;

@@ -40,8 +40,8 @@ public:
     valid(false)
     {}
 
-  uint frames;
-  uint size;
+  TagLib::uint frames;
+  TagLib::uint size;
   bool valid;
 };
 

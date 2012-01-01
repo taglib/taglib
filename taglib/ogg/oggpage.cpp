@@ -197,7 +197,7 @@ ByteVector Ogg::Page::render() const
 
 List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
                                       PaginationStrategy strategy,
-                                      uint streamSerialNumber,
+                                      TagLib::uint streamSerialNumber,
                                       int firstPage,
                                       bool firstPacketContinued,
                                       bool lastPacketCompleted,
@@ -310,7 +310,7 @@ Ogg::Page* Ogg::Page::getCopyWithNewPageSequenceNumber(int sequenceNumber)
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::Page::Page(const ByteVectorList &packets,
-                uint streamSerialNumber,
+                TagLib::uint streamSerialNumber,
                 int pageNumber,
                 bool firstPacketContinued,
                 bool lastPacketCompleted,

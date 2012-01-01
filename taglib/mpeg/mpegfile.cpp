@@ -70,11 +70,11 @@ public:
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
   long ID3v2Location;
-  uint ID3v2OriginalSize;
+  TagLib::uint ID3v2OriginalSize;
 
   long APELocation;
   long APEFooterLocation;
-  uint APEOriginalSize;
+  TagLib::uint APEOriginalSize;
 
   long ID3v1Location;
 
@@ -349,12 +349,12 @@ long MPEG::File::nextFrameOffset(long position)
     if(foundLastSyncPattern && secondSynchByte(buffer[0]))
       return position - 1;
 
-    for(uint i = 0; i < buffer.size() - 1; i++) {
-      if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
+    for(TagLib::uint i = 0; i < buffer.size() - 1; i++) {
+      if(TagLib::uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
 
-    foundLastSyncPattern = uchar(buffer[buffer.size() - 1]) == 0xff;
+    foundLastSyncPattern = TagLib::uchar(buffer[buffer.size() - 1]) == 0xff;
     position += buffer.size();
   }
 }
@@ -365,7 +365,7 @@ long MPEG::File::previousFrameOffset(long position)
   ByteVector buffer;
 
   while (position > 0) {
-    long size = ulong(position) < bufferSize() ? position : bufferSize();
+    long size = TagLib::ulong(position) < bufferSize() ? position : bufferSize();
     position -= size;
 
     seek(position);
@@ -374,11 +374,11 @@ long MPEG::File::previousFrameOffset(long position)
     if(buffer.size() <= 0)
       break;
 
-    if(foundFirstSyncPattern && uchar(buffer[buffer.size() - 1]) == 0xff)
+    if(foundFirstSyncPattern && TagLib::uchar(buffer[buffer.size() - 1]) == 0xff)
       return position + buffer.size() - 1;
 
     for(int i = buffer.size() - 2; i >= 0; i--) {
-      if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
+      if(TagLib::uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
 
@@ -516,7 +516,7 @@ long MPEG::File::findID3v2()
         return bufferOffset + location;
       }
 
-      int firstSynchByte = buffer.find(char(uchar(255)));
+      int firstSynchByte = buffer.find(char(TagLib::uchar(255)));
 
       // Here we have to loop because there could be several of the first
       // (11111111) byte, and we want to check all such instances until we find
@@ -544,7 +544,7 @@ long MPEG::File::findID3v2()
 
         // Check in the rest of the buffer.
 
-        firstSynchByte = buffer.find(char(uchar(255)), firstSynchByte + 1);
+        firstSynchByte = buffer.find(char(TagLib::uchar(255)), firstSynchByte + 1);
       }
 
       // (3) partial match
@@ -599,7 +599,7 @@ void MPEG::File::findAPE()
 
 bool MPEG::File::secondSynchByte(char byte)
 {
-  if(uchar(byte) == 0xff)
+  if(TagLib::uchar(byte) == 0xff)
     return false;
 
   std::bitset<8> b(byte);

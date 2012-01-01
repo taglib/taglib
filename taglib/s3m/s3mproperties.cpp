@@ -43,18 +43,18 @@ public:
   {
   }
   
-  ushort lengthInPatterns;
+  TagLib::ushort lengthInPatterns;
   int    channels;
   bool   stereo;
-  ushort sampleCount;
-  ushort patternCount;
-  ushort flags;
-  ushort trackerVersion;
-  ushort fileFormatVersion;
-  uchar  globalVolume;
-  uchar  masterVolume;
-  uchar  tempo;
-  uchar  bpmSpeed;
+  TagLib::ushort sampleCount;
+  TagLib::ushort patternCount;
+  TagLib::ushort flags;
+  TagLib::ushort trackerVersion;
+  TagLib::ushort fileFormatVersion;
+  TagLib::uchar  globalVolume;
+  TagLib::uchar  masterVolume;
+  TagLib::uchar  tempo;
+  TagLib::uchar  bpmSpeed;
 };
 
 S3M::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -88,7 +88,7 @@ int S3M::Properties::channels() const
   return d->channels;
 }
 
-ushort S3M::Properties::lengthInPatterns() const
+TagLib::ushort S3M::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -98,52 +98,52 @@ bool S3M::Properties::stereo() const
   return d->stereo;
 }
 
-ushort S3M::Properties::sampleCount() const
+TagLib::ushort S3M::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-ushort S3M::Properties::patternCount() const
+TagLib::ushort S3M::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-ushort S3M::Properties::flags() const
+TagLib::ushort S3M::Properties::flags() const
 {
   return d->flags;
 }
 
-ushort S3M::Properties::trackerVersion() const
+TagLib::ushort S3M::Properties::trackerVersion() const
 {
   return d->trackerVersion;
 }
 
-ushort S3M::Properties::fileFormatVersion() const
+TagLib::ushort S3M::Properties::fileFormatVersion() const
 {
   return d->fileFormatVersion;
 }
 
-uchar S3M::Properties::globalVolume() const
+TagLib::uchar S3M::Properties::globalVolume() const
 {
   return d->globalVolume;
 }
 
-uchar S3M::Properties::masterVolume() const
+TagLib::uchar S3M::Properties::masterVolume() const
 {
   return d->masterVolume;
 }
 
-uchar S3M::Properties::tempo() const
+TagLib::uchar S3M::Properties::tempo() const
 {
   return d->tempo;
 }
 
-uchar S3M::Properties::bpmSpeed() const
+TagLib::uchar S3M::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
 
-void S3M::Properties::setLengthInPatterns(ushort lengthInPatterns)
+void S3M::Properties::setLengthInPatterns(TagLib::ushort lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }
@@ -158,47 +158,47 @@ void S3M::Properties::setStereo(bool stereo)
   d->stereo = stereo;
 }
 
-void S3M::Properties::setSampleCount(ushort sampleCount)
+void S3M::Properties::setSampleCount(TagLib::ushort sampleCount)
 {
   d->sampleCount = sampleCount;
 }
 
-void S3M::Properties::setPatternCount(ushort patternCount)
+void S3M::Properties::setPatternCount(TagLib::ushort patternCount)
 {
   d->patternCount = patternCount;
 }
 
-void S3M::Properties::setFlags(ushort flags)
+void S3M::Properties::setFlags(TagLib::ushort flags)
 {
   d->flags = flags;
 }
 
-void S3M::Properties::setTrackerVersion(ushort trackerVersion)
+void S3M::Properties::setTrackerVersion(TagLib::ushort trackerVersion)
 {
   d->trackerVersion = trackerVersion;
 }
 
-void S3M::Properties::setFileFormatVersion(ushort fileFormatVersion)
+void S3M::Properties::setFileFormatVersion(TagLib::ushort fileFormatVersion)
 {
   d->fileFormatVersion = fileFormatVersion;
 }
 
-void S3M::Properties::setGlobalVolume(uchar globalVolume)
+void S3M::Properties::setGlobalVolume(TagLib::uchar globalVolume)
 {
   d->globalVolume = globalVolume;
 }
 
-void S3M::Properties::setMasterVolume(uchar masterVolume)
+void S3M::Properties::setMasterVolume(TagLib::uchar masterVolume)
 {
   d->masterVolume = masterVolume;
 }
 
-void S3M::Properties::setTempo(uchar tempo)
+void S3M::Properties::setTempo(TagLib::uchar tempo)
 {
   d->tempo = tempo;
 }
 
-void S3M::Properties::setBpmSpeed(uchar bpmSpeed)
+void S3M::Properties::setBpmSpeed(TagLib::uchar bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
 }

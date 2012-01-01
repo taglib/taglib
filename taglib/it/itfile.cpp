@@ -83,9 +83,9 @@ bool IT::File::save()
 
   seek(2, Current);
 
-  ushort length = 0;
-  ushort instrumentCount = 0;
-  ushort sampleCount = 0;
+  TagLib::ushort length = 0;
+  TagLib::ushort instrumentCount = 0;
+  TagLib::ushort sampleCount = 0;
 
   if(!readU16L(length) || !readU16L(instrumentCount) || !readU16L(sampleCount))
     return false;
@@ -94,9 +94,9 @@ bool IT::File::save()
 
   // write comment as instrument and sample names:
   StringList lines = d->tag.comment().split("\n");
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(TagLib::ushort i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
-    ulong instrumentOffset = 0;
+    TagLib::ulong instrumentOffset = 0;
     if(!readU32L(instrumentOffset))
       return false;
 
@@ -109,9 +109,9 @@ bool IT::File::save()
     writeByte(0);
   }
 
-  for(ushort i = 0; i < sampleCount; ++ i) {
+  for(TagLib::ushort i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
-    ulong sampleOffset = 0;
+    TagLib::ulong sampleOffset = 0;
     if(!readU32L(sampleOffset))
       return false;
     
@@ -126,7 +126,7 @@ bool IT::File::save()
 
   // write rest as message:
   StringList messageLines;
-  for(uint i = instrumentCount + sampleCount; i < lines.size(); ++ i)
+  for(TagLib::uint i = instrumentCount + sampleCount; i < lines.size(); ++ i)
     messageLines.append(lines[i]);
   ByteVector message = messageLines.toString("\r").data(String::Latin1);
 
@@ -136,15 +136,15 @@ bool IT::File::save()
     message.resize(7999);
   message.append((char)0);
 
-  ushort special = 0;
-  ushort messageLength = 0;
-  ulong  messageOffset = 0;
+  TagLib::ushort special = 0;
+  TagLib::ushort messageLength = 0;
+  TagLib::ulong  messageOffset = 0;
 
   seek(46);
   if(!readU16L(special))
     return false;
 
-  ulong fileSize = File::length();
+  TagLib::ulong fileSize = File::length();
   if(special & Properties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))
@@ -246,8 +246,8 @@ void IT::File::read(bool)
   d->properties.setChannels(channels);
   
   // real length might be shorter because of skips and terminator
-  ushort realLength = 0;
-  for(ushort i = 0; i < length; ++ i) {
+  TagLib::ushort realLength = 0;
+  for(TagLib::ushort i = 0; i < length; ++ i) {
     READ_BYTE_AS(order);
     if(order == 255) break;
     if(order != 254) ++ realLength;
@@ -261,7 +261,7 @@ void IT::File::read(bool)
   //       Currently I just discard anything after a nil, but
   //       e.g. VLC seems to interprete a nil as a space. I
   //       don't know what is the proper behaviour.
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(TagLib::ushort i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
     READ_U32L_AS(instrumentOffset);
     seek(instrumentOffset);
@@ -277,7 +277,7 @@ void IT::File::read(bool)
     comment.append(instrumentName);
   }
   
-  for(ushort i = 0; i < sampleCount; ++ i) {
+  for(TagLib::ushort i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     READ_U32L_AS(sampleOffset);
     

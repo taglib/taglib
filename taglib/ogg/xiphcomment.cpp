@@ -144,7 +144,7 @@ void Ogg::XiphComment::setGenre(const String &s)
   addField("GENRE", s);
 }
 
-void Ogg::XiphComment::setYear(uint i)
+void Ogg::XiphComment::setYear(TagLib::uint i)
 {
   removeField("YEAR");
   if(i == 0)
@@ -153,7 +153,7 @@ void Ogg::XiphComment::setYear(uint i)
     addField("DATE", String::number(i));
 }
 
-void Ogg::XiphComment::setTrack(uint i)
+void Ogg::XiphComment::setTrack(TagLib::uint i)
 {
   removeField("TRACKNUM");
   if(i == 0)
@@ -174,7 +174,7 @@ bool Ogg::XiphComment::isEmpty() const
 
 TagLib::uint Ogg::XiphComment::fieldCount() const
 {
-  uint count = 0;
+  TagLib::uint count = 0;
 
   FieldListMap::ConstIterator it = d->fieldListMap.begin();
   for(; it != d->fieldListMap.end(); ++it)
@@ -285,7 +285,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
   // The first thing in the comment data is the vendor ID length, followed by a
   // UTF8 string with the vendor ID.
 
-  uint pos = 0;
+  TagLib::uint pos = 0;
 
   int vendorLength = data.mid(0, 4).toUInt(false);
   pos += 4;
@@ -295,19 +295,19 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   // Next the number of fields in the comment vector.
 
-  uint commentFields = data.mid(pos, 4).toUInt(false);
+  TagLib::uint commentFields = data.mid(pos, 4).toUInt(false);
   pos += 4;
 
   if(commentFields > (data.size() - 8) / 4) {
     return;
   }
 
-  for(uint i = 0; i < commentFields; i++) {
+  for(TagLib::uint i = 0; i < commentFields; i++) {
 
     // Each comment field is in the format "KEY=value" in a UTF8 string and has
     // 4 bytes before the text starts that gives the length.
 
-    uint commentLength = data.mid(pos, 4).toUInt(false);
+    TagLib::uint commentLength = data.mid(pos, 4).toUInt(false);
     pos += 4;
 
     String comment = String(data.mid(pos, commentLength), String::UTF8);

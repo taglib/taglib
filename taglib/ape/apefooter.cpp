@@ -47,17 +47,17 @@ public:
 
   ~FooterPrivate() {}
 
-  uint version;
+  TagLib::uint version;
 
   bool footerPresent;
   bool headerPresent;
 
   bool isHeader;
 
-  uint itemCount;
-  uint tagSize;
+  TagLib::uint itemCount;
+  TagLib::uint tagSize;
 
-  static const uint size = 32;
+  static const TagLib::uint size = 32;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ TagLib::uint Footer::itemCount() const
   return d->itemCount;
 }
 
-void Footer::setItemCount(uint s)
+void Footer::setItemCount(TagLib::uint s)
 {
   d->itemCount = s;
 }
@@ -142,7 +142,7 @@ TagLib::uint Footer::completeTagSize() const
     return d->tagSize;
 }
 
-void Footer::setTagSize(uint s)
+void Footer::setTagSize(TagLib::uint s)
 {
   d->tagSize = s;
 }

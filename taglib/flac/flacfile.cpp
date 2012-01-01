@@ -69,7 +69,7 @@ public:
 
   ~FilePrivate()
   {
-    for(uint i = 0; i < blocks.size(); i++) {
+    for(TagLib::uint i = 0; i < blocks.size(); i++) {
       delete blocks[i];
     }
     delete properties;
@@ -77,7 +77,7 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   long ID3v2Location;
-  uint ID3v2OriginalSize;
+  TagLib::uint ID3v2OriginalSize;
 
   long ID3v1Location;
 
@@ -166,7 +166,7 @@ bool FLAC::File::save()
 
   bool foundVorbisCommentBlock = false;
   List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(TagLib::uint i = 0; i < d->blocks.size(); i++) {
     MetadataBlock *block = d->blocks[i];
     if(block->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
@@ -189,7 +189,7 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(uint i = 0; i < newBlocks.size(); i++) {
+  for(TagLib::uint i = 0; i < newBlocks.size(); i++) {
     FLAC::MetadataBlock *block = newBlocks[i];
     ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
@@ -366,7 +366,7 @@ void FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool isLastBlock = (header[0] & 0x80) != 0;
-  uint length = header.mid(1, 3).toUInt();
+  TagLib::uint length = header.mid(1, 3).toUInt();
 
   // First block should be the stream_info metadata
 
@@ -479,7 +479,7 @@ long FLAC::File::findID3v2()
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(TagLib::uint i = 0; i < d->blocks.size(); i++) {
     Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
     if(picture) {
       pictures.append(picture);
@@ -507,7 +507,7 @@ void FLAC::File::removePicture(Picture *picture, bool del)
 void FLAC::File::removePictures()
 {
   List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(TagLib::uint i = 0; i < d->blocks.size(); i++) {
     Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
     if(picture) {
       delete picture;

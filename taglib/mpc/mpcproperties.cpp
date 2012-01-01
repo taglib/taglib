@@ -118,7 +118,7 @@ void MPC::Properties::read()
     d->channels = 2;
   }
   else {
-    uint headerData = d->data.mid(0, 4).toUInt(false);
+    TagLib::uint headerData = d->data.mid(0, 4).toUInt(false);
 
     d->bitrate = (headerData >> 23) & 0x01ff;
     d->version = (headerData >> 11) & 0x03ff;
@@ -131,7 +131,7 @@ void MPC::Properties::read()
       frames = d->data.mid(6, 2).toUInt(false);
   }
 
-  uint samples = frames * 1152 - 576;
+  TagLib::uint samples = frames * 1152 - 576;
 
   d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
 

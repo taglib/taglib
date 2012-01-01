@@ -64,13 +64,13 @@ public:
   }
 
   long APELocation;
-  uint APESize;
+  TagLib::uint APESize;
 
   long ID3v1Location;
 
   ID3v2::Header *ID3v2Header;
   long ID3v2Location;
-  uint ID3v2Size;
+  TagLib::uint ID3v2Size;
 
   TagUnion tag;
 

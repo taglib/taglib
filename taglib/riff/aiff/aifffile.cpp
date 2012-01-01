@@ -111,7 +111,7 @@ bool RIFF::AIFF::File::save()
 
 void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
-  for(uint i = 0; i < chunkCount(); i++) {
+  for(TagLib::uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
       d->tagChunkID = chunkName(i);
       d->tag = new ID3v2::Tag(this, chunkOffset(i));

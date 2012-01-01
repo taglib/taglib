@@ -228,7 +228,7 @@ void Ogg::FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool lastBlock = (header[0] & 0x80) != 0;
-  uint length = header.mid(1, 3).toUInt();
+  TagLib::uint length = header.mid(1, 3).toUInt();
   overhead += length;
 
   // Sanity: First block should be the stream_info metadata

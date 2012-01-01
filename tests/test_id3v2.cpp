@@ -296,7 +296,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("ident"), f.identification());
     CPPUNIT_ASSERT_EQUAL(15.0f / 512.0f,
                          f.volumeAdjustment(ID3v2::RelativeVolumeFrame::FrontRight));
-    CPPUNIT_ASSERT_EQUAL((uchar)8,
+    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)8,
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).bitsRepresentingPeak);
     CPPUNIT_ASSERT_EQUAL(ByteVector("\x45"),
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).peakVolume);

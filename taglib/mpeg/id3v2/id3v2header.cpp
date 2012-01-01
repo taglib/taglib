@@ -49,17 +49,17 @@ public:
 
   ~HeaderPrivate() {}
 
-  uint majorVersion;
-  uint revisionNumber;
+  TagLib::uint majorVersion;
+  TagLib::uint revisionNumber;
 
   bool unsynchronisation;
   bool extendedHeader;
   bool experimentalIndicator;
   bool footerPresent;
 
-  uint tagSize;
+  TagLib::uint tagSize;
 
-  static const uint size = 10;
+  static const TagLib::uint size = 10;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ TagLib::uint Header::completeTagSize() const
     return d->tagSize + d->size;
 }
 
-void Header::setTagSize(uint s)
+void Header::setTagSize(TagLib::uint s)
 {
   d->tagSize = s;
 }
@@ -216,7 +216,7 @@ void Header::parse(const ByteVector &data)
   }
 
   for(ByteVector::Iterator it = sizeData.begin(); it != sizeData.end(); it++) {
-    if(uchar(*it) >= 128) {
+    if(TagLib::uchar(*it) >= 128) {
       d->tagSize = 0;
       debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
       return;
