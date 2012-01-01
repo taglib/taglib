@@ -62,7 +62,7 @@ public:
   }
 
   long APELocation;
-  uint APESize;
+  TagLib::uint APESize;
 
   long ID3v1Location;
 

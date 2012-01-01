@@ -97,7 +97,7 @@ MP4::File::audioProperties() const
 bool
 MP4::File::checkValid(const MP4::AtomList &list)
 {
-  for(uint i = 0; i < list.size(); i++) {
+  for(TagLib::uint i = 0; i < list.size(); i++) {
     if(list[i]->length == 0)
       return false;
     if(!checkValid(list[i]->children))

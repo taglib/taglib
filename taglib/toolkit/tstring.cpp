@@ -100,7 +100,7 @@ String::String(const std::string &s, Type t)
   wstring::iterator targetIt = d->data.begin();
 
   for(std::string::const_iterator it = s.begin(); it != s.end(); it++) {
-    *targetIt = uchar(*it);
+    *targetIt = TagLib::uchar(*it);
     ++targetIt;
   }
 
@@ -113,7 +113,7 @@ String::String(const wstring &s, Type t)
   prepare(t);
 }
 
-String::String(const wchar_t *s, Type t)
+String::String(const TagLib::wchar *s, Type t)
 {
   d = new StringPrivate(s);
   prepare(t);
@@ -134,14 +134,14 @@ String::String(const char *s, Type t)
   wstring::iterator targetIt = d->data.begin();
 
   for(int i = 0; i < length; i++) {
-    *targetIt = uchar(s[i]);
+    *targetIt = TagLib::uchar(s[i]);
     ++targetIt;
   }
 
   prepare(t);
 }
 
-String::String(wchar_t c, Type t)
+String::String(TagLib::wchar c, Type t)
 {
   d = new StringPrivate;
   d->data += c;
@@ -157,7 +157,7 @@ String::String(char c, Type t)
     return;
   }
 
-  d->data += uchar(c);
+  d->data += TagLib::uchar(c);
   prepare(t);
 }
 
@@ -174,7 +174,7 @@ String::String(const ByteVector &v, Type t)
     d->data.resize(v.size());
     wstring::iterator targetIt = d->data.begin();
     for(ByteVector::ConstIterator it = v.begin(); it != v.end() && (*it); ++it) {
-      *targetIt = uchar(*it);
+      *targetIt = TagLib::uchar(*it);
       ++targetIt;
       ++length;
     }
@@ -333,7 +333,7 @@ bool String::startsWith(const String &s) const
   return substr(0, s.length()) == s;
 }
 
-String String::substr(uint position, uint n) const
+String String::substr(TagLib::uint position, TagLib::uint n) const
 {
   if(n > position + d->data.size())
     n = d->data.size() - position;
@@ -460,10 +460,10 @@ int String::toInt(bool *ok) const
 {
   int value = 0;
 
-  uint size = d->data.size();
+  TagLib::uint size = d->data.size();
   bool negative = size > 0 && d->data[0] == '-';
-  uint start = negative ? 1 : 0;
-  uint i = start;
+  TagLib::uint start = negative ? 1 : 0;
+  TagLib::uint i = start;
 
   for(; i < size && d->data[i] >= '0' && d->data[i] <= '9'; i++)
     value = value * 10 + (d->data[i] - '0');
@@ -580,7 +580,7 @@ String &String::operator+=(const String &s)
   return *this;
 }
 
-String &String::operator+=(const wchar_t *s)
+String &String::operator+=(const TagLib::wchar *s)
 {
   detach();
 
@@ -593,11 +593,11 @@ String &String::operator+=(const char *s)
   detach();
 
   for(int i = 0; s[i] != 0; i++)
-    d->data += uchar(s[i]);
+    d->data += TagLib::uchar(s[i]);
   return *this;
 }
 
-String &String::operator+=(wchar_t c)
+String &String::operator+=(TagLib::wchar c)
 {
   detach();
 
@@ -609,7 +609,7 @@ String &String::operator+=(char c)
 {
   detach();
 
-  d->data += uchar(c);
+  d->data += TagLib::uchar(c);
   return *this;
 }
 
@@ -636,7 +636,7 @@ String &String::operator=(const std::string &s)
 
   wstring::iterator targetIt = d->data.begin();
   for(std::string::const_iterator it = s.begin(); it != s.end(); it++) {
-    *targetIt = uchar(*it);
+    *targetIt = TagLib::uchar(*it);
     ++targetIt;
   }
 
@@ -651,7 +651,7 @@ String &String::operator=(const wstring &s)
   return *this;
 }
 
-String &String::operator=(const wchar_t *s)
+String &String::operator=(const TagLib::wchar *s)
 {
   if(d->deref())
     delete d;
@@ -664,11 +664,11 @@ String &String::operator=(char c)
   if(d->deref())
     delete d;
   d = new StringPrivate;
-  d->data += uchar(c);
+  d->data += TagLib::uchar(c);
   return *this;
 }
 
-String &String::operator=(wchar_t c)
+String &String::operator=(TagLib::wchar c)
 {
   if(d->deref())
     delete d;
@@ -689,7 +689,7 @@ String &String::operator=(const char *s)
 
   wstring::iterator targetIt = d->data.begin();
   for(int i = 0; i < length; i++) {
-    *targetIt = uchar(s[i]);
+    *targetIt = TagLib::uchar(s[i]);
     ++targetIt;
   }
 
@@ -705,10 +705,10 @@ String &String::operator=(const ByteVector &v)
   d->data.resize(v.size());
   wstring::iterator targetIt = d->data.begin();
 
-  uint i = 0;
+  TagLib::uint i = 0;
 
   for(ByteVector::ConstIterator it = v.begin(); it != v.end() && (*it); ++it) {
-    *targetIt = uchar(*it);
+    *targetIt = TagLib::uchar(*it);
     ++targetIt;
     ++i;
   }
@@ -750,7 +750,7 @@ void String::prepare(Type t)
       bool swap = d->data[0] != 0xfeff;
       d->data.erase(d->data.begin(), d->data.begin() + 1);
       if(swap) {
-        for(uint i = 0; i < d->data.size(); i++)
+        for(TagLib::uint i = 0; i < d->data.size(); i++)
           d->data[i] = byteSwap((unsigned short)d->data[i]);
       }
     }
@@ -796,7 +796,7 @@ void String::prepare(Type t)
   }
   case UTF16LE:
   {
-    for(uint i = 0; i < d->data.size(); i++)
+    for(TagLib::uint i = 0; i < d->data.size(); i++)
       d->data[i] = byteSwap((unsigned short)d->data[i]);
     break;
   }

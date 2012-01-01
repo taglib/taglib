@@ -39,7 +39,7 @@ void TagLib::debug(const String &s)
 
 void TagLib::debugData(const ByteVector &v)
 {
-  for(uint i = 0; i < v.size(); i++) {
+  for(TagLib::uint i = 0; i < v.size(); i++) {
 
     std::cout << "*** [" << i << "] - '" << char(v[i]) << "' - int " << int(v[i])
               << std::endl;

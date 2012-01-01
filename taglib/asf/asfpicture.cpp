@@ -149,7 +149,7 @@ void ASF::Picture::parse(const ByteVector& bytes)
     return;
   int pos = 0;
   d->type = (Type)bytes[0]; ++pos;
-  uint dataLen = bytes.mid(pos, 4).toUInt(false); pos+=4;
+  TagLib::uint dataLen = bytes.mid(pos, 4).toUInt(false); pos+=4;
 
   const ByteVector nullStringTerminator(2, 0);
 

@@ -68,7 +68,7 @@ FileName ByteVectorStream::name() const
   return FileName(""); // XXX do we need a name?
 }
 
-ByteVector ByteVectorStream::readBlock(ulong length)
+ByteVector ByteVectorStream::readBlock(TagLib::ulong length)
 {
   if(length == 0)
     return ByteVector::null;
@@ -80,7 +80,7 @@ ByteVector ByteVectorStream::readBlock(ulong length)
 
 void ByteVectorStream::writeBlock(const ByteVector &data)
 {
-  uint size = data.size();
+  TagLib::uint size = data.size();
   if(d->position + size > length()) {
     truncate(d->position + size);
   }
@@ -88,7 +88,7 @@ void ByteVectorStream::writeBlock(const ByteVector &data)
   d->position += size;
 }
 
-void ByteVectorStream::insert(const ByteVector &data, ulong start, ulong replace)
+void ByteVectorStream::insert(const ByteVector &data, TagLib::ulong start, TagLib::ulong replace)
 {
   long sizeDiff = data.size() - replace;
   if(sizeDiff < 0) {
@@ -96,20 +96,20 @@ void ByteVectorStream::insert(const ByteVector &data, ulong start, ulong replace
   }
   else if(sizeDiff > 0) {
     truncate(length() + sizeDiff);
-    ulong readPosition = start + replace;
-    ulong writePosition = start + data.size();
+    TagLib::ulong readPosition = start + replace;
+    TagLib::ulong writePosition = start + data.size();
     memmove(d->data.data() + writePosition, d->data.data() + readPosition, length() - sizeDiff - readPosition);
   }
   seek(start);
   writeBlock(data);
 }
 
-void ByteVectorStream::removeBlock(ulong start, ulong length)
+void ByteVectorStream::removeBlock(TagLib::ulong start, TagLib::ulong length)
 {
-  ulong readPosition = start + length;
-  ulong writePosition = start;
-  if(readPosition < ulong(ByteVectorStream::length())) {
-    ulong bytesToMove = ByteVectorStream::length() - readPosition;
+  TagLib::ulong readPosition = start + length;
+  TagLib::ulong writePosition = start;
+  if(readPosition < TagLib::ulong(ByteVectorStream::length())) {
+    TagLib::ulong bytesToMove = ByteVectorStream::length() - readPosition;
     memmove(d->data.data() + writePosition, d->data.data() + readPosition, bytesToMove);
     writePosition += bytesToMove;
   }

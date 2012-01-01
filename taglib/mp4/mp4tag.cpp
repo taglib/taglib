@@ -174,7 +174,7 @@ MP4::Tag::parseByte(MP4::Atom *atom, TagLib::File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
-    d->items.insert(atom->name, (uchar)data[0].at(0));
+    d->items.insert(atom->name, (TagLib::uchar)data[0].at(0));
   }
 }
 
@@ -691,13 +691,13 @@ MP4::Tag::setGenre(const String &value)
 }
 
 void
-MP4::Tag::setYear(uint value)
+MP4::Tag::setYear(TagLib::uint value)
 {
   d->items["\251day"] = StringList(String::number(value));
 }
 
 void
-MP4::Tag::setTrack(uint value)
+MP4::Tag::setTrack(TagLib::uint value)
 {
   d->items["trkn"] = MP4::Item(value, 0);
 }

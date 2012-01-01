@@ -44,7 +44,7 @@
 namespace TagLib {
   static const char hexTable[17] = "0123456789abcdef";
 
-  static const uint crcTable[256] = {
+  static const TagLib::uint crcTable[256] = {
     0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
     0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
     0x350c9b64, 0x31cd86d3, 0x3c8ea00a, 0x384fbdbd, 0x4c11db70, 0x48d0c6c7,
@@ -95,7 +95,7 @@ namespace TagLib {
    */
 
   template <class Vector>
-  int vectorFind(const Vector &v, const Vector &pattern, uint offset, int byteAlign)
+  int vectorFind(const Vector &v, const Vector &pattern, TagLib::uint offset, int byteAlign)
   {
     if(pattern.size() > v.size() || offset > v.size() - 1)
       return -1;
@@ -105,22 +105,22 @@ namespace TagLib {
 
     if(pattern.size() == 1) {
       char p = pattern[0];
-      for(uint i = offset; i < v.size(); i++) {
+      for(TagLib::uint i = offset; i < v.size(); i++) {
         if(v[i] == p && (i - offset) % byteAlign == 0)
           return i;
       }
       return -1;
     }
 
-    uchar lastOccurrence[256];
+    TagLib::uchar lastOccurrence[256];
 
-    for(uint i = 0; i < 256; ++i)
-      lastOccurrence[i] = uchar(pattern.size());
+    for(TagLib::uint i = 0; i < 256; ++i)
+      lastOccurrence[i] = TagLib::uchar(pattern.size());
 
-    for(uint i = 0; i < pattern.size() - 1; ++i)
-      lastOccurrence[uchar(pattern[i])] = uchar(pattern.size() - i - 1);
+    for(TagLib::uint i = 0; i < pattern.size() - 1; ++i)
+      lastOccurrence[TagLib::uchar(pattern[i])] = TagLib::uchar(pattern.size() - i - 1);
 
-    for(uint i = pattern.size() - 1 + offset; i < v.size(); i += lastOccurrence[uchar(v.at(i))]) {
+    for(TagLib::uint i = pattern.size() - 1 + offset; i < v.size(); i += lastOccurrence[TagLib::uchar(v.at(i))]) {
       int iBuffer = i;
       int iPattern = pattern.size() - 1;
 
@@ -159,17 +159,17 @@ namespace TagLib {
       return v.at(v.size() - index - 1);
     }
 
-    ByteVectorMirror mid(uint index, uint length = 0xffffffff) const
+    ByteVectorMirror mid(TagLib::uint index, TagLib::uint length = 0xffffffff) const
     {
       return length == 0xffffffff ? v.mid(0, index) : v.mid(index - length, length);
     }
 
-    uint size() const
+    TagLib::uint size() const
     {
       return v.size();
     }
 
-    int find(const ByteVectorMirror &pattern, uint offset = 0, int byteAlign = 1) const
+    int find(const ByteVectorMirror &pattern, TagLib::uint offset = 0, int byteAlign = 1) const
     {
       ByteVectorMirror v(*this);
 
@@ -210,11 +210,11 @@ namespace TagLib {
       return sum;
     }
 
-    uint size = sizeof(T);
-    uint last = data.size() > size ? size - 1 : data.size() - 1;
+    TagLib::uint size = sizeof(T);
+    TagLib::uint last = data.size() > size ? size - 1 : data.size() - 1;
 
-    for(uint i = 0; i <= last; i++)
-      sum |= (T) uchar(data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
+    for(TagLib::uint i = 0; i <= last; i++)
+      sum |= (T) TagLib::uchar(data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
 
     return sum;
   }
@@ -227,7 +227,7 @@ namespace TagLib {
     ByteVector v(size, 0);
 
     for(int i = 0; i < size; i++)
-      v[i] = uchar(value >> ((mostSignificantByteFirst ? size - 1 - i : i) * 8) & 0xff);
+      v[i] = TagLib::uchar(value >> ((mostSignificantByteFirst ? size - 1 - i : i) * 8) & 0xff);
 
     return v;
   }
@@ -246,7 +246,7 @@ public:
 
   // std::vector<T>::size() is very slow, so we'll cache the value
 
-  uint size;
+  TagLib::uint size;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,7 +255,7 @@ public:
 
 ByteVector ByteVector::null;
 
-ByteVector ByteVector::fromCString(const char *s, uint length)
+ByteVector ByteVector::fromCString(const char *s, TagLib::uint length)
 {
   ByteVector v;
 
@@ -267,9 +267,9 @@ ByteVector ByteVector::fromCString(const char *s, uint length)
   return v;
 }
 
-ByteVector ByteVector::fromUInt(uint value, bool mostSignificantByteFirst)
+ByteVector ByteVector::fromUInt(TagLib::uint value, bool mostSignificantByteFirst)
 {
-  return fromNumber<uint>(value, mostSignificantByteFirst);
+  return fromNumber<TagLib::uint>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
@@ -291,7 +291,7 @@ ByteVector::ByteVector()
   d = new ByteVectorPrivate;
 }
 
-ByteVector::ByteVector(uint size, char value)
+ByteVector::ByteVector(TagLib::uint size, char value)
 {
   d = new ByteVectorPrivate(size, value);
 }
@@ -308,7 +308,7 @@ ByteVector::ByteVector(char c)
   d->size = 1;
 }
 
-ByteVector::ByteVector(const char *data, uint length)
+ByteVector::ByteVector(const char *data, TagLib::uint length)
 {
   d = new ByteVectorPrivate;
   setData(data, length);
@@ -326,7 +326,7 @@ ByteVector::~ByteVector()
     delete d;
 }
 
-ByteVector &ByteVector::setData(const char *data, uint length)
+ByteVector &ByteVector::setData(const char *data, TagLib::uint length)
 {
   detach();
 
@@ -354,7 +354,7 @@ const char *ByteVector::data() const
   return size() > 0 ? DATA(d) : 0;
 }
 
-ByteVector ByteVector::mid(uint index, uint length) const
+ByteVector ByteVector::mid(TagLib::uint index, TagLib::uint length) const
 {
   ByteVector v;
 
@@ -374,17 +374,17 @@ ByteVector ByteVector::mid(uint index, uint length) const
   return v;
 }
 
-char ByteVector::at(uint index) const
+char ByteVector::at(TagLib::uint index) const
 {
   return index < size() ? d->data[index] : 0;
 }
 
-int ByteVector::find(const ByteVector &pattern, uint offset, int byteAlign) const
+int ByteVector::find(const ByteVector &pattern, TagLib::uint offset, int byteAlign) const
 {
   return vectorFind<ByteVector>(*this, pattern, offset, byteAlign);
 }
 
-int ByteVector::rfind(const ByteVector &pattern, uint offset, int byteAlign) const
+int ByteVector::rfind(const ByteVector &pattern, TagLib::uint offset, int byteAlign) const
 {
   // Ok, this is a little goofy, but pretty cool after it sinks in.  Instead of
   // reversing the find method's Boyer-Moore search algorithm I created a "mirror"
@@ -396,7 +396,7 @@ int ByteVector::rfind(const ByteVector &pattern, uint offset, int byteAlign) con
   return v.find(p, offset, byteAlign);
 }
 
-bool ByteVector::containsAt(const ByteVector &pattern, uint offset, uint patternOffset, uint patternLength) const
+bool ByteVector::containsAt(const ByteVector &pattern, TagLib::uint offset, TagLib::uint patternOffset, TagLib::uint patternLength) const
 {
   if(pattern.size() < patternLength)
     patternLength = pattern.size();
@@ -408,7 +408,7 @@ bool ByteVector::containsAt(const ByteVector &pattern, uint offset, uint pattern
 
   // loop through looking for a mismatch
 
-  for(uint i = 0; i < patternLength - patternOffset; i++) {
+  for(TagLib::uint i = 0; i < patternLength - patternOffset; i++) {
     if(at(i + offset) != pattern[i + patternOffset])
       return false;
   }
@@ -431,8 +431,8 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
 
-  const uint withSize = with.size();
-  const uint patternSize = pattern.size();
+  const TagLib::uint withSize = with.size();
+  const TagLib::uint patternSize = pattern.size();
   int offset = 0;
 
   if(withSize == patternSize) {
@@ -447,7 +447,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   }
 
   // calculate new size:
-  uint newSize = 0;
+  TagLib::uint newSize = 0;
   for(;;) {
     int next = find(pattern, offset);
     if(next < 0) {
@@ -501,7 +501,7 @@ int ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
   // try to match the last n-1 bytes from the vector (where n is the pattern
   // size) -- continue trying to match n-2, n-3...1 bytes
 
-  for(uint i = 1; i < pattern.size(); i++) {
+  for(TagLib::uint i = 1; i < pattern.size(); i++) {
     if(containsAt(pattern, startIndex + i, 0, pattern.size() - i))
       return startIndex + i;
   }
@@ -516,7 +516,7 @@ ByteVector &ByteVector::append(const ByteVector &v)
 
   detach();
 
-  uint originalSize = d->size;
+  TagLib::uint originalSize = d->size;
   resize(d->size + v.d->size);
   ::memcpy(DATA(d) + originalSize, DATA(v.d), v.size());
 
@@ -537,7 +537,7 @@ TagLib::uint ByteVector::size() const
   return d->size;
 }
 
-ByteVector &ByteVector::resize(uint size, char padding)
+ByteVector &ByteVector::resize(TagLib::uint size, char padding)
 {
   if(d->size < size) {
     d->data.reserve(size);
@@ -583,15 +583,15 @@ bool ByteVector::isEmpty() const
 
 TagLib::uint ByteVector::checksum() const
 {
-  uint sum = 0;
+  TagLib::uint sum = 0;
   for(ByteVector::ConstIterator it = begin(); it != end(); ++it)
-    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ uchar(*it)];
+    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ TagLib::uchar(*it)];
   return sum;
 }
 
 TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(d->data, mostSignificantByteFirst);
+  return toNumber<TagLib::uint>(d->data, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
@@ -698,8 +698,8 @@ ByteVector ByteVector::toHex() const
 {
   ByteVector encoded(size() * 2);
 
-  uint j = 0;
-  for(uint i = 0; i < size(); i++) {
+  TagLib::uint j = 0;
+  for(TagLib::uint i = 0; i < size(); i++) {
     unsigned char c = d->data[i];
     encoded[j++] = hexTable[(c >> 4) & 0x0F];
     encoded[j++] = hexTable[(c     ) & 0x0F];

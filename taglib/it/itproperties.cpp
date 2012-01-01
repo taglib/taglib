@@ -47,20 +47,20 @@ public:
   }
 
   int    channels;
-  ushort lengthInPatterns;
-  ushort instrumentCount;
-  ushort sampleCount;
-  ushort patternCount;
-  ushort version;
-  ushort compatibleVersion;
-  ushort flags;
-  ushort special;
-  uchar  globalVolume;
-  uchar  mixVolume;
-  uchar  tempo;
-  uchar  bpmSpeed;
-  uchar  panningSeparation;
-  uchar  pitchWheelDepth;
+  TagLib::ushort lengthInPatterns;
+  TagLib::ushort instrumentCount;
+  TagLib::ushort sampleCount;
+  TagLib::ushort patternCount;
+  TagLib::ushort version;
+  TagLib::ushort compatibleVersion;
+  TagLib::ushort flags;
+  TagLib::ushort special;
+  TagLib::uchar  globalVolume;
+  TagLib::uchar  mixVolume;
+  TagLib::uchar  tempo;
+  TagLib::uchar  bpmSpeed;
+  TagLib::uchar  panningSeparation;
+  TagLib::uchar  pitchWheelDepth;
 };
 
 IT::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -94,7 +94,7 @@ int IT::Properties::channels() const
   return d->channels;
 }
 
-ushort IT::Properties::lengthInPatterns() const
+TagLib::ushort IT::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -104,67 +104,67 @@ bool IT::Properties::stereo() const
   return d->flags & Stereo;
 }
 
-ushort IT::Properties::instrumentCount() const
+TagLib::ushort IT::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-ushort IT::Properties::sampleCount() const
+TagLib::ushort IT::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-ushort IT::Properties::patternCount() const
+TagLib::ushort IT::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-ushort IT::Properties::version() const
+TagLib::ushort IT::Properties::version() const
 {
   return d->version;
 }
 
-ushort IT::Properties::compatibleVersion() const
+TagLib::ushort IT::Properties::compatibleVersion() const
 {
   return d->compatibleVersion;
 }
 
-ushort IT::Properties::flags() const
+TagLib::ushort IT::Properties::flags() const
 {
   return d->flags;
 }
 
-ushort IT::Properties::special() const
+TagLib::ushort IT::Properties::special() const
 {
   return d->special;
 }
 
-uchar IT::Properties::globalVolume() const
+TagLib::uchar IT::Properties::globalVolume() const
 {
   return d->globalVolume;
 }
 
-uchar IT::Properties::mixVolume() const
+TagLib::uchar IT::Properties::mixVolume() const
 {
   return d->mixVolume;
 }
 
-uchar IT::Properties::tempo() const
+TagLib::uchar IT::Properties::tempo() const
 {
   return d->tempo;
 }
 
-uchar IT::Properties::bpmSpeed() const
+TagLib::uchar IT::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
 
-uchar IT::Properties::panningSeparation() const
+TagLib::uchar IT::Properties::panningSeparation() const
 {
   return d->panningSeparation;
 }
 
-uchar IT::Properties::pitchWheelDepth() const
+TagLib::uchar IT::Properties::pitchWheelDepth() const
 {
   return d->pitchWheelDepth;
 }
@@ -174,72 +174,72 @@ void IT::Properties::setChannels(int channels)
   d->channels = channels;
 }
 
-void IT::Properties::setLengthInPatterns(ushort lengthInPatterns)
+void IT::Properties::setLengthInPatterns(TagLib::ushort lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }
 
-void IT::Properties::setInstrumentCount(ushort instrumentCount)
+void IT::Properties::setInstrumentCount(TagLib::ushort instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void IT::Properties::setSampleCount(ushort sampleCount)
+void IT::Properties::setSampleCount(TagLib::ushort sampleCount)
 {
   d->sampleCount = sampleCount;
 }
 
-void IT::Properties::setPatternCount(ushort patternCount)
+void IT::Properties::setPatternCount(TagLib::ushort patternCount)
 {
   d->patternCount = patternCount;
 }
 
-void IT::Properties::setFlags(ushort flags)
+void IT::Properties::setFlags(TagLib::ushort flags)
 {
   d->flags = flags;
 }
 
-void IT::Properties::setSpecial(ushort special)
+void IT::Properties::setSpecial(TagLib::ushort special)
 {
   d->special = special;
 }
 
-void IT::Properties::setCompatibleVersion(ushort compatibleVersion)
+void IT::Properties::setCompatibleVersion(TagLib::ushort compatibleVersion)
 {
   d->compatibleVersion = compatibleVersion;
 }
 
-void IT::Properties::setVersion(ushort version)
+void IT::Properties::setVersion(TagLib::ushort version)
 {
   d->version = version;
 }
 
-void IT::Properties::setGlobalVolume(uchar globalVolume)
+void IT::Properties::setGlobalVolume(TagLib::uchar globalVolume)
 {
   d->globalVolume = globalVolume;
 }
 
-void IT::Properties::setMixVolume(uchar mixVolume)
+void IT::Properties::setMixVolume(TagLib::uchar mixVolume)
 {
   d->mixVolume = mixVolume;
 }
 
-void IT::Properties::setTempo(uchar tempo)
+void IT::Properties::setTempo(TagLib::uchar tempo)
 {
   d->tempo = tempo;
 }
 
-void IT::Properties::setBpmSpeed(uchar bpmSpeed)
+void IT::Properties::setBpmSpeed(TagLib::uchar bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
 }
 
-void IT::Properties::setPanningSeparation(uchar panningSeparation)
+void IT::Properties::setPanningSeparation(TagLib::uchar panningSeparation)
 {
   d->panningSeparation = panningSeparation;
 }
 
-void IT::Properties::setPitchWheelDepth(uchar pitchWheelDepth)
+void IT::Properties::setPitchWheelDepth(TagLib::uchar pitchWheelDepth)
 {
   d->pitchWheelDepth = pitchWheelDepth;
 }

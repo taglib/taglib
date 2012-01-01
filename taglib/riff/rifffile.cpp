@@ -98,22 +98,22 @@ TagLib::uint RIFF::File::chunkCount() const
   return d->chunks.size();
 }
 
-TagLib::uint RIFF::File::chunkDataSize(uint i) const
+TagLib::uint RIFF::File::chunkDataSize(TagLib::uint i) const
 {
   return d->chunks[i].size;
 }
 
-TagLib::uint RIFF::File::chunkOffset(uint i) const
+TagLib::uint RIFF::File::chunkOffset(TagLib::uint i) const
 {
   return d->chunks[i].offset;
 }
 
-TagLib::uint RIFF::File::chunkPadding(uint i) const
+TagLib::uint RIFF::File::chunkPadding(TagLib::uint i) const
 {
   return d->chunks[i].padding;
 }
 
-ByteVector RIFF::File::chunkName(uint i) const
+ByteVector RIFF::File::chunkName(TagLib::uint i) const
 {
   if(i >= chunkCount())
     return ByteVector::null;
@@ -121,7 +121,7 @@ ByteVector RIFF::File::chunkName(uint i) const
   return d->chunks[i].name;
 }
 
-ByteVector RIFF::File::chunkData(uint i)
+ByteVector RIFF::File::chunkData(TagLib::uint i)
 {
   if(i >= chunkCount())
     return ByteVector::null;
@@ -130,7 +130,7 @@ ByteVector RIFF::File::chunkData(uint i)
 
   long begin = 12 + 8;
 
-  for(uint it = 0; it < i; it++)
+  for(TagLib::uint it = 0; it < i; it++)
     begin += 8 + d->chunks[it].size + d->chunks[it].padding;
 
   seek(begin);
@@ -145,7 +145,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
     return;
   }
 
-  for(uint i = 0; i < d->chunks.size(); i++) {
+  for(TagLib::uint i = 0; i < d->chunks.size(); i++) {
     if(d->chunks[i].name == name) {
 
       // First we update the global size
@@ -171,8 +171,8 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  uint i =  d->chunks.size() - 1;
-  ulong offset = d->chunks[i].offset + d->chunks[i].size;
+  TagLib::uint i =  d->chunks.size() - 1;
+  TagLib::ulong offset = d->chunks[i].offset + d->chunks[i].size;
 
   // First we update the global size
 
@@ -181,7 +181,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 
   // Now add the chunk to the file
 
-  writeChunk(name, data, offset, std::max(ulong(0), length() - offset), (offset & 1) ? 1 : 0);
+  writeChunk(name, data, offset, std::max(TagLib::ulong(0), length() - offset), (offset & 1) ? 1 : 0);
 
   // And update our internal structure
 
@@ -227,7 +227,7 @@ void RIFF::File::read()
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
-    uint chunkSize = readBlock(4).toUInt(bigEndian);
+    TagLib::uint chunkSize = readBlock(4).toUInt(bigEndian);
 
     if(!isValidChunkID(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
@@ -235,7 +235,7 @@ void RIFF::File::read()
       break;
     }
 
-    if(tell() + chunkSize > uint(length())) {
+    if(tell() + chunkSize > TagLib::uint(length())) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
       setValid(false);
       break;
@@ -267,7 +267,7 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            ulong offset, ulong replace, uint leadingPadding)
+                            TagLib::ulong offset, TagLib::ulong replace, TagLib::uint leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {

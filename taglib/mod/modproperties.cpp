@@ -35,8 +35,8 @@ public:
   }
   
   int   channels;
-  uint  instrumentCount;
-  uchar lengthInPatterns;
+  TagLib::uint  instrumentCount;
+  TagLib::uchar lengthInPatterns;
 };
 
 Mod::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -70,12 +70,12 @@ int Mod::Properties::channels() const
   return d->channels;
 }
 
-uint Mod::Properties::instrumentCount() const
+TagLib::uint Mod::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-uchar Mod::Properties::lengthInPatterns() const
+TagLib::uchar Mod::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -85,12 +85,12 @@ void Mod::Properties::setChannels(int channels)
   d->channels = channels;
 }
 
-void Mod::Properties::setInstrumentCount(uint instrumentCount)
+void Mod::Properties::setInstrumentCount(TagLib::uint instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void Mod::Properties::setLengthInPatterns(uchar lengthInPatterns)
+void Mod::Properties::setLengthInPatterns(TagLib::uchar lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }

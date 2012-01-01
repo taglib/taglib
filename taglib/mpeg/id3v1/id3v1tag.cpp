@@ -45,8 +45,8 @@ public:
   String album;
   String year;
   String comment;
-  uchar track;
-  uchar genre;
+  TagLib::uchar track;
+  TagLib::uchar genre;
 
   static const StringHandler *stringHandler;
 };
@@ -177,12 +177,12 @@ void ID3v1::Tag::setGenre(const String &s)
   d->genre = ID3v1::genreIndex(s);
 }
 
-void ID3v1::Tag::setYear(uint i)
+void ID3v1::Tag::setYear(TagLib::uint i)
 {
   d->year = i > 0 ? String::number(i) : String::null;
 }
 
-void ID3v1::Tag::setTrack(uint i)
+void ID3v1::Tag::setTrack(TagLib::uint i)
 {
   d->track = i < 256 ? i : 0;
 }
@@ -237,12 +237,12 @@ void ID3v1::Tag::parse(const ByteVector &data)
     // ID3v1.1 detected
 
     d->comment = TagPrivate::stringHandler->parse(data.mid(offset, 28));
-    d->track = uchar(data[offset + 29]);
+    d->track = TagLib::uchar(data[offset + 29]);
   }
   else
     d->comment = data.mid(offset, 30);
 
   offset += 30;
 
-  d->genre = uchar(data[offset]);
+  d->genre = TagLib::uchar(data[offset]);
 }

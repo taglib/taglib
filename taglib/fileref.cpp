@@ -220,7 +220,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   String s;
 
 #ifdef _WIN32
-  s = (wcslen((const wchar_t *) fileName) > 0) ? String((const wchar_t *) fileName) : String((const char *) fileName);
+  s = (wcslen((const TagLib::wchar *) fileName) > 0) ? String((const TagLib::wchar *) fileName) : String((const char *) fileName);
 #else
   s = fileName;
 #endif

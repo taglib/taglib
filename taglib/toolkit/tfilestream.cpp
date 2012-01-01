@@ -75,8 +75,8 @@ public:
   FileNameHandle name;
 
   bool readOnly;
-  ulong size;
-  static const uint bufferSize = 1024;
+  TagLib::ulong size;
+  static const TagLib::uint bufferSize = 1024;
 };
 
 FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openReadOnly) :
@@ -89,7 +89,7 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
 
 #ifdef _WIN32
 
-  if(wcslen((const wchar_t *) fileName) > 0) {
+  if(wcslen((const TagLib::wchar *) fileName) > 0) {
 
     if(openReadOnly)
       file = _wfopen(name, L"rb");
@@ -147,7 +147,7 @@ FileName FileStream::name() const
   return d->name;
 }
 
-ByteVector FileStream::readBlock(ulong length)
+ByteVector FileStream::readBlock(TagLib::ulong length)
 {
   if(!d->file) {
     debug("FileStream::readBlock() -- Invalid File");
@@ -158,12 +158,12 @@ ByteVector FileStream::readBlock(ulong length)
     return ByteVector::null;
 
   if(length > FileStreamPrivate::bufferSize &&
-     length > ulong(FileStream::length()))
+     length > TagLib::ulong(FileStream::length()))
   {
     length = FileStream::length();
   }
 
-  ByteVector v(static_cast<uint>(length));
+  ByteVector v(static_cast<TagLib::uint>(length));
   const int count = fread(v.data(), sizeof(char), length, d->file);
   v.resize(count);
   return v;
@@ -182,7 +182,7 @@ void FileStream::writeBlock(const ByteVector &data)
   fwrite(data.data(), sizeof(char), data.size(), d->file);
 }
 
-void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
+void FileStream::insert(const ByteVector &data, TagLib::ulong start, TagLib::ulong replace)
 {
   if(!d->file)
     return;
@@ -209,7 +209,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  ulong bufferLength = bufferSize();
+  TagLib::ulong bufferLength = bufferSize();
 
   while(data.size() - replace > bufferLength)
     bufferLength += bufferSize();
@@ -220,7 +220,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   long writePosition = start;
 
   ByteVector buffer;
-  ByteVector aboutToOverwrite(static_cast<uint>(bufferLength));
+  ByteVector aboutToOverwrite(static_cast<TagLib::uint>(bufferLength));
 
   // This is basically a special case of the loop below.  Here we're just
   // doing the same steps as below, but since we aren't using the same buffer
@@ -258,7 +258,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
     // Check to see if we just read the last block.  We need to call clear()
     // if we did so that the last write succeeds.
 
-    if(ulong(bytesRead) < bufferLength)
+    if(TagLib::ulong(bytesRead) < bufferLength)
       clear();
 
     // Seek to the write position and write our buffer.  Increment the
@@ -280,19 +280,19 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   }
 }
 
-void FileStream::removeBlock(ulong start, ulong length)
+void FileStream::removeBlock(TagLib::ulong start, TagLib::ulong length)
 {
   if(!d->file)
     return;
 
-  ulong bufferLength = bufferSize();
+  TagLib::ulong bufferLength = bufferSize();
 
   long readPosition = start + length;
   long writePosition = start;
 
-  ByteVector buffer(static_cast<uint>(bufferLength));
+  ByteVector buffer(static_cast<TagLib::uint>(bufferLength));
 
-  ulong bytesRead = 1;
+  TagLib::ulong bytesRead = 1;
 
   while(bytesRead != 0) {
     seek(readPosition);

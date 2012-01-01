@@ -248,7 +248,7 @@ void ID3v2::Tag::setGenre(const String &s)
 #endif
 }
 
-void ID3v2::Tag::setYear(uint i)
+void ID3v2::Tag::setYear(TagLib::uint i)
 {
   if(i <= 0) {
     removeFrames("TDRC");
@@ -257,7 +257,7 @@ void ID3v2::Tag::setYear(uint i)
   setTextFrame("TDRC", String::number(i));
 }
 
-void ID3v2::Tag::setTrack(uint i)
+void ID3v2::Tag::setTrack(TagLib::uint i)
 {
   if(i <= 0) {
     removeFrames("TRCK");
@@ -410,14 +410,14 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     StringList people;
     if(frameTMCL) {
       StringList v24People = frameTMCL->fieldList();
-      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+      for(TagLib::uint i = 0; i + 1 < v24People.size(); i += 2) {
         people.append(v24People[i]);
         people.append(v24People[i+1]);
       }
     }
     if(frameTIPL) {
       StringList v24People = frameTIPL->fieldList();
-      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+      for(TagLib::uint i = 0; i + 1 < v24People.size(); i += 2) {
         people.append(v24People[i]);
         people.append(v24People[i+1]);
       }
@@ -471,8 +471,8 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  uint paddingSize = 0;
-  uint originalSize = d->header.tagSize();
+  TagLib::uint paddingSize = 0;
+  TagLib::uint originalSize = d->header.tagSize();
 
   if(tagData.size() < originalSize)
     paddingSize = originalSize - tagData.size();
@@ -517,8 +517,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
   if(d->header.unsynchronisation() && d->header.majorVersion() <= 3)
     data = SynchData::decode(data);
 
-  uint frameDataPosition = 0;
-  uint frameDataLength = data.size();
+  TagLib::uint frameDataPosition = 0;
+  TagLib::uint frameDataLength = data.size();
 
   // check for extended header
 

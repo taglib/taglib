@@ -34,7 +34,7 @@ class ExtendedHeader::ExtendedHeaderPrivate
 public:
   ExtendedHeaderPrivate() : size(0) {}
 
-  uint size;
+  TagLib::uint size;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -112,8 +112,8 @@ bool RIFF::WAV::File::save()
 void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   ByteVector formatData;
-  uint streamLength = 0;
-  for(uint i = 0; i < chunkCount(); i++) {
+  TagLib::uint streamLength = 0;
+  for(TagLib::uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
       d->tagChunkID = chunkName(i);
       d->tag = new ID3v2::Tag(this, chunkOffset(i));

@@ -158,7 +158,7 @@ void APE::Tag::setGenre(const String &s)
   addValue("GENRE", s, true);
 }
 
-void APE::Tag::setYear(uint i)
+void APE::Tag::setYear(TagLib::uint i)
 {
   if(i <= 0)
     removeItem("YEAR");
@@ -166,7 +166,7 @@ void APE::Tag::setYear(uint i)
     addValue("YEAR", String::number(i), true);
 }
 
-void APE::Tag::setTrack(uint i)
+void APE::Tag::setTrack(TagLib::uint i)
 {
   if(i <= 0)
     removeItem("TRACK");
@@ -225,7 +225,7 @@ void APE::Tag::read()
     d->footer.setData(d->file->readBlock(Footer::size()));
 
     if(d->footer.tagSize() <= Footer::size() ||
-       d->footer.tagSize() > uint(d->file->length()))
+       d->footer.tagSize() > TagLib::uint(d->file->length()))
       return;
 
     d->file->seek(d->footerLocation + Footer::size() - d->footer.tagSize());
@@ -236,7 +236,7 @@ void APE::Tag::read()
 ByteVector APE::Tag::render() const
 {
   ByteVector data;
-  uint itemCount = 0;
+  TagLib::uint itemCount = 0;
 
   {
     for(Map<const String, Item>::ConstIterator it = d->itemListMap.begin();
@@ -256,11 +256,11 @@ ByteVector APE::Tag::render() const
 
 void APE::Tag::parse(const ByteVector &data)
 {
-  uint pos = 0;
+  TagLib::uint pos = 0;
 
   // 11 bytes is the minimum size for an APE item
 
-  for(uint i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
+  for(TagLib::uint i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
     APE::Item item;
     item.parse(data.mid(pos));
 

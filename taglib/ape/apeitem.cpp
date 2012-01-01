@@ -183,8 +183,8 @@ void APE::Item::parse(const ByteVector &data)
     return;
   }
 
-  uint valueLength  = data.mid(0, 4).toUInt(false);
-  uint flags        = data.mid(4, 4).toUInt(false);
+  TagLib::uint valueLength  = data.mid(0, 4).toUInt(false);
+  TagLib::uint flags        = data.mid(4, 4).toUInt(false);
 
   d->key = String(data.mid(8), String::UTF8);
 

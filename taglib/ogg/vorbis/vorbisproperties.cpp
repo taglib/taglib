@@ -145,7 +145,7 @@ void Vorbis::Properties::read()
   d->vorbisVersion = data.mid(pos, 4).toUInt(false);
   pos += 4;
 
-  d->channels = uchar(data[pos]);
+  d->channels = TagLib::uchar(data[pos]);
   pos += 1;
 
   d->sampleRate = data.mid(pos, 4).toUInt(false);

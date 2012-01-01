@@ -53,7 +53,7 @@ public:
     delete lastPageHeader;
   }
 
-  uint streamSerialNumber;
+  TagLib::uint streamSerialNumber;
   List<Page *> pages;
   PageHeader *firstPageHeader;
   PageHeader *lastPageHeader;
@@ -78,7 +78,7 @@ Ogg::File::~File()
   delete d;
 }
 
-ByteVector Ogg::File::packet(uint i)
+ByteVector Ogg::File::packet(TagLib::uint i)
 {
   // Check to see if we're called setPacket() for this packet since the last
   // save:
@@ -100,7 +100,7 @@ ByteVector Ogg::File::packet(uint i)
   // If the last read stopped at the packet that we're interested in, don't
   // reread its packet list.  (This should make sequential packet reads fast.)
 
-  uint pageIndex = d->packetToPageMap[i].front();
+  TagLib::uint pageIndex = d->packetToPageMap[i].front();
   if(d->currentPacketPage != d->pages[pageIndex]) {
     d->currentPacketPage = d->pages[pageIndex];
     d->currentPackets = d->currentPacketPage->packets();
@@ -136,7 +136,7 @@ ByteVector Ogg::File::packet(uint i)
   return packet;
 }
 
-void Ogg::File::setPacket(uint i, const ByteVector &p)
+void Ogg::File::setPacket(TagLib::uint i, const ByteVector &p)
 {
   while(d->packetToPageMap.size() <= i) {
     if(!nextPage()) {
@@ -265,8 +265,8 @@ bool Ogg::File::nextPage()
   // Loop through the packets in the page that we just read appending the
   // current page number to the packet to page map for each packet.
 
-  for(uint i = 0; i < d->currentPage->packetCount(); i++) {
-    uint currentPacket = d->currentPage->firstPacketIndex() + i;
+  for(TagLib::uint i = 0; i < d->currentPage->packetCount(); i++) {
+    TagLib::uint currentPacket = d->currentPage->firstPacketIndex() + i;
     if(d->packetToPageMap.size() <= currentPacket)
       d->packetToPageMap.push_back(List<int>());
     d->packetToPageMap[currentPacket].append(d->pages.size() - 1);
@@ -308,12 +308,12 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
   int originalSize = 0;
 
   for(List<int>::ConstIterator it = pageGroup.begin(); it != pageGroup.end(); ++it) {
-    uint firstPacket = d->pages[*it]->firstPacketIndex();
-    uint lastPacket = firstPacket + d->pages[*it]->packetCount() - 1;
+    TagLib::uint firstPacket = d->pages[*it]->firstPacketIndex();
+    TagLib::uint lastPacket = firstPacket + d->pages[*it]->packetCount() - 1;
 
     List<int>::ConstIterator last = --pageGroup.end();
 
-    for(uint i = firstPacket; i <= lastPacket; i++) {
+    for(TagLib::uint i = firstPacket; i <= lastPacket; i++) {
 
       if(it == last && i == lastPacket && !d->dirtyPages.contains(i))
         packets.append(d->pages[*it]->packets().back());

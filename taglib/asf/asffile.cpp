@@ -93,21 +93,21 @@ class ASF::File::FilePropertiesObject : public ASF::File::BaseObject
 {
 public:
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
 };
 
 class ASF::File::StreamPropertiesObject : public ASF::File::BaseObject
 {
 public:
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
 };
 
 class ASF::File::ContentDescriptionObject : public ASF::File::BaseObject
 {
 public:
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
   ByteVector render(ASF::File *file);
 };
 
@@ -116,7 +116,7 @@ class ASF::File::ExtendedContentDescriptionObject : public ASF::File::BaseObject
 public:
   ByteVectorList attributeData;
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
   ByteVector render(ASF::File *file);
 };
 
@@ -125,7 +125,7 @@ class ASF::File::MetadataObject : public ASF::File::BaseObject
 public:
   ByteVectorList attributeData;
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
   ByteVector render(ASF::File *file);
 };
 
@@ -134,7 +134,7 @@ class ASF::File::MetadataLibraryObject : public ASF::File::BaseObject
 public:
   ByteVectorList attributeData;
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
   ByteVector render(ASF::File *file);
 };
 
@@ -143,7 +143,7 @@ class ASF::File::HeaderExtensionObject : public ASF::File::BaseObject
 public:
   List<ASF::File::BaseObject *> objects;
   ByteVector guid();
-  void parse(ASF::File *file, uint size);
+  void parse(ASF::File *file, TagLib::uint size);
   ByteVector render(ASF::File *file);
 };
 
@@ -175,7 +175,7 @@ ByteVector ASF::File::FilePropertiesObject::guid()
   return filePropertiesGuid;
 }
 
-void ASF::File::FilePropertiesObject::parse(ASF::File *file, uint size)
+void ASF::File::FilePropertiesObject::parse(ASF::File *file, TagLib::uint size)
 {
   BaseObject::parse(file, size);
   file->d->properties->setLength((int)(data.mid(40, 8).toLongLong(false) / 10000000L - data.mid(56, 8).toLongLong(false) / 1000L));
@@ -186,7 +186,7 @@ ByteVector ASF::File::StreamPropertiesObject::guid()
   return streamPropertiesGuid;
 }
 
-void ASF::File::StreamPropertiesObject::parse(ASF::File *file, uint size)
+void ASF::File::StreamPropertiesObject::parse(ASF::File *file, TagLib::uint size)
 {
   BaseObject::parse(file, size);
   file->d->properties->setChannels(data.mid(56, 2).toShort(false));
@@ -199,7 +199,7 @@ ByteVector ASF::File::ContentDescriptionObject::guid()
   return contentDescriptionGuid;
 }
 
-void ASF::File::ContentDescriptionObject::parse(ASF::File *file, uint /*size*/)
+void ASF::File::ContentDescriptionObject::parse(ASF::File *file, TagLib::uint /*size*/)
 {
   file->d->contentDescriptionObject = this;
   int titleLength = file->readWORD();
@@ -240,7 +240,7 @@ ByteVector ASF::File::ExtendedContentDescriptionObject::guid()
   return extendedContentDescriptionGuid;
 }
 
-void ASF::File::ExtendedContentDescriptionObject::parse(ASF::File *file, uint /*size*/)
+void ASF::File::ExtendedContentDescriptionObject::parse(ASF::File *file, TagLib::uint /*size*/)
 {
   file->d->extendedContentDescriptionObject = this;
   int count = file->readWORD();
@@ -264,7 +264,7 @@ ByteVector ASF::File::MetadataObject::guid()
   return metadataGuid;
 }
 
-void ASF::File::MetadataObject::parse(ASF::File *file, uint /*size*/)
+void ASF::File::MetadataObject::parse(ASF::File *file, TagLib::uint /*size*/)
 {
   file->d->metadataObject = this;
   int count = file->readWORD();
@@ -288,7 +288,7 @@ ByteVector ASF::File::MetadataLibraryObject::guid()
   return metadataLibraryGuid;
 }
 
-void ASF::File::MetadataLibraryObject::parse(ASF::File *file, uint /*size*/)
+void ASF::File::MetadataLibraryObject::parse(ASF::File *file, TagLib::uint /*size*/)
 {
   file->d->metadataLibraryObject = this;
   int count = file->readWORD();
@@ -312,7 +312,7 @@ ByteVector ASF::File::HeaderExtensionObject::guid()
   return headerExtensionGuid;
 }
 
-void ASF::File::HeaderExtensionObject::parse(ASF::File *file, uint /*size*/)
+void ASF::File::HeaderExtensionObject::parse(ASF::File *file, TagLib::uint /*size*/)
 {
   file->d->headerExtensionObject = this;
   file->seek(18, File::Current);

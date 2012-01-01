@@ -59,7 +59,7 @@ public:
 
   IOStream *stream;
   bool valid;
-  static const uint bufferSize = 1024;
+  static const TagLib::uint bufferSize = 1024;
 };
 
 File::FilePrivate::FilePrivate(IOStream *stream) :
@@ -95,7 +95,7 @@ FileName File::name() const
   return d->stream->name();
 }
 
-ByteVector File::readBlock(ulong length)
+ByteVector File::readBlock(TagLib::ulong length)
 {
   return d->stream->readBlock(length);
 }
@@ -269,12 +269,12 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
   return -1;
 }
 
-void File::insert(const ByteVector &data, ulong start, ulong replace)
+void File::insert(const ByteVector &data, TagLib::ulong start, TagLib::ulong replace)
 {
   d->stream->insert(data, start, replace);
 }
 
-void File::removeBlock(ulong start, ulong length)
+void File::removeBlock(TagLib::ulong start, TagLib::ulong length)
 {
   d->stream->removeBlock(start, length);
 }
