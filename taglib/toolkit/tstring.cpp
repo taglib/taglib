@@ -567,6 +567,11 @@ bool String::operator==(const String &s) const
   return d == s.d || d->data == s.d->data;
 }
 
+bool String::operator!=(const String &s) const
+{
+  return !operator==(s);
+}
+
 String &String::operator+=(const String &s)
 {
   detach();
