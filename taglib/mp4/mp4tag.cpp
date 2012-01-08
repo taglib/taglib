@@ -1,5 +1,5 @@
 /**************************************************************************
-    copyright            : (C) 2007 by Lukáš Lalinský
+    copyright            : (C) 2007,2011 by Lukáš Lalinský
     email                : lalinsky@gmail.com
  **************************************************************************/
 
@@ -105,10 +105,10 @@ MP4::Tag::~Tag()
   delete d;
 }
 
-ByteVectorList
-MP4::Tag::parseData(MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool freeForm)
+MP4::AtomDataList
+MP4::Tag::parseData2(MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool freeForm)
 {
-  ByteVectorList result;
+  AtomDataList result;
   ByteVector data = file->readBlock(atom->length - 8);
   int i = 0;
   unsigned int pos = 0;
@@ -125,7 +125,7 @@ MP4::Tag::parseData(MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"name\"");
         return result;
       }
-      result.append(data.mid(pos + 12, length - 12));
+      result.append(AtomData(AtomDataType(flags), data.mid(pos + 12, length - 12)));
     }
     else {
       if(name != "data") {
@@ -133,11 +133,22 @@ MP4::Tag::parseData(MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool
         return result;
       }
       if(expectedFlags == -1 || flags == expectedFlags) {
-        result.append(data.mid(pos + 16, length - 16));
+        result.append(AtomData(AtomDataType(flags), data.mid(pos + 16, length - 16)));
       }
     }
     pos += length;
     i++;
+  }
+  return result;
+}
+
+ByteVectorList
+MP4::Tag::parseData(MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool freeForm)
+{
+  AtomDataList data = parseData2(atom, file, expectedFlags, freeForm);
+  ByteVectorList result;
+  for(uint i = 0; i < data.size(); i++) {
+    result.append(data[i].data);
   }
   return result;
 }
@@ -227,14 +238,34 @@ MP4::Tag::parseText(MP4::Atom *atom, TagLib::File *file, int expectedFlags)
 void
 MP4::Tag::parseFreeForm(MP4::Atom *atom, TagLib::File *file)
 {
-  ByteVectorList data = parseData(atom, file, 1, true);
+  AtomDataList data = parseData2(atom, file, -1, true);
   if(data.size() > 2) {
-    StringList value;
-    for(unsigned int i = 2; i < data.size(); i++) {
-      value.append(String(data[i], String::UTF8));
+    String name = "----:" + String(data[0].data, String::UTF8) + ':' + String(data[1].data, String::UTF8);
+    AtomDataType type = data[2].type;
+    for(uint i = 2; i < data.size(); i++) {
+      if(data[i].type != type) {
+        debug("MP4: We currently don't support values with multiple types");
+        break;
+      }
     }
-    String name = "----:" + data[0] + ':' + data[1];
-    d->items.insert(name, value);
+    if(type == TypeUTF8) {
+      StringList value;
+      for(uint i = 2; i < data.size(); i++) {
+        value.append(String(data[i].data, String::UTF8));
+      }
+      Item item(value);
+      item.setAtomDataType(type);
+      d->items.insert(name, item);
+    }
+    else {
+      ByteVectorList value;
+      for(uint i = 2; i < data.size(); i++) {
+        value.append(data[i].data);
+      }
+      Item item(value);
+      item.setAtomDataType(type);
+      d->items.insert(name, item);
+    }
   }
 }
 
@@ -252,7 +283,7 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
       break;
     }
-    if(flags == MP4::CoverArt::PNG || flags == MP4::CoverArt::JPEG) {
+    if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP) {
       value.append(MP4::CoverArt(MP4::CoverArt::Format(flags),
                                  data.mid(pos + 16, length - 16)));
     }
@@ -292,7 +323,7 @@ MP4::Tag::renderBool(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector(1, item.toBool() ? '\1' : '\0'));
-  return renderData(name, 0x15, data);
+  return renderData(name, TypeInteger, data);
 }
 
 ByteVector
@@ -300,7 +331,7 @@ MP4::Tag::renderInt(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector::fromShort(item.toInt()));
-  return renderData(name, 0x15, data);
+  return renderData(name, TypeInteger, data);
 }
 
 ByteVector
@@ -308,7 +339,7 @@ MP4::Tag::renderUInt(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector::fromUInt(item.toUInt()));
-  return renderData(name, 0x15, data);
+  return renderData(name, TypeInteger, data);
 }
 
 ByteVector
@@ -316,7 +347,7 @@ MP4::Tag::renderLongLong(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector::fromLongLong(item.toLongLong()));
-  return renderData(name, 0x15, data);
+  return renderData(name, TypeInteger, data);
 }
 
 ByteVector
@@ -324,7 +355,7 @@ MP4::Tag::renderByte(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector(1, item.toByte()));
-  return renderData(name, 0x15, data);
+  return renderData(name, TypeInteger, data);
 }
 
 ByteVector
@@ -335,7 +366,7 @@ MP4::Tag::renderIntPair(const ByteVector &name, MP4::Item &item)
               ByteVector::fromShort(item.toIntPair().first) +
               ByteVector::fromShort(item.toIntPair().second) +
               ByteVector(2, '\0'));
-  return renderData(name, 0x00, data);
+  return renderData(name, TypeImplicit, data);
 }
 
 ByteVector
@@ -345,7 +376,7 @@ MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, MP4::Item &item)
   data.append(ByteVector(2, '\0') +
               ByteVector::fromShort(item.toIntPair().first) +
               ByteVector::fromShort(item.toIntPair().second));
-  return renderData(name, 0x00, data);
+  return renderData(name, TypeImplicit, data);
 }
 
 ByteVector
@@ -382,9 +413,26 @@ MP4::Tag::renderFreeForm(const String &name, MP4::Item &item)
   ByteVector data;
   data.append(renderAtom("mean", ByteVector::fromUInt(0) + header[1].data(String::UTF8)));
   data.append(renderAtom("name", ByteVector::fromUInt(0) + header[2].data(String::UTF8)));
-  StringList value = item.toStringList();
-  for(unsigned int i = 0; i < value.size(); i++) {
-    data.append(renderAtom("data", ByteVector::fromUInt(1) + ByteVector(4, '\0') + value[i].data(String::UTF8)));
+  AtomDataType type = item.atomDataType();
+  if(type == TypeUndefined) {
+    if(!item.toStringList().isEmpty()) {
+      type = TypeUTF8;
+    }
+    else {
+      type = TypeImplicit;
+    }
+  }
+  if(type == TypeUTF8) {
+    StringList value = item.toStringList();
+    for(unsigned int i = 0; i < value.size(); i++) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + value[i].data(String::UTF8)));
+    }
+  }
+  else {
+    ByteVectorList value = item.toByteVectorList();
+    for(unsigned int i = 0; i < value.size(); i++) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + value[i]));
+    }
   }
   return renderAtom("----", data);
 }

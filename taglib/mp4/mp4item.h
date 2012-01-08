@@ -53,7 +53,11 @@ namespace TagLib {
       Item(bool value);
       Item(int first, int second);
       Item(const StringList &value);
+      Item(const ByteVectorList &value);
       Item(const CoverArtList &value);
+
+      void setAtomDataType(AtomDataType type);
+      AtomDataType atomDataType() const;
 
       int toInt() const;
       uchar toByte() const;
@@ -62,6 +66,7 @@ namespace TagLib {
       bool toBool() const;
       IntPair toIntPair() const;
       StringList toStringList() const;
+      ByteVectorList toByteVectorList() const;
       CoverArtList toCoverArtList() const;
 
       bool isValid() const;

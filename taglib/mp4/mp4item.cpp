@@ -36,9 +36,10 @@ using namespace TagLib;
 class MP4::Item::ItemPrivate : public RefCounter
 {
 public:
-  ItemPrivate() : RefCounter(), valid(true) {}
+  ItemPrivate() : RefCounter(), valid(true), atomDataType(TypeUndefined) {}
 
   bool valid;
+  AtomDataType atomDataType;
   union {
     bool m_bool;
     int m_int;
@@ -48,6 +49,7 @@ public:
     long long m_longlong;
   };
   StringList m_stringList;
+  ByteVectorList m_byteVectorList;
   MP4::CoverArtList m_coverArtList;
 };
 
@@ -117,6 +119,12 @@ MP4::Item::Item(int value1, int value2)
   d->m_intPair.second = value2;
 }
 
+MP4::Item::Item(const ByteVectorList &value)
+{
+  d = new ItemPrivate;
+  d->m_byteVectorList = value;
+}
+
 MP4::Item::Item(const StringList &value)
 {
   d = new ItemPrivate;
@@ -127,6 +135,16 @@ MP4::Item::Item(const MP4::CoverArtList &value)
 {
   d = new ItemPrivate;
   d->m_coverArtList = value;
+}
+
+void MP4::Item::setAtomDataType(MP4::AtomDataType type)
+{
+  d->atomDataType = type;
+}
+
+MP4::AtomDataType MP4::Item::atomDataType() const
+{
+  return d->atomDataType;
 }
 
 bool
@@ -169,6 +187,12 @@ StringList
 MP4::Item::toStringList() const
 {
   return d->m_stringList;
+}
+
+ByteVectorList
+MP4::Item::toByteVectorList() const
+{
+  return d->m_byteVectorList;
 }
 
 MP4::CoverArtList
