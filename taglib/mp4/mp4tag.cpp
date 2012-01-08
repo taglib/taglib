@@ -283,7 +283,7 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
       break;
     }
-    if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP) {
+    if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP || flags == TypeGIF) {
       value.append(MP4::CoverArt(MP4::CoverArt::Format(flags),
                                  data.mid(pos + 16, length - 16)));
     }

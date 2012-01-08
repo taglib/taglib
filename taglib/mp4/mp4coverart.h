@@ -44,7 +44,8 @@ namespace TagLib {
       enum Format {
         JPEG = TypeJPEG,
         PNG  = TypePNG,
-        BMP  = TypeBMP
+        BMP  = TypeBMP,
+        GIF  = TypeGIF
       };
 
       CoverArt(Format format, const ByteVector &data);
