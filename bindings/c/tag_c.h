@@ -63,6 +63,7 @@ extern "C" {
 typedef struct { int dummy; } TagLib_File;
 typedef struct { int dummy; } TagLib_Tag;
 typedef struct { int dummy; } TagLib_AudioProperties;
+typedef struct { int dummy; } TagLib_Mpeg_File;
 
 /*!
  * By default all strings coming into or out of TagLib's C API are in UTF8.
@@ -272,6 +273,26 @@ TAGLIB_C_EXPORT int taglib_audioproperties_samplerate(const TagLib_AudioProperti
  * Returns the number of channels in the audio stream.
  */
 TAGLIB_C_EXPORT int taglib_audioproperties_channels(const TagLib_AudioProperties *audioProperties);
+
+/******************************************************************************
+ * Mpeg File API
+ ******************************************************************************/
+
+/*!
+ * Returns the casted mpeg file pointer of this file.
+ */
+TAGLIB_C_EXPORT TagLib_Mpeg_File *taglib_mpeg_file(TagLib_File *file);
+
+/*!
+ * bool TagLib::MPEG:File::save(int tags, bool stripOthers, int id3v2Version);
+ */
+TAGLIB_C_EXPORT BOOL taglib_mpeg_file_save3(TagLib_Mpeg_File *file, int tags, BOOL stripOthers, int id3v2Version);
+
+/*!
+ * bool TagLib::MPEG:File::strip(int tags);
+ */
+TAGLIB_C_EXPORT BOOL taglib_mpeg_file_strip(TagLib_Mpeg_File *file, int tags);
+
 
 /*******************************************************************************
  * Special convenience ID3v2 functions
