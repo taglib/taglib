@@ -1,5 +1,5 @@
 /**************************************************************************
-    copyright            : (C) 2007 by Lukáš Lalinský
+    copyright            : (C) 2007,2011 by Lukáš Lalinský
     email                : lalinsky@gmail.com
  **************************************************************************/
 
@@ -68,6 +68,7 @@ namespace TagLib {
         ItemListMap &itemListMap();
 
     private:
+        AtomDataList parseData2(Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
         TagLib::ByteVectorList parseData(Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
         void parseText(Atom *atom, TagLib::File *file, int expectedFlags = 1);
         void parseFreeForm(Atom *atom, TagLib::File *file);
@@ -83,7 +84,7 @@ namespace TagLib {
         TagLib::ByteVector padIlst(const ByteVector &data, int length = -1);
         TagLib::ByteVector renderAtom(const ByteVector &name, const TagLib::ByteVector &data);
         TagLib::ByteVector renderData(const ByteVector &name, int flags, const TagLib::ByteVectorList &data);
-        TagLib::ByteVector renderText(const ByteVector &name, Item &item, int flags = 1);
+        TagLib::ByteVector renderText(const ByteVector &name, Item &item, int flags = TypeUTF8);
         TagLib::ByteVector renderFreeForm(const String &name, Item &item);
         TagLib::ByteVector renderBool(const ByteVector &name, Item &item);
         TagLib::ByteVector renderInt(const ByteVector &name, Item &item);
