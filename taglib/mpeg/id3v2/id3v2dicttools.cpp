@@ -57,7 +57,7 @@ namespace TagLib {
     /*!
      * A map of translations frameID <-> tag used by the unified dictionary interface.
      */
-    static const uint numid3frames = 54;
+    static const uint numid3frames = 55;
     static const char *id3frames[][2] = {
       // Text information frames
       { "TALB", "ALBUM"},
@@ -67,14 +67,14 @@ namespace TagLib {
       { "TCOP", "COPYRIGHT" },
       { "TDEN", "ENCODINGTIME" },
       { "TDLY", "PLAYLISTDELAY" },
-      { "TDOR", "ORIGINALRELEASETIME" },
+      { "TDOR", "ORIGINALDATE" },
       { "TDRC", "DATE" },
       // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
       // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
       // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
       // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-      { "TDRL", "RELEASETIME" },
-      { "TDTG", "TAGGINGTIME" },
+      { "TDRL", "RELEASEDATE" },
+      { "TDTG", "TAGGINGDATE" },
       { "TENC", "ENCODEDBY" },
       { "TEXT", "LYRICIST" },
       { "TFLT", "FILETYPE" },
@@ -94,9 +94,9 @@ namespace TagLib {
       { "TOPE", "ORIGINALARTIST" },
       { "TOWN", "OWNER" },
       { "TPE1", "ARTIST"},
-      { "TPE2", "PERFORMER" },
+      { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
       { "TPE3", "CONDUCTOR" },
-      { "TPE4", "ARRANGER" },
+      { "TPE4", "REMIXER" }, // could also be ARRANGER
       { "TPOS", "DISCNUMBER" },
       { "TPRO", "PRODUCEDNOTICE" },
       { "TPUB", "PUBLISHER" },
@@ -106,6 +106,7 @@ namespace TagLib {
       { "TSOA", "ALBUMSORT" },
       { "TSOP", "ARTISTSORT" },
       { "TSOT", "TITLESORT" },
+      { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
       { "TSRC", "ISRC" },
       { "TSSE", "ENCODING" },
 

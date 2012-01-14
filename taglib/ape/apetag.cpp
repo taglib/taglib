@@ -187,15 +187,17 @@ TagDict APE::Tag::toDict() const
       tagName = "TRACKNUMBER";
     else if (tagName == "YEAR")
       tagName = "DATE";
+    else if (tagName == "ALBUM ARTIST")
+      tagName = "ALBUMARTIST";
     if (it->second.type() == Item::Text)
       dict[tagName].append(it->second.toStringList());
   }
   return dict;
 }
 
-void APE::Tag::fromDict(const TagDict &orig_dict)
+void APE::Tag::fromDict(const TagDict &origDict)
 {
-  TagDict dict(orig_dict); // make a local copy that can be modified
+  TagDict dict(origDict); // make a local copy that can be modified
 
   // see comment in toDict() about TRACKNUMBER and YEAR
   if (dict.contains("TRACKNUMBER")) {

@@ -61,14 +61,14 @@ namespace TagLib {
         Mod::Tag *tag() const;
 
         /*!
-         * Implements the unified tag dictionary interface -- export function.
          * Forwards to Mod::Tag::toDict().
+         * BIC: will be removed once File::toDict() is made virtual
          */
         TagDict toDict() const;
 
         /*!
-         * Implements the unified tag dictionary interface -- import function.
          * Forwards to Mod::Tag::fromDict().
+         * BIC: will be removed once File::fromDict() is made virtual
          */
         void fromDict(const TagDict &);
 
