@@ -134,6 +134,33 @@ namespace TagLib {
       return m;
     }
 
+    // list of TXXX frame description conversions
+    static const uint txxxConversionSize = 4;
+    static const char *txxxConversionFrames[][2] = {
+      {"MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID"},
+      {"MusicBrainz Disc Id", "MUSICBRAINZ_DISCID"},
+      {"MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"},
+      {"MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID"},
+      {"MusicMagic Fingerprint", "MUSICIP_FINGERPRINT"},
+      {"MusicIP PUID", "MUSICIP_PUID"},
+      {"MusicBrainz Album Release Country", "RELEASECOUNTRY"},
+      {"MusicBrainz Album Status", "MUSICBRAINZ_ALBUMSTATUS"},
+      {"MusicBrainz Album Type", "MUSICBRAINZ_ALBUMTYPE"},
+      {"MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASE_GROUPID"},
+      {"MusicBrainz Work Id", "MUSICBRAINZ_WORKID"},
+      {"MusicBrainz Original Album Id", "MUSICBRAINZ_ORIGINALALBUMID"},
+      {"Acoustid Fingerprint", "ACOUSTID_FINGERPRINT"},
+      {"Acoustid Id", "ACOUSTID_ID"}
+    };
+
+    FrameIDMap &txxxConversionMap()
+    {
+      static FrameIDMap txxxMap;
+      if (txxxMap.isEmpty())
+        for(uint i = 0; i < txxxConversionSize; ++i)
+          txxxMap[txxxConversionFrames[i][0]] = txxxConversionFrames[i][1];
+      return txxxMap;
+    }
     String frameIDToTagName(const ByteVector &id)
     {
       Map<ByteVector, String> &m = idMap();
