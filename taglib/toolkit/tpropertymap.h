@@ -41,7 +41,7 @@ namespace TagLib {
    *
    */
 
-  class PropertyMap: public Map<String,StringList>
+  class TAGLIB_EXPORT PropertyMap: public Map<String,StringList>
   {
   public:
 
@@ -93,25 +93,38 @@ namespace TagLib {
     /*!
      * Returns a reference to the value associated with \a key.
      *
-     * \note: This has undefined behavior if the key is not valid.
+     * \note: This has undefined behavior if the key is not valid or not
+     * present in the map.
      */
     const StringList &operator[](const String &key) const;
 
     /*!
      * Returns a reference to the value associated with \a key.
      *
-     * If \a key is not present in the map, an empty list is inserted and
-     * returned.
-     *
-     * \note: This has undefined behavior if the key is not valid.
+     * \note: This has undefined behavior if the key is not valid or not
+     * present in the map.
      */
     StringList &operator[](const String &key);
+
+    /*!
+     * If a PropertyMap is read from a File object using File::properties(),
+     * the StringList returned from this function will represent metadata
+     * that could not be parsed into the PropertyMap representation. This could
+     * be e.g. binary data, unknown ID3 frames, etc.
+     * You can remove items from the returned list, which tells TagLib to remove
+     * those unsupported elements if you call File::setProperties() with the
+     * same PropertyMap as argument.
+     */
+    StringList &unsupportedData();
+
+  private:
 
     /*!
      * Converts \a proposed into another String suitable to be used as
      * a key, or returns String::null if this is not possible.
      */
     String prepareKey(const String &proposed) const;
+    StringList unsupported;
   };
 
 }

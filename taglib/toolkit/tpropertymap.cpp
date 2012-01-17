@@ -43,7 +43,11 @@ bool PropertyMap::insert(const String &key, const StringList &values)
   if (realKey.isNull())
     return false;
 
-  supertype::operator[](realKey).append(values);
+  Iterator result = supertype::find(realKey);
+  if (result == end())
+    supertype::insert(realKey, values);
+  else
+    supertype::operator[](realKey).append(values);
   return true;
 }
 
@@ -102,11 +106,12 @@ const StringList &PropertyMap::operator[](const String &key) const
 StringList &PropertyMap::operator[](const String &key)
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
-    return supertype::operator[](realKey); // invalid case
-  if (!supertype::contains(realKey))
-    supertype::insert(realKey, StringList());
   return supertype::operator[](realKey);
+}
+
+StringList &PropertyMap::unsupportedData()
+{
+  return unsupported;
 }
 
 String PropertyMap::prepareKey(const String &proposed) const {
