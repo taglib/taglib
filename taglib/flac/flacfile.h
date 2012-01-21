@@ -119,19 +119,21 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Implements the unified tag dictionary interface -- export function.
+       * Implements the unified property interface -- export function.
        * If the file contains more than one tag (e.g. XiphComment and ID3v1),
        * only the first one (in the order XiphComment, ID3v2, ID3v1) will be
-       * converted to the TagDict.
+       * converted to the PropertyMap.
        */
-      TagDict toDict() const;
+      PropertyMap properties() const;
+
+      void removeUnsupportedProperties(const StringList &);
 
       /*!
-       * Implements the unified tag dictionary interface -- import function.
+       * Implements the unified property interface -- import function.
        * As with the export, only one tag is taken into account. If the file
        * has no tag at all, a XiphComment will be created.
        */
-      void fromDict(const TagDict &);
+      PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties

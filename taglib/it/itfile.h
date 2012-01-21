@@ -61,16 +61,16 @@ namespace TagLib {
         Mod::Tag *tag() const;
 
         /*!
-         * Forwards to Mod::Tag::toDict().
+         * Forwards to Mod::Tag::properties().
          * BIC: will be removed once File::toDict() is made virtual
          */
-        TagDict toDict() const;
+        PropertyMap properties() const;
 
         /*!
-         * Forwards to Mod::Tag::fromDict().
-         * BIC: will be removed once File::fromDict() is made virtual
+         * Forwards to Mod::Tag::setProperties().
+         * BIC: will be removed once File::setProperties() is made virtual
          */
-        void fromDict(const TagDict &);
+        PropertyMap setProperties(const PropertyMap &);
 
         /*!
          * Returns the IT::Properties for this file. If no audio properties

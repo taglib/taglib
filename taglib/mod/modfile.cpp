@@ -70,14 +70,14 @@ Mod::Properties *Mod::File::audioProperties() const
   return &d->properties;
 }
 
-TagDict Mod::File::toDict() const
+PropertyMap Mod::File::properties() const
 {
-  return d->tag.toDict();
+  return d->tag.properties();
 }
 
-void Mod::File::fromDict(const TagDict &tagDict)
+PropertyMap Mod::File::setProperties(const PropertyMap &properties)
 {
-  d->tag.fromDict(tagDict);
+  return d->tag.setProperties(properties);
 }
 
 bool Mod::File::save()

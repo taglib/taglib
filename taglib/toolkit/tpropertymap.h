@@ -39,6 +39,11 @@ namespace TagLib {
    * i.e. it must contain at least one character; all printable ASCII characters
    * except '=' and '~' are allowed.
    *
+   * In order to be safe with other formats, keep these additional restrictions in mind:
+   *
+   * - APE only allows keys from 2 to 16 printable ASCII characters (including space),
+   *   with the exception of these strings: ID3, TAG, OggS, MP+
+   *
    */
 
   class TAGLIB_EXPORT PropertyMap: public Map<String,StringList>
@@ -117,13 +122,20 @@ namespace TagLib {
      */
     StringList &unsupportedData();
 
-  private:
+    /*!
+     * Removes all entries which have an empty value list.
+     */
+    void removeEmpty();
 
     /*!
      * Converts \a proposed into another String suitable to be used as
      * a key, or returns String::null if this is not possible.
      */
-    String prepareKey(const String &proposed) const;
+    static String prepareKey(const String &proposed);
+
+  private:
+
+
     StringList unsupported;
   };
 

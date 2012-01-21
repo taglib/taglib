@@ -28,16 +28,8 @@
 
 #include "taglib_export.h"
 #include "tstring.h"
-#include "tmap.h"
 
 namespace TagLib {
-
-  /*!
-   * This is used for the unified dictionary interface: the tags of a file are
-   * represented as a dictionary mapping a string (the tag name) to a list of
-   * strings (the values).
-   */
-  typedef Map<String, StringList> TagDict;
 
   //! A simple, generic interface to common audio meta data fields
 
@@ -49,6 +41,8 @@ namespace TagLib {
    * in TagLib::AudioProperties, TagLib::File and TagLib::FileRef.
    */
 
+  class PropertyMap;
+
   class TAGLIB_EXPORT Tag
   {
   public:
@@ -59,20 +53,30 @@ namespace TagLib {
     virtual ~Tag();
 
     /*!
-     * Unified tag dictionary interface -- export function. Converts the tags
-     * of the specific metadata format into a "human-readable" map of strings
-     * to lists of strings, being as precise as possible.
+     * Exports the tags of the file as dictionary mapping (human readable) tag
+     * names (Strings) to StringLists of tag values.
+     * The default implementation in this class considers only the usual built-in
+     * tags (artist, album, ...) and only one value per key.
      */
-    TagDict toDict() const;
+    PropertyMap properties() const;
 
     /*!
-     * Unified tag dictionary interface -- import function. Converts a map
-     * of strings to stringslists into the specific metadata format. Note that
-     * not all formats can store arbitrary tags and values, so data might
-     * be lost by this operation. Especially the default implementation handles
-     * only single values of the default tags specified in this class.
+     * Removes unsupported properties, or a subset of them, from the tag.
+     * The parameter \a properties must contain only entries from
+     * properties().unsupportedData().
+     * BIC: Will become virtual in future releases. Currently the non-virtual
+     * standard implementation of TagLib::Tag does nothing, since there are
+     * no unsupported elements.
      */
-    void fromDict(const TagDict &);
+    void removeUnsupportedProperties(const StringList& properties);
+
+    /*!
+     * Sets the tags of this File to those specified in \a properties. This default
+     * implementation sets only the tags for which setter methods exist in this class
+     * (artist, album, ...), and only one value per key; the rest will be contained
+     * in the returned PropertyMap.
+     */
+    PropertyMap setProperties(const PropertyMap &properties);
 
     /*!
      * Returns the track name; if no track name is present in the tag

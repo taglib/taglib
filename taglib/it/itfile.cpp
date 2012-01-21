@@ -65,14 +65,14 @@ Mod::Tag *IT::File::tag() const
   return &d->tag;
 }
 
-TagDict IT::File::toDict() const
+PropertyMap IT::File::properties() const
 {
-  return d->tag.toDict();
+  return d->tag.properties();
 }
 
-void IT::File::fromDict(const TagDict &tagDict)
+PropertyMap IT::File::setProperties(const PropertyMap &properties)
 {
-  d->tag.fromDict(tagDict);
+  return d->tag.setProperties(properties);
 }
 
 IT::Properties *IT::File::audioProperties() const

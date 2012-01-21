@@ -62,16 +62,16 @@ namespace TagLib {
       Mod::Tag *tag() const;
 
       /*!
-       * Implements the unified tag dictionary interface -- export function.
-       * Forwards to Mod::Tag::toDict().
+       * Implements the unified property interface -- export function.
+       * Forwards to Mod::Tag::properties().
        */
-      TagDict toDict() const;
+      PropertyMap properties() const;
 
       /*!
-       * Implements the unified tag dictionary interface -- import function.
-       * Forwards to Mod::Tag::fromDict().
+       * Implements the unified property interface -- import function.
+       * Forwards to Mod::Tag::setProperties().
        */
-      void fromDict(const TagDict &);
+      PropertyMap setProperties(const PropertyMap &);
       /*!
        * Returns the Mod::Properties for this file. If no audio properties
        * were read then this will return a null pointer.

@@ -113,83 +113,116 @@ FileName File::name() const
   return d->stream->name();
 }
 
-TagDict File::toDict() const
+PropertyMap File::properties() const
 {
   // ugly workaround until this method is virtual
   if (dynamic_cast<const APE::File* >(this))
-    return dynamic_cast<const APE::File* >(this)->toDict();
+    return dynamic_cast<const APE::File* >(this)->properties();
   if (dynamic_cast<const FLAC::File* >(this))
-    return dynamic_cast<const FLAC::File* >(this)->toDict();
+    return dynamic_cast<const FLAC::File* >(this)->properties();
   if (dynamic_cast<const IT::File* >(this))
-    return dynamic_cast<const IT::File* >(this)->toDict();
+    return dynamic_cast<const IT::File* >(this)->properties();
   if (dynamic_cast<const Mod::File* >(this))
-    return dynamic_cast<const Mod::File* >(this)->toDict();
+    return dynamic_cast<const Mod::File* >(this)->properties();
   if (dynamic_cast<const MPC::File* >(this))
-    return dynamic_cast<const MPC::File* >(this)->toDict();
+    return dynamic_cast<const MPC::File* >(this)->properties();
   if (dynamic_cast<const MPEG::File* >(this))
-    return dynamic_cast<const MPEG::File* >(this)->toDict();
+    return dynamic_cast<const MPEG::File* >(this)->properties();
   if (dynamic_cast<const Ogg::FLAC::File* >(this))
-    return dynamic_cast<const Ogg::FLAC::File* >(this)->toDict();
+    return dynamic_cast<const Ogg::FLAC::File* >(this)->properties();
   if (dynamic_cast<const Ogg::Speex::File* >(this))
-    return dynamic_cast<const Ogg::Speex::File* >(this)->toDict();
+    return dynamic_cast<const Ogg::Speex::File* >(this)->properties();
   if (dynamic_cast<const Ogg::Vorbis::File* >(this))
-    return dynamic_cast<const Ogg::Vorbis::File* >(this)->toDict();
+    return dynamic_cast<const Ogg::Vorbis::File* >(this)->properties();
   if (dynamic_cast<const RIFF::AIFF::File* >(this))
-    return dynamic_cast<const RIFF::AIFF::File* >(this)->toDict();
+    return dynamic_cast<const RIFF::AIFF::File* >(this)->properties();
   if (dynamic_cast<const RIFF::WAV::File* >(this))
-    return dynamic_cast<const RIFF::WAV::File* >(this)->toDict();
+    return dynamic_cast<const RIFF::WAV::File* >(this)->properties();
   if (dynamic_cast<const S3M::File* >(this))
-    return dynamic_cast<const S3M::File* >(this)->toDict();
+    return dynamic_cast<const S3M::File* >(this)->properties();
   if (dynamic_cast<const TrueAudio::File* >(this))
-    return dynamic_cast<const TrueAudio::File* >(this)->toDict();
+    return dynamic_cast<const TrueAudio::File* >(this)->properties();
   if (dynamic_cast<const WavPack::File* >(this))
-    return dynamic_cast<const WavPack::File* >(this)->toDict();
+    return dynamic_cast<const WavPack::File* >(this)->properties();
   if (dynamic_cast<const XM::File* >(this))
-    return dynamic_cast<const XM::File* >(this)->toDict();
+    return dynamic_cast<const XM::File* >(this)->properties();
   // no specialized implementation available -> use generic one
   // - ASF: ugly format, largely undocumented, not worth implementing
   //   dict interface ...
   // - MP4: taglib's MP4::Tag does not really support anything beyond
   //   the basic implementation, therefor we use just the default Tag
   //   interface
-  return tag()->toDict();
+  return tag()->properties();
 }
 
-void File::fromDict(const TagDict &dict)
+void File::removeUnsupportedProperties(const StringList &properties)
+{
+  // here we only consider those formats that could possibly contain
+  // unsupported properties
+  if (dynamic_cast<APE::File* >(this))
+    dynamic_cast<APE::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<FLAC::File* >(this))
+    dynamic_cast<FLAC::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<MPC::File* >(this))
+    dynamic_cast<MPC::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<MPEG::File* >(this))
+    dynamic_cast<MPEG::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<Ogg::FLAC::File* >(this))
+    dynamic_cast<Ogg::FLAC::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<Ogg::Speex::File* >(this))
+    dynamic_cast<Ogg::Speex::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<Ogg::Vorbis::File* >(this))
+    dynamic_cast<Ogg::Vorbis::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<RIFF::AIFF::File* >(this))
+    dynamic_cast<RIFF::AIFF::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<RIFF::WAV::File* >(this))
+    dynamic_cast<RIFF::WAV::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<S3M::File* >(this))
+    dynamic_cast<S3M::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<TrueAudio::File* >(this))
+    dynamic_cast<TrueAudio::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<WavPack::File* >(this))
+    dynamic_cast<WavPack::File* >(this)->removeUnsupportedProperties(properties);
+  else if (dynamic_cast<XM::File* >(this))
+    dynamic_cast<XM::File* >(this)->removeUnsupportedProperties(properties);
+  else
+    tag()->removeUnsupportedProperties(properties);
+}
+
+PropertyMap File::setProperties(const PropertyMap &properties)
 {
   if (dynamic_cast<APE::File* >(this))
-    dynamic_cast<APE::File* >(this)->fromDict(dict);
+    return dynamic_cast<APE::File* >(this)->setProperties(properties);
   else if (dynamic_cast<FLAC::File* >(this))
-    dynamic_cast<FLAC::File* >(this)->fromDict(dict);
+    return dynamic_cast<FLAC::File* >(this)->setProperties(properties);
   else if (dynamic_cast<IT::File* >(this))
-    dynamic_cast<IT::File* >(this)->fromDict(dict);
+    return dynamic_cast<IT::File* >(this)->setProperties(properties);
   else if (dynamic_cast<Mod::File* >(this))
-    dynamic_cast<Mod::File* >(this)->fromDict(dict);
+    return dynamic_cast<Mod::File* >(this)->setProperties(properties);
   else if (dynamic_cast<MPC::File* >(this))
-    dynamic_cast<MPC::File* >(this)->fromDict(dict);
+    return dynamic_cast<MPC::File* >(this)->setProperties(properties);
   else if (dynamic_cast<MPEG::File* >(this))
-    dynamic_cast<MPEG::File* >(this)->fromDict(dict);
+    return dynamic_cast<MPEG::File* >(this)->setProperties(properties);
   else if (dynamic_cast<Ogg::FLAC::File* >(this))
-    dynamic_cast<Ogg::FLAC::File* >(this)->fromDict(dict);
+    return dynamic_cast<Ogg::FLAC::File* >(this)->setProperties(properties);
   else if (dynamic_cast<Ogg::Speex::File* >(this))
-    dynamic_cast<Ogg::Speex::File* >(this)->fromDict(dict);
+    return dynamic_cast<Ogg::Speex::File* >(this)->setProperties(properties);
   else if (dynamic_cast<Ogg::Vorbis::File* >(this))
-    dynamic_cast<Ogg::Vorbis::File* >(this)->fromDict(dict);
+    return dynamic_cast<Ogg::Vorbis::File* >(this)->setProperties(properties);
   else if (dynamic_cast<RIFF::AIFF::File* >(this))
-    dynamic_cast<RIFF::AIFF::File* >(this)->fromDict(dict);
+    return dynamic_cast<RIFF::AIFF::File* >(this)->setProperties(properties);
   else if (dynamic_cast<RIFF::WAV::File* >(this))
-    dynamic_cast<RIFF::WAV::File* >(this)->fromDict(dict);
+    return dynamic_cast<RIFF::WAV::File* >(this)->setProperties(properties);
   else if (dynamic_cast<S3M::File* >(this))
-    dynamic_cast<S3M::File* >(this)->fromDict(dict);
+    return dynamic_cast<S3M::File* >(this)->setProperties(properties);
   else if (dynamic_cast<TrueAudio::File* >(this))
-    dynamic_cast<TrueAudio::File* >(this)->fromDict(dict);
+    return dynamic_cast<TrueAudio::File* >(this)->setProperties(properties);
   else if (dynamic_cast<WavPack::File* >(this))
-    dynamic_cast<WavPack::File* >(this)->fromDict(dict);
+    return dynamic_cast<WavPack::File* >(this)->setProperties(properties);
   else if (dynamic_cast<XM::File* >(this))
-    dynamic_cast<XM::File* >(this)->fromDict(dict);
+    return dynamic_cast<XM::File* >(this)->setProperties(properties);
   else
-    tag()->fromDict(dict);
-
+    return tag()->setProperties(properties);
 }
 
 ByteVector File::readBlock(ulong length)

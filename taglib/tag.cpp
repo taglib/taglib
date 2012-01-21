@@ -53,75 +53,101 @@ bool Tag::isEmpty() const
           track() == 0);
 }
 
-TagDict Tag::toDict() const
+PropertyMap Tag::properties() const
 {
-  TagDict dict;
-  if (!(title() == String::null))
-    dict["TITLE"].append(title());
-  if (!(artist() == String::null))
-    dict["ARTIST"].append(artist());
-  if (!(album() == String::null))
-    dict["ALBUM"].append(album());
-  if (!(comment() == String::null))
-    dict["COMMENT"].append(comment());
-  if (!(genre() == String::null))
-    dict["GENRE"].append(genre());
-  if (!(year() == 0))
-    dict["DATE"].append(String::number(year()));
-  if (!(track() == 0))
-    dict["TRACKNUMBER"].append(String::number(track()));
-  return dict;
+  PropertyMap map;
+  if(!(title().isNull()))
+    map["TITLE"].append(title());
+  if(!(artist().isNull()))
+    map["ARTIST"].append(artist());
+  if(!(album().isNull()))
+    map["ALBUM"].append(album());
+  if(!(comment().isNull()))
+    map["COMMENT"].append(comment());
+  if(!(genre().isNull()))
+    map["GENRE"].append(genre());
+  if(!(year() == 0))
+    map["DATE"].append(String::number(year()));
+  if(!(track() == 0))
+    map["TRACKNUMBER"].append(String::number(track()));
+  return map;
 }
 
-void Tag::fromDict(const TagDict &dict)
+void Tag::removeUnsupportedProperties(const StringList&)
 {
-  if (dict.contains("TITLE") && dict["TITLE"].size() >= 1)
-    setTitle(dict["TITLE"].front());
-  else
+}
+
+PropertyMap Tag::setProperties(const PropertyMap &origProps)
+{
+  PropertyMap properties(origProps);
+  properties.removeEmpty();
+  StringList oneValueSet;
+  // can this be simplified by using some preprocessor defines / function pointers?
+  if(properties.contains("TITLE")) {
+    setTitle(properties["TITLE"].front());
+    oneValueSet.append("TITLE");
+  } else
     setTitle(String::null);
 
-  if (dict.contains("ARTIST") && !dict["ARTIST"].isEmpty())
-    setArtist(dict["ARTIST"].front());
-  else
+  if(properties.contains("ARTIST")) {
+    setArtist(properties["ARTIST"].front());
+    oneValueSet.append("ARTIST");
+  } else
     setArtist(String::null);
 
-  if (dict.contains("ALBUM") && !dict["ALBUM"].isEmpty())
-      setAlbum(dict["ALBUM"].front());
-    else
-      setAlbum(String::null);
+  if(properties.contains("ALBUM")) {
+    setAlbum(properties["ALBUM"].front());
+    oneValueSet.append("ALBUM");
+  } else
+    setAlbum(String::null);
 
-  if (dict.contains("COMMENT") && !dict["COMMENT"].isEmpty())
-    setComment(dict["COMMENT"].front());
-  else
+  if(properties.contains("COMMENT")) {
+    setComment(properties["COMMENT"].front());
+    oneValueSet.append("COMMENT");
+  } else
     setComment(String::null);
 
-  if (dict.contains("GENRE") && !dict["GENRE"].isEmpty())
-    setGenre(dict["GENRE"].front());
-  else
+  if(properties.contains("GENRE")) {
+    setGenre(properties["GENRE"].front());
+    oneValueSet.append("GENRE");
+  } else
     setGenre(String::null);
 
-  if (dict.contains("DATE") && !dict["DATE"].isEmpty()) {
+  if(properties.contains("DATE")) {
     bool ok;
-    int date = dict["DATE"].front().toInt(&ok);
-    if (ok)
+    int date = properties["DATE"].front().toInt(&ok);
+    if(ok) {
       setYear(date);
-    else
+      oneValueSet.append("DATE");
+    } else
       setYear(0);
   }
   else
     setYear(0);
 
-  if (dict.contains("TRACKNUMBER") && !dict["TRACKNUMBER"].isEmpty()) {
+  if(properties.contains("TRACKNUMBER")) {
     bool ok;
-    int track = dict["TRACKNUMBER"].front().toInt(&ok);
-    if (ok)
+    int track = properties["TRACKNUMBER"].front().toInt(&ok);
+    if(ok) {
       setTrack(track);
-    else
+      oneValueSet.append("TRACKNUMBER");
+    } else
       setTrack(0);
   }
   else
     setYear(0);
+
+  // for each tag that has been set above, remove the first entry in the corresponding
+  // value list. The others will be returned as unsupported by this format.
+  for(StringList::Iterator it = oneValueSet.begin(); it != oneValueSet.end(); ++it) {
+    if(properties[*it].size() == 1)
+      properties.erase(*it);
+    else
+      properties[*it].erase( properties[*it].begin() );
+  }
+  return properties;
 }
+
 void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
 {
   if(overwrite) {

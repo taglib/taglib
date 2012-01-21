@@ -40,11 +40,11 @@ PropertyMap::~PropertyMap()
 bool PropertyMap::insert(const String &key, const StringList &values)
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
+  if(realKey.isNull())
     return false;
 
   Iterator result = supertype::find(realKey);
-  if (result == end())
+  if(result == end())
     supertype::insert(realKey, values);
   else
     supertype::operator[](realKey).append(values);
@@ -54,7 +54,7 @@ bool PropertyMap::insert(const String &key, const StringList &values)
 bool PropertyMap::replace(const String &key, const StringList &values)
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
+  if(realKey.isNull())
     return false;
   supertype::erase(realKey);
   supertype::insert(realKey, values);
@@ -64,7 +64,7 @@ bool PropertyMap::replace(const String &key, const StringList &values)
 PropertyMap::Iterator PropertyMap::find(const String &key)
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
+  if(realKey.isNull())
     return end();
   return supertype::find(realKey);
 }
@@ -72,7 +72,7 @@ PropertyMap::Iterator PropertyMap::find(const String &key)
 PropertyMap::ConstIterator PropertyMap::find(const String &key) const
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
+  if(realKey.isNull())
     return end();
   return supertype::find(realKey);
 }
@@ -80,7 +80,8 @@ PropertyMap::ConstIterator PropertyMap::find(const String &key) const
 bool PropertyMap::contains(const String &key) const
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
+  // we consider keys with empty value list as not present
+  if(realKey.isNull() || supertype::operator[](realKey).isEmpty())
     return false;
   return supertype::contains(realKey);
 }
@@ -109,13 +110,23 @@ StringList &PropertyMap::operator[](const String &key)
   return supertype::operator[](realKey);
 }
 
+void PropertyMap::removeEmpty()
+{
+  StringList emptyKeys;
+  for(Iterator it = begin(); it != end(); ++it)
+    if(it->second.isEmpty())
+      emptyKeys.append(it->first);
+  for(StringList::Iterator emptyIt = emptyKeys.begin(); emptyIt != emptyKeys.end(); emptyIt++ )
+    erase(*emptyIt);
+}
+
 StringList &PropertyMap::unsupportedData()
 {
   return unsupported;
 }
 
-String PropertyMap::prepareKey(const String &proposed) const {
-  if (proposed.isEmpty())
+static String PropertyMap::prepareKey(const String &proposed) {
+  if(proposed.isEmpty())
     return String::null;
   for (String::ConstIterator it = proposed.begin(); it != proposed.end(); it++)
     // forbid non-printable, non-ascii, '=' (#61) and '~' (#126)

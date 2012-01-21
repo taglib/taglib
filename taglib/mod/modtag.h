@@ -160,19 +160,20 @@ namespace TagLib {
       void setTrackerName(const String &trackerName);
 
       /*!
-       * Implements the unified tag dictionary interface -- export function.
-       * Since the module tag is very limited, the exported dict is as well.
+       * Implements the unified property interface -- export function.
+       * Since the module tag is very limited, the exported map is as well.
        */
-      TagDict toDict() const;
+      PropertyMap properties() const;
 
       /*!
-       * Implements the unified tag dictionary interface -- import function.
+       * Implements the unified property interface -- import function.
        * Because of the limitations of the module file tag, any tags besides
        * COMMENT, TITLE and, if it is an XM file, TRACKERNAME, will be
-       * ignored. Additionally, if the dict contains tags with multiple values,
-       * all but the first will be ignored.
+       * returened. Additionally, if the map contains tags with multiple values,
+       * all but the first will be contained in the returned map of unsupported
+       * properties.
        */
-      void fromDict(const TagDict &);
+      PropertyMap setProperties(const PropertyMap &);
 
     private:
       Tag(const Tag &);
