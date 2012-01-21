@@ -238,6 +238,28 @@ void UserTextIdentificationFrame::setDescription(const String &s)
   TextIdentificationFrame::setText(l);
 }
 
+PropertyMap UserTextIdentificationFrame::asProperties() const
+{
+  String tagName = description();
+  StringList l(fieldList());
+  // this is done because taglib stores the description also as first entry
+  // in the field list. (why?)
+  StringList::Iterator tagIt = l.find(tagName);
+  if(tagIt != l.end())
+     l.erase(tagIt);
+  // Quodlibet/Exfalso use QuodLibet::<tagname> if you set an arbitrary ID3
+  // tag.
+  int pos = tagName.find("::");
+  tagName = (pos != -1) ? tagName.substr(pos+2).upper() : tagName.upper();
+  PropertyMap map;
+  String key = map.prepareKey(tagName);
+  if(key.isNull()) // this frame's description is not a valid PropertyMap key -> add to unsupported list
+    map.unsupportedData().append("TXXX/" + description());
+  else
+    map.insert(key, l);
+  return map;
+}
+
 UserTextIdentificationFrame *UserTextIdentificationFrame::find(
   ID3v2::Tag *tag, const String &description) // static
 {

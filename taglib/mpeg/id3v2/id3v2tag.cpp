@@ -31,16 +31,8 @@
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
-#include "id3v2dicttools.h"
 #include "tbytevector.h"
 #include "id3v1genres.h"
-
-#include "frames/textidentificationframe.h"
-#include "frames/commentsframe.h"
-#include "frames/urllinkframe.h"
-#include "frames/uniquefileidentifierframe.h"
-#include "frames/unsynchronizedlyricsframe.h"
-#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -334,25 +326,19 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
     removeFrame(*it, true);
 }
 
-TagDict ID3v2::Tag::toDict(StringList *ignoreInfo) const
+PropertyMap ID3v2::Tag::properties() const
 {
-  TagDict dict;
-  FrameList::ConstIterator frameIt = frameList().begin();
-  for (; frameIt != frameList().end(); ++frameIt) {
-    ByteVector id = (*frameIt)->frameID();
-
+  PropertyMap properties;
+  for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
+    ByteVector id = (*it)->frameID();
     if (ignored(id)) {
       debug("toDict() found ignored id3 frame: " + id);
-      if (ignoreInfo)
-    	ignoreInfo->append(String(id) + " frame is not supported");
     } else if (deprecated(id)) {
       debug("toDict() found deprecated id3 frame: " + id);
-      if (ignoreInfo)
-        ignoreInfo->append(String(id) + " frame is deprecated");
     } else {
         // in the future, something like dict[frame->tagName()].append(frame->values())
         // might replace the following lines.
-        KeyValuePair kvp = parseFrame(*frameIt);
+        KeyValuePair kvp = parseFrame(*it);
         dict[kvp.first].append(kvp.second);
     }
   }

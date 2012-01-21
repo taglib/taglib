@@ -261,22 +261,26 @@ namespace TagLib {
       void removeFrames(const ByteVector &id);
 
       /*!
-       * Implements the unified tag dictionary interface -- export function.
+       * Implements the unified property interface -- export function.
        * This function does some work to translate the hard-specified ID3v2
-       * frame types into a free-form string-to-stringlist dictionary.
+       * frame types into a free-form string-to-stringlist PropertyMap.
        *
-       * If the optional pointer to a StringList is given, that list will
-       * be filled with a descriptive text for each ID3v2 frame that could
-       * not be incorporated into the dict interface (binary data, unsupported
-       * frames, ...).
        */
-      TagDict toDict(StringList *ignoredInfo = 0) const;
+      PropertyMap properties() const;
 
       /*!
-       * Implements the unified tag dictionary interface -- import function.
-       * See the comments in toDict().
+       * Removes unsupported frames given by \a properties. The elements of
+       * \a properties must be taken from properties().unsupportedData() and
+       * are the four-byte frame IDs of ID3 frames which are not compatible
+       * with the PropertyMap schema.
        */
-      void fromDict(const TagDict &);
+      void removeUnsupportedProperties(const StringList &properties);
+
+      /*!
+       * Implements the unified property interface -- import function.
+       * See the comments in properties().
+       */
+      PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.

@@ -23,13 +23,12 @@
 
 using namespace TagLib;
 
-typedef Map<String,StringList> supertype;
 
-PropertyMap::PropertyMap() : Map<String,StringList>()
+PropertyMap::PropertyMap() : SimplePropertyMap()
 {
 }
 
-PropertyMap::PropertyMap(const PropertyMap &m) : Map<String,StringList>(m)
+PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m)
 {
 }
 
@@ -43,11 +42,11 @@ bool PropertyMap::insert(const String &key, const StringList &values)
   if(realKey.isNull())
     return false;
 
-  Iterator result = supertype::find(realKey);
+  Iterator result = SimplePropertyMap::find(realKey);
   if(result == end())
-    supertype::insert(realKey, values);
+    SimplePropertyMap::insert(realKey, values);
   else
-    supertype::operator[](realKey).append(values);
+    SimplePropertyMap::operator[](realKey).append(values);
   return true;
 }
 
@@ -56,8 +55,8 @@ bool PropertyMap::replace(const String &key, const StringList &values)
   String realKey = prepareKey(key);
   if(realKey.isNull())
     return false;
-  supertype::erase(realKey);
-  supertype::insert(realKey, values);
+  SimplePropertyMap::erase(realKey);
+  SimplePropertyMap::insert(realKey, values);
   return true;
 }
 
@@ -66,7 +65,7 @@ PropertyMap::Iterator PropertyMap::find(const String &key)
   String realKey = prepareKey(key);
   if(realKey.isNull())
     return end();
-  return supertype::find(realKey);
+  return SimplePropertyMap::find(realKey);
 }
 
 PropertyMap::ConstIterator PropertyMap::find(const String &key) const
@@ -74,40 +73,46 @@ PropertyMap::ConstIterator PropertyMap::find(const String &key) const
   String realKey = prepareKey(key);
   if(realKey.isNull())
     return end();
-  return supertype::find(realKey);
+  return SimplePropertyMap::find(realKey);
 }
 
 bool PropertyMap::contains(const String &key) const
 {
   String realKey = prepareKey(key);
   // we consider keys with empty value list as not present
-  if(realKey.isNull() || supertype::operator[](realKey).isEmpty())
+  if(realKey.isNull() || SimplePropertyMap::operator[](realKey).isEmpty())
     return false;
-  return supertype::contains(realKey);
+  return SimplePropertyMap::contains(realKey);
 }
 
-/*!
- * Erase the \a key and its values from the map.
- */
 PropertyMap &PropertyMap::erase(const String &key)
 {
   String realKey = prepareKey(key);
-  if (realKey.isNull())
+  if(realKey.isNull())
     return *this;
-  supertype::erase(realKey);
+  SimplePropertyMap::erase(realKey);
+  return *this;
+}
+
+PropertyMap &PropertyMap::merge(const PropertyMap &other)
+{
+  for(PropertyMap::ConstIterator it = other.begin(); it != other.end(); ++it) {
+    insert(it->first, it->second);
+  }
+  unsupported.append(other.unsupported);
   return *this;
 }
 
 const StringList &PropertyMap::operator[](const String &key) const
 {
   String realKey = prepareKey(key);
-  return supertype::operator[](realKey);
+  return SimplePropertyMap::operator[](realKey);
 }
 
 StringList &PropertyMap::operator[](const String &key)
 {
   String realKey = prepareKey(key);
-  return supertype::operator[](realKey);
+  return SimplePropertyMap::operator[](realKey);
 }
 
 void PropertyMap::removeEmpty()
@@ -121,6 +126,11 @@ void PropertyMap::removeEmpty()
 }
 
 StringList &PropertyMap::unsupportedData()
+{
+  return unsupported;
+}
+
+const StringList &PropertyMap::unsupportedData() const
 {
   return unsupported;
 }

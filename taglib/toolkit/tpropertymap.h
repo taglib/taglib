@@ -27,6 +27,7 @@
 
 namespace TagLib {
 
+  typedef Map<String,StringList> SimplePropertyMap;
 
   //! A map for format-independent <key,valuelist> tag representations.
 
@@ -46,12 +47,12 @@ namespace TagLib {
    *
    */
 
-  class TAGLIB_EXPORT PropertyMap: public Map<String,StringList>
+  class TAGLIB_EXPORT PropertyMap: public SimplePropertyMap
   {
   public:
 
-    typedef Map<String,StringList>::Iterator Iterator;
-    typedef Map<String,StringList>::ConstIterator ConstIterator;
+    typedef SimplePropertyMap::Iterator Iterator;
+    typedef SimplePropertyMap::ConstIterator ConstIterator;
 
     PropertyMap();
 
@@ -96,6 +97,14 @@ namespace TagLib {
     PropertyMap &erase(const String &key);
 
     /*!
+     * Merge the contents of \a other into this PropertyMap.
+     * If a key is contained in both maps, the values of the second
+     * are appended to that of the first.
+     * The unsupportedData() lists are concatenated as well.
+     */
+    PropertyMap &merge(const PropertyMap &other);
+
+    /*!
      * Returns a reference to the value associated with \a key.
      *
      * \note: This has undefined behavior if the key is not valid or not
@@ -121,6 +130,7 @@ namespace TagLib {
      * same PropertyMap as argument.
      */
     StringList &unsupportedData();
+    const StringList &unsupportedData() const;
 
     /*!
      * Removes all entries which have an empty value list.

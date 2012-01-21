@@ -237,6 +237,11 @@ namespace TagLib {
       void setText(const StringList &fields);
 
       /*!
+       * Reimplement function.
+       */
+      PropertyMap asProperties() const;
+
+      /*!
        * Searches for the user defined text frame with the description \a description
        * in \a tag.  This returns null if no matching frames were found.
        */

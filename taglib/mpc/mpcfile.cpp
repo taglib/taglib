@@ -113,26 +113,33 @@ TagLib::Tag *MPC::File::tag() const
   return &d->tag;
 }
 
-TagLib::TagDict MPC::File::toDict(void) const
+PropertyMap MPC::File::properties() const
 {
-  // once Tag::toDict() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if (d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->toDict();
-  if (d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->toDict();
-  return TagLib::TagDict();
+  if(d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
+  if(d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+  return PropertyMap();
 }
 
-void MPC::File::fromDict(const TagDict &dict)
+void MPC::File::removeUnsupportedProperties(const StringList &properties)
 {
-  if (d->hasAPE)
-    d->tag.access<APE::Tag>(APEIndex, false)->fromDict(dict);
-  else if (d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->fromDict(dict);
-  else
-    d->tag.access<APE::Tag>(APEIndex, true)->fromDict(dict);
+  if(d->hasAPE)
+    d->tag.access<APE::Tag>(APEIndex, false)->removeUnsupportedProperties(properties);
+  if(d->hasID3v1)
+    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(properties);
 }
+
+PropertyMap MPC::File::setProperties(const PropertyMap &properties)
+{
+  if(d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
+  else if(d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+  else
+    return d->tag.access<APE::Tag>(APE, true)->setProperties(properties);
+}
+
 
 MPC::Properties *MPC::File::audioProperties() const
 {

@@ -262,6 +262,142 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
+static const uint frameTranslationSize = 55;
+static const char *frameTranslation[][2] = {
+  // Text information frames
+  { "TALB", "ALBUM"},
+  { "TBPM", "BPM" },
+  { "TCOM", "COMPOSER" },
+  { "TCON", "GENRE" },
+  { "TCOP", "COPYRIGHT" },
+  { "TDEN", "ENCODINGTIME" },
+  { "TDLY", "PLAYLISTDELAY" },
+  { "TDOR", "ORIGINALDATE" },
+  { "TDRC", "DATE" },
+  // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  { "TDRL", "RELEASEDATE" },
+  { "TDTG", "TAGGINGDATE" },
+  { "TENC", "ENCODEDBY" },
+  { "TEXT", "LYRICIST" },
+  { "TFLT", "FILETYPE" },
+  { "TIPL", "INVOLVEDPEOPLE" },
+  { "TIT1", "CONTENTGROUP" },
+  { "TIT2", "TITLE"},
+  { "TIT3", "SUBTITLE" },
+  { "TKEY", "INITIALKEY" },
+  { "TLAN", "LANGUAGE" },
+  { "TLEN", "LENGTH" },
+  { "TMCL", "MUSICIANCREDITS" },
+  { "TMED", "MEDIATYPE" },
+  { "TMOO", "MOOD" },
+  { "TOAL", "ORIGINALALBUM" },
+  { "TOFN", "ORIGINALFILENAME" },
+  { "TOLY", "ORIGINALLYRICIST" },
+  { "TOPE", "ORIGINALARTIST" },
+  { "TOWN", "OWNER" },
+  { "TPE1", "ARTIST"},
+  { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
+  { "TPE3", "CONDUCTOR" },
+  { "TPE4", "REMIXER" }, // could also be ARRANGER
+  { "TPOS", "DISCNUMBER" },
+  { "TPRO", "PRODUCEDNOTICE" },
+  { "TPUB", "PUBLISHER" },
+  { "TRCK", "TRACKNUMBER" },
+  { "TRSN", "RADIOSTATION" },
+  { "TRSO", "RADIOSTATIONOWNER" },
+  { "TSOA", "ALBUMSORT" },
+  { "TSOP", "ARTISTSORT" },
+  { "TSOT", "TITLESORT" },
+  { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
+  { "TSRC", "ISRC" },
+  { "TSSE", "ENCODING" },
+  // URL frames
+  { "WCOP", "COPYRIGHTURL" },
+  { "WOAF", "FILEWEBPAGE" },
+  { "WOAR", "ARTISTWEBPAGE" },
+  { "WOAS", "AUDIOSOURCEWEBPAGE" },
+  { "WORS", "RADIOSTATIONWEBPAGE" },
+  { "WPAY", "PAYMENTWEBPAGE" },
+  { "WPUB", "PUBLISHERWEBPAGE" },
+  { "WXXX", "URL"},
+  // Other frames
+  { "COMM", "COMMENT" },
+  { "USLT", "LYRICS" },
+};
+
+Map<ByteVector, String> &idMap()
+{
+  static Map<ByteVector, String> m;
+    if(m.isEmpty())
+      for(size_t i = 0; i < frameTranslationSize; ++i)
+        m[frameTranslation[i][0]] = frameTranslation[i][1];
+  return m;
+}
+
+// list of deprecated frames and their successors
+static const uint deprecatedFramesSize = 4;
+static const char *deprecatedFrames[][2] = {
+  {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+  {"TDAT", "TDRC"}, // 2.3 -> 2.4
+  {"TYER", "TDRC"}, // 2.3 -> 2.4
+  {"TIME", "TDRC"}, // 2.3 -> 2.4
+};
+
+FrameIDMap &deprecationMap()
+{
+  static FrameIDMap depMap;
+  if(depMap.isEmpty())
+    for(uint i = 0; i < deprecatedFramesSize; ++i)
+      depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
+  return depMap;
+}
+
+String Frame::frameIDToKey(const ByteVector &id)
+{
+  Map<ByteVector, String> &m = idMap();
+  if(m.contains(id))
+    return m[id];
+  if(deprecationMap().contains(id))
+    return m[deprecationMap()[id]];
+  return String::null;
+}
+
+ByteVector Frame::keyToFrameID(const String &s)
+{
+  static Map<String, ByteVector> m;
+  if(m.isEmpty())
+    for(size_t i = 0; i < frameTranslationSize; ++i)
+      m[frameTranslation[i][1]] = frameTranslation[i][0];
+  if(m.contains(s.upper()))
+    return m[s];
+  return ByteVector::null;
+}
+
+PropertyMap Frame::asProperties() const
+{
+  const ByteVector &id = frameID();
+  // workaround until this function is virtual
+  if(id == "TXXX")
+    return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
+  else if(id[0] == 'T')
+    return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
+  else if(id == "WXXX")
+    return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
+  else if(id[0] == 'W')
+    return dynamic_cast< const UrlLinkFrame* >(this)->asProperties();
+  else if(id == "COMM")
+    return dynamic_cast< const CommentsFrame* >(this)->asProperties();
+  else if(id == "USLT")
+    return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
+  else {
+    PropertyMap m;
+    m.unsupportedData().append(id);
+    return m;
+  }
+}
 ////////////////////////////////////////////////////////////////////////////////
 // Frame::Header class
 ////////////////////////////////////////////////////////////////////////////////

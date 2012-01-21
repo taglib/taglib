@@ -222,6 +222,27 @@ namespace TagLib {
       String::Type checkTextEncoding(const StringList &fields,
                                      String::Type encoding) const;
 
+
+      /*!
+       * Parses the contents of this frame as PropertyMap. If that fails, the returend
+       * PropertyMap will be empty, and its unsupportedData() will contain this frame's
+       * ID.
+       * BIC: Will be a virtual function in future releases.
+       */
+      PropertyMap asProperties() const;
+
+      /*!
+       * Returns an appropriate ID3 frame ID for the given free-form tag key. This method
+       * will return ByteVector::null if no specialized translation is found.
+       */
+      static ByteVector keyToFrameID(const String &);
+
+      /*!
+       * Returns a free-form tag name for the given ID3 frame ID. Note that this does not work
+       * for general frame IDs such as TXXX or WXXX; in such a case String::null is returned.
+       */
+      static String frameIDToKey(const ByteVector &);
+
     private:
       Frame(const Frame &);
       Frame &operator=(const Frame &);

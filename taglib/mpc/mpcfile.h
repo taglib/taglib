@@ -109,18 +109,20 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Implements the unified tag dictionary interface -- export function.
+       * Implements the unified property interface -- export function.
        * If the file contains both an APE and an ID3v1 tag, only the APE
-       * tag  will be converted to the TagDict.
+       * tag  will be converted to the PropertyMap.
        */
-      TagDict toDict() const;
+      PropertyMap properties() const;
+
+      void removeUnsupportedProperties(const StringList &properties);
 
       /*!
-       * Implements the unified tag dictionary interface -- import function.
+       * Implements the unified property interface -- import function.
        * As with the export, only one tag is taken into account. If the file
-       * has no tag at all, APE will be created.
+       * has no tag at all, an APE tag will be created.
        */
-      void fromDict(const TagDict &);
+      PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Returns the MPC::Properties for this file.  If no audio properties
