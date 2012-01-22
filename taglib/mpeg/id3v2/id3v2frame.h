@@ -33,6 +33,7 @@
 namespace TagLib {
 
   class StringList;
+  class PropertyMap;
 
   namespace ID3v2 {
 

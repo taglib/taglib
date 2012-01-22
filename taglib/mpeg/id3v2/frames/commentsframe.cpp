@@ -109,6 +109,19 @@ void CommentsFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
+PropertyMap CommentsFrame::asDescription() const
+{
+  String key = PropertyMap::prepareKey(description());
+  PropertyMap map;
+  if(key.isEmpty())
+    key = "COMMENT";
+  if(key.isNull())
+    map.unsupportedData().append(L"COMM/" + description());
+  else
+    map.insert(key, text());
+  return map;
+}
+
 CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
   ID3v2::FrameList comments = tag->frameList("COMM");

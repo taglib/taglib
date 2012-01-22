@@ -38,6 +38,7 @@
 
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -262,7 +263,7 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
-static const uint frameTranslationSize = 55;
+static const uint frameTranslationSize = 53;
 static const char *frameTranslation[][2] = {
   // Text information frames
   { "TALB", "ALBUM"},
@@ -283,14 +284,14 @@ static const char *frameTranslation[][2] = {
   { "TENC", "ENCODEDBY" },
   { "TEXT", "LYRICIST" },
   { "TFLT", "FILETYPE" },
-  { "TIPL", "INVOLVEDPEOPLE" },
+  //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
   { "TIT1", "CONTENTGROUP" },
   { "TIT2", "TITLE"},
   { "TIT3", "SUBTITLE" },
   { "TKEY", "INITIALKEY" },
   { "TLAN", "LANGUAGE" },
   { "TLEN", "LENGTH" },
-  { "TMCL", "MUSICIANCREDITS" },
+  //{ "TMCL", "MUSICIANCREDITS" }, handled separately
   { "TMED", "MEDIATYPE" },
   { "TMOO", "MOOD" },
   { "TOAL", "ORIGINALALBUM" },

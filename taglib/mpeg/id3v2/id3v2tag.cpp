@@ -33,6 +33,14 @@
 #include "id3v2synchdata.h"
 #include "tbytevector.h"
 #include "id3v1genres.h"
+#include "tpropertymap.h"
+
+#include "frames/textidentificationframe.h"
+#include "frames/commentsframe.h"
+#include "frames/urllinkframe.h"
+#include "frames/uniquefileidentifierframe.h"
+#include "frames/unsynchronizedlyricsframe.h"
+#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -329,23 +337,12 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-  for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
-    ByteVector id = (*it)->frameID();
-    if (ignored(id)) {
-      debug("toDict() found ignored id3 frame: " + id);
-    } else if (deprecated(id)) {
-      debug("toDict() found deprecated id3 frame: " + id);
-    } else {
-        // in the future, something like dict[frame->tagName()].append(frame->values())
-        // might replace the following lines.
-        KeyValuePair kvp = parseFrame(*it);
-        dict[kvp.first].append(kvp.second);
-    }
-  }
-  return dict;
+  for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it)
+    properties.merge((*it)->asProperties());
+  return properties;
 }
 
-void ID3v2::Tag::fromDict(const TagDict &dict)
+PropertyMap ID3v2::Tag::setProperties(const PropertyMap &properties)
 {
   FrameList toRemove;
   // first find out what frames to remove; we do not remove in-place

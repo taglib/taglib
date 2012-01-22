@@ -92,6 +92,40 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
+PropertyMap TextIdentificationFrame::asProperties() const
+{
+  if(frameID() == "TIPL")
+    return makeTIPLProperties();
+  if(frameID() == "TMCL")
+    return makeTMCLProperties();
+  PropertyMap map;
+  String tagName = frameIDToTagName(frameID());
+  if(tagName.isNull()) {
+    map.unsupportedData().append(frameID());
+    return map;
+  }
+  StringList values = fieldList();
+  if(tagName == "GENRE") {
+    // Special case: Support ID3v1-style genre numbers. They are not officially supported in
+    // ID3v2, however it seems that still a lot of programs use them.
+    for(StringList::Iterator it = values.begin(); it != values.end(); ++it) {
+      bool ok = false;
+      int test = it->toInt(&ok); // test if the genre value is an integer
+      if(ok)
+        *it = ID3v1::genre(test);
+    }
+  } else if(tagName == "DATE") {
+    for (StringList::Iterator it = values.begin(); it != values.end(); ++it) {
+      // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
+      // Since this is unusual in other formats, the T is removed.
+      int tpos = it->find("T");
+      if (tpos != -1)
+        (*it)[tpos] = ' ';
+    }
+  }
+  return KeyValuePair(tagName, values);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // TextIdentificationFrame protected members
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,6 +204,63 @@ TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data, Header 
   parseFields(fieldData(data));
 }
 
+// array of allowed TIPL prefixes and their corresponding key value
+static const uint involvedPeopleSize = 5;
+static const char* involvedPeople[2] = {
+    {"ARRANGER", "ARRANGER"},
+    {"ENGINEER", "ENGINEER"},
+    {"PRODUCER", "PRODUCER"},
+    {"DJ-MIX", "DJMIXER"},
+    {"MIX", "MIXER"}
+};
+
+PropertyMap TextIdentificationFrame::makeTIPLProperties() const
+{
+  PropertyMap map;
+  if(fieldList().size() % 2 != 0){
+    // according to the ID3 spec, TIPL must contain an even number of entries
+    map.unsupportedData().append(frameID());
+    return map;
+  }
+  for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it) {
+    bool found = false;
+    for(uint i = 0; i < involvedPeopleSize; ++i)
+      if(*it == involvedPeople[i][0]) {
+        map.insert(involvedPeople[i][1], (++it).split(","));
+        found = true;
+        break;
+      }
+    if(!found){
+      // invalid involved role -> mark whole frame as unsupported in order to be consisten with writing
+      map.clear();
+      map.unsupportedData().append(frameID());
+      return map;
+    }
+  }
+  return map;
+}
+
+PropertyMap TextIdentificationFrame::makeTMCLProperties() const
+{
+  PropertyMap map;
+  if(fieldList().size() % 2 != 0){
+    // according to the ID3 spec, TMCL must contain an even number of entries
+    map.unsupportedData().append(frameID());
+    return map;
+  }
+  for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it) {
+    String key = PropertyMap::prepareKey(*it);
+    if(key.isNull()) {
+      // instrument is not a valid key -> frame unsupported
+      map.clear();
+      map.unsupportedData().append(frameID());
+      return map;
+    }
+    map.insert(key, (++it).split(","));
+  }
+  return map;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // UserTextIdentificationFrame public members
 ////////////////////////////////////////////////////////////////////////////////
@@ -241,22 +332,17 @@ void UserTextIdentificationFrame::setDescription(const String &s)
 PropertyMap UserTextIdentificationFrame::asProperties() const
 {
   String tagName = description();
-  StringList l(fieldList());
-  // this is done because taglib stores the description also as first entry
-  // in the field list. (why?)
-  StringList::Iterator tagIt = l.find(tagName);
-  if(tagIt != l.end())
-     l.erase(tagIt);
-  // Quodlibet/Exfalso use QuodLibet::<tagname> if you set an arbitrary ID3
-  // tag.
+  // Quodlibet/Exfalso use QuodLibet::<tagname> if you set an arbitrary ID3 tag.
   int pos = tagName.find("::");
   tagName = (pos != -1) ? tagName.substr(pos+2).upper() : tagName.upper();
   PropertyMap map;
   String key = map.prepareKey(tagName);
   if(key.isNull()) // this frame's description is not a valid PropertyMap key -> add to unsupported list
-    map.unsupportedData().append("TXXX/" + description());
+    map.unsupportedData().append(L"TXXX/" + description());
   else
-    map.insert(key, l);
+    for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it)
+      if(*it != description())
+        map.insert(key, *it);
   return map;
 }
 

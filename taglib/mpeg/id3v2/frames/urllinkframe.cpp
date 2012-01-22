@@ -78,6 +78,18 @@ String UrlLinkFrame::toString() const
   return url();
 }
 
+PropertyMap UrlLinkFrame::asProperties() const
+{
+  String key = frameIDToKey(frameID());
+  PropertyMap map;
+  if(key.isNull())
+    // unknown W*** frame - this normally shouldn't happen
+    map.unsupportedData().append(frameID());
+  else
+    map.insert(key, url());
+  return map;
+}
+
 void UrlLinkFrame::parseFields(const ByteVector &data)
 {
   d->url = String(data);
@@ -137,6 +149,19 @@ String UserUrlLinkFrame::description() const
 void UserUrlLinkFrame::setDescription(const String &s)
 {
   d->description = s;
+}
+
+PropertyMap UserUrlLinkFrame::asProperties() const
+{
+  String key = PropertyMap::prepareKey(description());
+  PropertyMap map;
+  if(key.isEmpty())
+     key = "URL";
+  if(key.isNull())
+    map.unsupportedData().append(L"WXXX/" + description());
+  else
+    map.insert(key, url());
+  return map;
 }
 
 void UserUrlLinkFrame::parseFields(const ByteVector &data)

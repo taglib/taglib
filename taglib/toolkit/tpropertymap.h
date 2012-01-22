@@ -35,7 +35,7 @@ namespace TagLib {
    * This map implements a generic representation of textual audio metadata
    * ("tags") realized as pairs of a case-insensitive key
    * and a nonempty list of corresponding values, each value being an an arbitrary
-   * Unicode String.
+   * unicode String.
    * The key has the same restrictions as in the vorbis comment specification,
    * i.e. it must contain at least one character; all printable ASCII characters
    * except '=' and '~' are allowed.

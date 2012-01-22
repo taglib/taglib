@@ -173,6 +173,8 @@ namespace TagLib {
        */
       StringList fieldList() const;
 
+      PropertyMap asProperties() const;
+
     protected:
       // Reimplementations.
 
@@ -188,6 +190,16 @@ namespace TagLib {
       TextIdentificationFrame(const TextIdentificationFrame &);
       TextIdentificationFrame &operator=(const TextIdentificationFrame &);
 
+      /*!
+       * Parses the special structure of a TIPL frame
+       * Only the whitelisted roles "ARRANGER", "ENGINEER", "PRODUCER",
+       * "DJMIXER" (ID3: "DJ-MIX") and "MIXER" (ID3: "MIX") are allowed.
+       */
+      PropertyMap makeTIPLProperties() const;
+      /*!
+       * Parses the special structure of a TMCL frame.
+       */
+      PropertyMap makeTMCLProperties() const;
       class TextIdentificationFramePrivate;
       TextIdentificationFramePrivate *d;
     };
@@ -237,7 +249,17 @@ namespace TagLib {
       void setText(const StringList &fields);
 
       /*!
-       * Reimplement function.
+       * A UserTextIdentificationFrame is parsed into a PropertyMap as follows:
+       * - the key is the frame's description, uppercased
+       * - if the description contains '::', only the substring after that
+       *   separator is considered as key (compatibility with exfalso)
+       * - if the above rules don't yield a valid key (e.g. containing non-ASCII
+       *   characters), the returned map will contain an entry "TXXX/<description>"
+       *   in its unsupportedData() list.
+       * - The values will be copies of the fieldList().
+       * - If the description() appears as value in fieldList(), it will be omitted
+       *   in the value list, in order to be compatible with TagLib which copies
+       *   the description() into the fieldList().
        */
       PropertyMap asProperties() const;
 

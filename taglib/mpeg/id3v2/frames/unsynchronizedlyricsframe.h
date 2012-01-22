@@ -134,6 +134,13 @@ namespace TagLib {
        */
       void setTextEncoding(String::Type encoding);
 
+
+      /*!
+       * Parses this frame as PropertyMap. The returned map will contain a single key
+       * "LYRICS" with the text() as single value.
+       */
+      PropertyMap asProperties() const;
+
     protected:
       // Reimplementations.
 

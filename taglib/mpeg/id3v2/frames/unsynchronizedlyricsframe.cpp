@@ -111,6 +111,13 @@ void UnsynchronizedLyricsFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
+PropertyMap UnsynchronizedLyricsFrame::asProperties() const
+{
+  PropertyMap map;
+  map.insert("LYRICS", text());
+  return map;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

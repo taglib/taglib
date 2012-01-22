@@ -171,21 +171,6 @@ void TagUnion::setTrack(uint i)
 {
   setUnion(Track, i);
 }
-TagDict TagUnion::toDict() const
-{
-  for (int i = 0; i < 3; ++i)
-    if (d->tags[i])
-      return d->tags[i]->toDict();
-  TagDict dict;
-  return dict;
-}
-
-void TagUnion::fromDict(const TagDict &dict)
-{
-  for (int i = 0; i < 3; ++i)
-    if (d->tags[i])
-      d->tags[i]->fromDict(dict);
-}
 
 bool TagUnion::isEmpty() const
 {

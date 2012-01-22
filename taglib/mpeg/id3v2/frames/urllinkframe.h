@@ -68,6 +68,7 @@ namespace TagLib {
 
       virtual void setText(const String &s);
       virtual String toString() const;
+      PropertyMap asProperties() const;
 
     protected:
       virtual void parseFields(const ByteVector &data);
@@ -149,6 +150,16 @@ namespace TagLib {
        * Sets the description of the frame to \a s.  \a s must be unique.
        */
       void setDescription(const String &s);
+
+      /*!
+       * Parses the UserUrlLinkFrame as PropertyMap. The description() is taken as key,
+       * and the URL as single value.
+       * - if description() is empty, the key will be "URL".
+       * - otherwise, if description() is not a valid key (e.g. containing non-ASCII
+       *   characters), the returned map will contain an entry "WXXX/<description>"
+       *   in its unsupportedData() list.
+       */
+      PropertyMap asProperties() const;
 
     protected:
       virtual void parseFields(const ByteVector &data);

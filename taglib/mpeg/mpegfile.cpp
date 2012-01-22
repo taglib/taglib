@@ -35,6 +35,7 @@
 
 #include "mpegfile.h"
 #include "mpegheader.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 
