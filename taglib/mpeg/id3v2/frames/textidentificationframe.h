@@ -36,6 +36,7 @@ namespace TagLib {
   namespace ID3v2 {
 
     class Tag;
+    typedef Map<String, String> KeyConversionMap;
 
     //! An ID3v2 text identification frame implementation
 
@@ -124,6 +125,13 @@ namespace TagLib {
       explicit TextIdentificationFrame(const ByteVector &data);
 
       /*!
+       * This is a special factory method to create a TIPL (involved people list)
+       * frame from the given \a properties. Will parse key=[list of values] data
+       * into the TIPL format as specified in the ID3 standard.
+       */
+      static TextIdentificationFrame *createTIPLFrame(const PropertyMap &properties);
+
+      /*!
        * Destroys this TextIdentificationFrame instance.
        */
       virtual ~TextIdentificationFrame();
@@ -173,6 +181,11 @@ namespace TagLib {
        */
       StringList fieldList() const;
 
+      /*!
+       * Returns a KeyConversionMap mapping a role as it would be  used in a PropertyMap
+       * to the corresponding key used in a TIPL ID3 frame to describe that role.
+       */
+      static const KeyConversionMap &involvedPeopleMap();
       PropertyMap asProperties() const;
 
     protected:

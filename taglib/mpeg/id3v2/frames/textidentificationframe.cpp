@@ -57,6 +57,17 @@ TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data) :
   setData(data);
 }
 
+TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const PropertyMap &properties) // static
+{
+  TextIdentificationFrame* frame = TextIdentificationFrame("TIPL");
+  StringList l;
+  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
+    l.append(it->first);
+    l.append(it->second.toString(",")); // comma-separated list of names
+  }
+  frame->setText(l);
+  return frame;
+}
 TextIdentificationFrame::~TextIdentificationFrame()
 {
   delete d;
@@ -90,6 +101,25 @@ String::Type TextIdentificationFrame::textEncoding() const
 void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 {
   d->textEncoding = encoding;
+}
+
+// array of allowed TIPL prefixes and their corresponding key value
+static const uint involvedPeopleSize = 5;
+static const char* involvedPeople[2] = {
+    {"ARRANGER", "ARRANGER"},
+    {"ENGINEER", "ENGINEER"},
+    {"PRODUCER", "PRODUCER"},
+    {"DJ-MIX", "DJMIXER"},
+    {"MIX", "MIXER"}
+};
+
+const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
+{
+  static KeyConversionMap m;
+  if(m.isEmpty())
+    for(uint i = 0; i < involvedPeopleSize; ++i)
+      m.insert(involvedPeople[i][1], involvedPeople[i][0]);
+  return m;
 }
 
 PropertyMap TextIdentificationFrame::asProperties() const
@@ -204,16 +234,6 @@ TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data, Header 
   parseFields(fieldData(data));
 }
 
-// array of allowed TIPL prefixes and their corresponding key value
-static const uint involvedPeopleSize = 5;
-static const char* involvedPeople[2] = {
-    {"ARRANGER", "ARRANGER"},
-    {"ENGINEER", "ENGINEER"},
-    {"PRODUCER", "PRODUCER"},
-    {"DJ-MIX", "DJMIXER"},
-    {"MIX", "MIXER"}
-};
-
 PropertyMap TextIdentificationFrame::makeTIPLProperties() const
 {
   PropertyMap map;
@@ -249,14 +269,14 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
     return map;
   }
   for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it) {
-    String key = PropertyMap::prepareKey(*it);
-    if(key.isNull()) {
+    String instrument = PropertyMap::prepareKey(*it);
+    if(instrument.isNull()) {
       // instrument is not a valid key -> frame unsupported
       map.clear();
       map.unsupportedData().append(frameID());
       return map;
     }
-    map.insert(key, (++it).split(","));
+    map.insert(L"PERFORMER:" + instrument, (++it).split(","));
   }
   return map;
 }

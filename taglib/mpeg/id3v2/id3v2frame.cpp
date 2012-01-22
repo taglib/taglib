@@ -263,7 +263,7 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
-static const uint frameTranslationSize = 53;
+static const uint frameTranslationSize = 50;
 static const char *frameTranslation[][2] = {
   // Text information frames
   { "TALB", "ALBUM"},
@@ -323,10 +323,10 @@ static const char *frameTranslation[][2] = {
   { "WORS", "RADIOSTATIONWEBPAGE" },
   { "WPAY", "PAYMENTWEBPAGE" },
   { "WPUB", "PUBLISHERWEBPAGE" },
-  { "WXXX", "URL"},
+  //{ "WXXX", "URL"}, handled specially
   // Other frames
-  { "COMM", "COMMENT" },
-  { "USLT", "LYRICS" },
+  //{ "COMM", "COMMENT" }, handled specially
+  //{ "USLT", "LYRICS" }, handled specially
 };
 
 Map<ByteVector, String> &idMap()
