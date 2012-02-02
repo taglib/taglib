@@ -190,6 +190,9 @@ void ID3v1::Tag::setTrack(uint i)
 
 void ID3v1::Tag::setStringHandler(const StringHandler *handler)
 {
+  if (TagPrivate::stringHandler != &defaultStringHandler)
+    delete TagPrivate::stringHandler;
+
   TagPrivate::stringHandler = handler;
 }
 
