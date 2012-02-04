@@ -58,6 +58,10 @@ const ID3v1::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStri
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
+StringHandler::StringHandler()
+{
+}
+
 String ID3v1::StringHandler::parse(const ByteVector &data) const
 {
   return String(data, String::Latin1).stripWhiteSpace();
