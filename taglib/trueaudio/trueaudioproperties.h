@@ -74,6 +74,11 @@ namespace TagLib {
       int bitsPerSample() const;
 
       /*!
+       * Returns the total number of sample frames
+       */
+      uint sampleFrames() const;
+
+      /*!
        * Returns the major version number.
        */
       int ttaVersion() const;

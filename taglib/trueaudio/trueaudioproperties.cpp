@@ -48,7 +48,8 @@ public:
     bitrate(0),
     sampleRate(0),
     channels(0),
-    bitsPerSample(0) {}
+    bitsPerSample(0),
+    sampleFrames(0) {}
 
   ByteVector data;
   long streamLength;
@@ -59,6 +60,7 @@ public:
   int sampleRate;
   int channels;
   int bitsPerSample;
+  uint sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +103,11 @@ int TrueAudio::Properties::channels() const
   return d->channels;
 }
 
+uint TrueAudio::Properties::sampleFrames() const
+{
+  return d->sampleFrames;
+}
+
 int TrueAudio::Properties::ttaVersion() const
 {
   return d->version;
@@ -129,8 +136,8 @@ void TrueAudio::Properties::read()
   d->sampleRate = d->data.mid(pos, 4).toUInt(false);
   pos += 4;
 
-  unsigned long samples = d->data.mid(pos, 4).toUInt(false);
-  d->length = samples / d->sampleRate;
+  d->sampleFrames = d->data.mid(pos, 4).toUInt(false);
+  d->length = d->sampleFrames / d->sampleRate;
 
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
 }
