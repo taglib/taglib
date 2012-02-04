@@ -78,6 +78,11 @@ namespace TagLib {
       int sampleWidth() const;
 
       /*!
+       * Return the number of sample frames
+       */
+      unsigned long long sampleFrames() const;
+
+      /*!
        * Returns the MD5 signature of the uncompressed audio stream as read
        * from the stream info header header.
        */
