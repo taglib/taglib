@@ -67,14 +67,14 @@ Mod::Tag *S3M::File::tag() const
   return &d->tag;
 }
 
-TagDict S3M::File::toDict() const
+PropertyMap S3M::File::properties() const
 {
-  return d->tag.toDict();
+  return d->tag.properties();
 }
 
-void S3M::File::fromDict(const TagDict &tagDict)
+PropertyMap S3M::File::setProperties(const PropertyMap &properties)
 {
-  d->tag.fromDict(tagDict);
+  return d->tag.setProperties(properties);
 }
 
 S3M::Properties *S3M::File::audioProperties() const
