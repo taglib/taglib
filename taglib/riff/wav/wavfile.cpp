@@ -84,14 +84,14 @@ ID3v2::Tag *RIFF::WAV::File::tag() const
   return d->tag;
 }
 
-TagLib::TagDict RIFF::WAV::File::toDict(void) const
+PropertyMap RIFF::WAV::File::properties() const
 {
-  return d->tag->toDict();
+  return d->tag->properties();
 }
 
-void RIFF::WAV::File::fromDict(const TagDict &dict)
+PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 {
-  d->tag->fromDict(dict);
+  return d->tag->setProperties(properties);
 }
 
 

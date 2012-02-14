@@ -92,16 +92,6 @@ Ogg::XiphComment *Ogg::FLAC::File::tag() const
   return d->comment;
 }
 
-TagLib::TagDict Ogg::FLAC::File::toDict(void) const
-{
-  return d->comment->toDict();
-}
-
-void Ogg::FLAC::File::fromDict(const TagDict &dict)
-{
-  d->comment->fromDict(dict);
-}
-
 Properties *Ogg::FLAC::File::audioProperties() const
 {
   return d->properties;

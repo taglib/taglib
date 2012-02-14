@@ -84,15 +84,14 @@ ID3v2::Tag *RIFF::AIFF::File::tag() const
   return d->tag;
 }
 
-TagLib::TagDict RIFF::AIFF::File::toDict(void) const
+PropertyMap RIFF::AIFF::File::properties() const
 {
-  return d->tag->toDict();
-
+  return d->tag->properties();
 }
 
-void RIFF::AIFF::File::fromDict(const TagDict &dict)
+PropertyMap RIFF::AIFF::File::setProperties(const PropertyMap &properties)
 {
-  d->tag->fromDict(dict);
+  return d->tag->setProperties(properties);
 }
 
 

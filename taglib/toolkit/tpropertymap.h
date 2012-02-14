@@ -92,9 +92,20 @@ namespace TagLib {
     bool contains(const String &key) const;
 
     /*!
+     * Returns true if this map contains all keys of \a other
+     * and the values coincide for that keys.
+     */
+    bool contains(const PropertyMap &other) const;
+
+    /*!
      * Erase the \a key and its values from the map.
      */
     PropertyMap &erase(const String &key);
+
+    /*!
+     * Erases from this map all keys that appear in \a other.
+     */
+    PropertyMap &erase(const PropertyMap &other);
 
     /*!
      * Merge the contents of \a other into this PropertyMap.

@@ -113,8 +113,14 @@ void UnsynchronizedLyricsFrame::setTextEncoding(String::Type encoding)
 
 PropertyMap UnsynchronizedLyricsFrame::asProperties() const
 {
+  String key = PropertyMap::prepareKey(description());
   PropertyMap map;
-  map.insert("LYRICS", text());
+  if(key.isEmpty())
+    key = "LYRICS";
+  if(key.isNull())
+    map.unsupportedData().append(L"USLT/" + description());
+  else
+    map.insert("LYRICS:" + key, text());
   return map;
 }
 

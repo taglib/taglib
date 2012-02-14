@@ -59,7 +59,7 @@ TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data) :
 
 TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const PropertyMap &properties) // static
 {
-  TextIdentificationFrame* frame = TextIdentificationFrame("TIPL");
+  TextIdentificationFrame *frame = TextIdentificationFrame("TIPL");
   StringList l;
   for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
     l.append(it->first);
@@ -68,6 +68,21 @@ TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const Property
   frame->setText(l);
   return frame;
 }
+
+TextIdentificationFrame *TextIdentificationFrame::createTMCLFrame(const PropertyMap &properties) // static
+{
+  TextIdentificationFrame *frame = TextIdentificationFrame("TMCL");
+  StringList l;
+  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
+    if(!it->first.startsWith(instrumentPrefix)) // should not happen
+      continue;
+    l.append(it->first.substr(instrumentPrefix.size()));
+    l.append(it->second.toString(","));
+  }
+  frame->setText(l);
+  return frame;
+}
+
 TextIdentificationFrame::~TextIdentificationFrame()
 {
   delete d;

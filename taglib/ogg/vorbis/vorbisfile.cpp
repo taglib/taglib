@@ -85,14 +85,14 @@ Ogg::XiphComment *Vorbis::File::tag() const
   return d->comment;
 }
 
-TagLib::TagDict Ogg::Vorbis::File::toDict(void) const
+PropertyMap Vorbis::File::properties() const
 {
-  return d->comment->toDict();
+  return d->comment->properties();
 }
 
-void Ogg::Vorbis::File::fromDict(const TagDict &dict)
+PropertyMap Vorbis::File::setProperties(const PropertyMap &properties)
 {
-  d->comment->fromDict(dict);
+  return d->comment->setProperties(properties);
 }
 
 Vorbis::Properties *Vorbis::File::audioProperties() const

@@ -162,7 +162,7 @@ PropertyMap UserUrlLinkFrame::asProperties() const
   if(key.isNull())
     map.unsupportedData().append(L"WXXX/" + description());
   else
-    map.insert(key, url());
+    map.insert("URL:" + key, url());
   return map;
 }
 

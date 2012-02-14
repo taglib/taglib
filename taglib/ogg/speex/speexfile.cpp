@@ -82,16 +82,6 @@ Ogg::XiphComment *Speex::File::tag() const
   return d->comment;
 }
 
-TagLib::TagDict Ogg::Speex::File::toDict(void) const
-{
-  return d->comment->toDict();
-}
-
-void Ogg::Speex::File::fromDict(const TagDict &dict)
-{
-  d->comment->fromDict(dict);
-}
-
 Speex::Properties *Speex::File::audioProperties() const
 {
   return d->properties;

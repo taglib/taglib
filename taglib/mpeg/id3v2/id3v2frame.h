@@ -57,6 +57,14 @@ namespace TagLib {
       friend class FrameFactory;
 
     public:
+
+      /*!
+       * Creates a textual frame which corresponds to a single key in the PropertyMap
+       * interface. These are all (User)TextIdentificationFrames except TIPL and TMCL,
+       * all (User)URLLinkFrames, CommentsFrames, and UnsynchronizedLyricsFrame.
+       */
+      static Frame *createTextualFrame(const String &key, const StringList &values);
+
       /*!
        * Destroys this Frame instance.
        */
@@ -126,6 +134,23 @@ namespace TagLib {
        * type \a t.
        */
       static ByteVector textDelimiter(String::Type t);
+
+      /*!
+       * The string with which an instrument name is prefixed to build a key in a PropertyMap;
+       * used to translate PropertyMaps to TMCL frames. In the current implementation, this
+       * is "PERFORMER:".
+       */
+      static const String instrumentPrefix;
+      /*!
+       * The PropertyMap key prefix which triggers the use of a COMM frame instead of a TXXX
+       * frame for a non-standard key. In the current implementation, this is "COMMENT:".
+       */
+      static const String commentPrefix;
+      /*!
+       * The PropertyMap key prefix which triggers the use of a WXXX frame instead of a TXX
+       * frame for a non-standard key. In the current implementation, this is "URL:".
+       */
+      static const String urlPrefix;
 
     protected:
       class Header;
@@ -243,6 +268,23 @@ namespace TagLib {
        * for general frame IDs such as TXXX or WXXX; in such a case String::null is returned.
        */
       static String frameIDToKey(const ByteVector &);
+
+
+      /*!
+       * This helper function splits the PropertyMap \a original into three ProperytMaps
+       * \a singleFrameProperties, \a tiplProperties, and \a tmclProperties, such that:
+       * - \a singleFrameProperties contains only of keys which can be represented with
+       *   exactly one ID3 frame per key. In the current implementation
+       *   this is everything except for the fixed "involved people" keys and keys of the
+       *   form "TextIdentificationFrame::instrumentPrefix" + "instrument", which are
+       *   mapped to a TMCL frame.
+       * - \a tiplProperties will consist of those keys that are present in
+       *   TextIdentificationFrame::involvedPeopleMap()
+       * - \a tmclProperties contains the "musician credits" keys which should be mapped
+       *   to a TMCL frame
+       */
+      static void splitProperties(const PropertyMap &original, PropertyMap &singleFrameProperties,
+          PropertyMap &tiplProperties, PropertyMap &tmclProperties);
 
     private:
       Frame(const Frame &);

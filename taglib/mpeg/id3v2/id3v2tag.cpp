@@ -344,160 +344,46 @@ PropertyMap ID3v2::Tag::properties() const
 
 PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
 {
-  FrameList toRemove;
-  PropertyMap properties = origProps;
-  // first find out what frames to remove; we do not remove in-place
-  // because that would invalidate FrameListMap iterators.
-  // At the moment, we remove _all_ frames that don't contain unsupported data,
-  // and create new ones in the next step; this is to avoid clumsy technicalities
-  // arising when trying to do this more efficient. For example, if the current tag
-  // contains one URL attribute stored in an WXXX frame, but the given \a properties
-  // contain two URL values, we would need to remove the WXXX frame (which supports
-  // only one value), and create a TXXX frame with description=URL.
-  // The same may happen with COMM and USLT. Additionally, handling of TIPL and TMCL is
-  // complicated.
-  // In the future, someone might come up with a more clever sync algorithm. :-)
-  for(FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it) {
-    String key = Frame::frameIDToKey(it->first);
-    // for unsupported (binary) frame types, as well as frames that need special treatment
-    // (TXXX, WXXX, COMM, TMCL, TIPL, USLT), key will be String::null
-    if(key.isNull())
-      continue;
-    // else: non-user text or url frame -> there should be only one frame of this type,
-    // and it's asProperties() method should return a PropertyMap with exactly one key
-    // and empty unsupportedData().
-    if(it->second.size() != 1)
-      debug("invalid ID3 tag: found more than one " + it->first + " frame");
-    PropertyMap frameMap = it->second[0]->asProperties();
-    if(properties.contains(key) && frameMap[key] == properties[key])
-      properties.erase(key);
-    else
-      toRemove.append(it->second[0]);
-  }
-
-  // now handle the special cases
-  // first: TXXX frames
-  FrameList &userTextFrames = frameList("TXXX");
-  for(FrameList::ConstIterator it = userTextFrames.begin(); it != userTextFrames.end(); ++it) {
-    PropertyMap frameMap = (*it)->asProperties();
-    if(!frameMap.unsupportedData().isEmpty())
-      // don't touch unsupported frames
-      continue;
-    // TXXX frames yield only one key, so it must be begin()->first
-    String &key = frameMap.begin()->first;
-    if(!Frame::keyToFrameID(key).isNull())
-      // TXXX frame which a description (=key) for which there is a dedicated frame.
-      // We don't want this, so remove the frame, the appropriate T*** or W*** frame
-      // will be created later on.
-      toRemove.append(*it);
-    if(key.find(":") > 0)
-      // colon-separated key: this should be inside a TMCL frame.
-      toRemove.append(*it);
-    // More (ugly) exceptions: If the user provides more than one COMMENT, LYRICS, or URL
-    // tag, we store all of these in a TXXX, because COMM, USLT and WXXX. Otherwise there
-    // should not be such a TXXX frame.
-    if(key == "COMMENT") {
-      if(properties.contains("COMMENT")
-          && properties["COMMENT"].size() >= 2
-          && properties["COMMENT"] == frameMap.begin()->second)
-        properties.erase("COMMENT");
+  FrameList framesToDelete;
+  // we split up the PropertyMap into the "normal" keys and the "complicated" ones,
+  // which are those according to TIPL or TMCL frames.
+  PropertyMap properties;
+  PropertyMap tiplProperties;
+  PropertyMap tmclProperties;
+  Frame::splitProperties(origProps, properties, tiplProperties, tmclProperties);
+  for(FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it){
+    for(FrameList::ConstIterator lit = it->second.begin(); lit != it->second.end(); ++lit){
+      PropertyMap frameProperties = (*lit)->asProperties();
+      if(it->first == "TIPL")
+        if (tiplProperties != frameProperties)
+          framesToDelete.append(*lit);
+        else
+          tiplProperties.erase(frameProperties);
+      else if(it->first == "TMCL")
+        if (tmclProperties != frameProperties)
+          framesToDelete.append(*lit);
+        else
+          tmclProperties.erase(frameProperties);
+      else if(!properties.contains(frameProperties))
+        framesToDelete.append(*lit);
       else
-        toRemove.append(*it);
-    }else if(key == "LYRICS") {
-      if(properties.contains("LYRICS")
-          && properties["LYRICS"].size() >= 2
-          && properties["LYRICS"] == frameMap.begin()->second)
-        properties.erase("LYRICS");
-      else
-        toRemove.append(*it);
-    }else if(key == "URL") {
-       if(properties.contains("URL")
-           && properties["URL"].size() >= 2
-           && properties["URL"] == frameMap.begin()->second)
-         properties.erase("URL");
-       else
-         toRemove.append(*it);
+        properties.erase(frameProperties);
     }
   }
-
-  // next: WXXX frames
-  FrameList &userUrlFrames = frameList("WXXX");
-  for(FrameList::ConstIterator it = userUrlFrames.begin(); it != userUrlFrames.end(); ++it) {
-    PropertyMap frameMap = (*it)->asProperties();
-    if(!frameMap.unsupportedData().isEmpty())
-      // don't touch unsupported frames
-      continue;
-    // WXXX frames yield only one key, so it must be begin()->first
-    String &key = frameMap.begin()->first;
-    if(!Frame::keyToFrameID(key).isNull())
-      // WXXX frame which a description (=key) for which there is a dedicated frame.
-      // We don't want this, so remove the frame, the appropriate T*** or W*** frame
-      // will be created later on.
-      toRemove.append(*it);
-    else if(key.find(":") > 0)
-      // colon-separated key: this should be inside a TMCL frame.
-      toRemove.append(*it);
-    // More exceptions: we don't allow COMMENT and LYRICS in WXXX; they should be in COMM and USLT
-    // (or TXXX, see above).
-    else if(key == "COMMENT" || key == "LYRICS")
-      toRemove.append(*it);
-    // now, the key is either URL or some other string that neither has a dedicated text frame, nor
-    // a colon. We accept the frame if it's contents match the values in properties. However, if
-    // key != URL and the values are changed, they will be stored inside a TXXX frame instead, since
-    // we can't distinguish free-form text from free-form URL keys (possible fix: use URL:REASON like
-    // in TMCL / TIPL?).
-    else if(properties.contains(key) && properties[key] == frameMap.begin()->second)
-      properties.erase(key);
-    else
-      toRemove.append(*it);
-  }
-  for(FrameList::ConstIterator it = toRemove.begin(); it != toRemove.end(); ++it)
+  for(FrameList::ConstIterator it = framesToDelete.begin(); it != framesToDelete.end(); ++it)
     removeFrame(*it);
 
-  // next: TIPL
-  PropertyMap existingTipl;
-  if(!frameList("TIPL").isEmpty())
-    existingTipl = frameList("TIPL").front()->asProperties();
-  PropertyMap requestedTipl;
-  KeyConversionMap::ConstIterator it = TextIdentificationFrame::involvedPeopleMap().begin();
-  bool rebuildTipl = false;
-  for(; it != TextIdentificationFrame::involvedPeopleMap().end(); ++it) {
-    if(properties.contains(it->first)){
-      requestedTipl.insert(it->first, properties[it->first]);
-      properties.erase(it->first); // it's ensured now that this key gets handled correctly
-      if(!existingTipl.contains(it->first) || existingTipl[it->first] != requestedTipl[it->first])
-        rebuildTipl = true;
-    } else if(existingTipl.contains(it->first))
-      rebuildTipl = true;
-  }
-  if(rebuildTipl){
-    removeFrames("TIPL");
-    addFrame(TextIdentificationFrame::createTIPLFrame(requestedTipl));
-  }
-
-  // next: create frames for everything still in properties except for TMCL ("PERFORMER:<instrument>")
-  // keys, which are collected in a dedicated map
-  PropertyMap requestedTmcl;
-  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
-    if(it->first.find(":") != -1)
-      requestedTmcl.insert(it->first, it->second);
-    else{
-      // phew. Now we are in the simple case that our key=<value list> pair can be represented by a
-      // single frame, either a T*** (not TIPL, TMCL) or W*** frame.
-      ByteVector id = Frame::keyToFrameID(it->first);
-    }
-  }
-
-    // next: TMCL
-  PropertyMap existingTmcl;
-  if(!frameList("TMCL").isEmpty())
-    existingTmcl = frameList("TMCL").front()->asProperties();
-  bool rebuildTmcl = false;
-  // search for TMCL keys ("PERFORMER:<instrument>") in properties
-  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
-    if(it->first.find(":") != -1)
-      requestedTmcl.insert(it->first, it->second);
-  }
+  // now create remaining frames:
+  // start with the involved people list (TIPL)
+  if(!tiplProperties.isEmpty())
+      addFrame(TextIdentificationFrame::createTIPLFrame(tiplProperties));
+  // proceed with the musician credit list (TMCL)
+  if(!tmclProperties.isEmpty())
+      addFrame(TextIdentificationFrame::createTMCLFrame(tmclProperties));
+  // now create the "one key per frame" frames
+  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it)
+    addFrame(Frame::createTextualFrame(it->first, it->second));
+  return PropertyMap; // ID3 implements the complete PropertyMap interface, so an empty map is returned
 }
 
 ByteVector ID3v2::Tag::render() const

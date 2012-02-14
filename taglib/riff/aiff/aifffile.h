@@ -84,16 +84,16 @@ namespace TagLib {
         virtual ID3v2::Tag *tag() const;
 
         /*!
-         * Implements the unified tag dictionary interface -- export function.
-         * This method forwards to ID3v2::Tag::toDict.
+         * Implements the unified property interface -- export function.
+         * This method forwards to ID3v2::Tag::properties().
          */
-        TagDict toDict() const;
+        PropertyMap properties() const;
 
         /*!
-         * Implements the unified tag dictionary interface -- import function.
-         * This method forwards to ID3v2::Tag::fromDict.
+         * Implements the unified property interface -- import function.
+         * This method forwards to ID3v2::Tag::setProperties().
          */
-        void fromDict(const TagDict &);
+        PropertyMap setProperties(const PropertyMap &);
 
         /*!
          * Returns the AIFF::Properties for this file.  If no audio properties

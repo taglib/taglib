@@ -132,6 +132,13 @@ namespace TagLib {
       static TextIdentificationFrame *createTIPLFrame(const PropertyMap &properties);
 
       /*!
+       * This is a special factory method to create a TMCL (musician credits list)
+       * frame from the given \a properties. Will parse key=[list of values] data
+       * into the TMCL format as specified in the ID3 standard, where key should be
+       * of the form instrumentPrefix:instrument.
+       */
+      static TextIdentificationFrame *createTMCLFrame(const PropertyMap &properties);
+      /*!
        * Destroys this TextIdentificationFrame instance.
        */
       virtual ~TextIdentificationFrame();
@@ -186,6 +193,7 @@ namespace TagLib {
        * to the corresponding key used in a TIPL ID3 frame to describe that role.
        */
       static const KeyConversionMap &involvedPeopleMap();
+
       PropertyMap asProperties() const;
 
     protected:
@@ -242,6 +250,12 @@ namespace TagLib {
        * Creates a frame based on \a data.
        */
       explicit UserTextIdentificationFrame(const ByteVector &data);
+
+      /*!
+       * Creates a user defined text identification frame with the given \a description
+       * and \a text.
+       */
+      UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding = String::Latin1);
 
       virtual String toString() const;
 

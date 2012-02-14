@@ -139,6 +139,17 @@ namespace TagLib {
        * Parses this frame as PropertyMap. The returned map will contain a single key
        * "LYRICS" with the text() as single value.
        */
+      /*!
+       * Parses this frame as PropertyMap with a single key.
+       * - if description() is empty or "LYRICS", the key will be "LYRICS"
+       * - if description() is not a valid PropertyMap key, the frame will be
+       *   marked unsupported by an entry "USLT/<description>" in the unsupportedData()
+       *   attribute of the returned map.
+       * - otherwise, the key will be "LYRICS:<description>"
+       * - The single value will be the frame's text().
+       * Note that currently the language() field is not supported by the PropertyMap
+       * interface.
+       */
       PropertyMap asProperties() const;
 
     protected:
