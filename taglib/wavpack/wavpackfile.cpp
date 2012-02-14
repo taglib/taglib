@@ -105,23 +105,23 @@ TagLib::Tag *WavPack::File::tag() const
   return &d->tag;
 }
 
-TagLib::TagDict WavPack::File::toDict(void) const
+PropertyMap WavPack::File::properties() const
 {
   if (d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->toDict();
+    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
   if (d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->toDict();
-  return TagLib::TagDict();
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+  return PropertyMap();
 }
 
-void WavPack::File::fromDict(const TagDict &dict)
+PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 {
   if (d->hasAPE)
-    d->tag.access<APE::Tag>(APEIndex, false)->fromDict(dict);
+    return d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
   else if (d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->fromDict(dict);
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
   else
-    d->tag.access<APE::Tag>(APE, true)->fromDict(dict);
+    return d->tag.access<APE::Tag>(APE, true)->setProperties(properties);
 }
 
 WavPack::Properties *WavPack::File::audioProperties() const
