@@ -127,25 +127,25 @@ TagLib::Tag *TrueAudio::File::tag() const
   return &d->tag;
 }
 
-TagLib::TagDict TrueAudio::File::toDict(void) const
+PropertyMap TrueAudio::File::properties() const
 {
-  // once Tag::toDict() is virtual, this case distinction could actually be done
+  // once Tag::properties() is virtual, this case distinction could actually be done
   // within TagUnion.
   if (d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->toDict();
+    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->properties();
   if (d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->toDict();
-  return TagLib::TagDict();
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+  return PropertyMap();
 }
 
-void TrueAudio::File::fromDict(const TagDict &dict)
+PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
   if (d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->fromDict(dict);
+    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->setProperties(properties);
   else if (d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->fromDict(dict);
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
   else
-    d->tag.access<ID3v2::Tag>(ID3v2Index, true)->fromDict(dict);
+    return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
 }
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const
