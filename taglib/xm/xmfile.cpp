@@ -379,14 +379,14 @@ Mod::Tag *XM::File::tag() const
   return &d->tag;
 }
 
-TagDict XM::File::toDict() const
+PropertyMap XM::File::properties() const
 {
-  return d->tag.toDict();
+  return d->tag.properties();
 }
 
-void XM::File::fromDict(const TagDict &tagDict)
+PropertyMap XM::File::setProperties(const PropertyMap &properties)
 {
-  d->tag.fromDict(tagDict);
+  return d->tag.setProperties(properties);
 }
 
 XM::Properties *XM::File::audioProperties() const
