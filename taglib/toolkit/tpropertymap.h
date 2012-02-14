@@ -58,6 +58,13 @@ namespace TagLib {
 
     PropertyMap(const PropertyMap &m);
 
+    /*!
+     * Creates a PropertyMap initialized from a SimplePropertyMap. Copies all
+     * entries from \a m that have valid keys.
+     * Invalid keys will be appended to the unsupportedData() list.
+     */
+    PropertyMap(const SimplePropertyMap &m);
+
     virtual ~PropertyMap();
 
     /*!
@@ -93,7 +100,8 @@ namespace TagLib {
 
     /*!
      * Returns true if this map contains all keys of \a other
-     * and the values coincide for that keys.
+     * and the values coincide for that keys. Does not take
+     * the unsupportedData list into account.
      */
     bool contains(const PropertyMap &other) const;
 
@@ -130,6 +138,16 @@ namespace TagLib {
      * present in the map.
      */
     StringList &operator[](const String &key);
+
+    /*!
+     * Returns true if and only if \other has the same contents as this map.
+     */
+    bool operator==(const PropertyMap &other) const;
+
+    /*!
+     * Returns false if and only \other has the same contents as this map.
+     */
+    bool operator!=(const PropertyMap &other) const;
 
     /*!
      * If a PropertyMap is read from a File object using File::properties(),

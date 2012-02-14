@@ -354,17 +354,17 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   for(FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it){
     for(FrameList::ConstIterator lit = it->second.begin(); lit != it->second.end(); ++lit){
       PropertyMap frameProperties = (*lit)->asProperties();
-      if(it->first == "TIPL")
+      if(it->first == "TIPL") {
         if (tiplProperties != frameProperties)
           framesToDelete.append(*lit);
         else
           tiplProperties.erase(frameProperties);
-      else if(it->first == "TMCL")
+      } else if(it->first == "TMCL") {
         if (tmclProperties != frameProperties)
           framesToDelete.append(*lit);
         else
           tmclProperties.erase(frameProperties);
-      else if(!properties.contains(frameProperties))
+      } else if(!properties.contains(frameProperties))
         framesToDelete.append(*lit);
       else
         properties.erase(frameProperties);
@@ -383,7 +383,7 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   // now create the "one key per frame" frames
   for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it)
     addFrame(Frame::createTextualFrame(it->first, it->second));
-  return PropertyMap; // ID3 implements the complete PropertyMap interface, so an empty map is returned
+  return PropertyMap(); // ID3 implements the complete PropertyMap interface, so an empty map is returned
 }
 
 ByteVector ID3v2::Tag::render() const

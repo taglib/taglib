@@ -39,6 +39,10 @@
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
 #include "tpropertymap.h"
+#include "frames/textidentificationframe.h"
+#include "frames/urllinkframe.h"
+#include "frames/unsynchronizedlyricsframe.h"
+#include "frames/commentsframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -96,9 +100,9 @@ ByteVector Frame::textDelimiter(String::Type t)
   return d;
 }
 
-String TextIdentificationFrame::instrumentPrefix("PERFORMER:");
-String TextIdentificationFrame::commentPrefix("COMMENT:");
-String TextIdentificationFrame::urlPrefix("URL:");
+const String Frame::instrumentPrefix("PERFORMER:");
+const String Frame::commentPrefix("COMMENT:");
+const String Frame::urlPrefix("URL:");
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -110,11 +114,11 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   ByteVector frameID = keyToFrameID(key);
   if(!frameID.isNull()) {
     if(frameID[0] == 'T'){ // text frame
-      TextIdentificationFrame* frame = TextIdentificationFrame(frameID, String::UTF8);
+      TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
     } else if(values.size() == 1){  // URL frame (not WXXX); support only one value
-        UrlLinkFrame* frame = UrlLinkFrame(frameID);
+        UrlLinkFrame* frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;
     }
@@ -122,26 +126,26 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   // now we check if it's one of the "special" cases:
   // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
   if(key == "LYRICS" && values.size() == 1){
-    UnsynchronizedLyricsFrame *frame = UnsynchronizedLyricsFrame();
+    UnsynchronizedLyricsFrame *frame = new UnsynchronizedLyricsFrame();
     frame->setText(values.front());
     return frame;
   }
   // -URL: depending on the number of values, use WXXX or TXXX (with description=URL)
   if((key == "URL" || key.startsWith(urlPrefix)) && values.size() == 1){
-    UserUrlLinkFrame *frame = UserUrlLinkFrame(String::UTF8);
+    UserUrlLinkFrame *frame = new UserUrlLinkFrame(String::UTF8);
     frame->setDescription(key == "URL" ? key : key.substr(urlPrefix.size()));
     frame->setUrl(values.front());
     return frame;
   }
   // -COMMENT: depending on the number of values, use COMM or TXXX (with description=COMMENT)
   if((key == "COMMENT" || key.startsWith(commentPrefix)) && values.size() == 1){
-    CommentsFrame *frame = CommentsFrame(String::UTF8);
+    CommentsFrame *frame = new CommentsFrame(String::UTF8);
     frame->setDescription(key == "COMMENT" ? key : key.substr(commentPrefix.size()));
     frame->setText(values.front());
     return frame;
   }
   // if non of the above cases apply, we use a TXXX frame with the key as description
-  return UserTextIdentificationFrame(key, values, String::UTF8);
+  return new UserTextIdentificationFrame(key, values, String::UTF8);
 }
 
 Frame::~Frame()
@@ -391,9 +395,9 @@ static const char *deprecatedFrames[][2] = {
   {"TIME", "TDRC"}, // 2.3 -> 2.4
 };
 
-FrameIDMap &deprecationMap()
+Map<ByteVector,ByteVector> &deprecationMap()
 {
-  static FrameIDMap depMap;
+  static Map<ByteVector,ByteVector> depMap;
   if(depMap.isEmpty())
     for(uint i = 0; i < deprecatedFramesSize; ++i)
       depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];

@@ -28,6 +28,7 @@
 #include "unsynchronizedlyricsframe.h"
 #include <tbytevectorlist.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 
 using namespace TagLib;
 using namespace ID3v2;

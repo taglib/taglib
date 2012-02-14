@@ -27,6 +27,8 @@
 #include <id3v2tag.h>
 
 #include "textidentificationframe.h"
+#include "tpropertymap.h"
+#include "id3v1genres.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -59,7 +61,7 @@ TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data) :
 
 TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const PropertyMap &properties) // static
 {
-  TextIdentificationFrame *frame = TextIdentificationFrame("TIPL");
+  TextIdentificationFrame *frame = new TextIdentificationFrame("TIPL");
   StringList l;
   for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
     l.append(it->first);
@@ -71,7 +73,7 @@ TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const Property
 
 TextIdentificationFrame *TextIdentificationFrame::createTMCLFrame(const PropertyMap &properties) // static
 {
-  TextIdentificationFrame *frame = TextIdentificationFrame("TMCL");
+  TextIdentificationFrame *frame = new TextIdentificationFrame("TMCL");
   StringList l;
   for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
     if(!it->first.startsWith(instrumentPrefix)) // should not happen
@@ -120,12 +122,12 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 
 // array of allowed TIPL prefixes and their corresponding key value
 static const uint involvedPeopleSize = 5;
-static const char* involvedPeople[2] = {
+static const char* involvedPeople[][2] = {
     {"ARRANGER", "ARRANGER"},
     {"ENGINEER", "ENGINEER"},
     {"PRODUCER", "PRODUCER"},
     {"DJ-MIX", "DJMIXER"},
-    {"MIX", "MIXER"}
+    {"MIX", "MIXER"},
 };
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
@@ -144,7 +146,7 @@ PropertyMap TextIdentificationFrame::asProperties() const
   if(frameID() == "TMCL")
     return makeTMCLProperties();
   PropertyMap map;
-  String tagName = frameIDToTagName(frameID());
+  String tagName = frameIDToKey(frameID());
   if(tagName.isNull()) {
     map.unsupportedData().append(frameID());
     return map;
@@ -168,7 +170,9 @@ PropertyMap TextIdentificationFrame::asProperties() const
         (*it)[tpos] = ' ';
     }
   }
-  return KeyValuePair(tagName, values);
+  PropertyMap ret;
+  ret.insert(tagName, values);
+  return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,7 +265,7 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
     bool found = false;
     for(uint i = 0; i < involvedPeopleSize; ++i)
       if(*it == involvedPeople[i][0]) {
-        map.insert(involvedPeople[i][1], (++it).split(","));
+        map.insert(involvedPeople[i][1], (++it)->split(","));
         found = true;
         break;
       }
@@ -291,7 +295,7 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
       map.unsupportedData().append(frameID());
       return map;
     }
-    map.insert(L"PERFORMER:" + instrument, (++it).split(","));
+    map.insert(L"PERFORMER:" + instrument, (++it)->split(","));
   }
   return map;
 }

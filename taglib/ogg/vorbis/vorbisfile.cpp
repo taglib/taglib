@@ -27,8 +27,10 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 
 #include "vorbisfile.h"
+
 
 using namespace TagLib;
 

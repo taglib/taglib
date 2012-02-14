@@ -28,8 +28,19 @@ PropertyMap::PropertyMap() : SimplePropertyMap()
 {
 }
 
-PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m)
+PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m), unsupported(m.unsupported)
 {
+}
+
+PropertyMap::PropertyMap(const SimplePropertyMap &m)
+{
+  for(SimplePropertyMap::ConstIterator it = m.begin(); it != m.end(); ++it){
+    String key = prepareKey(it->first);
+    if(!key.isNull())
+      insert(it->first, it->second);
+    else
+      unsupported.append(it->first);
+  }
 }
 
 PropertyMap::~PropertyMap()

@@ -29,6 +29,7 @@
 #include <tstringlist.h>
 
 #include "commentsframe.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace ID3v2;
