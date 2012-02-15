@@ -553,8 +553,7 @@ public:
     ScopedFileCopy copy("rare_frames", ".mp3");
     string newname = copy.fileName();
     MPEG::File f(newname.c_str());
-    StringList ignored;
-    TagDict dict = f.ID3v2Tag(false)->toDict(&ignored);
+    PropertyMap dict = f.ID3v2Tag(false)->properties();
     CPPUNIT_ASSERT_EQUAL(uint(6), dict.size());
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION1"][0]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION1"][1]);
@@ -563,12 +562,12 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(String("Pop"), dict["GENRE"][0]);
 
-    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["USERURL"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["URL:USERURL"][0]);
     CPPUNIT_ASSERT_EQUAL(String("http://a.user.url/with/empty/description"), dict["URL"][0]);
 
     CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"][0]);
-    CPPUNIT_ASSERT_EQUAL(String("UFID frame is not supported"), ignored[0]);
-    CPPUNIT_ASSERT_EQUAL(1u, ignored.size());
+    CPPUNIT_ASSERT_EQUAL(1u, dict.unsupportedData().size());
+    CPPUNIT_ASSERT_EQUAL(String("UFID"), dict.unsupportedData().front());
   }
 
 };
