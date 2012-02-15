@@ -4,6 +4,7 @@
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <oggfile.h>
 #include <vorbisfile.h>
 #include <oggpageheader.h>
@@ -60,15 +61,15 @@ public:
 
     Vorbis::File *f = new Vorbis::File(newname.c_str());
 
-    CPPUNIT_ASSERT_EQUAL(uint(0), f->tag()->toDict().size());
+    CPPUNIT_ASSERT_EQUAL(uint(0), f->tag()->properties().size());
 
-    TagDict newTags;
+    PropertyMap newTags;
     StringList values("value 1");
     values.append("value 2");
     newTags["ARTIST"] = values;
-    f->tag()->fromDict(newTags);
+    f->tag()->setProperties(newTags);
 
-    TagDict map = f->tag()->toDict();
+    PropertyMap map = f->tag()->properties();
     CPPUNIT_ASSERT_EQUAL(uint(1), map.size());
     CPPUNIT_ASSERT_EQUAL(uint(2), map["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("value 1"), map["ARTIST"][0]);
@@ -82,7 +83,7 @@ public:
     string newname = copy.fileName();
 
     Vorbis::File *f = new Vorbis::File(newname.c_str());
-    TagDict tags = f->tag()->toDict();
+    PropertyMap tags = f->tag()->properties();
 
     CPPUNIT_ASSERT_EQUAL(uint(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
@@ -91,9 +92,9 @@ public:
 
     tags["UNICODETAG"][0] = L"νεω ναλυε";
     tags.erase("UNUSUALTAG");
-    f->tag()->fromDict(tags);
-    CPPUNIT_ASSERT_EQUAL(String(L"νεω ναλυε"), f->tag()->toDict()["UNICODETAG"][0]);
-    CPPUNIT_ASSERT_EQUAL(false, f->tag()->toDict().contains("UNUSUALTAG"));
+    f->tag()->setProperties(tags);
+    CPPUNIT_ASSERT_EQUAL(String(L"νεω ναλυε"), f->tag()->properties()["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(false, f->tag()->properties().contains("UNUSUALTAG"));
 
     delete f;
   }

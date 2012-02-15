@@ -4,6 +4,7 @@
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <flacfile.h>
 #include <xiphcomment.h>
 #include "utils.h"
@@ -216,15 +217,15 @@ public:
     string newname = copy.fileName();
 
     FLAC::File *f = new FLAC::File(newname.c_str());
-    TagDict dict;
+    PropertyMap dict;
     dict["ARTIST"].append("artøst 1");
     dict["ARTIST"].append("artöst 2");
-    f->fromDict(dict);
+    f->setProperties(dict);
     f->save();
     delete f;
 
     f = new FLAC::File(newname.c_str());
-    dict = f->toDict();
+    dict = f->properties();
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), dict["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("artøst 1"), dict["ARTIST"][0]);
     CPPUNIT_ASSERT_EQUAL(String("artöst 2"), dict["ARTIST"][1]);

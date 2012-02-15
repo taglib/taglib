@@ -15,6 +15,7 @@
 #include <popularimeterframe.h>
 #include <urllinkframe.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
 using namespace std;

@@ -4,6 +4,7 @@
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <apetag.h>
 #include "utils.h"
 
@@ -39,12 +40,12 @@ public:
   void testDict()
   {
 	  APE::Tag tag;
-	  TagDict dict = tag.toDict();
+	  PropertyMap dict = tag.properties();
 	  CPPUNIT_ASSERT(dict.isEmpty());
 	  dict["ARTIST"] = String("artist 1");
 	  dict["ARTIST"].append("artist 2");
 	  dict["TRACKNUMBER"].append("17");
-	  tag.fromDict(dict);
+	  tag.setProperties(dict);
 	  CPPUNIT_ASSERT_EQUAL(String("17"), tag.itemListMap()["TRACK"].values()[0]);
 	  CPPUNIT_ASSERT_EQUAL(2u, tag.itemListMap()["ARTIST"].values().size());
 	  CPPUNIT_ASSERT_EQUAL(String("artist 1"), tag.artist());
