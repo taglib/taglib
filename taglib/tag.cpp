@@ -25,6 +25,8 @@
 
 #include "tag.h"
 #include "tstringlist.h"
+#include "tpropertymap.h"
+
 using namespace TagLib;
 
 class Tag::TagPrivate

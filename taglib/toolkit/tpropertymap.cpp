@@ -146,7 +146,7 @@ const StringList &PropertyMap::unsupportedData() const
   return unsupported;
 }
 
-static String PropertyMap::prepareKey(const String &proposed) {
+String PropertyMap::prepareKey(const String &proposed) {
   if(proposed.isEmpty())
     return String::null;
   for (String::ConstIterator it = proposed.begin(); it != proposed.end(); it++)

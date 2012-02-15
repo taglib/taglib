@@ -36,6 +36,7 @@
 #include <tdebug.h>
 #include <tagunion.h>
 #include <id3v1tag.h>
+#include <tpropertymap.h>
 
 #include "apefile.h"
 

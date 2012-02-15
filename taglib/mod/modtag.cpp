@@ -21,6 +21,8 @@
 
 #include "modtag.h"
 #include "tstringlist.h"
+#include "tpropertymap.h"
+
 using namespace TagLib;
 using namespace Mod;
 

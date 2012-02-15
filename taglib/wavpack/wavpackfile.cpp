@@ -31,6 +31,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tagunion.h>
+#include <tpropertymap.h>
 
 #include "wavpackfile.h"
 #include "id3v1tag.h"

@@ -34,6 +34,7 @@
 #include <tfile.h>
 #include <tstring.h>
 #include <tmap.h>
+#include <tpropertymap.h>
 
 #include "apetag.h"
 #include "apefooter.h"
@@ -251,7 +252,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
       }
     }
   }
-  return PropertyMap;
+  return PropertyMap();
 }
 
 APE::Footer *APE::Tag::footer() const

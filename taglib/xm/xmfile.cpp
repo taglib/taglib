@@ -23,6 +23,7 @@
 #include "tdebug.h"
 #include "xmfile.h"
 #include "modfileprivate.h"
+#include "tpropertymap.h"
 
 #include <string.h>
 #include <algorithm>

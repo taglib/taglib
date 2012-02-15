@@ -32,6 +32,7 @@
 #include <tdebug.h>
 #include <tagunion.h>
 #include <tstringlist.h>
+#include <tpropertymap.h>
 
 #include "trueaudiofile.h"
 #include "id3v1tag.h"

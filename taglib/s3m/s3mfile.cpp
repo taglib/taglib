@@ -23,6 +23,7 @@
 #include "tstringlist.h"
 #include "tdebug.h"
 #include "modfileprivate.h"
+#include "tpropertymap.h"
 
 #include <iostream>
 

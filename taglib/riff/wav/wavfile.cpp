@@ -27,6 +27,7 @@
 #include <tdebug.h>
 #include <id3v2tag.h>
 #include <tstringlist.h>
+#include <tpropertymap.h>
 
 #include "wavfile.h"
 

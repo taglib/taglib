@@ -27,6 +27,7 @@
 #include "tfilestream.h"
 #include "tstring.h"
 #include "tdebug.h"
+#include "tpropertymap.h"
 
 #include <stdio.h>
 #include <string.h>

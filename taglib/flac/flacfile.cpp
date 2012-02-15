@@ -28,6 +28,7 @@
 #include <tlist.h>
 #include <tdebug.h>
 #include <tagunion.h>
+#include <tpropertymap.h>
 
 #include <id3v2header.h>
 #include <id3v2tag.h>
