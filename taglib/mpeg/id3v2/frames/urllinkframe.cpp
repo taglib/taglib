@@ -156,12 +156,10 @@ void UserUrlLinkFrame::setDescription(const String &s)
 PropertyMap UserUrlLinkFrame::asProperties() const
 {
   PropertyMap map;
-  String key;
-  if(description().isEmpty())
-     key = "URL";
-  else
-    key = PropertyMap::prepareKey(description());
-  if(key.isNull())
+  String key = PropertyMap::prepareKey(description());
+  if(key.isEmpty() || key.upper() == "URL")
+    map.insert("URL", url());
+  else if(key.isNull())
     map.unsupportedData().append(L"WXXX/" + description());
   else
     map.insert("URL:" + key, url());

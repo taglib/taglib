@@ -166,6 +166,8 @@ namespace TagLib {
      */
     void removeEmpty();
 
+    String toString() const;
+
     /*!
      * Converts \a proposed into another String suitable to be used as
      * a key, or returns String::null if this is not possible.

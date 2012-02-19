@@ -561,12 +561,15 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION2"][0]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION2"][1]);
 
-    CPPUNIT_ASSERT_EQUAL(String("Pop"), dict["GENRE"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("Pop"), dict["GENRE"].front());
 
-    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["URL:USERURL"][0]);
-    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url/with/empty/description"), dict["URL"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["URL:USERURL"].front());
 
-    CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("http://a.user.url/with/empty/description"), dict["URL"].front());
+    debug(dict.toString());
+    CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"].front());
+    debug("565");
+
     CPPUNIT_ASSERT_EQUAL(1u, dict.unsupportedData().size());
     CPPUNIT_ASSERT_EQUAL(String("UFID"), dict.unsupportedData().front());
   }

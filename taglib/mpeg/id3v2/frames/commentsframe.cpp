@@ -114,9 +114,9 @@ PropertyMap CommentsFrame::asProperties() const
 {
   String key = PropertyMap::prepareKey(description());
   PropertyMap map;
-  if(key.isEmpty())
-    key = "COMMENT";
-  if(key.isNull())
+  if(key.isEmpty() || key == "COMMENT")
+    map.insert("COMMENT", text());
+  else if(key.isNull())
     map.unsupportedData().append(L"COMM/" + description());
   else
     map.insert("COMMENT:" + key, text());

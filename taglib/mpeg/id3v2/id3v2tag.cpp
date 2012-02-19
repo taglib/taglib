@@ -337,10 +337,8 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-
   for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
     PropertyMap props = (*it)->asProperties();
-    debug(props);
     properties.merge(props);
   }
   return properties;

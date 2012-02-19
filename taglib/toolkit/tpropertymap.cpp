@@ -161,6 +161,14 @@ bool PropertyMap::operator!=(const PropertyMap &other) const
   return !(*this == other);
 }
 
+String PropertyMap::toString() const
+{
+  String ret = "";
+  for(ConstIterator it = begin(); it != end(); ++it)
+    ret += it->first+"="+it->second.toString(", ") + "\n";
+  return ret;
+}
+
 void PropertyMap::removeEmpty()
 {
   StringList emptyKeys;
