@@ -25,7 +25,6 @@
 
 #include <tbytevectorlist.h>
 #include <id3v2tag.h>
-#include <tdebug.h>
 #include "textidentificationframe.h"
 #include "tpropertymap.h"
 #include "id3v1genres.h"

@@ -566,9 +566,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("http://a.user.url"), dict["URL:USERURL"].front());
 
     CPPUNIT_ASSERT_EQUAL(String("http://a.user.url/with/empty/description"), dict["URL"].front());
-    debug(dict.toString());
     CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"].front());
-    debug("565");
 
     CPPUNIT_ASSERT_EQUAL(1u, dict.unsupportedData().size());
     CPPUNIT_ASSERT_EQUAL(String("UFID"), dict.unsupportedData().front());
