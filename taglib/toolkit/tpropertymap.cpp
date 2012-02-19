@@ -20,7 +20,6 @@
  ***************************************************************************/
 
 #include "tpropertymap.h"
-
 using namespace TagLib;
 
 
@@ -90,18 +89,34 @@ PropertyMap::ConstIterator PropertyMap::find(const String &key) const
 bool PropertyMap::contains(const String &key) const
 {
   String realKey = prepareKey(key);
-  // we consider keys with empty value list as not present
-  if(realKey.isNull() || SimplePropertyMap::operator[](realKey).isEmpty())
+  if(realKey.isNull())
     return false;
   return SimplePropertyMap::contains(realKey);
+}
+
+bool PropertyMap::contains(const PropertyMap &other) const
+{
+  for(ConstIterator it = other.begin(); it != other.end(); ++it) {
+    if(!SimplePropertyMap::contains(it->first))
+      return false;
+    if ((*this)[it->first] != it->second)
+      return false;
+  }
+  return true;
 }
 
 PropertyMap &PropertyMap::erase(const String &key)
 {
   String realKey = prepareKey(key);
-  if(realKey.isNull())
-    return *this;
-  SimplePropertyMap::erase(realKey);
+  if(!realKey.isNull())
+    SimplePropertyMap::erase(realKey);
+  return *this;
+}
+
+PropertyMap &PropertyMap::erase(const PropertyMap &other)
+{
+  for(ConstIterator it = other.begin(); it != other.end(); ++it)
+    erase(it->first);
   return *this;
 }
 
@@ -124,6 +139,26 @@ StringList &PropertyMap::operator[](const String &key)
 {
   String realKey = prepareKey(key);
   return SimplePropertyMap::operator[](realKey);
+}
+
+bool PropertyMap::operator==(const PropertyMap &other) const
+{
+  for(ConstIterator it = other.begin(); it != other.end(); ++it) {
+    ConstIterator thisFind = find(it->first);
+    if( thisFind == end() || (thisFind->second != it->second) )
+      return false;
+  }
+  for(ConstIterator it = begin(); it != end(); ++it) {
+    ConstIterator otherFind = other.find(it->first);
+    if( otherFind == other.end() || (otherFind->second != it->second) )
+      return false;
+  }
+  return unsupported == other.unsupported;
+}
+
+bool PropertyMap::operator!=(const PropertyMap &other) const
+{
+  return !(*this == other);
 }
 
 void PropertyMap::removeEmpty()

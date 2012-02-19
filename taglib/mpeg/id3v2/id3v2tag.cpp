@@ -337,9 +337,40 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-  for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it)
-    properties.merge((*it)->asProperties());
+
+  for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
+    PropertyMap props = (*it)->asProperties();
+    debug(props);
+    properties.merge(props);
+  }
   return properties;
+}
+
+void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
+{
+  // entries of unsupportedData() are usually frame IDs which are not supported
+  // by the PropertyMap interface. Three special cases exist: TXXX, WXXX, and COMM
+  // frames may also be unsupported if their description() is not a valid key.
+  for(StringList::ConstIterator it = properties.begin(); it != properties.end(); ++it){
+    ByteVector id = it->substr(0,4).data(String::Latin1);
+    if(id == "TXXX") {
+      String description = it->substr(5);
+      Frame *frame = UserTextIdentificationFrame::find(this, description);
+      if(frame)
+        removeFrame(frame);
+    } else if(id == "WXXX") {
+      String description = it->substr(5);
+      Frame *frame = UserUrlLinkFrame::find(this, description);
+      if(frame)
+        removeFrame(frame);
+    } else if(id == "COMM") {
+      String description = it->substr(5);
+      Frame *frame = CommentsFrame::findByDescription(this, description);
+      if(frame)
+        removeFrame(frame);
+    } else
+      removeFrames(id); // there should be only one frame with "id"
+  }
 }
 
 PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)

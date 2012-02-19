@@ -161,6 +161,12 @@ namespace TagLib {
        */
       PropertyMap asProperties() const;
 
+      /*!
+       * Searches for the user defined url frame with the description \a description
+       * in \a tag.  This returns null if no matching frames were found.
+       */
+      static UserUrlLinkFrame *find(Tag *tag, const String &description);
+
     protected:
       virtual void parseFields(const ByteVector &data);
       virtual ByteVector renderFields() const;

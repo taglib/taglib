@@ -253,9 +253,9 @@ namespace TagLib {
 
       /*!
        * Creates a user defined text identification frame with the given \a description
-       * and \a text.
+       * and \a values.
        */
-      UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding = String::Latin1);
+      UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding = String::UTF8);
 
       virtual String toString() const;
 

@@ -25,7 +25,7 @@
 
 #include <tbytevectorlist.h>
 #include <id3v2tag.h>
-
+#include <tdebug.h>
 #include "textidentificationframe.h"
 #include "tpropertymap.h"
 #include "id3v1genres.h"
@@ -321,6 +321,14 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data)
   checkFields();
 }
 
+UserTextIdentificationFrame::UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding) :
+    TextIdentificationFrame("TXXX", encoding),
+    d(0)
+{
+  setDescription(description);
+  setText(values);
+}
+
 String UserTextIdentificationFrame::toString() const
 {
   return "[" + description() + "] " + fieldList().toString();
@@ -378,10 +386,12 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
   String key = map.prepareKey(tagName);
   if(key.isNull()) // this frame's description is not a valid PropertyMap key -> add to unsupported list
     map.unsupportedData().append(L"TXXX/" + description());
-  else
-    for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it)
+  else {
+    StringList v = fieldList();
+    for(StringList::ConstIterator it = v.begin(); it != v.end(); ++it)
       if(*it != description())
         map.insert(key, *it);
+  }
   return map;
 }
 
