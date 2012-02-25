@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 #include <tfile.h>
-#include <tdebug.h>
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
@@ -34,6 +33,7 @@
 #include "tbytevector.h"
 #include "id3v1genres.h"
 #include "tpropertymap.h"
+#include <tdebug.h>
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
@@ -339,7 +339,6 @@ PropertyMap ID3v2::Tag::properties() const
   PropertyMap properties;
   for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
     PropertyMap props = (*it)->asProperties();
-    debug("read properties:\n" + props.toString());
     properties.merge(props);
   }
   return properties;

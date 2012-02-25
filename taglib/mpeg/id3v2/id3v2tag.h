@@ -263,7 +263,30 @@ namespace TagLib {
       /*!
        * Implements the unified property interface -- export function.
        * This function does some work to translate the hard-specified ID3v2
-       * frame types into a free-form string-to-stringlist PropertyMap.
+       * frame types into a free-form string-to-stringlist PropertyMap:
+       *  - if ID3v2 frame ID is known by Frame::frameIDToKey(), the returned
+       *    key is used
+       *  - if the frame ID is "TXXX" (user text frame), the description() is
+       *    used as key
+       *  - if the frame ID is "WXXX" (user url frame),
+       *    - if the description is empty or "URL", the key "URL" is used
+       *    - otherwise, the key "URL:<description>" is used;
+       *  - if the frame ID is "COMM" (comments frame),
+       *    - if the description is empty or "COMMENT", the key "COMMENT"
+       *      is used
+       *    - otherwise, the key "COMMENT:<description>" is used;
+       *  - if the frame ID is "USLT" (unsynchronized lyrics),
+       *    - if the description is empty or "LYRICS", the key "LYRICS" is used
+       *    - otherwise, the key "LYRICS:<description>" is used;
+       *  - if the frame ID is "TIPL" (involved peoples list), and if all the
+       *    roles defined in the frame are known in TextIdentificationFrame::involvedPeopleMap(),
+       *    then "<role>=<name>" will be contained in the returned obejct for each
+       *  - if the frame ID is "TMCL" (musician credit list), then
+       *    "PERFORMER:<instrument>=<name>" will be contained in the returned
+       *    PropertyMap for each defined musician
+       *  In any other case, the unsupportedData() of the returned object will contain
+       *  the frame's ID and, in case of a frame ID which is allowed to appear more than
+       *  once, the description, separated by a "/".
        *
        */
       PropertyMap properties() const;
