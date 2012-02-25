@@ -166,6 +166,8 @@ String PropertyMap::toString() const
   String ret = "";
   for(ConstIterator it = begin(); it != end(); ++it)
     ret += it->first+"="+it->second.toString(", ") + "\n";
+  if(!unsupported.isEmpty())
+    ret += "Unsupported Data: " + unsupported.toString(", ") + "\n";
   return ret;
 }
 

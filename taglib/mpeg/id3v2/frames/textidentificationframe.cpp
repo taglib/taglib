@@ -260,7 +260,8 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
     map.unsupportedData().append(frameID());
     return map;
   }
-  for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it) {
+  StringList l = fieldList();
+  for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     bool found = false;
     for(uint i = 0; i < involvedPeopleSize; ++i)
       if(*it == involvedPeople[i][0]) {
@@ -286,7 +287,8 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
     map.unsupportedData().append(frameID());
     return map;
   }
-  for(StringList::ConstIterator it = fieldList().begin(); it != fieldList().end(); ++it) {
+  StringList l = fieldList();
+  for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     String instrument = PropertyMap::prepareKey(*it);
     if(instrument.isNull()) {
       // instrument is not a valid key -> frame unsupported

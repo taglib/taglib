@@ -339,6 +339,7 @@ PropertyMap ID3v2::Tag::properties() const
   PropertyMap properties;
   for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
     PropertyMap props = (*it)->asProperties();
+    debug("read properties:\n" + props.toString());
     properties.merge(props);
   }
   return properties;

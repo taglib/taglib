@@ -10,6 +10,7 @@
 #include <uniquefileidentifierframe.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
+#include <unsynchronizedlyricsframe.h>
 #include <generalencapsulatedobjectframe.h>
 #include <relativevolumeframe.h>
 #include <popularimeterframe.h>
@@ -68,7 +69,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
-  CPPUNIT_TEST(testDictInterface);
+  CPPUNIT_TEST(testPropertyInterface);
+  CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -549,7 +551,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
   }
 
-  void testDictInterface()
+  void testPropertyInterface()
   {
     ScopedFileCopy copy("rare_frames", ".mp3");
     string newname = copy.fileName();
@@ -570,6 +572,55 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(1u, dict.unsupportedData().size());
     CPPUNIT_ASSERT_EQUAL(String("UFID"), dict.unsupportedData().front());
+  }
+
+  void testPropertyInterface2()
+  {
+    ID3v2::Tag tag;
+    ID3v2::UnsynchronizedLyricsFrame *frame1 = new ID3v2::UnsynchronizedLyricsFrame();
+    frame1->setDescription("test");
+    frame1->setText("la-la-la test");
+    tag.addFrame(frame1);
+
+    ID3v2::UnsynchronizedLyricsFrame *frame2 = new ID3v2::UnsynchronizedLyricsFrame();
+    frame2->setDescription("");
+    frame2->setText("la-la-la nodescription");
+    tag.addFrame(frame2);
+
+    ID3v2::AttachedPictureFrame *frame3 = new ID3v2::AttachedPictureFrame();
+    frame3->setDescription("test picture");
+    tag.addFrame(frame3);
+
+    ID3v2::TextIdentificationFrame *frame4 = new ID3v2::TextIdentificationFrame("TIPL");
+    frame4->setText("single value is invalid for TIPL");
+    tag.addFrame(frame4);
+
+    ID3v2::TextIdentificationFrame *frame5 = new ID3v2::TextIdentificationFrame("TMCL");
+    StringList tmclData;
+    tmclData.append("VIOLIN");
+    tmclData.append("a violinist");
+    tmclData.append("PIANO");
+    tmclData.append("a pianist");
+    frame5->setText(tmclData);
+    tag.addFrame(frame5);
+
+    PropertyMap properties = tag.properties();
+
+    CPPUNIT_ASSERT_EQUAL(2u, properties.unsupportedData().size());
+    CPPUNIT_ASSERT(properties.unsupportedData().contains("TIPL"));
+    CPPUNIT_ASSERT(properties.unsupportedData().contains("APIC"));
+
+    CPPUNIT_ASSERT(properties.contains("PERFORMER:VIOLIN"));
+    CPPUNIT_ASSERT(properties.contains("PERFORMER:PIANO"));
+    CPPUNIT_ASSERT_EQUAL(String("a violinist"), properties["PERFORMER:VIOLIN"].front());
+    CPPUNIT_ASSERT_EQUAL(String("a pianist"), properties["PERFORMER:PIANO"].front());
+
+    CPPUNIT_ASSERT(properties.contains("LYRICS"));
+    CPPUNIT_ASSERT(properties.contains("LYRICS:TEST"));
+
+    tag.removeUnsupportedProperties(properties.unsupportedData());
+    CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
+    CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
   }
 
 };
