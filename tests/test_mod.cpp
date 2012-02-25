@@ -21,6 +21,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <modfile.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
 using namespace std;
@@ -51,6 +52,7 @@ class TestMod : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestMod);
   CPPUNIT_TEST(testReadTags);
   CPPUNIT_TEST(testWriteTags);
+  CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -73,6 +75,22 @@ public:
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
       TEST_FILE_PATH_C("changed.mod")));
+  }
+
+  void testPropertyInterface()
+  {
+    Mod::Tag t;
+    PropertyMap properties;
+    properties["BLA"] = String("bla");
+    properties["ARTIST"] = String("artist1");
+    properties["ARTIST"].append("artist2");
+    properties["TITLE"] = String("title");
+
+    PropertyMap unsupported = t.setProperties(properties);
+    CPPUNIT_ASSERT(unsupported.contains("BLA"));
+    CPPUNIT_ASSERT(unsupported.contains("ARTIST"));
+    CPPUNIT_ASSERT_EQUAL(properties["ARTIST"], unsupported["ARTIST"]);
+    CPPUNIT_ASSERT(!unsupported.contains("TITLE"));
   }
 
 private:
