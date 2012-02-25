@@ -48,7 +48,8 @@ public:
     bitrate(0),
     sampleRate(0),
     channels(0),
-    bitsPerSample(0) {}
+    bitsPerSample(0),
+    sampleFrames(0) {}
 
   ByteVector data;
   long streamLength;
@@ -59,6 +60,7 @@ public:
   int sampleRate;
   int channels;
   int bitsPerSample;
+  uint sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +103,11 @@ int TrueAudio::Properties::channels() const
   return d->channels;
 }
 
+uint TrueAudio::Properties::sampleFrames() const
+{
+  return d->sampleFrames;
+}
+
 int TrueAudio::Properties::ttaVersion() const
 {
   return d->version;
@@ -118,19 +125,26 @@ void TrueAudio::Properties::read()
   int pos = 3;
 
   d->version = d->data[pos] - '0';
-  pos += 1 + 2;
+  pos += 1;
 
-  d->channels = d->data.mid(pos, 2).toShort(false);
-  pos += 2;
+  // According to http://en.true-audio.com/TTA_Lossless_Audio_Codec_-_Format_Description
+  // TTA2 headers are in development, and have a different format
+  if(1 == d->version) {
+    // Skip the audio format
+    pos += 2;
 
-  d->bitsPerSample = d->data.mid(pos, 2).toShort(false);
-  pos += 2;
+    d->channels = d->data.mid(pos, 2).toShort(false);
+    pos += 2;
 
-  d->sampleRate = d->data.mid(pos, 4).toUInt(false);
-  pos += 4;
+    d->bitsPerSample = d->data.mid(pos, 2).toShort(false);
+    pos += 2;
 
-  unsigned long samples = d->data.mid(pos, 4).toUInt(false);
-  d->length = samples / d->sampleRate;
+    d->sampleRate = d->data.mid(pos, 4).toUInt(false);
+    pos += 4;
 
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+    d->sampleFrames = d->data.mid(pos, 4).toUInt(false);
+    d->length = d->sampleFrames / d->sampleRate;
+
+    d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  }
 }
