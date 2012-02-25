@@ -135,12 +135,7 @@ namespace TagLib {
       void setTextEncoding(String::Type encoding);
 
 
-      /*!
-       * Parses this frame as PropertyMap. The returned map will contain a single key
-       * "LYRICS" with the text() as single value.
-       */
-      /*!
-       * Parses this frame as PropertyMap with a single key.
+      /*! Parses this frame as PropertyMap with a single key.
        * - if description() is empty or "LYRICS", the key will be "LYRICS"
        * - if description() is not a valid PropertyMap key, the frame will be
        *   marked unsupported by an entry "USLT/<description>" in the unsupportedData()

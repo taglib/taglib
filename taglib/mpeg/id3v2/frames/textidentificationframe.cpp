@@ -161,11 +161,11 @@ PropertyMap TextIdentificationFrame::asProperties() const
         *it = ID3v1::genre(test);
     }
   } else if(tagName == "DATE") {
-    for (StringList::Iterator it = values.begin(); it != values.end(); ++it) {
+    for(StringList::Iterator it = values.begin(); it != values.end(); ++it) {
       // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
       // Since this is unusual in other formats, the T is removed.
       int tpos = it->find("T");
-      if (tpos != -1)
+      if(tpos != -1)
         (*it)[tpos] = ' ';
     }
   }
