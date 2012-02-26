@@ -346,35 +346,36 @@ PropertyMap ID3v2::Tag::properties() const
 
 void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
 {
-  // entries of unsupportedData() are usually frame IDs which are not supported
-  // by the PropertyMap interface. Three special cases exist: TXXX, WXXX, and COMM
-  // frames may also be unsupported if their description() is not a valid key.
   for(StringList::ConstIterator it = properties.begin(); it != properties.end(); ++it){
-    if(*it == "UNKNOWN") {
-      // delete all unknown frames
-      FrameList l = frameList();
+    if(it->startsWith("UNKNOWN/")) {
+      String frameID = it->substr(String("UNKNOWN/").size());
+      if(frameID.size() != 4)
+        continue; // invalid specification
+      ByteVector id = frameID.data(String::Latin1);
+      // delete all unknown frames of given type
+      FrameList l = frameList(id);
       for(FrameList::ConstIterator fit = l.begin(); fit != l.end(); fit++)
         if (dynamic_cast<const UnknownFrame *>(*fit) != NULL)
           removeFrame(*fit);
+    } else if(it->size() == 4){
+      ByteVector id = it->data(String::Latin1);
+      removeFrames(id);
     } else {
       ByteVector id = it->substr(0,4).data(String::Latin1);
-      if(id == "TXXX") {
-        String description = it->substr(5);
-        Frame *frame = UserTextIdentificationFrame::find(this, description);
-        if(frame)
-          removeFrame(frame);
-      } else if(id == "WXXX") {
-        String description = it->substr(5);
-        Frame *frame = UserUrlLinkFrame::find(this, description);
-        if(frame)
-          removeFrame(frame);
-      } else if(id == "COMM") {
-        String description = it->substr(5);
-        Frame *frame = CommentsFrame::findByDescription(this, description);
-        if(frame)
-          removeFrame(frame);
-      } else
-        removeFrames(id); // there should be only one frame with "id"
+      if(it->size() <= 5)
+        continue; // invalid specification
+      String description = it->substr(5);
+      Frame *frame;
+      if(id == "TXXX")
+        frame = UserTextIdentificationFrame::find(this, description);
+      else if(id == "WXXX")
+        frame = UserUrlLinkFrame::find(this, description);
+      else if(id == "COMM")
+        frame = CommentsFrame::findByDescription(this, description);
+      else if(id == "USLT")
+        frame = UnsynchronizedLyricsFrame::findByDescription(this, description);
+      if(frame)
+        removeFrame(frame);
     }
   }
 }

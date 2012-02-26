@@ -558,10 +558,15 @@ public:
     MPEG::File f(newname.c_str());
     PropertyMap dict = f.ID3v2Tag(false)->properties();
     CPPUNIT_ASSERT_EQUAL(uint(6), dict.size());
+
+    CPPUNIT_ASSERT(dict.contains("USERTEXTDESCRIPTION1"));
+    CPPUNIT_ASSERT(dict.contains("QuodLibet::USERTEXTDESCRIPTION2"));
+    CPPUNIT_ASSERT_EQUAL(uint(2), dict["USERTEXTDESCRIPTION1"].size());
+    CPPUNIT_ASSERT_EQUAL(uint(2), dict["QuodLibet::USERTEXTDESCRIPTION2"].size());
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION1"][0]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION1"][1]);
-    CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION2"][0]);
-    CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION2"][1]);
+    CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["QuodLibet::USERTEXTDESCRIPTION2"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["QuodLibet::USERTEXTDESCRIPTION2"][1]);
 
     CPPUNIT_ASSERT_EQUAL(String("Pop"), dict["GENRE"].front());
 

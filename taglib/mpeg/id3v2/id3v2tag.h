@@ -293,9 +293,14 @@ namespace TagLib {
 
       /*!
        * Removes unsupported frames given by \a properties. The elements of
-       * \a properties must be taken from properties().unsupportedData() and
-       * are the four-byte frame IDs of ID3 frames which are not compatible
-       * with the PropertyMap schema.
+       * \a properties must be taken from properties().unsupportedData(); they
+       * are of one of the following forms:
+       *  - a four-character frame ID, if the ID3 specification allows only one
+       *    frame with that ID (thus, the frame is uniquely determined)
+       *  - frameID + "/" + description(), when the ID is one of "TXXX", "WXXX",
+       *    "COMM", or "USLT",
+       *  - "UNKNOWN/" + frameID, for frames that could not be parsed by TagLib.
+       *    In that case, *all* unknown frames with the given ID will be removed.
        */
       void removeUnsupportedProperties(const StringList &properties);
 

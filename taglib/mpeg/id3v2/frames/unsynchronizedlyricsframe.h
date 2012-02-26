@@ -147,6 +147,15 @@ namespace TagLib {
        */
       PropertyMap asProperties() const;
 
+      /*!
+       * LyricsFrames each have a unique description.  This searches for a lyrics
+       * frame with the decription \a d and returns a pointer to it.  If no
+       * frame is found that matches the given description null is returned.
+       *
+       * \see description()
+       */
+      static UnsynchronizedLyricsFrame *findByDescription(const Tag *tag, const String &d);
+
     protected:
       // Reimplementations.
 

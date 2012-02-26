@@ -43,6 +43,7 @@
 #include "frames/urllinkframe.h"
 #include "frames/unsynchronizedlyricsframe.h"
 #include "frames/commentsframe.h"
+#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -429,18 +430,16 @@ ByteVector Frame::keyToFrameID(const String &s)
 
 PropertyMap Frame::asProperties() const
 {
+  if(dynamic_cast< const UnknownFrame *>(this)) {
+    PropertyMap m;
+    m.unsupportedData().append("UNKNOWN/" + frameID());
+    return m;
+  }
   const ByteVector &id = frameID();
   // workaround until this function is virtual
-  if(id == "TXXX") {
-    const UserTextIdentificationFrame *txxxFrame = dynamic_cast< const UserTextIdentificationFrame* >(this);
-    if(txxxFrame != NULL)
-      return txxxFrame->asProperties();
-    else {
-      PropertyMap m;
-      m.unsupportedData().append("UNKNOWN");
-      return m;
-    }
-  } else if(id[0] == 'T')
+  if(id == "TXXX")
+    return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
+  else if(id[0] == 'T')
     return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
   else if(id == "WXXX")
     return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
