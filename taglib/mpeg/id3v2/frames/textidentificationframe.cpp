@@ -380,9 +380,7 @@ void UserTextIdentificationFrame::setDescription(const String &s)
 PropertyMap UserTextIdentificationFrame::asProperties() const
 {
   String tagName = description();
-  // Quodlibet/Exfalso use QuodLibet::<tagname> if you set an arbitrary ID3 tag.
-  int pos = tagName.find("::");
-  tagName = (pos != -1) ? tagName.substr(pos+2).upper() : tagName.upper();
+
   PropertyMap map;
   String key = map.prepareKey(tagName);
   if(key.isNull()) // this frame's description is not a valid PropertyMap key -> add to unsupported list
