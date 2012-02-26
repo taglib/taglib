@@ -382,9 +382,9 @@ static const char *frameTranslation[][2] = {
 Map<ByteVector, String> &idMap()
 {
   static Map<ByteVector, String> m;
-    if(m.isEmpty())
-      for(size_t i = 0; i < frameTranslationSize; ++i)
-        m[frameTranslation[i][0]] = frameTranslation[i][1];
+  if(m.isEmpty())
+    for(size_t i = 0; i < frameTranslationSize; ++i)
+      m[frameTranslation[i][0]] = frameTranslation[i][1];
   return m;
 }
 
