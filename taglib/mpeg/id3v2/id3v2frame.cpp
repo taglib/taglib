@@ -431,9 +431,16 @@ PropertyMap Frame::asProperties() const
 {
   const ByteVector &id = frameID();
   // workaround until this function is virtual
-  if(id == "TXXX")
-    return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
-  else if(id[0] == 'T')
+  if(id == "TXXX") {
+    const UserTextIdentificationFrame *txxxFrame = dynamic_cast< const UserTextIdentificationFrame* >(this);
+    if(txxxFrame != NULL)
+      return txxxFrame->asProperties();
+    else {
+      PropertyMap m;
+      m.unsupportedData().append("UNKNOWN");
+      return m;
+    }
+  } else if(id[0] == 'T')
     return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
   else if(id == "WXXX")
     return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
@@ -443,11 +450,9 @@ PropertyMap Frame::asProperties() const
     return dynamic_cast< const CommentsFrame* >(this)->asProperties();
   else if(id == "USLT")
     return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
-  else {
-    PropertyMap m;
-    m.unsupportedData().append(id);
-    return m;
-  }
+  PropertyMap m;
+  m.unsupportedData().append(id);
+  return m;
 }
 
 void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFrameProperties,

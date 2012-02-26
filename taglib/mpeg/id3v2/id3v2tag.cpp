@@ -350,24 +350,32 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
   // by the PropertyMap interface. Three special cases exist: TXXX, WXXX, and COMM
   // frames may also be unsupported if their description() is not a valid key.
   for(StringList::ConstIterator it = properties.begin(); it != properties.end(); ++it){
-    ByteVector id = it->substr(0,4).data(String::Latin1);
-    if(id == "TXXX") {
-      String description = it->substr(5);
-      Frame *frame = UserTextIdentificationFrame::find(this, description);
-      if(frame)
-        removeFrame(frame);
-    } else if(id == "WXXX") {
-      String description = it->substr(5);
-      Frame *frame = UserUrlLinkFrame::find(this, description);
-      if(frame)
-        removeFrame(frame);
-    } else if(id == "COMM") {
-      String description = it->substr(5);
-      Frame *frame = CommentsFrame::findByDescription(this, description);
-      if(frame)
-        removeFrame(frame);
-    } else
-      removeFrames(id); // there should be only one frame with "id"
+    if(*it == "UNKNOWN") {
+      // delete all unknown frames
+      FrameList l = frameList();
+      for(FrameList::ConstIterator fit = l.begin(); fit != l.end(); fit++)
+        if (dynamic_cast<const UnknownFrame *>(*fit) != NULL)
+          removeFrame(*fit);
+    } else {
+      ByteVector id = it->substr(0,4).data(String::Latin1);
+      if(id == "TXXX") {
+        String description = it->substr(5);
+        Frame *frame = UserTextIdentificationFrame::find(this, description);
+        if(frame)
+          removeFrame(frame);
+      } else if(id == "WXXX") {
+        String description = it->substr(5);
+        Frame *frame = UserUrlLinkFrame::find(this, description);
+        if(frame)
+          removeFrame(frame);
+      } else if(id == "COMM") {
+        String description = it->substr(5);
+        Frame *frame = CommentsFrame::findByDescription(this, description);
+        if(frame)
+          removeFrame(frame);
+      } else
+        removeFrames(id); // there should be only one frame with "id"
+    }
   }
 }
 
