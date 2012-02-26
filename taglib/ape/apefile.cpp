@@ -134,7 +134,7 @@ PropertyMap APE::File::setProperties(const PropertyMap &properties)
   else if(d->hasID3v1)
     return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
   else
-    return d->tag.access<APE::Tag>(APE, true)->setProperties(properties);
+    return d->tag.access<APE::Tag>(APEIndex, true)->setProperties(properties);
 }
 
 APE::Properties *APE::File::audioProperties() const
