@@ -102,6 +102,7 @@ ByteVector Frame::textDelimiter(String::Type t)
 
 const String Frame::instrumentPrefix("PERFORMER:");
 const String Frame::commentPrefix("COMMENT:");
+const String Frame::lyricsPrefix("LYRICS:");
 const String Frame::urlPrefix("URL:");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,8 +126,9 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   }
   // now we check if it's one of the "special" cases:
   // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
-  if(key == "LYRICS" && values.size() == 1){
+  if((key == "LYRICS" || key.startsWith(lyricsPrefix)) && values.size() == 1){
     UnsynchronizedLyricsFrame *frame = new UnsynchronizedLyricsFrame();
+    frame->setDescription(key == "LYRICS" ? key : key.substr(lyricsPrefix.size()));
     frame->setText(values.front());
     return frame;
   }

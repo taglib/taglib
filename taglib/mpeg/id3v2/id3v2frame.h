@@ -147,6 +147,11 @@ namespace TagLib {
        */
       static const String commentPrefix;
       /*!
+       * The PropertyMap key prefix which triggers the use of a USLT frame instead of a TXXX
+       * frame for a non-standard key. In the current implementation, this is "LYRICS:".
+       */
+      static const String lyricsPrefix;
+      /*!
        * The PropertyMap key prefix which triggers the use of a WXXX frame instead of a TXX
        * frame for a non-standard key. In the current implementation, this is "URL:".
        */
