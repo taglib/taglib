@@ -287,7 +287,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   int pos = 0;
 
-  int vendorLength = data.mid(0, 4).toUInt(false);
+  uint vendorLength = data.mid(0, 4).toUInt(false);
   pos += 4;
 
   d->vendorID = String(data.mid(pos, vendorLength), String::UTF8);
