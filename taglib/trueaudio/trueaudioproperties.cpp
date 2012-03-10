@@ -143,7 +143,7 @@ void TrueAudio::Properties::read()
     pos += 4;
 
     d->sampleFrames = d->data.mid(pos, 4).toUInt(false);
-    d->length = d->sampleFrames / d->sampleRate;
+    d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
 
     d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
   }
