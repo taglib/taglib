@@ -155,7 +155,7 @@ namespace TagLib {
 
       void updateGenre(TextIdentificationFrame *frame) const;
 
-      static FrameFactory *factory;
+      static FrameFactory factory;
 
       class FrameFactoryPrivate;
       FrameFactoryPrivate *d;

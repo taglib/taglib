@@ -65,7 +65,7 @@ public:
   }
 };
 
-FrameFactory *FrameFactory::factory = 0;
+FrameFactory FrameFactory::factory;
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -73,9 +73,7 @@ FrameFactory *FrameFactory::factory = 0;
 
 FrameFactory *FrameFactory::instance()
 {
-  if(!factory)
-    factory = new FrameFactory;
-  return factory;
+  return &factory;
 }
 
 Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) const
