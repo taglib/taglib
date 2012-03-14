@@ -39,15 +39,15 @@
 #include "apefooter.h"
 #include "apeitem.h"
 
-using namespace TagLib;
-using namespace APE;
+namespace TagLib
+{
 
 class APE::Tag::TagPrivate
 {
 public:
   TagPrivate() : file(0), footerLocation(-1), tagLength(0) {}
 
-  File *file;
+  TagLib::File *file;
   long footerLocation;
   long tagLength;
 
@@ -65,7 +65,7 @@ APE::Tag::Tag() : TagLib::Tag()
   d = new TagPrivate;
 }
 
-APE::Tag::Tag(File *file, long footerLocation) : TagLib::Tag()
+APE::Tag::Tag(TagLib::File *file, long footerLocation) : TagLib::Tag()
 {
   d = new TagPrivate;
   d->file = file;
@@ -268,4 +268,6 @@ void APE::Tag::parse(const ByteVector &data)
 
     pos += item.size();
   }
+}
+
 }
