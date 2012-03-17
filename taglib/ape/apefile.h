@@ -111,6 +111,25 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
+       * Implements the unified property interface -- export function.
+       * If the file contains both an APE and an ID3v1 tag, only APE
+       * will be converted to the PropertyMap.
+       */
+      PropertyMap properties() const;
+
+      /*!
+       * Removes unsupported properties. Forwards to the actual Tag's
+       * removeUnsupportedProperties() function.
+       */
+      void removeUnsupportedProperties(const StringList &properties);
+
+      /*!
+       * Implements the unified property interface -- import function.
+       * As for the export, only one tag is taken into account. If the file
+       * has no tag at all, APE will be created.
+       */
+      PropertyMap setProperties(const PropertyMap &);
+      /*!
        * Returns the APE::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */

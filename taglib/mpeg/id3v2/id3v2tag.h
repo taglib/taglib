@@ -261,6 +261,56 @@ namespace TagLib {
       void removeFrames(const ByteVector &id);
 
       /*!
+       * Implements the unified property interface -- export function.
+       * This function does some work to translate the hard-specified ID3v2
+       * frame types into a free-form string-to-stringlist PropertyMap:
+       *  - if ID3v2 frame ID is known by Frame::frameIDToKey(), the returned
+       *    key is used
+       *  - if the frame ID is "TXXX" (user text frame), the description() is
+       *    used as key
+       *  - if the frame ID is "WXXX" (user url frame),
+       *    - if the description is empty or "URL", the key "URL" is used
+       *    - otherwise, the key "URL:<description>" is used;
+       *  - if the frame ID is "COMM" (comments frame),
+       *    - if the description is empty or "COMMENT", the key "COMMENT"
+       *      is used
+       *    - otherwise, the key "COMMENT:<description>" is used;
+       *  - if the frame ID is "USLT" (unsynchronized lyrics),
+       *    - if the description is empty or "LYRICS", the key "LYRICS" is used
+       *    - otherwise, the key "LYRICS:<description>" is used;
+       *  - if the frame ID is "TIPL" (involved peoples list), and if all the
+       *    roles defined in the frame are known in TextIdentificationFrame::involvedPeopleMap(),
+       *    then "<role>=<name>" will be contained in the returned obejct for each
+       *  - if the frame ID is "TMCL" (musician credit list), then
+       *    "PERFORMER:<instrument>=<name>" will be contained in the returned
+       *    PropertyMap for each defined musician
+       *  In any other case, the unsupportedData() of the returned object will contain
+       *  the frame's ID and, in case of a frame ID which is allowed to appear more than
+       *  once, the description, separated by a "/".
+       *
+       */
+      PropertyMap properties() const;
+
+      /*!
+       * Removes unsupported frames given by \a properties. The elements of
+       * \a properties must be taken from properties().unsupportedData(); they
+       * are of one of the following forms:
+       *  - a four-character frame ID, if the ID3 specification allows only one
+       *    frame with that ID (thus, the frame is uniquely determined)
+       *  - frameID + "/" + description(), when the ID is one of "TXXX", "WXXX",
+       *    "COMM", or "USLT",
+       *  - "UNKNOWN/" + frameID, for frames that could not be parsed by TagLib.
+       *    In that case, *all* unknown frames with the given ID will be removed.
+       */
+      void removeUnsupportedProperties(const StringList &properties);
+
+      /*!
+       * Implements the unified property interface -- import function.
+       * See the comments in properties().
+       */
+      PropertyMap setProperties(const PropertyMap &);
+
+      /*!
        * Render the tag back to binary data, suitable to be written to disk.
        */
       ByteVector render() const;

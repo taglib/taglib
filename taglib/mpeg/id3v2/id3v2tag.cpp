@@ -24,18 +24,23 @@
  ***************************************************************************/
 
 #include <tfile.h>
-#include <tdebug.h>
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
-
+#include "tbytevector.h"
 #include "id3v1genres.h"
+#include "tpropertymap.h"
+#include <tdebug.h>
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
+#include "frames/urllinkframe.h"
+#include "frames/uniquefileidentifierframe.h"
+#include "frames/unsynchronizedlyricsframe.h"
+#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -324,9 +329,99 @@ void ID3v2::Tag::removeFrame(Frame *frame, bool del)
 
 void ID3v2::Tag::removeFrames(const ByteVector &id)
 {
-    FrameList l = d->frameListMap[id];
-    for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
-      removeFrame(*it, true);
+  FrameList l = d->frameListMap[id];
+  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+    removeFrame(*it, true);
+}
+
+PropertyMap ID3v2::Tag::properties() const
+{
+  PropertyMap properties;
+  for(FrameList::ConstIterator it = frameList().begin(); it != frameList().end(); ++it) {
+    PropertyMap props = (*it)->asProperties();
+    properties.merge(props);
+  }
+  return properties;
+}
+
+void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
+{
+  for(StringList::ConstIterator it = properties.begin(); it != properties.end(); ++it){
+    if(it->startsWith("UNKNOWN/")) {
+      String frameID = it->substr(String("UNKNOWN/").size());
+      if(frameID.size() != 4)
+        continue; // invalid specification
+      ByteVector id = frameID.data(String::Latin1);
+      // delete all unknown frames of given type
+      FrameList l = frameList(id);
+      for(FrameList::ConstIterator fit = l.begin(); fit != l.end(); fit++)
+        if (dynamic_cast<const UnknownFrame *>(*fit) != NULL)
+          removeFrame(*fit);
+    } else if(it->size() == 4){
+      ByteVector id = it->data(String::Latin1);
+      removeFrames(id);
+    } else {
+      ByteVector id = it->substr(0,4).data(String::Latin1);
+      if(it->size() <= 5)
+        continue; // invalid specification
+      String description = it->substr(5);
+      Frame *frame;
+      if(id == "TXXX")
+        frame = UserTextIdentificationFrame::find(this, description);
+      else if(id == "WXXX")
+        frame = UserUrlLinkFrame::find(this, description);
+      else if(id == "COMM")
+        frame = CommentsFrame::findByDescription(this, description);
+      else if(id == "USLT")
+        frame = UnsynchronizedLyricsFrame::findByDescription(this, description);
+      if(frame)
+        removeFrame(frame);
+    }
+  }
+}
+
+PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
+{
+  FrameList framesToDelete;
+  // we split up the PropertyMap into the "normal" keys and the "complicated" ones,
+  // which are those according to TIPL or TMCL frames.
+  PropertyMap properties;
+  PropertyMap tiplProperties;
+  PropertyMap tmclProperties;
+  Frame::splitProperties(origProps, properties, tiplProperties, tmclProperties);
+  for(FrameListMap::ConstIterator it = frameListMap().begin(); it != frameListMap().end(); ++it){
+    for(FrameList::ConstIterator lit = it->second.begin(); lit != it->second.end(); ++lit){
+      PropertyMap frameProperties = (*lit)->asProperties();
+      if(it->first == "TIPL") {
+        if (tiplProperties != frameProperties)
+          framesToDelete.append(*lit);
+        else
+          tiplProperties.erase(frameProperties);
+      } else if(it->first == "TMCL") {
+        if (tmclProperties != frameProperties)
+          framesToDelete.append(*lit);
+        else
+          tmclProperties.erase(frameProperties);
+      } else if(!properties.contains(frameProperties))
+        framesToDelete.append(*lit);
+      else
+        properties.erase(frameProperties);
+    }
+  }
+  for(FrameList::ConstIterator it = framesToDelete.begin(); it != framesToDelete.end(); ++it)
+    removeFrame(*it);
+
+  // now create remaining frames:
+  // start with the involved people list (TIPL)
+  if(!tiplProperties.isEmpty())
+      addFrame(TextIdentificationFrame::createTIPLFrame(tiplProperties));
+  // proceed with the musician credit list (TMCL)
+  if(!tmclProperties.isEmpty())
+      addFrame(TextIdentificationFrame::createTMCLFrame(tmclProperties));
+  // now create the "one key per frame" frames
+  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it)
+    addFrame(Frame::createTextualFrame(it->first, it->second));
+  return PropertyMap(); // ID3 implements the complete PropertyMap interface, so an empty map is returned
 }
 
 ByteVector ID3v2::Tag::render() const

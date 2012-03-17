@@ -23,6 +23,7 @@
 #include "tdebug.h"
 #include "xmfile.h"
 #include "modfileprivate.h"
+#include "tpropertymap.h"
 
 #include <string.h>
 #include <algorithm>
@@ -377,6 +378,16 @@ XM::File::~File()
 Mod::Tag *XM::File::tag() const
 {
   return &d->tag;
+}
+
+PropertyMap XM::File::properties() const
+{
+  return d->tag.properties();
+}
+
+PropertyMap XM::File::setProperties(const PropertyMap &properties)
+{
+  return d->tag.setProperties(properties);
 }
 
 XM::Properties *XM::File::audioProperties() const

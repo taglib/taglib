@@ -27,6 +27,7 @@
 #include <tdebug.h>
 
 #include <xiphcomment.h>
+#include <tpropertymap.h>
 
 using namespace TagLib;
 
@@ -186,6 +187,44 @@ TagLib::uint Ogg::XiphComment::fieldCount() const
 const Ogg::FieldListMap &Ogg::XiphComment::fieldListMap() const
 {
   return d->fieldListMap;
+}
+
+PropertyMap Ogg::XiphComment::properties() const
+{
+  return d->fieldListMap;
+}
+
+PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
+{
+  // check which keys are to be deleted
+  StringList toRemove;
+  for(FieldListMap::ConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
+    if (!properties.contains(it->first))
+      toRemove.append(it->first);
+
+  for(StringList::ConstIterator it = toRemove.begin(); it != toRemove.end(); ++it)
+      removeField(*it);
+
+  // now go through keys in \a properties and check that the values match those in the xiph comment */
+  PropertyMap::ConstIterator it = properties.begin();
+  for(; it != properties.end(); ++it)
+  {
+    if(!d->fieldListMap.contains(it->first) || !(it->second == d->fieldListMap[it->first])) {
+      const StringList &sl = it->second;
+      if(sl.size() == 0)
+        // zero size string list -> remove the tag with all values
+        removeField(it->first);
+      else {
+        // replace all strings in the list for the tag
+        StringList::ConstIterator valueIterator = sl.begin();
+        addField(it->first, *valueIterator, true);
+        ++valueIterator;
+        for(; valueIterator != sl.end(); ++valueIterator)
+          addField(it->first, *valueIterator, false);
+      }
+    }
+  }
+  return PropertyMap();
 }
 
 String Ogg::XiphComment::vendorID() const

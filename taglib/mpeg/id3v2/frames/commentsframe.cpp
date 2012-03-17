@@ -29,6 +29,7 @@
 #include <tstringlist.h>
 
 #include "commentsframe.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -107,6 +108,19 @@ String::Type CommentsFrame::textEncoding() const
 void CommentsFrame::setTextEncoding(String::Type encoding)
 {
   d->textEncoding = encoding;
+}
+
+PropertyMap CommentsFrame::asProperties() const
+{
+  String key = PropertyMap::prepareKey(description());
+  PropertyMap map;
+  if(key.isEmpty() || key == "COMMENT")
+    map.insert("COMMENT", text());
+  else if(key.isNull())
+    map.unsupportedData().append(L"COMM/" + description());
+  else
+    map.insert("COMMENT:" + key, text());
+  return map;
 }
 
 CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static

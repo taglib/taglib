@@ -31,6 +31,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tagunion.h>
+#include <tpropertymap.h>
 
 #include "wavpackfile.h"
 #include "id3v1tag.h"
@@ -103,6 +104,25 @@ WavPack::File::~File()
 TagLib::Tag *WavPack::File::tag() const
 {
   return &d->tag;
+}
+
+PropertyMap WavPack::File::properties() const
+{
+  if(d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
+  if(d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+  return PropertyMap();
+}
+
+PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
+{
+  if(d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
+  else if(d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+  else
+    return d->tag.access<APE::Tag>(APE, true)->setProperties(properties);
 }
 
 WavPack::Properties *WavPack::File::audioProperties() const

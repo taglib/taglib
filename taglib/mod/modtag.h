@@ -159,6 +159,22 @@ namespace TagLib {
        */
       void setTrackerName(const String &trackerName);
 
+      /*!
+       * Implements the unified property interface -- export function.
+       * Since the module tag is very limited, the exported map is as well.
+       */
+      PropertyMap properties() const;
+
+      /*!
+       * Implements the unified property interface -- import function.
+       * Because of the limitations of the module file tag, any tags besides
+       * COMMENT, TITLE and, if it is an XM file, TRACKERNAME, will be
+       * returened. Additionally, if the map contains tags with multiple values,
+       * all but the first will be contained in the returned map of unsupported
+       * properties.
+       */
+      PropertyMap setProperties(const PropertyMap &);
+
     private:
       Tag(const Tag &);
       Tag &operator=(const Tag &);
