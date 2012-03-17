@@ -63,6 +63,12 @@ namespace TagLib {
     virtual String artist() const = 0;
 
     /*!
+     * Returns the artist name; if no artist name is present in the tag
+     * String::null will be returned.
+     */
+    virtual String albumArtist() const;
+
+    /*!
      * Returns the album name; if no album name is present in the tag
      * String::null will be returned.
      */
@@ -79,6 +85,12 @@ namespace TagLib {
      * will be returned.
      */
     virtual String genre() const = 0;
+
+    /*!
+     * Returns the grouping value; if no genre is present in the tag String::null
+     * will be returned.
+     */
+    virtual String grouping() const;
 
     /*!
      * Returns the year; if there is no year set, this will return 0.
@@ -104,6 +116,12 @@ namespace TagLib {
     virtual void setArtist(const String &s) = 0;
 
     /*!
+     * Sets the album artist to \a s.  If \a s is String::null then this value will
+     * be cleared.
+     */
+    virtual void setAlbumArtist(const String &s);
+
+    /*!
      * Sets the album to \a s.  If \a s is String::null then this value will be
      * cleared.
      */
@@ -123,6 +141,12 @@ namespace TagLib {
      * implementation.
      */
     virtual void setGenre(const String &s) = 0;
+    
+    /*!
+     * Sets the grouping to \a s.  If \a s is String::null then this value will be
+     * cleared.
+     */
+    virtual void setGrouping(const String &s);
 
     /*!
      * Sets the year to \a i.  If \a s is 0 then this value will be cleared.

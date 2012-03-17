@@ -109,6 +109,13 @@ String ID3v2::Tag::artist() const
   return String::null;
 }
 
+String ID3v2::Tag::albumArtist() const
+{
+  if(!d->frameListMap["TPE2"].isEmpty())
+    return d->frameListMap["TPE2"].front()->toString();
+  return String::null;
+}
+
 String ID3v2::Tag::album() const
 {
   if(!d->frameListMap["TALB"].isEmpty())
@@ -177,6 +184,13 @@ String ID3v2::Tag::genre() const
   return genres.toString();
 }
 
+String ID3v2::Tag::grouping() const
+{
+  if(!d->frameListMap["TIT1"].isEmpty())
+    return d->frameListMap["TIT1"].front()->toString();
+  return String::null;
+}
+
 TagLib::uint ID3v2::Tag::year() const
 {
   if(!d->frameListMap["TDRC"].isEmpty())
@@ -199,6 +213,11 @@ void ID3v2::Tag::setTitle(const String &s)
 void ID3v2::Tag::setArtist(const String &s)
 {
   setTextFrame("TPE1", s);
+}
+
+void ID3v2::Tag::setAlbumArtist(const String &s)
+{
+  setTextFrame("TPE2", s);
 }
 
 void ID3v2::Tag::setAlbum(const String &s)
@@ -246,6 +265,11 @@ void ID3v2::Tag::setGenre(const String &s)
   setTextFrame("TCON", s);
 
 #endif
+}
+
+void ID3v2::Tag::setGrouping(const String &s)
+{
+  setTextFrame("TIT1", s);
 }
 
 void ID3v2::Tag::setYear(uint i)

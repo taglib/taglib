@@ -151,6 +151,15 @@ char *taglib_tag_artist(const TagLib_Tag *tag)
   return s;
 }
 
+char *taglib_tag_album_artist(const TagLib_Tag *tag)
+{
+  const Tag *t = reinterpret_cast<const Tag *>(tag);
+  char *s = ::strdup(t->albumArtist().toCString(unicodeStrings));
+  if(stringManagementEnabled)
+    strings.append(s);
+  return s;
+}
+
 char *taglib_tag_album(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
@@ -173,6 +182,15 @@ char *taglib_tag_genre(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
   char *s = ::strdup(t->genre().toCString(unicodeStrings));
+  if(stringManagementEnabled)
+    strings.append(s);
+  return s;
+}
+
+char *taglib_tag_grouping(const TagLib_Tag *tag)
+{
+  const Tag *t = reinterpret_cast<const Tag *>(tag);
+  char *s = ::strdup(t->grouping().toCString(unicodeStrings));
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -202,6 +220,12 @@ void taglib_tag_set_artist(TagLib_Tag *tag, const char *artist)
   t->setArtist(String(artist, unicodeStrings ? String::UTF8 : String::Latin1));
 }
 
+void taglib_tag_set_album_artist(TagLib_Tag *tag, const char *albumArtist)
+{
+  Tag *t = reinterpret_cast<Tag *>(tag);
+  t->setAlbumArtist(String(albumArtist, unicodeStrings ? String::UTF8 : String::Latin1));
+}
+
 void taglib_tag_set_album(TagLib_Tag *tag, const char *album)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
@@ -218,6 +242,12 @@ void taglib_tag_set_genre(TagLib_Tag *tag, const char *genre)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
   t->setGenre(String(genre, unicodeStrings ? String::UTF8 : String::Latin1));
+}
+
+void taglib_tag_set_grouping(TagLib_Tag *tag, const char *grouping)
+{
+  Tag *t = reinterpret_cast<Tag *>(tag);
+  t->setGenre(String(grouping, unicodeStrings ? String::UTF8 : String::Latin1));
 }
 
 void taglib_tag_set_year(TagLib_Tag *tag, unsigned int year)
