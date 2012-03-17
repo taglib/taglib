@@ -23,6 +23,7 @@
 #include "tstringlist.h"
 #include "tdebug.h"
 #include "modfileprivate.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace Mod;
@@ -68,6 +69,16 @@ Mod::Tag *Mod::File::tag() const
 Mod::Properties *Mod::File::audioProperties() const
 {
   return &d->properties;
+}
+
+PropertyMap Mod::File::properties() const
+{
+  return d->tag.properties();
+}
+
+PropertyMap Mod::File::setProperties(const PropertyMap &properties)
+{
+  return d->tag.setProperties(properties);
 }
 
 bool Mod::File::save()

@@ -27,8 +27,10 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 
 #include "vorbisfile.h"
+
 
 using namespace TagLib;
 
@@ -83,6 +85,16 @@ Vorbis::File::~File()
 Ogg::XiphComment *Vorbis::File::tag() const
 {
   return d->comment;
+}
+
+PropertyMap Vorbis::File::properties() const
+{
+  return d->comment->properties();
+}
+
+PropertyMap Vorbis::File::setProperties(const PropertyMap &properties)
+{
+  return d->comment->setProperties(properties);
 }
 
 Vorbis::Properties *Vorbis::File::audioProperties() const

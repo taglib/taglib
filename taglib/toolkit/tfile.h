@@ -28,6 +28,7 @@
 
 #include "taglib_export.h"
 #include "taglib.h"
+#include "tag.h"
 #include "tbytevector.h"
 #include "tiostream.h"
 
@@ -36,6 +37,7 @@ namespace TagLib {
   class String;
   class Tag;
   class AudioProperties;
+  class PropertyMap;
 
   //! A file class with some useful methods for tag manipulation
 
@@ -76,6 +78,36 @@ namespace TagLib {
      */
     virtual Tag *tag() const = 0;
 
+    /*!
+     * Exports the tags of the file as dictionary mapping (human readable) tag
+     * names (Strings) to StringLists of tag values. Calls the according specialization
+     * in the File subclasses.
+     * For each metadata object of the file that could not be parsed into the PropertyMap
+     * format, the returend map's unsupportedData() list will contain one entry identifying
+     * that object (e.g. the frame type for ID3v2 tags). Use removeUnsupportedProperties()
+     * to remove (a subset of) them.
+     * BIC: Will be made virtual in future releases.
+     */
+    PropertyMap properties() const;
+
+    /*!
+     * Removes unsupported properties, or a subset of them, from the file's metadata.
+     * The parameter \a properties must contain only entries from
+     * properties().unsupportedData().
+     * BIC: Will be mad virtual in future releases.
+     */
+    void removeUnsupportedProperties(const StringList& properties);
+
+    /*!
+     * Sets the tags of this File to those specified in \a properties. Calls the
+     * according specialization method in the subclasses of File to do the translation
+     * into the format-specific details.
+     * If some value(s) could not be written imported to the specific metadata format,
+     * the returned PropertyMap will contain those value(s). Otherwise it will be empty,
+     * indicating that no problems occured.
+     * BIC: will become pure virtual in the future
+     */
+    PropertyMap setProperties(const PropertyMap &properties);
     /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were

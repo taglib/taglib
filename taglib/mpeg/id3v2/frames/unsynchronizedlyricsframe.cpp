@@ -27,7 +27,9 @@
 
 #include "unsynchronizedlyricsframe.h"
 #include <tbytevectorlist.h>
+#include <id3v2tag.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -111,6 +113,30 @@ void UnsynchronizedLyricsFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
+PropertyMap UnsynchronizedLyricsFrame::asProperties() const
+{
+  PropertyMap map;
+  String key = PropertyMap::prepareKey(description());
+  if(key.isEmpty() || key.upper() == "LYRICS")
+    map.insert("LYRICS", text());
+  else if(key.isNull())
+    map.unsupportedData().append(L"USLT/" + description());
+  else
+    map.insert("LYRICS:" + key, text());
+  return map;
+}
+
+UnsynchronizedLyricsFrame *UnsynchronizedLyricsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
+{
+  ID3v2::FrameList lyrics = tag->frameList("USLT");
+
+  for(ID3v2::FrameList::ConstIterator it = lyrics.begin(); it != lyrics.end(); ++it){
+    UnsynchronizedLyricsFrame *frame = dynamic_cast<UnsynchronizedLyricsFrame *>(*it);
+    if(frame && frame->description() == d)
+      return frame;
+  }
+  return 0;
+}
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

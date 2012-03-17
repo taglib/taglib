@@ -61,6 +61,18 @@ namespace TagLib {
         Mod::Tag *tag() const;
 
         /*!
+         * Implements the unified property interface -- export function.
+         * Forwards to Mod::Tag::properties().
+         */
+        PropertyMap properties() const;
+
+        /*!
+         * Implements the unified property interface -- import function.
+         * Forwards to Mod::Tag::setProperties().
+         */
+        PropertyMap setProperties(const PropertyMap &);
+
+        /*!
          * Returns the S3M::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */

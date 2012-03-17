@@ -125,6 +125,20 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
+       * Implements the unified property interface -- export function.
+       * If the file contains both ID3v1 and v2 tags, only ID3v2 will be
+       * converted to the PropertyMap.
+       */
+      PropertyMap properties() const;
+
+      /*!
+       * Implements the unified property interface -- import function.
+       * As with the export, only one tag is taken into account. If the file
+       * has no tag at all, ID3v2 will be created.
+       */
+      PropertyMap setProperties(const PropertyMap &);
+
+      /*!
        * Returns the TrueAudio::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */

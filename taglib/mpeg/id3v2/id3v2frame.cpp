@@ -38,6 +38,12 @@
 
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
+#include "tpropertymap.h"
+#include "frames/textidentificationframe.h"
+#include "frames/urllinkframe.h"
+#include "frames/unsynchronizedlyricsframe.h"
+#include "frames/commentsframe.h"
+#include "frames/unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -95,9 +101,55 @@ ByteVector Frame::textDelimiter(String::Type t)
   return d;
 }
 
+const String Frame::instrumentPrefix("PERFORMER:");
+const String Frame::commentPrefix("COMMENT:");
+const String Frame::lyricsPrefix("LYRICS:");
+const String Frame::urlPrefix("URL:");
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
+
+Frame *Frame::createTextualFrame(const String &key, const StringList &values) //static
+{
+  // check if the key is contained in the key<=>frameID mapping
+  ByteVector frameID = keyToFrameID(key);
+  if(!frameID.isNull()) {
+    if(frameID[0] == 'T'){ // text frame
+      TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
+      frame->setText(values);
+      return frame;
+    } else if(values.size() == 1){  // URL frame (not WXXX); support only one value
+        UrlLinkFrame* frame = new UrlLinkFrame(frameID);
+        frame->setUrl(values.front());
+        return frame;
+    }
+  }
+  // now we check if it's one of the "special" cases:
+  // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
+  if((key == "LYRICS" || key.startsWith(lyricsPrefix)) && values.size() == 1){
+    UnsynchronizedLyricsFrame *frame = new UnsynchronizedLyricsFrame();
+    frame->setDescription(key == "LYRICS" ? key : key.substr(lyricsPrefix.size()));
+    frame->setText(values.front());
+    return frame;
+  }
+  // -URL: depending on the number of values, use WXXX or TXXX (with description=URL)
+  if((key == "URL" || key.startsWith(urlPrefix)) && values.size() == 1){
+    UserUrlLinkFrame *frame = new UserUrlLinkFrame(String::UTF8);
+    frame->setDescription(key == "URL" ? key : key.substr(urlPrefix.size()));
+    frame->setUrl(values.front());
+    return frame;
+  }
+  // -COMMENT: depending on the number of values, use COMM or TXXX (with description=COMMENT)
+  if((key == "COMMENT" || key.startsWith(commentPrefix)) && values.size() == 1){
+    CommentsFrame *frame = new CommentsFrame(String::UTF8);
+    frame->setDescription(key == "COMMENT" ? key : key.substr(commentPrefix.size()));
+    frame->setText(values.front());
+    return frame;
+  }
+  // if non of the above cases apply, we use a TXXX frame with the key as description
+  return new UserTextIdentificationFrame(key, values, String::UTF8);
+}
 
 Frame::~Frame()
 {
@@ -260,6 +312,163 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
 String::Type Frame::checkTextEncoding(const StringList &fields, String::Type encoding) const
 {
   return checkEncoding(fields, encoding, header()->version());
+}
+
+static const uint frameTranslationSize = 51;
+static const char *frameTranslation[][2] = {
+  // Text information frames
+  { "TALB", "ALBUM"},
+  { "TBPM", "BPM" },
+  { "TCOM", "COMPOSER" },
+  { "TCON", "GENRE" },
+  { "TCOP", "COPYRIGHT" },
+  { "TDEN", "ENCODINGTIME" },
+  { "TDLY", "PLAYLISTDELAY" },
+  { "TDOR", "ORIGINALDATE" },
+  { "TDRC", "DATE" },
+  // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  { "TDRL", "RELEASEDATE" },
+  { "TDTG", "TAGGINGDATE" },
+  { "TENC", "ENCODEDBY" },
+  { "TEXT", "LYRICIST" },
+  { "TFLT", "FILETYPE" },
+  //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
+  { "TIT1", "CONTENTGROUP" },
+  { "TIT2", "TITLE"},
+  { "TIT3", "SUBTITLE" },
+  { "TKEY", "INITIALKEY" },
+  { "TLAN", "LANGUAGE" },
+  { "TLEN", "LENGTH" },
+  //{ "TMCL", "MUSICIANCREDITS" }, handled separately
+  { "TMED", "MEDIATYPE" },
+  { "TMOO", "MOOD" },
+  { "TOAL", "ORIGINALALBUM" },
+  { "TOFN", "ORIGINALFILENAME" },
+  { "TOLY", "ORIGINALLYRICIST" },
+  { "TOPE", "ORIGINALARTIST" },
+  { "TOWN", "OWNER" },
+  { "TPE1", "ARTIST"},
+  { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
+  { "TPE3", "CONDUCTOR" },
+  { "TPE4", "REMIXER" }, // could also be ARRANGER
+  { "TPOS", "DISCNUMBER" },
+  { "TPRO", "PRODUCEDNOTICE" },
+  { "TPUB", "PUBLISHER" },
+  { "TRCK", "TRACKNUMBER" },
+  { "TRSN", "RADIOSTATION" },
+  { "TRSO", "RADIOSTATIONOWNER" },
+  { "TSOA", "ALBUMSORT" },
+  { "TSOP", "ARTISTSORT" },
+  { "TSOT", "TITLESORT" },
+  { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
+  { "TSRC", "ISRC" },
+  { "TSSE", "ENCODING" },
+  // URL frames
+  { "WCOP", "COPYRIGHTURL" },
+  { "WOAF", "FILEWEBPAGE" },
+  { "WOAR", "ARTISTWEBPAGE" },
+  { "WOAS", "AUDIOSOURCEWEBPAGE" },
+  { "WORS", "RADIOSTATIONWEBPAGE" },
+  { "WPAY", "PAYMENTWEBPAGE" },
+  { "WPUB", "PUBLISHERWEBPAGE" },
+  //{ "WXXX", "URL"}, handled specially
+  // Other frames
+  { "COMM", "COMMENT" },
+  //{ "USLT", "LYRICS" }, handled specially
+};
+
+Map<ByteVector, String> &idMap()
+{
+  static Map<ByteVector, String> m;
+  if(m.isEmpty())
+    for(size_t i = 0; i < frameTranslationSize; ++i)
+      m[frameTranslation[i][0]] = frameTranslation[i][1];
+  return m;
+}
+
+// list of deprecated frames and their successors
+static const uint deprecatedFramesSize = 4;
+static const char *deprecatedFrames[][2] = {
+  {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+  {"TDAT", "TDRC"}, // 2.3 -> 2.4
+  {"TYER", "TDRC"}, // 2.3 -> 2.4
+  {"TIME", "TDRC"}, // 2.3 -> 2.4
+};
+
+Map<ByteVector,ByteVector> &deprecationMap()
+{
+  static Map<ByteVector,ByteVector> depMap;
+  if(depMap.isEmpty())
+    for(uint i = 0; i < deprecatedFramesSize; ++i)
+      depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
+  return depMap;
+}
+
+String Frame::frameIDToKey(const ByteVector &id)
+{
+  Map<ByteVector, String> &m = idMap();
+  if(m.contains(id))
+    return m[id];
+  if(deprecationMap().contains(id))
+    return m[deprecationMap()[id]];
+  return String::null;
+}
+
+ByteVector Frame::keyToFrameID(const String &s)
+{
+  static Map<String, ByteVector> m;
+  if(m.isEmpty())
+    for(size_t i = 0; i < frameTranslationSize; ++i)
+      m[frameTranslation[i][1]] = frameTranslation[i][0];
+  if(m.contains(s.upper()))
+    return m[s];
+  return ByteVector::null;
+}
+
+PropertyMap Frame::asProperties() const
+{
+  if(dynamic_cast< const UnknownFrame *>(this)) {
+    PropertyMap m;
+    m.unsupportedData().append("UNKNOWN/" + frameID());
+    return m;
+  }
+  const ByteVector &id = frameID();
+  // workaround until this function is virtual
+  if(id == "TXXX")
+    return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
+  else if(id[0] == 'T')
+    return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
+  else if(id == "WXXX")
+    return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
+  else if(id[0] == 'W')
+    return dynamic_cast< const UrlLinkFrame* >(this)->asProperties();
+  else if(id == "COMM")
+    return dynamic_cast< const CommentsFrame* >(this)->asProperties();
+  else if(id == "USLT")
+    return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
+  PropertyMap m;
+  m.unsupportedData().append(id);
+  return m;
+}
+
+void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFrameProperties,
+          PropertyMap &tiplProperties, PropertyMap &tmclProperties)
+{
+
+  singleFrameProperties.clear();
+  tiplProperties.clear();
+  tmclProperties.clear();
+  for(PropertyMap::ConstIterator it = original.begin(); it != original.end(); ++it) {
+    if(TextIdentificationFrame::involvedPeopleMap().contains(it->first))
+      tiplProperties.insert(it->first, it->second);
+    else if(it->first.startsWith(TextIdentificationFrame::instrumentPrefix))
+      tmclProperties.insert(it->first, it->second);
+    else
+      singleFrameProperties.insert(it->first, it->second);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

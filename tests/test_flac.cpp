@@ -4,6 +4,7 @@
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <flacfile.h>
 #include <xiphcomment.h>
 #include "utils.h"
@@ -22,6 +23,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testRemoveAllPictures);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST(testSaveMultipleValues);
+  CPPUNIT_TEST(testDict);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -206,6 +208,27 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), m["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("artist 1"), m["ARTIST"][0]);
     CPPUNIT_ASSERT_EQUAL(String("artist 2"), m["ARTIST"][1]);
+  }
+
+  void testDict()
+  {
+	// test unicode & multiple values with dict interface
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    string newname = copy.fileName();
+
+    FLAC::File *f = new FLAC::File(newname.c_str());
+    PropertyMap dict;
+    dict["ARTIST"].append("artøst 1");
+    dict["ARTIST"].append("artöst 2");
+    f->setProperties(dict);
+    f->save();
+    delete f;
+
+    f = new FLAC::File(newname.c_str());
+    dict = f->properties();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), dict["ARTIST"].size());
+    CPPUNIT_ASSERT_EQUAL(String("artøst 1"), dict["ARTIST"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("artöst 2"), dict["ARTIST"][1]);
   }
 
 };

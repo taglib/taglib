@@ -23,6 +23,7 @@
 #include "tstringlist.h"
 #include "tdebug.h"
 #include "modfileprivate.h"
+#include "tpropertymap.h"
 
 #include <iostream>
 
@@ -65,6 +66,16 @@ S3M::File::~File()
 Mod::Tag *S3M::File::tag() const
 {
   return &d->tag;
+}
+
+PropertyMap S3M::File::properties() const
+{
+  return d->tag.properties();
+}
+
+PropertyMap S3M::File::setProperties(const PropertyMap &properties)
+{
+  return d->tag.setProperties(properties);
 }
 
 S3M::Properties *S3M::File::audioProperties() const

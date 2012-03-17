@@ -36,6 +36,7 @@
 #include <tdebug.h>
 #include <tagunion.h>
 #include <id3v1tag.h>
+#include <tpropertymap.h>
 
 #include "apefile.h"
 
@@ -107,6 +108,33 @@ APE::File::~File()
 TagLib::Tag *APE::File::tag() const
 {
   return &d->tag;
+}
+
+PropertyMap APE::File::properties() const
+{
+  if(d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
+  if(d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+  return PropertyMap();
+}
+
+void APE::File::removeUnsupportedProperties(const StringList &properties)
+{
+  if(d->hasAPE)
+    d->tag.access<APE::Tag>(APEIndex, false)->removeUnsupportedProperties(properties);
+  if(d->hasID3v1)
+    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(properties);
+}
+
+PropertyMap APE::File::setProperties(const PropertyMap &properties)
+{
+  if(d->hasAPE)
+    return d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
+  else if(d->hasID3v1)
+    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+  else
+    return d->tag.access<APE::Tag>(APEIndex, true)->setProperties(properties);
 }
 
 APE::Properties *APE::File::audioProperties() const

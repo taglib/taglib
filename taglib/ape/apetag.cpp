@@ -34,6 +34,7 @@
 #include <tfile.h>
 #include <tstring.h>
 #include <tmap.h>
+#include <tpropertymap.h>
 
 #include "apetag.h"
 #include "apefooter.h"
@@ -172,6 +173,86 @@ void APE::Tag::setTrack(uint i)
     removeItem("TRACK");
   else
     addValue("TRACK", String::number(i), true);
+}
+
+// conversions of tag keys between what we use in PropertyMap and what's usual
+// for APE tags
+static const uint keyConversionsSize = 5; //usual,         APE
+static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
+                                           {"DATE",        "YEAR"        },
+                                           {"ALBUMARTIST", "ALBUM ARTIST"},
+                                           {"DISCNUMBER",  "DISC"        },
+                                           {"REMIXER",     "MIXARTIST"   }};
+
+PropertyMap APE::Tag::properties() const
+{
+  PropertyMap properties;
+  ItemListMap::ConstIterator it = itemListMap().begin();
+  for(; it != itemListMap().end(); ++it) {
+    String tagName = PropertyMap::prepareKey(it->first);
+    // if the item is Binary or Locator, or if the key is an invalid string,
+    // add to unsupportedData
+    if(it->second.type() != Item::Text || tagName.isNull())
+      properties.unsupportedData().append(it->first);
+    else {
+      // Some tags need to be handled specially
+      for(uint i = 0; i < keyConversionsSize; ++i)
+        if(tagName == keyConversions[i][1])
+          tagName = keyConversions[i][0];
+        properties[tagName].append(it->second.toStringList());
+    }
+  }
+  return properties;
+}
+
+void APE::Tag::removeUnsupportedProperties(const StringList &properties)
+{
+  StringList::ConstIterator it = properties.begin();
+  for(; it != properties.end(); ++it)
+    removeItem(*it);
+}
+
+PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
+{
+  PropertyMap properties(origProps); // make a local copy that can be modified
+
+  // see comment in properties()
+  for(uint i = 0; i < keyConversionsSize; ++i)
+    if(properties.contains(keyConversions[i][0])) {
+      properties.insert(keyConversions[i][1], properties[keyConversions[i][0]]);
+      properties.erase(keyConversions[i][0]);
+    }
+
+  // first check if tags need to be removed completely
+  StringList toRemove;
+  ItemListMap::ConstIterator remIt = itemListMap().begin();
+  for(; remIt != itemListMap().end(); ++remIt) {
+    String key = PropertyMap::prepareKey(remIt->first);
+    // only remove if a) key is valid, b) type is text, c) key not contained in new properties
+    if(!key.isNull() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
+      toRemove.append(remIt->first);
+  }
+
+  for (StringList::Iterator removeIt = toRemove.begin(); removeIt != toRemove.end(); removeIt++)
+    removeItem(*removeIt);
+
+  // now sync in the "forward direction"
+  PropertyMap::ConstIterator it = properties.begin();
+  for(; it != properties.end(); ++it) {
+    const String &tagName = it->first;
+    if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == it->second)) {
+      if(it->second.size() == 0)
+        removeItem(tagName);
+      else {
+        StringList::ConstIterator valueIt = it->second.begin();
+        addValue(tagName, *valueIt, true);
+        ++valueIt;
+        for(; valueIt != it->second.end(); ++valueIt)
+          addValue(tagName, *valueIt, false);
+      }
+    }
+  }
+  return PropertyMap();
 }
 
 APE::Footer *APE::Tag::footer() const
