@@ -120,7 +120,7 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 }
 
 // array of allowed TIPL prefixes and their corresponding key value
-static const uint involvedPeopleSize = 5;
+static const TagLib::uint involvedPeopleSize = 5;
 static const char* involvedPeople[][2] = {
     {"ARRANGER", "ARRANGER"},
     {"ENGINEER", "ENGINEER"},

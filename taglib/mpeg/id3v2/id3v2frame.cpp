@@ -314,7 +314,7 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
-static const uint frameTranslationSize = 51;
+static const TagLib::uint frameTranslationSize = 51;
 static const char *frameTranslation[][2] = {
   // Text information frames
   { "TALB", "ALBUM"},
@@ -390,7 +390,7 @@ Map<ByteVector, String> &idMap()
 }
 
 // list of deprecated frames and their successors
-static const uint deprecatedFramesSize = 4;
+static const TagLib::uint deprecatedFramesSize = 4;
 static const char *deprecatedFrames[][2] = {
   {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
   {"TDAT", "TDRC"}, // 2.3 -> 2.4
@@ -402,7 +402,7 @@ Map<ByteVector,ByteVector> &deprecationMap()
 {
   static Map<ByteVector,ByteVector> depMap;
   if(depMap.isEmpty())
-    for(uint i = 0; i < deprecatedFramesSize; ++i)
+    for(TagLib::uint i = 0; i < deprecatedFramesSize; ++i)
       depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
   return depMap;
 }

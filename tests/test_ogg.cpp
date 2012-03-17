@@ -61,7 +61,7 @@ public:
 
     Vorbis::File *f = new Vorbis::File(newname.c_str());
 
-    CPPUNIT_ASSERT_EQUAL(uint(0), f->tag()->properties().size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->tag()->properties().size());
 
     PropertyMap newTags;
     StringList values("value 1");
@@ -70,8 +70,8 @@ public:
     f->tag()->setProperties(newTags);
 
     PropertyMap map = f->tag()->properties();
-    CPPUNIT_ASSERT_EQUAL(uint(1), map.size());
-    CPPUNIT_ASSERT_EQUAL(uint(2), map["ARTIST"].size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), map.size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), map["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("value 1"), map["ARTIST"][0]);
     delete f;
 
@@ -85,7 +85,7 @@ public:
     Vorbis::File *f = new Vorbis::File(newname.c_str());
     PropertyMap tags = f->tag()->properties();
 
-    CPPUNIT_ASSERT_EQUAL(uint(2), tags["UNUSUALTAG"].size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
     CPPUNIT_ASSERT_EQUAL(String("another value"), tags["UNUSUALTAG"][1]);
     CPPUNIT_ASSERT_EQUAL(String(L"öäüoΣø"), tags["UNICODETAG"][0]);
