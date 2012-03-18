@@ -28,7 +28,7 @@
 #include "tdebug.h"
 #include "tstringlist.h"
 
-#include <ostream>
+#include <iostream>
 
 #include <string.h>
 
