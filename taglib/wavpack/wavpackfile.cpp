@@ -38,11 +38,12 @@
 #include "apetag.h"
 #include "apefooter.h"
 
-using namespace TagLib;
-
-namespace
+namespace TagLib
 {
-  enum { wavAPEIndex, wavID3v1Index };
+
+namespace WavPack
+{
+  enum { APEIndex, ID3v1Index };
 }
 
 class WavPack::File::FilePrivate
@@ -181,23 +182,23 @@ bool WavPack::File::save()
 
 ID3v1::Tag *WavPack::File::ID3v1Tag(bool create)
 {
-  return d->tag.access<ID3v1::Tag>(wavID3v1Index, create);
+  return d->tag.access<ID3v1::Tag>(WavPack::ID3v1Index, create);
 }
 
 APE::Tag *WavPack::File::APETag(bool create)
 {
-  return d->tag.access<APE::Tag>(wavAPEIndex, create);
+  return d->tag.access<APE::Tag>(WavPack::APEIndex, create);
 }
 
 void WavPack::File::strip(int tags)
 {
   if(tags & ID3v1) {
-    d->tag.set(wavID3v1Index, 0);
+    d->tag.set(WavPack::ID3v1Index, 0);
     APETag(true);
   }
 
   if(tags & APE) {
-    d->tag.set(wavAPEIndex, 0);
+    d->tag.set(WavPack::APEIndex, 0);
 
     if(!ID3v1Tag())
       APETag(true);
@@ -215,7 +216,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.set(wavID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(WavPack::ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -224,7 +225,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
   d->APELocation = findAPE();
 
   if(d->APELocation >= 0) {
-    d->tag.set(wavAPEIndex, new APE::Tag(this, d->APELocation));
+    d->tag.set(WavPack::APEIndex, new APE::Tag(this, d->APELocation));
     d->APESize = APETag()->footer()->completeTagSize();
     d->APELocation = d->APELocation + APETag()->footer()->size() - d->APESize;
     d->hasAPE = true;
@@ -271,4 +272,6 @@ long WavPack::File::findID3v1()
     return p;
 
   return -1;
+}
+
 }
