@@ -32,7 +32,8 @@
 
 #include "apefooter.h"
 
-using namespace TagLib;
+namespace TagLib
+{
 
 class APE::Footer::FooterPrivate
 {
@@ -232,4 +233,6 @@ ByteVector APE::Footer::render(bool isHeader) const
   v.append(ByteVector::fromLongLong(0));
 
   return v;
+}
+
 }
