@@ -37,11 +37,12 @@
 #include "id3v2tag.h"
 #include "id3v2header.h"
 
-using namespace TagLib;
-
-namespace
+namespace TagLib
 {
-  enum { trueID3v2Index = 0, trueID3v1Index = 1 };
+
+namespace TrueAudio
+{
+  enum { ID3v2Index = 0, ID3v1Index = 1 };
 }
 
 class TrueAudio::File::FilePrivate
@@ -187,23 +188,23 @@ bool TrueAudio::File::save()
 
 ID3v1::Tag *TrueAudio::File::ID3v1Tag(bool create)
 {
-  return d->tag.access<ID3v1::Tag>(trueID3v1Index, create);
+  return d->tag.access<ID3v1::Tag>(TrueAudio::ID3v1Index, create);
 }
 
 ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
 {
-  return d->tag.access<ID3v2::Tag>(trueID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(TrueAudio::ID3v2Index, create);
 }
 
 void TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1) {
-    d->tag.set(trueID3v1Index, 0);
+    d->tag.set(TrueAudio::ID3v1Index, 0);
     ID3v2Tag(true);
   }
 
   if(tags & ID3v2) {
-    d->tag.set(trueID3v2Index, 0);
+    d->tag.set(TrueAudio::ID3v2Index, 0);
 
     if(!ID3v1Tag())
       ID3v2Tag(true);
@@ -223,12 +224,12 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.set(trueID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(TrueAudio::ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
     if(ID3v2Tag()->header()->tagSize() <= 0)
-      d->tag.set(trueID3v2Index, 0);
+      d->tag.set(TrueAudio::ID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -238,7 +239,7 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.set(trueID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(TrueAudio::ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -286,4 +287,6 @@ long TrueAudio::File::findID3v2()
     return 0;
 
   return -1;
+}
+
 }
