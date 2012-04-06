@@ -48,6 +48,7 @@ public:
     channels(0),
     version(0),
     bitsPerSample(0),
+    sampleFrames(0),
     file(0) {}
 
   ByteVector data;
@@ -59,6 +60,7 @@ public:
   int channels;
   int version;
   int bitsPerSample;
+  uint sampleFrames;
   File *file;
 };
 
@@ -115,6 +117,11 @@ int WavPack::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
+uint WavPack::Properties::sampleFrames() const
+{
+  return d->sampleFrames;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -161,6 +168,7 @@ void WavPack::Properties::read()
     }
   }
   d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
+  d->sampleFrames = samples;
 
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
 }
