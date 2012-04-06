@@ -69,6 +69,8 @@ namespace TagLib {
        * Returns the version of the bitstream (SV4-SV7)
        */
       int mpcVersion() const;
+      uint totalFrames() const;
+      uint sampleFrames() const;
 
     private:
       Properties(const Properties &);

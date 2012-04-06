@@ -43,7 +43,9 @@ public:
     length(0),
     bitrate(0),
     sampleRate(0),
-    channels(0) {}
+    channels(0),
+    totalFrames(0),
+    sampleFrames(0) {}
 
   ByteVector data;
   long streamLength;
@@ -53,6 +55,8 @@ public:
   int bitrate;
   int sampleRate;
   int channels;
+  uint totalFrames;
+  uint sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,6 +99,16 @@ int MPC::Properties::mpcVersion() const
   return d->version;
 }
 
+uint MPC::Properties::totalFrames() const
+{
+  return d->totalFrames;
+}
+
+uint MPC::Properties::sampleFrames() const
+{
+  return d->sampleFrames;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,14 +122,21 @@ void MPC::Properties::read()
 
   d->version = d->data[3] & 15;
 
-  unsigned int frames;
-
   if(d->version >= 7) {
-    frames = d->data.mid(4, 4).toUInt(false);
+    d->totalFrames = d->data.mid(4, 4).toUInt(false);
 
     std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(d->data.mid(8, 4).toUInt(false)));
     d->sampleRate = sftable[flags[17] * 2 + flags[16]];
     d->channels = 2;
+
+    uint gapless = d->data.mid(5, 4).toUInt(false);
+    bool trueGapless = (gapless >> 31) & 0x0001;
+    if(trueGapless) {
+      uint lastFrameSamples = (gapless >> 20) & 0x07FF;
+      d->sampleFrames = d->totalFrames * 1152 - lastFrameSamples;
+    }
+    else
+      d->sampleFrames = d->totalFrames * 1152 - 576;
   }
   else {
     uint headerData = d->data.mid(0, 4).toUInt(false);
@@ -126,14 +147,14 @@ void MPC::Properties::read()
     d->channels = 2;
 
     if(d->version >= 5)
-      frames = d->data.mid(4, 4).toUInt(false);
+      d->totalFrames = d->data.mid(4, 4).toUInt(false);
     else
-      frames = d->data.mid(6, 2).toUInt(false);
+      d->totalFrames = d->data.mid(6, 2).toUInt(false);
+
+    d->sampleFrames = d->totalFrames * 1152 - 576;
   }
 
-  uint samples = frames * 1152 - 576;
-
-  d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
+  d->length = d->sampleRate > 0 ? (d->sampleFrames + (d->sampleRate / 2)) / d->sampleRate : 0;
 
   if(!d->bitrate)
     d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;

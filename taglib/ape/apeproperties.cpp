@@ -46,6 +46,7 @@ public:
     channels(0),
     version(0),
     bitsPerSample(0),
+    sampleFrames(0),
     file(file),
     streamLength(streamLength) {}
 
@@ -55,6 +56,7 @@ public:
   int channels;
   int version;
   int bitsPerSample;
+  uint sampleFrames;
   File *file;
   long streamLength;
 };
@@ -102,6 +104,11 @@ int APE::Properties::version() const
 int APE::Properties::bitsPerSample() const
 {
   return d->bitsPerSample;
+}
+
+uint APE::Properties::sampleFrames() const
+{
+  return d->sampleFrames;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,8 +199,8 @@ void APE::Properties::analyzeCurrent()
   uint totalFrames = header.mid(12, 4).toUInt(false);
   uint blocksPerFrame = header.mid(4, 4).toUInt(false);
   uint finalFrameBlocks = header.mid(8, 4).toUInt(false);
-  uint totalBlocks = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
-  d->length = d->sampleRate > 0 ? totalBlocks / d->sampleRate : 0;
+  d->sampleFrames = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
+  d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
 }
 
