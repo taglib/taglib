@@ -276,8 +276,8 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
 {
   if(replace)
     removeItem(key);
-  if(!value.isEmpty()) {
-    if(d->itemListMap.contains(key) || !replace)
+  if(!key.isEmpty() && !value.isEmpty()) {
+    if(!replace && d->itemListMap.contains(key))
       d->itemListMap[key.upper()].appendValue(value);
     else
       setItem(key, Item(key, value));
@@ -286,7 +286,8 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
 
 void APE::Tag::setItem(const String &key, const Item &item)
 {
-  d->itemListMap.insert(key.upper(), item);
+  if(!key.isEmpty())
+    d->itemListMap.insert(key.upper(), item);
 }
 
 bool APE::Tag::isEmpty() const
