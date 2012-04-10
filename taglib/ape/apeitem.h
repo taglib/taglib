@@ -70,9 +70,10 @@ namespace TagLib {
       Item(const String &key, const StringList &values);
 
       /*!
-       * Constructs a binary item with \a key and \a value.
+       * Constructs an item with \a key and \a value.
+       * If \a binary is true a Binary item will be created, otherwise \a value will be interpreted as text
        */
-      Item(const String &key, const ByteVector &value);
+      Item(const String &key, const ByteVector &value, bool binary);
 
       /*!
        * Construct an item as a copy of \a item.

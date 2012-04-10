@@ -294,7 +294,7 @@ void APE::Tag::setData(const String &key, const ByteVector &value)
 {
   removeItem(key);
   if(!key.isEmpty() && !value.isEmpty())
-    setItem(key, Item(key, value));
+    setItem(key, Item(key, value, true));
 }
 
 void APE::Tag::setItem(const String &key, const Item &item)

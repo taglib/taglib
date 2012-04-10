@@ -62,12 +62,16 @@ APE::Item::Item(const String &key, const StringList &values)
   d->text = values;
 }
 
-APE::Item::Item(const String &key, const ByteVector &value)
+APE::Item::Item(const String &key, const ByteVector &value, bool binary)
 {
   d = new ItemPrivate;
-  d->type = Binary;
   d->key = key;
-  d->value = value;
+  if(binary) {
+    d->type = Binary;
+    d->value = value;
+  }
+  else
+	  d->text.append(value);	  
 }
 
 APE::Item::Item(const Item &item)
