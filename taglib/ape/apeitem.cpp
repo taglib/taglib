@@ -62,6 +62,18 @@ APE::Item::Item(const String &key, const StringList &values)
   d->text = values;
 }
 
+APE::Item::Item(const String &key, const ByteVector &value, bool binary)
+{
+  d = new ItemPrivate;
+  d->key = key;
+  if(binary) {
+    d->type = Binary;
+    d->value = value;
+  }
+  else
+	  d->text.append(value);	  
+}
+
 APE::Item::Item(const Item &item)
 {
   d = new ItemPrivate(*item.d);
@@ -104,6 +116,17 @@ String APE::Item::key() const
   return d->key;
 }
 
+ByteVector APE::Item::binaryData() const
+{
+  return d->value;
+}
+
+void APE::Item::setBinaryData(const ByteVector &value)
+{
+  d->type = Binary;
+  d->value = value;
+}
+
 ByteVector APE::Item::value() const
 {
   // This seems incorrect as it won't be actually rendering the value to keep it
@@ -119,27 +142,50 @@ void APE::Item::setKey(const String &key)
 
 void APE::Item::setValue(const String &value)
 {
+    d->type = Text;
     d->text = value;
 }
 
 void APE::Item::setValues(const StringList &value)
 {
+    d->type = Text;
     d->text = value;
 }
 
 void APE::Item::appendValue(const String &value)
 {
+    d->type = Text;
     d->text.append(value);
 }
 
 void APE::Item::appendValues(const StringList &values)
 {
+    d->type = Text;
     d->text.append(values);
 }
 
 int APE::Item::size() const
 {
-  return 8 + d->key.size() + 1 + d->value.size();
+  // SFB: Why is d->key.size() used when size() returns the length in UniChars and not UTF-8?
+  int result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
+  switch (d->type) {
+    case Text:
+      {
+        StringList::ConstIterator it = d->text.begin();
+		  
+        result += it->data(String::UTF8).size();
+        it++;
+        for(; it != d->text.end(); ++it)
+          result += 1 + it->data(String::UTF8).size();
+        break;
+      }
+
+    case Binary:
+    case Locator:
+      result += d->value.size();
+      break;
+  }
+  return result;
 }
 
 StringList APE::Item::toStringList() const
@@ -161,12 +207,12 @@ bool APE::Item::isEmpty() const
 {
   switch(d->type) {
     case Text:
-    case Binary:
       if(d->text.isEmpty())
         return true;
       if(d->text.size() == 1 && d->text.front().isEmpty())
         return true;
       return false;
+    case Binary:
     case Locator:
       return d->value.isEmpty();
     default:
@@ -193,7 +239,7 @@ void APE::Item::parse(const ByteVector &data)
   setReadOnly(flags & 1);
   setType(ItemTypes((flags >> 1) & 3));
 
-  if(int(d->type) < 2)
+  if(Text == d->type)
     d->text = StringList(ByteVectorList::split(d->value, '\0'), String::UTF8);
 }
 
