@@ -277,11 +277,24 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
   if(replace)
     removeItem(key);
   if(!key.isEmpty() && !value.isEmpty()) {
-    if(!replace && d->itemListMap.contains(key))
-      d->itemListMap[key.upper()].appendValue(value);
+    if(!replace && d->itemListMap.contains(key)) {
+      // Text items may contain more than one value
+      if(APE::Item::Text == d->itemListMap.begin()->second.type())
+        d->itemListMap[key.upper()].appendValue(value);
+      // Binary or locator items may have only one value
+      else
+        setItem(key, Item(key, value));
+    }
     else
       setItem(key, Item(key, value));
   }
+}
+
+void APE::Tag::setData(const String &key, const ByteVector &value)
+{
+  removeItem(key);
+  if(!key.isEmpty() && !value.isEmpty())
+    setItem(key, Item(key, value));
 }
 
 void APE::Tag::setItem(const String &key, const Item &item)

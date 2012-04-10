@@ -152,11 +152,18 @@ namespace TagLib {
       void removeItem(const String &key);
 
       /*!
-       * Adds to the item specified by \a key the data \a value.  If \a replace
+       * Adds to the text item specified by \a key the data \a value.  If \a replace
        * is true, then all of the other values on the same key will be removed
-       * first.
+       * first.  If a binary item exists for \a key it will be removed first.
        */
       void addValue(const String &key, const String &value, bool replace = true);
+
+     /*!
+      * Set the binary data for the key specified by \a item to \a value
+      * This will convert the item to type \a Binary if it isn't already and
+      * all of the other values on the same key will be removed.
+      */
+      void setData(const String &key, const ByteVector &value);
 
       /*!
        * Sets the \a key item to the value of \a item. If an item with the \a key is already
