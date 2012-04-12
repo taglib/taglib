@@ -43,9 +43,10 @@
 #include "apetag.h"
 #include "apefooter.h"
 
-using namespace TagLib;
+namespace TagLib
+{
 
-namespace
+namespace APE
 {
   enum { APEIndex, ID3v1Index };
 }
@@ -213,23 +214,23 @@ bool APE::File::save()
 
 ID3v1::Tag *APE::File::ID3v1Tag(bool create)
 {
-  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
+  return d->tag.access<ID3v1::Tag>(APE::ID3v1Index, create);
 }
 
 APE::Tag *APE::File::APETag(bool create)
 {
-  return d->tag.access<APE::Tag>(APEIndex, create);
+  return d->tag.access<APE::Tag>(APE::APEIndex, create);
 }
 
 void APE::File::strip(int tags)
 {
   if(tags & ID3v1) {
-    d->tag.set(ID3v1Index, 0);
+    d->tag.set(APE::ID3v1Index, 0);
     APETag(true);
   }
 
   if(tags & APE) {
-    d->tag.set(APEIndex, 0);
+    d->tag.set(APE::APEIndex, 0);
 
     if(!ID3v1Tag())
       APETag(true);
@@ -247,7 +248,7 @@ void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(APE::ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -256,7 +257,7 @@ void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   d->APELocation = findAPE();
 
   if(d->APELocation >= 0) {
-    d->tag.set(APEIndex, new APE::Tag(this, d->APELocation));
+    d->tag.set(APE::APEIndex, new APE::Tag(this, d->APELocation));
     d->APESize = APETag()->footer()->completeTagSize();
     d->APELocation = d->APELocation + APETag()->footer()->size() - d->APESize;
     d->hasAPE = true;
@@ -302,4 +303,6 @@ long APE::File::findID3v1()
     return p;
 
   return -1;
+}
+
 }
