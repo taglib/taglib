@@ -170,15 +170,15 @@ int APE::Item::size() const
   int result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
   switch (d->type) {
     case Text:
-      {
+      if(d->text.size()) {
         StringList::ConstIterator it = d->text.begin();
 		  
         result += it->data(String::UTF8).size();
         it++;
         for(; it != d->text.end(); ++it)
           result += 1 + it->data(String::UTF8).size();
-        break;
       }
+      break;
 
     case Binary:
     case Locator:
