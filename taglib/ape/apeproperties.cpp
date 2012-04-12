@@ -106,7 +106,7 @@ int APE::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
-uint APE::Properties::sampleFrames() const
+TagLib::uint APE::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
