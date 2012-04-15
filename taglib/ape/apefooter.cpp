@@ -35,7 +35,7 @@
 using namespace TagLib;
 using namespace APE;
 
-class Footer::FooterPrivate
+class APE::Footer::FooterPrivate
 {
 public:
   FooterPrivate() : version(0),
@@ -64,12 +64,12 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint Footer::size()
+TagLib::uint APE::Footer::size()
 {
   return FooterPrivate::size;
 }
 
-ByteVector Footer::fileIdentifier()
+ByteVector APE::Footer::fileIdentifier()
 {
   return ByteVector::fromCString("APETAGEX");
 }
@@ -78,63 +78,63 @@ ByteVector Footer::fileIdentifier()
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Footer::Footer()
+APE::Footer::Footer()
 {
   d = new FooterPrivate;
 }
 
-Footer::Footer(const ByteVector &data)
+APE::Footer::Footer(const ByteVector &data)
 {
   d = new FooterPrivate;
   parse(data);
 }
 
-Footer::~Footer()
+APE::Footer::~Footer()
 {
   delete d;
 }
 
-TagLib::uint Footer::version() const
+TagLib::uint APE::Footer::version() const
 {
   return d->version;
 }
 
-bool Footer::headerPresent() const
+bool APE::Footer::headerPresent() const
 {
   return d->headerPresent;
 }
 
-bool Footer::footerPresent() const
+bool APE::Footer::footerPresent() const
 {
   return d->footerPresent;
 }
 
-bool Footer::isHeader() const
+bool APE::Footer::isHeader() const
 {
   return d->isHeader;
 }
 
-void Footer::setHeaderPresent(bool b) const
+void APE::Footer::setHeaderPresent(bool b) const
 {
   d->headerPresent = b;
 }
 
-TagLib::uint Footer::itemCount() const
+TagLib::uint APE::Footer::itemCount() const
 {
   return d->itemCount;
 }
 
-void Footer::setItemCount(uint s)
+void APE::Footer::setItemCount(uint s)
 {
   d->itemCount = s;
 }
 
-TagLib::uint Footer::tagSize() const
+TagLib::uint APE::Footer::tagSize() const
 {
   return d->tagSize;
 }
 
-TagLib::uint Footer::completeTagSize() const
+TagLib::uint APE::Footer::completeTagSize() const
 {
   if(d->headerPresent)
     return d->tagSize + d->size;
@@ -142,22 +142,22 @@ TagLib::uint Footer::completeTagSize() const
     return d->tagSize;
 }
 
-void Footer::setTagSize(uint s)
+void APE::Footer::setTagSize(uint s)
 {
   d->tagSize = s;
 }
 
-void Footer::setData(const ByteVector &data)
+void APE::Footer::setData(const ByteVector &data)
 {
   parse(data);
 }
 
-ByteVector Footer::renderFooter() const
+ByteVector APE::Footer::renderFooter() const
 {
     return render(false);
 }
 
-ByteVector Footer::renderHeader() const
+ByteVector APE::Footer::renderHeader() const
 {
     if (!d->headerPresent) return ByteVector();
 
@@ -168,7 +168,7 @@ ByteVector Footer::renderHeader() const
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Footer::parse(const ByteVector &data)
+void APE::Footer::parse(const ByteVector &data)
 {
   if(data.size() < size())
     return;
@@ -197,7 +197,7 @@ void Footer::parse(const ByteVector &data)
 
 }
 
-ByteVector Footer::render(bool isHeader) const
+ByteVector APE::Footer::render(bool isHeader) const
 {
   ByteVector v;
 
