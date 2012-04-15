@@ -43,7 +43,7 @@ using namespace TagLib;
 
 namespace
 {
-  enum { ID3v2Index = 0, ID3v1Index = 1 };
+  enum { TrueAudioID3v2Index = 0, TrueAudioID3v1Index = 1 };
 }
 
 class TrueAudio::File::FilePrivate
@@ -133,20 +133,20 @@ PropertyMap TrueAudio::File::properties() const
   // once Tag::properties() is virtual, this case distinction could actually be done
   // within TagUnion.
   if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->properties();
+    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->properties();
   if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+    return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->properties();
   return PropertyMap();
 }
 
 PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->setProperties(properties);
+    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->setProperties(properties);
   else if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+    return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->setProperties(properties);
   else
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
+    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, true)->setProperties(properties);
 }
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const
@@ -210,23 +210,23 @@ bool TrueAudio::File::save()
 
 ID3v1::Tag *TrueAudio::File::ID3v1Tag(bool create)
 {
-  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
+  return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, create);
 }
 
 ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
 {
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, create);
 }
 
 void TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1) {
-    d->tag.set(ID3v1Index, 0);
+    d->tag.set(TrueAudioID3v1Index, 0);
     ID3v2Tag(true);
   }
 
   if(tags & ID3v2) {
-    d->tag.set(ID3v2Index, 0);
+    d->tag.set(TrueAudioID3v2Index, 0);
 
     if(!ID3v1Tag())
       ID3v2Tag(true);
@@ -246,12 +246,12 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(TrueAudioID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
     if(ID3v2Tag()->header()->tagSize() <= 0)
-      d->tag.set(ID3v2Index, 0);
+      d->tag.set(TrueAudioID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -261,7 +261,7 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(TrueAudioID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
