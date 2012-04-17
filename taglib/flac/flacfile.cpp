@@ -44,7 +44,7 @@ using namespace TagLib;
 
 namespace
 {
-  enum { XiphIndex = 0, ID3v2Index = 1, ID3v1Index = 2 };
+  enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
   enum { MinPaddingLength = 4096 };
   enum { LastBlockFlag = 0x80 };
 }
@@ -144,34 +144,34 @@ PropertyMap FLAC::File::properties() const
   // once Tag::properties() is virtual, this case distinction could actually be done
   // within TagUnion.
   if(d->hasXiphComment)
-    return d->tag.access<Ogg::XiphComment>(XiphIndex, false)->properties();
+    return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->properties();
   if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->properties();
+    return d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->properties();
   if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+    return d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->properties();
   return PropertyMap();
 }
 
 void FLAC::File::removeUnsupportedProperties(const StringList &unsupported)
 {
   if(d->hasXiphComment)
-    d->tag.access<Ogg::XiphComment>(XiphIndex, false)->removeUnsupportedProperties(unsupported);
+    d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->removeUnsupportedProperties(unsupported);
   if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->removeUnsupportedProperties(unsupported);
+    d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->removeUnsupportedProperties(unsupported);
   if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(unsupported);
+    d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->removeUnsupportedProperties(unsupported);
 }
 
 PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasXiphComment)
-    return d->tag.access<Ogg::XiphComment>(XiphIndex, false)->setProperties(properties);
+    return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->setProperties(properties);
   else if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->setProperties(properties);
+    return d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->setProperties(properties);
   else if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+    return d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->setProperties(properties);
   else
-    return d->tag.access<Ogg::XiphComment>(XiphIndex, true)->setProperties(properties);
+    return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, true)->setProperties(properties);
 }
 
 FLAC::Properties *FLAC::File::audioProperties() const
@@ -275,21 +275,21 @@ bool FLAC::File::save()
 
 ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
 {
-  if(!create || d->tag[ID3v2Index])
-    return static_cast<ID3v2::Tag *>(d->tag[ID3v2Index]);
+  if(!create || d->tag[FlacID3v2Index])
+    return static_cast<ID3v2::Tag *>(d->tag[FlacID3v2Index]);
 
-  d->tag.set(ID3v2Index, new ID3v2::Tag);
-  return static_cast<ID3v2::Tag *>(d->tag[ID3v2Index]);
+  d->tag.set(FlacID3v2Index, new ID3v2::Tag);
+  return static_cast<ID3v2::Tag *>(d->tag[FlacID3v2Index]);
 }
 
 ID3v1::Tag *FLAC::File::ID3v1Tag(bool create)
 {
-  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
+  return d->tag.access<ID3v1::Tag>(FlacID3v1Index, create);
 }
 
 Ogg::XiphComment *FLAC::File::xiphComment(bool create)
 {
-  return d->tag.access<Ogg::XiphComment>(XiphIndex, create);
+  return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, create);
 }
 
 void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
@@ -310,12 +310,12 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(FlacID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
     if(ID3v2Tag()->header()->tagSize() <= 0)
-      d->tag.set(ID3v2Index, 0);
+      d->tag.set(FlacID3v2Index, 0);
     else
       d->hasID3v2 = true;
   }
@@ -325,7 +325,7 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(FlacID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -337,9 +337,9 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     return;
 
   if(d->hasXiphComment)
-    d->tag.set(XiphIndex, new Ogg::XiphComment(xiphCommentData()));
+    d->tag.set(FlacXiphIndex, new Ogg::XiphComment(xiphCommentData()));
   else
-    d->tag.set(XiphIndex, new Ogg::XiphComment);
+    d->tag.set(FlacXiphIndex, new Ogg::XiphComment);
 
   if(readProperties)
     d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);

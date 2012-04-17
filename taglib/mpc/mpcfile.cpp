@@ -39,7 +39,7 @@ using namespace TagLib;
 
 namespace
 {
-  enum { APEIndex, ID3v1Index };
+  enum { MPCAPEIndex, MPCID3v1Index };
 }
 
 class MPC::File::FilePrivate
@@ -117,26 +117,26 @@ TagLib::Tag *MPC::File::tag() const
 PropertyMap MPC::File::properties() const
 {
   if(d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
+    return d->tag.access<APE::Tag>(MPCAPEIndex, false)->properties();
   if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
+    return d->tag.access<ID3v1::Tag>(MPCID3v1Index, false)->properties();
   return PropertyMap();
 }
 
 void MPC::File::removeUnsupportedProperties(const StringList &properties)
 {
   if(d->hasAPE)
-    d->tag.access<APE::Tag>(APEIndex, false)->removeUnsupportedProperties(properties);
+    d->tag.access<APE::Tag>(MPCAPEIndex, false)->removeUnsupportedProperties(properties);
   if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(properties);
+    d->tag.access<ID3v1::Tag>(MPCID3v1Index, false)->removeUnsupportedProperties(properties);
 }
 
 PropertyMap MPC::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
+    return d->tag.access<APE::Tag>(MPCAPEIndex, false)->setProperties(properties);
   else if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+    return d->tag.access<ID3v1::Tag>(MPCID3v1Index, false)->setProperties(properties);
   else
     return d->tag.access<APE::Tag>(APE, true)->setProperties(properties);
 }
@@ -225,18 +225,18 @@ bool MPC::File::save()
 
 ID3v1::Tag *MPC::File::ID3v1Tag(bool create)
 {
-  return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
+  return d->tag.access<ID3v1::Tag>(MPCID3v1Index, create);
 }
 
 APE::Tag *MPC::File::APETag(bool create)
 {
-  return d->tag.access<APE::Tag>(APEIndex, create);
+  return d->tag.access<APE::Tag>(MPCAPEIndex, create);
 }
 
 void MPC::File::strip(int tags)
 {
   if(tags & ID3v1) {
-    d->tag.set(ID3v1Index, 0);
+    d->tag.set(MPCID3v1Index, 0);
     APETag(true);
   }
 
@@ -246,7 +246,7 @@ void MPC::File::strip(int tags)
   }
 
   if(tags & APE) {
-    d->tag.set(APEIndex, 0);
+    d->tag.set(MPCAPEIndex, 0);
 
     if(!ID3v1Tag())
       APETag(true);
@@ -270,7 +270,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   d->ID3v1Location = findID3v1();
 
   if(d->ID3v1Location >= 0) {
-    d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+    d->tag.set(MPCID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
     d->hasID3v1 = true;
   }
 
@@ -281,7 +281,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   d->APELocation = findAPE();
 
   if(d->APELocation >= 0) {
-    d->tag.set(APEIndex, new APE::Tag(this, d->APELocation));
+    d->tag.set(MPCAPEIndex, new APE::Tag(this, d->APELocation));
 
     d->APESize = APETag()->footer()->completeTagSize();
     d->APELocation = d->APELocation + APETag()->footer()->size() - d->APESize;
