@@ -370,7 +370,7 @@ String String::upper() const
 
   for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
-      s.d->data.push_back(*it + shift);
+      s.d->data.push_back(static_cast<wchar_t>(*it + shift));
     else
       s.d->data.push_back(*it);
   }
