@@ -374,7 +374,7 @@ long MPEG::File::nextFrameOffset(long position)
 
   ByteVector buffer;
 
-  while(true) {
+  for(;;) {
     seek(position);
     buffer = readBlock(bufferSize());
 
