@@ -555,7 +555,7 @@ int ASF::File::readBYTE(bool *ok)
   return v[0];
 }
 
-int ASF::File::readWORD(bool *ok)
+unsigned short ASF::File::readWORD(bool *ok)
 {
   ByteVector v = readBlock(2);
   if(v.size() != 2) {
