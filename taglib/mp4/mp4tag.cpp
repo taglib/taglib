@@ -330,7 +330,7 @@ ByteVector
 MP4::Tag::renderInt(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
-  data.append(ByteVector::fromShort(item.toInt()));
+  data.append(ByteVector::fromShort(static_cast<short>(item.toInt())));
   return renderData(name, TypeInteger, data);
 }
 
@@ -363,8 +363,8 @@ MP4::Tag::renderIntPair(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector(2, '\0') +
-              ByteVector::fromShort(item.toIntPair().first) +
-              ByteVector::fromShort(item.toIntPair().second) +
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().first)) +
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().second)) +
               ByteVector(2, '\0'));
   return renderData(name, TypeImplicit, data);
 }
@@ -374,8 +374,8 @@ MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, MP4::Item &item)
 {
   ByteVectorList data;
   data.append(ByteVector(2, '\0') +
-              ByteVector::fromShort(item.toIntPair().first) +
-              ByteVector::fromShort(item.toIntPair().second));
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().first)) +
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().second)));
   return renderData(name, TypeImplicit, data);
 }
 
