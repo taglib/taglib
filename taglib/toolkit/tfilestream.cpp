@@ -27,7 +27,20 @@
 #include "tstring.h"
 #include "tdebug.h"
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4996) // Deprecated POSIX names
+#pragma push_macro ("_CRT_SECURE_NO_WARNINGS")
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+#endif
 #include <stdio.h>
+#ifdef _MSC_VER
+#pragma pop_macro ("_CRT_SECURE_NO_WARNINGS")
+#pragma warning (pop)
+#endif
+
 #include <string.h>
 #include <sys/stat.h>
 
