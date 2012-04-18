@@ -174,7 +174,7 @@ bool IT::File::save()
   if(messageOffset + messageLength >= fileSize) {
     // append new message
     seek(54);
-    writeU16L(message.size());
+    writeU16L(static_cast<ushort>(message.size()));
     writeU32L(messageOffset);
     seek(messageOffset);
     writeBlock(message);
