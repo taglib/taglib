@@ -313,16 +313,16 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   if(kind == 0) {
     data = File::renderString(name, true) +
-           ByteVector::fromShort((int)d->type, false) +
-           ByteVector::fromShort(data.size(), false) +
+           ByteVector::fromShort(static_cast<short>(d->type), false) +
+           ByteVector::fromShort(static_cast<short>(data.size()), false) +
            data;
   }
   else {
     ByteVector nameData = File::renderString(name);
-    data = ByteVector::fromShort(kind == 2 ? d->language : 0, false) +
-           ByteVector::fromShort(d->stream, false) +
-           ByteVector::fromShort(nameData.size(), false) +
-           ByteVector::fromShort((int)d->type, false) +
+    data = ByteVector::fromShort(kind == 2 ? static_cast<short>(d->language) : 0, false) +
+           ByteVector::fromShort(static_cast<short>(d->stream), false) +
+           ByteVector::fromShort(static_cast<short>(nameData.size()), false) +
+           ByteVector::fromShort(static_cast<short>(d->type), false) +
            ByteVector::fromUInt(data.size(), false) +
            nameData +
            data;
