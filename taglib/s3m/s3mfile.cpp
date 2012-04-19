@@ -193,9 +193,9 @@ void S3M::File::read(bool)
   seek(96);
   ushort realLength = 0;
   for(ushort i = 0; i < length; ++ i) {
-	  READ_BYTE_AS(order);
-	  if(order == 255) break;
-	  if(order != 254) ++ realLength;
+    READ_BYTE_AS(order);
+    if(order == 255) break;
+    if(order != 254) ++ realLength;
   }
   d->properties.setLengthInPatterns(realLength);
 

@@ -41,17 +41,17 @@ public:
 
   void testPropertyInterface1()
   {
-	  APE::Tag tag;
-	  PropertyMap dict = tag.properties();
-	  CPPUNIT_ASSERT(dict.isEmpty());
-	  dict["ARTIST"] = String("artist 1");
-	  dict["ARTIST"].append("artist 2");
-	  dict["TRACKNUMBER"].append("17");
-	  tag.setProperties(dict);
-	  CPPUNIT_ASSERT_EQUAL(String("17"), tag.itemListMap()["TRACK"].values()[0]);
-	  CPPUNIT_ASSERT_EQUAL(2u, tag.itemListMap()["ARTIST"].values().size());
-	  CPPUNIT_ASSERT_EQUAL(String("artist 1"), tag.artist());
-	  CPPUNIT_ASSERT_EQUAL(17u, tag.track());
+    APE::Tag tag;
+    PropertyMap dict = tag.properties();
+    CPPUNIT_ASSERT(dict.isEmpty());
+    dict["ARTIST"] = String("artist 1");
+    dict["ARTIST"].append("artist 2");
+    dict["TRACKNUMBER"].append("17");
+    tag.setProperties(dict);
+    CPPUNIT_ASSERT_EQUAL(String("17"), tag.itemListMap()["TRACK"].values()[0]);
+    CPPUNIT_ASSERT_EQUAL(2u, tag.itemListMap()["ARTIST"].values().size());
+    CPPUNIT_ASSERT_EQUAL(String("artist 1"), tag.artist());
+    CPPUNIT_ASSERT_EQUAL(17u, tag.track());
   }
 
   void testPropertyInterface2()

@@ -71,7 +71,7 @@ APE::Item::Item(const String &key, const ByteVector &value, bool binary)
     d->value = value;
   }
   else
-	  d->text.append(value);	  
+    d->text.append(value);	  
 }
 
 APE::Item::Item(const Item &item)
