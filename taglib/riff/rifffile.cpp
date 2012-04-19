@@ -189,7 +189,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
     d->chunks[i].padding = 1;
     offset++;
   }
-  
+
   Chunk chunk;
   chunk.name = name;
   chunk.size = data.size();

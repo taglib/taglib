@@ -125,7 +125,7 @@ bool IT::File::save()
     ulong sampleOffset = 0;
     if(!readU32L(sampleOffset))
       return false;
-    
+
     seek(sampleOffset + 20);
 
     if((i + instrumentCount) < lines.size())
@@ -206,7 +206,7 @@ void IT::File::read(bool)
   READ_U16L_AS(length);
   READ_U16L_AS(instrumentCount);
   READ_U16L_AS(sampleCount);
-  
+
   d->properties.setInstrumentCount(instrumentCount);
   d->properties.setSampleCount(sampleCount);
   READ_U16L(d->properties.setPatternCount);
@@ -255,7 +255,7 @@ void IT::File::read(bool)
         ++channels;
   }
   d->properties.setChannels(channels);
-  
+
   // real length might be shorter because of skips and terminator
   ushort realLength = 0;
   for(ushort i = 0; i < length; ++ i) {
@@ -287,11 +287,11 @@ void IT::File::read(bool)
     READ_STRING_AS(instrumentName, 26);
     comment.append(instrumentName);
   }
-  
+
   for(ushort i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     READ_U32L_AS(sampleOffset);
-    
+
     seek(sampleOffset);
 
     ByteVector sampleMagic = readBlock(4);
@@ -317,7 +317,7 @@ void IT::File::read(bool)
     READ_BYTE_AS(vibratoRate);
     READ_BYTE_AS(vibratoType);
     */
-    
+
     comment.append(sampleName);
   }
 

@@ -33,7 +33,7 @@
 
 using namespace TagLib;
 
-class FLAC::Picture::PicturePrivate 
+class FLAC::Picture::PicturePrivate
 {
 public:
   PicturePrivate() :
@@ -117,7 +117,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
   d->data = data.mid(pos, dataLength);
 
-  return true;  
+  return true;
 }
 
 ByteVector FLAC::Picture::render() const

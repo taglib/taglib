@@ -40,7 +40,7 @@ public:
     bpmSpeed(0)
   {
   }
-  
+
   ushort lengthInPatterns;
   int    channels;
   ushort version;
@@ -57,7 +57,7 @@ XM::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
   AudioProperties(propertiesStyle),
   d(new PropertiesPrivate)
 {
-}     
+}
 
 XM::Properties::~Properties()
 {

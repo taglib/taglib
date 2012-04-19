@@ -368,14 +368,14 @@ ByteVector ASF::File::HeaderExtensionObject::render(ASF::File *file)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) 
+ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle)
   : TagLib::File(file)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
 }
 
-ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) 
+ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle)
   : TagLib::File(stream)
 {
   d = new FilePrivate;

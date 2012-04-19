@@ -218,7 +218,7 @@ namespace TagLib {
        * Returns a list of pictures attached to the FLAC file.
        */
       List<Picture *> pictureList();
-      
+
       /*!
        * Removes an attached picture. If \a del is true the picture's memory
        * will be freed; if it is false, it must be deleted by the user.

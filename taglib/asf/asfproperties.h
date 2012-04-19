@@ -73,4 +73,4 @@ namespace TagLib {
 
 }
 
-#endif 
+#endif

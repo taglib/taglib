@@ -102,7 +102,7 @@ private:
 
     Mod::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
-    
+
     CPPUNIT_ASSERT(0 != p);
     CPPUNIT_ASSERT(0 != t);
 

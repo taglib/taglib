@@ -150,10 +150,10 @@ namespace TagLib {
       /*!
        * Sets the tracker name to \a trackerName.  If \a trackerName is
        * String::null then this value will be cleared.
-       * 
+       *
        * Note that only XM files support this tag.  Setting the
        * tracker name for other module file formats will be ignored.
-       * 
+       *
        * The length of this tag is limited to 20 characters (1 character
        * = 1 byte).
        */

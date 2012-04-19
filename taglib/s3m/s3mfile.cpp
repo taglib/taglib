@@ -118,7 +118,7 @@ bool S3M::File::save()
   }
 
   seek(channels, Current);
-  
+
   StringList lines = d->tag.comment().split("\n");
   // write comment as sample names:
   for(ushort i = 0; i < sampleCount; ++ i) {
@@ -189,7 +189,7 @@ void S3M::File::read(bool)
     if(setting != 0xff) ++ channels;
   }
   d->properties.setChannels(channels);
-  
+
   seek(96);
   ushort realLength = 0;
   for(ushort i = 0; i < length; ++ i) {
