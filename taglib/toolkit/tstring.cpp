@@ -30,7 +30,19 @@
 
 #include <iostream>
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4996) // Deprecated POSIX names
+#pragma push_macro ("_CRT_SECURE_NO_WARNINGS")
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+#endif
 #include <string.h>
+#ifdef MSC_VER
+#pragma pop_macro ("_CRT_SECURE_NO_WARNINGS")
+#pragma warning (pop)
+#endif
 
 namespace TagLib {
 
@@ -358,7 +370,7 @@ String String::upper() const
 
   for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
-      s.d->data.push_back(*it + shift);
+      s.d->data.push_back(static_cast<wchar_t>(*it + shift));
     else
       s.d->data.push_back(*it);
   }

@@ -450,6 +450,11 @@ long File::length()
   return d->stream->length();
 }
 
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4996) // Deprecated POSIX name
+#endif
+
 bool File::isReadable(const char *file)
 {
   return access(file, R_OK) == 0;
@@ -459,6 +464,10 @@ bool File::isWritable(const char *file)
 {
   return access(file, W_OK) == 0;
 }
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members

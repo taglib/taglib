@@ -229,7 +229,7 @@ bool FLAC::File::save()
     FLAC::MetadataBlock *block = newBlocks[i];
     ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    blockHeader[0] = static_cast<char>(block->code());
     data.append(blockHeader);
     data.append(blockData);
   }

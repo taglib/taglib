@@ -114,6 +114,7 @@ public:
   }
 
 protected:
+  ValueReader &operator=(const ValueReader &);
   T &value;
 };
 

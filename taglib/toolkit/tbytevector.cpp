@@ -197,6 +197,7 @@ namespace TagLib {
     }
 
   private:
+    ByteVectorMirror &operator=(const ByteVectorMirror &);
     const ByteVector &v;
   };
 

@@ -230,11 +230,11 @@ ByteVector ASF::File::ContentDescriptionObject::render(ASF::File *file)
   ByteVector v4 = file->renderString(file->d->tag->comment());
   ByteVector v5 = file->renderString(file->d->tag->rating());
   data.clear();
-  data.append(ByteVector::fromShort(v1.size(), false));
-  data.append(ByteVector::fromShort(v2.size(), false));
-  data.append(ByteVector::fromShort(v3.size(), false));
-  data.append(ByteVector::fromShort(v4.size(), false));
-  data.append(ByteVector::fromShort(v5.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v1.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v2.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v3.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v4.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v5.size()), false));
   data.append(v1);
   data.append(v2);
   data.append(v3);
@@ -262,7 +262,7 @@ void ASF::File::ExtendedContentDescriptionObject::parse(ASF::File *file, uint /*
 ByteVector ASF::File::ExtendedContentDescriptionObject::render(ASF::File *file)
 {
   data.clear();
-  data.append(ByteVector::fromShort(attributeData.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(attributeData.size()), false));
   data.append(attributeData.toByteVector(ByteVector::null));
   return BaseObject::render(file);
 }
@@ -286,7 +286,7 @@ void ASF::File::MetadataObject::parse(ASF::File *file, uint /*size*/)
 ByteVector ASF::File::MetadataObject::render(ASF::File *file)
 {
   data.clear();
-  data.append(ByteVector::fromShort(attributeData.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(attributeData.size()), false));
   data.append(attributeData.toByteVector(ByteVector::null));
   return BaseObject::render(file);
 }
@@ -310,7 +310,7 @@ void ASF::File::MetadataLibraryObject::parse(ASF::File *file, uint /*size*/)
 ByteVector ASF::File::MetadataLibraryObject::render(ASF::File *file)
 {
   data.clear();
-  data.append(ByteVector::fromShort(attributeData.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(attributeData.size()), false));
   data.append(attributeData.toByteVector(ByteVector::null));
   return BaseObject::render(file);
 }
@@ -555,7 +555,7 @@ int ASF::File::readBYTE(bool *ok)
   return v[0];
 }
 
-int ASF::File::readWORD(bool *ok)
+unsigned short ASF::File::readWORD(bool *ok)
 {
   ByteVector v = readBlock(2);
   if(v.size() != 2) {
@@ -608,7 +608,7 @@ ByteVector ASF::File::renderString(const String &str, bool includeLength)
 {
   ByteVector data = str.data(String::UTF16LE) + ByteVector::fromShort(0, false);
   if(includeLength) {
-    data = ByteVector::fromShort(data.size(), false) + data;
+    data = ByteVector::fromShort(static_cast<short>(data.size()), false) + data;
   }
   return data;
 }
