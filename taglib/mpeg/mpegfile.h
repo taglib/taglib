@@ -305,7 +305,13 @@ namespace TagLib {
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       long findID3v2();
       long findID3v1();
+      void findLyrics3v2();
       void findAPE();
+
+      /*!
+       * Extracts a number from a ByteVector
+       */
+      long readNumber(ByteVector vector);
 
       /*!
        * MPEG frames can be recognized by the bit pattern 11111111 111, so the
