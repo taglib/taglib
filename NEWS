@@ -1,3 +1,9 @@
+TagLib 1.7.2 (Apr 20, 2012)
+===========================
+
+ * Fixed division by zero while parsing corrupted MP4 files (CVE-2012-2396).
+ * Fixed compilation on Haiku.
+
 TagLib 1.7.1 (Mar 17, 2012)
 ===========================
 
