@@ -5,6 +5,12 @@ TagLib 1.8 (In Development)
  * Added methods for checking if WMA and MP4 files are DRM-protected.
  * Started using atomic int operations for reference counting.
 
+TagLib 1.7.2 (Apr 20, 2012)
+===========================
+
+ * Fixed division by zero while parsing corrupted MP4 files (CVE-2012-2396).
+ * Fixed compilation on Haiku.
+
 TagLib 1.7.1 (Mar 17, 2012)
 ===========================
 
