@@ -45,6 +45,12 @@ ADD_EXECUTABLE(strip-id3v1 strip-id3v1.cpp)
 
 TARGET_LINK_LIBRARIES(strip-id3v1  tag )
 
+INSTALL(TARGETS
+	tagreader tagreader_c tagwriter framelist strip-id3v1
+	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+)
 
 endif(BUILD_EXAMPLES)
 
