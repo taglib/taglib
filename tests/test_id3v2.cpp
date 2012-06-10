@@ -71,6 +71,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
+  CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -626,6 +627,28 @@ public:
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
+  }
+
+  void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    {
+      MPEG::File foo(newname.c_str());
+      foo.tag()->setArtist("Artist");
+      foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
+    }
+
+    {
+      MPEG::File bar(newname.c_str());
+      bar.ID3v2Tag()->removeFrames("TPE1");
+      // Should strip ID3v1 here and not add old values to ID3v2 again
+      bar.save(MPEG::File::ID3v2, true);
+    }
+
+    MPEG::File f(newname.c_str());
+    CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }
 
 };
