@@ -365,7 +365,7 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
       if(it->size() <= 5)
         continue; // invalid specification
       String description = it->substr(5);
-      Frame *frame;
+      Frame *frame = NULL;
       if(id == "TXXX")
         frame = UserTextIdentificationFrame::find(this, description);
       else if(id == "WXXX")
