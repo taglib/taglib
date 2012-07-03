@@ -355,7 +355,7 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
       // delete all unknown frames of given type
       FrameList l = frameList(id);
       for(FrameList::ConstIterator fit = l.begin(); fit != l.end(); fit++)
-        if (dynamic_cast<const UnknownFrame *>(*fit) != NULL)
+        if (dynamic_cast<const UnknownFrame *>(*fit) != 0)
           removeFrame(*fit);
     } else if(it->size() == 4){
       ByteVector id = it->data(String::Latin1);
@@ -365,7 +365,7 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
       if(it->size() <= 5)
         continue; // invalid specification
       String description = it->substr(5);
-      Frame *frame = NULL;
+      Frame *frame = 0;
       if(id == "TXXX")
         frame = UserTextIdentificationFrame::find(this, description);
       else if(id == "WXXX")
