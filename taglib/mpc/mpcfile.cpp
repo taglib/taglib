@@ -310,8 +310,18 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for MPC metadata
 
   if(readProperties) {
-    d->properties = new Properties(readBlock(MPC::HeaderSize),
+    // Checking MPC version
+    ByteVector magic = readBlock(4);
+    if (magic == MPC::V8MagicTitle) {
+      // Musepack version 8 or newer, we should find "SH" packet and "RG" packet
+      d->properties = new Properties(ByteVector("MPCK")+findHeaderPacket(),
                                    length() - d->ID3v2Size - d->APESize);
+    }
+    else {
+      seek(tell()-4);
+      d->properties = new Properties(readBlock(MPC::HeaderSize),
+                                   length() - d->ID3v2Size - d->APESize);
+    }
   }
 }
 
@@ -358,4 +368,43 @@ long MPC::File::findID3v2()
     return 0;
 
   return -1;
+}
+
+/*
+The structure of MPC v8 packet:
+key   16 bit
+size  n*8 bit, 0<n<10
+data  size*8
+
+This function returns only data for corresponding key
+*/
+ByteVector MPC::File::findHeaderPacket()
+{
+  ByteVector packet;
+  if(!isValid())
+    return packet;
+
+  ByteVector key = readBlock(2);
+  uint sizelength=0;
+  long size = readSize(sizelength);
+
+  if (key=="SH")
+    return readBlock(size-2-sizelength+12); //12 is the size of the next packet
+                                            //that contains replaygain info
+
+  return packet;
+}
+
+long MPC::File::readSize(uint &sizelength)
+{
+  unsigned char tmp;
+  long size = 0;
+
+  do {
+    ByteVector b = readBlock(1);
+    tmp = b[0];
+    size = (size << 7) | (tmp & 0x7F);
+    sizelength++;
+  } while((tmp & 0x80));
+  return size;
 }
