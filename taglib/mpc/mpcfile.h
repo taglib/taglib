@@ -32,6 +32,8 @@
 
 #include "mpcproperties.h"
 
+#include "tlist.h"
+
 namespace TagLib {
 
   class Tag;
@@ -180,7 +182,6 @@ namespace TagLib {
        */
       void remove(int tags = AllTags);
 
-
     private:
       File(const File &);
       File &operator=(const File &);
@@ -190,6 +191,8 @@ namespace TagLib {
       long findAPE();
       long findID3v1();
       long findID3v2();
+      ByteVector findHeaderPacket();
+      long readSize(uint &sizelength);
 
       class FilePrivate;
       FilePrivate *d;
