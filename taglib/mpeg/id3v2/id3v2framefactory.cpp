@@ -167,7 +167,8 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   // Text Identification (frames 4.2)
 
-  if(frameID.startsWith("T")) {
+  // Apple proprietary WFED (Podcast URL) is in fact a text frame.
+  if(frameID.startsWith("T") || frameID == "WFED") {
 
     TextIdentificationFrame *f = frameID != "TXXX"
       ? new TextIdentificationFrame(data, header)
@@ -422,6 +423,14 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     convertFrame("WCP", "WCOP", header);
     convertFrame("WPB", "WPUB", header);
     convertFrame("WXX", "WXXX", header);
+
+    // Apple iTunes nonstandard frames
+    convertFrame("PCS", "PCST", header);
+    convertFrame("TCT", "TCAT", header);
+    convertFrame("TDR", "TDRL", header);
+    convertFrame("TDS", "TDES", header);
+    convertFrame("TID", "TGID", header);
+    convertFrame("WFD", "WFED", header);
 
     break;
   }

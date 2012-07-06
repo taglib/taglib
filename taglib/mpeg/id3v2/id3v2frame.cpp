@@ -117,7 +117,8 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   // check if the key is contained in the key<=>frameID mapping
   ByteVector frameID = keyToFrameID(key);
   if(!frameID.isNull()) {
-    if(frameID[0] == 'T'){ // text frame
+    // Apple proprietary WFED (Podcast URL) is in fact a text frame.
+    if(frameID[0] == 'T' || frameID == "WFED"){ // text frame
       TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
@@ -427,6 +428,12 @@ static const char *frameTranslation[][2] = {
   // Other frames
   { "COMM", "COMMENT" },
   //{ "USLT", "LYRICS" }, handled specially
+  // Apple iTunes proprietary frames
+  { "PCST", "PODCAST" },
+  { "TCAT", "PODCASTCATEGORY" },
+  { "TDES", "PODCASTDESC" },
+  { "TGID", "PODCASTID" },
+  { "WFED", "PODCASTURL" },
 };
 
 static const TagLib::uint txxxFrameTranslationSize = 8;
@@ -532,7 +539,8 @@ PropertyMap Frame::asProperties() const
   // workaround until this function is virtual
   if(id == "TXXX")
     return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
-  else if(id[0] == 'T')
+  // Apple proprietary WFED (Podcast URL) is in fact a text frame.
+  else if(id[0] == 'T' || id == "WFED")
     return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
   else if(id == "WXXX")
     return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
