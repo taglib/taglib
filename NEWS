@@ -1,3 +1,8 @@
+TagLib 1.7.3 (Jul 12, 2012)
+===========================
+
+ * Fixed crash when parsing ID3v2 tags from APE files (BUG:278773).
+
 TagLib 1.7.2 (Apr 20, 2012)
 ===========================
 
