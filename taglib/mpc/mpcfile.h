@@ -191,8 +191,6 @@ namespace TagLib {
       long findAPE();
       long findID3v1();
       long findID3v2();
-      ByteVector findHeaderPacket();
-      long readSize(uint &sizelength);
 
       class FilePrivate;
       FilePrivate *d;

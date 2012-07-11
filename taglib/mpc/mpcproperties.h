@@ -36,7 +36,6 @@ namespace TagLib {
     class File;
 
     static const uint HeaderSize = 8*7;
-    static const char * V8MagicTitle = "MPCK";
 
     //! An implementation of audio property reading for MPC
 
@@ -51,8 +50,16 @@ namespace TagLib {
       /*!
        * Create an instance of MPC::Properties with the data read from the
        * ByteVector \a data.
+       *
+       * This constructor is deprecated. It only works for MPC version up to 7.
        */
       Properties(const ByteVector &data, long streamLength, ReadStyle style = Average);
+
+      /*!
+       * Create an instance of MPC::Properties with the data read directly
+       * from a MPC::File.
+       */
+      Properties(File *file, long streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this MPC::Properties instance.
@@ -103,7 +110,8 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read();
+      void readSV7(const ByteVector &data);
+      void readSV8(File *file);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;
