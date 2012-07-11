@@ -26,6 +26,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <bitset>
+#include <math.h>
 
 #include "mpcproperties.h"
 #include "mpcfile.h"
@@ -45,7 +46,11 @@ public:
     sampleRate(0),
     channels(0),
     totalFrames(0),
-    sampleFrames(0) {}
+    sampleFrames(0),
+    trackGain(0),
+    trackPeak(0),
+    albumGain(0),
+    albumPeak(0) {}
 
   ByteVector data;
   long streamLength;
@@ -57,6 +62,11 @@ public:
   int channels;
   uint totalFrames;
   uint sampleFrames;
+  uint trackGain;
+  uint trackPeak;
+  uint albumGain;
+  uint albumPeak;
+  String flags;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,14 +119,94 @@ uint MPC::Properties::sampleFrames() const
   return d->sampleFrames;
 }
 
+int MPC::Properties::trackGain() const
+{
+  return d->trackGain;
+}
+
+int MPC::Properties::trackPeak() const
+{
+  return d->trackPeak;
+}
+
+int MPC::Properties::albumGain() const
+{
+  return d->albumGain;
+}
+
+int MPC::Properties::albumPeak() const
+{
+  return d->albumPeak;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
+
+
+ulong readSize(const ByteVector &b, uint &sizelength)
+{
+  unsigned char tmp;
+  ulong size = 0;
+  sizelength = 0;
+
+  do {
+    tmp = b[sizelength];
+    size = (size << 7) | (tmp & 0x7F);
+    sizelength++;
+  } while((tmp & 0x80));
+  return size;
+}
 
 static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 
 void MPC::Properties::read()
 {
+  if (d->data.startsWith("MPCK")) {
+    //no checksum checking so far, this code isn't working
+    //quint16 crc=qChecksum(b.mid(4).data(), b.length()-4);
+    //uint crc1=d->data.mid(0,2).toUInt(false);
+
+
+    int pos=8;
+    d->version = d->data[pos];
+    pos+=1;
+    uint sizelength=0;
+    d->sampleFrames = readSize(d->data.mid(pos), sizelength);
+    pos+=sizelength;
+    ulong begSilence = readSize(d->data.mid(pos), sizelength);
+    pos+=sizelength;
+
+    std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(d->data.mid(pos,2).toUShort(true)));
+    pos+=2;
+
+    d->sampleRate = sftable[flags[15] * 4 + flags[14]*2 + flags[13]];
+    d->channels = flags[7] * 8 + flags[6]*4 + flags[5]*2+flags[4] + 1;
+
+    //bool msUsed = flags[3];
+    //int audioBlockFrames = (flags[2]*4 + flags[1]*2 + flags[0]) * 2;
+
+    if ((d->sampleFrames - begSilence) != 0)
+      d->bitrate = d->streamLength * 8.0 * d->sampleRate/(d->sampleFrames-begSilence);
+      d->bitrate = d->bitrate / 1000;
+
+    d->length = (d->sampleFrames - begSilence) / d->sampleRate;
+
+    // Replaygain info scanning
+    pos = d->data.find(ByteVector("RG"),pos);
+    if (pos>=0) {
+      int replayGainVersion = d->data[pos+3];
+      if (replayGainVersion==1) {
+        d->trackGain = d->data.mid(pos+4,2).toUInt(true);
+        d->trackPeak = d->data.mid(pos+6,2).toUInt(true);
+        d->albumGain = d->data.mid(pos+8,2).toUInt(true);
+        d->albumPeak = d->data.mid(pos+10,2).toUInt(true);
+      }
+    }
+
+    return;
+  }
+
   if(!d->data.startsWith("MP+"))
     return;
 
@@ -130,6 +220,31 @@ void MPC::Properties::read()
     d->channels = 2;
 
     uint gapless = d->data.mid(5, 4).toUInt(false);
+
+    d->trackGain = d->data.mid(14,2).toShort(false);
+    d->trackPeak = d->data.mid(12,2).toUInt(false);
+    d->albumGain = d->data.mid(18,2).toShort(false);
+    d->albumPeak = d->data.mid(16,2).toUInt(false);
+
+    // convert gain info
+    if (d->trackGain != 0) {
+      int tmp = (int)((64.82 - (short)d->trackGain / 100.) * 256. + .5);
+      if (tmp >= (1 << 16) || tmp < 0) tmp = 0;
+      d->trackGain = tmp;
+    }
+
+  if (d->albumGain != 0) {
+    int tmp = (int)((64.82 - d->albumGain / 100.) * 256. + .5);
+    if (tmp >= (1 << 16) || tmp < 0) tmp = 0;
+    d->albumGain = tmp;
+  }
+
+  if (d->trackPeak != 0)
+    d->trackPeak = (int) (log10(d->trackPeak) * 20 * 256 + .5);
+
+  if (d->albumPeak != 0)
+    d->albumPeak = (int) (log10(d->albumPeak) * 20 * 256 + .5);
+
     bool trueGapless = (gapless >> 31) & 0x0001;
     if(trueGapless) {
       uint lastFrameSamples = (gapless >> 20) & 0x07FF;
