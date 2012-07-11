@@ -652,7 +652,9 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       return;
     }
 
-    Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
+    Frame *frame = NULL;
+    if (d->factory)
+        frame = d->factory->createFrame(data.mid(frameDataPosition),
                                            &d->header);
 
     if(!frame)
