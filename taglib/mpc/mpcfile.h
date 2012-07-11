@@ -32,6 +32,8 @@
 
 #include "mpcproperties.h"
 
+#include "tlist.h"
+
 namespace TagLib {
 
   class Tag;
@@ -179,7 +181,6 @@ namespace TagLib {
        * \see strip
        */
       void remove(int tags = AllTags);
-
 
     private:
       File(const File &);

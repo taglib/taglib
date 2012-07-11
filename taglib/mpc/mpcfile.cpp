@@ -310,8 +310,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for MPC metadata
 
   if(readProperties) {
-    d->properties = new Properties(readBlock(MPC::HeaderSize),
-                                   length() - d->ID3v2Size - d->APESize);
+    d->properties = new Properties(this, length() - d->ID3v2Size - d->APESize);
   }
 }
 

@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2/frames
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpc
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff
@@ -59,6 +60,7 @@ SET(test_runner_SRCS
   test_s3m.cpp
   test_it.cpp
   test_xm.cpp
+  test_mpc.cpp
 )
 
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
