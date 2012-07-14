@@ -88,7 +88,10 @@ configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c
 
 add_subdirectory(taglib) 
 add_subdirectory(bindings)
-add_subdirectory(tests)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif(BUILD_TESTS)
 add_subdirectory(examples)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
