@@ -1,5 +1,3 @@
-if(BUILD_TESTS)
-
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
@@ -66,8 +64,6 @@ SET(test_runner_SRCS
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
 TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
 
-ADD_CUSTOM_TARGET(check
-    ./test_runner
-    DEPENDS test_runner
-)
-endif(BUILD_TESTS)
+ADD_TEST(test_runner test_runner)
+ADD_CUSTOM_TARGET(check COMMAND ${CMAKE_CTEST_COMMAND} -V
+                  DEPENDS test_runner)
