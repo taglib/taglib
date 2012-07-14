@@ -210,9 +210,9 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
        *
-       * If \a create is false (the default) this will return a null pointer
-       * if there is no valid ID3v2 tag.  If \a create is true it will create
-       * an ID3v2 tag if one does not exist.
+       * A tag will always be returned, regardless of whether there is a
+       * tag in the file or not. Use ID3v2::Tag::isEmpty() to check if
+       * the tag contains no data.
        *
        * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
@@ -223,9 +223,9 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this will return a null pointer
-       * if there is no valid ID3v1 tag.  If \a create is true it will create
-       * an ID3v1 tag if one does not exist.
+       * A tag will always be returned, regardless of whether there is a
+       * tag in the file or not. Use Tag::isEmpty() to check if
+       * the tag contains no data.
        *
        * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
