@@ -33,7 +33,7 @@ public:
     lengthInPatterns(0)
   {
   }
-  
+
   int   channels;
   uint  instrumentCount;
   uchar lengthInPatterns;

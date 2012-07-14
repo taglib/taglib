@@ -34,7 +34,7 @@
 
 using namespace TagLib;
 
-class FLAC::UnknownMetadataBlock::UnknownMetadataBlockPrivate 
+class FLAC::UnknownMetadataBlock::UnknownMetadataBlockPrivate
 {
 public:
   UnknownMetadataBlockPrivate() : code(0) {}

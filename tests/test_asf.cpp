@@ -164,7 +164,7 @@ public:
     f = new ASF::File(newname.c_str());
     ASF::AttributeList values2 = f->tag()->attributeListMap()["WM/Picture"];
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), values2.size());
-    ASF::Attribute attr2 = values2.front(); 
+    ASF::Attribute attr2 = values2.front();
     ASF::Picture picture2 = attr2.toPicture();
     CPPUNIT_ASSERT(picture2.isValid());
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture2.mimeType());

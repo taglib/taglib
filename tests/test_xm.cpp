@@ -122,7 +122,7 @@ public:
 
     XM::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
-    
+
     CPPUNIT_ASSERT(0 != p);
     CPPUNIT_ASSERT(0 != t);
 
@@ -168,7 +168,7 @@ private:
 
     XM::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
-    
+
     CPPUNIT_ASSERT(0 != p);
     CPPUNIT_ASSERT(0 != t);
 
@@ -193,7 +193,7 @@ private:
     CPPUNIT_ASSERT_EQUAL(0U, t->track());
     CPPUNIT_ASSERT_EQUAL(trackerName, t->trackerName());
   }
-  
+
   void testWriteTags(const String &comment)
   {
     ScopedFileCopy copy("test", ".xm");

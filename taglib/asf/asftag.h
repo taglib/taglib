@@ -120,17 +120,17 @@ namespace TagLib {
       virtual void setComment(const String &s);
 
       /*!
-       * Sets the rating to \a s. 
+       * Sets the rating to \a s.
        */
       virtual void setRating(const String &s);
 
       /*!
-       * Sets the copyright to \a s. 
+       * Sets the copyright to \a s.
        */
       virtual void setCopyright(const String &s);
 
       /*!
-       * Sets the genre to \a s. 
+       * Sets the genre to \a s.
        */
       virtual void setGenre(const String &s);
 
