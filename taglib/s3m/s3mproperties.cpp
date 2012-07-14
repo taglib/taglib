@@ -42,7 +42,7 @@ public:
     bpmSpeed(0)
   {
   }
-  
+
   ushort lengthInPatterns;
   int    channels;
   bool   stereo;

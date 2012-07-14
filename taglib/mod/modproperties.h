@@ -34,7 +34,7 @@ namespace TagLib {
     public:
       Properties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~Properties();
-      
+
       int length() const;
       int bitrate() const;
       int sampleRate() const;

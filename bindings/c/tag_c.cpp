@@ -109,7 +109,7 @@ void taglib_file_free(TagLib_File *file)
 
 BOOL taglib_file_is_valid(const TagLib_File *file)
 {
-	return reinterpret_cast<const File *>(file)->isValid();
+  return reinterpret_cast<const File *>(file)->isValid();
 }
 
 TagLib_Tag *taglib_file_tag(const TagLib_File *file)

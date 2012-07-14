@@ -71,7 +71,7 @@ APE::Item::Item(const String &key, const ByteVector &value, bool binary)
     d->value = value;
   }
   else
-	  d->text.append(value);	  
+    d->text.append(value);
 }
 
 APE::Item::Item(const Item &item)
@@ -172,7 +172,7 @@ int APE::Item::size() const
     case Text:
       if(d->text.size()) {
         StringList::ConstIterator it = d->text.begin();
-		  
+
         result += it->data(String::UTF8).size();
         it++;
         for(; it != d->text.end(); ++it)

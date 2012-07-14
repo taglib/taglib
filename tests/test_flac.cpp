@@ -212,7 +212,7 @@ public:
 
   void testDict()
   {
-	// test unicode & multiple values with dict interface
+    // test unicode & multiple values with dict interface
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 

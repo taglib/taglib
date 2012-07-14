@@ -56,7 +56,7 @@ ASF::Properties::Properties() : AudioProperties(AudioProperties::Average)
 ASF::Properties::~Properties()
 {
   if(d)
-    delete d;  
+    delete d;
 }
 
 int ASF::Properties::length() const
@@ -77,7 +77,7 @@ int ASF::Properties::sampleRate() const
 int ASF::Properties::channels() const
 {
   return d->channels;
-} 
+}
 
 bool ASF::Properties::isEncrypted() const
 {
