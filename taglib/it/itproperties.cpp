@@ -94,7 +94,7 @@ int IT::Properties::channels() const
   return d->channels;
 }
 
-ushort IT::Properties::lengthInPatterns() const
+TagLib::ushort IT::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -104,37 +104,37 @@ bool IT::Properties::stereo() const
   return d->flags & Stereo;
 }
 
-ushort IT::Properties::instrumentCount() const
+TagLib::ushort IT::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-ushort IT::Properties::sampleCount() const
+TagLib::ushort IT::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-ushort IT::Properties::patternCount() const
+TagLib::ushort IT::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-ushort IT::Properties::version() const
+TagLib::ushort IT::Properties::version() const
 {
   return d->version;
 }
 
-ushort IT::Properties::compatibleVersion() const
+TagLib::ushort IT::Properties::compatibleVersion() const
 {
   return d->compatibleVersion;
 }
 
-ushort IT::Properties::flags() const
+TagLib::ushort IT::Properties::flags() const
 {
   return d->flags;
 }
 
-ushort IT::Properties::special() const
+TagLib::ushort IT::Properties::special() const
 {
   return d->special;
 }

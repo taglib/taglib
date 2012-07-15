@@ -88,7 +88,7 @@ int S3M::Properties::channels() const
   return d->channels;
 }
 
-ushort S3M::Properties::lengthInPatterns() const
+TagLib::ushort S3M::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -98,27 +98,27 @@ bool S3M::Properties::stereo() const
   return d->stereo;
 }
 
-ushort S3M::Properties::sampleCount() const
+TagLib::ushort S3M::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-ushort S3M::Properties::patternCount() const
+TagLib::ushort S3M::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-ushort S3M::Properties::flags() const
+TagLib::ushort S3M::Properties::flags() const
 {
   return d->flags;
 }
 
-ushort S3M::Properties::trackerVersion() const
+TagLib::ushort S3M::Properties::trackerVersion() const
 {
   return d->trackerVersion;
 }
 
-ushort S3M::Properties::fileFormatVersion() const
+TagLib::ushort S3M::Properties::fileFormatVersion() const
 {
   return d->fileFormatVersion;
 }

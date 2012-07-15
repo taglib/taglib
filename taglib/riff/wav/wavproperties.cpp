@@ -104,7 +104,7 @@ int RIFF::WAV::Properties::sampleWidth() const
   return d->sampleWidth;
 }
 
-uint RIFF::WAV::Properties::sampleFrames() const
+TagLib::uint RIFF::WAV::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }

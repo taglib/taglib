@@ -70,7 +70,7 @@ int Mod::Properties::channels() const
   return d->channels;
 }
 
-uint Mod::Properties::instrumentCount() const
+TagLib::uint Mod::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }

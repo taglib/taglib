@@ -103,7 +103,7 @@ int TrueAudio::Properties::channels() const
   return d->channels;
 }
 
-uint TrueAudio::Properties::sampleFrames() const
+TagLib::uint TrueAudio::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
