@@ -139,7 +139,7 @@ int RIFF::AIFF::Properties::sampleWidth() const
   return d->sampleWidth;
 }
 
-uint RIFF::AIFF::Properties::sampleFrames() const
+TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }

@@ -117,7 +117,7 @@ int WavPack::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
-uint WavPack::Properties::sampleFrames() const
+TagLib::uint WavPack::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
