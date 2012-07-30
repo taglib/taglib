@@ -189,7 +189,7 @@ PropertyMap APE::Tag::properties() const
   PropertyMap properties;
   ItemListMap::ConstIterator it = itemListMap().begin();
   for(; it != itemListMap().end(); ++it) {
-    String tagName = PropertyMap::prepareKey(it->first);
+    String tagName = it->first.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
     if(it->second.type() != Item::Text || tagName.isNull())
@@ -227,7 +227,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   StringList toRemove;
   ItemListMap::ConstIterator remIt = itemListMap().begin();
   for(; remIt != itemListMap().end(); ++remIt) {
-    String key = PropertyMap::prepareKey(remIt->first);
+    String key = remIt->first.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
     if(!key.isNull() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
       toRemove.append(remIt->first);
@@ -238,9 +238,12 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
   // now sync in the "forward direction"
   PropertyMap::ConstIterator it = properties.begin();
+  PropertyMap invalid;
   for(; it != properties.end(); ++it) {
     const String &tagName = it->first;
-    if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == it->second)) {
+    if(!checkKey(tagName))
+      invalid.insert(it->first, it->second);
+    else if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == it->second)) {
       if(it->second.size() == 0)
         removeItem(tagName);
       else {
@@ -252,7 +255,21 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
       }
     }
   }
-  return PropertyMap();
+  return invalid;
+}
+
+bool APE::Tag::checkKey(const String &key)
+{
+  if(key.size() < 2 or key.size() > 16)
+      return false;
+    for(String::ConstIterator it = key.begin(); it != key.end(); it++)
+        // only allow printable ASCII including space (32..127)
+        if (*it < 32 || *it >= 128)
+          return false;
+    String upperKey = key.upper();
+    if (upperKey=="ID3" || upperKey=="TAG" || upperKey=="OGGS" || upperKey=="MP+")
+      return false;
+    return true;
 }
 
 APE::Footer *APE::Tag::footer() const

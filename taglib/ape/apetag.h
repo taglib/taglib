@@ -123,9 +123,16 @@ namespace TagLib {
 
       /*!
        * Implements the unified tag dictionary interface -- import function. The same
-       * comments as for the export function apply.
+       * comments as for the export function apply; additionally note that the APE tag
+       * specification requires keys to have between 2 and 16 printable ASCII characters
+       * with the exception of the fixed strings "ID3", "TAG", "OGGS", and "MP+".
        */
       PropertyMap setProperties(const PropertyMap &);
+
+      /*!
+       * Check if the given String is a valid APE tag key.
+       */
+      static bool checkKey(const String&);
 
       /*!
        * Returns a pointer to the tag's footer.

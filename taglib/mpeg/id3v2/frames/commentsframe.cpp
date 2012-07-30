@@ -112,7 +112,7 @@ void CommentsFrame::setTextEncoding(String::Type encoding)
 
 PropertyMap CommentsFrame::asProperties() const
 {
-  String key = PropertyMap::prepareKey(description());
+  String key = description().upper();
   PropertyMap map;
   if(key.isEmpty() || key == "COMMENT")
     map.insert("COMMENT", text());

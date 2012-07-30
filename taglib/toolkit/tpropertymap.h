@@ -36,15 +36,10 @@ namespace TagLib {
    * ("tags") realized as pairs of a case-insensitive key
    * and a nonempty list of corresponding values, each value being an an arbitrary
    * unicode String.
-   * The key has the same restrictions as in the vorbis comment specification,
-   * i.e. it must contain at least one character; all printable ASCII characters
-   * except '=' and '~' are allowed.
    *
-   * In order to be safe with other formats, keep these additional restrictions in mind:
-   *
-   * - APE only allows keys from 2 to 16 printable ASCII characters (including space),
-   *   with the exception of these strings: ID3, TAG, OggS, MP+
-   *
+   * Note that most metadata formats pose additional conditions on the tag keys. The
+   * most popular ones (Vorbis, APE, ID3v2) should support all ASCII only words of
+   * length between 2 and 16.
    */
 
   class TAGLIB_EXPORT PropertyMap: public SimplePropertyMap
@@ -126,16 +121,17 @@ namespace TagLib {
     /*!
      * Returns a reference to the value associated with \a key.
      *
-     * \note: This has undefined behavior if the key is not valid or not
-     * present in the map.
+     * \note: If \a key is not contained in the map, an empty
+     * StringList is returned without error.
      */
     const StringList &operator[](const String &key) const;
 
     /*!
      * Returns a reference to the value associated with \a key.
      *
-     * \note: This has undefined behavior if the key is not valid or not
-     * present in the map.
+     * \note: If \a key is not contained in the map, an empty
+     * StringList is returned. You can also directly add entries
+     * by using this function as an lvalue.
      */
     StringList &operator[](const String &key);
 
@@ -167,12 +163,6 @@ namespace TagLib {
     void removeEmpty();
 
     String toString() const;
-
-    /*!
-     * Converts \a proposed into another String suitable to be used as
-     * a key, or returns String::null if this is not possible.
-     */
-    static String prepareKey(const String &proposed);
 
   private:
 

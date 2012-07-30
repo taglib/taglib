@@ -205,11 +205,14 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
   for(StringList::ConstIterator it = toRemove.begin(); it != toRemove.end(); ++it)
       removeField(*it);
 
-  // now go through keys in \a properties and check that the values match those in the xiph comment */
+  // now go through keys in \a properties and check that the values match those in the xiph comment
+  PropertyMap invalid;
   PropertyMap::ConstIterator it = properties.begin();
   for(; it != properties.end(); ++it)
   {
-    if(!d->fieldListMap.contains(it->first) || !(it->second == d->fieldListMap[it->first])) {
+    if(!checkKey(it->first))
+      invalid.insert(it->first, it->second);
+    else if(!d->fieldListMap.contains(it->first) || !(it->second == d->fieldListMap[it->first])) {
       const StringList &sl = it->second;
       if(sl.size() == 0)
         // zero size string list -> remove the tag with all values
@@ -224,7 +227,18 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
       }
     }
   }
-  return PropertyMap();
+  return invalid;
+}
+
+bool Ogg::XiphComment::checkKey(const String &key)
+{
+  if(key.size() < 1)
+    return false;
+  for(String::ConstIterator it = key.begin(); it != key.end(); it++)
+      // forbid non-printable, non-ascii, '=' (#61) and '~' (#126)
+      if (*it < 32 || *it >= 128 || *it == 61 || *it == 126)
+        return false;
+  return true;
 }
 
 String Ogg::XiphComment::vendorID() const
