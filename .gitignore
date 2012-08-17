@@ -1,5 +1,7 @@
 cmake_install.cmake
+cmake_uninstall.cmake
 Makefile
+CTestTestfile.cmake
 CMakeFiles/
 *.so
 *.so.*
@@ -16,6 +18,7 @@ CMakeFiles/
 /config.h
 /taglib.pc
 /tests/test_runner
+/tests/Testing
 /taglib_config.h
 /taglib-config
 /bindings/c/taglib_c.pc
