@@ -107,7 +107,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   }
 
   for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
-    if( (*it < 'A' || *it > 'Z') && (*it < '1' || *it > '9') ) {
+    if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
       delete header;
       return 0;
     }

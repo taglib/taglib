@@ -69,6 +69,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
+  CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
@@ -550,6 +551,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
     CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
+  }
+
+  void testW000()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
+    CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("W000"));
+    ID3v2::UrlLinkFrame *frame =
+        dynamic_cast<TagLib::ID3v2::UrlLinkFrame*>(f.ID3v2Tag()->frameListMap()["W000"].front());
+    CPPUNIT_ASSERT(frame);
+    CPPUNIT_ASSERT_EQUAL(String("lukas.lalinsky@example.com____"), frame->url());
   }
 
   void testPropertyInterface()
