@@ -72,6 +72,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
+  CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST_SUITE_END();
 
@@ -640,6 +641,21 @@ public:
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
   }
 
+  void testDeleteFrame()
+  {
+    ScopedFileCopy copy("rare_frames", ".mp3");
+    string newname = copy.fileName();
+    MPEG::File f(newname.c_str());
+    ID3v2::Tag *t = f.ID3v2Tag();
+    ID3v2::Frame *frame = t->frameList("TCON")[0];
+    CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
+    t->removeFrame(frame, true);
+    f.save(MPEG::File::ID3v2);
+
+    MPEG::File f2(newname.c_str());
+    t = f2.ID3v2Tag();
+    CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
+  }
   void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
   {
     ScopedFileCopy copy("xing", ".mp3");

@@ -19,6 +19,7 @@ class TestAPETag : public CppUnit::TestFixture
   CPPUNIT_TEST(testIsEmpty2);
   CPPUNIT_TEST(testPropertyInterface1);
   CPPUNIT_TEST(testPropertyInterface2);
+  CPPUNIT_TEST(testInvalidKeys);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -76,10 +77,25 @@ public:
     APE::Item item3 = APE::Item("TRACKNUMBER", "29");
     tag.setItem("TRACKNUMBER", item3);
     properties = tag.properties();
-    CPPUNIT_ASSERT_EQUAL(2u, properties["TRACKNUMBER"].size());
+    CPPUNIT_ASSERT_EQUAL(uint(2), properties["TRACKNUMBER"].size());
     CPPUNIT_ASSERT_EQUAL(String("17"), properties["TRACKNUMBER"][0]);
     CPPUNIT_ASSERT_EQUAL(String("29"), properties["TRACKNUMBER"][1]);
 
+  }
+
+  void testInvalidKeys()
+  {
+    PropertyMap properties;
+    properties["A"] = String("invalid key: one character");
+    properties["MP+"] = String("invalid key: forbidden string");
+    properties["A B~C"] = String("valid key: space and tilde");
+    properties["ARTIST"] = String("valid key: normal one");
+
+    APE::Tag tag;
+    PropertyMap unsuccessful = tag.setProperties(properties);
+    CPPUNIT_ASSERT_EQUAL(uint(2), unsuccessful.size());
+    CPPUNIT_ASSERT(unsuccessful.contains("A"));
+    CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
   }
 
 };

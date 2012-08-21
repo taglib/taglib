@@ -2,6 +2,7 @@
 #include <string>
 #include <stdio.h>
 #include <xiphcomment.h>
+#include <tpropertymap.h>
 #include <tdebug.h>
 #include "utils.h"
 
@@ -15,6 +16,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testSetYear);
   CPPUNIT_TEST(testTrack);
   CPPUNIT_TEST(testSetTrack);
+  CPPUNIT_TEST(testInvalidKeys);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -57,6 +59,19 @@ public:
     cmt.setTrack(3);
     CPPUNIT_ASSERT(cmt.fieldListMap()["TRACKNUM"].isEmpty());
     CPPUNIT_ASSERT_EQUAL(String("3"), cmt.fieldListMap()["TRACKNUMBER"].front());
+  }
+
+  void testInvalidKeys()
+  {
+    PropertyMap map;
+    map[""] = String("invalid key: empty string");
+    map["A=B"] = String("invalid key: contains '='");
+    map["A~B"] = String("invalid key: contains '~'");
+
+    Ogg::XiphComment cmt;
+    PropertyMap unsuccessful = cmt.setProperties(map);
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), unsuccessful.size());
+    CPPUNIT_ASSERT(cmt.properties().isEmpty());
   }
 
 };
