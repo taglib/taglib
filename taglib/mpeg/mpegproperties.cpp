@@ -220,8 +220,8 @@ void MPEG::Properties::read()
 
       double length = timePerFrame * d->xingHeader->totalFrames();
 
-      d->length = int(length);
-      d->bitrate = d->length > 0 ? d->xingHeader->totalSize() * 8 / length / 1000 : 0;
+      d->length = (int)length;
+      d->bitrate = d->length > 0 ? (int)(d->xingHeader->totalSize() * 8 / length / 1000) : 0;
   }
   else {
     // Since there was no valid Xing header found, we hope that we're in a constant
