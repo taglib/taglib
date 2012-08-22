@@ -36,6 +36,7 @@
 #include <tdebug.h>
 #include <tstringlist.h>
 
+#include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
 #include "tpropertymap.h"
@@ -273,8 +274,12 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   if(end < *position)
     return String::null;
 
-  String str = String(data.mid(*position, end - *position), encoding);
-
+  String str;
+  if(encoding == String::Latin1)
+    str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
+  else
+    str = String(data.mid(*position, end - *position), encoding);
+  
   *position = end + delimiter.size();
 
   return str;
@@ -294,7 +299,7 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
     return encoding;
 
   for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
-    if(!(*it).isLatin1()) {
+    if(!Tag::latin1StringHandler()->canRender(*it)) {
       if(version == 4) {
         debug("Frame::checkEncoding() -- Rendering using UTF8.");
         return String::UTF8;

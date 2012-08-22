@@ -45,6 +45,32 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+////////////////////////////////////////////////////////////////////////////////
+// StringHandler implementation
+////////////////////////////////////////////////////////////////////////////////
+
+Latin1StringHandler::~Latin1StringHandler()
+{
+}
+
+String Latin1StringHandler::parse(const ByteVector &data) const
+{
+  return String(data, String::Latin1);
+}
+
+ByteVector Latin1StringHandler::render(const String &s) const
+{
+  if(!s.isLatin1())
+    return ByteVector();
+
+  return s.data(String::Latin1);
+}
+
+bool Latin1StringHandler::canRender(const String &s) const
+{
+  return s.isLatin1();
+}
+
 class ID3v2::Tag::TagPrivate
 {
 public:
@@ -70,7 +96,12 @@ public:
 
   FrameListMap frameListMap;
   FrameList frameList;
+
+  static const Latin1StringHandler *stringHandler;
 };
+
+static const Latin1StringHandler defaultStringHandler;
+const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -584,6 +615,19 @@ ByteVector ID3v2::Tag::render(int version) const
   return d->header.render() + tagData;
 }
 
+Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
+{
+  return TagPrivate::stringHandler;
+}
+
+void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
+{
+  if(!handler)
+    TagPrivate::stringHandler = &defaultStringHandler;
+  else
+    TagPrivate::stringHandler = handler;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
@@ -686,3 +730,4 @@ void ID3v2::Tag::setTextFrame(const ByteVector &id, const String &value)
     f->setText(value);
   }
 }
+

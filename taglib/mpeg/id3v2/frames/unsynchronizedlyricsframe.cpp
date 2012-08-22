@@ -158,8 +158,16 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
     ByteVectorList::split(data.mid(4), textDelimiter(d->textEncoding), byteAlign, 2);
 
   if(l.size() == 2) {
-    d->description = String(l.front(), d->textEncoding);
-    d->text = String(l.back(), d->textEncoding);
+    if(d->textEncoding == String::Latin1)
+    {
+      d->description = Tag::latin1StringHandler()->parse(l.front());
+      d->text = Tag::latin1StringHandler()->parse(l.back());
+    }
+    else
+    {
+      d->description = String(l.front(), d->textEncoding);
+      d->text = String(l.back(), d->textEncoding);
+    }
   }
 }
 
@@ -169,9 +177,18 @@ ByteVector UnsynchronizedLyricsFrame::renderFields() const
 
   v.append(char(d->textEncoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
-  v.append(d->description.data(d->textEncoding));
+
+  if(d->textEncoding == String::Latin1)
+    v.append(Tag::latin1StringHandler()->render(d->description));
+  else
+    v.append(d->description.data(d->textEncoding));
+
   v.append(textDelimiter(d->textEncoding));
-  v.append(d->text.data(d->textEncoding));
+
+  if(d->textEncoding == String::Latin1)
+    v.append(Tag::latin1StringHandler()->render(d->text));
+  else
+    v.append(d->text.data(d->textEncoding));
 
   return v;
 }

@@ -279,10 +279,10 @@ void MPC::Properties::readSV7(const ByteVector &data)
     }
 
     if (d->trackPeak != 0)
-      d->trackPeak = (int)(log10(d->trackPeak) * 20 * 256 + .5);
+      d->trackPeak = (int)(log10((long double)d->trackPeak) * 20 * 256 + .5);
 
     if (d->albumPeak != 0)
-      d->albumPeak = (int)(log10(d->albumPeak) * 20 * 256 + .5);
+      d->albumPeak = (int)(log10((long double)d->albumPeak) * 20 * 256 + .5);
 
     bool trueGapless = (gapless >> 31) & 0x0001;
     if(trueGapless) {
