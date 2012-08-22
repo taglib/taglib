@@ -154,7 +154,7 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
   d->sampleFrames   = data.mid(2, 4).toUInt();
   d->sampleWidth    = data.mid(6, 2).toShort();
   double sampleRate = ConvertFromIeeeExtended(reinterpret_cast<unsigned char *>(data.mid(8, 10).data()));
-  d->sampleRate     = sampleRate;
-  d->bitrate        = (sampleRate * d->sampleWidth * d->channels) / 1000.0;
+  d->sampleRate     = (int)sampleRate;
+  d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
 }

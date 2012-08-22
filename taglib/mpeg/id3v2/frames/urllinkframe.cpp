@@ -216,7 +216,12 @@ ByteVector UserUrlLinkFrame::renderFields() const
   String::Type encoding = checkTextEncoding(d->description, d->textEncoding);
 
   v.append(char(encoding));
-  v.append(d->description.data(encoding));
+
+  if (d->textEncoding == String::Latin1)
+	v.append(Tag::latin1StringHandler()->render(d->description));
+  else
+    v.append(d->description.data(encoding));
+  
   v.append(textDelimiter(encoding));
   v.append(url().data(String::Latin1));
 

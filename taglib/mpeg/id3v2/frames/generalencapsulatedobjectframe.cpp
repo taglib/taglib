@@ -28,6 +28,7 @@
 #include <tdebug.h>
 
 #include "generalencapsulatedobjectframe.h"
+#include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -156,9 +157,19 @@ ByteVector GeneralEncapsulatedObjectFrame::renderFields() const
   data.append(char(d->textEncoding));
   data.append(d->mimeType.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
-  data.append(d->fileName.data(d->textEncoding));
+
+  if (d->textEncoding == String::Latin1)
+	data.append(Tag::latin1StringHandler()->render(d->fileName));
+  else
+    data.append(d->fileName.data(d->textEncoding));
+  
   data.append(textDelimiter(d->textEncoding));
-  data.append(d->description.data(d->textEncoding));
+  
+  if (d->textEncoding == String::Latin1)
+	data.append(Tag::latin1StringHandler()->render(d->description));
+  else
+	data.append(d->description.data(d->textEncoding));
+  
   data.append(textDelimiter(d->textEncoding));
   data.append(d->data);
 
