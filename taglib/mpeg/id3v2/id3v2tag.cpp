@@ -55,20 +55,20 @@ Latin1StringHandler::~Latin1StringHandler()
 
 String Latin1StringHandler::parse(const ByteVector &data) const
 {
-	return String(data, String::Latin1);
+  return String(data, String::Latin1);
 }
 
 ByteVector Latin1StringHandler::render(const String &s) const
 {
-	if(!s.isLatin1())
-		return ByteVector();
+  if(!s.isLatin1())
+    return ByteVector();
 
-	return s.data(String::Latin1);
+  return s.data(String::Latin1);
 }
 
 bool Latin1StringHandler::canRender(const String &s) const
 {
-	return s.isLatin1();
+  return s.isLatin1();
 }
 
 class ID3v2::Tag::TagPrivate
@@ -617,15 +617,15 @@ ByteVector ID3v2::Tag::render(int version) const
 
 Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
 {
-	return TagPrivate::stringHandler;
+  return TagPrivate::stringHandler;
 }
 
 void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
 {
-	if (!handler)
-		TagPrivate::stringHandler = &defaultStringHandler;
-	else
-		TagPrivate::stringHandler = handler;
+  if(!handler)
+    TagPrivate::stringHandler = &defaultStringHandler;
+  else
+    TagPrivate::stringHandler = handler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -689,9 +689,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
     // portion of the frame data.
 
     if(data.at(frameDataPosition) == 0) {
-      if(d->header.footerPresent()){
+      if(d->header.footerPresent())
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
-	  }
 
       d->paddingSize = frameDataLength - frameDataPosition;
       return;

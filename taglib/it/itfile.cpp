@@ -128,7 +128,7 @@ bool IT::File::save()
 
     seek(sampleOffset + 20);
 
-    if((TagLib::uint)(i + instrumentCount) < lines.size())
+    if((i + instrumentCount) < lines.size())
       writeString(lines[i + instrumentCount], 25);
     else
       writeString(String::null, 25);

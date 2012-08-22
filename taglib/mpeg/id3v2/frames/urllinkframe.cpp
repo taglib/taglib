@@ -217,8 +217,8 @@ ByteVector UserUrlLinkFrame::renderFields() const
 
   v.append(char(encoding));
 
-  if (d->textEncoding == String::Latin1)
-	v.append(Tag::latin1StringHandler()->render(d->description));
+  if(d->textEncoding == String::Latin1)
+    v.append(Tag::latin1StringHandler()->render(d->description));
   else
     v.append(d->description.data(encoding));
   

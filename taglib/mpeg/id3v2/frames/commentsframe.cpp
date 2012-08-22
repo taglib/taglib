@@ -158,16 +158,16 @@ void CommentsFrame::parseFields(const ByteVector &data)
   ByteVectorList l = ByteVectorList::split(data.mid(4), textDelimiter(d->textEncoding), byteAlign, 2);
 
   if(l.size() == 2) {
-	if (d->textEncoding == String::Latin1)
-	{
-		d->description = Tag::latin1StringHandler()->parse(l.front());
-		d->text = Tag::latin1StringHandler()->parse(l.back());
-	}
-	else
-	{
-	  d->description = String(l.front(), d->textEncoding);
-	  d->text = String(l.back(), d->textEncoding);
-	}
+    if(d->textEncoding == String::Latin1)
+    {
+      d->description = Tag::latin1StringHandler()->parse(l.front());
+      d->text = Tag::latin1StringHandler()->parse(l.back());
+    }
+    else
+    {
+      d->description = String(l.front(), d->textEncoding);
+      d->text = String(l.back(), d->textEncoding);
+    }
   }
 }
 
@@ -183,17 +183,17 @@ ByteVector CommentsFrame::renderFields() const
   v.append(char(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
 
-  if (encoding == String::Latin1)
-	v.append(Tag::latin1StringHandler()->render(d->description));
+  if(encoding == String::Latin1)
+    v.append(Tag::latin1StringHandler()->render(d->description));
   else
-	v.append(d->description.data(encoding));
+    v.append(d->description.data(encoding));
 
   v.append(textDelimiter(encoding));
   
-  if (encoding == String::Latin1)
-	v.append(Tag::latin1StringHandler()->render(d->text));
+  if(encoding == String::Latin1)
+    v.append(Tag::latin1StringHandler()->render(d->text));
   else
-	v.append(d->text.data(encoding));
+    v.append(d->text.data(encoding));
 
   return v;
 }

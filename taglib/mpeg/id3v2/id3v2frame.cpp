@@ -275,10 +275,10 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
     return String::null;
 
   String str;
-  if (encoding == String::Latin1)
+  if(encoding == String::Latin1)
     str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
   else
-	str = String(data.mid(*position, end - *position), encoding);
+    str = String(data.mid(*position, end - *position), encoding);
   
   *position = end + delimiter.size();
 
