@@ -70,7 +70,26 @@ public:
 
   FrameListMap frameListMap;
   FrameList frameList;
+
+  static const Latin1StringHandler *stringHandler;
 };
+
+static const Latin1StringHandler defaultStringHandler;
+const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+
+////////////////////////////////////////////////////////////////////////////////
+// Latin1StringHandler implementation
+////////////////////////////////////////////////////////////////////////////////
+
+Latin1StringHandler::~Latin1StringHandler()
+{
+}
+
+String ID3v2::Latin1StringHandler::parse(const ByteVector &data) const
+{
+  return String(data, String::Latin1);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -584,6 +603,19 @@ ByteVector ID3v2::Tag::render(int version) const
   return d->header.render() + tagData;
 }
 
+Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
+{
+  return TagPrivate::stringHandler;
+}
+
+void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
+{
+  if(!handler)
+    TagPrivate::stringHandler = &defaultStringHandler;
+  else
+    TagPrivate::stringHandler = handler;
+}
+    
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
@@ -645,8 +677,9 @@ void ID3v2::Tag::parse(const ByteVector &origData)
     // portion of the frame data.
 
     if(data.at(frameDataPosition) == 0) {
-      if(d->header.footerPresent())
+      if(d->header.footerPresent()) {
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
+      }
 
       d->paddingSize = frameDataLength - frameDataPosition;
       return;
