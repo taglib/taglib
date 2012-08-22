@@ -36,6 +36,7 @@
 #include <tdebug.h>
 #include <tstringlist.h>
 
+#include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
 #include "tpropertymap.h"
@@ -273,7 +274,11 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   if(end < *position)
     return String::null;
 
-  String str = String(data.mid(*position, end - *position), encoding);
+  String str;
+  if(encoding == String::Latin1)
+    str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
+  else
+    str = String(data.mid(*position, end - *position), encoding);
 
   *position = end + delimiter.size();
 
