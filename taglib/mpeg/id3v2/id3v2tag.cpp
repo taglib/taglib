@@ -70,7 +70,25 @@ public:
 
   FrameListMap frameListMap;
   FrameList frameList;
+
+  static const Latin1StringHandler *stringHandler;
 };
+
+static const Latin1StringHandler defaultStringHandler;
+const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+
+////////////////////////////////////////////////////////////////////////////////
+// StringHandler implementation
+////////////////////////////////////////////////////////////////////////////////
+
+Latin1StringHandler::~Latin1StringHandler()
+{
+}
+
+String Latin1StringHandler::parse(const ByteVector &data) const
+{
+  return String(data, String::Latin1);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -582,6 +600,19 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // TODO: This should eventually include d->footer->render().
   return d->header.render() + tagData;
+}
+
+Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
+{
+  return TagPrivate::stringHandler;
+}
+
+void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
+{
+  if(handler)
+    TagPrivate::stringHandler = handler;
+  else
+    TagPrivate::stringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
