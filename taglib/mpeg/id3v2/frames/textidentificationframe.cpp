@@ -213,8 +213,10 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
   for(ByteVectorList::Iterator it = l.begin(); it != l.end(); it++) {
     if(!(*it).isEmpty()) {
-      String s(*it, d->textEncoding);
-      d->fieldList.append(s);
+      if(d->textEncoding == String::Latin1)
+        d->fieldList.append(Tag::latin1StringHandler()->parse(*it));
+      else
+        d->fieldList.append(String(*it, d->textEncoding));    
     }
   }
 }
