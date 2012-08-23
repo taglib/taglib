@@ -214,7 +214,7 @@ void MPC::Properties::readSV8(File *file)
       d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
 
       if((d->sampleFrames - begSilence) != 0)
-        d->bitrate = d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence);
+        d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
       d->bitrate = d->bitrate / 1000;
 
       d->length = (d->sampleFrames - begSilence) / d->sampleRate;
