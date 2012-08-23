@@ -154,6 +154,8 @@ namespace TagLib {
       /*!
        * Sets the string handler that decides how the ID3v1 data will be
        * converted to and from binary data.
+       * If the parameter \a handler is null, default ISO-8859-1 handler
+       * is restored.
        *
        * \see StringHandler
        */
