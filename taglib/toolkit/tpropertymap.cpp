@@ -34,7 +34,7 @@ PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m), unsupport
 PropertyMap::PropertyMap(const SimplePropertyMap &m)
 {
   for(SimplePropertyMap::ConstIterator it = m.begin(); it != m.end(); ++it){
-    String key = prepareKey(it->first);
+    String key = it->first.upper();
     if(!key.isNull())
       insert(it->first, it->second);
     else
@@ -48,10 +48,7 @@ PropertyMap::~PropertyMap()
 
 bool PropertyMap::insert(const String &key, const StringList &values)
 {
-  String realKey = prepareKey(key);
-  if(realKey.isNull())
-    return false;
-
+  String realKey = key.upper();
   Iterator result = SimplePropertyMap::find(realKey);
   if(result == end())
     SimplePropertyMap::insert(realKey, values);
@@ -62,9 +59,7 @@ bool PropertyMap::insert(const String &key, const StringList &values)
 
 bool PropertyMap::replace(const String &key, const StringList &values)
 {
-  String realKey = prepareKey(key);
-  if(realKey.isNull())
-    return false;
+  String realKey = key.upper();
   SimplePropertyMap::erase(realKey);
   SimplePropertyMap::insert(realKey, values);
   return true;
@@ -72,26 +67,17 @@ bool PropertyMap::replace(const String &key, const StringList &values)
 
 PropertyMap::Iterator PropertyMap::find(const String &key)
 {
-  String realKey = prepareKey(key);
-  if(realKey.isNull())
-    return end();
-  return SimplePropertyMap::find(realKey);
+  return SimplePropertyMap::find(key.upper());
 }
 
 PropertyMap::ConstIterator PropertyMap::find(const String &key) const
 {
-  String realKey = prepareKey(key);
-  if(realKey.isNull())
-    return end();
-  return SimplePropertyMap::find(realKey);
+  return SimplePropertyMap::find(key.upper());
 }
 
 bool PropertyMap::contains(const String &key) const
 {
-  String realKey = prepareKey(key);
-  if(realKey.isNull())
-    return false;
-  return SimplePropertyMap::contains(realKey);
+  return SimplePropertyMap::contains(key.upper());
 }
 
 bool PropertyMap::contains(const PropertyMap &other) const
@@ -107,9 +93,7 @@ bool PropertyMap::contains(const PropertyMap &other) const
 
 PropertyMap &PropertyMap::erase(const String &key)
 {
-  String realKey = prepareKey(key);
-  if(!realKey.isNull())
-    SimplePropertyMap::erase(realKey);
+  SimplePropertyMap::erase(key.upper());
   return *this;
 }
 
@@ -122,23 +106,20 @@ PropertyMap &PropertyMap::erase(const PropertyMap &other)
 
 PropertyMap &PropertyMap::merge(const PropertyMap &other)
 {
-  for(PropertyMap::ConstIterator it = other.begin(); it != other.end(); ++it) {
+  for(PropertyMap::ConstIterator it = other.begin(); it != other.end(); ++it)
     insert(it->first, it->second);
-  }
   unsupported.append(other.unsupported);
   return *this;
 }
 
 const StringList &PropertyMap::operator[](const String &key) const
 {
-  String realKey = prepareKey(key);
-  return SimplePropertyMap::operator[](realKey);
+  return SimplePropertyMap::operator[](key.upper());
 }
 
 StringList &PropertyMap::operator[](const String &key)
 {
-  String realKey = prepareKey(key);
-  return SimplePropertyMap::operator[](realKey);
+  return SimplePropertyMap::operator[](key.upper());
 }
 
 bool PropertyMap::operator==(const PropertyMap &other) const
@@ -189,14 +170,4 @@ StringList &PropertyMap::unsupportedData()
 const StringList &PropertyMap::unsupportedData() const
 {
   return unsupported;
-}
-
-String PropertyMap::prepareKey(const String &proposed) {
-  if(proposed.isEmpty())
-    return String::null;
-  for (String::ConstIterator it = proposed.begin(); it != proposed.end(); it++)
-    // forbid non-printable, non-ascii, '=' (#61) and '~' (#126)
-    if (*it < 32 || *it >= 128 || *it == 61 || *it == 126)
-      return String::null;
-  return proposed.upper();
 }
