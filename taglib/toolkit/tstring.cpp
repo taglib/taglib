@@ -259,7 +259,16 @@ const char *String::toCString(bool unicode) const
 
   std::string buffer = to8Bit(unicode);
   d->CString = new char[buffer.size() + 1];
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+
+  strcpy_s(d->CString, buffer.size() + 1, buffer.c_str());
+
+#else
+
   strcpy(d->CString, buffer.c_str());
+
+#endif                                          
 
   return d->CString;
 }

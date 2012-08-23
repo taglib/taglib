@@ -87,10 +87,45 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
-#ifdef _WIN32
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+
+  errno_t err;
+  if(wcslen((const wchar_t *) fileName) > 0) {
+    if(openReadOnly)
+      err = _wfopen_s(&file, name, L"rb");
+    else {
+      err = _wfopen_s(&file, name, L"rb+");
+
+      if(err == 0)
+        readOnly = false;
+      else
+        err = _wfopen_s(&file, name, L"rb");
+    }
+
+    if(err == 0)
+      return;
+  }
+
+  if(openReadOnly)
+    err = fopen_s(&file, name, "rb");
+  else {
+    err = fopen_s(&file, name, "rb+");
+
+    if(err == 0)
+      readOnly = false;
+    else
+      err = fopen_s(&file, name, "rb");
+  }
+
+  if(err != 0) {
+    debug("Could not open file " + String((const char *) name));
+  }
+
+#else   // defined(_MSC_VER) && (_MSC_VER >= 1400)
+
+# ifdef _WIN32
 
   if(wcslen((const wchar_t *) fileName) > 0) {
-
     if(openReadOnly)
       file = _wfopen(name, L"rb");
     else {
@@ -104,10 +139,9 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
 
     if(file)
       return;
-
   }
 
-#endif
+# endif // defined(_WIN32)
 
   if(openReadOnly)
     file = fopen(name, "rb");
@@ -120,10 +154,12 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
       file = fopen(name, "rb");
   }
 
-  if(!file)
-  {
+  if(!file) {
     debug("Could not open file " + String((const char *) name));
   }
+
+#endif  // defined(_MSC_VER) && (_MSC_VER >= 1400)
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -379,7 +415,17 @@ long FileStream::length()
 
 void FileStream::truncate(long length)
 {
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+
+  ftruncate(_fileno(d->file), length);
+
+#else
+
   ftruncate(fileno(d->file), length);
+
+#endif
+
 }
 
 TagLib::uint FileStream::bufferSize()
