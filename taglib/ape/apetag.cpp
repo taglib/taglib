@@ -260,7 +260,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
 bool APE::Tag::checkKey(const String &key)
 {
-  if(key.size() < 2 or key.size() > 16)
+  if(key.size() < 2 || key.size() > 16)
       return false;
     for(String::ConstIterator it = key.begin(); it != key.end(); it++)
         // only allow printable ASCII including space (32..127)
