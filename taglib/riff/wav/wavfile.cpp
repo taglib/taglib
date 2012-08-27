@@ -86,9 +86,9 @@ RIFF::WAV::File::~File()
   delete d;
 }
 
-Tag *RIFF::WAV::File::tag() const
+ID3v2::Tag *RIFF::WAV::File::tag() const
 {
-  return &d->tag;
+  return ID3v2Tag();
 }
 
 ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
