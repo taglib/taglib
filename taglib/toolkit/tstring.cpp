@@ -233,8 +233,9 @@ std::string String::to8Bit(bool unicode) const
                                 &target, targetBuffer + outputBufferSize,
                                 Unicode::lenientConversion);
 
-  if(result != Unicode::conversionOK)
+  if(result != Unicode::conversionOK) {
     debug("String::to8Bit() - Unicode conversion error.");
+  }
 
   int newSize = target - targetBuffer;
   s.resize(newSize);
@@ -779,9 +780,9 @@ void String::prepare(Type t)
                                   &target, targetBuffer + bufferSize,
                                   Unicode::lenientConversion);
 
-    if(result != Unicode::conversionOK)
+    if(result != Unicode::conversionOK) {
       debug("String::prepare() - Unicode conversion error.");
-
+    }
 
     int newSize = target != targetBuffer ? target - targetBuffer - 1 : 0;
     d->data.resize(newSize);
