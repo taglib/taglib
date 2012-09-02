@@ -65,6 +65,51 @@ struct FileNameHandle : public std::string
 
 #endif
 
+namespace {
+  FILE *openFile(const FileName &path, bool readOnly)
+  {
+    // Calls a proper variation of fopen() depending on the compiling environment.
+
+#if defined(_WIN32)
+  
+# if defined(_MSC_VER) && (_MSC_VER >= 1400) 
+
+    // Visual C++ 2005 or later.
+
+    FILE *file;
+    errno_t err;
+
+    if(wcslen(path) > 0)
+      err = _wfopen_s(&file, path, readOnly ? L"rb" : L"rb+");
+    else
+      err = fopen_s(&file, path, readOnly ? "rb" : "rb+");
+  
+    if(err == 0)
+      return file;
+    else
+      return NULL;
+  
+# else   // defined(_MSC_VER) && (_MSC_VER >= 1400)
+
+    // Visual C++.NET 2003 or earlier.
+
+    if(wcslen(path) > 0)
+      return _wfopen(path, readOnly ? L"rb" : L"rb+");
+    else
+      return fopen(path, readOnly ? "rb" : "rb+");
+
+# endif  // defined(_MSC_VER) && (_MSC_VER >= 1400)
+
+#else  // defined(_WIN32)
+
+    // Non-Win32
+
+    return fopen(path, readOnly ? "rb" : "rb+");
+
+#endif // defined(_WIN32)
+  }
+}
+
 class FileStream::FileStreamPrivate
 {
 public:
@@ -87,41 +132,15 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
-#ifdef _WIN32
+  if(!openReadOnly)
+    file = openFile(name, false);
 
-  if(wcslen((const wchar_t *) fileName) > 0) {
+  if(file)
+    readOnly = false;
+  else
+    file = openFile(name, true);
 
-    if(openReadOnly)
-      file = _wfopen(name, L"rb");
-    else {
-      file = _wfopen(name, L"rb+");
-
-      if(file)
-        readOnly = false;
-      else
-        file = _wfopen(name, L"rb");
-    }
-
-    if(file)
-      return;
-
-  }
-
-#endif
-
-  if(openReadOnly)
-    file = fopen(name, "rb");
-  else {
-    file = fopen(name, "rb+");
-
-    if(file)
-      readOnly = false;
-    else
-      file = fopen(name, "rb");
-  }
-
-  if(!file)
-  {
+  if(!file) {
     debug("Could not open file " + String((const char *) name));
   }
 }
@@ -379,7 +398,17 @@ long FileStream::length()
 
 void FileStream::truncate(long length)
 {
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+
+  ftruncate(_fileno(d->file), length);
+
+#else
+
   ftruncate(fileno(d->file), length);
+
+#endif
+
 }
 
 TagLib::uint FileStream::bufferSize()
