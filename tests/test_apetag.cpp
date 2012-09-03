@@ -77,7 +77,7 @@ public:
     APE::Item item3 = APE::Item("TRACKNUMBER", "29");
     tag.setItem("TRACKNUMBER", item3);
     properties = tag.properties();
-    CPPUNIT_ASSERT_EQUAL(uint(2), properties["TRACKNUMBER"].size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), properties["TRACKNUMBER"].size());
     CPPUNIT_ASSERT_EQUAL(String("17"), properties["TRACKNUMBER"][0]);
     CPPUNIT_ASSERT_EQUAL(String("29"), properties["TRACKNUMBER"][1]);
 
@@ -93,7 +93,7 @@ public:
 
     APE::Tag tag;
     PropertyMap unsuccessful = tag.setProperties(properties);
-    CPPUNIT_ASSERT_EQUAL(uint(2), unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), unsuccessful.size());
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
   }
