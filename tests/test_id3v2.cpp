@@ -15,6 +15,7 @@
 #include <relativevolumeframe.h>
 #include <popularimeterframe.h>
 #include <urllinkframe.h>
+#include <ownershipframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
 #include "utils.h"
@@ -61,6 +62,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderUrlLinkFrame);
   CPPUNIT_TEST(testParseUserUrlLinkFrame);
   CPPUNIT_TEST(testRenderUserUrlLinkFrame);
+  CPPUNIT_TEST(testParseOwnershipFrame);
+  CPPUNIT_TEST(testRenderOwnershipFrame);
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
@@ -69,11 +72,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
-  CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
-  CPPUNIT_TEST(testDeleteFrame);
-  CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -386,6 +386,38 @@ public:
                  "http://example.com", 33),  // URL
       f.render());
   }
+  
+  void testParseOwnershipFrame()
+  {
+    ID3v2::OwnershipFrame f(
+                            ByteVector("OWNE"                      // Frame ID
+                                       "\x00\x00\x00\x19"          // Frame size
+                                       "\x00\x00"                  // Frame flags
+                                       "\x00"                      // Text encoding
+                                       "GBP1.99\x00"               // Price paid
+                                       "20120905"                  // Date of purchase
+                                       "Beatport", 35));           // Seller
+    CPPUNIT_ASSERT_EQUAL(String("GBP1.99"), f.pricePaid());
+    CPPUNIT_ASSERT_EQUAL(String("20120905"), f.datePurchased());
+    CPPUNIT_ASSERT_EQUAL(String("Beatport"), f.seller());
+  }
+
+  void testRenderOwnershipFrame()
+  {
+    ID3v2::OwnershipFrame f;
+    f.setPricePaid("GBP1.99");
+    f.setDatePurchased("20120905");
+    f.setSeller("Beatport");
+    CPPUNIT_ASSERT_EQUAL(
+                         ByteVector("OWNE"                      // Frame ID
+                                    "\x00\x00\x00\x19"          // Frame size
+                                    "\x00\x00"                  // Frame flags
+                                    "\x00"                      // Text encoding
+                                    "GBP1.99\x00"               // Price paid
+                                    "20120905"                  // Date of purchase
+                                    "Beatport", 35),  // URL
+                         f.render());
+  }
 
   void testItunes24FrameSize()
   {
@@ -554,16 +586,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
   }
 
-  void testW000()
-  {
-    MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
-    CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("W000"));
-    ID3v2::UrlLinkFrame *frame =
-        dynamic_cast<TagLib::ID3v2::UrlLinkFrame*>(f.ID3v2Tag()->frameListMap()["W000"].front());
-    CPPUNIT_ASSERT(frame);
-    CPPUNIT_ASSERT_EQUAL(String("lukas.lalinsky@example.com____"), frame->url());
-  }
-
   void testPropertyInterface()
   {
     ScopedFileCopy copy("rare_frames", ".mp3");
@@ -639,43 +661,6 @@ public:
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
-  }
-
-  void testDeleteFrame()
-  {
-    ScopedFileCopy copy("rare_frames", ".mp3");
-    string newname = copy.fileName();
-    MPEG::File f(newname.c_str());
-    ID3v2::Tag *t = f.ID3v2Tag();
-    ID3v2::Frame *frame = t->frameList("TCON")[0];
-    CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
-    t->removeFrame(frame, true);
-    f.save(MPEG::File::ID3v2);
-
-    MPEG::File f2(newname.c_str());
-    t = f2.ID3v2Tag();
-    CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
-  }
-  void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
-  {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
-
-    {
-      MPEG::File foo(newname.c_str());
-      foo.tag()->setArtist("Artist");
-      foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
-    }
-
-    {
-      MPEG::File bar(newname.c_str());
-      bar.ID3v2Tag()->removeFrames("TPE1");
-      // Should strip ID3v1 here and not add old values to ID3v2 again
-      bar.save(MPEG::File::ID3v2, true);
-    }
-
-    MPEG::File f(newname.c_str());
-    CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }
 
 };

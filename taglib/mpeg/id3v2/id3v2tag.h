@@ -77,6 +77,7 @@ namespace TagLib {
     class TAGLIB_EXPORT Latin1StringHandler
     {
     public:
+      Latin1StringHandler();
       virtual ~Latin1StringHandler();
 
       /*!
