@@ -74,15 +74,17 @@ using namespace TagLib;
 class File::FilePrivate
 {
 public:
-  FilePrivate(IOStream *stream);
+  FilePrivate(IOStream *stream, bool owner);
 
   IOStream *stream;
+  bool streamOwner;
   bool valid;
   static const uint bufferSize = 1024;
 };
 
-File::FilePrivate::FilePrivate(IOStream *stream) :
+File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
   stream(stream),
+  streamOwner(owner),
   valid(true)
 {
 }
@@ -94,17 +96,17 @@ File::FilePrivate::FilePrivate(IOStream *stream) :
 File::File(FileName fileName)
 {
   IOStream *stream = new FileStream(fileName);
-  d = new FilePrivate(stream);
+  d = new FilePrivate(stream, true);
 }
 
 File::File(IOStream *stream)
 {
-  d = new FilePrivate(stream);
+  d = new FilePrivate(stream, false);
 }
 
 File::~File()
 {
-  if(d->stream)
+  if(d->stream && d->streamOwner)
     delete d->stream;
   delete d;
 }

@@ -260,6 +260,9 @@ namespace TagLib {
     /*!
      * Construct a File object and use the \a stream instance.
      *
+     * \note TagLib will *not* take ownership of the stream, the caller is
+     * responsible for deleting it after the File object.
+     *
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */

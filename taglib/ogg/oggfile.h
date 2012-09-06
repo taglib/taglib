@@ -100,6 +100,9 @@ namespace TagLib {
        * \note This constructor is protected since Ogg::File shouldn't be
        * instantiated directly but rather should be used through the codec
        * specific subclasses.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
        */
       File(IOStream *stream);
 

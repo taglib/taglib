@@ -65,6 +65,9 @@ namespace TagLib {
        *
        * \note In the current implementation, both \a readProperties and
        * \a propertiesStyle are ignored.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
        */
       File(IOStream *stream, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
 
