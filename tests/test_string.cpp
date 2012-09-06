@@ -41,6 +41,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testAppendCharDetach);
   CPPUNIT_TEST(testAppendStringDetach);
   CPPUNIT_TEST(testToInt);
+  CPPUNIT_TEST(testSubstr);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -191,6 +192,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("-123").toInt(), -123);
     CPPUNIT_ASSERT_EQUAL(String("123aa").toInt(), 123);
     CPPUNIT_ASSERT_EQUAL(String("-123aa").toInt(), -123);
+  }
+
+  void testSubstr()
+  {
+    CPPUNIT_ASSERT_EQUAL(String("01"), String("0123456").substr(0, 2));
+    CPPUNIT_ASSERT_EQUAL(String("12"), String("0123456").substr(1, 2));
+    CPPUNIT_ASSERT_EQUAL(String("123456"), String("0123456").substr(1, 200));
   }
 
 };
