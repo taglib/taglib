@@ -26,6 +26,7 @@
 #include <tdebug.h>
 
 #include "ownershipframe.h"
+#include <id3v2tag.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -33,7 +34,6 @@ using namespace ID3v2;
 class OwnershipFrame::OwnershipFramePrivate
 {
 public:
-  String currencyCode;
   String pricePaid;
   String datePurchased;
   String seller;
@@ -123,7 +123,7 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   
   // If we don't have at least 8 bytes left then don't parse the rest of the
   // data
-  if (data.size() - pos < 8) {
+  if(data.size() - pos < 8) {
     return;
   }
   
@@ -132,7 +132,10 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   pos += 8;
   
   // Read the seller
-  d->seller = String(data.mid(pos));
+  if(d->textEncoding == String::Latin1)
+    d->seller = Tag::latin1StringHandler()->parse(data.mid(pos));
+  else
+    d->seller = String(data.mid(pos), d->textEncoding);
 }
 
 ByteVector OwnershipFrame::renderFields() const

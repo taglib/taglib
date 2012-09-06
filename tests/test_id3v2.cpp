@@ -72,8 +72,11 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
+  CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
+  CPPUNIT_TEST(testDeleteFrame);
+  CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -585,6 +588,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
   }
+  
+  void testW000()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
+    CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("W000"));
+    ID3v2::UrlLinkFrame *frame =
+    dynamic_cast<TagLib::ID3v2::UrlLinkFrame*>(f.ID3v2Tag()->frameListMap()["W000"].front());
+    CPPUNIT_ASSERT(frame);
+    CPPUNIT_ASSERT_EQUAL(String("lukas.lalinsky@example.com____"), frame->url());
+  }
 
   void testPropertyInterface()
   {
@@ -661,6 +674,44 @@ public:
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
+  }
+
+  void testDeleteFrame()
+  {
+    ScopedFileCopy copy("rare_frames", ".mp3");
+    string newname = copy.fileName();
+    MPEG::File f(newname.c_str());
+    ID3v2::Tag *t = f.ID3v2Tag();
+    ID3v2::Frame *frame = t->frameList("TCON")[0];
+    CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
+    t->removeFrame(frame, true);
+    f.save(MPEG::File::ID3v2);
+    
+    MPEG::File f2(newname.c_str());
+    t = f2.ID3v2Tag();
+    CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
+  }
+  
+  void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+    
+    {
+      MPEG::File foo(newname.c_str());
+      foo.tag()->setArtist("Artist");
+      foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
+    }
+    
+    {
+      MPEG::File bar(newname.c_str());
+      bar.ID3v2Tag()->removeFrames("TPE1");
+      // Should strip ID3v1 here and not add old values to ID3v2 again
+      bar.save(MPEG::File::ID3v2, true);
+    }
+    
+    MPEG::File f(newname.c_str());
+    CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }
 
 };

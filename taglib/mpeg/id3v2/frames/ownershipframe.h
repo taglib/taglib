@@ -36,8 +36,8 @@ namespace TagLib {
     //! An implementation of ID3v2 "ownership"
 
     /*!
-     * This implements the ID3v2 ownership (OWNE frame).  It concists of
-     * an price paid, a date purchased (YYYYMMDD) and the name of the seller.
+     * This implements the ID3v2 ownership (OWNE frame).  It consists of
+     * a price paid, a date purchased (YYYYMMDD) and the name of the seller.
      */
 
     class TAGLIB_EXPORT OwnershipFrame : public Frame
@@ -80,7 +80,6 @@ namespace TagLib {
        * \see datePurchased()
        */
       void setDatePurchased(const String &datePurchased);
-
 
       /*!
        * Returns the price paid.
