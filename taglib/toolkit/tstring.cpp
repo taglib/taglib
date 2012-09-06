@@ -345,9 +345,6 @@ bool String::startsWith(const String &s) const
 
 String String::substr(uint position, uint n) const
 {
-  if(n > position + d->data.size())
-    n = d->data.size() - position;
-
   String s;
   s.d->data = d->data.substr(position, n);
   return s;
