@@ -1,5 +1,20 @@
-TagLib 1.8 BETA (Jul 14, 2012)
+TagLib 1.8 (Sep 6, 2012)
 ==============================
+
+1.8:
+
+ * Added support for OWNE ID3 frames.
+ * Changed key validation in the new PropertyMap API.
+ * ID3v1::Tag::setStringHandler will no londer delete the previous handler,
+   the caller is responsible for this.
+ * File objects will also no longer delete the passed IOStream objects. It
+   should be done in the caller code after the File object is no longer
+   used.
+ * Added ID3v2::Tag::setLatin1StringHandler for custom handling of
+   latin1-encoded text in ID3v2 frames.
+ * Fixed validation of ID3v2 frame IDs (IDs with '0' were ignored).
+
+1.8 BETA:
 
  * New API for accessing tags by name.
  * New abstract I/O stream layer to allow custom I/O handlers.
