@@ -81,6 +81,10 @@ const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defau
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
+Latin1StringHandler::Latin1StringHandler()
+{
+}
+
 Latin1StringHandler::~Latin1StringHandler()
 {
 }
