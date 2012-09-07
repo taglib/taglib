@@ -29,6 +29,7 @@
 #include "tag.h"
 #include "tbytevector.h"
 #include "tstring.h"
+#include "tstringhandler.h"
 #include "tlist.h"
 #include "tmap.h"
 #include "taglib_export.h"
@@ -74,17 +75,22 @@ namespace TagLib {
      *
      * \see ID3v2::Tag::setStringHandler()
      */
-    class TAGLIB_EXPORT Latin1StringHandler
+    class TAGLIB_EXPORT Latin1StringHandler : public TagLib::StringHandler
     {
     public:
-      Latin1StringHandler();
-      virtual ~Latin1StringHandler();
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.
        */
       virtual String parse(const ByteVector &data) const;
+
+      /*!
+       * Decode a string from \a data.  
+       *
+       * \note Not implemented intentionally.  Always returns empty \s ByteVector.
+       */
+      virtual ByteVector render(const String &s) const;
     };
 
     //! The main class in the ID3v2 implementation
@@ -358,9 +364,9 @@ namespace TagLib {
        * Gets the current string handler that decides how the "Latin-1" data 
        * will be converted to and from binary data.
        *
-       * \see Latin1StringHandler
+       * \see TagLib::StringHandler
        */
-      static Latin1StringHandler const *latin1StringHandler();
+      static TagLib::StringHandler const *latin1StringHandler();
 
       /*!
        * Sets the string handler that decides how the "Latin-1" data will be
@@ -371,9 +377,25 @@ namespace TagLib {
        * \note The caller is responsible for deleting the previous handler
        * as needed after it is released. 
        *
-       * \see Latin1StringHandler
+       * \note This method is left for backward compatibility.  Will removed 
+       * in version 2.0.
+       *
+       * \see ID3v2::Latin1StringHandler
        */
-      static void setLatin1StringHandler(const Latin1StringHandler *handler);
+      static void setLatin1StringHandler(const ID3v2::Latin1StringHandler *handler);
+
+      /*!
+       * Sets the string handler that decides how the "Latin-1" data will be
+       * converted to and from binary data.
+       * If the parameter \a handler is null, the previous handler is
+       * released and default ISO-8859-1 handler is restored.
+       *
+       * \note The caller is responsible for deleting the previous handler
+       * as needed after it is released. 
+       *
+       * \see TagLib::StringHandler
+       */
+      static void setLatin1StringHandler(const TagLib::StringHandler *handler);
 
     protected:
       /*!

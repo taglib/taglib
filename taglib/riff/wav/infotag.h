@@ -29,6 +29,7 @@
 #include "tag.h"
 #include "tmap.h"
 #include "tstring.h"
+#include "tstringhandler.h"
 #include "tstringlist.h"
 #include "tbytevector.h"
 #include "taglib_export.h"
@@ -57,11 +58,9 @@ namespace TagLib {
      * \see ID3v1::Tag::setStringHandler()
      */
 
-    class TAGLIB_EXPORT StringHandler
+    class TAGLIB_EXPORT StringHandler : public TagLib::StringHandler
     {
     public:
-      StringHandler();
-      ~StringHandler();
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
@@ -157,7 +156,7 @@ namespace TagLib {
        *
        * \see StringHandler
        */
-      static void setStringHandler(const StringHandler *handler);
+      static void setStringHandler(const TagLib::StringHandler *handler);
     
     protected:
       /*!
