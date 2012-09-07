@@ -99,7 +99,7 @@ namespace TagLib {
          * \note This method does not return all the tags for this file for 
          * backward compatibility.  Will be fixed in TagLib 2.0.
          */
-        ID3v2::Tag *RIFF::WAV::File::tag() const;
+        ID3v2::Tag *tag() const;
 
         /*!
          * Returns the ID3v2 Tag for this file.

@@ -103,6 +103,7 @@ set(tag_HDRS
   riff/aiff/aiffproperties.h
   riff/wav/wavfile.h
   riff/wav/wavproperties.h
+  riff/wav/infotag.h
   asf/asffile.h
   asf/asfproperties.h
   asf/asftag.h
@@ -244,6 +245,7 @@ set(aiff_SRCS
 set(wav_SRCS
   riff/wav/wavfile.cpp
   riff/wav/wavproperties.cpp
+  riff/wav/infotag.cpp
 )
 
 set(mod_SRCS
