@@ -437,6 +437,21 @@ long MPEG::File::lastFrameOffset()
   return previousFrameOffset(ID3v1Tag() ? d->ID3v1Location - 1 : length());
 }
 
+bool MPEG::File::hasID3v1Tag() const
+{
+  return d->hasID3v1;
+}
+
+bool MPEG::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
+}
+
+bool MPEG::File::hasAPETag() const
+{
+  return d->hasAPE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
