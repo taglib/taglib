@@ -191,7 +191,6 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Now add the chunk to the file
 
-  long len = length();
   writeChunk(name, data, offset, std::max<long>(0, length() - offset), (offset & 1) ? 1 : 0);
 
   // And update our internal structure

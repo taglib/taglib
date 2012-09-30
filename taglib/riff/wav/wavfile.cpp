@@ -199,13 +199,13 @@ void RIFF::WAV::File::strip(TagTypes tags)
     removeChunk(d->tagChunkID);
 
   if(tags & Info){
-    uint chunkId = findInfoTagChunk();
-    if(chunkId != -1)
+    TagLib::uint chunkId = findInfoTagChunk();
+    if(chunkId != TagLib::uint(-1))
       removeChunk(chunkId);
   }
 }
 
-uint RIFF::WAV::File::findInfoTagChunk()
+TagLib::uint RIFF::WAV::File::findInfoTagChunk()
 {
   for(uint i = 0; i < chunkCount(); ++i) {
     if(chunkName(i) == "LIST" && chunkData(i).mid(0, 4) == "INFO") {
@@ -213,5 +213,5 @@ uint RIFF::WAV::File::findInfoTagChunk()
     }
   }
   
-  return -1;
+  return TagLib::uint(-1);
 }
