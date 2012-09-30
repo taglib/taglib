@@ -49,6 +49,7 @@ set(tag_HDRS
   toolkit/tmap.h
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
+  toolkit/tstringhandler.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
@@ -273,6 +274,7 @@ set(xm_SRCS
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
+  toolkit/tstringhandler.cpp
   toolkit/tbytevector.cpp
   toolkit/tbytevectorlist.cpp
   toolkit/tbytevectorstream.cpp
