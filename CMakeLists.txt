@@ -66,8 +66,15 @@ math(EXPR TAGLIB_SOVERSION_PATCH "${TAGLIB_SOVERSION_REVISION}")
 
 include(ConfigureChecks.cmake)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/taglib-config DESTINATION ${BIN_INSTALL_DIR})
+if(NOT WIN32)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/taglib-config DESTINATION ${BIN_INSTALL_DIR})
+endif()
+
+if(WIN32)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmd.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd )
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd DESTINATION ${BIN_INSTALL_DIR})
+endif()
 
 if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc )
