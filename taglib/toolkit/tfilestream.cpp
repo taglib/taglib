@@ -64,18 +64,18 @@ namespace {
 
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
-    DWORD read_len;
-    ReadFile(stream, ptr, size * nmemb, &read_len, NULL);
+    DWORD readLen;
+    ReadFile(stream, ptr, size * nmemb, &readLen, NULL);
 
-    return (read_len / size);
+    return (readLen / size);
   }
 
   size_t fwrite(const void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
-    DWORD written_len;
-    WriteFile(stream, ptr, size * nmemb, &written_len, NULL);
+    DWORD writtenLen;
+    WriteFile(stream, ptr, size * nmemb, &writtenLen, NULL);
 
-    return written_len;
+    return writtenLen;
   }
 
 #else
@@ -444,12 +444,12 @@ void FileStream::truncate(long length)
 {
 #ifdef _WIN32
 
-  long current_pos = tell();
+  long currentPos = tell();
 
   seek(length);
   SetEndOfFile(d->file);
 
-  seek(current_pos);
+  seek(currentPos);
 
 #else
 
