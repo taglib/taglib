@@ -35,79 +35,65 @@
 # include <wchar.h>
 # include <windows.h>
 # include <io.h>
-# define ftruncate _chsize
 #else
 # include <unistd.h>
 #endif
 
 #include <stdlib.h>
 
-#ifndef R_OK
-# define R_OK 4
-#endif
-#ifndef W_OK
-# define W_OK 2
-#endif
-
 using namespace TagLib;
 
+namespace {
 #ifdef _WIN32
 
-typedef FileName FileNameHandle;
+  // For Windows 
+
+  typedef FileName FileNameHandle;
+
+  // Using native file handles instead of file descriptors for reducing the resource consumption.
+
+  HANDLE openFile(const FileName &path, bool readOnly)
+  {
+    DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
+
+    if(wcslen(path) > 0)
+      return CreateFileW(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    else
+      return CreateFileA(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+  }
+
+  size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
+  {
+    DWORD readLen;
+    ReadFile(stream, ptr, size * nmemb, &readLen, NULL);
+
+    return (readLen / size);
+  }
+
+  size_t fwrite(const void *ptr, size_t size, size_t nmemb, HANDLE stream)
+  {
+    DWORD writtenLen;
+    WriteFile(stream, ptr, size * nmemb, &writtenLen, NULL);
+
+    return writtenLen;
+  }
 
 #else
 
-struct FileNameHandle : public std::string
-{
-  FileNameHandle(FileName name) : std::string(name) {}
-  operator FileName () const { return c_str(); }
-};
+  // For non-Windows 
 
-#endif
+  struct FileNameHandle : public std::string
+  {
+    FileNameHandle(FileName name) : std::string(name) {}
+    operator FileName () const { return c_str(); }
+  };
 
-namespace {
   FILE *openFile(const FileName &path, bool readOnly)
   {
-    // Calls a proper variation of fopen() depending on the compiling environment.
-
-#if defined(_WIN32)
-  
-# if defined(_MSC_VER) && (_MSC_VER >= 1400) 
-
-    // Visual C++ 2005 or later.
-
-    FILE *file;
-    errno_t err;
-
-    if(wcslen(path) > 0)
-      err = _wfopen_s(&file, path, readOnly ? L"rb" : L"rb+");
-    else
-      err = fopen_s(&file, path, readOnly ? "rb" : "rb+");
-  
-    if(err == 0)
-      return file;
-    else
-      return NULL;
-  
-# else   // defined(_MSC_VER) && (_MSC_VER >= 1400)
-
-    // Visual C++.NET 2003 or earlier.
-
-    if(wcslen(path) > 0)
-      return _wfopen(path, readOnly ? L"rb" : L"rb+");
-    else
-      return fopen(path, readOnly ? "rb" : "rb+");
-
-# endif  // defined(_MSC_VER) && (_MSC_VER >= 1400)
-
-#else  // defined(_WIN32)
-
-    // Non-Win32
-
     return fopen(path, readOnly ? "rb" : "rb+");
-
-#endif // defined(_WIN32)
   }
+
+#endif
 }
 
 class FileStream::FileStreamPrivate
@@ -115,7 +101,15 @@ class FileStream::FileStreamPrivate
 public:
   FileStreamPrivate(FileName fileName, bool openReadOnly);
 
+#ifdef _WIN32
+
+  HANDLE file;
+
+#else
+
   FILE *file;
+
+#endif
 
   FileNameHandle name;
 
@@ -156,8 +150,18 @@ FileStream::FileStream(FileName file, bool openReadOnly)
 
 FileStream::~FileStream()
 {
+#ifdef _WIN32
+
+  if(d->file)
+    CloseHandle(d->file);
+
+#else
+
   if(d->file)
     fclose(d->file);
+
+#endif
+
   delete d;
 }
 
@@ -348,27 +352,67 @@ void FileStream::seek(long offset, Position p)
     return;
   }
 
+#ifdef _WIN32
+
+  DWORD whence;
   switch(p) {
   case Beginning:
-    fseek(d->file, offset, SEEK_SET);
+    whence = FILE_BEGIN;
     break;
   case Current:
-    fseek(d->file, offset, SEEK_CUR);
+    whence = FILE_CURRENT;
     break;
   case End:
-    fseek(d->file, offset, SEEK_END);
+    whence = FILE_END;
     break;
   }
+
+  SetFilePointer(d->file, offset, NULL, whence);
+
+#else
+
+  int whence;
+  switch(p) {
+  case Beginning:
+    whence = SEEK_SET;
+    break;
+  case Current:
+    whence = SEEK_CUR;
+    break;
+  case End:
+    whence = SEEK_END;
+    break;
+  }
+
+  fseek(d->file, offset, whence);
+
+#endif
 }
 
 void FileStream::clear()
 {
+#ifdef _WIN32
+
+  // NOP
+
+#else
+
   clearerr(d->file);
+
+#endif
 }
 
 long FileStream::tell() const
 {
+#ifdef _WIN32
+
+  return (long)SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
+
+#else
+
   return ftell(d->file);
+
+#endif
 }
 
 long FileStream::length()
@@ -398,17 +442,20 @@ long FileStream::length()
 
 void FileStream::truncate(long length)
 {
+#ifdef _WIN32
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+  long currentPos = tell();
 
-  ftruncate(_fileno(d->file), length);
+  seek(length);
+  SetEndOfFile(d->file);
+
+  seek(currentPos);
 
 #else
 
   ftruncate(fileno(d->file), length);
 
 #endif
-
 }
 
 TagLib::uint FileStream::bufferSize()
