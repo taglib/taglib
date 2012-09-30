@@ -96,13 +96,38 @@ namespace TagLib {
       ByteVector chunkData(uint i);
 
       /*!
+       * Sets the data for the the specified chunk to \a data. 
+       *
+       * \warning This will update the file immediately.
+       */
+      void setChunkData(uint i, const ByteVector &data);
+
+      /*!
        * Sets the data for the chunk \a name to \a data.  If a chunk with the
        * given name already exists it will be overwritten, otherwise it will be
        * created after the existing chunks.
        *
+       * \note If \a alwaysCreate is true, a new chunk is created regardless of 
+       * existence of chunk \a name. It should be used for only "LIST" chunks. 
+       *
        * \warning This will update the file immediately.
        */
-      void setChunkData(const ByteVector &name, const ByteVector &data);
+      void setChunkData(const ByteVector &name, const ByteVector &data, bool alwaysCreate = false);
+
+      /*!
+       * Removes the specified chunk.
+       *
+       * \warning This will update the file immediately.
+       */
+      void removeChunk(uint i);
+
+      /*!
+       * Removes the chunk \a name.
+       *
+       * \warning This will update the file immediately.
+       * \warning This removes all the chunks with the given name.
+       */
+      void removeChunk(const ByteVector &name);
 
     private:
       File(const File &);

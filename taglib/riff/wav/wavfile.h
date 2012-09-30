@@ -28,6 +28,7 @@
 
 #include "rifffile.h"
 #include "id3v2tag.h"
+#include "infotag.h"
 #include "wavproperties.h"
 
 namespace TagLib {
@@ -57,6 +58,17 @@ namespace TagLib {
       class TAGLIB_EXPORT File : public TagLib::RIFF::File
       {
       public:
+        enum TagTypes {
+          //! Empty set.  Matches no tag types.
+          NoTags  = 0x0000,
+          //! Matches ID3v2 tags.
+          ID3v2   = 0x0001,
+          //! Matches Info tags.
+          Info    = 0x0002,
+          //! Matches all tag types.
+          AllTags = 0xffff
+        };
+
         /*!
          * Contructs an WAV file from \a file.  If \a readProperties is true the
          * file's audio properties will also be read using \a propertiesStyle.  If
@@ -82,9 +94,22 @@ namespace TagLib {
         virtual ~File();
 
         /*!
-         * Returns the Tag for this file.
+         * Returns the ID3v2 Tag for this file.
+         * 
+         * \note This method does not return all the tags for this file for 
+         * backward compatibility.  Will be fixed in TagLib 2.0.
          */
-        virtual ID3v2::Tag *tag() const;
+        ID3v2::Tag *tag() const;
+
+        /*!
+         * Returns the ID3v2 Tag for this file.
+         */
+        ID3v2::Tag *ID3v2Tag() const;
+
+        /*!
+         * Returns the RIFF INFO Tag for this file.
+         */
+        Info::Tag *InfoTag() const;
 
         /*!
          * Implements the unified property interface -- export function.
@@ -109,11 +134,20 @@ namespace TagLib {
          */
         virtual bool save();
 
+        bool save(TagTypes tags, bool stripOthers = true, int id3v2Version = 4);
+
       private:
         File(const File &);
         File &operator=(const File &);
 
         void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+
+        void strip(TagTypes tags);
+
+        /*!
+         * Returns the index of the chunk that its name is "LIST" and list type is "INFO".
+         */
+        uint findInfoTagChunk();
 
         class FilePrivate;
         FilePrivate *d;
