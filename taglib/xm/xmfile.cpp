@@ -443,7 +443,7 @@ bool XM::File::save()
       return false;
 
     uint len = std::min(22UL, instrumentHeaderSize - 4U);
-    if(i > lines.size())
+    if(i >= lines.size())
       writeString(String::null, len);
     else
       writeString(lines[i], len);
