@@ -127,14 +127,6 @@ void APE::Item::setBinaryData(const ByteVector &value)
   d->value = value;
 }
 
-ByteVector APE::Item::value() const
-{
-  // This seems incorrect as it won't be actually rendering the value to keep it
-  // up to date.
-
-  return d->value;
-}
-
 void APE::Item::setKey(const String &key)
 {
     d->key = key;
@@ -186,11 +178,6 @@ int APE::Item::size() const
       break;
   }
   return result;
-}
-
-StringList APE::Item::toStringList() const
-{
-  return d->text;
 }
 
 StringList APE::Item::values() const

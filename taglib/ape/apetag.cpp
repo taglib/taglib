@@ -199,7 +199,7 @@ PropertyMap APE::Tag::properties() const
       for(uint i = 0; i < keyConversionsSize; ++i)
         if(tagName == keyConversions[i][1])
           tagName = keyConversions[i][0];
-        properties[tagName].append(it->second.toStringList());
+        properties[tagName].append(it->second.values());
     }
   }
   return properties;
