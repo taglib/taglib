@@ -29,6 +29,7 @@
 #include "tag.h"
 #include "tbytevector.h"
 #include "tstring.h"
+#include "tstringhandler.h"
 #include "tlist.h"
 #include "tmap.h"
 #include "taglib_export.h"
@@ -74,17 +75,21 @@ namespace TagLib {
      *
      * \see ID3v2::Tag::setStringHandler()
      */
-    class TAGLIB_EXPORT Latin1StringHandler
+    class TAGLIB_EXPORT Latin1StringHandler : public TagLib::StringHandler
     {
     public:
-      Latin1StringHandler();
-      virtual ~Latin1StringHandler();
-
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.
        */
       virtual String parse(const ByteVector &data) const;
+
+      /*!
+       * Encode a ByteVector with the data from \a s.
+       *
+       * /note Not implemented intentionally.  Always returns empty \s ByteVector.
+       */
+      virtual ByteVector render(const String &s) const;
     };
 
     //! The main class in the ID3v2 implementation
@@ -360,7 +365,7 @@ namespace TagLib {
        *
        * \see Latin1StringHandler
        */
-      static Latin1StringHandler const *latin1StringHandler();
+      static TagLib::StringHandler const *latin1StringHandler();
 
       /*!
        * Sets the string handler that decides how the "Latin-1" data will be
@@ -373,7 +378,7 @@ namespace TagLib {
        *
        * \see Latin1StringHandler
        */
-      static void setLatin1StringHandler(const Latin1StringHandler *handler);
+      static void setLatin1StringHandler(const TagLib::StringHandler *handler);
 
     protected:
       /*!

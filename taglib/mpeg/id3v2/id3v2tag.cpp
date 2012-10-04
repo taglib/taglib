@@ -71,27 +71,24 @@ public:
   FrameListMap frameListMap;
   FrameList frameList;
 
-  static const Latin1StringHandler *stringHandler;
+  static const TagLib::StringHandler *stringHandler;
 };
 
-static const Latin1StringHandler defaultStringHandler;
-const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+static const ID3v2::Latin1StringHandler defaultStringHandler;
+const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
-// StringHandler implementation
+// Latin1StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-Latin1StringHandler::Latin1StringHandler()
-{
-}
-
-Latin1StringHandler::~Latin1StringHandler()
-{
-}
-
-String Latin1StringHandler::parse(const ByteVector &data) const
+String ID3v2::Latin1StringHandler::parse(const ByteVector &data) const
 {
   return String(data, String::Latin1);
+}
+
+ByteVector ID3v2::Latin1StringHandler::render(const String &s) const
+{
+  return ByteVector();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -606,12 +603,12 @@ ByteVector ID3v2::Tag::render(int version) const
   return d->header.render() + tagData;
 }
 
-Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
+TagLib::StringHandler const *ID3v2::Tag::latin1StringHandler()
 {
   return TagPrivate::stringHandler;
 }
 
-void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
+void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
     TagPrivate::stringHandler = handler;
