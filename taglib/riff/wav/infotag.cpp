@@ -54,20 +54,15 @@ public:
 
   FieldListMap fieldListMap;
 
-  static const StringHandler *stringHandler;
+  static const TagLib::StringHandler *stringHandler;
 };
+
+static const RIFF::Info::StringHandler defaultStringHandler;
+const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
-
-StringHandler::StringHandler()
-{
-}
-
-StringHandler::~StringHandler()
-{
-}
 
 String RIFF::Info::StringHandler::parse(const ByteVector &data) const
 {
@@ -82,9 +77,6 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
-
-static const StringHandler defaultStringHandler;
-const RIFF::Info::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 RIFF::Info::Tag::Tag(const ByteVector &data) : TagLib::Tag()
 {
@@ -233,7 +225,7 @@ ByteVector RIFF::Info::Tag::render() const
     return data;
 }
 
-void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)
+void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
     TagPrivate::stringHandler = handler;

@@ -48,19 +48,15 @@ public:
   uchar track;
   uchar genre;
 
-  static const StringHandler *stringHandler;
+  static const TagLib::StringHandler *stringHandler;
 };
 
-static const StringHandler defaultStringHandler;
-const ID3v1::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+static const ID3v1::StringHandler defaultStringHandler;
+const TagLib::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
-
-StringHandler::StringHandler()
-{
-}
 
 String ID3v1::StringHandler::parse(const ByteVector &data) const
 {
@@ -69,12 +65,10 @@ String ID3v1::StringHandler::parse(const ByteVector &data) const
 
 ByteVector ID3v1::StringHandler::render(const String &s) const
 {
-  if(!s.isLatin1())
-  {
+  if(s.isLatin1())
+    return s.data(String::Latin1);
+  else
     return ByteVector();
-  }
-
-  return s.data(String::Latin1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -192,9 +186,9 @@ void ID3v1::Tag::setTrack(uint i)
   d->track = i < 256 ? i : 0;
 }
 
-void ID3v1::Tag::setStringHandler(const StringHandler *handler)
+void ID3v1::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
-  if (handler)
+  if(handler)
     TagPrivate::stringHandler = handler;
   else
     TagPrivate::stringHandler = &defaultStringHandler;

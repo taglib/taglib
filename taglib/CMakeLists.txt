@@ -40,6 +40,7 @@ set(tag_HDRS
   toolkit/tlist.h
   toolkit/tlist.tcc
   toolkit/tstringlist.h
+  toolkit/tstringhandler.h
   toolkit/tbytevector.h
   toolkit/tbytevectorlist.h
   toolkit/tbytevectorstream.h
@@ -273,6 +274,7 @@ set(xm_SRCS
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
+  toolkit/tstringhandler.cpp
   toolkit/tbytevector.cpp
   toolkit/tbytevectorlist.cpp
   toolkit/tbytevectorstream.cpp
