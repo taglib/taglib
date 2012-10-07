@@ -425,7 +425,7 @@ void FLAC::File::scan()
     length = header.mid(1, 3).toUInt();
 
     ByteVector data = readBlock(length);
-    if(data.size() != length) {
+    if(data.size() != length || length == 0) {
       debug("FLAC::File::scan() -- FLAC stream corrupted");
       setValid(false);
       return;
