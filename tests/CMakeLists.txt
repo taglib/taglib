@@ -62,6 +62,8 @@ SET(test_runner_SRCS
   test_mpc.cpp
 )
 
+INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
+
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
 TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
 
