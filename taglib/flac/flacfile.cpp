@@ -70,7 +70,8 @@ public:
 
   ~FilePrivate()
   {
-    for(uint i = 0; i < blocks.size(); i++) {
+    uint size = blocks.size();
+    for(uint i = 0; i < size; i++) {
       delete blocks[i];
     }
     delete properties;
