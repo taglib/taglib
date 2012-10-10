@@ -1,5 +1,17 @@
+TagLib 1.9 (In Development)
+==========================
+
+ * Added support for INFO tags in WAV files.
+ * Changed FileStream to use Windows file API.
+ * Included taglib-config.cmd script for Windows.
+ * New ID3v1::Tag methods for working directly with genre numbers.
+ * New MPEG::File methods for checking which tags are saved in the file.
+ * Better parsing of corrupted FLAC files.
+ * Fixed saving of PropertyMap comments without description into ID3v2 tags.
+ * Fixed crash when parsing certain XM files.
+
 TagLib 1.8 (Sep 6, 2012)
-==============================
+========================
 
 1.8:
 
