@@ -120,7 +120,7 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
       TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
-    } else if(values.size() == 1){  // URL frame (not WXXX); support only one value
+    } else if((frameID[0] == 'W') && (values.size() == 1)){  // URL frame (not WXXX); support only one value
         UrlLinkFrame* frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;
@@ -144,7 +144,9 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   // -COMMENT: depending on the number of values, use COMM or TXXX (with description=COMMENT)
   if((key == "COMMENT" || key.startsWith(commentPrefix)) && values.size() == 1){
     CommentsFrame *frame = new CommentsFrame(String::UTF8);
-    frame->setDescription(key == "COMMENT" ? key : key.substr(commentPrefix.size()));
+    if (key != "COMMENT"){
+      frame->setDescription(key.substr(commentPrefix.size()));
+    }
     frame->setText(values.front());
     return frame;
   }
