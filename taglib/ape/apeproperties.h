@@ -84,8 +84,8 @@ namespace TagLib {
 
       void read();
 
-      long findDescriptor();
-      long findID3v2();
+      offset_t findDescriptor();
+      offset_t findID3v2();
 
       void analyzeCurrent();
       void analyzeOld();

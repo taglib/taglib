@@ -36,7 +36,7 @@ using namespace TagLib;
 class MPC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(long length, ReadStyle s) :
+  PropertiesPrivate(offset_t length, ReadStyle s) :
     streamLength(length),
     style(s),
     version(0),
@@ -51,7 +51,7 @@ public:
     albumGain(0),
     albumPeak(0) {}
 
-  long streamLength;
+  offset_t streamLength;
   ReadStyle style;
   int version;
   int length;
@@ -71,13 +71,13 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) : AudioProperties(style)
+MPC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(streamLength, style);
   readSV7(data);
 }
 
-MPC::Properties::Properties(File *file, long streamLength, ReadStyle style) : AudioProperties(style)
+MPC::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(streamLength, style);
   ByteVector magic = file->readBlock(4);
@@ -214,7 +214,7 @@ void MPC::Properties::readSV8(File *file)
       d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
 
       if((d->sampleFrames - begSilence) != 0)
-        d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
+        d->bitrate = static_cast<int>(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
       d->bitrate = d->bitrate / 1000;
 
       d->length = (d->sampleFrames - begSilence) / d->sampleRate;
@@ -311,6 +311,6 @@ void MPC::Properties::readSV7(const ByteVector &data)
   d->length = d->sampleRate > 0 ? (d->sampleFrames + (d->sampleRate / 2)) / d->sampleRate : 0;
 
   if(!d->bitrate)
-    d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+    d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 }
 

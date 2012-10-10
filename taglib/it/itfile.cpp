@@ -155,7 +155,7 @@ bool IT::File::save()
   if(!readU16L(special))
     return false;
 
-  ulong fileSize = File::length();
+  ulong fileSize = static_cast<ulong>(File::length());
   if(special & Properties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))

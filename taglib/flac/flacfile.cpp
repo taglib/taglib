@@ -77,10 +77,10 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long ID3v2Location;
+  offset_t ID3v2Location;
   uint ID3v2OriginalSize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -89,9 +89,9 @@ public:
   ByteVector xiphCommentData;
   List<MetadataBlock *> blocks;
 
-  long flacStart;
-  long streamStart;
-  long streamLength;
+  offset_t flacStart;
+  offset_t streamStart;
+  offset_t streamLength;
   bool scanned;
 
   bool hasXiphComment;
@@ -236,7 +236,7 @@ bool FLAC::File::save()
 
   // Adjust the padding block(s)
 
-  long originalLength = d->streamStart - d->flacStart;
+  uint originalLength = static_cast<uint>(d->streamStart - d->flacStart);
   int paddingLength = originalLength - data.size() - 4;
   if (paddingLength < 0) {
     paddingLength = MinPaddingLength;
@@ -355,7 +355,7 @@ ByteVector FLAC::File::xiphCommentData() const
   return (isValid() && d->hasXiphComment) ? d->xiphCommentData : ByteVector();
 }
 
-long FLAC::File::streamLength()
+offset_t FLAC::File::streamLength()
 {
   return d->streamLength;
 }
@@ -370,7 +370,7 @@ void FLAC::File::scan()
   if(!isValid())
     return;
 
-  long nextBlockOffset;
+  offset_t nextBlockOffset;
 
   if(d->hasID3v2)
     nextBlockOffset = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize);
@@ -485,13 +485,13 @@ void FLAC::File::scan()
   d->scanned = true;
 }
 
-long FLAC::File::findID3v1()
+offset_t FLAC::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;
@@ -499,7 +499,7 @@ long FLAC::File::findID3v1()
   return -1;
 }
 
-long FLAC::File::findID3v2()
+offset_t FLAC::File::findID3v2()
 {
   if(!isValid())
     return -1;

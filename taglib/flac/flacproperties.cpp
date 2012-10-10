@@ -34,7 +34,7 @@ using namespace TagLib;
 class FLAC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(ByteVector d, long st, ReadStyle s) :
+  PropertiesPrivate(ByteVector d, offset_t st, ReadStyle s) :
     data(d),
     streamLength(st),
     style(s),
@@ -46,7 +46,7 @@ public:
     sampleFrames(0) {}
 
   ByteVector data;
-  long streamLength;
+  offset_t streamLength;
   ReadStyle style;
   int length;
   int bitrate;
@@ -61,7 +61,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(ByteVector data, long streamLength, ReadStyle style) : AudioProperties(style)
+FLAC::Properties::Properties(ByteVector data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
   read();
@@ -155,7 +155,7 @@ void FLAC::Properties::read()
   d->sampleFrames = (hi << 32) | lo;
 
   if(d->sampleRate > 0)
-    d->length = int(d->sampleFrames / d->sampleRate);
+    d->length = static_cast<int>(d->sampleFrames / d->sampleRate);
 
   // Uncompressed bitrate:
 
@@ -163,7 +163,7 @@ void FLAC::Properties::read()
 
   // Real bitrate:
 
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8UL) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 
   d->signature = d->data.mid(pos, 32);
 }

@@ -53,13 +53,13 @@ namespace TagLib {
        *
        * This constructor is deprecated. It only works for MPC version up to 7.
        */
-      Properties(const ByteVector &data, long streamLength, ReadStyle style = Average);
+      Properties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Create an instance of MPC::Properties with the data read directly
        * from a MPC::File.
        */
-      Properties(File *file, long streamLength, ReadStyle style = Average);
+      Properties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this MPC::Properties instance.

@@ -151,7 +151,7 @@ void MPEG::Properties::read()
   // Since we've likely just looked for the ID3v1 tag, start at the end of the
   // file where we're least likely to have to have to move the disk head.
 
-  long last = d->file->lastFrameOffset();
+  offset_t last = d->file->lastFrameOffset();
 
   if(last < 0) {
     debug("MPEG::Properties::read() -- Could not find a valid last MPEG frame in the stream.");
@@ -161,7 +161,7 @@ void MPEG::Properties::read()
   d->file->seek(last);
   Header lastHeader(d->file->readBlock(4));
 
-  long first = d->file->firstFrameOffset();
+  offset_t first = d->file->firstFrameOffset();
 
   if(first < 0) {
     debug("MPEG::Properties::read() -- Could not find a valid first MPEG frame in the stream.");
@@ -170,7 +170,7 @@ void MPEG::Properties::read()
 
   if(!lastHeader.isValid()) {
 
-    long pos = last;
+    offset_t pos = last;
 
     while(pos > first) {
 
@@ -234,7 +234,7 @@ void MPEG::Properties::read()
     // Xing header.
 
     if(firstHeader.frameLength() > 0 && firstHeader.bitrate() > 0) {
-      int frames = (last - first) / firstHeader.frameLength() + 1;
+      int frames = static_cast<int>((last - first) / firstHeader.frameLength() + 1);
 
       d->length = int(float(firstHeader.frameLength() * frames) /
                       float(firstHeader.bitrate() * 125) + 0.5);

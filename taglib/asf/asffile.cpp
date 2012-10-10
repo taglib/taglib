@@ -158,7 +158,7 @@ ASF::File::HeaderExtensionObject::~HeaderExtensionObject()
 void ASF::File::BaseObject::parse(ASF::File *file, unsigned int size)
 {
   data.clear();
-  if (size > 24 && size <= (unsigned int)(file->length()))
+  if (size > 24 && static_cast<offset_t>(size) <= file->length())
     data = file->readBlock(size - 24);
   else
     data = ByteVector::null;

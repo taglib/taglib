@@ -64,13 +64,13 @@ public:
     delete properties;
   }
 
-  long APELocation;
+  offset_t APELocation;
   uint APESize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   ID3v2::Header *ID3v2Header;
-  long ID3v2Location;
+  offset_t ID3v2Location;
   uint ID3v2Size;
 
   TagUnion tag;
@@ -314,7 +314,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   }
 }
 
-long MPC::File::findAPE()
+offset_t MPC::File::findAPE()
 {
   if(!isValid())
     return -1;
@@ -324,7 +324,7 @@ long MPC::File::findAPE()
   else
     seek(-32, End);
 
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(8) == APE::Tag::fileIdentifier())
     return p;
@@ -332,13 +332,13 @@ long MPC::File::findAPE()
   return -1;
 }
 
-long MPC::File::findID3v1()
+offset_t MPC::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;
@@ -346,7 +346,7 @@ long MPC::File::findID3v1()
   return -1;
 }
 
-long MPC::File::findID3v2()
+offset_t MPC::File::findID3v2()
 {
   if(!isValid())
     return -1;

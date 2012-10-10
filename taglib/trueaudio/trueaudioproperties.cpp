@@ -39,7 +39,7 @@ using namespace TagLib;
 class TrueAudio::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(const ByteVector &d, long length, ReadStyle s) :
+  PropertiesPrivate(const ByteVector &d, offset_t length, ReadStyle s) :
     data(d),
     streamLength(length),
     style(s),
@@ -52,7 +52,7 @@ public:
     sampleFrames(0) {}
 
   ByteVector data;
-  long streamLength;
+  offset_t streamLength;
   ReadStyle style;
   int version;
   int length;
@@ -67,7 +67,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) : AudioProperties(style)
+TrueAudio::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
   read();
@@ -145,6 +145,6 @@ void TrueAudio::Properties::read()
     d->sampleFrames = d->data.mid(pos, 4).toUInt(false);
     d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
 
-    d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+    d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
   }
 }

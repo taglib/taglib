@@ -66,10 +66,10 @@ public:
     delete properties;
   }
 
-  long APELocation;
+  offset_t APELocation;
   uint APESize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -272,7 +272,7 @@ void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   }
 }
 
-long APE::File::findAPE()
+offset_t APE::File::findAPE()
 {
   if(!isValid())
     return -1;
@@ -282,7 +282,7 @@ long APE::File::findAPE()
   else
     seek(-32, End);
 
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(8) == APE::Tag::fileIdentifier())
     return p;
@@ -290,13 +290,13 @@ long APE::File::findAPE()
   return -1;
 }
 
-long APE::File::findID3v1()
+offset_t APE::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;

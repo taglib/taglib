@@ -111,7 +111,7 @@ namespace TagLib {
        * Create an ID3v1 tag and parse the data in \a file starting at
        * \a tagOffset.
        */
-      Tag(File *file, long tagOffset);
+      Tag(File *file, offset_t tagOffset);
 
       /*!
        * Destroys this Tag instance.

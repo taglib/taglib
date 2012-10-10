@@ -206,8 +206,8 @@ namespace TagLib {
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       void scan();
-      long findID3v1();
-      long findID3v2();
+      offset_t findID3v1();
+      offset_t findID3v2();
 
       class FilePrivate;
       FilePrivate *d;

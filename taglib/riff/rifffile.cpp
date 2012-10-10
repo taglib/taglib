@@ -35,7 +35,7 @@ using namespace TagLib;
 struct Chunk
 {
   ByteVector name;
-  TagLib::uint offset;
+  offset_t offset;
   TagLib::uint size;
   char padding;
 };
@@ -103,7 +103,7 @@ TagLib::uint RIFF::File::chunkDataSize(uint i) const
   return d->chunks[i].size;
 }
 
-TagLib::uint RIFF::File::chunkOffset(uint i) const
+offset_t RIFF::File::chunkOffset(uint i) const
 {
   return d->chunks[i].offset;
 }
@@ -182,20 +182,25 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // Couldn't find an existing chunk, so let's create a new one.
 
   uint i =  d->chunks.size() - 1;
-  ulong offset = d->chunks[i].offset + d->chunks[i].size;
+  offset_t offset = d->chunks[i].offset + d->chunks[i].size;
 
   // First we update the global size
 
-  d->size += (offset & 1) + data.size() + 8;
+  d->size += static_cast<uint>(offset & 1) + data.size() + 8;
   insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
 
   // Now add the chunk to the file
 
-  writeChunk(name, data, offset, std::max<long>(0, length() - offset), (offset & 1) ? 1 : 0);
+  writeChunk(
+    name, 
+    data, 
+    offset, 
+    static_cast<uint>(std::max<offset_t>(0, length() - offset)), 
+    static_cast<uint>(offset & 1));
 
   // And update our internal structure
 
-  if (offset & 1) {
+  if(offset & 1) {
     d->chunks[i].padding = 1;
     offset++;
   }
@@ -204,7 +209,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   chunk.name = name;
   chunk.size = data.size();
   chunk.offset = offset + 8;
-  chunk.padding = (data.size() & 0x01) ? 1 : 0;
+  chunk.padding = static_cast<char>(data.size() & 1);
 
   d->chunks.push_back(chunk);
 }
@@ -282,8 +287,8 @@ void RIFF::File::read()
 
     // check padding
     chunk.padding = 0;
-    long uPosNotPadded = tell();
-    if((uPosNotPadded & 0x01) != 0) {
+    offset_t uPosNotPadded = tell();
+    if(uPosNotPadded & 1) {
       ByteVector iByte = readBlock(1);
       if((iByte.size() != 1) || (iByte[0] != 0)) {
         // not well formed, re-seek
@@ -299,7 +304,7 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            ulong offset, ulong replace, uint leadingPadding)
+                            offset_t offset, TagLib::uint replace, TagLib::uint leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {

@@ -70,14 +70,14 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
-  long ID3v2Location;
+  offset_t ID3v2Location;
   uint ID3v2OriginalSize;
 
-  long APELocation;
-  long APEFooterLocation;
+  offset_t APELocation;
+  offset_t APEFooterLocation;
   uint APEOriginalSize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -368,7 +368,7 @@ void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
   d->ID3v2FrameFactory = factory;
 }
 
-long MPEG::File::nextFrameOffset(long position)
+offset_t MPEG::File::nextFrameOffset(offset_t position)
 {
   bool foundLastSyncPattern = false;
 
@@ -394,13 +394,13 @@ long MPEG::File::nextFrameOffset(long position)
   }
 }
 
-long MPEG::File::previousFrameOffset(long position)
+offset_t MPEG::File::previousFrameOffset(offset_t position)
 {
   bool foundFirstSyncPattern = false;
   ByteVector buffer;
 
   while (position > 0) {
-    long size = ulong(position) < bufferSize() ? position : bufferSize();
+    uint size = position < static_cast<offset_t>(bufferSize()) ? static_cast<uint>(position) : bufferSize();
     position -= size;
 
     seek(position);
@@ -422,9 +422,9 @@ long MPEG::File::previousFrameOffset(long position)
   return -1;
 }
 
-long MPEG::File::firstFrameOffset()
+offset_t MPEG::File::firstFrameOffset()
 {
-  long position = 0;
+  offset_t position = 0;
 
   if(ID3v2Tag())
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
@@ -432,7 +432,7 @@ long MPEG::File::firstFrameOffset()
   return nextFrameOffset(position);
 }
 
-long MPEG::File::lastFrameOffset()
+offset_t MPEG::File::lastFrameOffset()
 {
   return previousFrameOffset(ID3v1Tag() ? d->ID3v1Location - 1 : length());
 }
@@ -503,7 +503,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   ID3v1Tag(true);
 }
 
-long MPEG::File::findID3v2()
+offset_t MPEG::File::findID3v2()
 {
   // This method is based on the contents of TagLib::File::find(), but because
   // of some subtlteies -- specifically the need to look for the bit pattern of
@@ -513,7 +513,7 @@ long MPEG::File::findID3v2()
 
     // The position in the file that the current buffer starts at.
 
-    long bufferOffset = 0;
+    offset_t bufferOffset = 0;
     ByteVector buffer;
 
     // These variables are used to keep track of a partial match that happens at
@@ -525,7 +525,7 @@ long MPEG::File::findID3v2()
     // Save the location of the current read pointer.  We will restore the
     // position using seek() before all returns.
 
-    long originalPosition = tell();
+    offset_t originalPosition = tell();
 
     // Start the search at the beginning of the file.
 
@@ -614,11 +614,11 @@ long MPEG::File::findID3v2()
   return -1;
 }
 
-long MPEG::File::findID3v1()
+offset_t MPEG::File::findID3v1()
 {
   if(isValid()) {
     seek(-128, End);
-    long p = tell();
+    offset_t p = tell();
 
     if(readBlock(3) == ID3v1::Tag::fileIdentifier())
       return p;
@@ -631,7 +631,7 @@ void MPEG::File::findAPE()
   if(isValid()) {
     seek(d->hasID3v1 ? -160 : -32, End);
 
-    long p = tell();
+    offset_t p = tell();
 
     if(readBlock(8) == APE::Tag::fileIdentifier()) {
       d->APEFooterLocation = p;

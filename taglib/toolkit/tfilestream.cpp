@@ -27,19 +27,16 @@
 #include "tstring.h"
 #include "tdebug.h"
 
-#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 
-#ifdef _WIN32
-# include <wchar.h>
-# include <windows.h>
-# include <io.h>
-#else
+#ifndef _WIN32
+# include <stdio.h>
 # include <unistd.h>
 #endif
 
 #include <stdlib.h>
+#include <limits>
 
 using namespace TagLib;
 
@@ -114,7 +111,7 @@ public:
   FileNameHandle name;
 
   bool readOnly;
-  ulong size;
+  offset_t size;
   static const uint bufferSize = 1024;
 };
 
@@ -170,7 +167,7 @@ FileName FileStream::name() const
   return d->name;
 }
 
-ByteVector FileStream::readBlock(ulong length)
+ByteVector FileStream::readBlock(uint length)
 {
   if(!d->file) {
     debug("FileStream::readBlock() -- Invalid File");
@@ -181,14 +178,14 @@ ByteVector FileStream::readBlock(ulong length)
     return ByteVector::null;
 
   if(length > FileStreamPrivate::bufferSize &&
-     length > ulong(FileStream::length()))
+     static_cast<offset_t>(length) > FileStream::length())
   {
-    length = FileStream::length();
+    length = static_cast<uint>(FileStream::length());
   }
 
-  ByteVector v(static_cast<uint>(length));
-  const int count = fread(v.data(), sizeof(char), length, d->file);
-  v.resize(count);
+  ByteVector v(length);
+  const size_t count = fread(v.data(), sizeof(char), length, d->file);
+  v.resize(static_cast<uint>(count));
   return v;
 }
 
@@ -205,7 +202,7 @@ void FileStream::writeBlock(const ByteVector &data)
   fwrite(data.data(), sizeof(char), data.size(), d->file);
 }
 
-void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
+void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
 {
   if(!d->file)
     return;
@@ -232,15 +229,15 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  ulong bufferLength = bufferSize();
+  size_t bufferLength = bufferSize();
 
   while(data.size() - replace > bufferLength)
     bufferLength += bufferSize();
 
   // Set where to start the reading and writing.
 
-  long readPosition = start + replace;
-  long writePosition = start;
+  offset_t readPosition  = start + replace;
+  offset_t writePosition = start;
 
   ByteVector buffer;
   ByteVector aboutToOverwrite(static_cast<uint>(bufferLength));
@@ -252,7 +249,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   // That's a bit slower than using char *'s so, we're only doing it here.
 
   seek(readPosition);
-  int bytesRead = fread(aboutToOverwrite.data(), sizeof(char), bufferLength, d->file);
+  size_t bytesRead = fread(aboutToOverwrite.data(), sizeof(char), bufferLength, d->file);
   readPosition += bufferLength;
 
   seek(writePosition);
@@ -281,7 +278,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
     // Check to see if we just read the last block.  We need to call clear()
     // if we did so that the last write succeeds.
 
-    if(ulong(bytesRead) < bufferLength)
+    if(bytesRead < bufferLength)
       clear();
 
     // Seek to the write position and write our buffer.  Increment the
@@ -301,21 +298,24 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
 
     bufferLength = bytesRead;
   }
+
+  // Clear the file size cache. 
+  d->size = 0;
 }
 
-void FileStream::removeBlock(ulong start, ulong length)
+void FileStream::removeBlock(offset_t start, uint length)
 {
   if(!d->file)
     return;
 
-  ulong bufferLength = bufferSize();
+  size_t bufferLength = bufferSize();
 
-  long readPosition = start + length;
-  long writePosition = start;
+  offset_t readPosition  = start + length;
+  offset_t writePosition = start;
 
   ByteVector buffer(static_cast<uint>(bufferLength));
 
-  ulong bytesRead = 1;
+  size_t bytesRead = 1;
 
   while(bytesRead != 0) {
     seek(readPosition);
@@ -345,7 +345,7 @@ bool FileStream::isOpen() const
   return (d->file != NULL);
 }
 
-void FileStream::seek(long offset, Position p)
+void FileStream::seek(offset_t offset, Position p)
 {
   if(!d->file) {
     debug("File::seek() -- trying to seek in a file that isn't opened.");
@@ -367,7 +367,9 @@ void FileStream::seek(long offset, Position p)
     break;
   }
 
-  SetFilePointer(d->file, offset, NULL, whence);
+  LARGE_INTEGER largeOffset = {};
+  largeOffset.QuadPart = offset;
+  SetFilePointerEx(d->file, largeOffset, nullptr, whence);
 
 #else
 
@@ -384,7 +386,15 @@ void FileStream::seek(long offset, Position p)
     break;
   }
 
-  fseek(d->file, offset, whence);
+# ifdef _LARGEFILE_SOURCE
+
+  fseeko(d->file, offset, whence);
+
+# else
+
+  fseek(d->file, static_cast<long>(offset), whence);
+
+# endif 
 
 #endif
 }
@@ -402,20 +412,33 @@ void FileStream::clear()
 #endif
 }
 
-long FileStream::tell() const
+offset_t FileStream::tell() const
 {
 #ifdef _WIN32
 
-  return (long)SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
+  LARGE_INTEGER largeOffset = {};
+  LARGE_INTEGER newPointer;
+
+  SetFilePointerEx(d->file, largeOffset, &newPointer, FILE_CURRENT);
+
+  return newPointer.QuadPart;
 
 #else
 
-  return ftell(d->file);
+# ifdef _LARGEFILE_SOURCE
+
+  return ftello(d->file);
+
+# else
+
+  return static_cast<offset_t>(ftell(d->file));
+
+# endif 
 
 #endif
 }
 
-long FileStream::length()
+offset_t FileStream::length()
 {
   // Do some caching in case we do multiple calls.
 
@@ -425,31 +448,31 @@ long FileStream::length()
   if(!d->file)
     return 0;
 
-  long curpos = tell();
+  offset_t currentPosition = tell();
 
   seek(0, End);
-  long endpos = tell();
+  offset_t endPosition = tell();
 
-  seek(curpos, Beginning);
+  seek(currentPosition, Beginning);
 
-  d->size = endpos;
-  return endpos;
+  d->size = endPosition;
+  return endPosition;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FileStream::truncate(long length)
+void FileStream::truncate(offset_t length)
 {
 #ifdef _WIN32
 
-  long currentPos = tell();
+  offset_t currentPosition = tell();
 
   seek(length);
   SetEndOfFile(d->file);
 
-  seek(currentPos);
+  seek(currentPosition);
 
 #else
 
