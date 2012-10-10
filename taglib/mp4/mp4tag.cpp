@@ -570,7 +570,7 @@ MP4::Tag::updateOffsets(long delta, long offset)
         atom->offset += delta;
       }
       d->file->seek(atom->offset + 9);
-      ByteVector data = d->file->readBlock(atom->offset - 9);
+      ByteVector data = d->file->readBlock(atom->length - 9);
       unsigned int flags = (ByteVector(1, '\0') + data.mid(0, 3)).toUInt();
       if(flags & 1) {
         long long o = data.mid(7, 8).toLongLong();
