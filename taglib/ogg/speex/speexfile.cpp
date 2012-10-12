@@ -63,7 +63,7 @@ Speex::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 Speex::File::File(IOStream *stream, bool readProperties,
@@ -71,7 +71,7 @@ Speex::File::File(IOStream *stream, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 Speex::File::~File()

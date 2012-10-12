@@ -91,7 +91,7 @@ APE::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 APE::File::File(IOStream *stream, bool readProperties,
@@ -99,7 +99,7 @@ APE::File::File(IOStream *stream, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 APE::File::~File()

@@ -68,7 +68,7 @@ Vorbis::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 Vorbis::File::File(IOStream *stream, bool readProperties,
@@ -76,7 +76,7 @@ Vorbis::File::File(IOStream *stream, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 Vorbis::File::~File()

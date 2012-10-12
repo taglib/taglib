@@ -359,8 +359,8 @@ XM::File::File(FileName file, bool readProperties,
   Mod::FileBase(file),
   d(new FilePrivate(propertiesStyle))
 {
-	if(isOpen())
-		read(readProperties);
+  if(isOpen())
+    read(readProperties);
 }
 
 XM::File::File(IOStream *stream, bool readProperties,
@@ -368,8 +368,8 @@ XM::File::File(IOStream *stream, bool readProperties,
   Mod::FileBase(stream),
   d(new FilePrivate(propertiesStyle))
 {
-	if(isOpen())
-		read(readProperties);
+  if(isOpen())
+    read(readProperties);
 }
 
 XM::File::~File()

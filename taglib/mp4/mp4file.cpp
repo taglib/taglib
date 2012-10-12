@@ -68,7 +68,7 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle a
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, audioPropertiesStyle);
+    read(readProperties, audioPropertiesStyle);
 }
 
 MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
@@ -76,7 +76,7 @@ MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyl
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, audioPropertiesStyle);
+    read(readProperties, audioPropertiesStyle);
 }
 
 MP4::File::~File()

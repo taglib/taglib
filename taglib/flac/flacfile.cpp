@@ -110,7 +110,7 @@ FLAC::File::File(FileName file, bool readProperties,
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -120,7 +120,7 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
@@ -130,7 +130,7 @@ FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 FLAC::File::~File()

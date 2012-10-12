@@ -373,7 +373,7 @@ ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle proper
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle)
@@ -381,7 +381,7 @@ ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle pro
 {
   d = new FilePrivate;
   if(isOpen())
-	read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle);
 }
 
 ASF::File::~File()
