@@ -67,14 +67,16 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle a
     : TagLib::File(file)
 {
   d = new FilePrivate;
-  read(readProperties, audioPropertiesStyle);
+  if(isOpen())
+	read(readProperties, audioPropertiesStyle);
 }
 
 MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
     : TagLib::File(stream)
 {
   d = new FilePrivate;
-  read(readProperties, audioPropertiesStyle);
+  if(isOpen())
+	read(readProperties, audioPropertiesStyle);
 }
 
 MP4::File::~File()

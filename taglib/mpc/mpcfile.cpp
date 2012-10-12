@@ -94,14 +94,16 @@ MPC::File::File(FileName file, bool readProperties,
                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
-  read(readProperties, propertiesStyle);
+  if(isOpen())
+	read(readProperties, propertiesStyle);
 }
 
 MPC::File::File(IOStream *stream, bool readProperties,
                 Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
-  read(readProperties, propertiesStyle);
+  if(isOpen())
+	read(readProperties, propertiesStyle);
 }
 
 MPC::File::~File()
