@@ -319,7 +319,7 @@ namespace TagLib {
        *  once, the description, separated by a "/".
        *
        */
-      PropertyMap properties() const;
+      virtual PropertyMap properties() const;
 
       /*!
        * Removes unsupported frames given by \a properties. The elements of
@@ -338,7 +338,7 @@ namespace TagLib {
        * Implements the unified property interface -- import function.
        * See the comments in properties().
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.

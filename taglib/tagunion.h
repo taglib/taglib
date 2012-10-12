@@ -56,6 +56,8 @@ namespace TagLib {
 
     void set(int index, Tag *tag);
 
+    virtual PropertyMap properties() const;
+
     virtual String title() const;
     virtual String artist() const;
     virtual String album() const;
