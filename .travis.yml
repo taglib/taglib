@@ -1,0 +1,6 @@
+language: cpp
+compiler:
+  - gcc
+install: apt-get install libcppunit-dev zlib1g-dev
+script: cmake && make
+
