@@ -60,6 +60,7 @@
 #include "mp4file.h"
 #include "wavpackfile.h"
 #include "speexfile.h"
+#include "opusfile.h"
 #include "trueaudiofile.h"
 #include "aifffile.h"
 #include "wavfile.h"
@@ -135,6 +136,8 @@ PropertyMap File::properties() const
     return dynamic_cast<const Ogg::FLAC::File* >(this)->properties();
   if(dynamic_cast<const Ogg::Speex::File* >(this))
     return dynamic_cast<const Ogg::Speex::File* >(this)->properties();
+  if(dynamic_cast<const Ogg::Opus::File* >(this))
+    return dynamic_cast<const Ogg::Opus::File* >(this)->properties();
   if(dynamic_cast<const Ogg::Vorbis::File* >(this))
     return dynamic_cast<const Ogg::Vorbis::File* >(this)->properties();
   if(dynamic_cast<const RIFF::AIFF::File* >(this))
@@ -174,6 +177,8 @@ void File::removeUnsupportedProperties(const StringList &properties)
     dynamic_cast<Ogg::FLAC::File* >(this)->removeUnsupportedProperties(properties);
   else if(dynamic_cast<Ogg::Speex::File* >(this))
     dynamic_cast<Ogg::Speex::File* >(this)->removeUnsupportedProperties(properties);
+  else if(dynamic_cast<Ogg::Opus::File* >(this))
+    dynamic_cast<Ogg::Opus::File* >(this)->removeUnsupportedProperties(properties);
   else if(dynamic_cast<Ogg::Vorbis::File* >(this))
     dynamic_cast<Ogg::Vorbis::File* >(this)->removeUnsupportedProperties(properties);
   else if(dynamic_cast<RIFF::AIFF::File* >(this))
@@ -210,6 +215,8 @@ PropertyMap File::setProperties(const PropertyMap &properties)
     return dynamic_cast<Ogg::FLAC::File* >(this)->setProperties(properties);
   else if(dynamic_cast<Ogg::Speex::File* >(this))
     return dynamic_cast<Ogg::Speex::File* >(this)->setProperties(properties);
+  else if(dynamic_cast<Ogg::Opus::File* >(this))
+    return dynamic_cast<Ogg::Opus::File* >(this)->setProperties(properties);
   else if(dynamic_cast<Ogg::Vorbis::File* >(this))
     return dynamic_cast<Ogg::Vorbis::File* >(this)->setProperties(properties);
   else if(dynamic_cast<RIFF::AIFF::File* >(this))

@@ -45,6 +45,7 @@
 #include "mp4file.h"
 #include "wavpackfile.h"
 #include "speexfile.h"
+#include "opusfile.h"
 #include "trueaudiofile.h"
 #include "aifffile.h"
 #include "wavfile.h"
@@ -252,6 +253,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "SPX")
       return new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "OPUS")
+      return new Ogg::Opus::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "TTA")
       return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
