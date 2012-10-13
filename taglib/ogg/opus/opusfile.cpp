@@ -119,8 +119,6 @@ void Opus::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     return;
   }
 
-  debug("starts with OpusTags");
-
   d->comment = new Ogg::XiphComment(commentHeaderData.mid(8));
 
   if(readProperties)
