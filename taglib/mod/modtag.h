@@ -163,7 +163,7 @@ namespace TagLib {
        * Implements the unified property interface -- export function.
        * Since the module tag is very limited, the exported map is as well.
        */
-      PropertyMap properties() const;
+      virtual PropertyMap properties() const;
 
       /*!
        * Implements the unified property interface -- import function.
@@ -173,7 +173,7 @@ namespace TagLib {
        * all but the first will be contained in the returned map of unsupported
        * properties.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
     private:
       Tag(const Tag &);

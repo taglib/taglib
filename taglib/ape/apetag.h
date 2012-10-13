@@ -117,7 +117,7 @@ namespace TagLib {
        * TRACK to TRACKNUMBER, YEAR to DATE, and ALBUM ARTIST to ALBUMARTIST, respectively,
        * in order to be compliant with the names used in other formats.
        */
-      PropertyMap properties() const;
+      virtual PropertyMap properties() const;
 
       void removeUnsupportedProperties(const StringList &properties);
 
@@ -127,7 +127,7 @@ namespace TagLib {
        * specification requires keys to have between 2 and 16 printable ASCII characters
        * with the exception of the fixed strings "ID3", "TAG", "OGGS", and "MP+".
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Check if the given String is a valid APE tag key.
