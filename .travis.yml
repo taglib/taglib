@@ -2,5 +2,5 @@ language: cpp
 compiler:
   - gcc
 install: sudo apt-get install libcppunit-dev zlib1g-dev
-script: cmake . && make && make check
+script: cmake -DBUILD_TESTS=ON . && make && make check
 
