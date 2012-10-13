@@ -70,7 +70,8 @@ public:
 
   ~FilePrivate()
   {
-    for(uint i = 0; i < blocks.size(); i++) {
+    uint size = blocks.size();
+    for(uint i = 0; i < size; i++) {
       delete blocks[i];
     }
     delete properties;
@@ -425,7 +426,7 @@ void FLAC::File::scan()
     length = header.mid(1, 3).toUInt();
 
     ByteVector data = readBlock(length);
-    if(data.size() != length) {
+    if(data.size() != length || length == 0) {
       debug("FLAC::File::scan() -- FLAC stream corrupted");
       setValid(false);
       return;

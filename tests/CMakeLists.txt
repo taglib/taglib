@@ -16,6 +16,8 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/vorbis
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/flac
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/speex
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/opus
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/flac
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/wavpack
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mod
@@ -60,7 +62,10 @@ SET(test_runner_SRCS
   test_it.cpp
   test_xm.cpp
   test_mpc.cpp
+  test_opus.cpp
 )
+
+INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
 
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
 TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
