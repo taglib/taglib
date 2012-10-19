@@ -1,6 +1,7 @@
 TagLib 1.9 (In Development)
 ==========================
 
+ * Added support for the Ogg Opus file format.
  * Added support for INFO tags in WAV files.
  * Changed FileStream to use Windows file API.
  * Included taglib-config.cmd script for Windows.
