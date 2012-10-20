@@ -64,9 +64,6 @@ namespace TagLib {
      * Removes unsupported properties, or a subset of them, from the tag.
      * The parameter \a properties must contain only entries from
      * properties().unsupportedData().
-     * BIC: Will become virtual in future releases. Currently the non-virtual
-     * standard implementation of TagLib::Tag does nothing, since there are
-     * no unsupported elements.
      */
     void removeUnsupportedProperties(const StringList& properties);
 

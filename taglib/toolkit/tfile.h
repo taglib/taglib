@@ -86,17 +86,15 @@ namespace TagLib {
      * format, the returend map's unsupportedData() list will contain one entry identifying
      * that object (e.g. the frame type for ID3v2 tags). Use removeUnsupportedProperties()
      * to remove (a subset of) them.
-     * BIC: Will be made virtual in future releases.
      */
-    PropertyMap properties() const;
+    virtual PropertyMap properties() const;
 
     /*!
      * Removes unsupported properties, or a subset of them, from the file's metadata.
      * The parameter \a properties must contain only entries from
      * properties().unsupportedData().
-     * BIC: Will be mad virtual in future releases.
      */
-    void removeUnsupportedProperties(const StringList& properties);
+    virtual void removeUnsupportedProperties(const StringList& properties);
 
     /*!
      * Sets the tags of this File to those specified in \a properties. Calls the
@@ -105,9 +103,9 @@ namespace TagLib {
      * If some value(s) could not be written imported to the specific metadata format,
      * the returned PropertyMap will contain those value(s). Otherwise it will be empty,
      * indicating that no problems occured.
-     * BIC: will become pure virtual in the future
      */
-    PropertyMap setProperties(const PropertyMap &properties);
+    virtual PropertyMap setProperties(const PropertyMap &properties);
+
     /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were
