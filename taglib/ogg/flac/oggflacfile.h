@@ -108,7 +108,7 @@ namespace TagLib {
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
        */
-      long streamLength();
+      offset_t streamLength();
 
     private:
       File(const File &);

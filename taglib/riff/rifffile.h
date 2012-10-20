@@ -71,7 +71,7 @@ namespace TagLib {
       /*!
        * \return The offset within the file for the selected chunk number.
        */
-      uint chunkOffset(uint i) const;
+      offset_t chunkOffset(uint i) const;
 
       /*!
        * \return The size of the chunk data.
@@ -135,7 +135,7 @@ namespace TagLib {
 
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,
-                      ulong offset, ulong replace = 0,
+                      offset_t offset, uint replace = 0,
                       uint leadingPadding = 0);
 
       class FilePrivate;

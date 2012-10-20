@@ -49,7 +49,7 @@ public:
   TagPrivate() : file(0), footerLocation(-1), tagLength(0) {}
 
   TagLib::File *file;
-  long footerLocation;
+  offset_t footerLocation;
   long tagLength;
 
   Footer footer;
@@ -66,7 +66,7 @@ APE::Tag::Tag() : TagLib::Tag()
   d = new TagPrivate;
 }
 
-APE::Tag::Tag(TagLib::File *file, long footerLocation) : TagLib::Tag()
+APE::Tag::Tag(TagLib::File *file, offset_t footerLocation) : TagLib::Tag()
 {
   d = new TagPrivate;
   d->file = file;

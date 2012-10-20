@@ -64,10 +64,10 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long ID3v2Location;
+  offset_t ID3v2Location;
   uint ID3v2OriginalSize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -284,13 +284,13 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   }
 }
 
-long TrueAudio::File::findID3v1()
+offset_t TrueAudio::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;
@@ -298,7 +298,7 @@ long TrueAudio::File::findID3v1()
   return -1;
 }
 
-long TrueAudio::File::findID3v2()
+offset_t TrueAudio::File::findID3v2()
 {
   if(!isValid())
     return -1;

@@ -44,6 +44,17 @@
 
 #include <string>
 
+#ifndef _WIN32
+
+#  ifndef _LARGEFILE_SOURCE
+#    define _LARGEFILE_SOURCE
+#  endif
+
+#  define _FILE_OFFSET_BITS 64
+#  include <sys/types.h>
+
+#endif
+
 #ifdef __APPLE__
 #  include <libkern/OSAtomic.h>
 #  define TAGLIB_ATOMIC_MAC
@@ -82,6 +93,14 @@ namespace TagLib {
   typedef unsigned short ushort;
   typedef unsigned int   uint;
   typedef unsigned long  ulong;
+
+  // Offset or length type for I/O streams.  
+  // In Win32, always 64bit. Otherwise, equivalent to off_t.
+#ifdef _WIN32
+  typedef LONGLONG offset_t;
+#else
+  typedef off_t    offset_t;
+#endif
 
   /*!
    * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)
