@@ -107,6 +107,17 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
     return 0;
   }
 
+#ifndef NO_ITUNES_HACKS
+  if(version == 3 && frameID.size() == 4 && frameID[3] == '\0') {
+    // iTunes v2.3 tags store v2.2 frames - convert now
+    frameID = frameID.mid(0, 3);
+    header->setFrameID(frameID);
+    header->setVersion(2);
+    updateFrame(header);
+    header->setVersion(3);
+  }
+#endif
+
   for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
     if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
       delete header;
