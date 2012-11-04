@@ -275,11 +275,6 @@ bool Ogg::XiphComment::contains(const String &key) const
   return d->fieldListMap.contains(key) && !d->fieldListMap[key].isEmpty();
 }
 
-ByteVector Ogg::XiphComment::render() const
-{
-  return render(true);
-}
-
 ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 {
   ByteVector data;
