@@ -34,7 +34,7 @@ using namespace TagLib;
 class FLAC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(ByteVector d, offset_t st, ReadStyle s) :
+  PropertiesPrivate(const ByteVector &d, offset_t st, ReadStyle s) :
     data(d),
     streamLength(st),
     style(s),
@@ -61,15 +61,9 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(ByteVector data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
+FLAC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
-  read();
-}
-
-FLAC::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
-{
-  d = new PropertiesPrivate(file->streamInfoData(), file->streamLength(), style);
   read();
 }
 
