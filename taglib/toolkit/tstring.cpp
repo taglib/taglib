@@ -458,11 +458,6 @@ ByteVector String::data(Type t) const
   return v;
 }
 
-int String::toInt() const
-{
-  return toInt(0);
-}
-
 int String::toInt(bool *ok) const
 {
   int value = 0;

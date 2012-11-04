@@ -37,12 +37,6 @@ class ByteVectorListPrivate
 ////////////////////////////////////////////////////////////////////////////////
 
 ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
-                                     int byteAlign)
-{
-  return split(v, pattern, byteAlign, 0);
-}
-
-ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
                                      int byteAlign, int max)
 {
   ByteVectorList l;
