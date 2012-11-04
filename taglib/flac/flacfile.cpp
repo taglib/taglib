@@ -104,31 +104,26 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) :
+FLAC::File::File(FileName file,
+                 bool readProperties, Properties::ReadStyle propertiesStyle,
+                 ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file)
 {
   d = new FilePrivate;
+  if(frameFactory)
+    d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
-FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
-{
-  d = new FilePrivate;
-  d->ID3v2FrameFactory = frameFactory;
-  if(isOpen())
-    read(readProperties, propertiesStyle);
-}
-
-FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+FLAC::File::File(IOStream *stream,
+                 bool readProperties, Properties::ReadStyle propertiesStyle,
+                 ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream)
 {
   d = new FilePrivate;
-  d->ID3v2FrameFactory = frameFactory;
+  if(frameFactory)
+    d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
