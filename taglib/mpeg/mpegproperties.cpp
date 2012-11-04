@@ -203,8 +203,8 @@ void MPEG::Properties::read()
   // Check for a Xing header that will help us in gathering information about a
   // VBR stream.
 
-  int xingHeaderOffset = MPEG::XingHeader::xingHeaderOffset(firstHeader.version(),
-                                                            firstHeader.channelMode());
+  int xingHeaderOffset = MPEG::XingHeader::offset(firstHeader.version(),
+                                                  firstHeader.channelMode());
 
   d->file->seek(first + xingHeaderOffset);
   d->xingHeader = new XingHeader(d->file->readBlock(16));

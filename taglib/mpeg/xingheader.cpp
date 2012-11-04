@@ -71,8 +71,8 @@ TagLib::uint MPEG::XingHeader::totalSize() const
   return d->size;
 }
 
-int MPEG::XingHeader::xingHeaderOffset(TagLib::MPEG::Header::Version v,
-                                       TagLib::MPEG::Header::ChannelMode c)
+int MPEG::XingHeader::offset(TagLib::MPEG::Header::Version v,
+                             TagLib::MPEG::Header::ChannelMode c)
 {
   if(v == MPEG::Header::Version1) {
     if(c == MPEG::Header::SingleChannel)

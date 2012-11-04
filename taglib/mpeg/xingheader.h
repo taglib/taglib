@@ -81,9 +81,8 @@ namespace TagLib {
        * Returns the offset for the start of this Xing header, given the
        * version and channels of the frame
        */
-      // BIC: rename to offset()
-      static int xingHeaderOffset(TagLib::MPEG::Header::Version v,
-                                  TagLib::MPEG::Header::ChannelMode c);
+      static int offset(TagLib::MPEG::Header::Version v,
+                        TagLib::MPEG::Header::ChannelMode c);
 
     private:
       XingHeader(const XingHeader &);
