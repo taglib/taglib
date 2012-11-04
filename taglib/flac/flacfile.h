@@ -191,22 +191,6 @@ namespace TagLib {
       void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
       /*!
-       * Returns the block of data used by FLAC::Properties for parsing the
-       * stream properties.
-       *
-       * \deprecated This method will not be public in a future release.
-       */
-      ByteVector streamInfoData(); // BIC: remove
-
-      /*!
-       * Returns the length of the audio-stream, used by FLAC::Properties for
-       * calculating the bitrate.
-       *
-       * \deprecated This method will not be public in a future release.
-       */
-      offset_t streamLength();  // BIC: remove
-
-      /*!
        * Returns a list of pictures attached to the FLAC file.
        */
       List<Picture *> pictureList();

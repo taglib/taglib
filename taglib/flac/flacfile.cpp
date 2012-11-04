@@ -341,22 +341,12 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     d->tag.set(FlacXiphIndex, new Ogg::XiphComment);
 
   if(readProperties)
-    d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
-}
-
-ByteVector FLAC::File::streamInfoData()
-{
-  return isValid() ? d->streamInfoData : ByteVector();
+    d->properties = new Properties(d->streamInfoData, d->streamLength, propertiesStyle);
 }
 
 ByteVector FLAC::File::xiphCommentData() const
 {
   return (isValid() && d->hasXiphComment) ? d->xiphCommentData : ByteVector();
-}
-
-offset_t FLAC::File::streamLength()
-{
-  return d->streamLength;
 }
 
 void FLAC::File::scan()
