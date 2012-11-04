@@ -50,7 +50,7 @@ namespace TagLib {
        * ByteVector \a data.
        */
        // BIC: switch to const reference
-      Properties(ByteVector data, long streamLength, ReadStyle style = Average);
+      Properties(ByteVector data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Create an instance of FLAC::Properties with the data read from the

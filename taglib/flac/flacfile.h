@@ -215,7 +215,7 @@ namespace TagLib {
        *
        * \deprecated This method will not be public in a future release.
        */
-      long streamLength();  // BIC: remove
+      offset_t streamLength();  // BIC: remove
 
       /*!
        * Returns a list of pictures attached to the FLAC file.
@@ -247,10 +247,10 @@ namespace TagLib {
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       void scan();
-      long findID3v2();
-      long findID3v1();
+      offset_t findID3v2();
+      offset_t findID3v1();
       ByteVector xiphCommentData() const;
-      long findPaddingBreak(long nextPageOffset, long targetOffset, bool *isLast);
+      offset_t findPaddingBreak(long nextPageOffset, long targetOffset, bool *isLast);
 
       class FilePrivate;
       FilePrivate *d;

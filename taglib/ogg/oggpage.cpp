@@ -35,7 +35,7 @@ using namespace TagLib;
 class Ogg::Page::PagePrivate
 {
 public:
-  PagePrivate(File *f = 0, long pageOffset = -1) :
+  PagePrivate(File *f = 0, offset_t pageOffset = -1) :
     file(f),
     fileOffset(pageOffset),
     packetOffset(0),
@@ -50,8 +50,8 @@ public:
   }
 
   File *file;
-  long fileOffset;
-  long packetOffset;
+  offset_t fileOffset;
+  offset_t packetOffset;
   int dataSize;
   List<int> packetSizes;
   PageHeader header;
@@ -63,7 +63,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::Page::Page(Ogg::File *file, long pageOffset)
+Ogg::Page::Page(Ogg::File *file, offset_t pageOffset)
 {
   d = new PagePrivate(file, pageOffset);
 }
@@ -73,7 +73,7 @@ Ogg::Page::~Page()
   delete d;
 }
 
-long Ogg::Page::fileOffset() const
+offset_t Ogg::Page::fileOffset() const
 {
   return d->fileOffset;
 }

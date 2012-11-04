@@ -62,10 +62,10 @@ public:
     delete properties;
   }
 
-  long APELocation;
+  offset_t APELocation;
   uint APESize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -261,7 +261,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
   }
 }
 
-long WavPack::File::findAPE()
+offset_t WavPack::File::findAPE()
 {
   if(!isValid())
     return -1;
@@ -271,7 +271,7 @@ long WavPack::File::findAPE()
   else
     seek(-32, End);
 
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(8) == APE::Tag::fileIdentifier())
     return p;
@@ -279,13 +279,13 @@ long WavPack::File::findAPE()
   return -1;
 }
 
-long WavPack::File::findID3v1()
+offset_t WavPack::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;

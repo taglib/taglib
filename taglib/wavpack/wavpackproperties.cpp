@@ -38,7 +38,7 @@ using namespace TagLib;
 class WavPack::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(const ByteVector &d, long length, ReadStyle s) :
+  PropertiesPrivate(const ByteVector &d, offset_t length, ReadStyle s) :
     data(d),
     streamLength(length),
     style(s),
@@ -52,7 +52,7 @@ public:
     file(0) {}
 
   ByteVector data;
-  long streamLength;
+  offset_t streamLength;
   ReadStyle style;
   int length;
   int bitrate;
@@ -68,13 +68,13 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) : AudioProperties(style)
+WavPack::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
   read();
 }
 
-WavPack::Properties::Properties(File *file, long streamLength, ReadStyle style) : AudioProperties(style)
+WavPack::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   ByteVector data = file->readBlock(32);
   d = new PropertiesPrivate(data, streamLength, style);
@@ -170,14 +170,14 @@ void WavPack::Properties::read()
   d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
   d->sampleFrames = samples;
 
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 }
 
 unsigned int WavPack::Properties::seekFinalIndex()
 {
   ByteVector blockID("wvpk", 4);
 
-  long offset = d->streamLength;
+  offset_t offset = d->streamLength;
   while(offset > 0) {
     offset = d->file->rfind(blockID, offset);
     if(offset == -1)

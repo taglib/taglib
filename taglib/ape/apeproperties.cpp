@@ -39,7 +39,7 @@ using namespace TagLib;
 class APE::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *file, long streamLength) :
+  PropertiesPrivate(File *file, offset_t streamLength) :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -58,7 +58,7 @@ public:
   int bitsPerSample;
   uint sampleFrames;
   File *file;
-  long streamLength;
+  offset_t streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ TagLib::uint APE::Properties::sampleFrames() const
 void APE::Properties::read()
 {
   // First we are searching the descriptor
-  long offset = findDescriptor();
+  offset_t offset = findDescriptor();
   if(offset < 0)
     return;
 
@@ -138,9 +138,9 @@ void APE::Properties::read()
   }
 }
 
-long APE::Properties::findDescriptor()
+offset_t APE::Properties::findDescriptor()
 {
-  long ID3v2Location = findID3v2();
+  offset_t ID3v2Location = findID3v2();
   long ID3v2OriginalSize = 0;
   bool hasID3v2 = false;
   if(ID3v2Location >= 0) {
@@ -150,7 +150,7 @@ long APE::Properties::findDescriptor()
       hasID3v2 = true;
   }
 
-  long offset = 0;
+  offset_t offset = 0;
   if(hasID3v2)
     offset = d->file->find("MAC ", ID3v2Location + ID3v2OriginalSize);
   else
@@ -164,7 +164,7 @@ long APE::Properties::findDescriptor()
   return offset;
 }
 
-long APE::Properties::findID3v2()
+offset_t APE::Properties::findID3v2()
 {
   if(!d->file->isValid())
     return -1;
@@ -201,7 +201,7 @@ void APE::Properties::analyzeCurrent()
   uint finalFrameBlocks = header.mid(8, 4).toUInt(false);
   d->sampleFrames = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 }
 
 void APE::Properties::analyzeOld()
@@ -226,6 +226,6 @@ void APE::Properties::analyzeOld()
   uint finalFrameBlocks = header.mid(22, 4).toUInt(false);
   uint totalBlocks = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = totalBlocks / d->sampleRate;
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 }
 

@@ -58,13 +58,13 @@ namespace TagLib {
        * \deprecated This constructor will be dropped in favor of the one below
        * in a future version.
        */
-      Properties(const ByteVector &data, long streamLength, ReadStyle style = Average);
+      Properties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Create an instance of WavPack::Properties.
        */
       // BIC: merge with the above constructor
-      Properties(File *file, long streamLength, ReadStyle style = Average);
+      Properties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this WavPack::Properties instance.
