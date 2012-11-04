@@ -107,19 +107,9 @@ short RelativeVolumeFrame::volumeAdjustmentIndex(ChannelType type) const
   return d->channels.contains(type) ? d->channels[type].volumeAdjustment : 0;
 }
 
-short RelativeVolumeFrame::volumeAdjustmentIndex() const
-{
-  return volumeAdjustmentIndex(MasterVolume);
-}
-
 void RelativeVolumeFrame::setVolumeAdjustmentIndex(short index, ChannelType type)
 {
   d->channels[type].volumeAdjustment = index;
-}
-
-void RelativeVolumeFrame::setVolumeAdjustmentIndex(short index)
-{
-  setVolumeAdjustmentIndex(index, MasterVolume);
 }
 
 float RelativeVolumeFrame::volumeAdjustment(ChannelType type) const
@@ -127,19 +117,9 @@ float RelativeVolumeFrame::volumeAdjustment(ChannelType type) const
   return d->channels.contains(type) ? float(d->channels[type].volumeAdjustment) / float(512) : 0;
 }
 
-float RelativeVolumeFrame::volumeAdjustment() const
-{
-  return volumeAdjustment(MasterVolume);
-}
-
 void RelativeVolumeFrame::setVolumeAdjustment(float adjustment, ChannelType type)
 {
   d->channels[type].volumeAdjustment = short(adjustment * float(512));
-}
-
-void RelativeVolumeFrame::setVolumeAdjustment(float adjustment)
-{
-  setVolumeAdjustment(adjustment, MasterVolume);
 }
 
 RelativeVolumeFrame::PeakVolume RelativeVolumeFrame::peakVolume(ChannelType type) const
@@ -147,19 +127,9 @@ RelativeVolumeFrame::PeakVolume RelativeVolumeFrame::peakVolume(ChannelType type
   return d->channels.contains(type) ? d->channels[type].peakVolume : PeakVolume();
 }
 
-RelativeVolumeFrame::PeakVolume RelativeVolumeFrame::peakVolume() const
-{
-  return peakVolume(MasterVolume);
-}
-
 void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak, ChannelType type)
 {
   d->channels[type].peakVolume = peak;
-}
-
-void RelativeVolumeFrame::setPeakVolume(const PeakVolume &peak)
-{
-  setPeakVolume(peak, MasterVolume);
 }
 
 String RelativeVolumeFrame::identification() const
