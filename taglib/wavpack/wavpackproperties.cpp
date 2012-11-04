@@ -38,7 +38,7 @@ using namespace TagLib;
 class WavPack::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(const ByteVector &d, offset_t length, ReadStyle s) :
+  PropertiesPrivate(const ByteVector &d, offset_t length, ReadStyle s, File *f) :
     data(d),
     streamLength(length),
     style(s),
@@ -49,7 +49,7 @@ public:
     version(0),
     bitsPerSample(0),
     sampleFrames(0),
-    file(0) {}
+    file(f) {}
 
   ByteVector data;
   offset_t streamLength;
@@ -68,17 +68,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
-{
-  d = new PropertiesPrivate(data, streamLength, style);
-  read();
-}
-
 WavPack::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) : AudioProperties(style)
 {
   ByteVector data = file->readBlock(32);
-  d = new PropertiesPrivate(data, streamLength, style);
-  d->file = file;
+  d = new PropertiesPrivate(data, streamLength, style, file);
   read();
 }
 
@@ -160,7 +153,7 @@ void WavPack::Properties::read()
 
   unsigned int samples = d->data.mid(12, 4).toUInt(false);
   if(samples == ~0u) {
-    if(d->file && d->style != Fast) {
+    if(d->style != Fast) {
       samples = seekFinalIndex();
     }
     else {

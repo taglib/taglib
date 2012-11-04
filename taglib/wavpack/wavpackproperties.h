@@ -52,18 +52,8 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of WavPack::Properties with the data read from the
-       * ByteVector \a data.
-       *
-       * \deprecated This constructor will be dropped in favor of the one below
-       * in a future version.
-       */
-      Properties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
-
-      /*!
        * Create an instance of WavPack::Properties.
        */
-      // BIC: merge with the above constructor
       Properties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
