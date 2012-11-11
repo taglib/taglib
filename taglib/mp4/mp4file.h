@@ -100,6 +100,11 @@ namespace TagLib {
        */
       bool save();
 
+      /*!
+       * Description of the file.
+       */
+      String toString() const;
+
     private:
 
       void read(bool readProperties, Properties::ReadStyle audioPropertiesStyle);
