@@ -811,28 +811,28 @@ void String::prepare(Type t)
 // related functions
 ////////////////////////////////////////////////////////////////////////////////
 
-const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2)
+const TagLib::String TagLib::operator+(const TagLib::String &s1, const TagLib::String &s2)
 {
   String s(s1);
   s.append(s2);
   return s;
 }
 
-const TagLib::String operator+(const char *s1, const TagLib::String &s2)
+const TagLib::String TagLib::operator+(const char *s1, const TagLib::String &s2)
 {
   String s(s1);
   s.append(s2);
   return s;
 }
 
-const TagLib::String operator+(const TagLib::String &s1, const char *s2)
+const TagLib::String TagLib::operator+(const TagLib::String &s1, const char *s2)
 {
   String s(s1);
   s.append(s2);
   return s;
 }
 
-std::ostream &operator<<(std::ostream &s, const String &str)
+std::ostream &TagLib::operator<<(std::ostream &s, const String &str)
 {
   s << str.to8Bit();
   return s;

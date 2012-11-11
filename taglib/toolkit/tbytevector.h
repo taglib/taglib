@@ -414,12 +414,12 @@ namespace TagLib {
     ByteVectorPrivate *d;
   };
 
-}
+  /*!
+   * \relates TagLib::ByteVector
+   * Streams the ByteVector \a v to the output stream \a s.
+   */
+  TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v);
 
-/*!
- * \relates TagLib::ByteVector
- * Streams the ByteVector \a v to the output stream \a s.
- */
-TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v);
+}
 
 #endif
