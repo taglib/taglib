@@ -1,4 +1,3 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
@@ -6,6 +5,7 @@
 #include <tbytevectorlist.h>
 #include <flacfile.h>
 #include <flacmetadatablock.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

@@ -1,5 +1,5 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <tbytevectorstream.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
 using namespace TagLib;

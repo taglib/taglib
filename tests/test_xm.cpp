@@ -19,8 +19,8 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#include <cppunit/extensions/HelperMacros.h>
 #include <xmfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

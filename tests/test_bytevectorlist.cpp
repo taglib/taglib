@@ -1,6 +1,6 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <tbytevector.h>
 #include <tbytevectorlist.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
 using namespace TagLib;
