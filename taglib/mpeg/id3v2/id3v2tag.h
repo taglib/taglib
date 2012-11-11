@@ -78,6 +78,8 @@ namespace TagLib {
     class TAGLIB_EXPORT Latin1StringHandler : public TagLib::StringHandler
     {
     public:
+      Latin1StringHandler();
+
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.

@@ -61,6 +61,8 @@ namespace TagLib {
     class TAGLIB_EXPORT StringHandler : public TagLib::StringHandler
     {
     public:
+      StringHandler();
+
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an UTF-8 character array.

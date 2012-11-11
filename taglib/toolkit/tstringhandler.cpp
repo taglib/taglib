@@ -25,6 +25,10 @@
 
 #include "tstringhandler.h"
 
+TagLib::StringHandler::StringHandler()
+{
+}
+
 TagLib::StringHandler::~StringHandler()
 {
 }

@@ -81,6 +81,10 @@ const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStr
 // Latin1StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
+ID3v2::Latin1StringHandler::Latin1StringHandler()
+{
+}
+
 String ID3v2::Latin1StringHandler::parse(const ByteVector &data) const
 {
   return String(data, String::Latin1);

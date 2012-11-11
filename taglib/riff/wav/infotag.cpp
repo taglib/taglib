@@ -64,6 +64,10 @@ const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defau
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
+RIFF::Info::StringHandler::StringHandler()
+{
+}
+
 String RIFF::Info::StringHandler::parse(const ByteVector &data) const
 {
   return String(data, String::UTF8);

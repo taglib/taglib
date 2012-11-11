@@ -53,6 +53,7 @@ namespace TagLib
   class TAGLIB_EXPORT StringHandler
   {
   public:
+    StringHandler();
     ~StringHandler();
 
     /*!
