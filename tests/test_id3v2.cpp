@@ -1,4 +1,3 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 // so evil :(
@@ -18,6 +17,7 @@
 #include <ownershipframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

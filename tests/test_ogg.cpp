@@ -1,4 +1,3 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
@@ -8,6 +7,7 @@
 #include <oggfile.h>
 #include <vorbisfile.h>
 #include <oggpageheader.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -88,12 +88,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
     CPPUNIT_ASSERT_EQUAL(String("another value"), tags["UNUSUALTAG"][1]);
-    CPPUNIT_ASSERT_EQUAL(String(L"öäüoΣø"), tags["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("öäüoΣø", String::UTF8), tags["UNICODETAG"][0]);
 
-    tags["UNICODETAG"][0] = L"νεω ναλυε";
+    tags["UNICODETAG"][0] = String("νεω ναλυε", String::UTF8);
     tags.erase("UNUSUALTAG");
     f->tag()->setProperties(tags);
-    CPPUNIT_ASSERT_EQUAL(String(L"νεω ναλυε"), f->tag()->properties()["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(String("νεω ναλυε", String::UTF8), f->tag()->properties()["UNICODETAG"][0]);
     CPPUNIT_ASSERT_EQUAL(false, f->tag()->properties().contains("UNUSUALTAG"));
 
     delete f;

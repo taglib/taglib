@@ -19,9 +19,9 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#include <cppunit/extensions/HelperMacros.h>
 #include <modfile.h>
 #include <tpropertymap.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

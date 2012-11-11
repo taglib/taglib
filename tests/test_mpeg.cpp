@@ -1,8 +1,9 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
+#include <tstring.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

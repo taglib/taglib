@@ -1,4 +1,3 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
@@ -7,6 +6,7 @@
 #include <tpropertymap.h>
 #include <apetag.h>
 #include <tdebug.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

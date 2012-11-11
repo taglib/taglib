@@ -1,10 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <fileref.h>
 #include <oggflacfile.h>
 #include <vorbisfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
