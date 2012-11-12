@@ -245,6 +245,11 @@ namespace TagLib {
      */
     static bool isWritable(const char *name);
 
+    /*!
+     * Description of the file.
+     */
+    String toString() const;
+
   protected:
     /*!
      * Construct a File object and opens the \a file.  \a file should be a

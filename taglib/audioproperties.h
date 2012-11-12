@@ -27,6 +27,7 @@
 #define TAGLIB_AUDIOPROPERTIES_H
 
 #include "taglib_export.h"
+#include "tstring.h"
 
 namespace TagLib {
 
@@ -85,6 +86,8 @@ namespace TagLib {
      * Returns the number of audio channels.
      */
     virtual int channels() const = 0;
+
+    String toString() const;
 
   protected:
 

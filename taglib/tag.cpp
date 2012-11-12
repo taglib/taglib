@@ -178,3 +178,17 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
       target->setTrack(source->track());
   }
 }
+
+String Tag::toString() const
+{
+  StringList desc;
+  desc.append("title=" + title());
+  desc.append("artist=" + artist());
+  desc.append("album=" + album());
+  desc.append("comment=" + comment());
+  desc.append("genre=" + genre());
+  desc.append("year=" + String::number(year()));
+  desc.append("track=" + String::number(track()));
+  return desc.toString("\n");
+}
+

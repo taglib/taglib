@@ -149,3 +149,16 @@ MP4::File::save()
   return d->tag->save();
 }
 
+String
+MP4::File::toString() const
+{
+  StringList desc;
+  if(d->properties) {
+    desc.append(d->properties->toString());
+  }
+  if(d->tag) {
+    desc.append(d->tag->toString());
+  }
+  return desc.toString("\n");
+}
+

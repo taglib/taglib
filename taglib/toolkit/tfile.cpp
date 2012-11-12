@@ -386,6 +386,20 @@ bool File::isWritable(const char *file)
 
 }
 
+String File::toString() const
+{
+  StringList desc;
+  AudioProperties *properties = audioProperties();
+  if(properties) {
+    desc.append(properties->toString());
+  }
+  Tag *t = tag();
+  if(t) {
+    desc.append(t->toString());
+  }
+  return desc.toString("\n");
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

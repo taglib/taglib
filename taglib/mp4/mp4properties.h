@@ -50,6 +50,8 @@ namespace TagLib {
       virtual int bitsPerSample() const;
       bool isEncrypted() const;
 
+      String toString() const;
+
     private:
       class PropertiesPrivate;
       PropertiesPrivate *d;
