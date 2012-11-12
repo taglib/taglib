@@ -178,16 +178,6 @@ bool MPEG::File::save()
   return save(AllTags);
 }
 
-bool MPEG::File::save(int tags)
-{
-  return save(tags, true);
-}
-
-bool MPEG::File::save(int tags, bool stripOthers)
-{
-  return save(tags, stripOthers, 4);
-}
-
 bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
 {
   if(tags == NoTags && stripOthers)
