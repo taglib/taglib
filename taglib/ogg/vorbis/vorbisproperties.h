@@ -31,16 +31,7 @@
 
 namespace TagLib {
 
-/*
- * This is just to make this appear to be in the Ogg namespace in the
- * documentation.  The typedef below will make this work with the current code.
- * In the next BIC version of TagLib this will be really moved into the Ogg
- * namespace.
- */
-
-#ifdef DOXYGEN
   namespace Ogg {
-#endif
 
   namespace Vorbis {
 
@@ -109,17 +100,7 @@ namespace TagLib {
     };
   }
 
-/*
- * To keep compatibility with the current version put Vorbis in the Ogg namespace
- * only in the docs and provide a typedef to make it work.  In the next BIC
- * version this will be removed and it will only exist in the Ogg namespace.
- */
-
-#ifdef DOXYGEN
   }
-#else
-  namespace Ogg { namespace Vorbis { typedef TagLib::AudioProperties AudioProperties; } }
-#endif
 
 }
 

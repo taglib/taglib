@@ -29,12 +29,12 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
-    Vorbis::File *f = new Vorbis::File(newname.c_str());
+    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
     f->tag()->setArtist("The Artist");
     f->save();
     delete f;
 
-    f = new Vorbis::File(newname.c_str());
+    f = new Ogg::Vorbis::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
     delete f;
   }
@@ -44,12 +44,12 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
-    Vorbis::File *f = new Vorbis::File(newname.c_str());
+    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
     f->tag()->addField("test", ByteVector(128 * 1024, 'x') + ByteVector(1, '\0'));
     f->save();
     delete f;
 
-    f = new Vorbis::File(newname.c_str());
+    f = new Ogg::Vorbis::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
     delete f;
   }
@@ -59,7 +59,7 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
-    Vorbis::File *f = new Vorbis::File(newname.c_str());
+    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
 
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->tag()->properties().size());
 
@@ -82,7 +82,7 @@ public:
     ScopedFileCopy copy("test", ".ogg");
     string newname = copy.fileName();
 
-    Vorbis::File *f = new Vorbis::File(newname.c_str());
+    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
     PropertyMap tags = f->tag()->properties();
 
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), tags["UNUSUALTAG"].size());
