@@ -10,6 +10,7 @@ TagLib 1.9 (In Development)
  * Better parsing of corrupted FLAC files.
  * Fixed saving of PropertyMap comments without description into ID3v2 tags.
  * Fixed crash when parsing certain XM files.
+ * Fixed compilation of unit test with clang.
 
 TagLib 1.8 (Sep 6, 2012)
 ========================
