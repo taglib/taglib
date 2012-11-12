@@ -38,13 +38,7 @@ using namespace TagLib;
 class MP4::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false), format(Unknown) {}
-
-  enum Format {
-    Unknown = 0,
-    AAC = 1,
-    ALAC = 2,
-  };
+  PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false) {}
 
   int length;
   int bitrate;
@@ -52,7 +46,6 @@ public:
   int channels;
   int bitsPerSample;
   bool encrypted;
-  Format format;
 };
 
 MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
@@ -125,7 +118,6 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
   file->seek(atom->offset);
   data = file->readBlock(atom->length);
   if(data.mid(20, 4) == "mp4a") {
-    d->format = PropertiesPrivate::AAC;
     d->channels = data.mid(40, 2).toShort();
     d->bitsPerSample = data.mid(42, 2).toShort();
     d->sampleRate = data.mid(46, 4).toUInt();
@@ -146,7 +138,6 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
     }
   }
   else if (data.mid(20, 4) == "alac") {
-    d->format = PropertiesPrivate::ALAC;
     if (atom->length == 88 && data.mid(56, 4) == "alac") {
       d->bitsPerSample = data.at(69);
       d->channels = data.at(73);
@@ -200,25 +191,5 @@ bool
 MP4::Properties::isEncrypted() const
 {
   return d->encrypted;
-}
-
-String
-MP4::Properties::toString() const
-{
-  String format;
-  if(d->format == PropertiesPrivate::AAC) {
-    format = "AAC";
-  }
-  else if(d->format == PropertiesPrivate::ALAC) {
-    format = "ALAC";
-  }
-  else {
-    format = "Unknown";
-  }
-  StringList desc;
-  desc.append("MPEG-4 audio (" + format + ")");
-  desc.append(String::number(length()) + " seconds");
-  desc.append(String::number(bitrate()) + " kbps");
-  return desc.toString(", ");
 }
 

@@ -182,8 +182,6 @@ namespace TagLib {
      */
     static void duplicate(const Tag *source, Tag *target, bool overwrite = true);
 
-    String toString() const;
-
   protected:
     /*!
      * Construct a Tag.  This is protected since tags should only be instantiated

@@ -26,7 +26,6 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <stdio.h>
 
 #include <taglib.h>
 #include <tdebug.h>
@@ -37,11 +36,10 @@ using namespace TagLib;
 class MP4::Item::ItemPrivate : public RefCounter
 {
 public:
-  ItemPrivate() : RefCounter(), valid(true), atomDataType(MP4::TypeUndefined), type(MP4::Item::TypeUndefined) {}
+  ItemPrivate() : RefCounter(), valid(true), atomDataType(TypeUndefined) {}
 
   bool valid;
   AtomDataType atomDataType;
-  ItemType type;
   union {
     bool m_bool;
     int m_int;
@@ -88,35 +86,30 @@ MP4::Item::Item(bool value)
 {
   d = new ItemPrivate;
   d->m_bool = value;
-  d->type = TypeBool;
 }
 
 MP4::Item::Item(int value)
 {
   d = new ItemPrivate;
   d->m_int = value;
-  d->type = TypeInt;
 }
 
 MP4::Item::Item(uchar value)
 {
   d = new ItemPrivate;
   d->m_byte = value;
-  d->type = TypeByte;
 }
 
 MP4::Item::Item(uint value)
 {
   d = new ItemPrivate;
   d->m_uint = value;
-  d->type = TypeUInt;
 }
 
 MP4::Item::Item(long long value)
 {
   d = new ItemPrivate;
   d->m_longlong = value;
-  d->type = TypeLongLong;
 }
 
 MP4::Item::Item(int value1, int value2)
@@ -124,28 +117,24 @@ MP4::Item::Item(int value1, int value2)
   d = new ItemPrivate;
   d->m_intPair.first = value1;
   d->m_intPair.second = value2;
-  d->type = TypeIntPair;
 }
 
 MP4::Item::Item(const ByteVectorList &value)
 {
   d = new ItemPrivate;
   d->m_byteVectorList = value;
-  d->type = TypeByteVectorList;
 }
 
 MP4::Item::Item(const StringList &value)
 {
   d = new ItemPrivate;
   d->m_stringList = value;
-  d->type = TypeStringList;
 }
 
 MP4::Item::Item(const MP4::CoverArtList &value)
 {
   d = new ItemPrivate;
   d->m_coverArtList = value;
-  d->type = TypeCoverArtList;
 }
 
 void MP4::Item::setAtomDataType(MP4::AtomDataType type)
@@ -216,48 +205,5 @@ bool
 MP4::Item::isValid() const
 {
   return d->valid;
-}
-
-String
-MP4::Item::toString() const
-{
-  StringList desc;
-  char tmp[256];
-  switch (d->type) {
-    case TypeBool:
-      return d->m_bool ? "true" : "false";
-    case TypeInt:
-      sprintf(tmp, "%d", d->m_int);
-      return tmp;
-    case TypeIntPair:
-      sprintf(tmp, "%d/%d", d->m_intPair.first, d->m_intPair.second);
-      return tmp;
-    case TypeByte:
-      sprintf(tmp, "%d", d->m_byte);
-      return tmp;
-    case TypeUInt:
-      sprintf(tmp, "%u", d->m_uint);
-      return tmp;
-    case TypeLongLong:
-      sprintf(tmp, "%lld", d->m_longlong);
-      return tmp;
-    case TypeStringList:
-      return d->m_stringList.toString(" / ");
-    case TypeByteVectorList:
-      for(int i = 0; i < d->m_byteVectorList.size(); i++) {
-        sprintf(tmp, "[%d bytes of data]", d->m_byteVectorList[i].size());
-        desc.append(tmp);
-      }
-      return desc.toString(", ");
-    case TypeCoverArtList:
-      for(int i = 0; i < d->m_coverArtList.size(); i++) {
-        sprintf(tmp, "[%d bytes of data]", d->m_coverArtList[i].data().size());
-        desc.append(tmp);
-      }
-      return desc.toString(", ");
-    case TypeUndefined:
-      return "[unknown]";
-  }
-  return String();
 }
 

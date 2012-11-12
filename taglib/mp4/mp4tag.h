@@ -67,8 +67,6 @@ namespace TagLib {
 
         ItemListMap &itemListMap();
 
-        String toString() const;
-
     private:
         AtomDataList parseData2(Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
         TagLib::ByteVectorList parseData(Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);

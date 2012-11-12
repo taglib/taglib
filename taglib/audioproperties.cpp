@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 #include "audioproperties.h"
-#include "tstringlist.h"
 
 using namespace TagLib;
 
@@ -49,14 +48,4 @@ AudioProperties::~AudioProperties()
 AudioProperties::AudioProperties(ReadStyle)
 {
 
-}
-
-String
-AudioProperties::toString() const
-{
-  StringList desc;
-  desc.append("Audio");
-  desc.append(String::number(length()) + " seconds");
-  desc.append(String::number(bitrate()) + " kbps");
-  return desc.toString(", ");
 }

@@ -5,7 +5,6 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4
 		     ${CMAKE_CURRENT_SOURCE_DIR}/../bindings/c/  )
 
 if(ENABLE_STATIC)
@@ -45,13 +44,6 @@ TARGET_LINK_LIBRARIES(framelist  tag )
 ADD_EXECUTABLE(strip-id3v1 strip-id3v1.cpp)
 
 TARGET_LINK_LIBRARIES(strip-id3v1  tag )
-
-
-########### next target ###############
-
-ADD_EXECUTABLE(inspect inspect.cpp)
-
-TARGET_LINK_LIBRARIES(inspect  tag )
 
 
 endif(BUILD_EXAMPLES)

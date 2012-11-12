@@ -759,13 +759,3 @@ MP4::Tag::itemListMap()
   return d->items;
 }
 
-String
-MP4::Tag::toString() const
-{
-  StringList desc;
-  for(MP4::ItemListMap::Iterator i = d->items.begin(); i != d->items.end(); i++) {
-    desc.append(i->first + "=" + i->second.toString());
-  }
-  return desc.toString("\n");
-}
-
