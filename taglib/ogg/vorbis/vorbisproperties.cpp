@@ -123,6 +123,15 @@ int Vorbis::Properties::bitrateMinimum() const
   return d->bitrateMinimum;
 }
 
+String Vorbis::Properties::toString() const
+{
+  StringList desc;
+  desc.append("Ogg Vorbis audio (version " + String::number(vorbisVersion()) + ")");
+  desc.append(String::number(length()) + " seconds");
+  desc.append(String::number(bitrate()) + " kbps");
+  return desc.toString(", ");
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////

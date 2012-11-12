@@ -73,6 +73,7 @@ namespace TagLib {
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
+      virtual String toString() const;
 
       /*!
        * Returns the Vorbis version, currently "0" (as specified by the spec).

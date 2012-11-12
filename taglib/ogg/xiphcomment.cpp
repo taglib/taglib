@@ -324,6 +324,17 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   return data;
 }
 
+String Ogg::XiphComment::toString() const
+{
+  StringList desc;
+  for(FieldListMap::ConstIterator i = d->fieldListMap.begin(); i != d->fieldListMap.end(); i++) {
+    for(StringList::ConstIterator j = i->second.begin(); j != i->second.end(); j++) {
+      desc.append(i->first + "=" + *j);
+    }
+  }
+  return desc.toString("\n");
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
