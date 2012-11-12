@@ -26,16 +26,10 @@
 #include <stdlib.h>
 
 #include <fileref.h>
-#include <mp4file.h>
+#include <tfile.h>
 
 using namespace std;
 using namespace TagLib;
-
-#define MAYBE_PRINT_DESC(_Type) \
-    if(dynamic_cast<_Type *>(f.file())) { \
-      cout << dynamic_cast<_Type *>(f.file())->toString().to8Bit(true) << endl; \
-      found = 1; \
-    }
 
 int main(int argc, char *argv[])
 {
@@ -46,15 +40,8 @@ int main(int argc, char *argv[])
     cout << "******************** \"" << argv[i] << "\"********************" << endl;
 
     FileRef f(argv[i]);
-
-    bool found = 0;
     if(!f.isNull() && f.file()) {
-      MAYBE_PRINT_DESC(MP4::File);
-      MAYBE_PRINT_DESC(File);
-    }
-
-    if(!found) {
-      cout << "could not find any information about the file" << endl;
+      cout << f.file()->toString().to8Bit(true) << endl;
     }
 
   }

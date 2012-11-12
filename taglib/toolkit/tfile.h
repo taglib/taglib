@@ -246,9 +246,9 @@ namespace TagLib {
     static bool isWritable(const char *name);
 
     /*!
-     * Description of the file.
+     * Returns description of the audio file and its tags.
      */
-    String toString() const;
+    virtual String toString() const;
 
   protected:
     /*!

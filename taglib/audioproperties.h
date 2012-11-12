@@ -87,7 +87,10 @@ namespace TagLib {
      */
     virtual int channels() const = 0;
 
-    String toString() const;
+    /*!
+     * Returns description of the audio file.
+     */
+    virtual String toString() const;
 
   protected:
 

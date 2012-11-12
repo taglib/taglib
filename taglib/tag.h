@@ -179,7 +179,10 @@ namespace TagLib {
      */
     static void duplicate(const Tag *source, Tag *target, bool overwrite = true);
 
-    String toString() const;
+    /*!
+     * Returns description of the tag.
+     */
+    virtual String toString() const;
 
   protected:
     /*!
