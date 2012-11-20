@@ -56,10 +56,16 @@ namespace {
   {
     DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
+    HANDLE handle;
     if(wcslen(path) > 0)
-      return CreateFileW(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+      handle = CreateFileW(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else
-      return CreateFileA(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+      handle = CreateFileA(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+
+    if(handle == INVALID_HANDLE_VALUE)
+      handle = NULL;
+
+    return handle;
   }
 
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
