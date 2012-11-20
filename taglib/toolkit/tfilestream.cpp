@@ -84,7 +84,7 @@ namespace {
 
   // For non-Windows 
 
-  const FILE *InvalidFile = 0;
+  FILE *const InvalidFile = 0;
 
   struct FileNameHandle : public std::string
   {
