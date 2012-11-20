@@ -52,6 +52,8 @@ namespace {
 
   // Using native file handles instead of file descriptors for reducing the resource consumption.
 
+  const HANDLE InvalidFile = INVALID_HANDLE_VALUE;
+
   HANDLE openFile(const FileName &path, bool readOnly)
   {
     DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
@@ -81,6 +83,8 @@ namespace {
 #else
 
   // For non-Windows 
+
+  const FILE *InvalidFile = 0;
 
   struct FileNameHandle : public std::string
   {
@@ -119,7 +123,7 @@ public:
 };
 
 FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openReadOnly) :
-  file(0),
+  file(InvalidFile),
   name(fileName),
   readOnly(true),
   size(0)
@@ -129,12 +133,12 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
   if(!openReadOnly)
     file = openFile(name, false);
 
-  if(file)
+  if(file != InvalidFile)
     readOnly = false;
   else
     file = openFile(name, true);
 
-  if(!file) {
+  if(file == InvalidFile) {
     debug("Could not open file " + String((const char *) name));
   }
 }
