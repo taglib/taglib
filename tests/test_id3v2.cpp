@@ -683,11 +683,11 @@ public:
     CPPUNIT_ASSERT(properties.contains("LYRICS"));
     CPPUNIT_ASSERT(properties.contains("LYRICS:TEST"));
 
-    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_RECORDINGID"));
-    CPPUNIT_ASSERT_EQUAL(String("152454b9-19ba-49f3-9fc9-8fc26545cf41"), properties["MUSICBRAINZ_RECORDINGID"].front());
+    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_TRACKID"));
+    CPPUNIT_ASSERT_EQUAL(String("152454b9-19ba-49f3-9fc9-8fc26545cf41"), properties["MUSICBRAINZ_TRACKID"].front());
 
-    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_RELEASEID"));
-    CPPUNIT_ASSERT_EQUAL(String("95c454a5-d7e0-4d8f-9900-db04aca98ab3"), properties["MUSICBRAINZ_RELEASEID"].front());
+    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_ALBUMID"));
+    CPPUNIT_ASSERT_EQUAL(String("95c454a5-d7e0-4d8f-9900-db04aca98ab3"), properties["MUSICBRAINZ_ALBUMID"].front());
 
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());

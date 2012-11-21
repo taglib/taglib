@@ -127,7 +127,7 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
         return frame;
     }
   }
-  if(key == "MUSICBRAINZ_RECORDINGID" && values.size() == 1) {
+  if(key == "MUSICBRAINZ_TRACKID" && values.size() == 1) {
     UniqueFileIdentifierFrame *frame = new UniqueFileIdentifierFrame("http://musicbrainz.org", values.front().data(String::UTF8));
     return frame;
   }
@@ -394,9 +394,9 @@ static const char *frameTranslation[][2] = {
 
 static const TagLib::uint txxxFrameTranslationSize = 7;
 static const char *txxxFrameTranslation[][2] = {
-  { "MusicBrainz Album Id", "MUSICBRAINZ_RELEASEID" },
+  { "MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
   { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
-  { "MusicBrainz Album Artist Id", "MUSICBRAINZ_RELEASEARTISTID" },
+  { "MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
   { "MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
   { "MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
   { "Acoustid Id", "ACOUSTID_ID" },

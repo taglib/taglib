@@ -93,7 +93,7 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
 {
   PropertyMap map;
   if(d->owner == "http://musicbrainz.org") {
-    map.insert("MUSICBRAINZ_RECORDINGID", String(d->identifier));
+    map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
   }
   else {
     map.unsupportedData().append(frameID() + String("/") + d->owner);
