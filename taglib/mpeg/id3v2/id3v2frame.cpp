@@ -44,6 +44,7 @@
 #include "frames/urllinkframe.h"
 #include "frames/unsynchronizedlyricsframe.h"
 #include "frames/commentsframe.h"
+#include "frames/uniquefileidentifierframe.h"
 #include "frames/unknownframe.h"
 
 using namespace TagLib;
@@ -126,6 +127,10 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
         return frame;
     }
   }
+  if(key == "MUSICBRAINZ_RECORDINGID" && values.size() == 1) {
+    UniqueFileIdentifierFrame *frame = new UniqueFileIdentifierFrame("http://musicbrainz.org", values.front().data(String::UTF8));
+    return frame;
+  }
   // now we check if it's one of the "special" cases:
   // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
   if((key == "LYRICS" || key.startsWith(lyricsPrefix)) && values.size() == 1){
@@ -151,7 +156,7 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
     return frame;
   }
   // if non of the above cases apply, we use a TXXX frame with the key as description
-  return new UserTextIdentificationFrame(key, values, String::UTF8);
+  return new UserTextIdentificationFrame(keyToTXXX(key), values, String::UTF8);
 }
 
 Frame::~Frame()
@@ -387,12 +392,36 @@ static const char *frameTranslation[][2] = {
   //{ "USLT", "LYRICS" }, handled specially
 };
 
+static const TagLib::uint txxxFrameTranslationSize = 7;
+static const char *txxxFrameTranslation[][2] = {
+  { "MusicBrainz Album Id", "MUSICBRAINZ_RELEASEID" },
+  { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
+  { "MusicBrainz Album Artist Id", "MUSICBRAINZ_RELEASEARTISTID" },
+  { "MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
+  { "MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
+  { "Acoustid Id", "ACOUSTID_ID" },
+  { "Acoustid Fingerprint", "ACOUSTID_FINGERPRINT" },
+  { "MusicIP PUID", "MUSICIP_PUID" },
+};
+
 Map<ByteVector, String> &idMap()
 {
   static Map<ByteVector, String> m;
   if(m.isEmpty())
     for(size_t i = 0; i < frameTranslationSize; ++i)
       m[frameTranslation[i][0]] = frameTranslation[i][1];
+  return m;
+}
+
+Map<String, String> &txxxMap()
+{
+  static Map<String, String> m;
+  if(m.isEmpty()) {
+    for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
+      String key = String(txxxFrameTranslation[i][0]).upper();
+      m[key] = txxxFrameTranslation[i][1];
+    }
+  }
   return m;
 }
 
@@ -435,6 +464,26 @@ ByteVector Frame::keyToFrameID(const String &s)
   return ByteVector::null;
 }
 
+String Frame::txxxToKey(const String &description)
+{
+  Map<String, String> &m = txxxMap();
+  String d = description.upper();
+  if(m.contains(d))
+    return m[d];
+  return d;
+}
+
+String Frame::keyToTXXX(const String &s)
+{
+  static Map<String, String> m;
+  if(m.isEmpty())
+    for(size_t i = 0; i < txxxFrameTranslationSize; ++i)
+      m[txxxFrameTranslation[i][1]] = txxxFrameTranslation[i][0];
+  if(m.contains(s.upper()))
+    return m[s];
+  return s;
+}
+
 PropertyMap Frame::asProperties() const
 {
   if(dynamic_cast< const UnknownFrame *>(this)) {
@@ -456,6 +505,8 @@ PropertyMap Frame::asProperties() const
     return dynamic_cast< const CommentsFrame* >(this)->asProperties();
   else if(id == "USLT")
     return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
+  else if(id == "UFID")
+    return dynamic_cast< const UniqueFileIdentifierFrame* >(this)->asProperties();
   PropertyMap m;
   m.unsupportedData().append(id);
   return m;

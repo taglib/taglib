@@ -624,7 +624,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"].front());
 
     CPPUNIT_ASSERT_EQUAL(1u, dict.unsupportedData().size());
-    CPPUNIT_ASSERT_EQUAL(String("UFID"), dict.unsupportedData().front());
+    CPPUNIT_ASSERT_EQUAL(String("UFID/supermihi@web.de"), dict.unsupportedData().front());
   }
 
   void testPropertyInterface2()
@@ -657,11 +657,23 @@ public:
     frame5->setText(tmclData);
     tag.addFrame(frame5);
 
+    ID3v2::UniqueFileIdentifierFrame *frame6 = new ID3v2::UniqueFileIdentifierFrame("http://musicbrainz.org", "152454b9-19ba-49f3-9fc9-8fc26545cf41");
+    tag.addFrame(frame6);
+
+    ID3v2::UniqueFileIdentifierFrame *frame7 = new ID3v2::UniqueFileIdentifierFrame("http://example.com", "123");
+    tag.addFrame(frame7);
+
+    ID3v2::UserTextIdentificationFrame *frame8 = new ID3v2::UserTextIdentificationFrame();
+    frame8->setDescription("MusicBrainz Album Id");
+    frame8->setText("95c454a5-d7e0-4d8f-9900-db04aca98ab3");
+    tag.addFrame(frame8);
+
     PropertyMap properties = tag.properties();
 
-    CPPUNIT_ASSERT_EQUAL(2u, properties.unsupportedData().size());
+    CPPUNIT_ASSERT_EQUAL(3u, properties.unsupportedData().size());
     CPPUNIT_ASSERT(properties.unsupportedData().contains("TIPL"));
     CPPUNIT_ASSERT(properties.unsupportedData().contains("APIC"));
+    CPPUNIT_ASSERT(properties.unsupportedData().contains("UFID/http://example.com"));
 
     CPPUNIT_ASSERT(properties.contains("PERFORMER:VIOLIN"));
     CPPUNIT_ASSERT(properties.contains("PERFORMER:PIANO"));
@@ -671,9 +683,17 @@ public:
     CPPUNIT_ASSERT(properties.contains("LYRICS"));
     CPPUNIT_ASSERT(properties.contains("LYRICS:TEST"));
 
+    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_RECORDINGID"));
+    CPPUNIT_ASSERT_EQUAL(String("152454b9-19ba-49f3-9fc9-8fc26545cf41"), properties["MUSICBRAINZ_RECORDINGID"].front());
+
+    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_RELEASEID"));
+    CPPUNIT_ASSERT_EQUAL(String("95c454a5-d7e0-4d8f-9900-db04aca98ab3"), properties["MUSICBRAINZ_RELEASEID"].front());
+
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
+    CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)0, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
+    CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
   }
 
   void testDeleteFrame()

@@ -40,6 +40,54 @@ namespace TagLib {
    * Note that most metadata formats pose additional conditions on the tag keys. The
    * most popular ones (Vorbis, APE, ID3v2) should support all ASCII only words of
    * length between 2 and 16.
+   * 
+   * This class can contain any tags, but here is a list of "well-known" tags that
+   * you might want to use:
+   *
+   * Basic tags:
+   *
+   *  - TITLE
+   *  - ALBUM
+   *  - ARTIST
+   *  - ALBUMARTIST
+   *  - SUBTITLE
+   *  - TRACKNUMBER
+   *  - DISCNUMBER
+   *  - DATE
+   *  - ORIGINALDATE
+   *  - GENRE
+   *  - COMMENT
+   *
+   * Credits:
+   *
+   *  - COMPOSER
+   *  - LYRICIST
+   *  - CONDUCTOR
+   *  - REMIXER
+   *  - PERFORMER:<XXXX>
+   *
+   * Other tags:
+   *
+   *  - ISRC
+   *  - ASIN
+   *  - BPM
+   *  - COPYRIGHT
+   *  - ENCODEDBY
+   *  - MOOD
+   *  - COMMENT 
+   *
+   * MusicBrainz identifiers:
+   * 
+   *  - MUSICBRAINZ_RECORDINGID
+   *  - MUSICBRAINZ_RELEASEID
+   *  - MUSICBRAINZ_RELEASEGROUPID
+   *  - MUSICBRAINZ_WORKID
+   *  - MUSICBRAINZ_ARTISTID
+   *  - MUSICBRAINZ_RELEASEARTISTID
+   *  - ACOUSTID_ID
+   *  - ACOUSTID_FINGERPRINT
+   *  - MUSICIP_PUID
+   *
    */
 
   class TAGLIB_EXPORT PropertyMap: public SimplePropertyMap
