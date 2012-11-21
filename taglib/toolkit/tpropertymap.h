@@ -58,6 +58,13 @@ namespace TagLib {
    *  - GENRE
    *  - COMMENT
    *
+   * Sort names:
+   *
+   *  - TITLESORT
+   *  - ALBUMSORT
+   *  - ARTISTSORT
+   *  - ALBUMARTISTSORT
+   *
    * Credits:
    *
    *  - COMPOSER
