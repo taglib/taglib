@@ -69,6 +69,7 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
+#include "mp4file.h"
 
 using namespace TagLib;
 
@@ -152,12 +153,11 @@ PropertyMap File::properties() const
     return dynamic_cast<const WavPack::File* >(this)->properties();
   if(dynamic_cast<const XM::File* >(this))
     return dynamic_cast<const XM::File* >(this)->properties();
+  if(dynamic_cast<const MP4::File* >(this))
+    return dynamic_cast<const MP4::File* >(this)->properties();
   // no specialized implementation available -> use generic one
   // - ASF: ugly format, largely undocumented, not worth implementing
   //   dict interface ...
-  // - MP4: taglib's MP4::Tag does not really support anything beyond
-  //   the basic implementation, therefor we use just the default Tag
-  //   interface
   return tag()->properties();
 }
 
@@ -193,6 +193,8 @@ void File::removeUnsupportedProperties(const StringList &properties)
     dynamic_cast<WavPack::File* >(this)->removeUnsupportedProperties(properties);
   else if(dynamic_cast<XM::File* >(this))
     dynamic_cast<XM::File* >(this)->removeUnsupportedProperties(properties);
+  else if(dynamic_cast<MP4::File* >(this))
+    dynamic_cast<MP4::File* >(this)->removeUnsupportedProperties(properties);
   else
     tag()->removeUnsupportedProperties(properties);
 }
@@ -231,6 +233,8 @@ PropertyMap File::setProperties(const PropertyMap &properties)
     return dynamic_cast<WavPack::File* >(this)->setProperties(properties);
   else if(dynamic_cast<XM::File* >(this))
     return dynamic_cast<XM::File* >(this)->setProperties(properties);
+  else if(dynamic_cast<MP4::File* >(this))
+    return dynamic_cast<MP4::File* >(this)->setProperties(properties);
   else
     return tag()->setProperties(properties);
 }

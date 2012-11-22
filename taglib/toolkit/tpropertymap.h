@@ -82,6 +82,9 @@ namespace TagLib {
    *  - ENCODEDBY
    *  - MOOD
    *  - COMMENT 
+   *  - MEDIA
+   *  - CATALOGNUMBER
+   *  - BARCODE
    *
    * MusicBrainz identifiers:
    * 

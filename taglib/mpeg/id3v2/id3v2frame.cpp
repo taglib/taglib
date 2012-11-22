@@ -355,7 +355,7 @@ static const char *frameTranslation[][2] = {
   { "TLAN", "LANGUAGE" },
   { "TLEN", "LENGTH" },
   //{ "TMCL", "MUSICIANCREDITS" }, handled separately
-  { "TMED", "MEDIATYPE" },
+  { "TMED", "MEDIA" },
   { "TMOO", "MOOD" },
   { "TOAL", "ORIGINALALBUM" },
   { "TOFN", "ORIGINALFILENAME" },
