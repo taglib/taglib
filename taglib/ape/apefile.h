@@ -132,6 +132,7 @@ namespace TagLib {
        * has no tag at all, APE will be created.
        */
       PropertyMap setProperties(const PropertyMap &);
+
       /*!
        * Returns the APE::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.

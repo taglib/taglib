@@ -91,6 +91,22 @@ namespace TagLib {
       virtual Tag *tag() const;
 
       /*!
+       * Implements the unified property interface -- export function.
+       */
+      PropertyMap properties() const;
+
+      /*!
+       * Removes unsupported properties. Forwards to the actual Tag's
+       * removeUnsupportedProperties() function.
+       */
+      void removeUnsupportedProperties(const StringList &properties);
+
+      /*!
+       * Implements the unified property interface -- import function.
+       */
+      PropertyMap setProperties(const PropertyMap &);
+
+      /*!
        * Returns the ASF audio properties for this file.
        */
       virtual Properties *audioProperties() const;
