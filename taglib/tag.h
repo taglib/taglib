@@ -103,6 +103,12 @@ namespace TagLib {
     virtual String comment() const = 0;
 
     /*!
+     * Returns the composer; if no composer is present in the tag String::null
+     * will be returned.
+     */
+    virtual String composer() const = 0;
+
+    /*!
      * Returns the genre name; if no genre is present in the tag String::null
      * will be returned.
      */
@@ -142,6 +148,12 @@ namespace TagLib {
      * cleared.
      */
     virtual void setComment(const String &s) = 0;
+
+    /*!
+     * Set the composer to \a s. If \a s is String::null then this this value will
+     * be cleared.
+     */
+    virtual void setComposer(const String &s) = 0;
 
     /*!
      * Sets the genre to \a s.  If \a s is String::null then this value will be

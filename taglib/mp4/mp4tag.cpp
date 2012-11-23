@@ -689,6 +689,14 @@ MP4::Tag::comment() const
 }
 
 String
+MP4::Tag::composer() const
+{
+  if(d->items.contains("\251wrt"))
+    return d->items["\251wrt"].toStringList().toString(", ");
+  return String::null;
+}
+
+String
 MP4::Tag::genre() const
 {
   if(d->items.contains("\251gen"))
@@ -734,6 +742,12 @@ void
 MP4::Tag::setComment(const String &value)
 {
   d->items["\251cmt"] = StringList(value);
+}
+
+void
+MP4::Tag::setComposer(const String &value)
+{
+  d->items["\251wrt"] = StringList(value);
 }
 
 void

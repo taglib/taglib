@@ -122,6 +122,11 @@ String TagUnion::comment() const
   stringUnion(comment);
 }
 
+String TagUnion::composer() const
+{
+  stringUnion(composer);
+}
+
 String TagUnion::genre() const
 {
   stringUnion(genre);
@@ -155,6 +160,11 @@ void TagUnion::setAlbum(const String &s)
 void TagUnion::setComment(const String &s)
 {
   setUnion(Comment, s);
+}
+
+void TagUnion::setComposer(const String &s)
+{
+  setUnion(Composer, s);
 }
 
 void TagUnion::setGenre(const String &s)

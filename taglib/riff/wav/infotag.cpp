@@ -121,6 +121,11 @@ String RIFF::Info::Tag::comment() const
   return fieldText("ICMT");
 }
 
+String RIFF::Info::Tag::composer() const
+{
+  return fieldText("IWRI");
+}
+
 String RIFF::Info::Tag::genre() const
 {
   return fieldText("IGNR");
@@ -154,6 +159,11 @@ void RIFF::Info::Tag::setAlbum(const String &s)
 void RIFF::Info::Tag::setComment(const String &s)
 {
   setFieldText("ICMT", s);
+}
+
+void RIFF::Info::Tag::setComposer(const String &s)
+{
+  setFieldText("IWRI", s);
 }
 
 void RIFF::Info::Tag::setGenre(const String &s)

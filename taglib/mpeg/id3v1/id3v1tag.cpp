@@ -45,6 +45,7 @@ public:
   String album;
   String year;
   String comment;
+  String composer;
   uchar track;
   uchar genre;
 
@@ -142,6 +143,11 @@ String ID3v1::Tag::comment() const
   return d->comment;
 }
 
+String ID3v1::Tag::composer() const
+{
+  return d->composer;
+}
+
 String ID3v1::Tag::genre() const
 {
   return ID3v1::genre(d->genre);
@@ -175,6 +181,11 @@ void ID3v1::Tag::setAlbum(const String &s)
 void ID3v1::Tag::setComment(const String &s)
 {
   d->comment = s;
+}
+
+void ID3v1::Tag::setComposer(const String &s)
+{
+  d->composer = s;
 }
 
 void ID3v1::Tag::setGenre(const String &s)
