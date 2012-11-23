@@ -155,9 +155,8 @@ PropertyMap File::properties() const
     return dynamic_cast<const XM::File* >(this)->properties();
   if(dynamic_cast<const MP4::File* >(this))
     return dynamic_cast<const MP4::File* >(this)->properties();
-  // no specialized implementation available -> use generic one
-  // - ASF: ugly format, largely undocumented, not worth implementing
-  //   dict interface ...
+  if(dynamic_cast<const ASF::File* >(this))
+    return dynamic_cast<const ASF::File* >(this)->properties();
   return tag()->properties();
 }
 
@@ -195,6 +194,8 @@ void File::removeUnsupportedProperties(const StringList &properties)
     dynamic_cast<XM::File* >(this)->removeUnsupportedProperties(properties);
   else if(dynamic_cast<MP4::File* >(this))
     dynamic_cast<MP4::File* >(this)->removeUnsupportedProperties(properties);
+  else if(dynamic_cast<ASF::File* >(this))
+    dynamic_cast<ASF::File* >(this)->removeUnsupportedProperties(properties);
   else
     tag()->removeUnsupportedProperties(properties);
 }
@@ -235,6 +236,8 @@ PropertyMap File::setProperties(const PropertyMap &properties)
     return dynamic_cast<XM::File* >(this)->setProperties(properties);
   else if(dynamic_cast<MP4::File* >(this))
     return dynamic_cast<MP4::File* >(this)->setProperties(properties);
+  else if(dynamic_cast<ASF::File* >(this))
+    return dynamic_cast<ASF::File* >(this)->setProperties(properties);
   else
     return tag()->setProperties(properties);
 }

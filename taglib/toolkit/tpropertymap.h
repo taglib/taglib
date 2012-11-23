@@ -83,6 +83,7 @@ namespace TagLib {
    *  - MOOD
    *  - COMMENT 
    *  - MEDIA
+   *  - LABEL
    *  - CATALOGNUMBER
    *  - BARCODE
    *

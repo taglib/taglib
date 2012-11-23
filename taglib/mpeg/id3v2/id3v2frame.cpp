@@ -368,7 +368,7 @@ static const char *frameTranslation[][2] = {
   { "TPE4", "REMIXER" }, // could also be ARRANGER
   { "TPOS", "DISCNUMBER" },
   { "TPRO", "PRODUCEDNOTICE" },
-  { "TPUB", "PUBLISHER" },
+  { "TPUB", "LABEL" },
   { "TRCK", "TRACKNUMBER" },
   { "TRSN", "RADIOSTATION" },
   { "TRSO", "RADIOSTATIONOWNER" },
