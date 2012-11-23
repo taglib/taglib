@@ -139,6 +139,7 @@ namespace TagLib {
       virtual String artist() const;
       virtual String album() const;
       virtual String comment() const;
+      virtual String composer() const;
       virtual String genre() const;
       virtual TagLib::uint year() const;
       virtual TagLib::uint track() const;
@@ -147,6 +148,7 @@ namespace TagLib {
       virtual void setArtist(const String &s);
       virtual void setAlbum(const String &s);
       virtual void setComment(const String &s);
+      virtual void setComposer(const String &s);
       virtual void setGenre(const String &s);
       virtual void setYear(TagLib::uint i);
       virtual void setTrack(TagLib::uint i);

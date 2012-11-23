@@ -72,6 +72,11 @@ namespace TagLib {
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
+      String composer() const;
+
+      /*!
+       * Not supported by module files.  Therefore always returns String::null.
+       */
       String genre() const;
 
       /*!
@@ -131,6 +136,11 @@ namespace TagLib {
        * characters.
        */
       void setComment(const String &comment);
+
+      /*!
+       * Not supported by module files and therefore ignored.
+       */
+      void setComposer(const String &genre);
 
       /*!
        * Not supported by module files and therefore ignored.

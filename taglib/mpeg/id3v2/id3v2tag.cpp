@@ -161,6 +161,13 @@ String ID3v2::Tag::comment() const
   return comments.front()->toString();
 }
 
+String ID3v2::Tag::composer() const
+{
+  if(!d->frameListMap["TCOM"].isEmpty())
+    return d->frameListMap["TCOM"].front()->toString();
+  return String::null;
+}
+
 String ID3v2::Tag::genre() const
 {
   // TODO: In the next major version (TagLib 2.0) a list of multiple genres
@@ -247,6 +254,11 @@ void ID3v2::Tag::setComment(const String &s)
     addFrame(f);
     f->setText(s);
   }
+}
+
+void ID3v2::Tag::setComposer(const String &s)
+{
+  setTextFrame("TCOM", s);
 }
 
 void ID3v2::Tag::setGenre(const String &s)

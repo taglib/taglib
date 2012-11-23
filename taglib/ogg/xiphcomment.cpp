@@ -95,6 +95,11 @@ String Ogg::XiphComment::comment() const
   return String::null;
 }
 
+String Ogg::XiphComment::composer() const
+{
+  return String::null;
+}
+
 String Ogg::XiphComment::genre() const
 {
   if(d->fieldListMap["GENRE"].isEmpty())
@@ -138,6 +143,10 @@ void Ogg::XiphComment::setAlbum(const String &s)
 void Ogg::XiphComment::setComment(const String &s)
 {
   addField(d->commentField.isEmpty() ? "DESCRIPTION" : d->commentField, s);
+}
+
+void Ogg::XiphComment::setComposer(const String &s)
+{
 }
 
 void Ogg::XiphComment::setGenre(const String &s)

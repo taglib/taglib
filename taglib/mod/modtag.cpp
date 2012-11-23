@@ -68,6 +68,11 @@ String Mod::Tag::comment() const
   return d->comment;
 }
 
+String Mod::Tag::composer() const
+{
+  return String::null;
+}
+
 String Mod::Tag::genre() const
 {
   return String::null;
@@ -104,6 +109,10 @@ void Mod::Tag::setAlbum(const String &)
 void Mod::Tag::setComment(const String &comment)
 {
   d->comment = comment;
+}
+
+void Mod::Tag::setComposer(const String &)
+{
 }
 
 void Mod::Tag::setGenre(const String &)

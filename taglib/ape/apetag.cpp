@@ -113,6 +113,13 @@ String APE::Tag::comment() const
   return d->itemListMap["COMMENT"].toString();
 }
 
+String APE::Tag::composer() const
+{
+  if(d->itemListMap["COMPOSER"].isEmpty())
+    return String::null;
+  return d->itemListMap["COMPOSER"].toString();
+}
+
 String APE::Tag::genre() const
 {
   if(d->itemListMap["GENRE"].isEmpty())
@@ -152,6 +159,11 @@ void APE::Tag::setAlbum(const String &s)
 void APE::Tag::setComment(const String &s)
 {
   addValue("COMMENT", s, true);
+}
+
+void APE::Tag::setComposer(const String &s)
+{
+  addValue("COMPOSER", s, true);
 }
 
 void APE::Tag::setGenre(const String &s)
