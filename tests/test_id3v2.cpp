@@ -75,6 +75,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
+  CPPUNIT_TEST(testBothID3Versions);
   CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST_SUITE_END();
@@ -694,6 +695,22 @@ public:
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
     CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)0, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
     CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
+  }
+
+void testBothID3Versions()
+  {
+    ScopedFileCopy copy("id3v1_neq_v2", ".mp3");
+    string newname = copy.fileName();
+    MPEG::File f(newname.c_str());
+    PropertyMap dict = f.properties();
+    CPPUNIT_ASSERT(!dict.contains("ALBUM"));
+    CPPUNIT_ASSERT(dict.contains("ARTIST"));
+
+    f.save();
+    MPEG::File f2(newname.c_str());
+    PropertyMap dict2 = f.properties();
+    CPPUNIT_ASSERT(!dict2.contains("ALBUM"));
+    CPPUNIT_ASSERT(dict2.contains("ARTIST"));
   }
 
   void testDeleteFrame()
