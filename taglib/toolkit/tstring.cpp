@@ -233,8 +233,9 @@ std::string String::to8Bit(bool unicode) const
                                 &target, targetBuffer + outputBufferSize,
                                 Unicode::lenientConversion);
 
-  if(result != Unicode::conversionOK)
+  if(result != Unicode::conversionOK) {
     debug("String::to8Bit() - Unicode conversion error.");
+  }
 
   int newSize = target - targetBuffer;
   s.resize(newSize);
@@ -259,7 +260,16 @@ const char *String::toCString(bool unicode) const
 
   std::string buffer = to8Bit(unicode);
   d->CString = new char[buffer.size() + 1];
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+
+  strcpy_s(d->CString, buffer.size() + 1, buffer.c_str());
+
+#else
+
   strcpy(d->CString, buffer.c_str());
+
+#endif                                          
 
   return d->CString;
 }
@@ -335,9 +345,6 @@ bool String::startsWith(const String &s) const
 
 String String::substr(uint position, uint n) const
 {
-  if(n > position + d->data.size())
-    n = d->data.size() - position;
-
   String s;
   s.d->data = d->data.substr(position, n);
   return s;
@@ -779,9 +786,9 @@ void String::prepare(Type t)
                                   &target, targetBuffer + bufferSize,
                                   Unicode::lenientConversion);
 
-    if(result != Unicode::conversionOK)
+    if(result != Unicode::conversionOK) {
       debug("String::prepare() - Unicode conversion error.");
-
+    }
 
     int newSize = target != targetBuffer ? target - targetBuffer - 1 : 0;
     d->data.resize(newSize);

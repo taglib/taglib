@@ -1,11 +1,12 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <mp4tag.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <mp4atom.h>
 #include <mp4file.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -25,6 +26,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCovrRead);
   CPPUNIT_TEST(testCovrWrite);
   CPPUNIT_TEST(testCovrRead2);
+  CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -222,6 +224,55 @@ public:
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
     delete f;
+  }
+
+  void testProperties()
+  {
+    MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+    
+    PropertyMap tags = f.properties();
+
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Artist"), tags["ARTIST"]);
+
+    tags["TRACKNUMBER"] = StringList("2/4");
+    tags["DISCNUMBER"] = StringList("3/5");
+    tags["BPM"] = StringList("123");
+    tags["ARTIST"] = StringList("Foo Bar");
+    tags["COMPILATION"] = StringList("1");
+    f.setProperties(tags);
+
+    tags = f.properties();
+
+    CPPUNIT_ASSERT(f.tag()->itemListMap().contains("trkn"));
+    CPPUNIT_ASSERT_EQUAL(2, f.tag()->itemListMap()["trkn"].toIntPair().first);
+    CPPUNIT_ASSERT_EQUAL(4, f.tag()->itemListMap()["trkn"].toIntPair().second);
+    CPPUNIT_ASSERT_EQUAL(StringList("2/4"), tags["TRACKNUMBER"]);
+
+    CPPUNIT_ASSERT(f.tag()->itemListMap().contains("disk"));
+    CPPUNIT_ASSERT_EQUAL(3, f.tag()->itemListMap()["disk"].toIntPair().first);
+    CPPUNIT_ASSERT_EQUAL(5, f.tag()->itemListMap()["disk"].toIntPair().second);
+    CPPUNIT_ASSERT_EQUAL(StringList("3/5"), tags["DISCNUMBER"]);
+
+    CPPUNIT_ASSERT(f.tag()->itemListMap().contains("tmpo"));
+    CPPUNIT_ASSERT_EQUAL(123, f.tag()->itemListMap()["tmpo"].toInt());
+    CPPUNIT_ASSERT_EQUAL(StringList("123"), tags["BPM"]);
+
+    CPPUNIT_ASSERT(f.tag()->itemListMap().contains("\251ART"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), f.tag()->itemListMap()["\251ART"].toStringList());
+    CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), tags["ARTIST"]);
+
+    CPPUNIT_ASSERT(f.tag()->itemListMap().contains("cpil"));
+    CPPUNIT_ASSERT_EQUAL(true, f.tag()->itemListMap()["cpil"].toBool());
+    CPPUNIT_ASSERT_EQUAL(StringList("1"), tags["COMPILATION"]);
+
+    tags["COMPILATION"] = StringList("0");
+    f.setProperties(tags);
+
+    tags = f.properties();
+
+    CPPUNIT_ASSERT(f.tag()->itemListMap().contains("cpil"));
+    CPPUNIT_ASSERT_EQUAL(false, f.tag()->itemListMap()["cpil"].toBool());
+    CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["COMPILATION"]);
   }
 
 };

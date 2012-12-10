@@ -48,6 +48,9 @@ namespace TagLib {
          * Contructs a Impulse Tracker file from \a stream. If \a readProperties
          * is true the file's audio properties will also be read using
          * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+         *
+         * \note TagLib will *not* take ownership of the stream, the caller is
+         * responsible for deleting it after the File object.
          */
         File(IOStream *stram, bool readProperties = true,
              AudioProperties::ReadStyle propertiesStyle =

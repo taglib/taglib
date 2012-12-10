@@ -1,4 +1,3 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 // so evil :(
@@ -15,8 +14,10 @@
 #include <relativevolumeframe.h>
 #include <popularimeterframe.h>
 #include <urllinkframe.h>
+#include <ownershipframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -61,6 +62,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderUrlLinkFrame);
   CPPUNIT_TEST(testParseUserUrlLinkFrame);
   CPPUNIT_TEST(testRenderUserUrlLinkFrame);
+  CPPUNIT_TEST(testParseOwnershipFrame);
+  CPPUNIT_TEST(testRenderOwnershipFrame);
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
@@ -69,6 +72,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
   CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
+  CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST(testDeleteFrame);
@@ -385,6 +389,38 @@ public:
                  "http://example.com", 33),  // URL
       f.render());
   }
+  
+  void testParseOwnershipFrame()
+  {
+    ID3v2::OwnershipFrame f(
+                            ByteVector("OWNE"                      // Frame ID
+                                       "\x00\x00\x00\x19"          // Frame size
+                                       "\x00\x00"                  // Frame flags
+                                       "\x00"                      // Text encoding
+                                       "GBP1.99\x00"               // Price paid
+                                       "20120905"                  // Date of purchase
+                                       "Beatport", 35));           // Seller
+    CPPUNIT_ASSERT_EQUAL(String("GBP1.99"), f.pricePaid());
+    CPPUNIT_ASSERT_EQUAL(String("20120905"), f.datePurchased());
+    CPPUNIT_ASSERT_EQUAL(String("Beatport"), f.seller());
+  }
+
+  void testRenderOwnershipFrame()
+  {
+    ID3v2::OwnershipFrame f;
+    f.setPricePaid("GBP1.99");
+    f.setDatePurchased("20120905");
+    f.setSeller("Beatport");
+    CPPUNIT_ASSERT_EQUAL(
+                         ByteVector("OWNE"                      // Frame ID
+                                    "\x00\x00\x00\x19"          // Frame size
+                                    "\x00\x00"                  // Frame flags
+                                    "\x00"                      // Text encoding
+                                    "GBP1.99\x00"               // Price paid
+                                    "20120905"                  // Date of purchase
+                                    "Beatport", 35),  // URL
+                         f.render());
+  }
 
   void testItunes24FrameSize()
   {
@@ -552,6 +588,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(86414), frame->picture().size());
   }
+  
+  void testW000()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
+    CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("W000"));
+    ID3v2::UrlLinkFrame *frame =
+    dynamic_cast<TagLib::ID3v2::UrlLinkFrame*>(f.ID3v2Tag()->frameListMap()["W000"].front());
+    CPPUNIT_ASSERT(frame);
+    CPPUNIT_ASSERT_EQUAL(String("lukas.lalinsky@example.com____"), frame->url());
+  }
 
   void testPropertyInterface()
   {
@@ -578,7 +624,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("A COMMENT"), dict["COMMENT"].front());
 
     CPPUNIT_ASSERT_EQUAL(1u, dict.unsupportedData().size());
-    CPPUNIT_ASSERT_EQUAL(String("UFID"), dict.unsupportedData().front());
+    CPPUNIT_ASSERT_EQUAL(String("UFID/supermihi@web.de"), dict.unsupportedData().front());
   }
 
   void testPropertyInterface2()
@@ -611,11 +657,23 @@ public:
     frame5->setText(tmclData);
     tag.addFrame(frame5);
 
+    ID3v2::UniqueFileIdentifierFrame *frame6 = new ID3v2::UniqueFileIdentifierFrame("http://musicbrainz.org", "152454b9-19ba-49f3-9fc9-8fc26545cf41");
+    tag.addFrame(frame6);
+
+    ID3v2::UniqueFileIdentifierFrame *frame7 = new ID3v2::UniqueFileIdentifierFrame("http://example.com", "123");
+    tag.addFrame(frame7);
+
+    ID3v2::UserTextIdentificationFrame *frame8 = new ID3v2::UserTextIdentificationFrame();
+    frame8->setDescription("MusicBrainz Album Id");
+    frame8->setText("95c454a5-d7e0-4d8f-9900-db04aca98ab3");
+    tag.addFrame(frame8);
+
     PropertyMap properties = tag.properties();
 
-    CPPUNIT_ASSERT_EQUAL(2u, properties.unsupportedData().size());
+    CPPUNIT_ASSERT_EQUAL(3u, properties.unsupportedData().size());
     CPPUNIT_ASSERT(properties.unsupportedData().contains("TIPL"));
     CPPUNIT_ASSERT(properties.unsupportedData().contains("APIC"));
+    CPPUNIT_ASSERT(properties.unsupportedData().contains("UFID/http://example.com"));
 
     CPPUNIT_ASSERT(properties.contains("PERFORMER:VIOLIN"));
     CPPUNIT_ASSERT(properties.contains("PERFORMER:PIANO"));
@@ -625,9 +683,17 @@ public:
     CPPUNIT_ASSERT(properties.contains("LYRICS"));
     CPPUNIT_ASSERT(properties.contains("LYRICS:TEST"));
 
+    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_TRACKID"));
+    CPPUNIT_ASSERT_EQUAL(String("152454b9-19ba-49f3-9fc9-8fc26545cf41"), properties["MUSICBRAINZ_TRACKID"].front());
+
+    CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_ALBUMID"));
+    CPPUNIT_ASSERT_EQUAL(String("95c454a5-d7e0-4d8f-9900-db04aca98ab3"), properties["MUSICBRAINZ_ALBUMID"].front());
+
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
+    CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)0, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
+    CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
   }
 
   void testDeleteFrame()
@@ -640,29 +706,30 @@ public:
     CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
     t->removeFrame(frame, true);
     f.save(MPEG::File::ID3v2);
-
+    
     MPEG::File f2(newname.c_str());
     t = f2.ID3v2Tag();
     CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
   }
+  
   void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
   {
     ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
-
+    
     {
       MPEG::File foo(newname.c_str());
       foo.tag()->setArtist("Artist");
       foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
     }
-
+    
     {
       MPEG::File bar(newname.c_str());
       bar.ID3v2Tag()->removeFrames("TPE1");
       // Should strip ID3v1 here and not add old values to ID3v2 again
       bar.save(MPEG::File::ID3v2, true);
     }
-
+    
     MPEG::File f(newname.c_str());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }

@@ -1,8 +1,9 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
+#include <tstring.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -32,9 +33,12 @@ public:
 
     String xxx = ByteVector(254, 'X');
     MPEG::File f(newname.c_str());
+    CPPUNIT_ASSERT_EQUAL(false, f.hasID3v2Tag());
+
     f.tag()->setTitle(xxx);
     f.tag()->setArtist("Artist A");
     f.save(MPEG::File::AllTags, true, 4);
+    CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
 
     MPEG::File f2(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4), f2.ID3v2Tag()->header()->majorVersion());
@@ -66,9 +70,12 @@ public:
 
     String xxx = ByteVector(254, 'X');
     MPEG::File f(newname.c_str());
+    CPPUNIT_ASSERT_EQUAL(false, f.hasID3v2Tag());
+
     f.tag()->setTitle(xxx);
     f.tag()->setArtist("Artist A");
     f.save(MPEG::File::AllTags, true, 3);
+    CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
 
     MPEG::File f2(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), f2.ID3v2Tag()->header()->majorVersion());

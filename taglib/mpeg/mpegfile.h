@@ -99,6 +99,9 @@ namespace TagLib {
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.  The frames will be created using
        * \a frameFactory.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
        */
       // BIC: merge with the above constructor
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
@@ -297,6 +300,21 @@ namespace TagLib {
        * Returns the position in the file of the last MPEG frame.
        */
       long lastFrameOffset();
+
+      /*!
+       * Returns whether or not the file on disk contains ID3v1 tag.
+       */
+      bool hasID3v1Tag() const;
+
+      /*!
+       * Returns whether or not the file on disk contains ID3v2 tag.
+       */
+      bool hasID3v2Tag() const;
+
+      /*!
+       * Returns whether or not the file on disk contains APE tag.
+       */
+      bool hasAPETag() const;
 
     private:
       File(const File &);

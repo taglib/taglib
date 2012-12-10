@@ -70,7 +70,8 @@ public:
 
   ~FilePrivate()
   {
-    for(uint i = 0; i < blocks.size(); i++) {
+    uint size = blocks.size();
+    for(uint i = 0; i < size; i++) {
       delete blocks[i];
     }
     delete properties;
@@ -108,7 +109,8 @@ FLAC::File::File(FileName file, bool readProperties,
   TagLib::File(file)
 {
   d = new FilePrivate;
-  read(readProperties, propertiesStyle);
+  if(isOpen())
+    read(readProperties, propertiesStyle);
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -117,7 +119,8 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 {
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
-  read(readProperties, propertiesStyle);
+  if(isOpen())
+    read(readProperties, propertiesStyle);
 }
 
 FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
@@ -126,7 +129,8 @@ FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
 {
   d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
-  read(readProperties, propertiesStyle);
+  if(isOpen())
+    read(readProperties, propertiesStyle);
 }
 
 FLAC::File::~File()
@@ -243,7 +247,7 @@ bool FLAC::File::save()
   }
   ByteVector padding = ByteVector::fromUInt(paddingLength);
   padding.resize(paddingLength + 4);
-  padding[0] = FLAC::MetadataBlock::Padding | LastBlockFlag;
+  padding[0] = (char)(FLAC::MetadataBlock::Padding | LastBlockFlag);
   data.append(padding);
 
   // Write the data to the file
@@ -425,7 +429,7 @@ void FLAC::File::scan()
     length = header.mid(1, 3).toUInt();
 
     ByteVector data = readBlock(length);
-    if(data.size() != length) {
+    if(data.size() != length || length == 0) {
       debug("FLAC::File::scan() -- FLAC stream corrupted");
       setValid(false);
       return;

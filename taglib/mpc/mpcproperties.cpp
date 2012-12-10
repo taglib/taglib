@@ -214,7 +214,7 @@ void MPC::Properties::readSV8(File *file)
       d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
 
       if((d->sampleFrames - begSilence) != 0)
-        d->bitrate = d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence);
+        d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
       d->bitrate = d->bitrate / 1000;
 
       d->length = (d->sampleFrames - begSilence) / d->sampleRate;
@@ -279,10 +279,10 @@ void MPC::Properties::readSV7(const ByteVector &data)
     }
 
     if (d->trackPeak != 0)
-      d->trackPeak = (int)(log10(d->trackPeak) * 20 * 256 + .5);
+      d->trackPeak = (int)(log10((double)d->trackPeak) * 20 * 256 + .5);
 
     if (d->albumPeak != 0)
-      d->albumPeak = (int)(log10(d->albumPeak) * 20 * 256 + .5);
+      d->albumPeak = (int)(log10((double)d->albumPeak) * 20 * 256 + .5);
 
     bool trueGapless = (gapless >> 31) & 0x0001;
     if(trueGapless) {

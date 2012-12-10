@@ -1,10 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <fileref.h>
 #include <oggflacfile.h>
 #include <vorbisfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testMP4_3);
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
+  CPPUNIT_TEST(testWav);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -127,6 +128,11 @@ public:
     fileRefSave("no-tags", ".3g2");
   }
 
+  void testWav()
+  {
+    fileRefSave("empty", ".wav");
+  }
+
   void testOGA_FLAC()
   {
       FileRef *f = new FileRef(TEST_FILE_PATH_C("empty_flac.oga"));
@@ -143,7 +149,7 @@ public:
 
   void testAPE()
   {
-    fileRefSave("mac-399.ape", ".ape");
+    fileRefSave("mac-399", ".ape");
   }
 };
 

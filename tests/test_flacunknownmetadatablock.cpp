@@ -1,10 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <flacunknownmetadatablock.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
