@@ -24,6 +24,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
+  CPPUNIT_TEST(testInvalid);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -229,6 +230,17 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), dict["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("artøst 1"), dict["ARTIST"][0]);
     CPPUNIT_ASSERT_EQUAL(String("artöst 2"), dict["ARTIST"][1]);
+  }
+
+  void testInvalid()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    PropertyMap map;
+    map["HÄÖ"] = String("bla");
+    FLAC::File f(copy.fileName().c_str());
+    PropertyMap invalid = f.setProperties(map);
+    CPPUNIT_ASSERT_EQUAL(uint(1), invalid.size());
+    CPPUNIT_ASSERT_EQUAL(uint(0), f.properties().size());
   }
 
 };
