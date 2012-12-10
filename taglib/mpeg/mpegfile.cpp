@@ -156,16 +156,17 @@ void MPEG::File::removeUnsupportedProperties(const StringList &properties)
   else if(d->hasID3v1)
     d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(properties);
 }
+
 PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->setProperties(properties);
-  else if(d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
-  else if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
-  else
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
+  PropertyMap result;
+  if(d->hasID3v1)
+      result = d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
+  if(d->hasAPE)
+      result = d->tag.access<APE::Tag>(APEIndex, false)->setProperties(properties);
+  if(d->hasID3v2 || !(d->hasID3v1 || d->hasAPE))
+    result = d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
+  return result;
 }
 
 MPEG::Properties *MPEG::File::audioProperties() const
