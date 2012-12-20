@@ -133,7 +133,7 @@ namespace TagLib {
       virtual Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
+       * Implements the reading part of the unified property interface.
        * If the file contains more than one tag, only the
        * first one (in the order ID3v2, APE, ID3v1) will be converted to the
        * PropertyMap.
@@ -143,9 +143,14 @@ namespace TagLib {
       void removeUnsupportedProperties(const StringList &properties);
 
       /*!
-       * Implements the unified tag dictionary interface -- import function.
-       * As with the export, only one tag is taken into account. If the file
-       * has no tag at all, ID3v2 will be created.
+       * Implements the writing part of the unified tag dictionary interface.
+       * In order to avoid problems with deprecated tag formats, this method
+       * always creates an ID3v2 tag if necessary, and removes potential APEv2
+       * tags (also invalidating all pointers to the APE tag) which are
+       * considered bad practice in MP3 files.
+       * If an ID3v1 tag  exists, it will be updated as well, within the
+       * limitations of that format.
+       * The returned PropertyMap refers to the ID3v2 tag only.
        */
       PropertyMap setProperties(const PropertyMap &);
 

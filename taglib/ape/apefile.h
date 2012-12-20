@@ -128,8 +128,9 @@ namespace TagLib {
 
       /*!
        * Implements the unified property interface -- import function.
-       * As for the export, only one tag is taken into account. If the file
-       * has no tag at all, APE will be created.
+       * Creates an APEv2 tag if necessary. A pontentially existing ID3v1
+       * tag is considered deprecated and will be removed, invalidating all
+       * pointers to that tag.
        */
       PropertyMap setProperties(const PropertyMap &);
 

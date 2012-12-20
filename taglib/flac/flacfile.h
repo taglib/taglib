@@ -133,8 +133,9 @@ namespace TagLib {
 
       /*!
        * Implements the unified property interface -- import function.
-       * As with the export, only one tag is taken into account. If the file
-       * has no tag at all, a XiphComment will be created.
+       * This always creates a Xiph comment, if none exists. The return value
+       * relates to the Xiph comment only.
+       * Potential ID3v1 and ID3v2 tags will also be updated.
        */
       PropertyMap setProperties(const PropertyMap &);
 

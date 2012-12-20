@@ -131,12 +131,9 @@ void APE::File::removeUnsupportedProperties(const StringList &properties)
 
 PropertyMap APE::File::setProperties(const PropertyMap &properties)
 {
-  PropertyMap result;
   if(d->hasID3v1)
-    result = d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->setProperties(properties);
-  if(d->hasAPE || !d->hasID3v1)
-    result = d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
-  return result;
+    strip(ID3v1);
+  return d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
 }
 
 APE::Properties *APE::File::audioProperties() const

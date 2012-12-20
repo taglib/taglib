@@ -80,8 +80,8 @@ namespace TagLib {
 
     /*!
      * Exports the tags of the file as dictionary mapping (human readable) tag
-     * names (Strings) to StringLists of tag values. Calls the according specialization
-     * in the File subclasses.
+     * names (uppercase Strings) to StringLists of tag values. Calls the according
+     * specialization in the File subclasses.
      * For each metadata object of the file that could not be parsed into the PropertyMap
      * format, the returend map's unsupportedData() list will contain one entry identifying
      * that object (e.g. the frame type for ID3v2 tags). Use removeUnsupportedProperties()
@@ -105,6 +105,10 @@ namespace TagLib {
      * If some value(s) could not be written imported to the specific metadata format,
      * the returned PropertyMap will contain those value(s). Otherwise it will be empty,
      * indicating that no problems occured.
+     * With file types that support several tag formats (for instance, MP3 files can have
+     * ID3v1, ID3v2, and APEv2 tags), this function will create the most appropriate one
+     * and may remove deprecated ones (mostly ID3v1). See the documentation of the 
+     * subclass implementations for detailed descriptions.
      * BIC: will become pure virtual in the future
      */
     PropertyMap setProperties(const PropertyMap &properties);

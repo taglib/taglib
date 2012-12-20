@@ -119,12 +119,9 @@ PropertyMap WavPack::File::properties() const
 
 PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 {
-  PropertyMap result;
   if(d->hasID3v1)
-    result = d->tag.access<ID3v1::Tag>(WavID3v1Index, false)->setProperties(properties);
-  if(d->hasAPE || !d->hasID3v1)
-    result = d->tag.access<APE::Tag>(WavAPEIndex, true)->setProperties(properties);
-  return result;
+    strip(ID3v1);
+  return d->tag.access<APE::Tag>(WavAPEIndex, true)->setProperties(properties);
 }
 
 WavPack::Properties *WavPack::File::audioProperties() const
