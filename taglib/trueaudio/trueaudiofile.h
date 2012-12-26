@@ -139,8 +139,8 @@ namespace TagLib {
 
       /*!
        * Implements the unified property interface -- import function.
-       * As with the export, only one tag is taken into account. If the file
-       * has no tag at all, ID3v2 will be created.
+       * Creates in ID3v2 tag if necessary. If an ID3v1 tag exists, it will
+       * be updated as well, within the limitations of ID3v1.
        */
       PropertyMap setProperties(const PropertyMap &);
 

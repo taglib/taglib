@@ -141,12 +141,9 @@ PropertyMap TrueAudio::File::properties() const
 
 PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->setProperties(properties);
-  else if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->setProperties(properties);
-  else
-    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, true)->setProperties(properties);
+  if(d->hasID3v1)
+    d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->setProperties(properties);
+  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, true)->setProperties(properties);
 }
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const

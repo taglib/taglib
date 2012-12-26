@@ -133,8 +133,10 @@ namespace TagLib {
 
       /*!
        * Implements the unified property interface -- import function.
-       * As with the export, only one tag is taken into account. If the file
-       * has no tag at all, a XiphComment will be created.
+       * This always creates a Xiph comment, if none exists. The return value
+       * relates to the Xiph comment only.
+       * Ignores any changes to ID3v1 or ID3v2 comments since they are not allowed
+       * in the FLAC specification.
        */
       PropertyMap setProperties(const PropertyMap &);
 
