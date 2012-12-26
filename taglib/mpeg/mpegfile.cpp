@@ -159,8 +159,6 @@ void MPEG::File::removeUnsupportedProperties(const StringList &properties)
 
 PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasAPE)
-    strip(APE, true);
   if(d->hasID3v1)
     // update ID3v1 tag if it exists, but ignore the return value
     d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);

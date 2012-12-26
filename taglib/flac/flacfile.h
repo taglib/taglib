@@ -135,7 +135,8 @@ namespace TagLib {
        * Implements the unified property interface -- import function.
        * This always creates a Xiph comment, if none exists. The return value
        * relates to the Xiph comment only.
-       * Potential ID3v1 and ID3v2 tags will also be updated.
+       * Ignores any changes to ID3v1 or ID3v2 comments since they are not allowed
+       * in the FLAC specification.
        */
       PropertyMap setProperties(const PropertyMap &);
 

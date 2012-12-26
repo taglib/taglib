@@ -129,8 +129,7 @@ namespace TagLib {
       /*!
        * Implements the unified property interface -- import function.
        * Creates an APEv2 tag if necessary. A pontentially existing ID3v1
-       * tag is considered deprecated and will be removed, invalidating all
-       * pointers to that tag.
+       * tag will be updated as well.
        */
       PropertyMap setProperties(const PropertyMap &);
 

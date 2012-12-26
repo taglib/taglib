@@ -132,7 +132,7 @@ void APE::File::removeUnsupportedProperties(const StringList &properties)
 PropertyMap APE::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
-    strip(ID3v1);
+    d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->setProperties(properties);
   return d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
 }
 

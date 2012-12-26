@@ -168,10 +168,6 @@ void FLAC::File::removeUnsupportedProperties(const StringList &unsupported)
 
 PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-      d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->setProperties(properties);
-  if(d->hasID3v2)
-      d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->setProperties(properties);
   return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, true)->setProperties(properties);
 }
 

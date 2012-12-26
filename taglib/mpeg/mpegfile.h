@@ -145,9 +145,7 @@ namespace TagLib {
       /*!
        * Implements the writing part of the unified tag dictionary interface.
        * In order to avoid problems with deprecated tag formats, this method
-       * always creates an ID3v2 tag if necessary, and removes potential APEv2
-       * tags (also invalidating all pointers to the APE tag) which are
-       * considered bad practice in MP3 files.
+       * always creates an ID3v2 tag if necessary.
        * If an ID3v1 tag  exists, it will be updated as well, within the
        * limitations of that format.
        * The returned PropertyMap refers to the ID3v2 tag only.

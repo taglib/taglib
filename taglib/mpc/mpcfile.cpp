@@ -136,7 +136,7 @@ void MPC::File::removeUnsupportedProperties(const StringList &properties)
 PropertyMap MPC::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
-    strip(ID3v1);
+    d->tag.access<APE::Tag>(MPCID3v1Index, false)->setProperties(properties);
   return d->tag.access<APE::Tag>(MPCAPEIndex, true)->setProperties(properties);
 }
 
