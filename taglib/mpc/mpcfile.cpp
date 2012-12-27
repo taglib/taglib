@@ -116,15 +116,6 @@ TagLib::Tag *MPC::File::tag() const
   return &d->tag;
 }
 
-PropertyMap MPC::File::properties() const
-{
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(MPCAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(MPCID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
 void MPC::File::removeUnsupportedProperties(const StringList &properties)
 {
   if(d->hasAPE)

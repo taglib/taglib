@@ -132,14 +132,6 @@ namespace TagLib {
        */
       virtual Tag *tag() const;
 
-      /*!
-       * Implements the reading part of the unified property interface.
-       * If the file contains more than one tag, only the
-       * first one (in the order ID3v2, APE, ID3v1) will be converted to the
-       * PropertyMap.
-       */
-      PropertyMap properties() const;
-
       void removeUnsupportedProperties(const StringList &properties);
 
       /*!

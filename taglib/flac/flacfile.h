@@ -110,14 +110,6 @@ namespace TagLib {
        */
       virtual TagLib::Tag *tag() const;
 
-      /*!
-       * Implements the unified property interface -- export function.
-       * If the file contains more than one tag (e.g. XiphComment and ID3v1),
-       * only the first one (in the order XiphComment, ID3v2, ID3v1) will be
-       * converted to the PropertyMap.
-       */
-      PropertyMap properties() const;
-
       void removeUnsupportedProperties(const StringList &);
 
       /*!

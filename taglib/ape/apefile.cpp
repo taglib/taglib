@@ -112,15 +112,6 @@ TagLib::Tag *APE::File::tag() const
   return &d->tag;
 }
 
-PropertyMap APE::File::properties() const
-{
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(ApeAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
 void APE::File::removeUnsupportedProperties(const StringList &properties)
 {
   if(d->hasAPE)

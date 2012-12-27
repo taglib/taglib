@@ -25,6 +25,7 @@
 
 #include "tagunion.h"
 #include "tstringlist.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 
@@ -100,6 +101,16 @@ void TagUnion::set(int index, Tag *tag)
 {
   delete d->tags[index];
   d->tags[index] = tag;
+}
+
+PropertyMap TagUnion::properties() const
+{
+  for(uint i = 0; i < 3; ++i) {
+    if(tag(i)) {
+      return tag(i)->properties();
+    }
+  }
+  return PropertyMap();
 }
 
 String TagUnion::title() const

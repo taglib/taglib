@@ -89,22 +89,6 @@ namespace TagLib {
       Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       */
-      PropertyMap properties() const;
-
-      /*!
-       * Removes unsupported properties. Forwards to the actual Tag's
-       * removeUnsupportedProperties() function.
-       */
-      void removeUnsupportedProperties(const StringList &properties);
-
-      /*!
-       * Implements the unified property interface -- import function.
-       */
-      PropertyMap setProperties(const PropertyMap &);
-
-      /*!
        * Returns the MP4 audio properties for this file.
        */
       Properties *audioProperties() const;

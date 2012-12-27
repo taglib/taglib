@@ -148,7 +148,7 @@ namespace TagLib {
        * comment is nothing more than a map from tag names to list of values,
        * as is the dict interface).
        */
-      PropertyMap properties() const;
+      virtual PropertyMap properties() const;
 
       /*!
        * Implements the unified property interface -- import function.
@@ -157,7 +157,7 @@ namespace TagLib {
        * containing '=' or '~') in which case the according values will
        * be contained in the returned PropertyMap.
        */
-      PropertyMap setProperties(const PropertyMap&);
+      virtual PropertyMap setProperties(const PropertyMap&);
 
       /*!
        * Check if the given String is a valid Xiph comment key.

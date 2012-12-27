@@ -91,21 +91,6 @@ MP4::File::tag() const
   return d->tag;
 }
 
-PropertyMap MP4::File::properties() const
-{
-  return d->tag->properties();
-}
-
-void MP4::File::removeUnsupportedProperties(const StringList &properties)
-{
-  d->tag->removeUnsupportedProperties(properties);
-}
-
-PropertyMap MP4::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag->setProperties(properties);
-}
-
 MP4::Properties *
 MP4::File::audioProperties() const
 {

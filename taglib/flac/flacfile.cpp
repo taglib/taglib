@@ -138,19 +138,6 @@ TagLib::Tag *FLAC::File::tag() const
   return &d->tag;
 }
 
-PropertyMap FLAC::File::properties() const
-{
-  // once Tag::properties() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if(d->hasXiphComment)
-    return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->properties();
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
 void FLAC::File::removeUnsupportedProperties(const StringList &unsupported)
 {
   if(d->hasXiphComment)

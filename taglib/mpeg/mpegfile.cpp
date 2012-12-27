@@ -134,19 +134,6 @@ TagLib::Tag *MPEG::File::tag() const
   return &d->tag;
 }
 
-PropertyMap MPEG::File::properties() const
-{
-  // once Tag::properties() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->properties();
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
 void MPEG::File::removeUnsupportedProperties(const StringList &properties)
 {
   if(d->hasID3v2)

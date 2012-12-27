@@ -326,7 +326,7 @@ namespace TagLib {
        *  once, the description, separated by a "/".
        *
        */
-      PropertyMap properties() const;
+      virtual PropertyMap properties() const;
 
       /*!
        * Removes unsupported frames given by \a properties. The elements of
@@ -339,13 +339,13 @@ namespace TagLib {
        *  - "UNKNOWN/" + frameID, for frames that could not be parsed by TagLib.
        *    In that case, *all* unknown frames with the given ID will be removed.
        */
-      void removeUnsupportedProperties(const StringList &properties);
+      virtual void removeUnsupportedProperties(const StringList &properties);
 
       /*!
        * Implements the unified property interface -- import function.
        * See the comments in properties().
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
