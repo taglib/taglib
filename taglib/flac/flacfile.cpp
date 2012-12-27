@@ -138,16 +138,6 @@ TagLib::Tag *FLAC::File::tag() const
   return &d->tag;
 }
 
-void FLAC::File::removeUnsupportedProperties(const StringList &unsupported)
-{
-  if(d->hasXiphComment)
-    d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->removeUnsupportedProperties(unsupported);
-  if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->removeUnsupportedProperties(unsupported);
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->removeUnsupportedProperties(unsupported);
-}
-
 PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 {
   return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, true)->setProperties(properties);

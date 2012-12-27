@@ -110,13 +110,6 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       * If the file contains both an APE and an ID3v1 tag, only APE
-       * will be converted to the PropertyMap.
-       */
-      PropertyMap properties() const;
-
-      /*!
        * Implements the unified property interface -- import function.
        * Creates an APE tag if it does not exists and calls setProperties() on
        * that. Any existing ID3v1 tag will be updated as well.

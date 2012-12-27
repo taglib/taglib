@@ -113,6 +113,15 @@ PropertyMap TagUnion::properties() const
   return PropertyMap();
 }
 
+void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
+{
+  for(uint i = 0; i < 3; ++i) {
+    if(tag(i))
+      tag(i)->removeUnsupportedProperties(unsupported);
+  }
+}
+  
+
 String TagUnion::title() const
 {
   stringUnion(title);

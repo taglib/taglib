@@ -114,12 +114,6 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Removes unsupported properties. Forwards to the actual Tag's
-       * removeUnsupportedProperties() function.
-       */
-      void removeUnsupportedProperties(const StringList &properties);
-
-      /*!
        * Implements the unified property interface -- import function.
        * Creates an APEv2 tag if necessary. A pontentially existing ID3v1
        * tag will be updated as well.

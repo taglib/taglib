@@ -131,13 +131,6 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       * If the file contains both ID3v1 and v2 tags, only ID3v2 will be
-       * converted to the PropertyMap.
-       */
-      PropertyMap properties() const;
-
-      /*!
        * Implements the unified property interface -- import function.
        * Creates in ID3v2 tag if necessary. If an ID3v1 tag exists, it will
        * be updated as well, within the limitations of ID3v1.

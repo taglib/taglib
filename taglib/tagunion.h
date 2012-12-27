@@ -58,6 +58,8 @@ namespace TagLib {
 
     virtual PropertyMap properties() const;
     
+    virtual void removeUnsupportedProperties(const StringList& properties);
+    
     virtual String title() const;
     virtual String artist() const;
     virtual String album() const;

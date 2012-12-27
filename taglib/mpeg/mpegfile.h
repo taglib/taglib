@@ -132,8 +132,6 @@ namespace TagLib {
        */
       virtual Tag *tag() const;
 
-      void removeUnsupportedProperties(const StringList &properties);
-
       /*!
        * Implements the writing part of the unified tag dictionary interface.
        * In order to avoid problems with deprecated tag formats, this method

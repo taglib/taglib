@@ -110,8 +110,6 @@ namespace TagLib {
        */
       virtual TagLib::Tag *tag() const;
 
-      void removeUnsupportedProperties(const StringList &);
-
       /*!
        * Implements the unified property interface -- import function.
        * This always creates a Xiph comment, if none exists. The return value

@@ -108,15 +108,6 @@ TagLib::Tag *WavPack::File::tag() const
   return &d->tag;
 }
 
-PropertyMap WavPack::File::properties() const
-{
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(WavAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(WavID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
 PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)

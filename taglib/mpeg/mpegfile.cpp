@@ -134,16 +134,6 @@ TagLib::Tag *MPEG::File::tag() const
   return &d->tag;
 }
 
-void MPEG::File::removeUnsupportedProperties(const StringList &properties)
-{
-  if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->removeUnsupportedProperties(properties);
-  else if(d->hasAPE)
-    d->tag.access<APE::Tag>(APEIndex, false)->removeUnsupportedProperties(properties);
-  else if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(properties);
-}
-
 PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)

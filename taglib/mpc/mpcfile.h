@@ -113,8 +113,6 @@ namespace TagLib {
        */
       virtual TagLib::Tag *tag() const;
 
-      void removeUnsupportedProperties(const StringList &properties);
-
       /*!
        * Implements the unified property interface -- import function.
        * Affects only the APEv2 tag which will be created if necessary.

@@ -128,17 +128,6 @@ TagLib::Tag *TrueAudio::File::tag() const
   return &d->tag;
 }
 
-PropertyMap TrueAudio::File::properties() const
-{
-  // once Tag::properties() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
 PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
