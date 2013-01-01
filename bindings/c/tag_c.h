@@ -29,7 +29,9 @@
 extern "C" {
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(TAGLIB_STATIC)
+#define TAGLIB_C_EXPORT
+#elif defined(_WIN32) || defined(_WIN64)
 #ifdef MAKE_TAGLIB_C_LIB
 #define TAGLIB_C_EXPORT __declspec(dllexport)
 #else
