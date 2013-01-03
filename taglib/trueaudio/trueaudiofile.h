@@ -144,6 +144,8 @@ namespace TagLib {
        */
       PropertyMap setProperties(const PropertyMap &);
 
+      void removeUnsupportedProperties(const StringList &properties);
+
       /*!
        * Returns the TrueAudio::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.

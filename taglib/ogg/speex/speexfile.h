@@ -87,10 +87,24 @@ namespace TagLib {
         virtual Ogg::XiphComment *tag() const;
 
         /*!
+         * Implements the unified property interface -- export function.
+         * This forwards directly to XiphComment::properties().
+         */
+        PropertyMap properties() const;
+
+        /*!
+         * Implements the unified tag dictionary interface -- import function.
+         * Like properties(), this is a forwarder to the file's XiphComment.
+         */
+        PropertyMap setProperties(const PropertyMap &);
+
+        /*!
          * Returns the Speex::Properties for this file.  If no audio properties
          * were read then this will return a null pointer.
          */
         virtual Properties *audioProperties() const;
+
+
 
         virtual bool save();
 

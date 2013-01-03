@@ -117,6 +117,14 @@ PropertyMap WavPack::File::properties() const
   return PropertyMap();
 }
 
+
+void WavPack::File::removeUnsupportedProperties(const StringList &unsupported)
+{
+  if(d->hasAPE)
+    d->tag.access<APE::Tag>(WavAPEIndex, false)->removeUnsupportedProperties(unsupported);
+}
+
+
 PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)

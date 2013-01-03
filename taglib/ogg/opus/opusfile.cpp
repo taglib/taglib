@@ -31,6 +31,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 
 #include "opusfile.h"
 
@@ -80,6 +81,16 @@ Opus::File::~File()
 Ogg::XiphComment *Opus::File::tag() const
 {
   return d->comment;
+}
+
+PropertyMap Opus::File::properties() const
+{
+  return d->comment->properties();
+}
+
+PropertyMap Opus::File::setProperties(const PropertyMap &properties)
+{
+  return d->comment->setProperties(properties);
 }
 
 Opus::Properties *Opus::File::audioProperties() const

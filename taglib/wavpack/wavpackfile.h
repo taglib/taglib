@@ -116,6 +116,8 @@ namespace TagLib {
        */
       PropertyMap properties() const;
 
+      void removeUnsupportedProperties(const StringList &properties);
+
       /*!
        * Implements the unified property interface -- import function.
        * Creates an APE tag if it does not exists and calls setProperties() on

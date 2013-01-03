@@ -139,6 +139,12 @@ PropertyMap TrueAudio::File::properties() const
   return PropertyMap();
 }
 
+void TrueAudio::File::removeUnsupportedProperties(const StringList &unsupported)
+{
+  if(d->hasID3v2)
+    d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->removeUnsupportedProperties(unsupported);
+}
+
 PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
