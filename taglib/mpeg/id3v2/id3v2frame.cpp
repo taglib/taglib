@@ -134,7 +134,7 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   // now we check if it's one of the "special" cases:
   // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
   if((key == "LYRICS" || key.startsWith(lyricsPrefix)) && values.size() == 1){
-    UnsynchronizedLyricsFrame *frame = new UnsynchronizedLyricsFrame();
+    UnsynchronizedLyricsFrame *frame = new UnsynchronizedLyricsFrame(String::UTF8);
     frame->setDescription(key == "LYRICS" ? key : key.substr(lyricsPrefix.size()));
     frame->setText(values.front());
     return frame;
