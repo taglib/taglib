@@ -184,3 +184,17 @@ bool TagUnion::isEmpty() const
   return true;
 }
 
+PropertyMap TagUnion:properties() const
+{
+    PropertyMap ret = PropertyMap();
+    if(d->tags[0] && !d->tags[0]->isEmpty())
+        ret.merge(d->tags[0]);
+    
+    if(d->tags[1] && !d->tags[1]->isEmpty())
+       ret.merge(d->tags[1]);
+
+    if (d->tags[2] && !d->tags[2]->isEmpty())
+       ret.merge(d->tags[2]);
+
+    return ret;
+} 
