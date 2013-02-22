@@ -54,7 +54,7 @@ namespace TagLib
   {
   public:
     StringHandler();
-    ~StringHandler();
+    virtual ~StringHandler();
 
     /*!
      * Decode a string from \a data.
