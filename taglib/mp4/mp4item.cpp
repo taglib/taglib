@@ -32,6 +32,12 @@
 #include <tdebug.h>
 #include "mp4item.h"
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+# define SPRINTF sprintf_s
+#else
+# define SPRINTF sprintf
+#endif
+
 using namespace TagLib;
 
 class MP4::Item::ItemPrivate : public RefCounter
@@ -227,31 +233,31 @@ MP4::Item::toString() const
     case TypeBool:
       return d->m_bool ? "true" : "false";
     case TypeInt:
-      sprintf(tmp, "%d", d->m_int);
+      SPRINTF(tmp, "%d", d->m_int);
       return tmp;
     case TypeIntPair:
-      sprintf(tmp, "%d/%d", d->m_intPair.first, d->m_intPair.second);
+      SPRINTF(tmp, "%d/%d", d->m_intPair.first, d->m_intPair.second);
       return tmp;
     case TypeByte:
-      sprintf(tmp, "%d", d->m_byte);
+      SPRINTF(tmp, "%d", d->m_byte);
       return tmp;
     case TypeUInt:
-      sprintf(tmp, "%u", d->m_uint);
+      SPRINTF(tmp, "%u", d->m_uint);
       return tmp;
     case TypeLongLong:
-      sprintf(tmp, "%lld", d->m_longlong);
+      SPRINTF(tmp, "%lld", d->m_longlong);
       return tmp;
     case TypeStringList:
       return d->m_stringList.toString(" / ");
     case TypeByteVectorList:
-      for(int i = 0; i < d->m_byteVectorList.size(); i++) {
-        sprintf(tmp, "[%d bytes of data]", d->m_byteVectorList[i].size());
+      for(size_t i = 0; i < d->m_byteVectorList.size(); i++) {
+        SPRINTF(tmp, "[%d bytes of data]", d->m_byteVectorList[i].size());
         desc.append(tmp);
       }
       return desc.toString(", ");
     case TypeCoverArtList:
-      for(int i = 0; i < d->m_coverArtList.size(); i++) {
-        sprintf(tmp, "[%d bytes of data]", d->m_coverArtList[i].data().size());
+      for(size_t i = 0; i < d->m_coverArtList.size(); i++) {
+        SPRINTF(tmp, "[%d bytes of data]", d->m_coverArtList[i].data().size());
         desc.append(tmp);
       }
       return desc.toString(", ");
