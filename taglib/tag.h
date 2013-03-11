@@ -58,7 +58,7 @@ namespace TagLib {
      * The default implementation in this class considers only the usual built-in
      * tags (artist, album, ...) and only one value per key.
      */
-    PropertyMap properties() const;
+    virtual PropertyMap properties() const;
 
     /*!
      * Removes unsupported properties, or a subset of them, from the tag.
