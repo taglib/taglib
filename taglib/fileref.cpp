@@ -171,6 +171,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("s3m");
   l.append("it");
   l.append("xm");
+  l.append("aac");
 
   return l;
 }
@@ -276,6 +277,14 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new IT::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "AAC") {
+      // AAC files might represent both MP4 or MPEG data, so we try both
+      File *file = new MP4::File(fileName, readAudioProperties, audioPropertiesStyle);
+      if (file->isValid())
+        return file;
+      delete file;
+      return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
+    }
   }
 
   return 0;
