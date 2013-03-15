@@ -95,7 +95,7 @@ TagLib::uint RIFF::File::riffSize() const
 
 TagLib::uint RIFF::File::chunkCount() const
 {
-  return d->chunks.size();
+  return static_cast<TagLib::uint>(d->chunks.size());
 }
 
 TagLib::uint RIFF::File::chunkDataSize(uint i) const
@@ -181,8 +181,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  uint i =  d->chunks.size() - 1;
-  offset_t offset = d->chunks[i].offset + d->chunks[i].size;
+  offset_t offset = d->chunks.back().offset + d->chunks.back().size;
 
   // First we update the global size
 
@@ -201,7 +200,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // And update our internal structure
 
   if(offset & 1) {
-    d->chunks[i].padding = 1;
+    d->chunks.back().padding = 1;
     offset++;
   }
 

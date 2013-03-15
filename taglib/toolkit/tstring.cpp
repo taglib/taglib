@@ -95,8 +95,7 @@ String::String(const std::string &s, Type t)
     return;
   }
 
-  int length = s.length();
-  d->data.resize(length);
+  d->data.resize(s.length());
   wstring::iterator targetIt = d->data.begin();
 
   for(std::string::const_iterator it = s.begin(); it != s.end(); it++) {
@@ -128,12 +127,12 @@ String::String(const char *s, Type t)
     return;
   }
 
-  int length = ::strlen(s);
+  const size_t length = ::strlen(s);
   d->data.resize(length);
 
   wstring::iterator targetIt = d->data.begin();
 
-  for(int i = 0; i < length; i++) {
+  for(size_t i = 0; i < length; i++) {
     *targetIt = uchar(s[i]);
     ++targetIt;
   }
@@ -217,12 +216,12 @@ std::string String::to8Bit(bool unicode) const
     return s;
   }
 
-  const int outputBufferSize = d->data.size() * 3 + 1;
+  const size_t outputBufferSize = d->data.size() * 3 + 1;
 
   Unicode::UTF16 *sourceBuffer = new Unicode::UTF16[d->data.size() + 1];
   Unicode::UTF8  *targetBuffer = new Unicode::UTF8[outputBufferSize];
 
-  for(unsigned int i = 0; i < d->data.size(); i++)
+  for(size_t i = 0; i < d->data.size(); i++)
     sourceBuffer[i] = Unicode::UTF16(d->data[i]);
 
   const Unicode::UTF16 *source = sourceBuffer;
@@ -237,7 +236,7 @@ std::string String::to8Bit(bool unicode) const
     debug("String::to8Bit() - Unicode conversion error.");
   }
 
-  int newSize = target - targetBuffer;
+  const size_t newSize = target - targetBuffer;
   s.resize(newSize);
   targetBuffer[newSize] = 0;
 
@@ -296,21 +295,22 @@ String::ConstIterator String::end() const
 
 int String::find(const String &s, int offset) const
 {
-  wstring::size_type position = d->data.find(s.d->data, offset);
+  const size_t position 
+    = d->data.find(s.d->data, offset == -1 ? wstring::npos : offset);
 
   if(position != wstring::npos)
-    return position;
+    return static_cast<int>(position);
   else
     return -1;
 }
 
 int String::rfind(const String &s, int offset) const
 {
-  wstring::size_type position =
+  const size_t position =
     d->data.rfind(s.d->data, offset == -1 ? wstring::npos : offset);
 
   if(position != wstring::npos)
-    return position;
+    return static_cast<int>(position);
   else
     return -1;
 }
@@ -320,7 +320,7 @@ StringList String::split(const String &separator) const
   StringList list;
   for(int index = 0;;)
   {
-    int sep = find(separator, index);
+    const int sep = find(separator, index);
     if(sep < 0)
     {
       list.append(substr(index, size() - index));
@@ -375,7 +375,7 @@ String String::upper() const
 
 TagLib::uint String::size() const
 {
-  return d->data.size();
+  return static_cast<TagLib::uint>(d->data.size());
 }
 
 TagLib::uint String::length() const
@@ -385,12 +385,12 @@ TagLib::uint String::length() const
 
 bool String::isEmpty() const
 {
-  return d->data.size() == 0;
+  return (d->data.size() == 0);
 }
 
 bool String::isNull() const
 {
-  return d == null.d;
+  return (d == null.d);
 }
 
 ByteVector String::data(Type t) const
@@ -408,7 +408,7 @@ ByteVector String::data(Type t) const
   case UTF8:
   {
     std::string s = to8Bit(true);
-    v.setData(s.c_str(), s.length());
+    v.setData(s.c_str(), static_cast<TagLib::uint>(s.length()));
     break;
   }
   case UTF16:
@@ -462,11 +462,11 @@ int String::toInt(bool *ok) const
 {
   int value = 0;
 
-  uint size = d->data.size();
-  bool negative = size > 0 && d->data[0] == '-';
-  uint start = negative ? 1 : 0;
-  uint i = start;
+  const size_t size = d->data.size();
+  const bool negative = size > 0 && d->data[0] == '-';
+  const size_t start = negative ? 1 : 0;
 
+  size_t i = start;
   for(; i < size && d->data[i] >= '0' && d->data[i] <= '9'; i++)
     value = value * 10 + (d->data[i] - '0');
 
@@ -532,7 +532,7 @@ String String::number(int n) // static
 
   bool negative = n < 0;
 
-  if(negative)
+  if(negative) 
     n = n * -1;
 
   while(n > 0) {
@@ -546,7 +546,7 @@ String String::number(int n) // static
   if(negative)
     s += '-';
 
-  for(int i = charStack.d->data.size() - 1; i >= 0; i--)
+  for(size_t i = charStack.d->data.size() - 1; i >= 0; i--)
     s += charStack.d->data[i];
 
   return s;
@@ -686,11 +686,11 @@ String &String::operator=(const char *s)
 
   d = new StringPrivate;
 
-  int length = ::strlen(s);
+  const size_t length = ::strlen(s);
   d->data.resize(length);
 
   wstring::iterator targetIt = d->data.begin();
-  for(int i = 0; i < length; i++) {
+  for(size_t i = 0; i < length; i++) {
     *targetIt = uchar(s[i]);
     ++targetIt;
   }
@@ -764,7 +764,7 @@ void String::prepare(Type t)
   }
   case UTF8:
   {
-    int bufferSize = d->data.size() + 1;
+    const size_t bufferSize = d->data.size() + 1;
     Unicode::UTF8  *sourceBuffer = new Unicode::UTF8[bufferSize];
     Unicode::UTF16 *targetBuffer = new Unicode::UTF16[bufferSize];
 
@@ -785,10 +785,10 @@ void String::prepare(Type t)
       debug("String::prepare() - Unicode conversion error.");
     }
 
-    int newSize = target != targetBuffer ? target - targetBuffer - 1 : 0;
+    const size_t newSize = target != targetBuffer ? target - targetBuffer - 1 : 0;
     d->data.resize(newSize);
 
-    for(int i = 0; i < newSize; i++)
+    for(size_t i = 0; i < newSize; i++)
       d->data[i] = targetBuffer[i];
 
     delete [] sourceBuffer;

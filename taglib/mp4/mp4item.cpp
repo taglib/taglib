@@ -250,13 +250,13 @@ MP4::Item::toString() const
     case TypeStringList:
       return d->m_stringList.toString(" / ");
     case TypeByteVectorList:
-      for(size_t i = 0; i < d->m_byteVectorList.size(); i++) {
+      for(TagLib::uint i = 0; i < d->m_byteVectorList.size(); i++) {
         SPRINTF(tmp, "[%d bytes of data]", d->m_byteVectorList[i].size());
         desc.append(tmp);
       }
       return desc.toString(", ");
     case TypeCoverArtList:
-      for(size_t i = 0; i < d->m_coverArtList.size(); i++) {
+      for(TagLib::uint i = 0; i < d->m_coverArtList.size(); i++) {
         SPRINTF(tmp, "[%d bytes of data]", d->m_coverArtList[i].data().size());
         desc.append(tmp);
       }

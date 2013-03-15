@@ -64,7 +64,7 @@ namespace {
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
     DWORD readLen;
-    ReadFile(stream, ptr, size * nmemb, &readLen, NULL);
+    ReadFile(stream, ptr, static_cast<DWORD>(size * nmemb), &readLen, NULL);
 
     return (readLen / size);
   }
@@ -72,7 +72,7 @@ namespace {
   size_t fwrite(const void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
     DWORD writtenLen;
-    WriteFile(stream, ptr, size * nmemb, &writtenLen, NULL);
+    WriteFile(stream, ptr, static_cast<DWORD>(size * nmemb), &writtenLen, NULL);
 
     return writtenLen;
   }
@@ -264,7 +264,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
 
   // In case we've already reached the end of file...
 
-  buffer.resize(bytesRead);
+  buffer.resize(static_cast<TagLib::uint>(bytesRead));
 
   // Ok, here's the main loop.  We want to loop until the read fails, which
   // means that we hit the end of the file.
@@ -276,7 +276,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
 
     seek(readPosition);
     bytesRead = fread(aboutToOverwrite.data(), sizeof(char), bufferLength, d->file);
-    aboutToOverwrite.resize(bytesRead);
+    aboutToOverwrite.resize(static_cast<TagLib::uint>(bytesRead));
     readPosition += bufferLength;
 
     // Check to see if we just read the last block.  We need to call clear()

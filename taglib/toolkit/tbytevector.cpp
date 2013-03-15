@@ -210,10 +210,10 @@ namespace TagLib {
       return sum;
     }
 
-    uint size = sizeof(T);
-    uint last = data.size() > size ? size - 1 : data.size() - 1;
+    const size_t size = sizeof(T);
+    const size_t last = data.size() > size ? size - 1 : data.size() - 1;
 
-    for(uint i = 0; i <= last; i++)
+    for(size_t i = 0; i <= last; i++)
       sum |= (T) uchar(data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
 
     return sum;
@@ -222,11 +222,11 @@ namespace TagLib {
   template <class T>
   ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   {
-    int size = sizeof(T);
+    const TagLib::uint size = sizeof(T);
 
     ByteVector v(size, 0);
 
-    for(int i = 0; i < size; i++)
+    for(TagLib::uint i = 0; i < size; i++)
       v[i] = uchar(value >> ((mostSignificantByteFirst ? size - 1 - i : i) * 8) & 0xff);
 
     return v;
@@ -238,15 +238,20 @@ using namespace TagLib;
 class ByteVector::ByteVectorPrivate : public RefCounter
 {
 public:
-  ByteVectorPrivate() : RefCounter(), size(0) {}
-  ByteVectorPrivate(const std::vector<char> &v) : RefCounter(), data(v), size(v.size()) {}
-  ByteVectorPrivate(TagLib::uint len, char value) : RefCounter(), data(len, value), size(len) {}
+  ByteVectorPrivate() 
+    : RefCounter(), size(0) {}
+
+  ByteVectorPrivate(const std::vector<char> &v) 
+    : RefCounter(), data(v), size(static_cast<TagLib::uint>(v.size())) {}
+
+  ByteVectorPrivate(TagLib::uint len, char value) 
+    : RefCounter(), data(len, value), size(len) {}
 
   std::vector<char> data;
 
   // std::vector<T>::size() is very slow, so we'll cache the value
 
-  uint size;
+  TagLib::uint size;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +345,7 @@ ByteVector &ByteVector::setData(const char *data, uint length)
 
 ByteVector &ByteVector::setData(const char *data)
 {
-  return setData(data, ::strlen(data));
+  return setData(data, static_cast<TagLib::uint>(::strlen(data)));
 }
 
 char *ByteVector::data()
@@ -369,7 +374,7 @@ ByteVector ByteVector::mid(uint index, uint length) const
     endIt = d->data.end();
 
   v.d->data.insert(v.d->data.begin(), ConstIterator(d->data.begin() + index), endIt);
-  v.d->size = v.d->data.size();
+  v.d->size = static_cast<TagLib::uint>(v.d->data.size());
 
   return v;
 }
