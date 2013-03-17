@@ -764,9 +764,28 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
   else
   {
-    std::vector<wchar_t> sourceBuffer(length / 2);
+    bool swap;
+    if(t == UTF16) {
+      if(length >= 2) {
+        if(*reinterpret_cast<const TagLib::ushort*>(s) == 0xfeff) 
+          swap = false; // Same as CPU endian. No need to swap bytes.
+        else if(*reinterpret_cast<const TagLib::ushort*>(s) == 0xfffe) 
+          swap = true;  // Not same as CPU endian. Need to swap bytes.
+        else {
+          debug("String::prepare() - Invalid UTF16 string.");
+          return;
+        }
+
+        s += 2;
+        length -= 2;
+      }
+    }
+    else 
+      swap = (t != WCharByteOrder);
+
+    d->data.resize(length / 2);
     for(size_t i = 0; i < length / 2; ++i) {
-      sourceBuffer[i] = combine(*s, *(s + 1));
+      d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
       s += 2;
     }
   }
