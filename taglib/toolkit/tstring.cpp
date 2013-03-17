@@ -57,14 +57,14 @@ namespace {
   {
     // Detect CPU endian.
     union {
-      wchar_t w;
-      char c[2];
-    } x = { 0xfeff };
+      TagLib::ushort w;
+      char c;
+    } x = { 0x1234 };
 
-    if(x.c[0] == 0xfe)
-      return String::UTF16BE;
-    else
+    if(x.c == 0x34)
       return String::UTF16LE;
+    else
+      return String::UTF16BE;
   }
 }
 
