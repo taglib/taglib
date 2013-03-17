@@ -546,7 +546,7 @@ String String::number(int n) // static
   if(negative)
     s += '-';
 
-  for(size_t i = charStack.d->data.size() - 1; i >= 0; i--)
+  for(int i = charStack.d->data.size() - 1; i >= 0; i--)
     s += charStack.d->data[i];
 
   return s;
