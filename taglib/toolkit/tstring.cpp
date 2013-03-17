@@ -724,7 +724,7 @@ void String::copyFromUTF8(const char *s, size_t length)
   d->data.resize(::wcslen(d->data.c_str()));
 
   if(result != Unicode::conversionOK) {
-    debug("String::prepare() - Unicode conversion error.");
+    debug("String::copyFromUTF8() - Unicode conversion error.");
   }
 }
 
@@ -732,19 +732,17 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 {
   bool swap;
   if(t == UTF16) {
-    if(length >= 1) {
-      if(s[0] == 0xfeff) 
-        swap = false; // Same as CPU endian. No need to swap bytes.
-      else if(s[0] == 0xfffe) 
-        swap = true;  // Not same as CPU endian. Need to swap bytes.
-      else {
-        debug("String::prepare() - Invalid UTF16 string.");
-        return;
-      }
-
-      s++;
-      length--;
+    if(length >= 1 && s[0] == 0xfeff) 
+      swap = false; // Same as CPU endian. No need to swap bytes.
+    else if(length >= 1 && s[0] == 0xfffe) 
+      swap = true;  // Not same as CPU endian. Need to swap bytes.
+    else {
+      debug("String::copyFromUTF16() - Invalid UTF16 string.");
+      return;
     }
+
+    s++;
+    length--;
   }
   else 
     swap = (t != WCharByteOrder);
@@ -766,19 +764,17 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   {
     bool swap;
     if(t == UTF16) {
-      if(length >= 2) {
-        if(*reinterpret_cast<const TagLib::ushort*>(s) == 0xfeff) 
-          swap = false; // Same as CPU endian. No need to swap bytes.
-        else if(*reinterpret_cast<const TagLib::ushort*>(s) == 0xfffe) 
-          swap = true;  // Not same as CPU endian. Need to swap bytes.
-        else {
-          debug("String::prepare() - Invalid UTF16 string.");
-          return;
-        }
-
-        s += 2;
-        length -= 2;
+      if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfeff) 
+        swap = false; // Same as CPU endian. No need to swap bytes.
+      else if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfffe) 
+        swap = true;  // Not same as CPU endian. Need to swap bytes.
+      else {
+        debug("String::copyFromUTF16() - Invalid UTF16 string.");
+        return;
       }
+
+      s += 2;
+      length -= 2;
     }
     else 
       swap = (t != WCharByteOrder);
