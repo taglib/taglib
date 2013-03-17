@@ -116,7 +116,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(a, String(d, String::UTF16));
   }
 
-  // this test is expected to print "TagLib: String::prepare() -
+  // this test is expected to print "TagLib: String::copyFromUTF16() -
   // Invalid UTF16 string." on the console 3 times
   void testUTF16DecodeInvalidBOM()
   {

@@ -342,10 +342,22 @@ namespace TagLib {
     const wchar &operator[](size_t i) const;
 
     /*!
-     * Compares each character of the String with each character of \a s and
+     * Compares each character of the String with each character in \a s and
      * returns true if the strings match.
      */
     bool operator==(const String &s) const;
+
+    /*!
+     * Compares each character of the String with each character in \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const char *s) const;
+
+    /*!
+     * Compares each character of the String with each character of \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const wchar_t *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and

@@ -330,9 +330,10 @@ String &String::append(const String &s)
 
 String String::upper() const
 {
-  String s;
+  static const int shift = 'A' - 'a';
 
-  static int shift = 'A' - 'a';
+  String s;
+  s.d->data.reserve(d->data.size());
 
   for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
@@ -537,7 +538,24 @@ const TagLib::wchar &String::operator[](size_t i) const
 
 bool String::operator==(const String &s) const
 {
-  return d == s.d || d->data == s.d->data;
+  return (d == s.d || d->data == s.d->data);
+}
+
+bool String::operator==(const char *s) const
+{
+  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    if(*it != static_cast<uchar>(*s))
+      return false;
+
+    s++;
+  }
+
+  return true;
+}
+
+bool String::operator==(const wchar_t *s) const
+{
+  return (d->data == s);
 }
 
 bool String::operator!=(const String &s) const
@@ -699,7 +717,6 @@ void String::detach()
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
-
 
 void String::copyFromLatin1(const char *s, size_t length)
 {
