@@ -31,6 +31,24 @@
 #include <iostream>
 #include <string.h>
 
+// Determine if the compiler supports codecvt.
+
+#ifndef __has_include       
+# define __has_include(x) 0 
+#endif
+
+#if (((defined(__GNUC__) && defined(__GXX_EXPERIMENTAL_CXX0X__))  /* GCC with -std=c++0x option */  \
+  || (defined(_MSC_VER) && _MSC_VER >= 1600)))                    /* VC++2010 or later */           \
+  || (defined(__has_include) && __has_include(<codecvt>))         /* Clang has <codecvt> */
+
+# define TAGLIB_USE_CODECVT
+#endif
+
+#ifdef TAGLIB_USE_CODECVT
+# include <codecvt>
+  typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
+#endif
+
 using namespace TagLib;
 
 namespace {
@@ -215,6 +233,20 @@ std::string String::to8Bit(bool unicode) const
   else {
     s.resize(d->data.size() * 4 + 1);
 
+#ifdef TAGLIB_USE_CODECVT
+
+    std::mbstate_t st = 0;
+    const wchar_t *source;
+    char *target;
+    utf8_utf16_t::result result = utf8_utf16_t().out(
+      st, &d->data[0], &d->data[d->data.size()], source, &s[0], &s[s.size()], target);
+
+    if(result != utf8_utf16_t::ok) {
+      debug("String::copyFromUTF8() - Unicode conversion error.");
+    }
+
+#else
+
     const Unicode::UTF16 *source = &d->data[0];
     Unicode::UTF8 *target = reinterpret_cast<Unicode::UTF8*>(&s[0]);
 
@@ -226,6 +258,8 @@ std::string String::to8Bit(bool unicode) const
     if(result != Unicode::conversionOK) {
       debug("String::to8Bit() - Unicode conversion error.");
     }
+
+#endif
 
     s.resize(::strlen(s.c_str()));
   }
@@ -379,8 +413,38 @@ ByteVector String::data(Type t) const
   }
   case UTF8:
   {
-    std::string s = to8Bit(true);
-    v.setData(s.c_str(), static_cast<TagLib::uint>(s.length()));
+    v.resize(d->data.size() * 4 + 1);
+
+#ifdef TAGLIB_USE_CODECVT
+
+    std::mbstate_t st = 0;
+    const wchar_t *source;
+    char *target;
+    utf8_utf16_t::result result = utf8_utf16_t().out(
+      st, &d->data[0], &d->data[d->data.size()], source, v.data(), v.data() + v.size(), target);
+
+    if(result != utf8_utf16_t::ok) {
+      debug("String::copyFromUTF8() - Unicode conversion error.");
+    }
+
+#else
+
+    const Unicode::UTF16 *source = &d->data[0];
+    Unicode::UTF8 *target = reinterpret_cast<Unicode::UTF8*>(v.data());
+
+    Unicode::ConversionResult result = Unicode::ConvertUTF16toUTF8(
+      &source, source + d->data.size(),
+      &target, target + v.size(),
+      Unicode::lenientConversion);
+
+    if(result != Unicode::conversionOK) {
+      debug("String::to8Bit() - Unicode conversion error.");
+    }
+
+#endif
+
+    v.resize(::strlen(v.data()) + 1);
+
     break;
   }
   case UTF16:
@@ -730,6 +794,20 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data.resize(length);
 
+#ifdef TAGLIB_USE_CODECVT
+
+  std::mbstate_t st = 0;
+  const char *source;
+  wchar_t *target;
+  utf8_utf16_t::result result = utf8_utf16_t().in(
+    st, s, s + length, source, &d->data[0], &d->data[d->data.size()], target);
+
+  if(result != utf8_utf16_t::ok) {
+    debug("String::copyFromUTF8() - Unicode conversion error.");
+  }
+
+#else
+  
   const Unicode::UTF8 *source = reinterpret_cast<const Unicode::UTF8 *>(s);
   Unicode::UTF16 *target = &d->data[0];
 
@@ -738,11 +816,13 @@ void String::copyFromUTF8(const char *s, size_t length)
     &target, target + length,
     Unicode::lenientConversion);
 
-  d->data.resize(::wcslen(d->data.c_str()));
-
   if(result != Unicode::conversionOK) {
     debug("String::copyFromUTF8() - Unicode conversion error.");
   }
+
+#endif
+
+  d->data.resize(::wcslen(d->data.c_str()));
 }
 
 void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
