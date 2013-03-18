@@ -436,7 +436,7 @@ ByteVector String::data(Type t) const
 
 #endif
 
-    v.resize(::strlen(v.data()) + 1);
+    v.resize(::strlen(v.data()));
 
     break;
   }
