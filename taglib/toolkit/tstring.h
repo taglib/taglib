@@ -98,8 +98,7 @@ namespace TagLib {
        */
       UTF16 = 1,
       /*!
-       * UTF16 <i>big endian</i>.  16 bit characters.  This is the encoding used
-       * internally by TagLib.
+       * UTF16 <i>big endian</i>.  16 bit characters.  
        */
       UTF16BE = 2,
       /*!
@@ -135,12 +134,12 @@ namespace TagLib {
     /*!
      * Makes a deep copy of the data in \a s.
      */
-    String(const wstring &s, Type t = UTF16BE);
+    String(const wstring &s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a s.
      */
-    String(const wchar_t *s, Type t = UTF16BE);
+    String(const wchar_t *s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a c.
@@ -187,7 +186,7 @@ namespace TagLib {
     /*!
      * Returns a wstring version of the TagLib string as a wide string.
      */
-    wstring toWString() const;
+    const TagLib::wstring &toWString() const;
 
     /*!
      * Creates and returns a C-String based on the data.  This string is still
@@ -335,18 +334,30 @@ namespace TagLib {
     /*!
      * Returns a reference to the character at position \a i.
      */
-    wchar &operator[](int i);
+    wchar &operator[](size_t i);
 
     /*!
      * Returns a const reference to the character at position \a i.
      */
-    const wchar &operator[](int i) const;
+    const wchar &operator[](size_t i) const;
+
+    /*!
+     * Compares each character of the String with each character in \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const String &s) const;
+
+    /*!
+     * Compares each character of the String with each character in \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const char *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
      * returns true if the strings match.
      */
-    bool operator==(const String &s) const;
+    bool operator==(const wchar_t *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
@@ -442,12 +453,35 @@ namespace TagLib {
 
   private:
     /*!
-     * This checks to see if the string is in \e UTF-16 (with BOM) or \e UTF-8
-     * format and if so converts it to \e UTF-16BE for internal use.  \e Latin1
-     * does not require conversion since it is a subset of \e UTF-16BE and
-     * \e UTF16-BE requires no conversion since it is used internally.
+     * Converts a \e Latin-1 string into \e UTF-16(without BOM/CPU byte order) 
+     * and copies it to the internal buffer.
      */
-    void prepare(Type t);
+    void copyFromLatin1(const char *s, size_t length);
+
+    /*!
+     * Converts a \e UTF-8 string into \e UTF-16(without BOM/CPU byte order) 
+     * and copies it to the internal buffer.
+     */
+    void copyFromUTF8(const char *s, size_t length);
+
+    /*!
+     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into 
+     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
+     */
+    void copyFromUTF16(const wchar_t *s, size_t length, Type t);
+
+    /*!
+     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into 
+     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
+     */
+    void copyFromUTF16(const char *s, size_t length, Type t);
+    
+    /*!
+     * Indicates which byte order of UTF-16 is used to store strings internally. 
+     *
+     * \note Set to \e UTF16BE or \e UTF16LE at run time.
+     */
+    static Type WCharByteOrder;
 
     class StringPrivate;
     StringPrivate *d;
