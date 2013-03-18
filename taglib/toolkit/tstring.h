@@ -123,6 +123,15 @@ namespace TagLib {
      */
     String(const String &s);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a s into the \e String.
+     */
+    String(String &&s);
+
+#endif
+
     /*!
      * Makes a deep copy of the data in \a s.
      *
@@ -396,6 +405,15 @@ namespace TagLib {
      */
     String &operator=(const String &s);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a s into the \e String.
+     */
+    String &operator=(String &&s);
+
+#endif
+
     /*!
      * Performs a deep copy of the data in \a s.
      */
@@ -405,6 +423,15 @@ namespace TagLib {
      * Performs a deep copy of the data in \a s.
      */
     String &operator=(const wstring &s);
+
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a s into the \e String.
+     */
+    String &operator=(wstring &&s);
+
+#endif
 
     /*!
      * Performs a deep copy of the data in \a s.
@@ -484,7 +511,12 @@ namespace TagLib {
     static Type WCharByteOrder;
 
     class StringPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+    std::shared_ptr<StringPrivate> d;
+#else
     StringPrivate *d;
+#endif
   };
 
   /*!

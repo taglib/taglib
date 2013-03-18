@@ -103,10 +103,19 @@ namespace TagLib
       Picture();
 
       /*!
-       * Construct an picture as a copy of \a other.
+       * Constructs an picture as a copy of \a other.
        */
       Picture(const Picture& other);
 
+#ifdef TAGLIB_USE_CXX11
+
+      /*!
+       * Constructs an picture equivalent to \a other.
+       */
+      Picture(Picture &&other);
+
+#endif
+      
       /*!
        * Destroys the picture.
        */
@@ -116,6 +125,15 @@ namespace TagLib
        * Copies the contents of \a other into this picture.
        */
       Picture& operator=(const Picture& other);
+
+#ifdef TAGLIB_USE_CXX11
+
+      /*!
+       * Moves the contents of \a other into this picture.
+       */
+      Picture& operator=(Picture &&other);
+
+#endif
 
       /*!
        * Returns true if Picture stores valid picture
@@ -207,10 +225,15 @@ namespace TagLib
       static Picture fromInvalid();
       friend class Attribute;
 #endif
-      private:
-        class PicturePrivate;
-        PicturePrivate *d;
-      };
+    private:
+      class PicturePrivate;
+
+#ifdef TAGLIB_USE_CXX11
+      std::shared_ptr<PicturePrivate> d;
+#else
+      PicturePrivate *d;
+#endif
+    };
   }
 }
 

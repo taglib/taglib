@@ -50,21 +50,38 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::Picture::Picture()
+  : d(new PicturePrivate())
 {
-  d = new PicturePrivate();
   d->valid = true;
 }
 
 ASF::Picture::Picture(const Picture& other)
   : d(other.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+ASF::Picture::Picture(Picture &&other)
+  : d(std::move(other.d))
+{
+}
+
+#endif
 
 ASF::Picture::~Picture()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref())
     delete d;
+
+#endif
 }
 
 bool ASF::Picture::isValid() const
@@ -121,14 +138,34 @@ int ASF::Picture::dataSize() const
 
 ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = other.d;
+
+#else
+
   if(other.d != d) {
     if(d->deref())
       delete d;
     d = other.d;
     d->ref();
   }
+
+#endif
+
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+ASF::Picture& ASF::Picture::operator=(ASF::Picture &&other)
+{
+  d = std::move(other.d);
+  return *this;
+}
+
+#endif
+
 
 ByteVector ASF::Picture::render() const
 {

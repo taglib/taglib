@@ -62,12 +62,21 @@ namespace TagLib {
     ByteVector(uint size, char value = 0);
 
     /*!
-     * Contructs a byte vector that is a copy of \a v.
+     * Constructs a byte vector that is a copy of \a v.
      */
     ByteVector(const ByteVector &v);
 
+#ifdef TAGLIB_USE_CXX11
+
     /*!
-     * Contructs a byte vector that contains \a c.
+     * Constructs a byte vector equivalent to \a v.
+     */
+    ByteVector(ByteVector &&v);
+
+#endif
+
+    /*!
+     * Constructs a byte vector that contains \a c.
      */
     ByteVector(char c);
 
@@ -380,6 +389,15 @@ namespace TagLib {
      */
     ByteVector &operator=(const ByteVector &v);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a v into the ByteVector.
+     */
+    ByteVector &operator=(ByteVector &&v);
+
+#endif
+
     /*!
      * Copies ByteVector \a v.
      */
@@ -411,7 +429,12 @@ namespace TagLib {
 
   private:
     class ByteVectorPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+    std::shared_ptr<ByteVectorPrivate> d;
+#else
     ByteVectorPrivate *d;
+#endif
   };
 
   /*!

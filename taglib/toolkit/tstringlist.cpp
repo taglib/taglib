@@ -27,11 +27,6 @@
 
 using namespace TagLib;
 
-class StringListPrivate
-{
-
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,13 +52,19 @@ StringList StringList::split(const String &s, const String &pattern)
 
 StringList::StringList() : List<String>()
 {
-
 }
 
 StringList::StringList(const StringList &l) : List<String>(l)
 {
-
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+StringList::StringList(StringList &&l) : List<String>(l)
+{
+}
+
+#endif
 
 StringList::StringList(const String &s) : List<String>()
 {
@@ -76,11 +77,6 @@ StringList::StringList(const ByteVectorList &bl, String::Type t) : List<String>(
   for(;i != bl.end(); i++) {
     append(String(*i, t));
   }
-}
-
-StringList::~StringList()
-{
-
 }
 
 String StringList::toString(const String &separator) const
@@ -111,6 +107,38 @@ StringList &StringList::append(const StringList &l)
   List<String>::append(l);
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+StringList &StringList::append(String &&s)
+{
+  List<String>::append(s);
+  return *this;
+}
+
+StringList &StringList::append(StringList &&l)
+{
+  List<String>::append(l);
+  return *this;
+}
+
+#endif
+
+StringList &StringList::operator=(const StringList &l)
+{
+  List<String>::operator=(l);
+  return *this;
+}
+
+#ifdef TAGLIB_USE_CXX11
+
+StringList &StringList::operator=(StringList &&l)
+{
+  List<String>::operator=(l);
+  return *this;
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions

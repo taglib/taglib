@@ -244,6 +244,13 @@ public:
   ByteVectorPrivate(const std::vector<char> &v) 
     : RefCounter(), data(v), size(static_cast<TagLib::uint>(v.size())) {}
 
+#ifdef TAGLIB_USE_CXX11 
+
+  ByteVectorPrivate(std::vector<char> &&v) 
+    : RefCounter(), data(v), size(static_cast<TagLib::uint>(v.size())) {}
+
+#endif
+
   ByteVectorPrivate(TagLib::uint len, char value) 
     : RefCounter(), data(len, value), size(len) {}
 
@@ -292,43 +299,61 @@ ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFir
 ////////////////////////////////////////////////////////////////////////////////
 
 ByteVector::ByteVector()
+  : d(new ByteVectorPrivate())
 {
-  d = new ByteVectorPrivate;
 }
 
 ByteVector::ByteVector(uint size, char value)
+  : d(new ByteVectorPrivate(size, value))
 {
-  d = new ByteVectorPrivate(size, value);
 }
 
-ByteVector::ByteVector(const ByteVector &v) : d(v.d)
+ByteVector::ByteVector(const ByteVector &v) 
+  : d(v.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+ByteVector::ByteVector(ByteVector &&v) 
+  : d(std::move(v.d))
+{
+}
+
+#endif
 
 ByteVector::ByteVector(char c)
+  : d(new ByteVectorPrivate())
 {
-  d = new ByteVectorPrivate;
   d->data.push_back(c);
   d->size = 1;
 }
 
 ByteVector::ByteVector(const char *data, uint length)
+  : d(new ByteVectorPrivate())
 {
-  d = new ByteVectorPrivate;
   setData(data, length);
 }
 
 ByteVector::ByteVector(const char *data)
+  : d(new ByteVectorPrivate())
 {
-  d = new ByteVectorPrivate;
   setData(data);
 }
 
 ByteVector::~ByteVector()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref())
     delete d;
+
+#endif  
 }
 
 ByteVector &ByteVector::setData(const char *data, uint length)
@@ -488,10 +513,18 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   }
 
   // replace private data:
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(newData);
+
+#else
+
   if(d->deref())
     delete d;
 
   d = newData;
+
+#endif
 
   return *this;
 }
@@ -676,6 +709,12 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = v.d;
+
+#else
+
   if(&v == this)
     return *this;
 
@@ -684,18 +723,49 @@ ByteVector &ByteVector::operator=(const ByteVector &v)
 
   d = v.d;
   d->ref();
+
+#endif
+
   return *this;
 }
 
+#ifdef TAGLIB_USE_CXX11
+
+ByteVector &ByteVector::operator=(ByteVector &&v)
+{
+  d = std::move(v.d);
+  return *this;
+}
+
+#endif
+
 ByteVector &ByteVector::operator=(char c)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = ByteVector(c).d;
+
+#else
+
   *this = ByteVector(c);
+
+#endif
+
   return *this;
 }
 
 ByteVector &ByteVector::operator=(const char *data)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = ByteVector(data).d;
+
+#else
+
   *this = ByteVector(data);
+
+#endif
+
   return *this;
 }
 
@@ -719,10 +789,19 @@ ByteVector ByteVector::toHex() const
 
 void ByteVector::detach()
 {
+#ifdef TAGLIB_USE_CXX11
+
+  if(!d.unique())
+    d.reset(new ByteVectorPrivate(d->data));
+
+#else
+
   if(d->count() > 1) {
     d->deref();
     d = new ByteVectorPrivate(d->data);
   }
+
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

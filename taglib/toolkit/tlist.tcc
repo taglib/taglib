@@ -53,8 +53,15 @@ template <class TP> class List<T>::ListPrivate  : public ListPrivateBase
 public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP> &l) : ListPrivateBase(), list(l) {}
+
+#ifdef TAGLIB_USE_CXX11
+
+  ListPrivate(std::list<TP> &&l) : ListPrivateBase(), list(l) {}
+
+#endif
+
   void clear() {
-    list.clear();
+    std::list<TP>().swap(list);
   }
   std::list<TP> list;
 };
@@ -68,18 +75,33 @@ template <class TP> class List<T>::ListPrivate<TP *>  : public ListPrivateBase
 public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP *> &l) : ListPrivateBase(), list(l) {}
+
+#ifdef TAGLIB_USE_CXX11
+
+  ListPrivate(std::list<TP *> &&l) : ListPrivateBase(), list(l) {}
+
+#endif
+
   ~ListPrivate() {
-    clear();
+    deletePointers();
   }
+
   void clear() {
-    if(autoDelete) {
-      typename std::list<TP *>::const_iterator it = list.begin();
-      for(; it != list.end(); ++it)
-        delete *it;
-    }
-    list.clear();
+    deletePointers();
+	std::list<TP *>().swap(list);
   }
+
   std::list<TP *> list;
+
+private:
+  void deletePointers() {
+    if(!autoDelete)
+	  return;
+    
+	typename std::list<TP *>::const_iterator it = list.begin();
+    for(; it != list.end(); ++it)
+    delete *it;
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,21 +110,40 @@ public:
 
 template <class T>
 List<T>::List()
+    : d(new ListPrivate<T>())
 {
-  d = new ListPrivate<T>;
 }
 
 template <class T>
-List<T>::List(const List<T> &l) : d(l.d)
+List<T>::List(const List<T> &l) 
+: d(l.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+template <class T>
+List<T>::List(List<T> &&l) 
+  : d(std::move(l.d))
+{
+}
+
+#endif 
 
 template <class T>
 List<T>::~List()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref())
     delete d;
+
+#endif
 }
 
 template <class T>
@@ -167,6 +208,29 @@ List<T> &List<T>::append(const List<T> &l)
   return *this;
 }
 
+#ifdef TAGLIB_USE_CXX11
+
+template <class T>
+List<T> &List<T>::append(T &&item)
+{
+  detach();
+  d->list.push_back(item);
+  return *this;
+}
+
+template <class T>
+List<T> &List<T>::append(List<T> &&l)
+{
+  detach();
+  
+  for(Iterator it = l.begin(); it != l.end(); ++it)
+    d->list.push_back(std::move(*it));
+  
+  return *this;
+}
+
+#endif
+
 template <class T>
 List<T> &List<T>::prepend(const T &item)
 {
@@ -182,6 +246,29 @@ List<T> &List<T>::prepend(const List<T> &l)
   d->list.insert(d->list.begin(), l.begin(), l.end());
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+template <class T>
+List<T> &List<T>::prepend(T &&item)
+{
+  detach();
+  d->list.push_front(item);
+  return *this;
+}
+
+template <class T>
+List<T> &List<T>::prepend(List<T> &&l)
+{
+  detach();
+  
+  for(Iterator it = l.rbegin(); it != l.rend(); ++it)
+    d->list.push_front(std::move(*it));
+  
+  return *this;
+}
+
+#endif
 
 template <class T>
 List<T> &List<T>::clear()
@@ -284,6 +371,12 @@ const T &List<T>::operator[](uint i) const
 template <class T>
 List<T> &List<T>::operator=(const List<T> &l)
 {
+ #ifdef TAGLIB_USE_CXX11
+
+  d = l.d;
+
+ #else
+
   if(&l == this)
     return *this;
 
@@ -291,8 +384,21 @@ List<T> &List<T>::operator=(const List<T> &l)
     delete d;
   d = l.d;
   d->ref();
+#endif
+
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+template <class T>
+List<T> &List<T>::operator=(List<T> &&l)
+{
+  d = std::move(l.d);
+  return *this;
+}
+
+#endif
 
 template <class T>
 bool List<T>::operator==(const List<T> &l) const
@@ -313,10 +419,19 @@ bool List<T>::operator!=(const List<T> &l) const
 template <class T>
 void List<T>::detach()
 {
+#ifdef TAGLIB_USE_CXX11
+  
+  if(!d.unique())
+    d.reset(new ListPrivate<T>(d->list));
+
+#else
+
   if(d->count() > 1) {
     d->deref();
     d = new ListPrivate<T>(d->list);
   }
+
+#endif
 }
 
 } // namespace TagLib

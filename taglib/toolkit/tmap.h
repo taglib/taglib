@@ -73,6 +73,15 @@ namespace TagLib {
      */
     Map(const Map<Key, T> &m);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a m into the Map.
+     */
+    Map(Map<Key, T> &&m);
+
+#endif
+
     /*!
      * Destroys this instance of the Map.
      */
@@ -107,6 +116,16 @@ namespace TagLib {
      * exists it will be overwritten.
      */
     Map<Key, T> &insert(const Key &key, const T &value);
+
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Inserts \a value under \a key in the map.  If a value for \a key already
+     * exists it will be overwritten.
+     */
+    Map<Key, T> &insert(const Key &key, T &&value);
+
+#endif
 
     /*!
      * Removes all of the elements from elements from the map.  This however
@@ -174,6 +193,15 @@ namespace TagLib {
      */
     Map<Key, T> &operator=(const Map<Key, T> &m);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a m into the Map.
+     */
+    Map<Key, T> &operator=(Map<Key, T> &&m);
+
+#endif
+
   protected:
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
@@ -185,10 +213,15 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class KeyP, class TP> class MapPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+    std::shared_ptr<MapPrivate<Key, T>> d;
+#else
     MapPrivate<Key, T> *d;
 #endif
-  };
 
+#endif
+  };
 }
 
 // Since GCC doesn't support the "export" keyword, we have to include the

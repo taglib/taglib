@@ -92,7 +92,7 @@ namespace TagLib {
     class TAGLIB_EXPORT FileTypeResolver
     {
     public:
-      virtual ~FileTypeResolver();
+      virtual ~FileTypeResolver() {}
 
       /*!
        * This method must be overridden to provide an additional file type
@@ -138,6 +138,15 @@ namespace TagLib {
      * Make a copy of \a ref.
      */
     FileRef(const FileRef &ref);
+
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Move \a ref into the FileRef.
+     */
+    FileRef(FileRef &&ref);
+
+#endif
 
     /*!
      * Destroys this FileRef instance.
@@ -227,6 +236,15 @@ namespace TagLib {
      */
     FileRef &operator=(const FileRef &ref);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Assign the file pointed to by \a ref to this FileRef.
+     */
+    FileRef &operator=(FileRef &&ref);
+
+#endif
+
     /*!
      * Returns true if this FileRef and \a ref point to the same File object.
      */
@@ -256,7 +274,12 @@ namespace TagLib {
 
   private:
     class FileRefPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+    std::shared_ptr<FileRefPrivate> d;
+#else
     FileRefPrivate *d;
+#endif
   };
 
 } // namespace TagLib

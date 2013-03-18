@@ -60,80 +60,107 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::Attribute::Attribute()
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = UnicodeType;
 }
 
 ASF::Attribute::Attribute(const ASF::Attribute &other)
   : d(other.d)
 {
-  d->ref();
-}
+#ifndef TAGLIB_USE_CXX11
 
-ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
-{
-  if(d->deref())
-    delete d;
-  d = other.d;
   d->ref();
-  return *this;
-}
 
-ASF::Attribute::~Attribute()
-{
-  if(d->deref())
-    delete d;
+#endif
 }
 
 ASF::Attribute::Attribute(const String &value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = UnicodeType;
   d->stringValue = value;
 }
 
 ASF::Attribute::Attribute(const ByteVector &value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = BytesType;
   d->byteVectorValue = value;
 }
 
 ASF::Attribute::Attribute(const ASF::Picture &value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = BytesType;
   d->pictureValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned int value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = DWordType;
   d->intValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned long long value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = QWordType;
   d->longLongValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned short value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = WordType;
   d->shortValue = value;
 }
 
 ASF::Attribute::Attribute(bool value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = BoolType;
   d->boolValue = value;
 }
+
+ASF::Attribute::~Attribute()
+{
+#ifndef TAGLIB_USE_CXX11
+
+  if(d->deref())
+    delete d;
+
+#endif
+}
+
+ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
+{
+#ifdef TAGLIB_USE_CXX11
+
+  d = other.d;
+
+#else
+
+  if(d->deref())
+    delete d;
+  d = other.d;
+  d->ref();
+
+#endif
+
+  return *this;
+}
+
+#ifdef TAGLIB_USE_CXX11
+
+ASF::Attribute &ASF::Attribute::operator=(ASF::Attribute &&other)
+{
+  d = std::move(other.d);
+  return *this;
+}
+
+#endif
 
 ASF::Attribute::AttributeTypes ASF::Attribute::type() const
 {

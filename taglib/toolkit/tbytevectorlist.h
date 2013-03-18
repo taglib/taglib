@@ -48,16 +48,36 @@ namespace TagLib {
     ByteVectorList();
 
     /*!
-     * Destroys this ByteVectorList instance.
+     * Make a shallow, implicitly shared, copy of \a l.  Because this is
+     * implicitly shared, this method is lightweight and suitable for
+     * pass-by-value usage.
      */
-    virtual ~ByteVectorList();
+    ByteVectorList(const ByteVectorList &l);
+
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a l into the StringList.
+     */
+    ByteVectorList(ByteVectorList &&l);
+
+#endif
 
     /*!
      * Make a shallow, implicitly shared, copy of \a l.  Because this is
      * implicitly shared, this method is lightweight and suitable for
      * pass-by-value usage.
      */
-    ByteVectorList(const ByteVectorList &l);
+    ByteVectorList &operator=(const ByteVectorList &l);
+
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a l into the \e ByteVectorList.
+     */
+    ByteVectorList &operator=(ByteVectorList &&l);
+
+#endif
 
     /*!
      * Convert the ByteVectorList to a ByteVector separated by \a separator.  By
@@ -74,9 +94,6 @@ namespace TagLib {
      */
     static ByteVectorList split(const ByteVector &v, const ByteVector &pattern,
                                 int byteAlign = 1, int max = 0);
-  private:
-    class ByteVectorListPrivate;
-    ByteVectorListPrivate *d;
   };
 
 }

@@ -115,6 +115,15 @@ namespace TagLib
        */
       ASF::Attribute &operator=(const Attribute &other);
 
+#ifdef TAGLIB_USE_CXX11
+
+      /*!
+       * Moves the contents of \a other into this item.
+       */
+      ASF::Attribute &operator=(Attribute &&other);
+
+#endif
+
       /*!
        * Destroys the attribute.
        */
@@ -194,7 +203,12 @@ namespace TagLib
       ByteVector render(const String &name, int kind = 0) const;
 
       class AttributePrivate;
+
+#ifdef TAGLIB_USE_CXX11
+      std::shared_ptr<AttributePrivate> d;
+#else
       AttributePrivate *d;
+#endif
     };
   }
 

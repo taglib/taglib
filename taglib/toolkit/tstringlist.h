@@ -58,6 +58,15 @@ namespace TagLib {
      */
     StringList(const StringList &l);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a l into the StringList.
+     */
+    StringList(StringList &&l);
+
+#endif
+
     /*!
      * Constructs a StringList with \a s as a member.
      */
@@ -70,11 +79,6 @@ namespace TagLib {
      * used with other codecs it will simply print a warning and exit.
      */
     StringList(const ByteVectorList &vl, String::Type t = String::Latin1);
-
-    /*!
-     * Destroys this StringList instance.
-     */
-    virtual ~StringList();
 
     /*!
      * Concatenate the list of strings into one string separated by \a separator.
@@ -93,15 +97,43 @@ namespace TagLib {
      */
     StringList &append(const StringList &l);
 
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Appends \a s to the end of the list and returns a reference to the
+     * list.
+     */
+    StringList &append(String &&s);
+
+    /*!
+     * Appends all of the values in \a l to the end of the list and returns a
+     * reference to the list.
+     */
+    StringList &append(StringList &&l);
+
+#endif
+
+    /*!
+     * Make a shallow, implicitly shared, copy of \a l.  Because this is
+     * implicitly shared, this method is lightweight and suitable for
+     * pass-by-value usage.
+     */
+    StringList &operator=(const StringList &l);
+
+#ifdef TAGLIB_USE_CXX11
+
+    /*!
+     * Moves \a l into the \e StringList.
+     */
+    StringList &operator=(StringList &&l);
+
+#endif
+
     /*!
      * Splits the String \a s into several strings at \a pattern.  This will not include
      * the pattern in the returned strings.
      */
     static StringList split(const String &s, const String &pattern);
-
-  private:
-    class StringListPrivate;
-    StringListPrivate *d;
   };
 
   /*!
