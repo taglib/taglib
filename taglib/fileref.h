@@ -143,6 +143,8 @@ namespace TagLib {
 
     /*!
      * Move \a ref into the FileRef.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     FileRef(FileRef &&ref);
 
@@ -239,7 +241,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Assign the file pointed to by \a ref to this FileRef.
+     * Moves \a ref into this FileRef.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     FileRef &operator=(FileRef &&ref);
 

@@ -73,7 +73,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a l into the \e List.
+     * Moves \a l into this List.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     List(List<T> &&l);
 
@@ -138,12 +140,16 @@ namespace TagLib {
     /*!
      * Appends \a item to the end of the list and returns a reference to the
      * list.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     List<T> &append(T &&item);
 
     /*!
      * Appends all of the values in \a l to the end of the list and returns a
      * reference to the list.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     List<T> &append(List<T> &&l);
 
@@ -166,12 +172,16 @@ namespace TagLib {
     /*!
      * Prepends \a item to the beginning list and returns a reference to the
      * list.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     List<T> &prepend(T &&item);
 
     /*!
      * Prepends all of the items in \a l to the beginning list and returns a
      * reference to the list.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     List<T> &prepend(List<T> &&l);
 
@@ -265,7 +275,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a l into the \e List.
+     * Moves \a l into this List.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     List<T> &operator=(List<T> &&l);
 

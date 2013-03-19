@@ -111,6 +111,8 @@ namespace TagLib
 
       /*!
        * Constructs an picture equivalent to \a other.
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
        */
       Picture(Picture &&other);
 
@@ -130,7 +132,9 @@ namespace TagLib
 
       /*!
        * Moves the contents of \a other into this picture.
-       */
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+      */
       Picture& operator=(Picture &&other);
 
 #endif

@@ -119,6 +119,8 @@ namespace TagLib
 
       /*!
        * Moves the contents of \a other into this item.
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
        */
       ASF::Attribute &operator=(Attribute &&other);
 

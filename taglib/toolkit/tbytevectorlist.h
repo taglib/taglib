@@ -57,7 +57,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a l into the StringList.
+     * Moves \a l into this ByteVectorList.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     ByteVectorList(ByteVectorList &&l);
 
@@ -73,7 +75,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a l into the \e ByteVectorList.
+     * Moves \a l into this ByteVectorList.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     ByteVectorList &operator=(ByteVectorList &&l);
 

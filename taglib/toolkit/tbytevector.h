@@ -70,6 +70,8 @@ namespace TagLib {
 
     /*!
      * Constructs a byte vector equivalent to \a v.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     ByteVector(ByteVector &&v);
 
@@ -392,7 +394,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a v into the ByteVector.
+     * Moves \a v into this ByteVector.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     ByteVector &operator=(ByteVector &&v);
 

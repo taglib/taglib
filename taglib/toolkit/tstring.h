@@ -126,7 +126,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a s into the \e String.
+     * Constructs a String equivalent to \a s.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     String(String &&s);
 
@@ -408,7 +410,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a s into the \e String.
+     * Moves \a s into this String.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     String &operator=(String &&s);
 
@@ -427,7 +431,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a s into the \e String.
+     * Moves \a s into this String.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     String &operator=(wstring &&s);
 

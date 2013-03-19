@@ -76,7 +76,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a m into the Map.
+     * Moves \a m into this Map.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     Map(Map<Key, T> &&m);
 
@@ -122,6 +124,8 @@ namespace TagLib {
     /*!
      * Inserts \a value under \a key in the map.  If a value for \a key already
      * exists it will be overwritten.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     Map<Key, T> &insert(const Key &key, T &&value);
 
@@ -196,7 +200,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a m into the Map.
+     * Moves \a m into this Map.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     Map<Key, T> &operator=(Map<Key, T> &&m);
 

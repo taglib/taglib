@@ -59,8 +59,10 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
       /*!
-       * Moves \a h into the \e Header.
-       */
+       * Moves \a h into this Header.
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+      */
       Header(Header &&h);
 
 #endif
@@ -166,7 +168,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
       /*!
-       * Moves \a h into the \e Header.
+       * Moves \a h into this Header.
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
        */
       Header &operator=(Header &&h);
 

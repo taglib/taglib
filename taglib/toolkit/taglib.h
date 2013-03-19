@@ -52,21 +52,8 @@
 
 #endif
 
-// Determines if std::shared_ptr<T> and rvalue reference are available.
+// TAGLIB_USE_CXX11 determines whether or not to enable C++11 features.
 // Replaces RefCounter capability with std::shared_ptr<T> if available.
-
-#ifndef __has_feature
-# define __has_feature(x) 0
-#endif
-
-#ifndef TAGLIB_USE_CXX11
-# if (defined(_MSC_VER) && _MSC_VER >= 1600)  \
-      || (defined(__clang__) && __has_feature(cxx_rvalue_references))   \
-      || (defined(__GNUC__) && defined(__GXX_EXPERIMENTAL_CXX0X__))
-
-#   define TAGLIB_USE_CXX11
-# endif
-#endif
 
 #ifdef TAGLIB_USE_CXX11
 # include <memory>

@@ -61,7 +61,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a l into the StringList.
+     * Constructs a StringList equivalent to \a l.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     StringList(StringList &&l);
 
@@ -102,12 +104,16 @@ namespace TagLib {
     /*!
      * Appends \a s to the end of the list and returns a reference to the
      * list.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     StringList &append(String &&s);
 
     /*!
      * Appends all of the values in \a l to the end of the list and returns a
      * reference to the list.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     StringList &append(StringList &&l);
 
@@ -123,7 +129,9 @@ namespace TagLib {
 #ifdef TAGLIB_USE_CXX11
 
     /*!
-     * Moves \a l into the \e StringList.
+     * Moves \a l into this StringList.
+     *
+     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
      */
     StringList &operator=(StringList &&l);
 
