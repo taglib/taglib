@@ -83,12 +83,24 @@ namespace {
 class String::StringPrivate : public RefCounter
 {
 public:
+
+#ifdef TAGLIB_USE_CXX11
+
+  StringPrivate() {}
+  StringPrivate(const wstring &s) : data(s) {}
+  StringPrivate(wstring &&s) : data(s) {}
+
+#else
+
+public:
   StringPrivate(const wstring &s) :
     RefCounter(),
     data(s) {}
 
   StringPrivate() :
     RefCounter() {}
+
+#endif
 
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian. 
@@ -105,20 +117,33 @@ String String::null;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-String::String()
+String::String() 
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
 }
 
-String::String(const String &s) : d(s.d)
+String::String(const String &s) 
+  : d(s.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+String::String(String &&s) 
+  : d(std::move(s.d))
+{
+}
+
+#endif
 
 String::String(const std::string &s, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-
   if(t == Latin1)
     copyFromLatin1(&s[0], s.length());
   else if(t == String::UTF8)
@@ -129,9 +154,8 @@ String::String(const std::string &s, Type t)
 }
 
 String::String(const wstring &s, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s.c_str(), s.length(), t);
   else {
@@ -140,9 +164,8 @@ String::String(const wstring &s, Type t)
 }
 
 String::String(const wchar_t *s, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s, ::wcslen(s), t);
   else {
@@ -151,9 +174,8 @@ String::String(const wchar_t *s, Type t)
 }
 
 String::String(const char *s, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-
   if(t == Latin1)
     copyFromLatin1(s, ::strlen(s));
   else if(t == String::UTF8)
@@ -164,9 +186,8 @@ String::String(const char *s, Type t)
 }
 
 String::String(wchar_t c, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-  
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
   else {
@@ -175,9 +196,8 @@ String::String(wchar_t c, Type t)
 }
 
 String::String(char c, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-
   if(t == Latin1 || t == UTF8) {
     d->data.resize(1);
     d->data[0] = static_cast<uchar>(c);
@@ -188,9 +208,8 @@ String::String(char c, Type t)
 }
 
 String::String(const ByteVector &v, Type t)
+  : d(new StringPrivate())
 {
-  d = new StringPrivate;
-
   if(v.isEmpty())
     return;
 
@@ -206,8 +225,12 @@ String::String(const ByteVector &v, Type t)
 
 String::~String()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref())
     delete d;
+
+#endif
 }
 
 std::string String::to8Bit(bool unicode) const
@@ -663,6 +686,12 @@ String &String::operator+=(char c)
 
 String &String::operator=(const String &s)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = s.d;
+
+#else
+
   if(&s == this)
     return *this;
 
@@ -670,15 +699,37 @@ String &String::operator=(const String &s)
     delete d;
   d = s.d;
   d->ref();
+
+#endif
+
   return *this;
 }
 
+#ifdef TAGLIB_USE_CXX11
+
+String &String::operator=(String &&s)
+{
+  d = std::move(s.d);
+  return *this;
+}
+
+#endif
+
 String &String::operator=(const std::string &s)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate());
+
+#else
+
   if(d->deref())
     delete d;
 
   d = new StringPrivate;
+
+#endif
+
   copyFromLatin1(s.c_str(), s.length());
 
   return *this;
@@ -686,20 +737,47 @@ String &String::operator=(const std::string &s)
 
 String &String::operator=(const wstring &s)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate(s));
+
+#else
+
   if(d->deref())
     delete d;
   
   d = new StringPrivate(s);
 
+#endif
+
   return *this;
 }
 
+#ifdef TAGLIB_USE_CXX11
+
+String &String::operator=(wstring &&s)
+{
+  d.reset(new StringPrivate(s));
+  return *this;
+}
+
+#endif
+
 String &String::operator=(const wchar_t *s)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate());
+
+#else
+
   if(d->deref())
     delete d;
-  
+
   d = new StringPrivate;
+
+#endif
+
   copyFromUTF16(s, ::wcslen(s), WCharByteOrder);
 
   return *this;
@@ -707,10 +785,19 @@ String &String::operator=(const wchar_t *s)
 
 String &String::operator=(char c)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate());
+
+#else
+
   if(d->deref())
     delete d;
-  
+
   d = new StringPrivate;
+
+#endif
+
   d->data.resize(1);
   d->data[0] = static_cast<uchar>(c);
 
@@ -719,10 +806,19 @@ String &String::operator=(char c)
 
 String &String::operator=(wchar_t c)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate());
+
+#else
+
   if(d->deref())
     delete d;
 
   d = new StringPrivate;
+
+#endif
+
   d->data.resize(1);
   d->data[0] = c;
 
@@ -731,10 +827,19 @@ String &String::operator=(wchar_t c)
 
 String &String::operator=(const char *s)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate());
+
+#else
+
   if(d->deref())
     delete d;
 
   d = new StringPrivate;
+
+#endif
+
   copyFromLatin1(s, ::strlen(s));
 
   return *this;
@@ -742,10 +847,19 @@ String &String::operator=(const char *s)
 
 String &String::operator=(const ByteVector &v)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d.reset(new StringPrivate());
+
+#else
+
   if(d->deref())
     delete d;
 
   d = new StringPrivate;
+
+#endif
+
   copyFromLatin1(v.data(), v.size());
 
   // If we hit a null in the ByteVector, shrink the string again.
@@ -765,10 +879,19 @@ bool String::operator<(const String &s) const
 
 void String::detach()
 {
+#ifdef TAGLIB_USE_CXX11
+
+  if(!d.unique())
+    d.reset(new StringPrivate(d->data));
+
+#else
+
   if(d->count() > 1) {
     d->deref();
     d = new StringPrivate(d->data);
   }
+
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -56,6 +56,17 @@ namespace TagLib {
        */
       Header(const Header &h);
 
+#ifdef TAGLIB_USE_CXX11
+
+      /*!
+       * Moves \a h into this Header.
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+      */
+      Header(Header &&h);
+
+#endif
+
       /*!
        * Destroys this Header instance.
        */
@@ -154,11 +165,27 @@ namespace TagLib {
        */
       Header &operator=(const Header &h);
 
+#ifdef TAGLIB_USE_CXX11
+
+      /*!
+       * Moves \a h into this Header.
+       *
+       * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+       */
+      Header &operator=(Header &&h);
+
+#endif
+
     private:
       void parse(const ByteVector &data);
 
       class HeaderPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+      std::shared_ptr<HeaderPrivate> d;
+#else
       HeaderPrivate *d;
+#endif
     };
   }
 }

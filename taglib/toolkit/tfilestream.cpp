@@ -55,10 +55,10 @@ namespace {
   {
     DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
-    if(wcslen(path) > 0)
-      return CreateFileW(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if(!path.wstr().empty())
+      return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else
-      return CreateFileA(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+      return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
   }
 
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
@@ -136,7 +136,17 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
     file = openFile(name, true);
 
   if(file == InvalidFile) {
-    debug("Could not open file " + String((const char *) name));
+#ifdef _WIN32
+    String n;
+    if(!name.wstr().empty())
+      n = name.wstr();
+    else
+      n = name.str();
+#else
+    String n(name);
+#endif // DEBUG
+
+    debug("Could not open file " + n);
   }
 }
 
