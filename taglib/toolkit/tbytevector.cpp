@@ -30,6 +30,16 @@
 
 #include <string.h>
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400 && (defined(_M_IX86) || defined(_M_X64))
+# define TAGLIB_MSC_BYTESWAP
+#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
+# define TAGLIB_GCC_BYTESWAP
+#endif
+
+#ifdef  TAGLIB_GCC_BYTESWAP
+# include <byteswap.h>
+#endif
+
 #include "tbytevector.h"
 
 // This is a bit ugly to keep writing over and over again.
@@ -91,128 +101,163 @@ namespace TagLib {
   };
 
   /*!
-   * A templatized KMP find that works both with a ByteVector and a ByteVectorMirror.
+   * A templatized straightforward find that works with the types 
+   * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
    */
-
-  template <class Vector>
-  int vectorFind(const Vector &v, const Vector &pattern, uint offset, int byteAlign)
+  template <class TIterator>
+  int findChar(
+    const TIterator dataBegin, const TIterator dataEnd,
+    char c, size_t offset, size_t byteAlign)
   {
-    if(pattern.size() > v.size() || offset > v.size() - 1)
+    const size_t dataSize = dataEnd - dataBegin;
+    if(dataSize == 0 || offset > dataSize - 1)
       return -1;
 
-    // Let's go ahead and special case a pattern of size one since that's common
-    // and easy to make fast.
+    // n % 0 is invalid
 
-    if(pattern.size() == 1) {
-      char p = pattern[0];
-      for(uint i = offset; i < v.size(); i++) {
-        if(v[i] == p && (i - offset) % byteAlign == 0)
-          return i;
-      }
+    if(byteAlign == 0)
       return -1;
-    }
 
-    uchar lastOccurrence[256];
-
-    for(uint i = 0; i < 256; ++i)
-      lastOccurrence[i] = uchar(pattern.size());
-
-    for(uint i = 0; i < pattern.size() - 1; ++i)
-      lastOccurrence[uchar(pattern[i])] = uchar(pattern.size() - i - 1);
-
-    for(uint i = pattern.size() - 1 + offset; i < v.size(); i += lastOccurrence[uchar(v.at(i))]) {
-      int iBuffer = i;
-      int iPattern = pattern.size() - 1;
-
-      while(iPattern >= 0 && v.at(iBuffer) == pattern[iPattern]) {
-        --iBuffer;
-        --iPattern;
-      }
-
-      if(-1 == iPattern && (iBuffer + 1 - offset) % byteAlign == 0)
-        return iBuffer + 1;
+    for(TIterator it = dataBegin + offset; it < dataEnd; it += byteAlign) {
+      if(*it == c)
+        return (it - dataBegin);
     }
 
     return -1;
   }
 
   /*!
-   * Wraps the accessors to a ByteVector to make the search algorithm access the
-   * elements in reverse.
-   *
-   * \see vectorFind()
-   * \see ByteVector::rfind()
+   * A templatized KMP find that works with the types 
+   * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
    */
-
-  class ByteVectorMirror
+  template <class TIterator>
+  int findVector(
+    const TIterator dataBegin, const TIterator dataEnd,
+    const TIterator patternBegin, const TIterator patternEnd,
+    size_t offset, size_t byteAlign)
   {
-  public:
-    ByteVectorMirror(const ByteVector &source) : v(source) {}
+    const size_t dataSize    = dataEnd    - dataBegin;
+    const size_t patternSize = patternEnd - patternBegin;
+    if(patternSize > dataSize || offset > dataSize - 1)
+      return -1;
 
-    char operator[](int index) const
+    // n % 0 is invalid
+
+    if(byteAlign == 0)
+      return -1;
+
+    // Special case that pattern has single char.
+
+    if(patternSize == 1)
+      return findChar(dataBegin, dataEnd, *patternBegin, offset, byteAlign);
+
+    size_t lastOccurrence[256];
+
+    for(size_t i = 0; i < 256; ++i)
+      lastOccurrence[i] = patternSize;
+
+    for(size_t i = 0; i < patternSize - 1; ++i)
+      lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
+
+    for(TIterator it = dataBegin + patternSize - 1 + offset;
+      it < dataEnd;
+      it += lastOccurrence[static_cast<uchar>(*it)])
     {
-      return v[v.size() - index - 1];
-    }
+      TIterator itBuffer = it;
+      TIterator itPattern = patternBegin + patternSize - 1;
 
-    char at(int index) const
-    {
-      return v.at(v.size() - index - 1);
-    }
-
-    ByteVectorMirror mid(uint index, uint length = 0xffffffff) const
-    {
-      return length == 0xffffffff ? v.mid(0, index) : v.mid(index - length, length);
-    }
-
-    uint size() const
-    {
-      return v.size();
-    }
-
-    int find(const ByteVectorMirror &pattern, uint offset = 0, int byteAlign = 1) const
-    {
-      ByteVectorMirror v(*this);
-
-      if(offset > 0) {
-        offset = size() - offset - pattern.size();
-        if(offset >= size())
-          offset = 0;
+      while(itPattern >= patternBegin && *itBuffer == *itPattern) {
+        --itBuffer;
+        --itPattern;
       }
 
-      const int pos = vectorFind<ByteVectorMirror>(v, pattern, offset, byteAlign);
-
-      // If the offset is zero then we need to adjust the location in the search
-      // to be appropriately reversed.  If not we need to account for the fact
-      // that the recursive call (called from the above line) has already ajusted
-      // for this but that the normal templatized find above will add the offset
-      // to the returned value.
-      //
-      // This is a little confusing at first if you don't first stop to think
-      // through the logic involved in the forward search.
-
-      if(pos == -1)
-        return -1;
-
-      return size() - pos - pattern.size();
+      if(itPattern < patternBegin && (itBuffer - dataBegin + 1 - offset) % byteAlign == 0)
+        return (itBuffer - dataBegin + 1);
     }
 
-  private:
-    const ByteVector &v;
-  };
+    return -1;
+  }
+
+#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
+
+  template <class T>
+  T byteSwap(T x)
+  {
+    // There should be all counterparts of to*() and from*() overloads for integral types.
+    debug("byteSwap<T>() -- Non specialized version should not be called");
+    return 0;
+  }
+
+#endif
+
+#ifdef TAGLIB_MSC_BYTESWAP
+
+  template <>
+  unsigned short byteSwap<unsigned short>(unsigned short x)
+  {
+    return _byteswap_ushort(x);
+  }
+
+  template <>
+  unsigned int byteSwap<unsigned int>(unsigned int x)
+  {
+    return _byteswap_ulong(x);
+  }
+
+  template <>
+  unsigned long long byteSwap<unsigned long long>(unsigned long long x)
+  {
+    return _byteswap_uint64(x);
+  }
+
+#endif
+
+#ifdef TAGLIB_GCC_BYTESWAP
+
+  template <>
+  unsigned short byteSwap<unsigned short>(unsigned short x)
+  {
+    return __bswap_16(x);
+  }
+
+  template <>
+  unsigned int byteSwap<unsigned int>(unsigned int x)
+  {
+    return __bswap_32(x);
+  }
+
+  template <>
+  unsigned long long byteSwap<unsigned long long>(unsigned long long x)
+  {
+    return __bswap_64(x);
+  }
+
+#endif 
 
   template <class T>
   T toNumber(const std::vector<char> &data, bool mostSignificantByteFirst)
   {
-    T sum = 0;
-
-    if(data.size() <= 0) {
-      debug("ByteVectorMirror::toNumber<T>() -- data is empty, returning 0");
-      return sum;
+    if(data.empty()) {
+      debug("toNumber<T>() -- data is empty, returning 0");
+      return 0;
     }
 
     const size_t size = sizeof(T);
-    const size_t last = data.size() > size ? size - 1 : data.size() - 1;
 
+#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
+
+    if(data.size() >= size)
+    {
+      if(mostSignificantByteFirst)
+        return byteSwap(*reinterpret_cast<const T*>(&data[0]));
+      else
+        return *reinterpret_cast<const T*>(&data[0]);
+    }
+
+#endif
+
+    const size_t last = data.size() > size ? size - 1 : data.size() - 1;
+    T sum = 0;
     for(size_t i = 0; i <= last; i++)
       sum |= (T) uchar(data[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
 
@@ -222,14 +267,24 @@ namespace TagLib {
   template <class T>
   ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   {
-    const TagLib::uint size = sizeof(T);
+    const size_t size = sizeof(T);
+
+#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
+
+    if(mostSignificantByteFirst)
+      value = byteSwap(value);
+
+    return ByteVector(reinterpret_cast<const char *>(&value), size);
+
+#else
 
     ByteVector v(size, 0);
-
-    for(TagLib::uint i = 0; i < size; i++)
+    for(size_t i = 0; i < size; i++)
       v[i] = uchar(value >> ((mostSignificantByteFirst ? size - 1 - i : i) * 8) & 0xff);
 
     return v;
+
+#endif
   }
 }
 
@@ -281,17 +336,17 @@ ByteVector ByteVector::fromCString(const char *s, uint length)
 
 ByteVector ByteVector::fromUInt(uint value, bool mostSignificantByteFirst)
 {
-  return fromNumber<uint>(value, mostSignificantByteFirst);
+  return fromNumber<unsigned int>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
 {
-  return fromNumber<short>(value, mostSignificantByteFirst);
+  return fromNumber<unsigned short>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)
 {
-  return fromNumber<long long>(value, mostSignificantByteFirst);
+  return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -411,19 +466,31 @@ char ByteVector::at(uint index) const
 
 int ByteVector::find(const ByteVector &pattern, uint offset, int byteAlign) const
 {
-  return vectorFind<ByteVector>(*this, pattern, offset, byteAlign);
+  return findVector<std::vector<char>::iterator>(
+    d->data.begin(), d->data.end(), pattern.d->data.begin(), pattern.d->data.end(), offset, byteAlign);
+}
+
+int ByteVector::find(char c, uint offset, int byteAlign) const
+{
+  return findChar<std::vector<char>::iterator>(
+    d->data.begin(), d->data.end(), c, offset, byteAlign);
 }
 
 int ByteVector::rfind(const ByteVector &pattern, uint offset, int byteAlign) const
 {
-  // Ok, this is a little goofy, but pretty cool after it sinks in.  Instead of
-  // reversing the find method's Boyer-Moore search algorithm I created a "mirror"
-  // for a ByteVector to reverse the behavior of the accessors.
+  if(offset > 0) {
+    offset = size() - offset - pattern.size();
+    if(offset >= size())
+      offset = 0;
+  }
 
-  ByteVectorMirror v(*this);
-  ByteVectorMirror p(pattern);
+  const int pos = findVector<std::vector<char>::reverse_iterator>(
+    d->data.rbegin(), d->data.rend(), pattern.d->data.rbegin(), pattern.d->data.rend(), offset, byteAlign);
 
-  return v.find(p, offset, byteAlign);
+  if(pos == -1)
+    return -1;
+  else
+    return size() - pos - pattern.size();
 }
 
 bool ByteVector::containsAt(const ByteVector &pattern, uint offset, uint patternOffset, uint patternLength) const
@@ -629,7 +696,7 @@ TagLib::uint ByteVector::checksum() const
 
 TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(d->data, mostSignificantByteFirst);
+  return toNumber<unsigned int>(d->data, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
