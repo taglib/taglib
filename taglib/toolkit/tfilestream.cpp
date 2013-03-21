@@ -362,7 +362,7 @@ bool FileStream::isOpen() const
 void FileStream::seek(offset_t offset, Position p)
 {
   if(!d->file) {
-    debug("File::seek() -- trying to seek in a file that isn't opened.");
+    debug("FileStream::seek() -- trying to seek in a file that isn't opened.");
     return;
   }
 
@@ -379,6 +379,9 @@ void FileStream::seek(offset_t offset, Position p)
   case End:
     whence = FILE_END;
     break;
+  default:
+    debug("FileStream::seek() -- Invalid Position value.");
+    return;
   }
 
   LARGE_INTEGER largeOffset = {};
@@ -398,6 +401,9 @@ void FileStream::seek(offset_t offset, Position p)
   case End:
     whence = SEEK_END;
     break;
+  default:
+    debug("FileStream::seek() -- Invalid Position value.");
+    return;
   }
 
 # ifdef _LARGEFILE_SOURCE
@@ -430,7 +436,7 @@ offset_t FileStream::tell() const
 {
 #ifdef _WIN32
 
-  LARGE_INTEGER largeOffset = {};
+  const LARGE_INTEGER largeOffset = {};
   LARGE_INTEGER newPointer;
 
   SetFilePointerEx(d->file, largeOffset, &newPointer, FILE_CURRENT);
@@ -462,7 +468,7 @@ offset_t FileStream::length()
   if(!d->file)
     return 0;
 
-  offset_t currentPosition = tell();
+  const offset_t currentPosition = tell();
 
   seek(0, End);
   offset_t endPosition = tell();
@@ -481,16 +487,21 @@ void FileStream::truncate(offset_t length)
 {
 #ifdef _WIN32
 
-  offset_t currentPosition = tell();
+  const offset_t currentPosition = tell();
 
   seek(length);
-  SetEndOfFile(d->file);
-
+  BOOL set = SetEndOfFile(d->file);
+  if(!set) {
+    debug("FileStream::truncate() -- Coundn't truncate the file.");
+  }
   seek(currentPosition);
 
 #else
 
-  ftruncate(fileno(d->file), length);
+  const int error = ftruncate(fileno(d->file), length);
+  if(error != 0) {
+    debug("FileStream::truncate() -- Coundn't truncate the file.");
+  }
 
 #endif
 }
