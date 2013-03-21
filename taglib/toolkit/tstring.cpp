@@ -31,7 +31,7 @@
 
 // Determine if the compiler supports codecvt.
 
-#if (defined(_MSC_VER) && _MSC_VER >= 1600)  // VC++2010 or later 
+#if (defined(_MSC_VER) && _MSC_VER >= 1600)
 # define TAGLIB_USE_CODECVT
 #endif
 
@@ -42,15 +42,23 @@
 # include "unicode.h"
 #endif
 
+#if defined(__GNUC__)
+# include <byteswap.h>
+#endif
+
 using namespace TagLib;
 
 namespace {
 
   inline unsigned short byteSwap(unsigned short x)
   {
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+#if defined(_MSC_VER) && (_MSC_VER >= 1400) 
 
     return _byteswap_ushort(x);
+
+#elif defined(__GNUC__)
+
+    return __bswap_16(x);
 
 #else
 
@@ -64,9 +72,11 @@ namespace {
     return (c1 << 8) | c2;
   }
 
+#if !defined(TAGLIB_LITTLE_ENDIAN) && !defined(TAGLIB_BIG_ENDIAN)
+
   String::Type wcharByteOrder() 
   {
-    // Detect CPU endian.
+    // Detect CPU endian at run time.
     union {
       TagLib::ushort w;
       char c;
@@ -77,8 +87,9 @@ namespace {
     else
       return String::UTF16BE;
   }
-}
 
+#endif
+}
 
 class String::StringPrivate : public RefCounter
 {
@@ -1000,8 +1011,19 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-String::Type String::WCharByteOrder = wcharByteOrder();
+#if defined(TAGLIB_LITTLE_ENDIAN)
 
+const String::Type String::WCharByteOrder = String::UTF16LE;
+
+#elif defined(TAGLIB_BIG_ENDIAN)
+
+const String::Type String::WCharByteOrder = String::UTF16BE;
+
+#else
+
+const String::Type String::WCharByteOrder = wcharByteOrder();
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions
