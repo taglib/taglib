@@ -46,8 +46,6 @@
 # include <byteswap.h>
 #endif
 
-using namespace TagLib;
-
 namespace {
 
   inline unsigned short byteSwap(unsigned short x)
@@ -90,6 +88,8 @@ namespace {
 
 #endif
 }
+
+namespace TagLib {
 
 class String::StringPrivate : public RefCounter
 {
@@ -980,35 +980,46 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
   }
 }
 
+template <size_t sizeOfWcharT>
+void String::internalCopyFromUTF16(const char *s, size_t length, Type t)
+{
+  // Non specialized version. Used where sizeof(wchar_t) != 2.
+
+  bool swap;
+  if(t == UTF16) {
+    if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfeff) 
+      swap = false; // Same as CPU endian. No need to swap bytes.
+    else if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfffe) 
+      swap = true;  // Not same as CPU endian. Need to swap bytes.
+    else {
+      debug("String::copyFromUTF16() - Invalid UTF16 string.");
+      return;
+    }
+
+    s += 2;
+    length -= 2;
+  }
+  else 
+    swap = (t != WCharByteOrder);
+
+  d->data.resize(length / 2);
+  for(size_t i = 0; i < length / 2; ++i) {
+    d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
+    s += 2;
+  }
+}
+
+template <>
+void String::internalCopyFromUTF16<2>(const char *s, size_t length, Type t)
+{
+  // Specialized version for where sizeof(wchar_t) == 2.
+
+  copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
+}
+
 void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
-  if(sizeof(wchar_t) == 2) 
-    copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
-  else
-  {
-    bool swap;
-    if(t == UTF16) {
-      if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfeff) 
-        swap = false; // Same as CPU endian. No need to swap bytes.
-      else if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfffe) 
-        swap = true;  // Not same as CPU endian. Need to swap bytes.
-      else {
-        debug("String::copyFromUTF16() - Invalid UTF16 string.");
-        return;
-      }
-
-      s += 2;
-      length -= 2;
-    }
-    else 
-      swap = (t != WCharByteOrder);
-
-    d->data.resize(length / 2);
-    for(size_t i = 0; i < length / 2; ++i) {
-      d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
-      s += 2;
-    }
-  }
+  internalCopyFromUTF16<sizeof(wchar_t)>(s, length, t);
 }
 
 #if defined(TAGLIB_LITTLE_ENDIAN)
@@ -1029,29 +1040,30 @@ const String::Type String::WCharByteOrder = wcharByteOrder();
 // related functions
 ////////////////////////////////////////////////////////////////////////////////
 
-const TagLib::String TagLib::operator+(const TagLib::String &s1, const TagLib::String &s2)
+const String operator+(const String &s1, const String &s2)
 {
   String s(s1);
   s.append(s2);
   return s;
 }
 
-const TagLib::String TagLib::operator+(const char *s1, const TagLib::String &s2)
+const String operator+(const char *s1, const String &s2)
 {
   String s(s1);
   s.append(s2);
   return s;
 }
 
-const TagLib::String TagLib::operator+(const TagLib::String &s1, const char *s2)
+const String operator+(const String &s1, const char *s2)
 {
   String s(s1);
   s.append(s2);
   return s;
 }
 
-std::ostream &TagLib::operator<<(std::ostream &s, const String &str)
+std::ostream &operator<<(std::ostream &s, const String &str)
 {
   s << str.to8Bit();
   return s;
+}
 }
