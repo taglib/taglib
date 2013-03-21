@@ -474,7 +474,7 @@ namespace TagLib {
     /*!
      * A null string provided for convenience.
      */
-    static String null;
+    static const String null;
 
   protected:
     /*!
