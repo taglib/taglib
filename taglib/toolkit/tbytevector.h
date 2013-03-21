@@ -424,7 +424,8 @@ namespace TagLib {
      * A static, empty ByteVector which is convenient and fast (since returning
      * an empty or "null" value does not require instantiating a new ByteVector).
      */
-    static ByteVector null;
+    static const ByteVector null;
+
 
     /*!
      * Returns a hex-encoded copy of the byte vector.
