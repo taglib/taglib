@@ -320,7 +320,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVector ByteVector::null;
+const ByteVector ByteVector::null;
 
 ByteVector ByteVector::fromCString(const char *s, uint length)
 {
