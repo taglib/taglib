@@ -512,9 +512,9 @@ namespace TagLib {
     /*!
      * Indicates which byte order of UTF-16 is used to store strings internally. 
      *
-     * \note Set to \e UTF16BE or \e UTF16LE at run time.
+     * \note \e String::UTF16BE or \e String::UTF16LE
      */
-    static Type WCharByteOrder;
+    static const Type WCharByteOrder;
 
     class StringPrivate;
 
