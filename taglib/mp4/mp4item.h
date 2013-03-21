@@ -56,7 +56,14 @@ namespace TagLib {
 
       Item();
       Item(const Item &item);
+#ifdef TAGLIB_USE_CXX11
+      Item(Item &&item);
+#endif
+
       Item &operator=(const Item &item);
+#ifdef TAGLIB_USE_CXX11
+      Item &operator=(Item &&item);
+#endif
       ~Item();
 
       Item(int value);
@@ -90,7 +97,12 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+      std::shared_ptr<ItemPrivate> d;
+#else
       ItemPrivate *d;
+#endif
     };
 
   }

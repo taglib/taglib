@@ -62,94 +62,132 @@ public:
 };
 
 MP4::Item::Item()
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->valid = false;
 }
 
-MP4::Item::Item(const Item &item) : d(item.d)
+MP4::Item::Item(const Item &item) 
+  : d(item.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
 
-MP4::Item &
-MP4::Item::operator=(const Item &item)
+#ifdef TAGLIB_USE_CXX11
+
+MP4::Item::Item(Item &&item) 
+  : d(std::move(item.d))
 {
+}
+
+#endif
+
+MP4::Item &
+  MP4::Item::operator=(const Item &item)
+{
+#ifdef TAGLIB_USE_CXX11
+
+  d = item.d;
+
+#else
+
   if(d->deref()) {
     delete d;
   }
   d = item.d;
   d->ref();
+
+#endif
+
   return *this;
 }
 
+#ifdef TAGLIB_USE_CXX11
+
+MP4::Item &
+  MP4::Item::operator=(Item &&item)
+{
+  d = std::move(item.d);
+  return *this;
+}
+
+#endif
+
 MP4::Item::~Item()
 {
+#ifndef TAGLIB_USE_CXX11
+  
   if(d->deref()) {
     delete d;
   }
+
+#endif
 }
 
 MP4::Item::Item(bool value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_bool = value;
   d->type = TypeBool;
 }
 
 MP4::Item::Item(int value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_int = value;
   d->type = TypeInt;
 }
 
 MP4::Item::Item(uchar value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_byte = value;
   d->type = TypeByte;
 }
 
 MP4::Item::Item(uint value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_uint = value;
   d->type = TypeUInt;
 }
 
 MP4::Item::Item(long long value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_longlong = value;
   d->type = TypeLongLong;
 }
 
 MP4::Item::Item(int value1, int value2)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_intPair.first = value1;
   d->m_intPair.second = value2;
   d->type = TypeIntPair;
 }
 
 MP4::Item::Item(const ByteVectorList &value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_byteVectorList = value;
   d->type = TypeByteVectorList;
 }
 
 MP4::Item::Item(const StringList &value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_stringList = value;
   d->type = TypeStringList;
 }
 
 MP4::Item::Item(const MP4::CoverArtList &value)
+  : d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->m_coverArtList = value;
   d->type = TypeCoverArtList;
 }

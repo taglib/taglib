@@ -35,32 +35,78 @@ class Map<Key, T>::MapPrivate : public RefCounter
 {
 public:
   MapPrivate() : RefCounter() {}
+
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
-  MapPrivate(const std::map<class KeyP, class TP>& m) : RefCounter(), map(m) {}
+
+  MapPrivate(const std::map<class KeyP, class TP> &m) : RefCounter(), map(m) {}
+
+# ifdef TAGLIB_USE_CXX11
+
+  MapPrivate(std::map<class KeyP, class TP> &&m) : RefCounter(), map(m) {}
+
+# endif
+
+  void clear() {
+    std::map<class KeyP, class TP>().swap(map);
+  }
+
   std::map<class KeyP, class TP> map;
+
 #else
+
   MapPrivate(const std::map<KeyP, TP>& m) : RefCounter(), map(m) {}
+
+# ifdef TAGLIB_USE_CXX11
+
+  MapPrivate(std::map<KeyP, TP> &&m) : RefCounter(), map(m) {}
+
+# endif
+
+  void clear() {
+    std::map<KeyP, TP>().swap(map);
+  }
+
   std::map<KeyP, TP> map;
+
 #endif
 };
 
 template <class Key, class T>
 Map<Key, T>::Map()
+  : d(new MapPrivate<Key, T>())
 {
-  d = new MapPrivate<Key, T>;
 }
 
 template <class Key, class T>
-Map<Key, T>::Map(const Map<Key, T> &m) : d(m.d)
+Map<Key, T>::Map(const Map<Key, T> &m) 
+  : d(m.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+template <class Key, class T>
+TagLib::Map<Key, T>::Map(Map<Key, T> &&m)
+  : d(std::move(m.d))
+{
+}
+
+#endif
 
 template <class Key, class T>
 Map<Key, T>::~Map()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref())
     delete(d);
+
+#endif
 }
 
 template <class Key, class T>
@@ -96,6 +142,18 @@ Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
   d->map[key] = value;
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+template <class Key, class T>
+Map<Key, T> &Map<Key, T>::insert(const Key &key, T &&value)
+{
+  detach();
+  d->map[key] = value;
+  return *this;
+}
+
+#endif
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::clear()
@@ -170,6 +228,12 @@ T &Map<Key, T>::operator[](const Key &key)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = m.d;
+
+#else
+
   if(&m == this)
     return *this;
 
@@ -177,8 +241,22 @@ Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
     delete(d);
   d = m.d;
   d->ref();
+
+#endif
+
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+template <class Key, class T>
+Map<Key, T> &Map<Key, T>::operator=(Map<Key, T> &&m)
+{
+  d = std::move(m.d);
+  return *this;
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
@@ -187,10 +265,19 @@ Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
+#ifdef TAGLIB_USE_CXX11
+ 
+  if(!d.unique())
+    d.reset(new MapPrivate<Key, T>(d->map));
+
+#else
+
   if(d->count() > 1) {
     d->deref();
     d = new MapPrivate<Key, T>(d->map);
   }
+
+#endif
 }
 
 } // namespace TagLib

@@ -71,13 +71,31 @@ ByteVectorList::ByteVectorList() : List<ByteVector>()
 
 ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
 {
-
 }
 
-ByteVectorList::~ByteVectorList()
+#ifdef TAGLIB_USE_CXX11
+
+ByteVectorList::ByteVectorList(ByteVectorList &&l) : List<ByteVector>(l)
 {
-
 }
+
+#endif
+
+ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
+{
+  List<ByteVector>::operator=(l);
+  return *this;
+}
+
+#ifdef TAGLIB_USE_CXX11
+
+ByteVectorList &ByteVectorList::operator=(ByteVectorList &&l)
+{
+  List<ByteVector>::operator=(l);
+  return *this;
+}
+
+#endif
 
 ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {

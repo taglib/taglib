@@ -54,6 +54,9 @@ namespace TagLib {
 
       CoverArt(const CoverArt &item);
       CoverArt &operator=(const CoverArt &item);
+#ifdef TAGLIB_USE_CXX11
+      CoverArt &operator=(CoverArt &&item);
+#endif
 
       //! Format of the image
       Format format() const;
@@ -63,7 +66,12 @@ namespace TagLib {
 
     private:
       class CoverArtPrivate;
+
+#ifdef TAGLIB_USE_CXX11
+      std::shared_ptr<CoverArtPrivate> d;
+#else
       CoverArtPrivate *d;
+#endif
     };
 
     typedef List<CoverArt> CoverArtList;

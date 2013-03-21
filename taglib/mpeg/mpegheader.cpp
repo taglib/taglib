@@ -68,20 +68,38 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPEG::Header::Header(const ByteVector &data)
+  : d(new HeaderPrivate())
 {
-  d = new HeaderPrivate;
   parse(data);
 }
 
-MPEG::Header::Header(const Header &h) : d(h.d)
+MPEG::Header::Header(const Header &h) 
+  : d(h.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+MPEG::Header::Header(Header &&h) 
+  : d(std::move(h.d))
+{
+}
+
+#endif
 
 MPEG::Header::~Header()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if (d->deref())
     delete d;
+
+#endif
 }
 
 bool MPEG::Header::isValid() const
@@ -146,6 +164,12 @@ int MPEG::Header::samplesPerFrame() const
 
 MPEG::Header &MPEG::Header::operator=(const Header &h)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = h.d;
+
+#else
+
   if(&h == this)
     return *this;
 
@@ -154,8 +178,21 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 
   d = h.d;
   d->ref();
+
+#endif
+
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+MPEG::Header &MPEG::Header::operator=(Header &&h)
+{
+  d = std::move(h.d);
+  return *this;
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members

@@ -38,34 +38,42 @@
 
 #include <string>
 
-#ifndef _WIN32
-
-#  ifndef _LARGEFILE_SOURCE
-#    define _LARGEFILE_SOURCE
-#  endif
-
-#  define _FILE_OFFSET_BITS 64
-#  include <sys/types.h>
+#ifdef _WIN32
+# if !defined(NOMINMAX)
+#   define NOMINMAX
+# endif
+# include <windows.h>
+#else
+# ifndef _LARGEFILE_SOURCE
+#   define _LARGEFILE_SOURCE
+# endif
+# define _FILE_OFFSET_BITS 64
+# include <sys/types.h>
 
 #endif
 
-#ifdef __APPLE__
-#  include <libkern/OSAtomic.h>
-#  define TAGLIB_ATOMIC_MAC
-#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
-#  if !defined(NOMINMAX)
-#    define NOMINMAX
-#  endif
-#  include <windows.h>
-#  define TAGLIB_ATOMIC_WIN
-#elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
+// TAGLIB_USE_CXX11 determines whether or not to enable C++11 features.
+// Replaces RefCounter capability with std::shared_ptr<T> if available.
+
+#ifdef TAGLIB_USE_CXX11
+# include <memory>
+#endif
+
+#ifndef TAGLIB_USE_CXX11
+# ifdef __APPLE__
+#   include <libkern/OSAtomic.h>
+#   define TAGLIB_ATOMIC_MAC
+# elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
+#   define TAGLIB_ATOMIC_WIN
+# elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
       && (defined(__i386__) || defined(__i486__) || defined(__i586__) || \
           defined(__i686__) || defined(__x86_64) || defined(__ia64)) \
       && !defined(__INTEL_COMPILER)
-#  define TAGLIB_ATOMIC_GCC
-#elif defined(__ia64) && defined(__INTEL_COMPILER)
-#  include <ia64intrin.h>
-#  define TAGLIB_ATOMIC_GCC
+#   define TAGLIB_ATOMIC_GCC
+# elif defined(__ia64) && defined(__INTEL_COMPILER)
+#   include <ia64intrin.h>
+#   define TAGLIB_ATOMIC_GCC
+# endif
 #endif
 
 //! A namespace for all TagLib related classes and functions
@@ -110,39 +118,46 @@ namespace TagLib {
    * \warning This <b>is not</b> part of the TagLib public API!
    */
 
+
   class RefCounter
   {
+    // RefCounter is a mere dummy if std::shared_ptr<T> is available.
+
+#ifndef TAGLIB_USE_CXX11
+
   public:
     RefCounter() : refCount(1) {}
-
-#ifdef TAGLIB_ATOMIC_MAC
+    
+# ifdef TAGLIB_ATOMIC_MAC
     void ref() { OSAtomicIncrement32Barrier(const_cast<int32_t*>(&refCount)); }
     bool deref() { return ! OSAtomicDecrement32Barrier(const_cast<int32_t*>(&refCount)); }
     int32_t count() { return refCount; }
   private:
     volatile int32_t refCount;
-#elif defined(TAGLIB_ATOMIC_WIN)
+# elif defined(TAGLIB_ATOMIC_WIN)
     void ref() { InterlockedIncrement(&refCount); }
     bool deref() { return ! InterlockedDecrement(&refCount); }
     long count() { return refCount; }
   private:
     volatile long refCount;
-#elif defined(TAGLIB_ATOMIC_GCC)
+# elif defined(TAGLIB_ATOMIC_GCC)
     void ref() { __sync_add_and_fetch(&refCount, 1); }
     bool deref() { return ! __sync_sub_and_fetch(&refCount, 1); }
     int count() { return refCount; }
   private:
     volatile int refCount;
-#else
+# else
     void ref() { refCount++; }
     bool deref() { return ! --refCount; }
     int count() { return refCount; }
   private:
     uint refCount;
+# endif
 #endif
-
+  
+  public:
+    virtual ~RefCounter() {}
   };
-
 #endif // DO_NOT_DOCUMENT
 
 }

@@ -31,6 +31,10 @@
 #include <config.h>
 #endif
 
+#ifdef _WIN32
+# include <Shlwapi.h>
+#endif
+
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>
@@ -60,12 +64,24 @@ using namespace TagLib;
 class FileRef::FileRefPrivate : public RefCounter
 {
 public:
-  FileRefPrivate(File *f) : RefCounter(), file(f) {}
-  ~FileRefPrivate() {
+  FileRefPrivate(File *f) 
+    : RefCounter(), file(f) {}
+
+  ~FileRefPrivate() 
+  {
+#ifndef TAGLIB_USE_CXX11
+
     delete file;
+
+#endif
   }
 
+#ifdef TAGLIB_USE_CXX11
+  std::unique_ptr<File> file;
+#else
   File *file;
+#endif
+
   static List<const FileTypeResolver *> fileTypeResolvers;
 };
 
@@ -76,30 +92,48 @@ List<const FileRef::FileTypeResolver *> FileRef::FileRefPrivate::fileTypeResolve
 ////////////////////////////////////////////////////////////////////////////////
 
 FileRef::FileRef()
+  : d(new FileRefPrivate(0))
 {
-  d = new FileRefPrivate(0);
 }
 
-FileRef::FileRef(FileName fileName, bool readAudioProperties,
-                 AudioProperties::ReadStyle audioPropertiesStyle)
+FileRef::FileRef(FileName fileName, 
+                 bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle)
+  : d(new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle)))
 {
-  d = new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle));
 }
 
 FileRef::FileRef(File *file)
+  : d(new FileRefPrivate(file))
 {
-  d = new FileRefPrivate(file);
 }
 
-FileRef::FileRef(const FileRef &ref) : d(ref.d)
+FileRef::FileRef(const FileRef &ref) 
+  : d(ref.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+FileRef::FileRef(FileRef &&ref) 
+  : d(std::move(ref.d))
+{
+}
+
+#endif
 
 FileRef::~FileRef()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref())
     delete d;
+
+#endif
 }
 
 Tag *FileRef::tag() const
@@ -122,7 +156,15 @@ AudioProperties *FileRef::audioProperties() const
 
 File *FileRef::file() const
 {
+#ifdef TAGLIB_USE_CXX11
+
+  return d->file.get();
+
+#else
+
   return d->file;
+
+#endif
 }
 
 bool FileRef::save()
@@ -182,6 +224,12 @@ bool FileRef::isNull() const
 
 FileRef &FileRef::operator=(const FileRef &ref)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = ref.d;
+
+#else
+
   if(&ref == this)
     return *this;
 
@@ -191,8 +239,20 @@ FileRef &FileRef::operator=(const FileRef &ref)
   d = ref.d;
   d->ref();
 
+#endif
+
   return *this;
 }
+
+#ifdef TAGLIB_USE_CXX11
+
+FileRef &FileRef::operator=(FileRef &&ref)
+{
+  d = std::move(ref.d);
+  return *this;
+}
+
+#endif
 
 bool FileRef::operator==(const FileRef &ref) const
 {
@@ -216,23 +276,36 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return file;
   }
 
-  // Ok, this is really dumb for now, but it works for testing.
-
-  String s;
+  String ext;
 
 #ifdef _WIN32
-  s = (wcslen((const wchar_t *) fileName) > 0) ? String((const wchar_t *) fileName) : String((const char *) fileName);
+  // Avoids direct conversion from FileName to String
+  // because String can't accept non-Latin-1 string in char array.
+  
+  if(!fileName.wstr().empty()) {
+    const wchar_t *pext = PathFindExtensionW(fileName.wstr().c_str());
+    if(*pext == L'.')
+      ext = String(pext + 1).upper();
+  }
+  else {
+    const char *pext = PathFindExtensionA(fileName.str().c_str());
+    if(*pext == '.')
+      ext = String(pext + 1).upper();
+  }
 #else
-  s = fileName;
+  {
+    String s = fileName;
+    int pos = s.rfind(".");
+    if(pos != -1)
+      ext = s.substr(pos + 1).upper();
+  }
 #endif
 
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
   // that a default file type resolver is created.
 
-  int pos = s.rfind(".");
-  if(pos != -1) {
-    String ext = s.substr(pos + 1).upper();
+  if(!ext.isEmpty()) {
     if(ext == "MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "OGG")

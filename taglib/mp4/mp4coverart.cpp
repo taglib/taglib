@@ -43,33 +43,61 @@ public:
 };
 
 MP4::CoverArt::CoverArt(Format format, const ByteVector &data)
+  : d(new CoverArtPrivate())
 {
-  d = new CoverArtPrivate;
   d->format = format;
   d->data = data;
 }
 
 MP4::CoverArt::CoverArt(const CoverArt &item) : d(item.d)
 {
+#ifndef TAGLIB_USE_CXX11
+
   d->ref();
+
+#endif
 }
 
 MP4::CoverArt &
-MP4::CoverArt::operator=(const CoverArt &item)
+  MP4::CoverArt::operator=(const CoverArt &item)
 {
+#ifdef TAGLIB_USE_CXX11
+
+  d = item.d;
+
+#else
+
   if(d->deref()) {
     delete d;
   }
   d = item.d;
   d->ref();
+
+#endif
+
   return *this;
 }
 
+#ifdef TAGLIB_USE_CXX11
+
+MP4::CoverArt &
+  MP4::CoverArt::operator=(CoverArt &&item)
+{
+  d = std::move(item.d);
+  return *this;
+}
+
+#endif
+
 MP4::CoverArt::~CoverArt()
 {
+#ifndef TAGLIB_USE_CXX11
+
   if(d->deref()) {
     delete d;
   }
+
+#endif
 }
 
 MP4::CoverArt::Format
