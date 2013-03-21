@@ -428,19 +428,21 @@ bool String::isNull() const
 
 ByteVector String::data(Type t) const
 {
-  ByteVector v;
-
-  switch(t) {
-
+  switch(t) 
+  {
   case Latin1:
   {
+    ByteVector v(size());
+    char *p = v.data();
+
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++)
-      v.append(char(*it));
-    break;
+      *p++ = static_cast<char>(*it);
+
+    return v;
   }
   case UTF8:
   {
-    v.resize(d->data.size() * 4 + 1);
+    ByteVector v(size() * 4 + 1);
 
 #ifdef TAGLIB_USE_CODECVT
 
@@ -451,7 +453,7 @@ ByteVector String::data(Type t) const
         st, &d->data[0], &d->data[d->data.size()], source, v.data(), v.data() + v.size(), target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::data() - Unicode conversion error.");
     }
 
 #else
@@ -465,60 +467,63 @@ ByteVector String::data(Type t) const
       Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::to8Bit() - Unicode conversion error.");
+      debug("String::data() - Unicode conversion error.");
     }
 
 #endif
 
     v.resize(::strlen(v.data()));
 
-    break;
+    return v;
   }
   case UTF16:
   {
+    ByteVector v(2 + size() * 2);
+    char *p = v.data();
+
     // Assume that if we're doing UTF16 and not UTF16BE that we want little
     // endian encoding.  (Byte Order Mark)
 
-    v.append(char(0xff));
-    v.append(char(0xfe));
+    *p++ = '\xff';
+    *p++ = '\xfe';
 
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
-
-      char c1 = *it & 0xff;
-      char c2 = *it >> 8;
-
-      v.append(c1);
-      v.append(c2);
+      *p++ = static_cast<char>(*it & 0xff);
+      *p++ = static_cast<char>(*it >> 8);
     }
-    break;
+
+    return v;
   }
   case UTF16BE:
   {
+    ByteVector v(size() * 2);
+    char *p = v.data();
+
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
-
-      char c1 = *it >> 8;
-      char c2 = *it & 0xff;
-
-      v.append(c1);
-      v.append(c2);
+      *p++ = static_cast<char>(*it >> 8);
+      *p++ = static_cast<char>(*it & 0xff);
     }
-    break;
+
+    return v;
   }
   case UTF16LE:
   {
+    ByteVector v(size() * 2);
+    char *p = v.data();
+
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
-
-      char c1 = *it & 0xff;
-      char c2 = *it >> 8;
-
-      v.append(c1);
-      v.append(c2);
+      *p++ = static_cast<char>(*it & 0xff);
+      *p++ = static_cast<char>(*it >> 8);
     }
-    break;
-  }
-  }
 
-  return v;
+    return v;
+  }
+  default:
+  {
+    debug("String::data() - Invalid Type value.");
+    return ByteVector();
+  }
+  }
 }
 
 int String::toInt(bool *ok) const
