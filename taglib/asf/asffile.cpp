@@ -553,7 +553,7 @@ bool ASF::File::save()
     data.append(d->objects[i]->render(this));
   }
   data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;
-  insert(data, 0, (TagLib::ulong)d->size);
+  insert(data, 0, (uint)d->size);
 
   return true;
 }
