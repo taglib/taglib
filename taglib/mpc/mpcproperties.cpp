@@ -205,7 +205,7 @@ void MPC::Properties::readSV8(File *file)
       d->version = data[pos];
       pos += 1;
       d->sampleFrames = readSize(data.mid(pos), pos);
-      ulong begSilence = readSize(data.mid(pos), pos);
+      uint begSilence = readSize(data.mid(pos), pos);
 
       std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.mid(pos, 2).toUShort(true)));
       pos += 2;
