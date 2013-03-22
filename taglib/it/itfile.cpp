@@ -99,7 +99,7 @@ bool IT::File::save()
   StringList lines = d->tag.comment().split("\n");
   for(ushort i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
-    ulong instrumentOffset = 0;
+    uint instrumentOffset = 0;
     if(!readU32L(instrumentOffset))
       return false;
 
@@ -114,7 +114,7 @@ bool IT::File::save()
 
   for(ushort i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
-    ulong sampleOffset = 0;
+    uint sampleOffset = 0;
     if(!readU32L(sampleOffset))
       return false;
 
@@ -141,13 +141,13 @@ bool IT::File::save()
 
   ushort special = 0;
   ushort messageLength = 0;
-  ulong  messageOffset = 0;
+  uint   messageOffset = 0;
 
   seek(46);
   if(!readU16L(special))
     return false;
 
-  ulong fileSize = static_cast<ulong>(File::length());
+  uint fileSize = static_cast<uint>(File::length());
   if(special & Properties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))
