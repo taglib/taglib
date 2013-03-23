@@ -116,7 +116,16 @@ public:
 
   bool readOnly;
   offset_t size;
-  static const uint bufferSize = 1024;
+
+#ifdef _WIN32
+
+  static const size_t bufferSize = 8196;
+
+#else
+
+  static const size_t bufferSize = 1024;
+
+#endif
 };
 
 FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openReadOnly) :
@@ -181,7 +190,7 @@ FileName FileStream::name() const
   return d->name;
 }
 
-ByteVector FileStream::readBlock(uint length)
+ByteVector FileStream::readBlock(size_t length)
 {
   if(!d->file) {
     debug("FileStream::readBlock() -- Invalid File");
@@ -191,15 +200,12 @@ ByteVector FileStream::readBlock(uint length)
   if(length == 0)
     return ByteVector::null;
 
-  if(length > FileStreamPrivate::bufferSize &&
-     static_cast<offset_t>(length) > FileStream::length())
-  {
-    length = static_cast<uint>(FileStream::length());
-  }
+  if(length > FileStreamPrivate::bufferSize && static_cast<offset_t>(length) > FileStream::length())
+    length = static_cast<size_t>(FileStream::length());
 
-  ByteVector v(length);
+  ByteVector v(length, 0);
   const size_t count = fread(v.data(), sizeof(char), length, d->file);
-  v.resize(static_cast<uint>(count));
+  v.resize(count);
   return v;
 }
 
@@ -216,7 +222,7 @@ void FileStream::writeBlock(const ByteVector &data)
   fwrite(data.data(), sizeof(char), data.size(), d->file);
 }
 
-void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
+void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
 {
   if(!d->file)
     return;
@@ -243,10 +249,10 @@ void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  size_t bufferLength = bufferSize();
+  size_t bufferLength = FileStreamPrivate::bufferSize;
 
   while(data.size() - replace > bufferLength)
-    bufferLength += bufferSize();
+    bufferLength += FileStreamPrivate::bufferSize;
 
   // Set where to start the reading and writing.
 
@@ -254,7 +260,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
   offset_t writePosition = start;
 
   ByteVector buffer;
-  ByteVector aboutToOverwrite(static_cast<uint>(bufferLength));
+  ByteVector aboutToOverwrite(bufferLength, 0);
 
   // This is basically a special case of the loop below.  Here we're just
   // doing the same steps as below, but since we aren't using the same buffer
@@ -274,7 +280,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
 
   // In case we've already reached the end of file...
 
-  buffer.resize(static_cast<TagLib::uint>(bytesRead));
+  buffer.resize(bytesRead);
 
   // Ok, here's the main loop.  We want to loop until the read fails, which
   // means that we hit the end of the file.
@@ -317,17 +323,17 @@ void FileStream::insert(const ByteVector &data, offset_t start, uint replace)
   d->size = 0;
 }
 
-void FileStream::removeBlock(offset_t start, uint length)
+void FileStream::removeBlock(offset_t start, size_t length)
 {
   if(!d->file)
     return;
 
-  size_t bufferLength = bufferSize();
+  size_t bufferLength = FileStreamPrivate::bufferSize;
 
   offset_t readPosition  = start + length;
   offset_t writePosition = start;
 
-  ByteVector buffer(static_cast<uint>(bufferLength));
+  ByteVector buffer(bufferLength, 0);
 
   size_t bytesRead = 1;
 
@@ -504,9 +510,4 @@ void FileStream::truncate(offset_t length)
   }
 
 #endif
-}
-
-TagLib::uint FileStream::bufferSize()
-{
-  return FileStreamPrivate::bufferSize;
 }

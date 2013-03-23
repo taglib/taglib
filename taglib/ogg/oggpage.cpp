@@ -133,7 +133,7 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
 
 TagLib::uint Ogg::Page::packetCount() const
 {
-  return d->header.packetSizes().size();
+  return static_cast<uint>(d->header.packetSizes().size());
 }
 
 ByteVectorList Ogg::Page::packets() const
@@ -188,7 +188,7 @@ ByteVector Ogg::Page::render() const
   // the entire page with the 4 bytes reserved for the checksum zeroed and then
   // inserted in bytes 22-25 of the page header.
 
-  ByteVector checksum = ByteVector::fromUInt(data.checksum(), false);
+  ByteVector checksum = ByteVector::fromUInt32(data.checksum(), false);
   for(int i = 0; i < 4; i++)
     data[i + 22] = checksum[i];
 
@@ -205,7 +205,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 {
   List<Page *> l;
 
-  int totalSize = 0;
+  size_t totalSize = 0;
 
   for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it)
     totalSize += (*it).size();
@@ -331,7 +331,7 @@ Ogg::Page::Page(const ByteVectorList &packets,
   // Build a page from the list of packets.
 
   for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it) {
-    packetSizes.append((*it).size());
+    packetSizes.append(static_cast<int>((*it).size()));
     data.append(*it);
   }
   d->packets = packets;

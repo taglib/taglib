@@ -184,22 +184,22 @@ void UserUrlLinkFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int pos = 0;
+  size_t pos = 0;
 
   d->textEncoding = String::Type(data[0]);
   pos += 1;
 
   if(d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8) {
-    int offset = data.find(textDelimiter(d->textEncoding), pos);
-    if(offset < pos)
+    const size_t offset = data.find(textDelimiter(d->textEncoding), pos);
+    if(offset == ByteVector::npos || offset < pos)
       return;
 
     d->description = String(data.mid(pos, offset - pos), d->textEncoding);
     pos = offset + 1;
   }
   else {
-    int len = data.mid(pos).find(textDelimiter(d->textEncoding), 0, 2);
-    if(len < 0)
+    const size_t len = data.mid(pos).find(textDelimiter(d->textEncoding), 0, 2);
+    if(len == ByteVector::npos)
       return;
 
     d->description = String(data.mid(pos, len), d->textEncoding);

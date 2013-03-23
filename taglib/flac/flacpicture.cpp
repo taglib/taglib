@@ -83,9 +83,9 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
 
   int pos = 0;
-  d->type = FLAC::Picture::Type(data.mid(pos, 4).toUInt());
+  d->type = FLAC::Picture::Type(data.mid(pos, 4).toUInt32());
   pos += 4;
-  uint mimeTypeLength = data.mid(pos, 4).toUInt();
+  uint mimeTypeLength = data.mid(pos, 4).toUInt32();
   pos += 4;
   if(pos + mimeTypeLength + 24 > data.size()) {
     debug("Invalid picture block.");
@@ -93,7 +93,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
   d->mimeType = String(data.mid(pos, mimeTypeLength), String::UTF8);
   pos += mimeTypeLength;
-  uint descriptionLength = data.mid(pos, 4).toUInt();
+  uint descriptionLength = data.mid(pos, 4).toUInt32();
   pos += 4;
   if(pos + descriptionLength + 20 > data.size()) {
     debug("Invalid picture block.");
@@ -101,15 +101,15 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
   d->description = String(data.mid(pos, descriptionLength), String::UTF8);
   pos += descriptionLength;
-  d->width = data.mid(pos, 4).toUInt();
+  d->width = data.mid(pos, 4).toUInt32();
   pos += 4;
-  d->height = data.mid(pos, 4).toUInt();
+  d->height = data.mid(pos, 4).toUInt32();
   pos += 4;
-  d->colorDepth = data.mid(pos, 4).toUInt();
+  d->colorDepth = data.mid(pos, 4).toUInt32();
   pos += 4;
-  d->numColors = data.mid(pos, 4).toUInt();
+  d->numColors = data.mid(pos, 4).toUInt32();
   pos += 4;
-  uint dataLength = data.mid(pos, 4).toUInt();
+  uint dataLength = data.mid(pos, 4).toUInt32();
   pos += 4;
   if(pos + dataLength > data.size()) {
     debug("Invalid picture block.");
@@ -123,18 +123,18 @@ bool FLAC::Picture::parse(const ByteVector &data)
 ByteVector FLAC::Picture::render() const
 {
   ByteVector result;
-  result.append(ByteVector::fromUInt(d->type));
+  result.append(ByteVector::fromUInt32(d->type));
   ByteVector mimeTypeData = d->mimeType.data(String::UTF8);
-  result.append(ByteVector::fromUInt(mimeTypeData.size()));
+  result.append(ByteVector::fromUInt32(mimeTypeData.size()));
   result.append(mimeTypeData);
   ByteVector descriptionData = d->description.data(String::UTF8);
-  result.append(ByteVector::fromUInt(descriptionData.size()));
+  result.append(ByteVector::fromUInt32(descriptionData.size()));
   result.append(descriptionData);
-  result.append(ByteVector::fromUInt(d->width));
-  result.append(ByteVector::fromUInt(d->height));
-  result.append(ByteVector::fromUInt(d->colorDepth));
-  result.append(ByteVector::fromUInt(d->numColors));
-  result.append(ByteVector::fromUInt(d->data.size()));
+  result.append(ByteVector::fromUInt32(d->width));
+  result.append(ByteVector::fromUInt32(d->height));
+  result.append(ByteVector::fromUInt32(d->colorDepth));
+  result.append(ByteVector::fromUInt32(d->numColors));
+  result.append(ByteVector::fromUInt32(d->data.size()));
   result.append(d->data);
   return result;
 }

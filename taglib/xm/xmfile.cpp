@@ -127,14 +127,14 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     ByteVector data = file.readBlock(std::min(m_size, limit));
-    uint count = data.size();
-    int index = data.find((char) 0);
-    if(index > -1) {
+    size_t count = data.size();
+    const size_t index = data.find((char) 0);
+    if(index != ByteVector::npos) {
       data.resize(index);
     }
     data.replace((char) 0xff, ' ');
     value = data;
-    return count;
+    return static_cast<uint>(count);
   }
 
   uint size() const
@@ -157,7 +157,7 @@ public:
     if(data.size() > 0) {
       value = data[0];
     }
-    return data.size();
+    return static_cast<uint>(data.size());
   }
 
   uint size() const
@@ -188,8 +188,8 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     ByteVector data = file.readBlock(std::min(2U,limit));
-    value = data.toUShort(bigEndian);
-    return data.size();
+    value = data.toUInt16(bigEndian);
+    return static_cast<uint>(data.size());
   }
 
   uint size() const
@@ -209,8 +209,8 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     ByteVector data = file.readBlock(std::min(4U,limit));
-    value = data.toUInt(bigEndian);
-    return data.size();
+    value = data.toUInt32(bigEndian);
+    return static_cast<uint>(data.size());
   }
 
   uint size() const

@@ -35,8 +35,11 @@ StringList StringList::split(const String &s, const String &pattern)
 {
   StringList l;
 
-  int previousOffset = 0;
-  for(int offset = s.find(pattern); offset != -1; offset = s.find(pattern, offset + 1)) {
+  size_t previousOffset = 0;
+  for(size_t offset = s.find(pattern);
+    offset != String::npos;
+    offset = s.find(pattern, offset + 1)) 
+  {
     l.append(s.substr(previousOffset, offset - previousOffset));
     previousOffset = offset + 1;
   }

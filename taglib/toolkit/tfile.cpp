@@ -81,7 +81,16 @@ public:
   IOStream *stream;
   bool streamOwner;
   bool valid;
-  static const uint bufferSize = 1024;
+
+#ifdef _WIN32
+
+  static const size_t bufferSize = 8192;
+
+#else
+
+  static const size_t bufferSize = 1024;
+
+#endif
 };
 
 File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
@@ -133,7 +142,7 @@ PropertyMap File::setProperties(const PropertyMap &properties)
   return tag()->setProperties(properties);
 }
 
-ByteVector File::readBlock(uint length)
+ByteVector File::readBlock(size_t length)
 {
   return d->stream->readBlock(length);
 }
@@ -151,13 +160,12 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // The position in the file that the current buffer starts at.
 
   offset_t bufferOffset = fromOffset;
-  ByteVector buffer;
 
   // These variables are used to keep track of a partial match that happens at
   // the end of a buffer.
 
-  int previousPartialMatch = -1;
-  int beforePreviousPartialMatch = -1;
+  size_t previousPartialMatch = ByteVector::npos;
+  size_t beforePreviousPartialMatch = ByteVector::npos;
 
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
@@ -186,20 +194,29 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // then check for "before".  The order is important because it gives priority
   // to "real" matches.
 
-  for(buffer = readBlock(d->bufferSize); buffer.size() > 0; buffer = readBlock(d->bufferSize)) {
+  while(true)
+  {
+    ByteVector buffer = readBlock(bufferSize());
+    if(buffer.isEmpty())
+      break;
 
     // (1) previous partial match
 
-    if(previousPartialMatch >= 0 && int(d->bufferSize) > previousPartialMatch) {
-      const int patternOffset = (d->bufferSize - previousPartialMatch);
+    if(previousPartialMatch != ByteVector::npos 
+      && d->bufferSize > previousPartialMatch) 
+    {
+      const size_t patternOffset = (d->bufferSize - previousPartialMatch);
       if(buffer.containsAt(pattern, 0, patternOffset)) {
         seek(originalPosition);
         return bufferOffset - d->bufferSize + previousPartialMatch;
       }
     }
 
-    if(!before.isNull() && beforePreviousPartialMatch >= 0 && int(d->bufferSize) > beforePreviousPartialMatch) {
-      const int beforeOffset = (d->bufferSize - beforePreviousPartialMatch);
+    if(!before.isNull() 
+      && beforePreviousPartialMatch != ByteVector::npos 
+      && d->bufferSize > beforePreviousPartialMatch) 
+    {
+      const size_t beforeOffset = (d->bufferSize - beforePreviousPartialMatch);
       if(buffer.containsAt(before, 0, beforeOffset)) {
         seek(originalPosition);
         return -1;
@@ -208,13 +225,13 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
     // (2) pattern contained in current buffer
 
-    long location = buffer.find(pattern);
-    if(location >= 0) {
+    size_t location = buffer.find(pattern);
+    if(location != ByteVector::npos) {
       seek(originalPosition);
       return bufferOffset + location;
     }
 
-    if(!before.isNull() && buffer.find(before) >= 0) {
+    if(!before.isNull() && buffer.find(before) != ByteVector::npos) {
       seek(originalPosition);
       return -1;
     }
@@ -281,13 +298,13 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
     // (2) pattern contained in current buffer
 
-    long location = buffer.rfind(pattern);
-    if(location >= 0) {
+    const size_t location = buffer.rfind(pattern);
+    if(location != ByteVector::npos) {
       seek(originalPosition);
       return bufferOffset + location;
     }
 
-    if(!before.isNull() && buffer.find(before) >= 0) {
+    if(!before.isNull() && buffer.find(before) != ByteVector::npos) {
       seek(originalPosition);
       return -1;
     }
@@ -307,12 +324,12 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
   return -1;
 }
 
-void File::insert(const ByteVector &data, offset_t start, uint replace)
+void File::insert(const ByteVector &data, offset_t start, size_t replace)
 {
   d->stream->insert(data, start, replace);
 }
 
-void File::removeBlock(offset_t start, uint length)
+void File::removeBlock(offset_t start, size_t length)
 {
   d->stream->removeBlock(start, length);
 }
@@ -405,7 +422,7 @@ String File::toString() const
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint File::bufferSize()
+size_t File::bufferSize()
 {
   return FilePrivate::bufferSize;
 }

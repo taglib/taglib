@@ -52,13 +52,13 @@ public:
     v[2] = b;
     v[1] = c;
     v[0] = d;
-    CPPUNIT_ASSERT(v.toUInt(false) == i);
+    CPPUNIT_ASSERT(v.toUInt32(false) == i);
 
     v[0] = a;
     v[1] = b;
     v[2] = c;
     v[3] = d;
-    CPPUNIT_ASSERT(v.toUInt() == i);
+    CPPUNIT_ASSERT(v.toUInt32() == i);
   }
 
   void testByteVector()
@@ -70,12 +70,12 @@ public:
 
     ByteVector n(4, 0);
     n[0] = 1;
-    CPPUNIT_ASSERT(n.toUInt(true) == 16777216);
-    CPPUNIT_ASSERT(n.toUInt(false) == 1);
-    CPPUNIT_ASSERT(ByteVector::fromUInt(16777216, true) == n);
-    CPPUNIT_ASSERT(ByteVector::fromUInt(1, false) == n);
+    CPPUNIT_ASSERT(n.toUInt32(true) == 16777216);
+    CPPUNIT_ASSERT(n.toUInt32(false) == 1);
+    CPPUNIT_ASSERT(ByteVector::fromUInt32(16777216, true) == n);
+    CPPUNIT_ASSERT(ByteVector::fromUInt32(1, false) == n);
 
-    CPPUNIT_ASSERT(ByteVector::fromUInt(0xa0).toUInt() == 0xa0);
+    CPPUNIT_ASSERT(ByteVector::fromUInt32(0xa0).toUInt32() == 0xa0);
 
     testConversion(0x000000a0, 0x00, 0x00, 0x00, 0xa0);
     testConversion(0xd50bf072, 0xd5, 0x0b, 0xf0, 0x72);
@@ -83,16 +83,16 @@ public:
     ByteVector intVector(2, 0);
     intVector[0] = char(0xfc);
     intVector[1] = char(0x00);
-    CPPUNIT_ASSERT(intVector.toShort() == -1024);
+    CPPUNIT_ASSERT(intVector.toInt16() == -1024);
     intVector[0] = char(0x04);
     intVector[1] = char(0x00);
-    CPPUNIT_ASSERT(intVector.toShort() == 1024);
+    CPPUNIT_ASSERT(intVector.toInt16() == 1024);
 
-    CPPUNIT_ASSERT(ByteVector::fromLongLong(1).toLongLong() == 1);
-    CPPUNIT_ASSERT(ByteVector::fromLongLong(0).toLongLong() == 0);
-    CPPUNIT_ASSERT(ByteVector::fromLongLong(0xffffffffffffffffLL).toLongLong() == -1);
-    CPPUNIT_ASSERT(ByteVector::fromLongLong(0xfffffffffffffffeLL).toLongLong() == -2);
-    CPPUNIT_ASSERT(ByteVector::fromLongLong(1024).toLongLong() == 1024);
+    CPPUNIT_ASSERT(ByteVector::fromUInt64(1).toInt64() == 1);
+    CPPUNIT_ASSERT(ByteVector::fromUInt64(0).toInt64() == 0);
+    CPPUNIT_ASSERT(ByteVector::fromUInt64(0xffffffffffffffffLL).toInt64() == -1);
+    CPPUNIT_ASSERT(ByteVector::fromUInt64(0xfffffffffffffffeLL).toInt64() == -2);
+    CPPUNIT_ASSERT(ByteVector::fromUInt64(1024).toInt64() == 1024);
 
     ByteVector a1("foo");
     a1.append("bar");
@@ -120,38 +120,38 @@ public:
 
   void testFind1()
   {
-    CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO"));
-    CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO", 0));
-    CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO", 1));
-    CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO", 2));
-    CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO", 3));
-    CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO", 4));
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 5));
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 6));
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 7));
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 8));
+    CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO"));
+    CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 0));
+    CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 1));
+    CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 2));
+    CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 3));
+    CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 4));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 5));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 6));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 7));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 8));
   }
 
   void testFind2()
   {
-    CPPUNIT_ASSERT_EQUAL(0, ByteVector("\x01", 1).find("\x01"));
-    CPPUNIT_ASSERT_EQUAL(0, ByteVector("\x01\x02", 2).find("\x01\x02"));
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("\x01", 1).find("\x02"));
-    CPPUNIT_ASSERT_EQUAL(-1, ByteVector("\x01\x02", 2).find("\x01\x03"));
+    CPPUNIT_ASSERT_EQUAL((size_t)0, ByteVector("\x01", 1).find("\x01"));
+    CPPUNIT_ASSERT_EQUAL((size_t)0, ByteVector("\x01\x02", 2).find("\x01\x02"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("\x01", 1).find("\x02"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("\x01\x02", 2).find("\x01\x03"));
   }
 
   void testRfind1()
   {
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 0));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 1));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 2));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 3));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 4));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 5));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 6));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 7));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS", 8));
-    CPPUNIT_ASSERT_EQUAL(1, ByteVector(".OggS....").rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 0));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 1));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 2));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 3));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 4));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 5));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 6));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 7));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS", 8));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, ByteVector(".OggS....").rfind("OggS"));
   }
 
   void testRfind2()
@@ -162,18 +162,18 @@ public:
     ByteVector r3("OggS******OggS");
     ByteVector r4("OggS*OggS*OggS");
 
-    CPPUNIT_ASSERT_EQUAL(-1, r0.find("OggS"));
-    CPPUNIT_ASSERT_EQUAL(-1, r0.rfind("OggS"));
-    CPPUNIT_ASSERT_EQUAL(0, r1.find("OggS"));
-    CPPUNIT_ASSERT_EQUAL(0, r1.rfind("OggS"));
-    CPPUNIT_ASSERT_EQUAL(10, r2.find("OggS"));
-    CPPUNIT_ASSERT_EQUAL(10, r2.rfind("OggS"));
-    CPPUNIT_ASSERT_EQUAL(0, r3.find("OggS"));
-    CPPUNIT_ASSERT_EQUAL(10, r3.rfind("OggS"));
-    CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS"));
-    CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS", 0));
-    CPPUNIT_ASSERT_EQUAL(5, r4.rfind("OggS", 7));
-    CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS", 12));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, r0.find("OggS"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, r0.rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)0, r1.find("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)0, r1.rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)10, r2.find("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)10, r2.rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)0, r3.find("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)10, r3.rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)10, r4.rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL((size_t)10, r4.rfind("OggS", 0));
+    CPPUNIT_ASSERT_EQUAL((size_t)5, r4.rfind("OggS", 7));
+    CPPUNIT_ASSERT_EQUAL((size_t)10, r4.rfind("OggS", 12));
   }
 
   void testToHex()
@@ -185,11 +185,11 @@ public:
 
   void testToUShort()
   {
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFFFF, ByteVector("\xff\xff", 2).toUShort());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0001, ByteVector("\x00\x01", 2).toUShort());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0100, ByteVector("\x00\x01", 2).toUShort(false));
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFF01, ByteVector("\xFF\x01", 2).toUShort());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0x01FF, ByteVector("\xFF\x01", 2).toUShort(false));
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFFFF, ByteVector("\xff\xff", 2).toUInt16());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0001, ByteVector("\x00\x01", 2).toUInt16());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0100, ByteVector("\x00\x01", 2).toUInt16(false));
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFF01, ByteVector("\xFF\x01", 2).toUInt16());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)0x01FF, ByteVector("\xFF\x01", 2).toUInt16(false));
   }
 
   void testReplace()

@@ -269,7 +269,7 @@ bool Ogg::File::nextPage()
     uint currentPacket = d->currentPage->firstPacketIndex() + i;
     if(d->packetToPageMap.size() <= currentPacket)
       d->packetToPageMap.push_back(List<int>());
-    d->packetToPageMap[currentPacket].append(d->pages.size() - 1);
+    d->packetToPageMap[currentPacket].append(static_cast<int>(d->pages.size()) - 1);
   }
 
   return true;

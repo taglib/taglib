@@ -109,7 +109,7 @@ void PopularimeterFrame::parseFields(const ByteVector &data)
   if(pos < size) {
     d->rating = (unsigned char)(data[pos++]);
     if(pos < size) {
-      d->counter = data.mid(pos, 4).toUInt();
+      d->counter = data.mid(pos, 4).toUInt32();
     }
   }
 }
@@ -121,7 +121,7 @@ ByteVector PopularimeterFrame::renderFields() const
   data.append(d->email.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
   data.append(char(d->rating));
-  data.append(ByteVector::fromUInt(d->counter));
+  data.append(ByteVector::fromUInt32(d->counter));
 
   return data;
 }

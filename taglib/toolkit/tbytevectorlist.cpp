@@ -36,14 +36,14 @@ class ByteVectorListPrivate
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
-                                     int byteAlign, int max)
+ByteVectorList ByteVectorList::split(
+  const ByteVector &v, const ByteVector &pattern, size_t byteAlign, size_t max)
 {
   ByteVectorList l;
 
-  uint previousOffset = 0;
-  for(int offset = v.find(pattern, 0, byteAlign);
-      offset != -1 && (max == 0 || max > int(l.size()) + 1);
+  size_t previousOffset = 0;
+  for(size_t offset = v.find(pattern, 0, byteAlign);
+      offset != ByteVector::npos && (max == 0 || max > l.size() + 1);
       offset = v.find(pattern, offset + pattern.size(), byteAlign))
   {
     if(offset - previousOffset >= 1)

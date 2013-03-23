@@ -288,12 +288,12 @@ int ASF::Attribute::dataSize() const
   case QWordType:
     return 5;
   case UnicodeType:
-    return d->stringValue.size() * 2 + 2;
+    return static_cast<int>(d->stringValue.size() * 2 + 2);
   case BytesType:
     if(d->pictureValue.isValid())
       return d->pictureValue.dataSize();
   case GuidType:
-    return d->byteVectorValue.size();
+    return static_cast<int>(d->byteVectorValue.size());
   }
   return 0;
 }
@@ -304,24 +304,24 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   switch (d->type) {
   case WordType:
-    data.append(ByteVector::fromShort(d->shortValue, false));
+    data.append(ByteVector::fromUInt16(d->shortValue, false));
     break;
 
   case BoolType:
     if(kind == 0) {
-      data.append(ByteVector::fromUInt(d->boolValue ? 1 : 0, false));
+      data.append(ByteVector::fromUInt32(d->boolValue ? 1 : 0, false));
     }
     else {
-      data.append(ByteVector::fromShort(d->boolValue ? 1 : 0, false));
+      data.append(ByteVector::fromUInt16(d->boolValue ? 1 : 0, false));
     }
     break;
 
   case DWordType:
-    data.append(ByteVector::fromUInt(d->intValue, false));
+    data.append(ByteVector::fromUInt32(d->intValue, false));
     break;
 
   case QWordType:
-    data.append(ByteVector::fromLongLong(d->longLongValue, false));
+    data.append(ByteVector::fromUInt64(d->longLongValue, false));
     break;
 
   case UnicodeType:
@@ -340,17 +340,17 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   if(kind == 0) {
     data = File::renderString(name, true) +
-           ByteVector::fromShort((int)d->type, false) +
-           ByteVector::fromShort(data.size(), false) +
+           ByteVector::fromUInt16((int)d->type, false) +
+           ByteVector::fromUInt16(data.size(), false) +
            data;
   }
   else {
     ByteVector nameData = File::renderString(name);
-    data = ByteVector::fromShort(kind == 2 ? d->language : 0, false) +
-           ByteVector::fromShort(d->stream, false) +
-           ByteVector::fromShort(nameData.size(), false) +
-           ByteVector::fromShort((int)d->type, false) +
-           ByteVector::fromUInt(data.size(), false) +
+    data = ByteVector::fromUInt16(kind == 2 ? d->language : 0, false) +
+           ByteVector::fromUInt16(d->stream, false) +
+           ByteVector::fromUInt16(nameData.size(), false) +
+           ByteVector::fromUInt16((int)d->type, false) +
+           ByteVector::fromUInt32(data.size(), false) +
            nameData +
            data;
   }

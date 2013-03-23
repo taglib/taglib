@@ -162,7 +162,7 @@ bool TrueAudio::File::save()
     ByteVector data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
     d->ID3v1Location -= d->ID3v2OriginalSize - data.size();
-    d->ID3v2OriginalSize = data.size();
+    d->ID3v2OriginalSize = static_cast<uint>(data.size());
     d->hasID3v2 = true;
   }
   else if(d->hasID3v2) {

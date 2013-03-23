@@ -82,7 +82,7 @@ bool Mod::File::save()
   seek(0);
   writeString(d->tag.title(), 20);
   StringList lines = d->tag.comment().split("\n");
-  uint n = std::min(lines.size(), d->properties.instrumentCount());
+  uint n = std::min(static_cast<uint>(lines.size()), d->properties.instrumentCount());
   for(uint i = 0; i < n; ++ i) {
     writeString(lines[i], 22);
     seek(8, Current);
