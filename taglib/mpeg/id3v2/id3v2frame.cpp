@@ -193,7 +193,7 @@ void Frame::setText(const String &)
 ByteVector Frame::render() const
 {
   ByteVector fieldData = renderFields();
-  d->header->setFrameSize(fieldData.size());
+  d->header->setFrameSize(static_cast<uint>(fieldData.size()));
   ByteVector headerData = d->header->render();
 
   return headerData + fieldData;
@@ -240,10 +240,10 @@ void Frame::parse(const ByteVector &data)
 
 ByteVector Frame::fieldData(const ByteVector &frameData) const
 {
-  uint headerSize = Header::size(d->header->version());
+  const size_t headerSize = Header::size(d->header->version());
 
-  uint frameDataOffset = headerSize;
-  uint frameDataLength = size();
+  size_t frameDataOffset = headerSize;
+  size_t frameDataLength = size();
 
   if(d->header->compression() || d->header->dataLengthIndicator()) {
     frameDataLength = SynchData::toUInt(frameData.mid(headerSize, 4));
@@ -255,7 +255,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
      !d->header->encryption())
   {
     ByteVector data(frameDataLength);
-    uLongf uLongTmp = frameDataLength;
+    uLongf uLongTmp = static_cast<uLongf>(frameDataLength);
     ::uncompress((Bytef *) data.data(),
                  (uLongf *) &uLongTmp,
                  (Bytef *) frameData.data() + frameDataOffset,
@@ -276,9 +276,8 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
 
   ByteVector delimiter = textDelimiter(encoding);
 
-  int end = data.find(delimiter, *position, delimiter.size());
-
-  if(end < *position)
+  const size_t end = data.find(delimiter, *position, delimiter.size());
+  if(end == ByteVector::npos || end < static_cast<size_t>(*position))
     return String::null;
 
   String str;
@@ -287,7 +286,7 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   else
     str = String(data.mid(*position, end - *position), encoding);
 
-  *position = end + delimiter.size();
+  *position = static_cast<int>(end + delimiter.size());
 
   return str;
 }
@@ -642,7 +641,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
       return;
     }
 
-    d->frameSize = data.mid(3, 3).toUInt();
+    d->frameSize = data.mid(3, 3).toUInt32();
 
     break;
   }
@@ -670,7 +669,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // Set the size -- the frame size is the four bytes starting at byte four in
     // the frame header (structure 4)
 
-    d->frameSize = data.mid(4, 4).toUInt();
+    d->frameSize = data.mid(4, 4).toUInt32();
 
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
@@ -717,7 +716,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // iTunes writes v2.4 tags with v2.3-like frame sizes
     if(d->frameSize > 127) {
       if(!isValidFrameID(data.mid(d->frameSize + 10, 4))) {
-        unsigned int uintSize = data.mid(4, 4).toUInt();
+        unsigned int uintSize = data.mid(4, 4).toUInt32();
         if(isValidFrameID(data.mid(uintSize + 10, 4))) {
           d->frameSize = uintSize;
         }
@@ -831,7 +830,7 @@ ByteVector Frame::Header::render() const
 
   ByteVector v = d->frameID +
     (d->version == 3
-      ? ByteVector::fromUInt(d->frameSize)
+      ? ByteVector::fromUInt32(d->frameSize)
       : SynchData::fromUInt(d->frameSize)) +
     flags;
 

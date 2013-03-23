@@ -289,13 +289,13 @@ MP4::Item::toString() const
       return d->m_stringList.toString(" / ");
     case TypeByteVectorList:
       for(TagLib::uint i = 0; i < d->m_byteVectorList.size(); i++) {
-        SPRINTF(tmp, "[%d bytes of data]", d->m_byteVectorList[i].size());
+        SPRINTF(tmp, "[%d bytes of data]", static_cast<int>(d->m_byteVectorList[i].size()));
         desc.append(tmp);
       }
       return desc.toString(", ");
     case TypeCoverArtList:
       for(TagLib::uint i = 0; i < d->m_coverArtList.size(); i++) {
-        SPRINTF(tmp, "[%d bytes of data]", d->m_coverArtList[i].data().size());
+        SPRINTF(tmp, "[%d bytes of data]", static_cast<int>(d->m_coverArtList[i].data().size()));
         desc.append(tmp);
       }
       return desc.toString(", ");

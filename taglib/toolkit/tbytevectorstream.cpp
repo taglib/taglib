@@ -68,52 +68,53 @@ FileName ByteVectorStream::name() const
   return FileName(""); // XXX do we need a name?
 }
 
-ByteVector ByteVectorStream::readBlock(uint length)
+ByteVector ByteVectorStream::readBlock(size_t length)
 {
   if(length == 0)
     return ByteVector::null;
 
-  ByteVector v = d->data.mid(static_cast<uint>(d->position), length);
+  ByteVector v = d->data.mid(static_cast<size_t>(d->position), length);
   d->position += v.size();
   return v;
 }
 
 void ByteVectorStream::writeBlock(const ByteVector &data)
 {
-  uint size = data.size();
+  const size_t size = data.size();
   if(static_cast<offset_t>(d->position + size) > length())
     truncate(d->position + size);
   
-  memcpy(d->data.data() + d->position, data.data(), size);
+  ::memcpy(d->data.data() + d->position, data.data(), size);
   d->position += size;
 }
 
-void ByteVectorStream::insert(const ByteVector &data, offset_t start, uint replace)
+void ByteVectorStream::insert(const ByteVector &data, offset_t start, size_t replace)
 {
-  long sizeDiff = data.size() - replace;
-  if(sizeDiff < 0) {
-    removeBlock(start + data.size(), -sizeDiff);
+  if(data.size() < replace) {
+    removeBlock(start + data.size(), replace - data.size());
   }
-  else if(sizeDiff > 0) {
+  else if(data.size() > replace) {
+    const size_t sizeDiff = data.size() - replace;
     truncate(length() + sizeDiff);
-    offset_t readPosition  = start + replace;
-    offset_t writePosition = start + data.size();
-    memmove(
-      d->data.data() + static_cast<ptrdiff_t>(writePosition), 
-      d->data.data() + static_cast<ptrdiff_t>(readPosition), 
+
+    const size_t readPosition  = static_cast<size_t>(start + replace);
+    const size_t writePosition = static_cast<size_t>(start + data.size());
+    ::memmove(
+      d->data.data() + writePosition, 
+      d->data.data() + readPosition, 
       static_cast<size_t>(length() - sizeDiff - readPosition));
   }
   seek(start);
   writeBlock(data);
 }
 
-void ByteVectorStream::removeBlock(offset_t start, uint length)
+void ByteVectorStream::removeBlock(offset_t start, size_t length)
 {
-  offset_t readPosition  = start + length;
+  const offset_t readPosition  = start + length;
   offset_t writePosition = start;
   if(readPosition < ByteVectorStream::length()) {
     size_t bytesToMove = static_cast<size_t>(ByteVectorStream::length() - readPosition);
-    memmove(
+    ::memmove(
       d->data.data() + static_cast<ptrdiff_t>(writePosition), 
       d->data.data() + static_cast<ptrdiff_t>(readPosition), 
       bytesToMove);

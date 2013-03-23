@@ -92,7 +92,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(311), f->chunkDataSize(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f->chunkName(2));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), f->chunkPadding(2));
-    CPPUNIT_ASSERT_EQUAL(long(4400), f->length());
+    CPPUNIT_ASSERT_EQUAL(offset_t(4400), f->length());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4399 - 8), f->riffSize());
     f->setChunkData("TEST", "abcd");
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4088), f->chunkOffset(2));
@@ -115,7 +115,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4), f->chunkDataSize(3));
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(3));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->chunkPadding(3));
-    CPPUNIT_ASSERT_EQUAL(long(4412), f->length());
+    CPPUNIT_ASSERT_EQUAL(offset_t(4412), f->length());
     delete f;
   }
 
@@ -129,7 +129,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(311), f->chunkDataSize(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f->chunkName(2));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->chunkPadding(2));
-    CPPUNIT_ASSERT_EQUAL(long(4399), f->length());
+    CPPUNIT_ASSERT_EQUAL(offset_t(4399), f->length());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4399 - 8), f->riffSize());
     f->setChunkData("TEST", "abcd");
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4088), f->chunkOffset(2));
@@ -152,7 +152,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4), f->chunkDataSize(3));
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(3));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->chunkPadding(3));
-    CPPUNIT_ASSERT_EQUAL(long(4412), f->length());
+    CPPUNIT_ASSERT_EQUAL(offset_t(4412), f->length());
     delete f;
   }
 
@@ -166,7 +166,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(311), f->chunkDataSize(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f->chunkName(2));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->chunkPadding(2));
-    CPPUNIT_ASSERT_EQUAL(long(4399), f->length());
+    CPPUNIT_ASSERT_EQUAL(offset_t(4399), f->length());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4399 - 8), f->riffSize());
     f->setChunkData("TEST", "abc");
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(4088), f->chunkOffset(2));
@@ -189,7 +189,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), f->chunkDataSize(3));
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(3));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), f->chunkPadding(3));
-    CPPUNIT_ASSERT_EQUAL(long(4412), f->length());
+    CPPUNIT_ASSERT_EQUAL(offset_t(4412), f->length());
     delete f;
   }
 

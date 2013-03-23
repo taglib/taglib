@@ -198,7 +198,7 @@ namespace TagLib {
     /*!
      * Returns the number of elements in the list.
      */
-    uint size() const;
+    size_t size() const;
     bool isEmpty() const;
 
     /*!
@@ -256,14 +256,14 @@ namespace TagLib {
      *
      * \warning This method is slow.  Use iterators to loop through the list.
      */
-    T &operator[](uint i);
+    T &operator[](size_t i);
 
     /*!
      * Returns a const reference to item \a i in the list.
      *
      * \warning This method is slow.  Use iterators to loop through the list.
      */
-    const T &operator[](uint i) const;
+    const T &operator[](size_t i) const;
 
     /*!
      * Make a shallow, implicitly shared, copy of \a l.  Because this is

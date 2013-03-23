@@ -177,19 +177,19 @@ void APE::Footer::parse(const ByteVector &data)
 
   // Read the version number
 
-  d->version = data.mid(8, 4).toUInt(false);
+  d->version = data.mid(8, 4).toUInt32(false);
 
   // Read the tag size
 
-  d->tagSize = data.mid(12, 4).toUInt(false);
+  d->tagSize = data.mid(12, 4).toUInt32(false);
 
   // Read the item count
 
-  d->itemCount = data.mid(16, 4).toUInt(false);
+  d->itemCount = data.mid(16, 4).toUInt32(false);
 
   // Read the flags
 
-  std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.mid(20, 4).toUInt(false)));
+  std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.mid(20, 4).toUInt32(false)));
 
   d->headerPresent = flags[31];
   d->footerPresent = !flags[30];
@@ -208,15 +208,15 @@ ByteVector APE::Footer::render(bool isHeader) const
   // add the version number -- we always render a 2.000 tag regardless of what
   // the tag originally was.
 
-  v.append(ByteVector::fromUInt(2000, false));
+  v.append(ByteVector::fromUInt32(2000, false));
 
   // add the tag size
 
-  v.append(ByteVector::fromUInt(d->tagSize, false));
+  v.append(ByteVector::fromUInt32(d->tagSize, false));
 
   // add the item count
 
-  v.append(ByteVector::fromUInt(d->itemCount, false));
+  v.append(ByteVector::fromUInt32(d->itemCount, false));
 
   // render and add the flags
 
@@ -226,11 +226,11 @@ ByteVector APE::Footer::render(bool isHeader) const
   flags[30] = false; // footer is always present
   flags[29] = isHeader;
 
-  v.append(ByteVector::fromUInt(flags.to_ulong(), false));
+  v.append(ByteVector::fromUInt32(flags.to_ulong(), false));
 
   // add the reserved 64bit
 
-  v.append(ByteVector::fromLongLong(0));
+  v.append(ByteVector::fromUInt64(0));
 
   return v;
 }

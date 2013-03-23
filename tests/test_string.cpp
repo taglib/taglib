@@ -156,15 +156,15 @@ public:
 
   void testRfind()
   {
-    CPPUNIT_ASSERT_EQUAL(-1, String("foo.bar").rfind(".", 0));
-    CPPUNIT_ASSERT_EQUAL(-1, String("foo.bar").rfind(".", 1));
-    CPPUNIT_ASSERT_EQUAL(-1, String("foo.bar").rfind(".", 2));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 3));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 4));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 5));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 6));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 7));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind("."));
+    CPPUNIT_ASSERT_EQUAL(String::npos, String("foo.bar").rfind(".", 0));
+    CPPUNIT_ASSERT_EQUAL(String::npos, String("foo.bar").rfind(".", 1));
+    CPPUNIT_ASSERT_EQUAL(String::npos, String("foo.bar").rfind(".", 2));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 3));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 4));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 5));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 6));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 7));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind("."));
   }
 
   void testToInt()

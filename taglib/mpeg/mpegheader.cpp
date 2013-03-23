@@ -205,7 +205,7 @@ void MPEG::Header::parse(const ByteVector &data)
     return;
   }
 
-  std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt()));
+  std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt32()));
 
   // Check for the second byte's part of the MPEG synch
 

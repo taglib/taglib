@@ -131,9 +131,9 @@ void ASF::Picture::setPicture(const ByteVector &p)
 
 int ASF::Picture::dataSize() const
 {
-  return
+  return static_cast<int>(
     9 + (d->mimeType.length() + d->description.length()) * 2 +
-    d->picture.size();
+    d->picture.size());
 }
 
 ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
@@ -173,7 +173,7 @@ ByteVector ASF::Picture::render() const
     return ByteVector::null;
   return
     ByteVector((char)d->type) +
-    ByteVector::fromUInt(d->picture.size(), false) +
+    ByteVector::fromUInt32(d->picture.size(), false) +
     ASF::File::renderString(d->mimeType) +
     ASF::File::renderString(d->description) +
     d->picture;
@@ -184,20 +184,20 @@ void ASF::Picture::parse(const ByteVector& bytes)
   d->valid = false;
   if(bytes.size() < 9)
     return;
-  int pos = 0;
+  size_t pos = 0;
   d->type = (Type)bytes[0]; ++pos;
-  uint dataLen = bytes.mid(pos, 4).toUInt(false); pos+=4;
+  uint dataLen = bytes.mid(pos, 4).toUInt32(false); pos+=4;
 
   const ByteVector nullStringTerminator(2, 0);
 
-  int endPos = bytes.find(nullStringTerminator, pos, 2);
-  if(endPos < 0)
+  size_t endPos = bytes.find(nullStringTerminator, pos, 2);
+  if(endPos == ByteVector::npos)
     return;
   d->mimeType = String(bytes.mid(pos, endPos - pos), String::UTF16LE);
   pos = endPos+2;
 
   endPos = bytes.find(nullStringTerminator, pos, 2);
-  if(endPos < 0)
+  if(endPos == ByteVector::npos)
     return;
   d->description = String(bytes.mid(pos, endPos - pos), String::UTF16LE);
   pos = endPos+2;

@@ -360,7 +360,7 @@ ByteVector APE::Tag::render() const
   }
 
   d->footer.setItemCount(itemCount);
-  d->footer.setTagSize(data.size() + Footer::size());
+  d->footer.setTagSize(static_cast<uint>(data.size() + Footer::size()));
   d->footer.setHeaderPresent(true);
 
   return d->footer.renderHeader() + data + d->footer.renderFooter();

@@ -103,8 +103,8 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
       debug("MP4: Atom 'trak.mdia.mdhd' is smaller than expected");
       return;
     }
-    long long unit = data.mid(28, 8).toLongLong();
-    long long length = data.mid(36, 8).toLongLong();
+    long long unit = data.mid(28, 8).toInt64();
+    long long length = data.mid(36, 8).toInt64();
     d->length = unit ? int(length / unit) : 0;
   }
   else {
@@ -112,8 +112,8 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
       debug("MP4: Atom 'trak.mdia.mdhd' is smaller than expected");
       return;
     }
-    unsigned int unit = data.mid(20, 4).toUInt();
-    unsigned int length = data.mid(24, 4).toUInt();
+    unsigned int unit = data.mid(20, 4).toUInt32();
+    unsigned int length = data.mid(24, 4).toUInt32();
     d->length = unit ? length / unit : 0;
   }
 
@@ -126,9 +126,9 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
   data = file->readBlock(atom->length);
   if(data.mid(20, 4) == "mp4a") {
     d->format = PropertiesPrivate::AAC;
-    d->channels = data.mid(40, 2).toShort();
-    d->bitsPerSample = data.mid(42, 2).toShort();
-    d->sampleRate = data.mid(46, 4).toUInt();
+    d->channels = data.mid(40, 2).toInt16();
+    d->bitsPerSample = data.mid(42, 2).toInt16();
+    d->sampleRate = data.mid(46, 4).toUInt32();
     if(data.mid(56, 4) == "esds" && data[64] == 0x03) {
       long pos = 65;
       if(data.mid(pos, 3) == "\x80\x80\x80") {
@@ -141,7 +141,7 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
           pos += 3;
         }
         pos += 10;
-        d->bitrate = (data.mid(pos, 4).toUInt() + 500) / 1000;
+        d->bitrate = (data.mid(pos, 4).toUInt32() + 500) / 1000;
       }
     }
   }
@@ -150,8 +150,8 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
     if (atom->length == 88 && data.mid(56, 4) == "alac") {
       d->bitsPerSample = data.at(69);
       d->channels = data.at(73);
-      d->bitrate = data.mid(80, 4).toUInt() / 1000;
-      d->sampleRate = data.mid(84, 4).toUInt();
+      d->bitrate = data.mid(80, 4).toUInt32() / 1000;
+      d->sampleRate = data.mid(84, 4).toUInt32();
     }
   }
 

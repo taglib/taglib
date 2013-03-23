@@ -88,7 +88,7 @@ public:
 
   void clear() {
     deletePointers();
-	std::list<TP *>().swap(list);
+    std::list<TP *>().swap(list);
   }
 
   std::list<TP *> list;
@@ -96,9 +96,9 @@ public:
 private:
   void deletePointers() {
     if(!autoDelete)
-	  return;
+      return;
     
-	typename std::list<TP *>::const_iterator it = list.begin();
+    typename std::list<TP *>::const_iterator it = list.begin();
     for(; it != list.end(); ++it)
     delete *it;
   }
@@ -279,9 +279,9 @@ List<T> &List<T>::clear()
 }
 
 template <class T>
-TagLib::uint List<T>::size() const
+size_t List<T>::size() const
 {
-  return static_cast<TagLib::uint>(d->list.size());
+  return d->list.size();
 }
 
 template <class T>
@@ -347,7 +347,7 @@ T &List<T>::back()
 }
 
 template <class T>
-T &List<T>::operator[](uint i)
+T &List<T>::operator[](size_t i)
 {
   Iterator it = d->list.begin();
 
@@ -358,7 +358,7 @@ T &List<T>::operator[](uint i)
 }
 
 template <class T>
-const T &List<T>::operator[](uint i) const
+const T &List<T>::operator[](size_t i) const
 {
   ConstIterator it = d->list.begin();
 

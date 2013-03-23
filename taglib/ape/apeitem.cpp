@@ -159,7 +159,7 @@ void APE::Item::appendValues(const StringList &values)
 int APE::Item::size() const
 {
   // SFB: Why is d->key.size() used when size() returns the length in UniChars and not UTF-8?
-  int result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
+  size_t result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
   switch (d->type) {
     case Text:
       if(d->text.size()) {
@@ -177,7 +177,7 @@ int APE::Item::size() const
       result += d->value.size();
       break;
   }
-  return result;
+  return static_cast<int>(result);
 }
 
 StringList APE::Item::values() const
@@ -216,8 +216,8 @@ void APE::Item::parse(const ByteVector &data)
     return;
   }
 
-  uint valueLength  = data.mid(0, 4).toUInt(false);
-  uint flags        = data.mid(4, 4).toUInt(false);
+  uint valueLength  = data.mid(0, 4).toUInt32(false);
+  uint flags        = data.mid(4, 4).toUInt32(false);
 
   d->key = String(data.mid(8), String::UTF8);
 
@@ -253,8 +253,8 @@ ByteVector APE::Item::render() const
   else
     value.append(d->value);
 
-  data.append(ByteVector::fromUInt(value.size(), false));
-  data.append(ByteVector::fromUInt(flags, false));
+  data.append(ByteVector::fromUInt32(value.size(), false));
+  data.append(ByteVector::fromUInt32(flags, false));
   data.append(d->key.data(String::UTF8));
   data.append(ByteVector('\0'));
   data.append(value);

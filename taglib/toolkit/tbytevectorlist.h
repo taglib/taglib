@@ -96,8 +96,8 @@ namespace TagLib {
      * is 2 then a maximum of 1 match will be found and the vector will be split
      * on that match.
      */
-    static ByteVectorList split(const ByteVector &v, const ByteVector &pattern,
-                                int byteAlign = 1, int max = 0);
+    static ByteVectorList split(
+      const ByteVector &v, const ByteVector &pattern, size_t byteAlign = 1, size_t max = 0);
   };
 
 }

@@ -61,7 +61,7 @@ public:
 
     Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
 
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f->tag()->properties().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(0), f->tag()->properties().size());
 
     PropertyMap newTags;
     StringList values("value 1");
@@ -70,8 +70,8 @@ public:
     f->tag()->setProperties(newTags);
 
     PropertyMap map = f->tag()->properties();
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), map.size());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), map["ARTIST"].size());
+    CPPUNIT_ASSERT_EQUAL(size_t(1), map.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(2), map["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("value 1"), map["ARTIST"][0]);
     delete f;
 
@@ -85,7 +85,7 @@ public:
     Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
     PropertyMap tags = f->tag()->properties();
 
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), tags["UNUSUALTAG"].size());
+    CPPUNIT_ASSERT_EQUAL(size_t(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
     CPPUNIT_ASSERT_EQUAL(String("another value"), tags["UNUSUALTAG"][1]);
     CPPUNIT_ASSERT_EQUAL(String("öäüoΣø", String::UTF8), tags["UNICODETAG"][0]);

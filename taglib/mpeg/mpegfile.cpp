@@ -370,13 +370,13 @@ offset_t MPEG::File::previousFrameOffset(offset_t position)
     seek(position);
     buffer = readBlock(size);
 
-    if(buffer.size() <= 0)
+    if(buffer.isEmpty())
       break;
 
     if(foundFirstSyncPattern && uchar(buffer[buffer.size() - 1]) == 0xff)
       return position + buffer.size() - 1;
 
-    for(int i = buffer.size() - 2; i >= 0; i--) {
+    for(int i = static_cast<int>(buffer.size()) - 2; i >= 0; i--) {
       if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
@@ -478,18 +478,17 @@ offset_t MPEG::File::findID3v2()
     // The position in the file that the current buffer starts at.
 
     offset_t bufferOffset = 0;
-    ByteVector buffer;
 
     // These variables are used to keep track of a partial match that happens at
     // the end of a buffer.
 
-    int previousPartialMatch = -1;
+    size_t previousPartialMatch = ByteVector::npos;
     bool previousPartialSynchMatch = false;
 
     // Save the location of the current read pointer.  We will restore the
     // position using seek() before all returns.
 
-    offset_t originalPosition = tell();
+    const offset_t originalPosition = tell();
 
     // Start the search at the beginning of the file.
 
@@ -507,15 +506,19 @@ offset_t MPEG::File::findID3v2()
     // note this for use in the next itteration, where we will check for the rest
     // of the pattern.
 
-    for(buffer = readBlock(bufferSize()); buffer.size() > 0; buffer = readBlock(bufferSize())) {
+    while(true)
+    {
+      ByteVector buffer = readBlock(bufferSize());
+      if(buffer.isEmpty())
+        break;
 
       // (1) previous partial match
 
       if(previousPartialSynchMatch && secondSynchByte(buffer[0]))
         return -1;
 
-      if(previousPartialMatch >= 0 && int(bufferSize()) > previousPartialMatch) {
-        const int patternOffset = (bufferSize() - previousPartialMatch);
+      if(previousPartialMatch != ByteVector::npos && bufferSize() > previousPartialMatch) {
+        const size_t patternOffset = (bufferSize() - previousPartialMatch);
         if(buffer.containsAt(ID3v2::Header::fileIdentifier(), 0, patternOffset)) {
           seek(originalPosition);
           return bufferOffset - bufferSize() + previousPartialMatch;
@@ -524,23 +527,23 @@ offset_t MPEG::File::findID3v2()
 
       // (2) pattern contained in current buffer
 
-      long location = buffer.find(ID3v2::Header::fileIdentifier());
-      if(location >= 0) {
+      const size_t location = buffer.find(ID3v2::Header::fileIdentifier());
+      if(location != ByteVector::npos) {
         seek(originalPosition);
         return bufferOffset + location;
       }
 
-      int firstSynchByte = buffer.find(char(uchar(255)));
+      size_t firstSynchByte = buffer.find(char(uchar(255)));
 
       // Here we have to loop because there could be several of the first
       // (11111111) byte, and we want to check all such instances until we find
       // a full match (11111111 111) or hit the end of the buffer.
 
-      while(firstSynchByte >= 0) {
+      while(firstSynchByte != ByteVector::npos) {
 
         // if this *is not* at the end of the buffer
 
-        if(firstSynchByte < int(buffer.size()) - 1) {
+        if(firstSynchByte < buffer.size() - 1) {
           if(secondSynchByte(buffer[firstSynchByte + 1])) {
             // We've found the frame synch pattern.
             seek(originalPosition);

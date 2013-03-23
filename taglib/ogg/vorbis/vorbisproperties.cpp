@@ -151,22 +151,22 @@ void Ogg::Vorbis::Properties::read()
 
   pos += 7;
 
-  d->vorbisVersion = data.mid(pos, 4).toUInt(false);
+  d->vorbisVersion = data.mid(pos, 4).toUInt32(false);
   pos += 4;
 
   d->channels = uchar(data[pos]);
   pos += 1;
 
-  d->sampleRate = data.mid(pos, 4).toUInt(false);
+  d->sampleRate = data.mid(pos, 4).toUInt32(false);
   pos += 4;
 
-  d->bitrateMaximum = data.mid(pos, 4).toUInt(false);
+  d->bitrateMaximum = data.mid(pos, 4).toUInt32(false);
   pos += 4;
 
-  d->bitrateNominal = data.mid(pos, 4).toUInt(false);
+  d->bitrateNominal = data.mid(pos, 4).toUInt32(false);
   pos += 4;
 
-  d->bitrateMinimum = data.mid(pos, 4).toUInt(false);
+  d->bitrateMinimum = data.mid(pos, 4).toUInt32(false);
 
   // TODO: Later this should be only the "fast" mode.
   d->bitrate = d->bitrateNominal;
