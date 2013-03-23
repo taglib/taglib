@@ -126,6 +126,9 @@ public:
 
 const String String::null;
 
+// Actual value is -1.
+const size_t String::npos = wstring::npos;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 String::String() 
@@ -325,35 +328,23 @@ String::ConstIterator String::end() const
   return d->data.end();
 }
 
-int String::find(const String &s, int offset) const
+size_t String::find(const String &s, size_t offset) const
 {
-  const size_t position 
-    = d->data.find(s.d->data, offset == -1 ? wstring::npos : offset);
-
-  if(position != wstring::npos)
-    return static_cast<int>(position);
-  else
-    return -1;
+  return d->data.find(s.d->data, offset);
 }
 
-int String::rfind(const String &s, int offset) const
+size_t String::rfind(const String &s, size_t offset) const
 {
-  const size_t position =
-    d->data.rfind(s.d->data, offset == -1 ? wstring::npos : offset);
-
-  if(position != wstring::npos)
-    return static_cast<int>(position);
-  else
-    return -1;
+  return d->data.rfind(s.d->data, offset);
 }
 
 StringList String::split(const String &separator) const
 {
   StringList list;
-  for(int index = 0;;)
+  for(size_t index = 0;;)
   {
-    const int sep = find(separator, index);
-    if(sep < 0)
+    const size_t sep = find(separator, index);
+    if(sep == npos)
     {
       list.append(substr(index, size() - index));
       break;
@@ -375,11 +366,9 @@ bool String::startsWith(const String &s) const
   return substr(0, s.length()) == s;
 }
 
-String String::substr(uint position, uint n) const
+String String::substr(size_t position, size_t length) const
 {
-  String s;
-  s.d->data = d->data.substr(position, n);
-  return s;
+  return String(d->data.substr(position, length));
 }
 
 String &String::append(const String &s)
@@ -394,31 +383,32 @@ String String::upper() const
   static const int shift = 'A' - 'a';
 
   String s;
-  s.d->data.reserve(d->data.size());
+  s.d->data.resize(d->data.size());
 
+  wchar_t *p = &s.d->data[0];
   for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
-      s.d->data.push_back(*it + shift);
+      *p++ = *it + shift;
     else
-      s.d->data.push_back(*it);
+      *p++ = *it;
   }
 
   return s;
 }
 
-TagLib::uint String::size() const
+size_t String::size() const
 {
-  return static_cast<TagLib::uint>(d->data.size());
+  return d->data.size();
 }
 
-TagLib::uint String::length() const
+size_t String::length() const
 {
   return size();
 }
 
 bool String::isEmpty() const
 {
-  return (d->data.size() == 0);
+  return d->data.empty();
 }
 
 bool String::isNull() const
@@ -432,7 +422,7 @@ ByteVector String::data(Type t) const
   {
   case Latin1:
   {
-    ByteVector v(size());
+    ByteVector v(size(), 0);
     char *p = v.data();
 
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++)
@@ -442,7 +432,7 @@ ByteVector String::data(Type t) const
   }
   case UTF8:
   {
-    ByteVector v(size() * 4 + 1);
+    ByteVector v(size() * 4 + 1, 0);
 
 #ifdef TAGLIB_USE_CODECVT
 
@@ -478,7 +468,7 @@ ByteVector String::data(Type t) const
   }
   case UTF16:
   {
-    ByteVector v(2 + size() * 2);
+    ByteVector v(2 + size() * 2, 0);
     char *p = v.data();
 
     // Assume that if we're doing UTF16 and not UTF16BE that we want little
@@ -496,7 +486,7 @@ ByteVector String::data(Type t) const
   }
   case UTF16BE:
   {
-    ByteVector v(size() * 2);
+    ByteVector v(size() * 2, 0);
     char *p = v.data();
 
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
@@ -508,7 +498,7 @@ ByteVector String::data(Type t) const
   }
   case UTF16LE:
   {
-    ByteVector v(size() * 2);
+    ByteVector v(size() * 2, 0);
     char *p = v.data();
 
     for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
@@ -614,7 +604,7 @@ String String::number(int n) // static
   if(negative)
     s += '-';
 
-  for(int i = charStack.d->data.size() - 1; i >= 0; i--)
+  for(int i = static_cast<int>(charStack.d->data.size()) - 1; i >= 0; i--)
     s += charStack.d->data[i];
 
   return s;

@@ -161,7 +161,7 @@ void RelativeVolumeFrame::parseFields(const ByteVector &data)
 
     ChannelData &channel = d->channels[type];
 
-    channel.volumeAdjustment = data.mid(pos, 2).toShort();
+    channel.volumeAdjustment = data.mid(pos, 2).toInt16();
     pos += 2;
 
     channel.peakVolume.bitsRepresentingPeak = data[pos];
@@ -187,7 +187,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
     const ChannelData &channel = (*it).second;
 
     data.append(char(type));
-    data.append(ByteVector::fromShort(channel.volumeAdjustment));
+    data.append(ByteVector::fromUInt16(channel.volumeAdjustment));
     data.append(char(channel.peakVolume.bitsRepresentingPeak));
     data.append(channel.peakVolume.peakVolume);
   }

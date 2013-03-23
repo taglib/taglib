@@ -128,7 +128,7 @@ void APE::Properties::read()
   ByteVector commonHeader=d->file->readBlock(6);
   if(!commonHeader.startsWith("MAC "))
     return;
-  d->version = commonHeader.mid(4).toUInt(false);
+  d->version = commonHeader.mid(4).toUInt32(false);
 
   if(d->version >= 3980) {
     analyzeCurrent();
@@ -182,7 +182,7 @@ void APE::Properties::analyzeCurrent()
   // Read the descriptor
   d->file->seek(2, File::Current);
   ByteVector descriptor = d->file->readBlock(44);
-  uint descriptorBytes = descriptor.mid(0,4).toUInt(false);
+  uint descriptorBytes = descriptor.mid(0,4).toUInt32(false);
 
   if ((descriptorBytes - 52) > 0)
     d->file->seek(descriptorBytes - 52, File::Current);
@@ -191,14 +191,14 @@ void APE::Properties::analyzeCurrent()
   ByteVector header = d->file->readBlock(24);
 
   // Get the APE info
-  d->channels = header.mid(18, 2).toShort(false);
-  d->sampleRate = header.mid(20, 4).toUInt(false);
-  d->bitsPerSample = header.mid(16, 2).toShort(false);
+  d->channels = header.mid(18, 2).toInt16(false);
+  d->sampleRate = header.mid(20, 4).toUInt32(false);
+  d->bitsPerSample = header.mid(16, 2).toInt16(false);
   //d->compressionLevel =
 
-  uint totalFrames = header.mid(12, 4).toUInt(false);
-  uint blocksPerFrame = header.mid(4, 4).toUInt(false);
-  uint finalFrameBlocks = header.mid(8, 4).toUInt(false);
+  uint totalFrames = header.mid(12, 4).toUInt32(false);
+  uint blocksPerFrame = header.mid(4, 4).toUInt32(false);
+  uint finalFrameBlocks = header.mid(8, 4).toUInt32(false);
   d->sampleFrames = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
   d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
@@ -207,13 +207,13 @@ void APE::Properties::analyzeCurrent()
 void APE::Properties::analyzeOld()
 {
   ByteVector header = d->file->readBlock(26);
-  uint totalFrames = header.mid(18, 4).toUInt(false);
+  uint totalFrames = header.mid(18, 4).toUInt32(false);
 
   // Fail on 0 length APE files (catches non-finalized APE files)
   if(totalFrames == 0)
     return;
 
-  short compressionLevel = header.mid(0, 2).toShort(false);
+  short compressionLevel = header.mid(0, 2).toInt16(false);
   uint blocksPerFrame;
   if(d->version >= 3950)
     blocksPerFrame = 73728 * 4;
@@ -221,9 +221,9 @@ void APE::Properties::analyzeOld()
     blocksPerFrame = 73728;
   else
     blocksPerFrame = 9216;
-  d->channels = header.mid(4, 2).toShort(false);
-  d->sampleRate = header.mid(6, 4).toUInt(false);
-  uint finalFrameBlocks = header.mid(22, 4).toUInt(false);
+  d->channels = header.mid(4, 2).toInt16(false);
+  d->sampleRate = header.mid(6, 4).toUInt32(false);
+  uint finalFrameBlocks = header.mid(22, 4).toUInt32(false);
   uint totalBlocks = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = totalBlocks / d->sampleRate;
   d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;

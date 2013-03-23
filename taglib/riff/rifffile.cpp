@@ -143,13 +143,13 @@ void RIFF::File::setChunkData(uint i, const ByteVector &data)
   // First we update the global size
 
   d->size += ((data.size() + 1) & ~1) - (d->chunks[i].size + d->chunks[i].padding);
-  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
+  insert(ByteVector::fromUInt32(d->size, d->endianness == BigEndian), 4, 4);
 
   // Now update the specific chunk
 
   writeChunk(chunkName(i), data, d->chunks[i].offset - 8, d->chunks[i].size + d->chunks[i].padding + 8);
 
-  d->chunks[i].size = data.size();
+  d->chunks[i].size = static_cast<uint>(data.size());
   d->chunks[i].padding = (data.size() & 0x01) ? 1 : 0;
 
   // Now update the internal offsets
@@ -185,8 +185,8 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // First we update the global size
 
-  d->size += static_cast<uint>(offset & 1) + data.size() + 8;
-  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
+  d->size += static_cast<uint>((offset & 1) + data.size() + 8);
+  insert(ByteVector::fromUInt32(d->size, d->endianness == BigEndian), 4, 4);
 
   // Now add the chunk to the file
 
@@ -206,7 +206,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   Chunk chunk;
   chunk.name = name;
-  chunk.size = data.size();
+  chunk.size = static_cast<uint>(data.size());
   chunk.offset = offset + 8;
   chunk.padding = static_cast<char>(data.size() & 1);
 
@@ -257,13 +257,13 @@ void RIFF::File::read()
   bool bigEndian = (d->endianness == BigEndian);
 
   d->type = readBlock(4);
-  d->size = readBlock(4).toUInt(bigEndian);
+  d->size = readBlock(4).toUInt32(bigEndian);
   d->format = readBlock(4);
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
-    uint chunkSize = readBlock(4).toUInt(bigEndian);
+    uint chunkSize = readBlock(4).toUInt32(bigEndian);
 
     if(!isValidChunkID(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
@@ -310,7 +310,7 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
     combined.append(ByteVector(leadingPadding, '\x00'));
   }
   combined.append(name);
-  combined.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
+  combined.append(ByteVector::fromUInt32(data.size(), d->endianness == BigEndian));
   combined.append(data);
   if((data.size() & 0x01) != 0) {
     combined.append('\x00');

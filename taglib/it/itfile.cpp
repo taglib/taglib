@@ -166,7 +166,7 @@ bool IT::File::save()
   if(messageOffset + messageLength >= fileSize) {
     // append new message
     seek(54);
-    writeU16L(message.size());
+    writeU16L(static_cast<ushort>(message.size()));
     writeU32L(messageOffset);
     seek(messageOffset);
     writeBlock(message);
@@ -224,8 +224,8 @@ void IT::File::read(bool)
     seek(messageOffset);
     ByteVector messageBytes = readBlock(messageLength);
     READ_ASSERT(messageBytes.size() == messageLength);
-    int index = messageBytes.find((char) 0);
-    if(index > -1)
+    const size_t index = messageBytes.find((char) 0);
+    if(index != ByteVector::npos)
       messageBytes.resize(index, 0);
     messageBytes.replace('\r', '\n');
     message = messageBytes;

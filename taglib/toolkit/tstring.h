@@ -240,16 +240,16 @@ namespace TagLib {
 
     /*!
      * Finds the first occurrence of pattern \a s in this string starting from
-     * \a offset.  If the pattern is not found, -1 is returned.
+     * \a offset.  If the pattern is not found, \a npos is returned.
      */
-    int find(const String &s, int offset = 0) const;
+    size_t find(const String &s, size_t offset = 0) const;
 
     /*!
      * Finds the last occurrence of pattern \a s in this string, searched backwards,
      * either from the end of the string or starting from \a offset. If the pattern
-     * is not found, -1 is returned.
+     * is not found, \a npos is returned.
      */
-    int rfind(const String &s, int offset = -1) const;
+    size_t rfind(const String &s, size_t offset = npos) const;
 
     /*!
      * Splits the string on each occurrence of \a separator.
@@ -265,7 +265,7 @@ namespace TagLib {
      * Extract a substring from this string starting at \a position and
      * continuing for \a n characters.
      */
-    String substr(uint position, uint n = 0xffffffff) const;
+    String substr(size_t position, size_t n = npos) const;
 
     /*!
      * Append \a s to the current string and return a reference to the current
@@ -283,12 +283,12 @@ namespace TagLib {
     /*!
      * Returns the size of the string.
      */
-    uint size() const;
+    size_t size() const;
 
     /*!
      * Returns the length of the string.  Equivalent to size().
      */
-    uint length() const;
+    size_t length() const;
 
     /*!
      * Returns true if the string is empty.
@@ -475,6 +475,13 @@ namespace TagLib {
      * A null string provided for convenience.
      */
     static const String null;
+
+    /*!
+    * When used as the value for a \a length parameter in String's member 
+    * functions, means "until the end of the string".
+    * As a return value, it is usually used to indicate no matches.
+    */
+    static const size_t npos;
 
   protected:
     /*!

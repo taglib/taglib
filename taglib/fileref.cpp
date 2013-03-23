@@ -295,8 +295,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 #else
   {
     String s = fileName;
-    int pos = s.rfind(".");
-    if(pos != -1)
+    const size_t pos = s.rfind(".");
+    if(pos != String::npos)
       ext = s.substr(pos + 1).upper();
   }
 #endif

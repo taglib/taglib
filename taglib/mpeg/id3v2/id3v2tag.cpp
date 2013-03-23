@@ -593,8 +593,8 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  uint paddingSize = 0;
-  uint originalSize = d->header.tagSize();
+  size_t paddingSize = 0;
+  const size_t originalSize = d->header.tagSize();
 
   if(tagData.size() < originalSize)
     paddingSize = originalSize - tagData.size();
@@ -605,7 +605,7 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(tagData.size());
+  d->header.setTagSize(static_cast<uint>(tagData.size()));
 
   // TODO: This should eventually include d->footer->render().
   return d->header.render() + tagData;
@@ -652,8 +652,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
   if(d->header.unsynchronisation() && d->header.majorVersion() <= 3)
     data = SynchData::decode(data);
 
-  uint frameDataPosition = 0;
-  uint frameDataLength = data.size();
+  size_t frameDataPosition = 0;
+  size_t frameDataLength = data.size();
 
   // check for extended header
 
@@ -689,7 +689,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
       }
 
-      d->paddingSize = frameDataLength - frameDataPosition;
+      d->paddingSize = static_cast<int>(frameDataLength - frameDataPosition);
       return;
     }
 

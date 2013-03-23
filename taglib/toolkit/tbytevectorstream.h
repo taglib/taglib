@@ -61,7 +61,7 @@ namespace TagLib {
     /*!
      * Reads a block of size \a length at the current get pointer.
      */
-    ByteVector readBlock(uint length);
+    ByteVector readBlock(size_t length);
 
     /*!
      * Attempts to write the block \a data at the current get pointer.  If the
@@ -81,7 +81,7 @@ namespace TagLib {
      * \note This method is slow since it requires rewriting all of the file
      * after the insertion point.
      */
-    void insert(const ByteVector &data, offset_t start = 0, uint replace = 0);
+    void insert(const ByteVector &data, offset_t start = 0, size_t replace = 0);
 
     /*!
      * Removes a block of the file starting a \a start and continuing for
@@ -90,7 +90,7 @@ namespace TagLib {
      * \note This method is slow since it involves rewriting all of the file
      * after the removed portion.
      */
-    void removeBlock(offset_t start = 0, uint length = 0);
+    void removeBlock(offset_t start = 0, size_t length = 0);
 
     /*!
      * Returns true if the file is read only (or if the file can not be opened).

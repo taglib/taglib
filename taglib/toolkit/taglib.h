@@ -127,10 +127,11 @@ namespace TagLib {
 
   class String;
 
-  typedef wchar_t wchar;
-  typedef unsigned char  uchar;
-  typedef unsigned short ushort;
-  typedef unsigned int   uint;
+  typedef wchar_t            wchar;
+  typedef unsigned char      uchar;
+  typedef unsigned short     ushort;
+  typedef unsigned int       uint;
+  typedef unsigned long long ulonglong;
 
   // long/ulong can be either 32-bit or 64-bit wide.
   typedef unsigned long  ulong;

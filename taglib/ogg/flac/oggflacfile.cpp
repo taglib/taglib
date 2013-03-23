@@ -108,7 +108,7 @@ bool Ogg::FLAC::File::save()
 
   // Put the size in the first 32 bit (I assume no more than 24 bit are used)
 
-  ByteVector v = ByteVector::fromUInt(d->xiphCommentData.size());
+  ByteVector v = ByteVector::fromUInt32(d->xiphCommentData.size());
 
   // Set the type of the metadata-block to be a Xiph / Vorbis comment
 
@@ -230,7 +230,7 @@ void Ogg::FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool lastBlock = (header[0] & 0x80) != 0;
-  uint length = header.mid(1, 3).toUInt();
+  uint length = header.mid(1, 3).toUInt32();
   overhead += length;
 
   // Sanity: First block should be the stream_info metadata
@@ -253,7 +253,7 @@ void Ogg::FLAC::File::scan()
     header = metadataHeader.mid(0, 4);
     blockType = header[0] & 0x7f;
     lastBlock = (header[0] & 0x80) != 0;
-    length = header.mid(1, 3).toUInt();
+    length = header.mid(1, 3).toUInt32();
     overhead += length;
 
     if(blockType == 1) {

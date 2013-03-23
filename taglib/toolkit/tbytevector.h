@@ -59,7 +59,7 @@ namespace TagLib {
      * Construct a vector of size \a size with all values set to \a value by
      * default.
      */
-    ByteVector(uint size, char value = 0);
+    ByteVector(size_t size, char value = 0);
 
     /*!
      * Constructs a byte vector that is a copy of \a v.
@@ -85,7 +85,7 @@ namespace TagLib {
     /*!
      * Constructs a byte vector that copies \a data for up to \a length bytes.
      */
-    ByteVector(const char *data, uint length);
+    ByteVector(const char *data, size_t length);
 
     /*!
      * Constructs a byte vector that copies \a data up to the first null
@@ -103,7 +103,7 @@ namespace TagLib {
     /*!
      * Sets the data for the byte array using the first \a length bytes of \a data
      */
-    ByteVector &setData(const char *data, uint length);
+    ByteVector &setData(const char *data, size_t length);
 
     /*!
      * Sets the data for the byte array copies \a data up to the first null
@@ -130,37 +130,37 @@ namespace TagLib {
      * for \a length bytes.  If \a length is not specified it will return the bytes
      * from \a index to the end of the vector.
      */
-    ByteVector mid(uint index, uint length = 0xffffffff) const;
+    ByteVector mid(size_t index, size_t length = npos) const;
 
     /*!
      * This essentially performs the same as operator[](), but instead of causing
      * a runtime error if the index is out of bounds, it will return a null byte.
      */
-    char at(uint index) const;
+    char at(size_t index) const;
 
     /*!
      * Searches the ByteVector for \a pattern starting at \a offset and returns
-     * the offset.  Returns -1 if the pattern was not found.  If \a byteAlign is
+     * the offset.  Returns \a npos if the pattern was not found.  If \a byteAlign is
      * specified the pattern will only be matched if it starts on a byte divisible
      * by \a byteAlign (starting from \a offset).
      */
-    int find(const ByteVector &pattern, uint offset = 0, int byteAlign = 1) const;
+    size_t find(const ByteVector &pattern, size_t offset = 0, size_t byteAlign = 1) const;
 
     /*!
      * Searches the char for \a c starting at \a offset and returns
-     * the offset.  Returns -1 if the pattern was not found.  If \a byteAlign is
+     * the offset.  Returns \a npos if the pattern was not found.  If \a byteAlign is
      * specified the pattern will only be matched if it starts on a byte divisible
      * by \a byteAlign (starting from \a offset).
      */
-    int find(char c, uint offset = 0, int byteAlign = 1) const;
+    size_t find(char c, size_t offset = 0, size_t byteAlign = 1) const;
 
     /*!
      * Searches the ByteVector for \a pattern starting from either the end of the
-     * vector or \a offset and returns the offset.  Returns -1 if the pattern was
+     * vector or \a offset and returns the offset.  Returns \ npos if the pattern was
      * not found.  If \a byteAlign is specified the pattern will only be matched
      * if it starts on a byte divisible by \a byteAlign (starting from \a offset).
      */
-    int rfind(const ByteVector &pattern, uint offset = 0, int byteAlign = 1) const;
+    size_t rfind(const ByteVector &pattern, size_t offset = 0, size_t byteAlign = 1) const;
 
     /*!
      * Checks to see if the vector contains the \a pattern starting at position
@@ -169,7 +169,8 @@ namespace TagLib {
      * specify to only check for the first \a patternLength bytes of \a pattern with
      * the \a patternLength argument.
      */
-    bool containsAt(const ByteVector &pattern, uint offset, uint patternOffset = 0, uint patternLength = 0xffffffff) const;
+    bool containsAt(
+      const ByteVector &pattern, size_t offset, size_t patternOffset = 0, size_t patternLength = npos) const;
 
     /*!
      * Returns true if the vector starts with \a pattern.
@@ -189,7 +190,7 @@ namespace TagLib {
 
     /*!
      * Checks for a partial match of \a pattern at the end of the vector.  It
-     * returns the offset of the partial match within the vector, or -1 if the
+     * returns the offset of the partial match within the vector, or \a npos if the
      * pattern is not found.  This method is particularly useful when searching for
      * patterns that start in one vector and end in another.  When combined with
      * startsWith() it can be used to find a pattern that overlaps two buffers.
@@ -197,7 +198,7 @@ namespace TagLib {
      * \note This will not match the complete pattern at the end of the string; use
      * endsWith() for that.
      */
-    int endsWithPartialMatch(const ByteVector &pattern) const;
+    size_t endsWithPartialMatch(const ByteVector &pattern) const;
 
     /*!
      * Appends \a v to the end of the ByteVector.
@@ -212,14 +213,14 @@ namespace TagLib {
     /*!
      * Returns the size of the array.
      */
-    uint size() const;
+    size_t size() const;
 
     /*!
      * Resize the vector to \a size.  If the vector is currently less than
      * \a size, pad the remaining spaces with \a padding.  Returns a reference
      * to the resized vector.
      */
-    ByteVector &resize(uint size, char padding = 0);
+    ByteVector &resize(size_t size, char padding = 0);
 
     /*!
      * Returns an Iterator that points to the front of the vector.
@@ -263,27 +264,15 @@ namespace TagLib {
     uint checksum() const;
 
     /*!
-     * Converts the first 4 bytes of the vector to an unsigned integer.
-     *
-     * If \a mostSignificantByteFirst is true this will operate left to right
-     * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
-     * 0x01000000 == 1.
-     *
-     * \see fromUInt()
-     */
-    uint toUInt(bool mostSignificantByteFirst = true) const;
-
-    /*!
      * Converts the first 2 bytes of the vector to a short.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
      * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
      *
-     * \see fromShort()
+     * \see fromUInt16()
      */
-    short toShort(bool mostSignificantByteFirst = true) const;
+    short toInt16(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 2 bytes of the vector to a unsigned short.
@@ -292,9 +281,21 @@ namespace TagLib {
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
      * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
      *
-     * \see fromShort()
+     * \see fromUInt16()
      */
-    unsigned short toUShort(bool mostSignificantByteFirst = true) const;
+    unsigned short toUInt16(bool mostSignificantByteFirst = true) const;
+
+     /*!
+     * Converts the first 4 bytes of the vector to an unsigned integer.
+     *
+     * If \a mostSignificantByteFirst is true this will operate left to right
+     * evaluating the integer.  For example if \a mostSignificantByteFirst is
+     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
+     * 0x01000000 == 1.
+     *
+     * \see fromUInt32()
+     */
+    uint toUInt32(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 8 bytes of the vector to a (signed) long long.
@@ -304,9 +305,20 @@ namespace TagLib {
      * true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
      * if false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
-     * \see fromUInt()
+     * \see fromUInt64()
      */
-    long long toLongLong(bool mostSignificantByteFirst = true) const;
+    long long toInt64(bool mostSignificantByteFirst = true) const;
+
+    /*!
+     * Creates a 2 byte ByteVector based on \a value.  If
+     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * in building the ByteVector.  For example if \a mostSignificantByteFirst is
+     * true then $00 01 == 0x0001 == 1, if false, $01 00 == 0x0100 == 1.
+     *
+     * \note If \a value is larger than 16-bit, the lowest 16 bits are used. 
+     * \see toInt16()
+     */
+    static ByteVector fromUInt16(size_t value, bool mostSignificantByteFirst = true);
 
     /*!
      * Creates a 4 byte ByteVector based on \a value.  If
@@ -315,19 +327,10 @@ namespace TagLib {
      * true then $00 00 00 01 == 0x00000001 == 1, if false, $01 00 00 00 ==
      * 0x01000000 == 1.
      *
-     * \see toUInt()
+     * \note If \a value is larger than 32-bit, the lowest 32 bits are used. 
+     * \see toUInt32()
      */
-    static ByteVector fromUInt(uint value, bool mostSignificantByteFirst = true);
-
-    /*!
-     * Creates a 2 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
-     * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 01 == 0x0001 == 1, if false, $01 00 == 0x0100 == 1.
-     *
-     * \see toShort()
-     */
-    static ByteVector fromShort(short value, bool mostSignificantByteFirst = true);
+    static ByteVector fromUInt32(size_t value, bool mostSignificantByteFirst = true);
 
     /*!
      * Creates a 8 byte ByteVector based on \a value.  If
@@ -336,24 +339,24 @@ namespace TagLib {
      * true then $00 00 00 01 == 0x0000000000000001 == 1, if false,
      * $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
-     * \see toLongLong()
+     * \see toInt64()
      */
-    static ByteVector fromLongLong(long long value, bool mostSignificantByteFirst = true);
+    static ByteVector fromUInt64(ulonglong value, bool mostSignificantByteFirst = true);
 
     /*!
      * Returns a ByteVector based on the CString \a s.
      */
-    static ByteVector fromCString(const char *s, uint length = 0xffffffff);
+    static ByteVector fromCString(const char *s, size_t length = npos);
 
     /*!
-     * Returns a const refernence to the byte at \a index.
+     * Returns a const reference to the byte at \a index.
      */
-    const char &operator[](int index) const;
+    const char &operator[](size_t index) const;
 
     /*!
      * Returns a reference to the byte at \a index.
      */
-    char &operator[](int index);
+    char &operator[](size_t index);
 
     /*!
      * Returns true if this ByteVector and \a v are equal.
@@ -426,6 +429,12 @@ namespace TagLib {
      */
     static const ByteVector null;
 
+    /*!
+    * When used as the value for a \a length or \a patternLength parameter 
+    * in ByteVector's member functions, means "until the end of the data".
+    * As a return value, it is usually used to indicate no matches.
+    */
+    static const size_t npos;
 
     /*!
      * Returns a hex-encoded copy of the byte vector.
