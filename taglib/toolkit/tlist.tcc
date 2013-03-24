@@ -243,7 +243,7 @@ template <class T>
 List<T> &List<T>::prepend(const List<T> &l)
 {
   detach();
-  d->list.insert(d->list.begin(), l.begin(), l.end());
+  d->list.insert(d->list.begin(), l.d->list.begin(), l.d->list.end());
   return *this;
 }
 
@@ -262,7 +262,7 @@ List<T> &List<T>::prepend(List<T> &&l)
 {
   detach();
   
-  for(Iterator it = l.rbegin(); it != l.rend(); ++it)
+  for(typename std::list<T>::reverse_iterator it = l.d->list.rbegin(); it != l.d->list.rend(); ++it)
     d->list.push_front(std::move(*it));
   
   return *this;
