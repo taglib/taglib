@@ -311,6 +311,10 @@ if(ZLIB_FOUND)
 	target_link_libraries(tag ${ZLIB_LIBRARIES})
 endif()
 
+if(WIN32 AND NOT TAGLIB_STATIC)
+	target_link_libraries(tag shlwapi.lib)
+endif()
+
 set_target_properties(tag PROPERTIES
   VERSION ${TAGLIB_SOVERSION_MAJOR}.${TAGLIB_SOVERSION_MINOR}.${TAGLIB_SOVERSION_PATCH}
   SOVERSION ${TAGLIB_SOVERSION_MAJOR}
