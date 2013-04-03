@@ -166,13 +166,19 @@ namespace TagLib {
       TIterator itBuffer = it;
       TIterator itPattern = patternBegin + patternSize - 1;
 
-      while(itPattern >= patternBegin && *itBuffer == *itPattern) {
-        --itBuffer;
-        --itPattern;
-      }
+	  while(*itBuffer == *itPattern)
+	  {
+		if(itPattern == patternBegin)
+		{
+		  if((itBuffer - dataBegin - offset) % byteAlign == 0)
+			return (itBuffer - dataBegin);
+		  else
+            break;
+		}
 
-      if(itPattern < patternBegin && (itBuffer - dataBegin + 1 - offset) % byteAlign == 0)
-        return (itBuffer - dataBegin + 1);
+		--itBuffer;
+		--itPattern;
+	  }
     }
 
     return ByteVector::npos;
