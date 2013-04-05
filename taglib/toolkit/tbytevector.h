@@ -48,6 +48,8 @@ namespace TagLib {
 #ifndef DO_NOT_DOCUMENT
     typedef std::vector<char>::iterator Iterator;
     typedef std::vector<char>::const_iterator ConstIterator;
+    typedef std::vector<char>::reverse_iterator ReverseIterator;
+    typedef std::vector<char>::const_reverse_iterator ConstReverseIterator;
 #endif
 
     /*!
@@ -65,6 +67,11 @@ namespace TagLib {
      * Contructs a byte vector that is a copy of \a v.
      */
     ByteVector(const ByteVector &v);
+
+    /*!
+     * Contructs a byte vector that is a copy of \a v.
+     */
+    ByteVector(const ByteVector &v, uint offset, uint length);
 
     /*!
      * Contructs a byte vector that contains \a c.
@@ -134,6 +141,14 @@ namespace TagLib {
      * by \a byteAlign (starting from \a offset).
      */
     int find(const ByteVector &pattern, uint offset = 0, int byteAlign = 1) const;
+
+    /*!
+     * Searches the char for \a c starting at \a offset and returns
+     * the offset.  Returns \a npos if the pattern was not found.  If \a byteAlign is
+     * specified the pattern will only be matched if it starts on a byte divisible
+     * by \a byteAlign (starting from \a offset).
+     */
+    int find(char c, uint offset = 0, int byteAlign = 1) const;
 
     /*!
      * Searches the ByteVector for \a pattern starting from either the end of the
@@ -221,6 +236,26 @@ namespace TagLib {
      * Returns a ConstIterator that points to the back of the vector.
      */
     ConstIterator end() const;
+
+    /*!
+     * Returns a ReverseIterator that points to the front of the vector.
+     */
+    ReverseIterator rbegin();
+
+    /*!
+     * Returns a ConstReverseIterator that points to the front of the vector.
+     */
+    ConstReverseIterator rbegin() const;
+
+    /*!
+     * Returns a ReverseIterator that points to the back of the vector.
+     */
+    ReverseIterator rend();
+
+    /*!
+     * Returns a ConstReverseIterator that points to the back of the vector.
+     */
+    ConstReverseIterator rend() const;
 
     /*!
      * Returns true if the vector is null.
@@ -413,7 +448,6 @@ namespace TagLib {
     class ByteVectorPrivate;
     ByteVectorPrivate *d;
   };
-
 }
 
 /*!
