@@ -21,3 +21,22 @@ if(NOT CppUnit_FOUND AND BUILD_TESTS)
 	set(BUILD_TESTS OFF)
 endif()
 
+# Check where to find the byteorder-related functions (htobe32 etc).
+check_cxx_source_compiles("
+    #include <endian.h>
+    int main() {
+        htobe64(0);
+    }
+" BYTEORDER_IN_ENDIAN_H)
+check_cxx_source_compiles("
+    #include <sys/endian.h>
+    int main() {
+        htobe64(0);
+    }
+" BYTEORDER_IN_SYS_ENDIAN_H)
+check_cxx_source_compiles("
+    #include <sys/types.h>
+    int main() {
+        htobe64(0);
+    }
+" BYTEORDER_IN_SYS_TYPES_H)
