@@ -48,6 +48,8 @@ namespace TagLib {
 #ifndef DO_NOT_DOCUMENT
     typedef std::vector<char>::iterator Iterator;
     typedef std::vector<char>::const_iterator ConstIterator;
+    typedef std::vector<char>::reverse_iterator ReverseIterator;
+    typedef std::vector<char>::const_reverse_iterator ConstReverseIterator;
 #endif
 
     /*!
@@ -76,6 +78,11 @@ namespace TagLib {
     ByteVector(ByteVector &&v);
 
 #endif
+
+    /*!
+     * Constructs a byte vector that is a copy of \a v.
+     */
+    ByteVector(const ByteVector &v, size_t offset, size_t length);
 
     /*!
      * Constructs a byte vector that contains \a c.
@@ -241,6 +248,26 @@ namespace TagLib {
      * Returns a ConstIterator that points to the back of the vector.
      */
     ConstIterator end() const;
+
+    /*!
+     * Returns a ReverseIterator that points to the front of the vector.
+     */
+    ReverseIterator rbegin();
+
+    /*!
+     * Returns a ConstReverseIterator that points to the front of the vector.
+     */
+    ConstReverseIterator rbegin() const;
+
+    /*!
+     * Returns a ReverseIterator that points to the back of the vector.
+     */
+    ReverseIterator rend();
+
+    /*!
+     * Returns a ConstReverseIterator that points to the back of the vector.
+     */
+    ConstReverseIterator rend() const;
 
     /*!
      * Returns true if the vector is null.
@@ -464,7 +491,6 @@ namespace TagLib {
    * Streams the ByteVector \a v to the output stream \a s.
    */
   TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v);
-
 }
 
 #endif
