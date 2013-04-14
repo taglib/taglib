@@ -895,8 +895,8 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
         d->items[name] = MP4::Item(value);
       }
       else if(it->first == "COMPILATION") {
-        bool value = it->second.front().toInt();
-        d->items[name] = MP4::Item(value > 0);
+        bool value = (it->second.front().toInt() != 0);
+        d->items[name] = MP4::Item(value);
       }
       else {
         d->items[name] = it->second;
