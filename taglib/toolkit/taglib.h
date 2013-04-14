@@ -63,6 +63,18 @@
 #  define TAGLIB_ATOMIC_GCC
 #endif
 
+// Detect CPU endian at compile time rather than run time if possible.
+// This is a poor list. Hope someone enrich it.
+#if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))) \
+  || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))) \
+  || (defined(__clang__) && (defined(__i386__) || defined(__x86_64__)))
+# define TAGLIB_LITTLE_ENDIAN
+/*
+#elif ....
+# define TAGLIB_BIG_ENDIAN
+*/
+#endif
+
 //! A namespace for all TagLib related classes and functions
 
 /*!

@@ -135,12 +135,12 @@ namespace TagLib {
     /*!
      * Makes a deep copy of the data in \a s.
      */
-    String(const wstring &s, Type t = UTF16BE);
+    String(const wstring &s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a s.
      */
-    String(const wchar_t *s, Type t = UTF16BE);
+    String(const wchar_t *s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a c.
@@ -451,17 +451,42 @@ namespace TagLib {
 
   private:
     /*!
-     * This checks to see if the string is in \e UTF-16 (with BOM) or \e UTF-8
-     * format and if so converts it to \e UTF-16BE for internal use.  \e Latin1
-     * does not require conversion since it is a subset of \e UTF-16BE and
-     * \e UTF16-BE requires no conversion since it is used internally.
+     * Converts a \e Latin-1 string into \e UTF-16(without BOM/CPU byte order) 
+     * and copies it to the internal buffer.
      */
-    void prepare(Type t);
+    void copyFromLatin1(const char *s, size_t length);
+
+    /*!
+     * Converts a \e UTF-8 string into \e UTF-16(without BOM/CPU byte order) 
+     * and copies it to the internal buffer.
+     */
+    void copyFromUTF8(const char *s, size_t length);
+
+    /*!
+     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into 
+     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
+     */
+    void copyFromUTF16(const wchar_t *s, size_t length, Type t);
+
+    /*!
+     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into 
+     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
+     */
+    void copyFromUTF16(const char *s, size_t length, Type t);
+    
+    template <size_t sizeOfWcharT>
+    void internalCopyFromUTF16(const char *s, size_t length, Type t);
+
+    /*!
+     * Indicates which byte order of UTF-16 is used to store strings internally. 
+     *
+     * \note \e String::UTF16BE or \e String::UTF16LE
+     */
+    static const Type WCharByteOrder;
 
     class StringPrivate;
     StringPrivate *d;
   };
-
 }
 
 /*!
