@@ -59,6 +59,20 @@
 
 #endif
 
+// Determines CPU byte order at compile time rather than run time if possible.
+
+#if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))) \
+  || (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)) \
+  || (defined(__clang__) && defined(__LITTLE_ENDIAN__))
+# define TAGLIB_LITTLE_ENDIAN
+
+#elif (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)) \
+  || (defined(__clang__) && defined(__BIG_ENDIAN__))
+# define TAGLIB_BIG_ENDIAN
+
+#endif
+
+
 namespace TagLib 
 {
   ushort byteSwap16(ushort x)
@@ -154,6 +168,24 @@ namespace TagLib
       | ((x & 0x0000000000ff0000ull) << 24)            
       | ((x & 0x000000000000ff00ull) << 40)            
       | ((x & 0x00000000000000ffull) << 56);
+
+#endif
+  }
+
+  bool isLittleEndianSystem() 
+  {
+#if defined(TAGLIB_LITTLE_ENDIAN)
+
+    return true;
+
+#elif defined(TAGLIB_BIG_ENDIAN)
+
+    return false;
+
+#else
+
+    ushort x = 1;
+    return (*reinterpret_cast<uchar>(&x) == 1);
 
 #endif
   }
