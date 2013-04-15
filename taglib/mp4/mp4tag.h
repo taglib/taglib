@@ -105,6 +105,8 @@ namespace TagLib {
         void saveNew(TagLib::ByteVector &data);
         void saveExisting(TagLib::ByteVector &data, AtomList &path);
 
+        void addItem(const String &name, const Item &value);
+
         class TagPrivate;
         TagPrivate *d;
     };
