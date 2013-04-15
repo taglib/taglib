@@ -445,6 +445,11 @@ namespace TagLib {
     void detach();
 
   private:
+     /*!
+     * Indicates the system endian. \a true if little endian, \a false if big endian.
+     */
+    static const bool isLittleEndian;
+
     class ByteVectorPrivate;
     ByteVectorPrivate *d;
   };
