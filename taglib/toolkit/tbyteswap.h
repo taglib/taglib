@@ -44,6 +44,12 @@ namespace TagLib
    * Converts the byte order of \a x as a 64-bit unsigned integer.
    */
   ulonglong byteSwap64(ulonglong x);
+
+  /*!
+   * Detects the system byte order.
+   * Returns \a true if little endian, \a false if big endian.
+   */
+  bool isLittleEndianSystem();
 }
 
 #endif

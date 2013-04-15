@@ -53,24 +53,6 @@ namespace {
   {
     return (c1 << 8) | c2;
   }
-
-#if !defined(TAGLIB_LITTLE_ENDIAN) && !defined(TAGLIB_BIG_ENDIAN)
-
-  TagLib::String::Type wcharByteOrder() 
-  {
-    // Detect CPU endian at run time.
-    union {
-      TagLib::ushort w;
-      char c;
-    } x = { 0x1234 };
-
-    if(x.c == 0x34)
-      return String::UTF16LE;
-    else
-      return String::UTF16BE;
-  }
-
-#endif
 }
 
 namespace TagLib {
@@ -839,19 +821,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   internalCopyFromUTF16<sizeof(wchar_t)>(s, length, t);
 }
 
-#if defined(TAGLIB_LITTLE_ENDIAN)
-
-const String::Type String::WCharByteOrder = String::UTF16LE;
-
-#elif defined(TAGLIB_BIG_ENDIAN)
-
-const String::Type String::WCharByteOrder = String::UTF16BE;
-
-#else
-
-const String::Type String::WCharByteOrder = wcharByteOrder();
-
-#endif
+const String::Type String::WCharByteOrder = isLittleEndianSystem() ? String::UTF16LE : String::UTF16BE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
