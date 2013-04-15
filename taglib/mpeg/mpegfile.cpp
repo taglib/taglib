@@ -656,9 +656,6 @@ void MPEG::File::findAPE()
 
 bool MPEG::File::secondSynchByte(char byte)
 {
-  if(uchar(byte) == 0xff)
-    return false;
-
   std::bitset<8> b(byte);
 
   // check to see if the byte matches 111xxxxx
