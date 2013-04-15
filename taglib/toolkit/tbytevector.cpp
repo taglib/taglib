@@ -183,25 +183,25 @@ T byteSwap(T x)
 }
 
 template <>
-unsigned short byteSwap<unsigned short>(unsigned short x)
+ushort byteSwap<ushort>(ushort x)
 {
   return byteSwap16(x);
 }
 
 template <>
-unsigned int byteSwap<unsigned int>(unsigned int x)
+uint byteSwap<uint>(uint x)
 {
   return byteSwap32(x);
 }
 
 template <>
-unsigned long long byteSwap<unsigned long long>(unsigned long long x)
+ulonglong byteSwap<ulonglong>(ulonglong x)
 {
   return byteSwap64(x);
 }
 
 template <class T>
-T toNumber(const ByteVector &v, bool swapBytes)
+T toNumber(const ByteVector &v, bool mostSignificantByteFirst)
 {
   if(v.isEmpty()) {
     debug("toNumber<T>() -- data is empty, returning 0");
@@ -212,26 +212,26 @@ T toNumber(const ByteVector &v, bool swapBytes)
 
   if(v.size() >= size)
   {
-    if(swapBytes)
+    if(isLittleEndianSystem == mostSignificantByteFirst)
       return byteSwap<T>(*reinterpret_cast<const T*>(v.data()));
     else
       return *reinterpret_cast<const T*>(v.data());
   }
 
-  const uint last = v.size() > size ? size - 1 : v.size() - 1;
+  const uint last = std::min<uint>(v.size() - 1, size);
   T sum = 0;
   for(uint i = 0; i <= last; i++)
-    sum |= (T) uchar(v[i]) << ((swapBytes ? last - i : i) * 8);
+    sum |= (T) uchar(v[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
 
   return sum;
 }
 
 template <class T>
-ByteVector fromNumber(T value, bool swapBytes)
+ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
   const size_t size = sizeof(T);
 
-  if(swapBytes)
+  if(isLittleEndianSystem == mostSignificantByteFirst)
     value = byteSwap<T>(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), size);
@@ -353,17 +353,17 @@ ByteVector ByteVector::fromCString(const char *s, uint length)
 
 ByteVector ByteVector::fromUInt(uint value, bool mostSignificantByteFirst)
 {
-  return fromNumber<uint>(value, (isLittleEndian == mostSignificantByteFirst));
+  return fromNumber<uint>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
 {
-  return fromNumber<ushort>(value, (isLittleEndian == mostSignificantByteFirst));
+  return fromNumber<ushort>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)
 {
-  return fromNumber<unsigned long long>(value, (isLittleEndian == mostSignificantByteFirst));
+  return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -684,22 +684,22 @@ TagLib::uint ByteVector::checksum() const
 
 TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, (isLittleEndian == mostSignificantByteFirst));
+  return toNumber<uint>(*this, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, (isLittleEndian == mostSignificantByteFirst));
+  return toNumber<unsigned short>(*this, mostSignificantByteFirst);
 }
 
 unsigned short ByteVector::toUShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, (isLittleEndian == mostSignificantByteFirst));
+  return toNumber<unsigned short>(*this, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, (isLittleEndian == mostSignificantByteFirst));
+  return toNumber<unsigned long long>(*this, mostSignificantByteFirst);
 }
 
 const char &ByteVector::operator[](int index) const
@@ -816,12 +816,6 @@ void ByteVector::detach()
     d = new ByteVectorPrivate(d->data->data, d->offset, d->length);
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// private members
-////////////////////////////////////////////////////////////////////////////////
-
-const bool ByteVector::isLittleEndian = isLittleEndianSystem();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
