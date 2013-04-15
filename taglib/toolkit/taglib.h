@@ -43,6 +43,7 @@
 #endif
 
 #include <string>
+#include <climits>
 
 #ifdef __APPLE__
 #  include <libkern/OSAtomic.h>
@@ -75,6 +76,30 @@
 */
 #endif
 
+// Check the widths of integral types.
+
+#if UCHAR_MAX != 255U
+# error TagLib assumes that char is 8-bit wide.
+#endif
+
+#if USHRT_MAX != 65535U
+# error TagLib assumes that short is 16-bit wide.
+#endif
+
+#if UINT_MAX != 4294967295U
+# error TagLib assumes that int is 32-bit wide.
+#endif
+
+#if !defined(ULLONG_MAX) && !defined(ULONGLONG_MAX) && !defined(ULONG_LONG_MAX)
+# error TagLib assumes that long long is 64-bit wide.
+#elif defined(ULLONG_MAX) && ULLONG_MAX != 18446744073709551615ULL
+# error TagLib assumes that long long is 64-bit wide.
+#elif defined(ULONGLONG_MAX) && ULONGLONG_MAX != 18446744073709551615ULL
+# error TagLib assumes that long long is 64-bit wide.
+#elif defined(ULONG_LONG_MAX) && ULONG_LONG_MAX != 18446744073709551615ULL
+# error TagLib assumes that long long is 64-bit wide.
+#endif
+
 //! A namespace for all TagLib related classes and functions
 
 /*!
@@ -89,10 +114,13 @@ namespace TagLib {
 
   class String;
 
-  typedef wchar_t wchar;
-  typedef unsigned char  uchar;
-  typedef unsigned short ushort;
-  typedef unsigned int   uint;
+  typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
+  typedef unsigned char      uchar;
+  typedef unsigned short     ushort;
+  typedef unsigned int       uint;
+  typedef unsigned long long ulonglong;
+
+  // long/ulong can be either 32-bit or 64-bit wide.
   typedef unsigned long  ulong;
 
   /*!

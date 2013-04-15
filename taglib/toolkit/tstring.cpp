@@ -29,9 +29,9 @@
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
+#include "tbyteswap.h"
 
 #include <iostream>
-
 #include <string.h>
 
 // Determine if the compiler supports codecvt.
@@ -48,19 +48,6 @@ typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
 #endif
 
 namespace {
-
-  inline unsigned short byteSwap(unsigned short x)
-  {
-#if defined(_MSC_VER) && (_MSC_VER >= 1400) 
-
-    return _byteswap_ushort(x);
-
-#else
-
-    return (((x) >> 8) & 0xff) | (((x) & 0xff) << 8);
-
-#endif
-  }
 
   inline unsigned short combine(unsigned char c1, unsigned char c2)
   {
@@ -806,7 +793,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
   if(swap) {
     for(size_t i = 0; i < length; ++i)
-      d->data[i] = byteSwap(static_cast<unsigned short>(s[i]));
+      d->data[i] = byteSwap16(static_cast<ushort>(s[i]));
   }
 }
 
