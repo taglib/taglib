@@ -24,23 +24,12 @@
  ***************************************************************************/
 
 #include <iostream>
-
 #include <tstring.h>
 #include <tdebug.h>
-
 #include <string.h>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400 && (defined(_M_IX86) || defined(_M_X64))
-# define TAGLIB_MSC_BYTESWAP
-#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
-# define TAGLIB_GCC_BYTESWAP
-#endif
-
-#ifdef  TAGLIB_GCC_BYTESWAP
-# include <byteswap.h>
-#endif
-
 #include "tbytevector.h"
+#include "tbyteswap.h"
 
 // This is a bit ugly to keep writing over and over again.
 
@@ -184,8 +173,6 @@ namespace TagLib {
     return -1;
   }
 
-#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
-
   template <class T>
   T byteSwap(T x)
   {
@@ -194,51 +181,23 @@ namespace TagLib {
     return 0;
   }
 
-#endif
-
-#ifdef TAGLIB_MSC_BYTESWAP
-
   template <>
   unsigned short byteSwap<unsigned short>(unsigned short x)
   {
-    return _byteswap_ushort(x);
+    return byteSwap16(x);
   }
 
   template <>
   unsigned int byteSwap<unsigned int>(unsigned int x)
   {
-    return _byteswap_ulong(x);
+    return byteSwap32(x);
   }
 
   template <>
   unsigned long long byteSwap<unsigned long long>(unsigned long long x)
   {
-    return _byteswap_uint64(x);
+    return byteSwap64(x);
   }
-
-#endif
-
-#ifdef TAGLIB_GCC_BYTESWAP
-
-  template <>
-  unsigned short byteSwap<unsigned short>(unsigned short x)
-  {
-    return __bswap_16(x);
-  }
-
-  template <>
-  unsigned int byteSwap<unsigned int>(unsigned int x)
-  {
-    return __bswap_32(x);
-  }
-
-  template <>
-  unsigned long long byteSwap<unsigned long long>(unsigned long long x)
-  {
-    return __bswap_64(x);
-  }
-
-#endif 
 
   template <class T>
   T toNumber(const ByteVector &v, bool mostSignificantByteFirst)
