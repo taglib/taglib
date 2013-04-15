@@ -70,8 +70,17 @@
   || (defined(__clang__) && defined(__BIG_ENDIAN__))
 # define TAGLIB_BIG_ENDIAN
 
-#endif
+#else
 
+namespace {
+  bool isLittleEndian()
+  {
+    TagLib::ushort x = 1;
+    return (*reinterpret_cast<TagLib::uchar*>(&x) == 1);
+  }
+}
+
+#endif
 
 namespace TagLib 
 {
@@ -172,21 +181,17 @@ namespace TagLib
 #endif
   }
 
-  bool isLittleEndianSystem() 
-  {
 #if defined(TAGLIB_LITTLE_ENDIAN)
 
-    return true;
+  const bool isLittleEndianSystem = true;
 
 #elif defined(TAGLIB_BIG_ENDIAN)
 
-    return false;
+  const bool isLittleEndianSystem = false;
 
 #else
 
-    ushort x = 1;
-    return (*reinterpret_cast<uchar>(&x) == 1);
+  const bool isLittleEndianSystem = isLittleEndianSystem();
 
 #endif
-  }
 }

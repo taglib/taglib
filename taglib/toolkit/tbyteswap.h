@@ -46,10 +46,10 @@ namespace TagLib
   ulonglong byteSwap64(ulonglong x);
 
   /*!
-   * Detects the system byte order.
-   * Returns \a true if little endian, \a false if big endian.
+   * Indicates the system byte order.
+   * \a true if little endian, \a false if big endian.
    */
-  bool isLittleEndianSystem();
+  extern const bool isLittleEndianSystem;
 }
 
 #endif
