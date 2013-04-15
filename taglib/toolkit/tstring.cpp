@@ -821,7 +821,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   internalCopyFromUTF16<sizeof(wchar_t)>(s, length, t);
 }
 
-const String::Type String::WCharByteOrder = isLittleEndianSystem() ? String::UTF16LE : String::UTF16BE;
+const String::Type String::WCharByteOrder = isLittleEndianSystem ? String::UTF16LE : String::UTF16BE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
