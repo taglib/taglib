@@ -23,6 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <iostream>
 
 #include <tstring.h>
@@ -30,14 +34,24 @@
 
 #include <string.h>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400 && (defined(_M_IX86) || defined(_M_X64))
-# define TAGLIB_MSC_BYTESWAP
-#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
-# define TAGLIB_GCC_BYTESWAP
-#endif
-
-#ifdef  TAGLIB_GCC_BYTESWAP
-# include <byteswap.h>
+// Swapping byte orders in a cross-platform way is tricky: while at least
+// hton{s,l} are standardized, they live in different headers depending on the
+// platform. And we also need a 64-version of it, which is platform-dependent
+// as well. Right now we only need to convert from host order to network order
+// (since these are called when we want numbers with MSB first).
+#if defined(BYTEORDER_IN_ENDIAN_H) // glibc. htobe{16,32,64} are defined.
+# include <endian.h>
+#elif defined(BYTEORDER_IN_SYS_ENDIAN_H) // Most BSDs. htobe{16,32,64} are defined.
+# include <sys/endian.h>
+#elif defined(BYTEORDER_IN_SYS_TYPES_H) // OpenBSD. htobe{16,32,64} are defined.
+# include <sys/types.h>
+#elif defined(_MSC_VER) && _MSC_VER >= 1400 // Windows. Resort to the byteswap functions
+                                            // since we assume Windows always run on little-endian
+                                            // platforms.
+# include <stdlib.h>
+# define htobe16(x) _byteswap_ushort(x)
+# define htobe32(x) _byteswap_ulong(x)
+# define htobe64(x) _byteswap_uint64(x)
 #endif
 
 #include "tbytevector.h"
@@ -184,8 +198,6 @@ namespace TagLib {
     return -1;
   }
 
-#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
-
   template <class T>
   T byteSwap(T x)
   {
@@ -194,51 +206,23 @@ namespace TagLib {
     return 0;
   }
 
-#endif
-
-#ifdef TAGLIB_MSC_BYTESWAP
-
   template <>
   unsigned short byteSwap<unsigned short>(unsigned short x)
   {
-    return _byteswap_ushort(x);
+    return htobe16(x);
   }
 
   template <>
   unsigned int byteSwap<unsigned int>(unsigned int x)
   {
-    return _byteswap_ulong(x);
+    return htobe32(x);
   }
 
   template <>
   unsigned long long byteSwap<unsigned long long>(unsigned long long x)
   {
-    return _byteswap_uint64(x);
+    return htobe64(x);
   }
-
-#endif
-
-#ifdef TAGLIB_GCC_BYTESWAP
-
-  template <>
-  unsigned short byteSwap<unsigned short>(unsigned short x)
-  {
-    return __bswap_16(x);
-  }
-
-  template <>
-  unsigned int byteSwap<unsigned int>(unsigned int x)
-  {
-    return __bswap_32(x);
-  }
-
-  template <>
-  unsigned long long byteSwap<unsigned long long>(unsigned long long x)
-  {
-    return __bswap_64(x);
-  }
-
-#endif 
 
   template <class T>
   T toNumber(const ByteVector &v, bool mostSignificantByteFirst)
@@ -250,8 +234,6 @@ namespace TagLib {
 
     const size_t size = sizeof(T);
 
-#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
-
     if(v.size() >= size)
     {
       if(mostSignificantByteFirst)
@@ -259,8 +241,6 @@ namespace TagLib {
       else
         return *reinterpret_cast<const T*>(v.data());
     }
-
-#endif
 
     const uint last = v.size() > size ? size - 1 : v.size() - 1;
     T sum = 0;
@@ -275,22 +255,10 @@ namespace TagLib {
   {
     const size_t size = sizeof(T);
 
-#if defined(TAGLIB_MSC_BYTESWAP) || defined(TAGLIB_GCC_BYTESWAP)
-
     if(mostSignificantByteFirst)
       value = byteSwap(value);
 
     return ByteVector(reinterpret_cast<const char *>(&value), size);
-
-#else
-
-    ByteVector v(size, 0);
-    for(uint i = 0; i < size; i++)
-      v[i] = uchar(value >> ((mostSignificantByteFirst ? size - 1 - i : i) * 8) & 0xff);
-
-    return v;
-
-#endif
   }
 }
 

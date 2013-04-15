@@ -7,5 +7,9 @@
 #cmakedefine   WITH_ASF 1
 #cmakedefine   WITH_MP4 1
 
+#cmakedefine   BYTEORDER_IN_ENDIAN_H 1
+#cmakedefine   BYTEORDER_IN_SYS_ENDIAN_H 1
+#cmakedefine   BYTEORDER_IN_SYS_TYPES_H 1
+
 #cmakedefine TESTS_DIR "@TESTS_DIR@"
 
