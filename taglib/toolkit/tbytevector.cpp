@@ -28,16 +28,6 @@
 #include <tdebug.h>
 #include <string.h>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400 && (defined(_M_IX86) || defined(_M_X64))
-# define TAGLIB_MSC_BYTESWAP
-#elif defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
-# define TAGLIB_GCC_BYTESWAP
-#endif
-
-#ifdef  TAGLIB_GCC_BYTESWAP
-# include <byteswap.h>
-#endif
-
 #include "tbytevector.h"
 #include "tbyteswap.h"
 
@@ -246,7 +236,7 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   return ByteVector(reinterpret_cast<const char *>(&value), size);
 }
 
-class DataPrivate : public RefCounter
+class DataPrivate
 {
 public:
   DataPrivate()
@@ -258,6 +248,12 @@ public:
   {
   }
 
+  // A char* can be an iterator.
+  DataPrivate(const char *begin, const char *end)
+    : data(begin, end)
+  {
+  }
+
   DataPrivate(size_t l, char c) 
     : data(l, c) 
   {
@@ -266,124 +262,65 @@ public:
   std::vector<char> data;
 };
 
-class ByteVector::ByteVectorPrivate : public RefCounter
+class ByteVector::ByteVectorPrivate 
 {
 public:
   ByteVectorPrivate() 
-    : RefCounter()
-    , data(new DataPrivate())
+    : data(new DataPrivate())
     , offset(0)
     , length(0) 
   {
   }
 
-#ifdef TAGLIB_USE_CXX11
-
-  ByteVectorPrivate(std::shared_ptr<ByteVectorPrivate> d, size_t o, size_t l)
-    : RefCounter()
-    , data(d->data)
+  ByteVectorPrivate(RefCountPtr<ByteVectorPrivate> d, size_t o, size_t l)
+    : data(d->data)
     , offset(d->offset + o)
     , length(l)
   {
   }
-
-#else
-
-  ByteVectorPrivate(ByteVectorPrivate *d, size_t o, size_t l)
-    : RefCounter()
-    , data(d->data)
-    , offset(d->offset + o)
-    , length(l)
-  {
-    data->ref();
-  }
-
-#endif
 
   ByteVectorPrivate(const std::vector<char> &v, size_t o, size_t l)
-    : RefCounter()
-    , data(new DataPrivate(v, o, l))
+    : data(new DataPrivate(v, o, l))
     , offset(0)
     , length(l)
   {
   }
 
   ByteVectorPrivate(size_t l, char c) 
-    : RefCounter()
-    , data(new DataPrivate(l, c))
+    : data(new DataPrivate(l, c))
     , offset(0)
     , length(l)
   {
   }
 
   ByteVectorPrivate(const char *s, size_t l) 
-    : RefCounter()
-    , data(new DataPrivate())
+    : data(new DataPrivate(s, s + l))
     , offset(0)
     , length(l)
   {
-    data->data.resize(length);
-    memcpy(DATA(this), s, l);
   }
   
   void detach()
   {
-#ifdef TAGLIB_USE_CXX11
-
     if(!data.unique()) {
       data.reset(new DataPrivate(data->data, offset, length));
       offset = 0;
     }
-
-#else
-
-    if(data->count() > 1) {
-      data->deref();
-      data = new DataPrivate(data->data, offset, length);
-      offset = 0;
-    }
-
-#endif
   }
 
   ~ByteVectorPrivate()
   {
-#ifndef TAGLIB_USE_CXX11
-
-    if(data->deref())
-      delete data;
-
-#endif
   }
 
   ByteVectorPrivate &operator=(const ByteVectorPrivate &x)
   {
     if(&x != this)
-    {
-#ifdef TAGLIB_USE_CXX11
-
       data = x.data;
-
-#else
-
-      if(data->deref())
-        delete data;
-
-      data = x.data;
-      data->ref();
-
-#endif
-    }
 
     return *this;
   }
 
-#ifdef TAGLIB_USE_CXX11
-  std::shared_ptr<DataPrivate> data;
-#else
-  DataPrivate *data;
-#endif
-
+  RefCountPtr<DataPrivate> data;
   size_t offset;
   size_t length;
 };
@@ -436,11 +373,6 @@ ByteVector::ByteVector(size_t size, char value)
 ByteVector::ByteVector(const ByteVector &v) 
   : d(v.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 ByteVector::ByteVector(const ByteVector &v, size_t offset, size_t length)
@@ -474,12 +406,6 @@ ByteVector::ByteVector(const char *data)
 
 ByteVector::~ByteVector()
 {
-#ifndef TAGLIB_USE_CXX11
-
-  if(d->deref())
-    delete d;
-
-#endif  
 }
 
 ByteVector &ByteVector::setData(const char *data, size_t length)
@@ -630,18 +556,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   }
 
   // replace private data:
-#ifdef TAGLIB_USE_CXX11
-
   d.reset(newData);
-
-#else
-
-  if(d->deref())
-    delete d;
-
-  d = newData;
-
-#endif
 
   return *this;
 }
@@ -842,22 +757,7 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = v.d;
-
-#else
-
-  if(&v == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-
-  d = v.d;
-  d->ref();
-
-#endif
 
   return *this;
 }
@@ -874,31 +774,13 @@ ByteVector &ByteVector::operator=(ByteVector &&v)
 
 ByteVector &ByteVector::operator=(char c)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = ByteVector(c).d;
-
-#else
-
-  *this = ByteVector(c);
-
-#endif
-
   return *this;
 }
 
 ByteVector &ByteVector::operator=(const char *data)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = ByteVector(data).d;
-
-#else
-
-  *this = ByteVector(data);
-
-#endif
-
   return *this;
 }
 
@@ -924,19 +806,8 @@ void ByteVector::detach()
 {
   d->detach();
 
-#ifdef TAGLIB_USE_CXX11
-
   if(!d.unique())
     d.reset(new ByteVectorPrivate(d->data->data, d->offset, d->length));
-
-#else
-
-  if(d->count() > 1) {
-    d->deref();
-    d = new ByteVectorPrivate(d->data->data, d->offset, d->length);
-  }
-
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -66,12 +66,7 @@ namespace TagLib {
 
     private:
       class CoverArtPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-      std::shared_ptr<CoverArtPrivate> d;
-#else
-      CoverArtPrivate *d;
-#endif
+      RefCountPtr<CoverArtPrivate> d;
     };
 
     typedef List<CoverArt> CoverArtList;

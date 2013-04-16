@@ -27,7 +27,7 @@
 #define TAGLIB_LIST_H
 
 #include "taglib.h"
-
+#include "trefcountptr.h"
 #include <list>
 
 namespace TagLib {
@@ -305,12 +305,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class TP> class ListPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-    std::shared_ptr<ListPrivate<T>> d;
-#else
-    ListPrivate<T> *d;
-#endif 
+    RefCountPtr<ListPrivate<T> > d;
 #endif
   };
 

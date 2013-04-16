@@ -61,26 +61,12 @@
 
 using namespace TagLib;
 
-class FileRef::FileRefPrivate : public RefCounter
+class FileRef::FileRefPrivate 
 {
 public:
-  FileRefPrivate(File *f) 
-    : RefCounter(), file(f) {}
+  FileRefPrivate(File *f) : file(f) {}
 
-  ~FileRefPrivate() 
-  {
-#ifndef TAGLIB_USE_CXX11
-
-    delete file;
-
-#endif
-  }
-
-#ifdef TAGLIB_USE_CXX11
-  std::unique_ptr<File> file;
-#else
-  File *file;
-#endif
+  RefCountPtr<File> file;
 
   static List<const FileTypeResolver *> fileTypeResolvers;
 };
@@ -110,11 +96,6 @@ FileRef::FileRef(File *file)
 FileRef::FileRef(const FileRef &ref) 
   : d(ref.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 #ifdef TAGLIB_USE_CXX11
@@ -128,12 +109,6 @@ FileRef::FileRef(FileRef &&ref)
 
 FileRef::~FileRef()
 {
-#ifndef TAGLIB_USE_CXX11
-
-  if(d->deref())
-    delete d;
-
-#endif
 }
 
 Tag *FileRef::tag() const
@@ -156,15 +131,7 @@ AudioProperties *FileRef::audioProperties() const
 
 File *FileRef::file() const
 {
-#ifdef TAGLIB_USE_CXX11
-
   return d->file.get();
-
-#else
-
-  return d->file;
-
-#endif
 }
 
 bool FileRef::save()
@@ -224,23 +191,7 @@ bool FileRef::isNull() const
 
 FileRef &FileRef::operator=(const FileRef &ref)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = ref.d;
-
-#else
-
-  if(&ref == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-
-  d = ref.d;
-  d->ref();
-
-#endif
-
   return *this;
 }
 

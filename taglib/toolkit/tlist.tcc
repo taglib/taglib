@@ -38,7 +38,7 @@ namespace TagLib {
 // A base for the generic and specialized private class types.  New
 // non-templatized members should be added here.
 
-class ListPrivateBase : public RefCounter
+class ListPrivateBase
 {
 public:
   ListPrivateBase() : autoDelete(false) {}
@@ -118,11 +118,6 @@ template <class T>
 List<T>::List(const List<T> &l) 
 : d(l.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 #ifdef TAGLIB_USE_CXX11
@@ -138,12 +133,6 @@ List<T>::List(List<T> &&l)
 template <class T>
 List<T>::~List()
 {
-#ifndef TAGLIB_USE_CXX11
-
-  if(d->deref())
-    delete d;
-
-#endif
 }
 
 template <class T>
@@ -371,21 +360,7 @@ const T &List<T>::operator[](size_t i) const
 template <class T>
 List<T> &List<T>::operator=(const List<T> &l)
 {
- #ifdef TAGLIB_USE_CXX11
-
   d = l.d;
-
- #else
-
-  if(&l == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-  d = l.d;
-  d->ref();
-#endif
-
   return *this;
 }
 
@@ -419,19 +394,8 @@ bool List<T>::operator!=(const List<T> &l) const
 template <class T>
 void List<T>::detach()
 {
-#ifdef TAGLIB_USE_CXX11
-  
   if(!d.unique())
     d.reset(new ListPrivate<T>(d->list));
-
-#else
-
-  if(d->count() > 1) {
-    d->deref();
-    d = new ListPrivate<T>(d->list);
-  }
-
-#endif
 }
 
 } // namespace TagLib

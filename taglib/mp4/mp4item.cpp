@@ -40,10 +40,10 @@
 
 using namespace TagLib;
 
-class MP4::Item::ItemPrivate : public RefCounter
+class MP4::Item::ItemPrivate 
 {
 public:
-  ItemPrivate() : RefCounter(), valid(true), atomDataType(MP4::TypeUndefined), type(MP4::Item::TypeUndefined) {}
+  ItemPrivate() : valid(true), atomDataType(MP4::TypeUndefined), type(MP4::Item::TypeUndefined) {}
 
   bool valid;
   AtomDataType atomDataType;
@@ -70,11 +70,6 @@ MP4::Item::Item()
 MP4::Item::Item(const Item &item) 
   : d(item.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 #ifdef TAGLIB_USE_CXX11
@@ -89,20 +84,7 @@ MP4::Item::Item(Item &&item)
 MP4::Item &
   MP4::Item::operator=(const Item &item)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = item.d;
-
-#else
-
-  if(d->deref()) {
-    delete d;
-  }
-  d = item.d;
-  d->ref();
-
-#endif
-
   return *this;
 }
 
@@ -119,13 +101,6 @@ MP4::Item &
 
 MP4::Item::~Item()
 {
-#ifndef TAGLIB_USE_CXX11
-  
-  if(d->deref()) {
-    delete d;
-  }
-
-#endif
 }
 
 MP4::Item::Item(bool value)

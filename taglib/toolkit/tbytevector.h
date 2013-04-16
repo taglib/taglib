@@ -26,9 +26,9 @@
 #ifndef TAGLIB_BYTEVECTOR_H
 #define TAGLIB_BYTEVECTOR_H
 
-#include "taglib.h"
 #include "taglib_export.h"
-
+#include "taglib.h"
+#include "trefcountptr.h"
 #include <vector>
 #include <iostream>
 
@@ -478,12 +478,7 @@ namespace TagLib {
 
   private:
     class ByteVectorPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-    std::shared_ptr<ByteVectorPrivate> d;
-#else
-    ByteVectorPrivate *d;
-#endif
+    RefCountPtr<ByteVectorPrivate> d;
   };
 
   /*!

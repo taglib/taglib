@@ -97,12 +97,7 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-      std::shared_ptr<ItemPrivate> d;
-#else
-      ItemPrivate *d;
-#endif
+      RefCountPtr<ItemPrivate> d;
     };
 
   }
