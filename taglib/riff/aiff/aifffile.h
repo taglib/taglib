@@ -92,6 +92,8 @@ namespace TagLib {
          */
         PropertyMap properties() const;
 
+        void removeUnsupportedProperties(const StringList &properties);
+
         /*!
          * Implements the unified property interface -- import function.
          * This method forwards to ID3v2::Tag::setProperties().

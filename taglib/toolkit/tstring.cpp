@@ -23,9 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+// This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
+// 
+
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
+#include "tbyteswap.h"
 
 #include <string.h>
 
@@ -48,45 +52,10 @@
 
 namespace {
 
-  inline unsigned short byteSwap(unsigned short x)
-  {
-#if defined(_MSC_VER) && (_MSC_VER >= 1400) 
-
-    return _byteswap_ushort(x);
-
-#elif defined(__GNUC__)
-
-    return __bswap_16(x);
-
-#else
-
-    return (((x) >> 8) & 0xff) | (((x) & 0xff) << 8);
-
-#endif
-  }
-
   inline unsigned short combine(unsigned char c1, unsigned char c2)
   {
     return (c1 << 8) | c2;
   }
-
-#if !defined(TAGLIB_LITTLE_ENDIAN) && !defined(TAGLIB_BIG_ENDIAN)
-
-  String::Type wcharByteOrder() 
-  {
-    // Detect CPU endian at run time.
-    union {
-      TagLib::ushort w;
-      char c;
-    } x = { 0x1234 };
-
-    if(x.c == 0x34)
-      return String::UTF16LE;
-    else
-      return String::UTF16BE;
-  }
-
-#endif
 }
 
 namespace TagLib {
@@ -613,7 +582,6 @@ String String::number(int n) // static
 TagLib::wchar &String::operator[](size_t i)
 {
   detach();
-
   return d->data[i];
 }
 
@@ -971,7 +939,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
   if(swap) {
     for(size_t i = 0; i < length; ++i)
-      d->data[i] = byteSwap(static_cast<unsigned short>(s[i]));
+      d->data[i] = byteSwap16(static_cast<unsigned short>(s[i]));
   }
 }
 
@@ -1017,19 +985,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   internalCopyFromUTF16<sizeof(wchar_t)>(s, length, t);
 }
 
-#if defined(TAGLIB_LITTLE_ENDIAN)
-
-const String::Type String::WCharByteOrder = String::UTF16LE;
-
-#elif defined(TAGLIB_BIG_ENDIAN)
-
-const String::Type String::WCharByteOrder = String::UTF16BE;
-
-#else
-
-const String::Type String::WCharByteOrder = wcharByteOrder();
-
-#endif
+const String::Type String::WCharByteOrder = isLittleEndianSystem ? String::UTF16LE : String::UTF16BE;
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions
@@ -1037,26 +993,26 @@ const String::Type String::WCharByteOrder = wcharByteOrder();
 
 const String operator+(const String &s1, const String &s2)
 {
-  String s(s1);
+  TagLib::String s(s1);
   s.append(s2);
   return s;
 }
 
 const String operator+(const char *s1, const String &s2)
 {
-  String s(s1);
+  TagLib::String s(s1);
   s.append(s2);
   return s;
 }
 
 const String operator+(const String &s1, const char *s2)
 {
-  String s(s1);
+  TagLib::String s(s1);
   s.append(s2);
   return s;
 }
 
-std::ostream &operator<<(std::ostream &s, const String &str)
+std::ostream &operator<<(std::ostream &s, const TagLib::String &str)
 {
   s << str.to8Bit();
   return s;
