@@ -42,6 +42,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testAppendStringDetach);
   CPPUNIT_TEST(testToInt);
   CPPUNIT_TEST(testSubstr);
+  CPPUNIT_TEST(testNewline);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -199,6 +200,22 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("01"), String("0123456").substr(0, 2));
     CPPUNIT_ASSERT_EQUAL(String("12"), String("0123456").substr(1, 2));
     CPPUNIT_ASSERT_EQUAL(String("123456"), String("0123456").substr(1, 200));
+  }
+
+  void testNewline()
+  {
+    ByteVector cr("abc\x0dxyz", 7);
+    ByteVector lf("abc\x0axyz", 7);
+    ByteVector crlf("abc\x0d\x0axyz", 8);
+
+    CPPUNIT_ASSERT_EQUAL(size_t(7), String(cr).size());
+    CPPUNIT_ASSERT_EQUAL(size_t(7), String(lf).size());
+    CPPUNIT_ASSERT_EQUAL(size_t(8), String(crlf).size());
+
+    CPPUNIT_ASSERT_EQUAL(L'\x0d', String(cr)[3]);
+    CPPUNIT_ASSERT_EQUAL(L'\x0a', String(lf)[3]);
+    CPPUNIT_ASSERT_EQUAL(L'\x0d', String(crlf)[3]);
+    CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
   }
 
 };

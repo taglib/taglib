@@ -154,6 +154,11 @@ bool MPEG::File::save()
 
 bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
 {
+  return save(tags, stripOthers, id3v2Version, true);
+}
+
+bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags)
+{
   if(tags == NoTags && stripOthers)
     return strip(AllTags);
 
@@ -170,14 +175,19 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
     return false;
   }
 
-  // Create the tags if we've been asked to.  Copy the values from the tag that
-  // does exist into the new tag, except if the existing tag is to be stripped.
+  // Create the tags if we've been asked to.
 
-  if((tags & ID3v2) && ID3v1Tag() && !(stripOthers && !(tags & ID3v1)))
-    Tag::duplicate(ID3v1Tag(), ID3v2Tag(true), false);
+  if (duplicateTags) {
 
-  if((tags & ID3v1) && d->tag[ID3v2Index] && !(stripOthers && !(tags & ID3v2)))
-    Tag::duplicate(ID3v2Tag(), ID3v1Tag(true), false);
+    // Copy the values from the tag that does exist into the new tag,
+    // except if the existing tag is to be stripped.
+
+    if((tags & ID3v2) && ID3v1Tag() && !(stripOthers && !(tags & ID3v1)))
+      Tag::duplicate(ID3v1Tag(), ID3v2Tag(true), false);
+
+    if((tags & ID3v1) && d->tag[ID3v2Index] && !(stripOthers && !(tags & ID3v2)))
+      Tag::duplicate(ID3v2Tag(), ID3v1Tag(true), false);
+  }
 
   bool success = true;
 
@@ -616,9 +626,6 @@ void MPEG::File::findAPE()
 
 bool MPEG::File::secondSynchByte(char byte)
 {
-  if(uchar(byte) == 0xff)
-    return false;
-
   std::bitset<8> b(byte);
 
   // check to see if the byte matches 111xxxxx
