@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
-// 
 
 #include "tstring.h"
 #include "tdebug.h"
@@ -60,8 +59,22 @@ namespace TagLib {
 class String::StringPrivate : public RefCounter
 {
 public:
-  StringPrivate(const wstring &s) : RefCounter(), data(s) {}
-  StringPrivate() : RefCounter() {}
+  StringPrivate() 
+    : RefCounter() 
+  {
+  }
+
+  StringPrivate(const wstring &s) 
+    : RefCounter()
+    , data(s) 
+  {
+  }
+  
+  StringPrivate(uint n, wchar_t c) 
+    : RefCounter()
+    , data(static_cast<size_t>(n), c) 
+  {
+  }
 
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian. 
@@ -144,14 +157,10 @@ String::String(wchar_t c, Type t)
 }
 
 String::String(char c, Type t)
-  : d(new StringPrivate())
+  : d(new StringPrivate(1, static_cast<uchar>(c)))
 {
-  if(t == Latin1 || t == UTF8) {
-    d->data.resize(1);
-    d->data[0] = static_cast<uchar>(c);
-  }
-  else {
-    debug("String::String() -- A char  should not contain UTF16.");
+  if(t != Latin1 && t != UTF8) {
+    debug("String::String() -- A char should not contain UTF16.");
   }
 }
 
@@ -640,6 +649,7 @@ String &String::operator=(const wchar_t *s)
 {
   if(d->deref())
     delete d;
+
   d = new StringPrivate(s);
   return *this;
 }
@@ -648,8 +658,8 @@ String &String::operator=(char c)
 {
   if(d->deref())
     delete d;
-  d = new StringPrivate;
-  d->data += uchar(c);
+
+  d = new StringPrivate(1, static_cast<uchar>(c));
   return *this;
 }
 
@@ -657,8 +667,8 @@ String &String::operator=(wchar_t c)
 {
   if(d->deref())
     delete d;
-  d = new StringPrivate;
-  d->data += c;
+
+  d = new StringPrivate(1, static_cast<uchar>(c));
   return *this;
 }
 
