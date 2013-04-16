@@ -208,22 +208,21 @@ T toNumber(const ByteVector &v, bool mostSignificantByteFirst)
     return 0;
   }
 
-  const size_t size = sizeof(T);
-
-  if(v.size() >= size)
-  {
+  if(v.size() >= sizeof(T)) {
     if(isLittleEndianSystem == mostSignificantByteFirst)
       return byteSwap<T>(*reinterpret_cast<const T*>(v.data()));
     else
       return *reinterpret_cast<const T*>(v.data());
   }
+  else {
+    T sum = 0;
+    for(size_t i = 0; i < v.size(); i++) {
+      const size_t shift = (mostSignificantByteFirst ? v.size() - 1 - i : i) * 8;
+      sum |= static_cast<T>(static_cast<uchar>(v[i]) << shift);
+    }
 
-  const uint last = std::min<uint>(v.size() - 1, size);
-  T sum = 0;
-  for(uint i = 0; i <= last; i++)
-    sum |= (T) uchar(v[i]) << ((mostSignificantByteFirst ? last - i : i) * 8);
-
-  return sum;
+    return sum;
+  }
 }
 
 template <class T>
