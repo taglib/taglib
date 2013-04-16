@@ -27,6 +27,7 @@
 #define TAGLIB_MPEGHEADER_H
 
 #include "taglib_export.h"
+#include "trefcountptr.h"
 
 namespace TagLib {
 
@@ -180,12 +181,7 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
       class HeaderPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-      std::shared_ptr<HeaderPrivate> d;
-#else
-      HeaderPrivate *d;
-#endif
+      RefCountPtr<HeaderPrivate> d;
     };
   }
 }

@@ -26,12 +26,8 @@
 #ifndef TAGLIB_STRING_H
 #define TAGLIB_STRING_H
 
-#include "taglib_export.h"
-#include "taglib.h"
 #include "tbytevector.h"
-
 #include <string>
-#include <iostream>
 
 /*!
  * \relates TagLib::String
@@ -527,12 +523,7 @@ namespace TagLib {
     static const Type WCharByteOrder;
 
     class StringPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-    std::shared_ptr<StringPrivate> d;
-#else
-    StringPrivate *d;
-#endif
+    RefCountPtr<StringPrivate> d;
   };
 
   /*!

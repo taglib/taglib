@@ -205,12 +205,7 @@ namespace TagLib
       ByteVector render(const String &name, int kind = 0) const;
 
       class AttributePrivate;
-
-#ifdef TAGLIB_USE_CXX11
-      std::shared_ptr<AttributePrivate> d;
-#else
-      AttributePrivate *d;
-#endif
+      RefCountPtr<AttributePrivate> d;
     };
   }
 

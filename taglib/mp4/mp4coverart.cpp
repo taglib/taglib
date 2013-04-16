@@ -33,10 +33,10 @@
 
 using namespace TagLib;
 
-class MP4::CoverArt::CoverArtPrivate : public RefCounter
+class MP4::CoverArt::CoverArtPrivate 
 {
 public:
-  CoverArtPrivate() : RefCounter(), format(MP4::CoverArt::JPEG) {}
+  CoverArtPrivate() : format(MP4::CoverArt::JPEG) {}
 
   Format format;
   ByteVector data;
@@ -51,30 +51,12 @@ MP4::CoverArt::CoverArt(Format format, const ByteVector &data)
 
 MP4::CoverArt::CoverArt(const CoverArt &item) : d(item.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 MP4::CoverArt &
   MP4::CoverArt::operator=(const CoverArt &item)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = item.d;
-
-#else
-
-  if(d->deref()) {
-    delete d;
-  }
-  d = item.d;
-  d->ref();
-
-#endif
-
   return *this;
 }
 
@@ -91,13 +73,6 @@ MP4::CoverArt &
 
 MP4::CoverArt::~CoverArt()
 {
-#ifndef TAGLIB_USE_CXX11
-
-  if(d->deref()) {
-    delete d;
-  }
-
-#endif
 }
 
 MP4::CoverArt::Format
