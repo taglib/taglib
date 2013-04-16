@@ -31,10 +31,10 @@ namespace TagLib {
 
 template <class Key, class T>
 template <class KeyP, class TP>
-class Map<Key, T>::MapPrivate : public RefCounter
+class Map<Key, T>::MapPrivate
 {
 public:
-  MapPrivate() : RefCounter() {}
+  MapPrivate() {}
 
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
 
@@ -54,11 +54,11 @@ public:
 
 #else
 
-  MapPrivate(const std::map<KeyP, TP>& m) : RefCounter(), map(m) {}
+  MapPrivate(const std::map<KeyP, TP>& m) : map(m) {}
 
 # ifdef TAGLIB_USE_CXX11
 
-  MapPrivate(std::map<KeyP, TP> &&m) : RefCounter(), map(m) {}
+  MapPrivate(std::map<KeyP, TP> &&m) : map(m) {}
 
 # endif
 
@@ -81,11 +81,6 @@ template <class Key, class T>
 Map<Key, T>::Map(const Map<Key, T> &m) 
   : d(m.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 #ifdef TAGLIB_USE_CXX11
@@ -101,12 +96,6 @@ TagLib::Map<Key, T>::Map(Map<Key, T> &&m)
 template <class Key, class T>
 Map<Key, T>::~Map()
 {
-#ifndef TAGLIB_USE_CXX11
-
-  if(d->deref())
-    delete(d);
-
-#endif
 }
 
 template <class Key, class T>
@@ -228,22 +217,7 @@ T &Map<Key, T>::operator[](const Key &key)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = m.d;
-
-#else
-
-  if(&m == this)
-    return *this;
-
-  if(d->deref())
-    delete(d);
-  d = m.d;
-  d->ref();
-
-#endif
-
   return *this;
 }
 
@@ -265,19 +239,8 @@ Map<Key, T> &Map<Key, T>::operator=(Map<Key, T> &&m)
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
-#ifdef TAGLIB_USE_CXX11
- 
   if(!d.unique())
     d.reset(new MapPrivate<Key, T>(d->map));
-
-#else
-
-  if(d->count() > 1) {
-    d->deref();
-    d = new MapPrivate<Key, T>(d->map);
-  }
-
-#endif
 }
 
 } // namespace TagLib

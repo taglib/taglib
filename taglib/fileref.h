@@ -278,12 +278,7 @@ namespace TagLib {
 
   private:
     class FileRefPrivate;
-
-#ifdef TAGLIB_USE_CXX11
-    std::shared_ptr<FileRefPrivate> d;
-#else
-    FileRefPrivate *d;
-#endif
+    RefCountPtr<FileRefPrivate> d;
   };
 
 } // namespace TagLib

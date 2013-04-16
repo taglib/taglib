@@ -231,12 +231,7 @@ namespace TagLib
 #endif
     private:
       class PicturePrivate;
-
-#ifdef TAGLIB_USE_CXX11
-      std::shared_ptr<PicturePrivate> d;
-#else
-      PicturePrivate *d;
-#endif
+      RefCountPtr<PicturePrivate> d;
     };
   }
 }

@@ -34,7 +34,7 @@
 
 using namespace TagLib;
 
-class ASF::Attribute::AttributePrivate : public RefCounter
+class ASF::Attribute::AttributePrivate
 {
 public:
   AttributePrivate()
@@ -68,11 +68,6 @@ ASF::Attribute::Attribute()
 ASF::Attribute::Attribute(const ASF::Attribute &other)
   : d(other.d)
 {
-#ifndef TAGLIB_USE_CXX11
-
-  d->ref();
-
-#endif
 }
 
 ASF::Attribute::Attribute(const String &value)
@@ -126,29 +121,11 @@ ASF::Attribute::Attribute(bool value)
 
 ASF::Attribute::~Attribute()
 {
-#ifndef TAGLIB_USE_CXX11
-
-  if(d->deref())
-    delete d;
-
-#endif
 }
 
 ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
 {
-#ifdef TAGLIB_USE_CXX11
-
   d = other.d;
-
-#else
-
-  if(d->deref())
-    delete d;
-  d = other.d;
-  d->ref();
-
-#endif
-
   return *this;
 }
 
