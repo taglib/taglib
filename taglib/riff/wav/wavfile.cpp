@@ -103,12 +103,17 @@ RIFF::Info::Tag *RIFF::WAV::File::InfoTag() const
 
 PropertyMap RIFF::WAV::File::properties() const
 {
-  return d->tag.properties();
+  return tag()->properties();
+}
+
+void RIFF::WAV::File::removeUnsupportedProperties(const StringList &unsupported)
+{
+  tag()->removeUnsupportedProperties(unsupported);
 }
 
 PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 {
-  return d->tag.setProperties(properties);
+  return tag()->setProperties(properties);
 }
 
 RIFF::WAV::Properties *RIFF::WAV::File::audioProperties() const

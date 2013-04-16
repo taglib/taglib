@@ -186,7 +186,7 @@ MP4::Tag::parseByte(MP4::Atom *atom, TagLib::File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
-    d->items.insert(atom->name, (uchar)data[0].at(0));
+    addItem(atom->name, (uchar)data[0].at(0));
   }
 }
 
@@ -195,7 +195,7 @@ MP4::Tag::parseGnre(MP4::Atom *atom, TagLib::File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
-    int idx = (int)data[0].toInt16();
+    const int idx = (int)data[0].toInt16();
     if(!d->items.contains("\251gen") && idx > 0) {
       d->items.insert("\251gen", StringList(ID3v1::genre(idx - 1)));
     }
@@ -207,8 +207,8 @@ MP4::Tag::parseIntPair(MP4::Atom *atom, TagLib::File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
-    int a = data[0].mid(2, 2).toInt16();
-    int b = data[0].mid(4, 2).toInt16();
+    const int a = data[0].mid(2, 2).toInt16();
+    const int b = data[0].mid(4, 2).toInt16();
     d->items.insert(atom->name, MP4::Item(a, b));
   }
 }
@@ -219,7 +219,7 @@ MP4::Tag::parseBool(MP4::Atom *atom, TagLib::File *file)
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
     bool value = data[0].size() ? data[0][0] != '\0' : false;
-    d->items.insert(atom->name, value);
+    addItem(atom->name, value);
   }
 }
 
@@ -232,7 +232,7 @@ MP4::Tag::parseText(MP4::Atom *atom, TagLib::File *file, int expectedFlags)
     for(unsigned int i = 0; i < data.size(); i++) {
       value.append(String(data[i], String::UTF8));
     }
-    d->items.insert(atom->name, value);
+    addItem(atom->name, value);
   }
 }
 
@@ -256,7 +256,7 @@ MP4::Tag::parseFreeForm(MP4::Atom *atom, TagLib::File *file)
       }
       Item item(value);
       item.setAtomDataType(type);
-      d->items.insert(name, item);
+      addItem(name, item);
     }
     else {
       ByteVectorList value;
@@ -265,7 +265,7 @@ MP4::Tag::parseFreeForm(MP4::Atom *atom, TagLib::File *file)
       }
       Item item(value);
       item.setAtomDataType(type);
-      d->items.insert(name, item);
+      addItem(name, item);
     }
   }
 }
@@ -294,7 +294,7 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
     pos += length;
   }
   if(value.size() > 0)
-    d->items.insert(atom->name, value);
+    addItem(atom->name, value);
 }
 
 ByteVector
@@ -920,3 +920,12 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
   return ignoredProps;
 }
 
+void MP4::Tag::addItem(const String &name, const Item &value)
+{
+  if(!d->items.contains(name)) {
+    d->items.insert(name, value);
+  }
+  else {
+    debug("MP4: Ignoring duplicate atom \"" + name + "\"");
+  }
+}

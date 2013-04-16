@@ -563,7 +563,6 @@ namespace TagLib {
    * Send the string to an output stream.
    */
   TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::String &str);
-
 }
 
 #endif

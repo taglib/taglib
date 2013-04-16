@@ -92,11 +92,27 @@ namespace TagLib {
        */
       virtual XiphComment *tag() const;
 
+
+
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
       virtual Properties *audioProperties() const;
+
+
+      /*! 
+       * Implements the unified property interface -- export function.
+       * This forwards directly to XiphComment::properties().
+       */
+      PropertyMap properties() const;
+
+      /*! 
+       * Implements the unified tag dictionary interface -- import function.
+       * Like properties(), this is a forwarder to the file's XiphComment.
+       */
+      PropertyMap setProperties(const PropertyMap &); 
+
 
       /*!
        * Save the file.  This will primarily save and update the XiphComment.

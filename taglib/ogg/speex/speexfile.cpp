@@ -31,6 +31,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <tpropertymap.h>
 
 #include "speexfile.h"
 
@@ -82,6 +83,16 @@ Speex::File::~File()
 Ogg::XiphComment *Speex::File::tag() const
 {
   return d->comment;
+}
+
+PropertyMap Speex::File::properties() const
+{
+  return d->comment->properties();
+}
+
+PropertyMap Speex::File::setProperties(const PropertyMap &properties)
+{
+  return d->comment->setProperties(properties);
 }
 
 Speex::Properties *Speex::File::audioProperties() const
