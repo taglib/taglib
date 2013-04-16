@@ -248,6 +248,12 @@ public:
   {
   }
 
+  // A char* can be an iterator.
+  DataPrivate(const char *begin, const char *end)
+    : data(begin, end)
+  {
+  }
+
   DataPrivate(uint len, char c) 
     : data(len, c) 
   {
@@ -294,12 +300,10 @@ public:
 
   ByteVectorPrivate(const char *s, uint l) 
     : RefCounter()
-    , data(new DataPrivate())
+    , data(new DataPrivate(s, s + l))
     , offset(0)
     , length(l)
   {
-    data->data.resize(length);
-    memcpy(DATA(this), s, l);
   }
   
   void detach()
