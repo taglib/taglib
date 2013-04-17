@@ -51,7 +51,6 @@ set(tag_HDRS
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
   toolkit/tbyteswap.h
-  toolkit/trefcountptr.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
@@ -310,10 +309,6 @@ add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
 	target_link_libraries(tag ${ZLIB_LIBRARIES})
-endif()
-
-if(WIN32 AND NOT TAGLIB_STATIC)
-	target_link_libraries(tag shlwapi.lib)
 endif()
 
 set_target_properties(tag PROPERTIES
