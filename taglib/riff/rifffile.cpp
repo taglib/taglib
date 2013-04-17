@@ -158,6 +158,11 @@ void RIFF::File::setChunkData(uint i, const ByteVector &data)
     d->chunks[i].offset = d->chunks[i-1].offset + 8 + d->chunks[i-1].size + d->chunks[i-1].padding;
 }
 
+void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
+{
+  setChunkData(name, data, false);
+}
+
 void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bool alwaysCreate)
 {
   if(d->chunks.size() == 0) {

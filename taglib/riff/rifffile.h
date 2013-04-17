@@ -107,12 +107,22 @@ namespace TagLib {
        * given name already exists it will be overwritten, otherwise it will be
        * created after the existing chunks.
        *
+       * \warning This will update the file immediately.
+       */
+      void setChunkData(const ByteVector &name, const ByteVector &data);
+
+      /*!
+       * Sets the data for the chunk \a name to \a data.  If a chunk with the
+       * given name already exists it will be overwritten, otherwise it will be
+       * created after the existing chunks.
+       *
        * \note If \a alwaysCreate is true, a new chunk is created regardless of 
-       * existence of chunk \a name. It should be used for only "LIST" chunks. 
+       * whether or not the chunk \a name exists. It should only be used for 
+       * "LIST" chunks. 
        *
        * \warning This will update the file immediately.
        */
-      void setChunkData(const ByteVector &name, const ByteVector &data, bool alwaysCreate = false);
+      void setChunkData(const ByteVector &name, const ByteVector &data, bool alwaysCreate);
 
       /*!
        * Removes the specified chunk.
