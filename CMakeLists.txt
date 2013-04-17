@@ -11,11 +11,6 @@ else()
 endif()
 OPTION(ENABLE_STATIC_RUNTIME "Visual Studio, link with runtime statically"  OFF)
 
-option(ENABLE_CXX11 "Enable C++11 features" OFF)
-if(ENABLE_CXX11)
-  add_definitions(-DTAGLIB_USE_CXX11)
-endif()
-
 option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden"  OFF)
 if(VISIBILITY_HIDDEN)
   add_definitions (-fvisibility=hidden)
