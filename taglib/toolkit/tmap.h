@@ -26,10 +26,9 @@
 #ifndef TAGLIB_MAP_H
 #define TAGLIB_MAP_H
 
-#include "taglib.h"
-#include "trefcountptr.h"
 #include <map>
 
+#include "taglib.h"
 
 namespace TagLib {
 
@@ -186,7 +185,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class KeyP, class TP> class MapPrivate;
-    RefCountPtr<MapPrivate<Key, T> > d;
+    MapPrivate<Key, T> *d;
 #endif
   };
 
