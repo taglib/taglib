@@ -31,6 +31,10 @@
 #include <config.h>
 #endif
 
+#ifdef _WIN32
+# include <Shlwapi.h>
+#endif
+
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>
@@ -57,15 +61,12 @@
 
 using namespace TagLib;
 
-class FileRef::FileRefPrivate : public RefCounter
+class FileRef::FileRefPrivate 
 {
 public:
-  FileRefPrivate(File *f) : RefCounter(), file(f) {}
-  ~FileRefPrivate() {
-    delete file;
-  }
+  FileRefPrivate(File *f) : file(f) {}
 
-  File *file;
+  RefCountPtr<File> file;
   static List<const FileTypeResolver *> fileTypeResolvers;
 };
 
@@ -76,30 +77,28 @@ List<const FileRef::FileTypeResolver *> FileRef::FileRefPrivate::fileTypeResolve
 ////////////////////////////////////////////////////////////////////////////////
 
 FileRef::FileRef()
+  : d(new FileRefPrivate(0))
 {
-  d = new FileRefPrivate(0);
 }
 
-FileRef::FileRef(FileName fileName, bool readAudioProperties,
-                 AudioProperties::ReadStyle audioPropertiesStyle)
+FileRef::FileRef(
+  FileName fileName, bool readAudioProperties,  AudioProperties::ReadStyle audioPropertiesStyle)
+  : d(new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle)))
 {
-  d = new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle));
 }
 
 FileRef::FileRef(File *file)
+  : d(new FileRefPrivate(file))
 {
-  d = new FileRefPrivate(file);
 }
 
-FileRef::FileRef(const FileRef &ref) : d(ref.d)
+FileRef::FileRef(const FileRef &ref) 
+  : d(ref.d)
 {
-  d->ref();
 }
 
 FileRef::~FileRef()
 {
-  if(d->deref())
-    delete d;
 }
 
 Tag *FileRef::tag() const
@@ -122,7 +121,7 @@ AudioProperties *FileRef::audioProperties() const
 
 File *FileRef::file() const
 {
-  return d->file;
+  return d->file.get();
 }
 
 bool FileRef::save()
@@ -182,15 +181,7 @@ bool FileRef::isNull() const
 
 FileRef &FileRef::operator=(const FileRef &ref)
 {
-  if(&ref == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-
   d = ref.d;
-  d->ref();
-
   return *this;
 }
 
@@ -218,21 +209,36 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 
   // Ok, this is really dumb for now, but it works for testing.
 
-  String s;
+  String ext;
 
 #ifdef _WIN32
-  s = (wcslen((const wchar_t *) fileName) > 0) ? String((const wchar_t *) fileName) : String((const char *) fileName);
+  // Avoids direct conversion from FileName to String
+  // because String can't accept non-Latin-1 string in char array.
+
+  if(!fileName.wstr().empty()) {
+    const wchar_t *pext = PathFindExtensionW(fileName.wstr().c_str());
+    if(*pext == L'.')
+      ext = String(pext + 1).upper();
+  }
+  else {
+    const char *pext = PathFindExtensionA(fileName.str().c_str());
+    if(*pext == '.')
+      ext = String(pext + 1).upper();
+  }
 #else
-  s = fileName;
+  {
+    String s = fileName;
+    const int pos = s.rfind(".");
+    if(pos != -1)
+      ext = s.substr(pos + 1).upper();
+  }
 #endif
 
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
   // that a default file type resolver is created.
 
-  int pos = s.rfind(".");
-  if(pos != -1) {
-    String ext = s.substr(pos + 1).upper();
+  if(!ext.isEmpty()) {
     if(ext == "MP3")
       return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "OGG")
@@ -279,4 +285,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   }
 
   return 0;
+}
+
+FileRef::FileTypeResolver::~FileTypeResolver() 
+{
 }

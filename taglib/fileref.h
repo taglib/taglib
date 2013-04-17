@@ -91,7 +91,6 @@ namespace TagLib {
 
     class TAGLIB_EXPORT FileTypeResolver
     {
-      TAGLIB_IGNORE_MISSING_DESTRUCTOR
     public:
       /*!
        * This method must be overridden to provide an additional file type
@@ -106,6 +105,8 @@ namespace TagLib {
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
+
+      virtual ~FileTypeResolver();
     };
 
     /*!
@@ -255,7 +256,7 @@ namespace TagLib {
 
   private:
     class FileRefPrivate;
-    FileRefPrivate *d;
+    RefCountPtr<FileRefPrivate> d;
   };
 
 } // namespace TagLib
