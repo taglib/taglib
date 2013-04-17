@@ -26,21 +26,26 @@
 #ifndef TAGLIB_REFCOUNTPTR_H
 #define TAGLIB_REFCOUNTPTR_H
 
-#include "tdebug.h"
+// TAGLIB_USE_CXX11 determines whether or not to enable C++11 features.
 
-#ifdef __APPLE__
-#  include <libkern/OSAtomic.h>
-#  define TAGLIB_ATOMIC_MAC
-#elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
-#  define TAGLIB_ATOMIC_WIN
-#elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
+#ifdef TAGLIB_USE_CXX11
+# include <memory>
+
+#else
+# ifdef __APPLE__
+#   include <libkern/OSAtomic.h>
+#   define TAGLIB_ATOMIC_MAC
+# elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
+#   define TAGLIB_ATOMIC_WIN
+# elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
   && (defined(__i386__) || defined(__i486__) || defined(__i586__) || \
   defined(__i686__) || defined(__x86_64) || defined(__ia64)) \
   && !defined(__INTEL_COMPILER)
-#  define TAGLIB_ATOMIC_GCC
-#elif defined(__ia64) && defined(__INTEL_COMPILER)
-#  include <ia64intrin.h>
-#  define TAGLIB_ATOMIC_GCC
+#   define TAGLIB_ATOMIC_GCC
+# elif defined(__ia64) && defined(__INTEL_COMPILER)
+#   include <ia64intrin.h>
+#   define TAGLIB_ATOMIC_GCC
+# endif
 #endif
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
@@ -52,9 +57,18 @@
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
+#ifdef TAGLIB_USE_CXX11
+
+  // RefCountPtr<T> is just an alias of std::shared_ptr<T> if C++11 is available.
+# define RefCountPtr std::shared_ptr
+
+  // Workaround for the fact that some compilers don't support the template aliases.
+
+#else
+
 namespace TagLib {
 
-  // RefCountPtr<T> mimics std::shared_ptr<T>.
+  // RefCountPtr<T> mimics std::shared_ptr<T> if C++11 is not available.
 
   template<typename T>
   class RefCountPtr
@@ -234,6 +248,7 @@ namespace TagLib {
     counter_base *counter;
   };
 }
+#endif // TAGLIB_USE_CXX11
 
 #endif // DO_NOT_DOCUMENT
 
