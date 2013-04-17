@@ -33,7 +33,7 @@
 
 using namespace TagLib;
 
-class MPEG::Header::HeaderPrivate
+class MPEG::Header::HeaderPrivate : public RefCounter
 {
 public:
   HeaderPrivate() :
@@ -68,18 +68,20 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPEG::Header::Header(const ByteVector &data)
-  : d(new HeaderPrivate())
 {
+  d = new HeaderPrivate;
   parse(data);
 }
 
-MPEG::Header::Header(const Header &h) 
-  : d(h.d)
+MPEG::Header::Header(const Header &h) : d(h.d)
 {
+  d->ref();
 }
 
 MPEG::Header::~Header()
 {
+  if (d->deref())
+    delete d;
 }
 
 bool MPEG::Header::isValid() const
@@ -144,7 +146,14 @@ int MPEG::Header::samplesPerFrame() const
 
 MPEG::Header &MPEG::Header::operator=(const Header &h)
 {
+  if(&h == this)
+    return *this;
+
+  if(d->deref())
+    delete d;
+
   d = h.d;
+  d->ref();
   return *this;
 }
 

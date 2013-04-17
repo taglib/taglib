@@ -3,10 +3,6 @@
 /* Define if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 
-#cmakedefine   HAVE_STD_SHARED_PTR 1
-#cmakedefine   HAVE_TR1_SHARED_PTR 1
-#cmakedefine   HAVE_BOOST_SHARED_PTR 1
-
 #cmakedefine   NO_ITUNES_HACKS 1
 #cmakedefine   WITH_ASF 1
 #cmakedefine   WITH_MP4 1

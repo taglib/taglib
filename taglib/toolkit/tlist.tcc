@@ -38,7 +38,7 @@ namespace TagLib {
 // A base for the generic and specialized private class types.  New
 // non-templatized members should be added here.
 
-class ListPrivateBase
+class ListPrivateBase : public RefCounter
 {
 public:
   ListPrivateBase() : autoDelete(false) {}
@@ -53,9 +53,8 @@ template <class TP> class List<T>::ListPrivate  : public ListPrivateBase
 public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP> &l) : ListPrivateBase(), list(l) {}
-
   void clear() {
-    std::list<TP>().swap(list);
+    list.clear();
   }
   std::list<TP> list;
 };
@@ -69,27 +68,18 @@ template <class TP> class List<T>::ListPrivate<TP *>  : public ListPrivateBase
 public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP *> &l) : ListPrivateBase(), list(l) {}
-
   ~ListPrivate() {
-    deletePointers();
+    clear();
   }
-
   void clear() {
-    deletePointers();
-    std::list<TP *>().swap(list);
+    if(autoDelete) {
+      typename std::list<TP *>::const_iterator it = list.begin();
+      for(; it != list.end(); ++it)
+        delete *it;
+    }
+    list.clear();
   }
-
   std::list<TP *> list;
-
-private:
-  void deletePointers() {
-    if(!autoDelete)
-      return;
-    
-    typename std::list<TP *>::const_iterator it = list.begin();
-    for(; it != list.end(); ++it)
-    delete *it;
-  }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,19 +88,21 @@ private:
 
 template <class T>
 List<T>::List()
-  : d(new ListPrivate<T>())
 {
+  d = new ListPrivate<T>;
 }
 
 template <class T>
-List<T>::List(const List<T> &l) 
-  : d(l.d)
+List<T>::List(const List<T> &l) : d(l.d)
 {
+  d->ref();
 }
 
 template <class T>
 List<T>::~List()
 {
+  if(d->deref())
+    delete d;
 }
 
 template <class T>
@@ -187,7 +179,7 @@ template <class T>
 List<T> &List<T>::prepend(const List<T> &l)
 {
   detach();
-  d->list.insert(d->list.begin(), l.d->list.begin(), l.d->list.end());
+  d->list.insert(d->list.begin(), l.begin(), l.end());
   return *this;
 }
 
@@ -200,7 +192,7 @@ List<T> &List<T>::clear()
 }
 
 template <class T>
-uint List<T>::size() const
+TagLib::uint List<T>::size() const
 {
   return d->list.size();
 }
@@ -292,7 +284,13 @@ const T &List<T>::operator[](uint i) const
 template <class T>
 List<T> &List<T>::operator=(const List<T> &l)
 {
+  if(&l == this)
+    return *this;
+
+  if(d->deref())
+    delete d;
   d = l.d;
+  d->ref();
   return *this;
 }
 
@@ -315,8 +313,10 @@ bool List<T>::operator!=(const List<T> &l) const
 template <class T>
 void List<T>::detach()
 {
-  if(!d.unique())
-    d.reset(new ListPrivate<T>(d->list));
+  if(d->count() > 1) {
+    d->deref();
+    d = new ListPrivate<T>(d->list);
+  }
 }
 
 } // namespace TagLib

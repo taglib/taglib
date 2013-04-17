@@ -63,7 +63,7 @@ namespace TagLib {
 
     private:
       class CoverArtPrivate;
-      RefCountPtr<CoverArtPrivate> d;
+      CoverArtPrivate *d;
     };
 
     typedef List<CoverArt> CoverArtList;

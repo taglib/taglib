@@ -35,7 +35,7 @@
 
 using namespace TagLib;
 
-class ASF::Picture::PicturePrivate
+class ASF::Picture::PicturePrivate : public RefCounter
 {
 public:
   bool valid;
@@ -50,18 +50,21 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::Picture::Picture()
-  : d(new PicturePrivate())
 {
+  d = new PicturePrivate();
   d->valid = true;
 }
 
 ASF::Picture::Picture(const Picture& other)
   : d(other.d)
 {
+  d->ref();
 }
 
 ASF::Picture::~Picture()
 {
+  if(d->deref())
+    delete d;
 }
 
 bool ASF::Picture::isValid() const
@@ -118,7 +121,12 @@ int ASF::Picture::dataSize() const
 
 ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
 {
-  d = other.d;
+  if(other.d != d) {
+    if(d->deref())
+      delete d;
+    d = other.d;
+    d->ref();
+  }
   return *this;
 }
 

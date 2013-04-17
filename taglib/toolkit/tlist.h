@@ -27,7 +27,7 @@
 #define TAGLIB_LIST_H
 
 #include "taglib.h"
-#include "trefcountptr.h"
+
 #include <list>
 
 namespace TagLib {
@@ -243,7 +243,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class TP> class ListPrivate;
-    RefCountPtr<ListPrivate<T> > d;
+    ListPrivate<T> *d;
 #endif
   };
 

@@ -30,6 +30,7 @@
 #include "tstringlist.h"
 #include "tbyteswap.h"
 
+#include <iostream>
 #include <string.h>
 
 // Determine if the compiler supports codecvt.
@@ -55,20 +56,23 @@ namespace {
 
 namespace TagLib {
 
-class String::StringPrivate
+class String::StringPrivate : public RefCounter
 {
 public:
   StringPrivate() 
+    : RefCounter() 
   {
   }
 
   StringPrivate(const wstring &s) 
-    : data(s) 
+    : RefCounter()
+    , data(s) 
   {
   }
   
   StringPrivate(uint n, wchar_t c) 
-    : data(static_cast<size_t>(n), c) 
+    : RefCounter()
+    , data(static_cast<size_t>(n), c) 
   {
   }
 
@@ -95,6 +99,7 @@ String::String()
 String::String(const String &s) 
   : d(s.d)
 {
+  d->ref();
 }
 
 String::String(const std::string &s, Type t)
@@ -177,6 +182,8 @@ String::String(const ByteVector &v, Type t)
 
 String::~String()
 {
+  if(d->deref())
+    delete d;
 }
 
 std::string String::to8Bit(bool unicode) const
@@ -609,13 +616,22 @@ String &String::operator+=(char c)
 
 String &String::operator=(const String &s)
 {
+  if(&s == this)
+    return *this;
+
+  if(d->deref())
+    delete d;
   d = s.d;
+  d->ref();
   return *this;
 }
 
 String &String::operator=(const std::string &s)
 {
-  d.reset(new StringPrivate());
+  if(d->deref())
+    delete d;
+
+  d = new StringPrivate;
   copyFromLatin1(s.c_str(), s.length());
 
   return *this;
@@ -623,33 +639,45 @@ String &String::operator=(const std::string &s)
 
 String &String::operator=(const wstring &s)
 {
-  d.reset(new StringPrivate(s));
+  if(d->deref())
+    delete d;
+  d = new StringPrivate(s);
   return *this;
 }
 
 String &String::operator=(const wchar_t *s)
 {
-  d.reset(new StringPrivate());
-  copyFromUTF16(s, ::wcslen(s), WCharByteOrder);
+  if(d->deref())
+    delete d;
 
+  d = new StringPrivate(s);
   return *this;
 }
 
 String &String::operator=(char c)
 {
-  d.reset(new StringPrivate(1, static_cast<uchar>(c)));
+  if(d->deref())
+    delete d;
+
+  d = new StringPrivate(1, static_cast<uchar>(c));
   return *this;
 }
 
 String &String::operator=(wchar_t c)
 {
-  d.reset(new StringPrivate(1, static_cast<uchar>(c)));
+  if(d->deref())
+    delete d;
+
+  d = new StringPrivate(1, static_cast<uchar>(c));
   return *this;
 }
 
 String &String::operator=(const char *s)
 {
-  d.reset(new StringPrivate());
+  if(d->deref())
+    delete d;
+
+  d = new StringPrivate;
   copyFromLatin1(s, ::strlen(s));
 
   return *this;
@@ -657,7 +685,10 @@ String &String::operator=(const char *s)
 
 String &String::operator=(const ByteVector &v)
 {
-  d.reset(new StringPrivate());
+  if(d->deref())
+    delete d;
+
+  d = new StringPrivate;
   copyFromLatin1(v.data(), v.size());
 
   // If we hit a null in the ByteVector, shrink the string again.
@@ -677,8 +708,10 @@ bool String::operator<(const String &s) const
 
 void String::detach()
 {
-  if(!d.unique())
-    d.reset(new StringPrivate(d->data));
+  if(d->count() > 1) {
+    d->deref();
+    d = new StringPrivate(d->data);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
