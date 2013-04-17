@@ -67,7 +67,8 @@ namespace TagLib {
 
 # if defined(SUPPORT_TEMPLATE_ALIAS)
 
-  // Defines RefCountPtr<T> as an alias of shared_ptr<T>.
+  // Defines RefCountPtr<T> as an alias of shared_ptr<T>
+  // if shared_ptr<T> and the template alias are both available.
 
 #   if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR)
 
@@ -83,7 +84,8 @@ namespace TagLib {
 
 # else
 
-  // Defines RefCountPtr<T> as an derived class of shared_ptr<T>.
+  // Defines RefCountPtr<T> as a derived class of shared_ptr<T>.
+  // if shared_ptr<T> is available but the template alias is not.
 
 #   if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR)
 
