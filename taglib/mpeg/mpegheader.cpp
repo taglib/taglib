@@ -78,7 +78,7 @@ MPEG::Header::Header(const Header &h)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 MPEG::Header::Header(Header &&h) 
   : d(std::move(h.d))
@@ -157,7 +157,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 MPEG::Header &MPEG::Header::operator=(Header &&h)
 {

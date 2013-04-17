@@ -26,13 +26,16 @@
 #ifndef TAGLIB_REFCOUNTPTR_H
 #define TAGLIB_REFCOUNTPTR_H
 
-// TAGLIB_USE_CXX11 determines whether or not to enable C++11 features.
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#include "tdebug.h"
-
-#ifdef TAGLIB_USE_CXX11
+#if defined(HAVE_STD_SHARED_PTR)
 # include <memory>
-
+#elif defined(HAVE_TR1_SHARED_PTR) 
+# include <tr1/memory>
+#elif defined(HAVE_BOOST_SHARED_PTR) 
+# include <boost/shared_ptr.hpp>
 #else
 # ifdef __APPLE__
 #   include <libkern/OSAtomic.h>
@@ -51,7 +54,6 @@
 #endif
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
-
 /*!
  * \internal
  * This is just used as a smart pointer for shared classes in TagLib.
@@ -59,18 +61,55 @@
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
-#ifdef TAGLIB_USE_CXX11
-
-  // RefCountPtr<T> is just an alias of std::shared_ptr<T> if C++11 is available.
-# define RefCountPtr std::shared_ptr
-
-  // Workaround for the fact that some compilers don't support the template aliases.
-
-#else
-
 namespace TagLib {
 
-  // RefCountPtr<T> mimics std::shared_ptr<T> if C++11 is not available.
+#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR) || defined(HAVE_BOOST_SHARED_PTR)
+
+# if defined(SUPPORT_TEMPLATE_ALIAS)
+
+  // Defines RefCountPtr<T> as an alias of shared_ptr<T>.
+
+#   if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR)
+
+  template <typename T> 
+  using RefCountPtr = std::tr1::shared_ptr<T>;
+
+#   else
+
+  template <typename T> 
+  using RefCountPtr = boost::shared_ptr<T>;
+
+#   endif
+
+# else
+
+  // Defines RefCountPtr<T> as an derived class of shared_ptr<T>.
+
+#   if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR)
+
+  template <typename T>
+  class RefCountPtr : public std::tr1::shared_ptr<T>
+  {
+  public:
+    explicit RefCountPtr(T *p) : std::tr1::shared_ptr<T>(p) {}
+  };
+
+#   else
+
+  template <typename T>
+  class RefCountPtr : public boost::shared_ptr<T>
+  {
+  public:
+    explicit RefCountPtr(T *p) : boost::shared_ptr<T>(p) {}
+  };
+
+#   endif
+
+# endif
+
+#else // HAVE_*_SHARED_PTR
+
+  // Implements RefCountPtr<T> if shared_ptr<T> is not available.
 
   template<typename T>
   class RefCountPtr
@@ -249,9 +288,9 @@ namespace TagLib {
   private:
     CounterBase *counter;
   };
-}
-#endif // TAGLIB_USE_CXX11
 
+#endif // HAVE_*_SHARED_PTR
+}
 #endif // DO_NOT_DOCUMENT
 
 #endif

@@ -72,7 +72,7 @@ MP4::Item::Item(const Item &item)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 MP4::Item::Item(Item &&item) 
   : d(std::move(item.d))
@@ -88,7 +88,7 @@ MP4::Item &
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 MP4::Item &
   MP4::Item::operator=(Item &&item)

@@ -40,7 +40,7 @@ public:
 
   MapPrivate(const std::map<class KeyP, class TP> &m) : RefCounter(), map(m) {}
 
-# ifdef TAGLIB_USE_CXX11
+# ifdef SUPPORT_MOVE_SEMANTICS
 
   MapPrivate(std::map<class KeyP, class TP> &&m) : RefCounter(), map(m) {}
 
@@ -56,7 +56,7 @@ public:
 
   MapPrivate(const std::map<KeyP, TP>& m) : map(m) {}
 
-# ifdef TAGLIB_USE_CXX11
+# ifdef SUPPORT_MOVE_SEMANTICS
 
   MapPrivate(std::map<KeyP, TP> &&m) : map(m) {}
 
@@ -83,7 +83,7 @@ Map<Key, T>::Map(const Map<Key, T> &m)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 template <class Key, class T>
 TagLib::Map<Key, T>::Map(Map<Key, T> &&m)
@@ -132,7 +132,7 @@ Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::insert(const Key &key, T &&value)
@@ -221,7 +221,7 @@ Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(Map<Key, T> &&m)
