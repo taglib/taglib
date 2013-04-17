@@ -207,10 +207,10 @@ namespace TagLib
       static Picture fromInvalid();
       friend class Attribute;
 #endif
-      private:
-        class PicturePrivate;
-        PicturePrivate *d;
-      };
+    private:
+      class PicturePrivate;
+      RefCountPtr<PicturePrivate> d;
+    };
   }
 }
 

@@ -73,7 +73,7 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
-      ItemPrivate *d;
+      RefCountPtr<ItemPrivate> d;
     };
 
   }

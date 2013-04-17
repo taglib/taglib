@@ -236,7 +236,7 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   return ByteVector(reinterpret_cast<const char *>(&value), size);
 }
 
-class DataPrivate : public RefCounter
+class DataPrivate
 {
 public:
   DataPrivate()
@@ -262,45 +262,39 @@ public:
   std::vector<char> data;
 };
 
-class ByteVector::ByteVectorPrivate : public RefCounter
+class ByteVector::ByteVectorPrivate 
 {
 public:
   ByteVectorPrivate() 
-    : RefCounter()
-    , data(new DataPrivate())
+    : data(new DataPrivate())
     , offset(0)
     , length(0) 
   {
   }
 
-  ByteVectorPrivate(ByteVectorPrivate *d, uint o, uint l)
-    : RefCounter()
-    , data(d->data)
+  ByteVectorPrivate(RefCountPtr<ByteVectorPrivate> d, uint o, uint l)
+    : data(d->data)
     , offset(d->offset + o)
     , length(l)
   {
-    data->ref();
   }
 
   ByteVectorPrivate(const std::vector<char> &v, uint o, uint l)
-    : RefCounter()
-    , data(new DataPrivate(v, o, l))
+    : data(new DataPrivate(v, o, l))
     , offset(0)
     , length(l)
   {
   }
 
   ByteVectorPrivate(uint l, char c) 
-    : RefCounter()
-    , data(new DataPrivate(l, c))
+    : data(new DataPrivate(l, c))
     , offset(0)
     , length(l)
   {
   }
 
   ByteVectorPrivate(const char *s, uint l) 
-    : RefCounter()
-    , data(new DataPrivate(s, s + l))
+    : data(new DataPrivate(s, s + l))
     , offset(0)
     , length(l)
   {
@@ -308,34 +302,25 @@ public:
   
   void detach()
   {
-    if(data->count() > 1) {
-      data->deref();
-      data = new DataPrivate(data->data, offset, length);
+    if(!data.unique()) {
+      data.reset(new DataPrivate(data->data, offset, length));
       offset = 0;
     }
   }
 
   ~ByteVectorPrivate()
   {
-    if(data->deref())
-      delete data;
   }
 
   ByteVectorPrivate &operator=(const ByteVectorPrivate &x)
   {
     if(&x != this)
-    {
-      if(data->deref())
-        delete data;
-
       data = x.data;
-      data->ref();
-    }
 
     return *this;
   }
 
-  DataPrivate *data;
+  RefCountPtr<DataPrivate> data;
   uint offset;
   uint length;
 };
@@ -386,13 +371,11 @@ ByteVector::ByteVector(uint size, char value)
 ByteVector::ByteVector(const ByteVector &v) 
   : d(v.d)
 {
-  d->ref();
 }
 
 ByteVector::ByteVector(const ByteVector &v, uint offset, uint length)
   : d(new ByteVectorPrivate(v.d, offset, length))
 {
-  d->ref();
 }
 
 ByteVector::ByteVector(char c)
@@ -412,8 +395,6 @@ ByteVector::ByteVector(const char *data)
 
 ByteVector::~ByteVector()
 {
-  if(d->deref())
-    delete d;
 }
 
 ByteVector &ByteVector::setData(const char *s, uint length)
@@ -563,10 +544,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   }
 
   // replace private data:
-  if(d->deref())
-    delete d;
-
-  d = newData;
+  d.reset(newData);
 
   return *this;
 }
@@ -765,14 +743,7 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
-  if(&v == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-
   d = v.d;
-  d->ref();
   return *this;
 }
 
@@ -808,16 +779,10 @@ ByteVector ByteVector::toHex() const
 
 void ByteVector::detach()
 {
-  if(d->data->count() > 1) {
-    d->data->deref();
-    d->data = new DataPrivate(d->data->data, d->offset, d->length);
-    d->offset = 0;
-  }
+  d->detach();
 
-  if(d->count() > 1) {
-    d->deref();
-    d = new ByteVectorPrivate(d->data->data, d->offset, d->length);
-  }
+  if(!d.unique())
+    d.reset(new ByteVectorPrivate(d->data->data, d->offset, d->length));
 }
 }
 

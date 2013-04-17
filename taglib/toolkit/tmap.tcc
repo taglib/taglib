@@ -31,36 +31,49 @@ namespace TagLib {
 
 template <class Key, class T>
 template <class KeyP, class TP>
-class Map<Key, T>::MapPrivate : public RefCounter
+class Map<Key, T>::MapPrivate
 {
 public:
-  MapPrivate() : RefCounter() {}
+  MapPrivate() {}
+
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
-  MapPrivate(const std::map<class KeyP, class TP>& m) : RefCounter(), map(m) {}
+
+  MapPrivate(const std::map<class KeyP, class TP> &m) : RefCounter(), map(m) {}
+
+  void clear() {
+    std::map<class KeyP, class TP>().swap(map);
+  }
+
   std::map<class KeyP, class TP> map;
+
 #else
-  MapPrivate(const std::map<KeyP, TP>& m) : RefCounter(), map(m) {}
+
+  MapPrivate(const std::map<KeyP, TP>& m) : map(m) {}
+
+  void clear() {
+    std::map<KeyP, TP>().swap(map);
+  }
+
   std::map<KeyP, TP> map;
+
 #endif
 };
 
 template <class Key, class T>
 Map<Key, T>::Map()
+  : d(new MapPrivate<Key, T>())
 {
-  d = new MapPrivate<Key, T>;
 }
 
 template <class Key, class T>
-Map<Key, T>::Map(const Map<Key, T> &m) : d(m.d)
+Map<Key, T>::Map(const Map<Key, T> &m) 
+  : d(m.d)
 {
-  d->ref();
 }
 
 template <class Key, class T>
 Map<Key, T>::~Map()
 {
-  if(d->deref())
-    delete(d);
 }
 
 template <class Key, class T>
@@ -149,7 +162,7 @@ Map<Key, T> &Map<Key,T>::erase(const Key &key)
 }
 
 template <class Key, class T>
-TagLib::uint Map<Key, T>::size() const
+uint Map<Key, T>::size() const
 {
   return d->map.size();
 }
@@ -170,13 +183,7 @@ T &Map<Key, T>::operator[](const Key &key)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
-  if(&m == this)
-    return *this;
-
-  if(d->deref())
-    delete(d);
   d = m.d;
-  d->ref();
   return *this;
 }
 
@@ -187,10 +194,8 @@ Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
-  if(d->count() > 1) {
-    d->deref();
-    d = new MapPrivate<Key, T>(d->map);
-  }
+  if(!d.unique())
+    d.reset(new MapPrivate<Key, T>(d->map));
 }
 
 } // namespace TagLib
