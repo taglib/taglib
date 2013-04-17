@@ -38,8 +38,13 @@ namespace TagLib {
   public:
     FileName(const wchar_t *name) : m_wname(name) {}
     FileName(const char *name) : m_name(name) {}
+
     operator const wchar_t *() const { return m_wname.c_str(); }
     operator const char *() const { return m_name.c_str(); }
+
+    const std::wstring &wstr() const { return m_wname; }
+    const std::string  &str()  const { return m_name; }  
+
   private:
     std::string m_name;
     std::wstring m_wname;
