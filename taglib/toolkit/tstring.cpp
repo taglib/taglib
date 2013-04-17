@@ -25,6 +25,10 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
@@ -33,15 +37,11 @@
 #include <iostream>
 #include <string.h>
 
-// Determine if the compiler supports codecvt.
-
-#if (defined(_MSC_VER) && _MSC_VER >= 1600)
-# define TAGLIB_USE_CODECVT
-#endif
-
-#ifdef TAGLIB_USE_CODECVT
+#ifdef HAVE_CODECVT
 # include <codecvt>
-typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
+namespace {
+  typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
+}
 #else
 # include "unicode.h"
 #endif
@@ -202,7 +202,7 @@ std::string String::to8Bit(bool unicode) const
   else {
     s.resize(d->data.size() * 4 + 1);
 
-#ifdef TAGLIB_USE_CODECVT
+#ifdef HAVE_CODECVT
 
     std::mbstate_t st = 0;
     const wchar_t *source;
@@ -371,7 +371,7 @@ ByteVector String::data(Type t) const
     {
       ByteVector v(size() * 4 + 1, 0);
 
-#ifdef TAGLIB_USE_CODECVT
+#ifdef HAVE_CODECVT
 
       std::mbstate_t st = 0;
       const wchar_t *source;
@@ -730,7 +730,7 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data.resize(length);
 
-#ifdef TAGLIB_USE_CODECVT
+#ifdef HAVE_CODECVT
 
   std::mbstate_t st = 0;
   const char *source;
