@@ -54,7 +54,7 @@ namespace TagLib {
 
       CoverArt(const CoverArt &item);
       CoverArt &operator=(const CoverArt &item);
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
       CoverArt &operator=(CoverArt &&item);
 #endif
 

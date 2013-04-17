@@ -68,12 +68,12 @@ namespace TagLib {
      */
     ByteVector(const ByteVector &v);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Constructs a byte vector equivalent to \a v.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     ByteVector(ByteVector &&v);
 
@@ -429,12 +429,12 @@ namespace TagLib {
      */
     ByteVector &operator=(const ByteVector &v);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Moves \a v into this ByteVector.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     ByteVector &operator=(ByteVector &&v);
 

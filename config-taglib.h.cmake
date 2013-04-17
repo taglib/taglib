@@ -3,6 +3,20 @@
 /* Define if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 
+/* Defined if your compiler supports the move semantics */
+#cmakedefine   SUPPORT_MOVE_SEMANTICS 1
+
+/* Defined if your compiler supports the template alias */
+#cmakedefine   SUPPORT_TEMPLATE_ALIAS 1
+
+/* Defined if your compiler supports shared_ptr */
+#cmakedefine   HAVE_STD_SHARED_PTR 1
+#cmakedefine   HAVE_TR1_SHARED_PTR 1
+#cmakedefine   HAVE_BOOST_SHARED_PTR 1
+
+/* Defined if your compiler has <codecvt> header */
+#cmakedefine   HAVE_CODECVT 1
+
 #cmakedefine   NO_ITUNES_HACKS 1
 #cmakedefine   WITH_ASF 1
 #cmakedefine   WITH_MP4 1

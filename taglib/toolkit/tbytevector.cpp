@@ -380,7 +380,7 @@ ByteVector::ByteVector(const ByteVector &v, size_t offset, size_t length)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 ByteVector::ByteVector(ByteVector &&v) 
   : d(std::move(v.d))
@@ -762,7 +762,7 @@ ByteVector &ByteVector::operator=(const ByteVector &v)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 ByteVector &ByteVector::operator=(ByteVector &&v)
 {

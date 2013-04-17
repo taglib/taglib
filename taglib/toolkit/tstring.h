@@ -119,12 +119,12 @@ namespace TagLib {
      */
     String(const String &s);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Constructs a String equivalent to \a s.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     String(String &&s);
 
@@ -403,12 +403,12 @@ namespace TagLib {
      */
     String &operator=(const String &s);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Moves \a s into this String.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     String &operator=(String &&s);
 
@@ -424,12 +424,12 @@ namespace TagLib {
      */
     String &operator=(const wstring &s);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Moves \a s into this String.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     String &operator=(wstring &&s);
 

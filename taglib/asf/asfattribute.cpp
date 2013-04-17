@@ -129,7 +129,7 @@ ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 ASF::Attribute &ASF::Attribute::operator=(ASF::Attribute &&other)
 {

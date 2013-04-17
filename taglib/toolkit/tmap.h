@@ -73,12 +73,12 @@ namespace TagLib {
      */
     Map(const Map<Key, T> &m);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Moves \a m into this Map.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     Map(Map<Key, T> &&m);
 
@@ -119,13 +119,13 @@ namespace TagLib {
      */
     Map<Key, T> &insert(const Key &key, const T &value);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Inserts \a value under \a key in the map.  If a value for \a key already
      * exists it will be overwritten.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     Map<Key, T> &insert(const Key &key, T &&value);
 
@@ -197,12 +197,12 @@ namespace TagLib {
      */
     Map<Key, T> &operator=(const Map<Key, T> &m);
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
     /*!
      * Moves \a m into this Map.
      *
-     * \note Not available unless TAGLIB_USE_CXX11 macro is defined.
+     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
      */
     Map<Key, T> &operator=(Map<Key, T> &&m);
 

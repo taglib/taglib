@@ -61,7 +61,7 @@ StringList::StringList(const StringList &l) : List<String>(l)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 StringList::StringList(StringList &&l) : List<String>(l)
 {
@@ -111,7 +111,7 @@ StringList &StringList::append(const StringList &l)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 StringList &StringList::append(String &&s)
 {
@@ -133,7 +133,7 @@ StringList &StringList::operator=(const StringList &l)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 StringList &StringList::operator=(StringList &&l)
 {
