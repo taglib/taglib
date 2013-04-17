@@ -34,7 +34,7 @@
 
 using namespace TagLib;
 
-class ASF::Attribute::AttributePrivate : public RefCounter
+class ASF::Attribute::AttributePrivate
 {
 public:
   AttributePrivate()
@@ -60,77 +60,71 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::Attribute::Attribute()
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = UnicodeType;
 }
 
 ASF::Attribute::Attribute(const ASF::Attribute &other)
   : d(other.d)
 {
-  d->ref();
 }
 
 ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
 {
-  if(d->deref())
-    delete d;
   d = other.d;
-  d->ref();
   return *this;
 }
 
 ASF::Attribute::~Attribute()
 {
-  if(d->deref())
-    delete d;
 }
 
 ASF::Attribute::Attribute(const String &value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = UnicodeType;
   d->stringValue = value;
 }
 
 ASF::Attribute::Attribute(const ByteVector &value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = BytesType;
   d->byteVectorValue = value;
 }
 
 ASF::Attribute::Attribute(const ASF::Picture &value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = BytesType;
   d->pictureValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned int value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = DWordType;
   d->intValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned long long value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = QWordType;
   d->longLongValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned short value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = WordType;
   d->shortValue = value;
 }
 
 ASF::Attribute::Attribute(bool value)
+  : d(new AttributePrivate())
 {
-  d = new AttributePrivate;
   d->type = BoolType;
   d->boolValue = value;
 }
