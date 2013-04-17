@@ -77,15 +77,15 @@ namespace TagLib {
 
     // Counter base class. Provides a reference counter.
 
-    class counter_base
+    class CounterBase
     {
     public:
-      counter_base() 
+      CounterBase() 
         : count(1) 
       {
       }
 
-      virtual ~counter_base()
+      virtual ~CounterBase()
       {
       }
 
@@ -142,10 +142,10 @@ namespace TagLib {
     // Counter impl class. Provides a dynamic deleter.
 
     template <typename U>
-    class counter_impl : public counter_base
+    class CounterImpl : public CounterBase
     {
     public:
-      counter_impl(U *p)
+      CounterImpl(U *p)
         : p(p)
       {
       }
@@ -167,7 +167,7 @@ namespace TagLib {
   public:
     template <typename U>
     explicit RefCountPtr(U *p)
-      : counter(new counter_impl<U>(p))
+      : counter(new CounterImpl<U>(p))
     {
     }
 
@@ -184,7 +184,7 @@ namespace TagLib {
 
     T *get() const
     {
-      return static_cast<counter_impl<T>*>(counter)->get();
+      return static_cast<CounterImpl<T>*>(counter)->get();
     }
 
     long use_count() const
@@ -203,7 +203,7 @@ namespace TagLib {
       if(get() != p)
       {
         counter->release();
-        counter = new counter_impl<U>(p);
+        counter = new CounterImpl<U>(p);
       }
     }
 
@@ -245,7 +245,7 @@ namespace TagLib {
     }
 
   private:
-    counter_base *counter;
+    CounterBase *counter;
   };
 }
 #endif // TAGLIB_USE_CXX11
