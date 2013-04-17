@@ -26,10 +26,31 @@
 #ifndef TAGLIB_REFCOUNTPTR_H
 #define TAGLIB_REFCOUNTPTR_H
 
-// TAGLIB_USE_CXX11 determines whether or not to enable C++11 features.
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-#ifdef TAGLIB_USE_CXX11
+#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
+/*!
+ * \internal
+ * This is just used as a smart pointer for shared classes in TagLib.
+ *
+ * \warning This <b>is not</b> part of the TagLib public API!
+ */
+
+// RefCountPtr<T> is just an alias of shared_ptr<T> if it is available.
+
+#if defined(HAVE_STD_SHARED_PTR)
 # include <memory>
+# define RefCountPtr std::tr1::shared_ptr
+
+#elif defined(HAVE_TR1_SHARED_PTR) 
+# include <tr1/memory>
+# define RefCountPtr std::tr1::shared_ptr
+
+#elif defined(HAVE_BOOST_SHARED_PTR) 
+# include <boost/shared_ptr.hpp>
+# define RefCountPtr boost::shared_ptr
 
 #else
 # ifdef __APPLE__
@@ -46,29 +67,10 @@
 #   include <ia64intrin.h>
 #   define TAGLIB_ATOMIC_GCC
 # endif
-#endif
-
-#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
-
-/*!
- * \internal
- * This is just used as a smart pointer for shared classes in TagLib.
- *
- * \warning This <b>is not</b> part of the TagLib public API!
- */
-
-#ifdef TAGLIB_USE_CXX11
-
-  // RefCountPtr<T> is just an alias of std::shared_ptr<T> if C++11 is available.
-# define RefCountPtr std::shared_ptr
-
-  // Workaround for the fact that some compilers don't support the template aliases.
-
-#else
 
 namespace TagLib {
 
-  // RefCountPtr<T> mimics std::shared_ptr<T> if C++11 is not available.
+  // RefCountPtr<T> mimics std::shared_ptr<T> if it is not available.
 
   template<typename T>
   class RefCountPtr
