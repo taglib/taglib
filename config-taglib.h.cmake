@@ -3,6 +3,9 @@
 /* Define if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 
+/* Defined if your compiler has <codecvt> header */
+#cmakedefine   HAVE_CODECVT 1
+
 #cmakedefine   NO_ITUNES_HACKS 1
 #cmakedefine   WITH_ASF 1
 #cmakedefine   WITH_MP4 1
