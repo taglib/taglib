@@ -60,7 +60,7 @@ ASF::Picture::Picture(const Picture& other)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 ASF::Picture::Picture(Picture &&other)
   : d(std::move(other.d))
@@ -131,7 +131,7 @@ ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 ASF::Picture& ASF::Picture::operator=(ASF::Picture &&other)
 {

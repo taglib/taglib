@@ -98,7 +98,7 @@ FileRef::FileRef(const FileRef &ref)
 {
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 FileRef::FileRef(FileRef &&ref) 
   : d(std::move(ref.d))
@@ -195,7 +195,7 @@ FileRef &FileRef::operator=(const FileRef &ref)
   return *this;
 }
 
-#ifdef TAGLIB_USE_CXX11
+#ifdef SUPPORT_MOVE_SEMANTICS
 
 FileRef &FileRef::operator=(FileRef &&ref)
 {
