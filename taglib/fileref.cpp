@@ -286,7 +286,3 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 
   return 0;
 }
-
-FileRef::FileTypeResolver::~FileTypeResolver() 
-{
-}
