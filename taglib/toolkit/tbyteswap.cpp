@@ -191,7 +191,7 @@ namespace TagLib
 
 #else
 
-  const bool isLittleEndianSystem = isLittleEndianSystem();
+  const bool isLittleEndianSystem = isLittleEndian();
 
 #endif
 }
