@@ -209,7 +209,7 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
   //  return 0;
   //}
 
-  if(offset + length >= v.size()) {
+  if(offset + length > v.size()) {
     debug("toNumber<T>() -- offset and/or length is out of range. Returning 0.");
     return 0;
   }
