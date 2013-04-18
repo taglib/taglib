@@ -24,9 +24,10 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <cstdio>
+#include <cstring>
 #include <tstring.h>
 #include <tdebug.h>
-#include <string.h>
 
 #include "tbytevector.h"
 #include "tbyteswap.h"
@@ -201,24 +202,35 @@ ulonglong byteSwap<ulonglong>(ulonglong x)
 }
 
 template <class T>
-T toNumber(const ByteVector &v, bool mostSignificantByteFirst)
+T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
-  if(v.isEmpty()) {
-    debug("toNumber<T>() -- data is empty, returning 0");
+  if(offset + sizeof(T) > v.size()) {
+    debug("toNumber<T>() -- offset is out of range. Returning 0.");
     return 0;
   }
 
-  if(v.size() >= sizeof(T)) {
-    if(isLittleEndianSystem == mostSignificantByteFirst)
-      return byteSwap<T>(*reinterpret_cast<const T*>(v.data()));
-    else
-      return *reinterpret_cast<const T*>(v.data());
+  if(isLittleEndianSystem == mostSignificantByteFirst)
+    return byteSwap<T>(*reinterpret_cast<const T*>(v.data() + offset));
+  else
+    return *reinterpret_cast<const T*>(v.data() + offset);
+}
+
+template <class T>
+T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
+{
+  if(offset + length > v.size()) {
+    debug("toNumber<T>() -- offset and/or length is out of range. Returning 0.");
+    return 0;
+  }
+
+  if(length >= sizeof(T)) {
+    return toNumber<T>(v, offset, mostSignificantByteFirst);
   }
   else {
     T sum = 0;
-    for(size_t i = 0; i < v.size(); i++) {
-      const size_t shift = (mostSignificantByteFirst ? v.size() - 1 - i : i) * 8;
-      sum |= static_cast<T>(static_cast<uchar>(v[i]) << shift);
+    for(size_t i = 0; i < length; i++) {
+      const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
+      sum |= static_cast<T>(static_cast<uchar>(v[offset + i]) << shift);
     }
 
     return sum;
@@ -441,11 +453,8 @@ const char *ByteVector::data() const
 
 ByteVector ByteVector::mid(uint index, uint length) const
 {
-  if(index > size())
-    index = size();
-
-  if(length > size() - index)
-    length = size() - index;
+  index  = std::min(index, size());
+  length = std::min(length, size() - index);
 
   return ByteVector(*this, index, length);
 }
@@ -687,22 +696,47 @@ TagLib::uint ByteVector::checksum() const
 
 TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, mostSignificantByteFirst);
+  return toNumber<uint>(*this, 0, mostSignificantByteFirst);
+}
+
+TagLib::uint ByteVector::toUInt(uint offset, bool mostSignificantByteFirst) const
+{
+  return toNumber<uint>(*this, offset, mostSignificantByteFirst);
+}
+
+TagLib::uint ByteVector::toUInt(uint offset, uint length, bool mostSignificantByteFirst) const
+{
+  return toNumber<uint>(*this, offset, length, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, mostSignificantByteFirst);
+  return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
+}
+
+short ByteVector::toShort(uint offset, bool mostSignificantByteFirst) const
+{
+  return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
 }
 
 unsigned short ByteVector::toUShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, mostSignificantByteFirst);
+  return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
+}
+
+unsigned short ByteVector::toUShort(uint offset, bool mostSignificantByteFirst) const
+{
+  return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, mostSignificantByteFirst);
+  return toNumber<unsigned long long>(*this, 0, mostSignificantByteFirst);
+}
+
+long long ByteVector::toLongLong(uint offset, bool mostSignificantByteFirst) const
+{
+  return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
 }
 
 const char &ByteVector::operator[](int index) const

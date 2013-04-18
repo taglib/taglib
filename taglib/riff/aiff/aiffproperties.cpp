@@ -150,9 +150,9 @@ TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
 
 void RIFF::AIFF::Properties::read(const ByteVector &data)
 {
-  d->channels       = data.mid(0, 2).toShort();
-  d->sampleFrames   = data.mid(2, 4).toUInt();
-  d->sampleWidth    = data.mid(6, 2).toShort();
+  d->channels       = data.toShort(0U);
+  d->sampleFrames   = data.toUInt(2U);
+  d->sampleWidth    = data.toShort(6U);
   double sampleRate = ConvertFromIeeeExtended(reinterpret_cast<unsigned char *>(data.mid(8, 10).data()));
   d->sampleRate     = (int)sampleRate;
   d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);

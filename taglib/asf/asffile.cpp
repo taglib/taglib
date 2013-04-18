@@ -187,7 +187,8 @@ ByteVector ASF::File::FilePropertiesObject::guid()
 void ASF::File::FilePropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setLength((int)(data.mid(40, 8).toLongLong(false) / 10000000L - data.mid(56, 8).toLongLong(false) / 1000L));
+  file->d->properties->setLength(
+    (int)(data.toLongLong(40, false) / 10000000L - data.toLongLong(56, false) / 1000L));
 }
 
 ByteVector ASF::File::StreamPropertiesObject::guid()
@@ -198,9 +199,9 @@ ByteVector ASF::File::StreamPropertiesObject::guid()
 void ASF::File::StreamPropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setChannels(data.mid(56, 2).toShort(false));
-  file->d->properties->setSampleRate(data.mid(58, 4).toUInt(false));
-  file->d->properties->setBitrate(data.mid(62, 4).toUInt(false) * 8 / 1000);
+  file->d->properties->setChannels(data.toShort(56, false));
+  file->d->properties->setSampleRate(data.toUInt(58, false));
+  file->d->properties->setBitrate(data.toUInt(62, false) * 8 / 1000);
 }
 
 ByteVector ASF::File::ContentDescriptionObject::guid()
