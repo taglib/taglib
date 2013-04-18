@@ -39,6 +39,9 @@ namespace TagLib {
     FileName(const wchar_t *name) : m_wname(name) {}
     FileName(const char *name) : m_name(name) {}
 
+    FileName(const FileName &name) 
+      : m_wname(name.m_wname), m_name(name.m_name) {}
+
     operator const wchar_t *() const { return m_wname.c_str(); }
     operator const char *() const { return m_name.c_str(); }
 
