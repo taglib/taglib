@@ -249,7 +249,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
 {
   uint p = 4;
   while(p < data.size()) {
-    uint size = data.mid(p + 4, 4).toUInt(false);
+    const uint size = data.toUInt(p + 4, false);
     d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
 
     p += ((size + 1) & ~1) + 8;
