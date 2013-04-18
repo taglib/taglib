@@ -56,9 +56,9 @@ namespace {
 
   HANDLE openFile(const FileName &path, bool readOnly)
   {
-    DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
+    const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
-    if(wcslen(path) > 0)
+    if(!path.wstr().empty())
       return CreateFileW(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else
       return CreateFileA(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
@@ -67,17 +67,19 @@ namespace {
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
     DWORD readLen;
-    ReadFile(stream, ptr, size * nmemb, &readLen, NULL);
-
-    return (readLen / size);
+    if(ReadFile(stream, ptr, size * nmemb, &readLen, NULL))
+      return (readLen / size);
+    else
+      return 0;
   }
 
   size_t fwrite(const void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
     DWORD writtenLen;
-    WriteFile(stream, ptr, size * nmemb, &writtenLen, NULL);
-
-    return writtenLen;
+    if(WriteFile(stream, ptr, size * nmemb, &writtenLen, NULL))
+      return (writtenLen / size);
+    else 
+      return 0;
   }
 
 #else
@@ -103,7 +105,7 @@ namespace {
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(FileName fileName, bool openReadOnly);
+  FileStreamPrivate(const FileName &fileName, bool openReadOnly);
 
 #ifdef _WIN32
 
@@ -122,7 +124,7 @@ public:
   static const uint bufferSize = 1024;
 };
 
-FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openReadOnly) :
+FileStream::FileStreamPrivate::FileStreamPrivate(const FileName &fileName, bool openReadOnly) :
   file(InvalidFile),
   name(fileName),
   readOnly(true),
@@ -138,8 +140,22 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
   else
     file = openFile(name, true);
 
-  if(file == InvalidFile) {
+  if(file == InvalidFile) 
+  {
+# ifdef _WIN32
+
+    if(!name.wstr().empty()) {
+      debug("Could not open file " + String(name.wstr()));
+    }
+    else {
+      debug("Could not open file " + String(name.str()));
+    }
+
+# else
+
     debug("Could not open file " + String((const char *) name));
+
+# endif 
   }
 }
 
@@ -148,20 +164,20 @@ FileStream::FileStreamPrivate::FileStreamPrivate(FileName fileName, bool openRea
 ////////////////////////////////////////////////////////////////////////////////
 
 FileStream::FileStream(FileName file, bool openReadOnly)
+  : d(new FileStreamPrivate(file, openReadOnly))
 {
-  d = new FileStreamPrivate(file, openReadOnly);
 }
 
 FileStream::~FileStream()
 {
 #ifdef _WIN32
 
-  if(d->file)
+  if(isOpen())
     CloseHandle(d->file);
 
 #else
 
-  if(d->file)
+  if(isOpen())
     fclose(d->file);
 
 #endif
@@ -176,8 +192,8 @@ FileName FileStream::name() const
 
 ByteVector FileStream::readBlock(ulong length)
 {
-  if(!d->file) {
-    debug("FileStream::readBlock() -- Invalid File");
+  if(!isOpen()) {
+    debug("File::readBlock() -- invalid file.");
     return ByteVector::null;
   }
 
@@ -198,11 +214,13 @@ ByteVector FileStream::readBlock(ulong length)
 
 void FileStream::writeBlock(const ByteVector &data)
 {
-  if(!d->file)
+  if(!isOpen()) {
+    debug("File::writeBlock() -- invalid file.");
     return;
+  }
 
-  if(d->readOnly) {
-    debug("File::writeBlock() -- attempted to write to a file that is not writable");
+  if(readOnly()) {
+    debug("File::writeBlock() -- read only file.");
     return;
   }
 
@@ -211,8 +229,15 @@ void FileStream::writeBlock(const ByteVector &data)
 
 void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
 {
-  if(!d->file)
+  if(!isOpen()) {
+    debug("File::insert() -- invalid file.");
     return;
+  }
+
+  if(readOnly()) {
+    debug("File::insert() -- read only file.");
+    return;
+  }
 
   if(data.size() == replace) {
     seek(start);
@@ -309,8 +334,10 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
 
 void FileStream::removeBlock(ulong start, ulong length)
 {
-  if(!d->file)
+  if(!isOpen()) {
+    debug("File::removeBlock() -- invalid file.");
     return;
+  }
 
   ulong bufferLength = bufferSize();
 
@@ -346,13 +373,13 @@ bool FileStream::readOnly() const
 
 bool FileStream::isOpen() const
 {
-  return (d->file != NULL);
+  return (d->file != InvalidFile);
 }
 
 void FileStream::seek(long offset, Position p)
 {
-  if(!d->file) {
-    debug("File::seek() -- trying to seek in a file that isn't opened.");
+  if(!isOpen()) {
+    debug("File::seek() -- invalid file.");
     return;
   }
 
@@ -427,13 +454,15 @@ long FileStream::tell() const
 
 long FileStream::length()
 {
+  if(!isOpen()) {
+    debug("File::length() -- invalid file.");
+    return 0;
+  }
+
   // Do some caching in case we do multiple calls.
 
   if(d->size > 0)
     return d->size;
-
-  if(!d->file)
-    return 0;
 
   const long curpos = tell();
 
