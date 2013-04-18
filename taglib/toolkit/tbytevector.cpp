@@ -202,24 +202,30 @@ ulonglong byteSwap<ulonglong>(ulonglong x)
 }
 
 template <class T>
+T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
+{
+  const size_t length = sizeof(T);
+  if(offset + length > v.size()) {
+    debug("toNumber<T>() -- offset is out of range. Returning 0.");
+    return 0;
+  }
+
+  if(isLittleEndianSystem == mostSignificantByteFirst)
+    return byteSwap<T>(*reinterpret_cast<const T*>(v.data() + offset));
+  else
+    return *reinterpret_cast<const T*>(v.data() + offset);
+}
+
+template <class T>
 T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
 {
-  //if(offset >= v.size()) {
-  //  debug("toNumber<T>() -- offset is out of range. Returning 0.");
-  //  return 0;
-  //}
-
   if(offset + length > v.size()) {
     debug("toNumber<T>() -- offset and/or length is out of range. Returning 0.");
     return 0;
   }
 
-  length = std::min(length, v.size() - offset);
   if(length >= sizeof(T)) {
-    if(isLittleEndianSystem == mostSignificantByteFirst)
-      return byteSwap<T>(*reinterpret_cast<const T*>(v.data() + offset));
-    else
-      return *reinterpret_cast<const T*>(v.data() + offset);
+    return toNumber<T>(v, offset, mostSignificantByteFirst);
   }
   else {
     T sum = 0;
@@ -691,12 +697,12 @@ TagLib::uint ByteVector::checksum() const
 
 TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, 0, 4, mostSignificantByteFirst);
+  return toNumber<uint>(*this, 0, mostSignificantByteFirst);
 }
 
 TagLib::uint ByteVector::toUInt(uint offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, offset, 4, mostSignificantByteFirst);
+  return toNumber<uint>(*this, offset, mostSignificantByteFirst);
 }
 
 TagLib::uint ByteVector::toUInt(uint offset, uint length, bool mostSignificantByteFirst) const
@@ -706,32 +712,32 @@ TagLib::uint ByteVector::toUInt(uint offset, uint length, bool mostSignificantBy
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, 0, 2, mostSignificantByteFirst);
+  return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(uint offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, offset, 2, mostSignificantByteFirst);
+  return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
 }
 
 unsigned short ByteVector::toUShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, 0, 2, mostSignificantByteFirst);
+  return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
 }
 
 unsigned short ByteVector::toUShort(uint offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, offset, 2, mostSignificantByteFirst);
+  return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, 0, 8, mostSignificantByteFirst);
+  return toNumber<unsigned long long>(*this, 0, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(uint offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, offset, 8, mostSignificantByteFirst);
+  return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
 }
 
 const char &ByteVector::operator[](int index) const
