@@ -35,7 +35,6 @@
 # include <Shlwapi.h>
 #endif 
 
-
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>
