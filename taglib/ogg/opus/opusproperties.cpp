@@ -129,11 +129,11 @@ void Opus::Properties::read()
   pos += 1;
 
   // *Pre-skip* (16 bits, unsigned, little endian)
-  ushort preSkip = data.mid(pos, 2).toUShort(false);
+  const ushort preSkip = data.toUShort(pos, 2, false);
   pos += 2;
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)
-  d->inputSampleRate = data.mid(pos, 4).toUInt(false);
+  d->inputSampleRate = data.toUInt(pos, 4, false);
   pos += 4;
 
   // *Output Gain* (16 bits, signed, little endian)

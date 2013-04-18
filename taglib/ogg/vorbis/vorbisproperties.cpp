@@ -142,22 +142,22 @@ void Vorbis::Properties::read()
 
   pos += 7;
 
-  d->vorbisVersion = data.mid(pos, 4).toUInt(false);
+  d->vorbisVersion = data.toUInt(pos, 4, false);
   pos += 4;
 
   d->channels = uchar(data[pos]);
   pos += 1;
 
-  d->sampleRate = data.mid(pos, 4).toUInt(false);
+  d->sampleRate = data.toUInt(pos, 4, false);
   pos += 4;
 
-  d->bitrateMaximum = data.mid(pos, 4).toUInt(false);
+  d->bitrateMaximum = data.toUInt(pos, 4, false);
   pos += 4;
 
-  d->bitrateNominal = data.mid(pos, 4).toUInt(false);
+  d->bitrateNominal = data.toUInt(pos, 4, false);
   pos += 4;
 
-  d->bitrateMinimum = data.mid(pos, 4).toUInt(false);
+  d->bitrateMinimum = data.toUInt(pos, 4, false);
 
   // TODO: Later this should be only the "fast" mode.
   d->bitrate = d->bitrateNominal;
