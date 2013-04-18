@@ -82,6 +82,36 @@ namespace {
       return 0;
   }
 
+# if _DEBUG
+
+  // Convert a string in a local encoding into a UTF-16 string.
+
+  // This function should only be used to generate an error message.
+  // In actual use, file names in local encodings are passed to CreateFileA()
+  // without any conversions.
+
+  String fileNameToString(const FileName &name)
+  {
+    if(!name.wstr().empty()) {
+      return String(name.wstr());
+    } 
+    else if(!name.str().empty()) {
+      const int len = MultiByteToWideChar(CP_ACP, 0, name.str().c_str(), -1, NULL, 0);
+      if(len == 0)
+        return String::null;
+
+      wstring wstr(len, L'\0');
+      MultiByteToWideChar(CP_ACP, 0, name.str().c_str(), -1, &wstr[0], len);
+
+      return String(wstr);
+    }
+    else {
+      return String::null;
+    }
+  }
+
+# endif
+
 #else
 
   // For non-Windows 
@@ -144,12 +174,7 @@ FileStream::FileStreamPrivate::FileStreamPrivate(const FileName &fileName, bool 
   {
 # ifdef _WIN32
 
-    if(!name.wstr().empty()) {
-      debug("Could not open file " + String(name.wstr()));
-    }
-    else {
-      debug("Could not open file " + String(name.str()));
-    }
+    debug("Could not open file " + fileNameToString(name));
 
 # else
 
