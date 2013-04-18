@@ -133,7 +133,7 @@ void Vorbis::Properties::read()
 
   ByteVector data = d->file->packet(0);
 
-  int pos = 0;
+  uint pos = 0;
 
   if(data.mid(pos, 7) != vorbisSetupHeaderID) {
     debug("Vorbis::Properties::read() -- invalid Vorbis identification header");
@@ -142,22 +142,22 @@ void Vorbis::Properties::read()
 
   pos += 7;
 
-  d->vorbisVersion = data.toUInt(pos, 4, false);
+  d->vorbisVersion = data.toUInt(pos, false);
   pos += 4;
 
   d->channels = uchar(data[pos]);
   pos += 1;
 
-  d->sampleRate = data.toUInt(pos, 4, false);
+  d->sampleRate = data.toUInt(pos, false);
   pos += 4;
 
-  d->bitrateMaximum = data.toUInt(pos, 4, false);
+  d->bitrateMaximum = data.toUInt(pos, false);
   pos += 4;
 
-  d->bitrateNominal = data.toUInt(pos, 4, false);
+  d->bitrateNominal = data.toUInt(pos, false);
   pos += 4;
 
-  d->bitrateMinimum = data.toUInt(pos, 4, false);
+  d->bitrateMinimum = data.toUInt(pos, false);
 
   // TODO: Later this should be only the "fast" mode.
   d->bitrate = d->bitrateNominal;

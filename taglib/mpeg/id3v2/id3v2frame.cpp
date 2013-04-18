@@ -640,9 +640,10 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     if(data.size() < 6) {
       d->frameSize = 0;
       return;
-    }
-
-    d->frameSize = data.toUInt(3, 3);
+    } else if (data.size() == 6) 
+      d->frameSize = data.toUInt(3U);
+    else
+      d->frameSize = data.toUInt(3U);
 
     break;
   }
@@ -670,7 +671,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // Set the size -- the frame size is the four bytes starting at byte four in
     // the frame header (structure 4)
 
-    d->frameSize = data.toUInt(4, 4);
+    d->frameSize = data.toUInt(4U);
 
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
@@ -717,7 +718,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // iTunes writes v2.4 tags with v2.3-like frame sizes
     if(d->frameSize > 127) {
       if(!isValidFrameID(data.mid(d->frameSize + 10, 4))) {
-        unsigned int uintSize = data.toUInt(4, 4);
+        unsigned int uintSize = data.toUInt(4U);
         if(isValidFrameID(data.mid(uintSize + 10, 4))) {
           d->frameSize = uintSize;
         }

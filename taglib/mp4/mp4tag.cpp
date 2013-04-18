@@ -114,9 +114,9 @@ MP4::Tag::parseData2(MP4::Atom *atom, TagLib::File *file, int expectedFlags, boo
   int i = 0;
   unsigned int pos = 0;
   while(pos < data.size()) {
-    const int length = static_cast<int>(data.toUInt(pos, 4));
+    const int length = static_cast<int>(data.toUInt(pos));
     ByteVector name = data.mid(pos + 4, 4);
-    const int flags = static_cast<int>(data.toUInt(pos + 8, 4));
+    const int flags = static_cast<int>(data.toUInt(pos + 8));
     if(freeForm && i < 2) {
       if(i == 0 && name != "mean") {
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"mean\"");
@@ -207,8 +207,8 @@ MP4::Tag::parseIntPair(MP4::Atom *atom, TagLib::File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
-    const int a = data[0].toShort(2, 2);
-    const int b = data[0].toShort(4, 2);
+    const int a = data[0].toShort(2U);
+    const int b = data[0].toShort(4U);
     addItem(atom->name, MP4::Item(a, b));
   }
 }
@@ -277,9 +277,9 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
   ByteVector data = file->readBlock(atom->length - 8);
   unsigned int pos = 0;
   while(pos < data.size()) {
-    const int length = static_cast<int>(data.toUInt(pos, 4));
+    const int length = static_cast<int>(data.toUInt(pos));
     ByteVector name = data.mid(pos + 4, 4);
-    const int flags = static_cast<int>(data.toUInt(pos + 8, 4));
+    const int flags = static_cast<int>(data.toUInt(pos + 8));
     if(name != "data") {
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
       break;
@@ -530,11 +530,11 @@ MP4::Tag::updateOffsets(long delta, long offset)
       }
       d->file->seek(atom->offset + 12);
       ByteVector data = d->file->readBlock(atom->length - 12);
-      unsigned int count = data.toUInt(0, 4);
+      unsigned int count = data.toUInt();
       d->file->seek(atom->offset + 16);
-      int pos = 4;
+      uint pos = 4;
       while(count--) {
-        long o = static_cast<long>(data.toUInt(pos, 4));
+        long o = static_cast<long>(data.toUInt(pos));
         if(o > offset) {
           o += delta;
         }
@@ -553,9 +553,9 @@ MP4::Tag::updateOffsets(long delta, long offset)
       ByteVector data = d->file->readBlock(atom->length - 12);
       unsigned int count = data.toUInt();
       d->file->seek(atom->offset + 16);
-      int pos = 4;
+      uint pos = 4;
       while(count--) {
-        long long o = data.toLongLong(pos, 8);
+        long long o = data.toLongLong(pos);
         if(o > offset) {
           o += delta;
         }
@@ -575,9 +575,9 @@ MP4::Tag::updateOffsets(long delta, long offset)
       }
       d->file->seek(atom->offset + 9);
       ByteVector data = d->file->readBlock(atom->length - 9);
-      const unsigned int flags = data.toUInt(0, 3);
+      const unsigned int flags = data.toUInt(0U, 3U);
       if(flags & 1) {
-        long long o = data.toLongLong(7, 8);
+        long long o = data.toLongLong(7U);
         if(o > offset) {
           o += delta;
         }

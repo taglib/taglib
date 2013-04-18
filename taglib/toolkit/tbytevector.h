@@ -291,8 +291,20 @@ namespace TagLib {
     uint toUInt(bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the \a length bytes at \a offset of the vector to an 
-     * unsigned integer. if \ length is larger than 4, the excess is ignored.
+     * Converts the 4 bytes at \a offset of the vector to an unsigned integer. 
+     *
+     * If \a mostSignificantByteFirst is true this will operate left to right
+     * evaluating the integer.  For example if \a mostSignificantByteFirst is
+     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
+     * 0x01000000 == 1.
+     *
+     * \see fromUInt()
+     */
+    uint toUInt(uint offset, bool mostSignificantByteFirst = true) const;
+
+    /*!
+     * Converts the \a length bytes at \a offset of the vector to an unsigned 
+     * integer. If \a length is larger than 4, the excess is ignored. 
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -304,7 +316,7 @@ namespace TagLib {
     uint toUInt(uint offset, uint length, bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the first 2 bytes of the vector to a short.
+     * Converts the first 2 bytes of the vector to a (signed) short.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -315,8 +327,7 @@ namespace TagLib {
     short toShort(bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the \a length bytes at \a offset of the vector to a short. 
-     * if \ length is larger than 2, the excess is ignored.
+     * Converts the 2 bytes at \a offset of the vector to a (signed) short.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -324,7 +335,7 @@ namespace TagLib {
      *
      * \see fromShort()
      */
-    short toShort(uint offset, uint length, bool mostSignificantByteFirst = true) const;
+    short toShort(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 2 bytes of the vector to a unsigned short.
@@ -338,8 +349,7 @@ namespace TagLib {
     unsigned short toUShort(bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the \a length bytes at \a offset of the vector to a unsigned 
-     * short. if \ length is larger than 2, the excess is ignored.
+     * Converts the 2 bytes at \a offset of the vector to a unsigned short.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -347,7 +357,7 @@ namespace TagLib {
      *
      * \see fromShort()
      */
-    unsigned short toUShort(uint offset, uint length, bool mostSignificantByteFirst = true) const;
+    unsigned short toUShort(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 8 bytes of the vector to a (signed) long long.
@@ -362,8 +372,7 @@ namespace TagLib {
     long long toLongLong(bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the \a length bytes at \a offset of the vector to a (signed) 
-     * long long. if \ length is larger than 8, the excess is ignored.
+     * Converts the 8 bytes at \a offset of the vector to a (signed) long long.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -372,7 +381,7 @@ namespace TagLib {
      *
      * \see fromUInt()
      */
-    long long toLongLong(uint offset, uint length, bool mostSignificantByteFirst = true) const;
+    long long toLongLong(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Creates a 4 byte ByteVector based on \a value.  If

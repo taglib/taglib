@@ -133,16 +133,16 @@ void TrueAudio::Properties::read()
     // Skip the audio format
     pos += 2;
 
-    d->channels = d->data.toShort(pos, 2, false);
+    d->channels = d->data.toShort(pos, false);
     pos += 2;
 
-    d->bitsPerSample = d->data.toShort(pos, 2, false);
+    d->bitsPerSample = d->data.toShort(pos, false);
     pos += 2;
 
-    d->sampleRate = d->data.toUInt(pos, 4, false);
+    d->sampleRate = d->data.toUInt(pos, false);
     pos += 4;
 
-    d->sampleFrames = d->data.toUInt(pos, 4, false);
+    d->sampleFrames = d->data.toUInt(pos, false);
     d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
 
     d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;

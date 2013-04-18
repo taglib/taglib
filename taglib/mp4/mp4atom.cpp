@@ -52,7 +52,7 @@ MP4::Atom::Atom(File *file)
     return;
   }
 
-  length = header.toUInt(0, 4);
+  length = header.toUInt();
 
   if (length == 1) {
     const long long longLength = file->readBlock(8).toLongLong();

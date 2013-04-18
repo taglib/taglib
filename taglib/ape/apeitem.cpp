@@ -229,8 +229,8 @@ void APE::Item::parse(const ByteVector &data)
     return;
   }
 
-  const uint valueLength  = data.toUInt(0, 4, false);
-  const uint flags        = data.toUInt(4, 4, false);
+  const uint valueLength  = data.toUInt(0, false);
+  const uint flags        = data.toUInt(4, false);
 
   d->key = String(data.mid(8), String::UTF8);
 

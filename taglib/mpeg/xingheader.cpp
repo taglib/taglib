@@ -108,8 +108,8 @@ void MPEG::XingHeader::parse(const ByteVector &data)
     return;
   }
 
-  d->frames = data.toUInt(8, 4);
-  d->size = data.toUInt(12, 4);
+  d->frames = data.toUInt(8U);
+  d->size   = data.toUInt(12U);
 
   d->valid = true;
 }
