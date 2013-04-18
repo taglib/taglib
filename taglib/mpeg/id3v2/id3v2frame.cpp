@@ -640,6 +640,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     if(data.size() < 6) {
       d->frameSize = 0;
       return;
+    }
 
     d->frameSize = data.toUInt(3, 3, true);
 
