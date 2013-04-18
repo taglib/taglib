@@ -369,6 +369,9 @@ void FileStream::seek(long offset, Position p)
   case End:
     whence = FILE_END;
     break;
+  default:
+    debug("FileStream::seek() -- Invalid Position value.");
+    return;
   }
 
   SetFilePointer(d->file, offset, NULL, whence);
@@ -386,6 +389,9 @@ void FileStream::seek(long offset, Position p)
   case End:
     whence = SEEK_END;
     break;
+  default:
+    debug("FileStream::seek() -- Invalid Position value.");
+    return;
   }
 
   fseek(d->file, offset, whence);
@@ -429,10 +435,10 @@ long FileStream::length()
   if(!d->file)
     return 0;
 
-  long curpos = tell();
+  const long curpos = tell();
 
   seek(0, End);
-  long endpos = tell();
+  const long endpos = tell();
 
   seek(curpos, Beginning);
 
@@ -448,7 +454,7 @@ void FileStream::truncate(long length)
 {
 #ifdef _WIN32
 
-  long currentPos = tell();
+  const long currentPos = tell();
 
   seek(length);
   SetEndOfFile(d->file);
@@ -457,7 +463,10 @@ void FileStream::truncate(long length)
 
 #else
 
-  ftruncate(fileno(d->file), length);
+  const int error = ftruncate(fileno(d->file), length);
+  if(error != 0) {
+    debug("FileStream::truncate() -- Coundn't truncate the file.");
+  }
 
 #endif
 }
