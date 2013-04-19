@@ -46,7 +46,8 @@ public:
     if(info && (value = info->getChild(Constants::Duration))) {
       length = static_cast<int>(value->getAsFloat());
       if((value = info->getChild(Constants::TimecodeScale))){
-        length /= (value->getAsUnsigned() / 1000);}
+        length /= (value->getAsUnsigned() * (1 / 1000000000));
+      }
     }
     
     info = elem->getChild(Constants::Tracks);
