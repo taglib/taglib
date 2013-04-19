@@ -642,7 +642,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
       return;
     }
 
-    d->frameSize = data.toUInt(3, 3, true);
+    d->frameSize = data.toUInt24(3U);
 
     break;
   }

@@ -303,17 +303,28 @@ namespace TagLib {
     uint toUInt(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the \a length bytes at \a offset of the vector to an unsigned 
-     * integer. If \a length is larger than 4, the excess is ignored. 
+     * Converts the first 3 bytes of the vector to an unsigned integer.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
-     * 0x01000000 == 1.
+     * true then $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 ==
+     * 0x010000 == 1.
      *
      * \see fromUInt()
      */
-    uint toUInt(uint offset, uint length, bool mostSignificantByteFirst = true) const;
+    uint toUInt24(bool mostSignificantByteFirst = true) const;
+
+    /*!
+     * Converts the 3 bytes at \a offset of the vector to an unsigned integer. 
+     *
+     * If \a mostSignificantByteFirst is true this will operate left to right
+     * evaluating the integer.  For example if \a mostSignificantByteFirst is
+     * true then $00 $00 $01 == 0x000001 == 1, if false, $01 00 00 ==
+     * 0x010000 == 1.
+     *
+     * \see fromUInt()
+     */
+    uint toUInt24(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 2 bytes of the vector to a (signed) short.
