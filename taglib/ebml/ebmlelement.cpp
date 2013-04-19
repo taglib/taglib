@@ -88,7 +88,7 @@ public:
   
     // Store the result and return the current position
     if(result)
-      *result = static_cast<ulli>(vint.toLongLong());
+      *result = static_cast<ulli>(vint.toInt64());
     return position + byteSize;
   }
   
@@ -100,7 +100,7 @@ public:
   // for the id)
   ByteVector createVInt(ulli number, bool addOne = true, bool shortest = true)
   {
-    ByteVector vint = ByteVector::fromLongLong(static_cast<signed long long>(number));
+    ByteVector vint = ByteVector::fromUInt64(static_cast<signed long long>(number));
     
     // Do we actually need to calculate the length of the variable length
     // integer? If not, then prepend the 0b0000 0001 if necessary and return the
@@ -236,7 +236,7 @@ public:
     else {
       document->seek(freeSpace->d->position);
       if((freeSpace->d->size + freeSpace->d->data - freeSpace->d->position)
-        == content.size()) {
+        == static_cast<offset_t>(content.size())) {
         // Write to file
         document->writeBlock(content);
         // Update parent
@@ -252,7 +252,7 @@ public:
         ByteVector newVoid(createVInt(Void, false).append(createVInt(newSize, true, false)));
         
         // Check if the original size of the size field was really 8 byte
-        if (newVoid.size() != (freeSpace->d->data - freeSpace->d->position))
+        if (static_cast<offset_t>(newVoid.size()) != (freeSpace->d->data - freeSpace->d->position))
           newVoid = createVInt(Void, false).append(createVInt(newSize));
         // Update freeSpace
         freeSpace->d->size = newSize;
@@ -327,14 +327,14 @@ signed long long EBML::Element::getAsInt()
 {
   // The debug note about returning 0 because of empty data is irrelevant. The
   // behavior is as expected.
-  return getAsBinary().toLongLong();
+  return getAsBinary().toInt64();
 }
 
 EBML::ulli EBML::Element::getAsUnsigned()
 {
   // The debug note about returning 0 because of empty data is irrelevant. The
   // behavior is as expected.
-  return static_cast<ulli>(getAsBinary().toLongLong());
+  return static_cast<ulli>(getAsBinary().toInt64());
 }
 
 long double EBML::Element::getAsFloat()
@@ -390,12 +390,12 @@ EBML::Element *EBML::Element::addElement(EBML::ulli id, const String &string)
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, signed long long number)
 {
-  return addElement(id, ByteVector::fromLongLong(number));
+  return addElement(id, ByteVector::fromUInt64(number));
 }
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, EBML::ulli number)
 {
-  return addElement(id, ByteVector::fromLongLong(static_cast<signed long long>(number)));
+  return addElement(id, ByteVector::fromUInt64(static_cast<signed long long>(number)));
 }
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, long double number)
@@ -459,12 +459,12 @@ void EBML::Element::setAsString(const String &string)
 
 void EBML::Element::setAsInt(signed long long number)
 {
-  setAsBinary(ByteVector::fromLongLong(number));
+  setAsBinary(ByteVector::fromUInt64(number));
 }
 
 void EBML::Element::setAsUnsigned(EBML::ulli number)
 {
-  setAsBinary(ByteVector::fromLongLong(static_cast<signed long long>(number)));
+  setAsBinary(ByteVector::fromUInt64(static_cast<signed long long>(number)));
 }
 
 void EBML::Element::setAsFloat(long double)
