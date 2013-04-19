@@ -474,7 +474,6 @@ namespace TagLib {
      */
     void copyFromUTF16(const char *s, size_t length, Type t);
     
-    template <size_t sizeOfWcharT>
     void internalCopyFromUTF16(const char *s, size_t length, Type t);
 
     /*!
