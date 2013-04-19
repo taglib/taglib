@@ -789,16 +789,32 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
   }
 }
 
-template <size_t sizeOfWcharT>
-void String::internalCopyFromUTF16(const char *s, size_t length, Type t)
+void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
-  // Non specialized version. Used where sizeof(wchar_t) != 2.
+#if !defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
+
+  // It's certain that sizeof(wchar_t) == 2 and alignment-tolerant.
+
+  copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
+
+#else
+
+  // Maybe sizeof(wchar_t) != 2 or alignment-strict.
 
   bool swap;
   if(t == UTF16) {
-    if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfeff) 
+    if(length < 2) {
+      debug("String::copyFromUTF16() - Invalid UTF16 string.");
+      return;
+    }
+
+    // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
+    ushort bom;
+    ::memcpy(&bom, s, 2);
+
+    if(bom == 0xfeff) 
       swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(length >= 2 && *reinterpret_cast<const TagLib::ushort*>(s) == 0xfffe) 
+    else if(bom == 0xfffe) 
       swap = true;  // Not same as CPU endian. Need to swap bytes.
     else {
       debug("String::copyFromUTF16() - Invalid UTF16 string.");
@@ -816,19 +832,8 @@ void String::internalCopyFromUTF16(const char *s, size_t length, Type t)
     d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
     s += 2;
   }
-}
 
-template <>
-void String::internalCopyFromUTF16<2>(const char *s, size_t length, Type t)
-{
-  // Specialized version for where sizeof(wchar_t) == 2.
-
-  copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
-}
-
-void String::copyFromUTF16(const char *s, size_t length, Type t)
-{
-  internalCopyFromUTF16<sizeof(wchar_t)>(s, length, t);
+#endif
 }
 
 const String::Type String::WCharByteOrder = isLittleEndianSystem ? String::UTF16LE : String::UTF16BE;
