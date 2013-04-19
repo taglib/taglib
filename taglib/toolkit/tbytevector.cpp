@@ -209,10 +209,14 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
     return 0;
   }
 
+  // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
+  T tmp;
+  ::memcpy(&tmp, v.data() + offset, sizeof(T));
+
   if(isLittleEndianSystem == mostSignificantByteFirst)
-    return byteSwap<T>(*reinterpret_cast<const T*>(v.data() + offset));
+    return byteSwap<T>(tmp);
   else
-    return *reinterpret_cast<const T*>(v.data() + offset);
+    return tmp;
 }
 
 template <class T>
