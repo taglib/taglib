@@ -793,13 +793,13 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
 #if !defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
 
-  // It's certain that sizeof(wchar_t) == 2 and alignment-tolerant.
+  // It's certain that sizeof(wchar_t) == 2 and the system is alignment-tolerant.
 
   copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
 
 #else
 
-  // Maybe sizeof(wchar_t) != 2 or alignment-strict.
+  // Maybe sizeof(wchar_t) != 2 or the system is alignment-strict.
 
   bool swap;
   if(t == UTF16) {
@@ -829,14 +829,15 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 
   d->data.resize(length / 2);
   for(size_t i = 0; i < length / 2; ++i) {
-    d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
-    s += 2;
+    d->data[i] = swap ? combine(s[0], s[1]) : combine(s[1], s[0]);
+    s += 2;             
   }
 
 #endif
 }
 
-const String::Type String::WCharByteOrder = isLittleEndianSystem ? String::UTF16LE : String::UTF16BE;
+const String::Type String::WCharByteOrder 
+  = TAGLIB_IS_LITTLE_ENDIAN ? String::UTF16LE : String::UTF16BE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
