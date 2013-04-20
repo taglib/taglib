@@ -184,25 +184,27 @@ T byteSwap(T x)
 }
 
 template <>
-ushort byteSwap<ushort>(ushort x)
+inline ushort byteSwap<ushort>(ushort x)
 {
   return byteSwap16(x);
 }
 
 template <>
-uint byteSwap<uint>(uint x)
+inline uint byteSwap<uint>(uint x)
 {
   return byteSwap32(x);
 }
 
 template <>
-ulonglong byteSwap<ulonglong>(ulonglong x)
+inline ulonglong byteSwap<ulonglong>(ulonglong x)
 {
   return byteSwap64(x);
 }
 
+// This one should be used when the required data size == sizeof(T). 
+
 template <class T>
-T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
+inline T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
   if(offset + sizeof(T) > v.size()) {
     debug("toNumber<T>() -- offset is out of range. Returning 0.");
@@ -213,40 +215,37 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   T tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-  if(isLittleEndianSystem == mostSignificantByteFirst)
+  if(mostSignificantByteFirst == TAGLIB_IS_LITTLE_ENDIAN)
     return byteSwap<T>(tmp);
   else
     return tmp;
 }
 
+// This one should be used when the required data size < sizeof(T). 
+
 template <class T>
-T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
+inline T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
 {
   if(offset + length > v.size()) {
     debug("toNumber<T>() -- offset and/or length is out of range. Returning 0.");
     return 0;
   }
 
-  if(length >= sizeof(T)) {
-    return toNumber<T>(v, offset, mostSignificantByteFirst);
+  T sum = 0;
+  for(size_t i = 0; i < length; i++) {
+    const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
+    sum |= static_cast<T>(static_cast<uchar>(v[offset + i]) << shift);
   }
-  else {
-    T sum = 0;
-    for(size_t i = 0; i < length; i++) {
-      const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
-      sum |= static_cast<T>(static_cast<uchar>(v[offset + i]) << shift);
-    }
 
-    return sum;
-  }
+  return sum;
 }
 
 template <class T>
-ByteVector fromNumber(T value, bool mostSignificantByteFirst)
+inline ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
   const size_t size = sizeof(T);
 
-  if(isLittleEndianSystem == mostSignificantByteFirst)
+  if(mostSignificantByteFirst == TAGLIB_IS_LITTLE_ENDIAN)
     value = byteSwap<T>(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), size);
