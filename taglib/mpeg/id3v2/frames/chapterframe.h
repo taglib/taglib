@@ -54,7 +54,7 @@ namespace TagLib {
        * start time \a sT, end time \a eT, start offset \a sO
        * and end offset \a eO.
        */
-      ChapterFrame(const ByteVector &eID, const int &sT, const int &eT, const int &sO, const int &eO);
+      ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO);
 
       /*!
        * Destroys the frame.
@@ -143,7 +143,8 @@ namespace TagLib {
 
       /*!
        * CHAP frames each have a unique element ID. This searches for a CHAP
-       * frame with the element ID \a eID and returns a pointer to it.
+       * frame with the element ID \a eID and returns a pointer to it. This
+       * can be used to link CTOC and CHAP frames together.
        *
        * \see elementID()
        */

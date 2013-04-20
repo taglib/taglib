@@ -53,12 +53,12 @@ namespace TagLib {
        * Creates a table of contents frame with the element ID \a eID and
        * the child elements \a ch.
        */
-      UniqueFileIdentifierFrame(const ByteVector &eID, const List<ByteVector> &ch);
+      TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch);
 
       /*!
        * Destroys the frame.
        */
-      ~UniqueFileIdentifierFrame();
+      ~TableOfContentsFrame();
       
       /*!
        * Returns the elementID of the frame. Element ID
@@ -88,7 +88,7 @@ namespace TagLib {
        * Returns count of child elements of the frame. It allways
        * corresponds to size of child elements list.
        * 
-       * \note Return type should be uint8_t.
+       * \note Return type should be uint8_t, not unsigned char.
        * \see childElements()
        */
       unsigned char entryCount() const;
@@ -98,7 +98,7 @@ namespace TagLib {
        *
        * \see setChildElements()
        */
-      List<ByteVector> childElements() const;
+      ByteVectorList childElements() const;
 
       /*!
        * Sets the elementID of the frame to \a eID. 
@@ -129,7 +129,7 @@ namespace TagLib {
        *
        * \see childElements()
        */
-      void setChildElements(const List<ByteVector> &l);
+      void setChildElements(const ByteVectorList &l);
 
       virtual String toString() const;
 
@@ -137,11 +137,12 @@ namespace TagLib {
 
       /*!
        * CTOC frames each have a unique element ID. This searches for a CTOC
-       * frame with the element ID \a eID and returns a pointer to it.
+       * frame with the element ID \a eID and returns a pointer to it. This 
+       * can be used to link together parent and child CTOC frames.
        *
        * \see elementID()
        */
-      static UniqueFileIdentifierFrame *findByElementID(const Tag *tag, const ByteVector &eID);
+      static TableOfContentsFrame *findByElementID(const Tag *tag, const ByteVector &eID);
 
     protected:
       virtual void parseFields(const ByteVector &data);

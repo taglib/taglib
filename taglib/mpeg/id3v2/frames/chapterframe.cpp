@@ -28,60 +28,96 @@
 #include <tdebug.h>
 
 #include "id3v2tag.h"
-#include "uniquefileidentifierframe.h"
+#include "chapterframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
 
-class UniqueFileIdentifierFrame::UniqueFileIdentifierFramePrivate
+class ChapterFrame::ChapterFramePrivate
 {
 public:
-  String owner;
-  ByteVector identifier;
+  ByteVector elementID;
+  uint startTime;
+  uint endTime;
+  uint startOffset;
+  uint endOffset;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const ByteVector &data) :
+ChapterFrame::ChapterFrame(const ByteVector &data) :
     ID3v2::Frame(data)
 {
-  d = new UniqueFileIdentifierFramePrivate;
+  d = new ChapterFramePrivate;
   setData(data);
 }
 
-UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const String &owner, const ByteVector &id) :
-    ID3v2::Frame("UFID")
+ChapterFrame::ChapterFrame(const ByteVector &eID, const int &sT, const int &eT, const int &sO, const int &eO) :
+    ID3v2::Frame("CHAP")
 {
-  d = new UniqueFileIdentifierFramePrivate;
-  d->owner = owner;
-  d->identifier = id;
+  d = new ChapterFramePrivate;
+  d->elementID = eID;
+  d->startTime = sT;
+  d->endTime = eT;
+  d->startOffset = sO;
+  d->endOffset = e0;
 }
 
-UniqueFileIdentifierFrame::~UniqueFileIdentifierFrame()
+ChapterFrame::~ChapterFrame()
 {
   delete d;
 }
 
-String UniqueFileIdentifierFrame::owner() const
+ByteVector ChapterFrame::elementID() const
 {
-    return d->owner;
+    return d->elementID;
 }
 
-ByteVector UniqueFileIdentifierFrame::identifier() const
+uint ChapterFrame::startTime() const
 {
-  return d->identifier;
+  return d->startTime;
 }
 
-void UniqueFileIdentifierFrame::setOwner(const String &s)
+uint ChapterFrame::endTime() const
 {
-  d->owner = s;
+  return d->endTime;
 }
 
-void UniqueFileIdentifierFrame::setIdentifier(const ByteVector &v)
+uint ChapterFrame::startOffset() const
 {
-  d->identifier = v;
+  return d->startOffset;
+}
+
+uint ChapterFrame::endOffset() const
+{
+  return d->endOffset;
+}
+
+void ChapterFrame::setElementID(const ByteVector &eID)
+{
+  d->elementID = eID;
+}
+
+void ChapterFrame::setStartTime(const uint &sT)
+{
+  d->startTime = sT;
+}
+
+void ChapterFrame::setEndTime(const uint &eT)
+{
+  d->endTime = eT;
+}
+
+void ChapterFrame::setStartOffset(const uint &sO)
+{
+  d->startOffset = sO;
+}
+
+void ChapterFrame::setEndOffset(const uint &eO)
+{
+  d->endOffset = eO;
 }
 
 String UniqueFileIdentifierFrame::toString() const
@@ -89,8 +125,9 @@ String UniqueFileIdentifierFrame::toString() const
   return String::null;
 }
 
-PropertyMap UniqueFileIdentifierFrame::asProperties() const
+PropertyMap ChapterFrame::asProperties() const
 {
+  //DODELAT
   PropertyMap map;
   if(d->owner == "http://musicbrainz.org") {
     map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
@@ -101,24 +138,25 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
   return map;
 }
 
-UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::Tag *tag, const String &o) // static
+ChapterFrame *ChapterFrame::findByElementID(const Tag *tag, const ByteVector &eID) // static
 {
-  ID3v2::FrameList comments = tag->frameList("UFID");
+  ID3v2::FrameList comments = tag->frameList("CHAP");
 
   for(ID3v2::FrameList::ConstIterator it = comments.begin();
       it != comments.end();
       ++it)
   {
-    UniqueFileIdentifierFrame *frame = dynamic_cast<UniqueFileIdentifierFrame *>(*it);
-    if(frame && frame->owner() == o)
+    ChapterFrame *frame = dynamic_cast<ChapterFrame *>(*it);
+    if(frame && frame->elementID() == eID)
       return frame;
   }
 
   return 0;
 }
 
-void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
+void ChapterFrame::parseFields(const ByteVector &data)
 {
+  //DODELAT
   if(data.size() < 1) {
     debug("An UFID frame must contain at least 1 byte.");
     return;
@@ -129,8 +167,9 @@ void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
   d->identifier = data.mid(pos);
 }
 
-ByteVector UniqueFileIdentifierFrame::renderFields() const
+ByteVector ChapterFrame::renderFields() const
 {
+  //DODELAT
   ByteVector data;
 
   data.append(d->owner.data(String::Latin1));
@@ -140,9 +179,9 @@ ByteVector UniqueFileIdentifierFrame::renderFields() const
   return data;
 }
 
-UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const ByteVector &data, Header *h) :
+ChapterFrame::ChapterFrame(const ByteVector &data, Header *h) :
   Frame(h)
 {
-  d = new UniqueFileIdentifierFramePrivate;
+  d = new ChapterFramePrivate;
   parseFields(fieldData(data));
 }

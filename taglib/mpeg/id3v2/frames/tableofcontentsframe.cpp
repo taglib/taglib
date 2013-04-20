@@ -28,69 +28,97 @@
 #include <tdebug.h>
 
 #include "id3v2tag.h"
-#include "uniquefileidentifierframe.h"
+#include "tableofcontentsframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
 
-class UniqueFileIdentifierFrame::UniqueFileIdentifierFramePrivate
+class TableOfContentsFrame::TableOfContentsFramePrivate
 {
 public:
-  String owner;
-  ByteVector identifier;
+  ByteVector elementID;
+  bool isTopLevel;
+  bool isOrdered;
+  ByteVectorList childElements;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const ByteVector &data) :
+TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data) :
     ID3v2::Frame(data)
 {
-  d = new UniqueFileIdentifierFramePrivate;
+  d = new TableOfContentsFramePrivate;
   setData(data);
 }
 
-UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const String &owner, const ByteVector &id) :
-    ID3v2::Frame("UFID")
+TableOfContentsFrame::TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch) :
+    ID3v2::Frame("CTOC")
 {
-  d = new UniqueFileIdentifierFramePrivate;
-  d->owner = owner;
-  d->identifier = id;
+  d = new TableOfContentsFramePrivate;
+  d->elementID = eID;
+  d->childElements = ch;
 }
 
-UniqueFileIdentifierFrame::~UniqueFileIdentifierFrame()
+TableOfContentsFrame::~TableOfContentsFrame()
 {
   delete d;
 }
 
-String UniqueFileIdentifierFrame::owner() const
+ByteVector TableOfContentsFrame::elementID() const
 {
-    return d->owner;
+  return d->elementID;
 }
 
-ByteVector UniqueFileIdentifierFrame::identifier() const
+bool TableOfContentsFrame::isTopLevel() const
 {
-  return d->identifier;
+  return d->isTopLevel;
 }
 
-void UniqueFileIdentifierFrame::setOwner(const String &s)
+bool TableOfContentsFrame::isOrdered() const
 {
-  d->owner = s;
+  return d->isOrdered;
 }
 
-void UniqueFileIdentifierFrame::setIdentifier(const ByteVector &v)
+unsigned char TableOfContentsFrame::entryCount() const
 {
-  d->identifier = v;
+  return (unsigned char)(d->childElements.size());
 }
 
-String UniqueFileIdentifierFrame::toString() const
+ByteVectorList TableOfContentsFrame::childElements const
+{
+  return d->childElements;
+}
+
+void TableOfContentsFrame::setElementID(const ByteVector &eID)
+{
+  d->elementID = eID;
+}
+
+void TableOfContentsFrame::setIsTopLevel(const bool &t)
+{
+  d->isTopLevel = t;
+}
+
+void TableOfContentsFrame::setIsOrdered(const bool &o)
+{
+  d->isOrdered = o;
+}
+
+void TableOfContentsFrame::setChildElements(const ByteVectorList &l)
+{
+  d->childElements = l;
+}
+
+String TableOfContentsFrame::toString() const
 {
   return String::null;
 }
 
-PropertyMap UniqueFileIdentifierFrame::asProperties() const
+PropertyMap TableOfContentsFrame::asProperties() const
 {
+  //DODELAT
   PropertyMap map;
   if(d->owner == "http://musicbrainz.org") {
     map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
@@ -101,24 +129,25 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
   return map;
 }
 
-UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::Tag *tag, const String &o) // static
+TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag, const ByteVector &eID) // static
 {
-  ID3v2::FrameList comments = tag->frameList("UFID");
+  ID3v2::FrameList comments = tag->frameList("CTOC");
 
   for(ID3v2::FrameList::ConstIterator it = comments.begin();
       it != comments.end();
       ++it)
   {
-    UniqueFileIdentifierFrame *frame = dynamic_cast<UniqueFileIdentifierFrame *>(*it);
-    if(frame && frame->owner() == o)
+    TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
+    if(frame && frame->elementID() == eID)
       return frame;
   }
 
   return 0;
 }
 
-void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
+void TableOfContentsFrame::parseFields(const ByteVector &data)
 {
+  //DODELAT
   if(data.size() < 1) {
     debug("An UFID frame must contain at least 1 byte.");
     return;
@@ -129,8 +158,9 @@ void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
   d->identifier = data.mid(pos);
 }
 
-ByteVector UniqueFileIdentifierFrame::renderFields() const
+ByteVector TableOfContentsFrame::renderFields() const
 {
+  //DODELAT
   ByteVector data;
 
   data.append(d->owner.data(String::Latin1));
@@ -140,9 +170,9 @@ ByteVector UniqueFileIdentifierFrame::renderFields() const
   return data;
 }
 
-UniqueFileIdentifierFrame::UniqueFileIdentifierFrame(const ByteVector &data, Header *h) :
+TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data, Header *h) :
   Frame(h)
 {
-  d = new UniqueFileIdentifierFramePrivate;
+  d = new TableOfContentsFramePrivate;
   parseFields(fieldData(data));
 }
