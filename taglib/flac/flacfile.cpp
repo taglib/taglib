@@ -399,7 +399,7 @@ void FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool isLastBlock = (header[0] & 0x80) != 0;
-  uint length = header.toUInt(1U, 3U);
+  uint length = header.toUInt24(1U);
 
   // First block should be the stream_info metadata
 
@@ -419,7 +419,7 @@ void FLAC::File::scan()
     header = readBlock(4);
     blockType = header[0] & 0x7f;
     isLastBlock = (header[0] & 0x80) != 0;
-    length = header.toUInt(1U, 3U);
+    length = header.toUInt24(1U);
 
     ByteVector data = readBlock(length);
     if(data.size() != length || length == 0) {
