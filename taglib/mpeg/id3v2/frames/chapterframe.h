@@ -62,7 +62,7 @@ namespace TagLib {
       ~ChapterFrame();
       
       /*!
-       * Returns the elementID of the frame. Element ID
+       * Returns the element ID of the frame. Element ID
        * is a null terminated string, however it's not human-readable.
        * 
        * \see setElementID()
@@ -100,9 +100,9 @@ namespace TagLib {
       uint endOffset() const;
 
       /*!
-       * Sets the elementID of the frame to \a eID. 
+       * Sets the element ID of the frame to \a eID. If \a eID isn't
+       * null terminated, a null char is appended automatically.
        * 
-       * \warning Element ID must be null terminated.
        * \see elementID()
        */
       void setElementID(const ByteVector &eID);

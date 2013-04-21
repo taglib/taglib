@@ -88,10 +88,9 @@ namespace TagLib {
        * Returns count of child elements of the frame. It allways
        * corresponds to size of child elements list.
        * 
-       * \note Return type should be uint8_t, not unsigned char.
        * \see childElements()
        */
-      unsigned char entryCount() const;
+      uint entryCount() const;
       
       /*!
        * Returns list of child elements of the frame.
@@ -101,9 +100,9 @@ namespace TagLib {
       ByteVectorList childElements() const;
 
       /*!
-       * Sets the elementID of the frame to \a eID. 
+       * Sets the elementID of the frame to \a eID. If \a eID isn't
+       * null terminated, a null char is appended automatically.
        * 
-       * \warning Element ID must be null terminated.
        * \see elementID()
        */
       void setElementID(const ByteVector &eID);
@@ -143,6 +142,15 @@ namespace TagLib {
        * \see elementID()
        */
       static TableOfContentsFrame *findByElementID(const Tag *tag, const ByteVector &eID);
+      
+      /*!
+       * CTOC frames each contain a flag that indicates, if CTOC frame is top-level (there isn't
+       * any frame, which contains this frame in its child elements list). Only a single frame 
+       * within tag can be top-level. This searches for a top-level CTOC frame.
+       *
+       * \see isTopLevel()
+       */
+      static TableOfContentsFrame *findTopLevel(const Tag *tag);
 
     protected:
       virtual void parseFields(const ByteVector &data);

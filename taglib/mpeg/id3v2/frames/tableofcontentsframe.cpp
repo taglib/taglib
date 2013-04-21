@@ -81,9 +81,9 @@ bool TableOfContentsFrame::isOrdered() const
   return d->isOrdered;
 }
 
-unsigned char TableOfContentsFrame::entryCount() const
+uint TableOfContentsFrame::entryCount() const
 {
-  return (unsigned char)(d->childElements.size());
+  return d->childElements.size();
 }
 
 ByteVectorList TableOfContentsFrame::childElements const
@@ -94,6 +94,8 @@ ByteVectorList TableOfContentsFrame::childElements const
 void TableOfContentsFrame::setElementID(const ByteVector &eID)
 {
   d->elementID = eID;
+  if(eID.at(eID.size() - 1) != char(0))
+    d->elementID.append(char(0));
 }
 
 void TableOfContentsFrame::setIsTopLevel(const bool &t)
@@ -118,23 +120,19 @@ String TableOfContentsFrame::toString() const
 
 PropertyMap TableOfContentsFrame::asProperties() const
 {
-  //DODELAT
   PropertyMap map;
-  if(d->owner == "http://musicbrainz.org") {
-    map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
-  }
-  else {
-    map.unsupportedData().append(frameID() + String("/") + d->owner);
-  }
+
+  map.unsupportedData().append(frameID() + String("/") + d->elementID);
+  
   return map;
 }
 
 TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag, const ByteVector &eID) // static
 {
-  ID3v2::FrameList comments = tag->frameList("CTOC");
+  ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
-  for(ID3v2::FrameList::ConstIterator it = comments.begin();
-      it != comments.end();
+  for(ID3v2::FrameList::ConstIterator it = tablesOfContents.begin();
+      it != tablesOfContents.end();
       ++it)
   {
     TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
@@ -145,28 +143,63 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
   return 0;
 }
 
+TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const Tag *tag) // static
+{
+  ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
+
+  for(ID3v2::FrameList::ConstIterator it = tablesOfContents.begin();
+      it != tablesOfContents.end();
+      ++it)
+  {
+    TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
+    if(frame && frame->isTopLevel() == true)
+      return frame;
+  }
+
+  return 0;
+}
+
 void TableOfContentsFrame::parseFields(const ByteVector &data)
 {
-  //DODELAT
-  if(data.size() < 1) {
-    debug("An UFID frame must contain at least 1 byte.");
+  if(data.size() < 6) {
+    debug("An CTOC frame must contain at least 6 bytes (1 byte element ID terminated by null, 1 byte flags, 1 byte entry count and 1 byte child element ID terminated by null.");
     return;
   }
 
   int pos = 0;
-  d->owner = readStringField(data, String::Latin1, &pos);
-  d->identifier = data.mid(pos);
+  d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
+  d->elementID.append(char(0));
+  d->isTopLevel = (data.at(pos++) & 2) > 0;
+  d->isOrdered = (data.at(pos++) & 1) > 0;
+  uint entryCount = data.at(pos++);
+  for(int i = 0; i < entryCount; i++)
+  {
+    ByteVector childElementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
+    childElementID.append(char(0));
+    d->childElements.append(childElementID);
+  }
 }
 
 ByteVector TableOfContentsFrame::renderFields() const
 {
-  //DODELAT
   ByteVector data;
 
-  data.append(d->owner.data(String::Latin1));
+  data.append(d->elementID);
   data.append(char(0));
-  data.append(d->identifier);
-
+  char flags = 0;
+  if(d->isTopLevel)
+    flags += 2;
+  if(d->isOrdered)
+    flags += 1;
+  data.append(flags);
+  data.append((char)(entryCount()));
+  ConstIterator it = d->childElements.begin();
+  while(it != d->childElements.end()) {
+    data.append(*it);
+    data.append(char(0));
+    it++;
+  }
+  
   return data;
 }
 
