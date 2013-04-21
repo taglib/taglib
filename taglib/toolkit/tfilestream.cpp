@@ -43,16 +43,15 @@
 
 using namespace TagLib;
 
-namespace {
+namespace 
+{
 #ifdef _WIN32
 
-  // For Windows 
+  // Using Win32 native API instead of standard C file I/O to reduce the resource consumption.
 
   typedef FileName FileNameHandle;
 
-  // Using native file handles instead of file descriptors for reducing the resource consumption.
-
-  const HANDLE InvalidFile = INVALID_HANDLE_VALUE;
+# define INVALID_FILE INVALID_HANDLE_VALUE
 
   HANDLE openFile(const FileName &path, bool readOnly)
   {
@@ -60,8 +59,10 @@ namespace {
 
     if(!path.wstr().empty())
       return CreateFileW(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    else
+    else if(!path.str().empty())
       return CreateFileA(path, access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    else
+      return INVALID_FILE;
   }
 
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
@@ -114,9 +115,7 @@ namespace {
 
 #else
 
-  // For non-Windows 
-
-  FILE *const InvalidFile = 0;
+# define INVALID_FILE 0
 
   struct FileNameHandle : public std::string
   {
@@ -155,7 +154,7 @@ public:
 };
 
 FileStream::FileStreamPrivate::FileStreamPrivate(const FileName &fileName, bool openReadOnly) :
-  file(InvalidFile),
+  file(INVALID_FILE),
   name(fileName),
   readOnly(true),
   size(0)
@@ -165,12 +164,12 @@ FileStream::FileStreamPrivate::FileStreamPrivate(const FileName &fileName, bool 
   if(!openReadOnly)
     file = openFile(name, false);
 
-  if(file != InvalidFile)
+  if(file != INVALID_FILE)
     readOnly = false;
   else
     file = openFile(name, true);
 
-  if(file == InvalidFile) 
+  if(file == INVALID_FILE) 
   {
 # ifdef _WIN32
 
@@ -398,7 +397,7 @@ bool FileStream::readOnly() const
 
 bool FileStream::isOpen() const
 {
-  return (d->file != InvalidFile);
+  return (d->file != INVALID_FILE);
 }
 
 void FileStream::seek(long offset, Position p)
@@ -489,6 +488,21 @@ long FileStream::length()
   if(d->size > 0)
     return d->size;
 
+#ifdef _WIN32
+
+  LARGE_INTEGER fileSize;
+  if(GetFileSizeEx(d->file, &fileSize)) {
+    d->size = static_cast<ulong>(fileSize.QuadPart);
+    return d->size;
+  }
+  else {
+    debug("File::length() -- Failed to get the file size.");
+    d->size = 0;
+    return 0;
+  }
+
+#else
+
   const long curpos = tell();
 
   seek(0, End);
@@ -498,6 +512,8 @@ long FileStream::length()
 
   d->size = endpos;
   return endpos;
+
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
