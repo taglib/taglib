@@ -49,8 +49,8 @@ namespace TagLib {
     const std::string  &str()  const { return m_name; }  
 
   private:
-    std::string m_name;
-    std::wstring m_wname;
+    const std::string  m_name;
+    const std::wstring m_wname;
   };
 #else
   typedef const char *FileName;
