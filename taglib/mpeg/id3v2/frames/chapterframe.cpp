@@ -98,6 +98,8 @@ uint ChapterFrame::endOffset() const
 void ChapterFrame::setElementID(const ByteVector &eID)
 {
   d->elementID = eID;
+  if(eID.at(eID.size() - 1) != char(0))
+    d->elementID.append(char(0));
 }
 
 void ChapterFrame::setStartTime(const uint &sT)
@@ -120,21 +122,17 @@ void ChapterFrame::setEndOffset(const uint &eO)
   d->endOffset = eO;
 }
 
-String UniqueFileIdentifierFrame::toString() const
+String ChapterFrame::toString() const
 {
   return String::null;
 }
 
-PropertyMap ChapterFrame::asProperties() const
+PropertyMap UniqueFileIdentifierFrame::asProperties() const
 {
-  //DODELAT
   PropertyMap map;
-  if(d->owner == "http://musicbrainz.org") {
-    map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
-  }
-  else {
-    map.unsupportedData().append(frameID() + String("/") + d->owner);
-  }
+
+  map.unsupportedData().append(frameID() + String("/") + d->elementID);
+  
   return map;
 }
 
@@ -156,25 +154,32 @@ ChapterFrame *ChapterFrame::findByElementID(const Tag *tag, const ByteVector &eI
 
 void ChapterFrame::parseFields(const ByteVector &data)
 {
-  //DODELAT
-  if(data.size() < 1) {
-    debug("An UFID frame must contain at least 1 byte.");
+  if(data.size() < 18) {
+    debug("An CHAP frame must contain at least 18 bytes (1 byte element ID terminated by null and 4x4 bytes for start and end time and offset).");
     return;
   }
 
   int pos = 0;
-  d->owner = readStringField(data, String::Latin1, &pos);
-  d->identifier = data.mid(pos);
+  d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
+  d->elementID.append(char(0));
+  d->startTime = data.mid(pos, 4).toUInt(true);
+  pos += 4;
+  d->endTime = data.mid(pos, 4).toUInt(true);
+  pos += 4;
+  d->startOffset = data.mid(pos, 4).toUInt(true);
+  pos += 4;
+  d->endOffset = data.mid(pos, 4).toUInt(true);
 }
 
 ByteVector ChapterFrame::renderFields() const
 {
-  //DODELAT
   ByteVector data;
 
-  data.append(d->owner.data(String::Latin1));
-  data.append(char(0));
-  data.append(d->identifier);
+  data.append(d->elementID);
+  data.append(ByteVector.fromUInt(d->startTime, true));
+  data.append(ByteVector.fromUInt(d->endTime, true));
+  data.append(ByteVector.fromUInt(d->startOffset, true));
+  data.append(ByteVector.fromUInt(d->endOffset, true));
 
   return data;
 }

@@ -45,6 +45,8 @@
 #include "frames/popularimeterframe.h"
 #include "frames/privateframe.h"
 #include "frames/ownershipframe.h"
+#include "frames/chapterframe.h"
+#include "frames/tableofcontentsframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -258,6 +260,16 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
     d->setTextEncoding(f);
     return f;
   }
+  
+  // Chapter (ID3v2 chapters 1.0)
+  
+  if(frameID == "CHAP")
+    return new ChapterFrame(data, header);
+  
+  // Table of contents (ID3v2 chapters 1.0)
+  
+  if(frameID == "CTOC")
+    return new TableOfContentsFrame(data, header);
 
   return new UnknownFrame(data, header);
 }
