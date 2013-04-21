@@ -227,18 +227,13 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
     return 0;
   }
 
-  if(length >= sizeof(T)) {
-    return toNumber<T>(v, offset, mostSignificantByteFirst);
+  T sum = 0;
+  for(size_t i = 0; i < length; i++) {
+    const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
+    sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
   }
-  else {
-    T sum = 0;
-    for(size_t i = 0; i < length; i++) {
-      const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
-      sum |= static_cast<T>(static_cast<uchar>(v[offset + i]) << shift);
-    }
 
-    return sum;
-  }
+  return sum;
 }
 
 template <class T>
