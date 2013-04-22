@@ -490,9 +490,9 @@ long FileStream::length()
 
 #ifdef _WIN32
 
-  LARGE_INTEGER fileSize;
-  if(GetFileSizeEx(d->file, &fileSize)) {
-    d->size = static_cast<ulong>(fileSize.QuadPart);
+  const DWORD fileSize = GetFileSize(d->file, NULL);
+  if(GetLastError() != ERROR_SUCCESS) {
+    d->size = static_cast<ulong>(fileSize);
     return d->size;
   }
   else {
