@@ -36,17 +36,16 @@ namespace TagLib {
   class TAGLIB_EXPORT FileName
   {
   public:
-    FileName(const wchar_t *name) : m_wname(name) {}
-    FileName(const char *name) : m_name(name) {}
+    FileName(const wchar_t *name);
+    FileName(const char *name);
 
-    FileName(const FileName &name) 
-      : m_wname(name.m_wname), m_name(name.m_name) {}
+    FileName(const FileName &name);
 
-    operator const wchar_t *() const { return m_wname.c_str(); }
-    operator const char *() const { return m_name.c_str(); }
+    operator const wchar_t *() const;
+    operator const char *() const;
 
-    const std::wstring &wstr() const { return m_wname; }
-    const std::string  &str()  const { return m_name; }  
+    const std::wstring &wstr() const;
+    const std::string  &str() const; 
 
   private:
     const std::string  m_name;
