@@ -25,8 +25,8 @@
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1
 #cmakedefine   HAVE_GCC_BYTESWAP_32 1
 #cmakedefine   HAVE_GCC_BYTESWAP_64 1
-#cmakedefine   HAVE_MSC_BYTESWAP 1
 #cmakedefine   HAVE_GLIBC_BYTESWAP 1
+#cmakedefine   HAVE_MSC_BYTESWAP 1
 #cmakedefine   HAVE_MAC_BYTESWAP 1
 #cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
@@ -41,4 +41,3 @@
 #cmakedefine   WITH_MP4 1
 
 #cmakedefine TESTS_DIR "@TESTS_DIR@"
-
