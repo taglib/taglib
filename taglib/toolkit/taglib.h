@@ -69,38 +69,38 @@
 
 #if defined(HAVE_STD_ATOMIC)
 # include <atomic>
-#elif defined(HAVE_BOOST_ATOMIC)
-# include <boost/atomic.hpp>
-#elif defined(HAVE_MAC_ATOMIC)
-# include <libkern/OSAtomic.h>
-#elif defined(HAVE_WIN_ATOMIC)
-# include <windows.h>
-#elif defined(HAVE_IA64_ATOMIC)
-# include <ia64intrin.h>
-#endif
-
-#if defined(HAVE_STD_ATOMIC)
 # define TAGLIB_ATOMIC_INT std::atomic<unsigned int>
 # define TAGLIB_ATOMIC_INC(x) x.fetch_add(1)
 # define TAGLIB_ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
 #elif defined(HAVE_BOOST_ATOMIC)
+# include <boost/atomic.hpp>
 # define TAGLIB_ATOMIC_INT boost::atomic<unsigned int>
 # define TAGLIB_ATOMIC_INC(x) x.fetch_add(1)
 # define TAGLIB_ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
 #elif defined(HAVE_GCC_ATOMIC)
-# define TAGLIB_ATOMIC_INT volatile int
+# define TAGLIB_ATOMIC_INT int
 # define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
 # define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+#elif defined(HAVE_WIN_ATOMIC)
+# if !defined(NOMINMAX)
+#   define NOMINMAX
+# endif
+# include <windows.h>
+# define TAGLIB_ATOMIC_INT long
+# define TAGLIB_ATOMIC_INC(x) InterlockedIncrement(&x)
+# define TAGLIB_ATOMIC_DEC(x) InterlockedDecrement(&x)
 #elif defined(HAVE_MAC_ATOMIC)
-# define TAGLIB_ATOMIC_INT volatile int32_t
+# include <libkern/OSAtomic.h>
+# define TAGLIB_ATOMIC_INT int32_t
 # define TAGLIB_ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
 # define TAGLIB_ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
 #elif defined(HAVE_IA64_ATOMIC)
-# define TAGLIB_ATOMIC_INT volatile int
+# include <ia64intrin.h>
+# define TAGLIB_ATOMIC_INT int
 # define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
 # define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
 #else
-# define TAGLIB_ATOMIC_INT volatile int
+# define TAGLIB_ATOMIC_INT int
 # define TAGLIB_ATOMIC_INC(x) (++x)
 # define TAGLIB_ATOMIC_DEC(x) (--x)
 #endif
@@ -204,7 +204,7 @@ namespace TagLib {
     int count() { return refCount; }
 
   private:
-    TAGLIB_ATOMIC_INT refCount;
+    volatile TAGLIB_ATOMIC_INT refCount;
   };
 
 #endif // DO_NOT_DOCUMENT
