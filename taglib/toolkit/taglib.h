@@ -117,7 +117,7 @@
 # include <sys/endian.h>
 #endif
 
-#if defined(HAVE_GCC_BYTESWAP16)
+#if defined(HAVE_GCC_BYTESWAP_16)
 # define TAGLIB_BYTESWAP_16(x) __builtin_bswap16(x)
 #elif defined(HAVE_MSC_BYTESWAP)
 # define TAGLIB_BYTESWAP_16(x) _byteswap_ushort(x)
@@ -129,7 +129,7 @@
 # define TAGLIB_BYTESWAP_16(x) swap16(x)
 #endif
 
-#if defined(HAVE_GCC_BYTESWAP32)
+#if defined(HAVE_GCC_BYTESWAP_32)
 # define TAGLIB_BYTESWAP_32(x) __builtin_bswap32(x)
 #elif defined(HAVE_MSC_BYTESWAP)
 # define TAGLIB_BYTESWAP_32(x) _byteswap_ulong(x)
@@ -141,7 +141,7 @@
 # define TAGLIB_BYTESWAP_32(x) swap32(x)
 #endif
 
-#if defined(HAVE_GCC_BYTESWAP64)
+#if defined(HAVE_GCC_BYTESWAP_64)
 # define TAGLIB_BYTESWAP_64(x) __builtin_bswap64(x)
 #elif defined(HAVE_MSC_BYTESWAP)
 # define TAGLIB_BYTESWAP_64(x) _byteswap_uint64(x)
