@@ -25,32 +25,127 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
-#include "tbyteswap.h"
 
 #include <iostream>
 #include <string.h>
 
-#ifdef HAVE_CODECVT
+#ifdef HAVE_STD_CODECVT
 # include <codecvt>
-namespace {
-  typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
-}
 #else
 # include "unicode.h"
 #endif
 
-namespace {
+namespace 
+{
+  inline TagLib::ushort byteSwap(TagLib::ushort x)
+  {
+#ifdef TAGLIB_BYTESWAP_16
+
+    return TAGLIB_BYTESWAP_16(x);
+
+#else
+
+    return((x >> 8) & 0xff) | ((x & 0xff) << 8);
+
+#endif
+  }
 
   inline unsigned short combine(unsigned char c1, unsigned char c2)
   {
     return (c1 << 8) | c2;
+  }
+
+  void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
+  {
+#ifdef HAVE_STD_CODECVT
+
+    typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
+
+    using namespace TagLib;
+
+    const wchar_t *srcBegin = src;
+    const wchar_t *srcEnd   = srcBegin + srcLength;
+
+    char *dstBegin = dst;
+    char *dstEnd   = dstBegin + dstLength;
+
+    std::mbstate_t st = 0;
+    const wchar_t *source;
+    char *target;
+    std::codecvt_base::result result = utf8_utf16_t().out(
+      st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
+
+    if(result != utf8_utf16_t::ok) {
+      debug("String::copyFromUTF8() - Unicode conversion error.");
+    }
+
+#else
+
+    using namespace Unicode;
+    using namespace TagLib;
+
+    const Unicode::UTF16 *srcBegin = src;
+    const Unicode::UTF16 *srcEnd   = srcBegin + srcLength;
+
+    Unicode::UTF8 *dstBegin = reinterpret_cast<Unicode::UTF8*>(dst);
+    Unicode::UTF8 *dstEnd   = dstBegin + dstLength;
+
+    Unicode::ConversionResult result = Unicode::ConvertUTF16toUTF8(
+      &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
+
+    if(result != Unicode::conversionOK) {
+      debug("String::to8Bit() - Unicode conversion error.");
+    }
+
+#endif
+  }
+
+  void UTF8toUTF16(const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
+  {
+#ifdef HAVE_STD_CODECVT
+
+    typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
+
+    using namespace TagLib;
+
+    const char *srcBegin = src;
+    const char *srcEnd   = srcBegin + srcLength;
+
+    wchar_t *dstBegin = dst;
+    wchar_t *dstEnd   = dstBegin + dstLength;
+
+    std::mbstate_t st = 0;
+    const char *source;
+    wchar_t *target;
+    std::codecvt_base::result result = utf8_utf16_t().in(
+      st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
+
+    if(result != utf8_utf16_t::ok) {
+      debug("String::copyFromUTF8() - Unicode conversion error.");
+    }
+
+#else
+
+    using namespace Unicode;
+    using namespace TagLib;
+
+    const Unicode::UTF8 *srcBegin = reinterpret_cast<const Unicode::UTF8*>(src);
+    const Unicode::UTF8 *srcEnd   = srcBegin + srcLength;
+
+    Unicode::UTF16 *dstBegin = dst;
+    Unicode::UTF16 *dstEnd   = dstBegin + dstLength;
+
+    Unicode::ConversionResult result = Unicode::ConvertUTF8toUTF16(
+      &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
+
+    if(result != Unicode::conversionOK) {
+      debug("String::copyFromUTF8() - Unicode conversion error.");
+    }
+
+#endif 
   }
 }
 
@@ -202,34 +297,7 @@ std::string String::to8Bit(bool unicode) const
   else {
     s.resize(d->data.size() * 4 + 1);
 
-#ifdef HAVE_CODECVT
-
-    std::mbstate_t st = 0;
-    const wchar_t *source;
-    char *target;
-    std::codecvt_base::result result = utf8_utf16_t().out(
-      st, &d->data[0], &d->data[d->data.size()], source, &s[0], &s[s.size()], target);
-
-    if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
-    }
-
-#else
-
-    const Unicode::UTF16 *source = &d->data[0];
-    Unicode::UTF8 *target = reinterpret_cast<Unicode::UTF8*>(&s[0]);
-
-    Unicode::ConversionResult result = Unicode::ConvertUTF16toUTF8(
-      &source, source + d->data.size(),
-      &target, target + s.size(),
-      Unicode::lenientConversion);
-
-    if(result != Unicode::conversionOK) {
-      debug("String::to8Bit() - Unicode conversion error.");
-    }
-
-#endif
-
+    UTF16toUTF8(&d->data[0], d->data.size(), &s[0], s.size());
     s.resize(::strlen(s.c_str()));
   }
 
@@ -371,34 +439,7 @@ ByteVector String::data(Type t) const
     {
       ByteVector v(size() * 4 + 1, 0);
 
-#ifdef HAVE_CODECVT
-
-      std::mbstate_t st = 0;
-      const wchar_t *source;
-      char *target;
-      std::codecvt_base::result result = utf8_utf16_t().out(
-        st, &d->data[0], &d->data[d->data.size()], source, v.data(), v.data() + v.size(), target);
-
-      if(result != utf8_utf16_t::ok) {
-        debug("String::data() - Unicode conversion error.");
-      }
-
-#else
-
-      const Unicode::UTF16 *source = &d->data[0];
-      Unicode::UTF8 *target = reinterpret_cast<Unicode::UTF8*>(v.data());
-
-      Unicode::ConversionResult result = Unicode::ConvertUTF16toUTF8(
-        &source, source + d->data.size(),
-        &target, target + v.size(),
-        Unicode::lenientConversion);
-
-      if(result != Unicode::conversionOK) {
-        debug("String::data() - Unicode conversion error.");
-      }
-
-#endif
-
+      UTF16toUTF8(&d->data[0], d->data.size(), v.data(), v.size());
       v.resize(::strlen(v.data()));
 
       return v;
@@ -730,34 +771,7 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data.resize(length);
 
-#ifdef HAVE_CODECVT
-
-  std::mbstate_t st = 0;
-  const char *source;
-  wchar_t *target;
-  std::codecvt_base::result result = utf8_utf16_t().in(
-    st, s, s + length, source, &d->data[0], &d->data[d->data.size()], target);
-
-  if(result != utf8_utf16_t::ok) {
-    debug("String::copyFromUTF8() - Unicode conversion error.");
-  }
-
-#else
-
-  const Unicode::UTF8 *source = reinterpret_cast<const Unicode::UTF8 *>(s);
-  Unicode::UTF16 *target = &d->data[0];
-
-  Unicode::ConversionResult result = Unicode::ConvertUTF8toUTF16(
-    &source, source + length,
-    &target, target + length,
-    Unicode::lenientConversion);
-
-  if(result != Unicode::conversionOK) {
-    debug("String::copyFromUTF8() - Unicode conversion error.");
-  }
-
-#endif
-
+  UTF8toUTF16(s, length, &d->data[0], d->data.size());
   d->data.resize(::wcslen(d->data.c_str()));
 }
 
@@ -785,7 +799,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
   if(swap) {
     for(size_t i = 0; i < length; ++i)
-      d->data[i] = byteSwap16(static_cast<ushort>(s[i]));
+      d->data[i] = byteSwap(static_cast<ushort>(s[i]));
   }
 }
 
@@ -836,7 +850,16 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 #endif
 }
 
-const String::Type String::WCharByteOrder = isLittleEndianSystem ? String::UTF16LE : String::UTF16BE;
+#ifdef TAGLIB_LITTLE_ENDIAN
+
+const String::Type String::WCharByteOrder = String::UTF16LE;
+
+#else
+
+const String::Type String::WCharByteOrder = String::UTF16BE;
+
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

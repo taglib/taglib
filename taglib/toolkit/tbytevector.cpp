@@ -30,7 +30,6 @@
 #include <tdebug.h>
 
 #include "tbytevector.h"
-#include "tbyteswap.h"
 
 // This is a bit ugly to keep writing over and over again.
 
@@ -186,19 +185,53 @@ T byteSwap(T x)
 template <>
 ushort byteSwap<ushort>(ushort x)
 {
-  return byteSwap16(x);
+#ifdef TAGLIB_BYTESWAP_16
+
+  return TAGLIB_BYTESWAP_16(x);
+
+#else
+
+  return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
+
+#endif
 }
 
 template <>
 uint byteSwap<uint>(uint x)
 {
-  return byteSwap32(x);
+#ifdef TAGLIB_BYTESWAP_32
+
+  return TAGLIB_BYTESWAP_32(x);
+
+#else
+
+  return ((x & 0xff000000u) >> 24) 
+    | ((x & 0x00ff0000u) >>  8) 
+    | ((x & 0x0000ff00u) <<  8)
+    | ((x & 0x000000ffu) << 24);
+
+#endif
 }
 
 template <>
 ulonglong byteSwap<ulonglong>(ulonglong x)
 {
-  return byteSwap64(x);
+#ifdef TAGLIB_BYTESWAP_64
+
+  return TAGLIB_BYTESWAP_64(x);
+
+#else
+
+  return ((x & 0xff00000000000000ull) >> 56)
+    | ((x & 0x00ff000000000000ull) >> 40)
+    | ((x & 0x0000ff0000000000ull) >> 24)
+    | ((x & 0x000000ff00000000ull) >> 8)
+    | ((x & 0x00000000ff000000ull) << 8)
+    | ((x & 0x0000000000ff0000ull) << 24)
+    | ((x & 0x000000000000ff00ull) << 40)
+    | ((x & 0x00000000000000ffull) << 56);
+
+#endif
 }
 
 template <class T>
@@ -213,7 +246,12 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   T tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-  if(isLittleEndianSystem == mostSignificantByteFirst)
+#ifdef TAGLIB_LITTLE_ENDIAN
+  const bool swap = mostSignificantByteFirst;
+#else
+  const bool swap != mostSignificantByteFirst;
+#endif
+  if(swap)
     return byteSwap<T>(tmp);
   else
     return tmp;
@@ -241,7 +279,12 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
   const size_t size = sizeof(T);
 
-  if(isLittleEndianSystem == mostSignificantByteFirst)
+#ifdef TAGLIB_LITTLE_ENDIAN
+  const bool swap = mostSignificantByteFirst;
+#else
+  const bool swap != mostSignificantByteFirst;
+#endif
+ if(swap)
     value = byteSwap<T>(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), size);

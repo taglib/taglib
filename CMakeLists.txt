@@ -21,7 +21,6 @@ option(BUILD_EXAMPLES "Build the examples"  OFF)
 
 option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
 
-add_definitions(-DHAVE_CONFIG_H)
 set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
 ## the following are directories where stuff will be installed to

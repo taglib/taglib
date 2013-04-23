@@ -27,9 +27,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #ifdef _WIN32
 # include <Shlwapi.h>
