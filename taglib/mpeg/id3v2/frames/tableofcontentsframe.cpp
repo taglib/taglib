@@ -86,7 +86,7 @@ uint TableOfContentsFrame::entryCount() const
   return d->childElements.size();
 }
 
-ByteVectorList TableOfContentsFrame::childElements const
+ByteVectorList TableOfContentsFrame::childElements() const
 {
   return d->childElements;
 }
