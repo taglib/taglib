@@ -709,7 +709,7 @@ String &String::operator=(wchar_t c)
   if(d->deref())
     delete d;
 
-  d = new StringPrivate(1, static_cast<uchar>(c));
+  d = new StringPrivate(1, c);
   return *this;
 }
 
