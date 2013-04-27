@@ -203,15 +203,15 @@ ByteVector Ogg::PageHeader::render() const
 
   // absolute granular position
 
-  data.append(ByteVector::fromUInt64(d->absoluteGranularPosition, false));
+  data.append(ByteVector::fromUInt64LE(d->absoluteGranularPosition));
 
   // stream serial number
 
-  data.append(ByteVector::fromUInt32(d->streamSerialNumber, false));
+  data.append(ByteVector::fromUInt32LE(d->streamSerialNumber));
 
   // page sequence number
 
-  data.append(ByteVector::fromUInt32(d->pageSequenceNumber, false));
+  data.append(ByteVector::fromUInt32LE(d->pageSequenceNumber));
 
   // checksum -- this is left empty and should be filled in by the Ogg::Page
   // class
@@ -255,9 +255,9 @@ void Ogg::PageHeader::read()
   d->firstPageOfStream = flags.test(1);
   d->lastPageOfStream = flags.test(2);
 
-  d->absoluteGranularPosition = data.mid(6, 8).toInt64(false);
-  d->streamSerialNumber = data.mid(14, 4).toUInt32(false);
-  d->pageSequenceNumber = data.mid(18, 4).toUInt32(false);
+  d->absoluteGranularPosition = data.toInt64LE(6);
+  d->streamSerialNumber = data.toUInt32LE(14);
+  d->pageSequenceNumber = data.toUInt32LE(18);
 
   // Byte number 27 is the number of page segments, which is the only variable
   // length portion of the page header.  After reading the number of page

@@ -29,7 +29,6 @@
 #include <string.h>
 
 #include "tbytevector.h"
-#include "tbyteswap.h"
 
 // This is a bit ugly to keep writing over and over again.
 
@@ -175,7 +174,7 @@ size_t findVector(
 }
 
 template <class T>
-T byteSwap(T x)
+inline T byteSwap(T x)
 {
   // There should be all counterparts of to*() and from*() overloads for integral types.
   debug("byteSwap<T>() -- Non specialized version should not be called");
@@ -183,57 +182,129 @@ T byteSwap(T x)
 }
 
 template <>
-ushort byteSwap<ushort>(ushort x)
+inline ushort byteSwap<ushort>(ushort x)
 {
-  return byteSwap16(x);
+#ifdef TAGLIB_BYTESWAP_16
+
+  return TAGLIB_BYTESWAP_16(x);
+
+#else
+
+  return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
+
+#endif
 }
 
 template <>
-uint byteSwap<uint>(uint x)
+inline uint byteSwap<uint>(uint x)
 {
-  return byteSwap32(x);
+#ifdef TAGLIB_BYTESWAP_32
+
+  return TAGLIB_BYTESWAP_32(x);
+
+#else
+
+  return ((x & 0xff000000u) >> 24) 
+    | ((x & 0x00ff0000u) >>  8) 
+    | ((x & 0x0000ff00u) <<  8)
+    | ((x & 0x000000ffu) << 24);
+
+#endif
 }
 
 template <>
-ulonglong byteSwap<ulonglong>(ulonglong x)
+inline ulonglong byteSwap<ulonglong>(ulonglong x)
 {
-  return byteSwap64(x);
+#ifdef TAGLIB_BYTESWAP_64
+
+  return TAGLIB_BYTESWAP_64(x);
+
+#else
+
+  return ((x & 0xff00000000000000ull) >> 56)
+    | ((x & 0x00ff000000000000ull) >> 40)
+    | ((x & 0x0000ff0000000000ull) >> 24)
+    | ((x & 0x000000ff00000000ull) >> 8)
+    | ((x & 0x00000000ff000000ull) << 8)
+    | ((x & 0x0000000000ff0000ull) << 24)
+    | ((x & 0x000000000000ff00ull) << 40)
+    | ((x & 0x00000000000000ffull) << 56);
+
+#endif
 }
 
-template <class T>
-T toNumber(const ByteVector &v, bool mostSignificantByteFirst)
+namespace {
+  enum Endianness {
+    LittleEndian,
+    BigEndian
+  };
+}
+
+template <typename T, size_t LENGTH, Endianness ENDIAN>
+inline T toNumber(const ByteVector &v, size_t offset)
 {
-  if(v.isEmpty()) {
-    debug("toNumber<T>() -- data is empty, returning 0");
+#ifdef TAGLIB_LITTLE_ENDIAN
+  static const bool swap = (ENDIAN == BigEndian);
+#else
+  static const bool swap = (ENDIAN == LittleEndian);
+#endif
+
+  if(offset + LENGTH > v.size()) {
+    debug("toNumber<T>() -- offset is out of range. Returning 0.");
     return 0;
   }
 
-  if(v.size() >= sizeof(T)) {
-    if(isLittleEndianSystem == mostSignificantByteFirst)
-      return byteSwap<T>(*reinterpret_cast<const T*>(v.data()));
+  if(LENGTH >= sizeof(T)) {
+    // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
+    T tmp;
+    ::memcpy(&tmp, v.data() + offset, sizeof(T));
+
+    if(swap)
+      return byteSwap<T>(tmp);
     else
-      return *reinterpret_cast<const T*>(v.data());
+      return tmp;
   }
   else {
     T sum = 0;
-    for(size_t i = 0; i < v.size(); i++) {
-      const size_t shift = (mostSignificantByteFirst ? v.size() - 1 - i : i) * 8;
-      sum |= static_cast<T>(static_cast<uchar>(v[i]) << shift);
+    for(size_t i = 0; i < LENGTH; i++) {
+      const size_t shift = (ENDIAN == LittleEndian ? i : LENGTH - 1 - i) * 8;
+      sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
     }
 
     return sum;
   }
 }
 
-template <class T>
-ByteVector fromNumber(T value, bool mostSignificantByteFirst)
+template <typename T, Endianness ENDIAN>
+inline ByteVector fromNumber(T value)
 {
-  const size_t size = sizeof(T);
+#ifdef TAGLIB_LITTLE_ENDIAN
+  static const bool swap = (ENDIAN == BigEndian);
+#else
+  static const bool swap = (ENDIAN == LittleEndian);
+#endif
 
-  if(isLittleEndianSystem == mostSignificantByteFirst)
+  if(swap)
     value = byteSwap<T>(value);
 
-  return ByteVector(reinterpret_cast<const char *>(&value), size);
+  return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
+}
+
+template <class T, bool IS_LITTLE_ENDIAN>
+inline void appendNumber(ByteVector &v, T value)
+{
+#ifdef TAGLIB_LITTLE_ENDIAN
+  static const bool swap = !IS_LITTLE_ENDIAN;
+#else
+  static const bool swap = IS_LITTLE_ENDIAN;
+#endif
+
+  if(swap)
+    value = byteSwap<T>(value);
+
+  const size_t offset = v.size();
+  v.resize(offset + sizeof(T));
+  ::memcpy(v.data() + offset, reinterpret_cast<const char *>(&value), sizeof(T));
 }
 
 class DataPrivate
@@ -341,19 +412,34 @@ ByteVector ByteVector::fromCString(const char *s, size_t length)
     return ByteVector(s, length);
 }
 
-ByteVector ByteVector::fromUInt16(size_t value, bool mostSignificantByteFirst)
+ByteVector ByteVector::fromUInt16LE(size_t value)
 {
-  return fromNumber<ushort>(static_cast<ushort>(value), mostSignificantByteFirst);
+  return fromNumber<ushort, LittleEndian>(static_cast<ushort>(value));
 }
 
-ByteVector ByteVector::fromUInt32(size_t value, bool mostSignificantByteFirst)
+ByteVector ByteVector::fromUInt16BE(size_t value)
 {
-  return fromNumber<uint>(static_cast<uint>(value), mostSignificantByteFirst);
+  return fromNumber<ushort, BigEndian>(static_cast<ushort>(value));
 }
 
-ByteVector ByteVector::fromUInt64(ulonglong value, bool mostSignificantByteFirst)
+ByteVector ByteVector::fromUInt32LE(size_t value)
 {
-  return fromNumber<ulonglong>(value, mostSignificantByteFirst);
+  return fromNumber<uint, LittleEndian>(static_cast<uint>(value));
+}
+
+ByteVector ByteVector::fromUInt32BE(size_t value)
+{
+  return fromNumber<uint, BigEndian>(static_cast<uint>(value));
+}
+
+ByteVector ByteVector::fromUInt64LE(ulonglong value)
+{
+  return fromNumber<ulonglong, LittleEndian>(value);
+}
+
+ByteVector ByteVector::fromUInt64BE(ulonglong value)
+{
+  return fromNumber<ulonglong, BigEndian>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -593,6 +679,12 @@ ByteVector &ByteVector::append(const ByteVector &v)
   return *this;
 }
 
+ByteVector &ByteVector::append(char c)
+{
+  resize(size() + 1, c);
+  return *this;
+}
+
 ByteVector &ByteVector::clear()
 {
   detach();
@@ -677,25 +769,56 @@ TagLib::uint ByteVector::checksum() const
   return sum;
 }
 
-TagLib::uint ByteVector::toUInt32(bool mostSignificantByteFirst) const
+short ByteVector::toInt16LE(size_t offset) const
 {
-  return toNumber<uint>(*this, mostSignificantByteFirst);
+  return static_cast<short>(toNumber<ushort, 2, LittleEndian>(*this, offset));
 }
 
-short ByteVector::toInt16(bool mostSignificantByteFirst) const
+short ByteVector::toInt16BE(size_t offset) const
 {
-  return toNumber<unsigned short>(*this, mostSignificantByteFirst);
+  return static_cast<short>(toNumber<ushort, 2, BigEndian>(*this, offset));
 }
 
-unsigned short ByteVector::toUInt16(bool mostSignificantByteFirst) const
+ushort ByteVector::toUInt16LE(size_t offset) const
 {
-  return toNumber<unsigned short>(*this, mostSignificantByteFirst);
+  return toNumber<ushort, 2, LittleEndian>(*this, offset);
 }
 
-long long ByteVector::toInt64(bool mostSignificantByteFirst) const
+ushort ByteVector::toUInt16BE(size_t offset) const
 {
-  return toNumber<unsigned long long>(*this, mostSignificantByteFirst);
+  return toNumber<ushort, 2, BigEndian>(*this, offset);
 }
+
+uint ByteVector::toUInt24LE(size_t offset) const
+{
+  return toNumber<uint, 3, LittleEndian>(*this, offset);
+}
+
+uint ByteVector::toUInt24BE(size_t offset) const
+{
+  return toNumber<uint, 3, BigEndian>(*this, offset);
+}
+
+uint ByteVector::toUInt32LE(size_t offset) const
+{
+  return toNumber<uint, 4, LittleEndian>(*this, offset);
+}
+
+uint ByteVector::toUInt32BE(size_t offset) const
+{
+  return toNumber<uint, 4, BigEndian>(*this, offset);
+}
+
+long long ByteVector::toInt64LE(size_t offset) const
+{
+  return static_cast<long long>(toNumber<ulonglong, 8, LittleEndian>(*this, offset));
+}
+
+long long ByteVector::toInt64BE(size_t offset) const
+{
+  return static_cast<long long>(toNumber<ulonglong, 8, BigEndian>(*this, offset));
+}
+
 
 const char &ByteVector::operator[](size_t index) const
 {

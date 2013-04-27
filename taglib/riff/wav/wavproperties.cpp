@@ -115,12 +115,12 @@ TagLib::uint RIFF::WAV::Properties::sampleFrames() const
 
 void RIFF::WAV::Properties::read(const ByteVector &data)
 {
-  d->format = data.mid(0, 2).toInt16(false);
-  d->channels = data.mid(2, 2).toInt16(false);
-  d->sampleRate = data.mid(4, 4).toUInt32(false);
-  d->sampleWidth = data.mid(14, 2).toInt16(false);
+  d->format      = data.toInt16LE(0);
+  d->channels    = data.toInt16LE(2);
+  d->sampleRate  = data.toUInt32LE(4);
+  d->sampleWidth = data.toInt16LE(14);
 
-  uint byteRate = data.mid(8, 4).toUInt32(false);
+  const uint byteRate = data.toUInt32LE(8);
   d->bitrate = byteRate * 8 / 1000;
 
   d->length = byteRate > 0 ? d->streamLength / byteRate : 0;

@@ -39,8 +39,16 @@
 
 #define UnsignedToFloat(u) (((double)((long)(u - 2147483647L - 1))) + 2147483648.0)
 
-static double ConvertFromIeeeExtended(unsigned char *bytes)
+using namespace TagLib;
+
+static double ConvertFromIeeeExtended(const ByteVector &v, size_t offset)
 {
+  if(offset > v.size() - 10) {
+    debug("ConvertFromIeeeExtended() - offset is out of range. Returning 0.");
+    return 0.0;
+  }
+
+  const unsigned char *bytes = reinterpret_cast<const unsigned char*>(v.data() + offset);
   double f;
   int expon;
   unsigned long hiMant, loMant;
@@ -74,8 +82,6 @@ static double ConvertFromIeeeExtended(unsigned char *bytes)
   else
     return f;
 }
-
-using namespace TagLib;
 
 class RIFF::AIFF::Properties::PropertiesPrivate
 {
@@ -150,10 +156,10 @@ TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
 
 void RIFF::AIFF::Properties::read(const ByteVector &data)
 {
-  d->channels       = data.mid(0, 2).toInt16();
-  d->sampleFrames   = data.mid(2, 4).toUInt32();
-  d->sampleWidth    = data.mid(6, 2).toInt16();
-  double sampleRate = ConvertFromIeeeExtended(reinterpret_cast<unsigned char *>(data.mid(8, 10).data()));
+  d->channels       = data.toInt16BE(0);
+  d->sampleFrames   = data.toUInt32BE(2);
+  d->sampleWidth    = data.toInt16BE(6);
+  double sampleRate = ConvertFromIeeeExtended(data, 8);
   d->sampleRate     = (int)sampleRate;
   d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;

@@ -133,17 +133,17 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
 
   d->textEncoding = String::Type(data[0]);
 
-  int pos = 1;
+  size_t pos = 1;
 
-  d->mimeType = readStringField(data, String::Latin1, &pos);
+  d->mimeType = readStringField(data, String::Latin1, pos);
   /* Now we need at least two more bytes available */
-  if (uint(pos) + 1 >= data.size()) {
+  if (pos + 1 >= data.size()) {
     debug("Truncated picture frame.");
     return;
   }
 
   d->type = (TagLib::ID3v2::AttachedPictureFrame::Type)data[pos++];
-  d->description = readStringField(data, d->textEncoding, &pos);
+  d->description = readStringField(data, d->textEncoding, pos);
 
   d->data = data.mid(pos);
 }
@@ -188,7 +188,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
 
   d->textEncoding = String::Type(data[0]);
 
-  int pos = 1;
+  size_t pos = 1;
 
   String fixedString = String(data.mid(pos, 3), String::Latin1);
   pos += 3;
@@ -203,7 +203,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
   }
 
   d->type = (TagLib::ID3v2::AttachedPictureFrame::Type)data[pos++];
-  d->description = readStringField(data, d->textEncoding, &pos);
+  d->description = readStringField(data, d->textEncoding, pos);
 
   d->data = data.mid(pos);
 }

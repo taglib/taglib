@@ -132,7 +132,7 @@ void FLAC::Properties::read()
   // Maximum frame size (in bytes)
   pos += 3;
 
-  uint flags = d->data.mid(pos, 4).toUInt32(true);
+  uint flags = d->data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleRate = flags >> 12;
@@ -143,7 +143,7 @@ void FLAC::Properties::read()
   // stream length in samples. (Audio files measured in days)
 
   unsigned long long hi = flags & 0xf;
-  unsigned long long lo = d->data.mid(pos, 4).toUInt32(true);
+  unsigned long long lo = d->data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleFrames = (hi << 32) | lo;

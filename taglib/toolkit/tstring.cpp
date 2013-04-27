@@ -32,7 +32,6 @@
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
-#include "tbyteswap.h"
 
 #include <string.h>
 
@@ -45,7 +44,20 @@
 # include "unicode.h"
 #endif
 
-namespace {
+namespace
+{
+  inline TagLib::ushort byteSwap(TagLib::ushort x)
+  {
+#ifdef TAGLIB_BYTESWAP_16
+
+    return TAGLIB_BYTESWAP_16(x);
+
+#else
+
+    return((x >> 8) & 0xff) | ((x & 0xff) << 8);
+
+#endif
+  }
 
   inline unsigned short combine(unsigned char c1, unsigned char c2)
   {
@@ -812,7 +824,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
   if(swap) {
     for(size_t i = 0; i < length; ++i)
-      d->data[i] = byteSwap16(static_cast<unsigned short>(s[i]));
+      d->data[i] = byteSwap(static_cast<unsigned short>(s[i]));
   }
 }
 
@@ -858,7 +870,15 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   internalCopyFromUTF16<sizeof(wchar_t)>(s, length, t);
 }
 
-const String::Type String::WCharByteOrder = isLittleEndianSystem ? String::UTF16LE : String::UTF16BE;
+#ifdef TAGLIB_LITTLE_ENDIAN
+
+const String::Type String::WCharByteOrder = String::UTF16LE;
+
+#else
+
+const String::Type String::WCharByteOrder = String::UTF16BE;
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions

@@ -267,26 +267,21 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     return frameData.mid(frameDataOffset, frameDataLength);
 }
 
-String Frame::readStringField(const ByteVector &data, String::Type encoding, int *position)
+String Frame::readStringField(const ByteVector &data, String::Type encoding, size_t &position)
 {
-  int start = 0;
-
-  if(!position)
-    position = &start;
-
   ByteVector delimiter = textDelimiter(encoding);
 
-  const size_t end = data.find(delimiter, *position, delimiter.size());
-  if(end == ByteVector::npos || end < static_cast<size_t>(*position))
+  const size_t end = data.find(delimiter, position, delimiter.size());
+  if(end == ByteVector::npos || end < position)
     return String::null;
 
   String str;
   if(encoding == String::Latin1)
-    str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
+    str = Tag::latin1StringHandler()->parse(data.mid(position, end - position));
   else
-    str = String(data.mid(*position, end - *position), encoding);
+    str = String(data.mid(position, end - position), encoding);
 
-  *position = static_cast<int>(end + delimiter.size());
+  position = end + delimiter.size();
 
   return str;
 }
@@ -641,7 +636,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
       return;
     }
 
-    d->frameSize = data.mid(3, 3).toUInt32();
+    d->frameSize = data.toUInt24BE(3);
 
     break;
   }
@@ -669,7 +664,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // Set the size -- the frame size is the four bytes starting at byte four in
     // the frame header (structure 4)
 
-    d->frameSize = data.mid(4, 4).toUInt32();
+    d->frameSize = data.toUInt32BE(4);
 
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
@@ -716,7 +711,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // iTunes writes v2.4 tags with v2.3-like frame sizes
     if(d->frameSize > 127) {
       if(!isValidFrameID(data.mid(d->frameSize + 10, 4))) {
-        unsigned int uintSize = data.mid(4, 4).toUInt32();
+        unsigned int uintSize = data.toUInt32BE(4);
         if(isValidFrameID(data.mid(uintSize + 10, 4))) {
           d->frameSize = uintSize;
         }
@@ -830,7 +825,7 @@ ByteVector Frame::Header::render() const
 
   ByteVector v = d->frameID +
     (d->version == 3
-      ? ByteVector::fromUInt32(d->frameSize)
+      ? ByteVector::fromUInt32BE(d->frameSize)
       : SynchData::fromUInt(d->frameSize)) +
     flags;
 

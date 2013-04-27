@@ -143,7 +143,10 @@ void RIFF::File::setChunkData(uint i, const ByteVector &data)
   // First we update the global size
 
   d->size += ((data.size() + 1) & ~1) - (d->chunks[i].size + d->chunks[i].padding);
-  insert(ByteVector::fromUInt32(d->size, d->endianness == BigEndian), 4, 4);
+  if(d->endianness == BigEndian)
+    insert(ByteVector::fromUInt32BE(d->size), 4, 4);
+  else
+    insert(ByteVector::fromUInt32LE(d->size), 4, 4);
 
   // Now update the specific chunk
 
@@ -186,7 +189,10 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // First we update the global size
 
   d->size += static_cast<uint>((offset & 1) + data.size() + 8);
-  insert(ByteVector::fromUInt32(d->size, d->endianness == BigEndian), 4, 4);
+  if(d->endianness == BigEndian)
+    insert(ByteVector::fromUInt32BE(d->size), 4, 4);
+  else
+    insert(ByteVector::fromUInt32LE(d->size), 4, 4);
 
   // Now add the chunk to the file
 
@@ -254,16 +260,23 @@ static bool isValidChunkID(const ByteVector &name)
 
 void RIFF::File::read()
 {
-  bool bigEndian = (d->endianness == BigEndian);
-
   d->type = readBlock(4);
-  d->size = readBlock(4).toUInt32(bigEndian);
+
+  if(d->endianness == BigEndian)
+    d->size = readBlock(4).toUInt32BE(0);
+  else
+    d->size = readBlock(4).toUInt32LE(0);
+
   d->format = readBlock(4);
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
-    uint chunkSize = readBlock(4).toUInt32(bigEndian);
+    uint chunkSize;
+    if(d->endianness == BigEndian)
+      chunkSize = readBlock(4).toUInt32BE(0);
+    else
+      chunkSize = readBlock(4).toUInt32LE(0);
 
     if(!isValidChunkID(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
@@ -310,7 +323,12 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
     combined.append(ByteVector(leadingPadding, '\x00'));
   }
   combined.append(name);
-  combined.append(ByteVector::fromUInt32(data.size(), d->endianness == BigEndian));
+
+  if(d->endianness == BigEndian)
+    combined.append(ByteVector::fromUInt32BE(data.size()));
+  else
+    combined.append(ByteVector::fromUInt32LE(data.size()));
+
   combined.append(data);
   if((data.size() & 0x01) != 0) {
     combined.append('\x00');

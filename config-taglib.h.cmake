@@ -3,11 +3,24 @@
 /* Define if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 
+/* Indicates the endianness of your target system */
+#cmakedefine   TAGLIB_LITTLE_ENDIAN 1
+#cmakedefine   TAGLIB_BIG_ENDIAN 1
+
 /* Defined if your compiler supports the move semantics */
 #cmakedefine   SUPPORT_MOVE_SEMANTICS 1
 
 /* Defined if your compiler supports the template alias */
 #cmakedefine   SUPPORT_TEMPLATE_ALIAS 1
+
+/* Defined if your compiler supports some byte swap functions */
+#cmakedefine   HAVE_GCC_BYTESWAP_16 1
+#cmakedefine   HAVE_GCC_BYTESWAP_32 1
+#cmakedefine   HAVE_GCC_BYTESWAP_64 1
+#cmakedefine   HAVE_GLIBC_BYTESWAP 1
+#cmakedefine   HAVE_MSC_BYTESWAP 1
+#cmakedefine   HAVE_MAC_BYTESWAP 1
+#cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
 /* Defined if your compiler supports shared_ptr */
 #cmakedefine   HAVE_STD_SHARED_PTR 1
@@ -16,6 +29,9 @@
 
 /* Defined if your compiler has <codecvt> header */
 #cmakedefine   HAVE_CODECVT 1
+
+/* Define if you have libz */
+#cmakedefine   HAVE_ZLIB 1
 
 #cmakedefine   NO_ITUNES_HACKS 1
 #cmakedefine   WITH_ASF 1

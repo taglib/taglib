@@ -141,17 +141,17 @@ void WavPack::Properties::read()
   if(!d->data.startsWith("wvpk"))
     return;
 
-  d->version = d->data.mid(8, 2).toInt16(false);
+  d->version = d->data.toInt16LE(8);
   if(d->version < MIN_STREAM_VERS || d->version > MAX_STREAM_VERS)
     return;
 
-  unsigned int flags = d->data.mid(24, 4).toUInt32(false);
+  const uint flags = d->data.toUInt32LE(24);
   d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 -
     ((flags & SHIFT_MASK) >> SHIFT_LSB);
   d->sampleRate = sample_rates[(flags & SRATE_MASK) >> SRATE_LSB];
   d->channels = (flags & MONO_FLAG) ? 1 : 2;
 
-  unsigned int samples = d->data.mid(12, 4).toUInt32(false);
+  uint samples = d->data.toUInt32LE(12);
   if(samples == ~0u) {
     if(d->style != Fast) {
       samples = seekFinalIndex();
@@ -179,14 +179,14 @@ unsigned int WavPack::Properties::seekFinalIndex()
     ByteVector data = d->file->readBlock(32);
     if(data.size() != 32)
       return 0;
-    int version = data.mid(8, 2).toInt16(false);
+    const int version = data.toInt16LE(8);
     if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
       continue;
-    unsigned int flags = data.mid(24, 4).toUInt32(false);
+    const uint flags = data.toUInt32LE(24);
     if(!(flags & FINAL_BLOCK))
       return 0;
-    unsigned int blockIndex = data.mid(16, 4).toUInt32(false);
-    unsigned int blockSamples = data.mid(20, 4).toUInt32(false);
+    const uint blockIndex = data.toUInt32LE(16);
+    const uint blockSamples = data.toUInt32LE(20);
     return blockIndex + blockSamples;
   }
 

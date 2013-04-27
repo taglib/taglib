@@ -63,22 +63,22 @@ void Mod::FileBase::writeByte(uchar byte)
 
 void Mod::FileBase::writeU16L(ushort number)
 {
-  writeBlock(ByteVector::fromUInt16(number, false));
+  writeBlock(ByteVector::fromUInt16LE(number));
 }
 
 void Mod::FileBase::writeU32L(uint number)
 {
-  writeBlock(ByteVector::fromUInt32(number, false));
+  writeBlock(ByteVector::fromUInt32LE(number));
 }
 
 void Mod::FileBase::writeU16B(ushort number)
 {
-  writeBlock(ByteVector::fromUInt16(number, true));
+  writeBlock(ByteVector::fromUInt16BE(number));
 }
 
 void Mod::FileBase::writeU32B(uint number)
 {
-  writeBlock(ByteVector::fromUInt32(number, true));
+  writeBlock(ByteVector::fromUInt32BE(number));
 }
 
 bool Mod::FileBase::readByte(uchar &byte)
@@ -93,14 +93,14 @@ bool Mod::FileBase::readU16L(ushort &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;
-  number = data.toUInt16(false);
+  number = data.toUInt16LE(0);
   return true;
 }
 
 bool Mod::FileBase::readU32L(uint &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
-  number = data.toUInt32(false);
+  number = data.toUInt32LE(0);
   return true;
 }
 
@@ -108,13 +108,13 @@ bool Mod::FileBase::readU16B(ushort &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;
-  number = data.toUInt16(true);
+  number = data.toUInt16BE(0);
   return true;
 }
 
 bool Mod::FileBase::readU32B(uint &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
-  number = data.toUInt32(true);
+  number = data.toUInt32BE(0);
   return true;
 }

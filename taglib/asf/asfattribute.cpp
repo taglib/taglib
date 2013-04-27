@@ -281,24 +281,24 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   switch (d->type) {
   case WordType:
-    data.append(ByteVector::fromUInt16(d->shortValue, false));
+    data.append(ByteVector::fromUInt16LE(d->shortValue));
     break;
 
   case BoolType:
     if(kind == 0) {
-      data.append(ByteVector::fromUInt32(d->boolValue ? 1 : 0, false));
+      data.append(ByteVector::fromUInt32LE(d->boolValue ? 1 : 0));
     }
     else {
-      data.append(ByteVector::fromUInt16(d->boolValue ? 1 : 0, false));
+      data.append(ByteVector::fromUInt16LE(d->boolValue ? 1 : 0));
     }
     break;
 
   case DWordType:
-    data.append(ByteVector::fromUInt32(d->intValue, false));
+    data.append(ByteVector::fromUInt32LE(d->intValue));
     break;
 
   case QWordType:
-    data.append(ByteVector::fromUInt64(d->longLongValue, false));
+    data.append(ByteVector::fromUInt64LE(d->longLongValue));
     break;
 
   case UnicodeType:
@@ -317,17 +317,17 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   if(kind == 0) {
     data = File::renderString(name, true) +
-           ByteVector::fromUInt16((int)d->type, false) +
-           ByteVector::fromUInt16(data.size(), false) +
+           ByteVector::fromUInt16LE((int)d->type) +
+           ByteVector::fromUInt16LE(data.size()) +
            data;
   }
   else {
     ByteVector nameData = File::renderString(name);
-    data = ByteVector::fromUInt16(kind == 2 ? d->language : 0, false) +
-           ByteVector::fromUInt16(d->stream, false) +
-           ByteVector::fromUInt16(nameData.size(), false) +
-           ByteVector::fromUInt16((int)d->type, false) +
-           ByteVector::fromUInt32(data.size(), false) +
+    data = ByteVector::fromUInt16LE(kind == 2 ? d->language : 0) +
+           ByteVector::fromUInt16LE(d->stream) +
+           ByteVector::fromUInt16LE(nameData.size()) +
+           ByteVector::fromUInt16LE((int)d->type) +
+           ByteVector::fromUInt32LE(data.size()) +
            nameData +
            data;
   }

@@ -52,10 +52,10 @@ MP4::Atom::Atom(File *file)
     return;
   }
 
-  length = header.mid(0, 4).toUInt32();
+  length = header.toUInt32BE(0);
 
   if (length == 1) {
-    long long longLength = file->readBlock(8).toInt64();
+    long long longLength = file->readBlock(8).toInt64BE(0);
     if (longLength >= 8 && longLength <= 0xFFFFFFFF) {
         // The atom has a 64-bit length, but it's actually a 32-bit value
         length = (long)longLength;
