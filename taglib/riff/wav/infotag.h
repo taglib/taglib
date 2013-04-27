@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2012 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -82,7 +82,7 @@ namespace TagLib {
      * This is the main class in the INFO tag implementation.  RIFF INFO tag is a 
      * metadata format found in WAV audio and AVI video files.  Though it is a part 
      * of Microsoft/IBM's RIFF specification, the author could not find the official 
-     * documents about it.  So, this implementation is refering to unofficial documents 
+     * documents about it.  So, this implementation is referring to unofficial documents 
      * online and some applications' behaviors especially Windows Explorer.
      */
     class TAGLIB_EXPORT Tag : public TagLib::Tag
