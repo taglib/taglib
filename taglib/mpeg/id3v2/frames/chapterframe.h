@@ -27,6 +27,7 @@
 #define TAGLIB_CHAPTERFRAME
 
 #include "id3v2frame.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 
@@ -87,6 +88,7 @@ namespace TagLib {
        * Returns zero based byte offset (count of bytes from the beginning
        * of the audio file) of chapter's start.
        * 
+       * \note If returned value is 0xFFFFFFFF, start time should be used instead.
        * \see setStartOffset()
        */
       uint startOffset() const;
@@ -95,6 +97,7 @@ namespace TagLib {
        * Returns zero based byte offset (count of bytes from the beginning
        * of the audio file) of chapter's end.
        * 
+       * \note If returned value is 0xFFFFFFFF, end time should be used instead.
        * \see setEndOffset()
        */
       uint endOffset() const;
@@ -135,7 +138,7 @@ namespace TagLib {
        * 
        * \see endOffset()
        */
-      void endOffset(const uint &eO);
+      void setEndOffset(const uint &eO);
 
       virtual String toString() const;
 

@@ -169,10 +169,10 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
   int pos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
   d->elementID.append(char(0));
-  d->isTopLevel = (data.at(pos++) & 2) > 0;
+  d->isTopLevel = (data.at(pos) & 2) > 0;
   d->isOrdered = (data.at(pos++) & 1) > 0;
   uint entryCount = data.at(pos++);
-  for(int i = 0; i < entryCount; i++)
+  for(uint i = 0; i < entryCount; i++)
   {
     ByteVector childElementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
     childElementID.append(char(0));
@@ -193,7 +193,7 @@ ByteVector TableOfContentsFrame::renderFields() const
     flags += 1;
   data.append(flags);
   data.append((char)(entryCount()));
-  ConstIterator it = d->childElements.begin();
+  ByteVectorList::ConstIterator it = d->childElements.begin();
   while(it != d->childElements.end()) {
     data.append(*it);
     data.append(char(0));

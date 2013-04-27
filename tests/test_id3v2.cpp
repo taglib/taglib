@@ -15,6 +15,8 @@
 #include <popularimeterframe.h>
 #include <urllinkframe.h>
 #include <ownershipframe.h>
+#include <chapterframe.h>
+#include <tableofcontentsframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -77,6 +79,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
+  CPPUNIT_TEST(testChapters);
+  CPPUNIT_TEST(testTableOfContents);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -734,6 +738,66 @@ public:
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }
 
+  void testChaptersParsing()
+  {
+    ID3v2::ChapterFrame f(
+      ByteVector("CHAP"                     // Frame ID
+                 "\x00\x00\x00\x12"         // Frame size
+                 "\x00\x00"                 // Frame flags
+                 "\x43\x00"                 // Element ID
+		 "\x00\x00\x00\x03"         // Start time
+		 "\x00\x00\x00\x05"         // End time
+		 "\x00\x00\x00\x02"         // Start offset
+                 "\x00\x00\x00\x03", 28));  // End offset
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
+                         f.elementID());
+    CPPUNIT_ASSERT((uint)0x03 == f.startTime());
+    CPPUNIT_ASSERT((uint)0x05 == f.endTime());
+    CPPUNIT_ASSERT((uint)0x02 == f.startOffset());
+    CPPUNIT_ASSERT((uint)0x03 == f.endOffset());
+  }
+  
+  void testChapters()
+  {
+    ID3v2::ChapterFrame f(
+      ByteVector("CHAP"                     // Frame ID
+                 "\x00\x00\x00\x12"         // Frame size
+                 "\x00\x00"                 // Frame flags
+                 "\x43\x00"                 // Element ID
+		 "\x00\x00\x00\x03"         // Start time
+		 "\x00\x00\x00\x05"         // End time
+		 "\x00\x00\x00\x02"         // Start offset
+                 "\x00\x00\x00\x03", 28));  // End offset
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
+                         f.elementID());
+    CPPUNIT_ASSERT((uint)0x03 == f.startTime());
+    CPPUNIT_ASSERT((uint)0x05 == f.endTime());
+    CPPUNIT_ASSERT((uint)0x02 == f.startOffset());
+    CPPUNIT_ASSERT((uint)0x03 == f.endOffset());
+  }
+  
+  void testTableOfContents()
+  {
+    ID3v2::TableOfContentsFrame f(
+      ByteVector("CTOC"                     // Frame ID
+                 "\x00\x00\x00\x08"         // Frame size
+                 "\x00\x00"                 // Frame flags
+                 "\x54\x00"                 // Element ID
+		 "\x01"                     // CTOC flags
+		 "\x02"                     // Entry count
+		 "\x43\x00"                 // First entry
+                 "\x44\x00", 18));          // Second entry
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x54\x00", 2),
+                         f.elementID());
+    CPPUNIT_ASSERT(!f.isTopLevel());
+    CPPUNIT_ASSERT(f.isOrdered());
+    CPPUNIT_ASSERT((uint)0x02 == f.entryCount());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
+                         f.childElements()[0]);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x44\x00", 2),
+                         f.childElements()[1]);
+  }
+  
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v2);
