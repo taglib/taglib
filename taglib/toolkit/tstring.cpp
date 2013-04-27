@@ -32,6 +32,12 @@
 #include <iostream>
 #include <string.h>
 
+// x86 CPUs are alignment-tolerant or allow pointer casts from smaller types to larger types.
+#if defined(__i386__) || defined(_M_IX86) || defined(__amd64) || defined(__amd64__) \
+  || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) 
+# define TAGLIB_ALIGNMENT_TOLERANT 1
+#endif
+
 #ifdef HAVE_STD_CODECVT
 # include <codecvt>
 #else
@@ -805,15 +811,11 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
 void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
-#if !defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))
-
-  // It's certain that sizeof(wchar_t) == 2 and alignment-tolerant.
+#if SIZEOF_WCHAR_T == 2 && defined(TAGLIB_ALIGNMENT_TOLERANT)
 
   copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
 
 #else
-
-  // Maybe sizeof(wchar_t) != 2 or alignment-strict.
 
   bool swap;
   if(t == UTF16) {
