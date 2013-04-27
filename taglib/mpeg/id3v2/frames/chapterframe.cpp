@@ -54,7 +54,7 @@ ChapterFrame::ChapterFrame(const ByteVector &data) :
   setData(data);
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &eID, const int &sT, const int &eT, const int &sO, const int &eO) :
+ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO) :
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
@@ -62,7 +62,7 @@ ChapterFrame::ChapterFrame(const ByteVector &eID, const int &sT, const int &eT, 
   d->startTime = sT;
   d->endTime = eT;
   d->startOffset = sO;
-  d->endOffset = e0;
+  d->endOffset = eO;
 }
 
 ChapterFrame::~ChapterFrame()
@@ -127,7 +127,7 @@ String ChapterFrame::toString() const
   return String::null;
 }
 
-PropertyMap UniqueFileIdentifierFrame::asProperties() const
+PropertyMap ChapterFrame::asProperties() const
 {
   PropertyMap map;
 
@@ -176,10 +176,10 @@ ByteVector ChapterFrame::renderFields() const
   ByteVector data;
 
   data.append(d->elementID);
-  data.append(ByteVector.fromUInt(d->startTime, true));
-  data.append(ByteVector.fromUInt(d->endTime, true));
-  data.append(ByteVector.fromUInt(d->startOffset, true));
-  data.append(ByteVector.fromUInt(d->endOffset, true));
+  data.append(ByteVector::fromUInt(d->startTime, true));
+  data.append(ByteVector::fromUInt(d->endTime, true));
+  data.append(ByteVector::fromUInt(d->startOffset, true));
+  data.append(ByteVector::fromUInt(d->endOffset, true));
 
   return data;
 }
