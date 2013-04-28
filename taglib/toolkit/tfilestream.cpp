@@ -426,6 +426,9 @@ void FileStream::seek(long offset, Position p)
   }
 
   SetFilePointer(d->file, offset, NULL, whence);
+  if(GetLastError() != NO_ERROR) {
+    debug("File::seek() -- Failed to set the file size.");
+  }
 
 #else
 
@@ -467,7 +470,14 @@ long FileStream::tell() const
 {
 #ifdef _WIN32
 
-  return (long)SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
+  const DWORD position = SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
+  if(GetLastError() == NO_ERROR) {
+    return static_cast<long>(position);
+  }
+  else {
+    debug("File::tell() -- Failed to get the file pointer.");
+    return 0;
+  }
 
 #else
 
@@ -491,7 +501,7 @@ long FileStream::length()
 #ifdef _WIN32
 
   const DWORD fileSize = GetFileSize(d->file, NULL);
-  if(GetLastError() != ERROR_SUCCESS) {
+  if(GetLastError() == NO_ERROR) {
     d->size = static_cast<ulong>(fileSize);
     return d->size;
   }
@@ -528,6 +538,9 @@ void FileStream::truncate(long length)
 
   seek(length);
   SetEndOfFile(d->file);
+  if(GetLastError() != NO_ERROR) {
+    debug("File::truncate() -- Failed to truncate the file.");
+  }
 
   seek(currentPos);
 
