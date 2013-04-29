@@ -231,7 +231,7 @@ namespace TagLib
 #endif
     private:
       class PicturePrivate;
-      RefCountPtr<PicturePrivate> d;
+      TAGLIB_SHARED_PTR<PicturePrivate> d;
     };
   }
 }

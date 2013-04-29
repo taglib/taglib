@@ -181,7 +181,7 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
       class HeaderPrivate;
-      RefCountPtr<HeaderPrivate> d;
+      TAGLIB_SHARED_PTR<HeaderPrivate> d;
     };
   }
 }

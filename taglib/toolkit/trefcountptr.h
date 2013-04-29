@@ -37,19 +37,33 @@
 #elif defined(HAVE_BOOST_SHARED_PTR) 
 # include <boost/shared_ptr.hpp>
 #else
-# ifdef __APPLE__
-#   include <libkern/OSAtomic.h>
-#   define TAGLIB_ATOMIC_MAC
-# elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
-#   define TAGLIB_ATOMIC_WIN
-# elif defined (__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 401)    \
-  && (defined(__i386__) || defined(__i486__) || defined(__i586__) || \
-  defined(__i686__) || defined(__x86_64) || defined(__ia64)) \
-  && !defined(__INTEL_COMPILER)
-#   define TAGLIB_ATOMIC_GCC
-# elif defined(__ia64) && defined(__INTEL_COMPILER)
-#   include <ia64intrin.h>
-#   define TAGLIB_ATOMIC_GCC
+# include <algorithm>
+# if defined(HAVE_GCC_ATOMIC)
+#    define TAGLIB_ATOMIC_INT int
+#    define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
+#    define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+# elif defined(HAVE_WIN_ATOMIC)
+#    if !defined(NOMINMAX)
+#      define NOMINMAX
+#    endif
+#    include <windows.h>
+#    define TAGLIB_ATOMIC_INT long
+#    define TAGLIB_ATOMIC_INC(x) InterlockedIncrement(&x)
+#    define TAGLIB_ATOMIC_DEC(x) InterlockedDecrement(&x)
+# elif defined(HAVE_MAC_ATOMIC)
+#    include <libkern/OSAtomic.h>
+#    define TAGLIB_ATOMIC_INT int32_t
+#    define TAGLIB_ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
+#    define TAGLIB_ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
+# elif defined(HAVE_IA64_ATOMIC)
+#    include <ia64intrin.h>
+#    define TAGLIB_ATOMIC_INT int
+#    define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
+#    define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+# else
+#    define TAGLIB_ATOMIC_INT int
+#    define TAGLIB_ATOMIC_INC(x) (++x)
+#    define TAGLIB_ATOMIC_DEC(x) (--x)
 # endif
 #endif
 
@@ -63,55 +77,18 @@
 
 namespace TagLib {
 
-#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR) || defined(HAVE_BOOST_SHARED_PTR)
+#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR) 
+  
+#define TAGLIB_SHARED_PTR std::tr1::shared_ptr
 
-# if defined(SUPPORT_TEMPLATE_ALIAS)
+#elif defined(HAVE_BOOST_SHARED_PTR)
 
-  // Defines RefCountPtr<T> as an alias of shared_ptr<T>
-  // if shared_ptr<T> and the template alias are both available.
-
-#   if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR)
-
-  template <typename T> 
-  using RefCountPtr = std::tr1::shared_ptr<T>;
-
-#   else
-
-  template <typename T> 
-  using RefCountPtr = boost::shared_ptr<T>;
-
-#   endif
-
-# else
-
-  // Defines RefCountPtr<T> as a derived class of shared_ptr<T>.
-  // if shared_ptr<T> is available but the template alias is not.
-
-#   if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR)
-
-  template <typename T>
-  class RefCountPtr : public std::tr1::shared_ptr<T>
-  {
-  public:
-    explicit RefCountPtr(T *p) : std::tr1::shared_ptr<T>(p) {}
-  };
-
-#   else
-
-  template <typename T>
-  class RefCountPtr : public boost::shared_ptr<T>
-  {
-  public:
-    explicit RefCountPtr(T *p) : boost::shared_ptr<T>(p) {}
-  };
-
-#   endif
-
-# endif
+#define TAGLIB_SHARED_PTR boost::shared_ptr
 
 #else // HAVE_*_SHARED_PTR
 
-  // Implements RefCountPtr<T> if shared_ptr<T> is not available.
+  // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
+  // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
 
   template<typename T>
   class RefCountPtr
@@ -134,12 +111,12 @@ namespace TagLib {
 
       void addref() 
       { 
-        increment(&count); 
+        TAGLIB_ATOMIC_INC(count); 
       }
 
       void release()
       {
-        if(decrement(&count) == 0) {
+        if(TAGLIB_ATOMIC_DEC(count) == 0) {
           dispose();
           delete this;
         }
@@ -153,33 +130,7 @@ namespace TagLib {
       virtual void dispose() = 0;
 
     private:
-# if defined(TAGLIB_ATOMIC_MAC)
-      typedef volatile int32_t counter_t;
-
-      inline static void increment(counter_t *c) { OSAtomicIncrement32Barrier(c); }
-      inline static counter_t decrement(counter_t *c) { return OSAtomicDecrement32Barrier(c); }
-
-# elif defined(TAGLIB_ATOMIC_WIN)
-      typedef volatile long counter_t;
-
-      inline static void increment(counter_t *c) { InterlockedIncrement(c); }
-      inline static counter_t decrement(counter_t *c) { return InterlockedDecrement(c); }
-
-# elif defined(TAGLIB_ATOMIC_GCC)
-      typedef volatile int counter_t;
-
-      inline static void increment(counter_t *c) { __sync_add_and_fetch(c, 1); }
-      inline static counter_t decrement(counter_t *c) { return __sync_sub_and_fetch(c, 1); }
-
-# else
-      typedef uint counter_t;
-
-      inline static void increment(counter_t *c) { ++(*c) }
-      inline static counter_t decrement(counter_t *c) { return --(*c); }
-
-# endif
-
-      counter_t count;
+      volatile TAGLIB_ATOMIC_INT count;
     };
 
     // Counter impl class. Provides a dynamic deleter.
@@ -208,31 +159,52 @@ namespace TagLib {
     };
 
   public:
+    explicit RefCountPtr()
+      : counter(0)
+    {
+    }
+
     template <typename U>
     explicit RefCountPtr(U *p)
       : counter(new CounterImpl<U>(p))
     {
     }
 
-    RefCountPtr(const RefCountPtr &x)
+    RefCountPtr(const RefCountPtr<T> &x)
+      : counter(x.counter)
     {
-      counter = x.counter;
-      counter->addref();
+      if(counter)
+        counter->addref();
+    }
+
+    template <typename U>
+    RefCountPtr(const RefCountPtr<U> &x)
+      : counter(reinterpret_cast<CounterBase*>(x.counter))
+    {
+      if(counter)
+        counter->addref();
     }
 
     ~RefCountPtr()
     {
-      counter->release();
+      if(counter)
+        counter->release();
     }
 
     T *get() const
     {
-      return static_cast<CounterImpl<T>*>(counter)->get();
+      if(counter)
+        return static_cast<CounterImpl<T>*>(counter)->get();
+      else
+        return 0;
     }
 
     long use_count() const
     {
-      return counter->use_count();
+      if(counter)
+        return counter->use_count();
+      else
+        return 0;
     }
 
     bool unique() const 
@@ -244,20 +216,44 @@ namespace TagLib {
     void reset(U *p)
     {
       if(get() != p)
-      {
-        counter->release();
-        counter = new CounterImpl<U>(p);
-      }
+        RefCountPtr<T>(p).swap(*this);
+    }
+
+    void reset()
+    {
+      RefCountPtr<T>().swap(*this);
+    }
+
+    void swap(RefCountPtr<T> &x)
+    {
+      std::swap(counter, x.counter);
     }
 
     RefCountPtr<T> &operator=(const RefCountPtr<T> &x)
     {
-      if(get() != x.get())
-      {
-        counter->release();
+      if(get() != x.get()) {
+        if(counter)
+          counter->release();
 
         counter = x.counter;
-        counter->addref();
+
+        if(counter)
+          counter->addref();
+      }
+      return *this;
+    }
+
+    template <typename U>
+    RefCountPtr<T> &operator=(const RefCountPtr<U> &x)
+    {
+      if(get() != x.get()) {
+        if(counter)
+          counter->release();
+
+        counter = reinterpret_cast<CounterBase*>(x.counter);
+
+        if(counter)
+          counter->addref();
       }
       return *this;
     }
@@ -288,8 +284,18 @@ namespace TagLib {
     }
 
   private:
-    CounterBase *counter;
+    mutable CounterBase *counter;
+
+    template <typename U> friend class RefCountPtr;
   };
+
+# define TAGLIB_SHARED_PTR TagLib::RefCountPtr
+
+  template <typename T>
+  void swap(RefCountPtr<T> &a, RefCountPtr<T> &b)
+  {
+    a.swap(b);
+  }
 
 #endif // HAVE_*_SHARED_PTR
 }
