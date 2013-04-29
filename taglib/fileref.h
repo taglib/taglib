@@ -278,7 +278,7 @@ namespace TagLib {
 
   private:
     class FileRefPrivate;
-    RefCountPtr<FileRefPrivate> d;
+    TAGLIB_SHARED_PTR<FileRefPrivate> d;
   };
 
 } // namespace TagLib
