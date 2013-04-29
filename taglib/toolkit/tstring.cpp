@@ -78,9 +78,10 @@ namespace
     char *dstBegin = dst;
     char *dstEnd   = dstBegin + dstLength;
 
-    std::mbstate_t st = 0;
+    std::mbstate_t st;
     const wchar_t *source;
     char *target;
+    memset(&st, 0, sizeof(st));
     std::codecvt_base::result result = utf8_utf16_t().out(
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
@@ -123,9 +124,10 @@ namespace
     wchar_t *dstBegin = dst;
     wchar_t *dstEnd   = dstBegin + dstLength;
 
-    std::mbstate_t st = 0;
+    std::mbstate_t st;
     const char *source;
     wchar_t *target;
+    memset(&st, 0, sizeof(st));
     std::codecvt_base::result result = utf8_utf16_t().in(
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
