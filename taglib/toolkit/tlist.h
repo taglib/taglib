@@ -305,7 +305,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class TP> class ListPrivate;
-    RefCountPtr<ListPrivate<T> > d;
+    TAGLIB_SHARED_PTR<ListPrivate<T> > d;
 #endif
   };
 

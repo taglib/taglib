@@ -97,7 +97,7 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
-      RefCountPtr<ItemPrivate> d;
+      TAGLIB_SHARED_PTR<ItemPrivate> d;
     };
 
   }

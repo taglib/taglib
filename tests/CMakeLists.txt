@@ -30,6 +30,7 @@ SET(test_runner_SRCS
   main.cpp
   test_list.cpp
   test_map.cpp
+  test_smartptr.cpp
   test_mpeg.cpp
   test_synchdata.cpp
   test_trueaudio.cpp
