@@ -38,7 +38,7 @@
 //
 // http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
 
-#define DATA(x) (&(x->data->data[0]))
+#define DATA(x) (&(*(x->data))[0])
 
 namespace TagLib {
 
@@ -236,37 +236,11 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   return ByteVector(reinterpret_cast<const char *>(&value), size);
 }
 
-class DataPrivate
-{
-public:
-  DataPrivate()
-  {
-  }
-
-  DataPrivate(const std::vector<char> &v, size_t o, size_t l) 
-    : data(v.begin() + o, v.begin() + o + l) 
-  {
-  }
-
-  // A char* can be an iterator.
-  DataPrivate(const char *begin, const char *end)
-    : data(begin, end)
-  {
-  }
-
-  DataPrivate(size_t l, char c) 
-    : data(l, c) 
-  {
-  }
-
-  std::vector<char> data;
-};
-
 class ByteVector::ByteVectorPrivate 
 {
 public:
   ByteVectorPrivate() 
-    : data(new DataPrivate())
+    : data(new std::vector<char>())
     , offset(0)
     , length(0) 
   {
@@ -280,21 +254,21 @@ public:
   }
 
   ByteVectorPrivate(const std::vector<char> &v, size_t o, size_t l)
-    : data(new DataPrivate(v, o, l))
+    : data(new std::vector<char>(v.begin() + o, v.begin() + o + l))
     , offset(0)
     , length(l)
   {
   }
 
   ByteVectorPrivate(size_t l, char c) 
-    : data(new DataPrivate(l, c))
+    : data(new std::vector<char>(l, c))
     , offset(0)
     , length(l)
   {
   }
 
   ByteVectorPrivate(const char *s, size_t l) 
-    : data(new DataPrivate(s, s + l))
+    : data(new std::vector<char>(s, s + l))
     , offset(0)
     , length(l)
   {
@@ -303,7 +277,7 @@ public:
   void detach()
   {
     if(!data.unique()) {
-      data.reset(new DataPrivate(data->data, offset, length));
+      data.reset(new std::vector<char>(data->begin() + offset, data->begin() + offset + length));
       offset = 0;
     }
   }
@@ -320,7 +294,7 @@ public:
     return *this;
   }
 
-  TAGLIB_SHARED_PTR<DataPrivate> data;
+  TAGLIB_SHARED_PTR<std::vector<char> > data;
   size_t offset;
   size_t length;
 };
@@ -609,7 +583,7 @@ size_t ByteVector::size() const
 ByteVector &ByteVector::resize(size_t size, char padding)
 {
   detach();
-  d->data->data.resize(d->offset + size, padding);
+  d->data->resize(d->offset + size, padding);
   d->length = size;
 
   return *this;
@@ -617,45 +591,45 @@ ByteVector &ByteVector::resize(size_t size, char padding)
 
 ByteVector::Iterator ByteVector::begin()
 {
-  return d->data->data.begin() + d->offset;
+  return d->data->begin() + d->offset;
 }
 
 ByteVector::ConstIterator ByteVector::begin() const
 {
-  return d->data->data.begin() + d->offset;
+  return d->data->begin() + d->offset;
 }
 
 ByteVector::Iterator ByteVector::end()
 {
-  return d->data->data.begin() + d->offset + d->length;
+  return d->data->begin() + d->offset + d->length;
 }
 
 ByteVector::ConstIterator ByteVector::end() const
 {
-  return d->data->data.begin() + d->offset + d->length;
+  return d->data->begin() + d->offset + d->length;
 }
 
 ByteVector::ReverseIterator ByteVector::rbegin()
 {
-  std::vector<char> &v = d->data->data;
+  std::vector<char> &v = *(d->data);
   return v.rbegin() + (v.size() - (d->offset + d->length));
 }
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  std::vector<char> &v = d->data->data;
+  std::vector<char> &v = *(d->data);
   return v.rbegin() + (v.size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
 {
-  std::vector<char> &v = d->data->data;
+  std::vector<char> &v = *(d->data);
   return v.rbegin() + (v.size() - d->offset);
 }
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  std::vector<char> &v = d->data->data;
+  std::vector<char> &v = *(d->data);
   return v.rbegin() + (v.size() - d->offset);
 }
 
@@ -699,13 +673,13 @@ long long ByteVector::toInt64(bool mostSignificantByteFirst) const
 
 const char &ByteVector::operator[](size_t index) const
 {
-  return d->data->data[d->offset + index];
+  return DATA(d)[d->offset + index];
 }
 
 char &ByteVector::operator[](size_t index)
 {
   detach();
-  return d->data->data[d->offset + index];
+  return DATA(d)[d->offset + index];
 }
 
 bool ByteVector::operator==(const ByteVector &v) const
@@ -807,7 +781,7 @@ void ByteVector::detach()
   d->detach();
 
   if(!d.unique())
-    d.reset(new ByteVectorPrivate(d->data->data, d->offset, d->length));
+    d.reset(new ByteVectorPrivate(*(d->data), d->offset, d->length));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
