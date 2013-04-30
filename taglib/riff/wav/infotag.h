@@ -119,6 +119,7 @@ namespace TagLib {
       virtual void setTrack(uint i);
 
       virtual bool isEmpty() const;
+
       /*
        * Gets the value of the field with the ID \a id.
        */
@@ -129,7 +130,7 @@ namespace TagLib {
         * If the field does not exist, it is created.
         * If \s is empty, the field is removed.
         *
-        * \note fieldId must be four-byte long pure ascii string.  This function 
+        * \note fieldId must be four-byte long pure ASCII string.  This function 
         * performs nothing if fieldId is invalid.
         */
       void setFieldText(const ByteVector &id, const String &s);

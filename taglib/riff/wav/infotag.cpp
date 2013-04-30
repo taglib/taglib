@@ -1,5 +1,5 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
+    copyright            : (C) 2012 by Tsuda Kageyu
     email                : wheeler@kde.org
  ***************************************************************************/
 
@@ -86,19 +86,22 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 static const StringHandler defaultStringHandler;
 const RIFF::Info::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
-RIFF::Info::Tag::Tag(const ByteVector &data) : TagLib::Tag()
+RIFF::Info::Tag::Tag(const ByteVector &data) 
+  : TagLib::Tag()
+  , d(new TagPrivate())
 {
-  d = new TagPrivate;
   parse(data);
 }
 
-RIFF::Info::Tag::Tag() : TagLib::Tag()
+RIFF::Info::Tag::Tag() 
+  : TagLib::Tag()
+  , d(new TagPrivate())
 {
-  d = new TagPrivate;
 }
 
 RIFF::Info::Tag::~Tag()
 {
+  delete d;
 }
 
 String RIFF::Info::Tag::title() const
