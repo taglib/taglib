@@ -8,12 +8,17 @@ include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 
 # Determine the CPU byte order.
-
 test_big_endian(TAGLIB_BIG_ENDIAN)
 
 if(NOT TAGLIB_BIG_ENDIAN)
   set(TAGLIB_LITTLE_ENDIAN 1)
 endif()
+
+# Determine the size of integral types.
+check_type_size("short"   SIZEOF_SHORT)
+check_type_size("int"     SIZEOF_INT)
+check_type_size("long long" SIZEOF_LONGLONG)
+check_type_size("wchar_t"   SIZEOF_WCHAR_T)
 
 # Determine whether or not your compiler supports move semantics.
 check_cxx_source_compiles("
@@ -24,6 +29,15 @@ check_cxx_source_compiles("
   int func(int &&x) { return x - 1; }
   int main() { return func(std::move(1)); }
 " SUPPORT_MOVE_SEMANTICS)
+
+# Determine if your compiler supports std::wstring.
+check_cxx_source_compiles("
+  #include <string>
+  int main() { 
+    std::wstring x(L\"ABC\");
+    return 0; 
+  }
+" HAVE_STD_WSTRING)
 
 # Determine which kind of byte swap functions your compiler supports.
 
@@ -179,13 +193,16 @@ if(NOT HAVE_SNPRINTF)
   " HAVE_SPRINTF_S)
 endif()
 
-# Determine whether your compiler supports codecvt header.
+# Determine whether your compiler supports codecvt.
 check_cxx_source_compiles("
-#include <codecvt>
-int main() { std::codecvt_utf8_utf16<wchar_t> x; return 0; }
-" HAVE_CODECVT)
+  #include <codecvt>
+  int main() { 
+    std::codecvt_utf8_utf16<wchar_t> x; 
+    return 0; 
+  }
+" HAVE_STD_CODECVT)
 
-# check for libz using the cmake supplied FindZLIB.cmake
+# Check for libz using the cmake supplied FindZLIB.cmake
 find_package(ZLIB)
 if(ZLIB_FOUND)
   set(HAVE_ZLIB 1)
@@ -193,10 +210,10 @@ else()
   set(HAVE_ZLIB 0)
 endif()
 
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 find_package(CppUnit)
 if(NOT CppUnit_FOUND AND BUILD_TESTS)
   message(STATUS "CppUnit not found, disabling tests.")
   set(BUILD_TESTS OFF)
 endif()
-

@@ -4,8 +4,17 @@
 #cmakedefine   TAGLIB_LITTLE_ENDIAN 1
 #cmakedefine   TAGLIB_BIG_ENDIAN 1
 
+/* Size of integral types */
+#cmakedefine   SIZEOF_SHORT    ${SIZEOF_SHORT}
+#cmakedefine   SIZEOF_INT      ${SIZEOF_INT}
+#cmakedefine   SIZEOF_LONGLONG ${SIZEOF_LONGLONG}
+#cmakedefine   SIZEOF_WCHAR_T  ${SIZEOF_WCHAR_T}
+
 /* Defined if your compiler supports the move semantics */
 #cmakedefine   SUPPORT_MOVE_SEMANTICS 1
+
+/* Defined if your compiler supports std::wstring */
+#cmakedefine   HAVE_STD_WSTRING 1
 
 /* Defined if your compiler supports some byte swap functions */
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1
@@ -31,10 +40,10 @@
 #cmakedefine   HAVE_SNPRINTF 1
 #cmakedefine   HAVE_SPRINTF_S 1
 
-/* Defined if your compiler has <codecvt> header */
-#cmakedefine   HAVE_CODECVT 1
+/* Defined if your compiler supports codecvt */
+#cmakedefine   HAVE_STD_CODECVT 1
 
-/* Define if you have libz */
+/* Defined if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 
 #cmakedefine   NO_ITUNES_HACKS 1
@@ -42,4 +51,3 @@
 #cmakedefine   WITH_MP4 1
 
 #cmakedefine TESTS_DIR "@TESTS_DIR@"
-

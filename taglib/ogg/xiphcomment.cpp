@@ -354,7 +354,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   // Next the number of fields in the comment vector.
 
-  uint commentFields = data.toUInt32LE(pos);
+  const uint commentFields = data.toUInt32LE(pos);
   pos += 4;
 
   if(commentFields > (data.size() - 8) / 4) {
@@ -366,7 +366,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     // Each comment field is in the format "KEY=value" in a UTF8 string and has
     // 4 bytes before the text starts that gives the length.
 
-    uint commentLength = data.toUInt32LE(pos);
+    const uint commentLength = data.toUInt32LE(pos);
     pos += 4;
 
     String comment = String(data.mid(pos, commentLength), String::UTF8);

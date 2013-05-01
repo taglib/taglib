@@ -24,9 +24,10 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <cstdio>
+#include <cstring>
 #include <tstring.h>
 #include <tdebug.h>
-#include <string.h>
 
 #include "tbytevector.h"
 
@@ -493,11 +494,8 @@ const char *ByteVector::data() const
 
 ByteVector ByteVector::mid(size_t index, size_t length) const
 {
-  if(index > size())
-    index = size();
-
-  if(length > size() - index)
-    length = size() - index;
+  index  = std::min(index, size());
+  length = std::min(length, size() - index);
 
   return ByteVector(*this, index, length);
 }
@@ -792,7 +790,6 @@ long long ByteVector::toInt64BE(size_t offset) const
 {
   return static_cast<long long>(toNumber<ulonglong, 8, BigEndian>(*this, offset));
 }
-
 
 const char &ByteVector::operator[](size_t index) const
 {

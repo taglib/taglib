@@ -118,7 +118,7 @@ void Opus::Properties::read()
   ByteVector data = d->file->packet(0);
 
   // *Magic Signature*
-  int pos = 8;
+  uint pos = 8;
 
   // *Version* (8 bits, unsigned)
   d->opusVersion = uchar(data.at(pos));
@@ -129,7 +129,7 @@ void Opus::Properties::read()
   pos += 1;
 
   // *Pre-skip* (16 bits, unsigned, little endian)
-  ushort preSkip = data.toUInt16LE(pos);
+  const ushort preSkip = data.toUInt16LE(pos);
   pos += 2;
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)

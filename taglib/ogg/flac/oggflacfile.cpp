@@ -251,7 +251,7 @@ void Ogg::FLAC::File::scan()
     return;
   }
 
-  d->streamInfoData = metadataHeader.mid(4,length);
+  d->streamInfoData = metadataHeader.mid(4, length);
 
   // Search through the remaining metadata
 

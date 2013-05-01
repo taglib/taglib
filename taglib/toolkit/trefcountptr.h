@@ -26,9 +26,7 @@
 #ifndef TAGLIB_REFCOUNTPTR_H
 #define TAGLIB_REFCOUNTPTR_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "config.h"
 
 #if defined(HAVE_STD_SHARED_PTR)
 # include <memory>
