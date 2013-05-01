@@ -431,7 +431,10 @@ void FileStream::seek(offset_t offset, Position p)
     return;
   }
 
-  SetFilePointer(d->file, offset, NULL, whence);
+  LARGE_INTEGER liOffset;
+  liOffset.QuadPart = offset;
+
+  SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
   if(GetLastError() != NO_ERROR) {
     debug("File::seek() -- Failed to set the file size.");
   }
@@ -484,9 +487,13 @@ offset_t FileStream::tell() const
 {
 #ifdef _WIN32
 
-  const DWORD position = SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
+  LARGE_INTEGER position;
+  position.QuadPart = 0;
+
+  position.LowPart = SetFilePointer(
+    d->file, position.LowPart, &position.HighPart, FILE_CURRENT);
   if(GetLastError() == NO_ERROR) {
-    return static_cast<long>(position);
+    return position.QuadPart;
   }
   else {
     debug("File::tell() -- Failed to get the file pointer.");
@@ -522,9 +529,12 @@ offset_t FileStream::length()
 
 #ifdef _WIN32
 
-  const DWORD fileSize = GetFileSize(d->file, NULL);
+  LARGE_INTEGER fileSize;
+  fileSize.QuadPart = 0;
+
+  fileSize.LowPart = GetFileSize(d->file, reinterpret_cast<LPDWORD>(&fileSize.HighPart));
   if(GetLastError() == NO_ERROR) {
-    d->size = static_cast<ulong>(fileSize);
+    d->size = fileSize.QuadPart;
     return d->size;
   }
   else {
