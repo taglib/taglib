@@ -197,7 +197,7 @@ bool FLAC::File::save()
   for(uint i = 0; i < newBlocks.size(); i++) {
     FLAC::MetadataBlock *block = newBlocks[i];
     ByteVector blockData = block->render();
-    ByteVector blockHeader = ByteVector::fromUInt32(blockData.size());
+    ByteVector blockHeader = ByteVector::fromUInt32BE(blockData.size());
     blockHeader[0] = block->code();
     data.append(blockHeader);
     data.append(blockData);
@@ -210,7 +210,7 @@ bool FLAC::File::save()
   if (paddingLength < 0) {
     paddingLength = MinPaddingLength;
   }
-  ByteVector padding = ByteVector::fromUInt32(paddingLength);
+  ByteVector padding = ByteVector::fromUInt32BE(paddingLength);
   padding.resize(paddingLength + 4);
   padding[0] = (char)(FLAC::MetadataBlock::Padding | LastBlockFlag);
   data.append(padding);
@@ -361,7 +361,7 @@ void FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool isLastBlock = (header[0] & 0x80) != 0;
-  uint length = header.mid(1, 3).toUInt32();
+  uint length = header.toUInt24BE(1);
 
   // First block should be the stream_info metadata
 
@@ -381,7 +381,7 @@ void FLAC::File::scan()
     header = readBlock(4);
     blockType = header[0] & 0x7f;
     isLastBlock = (header[0] & 0x80) != 0;
-    length = header.mid(1, 3).toUInt32();
+    length = header.toUInt24BE(1);
 
     ByteVector data = readBlock(length);
     if(data.size() != length || length == 0) {

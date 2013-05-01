@@ -148,7 +148,7 @@ ByteVector ASF::Picture::render() const
     return ByteVector::null;
   return
     ByteVector((char)d->type) +
-    ByteVector::fromUInt32(d->picture.size(), false) +
+    ByteVector::fromUInt32LE(d->picture.size()) +
     ASF::File::renderString(d->mimeType) +
     ASF::File::renderString(d->description) +
     d->picture;
@@ -161,7 +161,7 @@ void ASF::Picture::parse(const ByteVector& bytes)
     return;
   size_t pos = 0;
   d->type = (Type)bytes[0]; ++pos;
-  uint dataLen = bytes.mid(pos, 4).toUInt32(false); pos+=4;
+  uint dataLen = bytes.toUInt32LE(pos); pos+=4;
 
   const ByteVector nullStringTerminator(2, 0);
 

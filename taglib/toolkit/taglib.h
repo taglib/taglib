@@ -26,6 +26,8 @@
 #ifndef TAGLIB_H
 #define TAGLIB_H
 
+#include "config.h"
+
 #define TAGLIB_MAJOR_VERSION 1
 #define TAGLIB_MINOR_VERSION 8
 #define TAGLIB_PATCH_VERSION 0
@@ -77,28 +79,52 @@
 # error TagLib assumes that long long is 64-bit wide.
 #endif
 
-// Check the widths of integral types.
+// Optimized byte swap functions.
 
-#if UCHAR_MAX != 255U
-# error TagLib assumes that char is 8-bit wide.
+#if defined(HAVE_MSC_BYTESWAP)
+# include <stdlib.h>
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# include <byteswap.h>
+#elif defined(HAVE_MAC_BYTESWAP)
+# include <libkern/OSByteOrder.h>
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# include <sys/endian.h>
 #endif
 
-#if USHRT_MAX != 65535U
-# error TagLib assumes that short is 16-bit wide.
+#if defined(HAVE_GCC_BYTESWAP_16)
+# define TAGLIB_BYTESWAP_16(x) __builtin_bswap16(x)
+#elif defined(HAVE_MSC_BYTESWAP)
+# define TAGLIB_BYTESWAP_16(x) _byteswap_ushort(x)
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# define TAGLIB_BYTESWAP_16(x) __bswap_16(x)
+#elif defined(HAVE_MAC_BYTESWAP)
+# define TAGLIB_BYTESWAP_16(x) OSSwapInt16(x)
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# define TAGLIB_BYTESWAP_16(x) swap16(x)
 #endif
 
-#if UINT_MAX != 4294967295U
-# error TagLib assumes that int is 32-bit wide.
+#if defined(HAVE_GCC_BYTESWAP_32)
+# define TAGLIB_BYTESWAP_32(x) __builtin_bswap32(x)
+#elif defined(HAVE_MSC_BYTESWAP)
+# define TAGLIB_BYTESWAP_32(x) _byteswap_ulong(x)
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# define TAGLIB_BYTESWAP_32(x) __bswap_32(x)
+#elif defined(HAVE_MAC_BYTESWAP)
+# define TAGLIB_BYTESWAP_32(x) OSSwapInt32(x)
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# define TAGLIB_BYTESWAP_32(x) swap32(x)
 #endif
 
-#if !defined(ULLONG_MAX) && !defined(ULONGLONG_MAX) && !defined(ULONG_LONG_MAX)
-# error TagLib assumes that long long is 64-bit wide.
-#elif defined(ULLONG_MAX) && ULLONG_MAX != 18446744073709551615ULL
-# error TagLib assumes that long long is 64-bit wide.
-#elif defined(ULONGLONG_MAX) && ULONGLONG_MAX != 18446744073709551615ULL
-# error TagLib assumes that long long is 64-bit wide.
-#elif defined(ULONG_LONG_MAX) && ULONG_LONG_MAX != 18446744073709551615ULL
-# error TagLib assumes that long long is 64-bit wide.
+#if defined(HAVE_GCC_BYTESWAP_64)
+# define TAGLIB_BYTESWAP_64(x) __builtin_bswap64(x)
+#elif defined(HAVE_MSC_BYTESWAP)
+# define TAGLIB_BYTESWAP_64(x) _byteswap_uint64(x)
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# define TAGLIB_BYTESWAP_64(x) __bswap_64(x)
+#elif defined(HAVE_MAC_BYTESWAP)
+# define TAGLIB_BYTESWAP_64(x) OSSwapInt64(x)
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# define TAGLIB_BYTESWAP_64(x) swap64(x)
 #endif
 
 //! A namespace for all TagLib related classes and functions

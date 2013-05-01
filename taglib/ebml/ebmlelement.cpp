@@ -88,7 +88,7 @@ public:
   
     // Store the result and return the current position
     if(result)
-      *result = static_cast<ulli>(vint.toInt64());
+      *result = static_cast<ulli>(vint.toInt64BE(0));
     return position + byteSize;
   }
   
@@ -100,7 +100,7 @@ public:
   // for the id)
   ByteVector createVInt(ulli number, bool addOne = true, bool shortest = true)
   {
-    ByteVector vint = ByteVector::fromUInt64(static_cast<signed long long>(number));
+    ByteVector vint = ByteVector::fromUInt64BE(static_cast<signed long long>(number));
     
     // Do we actually need to calculate the length of the variable length
     // integer? If not, then prepend the 0b0000 0001 if necessary and return the
@@ -327,14 +327,14 @@ signed long long EBML::Element::getAsInt()
 {
   // The debug note about returning 0 because of empty data is irrelevant. The
   // behavior is as expected.
-  return getAsBinary().toInt64();
+  return getAsBinary().toInt64BE(0);
 }
 
 EBML::ulli EBML::Element::getAsUnsigned()
 {
   // The debug note about returning 0 because of empty data is irrelevant. The
   // behavior is as expected.
-  return static_cast<ulli>(getAsBinary().toInt64());
+  return static_cast<ulli>(getAsBinary().toInt64BE(0));
 }
 
 long double EBML::Element::getAsFloat()
@@ -390,12 +390,12 @@ EBML::Element *EBML::Element::addElement(EBML::ulli id, const String &string)
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, signed long long number)
 {
-  return addElement(id, ByteVector::fromUInt64(number));
+  return addElement(id, ByteVector::fromUInt64BE(number));
 }
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, EBML::ulli number)
 {
-  return addElement(id, ByteVector::fromUInt64(static_cast<signed long long>(number)));
+  return addElement(id, ByteVector::fromUInt64BE(static_cast<signed long long>(number)));
 }
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, long double number)
@@ -459,12 +459,12 @@ void EBML::Element::setAsString(const String &string)
 
 void EBML::Element::setAsInt(signed long long number)
 {
-  setAsBinary(ByteVector::fromUInt64(number));
+  setAsBinary(ByteVector::fromUInt64BE(number));
 }
 
 void EBML::Element::setAsUnsigned(EBML::ulli number)
 {
-  setAsBinary(ByteVector::fromUInt64(static_cast<signed long long>(number)));
+  setAsBinary(ByteVector::fromUInt64BE(static_cast<signed long long>(number)));
 }
 
 void EBML::Element::setAsFloat(long double)

@@ -188,7 +188,12 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     ByteVector data = file.readBlock(std::min(2U,limit));
-    value = data.toUInt16(bigEndian);
+
+    if(bigEndian)
+      value = data.toUInt16BE(0);
+    else
+      value = data.toUInt16LE(0);
+
     return static_cast<uint>(data.size());
   }
 
@@ -209,7 +214,12 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     ByteVector data = file.readBlock(std::min(4U,limit));
-    value = data.toUInt32(bigEndian);
+
+    if(bigEndian)
+      value = data.toUInt32BE(0);
+    else
+      value = data.toUInt32LE(0);
+
     return static_cast<uint>(data.size());
   }
 

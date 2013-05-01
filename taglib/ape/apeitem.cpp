@@ -216,8 +216,8 @@ void APE::Item::parse(const ByteVector &data)
     return;
   }
 
-  uint valueLength  = data.mid(0, 4).toUInt32(false);
-  uint flags        = data.mid(4, 4).toUInt32(false);
+  const uint valueLength  = data.toUInt32LE(0);
+  const uint flags        = data.toUInt32LE(4);
 
   d->key = String(data.mid(8), String::UTF8);
 
@@ -253,8 +253,8 @@ ByteVector APE::Item::render() const
   else
     value.append(d->value);
 
-  data.append(ByteVector::fromUInt32(value.size(), false));
-  data.append(ByteVector::fromUInt32(flags, false));
+  data.append(ByteVector::fromUInt32LE(value.size()));
+  data.append(ByteVector::fromUInt32LE(flags));
   data.append(d->key.data(String::UTF8));
   data.append(ByteVector('\0'));
   data.append(value);

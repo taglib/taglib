@@ -124,8 +124,8 @@ void UniqueFileIdentifierFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int pos = 0;
-  d->owner = readStringField(data, String::Latin1, &pos);
+  size_t pos = 0;
+  d->owner = readStringField(data, String::Latin1, pos);
   d->identifier = data.mid(pos);
 }
 

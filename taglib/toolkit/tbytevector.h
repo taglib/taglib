@@ -213,6 +213,11 @@ namespace TagLib {
     ByteVector &append(const ByteVector &v);
 
     /*!
+     * Appends \a c to the end of the ByteVector.
+     */
+    ByteVector &append(char c);
+
+    /*!
      * Clears the data.
      */
     ByteVector &clear();
@@ -291,84 +296,132 @@ namespace TagLib {
     uint checksum() const;
 
     /*!
-     * Converts the first 2 bytes of the vector to a short.
+     * Converts the 2 bytes at \a offset of the vector to a short as a signed
+     * 16-bit little-endian integer.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
-     * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
-     *
-     * \see fromUInt16()
+     * \see fromUInt16LE()
      */
-    short toInt16(bool mostSignificantByteFirst = true) const;
+    short toInt16LE(size_t offset) const;
 
     /*!
-     * Converts the first 2 bytes of the vector to a unsigned short.
+     * Converts the 2 bytes at \a offset of the vector to a short as a signed
+     * 16-bit big-endian integer.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
-     * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
-     *
-     * \see fromUInt16()
+     * \see fromUInt16BE()
      */
-    unsigned short toUInt16(bool mostSignificantByteFirst = true) const;
-
-     /*!
-     * Converts the first 4 bytes of the vector to an unsigned integer.
-     *
-     * If \a mostSignificantByteFirst is true this will operate left to right
-     * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
-     * 0x01000000 == 1.
-     *
-     * \see fromUInt32()
-     */
-    uint toUInt32(bool mostSignificantByteFirst = true) const;
+    short toInt16BE(size_t offset) const;
 
     /*!
-     * Converts the first 8 bytes of the vector to a (signed) long long.
+     * Converts the 2 bytes at \a offset of the vector to a ushort as an unsigned
+     * 16-bit little-endian integer.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
-     * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
-     * if false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
-     *
-     * \see fromUInt64()
+     * \see fromUInt16LE()
      */
-    long long toInt64(bool mostSignificantByteFirst = true) const;
+    ushort toUInt16LE(size_t offset) const;
 
     /*!
-     * Creates a 2 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
-     * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 01 == 0x0001 == 1, if false, $01 00 == 0x0100 == 1.
+     * Converts the 2 bytes at \a offset of the vector to a ushort as an unsigned
+     * 16-bit big-endian integer.
+     *
+     * \see fromUInt16BE()
+     */
+    ushort toUInt16BE(size_t offset) const;
+
+    /*!
+     * Converts the 3 bytes at \a offset of the vector to a uint as an unsigned
+     * 24-bit little-endian integer.
+     */
+    uint toUInt24LE(size_t offset) const;
+
+    /*!
+     * Converts the 3 bytes at \a offset of the vector to a uint as an unsigned
+     * 24-bit big-endian integer.
+     */
+    uint toUInt24BE(size_t offset) const;
+ 
+    /*!
+     * Converts the 4 bytes at \a offset of the vector to a uint as an unsigned
+     * 32-bit little-endian integer.
+     *
+     * \see fromUInt32LE()
+     */
+    uint toUInt32LE(size_t offset) const;
+    
+    /*!
+     * Converts the 4 bytes at \a offset of the vector to a ushort as an unsigned
+     * 32-bit big-endian integer.
+     *
+     * \see fromUInt32BE()
+     */
+    uint toUInt32BE(size_t offset) const;
+    
+    /*!
+     * Converts the 8 bytes at \a offset of the vector to a long long as a signed
+     * 64-bit little-endian integer.
+     *
+     * \see fromUInt64LE()
+     */
+    long long toInt64LE(size_t offset) const;
+    
+    /*!
+     * Converts the 8 bytes at \a offset of the vector to a long long as a signed
+     * 64-bit big-endian integer.
+     *
+     * \see fromUInt64BE()
+     */
+    long long toInt64BE(size_t offset) const;
+
+    /*!
+     * Creates a 2 byte ByteVector based on \a value as an unsigned 16-bit
+     * little-endian integer.
      *
      * \note If \a value is larger than 16-bit, the lowest 16 bits are used. 
-     * \see toInt16()
+     * \see toUInt16LE()
      */
-    static ByteVector fromUInt16(size_t value, bool mostSignificantByteFirst = true);
+    static ByteVector fromUInt16LE(size_t value);
 
     /*!
-     * Creates a 4 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
-     * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 01 == 0x00000001 == 1, if false, $01 00 00 00 ==
-     * 0x01000000 == 1.
+     * Creates a 2 byte ByteVector based on \a value as an unsigned 16-bit
+     * big-endian integer.
+     *
+     * \note If \a value is larger than 16-bit, the lowest 16 bits are used. 
+     * \see toUInt16BE()
+     */
+    static ByteVector fromUInt16BE(size_t value);
+
+    /*!
+     * Creates a 4 byte ByteVector based on \a value as an unsigned 32-bit
+     * little-endian integer.
      *
      * \note If \a value is larger than 32-bit, the lowest 32 bits are used. 
-     * \see toUInt32()
+     * \see toUInt32LE()
      */
-    static ByteVector fromUInt32(size_t value, bool mostSignificantByteFirst = true);
+    static ByteVector fromUInt32LE(size_t value);
 
     /*!
-     * Creates a 8 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
-     * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 01 == 0x0000000000000001 == 1, if false,
-     * $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
+     * Creates a 4 byte ByteVector based on \a value as an unsigned 32-bit
+     * big-endian integer.
      *
-     * \see toInt64()
+     * \note If \a value is larger than 32-bit, the lowest 32 bits are used. 
+     * \see toUInt32BE()
      */
-    static ByteVector fromUInt64(ulonglong value, bool mostSignificantByteFirst = true);
+    static ByteVector fromUInt32BE(size_t value);
+
+    /*!
+     * Creates a 8 byte ByteVector based on \a value as an unsigned 64-bit
+     * little-endian integer.
+     *
+     * \see toUInt64LE()
+     */
+    static ByteVector fromUInt64LE(ulonglong value);
+
+    /*!
+     * Creates a 8 byte ByteVector based on \a value as an unsigned 64-bit
+     * big-endian integer.
+     *
+     * \see toUInt64BE()
+     */
+    static ByteVector fromUInt64BE(ulonglong value);
 
     /*!
      * Returns a ByteVector based on the CString \a s.

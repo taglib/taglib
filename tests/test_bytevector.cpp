@@ -38,28 +38,11 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testRfind1);
   CPPUNIT_TEST(testRfind2);
   CPPUNIT_TEST(testToHex);
-  CPPUNIT_TEST(testToUShort);
+  CPPUNIT_TEST(testNumericCoversion);
   CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
-  void testConversion(unsigned int i, unsigned char a, unsigned char b, unsigned char c, unsigned char d)
-  {
-    ByteVector v(4, 0);
-
-    v[3] = a;
-    v[2] = b;
-    v[1] = c;
-    v[0] = d;
-    CPPUNIT_ASSERT(v.toUInt32(false) == i);
-
-    v[0] = a;
-    v[1] = b;
-    v[2] = c;
-    v[3] = d;
-    CPPUNIT_ASSERT(v.toUInt32() == i);
-  }
 
   void testByteVector()
   {
@@ -67,32 +50,6 @@ public:
 
     CPPUNIT_ASSERT(v.find("ob") == 2);
     CPPUNIT_ASSERT(v.find('b') == 3);
-
-    ByteVector n(4, 0);
-    n[0] = 1;
-    CPPUNIT_ASSERT(n.toUInt32(true) == 16777216);
-    CPPUNIT_ASSERT(n.toUInt32(false) == 1);
-    CPPUNIT_ASSERT(ByteVector::fromUInt32(16777216, true) == n);
-    CPPUNIT_ASSERT(ByteVector::fromUInt32(1, false) == n);
-
-    CPPUNIT_ASSERT(ByteVector::fromUInt32(0xa0).toUInt32() == 0xa0);
-
-    testConversion(0x000000a0, 0x00, 0x00, 0x00, 0xa0);
-    testConversion(0xd50bf072, 0xd5, 0x0b, 0xf0, 0x72);
-
-    ByteVector intVector(2, 0);
-    intVector[0] = char(0xfc);
-    intVector[1] = char(0x00);
-    CPPUNIT_ASSERT(intVector.toInt16() == -1024);
-    intVector[0] = char(0x04);
-    intVector[1] = char(0x00);
-    CPPUNIT_ASSERT(intVector.toInt16() == 1024);
-
-    CPPUNIT_ASSERT(ByteVector::fromUInt64(1).toInt64() == 1);
-    CPPUNIT_ASSERT(ByteVector::fromUInt64(0).toInt64() == 0);
-    CPPUNIT_ASSERT(ByteVector::fromUInt64(0xffffffffffffffffLL).toInt64() == -1);
-    CPPUNIT_ASSERT(ByteVector::fromUInt64(0xfffffffffffffffeLL).toInt64() == -2);
-    CPPUNIT_ASSERT(ByteVector::fromUInt64(1024).toInt64() == 1024);
 
     ByteVector a1("foo");
     a1.append("bar");
@@ -183,13 +140,43 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("f0e1d2c3b4a5968778695a4b3c2d1e0f"), v.toHex());
   }
 
-  void testToUShort()
+  void testNumericCoversion()
   {
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFFFF, ByteVector("\xff\xff", 2).toUInt16());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0001, ByteVector("\x00\x01", 2).toUInt16());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0x0100, ByteVector("\x00\x01", 2).toUInt16(false));
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0xFF01, ByteVector("\xFF\x01", 2).toUInt16());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)0x01FF, ByteVector("\xFF\x01", 2).toUInt16(false));
+    ByteVector n(16, 0);
+    for(size_t i = 0; i < 8; ++i) {
+      n[i * 2    ] = static_cast<unsigned char>(0x11 * i);
+      n[i * 2 + 1] = static_cast<unsigned char>(0x11 * (i + 8));
+    }
+
+    CPPUNIT_ASSERT(n.toUInt16LE(1) == 4488);
+    CPPUNIT_ASSERT(n.toUInt16BE(2) == 4505);
+    CPPUNIT_ASSERT(n.toUInt24LE(3) == 11149977);
+    CPPUNIT_ASSERT(n.toUInt24BE(4) == 2271795);
+    CPPUNIT_ASSERT(n.toUInt32LE(5) == 1153119146);
+    CPPUNIT_ASSERT(n.toUInt32BE(6) == 867910860);
+    CPPUNIT_ASSERT(n.toInt16LE(3)  == 8857);
+    CPPUNIT_ASSERT(n.toInt16BE(7)  == -17596);
+    CPPUNIT_ASSERT(n.toInt16LE(10) == -8875);
+    CPPUNIT_ASSERT(n.toInt16BE(14) == 30719);
+    CPPUNIT_ASSERT(n.toInt64LE(5)  == 7412174897536512938ll);
+    CPPUNIT_ASSERT(n.toInt64BE(3)  == -7412174897536512939ll);
+    CPPUNIT_ASSERT(n.toInt64LE(6)  == -1268082884489200845ll);
+    CPPUNIT_ASSERT(n.toInt64BE(4)  == 2497865822736504285ll);
+    
+    // Shows the message "toNumber<T>() -- offset is out of range. Returning 0." 2 times.
+    CPPUNIT_ASSERT(n.toUInt32LE(13) == 0);
+    CPPUNIT_ASSERT(n.toUInt16BE(15) == 0);
+
+    CPPUNIT_ASSERT(ByteVector::fromUInt16LE(n.toInt16LE(5))  == n.mid(5, 2));
+    CPPUNIT_ASSERT(ByteVector::fromUInt16BE(n.toInt16BE(9))  == n.mid(9, 2));
+    CPPUNIT_ASSERT(ByteVector::fromUInt32LE(n.toUInt32LE(4)) == n.mid(4, 4));
+    CPPUNIT_ASSERT(ByteVector::fromUInt32BE(n.toUInt32BE(7)) == n.mid(7, 4));
+    CPPUNIT_ASSERT(ByteVector::fromUInt64LE(n.toInt64LE(1))  == n.mid(1, 8));
+    CPPUNIT_ASSERT(ByteVector::fromUInt64BE(n.toInt64BE(6))  == n.mid(6, 8));
+
+    CPPUNIT_ASSERT(ByteVector::fromUInt16LE(4386) == ByteVector::fromUInt16BE(8721));
+    CPPUNIT_ASSERT(ByteVector::fromUInt32LE(287454020) == ByteVector::fromUInt32BE(1144201745));
+    CPPUNIT_ASSERT(ByteVector::fromUInt64LE(1234605615291183940) == ByteVector::fromUInt64BE(4914309075945333265));
   }
 
   void testReplace()

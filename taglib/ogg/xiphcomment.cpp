@@ -286,12 +286,12 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 
   ByteVector vendorData = d->vendorID.data(String::UTF8);
 
-  data.append(ByteVector::fromUInt32(vendorData.size(), false));
+  data.append(ByteVector::fromUInt32LE(vendorData.size()));
   data.append(vendorData);
 
   // Add the number of fields.
 
-  data.append(ByteVector::fromUInt32(fieldCount(), false));
+  data.append(ByteVector::fromUInt32LE(fieldCount()));
 
   // Iterate over the the field lists.  Our iterator returns a
   // std::pair<String, StringList> where the first String is the field name and
@@ -311,7 +311,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
       fieldData.append('=');
       fieldData.append((*valuesIt).data(String::UTF8));
 
-      data.append(ByteVector::fromUInt32(fieldData.size(), false));
+      data.append(ByteVector::fromUInt32LE(fieldData.size()));
       data.append(fieldData);
     }
   }
@@ -344,9 +344,9 @@ void Ogg::XiphComment::parse(const ByteVector &data)
   // The first thing in the comment data is the vendor ID length, followed by a
   // UTF8 string with the vendor ID.
 
-  uint pos = 0;
+  size_t pos = 0;
 
-  uint vendorLength = data.mid(0, 4).toUInt32(false);
+  const uint vendorLength = data.toUInt32LE(0);
   pos += 4;
 
   d->vendorID = String(data.mid(pos, vendorLength), String::UTF8);
@@ -354,7 +354,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   // Next the number of fields in the comment vector.
 
-  uint commentFields = data.mid(pos, 4).toUInt32(false);
+  uint commentFields = data.toUInt32LE(pos);
   pos += 4;
 
   if(commentFields > (data.size() - 8) / 4) {
@@ -366,7 +366,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     // Each comment field is in the format "KEY=value" in a UTF8 string and has
     // 4 bytes before the text starts that gives the length.
 
-    uint commentLength = data.mid(pos, 4).toUInt32(false);
+    uint commentLength = data.toUInt32LE(pos);
     pos += 4;
 
     String comment = String(data.mid(pos, commentLength), String::UTF8);
