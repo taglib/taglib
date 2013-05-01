@@ -27,19 +27,44 @@
 # include <config.h>
 #endif
 
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 
 #include <taglib.h>
 #include <tdebug.h>
 #include "mp4item.h"
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
-# define SPRINTF sprintf_s
+using namespace TagLib;
+
+namespace
+{
+  String format(const char *fmt, ...)
+  {
+    va_list args;
+    va_start(args,fmt);
+
+    char buf[256];
+
+#if defined(HAVE_SNPRINTF)
+
+    vsnprintf(buf, sizeof(buf), fmt, args);
+
+#elif defined(HAVE_SPRINTF_S)
+
+    vsprintf_s(buf, fmt, args);
+
 #else
-# define SPRINTF sprintf
+
+    // Be careful. May cause a buffer overflow.  
+    vsprintf(buf, fmt, args);
+
 #endif
 
-using namespace TagLib;
+    va_end(args);
+
+    return String(buf);
+  }
+}
 
 class MP4::Item::ItemPrivate 
 {
@@ -242,37 +267,31 @@ String
 MP4::Item::toString() const
 {
   StringList desc;
-  char tmp[256];
   switch (d->type) {
     case TypeBool:
       return d->m_bool ? "true" : "false";
     case TypeInt:
-      SPRINTF(tmp, "%d", d->m_int);
-      return tmp;
+      return format("%d", d->m_int);
     case TypeIntPair:
-      SPRINTF(tmp, "%d/%d", d->m_intPair.first, d->m_intPair.second);
-      return tmp;
+      return format("%d/%d", d->m_intPair.first, d->m_intPair.second);
     case TypeByte:
-      SPRINTF(tmp, "%d", d->m_byte);
-      return tmp;
+      return format("%d", d->m_byte);
     case TypeUInt:
-      SPRINTF(tmp, "%u", d->m_uint);
-      return tmp;
+      return format("%u", d->m_uint);
     case TypeLongLong:
-      SPRINTF(tmp, "%lld", d->m_longlong);
-      return tmp;
+      return format("%lld", d->m_longlong);
     case TypeStringList:
       return d->m_stringList.toString(" / ");
     case TypeByteVectorList:
       for(TagLib::uint i = 0; i < d->m_byteVectorList.size(); i++) {
-        SPRINTF(tmp, "[%d bytes of data]", static_cast<int>(d->m_byteVectorList[i].size()));
-        desc.append(tmp);
+        desc.append(format(
+          "[%d bytes of data]", static_cast<int>(d->m_byteVectorList[i].size())));
       }
       return desc.toString(", ");
     case TypeCoverArtList:
       for(TagLib::uint i = 0; i < d->m_coverArtList.size(); i++) {
-        SPRINTF(tmp, "[%d bytes of data]", static_cast<int>(d->m_coverArtList[i].data().size()));
-        desc.append(tmp);
+        desc.append(format(
+          "[%d bytes of data]", static_cast<int>(d->m_coverArtList[i].data().size())));
       }
       return desc.toString(", ");
     case TypeUndefined:

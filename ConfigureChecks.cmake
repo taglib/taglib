@@ -84,12 +84,24 @@ if(NOT HAVE_STD_SHARED_PTR AND NOT HAVE_TR1_SHARED_PTR AND NOT HAVE_BOOST_SHARED
   endif()
 endif()
 
-
 # Determine whether your compiler supports codecvt header.
 check_cxx_source_compiles("
 #include <codecvt>
 int main() { std::codecvt_utf8_utf16<wchar_t> x; return 0; }
 " HAVE_CODECVT)
+
+# Determine whether your compiler supports some safer version of sprintf.
+check_cxx_source_compiles("
+  #include <cstdio>
+  int main() { char buf[20]; snprintf(buf, 20, \"%d\", 1); return 0; }
+" HAVE_SNPRINTF)
+
+if(NOT HAVE_SNPRINTF)
+  check_cxx_source_compiles("
+    #include <cstdio>
+    int main() { char buf[20]; sprintf_s(buf, \"%d\", 1);  return 0; }
+  " HAVE_SPRINTF_S)
+endif()
 
 # check for libz using the cmake supplied FindZLIB.cmake
 find_package(ZLIB)
