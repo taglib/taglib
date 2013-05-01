@@ -73,10 +73,10 @@ public:
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
       f->seek(stco->offset + 12);
       ByteVector data = f->readBlock(stco->length - 12);
-      unsigned int count = data.mid(0, 4).toUInt32();
-      int pos = 4;
+      unsigned int count = data.toUInt32BE(0);
+      size_t pos = 4;
       while (count--) {
-        unsigned int offset = data.mid(pos, 4).toUInt32();
+        unsigned int offset = data.toUInt32BE(pos);
         f->seek(offset);
         data1.append(f->readBlock(20));
         pos += 4;
@@ -92,10 +92,10 @@ public:
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
       f->seek(stco->offset + 12);
       ByteVector data = f->readBlock(stco->length - 12);
-      unsigned int count = data.mid(0, 4).toUInt32();
-      int pos = 4, i = 0;
+      unsigned int count = data.toUInt32BE(0);
+      size_t pos = 4, i = 0;
       while (count--) {
-        unsigned int offset = data.mid(pos, 4).toUInt32();
+        unsigned int offset = data.toUInt32BE(pos);
         f->seek(offset);
         CPPUNIT_ASSERT_EQUAL(data1[i], f->readBlock(20));
         pos += 4;

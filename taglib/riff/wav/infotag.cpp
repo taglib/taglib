@@ -215,7 +215,7 @@ ByteVector RIFF::Info::Tag::render() const
       continue;
 
     data.append(it->first);
-    data.append(ByteVector::fromUInt32(text.size() + 1, false));
+    data.append(ByteVector::fromUInt32LE(text.size() + 1));
     data.append(text);
     
     do {
@@ -243,9 +243,9 @@ void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
 
 void RIFF::Info::Tag::parse(const ByteVector &data)
 {
-  uint p = 4;
+  size_t p = 4;
   while(p < data.size()) {
-    uint size = data.mid(p + 4, 4).toUInt32(false);
+    uint size = data.toUInt32LE(p + 4);
     d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
 
     p += ((size + 1) & ~1) + 8;

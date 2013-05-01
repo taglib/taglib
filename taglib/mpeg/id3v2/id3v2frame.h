@@ -223,8 +223,7 @@ namespace TagLib {
        * updated to replect the position just after the string that has been read.
        * This is useful for reading strings sequentially.
        */
-      String readStringField(const ByteVector &data, String::Type encoding,
-                             int *positon = 0);
+      String readStringField(const ByteVector &data, String::Type encoding, size_t &positon);
 
       /*!
        * Checks a the list of string values to see if they can be used with the

@@ -155,7 +155,7 @@ int MPC::Properties::albumPeak() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long readSize(File *file, TagLib::uint &sizelength)
+unsigned long readSize(File *file, size_t &sizelength)
 {
   unsigned char tmp;
   unsigned long size = 0;
@@ -169,7 +169,7 @@ unsigned long readSize(File *file, TagLib::uint &sizelength)
   return size;
 }
 
-unsigned long readSize(const ByteVector &data, TagLib::uint &sizelength)
+unsigned long readSize(const ByteVector &data, size_t &sizelength)
 {
   unsigned char tmp;
   unsigned long size = 0;
@@ -191,9 +191,9 @@ void MPC::Properties::readSV8(File *file)
 
   while(!readSH && !readRG) {
     ByteVector packetType = file->readBlock(2);
-    uint packetSizeLength = 0;
-    unsigned long packetSize = readSize(file, packetSizeLength);
-    unsigned long dataSize = packetSize - 2 - packetSizeLength;
+    size_t packetSizeLength = 0;
+    size_t packetSize = readSize(file, packetSizeLength);
+    size_t dataSize = packetSize - 2 - packetSizeLength;
 
     if(packetType == "SH") {
       // Stream Header
@@ -201,13 +201,13 @@ void MPC::Properties::readSV8(File *file)
       ByteVector data = file->readBlock(dataSize);
       readSH = true;
 
-      TagLib::uint pos = 4;
+      size_t pos = 4;
       d->version = data[pos];
       pos += 1;
       d->sampleFrames = readSize(data.mid(pos), pos);
       uint begSilence = readSize(data.mid(pos), pos);
 
-      std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.mid(pos, 2).toUInt16(true)));
+      std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt16BE(pos)));
       pos += 2;
 
       d->sampleRate = sftable[flags[15] * 4 + flags[14] * 2 + flags[13]];
@@ -228,10 +228,10 @@ void MPC::Properties::readSV8(File *file)
 
       int replayGainVersion = data[0];
       if(replayGainVersion == 1) {
-        d->trackGain = data.mid(1, 2).toUInt32(true);
-        d->trackPeak = data.mid(3, 2).toUInt32(true);
-        d->albumGain = data.mid(5, 2).toUInt32(true);
-        d->albumPeak = data.mid(7, 2).toUInt32(true);
+        d->trackGain = data.toUInt16BE(1);
+        d->trackPeak = data.toUInt16BE(3);
+        d->albumGain = data.toUInt16BE(5);
+        d->albumPeak = data.toUInt16BE(7);
       }
     }
 
@@ -252,18 +252,18 @@ void MPC::Properties::readSV7(const ByteVector &data)
     if(d->version < 7)
       return;
 
-    d->totalFrames = data.mid(4, 4).toUInt32(false);
+    d->totalFrames = data.toUInt32LE(4);
 
-    std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.mid(8, 4).toUInt32(false)));
+    std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt32LE(8)));
     d->sampleRate = sftable[flags[17] * 2 + flags[16]];
     d->channels = 2;
 
-    uint gapless = data.mid(5, 4).toUInt32(false);
+    const uint gapless = data.toUInt32LE(5);
 
-    d->trackGain = data.mid(14,2).toInt16(false);
-    d->trackPeak = data.mid(12,2).toUInt32(false);
-    d->albumGain = data.mid(18,2).toInt16(false);
-    d->albumPeak = data.mid(16,2).toUInt32(false);
+    d->trackGain = data.toUInt16LE(14);
+    d->trackPeak = data.toUInt16LE(12);
+    d->albumGain = data.toUInt16LE(18);
+    d->albumPeak = data.toUInt16LE(16);
 
     // convert gain info
     if(d->trackGain != 0) {
@@ -293,7 +293,7 @@ void MPC::Properties::readSV7(const ByteVector &data)
       d->sampleFrames = d->totalFrames * 1152 - 576;
   }
   else {
-    uint headerData = data.mid(0, 4).toUInt32(false);
+    uint headerData = data.toUInt32LE(0);
 
     d->bitrate = (headerData >> 23) & 0x01ff;
     d->version = (headerData >> 11) & 0x03ff;
@@ -301,9 +301,9 @@ void MPC::Properties::readSV7(const ByteVector &data)
     d->channels = 2;
 
     if(d->version >= 5)
-      d->totalFrames = data.mid(4, 4).toUInt32(false);
+      d->totalFrames = data.toUInt32LE(4);
     else
-      d->totalFrames = data.mid(6, 2).toUInt32(false);
+      d->totalFrames = data.toUInt16LE(6);
 
     d->sampleFrames = d->totalFrames * 1152 - 576;
   }

@@ -148,12 +148,12 @@ void RelativeVolumeFrame::setIdentification(const String &s)
 
 void RelativeVolumeFrame::parseFields(const ByteVector &data)
 {
-  int pos = 0;
-  d->identification = readStringField(data, String::Latin1, &pos);
+  size_t pos = 0;
+  d->identification = readStringField(data, String::Latin1, pos);
 
   // Each channel is at least 4 bytes.
 
-  while(pos <= (int)data.size() - 4) {
+  while(pos + 4 <= data.size()) {
 
 
     ChannelType type = ChannelType(data[pos]);
@@ -161,7 +161,7 @@ void RelativeVolumeFrame::parseFields(const ByteVector &data)
 
     ChannelData &channel = d->channels[type];
 
-    channel.volumeAdjustment = data.mid(pos, 2).toInt16();
+    channel.volumeAdjustment = data.toInt16BE(pos);
     pos += 2;
 
     channel.peakVolume.bitsRepresentingPeak = data[pos];
@@ -187,7 +187,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
     const ChannelData &channel = (*it).second;
 
     data.append(char(type));
-    data.append(ByteVector::fromUInt16(channel.volumeAdjustment));
+    data.append(ByteVector::fromUInt16BE(channel.volumeAdjustment));
     data.append(char(channel.peakVolume.bitsRepresentingPeak));
     data.append(channel.peakVolume.peakVolume);
   }

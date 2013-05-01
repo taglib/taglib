@@ -188,7 +188,7 @@ ByteVector Ogg::Page::render() const
   // the entire page with the 4 bytes reserved for the checksum zeroed and then
   // inserted in bytes 22-25 of the page header.
 
-  ByteVector checksum = ByteVector::fromUInt32(data.checksum(), false);
+  ByteVector checksum = ByteVector::fromUInt32LE(data.checksum());
   for(int i = 0; i < 4; i++)
     data[i + 22] = checksum[i];
 
