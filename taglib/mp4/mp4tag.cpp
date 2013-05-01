@@ -23,9 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 
 #include <tdebug.h>
 #include <tstring.h>
@@ -114,9 +112,9 @@ MP4::Tag::parseData2(MP4::Atom *atom, TagLib::File *file, int expectedFlags, boo
   int i = 0;
   size_t pos = 0;
   while(pos < data.size()) {
-    int length = data.toUInt32BE(pos);
-    ByteVector name = data.mid(pos + 4, 4);
-    int flags = data.toUInt32BE(pos + 8);
+    const int length = data.toUInt32BE(pos);
+    const ByteVector name = data.mid(pos + 4, 4);
+    const int flags = data.toUInt32BE(pos + 8);
     if(freeForm && i < 2) {
       if(i == 0 && name != "mean") {
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"mean\"");
@@ -277,9 +275,9 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
   ByteVector data = file->readBlock(atom->length - 8);
   size_t pos = 0;
   while(pos < data.size()) {
-    int length = data.toUInt32BE(pos);
-    ByteVector name = data.mid(pos + 4, 4);
-    int flags = data.toUInt32BE(pos + 8);
+    const int length = data.toUInt32BE(pos);
+    const ByteVector name = data.mid(pos + 4, 4);
+    const int flags = data.toUInt32BE(pos + 8);
     if(name != "data") {
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
       break;
@@ -575,7 +573,7 @@ MP4::Tag::updateOffsets(long delta, offset_t offset)
       }
       d->file->seek(atom->offset + 9);
       ByteVector data = d->file->readBlock(atom->length - 9);
-      unsigned int flags = data.toUInt24BE(0);
+      const uint flags = data.toUInt24BE(0);
       if(flags & 1) {
         long long o = data.toInt64BE(7);
         if(o > offset) {

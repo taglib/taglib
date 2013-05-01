@@ -48,7 +48,7 @@ static double ConvertFromIeeeExtended(const ByteVector &v, size_t offset)
     return 0.0;
   }
 
-  const unsigned char *bytes = reinterpret_cast<const unsigned char*>(v.data() + offset);
+  const uchar *bytes = reinterpret_cast<const uchar*>(v.data() + offset);
   double f;
   int expon;
   unsigned long hiMant, loMant;

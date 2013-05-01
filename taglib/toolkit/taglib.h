@@ -52,31 +52,24 @@
 # endif
 # define _FILE_OFFSET_BITS 64
 # include <sys/types.h>
-
 #endif
 
 // Check the widths of integral types.
 
-#if UCHAR_MAX != 255U
-# error TagLib assumes that char is 8-bit wide.
+#if SIZEOF_SHORT != 2
+# error TagLib requires that short is 16-bit wide.
 #endif
 
-#if USHRT_MAX != 65535U
-# error TagLib assumes that short is 16-bit wide.
+#if SIZEOF_INT != 4
+# error TagLib requires that int is 32-bit wide.
 #endif
 
-#if UINT_MAX != 4294967295U
-# error TagLib assumes that int is 32-bit wide.
+#if SIZEOF_LONGLONG != 8
+# error TagLib requires that long long is 64-bit wide.
 #endif
 
-#if !defined(ULLONG_MAX) && !defined(ULONGLONG_MAX) && !defined(ULONG_LONG_MAX)
-# error TagLib assumes that long long is 64-bit wide.
-#elif defined(ULLONG_MAX) && ULLONG_MAX != 18446744073709551615ULL
-# error TagLib assumes that long long is 64-bit wide.
-#elif defined(ULONGLONG_MAX) && ULONGLONG_MAX != 18446744073709551615ULL
-# error TagLib assumes that long long is 64-bit wide.
-#elif defined(ULONG_LONG_MAX) && ULONG_LONG_MAX != 18446744073709551615ULL
-# error TagLib assumes that long long is 64-bit wide.
+#if SIZEOF_WCHAR_T < 2
+# error TagLib requires that wchar_t is sufficient to store a UTF-16 char.
 #endif
 
 // Optimized byte swap functions.
@@ -162,7 +155,11 @@ namespace TagLib {
    * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)
    * so I'm providing something here that should be constant.
    */
+#ifdef HAVE_STD_WSTRING
+  typedef std::wstring wstring;
+#else
   typedef std::basic_string<wchar> wstring;
+#endif
 }
 
 /*!

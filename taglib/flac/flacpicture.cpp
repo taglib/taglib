@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <taglib.h>
 #include <tdebug.h>
 #include "flacpicture.h"
@@ -109,7 +105,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   pos += 4;
   d->numColors = data.toUInt32BE(pos);
   pos += 4;
-  uint dataLength = data.toUInt32BE(pos);
+  const uint dataLength = data.toUInt32BE(pos);
   pos += 4;
   if(pos + dataLength > data.size()) {
     debug("Invalid picture block.");

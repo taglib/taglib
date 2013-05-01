@@ -27,13 +27,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #ifdef _WIN32
 # include <Shlwapi.h>
-#endif
+#endif 
 
 #include <tfile.h>
 #include <tstring.h>
@@ -231,8 +229,8 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 
 #ifdef _WIN32
   // Avoids direct conversion from FileName to String
-  // because String can't accept non-Latin-1 string in char array.
-  
+  // because String can't decode strings in local encodings properly.
+
   if(!fileName.wstr().empty()) {
     const wchar_t *pext = PathFindExtensionW(fileName.wstr().c_str());
     if(*pext == L'.')
