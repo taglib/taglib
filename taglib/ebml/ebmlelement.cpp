@@ -112,8 +112,8 @@ public:
     }
     
     // Calculate the minimal length of the variable length integer
-    uint byteSize = vint.size();
-    for(uint i = 0; byteSize > 0 && vint[i] == 0; ++i)
+    size_t byteSize = vint.size();
+    for(size_t i = 0; byteSize > 0 && vint[i] == 0; ++i)
       --byteSize;
     
     if(!addOne)
@@ -125,7 +125,7 @@ public:
     if(number >= (firstByte << (8 * (byteSize - 1))) && byteSize < vint.size())
       ++byteSize;
     // Add the one at the correct position
-    uint firstBytePosition = vint.size() - byteSize;
+    size_t firstBytePosition = vint.size() - byteSize;
     vint[firstBytePosition] |= (1 << firstBytePosition);
     return ByteVector(vint.data() + firstBytePosition, byteSize);
   }
@@ -207,7 +207,7 @@ public:
     ByteVector content(createVInt(id, false).append(createVInt(size, true, false)));
     data = position + content.size();
     // space for children
-    content.resize(data - position + size);
+    content.resize(static_cast<size_t>(data - position + size));
     
     Element *freeSpace;
     if (!(freeSpace = searchVoid(content.size()))) {
@@ -218,7 +218,7 @@ public:
         current->d->size += content.size();
         // Create new header and write it.
         ByteVector parentHeader(createVInt(current->d->id, false).append(createVInt(current->d->size, true, false)));
-        uint oldHeaderSize = current->d->data - current->d->position;
+        size_t oldHeaderSize = static_cast<size_t>(current->d->data - current->d->position);
         if(oldHeaderSize < parentHeader.size()) {
           ByteVector secondHeader(createVInt(current->d->id, false).append(createVInt(current->d->size)));
           if(oldHeaderSize == secondHeader.size()) {
@@ -258,7 +258,8 @@ public:
         freeSpace->d->size = newSize;
         freeSpace->d->data = freeSpace->d->position + newVoid.size();
         // Write to file
-        document->writeBlock(newVoid.resize(newVoid.size() + newSize).append(content));
+        document->writeBlock(
+          newVoid.resize(static_cast<size_t>(newVoid.size() + newSize)).append(content));
       }
     }
   }
@@ -315,7 +316,7 @@ EBML::Element *EBML::Element::getParent()
 ByteVector EBML::Element::getAsBinary()
 {
   d->document->seek(d->data);
-  return d->document->readBlock(d->size);
+  return d->document->readBlock(static_cast<size_t>(d->size));
 }
 
 String EBML::Element::getAsString()
@@ -341,16 +342,16 @@ long double EBML::Element::getAsFloat()
 {
   // Very dirty implementation!
   ByteVector bin = getAsBinary();
-  uint size = bin.size();
-  ulli sum = 0.0L;
+  size_t size = bin.size();
+  ulli sum = 0;
   
   // For 0 byte floats and any float that is not defined in the ebml spec.
   if (size != 4 && size != 8 /*&& size() != 10*/) // XXX: Currently no support for 10 bit floats.
-    return sum;
+    return static_cast<long double>(sum);
   
   // From toNumber; Might not be portable, since it requires IEEE floats.
-  uint last = size - 1;
-  for(uint i = 0; i <= last; i++)
+  size_t last = size - 1;
+  for(size_t i = 0; i <= last; i++)
     sum |= (ulli) uchar(bin[i]) << ((last - i) * 8);
   
   if (size == 4) {
@@ -433,7 +434,7 @@ bool EBML::Element::removeChild(Element *element, bool useVoid)
     return false;
   
   if(!useVoid || !element->d->makeVoid()) {
-    d->document->removeBlock(element->d->position, element->d->size);
+    d->document->removeBlock(element->d->position, static_cast<size_t>(element->d->size));
     // Update parents
     for(Element* current = this; current; current = current->d->parent)
       current->d->size -= element->d->size;
@@ -449,7 +450,7 @@ bool EBML::Element::removeChild(Element *element, bool useVoid)
 void EBML::Element::setAsBinary(const ByteVector &binary)
 {
   // Maybe: Search for void element after this one
-  d->document->insert(binary, d->data, d->size);
+  d->document->insert(binary, d->data, static_cast<size_t>(d->size));
 }
 
 void EBML::Element::setAsString(const String &string)
