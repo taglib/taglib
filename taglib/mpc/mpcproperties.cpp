@@ -293,7 +293,7 @@ void MPC::Properties::readSV7(const ByteVector &data)
       d->sampleFrames = d->totalFrames * 1152 - 576;
   }
   else {
-    uint headerData = data.toUInt32LE(0);
+    const uint headerData = data.toUInt32LE(0);
 
     d->bitrate = (headerData >> 23) & 0x01ff;
     d->version = (headerData >> 11) & 0x03ff;

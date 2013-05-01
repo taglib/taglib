@@ -142,7 +142,7 @@ void Ogg::Vorbis::Properties::read()
 
   ByteVector data = d->file->packet(0);
 
-  int pos = 0;
+  uint pos = 0;
 
   if(data.mid(pos, 7) != vorbisSetupHeaderID) {
     debug("Ogg::Vorbis::Properties::read() -- invalid Ogg::Vorbis identification header");

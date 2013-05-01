@@ -23,9 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
 
 #include <tdebug.h>
 #include <tstring.h>
@@ -130,7 +128,7 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
     d->bitsPerSample = data.toInt16BE(42);
     d->sampleRate    = data.toUInt32BE(46);
     if(data.mid(56, 4) == "esds" && data[64] == 0x03) {
-      long pos = 65;
+      uint pos = 65;
       if(data.mid(pos, 3) == "\x80\x80\x80") {
         pos += 3;
       }

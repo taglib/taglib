@@ -125,7 +125,7 @@ void APE::Properties::read()
 
   // Then we read the header common for all versions of APE
   d->file->seek(offset);
-  ByteVector commonHeader=d->file->readBlock(6);
+  ByteVector commonHeader = d->file->readBlock(6);
   if(!commonHeader.startsWith("MAC "))
     return;
   d->version = commonHeader.toUInt16LE(4);
@@ -182,7 +182,7 @@ void APE::Properties::analyzeCurrent()
   // Read the descriptor
   d->file->seek(2, File::Current);
   ByteVector descriptor = d->file->readBlock(44);
-  uint descriptorBytes = descriptor.toUInt32LE(0);
+  const uint descriptorBytes = descriptor.toUInt32LE(0);
 
   if ((descriptorBytes - 52) > 0)
     d->file->seek(descriptorBytes - 52, File::Current);
@@ -196,9 +196,10 @@ void APE::Properties::analyzeCurrent()
   d->bitsPerSample = header.toInt16LE(16);
   //d->compressionLevel =
 
-  uint totalFrames = header.toUInt32LE(12);
-  uint blocksPerFrame = header.toUInt32LE(4);
-  uint finalFrameBlocks = header.toUInt32LE(8);
+  const uint totalFrames = header.toUInt32LE(12);
+  const uint blocksPerFrame = header.toUInt32LE(4);
+  const uint finalFrameBlocks = header.toUInt32LE(8);
+
   d->sampleFrames = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
   d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
@@ -207,13 +208,13 @@ void APE::Properties::analyzeCurrent()
 void APE::Properties::analyzeOld()
 {
   ByteVector header = d->file->readBlock(26);
-  uint totalFrames = header.toUInt32LE(18);
+  const uint totalFrames = header.toUInt32LE(18);
 
   // Fail on 0 length APE files (catches non-finalized APE files)
   if(totalFrames == 0)
     return;
 
-  short compressionLevel = header.toUInt32LE(0);
+  const short compressionLevel = header.toUInt32LE(0);
   uint blocksPerFrame;
   if(d->version >= 3950)
     blocksPerFrame = 73728 * 4;
@@ -221,6 +222,7 @@ void APE::Properties::analyzeOld()
     blocksPerFrame = 73728;
   else
     blocksPerFrame = 9216;
+
   d->channels = header.toUInt16LE(4);
   d->sampleRate = header.toUInt32LE(6);
   const uint finalFrameBlocks = header.toUInt32LE(22);
