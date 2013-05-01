@@ -1,7 +1,7 @@
-/**************************************************************************
-    copyright            : (C) 2009 by Lukáš Lalinský
-    email                : lalinsky@gmail.com
- **************************************************************************/
+/***************************************************************************
+    copyright            : (C) 2013 by Sebastian Rachuj
+    email                : rachus@web.de
+ ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -23,56 +23,64 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_MP4COVERART_H
-#define TAGLIB_MP4COVERART_H
+#ifndef TAGLIB_EBMLFILE_H
+#define TAGLIB_EBMLFILE_H
 
-#include "tlist.h"
-#include "tbytevector.h"
 #include "taglib_export.h"
-#include "mp4atom.h"
+#include "tfile.h"
+
+#include "ebmlconstants.h"
 
 namespace TagLib {
 
-  namespace MP4 {
-
-    class TAGLIB_EXPORT CoverArt
+  //! A namespace for the classes used by EBML-based metadata files
+  namespace EBML {
+  
+    class Element;
+  
+    /*!
+     * Represents an EBML file. It offers access to the root element which can
+     * be used to obtain the necessary information and to change the file
+     * according to changes.
+     */
+    class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
+      //! Destroys the instance of the file.
+      virtual ~File();
+      
       /*!
-       * This describes the image type.
+       * Returns a pointer to the document root element of the EBML file.
        */
-      enum Format {
-        JPEG    = TypeJPEG,
-        PNG     = TypePNG,
-        BMP     = TypeBMP,
-        GIF     = TypeGIF,
-        Unknown = TypeImplicit,
-      };
-
-      CoverArt(Format format, const ByteVector &data);
-      ~CoverArt();
-
-      CoverArt(const CoverArt &item);
-      CoverArt &operator=(const CoverArt &item);
-#ifdef SUPPORT_MOVE_SEMANTICS
-      CoverArt &operator=(CoverArt &&item);
-#endif
-
-      //! Format of the image
-      Format format() const;
-
-      //! The image data
-      ByteVector data() const;
-
+      Element *getDocumentRoot();
+      
+    protected:
+      /*!
+       * Constructs an instance of an EBML file from \a file.
+       *
+       * This constructor is protected since an object should be created
+       * through a specific subclass.
+       */
+      File(FileName file);
+      
+      /*!
+       * Constructs an instance of an EBML file from an IOStream.
+       *
+       * This constructor is protected since an object should be created
+       * through a specific subclass.
+       */
+      File(IOStream *stream);
+    
     private:
-      class CoverArtPrivate;
-      TAGLIB_SHARED_PTR<CoverArtPrivate> d;
+      //! Non-copyable
+      File(const File&);
+      File &operator=(const File &);
+      
+      class FilePrivate;
+      FilePrivate *d;
     };
-
-    typedef List<CoverArt> CoverArtList;
-
+  
   }
-
 }
 
 #endif
