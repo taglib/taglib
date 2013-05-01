@@ -65,7 +65,7 @@ namespace
   size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
     DWORD readLen;
-    if(ReadFile(stream, ptr, size * nmemb, &readLen, NULL))
+    if(ReadFile(stream, ptr, static_cast<DWORD>(size * nmemb), &readLen, NULL))
       return (readLen / size);
     else
       return 0;
@@ -74,7 +74,7 @@ namespace
   size_t fwrite(const void *ptr, size_t size, size_t nmemb, HANDLE stream)
   {
     DWORD writtenLen;
-    if(WriteFile(stream, ptr, size * nmemb, &writtenLen, NULL))
+    if(WriteFile(stream, ptr, static_cast<DWORD>(size * nmemb), &writtenLen, NULL))
       return (writtenLen / size);
     else 
       return 0;

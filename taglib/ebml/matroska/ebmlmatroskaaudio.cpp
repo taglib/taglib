@@ -46,7 +46,7 @@ public:
     if(info && (value = info->getChild(Constants::Duration))) {
       length = static_cast<int>(value->getAsFloat());
       if((value = info->getChild(Constants::TimecodeScale))){
-        length /= (value->getAsUnsigned() * (1 / 1000000000));
+        length = static_cast<int>(length / (value->getAsUnsigned() * (1.0 / 1000000000)));
       }
     }
     
@@ -59,10 +59,10 @@ public:
     
     // Dirty bitrate:
     document->seek(0, File::End);
-    bitrate = ((8 * document->tell()) / length) / 1000;
+    bitrate = static_cast<int>(8 * document->tell() / length / 1000);
     
     if((value = info->getChild(Constants::Channels)))
-      channels = value->getAsUnsigned();
+      channels = static_cast<int>(value->getAsUnsigned());
     
     if((value = info->getChild(Constants::SamplingFrequency)))
       samplerate = static_cast<int>(value->getAsFloat());

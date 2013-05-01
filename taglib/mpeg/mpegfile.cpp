@@ -374,7 +374,8 @@ offset_t MPEG::File::previousFrameOffset(offset_t position)
   ByteVector buffer;
 
   while (position > 0) {
-    uint size = position < static_cast<offset_t>(bufferSize()) ? static_cast<uint>(position) : bufferSize();
+    size_t size = position < static_cast<offset_t>(bufferSize()) 
+      ? static_cast<size_t>(position) : bufferSize();
     position -= size;
 
     seek(position);
