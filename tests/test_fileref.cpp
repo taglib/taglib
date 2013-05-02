@@ -6,9 +6,6 @@
 #include <vorbisfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 using namespace std;
 using namespace TagLib;

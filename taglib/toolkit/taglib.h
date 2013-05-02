@@ -26,26 +26,11 @@
 #ifndef TAGLIB_H
 #define TAGLIB_H
 
-#include "config.h"
+#include "taglib_config.h"
 
 #define TAGLIB_MAJOR_VERSION 1
 #define TAGLIB_MINOR_VERSION 8
 #define TAGLIB_PATCH_VERSION 0
-
-#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
-#define TAGLIB_IGNORE_MISSING_DESTRUCTOR _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")
-#else
-#define TAGLIB_IGNORE_MISSING_DESTRUCTOR
-#endif
-
-#if (defined(_MSC_VER) && _MSC_VER >= 1600)
-#define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long long>(x)
-#else
-#define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
-#endif
-
-#include <string>
-#include <climits>
 
 // Check the widths of integral types.
 
@@ -63,6 +48,20 @@
 
 #if SIZEOF_WCHAR_T < 2
 # error TagLib requires that wchar_t is sufficient to store a UTF-16 char.
+#endif
+
+#include <string>
+
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
+#define TAGLIB_IGNORE_MISSING_DESTRUCTOR _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")
+#else
+#define TAGLIB_IGNORE_MISSING_DESTRUCTOR
+#endif
+
+#if (defined(_MSC_VER) && _MSC_VER >= 1600)
+#define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long long>(x)
+#else
+#define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
 #endif
 
 // Atomic increment/decrement operations

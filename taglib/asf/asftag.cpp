@@ -23,8 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
-
+#include "taglib_config.h"
 #include <tpropertymap.h>
 #include "asftag.h"
 
