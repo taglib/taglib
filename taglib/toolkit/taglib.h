@@ -39,7 +39,6 @@
 #endif
 
 #include <string>
-#include <climits>
 
 #ifdef _WIN32
 # if !defined(NOMINMAX)

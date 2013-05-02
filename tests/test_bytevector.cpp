@@ -177,6 +177,16 @@ public:
     CPPUNIT_ASSERT(ByteVector::fromUInt16LE(4386) == ByteVector::fromUInt16BE(8721));
     CPPUNIT_ASSERT(ByteVector::fromUInt32LE(287454020) == ByteVector::fromUInt32BE(1144201745));
     CPPUNIT_ASSERT(ByteVector::fromUInt64LE(1234605615291183940) == ByteVector::fromUInt64BE(4914309075945333265));
+  
+
+	const uchar PI32[] = { 0x00, 0x40, 0x49, 0x0f, 0xdb };
+	const uchar PI64[] = { 0x00, 0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18 };
+
+	ByteVector pi32(reinterpret_cast<const char*>(PI32), 5);
+	CPPUNIT_ASSERT(static_cast<int>(pi32.toFloat32BE(1) * 100) == 314);
+
+	ByteVector pi64(reinterpret_cast<const char*>(PI64), 9);
+	CPPUNIT_ASSERT(static_cast<int>(pi64.toFloat64BE(1) * 100) == 314);
   }
 
   void testReplace()
