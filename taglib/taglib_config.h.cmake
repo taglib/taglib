@@ -4,39 +4,33 @@
 #cmakedefine   TAGLIB_LITTLE_ENDIAN 1
 #cmakedefine   TAGLIB_BIG_ENDIAN 1
 
-/* Size of integral types */
-#cmakedefine   SIZEOF_SHORT    ${SIZEOF_SHORT}
-#cmakedefine   SIZEOF_INT      ${SIZEOF_INT}
-#cmakedefine   SIZEOF_LONGLONG ${SIZEOF_LONGLONG}
-#cmakedefine   SIZEOF_WCHAR_T  ${SIZEOF_WCHAR_T}
-
 /* Defined if your compiler supports std::wstring */
-#cmakedefine   HAVE_STD_WSTRING 1
+#cmakedefine   TAGLIB_HAVE_STD_WSTRING 1
 
 /* Defined if your compiler supports some atomic operations */
-#cmakedefine   HAVE_STD_ATOMIC 1
-#cmakedefine   HAVE_BOOST_ATOMIC 1
-#cmakedefine   HAVE_GCC_ATOMIC 1
-#cmakedefine   HAVE_MAC_ATOMIC 1
-#cmakedefine   HAVE_WIN_ATOMIC 1
-#cmakedefine   HAVE_IA64_ATOMIC 1
+#cmakedefine   TAGLIB_HAVE_STD_ATOMIC 1
+#cmakedefine   TAGLIB_HAVE_BOOST_ATOMIC 1
+#cmakedefine   TAGLIB_HAVE_GCC_ATOMIC 1
+#cmakedefine   TAGLIB_HAVE_MAC_ATOMIC 1
+#cmakedefine   TAGLIB_HAVE_WIN_ATOMIC 1
+#cmakedefine   TAGLIB_HAVE_IA64_ATOMIC 1
 
 /* Defined if your compiler supports some byte swap functions */
-#cmakedefine   HAVE_GCC_BYTESWAP_16 1
-#cmakedefine   HAVE_GCC_BYTESWAP_32 1
-#cmakedefine   HAVE_GCC_BYTESWAP_64 1
-#cmakedefine   HAVE_GLIBC_BYTESWAP 1
-#cmakedefine   HAVE_MSC_BYTESWAP 1
-#cmakedefine   HAVE_MAC_BYTESWAP 1
-#cmakedefine   HAVE_OPENBSD_BYTESWAP 1
+#cmakedefine   TAGLIB_HAVE_GCC_BYTESWAP_16 1
+#cmakedefine   TAGLIB_HAVE_GCC_BYTESWAP_32 1
+#cmakedefine   TAGLIB_HAVE_GCC_BYTESWAP_64 1
+#cmakedefine   TAGLIB_HAVE_GLIBC_BYTESWAP 1
+#cmakedefine   TAGLIB_HAVE_MSC_BYTESWAP 1
+#cmakedefine   TAGLIB_HAVE_MAC_BYTESWAP 1
+#cmakedefine   TAGLIB_HAVE_OPENBSD_BYTESWAP 1
 
 /* Defined if your compiler supports codecvt */
-#cmakedefine   HAVE_STD_CODECVT 1
+#cmakedefine   TAGLIB_HAVE_STD_CODECVT 1
 
 /* Defined if you have libz */
-#cmakedefine   HAVE_ZLIB 1
+#cmakedefine   TAGLIB_HAVE_ZLIB 1
 
 #define   TAGLIB_WITH_ASF 1
 #define   TAGLIB_WITH_MP4 1
 
-#cmakedefine TESTS_DIR "@TESTS_DIR@"
+#cmakedefine TAGLIB_TESTS_DIR "@TESTS_DIR@"

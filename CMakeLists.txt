@@ -21,7 +21,7 @@ option(BUILD_EXAMPLES "Build the examples"  OFF)
 
 option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
 
-set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
+set(TAGLIB_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
 ## the following are directories where stuff will be installed to
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")

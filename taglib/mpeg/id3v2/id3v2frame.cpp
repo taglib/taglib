@@ -25,7 +25,7 @@
 
 #include "taglib_config.h"
 
-#if HAVE_ZLIB
+#if TAGLIB_HAVE_ZLIB
 #include <zlib.h>
 #endif
 
@@ -248,7 +248,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     frameDataOffset += 4;
   }
 
-#if HAVE_ZLIB
+#if TAGLIB_HAVE_ZLIB
   if(d->header->compression() &&
      !d->header->encryption())
   {

@@ -17,7 +17,7 @@ using namespace std;
 
 inline string testFilePath(const string &filename)
 {
-  return string(TESTS_DIR "data/") + filename;
+  return string(TAGLIB_TESTS_DIR "data/") + filename;
 }
 
 #define TEST_FILE_PATH_C(f) testFilePath(f).c_str()

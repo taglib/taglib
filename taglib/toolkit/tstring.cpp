@@ -32,13 +32,7 @@
 #include <iostream>
 #include <string.h>
 
-// x86 CPUs are alignment-tolerant or allow pointer casts from smaller types to larger types.
-#if defined(__i386__) || defined(_M_IX86) || defined(__amd64) || defined(__amd64__) \
-  || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) 
-# define TAGLIB_ALIGNMENT_TOLERANT 1
-#endif
-
-#ifdef HAVE_STD_CODECVT
+#ifdef TAGLIB_HAVE_STD_CODECVT
 # include <codecvt>
 #else
 # include "unicode.h"
@@ -66,7 +60,7 @@ namespace
 
   void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
-#ifdef HAVE_STD_CODECVT
+#ifdef TAGLIB_HAVE_STD_CODECVT
 
     typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
 
@@ -112,7 +106,7 @@ namespace
 
   void UTF8toUTF16(const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
   {
-#ifdef HAVE_STD_CODECVT
+#ifdef TAGLIB_HAVE_STD_CODECVT
 
     typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
 
@@ -813,12 +807,6 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
 void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
-#if SIZEOF_WCHAR_T == 2 && defined(TAGLIB_ALIGNMENT_TOLERANT)
-
-  copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
-
-#else
-
   bool swap;
   if(t == UTF16) {
     if(length < 2) {
@@ -850,8 +838,6 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
     s += 2;
   }
-
-#endif
 }
 
 #ifdef TAGLIB_LITTLE_ENDIAN
