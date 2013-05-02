@@ -371,6 +371,26 @@ namespace TagLib {
      */
     long long toInt64BE(size_t offset) const;
 
+    /*
+     * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
+     * 32-bit big-endian floating point number.
+     */
+    float toFloat32BE(size_t offset) const;
+
+    /*
+     * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
+     * 64-bit big-endian floating point number.
+     */
+    double toFloat64BE(size_t offset) const;
+
+    /*
+     * Converts the 10 bytes at \a offset of the vector to a long double as an IEEE754
+     * 80-bit big-endian floating point number.
+     *
+     * \note This may compromise the precision depends on the size of long double.
+     */
+    long double toFloat80BE(size_t offset) const;
+
     /*!
      * Creates a 2 byte ByteVector based on \a value as an unsigned 16-bit
      * little-endian integer.

@@ -340,27 +340,18 @@ EBML::ulli EBML::Element::getAsUnsigned()
 
 long double EBML::Element::getAsFloat()
 {
-  // Very dirty implementation!
-  ByteVector bin = getAsBinary();
-  size_t size = bin.size();
-  ulli sum = 0;
-  
-  // For 0 byte floats and any float that is not defined in the ebml spec.
-  if (size != 4 && size != 8 /*&& size() != 10*/) // XXX: Currently no support for 10 bit floats.
-    return static_cast<long double>(sum);
-  
-  // From toNumber; Might not be portable, since it requires IEEE floats.
-  size_t last = size - 1;
-  for(size_t i = 0; i <= last; i++)
-    sum |= (ulli) uchar(bin[i]) << ((last - i) * 8);
-  
-  if (size == 4) {
-    float result = *reinterpret_cast<float *>(&sum);
-    return result;
-  }
-  else {
-    double result = *reinterpret_cast<double *>(&sum);
-    return result;
+  const ByteVector bin = getAsBinary();
+  switch (bin.size())
+  {
+  case 4:
+    return bin.toFloat32BE(0);
+  case 8:
+    return bin.toFloat64BE(0);
+  case 10:
+    return bin.toFloat80BE(0);
+  default:
+    debug("EBML::Element::getAsFloat() - Invalid data size. Returning 0.");
+    return 0.0;
   }
 }
 

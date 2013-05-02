@@ -5,10 +5,13 @@
 #cmakedefine   TAGLIB_BIG_ENDIAN 1
 
 /* Size of integral types */
-#cmakedefine   SIZEOF_SHORT    ${SIZEOF_SHORT}
-#cmakedefine   SIZEOF_INT      ${SIZEOF_INT}
-#cmakedefine   SIZEOF_LONGLONG ${SIZEOF_LONGLONG}
-#cmakedefine   SIZEOF_WCHAR_T  ${SIZEOF_WCHAR_T}
+#cmakedefine   SIZEOF_SHORT      ${SIZEOF_SHORT}
+#cmakedefine   SIZEOF_INT        ${SIZEOF_INT}
+#cmakedefine   SIZEOF_LONGLONG   ${SIZEOF_LONGLONG}
+#cmakedefine   SIZEOF_WCHAR_T    ${SIZEOF_WCHAR_T}
+#cmakedefine   SIZEOF_FLOAT      ${SIZEOF_FLOAT}
+#cmakedefine   SIZEOF_DOUBLE     ${SIZEOF_DOUBLE}
+#cmakedefine   SIZEOF_LONGDOUBLE ${SIZEOF_LONGDOUBLE}
 
 /* Defined if your compiler supports the move semantics */
 #cmakedefine   SUPPORT_MOVE_SEMANTICS 1
