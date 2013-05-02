@@ -14,11 +14,14 @@ if(NOT TAGLIB_BIG_ENDIAN)
   set(TAGLIB_LITTLE_ENDIAN 1)
 endif()
 
-# Determine the size of integral types.
-check_type_size("short"   SIZEOF_SHORT)
-check_type_size("int"     SIZEOF_INT)
-check_type_size("long long" SIZEOF_LONGLONG)
-check_type_size("wchar_t"   SIZEOF_WCHAR_T)
+# Determine the size of numeric types.
+check_type_size("short"       SIZEOF_SHORT)
+check_type_size("int"         SIZEOF_INT)
+check_type_size("long long"   SIZEOF_LONGLONG)
+check_type_size("wchar_t"     SIZEOF_WCHAR_T)
+check_type_size("float"       SIZEOF_FLOAT)
+check_type_size("double"      SIZEOF_DOUBLE)
+check_type_size("long double" SIZEOF_LONGDOUBLE)
 
 # Determine whether or not your compiler supports move semantics.
 check_cxx_source_compiles("
