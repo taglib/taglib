@@ -36,6 +36,7 @@ set(tag_HDRS
   audioproperties.h
   taglib_export.h
   ${CMAKE_BINARY_DIR}/taglib_config.h
+  ${CMAKE_BINARY_DIR}/config.h
   toolkit/taglib.h
   toolkit/tstring.h
   toolkit/tlist.h
