@@ -107,12 +107,12 @@ namespace TagLib
        */
       Picture(const Picture& other);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
       /*!
        * Constructs an picture equivalent to \a other.
        *
-       * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
        */
       Picture(Picture &&other);
 
@@ -128,12 +128,12 @@ namespace TagLib
        */
       Picture& operator=(const Picture& other);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
       /*!
        * Moves the contents of \a other into this picture.
        *
-       * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
       */
       Picture& operator=(Picture &&other);
 

@@ -1,6 +1,5 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+#include "config.h"
+
 #ifdef _WIN32
 #include <windows.h>
 #else

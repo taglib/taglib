@@ -26,7 +26,7 @@
 #ifndef TAGLIB_H
 #define TAGLIB_H
 
-#include "config.h"
+#include "taglib_config.h"
 
 #define TAGLIB_MAJOR_VERSION 1
 #define TAGLIB_MINOR_VERSION 8
@@ -37,8 +37,6 @@
 #else
 #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
 #endif
-
-#include <string>
 
 #ifdef _WIN32
 # if !defined(NOMINMAX)
@@ -51,72 +49,6 @@
 # endif
 # define _FILE_OFFSET_BITS 64
 # include <sys/types.h>
-#endif
-
-// Check the widths of integral types.
-
-#if SIZEOF_SHORT != 2
-# error TagLib requires that short is 16-bit wide.
-#endif
-
-#if SIZEOF_INT != 4
-# error TagLib requires that int is 32-bit wide.
-#endif
-
-#if SIZEOF_LONGLONG != 8
-# error TagLib requires that long long is 64-bit wide.
-#endif
-
-#if SIZEOF_WCHAR_T < 2
-# error TagLib requires that wchar_t is sufficient to store a UTF-16 char.
-#endif
-
-// Optimized byte swap functions.
-
-#if defined(HAVE_MSC_BYTESWAP)
-# include <stdlib.h>
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# include <byteswap.h>
-#elif defined(HAVE_MAC_BYTESWAP)
-# include <libkern/OSByteOrder.h>
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# include <sys/endian.h>
-#endif
-
-#if defined(HAVE_GCC_BYTESWAP_16)
-# define TAGLIB_BYTESWAP_16(x) __builtin_bswap16(x)
-#elif defined(HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) _byteswap_ushort(x)
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) __bswap_16(x)
-#elif defined(HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) OSSwapInt16(x)
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) swap16(x)
-#endif
-
-#if defined(HAVE_GCC_BYTESWAP_32)
-# define TAGLIB_BYTESWAP_32(x) __builtin_bswap32(x)
-#elif defined(HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) _byteswap_ulong(x)
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) __bswap_32(x)
-#elif defined(HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) OSSwapInt32(x)
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) swap32(x)
-#endif
-
-#if defined(HAVE_GCC_BYTESWAP_64)
-# define TAGLIB_BYTESWAP_64(x) __builtin_bswap64(x)
-#elif defined(HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) _byteswap_uint64(x)
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) __bswap_64(x)
-#elif defined(HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) OSSwapInt64(x)
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) swap64(x)
 #endif
 
 //! A namespace for all TagLib related classes and functions
@@ -143,21 +75,11 @@ namespace TagLib {
   typedef unsigned long  ulong;
 
   // Offset or length type for I/O streams.  
-  // In Win32, always 64bit. Otherwise, equivalent to off_t.
+  // In Win32, always signed 64-bit. Otherwise, equivalent to off_t.
 #ifdef _WIN32
   typedef LONGLONG offset_t;
 #else
   typedef off_t    offset_t;
-#endif
-
-  /*!
-   * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)
-   * so I'm providing something here that should be constant.
-   */
-#ifdef HAVE_STD_WSTRING
-  typedef std::wstring wstring;
-#else
-  typedef std::basic_string<wchar> wstring;
 #endif
 }
 

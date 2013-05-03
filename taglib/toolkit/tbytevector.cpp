@@ -23,14 +23,26 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "config.h"
+
 #include <iostream>
 #include <limits>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+
+#if defined(HAVE_MSC_BYTESWAP)
+# include <stdlib.h>
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# include <byteswap.h>
+#elif defined(HAVE_MAC_BYTESWAP)
+# include <libkern/OSByteOrder.h>
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# include <sys/endian.h>
+#endif
+
 #include <tstring.h>
 #include <tdebug.h>
-
 #include "tbytevector.h"
 
 // This is a bit ugly to keep writing over and over again.
@@ -187,9 +199,25 @@ inline T byteSwap(T x)
 template <>
 inline ushort byteSwap<ushort>(ushort x)
 {
-#ifdef TAGLIB_BYTESWAP_16
+#if defined(HAVE_GCC_BYTESWAP_16)
 
-  return TAGLIB_BYTESWAP_16(x);
+  return __builtin_bswap16(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+  return _byteswap_ushort(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+  return __bswap_16(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+  return OSSwapInt16(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+  return swap16(x);
 
 #else
 
@@ -201,9 +229,25 @@ inline ushort byteSwap<ushort>(ushort x)
 template <>
 inline uint byteSwap<uint>(uint x)
 {
-#ifdef TAGLIB_BYTESWAP_32
+#if defined(HAVE_GCC_BYTESWAP_32)
 
-  return TAGLIB_BYTESWAP_32(x);
+  return __builtin_bswap32(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+  return _byteswap_ulong(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+  return __bswap_32(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+  return OSSwapInt32(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+  return swap32(x);
 
 #else
 
@@ -218,9 +262,25 @@ inline uint byteSwap<uint>(uint x)
 template <>
 inline ulonglong byteSwap<ulonglong>(ulonglong x)
 {
-#ifdef TAGLIB_BYTESWAP_64
+#if defined(HAVE_GCC_BYTESWAP_64)
 
-  return TAGLIB_BYTESWAP_64(x);
+  return __builtin_bswap64(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+  return _byteswap_uint64(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+  return __bswap_64(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+  return OSSwapInt64(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+  return swap64(x);
 
 #else
 
@@ -246,7 +306,7 @@ namespace {
 template <typename T, size_t LENGTH, Endianness ENDIAN>
 inline T toNumber(const ByteVector &v, size_t offset)
 {
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
   static const bool swap = (ENDIAN == BigEndian);
 #else
   static const bool swap = (ENDIAN == LittleEndian);
@@ -281,7 +341,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
 template <typename T, Endianness ENDIAN>
 inline ByteVector fromNumber(T value)
 {
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
   static const bool swap = (ENDIAN == BigEndian);
 #else
   static const bool swap = (ENDIAN == LittleEndian);
@@ -291,23 +351,6 @@ inline ByteVector fromNumber(T value)
     value = byteSwap<T>(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
-}
-
-template <class T, bool IS_LITTLE_ENDIAN>
-inline void appendNumber(ByteVector &v, T value)
-{
-#ifdef TAGLIB_LITTLE_ENDIAN
-  static const bool swap = !IS_LITTLE_ENDIAN;
-#else
-  static const bool swap = IS_LITTLE_ENDIAN;
-#endif
-
-  if(swap)
-    value = byteSwap<T>(value);
-
-  const size_t offset = v.size();
-  v.resize(offset + sizeof(T));
-  ::memcpy(v.data() + offset, reinterpret_cast<const char *>(&value), sizeof(T));
 }
 
 class ByteVector::ByteVectorPrivate 
@@ -443,7 +486,7 @@ ByteVector::ByteVector(const ByteVector &v, size_t offset, size_t length)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 ByteVector::ByteVector(ByteVector &&v) 
   : d(std::move(v.d))
@@ -809,7 +852,7 @@ float ByteVector::toFloat32BE(size_t offset) const
     uint tmp;
     ::memcpy(&tmp, data() + offset, 4);
 
-# ifdef TAGLIB_LITTLE_ENDIAN
+# if SYSTEM_BYTEORDER == 1
     tmp = byteSwap<uint>(tmp);
 # endif
 
@@ -867,7 +910,7 @@ double ByteVector::toFloat64BE(size_t offset) const
     ulonglong tmp;
     ::memcpy(&tmp, data() + offset, 8);
 
-# ifdef TAGLIB_LITTLE_ENDIAN
+# if SYSTEM_BYTEORDER == 1
     tmp = byteSwap<ulonglong>(tmp);
 # endif
 
@@ -1022,7 +1065,7 @@ ByteVector &ByteVector::operator=(const ByteVector &v)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 ByteVector &ByteVector::operator=(ByteVector &&v)
 {

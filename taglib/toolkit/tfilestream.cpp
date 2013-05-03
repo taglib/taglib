@@ -98,7 +98,7 @@ namespace
       if(len == 0)
         return String::null;
 
-      wstring wstr(len, L'\0');
+      std::wstring wstr(len, L'\0');
       MultiByteToWideChar(CP_ACP, 0, name.str().c_str(), -1, &wstr[0], len);
 
       return String(wstr);

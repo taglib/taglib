@@ -28,7 +28,6 @@
 #include <tbytevector.h>
 #include <tstring.h>
 #include <tdebug.h>
-
 #include "mpegheader.h"
 
 using namespace TagLib;
@@ -78,7 +77,7 @@ MPEG::Header::Header(const Header &h)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 MPEG::Header::Header(Header &&h) 
   : d(std::move(h.d))
@@ -157,7 +156,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 MPEG::Header &MPEG::Header::operator=(Header &&h)
 {

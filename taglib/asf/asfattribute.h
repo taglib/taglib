@@ -115,12 +115,12 @@ namespace TagLib
        */
       ASF::Attribute &operator=(const Attribute &other);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
       /*!
        * Moves the contents of \a other into this item.
        *
-       * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
        */
       ASF::Attribute &operator=(Attribute &&other);
 
