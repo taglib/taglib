@@ -25,16 +25,23 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
+#include <cstring>
+
+#include "config.h"
+
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 
-#include <string.h>
 
-// x86 CPUs are alignment-tolerant or allow pointer casts from smaller types to larger types.
-#if defined(__i386__) || defined(_M_IX86) || defined(__amd64) || defined(__amd64__) \
-  || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) 
-# define TAGLIB_ALIGNMENT_TOLERANT 1
+#if defined(HAVE_MSC_BYTESWAP)
+# include <stdlib.h>
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# include <byteswap.h>
+#elif defined(HAVE_MAC_BYTESWAP)
+# include <libkern/OSByteOrder.h>
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# include <sys/endian.h>
 #endif
 
 #ifdef HAVE_STD_CODECVT
@@ -47,13 +54,29 @@ namespace
 {
   inline TagLib::ushort byteSwap(TagLib::ushort x)
   {
-#ifdef TAGLIB_BYTESWAP_16
+#if defined(HAVE_GCC_BYTESWAP_16)
 
-    return TAGLIB_BYTESWAP_16(x);
+    return __builtin_bswap16(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+    return _byteswap_ushort(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+    return __bswap_16(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+    return OSSwapInt16(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+    return swap16(x);
 
 #else
 
-    return((x >> 8) & 0xff) | ((x & 0xff) << 8);
+    return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
 
 #endif
   }
@@ -165,14 +188,14 @@ public:
   {
   }
 
-  StringPrivate(const wstring &s) 
+  StringPrivate(const std::wstring &s) 
     : data(s) 
   {
   }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
-  StringPrivate(wstring &&s) 
+  StringPrivate(std::wstring &&s) 
     : data(s) 
   {
   }
@@ -187,7 +210,7 @@ public:
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian. 
    */
-  TagLib::wstring data;
+  std::wstring data;
 
   /*!
    * This is only used to hold the the most recent value of toCString().
@@ -198,7 +221,7 @@ public:
 const String String::null;
 
 // Actual value is -1.
-const size_t String::npos = wstring::npos;
+const size_t String::npos = std::wstring::npos;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -212,7 +235,7 @@ String::String(const String &s)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 String::String(String &&s) 
   : d(std::move(s.d))
@@ -233,13 +256,13 @@ String::String(const std::string &s, Type t)
   }
 }
 
-String::String(const wstring &s, Type t)
+String::String(const std::wstring &s, Type t)
   : d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s.c_str(), s.length(), t);
   else {
-    debug("String::String() -- A TagLib::wstring should not contain Latin1 or UTF-8.");
+    debug("String::String() -- A TagLib::std::wstring should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -311,7 +334,7 @@ std::string String::to8Bit(bool unicode) const
     s.resize(d->data.size());
 
     std::string::iterator targetIt = s.begin();
-    for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
       *targetIt = static_cast<char>(*it);
       ++targetIt;
     }
@@ -326,7 +349,7 @@ std::string String::to8Bit(bool unicode) const
   return s;
 }
 
-const TagLib::wstring &String::toWString() const
+const std::wstring &String::toWString() const
 {
   return d->data;
 }
@@ -415,7 +438,7 @@ String String::upper() const
   s.d->data.resize(d->data.size());
 
   wchar_t *p = &s.d->data[0];
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+  for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
       *p++ = *it + shift;
     else
@@ -454,7 +477,7 @@ ByteVector String::data(Type t) const
     ByteVector v(size(), 0);
     char *p = v.data();
 
-    for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++)
+    for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++)
       *p++ = static_cast<char>(*it);
 
     return v;
@@ -479,7 +502,7 @@ ByteVector String::data(Type t) const
     *p++ = '\xff';
     *p++ = '\xfe';
 
-    for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
       *p++ = static_cast<char>(*it & 0xff);
       *p++ = static_cast<char>(*it >> 8);
     }
@@ -491,7 +514,7 @@ ByteVector String::data(Type t) const
     ByteVector v(size() * 2, 0);
     char *p = v.data();
 
-    for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
       *p++ = static_cast<char>(*it >> 8);
       *p++ = static_cast<char>(*it & 0xff);
     }
@@ -503,7 +526,7 @@ ByteVector String::data(Type t) const
     ByteVector v(size() * 2, 0);
     char *p = v.data();
 
-    for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+    for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
       *p++ = static_cast<char>(*it & 0xff);
       *p++ = static_cast<char>(*it >> 8);
     }
@@ -541,8 +564,8 @@ int String::toInt(bool *ok) const
 
 String String::stripWhiteSpace() const
 {
-  wstring::const_iterator begin = d->data.begin();
-  wstring::const_iterator end = d->data.end();
+  std::wstring::const_iterator begin = d->data.begin();
+  std::wstring::const_iterator end = d->data.end();
 
   while(begin != end &&
         (*begin == '\t' || *begin == '\n' || *begin == '\f' ||
@@ -562,12 +585,12 @@ String String::stripWhiteSpace() const
   } while(*end == '\t' || *end == '\n' ||
           *end == '\f' || *end == '\r' || *end == ' ');
 
-  return String(wstring(begin, end + 1));
+  return String(std::wstring(begin, end + 1));
 }
 
 bool String::isLatin1() const
 {
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+  for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
     if(*it >= 256)
       return false;
   }
@@ -576,7 +599,7 @@ bool String::isLatin1() const
 
 bool String::isAscii() const
 {
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+  for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
     if(*it >= 128)
       return false;
   }
@@ -630,7 +653,7 @@ bool String::operator==(const String &s) const
 
 bool String::operator==(const char *s) const
 {
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+  for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
     if(*it != static_cast<uchar>(*s))
       return false;
 
@@ -697,7 +720,7 @@ String &String::operator=(const String &s)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 String &String::operator=(String &&s)
 {
@@ -715,15 +738,15 @@ String &String::operator=(const std::string &s)
   return *this;
 }
 
-String &String::operator=(const wstring &s)
+String &String::operator=(const std::wstring &s)
 {
   d.reset(new StringPrivate(s));
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
-String &String::operator=(wstring &&s)
+String &String::operator=(std::wstring &&s)
 {
   d.reset(new StringPrivate(s));
   return *this;
@@ -835,12 +858,6 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
 void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
-#if SIZEOF_WCHAR_T == 2 && defined(TAGLIB_ALIGNMENT_TOLERANT)
-
-  copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
-
-#else
-
   bool swap;
   if(t == UTF16) {
     if(length < 2) {
@@ -872,11 +889,9 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
     s += 2;
   }
-
-#endif
 }
 
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
 
 const String::Type String::WCharByteOrder = String::UTF16LE;
 

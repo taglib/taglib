@@ -56,7 +56,7 @@ MP4::CoverArt &
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 MP4::CoverArt &
   MP4::CoverArt::operator=(CoverArt &&item)

@@ -27,7 +27,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <config.h>
+#include "taglib_config.h"
 
 #ifdef _WIN32
 # include <Shlwapi.h>
@@ -96,7 +96,7 @@ FileRef::FileRef(const FileRef &ref)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 FileRef::FileRef(FileRef &&ref) 
   : d(std::move(ref.d))
@@ -193,7 +193,7 @@ FileRef &FileRef::operator=(const FileRef &ref)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 FileRef &FileRef::operator=(FileRef &&ref)
 {

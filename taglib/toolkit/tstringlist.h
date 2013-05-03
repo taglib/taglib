@@ -58,12 +58,12 @@ namespace TagLib {
      */
     StringList(const StringList &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Constructs a StringList equivalent to \a l.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     StringList(StringList &&l);
 
@@ -99,13 +99,13 @@ namespace TagLib {
      */
     StringList &append(const StringList &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Appends \a s to the end of the list and returns a reference to the
      * list.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     StringList &append(String &&s);
 
@@ -113,7 +113,7 @@ namespace TagLib {
      * Appends all of the values in \a l to the end of the list and returns a
      * reference to the list.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     StringList &append(StringList &&l);
 
@@ -126,12 +126,12 @@ namespace TagLib {
      */
     StringList &operator=(const StringList &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a l into this StringList.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     StringList &operator=(StringList &&l);
 

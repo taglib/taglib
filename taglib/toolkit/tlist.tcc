@@ -55,7 +55,7 @@ public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP> &l) : ListPrivateBase(), list(l) {}
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
   ListPrivate(std::list<TP> &&l) : ListPrivateBase(), list(l) {}
 
@@ -77,7 +77,7 @@ public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP *> &l) : ListPrivateBase(), list(l) {}
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
   ListPrivate(std::list<TP *> &&l) : ListPrivateBase(), list(l) {}
 
@@ -121,7 +121,7 @@ List<T>::List(const List<T> &l)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 template <class T>
 List<T>::List(List<T> &&l) 
@@ -198,7 +198,7 @@ List<T> &List<T>::append(const List<T> &l)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 template <class T>
 List<T> &List<T>::append(T &&item)
@@ -237,7 +237,7 @@ List<T> &List<T>::prepend(const List<T> &l)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 template <class T>
 List<T> &List<T>::prepend(T &&item)
@@ -365,7 +365,7 @@ List<T> &List<T>::operator=(const List<T> &l)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 template <class T>
 List<T> &List<T>::operator=(List<T> &&l)

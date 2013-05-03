@@ -26,21 +26,21 @@
 #ifndef TAGLIB_REFCOUNTPTR_H
 #define TAGLIB_REFCOUNTPTR_H
 
-#include "config.h"
+#include "taglib_config.h"
 
-#if defined(HAVE_STD_SHARED_PTR)
+#if defined(TAGLIB_USE_STD_SHARED_PTR)
 # include <memory>
-#elif defined(HAVE_TR1_SHARED_PTR) 
+#elif defined(TAGLIB_USE_TR1_SHARED_PTR) 
 # include <tr1/memory>
-#elif defined(HAVE_BOOST_SHARED_PTR) 
+#elif defined(TAGLIB_USE_BOOST_SHARED_PTR) 
 # include <boost/shared_ptr.hpp>
 #else
 # include <algorithm>
-# if defined(HAVE_GCC_ATOMIC)
+# if defined(TAGLIB_USE_GCC_ATOMIC)
 #    define TAGLIB_ATOMIC_INT int
 #    define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
 #    define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-# elif defined(HAVE_WIN_ATOMIC)
+# elif defined(TAGLIB_USE_WIN_ATOMIC)
 #    if !defined(NOMINMAX)
 #      define NOMINMAX
 #    endif
@@ -48,12 +48,12 @@
 #    define TAGLIB_ATOMIC_INT long
 #    define TAGLIB_ATOMIC_INC(x) InterlockedIncrement(&x)
 #    define TAGLIB_ATOMIC_DEC(x) InterlockedDecrement(&x)
-# elif defined(HAVE_MAC_ATOMIC)
+# elif defined(TAGLIB_USE_MAC_ATOMIC)
 #    include <libkern/OSAtomic.h>
 #    define TAGLIB_ATOMIC_INT int32_t
 #    define TAGLIB_ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
 #    define TAGLIB_ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-# elif defined(HAVE_IA64_ATOMIC)
+# elif defined(TAGLIB_USE_IA64_ATOMIC)
 #    include <ia64intrin.h>
 #    define TAGLIB_ATOMIC_INT int
 #    define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
@@ -75,15 +75,15 @@
 
 namespace TagLib {
 
-#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_TR1_SHARED_PTR) 
+#if defined(TAGLIB_USE_STD_SHARED_PTR) || defined(TAGLIB_USE_TR1_SHARED_PTR) 
   
 #define TAGLIB_SHARED_PTR std::tr1::shared_ptr
 
-#elif defined(HAVE_BOOST_SHARED_PTR)
+#elif defined(TAGLIB_USE_BOOST_SHARED_PTR)
 
 #define TAGLIB_SHARED_PTR boost::shared_ptr
 
-#else // HAVE_*_SHARED_PTR
+#else // TAGLIB_USE_*_SHARED_PTR
 
   // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
@@ -295,7 +295,7 @@ namespace TagLib {
     a.swap(b);
   }
 
-#endif // HAVE_*_SHARED_PTR
+#endif // TAGLIB_USE_*_SHARED_PTR
 }
 #endif // DO_NOT_DOCUMENT
 

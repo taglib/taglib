@@ -70,12 +70,12 @@ namespace TagLib {
      */
     List(const List<T> &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a l into this List.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     List(List<T> &&l);
 
@@ -135,13 +135,13 @@ namespace TagLib {
      */
     List<T> &append(const List<T> &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Appends \a item to the end of the list and returns a reference to the
      * list.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     List<T> &append(T &&item);
 
@@ -149,7 +149,7 @@ namespace TagLib {
      * Appends all of the values in \a l to the end of the list and returns a
      * reference to the list.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     List<T> &append(List<T> &&l);
 
@@ -167,13 +167,13 @@ namespace TagLib {
      */
     List<T> &prepend(const List<T> &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Prepends \a item to the beginning list and returns a reference to the
      * list.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     List<T> &prepend(T &&item);
 
@@ -181,7 +181,7 @@ namespace TagLib {
      * Prepends all of the items in \a l to the beginning list and returns a
      * reference to the list.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     List<T> &prepend(List<T> &&l);
 
@@ -272,12 +272,12 @@ namespace TagLib {
      */
     List<T> &operator=(const List<T> &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a l into this List.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     List<T> &operator=(List<T> &&l);
 

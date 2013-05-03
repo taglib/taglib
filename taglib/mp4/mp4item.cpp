@@ -36,7 +36,7 @@ namespace
   String format(const char *fmt, ...)
   {
     va_list args;
-    va_start(args,fmt);
+    va_start(args, fmt);
 
     char buf[256];
 
@@ -93,7 +93,7 @@ MP4::Item::Item(const Item &item)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 MP4::Item::Item(Item &&item) 
   : d(std::move(item.d))
@@ -109,7 +109,7 @@ MP4::Item &
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 MP4::Item &
   MP4::Item::operator=(Item &&item)

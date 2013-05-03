@@ -57,12 +57,12 @@ namespace TagLib {
        */
       Header(const Header &h);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
       /*!
        * Moves \a h into this Header.
        *
-       * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
       */
       Header(Header &&h);
 
@@ -166,12 +166,12 @@ namespace TagLib {
        */
       Header &operator=(const Header &h);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
       /*!
        * Moves \a h into this Header.
        *
-       * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
        */
       Header &operator=(Header &&h);
 

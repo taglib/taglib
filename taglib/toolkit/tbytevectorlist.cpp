@@ -73,7 +73,7 @@ ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
 {
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 ByteVectorList::ByteVectorList(ByteVectorList &&l) : List<ByteVector>(l)
 {
@@ -87,7 +87,7 @@ ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
   return *this;
 }
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
 ByteVectorList &ByteVectorList::operator=(ByteVectorList &&l)
 {
