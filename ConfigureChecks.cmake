@@ -7,30 +7,37 @@ include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 
-# Determine the CPU byte order.
+# Check if the size of integral types are suitable.
 
-test_big_endian(TAGLIB_BIG_ENDIAN)
-
-if(NOT TAGLIB_BIG_ENDIAN)
-  set(TAGLIB_LITTLE_ENDIAN 1)
+check_type_size("short" SIZEOF_SHORT)
+if(NOT ${SIZEOF_SHORT} EQUAL 2)
+  MESSAGE(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
 endif()
 
-# Determine the size of integral types.
+check_type_size("int" SIZEOF_INT)
+if(NOT ${SIZEOF_INT} EQUAL 4)
+  MESSAGE(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
+endif()
 
-check_type_size("short"   SIZEOF_SHORT)
-check_type_size("int"     SIZEOF_INT)
 check_type_size("long long" SIZEOF_LONGLONG)
-check_type_size("wchar_t"   SIZEOF_WCHAR_T)
+if(NOT ${SIZEOF_LONGLONG} EQUAL 8)
+  MESSAGE(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
+endif()
 
-# Determine if your compiler supports std::wstring.
+check_type_size("wchar_t" SIZEOF_WCHAR_T)
+if(${SIZEOF_WCHAR_T} LESS 2)
+  MESSAGE(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
+endif()
 
-check_cxx_source_compiles("
-  #include <string>
-  int main() { 
-    std::wstring x(L\"ABC\");
-    return 0; 
-  }
-" HAVE_STD_WSTRING)
+# Determine the CPU byte order.
+
+test_big_endian(IS_BIG_ENDIAN)
+
+if(NOT IS_BIG_ENDIAN)
+  set(SYSTEM_BYTEORDER 1)
+else()
+  set(SYSTEM_BYTEORDER 2)
+endif()
 
 # Determine which kind of atomic operations your compiler supports.
 

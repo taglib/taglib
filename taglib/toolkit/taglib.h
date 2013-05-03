@@ -26,7 +26,7 @@
 #ifndef TAGLIB_H
 #define TAGLIB_H
 
-#include "config.h"
+#include "taglib_config.h"
 
 #define TAGLIB_MAJOR_VERSION 1
 #define TAGLIB_MINOR_VERSION 8
@@ -45,113 +45,6 @@
 #endif
 
 #include <string>
-#include <climits>
-
-// Check the widths of integral types.
-
-#if SIZEOF_SHORT != 2
-# error TagLib requires that short is 16-bit wide.
-#endif
-
-#if SIZEOF_INT != 4
-# error TagLib requires that int is 32-bit wide.
-#endif
-
-#if SIZEOF_LONGLONG != 8
-# error TagLib requires that long long is 64-bit wide.
-#endif
-
-#if SIZEOF_WCHAR_T < 2
-# error TagLib requires that wchar_t is sufficient to store a UTF-16 char.
-#endif
-
-// Atomic increment/decrement operations
-
-#if defined(HAVE_STD_ATOMIC)
-# include <atomic>
-# define TAGLIB_ATOMIC_INT std::atomic<unsigned int>
-# define TAGLIB_ATOMIC_INC(x) x.fetch_add(1)
-# define TAGLIB_ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
-#elif defined(HAVE_BOOST_ATOMIC)
-# include <boost/atomic.hpp>
-# define TAGLIB_ATOMIC_INT boost::atomic<unsigned int>
-# define TAGLIB_ATOMIC_INC(x) x.fetch_add(1)
-# define TAGLIB_ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
-#elif defined(HAVE_GCC_ATOMIC)
-# define TAGLIB_ATOMIC_INT int
-# define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-#elif defined(HAVE_WIN_ATOMIC)
-# if !defined(NOMINMAX)
-#   define NOMINMAX
-# endif
-# include <windows.h>
-# define TAGLIB_ATOMIC_INT long
-# define TAGLIB_ATOMIC_INC(x) InterlockedIncrement(&x)
-# define TAGLIB_ATOMIC_DEC(x) InterlockedDecrement(&x)
-#elif defined(HAVE_MAC_ATOMIC)
-# include <libkern/OSAtomic.h>
-# define TAGLIB_ATOMIC_INT int32_t
-# define TAGLIB_ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-# define TAGLIB_ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-#elif defined(HAVE_IA64_ATOMIC)
-# include <ia64intrin.h>
-# define TAGLIB_ATOMIC_INT int
-# define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-#else
-# define TAGLIB_ATOMIC_INT int
-# define TAGLIB_ATOMIC_INC(x) (++x)
-# define TAGLIB_ATOMIC_DEC(x) (--x)
-#endif
-
-// Optimized byte swap functions.
-
-#if defined(HAVE_MSC_BYTESWAP)
-# include <stdlib.h>
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# include <byteswap.h>
-#elif defined(HAVE_MAC_BYTESWAP)
-# include <libkern/OSByteOrder.h>
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# include <sys/endian.h>
-#endif
-
-#if defined(HAVE_GCC_BYTESWAP_16)
-# define TAGLIB_BYTESWAP_16(x) __builtin_bswap16(x)
-#elif defined(HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) _byteswap_ushort(x)
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) __bswap_16(x)
-#elif defined(HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) OSSwapInt16(x)
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) swap16(x)
-#endif
-
-#if defined(HAVE_GCC_BYTESWAP_32)
-# define TAGLIB_BYTESWAP_32(x) __builtin_bswap32(x)
-#elif defined(HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) _byteswap_ulong(x)
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) __bswap_32(x)
-#elif defined(HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) OSSwapInt32(x)
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) swap32(x)
-#endif
-
-#if defined(HAVE_GCC_BYTESWAP_64)
-# define TAGLIB_BYTESWAP_64(x) __builtin_bswap64(x)
-#elif defined(HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) _byteswap_uint64(x)
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) __bswap_64(x)
-#elif defined(HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) OSSwapInt64(x)
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) swap64(x)
-#endif
 
 //! A namespace for all TagLib related classes and functions
 
@@ -180,35 +73,7 @@ namespace TagLib {
    * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)
    * so I'm providing something here that should be constant.
    */
-#ifdef HAVE_STD_WSTRING
-  typedef std::wstring wstring;
-#else
   typedef std::basic_string<wchar> wstring;
-#endif
-
-#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
-  /*!
-   * \internal
-   * This is just used as a base class for shared classes in TagLib.
-   *
-   * \warning This <b>is not</b> part of the TagLib public API!
-   */
-
-  class RefCounter
-  {
-  public:
-    RefCounter() : refCount(1) {}
-
-    void ref() { TAGLIB_ATOMIC_INC(refCount); }
-    bool deref() { return (TAGLIB_ATOMIC_DEC(refCount) == 0); }
-    int count() { return refCount; }
-
-  private:
-    volatile TAGLIB_ATOMIC_INT refCount;
-  };
-
-#endif // DO_NOT_DOCUMENT
-
 }
 
 /*!

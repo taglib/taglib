@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "config.h"
+#include "taglib_config.h"
 
 #if HAVE_ZLIB
 #include <zlib.h>

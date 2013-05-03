@@ -23,11 +23,25 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "config.h"
+
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+
+#if defined(HAVE_MSC_BYTESWAP)
+# include <stdlib.h>
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# include <byteswap.h>
+#elif defined(HAVE_MAC_BYTESWAP)
+# include <libkern/OSByteOrder.h>
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# include <sys/endian.h>
+#endif
+
 #include <tstring.h>
 #include <tdebug.h>
+#include "trefcounter.h"
 
 #include "tbytevector.h"
 
@@ -185,9 +199,25 @@ T byteSwap(T x)
 template <>
 ushort byteSwap<ushort>(ushort x)
 {
-#ifdef TAGLIB_BYTESWAP_16
+#if defined(HAVE_GCC_BYTESWAP_16)
 
-  return TAGLIB_BYTESWAP_16(x);
+  return __builtin_bswap16(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+  return _byteswap_ushort(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+  return __bswap_16(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+  return OSSwapInt16(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+  return swap16(x);
 
 #else
 
@@ -199,9 +229,25 @@ ushort byteSwap<ushort>(ushort x)
 template <>
 uint byteSwap<uint>(uint x)
 {
-#ifdef TAGLIB_BYTESWAP_32
+#if defined(HAVE_GCC_BYTESWAP_32)
 
-  return TAGLIB_BYTESWAP_32(x);
+  return __builtin_bswap32(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+  return _byteswap_ulong(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+  return __bswap_32(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+  return OSSwapInt32(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+  return swap32(x);
 
 #else
 
@@ -216,9 +262,25 @@ uint byteSwap<uint>(uint x)
 template <>
 ulonglong byteSwap<ulonglong>(ulonglong x)
 {
-#ifdef TAGLIB_BYTESWAP_64
+#if defined(HAVE_GCC_BYTESWAP_64)
 
-  return TAGLIB_BYTESWAP_64(x);
+  return __builtin_bswap64(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+  return _byteswap_uint64(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+  return __bswap_64(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+  return OSSwapInt64(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+  return swap64(x);
 
 #else
 
@@ -246,7 +308,7 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   T tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
   const bool swap = mostSignificantByteFirst;
 #else
   const bool swap != mostSignificantByteFirst;
@@ -279,7 +341,7 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
   const size_t size = sizeof(T);
 
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
   const bool swap = mostSignificantByteFirst;
 #else
   const bool swap != mostSignificantByteFirst;

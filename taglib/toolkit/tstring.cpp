@@ -25,17 +25,24 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
+#include "config.h"
+
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
+#include "trefcounter.h"
 
 #include <iostream>
 #include <string.h>
 
-// x86 CPUs are alignment-tolerant or allow pointer casts from smaller types to larger types.
-#if defined(__i386__) || defined(_M_IX86) || defined(__amd64) || defined(__amd64__) \
-  || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) 
-# define TAGLIB_ALIGNMENT_TOLERANT 1
+#if defined(HAVE_MSC_BYTESWAP)
+# include <stdlib.h>
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# include <byteswap.h>
+#elif defined(HAVE_MAC_BYTESWAP)
+# include <libkern/OSByteOrder.h>
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# include <sys/endian.h>
 #endif
 
 #ifdef HAVE_STD_CODECVT
@@ -48,13 +55,29 @@ namespace
 {
   inline TagLib::ushort byteSwap(TagLib::ushort x)
   {
-#ifdef TAGLIB_BYTESWAP_16
+#if defined(HAVE_GCC_BYTESWAP_16)
 
-    return TAGLIB_BYTESWAP_16(x);
+    return __builtin_bswap16(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+    return _byteswap_ushort(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+    return __bswap_16(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+    return OSSwapInt16(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+    return swap16(x);
 
 #else
 
-    return((x >> 8) & 0xff) | ((x & 0xff) << 8);
+    return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
 
 #endif
   }
@@ -813,12 +836,6 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
 void String::copyFromUTF16(const char *s, size_t length, Type t)
 {
-#if SIZEOF_WCHAR_T == 2 && defined(TAGLIB_ALIGNMENT_TOLERANT)
-
-  copyFromUTF16(reinterpret_cast<const wchar_t*>(s), length / 2, t);
-
-#else
-
   bool swap;
   if(t == UTF16) {
     if(length < 2) {
@@ -850,11 +867,9 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
     s += 2;
   }
-
-#endif
 }
 
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
 
 const String::Type String::WCharByteOrder = String::UTF16LE;
 
