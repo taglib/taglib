@@ -39,16 +39,6 @@ else()
   set(SYSTEM_BYTEORDER 2)
 endif()
 
-# Determine if your compiler supports std::wstring.
-
-check_cxx_source_compiles("
-  #include <string>
-  int main() { 
-    std::wstring x(L\"ABC\");
-    return 0; 
-  }
-" TAGLIB_HAVE_STD_WSTRING)
-
 # Determine which kind of atomic operations your compiler supports.
 
 check_cxx_source_compiles("

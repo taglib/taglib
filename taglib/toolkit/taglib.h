@@ -73,11 +73,7 @@ namespace TagLib {
    * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)
    * so I'm providing something here that should be constant.
    */
-#ifdef TAGLIB_HAVE_STD_WSTRING
-  typedef std::wstring wstring;
-#else
   typedef std::basic_string<wchar> wstring;
-#endif
 }
 
 /*!
