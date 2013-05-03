@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include "config.h"
-
+#include "taglib_config.h"
 #include <tdebug.h>
 
 #include "id3v2framefactory.h"
@@ -134,7 +134,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   // TagLib doesn't mess with encrypted frames, so just treat them
   // as unknown frames.
 
-#if HAVE_ZLIB == 0
+#if !defined(HAVE_ZLIB) || HAVE_ZLIB == 0
   if(header->compression()) {
     debug("Compressed frames are currently not supported.");
     return new UnknownFrame(data, header);

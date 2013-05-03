@@ -27,7 +27,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <config.h>
+#include "taglib_config.h"
 
 #ifdef _WIN32
 # include <Shlwapi.h>
@@ -36,6 +36,7 @@
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>
+#include "trefcounter.h"
 
 #include "fileref.h"
 #include "asffile.h"

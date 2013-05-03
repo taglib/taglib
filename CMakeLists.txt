@@ -81,13 +81,13 @@ if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
 endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-configure_file(config-taglib.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 if(WITH_ASF)
-    set(TAGLIB_WITH_ASF TRUE)
+  set(TAGLIB_WITH_ASF TRUE)
 endif()
 if(WITH_MP4)
-    set(TAGLIB_WITH_MP4 TRUE)
+  set(TAGLIB_WITH_MP4 TRUE)
 endif()
 
 configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
