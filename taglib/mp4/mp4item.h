@@ -56,12 +56,12 @@ namespace TagLib {
 
       Item();
       Item(const Item &item);
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
       Item(Item &&item);
 #endif
 
       Item &operator=(const Item &item);
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
       Item &operator=(Item &&item);
 #endif
       ~Item();

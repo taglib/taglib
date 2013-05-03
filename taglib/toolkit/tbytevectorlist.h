@@ -54,12 +54,12 @@ namespace TagLib {
      */
     ByteVectorList(const ByteVectorList &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a l into this ByteVectorList.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     ByteVectorList(ByteVectorList &&l);
 
@@ -72,12 +72,12 @@ namespace TagLib {
      */
     ByteVectorList &operator=(const ByteVectorList &l);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a l into this ByteVectorList.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     ByteVectorList &operator=(ByteVectorList &&l);
 

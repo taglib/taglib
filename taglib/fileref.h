@@ -143,12 +143,12 @@ namespace TagLib {
      */
     FileRef(const FileRef &ref);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Move \a ref into the FileRef.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     FileRef(FileRef &&ref);
 
@@ -242,12 +242,12 @@ namespace TagLib {
      */
     FileRef &operator=(const FileRef &ref);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a ref into this FileRef.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     FileRef &operator=(FileRef &&ref);
 

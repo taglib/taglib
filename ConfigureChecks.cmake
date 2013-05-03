@@ -7,40 +7,43 @@ include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 
-# Determine the CPU byte order.
-test_big_endian(TAGLIB_BIG_ENDIAN)
+# Check if the size of integral types are suitable.
 
-if(NOT TAGLIB_BIG_ENDIAN)
-  set(TAGLIB_LITTLE_ENDIAN 1)
+check_type_size("short" SIZEOF_SHORT)
+if(NOT ${SIZEOF_SHORT} EQUAL 2)
+  MESSAGE(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
 endif()
 
-# Determine the size of numeric types.
-check_type_size("short"       SIZEOF_SHORT)
-check_type_size("int"         SIZEOF_INT)
-check_type_size("long long"   SIZEOF_LONGLONG)
-check_type_size("wchar_t"     SIZEOF_WCHAR_T)
+check_type_size("int" SIZEOF_INT)
+if(NOT ${SIZEOF_INT} EQUAL 4)
+  MESSAGE(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
+endif()
+
+check_type_size("long long" SIZEOF_LONGLONG)
+if(NOT ${SIZEOF_LONGLONG} EQUAL 8)
+  MESSAGE(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
+endif()
+
+check_type_size("wchar_t" SIZEOF_WCHAR_T)
+if(${SIZEOF_WCHAR_T} LESS 2)
+  MESSAGE(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
+endif()
+
+# Determine the CPU byte order.
+
+test_big_endian(IS_BIG_ENDIAN)
+
+if(NOT IS_BIG_ENDIAN)
+  set(SYSTEM_BYTEORDER 1)
+else()
+  set(SYSTEM_BYTEORDER 2)
+endif()
+
+# Determine the size of floating point types.
+
 check_type_size("float"       SIZEOF_FLOAT)
 check_type_size("double"      SIZEOF_DOUBLE)
 check_type_size("long double" SIZEOF_LONGDOUBLE)
-
-# Determine whether or not your compiler supports move semantics.
-check_cxx_source_compiles("
-  #ifdef __clang__
-  # pragma clang diagnostic error \"-Wc++11-extensions\" 
-  #endif
-  #include <utility>
-  int func(int &&x) { return x - 1; }
-  int main() { return func(std::move(1)); }
-" SUPPORT_MOVE_SEMANTICS)
-
-# Determine if your compiler supports std::wstring.
-check_cxx_source_compiles("
-  #include <string>
-  int main() { 
-    std::wstring x(L\"ABC\");
-    return 0; 
-  }
-" HAVE_STD_WSTRING)
 
 # Determine which kind of byte swap functions your compiler supports.
 
@@ -115,75 +118,8 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
-# Determine where shared_ptr<T> is defined regardless of C++11 support.
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::tr1::shared_ptr<int> x; return 0; }
-" HAVE_STD_SHARED_PTR)
-
-if(NOT HAVE_STD_SHARED_PTR)
-  check_cxx_source_compiles("
-    #include <tr1/memory>
-    int main() { std::tr1::shared_ptr<int> x; return 0; }
-  " HAVE_TR1_SHARED_PTR)
-
-  if(NOT HAVE_TR1_SHARED_PTR)
-    check_cxx_source_compiles("
-      #include <boost/shared_ptr.hpp>
-      int main() { boost::shared_ptr<int> x; return 0; }
-    " HAVE_BOOST_SHARED_PTR)
-  endif()
-endif()
-
-# Determine which kind of atomic operations your compiler supports.
-if(NOT HAVE_STD_SHARED_PTR AND NOT HAVE_TR1_SHARED_PTR AND NOT HAVE_BOOST_SHARED_PTR)
-  check_cxx_source_compiles("
-    int main() { 
-      volatile int x;
-      __sync_add_and_fetch(&x, 1);
-      int y = __sync_sub_and_fetch(&x, 1);
-      return 0; 
-    }
-  " HAVE_GCC_ATOMIC)
-
-  if(NOT HAVE_GCC_ATOMIC)
-    check_cxx_source_compiles("
-      #include <libkern/OSAtomic.h>
-      int main() { 
-        volatile int32_t x;
-        OSAtomicIncrement32Barrier(&x);
-        int32_t y = OSAtomicDecrement32Barrier(&x);
-        return 0; 
-      }
-    " HAVE_MAC_ATOMIC)
-
-    if(NOT HAVE_MAC_ATOMIC)
-      check_cxx_source_compiles("
-        #include <windows.h>
-        int main() { 
-          volatile LONG x;
-          InterlockedIncrement(&x);
-          LONG y = InterlockedDecrement(&x);
-          return 0; 
-        }
-      " HAVE_WIN_ATOMIC)
-
-      if(NOT HAVE_WIN_ATOMIC)
-        check_cxx_source_compiles("
-          #include <ia64intrin.h>
-          int main() { 
-            volatile int x;
-            __sync_add_and_fetch(&x, 1);
-            int y = __sync_sub_and_fetch(&x, 1);
-            return 0; 
-          }
-        " HAVE_IA64_ATOMIC)
-      endif()
-    endif()
-  endif()
-endif()
-
 # Determine whether your compiler supports some safer version of sprintf.
+
 check_cxx_source_compiles("
   #include <cstdio>
   int main() { char buf[20]; snprintf(buf, 20, \"%d\", 1); return 0; }
@@ -197,6 +133,7 @@ if(NOT HAVE_SNPRINTF)
 endif()
 
 # Determine whether your compiler supports codecvt.
+
 check_cxx_source_compiles("
   #include <codecvt>
   int main() { 
@@ -205,7 +142,8 @@ check_cxx_source_compiles("
   }
 " HAVE_STD_CODECVT)
 
-# Check for libz using the cmake supplied FindZLIB.cmake
+# Determine whether zlib is installed.
+
 find_package(ZLIB)
 if(ZLIB_FOUND)
   set(HAVE_ZLIB 1)
@@ -213,6 +151,88 @@ else()
   set(HAVE_ZLIB 0)
 endif()
 
+# Determine whether your compiler supports move semantics.
+
+check_cxx_source_compiles("
+  #ifdef __clang__
+  # pragma clang diagnostic error \"-Wc++11-extensions\" 
+  #endif
+  #include <utility>
+  int func(int &&x) { return x - 1; }
+  int main() { return func(std::move(1)); }
+" TAGLIB_USE_MOVE_SEMANTICS)
+
+# Determine where shared_ptr<T> is defined regardless of C++11 support.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() { std::tr1::shared_ptr<int> x; return 0; }
+" TAGLIB_USE_STD_SHARED_PTR)
+
+if(NOT TAGLIB_USE_STD_SHARED_PTR)
+  check_cxx_source_compiles("
+    #include <tr1/memory>
+    int main() { std::tr1::shared_ptr<int> x; return 0; }
+  " TAGLIB_USE_TR1_SHARED_PTR)
+
+  if(NOT TAGLIB_USE_TR1_SHARED_PTR)
+    check_cxx_source_compiles("
+      #include <boost/shared_ptr.hpp>
+      int main() { boost::shared_ptr<int> x; return 0; }
+    " TAGLIB_USE_BOOST_SHARED_PTR)
+  endif()
+endif()
+
+# Determine which kind of atomic operations your compiler supports.
+
+if(NOT TAGLIB_USE_STD_SHARED_PTR AND NOT TAGLIB_USE_TR1_SHARED_PTR AND NOT TAGLIB_USE_BOOST_SHARED_PTR)
+  check_cxx_source_compiles("
+    int main() { 
+      volatile int x;
+      __sync_add_and_fetch(&x, 1);
+      int y = __sync_sub_and_fetch(&x, 1);
+      return 0; 
+    }
+  " TAGLIB_USE_GCC_ATOMIC)
+
+  if(NOT TAGLIB_USE_GCC_ATOMIC)
+    check_cxx_source_compiles("
+      #include <libkern/OSAtomic.h>
+      int main() { 
+        volatile int32_t x;
+        OSAtomicIncrement32Barrier(&x);
+        int32_t y = OSAtomicDecrement32Barrier(&x);
+        return 0; 
+      }
+    " TAGLIB_USE_MAC_ATOMIC)
+
+    if(NOT TAGLIB_USE_MAC_ATOMIC)
+      check_cxx_source_compiles("
+        #include <windows.h>
+        int main() { 
+          volatile LONG x;
+          InterlockedIncrement(&x);
+          LONG y = InterlockedDecrement(&x);
+          return 0; 
+        }
+      " TAGLIB_USE_WIN_ATOMIC)
+
+      if(NOT TAGLIB_USE_WIN_ATOMIC)
+        check_cxx_source_compiles("
+          #include <ia64intrin.h>
+          int main() { 
+            volatile int x;
+            __sync_add_and_fetch(&x, 1);
+            int y = __sync_sub_and_fetch(&x, 1);
+            return 0; 
+          }
+        " TAGLIB_USE_IA64_ATOMIC)
+      endif()
+    endif()
+  endif()
+endif()
+
+# Determine whether CppUnit is installed.
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 find_package(CppUnit)

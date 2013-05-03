@@ -58,9 +58,9 @@ namespace TagLib {
 
   /*!
    * This is an implicitly shared \e wide string.  For storage it uses
-   * TagLib::wstring, but as this is an <i>implementation detail</i> this of
-   * course could change.  Strings are stored internally as UTF-16BE.  (Without
-   * the BOM (Byte Order Mark)
+   * TagLib::std::wstring, but as this is an <i>implementation detail</i> this of
+   * course could change.  Strings are stored internally as UTF-16(without BOM/
+   * CPU byte order)
    *
    * The use of implicit sharing means that copying a string is cheap, the only
    * \e cost comes into play when the copy is modified.  Prior to that the string
@@ -119,12 +119,12 @@ namespace TagLib {
      */
     String(const String &s);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Constructs a String equivalent to \a s.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     String(String &&s);
 
@@ -141,7 +141,7 @@ namespace TagLib {
     /*!
      * Makes a deep copy of the data in \a s.
      */
-    String(const wstring &s, Type t = WCharByteOrder);
+    String(const std::wstring &s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a s.
@@ -185,15 +185,15 @@ namespace TagLib {
 
     /*!
      * If \a unicode if false (the default) this will return a \e Latin1 encoded
-     * std::string.  If it is true the returned std::wstring will be UTF-8
+     * std::string.  If it is true the returned std::std::wstring will be UTF-8
      * encoded.
      */
     std::string to8Bit(bool unicode = false) const;
 
     /*!
-     * Returns a wstring version of the TagLib string as a wide string.
+     * Returns a std::wstring version of the TagLib string as a wide string.
      */
-    const TagLib::wstring &toWString() const;
+    const std::wstring &toWString() const;
 
     /*!
      * Creates and returns a C-String based on the data.  This string is still
@@ -403,12 +403,12 @@ namespace TagLib {
      */
     String &operator=(const String &s);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a s into this String.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
     String &operator=(String &&s);
 
@@ -422,16 +422,16 @@ namespace TagLib {
     /*!
      * Performs a deep copy of the data in \a s.
      */
-    String &operator=(const wstring &s);
+    String &operator=(const std::wstring &s);
 
-#ifdef SUPPORT_MOVE_SEMANTICS
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
 
     /*!
      * Moves \a s into this String.
      *
-     * \note Not available unless SUPPORT_MOVE_SEMANTICS macro is defined.
+     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
      */
-    String &operator=(wstring &&s);
+    String &operator=(std::wstring &&s);
 
 #endif
 
