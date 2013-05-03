@@ -3,14 +3,6 @@
 /* Defined if your compiler supports std::wstring */
 #cmakedefine   TAGLIB_HAVE_STD_WSTRING 1
 
-/* Defined if your compiler supports some atomic operations */
-#cmakedefine   TAGLIB_HAVE_STD_ATOMIC 1
-#cmakedefine   TAGLIB_HAVE_BOOST_ATOMIC 1
-#cmakedefine   TAGLIB_HAVE_GCC_ATOMIC 1
-#cmakedefine   TAGLIB_HAVE_MAC_ATOMIC 1
-#cmakedefine   TAGLIB_HAVE_WIN_ATOMIC 1
-#cmakedefine   TAGLIB_HAVE_IA64_ATOMIC 1
-
 #define   TAGLIB_WITH_ASF 1
 #define   TAGLIB_WITH_MP4 1
 

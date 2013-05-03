@@ -46,46 +46,6 @@
 
 #include <string>
 
-// Atomic increment/decrement operations
-
-#if defined(TAGLIB_HAVE_STD_ATOMIC)
-# include <atomic>
-# define TAGLIB_ATOMIC_INT std::atomic<unsigned int>
-# define TAGLIB_ATOMIC_INC(x) x.fetch_add(1)
-# define TAGLIB_ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
-#elif defined(TAGLIB_HAVE_BOOST_ATOMIC)
-# include <boost/atomic.hpp>
-# define TAGLIB_ATOMIC_INT boost::atomic<unsigned int>
-# define TAGLIB_ATOMIC_INC(x) x.fetch_add(1)
-# define TAGLIB_ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
-#elif defined(TAGLIB_HAVE_GCC_ATOMIC)
-# define TAGLIB_ATOMIC_INT int
-# define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-#elif defined(TAGLIB_HAVE_WIN_ATOMIC)
-# if !defined(NOMINMAX)
-#   define NOMINMAX
-# endif
-# include <windows.h>
-# define TAGLIB_ATOMIC_INT long
-# define TAGLIB_ATOMIC_INC(x) InterlockedIncrement(&x)
-# define TAGLIB_ATOMIC_DEC(x) InterlockedDecrement(&x)
-#elif defined(TAGLIB_HAVE_MAC_ATOMIC)
-# include <libkern/OSAtomic.h>
-# define TAGLIB_ATOMIC_INT int32_t
-# define TAGLIB_ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-# define TAGLIB_ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-#elif defined(TAGLIB_HAVE_IA64_ATOMIC)
-# include <ia64intrin.h>
-# define TAGLIB_ATOMIC_INT int
-# define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-#else
-# define TAGLIB_ATOMIC_INT int
-# define TAGLIB_ATOMIC_INC(x) (++x)
-# define TAGLIB_ATOMIC_DEC(x) (--x)
-#endif
-
 //! A namespace for all TagLib related classes and functions
 
 /*!
@@ -118,30 +78,6 @@ namespace TagLib {
 #else
   typedef std::basic_string<wchar> wstring;
 #endif
-
-#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
-  /*!
-   * \internal
-   * This is just used as a base class for shared classes in TagLib.
-   *
-   * \warning This <b>is not</b> part of the TagLib public API!
-   */
-
-  class RefCounter
-  {
-  public:
-    RefCounter() : refCount(1) {}
-
-    void ref() { TAGLIB_ATOMIC_INC(refCount); }
-    bool deref() { return (TAGLIB_ATOMIC_DEC(refCount) == 0); }
-    int count() { return refCount; }
-
-  private:
-    volatile TAGLIB_ATOMIC_INT refCount;
-  };
-
-#endif // DO_NOT_DOCUMENT
-
 }
 
 /*!

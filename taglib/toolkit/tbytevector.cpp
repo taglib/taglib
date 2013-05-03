@@ -41,6 +41,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include "trefcounter.h"
 
 #include "tbytevector.h"
 

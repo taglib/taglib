@@ -25,6 +25,7 @@
 
 #include <taglib.h>
 #include <tdebug.h>
+#include "trefcounter.h"
 #include "asfattribute.h"
 #include "asffile.h"
 #include "asfpicture.h"

@@ -36,6 +36,7 @@
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>
+#include "trefcounter.h"
 
 #include "fileref.h"
 #include "asffile.h"

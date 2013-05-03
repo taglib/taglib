@@ -16,6 +16,14 @@
 /* Defined if your compiler supports codecvt */
 #cmakedefine   HAVE_STD_CODECVT 1
 
+/* Defined if your compiler supports some atomic operations */
+#cmakedefine   HAVE_STD_ATOMIC 1
+#cmakedefine   HAVE_BOOST_ATOMIC 1
+#cmakedefine   HAVE_GCC_ATOMIC 1
+#cmakedefine   HAVE_MAC_ATOMIC 1
+#cmakedefine   HAVE_WIN_ATOMIC 1
+#cmakedefine   HAVE_IA64_ATOMIC 1
+
 /* Defined if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 

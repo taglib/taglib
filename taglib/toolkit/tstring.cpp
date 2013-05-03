@@ -30,6 +30,7 @@
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
+#include "trefcounter.h"
 
 #include <iostream>
 #include <string.h>

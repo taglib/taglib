@@ -1,7 +1,7 @@
-/**************************************************************************
-    copyright            : (C) 2009 by Lukáš Lalinský
-    email                : lalinsky@gmail.com
- **************************************************************************/
+/***************************************************************************
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
+ ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -23,61 +23,35 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <taglib.h>
-#include <tdebug.h>
-#include "trefcounter.h"
-#include "mp4coverart.h"
+#ifndef TAGLIB_REFCOUNTER_H
+#define TAGLIB_REFCOUNTER_H
 
-using namespace TagLib;
+#include "taglib.h"
 
-class MP4::CoverArt::CoverArtPrivate : public RefCounter
+#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
+/*!
+  * \internal
+  * This is just used as a base class for shared classes in TagLib.
+  *
+  * \warning This <b>is not</b> part of the TagLib public API!
+  */
+namespace TagLib
 {
-public:
-  CoverArtPrivate() : RefCounter(), format(MP4::CoverArt::JPEG) {}
+  class RefCounter
+  {
+  public:
+    RefCounter();
+    virtual ~RefCounter();
 
-  Format format;
-  ByteVector data;
-};
+    void ref();
+    bool deref();
+    int count() const;
 
-MP4::CoverArt::CoverArt(Format format, const ByteVector &data)
-{
-  d = new CoverArtPrivate;
-  d->format = format;
-  d->data = data;
+  private:
+    class RefCounterPrivate;
+    RefCounterPrivate *d;
+  };
 }
 
-MP4::CoverArt::CoverArt(const CoverArt &item) : d(item.d)
-{
-  d->ref();
-}
-
-MP4::CoverArt &
-MP4::CoverArt::operator=(const CoverArt &item)
-{
-  if(d->deref()) {
-    delete d;
-  }
-  d = item.d;
-  d->ref();
-  return *this;
-}
-
-MP4::CoverArt::~CoverArt()
-{
-  if(d->deref()) {
-    delete d;
-  }
-}
-
-MP4::CoverArt::Format
-MP4::CoverArt::format() const
-{
-  return d->format;
-}
-
-ByteVector
-MP4::CoverArt::data() const
-{
-  return d->data;
-}
-
+#endif // DO_NOT_DOCUMENT
+#endif
