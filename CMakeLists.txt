@@ -21,7 +21,7 @@ option(BUILD_EXAMPLES "Build the examples"  OFF)
 
 option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
 
-set(TAGLIB_TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
+set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
 ## the following are directories where stuff will be installed to
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
@@ -81,6 +81,7 @@ if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
 endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 if(WITH_ASF)
   set(TAGLIB_WITH_ASF TRUE)

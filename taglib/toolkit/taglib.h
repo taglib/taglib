@@ -86,54 +86,6 @@
 # define TAGLIB_ATOMIC_DEC(x) (--x)
 #endif
 
-// Optimized byte swap functions.
-
-#if defined(TAGLIB_HAVE_MSC_BYTESWAP)
-# include <stdlib.h>
-#elif defined(TAGLIB_HAVE_GLIBC_BYTESWAP)
-# include <byteswap.h>
-#elif defined(TAGLIB_HAVE_MAC_BYTESWAP)
-# include <libkern/OSByteOrder.h>
-#elif defined(TAGLIB_HAVE_OPENBSD_BYTESWAP)
-# include <sys/endian.h>
-#endif
-
-#if defined(TAGLIB_HAVE_GCC_BYTESWAP_16)
-# define TAGLIB_BYTESWAP_16(x) __builtin_bswap16(x)
-#elif defined(TAGLIB_HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) _byteswap_ushort(x)
-#elif defined(TAGLIB_HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) __bswap_16(x)
-#elif defined(TAGLIB_HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) OSSwapInt16(x)
-#elif defined(TAGLIB_HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_16(x) swap16(x)
-#endif
-
-#if defined(TAGLIB_HAVE_GCC_BYTESWAP_32)
-# define TAGLIB_BYTESWAP_32(x) __builtin_bswap32(x)
-#elif defined(TAGLIB_HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) _byteswap_ulong(x)
-#elif defined(TAGLIB_HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) __bswap_32(x)
-#elif defined(TAGLIB_HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) OSSwapInt32(x)
-#elif defined(TAGLIB_HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_32(x) swap32(x)
-#endif
-
-#if defined(TAGLIB_HAVE_GCC_BYTESWAP_64)
-# define TAGLIB_BYTESWAP_64(x) __builtin_bswap64(x)
-#elif defined(TAGLIB_HAVE_MSC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) _byteswap_uint64(x)
-#elif defined(TAGLIB_HAVE_GLIBC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) __bswap_64(x)
-#elif defined(TAGLIB_HAVE_MAC_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) OSSwapInt64(x)
-#elif defined(TAGLIB_HAVE_OPENBSD_BYTESWAP)
-# define TAGLIB_BYTESWAP_64(x) swap64(x)
-#endif
-
 //! A namespace for all TagLib related classes and functions
 
 /*!

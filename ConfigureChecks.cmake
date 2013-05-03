@@ -31,10 +31,12 @@ endif()
 
 # Determine the CPU byte order.
 
-test_big_endian(TAGLIB_BIG_ENDIAN)
+test_big_endian(IS_BIG_ENDIAN)
 
-if(NOT TAGLIB_BIG_ENDIAN)
-  set(TAGLIB_LITTLE_ENDIAN 1)
+if(NOT IS_BIG_ENDIAN)
+  set(SYSTEM_BYTEORDER 1)
+else()
+  set(SYSTEM_BYTEORDER 2)
 endif()
 
 # Determine if your compiler supports std::wstring.
@@ -127,23 +129,23 @@ check_cxx_source_compiles("
     __builtin_bswap16(0);
     return 0; 
   }
-" TAGLIB_HAVE_GCC_BYTESWAP_16)
+" HAVE_GCC_BYTESWAP_16)
 
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap32(0);
     return 0; 
   }
-" TAGLIB_HAVE_GCC_BYTESWAP_32)
+" HAVE_GCC_BYTESWAP_32)
 
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap64(0);
     return 0; 
   }
-" TAGLIB_HAVE_GCC_BYTESWAP_64)
+" HAVE_GCC_BYTESWAP_64)
 
-if(NOT TAGLIB_HAVE_GCC_BYTESWAP_16 OR NOT TAGLIB_HAVE_GCC_BYTESWAP_32 OR NOT TAGLIB_HAVE_GCC_BYTESWAP_64)
+if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP_64)
   check_cxx_source_compiles("
     #include <byteswap.h>
     int main() {
@@ -152,9 +154,9 @@ if(NOT TAGLIB_HAVE_GCC_BYTESWAP_16 OR NOT TAGLIB_HAVE_GCC_BYTESWAP_32 OR NOT TAG
       __bswap_64(0);
       return 0; 
     }
-  " TAGLIB_HAVE_GLIBC_BYTESWAP)
+  " HAVE_GLIBC_BYTESWAP)
 
-  if(NOT TAGLIB_HAVE_GLIBC_BYTESWAP)
+  if(NOT HAVE_GLIBC_BYTESWAP)
     check_cxx_source_compiles("
       #include <stdlib.h>
       int main() {
@@ -163,9 +165,9 @@ if(NOT TAGLIB_HAVE_GCC_BYTESWAP_16 OR NOT TAGLIB_HAVE_GCC_BYTESWAP_32 OR NOT TAG
         _byteswap_uint64(0);
         return 0; 
       }
-    " TAGLIB_HAVE_MSC_BYTESWAP)
+    " HAVE_MSC_BYTESWAP)
 
-    if(NOT TAGLIB_HAVE_MSC_BYTESWAP)
+    if(NOT HAVE_MSC_BYTESWAP)
       check_cxx_source_compiles("
         #include <libkern/OSByteOrder.h>
         int main() {
@@ -174,9 +176,9 @@ if(NOT TAGLIB_HAVE_GCC_BYTESWAP_16 OR NOT TAGLIB_HAVE_GCC_BYTESWAP_32 OR NOT TAG
           OSSwapInt64(0);
           return 0; 
         }
-      " TAGLIB_HAVE_MAC_BYTESWAP)
+      " HAVE_MAC_BYTESWAP)
 
-      if(NOT TAGLIB_HAVE_MAC_BYTESWAP)
+      if(NOT HAVE_MAC_BYTESWAP)
         check_cxx_source_compiles("
           #include <sys/endian.h>
           int main() {
@@ -185,7 +187,7 @@ if(NOT TAGLIB_HAVE_GCC_BYTESWAP_16 OR NOT TAGLIB_HAVE_GCC_BYTESWAP_32 OR NOT TAG
             swap64(0);
             return 0; 
           }
-        " TAGLIB_HAVE_OPENBSD_BYTESWAP)
+        " HAVE_OPENBSD_BYTESWAP)
       endif()
     endif()
   endif()
@@ -199,15 +201,15 @@ check_cxx_source_compiles("
     std::codecvt_utf8_utf16<wchar_t> x; 
     return 0; 
   }
-" TAGLIB_HAVE_STD_CODECVT)
+" HAVE_STD_CODECVT)
 
 # Check for libz using the cmake supplied FindZLIB.cmake
 
 find_package(ZLIB)
 if(ZLIB_FOUND)
-  set(TAGLIB_HAVE_ZLIB 1)
+  set(HAVE_ZLIB 1)
 else()
-  set(TAGLIB_HAVE_ZLIB 0)
+  set(HAVE_ZLIB 0)
 endif()
 
 

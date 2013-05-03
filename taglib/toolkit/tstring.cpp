@@ -25,6 +25,8 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
+#include "config.h"
+
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
@@ -32,7 +34,17 @@
 #include <iostream>
 #include <string.h>
 
-#ifdef TAGLIB_HAVE_STD_CODECVT
+#if defined(HAVE_MSC_BYTESWAP)
+# include <stdlib.h>
+#elif defined(HAVE_GLIBC_BYTESWAP)
+# include <byteswap.h>
+#elif defined(HAVE_MAC_BYTESWAP)
+# include <libkern/OSByteOrder.h>
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+# include <sys/endian.h>
+#endif
+
+#ifdef HAVE_STD_CODECVT
 # include <codecvt>
 #else
 # include "unicode.h"
@@ -42,13 +54,29 @@ namespace
 {
   inline TagLib::ushort byteSwap(TagLib::ushort x)
   {
-#ifdef TAGLIB_BYTESWAP_16
+#if defined(HAVE_GCC_BYTESWAP_16)
 
-    return TAGLIB_BYTESWAP_16(x);
+    return __builtin_bswap16(x);
+
+#elif defined(HAVE_MSC_BYTESWAP)
+
+    return _byteswap_ushort(x);
+
+#elif defined(HAVE_GLIBC_BYTESWAP)
+
+    return __bswap_16(x);
+
+#elif defined(HAVE_MAC_BYTESWAP)
+
+    return OSSwapInt16(x);
+
+#elif defined(HAVE_OPENBSD_BYTESWAP)
+
+    return swap16(x);
 
 #else
 
-    return((x >> 8) & 0xff) | ((x & 0xff) << 8);
+    return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
 
 #endif
   }
@@ -60,7 +88,7 @@ namespace
 
   void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
-#ifdef TAGLIB_HAVE_STD_CODECVT
+#ifdef HAVE_STD_CODECVT
 
     typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
 
@@ -106,7 +134,7 @@ namespace
 
   void UTF8toUTF16(const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
   {
-#ifdef TAGLIB_HAVE_STD_CODECVT
+#ifdef HAVE_STD_CODECVT
 
     typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
 
@@ -840,7 +868,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-#ifdef TAGLIB_LITTLE_ENDIAN
+#if SYSTEM_BYTEORDER == 1
 
 const String::Type String::WCharByteOrder = String::UTF16LE;
 
