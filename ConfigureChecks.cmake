@@ -49,9 +49,9 @@ check_cxx_source_compiles("
     x.fetch_sub(1);
     return 0; 
   }
-" TAGLIB_HAVE_STD_ATOMIC)
+" HAVE_STD_ATOMIC)
 
-if(NOT TAGLIB_HAVE_STD_ATOMIC)
+if(NOT HAVE_STD_ATOMIC)
   check_cxx_source_compiles("
     #include <boost/atomic.hpp>
     int main() { 
@@ -60,9 +60,9 @@ if(NOT TAGLIB_HAVE_STD_ATOMIC)
       x.fetch_sub(1);
       return 0; 
     }
-  " TAGLIB_HAVE_BOOST_ATOMIC)
+  " HAVE_BOOST_ATOMIC)
 
-  if(NOT TAGLIB_HAVE_BOOST_ATOMIC)
+  if(NOT HAVE_BOOST_ATOMIC)
     check_cxx_source_compiles("
       int main() { 
         volatile int x;
@@ -70,9 +70,9 @@ if(NOT TAGLIB_HAVE_STD_ATOMIC)
         int y = __sync_sub_and_fetch(&x, 1);
         return 0; 
       }
-    " TAGLIB_HAVE_GCC_ATOMIC)
+    " HAVE_GCC_ATOMIC)
 
-    if(NOT TAGLIB_HAVE_GCC_ATOMIC)
+    if(NOT HAVE_GCC_ATOMIC)
       check_cxx_source_compiles("
         #include <libkern/OSAtomic.h>
         int main() { 
@@ -81,9 +81,9 @@ if(NOT TAGLIB_HAVE_STD_ATOMIC)
           int32_t y = OSAtomicDecrement32Barrier(&x);
           return 0; 
         }
-      " TAGLIB_HAVE_MAC_ATOMIC)
+      " HAVE_MAC_ATOMIC)
 
-      if(NOT TAGLIB_HAVE_MAC_ATOMIC)
+      if(NOT HAVE_MAC_ATOMIC)
         check_cxx_source_compiles("
           #include <windows.h>
           int main() { 
@@ -92,9 +92,9 @@ if(NOT TAGLIB_HAVE_STD_ATOMIC)
             LONG y = InterlockedDecrement(&x);
             return 0; 
           }
-        " TAGLIB_HAVE_WIN_ATOMIC)
+        " HAVE_WIN_ATOMIC)
 
-        if(NOT TAGLIB_HAVE_WIN_ATOMIC)
+        if(NOT HAVE_WIN_ATOMIC)
           check_cxx_source_compiles("
             #include <ia64intrin.h>
             int main() { 
@@ -103,7 +103,7 @@ if(NOT TAGLIB_HAVE_STD_ATOMIC)
               int y = __sync_sub_and_fetch(&x, 1);
               return 0; 
             }
-          " TAGLIB_HAVE_IA64_ATOMIC)
+          " HAVE_IA64_ATOMIC)
         endif()
       endif()
     endif()
