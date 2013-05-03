@@ -63,8 +63,8 @@ namespace TagLib {
   /*!
    * This is an implicitly shared \e wide string.  For storage it uses
    * TagLib::wstring, but as this is an <i>implementation detail</i> this of
-   * course could change.  Strings are stored internally as UTF-16BE.  (Without
-   * the BOM (Byte Order Mark)
+   * course could change.  Strings are stored internally as UTF-16(without BOM/
+   * CPU byte order)
    *
    * The use of implicit sharing means that copying a string is cheap, the only
    * \e cost comes into play when the copy is modified.  Prior to that the string
@@ -306,7 +306,7 @@ namespace TagLib {
     /*!
      * Convert the string to an integer.
      *
-     * Returns the integer if the conversion was successfull or 0 if the
+     * Returns the integer if the conversion was successful or 0 if the
      * string does not represent a number.
      */
     // BIC: merge with the method below
@@ -474,8 +474,6 @@ namespace TagLib {
      */
     void copyFromUTF16(const char *s, size_t length, Type t);
     
-    void internalCopyFromUTF16(const char *s, size_t length, Type t);
-
     /*!
      * Indicates which byte order of UTF-16 is used to store strings internally. 
      *
