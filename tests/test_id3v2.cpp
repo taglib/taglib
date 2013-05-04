@@ -737,25 +737,6 @@ public:
     MPEG::File f(newname.c_str());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }
-
-  void testChaptersParsing()
-  {
-    ID3v2::ChapterFrame f(
-      ByteVector("CHAP"                     // Frame ID
-                 "\x00\x00\x00\x12"         // Frame size
-                 "\x00\x00"                 // Frame flags
-                 "\x43\x00"                 // Element ID
-		 "\x00\x00\x00\x03"         // Start time
-		 "\x00\x00\x00\x05"         // End time
-		 "\x00\x00\x00\x02"         // Start offset
-                 "\x00\x00\x00\x03", 28));  // End offset
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
-                         f.elementID());
-    CPPUNIT_ASSERT((uint)0x03 == f.startTime());
-    CPPUNIT_ASSERT((uint)0x05 == f.endTime());
-    CPPUNIT_ASSERT((uint)0x02 == f.startOffset());
-    CPPUNIT_ASSERT((uint)0x03 == f.endOffset());
-  }
   
   void testChapters()
   {
