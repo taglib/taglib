@@ -27,7 +27,7 @@
 #define TAGLIB_LIST_H
 
 #include "taglib.h"
-#include "trefcountptr.h"
+#include "tsmartptr.h"
 #include <list>
 
 namespace TagLib {
