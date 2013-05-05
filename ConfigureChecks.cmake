@@ -118,6 +118,53 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
+# Determine which kind of atomic operations your compiler supports.
+
+check_cxx_source_compiles("
+  int main() { 
+    volatile int x;
+    __sync_add_and_fetch(&x, 1);
+    int y = __sync_sub_and_fetch(&x, 1);
+    return 0; 
+  }
+" HAVE_GCC_ATOMIC)
+
+if(NOT HAVE_GCC_ATOMIC)
+  check_cxx_source_compiles("
+    #include <libkern/OSAtomic.h>
+    int main() { 
+      volatile int32_t x;
+      OSAtomicIncrement32Barrier(&x);
+      int32_t y = OSAtomicDecrement32Barrier(&x);
+      return 0; 
+    }
+  " HAVE_MAC_ATOMIC)
+
+  if(NOT HAVE_MAC_ATOMIC)
+    check_cxx_source_compiles("
+      #include <windows.h>
+      int main() { 
+        volatile LONG x;
+        InterlockedIncrement(&x);
+        LONG y = InterlockedDecrement(&x);
+        return 0; 
+      }
+    " HAVE_WIN_ATOMIC)
+
+    if(NOT HAVE_WIN_ATOMIC)
+      check_cxx_source_compiles("
+        #include <ia64intrin.h>
+        int main() { 
+          volatile int x;
+          __sync_add_and_fetch(&x, 1);
+          int y = __sync_sub_and_fetch(&x, 1);
+          return 0; 
+        }
+      " HAVE_IA64_ATOMIC)
+    endif()
+  endif()
+endif()
+
 # Determine whether your compiler supports some safer version of sprintf.
 
 check_cxx_source_compiles("
@@ -180,55 +227,6 @@ if(NOT TAGLIB_USE_STD_SHARED_PTR)
       #include <boost/shared_ptr.hpp>
       int main() { boost::shared_ptr<int> x; return 0; }
     " TAGLIB_USE_BOOST_SHARED_PTR)
-  endif()
-endif()
-
-# Determine which kind of atomic operations your compiler supports.
-
-if(NOT TAGLIB_USE_STD_SHARED_PTR AND NOT TAGLIB_USE_TR1_SHARED_PTR AND NOT TAGLIB_USE_BOOST_SHARED_PTR)
-  check_cxx_source_compiles("
-    int main() { 
-      volatile int x;
-      __sync_add_and_fetch(&x, 1);
-      int y = __sync_sub_and_fetch(&x, 1);
-      return 0; 
-    }
-  " TAGLIB_USE_GCC_ATOMIC)
-
-  if(NOT TAGLIB_USE_GCC_ATOMIC)
-    check_cxx_source_compiles("
-      #include <libkern/OSAtomic.h>
-      int main() { 
-        volatile int32_t x;
-        OSAtomicIncrement32Barrier(&x);
-        int32_t y = OSAtomicDecrement32Barrier(&x);
-        return 0; 
-      }
-    " TAGLIB_USE_MAC_ATOMIC)
-
-    if(NOT TAGLIB_USE_MAC_ATOMIC)
-      check_cxx_source_compiles("
-        #include <windows.h>
-        int main() { 
-          volatile LONG x;
-          InterlockedIncrement(&x);
-          LONG y = InterlockedDecrement(&x);
-          return 0; 
-        }
-      " TAGLIB_USE_WIN_ATOMIC)
-
-      if(NOT TAGLIB_USE_WIN_ATOMIC)
-        check_cxx_source_compiles("
-          #include <ia64intrin.h>
-          int main() { 
-            volatile int x;
-            __sync_add_and_fetch(&x, 1);
-            int y = __sync_sub_and_fetch(&x, 1);
-            return 0; 
-          }
-        " TAGLIB_USE_IA64_ATOMIC)
-      endif()
-    endif()
   endif()
 endif()
 

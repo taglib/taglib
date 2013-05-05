@@ -11,9 +11,3 @@
 #cmakedefine   TAGLIB_USE_TR1_SHARED_PTR 1
 #cmakedefine   TAGLIB_USE_BOOST_SHARED_PTR 1
 
-/* Defined if your compiler supports some atomic operations */
-#cmakedefine   TAGLIB_USE_GCC_ATOMIC 1
-#cmakedefine   TAGLIB_USE_MAC_ATOMIC 1
-#cmakedefine   TAGLIB_USE_WIN_ATOMIC 1
-#cmakedefine   TAGLIB_USE_IA64_ATOMIC 1
-

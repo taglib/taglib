@@ -27,7 +27,7 @@
 #define TAGLIB_MPEGHEADER_H
 
 #include "taglib_export.h"
-#include "trefcountptr.h"
+#include "tsmartptr.h"
 
 namespace TagLib {
 

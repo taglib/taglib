@@ -1,5 +1,6 @@
-#include <trefcountptr.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "taglib.h"
+#include "tsmartptr.h"
 #include "utils.h"
 
 using namespace std;
