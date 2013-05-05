@@ -28,7 +28,7 @@
 
 #include "taglib_export.h"
 #include "taglib.h"
-#include "trefcountptr.h"
+#include "tsmartptr.h"
 #include <vector>
 #include <iostream>
 

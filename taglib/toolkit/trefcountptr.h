@@ -26,44 +26,7 @@
 #ifndef TAGLIB_REFCOUNTPTR_H
 #define TAGLIB_REFCOUNTPTR_H
 
-#include "taglib_config.h"
-
-#if defined(TAGLIB_USE_STD_SHARED_PTR)
-# include <memory>
-#elif defined(TAGLIB_USE_TR1_SHARED_PTR) 
-# include <tr1/memory>
-#elif defined(TAGLIB_USE_BOOST_SHARED_PTR) 
-# include <boost/shared_ptr.hpp>
-#else
-# include <algorithm>
-# if defined(TAGLIB_USE_GCC_ATOMIC)
-#    define TAGLIB_ATOMIC_INT int
-#    define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-#    define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-# elif defined(TAGLIB_USE_WIN_ATOMIC)
-#    if !defined(NOMINMAX)
-#      define NOMINMAX
-#    endif
-#    include <windows.h>
-#    define TAGLIB_ATOMIC_INT long
-#    define TAGLIB_ATOMIC_INC(x) InterlockedIncrement(&x)
-#    define TAGLIB_ATOMIC_DEC(x) InterlockedDecrement(&x)
-# elif defined(TAGLIB_USE_MAC_ATOMIC)
-#    include <libkern/OSAtomic.h>
-#    define TAGLIB_ATOMIC_INT int32_t
-#    define TAGLIB_ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-#    define TAGLIB_ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-# elif defined(TAGLIB_USE_IA64_ATOMIC)
-#    include <ia64intrin.h>
-#    define TAGLIB_ATOMIC_INT int
-#    define TAGLIB_ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-#    define TAGLIB_ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-# else
-#    define TAGLIB_ATOMIC_INT int
-#    define TAGLIB_ATOMIC_INC(x) (++x)
-#    define TAGLIB_ATOMIC_DEC(x) (--x)
-# endif
-#endif
+#include <algorithm>
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
 /*!
@@ -87,7 +50,22 @@ namespace TagLib {
 
   // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
+  
+  class RefCounter
+  {
+  public:
+    RefCounter();
+    ~RefCounter();
 
+    size_t ref();
+    size_t deref();
+    size_t count() const;
+
+  private:
+    class RefCounterPrivate;
+    RefCounterPrivate *d;
+  };
+  
   template<typename T>
   class RefCountPtr
   {
@@ -98,23 +76,18 @@ namespace TagLib {
     class CounterBase
     {
     public:
-      CounterBase() 
-        : count(1) 
-      {
-      }
-
       virtual ~CounterBase()
       {
       }
 
       void addref() 
       { 
-        TAGLIB_ATOMIC_INC(count); 
+        count.ref();
       }
 
       void release()
       {
-        if(TAGLIB_ATOMIC_DEC(count) == 0) {
+        if(count.deref() == 0) {
           dispose();
           delete this;
         }
@@ -122,13 +95,13 @@ namespace TagLib {
 
       long use_count() const
       {
-        return static_cast<long>(count);
+        return static_cast<long>(count.count());
       }
 
       virtual void dispose() = 0;
 
     private:
-      volatile TAGLIB_ATOMIC_INT count;
+      RefCounter count;
     };
 
     // Counter impl class. Provides a dynamic deleter.
@@ -286,8 +259,6 @@ namespace TagLib {
 
     template <typename U> friend class RefCountPtr;
   };
-
-# define TAGLIB_SHARED_PTR TagLib::RefCountPtr
 
   template <typename T>
   void swap(RefCountPtr<T> &a, RefCountPtr<T> &b)
