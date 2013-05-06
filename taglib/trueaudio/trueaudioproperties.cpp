@@ -36,7 +36,7 @@
 
 using namespace TagLib;
 
-class TrueAudio::Properties::PropertiesPrivate
+class TrueAudio::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(const ByteVector &d, offset_t length, ReadStyle s) :
@@ -67,48 +67,50 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
+TrueAudio::AudioProperties::AudioProperties(
+    const ByteVector &data, offset_t streamLength, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
   read();
 }
 
-TrueAudio::Properties::~Properties()
+TrueAudio::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int TrueAudio::Properties::length() const
+int TrueAudio::AudioProperties::length() const
 {
   return d->length;
 }
 
-int TrueAudio::Properties::bitrate() const
+int TrueAudio::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int TrueAudio::Properties::sampleRate() const
+int TrueAudio::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int TrueAudio::Properties::bitsPerSample() const
+int TrueAudio::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-int TrueAudio::Properties::channels() const
+int TrueAudio::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-TagLib::uint TrueAudio::Properties::sampleFrames() const
+TagLib::uint TrueAudio::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
 
-int TrueAudio::Properties::ttaVersion() const
+int TrueAudio::AudioProperties::ttaVersion() const
 {
   return d->version;
 }
@@ -117,7 +119,7 @@ int TrueAudio::Properties::ttaVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::Properties::read()
+void TrueAudio::AudioProperties::read()
 {
   if(!d->data.startsWith("TTA"))
     return;

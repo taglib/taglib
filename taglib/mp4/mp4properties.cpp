@@ -32,7 +32,7 @@
 
 using namespace TagLib;
 
-class MP4::Properties::PropertiesPrivate
+class MP4::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false), format(Unknown) {}
@@ -52,8 +52,8 @@ public:
   Format format;
 };
 
-MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
-  : AudioProperties(style)
+MP4::AudioProperties::AudioProperties(File *file, MP4::Atoms *atoms, ReadStyle style)
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate;
 
@@ -158,49 +158,49 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
   }
 }
 
-MP4::Properties::~Properties()
+MP4::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
 int
-MP4::Properties::channels() const
+MP4::AudioProperties::channels() const
 {
   return d->channels;
 }
 
 int
-MP4::Properties::sampleRate() const
+MP4::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
 int
-MP4::Properties::length() const
+MP4::AudioProperties::length() const
 {
   return d->length;
 }
 
 int
-MP4::Properties::bitrate() const
+MP4::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
 int
-MP4::Properties::bitsPerSample() const
+MP4::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
 bool
-MP4::Properties::isEncrypted() const
+MP4::AudioProperties::isEncrypted() const
 {
   return d->encrypted;
 }
 
 String
-MP4::Properties::toString() const
+MP4::AudioProperties::toString() const
 {
   String format;
   if(d->format == PropertiesPrivate::AAC) {

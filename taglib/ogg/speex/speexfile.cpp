@@ -52,7 +52,7 @@ public:
   }
 
   Ogg::XiphComment *comment;
-  Properties *properties;
+  AudioProperties *properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Speex::File::File(FileName file, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+                   AudioProperties::ReadStyle propertiesStyle) : Ogg::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -68,7 +68,7 @@ Speex::File::File(FileName file, bool readProperties,
 }
 
 Speex::File::File(IOStream *stream, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) : Ogg::File(stream)
+                   AudioProperties::ReadStyle propertiesStyle) : Ogg::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -95,7 +95,7 @@ PropertyMap Speex::File::setProperties(const PropertyMap &properties)
   return d->comment->setProperties(properties);
 }
 
-Speex::Properties *Speex::File::audioProperties() const
+Speex::AudioProperties *Speex::File::audioProperties() const
 {
   return d->properties;
 }
@@ -114,7 +114,7 @@ bool Speex::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Speex::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void Speex::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   ByteVector speexHeaderData = packet(0);
 
@@ -128,5 +128,5 @@ void Speex::File::read(bool readProperties, Properties::ReadStyle propertiesStyl
   d->comment = new Ogg::XiphComment(commentHeaderData);
 
   if(readProperties)
-    d->properties = new Properties(this, propertiesStyle);
+    d->properties = new AudioProperties(this, propertiesStyle);
 }

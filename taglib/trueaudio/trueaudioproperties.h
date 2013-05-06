@@ -47,19 +47,19 @@ namespace TagLib {
      * API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
-       * Create an instance of TrueAudio::Properties with the data read from the
-       * ByteVector \a data.
+       * Create an instance of TrueAudio::AudioProperties with the data read from 
+       * the ByteVector \a data.
        */
-      Properties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
-       * Destroys this TrueAudio::Properties instance.
+       * Destroys this TrueAudio::AudioProperties instance.
        */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -84,8 +84,8 @@ namespace TagLib {
       int ttaVersion() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      AudioProperties(const AudioProperties &);
+      AudioProperties &operator=(const AudioProperties &);
 
       void read();
 

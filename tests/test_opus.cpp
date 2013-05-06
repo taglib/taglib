@@ -26,7 +26,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(48000, ((Ogg::Opus::Properties *)f.audioProperties())->inputSampleRate());
+    CPPUNIT_ASSERT_EQUAL(48000, ((Ogg::Opus::AudioProperties *)f.audioProperties())->inputSampleRate());
   }
 
   void testReadComments()

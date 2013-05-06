@@ -37,7 +37,7 @@ public:
   }
 
   Mod::Tag       tag;
-  IT::Properties properties;
+  IT::AudioProperties properties;
 };
 
 IT::File::File(FileName file, bool readProperties,
@@ -68,7 +68,7 @@ Mod::Tag *IT::File::tag() const
   return &d->tag;
 }
 
-IT::Properties *IT::File::audioProperties() const
+IT::AudioProperties *IT::File::audioProperties() const
 {
   return &d->properties;
 }
@@ -148,7 +148,7 @@ bool IT::File::save()
     return false;
 
   uint fileSize = static_cast<uint>(File::length());
-  if(special & Properties::MessageAttached) {
+  if(special & AudioProperties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))
       return false;
@@ -218,7 +218,7 @@ void IT::File::read(bool)
   // sample/instrument names are abused as comments so
   // I just add all together.
   String message;
-  if(special & Properties::MessageAttached) {
+  if(special & AudioProperties::MessageAttached) {
     READ_U16L_AS(messageLength);
     READ_U32L_AS(messageOffset);
     seek(messageOffset);

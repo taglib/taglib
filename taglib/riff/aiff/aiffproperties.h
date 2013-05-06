@@ -43,19 +43,21 @@ namespace TagLib {
        * API.
        */
 
-      class TAGLIB_EXPORT Properties : public AudioProperties
+      class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
       {
       public:
         /*!
-         * Create an instance of AIFF::Properties with the data read from the
-         * ByteVector \a data.
+         * Create an instance of AIFF::AudioProperties with the data read from 
+         * the ByteVector \a data.
          */
-        Properties(const ByteVector &data, ReadStyle style);
+        AudioProperties(const ByteVector &data, ReadStyle style);
 
         /*!
-         * Destroys this AIFF::Properties instance.
+         * Destroys this AIFF::AudioProperties instance.
          */
-        virtual ~Properties();
+        virtual ~AudioProperties();
+
+        virtual bool isNull() const;
 
         // Reimplementations.
 
@@ -68,13 +70,10 @@ namespace TagLib {
         uint sampleFrames() const;
 
       private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
-
         void read(const ByteVector &data);
 
         class PropertiesPrivate;
-        PropertiesPrivate *d;
+        TAGLIB_SHARED_PTR<PropertiesPrivate> d;
       };
     }
   }

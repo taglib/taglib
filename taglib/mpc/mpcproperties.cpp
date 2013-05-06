@@ -33,7 +33,7 @@
 
 using namespace TagLib;
 
-class MPC::Properties::PropertiesPrivate
+class MPC::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(offset_t length, ReadStyle s) :
@@ -71,13 +71,15 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
+MPC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(streamLength, style);
   readSV7(data);
 }
 
-MPC::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) : AudioProperties(style)
+MPC::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(streamLength, style);
   ByteVector magic = file->readBlock(4);
@@ -91,62 +93,62 @@ MPC::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) 
   }
 }
 
-MPC::Properties::~Properties()
+MPC::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int MPC::Properties::length() const
+int MPC::AudioProperties::length() const
 {
   return d->length;
 }
 
-int MPC::Properties::bitrate() const
+int MPC::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int MPC::Properties::sampleRate() const
+int MPC::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int MPC::Properties::channels() const
+int MPC::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int MPC::Properties::mpcVersion() const
+int MPC::AudioProperties::mpcVersion() const
 {
   return d->version;
 }
 
-TagLib::uint MPC::Properties::totalFrames() const
+TagLib::uint MPC::AudioProperties::totalFrames() const
 {
   return d->totalFrames;
 }
 
-TagLib::uint MPC::Properties::sampleFrames() const
+TagLib::uint MPC::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
 
-int MPC::Properties::trackGain() const
+int MPC::AudioProperties::trackGain() const
 {
   return d->trackGain;
 }
 
-int MPC::Properties::trackPeak() const
+int MPC::AudioProperties::trackPeak() const
 {
   return d->trackPeak;
 }
 
-int MPC::Properties::albumGain() const
+int MPC::AudioProperties::albumGain() const
 {
   return d->albumGain;
 }
 
-int MPC::Properties::albumPeak() const
+int MPC::AudioProperties::albumPeak() const
 {
   return d->albumPeak;
 }
@@ -185,7 +187,7 @@ unsigned long readSize(const ByteVector &data, size_t &sizelength)
 
 static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 
-void MPC::Properties::readSV8(File *file)
+void MPC::AudioProperties::readSV8(File *file)
 {
   bool readSH = false, readRG = false;
 
@@ -245,7 +247,7 @@ void MPC::Properties::readSV8(File *file)
   }
 }
 
-void MPC::Properties::readSV7(const ByteVector &data)
+void MPC::AudioProperties::readSV7(const ByteVector &data)
 {
   if(data.startsWith("MP+")) {
     d->version = data[3] & 15;

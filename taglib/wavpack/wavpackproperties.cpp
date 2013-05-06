@@ -35,7 +35,7 @@
 
 using namespace TagLib;
 
-class WavPack::Properties::PropertiesPrivate
+class WavPack::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(const ByteVector &d, offset_t length, ReadStyle s, File *f) :
@@ -68,49 +68,50 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) : AudioProperties(style)
+WavPack::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   ByteVector data = file->readBlock(32);
   d = new PropertiesPrivate(data, streamLength, style, file);
   read();
 }
 
-WavPack::Properties::~Properties()
+WavPack::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int WavPack::Properties::length() const
+int WavPack::AudioProperties::length() const
 {
   return d->length;
 }
 
-int WavPack::Properties::bitrate() const
+int WavPack::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int WavPack::Properties::sampleRate() const
+int WavPack::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int WavPack::Properties::channels() const
+int WavPack::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int WavPack::Properties::version() const
+int WavPack::AudioProperties::version() const
 {
   return d->version;
 }
 
-int WavPack::Properties::bitsPerSample() const
+int WavPack::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-TagLib::uint WavPack::Properties::sampleFrames() const
+TagLib::uint WavPack::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -136,7 +137,7 @@ static const unsigned int sample_rates[] = { 6000, 8000, 9600, 11025, 12000,
 
 #define FINAL_BLOCK     0x1000
 
-void WavPack::Properties::read()
+void WavPack::AudioProperties::read()
 {
   if(!d->data.startsWith("wvpk"))
     return;
@@ -166,7 +167,7 @@ void WavPack::Properties::read()
   d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 }
 
-unsigned int WavPack::Properties::seekFinalIndex()
+unsigned int WavPack::AudioProperties::seekFinalIndex()
 {
   ByteVector blockID("wvpk", 4);
 

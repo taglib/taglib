@@ -98,7 +98,7 @@ private:
 
     CPPUNIT_ASSERT(file.isValid());
 
-    IT::Properties *p = file.audioProperties();
+    IT::AudioProperties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
     CPPUNIT_ASSERT(0 != p);

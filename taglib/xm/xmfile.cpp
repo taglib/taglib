@@ -360,7 +360,7 @@ public:
   }
 
   Mod::Tag       tag;
-  XM::Properties properties;
+  XM::AudioProperties properties;
 };
 
 XM::File::File(FileName file, bool readProperties,
@@ -391,7 +391,7 @@ Mod::Tag *XM::File::tag() const
   return &d->tag;
 }
 
-XM::Properties *XM::File::audioProperties() const
+XM::AudioProperties *XM::File::audioProperties() const
 {
   return &d->properties;
 }

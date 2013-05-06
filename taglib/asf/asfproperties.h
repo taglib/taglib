@@ -35,19 +35,19 @@ namespace TagLib {
   namespace ASF {
 
     //! An implementation of ASF audio properties
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
 
       /*!
-       * Create an instance of ASF::Properties.
+       * Create an instance of ASF::AudioProperties.
        */
-      Properties();
+      AudioProperties();
 
       /*!
-       * Destroys this ASF::Properties instance.
+       * Destroys this ASF::AudioProperties instance.
        */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
       virtual int length() const;

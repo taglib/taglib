@@ -79,7 +79,7 @@ namespace TagLib {
        * in a future version.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Contructs an MPEG file from \a file.  If \a readProperties is true the
@@ -92,7 +92,7 @@ namespace TagLib {
        */
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Contructs an MPEG file from \a stream.  If \a readProperties is true the
@@ -106,7 +106,7 @@ namespace TagLib {
       // BIC: merge with the above constructor
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -146,7 +146,7 @@ namespace TagLib {
        * Returns the MPEG::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
       /*!
        * Save the file.  If at least one tag -- ID3v1 or ID3v2 -- exists this
@@ -307,7 +307,7 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
       offset_t findID3v2();
       offset_t findID3v1();
       void findAPE();

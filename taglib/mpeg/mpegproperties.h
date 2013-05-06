@@ -45,19 +45,19 @@ namespace TagLib {
      * AudioProperties API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
-       * Create an instance of MPEG::Properties with the data read from the
-       * MPEG::File \a file.
+       * Create an instance of MPEG::AudioProperties with the data read from 
+       * the MPEG::File \a file.
        */
-      Properties(File *file, ReadStyle style = Average);
+      AudioProperties(File *file, ReadStyle style = Average);
 
       /*!
-       * Destroys this MPEG Properties instance.
+       * Destroys this MPEG::AudioProperties instance.
        */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -104,8 +104,8 @@ namespace TagLib {
       bool isOriginal() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      AudioProperties(const AudioProperties &);
+      AudioProperties &operator=(const AudioProperties &);
 
       void read();
 

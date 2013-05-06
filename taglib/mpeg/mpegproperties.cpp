@@ -32,7 +32,7 @@
 
 using namespace TagLib;
 
-class MPEG::Properties::PropertiesPrivate
+class MPEG::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(File *f, ReadStyle s) :
@@ -74,7 +74,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+MPEG::AudioProperties::AudioProperties(File *file, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(file, style);
 
@@ -82,62 +83,62 @@ MPEG::Properties::Properties(File *file, ReadStyle style) : AudioProperties(styl
     read();
 }
 
-MPEG::Properties::~Properties()
+MPEG::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int MPEG::Properties::length() const
+int MPEG::AudioProperties::length() const
 {
   return d->length;
 }
 
-int MPEG::Properties::bitrate() const
+int MPEG::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int MPEG::Properties::sampleRate() const
+int MPEG::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int MPEG::Properties::channels() const
+int MPEG::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-const MPEG::XingHeader *MPEG::Properties::xingHeader() const
+const MPEG::XingHeader *MPEG::AudioProperties::xingHeader() const
 {
   return d->xingHeader;
 }
 
-MPEG::Header::Version MPEG::Properties::version() const
+MPEG::Header::Version MPEG::AudioProperties::version() const
 {
   return d->version;
 }
 
-int MPEG::Properties::layer() const
+int MPEG::AudioProperties::layer() const
 {
   return d->layer;
 }
 
-bool MPEG::Properties::protectionEnabled() const
+bool MPEG::AudioProperties::protectionEnabled() const
 {
   return d->protectionEnabled;
 }
 
-MPEG::Header::ChannelMode MPEG::Properties::channelMode() const
+MPEG::Header::ChannelMode MPEG::AudioProperties::channelMode() const
 {
   return d->channelMode;
 }
 
-bool MPEG::Properties::isCopyrighted() const
+bool MPEG::AudioProperties::isCopyrighted() const
 {
   return d->isCopyrighted;
 }
 
-bool MPEG::Properties::isOriginal() const
+bool MPEG::AudioProperties::isOriginal() const
 {
   return d->isOriginal;
 }
@@ -146,7 +147,7 @@ bool MPEG::Properties::isOriginal() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::Properties::read()
+void MPEG::AudioProperties::read()
 {
   // Since we've likely just looked for the ID3v1 tag, start at the end of the
   // file where we're least likely to have to have to move the disk head.

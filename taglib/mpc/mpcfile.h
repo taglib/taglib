@@ -89,7 +89,7 @@ namespace TagLib {
        * false, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Contructs an MPC file from \a file.  If \a readProperties is true the
@@ -100,7 +100,7 @@ namespace TagLib {
        * responsible for deleting it after the File object.
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -124,7 +124,7 @@ namespace TagLib {
        * Returns the MPC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
       /*!
        * Saves the file.
@@ -180,7 +180,7 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
       void scan();
       offset_t findAPE();
       offset_t findID3v1();

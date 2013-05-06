@@ -56,7 +56,7 @@ namespace TagLib {
        * \note In the current implementation, both \a readProperties and
        * \a propertiesStyle are ignored.
        */
-      File(FileName file, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+      File(FileName file, bool readProperties = true, AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
        * Contructs a MP4 file from \a file.  If \a readProperties is true the
@@ -69,7 +69,7 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true, Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+      File(IOStream *stream, bool readProperties = true, AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -91,7 +91,7 @@ namespace TagLib {
       /*!
        * Returns the MP4 audio properties for this file.
        */
-      Properties *audioProperties() const;
+      AudioProperties *audioProperties() const;
 
       /*!
        * Save the file.
@@ -102,7 +102,7 @@ namespace TagLib {
 
     private:
 
-      void read(bool readProperties, Properties::ReadStyle audioPropertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle);
       bool checkValid(const MP4::AtomList &list);
 
       class FilePrivate;

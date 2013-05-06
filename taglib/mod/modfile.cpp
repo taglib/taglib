@@ -37,7 +37,7 @@ public:
   }
 
   Mod::Tag        tag;
-  Mod::Properties properties;
+  Mod::AudioProperties properties;
 };
 
 Mod::File::File(FileName file, bool readProperties,
@@ -68,7 +68,7 @@ Mod::Tag *Mod::File::tag() const
   return &d->tag;
 }
 
-Mod::Properties *Mod::File::audioProperties() const
+Mod::AudioProperties *Mod::File::audioProperties() const
 {
   return &d->properties;
 }

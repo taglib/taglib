@@ -39,7 +39,7 @@ public:
   }
 
   Mod::Tag        tag;
-  S3M::Properties properties;
+  S3M::AudioProperties properties;
 };
 
 S3M::File::File(FileName file, bool readProperties,
@@ -70,7 +70,7 @@ Mod::Tag *S3M::File::tag() const
   return &d->tag;
 }
 
-S3M::Properties *S3M::File::audioProperties() const
+S3M::AudioProperties *S3M::File::audioProperties() const
 {
   return &d->properties;
 }
