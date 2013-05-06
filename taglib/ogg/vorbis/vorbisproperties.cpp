@@ -33,7 +33,7 @@
 
 using namespace TagLib;
 
-class Ogg::Vorbis::Properties::PropertiesPrivate
+class Ogg::Vorbis::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(File *f, ReadStyle s) :
@@ -72,58 +72,59 @@ namespace TagLib {
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::Vorbis::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+Ogg::Vorbis::AudioProperties::AudioProperties(File *file, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(file, style);
   read();
 }
 
-Ogg::Vorbis::Properties::~Properties()
+Ogg::Vorbis::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int Ogg::Vorbis::Properties::length() const
+int Ogg::Vorbis::AudioProperties::length() const
 {
   return d->length;
 }
 
-int Ogg::Vorbis::Properties::bitrate() const
+int Ogg::Vorbis::AudioProperties::bitrate() const
 {
   return int(float(d->bitrate) / float(1000) + 0.5);
 }
 
-int Ogg::Vorbis::Properties::sampleRate() const
+int Ogg::Vorbis::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int Ogg::Vorbis::Properties::channels() const
+int Ogg::Vorbis::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int Ogg::Vorbis::Properties::vorbisVersion() const
+int Ogg::Vorbis::AudioProperties::vorbisVersion() const
 {
   return d->vorbisVersion;
 }
 
-int Ogg::Vorbis::Properties::bitrateMaximum() const
+int Ogg::Vorbis::AudioProperties::bitrateMaximum() const
 {
   return d->bitrateMaximum;
 }
 
-int Ogg::Vorbis::Properties::bitrateNominal() const
+int Ogg::Vorbis::AudioProperties::bitrateNominal() const
 {
   return d->bitrateNominal;
 }
 
-int Ogg::Vorbis::Properties::bitrateMinimum() const
+int Ogg::Vorbis::AudioProperties::bitrateMinimum() const
 {
   return d->bitrateMinimum;
 }
 
-String Ogg::Vorbis::Properties::toString() const
+String Ogg::Vorbis::AudioProperties::toString() const
 {
   StringList desc;
   desc.append("Ogg Vorbis audio (version " + String::number(vorbisVersion()) + ")");
@@ -136,7 +137,7 @@ String Ogg::Vorbis::Properties::toString() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Ogg::Vorbis::Properties::read()
+void Ogg::Vorbis::AudioProperties::read()
 {
   // Get the identification header from the Ogg implementation.
 

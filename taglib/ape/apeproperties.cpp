@@ -36,7 +36,7 @@
 
 using namespace TagLib;
 
-class APE::Properties::PropertiesPrivate
+class APE::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(File *file, offset_t streamLength) :
@@ -65,48 +65,49 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+APE::AudioProperties::AudioProperties(File *file, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(file, file->length());
   read();
 }
 
-APE::Properties::~Properties()
+APE::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int APE::Properties::length() const
+int APE::AudioProperties::length() const
 {
   return d->length;
 }
 
-int APE::Properties::bitrate() const
+int APE::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int APE::Properties::sampleRate() const
+int APE::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int APE::Properties::channels() const
+int APE::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int APE::Properties::version() const
+int APE::AudioProperties::version() const
 {
   return d->version;
 }
 
-int APE::Properties::bitsPerSample() const
+int APE::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-TagLib::uint APE::Properties::sampleFrames() const
+TagLib::uint APE::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -116,7 +117,7 @@ TagLib::uint APE::Properties::sampleFrames() const
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void APE::Properties::read()
+void APE::AudioProperties::read()
 {
   // First we are searching the descriptor
   offset_t offset = findDescriptor();
@@ -138,7 +139,7 @@ void APE::Properties::read()
   }
 }
 
-offset_t APE::Properties::findDescriptor()
+offset_t APE::AudioProperties::findDescriptor()
 {
   offset_t ID3v2Location = findID3v2();
   long ID3v2OriginalSize = 0;
@@ -164,7 +165,7 @@ offset_t APE::Properties::findDescriptor()
   return offset;
 }
 
-offset_t APE::Properties::findID3v2()
+offset_t APE::AudioProperties::findID3v2()
 {
   if(!d->file->isValid())
     return -1;
@@ -177,7 +178,7 @@ offset_t APE::Properties::findID3v2()
   return -1;
 }
 
-void APE::Properties::analyzeCurrent()
+void APE::AudioProperties::analyzeCurrent()
 {
   // Read the descriptor
   d->file->seek(2, File::Current);
@@ -205,7 +206,7 @@ void APE::Properties::analyzeCurrent()
   d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
 }
 
-void APE::Properties::analyzeOld()
+void APE::AudioProperties::analyzeOld()
 {
   ByteVector header = d->file->readBlock(26);
   const uint totalFrames = header.toUInt32LE(18);

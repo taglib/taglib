@@ -27,7 +27,7 @@
 
 namespace TagLib {
   namespace IT {
-    class TAGLIB_EXPORT Properties : public AudioProperties {
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties {
       friend class File;
     public:
       /*! Flag bits. */
@@ -48,8 +48,8 @@ namespace TagLib {
         MidiConfEmbedded = 8
       };
 
-      Properties(AudioProperties::ReadStyle propertiesStyle);
-      virtual ~Properties();
+      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~AudioProperties();
 
       int length()     const;
       int bitrate()    const;
@@ -89,8 +89,8 @@ namespace TagLib {
       void setPitchWheelDepth  (uchar pitchWheelDepth);
 
     private:
-      Properties(const Properties&);
-      Properties &operator=(const Properties&);
+      AudioProperties(const AudioProperties&);
+      AudioProperties &operator=(const AudioProperties&);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

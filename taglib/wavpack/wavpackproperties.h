@@ -48,18 +48,18 @@ namespace TagLib {
      * API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
-       * Create an instance of WavPack::Properties.
+       * Create an instance of WavPack::AudioProperties.
        */
-      Properties(File *file, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
-       * Destroys this WavPack::Properties instance.
+       * Destroys this WavPack::AudioProperties instance.
        */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -80,8 +80,8 @@ namespace TagLib {
       int version() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      AudioProperties(const AudioProperties &);
+      AudioProperties &operator=(const AudioProperties &);
 
       void read();
       unsigned int seekFinalIndex();

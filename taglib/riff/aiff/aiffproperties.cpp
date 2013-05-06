@@ -29,7 +29,7 @@
 
 using namespace TagLib;
 
-class RIFF::AIFF::Properties::PropertiesPrivate
+class RIFF::AIFF::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
@@ -55,43 +55,48 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) 
+  : TagLib::AudioProperties(style)
+  , d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
   read(data);
 }
 
-RIFF::AIFF::Properties::~Properties()
+RIFF::AIFF::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
-int RIFF::AIFF::Properties::length() const
+bool RIFF::AIFF::AudioProperties::isNull() const
+{
+  return (static_cast<bool>(d));
+}
+
+int RIFF::AIFF::AudioProperties::length() const
 {
   return d->length;
 }
 
-int RIFF::AIFF::Properties::bitrate() const
+int RIFF::AIFF::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int RIFF::AIFF::Properties::sampleRate() const
+int RIFF::AIFF::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int RIFF::AIFF::Properties::channels() const
+int RIFF::AIFF::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int RIFF::AIFF::Properties::sampleWidth() const
+int RIFF::AIFF::AudioProperties::sampleWidth() const
 {
   return d->sampleWidth;
 }
 
-TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
+TagLib::uint RIFF::AIFF::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -100,7 +105,7 @@ TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::Properties::read(const ByteVector &data)
+void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
 {
   d->channels       = data.toInt16BE(0);
   d->sampleFrames   = data.toUInt32BE(2);

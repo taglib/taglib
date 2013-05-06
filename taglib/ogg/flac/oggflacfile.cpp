@@ -32,7 +32,7 @@
 #include "oggflacfile.h"
 
 using namespace TagLib;
-using TagLib::FLAC::Properties;
+using TagLib::FLAC::AudioProperties;
 
 class Ogg::FLAC::File::FilePrivate
 {
@@ -54,7 +54,7 @@ public:
 
   Ogg::XiphComment *comment;
 
-  Properties *properties;
+  AudioProperties *properties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
   offset_t streamStart;
@@ -70,7 +70,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::FLAC::File::File(FileName file, bool readProperties,
-                      Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+                      AudioProperties::ReadStyle propertiesStyle) : Ogg::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -78,7 +78,7 @@ Ogg::FLAC::File::File(FileName file, bool readProperties,
 }
 
 Ogg::FLAC::File::File(IOStream *stream, bool readProperties,
-                      Properties::ReadStyle propertiesStyle) : Ogg::File(stream)
+                      AudioProperties::ReadStyle propertiesStyle) : Ogg::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -105,7 +105,7 @@ PropertyMap Ogg::FLAC::File::setProperties(const PropertyMap &properties)
   return d->comment->setProperties(properties);
 }  
 
-Properties *Ogg::FLAC::File::audioProperties() const
+FLAC::AudioProperties *Ogg::FLAC::File::audioProperties() const
 {
   return d->properties;
 }
@@ -141,7 +141,7 @@ bool Ogg::FLAC::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void Ogg::FLAC::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   // Sanity: Check if we really have an Ogg/FLAC file
 
@@ -171,7 +171,7 @@ void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle properties
 
 
   if(readProperties)
-    d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
+    d->properties = new AudioProperties(streamInfoData(), streamLength(), propertiesStyle);
 }
 
 ByteVector Ogg::FLAC::File::streamInfoData()

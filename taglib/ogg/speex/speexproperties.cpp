@@ -38,7 +38,7 @@
 using namespace TagLib;
 using namespace TagLib::Ogg;
 
-class Speex::Properties::PropertiesPrivate
+class Speex::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(File *f, ReadStyle s) :
@@ -67,38 +67,39 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Speex::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+Speex::AudioProperties::AudioProperties(File *file, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(file, style);
   read();
 }
 
-Speex::Properties::~Properties()
+Speex::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int Speex::Properties::length() const
+int Speex::AudioProperties::length() const
 {
   return d->length;
 }
 
-int Speex::Properties::bitrate() const
+int Speex::AudioProperties::bitrate() const
 {
   return int(float(d->bitrate) / float(1000) + 0.5);
 }
 
-int Speex::Properties::sampleRate() const
+int Speex::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int Speex::Properties::channels() const
+int Speex::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int Speex::Properties::speexVersion() const
+int Speex::AudioProperties::speexVersion() const
 {
   return d->speexVersion;
 }
@@ -107,7 +108,7 @@ int Speex::Properties::speexVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Speex::Properties::read()
+void Speex::AudioProperties::read()
 {
   // Get the identification header from the Ogg implementation.
 

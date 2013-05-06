@@ -75,7 +75,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
   bool scanned;
 
   // These indicate whether the file *on disk* has these tags, not if
@@ -91,7 +91,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPC::File::File(FileName file, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -99,7 +99,7 @@ MPC::File::File(FileName file, bool readProperties,
 }
 
 MPC::File::File(IOStream *stream, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -123,7 +123,7 @@ PropertyMap MPC::File::setProperties(const PropertyMap &properties)
   return d->tag.access<APE::Tag>(MPCAPEIndex, true)->setProperties(properties);
 }
 
-MPC::Properties *MPC::File::audioProperties() const
+MPC::AudioProperties *MPC::File::audioProperties() const
 {
   return d->properties;
 }
@@ -244,7 +244,7 @@ void MPC::File::remove(int tags)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v1 tag
 
@@ -291,7 +291,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for MPC metadata
 
   if(readProperties) {
-    d->properties = new Properties(this, length() - d->ID3v2Size - d->APESize);
+    d->properties = new AudioProperties(this, length() - d->ID3v2Size - d->APESize);
   }
 }
 

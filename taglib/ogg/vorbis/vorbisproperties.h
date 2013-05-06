@@ -44,19 +44,19 @@ namespace TagLib {
      * API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
        * Create an instance of Vorbis::Properties with the data read from the
        * Vorbis::File \a file.
        */
-      Properties(File *file, ReadStyle style = Average);
+      AudioProperties(File *file, ReadStyle style = Average);
 
       /*!
        * Destroys this VorbisProperties instance.
        */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -90,8 +90,8 @@ namespace TagLib {
       int bitrateMinimum() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      AudioProperties(const AudioProperties &);
+      AudioProperties &operator=(const AudioProperties &);
 
       void read();
 

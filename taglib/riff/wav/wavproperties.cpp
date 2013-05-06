@@ -32,7 +32,7 @@
 
 using namespace TagLib;
 
-class RIFF::WAV::Properties::PropertiesPrivate
+class RIFF::WAV::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(uint streamLength = 0) :
@@ -62,49 +62,51 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate();
   read(data);
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength, ReadStyle style) 
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(streamLength);
   read(data);
 }
 
-RIFF::WAV::Properties::~Properties()
+RIFF::WAV::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int RIFF::WAV::Properties::length() const
+int RIFF::WAV::AudioProperties::length() const
 {
   return d->length;
 }
 
-int RIFF::WAV::Properties::bitrate() const
+int RIFF::WAV::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int RIFF::WAV::Properties::sampleRate() const
+int RIFF::WAV::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int RIFF::WAV::Properties::channels() const
+int RIFF::WAV::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int RIFF::WAV::Properties::sampleWidth() const
+int RIFF::WAV::AudioProperties::sampleWidth() const
 {
   return d->sampleWidth;
 }
 
-TagLib::uint RIFF::WAV::Properties::sampleFrames() const
+TagLib::uint RIFF::WAV::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -113,7 +115,7 @@ TagLib::uint RIFF::WAV::Properties::sampleFrames() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::Properties::read(const ByteVector &data)
+void RIFF::WAV::AudioProperties::read(const ByteVector &data)
 {
   d->format      = data.toInt16LE(0);
   d->channels    = data.toInt16LE(2);

@@ -54,7 +54,7 @@ public:
     delete properties;
   }
 
-  Properties *properties;
+  AudioProperties *properties;
   
   ByteVector tagChunkID;
 
@@ -66,7 +66,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::WAV::File::File(FileName file, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(file, LittleEndian)
+                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(file, LittleEndian)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -74,7 +74,7 @@ RIFF::WAV::File::File(FileName file, bool readProperties,
 }
 
 RIFF::WAV::File::File(IOStream *stream, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(stream, LittleEndian)
+                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(stream, LittleEndian)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -116,7 +116,7 @@ PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
   return tag()->setProperties(properties);
 }
 
-RIFF::WAV::Properties *RIFF::WAV::File::audioProperties() const
+RIFF::WAV::AudioProperties *RIFF::WAV::File::audioProperties() const
 {
   return d->properties;
 }
@@ -165,7 +165,7 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void RIFF::WAV::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   ByteVector formatData;
   uint streamLength = 0;
@@ -195,7 +195,7 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
     d->tag.set(InfoIndex, new RIFF::Info::Tag);
 
   if(!formatData.isEmpty())
-    d->properties = new Properties(formatData, streamLength, propertiesStyle);
+    d->properties = new AudioProperties(formatData, streamLength, propertiesStyle);
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)

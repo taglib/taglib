@@ -88,7 +88,7 @@ public:
   bool hasID3v1;
   bool hasAPE;
 
-  Properties *properties;
+  AudioProperties *properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPEG::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
 
@@ -105,7 +105,7 @@ MPEG::File::File(FileName file, bool readProperties,
 }
 
 MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(file)
 {
   d = new FilePrivate(frameFactory);
@@ -115,7 +115,7 @@ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 }
 
 MPEG::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(stream)
 {
   d = new FilePrivate(frameFactory);
@@ -142,7 +142,7 @@ PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
   return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
 }
 
-MPEG::Properties *MPEG::File::audioProperties() const
+MPEG::AudioProperties *MPEG::File::audioProperties() const
 {
   return d->properties;
 }
@@ -431,7 +431,7 @@ bool MPEG::File::hasAPETag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void MPEG::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   // Look for an ID3v2 tag
 
@@ -470,7 +470,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   }
 
   if(readProperties)
-    d->properties = new Properties(this, propertiesStyle);
+    d->properties = new AudioProperties(this, propertiesStyle);
 
   // Make sure that we have our default tag types available.
 
