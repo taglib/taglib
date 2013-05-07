@@ -55,6 +55,7 @@ public:
     APEFooterLocation(-1),
     APEOriginalSize(0),
     ID3v1Location(-1),
+    tag(3),
     hasID3v2(false),
     hasID3v1(false),
     hasAPE(false),
