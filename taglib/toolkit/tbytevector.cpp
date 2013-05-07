@@ -849,14 +849,17 @@ float ByteVector::toFloat32BE(size_t offset) const
   {
     // float is 32-bit wide and IEEE754 compliant.
 
-    uint tmp;
+    union {
+      uint  i;
+      float f;
+    } tmp;
     ::memcpy(&tmp, data() + offset, 4);
 
 # if SYSTEM_BYTEORDER == 1
-    tmp = byteSwap<uint>(tmp);
+    tmp.i = byteSwap<uint>(tmp.i);
 # endif
 
-    return *reinterpret_cast<float*>(&tmp);
+    return tmp.f;
   }
 
 #endif
@@ -907,14 +910,17 @@ double ByteVector::toFloat64BE(size_t offset) const
   {
     // double is 64-bit wide and IEEE754 compliant.
 
-    ulonglong tmp;
+    union {
+      ulonglong i;
+      double    f;
+    } tmp;
     ::memcpy(&tmp, data() + offset, 8);
 
 # if SYSTEM_BYTEORDER == 1
-    tmp = byteSwap<ulonglong>(tmp);
+    tmp.i = byteSwap<ulonglong>(tmp.i);
 # endif
 
-    return *reinterpret_cast<double*>(&tmp);
+    return tmp.f;
   }
 
 #endif
