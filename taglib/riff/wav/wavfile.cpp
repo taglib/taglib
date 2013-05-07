@@ -45,7 +45,8 @@ class RIFF::WAV::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tagChunkID("ID3 ")
+    tagChunkID("ID3 "),
+    tag(2)
   {
   }
 

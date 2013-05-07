@@ -29,95 +29,85 @@
 
 using namespace TagLib;
 
-#define stringUnion(method)                                          \
-  if(tag(0) && !tag(0)->method().isEmpty())                          \
-    return tag(0)->method();                                         \
-  if(tag(1) && !tag(1)->method().isEmpty())                          \
-    return tag(1)->method();                                         \
-  if(tag(2) && !tag(2)->method().isEmpty())                          \
-    return tag(2)->method();                                         \
-  return String::null                                                \
+namespace
+{
+  typedef std::vector<TAGLIB_SHARED_PTR<Tag> > TagVector;
+  typedef TagVector::iterator TagIterator;
+  typedef TagVector::const_iterator TagConstIterator;
+}
 
-#define numberUnion(method)                                          \
-  if(tag(0) && tag(0)->method() > 0)                                 \
-    return tag(0)->method();                                         \
-  if(tag(1) && tag(1)->method() > 0)                                 \
-    return tag(1)->method();                                         \
-  if(tag(2) && tag(2)->method() > 0)                                 \
-    return tag(2)->method();                                         \
-  return 0
+#define stringUnion(method)                                               \
+  for(TagConstIterator it = d->tags.begin(); it != d->tags.end(); ++it) { \
+    String val = (*it) ? (*it)->method() : String::null;                  \
+    if(!val.isEmpty())                                                    \
+      return val;                                                         \
+  }                                                                       \
+  return String::null;
 
-#define setUnion(method, value)                                      \
-  if(tag(0))                                                         \
-    tag(0)->set##method(value);                                      \
-  if(tag(1))                                                         \
-    tag(1)->set##method(value);                                      \
-  if(tag(2))                                                         \
-    tag(2)->set##method(value);                                      \
+#define numberUnion(method)                                               \
+  for(TagConstIterator it = d->tags.begin(); it != d->tags.end(); ++it) { \
+    uint val = (*it) ? (*it)->method() : 0;                               \
+    if(val > 0)                                                           \
+      return val;                                                         \
+  }                                                                       \
+  return 0;
+
+#define setUnion(method, value)                                           \
+  for(TagIterator it = d->tags.begin(); it != d->tags.end(); ++it) {      \
+    if(*it)                                                               \
+      (*it)->set##method(value);                                          \
+  }
 
 class TagUnion::TagUnionPrivate
 {
 public:
-  TagUnionPrivate() : tags(3, static_cast<Tag *>(0))
+  TagUnionPrivate(size_t count) 
+    : tags(count)
   {
-
   }
 
-  ~TagUnionPrivate()
-  {
-    delete tags[0];
-    delete tags[1];
-    delete tags[2];
-  }
-
-  std::vector<Tag *> tags;
+  std::vector<TAGLIB_SHARED_PTR<Tag> > tags;
 };
 
-TagUnion::TagUnion(Tag *first, Tag *second, Tag *third)
+TagUnion::TagUnion(size_t count)
+  : d(new TagUnionPrivate(count))
 {
-  d = new TagUnionPrivate;
-
-  d->tags[0] = first;
-  d->tags[1] = second;
-  d->tags[2] = third;
 }
 
 TagUnion::~TagUnion()
 {
-  delete d;
 }
 
-Tag *TagUnion::operator[](int index) const
+Tag *TagUnion::operator[](size_t index) const
 {
   return tag(index);
 }
 
-Tag *TagUnion::tag(int index) const
+Tag *TagUnion::tag(size_t index) const
 {
-  return d->tags[index];
+  return d->tags[index].get();
 }
 
-void TagUnion::set(int index, Tag *tag)
+void TagUnion::set(size_t index, Tag *tag)
 {
-  delete d->tags[index];
-  d->tags[index] = tag;
+  d->tags[index].reset(tag);
 }
 
 PropertyMap TagUnion::properties() const
 {
-  for(uint i = 0; i < 3; ++i) {
-    if(tag(i)) {
-      return tag(i)->properties();
-    }
+  for(TagConstIterator it = d->tags.begin(); it != d->tags.end(); ++it) {
+    if(*it)
+      return (*it)->properties();
   }
+
   return PropertyMap();
 }
 
 void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
 {
-  for(uint i = 0; i < 3; ++i) {
-    if(tag(i))
-      tag(i)->removeUnsupportedProperties(unsupported);
+  for(TagIterator it = d->tags.begin(); it != d->tags.end(); ++it) {
+    if(*it)
+      (*it)->removeUnsupportedProperties(unsupported);
   }
 }
   
@@ -194,12 +184,10 @@ void TagUnion::setTrack(uint i)
 
 bool TagUnion::isEmpty() const
 {
-  if(d->tags[0] && !d->tags[0]->isEmpty())
-    return false;
-  if(d->tags[1] && !d->tags[1]->isEmpty())
-    return false;
-  if(d->tags[2] && !d->tags[2]->isEmpty())
-    return false;
+  for(TagIterator it = d->tags.begin(); it != d->tags.end(); ++it) {
+    if(*it && !(*it)->isEmpty())
+      return false;
+  }
 
   return true;
 }

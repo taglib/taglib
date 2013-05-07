@@ -57,6 +57,7 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
+    tag(2),
     properties(0),
     hasAPE(false),
     hasID3v1(false) {}

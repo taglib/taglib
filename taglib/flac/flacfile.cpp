@@ -57,6 +57,7 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
+    tag(3),
     properties(0),
     flacStart(0),
     streamStart(0),
