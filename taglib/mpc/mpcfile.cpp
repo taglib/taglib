@@ -52,6 +52,7 @@ public:
     ID3v2Header(0),
     ID3v2Location(-1),
     ID3v2Size(0),
+    tag(2),
     properties(0),
     scanned(false),
     hasAPE(false),

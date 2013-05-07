@@ -43,18 +43,16 @@ namespace TagLib {
     enum AccessType { Read, Write };
 
     /*!
-     * Creates a TagLib::Tag that is the union of \a first, \a second, and
-     * \a third.  The TagUnion takes ownership of these tags and will handle
-     * their deletion.
+     * Creates a TagLib::Tag that is the union of \a count tags.
      */
-    TagUnion(Tag *first = 0, Tag *second = 0, Tag *third = 0);
+    TagUnion(size_t count);
 
     virtual ~TagUnion();
 
-    Tag *operator[](int index) const;
-    Tag *tag(int index) const;
+    Tag *operator[](size_t index) const;
+    Tag *tag(size_t index) const;
 
-    void set(int index, Tag *tag);
+    void set(size_t index, Tag *tag);
 
     virtual PropertyMap properties() const;
     
@@ -77,7 +75,7 @@ namespace TagLib {
     virtual void setTrack(uint i);
     virtual bool isEmpty() const;
 
-    template <class T> T *access(int index, bool create)
+    template <class T> T *access(size_t index, bool create)
     {
       if(!create || tag(index))
         return static_cast<T *>(tag(index));
@@ -91,7 +89,7 @@ namespace TagLib {
     TagUnion &operator=(const Tag &);
 
     class TagUnionPrivate;
-    TagUnionPrivate *d;
+    TAGLIB_SHARED_PTR<TagUnionPrivate> d;
   };
 }
 
