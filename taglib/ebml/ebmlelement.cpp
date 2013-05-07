@@ -23,6 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tdebug.h"
 #include "ebmlelement.h"
 
 using namespace TagLib;
