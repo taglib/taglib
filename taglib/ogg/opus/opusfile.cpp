@@ -52,7 +52,7 @@ public:
   }
 
   Ogg::XiphComment *comment;
-  Properties *properties;
+  AudioProperties *properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,14 +60,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Opus::File::File(FileName file, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+                   AudioProperties::ReadStyle propertiesStyle) : Ogg::File(file)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
 }
 
 Opus::File::File(IOStream *stream, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) : Ogg::File(stream)
+                   AudioProperties::ReadStyle propertiesStyle) : Ogg::File(stream)
 {
   d = new FilePrivate;
   read(readProperties, propertiesStyle);
@@ -93,7 +93,7 @@ PropertyMap Opus::File::setProperties(const PropertyMap &properties)
   return d->comment->setProperties(properties);
 }
 
-Opus::Properties *Opus::File::audioProperties() const
+Opus::AudioProperties *Opus::File::audioProperties() const
 {
   return d->properties;
 }
@@ -112,7 +112,7 @@ bool Opus::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Opus::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void Opus::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   ByteVector opusHeaderData = packet(0);
 
@@ -133,5 +133,5 @@ void Opus::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   d->comment = new Ogg::XiphComment(commentHeaderData.mid(8));
 
   if(readProperties)
-    d->properties = new Properties(this, propertiesStyle);
+    d->properties = new AudioProperties(this, propertiesStyle);
 }

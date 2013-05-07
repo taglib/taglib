@@ -38,7 +38,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, ((MP4::Properties *)f.audioProperties())->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, ((MP4::AudioProperties *)f.audioProperties())->bitsPerSample());
   }
 
   void testPropertiesALAC()
@@ -48,7 +48,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, ((MP4::Properties *)f.audioProperties())->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, ((MP4::AudioProperties *)f.audioProperties())->bitsPerSample());
   }
 
   void testCheckValid()

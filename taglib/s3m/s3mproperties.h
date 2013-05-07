@@ -27,7 +27,7 @@
 
 namespace TagLib {
   namespace S3M {
-    class TAGLIB_EXPORT Properties : public AudioProperties {
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties {
       friend class File;
     public:
       /*! Flag bits. */
@@ -41,8 +41,8 @@ namespace TagLib {
         CustomData           = 128
       };
 
-      Properties(AudioProperties::ReadStyle propertiesStyle);
-      virtual ~Properties();
+      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~AudioProperties();
 
       int length()     const;
       int bitrate()    const;
@@ -76,8 +76,8 @@ namespace TagLib {
       void setBpmSpeed         (uchar bpmSpeed);
 
     private:
-      Properties(const Properties&);
-      Properties &operator=(const Properties&);
+      AudioProperties(const AudioProperties&);
+      AudioProperties &operator=(const AudioProperties&);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

@@ -120,7 +120,7 @@ public:
     XM::File file(TEST_FILE_PATH_C("stripped.xm"));
     CPPUNIT_ASSERT(file.isValid());
 
-    XM::Properties *p = file.audioProperties();
+    XM::AudioProperties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
     CPPUNIT_ASSERT(0 != p);
@@ -166,7 +166,7 @@ private:
 
     CPPUNIT_ASSERT(file.isValid());
 
-    XM::Properties *p = file.audioProperties();
+    XM::AudioProperties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
     CPPUNIT_ASSERT(0 != p);

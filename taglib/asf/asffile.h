@@ -58,7 +58,7 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(FileName file, bool readProperties = true, Properties::ReadStyle propertiesStyle = Properties::Average);
+      File(FileName file, bool readProperties = true, AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Contructs an ASF file from \a file.  If \a readProperties is true the
@@ -71,7 +71,7 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true, Properties::ReadStyle propertiesStyle = Properties::Average);
+      File(IOStream *stream, bool readProperties = true, AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -109,7 +109,7 @@ namespace TagLib {
       /*!
        * Returns the ASF audio properties for this file.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
       /*!
        * Save the file.
@@ -126,7 +126,7 @@ namespace TagLib {
       long long readQWORD(bool *ok = 0);
       static ByteVector renderString(const String &str, bool includeLength = false);
       String readString(int len);
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
 
       friend class Attribute;
       friend class Picture;

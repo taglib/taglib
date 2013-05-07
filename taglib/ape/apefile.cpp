@@ -73,7 +73,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -87,7 +87,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::File::File(FileName file, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -95,7 +95,7 @@ APE::File::File(FileName file, bool readProperties,
 }
 
 APE::File::File(IOStream *stream, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -119,7 +119,7 @@ PropertyMap APE::File::setProperties(const PropertyMap &properties)
   return d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
 }
 
-APE::Properties *APE::File::audioProperties() const
+APE::AudioProperties *APE::File::audioProperties() const
 {
   return d->properties;
 }
@@ -222,7 +222,7 @@ void APE::File::strip(int tags)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void APE::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v1 tag
 
@@ -250,7 +250,7 @@ void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for APE audio properties
 
   if(readProperties) {
-    d->properties = new Properties(this);
+    d->properties = new AudioProperties(this);
   }
 }
 

@@ -28,7 +28,7 @@
 
 namespace TagLib {
   namespace XM {
-    class Properties : public AudioProperties {
+    class AudioProperties : public TagLib::AudioProperties {
       friend class File;
     public:
       /*! Flag bits. */
@@ -36,8 +36,8 @@ namespace TagLib {
         LinearFreqTable = 1 // otherwise its the amiga freq. table
       };
 
-      Properties(AudioProperties::ReadStyle propertiesStyle);
-      virtual ~Properties();
+      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      virtual ~AudioProperties();
 
       int length()     const;
       int bitrate()    const;
@@ -67,8 +67,8 @@ namespace TagLib {
       void setBpmSpeed(ushort bpmSpeed);
 
     private:
-      Properties(const Properties&);
-      Properties &operator=(const Properties&);
+      AudioProperties(const AudioProperties&);
+      AudioProperties &operator=(const AudioProperties&);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

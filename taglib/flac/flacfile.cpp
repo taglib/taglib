@@ -85,7 +85,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
   List<MetadataBlock *> blocks;
@@ -105,7 +105,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 FLAC::File::File(FileName file,
-                 bool readProperties, Properties::ReadStyle propertiesStyle,
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle,
                  ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file)
 {
@@ -117,7 +117,7 @@ FLAC::File::File(FileName file,
 }
 
 FLAC::File::File(IOStream *stream,
-                 bool readProperties, Properties::ReadStyle propertiesStyle,
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle,
                  ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream)
 {
@@ -143,7 +143,7 @@ PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
   return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, true)->setProperties(properties);
 }
 
-FLAC::Properties *FLAC::File::audioProperties() const
+FLAC::AudioProperties *FLAC::File::audioProperties() const
 {
   return d->properties;
 }
@@ -271,7 +271,7 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void FLAC::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   // Look for an ID3v2 tag
 
@@ -311,7 +311,7 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     d->tag.set(FlacXiphIndex, new Ogg::XiphComment);
 
   if(readProperties)
-    d->properties = new Properties(d->streamInfoData, d->streamLength, propertiesStyle);
+    d->properties = new AudioProperties(d->streamInfoData, d->streamLength, propertiesStyle);
 }
 
 ByteVector FLAC::File::xiphCommentData() const

@@ -47,19 +47,19 @@ namespace TagLib {
        * API.
        */
 
-      class TAGLIB_EXPORT Properties : public AudioProperties
+      class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
       {
       public:
         /*!
-         * Create an instance of Speex::Properties with the data read from the
-         * Speex::File \a file.
+         * Create an instance of Speex::AudioProperties with the data read from 
+         * the Speex::File \a file.
          */
-        Properties(File *file, ReadStyle style = Average);
+        AudioProperties(File *file, ReadStyle style = Average);
 
         /*!
-         * Destroys this Speex::Properties instance.
+         * Destroys this Speex::AudioProperties instance.
          */
-        virtual ~Properties();
+        virtual ~AudioProperties();
 
         // Reimplementations.
 
@@ -74,8 +74,8 @@ namespace TagLib {
         int speexVersion() const;
 
       private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
+        AudioProperties(const AudioProperties &);
+        AudioProperties &operator=(const AudioProperties &);
 
         void read();
 

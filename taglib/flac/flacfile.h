@@ -76,7 +76,7 @@ namespace TagLib {
        */
       File(FileName file,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average,
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
            ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
@@ -92,7 +92,7 @@ namespace TagLib {
        */
       File(IOStream *stream,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average,
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
            ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
@@ -123,7 +123,7 @@ namespace TagLib {
        * Returns the FLAC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
       /*!
        * Save the file.  This will primarily save the XiphComment, but
@@ -210,7 +210,7 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
       void scan();
       offset_t findID3v2();
       offset_t findID3v1();

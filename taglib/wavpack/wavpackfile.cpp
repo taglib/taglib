@@ -69,7 +69,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -83,7 +83,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 WavPack::File::File(FileName file, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -91,7 +91,7 @@ WavPack::File::File(FileName file, bool readProperties,
 }
 
 WavPack::File::File(IOStream *stream, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -115,7 +115,7 @@ PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
   return d->tag.access<APE::Tag>(WavAPEIndex, true)->setProperties(properties);
 }
 
-WavPack::Properties *WavPack::File::audioProperties() const
+WavPack::AudioProperties *WavPack::File::audioProperties() const
 {
   return d->properties;
 }
@@ -218,7 +218,7 @@ void WavPack::File::strip(int tags)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void WavPack::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v1 tag
 
@@ -247,7 +247,7 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
 
   if(readProperties) {
     seek(0);
-    d->properties = new Properties(this, length() - d->APESize);
+    d->properties = new AudioProperties(this, length() - d->APESize);
   }
 }
 

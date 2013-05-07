@@ -47,7 +47,7 @@ public:
     metadataLibraryObject(0) {}
   unsigned long long size;
   ASF::Tag *tag;
-  ASF::Properties *properties;
+  ASF::AudioProperties *properties;
   List<ASF::File::BaseObject *> objects;
   ASF::File::ContentDescriptionObject *contentDescriptionObject;
   ASF::File::ExtendedContentDescriptionObject *extendedContentDescriptionObject;
@@ -365,7 +365,7 @@ ByteVector ASF::File::HeaderExtensionObject::render(ASF::File *file)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle)
+ASF::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle propertiesStyle)
   : TagLib::File(file)
 {
   d = new FilePrivate;
@@ -373,7 +373,7 @@ ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle proper
     read(readProperties, propertiesStyle);
 }
 
-ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle)
+ASF::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle propertiesStyle)
   : TagLib::File(stream)
 {
   d = new FilePrivate;
@@ -415,12 +415,12 @@ PropertyMap ASF::File::setProperties(const PropertyMap &properties)
   return d->tag->setProperties(properties);
 }
 
-ASF::Properties *ASF::File::audioProperties() const
+ASF::AudioProperties *ASF::File::audioProperties() const
 {
   return d->properties;
 }
 
-void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*propertiesStyle*/)
+void ASF::File::read(bool /*readProperties*/, AudioProperties::ReadStyle /*propertiesStyle*/)
 {
   if(!isValid())
     return;
@@ -433,7 +433,7 @@ void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*properties
   }
 
   d->tag = new ASF::Tag();
-  d->properties = new ASF::Properties();
+  d->properties = new ASF::AudioProperties();
 
   bool ok;
   d->size = readQWORD(&ok);

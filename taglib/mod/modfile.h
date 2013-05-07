@@ -68,7 +68,7 @@ namespace TagLib {
        * Returns the Mod::Properties for this file. If no audio properties
        * were read then this will return a null pointer.
        */
-      Mod::Properties *audioProperties() const;
+      Mod::AudioProperties *audioProperties() const;
 
       /*!
        * Save the file.

@@ -71,7 +71,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -85,7 +85,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 TrueAudio::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -93,7 +93,7 @@ TrueAudio::File::File(FileName file, bool readProperties,
 }
 
 TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(file)
 {
   d = new FilePrivate(frameFactory);
@@ -102,7 +102,7 @@ TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 }
 
 TrueAudio::File::File(IOStream *stream, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -110,7 +110,7 @@ TrueAudio::File::File(IOStream *stream, bool readProperties,
 }
 
 TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(stream)
 {
   d = new FilePrivate(frameFactory);
@@ -135,7 +135,7 @@ PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
   return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, true)->setProperties(properties);
 }
 
-TrueAudio::Properties *TrueAudio::File::audioProperties() const
+TrueAudio::AudioProperties *TrueAudio::File::audioProperties() const
 {
   return d->properties;
 }
@@ -224,7 +224,7 @@ void TrueAudio::File::strip(int tags)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void TrueAudio::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v2 tag
 
@@ -259,12 +259,12 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   if(readProperties) {
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      d->properties = new Properties(readBlock(TrueAudio::HeaderSize),
+      d->properties = new AudioProperties(readBlock(TrueAudio::HeaderSize),
                                      length() - d->ID3v2OriginalSize);
     }
     else {
       seek(0);
-      d->properties = new Properties(readBlock(TrueAudio::HeaderSize),
+      d->properties = new AudioProperties(readBlock(TrueAudio::HeaderSize),
                                      length());
     }
   }

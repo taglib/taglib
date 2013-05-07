@@ -31,7 +31,7 @@
 
 using namespace TagLib;
 
-class FLAC::Properties::PropertiesPrivate
+class FLAC::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate(const ByteVector &d, offset_t st, ReadStyle s) :
@@ -61,48 +61,49 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) : AudioProperties(style)
+FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style)
+  : TagLib::AudioProperties(style)
 {
   d = new PropertiesPrivate(data, streamLength, style);
   read();
 }
 
-FLAC::Properties::~Properties()
+FLAC::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int FLAC::Properties::length() const
+int FLAC::AudioProperties::length() const
 {
   return d->length;
 }
 
-int FLAC::Properties::bitrate() const
+int FLAC::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int FLAC::Properties::sampleRate() const
+int FLAC::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int FLAC::Properties::sampleWidth() const
+int FLAC::AudioProperties::sampleWidth() const
 {
   return d->sampleWidth;
 }
 
-int FLAC::Properties::channels() const
+int FLAC::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-unsigned long long FLAC::Properties::sampleFrames() const
+unsigned long long FLAC::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
 
-ByteVector FLAC::Properties::signature() const
+ByteVector FLAC::AudioProperties::signature() const
 {
   return d->signature;
 }
@@ -111,7 +112,7 @@ ByteVector FLAC::Properties::signature() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::Properties::read()
+void FLAC::AudioProperties::read()
 {
   if(d->data.size() < 18) {
     debug("FLAC::Properties::read() - FLAC properties must contain at least 18 bytes.");
