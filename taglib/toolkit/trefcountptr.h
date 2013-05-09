@@ -38,16 +38,6 @@
 
 namespace TagLib {
 
-#if defined(TAGLIB_USE_STD_SHARED_PTR) || defined(TAGLIB_USE_TR1_SHARED_PTR) 
-  
-#define TAGLIB_SHARED_PTR std::tr1::shared_ptr
-
-#elif defined(TAGLIB_USE_BOOST_SHARED_PTR)
-
-#define TAGLIB_SHARED_PTR boost::shared_ptr
-
-#else // TAGLIB_USE_*_SHARED_PTR
-
   // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
   
@@ -265,8 +255,6 @@ namespace TagLib {
   {
     a.swap(b);
   }
-
-#endif // TAGLIB_USE_*_SHARED_PTR
 }
 #endif // DO_NOT_DOCUMENT
 

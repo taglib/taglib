@@ -28,7 +28,7 @@
 
 #include "taglib_config.h"
 
-#if defined(TAGLIB_USE_STD_SHARED_PTR)
+#if defined(TAGLIB_USE_STD_SHARED_PTR) 
 # include <memory>
 #elif defined(TAGLIB_USE_TR1_SHARED_PTR) 
 # include <tr1/memory>
@@ -38,11 +38,15 @@
 # include "trefcountptr.h"
 #endif
 
-#if defined(TAGLIB_USE_STD_SHARED_PTR) || defined(TAGLIB_USE_TR1_SHARED_PTR) 
+#if defined(TAGLIB_USE_STD_SHARED_PTR)
+
+# define TAGLIB_SHARED_PTR std::shared_ptr
+
+#elif defined(TAGLIB_USE_STD_TR1_SHARED_PTR) || defined(TAGLIB_USE_TR1_SHARED_PTR) 
 
 # define TAGLIB_SHARED_PTR std::tr1::shared_ptr
 
-#elif defined(TAGLIB_USE_BOOST_SHARED_PTR)
+#elif defined(TAGLIB_USE_BOOST_SHARED_PTR) 
 
 # define TAGLIB_SHARED_PTR boost::shared_ptr
 

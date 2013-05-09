@@ -213,7 +213,7 @@ check_cxx_source_compiles("
 
 check_cxx_source_compiles("
   #include <memory>
-  int main() { std::tr1::shared_ptr<int> x; return 0; }
+  int main() { std::shared_ptr<int> x; return 0; }
 " TAGLIB_USE_STD_SHARED_PTR)
 
 if(NOT TAGLIB_USE_STD_SHARED_PTR)
