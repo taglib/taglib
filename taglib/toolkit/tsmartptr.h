@@ -28,7 +28,7 @@
 
 #include "taglib_config.h"
 
-#if defined(TAGLIB_USE_STD_SHARED_PTR) || defined(TAGLIB_USE_STD_TR1_SHARED_PTR)
+#if defined(TAGLIB_USE_STD_SHARED_PTR) 
 # include <memory>
 #elif defined(TAGLIB_USE_TR1_SHARED_PTR) 
 # include <tr1/memory>

@@ -13,9 +13,6 @@
 /* #include <memory> / std::shared_ptr<T> */
 #cmakedefine   TAGLIB_USE_STD_SHARED_PTR 1
 
-/* #include <memory> / std::tr1::shared_ptr<T> */
-#cmakedefine   TAGLIB_USE_STD_TR1_SHARED_PTR 1
-
 /* #include <tr1/memory> / std::tr1::shared_ptr<T> */
 #cmakedefine   TAGLIB_USE_TR1_SHARED_PTR 1
 
