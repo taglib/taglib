@@ -213,20 +213,27 @@ check_cxx_source_compiles("
 
 check_cxx_source_compiles("
   #include <memory>
-  int main() { std::tr1::shared_ptr<int> x; return 0; }
+  int main() { std::shared_ptr<int> x; return 0; }
 " TAGLIB_USE_STD_SHARED_PTR)
 
-if(NOT TAGLIB_USE_STD_SHARED_PTR)
+ if(NOT TAGLIB_USE_STD_SHARED_PTR)
   check_cxx_source_compiles("
-    #include <tr1/memory>
+    #include <memory>
     int main() { std::tr1::shared_ptr<int> x; return 0; }
-  " TAGLIB_USE_TR1_SHARED_PTR)
+  " TAGLIB_USE_STD_TR1_SHARED_PTR)
 
-  if(NOT TAGLIB_USE_TR1_SHARED_PTR)
+  if(NOT TAGLIB_USE_STD_TR1_SHARED_PTR)
     check_cxx_source_compiles("
-      #include <boost/shared_ptr.hpp>
-      int main() { boost::shared_ptr<int> x; return 0; }
-    " TAGLIB_USE_BOOST_SHARED_PTR)
+      #include <tr1/memory>
+      int main() { std::tr1::shared_ptr<int> x; return 0; }
+    " TAGLIB_USE_TR1_SHARED_PTR)
+
+    if(NOT TAGLIB_USE_TR1_SHARED_PTR)
+      check_cxx_source_compiles("
+        #include <boost/shared_ptr.hpp>
+        int main() { boost::shared_ptr<int> x; return 0; }
+      " TAGLIB_USE_BOOST_SHARED_PTR)
+    endif()
   endif()
 endif()
 

@@ -3,11 +3,21 @@
 /* The variables below indicate the compiler capability.               */
 /* DO NOT MODIFY them manually. It may break the binary compatibility. */
 
+
 /* Defined if your compiler supports the move semantics */
 #cmakedefine   TAGLIB_USE_MOVE_SEMANTICS 1
 
-/* Defined if your compiler supports shared_ptr */
-#cmakedefine   TAGLIB_USE_STD_SHARED_PTR 1
-#cmakedefine   TAGLIB_USE_TR1_SHARED_PTR 1
-#cmakedefine   TAGLIB_USE_BOOST_SHARED_PTR 1
 
+/* Defined if your compiler supports shared_ptr */
+
+/* #include <memory> / std::shared_ptr<T> */
+#cmakedefine   TAGLIB_USE_STD_SHARED_PTR 1
+
+/* #include <memory> / std::tr1::shared_ptr<T> */
+#cmakedefine   TAGLIB_USE_STD_TR1_SHARED_PTR 1
+
+/* #include <tr1/memory> / std::tr1::shared_ptr<T> */
+#cmakedefine   TAGLIB_USE_TR1_SHARED_PTR 1
+
+/* #include <boost/shared_ptr.hpp> / boost/shared_ptr<T> */
+#cmakedefine   TAGLIB_USE_BOOST_SHARED_PTR 1
