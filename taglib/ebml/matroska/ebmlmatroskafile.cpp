@@ -373,6 +373,7 @@ public:
       if(i->second.second == ttv)
         return i;
     }
+    return document->d->tags.end();
   }
   
   // Updates the given information
