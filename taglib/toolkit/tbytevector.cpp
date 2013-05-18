@@ -729,9 +729,11 @@ TagLib::uint ByteVector::size() const
 
 ByteVector &ByteVector::resize(uint size, char padding)
 {
-  detach();
-  d->data->data.resize(d->offset + size, padding);
-  d->length = size;
+  if(size != d->length) {
+    detach();
+    d->data->data.resize(d->offset + size, padding);
+    d->length = size;
+  }
 
   return *this;
 }
