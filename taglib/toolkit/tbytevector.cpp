@@ -363,7 +363,7 @@ public:
   {
   }
 
-  ByteVectorPrivate(TAGLIB_SHARED_PTR<ByteVectorPrivate> d, size_t o, size_t l)
+  ByteVectorPrivate(RefCountPtr<ByteVectorPrivate> d, size_t o, size_t l)
     : data(d->data)
     , offset(d->offset + o)
     , length(l)
@@ -411,7 +411,7 @@ public:
     return *this;
   }
 
-  TAGLIB_SHARED_PTR<std::vector<char> > data;
+  RefCountPtr<std::vector<char> > data;
   size_t offset;
   size_t length;
 };

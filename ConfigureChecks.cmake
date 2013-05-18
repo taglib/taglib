@@ -213,7 +213,7 @@ check_cxx_source_compiles("
 
 check_cxx_source_compiles("
   #include <memory>
-  int main() { std::tr1::shared_ptr<int> x; return 0; }
+  int main() { std::shared_ptr<int> x; return 0; }
 " TAGLIB_USE_STD_SHARED_PTR)
 
 if(NOT TAGLIB_USE_STD_SHARED_PTR)
@@ -228,6 +228,20 @@ if(NOT TAGLIB_USE_STD_SHARED_PTR)
       int main() { boost::shared_ptr<int> x; return 0; }
     " TAGLIB_USE_BOOST_SHARED_PTR)
   endif()
+endif()
+
+# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() { std::unique_ptr<int> x; return 0; }
+" TAGLIB_USE_STD_UNIQUE_PTR)
+
+if(NOT TAGLIB_USE_STD_UNIQUE_PTR)
+  check_cxx_source_compiles("
+    #include <boost/scoped_ptr.hpp>
+    int main() { boost::scoped_ptr<int> x; return 0; }
+  " TAGLIB_USE_BOOST_SCOPED_PTR)
 endif()
 
 # Determine whether CppUnit is installed.

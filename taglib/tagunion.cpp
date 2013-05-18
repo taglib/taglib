@@ -31,7 +31,7 @@ using namespace TagLib;
 
 namespace
 {
-  typedef std::vector<TAGLIB_SHARED_PTR<Tag> > TagVector;
+  typedef std::vector<RefCountPtr<Tag> > TagVector;
   typedef TagVector::iterator TagIterator;
   typedef TagVector::const_iterator TagConstIterator;
 }
@@ -66,7 +66,7 @@ public:
   {
   }
 
-  std::vector<TAGLIB_SHARED_PTR<Tag> > tags;
+  TagVector tags;
 };
 
 TagUnion::TagUnion(size_t count)

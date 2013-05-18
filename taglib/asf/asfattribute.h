@@ -205,7 +205,7 @@ namespace TagLib
       ByteVector render(const String &name, int kind = 0) const;
 
       class AttributePrivate;
-      TAGLIB_SHARED_PTR<AttributePrivate> d;
+      RefCountPtr<AttributePrivate> d;
     };
   }
 

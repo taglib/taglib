@@ -66,7 +66,7 @@ namespace TagLib {
 
     private:
       class CoverArtPrivate;
-      TAGLIB_SHARED_PTR<CoverArtPrivate> d;
+      RefCountPtr<CoverArtPrivate> d;
     };
 
     typedef List<CoverArt> CoverArtList;
