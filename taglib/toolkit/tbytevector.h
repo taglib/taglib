@@ -551,7 +551,7 @@ namespace TagLib {
 
   private:
     class ByteVectorPrivate;
-    TAGLIB_SHARED_PTR<ByteVectorPrivate> d;
+    RefCountPtr<ByteVectorPrivate> d;
   };
 
   /*!

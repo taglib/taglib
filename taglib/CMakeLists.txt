@@ -54,7 +54,6 @@ set(tag_HDRS
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
   toolkit/tsmartptr.h
-  toolkit/trefcountptr.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
@@ -301,7 +300,7 @@ set(toolkit_SRCS
   toolkit/tfilestream.cpp
   toolkit/tdebug.cpp
   toolkit/tpropertymap.cpp
-  toolkit/trefcountptr.cpp
+  toolkit/tsmartptr.cpp
   toolkit/unicode.cpp
 )
 

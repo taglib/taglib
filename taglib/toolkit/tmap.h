@@ -219,7 +219,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class KeyP, class TP> class MapPrivate;
-    TAGLIB_SHARED_PTR<MapPrivate<Key, T> > d;
+    RefCountPtr<MapPrivate<Key, T> > d;
 
 #endif
   };
