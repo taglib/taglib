@@ -7,7 +7,11 @@
 #cmakedefine   TAGLIB_USE_MOVE_SEMANTICS 1
 
 /* Defined if your compiler supports shared_ptr */
-#cmakedefine   TAGLIB_USE_STD_SHARED_PTR 1
-#cmakedefine   TAGLIB_USE_TR1_SHARED_PTR 1
-#cmakedefine   TAGLIB_USE_BOOST_SHARED_PTR 1
+#cmakedefine   TAGLIB_USE_STD_SHARED_PTR 1        // #include <memory> / std::shared_ptr<T>
+#cmakedefine   TAGLIB_USE_TR1_SHARED_PTR 1        // #include <tr1/memory> / std::tr1::shared_ptr<T>
+#cmakedefine   TAGLIB_USE_BOOST_SHARED_PTR 1      // #include <boost/shared_ptr.hpp> / boost::shared_ptr<T>
+
+/* Defined if your compiler supports unique_ptr or scoped_ptr */
+#cmakedefine   TAGLIB_USE_STD_UNIQUE_PTR 1        // #include <memory> / std::unique_ptr<T>
+#cmakedefine   TAGLIB_USE_BOOST_SCOPED_PTR 1      // #include <boost/scoped_ptr.hpp> / boost::scoped_ptr<T>
 

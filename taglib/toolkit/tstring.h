@@ -520,7 +520,7 @@ namespace TagLib {
     static const Type WCharByteOrder;
 
     class StringPrivate;
-    TAGLIB_SHARED_PTR<StringPrivate> d;
+    RefCountPtr<StringPrivate> d;
   };
 
   /*!

@@ -64,7 +64,7 @@ class FileRef::FileRefPrivate
 public:
   FileRefPrivate(File *f) : file(f) {}
 
-  TAGLIB_SHARED_PTR<File> file;
+  RefCountPtr<File> file;
 
   static List<const FileTypeResolver *> fileTypeResolvers;
 };

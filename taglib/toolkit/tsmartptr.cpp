@@ -23,8 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "taglib_config.h"
+
+#if !defined(TAGLIB_USE_STD_SHARED_PTR) \
+  && !defined(TAGLIB_USE_TR1_SHARED_PTR) \
+  && !defined(TAGLIB_USE_BOOST_SHARED_PTR)
+
 #include "config.h"
-#include "trefcountptr.h"
+#include "tsmartptr.h"
 
 #if defined(HAVE_STD_ATOMIC)
 # include <atomic>
@@ -66,41 +72,44 @@
 
 namespace TagLib
 {
-  class RefCounter::RefCounterPrivate
+  class CounterBase::CounterBasePrivate
   {
   public:
-    RefCounterPrivate() : refCount(1) {}
-
-    size_t ref() { return static_cast<size_t>(ATOMIC_INC(refCount)); }
-    size_t deref() { return static_cast<size_t>(ATOMIC_DEC(refCount)); }
-    size_t count() const { return static_cast<size_t>(refCount); }
+    CounterBasePrivate() 
+      : refCount(1) 
+    {
+    }
 
     volatile ATOMIC_INT refCount;
   };
 
-  RefCounter::RefCounter()
-    : d(new RefCounterPrivate())
+  CounterBase::CounterBase()
+    : d(new CounterBasePrivate())
   {
   }
 
-  RefCounter::~RefCounter()
+  CounterBase::~CounterBase()
   {
     delete d;
   }
 
-  size_t RefCounter::ref() 
+  void CounterBase::addref() 
   { 
-    return d->ref(); 
+    ATOMIC_INC(d->refCount); 
   }
 
-  size_t RefCounter::deref() 
-  { 
-    return d->deref(); 
+  void CounterBase::release()
+  {
+    if(ATOMIC_DEC(d->refCount) == 0) {
+      dispose();
+      delete this;
+    }
   }
 
-  size_t RefCounter::count() const 
-  { 
-    return d->count(); 
+  long CounterBase::use_count() const
+  {
+    return static_cast<long>(d->refCount);
   }
 }
 
+#endif
