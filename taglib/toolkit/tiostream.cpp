@@ -29,6 +29,8 @@ using namespace TagLib;
 
 #ifdef _WIN32
 
+# include "tstring.h"
+# include "tdebug.h"
 # include <windows.h>
 
 namespace 
@@ -50,14 +52,18 @@ namespace
   // This function should only be used in Windows9x systems which don't support 
   // Unicode file names.
 
-  std::string unicodeToAnsi(const std::wstring &wstr)
+  std::string unicodeToAnsi(const wchar_t *wstr)
   {
-    const int len = WideCharToMultiByte(CP_ACP, 0, &wstr[0], -1, NULL, 0, NULL, NULL);
+    if(SystemSupportsUnicode) {
+      debug("unicodeToAnsi() - Should not be used on WinNT systems.");
+    }
+
+    const int len = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
     if(len == 0)
       return std::string();
 
     std::string str(len, '\0');
-    WideCharToMultiByte(CP_ACP, 0, &wstr[0], -1, &str[0], len, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, wstr, -1, &str[0], len, NULL, NULL);
 
     return str;
   }
