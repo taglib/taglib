@@ -47,12 +47,12 @@ static bool stringManagementEnabled = true;
 
 void taglib_set_strings_unicode(BOOL unicode)
 {
-  unicodeStrings = bool(unicode);
+  unicodeStrings = (unicode != 0);
 }
 
 void taglib_set_string_management_enabled(BOOL management)
 {
-  stringManagementEnabled = bool(management);
+  stringManagementEnabled = (management != 0);
 }
 
 void taglib_free(void* pointer)
@@ -66,32 +66,32 @@ void taglib_free(void* pointer)
 
 TagLib_File *taglib_file_new(const char *filename)
 {
-  return reinterpret_cast<TagLib_File *>(FileRef::create(filename));
+  return reinterpret_cast<TagLib_File *>(new FileRef(filename));
 }
 
 TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
 {
   switch(type) {
   case TagLib_File_MPEG:
-    return reinterpret_cast<TagLib_File *>(new MPEG::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new MPEG::File(filename)));
   case TagLib_File_OggVorbis:
-    return reinterpret_cast<TagLib_File *>(new Ogg::Vorbis::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new Ogg::Vorbis::File(filename)));
   case TagLib_File_FLAC:
-    return reinterpret_cast<TagLib_File *>(new FLAC::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new FLAC::File(filename)));
   case TagLib_File_MPC:
-    return reinterpret_cast<TagLib_File *>(new MPC::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new MPC::File(filename)));
   case TagLib_File_OggFlac:
-    return reinterpret_cast<TagLib_File *>(new Ogg::FLAC::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new Ogg::FLAC::File(filename)));
   case TagLib_File_WavPack:
-    return reinterpret_cast<TagLib_File *>(new WavPack::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new WavPack::File(filename)));
   case TagLib_File_Speex:
-    return reinterpret_cast<TagLib_File *>(new Ogg::Speex::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new Ogg::Speex::File(filename)));
   case TagLib_File_TrueAudio:
-    return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new TrueAudio::File(filename)));
   case TagLib_File_MP4:
-    return reinterpret_cast<TagLib_File *>(new MP4::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new MP4::File(filename)));
   case TagLib_File_ASF:
-    return reinterpret_cast<TagLib_File *>(new ASF::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new ASF::File(filename)));
   default:
     return 0;
   }
@@ -101,29 +101,29 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
 
 void taglib_file_free(TagLib_File *file)
 {
-  delete reinterpret_cast<File *>(file);
+  delete reinterpret_cast<FileRef *>(file);
 }
 
 BOOL taglib_file_is_valid(const TagLib_File *file)
 {
-  return reinterpret_cast<const File *>(file)->isValid();
+  return reinterpret_cast<const FileRef *>(file)->isValid();
 }
 
 TagLib_Tag *taglib_file_tag(const TagLib_File *file)
 {
-  const File *f = reinterpret_cast<const File *>(file);
+  const FileRef *f = reinterpret_cast<const FileRef *>(file);
   return reinterpret_cast<TagLib_Tag *>(f->tag());
 }
 
 const TagLib_AudioProperties *taglib_file_audioproperties(const TagLib_File *file)
 {
-  const File *f = reinterpret_cast<const File *>(file);
+  const FileRef *f = reinterpret_cast<const FileRef *>(file);
   return reinterpret_cast<const TagLib_AudioProperties *>(f->audioProperties());
 }
 
 BOOL taglib_file_save(TagLib_File *file)
 {
-  return reinterpret_cast<File *>(file)->save();
+  return reinterpret_cast<FileRef *>(file)->save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

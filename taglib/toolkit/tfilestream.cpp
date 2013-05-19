@@ -43,8 +43,9 @@ namespace
   // Using Win32 native API instead of standard C file I/O to reduce the resource consumption.
 
   typedef FileName FileNameHandle;
-
   typedef HANDLE FileHandle;
+
+  const size_t BufferSize = 8192;
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -120,6 +121,8 @@ namespace
   };
 
   typedef FILE* FileHandle;
+
+  const size_t BufferSize = 1024;
   const FileHandle InvalidFileHandle = 0;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -160,8 +163,6 @@ public:
   FileNameHandle name;
   bool readOnly;
   offset_t size;
-
-  static const uint bufferSize = 1024;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,8 +196,6 @@ FileStream::~FileStream()
 {
   if(isOpen())
     closeFile(d->file);
-
-  delete d;
 }
 
 FileName FileStream::name() const
@@ -215,7 +214,7 @@ ByteVector FileStream::readBlock(size_t length)
     return ByteVector::null;
 
   const offset_t streamLength = FileStream::length();
-  if(length > FileStreamPrivate::bufferSize && static_cast<offset_t>(length) > streamLength)
+  if(length > BufferSize && static_cast<offset_t>(length) > streamLength)
     length = static_cast<size_t>(streamLength);
 
   ByteVector buffer(length);
@@ -275,10 +274,10 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  size_t bufferLength = FileStreamPrivate::bufferSize;
+  size_t bufferLength = BufferSize;
 
   while(data.size() - replace > bufferLength)
-    bufferLength += FileStreamPrivate::bufferSize;
+    bufferLength += BufferSize;
 
   // Set where to start the reading and writing.
 
@@ -333,7 +332,7 @@ void FileStream::removeBlock(offset_t start, size_t length)
     return;
   }
 
-  size_t bufferLength = FileStreamPrivate::bufferSize;
+  size_t bufferLength = BufferSize;
 
   offset_t readPosition  = start + length;
   offset_t writePosition = start;
@@ -523,6 +522,11 @@ offset_t FileStream::length()
   return endPosition;
 
 #endif
+}
+
+size_t FileStream::bufferSize()
+{
+  return BufferSize;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
