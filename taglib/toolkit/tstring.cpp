@@ -33,7 +33,8 @@
 #include "trefcounter.h"
 
 #include <iostream>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 #if defined(HAVE_MSC_BYTESWAP)
 # include <stdlib.h>
@@ -597,31 +598,30 @@ bool String::isAscii() const
 
 String String::number(int n) // static
 {
-  if(n == 0)
-    return String("0");
+  static const size_t BufferSize = 11; // Sufficient to store "-214748364".
+  static const char *Format = "%d";
 
-  String charStack;
+  char buffer[BufferSize];
+  int length;
 
-  bool negative = n < 0;
+#if defined(HAVE_SNPRINTF)
 
-  if(negative)
-    n = n * -1;
+  length = snprintf(buffer, BufferSize, Format, n);
 
-  while(n > 0) {
-    int remainder = n % 10;
-    charStack += char(remainder + '0');
-    n = (n - remainder) / 10;
-  }
+#elif defined(HAVE_SPRINTF_S)
 
-  String s;
+  length = sprintf_s(buffer, Format, n);
 
-  if(negative)
-    s += '-';
+#else
 
-  for(int i = charStack.d->data.size() - 1; i >= 0; i--)
-    s += charStack.d->data[i];
+  length = sprintf(buffer, Format, n);
 
-  return s;
+#endif
+
+  if(length > 0)
+    return String(buffer);
+  else
+    return String::null;
 }
 
 TagLib::wchar &String::operator[](int i)
