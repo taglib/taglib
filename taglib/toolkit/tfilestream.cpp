@@ -27,19 +27,12 @@
 #include "tstring.h"
 #include "tdebug.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-
 #ifdef _WIN32
-# include <wchar.h>
 # include <windows.h>
-# include <io.h>
 #else
+# include <stdio.h>
 # include <unistd.h>
 #endif
-
-#include <stdlib.h>
 
 using namespace TagLib;
 
@@ -89,11 +82,12 @@ namespace
       return 0;
   }
 
+# ifndef NDEBUG
+
   // Convert a string in a local encoding into a UTF-16 string.
 
-  // This function should only be used to generate an error message.
-  // In actual use, file names in local encodings are passed to CreateFileA()
-  // without any conversions.
+  // Debugging use only. In actual use, file names in local encodings are passed to 
+  // CreateFileA() without any conversions.
 
   String fileNameToString(const FileName &name)
   {
@@ -115,7 +109,9 @@ namespace
     }
   }
 
-#else
+# endif
+
+#else   // _WIN32
 
   struct FileNameHandle : public std::string
   {
@@ -146,16 +142,16 @@ namespace
     return fwrite(buffer.data(), sizeof(char), buffer.size(), file);
   }
 
-#endif
+#endif  // _WIN32
 }
 
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName, bool openReadOnly)
+  FileStreamPrivate(const FileName &fileName)
     : file(InvalidFileHandle)
     , name(fileName)
-    , readOnly(openReadOnly)
+    , readOnly(true)
     , size(0)
   {
   }
@@ -172,23 +168,23 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileStream::FileStream(FileName file, bool openReadOnly)
-  : d(new FileStreamPrivate(file, openReadOnly))
+FileStream::FileStream(FileName fileName, bool openReadOnly)
+  : d(new FileStreamPrivate(fileName))
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
   if(!openReadOnly)
-    d->file = openFile(file, false);
+    d->file = openFile(fileName, false);
 
   if(d->file != InvalidFileHandle)
     d->readOnly = false;
   else
-    d->file = openFile(d->name, true);
+    d->file = openFile(fileName, true);
 
   if(d->file == InvalidFileHandle) 
   {
 # ifdef _WIN32
-    debug("Could not open file " + fileNameToString(d->name));
+    debug("Could not open file " + fileNameToString(fileName));
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
 # endif 
