@@ -208,7 +208,7 @@ namespace TagLib {
     bool isOpen() const;
 
     /*!
-     * Returns true if the file is open and readble.
+     * Returns true if the file is open and readable.
      */
     bool isValid() const;
 

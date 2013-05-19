@@ -27,16 +27,12 @@
 #include "tstring.h"
 #include "tdebug.h"
 
-#include <string.h>
-#include <sys/stat.h>
-
-#ifndef _WIN32
+#ifdef _WIN32
+# include <windows.h>
+#else
 # include <stdio.h>
 # include <unistd.h>
 #endif
-
-#include <stdlib.h>
-#include <limits>
 
 using namespace TagLib;
 
@@ -48,9 +44,10 @@ namespace
 
   typedef FileName FileNameHandle;
 
-# define INVALID_FILE INVALID_HANDLE_VALUE
+  typedef HANDLE FileHandle;
+  const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
-  HANDLE openFile(const FileName &path, bool readOnly)
+  inline FileHandle openFile(const FileName &path, bool readOnly)
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
@@ -59,34 +56,38 @@ namespace
     else if(!path.str().empty())
       return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else
-      return INVALID_FILE;
+      return InvalidFileHandle;
   }
 
-  size_t fread(void *ptr, size_t size, size_t nmemb, HANDLE stream)
+  inline void closeFile(FileHandle file)
   {
-    DWORD readLen;
-    if(ReadFile(stream, ptr, static_cast<DWORD>(size * nmemb), &readLen, NULL))
-      return (readLen / size);
+    CloseHandle(file);
+  }
+
+  inline size_t readFile(FileHandle file, ByteVector &buffer)
+  {
+    DWORD length;
+    if(ReadFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
+      return static_cast<size_t>(length);
     else
       return 0;
   }
 
-  size_t fwrite(const void *ptr, size_t size, size_t nmemb, HANDLE stream)
+  inline size_t writeFile(FileHandle file, const ByteVector &buffer)
   {
-    DWORD writtenLen;
-    if(WriteFile(stream, ptr, static_cast<DWORD>(size * nmemb), &writtenLen, NULL))
-      return (writtenLen / size);
+    DWORD length;
+    if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
+      return static_cast<size_t>(length);
     else 
       return 0;
   }
 
-# if _DEBUG
+# ifndef NDEBUG
 
   // Convert a string in a local encoding into a UTF-16 string.
 
-  // This function should only be used to generate an error message.
-  // In actual use, file names in local encodings are passed to CreateFileA()
-  // without any conversions.
+  // Debugging use only. In actual use, file names in local encodings are passed to 
+  // CreateFileA() without any conversions.
 
   String fileNameToString(const FileName &name)
   {
@@ -110,9 +111,7 @@ namespace
 
 # endif
 
-#else
-
-# define INVALID_FILE 0
+#else   // _WIN32
 
   struct FileNameHandle : public std::string
   {
@@ -120,97 +119,82 @@ namespace
     operator FileName () const { return c_str(); }
   };
 
-  FILE *openFile(const FileName &path, bool readOnly)
+  typedef FILE* FileHandle;
+  const FileHandle InvalidFileHandle = 0;
+
+  inline FileHandle openFile(const FileName &path, bool readOnly)
   {
     return fopen(path, readOnly ? "rb" : "rb+");
   }
 
-#endif
+  inline void closeFile(FileHandle file)
+  {
+    fclose(file);
+  }
+
+  inline size_t readFile(FileHandle file, ByteVector &buffer)
+  {
+    return fread(buffer.data(), sizeof(char), buffer.size(), file);
+  }
+
+  inline size_t writeFile(FileHandle file, const ByteVector &buffer)
+  {
+    return fwrite(buffer.data(), sizeof(char), buffer.size(), file);
+  }
+
+#endif  // _WIN32
 }
 
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName, bool openReadOnly);
+  FileStreamPrivate(const FileName &fileName)
+    : file(InvalidFileHandle)
+    , name(fileName)
+    , readOnly(true)
+    , size(0)
+  {
+  }
 
-#ifdef _WIN32
-
-  HANDLE file;
-
-#else
-
-  FILE *file;
-
-#endif
-
+  FileHandle file;
   FileNameHandle name;
-
   bool readOnly;
   offset_t size;
 
-#ifdef _WIN32
-
-  static const size_t bufferSize = 8196;
-
-#else
-
-  static const size_t bufferSize = 1024;
-
-#endif
+  static const uint bufferSize = 1024;
 };
-
-FileStream::FileStreamPrivate::FileStreamPrivate(const FileName &fileName, bool openReadOnly) :
-  file(INVALID_FILE),
-  name(fileName),
-  readOnly(true),
-  size(0)
-{
-  // First try with read / write mode, if that fails, fall back to read only.
-
-  if(!openReadOnly)
-    file = openFile(name, false);
-
-  if(file != INVALID_FILE)
-    readOnly = false;
-  else
-    file = openFile(name, true);
-
-  if(file == INVALID_FILE) 
-  {
-# ifdef _WIN32
-
-    debug("Could not open file " + fileNameToString(name));
-
-# else
-
-    debug("Could not open file " + String((const char *) name));
-
-# endif 
-  }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileStream::FileStream(FileName file, bool openReadOnly)
-  : d(new FileStreamPrivate(file, openReadOnly))
+FileStream::FileStream(FileName fileName, bool openReadOnly)
+  : d(new FileStreamPrivate(fileName))
 {
+  // First try with read / write mode, if that fails, fall back to read only.
+
+  if(!openReadOnly)
+    d->file = openFile(fileName, false);
+
+  if(d->file != InvalidFileHandle)
+    d->readOnly = false;
+  else
+    d->file = openFile(fileName, true);
+
+  if(d->file == InvalidFileHandle) 
+  {
+# ifdef _WIN32
+    debug("Could not open file " + fileNameToString(fileName));
+# else
+    debug("Could not open file " + String(static_cast<const char *>(d->name)));
+# endif 
+  }
 }
 
 FileStream::~FileStream()
 {
-#ifdef _WIN32
-
   if(isOpen())
-    CloseHandle(d->file);
-
-#else
-
-  if(isOpen())
-    fclose(d->file);
-
-#endif
+    closeFile(d->file);
 
   delete d;
 }
@@ -230,13 +214,16 @@ ByteVector FileStream::readBlock(size_t length)
   if(length == 0)
     return ByteVector::null;
 
-  if(length > FileStreamPrivate::bufferSize && static_cast<offset_t>(length) > FileStream::length())
-    length = static_cast<size_t>(FileStream::length());
+  const offset_t streamLength = FileStream::length();
+  if(length > FileStreamPrivate::bufferSize && static_cast<offset_t>(length) > streamLength)
+    length = static_cast<size_t>(streamLength);
 
-  ByteVector v(length, 0);
-  const size_t count = fread(v.data(), sizeof(char), length, d->file);
-  v.resize(count);
-  return v;
+  ByteVector buffer(length);
+
+  const size_t count = readFile(d->file, buffer);
+  buffer.resize(count);
+  
+  return buffer;
 }
 
 void FileStream::writeBlock(const ByteVector &data)
@@ -251,7 +238,7 @@ void FileStream::writeBlock(const ByteVector &data)
     return;
   }
 
-  fwrite(data.data(), sizeof(char), data.size(), d->file);
+  writeFile(d->file, data);
 }
 
 void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
@@ -272,10 +259,10 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
     return;
   }
   else if(data.size() < replace) {
-      seek(start);
-      writeBlock(data);
-      removeBlock(start + data.size(), replace - data.size());
-      return;
+    seek(start);
+    writeBlock(data);
+    removeBlock(start + data.size(), replace - data.size());
+    return;
   }
 
   // Woohoo!  Faster (about 20%) than id3lib at last.  I had to get hardcore
@@ -298,40 +285,17 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
   offset_t readPosition  = start + replace;
   offset_t writePosition = start;
 
-  ByteVector buffer;
-  ByteVector aboutToOverwrite(bufferLength, 0);
+  ByteVector buffer = data;
+  ByteVector aboutToOverwrite(bufferLength);
 
-  // This is basically a special case of the loop below.  Here we're just
-  // doing the same steps as below, but since we aren't using the same buffer
-  // size -- instead we're using the tag size -- this has to be handled as a
-  // special case.  We're also using File::writeBlock() just for the tag.
-  // That's a bit slower than using char *'s so, we're only doing it here.
-
-  seek(readPosition);
-  size_t bytesRead = fread(aboutToOverwrite.data(), sizeof(char), bufferLength, d->file);
-  readPosition += bufferLength;
-
-  seek(writePosition);
-  writeBlock(data);
-  writePosition += data.size();
-
-  buffer = aboutToOverwrite;
-
-  // In case we've already reached the end of file...
-
-  buffer.resize(bytesRead);
-
-  // Ok, here's the main loop.  We want to loop until the read fails, which
-  // means that we hit the end of the file.
-
-  while(!buffer.isEmpty()) {
-
+  while(true)
+  {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
-
+    
     seek(readPosition);
-    bytesRead = fread(aboutToOverwrite.data(), sizeof(char), bufferLength, d->file);
-    aboutToOverwrite.resize(static_cast<TagLib::uint>(bytesRead));
+    const size_t bytesRead = readFile(d->file, aboutToOverwrite);
+    aboutToOverwrite.resize(bytesRead);
     readPosition += bufferLength;
 
     // Check to see if we just read the last block.  We need to call clear()
@@ -344,18 +308,18 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
     // writePosition.
 
     seek(writePosition);
-    fwrite(buffer.data(), sizeof(char), buffer.size(), d->file);
+    writeBlock(buffer);
+
+    // We hit the end of the file.
+
+    if(bytesRead == 0)
+      break;
+
     writePosition += buffer.size();
 
     // Make the current buffer the data that we read in the beginning.
-
+    
     buffer = aboutToOverwrite;
-
-    // Again, we need this for the last write.  We don't want to write garbage
-    // at the end of our file, so we need to set the buffer size to the amount
-    // that we actually read.
-
-    bufferLength = bytesRead;
   }
 
   // Clear the file size cache. 
@@ -376,11 +340,9 @@ void FileStream::removeBlock(offset_t start, size_t length)
 
   ByteVector buffer(bufferLength, 0);
 
-  size_t bytesRead = 1;
-
-  while(bytesRead != 0) {
+  while(true) {
     seek(readPosition);
-    bytesRead = fread(buffer.data(), sizeof(char), bufferLength, d->file);
+    const size_t bytesRead = readFile(d->file, buffer);
     readPosition += bytesRead;
 
     // Check to see if we just read the last block.  We need to call clear()
@@ -390,9 +352,14 @@ void FileStream::removeBlock(offset_t start, size_t length)
       clear();
 
     seek(writePosition);
-    fwrite(buffer.data(), sizeof(char), bytesRead, d->file);
+    writeFile(d->file, buffer);
+
+    if(bytesRead == 0)
+      break;
+    
     writePosition += bytesRead;
   }
+
   truncate(writePosition);
 }
 
@@ -403,7 +370,7 @@ bool FileStream::readOnly() const
 
 bool FileStream::isOpen() const
 {
-  return (d->file != INVALID_FILE);
+  return (d->file != InvalidFileHandle);
 }
 
 void FileStream::seek(offset_t offset, Position p)

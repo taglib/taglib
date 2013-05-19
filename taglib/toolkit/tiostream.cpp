@@ -29,39 +29,41 @@ using namespace TagLib;
 
 #ifdef _WIN32
 
-// MSVC 2008 or later can't produce the binary for Win9x.
-#if !defined(_MSC_VER) || (_MSC_VER < 1500)
+# include "tstring.h"
+# include "tdebug.h"
+# include <windows.h>
 
 namespace 
 {
+  // Check if the running system has CreateFileW() function.
+  // Windows9x systems don't have CreateFileW() or can't accept Unicode file names. 
 
-  // Determines whether or not the running system is WinNT.
-  // In other words, whether the system supports Unicode.
-
-  bool isWinNT() 
+  bool supportsUnicode()
   {
-    OSVERSIONINFOA ver = {};
-    ver.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-    if(GetVersionExA(&ver)) {
-      return (ver.dwPlatformId == VER_PLATFORM_WIN32_NT);
-    }
-    else {
-      return false;
-    }
+    const FARPROC p = GetProcAddress(GetModuleHandleA("kernel32"), "CreateFileW");
+    return (p != NULL);
   }
+
+  // Indicates whether the system supports Unicode file names.
   
-  const bool IsWinNT = isWinNT();
+  const bool SystemSupportsUnicode = supportsUnicode(); 
 
   // Converts a UTF-16 string into a local encoding.
+  // This function should only be used in Windows9x systems which don't support 
+  // Unicode file names.
 
-  std::string unicodeToAnsi(const std::wstring &wstr)
+  std::string unicodeToAnsi(const wchar_t *wstr)
   {
-    const int len = WideCharToMultiByte(CP_ACP, 0, &wstr[0], -1, NULL, 0, NULL, NULL);
+    if(SystemSupportsUnicode) {
+      debug("unicodeToAnsi() - Should not be used on WinNT systems.");
+    }
+
+    const int len = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
     if(len == 0)
       return std::string();
 
     std::string str(len, '\0');
-    WideCharToMultiByte(CP_ACP, 0, &wstr[0], -1, &str[0], len, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, wstr, -1, &str[0], len, NULL, NULL);
 
     return str;
   }
@@ -71,19 +73,10 @@ namespace
 // If Win9x, converts and stores it into m_name to avoid calling Unicode version functions.
 
 FileName::FileName(const wchar_t *name) 
-  : m_wname(IsWinNT ? name : L"")
-  , m_name(IsWinNT ? "" : unicodeToAnsi(name))
+  : m_wname(SystemSupportsUnicode ? name : L"")
+  , m_name (SystemSupportsUnicode ? "" : unicodeToAnsi(name))
 {
 }
-
-#else
-
-FileName::FileName(const wchar_t *name) 
-  : m_wname(name)
-{
-}
-
-#endif 
 
 FileName::FileName(const char *name) 
   : m_name(name) 
@@ -92,7 +85,7 @@ FileName::FileName(const char *name)
 
 FileName::FileName(const FileName &name) 
   : m_wname(name.m_wname)
-  , m_name(name.m_name) 
+  , m_name (name.m_name) 
 {
 }
 
@@ -106,7 +99,7 @@ const std::string &FileName::str() const
   return m_name; 
 }  
 
-#endif
+#endif  // _WIN32
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
