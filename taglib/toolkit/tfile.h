@@ -236,34 +236,18 @@ namespace TagLib {
     offset_t length();
 
     /*!
-     * Returns true if \a file can be opened for reading.  If the file does not
-     * exist, this will return false.
-     *
-     * \deprecated
-     */
-    static bool isReadable(const char *file);
-
-    /*!
-     * Returns true if \a file can be opened for writing.
-     *
-     * \deprecated
-     */
-    static bool isWritable(const char *name);
-
-    /*!
      * Returns description of the audio file and its tags.
      */
     virtual String toString() const;
 
   protected:
     /*!
-     * Construct a File object and opens the \a file.  \a file should be a
-     * be a C-string in the local file system encoding.
+     * Construct a File object and opens the file specified by \a fileName.  
      *
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */
-    File(FileName file);
+    File(const FileName &fileName);
 
     /*!
      * Construct a File object and use the \a stream instance.
@@ -297,8 +281,10 @@ namespace TagLib {
     File(const File &);
     File &operator=(const File &);
 
-    class FilePrivate;
-    FilePrivate *d;
+    class FilePrivateBase;
+    class ManagedFilePrivate;
+    class UnmanagedFilePrivate;
+    NonRefCountPtr<FilePrivateBase> d;
   };
 
 }

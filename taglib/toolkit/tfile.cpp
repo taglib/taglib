@@ -28,96 +28,76 @@
 #include "tstring.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-
-#ifdef _WIN32
-# include <windows.h>
-# include <io.h>
-#else
-# include <stdio.h>
-# include <unistd.h>
-#endif
-
-#ifndef R_OK
-# define R_OK 4
-#endif
-#ifndef W_OK
-# define W_OK 2
-#endif
-
-#include "asffile.h"
-#include "mpegfile.h"
-#include "vorbisfile.h"
-#include "flacfile.h"
-#include "oggflacfile.h"
-#include "mpcfile.h"
-#include "mp4file.h"
-#include "wavpackfile.h"
-#include "speexfile.h"
-#include "opusfile.h"
-#include "trueaudiofile.h"
-#include "aifffile.h"
-#include "wavfile.h"
-#include "apefile.h"
-#include "modfile.h"
-#include "s3mfile.h"
-#include "itfile.h"
-#include "xmfile.h"
-#include "mp4file.h"
+#include "audioproperties.h"
 
 using namespace TagLib;
 
-class File::FilePrivate
+class File::FilePrivateBase
 {
 public:
-  FilePrivate(IOStream *stream, bool owner);
+  FilePrivateBase()
+    : valid(true)
+  {
+  }
 
-  IOStream *stream;
-  bool streamOwner;
+  virtual ~FilePrivateBase()
+  {
+  }
+
+  virtual IOStream *stream() const = 0;
+
   bool valid;
-
-#ifdef _WIN32
-
-  static const size_t bufferSize = 8192;
-
-#else
-
-  static const size_t bufferSize = 1024;
-
-#endif
 };
 
-File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
-  stream(stream),
-  streamOwner(owner),
-  valid(true)
+// FilePrivate implementation which takes ownership of the stream.
+
+class File::ManagedFilePrivate : public File::FilePrivateBase
 {
-}
+public:
+  ManagedFilePrivate(IOStream *stream)
+    : p(stream)
+  {
+  }
+
+  virtual IOStream *stream() const
+  {
+    return p.get();
+  }
+
+private:
+  NonRefCountPtr<IOStream> p;
+};
+
+// FilePrivate implementation which doesn't take ownership of the stream.
+
+class File::UnmanagedFilePrivate : public File::FilePrivateBase
+{
+public:
+  UnmanagedFilePrivate(IOStream *stream)
+    : p(stream)
+  {
+  }
+
+  virtual IOStream *stream() const
+  {
+    return p;
+  }
+
+private:
+  IOStream *p;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(FileName fileName)
-{
-  IOStream *stream = new FileStream(fileName);
-  d = new FilePrivate(stream, true);
-}
-
-File::File(IOStream *stream)
-{
-  d = new FilePrivate(stream, false);
-}
-
 File::~File()
 {
-  if(d->stream && d->streamOwner)
-    delete d->stream;
-  delete d;
 }
 
 FileName File::name() const
 {
-  return d->stream->name();
+  return d->stream()->name();
 }
 
 PropertyMap File::properties() const
@@ -137,17 +117,17 @@ PropertyMap File::setProperties(const PropertyMap &properties)
 
 ByteVector File::readBlock(size_t length)
 {
-  return d->stream->readBlock(length);
+  return d->stream()->readBlock(length);
 }
 
 void File::writeBlock(const ByteVector &data)
 {
-  d->stream->writeBlock(data);
+  d->stream()->writeBlock(data);
 }
 
 offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > d->bufferSize)
+  if(!d->stream() || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
@@ -196,20 +176,20 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
     // (1) previous partial match
 
     if(previousPartialMatch != ByteVector::npos 
-      && d->bufferSize > previousPartialMatch) 
+      && bufferSize() > previousPartialMatch) 
     {
-      const size_t patternOffset = (d->bufferSize - previousPartialMatch);
+      const size_t patternOffset = (bufferSize() - previousPartialMatch);
       if(buffer.containsAt(pattern, 0, patternOffset)) {
         seek(originalPosition);
-        return bufferOffset - d->bufferSize + previousPartialMatch;
+        return bufferOffset - bufferSize() + previousPartialMatch;
       }
     }
 
     if(!before.isNull() 
       && beforePreviousPartialMatch != ByteVector::npos 
-      && d->bufferSize > beforePreviousPartialMatch) 
+      && bufferSize() > beforePreviousPartialMatch) 
     {
-      const size_t beforeOffset = (d->bufferSize - beforePreviousPartialMatch);
+      const size_t beforeOffset = (bufferSize() - beforePreviousPartialMatch);
       if(buffer.containsAt(before, 0, beforeOffset)) {
         seek(originalPosition);
         return -1;
@@ -236,7 +216,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
     if(!before.isNull())
       beforePreviousPartialMatch = buffer.endsWithPartialMatch(before);
 
-    bufferOffset += d->bufferSize;
+    bufferOffset += bufferSize();
   }
 
   // Since we hit the end of the file, reset the status before continuing.
@@ -251,20 +231,8 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
 offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > d->bufferSize)
+  if(!d->stream() || pattern.size() > bufferSize())
       return -1;
-
-  // The position in the file that the current buffer starts at.
-
-  ByteVector buffer;
-
-  // These variables are used to keep track of a partial match that happens at
-  // the end of a buffer.
-
-  /*
-  int previousPartialMatch = -1;
-  int beforePreviousPartialMatch = -1;
-  */
 
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
@@ -275,17 +243,21 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
   offset_t bufferOffset;
   if(fromOffset == 0) {
-    seek(-1 * int(d->bufferSize), End);
+    seek(-1 * int(bufferSize()), End);
     bufferOffset = tell();
   }
   else {
-    seek(fromOffset + -1 * int(d->bufferSize), Beginning);
+    seek(fromOffset + -1 * int(bufferSize()), Beginning);
     bufferOffset = tell();
   }
 
   // See the notes in find() for an explanation of this algorithm.
 
-  for(buffer = readBlock(d->bufferSize); buffer.size() > 0; buffer = readBlock(d->bufferSize)) {
+  while(true)
+  {
+    ByteVector buffer = readBlock(bufferSize());
+    if(buffer.isEmpty())
+      break;
 
     // TODO: (1) previous partial match
 
@@ -304,7 +276,7 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
     // TODO: (3) partial match
 
-    bufferOffset -= d->bufferSize;
+    bufferOffset -= bufferSize();
     seek(bufferOffset);
   }
 
@@ -319,22 +291,22 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
 void File::insert(const ByteVector &data, offset_t start, size_t replace)
 {
-  d->stream->insert(data, start, replace);
+  d->stream()->insert(data, start, replace);
 }
 
 void File::removeBlock(offset_t start, size_t length)
 {
-  d->stream->removeBlock(start, length);
+  d->stream()->removeBlock(start, length);
 }
 
 bool File::readOnly() const
 {
-  return d->stream->readOnly();
+  return d->stream()->readOnly();
 }
 
 bool File::isOpen() const
 {
-  return d->stream->isOpen();
+  return d->stream()->isOpen();
 }
 
 bool File::isValid() const
@@ -344,57 +316,27 @@ bool File::isValid() const
 
 void File::seek(offset_t offset, Position p)
 {
-  d->stream->seek(offset, IOStream::Position(p));
+  d->stream()->seek(offset, IOStream::Position(p));
 }
 
 void File::truncate(offset_t length)
 {
-  d->stream->truncate(length);
+  d->stream()->truncate(length);
 }
 
 void File::clear()
 {
-  d->stream->clear();
+  d->stream()->clear();
 }
 
 offset_t File::tell() const
 {
-  return d->stream->tell();
+  return d->stream()->tell();
 }
 
 offset_t File::length()
 {
-  return d->stream->length();
-}
-
-bool File::isReadable(const char *file)
-{
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
-
-  return _access_s(file, R_OK) == 0;
-
-#else
-
-  return access(file, R_OK) == 0;
-
-#endif
-
-}
-
-bool File::isWritable(const char *file)
-{
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
-
-  return _access_s(file, W_OK) == 0;
-
-#else
-
-  return access(file, W_OK) == 0;
-
-#endif
-
+  return d->stream()->length();
 }
 
 String File::toString() const
@@ -415,9 +357,19 @@ String File::toString() const
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
+File::File(const FileName &fileName)
+  : d(new ManagedFilePrivate(new FileStream(fileName)))
+{
+}
+
+File::File(IOStream *stream)
+  : d(new UnmanagedFilePrivate(stream))
+{
+}
+
 size_t File::bufferSize()
 {
-  return FilePrivate::bufferSize;
+  return FileStream::bufferSize();
 }
 
 void File::setValid(bool valid)
