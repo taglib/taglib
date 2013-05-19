@@ -11,7 +11,7 @@ Teemu Tervo <teemu.tervo@gmx.net>
 Mathias Panzenböck <grosser.meister.morti@gmx.net>
  Mod, S3M, IT and XM metadata implementations
 Tsuda Kageyu <tsuda.kageyu@gmail.com>
- A lot of minor improvements, such as large files support.
+ A lot of fixes and improvements, i.e. memory copy reduction, large files support, etc.
 
 Please send all patches and questions to taglib-devel@kde.org rather than to
 individual developers!
