@@ -175,14 +175,17 @@ void APE::Tag::setTrack(uint i)
     addValue("TRACK", String::number(i), true);
 }
 
-// conversions of tag keys between what we use in PropertyMap and what's usual
-// for APE tags
-static const TagLib::uint keyConversionsSize = 5; //usual,         APE
-static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
-                                           {"DATE",        "YEAR"        },
-                                           {"ALBUMARTIST", "ALBUM ARTIST"},
-                                           {"DISCNUMBER",  "DISC"        },
-                                           {"REMIXER",     "MIXARTIST"   }};
+namespace
+{
+  // conversions of tag keys between what we use in PropertyMap and what's usual
+  // for APE tags
+  static const TagLib::uint keyConversionsSize = 5; //usual,         APE
+  static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
+                                             {"DATE",        "YEAR"        },
+                                             {"ALBUMARTIST", "ALBUM ARTIST"},
+                                             {"DISCNUMBER",  "DISC"        },
+                                             {"REMIXER",     "MIXARTIST"   }};
+}
 
 PropertyMap APE::Tag::properties() const
 {

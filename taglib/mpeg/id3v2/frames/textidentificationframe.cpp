@@ -119,15 +119,18 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
-// array of allowed TIPL prefixes and their corresponding key value
-static const TagLib::uint involvedPeopleSize = 5;
-static const char* involvedPeople[][2] = {
-    {"ARRANGER", "ARRANGER"},
-    {"ENGINEER", "ENGINEER"},
-    {"PRODUCER", "PRODUCER"},
-    {"DJ-MIX", "DJMIXER"},
-    {"MIX", "MIXER"},
-};
+namespace
+{
+  // array of allowed TIPL prefixes and their corresponding key value
+  static const TagLib::uint involvedPeopleSize = 5;
+  static const char* involvedPeople[][2] = {
+      {"ARRANGER", "ARRANGER"},
+      {"ENGINEER", "ENGINEER"},
+      {"PRODUCER", "PRODUCER"},
+      {"DJ-MIX", "DJMIXER"},
+      {"MIX", "MIXER"},
+  };
+}
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {

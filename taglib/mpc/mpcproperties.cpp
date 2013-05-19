@@ -157,35 +157,38 @@ int MPC::AudioProperties::albumPeak() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long readSize(File *file, size_t &sizelength)
+namespace
 {
-  unsigned char tmp;
-  unsigned long size = 0;
+  unsigned long readSize(File *file, size_t &sizelength)
+  {
+    unsigned char tmp;
+    unsigned long size = 0;
 
-  do {
-    ByteVector b = file->readBlock(1);
-    tmp = b[0];
-    size = (size << 7) | (tmp & 0x7F);
-    sizelength++;
-  } while((tmp & 0x80));
-  return size;
+    do {
+      ByteVector b = file->readBlock(1);
+      tmp = b[0];
+      size = (size << 7) | (tmp & 0x7F);
+      sizelength++;
+    } while((tmp & 0x80));
+    return size;
+  }
+
+  unsigned long readSize(const ByteVector &data, size_t &sizelength)
+  {
+    unsigned char tmp;
+    unsigned long size = 0;
+    unsigned long pos = 0;
+
+    do {
+      tmp = data[pos++];
+      size = (size << 7) | (tmp & 0x7F);
+      sizelength++;
+    } while((tmp & 0x80) && (pos < data.size()));
+    return size;
+  }
+
+  static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 }
-
-unsigned long readSize(const ByteVector &data, size_t &sizelength)
-{
-  unsigned char tmp;
-  unsigned long size = 0;
-  unsigned long pos = 0;
-
-  do {
-    tmp = data[pos++];
-    size = (size << 7) | (tmp & 0x7F);
-    sizelength++;
-  } while((tmp & 0x80) && (pos < data.size()));
-  return size;
-}
-
-static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 
 void MPC::AudioProperties::readSV8(File *file)
 {

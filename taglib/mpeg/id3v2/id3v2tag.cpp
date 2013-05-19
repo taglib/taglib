@@ -74,7 +74,11 @@ public:
   static const TagLib::StringHandler *stringHandler;
 };
 
-static const ID3v2::Latin1StringHandler defaultStringHandler;
+namespace
+{
+  const ID3v2::Latin1StringHandler defaultStringHandler;
+}
+
 const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
