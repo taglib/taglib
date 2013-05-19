@@ -57,7 +57,11 @@ public:
   static const TagLib::StringHandler *stringHandler;
 };
 
-static const RIFF::Info::StringHandler defaultStringHandler;
+namespace
+{
+  const RIFF::Info::StringHandler defaultStringHandler;
+}
+
 const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////

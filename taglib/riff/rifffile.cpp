@@ -32,13 +32,16 @@
 
 using namespace TagLib;
 
-struct Chunk
+namespace
 {
-  ByteVector name;
-  offset_t offset;
-  TagLib::uint size;
-  char padding;
-};
+  struct Chunk
+  {
+    ByteVector name;
+    offset_t offset;
+    TagLib::uint size;
+    char padding;
+  };
+}
 
 class RIFF::File::FilePrivate
 {
@@ -250,17 +253,20 @@ void RIFF::File::removeChunk(const ByteVector &name)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool isValidChunkID(const ByteVector &name)
+namespace
 {
-  if(name.size() != 4) {
-    return false;
-  }
-  for(int i = 0; i < 4; i++) {
-    if(name[i] < 32 || name[i] > 127) {
+  bool isValidChunkID(const ByteVector &name)
+  {
+    if(name.size() != 4) {
       return false;
     }
+    for(int i = 0; i < 4; i++) {
+      if(name[i] < 32 || name[i] > 127) {
+        return false;
+      }
+    }
+    return true;
   }
-  return true;
 }
 
 void RIFF::File::read()
