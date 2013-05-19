@@ -717,9 +717,11 @@ size_t ByteVector::size() const
 
 ByteVector &ByteVector::resize(size_t size, char padding)
 {
-  detach();
-  d->data->resize(d->offset + size, padding);
-  d->length = size;
+  if(size != d->length) {
+    detach();
+    d->data->resize(d->offset + size, padding);
+    d->length = size;
+  }
 
   return *this;
 }
