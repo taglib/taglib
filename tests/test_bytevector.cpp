@@ -163,10 +163,6 @@ public:
     CPPUNIT_ASSERT(n.toInt64LE(6)  == -1268082884489200845ll);
     CPPUNIT_ASSERT(n.toInt64BE(4)  == 2497865822736504285ll);
     
-    // Shows the message "toNumber<T>() -- offset is out of range. Returning 0." 2 times.
-    CPPUNIT_ASSERT(n.toUInt32LE(13) == 0);
-    CPPUNIT_ASSERT(n.toUInt16BE(15) == 0);
-
     CPPUNIT_ASSERT(ByteVector::fromUInt16LE(n.toInt16LE(5))  == n.mid(5, 2));
     CPPUNIT_ASSERT(ByteVector::fromUInt16BE(n.toInt16BE(9))  == n.mid(9, 2));
     CPPUNIT_ASSERT(ByteVector::fromUInt32LE(n.toUInt32LE(4)) == n.mid(4, 4));
