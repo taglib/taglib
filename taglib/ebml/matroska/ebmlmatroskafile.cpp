@@ -126,9 +126,11 @@ public:
 
 EBML::Matroska::File::~File()
 {
-  delete d->tag;
-  delete d->audio;
-  delete d;
+  if (d) {
+    delete d->tag;
+    delete d->audio;
+    delete d;
+  }
 }
 
 EBML::Matroska::File::File(FileName file) : EBML::File(file), d(0)
