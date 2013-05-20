@@ -299,10 +299,8 @@ ulonglong byteSwap<ulonglong>(ulonglong x)
 template <class T>
 T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
-  if(offset + sizeof(T) > v.size()) {
-    debug("toNumber<T>() -- offset is out of range. Returning 0.");
-    return 0;
-  }
+  if(offset + sizeof(T) > v.size()) 
+    return toNumber<T>(v, offset, v.size() - offset, mostSignificantByteFirst);
 
   // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
   T tmp;
@@ -322,10 +320,12 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 template <class T>
 T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
 {
-  if(offset + length > v.size()) {
-    debug("toNumber<T>() -- offset and/or length is out of range. Returning 0.");
+  if(offset >= v.size()) {
+    debug("toNumber<T>() -- No data to convert. Returning 0.");
     return 0;
   }
+
+  length = std::min(length, v.size() - offset);
 
   T sum = 0;
   for(size_t i = 0; i < length; i++) {
