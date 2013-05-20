@@ -301,7 +301,7 @@ namespace {
     LittleEndian,
     BigEndian
   };
-}
+}  
 
 template <typename T, size_t LENGTH, Endianness ENDIAN>
 inline T toNumber(const ByteVector &v, size_t offset)
@@ -312,12 +312,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
   static const bool swap = (ENDIAN == LittleEndian);
 #endif
 
-  if(offset + LENGTH > v.size()) {
-    debug("toNumber<T>() -- offset is out of range. Returning 0.");
-    return 0;
-  }
-
-  if(LENGTH >= sizeof(T)) {
+  if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size()) {
     // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
     T tmp;
     ::memcpy(&tmp, v.data() + offset, sizeof(T));
@@ -328,9 +323,10 @@ inline T toNumber(const ByteVector &v, size_t offset)
       return tmp;
   }
   else {
+    const size_t length = std::min(LENGTH, v.size() - offset);
     T sum = 0;
-    for(size_t i = 0; i < LENGTH; i++) {
-      const size_t shift = (ENDIAN == LittleEndian ? i : LENGTH - 1 - i) * 8;
+    for(size_t i = 0; i < length; i++) {
+      const size_t shift = (ENDIAN == LittleEndian ? i : length - 1 - i) * 8;
       sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
     }
 
@@ -363,7 +359,7 @@ public:
   {
   }
 
-  ByteVectorPrivate(TAGLIB_SHARED_PTR<ByteVectorPrivate> d, size_t o, size_t l)
+  ByteVectorPrivate(RefCountPtr<ByteVectorPrivate> d, size_t o, size_t l)
     : data(d->data)
     , offset(d->offset + o)
     , length(l)
@@ -411,7 +407,7 @@ public:
     return *this;
   }
 
-  TAGLIB_SHARED_PTR<std::vector<char> > data;
+  RefCountPtr<std::vector<char> > data;
   size_t offset;
   size_t length;
 };
@@ -717,9 +713,11 @@ size_t ByteVector::size() const
 
 ByteVector &ByteVector::resize(size_t size, char padding)
 {
-  detach();
-  d->data->resize(d->offset + size, padding);
-  d->length = size;
+  if(size != d->length) {
+    detach();
+    d->data->resize(d->offset + size, padding);
+    d->length = size;
+  }
 
   return *this;
 }

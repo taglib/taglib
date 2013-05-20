@@ -89,7 +89,7 @@ namespace TagLib {
     TagUnion &operator=(const Tag &);
 
     class TagUnionPrivate;
-    TAGLIB_SHARED_PTR<TagUnionPrivate> d;
+    NonRefCountPtr<TagUnionPrivate> d;
   };
 }
 

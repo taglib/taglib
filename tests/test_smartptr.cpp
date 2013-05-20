@@ -26,7 +26,7 @@ public:
   void testSharedptrBasic()
   {
     int * ip = new int;
-    TAGLIB_SHARED_PTR<int> cp ( ip );
+    RefCountPtr<int> cp ( ip );
     CPPUNIT_ASSERT( ip == cp.get() );
     CPPUNIT_ASSERT( cp.use_count() == 1 );
 
@@ -36,7 +36,7 @@ public:
     ck( static_cast<int*>(cp.get()), 54321 );
     ck( static_cast<int*>(ip), *cp );
 
-    TAGLIB_SHARED_PTR<int> cp2 ( cp );
+    RefCountPtr<int> cp2 ( cp );
     CPPUNIT_ASSERT( ip == cp2.get() );
     CPPUNIT_ASSERT( cp.use_count() == 2 );
     CPPUNIT_ASSERT( cp2.use_count() == 2 );
@@ -46,7 +46,7 @@ public:
     ck( static_cast<int*>(cp2.get()), 54321 );
     ck( static_cast<int*>(ip), *cp2 );
 
-    TAGLIB_SHARED_PTR<int> cp3 ( cp );
+    RefCountPtr<int> cp3 ( cp );
     CPPUNIT_ASSERT( cp.use_count() == 3 );
     CPPUNIT_ASSERT( cp2.use_count() == 3 );
     CPPUNIT_ASSERT( cp3.use_count() == 3 );
@@ -76,16 +76,16 @@ public:
     CPPUNIT_ASSERT( cp.use_count() == 3 );
     CPPUNIT_ASSERT( *cp == 87654 );
 
-    TAGLIB_SHARED_PTR<int> cp4;
+    RefCountPtr<int> cp4;
     swap( cp2, cp4 );
     CPPUNIT_ASSERT( cp4.use_count() == 3 );
     CPPUNIT_ASSERT( *cp4 == 87654 );
     CPPUNIT_ASSERT( cp2.get() == 0 );
 
-    std::set< TAGLIB_SHARED_PTR<int> > scp;
+    std::set< RefCountPtr<int> > scp;
     scp.insert(cp4);
     CPPUNIT_ASSERT( scp.find(cp4) != scp.end() );
-    CPPUNIT_ASSERT( scp.find(cp4) == scp.find( TAGLIB_SHARED_PTR<int>(cp4) ) );  
+    CPPUNIT_ASSERT( scp.find(cp4) == scp.find( RefCountPtr<int>(cp4) ) );  
   }
   
 private:
@@ -130,7 +130,7 @@ public:
     derivedDestructorCalled = false;
   
     {
-      TAGLIB_SHARED_PTR<DummyBase> p1(new DummyDerived(100));
+      RefCountPtr<DummyBase> p1(new DummyDerived(100));
       CPPUNIT_ASSERT(p1->getValue() == 100);
     }
   
@@ -141,8 +141,8 @@ public:
     derivedDestructorCalled = false;
   
     {
-      TAGLIB_SHARED_PTR<DummyDerived> p1(new DummyDerived(100));
-      TAGLIB_SHARED_PTR<DummyBase> p2 = p1;
+      RefCountPtr<DummyDerived> p1(new DummyDerived(100));
+      RefCountPtr<DummyBase> p2 = p1;
   
       CPPUNIT_ASSERT(p1->getValue() == 100);
       CPPUNIT_ASSERT(p2->getValue() == 100);
@@ -155,8 +155,8 @@ public:
     derivedDestructorCalled = false;
   
     {
-      TAGLIB_SHARED_PTR<DummyDerived> p1;
-      TAGLIB_SHARED_PTR<DummyBase> p2;
+      RefCountPtr<DummyDerived> p1;
+      RefCountPtr<DummyBase> p2;
   
       p1.reset(new DummyDerived(100));
       p2 = p1;
@@ -171,7 +171,7 @@ public:
 
 private:
   class DummyIncomplete;
-  TAGLIB_SHARED_PTR<DummyIncomplete> pincomplete;
+  RefCountPtr<DummyIncomplete> pincomplete;
  
   class DummyIncomplete
   {

@@ -135,9 +135,14 @@ namespace TagLib {
      */
     void truncate(offset_t length);
 
+    /*!
+     * Returns the buffer size that is used for internal buffering.
+     */
+    static size_t bufferSize();
+
   private:
     class FileStreamPrivate;
-    FileStreamPrivate *d;
+    NonRefCountPtr<FileStreamPrivate> d;
   };
 
 }

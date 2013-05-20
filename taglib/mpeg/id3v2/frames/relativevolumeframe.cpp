@@ -31,19 +31,22 @@
 using namespace TagLib;
 using namespace ID3v2;
 
-static inline int bitsToBytes(int i)
+namespace
 {
-  return i % 8 == 0 ? i / 8 : (i - i % 8) / 8 + 1;
+  static inline int bitsToBytes(int i)
+  {
+    return i % 8 == 0 ? i / 8 : (i - i % 8) / 8 + 1;
+  }
+
+  struct ChannelData
+  {
+    ChannelData() : channelType(RelativeVolumeFrame::Other), volumeAdjustment(0) {}
+
+    RelativeVolumeFrame::ChannelType channelType;
+    short volumeAdjustment;
+    RelativeVolumeFrame::PeakVolume peakVolume;
+  };
 }
-
-struct ChannelData
-{
-  ChannelData() : channelType(RelativeVolumeFrame::Other), volumeAdjustment(0) {}
-
-  RelativeVolumeFrame::ChannelType channelType;
-  short volumeAdjustment;
-  RelativeVolumeFrame::PeakVolume peakVolume;
-};
 
 class RelativeVolumeFrame::RelativeVolumeFramePrivate
 {
