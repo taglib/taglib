@@ -101,7 +101,7 @@ public:
   // for the id)
   ByteVector createVInt(ulli number, bool addOne = true, bool shortest = true)
   {
-    ByteVector vint = ByteVector::fromUInt64BE(static_cast<signed long long>(number));
+    ByteVector vint = ByteVector::fromUInt64BE(number);
     
     // Do we actually need to calculate the length of the variable length
     // integer? If not, then prepend the 0b0000 0001 if necessary and return the
@@ -388,7 +388,7 @@ EBML::Element *EBML::Element::addElement(EBML::ulli id, signed long long number)
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, EBML::ulli number)
 {
-  return addElement(id, ByteVector::fromUInt64BE(static_cast<signed long long>(number)));
+  return addElement(id, ByteVector::fromUInt64BE(number));
 }
 
 EBML::Element *EBML::Element::addElement(EBML::ulli id, long double number)
@@ -457,7 +457,7 @@ void EBML::Element::setAsInt(signed long long number)
 
 void EBML::Element::setAsUnsigned(EBML::ulli number)
 {
-  setAsBinary(ByteVector::fromUInt64BE(static_cast<signed long long>(number)));
+  setAsBinary(ByteVector::fromUInt64BE(number));
 }
 
 void EBML::Element::setAsFloat(long double)

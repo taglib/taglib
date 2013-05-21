@@ -40,7 +40,7 @@ public:
   {
     document->seek(0);
     ByteVector magical = document->readBlock(4);
-    if(static_cast<ulli>(magical.toInt64BE(0)) != Header::EBML)
+    if(static_cast<ulli>(magical.toUInt32BE(0)) != Header::EBML)
       return 0;
     FilePrivate *d = new FilePrivate(document);
     Element *head = d->root.getChild(Header::EBML);
