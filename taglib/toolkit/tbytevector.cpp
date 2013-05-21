@@ -312,7 +312,8 @@ inline T toNumber(const ByteVector &v, size_t offset)
   static const bool swap = (ENDIAN == LittleEndian);
 #endif
 
-  if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size()) {
+  if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size()) 
+  {
     // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
     T tmp;
     ::memcpy(&tmp, v.data() + offset, sizeof(T));
@@ -322,7 +323,8 @@ inline T toNumber(const ByteVector &v, size_t offset)
     else
       return tmp;
   }
-  else {
+  else if(offset < v.size())
+  {
     const size_t length = std::min(LENGTH, v.size() - offset);
     T sum = 0;
     for(size_t i = 0; i < length; i++) {
@@ -331,6 +333,11 @@ inline T toNumber(const ByteVector &v, size_t offset)
     }
 
     return sum;
+  }
+  else
+  {
+    debug("toNumber<T>() - offset is out of range. Returning 0.");
+    return 0;
   }
 }
 
