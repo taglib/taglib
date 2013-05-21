@@ -281,19 +281,22 @@ bool List<T>::isEmpty() const
 }
 
 template <class T>
-typename List<T>::Iterator List<T>::find(const T &value)
+template <class U>
+typename List<T>::Iterator List<T>::find(const U &value)
 {
   return std::find(d->list.begin(), d->list.end(), value);
 }
 
 template <class T>
-typename List<T>::ConstIterator List<T>::find(const T &value) const
+template <class U>
+typename List<T>::ConstIterator List<T>::find(const U &value) const
 {
   return std::find(d->list.begin(), d->list.end(), value);
 }
 
 template <class T>
-bool List<T>::contains(const T &value) const
+template <class U>
+bool List<T>::contains(const U &value) const
 {
   return std::find(d->list.begin(), d->list.end(), value) != d->list.end();
 }
