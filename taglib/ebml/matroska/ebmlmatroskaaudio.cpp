@@ -48,7 +48,7 @@ public:
       if((value = info->getChild(Constants::TimecodeScale)))
         length *= value->getAsUnsigned();
       else
-		length *= 1000000;
+        length *= 1000000;
     }
     
     info = elem->getChild(Constants::Tracks);
