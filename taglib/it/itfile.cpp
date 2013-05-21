@@ -31,31 +31,33 @@ using namespace IT;
 class IT::File::FilePrivate
 {
 public:
-  FilePrivate(AudioProperties::ReadStyle propertiesStyle)
-    : tag(), properties(propertiesStyle)
+  FilePrivate()
+    : tag()
   {
   }
 
   Mod::Tag       tag;
-  IT::AudioProperties properties;
+  NonRefCountPtr<IT::AudioProperties> audioProperties;
 };
 
 IT::File::File(FileName file, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+               AudioProperties::ReadStyle propertiesStyle)
+  : Mod::FileBase(file)
+  , d(new FilePrivate())
 {
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 IT::File::File(IOStream *stream, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+               AudioProperties::ReadStyle propertiesStyle)
+  : Mod::FileBase(stream)
+  , d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 IT::File::~File()
@@ -70,7 +72,7 @@ Mod::Tag *IT::File::tag() const
 
 IT::AudioProperties *IT::File::audioProperties() const
 {
-  return &d->properties;
+  return d->audioProperties.get();
 }
 
 bool IT::File::save()
@@ -184,10 +186,9 @@ bool IT::File::save()
   return true;
 }
 
-void IT::File::read(bool)
+void IT::File::read()
 {
-  if(!isOpen())
-    return;
+  d->audioProperties.reset(new AudioProperties());
 
   seek(0);
   READ_ASSERT(readBlock(4) == "IMPM");
@@ -199,20 +200,20 @@ void IT::File::read(bool)
   READ_U16L_AS(instrumentCount);
   READ_U16L_AS(sampleCount);
 
-  d->properties.setInstrumentCount(instrumentCount);
-  d->properties.setSampleCount(sampleCount);
-  READ_U16L(d->properties.setPatternCount);
-  READ_U16L(d->properties.setVersion);
-  READ_U16L(d->properties.setCompatibleVersion);
-  READ_U16L(d->properties.setFlags);
+  d->audioProperties->setInstrumentCount(instrumentCount);
+  d->audioProperties->setSampleCount(sampleCount);
+  READ_U16L(d->audioProperties->setPatternCount);
+  READ_U16L(d->audioProperties->setVersion);
+  READ_U16L(d->audioProperties->setCompatibleVersion);
+  READ_U16L(d->audioProperties->setFlags);
   READ_U16L_AS(special);
-  d->properties.setSpecial(special);
-  READ_BYTE(d->properties.setGlobalVolume);
-  READ_BYTE(d->properties.setMixVolume);
-  READ_BYTE(d->properties.setBpmSpeed);
-  READ_BYTE(d->properties.setTempo);
-  READ_BYTE(d->properties.setPanningSeparation);
-  READ_BYTE(d->properties.setPitchWheelDepth);
+  d->audioProperties->setSpecial(special);
+  READ_BYTE(d->audioProperties->setGlobalVolume);
+  READ_BYTE(d->audioProperties->setMixVolume);
+  READ_BYTE(d->audioProperties->setBpmSpeed);
+  READ_BYTE(d->audioProperties->setTempo);
+  READ_BYTE(d->audioProperties->setPanningSeparation);
+  READ_BYTE(d->audioProperties->setPitchWheelDepth);
 
   // IT supports some kind of comment tag. Still, the
   // sample/instrument names are abused as comments so
@@ -246,7 +247,7 @@ void IT::File::read(bool)
     if((unsigned char) pannings[i] < 128 && volumes[i] > 0)
         ++channels;
   }
-  d->properties.setChannels(channels);
+  d->audioProperties->setChannels(channels);
 
   // real length might be shorter because of skips and terminator
   ushort realLength = 0;
@@ -255,7 +256,7 @@ void IT::File::read(bool)
     if(order == 255) break;
     if(order != 254) ++ realLength;
   }
-  d->properties.setLengthInPatterns(realLength);
+  d->audioProperties->setLengthInPatterns(realLength);
 
   StringList comment;
   // Note: I found files that have nil characters somewhere

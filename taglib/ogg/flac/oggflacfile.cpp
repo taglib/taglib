@@ -39,7 +39,6 @@ class Ogg::FLAC::File::FilePrivate
 public:
   FilePrivate() :
     comment(0),
-    properties(0),
     streamStart(0),
     streamLength(0),
     scanned(false),
@@ -49,12 +48,11 @@ public:
   ~FilePrivate()
   {
     delete comment;
-    delete properties;
   }
 
   Ogg::XiphComment *comment;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
   offset_t streamStart;
@@ -107,7 +105,7 @@ PropertyMap Ogg::FLAC::File::setProperties(const PropertyMap &properties)
 
 FLAC::AudioProperties *Ogg::FLAC::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 
@@ -171,7 +169,7 @@ void Ogg::FLAC::File::read(bool readProperties, AudioProperties::ReadStyle prope
 
 
   if(readProperties)
-    d->properties = new AudioProperties(streamInfoData(), streamLength(), propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(streamInfoData(), streamLength(), propertiesStyle));
 }
 
 ByteVector Ogg::FLAC::File::streamInfoData()

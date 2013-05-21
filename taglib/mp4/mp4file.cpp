@@ -35,7 +35,7 @@ using namespace TagLib;
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() : tag(0), atoms(0), properties(0)
+  FilePrivate() : tag(0), atoms(0)
   {
   }
 
@@ -49,15 +49,11 @@ public:
         delete tag;
         tag = 0;
     }
-    if(properties) {
-        delete properties;
-        properties = 0;
-    }
   }
 
   MP4::Tag *tag;
   MP4::Atoms *atoms;
-  MP4::AudioProperties *properties;
+  NonRefCountPtr<MP4::AudioProperties> audioProperties;
 };
 
 MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
@@ -90,7 +86,7 @@ MP4::File::tag() const
 MP4::AudioProperties *
 MP4::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool
@@ -125,9 +121,8 @@ MP4::File::read(bool readProperties, AudioProperties::ReadStyle audioPropertiesS
   }
 
   d->tag = new Tag(this, d->atoms);
-  if(readProperties) {
-    d->properties = new AudioProperties(this, d->atoms, audioPropertiesStyle);
-  }
+  if(readProperties)
+    d->audioProperties.reset(new AudioProperties(this, d->atoms, audioPropertiesStyle));
 }
 
 bool

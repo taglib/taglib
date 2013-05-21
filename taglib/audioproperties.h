@@ -101,14 +101,12 @@ namespace TagLib {
      *
      * \see ReadStyle
      */
-    AudioProperties(ReadStyle style);
+    AudioProperties();
 
-  private:
+  private: 
+    // Noncopyable. Derived classes as well.
     AudioProperties(const AudioProperties &);
     AudioProperties &operator=(const AudioProperties &);
-
-    class AudioPropertiesPrivate;
-    AudioPropertiesPrivate *d;
   };
 
 }

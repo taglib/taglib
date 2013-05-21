@@ -53,13 +53,11 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
-    properties(0),
     hasAPE(false),
     hasID3v1(false) {}
 
   ~FilePrivate()
   {
-    delete properties;
   }
 
   offset_t APELocation;
@@ -69,7 +67,7 @@ public:
 
   DoubleTagUnion tag;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -117,7 +115,7 @@ PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 
 WavPack::AudioProperties *WavPack::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool WavPack::File::save()
@@ -247,7 +245,7 @@ void WavPack::File::read(bool readProperties, AudioProperties::ReadStyle /* prop
 
   if(readProperties) {
     seek(0);
-    d->properties = new AudioProperties(this, length() - d->APESize);
+    d->audioProperties.reset(new AudioProperties(this, length() - d->APESize));
   }
 }
 

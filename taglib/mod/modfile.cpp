@@ -31,31 +31,30 @@ using namespace Mod;
 class Mod::File::FilePrivate
 {
 public:
-  FilePrivate(AudioProperties::ReadStyle propertiesStyle)
-    : properties(propertiesStyle)
-  {
-  }
-
   Mod::Tag        tag;
-  Mod::AudioProperties properties;
+  NonRefCountPtr<Mod::AudioProperties> audioProperties;
 };
 
 Mod::File::File(FileName file, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+                AudioProperties::ReadStyle propertiesStyle)
+  : Mod::FileBase(file)
+  , d(new FilePrivate())
 {
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 Mod::File::File(IOStream *stream, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+                AudioProperties::ReadStyle propertiesStyle) 
+  : Mod::FileBase(stream)
+  , d(new FilePrivate())
 {
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 Mod::File::~File()
@@ -70,7 +69,7 @@ Mod::Tag *Mod::File::tag() const
 
 Mod::AudioProperties *Mod::File::audioProperties() const
 {
-  return &d->properties;
+  return d->audioProperties.get();
 }
 
 bool Mod::File::save()
@@ -82,23 +81,22 @@ bool Mod::File::save()
   seek(0);
   writeString(d->tag.title(), 20);
   StringList lines = d->tag.comment().split("\n");
-  uint n = std::min(static_cast<uint>(lines.size()), d->properties.instrumentCount());
+  uint n = std::min(static_cast<uint>(lines.size()), d->audioProperties->instrumentCount());
   for(uint i = 0; i < n; ++ i) {
     writeString(lines[i], 22);
     seek(8, Current);
   }
 
-  for(uint i = n; i < d->properties.instrumentCount(); ++ i) {
+  for(uint i = n; i < d->audioProperties->instrumentCount(); ++ i) {
     writeString(String::null, 22);
     seek(8, Current);
   }
   return true;
 }
 
-void Mod::File::read(bool)
+void Mod::File::read()
 {
-  if(!isOpen())
-    return;
+  d->audioProperties.reset(new AudioProperties());
 
   seek(1080);
   ByteVector modId = readBlock(4);
@@ -142,8 +140,8 @@ void Mod::File::read(bool)
     channels    =  4;
     instruments = 15;
   }
-  d->properties.setChannels(channels);
-  d->properties.setInstrumentCount(instruments);
+  d->audioProperties->setChannels(channels);
+  d->audioProperties->setInstrumentCount(instruments);
 
   seek(0);
   READ_STRING(d->tag.setTitle, 20);
@@ -171,7 +169,7 @@ void Mod::File::read(bool)
     comment.append(instrumentName);
   }
 
-  READ_BYTE(d->properties.setLengthInPatterns);
+  READ_BYTE(d->audioProperties->setLengthInPatterns);
 
   d->tag.setComment(comment.toString("\n"));
 }

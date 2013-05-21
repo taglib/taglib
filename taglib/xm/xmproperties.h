@@ -26,17 +26,21 @@
 #include "tstring.h"
 #include "audioproperties.h"
 
-namespace TagLib {
-  namespace XM {
-    class AudioProperties : public TagLib::AudioProperties {
-      friend class File;
+namespace TagLib 
+{
+  namespace XM 
+  {
+    class File;
+
+    class AudioProperties : public TagLib::AudioProperties 
+    {
     public:
       /*! Flag bits. */
       enum {
         LinearFreqTable = 1 // otherwise its the amiga freq. table
       };
 
-      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      AudioProperties();
       virtual ~AudioProperties();
 
       int length()     const;
@@ -54,6 +58,9 @@ namespace TagLib {
       ushort tempo()            const;
       ushort bpmSpeed()         const;
 
+    private:
+      friend class File;
+
       void setChannels(int channels);
 
       void setLengthInPatterns(ushort lengthInPatterns);
@@ -66,12 +73,8 @@ namespace TagLib {
       void setTempo(ushort tempo);
       void setBpmSpeed(ushort bpmSpeed);
 
-    private:
-      AudioProperties(const AudioProperties&);
-      AudioProperties &operator=(const AudioProperties&);
-
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      NonRefCountPtr<PropertiesPrivate> d;
     };
   }
 }

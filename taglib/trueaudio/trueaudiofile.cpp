@@ -54,14 +54,9 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
-    properties(0),
     hasID3v1(false),
     hasID3v2(false) {}
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   offset_t ID3v2Location;
@@ -71,7 +66,7 @@ public:
 
   DoubleTagUnion tag;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -137,7 +132,7 @@ PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 
 TrueAudio::AudioProperties *TrueAudio::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 void TrueAudio::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
@@ -259,13 +254,11 @@ void TrueAudio::File::read(bool readProperties, AudioProperties::ReadStyle /* pr
   if(readProperties) {
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      d->properties = new AudioProperties(readBlock(TrueAudio::HeaderSize),
-                                     length() - d->ID3v2OriginalSize);
+      d->audioProperties.reset(new AudioProperties(this, length() - d->ID3v2OriginalSize));
     }
     else {
       seek(0);
-      d->properties = new AudioProperties(readBlock(TrueAudio::HeaderSize),
-                                     length());
+      d->audioProperties.reset(new AudioProperties(this, length()));
     }
   }
 }

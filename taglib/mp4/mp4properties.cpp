@@ -35,7 +35,8 @@ using namespace TagLib;
 class MP4::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false), format(Unknown) {}
+  PropertiesPrivate() 
+    : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false), format(Unknown) {}
 
   enum Format {
     Unknown = 0,
@@ -53,10 +54,74 @@ public:
 };
 
 MP4::AudioProperties::AudioProperties(File *file, MP4::Atoms *atoms, ReadStyle style)
-  : TagLib::AudioProperties(style)
+  : d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
+  read(file, atoms);
+}
 
+MP4::AudioProperties::~AudioProperties()
+{
+}
+
+int
+MP4::AudioProperties::channels() const
+{
+  return d->channels;
+}
+
+int
+MP4::AudioProperties::sampleRate() const
+{
+  return d->sampleRate;
+}
+
+int
+MP4::AudioProperties::length() const
+{
+  return d->length;
+}
+
+int
+MP4::AudioProperties::bitrate() const
+{
+  return d->bitrate;
+}
+
+int
+MP4::AudioProperties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
+bool
+MP4::AudioProperties::isEncrypted() const
+{
+  return d->encrypted;
+}
+
+String
+MP4::AudioProperties::toString() const
+{
+  String format;
+  if(d->format == PropertiesPrivate::AAC) {
+    format = "AAC";
+  }
+  else if(d->format == PropertiesPrivate::ALAC) {
+    format = "ALAC";
+  }
+  else {
+    format = "Unknown";
+  }
+  StringList desc;
+  desc.append("MPEG-4 audio (" + format + ")");
+  desc.append(String::number(length()) + " seconds");
+  desc.append(String::number(bitrate()) + " kbps");
+  return desc.toString(", ");
+}
+
+void 
+MP4::AudioProperties::read(File *file, MP4::Atoms *atoms)
+{
   MP4::Atom *moov = atoms->find("moov");
   if(!moov) {
     debug("MP4: Atom 'moov' not found");
@@ -157,65 +222,3 @@ MP4::AudioProperties::AudioProperties(File *file, MP4::Atoms *atoms, ReadStyle s
     d->encrypted = true;
   }
 }
-
-MP4::AudioProperties::~AudioProperties()
-{
-  delete d;
-}
-
-int
-MP4::AudioProperties::channels() const
-{
-  return d->channels;
-}
-
-int
-MP4::AudioProperties::sampleRate() const
-{
-  return d->sampleRate;
-}
-
-int
-MP4::AudioProperties::length() const
-{
-  return d->length;
-}
-
-int
-MP4::AudioProperties::bitrate() const
-{
-  return d->bitrate;
-}
-
-int
-MP4::AudioProperties::bitsPerSample() const
-{
-  return d->bitsPerSample;
-}
-
-bool
-MP4::AudioProperties::isEncrypted() const
-{
-  return d->encrypted;
-}
-
-String
-MP4::AudioProperties::toString() const
-{
-  String format;
-  if(d->format == PropertiesPrivate::AAC) {
-    format = "AAC";
-  }
-  else if(d->format == PropertiesPrivate::ALAC) {
-    format = "ALAC";
-  }
-  else {
-    format = "Unknown";
-  }
-  StringList desc;
-  desc.append("MPEG-4 audio (" + format + ")");
-  desc.append(String::number(length()) + " seconds");
-  desc.append(String::number(bitrate()) + " kbps");
-  return desc.toString(", ");
-}
-

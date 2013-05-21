@@ -32,22 +32,8 @@ using namespace TagLib;
 
 class EBML::Matroska::File::FilePrivate
 {
-public:
-  // Returns true if simpleTag has a TagName and TagString child and writes
-  // their contents into name and value.
-  bool extractContent(Element *simpleTag, String &name, String &value)
-  {
-    Element *n = simpleTag->getChild(Constants::TagName);
-    Element *v = simpleTag->getChild(Constants::TagString);
-    if(!n || !v)
-      return false;
-    
-    name = n->getAsString();
-    value = v->getAsString();
-    return true;
-  }
-  
-  FilePrivate(File *p_document) : tag(0), document(p_document)
+private:
+  FilePrivate(File *document) : tag(0)
   {
     // Just get the first segment, because "Typically a Matroska file is
     // composed of 1 segment."
@@ -83,12 +69,29 @@ public:
     }
   }
   
+public:
+  // Returns true if simpleTag has a TagName and TagString child and writes
+  // their contents into name and value.
+  bool extractContent(Element *simpleTag, String &name, String &value)
+  {
+    Element *n = simpleTag->getChild(Constants::TagName);
+    Element *v = simpleTag->getChild(Constants::TagString);
+    if(!n || !v)
+      return false;
+
+    name = n->getAsString();
+    value = v->getAsString();
+    return true;
+  }
+
   // Creates Tag and AudioProperties. Late creation because both require a fully
   // functional FilePrivate (well AudioProperties doesn't...)
-  void lateCreate()
+  void lateCreate(File *document, bool readAudioProperties)
   {
-    tag = new Tag(document);
-    audio = new AudioProperties(document);
+    tag.reset(new Tag(document));
+
+    if(readAudioProperties)
+      audioProperties.reset(new AudioProperties(document));
   }
   
   // Checks the EBML header and creates the FilePrivate.
@@ -111,13 +114,10 @@ public:
   List<std::pair<PropertyMap, std::pair<Element *, ulli> > > tags;
   
   // The tag
-  Tag *tag;
+  NonRefCountPtr<Tag> tag;
   
   // The audio properties
-  AudioProperties *audio;
-  
-  // The corresponding file.
-  File *document;
+  NonRefCountPtr<AudioProperties> audioProperties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,38 +126,35 @@ public:
 
 EBML::Matroska::File::~File()
 {
-  if (d) {
-    delete d->tag;
-    delete d->audio;
-    delete d;
-  }
 }
 
-EBML::Matroska::File::File(FileName file) : EBML::File(file), d(0)
+EBML::Matroska::File::File(FileName file, bool readAudioProperties) 
+  : EBML::File(file), d(0)
 {
   if(isValid() && isOpen()) {
-    d = FilePrivate::checkAndCreate(this);
+    d.reset(FilePrivate::checkAndCreate(this));
     if(!d)
       setValid(false);
     else
-    d->lateCreate();
+      d->lateCreate(this, readAudioProperties);
   }
 }
 
-EBML::Matroska::File::File(IOStream *stream) : EBML::File(stream), d(0)
+EBML::Matroska::File::File(IOStream *stream, bool readAudioProperties) 
+  : EBML::File(stream), d(0)
 {
   if(isValid() && isOpen()) {
-    d = FilePrivate::checkAndCreate(this);
+    d.reset(FilePrivate::checkAndCreate(this));
     if(!d)
       setValid(false);
     else
-      d->lateCreate();
+      d->lateCreate(this, readAudioProperties);
   }
 }
 
 Tag *EBML::Matroska::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 PropertyMap EBML::Matroska::File::properties() const
@@ -189,7 +186,7 @@ PropertyMap EBML::Matroska::File::setProperties(const PropertyMap &properties)
 
 AudioProperties *EBML::Matroska::File::audioProperties() const
 {
-  return d->audio;
+  return d->audioProperties.get();
 }
 
 bool EBML::Matroska::File::save()
@@ -207,8 +204,8 @@ bool EBML::Matroska::File::save()
       // No element? Create it!
       if(!i->second.first) {
         // Should be save, since we already checked, when creating the object.
-        Element *container = d->document->getDocumentRoot()
-          ->getChild(Constants::Segment)->getChild(Constants::Tags);
+        Element *container 
+          = getDocumentRoot()->getChild(Constants::Segment)->getChild(Constants::Tags);
         
         // Create Targets container
         i->second.first = container->addElement(Constants::Tag);
@@ -429,7 +426,6 @@ public:
 
 EBML::Matroska::File::Tag::~Tag()
 {
-  delete e;
 }
 
 EBML::Matroska::File::Tag::Tag(EBML::Matroska::File *document) :

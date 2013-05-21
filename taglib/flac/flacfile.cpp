@@ -57,7 +57,6 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
-    properties(0),
     flacStart(0),
     streamStart(0),
     streamLength(0),
@@ -74,7 +73,6 @@ public:
     for(size_t i = 0; i < size; i++) {
       delete blocks[i];
     }
-    delete properties;
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
@@ -85,7 +83,7 @@ public:
 
   TripleTagUnion tag;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
   List<MetadataBlock *> blocks;
@@ -145,7 +143,7 @@ PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 
 FLAC::AudioProperties *FLAC::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 
@@ -307,7 +305,7 @@ void FLAC::File::read(bool readProperties, AudioProperties::ReadStyle properties
     d->tag.set(FlacXiphIndex, new Ogg::XiphComment);
 
   if(readProperties)
-    d->properties = new AudioProperties(d->streamInfoData, d->streamLength, propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(d->streamInfoData, d->streamLength, propertiesStyle));
 }
 
 ByteVector FLAC::File::xiphCommentData() const

@@ -33,31 +33,30 @@ using namespace S3M;
 class S3M::File::FilePrivate
 {
 public:
-  FilePrivate(AudioProperties::ReadStyle propertiesStyle)
-    : properties(propertiesStyle)
-  {
-  }
-
   Mod::Tag        tag;
-  S3M::AudioProperties properties;
+  NonRefCountPtr<S3M::AudioProperties> audioProperties;
 };
 
 S3M::File::File(FileName file, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+                AudioProperties::ReadStyle propertiesStyle) 
+  : Mod::FileBase(file)
+  , d(new FilePrivate())
 {
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 S3M::File::File(IOStream *stream, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+                AudioProperties::ReadStyle propertiesStyle)
+  : Mod::FileBase(stream)
+  , d(new FilePrivate())
 {
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 S3M::File::~File()
@@ -72,7 +71,7 @@ Mod::Tag *S3M::File::tag() const
 
 S3M::AudioProperties *S3M::File::audioProperties() const
 {
-  return &d->properties;
+  return d->audioProperties.get();
 }
 
 bool S3M::File::save()
@@ -131,10 +130,9 @@ bool S3M::File::save()
   return true;
 }
 
-void S3M::File::read(bool)
+void S3M::File::read()
 {
-  if(!isOpen())
-    return;
+  d->audioProperties.reset(new AudioProperties());
 
   READ_STRING(d->tag.setTitle, 28);
   READ_BYTE_AS(mark);
@@ -147,22 +145,22 @@ void S3M::File::read(bool)
   READ_U16L_AS(length);
   READ_U16L_AS(sampleCount);
 
-  d->properties.setSampleCount(sampleCount);
+  d->audioProperties->setSampleCount(sampleCount);
 
-  READ_U16L(d->properties.setPatternCount);
-  READ_U16L(d->properties.setFlags);
-  READ_U16L(d->properties.setTrackerVersion);
-  READ_U16L(d->properties.setFileFormatVersion);
+  READ_U16L(d->audioProperties->setPatternCount);
+  READ_U16L(d->audioProperties->setFlags);
+  READ_U16L(d->audioProperties->setTrackerVersion);
+  READ_U16L(d->audioProperties->setFileFormatVersion);
 
   READ_ASSERT(readBlock(4) == "SCRM");
 
-  READ_BYTE(d->properties.setGlobalVolume);
-  READ_BYTE(d->properties.setBpmSpeed);
-  READ_BYTE(d->properties.setTempo);
+  READ_BYTE(d->audioProperties->setGlobalVolume);
+  READ_BYTE(d->audioProperties->setBpmSpeed);
+  READ_BYTE(d->audioProperties->setTempo);
 
   READ_BYTE_AS(masterVolume);
-  d->properties.setMasterVolume(masterVolume & 0x7f);
-  d->properties.setStereo((masterVolume & 0x80) != 0);
+  d->audioProperties->setMasterVolume(masterVolume & 0x7f);
+  d->audioProperties->setStereo((masterVolume & 0x80) != 0);
 
   // I've seen players who call the next two bytes
   // "ultra click" and "use panning values" (if == 0xFC).
@@ -180,7 +178,7 @@ void S3M::File::read(bool)
     // need a better spec!
     if(setting != 0xff) ++ channels;
   }
-  d->properties.setChannels(channels);
+  d->audioProperties->setChannels(channels);
 
   seek(96);
   ushort realLength = 0;
@@ -189,7 +187,7 @@ void S3M::File::read(bool)
     if(order == 255) break;
     if(order != 254) ++ realLength;
   }
-  d->properties.setLengthInPatterns(realLength);
+  d->audioProperties->setLengthInPatterns(realLength);
 
   seek(channels, Current);
 

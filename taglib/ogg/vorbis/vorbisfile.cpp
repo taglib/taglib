@@ -38,17 +38,15 @@ class Ogg::Vorbis::File::FilePrivate
 {
 public:
   FilePrivate() :
-    comment(0),
-    properties(0) {}
+    comment(0) {}
 
   ~FilePrivate()
   {
     delete comment;
-    delete properties;
   }
 
   Ogg::XiphComment *comment;
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 };
 
 namespace TagLib {
@@ -101,7 +99,7 @@ PropertyMap Ogg::Vorbis::File::setProperties(const PropertyMap &properties)
 
 Ogg::Vorbis::AudioProperties *Ogg::Vorbis::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool Ogg::Vorbis::File::save()
@@ -134,5 +132,5 @@ void Ogg::Vorbis::File::read(bool readProperties, AudioProperties::ReadStyle pro
   d->comment = new Ogg::XiphComment(commentHeaderData.mid(7));
 
   if(readProperties)
-    d->properties = new AudioProperties(this, propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(this, propertiesStyle));
 }
