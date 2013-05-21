@@ -204,17 +204,20 @@ namespace TagLib {
     /*!
      * Find the first occurrence of \a value.
      */
-    Iterator find(const T &value);
+    template <class U>
+    Iterator find(const U &value);
 
     /*!
      * Find the first occurrence of \a value.
      */
-    ConstIterator find(const T &value) const;
+    template <class U>
+    ConstIterator find(const U &value) const;
 
     /*!
      * Returns true if the list contains \a value.
      */
-    bool contains(const T &value) const;
+    template <class U>
+    bool contains(const U &value) const;
 
     /*!
      * Erase the item at \a it from the list.
