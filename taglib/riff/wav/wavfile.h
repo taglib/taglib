@@ -94,12 +94,10 @@ namespace TagLib {
         virtual ~File();
 
         /*!
-         * Returns the ID3v2 Tag for this file.
-         * 
-         * \note This method does not return all the tags for this file for 
-         * backward compatibility.  Will be fixed in TagLib 2.0.
+         * Returns the Tag for this file.  This will be an ID3v2 tag, an INFO tag
+         * or a combination of the two.
          */
-        ID3v2::Tag *tag() const;
+        virtual TagLib::Tag *tag() const;
 
         /*!
          * Returns the ID3v2 Tag for this file.

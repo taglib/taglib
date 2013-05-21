@@ -45,8 +45,7 @@ class RIFF::WAV::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tagChunkID("ID3 "),
-    tag(2)
+    tagChunkID("ID3 ")
   {
   }
 
@@ -59,7 +58,7 @@ public:
   
   ByteVector tagChunkID;
 
-  TagUnion tag;
+  DoubleTagUnion tag;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,9 +86,9 @@ RIFF::WAV::File::~File()
   delete d;
 }
 
-ID3v2::Tag *RIFF::WAV::File::tag() const
+TagLib::Tag *RIFF::WAV::File::tag() const
 {
-  return ID3v2Tag();
+  return &d->tag;
 }
 
 ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
