@@ -76,7 +76,7 @@ namespace TagLib {
       
       private:
         class AudioPropertiesPrivate;
-        AudioPropertiesPrivate *d;
+        NonRefCountPtr<AudioPropertiesPrivate> d;
       };
       
     }

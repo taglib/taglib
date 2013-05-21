@@ -30,9 +30,11 @@
 #include "tstring.h"
 #include "taglib_export.h"
 
-namespace TagLib {
-
-  namespace ASF {
+namespace TagLib 
+{
+  namespace ASF 
+  {
+    class File;
 
     //! An implementation of ASF audio properties
     class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
@@ -56,17 +58,17 @@ namespace TagLib {
       virtual int channels() const;
       bool isEncrypted() const;
 
-#ifndef DO_NOT_DOCUMENT
+    private:
+      friend class File;
+
       void setLength(int value);
       void setBitrate(int value);
       void setSampleRate(int value);
       void setChannels(int value);
       void setEncrypted(bool value);
-#endif
 
-    private:
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      NonRefCountPtr<PropertiesPrivate> d;
     };
 
   }

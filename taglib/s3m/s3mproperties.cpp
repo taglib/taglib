@@ -57,15 +57,14 @@ public:
   uchar  bpmSpeed;
 };
 
-S3M::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle)
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+S3M::AudioProperties::AudioProperties()
+  : d(new PropertiesPrivate())
 {
+  // Values will be set in S3M::File class
 }
 
 S3M::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
 int S3M::AudioProperties::length() const

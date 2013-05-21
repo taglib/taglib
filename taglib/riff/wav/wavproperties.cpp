@@ -35,17 +35,15 @@ using namespace TagLib;
 class RIFF::WAV::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(uint streamLength = 0) :
+  PropertiesPrivate() :
     format(0),
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
     sampleWidth(0),
-    sampleFrames(0),
-    streamLength(streamLength)
+    sampleFrames(0)
   {
-
   }
 
   short format;
@@ -55,7 +53,6 @@ public:
   int channels;
   int sampleWidth;
   uint sampleFrames;
-  uint streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,22 +60,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+  : d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate();
-  read(data);
+  read(data, 0);
 }
 
 RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+  : d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(streamLength);
-  read(data);
+  read(data, streamLength);
 }
 
 RIFF::WAV::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
 int RIFF::WAV::AudioProperties::length() const
@@ -115,7 +109,7 @@ TagLib::uint RIFF::WAV::AudioProperties::sampleFrames() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::AudioProperties::read(const ByteVector &data)
+void RIFF::WAV::AudioProperties::read(const ByteVector &data, uint streamLength)
 {
   d->format      = data.toInt16LE(0);
   d->channels    = data.toInt16LE(2);
@@ -125,7 +119,7 @@ void RIFF::WAV::AudioProperties::read(const ByteVector &data)
   const uint byteRate = data.toUInt32LE(8);
   d->bitrate = byteRate * 8 / 1000;
 
-  d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
+  d->length = byteRate > 0 ? streamLength / byteRate : 0;
   if(d->channels > 0 && d->sampleWidth > 0)
-    d->sampleFrames = d->streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
+    d->sampleFrames = streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
 }

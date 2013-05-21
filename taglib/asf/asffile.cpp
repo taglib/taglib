@@ -39,15 +39,17 @@ public:
   FilePrivate():
     size(0),
     tag(0),
-    properties(0),
     contentDescriptionObject(0),
     extendedContentDescriptionObject(0),
     headerExtensionObject(0),
     metadataObject(0),
     metadataLibraryObject(0) {}
+  
   unsigned long long size;
+  
   ASF::Tag *tag;
-  ASF::AudioProperties *properties;
+  NonRefCountPtr<ASF::AudioProperties> audioProperties;
+
   List<ASF::File::BaseObject *> objects;
   ASF::File::ContentDescriptionObject *contentDescriptionObject;
   ASF::File::ExtendedContentDescriptionObject *extendedContentDescriptionObject;
@@ -186,7 +188,7 @@ ByteVector ASF::File::FilePropertiesObject::guid()
 void ASF::File::FilePropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setLength((int)(data.toInt64LE(40) / 10000000L - data.toInt64LE(56) / 1000L));
+  file->d->audioProperties->setLength((int)(data.toInt64LE(40) / 10000000L - data.toInt64LE(56) / 1000L));
 }
 
 ByteVector ASF::File::StreamPropertiesObject::guid()
@@ -197,9 +199,9 @@ ByteVector ASF::File::StreamPropertiesObject::guid()
 void ASF::File::StreamPropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setChannels(data.toInt16LE(56));
-  file->d->properties->setSampleRate(data.toUInt32LE(58));
-  file->d->properties->setBitrate(data.toInt16LE(62) * 8 / 1000);
+  file->d->audioProperties->setChannels(data.toInt16LE(56));
+  file->d->audioProperties->setSampleRate(data.toUInt32LE(58));
+  file->d->audioProperties->setBitrate(data.toInt16LE(62) * 8 / 1000);
 }
 
 ByteVector ASF::File::ContentDescriptionObject::guid()
@@ -372,16 +374,22 @@ ASF::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle p
   : TagLib::File(file)
 {
   d = new FilePrivate;
+
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read();
 }
 
 ASF::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle propertiesStyle)
   : TagLib::File(stream)
 {
   d = new FilePrivate;
+
+  // readProperties is ignored. 
+  // Reading audio properties can't be separated from reading metadata.
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read();
 }
 
 ASF::File::~File()
@@ -391,9 +399,6 @@ ASF::File::~File()
   }
   if(d->tag) {
     delete d->tag;
-  }
-  if(d->properties) {
-    delete d->properties;
   }
   delete d;
 }
@@ -420,10 +425,10 @@ PropertyMap ASF::File::setProperties(const PropertyMap &properties)
 
 ASF::AudioProperties *ASF::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
-void ASF::File::read(bool /*readProperties*/, AudioProperties::ReadStyle /*propertiesStyle*/)
+void ASF::File::read()
 {
   if(!isValid())
     return;
@@ -436,7 +441,7 @@ void ASF::File::read(bool /*readProperties*/, AudioProperties::ReadStyle /*prope
   }
 
   d->tag = new ASF::Tag();
-  d->properties = new ASF::AudioProperties();
+  d->audioProperties.reset(new ASF::AudioProperties());
 
   bool ok;
   d->size = readQWORD(&ok);
@@ -482,7 +487,7 @@ void ASF::File::read(bool /*readProperties*/, AudioProperties::ReadStyle /*prope
       if(guid == contentEncryptionGuid ||
          guid == extendedContentEncryptionGuid ||
          guid == advancedContentEncryptionGuid) {
-        d->properties->setEncrypted(true);
+        d->audioProperties->setEncrypted(true);
       }
       obj = new UnknownObject(guid);
     }

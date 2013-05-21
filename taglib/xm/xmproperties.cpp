@@ -53,15 +53,14 @@ public:
   ushort bpmSpeed;
 };
 
-XM::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle)
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+XM::AudioProperties::AudioProperties()
+  : d(new PropertiesPrivate())
 {
+  // Values will be set in XM::File class.
 }
 
 XM::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
 int XM::AudioProperties::length() const

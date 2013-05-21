@@ -25,10 +25,14 @@
 #include "taglib.h"
 #include "audioproperties.h"
 
-namespace TagLib {
-  namespace S3M {
-    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties {
-      friend class File;
+namespace TagLib
+{
+  namespace S3M 
+  {
+    class File;
+
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties 
+    {
     public:
       /*! Flag bits. */
       enum {
@@ -41,7 +45,7 @@ namespace TagLib {
         CustomData           = 128
       };
 
-      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      AudioProperties();
       virtual ~AudioProperties();
 
       int length()     const;
@@ -61,6 +65,9 @@ namespace TagLib {
       uchar  tempo()             const;
       uchar  bpmSpeed()          const;
 
+    private:
+      friend class File;
+
       void setChannels(int channels);
 
       void setLengthInPatterns (ushort lengthInPatterns);
@@ -75,12 +82,8 @@ namespace TagLib {
       void setTempo            (uchar tempo);
       void setBpmSpeed         (uchar bpmSpeed);
 
-    private:
-      AudioProperties(const AudioProperties&);
-      AudioProperties &operator=(const AudioProperties&);
-
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      NonRefCountPtr<PropertiesPrivate> d;
     };
   }
 }

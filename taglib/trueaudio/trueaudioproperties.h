@@ -38,8 +38,6 @@ namespace TagLib {
 
     class File;
 
-    static const uint HeaderSize = 18;
-
     //! An implementation of audio property reading for TrueAudio
 
     /*!
@@ -54,7 +52,7 @@ namespace TagLib {
        * Create an instance of TrueAudio::AudioProperties with the data read from 
        * the ByteVector \a data.
        */
-      AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this TrueAudio::AudioProperties instance.
@@ -84,13 +82,10 @@ namespace TagLib {
       int ttaVersion() const;
 
     private:
-      AudioProperties(const AudioProperties &);
-      AudioProperties &operator=(const AudioProperties &);
-
-      void read();
+      void read(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      NonRefCountPtr<PropertiesPrivate> d;
     };
   }
 }

@@ -39,15 +39,13 @@ public:
   uchar lengthInPatterns;
 };
 
-Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) 
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+Mod::AudioProperties::AudioProperties() 
+  : d(new PropertiesPrivate())
 {
 }
 
 Mod::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
 int Mod::AudioProperties::length() const

@@ -80,14 +80,11 @@ namespace TagLib {
       int version() const;
 
     private:
-      AudioProperties(const AudioProperties &);
-      AudioProperties &operator=(const AudioProperties &);
-
-      void read();
-      unsigned int seekFinalIndex();
+      void read(File *file, offset_t streamLength, ReadStyle style);
+      unsigned int seekFinalIndex(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      NonRefCountPtr<PropertiesPrivate> d;
     };
   }
 }

@@ -42,17 +42,15 @@ class Speex::File::FilePrivate
 {
 public:
   FilePrivate() :
-    comment(0),
-    properties(0) {}
+    comment(0) {}
 
   ~FilePrivate()
   {
     delete comment;
-    delete properties;
   }
 
   Ogg::XiphComment *comment;
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -97,7 +95,7 @@ PropertyMap Speex::File::setProperties(const PropertyMap &properties)
 
 Speex::AudioProperties *Speex::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool Speex::File::save()
@@ -128,5 +126,5 @@ void Speex::File::read(bool readProperties, AudioProperties::ReadStyle propertie
   d->comment = new Ogg::XiphComment(commentHeaderData);
 
   if(readProperties)
-    d->properties = new AudioProperties(this, propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(this, propertiesStyle));
 }

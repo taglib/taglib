@@ -57,14 +57,8 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
-    properties(0),
     hasAPE(false),
     hasID3v1(false) {}
-
-  ~FilePrivate()
-  {
-    delete properties;
-  }
 
   offset_t APELocation;
   uint APESize;
@@ -73,7 +67,7 @@ public:
 
   DoubleTagUnion tag;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -121,7 +115,7 @@ PropertyMap APE::File::setProperties(const PropertyMap &properties)
 
 APE::AudioProperties *APE::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool APE::File::save()
@@ -249,9 +243,8 @@ void APE::File::read(bool readProperties, AudioProperties::ReadStyle /* properti
 
   // Look for APE audio properties
 
-  if(readProperties) {
-    d->properties = new AudioProperties(this);
-  }
+  if(readProperties)
+    d->audioProperties.reset(new AudioProperties(this));
 }
 
 offset_t APE::File::findAPE()

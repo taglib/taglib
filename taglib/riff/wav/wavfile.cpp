@@ -44,17 +44,12 @@ class RIFF::WAV::File::FilePrivate
 {
 public:
   FilePrivate() :
-    properties(0),
     tagChunkID("ID3 ")
   {
   }
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
   
   ByteVector tagChunkID;
 
@@ -118,7 +113,7 @@ PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 
 RIFF::WAV::AudioProperties *RIFF::WAV::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool RIFF::WAV::File::save()
@@ -195,7 +190,7 @@ void RIFF::WAV::File::read(bool readProperties, AudioProperties::ReadStyle prope
     d->tag.set(InfoIndex, new RIFF::Info::Tag);
 
   if(!formatData.isEmpty())
-    d->properties = new AudioProperties(formatData, streamLength, propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(formatData, streamLength, propertiesStyle));
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)

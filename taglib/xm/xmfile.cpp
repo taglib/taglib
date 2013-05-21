@@ -358,31 +358,26 @@ namespace
 class XM::File::FilePrivate
 {
 public:
-  FilePrivate(AudioProperties::ReadStyle propertiesStyle)
-    : tag(), properties(propertiesStyle)
-  {
-  }
-
   Mod::Tag       tag;
-  XM::AudioProperties properties;
+  NonRefCountPtr<XM::AudioProperties> audioProperties;
 };
 
 XM::File::File(FileName file, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+               AudioProperties::ReadStyle propertiesStyle)
+  : Mod::FileBase(file)
+  , d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 XM::File::File(IOStream *stream, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+               AudioProperties::ReadStyle propertiesStyle)
+  : Mod::FileBase(stream)
+  , d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties);
+    read();
 }
 
 XM::File::~File()
@@ -397,7 +392,7 @@ Mod::Tag *XM::File::tag() const
 
 XM::AudioProperties *XM::File::audioProperties() const
 {
-  return &d->properties;
+  return d->audioProperties.get();
 }
 
 bool XM::File::save()
@@ -502,10 +497,9 @@ bool XM::File::save()
   return true;
 }
 
-void XM::File::read(bool)
+void XM::File::read()
 {
-  if(!isOpen())
-    return;
+  d->audioProperties.reset(new AudioProperties());
 
   seek(0);
   ByteVector magic = readBlock(17);
@@ -518,7 +512,7 @@ void XM::File::read(bool)
   READ_ASSERT(escape == 0x1A || escape == 0x00);
 
   READ_STRING(d->tag.setTrackerName, 20);
-  READ_U16L(d->properties.setVersion);
+  READ_U16L(d->audioProperties->setVersion);
 
   READ_U32L_AS(headerSize);
   READ_ASSERT(headerSize >= 4);
@@ -547,14 +541,14 @@ void XM::File::read(bool)
 
   READ_ASSERT(count == size);
 
-  d->properties.setLengthInPatterns(length);
-  d->properties.setRestartPosition(restartPosition);
-  d->properties.setChannels(channels);
-  d->properties.setPatternCount(patternCount);
-  d->properties.setInstrumentCount(instrumentCount);
-  d->properties.setFlags(flags);
-  d->properties.setTempo(tempo);
-  d->properties.setBpmSpeed(bpmSpeed);
+  d->audioProperties->setLengthInPatterns(length);
+  d->audioProperties->setRestartPosition(restartPosition);
+  d->audioProperties->setChannels(channels);
+  d->audioProperties->setPatternCount(patternCount);
+  d->audioProperties->setInstrumentCount(instrumentCount);
+  d->audioProperties->setFlags(flags);
+  d->audioProperties->setTempo(tempo);
+  d->audioProperties->setBpmSpeed(bpmSpeed);
 
   seek(60 + headerSize);
 
@@ -643,7 +637,7 @@ void XM::File::read(bool)
     seek(offset, Current);
   }
 
-  d->properties.setSampleCount(sumSampleCount);
+  d->audioProperties->setSampleCount(sumSampleCount);
   String comment(intrumentNames.toString("\n"));
   if(sampleNames.size() > 0) {
     comment += "\n";

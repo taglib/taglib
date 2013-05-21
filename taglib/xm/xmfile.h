@@ -81,7 +81,7 @@ namespace TagLib {
         File(const File &);
         File &operator=(const File &);
 
-        void read(bool readProperties);
+        void read();
 
         class FilePrivate;
         FilePrivate *d;

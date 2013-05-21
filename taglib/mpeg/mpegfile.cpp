@@ -57,15 +57,12 @@ public:
     ID3v1Location(-1),
     hasID3v2(false),
     hasID3v1(false),
-    hasAPE(false),
-    properties(0)
+    hasAPE(false)
   {
-
   }
 
   ~FilePrivate()
   {
-    delete properties;
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
@@ -88,7 +85,7 @@ public:
   bool hasID3v1;
   bool hasAPE;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +141,7 @@ PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 
 MPEG::AudioProperties *MPEG::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool MPEG::File::save()
@@ -470,7 +467,7 @@ void MPEG::File::read(bool readProperties, AudioProperties::ReadStyle properties
   }
 
   if(readProperties)
-    d->properties = new AudioProperties(this, propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(this, propertiesStyle));
 
   // Make sure that we have our default tag types available.
 

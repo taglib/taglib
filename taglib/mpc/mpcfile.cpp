@@ -52,7 +52,6 @@ public:
     ID3v2Header(0),
     ID3v2Location(-1),
     ID3v2Size(0),
-    properties(0),
     scanned(false),
     hasAPE(false),
     hasID3v1(false),
@@ -61,7 +60,6 @@ public:
   ~FilePrivate()
   {
     delete ID3v2Header;
-    delete properties;
   }
 
   offset_t APELocation;
@@ -75,7 +73,7 @@ public:
 
   DoubleTagUnion tag;
 
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
   bool scanned;
 
   // These indicate whether the file *on disk* has these tags, not if
@@ -125,7 +123,7 @@ PropertyMap MPC::File::setProperties(const PropertyMap &properties)
 
 MPC::AudioProperties *MPC::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool MPC::File::save()
@@ -290,9 +288,8 @@ void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* properti
 
   // Look for MPC metadata
 
-  if(readProperties) {
-    d->properties = new AudioProperties(this, length() - d->ID3v2Size - d->APESize);
-  }
+  if(readProperties)
+    d->audioProperties.reset(new AudioProperties(this, length() - d->ID3v2Size - d->APESize));
 }
 
 offset_t MPC::File::findAPE()

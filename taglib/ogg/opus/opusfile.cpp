@@ -42,17 +42,15 @@ class Opus::File::FilePrivate
 {
 public:
   FilePrivate() :
-    comment(0),
-    properties(0) {}
+    comment(0) {}
 
   ~FilePrivate()
   {
     delete comment;
-    delete properties;
   }
 
   Ogg::XiphComment *comment;
-  AudioProperties *properties;
+  NonRefCountPtr<AudioProperties> audioProperties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +93,7 @@ PropertyMap Opus::File::setProperties(const PropertyMap &properties)
 
 Opus::AudioProperties *Opus::File::audioProperties() const
 {
-  return d->properties;
+  return d->audioProperties.get();
 }
 
 bool Opus::File::save()
@@ -133,5 +131,5 @@ void Opus::File::read(bool readProperties, AudioProperties::ReadStyle properties
   d->comment = new Ogg::XiphComment(commentHeaderData.mid(8));
 
   if(readProperties)
-    d->properties = new AudioProperties(this, propertiesStyle);
+    d->audioProperties.reset(new AudioProperties(this, propertiesStyle));
 }

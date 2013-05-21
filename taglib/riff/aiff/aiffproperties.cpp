@@ -40,7 +40,6 @@ public:
     sampleWidth(0),
     sampleFrames(0)
   {
-
   }
 
   int length;
@@ -55,9 +54,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) 
-  : TagLib::AudioProperties(style)
-  , d(new PropertiesPrivate())
+RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle /*style*/) 
+  : d(new PropertiesPrivate())
 {
   read(data);
 }

@@ -126,7 +126,7 @@ namespace TagLib {
       long long readQWORD(bool *ok = 0);
       static ByteVector renderString(const String &str, bool includeLength = false);
       String readString(int len);
-      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+      void read();
 
       friend class Attribute;
       friend class Picture;

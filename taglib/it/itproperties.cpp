@@ -63,15 +63,14 @@ public:
   uchar  pitchWheelDepth;
 };
 
-IT::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle)
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+IT::AudioProperties::AudioProperties()
+  : d(new PropertiesPrivate())
 {
+  // Values will be set in IT::File class.
 }
 
 IT::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
 int IT::AudioProperties::length() const

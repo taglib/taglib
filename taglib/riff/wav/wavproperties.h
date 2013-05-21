@@ -77,13 +77,10 @@ namespace TagLib {
         uint sampleFrames() const;
 
       private:
-        AudioProperties(const AudioProperties &);
-        AudioProperties &operator=(const AudioProperties &);
-
-        void read(const ByteVector &data);
+        void read(const ByteVector &data, uint streamLength);
 
         class PropertiesPrivate;
-        PropertiesPrivate *d;
+        NonRefCountPtr<PropertiesPrivate> d;
       };
     }
   }

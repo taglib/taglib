@@ -49,12 +49,12 @@ namespace TagLib {
         /*!
          * Constructs a Matroska File from a file name.
          */
-        File(FileName file);
+        File(FileName file, bool readAudioProperties = true);
         
         /*!
          *  Constructs a Matroska File from a stream.
          */
-        File(IOStream *stream);
+        File(IOStream *stream, bool readAudioProperties = true);
         
         /*!
          * Returns the pointer to a tag that allow access on common tags.
@@ -186,12 +186,12 @@ namespace TagLib {
         
         private:
           class TagPrivate;
-          TagPrivate *e;
+          NonRefCountPtr<TagPrivate> e;
         };
         
       private:
         class FilePrivate;
-        FilePrivate *d;
+        NonRefCountPtr<FilePrivate> d;
       };
       
     }

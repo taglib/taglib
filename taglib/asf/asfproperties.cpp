@@ -33,7 +33,9 @@ using namespace TagLib;
 class ASF::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(): length(0), bitrate(0), sampleRate(0), channels(0), encrypted(false) {}
+  PropertiesPrivate()
+    : length(0), bitrate(0), sampleRate(0), channels(0), encrypted(false) {}
+
   int length;
   int bitrate;
   int sampleRate;
@@ -46,15 +48,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::AudioProperties::AudioProperties() 
-  : TagLib::AudioProperties(AudioProperties::Average)
+  : d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
+  // Values will be set in ASF::File class.
 }
 
 ASF::AudioProperties::~AudioProperties()
 {
-  if(d)
-    delete d;
 }
 
 int ASF::AudioProperties::length() const

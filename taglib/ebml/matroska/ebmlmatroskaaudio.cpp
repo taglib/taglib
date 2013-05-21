@@ -32,8 +32,7 @@ class EBML::Matroska::AudioProperties::AudioPropertiesPrivate
 {
 public:
   // Constructor
-  AudioPropertiesPrivate(File *p_document) :
-    document(p_document),
+  AudioPropertiesPrivate(File *document) :
     length(0),
     bitrate(0),
     channels(1),
@@ -69,9 +68,7 @@ public:
       samplerate = static_cast<int>(value->getAsFloat());
   }
   
-  // The corresponding file
-  File *document;
-  
+ 
   // The length of the file
   int length;
   
@@ -89,15 +86,13 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-EBML::Matroska::AudioProperties::AudioProperties(File *document) :
-  TagLib::AudioProperties(TagLib::AudioProperties::Fast),
-  d(new AudioPropertiesPrivate(document))
+EBML::Matroska::AudioProperties::AudioProperties(File *document)
+  : d(new AudioPropertiesPrivate(document))
 {
 }
 
 EBML::Matroska::AudioProperties::~AudioProperties()
 {
-  delete d;
 }
 
 int EBML::Matroska::AudioProperties::length() const

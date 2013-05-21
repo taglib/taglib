@@ -81,13 +81,10 @@ namespace TagLib {
       ByteVector signature() const;
 
     private:
-      AudioProperties(const AudioProperties &);
-      AudioProperties &operator=(const AudioProperties &);
-
-      void read();
+      void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      NonRefCountPtr<PropertiesPrivate> d;
     };
   }
 }
