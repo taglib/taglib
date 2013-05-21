@@ -52,7 +52,6 @@ public:
     ID3v2Header(0),
     ID3v2Location(-1),
     ID3v2Size(0),
-    tag(2),
     properties(0),
     scanned(false),
     hasAPE(false),
@@ -74,7 +73,7 @@ public:
   offset_t ID3v2Location;
   uint ID3v2Size;
 
-  TagUnion tag;
+  DoubleTagUnion tag;
 
   AudioProperties *properties;
   bool scanned;

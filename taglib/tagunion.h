@@ -36,6 +36,7 @@ namespace TagLib {
    * \internal
    */
 
+  template <size_t COUNT>
   class TagUnion : public Tag
   {
   public:
@@ -45,7 +46,7 @@ namespace TagLib {
     /*!
      * Creates a TagLib::Tag that is the union of \a count tags.
      */
-    TagUnion(size_t count);
+    TagUnion();
 
     virtual ~TagUnion();
 
@@ -85,12 +86,15 @@ namespace TagLib {
     }
 
   private:
-    TagUnion(const Tag &);
-    TagUnion &operator=(const Tag &);
-
     class TagUnionPrivate;
     NonRefCountPtr<TagUnionPrivate> d;
   };
+
+  // If you add a new typedef here, add a corresponding explicit instantiation 
+  // at the end of tagunion.cpp as well. 
+
+  typedef TagUnion<2> DoubleTagUnion;
+  typedef TagUnion<3> TripleTagUnion;
 }
 
 #endif

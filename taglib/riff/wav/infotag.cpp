@@ -1,6 +1,6 @@
 /***************************************************************************
     copyright            : (C) 2012 by Tsuda Kageyu
-    email                : wheeler@kde.org
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -31,14 +31,15 @@
 using namespace TagLib;
 using namespace RIFF::Info;
 
-namespace {
-  static bool isValidChunkID(const ByteVector &name)
+namespace 
+{
+  bool isValidChunkID(const ByteVector &name)
   {
     if(name.size() != 4)
       return false;
 
     for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || name[i] > 127)
+      if(name[i] < 32 || 127 < name[i])
         return false;
     }
 
@@ -86,7 +87,9 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::Info::Tag::Tag(const ByteVector &data) : TagLib::Tag()
+RIFF::Info::Tag::Tag(const ByteVector &data) 
+  : TagLib::Tag()
+  , d(new TagPrivate())
 {
   parse(data);
 }
@@ -193,7 +196,7 @@ String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
 {
-  // id must be four-byte long pure ascii string.
+  // id must be four-byte long pure ASCII string.
   if(!isValidChunkID(id))
     return;
 

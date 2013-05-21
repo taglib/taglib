@@ -55,7 +55,6 @@ public:
     APEFooterLocation(-1),
     APEOriginalSize(0),
     ID3v1Location(-1),
-    tag(3),
     hasID3v2(false),
     hasID3v1(false),
     hasAPE(false),
@@ -80,7 +79,7 @@ public:
 
   offset_t ID3v1Location;
 
-  TagUnion tag;
+  TripleTagUnion tag;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.

@@ -54,7 +54,6 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
-    tag(2),
     properties(0),
     hasID3v1(false),
     hasID3v2(false) {}
@@ -70,7 +69,7 @@ public:
 
   offset_t ID3v1Location;
 
-  TagUnion tag;
+  DoubleTagUnion tag;
 
   AudioProperties *properties;
 
