@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #include <ebmlmatroskafile.h>
+#include <ebmlmatroskaaudio.h>
 
 using namespace std;
 using namespace TagLib;
@@ -15,6 +16,7 @@ class TestMatroska : public CppUnit::TestFixture
 	CPPUNIT_TEST_SUITE(TestMatroska);
 	CPPUNIT_TEST(testPredefined);
 	CPPUNIT_TEST(testInsertAndExtract);
+	CPPUNIT_TEST(testAudioProperties);
 	CPPUNIT_TEST_SUITE_END();
 	
 public:
@@ -94,6 +96,12 @@ public:
 		
 		AudioProperties* a = f.audioProperties();
 		CPPUNIT_ASSERT(a != 0);
+		
+		// Not a very nice assertion...
+		CPPUNIT_ASSERT_EQUAL(a->length(), 0);
+		// Bitrate is not nice and thus not tested.
+		CPPUNIT_ASSERT_EQUAL(a->sampleRate(), 44100);
+		CPPUNIT_ASSERT_EQUAL(a->channels(), 2);
 	}
 };
 

@@ -64,8 +64,8 @@ public:
     List<Element *> entries = elem->getChildren(Constants::Tag);
     for(List<Element *>::Iterator i = entries.begin(); i != entries.end(); ++i) {
       Element *target = (*i)->getChild(Constants::Targets);
-      ulli ttvalue = 0;
-      if(target && (target = (*i)->getChild(Constants::TargetTypeValue)))
+      ulli ttvalue = 50; // 50 is default (see spec.)
+      if(target && (target = target->getChild(Constants::TargetTypeValue)))
         ttvalue = target->getAsUnsigned();
       
       // Load all SimpleTags
@@ -198,7 +198,7 @@ bool EBML::Matroska::File::save()
     return false;
   
   // C++11 features would be nice: for(auto &i : d->tags) { /* ... */ }
-  // Well, here we just iterate over each extracted element.
+  // Well, here we just iterate each extracted element.
   for(List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator i = d->tags.begin();
     i != d->tags.end(); ++i) {
     
@@ -218,7 +218,7 @@ bool EBML::Matroska::File::save()
           target->addElement(Constants::TargetType, Constants::TRACK);
         else if(i->second.second == Constants::MostCommonGroupingValue)
           target->addElement(Constants::TargetType, Constants::ALBUM);
-          
+        
         target->addElement(Constants::TargetTypeValue, i->second.second);
       }
       

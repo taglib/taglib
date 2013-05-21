@@ -44,10 +44,11 @@ public:
     Element *value;
     
     if(info && (value = info->getChild(Constants::Duration))) {
-      length = static_cast<int>(value->getAsFloat());
-      if((value = info->getChild(Constants::TimecodeScale))){
-        length = static_cast<int>(length / (value->getAsUnsigned() * (1.0 / 1000000000)));
-      }
+      length = static_cast<int>(value->getAsFloat() / 1000000000.L);
+      if((value = info->getChild(Constants::TimecodeScale)))
+        length *= value->getAsUnsigned();
+      else
+		length *= 1000000;
     }
     
     info = elem->getChild(Constants::Tracks);
@@ -59,7 +60,7 @@ public:
     
     // Dirty bitrate:
     document->seek(0, File::End);
-    bitrate = static_cast<int>(8 * document->tell() / length / 1000);
+    bitrate = static_cast<int>(8 * document->tell() / ((length > 0) ? length : 1));
     
     if((value = info->getChild(Constants::Channels)))
       channels = static_cast<int>(value->getAsUnsigned());
