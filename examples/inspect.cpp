@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     FileRef f(argv[i]);
     if(!f.isNull() && f.file()) {
-      cout << f.file()->toString().to8Bit(true) << endl;
+      cout << f.file()->toString().toStdString(String::UTF8) << endl;
     }
 
   }
