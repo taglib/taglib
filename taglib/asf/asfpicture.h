@@ -35,6 +35,7 @@ namespace TagLib
 {
   namespace ASF
   {
+    class Attribute;
 
     //! An ASF attached picture interface implementation
 
@@ -46,7 +47,8 @@ namespace TagLib
      * \see Attribute::toPicture()
      * \see Attribute::Attribute(const Picture& picture)
      */
-    class TAGLIB_EXPORT Picture {
+    class TAGLIB_EXPORT Picture 
+    {
     public:
 
       /*!
@@ -107,17 +109,6 @@ namespace TagLib
        */
       Picture(const Picture& other);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-      /*!
-       * Constructs an picture equivalent to \a other.
-       *
-       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-       */
-      Picture(Picture &&other);
-
-#endif
-      
       /*!
        * Destroys the picture.
        */
@@ -127,17 +118,6 @@ namespace TagLib
        * Copies the contents of \a other into this picture.
        */
       Picture& operator=(const Picture& other);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-      /*!
-       * Moves the contents of \a other into this picture.
-       *
-       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-      */
-      Picture& operator=(Picture &&other);
-
-#endif
 
       /*!
        * Returns true if Picture stores valid picture
@@ -223,15 +203,14 @@ namespace TagLib
        */
       int dataSize() const;
 
-#ifndef DO_NOT_DOCUMENT
-      /* THIS IS PRIVATE, DON'T TOUCH IT! */
-      void parse(const ByteVector& );
-      static Picture fromInvalid();
-      friend class Attribute;
-#endif
     private:
+      friend class Attribute;
+
+      void parse(const ByteVector &);
+      static Picture fromInvalid();
+
       class PicturePrivate;
-      RefCountPtr<PicturePrivate> d;
+      PicturePrivate *d;
     };
   }
 }

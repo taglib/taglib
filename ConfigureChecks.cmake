@@ -118,54 +118,113 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
+# Determine where shared_ptr<T> is defined regardless of C++11 support.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() { std::shared_ptr<int> x; return 0; }
+" HAVE_STD_SHARED_PTR)
+
+if(NOT HAVE_STD_SHARED_PTR)
+  check_cxx_source_compiles("
+    #include <tr1/memory>
+    int main() { std::tr1::shared_ptr<int> x; return 0; }
+  " HAVE_TR1_SHARED_PTR)
+
+  if(NOT HAVE_TR1_SHARED_PTR)
+    check_cxx_source_compiles("
+      #include <boost/shared_ptr.hpp>
+      int main() { boost::shared_ptr<int> x; return 0; }
+    " HAVE_BOOST_SHARED_PTR)
+  endif()
+endif()
+
+# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() { std::unique_ptr<int> x; return 0; }
+" HAVE_STD_UNIQUE_PTR)
+
+if(NOT HAVE_STD_UNIQUE_PTR)
+  check_cxx_source_compiles("
+    #include <boost/scoped_ptr.hpp>
+    int main() { boost::scoped_ptr<int> x; return 0; }
+  " HAVE_BOOST_SCOPED_PTR)
+endif()
+
 # Determine which kind of atomic operations your compiler supports.
 
 check_cxx_source_compiles("
+  #include <atomic>
   int main() { 
-    volatile int x;
-    __sync_add_and_fetch(&x, 1);
-    int y = __sync_sub_and_fetch(&x, 1);
+    std::atomic<unsigned int> x;
+    x.fetch_add(1);
+    x.fetch_sub(1);
     return 0; 
   }
-" HAVE_GCC_ATOMIC)
+" HAVE_STD_ATOMIC)
 
-if(NOT HAVE_GCC_ATOMIC)
+if(NOT HAVE_STD_ATOMIC)
   check_cxx_source_compiles("
-    #include <libkern/OSAtomic.h>
+    #include <boost/atomic.hpp>
     int main() { 
-      volatile int32_t x;
-      OSAtomicIncrement32Barrier(&x);
-      int32_t y = OSAtomicDecrement32Barrier(&x);
+      boost::atomic<unsigned int> x(1);
+      x.fetch_add(1);
+      x.fetch_sub(1);
       return 0; 
     }
-  " HAVE_MAC_ATOMIC)
+  " HAVE_BOOST_ATOMIC)
 
-  if(NOT HAVE_MAC_ATOMIC)
+  if(NOT HAVE_BOOST_ATOMIC)
     check_cxx_source_compiles("
-      #include <windows.h>
       int main() { 
-        volatile LONG x;
-        InterlockedIncrement(&x);
-        LONG y = InterlockedDecrement(&x);
+        volatile int x;
+        __sync_add_and_fetch(&x, 1);
+        int y = __sync_sub_and_fetch(&x, 1);
         return 0; 
       }
-    " HAVE_WIN_ATOMIC)
+    " HAVE_GCC_ATOMIC)
 
-    if(NOT HAVE_WIN_ATOMIC)
+    if(NOT HAVE_GCC_ATOMIC)
       check_cxx_source_compiles("
-        #include <ia64intrin.h>
+        #include <libkern/OSAtomic.h>
         int main() { 
-          volatile int x;
-          __sync_add_and_fetch(&x, 1);
-          int y = __sync_sub_and_fetch(&x, 1);
+          volatile int32_t x;
+          OSAtomicIncrement32Barrier(&x);
+          int32_t y = OSAtomicDecrement32Barrier(&x);
           return 0; 
         }
-      " HAVE_IA64_ATOMIC)
+      " HAVE_MAC_ATOMIC)
+
+      if(NOT HAVE_MAC_ATOMIC)
+        check_cxx_source_compiles("
+          #include <windows.h>
+          int main() { 
+            volatile LONG x;
+            InterlockedIncrement(&x);
+            LONG y = InterlockedDecrement(&x);
+            return 0; 
+          }
+        " HAVE_WIN_ATOMIC)
+
+        if(NOT HAVE_WIN_ATOMIC)
+          check_cxx_source_compiles("
+            #include <ia64intrin.h>
+            int main() { 
+              volatile int x;
+              __sync_add_and_fetch(&x, 1);
+              int y = __sync_sub_and_fetch(&x, 1);
+              return 0; 
+            }
+          " HAVE_IA64_ATOMIC)
+        endif()
+      endif()
     endif()
   endif()
 endif()
 
-# Determine whether your compiler supports some safer version of sprintf.
+# Determine whether your compiler supports snpritf or sprintf_s.
 
 check_cxx_source_compiles("
   #include <cstdio>
@@ -196,52 +255,6 @@ if(ZLIB_FOUND)
   set(HAVE_ZLIB 1)
 else()
   set(HAVE_ZLIB 0)
-endif()
-
-# Determine whether your compiler supports move semantics.
-
-check_cxx_source_compiles("
-  #ifdef __clang__
-  # pragma clang diagnostic error \"-Wc++11-extensions\" 
-  #endif
-  #include <utility>
-  int func(int &&x) { return x - 1; }
-  int main() { return func(std::move(1)); }
-" TAGLIB_USE_MOVE_SEMANTICS)
-
-# Determine where shared_ptr<T> is defined regardless of C++11 support.
-
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::shared_ptr<int> x; return 0; }
-" TAGLIB_USE_STD_SHARED_PTR)
-
-if(NOT TAGLIB_USE_STD_SHARED_PTR)
-  check_cxx_source_compiles("
-    #include <tr1/memory>
-    int main() { std::tr1::shared_ptr<int> x; return 0; }
-  " TAGLIB_USE_TR1_SHARED_PTR)
-
-  if(NOT TAGLIB_USE_TR1_SHARED_PTR)
-    check_cxx_source_compiles("
-      #include <boost/shared_ptr.hpp>
-      int main() { boost::shared_ptr<int> x; return 0; }
-    " TAGLIB_USE_BOOST_SHARED_PTR)
-  endif()
-endif()
-
-# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
-
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::unique_ptr<int> x; return 0; }
-" TAGLIB_USE_STD_UNIQUE_PTR)
-
-if(NOT TAGLIB_USE_STD_UNIQUE_PTR)
-  check_cxx_source_compiles("
-    #include <boost/scoped_ptr.hpp>
-    int main() { boost::scoped_ptr<int> x; return 0; }
-  " TAGLIB_USE_BOOST_SCOPED_PTR)
 endif()
 
 # Determine whether CppUnit is installed.

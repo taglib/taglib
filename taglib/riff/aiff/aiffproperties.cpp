@@ -40,7 +40,6 @@ public:
     sampleWidth(0),
     sampleFrames(0)
   {
-
   }
 
   int length;
@@ -64,11 +63,12 @@ RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle s
 
 RIFF::AIFF::AudioProperties::~AudioProperties()
 {
+  delete d;
 }
 
 bool RIFF::AIFF::AudioProperties::isNull() const
 {
-  return (static_cast<bool>(d));
+  return (d == 0);
 }
 
 int RIFF::AIFF::AudioProperties::length() const

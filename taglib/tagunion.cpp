@@ -26,7 +26,7 @@
 #include "tagunion.h"
 #include "tstringlist.h"
 #include "tpropertymap.h"
-
+#include "tsmartptr.h"
 
 #define stringUnion(method)                                               \
   for(size_t j = 0; j < COUNT; ++j) {                                     \
@@ -56,7 +56,7 @@ namespace TagLib
   class TagUnion<COUNT>::TagUnionPrivate
   {
   public:
-    NonRefCountPtr<Tag> tags[COUNT];
+    SCOPED_PTR<Tag> tags[COUNT];
   };
 
   template <size_t COUNT>
@@ -68,6 +68,7 @@ namespace TagLib
   template <size_t COUNT>
   TagUnion<COUNT>::~TagUnion()
   {
+    delete d;
   }
 
   template <size_t COUNT>

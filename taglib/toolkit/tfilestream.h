@@ -142,7 +142,7 @@ namespace TagLib {
 
   private:
     class FileStreamPrivate;
-    NonRefCountPtr<FileStreamPrivate> d;
+    FileStreamPrivate *d;
   };
 
 }

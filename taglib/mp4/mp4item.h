@@ -56,14 +56,8 @@ namespace TagLib {
 
       Item();
       Item(const Item &item);
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-      Item(Item &&item);
-#endif
 
       Item &operator=(const Item &item);
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-      Item &operator=(Item &&item);
-#endif
       ~Item();
 
       Item(int value);
@@ -97,7 +91,7 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
-      RefCountPtr<ItemPrivate> d;
+      ItemPrivate *d;
     };
 
   }

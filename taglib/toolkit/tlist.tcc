@@ -1,3 +1,4 @@
+
 /***************************************************************************
     copyright            : (C) 2002 - 2008 by Scott Wheeler
     email                : wheeler@kde.org
@@ -23,8 +24,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <config.h>
 #include <algorithm>
+#include "trefcounter.h"
 
 namespace TagLib {
 
@@ -36,34 +37,30 @@ namespace TagLib {
 // template specialization.  This is implemented in such a way that calling
 // setAutoDelete() on non-pointer types will simply have no effect.
 
-// A base for the generic and specialized private class types.  New
-// non-templatized members should be added here.
-
-class ListPrivateBase
-{
-public:
-  ListPrivateBase() : autoDelete(false) {}
-  bool autoDelete;
-};
-
 // A generic implementation
 
 template <class T>
-template <class TP> class List<T>::ListPrivate  : public ListPrivateBase
+template <class TP> class List<T>::ListPrivate : public RefCounter
 {
 public:
-  ListPrivate() : ListPrivateBase() {}
-  ListPrivate(const std::list<TP> &l) : ListPrivateBase(), list(l) {}
+  ListPrivate() 
+  {
+  }
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
+  ListPrivate(const std::list<TP> &l) 
+    : list(l) 
+  {
+  }
 
-  ListPrivate(std::list<TP> &&l) : ListPrivateBase(), list(l) {}
-
-#endif
-
-  void clear() {
+  void clear() 
+  {
     std::list<TP>().swap(list);
   }
+
+  void setAutoDelete(bool)
+  {
+  }
+
   std::list<TP> list;
 };
 
@@ -71,38 +68,49 @@ public:
 // setAutoDelete() functionality.
 
 template <class T>
-template <class TP> class List<T>::ListPrivate<TP *>  : public ListPrivateBase
+template <class TP> class List<T>::ListPrivate<TP *> : public RefCounter
 {
 public:
-  ListPrivate() : ListPrivateBase() {}
-  ListPrivate(const std::list<TP *> &l) : ListPrivateBase(), list(l) {}
+  ListPrivate() 
+    : autoDelete(false)
+  {
+  }
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
+  ListPrivate(const std::list<TP *> &l) 
+    : list(l) 
+    , autoDelete(false)
+  {
+  }
 
-  ListPrivate(std::list<TP *> &&l) : ListPrivateBase(), list(l) {}
-
-#endif
-
-  ~ListPrivate() {
+  ~ListPrivate() 
+  {
     deletePointers();
   }
 
-  void clear() {
+  void clear() 
+  {
     deletePointers();
     std::list<TP *>().swap(list);
+  }
+
+  void setAutoDelete(bool del)
+  {
+    autoDelete = del;
   }
 
   std::list<TP *> list;
 
 private:
-  void deletePointers() {
-    if(!autoDelete)
-      return;
-    
-    typename std::list<TP *>::const_iterator it = list.begin();
-    for(; it != list.end(); ++it)
-    delete *it;
+  void deletePointers()
+  {
+    if(autoDelete) {
+      typename std::list<TP *>::const_iterator it = list.begin();
+      for(; it != list.end(); ++it)
+        delete *it;
+    }
   }
+
+  bool autoDelete;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,29 +119,22 @@ private:
 
 template <class T>
 List<T>::List()
-    : d(new ListPrivate<T>())
+  : d(new ListPrivate<T>())
 {
 }
 
 template <class T>
 List<T>::List(const List<T> &l) 
-: d(l.d)
+  : d(l.d)
 {
+  d->ref();
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class T>
-List<T>::List(List<T> &&l) 
-  : d(std::move(l.d))
-{
-}
-
-#endif 
 
 template <class T>
 List<T>::~List()
 {
+  if(d->deref())
+    delete d;
 }
 
 template <class T>
@@ -198,29 +199,6 @@ List<T> &List<T>::append(const List<T> &l)
   return *this;
 }
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class T>
-List<T> &List<T>::append(T &&item)
-{
-  detach();
-  d->list.push_back(item);
-  return *this;
-}
-
-template <class T>
-List<T> &List<T>::append(List<T> &&l)
-{
-  detach();
-  
-  for(Iterator it = l.begin(); it != l.end(); ++it)
-    d->list.push_back(std::move(*it));
-  
-  return *this;
-}
-
-#endif
-
 template <class T>
 List<T> &List<T>::prepend(const T &item)
 {
@@ -233,32 +211,9 @@ template <class T>
 List<T> &List<T>::prepend(const List<T> &l)
 {
   detach();
-  d->list.insert(d->list.begin(), l.d->list.begin(), l.d->list.end());
+  d->list.insert(d->list.begin(), l.begin(), l.end());
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class T>
-List<T> &List<T>::prepend(T &&item)
-{
-  detach();
-  d->list.push_front(item);
-  return *this;
-}
-
-template <class T>
-List<T> &List<T>::prepend(List<T> &&l)
-{
-  detach();
-  
-  for(typename std::list<T>::reverse_iterator it = l.d->list.rbegin(); it != l.d->list.rend(); ++it)
-    d->list.push_front(std::move(*it));
-  
-  return *this;
-}
-
-#endif
 
 template <class T>
 List<T> &List<T>::clear()
@@ -329,7 +284,7 @@ const T &List<T>::back() const
 template <class T>
 void List<T>::setAutoDelete(bool autoDelete)
 {
-  d->autoDelete = autoDelete;
+  d->setAutoDelete(autoDelete);
 }
 
 template <class T>
@@ -364,20 +319,15 @@ const T &List<T>::operator[](size_t i) const
 template <class T>
 List<T> &List<T>::operator=(const List<T> &l)
 {
+  if(&l == this)
+    return *this;
+
+  if(d->deref())
+    delete d;
   d = l.d;
+  d->ref();
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class T>
-List<T> &List<T>::operator=(List<T> &&l)
-{
-  d = std::move(l.d);
-  return *this;
-}
-
-#endif
 
 template <class T>
 bool List<T>::operator==(const List<T> &l) const
@@ -398,8 +348,11 @@ bool List<T>::operator!=(const List<T> &l) const
 template <class T>
 void List<T>::detach()
 {
-  if(!d.unique())
-    d.reset(new ListPrivate<T>(d->list));
+  if(!d->unique()) {
+    d->deref();
+    d = new ListPrivate<T>(d->list);
+  }
 }
 
 } // namespace TagLib
+

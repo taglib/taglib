@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "trefcounter.h"
+
 namespace TagLib {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -31,44 +33,21 @@ namespace TagLib {
 
 template <class Key, class T>
 template <class KeyP, class TP>
-class Map<Key, T>::MapPrivate
+class Map<Key, T>::MapPrivate : public RefCounter
 {
 public:
-  MapPrivate() {}
-
-#ifdef WANT_CLASS_INSTANTIATION_OF_MAP
-
-  MapPrivate(const std::map<class KeyP, class TP> &m) : RefCounter(), map(m) {}
-
-# ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-  MapPrivate(std::map<class KeyP, class TP> &&m) : RefCounter(), map(m) {}
-
-# endif
-
-  void clear() {
-    std::map<class KeyP, class TP>().swap(map);
+  MapPrivate() 
+    : RefCounter() 
+  {
   }
 
-  std::map<class KeyP, class TP> map;
-
-#else
-
-  MapPrivate(const std::map<KeyP, TP>& m) : map(m) {}
-
-# ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-  MapPrivate(std::map<KeyP, TP> &&m) : map(m) {}
-
-# endif
-
-  void clear() {
-    std::map<KeyP, TP>().swap(map);
+  MapPrivate(const MapType &m) 
+    : RefCounter()
+    , map(m) 
+  {
   }
-
-  std::map<KeyP, TP> map;
-
-#endif
+  
+  MapType map;
 };
 
 template <class Key, class T>
@@ -78,24 +57,16 @@ Map<Key, T>::Map()
 }
 
 template <class Key, class T>
-Map<Key, T>::Map(const Map<Key, T> &m) 
-  : d(m.d)
+Map<Key, T>::Map(const Map<Key, T> &m) : d(m.d)
 {
+  d->ref();
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class Key, class T>
-TagLib::Map<Key, T>::Map(Map<Key, T> &&m)
-  : d(std::move(m.d))
-{
-}
-
-#endif
 
 template <class Key, class T>
 Map<Key, T>::~Map()
 {
+  if(d->deref())
+    delete d;
 }
 
 template <class Key, class T>
@@ -131,18 +102,6 @@ Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
   d->map[key] = value;
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class Key, class T>
-Map<Key, T> &Map<Key, T>::insert(const Key &key, T &&value)
-{
-  detach();
-  d->map[key] = value;
-  return *this;
-}
-
-#endif
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::clear()
@@ -217,20 +176,15 @@ T &Map<Key, T>::operator[](const Key &key)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
+  if(&m == this)
+    return *this;
+
+  if(d->deref())
+    delete(d);
   d = m.d;
+  d->ref();
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-template <class Key, class T>
-Map<Key, T> &Map<Key, T>::operator=(Map<Key, T> &&m)
-{
-  d = std::move(m.d);
-  return *this;
-}
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
@@ -239,8 +193,12 @@ Map<Key, T> &Map<Key, T>::operator=(Map<Key, T> &&m)
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
-  if(!d.unique())
-    d.reset(new MapPrivate<Key, T>(d->map));
+  if(!d->unique()) {
+    d->deref();
+    d = new MapPrivate<Key, T>(d->map);
+  }
 }
 
 } // namespace TagLib
+
+

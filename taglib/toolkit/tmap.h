@@ -27,7 +27,6 @@
 #define TAGLIB_MAP_H
 
 #include "taglib.h"
-#include "tsmartptr.h"
 #include <map>
 
 namespace TagLib {
@@ -42,7 +41,7 @@ namespace TagLib {
 
   template <class Key, class T> class Map
   {
-  public:
+  private:
 #ifndef DO_NOT_DOCUMENT
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
     // Some STL implementations get snippy over the use of the
@@ -53,12 +52,16 @@ namespace TagLib {
     // Not all the specializations of Map can use the class keyword
     // (when T is not actually a class type), so don't apply this
     // generally.
-    typedef typename std::map<class Key, class T>::iterator Iterator;
-    typedef typename std::map<class Key, class T>::const_iterator ConstIterator;
+    typedef std::map<class Key, class T> MapType;
 #else
-    typedef typename std::map<Key, T>::iterator Iterator;
-    typedef typename std::map<Key, T>::const_iterator ConstIterator;
+    typedef std::map<Key, T> MapType;
 #endif
+#endif
+
+ public:
+#ifndef DO_NOT_DOCUMENT
+    typedef typename MapType::iterator Iterator;
+    typedef typename MapType::const_iterator ConstIterator;
 #endif
 
     /*!
@@ -72,17 +75,6 @@ namespace TagLib {
      * pass-by-value usage.
      */
     Map(const Map<Key, T> &m);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a m into this Map.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    Map(Map<Key, T> &&m);
-
-#endif
 
     /*!
      * Destroys this instance of the Map.
@@ -118,18 +110,6 @@ namespace TagLib {
      * exists it will be overwritten.
      */
     Map<Key, T> &insert(const Key &key, const T &value);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Inserts \a value under \a key in the map.  If a value for \a key already
-     * exists it will be overwritten.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    Map<Key, T> &insert(const Key &key, T &&value);
-
-#endif
 
     /*!
      * Removes all of the elements from elements from the map.  This however
@@ -197,17 +177,6 @@ namespace TagLib {
      */
     Map<Key, T> &operator=(const Map<Key, T> &m);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a m into this Map.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    Map<Key, T> &operator=(Map<Key, T> &&m);
-
-#endif
-
   protected:
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
@@ -219,8 +188,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class KeyP, class TP> class MapPrivate;
-    RefCountPtr<MapPrivate<Key, T> > d;
-
+    MapPrivate<Key, T> *d;
 #endif
   };
 }

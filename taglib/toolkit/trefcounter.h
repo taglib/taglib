@@ -1,7 +1,7 @@
-/**************************************************************************
-    copyright            : (C) 2009 by Lukáš Lalinský
-    email                : lalinsky@gmail.com
- **************************************************************************/
+/***************************************************************************
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
+ ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -23,66 +23,32 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifndef TAGLIB_REFCOUNTER_H
+#define TAGLIB_REFCOUNTER_H
+
 #include "taglib.h"
-#include "tdebug.h"
-#include "tsmartptr.h"
-#include "mp4coverart.h"
 
-using namespace TagLib;
-
-namespace
+#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
+/*!
+ * \warning This <b>is not</b> part of the TagLib public API!
+ */
+namespace TagLib
 {
-  struct CoverArtData
+  class RefCounter
   {
-    MP4::CoverArt::Format format;
-    ByteVector data;
+  public:
+    RefCounter();
+    virtual ~RefCounter();
+
+    void ref();
+    bool deref();
+    bool unique() const;
+
+  private:
+    class RefCounterPrivate;
+    RefCounterPrivate *d;
   };
 }
 
-class MP4::CoverArt::CoverArtPrivate 
-{
-public:
-  CoverArtPrivate(Format f, const ByteVector &v) 
-    : data(new CoverArtData())
-  {
-    data->format = f;
-    data->data   = v;
-  }
-
-  SHARED_PTR<CoverArtData> data;
-};
-
-MP4::CoverArt::CoverArt(Format format, const ByteVector &data)
-  : d(new CoverArtPrivate(format, data))
-{
-}
-
-MP4::CoverArt::CoverArt(const CoverArt &item) 
-  : d(new CoverArtPrivate(*item.d))
-{
-}
-
-MP4::CoverArt &
-MP4::CoverArt::operator=(const CoverArt &item)
-{
-  *d = *item.d;
-  return *this;
-}
-
-MP4::CoverArt::~CoverArt()
-{
-  delete d;
-}
-
-MP4::CoverArt::Format
-MP4::CoverArt::format() const
-{
-  return d->data->format;
-}
-
-ByteVector
-MP4::CoverArt::data() const
-{
-  return d->data->data;
-}
-
+#endif // DO_NOT_DOCUMENT
+#endif

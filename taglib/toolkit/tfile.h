@@ -278,13 +278,14 @@ namespace TagLib {
     static size_t bufferSize();
 
   private:
+    // Noncopyable. Derived classes as well.
     File(const File &);
     File &operator=(const File &);
 
     class FilePrivateBase;
     class ManagedFilePrivate;
     class UnmanagedFilePrivate;
-    NonRefCountPtr<FilePrivateBase> d;
+    FilePrivateBase *d;
   };
 
 }

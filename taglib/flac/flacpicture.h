@@ -199,8 +199,6 @@ namespace TagLib {
       PicturePrivate *d;
     };
 
-    typedef List<Picture> PictureList;
-
   }
 
 }
