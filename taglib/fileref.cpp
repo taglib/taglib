@@ -56,6 +56,7 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
+#include "ebmlmatroskafile.h"
 
 using namespace TagLib;
 
@@ -150,6 +151,8 @@ namespace
         file.reset(new IT::File(fileName, readAudioProperties, audioPropertiesStyle));
       else if(ext == "XM")
         file.reset(new XM::File(fileName, readAudioProperties, audioPropertiesStyle));
+      else if(ext == "MKA")
+        file.reset(new EBML::Matroska::File(fileName, readAudioProperties, audioPropertiesStyle));
     }
 
     return file;

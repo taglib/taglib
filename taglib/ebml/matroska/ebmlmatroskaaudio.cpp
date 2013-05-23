@@ -46,7 +46,7 @@ public:
     if(info && (value = info->getChild(Constants::Duration))) {
       length = static_cast<int>(value->getAsFloat() / 1000000000.L);
       if((value = info->getChild(Constants::TimecodeScale)))
-        length *= value->getAsUnsigned();
+        length *= static_cast<int>(value->getAsUnsigned());
       else
         length *= 1000000;
     }

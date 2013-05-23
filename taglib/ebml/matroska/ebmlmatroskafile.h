@@ -28,6 +28,7 @@
 #define TAGLIB_EBMLMATROSKAFILE_H
 
 #include "ebmlelement.h"
+#include "audioproperties.h"
 
 namespace TagLib {
   
@@ -49,12 +50,14 @@ namespace TagLib {
         /*!
          * Constructs a Matroska File from a file name.
          */
-        File(FileName file);
+        File(FileName file, bool readProperties = true,
+             AudioProperties::ReadStyle readStyle = AudioProperties::Average);
         
         /*!
          *  Constructs a Matroska File from a stream.
          */
-        File(IOStream *stream);
+        File(IOStream *stream, bool readProperties = true,
+             AudioProperties::ReadStyle readStyle = AudioProperties::Average);
         
         /*!
          * Returns the pointer to a tag that allow access on common tags.
