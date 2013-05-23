@@ -40,7 +40,7 @@ namespace
 {
 #ifdef _WIN32
 
-  // Using Win32 native API instead of standard C file I/O to reduce the resource consumption.
+  // Uses Win32 native API instead of POSIX API to reduce the resource consumption.
 
   typedef FileName FileNameHandle;
   typedef HANDLE FileHandle;
@@ -155,14 +155,12 @@ public:
     : file(InvalidFileHandle)
     , name(fileName)
     , readOnly(true)
-    , size(0)
   {
   }
 
   FileHandle file;
   FileNameHandle name;
   bool readOnly;
-  offset_t size;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -320,9 +318,6 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
     
     buffer = aboutToOverwrite;
   }
-
-  // Clear the file size cache. 
-  d->size = 0;
 }
 
 void FileStream::removeBlock(offset_t start, size_t length)
@@ -339,23 +334,23 @@ void FileStream::removeBlock(offset_t start, size_t length)
 
   ByteVector buffer(bufferLength, 0);
 
-  while(true) {
+  for(size_t bytesRead = -1; bytesRead != 0;)
+  {
     seek(readPosition);
-    const size_t bytesRead = readFile(d->file, buffer);
+    bytesRead = readFile(d->file, buffer);
     readPosition += bytesRead;
 
     // Check to see if we just read the last block.  We need to call clear()
     // if we did so that the last write succeeds.
 
-    if(bytesRead < bufferLength)
+    if(bytesRead < buffer.size()) {
       clear();
+      buffer.resize(bytesRead);
+    }
 
     seek(writePosition);
     writeFile(d->file, buffer);
 
-    if(bytesRead == 0)
-      break;
-    
     writePosition += bytesRead;
   }
 
@@ -402,7 +397,7 @@ void FileStream::seek(offset_t offset, Position p)
 
   SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
   if(GetLastError() != NO_ERROR) {
-    debug("File::seek() -- Failed to set the file size.");
+    debug("File::seek() -- Failed to set the file pointer.");
   }
 
 #else
@@ -488,11 +483,6 @@ offset_t FileStream::length()
     return 0;
   }
 
-  // Do some caching in case we do multiple calls.
-
-  if(d->size > 0)
-    return d->size;
-
 #ifdef _WIN32
 
   LARGE_INTEGER fileSize;
@@ -500,12 +490,10 @@ offset_t FileStream::length()
 
   fileSize.LowPart = GetFileSize(d->file, reinterpret_cast<LPDWORD>(&fileSize.HighPart));
   if(GetLastError() == NO_ERROR) {
-    d->size = fileSize.QuadPart;
-    return d->size;
+    return fileSize.QuadPart;
   }
   else {
     debug("File::length() -- Failed to get the file size.");
-    d->size = 0;
     return 0;
   }
 
@@ -518,7 +506,6 @@ offset_t FileStream::length()
 
   seek(currentPosition, Beginning);
 
-  d->size = endPosition;
   return endPosition;
 
 #endif
