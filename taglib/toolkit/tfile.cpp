@@ -66,6 +66,15 @@
 
 using namespace TagLib;
 
+namespace
+{
+#ifdef _WIN32
+  const uint BufferSize = 8192;
+#else
+  const uint BufferSize = 1024;
+#endif
+}
+
 class File::FilePrivate
 {
 public:
@@ -74,7 +83,6 @@ public:
   IOStream *stream;
   bool streamOwner;
   bool valid;
-  static const uint bufferSize = 1024;
 };
 
 File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
@@ -237,7 +245,7 @@ void File::writeBlock(const ByteVector &data)
 
 long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > d->bufferSize)
+  if(!d->stream || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
@@ -278,20 +286,20 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
   // then check for "before".  The order is important because it gives priority
   // to "real" matches.
 
-  for(buffer = readBlock(d->bufferSize); buffer.size() > 0; buffer = readBlock(d->bufferSize)) {
+  for(buffer = readBlock(bufferSize()); buffer.size() > 0; buffer = readBlock(bufferSize())) {
 
     // (1) previous partial match
 
-    if(previousPartialMatch >= 0 && int(d->bufferSize) > previousPartialMatch) {
-      const int patternOffset = (d->bufferSize - previousPartialMatch);
+    if(previousPartialMatch >= 0 && int(bufferSize()) > previousPartialMatch) {
+      const int patternOffset = (bufferSize() - previousPartialMatch);
       if(buffer.containsAt(pattern, 0, patternOffset)) {
         seek(originalPosition);
-        return bufferOffset - d->bufferSize + previousPartialMatch;
+        return bufferOffset - bufferSize() + previousPartialMatch;
       }
     }
 
-    if(!before.isNull() && beforePreviousPartialMatch >= 0 && int(d->bufferSize) > beforePreviousPartialMatch) {
-      const int beforeOffset = (d->bufferSize - beforePreviousPartialMatch);
+    if(!before.isNull() && beforePreviousPartialMatch >= 0 && int(bufferSize()) > beforePreviousPartialMatch) {
+      const int beforeOffset = (bufferSize() - beforePreviousPartialMatch);
       if(buffer.containsAt(before, 0, beforeOffset)) {
         seek(originalPosition);
         return -1;
@@ -318,7 +326,7 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
     if(!before.isNull())
       beforePreviousPartialMatch = buffer.endsWithPartialMatch(before);
 
-    bufferOffset += d->bufferSize;
+    bufferOffset += bufferSize();
   }
 
   // Since we hit the end of the file, reset the status before continuing.
@@ -333,7 +341,7 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
 
 long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > d->bufferSize)
+  if(!d->stream || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
@@ -357,17 +365,17 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
 
   long bufferOffset;
   if(fromOffset == 0) {
-    seek(-1 * int(d->bufferSize), End);
+    seek(-1 * int(bufferSize()), End);
     bufferOffset = tell();
   }
   else {
-    seek(fromOffset + -1 * int(d->bufferSize), Beginning);
+    seek(fromOffset + -1 * int(bufferSize()), Beginning);
     bufferOffset = tell();
   }
 
   // See the notes in find() for an explanation of this algorithm.
 
-  for(buffer = readBlock(d->bufferSize); buffer.size() > 0; buffer = readBlock(d->bufferSize)) {
+  for(buffer = readBlock(bufferSize()); buffer.size() > 0; buffer = readBlock(bufferSize())) {
 
     // TODO: (1) previous partial match
 
@@ -386,7 +394,7 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
 
     // TODO: (3) partial match
 
-    bufferOffset -= d->bufferSize;
+    bufferOffset -= bufferSize();
     seek(bufferOffset);
   }
 
@@ -485,7 +493,7 @@ bool File::isWritable(const char *file)
 
 TagLib::uint File::bufferSize()
 {
-  return FilePrivate::bufferSize;
+  return BufferSize;
 }
 
 void File::setValid(bool valid)

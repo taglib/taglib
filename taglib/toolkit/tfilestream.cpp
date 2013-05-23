@@ -40,11 +40,12 @@ namespace
 {
 #ifdef _WIN32
 
-  // Using Win32 native API instead of standard C file I/O to reduce the resource consumption.
+  // Uses Win32 native API instead of POSIX API to reduce the resource consumption.
 
   typedef FileName FileNameHandle;
-
   typedef HANDLE FileHandle;
+
+  const uint BufferSize = 8192;
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -120,6 +121,8 @@ namespace
   };
 
   typedef FILE* FileHandle;
+
+  const uint BufferSize = 8192;
   const FileHandle InvalidFileHandle = 0;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -152,16 +155,12 @@ public:
     : file(InvalidFileHandle)
     , name(fileName)
     , readOnly(true)
-    , size(0)
   {
   }
 
   FileHandle file;
   FileNameHandle name;
   bool readOnly;
-  ulong size;
-
-  static const uint bufferSize = 1024;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -337,23 +336,23 @@ void FileStream::removeBlock(ulong start, ulong length)
 
   ByteVector buffer(static_cast<uint>(bufferLength));
 
-  while(true) {
+  for(size_t bytesRead = -1; bytesRead != 0;)
+  {
     seek(readPosition);
-    const size_t bytesRead = readFile(d->file, buffer);
+    bytesRead = readFile(d->file, buffer);
     readPosition += bytesRead;
 
     // Check to see if we just read the last block.  We need to call clear()
     // if we did so that the last write succeeds.
 
-    if(bytesRead < bufferLength)
+    if(bytesRead < buffer.size()) {
       clear();
+      buffer.resize(bytesRead);
+    }
 
     seek(writePosition);
     writeFile(d->file, buffer);
 
-    if(bytesRead == 0)
-      break;
-    
     writePosition += bytesRead;
   }
 
@@ -397,7 +396,7 @@ void FileStream::seek(long offset, Position p)
 
   SetFilePointer(d->file, offset, NULL, whence);
   if(GetLastError() != NO_ERROR) {
-    debug("File::seek() -- Failed to set the file size.");
+    debug("File::seek() -- Failed to set the file pointer.");
   }
 
 #else
@@ -463,21 +462,14 @@ long FileStream::length()
     return 0;
   }
 
-  // Do some caching in case we do multiple calls.
-
-  if(d->size > 0)
-    return d->size;
-
 #ifdef _WIN32
 
   const DWORD fileSize = GetFileSize(d->file, NULL);
   if(GetLastError() == NO_ERROR) {
-    d->size = static_cast<ulong>(fileSize);
-    return d->size;
+    return static_cast<ulong>(fileSize);
   }
   else {
     debug("File::length() -- Failed to get the file size.");
-    d->size = 0;
     return 0;
   }
 
@@ -490,7 +482,6 @@ long FileStream::length()
 
   seek(curpos, Beginning);
 
-  d->size = endpos;
   return endpos;
 
 #endif
@@ -526,5 +517,5 @@ void FileStream::truncate(long length)
 
 TagLib::uint FileStream::bufferSize()
 {
-  return FileStreamPrivate::bufferSize;
+  return BufferSize;
 }
