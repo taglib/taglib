@@ -60,7 +60,7 @@ public:
     CPPUNIT_ASSERT(strcmp(unicode.toCString(), "Jos\xe9 Carlos") == 0);
 
     String latin = "Jos\xe9 Carlos";
-    CPPUNIT_ASSERT(strcmp(latin.toCString(true), "José Carlos") == 0);
+    CPPUNIT_ASSERT(strcmp(latin.toCString(String::UTF8), "José Carlos") == 0);
 
     String c;
     c = "1";
@@ -69,7 +69,7 @@ public:
     c = L'\u4E00';
     CPPUNIT_ASSERT(c == L"\u4E00");
 
-    String unicode2(unicode.to8Bit(true), String::UTF8);
+    String unicode2(unicode.toStdString(String::UTF8), String::UTF8);
     CPPUNIT_ASSERT(unicode == unicode2);
 
     CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);

@@ -173,23 +173,24 @@ namespace TagLib {
     virtual ~String();
 
     /*!
-     * If \a unicode if false (the default) this will return a \e Latin1 encoded
-     * std::string.  If it is true the returned std::std::wstring will be UTF-8
-     * encoded.
+     * Returns a std::string version of the TagLib string.  If \t is \a Latin1, 
+     * the string is encoded in Latin-1.  If \t is \a UTF8 the string is encoded
+     * in UTF-8.  Other types are not acceptable.
      */
-    std::string to8Bit(bool unicode = false) const;
+    std::string toStdString(Type t = Latin1) const;
 
     /*!
-     * Returns a std::wstring version of the TagLib string as a wide string.
+    * Returns a std::wstring version of the TagLib string.  The string is encoded 
+    * in UTF-16(without BOM/CPU byte order).
      */
-    const std::wstring &toWString() const;
+    const std::wstring &toStdWString() const;
 
     /*!
      * Creates and returns a C-String based on the data.  This string is still
      * owned by the String (class) and as such should not be deleted by the user.
      *
-     * If \a unicode if false (the default) this string will be encoded in
-     * \e Latin1.  If it is true the returned C-String will be UTF-8 encoded.
+     * If \t is \a Latin1, the string is encoded in Latin-1.  If \t is \a UTF8 the 
+     * string is encoded in UTF-8.  Other types are not acceptable.
      *
      * This string remains valid until the String instance is destroyed or
      * another export method is called.
@@ -199,7 +200,7 @@ namespace TagLib {
      * String instance.  So, this method should not be used on large strings or
      * where memory is critical.
      */
-    const char *toCString(bool unicode = false) const;
+    const char *toCString(String::Type t = Latin1) const;
 
     /*!
      * Returns an iterator pointing to the beginning of the string.

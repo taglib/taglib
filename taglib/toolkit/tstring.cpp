@@ -312,38 +312,50 @@ String::~String()
   delete d;
 }
 
-std::string String::to8Bit(bool unicode) const
+std::string String::toStdString(String::Type t) const
 {
   std::string s;
 
-  if(!unicode) {
-    s.resize(d->data->size());
+  switch (t)
+  {
+  case TagLib::String::Latin1:
+    {
+      s.resize(d->data.size());
 
-    std::string::iterator targetIt = s.begin();
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-      *targetIt = static_cast<char>(*it);
-      ++targetIt;
+      std::string::iterator targetIt = s.begin();
+      for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+        *targetIt = static_cast<char>(*it);
+        ++targetIt;
+      }
     }
-  }
-  else {
-    s.resize(d->data->size() * 4 + 1);
+    break;
+  case TagLib::String::UTF8:
+    {
+      s.resize(d->data.size() * 4 + 1);
 
-    UTF16toUTF8(&(*d->data)[0], d->data->size(), &s[0], s.size());
-    s.resize(::strlen(s.c_str()));
+      UTF16toUTF8(&d->data[0], d->data.size(), &s[0], s.size());
+      s.resize(::strlen(s.c_str()));
+    }
+    break;
+  default:
+    {
+      debug("String::toStdString() - Invalid Type value.");
+    }
+  break;
   }
 
   return s;
 }
 
-const std::wstring &String::toWString() const
+const std::wstring &String::toStdWString() const
 {
   return *d->data;
 }
 
-const char *String::toCString(bool unicode) const
+const char *String::toCString(String::Type t) const
 {
-  d->cstring.reset(new std::string(to8Bit(unicode)));
-  return d->cstring->c_str();
+  d->cstring = toStdString(t);
+  return d->cstring.c_str();
 }
 
 String::Iterator String::begin()
@@ -888,7 +900,7 @@ const String operator+(const String &s1, const char *s2)
 
 std::ostream &operator<<(std::ostream &s, const TagLib::String &str)
 {
-  s << str.to8Bit();
+  s << str.toStdString();
   return s;
 }
 }
