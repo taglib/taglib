@@ -27,7 +27,6 @@
 #define TAGLIB_LIST_H
 
 #include "taglib.h"
-#include "tsmartptr.h"
 #include <list>
 
 namespace TagLib {
@@ -69,17 +68,6 @@ namespace TagLib {
      * pass-by-value usage.
      */
     List(const List<T> &l);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a l into this List.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    List(List<T> &&l);
-
-#endif 
 
     /*!
      * Destroys this List instance.  If auto deletion is enabled and this list
@@ -135,26 +123,6 @@ namespace TagLib {
      */
     List<T> &append(const List<T> &l);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Appends \a item to the end of the list and returns a reference to the
-     * list.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    List<T> &append(T &&item);
-
-    /*!
-     * Appends all of the values in \a l to the end of the list and returns a
-     * reference to the list.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    List<T> &append(List<T> &&l);
-
-#endif
-
     /*!
      * Prepends \a item to the beginning list and returns a reference to the
      * list.
@@ -166,26 +134,6 @@ namespace TagLib {
      * reference to the list.
      */
     List<T> &prepend(const List<T> &l);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Prepends \a item to the beginning list and returns a reference to the
-     * list.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    List<T> &prepend(T &&item);
-
-    /*!
-     * Prepends all of the items in \a l to the beginning list and returns a
-     * reference to the list.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    List<T> &prepend(List<T> &&l);
-
-#endif
 
     /*!
      * Clears the list.  If auto deletion is enabled and this list contains a
@@ -275,17 +223,6 @@ namespace TagLib {
      */
     List<T> &operator=(const List<T> &l);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a l into this List.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    List<T> &operator=(List<T> &&l);
-
-#endif 
-
     /*!
      * Compares this list with \a l and returns true if all of the elements are
      * the same.
@@ -308,7 +245,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class TP> class ListPrivate;
-    RefCountPtr<ListPrivate<T> > d;
+    ListPrivate<T> *d;
 #endif
   };
 

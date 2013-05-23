@@ -143,17 +143,6 @@ namespace TagLib {
      */
     FileRef(const FileRef &ref);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Move \a ref into the FileRef.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    FileRef(FileRef &&ref);
-
-#endif
-
     /*!
      * Destroys this FileRef instance.
      */
@@ -286,17 +275,6 @@ namespace TagLib {
      */
     FileRef &operator=(const FileRef &ref);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a ref into this FileRef.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    FileRef &operator=(FileRef &&ref);
-
-#endif
-
     /*!
      * Returns true if this FileRef and \a ref point to the same File object.
      */
@@ -310,7 +288,7 @@ namespace TagLib {
 
   private:
     class FileRefPrivate;
-    RefCountPtr<FileRefPrivate> d;
+    FileRefPrivate *d;
   };
 
 } // namespace TagLib

@@ -28,7 +28,6 @@
 
 #include "taglib_export.h"
 #include "taglib.h"
-#include "tsmartptr.h"
 #include <vector>
 #include <iostream>
 
@@ -67,17 +66,6 @@ namespace TagLib {
      * Constructs a byte vector that is a copy of \a v.
      */
     ByteVector(const ByteVector &v);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Constructs a byte vector equivalent to \a v.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    ByteVector(ByteVector &&v);
-
-#endif
 
     /*!
      * Constructs a byte vector that is a copy of \a v.
@@ -502,17 +490,6 @@ namespace TagLib {
      */
     ByteVector &operator=(const ByteVector &v);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a v into this ByteVector.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    ByteVector &operator=(ByteVector &&v);
-
-#endif
-
     /*!
      * Copies ByteVector \a v.
      */
@@ -551,7 +528,7 @@ namespace TagLib {
 
   private:
     class ByteVectorPrivate;
-    RefCountPtr<ByteVectorPrivate> d;
+    ByteVectorPrivate *d;
   };
 
   /*!

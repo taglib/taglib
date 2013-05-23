@@ -41,8 +41,9 @@
 # include <sys/endian.h>
 #endif
 
-#include <tstring.h>
-#include <tdebug.h>
+#include "tstring.h"
+#include "tdebug.h"
+#include "tsmartptr.h"
 #include "tbytevector.h"
 
 // This is a bit ugly to keep writing over and over again.
@@ -366,16 +367,9 @@ public:
   {
   }
 
-  ByteVectorPrivate(RefCountPtr<ByteVectorPrivate> d, size_t o, size_t l)
+  ByteVectorPrivate(ByteVectorPrivate* d, size_t o, size_t l)
     : data(d->data)
     , offset(d->offset + o)
-    , length(l)
-  {
-  }
-
-  ByteVectorPrivate(const std::vector<char> &v, size_t o, size_t l)
-    : data(new std::vector<char>(v.begin() + o, v.begin() + o + l))
-    , offset(0)
     , length(l)
   {
   }
@@ -406,15 +400,7 @@ public:
   {
   }
 
-  ByteVectorPrivate &operator=(const ByteVectorPrivate &x)
-  {
-    if(&x != this)
-      data = x.data;
-
-    return *this;
-  }
-
-  RefCountPtr<std::vector<char> > data;
+  SHARED_PTR<std::vector<char> > data;
   size_t offset;
   size_t length;
 };
@@ -480,7 +466,7 @@ ByteVector::ByteVector(size_t size, char value)
 }
 
 ByteVector::ByteVector(const ByteVector &v) 
-  : d(v.d)
+  : d(new ByteVectorPrivate(*v.d))
 {
 }
 
@@ -488,15 +474,6 @@ ByteVector::ByteVector(const ByteVector &v, size_t offset, size_t length)
   : d(new ByteVectorPrivate(v.d, offset, length))
 {
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-ByteVector::ByteVector(ByteVector &&v) 
-  : d(std::move(v.d))
-{
-}
-
-#endif
 
 ByteVector::ByteVector(char c)
   : d(new ByteVectorPrivate(1, c))
@@ -515,6 +492,7 @@ ByteVector::ByteVector(const char *data)
 
 ByteVector::~ByteVector()
 {
+  delete d;
 }
 
 ByteVector &ByteVector::setData(const char *data, size_t length)
@@ -641,8 +619,8 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   }
 
   // new private data of appropriate size:
-  ByteVectorPrivate *newData = new ByteVectorPrivate(newSize, 0);
-  char *target = DATA(newData);
+  ByteVectorPrivate newData(newSize, '\0');
+  char *target = &(*newData.data)[0];
   const char *source = DATA(d);
 
   // copy modified data into new private data:
@@ -662,7 +640,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   }
 
   // replace private data:
-  d.reset(newData);
+  *d = newData;
 
   return *this;
 }
@@ -708,7 +686,7 @@ ByteVector &ByteVector::append(char c)
 ByteVector &ByteVector::clear()
 {
   detach();
-  *this = ByteVector();
+  *d = *ByteVector::null.d; 
 
   return *this;
 }
@@ -1071,30 +1049,20 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
-  d = v.d;
+  *d = *v.d;
 
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-ByteVector &ByteVector::operator=(ByteVector &&v)
-{
-  d = std::move(v.d);
-  return *this;
-}
-
-#endif
 
 ByteVector &ByteVector::operator=(char c)
 {
-  d = ByteVector(c).d;
+  *this = ByteVector(c);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(const char *data)
 {
-  d = ByteVector(data).d;
+  *this = ByteVector(data);
   return *this;
 }
 
@@ -1119,9 +1087,6 @@ ByteVector ByteVector::toHex() const
 void ByteVector::detach()
 {
   d->detach();
-
-  if(!d.unique())
-    d.reset(new ByteVectorPrivate(*(d->data), d->offset, d->length));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

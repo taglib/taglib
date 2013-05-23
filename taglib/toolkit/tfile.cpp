@@ -27,6 +27,7 @@
 #include "tfilestream.h"
 #include "tstring.h"
 #include "tdebug.h"
+#include "tsmartptr.h"
 #include "tpropertymap.h"
 #include "audioproperties.h"
 
@@ -65,7 +66,7 @@ public:
   }
 
 private:
-  NonRefCountPtr<IOStream> p;
+  SCOPED_PTR<IOStream> p;
 };
 
 // FilePrivate implementation which doesn't take ownership of the stream.
@@ -93,6 +94,7 @@ private:
 
 File::~File()
 {
+  delete d;
 }
 
 FileName File::name() const

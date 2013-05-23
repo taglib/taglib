@@ -54,9 +54,6 @@ namespace TagLib {
 
       CoverArt(const CoverArt &item);
       CoverArt &operator=(const CoverArt &item);
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-      CoverArt &operator=(CoverArt &&item);
-#endif
 
       //! Format of the image
       Format format() const;
@@ -66,13 +63,11 @@ namespace TagLib {
 
     private:
       class CoverArtPrivate;
-      RefCountPtr<CoverArtPrivate> d;
+      CoverArtPrivate *d;
     };
 
     typedef List<CoverArt> CoverArtList;
-
   }
-
 }
 
 #endif

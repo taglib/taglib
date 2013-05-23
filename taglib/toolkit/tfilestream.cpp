@@ -196,6 +196,8 @@ FileStream::~FileStream()
 {
   if(isOpen())
     closeFile(d->file);
+
+  delete d;
 }
 
 FileName FileStream::name() const
@@ -402,7 +404,7 @@ void FileStream::seek(offset_t offset, Position p)
 
   SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
   if(GetLastError() != NO_ERROR) {
-    debug("File::seek() -- Failed to set the file size.");
+    debug("File::seek() -- Failed to set the file pointer.");
   }
 
 #else

@@ -48,10 +48,16 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), tagOffset(-1), extendedHeader(0), footer(0), paddingSize(0)
+  TagPrivate() 
+    : file(0)
+    , tagOffset(-1)
+    , extendedHeader(0)
+    , footer(0)
+    , paddingSize(0)
   {
     frameList.setAutoDelete(true);
   }
+
   ~TagPrivate()
   {
     delete extendedHeader;

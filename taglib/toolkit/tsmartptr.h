@@ -26,179 +26,64 @@
 #ifndef TAGLIB_SMARTPTR_H
 #define TAGLIB_SMARTPTR_H
 
-#include "taglib_config.h"
-#include <algorithm>
+// This file is not a part of TagLib public interface. This is not installed.
 
-#if defined(TAGLIB_USE_STD_SHARED_PTR)
-# include <memory>
-#elif defined(TAGLIB_USE_TR1_SHARED_PTR) 
-# include <tr1/memory>
-#elif defined(TAGLIB_USE_BOOST_SHARED_PTR)
-# include <boost/shared_ptr.hpp>
-#endif
-
-#if defined(TAGLIB_USE_STD_UNIQUE_PTR)
-# include <memory>
-#elif defined(TAGLIB_USE_BOOST_SCOPED_PTR)
-# include <boost/scoped_ptr.hpp>
-#endif
+#include "config.h"
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
 /*!
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
+#if defined(HAVE_STD_SHARED_PTR) 
+
+# include <memory>
+# define SHARED_PTR std::shared_ptr
+
+#elif defined(HAVE_TR1_SHARED_PTR) 
+
+# include <tr1/memory>
+# define SHARED_PTR std::tr1::shared_ptr
+
+#elif defined(HAVE_BOOST_SHARED_PTR)
+
+# include <boost/shared_ptr.hpp>
+# define SHARED_PTR boost::shared_ptr
+
+#else   //  HAVE_STD_SHARED_PTR
+
+# include <algorithm>
+
+# if defined(HAVE_GCC_ATOMIC)
+#   define ATOMIC_INT int
+#   define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
+#   define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+# elif defined(HAVE_WIN_ATOMIC)
+#   if !defined(NOMINMAX)
+#     define NOMINMAX
+#   endif
+#   include <windows.h>
+#   define ATOMIC_INT long
+#   define ATOMIC_INC(x) InterlockedIncrement(&x)
+#   define ATOMIC_DEC(x) InterlockedDecrement(&x)
+# elif defined(HAVE_MAC_ATOMIC)
+#   include <libkern/OSAtomic.h>
+#   define ATOMIC_INT int32_t
+#   define ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
+#   define ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
+# elif defined(HAVE_IA64_ATOMIC)
+#   include <ia64intrin.h>
+#   define ATOMIC_INT int
+#   define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
+#   define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+# else
+#   define ATOMIC_INT int
+#   define ATOMIC_INC(x) (++x)
+#   define ATOMIC_DEC(x) (--x)
+# endif
+
 namespace TagLib 
 {
-#if defined(TAGLIB_USE_STD_SHARED_PTR) \
-  || defined(TAGLIB_USE_TR1_SHARED_PTR) \
-  || defined(TAGLIB_USE_BOOST_SHARED_PTR)
-
-  // RefCountPtr<T> is just a thin wrapper of shared_ptr<T>.
-  // It will be optimized out by compilers and performs equivalent to them.
-
-  template <typename T>
-  class RefCountPtr
-  {
-  public:
-    RefCountPtr()
-      : sp()
-    {
-    }
-
-    template <typename U>
-    explicit RefCountPtr(U *p)
-      : sp(p)
-    {
-    }
-
-    RefCountPtr(const RefCountPtr<T> &x)
-      : sp(x.sp)
-    {
-    }
-
-    template <typename U>
-    RefCountPtr(const RefCountPtr<U> &x)
-      : sp(x.sp)
-    {
-    }
-
-# ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    RefCountPtr(RefCountPtr<T> &&x)
-      : sp(std::move(x.sp))
-    {
-    }
-
-    template <typename U>
-    RefCountPtr(RefCountPtr<U> &&x)
-      : sp(std::move(x.sp))
-    {
-    }
-
-# endif
-
-    T *get() const
-    {
-      return sp.get();
-    }
-
-    long use_count() const
-    {
-      return sp.use_count();
-    }
-
-    bool unique() const 
-    { 
-      return sp.unique();
-    }
-
-    template <typename U>
-    void reset(U *p)
-    {
-      sp.reset(p);
-    }
-
-    void reset()
-    {
-      sp.reset();
-    }
-
-    void swap(RefCountPtr<T> &x)
-    {
-      sp.swap(x.sp);
-    }
-
-    RefCountPtr<T> &operator=(const RefCountPtr<T> &x)
-    {
-      sp = x.sp;
-      return *this;
-    }
-
-    template <typename U>
-    RefCountPtr<T> &operator=(const RefCountPtr<U> &x)
-    {
-      sp = x.sp;
-      return *this;
-    }
-
-# ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    RefCountPtr<T> &operator=(RefCountPtr<T> &&x)
-    {
-      sp = std::move(x.sp);
-      return *this;
-    }
-
-    template <typename U>
-    RefCountPtr<T> &operator=(RefCountPtr<U> &&x)
-    {
-      sp = std::move(x.sp);
-      return *this;
-    }
-
-# endif
-
-    T& operator*() const
-    {
-      return sp.operator*();
-    }
-
-    T* operator->() const
-    {
-      return sp.operator->();
-    }
-
-    operator bool() const
-    {
-      return static_cast<bool>(sp);
-    }
-
-    bool operator!() const
-    {
-      return !static_cast<bool>(sp);
-    }
-
-  private:
-    template <typename U> friend class RefCountPtr;
-
-# if defined(TAGLIB_USE_STD_SHARED_PTR) 
-
-    std::shared_ptr<T> sp;
-
-# elif defined(TAGLIB_USE_TR1_SHARED_PTR) 
-
-    std::tr1::shared_ptr<T> sp;
-
-# else
-
-    boost::shared_ptr<T> sp;
-
-# endif
-  };
-
-#else   // TAGLIB_USE_STD_SHARED_PTR etc.
-
   // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
   
@@ -207,18 +92,37 @@ namespace TagLib
   class CounterBase
   {
   public:
-    CounterBase();
-    virtual ~CounterBase();
+    CounterBase()
+      : refCount(1)
+    {
+    }
 
-    void addref();
-    void release();
-    long use_count() const;
+    virtual ~CounterBase()
+    {
+    }
+
+    void addref() 
+    {    
+      ATOMIC_INC(refCount);
+    }
+
+    void release()
+    {
+      if(ATOMIC_DEC(refCount) == 0) {
+        dispose();
+        delete this;
+      }
+    }
+
+    long use_count() const
+    {
+      return static_cast<long>(refCount);
+    }
 
     virtual void dispose() = 0;
 
   private:
-    class CounterBasePrivate;
-    CounterBasePrivate *d;
+    volatile ATOMIC_INT refCount;
   };
 
   // Counter impl class. Provides a dynamic deleter.
@@ -380,83 +284,45 @@ namespace TagLib
     template <typename U> friend class RefCountPtr;
   };
 
-#endif  // TAGLIB_USE_STD_SHARED_PTR etc.
-
-#if defined(TAGLIB_USE_STD_UNIQUE_PTR) || defined(TAGLIB_USE_BOOST_SCOPED_PTR)
-
-  // NonRefCountPtr<T> is just a thin wrapper of unique_ptr<T> or scoped_ptr<T>.
-  // It will be optimized out by compilers and performs equivalent to them.
-
- template<typename T> 
-  class NonRefCountPtr
+  template <typename T, typename U>
+  bool operator==(const RefCountPtr<T> &a, const RefCountPtr<U> &b)
   {
-  public:
-    explicit NonRefCountPtr(T *p = 0)
-      : up(p) 
-    {
-    }
+    return (a.get() == b.get());
+  }
 
-    ~NonRefCountPtr()
-    {
-    }
+  template <typename T, typename U>
+  bool operator!=(const RefCountPtr<T> &a, const RefCountPtr<U> &b)
+  {
+    return (a.get() != b.get());
+  }
 
-    void reset(T *p = 0)
-    {
-      NonRefCountPtr<T>(p).swap(*this);
-    }
+  template <typename T>
+  void swap(RefCountPtr<T> &a, RefCountPtr<T> &b)
+  {
+    a.swap(b);
+  }
+}
 
-    T &operator*() const
-    {
-      return up.operator*();
-    }
+# define SHARED_PTR TagLib::RefCountPtr
 
-    T *operator->() const 
-    {
-      return up.operator->();
-    }
+#endif  // HAVE_STD_SHARED_PTR etc.
 
-    T *get() const
-    {
-      return up.get();
-    }
+#if defined(HAVE_STD_UNIQUE_PTR) 
 
-    operator bool() const
-    {
-      return static_cast<bool>(up);
-    }
+# include <memory>
+# define SCOPED_PTR std::unique_ptr
 
-    bool operator!() const
-    {
-      return !static_cast<bool>(up);
-    }
+#elif defined(HAVE_BOOST_SCOPED_PTR)
 
-    void swap(NonRefCountPtr &x) 
-    {
-      up.swap(x.up);
-    }
+# include <boost/scoped_ptr.hpp>
+# define SCOPED_PTR boost::scoped_ptr
 
-  private:
+#else // HAVE_STD_UNIQUE_PTR
+ 
+# include <algorithm>
 
-    // Noncopyable
-    NonRefCountPtr(const NonRefCountPtr &);
-    NonRefCountPtr &operator=(const NonRefCountPtr &);
-
-    void operator==(const NonRefCountPtr &) const;
-    void operator!=(const NonRefCountPtr &) const;
-
-# if defined(TAGLIB_USE_STD_UNIQUE_PTR) 
-
-    std::unique_ptr<T> up;
-
-# else
-
-    boost::scoped_ptr<T> up;
-
-# endif
-  };
-
-#else // TAGLIB_USE_STD_UNIQUE_PTR
-
+namespace TagLib
+{
   // Self-implements NonRefCountPtr<T> if unique_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard unique_ptr<T> rather than this class.
 
@@ -522,34 +388,6 @@ namespace TagLib
     T *px;
   };
 
-#endif  // TAGLIB_USE_STD_UNIQUE_PTR
-
-  // Comparison operators for smart pointers.
-
-  template <typename T, typename U>
-  bool operator==(const RefCountPtr<T> &a, const RefCountPtr<U> &b)
-  {
-    return (a.get() == b.get());
-  }
-
-  template <typename T, typename U>
-  bool operator!=(const RefCountPtr<T> &a, const RefCountPtr<U> &b)
-  {
-    return (a.get() != b.get());
-  }
-
-  template <typename T, typename U>
-  bool operator==(const RefCountPtr<T> &a, U *b)
-  {
-    return (a.get() == b);
-  }
-
-  template <typename T, typename U>
-  bool operator!=(const RefCountPtr<T> &a, U *b)
-  {
-    return (a.get() != b);
-  }
-
   template <typename T, typename U>
   bool operator==(const NonRefCountPtr<T> &a, U *b)
   {
@@ -562,42 +400,17 @@ namespace TagLib
     return (a.get() != b);
   }
 
-  template <typename T, typename U>
-  bool operator==(T *a, const RefCountPtr<U> &b)
-  {
-    return (a == b.get());
-  }
-
-  template <typename T, typename U>
-  bool operator!=(T *a, const RefCountPtr<U> &b)
-  {
-    return (a != b.get());
-  }
-
-  template <typename T, typename U>
-  bool operator==(T *a, const NonRefCountPtr<U> &b)
-  {
-    return (a == b.get());
-  }
-
-  template <typename T, typename U>
-  bool operator!=(T *a, const NonRefCountPtr<U> &b)
-  {
-    return (a != b.get());
-  }
-
   template <typename T>
-  void swap(RefCountPtr<T> &a, RefCountPtr<T> &b)
-  {
-    a.swap(b);
-  }
-
-  template <typename T>
-  void swap(NonRefCountPtr<T> &a, NonRefCountPtr<T> &b)
+    void swap(NonRefCountPtr<T> &a, NonRefCountPtr<T> &b)
   {
     a.swap(b);
   }
 }
+
+# define SCOPED_PTR TagLib::NonRefCountPtr
+
+#endif  // HAVE_STD_UNIQUE_PTR etc.
+
 
 #endif // DO_NOT_DOCUMENT
 #endif

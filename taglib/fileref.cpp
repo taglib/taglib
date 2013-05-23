@@ -33,9 +33,10 @@
 # include <Shlwapi.h>
 #endif 
 
-#include <tfile.h>
-#include <tstring.h>
-#include <tdebug.h>
+#include "tfile.h"
+#include "tstring.h"
+#include "tdebug.h"
+#include "tsmartptr.h"
 
 #include "fileref.h"
 #include "asffile.h"
@@ -66,12 +67,12 @@ namespace
 
   ResolverList fileTypeResolvers;
 
-  RefCountPtr<File> create(
+  SHARED_PTR<File> create(
     FileName fileName, 
     bool readAudioProperties,
     AudioProperties::ReadStyle audioPropertiesStyle)
   {
-    RefCountPtr<File> file;
+    SHARED_PTR<File> file;
     for(ResolverConstIterator it = fileTypeResolvers.begin(); it != fileTypeResolvers.end(); ++it) 
     {
       file.reset((*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle));
@@ -169,12 +170,12 @@ public:
   {
   }
   
-  FileRefPrivate(RefCountPtr<File> f) 
-    : file(f) 
+  FileRefPrivate(const SHARED_PTR<File> &f)
+    : file(f)
   {
   }
 
-  RefCountPtr<File> file;
+  SHARED_PTR<File> file;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +188,8 @@ FileRef::FileRef()
 }
 
 FileRef::FileRef(FileName fileName, 
-                 bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle)
+                 bool readAudioProperties, 
+                 AudioProperties::ReadStyle audioPropertiesStyle)
   : d(new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle)))
 {
 }
@@ -198,21 +200,13 @@ FileRef::FileRef(File *file)
 }
 
 FileRef::FileRef(const FileRef &ref) 
-  : d(ref.d)
+  : d(new FileRefPrivate(ref.d->file))
 {
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-FileRef::FileRef(FileRef &&ref) 
-  : d(std::move(ref.d))
-{
-}
-
-#endif
 
 FileRef::~FileRef()
 {
+  delete d;
 }
 
 Tag *FileRef::tag() const
@@ -330,26 +324,16 @@ bool FileRef::isNull() const
 
 FileRef &FileRef::operator=(const FileRef &ref)
 {
-  d = ref.d;
+  *d = *ref.d;
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-FileRef &FileRef::operator=(FileRef &&ref)
-{
-  d = std::move(ref.d);
-  return *this;
-}
-
-#endif
 
 bool FileRef::operator==(const FileRef &ref) const
 {
-  return ref.d->file == d->file;
+  return (d->file == ref.d->file);
 }
 
 bool FileRef::operator!=(const FileRef &ref) const
 {
-  return ref.d->file != d->file;
+  return (d->file != ref.d->file);
 }
