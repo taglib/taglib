@@ -30,7 +30,7 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
 endif()
 
-if(SHLWAPI_FOUND)
+if(NOT MSVC AND SHLWAPI_FOUND)
   include_directories(${SHLWAPI_INCLUDE_DIR})
 endif()
 
@@ -315,8 +315,12 @@ if(ZLIB_FOUND)
 	target_link_libraries(tag ${ZLIB_LIBRARIES})
 endif()
 
-if(SHLWAPI_FOUND)
-  target_link_libraries(tag ${SHLWAPI_LIBRARIES})
+if(MSVC)
+  target_link_libraries(tag shlwapi.lib)
+else()
+  if(SHLWAPI_FOUND)
+    target_link_libraries(tag ${SHLWAPI_LIBRARIES})
+  endif()
 endif()
 
 set_target_properties(tag PROPERTIES
