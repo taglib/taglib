@@ -219,7 +219,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
-if(WIN32)
+if(WIN32 AND NOT MSVC)
   find_package(SHLWAPI)
   if(SHLWAPI_FOUND)
     set(HAVE_SHLWAPI 1)
