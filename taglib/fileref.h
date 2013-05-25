@@ -32,10 +32,6 @@
 #include "taglib_export.h"
 #include "audioproperties.h"
 
-#if _WIN32
-# pragma comment(lib, "shlwapi.lib")
-#endif
-
 namespace TagLib {
 
   class Tag;
