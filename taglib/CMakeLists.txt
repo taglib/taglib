@@ -30,6 +30,10 @@ if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
 endif()
 
+if(SHLWAPI_FOUND)
+  include_directories(${SHLWAPI_INCLUDE_DIR})
+endif()
+
 set(tag_HDRS
   tag.h
   fileref.h
@@ -309,6 +313,10 @@ add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
 	target_link_libraries(tag ${ZLIB_LIBRARIES})
+endif()
+
+if(SHLWAPI_FOUND)
+  target_link_libraries(tag ${SHLWAPI_LIBRARIES})
 endif()
 
 set_target_properties(tag PROPERTIES
