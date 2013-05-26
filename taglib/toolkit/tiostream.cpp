@@ -69,44 +69,59 @@ namespace
   }
 }
 
-// If WinNT, stores a Unicode string into m_wname directly.
-// If Win9x, converts and stores it into m_name to avoid calling Unicode version functions.
+class FileName::FileNamePrivate
+{
+public:
+  std::wstring wname;
+  std::string  name;
+};
 
 FileName::FileName(const wchar_t *name) 
-  : m_wname(SystemSupportsUnicode ? name : L"")
-  , m_name (SystemSupportsUnicode ? "" : unicodeToAnsi(name))
+  : d(new FileNamePrivate())
 {
+  // If Windows NT, stores a Unicode string directly.
+  // If Windows 9x, stores it converting into an ANSI string.
+  if(SystemSupportsUnicode)
+    d->wname = name;
+  else
+    d->name = unicodeToAnsi(name);
 }
 
 FileName::FileName(const char *name) 
-  : m_name(name) 
+  : d(new FileNamePrivate())
 {
+  d->name = name;
 }
 
 FileName::FileName(const FileName &name) 
-  : m_wname(name.m_wname)
-  , m_name (name.m_name) 
+  : d(new FileNamePrivate(*name.d))
 {
+}
+
+FileName &FileName::operator==(const FileName &name)
+{
+  *d = *name.d;
+  return *this;
 }
 
 FileName::operator const wchar_t *() const 
 { 
-  return m_wname.c_str(); 
+  return d->wname.c_str(); 
 }
 
 FileName::operator const char *() const 
 { 
-  return m_name.c_str(); 
+  return d->name.c_str(); 
 }
 
 const std::wstring &FileName::wstr() const 
 { 
-  return m_wname; 
+  return d->wname; 
 }
 
 const std::string &FileName::str() const 
 { 
-  return m_name; 
+  return d->name; 
 }  
 
 #endif  // _WIN32
