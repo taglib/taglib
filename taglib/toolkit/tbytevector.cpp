@@ -508,7 +508,6 @@ ByteVector::ByteVector(const ByteVector &v)
 ByteVector::ByteVector(const ByteVector &v, uint offset, uint length)
   : d(new ByteVectorPrivate(v.d, offset, length))
 {
-  d->ref();
 }
 
 ByteVector::ByteVector(char c)
