@@ -176,12 +176,16 @@ namespace TagLib {
      * Returns a std::string version of the TagLib string.  If \t is \a Latin1, 
      * the string is encoded in Latin-1.  If \t is \a UTF8 the string is encoded
      * in UTF-8.  Other types are not acceptable.
+     *
+     * /note This performs a conversion at every call.
      */
     std::string toStdString(Type t = Latin1) const;
 
     /*!
-    * Returns a std::wstring version of the TagLib string.  The string is encoded 
-    * in UTF-16(without BOM/CPU byte order).
+     * Returns a std::wstring version of the TagLib string.  The string is encoded 
+     * in UTF-16(without BOM/CPU byte order).
+     *
+     * /note This returns the String's internal data without any conversions.
      */
     const std::wstring &toStdWString() const;
 
@@ -195,12 +199,23 @@ namespace TagLib {
      * This string remains valid until the String instance is destroyed or
      * another export method is called.
      *
+     * /note This performs a conversion at every call.
+     * 
      * \warning This however has the side effect that this C-String will remain
      * in memory <b>in addition to</b> other memory that is consumed by the
      * String instance.  So, this method should not be used on large strings or
      * where memory is critical.
      */
     const char *toCString(String::Type t = Latin1) const;
+    
+    /*!
+     * Returns a pointer to the wide char version of the TagLib string.  The string 
+     * is encoded in UTF-16(without BOM/CPU byte order). 
+     *
+     * /note This returns a pointer to the String's internal data without any 
+     * conversions.
+     */
+    const wchar_t *toCWString() const;
 
     /*!
      * Returns an iterator pointing to the beginning of the string.
