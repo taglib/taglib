@@ -41,7 +41,7 @@
 # Include names
 SET(SHLWAPI_INCLUDE "shlwapi.h")
 # Library  names
-SET(SHLWAPI_NAMES libshlwapi.a shlwapi.lib libshlwapi shlwapi)
+SET(SHLWAPI_NAMES libshlwapi shlwapi)
 # Where to look for the above ...
 SET(SHLWAPI_PATHS "${SHLWAPI_PREFIX_PATH}/lib"
                   "${SHLWAPI_PREFIX_PATH}/include"
