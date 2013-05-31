@@ -67,9 +67,10 @@ namespace TagLib {
     {
     public:
       /*!
-       * Contructs a FLAC file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs a FLAC file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        *
        * \deprecated This constructor will be dropped in favor of the one below
        * in a future version.
@@ -78,12 +79,13 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Contructs a FLAC file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs an APE file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read.
        *
        * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       // BIC: merge with the above constructor
       File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -91,15 +93,16 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Contructs a FLAC file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs a FLAC file from \a stream.  If \a readProperties is true the
+       * file's audio properties will also be read.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
        *
        * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
        *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       // BIC: merge with the above constructor
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,

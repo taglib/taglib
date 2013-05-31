@@ -48,22 +48,16 @@ namespace TagLib {
     public:
 
       /*!
-       * Contructs an ASF file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs an ASF file from \a file.
        *
        * \note In the current implementation, both \a readProperties and
        * \a propertiesStyle are ignored.
-       *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
        */
-      File(FileName file, bool readProperties = true, Properties::ReadStyle propertiesStyle = Properties::Average);
+      File(FileName file, bool readProperties = true, 
+           Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Contructs an ASF file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs an ASF file from \a stream.
        *
        * \note In the current implementation, both \a readProperties and
        * \a propertiesStyle are ignored.
@@ -71,7 +65,8 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true, Properties::ReadStyle propertiesStyle = Properties::Average);
+      File(IOStream *stream, bool readProperties = true, 
+           Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
        * Destroys this instance of the File.

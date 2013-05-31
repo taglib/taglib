@@ -80,15 +80,16 @@ namespace TagLib {
       };
 
       /*!
-       * Contructs an WavPack file from \a file.  If \a readProperties is true the
+       * Constructs a WavPack file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * false, \a propertiesStyle is ignored
        */
+
       File(FileName file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Contructs an WavPack file from \a file.  If \a readProperties is true the
+       * Constructs an WavPack file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
        *
