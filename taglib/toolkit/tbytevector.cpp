@@ -297,6 +297,25 @@ ulonglong byteSwap<ulonglong>(ulonglong x)
 }
 
 template <class T>
+T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
+{
+  if(offset >= v.size()) {
+    debug("toNumber<T>() -- No data to convert. Returning 0.");
+    return 0;
+  }
+
+  length = std::min(length, v.size() - offset);
+
+  T sum = 0;
+  for(size_t i = 0; i < length; i++) {
+    const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
+    sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
+  }
+
+  return sum;
+}
+
+template <class T>
 T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
   if(offset + sizeof(T) > v.size()) 
@@ -315,25 +334,6 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
     return byteSwap<T>(tmp);
   else
     return tmp;
-}
-
-template <class T>
-T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignificantByteFirst)
-{
-  if(offset >= v.size()) {
-    debug("toNumber<T>() -- No data to convert. Returning 0.");
-    return 0;
-  }
-
-  length = std::min(length, v.size() - offset);
-
-  T sum = 0;
-  for(size_t i = 0; i < length; i++) {
-    const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
-    sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
-  }
-
-  return sum;
 }
 
 template <class T>
