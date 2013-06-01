@@ -69,9 +69,9 @@ using namespace TagLib;
 namespace
 {
 #ifdef _WIN32
-  const uint BufferSize = 8192;
+  const TagLib::uint BufferSize = 8192;
 #else
-  const uint BufferSize = 1024;
+  const TagLib::uint BufferSize = 1024;
 #endif
 }
 
