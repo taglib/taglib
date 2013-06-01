@@ -194,6 +194,8 @@ FileStream::~FileStream()
 {
   if(isOpen())
     closeFile(d->file);
+
+  delete d;
 }
 
 FileName FileStream::name() const

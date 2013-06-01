@@ -26,6 +26,8 @@
 #ifndef TAGLIB_TAGUNION_H
 #define TAGLIB_TAGUNION_H
 
+// This file is not a part of TagLib public interface. This is not installed.
+
 #include "tag.h"
 
 #ifndef DO_NOT_DOCUMENT
@@ -87,7 +89,7 @@ namespace TagLib {
 
   private:
     class TagUnionPrivate;
-    NonRefCountPtr<TagUnionPrivate> d;
+    TagUnionPrivate *d;
   };
 
   // If you add a new typedef here, add a corresponding explicit instantiation 

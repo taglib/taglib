@@ -119,17 +119,6 @@ namespace TagLib {
      */
     String(const String &s);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Constructs a String equivalent to \a s.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    String(String &&s);
-
-#endif
-
     /*!
      * Makes a deep copy of the data in \a s.
      *
@@ -403,17 +392,6 @@ namespace TagLib {
      */
     String &operator=(const String &s);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a s into this String.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    String &operator=(String &&s);
-
-#endif
-
     /*!
      * Performs a deep copy of the data in \a s.
      */
@@ -423,17 +401,6 @@ namespace TagLib {
      * Performs a deep copy of the data in \a s.
      */
     String &operator=(const std::wstring &s);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a s into this String.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    String &operator=(std::wstring &&s);
-
-#endif
 
     /*!
      * Performs a deep copy of the data in \a s.
@@ -520,7 +487,7 @@ namespace TagLib {
     static const Type WCharByteOrder;
 
     class StringPrivate;
-    RefCountPtr<StringPrivate> d;
+    StringPrivate *d;
   };
 
   /*!

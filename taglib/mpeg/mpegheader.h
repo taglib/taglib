@@ -27,7 +27,6 @@
 #define TAGLIB_MPEGHEADER_H
 
 #include "taglib_export.h"
-#include "tsmartptr.h"
 
 namespace TagLib {
 
@@ -56,17 +55,6 @@ namespace TagLib {
        * Does a shallow copy of \a h.
        */
       Header(const Header &h);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-      /*!
-       * Moves \a h into this Header.
-       *
-       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-      */
-      Header(Header &&h);
-
-#endif
 
       /*!
        * Destroys this Header instance.
@@ -166,22 +154,11 @@ namespace TagLib {
        */
       Header &operator=(const Header &h);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-      /*!
-       * Moves \a h into this Header.
-       *
-       * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-       */
-      Header &operator=(Header &&h);
-
-#endif
-
     private:
       void parse(const ByteVector &data);
 
       class HeaderPrivate;
-      RefCountPtr<HeaderPrivate> d;
+      HeaderPrivate *d;
     };
   }
 }

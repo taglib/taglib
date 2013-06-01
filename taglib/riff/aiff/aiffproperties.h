@@ -73,7 +73,7 @@ namespace TagLib {
         void read(const ByteVector &data);
 
         class PropertiesPrivate;
-        RefCountPtr<PropertiesPrivate> d;
+        PropertiesPrivate *d;
       };
     }
   }

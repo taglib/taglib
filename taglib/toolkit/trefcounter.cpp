@@ -23,14 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "taglib_config.h"
-
-#if !defined(TAGLIB_USE_STD_SHARED_PTR) \
-  && !defined(TAGLIB_USE_TR1_SHARED_PTR) \
-  && !defined(TAGLIB_USE_BOOST_SHARED_PTR)
-
 #include "config.h"
-#include "tsmartptr.h"
+#include "trefcounter.h"
 
 #if defined(HAVE_STD_ATOMIC)
 # include <atomic>
@@ -72,10 +66,10 @@
 
 namespace TagLib
 {
-  class CounterBase::CounterBasePrivate
+  class RefCounter::RefCounterPrivate
   {
   public:
-    CounterBasePrivate() 
+    RefCounterPrivate() 
       : refCount(1) 
     {
     }
@@ -83,33 +77,28 @@ namespace TagLib
     volatile ATOMIC_INT refCount;
   };
 
-  CounterBase::CounterBase()
-    : d(new CounterBasePrivate())
+  RefCounter::RefCounter()
+    : d(new RefCounterPrivate())
   {
   }
 
-  CounterBase::~CounterBase()
+  RefCounter::~RefCounter()
   {
     delete d;
   }
 
-  void CounterBase::addref() 
-  { 
+  void RefCounter::ref() 
+  {
     ATOMIC_INC(d->refCount); 
   }
 
-  void CounterBase::release()
-  {
-    if(ATOMIC_DEC(d->refCount) == 0) {
-      dispose();
-      delete this;
-    }
+  bool RefCounter::deref()
+  { 
+    return (ATOMIC_DEC(d->refCount) == 0); 
   }
 
-  long CounterBase::use_count() const
-  {
-    return static_cast<long>(d->refCount);
+  bool RefCounter::unique() const 
+  { 
+    return (d->refCount == 1); 
   }
 }
-
-#endif

@@ -158,6 +158,8 @@ namespace TagLib {
     virtual void truncate(offset_t length) = 0;
 
   private:
+    // Noncopyable. Derived classes as well.
+
     IOStream(const IOStream &);
     IOStream &operator=(const IOStream &);
   };
