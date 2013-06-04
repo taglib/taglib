@@ -220,7 +220,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 if(WIN32)
-  find_package(SHLWAPI REQUIRED)
+  find_package(SHLWAPI)
   if(SHLWAPI_FOUND)
     set(HAVE_SHLWAPI 1)
   else()
