@@ -29,14 +29,14 @@
 namespace TagLib {
 
   class String;
-  class ByteVector;
 
 #ifndef DO_NOT_DOCUMENT
 #ifndef NDEBUG
 
   /*!
-   * A simple function that prints debugging output to cerr if debugging is
-   * not disabled.
+   * A simple function that prints debugging output if debugging is enabled.
+   *
+   * \note In Win32, the message is sent to the debugger. Otherwise, stderr. 
    *
    * \warning Do not use this outside of TagLib, it could lead to undefined
    * symbols in your build if TagLib is built with NDEBUG defined and your
@@ -46,23 +46,11 @@ namespace TagLib {
    */
   void debug(const String &s);
 
-  /*!
-   * For debugging binary data.
-   *
-   * \warning Do not use this outside of TagLib, it could lead to undefined
-   * symbols in your build if TagLib is built with NDEBUG defined and your
-   * application is not.
-   *
-   * \internal
-   */
-  void debugData(const ByteVector &v);
-
 #else
 
   // Define these to an empty statement if debugging is disabled.
 
 #define debug(x)
-#define debugData(x)
 
 #endif
 #endif
