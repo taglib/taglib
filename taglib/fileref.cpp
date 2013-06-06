@@ -29,10 +29,6 @@
 
 #include "taglib_config.h"
 
-#ifdef _WIN32
-# include <Shlwapi.h>
-#endif 
-
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>
@@ -222,29 +218,21 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
   // Ok, this is really dumb for now, but it works for testing.
 
   String ext;
-
-#ifdef _WIN32
-  // Avoids direct conversion from FileName to String
-  // because String can't decode strings in local encodings properly.
-
-  if(!fileName.wstr().empty()) {
-    const wchar_t *pext = PathFindExtensionW(fileName.wstr().c_str());
-    if(*pext == L'.')
-      ext = String(pext + 1).upper();
-  }
-  else {
-    const char *pext = PathFindExtensionA(fileName.str().c_str());
-    if(*pext == '.')
-      ext = String(pext + 1).upper();
-  }
-#else
   {
+#ifdef _WIN32
+
+    String s = fileName.toString();
+
+#else
+
     String s = fileName;
+
+ #endif
+
     const int pos = s.rfind(".");
     if(pos != -1)
       ext = s.substr(pos + 1).upper();
   }
-#endif
 
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time

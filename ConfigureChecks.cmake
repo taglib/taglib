@@ -219,15 +219,6 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
-if(WIN32 AND NOT MSVC)
-  find_package(SHLWAPI)
-  if(SHLWAPI_FOUND)
-    set(HAVE_SHLWAPI 1)
-  else()
-    set(HAVE_SHLWAPI 0)
-  endif()
-endif()
-
 find_package(CppUnit)
 if(NOT CppUnit_FOUND AND BUILD_TESTS)
   message(STATUS "CppUnit not found, disabling tests.")
