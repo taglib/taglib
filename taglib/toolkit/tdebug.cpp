@@ -27,29 +27,68 @@
 #include <iostream>
 #include <bitset>
 
+#ifdef _WIN32
+# include <windows.h>
+#endif
+
 #include "tdebug.h"
 #include "tstring.h"
 
 using namespace TagLib;
 
-void TagLib::debug(const String &s)
+#ifdef _WIN32
+
+namespace 
 {
-  std::cerr << "TagLib: " << s << std::endl;
-}
+  // Check if the running system has OutputDebugStringW() function.
+  // Windows9x systems don't have OutputDebugStringW() or can't accept Unicode messages. 
 
-void TagLib::debugData(const ByteVector &v)
-{
-  for(uint i = 0; i < v.size(); i++) {
+  bool supportsUnicode()
+  {
+    const FARPROC p = GetProcAddress(GetModuleHandleA("kernel32"), "OutputDebugStringW");
+    return (p != NULL);
+  }
 
-    std::cout << "*** [" << i << "] - '" << char(v[i]) << "' - int " << int(v[i])
-              << std::endl;
+  // Indicates whether the system supports Unicode debug messages.
 
-    std::bitset<8> b(v[i]);
+  const bool SystemSupportsUnicode = supportsUnicode(); 
 
-    for(int j = 0; j < 8; j++)
-      std::cout << i << ":" << j << " " << b.test(j) << std::endl;
+  // Converts a UTF-16 string into a local encoding.
+  // This function should only be used in Windows9x systems which don't support 
+  // Unicode file names.
 
-    std::cout << std::endl;
+  std::string unicodeToAnsi(const String &s)
+  {
+    const wchar_t *wstr = s.toWString().c_str();
+    const int len = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
+    if(len == 0)
+      return std::string();
+
+    std::string str(len, '\0');
+    WideCharToMultiByte(CP_ACP, 0, wstr, -1, &str[0], len, NULL, NULL);
+
+    return str;
   }
 }
+
+#endif  // _WIN32
+
+void TagLib::debug(const String &s)
+{
+  String msg = "TagLib: " + s + "\n";
+
+#ifdef _WIN32
+
+  if(SystemSupportsUnicode) 
+    OutputDebugStringW(msg.toWString().c_str());
+  else
+    OutputDebugStringA(unicodeToAnsi(s).c_str());
+
+#else
+
+  std::cerr << msg;
+
+#endif
+}
+
 #endif
