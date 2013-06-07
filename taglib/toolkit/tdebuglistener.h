@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,13 +23,49 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tdebug.h"
+#ifndef TAGLIB_DEBUGLISTENER_H
+#define TAGLIB_DEBUGLISTENER_H
+
+#include "taglib_export.h"
 #include "tstring.h"
-#include "tdebuglistener.h"
 
-using namespace TagLib;
-
-void TagLib::debug(const String &s)
+namespace TagLib 
 {
-  getDebugListener()->listen(s);
+  //! An abstraction for the listener to the debug messages.
+
+  /*!
+   * This class enables you to handle the debug messages in your preferred 
+   * way by subclassing this class, reimplementing listen() and setting your 
+   * reimplementation as the default with setDebugListener().
+   *
+   * \see setDebugListener()
+   */  
+  class TAGLIB_EXPORT DebugListener
+  {
+  public:
+    virtual void listen(const String &msg) = 0;
+  };
+
+  /*!
+   * Sets the listener that decides how the debug messages are redirected.
+   * If the parameter \a listener is null, the previous listener is released 
+   * and default stderr listener is restored.   
+   *
+   * \note The caller is responsible for deleting the previous listener
+   * as needed after it is released.
+   *
+   * \see DebugListener
+   */
+  void setDebugListener(DebugListener *listener);
+
+#ifndef DO_NOT_DOCUMENT
+
+  /*!
+   * \internal
+   */
+  DebugListener *getDebugListener();
+
+#endif
 }
+
+#endif

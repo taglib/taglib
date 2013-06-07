@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,13 +23,59 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tdebug.h"
-#include "tstring.h"
 #include "tdebuglistener.h"
+
+#ifndef NDEBUG
+# include <iostream>
+# ifdef _WIN32
+#   include <windows.h>
+# endif
+#endif
 
 using namespace TagLib;
 
-void TagLib::debug(const String &s)
+namespace
 {
-  getDebugListener()->listen(s);
+  class DefaultListener : public DebugListener
+  {
+  public:
+    virtual void listen(const String &msg)
+    {
+#ifndef NDEBUG
+# ifdef _WIN32
+
+      std::string s;
+      const wstring wstr = msg.toWString();
+      const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+      if(len != 0) {
+        s.resize(len);
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &s[0], len, NULL, NULL);
+      }
+
+      std::cerr << "TagLib: " << s << std::endl;
+
+# else
+
+      std::cerr << "TagLib: " << msg << std::endl;
+
+# endif 
+#endif
+    }
+  };
+
+  DefaultListener defaultListener;
+  DebugListener *traceListener = &defaultListener;
+}
+
+void TagLib::setDebugListener(DebugListener *listener)
+{
+  if(listener)
+    traceListener = listener;
+  else
+    traceListener = &defaultListener;
+}
+
+DebugListener *TagLib::getDebugListener()
+{
+  return traceListener;
 }
