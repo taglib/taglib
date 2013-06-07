@@ -42,12 +42,13 @@ namespace
 {
   std::string unicodeToAnsi(const String &s) 
   {
-    const int len = WideCharToMultiByte(CP_ACP, 0, s.toWString().c_str(), -1, NULL, 0, NULL, NULL);
+    const wstring wstr = s.toWString();
+    const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
     if(len == 0)
       return std::string();
 
     std::string str(len, '\0');
-    WideCharToMultiByte(CP_ACP, 0, s.toWString().c_str(), -1, &str[0], len, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &str[0], len, NULL, NULL);
 
     return str;
   }
