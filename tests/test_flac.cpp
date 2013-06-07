@@ -239,8 +239,8 @@ public:
     map["HÄÖ"] = String("bla");
     FLAC::File f(copy.fileName().c_str());
     PropertyMap invalid = f.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL(uint(1), invalid.size());
-    CPPUNIT_ASSERT_EQUAL(uint(0), f.properties().size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), invalid.size());
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.properties().size());
   }
 
 };
