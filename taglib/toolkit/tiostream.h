@@ -40,7 +40,6 @@ namespace TagLib {
     FileName(const char *name);
 
     FileName(const FileName &name);
-    FileName &operator==(const FileName &name);
 
     operator const wchar_t *() const;
     operator const char *() const;
@@ -51,14 +50,11 @@ namespace TagLib {
     String toString() const;
 
   private:
-    class FileNamePrivate;
-    FileNamePrivate *d;
+    const std::string  m_name;
+    const std::wstring m_wname;
   };
-
 #else
-
   typedef const char *FileName;
-
 #endif
 
   //! An abstract class that provides operations on a sequence of bytes
