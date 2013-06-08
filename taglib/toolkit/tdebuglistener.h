@@ -35,8 +35,8 @@ namespace TagLib
 
   /*!
    * This class enables you to handle the debug messages in your preferred 
-   * way by subclassing this class, reimplementing listen() and setting your 
-   * reimplementation as the default with setDebugListener().
+   * way by subclassing this class, reimplementing printMessage() and setting 
+   * your reimplementation as the default with setDebugListener().
    *
    * \see setDebugListener()
    */  
@@ -47,7 +47,6 @@ namespace TagLib
     virtual ~DebugListener();
 
     virtual void printMessage(const String &msg) = 0;
-    virtual void printData(const ByteVector &data) = 0;
 
   private:
     // Noncopyable

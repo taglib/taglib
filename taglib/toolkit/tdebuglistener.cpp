@@ -45,41 +45,21 @@ namespace
 #ifndef NDEBUG
 # ifdef _WIN32
 
-      std::string s;
       const wstring wstr = msg.toWString();
       const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
       if(len != 0) {
-        s.resize(len);
-        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &s[0], len, NULL, NULL);
+        std::vector<char> buf(len);
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &buf[0], len, NULL, NULL);
+
+        std::cerr << std::string(&buf[0]);
       }
 
-      std::cerr << "TagLib: " << s << std::endl;
 
 # else
 
-      std::cerr << "TagLib: " << msg << std::endl;
+      std::cerr << msg;
 
 # endif 
-#endif
-    }
-
-    virtual void printData(const ByteVector &v)
-    {
-#ifndef NDEBUG
-
-      for(size_t i = 0; i < v.size(); i++) 
-      {
-        std::cout << "*** [" << i << "] - '" << char(v[i]) << "' - int " << int(v[i])
-          << std::endl;
-
-        std::bitset<8> b(v[i]);
-
-        for(int j = 0; j < 8; j++)
-          std::cout << i << ":" << j << " " << b.test(j) << std::endl;
-
-        std::cout << std::endl;
-      }
-
 #endif
     }
   };
