@@ -71,7 +71,7 @@ namespace TagLib
   /*!
    * \internal
    */
-  TAGLIB_EXPORT DebugListener *getDebugListener();
+  DebugListener *getDebugListener();
 
 #endif
 }
