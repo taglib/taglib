@@ -43,7 +43,16 @@ namespace TagLib
   class TAGLIB_EXPORT DebugListener
   {
   public:
-    virtual void listen(const String &msg) = 0;
+    DebugListener();
+    virtual ~DebugListener();
+
+    virtual void printMessage(const String &msg) = 0;
+    virtual void printData(const ByteVector &data) = 0;
+
+  private:
+    // Noncopyable
+    DebugListener(const DebugListener &);
+    DebugListener &operator=(const DebugListener &);
   };
 
   /*!
@@ -56,14 +65,14 @@ namespace TagLib
    *
    * \see DebugListener
    */
-  void setDebugListener(DebugListener *listener);
+  TAGLIB_EXPORT void setDebugListener(DebugListener *listener);
 
 #ifndef DO_NOT_DOCUMENT
 
   /*!
    * \internal
    */
-  DebugListener *getDebugListener();
+  TAGLIB_EXPORT DebugListener *getDebugListener();
 
 #endif
 }

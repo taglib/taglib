@@ -27,6 +27,7 @@
 
 #ifndef NDEBUG
 # include <iostream>
+# include <bitset>
 # ifdef _WIN32
 #   include <windows.h>
 # endif
@@ -39,7 +40,7 @@ namespace
   class DefaultListener : public DebugListener
   {
   public:
-    virtual void listen(const String &msg)
+    virtual void printMessage(const String &msg)
     {
 #ifndef NDEBUG
 # ifdef _WIN32
@@ -61,21 +62,49 @@ namespace
 # endif 
 #endif
     }
+
+    virtual void printData(const ByteVector &v)
+    {
+#ifndef NDEBUG
+
+      for(size_t i = 0; i < v.size(); i++) 
+      {
+        std::cout << "*** [" << i << "] - '" << char(v[i]) << "' - int " << int(v[i])
+          << std::endl;
+
+        std::bitset<8> b(v[i]);
+
+        for(int j = 0; j < 8; j++)
+          std::cout << i << ":" << j << " " << b.test(j) << std::endl;
+
+        std::cout << std::endl;
+      }
+
+#endif
+    }
   };
 
   DefaultListener defaultListener;
-  DebugListener *traceListener = &defaultListener;
+  DebugListener *debugListener = &defaultListener;
+}
+
+TagLib::DebugListener::DebugListener()
+{
+}
+
+TagLib::DebugListener::~DebugListener()
+{
 }
 
 void TagLib::setDebugListener(DebugListener *listener)
 {
   if(listener)
-    traceListener = listener;
+    debugListener = listener;
   else
-    traceListener = &defaultListener;
+    debugListener = &defaultListener;
 }
 
 DebugListener *TagLib::getDebugListener()
 {
-  return traceListener;
+  return debugListener;
 }

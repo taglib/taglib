@@ -29,6 +29,7 @@
 namespace TagLib {
 
   class String;
+  class ByteVector;
 
 #ifndef DO_NOT_DOCUMENT
 
@@ -44,6 +45,17 @@ namespace TagLib {
    * \internal
    */
   void debug(const String &s);
+  
+  /*!
+   * For debugging binary data.
+   *
+   * \warning Do not use this outside of TagLib, it could lead to undefined
+   * symbols in your build if TagLib is built with NDEBUG defined and your
+   * application is not.
+   *
+   * \internal
+   */
+  void debugData(const ByteVector &v);
 }
 
 #endif

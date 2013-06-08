@@ -31,5 +31,10 @@ using namespace TagLib;
 
 void TagLib::debug(const String &s)
 {
-  getDebugListener()->listen(s);
+  getDebugListener()->printMessage(s);
+}
+
+void TagLib::debugData(const ByteVector &v)
+{
+  getDebugListener()->printData(v);
 }
