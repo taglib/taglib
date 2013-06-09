@@ -92,7 +92,7 @@ endif()
 
 option(TRACE_IN_RELEASE "Output debug messages even in release mode"  OFF)
 if(TRACE_IN_RELEASE)
-  set(TAGLIB_TRACE_IN_RELEASE TRUE)
+  set(TRACE_IN_RELEASE TRUE)
 endif()
 
 configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
