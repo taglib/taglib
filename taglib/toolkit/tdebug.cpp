@@ -30,11 +30,47 @@
 #include "tdebug.h"
 #include "tstring.h"
 
+#ifdef _WIN32
+# include <windows.h>
+#endif
+
 using namespace TagLib;
+
+#ifdef _WIN32
+
+namespace
+{
+  std::string unicodeToAnsi(const String &s) 
+  {
+    const wstring wstr = s.toWString();
+    const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+    if(len == 0)
+      return std::string();
+
+    std::string str(len, '\0');
+    WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &str[0], len, NULL, NULL);
+
+    return str;
+  }
+}
+
+#endif
 
 void TagLib::debug(const String &s)
 {
-  std::cerr << "TagLib: " << s << std::endl;
+  std::cerr << "TagLib: ";
+  
+#ifdef _WIN32
+
+  std::cerr << unicodeToAnsi(s);
+
+#else
+
+  std::cerr << s;
+
+#endif
+
+  std::cerr << std::endl;
 }
 
 void TagLib::debugData(const ByteVector &v)
