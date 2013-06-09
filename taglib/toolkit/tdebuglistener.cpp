@@ -25,12 +25,11 @@
 
 #include "tdebuglistener.h"
 
-#ifndef NDEBUG
-# include <iostream>
-# include <bitset>
-# ifdef _WIN32
-#   include <windows.h>
-# endif
+#include <iostream>
+#include <bitset>
+
+#ifdef _WIN32
+# include <windows.h>
 #endif
 
 using namespace TagLib;
@@ -42,8 +41,7 @@ namespace
   public:
     virtual void printMessage(const String &msg)
     {
-#ifndef NDEBUG
-# ifdef _WIN32
+#ifdef _WIN32
 
       const wstring wstr = msg.toWString();
       const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
@@ -54,13 +52,11 @@ namespace
         std::cerr << std::string(&buf[0]);
       }
 
-
-# else
+#else
 
       std::cerr << msg;
 
-# endif 
-#endif
+#endif 
     }
   };
 

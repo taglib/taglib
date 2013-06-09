@@ -3,3 +3,4 @@
 #define   TAGLIB_WITH_ASF 1
 #define   TAGLIB_WITH_MP4 1
 
+#cmakedefine   TAGLIB_TRACE_IN_RELEASE 1

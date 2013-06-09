@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "config.h"
+#include "taglib_config.h"
 
 #include "tdebug.h"
 #include "tstring.h"
@@ -67,11 +68,17 @@ namespace
 
 void TagLib::debug(const String &s)
 {
+#if !defined(NDEBUG) || defined(TAGLIB_TRACE_IN_RELEASE)
+  
   getDebugListener()->printMessage("TagLib: " + s + "\n");
+
+#endif
 }
 
 void TagLib::debugData(const ByteVector &v)
 {
+#if !defined(NDEBUG) || defined(TAGLIB_TRACE_IN_RELEASE)
+
   for(size_t i = 0; i < v.size(); ++i) 
   {
     String msg 
@@ -85,4 +92,6 @@ void TagLib::debugData(const ByteVector &v)
 
     getDebugListener()->printMessage(msg);
   }
+
+#endif
 }
