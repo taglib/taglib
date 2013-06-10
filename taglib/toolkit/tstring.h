@@ -173,13 +173,13 @@ namespace TagLib {
     virtual ~String();
 
     /*!
-     * Returns a std::string version of the TagLib string.  If \t is \a Latin1, 
-     * the string is encoded in Latin-1.  If \t is \a UTF8 the string is encoded
-     * in UTF-8.  Other types are not acceptable.
+     * Returns a std::string version of the TagLib string.  If \a t is \a UTF8 the 
+     * string is encoded in UTF-8.  If \a t is \a Latin1, the string is encoded in 
+     * Latin-1.  Other types are not acceptable.
      *
      * /note This performs a conversion at every call.
      */
-    std::string toStdString(Type t = Latin1) const;
+    std::string toStdString(Type t = UTF8) const;
 
     /*!
      * Returns a std::wstring version of the TagLib string.  The string is encoded 
@@ -193,8 +193,8 @@ namespace TagLib {
      * Creates and returns a C-String based on the data.  This string is still
      * owned by the String (class) and as such should not be deleted by the user.
      *
-     * If \t is \a Latin1, the string is encoded in Latin-1.  If \t is \a UTF8 the 
-     * string is encoded in UTF-8.  Other types are not acceptable.
+     * If \a t is \a UTF8 the string is encoded in UTF-8.  If \a t is \a Latin1, 
+     * the string is encoded in Latin-1.  Other types are not acceptable.
      *
      * This string remains valid until the String instance is destroyed or
      * another export method is called.
@@ -206,7 +206,7 @@ namespace TagLib {
      * String instance.  So, this method should not be used on large strings or
      * where memory is critical.
      */
-    const char *toCString(String::Type t = Latin1) const;
+    const char *toCString(String::Type t = UTF8) const;
     
     /*!
      * Returns a pointer to the wide char version of the TagLib string.  The string 

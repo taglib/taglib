@@ -320,10 +320,10 @@ std::string String::toStdString(String::Type t) const
   {
   case TagLib::String::Latin1:
     {
-      s.resize(d->data.size());
+      s.resize(d->data->size());
 
       std::string::iterator targetIt = s.begin();
-      for(std::wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++) {
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
         *targetIt = static_cast<char>(*it);
         ++targetIt;
       }
@@ -331,9 +331,9 @@ std::string String::toStdString(String::Type t) const
     break;
   case TagLib::String::UTF8:
     {
-      s.resize(d->data.size() * 4 + 1);
+      s.resize(d->data->size() * 4 + 1);
 
-      UTF16toUTF8(&d->data[0], d->data.size(), &s[0], s.size());
+      UTF16toUTF8(&(*d->data)[0], d->data->size(), &s[0], s.size());
       s.resize(::strlen(s.c_str()));
     }
     break;
@@ -341,7 +341,7 @@ std::string String::toStdString(String::Type t) const
     {
       debug("String::toStdString() - Invalid Type value.");
     }
-  break;
+    break;
   }
 
   return s;
@@ -354,13 +354,13 @@ const std::wstring &String::toStdWString() const
 
 const char *String::toCString(String::Type t) const
 {
-  d->cstring = toStdString(t);
-  return d->cstring.c_str();
+  d->cstring->swap(toStdString(t));
+  return d->cstring->c_str();
 }
 
 const wchar_t *String::toCWString() const
 {
-  return d->data.c_str();
+  return d->data->c_str();
 }
 
 String::Iterator String::begin()
