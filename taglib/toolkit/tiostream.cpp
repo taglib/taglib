@@ -31,6 +31,7 @@ using namespace TagLib;
 
 # include "tstring.h"
 # include "tdebug.h"
+# include "tsmartptr.h"
 # include <windows.h>
 
 namespace 
@@ -67,36 +68,73 @@ namespace
 
     return str;
   }
+
+  struct FileNameData
+  {
+    std::wstring wname;
+    std::string  name;
+  };
 }
 
-// If WinNT, stores a Unicode string into m_wname directly.
-// If Win9x, converts and stores it into m_name to avoid calling Unicode version functions.
-
-FileName::FileName(const wchar_t *name) 
-  : m_wname(SystemSupportsUnicode ? name : L"")
-  , m_name (SystemSupportsUnicode ? "" : unicodeToAnsi(name))
+class FileName::FileNamePrivate
 {
+public:
+  FileNamePrivate() 
+    : data(new FileNameData()) 
+  {
+  }
+
+  SHARED_PTR<FileNameData> data;
+};
+
+FileName::FileName()
+  : d(new FileNamePrivate())
+{
+}
+
+FileName::FileName(const wchar_t *name)
+  : d(new FileNamePrivate())
+{
+  // If WinNT, stores a Unicode string into wname directly.
+  // If Win9x, converts and stores it into name to avoid calling Unicode version functions.
+
+  if(SystemSupportsUnicode)
+    d->data->wname = name;
+  else
+    d->data->name = unicodeToAnsi(name);
 }
 
 FileName::FileName(const char *name) 
-  : m_name(name) 
+  : d(new FileNamePrivate())
 {
+  d->data->name = name;
 }
 
 FileName::FileName(const FileName &name) 
-  : m_wname(name.m_wname)
-  , m_name (name.m_name) 
+  : d(new FileNamePrivate())
 {
+  *d = *name.d;
+}
+
+FileName::~FileName()
+{
+  delete d;
+}
+
+FileName &FileName::operator=(const FileName &name)
+{
+  *d = *name.d;
+  return *this;
 }
 
 const std::wstring &FileName::wstr() const 
 { 
-  return m_wname; 
+  return d->data->wname; 
 }
 
 const std::string &FileName::str() const 
 { 
-  return m_name; 
+  return d->data->name;
 }  
 
 #endif  // _WIN32
