@@ -61,26 +61,25 @@ namespace
   };
 
   DefaultListener defaultListener;
+}
+
+namespace TagLib
+{
   DebugListener *debugListener = &defaultListener;
-}
 
-TagLib::DebugListener::DebugListener()
-{
-}
+  DebugListener::DebugListener()
+  {
+  }
 
-TagLib::DebugListener::~DebugListener()
-{
-}
+  DebugListener::~DebugListener()
+  {
+  }
 
-void TagLib::setDebugListener(DebugListener *listener)
-{
-  if(listener)
-    debugListener = listener;
-  else
-    debugListener = &defaultListener;
-}
-
-DebugListener *TagLib::getDebugListener()
-{
-  return debugListener;
+  void setDebugListener(DebugListener *listener)
+  {
+    if(listener)
+      debugListener = listener;
+    else
+      debugListener = &defaultListener;
+  }
 }

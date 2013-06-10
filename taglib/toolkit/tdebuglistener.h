@@ -65,15 +65,6 @@ namespace TagLib
    * \see DebugListener
    */
   TAGLIB_EXPORT void setDebugListener(DebugListener *listener);
-
-#ifndef DO_NOT_DOCUMENT
-
-  /*!
-   * \internal
-   */
-  DebugListener *getDebugListener();
-
-#endif
 }
 
 #endif

@@ -65,32 +65,38 @@ namespace
   }
 }
 
-void TagLib::debug(const String &s)
+namespace TagLib
 {
+  // The instance is defined in tdebuglistener.cpp.
+  extern DebugListener *debugListener;
+
+  void debug(const String &s)
+  {
 #if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
   
-  getDebugListener()->printMessage("TagLib: " + s + "\n");
+    debugListener->printMessage("TagLib: " + s + "\n");
 
 #endif
-}
-
-void TagLib::debugData(const ByteVector &v)
-{
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
-
-  for(size_t i = 0; i < v.size(); ++i) 
-  {
-    String msg 
-      = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b", i, v[i], v[i], v[i]);
-
-    std::bitset<8> b(v[i]);
-    for(int j = 7; j >= 0; --j) 
-      msg += format("%d", (b.test(j) ? 1 : 0));
-   
-    msg += "\n";
-
-    getDebugListener()->printMessage(msg);
   }
 
+  void debugData(const ByteVector &v)
+  {
+#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
+
+    for(size_t i = 0; i < v.size(); ++i) 
+    {
+      String msg 
+        = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b", i, v[i], v[i], v[i]);
+
+      std::bitset<8> b(v[i]);
+      for(int j = 7; j >= 0; --j) 
+        msg += format("%d", (b.test(j) ? 1 : 0));
+   
+      msg += "\n";
+
+      debugListener->printMessage(msg);
+    }
+
 #endif
+  }
 }
