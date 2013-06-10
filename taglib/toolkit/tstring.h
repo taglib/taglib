@@ -205,7 +205,16 @@ namespace TagLib {
      * where memory is critical.
      */
     const char *toCString(bool unicode = false) const;
-
+    
+    /*!
+     * Returns a pointer to the wide char version of the TagLib string.  The string 
+     * is encoded in UTF-16(without BOM/CPU byte order). 
+     *
+     * /note This returns a pointer to the String's internal data without any 
+     * conversions.
+     */
+    const wchar_t *toCWString() const;
+    
     /*!
      * Returns an iterator pointing to the beginning of the string.
      */
