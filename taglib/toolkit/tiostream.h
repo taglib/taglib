@@ -50,8 +50,8 @@ namespace TagLib {
     String toString() const;
 
   private:
-    const std::string  m_name;
     const std::wstring m_wname;
+    const std::string  m_name;
   };
 #else
   typedef const char *FileName;
