@@ -46,6 +46,10 @@ namespace TagLib
     DebugListener();
     virtual ~DebugListener();
 
+    /*!
+     * When overridden in a derived class, redirects \a msg to your preferred
+     * channel such as stderr, Windows debugger or so forth.
+     */
     virtual void printMessage(const String &msg) = 0;
 
   private:
