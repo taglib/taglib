@@ -49,15 +49,15 @@ namespace
 
   inline char *stringToCharArray(const String &s)
   {
-    const char *c = s.toCString(unicodeStrings);
+    const std::string str = s.to8Bit(unicodeStrings);
 
 #ifdef HAVE_ISO_STRDUP
 
-    return ::_strdup(c);
+    return ::_strdup(str.c_str());
 
 #else
 
-    return ::strdup(c);
+    return ::strdup(str.c_str());
 
 #endif
   }
