@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,75 +23,63 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
-
-#include "tdebug.h"
-#include "tstring.h"
 #include "tdebuglistener.h"
 
+#include <iostream>
 #include <bitset>
-#include <cstdio>
-#include <cstdarg>
+
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 using namespace TagLib;
 
 namespace
 {
-  String format(const char *fmt, ...)
+  class DefaultListener : public DebugListener
   {
-    va_list args;
-    va_start(args, fmt);
+  public:
+    virtual void printMessage(const String &msg)
+    {
+#ifdef _WIN32
 
-    char buf[256];
+      const wstring wstr = msg.toWString();
+      const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+      if(len != 0) {
+        std::vector<char> buf(len);
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &buf[0], len, NULL, NULL);
 
-#if defined(HAVE_SNPRINTF)
-
-    vsnprintf(buf, sizeof(buf), fmt, args);
-
-#elif defined(HAVE_SPRINTF_S)
-
-    vsprintf_s(buf, fmt, args);
+        std::cerr << std::string(&buf[0]);
+      }
 
 #else
 
-    // Be careful. May cause a buffer overflow.  
-    vsprintf(buf, fmt, args);
+      std::cerr << msg;
 
-#endif
+#endif 
+    }
+  };
 
-    va_end(args);
-
-    return String(buf);
-  }
+  DefaultListener defaultListener;
 }
 
 namespace TagLib
 {
-  // The instance is defined in tdebuglistener.cpp.
-  extern DebugListener *debugListener;
+  DebugListener *debugListener = &defaultListener;
 
-  void debug(const String &s)
+  DebugListener::DebugListener()
   {
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
-  
-    debugListener->printMessage("TagLib: " + s + "\n");
-
-#endif
   }
 
-  void debugData(const ByteVector &v)
+  DebugListener::~DebugListener()
   {
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
+  }
 
-    for(size_t i = 0; i < v.size(); ++i) 
-    {
-      std::string bits = std::bitset<8>(v[i]).to_string();
-      String msg = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b%s\n", 
-        i, v[i], v[i], v[i], bits.c_str());
-
-      debugListener->printMessage(msg);
-    }
-
-#endif
+  void setDebugListener(DebugListener *listener)
+  {
+    if(listener)
+      debugListener = listener;
+    else
+      debugListener = &defaultListener;
   }
 }
