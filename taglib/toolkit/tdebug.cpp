@@ -85,14 +85,9 @@ namespace TagLib
 
     for(size_t i = 0; i < v.size(); ++i) 
     {
-      String msg 
-        = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b", i, v[i], v[i], v[i]);
-
-      std::bitset<8> b(v[i]);
-      for(int j = 7; j >= 0; --j) 
-        msg += format("%d", (b.test(j) ? 1 : 0));
-   
-      msg += "\n";
+      std::string bits = std::bitset<8>(v[i]).to_string();
+      String msg = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b%s\n", 
+        i, v[i], v[i], v[i], bits.c_str());
 
       debugListener->printMessage(msg);
     }
