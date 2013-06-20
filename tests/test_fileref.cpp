@@ -27,6 +27,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
+  CPPUNIT_TEST(testMatroska);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -37,7 +38,6 @@ public:
     string newname = copy.fileName();
 
     FileRef *f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
     CPPUNIT_ASSERT(!f->isNull());
     f->tag()->setArtist("test artist");
     f->tag()->setTitle("test title");
@@ -49,7 +49,6 @@ public:
     delete f;
 
     f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
     CPPUNIT_ASSERT(!f->isNull());
     CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("test artist"));
     CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("test title"));
@@ -67,7 +66,6 @@ public:
     delete f;
 
     f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
     CPPUNIT_ASSERT(!f->isNull());
     CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("ttest artist"));
     CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("ytest title"));
@@ -76,27 +74,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(7));
     CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
     delete f;
-
-    f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
-    CPPUNIT_ASSERT(!f->isNull());
-    PropertyMap prop = f->properties();
-    CPPUNIT_ASSERT_EQUAL(prop["ARTIST"].front(), String("ttest artist"));
-    CPPUNIT_ASSERT_EQUAL(prop["TITLE" ].front(), String("ytest title"));
-    prop["ARTIST"].front() = "a test artist";
-    prop["TITLE" ].front() = "b test title";
-    f->setProperties(prop);
-    f->save();
-    delete f;
-    
-    f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
-    CPPUNIT_ASSERT(!f->isNull());
-    prop = f->properties();
-    CPPUNIT_ASSERT_EQUAL(prop["ARTIST"].front(), String("a test artist"));
-    CPPUNIT_ASSERT_EQUAL(prop["TITLE" ].front(), String("b test title"));
-    delete f;
-    
   }
 
   void testMusepack()
@@ -171,6 +148,11 @@ public:
   void testAPE()
   {
     fileRefSave("mac-399", ".ape");
+  }
+  
+  void testMatroska()
+  {
+    fileRefSave("matroska", ".mka");
   }
 };
 

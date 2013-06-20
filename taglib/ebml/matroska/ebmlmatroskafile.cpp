@@ -27,6 +27,7 @@
 #include "ebmlmatroskaaudio.h"
 
 #include "tpropertymap.h"
+#include "tsmartptr.h"
 
 using namespace TagLib;
 
@@ -47,7 +48,9 @@ public:
     return true;
   }
   
-  FilePrivate(File *p_document) : tag(0), document(p_document)
+  FilePrivate(File *document) 
+    : tag(0)
+    , audioProperties(0)
   {
     // Just get the first segment, because "Typically a Matroska file is
     // composed of 1 segment."
@@ -85,10 +88,12 @@ public:
   
   // Creates Tag and AudioProperties. Late creation because both require a fully
   // functional FilePrivate (well AudioProperties doesn't...)
-  void lateCreate()
+  void lateCreate(File *document, bool readProperties)
   {
     tag = new Tag(document);
-    audio = new AudioProperties(document);
+
+    if(readProperties)
+      audioProperties = new AudioProperties(document);
   }
   
   // Checks the EBML header and creates the FilePrivate.
@@ -114,10 +119,7 @@ public:
   Tag *tag;
   
   // The audio properties
-  AudioProperties *audio;
-  
-  // The corresponding file.
-  File *document;
+  AudioProperties *audioProperties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,30 +130,36 @@ EBML::Matroska::File::~File()
 {
   if (d) {
     delete d->tag;
-    delete d->audio;
+    delete d->audioProperties;
     delete d;
   }
 }
 
-EBML::Matroska::File::File(FileName file) : EBML::File(file), d(0)
+EBML::Matroska::File::File(FileName file, bool readProperties,
+                           AudioProperties::ReadStyle /*readStyle*/)
+  : EBML::File(file)
+  , d(0)
 {
   if(isValid() && isOpen()) {
     d = FilePrivate::checkAndCreate(this);
     if(!d)
       setValid(false);
     else
-    d->lateCreate();
+     d->lateCreate(this, readProperties);
   }
 }
 
-EBML::Matroska::File::File(IOStream *stream) : EBML::File(stream), d(0)
+EBML::Matroska::File::File(IOStream *stream, bool readProperties,
+                           AudioProperties::ReadStyle /*readStyle*/)
+  : EBML::File(stream)
+  , d(0)
 {
   if(isValid() && isOpen()) {
     d = FilePrivate::checkAndCreate(this);
     if(!d)
       setValid(false);
     else
-      d->lateCreate();
+      d->lateCreate(this, readProperties);
   }
 }
 
@@ -189,7 +197,7 @@ PropertyMap EBML::Matroska::File::setProperties(const PropertyMap &properties)
 
 AudioProperties *EBML::Matroska::File::audioProperties() const
 {
-  return d->audio;
+  return d->audioProperties;
 }
 
 bool EBML::Matroska::File::save()
@@ -207,8 +215,8 @@ bool EBML::Matroska::File::save()
       // No element? Create it!
       if(!i->second.first) {
         // Should be save, since we already checked, when creating the object.
-        Element *container = d->document->getDocumentRoot()
-          ->getChild(Constants::Segment)->getChild(Constants::Tags);
+        Element *container 
+          = getDocumentRoot()->getChild(Constants::Segment)->getChild(Constants::Tags);
         
         // Create Targets container
         i->second.first = container->addElement(Constants::Tag);
