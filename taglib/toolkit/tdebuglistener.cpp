@@ -43,7 +43,7 @@ namespace
     {
 #ifdef _WIN32
 
-      const wstring wstr = msg.toWString();
+      const std::wstring wstr = msg.toWString();
       const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
       if(len != 0) {
         std::vector<char> buf(len);
