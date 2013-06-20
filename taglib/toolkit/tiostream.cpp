@@ -73,8 +73,8 @@ namespace
 // If Win9x, converts and stores it into m_name to avoid calling Unicode version functions.
 
 FileName::FileName(const wchar_t *name) 
-  : m_wname(SystemSupportsUnicode ? name : L"")
-  , m_name (SystemSupportsUnicode ? "" : unicodeToAnsi(name))
+  : m_name (SystemSupportsUnicode ? "" : unicodeToAnsi(name))
+  , m_wname(SystemSupportsUnicode ? name : L"")
 {
 }
 
@@ -84,8 +84,8 @@ FileName::FileName(const char *name)
 }
 
 FileName::FileName(const FileName &name) 
-  : m_wname(name.m_wname)
-  , m_name (name.m_name) 
+  : m_name (name.m_name) 
+  , m_wname(name.m_wname)
 {
 }
 
