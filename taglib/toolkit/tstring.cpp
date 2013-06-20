@@ -25,7 +25,9 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "tstring.h"
 #include "tdebug.h"

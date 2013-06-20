@@ -19,7 +19,6 @@
  *   USA                                                                   *
  ***************************************************************************/
 
-#include "taglib_config.h"
 #include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>

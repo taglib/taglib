@@ -27,8 +27,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "taglib_config.h"
-
 #include <tfile.h>
 #include <tstring.h>
 #include <tdebug.h>

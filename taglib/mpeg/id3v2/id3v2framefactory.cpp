@@ -23,8 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
-#include "taglib_config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <tdebug.h>
 
 #include "id3v2framefactory.h"

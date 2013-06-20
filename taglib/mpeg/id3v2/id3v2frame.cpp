@@ -23,8 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
-#include "taglib_config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #if HAVE_ZLIB
 #include <zlib.h>
