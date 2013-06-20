@@ -19,7 +19,6 @@
  *   USA                                                                   *
  ***************************************************************************/
 
-#include "config.h"
 #include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>

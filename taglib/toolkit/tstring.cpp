@@ -25,26 +25,19 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include "tstring.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 #include "tsmartptr.h"
+#include "tutils.h"
 
 #include <iostream>
 #include <cstdio>
 #include <cstring>
-
-#if defined(HAVE_MSC_BYTESWAP)
-# include <stdlib.h>
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# include <byteswap.h>
-#elif defined(HAVE_MAC_BYTESWAP)
-# include <libkern/OSByteOrder.h>
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# include <sys/endian.h>
-#endif
 
 #ifdef HAVE_STD_CODECVT
 # include <codecvt>
@@ -54,34 +47,6 @@
 
 namespace
 {
-  inline TagLib::ushort byteSwap(TagLib::ushort x)
-  {
-#if defined(HAVE_GCC_BYTESWAP_16)
-
-    return __builtin_bswap16(x);
-
-#elif defined(HAVE_MSC_BYTESWAP)
-
-    return _byteswap_ushort(x);
-
-#elif defined(HAVE_GLIBC_BYTESWAP)
-
-    return __bswap_16(x);
-
-#elif defined(HAVE_MAC_BYTESWAP)
-
-    return OSSwapInt16(x);
-
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-
-    return swap16(x);
-
-#else
-
-    return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
-
-#endif
-  }
 
   inline unsigned short combine(unsigned char c1, unsigned char c2)
   {

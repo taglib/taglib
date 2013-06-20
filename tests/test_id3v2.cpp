@@ -1,6 +1,9 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <string>
 #include <stdio.h>
-#include <config.h>
 // so evil :(
 #define protected public
 #include <id3v2tag.h>

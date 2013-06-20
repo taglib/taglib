@@ -23,7 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <iostream>
 #include <limits>
@@ -31,19 +33,11 @@
 #include <cstdio>
 #include <cstring>
 
-#if defined(HAVE_MSC_BYTESWAP)
-# include <stdlib.h>
-#elif defined(HAVE_GLIBC_BYTESWAP)
-# include <byteswap.h>
-#elif defined(HAVE_MAC_BYTESWAP)
-# include <libkern/OSByteOrder.h>
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-# include <sys/endian.h>
-#endif
-
 #include "tstring.h"
 #include "tdebug.h"
 #include "tsmartptr.h"
+#include "tutils.h"
+
 #include "tbytevector.h"
 
 // This is a bit ugly to keep writing over and over again.
@@ -189,113 +183,6 @@ size_t findVector(
   return ByteVector::npos;
 }
 
-template <class T>
-inline T byteSwap(T x)
-{
-  // There should be 16,32 and 64-bit versions.
-  debug("byteSwap<T>() -- Non specialized version should not be called");
-  return 0;
-}
-
-template <>
-inline ushort byteSwap<ushort>(ushort x)
-{
-#if defined(HAVE_GCC_BYTESWAP_16)
-
-  return __builtin_bswap16(x);
-
-#elif defined(HAVE_MSC_BYTESWAP)
-
-  return _byteswap_ushort(x);
-
-#elif defined(HAVE_GLIBC_BYTESWAP)
-
-  return __bswap_16(x);
-
-#elif defined(HAVE_MAC_BYTESWAP)
-
-  return OSSwapInt16(x);
-
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-
-  return swap16(x);
-
-#else
-
-  return ((x >> 8) & 0xff) | ((x & 0xff) << 8);
-
-#endif
-}
-
-template <>
-inline uint byteSwap<uint>(uint x)
-{
-#if defined(HAVE_GCC_BYTESWAP_32)
-
-  return __builtin_bswap32(x);
-
-#elif defined(HAVE_MSC_BYTESWAP)
-
-  return _byteswap_ulong(x);
-
-#elif defined(HAVE_GLIBC_BYTESWAP)
-
-  return __bswap_32(x);
-
-#elif defined(HAVE_MAC_BYTESWAP)
-
-  return OSSwapInt32(x);
-
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-
-  return swap32(x);
-
-#else
-
-  return ((x & 0xff000000u) >> 24) 
-    | ((x & 0x00ff0000u) >>  8) 
-    | ((x & 0x0000ff00u) <<  8)
-    | ((x & 0x000000ffu) << 24);
-
-#endif
-}
-
-template <>
-inline ulonglong byteSwap<ulonglong>(ulonglong x)
-{
-#if defined(HAVE_GCC_BYTESWAP_64)
-
-  return __builtin_bswap64(x);
-
-#elif defined(HAVE_MSC_BYTESWAP)
-
-  return _byteswap_uint64(x);
-
-#elif defined(HAVE_GLIBC_BYTESWAP)
-
-  return __bswap_64(x);
-
-#elif defined(HAVE_MAC_BYTESWAP)
-
-  return OSSwapInt64(x);
-
-#elif defined(HAVE_OPENBSD_BYTESWAP)
-
-  return swap64(x);
-
-#else
-
-  return ((x & 0xff00000000000000ull) >> 56)
-    | ((x & 0x00ff000000000000ull) >> 40)
-    | ((x & 0x0000ff0000000000ull) >> 24)
-    | ((x & 0x000000ff00000000ull) >> 8)
-    | ((x & 0x00000000ff000000ull) << 8)
-    | ((x & 0x0000000000ff0000ull) << 24)
-    | ((x & 0x000000000000ff00ull) << 40)
-    | ((x & 0x00000000000000ffull) << 56);
-
-#endif
-}
 
 namespace {
   enum Endianness {
@@ -320,7 +207,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
     ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
     if(swap)
-      return byteSwap<T>(tmp);
+      return byteSwap(tmp);
     else
       return tmp;
   }
@@ -352,7 +239,7 @@ inline ByteVector fromNumber(T value)
 #endif
 
   if(swap)
-    value = byteSwap<T>(value);
+    value = byteSwap(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
 }
@@ -839,7 +726,7 @@ float ByteVector::toFloat32BE(size_t offset) const
     ::memcpy(&tmp, data() + offset, 4);
 
 # if SYSTEM_BYTEORDER == 1
-    tmp.i = byteSwap<uint>(tmp.i);
+    tmp.i = byteSwap(tmp.i);
 # endif
 
     return tmp.f;
@@ -900,7 +787,7 @@ double ByteVector::toFloat64BE(size_t offset) const
     ::memcpy(&tmp, data() + offset, 8);
 
 # if SYSTEM_BYTEORDER == 1
-    tmp.i = byteSwap<ulonglong>(tmp.i);
+    tmp.i = byteSwap(tmp.i);
 # endif
 
     return tmp.f;

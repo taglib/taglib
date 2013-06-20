@@ -23,7 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include "trefcounter.h"
 
 #if defined(HAVE_STD_ATOMIC)
