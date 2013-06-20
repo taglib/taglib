@@ -39,6 +39,9 @@
 #cmakedefine   HAVE_SNPRINTF 1
 #cmakedefine   HAVE_SPRINTF_S 1
 
+/* Defined if your compiler supports ISO _strdup. */
+#cmakedefine   HAVE_ISO_STRDUP 1
+
 /* Defined if your compiler supports codecvt */
 #cmakedefine   HAVE_STD_CODECVT 1
 

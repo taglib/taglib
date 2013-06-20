@@ -238,6 +238,16 @@ if(NOT HAVE_SNPRINTF)
   " HAVE_SPRINTF_S)
 endif()
 
+# Check which your compiler supports ISO _strdup.
+
+check_cxx_source_compiles("
+  #include <cstring>
+  int main() { 
+    _strdup(0); 
+    return 0; 
+}
+" HAVE_ISO_STRDUP)
+
 # Determine whether your compiler supports codecvt.
 
 check_cxx_source_compiles("
