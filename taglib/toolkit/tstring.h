@@ -52,7 +52,7 @@
  * conversion happening in the background
  *
  */
-#define TStringToQString(s) QString::fromUtf8(s.toCString(true))
+#define TStringToQString(s) QString::fromUtf8(s.to8Bit(true).c_str())
 
 namespace TagLib {
 
