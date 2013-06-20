@@ -26,6 +26,7 @@
 #ifndef TAGLIB_REFCOUNTER_H
 #define TAGLIB_REFCOUNTER_H
 
+#include "taglib_export.h"
 #include "taglib.h"
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
@@ -34,7 +35,7 @@
  */
 namespace TagLib
 {
-  class RefCounter
+  class TAGLIB_EXPORT RefCounter
   {
   public:
     RefCounter();

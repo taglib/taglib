@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,75 +23,52 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
+#ifndef TAGLIB_DEBUGLISTENER_H
+#define TAGLIB_DEBUGLISTENER_H
 
-#include "tdebug.h"
+#include "taglib_export.h"
 #include "tstring.h"
-#include "tdebuglistener.h"
 
-#include <bitset>
-#include <cstdio>
-#include <cstdarg>
-
-using namespace TagLib;
-
-namespace
+namespace TagLib 
 {
-  String format(const char *fmt, ...)
+  //! An abstraction for the listener to the debug messages.
+
+  /*!
+   * This class enables you to handle the debug messages in your preferred 
+   * way by subclassing this class, reimplementing printMessage() and setting 
+   * your reimplementation as the default with setDebugListener().
+   *
+   * \see setDebugListener()
+   */  
+  class TAGLIB_EXPORT DebugListener
   {
-    va_list args;
-    va_start(args, fmt);
+  public:
+    DebugListener();
+    virtual ~DebugListener();
 
-    char buf[256];
+    /*!
+     * When overridden in a derived class, redirects \a msg to your preferred
+     * channel such as stderr, Windows debugger or so forth.
+     */
+    virtual void printMessage(const String &msg) = 0;
 
-#if defined(HAVE_SNPRINTF)
+  private:
+    // Noncopyable
+    DebugListener(const DebugListener &);
+    DebugListener &operator=(const DebugListener &);
+  };
 
-    vsnprintf(buf, sizeof(buf), fmt, args);
-
-#elif defined(HAVE_SPRINTF_S)
-
-    vsprintf_s(buf, fmt, args);
-
-#else
-
-    // Be careful. May cause a buffer overflow.  
-    vsprintf(buf, fmt, args);
-
-#endif
-
-    va_end(args);
-
-    return String(buf);
-  }
+  /*!
+   * Sets the listener that decides how the debug messages are redirected.
+   * If the parameter \a listener is null, the previous listener is released 
+   * and default stderr listener is restored.   
+   *
+   * \note The caller is responsible for deleting the previous listener
+   * as needed after it is released.
+   *
+   * \see DebugListener
+   */
+  TAGLIB_EXPORT void setDebugListener(DebugListener *listener);
 }
 
-namespace TagLib
-{
-  // The instance is defined in tdebuglistener.cpp.
-  extern DebugListener *debugListener;
-
-  void debug(const String &s)
-  {
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
-  
-    debugListener->printMessage("TagLib: " + s + "\n");
-
 #endif
-  }
-
-  void debugData(const ByteVector &v)
-  {
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
-
-    for(size_t i = 0; i < v.size(); ++i) 
-    {
-      std::string bits = std::bitset<8>(v[i]).to_string();
-      String msg = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b%s\n", 
-        i, v[i], v[i], v[i], bits.c_str());
-
-      debugListener->printMessage(msg);
-    }
-
-#endif
-  }
-}

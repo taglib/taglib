@@ -54,11 +54,9 @@ namespace TagLib {
        *
        * \note In the current implementation, both \a readProperties and
        * \a propertiesStyle are ignored.
-       *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
        */
-      File(FileName file, bool readProperties = true, AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+      File(FileName file, bool readProperties = true, 
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Contructs an ASF file from \a file.  If \a readProperties is true the
@@ -71,7 +69,8 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true, AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+      File(IOStream *stream, bool readProperties = true, 
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.

@@ -67,12 +67,13 @@ namespace TagLib {
     {
     public:
       /*!
-       * Contructs a FLAC file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs a FLAC file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read.
        *
        * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file,
            bool readProperties = true,
@@ -80,12 +81,13 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
-       * Contructs a FLAC file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs a FLAC file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read.
        *
        * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.

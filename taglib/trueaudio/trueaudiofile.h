@@ -79,42 +79,50 @@ namespace TagLib {
       };
 
       /*!
-       * Contructs an TrueAudio file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs a TrueAudio file from \a file.  If \a readProperties is true 
+       * the file's audio properties will also be read.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
            AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
-       * Contructs an TrueAudio file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored. The frames will be created using
+       * Constructs a TrueAudio file from \a file.  If \a readProperties is true 
+       * the file's audio properties will also be read.
+       *
+       * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
-       * Contructs an TrueAudio file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Constructs a TrueAudio file from \a stream.  If \a readProperties is true
+       * the file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true,
            AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
-       * Contructs an TrueAudio file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored. The frames will be created using
-       * \a frameFactory.
+       * Constructs a TrueAudio file from \a stream.  If \a readProperties is true 
+       * the file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
+       *
+       * If this file contains and ID3v2 tag the frames will be created using
+       * \a frameFactory.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,

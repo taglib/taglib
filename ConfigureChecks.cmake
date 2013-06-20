@@ -270,6 +270,7 @@ endif()
 # Determine whether CppUnit is installed.
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
 find_package(CppUnit)
 if(NOT CppUnit_FOUND AND BUILD_TESTS)
   message(STATUS "CppUnit not found, disabling tests.")

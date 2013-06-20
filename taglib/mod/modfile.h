@@ -37,18 +37,20 @@ namespace TagLib {
     {
     public:
       /*!
-       * Contructs a Protracker file from \a file. If \a readProperties
-       * is true the file's audio properties will also be read using
-       * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+       * Constructs a Protracker file from \a file.
+       *
+       * \note In the current implementation, both \a readProperties and
+       * \a propertiesStyle are ignored.
        */
       File(FileName file, bool readProperties = true,
            AudioProperties::ReadStyle propertiesStyle =
            AudioProperties::Average);
 
       /*!
-       * Contructs a Protracker file from \a stream. If \a readProperties
-       * is true the file's audio properties will also be read using
-       * \a propertiesStyle. If false, \a propertiesStyle is ignored.
+       * Constructs a Protracker file from \a stream.
+       *
+       * \note In the current implementation, both \a readProperties and
+       * \a propertiesStyle are ignored.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.

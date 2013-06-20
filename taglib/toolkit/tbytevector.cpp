@@ -566,11 +566,11 @@ bool ByteVector::containsAt(
     patternLength = pattern.size();
 
   // do some sanity checking -- all of these things are needed for the search to be valid
-
-  if(offset + patternLength > size() || patternOffset >= pattern.size() || patternLength == 0)
+  const uint compareLength = patternLength - patternOffset;
+  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)    
     return false;
   
-  return (::memcmp(data() + offset, pattern.data() + patternOffset, patternLength - patternOffset) == 0);
+  return (::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0);
 }
 
 bool ByteVector::startsWith(const ByteVector &pattern) const
