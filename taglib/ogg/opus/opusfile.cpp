@@ -59,17 +59,17 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Opus::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) 
-  : Ogg::File(file)
-  , d(new FilePrivate())
+Opus::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) :
+  Ogg::File(file),
+  d(new FilePrivate())
 {
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
-Opus::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) 
-  : Ogg::File(stream)
-  , d(new FilePrivate())
+Opus::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) :
+  Ogg::File(stream),
+  d(new FilePrivate())
 {
   if(isOpen())
     read(readProperties, propertiesStyle);
