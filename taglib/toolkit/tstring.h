@@ -178,40 +178,56 @@ namespace TagLib {
     virtual ~String();
 
     /*!
-     * If \a unicode if false (the default) this will return a \e Latin1 encoded
-     * std::string.  If it is true the returned std::wstring will be UTF-8
-     * encoded.
+     * Returns a deep copy of this String as an std::string.  The returned string 
+     * is encoded in UTF8 if \a unicode is true, otherwise Latin1.
+     *
+     * \see toCString()
      */
     std::string to8Bit(bool unicode = false) const;
 
     /*!
-     * Returns a wstring version of the TagLib string as a wide string.
+     * Returns a deep copy of this String as a wstring.  The returned string is 
+     * encoded in UTF-16 (without BOM/CPU byte order).
+     *
+     * \see toCWString()
      */
     wstring toWString() const;
 
     /*!
-     * Creates and returns a C-String based on the data.  This string is still
-     * owned by the String (class) and as such should not be deleted by the user.
+     * Creates and returns a standard C-style (null-terminated) version of this 
+     * String.  The returned string is encoded in UTF8 if \a unicode is true, 
+     * otherwise Latin1.
+     * 
+     * The returned string is still owned by this String and should not be deleted 
+     * by the user.
      *
-     * If \a unicode if false (the default) this string will be encoded in
-     * \e Latin1.  If it is true the returned C-String will be UTF-8 encoded.
+     * The returned pointer remains valid until this String instance is destroyed 
+     * or toCString() is called again.
      *
-     * This string remains valid until the String instance is destroyed or
-     * another export method is called.
-     *
-     * \warning This however has the side effect that this C-String will remain
-     * in memory <b>in addition to</b> other memory that is consumed by the
+     * \warning This however has the side effect that the returned string will remain
+     * in memory <b>in addition to</b> other memory that is consumed by this 
      * String instance.  So, this method should not be used on large strings or
-     * where memory is critical.
+     * where memory is critical.  Consider using to8Bit() instead to avoid it.
+     *
+     * \see to8Bit()
      */
     const char *toCString(bool unicode = false) const;
     
     /*!
-     * Returns a pointer to the wide char version of the TagLib string.  The string 
-     * is encoded in UTF-16(without BOM/CPU byte order). 
+     * Returns a standard C-style (null-terminated) wide character version of 
+     * this String.  The returned string is encoded in UTF-16 (without BOM/CPU byte 
+     * order).
+     * 
+     * The returned string is still owned by this String and should not be deleted 
+     * by the user.
+     *
+     * The returned pointer remains valid until this String instance is destroyed 
+     * or any other method of this String is called.
      *
      * /note This returns a pointer to the String's internal data without any 
      * conversions.
+     *
+     * \see toWString()
      */
     const wchar_t *toCWString() const;
     
