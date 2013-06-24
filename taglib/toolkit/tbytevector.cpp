@@ -453,7 +453,7 @@ bool ByteVector::containsAt(
     patternLength = pattern.size();
 
   // do some sanity checking -- all of these things are needed for the search to be valid
-  const uint compareLength = patternLength - patternOffset;
+  const size_t compareLength = patternLength - patternOffset;
   if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)    
     return false;
   
