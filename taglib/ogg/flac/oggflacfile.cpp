@@ -137,6 +137,11 @@ bool Ogg::FLAC::File::save()
   return Ogg::File::save();
 }
 
+bool Ogg::FLAC::File::hasXiphComment() const
+{
+  return d->hasXiphComment;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -286,9 +291,4 @@ void Ogg::FLAC::File::scan()
   d->streamLength = File::length() - d->streamStart;
 
   d->scanned = true;
-}
-
-bool Ogg::FLAC::File::hasXiphComment() const
-{
-  return d->hasXiphComment;
 }

@@ -140,27 +140,38 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this will return a null pointer
+       * If \a create is false (the default) this may return a null pointer
        * if there is no valid ID3v1 tag.  If \a create is true it will create
-       * an ID3v1 tag if one does not exist. If there is already an APE tag, the
-       * new ID3v1 tag will be placed after it.
+       * an ID3v1 tag if one does not exist and returns a valid pointer.
        *
-       * \note The Tag <b>is still</b> owned by the APE::File and should not be
+       * \note This may return a valid pointer regardless of whether or not the 
+       * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file 
+       * on disk actually has an ID3v1 tag.
+       *
+       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
+       *
+       * \see hasID3v1Tag()
        */
       ID3v1::Tag *ID3v1Tag(bool create = false);
 
       /*!
        * Returns a pointer to the APE tag of the file.
        *
-       * If \a create is false (the default) this will return a null pointer
+       * If \a create is false (the default) this may return a null pointer
        * if there is no valid APE tag.  If \a create is true it will create
-       * a APE tag if one does not exist.
+       * an APE tag if one does not exist and returns a valid pointer.
        *
-       * \note The Tag <b>is still</b> owned by the APE::File and should not be
+       * \note This may return a valid pointer regardless of whether or not the 
+       * file on disk has an APE tag.  Use hasAPETag() to check if the file 
+       * on disk actually has an APE tag.
+       *
+       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
+       *
+       * \see hasAPETag()
        */
       APE::Tag *APETag(bool create = false);
 
@@ -175,12 +186,16 @@ namespace TagLib {
       void strip(int tags = AllTags);
       
       /*!
-       * Returns whether or not the file on disk contains an ID3v1 tag.
+       * Returns whether or not the file on disk actually has an ID3v1 tag.
+       *
+       * \see ID3v1Tag()
        */
       bool hasID3v1Tag() const;
 
       /*!
-       * Returns whether or not the file on disk contains an APE tag.
+       * Returns whether or not the file on disk actually has an APE tag.
+       *
+       * \see APETag()
        */
       bool hasAPETag() const;
     

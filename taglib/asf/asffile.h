@@ -114,7 +114,6 @@ namespace TagLib {
       virtual bool save();
 
     private:
-
       int readBYTE(bool *ok = 0);
       int readWORD(bool *ok = 0);
       unsigned int readDWORD(bool *ok = 0);
