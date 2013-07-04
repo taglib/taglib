@@ -209,7 +209,17 @@ namespace TagLib {
        * \note In order to make the removal permanent save() still needs to be called
        */
       void strip(int tags = AllTags);
+      
+      /*!
+       * Returns whether or not the file on disk contains an ID3v1 tag.
+       */
+      bool hasID3v1Tag() const;
 
+      /*!
+       * Returns whether or not the file on disk contains an ID3v2 tag.
+       */
+      bool hasID3v2Tag() const;
+    
     private:
       File(const File &);
       File &operator=(const File &);

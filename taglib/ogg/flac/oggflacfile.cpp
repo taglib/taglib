@@ -287,3 +287,8 @@ void Ogg::FLAC::File::scan()
 
   d->scanned = true;
 }
+
+bool Ogg::FLAC::File::hasXiphComment() const
+{
+  return d->hasXiphComment;
+}

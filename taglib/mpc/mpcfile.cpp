@@ -39,7 +39,7 @@ using namespace TagLib;
 
 namespace
 {
-  enum { MPCAPEIndex, MPCID3v1Index };
+  enum { MPCAPEIndex = 0, MPCID3v1Index = 1 };
 }
 
 class MPC::File::FilePrivate
@@ -256,6 +256,15 @@ void MPC::File::remove(int tags)
   strip(tags);
 }
 
+bool MPC::File::hasID3v1Tag() const
+{
+  return d->hasID3v1;
+}
+
+bool MPC::File::hasAPETag() const
+{
+  return d->hasAPE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members

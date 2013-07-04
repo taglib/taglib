@@ -128,6 +128,11 @@ namespace TagLib {
        */
       long streamLength();
 
+      /*!
+       * Returns whether or not the file on disk contains a Xiph comment.
+       */
+      bool hasXiphComment() const;
+
     private:
       File(const File &);
       File &operator=(const File &);

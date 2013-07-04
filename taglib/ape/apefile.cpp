@@ -47,7 +47,7 @@ using namespace TagLib;
 
 namespace
 {
-  enum { ApeAPEIndex, ApeID3v1Index };
+  enum { ApeAPEIndex = 0, ApeID3v1Index = 1 };
 }
 
 class APE::File::FilePrivate
@@ -233,6 +233,16 @@ void APE::File::strip(int tags)
     if(!ID3v1Tag())
       APETag(true);
   }
+}
+
+bool APE::File::hasAPETag() const
+{
+  return d->hasAPE;
+}
+
+bool APE::File::hasID3v1Tag() const
+{
+  return d->hasID3v1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -113,6 +113,11 @@ namespace TagLib {
          */
         virtual bool save();
 
+        /*!
+         * Returns whether or not the file on disk contains an ID3v2 tag.
+         */
+        bool hasID3v2Tag() const;
+
       private:
         File(const File &);
         File &operator=(const File &);

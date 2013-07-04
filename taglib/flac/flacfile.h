@@ -246,6 +246,21 @@ namespace TagLib {
        */
       void addPicture(Picture *picture);
 
+      /*!
+       * Returns whether or not the file on disk contains a Xiph comment.
+       */
+      bool hasXiphComment() const;
+
+      /*!
+       * Returns whether or not the file on disk contains an ID3v1 tag.
+       */
+      bool hasID3v1Tag() const;
+
+      /*!
+       * Returns whether or not the file on disk contains an ID3v2 tag.
+       */
+      bool hasID3v2Tag() const;
+
     private:
       File(const File &);
       File &operator=(const File &);

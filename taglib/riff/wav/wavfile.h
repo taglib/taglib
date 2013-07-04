@@ -139,6 +139,16 @@ namespace TagLib {
         virtual bool save();
 
         bool save(TagTypes tags, bool stripOthers = true, int id3v2Version = 4);
+        
+        /*!
+         * Returns whether or not the file on disk contains an ID3v2 tag.
+         */
+        bool hasID3v2Tag() const;
+
+        /*!
+         * Returns whether or not the file on disk contains an RIFF INFO tag.
+         */
+        bool hasInfoTag() const;
 
       private:
         File(const File &);
