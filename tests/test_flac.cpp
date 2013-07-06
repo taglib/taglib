@@ -80,7 +80,7 @@ public:
     List<FLAC::Picture *> lst = f->pictureList();
     CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
-    FLAC::Picture *newpic = new FLAC::Picture();
+    FLAC::Picture *newpic = f->addPicture();
     newpic->setType(FLAC::Picture::BackCover);
     newpic->setWidth(5);
     newpic->setHeight(6);
@@ -89,7 +89,6 @@ public:
     newpic->setMimeType("image/jpeg");
     newpic->setDescription("new image");
     newpic->setData("JPEG data");
-    f->addPicture(newpic);
     f->save();
 
     f = new FLAC::File(newname.c_str());
@@ -126,7 +125,8 @@ public:
     List<FLAC::Picture *> lst = f->pictureList();
     CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
-    FLAC::Picture *newpic = new FLAC::Picture();
+    f->removePictures();
+    FLAC::Picture *newpic = f->addPicture();
     newpic->setType(FLAC::Picture::BackCover);
     newpic->setWidth(5);
     newpic->setHeight(6);
@@ -135,8 +135,6 @@ public:
     newpic->setMimeType("image/jpeg");
     newpic->setDescription("new image");
     newpic->setData("JPEG data");
-    f->removePictures();
-    f->addPicture(newpic);
     f->save();
 
     f = new FLAC::File(newname.c_str());

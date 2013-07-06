@@ -46,7 +46,7 @@ namespace TagLib {
   /*!
    * This is implementation of FLAC metadata for non-Ogg FLAC files.  At some
    * point when Ogg / FLAC is more common there will be a similar implementation
-   * under the Ogg hiearchy.
+   * under the Ogg hierarchy.
    *
    * This supports ID3v1, ID3v2 and Xiph style comments as well as reading stream
    * properties from the file.
@@ -190,23 +190,27 @@ namespace TagLib {
       List<Picture *> pictureList();
 
       /*!
-       * Removes an attached picture. If \a del is true the picture's memory
-       * will be freed; if it is false, it must be deleted by the user.
+       * Adds a new picture based on \a data to the file and returns a pointer 
+       * to the new picture.
+       *
+       * \note The picture is owned by the FLAC::File and should not be deleted 
+       * by the user.  It will be deleted when the file (object) is destroyed.
+       *
+       * \note The file will be saved only after calling save().
+       *
+       * \see FLAC::Picture::Picture()
        */
-      void removePicture(Picture *picture, bool del = true);
+      Picture *addPicture(const ByteVector &data = ByteVector::null);
+
+      /*!
+       * Removes an attached picture. The picture's memory will be freed.
+       */
+      void removePicture(Picture *picture);
 
       /*!
        * Remove all attached images.
        */
       void removePictures();
-
-      /*!
-       * Add a new picture to the file. The file takes ownership of the
-       * picture and will handle freeing its memory.
-       *
-       * \note The file will be saved only after calling save().
-       */
-      void addPicture(Picture *picture);
 
     private:
       File(const File &);
