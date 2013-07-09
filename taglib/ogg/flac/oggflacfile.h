@@ -91,10 +91,18 @@ namespace TagLib {
 
       /*!
        * Returns the Tag for this file.  This will always be a XiphComment.
+       *
+       * \note This always returns a valid pointer regardless of whether or not 
+       * the file on disk has a XiphComment.  Use hasXiphComment() to check if 
+       * the file on disk actually has a XiphComment.
+       * 
+       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
+       * deleted by the user.  It will be deleted when the file (object) is
+       * destroyed.
+       *
+       * \see hasXiphComment()
        */
       virtual XiphComment *tag() const;
-
-
 
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties
@@ -127,6 +135,13 @@ namespace TagLib {
        * calculating the bitrate.
        */
       long streamLength();
+
+      /*!
+       * Returns whether or not the file on disk actually has a XiphComment.
+       *
+       * \see tag()
+       */
+      bool hasXiphComment() const;
 
     private:
       File(const File &);
