@@ -35,10 +35,9 @@ using namespace ID3v1;
 class ID3v1::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), tagOffset(-1), track(0), genre(255) {}
-
-  File *file;
-  offset_t tagOffset;
+  TagPrivate() : 
+    track(0), 
+    genre(255) {}
 
   String title;
   String artist;
@@ -47,16 +46,13 @@ public:
   String comment;
   uchar track;
   uchar genre;
-
-  static const TagLib::StringHandler *stringHandler;
 };
 
 namespace
 {
   const ID3v1::StringHandler defaultStringHandler;
+  const TagLib::StringHandler *stringHandler = &defaultStringHandler;
 }
-
-const TagLib::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
@@ -76,25 +72,24 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
   if(s.isLatin1())
     return s.data(String::Latin1);
   else
-    return ByteVector();
+    return ByteVector::null;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-ID3v1::Tag::Tag() : TagLib::Tag()
+ID3v1::Tag::Tag() : 
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
 }
 
-ID3v1::Tag::Tag(File *file, offset_t tagOffset) : TagLib::Tag()
+ID3v1::Tag::Tag(File *file, offset_t tagOffset) : 
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
-  d->file = file;
-  d->tagOffset = tagOffset;
-
-  read();
+  read(file, tagOffset);
 }
 
 ID3v1::Tag::~Tag()
@@ -105,13 +100,14 @@ ID3v1::Tag::~Tag()
 ByteVector ID3v1::Tag::render() const
 {
   ByteVector data;
+  data.reserve(128);
 
   data.append(fileIdentifier());
-  data.append(TagPrivate::stringHandler->render(d->title).resize(30));
-  data.append(TagPrivate::stringHandler->render(d->artist).resize(30));
-  data.append(TagPrivate::stringHandler->render(d->album).resize(30));
-  data.append(TagPrivate::stringHandler->render(d->year).resize(4));
-  data.append(TagPrivate::stringHandler->render(d->comment).resize(28));
+  data.append(stringHandler->render(d->title).resize(30));
+  data.append(stringHandler->render(d->artist).resize(30));
+  data.append(stringHandler->render(d->album).resize(30));
+  data.append(stringHandler->render(d->year).resize(4));
+  data.append(stringHandler->render(d->comment).resize(28));
   data.append(char(0));
   data.append(char(d->track));
   data.append(char(d->genre));
@@ -207,21 +203,21 @@ void ID3v1::Tag::setGenreNumber(TagLib::uint i)
 void ID3v1::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    stringHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    stringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v1::Tag::read()
+void ID3v1::Tag::read(File *file, offset_t tagOffset)
 {
-  if(d->file && d->file->isValid()) {
-    d->file->seek(d->tagOffset);
+  if(file && file->isValid()) {
+    file->seek(tagOffset);
     // read the tag -- always 128 bytes
-    ByteVector data = d->file->readBlock(128);
+    ByteVector data = file->readBlock(128);
 
     // some initial sanity checking
     if(data.size() == 128 && data.startsWith("TAG"))
@@ -233,18 +229,18 @@ void ID3v1::Tag::read()
 
 void ID3v1::Tag::parse(const ByteVector &data)
 {
-  int offset = 3;
+  size_t offset = 3;
 
-  d->title = TagPrivate::stringHandler->parse(data.mid(offset, 30));
+  d->title = stringHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->artist = TagPrivate::stringHandler->parse(data.mid(offset, 30));
+  d->artist = stringHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->album = TagPrivate::stringHandler->parse(data.mid(offset, 30));
+  d->album = stringHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->year = TagPrivate::stringHandler->parse(data.mid(offset, 4));
+  d->year = stringHandler->parse(data.mid(offset, 4));
   offset += 4;
 
   // Check for ID3v1.1 -- Note that ID3v1 *does not* support "track zero" -- this
@@ -255,7 +251,7 @@ void ID3v1::Tag::parse(const ByteVector &data)
   if(data[offset + 28] == 0 && data[offset + 29] != 0) {
     // ID3v1.1 detected
 
-    d->comment = TagPrivate::stringHandler->parse(data.mid(offset, 28));
+    d->comment = stringHandler->parse(data.mid(offset, 28));
     d->track = uchar(data[offset + 29]);
   }
   else

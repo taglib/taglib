@@ -20,6 +20,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/riff
   ${CMAKE_CURRENT_SOURCE_DIR}/riff/aiff
   ${CMAKE_CURRENT_SOURCE_DIR}/riff/wav
+  ${CMAKE_CURRENT_SOURCE_DIR}/riff/rmp3
   ${CMAKE_CURRENT_SOURCE_DIR}/mod
   ${CMAKE_CURRENT_SOURCE_DIR}/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/it
@@ -107,11 +108,13 @@ set(tag_HDRS
   trueaudio/trueaudiofile.h
   trueaudio/trueaudioproperties.h
   riff/rifffile.h
+  riff/infotag.h
   riff/aiff/aifffile.h
   riff/aiff/aiffproperties.h
   riff/wav/wavfile.h
   riff/wav/wavproperties.h
-  riff/wav/infotag.h
+  riff/rmp3/rmp3file.h
+  riff/rmp3/rmp3properties.h
   asf/asffile.h
   asf/asfproperties.h
   asf/asftag.h
@@ -254,6 +257,7 @@ set(asf_SRCS
 
 set(riff_SRCS
   riff/rifffile.cpp
+  riff/infotag.cpp
 )
 
 set(aiff_SRCS
@@ -264,7 +268,11 @@ set(aiff_SRCS
 set(wav_SRCS
   riff/wav/wavfile.cpp
   riff/wav/wavproperties.cpp
-  riff/wav/infotag.cpp
+)
+
+set(rmp3_SRCS
+  riff/rmp3/rmp3file.cpp
+  riff/rmp3/rmp3properties.cpp
 )
 
 set(mod_SRCS
@@ -320,8 +328,8 @@ set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
-  ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${ebml_SRCS} ${matroska_SRCS}
+  ${rmp3_SRCS} ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} 
+  ${opus_SRCS} ${ebml_SRCS} ${matroska_SRCS} 
   tag.cpp
   tagunion.cpp
   fileref.cpp

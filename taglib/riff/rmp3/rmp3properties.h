@@ -1,7 +1,7 @@
 /***************************************************************************
-    copyright            : (C) 2008 by Scott Wheeler
-    email                : wheeler@kde.org
-***************************************************************************/
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
+ ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -23,38 +23,40 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_WAVPROPERTIES_H
-#define TAGLIB_WAVPROPERTIES_H
+#ifndef TAGLIB_RMP3PROPERTIES_H
+#define TAGLIB_RMP3PROPERTIES_H
 
-#include "taglib.h"
+#include "taglib_export.h"
 #include "audioproperties.h"
+#include "mpegheader.h"
+#include "xingheader.h"
 
 namespace TagLib {
 
-  class ByteVector;
-
   namespace RIFF {
 
-    namespace WAV {
+    namespace RMP3 {
 
-      //! An implementation of audio property reading for WAV
+      class File;
+
+      //! An implementation of audio property reading for RMP3
 
       /*!
-       * This reads the data from an WAV stream found in the AudioProperties
-       * API.
+       * This reads the data from an MPEG Layer III stream found in the
+       * AudioProperties API.
        */
 
       class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
       {
       public:
         /*!
-         * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data and the length calculated using \a streamLength.
+         * Creates an instance of RMP3::AudioProperties with the data read from 
+         * the RMP3::File \a file.
          */
-        AudioProperties(const ByteVector &data, uint streamLength, ReadStyle style);
+        AudioProperties(File *file, ReadStyle style = Average);
 
         /*!
-         * Destroys this WAV::AudioProperties instance.
+         * Destroys this MPEG::AudioProperties instance.
          */
         virtual ~AudioProperties();
 
@@ -64,27 +66,45 @@ namespace TagLib {
         virtual int bitrate() const;
         virtual int sampleRate() const;
         virtual int channels() const;
-        
-        /*!
-         * Returns the number of bits used to define each sample.
-         */
-        int sampleWidth() const;
 
         /*!
-         * Returns the number of the data frames.
-         *
-         * \note If the format ID is not 1 (linear PCM), the value is not valid.Å@
+         * Returns a pointer to the XingHeader if one exists or null if no
+         * XingHeader was found.
          */
-        uint sampleFrames() const;
+        const MPEG::XingHeader *xingHeader() const;
 
         /*!
-         * Returns the format ID of the file.  1 means the linear PCM, 0 means unknown. 
-         * Although there are various IDs are defined, other ones are seldom used.
-         */ 
-        uint formatID() const;
+         * Returns the MPEG Version of the file.
+         */
+        MPEG::Header::Version version() const;
+
+        /*!
+         * Returns the layer version.  This will be between the values 1-3.
+         */
+        int layer() const;
+
+        /*!
+         * Returns true if the MPEG protection bit is enabled.
+         */
+        bool protectionEnabled() const;
+
+        /*!
+         * Returns the channel mode for this frame.
+         */
+        MPEG::Header::ChannelMode channelMode() const;
+
+        /*!
+         * Returns true if the copyrighted bit is set.
+         */
+        bool isCopyrighted() const;
+
+        /*!
+         * Returns true if the "original" bit is set.
+         */
+        bool isOriginal() const;
 
       private:
-        void read(const ByteVector &data, uint streamLength);
+        void read(File *file);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

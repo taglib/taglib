@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -27,14 +27,13 @@
 #include <tstring.h>
 #include <tsmartptr.h>
 
-#include "mpegproperties.h"
-#include "mpegfile.h"
-#include "xingheader.h"
+#include "rmp3properties.h"
+#include "rmp3file.h"
 #include "mpegutils.h"
 
 using namespace TagLib;
 
-class MPEG::AudioProperties::PropertiesPrivate
+class RIFF::RMP3::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
@@ -43,20 +42,20 @@ public:
     sampleRate(0),
     channels(0),
     layer(0),
-    version(Header::Version1),
-    channelMode(Header::Stereo),
+    version(MPEG::Header::Version1),
+    channelMode(MPEG::Header::Stereo),
     protectionEnabled(false),
     isCopyrighted(false),
     isOriginal(false) {}
 
-  SCOPED_PTR<XingHeader> xingHeader;
+  SCOPED_PTR<MPEG::XingHeader> xingHeader;
   int length;
   int bitrate;
   int sampleRate;
   int channels;
   int layer;
-  Header::Version version;
-  Header::ChannelMode channelMode;
+  MPEG::Header::Version version;
+  MPEG::Header::ChannelMode channelMode;
   bool protectionEnabled;
   bool isCopyrighted;
   bool isOriginal;
@@ -66,69 +65,69 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+RIFF::RMP3::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
   TagLib::AudioProperties(style),
   d(new PropertiesPrivate())
 {
   read(file);
 }
 
-MPEG::AudioProperties::~AudioProperties()
+RIFF::RMP3::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int MPEG::AudioProperties::length() const
+int RIFF::RMP3::AudioProperties::length() const
 {
   return d->length;
 }
 
-int MPEG::AudioProperties::bitrate() const
+int RIFF::RMP3::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int MPEG::AudioProperties::sampleRate() const
+int RIFF::RMP3::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int MPEG::AudioProperties::channels() const
+int RIFF::RMP3::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-const MPEG::XingHeader *MPEG::AudioProperties::xingHeader() const
+const XingHeader *RIFF::RMP3::AudioProperties::xingHeader() const
 {
   return d->xingHeader.get();
 }
 
-MPEG::Header::Version MPEG::AudioProperties::version() const
+Header::Version RIFF::RMP3::AudioProperties::version() const
 {
   return d->version;
 }
 
-int MPEG::AudioProperties::layer() const
+int RIFF::RMP3::AudioProperties::layer() const
 {
   return d->layer;
 }
 
-bool MPEG::AudioProperties::protectionEnabled() const
+bool RIFF::RMP3::AudioProperties::protectionEnabled() const
 {
   return d->protectionEnabled;
 }
 
-MPEG::Header::ChannelMode MPEG::AudioProperties::channelMode() const
+Header::ChannelMode RIFF::RMP3::AudioProperties::channelMode() const
 {
   return d->channelMode;
 }
 
-bool MPEG::AudioProperties::isCopyrighted() const
+bool RIFF::RMP3::AudioProperties::isCopyrighted() const
 {
   return d->isCopyrighted;
 }
 
-bool MPEG::AudioProperties::isOriginal() const
+bool RIFF::RMP3::AudioProperties::isOriginal() const
 {
   return d->isOriginal;
 }
@@ -137,7 +136,7 @@ bool MPEG::AudioProperties::isOriginal() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::AudioProperties::read(File *file)
+void RIFF::RMP3::AudioProperties::read(File *file)
 {
   readMpegAudioProperties(file, d);
 }
