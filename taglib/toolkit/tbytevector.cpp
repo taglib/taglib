@@ -594,6 +594,14 @@ ByteVector &ByteVector::resize(size_t size, char padding)
   return *this;
 }
 
+ByteVector &ByteVector::reserve(size_t size)
+{
+  detach();
+  d->data->reserve(size);
+
+  return *this;
+}
+
 ByteVector::Iterator ByteVector::begin()
 {
   return d->data->begin() + d->offset;

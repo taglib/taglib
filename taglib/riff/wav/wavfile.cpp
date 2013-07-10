@@ -23,14 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tbytevector.h"
-#include "tdebug.h"
-#include "tstringlist.h"
-#include "tpropertymap.h"
+#include <tbytevector.h>
+#include <tpropertymap.h>
+#include <tdebug.h>
+#include <tsmartptr.h>
 
 #include "wavfile.h"
-#include "id3v2tag.h"
-#include "infotag.h"
 #include "tagunion.h"
 
 using namespace TagLib;
@@ -44,21 +42,14 @@ class RIFF::WAV::File::FilePrivate
 {
 public:
   FilePrivate() :
-    properties(0),
-    tagChunkID("ID3 ")
-  {
-  }
+    ID3v2FrameFactory(ID3v2::FrameFactory::instance()),
+    tagChunkID("ID3 ") {}
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
+  const ID3v2::FrameFactory *ID3v2FrameFactory;
 
-  AudioProperties *properties;
-  
+  SCOPED_PTR<DoubleTagUnion> tag;
+  SCOPED_PTR<AudioProperties> properties;
   ByteVector tagChunkID;
-
-  DoubleTagUnion tag;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,17 +57,27 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::WAV::File::File(FileName file, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(file, LittleEndian)
+                      AudioProperties::ReadStyle propertiesStyle,
+                      ID3v2::FrameFactory *frameFactory) : 
+  RIFF::File(file, LittleEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
+  if(frameFactory)
+    d->ID3v2FrameFactory = frameFactory;
+
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 RIFF::WAV::File::File(IOStream *stream, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(stream, LittleEndian)
+                      AudioProperties::ReadStyle propertiesStyle,
+                      ID3v2::FrameFactory *frameFactory) : 
+  RIFF::File(stream, LittleEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
+  if(frameFactory)
+    d->ID3v2FrameFactory = frameFactory;
+
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
@@ -88,17 +89,17 @@ RIFF::WAV::File::~File()
 
 TagLib::Tag *RIFF::WAV::File::tag() const
 {
-  return &d->tag;
+  return d->tag.get();
 }
 
 ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
 {
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, false);
+  return d->tag->access<ID3v2::Tag>(ID3v2Index, false);
 }
 
 RIFF::Info::Tag *RIFF::WAV::File::InfoTag() const
 {
-  return d->tag.access<RIFF::Info::Tag>(InfoIndex, false);
+  return d->tag->access<RIFF::Info::Tag>(InfoIndex, false);
 }
 
 PropertyMap RIFF::WAV::File::properties() const
@@ -118,7 +119,7 @@ PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 
 RIFF::WAV::AudioProperties *RIFF::WAV::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool RIFF::WAV::File::save()
@@ -141,21 +142,16 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
   if(stripOthers)
     strip(static_cast<TagTypes>(AllTags & ~tags));
 
-  ID3v2::Tag *id3v2tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
+  ID3v2::Tag *id3v2tag = d->tag->access<ID3v2::Tag>(ID3v2Index, false);
   if(!id3v2tag->isEmpty()) {
     if(tags & ID3v2)
       setChunkData(d->tagChunkID, id3v2tag->render(id3v2Version));
   }
 
-  Info::Tag *infotag = d->tag.access<Info::Tag>(InfoIndex, false);
+  Info::Tag *infotag = d->tag->access<Info::Tag>(InfoIndex, false);
   if(!infotag->isEmpty()) {
-    if(tags & Info) {
-      int chunkId = findInfoTagChunk();
-      if(chunkId != -1)
-        setChunkData(chunkId, infotag->render());
-      else
-        setChunkData("LIST", infotag->render(), true);
-    }
+    removeInfoTagChunk();
+    setChunkData("LIST", infotag->render(), true);
   }
 
   return true;
@@ -167,35 +163,40 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
 
 void RIFF::WAV::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
+  if(typeName() != "RIFF" || formatName() != "WAVE") {
+    setValid(false);
+    return;
+  }
+
+  d->tag.reset(new DoubleTagUnion());
+
   ByteVector formatData;
   uint streamLength = 0;
   for(uint i = 0; i < chunkCount(); i++) {
     String name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       d->tagChunkID = chunkName(i);
-      d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i)));
+      d->tag->set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i), d->ID3v2FrameFactory));
     }
     else if(name == "fmt " && readProperties)
       formatData = chunkData(i);
     else if(name == "data" && readProperties)
       streamLength = chunkDataSize(i);
     else if(name == "LIST") {
-      ByteVector data = chunkData(i);
-      ByteVector type = data.mid(0, 4);
-
-      if(type == "INFO")
-        d->tag.set(InfoIndex, new RIFF::Info::Tag(data));
+      const ByteVector data = chunkData(i);
+      if(data.size() > 12 && data.mid(0, 4) == "INFO") 
+        d->tag->set(InfoIndex, new RIFF::Info::Tag(data));
     }
   }
 
-  if (!d->tag[ID3v2Index])
-    d->tag.set(ID3v2Index, new ID3v2::Tag);
+  if(!d->tag->tag(ID3v2Index))
+    d->tag->set(ID3v2Index, new ID3v2::Tag());
 
-  if (!d->tag[InfoIndex])
-    d->tag.set(InfoIndex, new RIFF::Info::Tag);
+  if(!d->tag->tag(InfoIndex))
+    d->tag->set(InfoIndex, new RIFF::Info::Tag());
 
   if(!formatData.isEmpty())
-    d->properties = new AudioProperties(formatData, streamLength, propertiesStyle);
+    d->properties.reset(new AudioProperties(formatData, streamLength, propertiesStyle));
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)
@@ -203,20 +204,16 @@ void RIFF::WAV::File::strip(TagTypes tags)
   if(tags & ID3v2)
     removeChunk(d->tagChunkID);
 
-  if(tags & Info){
-    TagLib::uint chunkId = findInfoTagChunk();
-    if(chunkId != TagLib::uint(-1))
-      removeChunk(chunkId);
-  }
+  if(tags & Info)
+    removeInfoTagChunk();
 }
 
-TagLib::uint RIFF::WAV::File::findInfoTagChunk()
+void RIFF::WAV::File::removeInfoTagChunk()
 {
   for(uint i = 0; i < chunkCount(); ++i) {
     if(chunkName(i) == "LIST" && chunkData(i).mid(0, 4) == "INFO") {
-      return i;
+      removeChunk(i);
+      break;
     }
   }
-  
-  return TagLib::uint(-1);
 }

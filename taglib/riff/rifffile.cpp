@@ -26,6 +26,7 @@
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <tstring.h>
+#include <tsmartptr.h>
 
 #include "rifffile.h"
 #include <vector>
@@ -48,10 +49,8 @@ class RIFF::File::FilePrivate
 public:
   FilePrivate() :
     endianness(BigEndian),
-    size(0)
-  {
+    size(0) {}
 
-  }
   Endianness endianness;
   ByteVector type;
   TagLib::uint size;
@@ -129,15 +128,7 @@ ByteVector RIFF::File::chunkData(uint i)
   if(i >= chunkCount())
     return ByteVector::null;
 
-  // Offset for the first subchunk's data
-
-  long begin = 12 + 8;
-
-  for(uint it = 0; it < i; it++)
-    begin += 8 + d->chunks[it].size + d->chunks[it].padding;
-
-  seek(begin);
-
+  seek(d->chunks[i].offset);
   return readBlock(d->chunks[i].size);
 }
 
@@ -249,6 +240,16 @@ void RIFF::File::removeChunk(const ByteVector &name)
   d->chunks.swap(newChunks);
 }
 
+TagLib::ByteVector TagLib::RIFF::File::typeName() const
+{
+  return d->type;
+}
+
+TagLib::ByteVector TagLib::RIFF::File::formatName() const
+{
+  return d->format;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -346,3 +347,4 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
   }
   insert(combined, offset, replace);
 }
+

@@ -223,6 +223,14 @@ namespace TagLib {
     ByteVector &resize(size_t size, char padding = 0);
 
     /*!
+     * Reallocates the internal buffer of the vector to be sufficient to contain 
+     * \a size bytes.  Returns a reference to the reallocated vector.
+     *
+     * \note This doesn't affect the size of the vector.
+     */
+    ByteVector &reserve(size_t size);
+
+    /*!
      * Returns an Iterator that points to the front of the vector.
      */
     Iterator begin();

@@ -27,6 +27,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
+  CPPUNIT_TEST(testRMP3);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -152,6 +153,11 @@ public:
   void testWav()
   {
     fileRefSave("empty", ".wav");
+  }
+
+  void testRMP3()
+  {
+    fileRefSave("xing", ".rmp");
   }
 
   void testOGA_FLAC()

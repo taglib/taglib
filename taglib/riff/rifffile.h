@@ -69,11 +69,6 @@ namespace TagLib {
       uint chunkCount() const;
 
       /*!
-       * \return The offset within the file for the selected chunk number.
-       */
-      offset_t chunkOffset(uint i) const;
-
-      /*!
        * \return The size of the chunk data.
        */
       uint chunkDataSize(uint i) const;
@@ -87,6 +82,11 @@ namespace TagLib {
        * \return The name of the specified chunk, for instance, "COMM" or "ID3 "
        */
       ByteVector chunkName(uint i) const;
+
+      /*!
+       * \return The offset within the file for the selected chunk number.
+       */
+      offset_t chunkOffset(uint i) const;
 
       /*!
        * Reads the chunk data from the file and returns it.
@@ -139,10 +139,17 @@ namespace TagLib {
        */
       void removeChunk(const ByteVector &name);
 
-    private:
-      File(const File &);
-      File &operator=(const File &);
+      /*!
+       * Returns the type name of the File.  Should be "RIFF".
+       */
+      ByteVector typeName() const;
 
+      /*!
+       * Returns the format name of the File.  For example, "WAVE" for WAV file.
+       */
+      ByteVector formatName() const;
+
+    private:
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,
                       offset_t offset, uint replace = 0,

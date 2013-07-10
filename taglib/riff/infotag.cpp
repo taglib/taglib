@@ -27,19 +27,26 @@
 #include <tfile.h>
 
 #include "infotag.h"
+#include "id3v1tag.h"
 
 using namespace TagLib;
 using namespace RIFF::Info;
 
 namespace 
 {
-  bool isValidChunkID(const ByteVector &name)
+  const RIFF::Info::StringHandler defaultStringHandler;
+  const TagLib::StringHandler *stringHandler = &defaultStringHandler;
+
+  bool isValidChunkID(const ByteVector &id)
   {
-    if(name.size() != 4)
+    // id should consist of 4 ASCII chars.
+
+    if(id.size() != 4)
       return false;
 
-    for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || 127 < name[i])
+    for(size_t i = 0; i < 4; i++) {
+      const uchar c = static_cast<uchar>(id[i]);
+      if(c < 32 || 127 < c)
         return false;
     }
 
@@ -50,20 +57,8 @@ namespace
 class RIFF::Info::Tag::TagPrivate
 {
 public:
-  TagPrivate() 
-  {}
-
-  FieldListMap fieldListMap;
-
-  static const TagLib::StringHandler *stringHandler;
+  FieldMap fields;
 };
-
-namespace
-{
-  const RIFF::Info::StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
@@ -167,10 +162,26 @@ void RIFF::Info::Tag::setGenre(const String &s)
 
 void RIFF::Info::Tag::setYear(uint i)
 {
-  if(i != 0)
-    setFieldText("ICRD", String::number(i));
-  else
-    d->fieldListMap.erase("ICRD");
+  if(i != 0) {
+    String year = "000" + String::number(i);
+    year = year.substr(year.length() - 4, 4);
+
+    String date = fieldText("ICRD");
+    if(date.length() >= 4) {
+      date[0] = year[0];
+      date[1] = year[1];
+      date[2] = year[2];
+      date[3] = year[3];
+    }
+    else {
+      date = year;
+    }
+
+    setFieldText("ICRD", date);
+  }
+  else {
+    removeField("ICRD");
+  }
 }
 
 void RIFF::Info::Tag::setTrack(uint i)
@@ -178,47 +189,56 @@ void RIFF::Info::Tag::setTrack(uint i)
   if(i != 0)
     setFieldText("IPRT", String::number(i));
   else
-    d->fieldListMap.erase("IPRT");
+    removeField("IPRT");
 }
 
 bool RIFF::Info::Tag::isEmpty() const
 {
-  return d->fieldListMap.isEmpty();
+  return d->fields.isEmpty();
+}
+
+RIFF::Info::FieldMap RIFF::Info::Tag::fieldMap() const
+{
+  return d->fields;
 }
 
 String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 {
-  if(d->fieldListMap.contains(id))
-    return String(d->fieldListMap[id]);
+  if(d->fields.contains(id))
+    return d->fields[id];
   else
-    return String();
+    return String::null;
 }
 
-void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
+void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &text)
 {
-  // id must be four-byte long pure ASCII string.
-  if(!isValidChunkID(id))
+  if(!isValidChunkID(id)) {
+    debug("RIFF::Info::Tag::setFieldText() - Invalid field ID '" + String(id) + "'.");
     return;
+  }
 
-  if(!s.isEmpty())
-    d->fieldListMap[id] = s;
+  if(!text.isEmpty())
+    d->fields[id] = text;
   else
     removeField(id);
 }
 
 void RIFF::Info::Tag::removeField(const ByteVector &id)
 {
-  if(d->fieldListMap.contains(id))
-    d->fieldListMap.erase(id);
+  if(d->fields.contains(id))
+    d->fields.erase(id);
 }
 
-ByteVector RIFF::Info::Tag::render() const
+ByteVector RIFF::Info::Tag::render(bool createIID3Field) const
 {
-  ByteVector data("INFO");
+  if(d->fields.isEmpty())
+    return ByteVector::null;
 
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it) {
-    ByteVector text = TagPrivate::stringHandler->render(it->second);
+  ByteVector data("INFO");
+  data.reserve(1024);
+
+  for(FieldMap::ConstIterator it = d->fields.begin(); it != d->fields.end(); ++it) {
+    ByteVector text = stringHandler->render(it->second);
     if(text.isEmpty())
       continue;
 
@@ -231,8 +251,23 @@ ByteVector RIFF::Info::Tag::render() const
     } while(data.size() & 1);
   }
 
+  if(createIID3Field) {
+    ID3v1::Tag v1tag;
+    v1tag.setTitle(title());
+    v1tag.setArtist(artist());
+    v1tag.setAlbum(album());
+    v1tag.setYear(year());
+    v1tag.setComment(comment());
+    v1tag.setTrack(track());
+    v1tag.setGenre(genre());
+
+    data.append("IID3");
+    data.append(ByteVector::fromUInt32LE(128));
+    data.append(v1tag.render());
+  }
+
   if(data.size() == 4)
-    return ByteVector();
+    return ByteVector::null;
   else
     return data;
 }
@@ -240,9 +275,9 @@ ByteVector RIFF::Info::Tag::render() const
 void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    stringHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    stringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -252,11 +287,20 @@ void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
 void RIFF::Info::Tag::parse(const ByteVector &data)
 {
   size_t p = 4;
-  while(p < data.size()) {
+  while(p < data.size() - 8) 
+  {
     const uint size = data.toUInt32LE(p + 4);
-    d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
+    const ByteVector id = data.mid(p, 4);
+    if(isValidChunkID(id)) {
+      // "IID3" field is ignored here, but will be restored when the tag is saved. 
+      if(id != "IID3")
+        d->fields[id] = stringHandler->parse(data.mid(p + 8, size));
+    }
+    else { 
+      debug("RIFF::Info::Tag::parse() - Skipped an invalid field '" + String(id) + "'.");
+    }
 
-    p += ((size + 1) & ~1) + 8;
+    p += 8 + ((size + 1) & ~1);
   }
 }
 
