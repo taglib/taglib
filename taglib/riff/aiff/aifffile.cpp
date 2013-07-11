@@ -130,6 +130,11 @@ bool RIFF::AIFF::File::save()
 
 void RIFF::AIFF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
+  if(typeName() != "FORM" || (formatName() != "AIFF" && formatName() != "AIFC")) {
+    setValid(false);
+    return;
+  }
+
   for(uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
       d->tagChunkID = chunkName(i);

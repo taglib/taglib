@@ -142,6 +142,18 @@ namespace TagLib {
        */
       void removeChunk(const ByteVector &name);
 
+      /*!
+       * Returns the type name of the File.  
+       * For example, "FORM" for AIFF files, "RIFF" for WAV and RIFF MP3 files.
+       */
+      ByteVector typeName() const;
+
+      /*!
+       * Returns the format name of the File.  
+       * For example, "AIFF" or "AIFC" for AIFF files, "WAVE" for WAV files.
+       */
+      ByteVector formatName() const;
+
     private:
       File(const File &);
       File &operator=(const File &);
