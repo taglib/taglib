@@ -313,7 +313,7 @@ const char *String::toCString(bool unicode) const
 
 const wchar_t *String::toCWString() const
 {
-  return d->data.c_str();
+  return d->data->c_str();
 }
 
 String::Iterator String::begin()
