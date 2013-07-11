@@ -72,6 +72,9 @@ public:
     String unicode2(unicode.to8Bit(true), String::UTF8);
     CPPUNIT_ASSERT(unicode == unicode2);
 
+	String unicode3(L"\u65E5\u672C\u8A9E");
+	CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+
     CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);
     CPPUNIT_ASSERT(strcmp(String::number(12345678).toCString(), "12345678") == 0);
     CPPUNIT_ASSERT(strcmp(String::number(-12345678).toCString(), "-12345678") == 0);
