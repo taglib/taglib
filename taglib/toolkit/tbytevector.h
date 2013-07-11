@@ -64,17 +64,17 @@ namespace TagLib {
     ByteVector(uint size, char value = 0);
 
     /*!
-     * Contructs a byte vector that is a copy of \a v.
+     * Constructs a byte vector that is a copy of \a v.
      */
     ByteVector(const ByteVector &v);
 
     /*!
-     * Contructs a byte vector that is a copy of \a v.
+     * Constructs a byte vector that is a copy of \a v.
      */
     ByteVector(const ByteVector &v, uint offset, uint length);
 
     /*!
-     * Contructs a byte vector that contains \a c.
+     * Constructs a byte vector that contains \a c.
      */
     ByteVector(char c);
 
