@@ -173,30 +173,40 @@ namespace TagLib {
       virtual bool save();
 
       /*!
-       * Returns a pointer to the ID3v2 tag of the file.
+       * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this will return a null pointer
-       * if there is no valid ID3v2 tag.  If \a create is true it will create
-       * an ID3v1 tag if one does not exist. If there is already an APE tag, the
-       * new ID3v1 tag will be placed after it.
+       * If \a create is false (the default) this may return a null pointer
+       * if there is no valid ID3v1 tag.  If \a create is true it will create
+       * an ID3v1 tag if one does not exist and returns a valid pointer.
        *
-       * \note The Tag <b>is still</b> owned by the TrueAudio::File and should not be
+       * \note This may return a valid pointer regardless of whether or not the 
+       * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file 
+       * on disk actually has an ID3v1 tag.
+       *
+       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
+       *
+       * \see hasID3v1Tag()
        */
       ID3v1::Tag *ID3v1Tag(bool create = false);
 
       /*!
-       * Returns a pointer to the ID3v1 tag of the file.
+       * Returns a pointer to the ID3v2 tag of the file.
        *
-       * If \a create is false (the default) this will return a null pointer
-       * if there is no valid ID3v1 tag.  If \a create is true it will create
-       * an ID3v1 tag if one does not exist. If there is already an APE tag, the
-       * new ID3v1 tag will be placed after it.
+       * If \a create is false (the default) this may return a null pointer
+       * if there is no valid ID3v2 tag.  If \a create is true it will create
+       * an ID3v2 tag if one does not exist and returns a valid pointer.
        *
-       * \note The Tag <b>is still</b> owned by the TrueAudio::File and should not be
+       * \note This may return a valid pointer regardless of whether or not the 
+       * file on disk has an ID3v2 tag.  Use hasID3v2Tag() to check if the file 
+       * on disk actually has an ID3v2 tag.
+       *
+       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
+       *
+       * \see hasID3v2Tag()
        */
       ID3v2::Tag *ID3v2Tag(bool create = false);
 
@@ -209,7 +219,21 @@ namespace TagLib {
        * \note In order to make the removal permanent save() still needs to be called
        */
       void strip(int tags = AllTags);
+      
+      /*!
+       * Returns whether or not the file on disk actually has an ID3v1 tag.
+       *
+       * \see ID3v1Tag()
+       */
+      bool hasID3v1Tag() const;
 
+      /*!
+       * Returns whether or not the file on disk actually has an ID3v2 tag.
+       *
+       * \see ID3v2Tag()
+       */
+      bool hasID3v2Tag() const;
+    
     private:
       File(const File &);
       File &operator=(const File &);

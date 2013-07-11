@@ -105,11 +105,23 @@ namespace TagLib {
 
         /*!
          * Returns the ID3v2 Tag for this file.
+         *
+         * \note This always returns a valid pointer regardless of whether or not 
+         * the file on disk has an ID3v2 tag.  Use hasID3v2Tag() to check if the 
+         * file on disk actually has an ID3v2 tag.
+         *
+         * \see hasID3v2Tag()
          */
         ID3v2::Tag *ID3v2Tag() const;
 
         /*!
          * Returns the RIFF INFO Tag for this file.
+         *
+         * \note This always returns a valid pointer regardless of whether or not 
+         * the file on disk has a RIFF INFO tag.  Use hasInfoTag() to check if the 
+         * file on disk actually has a RIFF INFO tag.
+         *
+         * \see hasInfoTag()
          */
         Info::Tag *InfoTag() const;
 
@@ -139,6 +151,20 @@ namespace TagLib {
         virtual bool save();
 
         bool save(TagTypes tags, bool stripOthers = true, int id3v2Version = 4);
+        
+        /*!
+         * Returns whether or not the file on disk actually has an ID3v2 tag.
+         *
+         * \see ID3v2Tag()
+         */
+        bool hasID3v2Tag() const;
+
+        /*!
+         * Returns whether or not the file on disk actually has a RIFF INFO tag.
+         *
+         * \see InfoTag()
+         */
+        bool hasInfoTag() const;
 
       private:
         File(const File &);

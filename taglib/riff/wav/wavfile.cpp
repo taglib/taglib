@@ -45,7 +45,9 @@ class RIFF::WAV::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tagChunkID("ID3 ")
+    tagChunkID("ID3 "),
+    hasID3v2(false),
+    hasInfo(false)
   {
   }
 
@@ -59,6 +61,9 @@ public:
   ByteVector tagChunkID;
 
   TagUnion tag;
+
+  bool hasID3v2;
+  bool hasInfo;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,8 +148,10 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
 
   ID3v2::Tag *id3v2tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
   if(!id3v2tag->isEmpty()) {
-    if(tags & ID3v2)
+    if(tags & ID3v2) {
       setChunkData(d->tagChunkID, id3v2tag->render(id3v2Version));
+      d->hasID3v2 = true;
+    }
   }
 
   Info::Tag *infotag = d->tag.access<Info::Tag>(InfoIndex, false);
@@ -155,10 +162,22 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
         setChunkData(chunkId, infotag->render());
       else
         setChunkData("LIST", infotag->render(), true);
+
+      d->hasInfo = true;
     }
   }
 
   return true;
+}
+
+bool RIFF::WAV::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
+}
+
+bool RIFF::WAV::File::hasInfoTag() const
+{
+  return d->hasInfo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -174,6 +193,7 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
     if(name == "ID3 " || name == "id3 ") {
       d->tagChunkID = chunkName(i);
       d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i)));
+      d->hasID3v2 = true;
     }
     else if(name == "fmt " && readProperties)
       formatData = chunkData(i);
@@ -183,8 +203,10 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
       ByteVector data = chunkData(i);
       ByteVector type = data.mid(0, 4);
 
-      if(type == "INFO")
+      if(type == "INFO") {
         d->tag.set(InfoIndex, new RIFF::Info::Tag(data));
+        d->hasInfo = true;
+      }
     }
   }
 

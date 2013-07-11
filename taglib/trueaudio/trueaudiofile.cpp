@@ -236,6 +236,16 @@ void TrueAudio::File::strip(int tags)
   }
 }
 
+bool TrueAudio::File::hasID3v1Tag() const
+{
+  return d->hasID3v1;
+}
+
+bool TrueAudio::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
