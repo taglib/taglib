@@ -27,6 +27,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
+  CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -171,6 +172,15 @@ public:
   void testAPE()
   {
     fileRefSave("mac-399", ".ape");
+  }
+
+  void testUnsupported()
+  {
+    FileRef f1(TEST_FILE_PATH_C("no-extension"));
+    CPPUNIT_ASSERT(f1.isNull());
+    
+    FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xxx"));
+    CPPUNIT_ASSERT(f2.isNull());
   }
 };
 

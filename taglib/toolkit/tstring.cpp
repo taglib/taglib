@@ -311,6 +311,11 @@ const char *String::toCString(bool unicode) const
   return d->cstring->c_str();
 }
 
+const wchar_t *String::toCWString() const
+{
+  return d->data.c_str();
+}
+
 String::Iterator String::begin()
 {
   return d->data->begin();
