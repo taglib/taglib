@@ -29,7 +29,6 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-
 #include <oggpageheader.h>
 
 #include "speexproperties.h"
@@ -41,9 +40,7 @@ using namespace TagLib::Ogg;
 class Speex::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -52,8 +49,6 @@ public:
     vbr(false),
     mode(0) {}
 
-  File *file;
-  ReadStyle style;
   int length;
   int bitrate;
   int sampleRate;
@@ -67,11 +62,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Speex::AudioProperties::AudioProperties(File *file, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+Speex::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-  read();
+  read(file);
 }
 
 Speex::AudioProperties::~AudioProperties()
@@ -108,11 +102,11 @@ int Speex::AudioProperties::speexVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Speex::AudioProperties::read()
+void Speex::AudioProperties::read(File *file)
 {
   // Get the identification header from the Ogg implementation.
 
-  ByteVector data = d->file->packet(0);
+  const ByteVector data = file->packet(0);
 
   size_t pos = 28;
 
@@ -153,12 +147,12 @@ void Speex::AudioProperties::read()
   // frames_per_packet;      /**< Number of frames stored per Ogg packet */
   // unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
 
-  const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last = d->file->lastPageHeader();
+  const Ogg::PageHeader *first = file->firstPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
-    long long start = first->absoluteGranularPosition();
-    long long end = last->absoluteGranularPosition();
+    const long long start = first->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0 && d->sampleRate > 0)
       d->length = (int) ((end - start) / (long long) d->sampleRate);

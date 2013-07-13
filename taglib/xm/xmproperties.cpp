@@ -37,9 +37,7 @@ public:
     sampleCount(0),
     flags(0),
     tempo(0),
-    bpmSpeed(0)
-  {
-  }
+    bpmSpeed(0) {}
 
   ushort lengthInPatterns;
   int    channels;
@@ -53,9 +51,12 @@ public:
   ushort bpmSpeed;
 };
 
-XM::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle)
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+XM::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) : 
+  d(new PropertiesPrivate())
 {
 }
 
@@ -128,6 +129,10 @@ TagLib::ushort XM::AudioProperties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
 
 void XM::AudioProperties::setLengthInPatterns(ushort lengthInPatterns)
 {

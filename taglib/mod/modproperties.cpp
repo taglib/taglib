@@ -30,18 +30,19 @@ public:
   PropertiesPrivate() :
     channels(0),
     instrumentCount(0),
-    lengthInPatterns(0)
-  {
-  }
+    lengthInPatterns(0) {}
 
   int   channels;
   uint  instrumentCount;
   uchar lengthInPatterns;
 };
 
-Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) 
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) :
+  d(new PropertiesPrivate)
 {
 }
 
@@ -79,6 +80,10 @@ uchar Mod::AudioProperties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
 
 void Mod::AudioProperties::setChannels(int channels)
 {

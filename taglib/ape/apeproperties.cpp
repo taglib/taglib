@@ -29,7 +29,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-#include <bitset>
+
 #include "id3v2tag.h"
 #include "apeproperties.h"
 #include "apefile.h"
@@ -39,16 +39,14 @@ using namespace TagLib;
 class APE::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *file, offset_t streamLength) :
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
     version(0),
     bitsPerSample(0),
-    sampleFrames(0),
-    file(file),
-    streamLength(streamLength) {}
+    sampleFrames(0) {}
 
   int length;
   int bitrate;
@@ -57,19 +55,16 @@ public:
   int version;
   int bitsPerSample;
   uint sampleFrames;
-  File *file;
-  offset_t streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::AudioProperties::AudioProperties(File *file, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+APE::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, file->length());
-  read();
+  read(file);
 }
 
 APE::AudioProperties::~AudioProperties()
@@ -117,35 +112,35 @@ TagLib::uint APE::AudioProperties::sampleFrames() const
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void APE::AudioProperties::read()
+void APE::AudioProperties::read(File *file)
 {
   // First we are searching the descriptor
-  offset_t offset = findDescriptor();
+  offset_t offset = findDescriptor(file);
   if(offset < 0)
     return;
 
   // Then we read the header common for all versions of APE
-  d->file->seek(offset);
-  ByteVector commonHeader = d->file->readBlock(6);
+  file->seek(offset);
+  ByteVector commonHeader = file->readBlock(6);
   if(!commonHeader.startsWith("MAC "))
     return;
   d->version = commonHeader.toUInt16LE(4);
 
   if(d->version >= 3980) {
-    analyzeCurrent();
+    analyzeCurrent(file);
   }
   else {
-    analyzeOld();
+    analyzeOld(file);
   }
 }
 
-offset_t APE::AudioProperties::findDescriptor()
+offset_t APE::AudioProperties::findDescriptor(File *file)
 {
-  offset_t ID3v2Location = findID3v2();
+  offset_t ID3v2Location = findID3v2(file);
   long ID3v2OriginalSize = 0;
   bool hasID3v2 = false;
   if(ID3v2Location >= 0) {
-    ID3v2::Tag tag(d->file, ID3v2Location);
+    ID3v2::Tag tag(file, ID3v2Location);
     ID3v2OriginalSize = tag.header()->completeTagSize();
     if(tag.header()->tagSize() > 0)
       hasID3v2 = true;
@@ -153,9 +148,9 @@ offset_t APE::AudioProperties::findDescriptor()
 
   offset_t offset = 0;
   if(hasID3v2)
-    offset = d->file->find("MAC ", ID3v2Location + ID3v2OriginalSize);
+    offset = file->find("MAC ", ID3v2Location + ID3v2OriginalSize);
   else
-    offset = d->file->find("MAC ");
+    offset = file->find("MAC ");
 
   if(offset < 0) {
     debug("APE::Properties::findDescriptor() -- APE descriptor not found");
@@ -165,31 +160,31 @@ offset_t APE::AudioProperties::findDescriptor()
   return offset;
 }
 
-offset_t APE::AudioProperties::findID3v2()
+offset_t APE::AudioProperties::findID3v2(File *file)
 {
-  if(!d->file->isValid())
+  if(!file->isValid())
     return -1;
 
-  d->file->seek(0);
+  file->seek(0);
 
-  if(d->file->readBlock(3) == ID3v2::Header::fileIdentifier())
+  if(file->readBlock(3) == ID3v2::Header::fileIdentifier())
     return 0;
 
   return -1;
 }
 
-void APE::AudioProperties::analyzeCurrent()
+void APE::AudioProperties::analyzeCurrent(File *file)
 {
   // Read the descriptor
-  d->file->seek(2, File::Current);
-  ByteVector descriptor = d->file->readBlock(44);
+  file->seek(2, File::Current);
+  ByteVector descriptor = file->readBlock(44);
   const uint descriptorBytes = descriptor.toUInt32LE(0);
 
   if ((descriptorBytes - 52) > 0)
-    d->file->seek(descriptorBytes - 52, File::Current);
+    file->seek(descriptorBytes - 52, File::Current);
 
   // Read the header
-  ByteVector header = d->file->readBlock(24);
+  ByteVector header = file->readBlock(24);
 
   // Get the APE info
   d->channels = header.toInt16LE(18);
@@ -203,12 +198,12 @@ void APE::AudioProperties::analyzeCurrent()
 
   d->sampleFrames = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
-  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(file->length() * 8L / d->length / 1000) : 0;
 }
 
-void APE::AudioProperties::analyzeOld()
+void APE::AudioProperties::analyzeOld(File *file)
 {
-  ByteVector header = d->file->readBlock(26);
+  ByteVector header = file->readBlock(26);
   const uint totalFrames = header.toUInt32LE(18);
 
   // Fail on 0 length APE files (catches non-finalized APE files)
@@ -229,6 +224,6 @@ void APE::AudioProperties::analyzeOld()
   const uint finalFrameBlocks = header.toUInt32LE(22);
   const uint totalBlocks = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = totalBlocks / d->sampleRate;
-  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(file->length() * 8L / d->length / 1000) : 0;
 }
 

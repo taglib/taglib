@@ -38,15 +38,17 @@ public:
     sampleRate(0),
     channels(0),
     sampleWidth(0),
-    sampleFrames(0)
-  {
-  }
+    sampleFrames(0) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
   int sampleWidth;
+
+  ByteVector compressionType;
+  String compressionName;
+
   uint sampleFrames;
 };
 
@@ -54,9 +56,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) 
-  : TagLib::AudioProperties(style)
-  , d(new PropertiesPrivate())
+RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
   read(data);
 }
@@ -101,12 +102,32 @@ TagLib::uint RIFF::AIFF::AudioProperties::sampleFrames() const
   return d->sampleFrames;
 }
 
+bool RIFF::AIFF::AudioProperties::isAiffC() const
+{
+  return (!d->compressionType.isEmpty());
+}
+
+ByteVector RIFF::AIFF::AudioProperties::compressionType() const
+{
+  return d->compressionType;
+}
+
+String RIFF::AIFF::AudioProperties::compressionName() const
+{
+  return d->compressionName;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
 void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
 {
+  if(data.size() < 18) {
+    debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF.");
+    return;
+  }
+
   d->channels       = data.toInt16BE(0);
   d->sampleFrames   = data.toUInt32BE(2);
   d->sampleWidth    = data.toInt16BE(6);
@@ -114,4 +135,12 @@ void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
   d->sampleRate     = static_cast<int>(sampleRate);
   d->bitrate        = static_cast<int>((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
+
+  if(data.size() < 23) {
+    debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF-C.");
+    return;
+  }
+
+  d->compressionType = data.mid(18, 4);
+  d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
 }

@@ -52,7 +52,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of WavPack::AudioProperties.
+       * Creates an instance of WavPack::AudioProperties.
        */
       AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
 
@@ -80,11 +80,8 @@ namespace TagLib {
       int version() const;
 
     private:
-      AudioProperties(const AudioProperties &);
-      AudioProperties &operator=(const AudioProperties &);
-
-      void read();
-      unsigned int seekFinalIndex();
+      void read(File *file, offset_t streamLength, ReadStyle style);
+      unsigned int seekFinalIndex(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

@@ -34,10 +34,7 @@ using namespace TagLib;
 class FLAC::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(const ByteVector &d, offset_t st, ReadStyle s) :
-    data(d),
-    streamLength(st),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -45,9 +42,6 @@ public:
     channels(0),
     sampleFrames(0) {}
 
-  ByteVector data;
-  offset_t streamLength;
-  ReadStyle style;
   int length;
   int bitrate;
   int sampleRate;
@@ -61,11 +55,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style)
-  : TagLib::AudioProperties(style)
+FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, 
+                                       ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(data, streamLength, style);
-  read();
+  read(data, streamLength);
 }
 
 FLAC::AudioProperties::~AudioProperties()
@@ -112,14 +106,14 @@ ByteVector FLAC::AudioProperties::signature() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::AudioProperties::read()
+void FLAC::AudioProperties::read(const ByteVector &data, offset_t streamLength)
 {
-  if(d->data.size() < 18) {
+  if(data.size() < 18) {
     debug("FLAC::Properties::read() - FLAC properties must contain at least 18 bytes.");
     return;
   }
 
-  uint pos = 0;
+  size_t pos = 0;
 
   // Minimum block size (in samples)
   pos += 2;
@@ -133,7 +127,7 @@ void FLAC::AudioProperties::read()
   // Maximum frame size (in bytes)
   pos += 3;
 
-  const uint flags = d->data.toUInt32BE(pos);
+  const uint flags = data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleRate = flags >> 12;
@@ -144,7 +138,7 @@ void FLAC::AudioProperties::read()
   // stream length in samples. (Audio files measured in days)
 
   const ulonglong hi = flags & 0xf;
-  const ulonglong lo = d->data.toUInt32BE(pos);
+  const ulonglong lo = data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleFrames = (hi << 32) | lo;
@@ -158,7 +152,7 @@ void FLAC::AudioProperties::read()
 
   // Real bitrate:
 
-  d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
 
-  d->signature = d->data.mid(pos, 32);
+  d->signature = data.mid(pos, 32);
 }

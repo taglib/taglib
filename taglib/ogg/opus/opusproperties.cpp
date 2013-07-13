@@ -29,7 +29,6 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-
 #include <oggpageheader.h>
 
 #include "opusproperties.h"
@@ -41,16 +40,12 @@ using namespace TagLib::Ogg;
 class Opus::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     inputSampleRate(0),
     channels(0),
     opusVersion(0) {}
 
-  File *file;
-  ReadStyle style;
   int length;
   int inputSampleRate;
   int channels;
@@ -61,11 +56,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Opus::AudioProperties::AudioProperties(File *file, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+Opus::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-  read();
+  read(file);
 }
 
 Opus::AudioProperties::~AudioProperties()
@@ -110,16 +104,16 @@ int Opus::AudioProperties::opusVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Opus::AudioProperties::read()
+void Opus::AudioProperties::read(File *file)
 {
   // Get the identification header from the Ogg implementation.
 
   // http://tools.ietf.org/html/draft-terriberry-oggopus-01#section-5.1
 
-  ByteVector data = d->file->packet(0);
+  const ByteVector data = file->packet(0);
 
   // *Magic Signature*
-  uint pos = 8;
+  size_t pos = 8;
 
   // *Version* (8 bits, unsigned)
   d->opusVersion = uchar(data.at(pos));
@@ -143,12 +137,12 @@ void Opus::AudioProperties::read()
   // *Channel Mapping Family* (8 bits, unsigned)
   pos += 1;
 
-  const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last = d->file->lastPageHeader();
+  const Ogg::PageHeader *first = file->firstPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
-    long long start = first->absoluteGranularPosition();
-    long long end = last->absoluteGranularPosition();
+    const long long start = first->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0)
       d->length = (int) ((end - start - preSkip) / 48000);

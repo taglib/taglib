@@ -50,10 +50,10 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of APE::AudioProperties with the data read from
+       * Creates an instance of APE::AudioProperties with the data read from
        * the ByteVector \a data.
        */
-      AudioProperties(File *f, ReadStyle style = Average);
+      AudioProperties(File *file, ReadStyle style = Average);
 
       /*!
        * Destroys this APE::AudioProperties instance.
@@ -79,16 +79,13 @@ namespace TagLib {
       int version() const;
 
     private:
-      AudioProperties(const AudioProperties &);
-      AudioProperties &operator=(const AudioProperties &);
+      void read(File *file);
 
-      void read();
+      offset_t findDescriptor(File *file);
+      offset_t findID3v2(File *file);
 
-      offset_t findDescriptor();
-      offset_t findID3v2();
-
-      void analyzeCurrent();
-      void analyzeOld();
+      void analyzeCurrent(File *file);
+      void analyzeOld(File *file);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

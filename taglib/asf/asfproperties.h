@@ -34,13 +34,16 @@ namespace TagLib {
 
   namespace ASF {
 
+    class File;
+
     //! An implementation of ASF audio properties
     class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
-    public:
+      friend class File;
 
+    public:
       /*!
-       * Create an instance of ASF::AudioProperties.
+       * Creates an instance of ASF::AudioProperties.
        */
       AudioProperties();
 
@@ -50,21 +53,20 @@ namespace TagLib {
       virtual ~AudioProperties();
 
       // Reimplementations.
+
       virtual int length() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
       bool isEncrypted() const;
 
-#ifndef DO_NOT_DOCUMENT
+    private:
       void setLength(int value);
       void setBitrate(int value);
       void setSampleRate(int value);
       void setChannels(int value);
       void setEncrypted(bool value);
-#endif
 
-    private:
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };

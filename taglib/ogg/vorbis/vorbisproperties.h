@@ -48,7 +48,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of Vorbis::Properties with the data read from the
+       * Creates an instance of Vorbis::Properties with the data read from the
        * Vorbis::File \a file.
        */
       AudioProperties(File *file, ReadStyle style = Average);
@@ -74,26 +74,29 @@ namespace TagLib {
       /*!
        * Returns the maximum bitrate as read from the Vorbis identification
        * header.
+       *
+       * \note The value is in bits per second unlike bitrate().
        */
       int bitrateMaximum() const;
 
       /*!
        * Returns the nominal bitrate as read from the Vorbis identification
        * header.
+       *
+       * \note The value is in bits per second unlike bitrate().
        */
       int bitrateNominal() const;
 
       /*!
        * Returns the minimum bitrate as read from the Vorbis identification
        * header.
+       *
+       * \note The value is in bits per second unlike bitrate().
        */
       int bitrateMinimum() const;
 
     private:
-      AudioProperties(const AudioProperties &);
-      AudioProperties &operator=(const AudioProperties &);
-
-      void read();
+      void read(File *file);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

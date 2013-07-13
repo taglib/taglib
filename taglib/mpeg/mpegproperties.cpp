@@ -25,6 +25,7 @@
 
 #include <tdebug.h>
 #include <tstring.h>
+#include <tsmartptr.h>
 
 #include "mpegproperties.h"
 #include "mpegfile.h"
@@ -35,10 +36,7 @@ using namespace TagLib;
 class MPEG::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    xingHeader(0),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -50,14 +48,7 @@ public:
     isCopyrighted(false),
     isOriginal(false) {}
 
-  ~PropertiesPrivate()
-  {
-    delete xingHeader;
-  }
-
-  File *file;
-  XingHeader *xingHeader;
-  ReadStyle style;
+  SCOPED_PTR<XingHeader> xingHeader;
   int length;
   int bitrate;
   int sampleRate;
@@ -74,13 +65,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::AudioProperties::AudioProperties(File *file, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+MPEG::AudioProperties::AudioProperties(File *file, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-
-  if(file && file->isOpen())
-    read();
+  read(file);
 }
 
 MPEG::AudioProperties::~AudioProperties()
@@ -110,7 +98,7 @@ int MPEG::AudioProperties::channels() const
 
 const MPEG::XingHeader *MPEG::AudioProperties::xingHeader() const
 {
-  return d->xingHeader;
+  return d->xingHeader.get();
 }
 
 MPEG::Header::Version MPEG::AudioProperties::version() const
@@ -147,22 +135,22 @@ bool MPEG::AudioProperties::isOriginal() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::AudioProperties::read()
+void MPEG::AudioProperties::read(File *file)
 {
   // Since we've likely just looked for the ID3v1 tag, start at the end of the
   // file where we're least likely to have to have to move the disk head.
 
-  offset_t last = d->file->lastFrameOffset();
+  offset_t last = file->lastFrameOffset();
 
   if(last < 0) {
     debug("MPEG::Properties::read() -- Could not find a valid last MPEG frame in the stream.");
     return;
   }
 
-  d->file->seek(last);
-  Header lastHeader(d->file->readBlock(4));
+  file->seek(last);
+  Header lastHeader(file->readBlock(4));
 
-  offset_t first = d->file->firstFrameOffset();
+  offset_t first = file->firstFrameOffset();
 
   if(first < 0) {
     debug("MPEG::Properties::read() -- Could not find a valid first MPEG frame in the stream.");
@@ -175,13 +163,13 @@ void MPEG::AudioProperties::read()
 
     while(pos > first) {
 
-      pos = d->file->previousFrameOffset(pos);
+      pos = file->previousFrameOffset(pos);
 
       if(pos < 0)
         break;
 
-      d->file->seek(pos);
-      Header header(d->file->readBlock(4));
+      file->seek(pos);
+      Header header(file->readBlock(4));
 
       if(header.isValid()) {
         lastHeader = header;
@@ -193,8 +181,8 @@ void MPEG::AudioProperties::read()
 
   // Now jump back to the front of the file and read what we need from there.
 
-  d->file->seek(first);
-  Header firstHeader(d->file->readBlock(4));
+  file->seek(first);
+  Header firstHeader(file->readBlock(4));
 
   if(!firstHeader.isValid() || !lastHeader.isValid()) {
     debug("MPEG::Properties::read() -- Page headers were invalid.");
@@ -207,8 +195,8 @@ void MPEG::AudioProperties::read()
   int xingHeaderOffset = MPEG::XingHeader::offset(firstHeader.version(),
                                                   firstHeader.channelMode());
 
-  d->file->seek(first + xingHeaderOffset);
-  d->xingHeader = new XingHeader(d->file->readBlock(16));
+  file->seek(first + xingHeaderOffset);
+  d->xingHeader.reset(new XingHeader(file->readBlock(16)));
 
   // Read the length and the bitrate from the Xing header.
 
@@ -228,8 +216,7 @@ void MPEG::AudioProperties::read()
     // Since there was no valid Xing header found, we hope that we're in a constant
     // bitrate file.
 
-    delete d->xingHeader;
-    d->xingHeader = 0;
+    d->xingHeader.reset();
 
     // TODO: Make this more robust with audio property detection for VBR without a
     // Xing header.
@@ -242,7 +229,6 @@ void MPEG::AudioProperties::read()
       d->bitrate = firstHeader.bitrate();
     }
   }
-
 
   d->sampleRate = firstHeader.sampleRate();
   d->channels = firstHeader.channelMode() == Header::SingleChannel ? 1 : 2;

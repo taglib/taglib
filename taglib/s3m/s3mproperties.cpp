@@ -39,9 +39,7 @@ public:
     globalVolume(0),
     masterVolume(0),
     tempo(0),
-    bpmSpeed(0)
-  {
-  }
+    bpmSpeed(0) {}
 
   ushort lengthInPatterns;
   int    channels;
@@ -57,9 +55,12 @@ public:
   uchar  bpmSpeed;
 };
 
-S3M::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle)
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+S3M::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) :
+  d(new PropertiesPrivate())
 {
 }
 
@@ -142,6 +143,10 @@ uchar S3M::AudioProperties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
 
 void S3M::AudioProperties::setLengthInPatterns(ushort lengthInPatterns)
 {
