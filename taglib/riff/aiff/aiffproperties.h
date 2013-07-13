@@ -36,7 +36,7 @@ namespace TagLib {
 
       class File;
 
-      //! An implementation of audio property reading for AIFF
+      //! An implementation of audio property reading for AIFF or AIFF-C
 
       /*!
        * This reads the data from an AIFF stream found in the AudioProperties
@@ -47,7 +47,7 @@ namespace TagLib {
       {
       public:
         /*!
-         * Create an instance of AIFF::AudioProperties with the data read from 
+         * Creates an instance of AIFF::AudioProperties with the data read from 
          * the ByteVector \a data.
          */
         AudioProperties(const ByteVector &data, ReadStyle style);
@@ -68,6 +68,30 @@ namespace TagLib {
 
         int sampleWidth() const;
         uint sampleFrames() const;
+
+        /*!
+         * Returns true if the file is in AIFF-C format, false if AIFF format.
+         */
+        bool isAiffC() const;
+
+        /*!
+         * Returns the compression type of the AIFF-C file.  For example, "NONE" for
+         * not compressed, "ACE2" for ACE 2-to-1.
+         *
+         * If the file is in AIFF format, always returns an empty vector.
+         *
+         * \see isAiffC()
+         */
+        ByteVector compressionType() const;
+
+        /*!
+         * Returns the concrete compression name of the AIFF-C file.
+         *
+         * If the file is in AIFF format, always returns an empty string.
+         *
+         * \see isAiffC()
+         */
+        String compressionName() const;
 
       private:
         void read(const ByteVector &data);

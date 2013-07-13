@@ -269,13 +269,11 @@ void TrueAudio::File::read(bool readProperties, AudioProperties::ReadStyle /* pr
   if(readProperties) {
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      d->properties = new AudioProperties(readBlock(TrueAudio::HeaderSize),
-                                     length() - d->ID3v2OriginalSize);
+      d->properties = new AudioProperties(this, length() - d->ID3v2OriginalSize);
     }
     else {
       seek(0);
-      d->properties = new AudioProperties(readBlock(TrueAudio::HeaderSize),
-                                     length());
+      d->properties = new AudioProperties(this, length());
     }
   }
 }

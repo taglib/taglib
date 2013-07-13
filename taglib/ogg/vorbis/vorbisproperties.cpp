@@ -36,9 +36,7 @@ using namespace TagLib;
 class Ogg::Vorbis::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -48,8 +46,6 @@ public:
     bitrateNominal(0),
     bitrateMinimum(0) {}
 
-  File *file;
-  ReadStyle style;
   int length;
   int bitrate;
   int sampleRate;
@@ -65,18 +61,17 @@ namespace TagLib {
    * Vorbis headers can be found with one type ID byte and the string "vorbis" in
    * an Ogg stream.  0x01 indicates the setup header.
    */
-  static const char vorbisSetupHeaderID[] = { 0x01, 'v', 'o', 'r', 'b', 'i', 's', 0 };
+  const char vorbisSetupHeaderID[] = { 0x01, 'v', 'o', 'r', 'b', 'i', 's', 0 };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::Vorbis::AudioProperties::AudioProperties(File *file, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+Ogg::Vorbis::AudioProperties::AudioProperties(File *file, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-  read();
+  read(file);
 }
 
 Ogg::Vorbis::AudioProperties::~AudioProperties()
@@ -137,13 +132,13 @@ String Ogg::Vorbis::AudioProperties::toString() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Ogg::Vorbis::AudioProperties::read()
+void Ogg::Vorbis::AudioProperties::read(File *file)
 {
   // Get the identification header from the Ogg implementation.
 
-  ByteVector data = d->file->packet(0);
+  const ByteVector data = file->packet(0);
 
-  uint pos = 0;
+  size_t pos = 0;
 
   if(data.mid(pos, 7) != vorbisSetupHeaderID) {
     debug("Ogg::Vorbis::Properties::read() -- invalid Ogg::Vorbis identification header");
@@ -175,12 +170,12 @@ void Ogg::Vorbis::AudioProperties::read()
   // Find the length of the file.  See http://wiki.xiph.org/Ogg::VorbisStreamLength/
   // for my notes on the topic.
 
-  const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last = d->file->lastPageHeader();
+  const Ogg::PageHeader *first = file->firstPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
-    long long start = first->absoluteGranularPosition();
-    long long end = last->absoluteGranularPosition();
+    const long long start = first->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0 && d->sampleRate > 0)
       d->length = (int)((end - start) / (long long) d->sampleRate);

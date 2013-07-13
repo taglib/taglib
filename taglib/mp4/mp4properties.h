@@ -53,6 +53,8 @@ namespace TagLib {
       String toString() const;
 
     private:
+      void read(File *file, Atoms *atoms);
+
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };

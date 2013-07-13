@@ -42,9 +42,7 @@ public:
     tempo(0),
     bpmSpeed(0),
     panningSeparation(0),
-    pitchWheelDepth(0)
-  {
-  }
+    pitchWheelDepth(0) {}
 
   int    channels;
   ushort lengthInPatterns;
@@ -63,9 +61,12 @@ public:
   uchar  pitchWheelDepth;
 };
 
-IT::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle)
-  : TagLib::AudioProperties(propertiesStyle)
-  , d(new PropertiesPrivate)
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+IT::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) : 
+  d(new PropertiesPrivate())
 {
 }
 
@@ -168,6 +169,10 @@ uchar IT::AudioProperties::pitchWheelDepth() const
 {
   return d->pitchWheelDepth;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
 
 void IT::AudioProperties::setChannels(int channels)
 {

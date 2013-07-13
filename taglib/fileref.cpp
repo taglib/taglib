@@ -122,7 +122,7 @@ namespace
         file.reset(new MP4::File(fileName, readAudioProperties, audioPropertiesStyle));
       else if(ext == "WMA" || ext == "ASF")
         file.reset(new ASF::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "AIF" || ext == "AIFF")
+      else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
         file.reset(new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle));
       else if(ext == "WAV")
         file.reset(new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle));

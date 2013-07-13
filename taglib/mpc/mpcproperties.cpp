@@ -36,9 +36,7 @@ using namespace TagLib;
 class MPC::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(offset_t length, ReadStyle s) :
-    streamLength(length),
-    style(s),
+  PropertiesPrivate() :
     version(0),
     length(0),
     bitrate(0),
@@ -51,8 +49,6 @@ public:
     albumGain(0),
     albumPeak(0) {}
 
-  offset_t streamLength;
-  ReadStyle style;
   int version;
   int length;
   int bitrate;
@@ -71,25 +67,17 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style) 
-  : TagLib::AudioProperties(style)
+MPC::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(streamLength, style);
-  readSV7(data);
-}
-
-MPC::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) 
-  : TagLib::AudioProperties(style)
-{
-  d = new PropertiesPrivate(streamLength, style);
-  ByteVector magic = file->readBlock(4);
+  const ByteVector magic = file->readBlock(4);
   if(magic == "MPCK") {
     // Musepack version 8
-    readSV8(file);
+    readSV8(file, streamLength);
   }
   else {
     // Musepack version 7 or older, fixed size header
-    readSV7(magic + file->readBlock(MPC::HeaderSize - 4));
+    readSV7(magic + file->readBlock(52), streamLength);
   }
 }
 
@@ -190,7 +178,7 @@ namespace
   static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
 }
 
-void MPC::AudioProperties::readSV8(File *file)
+void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
 {
   bool readSH = false, readRG = false;
 
@@ -219,7 +207,7 @@ void MPC::AudioProperties::readSV8(File *file)
       d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
 
       if((d->sampleFrames - begSilence) != 0)
-        d->bitrate = static_cast<int>(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
+        d->bitrate = static_cast<int>(streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
       d->bitrate = d->bitrate / 1000;
 
       d->length = (d->sampleFrames - begSilence) / d->sampleRate;
@@ -250,7 +238,7 @@ void MPC::AudioProperties::readSV8(File *file)
   }
 }
 
-void MPC::AudioProperties::readSV7(const ByteVector &data)
+void MPC::AudioProperties::readSV7(const ByteVector &data, offset_t streamLength)
 {
   if(data.startsWith("MP+")) {
     d->version = data[3] & 15;
@@ -316,6 +304,6 @@ void MPC::AudioProperties::readSV7(const ByteVector &data)
   d->length = d->sampleRate > 0 ? (d->sampleFrames + (d->sampleRate / 2)) / d->sampleRate : 0;
 
   if(!d->bitrate)
-    d->bitrate = d->length > 0 ? static_cast<int>(d->streamLength * 8L / d->length / 1000) : 0;
+    d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
 }
 

@@ -26,9 +26,15 @@
 #include "audioproperties.h"
 
 namespace TagLib {
+
   namespace IT {
-    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties {
+
+    class File;
+
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties 
+    {
       friend class File;
+    
     public:
       /*! Flag bits. */
       enum {
@@ -72,6 +78,7 @@ namespace TagLib {
       uchar  panningSeparation() const;
       uchar  pitchWheelDepth()   const;
 
+    private:
       void setChannels(int channels);
       void setLengthInPatterns(ushort lengthInPatterns);
       void setInstrumentCount(ushort instrumentCount);
@@ -87,10 +94,6 @@ namespace TagLib {
       void setBpmSpeed    (uchar bpmSpeed);
       void setPanningSeparation(uchar panningSeparation);
       void setPitchWheelDepth  (uchar pitchWheelDepth);
-
-    private:
-      AudioProperties(const AudioProperties&);
-      AudioProperties &operator=(const AudioProperties&);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

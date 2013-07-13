@@ -27,6 +27,8 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
+  CPPUNIT_TEST(testAIFF);
+  CPPUNIT_TEST(testAIFC);
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST_SUITE_END();
 
@@ -153,6 +155,16 @@ public:
   void testWav()
   {
     fileRefSave("empty", ".wav");
+  }
+
+  void testAIFF()
+  {
+    fileRefSave("empty", ".aiff");
+  }
+
+  void testAIFC()
+  {
+    fileRefSave("alaw", ".aifc");
   }
 
   void testOGA_FLAC()
