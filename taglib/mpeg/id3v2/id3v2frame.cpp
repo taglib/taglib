@@ -50,20 +50,11 @@
 using namespace TagLib;
 using namespace ID3v2;
 
-class Frame::FramePrivate
+namespace TagLib { namespace ID3v2
 {
-public:
-  FramePrivate() :
-    header(0)
-    {}
-
-  ~FramePrivate()
-  {
-    delete header;
-  }
-
-  Frame::Header *header;
-};
+  // The instance is defined in id3v2tag.cpp
+  extern const TagLib::StringHandler *latin1StringHandler;
+}}
 
 namespace
 {
@@ -80,6 +71,21 @@ namespace
     return true;
   }
 }
+
+class Frame::FramePrivate
+{
+public:
+  FramePrivate() :
+    header(0)
+    {}
+
+  ~FramePrivate()
+  {
+    delete header;
+  }
+
+  Frame::Header *header;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // static methods
@@ -277,7 +283,7 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, siz
 
   String str;
   if(encoding == String::Latin1)
-    str = Tag::latin1StringHandler()->parse(data.mid(position, end - position));
+    str = latin1StringHandler->parse(data.mid(position, end - position));
   else
     str = String(data.mid(position, end - position), encoding);
 

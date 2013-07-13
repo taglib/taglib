@@ -33,6 +33,12 @@ using namespace RIFF::Info;
 
 namespace 
 {
+  namespace
+  {
+    const RIFF::Info::StringHandler defaultStringHandler;
+    const TagLib::StringHandler *stringHandler = &defaultStringHandler;
+  }
+
   bool isValidChunkID(const ByteVector &name)
   {
     if(name.size() != 4)
@@ -57,13 +63,6 @@ public:
 
   static const TagLib::StringHandler *stringHandler;
 };
-
-namespace
-{
-  const RIFF::Info::StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
@@ -218,7 +217,7 @@ ByteVector RIFF::Info::Tag::render() const
 
   FieldListMap::ConstIterator it = d->fieldListMap.begin();
   for(; it != d->fieldListMap.end(); ++it) {
-    ByteVector text = TagPrivate::stringHandler->render(it->second);
+    ByteVector text = stringHandler->render(it->second);
     if(text.isEmpty())
       continue;
 
@@ -240,9 +239,9 @@ ByteVector RIFF::Info::Tag::render() const
 void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    stringHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    stringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -254,7 +253,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
   size_t p = 4;
   while(p < data.size()) {
     const uint size = data.toUInt32LE(p + 4);
-    d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
+    d->fieldListMap[data.mid(p, 4)] = stringHandler->parse(data.mid(p + 8, size));
 
     p += ((size + 1) & ~1) + 8;
   }

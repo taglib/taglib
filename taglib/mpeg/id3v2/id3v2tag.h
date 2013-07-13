@@ -362,14 +362,6 @@ namespace TagLib {
       ByteVector render(int version) const;
       
       /*!
-       * Gets the current string handler that decides how the "Latin-1" data 
-       * will be converted to and from binary data.
-       *
-       * \see Latin1StringHandler
-       */
-      static TagLib::StringHandler const *latin1StringHandler();
-
-      /*!
        * Sets the string handler that decides how the "Latin-1" data will be
        * converted to and from binary data.
        * If the parameter \a handler is null, the previous handler is

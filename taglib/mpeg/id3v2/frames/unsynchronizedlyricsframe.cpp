@@ -34,6 +34,12 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace TagLib { namespace ID3v2
+{
+  // The instance is defined in id3v2tag.cpp
+  extern const TagLib::StringHandler *latin1StringHandler;
+}}
+
 class UnsynchronizedLyricsFrame::UnsynchronizedLyricsFramePrivate
 {
 public:
@@ -159,11 +165,11 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
 
   if(l.size() == 2) {
     if(d->textEncoding == String::Latin1) {
-      d->description = Tag::latin1StringHandler()->parse(l.front());
-      d->text = Tag::latin1StringHandler()->parse(l.back());
+      d->description = latin1StringHandler->parse(l.front());
+      d->text        = latin1StringHandler->parse(l.back());
     } else {
       d->description = String(l.front(), d->textEncoding);
-      d->text = String(l.back(), d->textEncoding);
+      d->text        = String(l.back(), d->textEncoding);
     }  
   }
 }

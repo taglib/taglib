@@ -31,6 +31,12 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace TagLib { namespace ID3v2
+{
+  // The instance is defined in id3v2tag.cpp
+  extern const TagLib::StringHandler *latin1StringHandler;
+}}
+
 class OwnershipFrame::OwnershipFramePrivate
 {
 public:
@@ -133,7 +139,7 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   
   // Read the seller
   if(d->textEncoding == String::Latin1)
-    d->seller = Tag::latin1StringHandler()->parse(data.mid(pos));
+    d->seller = latin1StringHandler->parse(data.mid(pos));
   else
     d->seller = String(data.mid(pos), d->textEncoding);
 }
