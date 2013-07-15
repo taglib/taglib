@@ -839,7 +839,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-#if SYSTEM_BYTEORDER == 1
+#if !defined(SYSTEM_BYTEORDER) || SYSTEM_BYTEORDER == 1
 
 const String::Type String::WCharByteOrder = String::UTF16LE;
 

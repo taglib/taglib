@@ -210,10 +210,10 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   T tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-#if SYSTEM_BYTEORDER == 1
+#if !defined(SYSTEM_BYTEORDER) || SYSTEM_BYTEORDER == 1
   const bool swap = mostSignificantByteFirst;
 #else
-  const bool swap != mostSignificantByteFirst;
+  const bool swap = !mostSignificantByteFirst;
 #endif
   if(swap)
     return byteSwap(tmp);
@@ -226,12 +226,12 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
   const size_t size = sizeof(T);
 
-#if SYSTEM_BYTEORDER == 1
+#if !defined(SYSTEM_BYTEORDER) || SYSTEM_BYTEORDER == 1
   const bool swap = mostSignificantByteFirst;
 #else
-  const bool swap != mostSignificantByteFirst;
+  const bool swap = !mostSignificantByteFirst;
 #endif
- if(swap)
+  if(swap)
     value = byteSwap(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), size);
