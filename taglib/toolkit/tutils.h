@@ -144,6 +144,20 @@ namespace TagLib
 #endif
   }
 
+#ifndef SYSTEM_BYTEORDER
+
+  inline bool isSystemBigEndian()
+  {
+    union {
+      int  i;
+      char c;
+    } u;
+
+    u.i = 1;
+    return (u.c == 0);
+  }
+
+#endif
 };
 
 #endif
