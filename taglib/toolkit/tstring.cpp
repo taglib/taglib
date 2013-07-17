@@ -800,7 +800,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
   if(swap) {
     for(size_t i = 0; i < length; ++i)
-      d->data[i] = byteSwap(static_cast<ushort>(s[i]));
+      d->data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
   }
 }
 
@@ -839,15 +839,8 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-#if SYSTEM_BYTEORDER == 1
-
-const String::Type String::WCharByteOrder = String::UTF16LE;
-
-#else
-
-const String::Type String::WCharByteOrder = String::UTF16BE;
-
-#endif
+const String::Type String::WCharByteOrder 
+  = (Utils::SystemByteOrder == Utils::BigEndian) ? String::UTF16BE : String::UTF16LE;
 
 }
 
