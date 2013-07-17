@@ -46,7 +46,6 @@
 
 namespace TagLib
 {
-
   inline ushort byteSwap(ushort x)
   {
 #if defined(HAVE_GCC_BYTESWAP_16)
@@ -144,20 +143,42 @@ namespace TagLib
 #endif
   }
 
-#ifndef SYSTEM_BYTEORDER
 
-  inline bool isSystemBigEndian()
+  enum SystemByteOrder
   {
+    LittleEndian,
+    BigEndian
+  };
+
+  inline SystemByteOrder systemByteOrder()
+  {
+#ifdef SYSTEM_BYTEORDER
+
+# if SYSTEM_BYTEORDER == 1
+
+    return LittleEndian;
+
+# else
+
+    return BigEndian;
+
+# endif
+
+#else
+
     union {
       int  i;
       char c;
     } u;
 
     u.i = 1;
-    return (u.c == 0);
-  }
+    if(u.c == 1)
+      return LittleEndian;
+    else
+      return BigEndian;
 
 #endif
+  }
 };
 
 #endif

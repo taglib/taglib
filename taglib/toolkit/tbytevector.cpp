@@ -203,16 +203,8 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
 template <class T>
 T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
-#ifdef SYSTEM_BYTEORDER
-# if SYSTEM_BYTEORDER == 1
-  const bool swap = mostSignificantByteFirst;
-# else
-  const bool swap = !mostSignificantByteFirst;
-# endif
-#else
-  static const bool IsBigEndian = isSystemBigEndian();
+  static const bool IsBigEndian = (systemByteOrder() == BigEndian);
   const bool swap = (mostSignificantByteFirst != IsBigEndian);
-#endif
 
   if(offset + sizeof(T) > v.size()) 
     return toNumber<T>(v, offset, v.size() - offset, mostSignificantByteFirst);
@@ -230,16 +222,8 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 template <class T>
 ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
-#ifdef SYSTEM_BYTEORDER
-# if SYSTEM_BYTEORDER == 1
-  const bool swap = mostSignificantByteFirst;
-# else
-  const bool swap = !mostSignificantByteFirst;
-# endif
-#else
-  static const bool IsBigEndian = isSystemBigEndian();
+  static const bool IsBigEndian = (systemByteOrder() == BigEndian);
   const bool swap = (mostSignificantByteFirst != IsBigEndian);
-#endif
  
   const size_t size = sizeof(T);
 
