@@ -156,9 +156,8 @@ int findVector(
   for(size_t i = 0; i < patternSize - 1; ++i)
     lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
 
-  for(TIterator it = dataBegin + patternSize - 1 + offset;
-    it < dataEnd;
-    it += lastOccurrence[static_cast<uchar>(*it)])
+  TIterator it = dataBegin + patternSize - 1 + offset;
+  while(true)
   {
     TIterator itBuffer = it;
     TIterator itPattern = patternBegin + patternSize - 1;
@@ -176,6 +175,12 @@ int findVector(
       --itBuffer;
       --itPattern;
     }
+
+    const size_t step = lastOccurrence[static_cast<uchar>(*it)];
+    if(dataEnd - step <= it)
+      break;
+
+    it += step;
   }
 
   return -1;
