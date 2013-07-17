@@ -839,16 +839,8 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-#if SYSTEM_BYTEORDER == 1
-
-const String::Type String::WCharByteOrder = String::UTF16LE;
-
-#else
-
-const String::Type String::WCharByteOrder = String::UTF16BE;
-
-#endif
-
+const String::Type String::WCharByteOrder 
+  = (systemByteOrder() == BigEndian) ? String::UTF16BE : String::UTF16LE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

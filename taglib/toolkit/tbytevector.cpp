@@ -203,6 +203,9 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
 template <class T>
 T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
+  static const bool IsBigEndian = (systemByteOrder() == BigEndian);
+  const bool swap = (mostSignificantByteFirst != IsBigEndian);
+
   if(offset + sizeof(T) > v.size()) 
     return toNumber<T>(v, offset, v.size() - offset, mostSignificantByteFirst);
 
@@ -210,11 +213,6 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   T tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-#if SYSTEM_BYTEORDER == 1
-  const bool swap = mostSignificantByteFirst;
-#else
-  const bool swap != mostSignificantByteFirst;
-#endif
   if(swap)
     return byteSwap(tmp);
   else
@@ -224,14 +222,12 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 template <class T>
 ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
+  static const bool IsBigEndian = (systemByteOrder() == BigEndian);
+  const bool swap = (mostSignificantByteFirst != IsBigEndian);
+ 
   const size_t size = sizeof(T);
 
-#if SYSTEM_BYTEORDER == 1
-  const bool swap = mostSignificantByteFirst;
-#else
-  const bool swap != mostSignificantByteFirst;
-#endif
- if(swap)
+  if(swap)
     value = byteSwap(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), size);
