@@ -49,6 +49,16 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace
+{
+  const ID3v2::Latin1StringHandler defaultStringHandler;
+}
+
+namespace TagLib { namespace ID3v2
+{
+  const TagLib::StringHandler *latin1StringHandler = &defaultStringHandler;
+}}
+
 class ID3v2::Tag::TagPrivate
 {
 public:
@@ -80,16 +90,7 @@ public:
 
   FrameListMap frameListMap;
   FrameList frameList;
-
-  static const TagLib::StringHandler *stringHandler;
 };
-
-namespace
-{
-  const ID3v2::Latin1StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Latin1StringHandler implementation
@@ -625,17 +626,12 @@ ByteVector ID3v2::Tag::render(int version) const
   return d->header.render() + tagData;
 }
 
-TagLib::StringHandler const *ID3v2::Tag::latin1StringHandler()
-{
-  return TagPrivate::stringHandler;
-}
-
 void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    latin1StringHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    latin1StringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

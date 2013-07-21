@@ -32,6 +32,12 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace TagLib { namespace ID3v2
+{
+  // The instance is defined in id3v2tag.cpp
+  extern const TagLib::StringHandler *latin1StringHandler;
+}}
+
 class TextIdentificationFrame::TextIdentificationFramePrivate
 {
 public:
@@ -217,7 +223,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
   for(ByteVectorList::Iterator it = l.begin(); it != l.end(); it++) {
     if(!(*it).isEmpty()) {
       if(d->textEncoding == String::Latin1)
-        d->fieldList.append(Tag::latin1StringHandler()->parse(*it));
+        d->fieldList.append(latin1StringHandler->parse(*it));
       else
         d->fieldList.append(String(*it, d->textEncoding));    
     }
