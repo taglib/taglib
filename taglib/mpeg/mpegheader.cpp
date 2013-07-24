@@ -89,6 +89,7 @@ MPEG::Header::Header(const Header &h)
 
 MPEG::Header::~Header()
 {
+  delete d;
 }
 
 bool MPEG::Header::isValid() const
