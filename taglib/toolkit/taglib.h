@@ -61,10 +61,8 @@
  * \endcode
  */
 
-namespace TagLib {
-
-  class String;
-
+namespace TagLib 
+{
   typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
   typedef unsigned char      uchar;
   typedef unsigned short     ushort;
