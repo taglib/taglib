@@ -405,7 +405,7 @@ public:
     pm.insert(tagname, StringList(s));
     document->d->tags.append(
       std::pair<PropertyMap, std::pair<Element *, ulli> >(pm,
-        std::pair<Element *, ulli>(0, ttv)
+        std::pair<Element *, ulli>(static_cast<Element *>(0), ttv)
       )
     );
   }
