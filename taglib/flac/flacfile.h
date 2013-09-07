@@ -70,32 +70,32 @@ namespace TagLib {
        * Constructs a FLAC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
+       * If this file contains an ID3v2 tag the frames will be created using
+       * \a frameFactory.  \a frameFactory needs to be valid until the File 
+       * object is destructed.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      File(FileName file,
-           bool readProperties = true,
+      File(FileName file, bool readProperties = true,
            AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
-           ID3v2::FrameFactory *frameFactory = 0);
+           const ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
        * Constructs a FLAC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
+       * If this file contains an ID3v2 tag the frames will be created using
+       * \a frameFactory.  \a frameFactory needs to be valid until the File 
+       * object is destructed.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream,
-           bool readProperties = true,
+      File(IOStream *stream, bool readProperties = true,
            AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
-           ID3v2::FrameFactory *frameFactory = 0);
+           const ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
        * Destroys this instance of the File.
@@ -194,15 +194,6 @@ namespace TagLib {
       Ogg::XiphComment *xiphComment(bool create = false);
 
       /*!
-       * Set the ID3v2::FrameFactory to something other than the default.  This
-       * can be used to specify the way that ID3v2 frames will be interpreted
-       * when
-       *
-       * \see ID3v2FrameFactory
-       */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
-
-      /*!
        * Returns a list of pictures attached to the FLAC file.
        */
       List<Picture *> pictureList();
@@ -251,7 +242,8 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                const ID3v2::FrameFactory *frameFactory);
       void scan();
       offset_t findID3v2();
       offset_t findID3v1();

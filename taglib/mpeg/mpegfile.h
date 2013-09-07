@@ -74,43 +74,32 @@ namespace TagLib {
        * Constructs an MPEG file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
-       * \note In the current implementation, \a propertiesStyle is ignored.
+       * If this file contains an ID3v2 tag the frames will be created using
+       * \a frameFactory.  \a frameFactory needs to be valid until the File 
+       * object is destructed.
        *
-       * \deprecated This constructor will be dropped in favor of the one below
-       * in a future version.
+       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
-
-      /*!
-       * Constructs an MPEG file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read.
-       *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
-       *
-       * \note In the current implementation, \a propertiesStyle is ignored.
-       */
-      // BIC: merge with the above constructor
-      File(FileName file, ID3v2::FrameFactory *frameFactory,
-           bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average, 
+           const ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
        * Constructs an MPEG file from \a stream.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
+       * If this file contains an ID3v2 tag the frames will be created using
+       * \a frameFactory.  \a frameFactory needs to be valid until the File 
+       * object is destructed.
+       *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
-       *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-           bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+      File(IOStream *stream, bool readProperties = true,
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average, 
+           const ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
        * Destroys this instance of the File.
@@ -282,13 +271,6 @@ namespace TagLib {
       bool strip(int tags, bool freeMemory);
 
       /*!
-       * Set the ID3v2::FrameFactory to something other than the default.
-       *
-       * \see ID3v2FrameFactory
-       */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
-
-      /*!
        * Returns the position in the file of the first MPEG frame.
        */
       offset_t firstFrameOffset();
@@ -335,7 +317,8 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                const ID3v2::FrameFactory *frameFactory);
       offset_t findID3v2();
       offset_t findID3v1();
       void findAPE();
