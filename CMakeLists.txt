@@ -96,8 +96,6 @@ if(TRACE_IN_RELEASE)
   set(TRACE_IN_RELEASE TRUE)
 endif()
 
-configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
-
 add_subdirectory(taglib) 
 add_subdirectory(bindings)
 if(BUILD_TESTS)
