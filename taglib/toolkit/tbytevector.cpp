@@ -158,9 +158,8 @@ size_t findVector(
   for(size_t i = 0; i < patternSize - 1; ++i)
     lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
 
-  for(TIterator it = dataBegin + patternSize - 1 + offset;
-    it < dataEnd;
-    it += lastOccurrence[static_cast<uchar>(*it)])
+  TIterator it = dataBegin + patternSize - 1 + offset;
+  while(true)
   {
     TIterator itBuffer  = it;
     TIterator itPattern = patternBegin + patternSize - 1;
@@ -178,27 +177,21 @@ size_t findVector(
       --itBuffer;
       --itPattern;
     }
+
+    const size_t step = lastOccurrence[static_cast<uchar>(*it)];
+    if(dataEnd - step <= it)
+      break;
+
+    it += step;
   }
 
   return ByteVector::npos;
 }
 
-
-namespace {
-  enum Endianness {
-    LittleEndian,
-    BigEndian
-  };
-}  
-
-template <typename T, size_t LENGTH, Endianness ENDIAN>
+template <typename T, size_t LENGTH, ByteOrder ENDIAN>
 inline T toNumber(const ByteVector &v, size_t offset)
 {
-#if SYSTEM_BYTEORDER == 1
-  static const bool swap = (ENDIAN == BigEndian);
-#else
-  static const bool swap = (ENDIAN == LittleEndian);
-#endif
+  static const bool swap = (ENDIAN != Utils::SystemByteOrder);
 
   if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size()) 
   {
@@ -207,7 +200,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
     ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
     if(swap)
-      return byteSwap(tmp);
+      return Utils::byteSwap(tmp);
     else
       return tmp;
   }
@@ -216,7 +209,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
     const size_t length = std::min(LENGTH, v.size() - offset);
     T sum = 0;
     for(size_t i = 0; i < length; i++) {
-      const size_t shift = (ENDIAN == LittleEndian ? i : length - 1 - i) * 8;
+      const size_t shift = (swap ? length - 1 - i : i) * 8;
       sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
     }
 
@@ -229,17 +222,13 @@ inline T toNumber(const ByteVector &v, size_t offset)
   }
 }
 
-template <typename T, Endianness ENDIAN>
+template <typename T, ByteOrder ENDIAN>
 inline ByteVector fromNumber(T value)
 {
-#if SYSTEM_BYTEORDER == 1
-  static const bool swap = (ENDIAN == BigEndian);
-#else
-  static const bool swap = (ENDIAN == LittleEndian);
-#endif
+  static const bool swap = (ENDIAN != Utils::SystemByteOrder);
 
   if(swap)
-    value = byteSwap(value);
+    value = Utils::byteSwap(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
 }
@@ -725,9 +714,8 @@ float ByteVector::toFloat32BE(size_t offset) const
     } tmp;
     ::memcpy(&tmp, data() + offset, 4);
 
-# if SYSTEM_BYTEORDER == 1
-    tmp.i = byteSwap(tmp.i);
-# endif
+    if(Utils::SystemByteOrder == LittleEndian)
+      tmp.i = Utils::byteSwap(tmp.i);
 
     return tmp.f;
   }
@@ -786,9 +774,8 @@ double ByteVector::toFloat64BE(size_t offset) const
     } tmp;
     ::memcpy(&tmp, data() + offset, 8);
 
-# if SYSTEM_BYTEORDER == 1
-    tmp.i = byteSwap(tmp.i);
-# endif
+    if(Utils::SystemByteOrder == LittleEndian)
+      tmp.i = Utils::byteSwap(tmp.i);
 
     return tmp.f;
   }

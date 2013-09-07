@@ -50,9 +50,9 @@ public:
     endianness(BigEndian),
     size(0)
   {
-
   }
-  Endianness endianness;
+
+  ByteOrder endianness;
   ByteVector type;
   TagLib::uint size;
   ByteVector format;
@@ -73,7 +73,7 @@ RIFF::File::~File()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
+RIFF::File::File(FileName file, ByteOrder endianness) : TagLib::File(file)
 {
   d = new FilePrivate;
   d->endianness = endianness;
@@ -82,7 +82,7 @@ RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
     read();
 }
 
-RIFF::File::File(IOStream *stream, Endianness endianness) : TagLib::File(stream)
+RIFF::File::File(IOStream *stream, ByteOrder endianness) : TagLib::File(stream)
 {
   d = new FilePrivate;
   d->endianness = endianness;
