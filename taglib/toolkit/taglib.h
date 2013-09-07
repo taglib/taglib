@@ -79,6 +79,12 @@ namespace TagLib
 #else
   typedef off_t    offset_t;
 #endif
+
+  enum ByteOrder
+  {
+    LittleEndian,
+    BigEndian
+  };
 }
 
 /*!

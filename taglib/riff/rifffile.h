@@ -53,10 +53,8 @@ namespace TagLib {
 
     protected:
 
-      enum Endianness { BigEndian, LittleEndian };
-
-      File(FileName file, Endianness endianness);
-      File(IOStream *stream, Endianness endianness);
+      File(FileName file, ByteOrder endianness);
+      File(IOStream *stream, ByteOrder endianness);
 
       /*!
        * \return The size of the main RIFF chunk.

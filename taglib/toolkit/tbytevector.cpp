@@ -188,7 +188,7 @@ size_t findVector(
   return ByteVector::npos;
 }
 
-template <typename T, size_t LENGTH, Utils::ByteOrder ENDIAN>
+template <typename T, size_t LENGTH, ByteOrder ENDIAN>
 inline T toNumber(const ByteVector &v, size_t offset)
 {
   static const bool swap = (ENDIAN != Utils::SystemByteOrder);
@@ -222,7 +222,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
   }
 }
 
-template <typename T, Utils::ByteOrder ENDIAN>
+template <typename T, ByteOrder ENDIAN>
 inline ByteVector fromNumber(T value)
 {
   static const bool swap = (ENDIAN != Utils::SystemByteOrder);
@@ -299,32 +299,32 @@ ByteVector ByteVector::fromCString(const char *s, size_t length)
 
 ByteVector ByteVector::fromUInt16LE(size_t value)
 {
-  return fromNumber<ushort, Utils::LittleEndian>(static_cast<ushort>(value));
+  return fromNumber<ushort, LittleEndian>(static_cast<ushort>(value));
 }
 
 ByteVector ByteVector::fromUInt16BE(size_t value)
 {
-  return fromNumber<ushort, Utils::BigEndian>(static_cast<ushort>(value));
+  return fromNumber<ushort, BigEndian>(static_cast<ushort>(value));
 }
 
 ByteVector ByteVector::fromUInt32LE(size_t value)
 {
-  return fromNumber<uint, Utils::LittleEndian>(static_cast<uint>(value));
+  return fromNumber<uint, LittleEndian>(static_cast<uint>(value));
 }
 
 ByteVector ByteVector::fromUInt32BE(size_t value)
 {
-  return fromNumber<uint, Utils::BigEndian>(static_cast<uint>(value));
+  return fromNumber<uint, BigEndian>(static_cast<uint>(value));
 }
 
 ByteVector ByteVector::fromUInt64LE(ulonglong value)
 {
-  return fromNumber<ulonglong, Utils::LittleEndian>(value);
+  return fromNumber<ulonglong, LittleEndian>(value);
 }
 
 ByteVector ByteVector::fromUInt64BE(ulonglong value)
 {
-  return fromNumber<ulonglong, Utils::BigEndian>(value);
+  return fromNumber<ulonglong, BigEndian>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -647,52 +647,52 @@ TagLib::uint ByteVector::checksum() const
 
 short ByteVector::toInt16LE(size_t offset) const
 {
-  return static_cast<short>(toNumber<ushort, 2, Utils::LittleEndian>(*this, offset));
+  return static_cast<short>(toNumber<ushort, 2, LittleEndian>(*this, offset));
 }
 
 short ByteVector::toInt16BE(size_t offset) const
 {
-  return static_cast<short>(toNumber<ushort, 2, Utils::BigEndian>(*this, offset));
+  return static_cast<short>(toNumber<ushort, 2, BigEndian>(*this, offset));
 }
 
 ushort ByteVector::toUInt16LE(size_t offset) const
 {
-  return toNumber<ushort, 2, Utils::LittleEndian>(*this, offset);
+  return toNumber<ushort, 2, LittleEndian>(*this, offset);
 }
 
 ushort ByteVector::toUInt16BE(size_t offset) const
 {
-  return toNumber<ushort, 2, Utils::BigEndian>(*this, offset);
+  return toNumber<ushort, 2, BigEndian>(*this, offset);
 }
 
 uint ByteVector::toUInt24LE(size_t offset) const
 {
-  return toNumber<uint, 3, Utils::LittleEndian>(*this, offset);
+  return toNumber<uint, 3, LittleEndian>(*this, offset);
 }
 
 uint ByteVector::toUInt24BE(size_t offset) const
 {
-  return toNumber<uint, 3, Utils::BigEndian>(*this, offset);
+  return toNumber<uint, 3, BigEndian>(*this, offset);
 }
 
 uint ByteVector::toUInt32LE(size_t offset) const
 {
-  return toNumber<uint, 4, Utils::LittleEndian>(*this, offset);
+  return toNumber<uint, 4, LittleEndian>(*this, offset);
 }
 
 uint ByteVector::toUInt32BE(size_t offset) const
 {
-  return toNumber<uint, 4, Utils::BigEndian>(*this, offset);
+  return toNumber<uint, 4, BigEndian>(*this, offset);
 }
 
 long long ByteVector::toInt64LE(size_t offset) const
 {
-  return static_cast<long long>(toNumber<ulonglong, 8, Utils::LittleEndian>(*this, offset));
+  return static_cast<long long>(toNumber<ulonglong, 8, LittleEndian>(*this, offset));
 }
 
 long long ByteVector::toInt64BE(size_t offset) const
 {
-  return static_cast<long long>(toNumber<ulonglong, 8, Utils::BigEndian>(*this, offset));
+  return static_cast<long long>(toNumber<ulonglong, 8, BigEndian>(*this, offset));
 }    
 
 float ByteVector::toFloat32BE(size_t offset) const
@@ -714,7 +714,7 @@ float ByteVector::toFloat32BE(size_t offset) const
     } tmp;
     ::memcpy(&tmp, data() + offset, 4);
 
-    if(Utils::SystemByteOrder == Utils::LittleEndian)
+    if(Utils::SystemByteOrder == LittleEndian)
       tmp.i = Utils::byteSwap(tmp.i);
 
     return tmp.f;
@@ -774,7 +774,7 @@ double ByteVector::toFloat64BE(size_t offset) const
     } tmp;
     ::memcpy(&tmp, data() + offset, 8);
 
-    if(Utils::SystemByteOrder == Utils::LittleEndian)
+    if(Utils::SystemByteOrder == LittleEndian)
       tmp.i = Utils::byteSwap(tmp.i);
 
     return tmp.f;
