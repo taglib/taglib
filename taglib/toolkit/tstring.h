@@ -153,7 +153,7 @@ namespace TagLib {
     /*!
      * Makes a deep copy of the data in \a c.
      */
-    String(wchar_t c, Type t = Latin1);
+    String(wchar_t c, Type t = WCharByteOrder);
 
 
     /*!
