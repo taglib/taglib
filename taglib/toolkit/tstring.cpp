@@ -672,54 +672,43 @@ String &String::operator=(const String &s)
 
 String &String::operator=(const std::string &s)
 {
-  d->data.reset(new std::wstring());
-  copyFromLatin1(s.c_str(), s.length());
-
+  *this = String(s);
   return *this;
 }
 
 String &String::operator=(const std::wstring &s)
 {
-  d->data.reset(new std::wstring(s));
-  return *this;
-}
-
-String &String::operator=(const wchar_t *s)
-{
-  d->data.reset(new std::wstring());
-  copyFromUTF16(s, ::wcslen(s), WCharByteOrder);
-
-  return *this;
-}
-
-String &String::operator=(char c)
-{
-  d->data.reset(new std::wstring(1, c));
-  return *this;
-}
-
-String &String::operator=(wchar_t c)
-{
-  d->data.reset(new std::wstring(1, c));
+  *this = String(s);
   return *this;
 }
 
 String &String::operator=(const char *s)
 {
-  d->data.reset(new std::wstring());
-  copyFromLatin1(s, ::strlen(s));
+  *this = String(s);
+  return *this;
+}
 
+String &String::operator=(const wchar_t *s)
+{
+  *this = String(s);
+  return *this;
+}
+
+String &String::operator=(char c)
+{
+  *this = String(c);
+  return *this;
+}
+
+String &String::operator=(wchar_t c)
+{
+  *this = String(c);
   return *this;
 }
 
 String &String::operator=(const ByteVector &v)
 {
-  d->data.reset(new std::wstring());
-  copyFromLatin1(v.data(), v.size());
-
-  // If we hit a null in the ByteVector, shrink the string again.
-  d->data->resize(::wcslen(d->data->c_str()));
-
+  *this = String(v);
   return *this;
 }
 

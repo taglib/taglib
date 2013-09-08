@@ -441,6 +441,11 @@ namespace TagLib {
     /*!
      * Performs a deep copy of the data in \a s.
      */
+    String &operator=(const char *s);
+
+    /*!
+     * Performs a deep copy of the data in \a s.
+     */
     String &operator=(const wchar_t *s);
 
     /*!
@@ -452,11 +457,6 @@ namespace TagLib {
      * Performs a deep copy of the data in \a s.
      */
     String &operator=(wchar_t c);
-
-    /*!
-     * Performs a deep copy of the data in \a s.
-     */
-    String &operator=(const char *s);
 
     /*!
      * Performs a deep copy of the data in \a v.
