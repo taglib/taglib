@@ -635,7 +635,7 @@ String &String::operator+=(const wchar_t *s)
 {
   detach();
 
-  *d->data += *s;
+  *d->data += s;
   return *this;
 }
 

@@ -149,20 +149,30 @@ public:
 
   void testAppendStringDetach()
   {
-    String a("a");
+    String a("abc");
     String b = a;
-    a += "b";
-    CPPUNIT_ASSERT_EQUAL(String("ab"), a);
-    CPPUNIT_ASSERT_EQUAL(String("a"), b);
+    String c = a;
+
+    b += "def";
+    c += L"def";
+
+    CPPUNIT_ASSERT_EQUAL(String("abc"), a);
+    CPPUNIT_ASSERT_EQUAL(String("abcdef"), b);
+    CPPUNIT_ASSERT_EQUAL(String("abcdef"), c);
   }
 
   void testAppendCharDetach()
   {
-    String a("a");
+    String a("abc");
     String b = a;
-    a += 'b';
-    CPPUNIT_ASSERT_EQUAL(String("ab"), a);
-    CPPUNIT_ASSERT_EQUAL(String("a"), b);
+    String c = a;
+    
+    b += 'd';
+    c += L'd';
+    
+    CPPUNIT_ASSERT_EQUAL(String("abc"), a);
+    CPPUNIT_ASSERT_EQUAL(String("abcd"), b);
+    CPPUNIT_ASSERT_EQUAL(String("abcd"), c);
   }
 
   void testRfind()
