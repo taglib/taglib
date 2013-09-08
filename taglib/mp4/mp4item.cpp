@@ -23,47 +23,17 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
-
-#include <cstdio>
-#include <cstdarg>
-
 #include "taglib.h"
 #include "tdebug.h"
 #include "tsmartptr.h"
+#include "tstring.h"
+#include "tutils.h"
 #include "mp4item.h"
 
 using namespace TagLib;
 
 namespace
 {
-  String format(const char *fmt, ...)
-  {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[256];
-
-#if defined(HAVE_SNPRINTF)
-
-    vsnprintf(buf, sizeof(buf), fmt, args);
-
-#elif defined(HAVE_SPRINTF_S)
-
-    vsprintf_s(buf, fmt, args);
-
-#else
-
-    // Be careful. May cause a buffer overflow.  
-    vsprintf(buf, fmt, args);
-
-#endif
-
-    va_end(args);
-
-    return String(buf);
-  }
-
   struct ItemData
   {
     bool valid;
@@ -263,26 +233,26 @@ MP4::Item::toString() const
     case TypeBool:
       return d->data->m_bool ? "true" : "false";
     case TypeInt:
-      return format("%d", d->data->m_int);
+      return Utils::formatString("%d", d->data->m_int);
     case TypeIntPair:
-      return format("%d/%d", d->data->m_intPair.first, d->data->m_intPair.second);
+      return Utils::formatString("%d/%d", d->data->m_intPair.first, d->data->m_intPair.second);
     case TypeByte:
-      return format("%d", d->data->m_byte);
+      return Utils::formatString("%d", d->data->m_byte);
     case TypeUInt:
-      return format("%u", d->data->m_uint);
+      return Utils::formatString("%u", d->data->m_uint);
     case TypeLongLong:
-      return format("%lld", d->data->m_longlong);
+      return Utils::formatString("%lld", d->data->m_longlong);
     case TypeStringList:
       return d->data->m_stringList.toString(" / ");
     case TypeByteVectorList:
       for(TagLib::uint i = 0; i < d->data->m_byteVectorList.size(); i++) {
-        desc.append(format(
+        desc.append(Utils::formatString(
           "[%d bytes of data]", static_cast<int>(d->data->m_byteVectorList[i].size())));
       }
       return desc.toString(", ");
     case TypeCoverArtList:
       for(TagLib::uint i = 0; i < d->data->m_coverArtList.size(); i++) {
-        desc.append(format(
+        desc.append(Utils::formatString(
           "[%d bytes of data]", static_cast<int>(d->data->m_coverArtList[i].data().size())));
       }
       return desc.toString(", ");

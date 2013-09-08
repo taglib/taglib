@@ -44,6 +44,9 @@
 # include <sys/endian.h>
 #endif
 
+#include <cstdio>
+#include <cstdarg>
+
 namespace TagLib
 {
   namespace Utils
@@ -143,6 +146,47 @@ namespace TagLib
         | ((x & 0x00000000000000ffull) << 56);
 
 #endif
+    }
+
+    inline String formatString(const char *format, ...)
+    {
+      // Sufficient buffer size for the current internal uses.
+      // Consider changing this value when you use this function.
+
+      static const size_t BufferSize = 128; 
+
+      va_list args;
+      va_start(args, format);
+
+      char buf[BufferSize];
+      int length;
+
+#if defined(HAVE_SNPRINTF)
+
+      length = vsnprintf(buf, BufferSize, format, args);
+
+#elif defined(HAVE_SPRINTF_S)
+
+      length = vsprintf_s(buf, format, args);
+
+#else
+
+      // The last resort. May cause a buffer overflow.
+
+      length = vsprintf(buf, format, args);
+      if(length >= BufferSize) {
+        debug("Utils::formatString() - Buffer overflow! Returning an empty string.");
+        length = -1;
+      }
+
+#endif
+
+      va_end(args);
+
+      if(length != -1)
+        return String(buf);
+      else
+        return String::null;
     }
 
 #ifdef SYSTEM_BYTEORDER
