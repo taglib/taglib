@@ -41,7 +41,6 @@ public:
     tag(0),
     tagChunkID("ID3 ")
   {
-
   }
 
   ~FilePrivate()
@@ -59,20 +58,25 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::File::File(FileName file, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(file, BigEndian)
+RIFF::AIFF::File::File(FileName file, bool readProperties, 
+                       AudioProperties::ReadStyle propertiesStyle,
+                       const ID3v2::FrameFactory *frameFactory) :
+  RIFF::File(file, BigEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
-RIFF::AIFF::File::File(IOStream *stream, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(stream, BigEndian)
+RIFF::AIFF::File::File(IOStream *stream, bool readProperties, 
+                       AudioProperties::ReadStyle propertiesStyle,
+                       const ID3v2::FrameFactory *frameFactory) :
+  RIFF::File(stream, BigEndian),
+  d(new FilePrivate())
 {
   d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
 RIFF::AIFF::File::~File()
@@ -128,12 +132,16 @@ bool RIFF::AIFF::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
+void RIFF::AIFF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                            const ID3v2::FrameFactory *frameFactory)
 {
+  if(!frameFactory)
+    frameFactory = ID3v2::FrameFactory::instance();
+
   for(uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
       d->tagChunkID = chunkName(i);
-      d->tag = new ID3v2::Tag(this, chunkOffset(i));
+      d->tag = new ID3v2::Tag(this, chunkOffset(i), frameFactory);
     }
     else if(chunkName(i) == "COMM" && readProperties)
       d->properties = new AudioProperties(chunkData(i), propertiesStyle);

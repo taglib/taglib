@@ -53,7 +53,6 @@ class FLAC::File::FilePrivate
 {
 public:
   FilePrivate() :
-    ID3v2FrameFactory(ID3v2::FrameFactory::instance()),
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
@@ -77,7 +76,6 @@ public:
     delete properties;
   }
 
-  const ID3v2::FrameFactory *ID3v2FrameFactory;
   offset_t ID3v2Location;
   uint ID3v2OriginalSize;
 
@@ -104,28 +102,24 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(FileName file,
-                 bool readProperties, AudioProperties::ReadStyle propertiesStyle,
-                 ID3v2::FrameFactory *frameFactory) :
-  TagLib::File(file)
+FLAC::File::File(FileName file, bool readProperties, 
+                 AudioProperties::ReadStyle propertiesStyle,
+                 const ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
-  if(frameFactory)
-    d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
-FLAC::File::File(IOStream *stream,
-                 bool readProperties, AudioProperties::ReadStyle propertiesStyle,
-                 ID3v2::FrameFactory *frameFactory) :
-  TagLib::File(stream)
+FLAC::File::File(IOStream *stream, bool readProperties, 
+                 AudioProperties::ReadStyle propertiesStyle,
+                 const ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
-  if(frameFactory)
-    d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
 FLAC::File::~File()
@@ -257,25 +251,23 @@ Ogg::XiphComment *FLAC::File::xiphComment(bool create)
   return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, create);
 }
 
-void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
+void FLAC::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                      const ID3v2::FrameFactory *frameFactory)
 {
+  if(!frameFactory)
+    frameFactory = ID3v2::FrameFactory::instance();
+
   // Look for an ID3v2 tag
 
   d->ID3v2Location = findID3v2();
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.set(FlacID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(FlacID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, frameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 

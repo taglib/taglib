@@ -61,22 +61,32 @@ namespace TagLib {
          * Constructs an AIFF file from \a file.  If \a readProperties is true the
          * file's audio properties will also be read.
          *
+         * If this file contains an ID3v2 tag the frames will be created using
+         * \a frameFactory.  \a frameFactory needs to be valid until the File 
+         * object is destructed.
+         *
          * \note In the current implementation, \a propertiesStyle is ignored.
          */
         File(FileName file, bool readProperties = true,
-             AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+             AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
+             const ID3v2::FrameFactory *frameFactory = 0);
 
         /*!
          * Constructs an AIFF file from \a stream.  If \a readProperties is true the
          * file's audio properties will also be read.
          *
-         * \note TagLib will *not* take ownership of the stream, the caller is
-         * responsible for deleting it after the File object.
+         * If this file contains an ID3v2 tag the frames will be created using
+         * \a frameFactory.  \a frameFactory needs to be valid until the File 
+         * object is destructed.
          *
          * \note In the current implementation, \a propertiesStyle is ignored.
+         *
+         * \note TagLib will *not* take ownership of the stream, the caller is
+         * responsible for deleting it after the File object.
          */
         File(IOStream *stream, bool readProperties = true,
-             AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+             AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
+             const ID3v2::FrameFactory *frameFactory = 0);
 
         /*!
          * Destroys this instance of the File.
@@ -130,7 +140,8 @@ namespace TagLib {
         File(const File &);
         File &operator=(const File &);
 
-        void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+        void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                  const ID3v2::FrameFactory *frameFactory);
 
         class FilePrivate;
         FilePrivate *d;

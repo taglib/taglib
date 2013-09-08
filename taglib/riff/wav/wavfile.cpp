@@ -70,20 +70,24 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::File::File(FileName file, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(file, LittleEndian)
+RIFF::WAV::File::File(FileName file, bool readProperties, 
+                      AudioProperties::ReadStyle propertiesStyle,
+                      const ID3v2::FrameFactory *frameFactory) :
+  RIFF::File(file, LittleEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
-RIFF::WAV::File::File(IOStream *stream, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(stream, LittleEndian)
+RIFF::WAV::File::File(IOStream *stream, bool readProperties, 
+                      AudioProperties::ReadStyle propertiesStyle,
+                      const ID3v2::FrameFactory *frameFactory) :
+  RIFF::File(stream, LittleEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
 RIFF::WAV::File::~File()
@@ -184,15 +188,19 @@ bool RIFF::WAV::File::hasInfoTag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
+void RIFF::WAV::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                           const ID3v2::FrameFactory *frameFactory)
 {
+  if(!frameFactory)
+    frameFactory = ID3v2::FrameFactory::instance();
+
   ByteVector formatData;
   uint streamLength = 0;
   for(uint i = 0; i < chunkCount(); i++) {
     String name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       d->tagChunkID = chunkName(i);
-      d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i)));
+      d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i), frameFactory));
       d->hasID3v2 = true;
     }
     else if(name == "fmt " && readProperties)

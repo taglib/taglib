@@ -77,18 +77,6 @@ FrameFactory *FrameFactory::instance()
   return &factory;
 }
 
-Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) const
-{
-  return createFrame(data, uint(synchSafeInts ? 4 : 3));
-}
-
-Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
-{
-  Header tagHeader;
-  tagHeader.setMajorVersion(version);
-  return createFrame(data, &tagHeader);
-}
-
 Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) const
 {
   ByteVector data = origData;
@@ -156,7 +144,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   frameID = header->frameID();
 
-  // This is where things get necissarily nasty.  Here we determine which
+  // This is where things get necessarily nasty.  Here we determine which
   // Frame subclass (or if none is found simply an Frame) based
   // on the frame ID.  Since there are a lot of possibilities, that means
   // a lot of if blocks.
@@ -277,9 +265,9 @@ void FrameFactory::setDefaultTextEncoding(String::Type encoding)
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-FrameFactory::FrameFactory()
+FrameFactory::FrameFactory() : 
+  d(new FrameFactoryPrivate())
 {
-  d = new FrameFactoryPrivate;
 }
 
 FrameFactory::~FrameFactory()

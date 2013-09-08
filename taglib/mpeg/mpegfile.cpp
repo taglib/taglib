@@ -47,8 +47,7 @@ namespace
 class MPEG::File::FilePrivate
 {
 public:
-  FilePrivate(ID3v2::FrameFactory *frameFactory = ID3v2::FrameFactory::instance()) :
-    ID3v2FrameFactory(frameFactory),
+  FilePrivate() :
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     APELocation(-1),
@@ -60,15 +59,12 @@ public:
     hasAPE(false),
     properties(0)
   {
-
   }
 
   ~FilePrivate()
   {
     delete properties;
   }
-
-  const ID3v2::FrameFactory *ID3v2FrameFactory;
 
   offset_t ID3v2Location;
   uint ID3v2OriginalSize;
@@ -95,33 +91,24 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::File::File(FileName file, bool readProperties,
-                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
+MPEG::File::File(FileName file, bool readProperties, 
+                 AudioProperties::ReadStyle propertiesStyle,
+                 const ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
-
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
-MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+MPEG::File::File(IOStream *stream, bool readProperties, 
+                 AudioProperties::ReadStyle propertiesStyle,
+                 const ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate(frameFactory);
-
   if(isOpen())
-    read(readProperties, propertiesStyle);
-}
-
-MPEG::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
-{
-  d = new FilePrivate(frameFactory);
-
-  if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
 MPEG::File::~File()
@@ -337,11 +324,6 @@ bool MPEG::File::strip(int tags, bool freeMemory)
   return true;
 }
 
-void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
-}
-
 offset_t MPEG::File::nextFrameOffset(offset_t position)
 {
   bool foundLastSyncPattern = false;
@@ -431,15 +413,19 @@ bool MPEG::File::hasAPETag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
+void MPEG::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                      const ID3v2::FrameFactory *frameFactory)
 {
+  if(!frameFactory)
+    frameFactory = ID3v2::FrameFactory::instance();
+
   // Look for an ID3v2 tag
 
   d->ID3v2Location = findID3v2();
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, frameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 

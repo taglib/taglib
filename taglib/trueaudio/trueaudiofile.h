@@ -82,51 +82,32 @@ namespace TagLib {
        * Constructs a TrueAudio file from \a file.  If \a readProperties is true 
        * the file's audio properties will also be read.
        *
+       * If this file contains an ID3v2 tag the frames will be created using
+       * \a frameFactory.  \a frameFactory needs to be valid until the File 
+       * object is destructed.
+       *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
-
-      /*!
-       * Constructs a TrueAudio file from \a file.  If \a readProperties is true 
-       * the file's audio properties will also be read.
-       *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
-       *
-       * \note In the current implementation, \a propertiesStyle is ignored.
-       */
-      File(FileName file, ID3v2::FrameFactory *frameFactory,
-           bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
-
-      /*!
-       * Constructs a TrueAudio file from \a stream.  If \a readProperties is true
-       * the file's audio properties will also be read.
-       *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
-       *
-       * \note In the current implementation, \a propertiesStyle is ignored.
-       */
-      File(IOStream *stream, bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average, 
+           const ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
        * Constructs a TrueAudio file from \a stream.  If \a readProperties is true 
        * the file's audio properties will also be read.
        *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
-       *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
+       * If this file contains an ID3v2 tag the frames will be created using
+       * \a frameFactory.  \a frameFactory needs to be valid until the File 
+       * object is destructed.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-           bool readProperties = true,
-           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
+      File(IOStream *stream, bool readProperties = true,
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average,
+           const ID3v2::FrameFactory *frameFactory = 0);
 
       /*!
        * Destroys this instance of the File.
@@ -150,13 +131,6 @@ namespace TagLib {
        * were read then this will return a null pointer.
        */
       virtual AudioProperties *audioProperties() const;
-
-      /*!
-       * Set the ID3v2::FrameFactory to something other than the default.
-       *
-       * \see ID3v2FrameFactory
-       */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
       /*!
        * Saves the file.
@@ -229,7 +203,8 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle,
+                const ID3v2::FrameFactory *frameFactory);
       void scan();
       offset_t findID3v1();
       offset_t findID3v2();

@@ -49,8 +49,7 @@ namespace
 class TrueAudio::File::FilePrivate
 {
 public:
-  FilePrivate(const ID3v2::FrameFactory *frameFactory = ID3v2::FrameFactory::instance()) :
-    ID3v2FrameFactory(frameFactory),
+  FilePrivate() :
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
@@ -63,7 +62,6 @@ public:
     delete properties;
   }
 
-  const ID3v2::FrameFactory *ID3v2FrameFactory;
   offset_t ID3v2Location;
   uint ID3v2OriginalSize;
 
@@ -84,38 +82,24 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::File::File(FileName file, bool readProperties,
-                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
+TrueAudio::File::File(FileName file, bool readProperties, 
+                      AudioProperties::ReadStyle propertiesStyle,
+                      const ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
-TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+TrueAudio::File::File(IOStream *stream, bool readProperties, 
+                      AudioProperties::ReadStyle propertiesStyle,
+                      const ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate(frameFactory);
   if(isOpen())
-    read(readProperties, propertiesStyle);
-}
-
-TrueAudio::File::File(IOStream *stream, bool readProperties,
-                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
-{
-  d = new FilePrivate;
-  if(isOpen())
-    read(readProperties, propertiesStyle);
-}
-
-TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
-{
-  d = new FilePrivate(frameFactory);
-  if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties, propertiesStyle, frameFactory);
 }
 
 TrueAudio::File::~File()
@@ -138,11 +122,6 @@ PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 TrueAudio::AudioProperties *TrueAudio::File::audioProperties() const
 {
   return d->properties;
-}
-
-void TrueAudio::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
 }
 
 bool TrueAudio::File::save()
@@ -229,20 +208,23 @@ bool TrueAudio::File::hasID3v2Tag() const
   return d->hasID3v2;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
+void TrueAudio::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */,
+                           const ID3v2::FrameFactory *frameFactory)
 {
+  if(!frameFactory)
+    frameFactory = ID3v2::FrameFactory::instance();
+
   // Look for an ID3v2 tag
 
   d->ID3v2Location = findID3v2();
 
   if(d->ID3v2Location >= 0) {
 
-    d->tag.set(TrueAudioID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, d->ID3v2FrameFactory));
+    d->tag.set(TrueAudioID3v2Index, new ID3v2::Tag(this, d->ID3v2Location, frameFactory));
 
     d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
 
