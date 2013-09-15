@@ -136,6 +136,9 @@ void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
   d->bitrate        = static_cast<int>((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
 
+  if(data.size() == 18)
+    return;
+
   if(data.size() < 23) {
     debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF-C.");
     return;
