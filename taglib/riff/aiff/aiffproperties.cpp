@@ -136,14 +136,8 @@ void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
   d->bitrate        = static_cast<int>((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
 
-  if(data.size() == 18)
-    return;
-
-  if(data.size() < 23) {
-    debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF-C.");
-    return;
+  if(data.size() >= 23) {
+    d->compressionType = data.mid(18, 4);
+    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
   }
-
-  d->compressionType = data.mid(18, 4);
-  d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
 }
