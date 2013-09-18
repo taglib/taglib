@@ -26,7 +26,6 @@
 #include "taglib.h"
 #include "tdebug.h"
 #include "tsmartptr.h"
-#include "tstring.h"
 #include "tutils.h"
 #include "mp4item.h"
 

@@ -44,6 +44,7 @@
 # include <sys/endian.h>
 #endif
 
+#include "tstring.h"
 #include <cstdio>
 #include <cstdarg>
 

@@ -33,7 +33,6 @@
 #include <cstdio>
 #include <cstring>
 
-#include "tstring.h"
 #include "tdebug.h"
 #include "tsmartptr.h"
 #include "tutils.h"
