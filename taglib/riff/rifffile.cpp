@@ -28,6 +28,7 @@
 #include <tstring.h>
 
 #include "rifffile.h"
+#include <algorithm>
 #include <vector>
 
 using namespace TagLib;
