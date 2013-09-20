@@ -52,6 +52,7 @@ SET(test_runner_SRCS
   test_ape.cpp
   test_apetag.cpp
   test_wav.cpp
+  test_info.cpp
   test_wavpack.cpp
   test_mp4.cpp
   test_mp4item.cpp
