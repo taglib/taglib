@@ -27,6 +27,7 @@
 #include <config.h>
 #endif
 
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <cmath>
