@@ -123,7 +123,7 @@ bool DSF::File::save()
   uint newFileSize = d->metadataOffset + tagData.size();
 
   // Write the file size
-  insert(ByteVector::fromUInt(newFileSize), 12, 4);
+  insert(ByteVector::fromUInt(newFileSize, false), 12, 4);
 
   // Delete the old tag and write the new one
   insert(tagData, d->metadataOffset, oldTagSize);
@@ -147,7 +147,7 @@ void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
     return;
   }
 
-  TagLib::uint chunkSize = readBlock(8).toUInt();
+  TagLib::uint chunkSize = readBlock(8).toUInt(false);
   
   // Integrity check
   if(28 != chunkSize) {
@@ -155,8 +155,8 @@ void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
     return;
   }
   
-  d->fileSize = readBlock(8).toUInt();
-  d->metadataOffset = readBlock(8).toUInt();
+  d->fileSize = readBlock(8).toUInt(false);
+  d->metadataOffset = readBlock(8).toUInt(false);
 
   // File is malformed or corrupted
   if(d->metadataOffset > d->fileSize) {
@@ -171,7 +171,7 @@ void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
     return;
   }
 
-  chunkSize = readBlock(8).toUInt();
+  chunkSize = readBlock(8).toUInt(false);
   
   d->properties = new Properties(readBlock(chunkSize), propertiesStyle);
   

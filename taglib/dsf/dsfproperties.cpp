@@ -130,14 +130,14 @@ int DSF::Properties::blockSizePerChannel() const
 
 void DSF::Properties::read(const ByteVector &data)
 {
-  d->formatVersion         = data.mid(0, 4).toUInt();
-  d->formatID              = data.mid(4, 4).toUInt();
-  d->channelType           = data.mid(8, 4).toUInt();
-  d->channelNum            = data.mid(12, 4).toUInt();
-  d->samplingFrequency     = data.mid(16, 4).toUInt();
-  d->bitsPerSample         = data.mid(20, 4).toUInt();
-  d->sampleCount           = data.mid(24, 8).toUInt();
-  d->blockSizePerChannel   = data.mid(32, 4).toUInt();
+  d->formatVersion         = data.mid(0, 4).toUInt(false);
+  d->formatID              = data.mid(4, 4).toUInt(false);
+  d->channelType           = data.mid(8, 4).toUInt(false);
+  d->channelNum            = data.mid(12, 4).toUInt(false);
+  d->samplingFrequency     = data.mid(16, 4).toUInt(false);
+  d->bitsPerSample         = data.mid(20, 4).toUInt(false);
+  d->sampleCount           = data.mid(24, 8).toUInt(false);
+  d->blockSizePerChannel   = data.mid(32, 4).toUInt(false);
 
   d->bitrate               = (d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0;
   d->length                = d->samplingFrequency > 0 ? d->sampleCount / d->samplingFrequency : 0;
