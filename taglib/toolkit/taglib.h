@@ -26,17 +26,9 @@
 #ifndef TAGLIB_H
 #define TAGLIB_H
 
-#include "taglib_config.h"
-
 #define TAGLIB_MAJOR_VERSION 1
 #define TAGLIB_MINOR_VERSION 8
 #define TAGLIB_PATCH_VERSION 0
-
-#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
-#define TAGLIB_IGNORE_MISSING_DESTRUCTOR _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")
-#else
-#define TAGLIB_IGNORE_MISSING_DESTRUCTOR
-#endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600)
 #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long long>(x)
@@ -44,7 +36,18 @@
 #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
 #endif
 
-#include <string>
+#ifdef _WIN32
+# if !defined(NOMINMAX)
+#   define NOMINMAX
+# endif
+# include <windows.h>
+#else
+# ifndef _LARGEFILE_SOURCE
+#   define _LARGEFILE_SOURCE
+# endif
+# define _FILE_OFFSET_BITS 64
+# include <sys/types.h>
+#endif
 
 //! A namespace for all TagLib related classes and functions
 
@@ -56,10 +59,8 @@
  * \endcode
  */
 
-namespace TagLib {
-
-  class String;
-
+namespace TagLib 
+{
   typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
   typedef unsigned char      uchar;
   typedef unsigned short     ushort;
@@ -69,11 +70,19 @@ namespace TagLib {
   // long/ulong can be either 32-bit or 64-bit wide.
   typedef unsigned long  ulong;
 
-  /*!
-   * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)
-   * so I'm providing something here that should be constant.
-   */
-  typedef std::basic_string<wchar> wstring;
+  // Offset or length type for I/O streams.  
+  // In Win32, always signed 64-bit. Otherwise, equivalent to off_t.
+#ifdef _WIN32
+  typedef LONGLONG offset_t;
+#else
+  typedef off_t    offset_t;
+#endif
+
+  enum ByteOrder
+  {
+    LittleEndian,
+    BigEndian
+  };
 }
 
 /*!

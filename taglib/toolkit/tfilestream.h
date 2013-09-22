@@ -26,8 +26,6 @@
 #ifndef TAGLIB_FILESTREAM_H
 #define TAGLIB_FILESTREAM_H
 
-#include "taglib_export.h"
-#include "taglib.h"
 #include "tbytevector.h"
 #include "tiostream.h"
 
@@ -67,7 +65,7 @@ namespace TagLib {
     /*!
      * Reads a block of size \a length at the current get pointer.
      */
-    ByteVector readBlock(ulong length);
+    ByteVector readBlock(size_t length);
 
     /*!
      * Attempts to write the block \a data at the current get pointer.  If the
@@ -87,7 +85,7 @@ namespace TagLib {
      * \note This method is slow since it requires rewriting all of the file
      * after the insertion point.
      */
-    void insert(const ByteVector &data, ulong start = 0, ulong replace = 0);
+    void insert(const ByteVector &data, offset_t start = 0, size_t replace = 0);
 
     /*!
      * Removes a block of the file starting a \a start and continuing for
@@ -96,7 +94,7 @@ namespace TagLib {
      * \note This method is slow since it involves rewriting all of the file
      * after the removed portion.
      */
-    void removeBlock(ulong start = 0, ulong length = 0);
+    void removeBlock(offset_t start = 0, size_t length = 0);
 
     /*!
      * Returns true if the file is read only (or if the file can not be opened).
@@ -115,7 +113,7 @@ namespace TagLib {
      *
      * \see Position
      */
-    void seek(long offset, Position p = Beginning);
+    void seek(offset_t offset, Position p = Beginning);
 
     /*!
      * Reset the end-of-file and error flags on the file.
@@ -125,24 +123,22 @@ namespace TagLib {
     /*!
      * Returns the current offset within the file.
      */
-    long tell() const;
+    offset_t tell() const;
 
     /*!
      * Returns the length of the file.
      */
-    long length();
+    offset_t length();
 
     /*!
      * Truncates the file to a \a length.
      */
-    void truncate(long length);
-
-  protected:
+    void truncate(offset_t length);
 
     /*!
      * Returns the buffer size that is used for internal buffering.
      */
-    static uint bufferSize();
+    static size_t bufferSize();
 
   private:
     class FileStreamPrivate;

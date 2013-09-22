@@ -31,13 +31,10 @@
 
 using namespace TagLib;
 
-class FLAC::Properties::PropertiesPrivate
+class FLAC::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(ByteVector d, long st, ReadStyle s) :
-    data(d),
-    streamLength(st),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -45,9 +42,6 @@ public:
     channels(0),
     sampleFrames(0) {}
 
-  ByteVector data;
-  long streamLength;
-  ReadStyle style;
   int length;
   int bitrate;
   int sampleRate;
@@ -61,54 +55,49 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(ByteVector data, long streamLength, ReadStyle style) : AudioProperties(style)
+FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, 
+                                       ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(data, streamLength, style);
-  read();
+  read(data, streamLength);
 }
 
-FLAC::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
-{
-  d = new PropertiesPrivate(file->streamInfoData(), file->streamLength(), style);
-  read();
-}
-
-FLAC::Properties::~Properties()
+FLAC::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int FLAC::Properties::length() const
+int FLAC::AudioProperties::length() const
 {
   return d->length;
 }
 
-int FLAC::Properties::bitrate() const
+int FLAC::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int FLAC::Properties::sampleRate() const
+int FLAC::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int FLAC::Properties::sampleWidth() const
+int FLAC::AudioProperties::sampleWidth() const
 {
   return d->sampleWidth;
 }
 
-int FLAC::Properties::channels() const
+int FLAC::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-unsigned long long FLAC::Properties::sampleFrames() const
+unsigned long long FLAC::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
 
-ByteVector FLAC::Properties::signature() const
+ByteVector FLAC::AudioProperties::signature() const
 {
   return d->signature;
 }
@@ -117,14 +106,14 @@ ByteVector FLAC::Properties::signature() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::Properties::read()
+void FLAC::AudioProperties::read(const ByteVector &data, offset_t streamLength)
 {
-  if(d->data.size() < 18) {
+  if(data.size() < 18) {
     debug("FLAC::Properties::read() - FLAC properties must contain at least 18 bytes.");
     return;
   }
 
-  uint pos = 0;
+  size_t pos = 0;
 
   // Minimum block size (in samples)
   pos += 2;
@@ -138,7 +127,7 @@ void FLAC::Properties::read()
   // Maximum frame size (in bytes)
   pos += 3;
 
-  uint flags = d->data.toUInt(pos, true);
+  const uint flags = data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleRate = flags >> 12;
@@ -148,14 +137,14 @@ void FLAC::Properties::read()
   // The last 4 bits are the most significant 4 bits for the 36 bit
   // stream length in samples. (Audio files measured in days)
 
-  unsigned long long hi = flags & 0xf;
-  unsigned long long lo = d->data.toUInt(pos, true);
+  const ulonglong hi = flags & 0xf;
+  const ulonglong lo = data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleFrames = (hi << 32) | lo;
 
   if(d->sampleRate > 0)
-    d->length = int(d->sampleFrames / d->sampleRate);
+    d->length = static_cast<int>(d->sampleFrames / d->sampleRate);
 
   // Uncompressed bitrate:
 
@@ -163,7 +152,7 @@ void FLAC::Properties::read()
 
   // Real bitrate:
 
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8UL) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
 
-  d->signature = d->data.mid(pos, 32);
+  d->signature = data.mid(pos, 32);
 }

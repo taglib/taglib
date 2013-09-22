@@ -157,7 +157,7 @@ const Ogg::PageHeader *Ogg::File::firstPageHeader()
   if(d->firstPageHeader)
     return d->firstPageHeader->isValid() ? d->firstPageHeader : 0;
 
-  long firstPageHeaderOffset = find("OggS");
+  offset_t firstPageHeaderOffset = find("OggS");
 
   if(firstPageHeaderOffset < 0)
     return 0;
@@ -171,7 +171,7 @@ const Ogg::PageHeader *Ogg::File::lastPageHeader()
   if(d->lastPageHeader)
     return d->lastPageHeader->isValid() ? d->lastPageHeader : 0;
 
-  long lastPageHeaderOffset = rfind("OggS");
+  offset_t lastPageHeaderOffset = rfind("OggS");
 
   if(lastPageHeaderOffset < 0)
     return 0;
@@ -224,7 +224,7 @@ Ogg::File::File(IOStream *stream) : TagLib::File(stream)
 
 bool Ogg::File::nextPage()
 {
-  long nextPageOffset;
+  offset_t nextPageOffset;
   int currentPacket;
 
   if(d->pages.isEmpty()) {
@@ -269,7 +269,7 @@ bool Ogg::File::nextPage()
     uint currentPacket = d->currentPage->firstPacketIndex() + i;
     if(d->packetToPageMap.size() <= currentPacket)
       d->packetToPageMap.push_back(List<int>());
-    d->packetToPageMap[currentPacket].append(d->pages.size() - 1);
+    d->packetToPageMap[currentPacket].append(static_cast<int>(d->pages.size()) - 1);
   }
 
   return true;

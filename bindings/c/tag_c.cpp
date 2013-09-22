@@ -19,6 +19,10 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>
@@ -40,18 +44,41 @@
 
 using namespace TagLib;
 
-static List<char *> strings;
-static bool unicodeStrings = true;
-static bool stringManagementEnabled = true;
+namespace
+{
+  List<char *> strings;
+  bool unicodeStrings = true;
+  bool stringManagementEnabled = true;
+
+  inline char *stringToCharArray(const String &s)
+  {
+    const std::string str = s.to8Bit(unicodeStrings);
+
+#ifdef HAVE_ISO_STRDUP
+
+    return ::_strdup(str.c_str());
+
+#else
+
+    return ::strdup(str.c_str());
+
+#endif
+  }
+
+  inline String charArrayToString(const char *s)
+  {
+    return String(s, unicodeStrings ? String::UTF8 : String::Latin1);
+  }
+}
 
 void taglib_set_strings_unicode(BOOL unicode)
 {
-  unicodeStrings = bool(unicode);
+  unicodeStrings = (unicode != 0);
 }
 
 void taglib_set_string_management_enabled(BOOL management)
 {
-  stringManagementEnabled = bool(management);
+  stringManagementEnabled = (management != 0);
 }
 
 void taglib_free(void* pointer)
@@ -65,32 +92,32 @@ void taglib_free(void* pointer)
 
 TagLib_File *taglib_file_new(const char *filename)
 {
-  return reinterpret_cast<TagLib_File *>(FileRef::create(filename));
+  return reinterpret_cast<TagLib_File *>(new FileRef(filename));
 }
 
 TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
 {
   switch(type) {
   case TagLib_File_MPEG:
-    return reinterpret_cast<TagLib_File *>(new MPEG::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new MPEG::File(filename)));
   case TagLib_File_OggVorbis:
-    return reinterpret_cast<TagLib_File *>(new Ogg::Vorbis::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new Ogg::Vorbis::File(filename)));
   case TagLib_File_FLAC:
-    return reinterpret_cast<TagLib_File *>(new FLAC::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new FLAC::File(filename)));
   case TagLib_File_MPC:
-    return reinterpret_cast<TagLib_File *>(new MPC::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new MPC::File(filename)));
   case TagLib_File_OggFlac:
-    return reinterpret_cast<TagLib_File *>(new Ogg::FLAC::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new Ogg::FLAC::File(filename)));
   case TagLib_File_WavPack:
-    return reinterpret_cast<TagLib_File *>(new WavPack::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new WavPack::File(filename)));
   case TagLib_File_Speex:
-    return reinterpret_cast<TagLib_File *>(new Ogg::Speex::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new Ogg::Speex::File(filename)));
   case TagLib_File_TrueAudio:
-    return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new TrueAudio::File(filename)));
   case TagLib_File_MP4:
-    return reinterpret_cast<TagLib_File *>(new MP4::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new MP4::File(filename)));
   case TagLib_File_ASF:
-    return reinterpret_cast<TagLib_File *>(new ASF::File(filename));
+    return reinterpret_cast<TagLib_File *>(new FileRef(new ASF::File(filename)));
   default:
     return 0;
   }
@@ -100,29 +127,29 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
 
 void taglib_file_free(TagLib_File *file)
 {
-  delete reinterpret_cast<File *>(file);
+  delete reinterpret_cast<FileRef *>(file);
 }
 
 BOOL taglib_file_is_valid(const TagLib_File *file)
 {
-  return reinterpret_cast<const File *>(file)->isValid();
+  return reinterpret_cast<const FileRef *>(file)->isValid();
 }
 
 TagLib_Tag *taglib_file_tag(const TagLib_File *file)
 {
-  const File *f = reinterpret_cast<const File *>(file);
+  const FileRef *f = reinterpret_cast<const FileRef *>(file);
   return reinterpret_cast<TagLib_Tag *>(f->tag());
 }
 
 const TagLib_AudioProperties *taglib_file_audioproperties(const TagLib_File *file)
 {
-  const File *f = reinterpret_cast<const File *>(file);
+  const FileRef *f = reinterpret_cast<const FileRef *>(file);
   return reinterpret_cast<const TagLib_AudioProperties *>(f->audioProperties());
 }
 
 BOOL taglib_file_save(TagLib_File *file)
 {
-  return reinterpret_cast<File *>(file)->save();
+  return reinterpret_cast<FileRef *>(file)->save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +159,7 @@ BOOL taglib_file_save(TagLib_File *file)
 char *taglib_tag_title(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->title().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->title());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -141,7 +168,7 @@ char *taglib_tag_title(const TagLib_Tag *tag)
 char *taglib_tag_artist(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->artist().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->artist());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -150,7 +177,7 @@ char *taglib_tag_artist(const TagLib_Tag *tag)
 char *taglib_tag_album(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->album().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->album());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -159,7 +186,7 @@ char *taglib_tag_album(const TagLib_Tag *tag)
 char *taglib_tag_comment(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->comment().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->comment());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -168,7 +195,7 @@ char *taglib_tag_comment(const TagLib_Tag *tag)
 char *taglib_tag_genre(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->genre().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->genre());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -189,31 +216,31 @@ unsigned int taglib_tag_track(const TagLib_Tag *tag)
 void taglib_tag_set_title(TagLib_Tag *tag, const char *title)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setTitle(String(title, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setTitle(charArrayToString(title));
 }
 
 void taglib_tag_set_artist(TagLib_Tag *tag, const char *artist)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setArtist(String(artist, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setArtist(charArrayToString(artist));
 }
 
 void taglib_tag_set_album(TagLib_Tag *tag, const char *album)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setAlbum(String(album, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setAlbum(charArrayToString(album));
 }
 
 void taglib_tag_set_comment(TagLib_Tag *tag, const char *comment)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setComment(String(comment, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setComment(charArrayToString(comment));
 }
 
 void taglib_tag_set_genre(TagLib_Tag *tag, const char *genre)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setGenre(String(genre, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setGenre(charArrayToString(genre));
 }
 
 void taglib_tag_set_year(TagLib_Tag *tag, unsigned int year)

@@ -24,12 +24,15 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/it
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/xm
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ebml
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ebml/matroska
 )
 
 SET(test_runner_SRCS
   main.cpp
   test_list.cpp
   test_map.cpp
+  test_smartptr.cpp
   test_mpeg.cpp
   test_synchdata.cpp
   test_trueaudio.cpp
@@ -63,6 +66,7 @@ SET(test_runner_SRCS
   test_xm.cpp
   test_mpc.cpp
   test_opus.cpp
+  test_matroska.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

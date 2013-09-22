@@ -127,7 +127,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(a, String(d, String::UTF16));
   }
 
-  // this test is expected to print "TagLib: String::prepare() -
+  // this test is expected to print "TagLib: String::copyFromUTF16() -
   // Invalid UTF16 string." on the console 3 times
   void testUTF16DecodeInvalidBOM()
   {
@@ -149,33 +149,43 @@ public:
 
   void testAppendStringDetach()
   {
-    String a("a");
+    String a("abc");
     String b = a;
-    a += "b";
-    CPPUNIT_ASSERT_EQUAL(String("ab"), a);
-    CPPUNIT_ASSERT_EQUAL(String("a"), b);
+    String c = a;
+
+    b += "def";
+    c += L"def";
+
+    CPPUNIT_ASSERT_EQUAL(String("abc"), a);
+    CPPUNIT_ASSERT_EQUAL(String("abcdef"), b);
+    CPPUNIT_ASSERT_EQUAL(String("abcdef"), c);
   }
 
   void testAppendCharDetach()
   {
-    String a("a");
+    String a("abc");
     String b = a;
-    a += 'b';
-    CPPUNIT_ASSERT_EQUAL(String("ab"), a);
-    CPPUNIT_ASSERT_EQUAL(String("a"), b);
+    String c = a;
+    
+    b += 'd';
+    c += L'd';
+    
+    CPPUNIT_ASSERT_EQUAL(String("abc"), a);
+    CPPUNIT_ASSERT_EQUAL(String("abcd"), b);
+    CPPUNIT_ASSERT_EQUAL(String("abcd"), c);
   }
 
   void testRfind()
   {
-    CPPUNIT_ASSERT_EQUAL(-1, String("foo.bar").rfind(".", 0));
-    CPPUNIT_ASSERT_EQUAL(-1, String("foo.bar").rfind(".", 1));
-    CPPUNIT_ASSERT_EQUAL(-1, String("foo.bar").rfind(".", 2));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 3));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 4));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 5));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 6));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind(".", 7));
-    CPPUNIT_ASSERT_EQUAL(3, String("foo.bar").rfind("."));
+    CPPUNIT_ASSERT_EQUAL(String::npos, String("foo.bar").rfind(".", 0));
+    CPPUNIT_ASSERT_EQUAL(String::npos, String("foo.bar").rfind(".", 1));
+    CPPUNIT_ASSERT_EQUAL(String::npos, String("foo.bar").rfind(".", 2));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 3));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 4));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 5));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 6));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind(".", 7));
+    CPPUNIT_ASSERT_EQUAL((size_t)3, String("foo.bar").rfind("."));
   }
 
   void testToInt()
@@ -218,9 +228,9 @@ public:
     ByteVector lf("abc\x0axyz", 7);
     ByteVector crlf("abc\x0d\x0axyz", 8);
 
-    CPPUNIT_ASSERT_EQUAL(uint(7), String(cr).size());
-    CPPUNIT_ASSERT_EQUAL(uint(7), String(lf).size());
-    CPPUNIT_ASSERT_EQUAL(uint(8), String(crlf).size());
+    CPPUNIT_ASSERT_EQUAL(size_t(7), String(cr).size());
+    CPPUNIT_ASSERT_EQUAL(size_t(7), String(lf).size());
+    CPPUNIT_ASSERT_EQUAL(size_t(8), String(crlf).size());
 
     CPPUNIT_ASSERT_EQUAL(L'\x0d', String(cr)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(lf)[3]);

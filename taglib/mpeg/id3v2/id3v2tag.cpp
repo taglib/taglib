@@ -52,10 +52,16 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), tagOffset(-1), extendedHeader(0), footer(0), paddingSize(0)
+  TagPrivate() 
+    : file(0)
+    , tagOffset(-1)
+    , extendedHeader(0)
+    , footer(0)
+    , paddingSize(0)
   {
     frameList.setAutoDelete(true);
   }
+
   ~TagPrivate()
   {
     delete extendedHeader;
@@ -63,7 +69,7 @@ public:
   }
 
   File *file;
-  long tagOffset;
+  offset_t tagOffset;
   const FrameFactory *factory;
 
   Header header;
@@ -75,27 +81,32 @@ public:
   FrameListMap frameListMap;
   FrameList frameList;
 
-  static const Latin1StringHandler *stringHandler;
+  static const TagLib::StringHandler *stringHandler;
 };
 
-static const Latin1StringHandler defaultStringHandler;
-const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+namespace
+{
+  const ID3v2::Latin1StringHandler defaultStringHandler;
+}
+
+const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
-// StringHandler implementation
+// Latin1StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-Latin1StringHandler::Latin1StringHandler()
+ID3v2::Latin1StringHandler::Latin1StringHandler()
 {
 }
 
-Latin1StringHandler::~Latin1StringHandler()
-{
-}
-
-String Latin1StringHandler::parse(const ByteVector &data) const
+String ID3v2::Latin1StringHandler::parse(const ByteVector &data) const
 {
   return String(data, String::Latin1);
+}
+
+ByteVector ID3v2::Latin1StringHandler::render(const String &s) const
+{
+  return ByteVector();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +119,7 @@ ID3v2::Tag::Tag() : TagLib::Tag()
   d->factory = FrameFactory::instance();
 }
 
-ID3v2::Tag::Tag(File *file, long tagOffset, const FrameFactory *factory) :
+ID3v2::Tag::Tag(File *file, offset_t tagOffset, const FrameFactory *factory) :
   TagLib::Tag()
 {
   d = new TagPrivate;
@@ -596,8 +607,8 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  uint paddingSize = 0;
-  uint originalSize = d->header.tagSize();
+  size_t paddingSize = 0;
+  const size_t originalSize = d->header.tagSize();
 
   if(tagData.size() < originalSize)
     paddingSize = originalSize - tagData.size();
@@ -608,18 +619,18 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(tagData.size());
+  d->header.setTagSize(static_cast<uint>(tagData.size()));
 
   // TODO: This should eventually include d->footer->render().
   return d->header.render() + tagData;
 }
 
-Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
+TagLib::StringHandler const *ID3v2::Tag::latin1StringHandler()
 {
   return TagPrivate::stringHandler;
 }
 
-void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
+void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
     TagPrivate::stringHandler = handler;
@@ -655,8 +666,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
   if(d->header.unsynchronisation() && d->header.majorVersion() <= 3)
     data = SynchData::decode(data);
 
-  uint frameDataPosition = 0;
-  uint frameDataLength = data.size();
+  size_t frameDataPosition = 0;
+  size_t frameDataLength = data.size();
 
   // check for extended header
 
@@ -692,7 +703,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
       }
 
-      d->paddingSize = frameDataLength - frameDataPosition;
+      d->paddingSize = static_cast<int>(frameDataLength - frameDataPosition);
       return;
     }
 

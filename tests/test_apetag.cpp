@@ -51,7 +51,7 @@ public:
     dict["TRACKNUMBER"].append("17");
     tag.setProperties(dict);
     CPPUNIT_ASSERT_EQUAL(String("17"), tag.itemListMap()["TRACK"].values()[0]);
-    CPPUNIT_ASSERT_EQUAL(2u, tag.itemListMap()["ARTIST"].values().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2u, tag.itemListMap()["ARTIST"].values().size());
     CPPUNIT_ASSERT_EQUAL(String("artist 1"), tag.artist());
     CPPUNIT_ASSERT_EQUAL(17u, tag.track());
   }
@@ -67,7 +67,7 @@ public:
     tag.setItem("TESTBINARY", item2);
 
     PropertyMap properties = tag.properties();
-    CPPUNIT_ASSERT_EQUAL(1u, properties.unsupportedData().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)1u, properties.unsupportedData().size());
     CPPUNIT_ASSERT(properties.contains("TRACKNUMBER"));
     CPPUNIT_ASSERT(!properties.contains("TRACK"));
     CPPUNIT_ASSERT(tag.itemListMap().contains("TESTBINARY"));
@@ -78,7 +78,7 @@ public:
     APE::Item item3 = APE::Item("TRACKNUMBER", "29");
     tag.setItem("TRACKNUMBER", item3);
     properties = tag.properties();
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), properties["TRACKNUMBER"].size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, properties["TRACKNUMBER"].size());
     CPPUNIT_ASSERT_EQUAL(String("17"), properties["TRACKNUMBER"][0]);
     CPPUNIT_ASSERT_EQUAL(String("29"), properties["TRACKNUMBER"][1]);
 
@@ -94,7 +94,7 @@ public:
 
     APE::Tag tag;
     PropertyMap unsuccessful = tag.setProperties(properties);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(2), unsuccessful.size());
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
   }

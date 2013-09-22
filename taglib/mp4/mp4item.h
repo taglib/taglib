@@ -41,8 +41,22 @@ namespace TagLib {
         int first, second;
       };
 
+      enum ItemType {
+        TypeUndefined = 0,
+        TypeBool,
+        TypeInt,
+        TypeIntPair,
+        TypeByte,
+        TypeUInt,
+        TypeLongLong,
+        TypeStringList,
+        TypeByteVectorList,
+        TypeCoverArtList,
+      };
+
       Item();
       Item(const Item &item);
+
       Item &operator=(const Item &item);
       ~Item();
 
@@ -69,7 +83,11 @@ namespace TagLib {
       ByteVectorList toByteVectorList() const;
       CoverArtList toCoverArtList() const;
 
+      ItemType type() const;
+
       bool isValid() const;
+
+      String toString() const;
 
     private:
       class ItemPrivate;

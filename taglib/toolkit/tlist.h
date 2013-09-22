@@ -27,7 +27,6 @@
 #define TAGLIB_LIST_H
 
 #include "taglib.h"
-
 #include <list>
 
 namespace TagLib {
@@ -147,23 +146,26 @@ namespace TagLib {
     /*!
      * Returns the number of elements in the list.
      */
-    uint size() const;
+    size_t size() const;
     bool isEmpty() const;
 
     /*!
      * Find the first occurrence of \a value.
      */
-    Iterator find(const T &value);
+    template <class U>
+    Iterator find(const U &value);
 
     /*!
      * Find the first occurrence of \a value.
      */
-    ConstIterator find(const T &value) const;
+    template <class U>
+    ConstIterator find(const U &value) const;
 
     /*!
      * Returns true if the list contains \a value.
      */
-    bool contains(const T &value) const;
+    template <class U>
+    bool contains(const U &value) const;
 
     /*!
      * Erase the item at \a it from the list.
@@ -205,14 +207,14 @@ namespace TagLib {
      *
      * \warning This method is slow.  Use iterators to loop through the list.
      */
-    T &operator[](uint i);
+    T &operator[](size_t i);
 
     /*!
      * Returns a const reference to item \a i in the list.
      *
      * \warning This method is slow.  Use iterators to loop through the list.
      */
-    const T &operator[](uint i) const;
+    const T &operator[](size_t i) const;
 
     /*!
      * Make a shallow, implicitly shared, copy of \a l.  Because this is

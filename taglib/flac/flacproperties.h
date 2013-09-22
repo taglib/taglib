@@ -42,27 +42,19 @@ namespace TagLib {
      * API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
-       * Create an instance of FLAC::Properties with the data read from the
-       * ByteVector \a data.
+       * Creates an instance of FLAC::AudioProperties with the data read from 
+       * the ByteVector \a data.
        */
-       // BIC: switch to const reference
-      Properties(ByteVector data, long streamLength, ReadStyle style = Average);
+      AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
-       * Create an instance of FLAC::Properties with the data read from the
-       * FLAC::File \a file.
+       * Destroys this FLAC::AudioProperties instance.
        */
-       // BIC: remove
-      Properties(File *file, ReadStyle style = Average);
-
-      /*!
-       * Destroys this FLAC::Properties instance.
-       */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -89,10 +81,7 @@ namespace TagLib {
       ByteVector signature() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
-
-      void read();
+      void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

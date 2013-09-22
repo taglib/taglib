@@ -48,19 +48,19 @@ MP4::Atom::Atom(File *file)
     return;
   }
 
-  length = header.toUInt();
+  length = header.toUInt32BE(0);
 
   if (length == 1) {
-    const long long longLength = file->readBlock(8).toLongLong();
+    const long long longLength = file->readBlock(8).toInt64BE(0);
     if (longLength >= 8 && longLength <= 0xFFFFFFFF) {
-        // The atom has a 64-bit length, but it's actually a 32-bit value
-        length = (long)longLength;
+      // The atom has a 64-bit length, but it's actually a 32-bit value
+      length = (long)longLength;
     }
     else {
-        debug("MP4: 64-bit atoms are not supported");
-        length = 0;
-        file->seek(0, File::End);
-        return;
+      debug("MP4: 64-bit atoms are not supported");
+      length = 0;
+      file->seek(0, File::End);
+      return;
     }
   }
   if (length < 8) {
@@ -148,7 +148,7 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
 MP4::Atoms::Atoms(File *file)
 {
   file->seek(0, File::End);
-  long end = file->tell();
+  offset_t end = file->tell();
   file->seek(0);
   while(file->tell() + 8 <= end) {
     MP4::Atom *atom = new MP4::Atom(file);

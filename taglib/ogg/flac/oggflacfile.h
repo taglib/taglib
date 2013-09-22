@@ -49,7 +49,7 @@ namespace TagLib {
    */
   namespace FLAC {
 
-    using TagLib::FLAC::Properties;
+    using TagLib::FLAC::AudioProperties;
 
     //! An implementation of TagLib::File with Ogg/FLAC specific methods
 
@@ -70,7 +70,7 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Constructs an Ogg/FLAC file from \a stream.  If \a readProperties is true 
@@ -82,7 +82,7 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -108,7 +108,7 @@ namespace TagLib {
        * Returns the FLAC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
 
       /*! 
@@ -134,7 +134,7 @@ namespace TagLib {
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
        */
-      long streamLength();
+      offset_t streamLength();
 
       /*!
        * Returns whether or not the file on disk actually has a XiphComment.
@@ -147,7 +147,7 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
       void scan();
       ByteVector streamInfoData();
       ByteVector xiphCommentData();

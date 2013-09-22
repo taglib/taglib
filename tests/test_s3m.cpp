@@ -88,7 +88,7 @@ private:
 
     CPPUNIT_ASSERT(file.isValid());
 
-    S3M::Properties *p = file.audioProperties();
+    S3M::AudioProperties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
     CPPUNIT_ASSERT(0 != p);

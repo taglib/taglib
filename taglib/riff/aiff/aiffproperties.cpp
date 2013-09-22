@@ -25,59 +25,11 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-#include <cmath>
-// ldexp is a c99 function, which might not be defined in <cmath>
-// so we pull in math.h too and hope it does the right (wrong) thing
-// wrt. c99 functions in C++
-#include <math.h>
-
 #include "aiffproperties.h"
-
-////////////////////////////////////////////////////////////////////////////////
-// nasty 80-bit float helpers
-////////////////////////////////////////////////////////////////////////////////
-
-#define UnsignedToFloat(u) (((double)((long)(u - 2147483647L - 1))) + 2147483648.0)
-
-static double ConvertFromIeeeExtended(const TagLib::uchar *bytes)
-{
-  double f;
-  int expon;
-  unsigned long hiMant, loMant;
-
-  expon  = ((bytes[0] & 0x7F) << 8) | (bytes[1] & 0xFF);
-
-  hiMant = ((unsigned long)(bytes[2] & 0xFF) << 24) |
-           ((unsigned long)(bytes[3] & 0xFF) << 16) |
-           ((unsigned long)(bytes[4] & 0xFF) << 8)  |
-           ((unsigned long)(bytes[5] & 0xFF));
-
-  loMant = ((unsigned long)(bytes[6] & 0xFF) << 24) |
-           ((unsigned long)(bytes[7] & 0xFF) << 16) |
-           ((unsigned long)(bytes[8] & 0xFF) << 8)  |
-           ((unsigned long)(bytes[9] & 0xFF));
-
-  if (expon == 0 && hiMant == 0 && loMant == 0)
-    f = 0;
-  else {
-    if(expon == 0x7FFF) /* Infinity or NaN */
-      f = HUGE_VAL;
-    else {
-      expon -= 16383;
-      f  = ldexp(UnsignedToFloat(hiMant), expon -= 31);
-      f += ldexp(UnsignedToFloat(loMant), expon -= 32);
-    }
-  }
-
-  if(bytes[0] & 0x80)
-    return -f;
-  else
-    return f;
-}
 
 using namespace TagLib;
 
-class RIFF::AIFF::Properties::PropertiesPrivate
+class RIFF::AIFF::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
@@ -86,16 +38,17 @@ public:
     sampleRate(0),
     channels(0),
     sampleWidth(0),
-    sampleFrames(0)
-  {
-
-  }
+    sampleFrames(0) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
   int sampleWidth;
+
+  ByteVector compressionType;
+  String compressionName;
+
   uint sampleFrames;
 };
 
@@ -103,58 +56,91 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
   read(data);
 }
 
-RIFF::AIFF::Properties::~Properties()
+RIFF::AIFF::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int RIFF::AIFF::Properties::length() const
+bool RIFF::AIFF::AudioProperties::isNull() const
+{
+  return (d == 0);
+}
+
+int RIFF::AIFF::AudioProperties::length() const
 {
   return d->length;
 }
 
-int RIFF::AIFF::Properties::bitrate() const
+int RIFF::AIFF::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int RIFF::AIFF::Properties::sampleRate() const
+int RIFF::AIFF::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int RIFF::AIFF::Properties::channels() const
+int RIFF::AIFF::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int RIFF::AIFF::Properties::sampleWidth() const
+int RIFF::AIFF::AudioProperties::sampleWidth() const
 {
   return d->sampleWidth;
 }
 
-TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
+TagLib::uint RIFF::AIFF::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
+}
+
+bool RIFF::AIFF::AudioProperties::isAiffC() const
+{
+  return (!d->compressionType.isEmpty());
+}
+
+ByteVector RIFF::AIFF::AudioProperties::compressionType() const
+{
+  return d->compressionType;
+}
+
+String RIFF::AIFF::AudioProperties::compressionName() const
+{
+  return d->compressionName;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::Properties::read(const ByteVector &data)
+void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
 {
-  d->channels       = data.toShort(0U);
-  d->sampleFrames   = data.toUInt(2U);
-  d->sampleWidth    = data.toShort(6U);
-  double sampleRate = ConvertFromIeeeExtended(reinterpret_cast<const uchar *>(data.data() + 8));
-  d->sampleRate     = (int)sampleRate;
-  d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);
+  if(data.size() < 18) {
+    debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF.");
+    return;
+  }
+
+  d->channels       = data.toInt16BE(0);
+  d->sampleFrames   = data.toUInt32BE(2);
+  d->sampleWidth    = data.toInt16BE(6);
+  const long double sampleRate = data.toFloat80BE(8);
+  d->sampleRate     = static_cast<int>(sampleRate);
+  d->bitrate        = static_cast<int>((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
+
+  if(data.size() < 23) {
+    debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF-C.");
+    return;
+  }
+
+  d->compressionType = data.mid(18, 4);
+  d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
 }

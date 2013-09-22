@@ -90,7 +90,7 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Constructs an MPC file from \a stream.  If \a readProperties is true the
@@ -102,7 +102,7 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -116,15 +116,6 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       * If the file contains both an APE and an ID3v1 tag, only the APE
-       * tag  will be converted to the PropertyMap.
-       */
-      PropertyMap properties() const;
-
-      void removeUnsupportedProperties(const StringList &properties);
-
-      /*!
        * Implements the unified property interface -- import function.
        * Affects only the APEv2 tag which will be created if necessary.
        * If an ID3v1 tag exists, it will be updated as well.
@@ -135,7 +126,7 @@ namespace TagLib {
        * Returns the MPC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
       /*!
        * Saves the file.
@@ -216,11 +207,11 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
       void scan();
-      long findAPE();
-      long findID3v1();
-      long findID3v2();
+      offset_t findAPE();
+      offset_t findID3v1();
+      offset_t findID3v2();
 
       class FilePrivate;
       FilePrivate *d;

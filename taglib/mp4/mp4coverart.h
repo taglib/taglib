@@ -67,9 +67,7 @@ namespace TagLib {
     };
 
     typedef List<CoverArt> CoverArtList;
-
   }
-
 }
 
 #endif

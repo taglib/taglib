@@ -71,8 +71,8 @@ TagLib::uint MPEG::XingHeader::totalSize() const
   return d->size;
 }
 
-int MPEG::XingHeader::xingHeaderOffset(TagLib::MPEG::Header::Version v,
-                                       TagLib::MPEG::Header::ChannelMode c)
+int MPEG::XingHeader::offset(TagLib::MPEG::Header::Version v,
+                             TagLib::MPEG::Header::ChannelMode c)
 {
   if(v == MPEG::Header::Version1) {
     if(c == MPEG::Header::SingleChannel)
@@ -108,8 +108,8 @@ void MPEG::XingHeader::parse(const ByteVector &data)
     return;
   }
 
-  d->frames = data.toUInt(8U);
-  d->size   = data.toUInt(12U);
+  d->frames = data.toUInt32BE(8);
+  d->size   = data.toUInt32BE(12);
 
   d->valid = true;
 }

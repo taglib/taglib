@@ -37,7 +37,7 @@ public:
   }
 
   Mod::Tag        tag;
-  Mod::Properties properties;
+  Mod::AudioProperties properties;
 };
 
 Mod::File::File(FileName file, bool readProperties,
@@ -68,19 +68,9 @@ Mod::Tag *Mod::File::tag() const
   return &d->tag;
 }
 
-Mod::Properties *Mod::File::audioProperties() const
+Mod::AudioProperties *Mod::File::audioProperties() const
 {
   return &d->properties;
-}
-
-PropertyMap Mod::File::properties() const
-{
-  return d->tag.properties();
-}
-
-PropertyMap Mod::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag.setProperties(properties);
 }
 
 bool Mod::File::save()
@@ -92,7 +82,7 @@ bool Mod::File::save()
   seek(0);
   writeString(d->tag.title(), 20);
   StringList lines = d->tag.comment().split("\n");
-  uint n = std::min(lines.size(), d->properties.instrumentCount());
+  uint n = std::min(static_cast<uint>(lines.size()), d->properties.instrumentCount());
   for(uint i = 0; i < n; ++ i) {
     writeString(lines[i], 22);
     seek(8, Current);

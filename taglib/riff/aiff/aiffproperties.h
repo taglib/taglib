@@ -36,26 +36,28 @@ namespace TagLib {
 
       class File;
 
-      //! An implementation of audio property reading for AIFF
+      //! An implementation of audio property reading for AIFF or AIFF-C
 
       /*!
        * This reads the data from an AIFF stream found in the AudioProperties
        * API.
        */
 
-      class TAGLIB_EXPORT Properties : public AudioProperties
+      class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
       {
       public:
         /*!
-         * Create an instance of AIFF::Properties with the data read from the
-         * ByteVector \a data.
+         * Creates an instance of AIFF::AudioProperties with the data read from 
+         * the ByteVector \a data.
          */
-        Properties(const ByteVector &data, ReadStyle style);
+        AudioProperties(const ByteVector &data, ReadStyle style);
 
         /*!
-         * Destroys this AIFF::Properties instance.
+         * Destroys this AIFF::AudioProperties instance.
          */
-        virtual ~Properties();
+        virtual ~AudioProperties();
+
+        virtual bool isNull() const;
 
         // Reimplementations.
 
@@ -67,10 +69,31 @@ namespace TagLib {
         int sampleWidth() const;
         uint sampleFrames() const;
 
-      private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
+        /*!
+         * Returns true if the file is in AIFF-C format, false if AIFF format.
+         */
+        bool isAiffC() const;
 
+        /*!
+         * Returns the compression type of the AIFF-C file.  For example, "NONE" for
+         * not compressed, "ACE2" for ACE 2-to-1.
+         *
+         * If the file is in AIFF format, always returns an empty vector.
+         *
+         * \see isAiffC()
+         */
+        ByteVector compressionType() const;
+
+        /*!
+         * Returns the concrete compression name of the AIFF-C file.
+         *
+         * If the file is in AIFF format, always returns an empty string.
+         *
+         * \see isAiffC()
+         */
+        String compressionName() const;
+
+      private:
         void read(const ByteVector &data);
 
         class PropertiesPrivate;

@@ -34,16 +34,7 @@
 
 namespace TagLib {
 
-/*
- * This is just to make this appear to be in the Ogg namespace in the
- * documentation.  The typedef below will make this work with the current code.
- * In the next BIC version of TagLib this will be really moved into the Ogg
- * namespace.
- */
-
-#ifdef DOXYGEN
   namespace Ogg {
-#endif
 
   //! A namespace containing classes for Vorbis metadata
 
@@ -69,7 +60,7 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Constructs a Vorbis file from \a stream.  If \a readProperties is true the
@@ -81,7 +72,7 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -112,7 +103,7 @@ namespace TagLib {
        * Returns the Vorbis::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      virtual AudioProperties *audioProperties() const;
 
       virtual bool save();
 
@@ -120,24 +111,14 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
 
       class FilePrivate;
       FilePrivate *d;
     };
   }
 
-/*
- * To keep compatibility with the current version put Vorbis in the Ogg namespace
- * only in the docs and provide a typedef to make it work.  In the next BIC
- * version this will be removed and it will only exist in the Ogg namespace.
- */
-
-#ifdef DOXYGEN
   }
-#else
-  namespace Ogg { namespace Vorbis { typedef TagLib::Vorbis::File File; } }
-#endif
 
 }
 

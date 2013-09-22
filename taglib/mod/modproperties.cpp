@@ -24,73 +24,78 @@
 using namespace TagLib;
 using namespace Mod;
 
-class Mod::Properties::PropertiesPrivate
+class Mod::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
     channels(0),
     instrumentCount(0),
-    lengthInPatterns(0)
-  {
-  }
+    lengthInPatterns(0) {}
 
   int   channels;
   uint  instrumentCount;
   uchar lengthInPatterns;
 };
 
-Mod::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
-  AudioProperties(propertiesStyle),
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) :
   d(new PropertiesPrivate)
 {
 }
 
-Mod::Properties::~Properties()
+Mod::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int Mod::Properties::length() const
+int Mod::AudioProperties::length() const
 {
   return 0;
 }
 
-int Mod::Properties::bitrate() const
+int Mod::AudioProperties::bitrate() const
 {
   return 0;
 }
 
-int Mod::Properties::sampleRate() const
+int Mod::AudioProperties::sampleRate() const
 {
   return 0;
 }
 
-int Mod::Properties::channels() const
+int Mod::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-TagLib::uint Mod::Properties::instrumentCount() const
+TagLib::uint Mod::AudioProperties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-uchar Mod::Properties::lengthInPatterns() const
+uchar Mod::AudioProperties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
 
-void Mod::Properties::setChannels(int channels)
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
+void Mod::AudioProperties::setChannels(int channels)
 {
   d->channels = channels;
 }
 
-void Mod::Properties::setInstrumentCount(uint instrumentCount)
+void Mod::AudioProperties::setInstrumentCount(uint instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void Mod::Properties::setLengthInPatterns(uchar lengthInPatterns)
+void Mod::AudioProperties::setLengthInPatterns(uchar lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }

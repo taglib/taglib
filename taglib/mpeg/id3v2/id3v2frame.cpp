@@ -193,7 +193,7 @@ void Frame::setText(const String &)
 ByteVector Frame::render() const
 {
   ByteVector fieldData = renderFields();
-  d->header->setFrameSize(fieldData.size());
+  d->header->setFrameSize(static_cast<uint>(fieldData.size()));
   ByteVector headerData = d->header->render();
 
   return headerData + fieldData;
@@ -240,10 +240,10 @@ void Frame::parse(const ByteVector &data)
 
 ByteVector Frame::fieldData(const ByteVector &frameData) const
 {
-  uint headerSize = Header::size(d->header->version());
+  const size_t headerSize = Header::size(d->header->version());
 
-  uint frameDataOffset = headerSize;
-  uint frameDataLength = size();
+  size_t frameDataOffset = headerSize;
+  size_t frameDataLength = size();
 
   if(d->header->compression() || d->header->dataLengthIndicator()) {
     frameDataLength = SynchData::toUInt(frameData.mid(headerSize, 4));
@@ -255,7 +255,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
      !d->header->encryption())
   {
     ByteVector data(frameDataLength);
-    uLongf uLongTmp = frameDataLength;
+    uLongf uLongTmp = static_cast<uLongf>(frameDataLength);
     ::uncompress((Bytef *) data.data(),
                  (uLongf *) &uLongTmp,
                  (Bytef *) frameData.data() + frameDataOffset,
@@ -267,27 +267,21 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     return frameData.mid(frameDataOffset, frameDataLength);
 }
 
-String Frame::readStringField(const ByteVector &data, String::Type encoding, int *position)
+String Frame::readStringField(const ByteVector &data, String::Type encoding, size_t &position)
 {
-  int start = 0;
-
-  if(!position)
-    position = &start;
-
   ByteVector delimiter = textDelimiter(encoding);
 
-  int end = data.find(delimiter, *position, delimiter.size());
-
-  if(end < *position)
+  const size_t end = data.find(delimiter, position, delimiter.size());
+  if(end == ByteVector::npos || end < position)
     return String::null;
 
   String str;
   if(encoding == String::Latin1)
-    str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
+    str = Tag::latin1StringHandler()->parse(data.mid(position, end - position));
   else
-    str = String(data.mid(*position, end - *position), encoding);
+    str = String(data.mid(position, end - position), encoding);
 
-  *position = end + delimiter.size();
+  position = end + delimiter.size();
 
   return str;
 }
@@ -326,121 +320,125 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
-static const TagLib::uint frameTranslationSize = 51;
-static const char *frameTranslation[][2] = {
-  // Text information frames
-  { "TALB", "ALBUM"},
-  { "TBPM", "BPM" },
-  { "TCOM", "COMPOSER" },
-  { "TCON", "GENRE" },
-  { "TCOP", "COPYRIGHT" },
-  { "TDEN", "ENCODINGTIME" },
-  { "TDLY", "PLAYLISTDELAY" },
-  { "TDOR", "ORIGINALDATE" },
-  { "TDRC", "DATE" },
-  // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  { "TDRL", "RELEASEDATE" },
-  { "TDTG", "TAGGINGDATE" },
-  { "TENC", "ENCODEDBY" },
-  { "TEXT", "LYRICIST" },
-  { "TFLT", "FILETYPE" },
-  //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
-  { "TIT1", "CONTENTGROUP" },
-  { "TIT2", "TITLE"},
-  { "TIT3", "SUBTITLE" },
-  { "TKEY", "INITIALKEY" },
-  { "TLAN", "LANGUAGE" },
-  { "TLEN", "LENGTH" },
-  //{ "TMCL", "MUSICIANCREDITS" }, handled separately
-  { "TMED", "MEDIA" },
-  { "TMOO", "MOOD" },
-  { "TOAL", "ORIGINALALBUM" },
-  { "TOFN", "ORIGINALFILENAME" },
-  { "TOLY", "ORIGINALLYRICIST" },
-  { "TOPE", "ORIGINALARTIST" },
-  { "TOWN", "OWNER" },
-  { "TPE1", "ARTIST"},
-  { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
-  { "TPE3", "CONDUCTOR" },
-  { "TPE4", "REMIXER" }, // could also be ARRANGER
-  { "TPOS", "DISCNUMBER" },
-  { "TPRO", "PRODUCEDNOTICE" },
-  { "TPUB", "LABEL" },
-  { "TRCK", "TRACKNUMBER" },
-  { "TRSN", "RADIOSTATION" },
-  { "TRSO", "RADIOSTATIONOWNER" },
-  { "TSOA", "ALBUMSORT" },
-  { "TSOP", "ARTISTSORT" },
-  { "TSOT", "TITLESORT" },
-  { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
-  { "TSRC", "ISRC" },
-  { "TSSE", "ENCODING" },
-  // URL frames
-  { "WCOP", "COPYRIGHTURL" },
-  { "WOAF", "FILEWEBPAGE" },
-  { "WOAR", "ARTISTWEBPAGE" },
-  { "WOAS", "AUDIOSOURCEWEBPAGE" },
-  { "WORS", "RADIOSTATIONWEBPAGE" },
-  { "WPAY", "PAYMENTWEBPAGE" },
-  { "WPUB", "PUBLISHERWEBPAGE" },
-  //{ "WXXX", "URL"}, handled specially
-  // Other frames
-  { "COMM", "COMMENT" },
-  //{ "USLT", "LYRICS" }, handled specially
-};
-
-static const TagLib::uint txxxFrameTranslationSize = 7;
-static const char *txxxFrameTranslation[][2] = {
-  { "MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
-  { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
-  { "MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
-  { "MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
-  { "MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
-  { "Acoustid Id", "ACOUSTID_ID" },
-  { "Acoustid Fingerprint", "ACOUSTID_FINGERPRINT" },
-  { "MusicIP PUID", "MUSICIP_PUID" },
-};
-
-Map<ByteVector, String> &idMap()
+namespace
 {
-  static Map<ByteVector, String> m;
-  if(m.isEmpty())
-    for(size_t i = 0; i < frameTranslationSize; ++i)
-      m[frameTranslation[i][0]] = frameTranslation[i][1];
-  return m;
-}
+  static const TagLib::uint frameTranslationSize = 51;
+  static const char *frameTranslation[][2] = {
+    // Text information frames
+    { "TALB", "ALBUM"},
+    { "TBPM", "BPM" },
+    { "TCOM", "COMPOSER" },
+    { "TCON", "GENRE" },
+    { "TCOP", "COPYRIGHT" },
+    { "TDEN", "ENCODINGTIME" },
+    { "TDLY", "PLAYLISTDELAY" },
+    { "TDOR", "ORIGINALDATE" },
+    { "TDRC", "DATE" },
+    // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    { "TDRL", "RELEASEDATE" },
+    { "TDTG", "TAGGINGDATE" },
+    { "TENC", "ENCODEDBY" },
+    { "TEXT", "LYRICIST" },
+    { "TFLT", "FILETYPE" },
+    //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
+    { "TIT1", "CONTENTGROUP" },
+    { "TIT2", "TITLE"},
+    { "TIT3", "SUBTITLE" },
+    { "TKEY", "INITIALKEY" },
+    { "TLAN", "LANGUAGE" },
+    { "TLEN", "LENGTH" },
+    //{ "TMCL", "MUSICIANCREDITS" }, handled separately
+    { "TMED", "MEDIA" },
+    { "TMOO", "MOOD" },
+    { "TOAL", "ORIGINALALBUM" },
+    { "TOFN", "ORIGINALFILENAME" },
+    { "TOLY", "ORIGINALLYRICIST" },
+    { "TOPE", "ORIGINALARTIST" },
+    { "TOWN", "OWNER" },
+    { "TPE1", "ARTIST"},
+    { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
+    { "TPE3", "CONDUCTOR" },
+    { "TPE4", "REMIXER" }, // could also be ARRANGER
+    { "TPOS", "DISCNUMBER" },
+    { "TPRO", "PRODUCEDNOTICE" },
+    { "TPUB", "LABEL" },
+    { "TRCK", "TRACKNUMBER" },
+    { "TRSN", "RADIOSTATION" },
+    { "TRSO", "RADIOSTATIONOWNER" },
+    { "TSOA", "ALBUMSORT" },
+    { "TSOP", "ARTISTSORT" },
+    { "TSOT", "TITLESORT" },
+    { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
+    { "TSRC", "ISRC" },
+    { "TSSE", "ENCODING" },
+    // URL frames
+    { "WCOP", "COPYRIGHTURL" },
+    { "WOAF", "FILEWEBPAGE" },
+    { "WOAR", "ARTISTWEBPAGE" },
+    { "WOAS", "AUDIOSOURCEWEBPAGE" },
+    { "WORS", "RADIOSTATIONWEBPAGE" },
+    { "WPAY", "PAYMENTWEBPAGE" },
+    { "WPUB", "PUBLISHERWEBPAGE" },
+    //{ "WXXX", "URL"}, handled specially
+    // Other frames
+    { "COMM", "COMMENT" },
+    //{ "USLT", "LYRICS" }, handled specially
+  };
 
-Map<String, String> &txxxMap()
-{
-  static Map<String, String> m;
-  if(m.isEmpty()) {
-    for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-      String key = String(txxxFrameTranslation[i][0]).upper();
-      m[key] = txxxFrameTranslation[i][1];
-    }
+  static const TagLib::uint txxxFrameTranslationSize = 7;
+  static const char *txxxFrameTranslation[][2] = {
+    { "MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
+    { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
+    { "MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
+    { "MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
+    { "Acoustid Id", "ACOUSTID_ID" },
+    { "Acoustid Fingerprint", "ACOUSTID_FINGERPRINT" },
+    { "MusicIP PUID", "MUSICIP_PUID" },
+  };
+
+  Map<ByteVector, String> &idMap()
+  {
+    static Map<ByteVector, String> m;
+    if(m.isEmpty())
+      for(size_t i = 0; i < frameTranslationSize; ++i)
+        m[frameTranslation[i][0]] = frameTranslation[i][1];
+    return m;
   }
-  return m;
-}
 
-// list of deprecated frames and their successors
-static const TagLib::uint deprecatedFramesSize = 4;
-static const char *deprecatedFrames[][2] = {
-  {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
-  {"TDAT", "TDRC"}, // 2.3 -> 2.4
-  {"TYER", "TDRC"}, // 2.3 -> 2.4
-  {"TIME", "TDRC"}, // 2.3 -> 2.4
-};
+  Map<String, String> &txxxMap()
+  {
+    static Map<String, String> m;
+    if(m.isEmpty()) {
+      for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
+        String key = String(txxxFrameTranslation[i][0]).upper();
+        m[key] = txxxFrameTranslation[i][1];
+      }
+    }
+    return m;
+  }
 
-Map<ByteVector,ByteVector> &deprecationMap()
-{
-  static Map<ByteVector,ByteVector> depMap;
-  if(depMap.isEmpty())
-    for(TagLib::uint i = 0; i < deprecatedFramesSize; ++i)
-      depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
-  return depMap;
+  // list of deprecated frames and their successors
+  static const TagLib::uint deprecatedFramesSize = 4;
+  static const char *deprecatedFrames[][2] = {
+    {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+    {"TDAT", "TDRC"}, // 2.3 -> 2.4
+    {"TYER", "TDRC"}, // 2.3 -> 2.4
+    {"TIME", "TDRC"}, // 2.3 -> 2.4
+  };
+
+
+  Map<ByteVector,ByteVector> &deprecationMap()
+  {
+    static Map<ByteVector,ByteVector> depMap;
+    if(depMap.isEmpty())
+      for(TagLib::uint i = 0; i < deprecatedFramesSize; ++i)
+        depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
+    return depMap;
+  }
 }
 
 String Frame::frameIDToKey(const ByteVector &id)
@@ -642,7 +640,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
       return;
     }
 
-    d->frameSize = data.toUInt(3, 3, true);
+    d->frameSize = data.toUInt24BE(3);
 
     break;
   }
@@ -670,7 +668,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // Set the size -- the frame size is the four bytes starting at byte four in
     // the frame header (structure 4)
 
-    d->frameSize = data.toUInt(4U);
+    d->frameSize = data.toUInt32BE(4);
 
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
@@ -717,7 +715,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // iTunes writes v2.4 tags with v2.3-like frame sizes
     if(d->frameSize > 127) {
       if(!isValidFrameID(data.mid(d->frameSize + 10, 4))) {
-        unsigned int uintSize = data.toUInt(4U);
+        const uint uintSize = data.toUInt32BE(4);
         if(isValidFrameID(data.mid(uintSize + 10, 4))) {
           d->frameSize = uintSize;
         }
@@ -831,7 +829,7 @@ ByteVector Frame::Header::render() const
 
   ByteVector v = d->frameID +
     (d->version == 3
-      ? ByteVector::fromUInt(d->frameSize)
+      ? ByteVector::fromUInt32BE(d->frameSize)
       : SynchData::fromUInt(d->frameSize)) +
     flags;
 

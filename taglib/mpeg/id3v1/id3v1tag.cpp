@@ -38,7 +38,7 @@ public:
   TagPrivate() : file(0), tagOffset(-1), track(0), genre(255) {}
 
   File *file;
-  long tagOffset;
+  offset_t tagOffset;
 
   String title;
   String artist;
@@ -48,17 +48,21 @@ public:
   uchar track;
   uchar genre;
 
-  static const StringHandler *stringHandler;
+  static const TagLib::StringHandler *stringHandler;
 };
 
-static const StringHandler defaultStringHandler;
-const ID3v1::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+namespace
+{
+  const ID3v1::StringHandler defaultStringHandler;
+}
+
+const TagLib::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-StringHandler::StringHandler()
+ID3v1::StringHandler::StringHandler()
 {
 }
 
@@ -69,12 +73,10 @@ String ID3v1::StringHandler::parse(const ByteVector &data) const
 
 ByteVector ID3v1::StringHandler::render(const String &s) const
 {
-  if(!s.isLatin1())
-  {
+  if(s.isLatin1())
+    return s.data(String::Latin1);
+  else
     return ByteVector();
-  }
-
-  return s.data(String::Latin1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +88,7 @@ ID3v1::Tag::Tag() : TagLib::Tag()
   d = new TagPrivate;
 }
 
-ID3v1::Tag::Tag(File *file, long tagOffset) : TagLib::Tag()
+ID3v1::Tag::Tag(File *file, offset_t tagOffset) : TagLib::Tag()
 {
   d = new TagPrivate;
   d->file = file;
@@ -202,9 +204,9 @@ void ID3v1::Tag::setGenreNumber(TagLib::uint i)
   d->genre = i < 256 ? i : 255;
 }
 
-void ID3v1::Tag::setStringHandler(const StringHandler *handler)
+void ID3v1::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
-  if (handler)
+  if(handler)
     TagPrivate::stringHandler = handler;
   else
     TagPrivate::stringHandler = &defaultStringHandler;

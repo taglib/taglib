@@ -29,6 +29,7 @@
 #include "tag.h"
 #include "tbytevector.h"
 #include "tstring.h"
+#include "tstringhandler.h"
 #include "tlist.h"
 #include "tmap.h"
 #include "taglib_export.h"
@@ -74,17 +75,23 @@ namespace TagLib {
      *
      * \see ID3v2::Tag::setStringHandler()
      */
-    class TAGLIB_EXPORT Latin1StringHandler
+    class TAGLIB_EXPORT Latin1StringHandler : public TagLib::StringHandler
     {
     public:
       Latin1StringHandler();
-      virtual ~Latin1StringHandler();
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.
        */
       virtual String parse(const ByteVector &data) const;
+
+      /*!
+       * Encode a ByteVector with the data from \a s.
+       *
+       * /note Not implemented intentionally.  Always returns empty \s ByteVector.
+       */
+      virtual ByteVector render(const String &s) const;
     };
 
     //! The main class in the ID3v2 implementation
@@ -154,7 +161,7 @@ namespace TagLib {
        *
        * \see FrameFactory
        */
-      Tag(File *file, long tagOffset,
+      Tag(File *file, offset_t tagOffset,
           const FrameFactory *factory = FrameFactory::instance());
 
       /*!
@@ -319,7 +326,7 @@ namespace TagLib {
        *  once, the description, separated by a "/".
        *
        */
-      PropertyMap properties() const;
+      virtual PropertyMap properties() const;
 
       /*!
        * Removes unsupported frames given by \a properties. The elements of
@@ -332,13 +339,13 @@ namespace TagLib {
        *  - "UNKNOWN/" + frameID, for frames that could not be parsed by TagLib.
        *    In that case, *all* unknown frames with the given ID will be removed.
        */
-      void removeUnsupportedProperties(const StringList &properties);
+      virtual void removeUnsupportedProperties(const StringList &properties);
 
       /*!
        * Implements the unified property interface -- import function.
        * See the comments in properties().
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
@@ -360,7 +367,7 @@ namespace TagLib {
        *
        * \see Latin1StringHandler
        */
-      static Latin1StringHandler const *latin1StringHandler();
+      static TagLib::StringHandler const *latin1StringHandler();
 
       /*!
        * Sets the string handler that decides how the "Latin-1" data will be
@@ -373,7 +380,7 @@ namespace TagLib {
        *
        * \see Latin1StringHandler
        */
-      static void setLatin1StringHandler(const Latin1StringHandler *handler);
+      static void setLatin1StringHandler(const TagLib::StringHandler *handler);
 
     protected:
       /*!

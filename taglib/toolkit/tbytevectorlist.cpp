@@ -27,29 +27,18 @@
 
 using namespace TagLib;
 
-class ByteVectorListPrivate
-{
-
-};
-
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
-                                     int byteAlign)
-{
-  return split(v, pattern, byteAlign, 0);
-}
-
-ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &pattern,
-                                     int byteAlign, int max)
+ByteVectorList ByteVectorList::split(
+  const ByteVector &v, const ByteVector &pattern, size_t byteAlign, size_t max)
 {
   ByteVectorList l;
 
-  uint previousOffset = 0;
-  for(int offset = v.find(pattern, 0, byteAlign);
-      offset != -1 && (max == 0 || max > int(l.size()) + 1);
+  size_t previousOffset = 0;
+  for(size_t offset = v.find(pattern, 0, byteAlign);
+      offset != ByteVector::npos && (max == 0 || max > l.size() + 1);
       offset = v.find(pattern, offset + pattern.size(), byteAlign))
   {
     if(offset - previousOffset >= 1)
@@ -77,13 +66,31 @@ ByteVectorList::ByteVectorList() : List<ByteVector>()
 
 ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
 {
-
 }
 
-ByteVectorList::~ByteVectorList()
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
+
+ByteVectorList::ByteVectorList(ByteVectorList &&l) : List<ByteVector>(l)
 {
-
 }
+
+#endif
+
+ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
+{
+  List<ByteVector>::operator=(l);
+  return *this;
+}
+
+#ifdef TAGLIB_USE_MOVE_SEMANTICS
+
+ByteVectorList &ByteVectorList::operator=(ByteVectorList &&l)
+{
+  List<ByteVector>::operator=(l);
+  return *this;
+}
+
+#endif
 
 ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {

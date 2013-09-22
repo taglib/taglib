@@ -70,7 +70,7 @@ public:
 
     Ogg::XiphComment cmt;
     PropertyMap unsuccessful = cmt.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(3), unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
   }
 

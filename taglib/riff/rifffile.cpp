@@ -33,13 +33,16 @@
 
 using namespace TagLib;
 
-struct Chunk
+namespace
 {
-  ByteVector name;
-  TagLib::uint offset;
-  TagLib::uint size;
-  char padding;
-};
+  struct Chunk
+  {
+    ByteVector name;
+    offset_t offset;
+    TagLib::uint size;
+    char padding;
+  };
+}
 
 class RIFF::File::FilePrivate
 {
@@ -48,9 +51,9 @@ public:
     endianness(BigEndian),
     size(0)
   {
-
   }
-  Endianness endianness;
+
+  ByteOrder endianness;
   ByteVector type;
   TagLib::uint size;
   ByteVector format;
@@ -71,7 +74,7 @@ RIFF::File::~File()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
+RIFF::File::File(FileName file, ByteOrder endianness) : TagLib::File(file)
 {
   d = new FilePrivate;
   d->endianness = endianness;
@@ -80,7 +83,7 @@ RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
     read();
 }
 
-RIFF::File::File(IOStream *stream, Endianness endianness) : TagLib::File(stream)
+RIFF::File::File(IOStream *stream, ByteOrder endianness) : TagLib::File(stream)
 {
   d = new FilePrivate;
   d->endianness = endianness;
@@ -96,7 +99,7 @@ TagLib::uint RIFF::File::riffSize() const
 
 TagLib::uint RIFF::File::chunkCount() const
 {
-  return d->chunks.size();
+  return static_cast<TagLib::uint>(d->chunks.size());
 }
 
 TagLib::uint RIFF::File::chunkDataSize(uint i) const
@@ -104,7 +107,7 @@ TagLib::uint RIFF::File::chunkDataSize(uint i) const
   return d->chunks[i].size;
 }
 
-TagLib::uint RIFF::File::chunkOffset(uint i) const
+offset_t RIFF::File::chunkOffset(uint i) const
 {
   return d->chunks[i].offset;
 }
@@ -144,13 +147,16 @@ void RIFF::File::setChunkData(uint i, const ByteVector &data)
   // First we update the global size
 
   d->size += ((data.size() + 1) & ~1) - (d->chunks[i].size + d->chunks[i].padding);
-  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
+  if(d->endianness == BigEndian)
+    insert(ByteVector::fromUInt32BE(d->size), 4, 4);
+  else
+    insert(ByteVector::fromUInt32LE(d->size), 4, 4);
 
   // Now update the specific chunk
 
   writeChunk(chunkName(i), data, d->chunks[i].offset - 8, d->chunks[i].size + d->chunks[i].padding + 8);
 
-  d->chunks[i].size = data.size();
+  d->chunks[i].size = static_cast<uint>(data.size());
   d->chunks[i].padding = (data.size() & 0x01) ? 1 : 0;
 
   // Now update the internal offsets
@@ -187,30 +193,37 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  uint i =  d->chunks.size() - 1;
-  ulong offset = d->chunks[i].offset + d->chunks[i].size;
+  offset_t offset = d->chunks.back().offset + d->chunks.back().size;
 
   // First we update the global size
 
-  d->size += (offset & 1) + data.size() + 8;
-  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
+  d->size += static_cast<uint>((offset & 1) + data.size() + 8);
+  if(d->endianness == BigEndian)
+    insert(ByteVector::fromUInt32BE(d->size), 4, 4);
+  else
+    insert(ByteVector::fromUInt32LE(d->size), 4, 4);
 
   // Now add the chunk to the file
 
-  writeChunk(name, data, offset, std::max<long>(0, length() - offset), (offset & 1) ? 1 : 0);
+  writeChunk(
+    name, 
+    data, 
+    offset, 
+    static_cast<uint>(std::max<offset_t>(0, length() - offset)), 
+    static_cast<uint>(offset & 1));
 
   // And update our internal structure
 
-  if (offset & 1) {
-    d->chunks[i].padding = 1;
+  if(offset & 1) {
+    d->chunks.back().padding = 1;
     offset++;
   }
 
   Chunk chunk;
   chunk.name = name;
-  chunk.size = data.size();
+  chunk.size = static_cast<uint>(data.size());
   chunk.offset = offset + 8;
-  chunk.padding = (data.size() & 0x01) ? 1 : 0;
+  chunk.padding = static_cast<char>(data.size() & 1);
 
   d->chunks.push_back(chunk);
 }
@@ -241,31 +254,41 @@ void RIFF::File::removeChunk(const ByteVector &name)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool isValidChunkID(const ByteVector &name)
+namespace
 {
-  if(name.size() != 4) {
-    return false;
-  }
-  for(int i = 0; i < 4; i++) {
-    if(name[i] < 32 || name[i] > 127) {
+  bool isValidChunkID(const ByteVector &name)
+  {
+    if(name.size() != 4) {
       return false;
     }
+    for(int i = 0; i < 4; i++) {
+      if(name[i] < 32 || name[i] > 127) {
+        return false;
+      }
+    }
+    return true;
   }
-  return true;
 }
 
 void RIFF::File::read()
 {
-  bool bigEndian = (d->endianness == BigEndian);
-
   d->type = readBlock(4);
-  d->size = readBlock(4).toUInt(bigEndian);
+
+  if(d->endianness == BigEndian)
+    d->size = readBlock(4).toUInt32BE(0);
+  else
+    d->size = readBlock(4).toUInt32LE(0);
+
   d->format = readBlock(4);
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
-    uint chunkSize = readBlock(4).toUInt(bigEndian);
+    uint chunkSize;
+    if(d->endianness == BigEndian)
+      chunkSize = readBlock(4).toUInt32BE(0);
+    else
+      chunkSize = readBlock(4).toUInt32LE(0);
 
     if(!isValidChunkID(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
@@ -288,8 +311,8 @@ void RIFF::File::read()
 
     // check padding
     chunk.padding = 0;
-    long uPosNotPadded = tell();
-    if((uPosNotPadded & 0x01) != 0) {
+    offset_t uPosNotPadded = tell();
+    if(uPosNotPadded & 1) {
       ByteVector iByte = readBlock(1);
       if((iByte.size() != 1) || (iByte[0] != 0)) {
         // not well formed, re-seek
@@ -305,14 +328,19 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            ulong offset, ulong replace, uint leadingPadding)
+                            offset_t offset, TagLib::uint replace, TagLib::uint leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {
     combined.append(ByteVector(leadingPadding, '\x00'));
   }
   combined.append(name);
-  combined.append(ByteVector::fromUInt(data.size(), d->endianness == BigEndian));
+
+  if(d->endianness == BigEndian)
+    combined.append(ByteVector::fromUInt32BE(data.size()));
+  else
+    combined.append(ByteVector::fromUInt32LE(data.size()));
+
   combined.append(data);
   if((data.size() & 0x01) != 0) {
     combined.append('\x00');

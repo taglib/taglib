@@ -64,14 +64,14 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long ID3v2Location;
+  offset_t ID3v2Location;
   uint ID3v2OriginalSize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
-  TagUnion tag;
+  DoubleTagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -85,7 +85,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 TrueAudio::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -93,7 +93,7 @@ TrueAudio::File::File(FileName file, bool readProperties,
 }
 
 TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(file)
 {
   d = new FilePrivate(frameFactory);
@@ -102,7 +102,7 @@ TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 }
 
 TrueAudio::File::File(IOStream *stream, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                 AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -110,7 +110,7 @@ TrueAudio::File::File(IOStream *stream, bool readProperties,
 }
 
 TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
+                 bool readProperties, AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(stream)
 {
   d = new FilePrivate(frameFactory);
@@ -128,23 +128,6 @@ TagLib::Tag *TrueAudio::File::tag() const
   return &d->tag;
 }
 
-PropertyMap TrueAudio::File::properties() const
-{
-  // once Tag::properties() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
-void TrueAudio::File::removeUnsupportedProperties(const StringList &unsupported)
-{
-  if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, false)->removeUnsupportedProperties(unsupported);
-}
-
 PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
@@ -152,7 +135,7 @@ PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
   return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, true)->setProperties(properties);
 }
 
-TrueAudio::Properties *TrueAudio::File::audioProperties() const
+TrueAudio::AudioProperties *TrueAudio::File::audioProperties() const
 {
   return d->properties;
 }
@@ -179,7 +162,7 @@ bool TrueAudio::File::save()
     ByteVector data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
     d->ID3v1Location -= d->ID3v2OriginalSize - data.size();
-    d->ID3v2OriginalSize = data.size();
+    d->ID3v2OriginalSize = static_cast<uint>(data.size());
     d->hasID3v2 = true;
   }
   else if(d->hasID3v2) {
@@ -251,7 +234,7 @@ bool TrueAudio::File::hasID3v2Tag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void TrueAudio::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v2 tag
 
@@ -286,24 +269,22 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   if(readProperties) {
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      d->properties = new Properties(readBlock(TrueAudio::HeaderSize),
-                                     length() - d->ID3v2OriginalSize);
+      d->properties = new AudioProperties(this, length() - d->ID3v2OriginalSize);
     }
     else {
       seek(0);
-      d->properties = new Properties(readBlock(TrueAudio::HeaderSize),
-                                     length());
+      d->properties = new AudioProperties(this, length());
     }
   }
 }
 
-long TrueAudio::File::findID3v1()
+offset_t TrueAudio::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;
@@ -311,7 +292,7 @@ long TrueAudio::File::findID3v1()
   return -1;
 }
 
-long TrueAudio::File::findID3v2()
+offset_t TrueAudio::File::findID3v2()
 {
   if(!isValid())
     return -1;

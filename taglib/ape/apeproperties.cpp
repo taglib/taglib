@@ -29,26 +29,24 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-#include <bitset>
+
 #include "id3v2tag.h"
 #include "apeproperties.h"
 #include "apefile.h"
 
 using namespace TagLib;
 
-class APE::Properties::PropertiesPrivate
+class APE::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *file, long streamLength) :
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
     version(0),
     bitsPerSample(0),
-    sampleFrames(0),
-    file(file),
-    streamLength(streamLength) {}
+    sampleFrames(0) {}
 
   int length;
   int bitrate;
@@ -57,56 +55,54 @@ public:
   int version;
   int bitsPerSample;
   uint sampleFrames;
-  File *file;
-  long streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+APE::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, file->length());
-  read();
+  read(file);
 }
 
-APE::Properties::~Properties()
+APE::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int APE::Properties::length() const
+int APE::AudioProperties::length() const
 {
   return d->length;
 }
 
-int APE::Properties::bitrate() const
+int APE::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int APE::Properties::sampleRate() const
+int APE::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int APE::Properties::channels() const
+int APE::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int APE::Properties::version() const
+int APE::AudioProperties::version() const
 {
   return d->version;
 }
 
-int APE::Properties::bitsPerSample() const
+int APE::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-TagLib::uint APE::Properties::sampleFrames() const
+TagLib::uint APE::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -116,45 +112,45 @@ TagLib::uint APE::Properties::sampleFrames() const
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void APE::Properties::read()
+void APE::AudioProperties::read(File *file)
 {
   // First we are searching the descriptor
-  long offset = findDescriptor();
+  offset_t offset = findDescriptor(file);
   if(offset < 0)
     return;
 
   // Then we read the header common for all versions of APE
-  d->file->seek(offset);
-  ByteVector commonHeader = d->file->readBlock(6);
+  file->seek(offset);
+  ByteVector commonHeader = file->readBlock(6);
   if(!commonHeader.startsWith("MAC "))
     return;
-  d->version = commonHeader.toUShort(4, false);
+  d->version = commonHeader.toUInt16LE(4);
 
   if(d->version >= 3980) {
-    analyzeCurrent();
+    analyzeCurrent(file);
   }
   else {
-    analyzeOld();
+    analyzeOld(file);
   }
 }
 
-long APE::Properties::findDescriptor()
+offset_t APE::AudioProperties::findDescriptor(File *file)
 {
-  long ID3v2Location = findID3v2();
+  offset_t ID3v2Location = findID3v2(file);
   long ID3v2OriginalSize = 0;
   bool hasID3v2 = false;
   if(ID3v2Location >= 0) {
-    ID3v2::Tag tag(d->file, ID3v2Location);
+    ID3v2::Tag tag(file, ID3v2Location);
     ID3v2OriginalSize = tag.header()->completeTagSize();
     if(tag.header()->tagSize() > 0)
       hasID3v2 = true;
   }
 
-  long offset = 0;
+  offset_t offset = 0;
   if(hasID3v2)
-    offset = d->file->find("MAC ", ID3v2Location + ID3v2OriginalSize);
+    offset = file->find("MAC ", ID3v2Location + ID3v2OriginalSize);
   else
-    offset = d->file->find("MAC ");
+    offset = file->find("MAC ");
 
   if(offset < 0) {
     debug("APE::Properties::findDescriptor() -- APE descriptor not found");
@@ -164,56 +160,57 @@ long APE::Properties::findDescriptor()
   return offset;
 }
 
-long APE::Properties::findID3v2()
+offset_t APE::AudioProperties::findID3v2(File *file)
 {
-  if(!d->file->isValid())
+  if(!file->isValid())
     return -1;
 
-  d->file->seek(0);
+  file->seek(0);
 
-  if(d->file->readBlock(3) == ID3v2::Header::fileIdentifier())
+  if(file->readBlock(3) == ID3v2::Header::fileIdentifier())
     return 0;
 
   return -1;
 }
 
-void APE::Properties::analyzeCurrent()
+void APE::AudioProperties::analyzeCurrent(File *file)
 {
   // Read the descriptor
-  d->file->seek(2, File::Current);
-  ByteVector descriptor = d->file->readBlock(44);
-  const uint descriptorBytes = descriptor.toUInt(0, false);
+  file->seek(2, File::Current);
+  ByteVector descriptor = file->readBlock(44);
+  const uint descriptorBytes = descriptor.toUInt32LE(0);
 
   if ((descriptorBytes - 52) > 0)
-    d->file->seek(descriptorBytes - 52, File::Current);
+    file->seek(descriptorBytes - 52, File::Current);
 
   // Read the header
-  ByteVector header = d->file->readBlock(24);
+  ByteVector header = file->readBlock(24);
 
   // Get the APE info
-  d->channels      = header.toShort(18, false);
-  d->sampleRate    = header.toUInt(20, false);
-  d->bitsPerSample = header.toShort(16, false);
+  d->channels = header.toInt16LE(18);
+  d->sampleRate = header.toUInt32LE(20);
+  d->bitsPerSample = header.toInt16LE(16);
   //d->compressionLevel =
 
-  const uint totalFrames      = header.toUInt(12, false);
-  const uint blocksPerFrame   = header.toUInt(4, false);
-  const uint finalFrameBlocks = header.toUInt(8, false);
+  const uint totalFrames = header.toUInt32LE(12);
+  const uint blocksPerFrame = header.toUInt32LE(4);
+  const uint finalFrameBlocks = header.toUInt32LE(8);
+
   d->sampleFrames = totalFrames > 0 ? (totalFrames -  1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(file->length() * 8L / d->length / 1000) : 0;
 }
 
-void APE::Properties::analyzeOld()
+void APE::AudioProperties::analyzeOld(File *file)
 {
-  ByteVector header = d->file->readBlock(26);
-  const uint totalFrames = header.toUInt(18, false);
+  ByteVector header = file->readBlock(26);
+  const uint totalFrames = header.toUInt32LE(18);
 
   // Fail on 0 length APE files (catches non-finalized APE files)
   if(totalFrames == 0)
     return;
 
-  const short compressionLevel = header.toShort(0, false);
+  const short compressionLevel = header.toUInt32LE(0);
   uint blocksPerFrame;
   if(d->version >= 3950)
     blocksPerFrame = 73728 * 4;
@@ -221,12 +218,12 @@ void APE::Properties::analyzeOld()
     blocksPerFrame = 73728;
   else
     blocksPerFrame = 9216;
-  d->channels   = header.toShort(4, false);
-  d->sampleRate = header.toUInt(6, false);
-  const uint finalFrameBlocks = header.toUInt(22, false);
-  const uint totalBlocks 
-    = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
+
+  d->channels = header.toUInt16LE(4);
+  d->sampleRate = header.toUInt32LE(6);
+  const uint finalFrameBlocks = header.toUInt32LE(22);
+  const uint totalBlocks = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = totalBlocks / d->sampleRate;
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? static_cast<int>(file->length() * 8L / d->length / 1000) : 0;
 }
 

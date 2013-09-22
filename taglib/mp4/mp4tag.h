@@ -67,6 +67,8 @@ namespace TagLib {
 
         ItemListMap &itemListMap();
 
+        String toString() const;
+
         PropertyMap properties() const;
         void removeUnsupportedProperties(const StringList& properties);
         PropertyMap setProperties(const PropertyMap &properties);
@@ -100,7 +102,7 @@ namespace TagLib {
         TagLib::ByteVector renderCovr(const ByteVector &name, Item &item);
 
         void updateParents(AtomList &path, long delta, int ignore = 0);
-        void updateOffsets(long delta, long offset);
+        void updateOffsets(long delta, offset_t offset);
 
         void saveNew(TagLib::ByteVector &data);
         void saveExisting(TagLib::ByteVector &data, AtomList &path);

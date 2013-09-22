@@ -50,7 +50,7 @@ public:
     delete tag;
   }
 
-  Properties *properties;
+  AudioProperties *properties;
   ID3v2::Tag *tag;
   ByteVector tagChunkID;
 };
@@ -60,7 +60,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::AIFF::File::File(FileName file, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(file, BigEndian)
+                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(file, BigEndian)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -68,7 +68,7 @@ RIFF::AIFF::File::File(FileName file, bool readProperties,
 }
 
 RIFF::AIFF::File::File(IOStream *stream, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(stream, BigEndian)
+                       AudioProperties::ReadStyle propertiesStyle) : RIFF::File(stream, BigEndian)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -101,7 +101,7 @@ PropertyMap RIFF::AIFF::File::setProperties(const PropertyMap &properties)
 }
 
 
-RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
+RIFF::AIFF::AudioProperties *RIFF::AIFF::File::audioProperties() const
 {
   return d->properties;
 }
@@ -128,7 +128,7 @@ bool RIFF::AIFF::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void RIFF::AIFF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   for(uint i = 0; i < chunkCount(); i++) {
     if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
@@ -136,7 +136,7 @@ void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertie
       d->tag = new ID3v2::Tag(this, chunkOffset(i));
     }
     else if(chunkName(i) == "COMM" && readProperties)
-      d->properties = new Properties(chunkData(i), propertiesStyle);
+      d->properties = new AudioProperties(chunkData(i), propertiesStyle);
   }
 
   if(!d->tag)

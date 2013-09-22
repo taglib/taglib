@@ -55,19 +55,19 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true, 
-           Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
-       * Constructs an MP4 file from \a stream.  If \a readProperties is true the
+       * Constructs an MP4 file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
-       *
-       * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true, 
-           Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+           AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -87,25 +87,9 @@ namespace TagLib {
       Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       */
-      PropertyMap properties() const;
-
-      /*!
-       * Removes unsupported properties. Forwards to the actual Tag's
-       * removeUnsupportedProperties() function.
-       */
-      void removeUnsupportedProperties(const StringList &properties);
-
-      /*!
-       * Implements the unified property interface -- import function.
-       */
-      PropertyMap setProperties(const PropertyMap &);
-
-      /*!
        * Returns the MP4 audio properties for this file.
        */
-      Properties *audioProperties() const;
+      AudioProperties *audioProperties() const;
 
       /*!
        * Save the file.
@@ -116,7 +100,7 @@ namespace TagLib {
 
     private:
 
-      void read(bool readProperties, Properties::ReadStyle audioPropertiesStyle);
+      void read(bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle);
       bool checkValid(const MP4::AtomList &list);
 
       class FilePrivate;

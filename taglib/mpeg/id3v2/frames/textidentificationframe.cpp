@@ -119,15 +119,18 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
-// array of allowed TIPL prefixes and their corresponding key value
-static const TagLib::uint involvedPeopleSize = 5;
-static const char* involvedPeople[][2] = {
-    {"ARRANGER", "ARRANGER"},
-    {"ENGINEER", "ENGINEER"},
-    {"PRODUCER", "PRODUCER"},
-    {"DJ-MIX", "DJMIXER"},
-    {"MIX", "MIXER"},
-};
+namespace
+{
+  // array of allowed TIPL prefixes and their corresponding key value
+  static const TagLib::uint involvedPeopleSize = 5;
+  static const char* involvedPeople[][2] = {
+      {"ARRANGER", "ARRANGER"},
+      {"ENGINEER", "ENGINEER"},
+      {"PRODUCER", "PRODUCER"},
+      {"DJ-MIX", "DJMIXER"},
+      {"MIX", "MIXER"},
+  };
+}
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {
@@ -164,8 +167,8 @@ PropertyMap TextIdentificationFrame::asProperties() const
     for(StringList::Iterator it = values.begin(); it != values.end(); ++it) {
       // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
       // Since this is unusual in other formats, the T is removed.
-      int tpos = it->find("T");
-      if(tpos != -1)
+      const size_t tpos = it->find("T");
+      if(tpos != String::npos)
         (*it)[tpos] = ' ';
     }
   }
@@ -196,7 +199,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
   // build a small counter to strip nulls off the end of the field
 
-  int dataLength = data.size() - 1;
+  int dataLength = static_cast<int>(data.size()) - 1;
 
   while(dataLength > 0 && data[dataLength] == 0)
     dataLength--;
@@ -414,7 +417,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data,
 
 void UserTextIdentificationFrame::checkFields()
 {
-  int fields = fieldList().size();
+  const size_t fields = fieldList().size();
 
   if(fields == 0)
     setDescription(String::null);

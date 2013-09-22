@@ -39,76 +39,11 @@ else()
   set(SYSTEM_BYTEORDER 2)
 endif()
 
-# Determine which kind of atomic operations your compiler supports.
+# Determine the size of floating point types.
 
-check_cxx_source_compiles("
-  #include <atomic>
-  int main() { 
-    std::atomic<unsigned int> x;
-    x.fetch_add(1);
-    x.fetch_sub(1);
-    return 0; 
-  }
-" HAVE_STD_ATOMIC)
-
-if(NOT HAVE_STD_ATOMIC)
-  check_cxx_source_compiles("
-    #include <boost/atomic.hpp>
-    int main() { 
-      boost::atomic<unsigned int> x(1);
-      x.fetch_add(1);
-      x.fetch_sub(1);
-      return 0; 
-    }
-  " HAVE_BOOST_ATOMIC)
-
-  if(NOT HAVE_BOOST_ATOMIC)
-    check_cxx_source_compiles("
-      int main() { 
-        volatile int x;
-        __sync_add_and_fetch(&x, 1);
-        int y = __sync_sub_and_fetch(&x, 1);
-        return 0; 
-      }
-    " HAVE_GCC_ATOMIC)
-
-    if(NOT HAVE_GCC_ATOMIC)
-      check_cxx_source_compiles("
-        #include <libkern/OSAtomic.h>
-        int main() { 
-          volatile int32_t x;
-          OSAtomicIncrement32Barrier(&x);
-          int32_t y = OSAtomicDecrement32Barrier(&x);
-          return 0; 
-        }
-      " HAVE_MAC_ATOMIC)
-
-      if(NOT HAVE_MAC_ATOMIC)
-        check_cxx_source_compiles("
-          #include <windows.h>
-          int main() { 
-            volatile LONG x;
-            InterlockedIncrement(&x);
-            LONG y = InterlockedDecrement(&x);
-            return 0; 
-          }
-        " HAVE_WIN_ATOMIC)
-
-        if(NOT HAVE_WIN_ATOMIC)
-          check_cxx_source_compiles("
-            #include <ia64intrin.h>
-            int main() { 
-              volatile int x;
-              __sync_add_and_fetch(&x, 1);
-              int y = __sync_sub_and_fetch(&x, 1);
-              return 0; 
-            }
-          " HAVE_IA64_ATOMIC)
-        endif()
-      endif()
-    endif()
-  endif()
-endif()
+check_type_size("float"       SIZEOF_FLOAT)
+check_type_size("double"      SIZEOF_DOUBLE)
+check_type_size("long double" SIZEOF_LONGDOUBLE)
 
 # Determine which kind of byte swap functions your compiler supports.
 
@@ -183,7 +118,113 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
-# Determine whether your compiler supports some safer version of sprintf.
+# Determine where shared_ptr<T> is defined regardless of C++11 support.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() { std::shared_ptr<int> x; return 0; }
+" HAVE_STD_SHARED_PTR)
+
+if(NOT HAVE_STD_SHARED_PTR)
+  check_cxx_source_compiles("
+    #include <tr1/memory>
+    int main() { std::tr1::shared_ptr<int> x; return 0; }
+  " HAVE_TR1_SHARED_PTR)
+
+  if(NOT HAVE_TR1_SHARED_PTR)
+    check_cxx_source_compiles("
+      #include <boost/shared_ptr.hpp>
+      int main() { boost::shared_ptr<int> x; return 0; }
+    " HAVE_BOOST_SHARED_PTR)
+  endif()
+endif()
+
+# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() { std::unique_ptr<int> x; return 0; }
+" HAVE_STD_UNIQUE_PTR)
+
+if(NOT HAVE_STD_UNIQUE_PTR)
+  check_cxx_source_compiles("
+    #include <boost/scoped_ptr.hpp>
+    int main() { boost::scoped_ptr<int> x; return 0; }
+  " HAVE_BOOST_SCOPED_PTR)
+endif()
+
+# Determine which kind of atomic operations your compiler supports.
+
+check_cxx_source_compiles("
+  #include <atomic>
+  int main() { 
+    std::atomic<unsigned int> x;
+    x.fetch_add(1);
+    x.fetch_sub(1);
+    return 0; 
+  }
+" HAVE_STD_ATOMIC)
+
+if(NOT HAVE_STD_ATOMIC)
+  check_cxx_source_compiles("
+    #include <boost/atomic.hpp>
+    int main() { 
+      boost::atomic<unsigned int> x(1);
+      x.fetch_add(1);
+      x.fetch_sub(1);
+      return 0; 
+    }
+  " HAVE_BOOST_ATOMIC)
+
+  if(NOT HAVE_BOOST_ATOMIC)
+    check_cxx_source_compiles("
+      int main() { 
+        volatile int x;
+        __sync_add_and_fetch(&x, 1);
+        int y = __sync_sub_and_fetch(&x, 1);
+        return 0; 
+      }
+    " HAVE_GCC_ATOMIC)
+
+    if(NOT HAVE_GCC_ATOMIC)
+      check_cxx_source_compiles("
+        #include <libkern/OSAtomic.h>
+        int main() { 
+          volatile int32_t x;
+          OSAtomicIncrement32Barrier(&x);
+          int32_t y = OSAtomicDecrement32Barrier(&x);
+          return 0; 
+        }
+      " HAVE_MAC_ATOMIC)
+
+      if(NOT HAVE_MAC_ATOMIC)
+        check_cxx_source_compiles("
+          #include <windows.h>
+          int main() { 
+            volatile LONG x;
+            InterlockedIncrement(&x);
+            LONG y = InterlockedDecrement(&x);
+            return 0; 
+          }
+        " HAVE_WIN_ATOMIC)
+
+        if(NOT HAVE_WIN_ATOMIC)
+          check_cxx_source_compiles("
+            #include <ia64intrin.h>
+            int main() { 
+              volatile int x;
+              __sync_add_and_fetch(&x, 1);
+              int y = __sync_sub_and_fetch(&x, 1);
+              return 0; 
+            }
+          " HAVE_IA64_ATOMIC)
+        endif()
+      endif()
+    endif()
+  endif()
+endif()
+
+# Determine whether your compiler supports snpritf or sprintf_s.
 
 check_cxx_source_compiles("
   #include <cstdio>
@@ -197,6 +238,16 @@ if(NOT HAVE_SNPRINTF)
   " HAVE_SPRINTF_S)
 endif()
 
+# Check which your compiler supports ISO _strdup.
+
+check_cxx_source_compiles("
+  #include <cstring>
+  int main() { 
+    _strdup(0); 
+    return 0; 
+}
+" HAVE_ISO_STRDUP)
+
 # Determine whether your compiler supports codecvt.
 
 check_cxx_source_compiles("
@@ -207,7 +258,7 @@ check_cxx_source_compiles("
   }
 " HAVE_STD_CODECVT)
 
-# Check for libz using the cmake supplied FindZLIB.cmake
+# Determine whether zlib is installed.
 
 find_package(ZLIB)
 if(ZLIB_FOUND)
@@ -216,6 +267,7 @@ else()
   set(HAVE_ZLIB 0)
 endif()
 
+# Determine whether CppUnit is installed.
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 

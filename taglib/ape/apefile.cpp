@@ -66,14 +66,14 @@ public:
     delete properties;
   }
 
-  long APELocation;
+  offset_t APELocation;
   uint APESize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
-  TagUnion tag;
+  DoubleTagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -87,7 +87,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::File::File(FileName file, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -95,7 +95,7 @@ APE::File::File(FileName file, bool readProperties,
 }
 
 APE::File::File(IOStream *stream, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -112,23 +112,6 @@ TagLib::Tag *APE::File::tag() const
   return &d->tag;
 }
 
-PropertyMap APE::File::properties() const
-{
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(ApeAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
-void APE::File::removeUnsupportedProperties(const StringList &properties)
-{
-  if(d->hasAPE)
-    d->tag.access<APE::Tag>(ApeAPEIndex, false)->removeUnsupportedProperties(properties);
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->removeUnsupportedProperties(properties);
-}
-
 PropertyMap APE::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
@@ -136,7 +119,7 @@ PropertyMap APE::File::setProperties(const PropertyMap &properties)
   return d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
 }
 
-APE::Properties *APE::File::audioProperties() const
+APE::AudioProperties *APE::File::audioProperties() const
 {
   return d->properties;
 }
@@ -249,7 +232,7 @@ bool APE::File::hasID3v1Tag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void APE::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v1 tag
 
@@ -277,11 +260,11 @@ void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for APE audio properties
 
   if(readProperties) {
-    d->properties = new Properties(this);
+    d->properties = new AudioProperties(this);
   }
 }
 
-long APE::File::findAPE()
+offset_t APE::File::findAPE()
 {
   if(!isValid())
     return -1;
@@ -291,7 +274,7 @@ long APE::File::findAPE()
   else
     seek(-32, End);
 
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(8) == APE::Tag::fileIdentifier())
     return p;
@@ -299,13 +282,13 @@ long APE::File::findAPE()
   return -1;
 }
 
-long APE::File::findID3v1()
+offset_t APE::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;

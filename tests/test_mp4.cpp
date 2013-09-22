@@ -38,7 +38,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, ((MP4::Properties *)f.audioProperties())->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, ((MP4::AudioProperties *)f.audioProperties())->bitsPerSample());
   }
 
   void testPropertiesALAC()
@@ -48,7 +48,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, ((MP4::Properties *)f.audioProperties())->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, ((MP4::AudioProperties *)f.audioProperties())->bitsPerSample());
   }
 
   void testCheckValid()
@@ -73,10 +73,10 @@ public:
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
       f->seek(stco->offset + 12);
       ByteVector data = f->readBlock(stco->length - 12);
-      unsigned int count = data.mid(0, 4).toUInt();
-      int pos = 4;
+      unsigned int count = data.toUInt32BE(0);
+      size_t pos = 4;
       while (count--) {
-        unsigned int offset = data.mid(pos, 4).toUInt();
+        unsigned int offset = data.toUInt32BE(pos);
         f->seek(offset);
         data1.append(f->readBlock(20));
         pos += 4;
@@ -92,10 +92,10 @@ public:
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
       f->seek(stco->offset + 12);
       ByteVector data = f->readBlock(stco->length - 12);
-      unsigned int count = data.mid(0, 4).toUInt();
-      int pos = 4, i = 0;
+      unsigned int count = data.toUInt32BE(0);
+      size_t pos = 4, i = 0;
       while (count--) {
-        unsigned int offset = data.mid(pos, 4).toUInt();
+        unsigned int offset = data.toUInt32BE(pos);
         f->seek(offset);
         CPPUNIT_ASSERT_EQUAL(data1[i], f->readBlock(20));
         pos += 4;
@@ -179,11 +179,11 @@ public:
     MP4::File *f = new MP4::File(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
     MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), l.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(2), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
     delete f;
   }
 
@@ -203,13 +203,13 @@ public:
     f = new MP4::File(filename.c_str());
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
     l = f->tag()->itemListMap()["covr"].toCoverArtList();
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), l.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(3), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), l[2].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(3), l[2].data().size());
     delete f;
   }
 
@@ -218,11 +218,11 @@ public:
     MP4::File *f = new MP4::File(TEST_FILE_PATH_C("covr-junk.m4a"));
     CPPUNIT_ASSERT(f->tag()->itemListMap().contains("covr"));
     MP4::CoverArtList l = f->tag()->itemListMap()["covr"].toCoverArtList();
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), l.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(2), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(79), l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(287), l[1].data().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
     delete f;
   }
 

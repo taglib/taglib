@@ -25,162 +25,187 @@
 
 #include "tagunion.h"
 #include "tstringlist.h"
+#include "tpropertymap.h"
+#include "tsmartptr.h"
 
-using namespace TagLib;
+#define stringUnion(method)                                               \
+  for(size_t j = 0; j < COUNT; ++j) {                                     \
+    String val = d->tags[j] ? d->tags[j]->method() : String::null;        \
+    if(!val.isEmpty())                                                    \
+      return val;                                                         \
+  }                                                                       \
+  return String::null;
 
-#define stringUnion(method)                                          \
-  if(tag(0) && !tag(0)->method().isEmpty())                          \
-    return tag(0)->method();                                         \
-  if(tag(1) && !tag(1)->method().isEmpty())                          \
-    return tag(1)->method();                                         \
-  if(tag(2) && !tag(2)->method().isEmpty())                          \
-    return tag(2)->method();                                         \
-  return String::null                                                \
+#define numberUnion(method)                                               \
+  for(size_t j = 0; j < COUNT; ++j) {                                     \
+    uint val = d->tags[j] ? d->tags[j]->method() : 0;                     \
+    if(val > 0)                                                           \
+      return val;                                                         \
+  }                                                                       \
+  return 0;
 
-#define numberUnion(method)                                          \
-  if(tag(0) && tag(0)->method() > 0)                                 \
-    return tag(0)->method();                                         \
-  if(tag(1) && tag(1)->method() > 0)                                 \
-    return tag(1)->method();                                         \
-  if(tag(2) && tag(2)->method() > 0)                                 \
-    return tag(2)->method();                                         \
-  return 0
-
-#define setUnion(method, value)                                      \
-  if(tag(0))                                                         \
-    tag(0)->set##method(value);                                      \
-  if(tag(1))                                                         \
-    tag(1)->set##method(value);                                      \
-  if(tag(2))                                                         \
-    tag(2)->set##method(value);                                      \
-
-class TagUnion::TagUnionPrivate
-{
-public:
-  TagUnionPrivate() : tags(3, static_cast<Tag *>(0))
-  {
-
+#define setUnion(method, value)                                           \
+  for(size_t j = 0; j < COUNT; ++j) {                                     \
+    if(d->tags[j])                                                        \
+      d->tags[j]->set##method(value);                                     \
   }
 
-  ~TagUnionPrivate()
+namespace TagLib
+{
+  template <size_t COUNT>
+  class TagUnion<COUNT>::TagUnionPrivate
   {
-    delete tags[0];
-    delete tags[1];
-    delete tags[2];
+  public:
+    SCOPED_PTR<Tag> tags[COUNT];
+  };
+
+  template <size_t COUNT>
+  TagUnion<COUNT>::TagUnion()
+    : d(new TagUnionPrivate())
+  {
   }
 
-  std::vector<Tag *> tags;
-};
+  template <size_t COUNT>
+  TagUnion<COUNT>::~TagUnion()
+  {
+    delete d;
+  }
 
-TagUnion::TagUnion(Tag *first, Tag *second, Tag *third)
-{
-  d = new TagUnionPrivate;
+  template <size_t COUNT>
+  Tag *TagUnion<COUNT>::operator[](size_t index) const
+  {
+    return tag(index);
+  }
 
-  d->tags[0] = first;
-  d->tags[1] = second;
-  d->tags[2] = third;
+  template <size_t COUNT>
+  Tag *TagUnion<COUNT>::tag(size_t index) const
+  {
+    return d->tags[index].get();
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::set(size_t index, Tag *tag)
+  {
+    d->tags[index].reset(tag);
+  }
+
+  template <size_t COUNT>
+  PropertyMap TagUnion<COUNT>::properties() const
+  {
+    for(size_t i = 0; i < COUNT; ++i) {
+      if(d->tags[i])
+        return d->tags[i]->properties();
+    }
+
+    return PropertyMap();
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::removeUnsupportedProperties(const StringList &unsupported)
+  {
+    for(size_t i = 0; i < COUNT; ++i) {
+      if(d->tags[i])
+        d->tags[i]->removeUnsupportedProperties(unsupported);
+    }
+  }
+
+  template <size_t COUNT>
+  String TagUnion<COUNT>::title() const
+  {
+    stringUnion(title);
+  }
+
+  template <size_t COUNT>
+  String TagUnion<COUNT>::artist() const
+  {
+    stringUnion(artist);
+  }
+
+  template <size_t COUNT>
+  String TagUnion<COUNT>::album() const
+  {
+    stringUnion(album);
+  }
+
+  template <size_t COUNT>
+  String TagUnion<COUNT>::comment() const
+  {
+    stringUnion(comment);
+  }
+
+  template <size_t COUNT>
+  String TagUnion<COUNT>::genre() const
+  {
+    stringUnion(genre);
+  }
+
+  template <size_t COUNT>
+  TagLib::uint TagUnion<COUNT>::year() const
+  {
+    numberUnion(year);
+  }
+
+  template <size_t COUNT>
+  TagLib::uint TagUnion<COUNT>::track() const
+  {
+    numberUnion(track);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setTitle(const String &s)
+  {
+    setUnion(Title, s);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setArtist(const String &s)
+  {
+    setUnion(Artist, s);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setAlbum(const String &s)
+  {
+    setUnion(Album, s);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setComment(const String &s)
+  {
+    setUnion(Comment, s);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setGenre(const String &s)
+  {
+    setUnion(Genre, s);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setYear(uint i)
+  {
+    setUnion(Year, i);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setTrack(uint i)
+  {
+    setUnion(Track, i);
+  }
+
+  template <size_t COUNT>
+  bool TagUnion<COUNT>::isEmpty() const
+  {
+    for(size_t i = 0; i < COUNT; ++i) {
+      if(d->tags[i] && !d->tags[i]->isEmpty())
+        return false;
+    }
+
+    return true;
+  }
+
+  // All the versions of TagUnion should be explicitly instantiated here.
+
+  template class TagUnion<2>;
+  template class TagUnion<3>;
 }
-
-TagUnion::~TagUnion()
-{
-  delete d;
-}
-
-Tag *TagUnion::operator[](int index) const
-{
-  return tag(index);
-}
-
-Tag *TagUnion::tag(int index) const
-{
-  return d->tags[index];
-}
-
-void TagUnion::set(int index, Tag *tag)
-{
-  delete d->tags[index];
-  d->tags[index] = tag;
-}
-
-String TagUnion::title() const
-{
-  stringUnion(title);
-}
-
-String TagUnion::artist() const
-{
-  stringUnion(artist);
-}
-
-String TagUnion::album() const
-{
-  stringUnion(album);
-}
-
-String TagUnion::comment() const
-{
-  stringUnion(comment);
-}
-
-String TagUnion::genre() const
-{
-  stringUnion(genre);
-}
-
-TagLib::uint TagUnion::year() const
-{
-  numberUnion(year);
-}
-
-TagLib::uint TagUnion::track() const
-{
-  numberUnion(track);
-}
-
-void TagUnion::setTitle(const String &s)
-{
-  setUnion(Title, s);
-}
-
-void TagUnion::setArtist(const String &s)
-{
-  setUnion(Artist, s);
-}
-
-void TagUnion::setAlbum(const String &s)
-{
-  setUnion(Album, s);
-}
-
-void TagUnion::setComment(const String &s)
-{
-  setUnion(Comment, s);
-}
-
-void TagUnion::setGenre(const String &s)
-{
-  setUnion(Genre, s);
-}
-
-void TagUnion::setYear(uint i)
-{
-  setUnion(Year, i);
-}
-
-void TagUnion::setTrack(uint i)
-{
-  setUnion(Track, i);
-}
-
-bool TagUnion::isEmpty() const
-{
-  if(d->tags[0] && !d->tags[0]->isEmpty())
-    return false;
-  if(d->tags[1] && !d->tags[1]->isEmpty())
-    return false;
-  if(d->tags[2] && !d->tags[2]->isEmpty())
-    return false;
-
-  return true;
-}
-

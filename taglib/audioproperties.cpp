@@ -24,13 +24,9 @@
  ***************************************************************************/
 
 #include "audioproperties.h"
+#include "tstringlist.h"
 
 using namespace TagLib;
-
-class AudioProperties::AudioPropertiesPrivate
-{
-
-};
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
@@ -38,14 +34,21 @@ class AudioProperties::AudioPropertiesPrivate
 
 AudioProperties::~AudioProperties()
 {
+}
 
+String AudioProperties::toString() const
+{
+  StringList desc;
+  desc.append("Audio");
+  desc.append(String::number(length()) + " seconds");
+  desc.append(String::number(bitrate()) + " kbps");
+  return desc.toString(", ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-AudioProperties::AudioProperties(ReadStyle)
+AudioProperties::AudioProperties()
 {
-
 }

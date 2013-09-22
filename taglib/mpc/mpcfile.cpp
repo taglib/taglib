@@ -64,18 +64,18 @@ public:
     delete properties;
   }
 
-  long APELocation;
+  offset_t APELocation;
   uint APESize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   ID3v2::Header *ID3v2Header;
-  long ID3v2Location;
+  offset_t ID3v2Location;
   uint ID3v2Size;
 
-  TagUnion tag;
+  DoubleTagUnion tag;
 
-  Properties *properties;
+  AudioProperties *properties;
   bool scanned;
 
   // These indicate whether the file *on disk* has these tags, not if
@@ -91,7 +91,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPC::File::File(FileName file, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -99,7 +99,7 @@ MPC::File::File(FileName file, bool readProperties,
 }
 
 MPC::File::File(IOStream *stream, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -116,23 +116,6 @@ TagLib::Tag *MPC::File::tag() const
   return &d->tag;
 }
 
-PropertyMap MPC::File::properties() const
-{
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(MPCAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(MPCID3v1Index, false)->properties();
-  return PropertyMap();
-}
-
-void MPC::File::removeUnsupportedProperties(const StringList &properties)
-{
-  if(d->hasAPE)
-    d->tag.access<APE::Tag>(MPCAPEIndex, false)->removeUnsupportedProperties(properties);
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(MPCID3v1Index, false)->removeUnsupportedProperties(properties);
-}
-
 PropertyMap MPC::File::setProperties(const PropertyMap &properties)
 {
   if(d->hasID3v1)
@@ -140,7 +123,7 @@ PropertyMap MPC::File::setProperties(const PropertyMap &properties)
   return d->tag.access<APE::Tag>(MPCAPEIndex, true)->setProperties(properties);
 }
 
-MPC::Properties *MPC::File::audioProperties() const
+MPC::AudioProperties *MPC::File::audioProperties() const
 {
   return d->properties;
 }
@@ -270,7 +253,7 @@ bool MPC::File::hasAPETag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
 {
   // Look for an ID3v1 tag
 
@@ -317,11 +300,11 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for MPC metadata
 
   if(readProperties) {
-    d->properties = new Properties(this, length() - d->ID3v2Size - d->APESize);
+    d->properties = new AudioProperties(this, length() - d->ID3v2Size - d->APESize);
   }
 }
 
-long MPC::File::findAPE()
+offset_t MPC::File::findAPE()
 {
   if(!isValid())
     return -1;
@@ -331,7 +314,7 @@ long MPC::File::findAPE()
   else
     seek(-32, End);
 
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(8) == APE::Tag::fileIdentifier())
     return p;
@@ -339,13 +322,13 @@ long MPC::File::findAPE()
   return -1;
 }
 
-long MPC::File::findID3v1()
+offset_t MPC::File::findID3v1()
 {
   if(!isValid())
     return -1;
 
   seek(-128, End);
-  long p = tell();
+  offset_t p = tell();
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;
@@ -353,7 +336,7 @@ long MPC::File::findID3v1()
   return -1;
 }
 
-long MPC::File::findID3v2()
+offset_t MPC::File::findID3v2()
 {
   if(!isValid())
     return -1;

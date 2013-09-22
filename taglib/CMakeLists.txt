@@ -24,6 +24,8 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/it
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
+  ${CMAKE_CURRENT_SOURCE_DIR}/ebml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ebml/matroska
 )
 
 if(ZLIB_FOUND)
@@ -35,12 +37,12 @@ set(tag_HDRS
   fileref.h
   audioproperties.h
   taglib_export.h
-  ${CMAKE_BINARY_DIR}/taglib_config.h
   toolkit/taglib.h
   toolkit/tstring.h
   toolkit/tlist.h
   toolkit/tlist.tcc
   toolkit/tstringlist.h
+  toolkit/tstringhandler.h
   toolkit/tbytevector.h
   toolkit/tbytevectorlist.h
   toolkit/tbytevectorstream.h
@@ -130,6 +132,12 @@ set(tag_HDRS
   s3m/s3mproperties.h
   xm/xmfile.h
   xm/xmproperties.h
+  ebml/ebmlfile.h
+  ebml/ebmlelement.h
+  ebml/ebmlconstants.h
+  ebml/matroska/ebmlmatroskafile.h
+  ebml/matroska/ebmlmatroskaconstants.h
+  ebml/matroska/ebmlmatroskaaudio.h
 )
 
 set(mpeg_SRCS
@@ -283,6 +291,7 @@ set(xm_SRCS
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
+  toolkit/tstringhandler.cpp
   toolkit/tbytevector.cpp
   toolkit/tbytevectorlist.cpp
   toolkit/tbytevectorstream.cpp
@@ -296,11 +305,22 @@ set(toolkit_SRCS
   toolkit/unicode.cpp
 )
 
+set(ebml_SRCS
+  ebml/ebmlfile.cpp
+  ebml/ebmlelement.cpp
+)
+
+set(matroska_SRCS
+  ebml/matroska/ebmlmatroskafile.cpp
+  ebml/matroska/ebmlmatroskaaudio.cpp
+)
+
 set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
+  ${ebml_SRCS} ${matroska_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
@@ -311,6 +331,10 @@ add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
 	target_link_libraries(tag ${ZLIB_LIBRARIES})
+endif()
+
+if(WIN32 AND NOT TAGLIB_STATIC)
+	target_link_libraries(tag shlwapi.lib)
 endif()
 
 set_target_properties(tag PROPERTIES

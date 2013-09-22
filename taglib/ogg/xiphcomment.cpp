@@ -179,7 +179,7 @@ TagLib::uint Ogg::XiphComment::fieldCount() const
 
   FieldListMap::ConstIterator it = d->fieldListMap.begin();
   for(; it != d->fieldListMap.end(); ++it)
-    count += (*it).second.size();
+    count += static_cast<uint>((*it).second.size());
 
   return count;
 }
@@ -275,11 +275,6 @@ bool Ogg::XiphComment::contains(const String &key) const
   return d->fieldListMap.contains(key) && !d->fieldListMap[key].isEmpty();
 }
 
-ByteVector Ogg::XiphComment::render() const
-{
-  return render(true);
-}
-
 ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 {
   ByteVector data;
@@ -291,12 +286,12 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 
   ByteVector vendorData = d->vendorID.data(String::UTF8);
 
-  data.append(ByteVector::fromUInt(vendorData.size(), false));
+  data.append(ByteVector::fromUInt32LE(vendorData.size()));
   data.append(vendorData);
 
   // Add the number of fields.
 
-  data.append(ByteVector::fromUInt(fieldCount(), false));
+  data.append(ByteVector::fromUInt32LE(fieldCount()));
 
   // Iterate over the the field lists.  Our iterator returns a
   // std::pair<String, StringList> where the first String is the field name and
@@ -316,7 +311,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
       fieldData.append('=');
       fieldData.append((*valuesIt).data(String::UTF8));
 
-      data.append(ByteVector::fromUInt(fieldData.size(), false));
+      data.append(ByteVector::fromUInt32LE(fieldData.size()));
       data.append(fieldData);
     }
   }
@@ -329,6 +324,17 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   return data;
 }
 
+String Ogg::XiphComment::toString() const
+{
+  StringList desc;
+  for(FieldListMap::ConstIterator i = d->fieldListMap.begin(); i != d->fieldListMap.end(); i++) {
+    for(StringList::ConstIterator j = i->second.begin(); j != i->second.end(); j++) {
+      desc.append(i->first + "=" + *j);
+    }
+  }
+  return desc.toString("\n");
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,9 +344,9 @@ void Ogg::XiphComment::parse(const ByteVector &data)
   // The first thing in the comment data is the vendor ID length, followed by a
   // UTF8 string with the vendor ID.
 
-  uint pos = 0;
+  size_t pos = 0;
 
-  const uint vendorLength = data.toUInt(0, false);
+  const uint vendorLength = data.toUInt32LE(0);
   pos += 4;
 
   d->vendorID = String(data.mid(pos, vendorLength), String::UTF8);
@@ -348,7 +354,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   // Next the number of fields in the comment vector.
 
-  const uint commentFields = data.toUInt(pos, false);
+  const uint commentFields = data.toUInt32LE(pos);
   pos += 4;
 
   if(commentFields > (data.size() - 8) / 4) {
@@ -360,7 +366,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     // Each comment field is in the format "KEY=value" in a UTF8 string and has
     // 4 bytes before the text starts that gives the length.
 
-    const uint commentLength = data.toUInt(pos, false);
+    const uint commentLength = data.toUInt32LE(pos);
     pos += 4;
 
     String comment = String(data.mid(pos, commentLength), String::UTF8);
@@ -369,8 +375,8 @@ void Ogg::XiphComment::parse(const ByteVector &data)
       break;
     }
 
-    int commentSeparatorPosition = comment.find("=");
-    if(commentSeparatorPosition == -1) {
+    const size_t commentSeparatorPosition = comment.find("=");
+    if(commentSeparatorPosition == String::npos) {
       break;
     }
 

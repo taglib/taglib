@@ -21,7 +21,7 @@ public:
   void testBasic()
   {
     WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
-    WavPack::Properties *props = f.audioProperties();
+    WavPack::AudioProperties *props = f.audioProperties();
     CPPUNIT_ASSERT_EQUAL(44100, props->sampleRate());
     CPPUNIT_ASSERT_EQUAL(2, props->channels());
     CPPUNIT_ASSERT_EQUAL(1, props->bitrate());
@@ -31,7 +31,7 @@ public:
   void testLengthScan()
   {
     WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
-    WavPack::Properties *props = f.audioProperties();
+    WavPack::AudioProperties *props = f.audioProperties();
     CPPUNIT_ASSERT_EQUAL(4, props->length());
   }
 

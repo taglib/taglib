@@ -26,6 +26,8 @@
 #ifndef TAGLIB_TAGUNION_H
 #define TAGLIB_TAGUNION_H
 
+// This file is not a part of TagLib public interface. This is not installed.
+
 #include "tag.h"
 
 #ifndef DO_NOT_DOCUMENT
@@ -36,6 +38,7 @@ namespace TagLib {
    * \internal
    */
 
+  template <size_t COUNT>
   class TagUnion : public Tag
   {
   public:
@@ -43,19 +46,21 @@ namespace TagLib {
     enum AccessType { Read, Write };
 
     /*!
-     * Creates a TagLib::Tag that is the union of \a first, \a second, and
-     * \a third.  The TagUnion takes ownership of these tags and will handle
-     * their deletion.
+     * Creates a TagLib::Tag that is the union of \a count tags.
      */
-    TagUnion(Tag *first = 0, Tag *second = 0, Tag *third = 0);
+    TagUnion();
 
     virtual ~TagUnion();
 
-    Tag *operator[](int index) const;
-    Tag *tag(int index) const;
+    Tag *operator[](size_t index) const;
+    Tag *tag(size_t index) const;
 
-    void set(int index, Tag *tag);
+    void set(size_t index, Tag *tag);
 
+    virtual PropertyMap properties() const;
+    
+    virtual void removeUnsupportedProperties(const StringList& properties);
+    
     virtual String title() const;
     virtual String artist() const;
     virtual String album() const;
@@ -73,7 +78,7 @@ namespace TagLib {
     virtual void setTrack(uint i);
     virtual bool isEmpty() const;
 
-    template <class T> T *access(int index, bool create)
+    template <class T> T *access(size_t index, bool create)
     {
       if(!create || tag(index))
         return static_cast<T *>(tag(index));
@@ -83,12 +88,15 @@ namespace TagLib {
     }
 
   private:
-    TagUnion(const Tag &);
-    TagUnion &operator=(const Tag &);
-
     class TagUnionPrivate;
     TagUnionPrivate *d;
   };
+
+  // If you add a new typedef here, add a corresponding explicit instantiation 
+  // at the end of tagunion.cpp as well. 
+
+  typedef TagUnion<2> DoubleTagUnion;
+  typedef TagUnion<3> TripleTagUnion;
 }
 
 #endif

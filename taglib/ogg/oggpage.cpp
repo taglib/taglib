@@ -35,7 +35,7 @@ using namespace TagLib;
 class Ogg::Page::PagePrivate
 {
 public:
-  PagePrivate(File *f = 0, long pageOffset = -1) :
+  PagePrivate(File *f = 0, offset_t pageOffset = -1) :
     file(f),
     fileOffset(pageOffset),
     packetOffset(0),
@@ -50,8 +50,8 @@ public:
   }
 
   File *file;
-  long fileOffset;
-  long packetOffset;
+  offset_t fileOffset;
+  offset_t packetOffset;
   int dataSize;
   List<int> packetSizes;
   PageHeader header;
@@ -63,7 +63,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::Page::Page(Ogg::File *file, long pageOffset)
+Ogg::Page::Page(Ogg::File *file, offset_t pageOffset)
 {
   d = new PagePrivate(file, pageOffset);
 }
@@ -73,7 +73,7 @@ Ogg::Page::~Page()
   delete d;
 }
 
-long Ogg::Page::fileOffset() const
+offset_t Ogg::Page::fileOffset() const
 {
   return d->fileOffset;
 }
@@ -133,7 +133,7 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
 
 TagLib::uint Ogg::Page::packetCount() const
 {
-  return d->header.packetSizes().size();
+  return static_cast<uint>(d->header.packetSizes().size());
 }
 
 ByteVectorList Ogg::Page::packets() const
@@ -188,7 +188,7 @@ ByteVector Ogg::Page::render() const
   // the entire page with the 4 bytes reserved for the checksum zeroed and then
   // inserted in bytes 22-25 of the page header.
 
-  ByteVector checksum = ByteVector::fromUInt(data.checksum(), false);
+  ByteVector checksum = ByteVector::fromUInt32LE(data.checksum());
   for(int i = 0; i < 4; i++)
     data[i + 22] = checksum[i];
 
@@ -205,7 +205,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 {
   List<Page *> l;
 
-  int totalSize = 0;
+  size_t totalSize = 0;
 
   for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it)
     totalSize += (*it).size();
@@ -331,7 +331,7 @@ Ogg::Page::Page(const ByteVectorList &packets,
   // Build a page from the list of packets.
 
   for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it) {
-    packetSizes.append((*it).size());
+    packetSizes.append(static_cast<int>((*it).size()));
     data.append(*it);
   }
   d->packets = packets;

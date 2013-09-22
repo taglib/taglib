@@ -47,19 +47,19 @@ namespace TagLib {
        * API.
        */
 
-      class TAGLIB_EXPORT Properties : public AudioProperties
+      class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
       {
       public:
         /*!
-         * Create an instance of Opus::Properties with the data read from the
-         * Opus::File \a file.
+         * Creates an instance of Opus::AudioProperties with the data read from 
+         * the Opus::File \a file.
          */
-        Properties(File *file, ReadStyle style = Average);
+        AudioProperties(File *file, ReadStyle style = Average);
 
         /*!
-         * Destroys this Opus::Properties instance.
+         * Destroys this Opus::AudioProperties instance.
          */
-        virtual ~Properties();
+        virtual ~AudioProperties();
 
         // Reimplementations.
 
@@ -81,10 +81,7 @@ namespace TagLib {
         int opusVersion() const;
 
       private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
-
-        void read();
+        void read(File *file);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

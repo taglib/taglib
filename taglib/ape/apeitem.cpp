@@ -128,14 +128,6 @@ void APE::Item::setBinaryData(const ByteVector &value)
   d->text.clear();
 }
 
-ByteVector APE::Item::value() const
-{
-  // This seems incorrect as it won't be actually rendering the value to keep it
-  // up to date.
-
-  return d->value;
-}
-
 void APE::Item::setKey(const String &key)
 {
   d->key = key;
@@ -172,7 +164,7 @@ void APE::Item::appendValues(const StringList &values)
 int APE::Item::size() const
 {
   // SFB: Why is d->key.size() used when size() returns the length in UniChars and not UTF-8?
-  int result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
+  size_t result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
   switch (d->type) {
     case Text:
       if(d->text.size()) {
@@ -190,12 +182,7 @@ int APE::Item::size() const
       result += d->value.size();
       break;
   }
-  return result;
-}
-
-StringList APE::Item::toStringList() const
-{
-  return d->text;
+  return static_cast<int>(result);
 }
 
 StringList APE::Item::values() const
@@ -237,8 +224,8 @@ void APE::Item::parse(const ByteVector &data)
     return;
   }
 
-  const uint valueLength  = data.toUInt(0, false);
-  const uint flags        = data.toUInt(4, false);
+  const uint valueLength  = data.toUInt32LE(0);
+  const uint flags        = data.toUInt32LE(4);
 
   d->key = String(data.mid(8), String::UTF8);
 
@@ -276,8 +263,8 @@ ByteVector APE::Item::render() const
   else
     value.append(d->value);
 
-  data.append(ByteVector::fromUInt(value.size(), false));
-  data.append(ByteVector::fromUInt(flags, false));
+  data.append(ByteVector::fromUInt32LE(value.size()));
+  data.append(ByteVector::fromUInt32LE(flags));
   data.append(d->key.data(String::UTF8));
   data.append(ByteVector('\0'));
   data.append(value);

@@ -46,25 +46,19 @@ namespace TagLib {
        * API.
        */
 
-      class TAGLIB_EXPORT Properties : public AudioProperties
+      class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
       {
       public:
         /*!
-         * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data.
-         */
-        Properties(const ByteVector &data, ReadStyle style);
-
-        /*!
-         * Create an instance of WAV::Properties with the data read from the
+         * Creates an instance of WAV::Properties with the data read from the
          * ByteVector \a data and the length calculated using \a streamLength.
          */
-        Properties(const ByteVector &data, uint streamLength, ReadStyle style);
+        AudioProperties(const ByteVector &data, uint streamLength, ReadStyle style);
 
         /*!
-         * Destroys this WAV::Properties instance.
+         * Destroys this WAV::AudioProperties instance.
          */
-        virtual ~Properties();
+        virtual ~AudioProperties();
 
         // Reimplementations.
 
@@ -73,14 +67,28 @@ namespace TagLib {
         virtual int sampleRate() const;
         virtual int channels() const;
 
+        /*!
+         * Returns the count of bits per sample.
+         */
         int sampleWidth() const;
+
+        /*!
+         * Returns the total number of the samples.
+         *
+         * If the format ID is not 1, always returns 0.
+         *
+         * \see format()
+         */
         uint sampleFrames() const;
 
-      private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
+        /*!
+         * Returns the format ID of the WAVE file.  For example, 0 for Unknown, 
+         * 1 for PCM and so forth.
+         */
+        uint format() const;
 
-        void read(const ByteVector &data);
+      private:
+        void read(const ByteVector &data, uint streamLength);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

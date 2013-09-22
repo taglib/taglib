@@ -33,19 +33,19 @@ Mod::FileBase::FileBase(IOStream *stream) : TagLib::File(stream)
 {
 }
 
-void Mod::FileBase::writeString(const String &s, ulong size, char padding)
+void Mod::FileBase::writeString(const String &s, uint size, char padding)
 {
   ByteVector data(s.data(String::Latin1));
   data.resize(size, padding);
   writeBlock(data);
 }
 
-bool Mod::FileBase::readString(String &s, ulong size)
+bool Mod::FileBase::readString(String &s, uint size)
 {
   ByteVector data(readBlock(size));
   if(data.size() < size) return false;
-  int index = data.find((char) 0);
-  if(index > -1)
+  const size_t index = data.find((char) 0);
+  if(index != ByteVector::npos)
   {
     data.resize(index);
   }
@@ -63,22 +63,22 @@ void Mod::FileBase::writeByte(uchar byte)
 
 void Mod::FileBase::writeU16L(ushort number)
 {
-  writeBlock(ByteVector::fromShort(number, false));
+  writeBlock(ByteVector::fromUInt16LE(number));
 }
 
-void Mod::FileBase::writeU32L(ulong number)
+void Mod::FileBase::writeU32L(uint number)
 {
-  writeBlock(ByteVector::fromUInt(number, false));
+  writeBlock(ByteVector::fromUInt32LE(number));
 }
 
 void Mod::FileBase::writeU16B(ushort number)
 {
-  writeBlock(ByteVector::fromShort(number, true));
+  writeBlock(ByteVector::fromUInt16BE(number));
 }
 
-void Mod::FileBase::writeU32B(ulong number)
+void Mod::FileBase::writeU32B(uint number)
 {
-  writeBlock(ByteVector::fromUInt(number, true));
+  writeBlock(ByteVector::fromUInt32BE(number));
 }
 
 bool Mod::FileBase::readByte(uchar &byte)
@@ -93,14 +93,14 @@ bool Mod::FileBase::readU16L(ushort &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;
-  number = data.toUShort(false);
+  number = data.toUInt16LE(0);
   return true;
 }
 
-bool Mod::FileBase::readU32L(ulong &number) {
+bool Mod::FileBase::readU32L(uint &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
-  number = data.toUInt(false);
+  number = data.toUInt32LE(0);
   return true;
 }
 
@@ -108,13 +108,13 @@ bool Mod::FileBase::readU16B(ushort &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;
-  number = data.toUShort(true);
+  number = data.toUInt16BE(0);
   return true;
 }
 
-bool Mod::FileBase::readU32B(ulong &number) {
+bool Mod::FileBase::readU32B(uint &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
-  number = data.toUInt(true);
+  number = data.toUInt32BE(0);
   return true;
 }

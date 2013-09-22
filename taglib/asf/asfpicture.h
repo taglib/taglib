@@ -35,6 +35,7 @@ namespace TagLib
 {
   namespace ASF
   {
+    class Attribute;
 
     //! An ASF attached picture interface implementation
 
@@ -46,7 +47,8 @@ namespace TagLib
      * \see Attribute::toPicture()
      * \see Attribute::Attribute(const Picture& picture)
      */
-    class TAGLIB_EXPORT Picture {
+    class TAGLIB_EXPORT Picture 
+    {
     public:
 
       /*!
@@ -103,7 +105,7 @@ namespace TagLib
       Picture();
 
       /*!
-       * Construct an picture as a copy of \a other.
+       * Constructs an picture as a copy of \a other.
        */
       Picture(const Picture& other);
 
@@ -201,16 +203,15 @@ namespace TagLib
        */
       int dataSize() const;
 
-#ifndef DO_NOT_DOCUMENT
-      /* THIS IS PRIVATE, DON'T TOUCH IT! */
-      void parse(const ByteVector& );
-      static Picture fromInvalid();
+    private:
       friend class Attribute;
-#endif
-      private:
-        class PicturePrivate;
-        PicturePrivate *d;
-      };
+
+      void parse(const ByteVector &);
+      static Picture fromInvalid();
+
+      class PicturePrivate;
+      PicturePrivate *d;
+    };
   }
 }
 

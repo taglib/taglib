@@ -57,7 +57,7 @@ public:
 
   MP4::Tag *tag;
   MP4::Atoms *atoms;
-  MP4::Properties *properties;
+  MP4::AudioProperties *properties;
 };
 
 MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
@@ -87,22 +87,7 @@ MP4::File::tag() const
   return d->tag;
 }
 
-PropertyMap MP4::File::properties() const
-{
-  return d->tag->properties();
-}
-
-void MP4::File::removeUnsupportedProperties(const StringList &properties)
-{
-  d->tag->removeUnsupportedProperties(properties);
-}
-
-PropertyMap MP4::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag->setProperties(properties);
-}
-
-MP4::Properties *
+MP4::AudioProperties *
 MP4::File::audioProperties() const
 {
   return d->properties;
@@ -121,7 +106,7 @@ MP4::File::checkValid(const MP4::AtomList &list)
 }
 
 void
-MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
+MP4::File::read(bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
 {
   if(!isValid())
     return;
@@ -141,7 +126,7 @@ MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
 
   d->tag = new Tag(this, d->atoms);
   if(readProperties) {
-    d->properties = new Properties(this, d->atoms, audioPropertiesStyle);
+    d->properties = new AudioProperties(this, d->atoms, audioPropertiesStyle);
   }
 }
 

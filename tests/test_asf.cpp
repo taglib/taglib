@@ -165,7 +165,7 @@ public:
 
     f = new ASF::File(newname.c_str());
     ASF::AttributeList values2 = f->tag()->attributeListMap()["WM/Picture"];
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), values2.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(1), values2.size());
     ASF::Attribute attr2 = values2.front();
     ASF::Picture picture2 = attr2.toPicture();
     CPPUNIT_ASSERT(picture2.isValid());
@@ -201,7 +201,7 @@ public:
 
     f = new ASF::File(newname.c_str());
     ASF::AttributeList values2 = f->tag()->attributeListMap()["WM/Picture"];
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), values2.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(2), values2.size());
     ASF::Picture picture3 = values2[1].toPicture();
     CPPUNIT_ASSERT(picture3.isValid());
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture3.mimeType());
@@ -235,17 +235,17 @@ public:
     CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), tags["ARTIST"]);
 
     CPPUNIT_ASSERT(f.tag()->attributeListMap().contains("WM/BeatsPerMinute"));
-    CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/BeatsPerMinute"].size());
+    CPPUNIT_ASSERT_EQUAL((size_t)1u, f.tag()->attributeListMap()["WM/BeatsPerMinute"].size());
     CPPUNIT_ASSERT_EQUAL(String("123"), f.tag()->attributeListMap()["WM/BeatsPerMinute"].front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("123"), tags["BPM"]);
 
     CPPUNIT_ASSERT(f.tag()->attributeListMap().contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/TrackNumber"].size());
+    CPPUNIT_ASSERT_EQUAL((size_t)1u, f.tag()->attributeListMap()["WM/TrackNumber"].size());
     CPPUNIT_ASSERT_EQUAL(String("2"), f.tag()->attributeListMap()["WM/TrackNumber"].front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("2"), tags["TRACKNUMBER"]);
 
     CPPUNIT_ASSERT(f.tag()->attributeListMap().contains("WM/PartOfSet"));
-    CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/PartOfSet"].size());
+    CPPUNIT_ASSERT_EQUAL((size_t)1u, f.tag()->attributeListMap()["WM/PartOfSet"].size());
     CPPUNIT_ASSERT_EQUAL(String("3"), f.tag()->attributeListMap()["WM/PartOfSet"].front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("3"), tags["DISCNUMBER"]);
   }

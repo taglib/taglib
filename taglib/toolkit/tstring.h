@@ -26,12 +26,8 @@
 #ifndef TAGLIB_STRING_H
 #define TAGLIB_STRING_H
 
-#include "taglib_export.h"
-#include "taglib.h"
 #include "tbytevector.h"
-
 #include <string>
-#include <iostream>
 
 /*!
  * \relates TagLib::String
@@ -62,7 +58,7 @@ namespace TagLib {
 
   /*!
    * This is an implicitly shared \e wide string.  For storage it uses
-   * TagLib::wstring, but as this is an <i>implementation detail</i> this of
+   * TagLib::std::wstring, but as this is an <i>implementation detail</i> this of
    * course could change.  Strings are stored internally as UTF-16(without BOM/
    * CPU byte order)
    *
@@ -98,8 +94,7 @@ namespace TagLib {
        */
       UTF16 = 1,
       /*!
-       * UTF16 <i>big endian</i>.  16 bit characters.  This is the encoding used
-       * internally by TagLib.
+       * UTF16 <i>big endian</i>.  16 bit characters.  
        */
       UTF16BE = 2,
       /*!
@@ -135,7 +130,7 @@ namespace TagLib {
     /*!
      * Makes a deep copy of the data in \a s.
      */
-    String(const wstring &s, Type t = WCharByteOrder);
+    String(const std::wstring &s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a s.
@@ -191,7 +186,7 @@ namespace TagLib {
      *
      * \see toCWString()
      */
-    wstring toWString() const;
+    const std::wstring &toWString() const;
 
     /*!
      * Creates and returns a standard C-style (null-terminated) version of this 
@@ -255,16 +250,16 @@ namespace TagLib {
 
     /*!
      * Finds the first occurrence of pattern \a s in this string starting from
-     * \a offset.  If the pattern is not found, -1 is returned.
+     * \a offset.  If the pattern is not found, \a npos is returned.
      */
-    int find(const String &s, int offset = 0) const;
+    size_t find(const String &s, size_t offset = 0) const;
 
     /*!
      * Finds the last occurrence of pattern \a s in this string, searched backwards,
      * either from the end of the string or starting from \a offset. If the pattern
-     * is not found, -1 is returned.
+     * is not found, \a npos is returned.
      */
-    int rfind(const String &s, int offset = -1) const;
+    size_t rfind(const String &s, size_t offset = npos) const;
 
     /*!
      * Splits the string on each occurrence of \a separator.
@@ -280,7 +275,7 @@ namespace TagLib {
      * Extract a substring from this string starting at \a position and
      * continuing for \a n characters.
      */
-    String substr(uint position, uint n = 0xffffffff) const;
+    String substr(size_t position, size_t n = npos) const;
 
     /*!
      * Append \a s to the current string and return a reference to the current
@@ -298,12 +293,12 @@ namespace TagLib {
     /*!
      * Returns the size of the string.
      */
-    uint size() const;
+    size_t size() const;
 
     /*!
      * Returns the length of the string.  Equivalent to size().
      */
-    uint length() const;
+    size_t length() const;
 
     /*!
      * Returns true if the string is empty.
@@ -331,20 +326,11 @@ namespace TagLib {
     /*!
      * Convert the string to an integer.
      *
-     * Returns the integer if the conversion was successful or 0 if the
-     * string does not represent a number.
-     */
-    // BIC: merge with the method below
-    int toInt() const;
-
-    /*!
-     * Convert the string to an integer.
-     *
      * If the conversion was successfull, it sets the value of \a *ok to
      * true and returns the integer. Otherwise it sets \a *ok to false
      * and the result is undefined.
      */
-    int toInt(bool *ok) const;
+    int toInt(bool *ok = 0) const;
 
     /*!
      * Returns a string with the leading and trailing whitespace stripped.
@@ -369,18 +355,30 @@ namespace TagLib {
     /*!
      * Returns a reference to the character at position \a i.
      */
-    wchar &operator[](int i);
+    wchar &operator[](size_t i);
 
     /*!
      * Returns a const reference to the character at position \a i.
      */
-    const wchar &operator[](int i) const;
+    const wchar &operator[](size_t i) const;
+
+    /*!
+     * Compares each character of the String with each character in \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const String &s) const;
+
+    /*!
+     * Compares each character of the String with each character in \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const char *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
      * returns true if the strings match.
      */
-    bool operator==(const String &s) const;
+    bool operator==(const wchar_t *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
@@ -427,7 +425,7 @@ namespace TagLib {
     /*!
      * Performs a deep copy of the data in \a s.
      */
-    String &operator=(const wstring &s);
+    String &operator=(const std::wstring &s);
 
     /*!
      * Performs a deep copy of the data in \a s.
@@ -464,7 +462,14 @@ namespace TagLib {
     /*!
      * A null string provided for convenience.
      */
-    static String null;
+    static const String null;
+
+    /*!
+    * When used as the value for a \a length parameter in String's member 
+    * functions, means "until the end of the string".
+    * As a return value, it is usually used to indicate no matches.
+    */
+    static const size_t npos;
 
   protected:
     /*!
@@ -498,7 +503,7 @@ namespace TagLib {
      * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
      */
     void copyFromUTF16(const char *s, size_t length, Type t);
-    
+
     /*!
      * Indicates which byte order of UTF-16 is used to store strings internally. 
      *
@@ -509,35 +514,36 @@ namespace TagLib {
     class StringPrivate;
     StringPrivate *d;
   };
+
+  /*!
+   * \relates TagLib::String
+   *
+   * Concatenates \a s1 and \a s2 and returns the result as a string.
+   */
+  TAGLIB_EXPORT const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2);
+
+  /*!
+   * \relates TagLib::String
+   *
+   * Concatenates \a s1 and \a s2 and returns the result as a string.
+   */
+  TAGLIB_EXPORT const TagLib::String operator+(const char *s1, const TagLib::String &s2);
+
+  /*!
+   * \relates TagLib::String
+   *
+   * Concatenates \a s1 and \a s2 and returns the result as a string.
+   */
+  TAGLIB_EXPORT const TagLib::String operator+(const TagLib::String &s1, const char *s2);
+
+
+  /*!
+   * \relates TagLib::String
+   *
+   * Send the string to an output stream.
+   */
+  TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::String &str);
 }
 
-/*!
- * \relates TagLib::String
- *
- * Concatenates \a s1 and \a s2 and returns the result as a string.
- */
-TAGLIB_EXPORT const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2);
-
-/*!
- * \relates TagLib::String
- *
- * Concatenates \a s1 and \a s2 and returns the result as a string.
- */
-TAGLIB_EXPORT const TagLib::String operator+(const char *s1, const TagLib::String &s2);
-
-/*!
- * \relates TagLib::String
- *
- * Concatenates \a s1 and \a s2 and returns the result as a string.
- */
-TAGLIB_EXPORT const TagLib::String operator+(const TagLib::String &s1, const char *s2);
-
-
-/*!
- * \relates TagLib::String
- *
- * Send the string to an output stream.
- */
-TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::String &str);
-
 #endif
+

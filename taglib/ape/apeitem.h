@@ -61,7 +61,6 @@ namespace TagLib {
       /*!
        * Constructs a text item with \a key and \a value.
        */
-      // BIC: Remove this, StringList has a constructor from a single string
       Item(const String &key, const String &value);
 
       /*!
@@ -106,11 +105,6 @@ namespace TagLib {
       * The item's type will also be set to \a Binary
       */
       void setBinaryData(const ByteVector &value);
-
-#ifndef DO_NOT_DOCUMENT
-      /* Remove in next binary incompatible release */
-      ByteVector value() const;
-#endif
 
       /*!
        * Sets the key for the item to \a key.
@@ -157,11 +151,6 @@ namespace TagLib {
        * an empty String.
        */
       String toString() const;
-
-#ifndef DO_NOT_DOCUMENT
-      /* Remove in next binary incompatible release */
-      StringList toStringList() const;
-#endif
 
       /*!
        * Returns the list of text values.  If the data type is not \a Text, always 

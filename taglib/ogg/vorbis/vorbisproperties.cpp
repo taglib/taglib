@@ -33,12 +33,10 @@
 
 using namespace TagLib;
 
-class Vorbis::Properties::PropertiesPrivate
+class Ogg::Vorbis::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -48,8 +46,6 @@ public:
     bitrateNominal(0),
     bitrateMinimum(0) {}
 
-  File *file;
-  ReadStyle style;
   int length;
   int bitrate;
   int sampleRate;
@@ -65,119 +61,128 @@ namespace TagLib {
    * Vorbis headers can be found with one type ID byte and the string "vorbis" in
    * an Ogg stream.  0x01 indicates the setup header.
    */
-  static const char vorbisSetupHeaderID[] = { 0x01, 'v', 'o', 'r', 'b', 'i', 's', 0 };
+  const char vorbisSetupHeaderID[] = { 0x01, 'v', 'o', 'r', 'b', 'i', 's', 0 };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Vorbis::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+Ogg::Vorbis::AudioProperties::AudioProperties(File *file, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-  read();
+  read(file);
 }
 
-Vorbis::Properties::~Properties()
+Ogg::Vorbis::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int Vorbis::Properties::length() const
+int Ogg::Vorbis::AudioProperties::length() const
 {
   return d->length;
 }
 
-int Vorbis::Properties::bitrate() const
+int Ogg::Vorbis::AudioProperties::bitrate() const
 {
   return int(float(d->bitrate) / float(1000) + 0.5);
 }
 
-int Vorbis::Properties::sampleRate() const
+int Ogg::Vorbis::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int Vorbis::Properties::channels() const
+int Ogg::Vorbis::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int Vorbis::Properties::vorbisVersion() const
+int Ogg::Vorbis::AudioProperties::vorbisVersion() const
 {
   return d->vorbisVersion;
 }
 
-int Vorbis::Properties::bitrateMaximum() const
+int Ogg::Vorbis::AudioProperties::bitrateMaximum() const
 {
   return d->bitrateMaximum;
 }
 
-int Vorbis::Properties::bitrateNominal() const
+int Ogg::Vorbis::AudioProperties::bitrateNominal() const
 {
   return d->bitrateNominal;
 }
 
-int Vorbis::Properties::bitrateMinimum() const
+int Ogg::Vorbis::AudioProperties::bitrateMinimum() const
 {
   return d->bitrateMinimum;
+}
+
+String Ogg::Vorbis::AudioProperties::toString() const
+{
+  StringList desc;
+  desc.append("Ogg Vorbis audio (version " + String::number(vorbisVersion()) + ")");
+  desc.append(String::number(length()) + " seconds");
+  desc.append(String::number(bitrate()) + " kbps");
+  return desc.toString(", ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Vorbis::Properties::read()
+void Ogg::Vorbis::AudioProperties::read(File *file)
 {
   // Get the identification header from the Ogg implementation.
 
-  ByteVector data = d->file->packet(0);
+  const ByteVector data = file->packet(0);
 
-  uint pos = 0;
+  size_t pos = 0;
 
   if(data.mid(pos, 7) != vorbisSetupHeaderID) {
-    debug("Vorbis::Properties::read() -- invalid Vorbis identification header");
+    debug("Ogg::Vorbis::Properties::read() -- invalid Ogg::Vorbis identification header");
     return;
   }
 
   pos += 7;
 
-  d->vorbisVersion = data.toUInt(pos, false);
+  d->vorbisVersion = data.toUInt32LE(pos);
   pos += 4;
 
   d->channels = uchar(data[pos]);
   pos += 1;
 
-  d->sampleRate = data.toUInt(pos, false);
+  d->sampleRate = data.toUInt32LE(pos);
   pos += 4;
 
-  d->bitrateMaximum = data.toUInt(pos, false);
+  d->bitrateMaximum = data.toUInt32LE(pos);
   pos += 4;
 
-  d->bitrateNominal = data.toUInt(pos, false);
+  d->bitrateNominal = data.toUInt32LE(pos);
   pos += 4;
 
-  d->bitrateMinimum = data.toUInt(pos, false);
+  d->bitrateMinimum = data.toUInt32LE(pos);
 
   // TODO: Later this should be only the "fast" mode.
   d->bitrate = d->bitrateNominal;
 
-  // Find the length of the file.  See http://wiki.xiph.org/VorbisStreamLength/
+  // Find the length of the file.  See http://wiki.xiph.org/Ogg::VorbisStreamLength/
   // for my notes on the topic.
 
-  const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last = d->file->lastPageHeader();
+  const Ogg::PageHeader *first = file->firstPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
-    long long start = first->absoluteGranularPosition();
-    long long end = last->absoluteGranularPosition();
+    const long long start = first->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0 && d->sampleRate > 0)
       d->length = (int)((end - start) / (long long) d->sampleRate);
     else
-      debug("Vorbis::Properties::read() -- Either the PCM values for the start or "
+      debug("Ogg::Vorbis::Properties::read() -- Either the PCM values for the start or "
             "end of this file was incorrect or the sample rate is zero.");
   }
   else
-    debug("Vorbis::Properties::read() -- Could not find valid first and last Ogg pages.");
+    debug("Ogg::Vorbis::Properties::read() -- Could not find valid first and last Ogg pages.");
 }

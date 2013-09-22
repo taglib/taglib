@@ -31,6 +31,7 @@ using namespace TagLib;
 
 # include "tstring.h"
 # include "tdebug.h"
+# include "tsmartptr.h"
 # include <windows.h>
 
 namespace 
@@ -67,60 +68,87 @@ namespace
 
     return str;
   }
+
+  struct FileNameData
+  {
+    std::wstring wname;
+    std::string  name;
+  };
 }
 
-// If WinNT, stores a Unicode string into m_wname directly.
-// If Win9x, converts and stores it into m_name to avoid calling Unicode version functions.
-
-FileName::FileName(const wchar_t *name) 
-  : m_name (SystemSupportsUnicode ? "" : unicodeToAnsi(name))
-  , m_wname(SystemSupportsUnicode ? name : L"")
+class FileName::FileNamePrivate
 {
+public:
+  FileNamePrivate() 
+    : data(new FileNameData()) 
+  {
+  }
+
+  SHARED_PTR<FileNameData> data;
+};
+
+FileName::FileName()
+  : d(new FileNamePrivate())
+{
+}
+
+FileName::FileName(const wchar_t *name)
+  : d(new FileNamePrivate())
+{
+  // If WinNT, stores a Unicode string into wname directly.
+  // If Win9x, converts and stores it into name to avoid calling Unicode version functions.
+
+  if(SystemSupportsUnicode)
+    d->data->wname = name;
+  else
+    d->data->name = unicodeToAnsi(name);
 }
 
 FileName::FileName(const char *name) 
-  : m_name(name) 
+  : d(new FileNamePrivate())
 {
+  d->data->name = name;
 }
 
 FileName::FileName(const FileName &name) 
-  : m_name (name.m_name) 
-  , m_wname(name.m_wname)
+  : d(new FileNamePrivate())
 {
+  *d = *name.d;
 }
 
-FileName::operator const wchar_t *() const 
-{ 
-  return m_wname.c_str(); 
+FileName::~FileName()
+{
+  delete d;
 }
 
-FileName::operator const char *() const 
-{ 
-  return m_name.c_str(); 
+FileName &FileName::operator=(const FileName &name)
+{
+  *d = *name.d;
+  return *this;
 }
 
 const std::wstring &FileName::wstr() const 
 { 
-  return m_wname; 
+  return d->data->wname; 
 }
 
 const std::string &FileName::str() const 
 { 
-  return m_name; 
+  return d->data->name;
 }  
 
 String FileName::toString() const
 {
-  if(!m_wname.empty()) {
-    return String(m_wname);
+  if(!d->data->wname.empty()) {
+    return String(d->data->wname);
   } 
-  else if(!m_name.empty()) {
-    const int len = MultiByteToWideChar(CP_ACP, 0, m_name.c_str(), -1, NULL, 0);
+  else if(!d->data->name.empty()) {
+    const int len = MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, NULL, 0);
     if(len == 0)
       return String::null;
 
     std::vector<wchar_t> buf(len);
-    MultiByteToWideChar(CP_ACP, 0, m_name.c_str(), -1, &buf[0], len);
+    MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, &buf[0], len);
 
     return String(&buf[0]);
   }

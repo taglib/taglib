@@ -49,7 +49,7 @@ public:
   TagPrivate() : file(0), footerLocation(-1), tagLength(0) {}
 
   TagLib::File *file;
-  long footerLocation;
+  offset_t footerLocation;
   long tagLength;
 
   Footer footer;
@@ -66,7 +66,7 @@ APE::Tag::Tag() : TagLib::Tag()
   d = new TagPrivate;
 }
 
-APE::Tag::Tag(TagLib::File *file, long footerLocation) : TagLib::Tag()
+APE::Tag::Tag(TagLib::File *file, offset_t footerLocation) : TagLib::Tag()
 {
   d = new TagPrivate;
   d->file = file;
@@ -175,14 +175,17 @@ void APE::Tag::setTrack(uint i)
     addValue("TRACK", String::number(i), true);
 }
 
-// conversions of tag keys between what we use in PropertyMap and what's usual
-// for APE tags
-static const TagLib::uint keyConversionsSize = 5; //usual,         APE
-static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
-                                           {"DATE",        "YEAR"        },
-                                           {"ALBUMARTIST", "ALBUM ARTIST"},
-                                           {"DISCNUMBER",  "DISC"        },
-                                           {"REMIXER",     "MIXARTIST"   }};
+namespace
+{
+  // conversions of tag keys between what we use in PropertyMap and what's usual
+  // for APE tags
+  static const TagLib::uint keyConversionsSize = 5; //usual,         APE
+  static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
+                                             {"DATE",        "YEAR"        },
+                                             {"ALBUMARTIST", "ALBUM ARTIST"},
+                                             {"DISCNUMBER",  "DISC"        },
+                                             {"REMIXER",     "MIXARTIST"   }};
+}
 
 PropertyMap APE::Tag::properties() const
 {
@@ -199,7 +202,7 @@ PropertyMap APE::Tag::properties() const
       for(uint i = 0; i < keyConversionsSize; ++i)
         if(tagName == keyConversions[i][1])
           tagName = keyConversions[i][0];
-        properties[tagName].append(it->second.toStringList());
+        properties[tagName].append(it->second.values());
     }
   }
   return properties;
@@ -360,7 +363,7 @@ ByteVector APE::Tag::render() const
   }
 
   d->footer.setItemCount(itemCount);
-  d->footer.setTagSize(data.size() + Footer::size());
+  d->footer.setTagSize(static_cast<uint>(data.size() + Footer::size()));
   d->footer.setHeaderPresent(true);
 
   return d->footer.renderHeader() + data + d->footer.renderFooter();

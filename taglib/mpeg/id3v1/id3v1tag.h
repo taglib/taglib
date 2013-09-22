@@ -28,6 +28,7 @@
 
 #include "tag.h"
 #include "tbytevector.h"
+#include "tstringhandler.h"
 #include "taglib_export.h"
 
 namespace TagLib {
@@ -45,10 +46,10 @@ namespace TagLib {
      * practice it does not.  TagLib by default only supports ISO-8859-1 data
      * in ID3v1 tags.
      *
-     * However by subclassing this class and reimplementing parse() and render()
-     * and setting your reimplementation as the default with
-     * ID3v1::Tag::setStringHandler() you can define how you would like these
-     * transformations to be done.
+     * However by subclassing TagLib::StringHandler class and reimplementing 
+     * parse() and render() and setting your reimplementation as the default 
+     * with ID3v1::Tag::setStringHandler() you can define how you would like 
+     * these transformations to be done.
      *
      * \warning It is advisable <b>not</b> to write non-ISO-8859-1 data to ID3v1
      * tags.  Please consider disabling the writing of ID3v1 tags in the case
@@ -57,11 +58,9 @@ namespace TagLib {
      * \see ID3v1::Tag::setStringHandler()
      */
 
-    class TAGLIB_EXPORT StringHandler
+    class TAGLIB_EXPORT StringHandler : public TagLib::StringHandler
     {
-      TAGLIB_IGNORE_MISSING_DESTRUCTOR
     public:
-      // BIC: Add virtual destructor.
       StringHandler();
 
       /*!
@@ -114,7 +113,7 @@ namespace TagLib {
        * Create an ID3v1 tag and parse the data in \a file starting at
        * \a tagOffset.
        */
-      Tag(File *file, long tagOffset);
+      Tag(File *file, offset_t tagOffset);
 
       /*!
        * Destroys this Tag instance.
@@ -177,7 +176,7 @@ namespace TagLib {
        *
        * \see StringHandler
        */
-      static void setStringHandler(const StringHandler *handler);
+      static void setStringHandler(const TagLib::StringHandler *handler);
 
     protected:
       /*!

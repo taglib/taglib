@@ -1,6 +1,6 @@
 /***************************************************************************
     copyright            : (C) 2012 by Tsuda Kageyu
-    email                : wheeler@kde.org
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -31,14 +31,15 @@
 using namespace TagLib;
 using namespace RIFF::Info;
 
-namespace {
-  static bool isValidChunkID(const ByteVector &name)
+namespace 
+{
+  bool isValidChunkID(const ByteVector &name)
   {
     if(name.size() != 4)
       return false;
 
     for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || name[i] > 127)
+      if(name[i] < 32 || 127 < name[i])
         return false;
     }
 
@@ -54,18 +55,21 @@ public:
 
   FieldListMap fieldListMap;
 
-  static const StringHandler *stringHandler;
+  static const TagLib::StringHandler *stringHandler;
 };
+
+namespace
+{
+  const RIFF::Info::StringHandler defaultStringHandler;
+}
+
+const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-StringHandler::StringHandler()
-{
-}
-
-StringHandler::~StringHandler()
+RIFF::Info::StringHandler::StringHandler()
 {
 }
 
@@ -82,9 +86,6 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
-
-static const StringHandler defaultStringHandler;
-const RIFF::Info::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
 RIFF::Info::Tag::Tag(const ByteVector &data) 
   : TagLib::Tag()
@@ -195,7 +196,7 @@ String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
 {
-  // id must be four-byte long pure ascii string.
+  // id must be four-byte long pure ASCII string.
   if(!isValidChunkID(id))
     return;
 
@@ -222,7 +223,7 @@ ByteVector RIFF::Info::Tag::render() const
       continue;
 
     data.append(it->first);
-    data.append(ByteVector::fromUInt(text.size() + 1, false));
+    data.append(ByteVector::fromUInt32LE(text.size() + 1));
     data.append(text);
     
     do {
@@ -236,7 +237,7 @@ ByteVector RIFF::Info::Tag::render() const
     return data;
 }
 
-void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)
+void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
     TagPrivate::stringHandler = handler;
@@ -250,9 +251,9 @@ void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)
 
 void RIFF::Info::Tag::parse(const ByteVector &data)
 {
-  uint p = 4;
+  size_t p = 4;
   while(p < data.size()) {
-    const uint size = data.toUInt(p + 4, false);
+    const uint size = data.toUInt32LE(p + 4);
     d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
 
     p += ((size + 1) & ~1) + 8;

@@ -29,7 +29,6 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-
 #include <oggpageheader.h>
 
 #include "opusproperties.h"
@@ -38,19 +37,15 @@
 using namespace TagLib;
 using namespace TagLib::Ogg;
 
-class Opus::Properties::PropertiesPrivate
+class Opus::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     inputSampleRate(0),
     channels(0),
     opusVersion(0) {}
 
-  File *file;
-  ReadStyle style;
   int length;
   int inputSampleRate;
   int channels;
@@ -61,28 +56,28 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Opus::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+Opus::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-  read();
+  read(file);
 }
 
-Opus::Properties::~Properties()
+Opus::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int Opus::Properties::length() const
+int Opus::AudioProperties::length() const
 {
   return d->length;
 }
 
-int Opus::Properties::bitrate() const
+int Opus::AudioProperties::bitrate() const
 {
   return 0;
 }
 
-int Opus::Properties::sampleRate() const
+int Opus::AudioProperties::sampleRate() const
 {
   // Opus can decode any stream at a sample rate of 8, 12, 16, 24, or 48 kHz,
   // so there is no single sample rate. Let's assume it's the highest
@@ -90,17 +85,17 @@ int Opus::Properties::sampleRate() const
   return 48000;
 }
 
-int Opus::Properties::channels() const
+int Opus::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int Opus::Properties::inputSampleRate() const
+int Opus::AudioProperties::inputSampleRate() const
 {
   return d->inputSampleRate;
 }
 
-int Opus::Properties::opusVersion() const
+int Opus::AudioProperties::opusVersion() const
 {
   return d->opusVersion;
 }
@@ -109,16 +104,16 @@ int Opus::Properties::opusVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Opus::Properties::read()
+void Opus::AudioProperties::read(File *file)
 {
   // Get the identification header from the Ogg implementation.
 
   // http://tools.ietf.org/html/draft-terriberry-oggopus-01#section-5.1
 
-  ByteVector data = d->file->packet(0);
+  const ByteVector data = file->packet(0);
 
   // *Magic Signature*
-  uint pos = 8;
+  size_t pos = 8;
 
   // *Version* (8 bits, unsigned)
   d->opusVersion = uchar(data.at(pos));
@@ -129,11 +124,11 @@ void Opus::Properties::read()
   pos += 1;
 
   // *Pre-skip* (16 bits, unsigned, little endian)
-  const ushort preSkip = data.toUShort(pos, false);
+  const ushort preSkip = data.toUInt16LE(pos);
   pos += 2;
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)
-  d->inputSampleRate = data.toUInt(pos, false);
+  d->inputSampleRate = data.toUInt32LE(pos);
   pos += 4;
 
   // *Output Gain* (16 bits, signed, little endian)
@@ -142,12 +137,12 @@ void Opus::Properties::read()
   // *Channel Mapping Family* (8 bits, unsigned)
   pos += 1;
 
-  const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last = d->file->lastPageHeader();
+  const Ogg::PageHeader *first = file->firstPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
-    long long start = first->absoluteGranularPosition();
-    long long end = last->absoluteGranularPosition();
+    const long long start = first->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0)
       d->length = (int) ((end - start - preSkip) / 48000);

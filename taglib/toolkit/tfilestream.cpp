@@ -45,7 +45,7 @@ namespace
   typedef FileName FileNameHandle;
   typedef HANDLE FileHandle;
 
-  const TagLib::uint BufferSize = 8192;
+  const size_t BufferSize = 8192;
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -93,7 +93,7 @@ namespace
 
   typedef FILE* FileHandle;
 
-  const TagLib::uint BufferSize = 8192;
+  const size_t BufferSize = 1024;
   const FileHandle InvalidFileHandle = 0;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -174,7 +174,7 @@ FileName FileStream::name() const
   return d->name;
 }
 
-ByteVector FileStream::readBlock(ulong length)
+ByteVector FileStream::readBlock(size_t length)
 {
   if(!isOpen()) {
     debug("File::readBlock() -- invalid file.");
@@ -184,14 +184,14 @@ ByteVector FileStream::readBlock(ulong length)
   if(length == 0)
     return ByteVector::null;
 
-  const ulong streamLength = static_cast<ulong>(FileStream::length());
-  if(length > bufferSize() && length > streamLength)
-    length = streamLength;
+  const offset_t streamLength = FileStream::length();
+  if(length > BufferSize && static_cast<offset_t>(length) > streamLength)
+    length = static_cast<size_t>(streamLength);
 
-  ByteVector buffer(static_cast<uint>(length));
+  ByteVector buffer(length);
 
   const size_t count = readFile(d->file, buffer);
-  buffer.resize(static_cast<uint>(count));
+  buffer.resize(count);
   
   return buffer;
 }
@@ -211,7 +211,7 @@ void FileStream::writeBlock(const ByteVector &data)
   writeFile(d->file, data);
 }
 
-void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
+void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
 {
   if(!isOpen()) {
     debug("File::insert() -- invalid file.");
@@ -245,18 +245,18 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  ulong bufferLength = bufferSize();
+  size_t bufferLength = BufferSize;
 
   while(data.size() - replace > bufferLength)
-    bufferLength += bufferSize();
+    bufferLength += BufferSize;
 
   // Set where to start the reading and writing.
 
-  long readPosition = start + replace;
-  long writePosition = start;
+  offset_t readPosition  = start + replace;
+  offset_t writePosition = start;
 
   ByteVector buffer = data;
-  ByteVector aboutToOverwrite(static_cast<uint>(bufferLength));
+  ByteVector aboutToOverwrite(bufferLength);
 
   while(true)
   {
@@ -293,19 +293,19 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   }
 }
 
-void FileStream::removeBlock(ulong start, ulong length)
+void FileStream::removeBlock(offset_t start, size_t length)
 {
   if(!isOpen()) {
     debug("File::removeBlock() -- invalid file.");
     return;
   }
 
-  ulong bufferLength = bufferSize();
+  size_t bufferLength = BufferSize;
 
-  long readPosition = start + length;
-  long writePosition = start;
+  offset_t readPosition  = start + length;
+  offset_t writePosition = start;
 
-  ByteVector buffer(static_cast<uint>(bufferLength));
+  ByteVector buffer(bufferLength, 0);
 
   for(size_t bytesRead = -1; bytesRead != 0;)
   {
@@ -340,7 +340,7 @@ bool FileStream::isOpen() const
   return (d->file != InvalidFileHandle);
 }
 
-void FileStream::seek(long offset, Position p)
+void FileStream::seek(offset_t offset, Position p)
 {
   if(!isOpen()) {
     debug("File::seek() -- invalid file.");
@@ -365,7 +365,10 @@ void FileStream::seek(long offset, Position p)
     return;
   }
 
-  SetFilePointer(d->file, offset, NULL, whence);
+  LARGE_INTEGER liOffset;
+  liOffset.QuadPart = offset;
+
+  SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
   if(GetLastError() != NO_ERROR) {
     debug("File::seek() -- Failed to set the file pointer.");
   }
@@ -388,7 +391,15 @@ void FileStream::seek(long offset, Position p)
     return;
   }
 
-  fseek(d->file, offset, whence);
+# ifdef _LARGEFILE_SOURCE
+
+  fseeko(d->file, offset, whence);
+
+# else
+
+  fseek(d->file, static_cast<long>(offset), whence);
+
+# endif 
 
 #endif
 }
@@ -406,13 +417,17 @@ void FileStream::clear()
 #endif
 }
 
-long FileStream::tell() const
+offset_t FileStream::tell() const
 {
 #ifdef _WIN32
 
-  const DWORD position = SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
+  LARGE_INTEGER position;
+  position.QuadPart = 0;
+
+  position.LowPart = SetFilePointer(
+    d->file, position.LowPart, &position.HighPart, FILE_CURRENT);
   if(GetLastError() == NO_ERROR) {
-    return static_cast<long>(position);
+    return position.QuadPart;
   }
   else {
     debug("File::tell() -- Failed to get the file pointer.");
@@ -421,12 +436,20 @@ long FileStream::tell() const
 
 #else
 
-  return ftell(d->file);
+# ifdef _LARGEFILE_SOURCE
+
+  return ftello(d->file);
+
+# else
+
+  return static_cast<offset_t>(ftell(d->file));
+
+# endif 
 
 #endif
 }
 
-long FileStream::length()
+offset_t FileStream::length()
 {
   if(!isOpen()) {
     debug("File::length() -- invalid file.");
@@ -435,9 +458,12 @@ long FileStream::length()
 
 #ifdef _WIN32
 
-  const DWORD fileSize = GetFileSize(d->file, NULL);
+  LARGE_INTEGER fileSize;
+  fileSize.QuadPart = 0;
+
+  fileSize.LowPart = GetFileSize(d->file, reinterpret_cast<LPDWORD>(&fileSize.HighPart));
   if(GetLastError() == NO_ERROR) {
-    return static_cast<ulong>(fileSize);
+    return fileSize.QuadPart;
   }
   else {
     debug("File::length() -- Failed to get the file size.");
@@ -446,27 +472,32 @@ long FileStream::length()
 
 #else
 
-  const long curpos = tell();
+  const offset_t currentPosition = tell();
 
   seek(0, End);
-  const long endpos = tell();
+  offset_t endPosition = tell();
 
-  seek(curpos, Beginning);
+  seek(currentPosition, Beginning);
 
-  return endpos;
+  return endPosition;
 
 #endif
+}
+
+size_t FileStream::bufferSize()
+{
+  return BufferSize;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FileStream::truncate(long length)
+void FileStream::truncate(offset_t length)
 {
 #ifdef _WIN32
 
-  const long currentPos = tell();
+  const offset_t currentPos = tell();
 
   seek(length);
   SetEndOfFile(d->file);
@@ -484,9 +515,4 @@ void FileStream::truncate(long length)
   }
 
 #endif
-}
-
-TagLib::uint FileStream::bufferSize()
-{
-  return BufferSize;
 }

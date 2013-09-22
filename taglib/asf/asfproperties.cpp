@@ -29,10 +29,16 @@
 
 using namespace TagLib;
 
-class ASF::Properties::PropertiesPrivate
+class ASF::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(): length(0), bitrate(0), sampleRate(0), channels(0), encrypted(false) {}
+  PropertiesPrivate() : 
+    length(0), 
+    bitrate(0), 
+    sampleRate(0), 
+    channels(0), 
+    encrypted(false) {}
+
   int length;
   int bitrate;
   int sampleRate;
@@ -44,38 +50,37 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::Properties::Properties() : AudioProperties(AudioProperties::Average)
+ASF::AudioProperties::AudioProperties() :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
 }
 
-ASF::Properties::~Properties()
+ASF::AudioProperties::~AudioProperties()
 {
-  if(d)
-    delete d;
+  delete d;
 }
 
-int ASF::Properties::length() const
+int ASF::AudioProperties::length() const
 {
   return d->length;
 }
 
-int ASF::Properties::bitrate() const
+int ASF::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int ASF::Properties::sampleRate() const
+int ASF::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int ASF::Properties::channels() const
+int ASF::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-bool ASF::Properties::isEncrypted() const
+bool ASF::AudioProperties::isEncrypted() const
 {
   return d->encrypted;
 }
@@ -84,27 +89,27 @@ bool ASF::Properties::isEncrypted() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ASF::Properties::setLength(int length)
+void ASF::AudioProperties::setLength(int length)
 {
   d->length = length;
 }
 
-void ASF::Properties::setBitrate(int length)
+void ASF::AudioProperties::setBitrate(int length)
 {
   d->bitrate = length;
 }
 
-void ASF::Properties::setSampleRate(int length)
+void ASF::AudioProperties::setSampleRate(int length)
 {
   d->sampleRate = length;
 }
 
-void ASF::Properties::setChannels(int length)
+void ASF::AudioProperties::setChannels(int length)
 {
   d->channels = length;
 }
 
-void ASF::Properties::setEncrypted(bool encrypted)
+void ASF::AudioProperties::setEncrypted(bool encrypted)
 {
   d->encrypted = encrypted;
 }

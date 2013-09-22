@@ -48,28 +48,18 @@ namespace TagLib {
      * API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
-       * Create an instance of WavPack::Properties with the data read from the
-       * ByteVector \a data.
-       *
-       * \deprecated This constructor will be dropped in favor of the one below
-       * in a future version.
+       * Creates an instance of WavPack::AudioProperties.
        */
-      Properties(const ByteVector &data, long streamLength, ReadStyle style = Average);
+      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
-       * Create an instance of WavPack::Properties.
+       * Destroys this WavPack::AudioProperties instance.
        */
-      // BIC: merge with the above constructor
-      Properties(File *file, long streamLength, ReadStyle style = Average);
-
-      /*!
-       * Destroys this WavPack::Properties instance.
-       */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -90,11 +80,8 @@ namespace TagLib {
       int version() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
-
-      void read();
-      unsigned int seekFinalIndex();
+      void read(File *file, offset_t streamLength, ReadStyle style);
+      unsigned int seekFinalIndex(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

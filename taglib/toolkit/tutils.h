@@ -145,12 +145,6 @@ namespace TagLib
 #endif
     }
 
-    enum ByteOrder
-    {
-      LittleEndian,
-      BigEndian
-    };
-
 #ifdef SYSTEM_BYTEORDER
 
 # if SYSTEM_BYTEORDER == 1

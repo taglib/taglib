@@ -26,9 +26,8 @@
 #ifndef TAGLIB_MAP_H
 #define TAGLIB_MAP_H
 
-#include <map>
-
 #include "taglib.h"
+#include <map>
 
 namespace TagLib {
 
@@ -42,7 +41,7 @@ namespace TagLib {
 
   template <class Key, class T> class Map
   {
-  public:
+  private:
 #ifndef DO_NOT_DOCUMENT
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
     // Some STL implementations get snippy over the use of the
@@ -53,12 +52,16 @@ namespace TagLib {
     // Not all the specializations of Map can use the class keyword
     // (when T is not actually a class type), so don't apply this
     // generally.
-    typedef typename std::map<class Key, class T>::iterator Iterator;
-    typedef typename std::map<class Key, class T>::const_iterator ConstIterator;
+    typedef std::map<class Key, class T> MapType;
 #else
-    typedef typename std::map<Key, T>::iterator Iterator;
-    typedef typename std::map<Key, T>::const_iterator ConstIterator;
+    typedef std::map<Key, T> MapType;
 #endif
+#endif
+
+ public:
+#ifndef DO_NOT_DOCUMENT
+    typedef typename MapType::iterator Iterator;
+    typedef typename MapType::const_iterator ConstIterator;
 #endif
 
     /*!
@@ -119,7 +122,7 @@ namespace TagLib {
      *
      * \see isEmpty()
      */
-    uint size() const;
+    size_t size() const;
 
     /*!
      * Returns true if the map is empty.
@@ -188,7 +191,6 @@ namespace TagLib {
     MapPrivate<Key, T> *d;
 #endif
   };
-
 }
 
 // Since GCC doesn't support the "export" keyword, we have to include the

@@ -23,30 +23,23 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "wavproperties.h"
-
 #include <tstring.h>
 #include <tdebug.h>
-#include <cmath>
-#include <math.h>
+#include "wavproperties.h"
 
 using namespace TagLib;
 
-class RIFF::WAV::Properties::PropertiesPrivate
+class RIFF::WAV::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(uint streamLength = 0) :
+  PropertiesPrivate() :
     format(0),
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
     sampleWidth(0),
-    sampleFrames(0),
-    streamLength(streamLength)
-  {
-
-  }
+    sampleFrames(0) {}
 
   short format;
   int length;
@@ -55,75 +48,81 @@ public:
   int channels;
   int sampleWidth;
   uint sampleFrames;
-  uint streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength, 
+                                            ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate();
-  read(data);
+  read(data, streamLength);
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) : AudioProperties(style)
-{
-  d = new PropertiesPrivate(streamLength);
-  read(data);
-}
-
-RIFF::WAV::Properties::~Properties()
+RIFF::WAV::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int RIFF::WAV::Properties::length() const
+int RIFF::WAV::AudioProperties::length() const
 {
   return d->length;
 }
 
-int RIFF::WAV::Properties::bitrate() const
+int RIFF::WAV::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int RIFF::WAV::Properties::sampleRate() const
+int RIFF::WAV::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int RIFF::WAV::Properties::channels() const
+int RIFF::WAV::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-int RIFF::WAV::Properties::sampleWidth() const
+int RIFF::WAV::AudioProperties::sampleWidth() const
 {
   return d->sampleWidth;
 }
 
-TagLib::uint RIFF::WAV::Properties::sampleFrames() const
+TagLib::uint RIFF::WAV::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
+}
+
+TagLib::uint RIFF::WAV::AudioProperties::format() const
+{
+  return d->format;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::Properties::read(const ByteVector &data)
+void RIFF::WAV::AudioProperties::read(const ByteVector &data, uint streamLength)
 {
-  d->format      = data.toShort(0, false);
-  d->channels    = data.toShort(2, false);
-  d->sampleRate  = data.toUInt(4, false);
-  d->sampleWidth = data.toShort(14, false);
+  if(data.size() < 16) {
+    debug("RIFF::WAV::AudioProperties::read() - \"fmt \" chunk is too short.");
+    return;
+  }
 
-  const uint byteRate = data.toUInt(8, false);
+  d->format      = data.toInt16LE(0);
+  d->channels    = data.toInt16LE(2);
+  d->sampleRate  = data.toUInt32LE(4);
+  d->sampleWidth = data.toInt16LE(14);
+
+  const uint byteRate = data.toUInt32LE(8);
   d->bitrate = byteRate * 8 / 1000;
 
-  d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
-  if(d->channels > 0 && d->sampleWidth > 0)
-    d->sampleFrames = d->streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
+  d->length = byteRate > 0 ? streamLength / byteRate : 0;
+
+  // format ID 1 means uncompressed PCM.
+  if(d->format == 1 && d->channels > 0 && d->sampleWidth > 0)
+    d->sampleFrames = streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
 }

@@ -27,6 +27,7 @@
 #define TAGLIB_AUDIOPROPERTIES_H
 
 #include "taglib_export.h"
+#include "tstring.h"
 
 namespace TagLib {
 
@@ -86,23 +87,24 @@ namespace TagLib {
      */
     virtual int channels() const = 0;
 
+    /*!
+     * Returns description of the audio file.
+     */
+    virtual String toString() const;
+
   protected:
 
     /*!
-     * Construct an audio properties instance.  This is protected as this class
+     * Constructs an audio properties instance.  This is protected as this class
      * should not be instantiated directly, but should be instantiated via its
      * subclasses and can be fetched from the FileRef or File APIs.
-     *
-     * \see ReadStyle
      */
-    AudioProperties(ReadStyle style);
+    AudioProperties();
 
   private:
+    // Noncopyable. Derived classes as well.
     AudioProperties(const AudioProperties &);
     AudioProperties &operator=(const AudioProperties &);
-
-    class AudioPropertiesPrivate;
-    AudioPropertiesPrivate *d;
   };
 
 }

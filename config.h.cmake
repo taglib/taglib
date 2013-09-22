@@ -4,6 +4,11 @@
 /* 1 if little-endian, 2 if big-endian. */
 #cmakedefine   SYSTEM_BYTEORDER ${SYSTEM_BYTEORDER}
 
+/* Size of floating point types */
+#cmakedefine   SIZEOF_FLOAT      ${SIZEOF_FLOAT}
+#cmakedefine   SIZEOF_DOUBLE     ${SIZEOF_DOUBLE}
+#cmakedefine   SIZEOF_LONGDOUBLE ${SIZEOF_LONGDOUBLE}
+
 /* Defined if your compiler supports some byte swap functions */
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1
 #cmakedefine   HAVE_GCC_BYTESWAP_32 1
@@ -13,8 +18,14 @@
 #cmakedefine   HAVE_MAC_BYTESWAP 1
 #cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
-/* Defined if your compiler supports codecvt */
-#cmakedefine   HAVE_STD_CODECVT 1
+/* Defined if your compiler supports shared_ptr */
+#cmakedefine   HAVE_STD_SHARED_PTR 1    // #include <memory> / std::shared_ptr<T>
+#cmakedefine   HAVE_TR1_SHARED_PTR 1    // #include <tr1/memory> / std::tr1::shared_ptr<T>
+#cmakedefine   HAVE_BOOST_SHARED_PTR 1  // #include <boost/shared_ptr.hpp> / boost::shared_ptr<T>
+
+/* Defined if your compiler supports unique_ptr or scoped_ptr */
+#cmakedefine   HAVE_STD_UNIQUE_PTR 1    // #include <memory> / std::unique_ptr<T>
+#cmakedefine   HAVE_BOOST_SCOPED_PTR 1  // #include <boost/scoped_ptr.hpp> / boost::scoped_ptr<T>
 
 /* Defined if your compiler supports some atomic operations */
 #cmakedefine   HAVE_STD_ATOMIC 1
@@ -24,9 +35,15 @@
 #cmakedefine   HAVE_WIN_ATOMIC 1
 #cmakedefine   HAVE_IA64_ATOMIC 1
 
-/* Defined if your compiler supports some safer version of sprintf */
+/* Defined if your compiler supports snpritf or sprintf_s. */
 #cmakedefine   HAVE_SNPRINTF 1
 #cmakedefine   HAVE_SPRINTF_S 1
+
+/* Defined if your compiler supports ISO _strdup. */
+#cmakedefine   HAVE_ISO_STRDUP 1
+
+/* Defined if your compiler supports codecvt */
+#cmakedefine   HAVE_STD_CODECVT 1
 
 /* Defined if you have libz */
 #cmakedefine   HAVE_ZLIB 1
@@ -35,3 +52,4 @@
 #cmakedefine   TRACE_IN_RELEASE 1
 
 #cmakedefine TESTS_DIR "@TESTS_DIR@"
+
