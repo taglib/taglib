@@ -51,6 +51,7 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
+#include "dsffile.h"
 
 using namespace TagLib;
 
@@ -137,6 +138,8 @@ namespace
         file.reset(new IT::File(fileName, readAudioProperties, audioPropertiesStyle));
       else if(ext == "XM")
         file.reset(new XM::File(fileName, readAudioProperties, audioPropertiesStyle));
+      else if(ext == "DSF")
+        file.reset(new DSF::File(fileName, readAudioProperties, audioPropertiesStyle));
     }
 
     return file;
@@ -294,6 +297,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("s3m");
   l.append("it");
   l.append("xm");
+  l.append("dsf");
 
   return l;
 }

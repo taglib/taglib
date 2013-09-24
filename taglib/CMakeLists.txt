@@ -26,6 +26,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
   ${CMAKE_CURRENT_SOURCE_DIR}/ebml
   ${CMAKE_CURRENT_SOURCE_DIR}/ebml/matroska
+  ${CMAKE_CURRENT_SOURCE_DIR}/dsf
 )
 
 if(ZLIB_FOUND)
@@ -138,6 +139,8 @@ set(tag_HDRS
   ebml/matroska/ebmlmatroskafile.h
   ebml/matroska/ebmlmatroskaconstants.h
   ebml/matroska/ebmlmatroskaaudio.h
+  dsf/dsffile.h
+  dsf/dsfproperties.h
 )
 
 set(mpeg_SRCS
@@ -288,6 +291,11 @@ set(xm_SRCS
   xm/xmproperties.cpp
 )
 
+set(dsf_SRCS
+  dsf/dsffile.cpp
+  dsf/dsfproperties.cpp
+)
+
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
@@ -320,7 +328,7 @@ set(tag_LIB_SRCS
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${ebml_SRCS} ${matroska_SRCS}
+  ${ebml_SRCS} ${matroska_SRCS} ${dsf_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
