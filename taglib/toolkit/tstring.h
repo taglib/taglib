@@ -29,6 +29,10 @@
 #include "tbytevector.h"
 #include <string>
 
+#if __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 /*!
  * \relates TagLib::String
  *
@@ -132,6 +136,13 @@ namespace TagLib {
      */
     String(const std::wstring &s, Type t = WCharByteOrder);
 
+#if __APPLE__
+    /*!
+     * Creates a deep copy of the data in \a s
+     */
+    String(CFStringRef s);
+#endif
+
     /*!
      * Makes a deep copy of the data in \a s.
      */
@@ -225,7 +236,7 @@ namespace TagLib {
      * \see toWString()
      */
     const wchar_t *toCWString() const;
-    
+
     /*!
      * Returns an iterator pointing to the beginning of the string.
      */
