@@ -216,6 +216,23 @@ String::String(const std::wstring &s, Type t)
   }
 }
 
+#if __APPLE__
+String::String(CFStringRef s)
+  : d(new StringPrivate())
+{
+  if(s) {
+	  CFIndex len = CFStringGetLength(s);
+	  d->data->reserve(len);
+
+	  CFStringInlineBuffer buf;
+	  CFStringInitInlineBuffer(s, &buf, CFRangeMake(0, len));
+
+	  for(CFIndex i = 0; i < len; ++i)
+		  d->data->operator+=((wchar_t)CFStringGetCharacterFromInlineBuffer(&buf, i));
+  }
+}
+#endif
+
 String::String(const wchar_t *s, Type t)
   : d(new StringPrivate())
 {
