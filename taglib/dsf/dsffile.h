@@ -93,7 +93,7 @@ namespace TagLib {
       PropertyMap setProperties(const PropertyMap &);
 
       /*!
-       * Returns the AIFF::Properties for this file.  If no audio properties
+       * Returns the DSF::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
       virtual Properties *audioProperties() const;
