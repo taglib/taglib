@@ -114,20 +114,30 @@ bool DSF::File::save()
     return false;
   }
 
-  // Two things must be updated: the file size and the tag data
-  // The metadata offset doesn't change
+  // Three things must be updated: the file size, the tag data, and the metadata offset
 
   ByteVector tagData = d->tag->render();
-  
-  long long oldTagSize = d->fileSize - d->metadataOffset;
-  long long newFileSize = d->metadataOffset + tagData.size();
 
-  // Write the file size
-  insert(ByteVector::fromUInt64LE(newFileSize), 12, 8);
+  long long metadataLocation = d->metadataOffset ? d->metadataOffset : d->fileSize;
+  long long newFileSize = metadataLocation + tagData.size();
+  long long newMetadataOffset = tagData.size() ? metadataLocation : 0;
+  long long oldTagSize = d->fileSize - metadataLocation;
+
+  // Update the file size
+  if(d->fileSize != newFileSize) {
+    insert(ByteVector::fromUInt64LE(newFileSize), 12, 8);
+    d->fileSize = newFileSize;
+  }
+
+  // Update the metadata offset
+  if(d->metadataOffset != newMetadataOffset) {
+    insert(ByteVector::fromUInt64LE(newMetadataOffset), 20, 8);
+    d->metadataOffset = newMetadataOffset;
+  }
 
   // Delete the old tag and write the new one
-  insert(tagData, d->metadataOffset, oldTagSize);
-  
+  insert(tagData, metadataLocation, oldTagSize);
+
   return true;
 }
 
@@ -177,7 +187,9 @@ void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
   
   // Skip the data chunk
 
-  // TODO: Is it better to read the chunk size directly or trust the offset in the DSD chunk?  
-  d->tag = new ID3v2::Tag(this, d->metadataOffset);  
+  // A metadata offset of 0 indicates the absence of an ID3v2 tag
+  if(0 == d->metadataOffset)
+    d->tag = new ID3v2::Tag();
+  else
+    d->tag = new ID3v2::Tag(this, d->metadataOffset);
 }
-
