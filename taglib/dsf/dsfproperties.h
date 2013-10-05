@@ -41,19 +41,19 @@ namespace TagLib {
      * API.
      */
 
-    class TAGLIB_EXPORT Properties : public AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
       /*!
-       * Create an instance of DSF::Properties with the data read from the
+       * Create an instance of DSF::AudioProperties with the data read from the
        * ByteVector \a data.
        */
-      Properties(const ByteVector &data, ReadStyle style);
+      AudioProperties(const ByteVector &data, ReadStyle style);
 
       /*!
-       * Destroys this AIFF::Properties instance.
+       * Destroys this DSF::AudioProperties instance.
         */
-      virtual ~Properties();
+      virtual ~AudioProperties();
 
       // Reimplementations.
 
@@ -70,8 +70,8 @@ namespace TagLib {
       int blockSizePerChannel() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      AudioProperties(const AudioProperties &);
+      AudioProperties &operator=(const AudioProperties &);
 
       void read(const ByteVector &data);
 

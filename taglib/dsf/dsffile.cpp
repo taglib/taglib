@@ -53,7 +53,7 @@ public:
 
   long long fileSize;
   long long metadataOffset;
-  Properties *properties;
+  AudioProperties *properties;
   ID3v2::Tag *tag;
 };
 
@@ -62,7 +62,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 DSF::File::File(FileName file, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                       AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -70,7 +70,7 @@ DSF::File::File(FileName file, bool readProperties,
 }
 
 DSF::File::File(IOStream *stream, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                       AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
 {
   d = new FilePrivate;
   if(isOpen())
@@ -97,7 +97,7 @@ PropertyMap DSF::File::setProperties(const PropertyMap &properties)
   return d->tag->setProperties(properties);
 }
 
-DSF::Properties *DSF::File::audioProperties() const
+DSF::AudioProperties *DSF::File::audioProperties() const
 {
   return d->properties;
 }
@@ -145,7 +145,7 @@ bool DSF::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
   // A DSF file consists of four chunks: DSD chunk, format chunk, data chunk, and metadata chunk
   // The file format is not chunked in the sense of a RIFF File, though
@@ -183,7 +183,7 @@ void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 
   chunkSize = readBlock(8).toInt64LE(0);
   
-  d->properties = new Properties(readBlock(chunkSize), propertiesStyle);
+  d->properties = new AudioProperties(readBlock(chunkSize), propertiesStyle);
   
   // Skip the data chunk
 

@@ -30,7 +30,7 @@
 
 using namespace TagLib;
 
-class DSF::Properties::PropertiesPrivate
+class DSF::AudioProperties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
@@ -67,64 +67,64 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DSF::Properties::Properties(const ByteVector &data, ReadStyle style)
+DSF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style)
 {
   d = new PropertiesPrivate;
   read(data);
 }
 
-DSF::Properties::~Properties()
+DSF::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int DSF::Properties::length() const
+int DSF::AudioProperties::length() const
 {
   return d->length;
 }
 
-int DSF::Properties::bitrate() const
+int DSF::AudioProperties::bitrate() const
 {
   return d->bitrate;
 }
 
-int DSF::Properties::sampleRate() const
+int DSF::AudioProperties::sampleRate() const
 {
   return d->samplingFrequency;
 }
 
-int DSF::Properties::channels() const
+int DSF::AudioProperties::channels() const
 {
   return d->channelNum;
 }
 
 // DSF specific
-int DSF::Properties::formatVersion() const
+int DSF::AudioProperties::formatVersion() const
 {
   return d->formatVersion;
 }
 
-int DSF::Properties::formatID() const
+int DSF::AudioProperties::formatID() const
 {
   return d->formatID;
 }
 
-int DSF::Properties::channelType() const
+int DSF::AudioProperties::channelType() const
 {
   return d->channelType;
 }
 
-int DSF::Properties::bitsPerSample() const
+int DSF::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-long long DSF::Properties::sampleCount() const
+long long DSF::AudioProperties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-int DSF::Properties::blockSizePerChannel() const
+int DSF::AudioProperties::blockSizePerChannel() const
 {
   return d->blockSizePerChannel;
 }
@@ -133,7 +133,7 @@ int DSF::Properties::blockSizePerChannel() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void DSF::Properties::read(const ByteVector &data)
+void DSF::AudioProperties::read(const ByteVector &data)
 {
   d->formatVersion         = data.mid(0, 4).toUInt32LE(0);
   d->formatID              = data.mid(4, 4).toUInt32LE(0);
