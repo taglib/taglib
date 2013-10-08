@@ -26,6 +26,7 @@
 #ifndef TAGLIB_CHAPTERFRAME
 #define TAGLIB_CHAPTERFRAME
 
+#include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "taglib_export.h"
 
@@ -52,10 +53,10 @@ namespace TagLib {
 
       /*!
        * Creates a chapter frame with the element ID \a eID,
-       * start time \a sT, end time \a eT, start offset \a sO
-       * and end offset \a eO.
+       * start time \a sT, end time \a eT, start offset \a sO,
+       * end offset \a eO and embedded frames, that are in \a eF.
        */
-      ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO);
+      ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO, const FrameList &eF);
 
       /*!
        * Destroys the frame.
@@ -139,6 +140,75 @@ namespace TagLib {
        * \see endOffset()
        */
       void setEndOffset(const uint &eO);
+      
+      /*!
+       * Returns a reference to the frame list map.  This is an FrameListMap of
+       * all of the frames embedded in the CHAP frame.
+       *
+       * This is the most convenient structure for accessing the CHAP frame's 
+       * embedded frames. Many frame types allow multiple instances of the same 
+       * frame type so this is a map of lists. In most cases however there will 
+       * only be a single frame of a certain type.
+       *
+       * \warning You should not modify this data structure directly, instead
+       * use addEmbeddedFrame() and removeEmbeddedFrame().
+       *
+       * \see embeddedFrameList()
+       */
+      const FrameListMap &embeddedFrameListMap() const;
+      
+      /*!
+       * Returns a reference to the embedded frame list.  This is an FrameList 
+       * of all of the frames embedded in the CHAP frame in the order that they
+       * were parsed.
+       *
+       * This can be useful if for example you want iterate over the CHAP frame's 
+       * embedded frames in the order that they occur in the CHAP frame.
+       *
+       * \warning You should not modify this data structure directly, instead
+       * use addEmbeddedFrame() and removeEmbeddedFrame().
+       */
+      const FrameList &embeddedFrameList() const;
+
+      /*!
+       * Returns the embedded frame list for frames with the id \a frameID 
+       * or an empty list if there are no embedded frames of that type.  This
+       * is just a convenience and is equivalent to:
+       *
+       * \code
+       * embeddedFrameListMap()[frameID];
+       * \endcode
+       *
+       * \see embeddedFrameListMap()
+       */
+      const FrameList &embeddedFrameList(const ByteVector &frameID) const;
+
+      /*!
+       * Add an embedded frame to the CHAP frame.  At this point the CHAP frame 
+       * takes ownership of the embedded frame and will handle freeing its memory.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by embeddedFrameList()
+       */
+      void addEmbeddedFrame(Frame *frame);
+
+      /*!
+       * Remove an embedded frame from the CHAP frame.  If \a del is true the frame's 
+       * memory will be freed; if it is false, it must be deleted by the user.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by embeddedFrameList()
+       */
+      void removeEmbeddedFrame(Frame *frame, bool del = true);
+
+      /*!
+       * Remove all embedded frames of type \a id from the CHAP frame and free their 
+       * memory.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by embeddedFrameList()
+       */
+      void removeEmbeddedFrames(const ByteVector &id);
 
       virtual String toString() const;
 
