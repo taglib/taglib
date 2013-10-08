@@ -273,7 +273,7 @@ void RIFF::File::read()
       break;
     }
 
-    if(tell() + chunkSize > uint(length())) {
+    if(static_cast<ulonglong>(tell()) + chunkSize > static_cast<ulonglong>(length())) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
       setValid(false);
       break;
