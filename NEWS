@@ -1,5 +1,13 @@
-TagLib 1.9 (Oct 6, 2013)
+TagLib 1.9.1 (Oct 8, 2013)
 ==========================
+
+ * Fixed binary incompatible change in TagLib::Map and TagLib::List.
+ * Fixed constructing String from ByteVector.
+ * Fixed compilation on MSVC with the /Zc:wchar_t- option.
+ * Fixed detecting of RIFF files with invalid chunk sizes.
+
+TagLib 1.9 (Oct 6, 2013)
+========================
 
  * Added support for the Ogg Opus file format.
  * Added support for INFO tags in WAV files.
