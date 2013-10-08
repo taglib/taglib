@@ -26,8 +26,8 @@
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
 #include <tdebug.h>
+#include <stdio.h>
 
-#include "id3v2tag.h"
 #include "chapterframe.h"
 
 using namespace TagLib;
@@ -41,6 +41,9 @@ public:
   uint endTime;
   uint startOffset;
   uint endOffset;
+  const FrameFactory *factory;
+  FrameListMap embeddedFrameListMap;
+  FrameList embeddedFrameList;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,10 +54,11 @@ ChapterFrame::ChapterFrame(const ByteVector &data) :
     ID3v2::Frame(data)
 {
   d = new ChapterFramePrivate;
+  d->factory = FrameFactory::instance();
   setData(data);
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO) :
+ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO, const FrameList &eF) :
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
@@ -63,6 +67,10 @@ ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT
   d->endTime = eT;
   d->startOffset = sO;
   d->endOffset = eO;
+  FrameList l = eF;
+  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+    addEmbeddedFrame(*it);
+  d->factory = FrameFactory::instance();
 }
 
 ChapterFrame::~ChapterFrame()
@@ -122,6 +130,49 @@ void ChapterFrame::setEndOffset(const uint &eO)
   d->endOffset = eO;
 }
 
+const FrameListMap &ChapterFrame::embeddedFrameListMap() const
+{
+  return d->embeddedFrameListMap;
+}
+
+const FrameList &ChapterFrame::embeddedFrameList() const
+{
+  return d->embeddedFrameList;
+}
+
+const FrameList &ChapterFrame::embeddedFrameList(const ByteVector &frameID) const
+{
+  return d->embeddedFrameListMap[frameID];
+}
+
+void ChapterFrame::addEmbeddedFrame(Frame *frame)
+{
+  d->embeddedFrameList.append(frame);
+  d->embeddedFrameListMap[frame->frameID()].append(frame);
+}
+
+void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
+{
+  // remove the frame from the frame list
+  FrameList::Iterator it = d->embeddedFrameList.find(frame);
+  d->embeddedFrameList.erase(it);
+
+  // ...and from the frame list map
+  it = d->embeddedFrameListMap[frame->frameID()].find(frame);
+  d->embeddedFrameListMap[frame->frameID()].erase(it);
+
+  // ...and delete as desired
+  if(del)
+    delete frame;
+}
+
+void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
+{
+  FrameList l = d->embeddedFrameListMap[id];
+  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+    removeEmbeddedFrame(*it, true);
+}
+
 String ChapterFrame::toString() const
 {
   return String::null;
@@ -154,12 +205,13 @@ ChapterFrame *ChapterFrame::findByElementID(const Tag *tag, const ByteVector &eI
 
 void ChapterFrame::parseFields(const ByteVector &data)
 {
-  if(data.size() < 18) {
-    debug("An CHAP frame must contain at least 18 bytes (1 byte element ID terminated by null and 4x4 bytes for start and end time and offset).");
+  uint size = data.size();
+  if(size < 18) {
+    debug("A CHAP frame must contain at least 18 bytes (1 byte element ID terminated by null and 4x4 bytes for start and end time and offset).");
     return;
   }
 
-  int pos = 0;
+  int pos = 0, embPos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
   d->elementID.append(char(0));
   d->startTime = data.mid(pos, 4).toUInt(true);
@@ -169,6 +221,24 @@ void ChapterFrame::parseFields(const ByteVector &data)
   d->startOffset = data.mid(pos, 4).toUInt(true);
   pos += 4;
   d->endOffset = data.mid(pos, 4).toUInt(true);
+  pos += 4;
+  size -= pos;
+  while((uint)embPos < size - Frame::headerSize(4))
+  {
+    Frame *frame = d->factory->createFrame(data.mid(pos + embPos));
+
+    if(!frame)
+      return;
+
+    // Checks to make sure that frame parsed correctly.
+    if(frame->size() <= 0) {
+      delete frame;
+      return;
+    }
+
+    embPos += frame->size() + Frame::headerSize(4);
+    addEmbeddedFrame(frame);
+  }   
 }
 
 ByteVector ChapterFrame::renderFields() const
@@ -180,7 +250,10 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
-
+  FrameList l = d->embeddedFrameList;
+  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+    data.append((*it)->render());
+  
   return data;
 }
 
@@ -188,5 +261,6 @@ ChapterFrame::ChapterFrame(const ByteVector &data, Header *h) :
   Frame(h)
 {
   d = new ChapterFramePrivate;
+  d->factory = FrameFactory::instance();
   parseFields(fieldData(data));
 }

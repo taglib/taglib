@@ -26,6 +26,7 @@
 #ifndef TAGLIB_TABLEOFCONTENTSFRAME
 #define TAGLIB_TABLEOFCONTENTSFRAME
 
+#include "id3v2tag.h"
 #include "id3v2frame.h"
 
 namespace TagLib {
@@ -50,10 +51,10 @@ namespace TagLib {
       TableOfContentsFrame(const ByteVector &data);
 
       /*!
-       * Creates a table of contents frame with the element ID \a eID and
-       * the child elements \a ch.
+       * Creates a table of contents frame with the element ID \a eID,
+       * the child elements \a ch and embedded frames, that are in \a eF.
        */
-      TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch);
+      TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch, const FrameList &eF);
 
       /*!
        * Destroys the frame.
@@ -129,6 +130,89 @@ namespace TagLib {
        * \see childElements()
        */
       void setChildElements(const ByteVectorList &l);
+      
+      /*!
+       * Adds \a cE to list of child elements of the frame.
+       *
+       * \see childElements()
+       */
+      void addChildElement(const ByteVector &cE);
+      
+      /*!
+       * Removes \a cE to list of child elements of the frame.
+       *
+       * \see childElements()
+       */
+      void removeChildElement(const ByteVector &cE);
+      
+      /*!
+       * Returns a reference to the frame list map.  This is an FrameListMap of
+       * all of the frames embedded in the CTOC frame.
+       *
+       * This is the most convenient structure for accessing the CTOC frame's 
+       * embedded frames. Many frame types allow multiple instances of the same 
+       * frame type so this is a map of lists. In most cases however there will 
+       * only be a single frame of a certain type.
+       *
+       * \warning You should not modify this data structure directly, instead
+       * use addEmbeddedFrame() and removeEmbeddedFrame().
+       *
+       * \see embeddedFrameList()
+       */
+      const FrameListMap &embeddedFrameListMap() const;
+      
+      /*!
+       * Returns a reference to the embedded frame list.  This is an FrameList 
+       * of all of the frames embedded in the CTOC frame in the order that they
+       * were parsed.
+       *
+       * This can be useful if for example you want iterate over the CTOC frame's 
+       * embedded frames in the order that they occur in the CTOC frame.
+       *
+       * \warning You should not modify this data structure directly, instead
+       * use addEmbeddedFrame() and removeEmbeddedFrame().
+       */
+      const FrameList &embeddedFrameList() const;
+
+      /*!
+       * Returns the embedded frame list for frames with the id \a frameID 
+       * or an empty list if there are no embedded frames of that type.  This
+       * is just a convenience and is equivalent to:
+       *
+       * \code
+       * embeddedFrameListMap()[frameID];
+       * \endcode
+       *
+       * \see embeddedFrameListMap()
+       */
+      const FrameList &embeddedFrameList(const ByteVector &frameID) const;
+
+      /*!
+       * Add an embedded frame to the CTOC frame.  At this point the CTOC frame 
+       * takes ownership of the embedded frame and will handle freeing its memory.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by embeddedFrameList()
+       */
+      void addEmbeddedFrame(Frame *frame);
+
+      /*!
+       * Remove an embedded frame from the CTOC frame.  If \a del is true the frame's 
+       * memory will be freed; if it is false, it must be deleted by the user.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by embeddedFrameList()
+       */
+      void removeEmbeddedFrame(Frame *frame, bool del = true);
+
+      /*!
+       * Remove all embedded frames of type \a id from the CTOC frame and free their 
+       * memory.
+       *
+       * \note Using this method will invalidate any pointers on the list
+       * returned by embeddedFrameList()
+       */
+      void removeEmbeddedFrames(const ByteVector &id);
 
       virtual String toString() const;
 
