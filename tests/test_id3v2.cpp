@@ -73,7 +73,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateDate22);
   CPPUNIT_TEST(testDowngradeTo23);
   // CPPUNIT_TEST(testUpdateFullDate22); TODO TYE+TDA should be upgraded to TDRC together
-  //CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
+  CPPUNIT_TEST(testCompressedFrameWithBrokenLength);
   CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
