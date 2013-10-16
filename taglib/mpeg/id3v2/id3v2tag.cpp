@@ -461,10 +461,18 @@ ByteVector ID3v2::Tag::render() const
 
 void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
 {
+#ifdef NO_ITUNES_HACKS 
   const char *unsupportedFrames[] = {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
     "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP", 0
   };
+#else
+  // iTunes writes and reads TSOA, TSOT, TSOP to ID3v2.3.
+  const char *unsupportedFrames[] = {
+    "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
+    "TMOO", "TPRO", "TSST", 0
+  };
+#endif
   ID3v2::TextIdentificationFrame *frameTDOR = 0;
   ID3v2::TextIdentificationFrame *frameTDRC = 0;
   ID3v2::TextIdentificationFrame *frameTIPL = 0;
