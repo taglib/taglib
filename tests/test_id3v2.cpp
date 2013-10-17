@@ -575,10 +575,12 @@ public:
     CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDTG"));
     CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TMOO"));
     CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TPRO"));
+#ifdef NO_ITUNES_HACKS 
     CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOA"));
     CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOT"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
     CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
+#endif
+    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
   }
 
   void testCompressedFrameWithBrokenLength()
