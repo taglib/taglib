@@ -390,7 +390,7 @@ String String::upper() const
 {
   static const int shift = 'A' - 'a';
 
-  String s(*this);
+  String s(*d->data);
   for(Iterator it = s.begin(); it != s.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
       *it = *it + shift;
