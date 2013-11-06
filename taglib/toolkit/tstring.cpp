@@ -209,8 +209,16 @@ String::String(const std::string &s, Type t)
 String::String(const wstring &s, Type t)
   : d(new StringPrivate())
 {
-  if(t == UTF16 || t == UTF16BE || t == UTF16LE)
+  if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
+    // This looks ugly but needed for the compatibility with TagLib1.8. 
+    // Should be removed in TabLib2.0.
+    if (t == UTF16BE)
+      t = WCharByteOrder;
+    else if (t == UTF16LE)
+      t = (WCharByteOrder == UTF16LE ? UTF16BE : UTF16LE);
+
     copyFromUTF16(s.c_str(), s.length(), t);
+  }
   else {
     debug("String::String() -- A TagLib::wstring should not contain Latin1 or UTF-8.");
   }
@@ -219,8 +227,16 @@ String::String(const wstring &s, Type t)
 String::String(const wchar_t *s, Type t)
   : d(new StringPrivate())
 {
-  if(t == UTF16 || t == UTF16BE || t == UTF16LE)
+  if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
+    // This looks ugly but needed for the compatibility with TagLib1.8. 
+    // Should be removed in TabLib2.0.
+    if (t == UTF16BE)
+      t = WCharByteOrder;
+    else if (t == UTF16LE)
+      t = (WCharByteOrder == UTF16LE ? UTF16BE : UTF16LE);
+
     copyFromUTF16(s, ::wcslen(s), t);
+  }
   else {
     debug("String::String() -- A const wchar_t * should not contain Latin1 or UTF-8.");
   }
