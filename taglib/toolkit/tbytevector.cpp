@@ -31,6 +31,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstring>
+#include <cstddef>
 
 #include <tstring.h>
 #include <tdebug.h>
@@ -508,62 +509,40 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
 
-  const uint withSize = with.size();
-  const uint patternSize = pattern.size();
-  int offset = 0;
+  const size_t withSize    = with.size();
+  const size_t patternSize = pattern.size();
+  const ptrdiff_t diff = withSize - patternSize;
+  
+  size_t offset = 0;
+  while (true)
+  {
+    offset = find(pattern, offset);
+    if(offset == static_cast<size_t>(-1)) // Use npos in taglib2.
+      break;
 
-  if(withSize == patternSize) {
-    // I think this case might be common enough to optimize it
     detach();
-    offset = find(pattern);
-    while(offset >= 0) {
-      ::memcpy(data() + offset, with.data(), withSize);
-      offset = find(pattern, offset + withSize);
-    }
-    return *this;
-  }
 
-  // calculate new size:
-  uint newSize = 0;
-  for(;;) {
-    int next = find(pattern, offset);
-    if(next < 0) {
-      if(offset == 0)
-        // pattern not found, do nothing:
-        return *this;
-      newSize += size() - offset;
+    if(diff < 0) {
+      ::memmove(
+        data() + offset + withSize, 
+        data() + offset + patternSize, 
+        size() - offset - patternSize);
+      resize(size() + diff);
+    }
+    else if(diff > 0) {
+      resize(size() + diff);
+      ::memmove(
+        data() + offset + withSize, 
+        data() + offset + patternSize, 
+        size() - diff - offset - patternSize);
+    }
+
+    ::memcpy(data() + offset, with.data(), with.size());
+
+    offset += withSize;
+    if(offset > size() - patternSize)
       break;
-    }
-    newSize += (next - offset) + withSize;
-    offset = next + patternSize;
   }
-
-  // new private data of appropriate size:
-  ByteVectorPrivate *newData = new ByteVectorPrivate(newSize, 0);
-  char *target = DATA(newData);
-  const char *source = data();
-
-  // copy modified data into new private data:
-  offset = 0;
-  for(;;) {
-    int next = find(pattern, offset);
-    if(next < 0) {
-      ::memcpy(target, source + offset, size() - offset);
-      break;
-    }
-    int chunkSize = next - offset;
-    ::memcpy(target, source + offset, chunkSize);
-    target += chunkSize;
-    ::memcpy(target, with.data(), withSize);
-    target += withSize;
-    offset += chunkSize + patternSize;
-  }
-
-  // replace private data:
-  if(d->deref())
-    delete d;
-
-  d = newData;
 
   return *this;
 }
