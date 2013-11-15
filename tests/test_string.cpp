@@ -75,6 +75,20 @@ public:
 	String unicode3(L"\u65E5\u672C\u8A9E");
 	CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
 
+    String unicode4(L"\u65e5\u672c\u8a9e", String::UTF16BE);
+    CPPUNIT_ASSERT(unicode4[1] == L'\u672c');
+
+    String unicode5(L"\u65e5\u672c\u8a9e", String::UTF16LE);
+    CPPUNIT_ASSERT(unicode5[1] == L'\u2c67');
+
+    wstring stduni = L"\u65e5\u672c\u8a9e";
+
+    String unicode6(stduni, String::UTF16BE);
+    CPPUNIT_ASSERT(unicode6[1] == L'\u672c');
+
+    String unicode7(stduni, String::UTF16LE);
+    CPPUNIT_ASSERT(unicode7[1] == L'\u2c67');
+
     CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);
     CPPUNIT_ASSERT(strcmp(String::number(12345678).toCString(), "12345678") == 0);
     CPPUNIT_ASSERT(strcmp(String::number(-12345678).toCString(), "-12345678") == 0);

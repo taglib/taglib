@@ -134,13 +134,21 @@ namespace TagLib {
 
     /*!
      * Makes a deep copy of the data in \a s.
+     *
+     * /note If \a t is UTF16LE, the byte order of \a s will be swapped regardless 
+     * of the CPU byte order.  If UTF16BE, it will not be swapped.  This behavior
+     * will be changed in TagLib2.0.
      */
-    String(const wstring &s, Type t = WCharByteOrder);
+    String(const wstring &s, Type t = UTF16BE);
 
     /*!
      * Makes a deep copy of the data in \a s.
+     *
+     * /note If \a t is UTF16LE, the byte order of \a s will be swapped regardless 
+     * of the CPU byte order.  If UTF16BE, it will not be swapped.  This behavior
+     * will be changed in TagLib2.0.
      */
-    String(const wchar_t *s, Type t = WCharByteOrder);
+    String(const wchar_t *s, Type t = UTF16BE);
 
     /*!
      * Makes a deep copy of the data in \a c.
