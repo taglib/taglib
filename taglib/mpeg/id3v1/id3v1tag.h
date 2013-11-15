@@ -154,14 +154,14 @@ namespace TagLib {
       /*!
        * Returns the genre in number.
        *
-       * /note Normally 255 indicates that this tag contains no genre.
+       * \note Normally 255 indicates that this tag contains no genre.
        */
       TagLib::uint genreNumber() const;
 
       /*!
        * Sets the genre in number to \a i.
        *
-       * /note Valid value is from 0 up to 255. Normally 255 indicates that
+       * \note Valid value is from 0 up to 255. Normally 255 indicates that
        * this tag contains no genre.
        */
       void setGenreNumber(TagLib::uint i);
