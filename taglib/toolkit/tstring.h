@@ -129,11 +129,21 @@ namespace TagLib {
 
     /*!
      * Makes a deep copy of the data in \a s.
+     *
+     * \note This should only be used with the 16-bit codecs UTF16, UTF16BE or 
+     * UTF16LE, when used with other codecs it will simply print a warning and 
+     * exit.  UTF16BE or UTF16LE is automatically chosen as default according 
+     * to the CPU byte order    
      */
     String(const std::wstring &s, Type t = WCharByteOrder);
 
     /*!
      * Makes a deep copy of the data in \a s.
+     *
+     * \note This should only be used with the 16-bit codecs UTF16, UTF16BE or 
+     * UTF16LE, when used with other codecs it will simply print a warning and 
+     * exit.  UTF16BE or UTF16LE is automatically chosen as default according 
+     * to the CPU byte order    
      */
     String(const wchar_t *s, Type t = WCharByteOrder);
 
@@ -147,8 +157,13 @@ namespace TagLib {
 
     /*!
      * Makes a deep copy of the data in \a c.
+     *
+     * \note This should only be used with the 16-bit codecs UTF16, UTF16BE or 
+     * UTF16LE, when used with other codecs it will simply print a warning and 
+     * exit.  UTF16BE or UTF16LE is automatically chosen as default according 
+     * to the CPU byte order    
      */
-    String(wchar_t c, Type t = Latin1);
+    String(wchar_t c, Type t = WCharByteOrder);
 
 
     /*!
@@ -161,9 +176,6 @@ namespace TagLib {
 
     /*!
      * Makes a deep copy of the data in \a s.
-     *
-     * \note This should only be used with the 8-bit codecs Latin1 and UTF8, when
-     * used with other codecs it will simply print a warning and exit.
      */
     String(const ByteVector &v, Type t = Latin1);
 
