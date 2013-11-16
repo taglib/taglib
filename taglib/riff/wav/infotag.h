@@ -38,7 +38,8 @@ namespace TagLib {
 
   class File;
 
-  //! A RIFF Info tag implementation. 
+  //! A RIFF INFO tag implementation. 
+
   namespace RIFF {
   namespace Info {
 
@@ -76,14 +77,15 @@ namespace TagLib {
       virtual ByteVector render(const String &s) const;
     };
 
-    //! The main class in the ID3v2 implementation
+    //! The main class in the RIFF INFO tag implementation
 
     /*!
-     * This is the main class in the INFO tag implementation.  RIFF INFO tag is a 
-     * metadata format found in WAV audio and AVI video files.  Though it is a part 
-     * of Microsoft/IBM's RIFF specification, the author could not find the official 
-     * documents about it.  So, this implementation is referring to unofficial documents 
-     * online and some applications' behaviors especially Windows Explorer.
+     * This is the main class in the INFO tag implementation.  RIFF INFO tag is 
+     * a metadata format found in WAV audio and AVI video files.  Though it is a 
+     * part of Microsoft/IBM's RIFF specification, the author could not find the 
+     * official documents about it.  So, this implementation is referring to 
+     * unofficial documents on the web and some applications' behaviors especially 
+     * Windows Explorer.
      */
     class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
