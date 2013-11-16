@@ -28,8 +28,6 @@
 #cmakedefine   HAVE_BOOST_SCOPED_PTR 1  // #include <boost/scoped_ptr.hpp> / boost::scoped_ptr<T>
 
 /* Defined if your compiler supports some atomic operations */
-#cmakedefine   HAVE_STD_ATOMIC 1
-#cmakedefine   HAVE_BOOST_ATOMIC 1
 #cmakedefine   HAVE_GCC_ATOMIC 1
 #cmakedefine   HAVE_MAC_ATOMIC 1
 #cmakedefine   HAVE_WIN_ATOMIC 1

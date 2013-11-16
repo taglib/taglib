@@ -155,70 +155,48 @@ endif()
 
 # Determine which kind of atomic operations your compiler supports.
 
-check_cxx_source_compiles("
-  #include <atomic>
-  int main() { 
-    std::atomic<unsigned int> x;
-    x.fetch_add(1);
-    x.fetch_sub(1);
-    return 0; 
-  }
-" HAVE_STD_ATOMIC)
-
-if(NOT HAVE_STD_ATOMIC)
+if(NOT HAVE_STD_SHARED_PTR AND NOT HAVE_TR1_SHARED_PTR AND NOT HAVE_BOOST_SHARED_PTR)
   check_cxx_source_compiles("
-    #include <boost/atomic.hpp>
     int main() { 
-      boost::atomic<unsigned int> x(1);
-      x.fetch_add(1);
-      x.fetch_sub(1);
+      volatile int x;
+      __sync_add_and_fetch(&x, 1);
+      int y = __sync_sub_and_fetch(&x, 1);
       return 0; 
     }
-  " HAVE_BOOST_ATOMIC)
+  " HAVE_GCC_ATOMIC)
 
-  if(NOT HAVE_BOOST_ATOMIC)
+  if(NOT HAVE_GCC_ATOMIC)
     check_cxx_source_compiles("
+      #include <libkern/OSAtomic.h>
       int main() { 
-        volatile int x;
-        __sync_add_and_fetch(&x, 1);
-        int y = __sync_sub_and_fetch(&x, 1);
+        volatile int32_t x;
+        OSAtomicIncrement32Barrier(&x);
+        int32_t y = OSAtomicDecrement32Barrier(&x);
         return 0; 
       }
-    " HAVE_GCC_ATOMIC)
+    " HAVE_MAC_ATOMIC)
 
-    if(NOT HAVE_GCC_ATOMIC)
+    if(NOT HAVE_MAC_ATOMIC)
       check_cxx_source_compiles("
-        #include <libkern/OSAtomic.h>
+        #include <windows.h>
         int main() { 
-          volatile int32_t x;
-          OSAtomicIncrement32Barrier(&x);
-          int32_t y = OSAtomicDecrement32Barrier(&x);
+          volatile LONG x;
+          InterlockedIncrement(&x);
+          LONG y = InterlockedDecrement(&x);
           return 0; 
         }
-      " HAVE_MAC_ATOMIC)
+      " HAVE_WIN_ATOMIC)
 
-      if(NOT HAVE_MAC_ATOMIC)
+      if(NOT HAVE_WIN_ATOMIC)
         check_cxx_source_compiles("
-          #include <windows.h>
+          #include <ia64intrin.h>
           int main() { 
-            volatile LONG x;
-            InterlockedIncrement(&x);
-            LONG y = InterlockedDecrement(&x);
+            volatile int x;
+            __sync_add_and_fetch(&x, 1);
+            int y = __sync_sub_and_fetch(&x, 1);
             return 0; 
           }
-        " HAVE_WIN_ATOMIC)
-
-        if(NOT HAVE_WIN_ATOMIC)
-          check_cxx_source_compiles("
-            #include <ia64intrin.h>
-            int main() { 
-              volatile int x;
-              __sync_add_and_fetch(&x, 1);
-              int y = __sync_sub_and_fetch(&x, 1);
-              return 0; 
-            }
-          " HAVE_IA64_ATOMIC)
-        endif()
+        " HAVE_IA64_ATOMIC)
       endif()
     endif()
   endif()
