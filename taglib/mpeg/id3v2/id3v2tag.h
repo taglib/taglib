@@ -89,7 +89,7 @@ namespace TagLib {
       /*!
        * Encode a ByteVector with the data from \a s.
        *
-       * /note Not implemented intentionally.  Always returns empty \s ByteVector.
+       * \note Not implemented intentionally.  Always returns empty \s ByteVector.
        */
       virtual ByteVector render(const String &s) const;
     };
