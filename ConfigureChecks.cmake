@@ -7,6 +7,13 @@ include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 
+# Enable C++11 if possible.
+
+if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.0)
+    OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.3))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
 # Check if the size of integral types are suitable.
 
 check_type_size("short" SIZEOF_SHORT)
@@ -47,26 +54,26 @@ check_type_size("long double" SIZEOF_LONGDOUBLE)
 
 # Determine which kind of byte swap functions your compiler supports.
 
-# GCC's __builtin_bswap* should be checked individually 
+# GCC's __builtin_bswap* should be checked individually
 # because some of them can be missing depends on the GCC version.
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap16(0);
-    return 0; 
+    return 0;
   }
 " HAVE_GCC_BYTESWAP_16)
 
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap32(0);
-    return 0; 
+    return 0;
   }
 " HAVE_GCC_BYTESWAP_32)
 
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap64(0);
-    return 0; 
+    return 0;
   }
 " HAVE_GCC_BYTESWAP_64)
 
@@ -77,7 +84,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
       __bswap_16(0);
       __bswap_32(0);
       __bswap_64(0);
-      return 0; 
+      return 0;
     }
   " HAVE_GLIBC_BYTESWAP)
 
@@ -88,7 +95,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
         _byteswap_ushort(0);
         _byteswap_ulong(0);
         _byteswap_uint64(0);
-        return 0; 
+        return 0;
       }
     " HAVE_MSC_BYTESWAP)
 
@@ -99,7 +106,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
           OSSwapInt16(0);
           OSSwapInt32(0);
           OSSwapInt64(0);
-          return 0; 
+          return 0;
         }
       " HAVE_MAC_BYTESWAP)
 
@@ -110,7 +117,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
             swap16(0);
             swap32(0);
             swap64(0);
-            return 0; 
+            return 0;
           }
         " HAVE_OPENBSD_BYTESWAP)
       endif()
@@ -122,79 +129,67 @@ endif()
 
 check_cxx_source_compiles("
   #include <memory>
-  int main() { std::shared_ptr<int> x; return 0; }
-" HAVE_STD_SHARED_PTR)
+  int main() {
+    std::shared_ptr<int> x;
+    std::unique_ptr<int> y;
+    return 0;
+  }
+" HAVE_CXX11_SMART_PTR)
 
-if(NOT HAVE_STD_SHARED_PTR)
+if(NOT HAVE_CXX11_SMART_PTR)
   check_cxx_source_compiles("
-    #include <tr1/memory>
-    int main() { std::tr1::shared_ptr<int> x; return 0; }
-  " HAVE_TR1_SHARED_PTR)
-
-  if(NOT HAVE_TR1_SHARED_PTR)
-    check_cxx_source_compiles("
-      #include <boost/shared_ptr.hpp>
-      int main() { boost::shared_ptr<int> x; return 0; }
-    " HAVE_BOOST_SHARED_PTR)
-  endif()
-endif()
-
-# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
-
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::unique_ptr<int> x; return 0; }
-" HAVE_STD_UNIQUE_PTR)
-
-if(NOT HAVE_STD_UNIQUE_PTR)
-  check_cxx_source_compiles("
+    #include <boost/shared_ptr.hpp>
     #include <boost/scoped_ptr.hpp>
-    int main() { boost::scoped_ptr<int> x; return 0; }
-  " HAVE_BOOST_SCOPED_PTR)
+    int main() {
+      boost::shared_ptr<int> x;
+      boost::scoped_ptr<int> y;
+      return 0;
+    }
+  " HAVE_BOOST_SMART_PTR)
 endif()
 
 # Determine which kind of atomic operations your compiler supports.
 
-if(NOT HAVE_STD_SHARED_PTR AND NOT HAVE_TR1_SHARED_PTR AND NOT HAVE_BOOST_SHARED_PTR)
+if(NOT HAVE_CXX11_SMART_PTR AND NOT HAVE_BOOST_SMART_PTR)
   check_cxx_source_compiles("
-    int main() { 
+    int main() {
       volatile int x;
       __sync_add_and_fetch(&x, 1);
       int y = __sync_sub_and_fetch(&x, 1);
-      return 0; 
+      return 0;
     }
   " HAVE_GCC_ATOMIC)
 
   if(NOT HAVE_GCC_ATOMIC)
     check_cxx_source_compiles("
       #include <libkern/OSAtomic.h>
-      int main() { 
+      int main() {
         volatile int32_t x;
         OSAtomicIncrement32Barrier(&x);
         int32_t y = OSAtomicDecrement32Barrier(&x);
-        return 0; 
+        return 0;
       }
     " HAVE_MAC_ATOMIC)
 
     if(NOT HAVE_MAC_ATOMIC)
       check_cxx_source_compiles("
         #include <windows.h>
-        int main() { 
+        int main() {
           volatile LONG x;
           InterlockedIncrement(&x);
           LONG y = InterlockedDecrement(&x);
-          return 0; 
+          return 0;
         }
       " HAVE_WIN_ATOMIC)
 
       if(NOT HAVE_WIN_ATOMIC)
         check_cxx_source_compiles("
           #include <ia64intrin.h>
-          int main() { 
+          int main() {
             volatile int x;
             __sync_add_and_fetch(&x, 1);
             int y = __sync_sub_and_fetch(&x, 1);
-            return 0; 
+            return 0;
           }
         " HAVE_IA64_ATOMIC)
       endif()
@@ -220,9 +215,9 @@ endif()
 
 check_cxx_source_compiles("
   #include <cstring>
-  int main() { 
-    _strdup(0); 
-    return 0; 
+  int main() {
+    _strdup(0);
+    return 0;
 }
 " HAVE_ISO_STRDUP)
 
@@ -230,9 +225,9 @@ check_cxx_source_compiles("
 
 check_cxx_source_compiles("
   #include <codecvt>
-  int main() { 
-    std::codecvt_utf8_utf16<wchar_t> x; 
-    return 0; 
+  int main() {
+    std::codecvt_utf8_utf16<wchar_t> x;
+    return 0;
   }
 " HAVE_STD_CODECVT)
 
