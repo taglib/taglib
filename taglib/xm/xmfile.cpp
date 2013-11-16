@@ -237,7 +237,12 @@ namespace
   public:
     StructReader()
     {
-      m_readers.setAutoDelete(true);
+    }
+
+    ~StructReader()
+    {
+      for(List<Reader*>::ConstIterator it = m_readers.begin(); it != m_readers.end(); ++it)
+        delete *it;
     }
 
     /*!

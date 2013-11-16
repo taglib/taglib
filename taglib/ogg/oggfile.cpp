@@ -42,13 +42,13 @@ public:
     firstPageHeader(0),
     lastPageHeader(0),
     currentPage(0),
-    currentPacketPage(0)
-  {
-    pages.setAutoDelete(true);
-  }
+    currentPacketPage(0) {}
 
   ~FilePrivate()
   {
+    for(List<Page *>::ConstIterator it = pages.begin(); it != pages.end(); ++it)
+      delete *it;
+
     delete firstPageHeader;
     delete lastPageHeader;
   }

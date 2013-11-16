@@ -187,8 +187,8 @@ namespace TagLib {
 
   private:
 #ifndef DO_NOT_DOCUMENT
-    template <class KeyP, class TP> class MapPrivate;
-    MapPrivate<Key, T> *d;
+    class MapPrivate;
+    MapPrivate *d;
 #endif
   };
 }

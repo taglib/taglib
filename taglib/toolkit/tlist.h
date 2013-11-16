@@ -51,6 +51,10 @@ namespace TagLib {
 
   template <class T> class List
   {
+#ifndef DO_NOT_DOCUMENT
+    typedef std::list<T> ListType;
+#endif
+
   public:
 #ifndef DO_NOT_DOCUMENT
     typedef typename std::list<T>::iterator Iterator;
@@ -193,16 +197,6 @@ namespace TagLib {
     T &back();
 
     /*!
-     * Auto delete the members of the list when the last reference to the list
-     * passes out of scope.  This will have no effect on lists which do not
-     * contain a pointer type.
-     *
-     * \note This relies on partial template instantiation -- most modern C++
-     * compilers should now support this.
-     */
-    void setAutoDelete(bool autoDelete);
-
-    /*!
      * Returns a reference to item \a i in the list.
      *
      * \warning This method is slow.  Use iterators to loop through the list.
@@ -244,8 +238,8 @@ namespace TagLib {
 
   private:
 #ifndef DO_NOT_DOCUMENT
-    template <class TP> class ListPrivate;
-    ListPrivate<T> *d;
+    class ListPrivate;
+    ListPrivate *d;
 #endif
   };
 
