@@ -231,7 +231,7 @@ namespace TagLib {
      * The returned pointer remains valid until this String instance is destroyed 
      * or any other method of this String is called.
      *
-     * /note This returns a pointer to the String's internal data without any 
+     * \note This returns a pointer to the String's internal data without any 
      * conversions.
      *
      * \see toWString()

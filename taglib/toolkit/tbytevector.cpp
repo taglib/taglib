@@ -27,11 +27,13 @@
 #include <config.h>
 #endif
 
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <cstddef>
 
 #include "tstring.h"
 #include "tdebug.h"
@@ -464,59 +466,40 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
 
-  const size_t withSize = with.size();
+  const size_t withSize    = with.size();
   const size_t patternSize = pattern.size();
+  const ptrdiff_t diff = withSize - patternSize;
+  
   size_t offset = 0;
+  while (true)
+  {
+    offset = find(pattern, offset);
+    if(offset == npos)
+      break;
 
-  if(withSize == patternSize) {
-    // I think this case might be common enough to optimize it
     detach();
-    offset = find(pattern);
-    while(offset != npos) {
-      ::memcpy(DATA(d) + offset, DATA(with.d), withSize);
-      offset = find(pattern, offset + withSize);
-    }
-    return *this;
-  }
 
-  // calculate new size:
-  size_t newSize = 0;
-  for(;;) {
-    const size_t next = find(pattern, offset);
-    if(next == npos) {
-      if(offset == 0)
-        // pattern not found, do nothing:
-        return *this;
-      newSize += size() - offset;
+    if(diff < 0) {
+      ::memmove(
+        data() + offset + withSize, 
+        data() + offset + patternSize, 
+        size() - offset - patternSize);
+      resize(size() + diff);
+    }
+    else if(diff > 0) {
+      resize(size() + diff);
+      ::memmove(
+        data() + offset + withSize, 
+        data() + offset + patternSize, 
+        size() - diff - offset - patternSize);
+    }
+
+    ::memcpy(data() + offset, with.data(), with.size());
+
+    offset += withSize;
+    if(offset > size() - patternSize)
       break;
-    }
-    newSize += (next - offset) + withSize;
-    offset = next + patternSize;
   }
-
-  // new private data of appropriate size:
-  ByteVectorPrivate newData(newSize, '\0');
-  char *target = &(*newData.data)[0];
-  const char *source = DATA(d);
-
-  // copy modified data into new private data:
-  offset = 0;
-  for(;;) {
-    const size_t next = find(pattern, offset);
-    if(next == npos) {
-      ::memcpy(target, source + offset, size() - offset);
-      break;
-    }
-    const size_t chunkSize = next - offset;
-    ::memcpy(target, source + offset, chunkSize);
-    target += chunkSize;
-    ::memcpy(target, DATA(with.d), withSize);
-    target += withSize;
-    offset += chunkSize + patternSize;
-  }
-
-  // replace private data:
-  *d = newData;
 
   return *this;
 }
