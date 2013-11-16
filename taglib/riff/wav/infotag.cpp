@@ -32,41 +32,30 @@
 using namespace TagLib;
 using namespace RIFF::Info;
 
+namespace
+{
+  class DefaultStringHandler : public StringHandler
+  {
+    virtual String parse(const ByteVector &data) const
+    {
+      return String(data, String::UTF8);
+    }
+
+    virtual ByteVector render(const String &s) const
+    {
+      return s.data(String::UTF8);
+    }
+  };
+
+  DefaultStringHandler defaultStringHandler;
+  StringHandler *strHandler = &defaultStringHandler;
+}
+
 class RIFF::Info::Tag::TagPrivate
 {
 public:
-  TagPrivate()
-  {}
-
   FieldListMap fieldListMap;
-
-  static const TagLib::StringHandler *stringHandler;
 };
-
-namespace
-{
-  const RIFF::Info::StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
-
-////////////////////////////////////////////////////////////////////////////////
-// StringHandler implementation
-////////////////////////////////////////////////////////////////////////////////
-
-RIFF::Info::StringHandler::StringHandler()
-{
-}
-
-String RIFF::Info::StringHandler::parse(const ByteVector &data) const
-{
-  return String(data, String::UTF8);
-}
-
-ByteVector RIFF::Info::StringHandler::render(const String &s) const
-{
-  return s.data(String::UTF8);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -208,7 +197,7 @@ ByteVector RIFF::Info::Tag::render() const
 
   FieldListMap::ConstIterator it = d->fieldListMap.begin();
   for(; it != d->fieldListMap.end(); ++it) {
-    ByteVector text = TagPrivate::stringHandler->render(it->second);
+    ByteVector text = strHandler->render(it->second);
     if(text.isEmpty())
       continue;
 
@@ -227,12 +216,17 @@ ByteVector RIFF::Info::Tag::render() const
     return data;
 }
 
-void RIFF::Info::Tag::setStringHandler(const TagLib::StringHandler *handler)
+StringHandler *RIFF::Info::Tag::stringHandler() // static
+{
+  return strHandler;
+}
+
+void RIFF::Info::Tag::setStringHandler(StringHandler *handler)  // static
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    strHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    strHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,7 +238,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
   size_t p = 4;
   while(p < data.size()) {
     const uint size = data.toUInt32LE(p + 4);
-    d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
+    d->fieldListMap[data.mid(p, 4)] = strHandler->parse(data.mid(p + 8, size));
 
     p += ((size + 1) & ~1) + 8;
   }

@@ -41,6 +41,7 @@ SET(test_runner_SRCS
   test_bytevectorlist.cpp
   test_bytevectorstream.cpp
   test_string.cpp
+  test_strhandler.cpp
   test_propertymap.cpp
   test_fileref.cpp
   test_id3v1.cpp

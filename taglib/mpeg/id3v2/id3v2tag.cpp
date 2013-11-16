@@ -49,10 +49,30 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace
+{
+  class DefaultStringHandler : public StringHandler
+  {
+    virtual String parse(const ByteVector &data) const
+    {
+      return String(data, String::Latin1);
+    }
+
+    virtual ByteVector render(const String &s) const
+    {
+      // Not implemented intentionally.
+      return ByteVector::null;
+    }
+  };
+
+  DefaultStringHandler defaultStringHandler;
+  StringHandler *strHandler = &defaultStringHandler;
+}
+
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() 
+  TagPrivate()
     : file(0)
     , tagOffset(-1)
     , extendedHeader(0)
@@ -80,34 +100,7 @@ public:
 
   FrameListMap frameListMap;
   FrameList frameList;
-
-  static const TagLib::StringHandler *stringHandler;
 };
-
-namespace
-{
-  const ID3v2::Latin1StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
-
-////////////////////////////////////////////////////////////////////////////////
-// Latin1StringHandler implementation
-////////////////////////////////////////////////////////////////////////////////
-
-ID3v2::Latin1StringHandler::Latin1StringHandler()
-{
-}
-
-String ID3v2::Latin1StringHandler::parse(const ByteVector &data) const
-{
-  return String(data, String::Latin1);
-}
-
-ByteVector ID3v2::Latin1StringHandler::render(const String &s) const
-{
-  return ByteVector();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -625,17 +618,17 @@ ByteVector ID3v2::Tag::render(int version) const
   return d->header.render() + tagData;
 }
 
-TagLib::StringHandler const *ID3v2::Tag::latin1StringHandler()
+StringHandler *ID3v2::Tag::latin1StringHandler()  // static
 {
-  return TagPrivate::stringHandler;
+  return strHandler;
 }
 
-void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
+void ID3v2::Tag::setLatin1StringHandler(StringHandler *handler) // static
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    strHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    strHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,28 @@
 using namespace TagLib;
 using namespace ID3v1;
 
+namespace
+{
+  class DefaultStringHandler : public StringHandler
+  {
+    virtual String parse(const ByteVector &data) const
+    {
+      return String(data, String::Latin1).stripWhiteSpace();
+    }
+
+    virtual ByteVector render(const String &s) const
+    {
+      if(s.isLatin1())
+        return s.data(String::Latin1);
+      else
+        return ByteVector();
+    }
+  };
+
+  DefaultStringHandler defaultStringHandler;
+  StringHandler *strHandler = &defaultStringHandler;
+}
+
 class ID3v1::Tag::TagPrivate
 {
 public:
@@ -47,37 +69,7 @@ public:
   String comment;
   uchar track;
   uchar genre;
-
-  static const TagLib::StringHandler *stringHandler;
 };
-
-namespace
-{
-  const ID3v1::StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *ID3v1::Tag::TagPrivate::stringHandler = &defaultStringHandler;
-
-////////////////////////////////////////////////////////////////////////////////
-// StringHandler implementation
-////////////////////////////////////////////////////////////////////////////////
-
-ID3v1::StringHandler::StringHandler()
-{
-}
-
-String ID3v1::StringHandler::parse(const ByteVector &data) const
-{
-  return String(data, String::Latin1).stripWhiteSpace();
-}
-
-ByteVector ID3v1::StringHandler::render(const String &s) const
-{
-  if(s.isLatin1())
-    return s.data(String::Latin1);
-  else
-    return ByteVector();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
@@ -107,11 +99,11 @@ ByteVector ID3v1::Tag::render() const
   ByteVector data;
 
   data.append(fileIdentifier());
-  data.append(TagPrivate::stringHandler->render(d->title).resize(30));
-  data.append(TagPrivate::stringHandler->render(d->artist).resize(30));
-  data.append(TagPrivate::stringHandler->render(d->album).resize(30));
-  data.append(TagPrivate::stringHandler->render(d->year).resize(4));
-  data.append(TagPrivate::stringHandler->render(d->comment).resize(28));
+  data.append(strHandler->render(d->title).resize(30));
+  data.append(strHandler->render(d->artist).resize(30));
+  data.append(strHandler->render(d->album).resize(30));
+  data.append(strHandler->render(d->year).resize(4));
+  data.append(strHandler->render(d->comment).resize(28));
   data.append(char(0));
   data.append(char(d->track));
   data.append(char(d->genre));
@@ -204,12 +196,17 @@ void ID3v1::Tag::setGenreNumber(TagLib::uint i)
   d->genre = i < 256 ? i : 255;
 }
 
-void ID3v1::Tag::setStringHandler(const TagLib::StringHandler *handler)
+StringHandler *ID3v1::Tag::stringHandler()  // static
+{
+  return strHandler;
+}
+
+void ID3v1::Tag::setStringHandler(StringHandler *handler) // static
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    strHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    strHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,16 +232,16 @@ void ID3v1::Tag::parse(const ByteVector &data)
 {
   int offset = 3;
 
-  d->title = TagPrivate::stringHandler->parse(data.mid(offset, 30));
+  d->title = strHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->artist = TagPrivate::stringHandler->parse(data.mid(offset, 30));
+  d->artist = strHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->album = TagPrivate::stringHandler->parse(data.mid(offset, 30));
+  d->album = strHandler->parse(data.mid(offset, 30));
   offset += 30;
 
-  d->year = TagPrivate::stringHandler->parse(data.mid(offset, 4));
+  d->year = strHandler->parse(data.mid(offset, 4));
   offset += 4;
 
   // Check for ID3v1.1 -- Note that ID3v1 *does not* support "track zero" -- this
@@ -255,7 +252,7 @@ void ID3v1::Tag::parse(const ByteVector &data)
   if(data[offset + 28] == 0 && data[offset + 29] != 0) {
     // ID3v1.1 detected
 
-    d->comment = TagPrivate::stringHandler->parse(data.mid(offset, 28));
+    d->comment = strHandler->parse(data.mid(offset, 28));
     d->track = uchar(data[offset + 29]);
   }
   else
