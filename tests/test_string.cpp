@@ -51,6 +51,18 @@ public:
 
   void testString()
   {
+    // Needs to know the system byte order for some Unicode tests.
+    bool littleEndian;
+    {
+      union {
+        int  i;
+        char c;
+      } u;
+
+      u.i = 1;
+      littleEndian = (u.c == 1) ? true : false;
+    }
+
     String s = "taglib string";
     ByteVector v = "taglib string";
     CPPUNIT_ASSERT(v == s.data(String::Latin1));
@@ -74,8 +86,28 @@ public:
     String unicode2(unicode.to8Bit(true), String::UTF8);
     CPPUNIT_ASSERT(unicode == unicode2);
 
-	String unicode3(L"\u65E5\u672C\u8A9E");
-	CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+    String unicode3(L"\u65E5\u672C\u8A9E");
+    CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+
+    String unicode4(L"\u65e5\u672c\u8a9e");
+    CPPUNIT_ASSERT(unicode4[1] == L'\u672c');
+
+    String unicode5(L"\u65e5\u672c\u8a9e", String::UTF16BE);
+    CPPUNIT_ASSERT(unicode5[1] == (littleEndian ? L'\u2c67' : L'\u672c'));
+
+    String unicode6(L"\u65e5\u672c\u8a9e", String::UTF16LE);
+    CPPUNIT_ASSERT(unicode6[1] == (littleEndian ? L'\u672c' : L'\u2c67'));
+
+    wstring stduni = L"\u65e5\u672c\u8a9e";
+
+    String unicode7(stduni);
+    CPPUNIT_ASSERT(unicode7[1] == L'\u672c');
+
+    String unicode8(stduni, String::UTF16BE);
+    CPPUNIT_ASSERT(unicode8[1] == (littleEndian ? L'\u2c67' : L'\u672c'));
+
+    String unicode9(stduni, String::UTF16LE);
+    CPPUNIT_ASSERT(unicode9[1] == (littleEndian ? L'\u672c' : L'\u2c67'));
 
     CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);
     CPPUNIT_ASSERT(strcmp(String::number(12345678).toCString(), "12345678") == 0);

@@ -41,13 +41,7 @@ public:
     channels(0), 
     bitsPerSample(0), 
     encrypted(false), 
-    format(Unknown) {}
-
-  enum Format {
-    Unknown = 0,
-    AAC = 1,
-    ALAC = 2,
-  };
+    codec(Unknown) {}
 
   int length;
   int bitrate;
@@ -55,8 +49,12 @@ public:
   int channels;
   int bitsPerSample;
   bool encrypted;
-  Format format;
+  Codec codec;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
 MP4::AudioProperties::AudioProperties(File *file, MP4::Atoms *atoms, ReadStyle style) : 
   d(new PropertiesPrivate())
@@ -105,14 +103,20 @@ MP4::AudioProperties::isEncrypted() const
   return d->encrypted;
 }
 
+MP4::AudioProperties::Codec 
+MP4::AudioProperties::codec() const
+{
+  return d->codec;
+}
+
 String
 MP4::AudioProperties::toString() const
 {
   String format;
-  if(d->format == PropertiesPrivate::AAC) {
+  if(d->codec == AAC) {
     format = "AAC";
   }
-  else if(d->format == PropertiesPrivate::ALAC) {
+  else if(d->codec == ALAC) {
     format = "ALAC";
   }
   else {
@@ -124,6 +128,10 @@ MP4::AudioProperties::toString() const
   desc.append(String::number(bitrate()) + " kbps");
   return desc.toString(", ");
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
 
 void 
 MP4::AudioProperties::read(File *file, Atoms *atoms)
@@ -193,7 +201,7 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
   file->seek(atom->offset);
   data = file->readBlock(atom->length);
   if(data.mid(20, 4) == "mp4a") {
-    d->format        = PropertiesPrivate::AAC;
+    d->codec        = AAC;
     d->channels      = data.toInt16BE(40);
     d->bitsPerSample = data.toInt16BE(42);
     d->sampleRate    = data.toUInt32BE(46);
@@ -214,7 +222,7 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
     }
   }
   else if (data.mid(20, 4) == "alac") {
-    d->format = PropertiesPrivate::ALAC;
+    d->codec = ALAC;
     if (atom->length == 88 && data.mid(56, 4) == "alac") {
       d->bitsPerSample = data.at(69);
       d->channels      = data.at(73);

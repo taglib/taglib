@@ -40,6 +40,12 @@ namespace TagLib {
     class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
     public:
+      enum Codec {
+        Unknown = 0,
+        AAC,
+        ALAC
+      };
+
       AudioProperties(File *file, Atoms *atoms, ReadStyle style = Average);
       virtual ~AudioProperties();
 
@@ -49,6 +55,9 @@ namespace TagLib {
       virtual int channels() const;
       virtual int bitsPerSample() const;
       bool isEncrypted() const;
+
+      //! Audio codec used in the MP4 file
+      Codec codec() const;
 
       String toString() const;
 

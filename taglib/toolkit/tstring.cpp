@@ -267,6 +267,9 @@ String::String(const ByteVector &v, Type t)
     copyFromUTF8(v.data(), v.size());
   else 
     copyFromUTF16(v.data(), v.size(), t);
+
+  // If we hit a null in the ByteVector, shrink the string again.
+  d->data->resize(::wcslen(d->data->c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
