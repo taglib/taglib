@@ -7,6 +7,13 @@ include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 
+# Enable C++11 if possible.
+
+if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.0)
+    OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.3))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
 # Check if the size of integral types are suitable.
 
 check_type_size("short" SIZEOF_SHORT)
