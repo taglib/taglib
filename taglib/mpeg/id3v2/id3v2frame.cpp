@@ -325,7 +325,7 @@ namespace
   static const TagLib::uint frameTranslationSize = 51;
   static const char *frameTranslation[][2] = {
     // Text information frames
-    { "TALB", "ALBUM"},
+    { "TALB", "ALBUM" },
     { "TBPM", "BPM" },
     { "TCOM", "COMPOSER" },
     { "TCON", "GENRE" },
@@ -388,7 +388,7 @@ namespace
     //{ "USLT", "LYRICS" }, handled specially
   };
 
-  static const TagLib::uint txxxFrameTranslationSize = 7;
+  static const TagLib::uint txxxFrameTranslationSize = 8;
   static const char *txxxFrameTranslation[][2] = {
     { "MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
     { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },

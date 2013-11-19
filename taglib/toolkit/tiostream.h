@@ -28,14 +28,11 @@
 
 #include "tbytevector.h"
 
-#ifdef _WIN32
-# include "tstring.h"
-# include "tdebug.h"
-#endif
-
 namespace TagLib {
 
 #ifdef _WIN32
+
+  class String;
 
   class TAGLIB_EXPORT FileName
   {

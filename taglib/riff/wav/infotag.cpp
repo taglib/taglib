@@ -26,26 +26,11 @@
 #include <tdebug.h>
 #include <tfile.h>
 
+#include "rifffile.h"
 #include "infotag.h"
 
 using namespace TagLib;
 using namespace RIFF::Info;
-
-namespace 
-{
-  bool isValidChunkID(const ByteVector &name)
-  {
-    if(name.size() != 4)
-      return false;
-
-    for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || 127 < name[i])
-        return false;
-    }
-
-    return true;
-  }
-}
 
 class RIFF::Info::Tag::TagPrivate
 {
@@ -186,6 +171,11 @@ bool RIFF::Info::Tag::isEmpty() const
   return d->fieldListMap.isEmpty();
 }
 
+FieldListMap RIFF::Info::Tag::fieldListMap() const
+{
+  return d->fieldListMap;
+}
+
 String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 {
   if(d->fieldListMap.contains(id))
@@ -197,7 +187,7 @@ String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
 {
   // id must be four-byte long pure ASCII string.
-  if(!isValidChunkID(id))
+  if(!RIFF::File::isValidChunkName(id))
     return;
 
   if(!s.isEmpty())

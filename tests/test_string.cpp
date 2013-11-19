@@ -41,14 +41,28 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testAppendCharDetach);
   CPPUNIT_TEST(testAppendStringDetach);
   CPPUNIT_TEST(testToInt);
+  CPPUNIT_TEST(testFromInt);
   CPPUNIT_TEST(testSubstr);
   CPPUNIT_TEST(testNewline);
+  CPPUNIT_TEST(testUpper);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
   void testString()
   {
+    // Needs to know the system byte order for some Unicode tests.
+    bool littleEndian;
+    {
+      union {
+        int  i;
+        char c;
+      } u;
+
+      u.i = 1;
+      littleEndian = (u.c == 1) ? true : false;
+    }
+
     String s = "taglib string";
     ByteVector v = "taglib string";
     CPPUNIT_ASSERT(v == s.data(String::Latin1));
@@ -72,8 +86,28 @@ public:
     String unicode2(unicode.to8Bit(true), String::UTF8);
     CPPUNIT_ASSERT(unicode == unicode2);
 
-	String unicode3(L"\u65E5\u672C\u8A9E");
-	CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+    String unicode3(L"\u65E5\u672C\u8A9E");
+    CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+
+    String unicode4(L"\u65e5\u672c\u8a9e");
+    CPPUNIT_ASSERT(unicode4[1] == L'\u672c');
+
+    String unicode5(L"\u65e5\u672c\u8a9e", String::UTF16BE);
+    CPPUNIT_ASSERT(unicode5[1] == (littleEndian ? L'\u2c67' : L'\u672c'));
+
+    String unicode6(L"\u65e5\u672c\u8a9e", String::UTF16LE);
+    CPPUNIT_ASSERT(unicode6[1] == (littleEndian ? L'\u672c' : L'\u2c67'));
+
+    wstring stduni = L"\u65e5\u672c\u8a9e";
+
+    String unicode7(stduni);
+    CPPUNIT_ASSERT(unicode7[1] == L'\u672c');
+
+    String unicode8(stduni, String::UTF16BE);
+    CPPUNIT_ASSERT(unicode8[1] == (littleEndian ? L'\u2c67' : L'\u672c'));
+
+    String unicode9(stduni, String::UTF16LE);
+    CPPUNIT_ASSERT(unicode9[1] == (littleEndian ? L'\u672c' : L'\u2c67'));
 
     CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);
     CPPUNIT_ASSERT(strcmp(String::number(12345678).toCString(), "12345678") == 0);
@@ -215,6 +249,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("-123aa").toInt(), -123);
   }
 
+  void testFromInt()
+  {
+    CPPUNIT_ASSERT_EQUAL(String("123"), String::number(123));
+    CPPUNIT_ASSERT_EQUAL(String("-123"), String::number(-123));
+  }
+
   void testSubstr()
   {
     CPPUNIT_ASSERT_EQUAL(String("01"), String("0123456").substr(0, 2));
@@ -236,6 +276,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(lf)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0d', String(crlf)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
+  }
+  
+  void testUpper()
+  {
+    String s1 = "tagLIB 012 strING";
+    String s2 = s1.upper();
+    CPPUNIT_ASSERT_EQUAL(String("tagLIB 012 strING"), s1);
+    CPPUNIT_ASSERT_EQUAL(String("TAGLIB 012 STRING"), s2);
   }
 
 };

@@ -36,7 +36,6 @@
 #include "tutils.h"
 
 #include <iostream>
-#include <cstdio>
 #include <cstring>
 
 #ifdef HAVE_STD_CODECVT
@@ -156,11 +155,6 @@ public:
   {
   }
 
-  StringPrivate(const std::wstring &s) 
-    : data(new std::wstring(s)) 
-  {
-  }
-
   StringPrivate(size_t n, wchar_t c) 
     : data(new std::wstring(n, c)) 
   {
@@ -268,6 +262,9 @@ String::String(const ByteVector &v, Type t)
     copyFromUTF8(v.data(), v.size());
   else 
     copyFromUTF16(v.data(), v.size(), t);
+
+  // If we hit a null in the ByteVector, shrink the string again.
+  d->data->resize(::wcslen(d->data->c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,7 +387,7 @@ String String::upper() const
 {
   static const int shift = 'A' - 'a';
 
-  String s(*this);
+  String s(*d->data);
   for(Iterator it = s.begin(); it != s.end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
       *it = *it + shift;
@@ -559,30 +556,7 @@ bool String::isAscii() const
 
 String String::number(int n) // static
 {
-  static const size_t BufferSize = 11; // Sufficient to store "-214748364".
-  static const char *Format = "%d";
-
-  char buffer[BufferSize];
-  int length;
-
-#if defined(HAVE_SNPRINTF)
-
-  length = snprintf(buffer, BufferSize, Format, n);
-
-#elif defined(HAVE_SPRINTF_S)
-
-  length = sprintf_s(buffer, Format, n);
-
-#else
-
-  length = sprintf(buffer, Format, n);
-
-#endif
-
-  if(length > 0)
-    return String(buffer);
-  else
-    return String::null;
+  return Utils::formatString("%d", n);
 }
 
 TagLib::wchar &String::operator[](size_t i)
@@ -672,54 +646,43 @@ String &String::operator=(const String &s)
 
 String &String::operator=(const std::string &s)
 {
-  d->data.reset(new std::wstring());
-  copyFromLatin1(s.c_str(), s.length());
-
+  *this = String(s);
   return *this;
 }
 
 String &String::operator=(const std::wstring &s)
 {
-  d->data.reset(new std::wstring(s));
+  *this = String(s);
   return *this;
 }
 
 String &String::operator=(const wchar_t *s)
 {
-  d->data.reset(new std::wstring());
-  copyFromUTF16(s, ::wcslen(s), WCharByteOrder);
-
+  *this = String(s);
   return *this;
 }
 
 String &String::operator=(char c)
 {
-  d->data.reset(new std::wstring(1, c));
+  *this = String(c);
   return *this;
 }
 
 String &String::operator=(wchar_t c)
 {
-  d->data.reset(new std::wstring(1, c));
+  *this = String(c);
   return *this;
 }
 
 String &String::operator=(const char *s)
 {
-  d->data.reset(new std::wstring());
-  copyFromLatin1(s, ::strlen(s));
-
+  *this = String(s);
   return *this;
 }
 
 String &String::operator=(const ByteVector &v)
 {
-  d->data.reset(new std::wstring());
-  copyFromLatin1(v.data(), v.size());
-
-  // If we hit a null in the ByteVector, shrink the string again.
-  d->data->resize(::wcslen(d->data->c_str()));
-
+  *this = String(v);
   return *this;
 }
 

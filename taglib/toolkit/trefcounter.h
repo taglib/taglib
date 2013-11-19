@@ -35,6 +35,7 @@
  */
 namespace TagLib
 {
+
   class TAGLIB_EXPORT RefCounter
   {
   public:
@@ -49,7 +50,9 @@ namespace TagLib
     class RefCounterPrivate;
     RefCounterPrivate *d;
   };
+
 }
 
 #endif // DO_NOT_DOCUMENT
 #endif
+

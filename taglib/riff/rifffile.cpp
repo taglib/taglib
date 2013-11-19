@@ -28,6 +28,7 @@
 #include <tstring.h>
 
 #include "rifffile.h"
+#include <algorithm>
 #include <vector>
 
 using namespace TagLib;
@@ -67,6 +68,20 @@ public:
 RIFF::File::~File()
 {
   delete d;
+}
+
+bool RIFF::File::isValidChunkName(const ByteVector &name)   // static
+{
+  if(name.size() != 4)
+    return false;
+
+  for(ByteVector::ConstIterator it = name.begin(); it != name.end(); ++it) {
+    const uchar c = static_cast<uchar>(*it);
+    if(c < 32 || 127 < c)
+      return false;
+  }
+
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -253,22 +268,6 @@ void RIFF::File::removeChunk(const ByteVector &name)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace
-{
-  bool isValidChunkID(const ByteVector &name)
-  {
-    if(name.size() != 4) {
-      return false;
-    }
-    for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || name[i] > 127) {
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
 void RIFF::File::read()
 {
   d->type = readBlock(4);
@@ -289,13 +288,13 @@ void RIFF::File::read()
     else
       chunkSize = readBlock(4).toUInt32LE(0);
 
-    if(!isValidChunkID(chunkName)) {
+    if(!isValidChunkName(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
       setValid(false);
       break;
     }
 
-    if(tell() + chunkSize > uint(length())) {
+    if(static_cast<ulonglong>(tell()) + chunkSize > static_cast<ulonglong>(length())) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
       setValid(false);
       break;

@@ -29,43 +29,12 @@
 
 #include "tdebug.h"
 #include "tstring.h"
+#include "tutils.h"
 #include "tdebuglistener.h"
 
 #include <bitset>
-#include <cstdio>
-#include <cstdarg>
 
 using namespace TagLib;
-
-namespace
-{
-  String format(const char *fmt, ...)
-  {
-    va_list args;
-    va_start(args, fmt);
-
-    char buf[256];
-
-#if defined(HAVE_SNPRINTF)
-
-    vsnprintf(buf, sizeof(buf), fmt, args);
-
-#elif defined(HAVE_SPRINTF_S)
-
-    vsprintf_s(buf, fmt, args);
-
-#else
-
-    // Be careful. May cause a buffer overflow.  
-    vsprintf(buf, fmt, args);
-
-#endif
-
-    va_end(args);
-
-    return String(buf);
-  }
-}
 
 namespace TagLib
 {
@@ -88,7 +57,8 @@ namespace TagLib
     for(size_t i = 0; i < v.size(); ++i) 
     {
       std::string bits = std::bitset<8>(v[i]).to_string();
-      String msg = format("*** [%d] - char '%c' - int %d, 0x%02x, 0b%s\n", 
+      String msg = Utils::formatString(
+        "*** [%d] - char '%c' - int %d, 0x%02x, 0b%s\n", 
         i, v[i], v[i], v[i], bits.c_str());
 
       debugListener->printMessage(msg);
