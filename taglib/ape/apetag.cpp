@@ -35,6 +35,7 @@
 #include <tstring.h>
 #include <tmap.h>
 #include <tpropertymap.h>
+#include <tutils.h>
 
 #include "apetag.h"
 #include "apefooter.h"
@@ -178,13 +179,13 @@ void APE::Tag::setTrack(uint i)
 namespace
 {
   // conversions of tag keys between what we use in PropertyMap and what's usual
-  // for APE tags
-  static const TagLib::uint keyConversionsSize = 5; //usual,         APE
-  static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
-                                             {"DATE",        "YEAR"        },
-                                             {"ALBUMARTIST", "ALBUM ARTIST"},
-                                             {"DISCNUMBER",  "DISC"        },
-                                             {"REMIXER",     "MIXARTIST"   }};
+  // for APE tags                       usual,         APE
+  const String keyConversions[][2] = {{"TRACKNUMBER", "TRACK"       },
+                                      {"DATE",        "YEAR"        },
+                                      {"ALBUMARTIST", "ALBUM ARTIST"},
+                                      {"DISCNUMBER",  "DISC"        },
+                                      {"REMIXER",     "MIXARTIST"   }};
+  const size_t keyConversionsSize = Utils::countOf(keyConversions);
 }
 
 PropertyMap APE::Tag::properties() const
@@ -199,7 +200,7 @@ PropertyMap APE::Tag::properties() const
       properties.unsupportedData().append(it->first);
     else {
       // Some tags need to be handled specially
-      for(uint i = 0; i < keyConversionsSize; ++i)
+      for(size_t i = 0; i < keyConversionsSize; ++i)
         if(tagName == keyConversions[i][1])
           tagName = keyConversions[i][0];
         properties[tagName].append(it->second.values());
@@ -220,7 +221,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap properties(origProps); // make a local copy that can be modified
 
   // see comment in properties()
-  for(uint i = 0; i < keyConversionsSize; ++i)
+  for(size_t i = 0; i < keyConversionsSize; ++i)
     if(properties.contains(keyConversions[i][0])) {
       properties.insert(keyConversions[i][1], properties[keyConversions[i][0]]);
       properties.erase(keyConversions[i][0]);
