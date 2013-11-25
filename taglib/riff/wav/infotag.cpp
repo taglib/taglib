@@ -1,6 +1,6 @@
 /***************************************************************************
     copyright            : (C) 2012 by Tsuda Kageyu
-    email                : wheeler@kde.org
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -49,7 +49,7 @@ namespace {
 class RIFF::Info::Tag::TagPrivate
 {
 public:
-  TagPrivate() 
+  TagPrivate()
   {}
 
   FieldListMap fieldListMap;
@@ -86,14 +86,14 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 static const StringHandler defaultStringHandler;
 const RIFF::Info::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
-RIFF::Info::Tag::Tag(const ByteVector &data) 
+RIFF::Info::Tag::Tag(const ByteVector &data)
   : TagLib::Tag()
   , d(new TagPrivate())
 {
   parse(data);
 }
 
-RIFF::Info::Tag::Tag() 
+RIFF::Info::Tag::Tag()
   : TagLib::Tag()
   , d(new TagPrivate())
 {
@@ -229,7 +229,7 @@ ByteVector RIFF::Info::Tag::render() const
     data.append(it->first);
     data.append(ByteVector::fromUInt(text.size() + 1, false));
     data.append(text);
-    
+
     do {
       data.append('\0');
     } while(data.size() & 1);
