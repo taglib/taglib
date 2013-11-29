@@ -135,14 +135,14 @@ int DSF::AudioProperties::blockSizePerChannel() const
 
 void DSF::AudioProperties::read(const ByteVector &data)
 {
-  d->formatVersion         = data.mid(0, 4).toUInt32LE(0);
-  d->formatID              = data.mid(4, 4).toUInt32LE(0);
-  d->channelType           = data.mid(8, 4).toUInt32LE(0);
-  d->channelNum            = data.mid(12, 4).toUInt32LE(0);
-  d->samplingFrequency     = data.mid(16, 4).toUInt32LE(0);
-  d->bitsPerSample         = data.mid(20, 4).toUInt32LE(0);
-  d->sampleCount           = data.mid(24, 8).toInt64LE(0);
-  d->blockSizePerChannel   = data.mid(32, 4).toUInt32LE(0);
+  d->formatVersion         = data.toUInt32LE(0);
+  d->formatID              = data.toUInt32LE(4);
+  d->channelType           = data.toUInt32LE(8);
+  d->channelNum            = data.toUInt32LE(12);
+  d->samplingFrequency     = data.toUInt32LE(16);
+  d->bitsPerSample         = data.toUInt32LE(20);
+  d->sampleCount           = data.toInt64LE(24);
+  d->blockSizePerChannel   = data.toUInt32LE(32);
 
   d->bitrate               = (d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0;
   d->length                = d->samplingFrequency > 0 ? d->sampleCount / d->samplingFrequency : 0;
