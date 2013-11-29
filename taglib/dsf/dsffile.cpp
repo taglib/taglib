@@ -130,7 +130,7 @@ bool DSF::File::save()
     // Update the metadata offset to 0 since there is no longer a tag
     if(d->metadataOffset != newMetadataOffset) {
       insert(ByteVector::fromUInt64LE(0ULL), 20, 8);
-      d->metadataOffset = newMetadataOffset;
+      d->metadataOffset = 0;
     }
 
     // Delete the old tag
