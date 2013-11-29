@@ -58,17 +58,6 @@ namespace TagLib {
      */
     StringList(const StringList &l);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Constructs a StringList equivalent to \a l.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    StringList(StringList &&l);
-
-#endif
-
     /*!
      * Constructs a StringList with \a s as a member.
      */
@@ -99,43 +88,12 @@ namespace TagLib {
      */
     StringList &append(const StringList &l);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Appends \a s to the end of the list and returns a reference to the
-     * list.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    StringList &append(String &&s);
-
-    /*!
-     * Appends all of the values in \a l to the end of the list and returns a
-     * reference to the list.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    StringList &append(StringList &&l);
-
-#endif
-
     /*!
      * Make a shallow, implicitly shared, copy of \a l.  Because this is
      * implicitly shared, this method is lightweight and suitable for
      * pass-by-value usage.
      */
     StringList &operator=(const StringList &l);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a l into this StringList.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    StringList &operator=(StringList &&l);
-
-#endif
 
     /*!
      * Splits the String \a s into several strings at \a pattern.  This will not include

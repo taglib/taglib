@@ -54,34 +54,12 @@ namespace TagLib {
      */
     ByteVectorList(const ByteVectorList &l);
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a l into this ByteVectorList.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    ByteVectorList(ByteVectorList &&l);
-
-#endif
-
     /*!
      * Make a shallow, implicitly shared, copy of \a l.  Because this is
      * implicitly shared, this method is lightweight and suitable for
      * pass-by-value usage.
      */
     ByteVectorList &operator=(const ByteVectorList &l);
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-    /*!
-     * Moves \a l into this ByteVectorList.
-     *
-     * \note Not available unless TAGLIB_USE_MOVE_SEMANTICS macro is defined.
-     */
-    ByteVectorList &operator=(ByteVectorList &&l);
-
-#endif
 
     /*!
      * Convert the ByteVectorList to a ByteVector separated by \a separator.  By

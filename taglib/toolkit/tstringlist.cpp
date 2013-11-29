@@ -38,7 +38,7 @@ StringList StringList::split(const String &s, const String &pattern)
   size_t previousOffset = 0;
   for(size_t offset = s.find(pattern);
     offset != String::npos;
-    offset = s.find(pattern, offset + 1)) 
+    offset = s.find(pattern, offset + 1))
   {
     l.append(s.substr(previousOffset, offset - previousOffset));
     previousOffset = offset + 1;
@@ -60,14 +60,6 @@ StringList::StringList() : List<String>()
 StringList::StringList(const StringList &l) : List<String>(l)
 {
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-StringList::StringList(StringList &&l) : List<String>(l)
-{
-}
-
-#endif
 
 StringList::StringList(const String &s) : List<String>()
 {
@@ -111,37 +103,11 @@ StringList &StringList::append(const StringList &l)
   return *this;
 }
 
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-StringList &StringList::append(String &&s)
-{
-  List<String>::append(s);
-  return *this;
-}
-
-StringList &StringList::append(StringList &&l)
-{
-  List<String>::append(l);
-  return *this;
-}
-
-#endif
-
 StringList &StringList::operator=(const StringList &l)
 {
   List<String>::operator=(l);
   return *this;
 }
-
-#ifdef TAGLIB_USE_MOVE_SEMANTICS
-
-StringList &StringList::operator=(StringList &&l)
-{
-  List<String>::operator=(l);
-  return *this;
-}
-
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions
