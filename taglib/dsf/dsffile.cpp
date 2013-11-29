@@ -116,10 +116,8 @@ bool DSF::File::save()
 
   // Three things must be updated: the file size, the tag data, and the metadata offset
 
-  long long newMetadataOffset = d->metadataOffset ? d->metadataOffset : d->fileSize;
-
   if(d->tag->isEmpty()) {
-    long long newFileSize = newMetadataOffset;
+    long long newFileSize = d->metadataOffset ? d->metadataOffset : d->fileSize;
 
     // Update the file size
     if(d->fileSize != newFileSize) {
@@ -128,17 +126,18 @@ bool DSF::File::save()
     }
 
     // Update the metadata offset to 0 since there is no longer a tag
-    if(d->metadataOffset != newMetadataOffset) {
+    if(d->metadataOffset) {
       insert(ByteVector::fromUInt64LE(0ULL), 20, 8);
       d->metadataOffset = 0;
     }
 
     // Delete the old tag
-    truncate(newMetadataOffset);
+    truncate(newFileSize);
   }
   else {
     ByteVector tagData = d->tag->render();
 
+    long long newMetadataOffset = d->metadataOffset ? d->metadataOffset : d->fileSize;
     long long newFileSize = newMetadataOffset + tagData.size();
     long long oldTagSize = d->fileSize - newMetadataOffset;
 
