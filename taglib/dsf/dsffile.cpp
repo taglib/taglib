@@ -154,6 +154,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   ByteVector chunkName = readBlock(4);
   if(chunkName != "DSD ") {
     debug("DSF::File::read() -- Not a DSF file.");
+    setValid(false);
     return;
   }
 
@@ -162,6 +163,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   // Integrity check
   if(28 != chunkSize) {
     debug("DSF::File::read() -- File is corrupted.");
+    setValid(false);
     return;
   }
   
@@ -171,6 +173,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   // File is malformed or corrupted
   if(d->metadataOffset > d->fileSize) {
     debug("DSF::File::read() -- Invalid metadata offset.");
+    setValid(false);
     return;
   }
 
@@ -178,6 +181,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   chunkName = readBlock(4);
   if(chunkName != "fmt ") {
     debug("DSF::File::read() -- Missing 'fmt ' chunk.");
+    setValid(false);
     return;
   }
 
@@ -193,3 +197,4 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   else
     d->tag = new ID3v2::Tag(this, d->metadataOffset);
 }
+
