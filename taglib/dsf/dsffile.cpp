@@ -116,27 +116,47 @@ bool DSF::File::save()
 
   // Three things must be updated: the file size, the tag data, and the metadata offset
 
-  ByteVector tagData = d->tag->render();
+  long long newMetadataOffset = d->metadataOffset ? d->metadataOffset : d->fileSize;
 
-  long long metadataLocation = d->metadataOffset ? d->metadataOffset : d->fileSize;
-  long long newFileSize = metadataLocation + tagData.size();
-  long long newMetadataOffset = tagData.size() ? metadataLocation : 0;
-  long long oldTagSize = d->fileSize - metadataLocation;
+  if(d->tag->isEmpty()) {
+    long long newFileSize = newMetadataOffset;
 
-  // Update the file size
-  if(d->fileSize != newFileSize) {
-    insert(ByteVector::fromUInt64LE(newFileSize), 12, 8);
-    d->fileSize = newFileSize;
+    // Update the file size
+    if(d->fileSize != newFileSize) {
+      insert(ByteVector::fromUInt64LE(newFileSize), 12, 8);
+      d->fileSize = newFileSize;
+    }
+
+    // Update the metadata offset
+    if(d->metadataOffset != newMetadataOffset) {
+      insert(ByteVector::fromUInt64LE(newMetadataOffset), 20, 8);
+      d->metadataOffset = newMetadataOffset;
+    }
+
+    // Delete the old tag
+    truncate(newMetadataOffset);
   }
+  else {
+    ByteVector tagData = d->tag->render();
 
-  // Update the metadata offset
-  if(d->metadataOffset != newMetadataOffset) {
-    insert(ByteVector::fromUInt64LE(newMetadataOffset), 20, 8);
-    d->metadataOffset = newMetadataOffset;
+    long long newFileSize = newMetadataOffset + tagData.size();
+    long long oldTagSize = d->fileSize - newMetadataOffset;
+
+    // Update the file size
+    if(d->fileSize != newFileSize) {
+      insert(ByteVector::fromUInt64LE(newFileSize), 12, 8);
+      d->fileSize = newFileSize;
+    }
+
+    // Update the metadata offset
+    if(d->metadataOffset != newMetadataOffset) {
+      insert(ByteVector::fromUInt64LE(newMetadataOffset), 20, 8);
+      d->metadataOffset = newMetadataOffset;
+    }
+
+    // Delete the old tag and write the new one
+    insert(tagData, newMetadataOffset, oldTagSize);
   }
-
-  // Delete the old tag and write the new one
-  insert(tagData, metadataLocation, oldTagSize);
 
   return true;
 }
