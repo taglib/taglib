@@ -168,6 +168,14 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   }
   
   d->fileSize = readBlock(8).toInt64LE(0);
+
+  // File is malformed or corrupted
+  if(d->fileSize != length()) {
+    debug("DSF::File::read() -- File is corrupted.");
+    setValid(false);
+    return;
+  }
+
   d->metadataOffset = readBlock(8).toInt64LE(0);
 
   // File is malformed or corrupted
