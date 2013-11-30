@@ -80,12 +80,12 @@ namespace TagLib {
     //! The main class in the RIFF INFO tag implementation
 
     /*!
-     * This is the main class in the INFO tag implementation.  RIFF INFO tag is 
-     * a metadata format found in WAV audio and AVI video files.  Though it is a 
-     * part of Microsoft/IBM's RIFF specification, the author could not find the 
-     * official documents about it.  So, this implementation is referring to 
-     * unofficial documents on the web and some applications' behaviors especially 
-     * Windows Explorer.
+     * This is the main class in the INFO tag implementation.  RIFF INFO tag (aka
+     * LIST INFO chunk or RIFF SIF) is a metadata format found in WAV audio and 
+     * AVI video files.  Though it is a part of Microsoft/IBM's RIFF specification, 
+     * the author could not find any official documents about it.  So, this 
+     * implementation is referring to some unofficial documents online and the
+     * behavior of some softwares especially Windows Explorer.
      */
     class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
@@ -104,27 +104,85 @@ namespace TagLib {
 
       // Reimplementations
 
+      /*!
+       * Returns the track name.  Corresponding to the "INAM" field. 
+       */
       virtual String title() const;
+
+      /*!
+       * Returns the artist name.  Corresponding to the "IART" field. 
+       */
       virtual String artist() const;
+
+      /*!
+       * Returns the album name.  Corresponding to the "IPRD" field. 
+       */
       virtual String album() const;
+
+      /*!
+       * Returns the track comment.  Corresponding to the "ICMT" field. 
+       */
       virtual String comment() const;
+      
+      /*!
+       * Returns the genre name.  Corresponding to the "IGNR" field. 
+       */
       virtual String genre() const;
+
+      /*!
+       * Returns the year part of the creation date.  Corresponding to the "ICRD" field,
+       * but converts the first four chars of the "ICRD" field to uint. 
+       */
       virtual uint year() const;
+
+      /*!
+       * Returns the track number.  Corresponding to the "ITRK" field. 
+       */
       virtual uint track() const;
 
+      /*!
+       * Sets the track name.  Corresponding to the "INAM" field. 
+       */
       virtual void setTitle(const String &s);
+
+      /*!
+       * Sets the artist name.  Corresponding to the "IART" field. 
+       */
       virtual void setArtist(const String &s);
+
+      /*!
+       * Sets the album name.  Corresponding to the "IPRD" field. 
+       */
       virtual void setAlbum(const String &s);
+
+      /*!
+       * Sets the track comment.  Corresponding to the "ICMT" field. 
+       */
       virtual void setComment(const String &s);
+
+      /*!
+       * Sets the genre name.  Corresponding to the "IGNR" field. 
+       */
       virtual void setGenre(const String &s);
+
+      /*!
+       * Sets the year part of the creation date.  Corresponding to the "ICRD" field,
+       * but modifies the first four chars of the "ICRD" field. 
+       * If \a i is zero, removes the "ICRD" field.
+       */
       virtual void setYear(uint i);
+
+      /*!
+       * Sets the track number.  Corresponding to the "ITRK" field. 
+       * If \a i is zero, removes the "ITRK" field.
+       */
       virtual void setTrack(uint i);
 
       virtual bool isEmpty() const;
 
       /*!
-       * Returns a copy of the internal fields of the tag.  The returned map directly 
-       * reflects the contents of the "INFO" chunk.
+       * Returns a copy of the internal fields of the tag.  The returned map 
+       * directly reflects the contents of the "INFO" chunk.
        *
        * \note Modifying this map does not affect the tag's internal data.
        * Use setFieldText() and removeField() instead.
@@ -135,19 +193,19 @@ namespace TagLib {
       FieldListMap fieldListMap() const;
 
       /*
-       * Gets the value of the field with the ID \a id.
+       * Returns the value of the field with the ID \a id.
        */
       String fieldText(const ByteVector &id) const;
         
       /*
-        * Sets the value of the field with the ID \a id to \a s.
-        * If the field does not exist, it is created.
-        * If \s is empty, the field is removed.
-        *
-        * \note fieldId must be four-byte long pure ASCII string.  This function 
-        * performs nothing if fieldId is invalid.
-        */
-      void setFieldText(const ByteVector &id, const String &s);
+       * Sets the value of the field with the ID \a id to \a text.
+       * If the field does not exist, it is created.  If \text is empty, the field 
+       * is removed.
+       *
+       * \note fieldId must be four-byte long pure ASCII string.  This function 
+       * performs nothing if fieldId is invalid.
+       */
+      void setFieldText(const ByteVector &id, const String &text);
 
       /*
        * Removes the field with the ID \a id.
@@ -157,9 +215,12 @@ namespace TagLib {
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
        *
-       * \note Returns empty ByteVector is the tag contains no fields. 
+       * If \a createIID3Field is true, an ID3v1 tag will be appended as an
+       * "IID3" field at the end of the data.
+       *
+       * Returns an empty ByteVector if the tag is empty. 
        */
-      ByteVector render() const;
+      ByteVector render(bool createIID3Field = false) const;
 
       /*!
        * Sets the string handler that decides how the text data will be
@@ -180,11 +241,7 @@ namespace TagLib {
        */
       void parse(const ByteVector &data);
 
-
     private:
-      Tag(const Tag &);
-      Tag &operator=(const Tag &);
-
       class TagPrivate;
       TagPrivate *d;
     };

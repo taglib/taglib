@@ -186,6 +186,11 @@ bool RIFF::WAV::File::hasInfoTag() const
 
 void RIFF::WAV::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
 {
+  if(typeName() != "RIFF" || formatName() != "WAVE") {
+    setValid(false);
+    return;
+  }
+
   ByteVector formatData;
   uint streamLength = 0;
   for(uint i = 0; i < chunkCount(); i++) {

@@ -29,6 +29,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testWav);
   CPPUNIT_TEST(testAIFF);
   CPPUNIT_TEST(testAIFC);
+  CPPUNIT_TEST(testRMP3);
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST_SUITE_END();
 
@@ -165,6 +166,11 @@ public:
   void testAIFC()
   {
     fileRefSave("alaw", ".aifc");
+  }
+
+  void testRMP3()
+  {
+    fileRefSave("xing", ".rmp");
   }
 
   void testOGA_FLAC()

@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/wav
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/rmp3
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/vorbis
@@ -68,6 +69,7 @@ SET(test_runner_SRCS
   test_mpc.cpp
   test_opus.cpp
   test_matroska.cpp
+  test_rmp3.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

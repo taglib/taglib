@@ -51,6 +51,7 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
+#include "rmp3file.h"
 
 using namespace TagLib;
 
@@ -137,6 +138,8 @@ namespace
         file.reset(new IT::File(fileName, readAudioProperties, audioPropertiesStyle));
       else if(ext == "XM")
         file.reset(new XM::File(fileName, readAudioProperties, audioPropertiesStyle));
+      else if(ext == "RMP")
+        file.reset(new RIFF::RMP3::File(fileName, readAudioProperties, audioPropertiesStyle));
     }
 
     return file;

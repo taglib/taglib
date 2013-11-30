@@ -264,6 +264,16 @@ void RIFF::File::removeChunk(const ByteVector &name)
   d->chunks.swap(newChunks);
 }
 
+TagLib::ByteVector TagLib::RIFF::File::typeName() const
+{
+  return d->type;
+}
+
+TagLib::ByteVector TagLib::RIFF::File::formatName() const
+{
+  return d->format;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
