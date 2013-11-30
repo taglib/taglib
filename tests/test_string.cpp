@@ -44,6 +44,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testSubstr);
   CPPUNIT_TEST(testNewline);
   CPPUNIT_TEST(testEncode);
+  CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -278,6 +279,24 @@ public:
     CPPUNIT_ASSERT(empty5.isEmpty());
     CPPUNIT_ASSERT(empty6.empty());
     CPPUNIT_ASSERT(empty7.empty());
+  }
+
+  void testIterator()
+  {
+    String s1 = "taglib string";
+    String s2 = s1;
+
+    String::Iterator it1 = s1.begin();
+    String::Iterator it2 = s2.begin();
+
+    CPPUNIT_ASSERT_EQUAL(L't', *it1);
+    CPPUNIT_ASSERT_EQUAL(L't', *it2);
+
+    std::advance(it1, 4);
+    std::advance(it2, 4);
+    *it2 = L'I';
+    CPPUNIT_ASSERT_EQUAL(L'i', *it1);
+    CPPUNIT_ASSERT_EQUAL(L'I', *it2);
   }
 
 };

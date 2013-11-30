@@ -316,6 +316,7 @@ const wchar_t *String::toCWString() const
 
 String::Iterator String::begin()
 {
+  detach();
   return d->data.begin();
 }
 
@@ -326,6 +327,7 @@ String::ConstIterator String::begin() const
 
 String::Iterator String::end()
 {
+  detach();
   return d->data.end();
 }
 

@@ -208,6 +208,7 @@ bool List<T>::isEmpty() const
 template <class T>
 typename List<T>::Iterator List<T>::find(const T &value)
 {
+  detach();
   return std::find(d->list.begin(), d->list.end(), value);
 }
 
