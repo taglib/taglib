@@ -1,0 +1,149 @@
+/***************************************************************************
+    copyright            : (C) 2013 by Stephen F. Booth
+    email                : me@sbooth.org
+ ***************************************************************************/
+
+/***************************************************************************
+ *   This library is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License version   *
+ *   2.1 as published by the Free Software Foundation.                     *
+ *                                                                         *
+ *   This library is distributed in the hope that it will be useful, but   *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   Lesser General Public License for more details.                       *
+ *                                                                         *
+ *   You should have received a copy of the GNU Lesser General Public      *
+ *   License along with this library; if not, write to the Free Software   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
+ ***************************************************************************/
+
+#include <tstring.h>
+#include <tdebug.h>
+
+#include "dsfproperties.h"
+
+using namespace TagLib;
+
+class DSF::AudioProperties::PropertiesPrivate
+{
+public:
+  PropertiesPrivate() :
+    formatVersion(0),
+    formatID(0),
+    channelType(0),
+    channelNum(0),
+    samplingFrequency(0),
+    bitsPerSample(0),
+    sampleCount(0),
+    blockSizePerChannel(0),
+    bitrate(0),
+    length(0)
+  {
+
+  }
+
+  // Nomenclature is from DSF file format specification
+  uint formatVersion;
+  uint formatID;
+  uint channelType;
+  uint channelNum;
+  uint samplingFrequency;
+  uint bitsPerSample;
+  long long sampleCount;
+  uint blockSizePerChannel;
+
+  // Computed
+  uint bitrate;
+  uint length;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+DSF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style)
+{
+  d = new PropertiesPrivate;
+  read(data);
+}
+
+DSF::AudioProperties::~AudioProperties()
+{
+  delete d;
+}
+
+int DSF::AudioProperties::length() const
+{
+  return d->length;
+}
+
+int DSF::AudioProperties::bitrate() const
+{
+  return d->bitrate;
+}
+
+int DSF::AudioProperties::sampleRate() const
+{
+  return d->samplingFrequency;
+}
+
+int DSF::AudioProperties::channels() const
+{
+  return d->channelNum;
+}
+
+// DSF specific
+int DSF::AudioProperties::formatVersion() const
+{
+  return d->formatVersion;
+}
+
+int DSF::AudioProperties::formatID() const
+{
+  return d->formatID;
+}
+
+int DSF::AudioProperties::channelType() const
+{
+  return d->channelType;
+}
+
+int DSF::AudioProperties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
+long long DSF::AudioProperties::sampleCount() const
+{
+  return d->sampleCount;
+}
+
+int DSF::AudioProperties::blockSizePerChannel() const
+{
+  return d->blockSizePerChannel;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
+void DSF::AudioProperties::read(const ByteVector &data)
+{
+  d->formatVersion         = data.toUInt32LE(0);
+  d->formatID              = data.toUInt32LE(4);
+  d->channelType           = data.toUInt32LE(8);
+  d->channelNum            = data.toUInt32LE(12);
+  d->samplingFrequency     = data.toUInt32LE(16);
+  d->bitsPerSample         = data.toUInt32LE(20);
+  d->sampleCount           = data.toInt64LE(24);
+  d->blockSizePerChannel   = data.toUInt32LE(32);
+
+  d->bitrate               = (d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0;
+  d->length                = d->samplingFrequency > 0 ? d->sampleCount / d->samplingFrequency : 0;
+}
