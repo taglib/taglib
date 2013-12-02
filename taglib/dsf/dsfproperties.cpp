@@ -144,6 +144,8 @@ void DSF::AudioProperties::read(const ByteVector &data)
   d->sampleCount           = data.toInt64LE(24);
   d->blockSizePerChannel   = data.toUInt32LE(32);
 
-  d->bitrate               = (d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0;
-  d->length                = d->samplingFrequency > 0 ? d->sampleCount / d->samplingFrequency : 0;
+  d->bitrate               
+    = static_cast<uint>((d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0);
+  d->length                
+    = d->samplingFrequency > 0 ? static_cast<uint>(d->sampleCount / d->samplingFrequency) : 0;
 }
