@@ -276,25 +276,8 @@ String::~String()
 
 std::string String::to8Bit(bool unicode) const
 {
-  std::string s;
-
-  if(!unicode) {
-    s.resize(d->data->size());
-
-    std::string::iterator targetIt = s.begin();
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-      *targetIt = static_cast<char>(*it);
-      ++targetIt;
-    }
-  }
-  else {
-    s.resize(d->data->size() * 4 + 1);
-
-    UTF16toUTF8(&(*d->data)[0], d->data->size(), &s[0], s.size());
-    s.resize(::strlen(s.c_str()));
-  }
-
-  return s;
+  const ByteVector v = data(unicode ? UTF8 : Latin1);
+  return std::string(v.data(), v.size());
 }
 
 const std::wstring &String::toWString() const
