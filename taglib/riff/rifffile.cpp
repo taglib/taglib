@@ -219,22 +219,23 @@ void RIFF::File::removeChunk(uint i)
 {
   if(i >= d->chunks.size())
     return;
+
+  std::vector<Chunk>::iterator it = d->chunks.begin() + i;
+  const uint removedSize = it->size + it->padding + 8;
   
-  removeBlock(d->chunks[i].offset - 8, d->chunks[i].size + 8);
-  d->chunks.erase(d->chunks.begin() + i);
+  removeBlock(it->offset - 8, removedSize);
+  it = d->chunks.erase(it);
+  
+  for(; it != d->chunks.end(); ++it)
+    it->offset -= removedSize;
 }
 
 void RIFF::File::removeChunk(const ByteVector &name)
 {
-  std::vector<Chunk> newChunks;
-  for(size_t i = 0; i < d->chunks.size(); ++i) {
+  for(int i = d->chunks.size() - 1; i >= 0; --i) {
     if(d->chunks[i].name == name)
-      removeBlock(d->chunks[i].offset - 8, d->chunks[i].size + 8);
-    else
-      newChunks.push_back(d->chunks[i]);
+      removeChunk(i);
   }
-
-  d->chunks.swap(newChunks);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
