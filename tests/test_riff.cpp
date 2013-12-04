@@ -203,7 +203,7 @@ public:
   {
     ScopedFileCopy copy("empty", ".aiff");
     string filename = copy.fileName();
-  
+
     PublicRIFF *f = new PublicRIFF(filename.c_str());
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f->chunkName(0));
@@ -219,19 +219,41 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x0026 + 8), f->chunkOffset(1));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x042E + 8), f->chunkOffset(2));
 
+    f->seek(f->chunkOffset(0) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f->readBlock(4));
+    f->seek(f->chunkOffset(1) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f->readBlock(4));
+    f->seek(f->chunkOffset(2) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->readBlock(4));
+
     f->setChunkData(0, data);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x000C + 8), f->chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x0414 + 8), f->chunkOffset(1));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x081C + 8), f->chunkOffset(2));
-    
+
+    f->seek(f->chunkOffset(0) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f->readBlock(4));
+    f->seek(f->chunkOffset(1) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f->readBlock(4));
+    f->seek(f->chunkOffset(2) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->readBlock(4));
+
     f->removeChunk("SSND");
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x000C + 8), f->chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x0414 + 8), f->chunkOffset(1));
 
+    f->seek(f->chunkOffset(0) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f->readBlock(4));
+    f->seek(f->chunkOffset(1) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->readBlock(4));
+
     f->removeChunk(0);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0x000C + 8), f->chunkOffset(0));
 
-    delete f;   
+    f->seek(f->chunkOffset(0) - 8);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->readBlock(4));
+
+    delete f;
   }
 
 };
