@@ -49,7 +49,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Creates an instance of TrueAudio::AudioProperties with the data read from 
+       * Creates an instance of TrueAudio::AudioProperties with the data read from
        * the ByteVector \a data.
        */
       AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);

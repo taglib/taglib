@@ -168,7 +168,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
 {
   // A DSF file consists of four chunks: DSD chunk, format chunk, data chunk, and metadata chunk
   // The file format is not chunked in the sense of a RIFF File, though
-  
+
   // DSD chunk
   ByteVector chunkName = readBlock(4);
   if(chunkName != "DSD ") {
@@ -178,14 +178,14 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   }
 
   long long chunkSize = readBlock(8).toInt64LE(0);
-  
+
   // Integrity check
   if(28 != chunkSize) {
     debug("DSF::File::read() -- File is corrupted.");
     setValid(false);
     return;
   }
-  
+
   d->fileSize = readBlock(8).toInt64LE(0);
 
   // File is malformed or corrupted
@@ -213,9 +213,9 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   }
 
   chunkSize = readBlock(8).toInt64LE(0);
-  
+
   d->properties = new AudioProperties(readBlock(chunkSize), propertiesStyle);
-  
+
   // Skip the data chunk
 
   // A metadata offset of 0 indicates the absence of an ID3v2 tag

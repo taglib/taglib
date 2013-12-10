@@ -65,7 +65,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-IT::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) : 
+IT::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) :
   d(new PropertiesPrivate())
 {
 }

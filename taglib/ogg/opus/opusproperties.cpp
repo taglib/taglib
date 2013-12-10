@@ -56,7 +56,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Opus::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+Opus::AudioProperties::AudioProperties(File *file, ReadStyle style) :
   d(new PropertiesPrivate())
 {
   read(file);

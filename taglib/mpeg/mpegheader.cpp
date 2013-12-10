@@ -53,7 +53,7 @@ namespace
 class MPEG::Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() 
+  HeaderPrivate()
     : data(new HeaderData())
   {
     data->isValid           = false;
@@ -66,7 +66,7 @@ public:
     data->isCopyrighted     = false;
     data->isOriginal        = false;
     data->frameLength       = 0;
-    data->samplesPerFrame   = 0; 
+    data->samplesPerFrame   = 0;
   }
 
   SHARED_PTR<HeaderData> data;
@@ -82,7 +82,7 @@ MPEG::Header::Header(const ByteVector &data)
   parse(data);
 }
 
-MPEG::Header::Header(const Header &h) 
+MPEG::Header::Header(const Header &h)
   : d(new HeaderPrivate(*h.d))
 {
 }

@@ -34,8 +34,8 @@ namespace TagLib {
 #ifndef DO_NOT_DOCUMENT
 
   /*!
-   * A simple function that outputs the debug messages to the listener. 
-   * The default listener redirects the messages to \a stderr when NDEBUG is 
+   * A simple function that outputs the debug messages to the listener.
+   * The default listener redirects the messages to \a stderr when NDEBUG is
    * not defined.
    *
    * \warning Do not use this outside of TagLib, it could lead to undefined
@@ -45,7 +45,7 @@ namespace TagLib {
    * \internal
    */
   void debug(const String &s);
-  
+
   /*!
    * For debugging binary data.
    *

@@ -220,7 +220,7 @@ public:
   void testProperties()
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    
+
     PropertyMap tags = f.properties();
 
     tags["TRACKNUMBER"] = StringList("2");

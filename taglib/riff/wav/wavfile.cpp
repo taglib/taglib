@@ -57,7 +57,7 @@ public:
   }
 
   AudioProperties *properties;
-  
+
   ByteVector tagChunkID;
 
   DoubleTagUnion tag;
@@ -239,6 +239,6 @@ TagLib::uint RIFF::WAV::File::findInfoTagChunk()
       return i;
     }
   }
-  
+
   return TagLib::uint(-1);
 }

@@ -103,7 +103,7 @@ PropertyMap Ogg::FLAC::File::properties() const
 PropertyMap Ogg::FLAC::File::setProperties(const PropertyMap &properties)
 {
   return d->comment->setProperties(properties);
-}  
+}
 
 FLAC::AudioProperties *Ogg::FLAC::File::audioProperties() const
 {

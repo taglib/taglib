@@ -40,7 +40,7 @@ namespace TagLib {
    * Note that most metadata formats pose additional conditions on the tag keys. The
    * most popular ones (Vorbis, APE, ID3v2) should support all ASCII only words of
    * length between 2 and 16.
-   * 
+   *
    * This class can contain any tags, but here is a list of "well-known" tags that
    * you might want to use:
    *
@@ -81,14 +81,14 @@ namespace TagLib {
    *  - COPYRIGHT
    *  - ENCODEDBY
    *  - MOOD
-   *  - COMMENT 
+   *  - COMMENT
    *  - MEDIA
    *  - LABEL
    *  - CATALOGNUMBER
    *  - BARCODE
    *
    * MusicBrainz identifiers:
-   * 
+   *
    *  - MUSICBRAINZ_TRACKID
    *  - MUSICBRAINZ_ALBUMID
    *  - MUSICBRAINZ_RELEASEGROUPID

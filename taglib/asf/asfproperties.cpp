@@ -32,11 +32,11 @@ using namespace TagLib;
 class ASF::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : 
-    length(0), 
-    bitrate(0), 
-    sampleRate(0), 
-    channels(0), 
+  PropertiesPrivate() :
+    length(0),
+    bitrate(0),
+    sampleRate(0),
+    channels(0),
     encrypted(false) {}
 
   int length;

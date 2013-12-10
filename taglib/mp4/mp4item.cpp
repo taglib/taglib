@@ -54,10 +54,10 @@ namespace
   };
 }
 
-class MP4::Item::ItemPrivate 
+class MP4::Item::ItemPrivate
 {
 public:
-  ItemPrivate() 
+  ItemPrivate()
     : data(new ItemData())
   {
     data->valid        = true;
@@ -74,7 +74,7 @@ MP4::Item::Item()
   d->data->valid = false;
 }
 
-MP4::Item::Item(const Item &item) 
+MP4::Item::Item(const Item &item)
   : d(new ItemPrivate(*item.d))
 {
 }

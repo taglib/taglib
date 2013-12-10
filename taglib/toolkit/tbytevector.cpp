@@ -102,7 +102,7 @@ static const uint crcTable[256] = {
 };
 
 /*!
-  * A templatized straightforward find that works with the types 
+  * A templatized straightforward find that works with the types
   * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
   */
 template <class TIterator>
@@ -128,7 +128,7 @@ size_t findChar(
 }
 
 /*!
-  * A templatized KMP find that works with the types 
+  * A templatized KMP find that works with the types
   * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
   */
 template <class TIterator>
@@ -195,7 +195,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
 {
   static const bool swap = (ENDIAN != Utils::SystemByteOrder);
 
-  if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size()) 
+  if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size())
   {
     // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
     T tmp;
@@ -235,13 +235,13 @@ inline ByteVector fromNumber(T value)
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
 }
 
-class ByteVector::ByteVectorPrivate 
+class ByteVector::ByteVectorPrivate
 {
 public:
-  ByteVectorPrivate() 
+  ByteVectorPrivate()
     : data(new std::vector<char>())
     , offset(0)
-    , length(0) 
+    , length(0)
   {
   }
 
@@ -252,20 +252,20 @@ public:
   {
   }
 
-  ByteVectorPrivate(size_t l, char c) 
+  ByteVectorPrivate(size_t l, char c)
     : data(new std::vector<char>(l, c))
     , offset(0)
     , length(l)
   {
   }
 
-  ByteVectorPrivate(const char *s, size_t l) 
+  ByteVectorPrivate(const char *s, size_t l)
     : data(new std::vector<char>(s, s + l))
     , offset(0)
     , length(l)
   {
   }
-  
+
   void detach()
   {
     if(!data.unique()) {
@@ -343,7 +343,7 @@ ByteVector::ByteVector(size_t size, char value)
 {
 }
 
-ByteVector::ByteVector(const ByteVector &v) 
+ByteVector::ByteVector(const ByteVector &v)
   : d(new ByteVectorPrivate(*v.d))
 {
 }
@@ -445,9 +445,9 @@ bool ByteVector::containsAt(
 
   // do some sanity checking -- all of these things are needed for the search to be valid
   const size_t compareLength = patternLength - patternOffset;
-  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)    
+  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)
     return false;
-  
+
   return (::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0);
 }
 
@@ -469,7 +469,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   const size_t withSize    = with.size();
   const size_t patternSize = pattern.size();
   const ptrdiff_t diff = withSize - patternSize;
-  
+
   size_t offset = 0;
   while (true)
   {
@@ -481,16 +481,16 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
 
     if(diff < 0) {
       ::memmove(
-        data() + offset + withSize, 
-        data() + offset + patternSize, 
+        data() + offset + withSize,
+        data() + offset + patternSize,
         size() - offset - patternSize);
       resize(size() + diff);
     }
     else if(diff > 0) {
       resize(size() + diff);
       ::memmove(
-        data() + offset + withSize, 
-        data() + offset + patternSize, 
+        data() + offset + withSize,
+        data() + offset + patternSize,
         size() - diff - offset - patternSize);
     }
 
@@ -545,7 +545,7 @@ ByteVector &ByteVector::append(char c)
 ByteVector &ByteVector::clear()
 {
   detach();
-  *d = *ByteVector::null.d; 
+  *d = *ByteVector::null.d;
 
   return *this;
 }
@@ -676,7 +676,7 @@ long long ByteVector::toInt64LE(size_t offset) const
 long long ByteVector::toInt64BE(size_t offset) const
 {
   return static_cast<long long>(toNumber<ulonglong, 8, BigEndian>(*this, offset));
-}    
+}
 
 float ByteVector::toFloat32BE(size_t offset) const
 {
@@ -687,7 +687,7 @@ float ByteVector::toFloat32BE(size_t offset) const
 
 #if defined(SIZEOF_FLOAT) && SIZEOF_FLOAT == 4
 
-  if(std::numeric_limits<float>::is_iec559) 
+  if(std::numeric_limits<float>::is_iec559)
   {
     // float is 32-bit wide and IEEE754 compliant.
 
@@ -707,17 +707,17 @@ float ByteVector::toFloat32BE(size_t offset) const
 
   const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
 
-  // 1-bit sign 
+  // 1-bit sign
   const bool negative = ((bytes[0] & 0x80) != 0);
 
   // 8-bit exponent
   const int exponent = ((bytes[0] & 0x7F) << 1) | (bytes[1] >> 7);
 
   // 1-bit integer part (always 1) and 23-bit fraction.
-  const uint fraction 
+  const uint fraction
     = (1U << 23)
-    | (static_cast<uint>(bytes[1] & 0x7f) << 16) 
-    | (static_cast<uint>(bytes[2]) <<  8) 
+    | (static_cast<uint>(bytes[1] & 0x7f) << 16)
+    | (static_cast<uint>(bytes[2]) <<  8)
     | (static_cast<uint>(bytes[3]));
 
   float val;
@@ -728,7 +728,7 @@ float ByteVector::toFloat32BE(size_t offset) const
       debug("ByteVector::toFloat32BE() - can't handle the infinity or NaN. Returning 0.");
       return 0.0;
     }
-    else 
+    else
       val = ::ldexp(static_cast<float>(fraction), exponent - 127 - 23);
   }
 
@@ -747,7 +747,7 @@ double ByteVector::toFloat64BE(size_t offset) const
 
 #if defined(SIZEOF_DOUBLE) && SIZEOF_DOUBLE == 8
 
-  if(std::numeric_limits<double>::is_iec559) 
+  if(std::numeric_limits<double>::is_iec559)
   {
     // double is 64-bit wide and IEEE754 compliant.
 
@@ -767,21 +767,21 @@ double ByteVector::toFloat64BE(size_t offset) const
 
   const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
 
-  // 1-bit sign 
+  // 1-bit sign
   const bool negative = ((bytes[0] & 0x80) != 0);
 
   // 11-bit exponent
   const int exponent = ((bytes[0] & 0x7F) << 4) | (bytes[1] >> 4);
 
   // 1-bit integer part (always 1) and 52-bit fraction.
-  const ulonglong fraction 
+  const ulonglong fraction
     = (1ULL << 52)
-    | (static_cast<ulonglong>(bytes[1] & 0x0F) << 48) 
-    | (static_cast<ulonglong>(bytes[2]) << 40) 
-    | (static_cast<ulonglong>(bytes[3]) << 32) 
+    | (static_cast<ulonglong>(bytes[1] & 0x0F) << 48)
+    | (static_cast<ulonglong>(bytes[2]) << 40)
+    | (static_cast<ulonglong>(bytes[3]) << 32)
     | (static_cast<ulonglong>(bytes[4]) << 24)
-    | (static_cast<ulonglong>(bytes[5]) << 16) 
-    | (static_cast<ulonglong>(bytes[6]) <<  8) 
+    | (static_cast<ulonglong>(bytes[5]) << 16)
+    | (static_cast<ulonglong>(bytes[6]) <<  8)
     | (static_cast<ulonglong>(bytes[7]));
 
   double val;
@@ -792,7 +792,7 @@ double ByteVector::toFloat64BE(size_t offset) const
       debug("ByteVector::toFloat64BE() - can't handle the infinity or NaN. Returning 0.");
       return 0.0;
     }
-    else 
+    else
       val = ::ldexp(1.0 + static_cast<double>(fraction), exponent - 1023 - 52);
   }
 
@@ -811,21 +811,21 @@ long double ByteVector::toFloat80BE(size_t offset) const
 
   const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
 
-  // 1-bit sign 
+  // 1-bit sign
   const bool negative = ((bytes[0] & 0x80) != 0);
 
   // 15-bit exponent
   const int exponent = ((bytes[0] & 0x7F) << 8) | bytes[1];
 
   // 1-bit integer part and 63-bit fraction.
-  const ulonglong fraction 
-    = (static_cast<ulonglong>(bytes[2]) << 56) 
-    | (static_cast<ulonglong>(bytes[3]) << 48) 
-    | (static_cast<ulonglong>(bytes[4]) << 40) 
+  const ulonglong fraction
+    = (static_cast<ulonglong>(bytes[2]) << 56)
+    | (static_cast<ulonglong>(bytes[3]) << 48)
+    | (static_cast<ulonglong>(bytes[4]) << 40)
     | (static_cast<ulonglong>(bytes[5]) << 32)
-    | (static_cast<ulonglong>(bytes[6]) << 24) 
-    | (static_cast<ulonglong>(bytes[7]) << 16) 
-    | (static_cast<ulonglong>(bytes[8]) <<  8) 
+    | (static_cast<ulonglong>(bytes[6]) << 24)
+    | (static_cast<ulonglong>(bytes[7]) << 16)
+    | (static_cast<ulonglong>(bytes[8]) <<  8)
     | (static_cast<ulonglong>(bytes[9]));
 
   long double val;
@@ -836,7 +836,7 @@ long double ByteVector::toFloat80BE(size_t offset) const
       debug("ByteVector::toFloat80BE() - can't handle the infinity or NaN. Returning 0.");
       return 0.0;
     }
-    else 
+    else
       val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
   }
 

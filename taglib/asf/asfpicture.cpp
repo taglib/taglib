@@ -44,7 +44,7 @@ namespace
   };
 }
 
-class ASF::Picture::PicturePrivate 
+class ASF::Picture::PicturePrivate
 {
 public:
   PicturePrivate()
