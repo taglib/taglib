@@ -155,11 +155,11 @@ namespace TagLib
 
 # if SYSTEM_BYTEORDER == 1
 
-    const ByteOrder SystemByteOrder = LittleEndian; 
+    const ByteOrder SystemByteOrder = LittleEndian;
 
 # else
 
-    const ByteOrder SystemByteOrder = BigEndian; 
+    const ByteOrder SystemByteOrder = BigEndian;
 
 # endif
 
@@ -178,8 +178,8 @@ namespace TagLib
       else
         return BigEndian;
     }
-    
-    const ByteOrder SystemByteOrder = systemByteOrder(); 
+
+    const ByteOrder SystemByteOrder = systemByteOrder();
 
 #endif
   }

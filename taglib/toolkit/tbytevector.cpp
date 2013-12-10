@@ -100,7 +100,7 @@ static const uint crcTable[256] = {
 };
 
 /*!
-  * A templatized straightforward find that works with the types 
+  * A templatized straightforward find that works with the types
   * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
   */
 template <class TIterator>
@@ -126,7 +126,7 @@ int findChar(
 }
 
 /*!
-  * A templatized KMP find that works with the types 
+  * A templatized KMP find that works with the types
   * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
   */
 template <class TIterator>
@@ -213,7 +213,7 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   static const bool isBigEndian = (Utils::SystemByteOrder == Utils::BigEndian);
   const bool swap = (mostSignificantByteFirst != isBigEndian);
 
-  if(offset + sizeof(T) > v.size()) 
+  if(offset + sizeof(T) > v.size())
     return toNumber<T>(v, offset, v.size() - offset, mostSignificantByteFirst);
 
   // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
@@ -245,8 +245,8 @@ public:
   {
   }
 
-  DataPrivate(const std::vector<char> &v, uint offset, uint length) 
-    : data(v.begin() + offset, v.begin() + offset + length) 
+  DataPrivate(const std::vector<char> &v, uint offset, uint length)
+    : data(v.begin() + offset, v.begin() + offset + length)
   {
   }
 
@@ -256,8 +256,8 @@ public:
   {
   }
 
-  DataPrivate(uint len, char c) 
-    : data(len, c) 
+  DataPrivate(uint len, char c)
+    : data(len, c)
   {
   }
 
@@ -267,11 +267,11 @@ public:
 class ByteVector::ByteVectorPrivate : public RefCounter
 {
 public:
-  ByteVectorPrivate() 
+  ByteVectorPrivate()
     : RefCounter()
     , data(new DataPrivate())
     , offset(0)
-    , length(0) 
+    , length(0)
   {
   }
 
@@ -292,7 +292,7 @@ public:
   {
   }
 
-  ByteVectorPrivate(uint l, char c) 
+  ByteVectorPrivate(uint l, char c)
     : RefCounter()
     , data(new DataPrivate(l, c))
     , offset(0)
@@ -300,14 +300,14 @@ public:
   {
   }
 
-  ByteVectorPrivate(const char *s, uint l) 
+  ByteVectorPrivate(const char *s, uint l)
     : RefCounter()
     , data(new DataPrivate(s, s + l))
     , offset(0)
     , length(l)
   {
   }
-  
+
   void detach()
   {
     if(data->count() > 1) {
@@ -385,7 +385,7 @@ ByteVector::ByteVector(uint size, char value)
 {
 }
 
-ByteVector::ByteVector(const ByteVector &v) 
+ByteVector::ByteVector(const ByteVector &v)
   : d(v.d)
 {
   d->ref();
@@ -488,9 +488,9 @@ bool ByteVector::containsAt(const ByteVector &pattern, uint offset, uint pattern
 
   // do some sanity checking -- all of these things are needed for the search to be valid
   const uint compareLength = patternLength - patternOffset;
-  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)    
+  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)
     return false;
-  
+
   return (::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0);
 }
 
@@ -512,7 +512,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   const size_t withSize    = with.size();
   const size_t patternSize = pattern.size();
   const ptrdiff_t diff = withSize - patternSize;
-  
+
   size_t offset = 0;
   while (true)
   {
@@ -524,16 +524,16 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
 
     if(diff < 0) {
       ::memmove(
-        data() + offset + withSize, 
-        data() + offset + patternSize, 
+        data() + offset + withSize,
+        data() + offset + patternSize,
         size() - offset - patternSize);
       resize(size() + diff);
     }
     else if(diff > 0) {
       resize(size() + diff);
       ::memmove(
-        data() + offset + withSize, 
-        data() + offset + patternSize, 
+        data() + offset + withSize,
+        data() + offset + patternSize,
         size() - diff - offset - patternSize);
     }
 

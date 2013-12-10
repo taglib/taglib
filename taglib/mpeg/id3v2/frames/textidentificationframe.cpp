@@ -216,7 +216,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
       if(d->textEncoding == String::Latin1)
         d->fieldList.append(Tag::latin1StringHandler()->parse(*it));
       else
-        d->fieldList.append(String(*it, d->textEncoding));    
+        d->fieldList.append(String(*it, d->textEncoding));
     }
   }
 }
