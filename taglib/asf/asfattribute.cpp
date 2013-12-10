@@ -153,7 +153,7 @@ ByteVector ASF::Attribute::toByteVector() const
 {
   if(d->data->pictureValue.isValid())
     return d->data->pictureValue.render();
-  
+
   return d->data->byteVectorValue;
 }
 

@@ -60,7 +60,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) : 
+TrueAudio::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) :
   d(new PropertiesPrivate())
 {
   read(file, streamLength);

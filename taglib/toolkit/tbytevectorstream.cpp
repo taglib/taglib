@@ -83,7 +83,7 @@ void ByteVectorStream::writeBlock(const ByteVector &data)
   const size_t size = data.size();
   if(static_cast<offset_t>(d->position + size) > length())
     truncate(d->position + size);
-  
+
   ::memcpy(d->data.data() + d->position, data.data(), size);
   d->position += size;
 }
@@ -100,8 +100,8 @@ void ByteVectorStream::insert(const ByteVector &data, offset_t start, size_t rep
     const size_t readPosition  = static_cast<size_t>(start + replace);
     const size_t writePosition = static_cast<size_t>(start + data.size());
     ::memmove(
-      d->data.data() + writePosition, 
-      d->data.data() + readPosition, 
+      d->data.data() + writePosition,
+      d->data.data() + readPosition,
       static_cast<size_t>(length() - sizeDiff - readPosition));
   }
   seek(start);
@@ -115,8 +115,8 @@ void ByteVectorStream::removeBlock(offset_t start, size_t length)
   if(readPosition < ByteVectorStream::length()) {
     size_t bytesToMove = static_cast<size_t>(ByteVectorStream::length() - readPosition);
     ::memmove(
-      d->data.data() + static_cast<ptrdiff_t>(writePosition), 
-      d->data.data() + static_cast<ptrdiff_t>(readPosition), 
+      d->data.data() + static_cast<ptrdiff_t>(writePosition),
+      d->data.data() + static_cast<ptrdiff_t>(readPosition),
       bytesToMove);
     writePosition += bytesToMove;
   }

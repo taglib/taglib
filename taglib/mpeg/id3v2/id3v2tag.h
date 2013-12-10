@@ -61,13 +61,13 @@ namespace TagLib {
     //! An abstraction for the ISO-8859-1 string to data encoding in ID3v2 tags.
 
     /*!
-     * ID3v2 tag can store strings in ISO-8859-1 (Latin1), and TagLib only 
-     * supports genuine ISO-8859-1 by default.  However, in practice, non 
-     * ISO-8859-1 encodings are often used instead of ISO-8859-1, such as 
+     * ID3v2 tag can store strings in ISO-8859-1 (Latin1), and TagLib only
+     * supports genuine ISO-8859-1 by default.  However, in practice, non
+     * ISO-8859-1 encodings are often used instead of ISO-8859-1, such as
      * Windows-1252 for western languages, Shift_JIS for Japanese and so on.
      *
      * Here is an option to read such tags by subclassing this class,
-     * reimplementing parse() and setting your reimplementation as the default 
+     * reimplementing parse() and setting your reimplementation as the default
      * with ID3v2::Tag::setStringHandler().
      *
      * \note Writing non-ISO-8859-1 tags is not implemented intentionally.
@@ -360,9 +360,9 @@ namespace TagLib {
        */
       // BIC: combine with the above method
       ByteVector render(int version) const;
-      
+
       /*!
-       * Gets the current string handler that decides how the "Latin-1" data 
+       * Gets the current string handler that decides how the "Latin-1" data
        * will be converted to and from binary data.
        *
        * \see Latin1StringHandler
@@ -376,7 +376,7 @@ namespace TagLib {
        * released and default ISO-8859-1 handler is restored.
        *
        * \note The caller is responsible for deleting the previous handler
-       * as needed after it is released. 
+       * as needed after it is released.
        *
        * \see Latin1StringHandler
        */

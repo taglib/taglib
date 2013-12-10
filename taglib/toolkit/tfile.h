@@ -110,7 +110,7 @@ namespace TagLib {
      * See the documentation of the subclass implementations for detailed descriptions.
      */
     virtual PropertyMap setProperties(const PropertyMap &properties);
-    
+
     /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were
@@ -242,7 +242,7 @@ namespace TagLib {
 
   protected:
     /*!
-     * Construct a File object and opens the file specified by \a fileName.  
+     * Construct a File object and opens the file specified by \a fileName.
      *
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.

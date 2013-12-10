@@ -220,10 +220,10 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // Now add the chunk to the file
 
   writeChunk(
-    name, 
-    data, 
-    offset, 
-    static_cast<uint>(std::max<offset_t>(0, length() - offset)), 
+    name,
+    data,
+    offset,
+    static_cast<uint>(std::max<offset_t>(0, length() - offset)),
     static_cast<uint>(offset & 1));
 
   // And update our internal structure
@@ -246,7 +246,7 @@ void RIFF::File::removeChunk(uint i)
 {
   if(i >= d->chunks.size())
     return;
-  
+
   removeBlock(d->chunks[i].offset - 8, d->chunks[i].size + 8);
   d->chunks.erase(d->chunks.begin() + i);
 }

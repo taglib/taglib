@@ -46,9 +46,9 @@ namespace TagLib {
      * practice it does not.  TagLib by default only supports ISO-8859-1 data
      * in ID3v1 tags.
      *
-     * However by subclassing TagLib::StringHandler class and reimplementing 
-     * parse() and render() and setting your reimplementation as the default 
-     * with ID3v1::Tag::setStringHandler() you can define how you would like 
+     * However by subclassing TagLib::StringHandler class and reimplementing
+     * parse() and render() and setting your reimplementation as the default
+     * with ID3v1::Tag::setStringHandler() you can define how you would like
      * these transformations to be done.
      *
      * \warning It is advisable <b>not</b> to write non-ISO-8859-1 data to ID3v1

@@ -55,7 +55,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-XM::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) : 
+XM::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) :
   d(new PropertiesPrivate())
 {
 }

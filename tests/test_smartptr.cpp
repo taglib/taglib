@@ -85,9 +85,9 @@ public:
     std::set< SHARED_PTR<int> > scp;
     scp.insert(cp4);
     CPPUNIT_ASSERT( scp.find(cp4) != scp.end() );
-    CPPUNIT_ASSERT( scp.find(cp4) == scp.find( SHARED_PTR<int>(cp4) ) );  
+    CPPUNIT_ASSERT( scp.find(cp4) == scp.find( SHARED_PTR<int>(cp4) ) );
   }
-  
+
 private:
   class DummyBase
   {
@@ -95,76 +95,76 @@ private:
     DummyBase(int x) : value(x)
     {
     }
-  
+
     virtual ~DummyBase()
     {
       baseDestructorCalled = true;
     }
-  
+
     int getValue() const
     {
       return value;
     }
-  
+
   private:
     int value;
   };
-  
+
   class DummyDerived : public DummyBase
   {
   public:
     DummyDerived(int x) : DummyBase(x)
     {
     }
-  
+
     virtual ~DummyDerived()
     {
       derivedDestructorCalled = true;
     }
   };
-  
+
 public:
   void testDerivedClass()
   {
     baseDestructorCalled = false;
     derivedDestructorCalled = false;
-  
+
     {
       SHARED_PTR<DummyBase> p1(new DummyDerived(100));
       CPPUNIT_ASSERT(p1->getValue() == 100);
     }
-  
+
     CPPUNIT_ASSERT(baseDestructorCalled);
     CPPUNIT_ASSERT(derivedDestructorCalled);
-  
+
     baseDestructorCalled = false;
     derivedDestructorCalled = false;
-  
+
     {
       SHARED_PTR<DummyDerived> p1(new DummyDerived(100));
       SHARED_PTR<DummyBase> p2 = p1;
-  
+
       CPPUNIT_ASSERT(p1->getValue() == 100);
       CPPUNIT_ASSERT(p2->getValue() == 100);
     }
-  
+
     CPPUNIT_ASSERT(baseDestructorCalled);
     CPPUNIT_ASSERT(derivedDestructorCalled);
-  
+
     baseDestructorCalled = false;
     derivedDestructorCalled = false;
-  
+
     {
       SHARED_PTR<DummyDerived> p1;
       SHARED_PTR<DummyBase> p2;
-  
+
       p1.reset(new DummyDerived(100));
       p2 = p1;
-  
+
       CPPUNIT_ASSERT(p1->getValue() == 100);
       CPPUNIT_ASSERT(p2->getValue() == 100);
     }
-  
+
     CPPUNIT_ASSERT(baseDestructorCalled);
     CPPUNIT_ASSERT(derivedDestructorCalled);
   }
@@ -172,7 +172,7 @@ public:
 private:
   class DummyIncomplete;
   SHARED_PTR<DummyIncomplete> pincomplete;
- 
+
   class DummyIncomplete
   {
   public:
@@ -180,7 +180,7 @@ private:
     {
       incompleteDestructorCalled = true;
     }
-  
+
     int getValue() const { return 100; }
   };
 
@@ -188,10 +188,10 @@ public:
   void testIncompleteClass()
   {
     incompleteDestructorCalled = false;
-  
+
     pincomplete.reset(new DummyIncomplete());
     CPPUNIT_ASSERT(pincomplete->getValue() == 100);
-  
+
     pincomplete.reset();
     CPPUNIT_ASSERT(incompleteDestructorCalled);
   }

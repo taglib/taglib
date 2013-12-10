@@ -59,7 +59,7 @@
  * \endcode
  */
 
-namespace TagLib 
+namespace TagLib
 {
   typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
   typedef unsigned char      uchar;
@@ -70,7 +70,7 @@ namespace TagLib
   // long/ulong can be either 32-bit or 64-bit wide.
   typedef unsigned long  ulong;
 
-  // Offset or length type for I/O streams.  
+  // Offset or length type for I/O streams.
   // In Win32, always signed 64-bit. Otherwise, equivalent to off_t.
 #ifdef _WIN32
   typedef LONGLONG offset_t;

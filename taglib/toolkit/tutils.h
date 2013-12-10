@@ -148,13 +148,13 @@ namespace TagLib
 
 #endif
     }
-    
+
     inline String formatString(const char *format, ...)
     {
       // Sufficient buffer size for the current internal uses.
       // Consider changing this value when you use this function.
 
-      static const size_t BufferSize = 128; 
+      static const size_t BufferSize = 128;
 
       va_list args;
       va_start(args, format);
@@ -194,11 +194,11 @@ namespace TagLib
 
 # if SYSTEM_BYTEORDER == 1
 
-    const ByteOrder SystemByteOrder = LittleEndian; 
+    const ByteOrder SystemByteOrder = LittleEndian;
 
 # else
 
-    const ByteOrder SystemByteOrder = BigEndian; 
+    const ByteOrder SystemByteOrder = BigEndian;
 
 # endif
 
@@ -217,8 +217,8 @@ namespace TagLib
       else
         return BigEndian;
     }
-    
-    const ByteOrder SystemByteOrder = systemByteOrder(); 
+
+    const ByteOrder SystemByteOrder = systemByteOrder();
 
 #endif
   }

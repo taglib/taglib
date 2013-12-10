@@ -234,7 +234,7 @@ void APE::Item::parse(const ByteVector &data)
   setReadOnly(flags & 1);
   setType(ItemTypes((flags >> 1) & 3));
 
-  if(Text == d->type) 
+  if(Text == d->type)
     d->text = StringList(ByteVectorList::split(value, '\0'), String::UTF8);
   else
     d->value = value;

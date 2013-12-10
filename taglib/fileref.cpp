@@ -63,12 +63,12 @@ namespace
   ResolverList fileTypeResolvers;
 
   SHARED_PTR<File> create(
-    FileName fileName, 
+    FileName fileName,
     bool readAudioProperties,
     AudioProperties::ReadStyle audioPropertiesStyle)
   {
     SHARED_PTR<File> file;
-    for(ResolverConstIterator it = fileTypeResolvers.begin(); it != fileTypeResolvers.end(); ++it) 
+    for(ResolverConstIterator it = fileTypeResolvers.begin(); it != fileTypeResolvers.end(); ++it)
     {
       file.reset((*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle));
       if(file)
@@ -146,7 +146,7 @@ namespace
   }
 }
 
-class FileRef::FileRefPrivate 
+class FileRef::FileRefPrivate
 {
 public:
   FileRefPrivate()
@@ -154,11 +154,11 @@ public:
   {
   }
 
-  FileRefPrivate(File *f) 
-    : file(f) 
+  FileRefPrivate(File *f)
+    : file(f)
   {
   }
-  
+
   FileRefPrivate(const SHARED_PTR<File> &f)
     : file(f)
   {
@@ -176,8 +176,8 @@ FileRef::FileRef()
 {
 }
 
-FileRef::FileRef(FileName fileName, 
-                 bool readAudioProperties, 
+FileRef::FileRef(FileName fileName,
+                 bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle)
   : d(new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle)))
 {
@@ -188,7 +188,7 @@ FileRef::FileRef(File *file)
 {
 }
 
-FileRef::FileRef(const FileRef &ref) 
+FileRef::FileRef(const FileRef &ref)
   : d(new FileRefPrivate(ref.d->file))
 {
 }

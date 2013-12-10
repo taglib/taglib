@@ -51,7 +51,7 @@ namespace TagLib {
       {
       public:
         /*!
-         * Creates an instance of Speex::AudioProperties with the data read from 
+         * Creates an instance of Speex::AudioProperties with the data read from
          * the Speex::File \a file.
          */
         AudioProperties(File *file, ReadStyle style = Average);

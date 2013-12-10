@@ -41,7 +41,7 @@ public:
     Element *elem = document->getDocumentRoot()->getChild(Constants::Segment);
     Element *info = elem->getChild(Constants::SegmentInfo);
     Element *value;
-    
+
     if(info && (value = info->getChild(Constants::Duration))) {
       length = static_cast<int>(value->getAsFloat() / 1000000000.L);
       if((value = info->getChild(Constants::TimecodeScale)))
@@ -49,34 +49,34 @@ public:
       else
         length *= 1000000;
     }
-    
+
     info = elem->getChild(Constants::Tracks);
     if(!info || !(info = info->getChild(Constants::TrackEntry)) ||
       !(info = info->getChild(Constants::Audio))) {
-      
+
       return;
     }
-    
+
     // Dirty bitrate:
     document->seek(0, File::End);
     bitrate = static_cast<int>(8 * document->tell() / ((length > 0) ? length : 1));
-    
+
     if((value = info->getChild(Constants::Channels)))
       channels = static_cast<int>(value->getAsUnsigned());
-    
+
     if((value = info->getChild(Constants::SamplingFrequency)))
       samplerate = static_cast<int>(value->getAsFloat());
   }
-  
+
   // The length of the file
   int length;
-  
+
   // The bitrate
   int bitrate;
-  
+
   // The amount of channels
   int channels;
-  
+
   // The sample rate
   int samplerate;
 };

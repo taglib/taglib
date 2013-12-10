@@ -34,13 +34,13 @@ using namespace TagLib;
 class MP4::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : 
-    length(0), 
-    bitrate(0), 
-    sampleRate(0), 
-    channels(0), 
-    bitsPerSample(0), 
-    encrypted(false), 
+  PropertiesPrivate() :
+    length(0),
+    bitrate(0),
+    sampleRate(0),
+    channels(0),
+    bitsPerSample(0),
+    encrypted(false),
     codec(Unknown) {}
 
   int length;
@@ -56,7 +56,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MP4::AudioProperties::AudioProperties(File *file, MP4::Atoms *atoms, ReadStyle style) : 
+MP4::AudioProperties::AudioProperties(File *file, MP4::Atoms *atoms, ReadStyle style) :
   d(new PropertiesPrivate())
 {
   read(file, atoms);
@@ -103,7 +103,7 @@ MP4::AudioProperties::isEncrypted() const
   return d->encrypted;
 }
 
-MP4::AudioProperties::Codec 
+MP4::AudioProperties::Codec
 MP4::AudioProperties::codec() const
 {
   return d->codec;
@@ -133,7 +133,7 @@ MP4::AudioProperties::toString() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void 
+void
 MP4::AudioProperties::read(File *file, Atoms *atoms)
 {
   MP4::Atom *moov = atoms->find("moov");

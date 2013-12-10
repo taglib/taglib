@@ -55,7 +55,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, 
+FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength,
                                        ReadStyle style) :
   d(new PropertiesPrivate())
 {

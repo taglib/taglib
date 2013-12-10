@@ -52,7 +52,7 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() 
+  TagPrivate()
     : file(0)
     , tagOffset(-1)
     , extendedHeader(0)
