@@ -70,7 +70,7 @@ namespace TagLib {
        * Returns the sample rate in Hz. 0 means unknown or custom.
        */
       virtual int sampleRate() const;
-      
+
       virtual int channels() const;
 
       /*!

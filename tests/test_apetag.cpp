@@ -98,19 +98,19 @@ public:
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
   }
-  
+
   void testTextBinary()
   {
     APE::Item item = APE::Item("DUMMY", "Test Text");
     CPPUNIT_ASSERT_EQUAL(String("Test Text"), item.toString());
     CPPUNIT_ASSERT_EQUAL(ByteVector::null, item.binaryData());
-    
+
     ByteVector data("Test Data");
     item.setBinaryData(data);
     CPPUNIT_ASSERT(item.values().isEmpty());
     CPPUNIT_ASSERT_EQUAL(String::null, item.toString());
     CPPUNIT_ASSERT_EQUAL(data, item.binaryData());
-    
+
     item.setValue("Test Text 2");
     CPPUNIT_ASSERT_EQUAL(String("Test Text 2"), item.toString());
     CPPUNIT_ASSERT_EQUAL(ByteVector::null, item.binaryData());

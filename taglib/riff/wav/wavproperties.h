@@ -82,7 +82,7 @@ namespace TagLib {
         uint sampleFrames() const;
 
         /*!
-         * Returns the format ID of the WAVE file.  For example, 0 for Unknown, 
+         * Returns the format ID of the WAVE file.  For example, 0 for Unknown,
          * 1 for PCM and so forth.
          */
         uint format() const;

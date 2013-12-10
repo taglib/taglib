@@ -64,7 +64,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Constructs an Ogg/FLAC file from \a file.  If \a readProperties is true 
+       * Constructs an Ogg/FLAC file from \a file.  If \a readProperties is true
        * the file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -73,7 +73,7 @@ namespace TagLib {
            AudioProperties::ReadStyle propertiesStyle = AudioProperties::Average);
 
       /*!
-       * Constructs an Ogg/FLAC file from \a stream.  If \a readProperties is true 
+       * Constructs an Ogg/FLAC file from \a stream.  If \a readProperties is true
        * the file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -92,10 +92,10 @@ namespace TagLib {
       /*!
        * Returns the Tag for this file.  This will always be a XiphComment.
        *
-       * \note This always returns a valid pointer regardless of whether or not 
-       * the file on disk has a XiphComment.  Use hasXiphComment() to check if 
+       * \note This always returns a valid pointer regardless of whether or not
+       * the file on disk has a XiphComment.  Use hasXiphComment() to check if
        * the file on disk actually has a XiphComment.
-       * 
+       *
        * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
@@ -111,17 +111,17 @@ namespace TagLib {
       virtual AudioProperties *audioProperties() const;
 
 
-      /*! 
+      /*!
        * Implements the unified property interface -- export function.
        * This forwards directly to XiphComment::properties().
        */
       PropertyMap properties() const;
 
-      /*! 
+      /*!
        * Implements the unified tag dictionary interface -- import function.
        * Like properties(), this is a forwarder to the file's XiphComment.
        */
-      PropertyMap setProperties(const PropertyMap &); 
+      PropertyMap setProperties(const PropertyMap &);
 
 
       /*!

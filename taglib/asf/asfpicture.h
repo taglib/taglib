@@ -47,7 +47,7 @@ namespace TagLib
      * \see Attribute::toPicture()
      * \see Attribute::Attribute(const Picture& picture)
      */
-    class TAGLIB_EXPORT Picture 
+    class TAGLIB_EXPORT Picture
     {
     public:
 

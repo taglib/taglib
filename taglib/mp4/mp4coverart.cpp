@@ -39,10 +39,10 @@ namespace
   };
 }
 
-class MP4::CoverArt::CoverArtPrivate 
+class MP4::CoverArt::CoverArtPrivate
 {
 public:
-  CoverArtPrivate(Format f, const ByteVector &v) 
+  CoverArtPrivate(Format f, const ByteVector &v)
     : data(new CoverArtData())
   {
     data->format = f;
@@ -57,7 +57,7 @@ MP4::CoverArt::CoverArt(Format format, const ByteVector &data)
 {
 }
 
-MP4::CoverArt::CoverArt(const CoverArt &item) 
+MP4::CoverArt::CoverArt(const CoverArt &item)
   : d(new CoverArtPrivate(*item.d))
 {
 }

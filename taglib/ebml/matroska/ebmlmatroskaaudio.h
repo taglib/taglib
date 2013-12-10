@@ -33,9 +33,9 @@
 namespace TagLib {
 
   namespace EBML {
-  
+
     namespace Matroska {
-      
+
       /*!
        * This class represents the audio properties of a matroska file.
        * Currently all information are read from the container format and
@@ -46,41 +46,41 @@ namespace TagLib {
       public:
         //! Destructor
         virtual ~AudioProperties();
-        
+
         /*!
          * Constructs an instance from a file.
          */
         AudioProperties(File *document);
-        
+
         /*!
          * Returns the length of the file.
          */
         virtual int length() const;
-        
+
         /*!
          * Returns the bit rate of the file. Since the container format does not
          * offer a proper value, it ist currently calculated by dividing the
          * file size by the length.
          */
         virtual int bitrate() const;
-        
+
         /*!
          * Returns the amount of channels of the file.
          */
         virtual int channels() const;
-        
+
         /*!
          * Returns the sample rate of the file.
          */
         virtual int sampleRate() const;
-      
+
       private:
         class AudioPropertiesPrivate;
         AudioPropertiesPrivate *d;
       };
-      
+
     }
-  
+
   }
 
 }

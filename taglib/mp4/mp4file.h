@@ -54,7 +54,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      File(FileName file, bool readProperties = true, 
+      File(FileName file, bool readProperties = true,
            AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
@@ -66,7 +66,7 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true, 
+      File(IOStream *stream, bool readProperties = true,
            AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!

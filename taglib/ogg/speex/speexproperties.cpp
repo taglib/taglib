@@ -62,7 +62,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Speex::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+Speex::AudioProperties::AudioProperties(File *file, ReadStyle style) :
   d(new PropertiesPrivate())
 {
   read(file);

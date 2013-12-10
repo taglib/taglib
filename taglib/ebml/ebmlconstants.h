@@ -36,13 +36,13 @@ namespace TagLib {
   namespace EBML {
     //! Shorter representation of the type.
     typedef unsigned long long int ulli;
-    
+
     //! The id of an EBML Void element that is just a placeholder.
     const ulli Void = 0xecL;
-    
+
     //! The id of an EBML CRC32 element that contains a crc32 value.
     const ulli CRC32 = 0xc3L;
-    
+
     //! A namespace containing the ids of the EBML header's elements.
     namespace Header {
       const ulli EBML = 0x1a45dfa3L;
@@ -54,7 +54,7 @@ namespace TagLib {
       const ulli DocTypeVersion = 0x4287L;
       const ulli DocTypeReadVersion = 0x4285L;
     }
-    
+
   }
 
 }

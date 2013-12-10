@@ -51,7 +51,7 @@ namespace TagLib {
       {
       public:
         /*!
-         * Creates an instance of Opus::AudioProperties with the data read from 
+         * Creates an instance of Opus::AudioProperties with the data read from
          * the Opus::File \a file.
          */
         AudioProperties(File *file, ReadStyle style = Average);

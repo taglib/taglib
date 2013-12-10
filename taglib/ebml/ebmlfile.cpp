@@ -33,7 +33,7 @@ public:
   FilePrivate(File *document) : root(document)
   {
   }
-  
+
   // Performs a few basic checks and creates the FilePrivate if they were
   // successful.
   static FilePrivate *checkAndCreate(File* document)
@@ -54,10 +54,10 @@ public:
     ) {
       delete d;
       return 0;
-	}
-	return d;
   }
-  
+  return d;
+  }
+
   Element root;
 };
 

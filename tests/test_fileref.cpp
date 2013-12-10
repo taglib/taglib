@@ -91,7 +91,7 @@ public:
     f->setProperties(prop);
     f->save();
     delete f;
-    
+
     f = new FileRef(newname.c_str());
     CPPUNIT_ASSERT(f->isValid());
     CPPUNIT_ASSERT(!f->isNull());
@@ -99,7 +99,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(prop["ARTIST"].front(), String("a test artist"));
     CPPUNIT_ASSERT_EQUAL(prop["TITLE" ].front(), String("b test title"));
     delete f;
-    
+
   }
 
   void testMusepack()
@@ -190,7 +190,7 @@ public:
   {
     FileRef f1(TEST_FILE_PATH_C("no-extension"));
     CPPUNIT_ASSERT(f1.isNull());
-    
+
     FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xxx"));
     CPPUNIT_ASSERT(f2.isNull());
   }

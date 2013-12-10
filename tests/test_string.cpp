@@ -200,10 +200,10 @@ public:
     String a("abc");
     String b = a;
     String c = a;
-    
+
     b += 'd';
     c += L'd';
-    
+
     CPPUNIT_ASSERT_EQUAL(String("abc"), a);
     CPPUNIT_ASSERT_EQUAL(String("abcd"), b);
     CPPUNIT_ASSERT_EQUAL(String("abcd"), c);
@@ -277,7 +277,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(L'\x0d', String(crlf)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
   }
-  
+
   void testUpper()
   {
     String s1 = "tagLIB 012 strING";

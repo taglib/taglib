@@ -49,7 +49,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Creates an instance of MPEG::AudioProperties with the data read from 
+       * Creates an instance of MPEG::AudioProperties with the data read from
        * the MPEG::File \a file.
        */
       AudioProperties(File *file, ReadStyle style = Average);
