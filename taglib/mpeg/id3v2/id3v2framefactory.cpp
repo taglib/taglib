@@ -250,9 +250,9 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   if(frameID == "PRIV")
     return new PrivateFrame(data, header);
-  
+
   // Ownership (frames 4.22)
-  
+
   if(frameID == "OWNE") {
     OwnershipFrame *f = new OwnershipFrame(data, header);
     d->setTextEncoding(f);

@@ -231,7 +231,7 @@ public:
   void testProperties()
   {
     MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
-    
+
     PropertyMap tags = f.properties();
 
     CPPUNIT_ASSERT_EQUAL(StringList("Test Artist"), tags["ARTIST"]);

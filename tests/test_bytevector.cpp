@@ -122,7 +122,7 @@ public:
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
   }
-  
+
   void testFind1()
   {
     CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO"));

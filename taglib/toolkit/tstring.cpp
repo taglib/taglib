@@ -45,7 +45,7 @@
 # include "unicode.h"
 #endif
 
-namespace 
+namespace
 {
 
   inline unsigned short combine(unsigned char c1, unsigned char c2)
@@ -142,7 +142,7 @@ namespace
       debug("String::copyFromUTF8() - Unicode conversion error.");
     }
 
-#endif 
+#endif
   }
 }
 
@@ -151,25 +151,25 @@ namespace TagLib {
 class String::StringPrivate : public RefCounter
 {
 public:
-  StringPrivate() 
-    : RefCounter() 
+  StringPrivate()
+    : RefCounter()
   {
   }
 
-  StringPrivate(const wstring &s) 
+  StringPrivate(const wstring &s)
     : RefCounter()
-    , data(s) 
+    , data(s)
   {
   }
-  
-  StringPrivate(uint n, wchar_t c) 
+
+  StringPrivate(uint n, wchar_t c)
     : RefCounter()
-    , data(static_cast<size_t>(n), c) 
+    , data(static_cast<size_t>(n), c)
   {
   }
 
   /*!
-   * Stores string in UTF-16. The byte order depends on the CPU endian. 
+   * Stores string in UTF-16. The byte order depends on the CPU endian.
    */
   TagLib::wstring data;
 
@@ -183,12 +183,12 @@ String String::null;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-String::String() 
+String::String()
   : d(new StringPrivate())
 {
 }
 
-String::String(const String &s) 
+String::String(const String &s)
   : d(s.d)
 {
   d->ref();
@@ -210,7 +210,7 @@ String::String(const wstring &s, Type t)
   : d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
-    // This looks ugly but needed for the compatibility with TagLib1.8. 
+    // This looks ugly but needed for the compatibility with TagLib1.8.
     // Should be removed in TabLib2.0.
     if (t == UTF16BE)
       t = WCharByteOrder;
@@ -228,7 +228,7 @@ String::String(const wchar_t *s, Type t)
   : d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
-    // This looks ugly but needed for the compatibility with TagLib1.8. 
+    // This looks ugly but needed for the compatibility with TagLib1.8.
     // Should be removed in TabLib2.0.
     if (t == UTF16BE)
       t = WCharByteOrder;
@@ -278,11 +278,11 @@ String::String(const ByteVector &v, Type t)
   if(v.isEmpty())
     return;
 
-  if(t == Latin1) 
+  if(t == Latin1)
     copyFromLatin1(v.data(), v.size());
-  else if(t == UTF8) 
+  else if(t == UTF8)
     copyFromUTF8(v.data(), v.size());
-  else 
+  else
     copyFromUTF16(v.data(), v.size(), t);
 
   // If we hit a null in the ByteVector, shrink the string again.
@@ -444,7 +444,7 @@ bool String::isNull() const
 
 ByteVector String::data(Type t) const
 {
-  switch(t) 
+  switch(t)
   {
   case Latin1:
     {
@@ -799,9 +799,9 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 {
   bool swap;
   if(t == UTF16) {
-    if(length >= 1 && s[0] == 0xfeff) 
+    if(length >= 1 && s[0] == 0xfeff)
       swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(length >= 1 && s[0] == 0xfffe) 
+    else if(length >= 1 && s[0] == 0xfffe)
       swap = true;  // Not same as CPU endian. Need to swap bytes.
     else {
       debug("String::copyFromUTF16() - Invalid UTF16 string.");
@@ -811,7 +811,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
     s++;
     length--;
   }
-  else 
+  else
     swap = (t != WCharByteOrder);
 
   d->data.resize(length);
@@ -836,9 +836,9 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     ushort bom;
     ::memcpy(&bom, s, 2);
 
-    if(bom == 0xfeff) 
+    if(bom == 0xfeff)
       swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(bom == 0xfffe) 
+    else if(bom == 0xfffe)
       swap = true;  // Not same as CPU endian. Need to swap bytes.
     else {
       debug("String::copyFromUTF16() - Invalid UTF16 string.");
@@ -848,7 +848,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     s += 2;
     length -= 2;
   }
-  else 
+  else
     swap = (t != WCharByteOrder);
 
   d->data.resize(length / 2);
@@ -858,7 +858,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-const String::Type String::WCharByteOrder 
+const String::Type String::WCharByteOrder
   = (Utils::SystemByteOrder == Utils::BigEndian) ? String::UTF16BE : String::UTF16LE;
 
 }

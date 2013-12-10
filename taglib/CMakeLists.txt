@@ -152,7 +152,7 @@ set(id3v2_SRCS
   mpeg/id3v2/id3v2frame.cpp
   mpeg/id3v2/id3v2footer.cpp
   mpeg/id3v2/id3v2extendedheader.cpp
-  )
+)
 
 set(frames_SRCS
   mpeg/id3v2/frames/attachedpictureframe.cpp
@@ -321,6 +321,7 @@ set_target_properties(tag PROPERTIES
   LINK_INTERFACE_LIBRARIES ""
   PUBLIC_HEADER "${tag_HDRS}"
 )
+
 if(BUILD_FRAMEWORK)
   set_target_properties(tag PROPERTIES FRAMEWORK TRUE)
 endif()

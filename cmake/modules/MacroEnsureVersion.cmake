@@ -34,7 +34,6 @@ MACRO(MACRO_ENSURE_VERSION requested_version found_version var_too_old)
 
 ENDMACRO(MACRO_ENSURE_VERSION)
 
-
 # This macro compares version numbers of the form "x.y"
 # MACRO_ENSURE_VERSION( FOO_MIN_VERSION FOO_VERSION_FOUND FOO_VERSION_OK)
 # will set FOO_VERSIN_OK to true if FOO_VERSION_FOUND >= FOO_MIN_VERSION
@@ -69,3 +68,4 @@ MACRO(MACRO_ENSURE_VERSION2 requested_version found_version var_too_old)
     endif (found_vers_num LESS req_vers_num)
 
 ENDMACRO(MACRO_ENSURE_VERSION2)
+

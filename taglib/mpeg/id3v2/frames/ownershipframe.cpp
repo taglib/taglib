@@ -113,24 +113,24 @@ void OwnershipFrame::setTextEncoding(String::Type encoding)
 void OwnershipFrame::parseFields(const ByteVector &data)
 {
   int pos = 0;
-  
+
   // Get the text encoding
   d->textEncoding = String::Type(data[0]);
   pos += 1;
-  
+
   // Read the price paid this is a null terminate string
   d->pricePaid = readStringField(data, String::Latin1, &pos);
-  
+
   // If we don't have at least 8 bytes left then don't parse the rest of the
   // data
   if(data.size() - pos < 8) {
     return;
   }
-  
+
   // Read the date purchased YYYYMMDD
   d->datePurchased = String(data.mid(pos, 8));
   pos += 8;
-  
+
   // Read the seller
   if(d->textEncoding == String::Latin1)
     d->seller = Tag::latin1StringHandler()->parse(data.mid(pos));
@@ -141,13 +141,13 @@ void OwnershipFrame::parseFields(const ByteVector &data)
 ByteVector OwnershipFrame::renderFields() const
 {
   ByteVector v;
-  
+
   v.append(char(d->textEncoding));
   v.append(d->pricePaid.data(String::Latin1));
   v.append(textDelimiter(String::Latin1));
   v.append(d->datePurchased.data(String::Latin1));
   v.append(d->seller.data(d->textEncoding));
- 
+
   return v;
 }
 
