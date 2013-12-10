@@ -163,7 +163,7 @@ set(id3v2_SRCS
   mpeg/id3v2/id3v2frame.cpp
   mpeg/id3v2/id3v2footer.cpp
   mpeg/id3v2/id3v2extendedheader.cpp
-  )
+)
 
 set(frames_SRCS
   mpeg/id3v2/frames/attachedpictureframe.cpp

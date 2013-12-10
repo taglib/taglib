@@ -38,7 +38,7 @@ namespace TagLib {
 
   class File;
 
-  //! A RIFF INFO tag implementation. 
+  //! A RIFF INFO tag implementation.
 
   namespace RIFF {
   namespace Info {
@@ -52,8 +52,8 @@ namespace TagLib {
      * In practice, local encoding of each system is largely used and UTF-8 is
      * popular too.
      *
-     * Here is an option to read and write tags in your preferrd encoding 
-     * by subclassing this class, reimplementing parse() and render() and setting 
+     * Here is an option to read and write tags in your preferrd encoding
+     * by subclassing this class, reimplementing parse() and render() and setting
      * your reimplementation as the default with Info::Tag::setStringHandler().
      *
      * \see ID3v1::Tag::setStringHandler()
@@ -72,7 +72,7 @@ namespace TagLib {
 
       /*!
        * Encode a ByteVector with the data from \a s.  The default implementation
-       * assumes that \a s is an UTF-8 string. 
+       * assumes that \a s is an UTF-8 string.
        */
       virtual ByteVector render(const String &s) const;
     };
@@ -80,11 +80,11 @@ namespace TagLib {
     //! The main class in the RIFF INFO tag implementation
 
     /*!
-     * This is the main class in the INFO tag implementation.  RIFF INFO tag is 
-     * a metadata format found in WAV audio and AVI video files.  Though it is a 
-     * part of Microsoft/IBM's RIFF specification, the author could not find the 
-     * official documents about it.  So, this implementation is referring to 
-     * unofficial documents on the web and some applications' behaviors especially 
+     * This is the main class in the INFO tag implementation.  RIFF INFO tag is
+     * a metadata format found in WAV audio and AVI video files.  Though it is a
+     * part of Microsoft/IBM's RIFF specification, the author could not find the
+     * official documents about it.  So, this implementation is referring to
+     * unofficial documents on the web and some applications' behaviors especially
      * Windows Explorer.
      */
     class TAGLIB_EXPORT Tag : public TagLib::Tag
@@ -123,7 +123,7 @@ namespace TagLib {
       virtual bool isEmpty() const;
 
       /*!
-       * Returns a copy of the internal fields of the tag.  The returned map directly 
+       * Returns a copy of the internal fields of the tag.  The returned map directly
        * reflects the contents of the "INFO" chunk.
        *
        * \note Modifying this map does not affect the tag's internal data.
@@ -138,13 +138,13 @@ namespace TagLib {
        * Gets the value of the field with the ID \a id.
        */
       String fieldText(const ByteVector &id) const;
-        
+
       /*
         * Sets the value of the field with the ID \a id to \a s.
         * If the field does not exist, it is created.
         * If \s is empty, the field is removed.
         *
-        * \note fieldId must be four-byte long pure ASCII string.  This function 
+        * \note fieldId must be four-byte long pure ASCII string.  This function
         * performs nothing if fieldId is invalid.
         */
       void setFieldText(const ByteVector &id, const String &s);
@@ -157,7 +157,7 @@ namespace TagLib {
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
        *
-       * \note Returns empty ByteVector is the tag contains no fields. 
+       * \note Returns empty ByteVector is the tag contains no fields.
        */
       ByteVector render() const;
 
@@ -173,7 +173,7 @@ namespace TagLib {
        * \see StringHandler
        */
       static void setStringHandler(const TagLib::StringHandler *handler);
-    
+
     protected:
       /*!
        * Pareses the body of the tag in \a data.

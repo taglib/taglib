@@ -31,10 +31,10 @@ namespace TagLib {
 
     class File;
 
-    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties 
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
       friend class File;
-    
+
     public:
       /*! Flag bits. */
       enum {

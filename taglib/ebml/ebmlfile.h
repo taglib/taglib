@@ -35,9 +35,9 @@ namespace TagLib {
 
   //! A namespace for the classes used by EBML-based metadata files
   namespace EBML {
-  
+
     class Element;
-  
+
     /*!
      * Represents an EBML file. It offers access to the root element which can
      * be used to obtain the necessary information and to change the file
@@ -48,12 +48,12 @@ namespace TagLib {
     public:
       //! Destroys the instance of the file.
       virtual ~File();
-      
+
       /*!
        * Returns a pointer to the document root element of the EBML file.
        */
       Element *getDocumentRoot();
-      
+
     protected:
       /*!
        * Constructs an instance of an EBML file from \a file.
@@ -62,7 +62,7 @@ namespace TagLib {
        * through a specific subclass.
        */
       File(FileName file);
-      
+
       /*!
        * Constructs an instance of an EBML file from an IOStream.
        *
@@ -70,16 +70,16 @@ namespace TagLib {
        * through a specific subclass.
        */
       File(IOStream *stream);
-    
+
     private:
       //! Non-copyable
       File(const File&);
       File &operator=(const File &);
-      
+
       class FilePrivate;
       FilePrivate *d;
     };
-  
+
   }
 }
 

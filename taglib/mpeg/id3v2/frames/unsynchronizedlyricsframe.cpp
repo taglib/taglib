@@ -164,7 +164,7 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
     } else {
       d->description = String(l.front(), d->textEncoding);
       d->text = String(l.back(), d->textEncoding);
-    }  
+    }
   }
 }
 

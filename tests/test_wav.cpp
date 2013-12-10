@@ -31,7 +31,7 @@ public:
     RIFF::WAV::File f(TEST_FILE_PATH_C("zero-size-chunk.wav"));
     CPPUNIT_ASSERT_EQUAL(false, f.isValid());
   }
-  
+
   void testFormat()
   {
     RIFF::WAV::File f1(TEST_FILE_PATH_C("empty.wav"));

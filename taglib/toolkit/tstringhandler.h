@@ -30,18 +30,18 @@
 #include "tbytevector.h"
 #include "taglib_export.h"
 
-namespace TagLib 
+namespace TagLib
 {
   //! A abstraction for the string to data encoding.
 
   /*!
    * ID3v1, ID3v2 and RIFF Info tag sometimes store strings in local encodings
-   * encodings instead of ISO-8859-1 (Latin1), such as Windows-1252 for western 
-   * languages, Shift_JIS for Japanese and so on. However, TagLib only supports 
+   * encodings instead of ISO-8859-1 (Latin1), such as Windows-1252 for western
+   * languages, Shift_JIS for Japanese and so on. However, TagLib only supports
    * genuine ISO-8859-1 by default.
    *
-   * Here is an option to read and write tags in your preferrd encoding 
-   * by subclassing this class, reimplementing parse() and render() and setting 
+   * Here is an option to read and write tags in your preferrd encoding
+   * by subclassing this class, reimplementing parse() and render() and setting
    * your reimplementation as the default with ID3v1::Tag::setStringHandler(),
    * ID3v2::Tag::setStringHandler() or Info::Tag::setStringHandler().
    *

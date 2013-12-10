@@ -79,7 +79,7 @@ public:
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
   }
-  
+
   void testFind1()
   {
     CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO"));
@@ -167,7 +167,7 @@ public:
     CPPUNIT_ASSERT(n.toInt64BE(3)  == -7412174897536512939ll);
     CPPUNIT_ASSERT(n.toInt64LE(6)  == -1268082884489200845ll);
     CPPUNIT_ASSERT(n.toInt64BE(4)  == 2497865822736504285ll);
-    
+
     CPPUNIT_ASSERT(ByteVector::fromUInt16LE(n.toInt16LE(5))  == n.mid(5, 2));
     CPPUNIT_ASSERT(ByteVector::fromUInt16BE(n.toInt16BE(9))  == n.mid(9, 2));
     CPPUNIT_ASSERT(ByteVector::fromUInt32LE(n.toUInt32LE(4)) == n.mid(4, 4));
@@ -178,16 +178,16 @@ public:
     CPPUNIT_ASSERT(ByteVector::fromUInt16LE(4386) == ByteVector::fromUInt16BE(8721));
     CPPUNIT_ASSERT(ByteVector::fromUInt32LE(287454020) == ByteVector::fromUInt32BE(1144201745));
     CPPUNIT_ASSERT(ByteVector::fromUInt64LE(1234605615291183940) == ByteVector::fromUInt64BE(4914309075945333265));
-  
 
-	const uchar PI32[] = { 0x00, 0x40, 0x49, 0x0f, 0xdb };
-	const uchar PI64[] = { 0x00, 0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18 };
 
-	ByteVector pi32(reinterpret_cast<const char*>(PI32), 5);
-	CPPUNIT_ASSERT(static_cast<int>(pi32.toFloat32BE(1) * 100) == 314);
+  const uchar PI32[] = { 0x00, 0x40, 0x49, 0x0f, 0xdb };
+  const uchar PI64[] = { 0x00, 0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18 };
 
-	ByteVector pi64(reinterpret_cast<const char*>(PI64), 9);
-	CPPUNIT_ASSERT(static_cast<int>(pi64.toFloat64BE(1) * 100) == 314);
+  ByteVector pi32(reinterpret_cast<const char*>(PI32), 5);
+  CPPUNIT_ASSERT(static_cast<int>(pi32.toFloat32BE(1) * 100) == 314);
+
+  ByteVector pi64(reinterpret_cast<const char*>(PI64), 9);
+  CPPUNIT_ASSERT(static_cast<int>(pi64.toFloat64BE(1) * 100) == 314);
   }
 
   void testReplace()

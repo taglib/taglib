@@ -54,7 +54,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength, 
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength,
                                             ReadStyle style) :
   d(new PropertiesPrivate())
 {

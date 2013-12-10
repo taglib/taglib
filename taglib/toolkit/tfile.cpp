@@ -177,8 +177,8 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
     // (1) previous partial match
 
-    if(previousPartialMatch != ByteVector::npos 
-      && bufferSize() > previousPartialMatch) 
+    if(previousPartialMatch != ByteVector::npos
+      && bufferSize() > previousPartialMatch)
     {
       const size_t patternOffset = (bufferSize() - previousPartialMatch);
       if(buffer.containsAt(pattern, 0, patternOffset)) {
@@ -187,9 +187,9 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
       }
     }
 
-    if(!before.isNull() 
-      && beforePreviousPartialMatch != ByteVector::npos 
-      && bufferSize() > beforePreviousPartialMatch) 
+    if(!before.isNull()
+      && beforePreviousPartialMatch != ByteVector::npos
+      && bufferSize() > beforePreviousPartialMatch)
     {
       const size_t beforeOffset = (bufferSize() - beforePreviousPartialMatch);
       if(buffer.containsAt(before, 0, beforeOffset)) {

@@ -58,9 +58,9 @@ namespace TagLib {
     void set(size_t index, Tag *tag);
 
     virtual PropertyMap properties() const;
-    
+
     virtual void removeUnsupportedProperties(const StringList& properties);
-    
+
     virtual String title() const;
     virtual String artist() const;
     virtual String album() const;
@@ -92,8 +92,8 @@ namespace TagLib {
     TagUnionPrivate *d;
   };
 
-  // If you add a new typedef here, add a corresponding explicit instantiation 
-  // at the end of tagunion.cpp as well. 
+  // If you add a new typedef here, add a corresponding explicit instantiation
+  // at the end of tagunion.cpp as well.
 
   typedef TagUnion<2> DoubleTagUnion;
   typedef TagUnion<3> TripleTagUnion;
