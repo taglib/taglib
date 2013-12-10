@@ -27,7 +27,7 @@ public:
       f.ID3v1Tag(true)->setArtist("Artist     ");
       f.save();
     }
-    
+
     {
       MPEG::File f(newname.c_str());
       CPPUNIT_ASSERT(f.ID3v1Tag(false));

@@ -219,7 +219,7 @@ void RIFF::File::removeChunk(uint i)
 {
   if(i >= d->chunks.size())
     return;
-  
+
   removeBlock(d->chunks[i].offset - 8, d->chunks[i].size + 8);
   d->chunks.erase(d->chunks.begin() + i);
 }

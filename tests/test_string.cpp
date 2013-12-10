@@ -72,8 +72,8 @@ public:
     String unicode2(unicode.to8Bit(true), String::UTF8);
     CPPUNIT_ASSERT(unicode == unicode2);
 
-	String unicode3(L"\u65E5\u672C\u8A9E");
-	CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+  String unicode3(L"\u65E5\u672C\u8A9E");
+  CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
 
     String unicode4(L"\u65e5\u672c\u8a9e", String::UTF16BE);
     CPPUNIT_ASSERT(unicode4[1] == L'\u672c');

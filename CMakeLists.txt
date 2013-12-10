@@ -55,7 +55,7 @@ set(TAGLIB_LIB_VERSION_STRING "${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VE
 # 1. If the library source code has changed at all since the last update, then increment revision.
 # 2. If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
 # 3. If any interfaces have been added since the last public release, then increment age.
-# 4. If any interfaces have been removed since the last public release, then set age to 0. 
+# 4. If any interfaces have been removed since the last public release, then set age to 0.
 set(TAGLIB_SOVERSION_CURRENT  15)
 set(TAGLIB_SOVERSION_REVISION 0)
 set(TAGLIB_SOVERSION_AGE      14)
@@ -98,7 +98,7 @@ endif()
 
 configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
 
-add_subdirectory(taglib) 
+add_subdirectory(taglib)
 add_subdirectory(bindings)
 if(BUILD_TESTS)
     enable_testing()
@@ -118,3 +118,4 @@ configure_file(
 
 add_custom_target(uninstall
   COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
