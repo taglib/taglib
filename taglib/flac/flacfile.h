@@ -76,7 +76,8 @@ namespace TagLib {
        * in a future version.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs an APE file from \a file.  If \a readProperties is true the
@@ -90,7 +91,8 @@ namespace TagLib {
       // BIC: merge with the above constructor
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs a FLAC file from \a stream.  If \a readProperties is true the

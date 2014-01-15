@@ -88,7 +88,7 @@ namespace TagLib {
        * instantiated directly but rather should be used through the codec
        * specific subclasses.
        */
-      File(FileName file);
+      File(FileName file, bool openReadOnly = false);
 
       /*!
        * Constructs an Ogg file from \a stream.

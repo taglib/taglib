@@ -55,7 +55,7 @@ namespace TagLib {
 
       enum Endianness { BigEndian, LittleEndian };
 
-      File(FileName file, Endianness endianness);
+      File(FileName file, Endianness endianness, bool openReadOnly = false);
       File(IOStream *stream, Endianness endianness);
 
       /*!

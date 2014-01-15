@@ -70,7 +70,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::FLAC::File::File(FileName file, bool readProperties,
-                      Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+                      Properties::ReadStyle propertiesStyle, bool openReadOnly) : Ogg::File(file, openReadOnly)
 {
   d = new FilePrivate;
   if(isOpen())

@@ -37,7 +37,7 @@ namespace TagLib {
     class TAGLIB_EXPORT FileBase : public TagLib::File
     {
     protected:
-      FileBase(FileName file);
+      FileBase(FileName file, bool openReadOnly = false);
       FileBase(IOStream *stream);
 
       void writeString(const String &s, ulong size, char padding = 0);

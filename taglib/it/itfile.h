@@ -44,7 +44,7 @@ namespace TagLib {
          */
         File(FileName file, bool readProperties = true,
              AudioProperties::ReadStyle propertiesStyle =
-             AudioProperties::Average);
+             AudioProperties::Average, bool openReadOnly = false);
 
         /*!
          * Constructs a Impulse Tracker file from \a stream.

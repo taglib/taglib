@@ -85,7 +85,8 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs a TrueAudio file from \a file.  If \a readProperties is true 
@@ -98,7 +99,8 @@ namespace TagLib {
        */
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs a TrueAudio file from \a stream.  If \a readProperties is true

@@ -96,9 +96,9 @@ File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(FileName fileName)
+File::File(FileName fileName, bool openReadOnly)
 {
-  IOStream *stream = new FileStream(fileName);
+  IOStream *stream = new FileStream(fileName, openReadOnly);
   d = new FilePrivate(stream, true);
 }
 

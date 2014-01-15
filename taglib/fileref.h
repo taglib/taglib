@@ -105,7 +105,8 @@ namespace TagLib {
       virtual File *createFile(FileName fileName,
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
-                               audioPropertiesStyle = AudioProperties::Average) const = 0;
+                               audioPropertiesStyle = AudioProperties::Average,
+                               bool openReadOnly = false) const = 0;
     };
 
     /*!
@@ -125,7 +126,8 @@ namespace TagLib {
     explicit FileRef(FileName fileName,
                      bool readAudioProperties = true,
                      AudioProperties::ReadStyle
-                     audioPropertiesStyle = AudioProperties::Average);
+                     audioPropertiesStyle = AudioProperties::Average,
+                     bool openReadOnly = false);
 
     /*!
      * Contruct a FileRef using \a file.  The FileRef now takes ownership of the
@@ -250,7 +252,8 @@ namespace TagLib {
      */
     static File *create(FileName fileName,
                         bool readAudioProperties = true,
-                        AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
+                        AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average,
+                        bool openReadOnly = false);
 
 
   private:

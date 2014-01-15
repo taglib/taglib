@@ -90,7 +90,8 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs an APE file from \a stream.  If \a readProperties is true the
