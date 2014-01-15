@@ -71,7 +71,8 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::WAV::File::File(FileName file, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(file, LittleEndian)
+                       Properties::ReadStyle propertiesStyle, bool openReadOnly) :
+  RIFF::File(file, LittleEndian, openReadOnly)
 {
   d = new FilePrivate;
   if(isOpen())

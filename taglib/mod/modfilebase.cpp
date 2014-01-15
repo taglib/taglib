@@ -25,7 +25,8 @@
 using namespace TagLib;
 using namespace Mod;
 
-Mod::FileBase::FileBase(FileName file) : TagLib::File(file)
+Mod::FileBase::FileBase(FileName file, bool openReadOnly) :
+  TagLib::File(file, openReadOnly)
 {
 }
 

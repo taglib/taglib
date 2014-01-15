@@ -55,7 +55,8 @@ namespace TagLib {
        * read.
        */
       File(FileName file, bool readProperties = true, 
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs an ASF file from \a stream.

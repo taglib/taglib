@@ -91,7 +91,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPC::File::File(FileName file, bool readProperties,
-                Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+                Properties::ReadStyle propertiesStyle, bool openReadOnly) : TagLib::File(file, openReadOnly)
 {
   d = new FilePrivate;
   if(isOpen())

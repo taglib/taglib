@@ -85,7 +85,8 @@ namespace TagLib {
        * false, \a propertiesStyle is ignored
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           bool openReadOnly = false);
 
       /*!
        * Constructs an WavPack file from \a file.  If \a readProperties is true the

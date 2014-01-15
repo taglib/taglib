@@ -355,8 +355,8 @@ public:
 };
 
 XM::File::File(FileName file, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
-  Mod::FileBase(file),
+               AudioProperties::ReadStyle propertiesStyle, bool openReadOnly) :
+  Mod::FileBase(file, openReadOnly),
   d(new FilePrivate(propertiesStyle))
 {
   if(isOpen())

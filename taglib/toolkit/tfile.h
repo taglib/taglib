@@ -263,7 +263,8 @@ namespace TagLib {
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */
-    File(FileName file);
+    //File(FileName file, bool openReadOnly = false); //XXX for testing:
+    File(FileName file, bool openReadOnly);
 
     /*!
      * Construct a File object and use the \a stream instance.
