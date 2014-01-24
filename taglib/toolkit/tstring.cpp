@@ -198,9 +198,9 @@ String::String(const std::string &s, Type t)
   : d(new StringPrivate())
 {
   if(t == Latin1)
-    copyFromLatin1(&s[0], s.length());
+    copyFromLatin1(s.c_str(), s.length());
   else if(t == String::UTF8)
-    copyFromUTF8(&s[0], s.length());
+    copyFromUTF8(s.c_str(), s.length());
   else {
     debug("String::String() -- A std::string should not contain UTF16.");
   }
@@ -778,8 +778,10 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data.resize(length);
 
-  UTF8toUTF16(s, length, &d->data[0], d->data.size());
-  d->data.resize(::wcslen(d->data.c_str()));
+  if(length >  0) {
+    UTF8toUTF16(s, length, &d->data[0], d->data.size());
+    d->data.resize(::wcslen(d->data.c_str()));
+  }
 }
 
 void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
