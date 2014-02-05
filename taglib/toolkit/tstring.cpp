@@ -804,11 +804,13 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
     swap = (t != WCharByteOrder);
 
   d->data.resize(length);
-  memcpy(&d->data[0], s, length * sizeof(wchar_t));
+  if(length > 0) {
+    memcpy(&d->data[0], s, length * sizeof(wchar_t));
 
-  if(swap) {
-    for(size_t i = 0; i < length; ++i)
-      d->data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+    if(swap) {
+      for(size_t i = 0; i < length; ++i)
+        d->data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+    }
   }
 }
 
