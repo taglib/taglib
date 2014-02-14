@@ -36,7 +36,7 @@
 
 using namespace TagLib;
 
-namespace 
+namespace
 {
 #ifdef _WIN32
 
@@ -79,7 +79,7 @@ namespace
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
       return static_cast<size_t>(length);
-    else 
+    else
       return 0;
   }
 
@@ -108,12 +108,18 @@ namespace
 
   inline size_t readFile(FileHandle file, ByteVector &buffer)
   {
-    return fread(buffer.data(), sizeof(char), buffer.size(), file);
+    const long pos = ftell(file);
+    const size_t len = fread(buffer.data(), sizeof(char), buffer.size(), file);
+    fseek(file, pos + len, SEEK_SET);
+    return len;
   }
 
   inline size_t writeFile(FileHandle file, const ByteVector &buffer)
   {
-    return fwrite(buffer.data(), sizeof(char), buffer.size(), file);
+    const long pos = ftell(file);
+    const size_t len = fwrite(buffer.data(), sizeof(char), buffer.size(), file);
+    fseek(file, pos + len, SEEK_SET);
+    return len;
   }
 
 #endif  // _WIN32
@@ -151,13 +157,13 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
   else
     d->file = openFile(fileName, true);
 
-  if(d->file == InvalidFileHandle) 
+  if(d->file == InvalidFileHandle)
   {
 # ifdef _WIN32
     debug("Could not open file " + fileName.toString());
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
-# endif 
+# endif
   }
 }
 
@@ -192,7 +198,7 @@ ByteVector FileStream::readBlock(ulong length)
 
   const size_t count = readFile(d->file, buffer);
   buffer.resize(static_cast<uint>(count));
-  
+
   return buffer;
 }
 
@@ -262,7 +268,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
-    
+
     seek(readPosition);
     const size_t bytesRead = readFile(d->file, aboutToOverwrite);
     aboutToOverwrite.resize(bytesRead);
@@ -288,7 +294,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
     writePosition += buffer.size();
 
     // Make the current buffer the data that we read in the beginning.
-    
+
     buffer = aboutToOverwrite;
   }
 }
