@@ -805,11 +805,12 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 
   d->data.resize(length);
   if(length > 0) {
-    memcpy(&d->data[0], s, length * sizeof(wchar_t));
-
     if(swap) {
       for(size_t i = 0; i < length; ++i)
         d->data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+    }
+    else {
+      ::memcpy(&d->data[0], s, length * sizeof(wchar_t));
     }
   }
 }

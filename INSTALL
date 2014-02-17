@@ -5,7 +5,7 @@ TagLib uses the CMake build system. As a user, you will most likely want to
 build TagLib in release mode and install it into a system-wide location.
 This can be done using the following commands:
 
-  cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_RELEASE_TYPE=Release .
+  cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release .
   make
   sudo make install
 
