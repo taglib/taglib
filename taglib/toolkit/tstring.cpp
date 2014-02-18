@@ -141,13 +141,13 @@ namespace
       debug("String::copyFromUTF8() - Unicode conversion error.");
     }
 
-#endif 
+#endif
   }
 }
 
 namespace TagLib {
 
-class String::StringPrivate 
+class String::StringPrivate
 {
 public:
   StringPrivate()
@@ -155,13 +155,13 @@ public:
   {
   }
 
-  StringPrivate(size_t n, wchar_t c) 
-    : data(new std::wstring(n, c)) 
+  StringPrivate(size_t n, wchar_t c)
+    : data(new std::wstring(n, c))
   {
   }
 
   /*!
-   * Stores string in UTF-16. The byte order depends on the CPU endian. 
+   * Stores string in UTF-16. The byte order depends on the CPU endian.
    */
   SHARED_PTR<std::wstring> data;
 
@@ -178,12 +178,12 @@ const size_t String::npos = std::wstring::npos;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-String::String() 
+String::String()
   : d(new StringPrivate())
 {
 }
 
-String::String(const String &s) 
+String::String(const String &s)
   : d(new StringPrivate(*s.d))
 {
 }
@@ -192,9 +192,9 @@ String::String(const std::string &s, Type t)
   : d(new StringPrivate())
 {
   if(t == Latin1)
-    copyFromLatin1(&s[0], s.length());
+    copyFromLatin1(s.c_str(), s.length());
   else if(t == String::UTF8)
-    copyFromUTF8(&s[0], s.length());
+    copyFromUTF8(s.c_str(), s.length());
   else {
     debug("String::String() -- A std::string should not contain UTF16.");
   }
@@ -256,11 +256,11 @@ String::String(const ByteVector &v, Type t)
   if(v.isEmpty())
     return;
 
-  if(t == Latin1) 
+  if(t == Latin1)
     copyFromLatin1(v.data(), v.size());
-  else if(t == UTF8) 
+  else if(t == UTF8)
     copyFromUTF8(v.data(), v.size());
-  else 
+  else
     copyFromUTF16(v.data(), v.size(), t);
 
   // If we hit a null in the ByteVector, shrink the string again.
@@ -276,25 +276,8 @@ String::~String()
 
 std::string String::to8Bit(bool unicode) const
 {
-  std::string s;
-
-  if(!unicode) {
-    s.resize(d->data->size());
-
-    std::string::iterator targetIt = s.begin();
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-      *targetIt = static_cast<char>(*it);
-      ++targetIt;
-    }
-  }
-  else {
-    s.resize(d->data->size() * 4 + 1);
-
-    UTF16toUTF8(&(*d->data)[0], d->data->size(), &s[0], s.size());
-    s.resize(::strlen(s.c_str()));
-  }
-
-  return s;
+  const ByteVector v = data(unicode ? UTF8 : Latin1);
+  return std::string(v.data(), v.size());
 }
 
 const std::wstring &String::toWString() const
@@ -418,74 +401,78 @@ bool String::isNull() const
 
 ByteVector String::data(Type t) const
 {
-  switch(t) 
+  switch(t)
   {
   case Latin1:
-  {
-    ByteVector v(size(), 0);
-    char *p = v.data();
+    {
+      ByteVector v(size(), 0);
+      char *p = v.data();
 
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++)
-      *p++ = static_cast<char>(*it);
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++)
+        *p++ = static_cast<char>(*it);
 
-    return v;
-  }
+      return v;
+    }
   case UTF8:
-  {
-    ByteVector v(size() * 4 + 1, 0);
+    if(!d->data->empty())
+    {
+      ByteVector v(size() * 4 + 1, 0);
 
-    UTF16toUTF8(&(*d->data)[0], d->data->size(), v.data(), v.size());
-    v.resize(::strlen(v.data()));
+      UTF16toUTF8(d->data->c_str(), d->data->size(), v.data(), v.size());
+      v.resize(::strlen(v.data()));
 
-    return v;
-  }
+      return v;
+    }
+    else {
+      return ByteVector::null;
+    }
   case UTF16:
-  {
-    ByteVector v(2 + size() * 2, 0);
-    char *p = v.data();
+    {
+      ByteVector v(2 + size() * 2, 0);
+      char *p = v.data();
 
-    // Assume that if we're doing UTF16 and not UTF16BE that we want little
-    // endian encoding.  (Byte Order Mark)
+      // Assume that if we're doing UTF16 and not UTF16BE that we want little
+      // endian encoding.  (Byte Order Mark)
 
-    *p++ = '\xff';
-    *p++ = '\xfe';
+      *p++ = '\xff';
+      *p++ = '\xfe';
 
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-      *p++ = static_cast<char>(*it & 0xff);
-      *p++ = static_cast<char>(*it >> 8);
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+        *p++ = static_cast<char>(*it & 0xff);
+        *p++ = static_cast<char>(*it >> 8);
+      }
+
+      return v;
     }
-
-    return v;
-  }
   case UTF16BE:
-  {
-    ByteVector v(size() * 2, 0);
-    char *p = v.data();
+    {
+      ByteVector v(size() * 2, 0);
+      char *p = v.data();
 
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-      *p++ = static_cast<char>(*it >> 8);
-      *p++ = static_cast<char>(*it & 0xff);
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+        *p++ = static_cast<char>(*it >> 8);
+        *p++ = static_cast<char>(*it & 0xff);
+      }
+
+      return v;
     }
-
-    return v;
-  }
   case UTF16LE:
-  {
-    ByteVector v(size() * 2, 0);
-    char *p = v.data();
+    {
+      ByteVector v(size() * 2, 0);
+      char *p = v.data();
 
-    for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-      *p++ = static_cast<char>(*it & 0xff);
-      *p++ = static_cast<char>(*it >> 8);
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+        *p++ = static_cast<char>(*it & 0xff);
+        *p++ = static_cast<char>(*it >> 8);
+      }
+
+      return v;
     }
-
-    return v;
-  }
   default:
-  {
-    debug("String::data() - Invalid Type value.");
-    return ByteVector();
-  }
+    {
+      debug("String::data() - Invalid Type value.");
+      return ByteVector::null;
+    }
   }
 }
 
@@ -717,17 +704,19 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data->resize(length);
 
-  UTF8toUTF16(s, length, &(*d->data)[0], d->data->size());
-  d->data->resize(::wcslen(d->data->c_str()));
+  if(length >  0) {
+    UTF8toUTF16(s, length, &(*d->data)[0], d->data->size());
+    d->data->resize(::wcslen(d->data->c_str()));
+  }
 }
 
 void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
 {
   bool swap;
   if(t == UTF16) {
-    if(length >= 1 && s[0] == 0xfeff) 
+    if(length >= 1 && s[0] == 0xfeff)
       swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(length >= 1 && s[0] == 0xfffe) 
+    else if(length >= 1 && s[0] == 0xfffe)
       swap = true;  // Not same as CPU endian. Need to swap bytes.
     else {
       debug("String::copyFromUTF16() - Invalid UTF16 string.");
@@ -737,15 +726,18 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
     s++;
     length--;
   }
-  else 
+  else
     swap = (t != WCharByteOrder);
 
   d->data->resize(length);
-  memcpy(&(*d->data)[0], s, length * sizeof(wchar_t));
-
-  if(swap) {
-    for(size_t i = 0; i < length; ++i)
-      (*d->data)[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+  if(length > 0) {
+    if(swap) {
+      for(size_t i = 0; i < length; ++i)
+        (*d->data)[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+    }
+    else {
+      ::memcpy(&(*d->data)[0], s, length * sizeof(wchar_t));
+    }
   }
 }
 
@@ -762,9 +754,9 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     ushort bom;
     ::memcpy(&bom, s, 2);
 
-    if(bom == 0xfeff) 
+    if(bom == 0xfeff)
       swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(bom == 0xfffe) 
+    else if(bom == 0xfffe)
       swap = true;  // Not same as CPU endian. Need to swap bytes.
     else {
       debug("String::copyFromUTF16() - Invalid UTF16 string.");
@@ -774,7 +766,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     s += 2;
     length -= 2;
   }
-  else 
+  else
     swap = (t != WCharByteOrder);
 
   d->data->resize(length / 2);
@@ -784,7 +776,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
   }
 }
 
-const String::Type String::WCharByteOrder 
+const String::Type String::WCharByteOrder
   = (Utils::SystemByteOrder == BigEndian) ? String::UTF16BE : String::UTF16LE;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -45,6 +45,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testSubstr);
   CPPUNIT_TEST(testNewline);
   CPPUNIT_TEST(testUpper);
+  CPPUNIT_TEST(testEncode);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -200,10 +201,10 @@ public:
     String a("abc");
     String b = a;
     String c = a;
-    
+
     b += 'd';
     c += L'd';
-    
+
     CPPUNIT_ASSERT_EQUAL(String("abc"), a);
     CPPUNIT_ASSERT_EQUAL(String("abcd"), b);
     CPPUNIT_ASSERT_EQUAL(String("abcd"), c);
@@ -277,13 +278,50 @@ public:
     CPPUNIT_ASSERT_EQUAL(L'\x0d', String(crlf)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
   }
-  
+
   void testUpper()
   {
     String s1 = "tagLIB 012 strING";
     String s2 = s1.upper();
     CPPUNIT_ASSERT_EQUAL(String("tagLIB 012 strING"), s1);
     CPPUNIT_ASSERT_EQUAL(String("TAGLIB 012 STRING"), s2);
+  }
+
+  void testEncode()
+  {
+    String jpn(L"\u65E5\u672C\u8A9E");
+    ByteVector jpn1 = jpn.data(String::Latin1);
+    ByteVector jpn2 = jpn.data(String::UTF8);
+    ByteVector jpn3 = jpn.data(String::UTF16);
+    ByteVector jpn4 = jpn.data(String::UTF16LE);
+    ByteVector jpn5 = jpn.data(String::UTF16BE);
+    std::string jpn6 = jpn.to8Bit(false);
+    std::string jpn7 = jpn.to8Bit(true);
+
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE5\x2C\x9E"), jpn1);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"), jpn2);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xFF\xFE\xE5\x65\x2C\x67\x9E\x8A"), jpn3);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE5\x65\x2C\x67\x9E\x8A"), jpn4);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x65\xE5\x67\x2C\x8A\x9E"), jpn5);
+    CPPUNIT_ASSERT_EQUAL(std::string("\xE5\x2C\x9E"), jpn6);
+    CPPUNIT_ASSERT_EQUAL(std::string("\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"), jpn7);
+
+    String empty;
+    ByteVector empty1 = empty.data(String::Latin1);
+    ByteVector empty2 = empty.data(String::UTF8);
+    ByteVector empty3 = empty.data(String::UTF16);
+    ByteVector empty4 = empty.data(String::UTF16LE);
+    ByteVector empty5 = empty.data(String::UTF16BE);
+    std::string empty6 = empty.to8Bit(false);
+    std::string empty7 = empty.to8Bit(true);
+
+    CPPUNIT_ASSERT(empty1.isEmpty());
+    CPPUNIT_ASSERT(empty2.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xFF\xFE"), empty3);
+    CPPUNIT_ASSERT(empty4.isEmpty());
+    CPPUNIT_ASSERT(empty5.isEmpty());
+    CPPUNIT_ASSERT(empty6.empty());
+    CPPUNIT_ASSERT(empty7.empty());
   }
 
 };
