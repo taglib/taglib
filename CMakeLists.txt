@@ -41,12 +41,12 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 if(MSVC)
-    ## do not warn for "unsafe" stl functions
-    add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
-    add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-    add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
-    ## suppress silly warnings
-    add_definitions(/wd4251) # needs to have dll-interface to be used by clients
+  ## do not warn for "unsafe" stl functions
+  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+  add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+  add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
+  ## suppress silly warnings
+  add_definitions(/wd4251) # needs to have dll-interface to be used by clients
 endif()
 if (MSVC AND ENABLE_STATIC_RUNTIME)
   foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
