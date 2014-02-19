@@ -32,13 +32,6 @@
 
 using namespace std;
 
-TagLib::String formatSeconds(int seconds)
-{
-  char secondsString[3];
-  sprintf(secondsString, "%02i", seconds);
-  return secondsString;
-}
-
 int main(int argc, char *argv[])
 {
   for(int i = 1; i < argc; i++) {
@@ -89,7 +82,7 @@ int main(int argc, char *argv[])
       cout << "bitrate     - " << properties->bitrate() << endl;
       cout << "sample rate - " << properties->sampleRate() << endl;
       cout << "channels    - " << properties->channels() << endl;
-      cout << "length      - " << minutes << ":" << formatSeconds(seconds) << endl;
+      cout << "length      - " << minutes << ":" << setfill('0') << setw(2) << seconds << endl;
     }
   }
   return 0;
