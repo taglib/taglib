@@ -5,13 +5,19 @@ include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
+include(CheckCXXCompilerFlag)
 include(TestBigEndian)
 
 # Enable C++11 if possible.
 
-if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.0)
-    OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.3))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+check_cxx_compiler_flag("-std=c++11" HAVE_STDCXX11_FLAG)
+if(HAVE_STDCXX11_FLAG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+  check_cxx_compiler_flag("-std=c++0x" HAVE_STDCXX0X_FLAG)
+  if(HAVE_STDCXX0X_FLAG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+  endif()
 endif()
 
 # Check if the size of integral types are suitable.
