@@ -23,83 +23,73 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "trefcounter.h"
+#include "tsmartptr.h"
 
 namespace TagLib {
+
+template <class Key, class T>
+class Map<Key, T>::MapPrivate
+{
+public:
+  MapPrivate() : 
+    map(new MapType()) {}
+
+  SHARED_PTR<MapType> map;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class Key, class T>
-template <class KeyP, class TP>
-class Map<Key, T>::MapPrivate : public RefCounter
-{
-public:
-  MapPrivate() 
-    : RefCounter() 
-  {
-  }
-
-  MapPrivate(const MapType &m) 
-    : RefCounter()
-    , map(m) 
-  {
-  }
-  
-  MapType map;
-};
-
-template <class Key, class T>
-Map<Key, T>::Map()
-  : d(new MapPrivate<Key, T>())
+Map<Key, T>::Map() : 
+  d(new MapPrivate())
 {
 }
 
 template <class Key, class T>
-Map<Key, T>::Map(const Map<Key, T> &m) : d(m.d)
+Map<Key, T>::Map(const Map<Key, T> &m) : 
+  d(new MapPrivate(*m.d))
 {
-  d->ref();
 }
 
 template <class Key, class T>
 Map<Key, T>::~Map()
 {
-  if(d->deref())
-    delete d;
+  delete d;
 }
 
 template <class Key, class T>
 typename Map<Key, T>::Iterator Map<Key, T>::begin()
 {
   detach();
-  return d->map.begin();
+  return d->map->begin();
 }
 
 template <class Key, class T>
 typename Map<Key, T>::ConstIterator Map<Key, T>::begin() const
 {
-  return d->map.begin();
+  return d->map->begin();
 }
 
 template <class Key, class T>
 typename Map<Key, T>::Iterator Map<Key, T>::end()
 {
   detach();
-  return d->map.end();
+  return d->map->end();
 }
 
 template <class Key, class T>
 typename Map<Key, T>::ConstIterator Map<Key, T>::end() const
 {
-  return d->map.end();
+  return d->map->end();
 }
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
 {
   detach();
-  d->map[key] = value;
+  (*d->map)[key] = value;
   return *this;
 }
 
@@ -107,40 +97,40 @@ template <class Key, class T>
 Map<Key, T> &Map<Key, T>::clear()
 {
   detach();
-  d->map.clear();
+  d->map->clear();
   return *this;
 }
 
 template <class Key, class T>
 bool Map<Key, T>::isEmpty() const
 {
-  return d->map.empty();
+  return d->map->empty();
 }
 
 template <class Key, class T>
 typename Map<Key, T>::Iterator Map<Key, T>::find(const Key &key)
 {
   detach();
-  return d->map.find(key);
+  return d->map->find(key);
 }
 
 template <class Key, class T>
 typename Map<Key,T>::ConstIterator Map<Key, T>::find(const Key &key) const
 {
-  return d->map.find(key);
+  return d->map->find(key);
 }
 
 template <class Key, class T>
 bool Map<Key, T>::contains(const Key &key) const
 {
-  return d->map.find(key) != d->map.end();
+  return d->map->find(key) != d->map->end();
 }
 
 template <class Key, class T>
 Map<Key, T> &Map<Key,T>::erase(Iterator it)
 {
   detach();
-  d->map.erase(it);
+  d->map->erase(it);
   return *this;
 }
 
@@ -148,41 +138,33 @@ template <class Key, class T>
 Map<Key, T> &Map<Key,T>::erase(const Key &key)
 {
   detach();
-  Iterator it = d->map.find(key);
-  if(it != d->map.end())
-    d->map.erase(it);
+  d->map->erase(key);
   return *this;
 }
 
 template <class Key, class T>
 size_t Map<Key, T>::size() const
 {
-  return d->map.size();
+  return d->map->size();
 }
 
 template <class Key, class T>
 const T &Map<Key, T>::operator[](const Key &key) const
 {
-  return d->map[key];
+  return (*d->map)[key];
 }
 
 template <class Key, class T>
 T &Map<Key, T>::operator[](const Key &key)
 {
   detach();
-  return d->map[key];
+  return (*d->map)[key];
 }
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
-  if(&m == this)
-    return *this;
-
-  if(d->deref())
-    delete(d);
-  d = m.d;
-  d->ref();
+  *d = *m.d;
   return *this;
 }
 
@@ -193,12 +175,8 @@ Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
-  if(!d->unique()) {
-    d->deref();
-    d = new MapPrivate<Key, T>(d->map);
-  }
+  if(!d->map.unique())
+    d->map.reset(new MapType(*d->map));
 }
 
 } // namespace TagLib
-
-

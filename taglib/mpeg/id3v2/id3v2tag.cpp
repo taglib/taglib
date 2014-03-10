@@ -52,18 +52,18 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() 
-    : file(0)
-    , tagOffset(-1)
-    , extendedHeader(0)
-    , footer(0)
-    , paddingSize(0)
-  {
-    frameList.setAutoDelete(true);
-  }
+  TagPrivate() : 
+    file(0), 
+    tagOffset(-1), 
+    extendedHeader(0), 
+    footer(0), 
+    paddingSize(0) {}
 
   ~TagPrivate()
   {
+    for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); ++it)
+      delete *it;
+
     delete extendedHeader;
     delete footer;
   }
@@ -583,16 +583,12 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Loop through the frames rendering them and adding them to the tagData.
 
-  FrameList newFrames;
-  newFrames.setAutoDelete(true);
-
   FrameList frameList;
-  if(version == 4) {
+  FrameList newFrames;
+  if(version == 4) 
     frameList = d->frameList;
-  }
-  else {
+  else 
     downgradeFrames(&frameList, &newFrames);
-  }
 
   for(FrameList::Iterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
@@ -604,6 +600,9 @@ ByteVector ID3v2::Tag::render(int version) const
     if(!(*it)->header()->tagAlterPreservation())
       tagData.append((*it)->render());
   }
+
+  for(FrameList::ConstIterator it = newFrames.begin(); it != newFrames.end(); ++it)
+    delete *it;
 
   // Compute the amount of padding, and append that to tagData.
 

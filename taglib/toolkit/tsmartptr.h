@@ -35,22 +35,20 @@
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
-#if defined(HAVE_STD_SHARED_PTR) 
+#if defined(HAVE_CXX11_SMART_PTR) 
 
 # include <memory>
 # define SHARED_PTR std::shared_ptr
+# define SCOPED_PTR std::unique_ptr
 
-#elif defined(HAVE_TR1_SHARED_PTR) 
-
-# include <tr1/memory>
-# define SHARED_PTR std::tr1::shared_ptr
-
-#elif defined(HAVE_BOOST_SHARED_PTR)
+#elif defined(HAVE_BOOST_SMART_PTR)
 
 # include <boost/shared_ptr.hpp>
+# include <boost/scoped_ptr.hpp>
 # define SHARED_PTR boost::shared_ptr
+# define SCOPED_PTR boost::scoped_ptr
 
-#else   //  HAVE_STD_SHARED_PTR
+#else   //  HAVE_CXX11_SMART_PTR
 
 # include <algorithm>
 
@@ -301,28 +299,7 @@ namespace TagLib
   {
     a.swap(b);
   }
-}
 
-# define SHARED_PTR TagLib::RefCountPtr
-
-#endif  // HAVE_STD_SHARED_PTR etc.
-
-#if defined(HAVE_STD_UNIQUE_PTR) 
-
-# include <memory>
-# define SCOPED_PTR std::unique_ptr
-
-#elif defined(HAVE_BOOST_SCOPED_PTR)
-
-# include <boost/scoped_ptr.hpp>
-# define SCOPED_PTR boost::scoped_ptr
-
-#else // HAVE_STD_UNIQUE_PTR
- 
-# include <algorithm>
-
-namespace TagLib
-{
   // Self-implements NonRefCountPtr<T> if unique_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard unique_ptr<T> rather than this class.
 
@@ -407,10 +384,10 @@ namespace TagLib
   }
 }
 
+# define SHARED_PTR TagLib::RefCountPtr
 # define SCOPED_PTR TagLib::NonRefCountPtr
 
-#endif  // HAVE_STD_UNIQUE_PTR etc.
-
+#endif  // HAVE_CXX11_SMART_PTR etc.
 
 #endif // DO_NOT_DOCUMENT
 #endif
