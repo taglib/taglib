@@ -154,7 +154,7 @@ bool DSF::File::save()
     }
 
     // Delete the old tag and write the new one
-    insert(tagData, newMetadataOffset, oldTagSize);
+    insert(tagData, static_cast<offset_t>(newMetadataOffset), static_cast<size_t>(oldTagSize));
   }
 
   return true;
@@ -214,7 +214,8 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
 
   chunkSize = readBlock(8).toInt64LE(0);
   
-  d->properties = new AudioProperties(readBlock(chunkSize), propertiesStyle);
+  d->properties 
+    = new AudioProperties(readBlock(static_cast<size_t>(chunkSize)), propertiesStyle);
   
   // Skip the data chunk
 
