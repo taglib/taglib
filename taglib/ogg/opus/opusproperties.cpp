@@ -45,6 +45,7 @@ public:
     file(f),
     style(s),
     length(0),
+    bitrate(0),
     inputSampleRate(0),
     channels(0),
     opusVersion(0) {}
@@ -52,6 +53,7 @@ public:
   File *file;
   ReadStyle style;
   int length;
+  int bitrate;
   int inputSampleRate;
   int channels;
   int opusVersion;
@@ -79,7 +81,7 @@ int Opus::Properties::length() const
 
 int Opus::Properties::bitrate() const
 {
-  return 0;
+  return d->bitrate;
 }
 
 int Opus::Properties::sampleRate() const
@@ -143,14 +145,16 @@ void Opus::Properties::read()
   pos += 1;
 
   const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last = d->file->lastPageHeader();
+  const Ogg::PageHeader *last  = d->file->lastPageHeader();
 
   if(first && last) {
-    long long start = first->absoluteGranularPosition();
-    long long end = last->absoluteGranularPosition();
+    const long long start = first->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
-    if(start >= 0 && end >= 0)
-      d->length = (int) ((end - start - preSkip) / 48000);
+    if(start >= 0 && end >= 0) {
+      d->length  = (int)((end - start - preSkip) / 48000);
+      d->bitrate = (int)(d->file->length() * 8.0 / (1000.0 * d->length) + 0.5);
+    }
     else {
       debug("Opus::Properties::read() -- The PCM values for the start or "
             "end of this file was incorrect.");
