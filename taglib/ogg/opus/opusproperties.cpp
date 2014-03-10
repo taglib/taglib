@@ -42,11 +42,13 @@ class Opus::AudioProperties::PropertiesPrivate
 public:
   PropertiesPrivate() :
     length(0),
+    bitrate(0),
     inputSampleRate(0),
     channels(0),
     opusVersion(0) {}
 
   int length;
+  int bitrate;
   int inputSampleRate;
   int channels;
   int opusVersion;
@@ -74,7 +76,7 @@ int Opus::AudioProperties::length() const
 
 int Opus::AudioProperties::bitrate() const
 {
-  return 0;
+  return d->bitrate;
 }
 
 int Opus::AudioProperties::sampleRate() const
@@ -144,8 +146,10 @@ void Opus::AudioProperties::read(File *file)
     const long long start = first->absoluteGranularPosition();
     const long long end   = last->absoluteGranularPosition();
 
-    if(start >= 0 && end >= 0)
-      d->length = (int) ((end - start - preSkip) / 48000);
+    if(start >= 0 && end >= 0) {
+      d->length  = (int)((end - start - preSkip) / 48000);
+      d->bitrate = (int)(file->length() * 8.0 / (1000.0 * d->length) + 0.5);
+    }
     else {
       debug("Opus::Properties::read() -- The PCM values for the start or "
             "end of this file was incorrect.");
