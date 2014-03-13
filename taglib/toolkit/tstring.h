@@ -334,6 +334,9 @@ namespace TagLib {
      * UTF8, this will return a vector of 8 bit characters, otherwise it will use
      * 16 bit characters.
      *
+     * \note If \a t is UTF16, the returned data is encoded in little-endian
+     * format and has a BOM.
+     *
      * \note The returned data is not null terminated.
      */
     ByteVector data(Type t) const;
