@@ -163,7 +163,6 @@ namespace TagLib {
      */
     String(wchar_t c, Type t = Latin1);
 
-
     /*!
      * Makes a deep copy of the data in \a s.
      *
@@ -173,7 +172,7 @@ namespace TagLib {
     String(const char *s, Type t = Latin1);
 
     /*!
-     * Makes a deep copy of the data in \a s.
+     * Makes a deep copy of the data in \a v.
      *
      * \note This should only be used with the 8-bit codecs Latin1 and UTF8, when
      * used with other codecs it will simply print a warning and exit.
