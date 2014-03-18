@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include <tpropertymap.h>
+#include <tutils.h>
 #include "asftag.h"
 
 using namespace TagLib;
@@ -195,7 +196,7 @@ bool ASF::Tag::isEmpty() const
 
 namespace
 {
-  const char *keyTranslation[][2] = {
+  const String keyTranslation[][2] = {
     { "WM/AlbumTitle", "ALBUM" },
     { "WM/Composer", "COMPOSER" },
     { "WM/Writer", "WRITER" },
@@ -235,18 +236,11 @@ namespace
     { "Acoustid/Id", "ACOUSTID_ID" },
     { "Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT" },
   };
+  const size_t keyTranslationSize = Utils::countOf(keyTranslation);
 }
 
 PropertyMap ASF::Tag::properties() const
 {
-  static Map<String, String> keyMap;
-  if(keyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      keyMap[keyTranslation[i][0]] = keyTranslation[i][1];
-    }
-  }
-
   PropertyMap props;
 
   if(!d->title.isEmpty()) {
@@ -262,10 +256,19 @@ PropertyMap ASF::Tag::properties() const
     props["COMMENT"] = d->comment;
   }
 
-  ASF::AttributeListMap::ConstIterator it = d->attributeListMap.begin();
-  for(; it != d->attributeListMap.end(); ++it) {
-    if(keyMap.contains(it->first)) {
-      String key = keyMap[it->first];
+  for(ASF::AttributeListMap::ConstIterator it = d->attributeListMap.begin();
+    it != d->attributeListMap.end();
+    ++it)
+  {
+    String key;
+    for(size_t i = 0; i < keyTranslationSize; ++i) {
+      if(it->first == keyTranslation[i][0]) {
+        key = keyTranslation[i][1];
+        break;
+      }
+    }
+
+    if(!key.isEmpty()) {
       AttributeList::ConstIterator it2 = it->second.begin();
       for(; it2 != it->second.end(); ++it2) {
         if(key == "TRACKNUMBER") {
@@ -283,6 +286,7 @@ PropertyMap ASF::Tag::properties() const
       props.unsupportedData().append(it->first);
     }
   }
+
   return props;
 }
 
@@ -295,17 +299,8 @@ void ASF::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
 {
-  static Map<String, String> reverseKeyMap;
-  if(reverseKeyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      reverseKeyMap[keyTranslation[i][1]] = keyTranslation[i][0];
-    }
-  }
-
   PropertyMap origProps = properties();
-  PropertyMap::ConstIterator it = origProps.begin();
-  for(; it != origProps.end(); ++it) {
+  for(PropertyMap::ConstIterator it = origProps.begin(); it != origProps.end(); ++it) {
     if(!props.contains(it->first) || props[it->first].isEmpty()) {
       if(it->first == "TITLE") {
         d->title = String::null;
@@ -320,16 +315,27 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
         d->copyright = String::null;
       }
       else {
-        d->attributeListMap.erase(reverseKeyMap[it->first]);
+        for(size_t i = 0; i < keyTranslationSize; ++i) {
+          if(it->first == keyTranslation[i][1]) {
+            d->attributeListMap.erase(keyTranslation[i][0]);
+            break;
+          }
+        }
       }
     }
   }
 
   PropertyMap ignoredProps;
-  it = props.begin();
-  for(; it != props.end(); ++it) {
-    if(reverseKeyMap.contains(it->first)) {
-      String name = reverseKeyMap[it->first];
+  for(PropertyMap::ConstIterator it = props.begin(); it != props.end(); ++it) {
+    String name;
+    for(size_t i = 0; i < keyTranslationSize; ++i) {
+      if(it->first == keyTranslation[i][1]) {
+        name = keyTranslation[i][0];
+        break;
+      }
+    }
+
+    if(!name.isEmpty()) {
       removeItem(name);
       StringList::ConstIterator it2 = it->second.begin();
       for(; it2 != it->second.end(); ++it2) {

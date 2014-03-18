@@ -148,23 +148,24 @@ namespace TagLib
 
 #endif
     }
-    
+
+    template <typename T, size_t SIZE>
+    inline size_t countOf(const T (&)[SIZE]) { return SIZE; }
+
     inline String formatString(const char *format, ...)
     {
-      // Sufficient buffer size for the current internal uses.
-      // Consider changing this value when you use this function.
-
-      static const size_t BufferSize = 128; 
-
       va_list args;
       va_start(args, format);
 
-      char buf[BufferSize];
+      // Sufficient buffer size for the current internal uses.
+      // Consider changing this value when you use this function.
+
+      char buf[128];
       int length;
 
 #if defined(HAVE_SNPRINTF)
 
-      length = vsnprintf(buf, BufferSize, format, args);
+      length = vsnprintf(buf, countOf(buf), format, args);
 
 #elif defined(HAVE_SPRINTF_S)
 
@@ -175,7 +176,7 @@ namespace TagLib
       // The last resort. May cause a buffer overflow.
 
       length = vsprintf(buf, format, args);
-      if(length >= BufferSize) {
+      if(length >= countOf(buf)) {
         debug("Utils::formatString() - Buffer overflow! Returning an empty string.");
         length = -1;
       }
@@ -194,11 +195,11 @@ namespace TagLib
 
 # if SYSTEM_BYTEORDER == 1
 
-    const ByteOrder SystemByteOrder = LittleEndian; 
+    const ByteOrder SystemByteOrder = LittleEndian;
 
 # else
 
-    const ByteOrder SystemByteOrder = BigEndian; 
+    const ByteOrder SystemByteOrder = BigEndian;
 
 # endif
 
@@ -217,8 +218,8 @@ namespace TagLib
       else
         return BigEndian;
     }
-    
-    const ByteOrder SystemByteOrder = systemByteOrder(); 
+
+    const ByteOrder SystemByteOrder = systemByteOrder();
 
 #endif
   }

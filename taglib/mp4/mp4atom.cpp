@@ -25,15 +25,20 @@
 
 #include <tdebug.h>
 #include <tstring.h>
+#include <tutils.h>
 #include "mp4atom.h"
 
 using namespace TagLib;
 
-const char *MP4::Atom::containers[11] = {
+namespace
+{
+  const char *containers[11] = {
     "moov", "udta", "mdia", "meta", "ilst",
     "stbl", "minf", "moof", "traf", "trak",
     "stsd"
-};
+  };
+  const size_t numContainers = Utils::countOf(containers);
+}
 
 MP4::Atom::Atom(File *file)
 {
@@ -72,7 +77,7 @@ MP4::Atom::Atom(File *file)
 
   name = header.mid(4, 4);
 
-  for(int i = 0; i < numContainers; i++) {
+  for(size_t i = 0; i < numContainers; i++) {
     if(name == containers[i]) {
       if(name == "meta") {
         file->seek(4, File::Current);

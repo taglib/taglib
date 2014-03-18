@@ -26,6 +26,7 @@
 #include <tdebug.h>
 #include <tstring.h>
 #include <tpropertymap.h>
+#include <tutils.h>
 #include "mp4atom.h"
 #include "mp4tag.h"
 #include "id3v1genres.h"
@@ -768,7 +769,7 @@ MP4::Tag::toString() const
 
 namespace
 {
-  const char *keyTranslation[][2] = {
+  const String keyTranslation[][2] = {
     { "\251nam", "TITLE" },
     { "\251ART", "ARTIST" },
     { "\251alb", "ALBUM" },
@@ -816,23 +817,22 @@ namespace
     { "----:com.apple.iTunes:LICENSE", "LICENSE" },
     { "----:com.apple.iTunes:MEDIA", "MEDIA" },
   };
+  const size_t keyTranslationSize = Utils::countOf(keyTranslation);
 }
 
 PropertyMap MP4::Tag::properties() const
 {
-  static Map<String, String> keyMap;
-  if(keyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      keyMap[keyTranslation[i][0]] = keyTranslation[i][1];
-    }
-  }
-
   PropertyMap props;
-  MP4::ItemListMap::ConstIterator it = d->items.begin();
-  for(; it != d->items.end(); ++it) {
-    if(keyMap.contains(it->first)) {
-      String key = keyMap[it->first];
+  for(MP4::ItemListMap::ConstIterator it = d->items.begin(); it != d->items.end(); ++it) {
+    String key;
+    for(size_t i = 0; i < keyTranslationSize; ++i) {
+      if(it->first == keyTranslation[i][0]) {
+        key = keyTranslation[i][1];
+        break;
+      }
+    }
+
+    if(!key.isEmpty()) {
       if(key == "TRACKNUMBER" || key == "DISCNUMBER") {
         MP4::Item::IntPair ip = it->second.toIntPair();
         String value = String::number(ip.first);
@@ -867,27 +867,29 @@ void MP4::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
 {
-  static Map<String, String> reverseKeyMap;
-  if(reverseKeyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      reverseKeyMap[keyTranslation[i][1]] = keyTranslation[i][0];
-    }
-  }
-
   PropertyMap origProps = properties();
-  PropertyMap::ConstIterator it = origProps.begin();
-  for(; it != origProps.end(); ++it) {
+  for(PropertyMap::ConstIterator it = origProps.begin(); it != origProps.end(); ++it) {
     if(!props.contains(it->first) || props[it->first].isEmpty()) {
-      d->items.erase(reverseKeyMap[it->first]);
+      for(size_t i = 0; i < keyTranslationSize; ++i) {
+        if(it->first == keyTranslation[i][1]) {
+          d->items.erase(keyTranslation[i][0]);
+          break;
+        }
+      }
     }
   }
 
   PropertyMap ignoredProps;
-  it = props.begin();
-  for(; it != props.end(); ++it) {
-    if(reverseKeyMap.contains(it->first)) {
-      String name = reverseKeyMap[it->first];
+  for(PropertyMap::ConstIterator it = props.begin(); it != props.end(); ++it) {
+    String name;
+    for(size_t i = 0; i < keyTranslationSize; ++i) {
+      if(it->first == keyTranslation[i][1]) {
+        name = keyTranslation[i][0];
+        break;
+      }
+    }
+
+    if(!name.isEmpty()) {
       if(it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") {
         int first = 0, second = 0;
         StringList parts = StringList::split(it->second.front(), "/");

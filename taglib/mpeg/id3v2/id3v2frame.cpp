@@ -35,6 +35,7 @@
 
 #include <tdebug.h>
 #include <tstringlist.h>
+#include <tutils.h>
 
 #include "id3v2tag.h"
 #include "id3v2frame.h"
@@ -322,8 +323,13 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
 
 namespace
 {
-  static const TagLib::uint frameTranslationSize = 51;
-  static const char *frameTranslation[][2] = {
+  struct FrameTranslation
+  {
+    ByteVector id;
+    String     key;
+  };
+
+  const FrameTranslation frameTranslation[] = {
     // Text information frames
     { "TALB", "ALBUM" },
     { "TBPM", "BPM" },
@@ -387,99 +393,79 @@ namespace
     { "COMM", "COMMENT" },
     //{ "USLT", "LYRICS" }, handled specially
   };
+  const size_t frameTranslationSize = Utils::countOf(frameTranslation);
 
-  static const TagLib::uint txxxFrameTranslationSize = 8;
-  static const char *txxxFrameTranslation[][2] = {
-    { "MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
-    { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
-    { "MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
-    { "MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
-    { "MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
-    { "Acoustid Id", "ACOUSTID_ID" },
-    { "Acoustid Fingerprint", "ACOUSTID_FINGERPRINT" },
-    { "MusicIP PUID", "MUSICIP_PUID" },
+  const String txxxFrameTranslation[][2] = {
+    { "MUSICBRAINZ ALBUM ID",         "MUSICBRAINZ_ALBUMID" },
+    { "MUSICBRAINZ ARTIST ID",        "MUSICBRAINZ_ARTISTID" },
+    { "MUSICBRAINZ ALBUM ARTIST ID",  "MUSICBRAINZ_ALBUMARTISTID" },
+    { "MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "MUSICBRAINZ WORK ID",          "MUSICBRAINZ_WORKID" },
+    { "ACOUSTID ID",                  "ACOUSTID_ID" },
+    { "ACOUSTID FINGERPRINT",         "ACOUSTID_FINGERPRINT" },
+    { "MUSICIP PUID",                 "MUSICIP_PUID" },
   };
-
-  Map<ByteVector, String> &idMap()
-  {
-    static Map<ByteVector, String> m;
-    if(m.isEmpty())
-      for(size_t i = 0; i < frameTranslationSize; ++i)
-        m[frameTranslation[i][0]] = frameTranslation[i][1];
-    return m;
-  }
-
-  Map<String, String> &txxxMap()
-  {
-    static Map<String, String> m;
-    if(m.isEmpty()) {
-      for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-        String key = String(txxxFrameTranslation[i][0]).upper();
-        m[key] = txxxFrameTranslation[i][1];
-      }
-    }
-    return m;
-  }
+  const size_t txxxFrameTranslationSize = Utils::countOf(txxxFrameTranslation);
 
   // list of deprecated frames and their successors
-  static const TagLib::uint deprecatedFramesSize = 4;
-  static const char *deprecatedFrames[][2] = {
+  const ByteVector deprecatedFrames[][2] = {
     {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
     {"TDAT", "TDRC"}, // 2.3 -> 2.4
     {"TYER", "TDRC"}, // 2.3 -> 2.4
     {"TIME", "TDRC"}, // 2.3 -> 2.4
   };
-
-
-  Map<ByteVector,ByteVector> &deprecationMap()
-  {
-    static Map<ByteVector,ByteVector> depMap;
-    if(depMap.isEmpty())
-      for(TagLib::uint i = 0; i < deprecatedFramesSize; ++i)
-        depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
-    return depMap;
-  }
+  const size_t deprecatedFramesSize = Utils::countOf(deprecatedFrames);
 }
 
 String Frame::frameIDToKey(const ByteVector &id)
 {
-  Map<ByteVector, String> &m = idMap();
-  if(m.contains(id))
-    return m[id];
-  if(deprecationMap().contains(id))
-    return m[deprecationMap()[id]];
+  ByteVector id24 = id;
+  for(size_t i = 0; i < deprecatedFramesSize; ++i) {
+    if(id == deprecatedFrames[i][0]) {
+      id24 = deprecatedFrames[i][1];
+      break;
+    }
+  }
+
+  for(size_t i = 0; i < frameTranslationSize; ++i) {
+    if(id24 == frameTranslation[i].id)
+      return frameTranslation[i].key;
+  }
+
   return String::null;
 }
 
-ByteVector Frame::keyToFrameID(const String &s)
+ByteVector Frame::keyToFrameID(const String &key)
 {
-  static Map<String, ByteVector> m;
-  if(m.isEmpty())
-    for(size_t i = 0; i < frameTranslationSize; ++i)
-      m[frameTranslation[i][1]] = frameTranslation[i][0];
-  if(m.contains(s.upper()))
-    return m[s];
+  const String k = key.upper();
+  for(size_t i = 0; i < frameTranslationSize; ++i) {
+    if(k == frameTranslation[i].key)
+      return frameTranslation[i].id;
+  }
+
   return ByteVector::null;
 }
 
 String Frame::txxxToKey(const String &description)
 {
-  Map<String, String> &m = txxxMap();
-  String d = description.upper();
-  if(m.contains(d))
-    return m[d];
+  const String d = description.upper();
+  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
+    if(d == txxxFrameTranslation[i][0])
+      return txxxFrameTranslation[i][1];
+  }
+
   return d;
 }
 
-String Frame::keyToTXXX(const String &s)
+String Frame::keyToTXXX(const String &key)
 {
-  static Map<String, String> m;
-  if(m.isEmpty())
-    for(size_t i = 0; i < txxxFrameTranslationSize; ++i)
-      m[txxxFrameTranslation[i][1]] = txxxFrameTranslation[i][0];
-  if(m.contains(s.upper()))
-    return m[s];
-  return s;
+  const String k = key.upper();
+  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
+    if(k == txxxFrameTranslation[i][1])
+      return txxxFrameTranslation[i][0];
+  }
+
+  return key;
 }
 
 PropertyMap Frame::asProperties() const
