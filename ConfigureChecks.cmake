@@ -5,6 +5,7 @@ include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
+include(CheckCXXCompilerFlag)
 include(TestBigEndian)
 
 # Check if the size of integral types are suitable.
@@ -45,9 +46,21 @@ check_type_size("float"       SIZEOF_FLOAT)
 check_type_size("double"      SIZEOF_DOUBLE)
 check_type_size("long double" SIZEOF_LONGDOUBLE)
 
+# Enable C++11 if possible.
+
+check_cxx_compiler_flag("-std=c++11" HAVE_STDCXX11_FLAG)
+if(HAVE_STDCXX11_FLAG)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+  check_cxx_compiler_flag("-std=c++0x" HAVE_STDCXX0X_FLAG)
+  if(HAVE_STDCXX0X_FLAG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+  endif()
+endif()
+
 # Determine which kind of byte swap functions your compiler supports.
 
-# GCC's __builtin_bswap* should be checked individually 
+# GCC's __builtin_bswap* should be checked individually
 # because some of them can be missing depends on the GCC version.
 check_cxx_source_compiles("
   int main() {
@@ -118,39 +131,27 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
-# Determine where shared_ptr<T> is defined regardless of C++11 support.
+# Determine whether your compiler supports smart pointers.
 
 check_cxx_source_compiles("
   #include <memory>
-  int main() { std::shared_ptr<int> x; return 0; }
-" HAVE_STD_SHARED_PTR)
+  int main() {
+    std::shared_ptr<int> x;
+    std::unique_ptr<int> y;
+    return 0;
+  }
+" HAVE_STD_SMART_PTR)
 
-if(NOT HAVE_STD_SHARED_PTR)
+if(NOT HAVE_STD_SMART_PTR)
   check_cxx_source_compiles("
-    #include <tr1/memory>
-    int main() { std::tr1::shared_ptr<int> x; return 0; }
-  " HAVE_TR1_SHARED_PTR)
-
-  if(NOT HAVE_TR1_SHARED_PTR)
-    check_cxx_source_compiles("
-      #include <boost/shared_ptr.hpp>
-      int main() { boost::shared_ptr<int> x; return 0; }
-    " HAVE_BOOST_SHARED_PTR)
-  endif()
-endif()
-
-# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
-
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::unique_ptr<int> x; return 0; }
-" HAVE_STD_UNIQUE_PTR)
-
-if(NOT HAVE_STD_UNIQUE_PTR)
-  check_cxx_source_compiles("
+    #include <boost/shared_ptr.hpp>
     #include <boost/scoped_ptr.hpp>
-    int main() { boost::scoped_ptr<int> x; return 0; }
-  " HAVE_BOOST_SCOPED_PTR)
+    int main() {
+      boost::shared_ptr<int> x;
+      boost::scoped_ptr<int> y;
+      return 0;
+    }
+  " HAVE_BOOST_SMART_PTR)
 endif()
 
 # Determine which kind of atomic operations your compiler supports.
@@ -228,13 +229,21 @@ endif()
 
 check_cxx_source_compiles("
   #include <cstdio>
-  int main() { char buf[20]; snprintf(buf, 20, \"%d\", 1); return 0; }
+    int main() { 
+      char buf[20]; 
+      snprintf(buf, 20, \"%d\", 1); 
+      return 0; 
+    }
 " HAVE_SNPRINTF)
 
 if(NOT HAVE_SNPRINTF)
   check_cxx_source_compiles("
     #include <cstdio>
-    int main() { char buf[20]; sprintf_s(buf, \"%d\", 1);  return 0; }
+      int main() { 
+        char buf[20]; 
+        sprintf_s(buf, \"%d\", 1);  
+        return 0; 
+      }
   " HAVE_SPRINTF_S)
 endif()
 

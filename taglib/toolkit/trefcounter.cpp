@@ -27,7 +27,7 @@
 #include <config.h>
 #endif
 
-#include "trefcounter.h"
+#include <trefcounter.h>
 
 #if defined(HAVE_STD_ATOMIC)
 # include <atomic>
@@ -48,7 +48,7 @@
 #   define NOMINMAX
 # endif
 # include <windows.h>
-# define ATOMIC_INT long
+# define ATOMIC_INT LONG volatile
 # define ATOMIC_INC(x) InterlockedIncrement(&x)
 # define ATOMIC_DEC(x) InterlockedDecrement(&x)
 #elif defined(HAVE_MAC_ATOMIC)
@@ -72,16 +72,14 @@ namespace TagLib
   class RefCounter::RefCounterPrivate
   {
   public:
-    RefCounterPrivate() 
-      : refCount(1) 
-    {
-    }
+    RefCounterPrivate() :
+      refCount(1) {}
 
-    volatile ATOMIC_INT refCount;
+    ATOMIC_INT refCount;
   };
 
-  RefCounter::RefCounter()
-    : d(new RefCounterPrivate())
+  RefCounter::RefCounter() : 
+    d(new RefCounterPrivate()) 
   {
   }
 
@@ -98,6 +96,11 @@ namespace TagLib
   bool RefCounter::deref()
   { 
     return (ATOMIC_DEC(d->refCount) == 0); 
+  }
+
+  long RefCounter::count() const
+  {
+    return static_cast<long>(d->refCount);
   }
 
   bool RefCounter::unique() const 
