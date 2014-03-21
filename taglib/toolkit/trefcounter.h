@@ -44,6 +44,7 @@ namespace TagLib
 
     void ref();
     bool deref();
+    long count() const;
     bool unique() const;
 
   private:

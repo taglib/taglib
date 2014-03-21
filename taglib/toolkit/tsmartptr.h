@@ -28,101 +28,58 @@
 
 // This file is not a part of TagLib public interface. This is not installed.
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
 /*!
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
-#if defined(HAVE_STD_SHARED_PTR) 
+#if defined(HAVE_STD_SMART_PTR) 
 
 # include <memory>
 # define SHARED_PTR std::shared_ptr
+# define SCOPED_PTR std::unique_ptr
 
-#elif defined(HAVE_TR1_SHARED_PTR) 
-
-# include <tr1/memory>
-# define SHARED_PTR std::tr1::shared_ptr
-
-#elif defined(HAVE_BOOST_SHARED_PTR)
+#elif defined(HAVE_BOOST_SMART_PTR)
 
 # include <boost/shared_ptr.hpp>
+# include <boost/scoped_ptr.hpp>
 # define SHARED_PTR boost::shared_ptr
+# define SCOPED_PTR boost::scoped_ptr
 
 #else   //  HAVE_STD_SHARED_PTR
 
+# include <trefcounter.h>
 # include <algorithm>
 
-# if defined(HAVE_GCC_ATOMIC)
-#   define ATOMIC_INT int
-#   define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-#   define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-# elif defined(HAVE_WIN_ATOMIC)
-#   if !defined(NOMINMAX)
-#     define NOMINMAX
-#   endif
-#   include <windows.h>
-#   define ATOMIC_INT long
-#   define ATOMIC_INC(x) InterlockedIncrement(&x)
-#   define ATOMIC_DEC(x) InterlockedDecrement(&x)
-# elif defined(HAVE_MAC_ATOMIC)
-#   include <libkern/OSAtomic.h>
-#   define ATOMIC_INT int32_t
-#   define ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-#   define ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-# elif defined(HAVE_IA64_ATOMIC)
-#   include <ia64intrin.h>
-#   define ATOMIC_INT int
-#   define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-#   define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-# else
-#   define ATOMIC_INT int
-#   define ATOMIC_INC(x) (++x)
-#   define ATOMIC_DEC(x) (--x)
-# endif
-
-namespace TagLib 
+namespace TagLib
 {
-  // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
-  // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
-  
+  // Smart pointer like shared_ptr<T> and unique_ptr<T>.  These are fall-back 
+  // options for when standard smart pointers are not available.  I STRONGLY 
+  // RECOMMEND using standard ones rather than these class.
+
   // Counter base class. Provides a reference counter.
 
-  class CounterBase
+  class CounterBase : public RefCounter
   {
   public:
-    CounterBase()
-      : refCount(1)
+    void addref()
     {
-    }
-
-    virtual ~CounterBase()
-    {
-    }
-
-    void addref() 
-    {    
-      ATOMIC_INC(refCount);
+      RefCounter::ref();
     }
 
     void release()
     {
-      if(ATOMIC_DEC(refCount) == 0) {
+      if(RefCounter::deref()) {
         dispose();
         delete this;
       }
     }
 
-    long use_count() const
-    {
-      return static_cast<long>(refCount);
-    }
-
     virtual void dispose() = 0;
-
-  private:
-    volatile ATOMIC_INT refCount;
   };
 
   // Counter impl class. Provides a dynamic deleter.
@@ -131,8 +88,8 @@ namespace TagLib
   class CounterImpl : public CounterBase
   {
   public:
-    CounterImpl(T *p)
-      : p(p)
+    CounterImpl(T *p) : 
+      p(p) 
     {
     }
 
@@ -154,31 +111,31 @@ namespace TagLib
   class RefCountPtr
   {
   public:
-    RefCountPtr()
-      : px(0)
-      , counter(0)
+    RefCountPtr() : 
+      px(0), 
+      counter(0)
     {
     }
 
     template <typename U>
-    explicit RefCountPtr(U *p)
-      : px(p)
-      , counter(new CounterImpl<U>(p))
+    explicit RefCountPtr(U *p) : 
+      px(p), 
+      counter(new CounterImpl<U>(p))
     {
     }
 
-    RefCountPtr(const RefCountPtr<T> &x)
-      : px(x.px)
-      , counter(x.counter)
+    RefCountPtr(const RefCountPtr<T> &x) : 
+      px(x.px), 
+      counter(x.counter)
     {
       if(counter)
         counter->addref();
     }
 
     template <typename U>
-    RefCountPtr(const RefCountPtr<U> &x)
-      : px(x.px)
-      , counter(x.counter)
+    RefCountPtr(const RefCountPtr<U> &x) : 
+      px(x.px), 
+      counter(x.counter)
     {
       if(counter)
         counter->addref();
@@ -198,7 +155,7 @@ namespace TagLib
     long use_count() const
     {
       if(counter)
-        return counter->use_count();
+        return counter->count();
       else
         return 0;
     }
@@ -301,37 +258,13 @@ namespace TagLib
   {
     a.swap(b);
   }
-}
-
-# define SHARED_PTR TagLib::RefCountPtr
-
-#endif  // HAVE_STD_SHARED_PTR etc.
-
-#if defined(HAVE_STD_UNIQUE_PTR) 
-
-# include <memory>
-# define SCOPED_PTR std::unique_ptr
-
-#elif defined(HAVE_BOOST_SCOPED_PTR)
-
-# include <boost/scoped_ptr.hpp>
-# define SCOPED_PTR boost::scoped_ptr
-
-#else // HAVE_STD_UNIQUE_PTR
- 
-# include <algorithm>
-
-namespace TagLib
-{
-  // Self-implements NonRefCountPtr<T> if unique_ptr<T> is not available.
-  // I STRONGLY RECOMMEND using standard unique_ptr<T> rather than this class.
 
   template<typename T> 
   class NonRefCountPtr
   {
   public:
-    explicit NonRefCountPtr(T *p = 0)
-      : px(p) 
+    explicit NonRefCountPtr(T *p = 0) : 
+      px(p) 
     {
     }
 
@@ -407,10 +340,10 @@ namespace TagLib
   }
 }
 
+# define SHARED_PTR TagLib::RefCountPtr
 # define SCOPED_PTR TagLib::NonRefCountPtr
 
 #endif  // HAVE_STD_UNIQUE_PTR etc.
-
 
 #endif // DO_NOT_DOCUMENT
 #endif
