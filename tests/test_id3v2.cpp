@@ -15,6 +15,7 @@
 #include <attachedpictureframe.h>
 #include <unsynchronizedlyricsframe.h>
 #include <synchronizedlyricsframe.h>
+#include <eventtimingcodesframe.h>
 #include <generalencapsulatedobjectframe.h>
 #include <relativevolumeframe.h>
 #include <popularimeterframe.h>
@@ -72,6 +73,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderOwnershipFrame);
   CPPUNIT_TEST(testParseSynchronizedLyricsFrame);
   CPPUNIT_TEST(testRenderSynchronizedLyricsFrame);
+  CPPUNIT_TEST(testParseEventTimingCodesFrame);
+  CPPUNIT_TEST(testRenderEventTimingCodesFrame);
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
@@ -484,6 +487,47 @@ public:
                  "\x00\x00\x04\xd2"          // 1st time stamp
                  "Lyrics\x00"                // 2nd text
                  "\x00\x00\x11\xd7", 43),    // 2nd time stamp
+      f.render());
+  }
+
+  void testParseEventTimingCodesFrame()
+  {
+    ID3v2::EventTimingCodesFrame f(
+      ByteVector("ETCO"                      // Frame ID
+                 "\x00\x00\x00\x0b"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "\x02"                      // Time stamp format
+                 "\x02"                      // 1st event
+                 "\x00\x00\xf3\x5c"          // 1st time stamp
+                 "\xfe"                      // 2nd event
+                 "\x00\x36\xee\x80", 21));   // 2nd time stamp
+    CPPUNIT_ASSERT_EQUAL(ID3v2::EventTimingCodesFrame::AbsoluteMilliseconds,
+                         f.timestampFormat());
+    ID3v2::EventTimingCodesFrame::SynchedEventList sel = f.synchedEvents();
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), sel.size());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::EventTimingCodesFrame::IntroStart, sel[0].type);
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(62300), sel[0].time);
+    CPPUNIT_ASSERT_EQUAL(ID3v2::EventTimingCodesFrame::AudioFileEnds, sel[1].type);
+    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3600000), sel[1].time);
+  }
+
+  void testRenderEventTimingCodesFrame()
+  {
+    ID3v2::EventTimingCodesFrame f;
+    f.setTimestampFormat(ID3v2::EventTimingCodesFrame::AbsoluteMilliseconds);
+    ID3v2::EventTimingCodesFrame::SynchedEventList sel;
+    sel.append(ID3v2::EventTimingCodesFrame::SynchedEvent(62300, ID3v2::EventTimingCodesFrame::IntroStart));
+    sel.append(ID3v2::EventTimingCodesFrame::SynchedEvent(3600000, ID3v2::EventTimingCodesFrame::AudioFileEnds));
+    f.setSynchedEvents(sel);
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("ETCO"                      // Frame ID
+                 "\x00\x00\x00\x0b"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "\x02"                      // Time stamp format
+                 "\x02"                      // 1st event
+                 "\x00\x00\xf3\x5c"          // 1st time stamp
+                 "\xfe"                      // 2nd event
+                 "\x00\x36\xee\x80", 21),    // 2nd time stamp
       f.render());
   }
 
