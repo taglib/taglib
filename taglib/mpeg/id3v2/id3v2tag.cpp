@@ -129,21 +129,21 @@ ID3v2::Tag::~Tag()
 String ID3v2::Tag::title() const
 {
   if(!d->frameListMap["TIT2"].isEmpty())
-    return d->frameListMap["TIT2"].front()->toString();
+    return dynamic_cast<TextIdentificationFrame*>(d->frameListMap["TIT2"].front())->fieldList().front();
   return String::null;
 }
 
 String ID3v2::Tag::artist() const
 {
   if(!d->frameListMap["TPE1"].isEmpty())
-    return d->frameListMap["TPE1"].front()->toString();
+    return dynamic_cast<TextIdentificationFrame*>(d->frameListMap["TPE1"].front())->fieldList().front();
   return String::null;
 }
 
 String ID3v2::Tag::album() const
 {
   if(!d->frameListMap["TALB"].isEmpty())
-    return d->frameListMap["TALB"].front()->toString();
+    return dynamic_cast<TextIdentificationFrame*>(d->frameListMap["TALB"].front())->fieldList().front();
   return String::null;
 }
 
@@ -167,10 +167,6 @@ String ID3v2::Tag::comment() const
 
 String ID3v2::Tag::genre() const
 {
-  // TODO: In the next major version (TagLib 2.0) a list of multiple genres
-  // should be separated by " / " instead of " ".  For the moment to keep
-  // the behavior the same as released versions it is being left with " ".
-
   if(d->frameListMap["TCON"].isEmpty() ||
      !dynamic_cast<TextIdentificationFrame *>(d->frameListMap["TCON"].front()))
   {
@@ -179,33 +175,15 @@ String ID3v2::Tag::genre() const
 
   // ID3v2.4 lists genres as the fields in its frames field list.  If the field
   // is simply a number it can be assumed that it is an ID3v1 genre number.
-  // Here was assume that if an ID3v1 string is present that it should be
-  // appended to the genre string.  Multiple fields will be appended as the
-  // string is built.
 
   TextIdentificationFrame *f = static_cast<TextIdentificationFrame *>(
     d->frameListMap["TCON"].front());
-
-  StringList fields = f->fieldList();
-
-  StringList genres;
-
-  for(StringList::Iterator it = fields.begin(); it != fields.end(); ++it) {
-
-    if((*it).isEmpty())
-      continue;
-
-    bool ok;
-    int number = (*it).toInt(&ok);
-    if(ok && number >= 0 && number <= 255) {
-      *it = ID3v1::genre(number);
-    }
-
-    if(std::find(genres.begin(), genres.end(), *it) == genres.end())
-      genres.append(*it);
-  }
-
-  return genres.toString();
+  String firstGenre = f->fieldList().front();
+  bool ok;
+  int number = firstGenre.toInt(&ok);
+  if(ok && number >= 0 && number <= 255)
+    return ID3v1::genre(number);
+  return firstGenre;
 }
 
 TagLib::uint ID3v2::Tag::year() const
