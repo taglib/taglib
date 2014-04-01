@@ -156,11 +156,6 @@ public:
   {
   }
 
-  StringPrivate(size_t n, wchar_t c)
-    : data(new std::wstring(n, c))
-  {
-  }
-
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian.
    */
@@ -239,14 +234,18 @@ String::String(wchar_t c, Type t)
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
   else {
-    debug("String::String() -- A const wchar_t should not contain Latin1 or UTF-8.");
+    debug("String::String() -- A wchar_t should not contain Latin1 or UTF-8.");
   }
 }
 
 String::String(char c, Type t)
-  : d(new StringPrivate(1, static_cast<uchar>(c)))
+  : d(new StringPrivate())
 {
-  if(t != Latin1 && t != UTF8) {
+  if(t == Latin1)
+    copyFromLatin1(&c, 1);
+  else if(t == String::UTF8)
+    copyFromUTF8(&c, 1);
+  else {
     debug("String::String() -- A char should not contain UTF16.");
   }
 }
