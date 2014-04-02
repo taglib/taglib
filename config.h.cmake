@@ -4,11 +4,6 @@
 /* 1 if little-endian, 2 if big-endian. */
 #cmakedefine   SYSTEM_BYTEORDER ${SYSTEM_BYTEORDER}
 
-/* Size of floating point types */
-#cmakedefine   SIZEOF_FLOAT      ${SIZEOF_FLOAT}
-#cmakedefine   SIZEOF_DOUBLE     ${SIZEOF_DOUBLE}
-#cmakedefine   SIZEOF_LONGDOUBLE ${SIZEOF_LONGDOUBLE}
-
 /* Defined if your compiler supports some byte swap functions */
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1
 #cmakedefine   HAVE_GCC_BYTESWAP_32 1

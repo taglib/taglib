@@ -685,9 +685,7 @@ float ByteVector::toFloat32BE(size_t offset) const
     return 0.0;
   }
 
-#if defined(SIZEOF_FLOAT) && SIZEOF_FLOAT == 4
-
-  if(std::numeric_limits<float>::is_iec559) 
+  if(sizeof(float) == 4 && std::numeric_limits<float>::is_iec559)
   {
     // float is 32-bit wide and IEEE754 compliant.
 
@@ -702,8 +700,6 @@ float ByteVector::toFloat32BE(size_t offset) const
 
     return tmp.f;
   }
-
-#endif
 
   const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
 
@@ -721,7 +717,7 @@ float ByteVector::toFloat32BE(size_t offset) const
     | (static_cast<uint>(bytes[3]));
 
   float val;
-  if (exponent == 0 && fraction == 0)
+  if(exponent == 0 && fraction == 0)
     val = 0;
   else {
     if(exponent == 0xFF) {
@@ -745,9 +741,7 @@ double ByteVector::toFloat64BE(size_t offset) const
     return 0.0;
   }
 
-#if defined(SIZEOF_DOUBLE) && SIZEOF_DOUBLE == 8
-
-  if(std::numeric_limits<double>::is_iec559) 
+  if(sizeof(double) == 8 && std::numeric_limits<double>::is_iec559)
   {
     // double is 64-bit wide and IEEE754 compliant.
 
@@ -762,8 +756,6 @@ double ByteVector::toFloat64BE(size_t offset) const
 
     return tmp.f;
   }
-
-#endif
 
   const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
 
@@ -785,7 +777,7 @@ double ByteVector::toFloat64BE(size_t offset) const
     | (static_cast<ulonglong>(bytes[7]));
 
   double val;
-  if (exponent == 0 && fraction == 0)
+  if(exponent == 0 && fraction == 0)
     val = 0;
   else {
     if(exponent == 0x7FF) {
@@ -829,7 +821,7 @@ long double ByteVector::toFloat80BE(size_t offset) const
     | (static_cast<ulonglong>(bytes[9]));
 
   long double val;
-  if (exponent == 0 && fraction == 0)
+  if(exponent == 0 && fraction == 0)
     val = 0;
   else {
     if(exponent == 0x7FFF) {
