@@ -28,7 +28,9 @@
 
 // This file is not a part of TagLib public interface. This is not installed.
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
 /*!
