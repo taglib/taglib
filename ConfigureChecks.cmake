@@ -39,12 +39,6 @@ else()
   set(SYSTEM_BYTEORDER 2)
 endif()
 
-# Determine the size of floating point types.
-
-check_type_size("float"       SIZEOF_FLOAT)
-check_type_size("double"      SIZEOF_DOUBLE)
-check_type_size("long double" SIZEOF_LONGDOUBLE)
-
 # Determine which kind of byte swap functions your compiler supports.
 
 # GCC's __builtin_bswap* should be checked individually 
