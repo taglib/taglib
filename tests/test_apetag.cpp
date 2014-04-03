@@ -52,7 +52,7 @@ public:
     tag.setProperties(dict);
     CPPUNIT_ASSERT_EQUAL(String("17"), tag.itemListMap()["TRACK"].values()[0]);
     CPPUNIT_ASSERT_EQUAL(2u, tag.itemListMap()["ARTIST"].values().size());
-    CPPUNIT_ASSERT_EQUAL(String("artist 1"), tag.artist());
+    CPPUNIT_ASSERT_EQUAL(String("artist 1 artist 2"), tag.artist());
     CPPUNIT_ASSERT_EQUAL(17u, tag.track());
   }
 
