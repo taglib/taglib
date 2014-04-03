@@ -84,13 +84,6 @@ endif()
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-if(WITH_ASF)
-  set(TAGLIB_WITH_ASF TRUE)
-endif()
-if(WITH_MP4)
-  set(TAGLIB_WITH_MP4 TRUE)
-endif()
-
 option(TRACE_IN_RELEASE "Output debug messages even in release mode"  OFF)
 if(TRACE_IN_RELEASE)
   set(TRACE_IN_RELEASE TRUE)
