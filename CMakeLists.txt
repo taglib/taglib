@@ -2,6 +2,10 @@ project(taglib)
 
 cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
 
+if(NOT ${CMAKE_VERSION} VERSION_LESS 2.8.12)
+  cmake_policy(SET CMP0022 OLD)
+endif()
+
 option(ENABLE_STATIC "Make static version of libtag"  OFF)
 if(ENABLE_STATIC)
   add_definitions(-DTAGLIB_STATIC)
