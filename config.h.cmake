@@ -30,7 +30,7 @@
 #cmakedefine   HAVE_WIN_ATOMIC 1
 #cmakedefine   HAVE_IA64_ATOMIC 1
 
-/* Defined if your compiler supports snpritf or sprintf_s. */
+/* Defined if your compiler supports snprintf or sprintf_s. */
 #cmakedefine   HAVE_SNPRINTF 1
 #cmakedefine   HAVE_SPRINTF_S 1
 

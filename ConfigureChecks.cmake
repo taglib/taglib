@@ -41,26 +41,26 @@ endif()
 
 # Determine which kind of byte swap functions your compiler supports.
 
-# GCC's __builtin_bswap* should be checked individually 
+# GCC's __builtin_bswap* should be checked individually
 # because some of them can be missing depends on the GCC version.
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap16(0);
-    return 0; 
+    return 0;
   }
 " HAVE_GCC_BYTESWAP_16)
 
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap32(0);
-    return 0; 
+    return 0;
   }
 " HAVE_GCC_BYTESWAP_32)
 
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap64(0);
-    return 0; 
+    return 0;
   }
 " HAVE_GCC_BYTESWAP_64)
 
@@ -71,7 +71,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
       __bswap_16(0);
       __bswap_32(0);
       __bswap_64(0);
-      return 0; 
+      return 0;
     }
   " HAVE_GLIBC_BYTESWAP)
 
@@ -82,7 +82,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
         _byteswap_ushort(0);
         _byteswap_ulong(0);
         _byteswap_uint64(0);
-        return 0; 
+        return 0;
       }
     " HAVE_MSC_BYTESWAP)
 
@@ -93,7 +93,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
           OSSwapInt16(0);
           OSSwapInt32(0);
           OSSwapInt64(0);
-          return 0; 
+          return 0;
         }
       " HAVE_MAC_BYTESWAP)
 
@@ -104,7 +104,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
             swap16(0);
             swap32(0);
             swap64(0);
-            return 0; 
+            return 0;
           }
         " HAVE_OPENBSD_BYTESWAP)
       endif()
@@ -151,65 +151,65 @@ endif()
 
 check_cxx_source_compiles("
   #include <atomic>
-  int main() { 
+  int main() {
     std::atomic<unsigned int> x;
     x.fetch_add(1);
     x.fetch_sub(1);
-    return 0; 
+    return 0;
   }
 " HAVE_STD_ATOMIC)
 
 if(NOT HAVE_STD_ATOMIC)
   check_cxx_source_compiles("
     #include <boost/atomic.hpp>
-    int main() { 
+    int main() {
       boost::atomic<unsigned int> x(1);
       x.fetch_add(1);
       x.fetch_sub(1);
-      return 0; 
+      return 0;
     }
   " HAVE_BOOST_ATOMIC)
 
   if(NOT HAVE_BOOST_ATOMIC)
     check_cxx_source_compiles("
-      int main() { 
+      int main() {
         volatile int x;
         __sync_add_and_fetch(&x, 1);
         int y = __sync_sub_and_fetch(&x, 1);
-        return 0; 
+        return 0;
       }
     " HAVE_GCC_ATOMIC)
 
     if(NOT HAVE_GCC_ATOMIC)
       check_cxx_source_compiles("
         #include <libkern/OSAtomic.h>
-        int main() { 
+        int main() {
           volatile int32_t x;
           OSAtomicIncrement32Barrier(&x);
           int32_t y = OSAtomicDecrement32Barrier(&x);
-          return 0; 
+          return 0;
         }
       " HAVE_MAC_ATOMIC)
 
       if(NOT HAVE_MAC_ATOMIC)
         check_cxx_source_compiles("
           #include <windows.h>
-          int main() { 
+          int main() {
             volatile LONG x;
             InterlockedIncrement(&x);
             LONG y = InterlockedDecrement(&x);
-            return 0; 
+            return 0;
           }
         " HAVE_WIN_ATOMIC)
 
         if(NOT HAVE_WIN_ATOMIC)
           check_cxx_source_compiles("
             #include <ia64intrin.h>
-            int main() { 
+            int main() {
               volatile int x;
               __sync_add_and_fetch(&x, 1);
               int y = __sync_sub_and_fetch(&x, 1);
-              return 0; 
+              return 0;
             }
           " HAVE_IA64_ATOMIC)
         endif()
@@ -218,7 +218,7 @@ if(NOT HAVE_STD_ATOMIC)
   endif()
 endif()
 
-# Determine whether your compiler supports snpritf or sprintf_s.
+# Determine whether your compiler supports snprintf or sprintf_s.
 
 check_cxx_source_compiles("
   #include <cstdio>
@@ -236,9 +236,9 @@ endif()
 
 check_cxx_source_compiles("
   #include <cstring>
-  int main() { 
-    _strdup(0); 
-    return 0; 
+  int main() {
+    _strdup(0);
+    return 0;
 }
 " HAVE_ISO_STRDUP)
 
@@ -246,9 +246,9 @@ check_cxx_source_compiles("
 
 check_cxx_source_compiles("
   #include <codecvt>
-  int main() { 
-    std::codecvt_utf8_utf16<wchar_t> x; 
-    return 0; 
+  int main() {
+    std::codecvt_utf8_utf16<wchar_t> x;
+    return 0;
   }
 " HAVE_STD_CODECVT)
 
