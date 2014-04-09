@@ -785,7 +785,7 @@ double ByteVector::toFloat64BE(size_t offset) const
       return 0.0;
     }
     else 
-      val = ::ldexp(1.0 + static_cast<double>(fraction), exponent - 1023 - 52);
+      val = ::ldexp(static_cast<double>(fraction), exponent - 1023 - 52);
   }
 
   if(negative)
