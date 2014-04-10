@@ -163,7 +163,6 @@ namespace TagLib {
      */
     String(wchar_t c, Type t = Latin1);
 
-
     /*!
      * Makes a deep copy of the data in \a s.
      *
@@ -173,7 +172,7 @@ namespace TagLib {
     String(const char *s, Type t = Latin1);
 
     /*!
-     * Makes a deep copy of the data in \a s.
+     * Makes a deep copy of the data in \a v.
      *
      * \note This should only be used with the 8-bit codecs Latin1 and UTF8, when
      * used with other codecs it will simply print a warning and exit.
@@ -333,6 +332,9 @@ namespace TagLib {
      * Returns a ByteVector containing the string's data.  If \a t is Latin1 or
      * UTF8, this will return a vector of 8 bit characters, otherwise it will use
      * 16 bit characters.
+     *
+     * \note If \a t is UTF16, the returned data is encoded in little-endian
+     * format and has a BOM.
      *
      * \note The returned data is not null terminated.
      */
