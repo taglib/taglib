@@ -37,12 +37,12 @@
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
-#if defined(HAVE_STD_SHARED_PTR) 
+#if defined(HAVE_STD_SHARED_PTR)
 
 # include <memory>
 # define SHARED_PTR std::shared_ptr
 
-#elif defined(HAVE_TR1_SHARED_PTR) 
+#elif defined(HAVE_TR1_SHARED_PTR)
 
 # include <tr1/memory>
 # define SHARED_PTR std::tr1::shared_ptr
@@ -52,50 +52,50 @@
 # include <boost/shared_ptr.hpp>
 # define SHARED_PTR boost::shared_ptr
 
-#else   //  HAVE_STD_SHARED_PTR
+#else // !HAVE_STD_SHARED_PTR && !HAVE_TR1_SHARED_PTR && !HAVE_BOOST_SHARED_PTR
 
 # include <algorithm>
 
 # if defined(HAVE_GCC_ATOMIC)
 #   define ATOMIC_INT int
-#   define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-#   define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+#   define ATOMIC_INC(x) ::__sync_add_and_fetch(&x, 1)
+#   define ATOMIC_DEC(x) ::__sync_sub_and_fetch(&x, 1)
 # elif defined(HAVE_WIN_ATOMIC)
 #   if !defined(NOMINMAX)
 #     define NOMINMAX
 #   endif
 #   include <windows.h>
-#   define ATOMIC_INT long
-#   define ATOMIC_INC(x) InterlockedIncrement(&x)
-#   define ATOMIC_DEC(x) InterlockedDecrement(&x)
+#   define ATOMIC_INT volatile LONG
+#   define ATOMIC_INC(x) ::InterlockedIncrement(&x)
+#   define ATOMIC_DEC(x) ::InterlockedDecrement(&x)
 # elif defined(HAVE_MAC_ATOMIC)
 #   include <libkern/OSAtomic.h>
 #   define ATOMIC_INT int32_t
-#   define ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-#   define ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
+#   define ATOMIC_INC(x) ::OSAtomicIncrement32Barrier(&x)
+#   define ATOMIC_DEC(x) ::OSAtomicDecrement32Barrier(&x)
 # elif defined(HAVE_IA64_ATOMIC)
 #   include <ia64intrin.h>
 #   define ATOMIC_INT int
-#   define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-#   define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+#   define ATOMIC_INC(x) ::__sync_add_and_fetch(&x, 1)
+#   define ATOMIC_DEC(x) ::__sync_sub_and_fetch(&x, 1)
 # else
 #   define ATOMIC_INT int
 #   define ATOMIC_INC(x) (++x)
 #   define ATOMIC_DEC(x) (--x)
 # endif
 
-namespace TagLib 
+namespace TagLib
 {
   // Self-implements RefCountPtr<T> if shared_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard shared_ptr<T> rather than this class.
-  
+
   // Counter base class. Provides a reference counter.
 
   class CounterBase
   {
   public:
-    CounterBase()
-      : refCount(1)
+    CounterBase() :
+      refCount(1)
     {
     }
 
@@ -103,8 +103,8 @@ namespace TagLib
     {
     }
 
-    void addref() 
-    {    
+    void addref()
+    {
       ATOMIC_INC(refCount);
     }
 
@@ -124,7 +124,7 @@ namespace TagLib
     virtual void dispose() = 0;
 
   private:
-    volatile ATOMIC_INT refCount;
+    ATOMIC_INT refCount;
   };
 
   // Counter impl class. Provides a dynamic deleter.
@@ -133,14 +133,14 @@ namespace TagLib
   class CounterImpl : public CounterBase
   {
   public:
-    CounterImpl(T *p)
-      : p(p)
+    CounterImpl(T *p) :
+      p(p)
     {
     }
 
-    virtual void dispose() 
-    { 
-      delete p; 
+    virtual void dispose()
+    {
+      delete p;
     }
 
     T *get() const
@@ -156,31 +156,31 @@ namespace TagLib
   class RefCountPtr
   {
   public:
-    RefCountPtr()
-      : px(0)
-      , counter(0)
+    RefCountPtr() :
+      px(0),
+      counter(0)
     {
     }
 
     template <typename U>
-    explicit RefCountPtr(U *p)
-      : px(p)
-      , counter(new CounterImpl<U>(p))
+    explicit RefCountPtr(U *p) :
+      px(p),
+      counter(new CounterImpl<U>(p))
     {
     }
 
-    RefCountPtr(const RefCountPtr<T> &x)
-      : px(x.px)
-      , counter(x.counter)
+    RefCountPtr(const RefCountPtr<T> &x) :
+      px(x.px),
+      counter(x.counter)
     {
       if(counter)
         counter->addref();
     }
 
     template <typename U>
-    RefCountPtr(const RefCountPtr<U> &x)
-      : px(x.px)
-      , counter(x.counter)
+    RefCountPtr(const RefCountPtr<U> &x) :
+      px(x.px),
+      counter(x.counter)
     {
       if(counter)
         counter->addref();
@@ -205,8 +205,8 @@ namespace TagLib
         return 0;
     }
 
-    bool unique() const 
-    { 
+    bool unique() const
+    {
       return (use_count() == 1);
     }
 
@@ -230,32 +230,14 @@ namespace TagLib
 
     RefCountPtr<T> &operator=(const RefCountPtr<T> &x)
     {
-      if(px != x.px) {
-        if(counter)
-          counter->release();
-
-        px = x.px;
-        counter = x.counter;
-
-        if(counter)
-          counter->addref();
-      }
+      RefCountPtr<T>(x).swap(*this);
       return *this;
     }
 
     template <typename U>
     RefCountPtr<T> &operator=(const RefCountPtr<U> &x)
     {
-      if(px != x.px) {
-        if(counter)
-          counter->release();
-
-        px = x.px;
-        counter = x.counter;
-
-        if(counter)
-          counter->addref();
-      }
+      RefCountPtr<T>(x).swap(*this);
       return *this;
     }
 
@@ -309,7 +291,7 @@ namespace TagLib
 
 #endif  // HAVE_STD_SHARED_PTR etc.
 
-#if defined(HAVE_STD_UNIQUE_PTR) 
+#if defined(HAVE_STD_UNIQUE_PTR)
 
 # include <memory>
 # define SCOPED_PTR std::unique_ptr
@@ -319,8 +301,8 @@ namespace TagLib
 # include <boost/scoped_ptr.hpp>
 # define SCOPED_PTR boost::scoped_ptr
 
-#else // HAVE_STD_UNIQUE_PTR
- 
+#else // !HAVE_STD_UNIQUE_PTR && !HAVE_BOOST_SCOPED_PTR
+
 # include <algorithm>
 
 namespace TagLib
@@ -328,12 +310,12 @@ namespace TagLib
   // Self-implements NonRefCountPtr<T> if unique_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard unique_ptr<T> rather than this class.
 
-  template<typename T> 
+  template<typename T>
   class NonRefCountPtr
   {
   public:
-    explicit NonRefCountPtr(T *p = 0)
-      : px(p) 
+    explicit NonRefCountPtr(T *p = 0) :
+      px(p)
     {
     }
 
@@ -352,7 +334,7 @@ namespace TagLib
       return *px;
     }
 
-    T *operator->() const 
+    T *operator->() const
     {
       return px;
     }
@@ -372,8 +354,7 @@ namespace TagLib
       return (px == 0);
     }
 
-
-    void swap(NonRefCountPtr &x) 
+    void swap(NonRefCountPtr &x)
     {
       std::swap(px, x.px);
     }
@@ -390,20 +371,8 @@ namespace TagLib
     T *px;
   };
 
-  template <typename T, typename U>
-  bool operator==(const NonRefCountPtr<T> &a, U *b)
-  {
-    return (a.get() == b);
-  }
-
-  template <typename T, typename U>
-  bool operator!=(const NonRefCountPtr<T> &a, U *b)
-  {
-    return (a.get() != b);
-  }
-
   template <typename T>
-    void swap(NonRefCountPtr<T> &a, NonRefCountPtr<T> &b)
+  void swap(NonRefCountPtr<T> &a, NonRefCountPtr<T> &b)
   {
     a.swap(b);
   }
@@ -412,7 +381,6 @@ namespace TagLib
 # define SCOPED_PTR TagLib::NonRefCountPtr
 
 #endif  // HAVE_STD_UNIQUE_PTR etc.
-
 
 #endif // DO_NOT_DOCUMENT
 #endif
