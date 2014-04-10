@@ -37,6 +37,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <cwchar>
 
 #ifdef HAVE_STD_CODECVT
 # include <codecvt>
@@ -155,11 +156,6 @@ public:
   {
   }
 
-  StringPrivate(size_t n, wchar_t c)
-    : data(new std::wstring(n, c))
-  {
-  }
-
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian.
    */
@@ -238,14 +234,18 @@ String::String(wchar_t c, Type t)
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
   else {
-    debug("String::String() -- A const wchar_t should not contain Latin1 or UTF-8.");
+    debug("String::String() -- A wchar_t should not contain Latin1 or UTF-8.");
   }
 }
 
 String::String(char c, Type t)
-  : d(new StringPrivate(1, static_cast<uchar>(c)))
+  : d(new StringPrivate())
 {
-  if(t != Latin1 && t != UTF8) {
+  if(t == Latin1)
+    copyFromLatin1(&c, 1);
+  else if(t == String::UTF8)
+    copyFromUTF8(&c, 1);
+  else {
     debug("String::String() -- A char should not contain UTF16.");
   }
 }
@@ -478,49 +478,27 @@ ByteVector String::data(Type t) const
 
 int String::toInt(bool *ok) const
 {
-  int value = 0;
+  const wchar_t *begin = d->data->c_str();
+  wchar_t *end;
+  const int value = static_cast<int>(::wcstol(begin, &end, 10));
 
-  const size_t size = d->data->size();
-  const bool negative = size > 0 && (*d->data)[0] == '-';
-  const size_t start = negative ? 1 : 0;
-
-  size_t i = start;
-  for(; i < size && (*d->data)[i] >= '0' && (*d->data)[i] <= '9'; i++)
-    value = value * 10 + ((*d->data)[i] - '0');
-
-  if(negative)
-    value = value * -1;
-
+  // Has wcstol() consumed the entire string?
   if(ok)
-    *ok = (size > start && i == size);
+    *ok = (end > begin && *end == L'\0');
 
   return value;
 }
 
 String String::stripWhiteSpace() const
 {
-  std::wstring::const_iterator begin = d->data->begin();
-  std::wstring::const_iterator end = d->data->end();
+  static const wchar_t *WhiteSpaceChars = L"\t\n\f\r ";
 
-  while(begin != end &&
-        (*begin == '\t' || *begin == '\n' || *begin == '\f' ||
-         *begin == '\r' || *begin == ' '))
-  {
-    ++begin;
-  }
+  const size_t pos1 = d->data->find_first_not_of(WhiteSpaceChars);
+  if(pos1 == std::wstring::npos)
+    return String::null;
 
-  if(begin == end)
-    return null;
-
-  // There must be at least one non-whitespace character here for us to have
-  // gotten this far, so we should be safe not doing bounds checking.
-
-  do {
-    --end;
-  } while(*end == '\t' || *end == '\n' ||
-          *end == '\f' || *end == '\r' || *end == ' ');
-
-  return String(std::wstring(begin, end + 1));
+  const size_t pos2 = d->data->find_last_not_of(WhiteSpaceChars);
+  return substr(pos1, pos2 - pos1 + 1);
 }
 
 bool String::isLatin1() const
@@ -565,10 +543,8 @@ bool String::operator==(const String &s) const
 bool String::operator==(const char *s) const
 {
   for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-    if(*it != static_cast<uchar>(*s))
+    if(*it != static_cast<uchar>(*s++))
       return false;
-
-    s++;
   }
 
   return true;
@@ -736,7 +712,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
         (*d->data)[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
     }
     else {
-      ::memcpy(&(*d->data)[0], s, length * sizeof(wchar_t));
+      ::wmemcpy(&(*d->data)[0], s, length);
     }
   }
 }
