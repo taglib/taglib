@@ -765,6 +765,7 @@ static const char *keyTranslation[][2] = {
   { "\251day", "DATE" },
   { "\251wrt", "COMPOSER" },
   { "\251grp", "GROUPING" },
+  { "aART", "ALBUMARTIST" },
   { "trkn", "TRACKNUMBER" },
   { "disk", "DISCNUMBER" },
   { "cpil", "COMPILATION" },
