@@ -178,16 +178,19 @@ public:
     CPPUNIT_ASSERT(ByteVector::fromUInt16LE(4386) == ByteVector::fromUInt16BE(8721));
     CPPUNIT_ASSERT(ByteVector::fromUInt32LE(287454020) == ByteVector::fromUInt32BE(1144201745));
     CPPUNIT_ASSERT(ByteVector::fromUInt64LE(1234605615291183940) == ByteVector::fromUInt64BE(4914309075945333265));
-  
 
-	const uchar PI32[] = { 0x00, 0x40, 0x49, 0x0f, 0xdb };
-	const uchar PI64[] = { 0x00, 0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18 };
+    const uchar PI32[] = { 0x00, 0x40, 0x49, 0x0f, 0xdb };
+    const uchar PI64[] = { 0x00, 0x40, 0x09, 0x21, 0xfb, 0x54, 0x44, 0x2d, 0x18 };
+    const uchar PI80[] = { 0x00, 0x40, 0x00, 0xc9, 0x0f, 0xda, 0xa2, 0x21, 0x68, 0xc0, 0x00 };
 
-	ByteVector pi32(reinterpret_cast<const char*>(PI32), 5);
-	CPPUNIT_ASSERT(static_cast<int>(pi32.toFloat32BE(1) * 100) == 314);
+    ByteVector pi32(reinterpret_cast<const char*>(PI32), 5);
+    CPPUNIT_ASSERT_EQUAL(31415, static_cast<int>(pi32.toFloat32BE(1) * 10000));
 
-	ByteVector pi64(reinterpret_cast<const char*>(PI64), 9);
-	CPPUNIT_ASSERT(static_cast<int>(pi64.toFloat64BE(1) * 100) == 314);
+    ByteVector pi64(reinterpret_cast<const char*>(PI64), 9);
+    CPPUNIT_ASSERT_EQUAL(31415, static_cast<int>(pi64.toFloat64BE(1) * 10000));
+
+    ByteVector pi80(reinterpret_cast<const char*>(PI80), 11);
+    CPPUNIT_ASSERT_EQUAL(31415, static_cast<int>(pi80.toFloat80BE(1) * 10000));
   }
 
   void testReplace()
