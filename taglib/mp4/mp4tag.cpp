@@ -777,6 +777,7 @@ namespace
     { "\251day", "DATE" },
     { "\251wrt", "COMPOSER" },
     { "\251grp", "GROUPING" },
+    { "aART", "ALBUMARTIST" },
     { "trkn", "TRACKNUMBER" },
     { "disk", "DISCNUMBER" },
     { "cpil", "COMPILATION" },

@@ -431,8 +431,7 @@ ByteVector String::data(Type t) const
       ByteVector v(2 + size() * 2, 0);
       char *p = v.data();
 
-      // Assume that if we're doing UTF16 and not UTF16BE that we want little
-      // endian encoding.  (Byte Order Mark)
+      // We use little-endian encoding here and need a BOM.
 
       *p++ = '\xff';
       *p++ = '\xfe';
