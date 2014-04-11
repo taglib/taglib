@@ -680,19 +680,21 @@ long long ByteVector::toInt64BE(size_t offset) const
 
 float ByteVector::toFloat32BE(size_t offset) const
 {
+  typedef std::numeric_limits<float> Limits;
+
   if(offset > size() - 4) {
     debug("ByteVector::toFloat32BE() - offset is out of range. Returning 0.");
     return 0.0;
   }
 
-  if(sizeof(float) == 4 && std::numeric_limits<float>::is_iec559)
-  {
+  if(Limits::is_iec559 && Limits::digits == 24) {
+
     // float is 32-bit wide and IEEE754 compliant.
 
     union {
       uint  i;
       float f;
-    } tmp;
+    } tmp = {};
     ::memcpy(&tmp, data() + offset, 4);
 
     if(Utils::SystemByteOrder == LittleEndian)
@@ -700,55 +702,61 @@ float ByteVector::toFloat32BE(size_t offset) const
 
     return tmp.f;
   }
-
-  const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
-
-  // 1-bit sign 
-  const bool negative = ((bytes[0] & 0x80) != 0);
-
-  // 8-bit exponent
-  const int exponent = ((bytes[0] & 0x7F) << 1) | (bytes[1] >> 7);
-
-  // 1-bit integer part (always 1) and 23-bit fraction.
-  const uint fraction 
-    = (1U << 23)
-    | (static_cast<uint>(bytes[1] & 0x7f) << 16) 
-    | (static_cast<uint>(bytes[2]) <<  8) 
-    | (static_cast<uint>(bytes[3]));
-
-  float val;
-  if(exponent == 0 && fraction == 0)
-    val = 0;
   else {
-    if(exponent == 0xFF) {
-      debug("ByteVector::toFloat32BE() - can't handle the infinity or NaN. Returning 0.");
-      return 0.0;
-    }
-    else 
-      val = ::ldexp(static_cast<float>(fraction), exponent - 127 - 23);
-  }
 
-  if(negative)
-    return -val;
-  else
-    return val;
+    // float is not 32-bit or not IEEE754. Very unlikely in practice.
+
+    const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
+
+    // 1-bit sign
+    const bool negative = ((bytes[0] & 0x80) != 0);
+
+    // 8-bit exponent
+    const int exponent = ((bytes[0] & 0x7F) << 1) | (bytes[1] >> 7);
+
+    // 24-bit fraction. Leading 1 is implied.
+    const uint fraction
+      = (1U << 23)
+      | (static_cast<uint>(bytes[1] & 0x7f) << 16)
+      | (static_cast<uint>(bytes[2]) <<  8)
+      | (static_cast<uint>(bytes[3]));
+
+    float val;
+    if(exponent == 0 && fraction == 0)
+      val = 0;
+    else {
+      if(exponent == 0xFF) {
+        debug("ByteVector::toFloat32BE() - can't handle the infinity or NaN. Returning 0.");
+        return 0.0;
+      }
+      else
+        val = ::ldexp(static_cast<float>(fraction), exponent - 127 - 23);
+    }
+
+    if(negative)
+      return -val;
+    else
+      return val;
+  }
 }
 
 double ByteVector::toFloat64BE(size_t offset) const
 {
+  typedef std::numeric_limits<double> Limits;
+
   if(offset > size() - 8) {
     debug("ByteVector::toFloat64BE() - offset is out of range. Returning 0.");
     return 0.0;
   }
 
-  if(sizeof(double) == 8 && std::numeric_limits<double>::is_iec559)
-  {
+  if(Limits::is_iec559 && Limits::digits == 53) {
+
     // double is 64-bit wide and IEEE754 compliant.
 
     union {
       ulonglong i;
       double    f;
-    } tmp;
+    } tmp = {};
     ::memcpy(&tmp, data() + offset, 8);
 
     if(Utils::SystemByteOrder == LittleEndian)
@@ -756,86 +764,118 @@ double ByteVector::toFloat64BE(size_t offset) const
 
     return tmp.f;
   }
-
-  const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
-
-  // 1-bit sign 
-  const bool negative = ((bytes[0] & 0x80) != 0);
-
-  // 11-bit exponent
-  const int exponent = ((bytes[0] & 0x7F) << 4) | (bytes[1] >> 4);
-
-  // 1-bit integer part (always 1) and 52-bit fraction.
-  const ulonglong fraction 
-    = (1ULL << 52)
-    | (static_cast<ulonglong>(bytes[1] & 0x0F) << 48) 
-    | (static_cast<ulonglong>(bytes[2]) << 40) 
-    | (static_cast<ulonglong>(bytes[3]) << 32) 
-    | (static_cast<ulonglong>(bytes[4]) << 24)
-    | (static_cast<ulonglong>(bytes[5]) << 16) 
-    | (static_cast<ulonglong>(bytes[6]) <<  8) 
-    | (static_cast<ulonglong>(bytes[7]));
-
-  double val;
-  if(exponent == 0 && fraction == 0)
-    val = 0;
   else {
-    if(exponent == 0x7FF) {
-      debug("ByteVector::toFloat64BE() - can't handle the infinity or NaN. Returning 0.");
-      return 0.0;
-    }
-    else 
-      val = ::ldexp(static_cast<double>(fraction), exponent - 1023 - 52);
-  }
 
-  if(negative)
-    return -val;
-  else
-    return val;
+    // double is not 64-bit or not IEEE754. Very unlikely in practice.
+
+    const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
+
+    // 1-bit sign
+    const bool negative = ((bytes[0] & 0x80) != 0);
+
+    // 11-bit exponent
+    const int exponent = ((bytes[0] & 0x7F) << 4) | (bytes[1] >> 4);
+
+    // 53-bit fraction. Leading 1 is implied.
+    const ulonglong fraction
+      = (1ULL << 52)
+      | (static_cast<ulonglong>(bytes[1] & 0x0F) << 48)
+      | (static_cast<ulonglong>(bytes[2]) << 40)
+      | (static_cast<ulonglong>(bytes[3]) << 32)
+      | (static_cast<ulonglong>(bytes[4]) << 24)
+      | (static_cast<ulonglong>(bytes[5]) << 16)
+      | (static_cast<ulonglong>(bytes[6]) <<  8)
+      | (static_cast<ulonglong>(bytes[7]));
+
+    double val;
+    if(exponent == 0 && fraction == 0)
+      val = 0;
+    else {
+      if(exponent == 0x7FF) {
+        debug("ByteVector::toFloat64BE() - can't handle the infinity or NaN. Returning 0.");
+        return 0.0;
+      }
+      else
+        val = ::ldexp(static_cast<double>(fraction), exponent - 1023 - 52);
+    }
+
+    if(negative)
+      return -val;
+    else
+      return val;
+  }
 }
 
 long double ByteVector::toFloat80BE(size_t offset) const
 {
+  typedef std::numeric_limits<long double> Limits;
+
   if(offset > size() - 10) {
     debug("ByteVector::toFloat80BE() - offset is out of range. Returning 0.");
     return 0.0;
   }
 
-  const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
+  if(Limits::is_iec559 && Limits::digits == 64) {
 
-  // 1-bit sign 
-  const bool negative = ((bytes[0] & 0x80) != 0);
+    // long double is 80-bit wide and IEEE754 compliant.
 
-  // 15-bit exponent
-  const int exponent = ((bytes[0] & 0x7F) << 8) | bytes[1];
+    union {
+      uchar       c[10];
+      long double f;
+    } tmp = {};
+    ::memcpy(&tmp, data() + offset, 10);
 
-  // 1-bit integer part and 63-bit fraction.
-  const ulonglong fraction 
-    = (static_cast<ulonglong>(bytes[2]) << 56) 
-    | (static_cast<ulonglong>(bytes[3]) << 48) 
-    | (static_cast<ulonglong>(bytes[4]) << 40) 
-    | (static_cast<ulonglong>(bytes[5]) << 32)
-    | (static_cast<ulonglong>(bytes[6]) << 24) 
-    | (static_cast<ulonglong>(bytes[7]) << 16) 
-    | (static_cast<ulonglong>(bytes[8]) <<  8) 
-    | (static_cast<ulonglong>(bytes[9]));
-
-  long double val;
-  if(exponent == 0 && fraction == 0)
-    val = 0;
-  else {
-    if(exponent == 0x7FFF) {
-      debug("ByteVector::toFloat80BE() - can't handle the infinity or NaN. Returning 0.");
-      return 0.0;
+    if(Utils::SystemByteOrder == LittleEndian) {
+      std::swap(tmp.c[0], tmp.c[9]);
+      std::swap(tmp.c[1], tmp.c[8]);
+      std::swap(tmp.c[2], tmp.c[7]);
+      std::swap(tmp.c[3], tmp.c[6]);
+      std::swap(tmp.c[4], tmp.c[5]);
     }
-    else 
-      val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
-  }
 
-  if(negative)
-    return -val;
-  else
-    return val;
+    return tmp.f;
+  }
+  else {
+
+    // long double is not 80-bit or not IEEE754.
+    // GCC on ARM, MSVC, etc. will go this way.
+
+    const uchar *bytes = reinterpret_cast<const uchar*>(data() + offset);
+
+    // 1-bit sign
+    const bool negative = ((bytes[0] & 0x80) != 0);
+
+    // 15-bit exponent
+    const int exponent = ((bytes[0] & 0x7F) << 8) | bytes[1];
+
+    // 64-bit fraction. Leading 1 is explicit.
+    const ulonglong fraction
+      = (static_cast<ulonglong>(bytes[2]) << 56)
+      | (static_cast<ulonglong>(bytes[3]) << 48)
+      | (static_cast<ulonglong>(bytes[4]) << 40)
+      | (static_cast<ulonglong>(bytes[5]) << 32)
+      | (static_cast<ulonglong>(bytes[6]) << 24)
+      | (static_cast<ulonglong>(bytes[7]) << 16)
+      | (static_cast<ulonglong>(bytes[8]) <<  8)
+      | (static_cast<ulonglong>(bytes[9]));
+
+    long double val;
+    if(exponent == 0 && fraction == 0)
+      val = 0;
+    else {
+      if(exponent == 0x7FFF) {
+        debug("ByteVector::toFloat80BE() - can't handle the infinity or NaN. Returning 0.");
+        return 0.0;
+      }
+      else
+        val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
+    }
+
+    if(negative)
+      return -val;
+    else
+      return val;
+  }
 }
 
 const char &ByteVector::operator[](size_t index) const
