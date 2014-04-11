@@ -173,9 +173,6 @@ namespace TagLib {
 
     /*!
      * Makes a deep copy of the data in \a v.
-     *
-     * \note This should only be used with the 8-bit codecs Latin1 and UTF8, when
-     * used with other codecs it will simply print a warning and exit.
      */
     String(const ByteVector &v, Type t = Latin1);
 
