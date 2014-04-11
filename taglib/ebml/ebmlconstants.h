@@ -26,11 +26,6 @@
 #ifndef TAGLIB_EBML_CONSTANTS
 #define TAGLIB_EBML_CONSTANTS
 
-#ifndef NDEBUG
-#include <iostream>
-#include "tdebug.h"
-#endif
-
 namespace TagLib {
 
   namespace EBML {
