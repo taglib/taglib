@@ -70,11 +70,13 @@ set(tag_HDRS
   mpeg/id3v2/id3v2tag.h
   mpeg/id3v2/frames/attachedpictureframe.h
   mpeg/id3v2/frames/commentsframe.h
+  mpeg/id3v2/frames/eventtimingcodesframe.h
   mpeg/id3v2/frames/generalencapsulatedobjectframe.h
   mpeg/id3v2/frames/ownershipframe.h
   mpeg/id3v2/frames/popularimeterframe.h
   mpeg/id3v2/frames/privateframe.h
   mpeg/id3v2/frames/relativevolumeframe.h
+  mpeg/id3v2/frames/synchronizedlyricsframe.h
   mpeg/id3v2/frames/textidentificationframe.h
   mpeg/id3v2/frames/uniquefileidentifierframe.h
   mpeg/id3v2/frames/unknownframe.h
@@ -168,11 +170,13 @@ set(id3v2_SRCS
 set(frames_SRCS
   mpeg/id3v2/frames/attachedpictureframe.cpp
   mpeg/id3v2/frames/commentsframe.cpp
+  mpeg/id3v2/frames/eventtimingcodesframe.cpp
   mpeg/id3v2/frames/generalencapsulatedobjectframe.cpp
   mpeg/id3v2/frames/ownershipframe.cpp
   mpeg/id3v2/frames/popularimeterframe.cpp
   mpeg/id3v2/frames/privateframe.cpp
   mpeg/id3v2/frames/relativevolumeframe.cpp
+  mpeg/id3v2/frames/synchronizedlyricsframe.cpp
   mpeg/id3v2/frames/textidentificationframe.cpp
   mpeg/id3v2/frames/uniquefileidentifierframe.cpp
   mpeg/id3v2/frames/unknownframe.cpp

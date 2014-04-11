@@ -45,6 +45,8 @@
 #include "frames/popularimeterframe.h"
 #include "frames/privateframe.h"
 #include "frames/ownershipframe.h"
+#include "frames/synchronizedlyricsframe.h"
+#include "frames/eventtimingcodesframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -240,6 +242,20 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
       f->setTextEncoding(d->defaultEncoding);
     return f;
   }
+
+  // Synchronised lyrics/text (frames 4.9)
+
+  if(frameID == "SYLT") {
+    SynchronizedLyricsFrame *f = new SynchronizedLyricsFrame(data, header);
+    if(d->useDefaultEncoding)
+      f->setTextEncoding(d->defaultEncoding);
+    return f;
+  }
+
+  // Event timing codes (frames 4.5)
+
+  if(frameID == "ETCO")
+    return new EventTimingCodesFrame(data, header);
 
   // Popularimeter (frames 4.17)
 

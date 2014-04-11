@@ -197,6 +197,7 @@ namespace
 {
   const char *keyTranslation[][2] = {
     { "WM/AlbumTitle", "ALBUM" },
+    { "WM/AlbumArtist", "ALBUMARTIST" },
     { "WM/Composer", "COMPOSER" },
     { "WM/Writer", "WRITER" },
     { "WM/Conductor", "CONDUCTOR" },
