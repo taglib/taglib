@@ -24,7 +24,7 @@ public:
     tag.setFieldText("TEST", "Dummy Text");
 
     CPPUNIT_ASSERT_EQUAL(String("Test title 1"), tag.title());
-    
+
     RIFF::Info::FieldListMap map = tag.fieldListMap();
     CPPUNIT_ASSERT_EQUAL(String("Test title 1"), map["INAM"]);
     CPPUNIT_ASSERT_EQUAL(String("Dummy Text"), map["TEST"]);

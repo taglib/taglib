@@ -224,7 +224,7 @@ void APE::Properties::analyzeOld()
   d->channels   = header.toShort(4, false);
   d->sampleRate = header.toUInt(6, false);
   const uint finalFrameBlocks = header.toUInt(22, false);
-  const uint totalBlocks 
+  const uint totalBlocks
     = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
   d->length = totalBlocks / d->sampleRate;
   d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;

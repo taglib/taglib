@@ -115,7 +115,7 @@ namespace TagLib {
      * BIC: will become pure virtual in the future
      */
     PropertyMap setProperties(const PropertyMap &properties);
-    
+
     /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were

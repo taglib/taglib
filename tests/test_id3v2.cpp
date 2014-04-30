@@ -400,7 +400,7 @@ public:
                  "http://example.com", 33),  // URL
       f.render());
   }
-  
+
   void testParseOwnershipFrame()
   {
     ID3v2::OwnershipFrame f(
@@ -692,7 +692,7 @@ public:
 
 #ifdef HAVE_ZLIB
 
-    ID3v2::AttachedPictureFrame *frame 
+    ID3v2::AttachedPictureFrame *frame
       = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
     CPPUNIT_ASSERT(frame);
     CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
@@ -705,13 +705,13 @@ public:
     // Skip the test if ZLIB is not installed.
     // The message "Compressed frames are currently not supported." will be displayed.
 
-    ID3v2::UnknownFrame *frame 
+    ID3v2::UnknownFrame *frame
       = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
     CPPUNIT_ASSERT(frame);
 
 #endif
   }
-  
+
   void testW000()
   {
     MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
@@ -829,30 +829,30 @@ public:
     CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
     t->removeFrame(frame, true);
     f.save(MPEG::File::ID3v2);
-    
+
     MPEG::File f2(newname.c_str());
     t = f2.ID3v2Tag();
     CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
   }
-  
+
   void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
   {
     ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
-    
+
     {
       MPEG::File foo(newname.c_str());
       foo.tag()->setArtist("Artist");
       foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
     }
-    
+
     {
       MPEG::File bar(newname.c_str());
       bar.ID3v2Tag()->removeFrames("TPE1");
       // Should strip ID3v1 here and not add old values to ID3v2 again
       bar.save(MPEG::File::ID3v2, true);
     }
-    
+
     MPEG::File f(newname.c_str());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }

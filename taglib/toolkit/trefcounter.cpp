@@ -91,18 +91,18 @@ namespace TagLib
     delete d;
   }
 
-  void RefCounter::ref() 
-  { 
-    d->ref(); 
+  void RefCounter::ref()
+  {
+    d->ref();
   }
 
-  bool RefCounter::deref() 
-  { 
-    return d->deref(); 
+  bool RefCounter::deref()
+  {
+    return d->deref();
   }
 
-  int RefCounter::count() const 
-  { 
-    return d->count(); 
+  int RefCounter::count() const
+  {
+    return d->count();
   }
 }
