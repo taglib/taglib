@@ -91,6 +91,7 @@ public:
     newpic->setData("JPEG data");
     f->addPicture(newpic);
     f->save();
+    delete f;
 
     f = new FLAC::File(newname.c_str());
     lst = f->pictureList();
@@ -138,6 +139,7 @@ public:
     f->removePictures();
     f->addPicture(newpic);
     f->save();
+    delete f;
 
     f = new FLAC::File(newname.c_str());
     lst = f->pictureList();
@@ -165,6 +167,7 @@ public:
 
     f->removePictures();
     f->save();
+    delete f;
 
     f = new FLAC::File(newname.c_str());
     lst = f->pictureList();
@@ -185,6 +188,7 @@ public:
     tag->setTitle("NEW TITLE 2");
     f->save();
     CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), tag->title());
+    delete f;
 
     f = new FLAC::File(newname.c_str());
     tag = f->tag();
