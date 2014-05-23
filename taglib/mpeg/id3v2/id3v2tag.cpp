@@ -679,6 +679,13 @@ void ID3v2::Tag::parse(const ByteVector &origData)
 
   // parse frames
 
+  // The way that ID3v2.4 maps some data is different compared to ID3v2.3.
+  // FrameFactory assumes that changes are renames, not merges.
+  // Avoid data loss by correctly handling this data outside of FrameFactory.
+  Frame *oldTYER = 0;
+  Frame *oldTDAT = 0;
+  Frame *oldTIME = 0;
+
   // Make sure that there is at least enough room in the remaining frame data for
   // a frame header.
 
@@ -693,24 +700,77 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       }
 
       d->paddingSize = frameDataLength - frameDataPosition;
-      return;
+      break;
     }
 
     Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
                                            &d->header);
 
     if(!frame)
-      return;
+      break;
 
     // Checks to make sure that frame parsed correctly.
 
     if(frame->size() <= 0) {
       delete frame;
-      return;
+      break;
     }
 
     frameDataPosition += frame->size() + Frame::headerSize(d->header.majorVersion());
-    addFrame(frame);
+	
+    // If the conversion to ID3v2.4 merges multiple frames into one, the frame is not
+    // ready to be added yet.
+    ByteVector frameID = frame->header()->frameID();
+    if(frameID == "TYER") {
+      // TYER is one of several frames to be merged into TDRC
+      oldTYER = frame;
+    }
+    else if(frameID == "TDAT") {
+      // TDAT is one of several frames to be merged into TDRC
+      oldTDAT = frame;
+    }
+    else if(frameID == "TIME") {
+      // TIME is one of several frames to be merged into TDRC
+      oldTIME = frame;
+    }
+    else 
+      addFrame(frame);
+  }
+
+  if(oldTYER) {
+    // Merge (2.3) TYER + TDAT + TIME into (2.4) TDRC.
+    // Assume that TIME will only exist if TDAT exists, which will only exist if TYER exists.
+    StringList dateComponents;
+	// Assume that TYER is 4 characters long
+    dateComponents.append(dynamic_cast<ID3v2::TextIdentificationFrame *>(oldTYER)->fieldList().front());
+    delete oldTYER;
+	if(oldTDAT) {
+      ID3v2::TextIdentificationFrame *frameTdat = dynamic_cast<ID3v2::TextIdentificationFrame *>(oldTDAT);
+      if (frameTdat->fieldList().front().length() == 4) {
+        // TDAT's format is "DDmm".  TDRC's format is "yyyy-MM-dd"
+        dateComponents.append("-");
+        dateComponents.append(frameTdat->fieldList().front().substr(2, 4));
+        dateComponents.append("-");
+        dateComponents.append(frameTdat->fieldList().front().substr(0, 2));
+        if(oldTIME) {
+          ID3v2::TextIdentificationFrame *frameTime = dynamic_cast<ID3v2::TextIdentificationFrame *>(oldTIME);
+          if (frameTime->fieldList().front().length() == 4) {
+            // TIME's format is "HHmm".  TDRC's format is "yyyy-MM-ddTHH:mm"
+            dateComponents.append("T");
+            dateComponents.append(frameTime->fieldList().front().substr(0,2));
+            dateComponents.append(":");
+            dateComponents.append(frameTime->fieldList().front().substr(2,4));
+		  }
+          delete oldTIME;
+        }
+      }
+      delete oldTDAT;
+    }
+    // Add TDRC to the frames list
+    ID3v2::TextIdentificationFrame *newTdrc =
+          new ID3v2::TextIdentificationFrame("TDRC", d->factory->defaultTextEncoding());
+    newTdrc->setText(dateComponents.toString(""));
+    addFrame(newTdrc);
   }
 }
 

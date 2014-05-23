@@ -394,12 +394,11 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 
   case 3: // ID3v2.3
   {
+    // TDAT and TIME are deprecated, but need to be merged with TYER into TDRC.
     if(frameID == "EQUA" ||
        frameID == "RVAD" ||
-       frameID == "TIME" ||
        frameID == "TRDA" ||
-       frameID == "TSIZ" ||
-       frameID == "TDAT")
+       frameID == "TSIZ")
     {
       debug("ID3v2.4 no longer supports the frame type " + String(frameID) +
             ".  It will be discarded from the tag.");
@@ -407,7 +406,6 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     }
 
     convertFrame("TORY", "TDOR", header);
-    convertFrame("TYER", "TDRC", header);
     convertFrame("IPLS", "TIPL", header);
 
     break;
