@@ -80,7 +80,7 @@ ChapterFrame::~ChapterFrame()
 
 ByteVector ChapterFrame::elementID() const
 {
-    return d->elementID;
+  return d->elementID;
 }
 
 uint ChapterFrame::startTime() const

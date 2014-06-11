@@ -275,7 +275,6 @@ ByteVector TableOfContentsFrame::renderFields() const
   ByteVectorList::ConstIterator it = d->childElements.begin();
   while(it != d->childElements.end()) {
     data.append(*it);
-    //data.append(char(0));
     it++;
   }
   FrameList l = d->embeddedFrameList;
