@@ -36,7 +36,7 @@
 
 using namespace TagLib;
 
-namespace 
+namespace
 {
 #ifdef _WIN32
 
@@ -79,7 +79,7 @@ namespace
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
       return static_cast<size_t>(length);
-    else 
+    else
       return 0;
   }
 
@@ -151,13 +151,13 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
   else
     d->file = openFile(fileName, true);
 
-  if(d->file == InvalidFileHandle) 
+  if(d->file == InvalidFileHandle)
   {
 # ifdef _WIN32
     debug("Could not open file " + fileName.toString());
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
-# endif 
+# endif
   }
 }
 
@@ -192,7 +192,7 @@ ByteVector FileStream::readBlock(size_t length)
 
   const size_t count = readFile(d->file, buffer);
   buffer.resize(count);
-  
+
   return buffer;
 }
 
@@ -262,7 +262,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
   {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
-    
+
     seek(readPosition);
     const size_t bytesRead = readFile(d->file, aboutToOverwrite);
     aboutToOverwrite.resize(bytesRead);
@@ -288,7 +288,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
     writePosition += buffer.size();
 
     // Make the current buffer the data that we read in the beginning.
-    
+
     buffer = aboutToOverwrite;
   }
 }
@@ -347,23 +347,14 @@ void FileStream::seek(offset_t offset, Position p)
     return;
   }
 
-#ifdef _WIN32
-
-  DWORD whence;
-  switch(p) {
-  case Beginning:
-    whence = FILE_BEGIN;
-    break;
-  case Current:
-    whence = FILE_CURRENT;
-    break;
-  case End:
-    whence = FILE_END;
-    break;
-  default:
+  if(p != IOStream::Beginning && p != IOStream::Current && p != IOStream::End) {
     debug("FileStream::seek() -- Invalid Position value.");
     return;
   }
+
+#ifdef _WIN32
+
+  const DWORD whence = static_cast<DWORD>(p);
 
   LARGE_INTEGER liOffset;
   liOffset.QuadPart = offset;
@@ -375,21 +366,7 @@ void FileStream::seek(offset_t offset, Position p)
 
 #else
 
-  int whence;
-  switch(p) {
-  case Beginning:
-    whence = SEEK_SET;
-    break;
-  case Current:
-    whence = SEEK_CUR;
-    break;
-  case End:
-    whence = SEEK_END;
-    break;
-  default:
-    debug("FileStream::seek() -- Invalid Position value.");
-    return;
-  }
+  const int whence = static_cast<int>(p);
 
 # ifdef _LARGEFILE_SOURCE
 
@@ -399,7 +376,7 @@ void FileStream::seek(offset_t offset, Position p)
 
   fseek(d->file, static_cast<long>(offset), whence);
 
-# endif 
+# endif
 
 #endif
 }
@@ -444,7 +421,7 @@ offset_t FileStream::tell() const
 
   return static_cast<offset_t>(ftell(d->file));
 
-# endif 
+# endif
 
 #endif
 }
