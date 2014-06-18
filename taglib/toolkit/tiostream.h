@@ -47,7 +47,7 @@ namespace TagLib {
     FileName &operator=(const FileName &name);
 
     const std::wstring &wstr() const;
-    const std::string  &str() const; 
+    const std::string  &str() const;
 
     String toString() const;
 
@@ -71,12 +71,15 @@ namespace TagLib {
      * Position in the file used for seeking.
      */
     enum Position {
+
       //! Seek from the beginning of the file.
-      Beginning,
+      Beginning = 0,
+
       //! Seek from the current position in the file.
-      Current,
+      Current = 1,
+
       //! Seek from the end of the file.
-      End
+      End = 2
     };
 
     IOStream();
