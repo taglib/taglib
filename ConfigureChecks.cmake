@@ -216,7 +216,6 @@ else()
   set(HAVE_ZLIB 0)
 endif()
 
-
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 find_package(CppUnit)

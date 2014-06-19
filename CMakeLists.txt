@@ -85,6 +85,11 @@ if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
+if(NOT HAVE_ZLIB AND ZLIB_SOURCE)
+  set(HAVE_ZLIB 1)
+  set(HAVE_ZLIB_SOURCE 1)
+endif()
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
