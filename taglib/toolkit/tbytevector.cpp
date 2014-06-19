@@ -109,7 +109,7 @@ int findChar(
   char c, uint offset, int byteAlign)
 {
   const size_t dataSize = dataEnd - dataBegin;
-  if(dataSize == 0 || offset + 1 > dataSize)
+  if(offset + 1 > dataSize)
     return -1;
 
   // n % 0 is invalid
@@ -137,7 +137,7 @@ int findVector(
 {
   const size_t dataSize    = dataEnd    - dataBegin;
   const size_t patternSize = patternEnd - patternBegin;
-  if(dataSize == 0 || offset + patternSize > dataSize)
+  if(patternSize == 0 || offset + patternSize > dataSize)
     return -1;
 
   // n % 0 is invalid
