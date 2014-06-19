@@ -11,11 +11,11 @@ public:
   {
     TagLib::PropertyMap map1;
     CPPUNIT_ASSERT(map1.isEmpty());
-    map1["ÄÖÜ"].append("test");
+    map1[L"\x00c4\x00d6\x00dc"].append("test");
     CPPUNIT_ASSERT_EQUAL(map1.size(), 1u);
 
     TagLib::PropertyMap map2;
-    map2["ÄÖÜ"].append("test");
+    map2[L"\x00c4\x00d6\x00dc"].append("test");
     CPPUNIT_ASSERT(map1 == map2);
     CPPUNIT_ASSERT(map1.contains(map2));
 
@@ -23,7 +23,7 @@ public:
     CPPUNIT_ASSERT(map1 != map2);
     CPPUNIT_ASSERT(map2.contains(map1));
 
-    map2["ÄÖÜ"].append("test 2");
+    map2[L"\x00c4\x00d6\x00dc"].append("test 2");
     CPPUNIT_ASSERT(!map2.contains(map1));
 
   }
