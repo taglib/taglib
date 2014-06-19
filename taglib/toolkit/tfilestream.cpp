@@ -36,7 +36,7 @@
 
 using namespace TagLib;
 
-namespace 
+namespace
 {
 #ifdef _WIN32
 
@@ -79,7 +79,7 @@ namespace
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
       return static_cast<size_t>(length);
-    else 
+    else
       return 0;
   }
 
@@ -151,13 +151,13 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
   else
     d->file = openFile(fileName, true);
 
-  if(d->file == InvalidFileHandle) 
+  if(d->file == InvalidFileHandle)
   {
 # ifdef _WIN32
     debug("Could not open file " + fileName.toString());
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
-# endif 
+# endif
   }
 }
 
@@ -192,7 +192,7 @@ ByteVector FileStream::readBlock(ulong length)
 
   const size_t count = readFile(d->file, buffer);
   buffer.resize(static_cast<uint>(count));
-  
+
   return buffer;
 }
 
@@ -262,7 +262,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
-    
+
     seek(readPosition);
     const size_t bytesRead = readFile(d->file, aboutToOverwrite);
     aboutToOverwrite.resize(bytesRead);
@@ -288,7 +288,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
     writePosition += buffer.size();
 
     // Make the current buffer the data that we read in the beginning.
-    
+
     buffer = aboutToOverwrite;
   }
 }
@@ -365,7 +365,12 @@ void FileStream::seek(long offset, Position p)
     return;
   }
 
+  SetLastError(NO_ERROR);
   SetFilePointer(d->file, offset, NULL, whence);
+  if(GetLastError() == ERROR_NEGATIVE_SEEK) {
+    SetLastError(NO_ERROR);
+    SetFilePointer(d->file, 0, NULL, FILE_BEGIN);
+  }
   if(GetLastError() != NO_ERROR) {
     debug("File::seek() -- Failed to set the file pointer.");
   }
@@ -410,6 +415,7 @@ long FileStream::tell() const
 {
 #ifdef _WIN32
 
+  SetLastError(NO_ERROR);
   const DWORD position = SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
   if(GetLastError() == NO_ERROR) {
     return static_cast<long>(position);
@@ -435,6 +441,7 @@ long FileStream::length()
 
 #ifdef _WIN32
 
+  SetLastError(NO_ERROR);
   const DWORD fileSize = GetFileSize(d->file, NULL);
   if(GetLastError() == NO_ERROR) {
     return static_cast<ulong>(fileSize);
@@ -469,6 +476,8 @@ void FileStream::truncate(long length)
   const long currentPos = tell();
 
   seek(length);
+
+  SetLastError(NO_ERROR);
   SetEndOfFile(d->file);
   if(GetLastError() != NO_ERROR) {
     debug("File::truncate() -- Failed to truncate the file.");
