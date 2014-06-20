@@ -72,7 +72,8 @@ Useful configuration options used with CMake (GUI and/or Command line):
                         Assumes parent of: \include and \lib.
   ZLIB_INCLUDE_DIR=     Where to find ZLib's Include directory.
   ZLIB_LIBRARY=         Where to find ZLib's Library.
-  ZLIB_SOURCE=          Where to find ZLib's source code.
+  ZLIB_SOURCE=          Where to find ZLib's Source Code.
+                        Alternative to ZLIB_INCLUDE_DIR and ZLIB_LIBRARY.
   CMAKE_INSTALL_PREFIX= Where to install Taglib.
   CMAKE_BUILD_TYPE=     Release, Debug, etc ... (Not available in MSVC)
 
