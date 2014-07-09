@@ -209,13 +209,14 @@ check_cxx_source_compiles("
 
 # Check for libz using the cmake supplied FindZLIB.cmake
 
-find_package(ZLIB)
-if(ZLIB_FOUND)
-  set(HAVE_ZLIB 1)
-else()
-  set(HAVE_ZLIB 0)
+if(NOT ZLIB_SOURCE)
+  find_package(ZLIB)
+  if(ZLIB_FOUND)
+    set(HAVE_ZLIB 1)
+  else()
+    set(HAVE_ZLIB 0)
+  endif()
 endif()
-
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 find_package(CppUnit)
