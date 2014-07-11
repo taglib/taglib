@@ -371,6 +371,22 @@ ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFir
   return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
 }
 
+ByteVector ByteVector::fromFloat(float value)
+{
+  char bytes[4];
+  ::memcpy(bytes, &value, sizeof(bytes));
+
+  return ByteVector(bytes, sizeof(bytes));
+}
+
+ByteVector ByteVector::fromDouble(double value)
+{
+  char bytes[8];
+  ::memcpy(bytes, &value, sizeof(value));
+
+  return ByteVector(bytes, sizeof(bytes));
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
@@ -706,6 +722,28 @@ long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 long long ByteVector::toLongLong(uint offset, bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
+}
+
+float ByteVector::toFloat() const
+{
+  float result = 0.0;
+
+  if(size() >= 4) {
+    ::memcpy(&result, this->data(), sizeof(result));
+  }
+
+  return result;
+}
+
+double ByteVector::toDouble() const
+{
+  double result = 0.0;
+
+  if(size() >= 8) {
+    ::memcpy(&result, this->data(), sizeof(result));
+  }
+
+  return result;
 }
 
 const char &ByteVector::operator[](int index) const

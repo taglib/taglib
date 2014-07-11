@@ -384,6 +384,20 @@ namespace TagLib {
     long long toLongLong(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
+     * Converts the first 4 bytes of the vector to a float.
+     *
+     * \see fromFloat()
+     */
+    float toFloat() const;
+
+    /*!
+     * Converts the first 8 bytes of the vector to a double.
+     *
+     * \see fromDouble()
+     */
+    double toDouble() const;
+
+    /*!
      * Creates a 4 byte ByteVector based on \a value.  If
      * \a mostSignificantByteFirst is true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
@@ -414,6 +428,20 @@ namespace TagLib {
      * \see toLongLong()
      */
     static ByteVector fromLongLong(long long value, bool mostSignificantByteFirst = true);
+
+    /*!
+     * Create a 4 byte ByteBector based on \a value.
+     *
+     * \see toFloat()
+     */
+    static ByteVector fromFloat(float value);
+
+    /*!
+     * Create a 8 byte ByteVector based on \a value.
+     *
+     * \see toDouble()
+     */
+    static ByteVector fromDouble(double value);
 
     /*!
      * Returns a ByteVector based on the CString \a s.
