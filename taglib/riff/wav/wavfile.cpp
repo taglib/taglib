@@ -221,16 +221,16 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
     }
   }
 
-  if (!d->tag[ID3v2Index])
+  if(!d->tag[ID3v2Index])
     d->tag.set(ID3v2Index, new ID3v2::Tag);
 
-  if (!d->tag[InfoIndex])
+  if(!d->tag[InfoIndex])
     d->tag.set(InfoIndex, new RIFF::Info::Tag);
 
-  if (!formatData.isEmpty())
+  if(!formatData.isEmpty())
     d->properties = new Properties(formatData, streamLength, propertiesStyle);
 
-  if (!acidData.isEmpty())
+  if(!acidData.isEmpty())
     d->acidInfo = new AcidInfo(acidData);
 }
 
