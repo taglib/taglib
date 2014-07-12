@@ -48,7 +48,8 @@ public:
     properties(0),
     tagChunkID("ID3 "),
     hasID3v2(false),
-    hasInfo(false)
+    hasInfo(false),
+    acidInfo(NULL)
   {
   }
 
