@@ -166,11 +166,23 @@ namespace TagLib
     setUnion(Title, s);
   }
 
+<<<<<<< HEAD
   template <size_t COUNT>
   void TagUnion<COUNT>::setArtist(const String &s)
   {
     setUnion(Artist, s);
   }
+=======
+TagLib::PictureMap TagUnion::pictures() const
+{
+  pictureMapUnion(pictures);
+}
+
+void TagUnion::setTitle(const String &s)
+{
+  setUnion(Title, s);
+}
+>>>>>>> Fix #94: add a unified interface for pictures
 
   template <size_t COUNT>
   TagLib::PictureMap TagUnion<COUNT>::pictures() const
@@ -208,11 +220,30 @@ namespace TagLib
     setUnion(Track, i);
   }
 
+<<<<<<< HEAD
   template <size_t COUNT>
   void TagUnion<COUNT>::setPictures(const PictureMap &l)
   {
       setUnion(Pictures, l);
   }
+=======
+void TagUnion::setPictures(const PictureMap &l)
+{
+    setUnion(Pictures, l);
+}
+
+bool TagUnion::isEmpty() const
+{
+  if(d->tags[0] && !d->tags[0]->isEmpty())
+    return false;
+  if(d->tags[1] && !d->tags[1]->isEmpty())
+    return false;
+  if(d->tags[2] && !d->tags[2]->isEmpty())
+    return false;
+
+  return true;
+}
+>>>>>>> Fix #94: add a unified interface for pictures
 
   template <size_t COUNT>
   bool TagUnion<COUNT>::isEmpty() const
