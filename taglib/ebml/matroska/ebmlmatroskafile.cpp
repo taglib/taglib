@@ -26,6 +26,7 @@
 #include "ebmlmatroskaconstants.h"
 #include "ebmlmatroskaaudio.h"
 
+#include "tpicturemap.h"
 #include "tpropertymap.h"
 
 using namespace TagLib;
@@ -41,25 +42,25 @@ public:
     Element *v = simpleTag->getChild(Constants::TagString);
     if(!n || !v)
       return false;
-    
+
     name = n->getAsString();
     value = v->getAsString();
     return true;
   }
-  
+
   FilePrivate(File *p_document) : tag(0), document(p_document)
   {
     // Just get the first segment, because "Typically a Matroska file is
     // composed of 1 segment."
     Element* elem = document->getDocumentRoot()->getChild(Constants::Segment);
-    
+
     // We take the first tags element (there shouldn't be more), if there is
     // non such element, consider the file as not compatible.
     if(!elem || !(elem = elem->getChild(Constants::Tags))) {
       document->setValid(false);
       return;
     }
-    
+
     // Load all Tag entries
     List<Element *> entries = elem->getChildren(Constants::Tag);
     for(List<Element *>::Iterator i = entries.begin(); i != entries.end(); ++i) {
@@ -67,7 +68,7 @@ public:
       ulli ttvalue = 50; // 50 is default (see spec.)
       if(target && (target = target->getChild(Constants::TargetTypeValue)))
         ttvalue = target->getAsUnsigned();
-      
+
       // Load all SimpleTags
       PropertyMap tagEntries;
       List<Element *> simpleTags = (*i)->getChildren(Constants::SimpleTag);
@@ -78,11 +79,11 @@ public:
           continue;
         tagEntries.insert(name, StringList(value));
       }
-      
+
       tags.append(std::pair<PropertyMap, std::pair<Element *, ulli> >(tagEntries, std::pair<Element *, ulli>(*i, ttvalue)));
     }
   }
-  
+
   // Creates Tag and AudioProperties. Late creation because both require a fully
   // functional FilePrivate (well AudioProperties doesn't...)
   void lateCreate()
@@ -90,7 +91,7 @@ public:
     tag = new Tag(document);
     audio = new AudioProperties(document);
   }
-  
+
   // Checks the EBML header and creates the FilePrivate.
   static FilePrivate *checkAndCreate(File *document)
   {
@@ -103,19 +104,19 @@ public:
         return fp;
       }
     }
-    
+
     return 0;
   }
-  
+
   // The tags with their Element and TargetTypeValue
   List<std::pair<PropertyMap, std::pair<Element *, ulli> > > tags;
-  
+
   // The tag
   Tag *tag;
-  
+
   // The audio properties
   AudioProperties *audio;
-  
+
   // The corresponding file.
   File *document;
 };
@@ -179,11 +180,11 @@ PropertyMap EBML::Matroska::File::setProperties(const PropertyMap &properties)
     if(best == d->tags.end() || best->second.second > i->second.second)
       best = i;
   }
-  
+
   std::pair<PropertyMap, std::pair<Element *, ulli> > replace(properties, best->second);
   d->tags.erase(best);
   d->tags.prepend(replace);
-  
+
   return PropertyMap();
 }
 
@@ -196,42 +197,42 @@ bool EBML::Matroska::File::save()
 {
   if(readOnly())
     return false;
-  
+
   // C++11 features would be nice: for(auto &i : d->tags) { /* ... */ }
   // Well, here we just iterate each extracted element.
   for(List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator i = d->tags.begin();
     i != d->tags.end(); ++i) {
-    
+
     for(PropertyMap::Iterator j = i->first.begin(); j != i->first.end(); ++j) {
-      
+
       // No element? Create it!
       if(!i->second.first) {
         // Should be save, since we already checked, when creating the object.
         Element *container = d->document->getDocumentRoot()
           ->getChild(Constants::Segment)->getChild(Constants::Tags);
-        
+
         // Create Targets container
         i->second.first = container->addElement(Constants::Tag);
         Element *target = i->second.first->addElement(Constants::Targets);
-        
+
         if(i->second.second == Constants::MostCommonPartValue)
           target->addElement(Constants::TargetType, Constants::TRACK);
         else if(i->second.second == Constants::MostCommonGroupingValue)
           target->addElement(Constants::TargetType, Constants::ALBUM);
-        
+
         target->addElement(Constants::TargetTypeValue, i->second.second);
       }
-      
+
       // Find entries
       List<Element *> simpleTags = i->second.first->getChildren(Constants::SimpleTag);
       StringList::Iterator str = j->second.begin();
       List<Element *>::Iterator k = simpleTags.begin();
       for(; k != simpleTags.end(); ++k) {
-        
+
         String name, value;
         if(!d->extractContent(*k, name, value))
           continue;
-        
+
         // Write entry from StringList
         if(name == j->first) {
           if(str == j->second.end()) {
@@ -248,7 +249,7 @@ bool EBML::Matroska::File::save()
           }
         }
       }
-      
+
       // If we didn't write the complete StringList, we have to write the rest.
       for(; str != j->second.end(); ++str) {
         Element *stag = i->second.first->addElement(Constants::SimpleTag);
@@ -256,21 +257,21 @@ bool EBML::Matroska::File::save()
         stag->addElement(Constants::TagString, *str);
       }
     }
-    
+
     // Finally, we have to find elements that are not in the PropertyMap and
     // remove them.
     List<Element *> simpleTags = i->second.first->getChildren(Constants::SimpleTag);
     for(List<Element *>::Iterator j = simpleTags.begin(); j != simpleTags.end(); ++j) {
-      
+
       String name, value;
       if(!d->extractContent(*j, name, value))
         continue;
-      
+
       if(i->first.find(name) == i->first.end()){
         i->second.first->removeChild(*j);}
     }
   }
-  
+
   return true;
 }
 
@@ -295,89 +296,89 @@ public:
     year(document->d->tags.end()),
     track(document->d->tags.end())
   {
-    
+
     for(List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator i =
       document->d->tags.begin(); i != document->d->tags.end(); ++i) {
-      
+
       // Just save it, if the title is more specific, or there is no title yet.
       if(i->first.find(Constants::TITLE) != i->first.end() &&
         (title == document->d->tags.end() ||
         title->second.second > i->second.second ||
         i->second.second == Constants::MostCommonPartValue)) {
-        
+
         title = i;
       }
-      
+
       // Same goes for artist.
       if(i->first.find(Constants::ARTIST) != i->first.end() &&
         (artist == document->d->tags.end() ||
         artist->second.second > i->second.second ||
         i->second.second == Constants::MostCommonPartValue)) {
-        
+
         artist = i;
       }
-      
+
       // Here, we also look for a title (the album title), but since we
       // specified the granularity, we have to search for it exactly.
       // Therefore it is possible, that title and album are the same (if only
       // the title of the album is given).
       if(i->first.find(Constants::TITLE) != i->first.end() &&
         i->second.second == Constants::MostCommonGroupingValue) {
-        
+
         album = i;
       }
-      
+
       // Again the same as title and artist.
       if(i->first.find(Constants::COMMENT) != i->first.end() &&
         (comment == document->d->tags.end() ||
         comment->second.second > i->second.second ||
         i->second.second == Constants::MostCommonPartValue)) {
-        
+
         comment = i;
       }
-      
+
       // Same goes for genre.
       if(i->first.find(Constants::GENRE) != i->first.end() &&
         (genre == document->d->tags.end() ||
         genre->second.second > i->second.second ||
         i->second.second == Constants::MostCommonPartValue)) {
-        
+
         genre = i;
       }
-      
+
       // And year (in our case: DATE_REALEASE)
       if(i->first.find(Constants::DATE_RELEASE) != i->first.end() &&
         (year == document->d->tags.end() ||
         year->second.second > i->second.second ||
         i->second.second == Constants::MostCommonPartValue)) {
-        
+
         year = i;
       }
-      
+
       // And track (in our case: PART_NUMBER)
       if(i->first.find(Constants::PART_NUMBER) != i->first.end() &&
         (track == document->d->tags.end() ||
         track->second.second > i->second.second ||
         i->second.second == Constants::MostCommonPartValue)) {
-        
+
         track = i;
       }
     }
   }
-  
+
   // Searches for the Tag with given TargetTypeValue (returns the first one)
   List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator
   find(ulli ttv)
   {
     for(List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator i =
       document->d->tags.begin(); i != document->d->tags.end(); ++i) {
-      
+
       if(i->second.second == ttv)
         return i;
     }
     return document->d->tags.end();
   }
-  
+
   // Updates the given information
   void update(
     List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator t,
@@ -387,19 +388,19 @@ public:
   {
     t->first.find(tagname)->second.front() = s;
   }
-  
+
   // Inserts a tag with given information
   void insert(const String &tagname, const ulli ttv, const String &s)
   {
     for(List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator i =
       document->d->tags.begin(); i != document->d->tags.end(); ++i) {
-      
+
       if(i->second.second == ttv) {
         i->first.insert(tagname, StringList(s));
         return;
       }
     }
-    
+
     // Not found? Create new!
     PropertyMap pm;
     pm.insert(tagname, StringList(s));
@@ -409,10 +410,10 @@ public:
       )
     );
   }
-  
+
   // The PropertyMap from the Matroska::File
   File *document;
-  
+
   // Iterators to the tags.
   List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator title;
   List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator artist;
@@ -459,6 +460,11 @@ String EBML::Matroska::File::Tag::album() const
     return e->album->first.find(Constants::TITLE)->second.front();
   else
     return String::null;
+}
+
+PictureMap EBML::Matroska::File::Tag::pictures() const
+{
+  return PictureMap();
 }
 
 String EBML::Matroska::File::Tag::comment() const
@@ -515,6 +521,11 @@ void EBML::Matroska::File::Tag::setAlbum(const String &s)
     e->update(e->album, Constants::TITLE, s);
   else
     e->insert(Constants::TITLE, Constants::MostCommonGroupingValue, s);
+}
+
+void EBML::Matroska::File::Tag::setPictures(const PictureMap& p )
+{
+    (void)p; // avoid warning for unused variable
 }
 
 void EBML::Matroska::File::Tag::setComment(const String &s)

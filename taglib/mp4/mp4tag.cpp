@@ -25,6 +25,7 @@
 
 #include <tdebug.h>
 #include <tstring.h>
+#include <tpicturemap.h>
 #include <tpropertymap.h>
 #include "mp4atom.h"
 #include "mp4tag.h"
@@ -720,6 +721,12 @@ MP4::Tag::track() const
   return 0;
 }
 
+PictureMap
+MP4::Tag::pictures() const
+{
+    return PictureMap();
+}
+
 void
 MP4::Tag::setTitle(const String &value)
 {
@@ -760,6 +767,11 @@ void
 MP4::Tag::setTrack(uint value)
 {
   d->items["trkn"] = MP4::Item(value, 0);
+}
+
+void
+MP4::Tag::setPictures(const PictureMap &l)
+{
 }
 
 bool MP4::Tag::isEmpty() const

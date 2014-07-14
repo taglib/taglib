@@ -27,7 +27,8 @@
 #include "config.h"
 #endif
 
-#include "tfile.h"
+#include <tfile.h>
+#include <tpicturemap.h>
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
@@ -238,6 +239,11 @@ TagLib::uint ID3v2::Tag::track() const
   return 0;
 }
 
+TagLib::PictureMap ID3v2::Tag::pictures() const
+{
+    return PictureMap();
+}
+
 void ID3v2::Tag::setTitle(const String &s)
 {
   setTextFrame("TIT2", s);
@@ -311,6 +317,10 @@ void ID3v2::Tag::setTrack(uint i)
     return;
   }
   setTextFrame("TRCK", String::number(i));
+}
+
+void ID3v2::Tag::setPictures(const PictureMap &l)
+{
 }
 
 bool ID3v2::Tag::isEmpty() const

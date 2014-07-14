@@ -111,6 +111,7 @@ namespace TagLib {
       virtual String genre() const;
       virtual uint year() const;
       virtual uint track() const;
+      virtual PictureMap pictures() const;
 
       virtual void setTitle(const String &s);
       virtual void setArtist(const String &s);
@@ -119,6 +120,7 @@ namespace TagLib {
       virtual void setGenre(const String &s);
       virtual void setYear(uint i);
       virtual void setTrack(uint i);
+      virtual void setPictures(const PictureMap &l);
 
       virtual bool isEmpty() const;
 
