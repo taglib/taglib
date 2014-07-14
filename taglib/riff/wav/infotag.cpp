@@ -25,6 +25,7 @@
 
 #include <tdebug.h>
 #include <tfile.h>
+#include <tpicturemap.h>
 
 #include "infotag.h"
 
@@ -139,6 +140,11 @@ TagLib::uint RIFF::Info::Tag::track() const
   return fieldText("IPRT").toInt();
 }
 
+TagLib::PictureMap RIFF::Info::Tag::pictures() const
+{
+    return PictureMap();
+}
+
 void RIFF::Info::Tag::setTitle(const String &s)
 {
   setFieldText("INAM", s);
@@ -178,6 +184,10 @@ void RIFF::Info::Tag::setTrack(uint i)
     setFieldText("IPRT", String::number(i));
   else
     d->fieldListMap.erase("IPRT");
+}
+
+void RIFF::Info::Tag::setPictures(const PictureMap &l)
+{
 }
 
 bool RIFF::Info::Tag::isEmpty() const

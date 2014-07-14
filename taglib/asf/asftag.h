@@ -98,6 +98,8 @@ namespace TagLib {
        */
       virtual uint track() const;
 
+      virtual PictureMap pictures() const;
+
       /*!
        * Sets the title to \a s.
        */
@@ -143,6 +145,8 @@ namespace TagLib {
        * Sets the track to \a i.  If \a s is 0 then this value will be cleared.
        */
       virtual void setTrack(uint i);
+
+      virtual void setPictures(const PictureMap &l);
 
       /*!
        * Returns true if the tag does not contain any data.  This should be
