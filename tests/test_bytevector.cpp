@@ -122,7 +122,7 @@ public:
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
   }
-  
+
   void testFind1()
   {
     CPPUNIT_ASSERT_EQUAL(4, ByteVector("....SggO."). find("SggO"));
@@ -135,6 +135,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 6));
     CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 7));
     CPPUNIT_ASSERT_EQUAL(-1, ByteVector("....SggO."). find("SggO", 8));
+
+    // Intentional out-of-bounds access.
+    ByteVector v("0123456789x");
+    v.resize(10);
+    v.data()[10] = 'x';
+    CPPUNIT_ASSERT_EQUAL(-1, v.find("789x", 7));
   }
 
   void testFind2()
