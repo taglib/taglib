@@ -183,11 +183,11 @@ PropertyMap ChapterFrame::asProperties() const
   PropertyMap map;
 
   map.unsupportedData().append(frameID() + String("/") + d->elementID);
-  
+
   return map;
 }
 
-ChapterFrame *ChapterFrame::findByElementID(const Tag *tag, const ByteVector &eID) // static
+ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVector &eID) // static
 {
   ID3v2::FrameList comments = tag->frameList("CHAP");
 
@@ -238,7 +238,7 @@ void ChapterFrame::parseFields(const ByteVector &data)
 
     embPos += frame->size() + Frame::headerSize(4);
     addEmbeddedFrame(frame);
-  }   
+  }
 }
 
 ByteVector ChapterFrame::renderFields() const
@@ -253,7 +253,7 @@ ByteVector ChapterFrame::renderFields() const
   FrameList l = d->embeddedFrameList;
   for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
     data.append((*it)->render());
-  
+
   return data;
 }
 

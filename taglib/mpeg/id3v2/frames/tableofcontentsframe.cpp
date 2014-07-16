@@ -184,7 +184,7 @@ PropertyMap TableOfContentsFrame::asProperties() const
   PropertyMap map;
 
   map.unsupportedData().append(frameID() + String("/") + d->elementID);
-  
+
   return map;
 }
 
@@ -204,7 +204,7 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
   return 0;
 }
 
-TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const Tag *tag) // static
+TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) // static
 {
   ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
@@ -240,7 +240,7 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
     childElementID.append(char(0));
     d->childElements.append(childElementID);
   }
-  
+
   size -= pos;
   while((uint)embPos < size - Frame::headerSize(4))
   {
@@ -257,7 +257,7 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
 
     embPos += frame->size() + Frame::headerSize(4);
     addEmbeddedFrame(frame);
-  }   
+  }
 }
 
 ByteVector TableOfContentsFrame::renderFields() const
@@ -280,7 +280,7 @@ ByteVector TableOfContentsFrame::renderFields() const
   FrameList l = d->embeddedFrameList;
   for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
     data.append((*it)->render());
-  
+
   return data;
 }
 
