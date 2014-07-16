@@ -31,6 +31,7 @@
 #include "wavfile.h"
 #include "id3v2tag.h"
 #include "infotag.h"
+#include "acidinfo.h"
 #include "tagunion.h"
 
 using namespace TagLib;
@@ -47,7 +48,8 @@ public:
     properties(0),
     tagChunkID("ID3 "),
     hasID3v2(false),
-    hasInfo(false)
+    hasInfo(false),
+    acidInfo(NULL)
   {
   }
 
@@ -64,6 +66,8 @@ public:
 
   bool hasID3v2;
   bool hasInfo;
+
+  AcidInfo *acidInfo;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +171,10 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
     }
   }
 
+  if(d->acidInfo != NULL && !d->acidInfo->isEmpty()) {
+    setChunkData("acid", d->acidInfo->render(), false);
+  }
+
   return true;
 }
 
@@ -187,6 +195,7 @@ bool RIFF::WAV::File::hasInfoTag() const
 void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   ByteVector formatData;
+  ByteVector acidData;
   uint streamLength = 0;
   for(uint i = 0; i < chunkCount(); i++) {
     String name = chunkName(i);
@@ -207,17 +216,22 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
         d->tag.set(InfoIndex, new RIFF::Info::Tag(data));
         d->hasInfo = true;
       }
+    } else if(name == "acid" && readProperties) {
+      acidData = chunkData(i);
     }
   }
 
-  if (!d->tag[ID3v2Index])
+  if(!d->tag[ID3v2Index])
     d->tag.set(ID3v2Index, new ID3v2::Tag);
 
-  if (!d->tag[InfoIndex])
+  if(!d->tag[InfoIndex])
     d->tag.set(InfoIndex, new RIFF::Info::Tag);
 
   if(!formatData.isEmpty())
     d->properties = new Properties(formatData, streamLength, propertiesStyle);
+
+  if(!acidData.isEmpty())
+    d->acidInfo = new AcidInfo(acidData);
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)

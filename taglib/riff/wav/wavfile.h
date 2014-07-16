@@ -30,6 +30,7 @@
 #include "id3v2tag.h"
 #include "infotag.h"
 #include "wavproperties.h"
+#include "acidinfo.h"
 
 namespace TagLib {
 
@@ -124,6 +125,11 @@ namespace TagLib {
          * \see hasInfoTag()
          */
         Info::Tag *InfoTag() const;
+
+        /*!
+         * Returns the Acid loop information for this file
+         */
+        AcidInfo *acidInfo() const;
 
         /*!
          * Implements the unified property interface -- export function.
