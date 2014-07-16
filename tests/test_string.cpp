@@ -82,7 +82,7 @@ public:
     String unicode5(L"\u65e5\u672c\u8a9e", String::UTF16LE);
     CPPUNIT_ASSERT(unicode5[1] == L'\u2c67');
 
-    wstring stduni = L"\u65e5\u672c\u8a9e";
+    std::wstring stduni = L"\u65e5\u672c\u8a9e";
 
     String unicode6(stduni, String::UTF16BE);
     CPPUNIT_ASSERT(unicode6[1] == L'\u672c');

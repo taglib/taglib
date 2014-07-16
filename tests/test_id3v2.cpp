@@ -4,12 +4,9 @@
 
 #include <string>
 #include <stdio.h>
-// so evil :(
-#define protected public
 #include <id3v2tag.h>
 #include <mpegfile.h>
 #include <id3v2frame.h>
-#undef protected
 #include <uniquefileidentifierframe.h>
 #include <textidentificationframe.h>
 #include <attachedpictureframe.h>
@@ -107,13 +104,23 @@ public:
 
   void testDowngradeUTF8ForID3v23()
   {
-    ID3v2::TextIdentificationFrame f(ByteVector("TPE1"), String::UTF8);
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    ID3v2::TextIdentificationFrame *f
+      = new ID3v2::TextIdentificationFrame(ByteVector("TPE1"), String::UTF8);
     StringList sl;
     sl.append("Foo");
-    f.setText(sl);
-    f.header()->setVersion(3);
-    ByteVector data = f.render();
+    f->setText(sl);
+
+    MPEG::File file(newname.c_str());
+    file.ID3v2Tag(true)->addFrame(f);
+    file.save(MPEG::File::ID3v2, true, 3);
+    CPPUNIT_ASSERT_EQUAL(true, file.hasID3v2Tag());
+
+    ByteVector data = f->render();
     CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+6+2), data.size());
+
     ID3v2::TextIdentificationFrame f2(data);
     CPPUNIT_ASSERT_EQUAL(sl, f2.fieldList());
     CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
@@ -299,13 +306,16 @@ public:
     f->setRating(200);
     f->setCounter(3);
 
-    MPEG::File foo(newname.c_str());
-    foo.ID3v2Tag()->addFrame(f);
-    foo.save();
-
-    MPEG::File bar(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("email@example.com"), dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->email());
-    CPPUNIT_ASSERT_EQUAL(200, dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->rating());
+    {
+      MPEG::File foo(newname.c_str());
+      foo.ID3v2Tag()->addFrame(f);
+      foo.save();
+    }
+    {
+      MPEG::File bar(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("email@example.com"), dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->email());
+      CPPUNIT_ASSERT_EQUAL(200, dynamic_cast<ID3v2::PopularimeterFrame *>(bar.ID3v2Tag()->frameList("POPM").front())->rating());
+    }
   }
 
   // http://bugs.kde.org/show_bug.cgi?id=150481
@@ -406,7 +416,7 @@ public:
                  "http://example.com", 33),  // URL
       f.render());
   }
-  
+
   void testParseOwnershipFrame()
   {
     ID3v2::OwnershipFrame f(
@@ -551,13 +561,17 @@ public:
     ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
     ID3v2::FrameFactory::instance()->setDefaultTextEncoding(String::UTF16);
-    MPEG::File foo(newname.c_str());
-    foo.strip();
-    foo.tag()->setComment("Test comment!");
-    foo.save();
-    MPEG::File bar(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("Test comment!"), bar.tag()->comment());
-    ID3v2::FrameFactory::instance()->setDefaultTextEncoding(defaultEncoding);
+    {
+      MPEG::File foo(newname.c_str());
+      foo.strip();
+      foo.tag()->setComment("Test comment!");
+      foo.save();
+    }
+    {
+      MPEG::File bar(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("Test comment!"), bar.tag()->comment());
+      ID3v2::FrameFactory::instance()->setDefaultTextEncoding(defaultEncoding);
+    }
   }
 
   void testUpdateGenre23_1()
@@ -638,57 +652,60 @@ public:
     string newname = copy.fileName();
 
     ID3v2::TextIdentificationFrame *tf;
-    MPEG::File foo(newname.c_str());
-    tf = new ID3v2::TextIdentificationFrame("TDOR", String::Latin1);
-    tf->setText("2011-03-16");
-    foo.ID3v2Tag()->addFrame(tf);
-    tf = new ID3v2::TextIdentificationFrame("TDRC", String::Latin1);
-    tf->setText("2012-04-17T12:01");
-    foo.ID3v2Tag()->addFrame(tf);
-    tf = new ID3v2::TextIdentificationFrame("TMCL", String::Latin1);
-    tf->setText(StringList().append("Guitar").append("Artist 1").append("Drums").append("Artist 2"));
-    foo.ID3v2Tag()->addFrame(tf);
-    tf = new ID3v2::TextIdentificationFrame("TIPL", String::Latin1);
-    tf->setText(StringList().append("Producer").append("Artist 3").append("Mastering").append("Artist 4"));
-    foo.ID3v2Tag()->addFrame(tf);
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDRL", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDTG", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TMOO", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TPRO", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOA", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOT", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSST", String::Latin1));
-    foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOP", String::Latin1));
-    foo.save(MPEG::File::AllTags, true, 3);
-
-    MPEG::File bar(newname.c_str());
-    tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
-    CPPUNIT_ASSERT(tf);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
-    CPPUNIT_ASSERT_EQUAL(String("2011"), tf->fieldList().front());
-    tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
-    CPPUNIT_ASSERT(tf);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
-    CPPUNIT_ASSERT_EQUAL(String("2012"), tf->fieldList().front());
-    tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TIPL").front());
-    CPPUNIT_ASSERT(tf);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(8), tf->fieldList().size());
-    CPPUNIT_ASSERT_EQUAL(String("Guitar"), tf->fieldList()[0]);
-    CPPUNIT_ASSERT_EQUAL(String("Artist 1"), tf->fieldList()[1]);
-    CPPUNIT_ASSERT_EQUAL(String("Drums"), tf->fieldList()[2]);
-    CPPUNIT_ASSERT_EQUAL(String("Artist 2"), tf->fieldList()[3]);
-    CPPUNIT_ASSERT_EQUAL(String("Producer"), tf->fieldList()[4]);
-    CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[5]);
-    CPPUNIT_ASSERT_EQUAL(String("Mastering"), tf->fieldList()[6]);
-    CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[7]);
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDRL"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDTG"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TMOO"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TPRO"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOA"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOT"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
-    CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
+    {
+      MPEG::File foo(newname.c_str());
+      tf = new ID3v2::TextIdentificationFrame("TDOR", String::Latin1);
+      tf->setText("2011-03-16");
+      foo.ID3v2Tag()->addFrame(tf);
+      tf = new ID3v2::TextIdentificationFrame("TDRC", String::Latin1);
+      tf->setText("2012-04-17T12:01");
+      foo.ID3v2Tag()->addFrame(tf);
+      tf = new ID3v2::TextIdentificationFrame("TMCL", String::Latin1);
+      tf->setText(StringList().append("Guitar").append("Artist 1").append("Drums").append("Artist 2"));
+      foo.ID3v2Tag()->addFrame(tf);
+      tf = new ID3v2::TextIdentificationFrame("TIPL", String::Latin1);
+      tf->setText(StringList().append("Producer").append("Artist 3").append("Mastering").append("Artist 4"));
+      foo.ID3v2Tag()->addFrame(tf);
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDRL", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDTG", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TMOO", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TPRO", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOA", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOT", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSST", String::Latin1));
+      foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOP", String::Latin1));
+      foo.save(MPEG::File::AllTags, true, 3);
+    }
+    {
+      MPEG::File bar(newname.c_str());
+      tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
+      CPPUNIT_ASSERT(tf);
+      CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(String("2011"), tf->fieldList().front());
+      tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
+      CPPUNIT_ASSERT(tf);
+      CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(String("2012"), tf->fieldList().front());
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TIPL").front());
+      CPPUNIT_ASSERT(tf);
+      CPPUNIT_ASSERT_EQUAL(TagLib::uint(8), tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(String("Guitar"), tf->fieldList()[0]);
+      CPPUNIT_ASSERT_EQUAL(String("Artist 1"), tf->fieldList()[1]);
+      CPPUNIT_ASSERT_EQUAL(String("Drums"), tf->fieldList()[2]);
+      CPPUNIT_ASSERT_EQUAL(String("Artist 2"), tf->fieldList()[3]);
+      CPPUNIT_ASSERT_EQUAL(String("Producer"), tf->fieldList()[4]);
+      CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[5]);
+      CPPUNIT_ASSERT_EQUAL(String("Mastering"), tf->fieldList()[6]);
+      CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[7]);
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDRL"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDTG"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TMOO"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TPRO"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOA"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOT"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
+      CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
+    }
   }
 
   void testCompressedFrameWithBrokenLength()
@@ -698,7 +715,7 @@ public:
 
 #ifdef HAVE_ZLIB
 
-    ID3v2::AttachedPictureFrame *frame 
+    ID3v2::AttachedPictureFrame *frame
       = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
     CPPUNIT_ASSERT(frame);
     CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
@@ -711,13 +728,13 @@ public:
     // Skip the test if ZLIB is not installed.
     // The message "Compressed frames are currently not supported." will be displayed.
 
-    ID3v2::UnknownFrame *frame 
+    ID3v2::UnknownFrame *frame
       = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
     CPPUNIT_ASSERT(frame);
 
 #endif
   }
-  
+
   void testW000()
   {
     MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
@@ -829,36 +846,40 @@ public:
   {
     ScopedFileCopy copy("rare_frames", ".mp3");
     string newname = copy.fileName();
-    MPEG::File f(newname.c_str());
-    ID3v2::Tag *t = f.ID3v2Tag();
-    ID3v2::Frame *frame = t->frameList("TCON")[0];
-    CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
-    t->removeFrame(frame, true);
-    f.save(MPEG::File::ID3v2);
-    
-    MPEG::File f2(newname.c_str());
-    t = f2.ID3v2Tag();
-    CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
+
+    {
+      MPEG::File f(newname.c_str());
+      ID3v2::Tag *t = f.ID3v2Tag();
+      ID3v2::Frame *frame = t->frameList("TCON")[0];
+      CPPUNIT_ASSERT_EQUAL(1u, t->frameList("TCON").size());
+      t->removeFrame(frame, true);
+      f.save(MPEG::File::ID3v2);
+    }
+    {
+      MPEG::File f2(newname.c_str());
+      ID3v2::Tag *t = f2.ID3v2Tag();
+      CPPUNIT_ASSERT(t->frameList("TCON").isEmpty());
+    }
   }
-  
+
   void testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2()
   {
     ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
-    
+
     {
       MPEG::File foo(newname.c_str());
       foo.tag()->setArtist("Artist");
       foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
     }
-    
+
     {
       MPEG::File bar(newname.c_str());
       bar.ID3v2Tag()->removeFrames("TPE1");
       // Should strip ID3v1 here and not add old values to ID3v2 again
       bar.save(MPEG::File::ID3v2, true);
     }
-    
+
     MPEG::File f(newname.c_str());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TPE1"));
   }
