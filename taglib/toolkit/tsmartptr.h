@@ -55,34 +55,7 @@
 #else // !HAVE_STD_SHARED_PTR && !HAVE_TR1_SHARED_PTR && !HAVE_BOOST_SHARED_PTR
 
 # include <algorithm>
-
-# if defined(HAVE_GCC_ATOMIC)
-#   define ATOMIC_INT int
-#   define ATOMIC_INC(x) ::__sync_add_and_fetch(&x, 1)
-#   define ATOMIC_DEC(x) ::__sync_sub_and_fetch(&x, 1)
-# elif defined(HAVE_WIN_ATOMIC)
-#   if !defined(NOMINMAX)
-#     define NOMINMAX
-#   endif
-#   include <windows.h>
-#   define ATOMIC_INT volatile LONG
-#   define ATOMIC_INC(x) ::InterlockedIncrement(&x)
-#   define ATOMIC_DEC(x) ::InterlockedDecrement(&x)
-# elif defined(HAVE_MAC_ATOMIC)
-#   include <libkern/OSAtomic.h>
-#   define ATOMIC_INT int32_t
-#   define ATOMIC_INC(x) ::OSAtomicIncrement32Barrier(&x)
-#   define ATOMIC_DEC(x) ::OSAtomicDecrement32Barrier(&x)
-# elif defined(HAVE_IA64_ATOMIC)
-#   include <ia64intrin.h>
-#   define ATOMIC_INT int
-#   define ATOMIC_INC(x) ::__sync_add_and_fetch(&x, 1)
-#   define ATOMIC_DEC(x) ::__sync_sub_and_fetch(&x, 1)
-# else
-#   define ATOMIC_INT int
-#   define ATOMIC_INC(x) (++x)
-#   define ATOMIC_DEC(x) (--x)
-# endif
+# include <trefcounter.h>
 
 namespace TagLib
 {
@@ -91,11 +64,11 @@ namespace TagLib
 
   // Counter base class. Provides a reference counter.
 
-  class CounterBase
+  class CounterBase : public RefCounter
   {
   public:
     CounterBase() :
-      refCount(1)
+      RefCounter()
     {
     }
 
@@ -105,12 +78,12 @@ namespace TagLib
 
     void addref()
     {
-      ATOMIC_INC(refCount);
+      RefCounter::ref();
     }
 
     void release()
     {
-      if(ATOMIC_DEC(refCount) == 0) {
+      if(RefCounter::deref()) {
         dispose();
         delete this;
       }
@@ -118,13 +91,10 @@ namespace TagLib
 
     long use_count() const
     {
-      return static_cast<long>(refCount);
+      return RefCounter::count();
     }
 
     virtual void dispose() = 0;
-
-  private:
-    ATOMIC_INT refCount;
   };
 
   // Counter impl class. Provides a dynamic deleter.
