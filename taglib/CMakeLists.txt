@@ -28,6 +28,8 @@ include_directories(
 
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
+elseif(HAVE_ZLIB_SOURCE)
+  include_directories(${ZLIB_SOURCE})
 endif()
 
 set(tag_HDRS
@@ -304,6 +306,18 @@ set(toolkit_SRCS
   toolkit/unicode.cpp
 )
 
+if(HAVE_ZLIB_SOURCE)
+  set(zlib_SRCS
+    ${ZLIB_SOURCE}/adler32.c
+    ${ZLIB_SOURCE}/crc32.c
+    ${ZLIB_SOURCE}/inffast.c
+    ${ZLIB_SOURCE}/inflate.c
+    ${ZLIB_SOURCE}/inftrees.c
+    ${ZLIB_SOURCE}/uncompr.c
+    ${ZLIB_SOURCE}/zutil.c
+  )
+endif()
+
 set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
@@ -315,10 +329,10 @@ set(tag_LIB_SRCS
   audioproperties.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+add_library(tag ${tag_LIB_SRCS} ${zlib_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
-	target_link_libraries(tag ${ZLIB_LIBRARIES})
+  target_link_libraries(tag ${ZLIB_LIBRARIES})
 endif()
 
 set_target_properties(tag PROPERTIES
