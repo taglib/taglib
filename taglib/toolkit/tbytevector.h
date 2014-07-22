@@ -291,7 +291,7 @@ namespace TagLib {
     uint toUInt(bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the 4 bytes at \a offset of the vector to an unsigned integer. 
+     * Converts the 4 bytes at \a offset of the vector to an unsigned integer.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -303,8 +303,8 @@ namespace TagLib {
     uint toUInt(uint offset, bool mostSignificantByteFirst = true) const;
 
     /*!
-     * Converts the \a length bytes at \a offset of the vector to an unsigned 
-     * integer. If \a length is larger than 4, the excess is ignored. 
+     * Converts the \a length bytes at \a offset of the vector to an unsigned
+     * integer. If \a length is larger than 4, the excess is ignored.
      *
      * If \a mostSignificantByteFirst is true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
@@ -383,6 +383,46 @@ namespace TagLib {
      */
     long long toLongLong(uint offset, bool mostSignificantByteFirst = true) const;
 
+    /*
+     * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
+     * 32-bit little-endian floating point number.
+     */
+    float toFloat32LE(size_t offset) const;
+
+    /*
+     * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
+     * 32-bit big-endian floating point number.
+     */
+    float toFloat32BE(size_t offset) const;
+
+    /*
+     * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
+     * 64-bit little-endian floating point number.
+     */
+    double toFloat64LE(size_t offset) const;
+
+    /*
+     * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
+     * 64-bit big-endian floating point number.
+     */
+    double toFloat64BE(size_t offset) const;
+
+    /*
+    * Converts the 10 bytes at \a offset of the vector to a long double as an
+    * IEEE754 80-bit little-endian floating point number.
+    *
+    * \note This may compromise the precision depends on the size of long double.
+    */
+    long double toFloat80LE(size_t offset) const;
+
+    /*
+     * Converts the 10 bytes at \a offset of the vector to a long double as an
+     * IEEE754 80-bit big-endian floating point number.
+     *
+     * \note This may compromise the precision depends on the size of long double.
+     */
+    long double toFloat80BE(size_t offset) const;
+
     /*!
      * Creates a 4 byte ByteVector based on \a value.  If
      * \a mostSignificantByteFirst is true, then this will operate left to right
@@ -414,6 +454,38 @@ namespace TagLib {
      * \see toLongLong()
      */
     static ByteVector fromLongLong(long long value, bool mostSignificantByteFirst = true);
+
+    /*!
+     * Creates a 4 byte ByteVector based on \a value as an IEEE754 32-bit
+     * little-endian floating point number.
+     *
+     * \see fromFloat32BE()
+     */
+    static ByteVector fromFloat32LE(float value);
+
+    /*!
+     * Creates a 4 byte ByteVector based on \a value as an IEEE754 32-bit
+     * big-endian floating point number.
+     *
+     * \see fromFloat32LE()
+     */
+    static ByteVector fromFloat32BE(float value);
+
+    /*!
+     * Creates a 8 byte ByteVector based on \a value as an IEEE754 64-bit
+     * little-endian floating point number.
+     *
+     * \see fromFloat64BE()
+     */
+    static ByteVector fromFloat64LE(double value);
+
+    /*!
+     * Creates a 8 byte ByteVector based on \a value as an IEEE754 64-bit
+     * big-endian floating point number.
+     *
+     * \see fromFloat64LE()
+     */
+    static ByteVector fromFloat64BE(double value);
 
     /*!
      * Returns a ByteVector based on the CString \a s.

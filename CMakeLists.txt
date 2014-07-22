@@ -6,6 +6,8 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS 2.8.12)
   cmake_policy(SET CMP0022 OLD)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
 option(ENABLE_STATIC "Make static version of libtag"  OFF)
 if(ENABLE_STATIC)
   add_definitions(-DTAGLIB_STATIC)

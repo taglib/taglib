@@ -29,6 +29,8 @@
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <cstddef>
@@ -238,6 +240,95 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
 }
 
+template <typename TFloat, typename TInt, Utils::ByteOrder ENDIAN>
+TFloat toFloat(const ByteVector &v, size_t offset)
+{
+  if (offset > v.size() - sizeof(TInt)) {
+    debug("toFloat() - offset is out of range. Returning 0.");
+    return 0.0;
+  }
+
+  union {
+    TInt   i;
+    TFloat f;
+  } tmp;
+  ::memcpy(&tmp, v.data() + offset, sizeof(TInt));
+
+  if(ENDIAN != Utils::FloatByteOrder)
+    tmp.i = Utils::byteSwap(tmp.i);
+
+  return tmp.f;
+}
+
+template <typename TFloat, typename TInt, Utils::ByteOrder ENDIAN>
+ByteVector fromFloat(TFloat value)
+{
+  union {
+    TInt   i;
+    TFloat f;
+  } tmp;
+  tmp.f = value;
+
+  if(ENDIAN != Utils::FloatByteOrder)
+    tmp.i = Utils::byteSwap(tmp.i);
+
+  return ByteVector(reinterpret_cast<char *>(&tmp), sizeof(TInt));
+}
+
+template <Utils::ByteOrder ENDIAN>
+long double toFloat80(const ByteVector &v, size_t offset)
+{
+  if(offset > v.size() - 10) {
+    debug("toFloat80() - offset is out of range. Returning 0.");
+    return 0.0;
+  }
+
+  uchar bytes[10];
+  ::memcpy(bytes, v.data() + offset, 10);
+
+  if(ENDIAN == Utils::LittleEndian) {
+    std::swap(bytes[0], bytes[9]);
+    std::swap(bytes[1], bytes[8]);
+    std::swap(bytes[2], bytes[7]);
+    std::swap(bytes[3], bytes[6]);
+    std::swap(bytes[4], bytes[5]);
+  }
+
+  // 1-bit sign
+  const bool negative = ((bytes[0] & 0x80) != 0);
+
+  // 15-bit exponent
+  const int exponent = ((bytes[0] & 0x7F) << 8) | bytes[1];
+
+  // 64-bit fraction. Leading 1 is explicit.
+  const ulonglong fraction
+    = (static_cast<ulonglong>(bytes[2]) << 56)
+    | (static_cast<ulonglong>(bytes[3]) << 48)
+    | (static_cast<ulonglong>(bytes[4]) << 40)
+    | (static_cast<ulonglong>(bytes[5]) << 32)
+    | (static_cast<ulonglong>(bytes[6]) << 24)
+    | (static_cast<ulonglong>(bytes[7]) << 16)
+    | (static_cast<ulonglong>(bytes[8]) <<  8)
+    | (static_cast<ulonglong>(bytes[9]));
+
+  long double val;
+  if(exponent == 0 && fraction == 0)
+    val = 0;
+  else {
+    if(exponent == 0x7FFF) {
+      debug("toFloat80() - can't handle the infinity or NaN. Returning 0.");
+      return 0.0;
+    }
+    else
+      val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
+  }
+
+  if(negative)
+    return -val;
+  else
+    return val;
+}
+
 class DataPrivate : public RefCounter
 {
 public:
@@ -369,6 +460,26 @@ ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)
 {
   return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
+}
+
+ByteVector ByteVector::fromFloat32LE(float value)
+{
+  return fromFloat<float, uint, Utils::LittleEndian>(value);
+}
+
+ByteVector ByteVector::fromFloat32BE(float value)
+{
+  return fromFloat<float, uint, Utils::BigEndian>(value);
+}
+
+ByteVector ByteVector::fromFloat64LE(double value)
+{
+  return fromFloat<double, ulonglong, Utils::LittleEndian>(value);
+}
+
+ByteVector ByteVector::fromFloat64BE(double value)
+{
+  return fromFloat<double, ulonglong, Utils::BigEndian>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -706,6 +817,36 @@ long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 long long ByteVector::toLongLong(uint offset, bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
+}
+
+float ByteVector::toFloat32LE(size_t offset) const
+{
+  return toFloat<float, uint, Utils::LittleEndian>(*this, offset);
+}
+
+float ByteVector::toFloat32BE(size_t offset) const
+{
+  return toFloat<float, uint, Utils::BigEndian>(*this, offset);
+}
+
+double ByteVector::toFloat64LE(size_t offset) const
+{
+  return toFloat<double, ulonglong, Utils::LittleEndian>(*this, offset);
+}
+
+double ByteVector::toFloat64BE(size_t offset) const
+{
+  return toFloat<double, ulonglong, Utils::BigEndian>(*this, offset);
+}
+
+long double ByteVector::toFloat80LE(size_t offset) const
+{
+  return toFloat80<Utils::LittleEndian>(*this, offset);
+}
+
+long double ByteVector::toFloat80BE(size_t offset) const
+{
+  return toFloat80<Utils::BigEndian>(*this, offset);
 }
 
 const char &ByteVector::operator[](int index) const

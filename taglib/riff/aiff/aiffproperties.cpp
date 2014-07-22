@@ -25,55 +25,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-#include <cmath>
-// ldexp is a c99 function, which might not be defined in <cmath>
-// so we pull in math.h too and hope it does the right (wrong) thing
-// wrt. c99 functions in C++
-#include <math.h>
-
 #include "aiffproperties.h"
-
-////////////////////////////////////////////////////////////////////////////////
-// nasty 80-bit float helpers
-////////////////////////////////////////////////////////////////////////////////
-
-#define UnsignedToFloat(u) (((double)((long)(u - 2147483647L - 1))) + 2147483648.0)
-
-static double ConvertFromIeeeExtended(const TagLib::uchar *bytes)
-{
-  double f;
-  int expon;
-  unsigned long hiMant, loMant;
-
-  expon  = ((bytes[0] & 0x7F) << 8) | (bytes[1] & 0xFF);
-
-  hiMant = ((unsigned long)(bytes[2] & 0xFF) << 24) |
-           ((unsigned long)(bytes[3] & 0xFF) << 16) |
-           ((unsigned long)(bytes[4] & 0xFF) << 8)  |
-           ((unsigned long)(bytes[5] & 0xFF));
-
-  loMant = ((unsigned long)(bytes[6] & 0xFF) << 24) |
-           ((unsigned long)(bytes[7] & 0xFF) << 16) |
-           ((unsigned long)(bytes[8] & 0xFF) << 8)  |
-           ((unsigned long)(bytes[9] & 0xFF));
-
-  if (expon == 0 && hiMant == 0 && loMant == 0)
-    f = 0;
-  else {
-    if(expon == 0x7FFF) /* Infinity or NaN */
-      f = HUGE_VAL;
-    else {
-      expon -= 16383;
-      f  = ldexp(UnsignedToFloat(hiMant), expon -= 31);
-      f += ldexp(UnsignedToFloat(loMant), expon -= 32);
-    }
-  }
-
-  if(bytes[0] & 0x80)
-    return -f;
-  else
-    return f;
-}
 
 using namespace TagLib;
 
@@ -153,7 +105,7 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
   d->channels       = data.toShort(0U);
   d->sampleFrames   = data.toUInt(2U);
   d->sampleWidth    = data.toShort(6U);
-  double sampleRate = ConvertFromIeeeExtended(reinterpret_cast<const uchar *>(data.data() + 8));
+  const long double sampleRate = data.toFloat80BE(8);
   d->sampleRate     = (int)sampleRate;
   d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);
   d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
