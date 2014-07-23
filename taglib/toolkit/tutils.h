@@ -44,6 +44,8 @@
 # include <sys/endian.h>
 #endif
 
+#include <cstring>
+
 namespace TagLib
 {
   namespace Utils
