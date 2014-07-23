@@ -47,10 +47,14 @@
 
 namespace
 {
-
   inline unsigned short combine(unsigned char c1, unsigned char c2)
   {
-    return (c1 << 8) | c2;
+    using namespace TagLib::Utils;
+
+    if(SystemByteOrder == LittleEndian)
+      return (c1 << 8) | c2;
+    else
+      return (c2 << 8) | c1;
   }
 
   void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
