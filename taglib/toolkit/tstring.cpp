@@ -48,11 +48,6 @@
 namespace
 {
 
-  inline unsigned short combine(unsigned char c1, unsigned char c2)
-  {
-    return (c1 << 8) | c2;
-  }
-
   void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
 #ifdef HAVE_STD_CODECVT
@@ -844,7 +839,12 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 
   d->data.resize(length / 2);
   for(size_t i = 0; i < length / 2; ++i) {
-    d->data[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
+    ushort c;
+    ::memcpy(&c, s, 2);
+    if(swap)
+      c = Utils::byteSwap(c);
+
+    d->data[i] = static_cast<wchar_t>(c);
     s += 2;
   }
 }
