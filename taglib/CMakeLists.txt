@@ -31,6 +31,8 @@ include_directories(
 
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
+elseif(HAVE_ZLIB_SOURCE)
+  include_directories(${ZLIB_SOURCE})
 endif()
 
 set(tag_HDRS
@@ -82,6 +84,8 @@ set(tag_HDRS
   mpeg/id3v2/frames/unknownframe.h
   mpeg/id3v2/frames/unsynchronizedlyricsframe.h
   mpeg/id3v2/frames/urllinkframe.h
+  mpeg/id3v2/frames/chapterframe.h
+  mpeg/id3v2/frames/tableofcontentsframe.h
   ogg/oggfile.h
   ogg/oggpage.h
   ogg/oggpageheader.h
@@ -182,6 +186,8 @@ set(frames_SRCS
   mpeg/id3v2/frames/unknownframe.cpp
   mpeg/id3v2/frames/unsynchronizedlyricsframe.cpp
   mpeg/id3v2/frames/urllinkframe.cpp
+  mpeg/id3v2/frames/chapterframe.cpp
+  mpeg/id3v2/frames/tableofcontentsframe.cpp
 )
 
 set(ogg_SRCS
@@ -300,6 +306,16 @@ set(dsf_SRCS
   dsf/dsfproperties.cpp
 )
 
+set(ebml_SRCS
+  ebml/ebmlfile.cpp
+  ebml/ebmlelement.cpp
+)
+
+set(matroska_SRCS
+  ebml/matroska/ebmlmatroskafile.cpp
+  ebml/matroska/ebmlmatroskaaudio.cpp
+)
+
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
@@ -317,15 +333,17 @@ set(toolkit_SRCS
   toolkit/unicode.cpp
 )
 
-set(ebml_SRCS
-  ebml/ebmlfile.cpp
-  ebml/ebmlelement.cpp
-)
-
-set(matroska_SRCS
-  ebml/matroska/ebmlmatroskafile.cpp
-  ebml/matroska/ebmlmatroskaaudio.cpp
-)
+if(HAVE_ZLIB_SOURCE)
+  set(zlib_SRCS
+    ${ZLIB_SOURCE}/adler32.c
+    ${ZLIB_SOURCE}/crc32.c
+    ${ZLIB_SOURCE}/inffast.c
+    ${ZLIB_SOURCE}/inflate.c
+    ${ZLIB_SOURCE}/inftrees.c
+    ${ZLIB_SOURCE}/uncompr.c
+    ${ZLIB_SOURCE}/zutil.c
+  )
+endif()
 
 set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
@@ -339,10 +357,10 @@ set(tag_LIB_SRCS
   audioproperties.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+add_library(tag ${tag_LIB_SRCS} ${zlib_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
-	target_link_libraries(tag ${ZLIB_LIBRARIES})
+  target_link_libraries(tag ${ZLIB_LIBRARIES})
 endif()
 
 set_target_properties(tag PROPERTIES
@@ -358,10 +376,9 @@ if(BUILD_FRAMEWORK)
 endif()
 
 install(TARGETS tag
-	FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
-	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-	PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
+  FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
+  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
 )
-

@@ -99,7 +99,7 @@ public:
     String unicode6(L"\u65e5\u672c\u8a9e", String::UTF16LE);
     CPPUNIT_ASSERT(unicode6[1] == (littleEndian ? L'\u672c' : L'\u2c67'));
 
-    wstring stduni = L"\u65e5\u672c\u8a9e";
+    std::wstring stduni = L"\u65e5\u672c\u8a9e";
 
     String unicode7(stduni);
     CPPUNIT_ASSERT(unicode7[1] == L'\u672c');

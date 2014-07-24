@@ -36,7 +36,7 @@
 
 using namespace TagLib;
 
-namespace 
+namespace
 {
 #ifdef _WIN32
 
@@ -79,7 +79,7 @@ namespace
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
       return static_cast<size_t>(length);
-    else 
+    else
       return 0;
   }
 
@@ -122,12 +122,10 @@ namespace
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName)
-    : file(InvalidFileHandle)
-    , name(fileName)
-    , readOnly(true)
-  {
-  }
+  FileStreamPrivate(const FileName &fileName) :
+    file(InvalidFileHandle),
+    name(fileName),
+    readOnly(true) {}
 
   FileHandle file;
   FileNameHandle name;
@@ -138,8 +136,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileStream::FileStream(FileName fileName, bool openReadOnly)
-  : d(new FileStreamPrivate(fileName))
+FileStream::FileStream(FileName fileName, bool openReadOnly) :
+  d(new FileStreamPrivate(fileName))
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
@@ -151,13 +149,13 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
   else
     d->file = openFile(fileName, true);
 
-  if(d->file == InvalidFileHandle) 
+  if(d->file == InvalidFileHandle)
   {
 # ifdef _WIN32
     debug("Could not open file " + fileName.toString());
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
-# endif 
+# endif
   }
 }
 
@@ -192,7 +190,7 @@ ByteVector FileStream::readBlock(size_t length)
 
   const size_t count = readFile(d->file, buffer);
   buffer.resize(count);
-  
+
   return buffer;
 }
 
@@ -262,7 +260,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
   {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
-    
+
     seek(readPosition);
     const size_t bytesRead = readFile(d->file, aboutToOverwrite);
     aboutToOverwrite.resize(bytesRead);
@@ -288,7 +286,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
     writePosition += buffer.size();
 
     // Make the current buffer the data that we read in the beginning.
-    
+
     buffer = aboutToOverwrite;
   }
 }
@@ -368,7 +366,12 @@ void FileStream::seek(offset_t offset, Position p)
   LARGE_INTEGER liOffset;
   liOffset.QuadPart = offset;
 
+  SetLastError(NO_ERROR);
   SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
+  if(GetLastError() == ERROR_NEGATIVE_SEEK) {
+    SetLastError(NO_ERROR);
+    SetFilePointer(d->file, 0, NULL, FILE_BEGIN);
+  }
   if(GetLastError() != NO_ERROR) {
     debug("File::seek() -- Failed to set the file pointer.");
   }
@@ -399,7 +402,7 @@ void FileStream::seek(offset_t offset, Position p)
 
   fseek(d->file, static_cast<long>(offset), whence);
 
-# endif 
+# endif
 
 #endif
 }
@@ -424,6 +427,7 @@ offset_t FileStream::tell() const
   LARGE_INTEGER position;
   position.QuadPart = 0;
 
+  SetLastError(NO_ERROR);
   position.LowPart = SetFilePointer(
     d->file, position.LowPart, &position.HighPart, FILE_CURRENT);
   if(GetLastError() == NO_ERROR) {
@@ -444,7 +448,7 @@ offset_t FileStream::tell() const
 
   return static_cast<offset_t>(ftell(d->file));
 
-# endif 
+# endif
 
 #endif
 }
@@ -461,6 +465,7 @@ offset_t FileStream::length()
   LARGE_INTEGER fileSize;
   fileSize.QuadPart = 0;
 
+  SetLastError(NO_ERROR);
   fileSize.LowPart = GetFileSize(d->file, reinterpret_cast<LPDWORD>(&fileSize.HighPart));
   if(GetLastError() == NO_ERROR) {
     return fileSize.QuadPart;
@@ -500,6 +505,8 @@ void FileStream::truncate(offset_t length)
   const offset_t currentPos = tell();
 
   seek(length);
+
+  SetLastError(NO_ERROR);
   SetEndOfFile(d->file);
   if(GetLastError() != NO_ERROR) {
     debug("File::truncate() -- Failed to truncate the file.");

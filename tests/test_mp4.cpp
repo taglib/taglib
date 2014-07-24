@@ -158,6 +158,7 @@ public:
 
     f->tag()->itemListMap()["pgap"] = true;
     f->save();
+    delete f;
 
     f = new MP4::File(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(true, f->tag()->itemListMap()["cpil"].toBool());
@@ -167,6 +168,7 @@ public:
     moov = atoms->atoms[0];
     // original size + 'pgap' size + padding
     CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
+    delete f;
   }
 
   void testGnre()
@@ -231,7 +233,7 @@ public:
   void testProperties()
   {
     MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
-    
+
     PropertyMap tags = f.properties();
 
     CPPUNIT_ASSERT_EQUAL(StringList("Test Artist"), tags["ARTIST"]);

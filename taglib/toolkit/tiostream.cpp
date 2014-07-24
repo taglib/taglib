@@ -34,10 +34,10 @@ using namespace TagLib;
 # include "tsmartptr.h"
 # include <windows.h>
 
-namespace 
+namespace
 {
   // Check if the running system has CreateFileW() function.
-  // Windows9x systems don't have CreateFileW() or can't accept Unicode file names. 
+  // Windows9x systems don't have CreateFileW() or can't accept Unicode file names.
 
   bool supportsUnicode()
   {
@@ -50,11 +50,11 @@ namespace
   }
 
   // Indicates whether the system supports Unicode file names.
-  
-  const bool SystemSupportsUnicode = supportsUnicode(); 
+
+  const bool SystemSupportsUnicode = supportsUnicode();
 
   // Converts a UTF-16 string into a local encoding.
-  // This function should only be used in Windows9x systems which don't support 
+  // This function should only be used in Windows9x systems which don't support
   // Unicode file names.
 
   std::string unicodeToAnsi(const wchar_t *wstr)
@@ -83,21 +83,19 @@ namespace
 class FileName::FileNamePrivate
 {
 public:
-  FileNamePrivate() 
-    : data(new FileNameData()) 
-  {
-  }
+  FileNamePrivate() :
+    data(new FileNameData()) {}
 
   SHARED_PTR<FileNameData> data;
 };
 
-FileName::FileName()
-  : d(new FileNamePrivate())
+FileName::FileName() :
+  d(new FileNamePrivate())
 {
 }
 
-FileName::FileName(const wchar_t *name)
-  : d(new FileNamePrivate())
+FileName::FileName(const wchar_t *name) :
+  d(new FileNamePrivate())
 {
   // If WinNT, stores a Unicode string into wname directly.
   // If Win9x, converts and stores it into name to avoid calling Unicode version functions.
@@ -108,14 +106,14 @@ FileName::FileName(const wchar_t *name)
     d->data->name = unicodeToAnsi(name);
 }
 
-FileName::FileName(const char *name) 
-  : d(new FileNamePrivate())
+FileName::FileName(const char *name) :
+  d(new FileNamePrivate())
 {
   d->data->name = name;
 }
 
-FileName::FileName(const FileName &name) 
-  : d(new FileNamePrivate())
+FileName::FileName(const FileName &name) :
+  d(new FileNamePrivate())
 {
   *d = *name.d;
 }
@@ -131,21 +129,21 @@ FileName &FileName::operator=(const FileName &name)
   return *this;
 }
 
-const std::wstring &FileName::wstr() const 
-{ 
-  return d->data->wname; 
+const std::wstring &FileName::wstr() const
+{
+  return d->data->wname;
 }
 
-const std::string &FileName::str() const 
-{ 
+const std::string &FileName::str() const
+{
   return d->data->name;
-}  
+}
 
 String FileName::toString() const
 {
   if(!d->data->wname.empty()) {
     return String(d->data->wname);
-  } 
+  }
   else if(!d->data->name.empty()) {
     const int len = MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, NULL, 0);
     if(len == 0)

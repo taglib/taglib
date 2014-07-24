@@ -48,11 +48,6 @@
 namespace
 {
 
-  inline unsigned short combine(unsigned char c1, unsigned char c2)
-  {
-    return (c1 << 8) | c2;
-  }
-
   void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
 #ifdef HAVE_STD_CODECVT
@@ -151,10 +146,8 @@ namespace TagLib {
 class String::StringPrivate
 {
 public:
-  StringPrivate()
-    : data(new std::wstring())
-  {
-  }
+  StringPrivate() :
+    data(new std::wstring()) {}
 
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian.
@@ -174,18 +167,18 @@ const size_t String::npos = std::wstring::npos;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-String::String()
-  : d(new StringPrivate())
+String::String() :
+  d(new StringPrivate())
 {
 }
 
-String::String(const String &s)
-  : d(new StringPrivate(*s.d))
+String::String(const String &s) :
+  d(new StringPrivate(*s.d))
 {
 }
 
-String::String(const std::string &s, Type t)
-  : d(new StringPrivate())
+String::String(const std::string &s, Type t) :
+  d(new StringPrivate())
 {
   if(t == Latin1)
     copyFromLatin1(s.c_str(), s.length());
@@ -196,8 +189,8 @@ String::String(const std::string &s, Type t)
   }
 }
 
-String::String(const std::wstring &s, Type t)
-  : d(new StringPrivate())
+String::String(const std::wstring &s, Type t) :
+  d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s.c_str(), s.length(), t);
@@ -206,8 +199,8 @@ String::String(const std::wstring &s, Type t)
   }
 }
 
-String::String(const wchar_t *s, Type t)
-  : d(new StringPrivate())
+String::String(const wchar_t *s, Type t) :
+  d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s, ::wcslen(s), t);
@@ -216,8 +209,8 @@ String::String(const wchar_t *s, Type t)
   }
 }
 
-String::String(const char *s, Type t)
-  : d(new StringPrivate())
+String::String(const char *s, Type t) :
+  d(new StringPrivate())
 {
   if(t == Latin1)
     copyFromLatin1(s, ::strlen(s));
@@ -228,8 +221,8 @@ String::String(const char *s, Type t)
   }
 }
 
-String::String(wchar_t c, Type t)
-  : d(new StringPrivate())
+String::String(wchar_t c, Type t) :
+  d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
@@ -238,8 +231,8 @@ String::String(wchar_t c, Type t)
   }
 }
 
-String::String(char c, Type t)
-  : d(new StringPrivate())
+String::String(char c, Type t) :
+  d(new StringPrivate())
 {
   if(t == Latin1)
     copyFromLatin1(&c, 1);
@@ -250,8 +243,8 @@ String::String(char c, Type t)
   }
 }
 
-String::String(const ByteVector &v, Type t)
-  : d(new StringPrivate())
+String::String(const ByteVector &v, Type t) :
+  d(new StringPrivate())
 {
   if(v.isEmpty())
     return;
@@ -746,7 +739,12 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 
   d->data->resize(length / 2);
   for(size_t i = 0; i < length / 2; ++i) {
-    (*d->data)[i] = swap ? combine(*s, *(s + 1)) : combine(*(s + 1), *s);
+    ushort c;
+    ::memcpy(&c, s, 2);
+    if(swap)
+      c = Utils::byteSwap(c);
+
+    (*d->data)[i] = static_cast<wchar_t>(c);
     s += 2;
   }
 }
