@@ -34,4 +34,7 @@
 /* Indicates whether debug messages are shown even in release mode */
 #cmakedefine   TRACE_IN_RELEASE 1
 
+/* Indicates whether debug messages are shown */
+#cmakedefine   NDEBUG 1
+
 #cmakedefine TESTS_DIR "@TESTS_DIR@"

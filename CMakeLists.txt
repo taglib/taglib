@@ -100,6 +100,11 @@ if(TRACE_IN_RELEASE)
   set(TRACE_IN_RELEASE TRUE)
 endif()
 
+option( NDEBUG "Do not output debug messages"  OFF )
+if(NDEBUG)
+  set(NDEBUG TRUE)
+endif()
+
 configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
 
 add_subdirectory(taglib) 
