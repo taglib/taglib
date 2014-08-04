@@ -394,15 +394,7 @@ void FileStream::seek(offset_t offset, Position p)
     return;
   }
 
-# ifdef _LARGEFILE_SOURCE
-
   fseeko(d->file, offset, whence);
-
-# else
-
-  fseek(d->file, static_cast<long>(offset), whence);
-
-# endif
 
 #endif
 }
@@ -440,15 +432,7 @@ offset_t FileStream::tell() const
 
 #else
 
-# ifdef _LARGEFILE_SOURCE
-
   return ftello(d->file);
-
-# else
-
-  return static_cast<offset_t>(ftell(d->file));
-
-# endif
 
 #endif
 }
