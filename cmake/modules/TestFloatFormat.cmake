@@ -2,12 +2,13 @@
 
 MACRO(TEST_FLOAT_FORMAT FP_IEEE754)
   IF(NOT FP_IEEE754)
-    TRY_COMPILE(HAVE_${FP_IEEE754} "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/cmake/TestFloatFormat.c"
+    TRY_COMPILE(HAVE_FLOAT_FORMAT_BIN
+      "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}/cmake/TestFloatFormat.c"
     COPY_FILE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/TestFloatFormat.bin")
 
     SET(FP_IEEE754 0)
 
-    IF(HAVE_${FP_IEEE754})
+    IF(HAVE_FLOAT_FORMAT_BIN)
 
       # dont match first/last letter because of string rounding errors :-)
       FILE(STRINGS "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/TestFloatFormat.bin"
