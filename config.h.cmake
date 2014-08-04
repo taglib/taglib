@@ -8,6 +8,9 @@
 /* 1 if little-endian, 2 if big-endian. */
 #cmakedefine   FLOAT_BYTEORDER  ${FLOAT_BYTEORDER}
 
+/* Defined if long is 64-bit wide */
+#cmakedefine   LONG_IS_INT64    ${LONG_IS_INT64}
+
 /* Defined if your compiler supports some byte swap functions */
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1
 #cmakedefine   HAVE_GCC_BYTESWAP_32 1
