@@ -154,7 +154,7 @@ public:
 
     MP4::Atoms *atoms = new MP4::Atoms(f);
     MP4::Atom *moov = atoms->atoms[0];
-    CPPUNIT_ASSERT_EQUAL(long(77), moov->length);
+    CPPUNIT_ASSERT_EQUAL(offset_t(77), moov->length);
 
     f->tag()->itemListMap()["pgap"] = true;
     f->save();
@@ -167,7 +167,7 @@ public:
     atoms = new MP4::Atoms(f);
     moov = atoms->atoms[0];
     // original size + 'pgap' size + padding
-    CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
+    CPPUNIT_ASSERT_EQUAL(offset_t(77 + 25 + 974), moov->length);
     delete f;
   }
 

@@ -27,6 +27,7 @@
 #define TAGLIB_LIST_H
 
 #include "taglib.h"
+#include <cstddef>
 #include <list>
 
 namespace TagLib {
