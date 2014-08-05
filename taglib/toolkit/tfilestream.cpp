@@ -85,10 +85,14 @@ namespace
 
 #else   // _WIN32
 
-  struct FileNameHandle : public std::string
+  class FileNameHandle
   {
-    FileNameHandle(FileName name) : std::string(name) {}
-    operator FileName () const { return c_str(); }
+  private:
+    std::string name;
+
+  public:
+    FileNameHandle(FileName n) : name(n) {}
+    FileName toFileName() const { return name.c_str(); }
   };
 
   typedef FILE* FileHandle;
@@ -122,12 +126,10 @@ namespace
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName)
-    : file(InvalidFileHandle)
-    , name(fileName)
-    , readOnly(true)
-  {
-  }
+  FileStreamPrivate(const FileName &fileName) :
+    file(InvalidFileHandle),
+    name(fileName),
+    readOnly(true) {}
 
   FileHandle file;
   FileNameHandle name;
@@ -138,8 +140,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileStream::FileStream(FileName fileName, bool openReadOnly)
-  : d(new FileStreamPrivate(fileName))
+FileStream::FileStream(FileName fileName, bool openReadOnly) :
+  d(new FileStreamPrivate(fileName))
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
@@ -156,7 +158,7 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
 # ifdef _WIN32
     debug("Could not open file " + fileName.toString());
 # else
-    debug("Could not open file " + String(static_cast<const char *>(d->name)));
+    debug("Could not open file " + String(d->name.toFileName()));
 # endif
   }
 }
@@ -171,7 +173,11 @@ FileStream::~FileStream()
 
 FileName FileStream::name() const
 {
+# ifdef _WIN32
   return d->name;
+# else
+  return d->name.toFileName();
+# endif
 }
 
 ByteVector FileStream::readBlock(ulong length)
