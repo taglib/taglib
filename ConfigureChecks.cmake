@@ -8,6 +8,7 @@ include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 include(TestFloatFormat)
+include(TestLargeFiles)
 
 # Determine whether your compiler supports C++0x/C++11 and enable it if possible.
 # This check covers GCC, Clang and ICC.
@@ -74,6 +75,15 @@ elseif(${FP_IEEE754} EQUAL 2)
   set(FLOAT_BYTEORDER 2)
 else()
   MESSAGE(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
+endif()
+
+# Determine whether your compiler supports large files.
+
+if(NOT WIN32)
+  test_large_files(SUPPORT_LARGE_FILES)
+  if(NOT SUPPORT_LARGE_FILES)
+    MESSAGE(FATAL_ERROR "TagLib requires large files support.")
+  endif()
 endif()
 
 # Determine which kind of atomic operations your compiler supports.
