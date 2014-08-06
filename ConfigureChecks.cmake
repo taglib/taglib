@@ -220,16 +220,6 @@ if(NOT HAVE_SNPRINTF)
   " HAVE_SPRINTF_S)
 endif()
 
-# Determine whether your compiler supports codecvt.
-
-check_cxx_source_compiles("
-  #include <codecvt>
-  int main() { 
-    std::codecvt_utf8_utf16<wchar_t> x; 
-    return 0; 
-  }
-" HAVE_STD_CODECVT)
-
 # Check for libz using the cmake supplied FindZLIB.cmake
 
 if(NOT ZLIB_SOURCE)

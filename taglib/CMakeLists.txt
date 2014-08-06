@@ -303,8 +303,13 @@ set(toolkit_SRCS
   toolkit/tpropertymap.cpp
   toolkit/trefcounter.cpp
   toolkit/tdebuglistener.cpp
-  toolkit/unicode.cpp
 )
+
+if(NOT WIN32)
+  set(unicode_SRCS
+    toolkit/unicode.cpp
+  )
+endif()
 
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS
@@ -323,13 +328,14 @@ set(tag_LIB_SRCS
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
+  ${unicode_SRCS} ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
   audioproperties.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${zlib_SRCS} ${tag_HDRS})
+add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
   target_link_libraries(tag ${ZLIB_LIBRARIES})
@@ -348,10 +354,9 @@ if(BUILD_FRAMEWORK)
 endif()
 
 install(TARGETS tag
-	FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
-	LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-	RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-	ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-	PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
+  FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
+  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
 )
-

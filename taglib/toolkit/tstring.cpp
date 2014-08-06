@@ -39,101 +39,72 @@
 #include <cstdio>
 #include <cstring>
 
-#ifdef HAVE_STD_CODECVT
-# include <codecvt>
+#ifdef _WIN32
+# include <windows.h>
 #else
 # include "unicode.h"
 #endif
 
 namespace
 {
+  using namespace TagLib;
 
-  void UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
+  inline void UTF16toUTF8(
+    const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
-#ifdef HAVE_STD_CODECVT
+#ifdef _WIN32
 
-    typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
-
-    using namespace TagLib;
-
-    const wchar_t *srcBegin = src;
-    const wchar_t *srcEnd   = srcBegin + srcLength;
-
-    char *dstBegin = dst;
-    char *dstEnd   = dstBegin + dstLength;
-
-    std::mbstate_t st;
-    const wchar_t *source;
-    char *target;
-    memset(&st, 0, sizeof(st));
-    std::codecvt_base::result result = utf8_utf16_t().out(
-      st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
-
-    if(result != utf8_utf16_t::ok) {
+    const int len = ::WideCharToMultiByte(
+      CP_UTF8, 0, src, srcLength, dst, dstLength, NULL, NULL);
+    if(len == 0) {
       debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
 
 #else
 
     using namespace Unicode;
-    using namespace TagLib;
 
-    const Unicode::UTF16 *srcBegin = src;
-    const Unicode::UTF16 *srcEnd   = srcBegin + srcLength;
+    const UTF16 *srcBegin = src;
+    const UTF16 *srcEnd   = srcBegin + srcLength;
 
-    Unicode::UTF8 *dstBegin = reinterpret_cast<Unicode::UTF8*>(dst);
-    Unicode::UTF8 *dstEnd   = dstBegin + dstLength;
+    UTF8 *dstBegin = reinterpret_cast<UTF8*>(dst);
+    UTF8 *dstEnd   = dstBegin + dstLength;
 
-    Unicode::ConversionResult result = Unicode::ConvertUTF16toUTF8(
-      &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
+    ConversionResult result = ConvertUTF16toUTF8(
+      &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
 
-    if(result != Unicode::conversionOK) {
+    if(result != conversionOK) {
       debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
 
 #endif
   }
 
-  void UTF8toUTF16(const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
+  inline void UTF8toUTF16(
+    const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
   {
-#ifdef HAVE_STD_CODECVT
+#ifdef _WIN32
 
-    typedef std::codecvt_utf8_utf16<wchar_t> utf8_utf16_t;
-
-    using namespace TagLib;
-
-    const char *srcBegin = src;
-    const char *srcEnd   = srcBegin + srcLength;
-
-    wchar_t *dstBegin = dst;
-    wchar_t *dstEnd   = dstBegin + dstLength;
-
-    std::mbstate_t st;
-    const char *source;
-    wchar_t *target;
-    memset(&st, 0, sizeof(st));
-    std::codecvt_base::result result = utf8_utf16_t().in(
-      st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
-
-    if(result != utf8_utf16_t::ok) {
+    const int len = ::MultiByteToWideChar(
+      CP_UTF8, 0, src, srcLength, dst, dstLength);
+    if (len == 0) {
       debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
 
 #else
 
     using namespace Unicode;
-    using namespace TagLib;
 
-    const Unicode::UTF8 *srcBegin = reinterpret_cast<const Unicode::UTF8*>(src);
-    const Unicode::UTF8 *srcEnd   = srcBegin + srcLength;
+    const UTF8 *srcBegin = reinterpret_cast<const UTF8*>(src);
+    const UTF8 *srcEnd   = srcBegin + srcLength;
 
-    Unicode::UTF16 *dstBegin = dst;
-    Unicode::UTF16 *dstEnd   = dstBegin + dstLength;
+    UTF16 *dstBegin = dst;
+    UTF16 *dstEnd   = dstBegin + dstLength;
 
-    Unicode::ConversionResult result = Unicode::ConvertUTF8toUTF16(
-      &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
+    ConversionResult result = ConvertUTF8toUTF16(
+      &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
 
-    if(result != Unicode::conversionOK) {
+    if(result != conversionOK) {
       debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
 
