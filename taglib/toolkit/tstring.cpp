@@ -38,6 +38,8 @@
 #include <iostream>
 #include <cstring>
 #include <cwchar>
+#include <cerrno>
+#include <climits>
 
 #ifdef HAVE_STD_CODECVT
 # include <codecvt>
@@ -472,13 +474,18 @@ int String::toInt(bool *ok) const
 {
   const wchar_t *begin = d->data->c_str();
   wchar_t *end;
-  const int value = static_cast<int>(::wcstol(begin, &end, 10));
+  errno = 0;
+  const long value = ::wcstol(begin, &end, 10);
 
-  // Has wcstol() consumed the entire string?
-  if(ok)
-    *ok = (end > begin && *end == L'\0');
+  // Has wcstol() consumed the entire string and not overflowed?
+  if(ok) {
+    *ok = (errno == 0 && end > begin && *end == L'\0');
+#if LONG_MAX > INT_MAX
+    *ok = (*ok && value > INT_MIN && value < INT_MAX);
+#endif
+  }
 
-  return value;
+  return static_cast<int>(value);
 }
 
 String String::stripWhiteSpace() const
