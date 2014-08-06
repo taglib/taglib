@@ -177,7 +177,7 @@ FileName FileStream::name() const
 ByteVector FileStream::readBlock(ulong length)
 {
   if(!isOpen()) {
-    debug("File::readBlock() -- invalid file.");
+    debug("FileStream::readBlock() -- invalid file.");
     return ByteVector::null;
   }
 
@@ -199,12 +199,12 @@ ByteVector FileStream::readBlock(ulong length)
 void FileStream::writeBlock(const ByteVector &data)
 {
   if(!isOpen()) {
-    debug("File::writeBlock() -- invalid file.");
+    debug("FileStream::writeBlock() -- invalid file.");
     return;
   }
 
   if(readOnly()) {
-    debug("File::writeBlock() -- read only file.");
+    debug("FileStream::writeBlock() -- read only file.");
     return;
   }
 
@@ -214,12 +214,12 @@ void FileStream::writeBlock(const ByteVector &data)
 void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
 {
   if(!isOpen()) {
-    debug("File::insert() -- invalid file.");
+    debug("FileStream::insert() -- invalid file.");
     return;
   }
 
   if(readOnly()) {
-    debug("File::insert() -- read only file.");
+    debug("FileStream::insert() -- read only file.");
     return;
   }
 
@@ -296,7 +296,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
 void FileStream::removeBlock(ulong start, ulong length)
 {
   if(!isOpen()) {
-    debug("File::removeBlock() -- invalid file.");
+    debug("FileStream::removeBlock() -- invalid file.");
     return;
   }
 
@@ -343,7 +343,7 @@ bool FileStream::isOpen() const
 void FileStream::seek(long offset, Position p)
 {
   if(!isOpen()) {
-    debug("File::seek() -- invalid file.");
+    debug("FileStream::seek() -- invalid file.");
     return;
   }
 
@@ -372,7 +372,7 @@ void FileStream::seek(long offset, Position p)
     SetFilePointer(d->file, 0, NULL, FILE_BEGIN);
   }
   if(GetLastError() != NO_ERROR) {
-    debug("File::seek() -- Failed to set the file pointer.");
+    debug("FileStream::seek() -- Failed to set the file pointer.");
   }
 
 #else
@@ -421,7 +421,7 @@ long FileStream::tell() const
     return static_cast<long>(position);
   }
   else {
-    debug("File::tell() -- Failed to get the file pointer.");
+    debug("FileStream::tell() -- Failed to get the file pointer.");
     return 0;
   }
 
@@ -435,7 +435,7 @@ long FileStream::tell() const
 long FileStream::length()
 {
   if(!isOpen()) {
-    debug("File::length() -- invalid file.");
+    debug("FileStream::length() -- invalid file.");
     return 0;
   }
 
@@ -447,7 +447,7 @@ long FileStream::length()
     return static_cast<ulong>(fileSize);
   }
   else {
-    debug("File::length() -- Failed to get the file size.");
+    debug("FileStream::length() -- Failed to get the file size.");
     return 0;
   }
 
@@ -480,7 +480,7 @@ void FileStream::truncate(long length)
   SetLastError(NO_ERROR);
   SetEndOfFile(d->file);
   if(GetLastError() != NO_ERROR) {
-    debug("File::truncate() -- Failed to truncate the file.");
+    debug("FileStream::truncate() -- Failed to truncate the file.");
   }
 
   seek(currentPos);

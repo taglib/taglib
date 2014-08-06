@@ -70,7 +70,7 @@ namespace
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
 
 #else
@@ -88,7 +88,7 @@ namespace
       &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::to8Bit() - Unicode conversion error.");
+      debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
 
 #endif
@@ -116,7 +116,7 @@ namespace
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
 
 #else
@@ -134,7 +134,7 @@ namespace
       &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
 
 #endif
@@ -197,7 +197,7 @@ String::String(const std::string &s, Type t)
   else if(t == String::UTF8)
     copyFromUTF8(s.c_str(), s.length());
   else {
-    debug("String::String() -- A std::string should not contain UTF16.");
+    debug("String::String() -- std::string should not contain UTF16.");
   }
 }
 
@@ -215,7 +215,7 @@ String::String(const wstring &s, Type t)
     copyFromUTF16(s.c_str(), s.length(), t);
   }
   else {
-    debug("String::String() -- A TagLib::wstring should not contain Latin1 or UTF-8.");
+    debug("String::String() -- TagLib::wstring should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -233,7 +233,7 @@ String::String(const wchar_t *s, Type t)
     copyFromUTF16(s, ::wcslen(s), t);
   }
   else {
-    debug("String::String() -- A const wchar_t * should not contain Latin1 or UTF-8.");
+    debug("String::String() -- const wchar_t * should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -245,7 +245,7 @@ String::String(const char *s, Type t)
   else if(t == String::UTF8)
     copyFromUTF8(s, ::strlen(s));
   else {
-    debug("String::String() -- A const char * should not contain UTF16.");
+    debug("String::String() -- const char * should not contain UTF16.");
   }
 }
 
@@ -255,7 +255,7 @@ String::String(wchar_t c, Type t)
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
   else {
-    debug("String::String() -- A const wchar_t should not contain Latin1 or UTF-8.");
+    debug("String::String() -- wchar_t should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -263,7 +263,7 @@ String::String(char c, Type t)
   : d(new StringPrivate(1, static_cast<uchar>(c)))
 {
   if(t != Latin1 && t != UTF8) {
-    debug("String::String() -- A char should not contain UTF16.");
+    debug("String::String() -- char should not contain UTF16.");
   }
 }
 
