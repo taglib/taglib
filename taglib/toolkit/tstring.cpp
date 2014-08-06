@@ -70,7 +70,7 @@ namespace
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("UTF16toUTF8() - Unicode conversion error.");
     }
 
 #else
@@ -88,7 +88,7 @@ namespace
       &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::to8Bit() - Unicode conversion error.");
+      debug("UTF16toUTF8() - Unicode conversion error.");
     }
 
 #endif
@@ -116,7 +116,7 @@ namespace
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("UTF8toUTF16() - Unicode conversion error.");
     }
 
 #else
@@ -134,7 +134,7 @@ namespace
       &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("UTF8toUTF16() - Unicode conversion error.");
     }
 
 #endif
@@ -255,7 +255,7 @@ String::String(wchar_t c, Type t)
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
   else {
-    debug("String::String() -- A const wchar_t should not contain Latin1 or UTF-8.");
+    debug("String::String() -- A wchar_t should not contain Latin1 or UTF-8.");
   }
 }
 
