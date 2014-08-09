@@ -7,6 +7,7 @@ include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 include(TestFloatFormat)
+include(TestLargeFiles)
 
 # Check if the size of numeric types are suitable.
 
@@ -59,6 +60,15 @@ elseif(${FP_IEEE754} EQUAL 2)
   set(FLOAT_BYTEORDER 2)
 else()
   MESSAGE(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
+endif()
+
+# Determine whether your compiler supports large files.
+
+if(NOT WIN32)
+  test_large_files(SUPPORT_LARGE_FILES)
+  if(NOT SUPPORT_LARGE_FILES)
+    MESSAGE(FATAL_ERROR "TagLib requires large files support.")
+  endif()
 endif()
 
 # Determine which kind of byte swap functions your compiler supports.

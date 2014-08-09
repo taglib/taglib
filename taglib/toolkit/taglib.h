@@ -36,19 +36,6 @@
 #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long>(x)
 #endif
 
-#ifdef _WIN32
-# if !defined(NOMINMAX)
-#   define NOMINMAX
-# endif
-# include <windows.h>
-#else
-# ifndef _LARGEFILE_SOURCE
-#   define _LARGEFILE_SOURCE
-# endif
-# define _FILE_OFFSET_BITS 64
-# include <sys/types.h>
-#endif
-
 //! A namespace for all TagLib related classes and functions
 
 /*!
@@ -59,7 +46,7 @@
  * \endcode
  */
 
-namespace TagLib 
+namespace TagLib
 {
   typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
   typedef unsigned char      uchar;
@@ -68,15 +55,10 @@ namespace TagLib
   typedef unsigned long long ulonglong;
 
   // long/ulong can be either 32-bit or 64-bit wide.
-  typedef unsigned long  ulong;
+  typedef unsigned long      ulong;
 
-  // Offset or length type for I/O streams.  
-  // In Win32, always signed 64-bit. Otherwise, equivalent to off_t.
-#ifdef _WIN32
-  typedef LONGLONG offset_t;
-#else
-  typedef off_t    offset_t;
-#endif
+  // Offset or length type for I/O streams. Always signed 64-bit.
+  typedef long long          offset_t;
 
   enum ByteOrder
   {

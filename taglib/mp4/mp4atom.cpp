@@ -39,7 +39,7 @@ MP4::Atom::Atom(File *file)
 {
   offset = file->tell();
   ByteVector header = file->readBlock(8);
-  if (header.size() != 8) {
+  if(header.size() != 8) {
     // The atom header must be 8 bytes long, otherwise there is either
     // trailing garbage or the file is truncated
     debug("MP4: Couldn't read 8 bytes of data for atom header");
@@ -50,20 +50,10 @@ MP4::Atom::Atom(File *file)
 
   length = header.toUInt32BE(0);
 
-  if (length == 1) {
-    const long long longLength = file->readBlock(8).toInt64BE(0);
-    if (longLength >= 8 && longLength <= 0xFFFFFFFF) {
-      // The atom has a 64-bit length, but it's actually a 32-bit value
-      length = (long)longLength;
-    }
-    else {
-      debug("MP4: 64-bit atoms are not supported");
-      length = 0;
-      file->seek(0, File::End);
-      return;
-    }
+  if(length == 1) {
+    length = file->readBlock(8).toInt64BE(0);
   }
-  if (length < 8) {
+  if(length < 8) {
     debug("MP4: Invalid atom size");
     length = 0;
     file->seek(0, File::End);
@@ -83,7 +73,7 @@ MP4::Atom::Atom(File *file)
       while(file->tell() < offset + length) {
         MP4::Atom *child = new MP4::Atom(file);
         children.append(child);
-        if (child->length == 0)
+        if(child->length == 0)
           return;
       }
       return;
