@@ -49,7 +49,7 @@ namespace
 {
   using namespace TagLib;
 
-  inline void UTF16toUTF8(
+  inline size_t UTF16toUTF8(
     const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
 #ifdef _WIN32
@@ -59,6 +59,7 @@ namespace
     if(len == 0) {
       debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
+    return len;
 
 #else
 
@@ -73,23 +74,29 @@ namespace
     ConversionResult result = ConvertUTF16toUTF8(
       &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
 
-    if(result != conversionOK) {
+    if(result == conversionOK) {
+      return (dstBegin - reinterpret_cast<UTF8*>(dst));
+    }
+    else
+    {
       debug("String::UTF16toUTF8() - Unicode conversion error.");
+      return 0;
     }
 
 #endif
   }
 
-  inline void UTF8toUTF16(
+  inline size_t UTF8toUTF16(
     const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
   {
 #ifdef _WIN32
 
     const int len = ::MultiByteToWideChar(
       CP_UTF8, 0, src, srcLength, dst, dstLength);
-    if (len == 0) {
+    if(len == 0) {
       debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
+    return len;
 
 #else
 
@@ -104,8 +111,12 @@ namespace
     ConversionResult result = ConvertUTF8toUTF16(
       &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
 
-    if(result != conversionOK) {
+    if(result == conversionOK) {
+      return (dstBegin - dst);
+    }
+    else {
       debug("String::UTF8toUTF16() - Unicode conversion error.");
+      return 0;
     }
 
 #endif
@@ -410,8 +421,9 @@ ByteVector String::data(Type t) const
     {
       ByteVector v(size() * 4 + 1, 0);
 
-      UTF16toUTF8(d->data.c_str(), d->data.size(), v.data(), v.size());
-      v.resize(::strlen(v.data()));
+      const size_t len = UTF16toUTF8(
+        d->data.c_str(), d->data.size(), v.data(), v.size());
+      v.resize(len);
 
       return v;
     }
@@ -744,8 +756,8 @@ void String::copyFromUTF8(const char *s, size_t length)
   d->data.resize(length);
 
   if(length >  0) {
-    UTF8toUTF16(s, length, &d->data[0], d->data.size());
-    d->data.resize(::wcslen(d->data.c_str()));
+    const size_t len = UTF8toUTF16(s, length, &d->data[0], d->data.size());
+    d->data.resize(len);
   }
 }
 
