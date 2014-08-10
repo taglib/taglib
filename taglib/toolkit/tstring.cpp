@@ -568,30 +568,7 @@ bool String::isAscii() const
 
 String String::number(int n) // static
 {
-  static const size_t BufferSize = 11; // Sufficient to store "-214748364".
-  static const char *Format = "%d";
-
-  char buffer[BufferSize];
-  int length;
-
-#if defined(HAVE_SNPRINTF)
-
-  length = snprintf(buffer, BufferSize, Format, n);
-
-#elif defined(HAVE_SPRINTF_S)
-
-  length = sprintf_s(buffer, Format, n);
-
-#else
-
-  length = sprintf(buffer, Format, n);
-
-#endif
-
-  if(length > 0)
-    return String(buffer);
-  else
-    return String::null;
+  return Utils::formatString("%d", n);
 }
 
 TagLib::wchar &String::operator[](int i)
