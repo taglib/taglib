@@ -58,42 +58,6 @@ namespace TagLib {
     typedef List<Frame *> FrameList;
     typedef Map<ByteVector, FrameList> FrameListMap;
 
-    //! An abstraction for the ISO-8859-1 string to data encoding in ID3v2 tags.
-
-    /*!
-     * ID3v2 tag can store strings in ISO-8859-1 (Latin1), and TagLib only 
-     * supports genuine ISO-8859-1 by default.  However, in practice, non 
-     * ISO-8859-1 encodings are often used instead of ISO-8859-1, such as 
-     * Windows-1252 for western languages, Shift_JIS for Japanese and so on.
-     *
-     * Here is an option to read such tags by subclassing this class,
-     * reimplementing parse() and setting your reimplementation as the default 
-     * with ID3v2::Tag::setStringHandler().
-     *
-     * \note Writing non-ISO-8859-1 tags is not implemented intentionally.
-     * Use UTF-16 or UTF-8 instead.
-     *
-     * \see ID3v2::Tag::setStringHandler()
-     */
-    class TAGLIB_EXPORT Latin1StringHandler : public TagLib::StringHandler
-    {
-    public:
-      Latin1StringHandler();
-
-      /*!
-       * Decode a string from \a data.  The default implementation assumes that
-       * \a data is an ISO-8859-1 (Latin1) character array.
-       */
-      virtual String parse(const ByteVector &data) const;
-
-      /*!
-       * Encode a ByteVector with the data from \a s.
-       *
-       * \note Not implemented intentionally.  Always returns empty \s ByteVector.
-       */
-      virtual ByteVector render(const String &s) const;
-    };
-
     //! The main class in the ID3v2 implementation
 
     /*!
@@ -360,14 +324,15 @@ namespace TagLib {
        */
       // BIC: combine with the above method
       ByteVector render(int version) const;
-      
+
       /*!
-       * Gets the current string handler that decides how the "Latin-1" data 
+       * Gets the current string handler that decides how the "Latin-1" data
        * will be converted to and from binary data.
        *
        * \see Latin1StringHandler
+       * \see setLatin1StringHandler()
        */
-      static TagLib::StringHandler const *latin1StringHandler();
+      static StringHandler *latin1StringHandler();
 
       /*!
        * Sets the string handler that decides how the "Latin-1" data will be
@@ -376,11 +341,12 @@ namespace TagLib {
        * released and default ISO-8859-1 handler is restored.
        *
        * \note The caller is responsible for deleting the previous handler
-       * as needed after it is released. 
+       * as needed after it is released.
        *
        * \see Latin1StringHandler
+       * \see latin1StringHandler()
        */
-      static void setLatin1StringHandler(const TagLib::StringHandler *handler);
+      static void setLatin1StringHandler(StringHandler *handler);
 
     protected:
       /*!
