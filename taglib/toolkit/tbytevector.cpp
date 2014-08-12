@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -102,9 +98,9 @@ static const uint crcTable[256] = {
 };
 
 /*!
-  * A templatized straightforward find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
+ * A templatized straightforward find that works with the types
+ * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
+ */
 template <class TIterator>
 int findChar(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -128,9 +124,9 @@ int findChar(
 }
 
 /*!
-  * A templatized KMP find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
+ * A templatized KMP find that works with the types
+ * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
+ */
 template <class TIterator>
 int findVector(
   const TIterator dataBegin, const TIterator dataEnd,
