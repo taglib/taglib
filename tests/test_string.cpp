@@ -56,6 +56,14 @@ public:
 
     char str[] = "taglib string";
     CPPUNIT_ASSERT(strcmp(s.toCString(), str) == 0);
+    CPPUNIT_ASSERT(s == "taglib string");
+    CPPUNIT_ASSERT(s != "taglib STRING");
+    CPPUNIT_ASSERT(s != "taglib");
+    CPPUNIT_ASSERT(s != "taglib string taglib");
+    CPPUNIT_ASSERT(s == L"taglib string");
+    CPPUNIT_ASSERT(s != L"taglib STRING");
+    CPPUNIT_ASSERT(s != L"taglib");
+    CPPUNIT_ASSERT(s != L"taglib string taglib");
 
     String unicode("José Carlos", String::UTF8);
     CPPUNIT_ASSERT(strcmp(unicode.toCString(), "Jos\xe9 Carlos") == 0);
@@ -73,8 +81,8 @@ public:
     String unicode2(unicode.to8Bit(true), String::UTF8);
     CPPUNIT_ASSERT(unicode == unicode2);
 
-	String unicode3(L"\u65E5\u672C\u8A9E");
-	CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
+    String unicode3(L"\u65E5\u672C\u8A9E");
+    CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
 
     String unicode4(L"\u65e5\u672c\u8a9e", String::UTF16BE);
     CPPUNIT_ASSERT(unicode4[1] == L'\u672c');

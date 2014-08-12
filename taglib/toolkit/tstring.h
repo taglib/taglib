@@ -398,6 +398,30 @@ namespace TagLib {
     bool operator!=(const String &s) const;
 
     /*!
+     * Compares each character of the String with each character of \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const char *s) const;
+
+    /*!
+     * Compares each character of the String with each character of \a s and
+     * returns false if the strings match.
+     */
+    bool operator!=(const char *s) const;
+
+    /*!
+     * Compares each character of the String with each character of \a s and
+     * returns true if the strings match.
+     */
+    bool operator==(const wchar_t *s) const;
+
+    /*!
+     * Compares each character of the String with each character of \a s and
+     * returns false if the strings match.
+     */
+    bool operator!=(const wchar_t *s) const;
+
+    /*!
      * Appends \a s to the end of the String.
      */
     String &operator+=(const String &s);
