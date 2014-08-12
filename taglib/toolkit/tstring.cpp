@@ -52,14 +52,11 @@ namespace
   inline size_t UTF16toUTF8(
     const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
+    size_t len = 0;
+
 #ifdef _WIN32
 
-    const int len = ::WideCharToMultiByte(
-      CP_UTF8, 0, src, srcLength, dst, dstLength, NULL, NULL);
-    if(len == 0) {
-      debug("String::UTF16toUTF8() - Unicode conversion error.");
-    }
-    return len;
+    len = ::WideCharToMultiByte(CP_UTF8, 0, src, srcLength, dst, dstLength, NULL, NULL);
 
 #else
 
@@ -74,29 +71,25 @@ namespace
     ConversionResult result = ConvertUTF16toUTF8(
       &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
 
-    if(result == conversionOK) {
-      return (dstBegin - reinterpret_cast<UTF8*>(dst));
-    }
-    else
-    {
-      debug("String::UTF16toUTF8() - Unicode conversion error.");
-      return 0;
-    }
+    if(result == conversionOK)
+      len = dstBegin - reinterpret_cast<UTF8*>(dst);
 
 #endif
+
+    if(len == 0)
+      debug("String::UTF16toUTF8() - Unicode conversion error.");
+
+    return len;
   }
 
   inline size_t UTF8toUTF16(
     const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
   {
+    size_t len = 0;
+
 #ifdef _WIN32
 
-    const int len = ::MultiByteToWideChar(
-      CP_UTF8, 0, src, srcLength, dst, dstLength);
-    if(len == 0) {
-      debug("String::UTF8toUTF16() - Unicode conversion error.");
-    }
-    return len;
+    len = ::MultiByteToWideChar(CP_UTF8, 0, src, srcLength, dst, dstLength);
 
 #else
 
@@ -111,15 +104,15 @@ namespace
     ConversionResult result = ConvertUTF8toUTF16(
       &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
 
-    if(result == conversionOK) {
-      return (dstBegin - dst);
-    }
-    else {
-      debug("String::UTF8toUTF16() - Unicode conversion error.");
-      return 0;
-    }
+    if(result == conversionOK)
+      len = dstBegin - dst;
 
 #endif
+
+    if(len == 0)
+      debug("String::UTF8toUTF16() - Unicode conversion error.");
+
+    return len;
   }
 }
 
