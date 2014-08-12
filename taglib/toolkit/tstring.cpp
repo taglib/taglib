@@ -607,12 +607,39 @@ const TagLib::wchar &String::operator[](int i) const
 
 bool String::operator==(const String &s) const
 {
-  return d == s.d || d->data == s.d->data;
+  return (d == s.d || d->data == s.d->data);
 }
 
 bool String::operator!=(const String &s) const
 {
-  return !operator==(s);
+  return !(*this == s);
+}
+
+bool String::operator==(const char *s) const
+{
+  const wchar_t *p = toCWString();
+
+  while(*p != L'\0' || *s != '\0')
+  {
+    if(*p++ != static_cast<uchar>(*s++))
+      return false;
+  }
+  return true;
+}
+
+bool String::operator!=(const char *s) const
+{
+  return !(*this == s);
+}
+
+bool String::operator==(const wchar_t *s) const
+{
+  return (::wcscmp(toCWString(), s) == 0);
+}
+
+bool String::operator!=(const wchar_t *s) const
+{
+  return !(*this == s);
 }
 
 String &String::operator+=(const String &s)
