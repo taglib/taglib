@@ -161,15 +161,12 @@ int findVector(
     lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
 
   TIterator it = dataBegin + patternSize - 1 + offset;
-  while(true)
-  {
+  while(true) {
     TIterator itBuffer = it;
     TIterator itPattern = patternBegin + patternSize - 1;
 
-    while(*itBuffer == *itPattern)
-    {
-      if(itPattern == patternBegin)
-      {
+    while(*itBuffer == *itPattern) {
+      if(itPattern == patternBegin) {
         if((itBuffer - dataBegin - offset) % byteAlign == 0)
           return (itBuffer - dataBegin);
         else
@@ -243,7 +240,7 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 template <typename TFloat, typename TInt, Utils::ByteOrder ENDIAN>
 TFloat toFloat(const ByteVector &v, size_t offset)
 {
-  if (offset > v.size() - sizeof(TInt)) {
+  if(offset > v.size() - sizeof(TInt)) {
     debug("toFloat() - offset is out of range. Returning 0.");
     return 0.0;
   }

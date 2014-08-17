@@ -347,16 +347,13 @@ int String::rfind(const String &s, int offset) const
 StringList String::split(const String &separator) const
 {
   StringList list;
-  for(int index = 0;;)
-  {
+  for(int index = 0;;) {
     int sep = find(separator, index);
-    if(sep < 0)
-    {
+    if(sep < 0) {
       list.append(substr(index, size() - index));
       break;
     }
-    else
-    {
+    else {
       list.append(substr(index, sep - index));
       index = sep + separator.size();
     }
@@ -619,8 +616,7 @@ bool String::operator==(const char *s) const
 {
   const wchar_t *p = toCWString();
 
-  while(*p != L'\0' || *s != '\0')
-  {
+  while(*p != L'\0' || *s != '\0') {
     if(*p++ != static_cast<uchar>(*s++))
       return false;
   }
@@ -634,7 +630,7 @@ bool String::operator!=(const char *s) const
 
 bool String::operator==(const wchar_t *s) const
 {
-  return (::wcscmp(toCWString(), s) == 0);
+  return (d->data == s);
 }
 
 bool String::operator!=(const wchar_t *s) const
