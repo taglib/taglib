@@ -41,6 +41,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testToHex);
   CPPUNIT_TEST(testNumericCoversion);
   CPPUNIT_TEST(testReplace);
+  CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -288,6 +289,36 @@ public:
       a.replace(ByteVector("bf"), ByteVector("x"));
       CPPUNIT_ASSERT_EQUAL(ByteVector("abcdax"), a);
     }
+  }
+
+  void testIterator()
+  {
+    ByteVector v1("taglib");
+    ByteVector v2 = v1;
+
+    ByteVector::Iterator it1 = v1.begin();
+    ByteVector::Iterator it2 = v2.begin();
+
+    CPPUNIT_ASSERT_EQUAL('t', *it1);
+    CPPUNIT_ASSERT_EQUAL('t', *it2);
+
+    std::advance(it1, 4);
+    std::advance(it2, 4);
+    *it2 = 'I';
+    CPPUNIT_ASSERT_EQUAL('i', *it1);
+    CPPUNIT_ASSERT_EQUAL('I', *it2);
+
+    ByteVector::ReverseIterator it3 = v1.rbegin();
+    ByteVector::ReverseIterator it4 = v2.rbegin();
+
+    CPPUNIT_ASSERT_EQUAL('b', *it3);
+    CPPUNIT_ASSERT_EQUAL('b', *it4);
+
+    std::advance(it3, 4);
+    std::advance(it4, 4);
+    *it4 = 'A';
+    CPPUNIT_ASSERT_EQUAL('a', *it3);
+    CPPUNIT_ASSERT_EQUAL('A', *it4);
   }
 
 };

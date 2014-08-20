@@ -51,8 +51,13 @@ public:
     l3.append(3);
     l3.append(4);
     CPPUNIT_ASSERT(l1 == l3);
+    
+    List<int> l4 = l1;
+    List<int>::Iterator it = l4.find(3);
+    *it = 33;
+    CPPUNIT_ASSERT_EQUAL(l1[2], 3);
+    CPPUNIT_ASSERT_EQUAL(l4[2], 33);
   }
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestList);

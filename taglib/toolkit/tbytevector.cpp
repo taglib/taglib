@@ -711,7 +711,8 @@ ByteVector &ByteVector::resize(uint size, char padding)
 
 ByteVector::Iterator ByteVector::begin()
 {
-  return d->data->data.begin() + d->offset;
+  detach();
+  return d->data->data.begin();
 }
 
 ByteVector::ConstIterator ByteVector::begin() const
@@ -721,7 +722,8 @@ ByteVector::ConstIterator ByteVector::begin() const
 
 ByteVector::Iterator ByteVector::end()
 {
-  return d->data->data.begin() + d->offset + d->length;
+  detach();
+  return d->data->data.end();
 }
 
 ByteVector::ConstIterator ByteVector::end() const
@@ -731,8 +733,8 @@ ByteVector::ConstIterator ByteVector::end() const
 
 ByteVector::ReverseIterator ByteVector::rbegin()
 {
-  std::vector<char> &v = d->data->data;
-  return v.rbegin() + (v.size() - (d->offset + d->length));
+  detach();
+  return d->data->data.rbegin();
 }
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
@@ -743,8 +745,8 @@ ByteVector::ConstReverseIterator ByteVector::rbegin() const
 
 ByteVector::ReverseIterator ByteVector::rend()
 {
-  std::vector<char> &v = d->data->data;
-  return v.rbegin() + (v.size() - d->offset);
+  detach();
+  return d->data->data.rend();
 }
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
