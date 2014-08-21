@@ -329,7 +329,7 @@ public:
   uint read(TagLib::File &file, uint limit)
   {
     uint sumcount = 0;
-    for(List<Reader*>::Iterator i = m_readers.begin();
+    for(List<Reader*>::ConstIterator i = m_readers.begin();
         limit > 0 && i != m_readers.end(); ++ i) {
       uint count = (*i)->read(file, limit);
       limit    -= count;

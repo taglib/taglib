@@ -356,7 +356,7 @@ void ID3v2::Tag::removeFrame(Frame *frame, bool del)
 void ID3v2::Tag::removeFrames(const ByteVector &id)
 {
   FrameList l = d->frameListMap[id];
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     removeFrame(*it, true);
 }
 
@@ -469,7 +469,7 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   ID3v2::TextIdentificationFrame *frameTDRC = 0;
   ID3v2::TextIdentificationFrame *frameTIPL = 0;
   ID3v2::TextIdentificationFrame *frameTMCL = 0;
-  for(FrameList::Iterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
+  for(FrameList::ConstIterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
     ID3v2::Frame *frame = *it;
     ByteVector frameID = frame->header()->frameID();
     for(int i = 0; unsupportedFrames[i]; i++) {
@@ -583,7 +583,7 @@ ByteVector ID3v2::Tag::render(int version) const
     downgradeFrames(&frameList, &newFrames);
   }
 
-  for(FrameList::Iterator it = frameList.begin(); it != frameList.end(); it++) {
+  for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
     if((*it)->header()->frameID().size() != 4) {
       debug("A frame of unsupported or unknown type \'"

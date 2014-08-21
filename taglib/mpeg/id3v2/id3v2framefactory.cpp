@@ -268,22 +268,22 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   if(frameID == "PRIV")
     return new PrivateFrame(data, header);
-  
+
   // Ownership (frames 4.22)
-  
+
   if(frameID == "OWNE") {
     OwnershipFrame *f = new OwnershipFrame(data, header);
     d->setTextEncoding(f);
     return f;
   }
-  
+
   // Chapter (ID3v2 chapters 1.0)
-  
+
   if(frameID == "CHAP")
     return new ChapterFrame(data, header);
-  
+
   // Table of contents (ID3v2 chapters 1.0)
-  
+
   if(frameID == "CTOC")
     return new TableOfContentsFrame(data, header);
 
@@ -458,7 +458,7 @@ void FrameFactory::updateGenre(TextIdentificationFrame *frame) const
   StringList fields = frame->fieldList();
   StringList newfields;
 
-  for(StringList::Iterator it = fields.begin(); it != fields.end(); ++it) {
+  for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
     String s = *it;
     int end = s.find(")");
 
