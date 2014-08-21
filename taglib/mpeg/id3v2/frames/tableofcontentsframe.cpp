@@ -63,7 +63,7 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &eID, const ByteVect
   d->elementID = eID;
   d->childElements = ch;
   FrameList l = eF;
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     addEmbeddedFrame(*it);
   d->factory = FrameFactory::instance();
 }
@@ -170,7 +170,7 @@ void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 void TableOfContentsFrame::removeEmbeddedFrames(const ByteVector &id)
 {
   FrameList l = d->embeddedFrameListMap[id];
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     removeEmbeddedFrame(*it, true);
 }
 
@@ -278,7 +278,7 @@ ByteVector TableOfContentsFrame::renderFields() const
     it++;
   }
   FrameList l = d->embeddedFrameList;
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     data.append((*it)->render());
 
   return data;

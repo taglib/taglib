@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
       char field = argv[i][1];
       TagLib::String value = argv[i + 1];
 
-      TagLib::List<TagLib::FileRef>::Iterator it;
+      TagLib::List<TagLib::FileRef>::ConstIterator it;
       for(it = fileList.begin(); it != fileList.end(); ++it) {
 
         TagLib::Tag *t = (*it).tag();
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
       usage();
   }
 
-  TagLib::List<TagLib::FileRef>::Iterator it;
+  TagLib::List<TagLib::FileRef>::ConstIterator it;
   for(it = fileList.begin(); it != fileList.end(); ++it)
     (*it).file()->save();
 
