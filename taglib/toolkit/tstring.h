@@ -468,12 +468,12 @@ namespace TagLib {
     String &operator=(const wchar_t *s);
 
     /*!
-     * Performs a deep copy of the data in \a s.
+     * Performs a deep copy of the data in \a c.
      */
     String &operator=(char c);
 
     /*!
-     * Performs a deep copy of the data in \a s.
+     * Performs a deep copy of the data in \a c.
      */
     String &operator=(wchar_t c);
 
@@ -488,9 +488,14 @@ namespace TagLib {
     String &operator=(const ByteVector &v);
 
     /*!
+     * Exchanges the content of the String by the content of \a s.
+     */
+    void swap(String &s);
+
+    /*!
      * To be able to use this class in a Map, this operator needed to be
-     * implemented.  Returns true if \a s is less than this string in a bytewise
-     * comparison.
+     * implemented.  Returns true if \a s is less than this string in a
+     * character-wise comparison.
      */
     bool operator<(const String &s) const;
 

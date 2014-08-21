@@ -527,13 +527,13 @@ ByteVector::~ByteVector()
 
 ByteVector &ByteVector::setData(const char *s, uint length)
 {
-  *this = ByteVector(s, length);
+  ByteVector(s, length).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::setData(const char *data)
 {
-  *this = ByteVector(data);
+  ByteVector(data).swap(*this);
   return *this;
 }
 
@@ -675,8 +675,7 @@ int ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
 
 ByteVector &ByteVector::append(const ByteVector &v)
 {
-  if(v.d->length != 0)
-  {
+  if(!v.isEmpty()) {
     detach();
 
     uint originalSize = size();
@@ -689,7 +688,7 @@ ByteVector &ByteVector::append(const ByteVector &v)
 
 ByteVector &ByteVector::clear()
 {
-  *this = ByteVector();
+  ByteVector().swap(*this);
   return *this;
 }
 
@@ -889,14 +888,14 @@ bool ByteVector::operator<(const ByteVector &v) const
 {
   const int result = ::memcmp(data(), v.data(), std::min(size(), v.size()));
   if(result != 0)
-    return result < 0;
+    return (result < 0);
   else
-    return size() < v.size();
+    return (size() < v.size());
 }
 
 bool ByteVector::operator>(const ByteVector &v) const
 {
-  return v < *this;
+  return (v < *this);
 }
 
 ByteVector ByteVector::operator+(const ByteVector &v) const
@@ -908,27 +907,25 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
-  if(&v == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-
-  d = v.d;
-  d->ref();
+  ByteVector(v).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(char c)
 {
-  *this = ByteVector(c);
+  ByteVector(c).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(const char *data)
 {
-  *this = ByteVector(data);
+  ByteVector(data).swap(*this);
   return *this;
+}
+
+void ByteVector::swap(ByteVector &v)
+{
+  std::swap(d, v.d);
 }
 
 ByteVector ByteVector::toHex() const

@@ -38,19 +38,24 @@ class Map<Key, T>::MapPrivate : public RefCounterOld
 {
 public:
   MapPrivate() : RefCounterOld() {}
+
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
+
   MapPrivate(const std::map<class KeyP, class TP>& m) : RefCounterOld(), map(m) {}
   std::map<class KeyP, class TP> map;
+
 #else
+
   MapPrivate(const std::map<KeyP, TP>& m) : RefCounterOld(), map(m) {}
   std::map<KeyP, TP> map;
+
 #endif
 };
 
 template <class Key, class T>
-Map<Key, T>::Map()
+Map<Key, T>::Map() :
+  d(new MapPrivate<Key, T>())
 {
-  d = new MapPrivate<Key, T>;
 }
 
 template <class Key, class T>
@@ -103,8 +108,7 @@ Map<Key, T> &Map<Key, T>::insert(const Key &key, const T &value)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::clear()
 {
-  detach();
-  d->map.clear();
+  Map<Key, T>().swap(*this);
   return *this;
 }
 
@@ -145,9 +149,7 @@ template <class Key, class T>
 Map<Key, T> &Map<Key,T>::erase(const Key &key)
 {
   detach();
-  Iterator it = d->map.find(key);
-  if(it != d->map.end())
-    d->map.erase(it);
+  d->map.erase(key);
   return *this;
 }
 
@@ -173,27 +175,45 @@ T &Map<Key, T>::operator[](const Key &key)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
-  if(&m == this)
-    return *this;
+  if(d != m.d)
+    Map<Key, T>(m).swap(*this);
 
-  if(d->deref())
-    delete(d);
-  d = m.d;
-  d->ref();
   return *this;
+}
+
+template <class Key, class T>
+void Map<Key, T>::swap(Map<Key, T> &m)
+{
+  std::swap(d, m.d);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef WANT_CLASS_INSTANTIATION_OF_MAP
+
+template <class Key, class T>
+Map<Key, T>::Map(const std::map<class Key, class T> &m) :
+  d(new MapPrivate<Key, T>(m))
+{
+}
+
+#else
+
+template <class Key, class T>
+Map<Key, T>::Map(const std::map<Key, T> &m) :
+  d(new MapPrivate<Key, T>(m))
+{
+}
+
+#endif
+
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
-  if(d->count() > 1) {
-    d->deref();
-    d = new MapPrivate<Key, T>(d->map);
-  }
+  if(d->count() > 1)
+    Map<Key, T>(d->map).swap(*this);
 }
 
 } // namespace TagLib

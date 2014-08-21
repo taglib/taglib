@@ -215,11 +215,16 @@ namespace TagLib {
     const T &operator[](uint i) const;
 
     /*!
-     * Make a shallow, implicitly shared, copy of \a l.  Because this is
+     * Makes a shallow, implicitly shared, copy of \a l.  Because this is
      * implicitly shared, this method is lightweight and suitable for
      * pass-by-value usage.
      */
     List<T> &operator=(const List<T> &l);
+
+    /*!
+     * Exchanges the content of the List by the content of \a l.
+     */
+    void swap(List<T> &l);
 
     /*!
      * Compares this list with \a l and returns true if all of the elements are
@@ -233,6 +238,11 @@ namespace TagLib {
     bool operator!=(const List<T> &l) const;
 
   protected:
+    /*!
+     * Makes a deep copy of \a l.
+     */
+    List(const std::list<T> &l);
+
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
      * data and separate from the shared members.  This should be called by all
