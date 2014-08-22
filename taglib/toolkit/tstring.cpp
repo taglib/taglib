@@ -38,6 +38,8 @@
 #include <iostream>
 #include <cstring>
 #include <cwchar>
+#include <cerrno>
+#include <climits>
 
 #ifdef HAVE_STD_CODECVT
 # include <codecvt>
@@ -70,7 +72,7 @@ namespace
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
 
 #else
@@ -88,7 +90,7 @@ namespace
       &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::to8Bit() - Unicode conversion error.");
+      debug("String::UTF16toUTF8() - Unicode conversion error.");
     }
 
 #endif
@@ -116,7 +118,7 @@ namespace
       st, srcBegin, srcEnd, source, dstBegin, dstEnd, target);
 
     if(result != utf8_utf16_t::ok) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
 
 #else
@@ -134,7 +136,7 @@ namespace
       &srcBegin, srcEnd, &dstBegin, dstEnd, Unicode::lenientConversion);
 
     if(result != Unicode::conversionOK) {
-      debug("String::copyFromUTF8() - Unicode conversion error.");
+      debug("String::UTF8toUTF16() - Unicode conversion error.");
     }
 
 #endif
@@ -185,7 +187,7 @@ String::String(const std::string &s, Type t) :
   else if(t == String::UTF8)
     copyFromUTF8(s.c_str(), s.length());
   else {
-    debug("String::String() -- A std::string should not contain UTF16.");
+    debug("String::String() -- std::string should not contain UTF16.");
   }
 }
 
@@ -195,7 +197,7 @@ String::String(const std::wstring &s, Type t) :
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s.c_str(), s.length(), t);
   else {
-    debug("String::String() -- A TagLib::std::wstring should not contain Latin1 or UTF-8.");
+    debug("String::String() -- std::wstring should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -205,7 +207,7 @@ String::String(const wchar_t *s, Type t) :
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(s, ::wcslen(s), t);
   else {
-    debug("String::String() -- A const wchar_t * should not contain Latin1 or UTF-8.");
+    debug("String::String() -- const wchar_t * should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -217,7 +219,7 @@ String::String(const char *s, Type t) :
   else if(t == String::UTF8)
     copyFromUTF8(s, ::strlen(s));
   else {
-    debug("String::String() -- A const char * should not contain UTF16.");
+    debug("String::String() -- const char * should not contain UTF16.");
   }
 }
 
@@ -227,7 +229,7 @@ String::String(wchar_t c, Type t) :
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(&c, 1, t);
   else {
-    debug("String::String() -- A wchar_t should not contain Latin1 or UTF-8.");
+    debug("String::String() -- wchar_t should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -239,7 +241,7 @@ String::String(char c, Type t) :
   else if(t == String::UTF8)
     copyFromUTF8(&c, 1);
   else {
-    debug("String::String() -- A char should not contain UTF16.");
+    debug("String::String() -- char should not contain UTF16.");
   }
 }
 
@@ -291,6 +293,7 @@ const wchar_t *String::toCWString() const
 
 String::Iterator String::begin()
 {
+  detach();
   return d->data->begin();
 }
 
@@ -301,6 +304,7 @@ String::ConstIterator String::begin() const
 
 String::Iterator String::end()
 {
+  detach();
   return d->data->end();
 }
 
@@ -322,16 +326,13 @@ size_t String::rfind(const String &s, size_t offset) const
 StringList String::split(const String &separator) const
 {
   StringList list;
-  for(size_t index = 0;;)
-  {
+  for(size_t index = 0;;) {
     const size_t sep = find(separator, index);
-    if(sep == npos)
-    {
+    if(sep == npos) {
       list.append(substr(index, size() - index));
       break;
     }
-    else
-    {
+    else {
       list.append(substr(index, sep - index));
       index = sep + separator.size();
     }
@@ -472,13 +473,18 @@ int String::toInt(bool *ok) const
 {
   const wchar_t *begin = d->data->c_str();
   wchar_t *end;
-  const int value = static_cast<int>(::wcstol(begin, &end, 10));
+  errno = 0;
+  const long value = ::wcstol(begin, &end, 10);
 
-  // Has wcstol() consumed the entire string?
-  if(ok)
-    *ok = (end > begin && *end == L'\0');
+  // Has wcstol() consumed the entire string and not overflowed?
+  if(ok) {
+    *ok = (errno == 0 && end > begin && *end == L'\0');
+#if LONG_MAX > INT_MAX
+    *ok = (*ok && value > INT_MIN && value < INT_MAX);
+#endif
+  }
 
-  return value;
+  return static_cast<int>(value);
 }
 
 String String::stripWhiteSpace() const
@@ -532,14 +538,25 @@ bool String::operator==(const String &s) const
   return (d->data == s.d->data || *d->data == *s.d->data);
 }
 
+bool String::operator!=(const String &s) const
+{
+  return !(*this == s);
+}
+
 bool String::operator==(const char *s) const
 {
-  for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
-    if(*it != static_cast<uchar>(*s++))
+  const wchar_t *p = toCWString();
+
+  while(*p != L'\0' || *s != '\0') {
+    if(*p++ != static_cast<uchar>(*s++))
       return false;
   }
-
   return true;
+}
+
+bool String::operator!=(const char *s) const
+{
+  return !(*this == s);
 }
 
 bool String::operator==(const wchar_t *s) const
@@ -547,9 +564,9 @@ bool String::operator==(const wchar_t *s) const
   return (*d->data == s);
 }
 
-bool String::operator!=(const String &s) const
+bool String::operator!=(const wchar_t *s) const
 {
-  return !operator==(s);
+  return !(*this == s);
 }
 
 String &String::operator+=(const String &s)

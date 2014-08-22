@@ -236,7 +236,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
       toRemove.append(remIt->first);
   }
 
-  for (StringList::Iterator removeIt = toRemove.begin(); removeIt != toRemove.end(); removeIt++)
+  for(StringList::ConstIterator removeIt = toRemove.begin(); removeIt != toRemove.end(); removeIt++)
     removeItem(*removeIt);
 
   // now sync in the "forward direction"

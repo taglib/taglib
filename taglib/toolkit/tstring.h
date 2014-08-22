@@ -342,9 +342,9 @@ namespace TagLib {
     /*!
      * Convert the string to an integer.
      *
-     * If the conversion was successfull, it sets the value of \a *ok to
-     * true and returns the integer. Otherwise it sets \a *ok to false
-     * and the result is undefined.
+     * If the conversion was successful, it sets the value of \a *ok to true and
+     * returns the integer.  Otherwise it sets \a *ok to false and the result is
+     * undefined.
      */
     int toInt(bool *ok = 0) const;
 
@@ -385,10 +385,22 @@ namespace TagLib {
     bool operator==(const String &s) const;
 
     /*!
-     * Compares each character of the String with each character in \a s and
+     * Compares each character of the String with each character of \a s and
+     * returns false if the strings match.
+     */
+    bool operator!=(const String &s) const;
+
+    /*!
+     * Compares each character of the String with each character of \a s and
      * returns true if the strings match.
      */
     bool operator==(const char *s) const;
+
+    /*!
+     * Compares each character of the String with each character of \a s and
+     * returns false if the strings match.
+     */
+    bool operator!=(const char *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
@@ -400,7 +412,7 @@ namespace TagLib {
      * Compares each character of the String with each character of \a s and
      * returns false if the strings match.
      */
-    bool operator!=(const String &s) const;
+    bool operator!=(const wchar_t *s) const;
 
     /*!
      * Appends \a s to the end of the String.
