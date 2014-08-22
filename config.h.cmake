@@ -8,6 +8,11 @@
 /* 1 if little-endian, 2 if big-endian. */
 #cmakedefine   FLOAT_BYTEORDER  ${FLOAT_BYTEORDER}
 
+/* Defined if required for large files support */
+#cmakedefine   _LARGE_FILES      ${_LARGE_FILES}
+#cmakedefine   _LARGEFILE_SOURCE ${_LARGEFILE_SOURCE}
+#cmakedefine   _FILE_OFFSET_BITS ${_FILE_OFFSET_BITS}
+
 /* Defined if your compiler supports some atomic operations */
 #cmakedefine   HAVE_STD_ATOMIC 1
 #cmakedefine   HAVE_BOOST_ATOMIC 1
