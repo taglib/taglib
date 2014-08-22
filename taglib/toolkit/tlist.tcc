@@ -239,6 +239,7 @@ template <class T>
 template <class U>
 typename List<T>::Iterator List<T>::find(const U &value)
 {
+  detach();
   return std::find(d->list.begin(), d->list.end(), value);
 }
 

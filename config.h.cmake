@@ -8,6 +8,18 @@
 /* 1 if little-endian, 2 if big-endian. */
 #cmakedefine   FLOAT_BYTEORDER  ${FLOAT_BYTEORDER}
 
+/* Defined if your compiler supports some atomic operations */
+#cmakedefine   HAVE_STD_ATOMIC 1
+#cmakedefine   HAVE_BOOST_ATOMIC 1
+#cmakedefine   HAVE_GCC_ATOMIC 1
+#cmakedefine   HAVE_MAC_ATOMIC 1
+#cmakedefine   HAVE_WIN_ATOMIC 1
+#cmakedefine   HAVE_IA64_ATOMIC 1
+
+/* Defined if your compiler supports shared_ptr */
+#cmakedefine   HAVE_STD_SMART_PTR 1
+#cmakedefine   HAVE_BOOST_SMART_PTR 1
+
 /* Defined if your compiler supports some byte swap functions */
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1
 #cmakedefine   HAVE_GCC_BYTESWAP_32 1
@@ -16,23 +28,6 @@
 #cmakedefine   HAVE_MSC_BYTESWAP 1
 #cmakedefine   HAVE_MAC_BYTESWAP 1
 #cmakedefine   HAVE_OPENBSD_BYTESWAP 1
-
-/* Defined if your compiler supports shared_ptr */
-#cmakedefine   HAVE_STD_SHARED_PTR 1    // #include <memory> / std::shared_ptr<T>
-#cmakedefine   HAVE_TR1_SHARED_PTR 1    // #include <tr1/memory> / std::tr1::shared_ptr<T>
-#cmakedefine   HAVE_BOOST_SHARED_PTR 1  // #include <boost/shared_ptr.hpp> / boost::shared_ptr<T>
-
-/* Defined if your compiler supports unique_ptr or scoped_ptr */
-#cmakedefine   HAVE_STD_UNIQUE_PTR 1    // #include <memory> / std::unique_ptr<T>
-#cmakedefine   HAVE_BOOST_SCOPED_PTR 1  // #include <boost/scoped_ptr.hpp> / boost::scoped_ptr<T>
-
-/* Defined if your compiler supports some atomic operations */
-#cmakedefine   HAVE_STD_ATOMIC 1
-#cmakedefine   HAVE_BOOST_ATOMIC 1
-#cmakedefine   HAVE_GCC_ATOMIC 1
-#cmakedefine   HAVE_MAC_ATOMIC 1
-#cmakedefine   HAVE_WIN_ATOMIC 1
-#cmakedefine   HAVE_IA64_ATOMIC 1
 
 /* Defined if your compiler supports snprintf or sprintf_s. */
 #cmakedefine   HAVE_SNPRINTF 1

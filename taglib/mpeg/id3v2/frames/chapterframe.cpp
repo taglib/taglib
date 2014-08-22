@@ -68,7 +68,7 @@ ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT
   d->startOffset = sO;
   d->endOffset = eO;
   FrameList l = eF;
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     addEmbeddedFrame(*it);
   d->factory = FrameFactory::instance();
 }
@@ -169,7 +169,7 @@ void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 {
   FrameList l = d->embeddedFrameListMap[id];
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     removeEmbeddedFrame(*it, true);
 }
 
@@ -251,7 +251,7 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt32BE(d->startOffset));
   data.append(ByteVector::fromUInt32BE(d->endOffset));
   FrameList l = d->embeddedFrameList;
-  for(FrameList::Iterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     data.append((*it)->render());
 
   return data;

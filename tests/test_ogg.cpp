@@ -88,12 +88,17 @@ public:
     CPPUNIT_ASSERT_EQUAL(size_t(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
     CPPUNIT_ASSERT_EQUAL(String("another value"), tags["UNUSUALTAG"][1]);
-    CPPUNIT_ASSERT_EQUAL(String("öäüoΣø", String::UTF8), tags["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(
+      String("\xC3\xB6\xC3\xA4\xC3\xBC\x6F\xCE\xA3\xC3\xB8", String::UTF8),
+      tags["UNICODETAG"][0]);
 
-    tags["UNICODETAG"][0] = String("νεω ναλυε", String::UTF8);
+    tags["UNICODETAG"][0] = String(
+      "\xCE\xBD\xCE\xB5\xCF\x89\x20\xCE\xBD\xCE\xB1\xCE\xBB\xCF\x85\xCE\xB5", String::UTF8);
     tags.erase("UNUSUALTAG");
     f->tag()->setProperties(tags);
-    CPPUNIT_ASSERT_EQUAL(String("νεω ναλυε", String::UTF8), f->tag()->properties()["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(
+      String("\xCE\xBD\xCE\xB5\xCF\x89\x20\xCE\xBD\xCE\xB1\xCE\xBB\xCF\x85\xCE\xB5", String::UTF8),
+      f->tag()->properties()["UNICODETAG"][0]);
     CPPUNIT_ASSERT_EQUAL(false, f->tag()->properties().contains("UNUSUALTAG"));
 
     delete f;

@@ -46,6 +46,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testNewline);
   CPPUNIT_TEST(testUpper);
   CPPUNIT_TEST(testEncode);
+  CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -109,19 +110,6 @@ public:
 
     String unicode9(stduni, String::UTF16LE);
     CPPUNIT_ASSERT(unicode9[1] == (littleEndian ? L'\u672c' : L'\u2c67'));
-
-    CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);
-    CPPUNIT_ASSERT(strcmp(String::number(12345678).toCString(), "12345678") == 0);
-    CPPUNIT_ASSERT(strcmp(String::number(-12345678).toCString(), "-12345678") == 0);
-
-    String n = "123";
-    CPPUNIT_ASSERT(n.toInt() == 123);
-
-    n = "-123";
-    CPPUNIT_ASSERT(n.toInt() == -123);
-
-    CPPUNIT_ASSERT(String("0").toInt() == 0);
-    CPPUNIT_ASSERT(String("1").toInt() == 1);
 
     CPPUNIT_ASSERT(String("  foo  ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("foo    ").stripWhiteSpace() == String("foo"));
@@ -232,6 +220,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("-123").toInt(&ok), -123);
     CPPUNIT_ASSERT_EQUAL(ok, true);
 
+    CPPUNIT_ASSERT_EQUAL(String("123aa").toInt(&ok), 123);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
+
+    CPPUNIT_ASSERT_EQUAL(String("-123aa").toInt(&ok), -123);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
+
     CPPUNIT_ASSERT_EQUAL(String("abc").toInt(&ok), 0);
     CPPUNIT_ASSERT_EQUAL(ok, false);
 
@@ -244,10 +238,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("-").toInt(&ok), 0);
     CPPUNIT_ASSERT_EQUAL(ok, false);
 
-    CPPUNIT_ASSERT_EQUAL(String("123").toInt(), 123);
-    CPPUNIT_ASSERT_EQUAL(String("-123").toInt(), -123);
-    CPPUNIT_ASSERT_EQUAL(String("123aa").toInt(), 123);
-    CPPUNIT_ASSERT_EQUAL(String("-123aa").toInt(), -123);
+    String("9999999999").toInt(&ok);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
   }
 
   void testFromInt()
@@ -324,6 +316,23 @@ public:
     CPPUNIT_ASSERT(empty7.empty());
   }
 
+  void testIterator()
+  {
+    String s1 = "taglib string";
+    String s2 = s1;
+
+    String::Iterator it1 = s1.begin();
+    String::Iterator it2 = s2.begin();
+
+    CPPUNIT_ASSERT_EQUAL(L't', *it1);
+    CPPUNIT_ASSERT_EQUAL(L't', *it2);
+
+    std::advance(it1, 4);
+    std::advance(it2, 4);
+    *it2 = L'I';
+    CPPUNIT_ASSERT_EQUAL(L'i', *it1);
+    CPPUNIT_ASSERT_EQUAL(L'I', *it2);
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestString);

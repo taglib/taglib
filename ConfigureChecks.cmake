@@ -4,9 +4,25 @@ include(CheckSymbolExists)
 include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckTypeSize)
+include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
 include(TestFloatFormat)
+
+# Determine whether your compiler supports C++0x/C++11 and enable it if possible.
+# This check covers GCC, Clang and ICC.
+
+if(NOT MSVC AND NOT CMAKE_CXX_FLAGS MATCHES "-std=^\\s+")
+  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_FLAG_CXX11)
+  if(COMPILER_FLAG_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  else()
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_FLAG_CXX0X)
+    if(COMPILER_FLAG_CXX0X)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    endif()
+  endif()
+endif()
 
 # Check if the size of numeric types are suitable.
 
@@ -43,7 +59,6 @@ endif()
 # Determine the CPU byte order.
 
 test_big_endian(IS_BIG_ENDIAN)
-
 if(NOT IS_BIG_ENDIAN)
   set(SYSTEM_BYTEORDER 1)
 else()
@@ -59,6 +74,100 @@ elseif(${FP_IEEE754} EQUAL 2)
   set(FLOAT_BYTEORDER 2)
 else()
   MESSAGE(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
+endif()
+
+# Determine which kind of atomic operations your compiler supports.
+
+check_cxx_source_compiles("
+  #include <atomic>
+  int main() {
+    std::atomic<unsigned int> x;
+    x.fetch_add(1);
+    x.fetch_sub(1);
+    return 0;
+  }
+" HAVE_STD_ATOMIC)
+
+if(NOT HAVE_STD_ATOMIC)
+  check_cxx_source_compiles("
+    #include <boost/atomic.hpp>
+    int main() {
+      boost::atomic<unsigned int> x(1);
+      x.fetch_add(1);
+      x.fetch_sub(1);
+      return 0;
+    }
+  " HAVE_BOOST_ATOMIC)
+
+  if(NOT HAVE_BOOST_ATOMIC)
+    check_cxx_source_compiles("
+      int main() {
+        volatile int x;
+        __sync_add_and_fetch(&x, 1);
+        int y = __sync_sub_and_fetch(&x, 1);
+        return 0;
+      }
+    " HAVE_GCC_ATOMIC)
+
+    if(NOT HAVE_GCC_ATOMIC)
+      check_cxx_source_compiles("
+        #include <libkern/OSAtomic.h>
+        int main() {
+          volatile int32_t x;
+          OSAtomicIncrement32Barrier(&x);
+          int32_t y = OSAtomicDecrement32Barrier(&x);
+          return 0;
+        }
+      " HAVE_MAC_ATOMIC)
+
+      if(NOT HAVE_MAC_ATOMIC)
+        check_cxx_source_compiles("
+          #include <windows.h>
+          int main() {
+            volatile LONG x;
+            InterlockedIncrement(&x);
+            LONG y = InterlockedDecrement(&x);
+            return 0;
+          }
+        " HAVE_WIN_ATOMIC)
+
+        if(NOT HAVE_WIN_ATOMIC)
+          check_cxx_source_compiles("
+            #include <ia64intrin.h>
+            int main() {
+              volatile int x;
+              __sync_add_and_fetch(&x, 1);
+              int y = __sync_sub_and_fetch(&x, 1);
+              return 0;
+            }
+          " HAVE_IA64_ATOMIC)
+        endif()
+      endif()
+    endif()
+  endif()
+endif()
+
+# Determine which kind of smart pointers your compiler supports.
+
+check_cxx_source_compiles("
+  #include <memory>
+  int main() {
+    std::shared_ptr<int> x;
+    std::unique_ptr<int> y;
+    return 0;
+  }
+" HAVE_STD_SMART_PTR)
+
+if(NOT HAVE_STD_SMART_PTR)
+  check_cxx_source_compiles("
+    #include <boost/shared_ptr.hpp>
+    #include <boost/scoped_ptr.hpp>
+    int main() {
+      boost::shared_ptr<int> x;
+      boost::scoped_ptr<int> y;
+      return 0;
+    }
+  " HAVE_BOOST_SMART_PTR)
 endif()
 
 # Determine which kind of byte swap functions your compiler supports.
@@ -134,112 +243,6 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
-# Determine where shared_ptr<T> is defined regardless of C++11 support.
-
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::shared_ptr<int> x; return 0; }
-" HAVE_STD_SHARED_PTR)
-
-if(NOT HAVE_STD_SHARED_PTR)
-  check_cxx_source_compiles("
-    #include <tr1/memory>
-    int main() { std::tr1::shared_ptr<int> x; return 0; }
-  " HAVE_TR1_SHARED_PTR)
-
-  if(NOT HAVE_TR1_SHARED_PTR)
-    check_cxx_source_compiles("
-      #include <boost/shared_ptr.hpp>
-      int main() { boost::shared_ptr<int> x; return 0; }
-    " HAVE_BOOST_SHARED_PTR)
-  endif()
-endif()
-
-# Determine where unique_ptr<T> or scoped_ptr<T> is defined regardless of C++11 support.
-
-check_cxx_source_compiles("
-  #include <memory>
-  int main() { std::unique_ptr<int> x; return 0; }
-" HAVE_STD_UNIQUE_PTR)
-
-if(NOT HAVE_STD_UNIQUE_PTR)
-  check_cxx_source_compiles("
-    #include <boost/scoped_ptr.hpp>
-    int main() { boost::scoped_ptr<int> x; return 0; }
-  " HAVE_BOOST_SCOPED_PTR)
-endif()
-
-# Determine which kind of atomic operations your compiler supports.
-
-check_cxx_source_compiles("
-  #include <atomic>
-  int main() {
-    std::atomic<unsigned int> x;
-    x.fetch_add(1);
-    x.fetch_sub(1);
-    return 0;
-  }
-" HAVE_STD_ATOMIC)
-
-if(NOT HAVE_STD_ATOMIC)
-  check_cxx_source_compiles("
-    #include <boost/atomic.hpp>
-    int main() {
-      boost::atomic<unsigned int> x(1);
-      x.fetch_add(1);
-      x.fetch_sub(1);
-      return 0;
-    }
-  " HAVE_BOOST_ATOMIC)
-
-  if(NOT HAVE_BOOST_ATOMIC)
-    check_cxx_source_compiles("
-      int main() {
-        volatile int x;
-        __sync_add_and_fetch(&x, 1);
-        int y = __sync_sub_and_fetch(&x, 1);
-        return 0;
-      }
-    " HAVE_GCC_ATOMIC)
-
-    if(NOT HAVE_GCC_ATOMIC)
-      check_cxx_source_compiles("
-        #include <libkern/OSAtomic.h>
-        int main() {
-          volatile int32_t x;
-          OSAtomicIncrement32Barrier(&x);
-          int32_t y = OSAtomicDecrement32Barrier(&x);
-          return 0;
-        }
-      " HAVE_MAC_ATOMIC)
-
-      if(NOT HAVE_MAC_ATOMIC)
-        check_cxx_source_compiles("
-          #include <windows.h>
-          int main() {
-            volatile LONG x;
-            InterlockedIncrement(&x);
-            LONG y = InterlockedDecrement(&x);
-            return 0;
-          }
-        " HAVE_WIN_ATOMIC)
-
-        if(NOT HAVE_WIN_ATOMIC)
-          check_cxx_source_compiles("
-            #include <ia64intrin.h>
-            int main() {
-              volatile int x;
-              __sync_add_and_fetch(&x, 1);
-              int y = __sync_sub_and_fetch(&x, 1);
-              return 0;
-            }
-          " HAVE_IA64_ATOMIC)
-        endif()
-      endif()
-    endif()
-  endif()
-endif()
-
 # Determine whether your compiler supports snprintf or sprintf_s.
 
 check_cxx_source_compiles("
@@ -286,8 +289,6 @@ if(NOT ZLIB_SOURCE)
 endif()
 
 # Determine whether CppUnit is installed.
-
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 find_package(CppUnit)
 if(NOT CppUnit_FOUND AND BUILD_TESTS)

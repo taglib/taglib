@@ -161,15 +161,12 @@ size_t findVector(
     lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
 
   TIterator it = dataBegin + patternSize - 1 + offset;
-  while(true)
-  {
+  while(true) {
     TIterator itBuffer  = it;
     TIterator itPattern = patternBegin + patternSize - 1;
 
-    while(*itBuffer == *itPattern)
-    {
-      if(itPattern == patternBegin)
-      {
+    while(*itBuffer == *itPattern) {
+      if(itPattern == patternBegin) {
         if((itBuffer - dataBegin - offset) % byteAlign == 0)
           return (itBuffer - dataBegin);
         else
@@ -193,32 +190,27 @@ size_t findVector(
 template <typename T, size_t LENGTH, ByteOrder ENDIAN>
 inline T toNumber(const ByteVector &v, size_t offset)
 {
-  static const bool swap = (ENDIAN != Utils::SystemByteOrder);
-
-  if(LENGTH >= sizeof(T) && offset + LENGTH <= v.size())
-  {
+  if(LENGTH == sizeof(T) && offset + LENGTH <= v.size()) {
     // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
     T tmp;
     ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-    if(swap)
+    if(ENDIAN != Utils::SystemByteOrder)
       return Utils::byteSwap(tmp);
     else
       return tmp;
   }
-  else if(offset < v.size())
-  {
+  else if(offset < v.size()) {
     const size_t length = std::min(LENGTH, v.size() - offset);
     T sum = 0;
-    for(size_t i = 0; i < length; i++) {
-      const size_t shift = (swap ? length - 1 - i : i) * 8;
+    for(size_t i = 0; i < length; ++i) {
+      const size_t shift = (ENDIAN == BigEndian ? length - 1 - i : i) * 8;
       sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
     }
 
     return sum;
   }
-  else
-  {
+  else {
     debug("toNumber<T>() - offset is out of range. Returning 0.");
     return 0;
   }
@@ -236,7 +228,7 @@ inline ByteVector fromNumber(T value)
 template <typename TFloat, typename TInt, ByteOrder ENDIAN>
 TFloat toFloat(const ByteVector &v, size_t offset)
 {
-  if (offset > v.size() - sizeof(TInt)) {
+  if(offset > v.size() - sizeof(TInt)) {
     debug("toFloat() - offset is out of range. Returning 0.");
     return 0.0;
   }
@@ -657,7 +649,8 @@ ByteVector &ByteVector::resize(size_t size, char padding)
 
 ByteVector::Iterator ByteVector::begin()
 {
-  return d->data->begin() + d->offset;
+  detach();
+  return d->data->begin();
 }
 
 ByteVector::ConstIterator ByteVector::begin() const
@@ -667,7 +660,8 @@ ByteVector::ConstIterator ByteVector::begin() const
 
 ByteVector::Iterator ByteVector::end()
 {
-  return d->data->begin() + d->offset + d->length;
+  detach();
+  return d->data->end();
 }
 
 ByteVector::ConstIterator ByteVector::end() const
@@ -677,26 +671,24 @@ ByteVector::ConstIterator ByteVector::end() const
 
 ByteVector::ReverseIterator ByteVector::rbegin()
 {
-  std::vector<char> &v = *(d->data);
-  return v.rbegin() + (v.size() - (d->offset + d->length));
+  detach();
+  return d->data->rbegin();
 }
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  std::vector<char> &v = *(d->data);
-  return v.rbegin() + (v.size() - (d->offset + d->length));
+  return d->data->rbegin() + (d->data->size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
 {
-  std::vector<char> &v = *(d->data);
-  return v.rbegin() + (v.size() - d->offset);
+  detach();
+  return d->data->rend();
 }
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  std::vector<char> &v = *(d->data);
-  return v.rbegin() + (v.size() - d->offset);
+  return d->data->rbegin() + (d->data->size() - d->offset);
 }
 
 bool ByteVector::isNull() const
