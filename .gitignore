@@ -42,3 +42,5 @@ CMakeFiles/
 /taglib/tag.dir/Release
 /ALL_BUILD.dir
 /ZERO_CHECK.dir
+taglib.xcodeproj
+CMakeScripts
