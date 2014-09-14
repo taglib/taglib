@@ -207,6 +207,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), frame->mimeType());
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FileIcon, frame->type());
     CPPUNIT_ASSERT_EQUAL(String("d"), frame->description());
+
+    delete frame;
   }
 
   void testDontRender22()

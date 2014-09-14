@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <string>
 #include <fstream>
@@ -26,7 +27,9 @@ inline string testFilePath(const string &filename)
 
 inline string copyFile(const string &filename, const string &ext)
 {
-  string newname = string(tempnam(NULL, NULL)) + ext;
+  char *newname_c = tempnam(NULL, NULL);
+  string newname = string(newname_c) + ext;
+  free(newname_c);
   string oldname = testFilePath(filename) + ext;
 #ifdef _WIN32
   CopyFileA(oldname.c_str(), newname.c_str(), FALSE);
