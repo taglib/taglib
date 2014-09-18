@@ -142,6 +142,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("82,164"), f->tag()->itemListMap()["----:com.apple.iTunes:replaygain_track_minmax"].toStringList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
     CPPUNIT_ASSERT_EQUAL(String("foo"), f->tag()->comment());
+    delete f;
   }
 
   void test64BitAtom()
@@ -158,6 +159,7 @@ public:
 
     f->tag()->itemListMap()["pgap"] = true;
     f->save();
+    delete atoms;
     delete f;
 
     f = new MP4::File(filename.c_str());
@@ -168,6 +170,7 @@ public:
     moov = atoms->atoms[0];
     // original size + 'pgap' size + padding
     CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
+    delete atoms;
     delete f;
   }
 
