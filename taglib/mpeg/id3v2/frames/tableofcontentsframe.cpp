@@ -54,7 +54,8 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data) :
   setData(data);
 }
 
-TableOfContentsFrame::TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch, const FrameList &eF) :
+TableOfContentsFrame::TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch,
+                                           const FrameList &eF) :
     ID3v2::Frame("CTOC")
 {
   d = new TableOfContentsFramePrivate;
@@ -185,7 +186,8 @@ PropertyMap TableOfContentsFrame::asProperties() const
   return map;
 }
 
-TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag, const ByteVector &eID) // static
+TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag,
+                                                            const ByteVector &eID) // static
 {
   ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
@@ -221,7 +223,9 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
 {
   uint size = data.size();
   if(size < 6) {
-    debug("A CTOC frame must contain at least 6 bytes (1 byte element ID terminated by null, 1 byte flags, 1 byte entry count and 1 byte child element ID terminated by null.");
+    debug("A CTOC frame must contain at least 6 bytes (1 byte element ID terminated by "
+          "null, 1 byte flags, 1 byte entry count and 1 byte child element ID terminated "
+          "by null.");
     return;
   }
 

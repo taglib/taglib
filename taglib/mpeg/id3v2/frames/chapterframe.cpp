@@ -56,7 +56,8 @@ ChapterFrame::ChapterFrame(const ByteVector &data) :
   setData(data);
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO, const uint &eO, const FrameList &eF) :
+ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT,
+                           const uint &sO, const uint &eO, const FrameList &eF) :
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
@@ -204,7 +205,8 @@ void ChapterFrame::parseFields(const ByteVector &data)
 {
   uint size = data.size();
   if(size < 18) {
-    debug("A CHAP frame must contain at least 18 bytes (1 byte element ID terminated by null and 4x4 bytes for start and end time and offset).");
+    debug("A CHAP frame must contain at least 18 bytes (1 byte element ID "
+          "terminated by null and 4x4 bytes for start and end time and offset).");
     return;
   }
 
