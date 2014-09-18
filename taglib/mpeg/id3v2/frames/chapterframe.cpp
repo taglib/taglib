@@ -41,7 +41,6 @@ public:
   uint endTime;
   uint startOffset;
   uint endOffset;
-  const FrameFactory *factory;
   FrameListMap embeddedFrameListMap;
   FrameList embeddedFrameList;
 };
@@ -54,7 +53,6 @@ ChapterFrame::ChapterFrame(const ByteVector &data) :
     ID3v2::Frame(data)
 {
   d = new ChapterFramePrivate;
-  d->factory = FrameFactory::instance();
   setData(data);
 }
 
@@ -70,7 +68,6 @@ ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT
   FrameList l = eF;
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     addEmbeddedFrame(*it);
-  d->factory = FrameFactory::instance();
 }
 
 ChapterFrame::~ChapterFrame()
@@ -225,7 +222,7 @@ void ChapterFrame::parseFields(const ByteVector &data)
   size -= pos;
   while((uint)embPos < size - Frame::headerSize(4))
   {
-    Frame *frame = d->factory->createFrame(data.mid(pos + embPos));
+    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos));
 
     if(!frame)
       return;
@@ -261,6 +258,5 @@ ChapterFrame::ChapterFrame(const ByteVector &data, Header *h) :
   Frame(h)
 {
   d = new ChapterFramePrivate;
-  d->factory = FrameFactory::instance();
   parseFields(fieldData(data));
 }

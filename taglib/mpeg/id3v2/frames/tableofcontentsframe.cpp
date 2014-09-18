@@ -39,7 +39,6 @@ public:
   bool isTopLevel;
   bool isOrdered;
   ByteVectorList childElements;
-  const FrameFactory *factory;
   FrameListMap embeddedFrameListMap;
   FrameList embeddedFrameList;
 };
@@ -52,7 +51,6 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data) :
     ID3v2::Frame(data)
 {
   d = new TableOfContentsFramePrivate;
-  d->factory = FrameFactory::instance();
   setData(data);
 }
 
@@ -65,7 +63,6 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &eID, const ByteVect
   FrameList l = eF;
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     addEmbeddedFrame(*it);
-  d->factory = FrameFactory::instance();
 }
 
 TableOfContentsFrame::~TableOfContentsFrame()
@@ -244,7 +241,7 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
   size -= pos;
   while((uint)embPos < size - Frame::headerSize(4))
   {
-    Frame *frame = d->factory->createFrame(data.mid(pos + embPos));
+    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos));
 
     if(!frame)
       return;
@@ -288,6 +285,5 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data, Header *h) :
   Frame(h)
 {
   d = new TableOfContentsFramePrivate;
-  d->factory = FrameFactory::instance();
   parseFields(fieldData(data));
 }
