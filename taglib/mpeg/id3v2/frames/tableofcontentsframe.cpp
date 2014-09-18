@@ -35,6 +35,11 @@ using namespace ID3v2;
 class TableOfContentsFrame::TableOfContentsFramePrivate
 {
 public:
+  TableOfContentsFramePrivate()
+  {
+    embeddedFrameList.setAutoDelete(true);
+  }
+
   ByteVector elementID;
   bool isTopLevel;
   bool isOrdered;

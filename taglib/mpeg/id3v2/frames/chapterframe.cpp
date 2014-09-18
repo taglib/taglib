@@ -36,6 +36,11 @@ using namespace ID3v2;
 class ChapterFrame::ChapterFramePrivate
 {
 public:
+  ChapterFramePrivate()
+  {
+    embeddedFrameList.setAutoDelete(true);
+  }
+
   ByteVector elementID;
   uint startTime;
   uint endTime;
