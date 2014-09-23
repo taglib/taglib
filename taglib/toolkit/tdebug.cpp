@@ -39,6 +39,10 @@ using namespace TagLib;
 
 namespace
 {
+#if defined(NDEBUG)
+TAGLIB_IGNORE_UNUSED_METHOD
+#endif
+    
   String format(const char *fmt, ...)
   {
     va_list args;
@@ -66,6 +70,10 @@ namespace
     return String(buf);
   }
 }
+
+#if defined(NDEBUG)
+TAGLIB_END_IGNORE
+#endif
 
 namespace TagLib
 {

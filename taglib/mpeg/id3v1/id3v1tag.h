@@ -179,6 +179,8 @@ namespace TagLib {
        */
       static void setStringHandler(const StringHandler *handler);
 
+      TAGLIB_END_IGNORE
+        
     protected:
       /*!
        * Reads from the file specified in the constructor.

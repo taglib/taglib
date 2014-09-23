@@ -64,6 +64,7 @@ namespace TagLib {
 
     class TAGLIB_EXPORT FrameFactory
     {
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
     public:
       static FrameFactory *instance();
       /*!
@@ -139,6 +140,8 @@ namespace TagLib {
        * See the id3v2.4.0-changes.txt document for further information.
        */
       virtual bool updateFrame(Frame::Header *header) const;
+
+      TAGLIB_END_IGNORE
 
     private:
       FrameFactory(const FrameFactory &);

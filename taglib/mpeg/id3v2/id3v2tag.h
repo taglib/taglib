@@ -134,6 +134,7 @@ namespace TagLib {
 
     class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
     public:
       /*!
        * Constructs an empty ID3v2 tag.
@@ -375,6 +376,7 @@ namespace TagLib {
        */
       static void setLatin1StringHandler(const Latin1StringHandler *handler);
 
+      TAGLIB_END_IGNORE
     protected:
       /*!
        * Reads data from the file specified in the constructor.  It does basic
