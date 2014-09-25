@@ -693,7 +693,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       }
 
       d->paddingSize = frameDataLength - frameDataPosition;
-      return;
+      break;
     }
 
     Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
@@ -712,6 +712,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
     frameDataPosition += frame->size() + Frame::headerSize(d->header.majorVersion());
     addFrame(frame);
   }
+
+  d->factory->rebuildAggregateFrames(this);
 }
 
 void ID3v2::Tag::setTextFrame(const ByteVector &id, const String &value)
