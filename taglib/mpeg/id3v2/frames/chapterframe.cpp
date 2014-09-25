@@ -36,11 +36,13 @@ using namespace ID3v2;
 class ChapterFrame::ChapterFramePrivate
 {
 public:
-  ChapterFramePrivate()
+  ChapterFramePrivate() :
+    tagHeader(0)
   {
     embeddedFrameList.setAutoDelete(true);
   }
 
+  const ID3v2::Header *tagHeader;
   ByteVector elementID;
   uint startTime;
   uint endTime;
@@ -54,10 +56,11 @@ public:
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-ChapterFrame::ChapterFrame(const ByteVector &data) :
+ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data) :
     ID3v2::Frame(data)
 {
   d = new ChapterFramePrivate;
+  d->tagHeader = tagHeader;
   setData(data);
 }
 
@@ -228,9 +231,8 @@ void ChapterFrame::parseFields(const ByteVector &data)
   d->endOffset = data.toUInt32BE(pos);
   pos += 4;
   size -= pos;
-  while(embPos < size - Frame::headerSize(4))
-  {
-    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos));
+  while(embPos < size - header()->size()) {
+    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
 
     if(!frame)
       return;
@@ -241,7 +243,7 @@ void ChapterFrame::parseFields(const ByteVector &data)
       return;
     }
 
-    embPos += frame->size() + Frame::headerSize(4);
+    embPos += frame->size() + header()->size();
     addEmbeddedFrame(frame);
   }
 }
@@ -262,9 +264,10 @@ ByteVector ChapterFrame::renderFields() const
   return data;
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &data, Header *h) :
+ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h) :
   Frame(h)
 {
   d = new ChapterFramePrivate;
+  d->tagHeader = tagHeader;
   parseFields(fieldData(data));
 }

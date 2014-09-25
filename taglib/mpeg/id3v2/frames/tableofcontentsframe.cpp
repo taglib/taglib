@@ -35,11 +35,13 @@ using namespace ID3v2;
 class TableOfContentsFrame::TableOfContentsFramePrivate
 {
 public:
-  TableOfContentsFramePrivate()
+  TableOfContentsFramePrivate() :
+    tagHeader(0)
   {
     embeddedFrameList.setAutoDelete(true);
   }
 
+  const ID3v2::Header *tagHeader;
   ByteVector elementID;
   bool isTopLevel;
   bool isOrdered;
@@ -52,7 +54,7 @@ public:
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data) :
+TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data) :
     ID3v2::Frame(data)
 {
   d = new TableOfContentsFramePrivate;
@@ -248,9 +250,8 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
   }
 
   size -= pos;
-  while((uint)embPos < size - Frame::headerSize(4))
-  {
-    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos));
+  while(embPos < size - header()->size()) {
+    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
 
     if(!frame)
       return;
@@ -261,7 +262,7 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
       return;
     }
 
-    embPos += frame->size() + Frame::headerSize(4);
+    embPos += frame->size() + header()->size();
     addEmbeddedFrame(frame);
   }
 }
@@ -290,9 +291,11 @@ ByteVector TableOfContentsFrame::renderFields() const
   return data;
 }
 
-TableOfContentsFrame::TableOfContentsFrame(const ByteVector &data, Header *h) :
+TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader,
+                                           const ByteVector &data, Header *h) :
   Frame(h)
 {
   d = new TableOfContentsFramePrivate;
+  d->tagHeader = tagHeader;
   parseFields(fieldData(data));
 }

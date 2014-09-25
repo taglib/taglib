@@ -280,12 +280,12 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   // Chapter (ID3v2 chapters 1.0)
 
   if(frameID == "CHAP")
-    return new ChapterFrame(data, header);
+    return new ChapterFrame(tagHeader, data, header);
 
   // Table of contents (ID3v2 chapters 1.0)
 
   if(frameID == "CTOC")
-    return new TableOfContentsFrame(data, header);
+    return new TableOfContentsFrame(tagHeader, data, header);
 
   return new UnknownFrame(data, header);
 }

@@ -47,9 +47,10 @@ namespace TagLib {
 
     public:
       /*!
-       * Creates a chapter frame based on \a data.
+       * Creates a chapter frame based on \a data.  \a tagHeader is required as
+       * the internal frames are parsed based on the tag version.
        */
-      ChapterFrame(const ByteVector &data);
+      ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data);
 
       /*!
        * Creates a chapter frame with the element ID \a eID,
@@ -229,10 +230,9 @@ namespace TagLib {
       virtual ByteVector renderFields() const;
 
     private:
+      ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
       ChapterFrame(const ChapterFrame &);
       ChapterFrame &operator=(const ChapterFrame &);
-
-      ChapterFrame(const ByteVector &data, Header *h);
 
       class ChapterFramePrivate;
       ChapterFramePrivate *d;

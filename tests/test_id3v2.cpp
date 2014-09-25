@@ -891,6 +891,7 @@ public:
   void testParseChapterFrame()
   {
     ID3v2::ChapterFrame f(
+      new ID3v2::Header,
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
                  "\x00\x00"                 // Frame flags
@@ -917,7 +918,7 @@ public:
 
   void testRenderChapterFrame()
   {
-    ID3v2::ChapterFrame f("CHAP");
+    ID3v2::ChapterFrame f(new ID3v2::Header, "CHAP");
     f.setElementID(ByteVector("\x43\x00", 2));
     f.setStartTime(3);
     f.setEndTime(5);
@@ -946,6 +947,7 @@ public:
   void testParseTableOfContentsFrame()
   {
     ID3v2::TableOfContentsFrame f(
+      new ID3v2::Header,
       ByteVector("CTOC"                     // Frame ID
                  "\x00\x00\x00\x16"         // Frame size
                  "\x00\x00"                 // Frame flags
@@ -975,7 +977,7 @@ public:
 
   void testRenderTableOfContentsFrame()
   {
-    ID3v2::TableOfContentsFrame f("CTOC");
+    ID3v2::TableOfContentsFrame f(new ID3v2::Header, "CTOC");
     f.setElementID(ByteVector("\x54\x00", 2));
     f.setIsTopLevel(false);
     f.setIsOrdered(true);
