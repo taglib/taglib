@@ -202,8 +202,10 @@ public:
                                  "\x01"
                                  "d\x00"
                                  "\x00", 18);
+    ID3v2::Header header;
+    header.setMajorVersion(2);
     ID3v2::AttachedPictureFrame *frame =
-        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, TagLib::uint(2)));
+        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, &header));
 
     CPPUNIT_ASSERT(frame);
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), frame->mimeType());
@@ -223,8 +225,10 @@ public:
                                  "\x01"
                                  "d\x00"
                                  "\x00", 18);
+    ID3v2::Header header;
+    header.setMajorVersion(2);
     ID3v2::AttachedPictureFrame *frame =
-        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, TagLib::uint(2)));
+        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, &header));
 
     CPPUNIT_ASSERT(frame);
 
@@ -587,8 +591,10 @@ public:
                                  "\x00\x00"             // Frame flags
                                  "\x00"                 // Encoding
                                  "(22)Death Metal", 26);     // Text
+    ID3v2::Header header;
+    header.setMajorVersion(3);
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, TagLib::uint(3)));
+        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
     CPPUNIT_ASSERT_EQUAL(size_t(1), frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("Death Metal"), frame->fieldList()[0]);
 
@@ -606,8 +612,10 @@ public:
                                  "\x00\x00"             // Frame flags
                                  "\x00"                 // Encoding
                                  "(4)Eurodisco", 23);   // Text
+    ID3v2::Header header;
+    header.setMajorVersion(3);
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, TagLib::uint(3)));
+        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
     CPPUNIT_ASSERT_EQUAL(size_t(2), frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("4"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
@@ -625,8 +633,9 @@ public:
                                  "\x00\x00"               // Frame flags
                                  "\0"                   // Encoding
                                  "14\0Eurodisco", 23);     // Text
+    ID3v2::Header header;
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, TagLib::uint(4)));
+        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
     CPPUNIT_ASSERT_EQUAL(size_t(2), frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("14"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
