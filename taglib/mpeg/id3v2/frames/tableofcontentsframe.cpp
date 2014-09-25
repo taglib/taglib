@@ -58,6 +58,7 @@ TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader, const
     ID3v2::Frame(data)
 {
   d = new TableOfContentsFramePrivate;
+  d->tagHeader = tagHeader;
   setData(data);
 }
 
