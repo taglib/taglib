@@ -208,14 +208,15 @@ ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVec
 
 void ChapterFrame::parseFields(const ByteVector &data)
 {
-  uint size = data.size();
+  size_t size = data.size();
   if(size < 18) {
     debug("A CHAP frame must contain at least 18 bytes (1 byte element ID "
           "terminated by null and 4x4 bytes for start and end time and offset).");
     return;
   }
 
-  size_t pos = 0, embPos = 0;
+  size_t pos = 0;
+  size_t embPos = 0;
   d->elementID = readStringField(data, String::Latin1, pos).data(String::Latin1);
   d->elementID.append(char(0));
   d->startTime = data.toUInt32BE(pos);
@@ -227,7 +228,7 @@ void ChapterFrame::parseFields(const ByteVector &data)
   d->endOffset = data.toUInt32BE(pos);
   pos += 4;
   size -= pos;
-  while((uint)embPos < size - Frame::headerSize(4))
+  while(embPos < size - Frame::headerSize(4))
   {
     Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos));
 
