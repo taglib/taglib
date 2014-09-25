@@ -25,7 +25,7 @@ public:
 
     RIFF::AIFF::File *f = new RIFF::AIFF::File(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(705, f->audioProperties()->bitrate());
-    CPPUNIT_ASSERT(f->audioProperties()->isAiffC());
+    CPPUNIT_ASSERT(!f->audioProperties()->isAiffC());
     delete f;
   }
 
