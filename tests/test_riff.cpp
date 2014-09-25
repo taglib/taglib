@@ -86,6 +86,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f->chunkName(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), f->chunkData(2));
+
+    delete f;
   }
 
   void testLastChunkAtEvenPosition()

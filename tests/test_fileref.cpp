@@ -172,6 +172,7 @@ public:
       FileRef *f = new FileRef(TEST_FILE_PATH_C("empty_flac.oga"));
       CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) == NULL);
       CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) != NULL);
+      delete f;
   }
 
   void testOGA_Vorbis()
@@ -179,6 +180,7 @@ public:
       FileRef *f = new FileRef(TEST_FILE_PATH_C("empty_vorbis.oga"));
       CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) != NULL);
       CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) == NULL);
+      delete f;
   }
 
   void testAPE()

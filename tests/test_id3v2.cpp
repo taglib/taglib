@@ -209,6 +209,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), frame->mimeType());
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FileIcon, frame->type());
     CPPUNIT_ASSERT_EQUAL(String("d"), frame->description());
+
+    delete frame;
   }
 
   void testDontRender22()
@@ -921,9 +923,9 @@ public:
     f.setEndTime(5);
     f.setStartOffset(2);
     f.setEndOffset(3);
-    ID3v2::TextIdentificationFrame eF("TIT2");
-    eF.setText("CH1");
-    f.addEmbeddedFrame(&eF);
+    ID3v2::TextIdentificationFrame *eF = new ID3v2::TextIdentificationFrame("TIT2");
+    eF->setText("CH1");
+    f.addEmbeddedFrame(eF);
     CPPUNIT_ASSERT_EQUAL(
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
@@ -979,9 +981,9 @@ public:
     f.setIsOrdered(true);
     f.addChildElement(ByteVector("\x43\x00", 2));
     f.addChildElement(ByteVector("\x44\x00", 2));
-    ID3v2::TextIdentificationFrame eF("TIT2");
-    eF.setText("TC1");
-    f.addEmbeddedFrame(&eF);
+    ID3v2::TextIdentificationFrame *eF = new ID3v2::TextIdentificationFrame("TIT2");
+    eF->setText("TC1");
+    f.addEmbeddedFrame(eF);
     CPPUNIT_ASSERT_EQUAL(
       ByteVector("CTOC"                     // Frame ID
                  "\x00\x00\x00\x16"         // Frame size

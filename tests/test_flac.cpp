@@ -69,6 +69,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
     CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
     CPPUNIT_ASSERT_EQUAL(size_t(150), pic->data().size());
+    delete f;
   }
 
   void testAddPicture()
