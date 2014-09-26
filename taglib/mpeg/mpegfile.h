@@ -52,6 +52,7 @@ namespace TagLib {
 
     class TAGLIB_EXPORT File : public TagLib::File
     {
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
     public:
       /*!
        * This set of flags is used for various operations and is suitable for
@@ -365,6 +366,8 @@ namespace TagLib {
        */
       bool hasAPETag() const;
 
+      TAGLIB_END_IGNORE
+        
     private:
       File(const File &);
       File &operator=(const File &);

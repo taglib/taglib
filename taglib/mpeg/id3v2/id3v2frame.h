@@ -56,6 +56,7 @@ namespace TagLib {
       friend class Tag;
       friend class FrameFactory;
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
     public:
 
       /*!
@@ -157,6 +158,8 @@ namespace TagLib {
        */
       static const String urlPrefix;
 
+      TAGLIB_END_IGNORE
+        
     protected:
       class Header;
 
@@ -325,6 +328,7 @@ namespace TagLib {
 
     class TAGLIB_EXPORT Frame::Header
     {
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
     public:
       /*!
        * Construct a Frame Header based on \a data.  \a data must at least
@@ -503,6 +507,8 @@ namespace TagLib {
        * \deprecated
        */
       bool frameAlterPreservation() const;
+
+      TAGLIB_END_IGNORE
 
     private:
       Header(const Header &);

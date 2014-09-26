@@ -49,6 +49,7 @@ namespace TagLib {
 
   class TAGLIB_EXPORT File
   {
+    TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
   public:
     /*!
      * Position in the file used for seeking.
@@ -254,6 +255,8 @@ namespace TagLib {
      * \deprecated
      */
     static bool isWritable(const char *name);
+      
+    TAGLIB_END_IGNORE
 
   protected:
     /*!

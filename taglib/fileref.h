@@ -252,6 +252,7 @@ namespace TagLib {
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
+    TAGLIB_END_IGNORE
 
   private:
     class FileRefPrivate;
