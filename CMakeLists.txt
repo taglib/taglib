@@ -8,12 +8,12 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-option(ENABLE_STATIC "Make static version of libtag"  OFF)
-if(ENABLE_STATIC)
+if(DEFINED ENABLE_STATIC)
+  message(FATAL_ERROR "This option is no longer available, use BUILD_SHARED_LIBS instead")
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DTAGLIB_STATIC)
-  set(BUILD_SHARED_LIBS OFF)
-else()
-  set(BUILD_SHARED_LIBS ON)
 endif()
 OPTION(ENABLE_STATIC_RUNTIME "Visual Studio, link with runtime statically"  OFF)
 
