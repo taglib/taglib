@@ -66,6 +66,9 @@ namespace TagLib {
     {
     public:
       static FrameFactory *instance();
+
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Create a frame based on \a data.  \a synchSafeInts should only be set
        * false if we are parsing an old tag (v2.3 or older) that does not support
@@ -85,6 +88,8 @@ namespace TagLib {
        * instance in new code.
        */
       Frame *createFrame(const ByteVector &data, uint version = 4) const;
+
+      TAGLIB_END_IGNORE
 
       /*!
        * Create a frame based on \a data.  \a tagHeader should be a valid

@@ -70,6 +70,8 @@ namespace TagLib {
         AllTags = 0xffff
       };
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Constructs an MPEG file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
@@ -81,6 +83,8 @@ namespace TagLib {
        */
       File(FileName file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
+
+      TAGLIB_END_IGNORE
 
       /*!
        * Constructs an MPEG file from \a file.  If \a readProperties is true the

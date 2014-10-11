@@ -91,7 +91,6 @@ namespace TagLib {
 
     class TAGLIB_EXPORT FileTypeResolver
     {
-      TAGLIB_IGNORE_MISSING_DESTRUCTOR
     public:
       /*!
        * This method must be overridden to provide an additional file type

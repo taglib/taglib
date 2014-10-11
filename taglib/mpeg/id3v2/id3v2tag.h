@@ -193,6 +193,8 @@ namespace TagLib {
        */
       ExtendedHeader *extendedHeader() const;
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Returns a pointer to the tag's footer or null if there is no footer.
        *
@@ -202,6 +204,8 @@ namespace TagLib {
        * release.
        */
       Footer *footer() const;
+
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
 
       /*!
        * Returns a reference to the frame list map.  This is an FrameListMap of
