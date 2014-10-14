@@ -64,6 +64,8 @@ public:
 // A partial specialization for all pointer types that implements the
 // setAutoDelete() functionality.
 
+TAGLIB_IGNORE_MISSING_DESTRUCTOR
+
 template <class T>
 template <class TP> class List<T>::ListPrivate<TP *>  : public ListPrivateBase
 {
@@ -83,6 +85,8 @@ public:
   }
   std::list<TP *> list;
 };
+
+TAGLIB_END_IGNORE
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members

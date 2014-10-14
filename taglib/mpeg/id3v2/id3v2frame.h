@@ -81,6 +81,8 @@ namespace TagLib {
        */
       uint size() const;
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Returns the size of the frame header
        *
@@ -98,6 +100,8 @@ namespace TagLib {
        */
       static uint headerSize(uint version); // BIC: remove and make non-static
 
+      TAGLIB_END_IGNORE
+        
       /*!
        * Sets the data that will be used as the frame.  Since the length is not
        * known before the frame has been parsed, this should just be a pointer to
@@ -326,6 +330,8 @@ namespace TagLib {
     class TAGLIB_EXPORT Frame::Header
     {
     public:
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Construct a Frame Header based on \a data.  \a data must at least
        * contain a 4 byte frame ID, and optionally can contain flag data and the
@@ -336,6 +342,8 @@ namespace TagLib {
        */
       Header(const ByteVector &data, bool synchSafeInts);
 
+      TAGLIB_END_IGNORE
+        
       /*!
        * Construct a Frame Header based on \a data.  \a data must at least
        * contain a 4 byte frame ID, and optionally can contain flag data and the
@@ -350,6 +358,8 @@ namespace TagLib {
        */
       virtual ~Header();
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Sets the data for the Header.
        *
@@ -358,6 +368,8 @@ namespace TagLib {
        */
       void setData(const ByteVector &data, bool synchSafeInts);
 
+      TAGLIB_END_IGNORE
+        
       /*!
        * Sets the data for the Header.  \a version should indicate the ID3v2
        * version number of the tag that this frame is contained in.
@@ -403,6 +415,8 @@ namespace TagLib {
        */
       void setVersion(uint version);
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * Returns the size of the frame header in bytes.
        *
@@ -421,6 +435,8 @@ namespace TagLib {
        */
       static uint size(uint version);
 
+      TAGLIB_END_IGNORE
+        
       /*!
        * Returns true if the flag for tag alter preservation is set.
        *
@@ -499,11 +515,15 @@ namespace TagLib {
        */
       ByteVector render() const;
 
+      TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+        
       /*!
        * \deprecated
        */
       bool frameAlterPreservation() const;
 
+      TAGLIB_END_IGNORE
+        
     private:
       Header(const Header &);
       Header &operator=(const Header &);

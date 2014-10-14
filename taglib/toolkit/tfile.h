@@ -240,6 +240,8 @@ namespace TagLib {
      */
     long length();
 
+    TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
+
     /*!
      * Returns true if \a file can be opened for reading.  If the file does not
      * exist, this will return false.
@@ -254,6 +256,8 @@ namespace TagLib {
      * \deprecated
      */
     static bool isWritable(const char *name);
+
+    TAGLIB_END_IGNORE
 
   protected:
     /*!
