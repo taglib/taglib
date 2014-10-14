@@ -37,6 +37,8 @@
 
 using namespace TagLib;
 
+#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
+
 namespace
 {
   String format(const char *fmt, ...)
@@ -66,6 +68,8 @@ namespace
     return String(buf);
   }
 }
+
+#endif
 
 namespace TagLib
 {

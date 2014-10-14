@@ -39,14 +39,10 @@
                                               _Pragma("clang diagnostic ignored \"-Wdocumentation\"")
 #define TAGLIB_IGNORE_SHADOWING_VARIABLES _Pragma("clang diagnostic push") \
                                           _Pragma("clang diagnostic ignored \"-Wshadow\"")
-#define TAGLIB_IGNORE_UNUSED_METHOD _Pragma( "clang diagnostic push") \
-                                    _Pragma("clang diagnostic ignored \"-Wunused-function\"")
 #define TAGLIB_END_IGNORE _Pragma("clang diagnostic pop")
 #elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1))
 #define TAGLIB_IGNORE_MISSING_DESTRUCTOR _Pragma("GCC diagnostic push") \
                                          _Pragma("GCC diagnostic ignored \"-Wdelete-non-virtual-dtor\"")
-#define TAGLIB_IGNORE_UNUSED_METHOD _Pragma("GCC diagnostic push") \
-                                    _Pragma("GCC diagnostic ignored \"-Wunused-function\"")
 #define TAGLIB_IGNORE_INCORRECT_DOCUMENTATION _Pragma("GCC diagnostic push") \
                                               _Pragma("GCC diagnostic ignored \"-Wdocumentation\"")
 #define TAGLIB_IGNORE_SHADOWING_VARIABLES _Pragma("GCC diagnostic push") \
@@ -54,7 +50,6 @@
 #define TAGLIB_END_IGNORE _Pragma("GCC diagnostic pop")
 #else
 #define TAGLIB_IGNORE_MISSING_DESTRUCTOR
-#define TAGLIB_UNUSED_METHOD
 #define TAGLIB_IGNORE_INCORRECT_DOCUMENTATION
 #define TAGLIB_IGNORE_SHADOWING_VARIABLES
 #define TAGLIB_END_IGNORE
