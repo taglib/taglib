@@ -290,7 +290,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   return new UnknownFrame(data, header);
 }
 
-void FrameFactory::rebuildAggregateFrames(Tag *tag) const
+void FrameFactory::rebuildAggregateFrames(ID3v2::Tag *tag) const
 {
   if(tag->header()->majorVersion() < 4 &&
      tag->frameList("TDRC").size() == 1 &&
