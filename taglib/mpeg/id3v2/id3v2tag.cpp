@@ -81,6 +81,11 @@ public:
 static const Latin1StringHandler defaultStringHandler;
 const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
 
+namespace
+{
+  const uint DefaultPaddingSize = 1024;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
@@ -596,15 +601,19 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  uint paddingSize = 0;
-  uint originalSize = d->header.tagSize();
+  uint paddingSize = DefaultPaddingSize;
 
-  if(tagData.size() < originalSize)
-    paddingSize = originalSize - tagData.size();
-  else
-    paddingSize = 1024;
+  if(d->file && tagData.size() < d->header.tagSize()) {
+    paddingSize = d->header.tagSize() - tagData.size();
 
-  tagData.append(ByteVector(paddingSize, char(0)));
+    // Padding won't increase beyond 1% of the file size.
+
+    const uint threshold = d->file->length() / 100; // should be ulonglong in taglib2.
+    if(paddingSize > d->paddingSize && paddingSize > threshold)
+      paddingSize = DefaultPaddingSize;
+  }
+
+  tagData.append(ByteVector(paddingSize, '\0'));
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
