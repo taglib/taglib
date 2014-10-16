@@ -99,7 +99,7 @@ namespace TagLib {
        * have been deprecated and can't be upgraded directly.
        */
       // BIC: Make virtual
-      void rebuildAggregateFrames(Tag *tag) const;
+      void rebuildAggregateFrames(ID3v2::Tag *tag) const;
 
       /*!
        * Returns the default text encoding for text frames.  If setTextEncoding()
