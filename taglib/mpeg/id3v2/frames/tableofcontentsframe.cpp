@@ -251,7 +251,7 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
   }
 
   size -= pos;
-  while(embPos < size - header()->size()) {
+  while(static_cast<uint>(embPos) < size - header()->size()) {
     Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
 
     if(!frame)
