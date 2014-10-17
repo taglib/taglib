@@ -195,7 +195,14 @@ void MPEG::Properties::read()
   d->file->seek(first);
   Header firstHeader(d->file->readBlock(4));
 
-  if(!firstHeader.isValid() || !lastHeader.isValid()) {
+  Header *sampleHeader;
+  if(firstHeader.isValid()) {
+    sampleHeader = &firstHeader;
+  }
+  else if(lastHeader.isValid()) {
+    sampleHeader = &lastHeader;
+  }
+  else {
     debug("MPEG::Properties::read() -- Page headers were invalid.");
     return;
   }
@@ -203,8 +210,9 @@ void MPEG::Properties::read()
   // Check for a Xing header that will help us in gathering information about a
   // VBR stream.
 
-  int xingHeaderOffset = MPEG::XingHeader::xingHeaderOffset(firstHeader.version(),
-                                                            firstHeader.channelMode());
+  const int xingHeaderOffset = MPEG::XingHeader::xingHeaderOffset(
+    sampleHeader->version(),
+    sampleHeader->channelMode());
 
   d->file->seek(first + xingHeaderOffset);
   d->xingHeader = new XingHeader(d->file->readBlock(16));
@@ -212,11 +220,10 @@ void MPEG::Properties::read()
   // Read the length and the bitrate from the Xing header.
 
   if(d->xingHeader->isValid() &&
-     firstHeader.sampleRate() > 0 &&
-     d->xingHeader->totalFrames() > 0)
-  {
+     sampleHeader->sampleRate() > 0 &&
+     d->xingHeader->totalFrames() > 0) {
       double timePerFrame =
-        double(firstHeader.samplesPerFrame()) / firstHeader.sampleRate();
+        double(sampleHeader->samplesPerFrame()) / sampleHeader->sampleRate();
 
       double length = timePerFrame * d->xingHeader->totalFrames();
 
@@ -233,22 +240,21 @@ void MPEG::Properties::read()
     // TODO: Make this more robust with audio property detection for VBR without a
     // Xing header.
 
-    if(firstHeader.frameLength() > 0 && firstHeader.bitrate() > 0) {
-      int frames = (last - first) / firstHeader.frameLength() + 1;
+    if(sampleHeader->frameLength() > 0 && sampleHeader->bitrate() > 0) {
+      int frames = (last - first) / sampleHeader->frameLength() + 1;
 
-      d->length = int(float(firstHeader.frameLength() * frames) /
-                      float(firstHeader.bitrate() * 125) + 0.5);
-      d->bitrate = firstHeader.bitrate();
+      d->length = int(float(sampleHeader->frameLength() * frames) /
+                      float(sampleHeader->bitrate() * 125) + 0.5);
+      d->bitrate = sampleHeader->bitrate();
     }
   }
 
-
-  d->sampleRate = firstHeader.sampleRate();
-  d->channels = firstHeader.channelMode() == Header::SingleChannel ? 1 : 2;
-  d->version = firstHeader.version();
-  d->layer = firstHeader.layer();
-  d->protectionEnabled = firstHeader.protectionEnabled();
-  d->channelMode = firstHeader.channelMode();
-  d->isCopyrighted = firstHeader.isCopyrighted();
-  d->isOriginal = firstHeader.isOriginal();
+  d->sampleRate        = sampleHeader->sampleRate();
+  d->channels          = sampleHeader->channelMode() == Header::SingleChannel ? 1 : 2;
+  d->version           = sampleHeader->version();
+  d->layer             = sampleHeader->layer();
+  d->protectionEnabled = sampleHeader->protectionEnabled();
+  d->channelMode       = sampleHeader->channelMode();
+  d->isCopyrighted     = sampleHeader->isCopyrighted();
+  d->isOriginal        = sampleHeader->isOriginal();
 }
