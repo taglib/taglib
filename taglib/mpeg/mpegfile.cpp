@@ -434,7 +434,11 @@ long MPEG::File::firstFrameOffset()
   long position = 0;
 
   if(ID3v2Tag()) {
+
     // Skip duplicate ID3v2 tags.
+
+    // Workaround for some faulty files that have duplicate ID3v2 tags.
+    // Combination of EAC and LAME creates such files when configured incorrectly.
 
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
 
