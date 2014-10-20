@@ -180,21 +180,35 @@ void MPEG::Header::parse(const ByteVector &data)
 
   // Set the MPEG version
 
-  if(!flags[20] && !flags[19])
+  if(!flags[20] && !flags[19]) {
     d->version = Version2_5;
-  else if(flags[20] && !flags[19])
+  }
+  else if(flags[20] && !flags[19]) {
     d->version = Version2;
-  else if(flags[20] && flags[19])
+  }
+  else if(flags[20] && flags[19]) {
     d->version = Version1;
+  }
+  else {
+    debug("MPEG::Header::parse() -- Invalid MPEG version.");
+    return;
+  }
 
   // Set the MPEG layer
 
-  if(!flags[18] && flags[17])
+  if(!flags[18] && flags[17]) {
     d->layer = 3;
-  else if(flags[18] && !flags[17])
+  }
+  else if(flags[18] && !flags[17]) {
     d->layer = 2;
-  else if(flags[18] && flags[17])
+  }
+  else if(flags[18] && flags[17]) {
     d->layer = 1;
+  }
+  else {
+    debug("MPEG::Header::parse() -- Invalid MPEG layer.");
+    return;
+  }
 
   d->protectionEnabled = !flags[16];
 
@@ -249,9 +263,16 @@ void MPEG::Header::parse(const ByteVector &data)
 
   // TODO: Add mode extension for completeness
 
-  d->isOriginal = flags[2];
+  d->isOriginal    = flags[2];
   d->isCopyrighted = flags[3];
-  d->isPadded = flags[9];
+  d->isPadded      = flags[9];
+
+  // Check the emphasis
+
+  if(!flags[1] && flags[0]) {
+    debug("MPEG::Header::parse() -- Invalid emphasis.");
+    return;
+  }
 
   // Calculate the frame length
 
