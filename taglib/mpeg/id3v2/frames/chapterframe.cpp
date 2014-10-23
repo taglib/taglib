@@ -218,8 +218,8 @@ void ChapterFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int pos = 0, embPos = 0;
-  d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
+  uint pos = 0, embPos = 0;
+  d->elementID = readStringField(data, String::Latin1, pos).data(String::Latin1);
   d->elementID.append(char(0));
   d->startTime = data.mid(pos, 4).toUInt(true);
   pos += 4;
@@ -231,9 +231,8 @@ void ChapterFrame::parseFields(const ByteVector &data)
   pos += 4;
   size -= pos;
 
-  while((uint)embPos < size - header()->size()) {
+  while(embPos < size - header()->size()) {
     Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
-
     if(!frame)
       return;
 

@@ -145,7 +145,7 @@ void SynchronizedLyricsFrame::setSynchedText(
 
 void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
 {
-  const int end = data.size();
+  const uint end = data.size();
   if(end < 7) {
     debug("A synchronized lyrics frame must contain at least 7 bytes.");
     return;
@@ -156,9 +156,9 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
   d->timestampFormat = TimestampFormat(data[4]);
   d->type = Type(data[5]);
 
-  int pos = 6;
+  uint pos = 6;
 
-  d->description = readStringField(data, d->textEncoding, &pos);
+  d->description = readStringField(data, d->textEncoding, pos);
   if(d->description.isNull())
     return;
 
@@ -189,7 +189,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
         enc = encWithEndianness;
       }
     }
-    String text = readStringField(data, enc, &pos);
+    String text = readStringField(data, enc, pos);
     if(text.isNull() || pos + 4 > end)
       return;
 

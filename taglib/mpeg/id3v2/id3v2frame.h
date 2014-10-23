@@ -218,13 +218,22 @@ namespace TagLib {
       ByteVector fieldData(const ByteVector &frameData) const;
 
       /*!
-       * Reads a String of type \a encodiong from the ByteVector \a data.  If \a
+       * Reads a String of type \a encoding from the ByteVector \a data.  If \a
        * position is passed in it is used both as the starting point and is
-       * updated to replect the position just after the string that has been read.
+       * updated to replace the position just after the string that has been read.
+       * This is useful for reading strings sequentially.
+       *
+       * \deprecated Please use the overload below.
+       */
+      String readStringField(const ByteVector &data, String::Type encoding, int *position = 0);
+
+      /*!
+       * Reads a String of type \a encoding from the ByteVector \a data.  If \a
+       * position is passed in it is used both as the starting point and is
+       * updated to replace the position just after the string that has been read.
        * This is useful for reading strings sequentially.
        */
-      String readStringField(const ByteVector &data, String::Type encoding,
-                             int *positon = 0);
+      String readStringField(const ByteVector &data, String::Type encoding, uint &position);
 
       /*!
        * Checks a the list of string values to see if they can be used with the

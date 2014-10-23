@@ -178,13 +178,12 @@ void RelativeVolumeFrame::setIdentification(const String &s)
 
 void RelativeVolumeFrame::parseFields(const ByteVector &data)
 {
-  int pos = 0;
-  d->identification = readStringField(data, String::Latin1, &pos);
+  uint pos = 0;
+  d->identification = readStringField(data, String::Latin1, pos);
 
   // Each channel is at least 4 bytes.
 
-  while(pos <= (int)data.size() - 4) {
-
+  while(pos <= data.size() - 4) {
 
     ChannelType type = ChannelType(data[pos]);
     pos += 1;

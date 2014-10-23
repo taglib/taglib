@@ -100,15 +100,15 @@ void PopularimeterFrame::setCounter(TagLib::uint s)
 
 void PopularimeterFrame::parseFields(const ByteVector &data)
 {
-  int pos = 0, size = int(data.size());
+  uint pos = 0;
 
-  d->email = readStringField(data, String::Latin1, &pos);
+  d->email = readStringField(data, String::Latin1, pos);
 
   d->rating = 0;
   d->counter = 0;
-  if(pos < size) {
+  if(pos < data.size()) {
     d->rating = (unsigned char)(data[pos++]);
-    if(pos < size) {
+    if(pos < data.size()) {
       d->counter = data.toUInt(static_cast<uint>(pos));
     }
   }

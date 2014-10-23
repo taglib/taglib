@@ -269,25 +269,35 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
 
 String Frame::readStringField(const ByteVector &data, String::Type encoding, int *position)
 {
-  int start = 0;
+  uint tmpPos;
+  if(position)
+    tmpPos = *position;
+  else
+    tmpPos = 0;
 
-  if(!position)
-    position = &start;
+  const String str = readStringField(data, encoding, tmpPos);
 
-  ByteVector delimiter = textDelimiter(encoding);
+  if(position)
+    *position = tmpPos;
 
-  int end = data.find(delimiter, *position, delimiter.size());
+  return str;
+}
 
-  if(end < *position)
+String Frame::readStringField(const ByteVector &data, String::Type encoding, uint &position)
+{
+  const ByteVector delimiter = textDelimiter(encoding);
+
+  const int end = data.find(delimiter, position, delimiter.size());
+  if(end == -1 || static_cast<uint>(end) < position)
     return String::null;
 
   String str;
   if(encoding == String::Latin1)
-    str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
+    str = Tag::latin1StringHandler()->parse(data.mid(position, end - position));
   else
-    str = String(data.mid(*position, end - *position), encoding);
+    str = String(data.mid(position, end - position), encoding);
 
-  *position = end + delimiter.size();
+  position = end + delimiter.size();
 
   return str;
 }
