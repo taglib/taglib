@@ -65,16 +65,12 @@ namespace TagLib {
       TypeUndefined = 255 // undefined
     };
 
-    TAGLIB_IGNORE_SHADOWING_VARIABLES
-
     struct AtomData {
-      AtomData(AtomDataType type, ByteVector data) : type(type), locale(0), data(data) {}
+      AtomData(AtomDataType newType, ByteVector newData) : type(newType), locale(0), data(newData) {}
       AtomDataType type;
       int locale;
       ByteVector data;
     };
-
-    TAGLIB_END_IGNORE
 
     typedef TagLib::List<AtomData> AtomDataList;
 
