@@ -208,7 +208,6 @@ void MPC::Properties::readSV8(File *file)
       ulong begSilence = readSize(data.mid(pos), pos);
 
       std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.toUShort(pos, true)));
-      pos += 2;
 
       d->sampleRate = sftable[flags[15] * 4 + flags[14] * 2 + flags[13]];
       d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;

@@ -113,44 +113,23 @@ void Speex::Properties::read()
 
   ByteVector data = d->file->packet(0);
 
-  uint pos = 28;
-
   // speex_version_id;       /**< Version for Speex (for checking compatibility) */
-  d->speexVersion = data.toUInt(pos, false);
-  pos += 4;
-
-  // header_size;            /**< Total size of the header ( sizeof(SpeexHeader) ) */
-  pos += 4;
+  d->speexVersion = data.toUInt(28, false);
 
   // rate;                   /**< Sampling rate used */
-  d->sampleRate = data.toUInt(pos, false);
-  pos += 4;
+  d->sampleRate = data.toUInt(36, false);
 
   // mode;                   /**< Mode used (0 for narrowband, 1 for wideband) */
-  d->mode = data.toUInt(pos, false);
-  pos += 4;
-
-  // mode_bitstream_version; /**< Version ID of the bit-stream */
-  pos += 4;
+  d->mode = data.toUInt(40, false);
 
   // nb_channels;            /**< Number of channels encoded */
-  d->channels = data.toUInt(pos, false);
-  pos += 4;
+  d->channels = data.toUInt(48, false);
 
   // bitrate;                /**< Bit-rate used */
-  d->bitrate = data.toUInt(pos, false);
-  pos += 4;
-
-  // frame_size;             /**< Size of frames */
-  // unsigned int frameSize = data.mid(pos, 4).toUInt(false);
-  pos += 4;
+  d->bitrate = data.toUInt(52, false);
 
   // vbr;                    /**< 1 for a VBR encoding, 0 otherwise */
-  d->vbr = data.toUInt(pos, false) == 1;
-  pos += 4;
-
-  // frames_per_packet;      /**< Number of frames stored per Ogg packet */
-  // unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
+  d->vbr = data.toUInt(60, false) == 1;
 
   const Ogg::PageHeader *first = d->file->firstPageHeader();
   const Ogg::PageHeader *last = d->file->lastPageHeader();

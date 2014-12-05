@@ -161,24 +161,20 @@ void Mod::File::read(bool)
   StringList comment;
   for(uint i = 0; i < instruments; ++ i) {
     READ_STRING_AS(instrumentName, 22);
+    comment.append(instrumentName);
+
+    // Skip unused fields.
+
     // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(sampleLength);
-
-    READ_BYTE_AS(fineTuneByte);
-    int fineTune = fineTuneByte & 0xF;
     // > 7 means negative value
-    if(fineTune > 7) fineTune -= 16;
-
-    READ_BYTE_AS(volume);
-    if(volume > 64) volume = 64;
+    READ_BYTE_AS(fineTuneByte);
     // volume in decibels: 20 * log10(volume / 64)
-
+    READ_BYTE_AS(volume);
     // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(repeatStart);
     // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(repatLength);
-
-    comment.append(instrumentName);
   }
 
   READ_BYTE(d->properties.setLengthInPatterns);
