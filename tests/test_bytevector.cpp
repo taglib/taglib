@@ -38,6 +38,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testFind2);
   CPPUNIT_TEST(testRfind1);
   CPPUNIT_TEST(testRfind2);
+  CPPUNIT_TEST(testContainsAt);
   CPPUNIT_TEST(testToHex);
   CPPUNIT_TEST(testNumericCoversion);
   CPPUNIT_TEST(testReplace);
@@ -117,12 +118,6 @@ public:
     CPPUNIT_ASSERT(ByteVector().size() == 0);
     CPPUNIT_ASSERT(ByteVector("asdf").clear().size() == 0);
     CPPUNIT_ASSERT(ByteVector("asdf").clear() == ByteVector());
-
-    ByteVector i("blah blah");
-    ByteVector j("blah");
-    CPPUNIT_ASSERT(i.containsAt(j, 5, 0));
-    CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
-    CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
   }
 
   void testFind1()
@@ -187,6 +182,26 @@ public:
     CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS", 0));
     CPPUNIT_ASSERT_EQUAL(5, r4.rfind("OggS", 7));
     CPPUNIT_ASSERT_EQUAL(10, r4.rfind("OggS", 12));
+  }
+
+  void testContainsAt()
+  {
+    ByteVector v1("blah blah");
+    ByteVector v2("blah");
+    ByteVector empty;
+
+    CPPUNIT_ASSERT(v1.containsAt(v2, 5, 0));
+    CPPUNIT_ASSERT(v1.containsAt(v2, 6, 1));
+    CPPUNIT_ASSERT(!v1.containsAt(v2, 20));
+
+    CPPUNIT_ASSERT(v1.containsAt(v2, 6, 1, 3));
+    CPPUNIT_ASSERT(!v1.containsAt(v2, 6, 3, 1));
+
+    CPPUNIT_ASSERT(!v1.containsAt(v2, 6, 4));
+    CPPUNIT_ASSERT(!v1.containsAt(v2, 6, 2, 2));
+
+    CPPUNIT_ASSERT(!v1.containsAt(empty, 0));
+    CPPUNIT_ASSERT(!v1.containsAt(empty, 20));
   }
 
   void testToHex()
