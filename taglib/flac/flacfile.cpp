@@ -47,6 +47,10 @@ namespace
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
   enum { MinPaddingLength = 4096 };
   enum { LastBlockFlag = 0x80 };
+
+  typedef List<FLAC::MetadataBlock *> BlockList;
+  typedef BlockList::Iterator      BlockIterator;
+  typedef BlockList::ConstIterator BlockConstIterator;
 }
 
 class FLAC::File::FilePrivate
@@ -198,35 +202,34 @@ bool FLAC::File::save()
   // Replace metadata blocks
 
   bool foundVorbisCommentBlock = false;
-  List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    MetadataBlock *block = d->blocks[i];
-    if(block->code() == MetadataBlock::VorbisComment) {
-      // Set the new Vorbis Comment block
-      delete block;
-      block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
+  BlockList newBlocks;
+  for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    const int code = (*it)->code();
+    if(code == MetadataBlock::VorbisComment) {
+      delete *it;
+      *it = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
       foundVorbisCommentBlock = true;
     }
-    if(block->code() == MetadataBlock::Padding) {
-      delete block;
+    else if(code == MetadataBlock::Padding) {
+      delete *it;
       continue;
     }
-    newBlocks.append(block);
+    newBlocks.append(*it);
   }
-  if(!foundVorbisCommentBlock) {
+
+  if (!foundVorbisCommentBlock)
     newBlocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
-    foundVorbisCommentBlock = true;
-  }
+
   d->blocks = newBlocks;
+
 
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(uint i = 0; i < newBlocks.size(); i++) {
-    FLAC::MetadataBlock *block = newBlocks[i];
-    ByteVector blockData = block->render();
+  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    ByteVector blockData = (*it)->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    blockHeader[0] = (*it)->code();
     data.append(blockHeader);
     data.append(blockData);
   }

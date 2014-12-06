@@ -37,6 +37,9 @@ public:
 
   void testMultipleCommentBlocks()
   {
+    // The message "multiple Vorbis Comment blocks found, using the first one"
+    // should be shown twice.
+
     ScopedFileCopy copy("multiple-vc", ".flac");
     string newname = copy.fileName();
 
