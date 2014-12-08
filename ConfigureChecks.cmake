@@ -20,11 +20,6 @@ if(NOT ${SIZEOF_INT} EQUAL 4)
   MESSAGE(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
 endif()
 
-check_type_size("long" SIZEOF_LONG)
-if(${SIZEOF_LONG} EQUAL 8)
-  set(LONG_IS_INT64 1)
-endif()
-
 check_type_size("long long" SIZEOF_LONGLONG)
 if(NOT ${SIZEOF_LONGLONG} EQUAL 8)
   MESSAGE(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
