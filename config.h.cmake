@@ -17,9 +17,6 @@
 #cmakedefine   HAVE_MAC_BYTESWAP 1
 #cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
-/* Defined if your compiler supports codecvt */
-#cmakedefine   HAVE_STD_CODECVT 1
-
 /* Defined if your compiler supports some atomic operations */
 #cmakedefine   HAVE_STD_ATOMIC 1
 #cmakedefine   HAVE_BOOST_ATOMIC 1
