@@ -2,11 +2,11 @@
 
 /* Integer byte order of your target system */
 /* 1 if little-endian, 2 if big-endian. */
-#cmakedefine   SYSTEM_BYTEORDER ${SYSTEM_BYTEORDER}
+#cmakedefine   INTEGER_BYTEORDER ${INTEGER_BYTEORDER}
 
 /* IEEE754 byte order of your target system. */
 /* 1 if little-endian, 2 if big-endian. */
-#cmakedefine   FLOAT_BYTEORDER  ${FLOAT_BYTEORDER}
+#cmakedefine   FLOAT_BYTEORDER   ${FLOAT_BYTEORDER}
 
 /* Defined if your compiler supports some byte swap functions */
 #cmakedefine   HAVE_GCC_BYTESWAP_16 1

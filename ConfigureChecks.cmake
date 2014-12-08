@@ -40,17 +40,16 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   MESSAGE(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
-# Determine the CPU byte order.
+# Check the byte order of integer types.
 
 test_big_endian(IS_BIG_ENDIAN)
-
 if(NOT IS_BIG_ENDIAN)
-  set(SYSTEM_BYTEORDER 1)
+  set(INTEGER_BYTEORDER 1)
 else()
-  set(SYSTEM_BYTEORDER 2)
+  set(INTEGER_BYTEORDER 2)
 endif()
 
-# Check if the format of floating point types are suitable.
+# Check the format and byte order of floating point types.
 
 test_float_format(FP_IEEE754)
 if(${FP_IEEE754} EQUAL 1)

@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -102,9 +98,9 @@ static const uint crcTable[256] = {
 };
 
 /*!
-  * A templatized straightforward find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
+ * A templatized straightforward find that works with the types
+ * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
+ */
 template <class TIterator>
 int findChar(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -128,9 +124,9 @@ int findChar(
 }
 
 /*!
-  * A templatized KMP find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
+ * A templatized KMP find that works with the types
+ * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
+ */
 template <class TIterator>
 int findVector(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -209,7 +205,7 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
 template <class T>
 T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
-  static const bool isBigEndian = (Utils::SystemByteOrder == Utils::BigEndian);
+  static const bool isBigEndian = (Utils::IntegerByteOrder == Utils::BigEndian);
   const bool swap = (mostSignificantByteFirst != isBigEndian);
 
   if(offset + sizeof(T) > v.size())
@@ -228,7 +224,7 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 template <class T>
 ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
-  static const bool isBigEndian = (Utils::SystemByteOrder == Utils::BigEndian);
+  static const bool isBigEndian = (Utils::IntegerByteOrder == Utils::BigEndian);
   const bool swap = (mostSignificantByteFirst != isBigEndian);
 
   if(swap)

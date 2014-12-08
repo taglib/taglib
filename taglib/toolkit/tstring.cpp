@@ -875,7 +875,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 }
 
 const String::Type String::WCharByteOrder
-  = (Utils::SystemByteOrder == Utils::BigEndian) ? String::UTF16BE : String::UTF16LE;
+  = (Utils::IntegerByteOrder == Utils::BigEndian) ? String::UTF16BE : String::UTF16LE;
 
 }
 

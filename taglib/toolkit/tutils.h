@@ -153,21 +153,21 @@ namespace TagLib
       BigEndian
     };
 
-#ifdef SYSTEM_BYTEORDER
+#ifdef INTEGER_BYTEORDER
 
-# if SYSTEM_BYTEORDER == 1
+# if INTEGER_BYTEORDER == 1
 
-    const ByteOrder SystemByteOrder = LittleEndian;
+    const ByteOrder IntegerByteOrder = LittleEndian;
 
 # else
 
-    const ByteOrder SystemByteOrder = BigEndian;
+    const ByteOrder IntegerByteOrder = BigEndian;
 
 # endif
 
 #else
 
-    inline ByteOrder systemByteOrder()
+    inline ByteOrder integerByteOrder()
     {
       union {
         int  i;
@@ -181,7 +181,7 @@ namespace TagLib
         return BigEndian;
     }
 
-    const ByteOrder SystemByteOrder = systemByteOrder();
+    const ByteOrder IntegerByteOrder = integerByteOrder();
 
 #endif
 
@@ -201,16 +201,14 @@ namespace TagLib
 
     inline ByteOrder floatByteOrder()
     {
-        double bin[] = {
-            // "*TAGLIB*" encoded as a little-endian floating-point number
-            (double) 3.9865557444897601e-105, (double) 0.0
-        };
+      // "*TAGLIB*" encoded as a little-endian floating-point number.
+      const double val = static_cast<double>(3.9865557444897601e-105);
 
-        char *str = (char*)&bin[0];
-        if(strncmp(&str[1], "TAGLIB", 6) == 0)
-          return LittleEndian;
-        else
-          return BigEndian;
+      const char *str = reinterpret_cast<const char *>(&val);
+      if(memcmp(&str[1], "TAGLIB", 6) == 0)
+        return LittleEndian;
+      else
+        return BigEndian;
     }
 
     const ByteOrder FloatByteOrder = floatByteOrder();
