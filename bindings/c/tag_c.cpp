@@ -46,12 +46,12 @@ static bool stringManagementEnabled = true;
 
 void taglib_set_strings_unicode(BOOL unicode)
 {
-  unicodeStrings = bool(unicode);
+  unicodeStrings = (unicode != 0);
 }
 
 void taglib_set_string_management_enabled(BOOL management)
 {
-  stringManagementEnabled = bool(management);
+  stringManagementEnabled = (management != 0);
 }
 
 void taglib_free(void* pointer)
