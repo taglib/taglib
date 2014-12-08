@@ -199,7 +199,7 @@ public:
                                  "JPG"
                                  "\x01"
                                  "d\x00"
-                                 "\x00", 18);
+                                 "\x00", 14);
     ID3v2::AttachedPictureFrame *frame =
         static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, TagLib::uint(2)));
 
@@ -220,7 +220,7 @@ public:
                                  "JPG"
                                  "\x01"
                                  "d\x00"
-                                 "\x00", 18);
+                                 "\x00", 14);
     ID3v2::AttachedPictureFrame *frame =
         static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, TagLib::uint(2)));
 
