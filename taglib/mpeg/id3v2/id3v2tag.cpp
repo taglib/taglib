@@ -608,9 +608,11 @@ ByteVector ID3v2::Tag::render(int version) const
 
     // Padding won't increase beyond 1% of the file size.
 
-    const uint threshold = d->file->length() / 100; // should be ulonglong in taglib2.
-    if(paddingSize > d->paddingSize && paddingSize > threshold)
-      paddingSize = DefaultPaddingSize;
+    if(paddingSize > DefaultPaddingSize) {
+      const uint threshold = d->file->length() / 100; // should be ulonglong in taglib2.
+      if(paddingSize > threshold)
+        paddingSize = DefaultPaddingSize;
+    }
   }
 
   tagData.append(ByteVector(paddingSize, '\0'));
