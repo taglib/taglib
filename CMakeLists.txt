@@ -8,6 +8,12 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
+if (NOT DEFINED tag_LIB_BUILD_STATIC)
+  SET(tag_LIB_BUILD_STATIC OFF) # Shared library by default
+endif()
+
+MESSAGE( STATUS "build_static= " ${tag_LIB_BUILD_STATIC})
+
 option(ENABLE_STATIC "Make static version of libtag"  OFF)
 if(ENABLE_STATIC)
   add_definitions(-DTAGLIB_STATIC)

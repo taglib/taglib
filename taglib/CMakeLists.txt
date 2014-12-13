@@ -335,7 +335,11 @@ set(tag_LIB_SRCS
   audioproperties.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+if (${tag_LIB_BUILD_STATIC})
+  add_library(tag STATIC ${tag_LIB_SRCS} ${tag_HDRS})
+else()
+  add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+endif()
 
 if(ZLIB_FOUND)
   target_link_libraries(tag ${ZLIB_LIBRARIES})

@@ -18,7 +18,11 @@ include_directories(
 
 set(tag_c_HDRS tag_c.h)
 
-add_library(tag_c tag_c.cpp ${tag_c_HDRS})
+if (${tag_LIB_BUILD_STATIC})
+  add_library(tag_c STATIC tag_c.cpp ${tag_c_HDRS})
+else()
+  add_library(tag_c tag_c.cpp ${tag_c_HDRS})
+endif()
 
 target_link_libraries(tag_c tag)
 set_target_properties(tag_c PROPERTIES PUBLIC_HEADER "${tag_c_HDRS}")
