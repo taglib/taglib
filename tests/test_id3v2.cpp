@@ -63,6 +63,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testParseEmptyUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testBrokenFrame1);
+  CPPUNIT_TEST(testBrokenFrame2);
   CPPUNIT_TEST(testItunes24FrameSize);
   CPPUNIT_TEST(testParseUrlLinkFrame);
   CPPUNIT_TEST(testRenderUrlLinkFrame);
@@ -149,6 +150,13 @@ public:
   void testBrokenFrame1()
   {
     MPEG::File f(TEST_FILE_PATH_C("broken-tenc.id3"), false);
+    CPPUNIT_ASSERT(f.tag());
+    CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TENC"));
+  }
+
+  void testBrokenFrame2()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("broken-flags.id3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT(!f.ID3v2Tag()->frameListMap().contains("TENC"));
   }

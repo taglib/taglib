@@ -546,7 +546,8 @@ public:
     compression(false),
     encryption(false),
     unsynchronisation(false),
-    dataLengthIndicator(false)
+    dataLengthIndicator(false),
+    hasBadFlags(false)
     {}
 
   ByteVector frameID;
@@ -563,6 +564,8 @@ public:
   bool encryption;
   bool unsynchronisation;
   bool dataLengthIndicator;
+
+  bool hasBadFlags;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -672,6 +675,11 @@ void Frame::Header::setData(const ByteVector &data, uint version)
 
     d->frameSize = data.toUInt(4U);
 
+    // Check the unused Flags. All unused flags must be cleared.
+    // The flags field is defined as follows: %abc00000 %ijk00000 (structure 3.3.1)
+
+    d->hasBadFlags = ((data[8] & 0x1F) != 0) || ((data[9] & 0x1F) != 0);
+
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
       d->tagAlterPreservation  = flags[7]; // (structure 3.3.1.a)
@@ -713,6 +721,7 @@ void Frame::Header::setData(const ByteVector &data, uint version)
     // the frame header (structure 4)
 
     d->frameSize = SynchData::toUInt(data.mid(4, 4));
+
 #ifndef NO_ITUNES_HACKS
     // iTunes writes v2.4 tags with v2.3-like frame sizes
     if(d->frameSize > 127) {
@@ -724,6 +733,11 @@ void Frame::Header::setData(const ByteVector &data, uint version)
       }
     }
 #endif
+
+    // Check the unused Flags. All unused flags must be cleared.
+    // The flags field is defined as follows: %0abc0000 %0h00kmnp (structure 4.1)
+
+    d->hasBadFlags = ((data[8] & 0x8F) != 0) || ((data[9] & 0xB0) != 0);
 
     { // read the first byte of flags
       std::bitset<8> flags(data[8]);
@@ -841,4 +855,9 @@ ByteVector Frame::Header::render() const
 bool Frame::Header::frameAlterPreservation() const
 {
   return fileAlterPreservation();
+}
+
+bool TagLib::ID3v2::Frame::Header::hasBadFlags() const
+{
+  return d->hasBadFlags;
 }
