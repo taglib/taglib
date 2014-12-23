@@ -17,6 +17,7 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesSV7);
   CPPUNIT_TEST(testPropertiesSV5);
   CPPUNIT_TEST(testPropertiesSV4);
+  CPPUNIT_TEST(testFuzzedFiles);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -59,6 +60,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+  }
+
+  void testFuzzedFiles()
+  {
+    MPC::File f1(TEST_FILE_PATH_C("zerodiv.mpc"));
+    CPPUNIT_ASSERT(f1.isValid());
+
+    MPC::File f2(TEST_FILE_PATH_C("infloop.mpc"));
+    CPPUNIT_ASSERT(f2.isValid());
+
+    MPC::File f3(TEST_FILE_PATH_C("segfault.mpc"));
+    CPPUNIT_ASSERT(f3.isValid());
   }
 
 };
