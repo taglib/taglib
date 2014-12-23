@@ -258,9 +258,15 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
   uint p = 4;
   while(p < data.size()) {
     const uint size = data.toUInt(p + 4, false);
-    d->fieldListMap[data.mid(p, 4)] = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
+    if(size > data.size() - p - 8)
+      break;
+
+    const ByteVector id = data.mid(p, 4);
+    if(isValidChunkID(id)) {
+      const String text = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
+      d->fieldListMap[id] = text;
+    }
 
     p += ((size + 1) & ~1) + 8;
   }
 }
-
