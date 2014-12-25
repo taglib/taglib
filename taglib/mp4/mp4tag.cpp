@@ -111,7 +111,12 @@ MP4::Tag::parseData2(MP4::Atom *atom, TagLib::File *file, int expectedFlags, boo
   unsigned int pos = 0;
   while(pos < data.size()) {
     const int length = static_cast<int>(data.toUInt(pos));
-    ByteVector name = data.mid(pos + 4, 4);
+    if(length < 12) {
+      debug("MP4: Too short atom");
+      return result;
+    }
+
+    const ByteVector name = data.mid(pos + 4, 4);
     const int flags = static_cast<int>(data.toUInt(pos + 8));
     if(freeForm && i < 2) {
       if(i == 0 && name != "mean") {
@@ -274,7 +279,12 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
   unsigned int pos = 0;
   while(pos < data.size()) {
     const int length = static_cast<int>(data.toUInt(pos));
-    ByteVector name = data.mid(pos + 4, 4);
+    if(length < 12) {
+      debug("MP4: Too short atom");
+      break;;
+    }
+
+    const ByteVector name = data.mid(pos + 4, 4);
     const int flags = static_cast<int>(data.toUInt(pos + 8));
     if(name != "data") {
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
@@ -296,7 +306,7 @@ MP4::Tag::parseCovr(MP4::Atom *atom, TagLib::File *file)
 ByteVector
 MP4::Tag::padIlst(const ByteVector &data, int length)
 {
-  if (length == -1) {
+  if(length == -1) {
     length = ((data.size() + 1023) & ~1023) - data.size();
   }
   return renderAtom("free", ByteVector(length, '\1'));
