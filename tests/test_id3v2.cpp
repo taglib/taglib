@@ -91,6 +91,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderChapterFrame);
   CPPUNIT_TEST(testParseTableOfContentsFrame);
   CPPUNIT_TEST(testRenderTableOfContentsFrame);
+  CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1003,6 +1004,39 @@ public:
                  "\x00"                     // TIT2 frame text encoding
                  "TC1", 32),                // Table of contents title
       f.render());
+  }
+
+  void testShrinkPadding()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    {
+      MPEG::File f(newname.c_str());
+      ID3v2::Tag *tag = f.ID3v2Tag(true);
+
+      ID3v2::TextIdentificationFrame *frame1 = new ID3v2::TextIdentificationFrame("TIT2");
+      frame1->setText("Title");
+      tag->addFrame(frame1);
+
+      ID3v2::AttachedPictureFrame *frame2 = new ID3v2::AttachedPictureFrame();
+      frame2->setPicture(ByteVector(100 * 1024, '\xff'));
+      tag->addFrame(frame2);
+
+      f.save();
+      CPPUNIT_ASSERT(f.length() > 100 * 1024);
+    }
+
+    {
+      MPEG::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
+
+      ID3v2::Tag *tag = f.ID3v2Tag();
+      tag->removeFrames("APIC");
+
+      f.save();
+      CPPUNIT_ASSERT(f.length() < 10 * 1024);
+    }
   }
 
 };
