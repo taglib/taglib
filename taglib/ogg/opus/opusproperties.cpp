@@ -119,30 +119,17 @@ void Opus::Properties::read()
 
   ByteVector data = d->file->packet(0);
 
-  // *Magic Signature*
-  uint pos = 8;
-
   // *Version* (8 bits, unsigned)
-  d->opusVersion = uchar(data.at(pos));
-  pos += 1;
+  d->opusVersion = uchar(data.at(8));
 
   // *Output Channel Count* 'C' (8 bits, unsigned)
-  d->channels = uchar(data.at(pos));
-  pos += 1;
+  d->channels = uchar(data.at(9));
 
   // *Pre-skip* (16 bits, unsigned, little endian)
-  const ushort preSkip = data.toUShort(pos, false);
-  pos += 2;
+  const ushort preSkip = data.toUShort(10, false);
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)
-  d->inputSampleRate = data.toUInt(pos, false);
-  pos += 4;
-
-  // *Output Gain* (16 bits, signed, little endian)
-  pos += 2;
-
-  // *Channel Mapping Family* (8 bits, unsigned)
-  pos += 1;
+  d->inputSampleRate = data.toUInt(12, false);
 
   const Ogg::PageHeader *first = d->file->firstPageHeader();
   const Ogg::PageHeader *last  = d->file->lastPageHeader();

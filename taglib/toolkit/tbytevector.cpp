@@ -595,11 +595,15 @@ bool ByteVector::containsAt(const ByteVector &pattern, uint offset, uint pattern
     patternLength = pattern.size();
 
   // do some sanity checking -- all of these things are needed for the search to be valid
-  const uint compareLength = patternLength - patternOffset;
-  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)
+
+  if(patternOffset >= patternLength)
     return false;
 
-  return (::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0);
+  const uint compareLength = patternLength - patternOffset;
+  if(offset + compareLength > size())
+    return false;
+
+  return (::memcmp(DATA(d) + offset, DATA(pattern.d) + patternOffset, compareLength) == 0);
 }
 
 bool ByteVector::startsWith(const ByteVector &pattern) const
@@ -934,12 +938,13 @@ ByteVector &ByteVector::operator=(const char *data)
 ByteVector ByteVector::toHex() const
 {
   ByteVector encoded(size() * 2);
-  char *p = encoded.data();
 
-  for(uint i = 0; i < size(); i++) {
-    unsigned char c = data()[i];
-    *p++ = hexTable[(c >> 4) & 0x0F];
-    *p++ = hexTable[(c     ) & 0x0F];
+  if(!encoded.isEmpty()) {
+    char *p = DATA(encoded.d);
+    for(ConstIterator it = begin(); it != end(); ++it) {
+      *p++ = hexTable[(*it >> 4) & 0x0F];
+      *p++ = hexTable[(*it     ) & 0x0F];
+    }
   }
 
   return encoded;
