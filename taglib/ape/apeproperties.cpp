@@ -221,12 +221,20 @@ void APE::Properties::analyzeOld()
     blocksPerFrame = 73728;
   else
     blocksPerFrame = 9216;
+
   d->channels   = header.toShort(4, false);
   d->sampleRate = header.toUInt(6, false);
+
   const uint finalFrameBlocks = header.toUInt(22, false);
-  const uint totalBlocks 
-    = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
-  d->length = totalBlocks / d->sampleRate;
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+
+  uint totalBlocks = 0;
+  if(totalFrames > 0)
+    totalBlocks = (totalFrames - 1) * blocksPerFrame + finalFrameBlocks;
+
+  if(d->sampleRate > 0)
+    d->length = totalBlocks / d->sampleRate;
+
+  if(d->length > 0)
+    d->bitrate = ((d->streamLength * 8L) / d->length) / 1000;
 }
 

@@ -368,9 +368,12 @@ ByteVector APE::Tag::render() const
 
 void APE::Tag::parse(const ByteVector &data)
 {
-  uint pos = 0;
-
   // 11 bytes is the minimum size for an APE item
+
+  if(data.size() < 11)
+    return;
+
+  uint pos = 0;
 
   for(uint i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
     APE::Item item;
