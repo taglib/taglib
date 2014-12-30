@@ -115,6 +115,11 @@ TagLib::uint RIFF::WAV::Properties::sampleFrames() const
 
 void RIFF::WAV::Properties::read(const ByteVector &data)
 {
+  if(data.size() < 16) {
+    debug("RIFF::WAV::Properties::read() - \"fmt \" chunk is too short for WAV.");
+    return;
+  }
+
   d->format      = data.toShort(0, false);
   d->channels    = data.toShort(2, false);
   d->sampleRate  = data.toUInt(4, false);

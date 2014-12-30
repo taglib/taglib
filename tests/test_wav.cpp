@@ -72,8 +72,11 @@ public:
 
   void testFuzzedFiles()
   {
-    RIFF::WAV::File f(TEST_FILE_PATH_C("infloop.wav"));
-    CPPUNIT_ASSERT(!f.isValid());
+    RIFF::WAV::File f1(TEST_FILE_PATH_C("infloop.wav"));
+    CPPUNIT_ASSERT(!f1.isValid());
+
+    RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
+    CPPUNIT_ASSERT(f2.isValid());
   }
 
 };
