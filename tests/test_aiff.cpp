@@ -21,24 +21,16 @@ public:
 
   void testReading()
   {
-    ScopedFileCopy copy("empty", ".aiff");
-    string filename = copy.fileName();
-
-    RIFF::AIFF::File *f = new RIFF::AIFF::File(filename.c_str());
-    CPPUNIT_ASSERT_EQUAL(705, f->audioProperties()->bitrate());
-    delete f;
+    RIFF::AIFF::File f(TEST_FILE_PATH_C("empty.aiff"));
+    CPPUNIT_ASSERT_EQUAL(705, f.audioProperties()->bitrate());
   }
 
   void testAiffCProperties()
   {
-    ScopedFileCopy copy("alaw", ".aifc");
-    string filename = copy.fileName();
-
-    RIFF::AIFF::File *f = new RIFF::AIFF::File(filename.c_str());
-    CPPUNIT_ASSERT(f->audioProperties()->isAiffC());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("ALAW"), f->audioProperties()->compressionType());
-    CPPUNIT_ASSERT_EQUAL(String("SGI CCITT G.711 A-law"), f->audioProperties()->compressionName());
-    delete f;
+    RIFF::AIFF::File f(TEST_FILE_PATH_C("alaw.aifc"));
+    CPPUNIT_ASSERT(f.audioProperties()->isAiffC());
+    CPPUNIT_ASSERT(f.audioProperties()->compressionType() == "ALAW");
+    CPPUNIT_ASSERT(f.audioProperties()->compressionName() == "SGI CCITT G.711 A-law");
   }
 
   void testFuzzedFiles()
