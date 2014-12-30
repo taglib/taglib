@@ -504,6 +504,11 @@ namespace TagLib {
        */
       bool frameAlterPreservation() const;
 
+      /*!
+       * Returns true if any of the unused frame header flags is set.
+       */
+      bool hasBadFlags() const;
+
     private:
       Header(const Header &);
       Header &operator=(const Header &);

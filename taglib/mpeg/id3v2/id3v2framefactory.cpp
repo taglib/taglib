@@ -98,15 +98,23 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   ByteVector data = origData;
   uint version = tagHeader->majorVersion();
   Frame::Header *header = new Frame::Header(data, version);
-  ByteVector frameID = header->frameID();
 
-  // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
-  // characters.  Also make sure that there is data in the frame.
+  // A quick sanity check -- make sure that the frame header has no bad flags
+  // and there is data in the frame.
 
-  if(frameID.size() != (version < 3 ? 3 : 4) ||
+  if(header->hasBadFlags() ||
      header->frameSize() <= uint(header->dataLengthIndicator() ? 4 : 0) ||
      header->frameSize() > data.size())
   {
+    delete header;
+    return 0;
+  }
+
+  // Make sure that the frameID is 4 uppercase Latin1 characters.
+
+  ByteVector frameID = header->frameID();
+
+  if(frameID.size() != (version < 3 ? 3 : 4)) {
     delete header;
     return 0;
   }
@@ -160,7 +168,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   frameID = header->frameID();
 
-  // This is where things get necissarily nasty.  Here we determine which
+  // This is where things get necessarily nasty.  Here we determine which
   // Frame subclass (or if none is found simply an Frame) based
   // on the frame ID.  Since there are a lot of possibilities, that means
   // a lot of if blocks.
