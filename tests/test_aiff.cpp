@@ -13,6 +13,8 @@ class TestAIFF : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestAIFF);
   CPPUNIT_TEST(testReading);
+  CPPUNIT_TEST(testAiffCProperties);
+  CPPUNIT_TEST(testReading);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -25,6 +27,24 @@ public:
     RIFF::AIFF::File *f = new RIFF::AIFF::File(filename.c_str());
     CPPUNIT_ASSERT_EQUAL(705, f->audioProperties()->bitrate());
     delete f;
+  }
+
+  void testAiffCProperties()
+  {
+    ScopedFileCopy copy("alaw", ".aifc");
+    string filename = copy.fileName();
+
+    RIFF::AIFF::File *f = new RIFF::AIFF::File(filename.c_str());
+    CPPUNIT_ASSERT(f->audioProperties()->isAiffC());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("ALAW"), f->audioProperties()->compressionType());
+    CPPUNIT_ASSERT_EQUAL(String("SGI CCITT G.711 A-law"), f->audioProperties()->compressionName());
+    delete f;
+  }
+
+  void testFuzzedFiles()
+  {
+    RIFF::AIFF::File f(TEST_FILE_PATH_C("segfault.aif"));
+    CPPUNIT_ASSERT(!f.isValid());
   }
 
 };
