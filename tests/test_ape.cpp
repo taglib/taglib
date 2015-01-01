@@ -16,6 +16,7 @@ class TestAPE : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties399);
   CPPUNIT_TEST(testProperties396);
   CPPUNIT_TEST(testProperties390);
+  CPPUNIT_TEST(testFuzzedFiles);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -45,6 +46,15 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+  }
+
+  void testFuzzedFiles()
+  {
+    APE::File f1(TEST_FILE_PATH_C("longloop.ape"));
+    CPPUNIT_ASSERT(f1.isValid());
+
+    APE::File f2(TEST_FILE_PATH_C("zerodiv.ape"));
+    CPPUNIT_ASSERT(f2.isValid());
   }
 
 };

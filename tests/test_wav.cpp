@@ -16,6 +16,8 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testZeroSizeDataChunk);
   CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST(testFormat);
+  CPPUNIT_TEST(testFuzzedFile1);
+  CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -75,11 +77,23 @@ public:
     RIFF::WAV::File f1(TEST_FILE_PATH_C("empty.wav"));
     CPPUNIT_ASSERT_EQUAL(true, f1.isValid());
     CPPUNIT_ASSERT_EQUAL((uint)1, f1.audioProperties()->format());
-
     RIFF::WAV::File f2(TEST_FILE_PATH_C("alaw.wav"));
     CPPUNIT_ASSERT_EQUAL(true, f2.isValid());
     CPPUNIT_ASSERT_EQUAL((uint)6, f2.audioProperties()->format());
   }
+
+  void testFuzzedFile1()
+  {
+    RIFF::WAV::File f1(TEST_FILE_PATH_C("infloop.wav"));
+    CPPUNIT_ASSERT(!f1.isValid());
+  }
+
+  void testFuzzedFile2()
+  {
+    RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
+    CPPUNIT_ASSERT(f2.isValid());
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestWAV);

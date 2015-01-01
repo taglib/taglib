@@ -13,6 +13,15 @@
 #cmakedefine   _LARGEFILE_SOURCE ${_LARGEFILE_SOURCE}
 #cmakedefine   _FILE_OFFSET_BITS ${_FILE_OFFSET_BITS}
 
+/* Defined if your compiler supports some byte swap functions */
+#cmakedefine   HAVE_GCC_BYTESWAP_16 1
+#cmakedefine   HAVE_GCC_BYTESWAP_32 1
+#cmakedefine   HAVE_GCC_BYTESWAP_64 1
+#cmakedefine   HAVE_GLIBC_BYTESWAP 1
+#cmakedefine   HAVE_MSC_BYTESWAP 1
+#cmakedefine   HAVE_MAC_BYTESWAP 1
+#cmakedefine   HAVE_OPENBSD_BYTESWAP 1
+
 /* Defined if your compiler supports some atomic operations */
 #cmakedefine   HAVE_STD_ATOMIC 1
 #cmakedefine   HAVE_BOOST_ATOMIC 1
@@ -24,15 +33,6 @@
 /* Defined if your compiler supports shared_ptr */
 #cmakedefine   HAVE_STD_SMART_PTR 1
 #cmakedefine   HAVE_BOOST_SMART_PTR 1
-
-/* Defined if your compiler supports some byte swap functions */
-#cmakedefine   HAVE_GCC_BYTESWAP_16 1
-#cmakedefine   HAVE_GCC_BYTESWAP_32 1
-#cmakedefine   HAVE_GCC_BYTESWAP_64 1
-#cmakedefine   HAVE_GLIBC_BYTESWAP 1
-#cmakedefine   HAVE_MSC_BYTESWAP 1
-#cmakedefine   HAVE_MAC_BYTESWAP 1
-#cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
 /* Defined if your compiler supports snprintf or sprintf_s. */
 #cmakedefine   HAVE_SNPRINTF 1
