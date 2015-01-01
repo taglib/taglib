@@ -44,10 +44,10 @@ public:
 
   const ID3v2::Header *tagHeader;
   ByteVector elementID;
-  uint startTime;
-  uint endTime;
-  uint startOffset;
-  uint endOffset;
+  TagLib::uint startTime;
+  TagLib::uint endTime;
+  TagLib::uint startOffset;
+  TagLib::uint endOffset;
   FrameListMap embeddedFrameListMap;
   FrameList embeddedFrameList;
 };
@@ -64,8 +64,8 @@ ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &dat
   setData(data);
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT,
-                           const uint &sO, const uint &eO, const FrameList &eF) :
+ChapterFrame::ChapterFrame(const ByteVector &eID, const TagLib::uint &sT, const TagLib::uint &eT,
+                           const TagLib::uint &sO, const TagLib::uint &eO, const FrameList &eF) :
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
@@ -89,22 +89,22 @@ ByteVector ChapterFrame::elementID() const
   return d->elementID;
 }
 
-uint ChapterFrame::startTime() const
+TagLib::uint ChapterFrame::startTime() const
 {
   return d->startTime;
 }
 
-uint ChapterFrame::endTime() const
+TagLib::uint ChapterFrame::endTime() const
 {
   return d->endTime;
 }
 
-uint ChapterFrame::startOffset() const
+TagLib::uint ChapterFrame::startOffset() const
 {
   return d->startOffset;
 }
 
-uint ChapterFrame::endOffset() const
+TagLib::uint ChapterFrame::endOffset() const
 {
   return d->endOffset;
 }
@@ -116,22 +116,22 @@ void ChapterFrame::setElementID(const ByteVector &eID)
     d->elementID.append(char(0));
 }
 
-void ChapterFrame::setStartTime(const uint &sT)
+void ChapterFrame::setStartTime(const TagLib::uint &sT)
 {
   d->startTime = sT;
 }
 
-void ChapterFrame::setEndTime(const uint &eT)
+void ChapterFrame::setEndTime(const TagLib::uint &eT)
 {
   d->endTime = eT;
 }
 
-void ChapterFrame::setStartOffset(const uint &sO)
+void ChapterFrame::setStartOffset(const TagLib::uint &sO)
 {
   d->startOffset = sO;
 }
 
-void ChapterFrame::setEndOffset(const uint &eO)
+void ChapterFrame::setEndOffset(const TagLib::uint &eO)
 {
   d->endOffset = eO;
 }
@@ -231,6 +231,7 @@ void ChapterFrame::parseFields(const ByteVector &data)
   d->endOffset = data.toUInt32BE(pos);
   pos += 4;
   size -= pos;
+
   while(embPos < size - header()->size()) {
     Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
 

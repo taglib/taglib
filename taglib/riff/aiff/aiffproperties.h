@@ -47,7 +47,7 @@ namespace TagLib {
       {
       public:
         /*!
-         * Creates an instance of AIFF::AudioProperties with the data read from 
+         * Creates an instance of AIFF::AudioProperties with the data read from
          * the ByteVector \a data.
          */
         AudioProperties(const ByteVector &data, ReadStyle style);
