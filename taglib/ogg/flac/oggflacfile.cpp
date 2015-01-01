@@ -103,7 +103,7 @@ PropertyMap Ogg::FLAC::File::properties() const
 PropertyMap Ogg::FLAC::File::setProperties(const PropertyMap &properties)
 {
   return d->comment->setProperties(properties);
-}  
+}
 
 Properties *Ogg::FLAC::File::audioProperties() const
 {
@@ -233,7 +233,12 @@ void Ogg::FLAC::File::scan()
 
   }
 
-  header = metadataHeader.mid(0,4);
+  header = metadataHeader.mid(0, 4);
+  if(header.size() < 4) {
+    debug("Ogg::FLAC::File::scan() -- Invalid Ogg/FLAC metadata header");
+    return;
+  }
+
   // Header format (from spec):
   // <1> Last-metadata-block flag
   // <7> BLOCK_TYPE
