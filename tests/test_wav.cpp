@@ -15,6 +15,8 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testLength);
   CPPUNIT_TEST(testZeroSizeDataChunk);
   CPPUNIT_TEST(testStripTags);
+  CPPUNIT_TEST(testFuzzedFile1);
+  CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -67,7 +69,19 @@ public:
     CPPUNIT_ASSERT(!f->hasID3v2Tag());
     CPPUNIT_ASSERT(f->hasInfoTag());
     delete f;
- }
+  }
+
+  void testFuzzedFile1()
+  {
+    RIFF::WAV::File f1(TEST_FILE_PATH_C("infloop.wav"));
+    CPPUNIT_ASSERT(!f1.isValid());
+  }
+
+  void testFuzzedFile2()
+  {
+    RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
+    CPPUNIT_ASSERT(f2.isValid());
+  }
 
 };
 
