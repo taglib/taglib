@@ -15,6 +15,7 @@ class TestAIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testReading);
   CPPUNIT_TEST(testSaveID3v2);
   CPPUNIT_TEST(testAiffCProperties);
+  CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
@@ -50,8 +51,19 @@ public:
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("alaw.aifc"));
     CPPUNIT_ASSERT(f.audioProperties()->isAiffC());
-    CPPUNIT_ASSERT(f.audioProperties()->compressionType() == "ALAW");
-    CPPUNIT_ASSERT(f.audioProperties()->compressionName() == "SGI CCITT G.711 A-law");
+    CPPUNIT_ASSERT_EQUAL(ByteVector("ALAW"), f.audioProperties()->compressionType());
+    CPPUNIT_ASSERT_EQUAL(String("SGI CCITT G.711 A-law"), f.audioProperties()->compressionName());
+  }
+
+  void testDuplicateID3v2()
+  {
+    RIFF::AIFF::File f(TEST_FILE_PATH_C("duplicate_id3v2.aiff"));
+
+    // duplicate_id3v2.aiff has duplicate ID3v2 tags.
+    // title() returns "Title2" if can't skip the second tag.
+
+    CPPUNIT_ASSERT(f.hasID3v2Tag());
+    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.tag()->title());
   }
 
   void testFuzzedFile1()

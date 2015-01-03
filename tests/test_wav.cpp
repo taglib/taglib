@@ -19,6 +19,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testID3v2Tag);
   CPPUNIT_TEST(testInfoTag);
   CPPUNIT_TEST(testStripTags);
+  CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
@@ -139,6 +140,20 @@ public:
     CPPUNIT_ASSERT(!f->hasID3v2Tag());
     CPPUNIT_ASSERT(f->hasInfoTag());
     delete f;
+  }
+
+  void testDuplicateTags()
+  {
+    RIFF::WAV::File f(TEST_FILE_PATH_C("duplicate_tags.wav"));
+
+    // duplicate_tags.wav has duplicate ID3v2/INFO tags.
+    // title() returns "Title2" if can't skip the second tag.
+
+    CPPUNIT_ASSERT(f.hasID3v2Tag());
+    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.ID3v2Tag()->title());
+
+    CPPUNIT_ASSERT(f.hasInfoTag());
+    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.InfoTag()->title());
   }
 
   void testFuzzedFile1()
