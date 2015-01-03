@@ -1,9 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
+#include <tpropertymap.h>
 #include <tbytevectorlist.h>
 #include <wavfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -17,6 +18,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -81,6 +83,17 @@ public:
   {
     RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
     CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testDuplicateID3v2()
+  {
+    RIFF::WAV::File f(TEST_FILE_PATH_C("duplicate_id3v2.wav"));
+
+    // duplicate_id3v2.wav has duplicate ID3v2 tags.
+    // title() returns "Title2" if the second tag has been read.
+
+    CPPUNIT_ASSERT(f.hasID3v2Tag());
+    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.ID3v2Tag()->title());
   }
 
 };
