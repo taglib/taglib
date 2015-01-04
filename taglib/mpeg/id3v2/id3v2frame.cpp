@@ -274,13 +274,14 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
 
       int result = inflate(&stream, Z_NO_FLUSH);
 
-      if(result == Z_STREAM_ERROR)
-        return ByteVector();
-      else if(result == Z_NEED_DICT ||
-              result == Z_DATA_ERROR ||
-              result == Z_MEM_ERROR)
+      if(result == Z_STREAM_ERROR ||
+         result == Z_NEED_DICT ||
+         result == Z_DATA_ERROR ||
+         result == Z_MEM_ERROR)
       {
-        inflateEnd(&stream);
+        if(result != Z_STREAM_ERROR)
+          inflateEnd(&stream);
+        debug("Error reading compressed stream");
         return ByteVector();
       }
 
