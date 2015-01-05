@@ -174,7 +174,21 @@ namespace TagLib {
      */
     Map<Key, T> &operator=(const Map<Key, T> &m);
 
+    /*!
+     * Exchanges the content of the Map by the content of \a m.
+     */
+    void swap(Map<Key, T> &m);
+
   protected:
+    /*!
+     * Makes a deep copy of \a m.
+     */
+#ifdef WANT_CLASS_INSTANTIATION_OF_MAP
+    Map(const std::map<class Key, class T> &m);
+#else
+    Map(const std::map<Key, T> &m);
+#endif
+
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
      * data and separate from the shared members.  This should be called by all

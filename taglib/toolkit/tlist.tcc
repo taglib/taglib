@@ -89,13 +89,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-List<T>::List()
+List<T>::List() :
+  d(new ListPrivate<T>())
 {
-  d = new ListPrivate<T>;
 }
 
 template <class T>
-List<T>::List(const List<T> &l) : d(l.d)
+List<T>::List(const List<T> &l) :
+  d(l.d)
 {
   d->ref();
 }
@@ -188,8 +189,7 @@ List<T> &List<T>::prepend(const List<T> &l)
 template <class T>
 List<T> &List<T>::clear()
 {
-  detach();
-  d->clear();
+  List<T>().swap(*this);
   return *this;
 }
 
@@ -221,7 +221,7 @@ typename List<T>::ConstIterator List<T>::find(const T &value) const
 template <class T>
 bool List<T>::contains(const T &value) const
 {
-  return std::find(d->list.begin(), d->list.end(), value) != d->list.end();
+  return (std::find(d->list.begin(), d->list.end(), value) != d->list.end());
 }
 
 template <class T>
@@ -266,10 +266,7 @@ template <class T>
 T &List<T>::operator[](uint i)
 {
   Iterator it = d->list.begin();
-
-  for(uint j = 0; j < i; j++)
-    ++it;
-
+  std::advance(it, i);
   return *it;
 }
 
@@ -277,36 +274,35 @@ template <class T>
 const T &List<T>::operator[](uint i) const
 {
   ConstIterator it = d->list.begin();
-
-  for(uint j = 0; j < i; j++)
-    ++it;
-
+  std::advance(it, i);
   return *it;
 }
 
 template <class T>
 List<T> &List<T>::operator=(const List<T> &l)
 {
-  if(&l == this)
-    return *this;
+  if(d != l.d)
+    List<T>(l).swap(*this);
 
-  if(d->deref())
-    delete d;
-  d = l.d;
-  d->ref();
   return *this;
+}
+
+template <class T>
+void List<T>::swap(List<T> &l)
+{
+  std::swap(d, l.d);
 }
 
 template <class T>
 bool List<T>::operator==(const List<T> &l) const
 {
-  return d->list == l.d->list;
+  return (d == l.d || d->list == l.d->list);
 }
 
 template <class T>
 bool List<T>::operator!=(const List<T> &l) const
 {
-  return d->list != l.d->list;
+  return !(*this == l);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -314,12 +310,16 @@ bool List<T>::operator!=(const List<T> &l) const
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
+List<T>::List(const std::list<T> &l) :
+  d(new ListPrivate<T>(l))
+{
+}
+
+template <class T>
 void List<T>::detach()
 {
-  if(d->count() > 1) {
-    d->deref();
-    d = new ListPrivate<T>(d->list);
-  }
+  if(d->count() > 1)
+    List<T>(d->list).swap(*this);
 }
 
 } // namespace TagLib

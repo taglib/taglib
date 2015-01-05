@@ -557,6 +557,11 @@ namespace TagLib {
     ByteVector &operator=(const char *data);
 
     /*!
+     * Exchanges the content of the ByteVector by the content of \a v.
+     */
+    void swap(ByteVector &v);
+
+    /*!
      * A static, empty ByteVector which is convenient and fast (since returning
      * an empty or "null" value does not require instantiating a new ByteVector).
      */

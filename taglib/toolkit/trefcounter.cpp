@@ -72,17 +72,14 @@ namespace TagLib
   class RefCounter::RefCounterPrivate
   {
   public:
-    RefCounterPrivate() : refCount(1) {}
-
-    void ref() { ATOMIC_INC(refCount); }
-    bool deref() { return (ATOMIC_DEC(refCount) == 0); }
-    int count() const { return refCount; }
+    RefCounterPrivate() :
+      refCount(1) {}
 
     volatile ATOMIC_INT refCount;
   };
 
-  RefCounter::RefCounter()
-    : d(new RefCounterPrivate())
+  RefCounter::RefCounter() :
+    d(new RefCounterPrivate())
   {
   }
 
@@ -91,18 +88,23 @@ namespace TagLib
     delete d;
   }
 
-  void RefCounter::ref() 
-  { 
-    d->ref(); 
+  void RefCounter::ref()
+  {
+    ATOMIC_INC(d->refCount);
   }
 
-  bool RefCounter::deref() 
-  { 
-    return d->deref(); 
+  bool RefCounter::deref()
+  {
+    return (ATOMIC_DEC(d->refCount) == 0);
   }
 
-  int RefCounter::count() const 
-  { 
-    return d->count(); 
+  int RefCounter::count() const
+  {
+    return static_cast<int>(d->refCount);
+  }
+
+  bool RefCounter::unique() const
+  {
+    return (count() == 1);
   }
 }

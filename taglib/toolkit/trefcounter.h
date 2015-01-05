@@ -67,6 +67,7 @@ namespace TagLib
     void ref();
     bool deref();
     int count() const;
+    bool unique() const;
 
   private:
     class RefCounterPrivate;

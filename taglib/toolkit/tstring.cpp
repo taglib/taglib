@@ -636,90 +636,62 @@ String &String::operator+=(char c)
 
 String &String::operator=(const String &s)
 {
-  if(&s == this)
-    return *this;
+  if(d != s.d)
+    String(s).swap(*this);
 
-  if(d->deref())
-    delete d;
-  d = s.d;
-  d->ref();
   return *this;
 }
 
 String &String::operator=(const std::string &s)
 {
-  if(d->deref())
-    delete d;
-
-  d = new StringPrivate;
-  copyFromLatin1(s.c_str(), s.length());
-
+  String(s).swap(*this);
   return *this;
 }
 
 String &String::operator=(const wstring &s)
 {
-  if(d->deref())
-    delete d;
-  d = new StringPrivate(s);
+  String(s).swap(*this);
   return *this;
 }
 
 String &String::operator=(const wchar_t *s)
 {
-  if(d->deref())
-    delete d;
-
-  d = new StringPrivate(s);
+  String(s).swap(*this);
   return *this;
 }
 
 String &String::operator=(char c)
 {
-  if(d->deref())
-    delete d;
-
-  d = new StringPrivate(1, static_cast<uchar>(c));
+  String(c).swap(*this);
   return *this;
 }
 
 String &String::operator=(wchar_t c)
 {
-  if(d->deref())
-    delete d;
-
-  d = new StringPrivate(1, c);
+  String(c, WCharByteOrder).swap(*this); // Second parameter can be removed in taglib2.
   return *this;
 }
 
 String &String::operator=(const char *s)
 {
-  if(d->deref())
-    delete d;
-
-  d = new StringPrivate;
-  copyFromLatin1(s, ::strlen(s));
-
+  String(s).swap(*this);
   return *this;
 }
 
 String &String::operator=(const ByteVector &v)
 {
-  if(d->deref())
-    delete d;
-
-  d = new StringPrivate;
-  copyFromLatin1(v.data(), v.size());
-
-  // If we hit a null in the ByteVector, shrink the string again.
-  d->data.resize(::wcslen(d->data.c_str()));
-
+  String(v).swap(*this);
   return *this;
+}
+
+void String::swap(String &s)
+{
+  std::swap(d, s.d);
 }
 
 bool String::operator<(const String &s) const
 {
-  return d->data < s.d->data;
+  return (d->data < s.d->data);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -728,10 +700,8 @@ bool String::operator<(const String &s) const
 
 void String::detach()
 {
-  if(d->count() > 1) {
-    d->deref();
-    d = new StringPrivate(d->data);
-  }
+  if(!d->unique())
+    String(d->data).swap(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
