@@ -96,10 +96,7 @@ public:
 
   void testDuplicateID3v2()
   {
-    ScopedFileCopy copy("duplicate_id3v2", ".mp3");
-    string newname = copy.fileName();
-
-    MPEG::File f(newname.c_str());
+    MPEG::File f(TEST_FILE_PATH_C("duplicate_id3v2.mp3"));
 
     // duplicate_id3v2.mp3 has duplicate ID3v2 tags.
     // Sample rate will be 32000 if can't skip the second tag.

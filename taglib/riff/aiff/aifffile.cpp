@@ -53,6 +53,8 @@ public:
   Properties *properties;
   ID3v2::Tag *tag;
   ByteVector tagChunkID;
+
+  bool hasID3v2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,10 +121,15 @@ bool RIFF::AIFF::File::save()
   }
 
   setChunkData(d->tagChunkID, d->tag->render());
+  d->hasID3v2 = true;
 
   return true;
 }
 
+bool TagLib::RIFF::AIFF::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
@@ -131,11 +138,18 @@ bool RIFF::AIFF::File::save()
 void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   for(uint i = 0; i < chunkCount(); i++) {
-    if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
-      d->tagChunkID = chunkName(i);
-      d->tag = new ID3v2::Tag(this, chunkOffset(i));
+    const ByteVector name = chunkName(i);
+    if(name == "ID3 " || name == "id3 ") {
+      if(!d->tag) {
+        d->tagChunkID = name;
+        d->tag = new ID3v2::Tag(this, chunkOffset(i));
+        d->hasID3v2 = true;
+      }
+      else {
+        debug("RIFF::AIFF::File::read() - Duplicate ID3v2 tag found.");
+      }
     }
-    else if(chunkName(i) == "COMM" && readProperties)
+    else if(name == "COMM" && readProperties)
       d->properties = new Properties(chunkData(i), propertiesStyle);
   }
 
