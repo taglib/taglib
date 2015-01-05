@@ -17,6 +17,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v24WrongParam);
   CPPUNIT_TEST(testSaveID3v23);
   CPPUNIT_TEST(testDuplicateID3v2);
+  CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -104,6 +105,12 @@ public:
     // Sample rate will be 32000 if can't skip the second tag.
 
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+  }
+
+  void testFuzzedFile()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("excessive_alloc.mp3"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };

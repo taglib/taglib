@@ -1,9 +1,9 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <aifffile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -14,7 +14,8 @@ class TestAIFF : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestAIFF);
   CPPUNIT_TEST(testReading);
   CPPUNIT_TEST(testAiffCProperties);
-  CPPUNIT_TEST(testReading);
+  CPPUNIT_TEST(testFuzzedFile1);
+  CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -33,9 +34,15 @@ public:
     CPPUNIT_ASSERT(f.audioProperties()->compressionName() == "SGI CCITT G.711 A-law");
   }
 
-  void testFuzzedFiles()
+  void testFuzzedFile1()
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("segfault.aif"));
+    CPPUNIT_ASSERT(!f.isValid());
+  }
+
+  void testFuzzedFile2()
+  {
+    RIFF::AIFF::File f(TEST_FILE_PATH_C("excessive_alloc.aif"));
     CPPUNIT_ASSERT(!f.isValid());
   }
 

@@ -32,6 +32,7 @@
 #endif
 
 #include <bitset>
+#include <cstring>
 
 #include <tdebug.h>
 #include <tstringlist.h>
@@ -255,7 +256,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
      !d->header->encryption())
   {
     z_stream stream;
-    memset(&stream, 0, sizeof(z_stream));
+    ::memset(&stream, 0, sizeof(z_stream));
 
     if(inflateInit(&stream) != Z_OK)
       return ByteVector();
