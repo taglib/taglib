@@ -318,7 +318,6 @@ if(HAVE_ZLIB_SOURCE)
     ${ZLIB_SOURCE}/inffast.c
     ${ZLIB_SOURCE}/inflate.c
     ${ZLIB_SOURCE}/inftrees.c
-    ${ZLIB_SOURCE}/uncompr.c
     ${ZLIB_SOURCE}/zutil.c
   )
 endif()
