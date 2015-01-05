@@ -13,6 +13,7 @@ class TestAIFF : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestAIFF);
   CPPUNIT_TEST(testReading);
+  CPPUNIT_TEST(testSaveID3v2);
   CPPUNIT_TEST(testAiffCProperties);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
@@ -24,6 +25,25 @@ public:
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("empty.aiff"));
     CPPUNIT_ASSERT_EQUAL(705, f.audioProperties()->bitrate());
+  }
+
+  void testSaveID3v2()
+  {
+    ScopedFileCopy copy("empty", ".aiff");
+    string newname = copy.fileName();
+
+    {
+      RIFF::AIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      f.tag()->setTitle(L"TitleXXX");
+      f.save();
+    }
+
+    {
+      RIFF::AIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String(L"TitleXXX"), f.tag()->title());
+    }
   }
 
   void testAiffCProperties()
