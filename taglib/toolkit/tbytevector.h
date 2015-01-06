@@ -202,6 +202,11 @@ namespace TagLib {
     ByteVector &append(const ByteVector &v);
 
     /*!
+     * Appends \a c to the end of the ByteVector.
+     */
+    ByteVector &append(char c);
+
+    /*!
      * Clears the data.
      */
     ByteVector &clear();
@@ -566,6 +571,11 @@ namespace TagLib {
      * \warning The behavior is undefined if \a data is not null terminated.
      */
     ByteVector &operator=(const char *data);
+
+    /*!
+     * Exchanges the content of the ByteVector by the content of \a v.
+     */
+    void swap(ByteVector &v);
 
     /*!
      * A static, empty ByteVector which is convenient and fast (since returning
