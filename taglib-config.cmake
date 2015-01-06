@@ -32,7 +32,7 @@ do
 	  flags="$flags -L$libdir -ltag"
 	  ;;
     --cflags)
-	  flags="$flags -I$includedir/taglib"
+	  flags="$flags -I$includedir -I$includedir/taglib"
 	  ;;
     --version)
 	  echo ${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}.${TAGLIB_LIB_PATCH_VERSION} 

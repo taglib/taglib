@@ -28,7 +28,7 @@ goto theend
   * It would be preferable if the top level CMakeLists.txt provided the library name during config. ??
 :doit
 if /i "%1#" == "--libs#"    echo -L${LIB_INSTALL_DIR} -llibtag
-if /i "%1#" == "--cflags#"  echo -I${INCLUDE_INSTALL_DIR}/taglib
+if /i "%1#" == "--cflags#"  echo -I${INCLUDE_INSTALL_DIR} -I${INCLUDE_INSTALL_DIR}/taglib
 if /i "%1#" == "--version#" echo ${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}.${TAGLIB_LIB_PATCH_VERSION}
 if /i "%1#" == "--prefix#"  echo ${CMAKE_INSTALL_PREFIX}
 
