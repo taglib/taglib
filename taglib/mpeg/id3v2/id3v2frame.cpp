@@ -32,7 +32,6 @@
 #endif
 
 #include <bitset>
-#include <cstring>
 
 #include <tdebug.h>
 #include <tstringlist.h>
@@ -255,13 +254,17 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
   if(d->header->compression() &&
      !d->header->encryption())
   {
-    z_stream stream;
-    ::memset(&stream, 0, sizeof(z_stream));
+    if(frameData.size() <= frameDataOffset) {
+      debug("Compressed frame doesn't have enough data to decode");
+      return ByteVector();
+    }
+
+    z_stream stream = {};
 
     if(inflateInit(&stream) != Z_OK)
       return ByteVector();
 
-    stream.avail_in = (uLongf) frameDataLength;
+    stream.avail_in = (uLongf) frameData.size() - frameDataOffset;
     stream.next_in = (Bytef *) frameData.data() + frameDataOffset;
 
     static const uint chunkSize = 1024;
