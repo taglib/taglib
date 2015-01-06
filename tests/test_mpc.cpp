@@ -1,10 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <mpcfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -17,7 +17,9 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesSV7);
   CPPUNIT_TEST(testPropertiesSV5);
   CPPUNIT_TEST(testPropertiesSV4);
-  CPPUNIT_TEST(testFuzzedFiles);
+  CPPUNIT_TEST(testFuzzedFile1);
+  CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testFuzzedFile3);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -62,16 +64,22 @@ public:
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
   }
 
-  void testFuzzedFiles()
+  void testFuzzedFile1()
   {
-    MPC::File f1(TEST_FILE_PATH_C("zerodiv.mpc"));
-    CPPUNIT_ASSERT(f1.isValid());
+    MPC::File f(TEST_FILE_PATH_C("zerodiv.mpc"));
+    CPPUNIT_ASSERT(f.isValid());
+  }
 
-    MPC::File f2(TEST_FILE_PATH_C("infloop.mpc"));
-    CPPUNIT_ASSERT(f2.isValid());
+  void testFuzzedFile2()
+  {
+    MPC::File f(TEST_FILE_PATH_C("infloop.mpc"));
+    CPPUNIT_ASSERT(f.isValid());
+  }
 
-    MPC::File f3(TEST_FILE_PATH_C("segfault.mpc"));
-    CPPUNIT_ASSERT(f3.isValid());
+  void testFuzzedFile3()
+  {
+    MPC::File f(TEST_FILE_PATH_C("segfault.mpc"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };
