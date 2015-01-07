@@ -161,72 +161,84 @@ unsigned long readSize(File *file, TagLib::uint &sizelength)
   unsigned long size = 0;
 
   do {
-    ByteVector b = file->readBlock(1);
+    const ByteVector b = file->readBlock(1);
+    if(b.size() < 1)
+      break;
+
     tmp = b[0];
     size = (size << 7) | (tmp & 0x7F);
     sizelength++;
-  } while((tmp & 0x80));
+  } while(tmp & 0x80);
+
   return size;
 }
 
-unsigned long readSize(const ByteVector &data, TagLib::uint &sizelength)
+unsigned long readSize(const ByteVector &data, TagLib::uint &pos)
 {
   unsigned char tmp;
   unsigned long size = 0;
-  unsigned long pos = 0;
 
   do {
+    if(pos >= data.size())
+      break;
+
     tmp = data[pos++];
     size = (size << 7) | (tmp & 0x7F);
-    sizelength++;
-  } while((tmp & 0x80) && (pos < data.size()));
+  } while (tmp & 0x80);
+
   return size;
 }
 
-static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
+static const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 
 void MPC::Properties::readSV8(File *file)
 {
   bool readSH = false, readRG = false;
 
   while(!readSH && !readRG) {
-    ByteVector packetType = file->readBlock(2);
-    uint packetSizeLength = 0;
-    unsigned long packetSize = readSize(file, packetSizeLength);
-    unsigned long dataSize = packetSize - 2 - packetSizeLength;
+    const ByteVector packetType = file->readBlock(2);
+    if(packetType.size() < 2)
+      break;
 
-    if(packetType == "SH") {
+    uint packetSizeLength = 0;
+    const unsigned long packetSize = readSize(file, packetSizeLength);
+    const unsigned long dataSize = packetSize - 2 - packetSizeLength;
+    const ByteVector data = file->readBlock(dataSize);
+    if(data.size() < dataSize)
+      break;
+
+    if(packetType == "SH" && dataSize >= 7) {
       // Stream Header
       // http://trac.musepack.net/wiki/SV8Specification#StreamHeaderPacket
-      ByteVector data = file->readBlock(dataSize);
       readSH = true;
 
       TagLib::uint pos = 4;
       d->version = data[pos];
       pos += 1;
-      d->sampleFrames = readSize(data.mid(pos), pos);
-      ulong begSilence = readSize(data.mid(pos), pos);
+      d->sampleFrames = readSize(data, pos);
+      const ulong begSilence = readSize(data, pos);
 
-      std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.toUShort(pos, true)));
+      const ushort flags = data.toUShort(pos, true);
       pos += 2;
 
-      d->sampleRate = sftable[flags[15] * 4 + flags[14] * 2 + flags[13]];
-      d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
+      d->sampleRate = sftable[(flags >> 13) & 0x7];
+      d->channels = ((flags >> 4) & 0xF) + 1;
 
-      if((d->sampleFrames - begSilence) != 0)
+      if((d->sampleFrames - begSilence) != 0) {
         d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
-      d->bitrate = d->bitrate / 1000;
+        d->bitrate = d->bitrate / 1000;
 
-      d->length = (d->sampleFrames - begSilence) / d->sampleRate;
+        if(d->sampleRate != 0)
+          d->length = (d->sampleFrames - begSilence) / d->sampleRate;
+      }
     }
 
-    else if (packetType == "RG") {
+    else if (packetType == "RG" && dataSize >= 9) {
       // Replay Gain
       // http://trac.musepack.net/wiki/SV8Specification#ReplaygainPacket
-      ByteVector data = file->readBlock(dataSize);
       readRG = true;
 
-      int replayGainVersion = data[0];
+      const int replayGainVersion = data[0];
       if(replayGainVersion == 1) {
         d->trackGain = data.toShort(1, true);
         d->trackPeak = data.toShort(3, true);
