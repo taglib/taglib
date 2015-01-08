@@ -206,13 +206,28 @@ void MPC::Properties::readSV8(File *file)
     if(packetType == "SH") {
       // Stream Header
       // http://trac.musepack.net/wiki/SV8Specification#StreamHeaderPacket
+
+      if(dataSize <= 5) {
+        debug("MPC::Properties::readSV8() - \"SH\" packet is too short to parse.");
+        break;
+      }
+
       readSH = true;
 
       TagLib::uint pos = 4;
       d->version = data[pos];
       pos += 1;
       d->sampleFrames = readSize(data.mid(pos), pos);
+      if(pos > dataSize - 3) {
+        debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
+        break;
+      }
+
       ulong begSilence = readSize(data.mid(pos), pos);
+      if(pos > dataSize - 2) {
+        debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
+        break;
+      }
 
       const ushort flags = data.toUShort(pos, true);
       pos += 2;
@@ -230,6 +245,12 @@ void MPC::Properties::readSV8(File *file)
     else if (packetType == "RG") {
       // Replay Gain
       // http://trac.musepack.net/wiki/SV8Specification#ReplaygainPacket
+
+      if(dataSize <= 9) {
+        debug("MPC::Properties::readSV8() - \"RG\" packet is too short to parse.");
+        break;
+      }
+
       readRG = true;
 
       int replayGainVersion = data[0];
