@@ -1,10 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <mpcfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -17,6 +17,7 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesSV7);
   CPPUNIT_TEST(testPropertiesSV5);
   CPPUNIT_TEST(testPropertiesSV4);
+  CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -59,6 +60,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+  }
+
+  void testFuzzedFile1()
+  {
+    MPC::File f(TEST_FILE_PATH_C("zerodiv.mpc"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };

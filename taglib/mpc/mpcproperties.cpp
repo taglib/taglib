@@ -183,7 +183,9 @@ unsigned long readSize(const ByteVector &data, TagLib::uint &sizelength)
   return size;
 }
 
-static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
+// This array looks weird, but the same as original MusePack code found at:
+// https://www.musepack.net/index.php?pg=src
+static const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 
 void MPC::Properties::readSV8(File *file)
 {
@@ -207,17 +209,17 @@ void MPC::Properties::readSV8(File *file)
       d->sampleFrames = readSize(data.mid(pos), pos);
       ulong begSilence = readSize(data.mid(pos), pos);
 
-      std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.toUShort(pos, true)));
+      const ushort flags = data.toUShort(pos, true);
       pos += 2;
 
-      d->sampleRate = sftable[flags[15] * 4 + flags[14] * 2 + flags[13]];
-      d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
+      d->sampleRate = sftable[(flags >> 13) & 0x07];
+      d->channels   = ((flags >> 4) & 0x0F) + 1;
 
-      if((d->sampleFrames - begSilence) != 0)
-        d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
-      d->bitrate = d->bitrate / 1000;
-
-      d->length = (d->sampleFrames - begSilence) / d->sampleRate;
+      const uint frameCount = d->sampleFrames - begSilence;
+      if(frameCount != 0 && d->sampleRate != 0) {
+        d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / frameCount / 1000);
+        d->length  = frameCount / d->sampleRate;
+      }
     }
 
     else if (packetType == "RG") {
