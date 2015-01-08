@@ -18,6 +18,7 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesSV5);
   CPPUNIT_TEST(testPropertiesSV4);
   CPPUNIT_TEST(testFuzzedFile1);
+  CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -65,6 +66,12 @@ public:
   void testFuzzedFile1()
   {
     MPC::File f(TEST_FILE_PATH_C("zerodiv.mpc"));
+    CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testFuzzedFile2()
+  {
+    MPC::File f(TEST_FILE_PATH_C("infloop.mpc"));
     CPPUNIT_ASSERT(f.isValid());
   }
 

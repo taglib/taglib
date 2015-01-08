@@ -197,10 +197,15 @@ void MPC::Properties::readSV8(File *file)
     unsigned long packetSize = readSize(file, packetSizeLength);
     unsigned long dataSize = packetSize - 2 - packetSizeLength;
 
+    const ByteVector data = file->readBlock(dataSize);
+    if(data.size() != dataSize) {
+      debug("MPC::Properties::readSV8() - dataSize doesn't match the actual data size.");
+      break;
+    }
+
     if(packetType == "SH") {
       // Stream Header
       // http://trac.musepack.net/wiki/SV8Specification#StreamHeaderPacket
-      ByteVector data = file->readBlock(dataSize);
       readSH = true;
 
       TagLib::uint pos = 4;
@@ -225,7 +230,6 @@ void MPC::Properties::readSV8(File *file)
     else if (packetType == "RG") {
       // Replay Gain
       // http://trac.musepack.net/wiki/SV8Specification#ReplaygainPacket
-      ByteVector data = file->readBlock(dataSize);
       readRG = true;
 
       int replayGainVersion = data[0];
