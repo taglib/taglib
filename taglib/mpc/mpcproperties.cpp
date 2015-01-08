@@ -155,30 +155,36 @@ int MPC::Properties::albumPeak() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long readSize(File *file, TagLib::uint &sizelength)
+unsigned long readSize(File *file, TagLib::uint &sizeLength, bool &eof)
 {
+  sizeLength = 0;
+  eof = false;
+
   unsigned char tmp;
   unsigned long size = 0;
 
   do {
-    ByteVector b = file->readBlock(1);
+    const ByteVector b = file->readBlock(1);
+    if(b.isEmpty()) {
+      eof = true;
+      break;
+    }
+
     tmp = b[0];
     size = (size << 7) | (tmp & 0x7F);
-    sizelength++;
+    sizeLength++;
   } while((tmp & 0x80));
   return size;
 }
 
-unsigned long readSize(const ByteVector &data, TagLib::uint &sizelength)
+unsigned long readSize(const ByteVector &data, TagLib::uint &pos)
 {
   unsigned char tmp;
   unsigned long size = 0;
-  unsigned long pos = 0;
 
   do {
     tmp = data[pos++];
     size = (size << 7) | (tmp & 0x7F);
-    sizelength++;
   } while((tmp & 0x80) && (pos < data.size()));
   return size;
 }
@@ -192,10 +198,17 @@ void MPC::Properties::readSV8(File *file)
   bool readSH = false, readRG = false;
 
   while(!readSH && !readRG) {
-    ByteVector packetType = file->readBlock(2);
-    uint packetSizeLength = 0;
-    unsigned long packetSize = readSize(file, packetSizeLength);
-    unsigned long dataSize = packetSize - 2 - packetSizeLength;
+    const ByteVector packetType = file->readBlock(2);
+
+    uint packetSizeLength;
+    bool eof;
+    const unsigned long packetSize = readSize(file, packetSizeLength, eof);
+    if(eof) {
+      debug("MPC::Properties::readSV8() - Reached to EOF.");
+      break;
+    }
+
+    const unsigned long dataSize = packetSize - 2 - packetSizeLength;
 
     const ByteVector data = file->readBlock(dataSize);
     if(data.size() != dataSize) {
@@ -217,13 +230,13 @@ void MPC::Properties::readSV8(File *file)
       TagLib::uint pos = 4;
       d->version = data[pos];
       pos += 1;
-      d->sampleFrames = readSize(data.mid(pos), pos);
+      d->sampleFrames = readSize(data, pos);
       if(pos > dataSize - 3) {
         debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
         break;
       }
 
-      ulong begSilence = readSize(data.mid(pos), pos);
+      ulong begSilence = readSize(data, pos);
       if(pos > dataSize - 2) {
         debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
         break;

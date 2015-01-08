@@ -20,6 +20,7 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST(testFuzzedFile3);
+  CPPUNIT_TEST(testFuzzedFile4);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -79,6 +80,12 @@ public:
   void testFuzzedFile3()
   {
     MPC::File f(TEST_FILE_PATH_C("segfault.mpc"));
+    CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testFuzzedFile4()
+  {
+    MPC::File f(TEST_FILE_PATH_C("segfault2.mpc"));
     CPPUNIT_ASSERT(f.isValid());
   }
 
