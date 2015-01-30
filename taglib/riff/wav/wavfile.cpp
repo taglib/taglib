@@ -57,7 +57,7 @@ public:
   }
 
   Properties *properties;
-  
+
   ByteVector tagChunkID;
 
   TagUnion tag;
@@ -146,21 +146,30 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
   if(stripOthers)
     strip(static_cast<TagTypes>(AllTags & ~tags));
 
-  ID3v2::Tag *id3v2tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
-  if((tags & ID3v2) && !id3v2tag->isEmpty()) {
-    setChunkData(d->tagChunkID, id3v2tag->render(id3v2Version));
-    d->hasID3v2 = true;
+  const ID3v2::Tag *id3v2tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
+  if(tags & ID3v2) {
+    if(d->hasID3v2) {
+      removeChunk(d->tagChunkID);
+      d->hasID3v2 = false;
+    }
+
+    if(!id3v2tag->isEmpty()) {
+      setChunkData(d->tagChunkID, id3v2tag->render(id3v2Version));
+      d->hasID3v2 = true;
+    }
   }
 
-  Info::Tag *infotag = d->tag.access<Info::Tag>(InfoIndex, false);
-  if((tags & Info) && !infotag->isEmpty()) {
-    int chunkId = findInfoTagChunk();
-    if(chunkId != -1)
-      setChunkData(chunkId, infotag->render());
-    else
-      setChunkData("LIST", infotag->render(), true);
+  const Info::Tag *infotag = d->tag.access<Info::Tag>(InfoIndex, false);
+  if(tags & Info) {
+    if(d->hasInfo) {
+      removeChunk(findInfoTagChunk());
+      d->hasInfo = false;
+    }
 
-    d->hasInfo = true;
+    if(!infotag->isEmpty()) {
+      setChunkData("LIST", infotag->render(), true);
+      d->hasInfo = true;
+    }
   }
 
   return true;
@@ -239,6 +248,6 @@ TagLib::uint RIFF::WAV::File::findInfoTagChunk()
       return i;
     }
   }
-  
+
   return TagLib::uint(-1);
 }
