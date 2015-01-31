@@ -1,9 +1,11 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
+#include <id3v2tag.h>
+#include <infotag.h>
 #include <tbytevectorlist.h>
 #include <wavfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -14,6 +16,8 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestWAV);
   CPPUNIT_TEST(testLength);
   CPPUNIT_TEST(testZeroSizeDataChunk);
+  CPPUNIT_TEST(testID3v2Tag);
+  CPPUNIT_TEST(testInfoTag);
   CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
@@ -24,14 +28,80 @@ public:
   void testLength()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("empty.wav"));
-    CPPUNIT_ASSERT_EQUAL(true, f.isValid());
+    CPPUNIT_ASSERT(f.isValid());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
   }
 
   void testZeroSizeDataChunk()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("zero-size-chunk.wav"));
-    CPPUNIT_ASSERT_EQUAL(false, f.isValid());
+    CPPUNIT_ASSERT(!f.isValid());
+  }
+
+  void testID3v2Tag()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+
+      f.ID3v2Tag()->setTitle(L"Title");
+      f.ID3v2Tag()->setArtist(L"Artist");
+      f.save();
+    }
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String(L"Title"),  f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String(L"Artist"), f.ID3v2Tag()->artist());
+
+      f.ID3v2Tag()->setTitle(L"");
+      f.ID3v2Tag()->setArtist(L"");
+      f.save();
+    }
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String(L""), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String(L""), f.ID3v2Tag()->artist());
+    }
+  }
+
+  void testInfoTag()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+
+      f.InfoTag()->setTitle(L"Title");
+      f.InfoTag()->setArtist(L"Artist");
+      f.save();
+    }
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String(L"Title"),  f.InfoTag()->title());
+      CPPUNIT_ASSERT_EQUAL(String(L"Artist"), f.InfoTag()->artist());
+
+      f.InfoTag()->setTitle(L"");
+      f.InfoTag()->setArtist(L"");
+      f.save();
+    }
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String(L""), f.InfoTag()->title());
+      CPPUNIT_ASSERT_EQUAL(String(L""), f.InfoTag()->artist());
+    }
   }
 
   void testStripTags()
