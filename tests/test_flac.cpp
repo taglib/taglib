@@ -15,6 +15,7 @@ using namespace TagLib;
 class TestFLAC : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestFLAC);
+  CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testSignature);
   CPPUNIT_TEST(testMultipleCommentBlocks);
   CPPUNIT_TEST(testReadPicture);
@@ -28,6 +29,17 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+
+  void testAudioProperties()
+  {
+    FLAC::File f(TEST_FILE_PATH_C("no-tags.flac"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3684, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+  }
 
   void testSignature()
   {
