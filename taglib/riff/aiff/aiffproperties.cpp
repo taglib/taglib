@@ -27,6 +27,8 @@
 #include <tdebug.h>
 #include "aiffproperties.h"
 
+#include <limits>
+
 using namespace TagLib;
 
 class RIFF::AIFF::Properties::PropertiesPrivate
@@ -56,9 +58,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
   read(data);
 }
 
@@ -68,6 +71,11 @@ RIFF::AIFF::Properties::~Properties()
 }
 
 int RIFF::AIFF::Properties::length() const
+{
+  return d->length / 1000;
+}
+
+int RIFF::AIFF::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -111,6 +119,7 @@ String RIFF::AIFF::Properties::compressionName() const
 {
   return d->compressionName;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,13 +131,16 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
     return;
   }
 
-  d->channels       = data.toShort(0U);
-  d->sampleFrames   = data.toUInt(2U);
-  d->sampleWidth    = data.toShort(6U);
+  d->channels     = data.toShort(0U);
+  d->sampleFrames = data.toUInt(2U);
+  d->sampleWidth  = data.toShort(6U);
+
   const long double sampleRate = data.toFloat80BE(8);
-  d->sampleRate     = (int)sampleRate;
-  d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);
-  d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
+  if(sampleRate > std::numeric_limits<double>::epsilon()) {
+    d->sampleRate = static_cast<int>(sampleRate);
+    d->bitrate    = static_cast<int>(sampleRate * d->sampleWidth * d->channels / 1000.0);
+    d->length     = static_cast<int>(d->sampleFrames * 1000.0 / d->sampleRate);
+  }
 
   if(data.size() >= 23) {
     d->compressionType = data.mid(18, 4);
