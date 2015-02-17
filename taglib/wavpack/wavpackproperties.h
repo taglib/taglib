@@ -74,13 +74,14 @@ namespace TagLib {
       // Reimplementations.
 
       virtual int length() const;
+      virtual int lengthInMilliseconds() const;
       virtual int bitrate() const;
 
       /*!
        * Returns the sample rate in Hz. 0 means unknown or custom.
        */
       virtual int sampleRate() const;
-      
+
       virtual int channels() const;
 
       /*!
@@ -98,8 +99,8 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read();
-      unsigned int seekFinalIndex();
+      void read(File *file, long streamLength, ReadStyle style);
+      unsigned int seekFinalIndex(File *file, long streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;
