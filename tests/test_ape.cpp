@@ -1,10 +1,10 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <apefile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -16,7 +16,8 @@ class TestAPE : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties399);
   CPPUNIT_TEST(testProperties396);
   CPPUNIT_TEST(testProperties390);
-  CPPUNIT_TEST(testFuzzedFiles);
+  CPPUNIT_TEST(testFuzzedFile1);
+  CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -48,13 +49,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
   }
 
-  void testFuzzedFiles()
+  void testFuzzedFile1()
   {
-    APE::File f1(TEST_FILE_PATH_C("longloop.ape"));
-    CPPUNIT_ASSERT(f1.isValid());
+    APE::File f(TEST_FILE_PATH_C("longloop.ape"));
+    CPPUNIT_ASSERT(f.isValid());
+  }
 
-    APE::File f2(TEST_FILE_PATH_C("zerodiv.ape"));
-    CPPUNIT_ASSERT(f2.isValid());
+  void testFuzzedFile2()
+  {
+    APE::File f(TEST_FILE_PATH_C("zerodiv.ape"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };
