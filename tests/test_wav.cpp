@@ -14,7 +14,7 @@ using namespace TagLib;
 class TestWAV : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestWAV);
-  CPPUNIT_TEST(testLength);
+  CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testZeroSizeDataChunk);
   CPPUNIT_TEST(testID3v2Tag);
   CPPUNIT_TEST(testInfoTag);
@@ -25,11 +25,16 @@ class TestWAV : public CppUnit::TestFixture
 
 public:
 
-  void testLength()
+  void testAudioProperties()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("empty.wav"));
     CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
   }
 
   void testZeroSizeDataChunk()
