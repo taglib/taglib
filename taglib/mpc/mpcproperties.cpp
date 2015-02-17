@@ -36,9 +36,7 @@ using namespace TagLib;
 class MPC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(long length, ReadStyle s) :
-    streamLength(length),
-    style(s),
+  PropertiesPrivate() :
     version(0),
     length(0),
     bitrate(0),
@@ -51,8 +49,6 @@ public:
     albumGain(0),
     albumPeak(0) {}
 
-  long streamLength;
-  ReadStyle style;
   int version;
   int length;
   int bitrate;
@@ -71,23 +67,25 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) : AudioProperties(style)
+MPC::Properties::Properties(const ByteVector &data, long streamLength, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(streamLength, style);
-  readSV7(data);
+  readSV7(data, streamLength);
 }
 
-MPC::Properties::Properties(File *file, long streamLength, ReadStyle style) : AudioProperties(style)
+MPC::Properties::Properties(File *file, long streamLength, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(streamLength, style);
-  ByteVector magic = file->readBlock(4);
+  const ByteVector magic = file->readBlock(4);
   if(magic == "MPCK") {
     // Musepack version 8
-    readSV8(file);
+    readSV8(file, streamLength);
   }
   else {
     // Musepack version 7 or older, fixed size header
-    readSV7(magic + file->readBlock(MPC::HeaderSize - 4));
+    readSV7(magic + file->readBlock(MPC::HeaderSize - 4), streamLength);
   }
 }
 
@@ -97,6 +95,11 @@ MPC::Properties::~Properties()
 }
 
 int MPC::Properties::length() const
+{
+  return d->length / 1000;
+}
+
+int MPC::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -193,7 +196,7 @@ unsigned long readSize(const ByteVector &data, TagLib::uint &pos)
 // https://www.musepack.net/index.php?pg=src
 static const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 
-void MPC::Properties::readSV8(File *file)
+void MPC::Properties::readSV8(File *file, long streamLength)
 {
   bool readSH = false, readRG = false;
 
@@ -249,9 +252,11 @@ void MPC::Properties::readSV8(File *file)
       d->channels   = ((flags >> 4) & 0x0F) + 1;
 
       const uint frameCount = d->sampleFrames - begSilence;
-      if(frameCount != 0 && d->sampleRate != 0) {
-        d->bitrate = (int)(d->streamLength * 8.0 * d->sampleRate / frameCount / 1000);
-        d->length  = frameCount / d->sampleRate;
+      if(frameCount > 0 && d->sampleRate > 0) {
+        const double length = frameCount * 1000.0 / d->sampleRate;
+
+        d->length  = static_cast<int>(frameCount * 1000.0 / d->sampleRate);
+        d->bitrate = static_cast<int>(streamLength * 8.0 / length);
       }
     }
 
@@ -285,7 +290,7 @@ void MPC::Properties::readSV8(File *file)
   }
 }
 
-void MPC::Properties::readSV7(const ByteVector &data)
+void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
 {
   if(data.startsWith("MP+")) {
     d->version = data[3] & 15;
@@ -294,11 +299,11 @@ void MPC::Properties::readSV7(const ByteVector &data)
 
     d->totalFrames = data.toUInt(4, false);
 
-    std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt(8, false)));
-    d->sampleRate = sftable[flags[17] * 2 + flags[16]];
+    const uint flags = data.toUInt(8, false);
+    d->sampleRate = sftable[(flags >> 16) & 0x03];
     d->channels = 2;
 
-    uint gapless = data.toUInt(5, false);
+    const uint gapless = data.toUInt(5, false);
 
     d->trackGain = data.toShort(14, false);
     d->trackPeak = data.toShort(12, false);
@@ -318,22 +323,22 @@ void MPC::Properties::readSV7(const ByteVector &data)
       d->albumGain = tmp;
     }
 
-    if (d->trackPeak != 0)
+    if(d->trackPeak != 0)
       d->trackPeak = (int)(log10((double)d->trackPeak) * 20 * 256 + .5);
 
-    if (d->albumPeak != 0)
+    if(d->albumPeak != 0)
       d->albumPeak = (int)(log10((double)d->albumPeak) * 20 * 256 + .5);
 
-    bool trueGapless = (gapless >> 31) & 0x0001;
+    const bool trueGapless = (gapless >> 31) & 0x0001;
     if(trueGapless) {
-      uint lastFrameSamples = (gapless >> 20) & 0x07FF;
+      const uint lastFrameSamples = (gapless >> 20) & 0x07FF;
       d->sampleFrames = d->totalFrames * 1152 - lastFrameSamples;
     }
     else
       d->sampleFrames = d->totalFrames * 1152 - 576;
   }
   else {
-    uint headerData = data.toUInt(0, false);
+    const uint headerData = data.toUInt(0, false);
 
     d->bitrate = (headerData >> 23) & 0x01ff;
     d->version = (headerData >> 11) & 0x03ff;
@@ -348,9 +353,12 @@ void MPC::Properties::readSV7(const ByteVector &data)
     d->sampleFrames = d->totalFrames * 1152 - 576;
   }
 
-  d->length = d->sampleRate > 0 ? (d->sampleFrames + (d->sampleRate / 2)) / d->sampleRate : 0;
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
 
-  if(!d->bitrate)
-    d->bitrate = d->length > 0 ? ((d->streamLength * 8L) / d->length) / 1000 : 0;
+    d->length = static_cast<int>(length);
+
+    if(d->bitrate == 0)
+      d->bitrate = static_cast<int>(streamLength * 8.0 / length);
+  }
 }
-

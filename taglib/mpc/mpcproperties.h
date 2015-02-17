@@ -69,6 +69,7 @@ namespace TagLib {
       // Reimplementations.
 
       virtual int length() const;
+      virtual int lengthInMilliseconds() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
@@ -110,8 +111,8 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void readSV7(const ByteVector &data);
-      void readSV8(File *file);
+      void readSV7(const ByteVector &data, long streamLength);
+      void readSV8(File *file, long streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;
