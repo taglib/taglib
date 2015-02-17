@@ -132,9 +132,11 @@ void RIFF::WAV::Properties::read(const ByteVector &data, uint streamLength)
 
   if(streamLength > 0) {
     if(byteRate > 0)
-      d->length = static_cast<int>(streamLength * 1000.0 / byteRate);
+      d->length = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
 
-    if(d->channels > 0 && d->sampleWidth > 0)
-      d->sampleFrames = streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
+    if(d->channels > 0 && d->sampleWidth > 0) {
+      const int bytesPerSample = d->channels * ((d->sampleWidth + 7) / 8);
+      d->sampleFrames = streamLength / bytesPerSample;
+    }
   }
 }

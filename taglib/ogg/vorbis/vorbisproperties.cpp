@@ -182,8 +182,8 @@ void Vorbis::Properties::read(File *file)
       if(frameCount > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
 
-        d->length  = static_cast<int>(length);
-        d->bitrate = static_cast<int>(file->length() * 8.0 / length);
+        d->length  = static_cast<int>(length + 0.5);
+        d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
       }
     }
     else {

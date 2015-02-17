@@ -158,8 +158,8 @@ void FLAC::Properties::read(const ByteVector &data, long streamLength)
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const double length = d->sampleFrames * 1000.0 / d->sampleRate;
 
-    d->length  = static_cast<int>(length);
-    d->bitrate = static_cast<int>(streamLength * 8.0 / length);
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
 
   d->signature = data.mid(pos, 32);

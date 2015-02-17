@@ -222,8 +222,8 @@ void APE::Properties::analyzeCurrent(File *file)
     if(d->sampleFrames > 0 && d->sampleRate > 0) {
       const double length = d->sampleFrames * 1000.0 / d->sampleRate;
 
-      d->length  = static_cast<int>(length);
-      d->bitrate = static_cast<int>(file->length() * 8.0 / length);
+      d->length  = static_cast<int>(length + 0.5);
+      d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
     }
   }
 }
@@ -262,8 +262,8 @@ void APE::Properties::analyzeOld(File *file)
     if(totalBlocks > 0 && d->sampleRate > 0) {
       const double length = totalBlocks * 1000.0 / d->sampleRate;
 
-      d->length  = static_cast<int>(length);
-      d->bitrate = static_cast<int>(file->length() * 8.0 / length);
+      d->length  = static_cast<int>(length + 0.5);
+      d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
     }
   }
 }

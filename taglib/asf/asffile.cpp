@@ -191,7 +191,7 @@ void ASF::File::FilePropertiesObject::parse(ASF::File *file, uint size)
 
   const long long duration = data.toLongLong(40, false);
   const long long preroll  = data.toLongLong(56, false);
-  file->d->properties->setLengthInMilliseconds(static_cast<int>(duration / 10000.0 - preroll));
+  file->d->properties->setLengthInMilliseconds(static_cast<int>(duration / 10000.0 - preroll + 0.5));
 }
 
 ByteVector ASF::File::StreamPropertiesObject::guid()

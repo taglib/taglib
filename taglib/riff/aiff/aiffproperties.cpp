@@ -137,9 +137,9 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
 
   const long double sampleRate = data.toFloat80BE(8);
   if(sampleRate > std::numeric_limits<double>::epsilon()) {
-    d->sampleRate = static_cast<int>(sampleRate);
-    d->bitrate    = static_cast<int>(sampleRate * d->sampleWidth * d->channels / 1000.0);
-    d->length     = static_cast<int>(d->sampleFrames * 1000.0 / d->sampleRate);
+    d->sampleRate = static_cast<int>(sampleRate + 0.5);
+    d->bitrate    = static_cast<int>(sampleRate * d->sampleWidth * d->channels / 1000.0 + 0.5);
+    d->length     = static_cast<int>(d->sampleFrames * 1000.0 / sampleRate + 0.5);
   }
 
   if(data.size() >= 23) {

@@ -31,8 +31,8 @@ public:
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->mpcVersion());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(1496, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(1497, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
   }
@@ -43,7 +43,7 @@ public:
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(7, f.audioProperties()->mpcVersion());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(39, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(40, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(318, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
@@ -55,7 +55,7 @@ public:
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(5, f.audioProperties()->mpcVersion());
     CPPUNIT_ASSERT_EQUAL(26, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(26370, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(26371, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
@@ -67,7 +67,7 @@ public:
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->mpcVersion());
     CPPUNIT_ASSERT_EQUAL(26, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(26370, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(26371, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
