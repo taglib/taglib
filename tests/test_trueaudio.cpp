@@ -20,6 +20,10 @@ public:
     TrueAudio::File f(TEST_FILE_PATH_C("empty.tta"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3684, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(172, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
   }
 
 };
