@@ -31,7 +31,9 @@ public:
   void testAudioProperties()
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->length());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3712, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
@@ -220,7 +222,7 @@ public:
   void testProperties()
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    
+
     PropertyMap tags = f.properties();
 
     tags["TRACKNUMBER"] = StringList("2");

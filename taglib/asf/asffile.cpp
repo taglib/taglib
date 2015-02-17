@@ -183,8 +183,15 @@ ByteVector ASF::File::FilePropertiesObject::guid()
 void ASF::File::FilePropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setLength(
-    (int)(data.toLongLong(40, false) / 10000000L - data.toLongLong(56, false) / 1000L));
+
+  if(data.size() < 64) {
+    debug("ASF::File::FilePropertiesObject::parse() -- data is too short.");
+    return;
+  }
+
+  const long long duration = data.toLongLong(40, false);
+  const long long preroll  = data.toLongLong(56, false);
+  file->d->properties->setLengthInMilliseconds(static_cast<int>(duration / 10000.0 - preroll));
 }
 
 ByteVector ASF::File::StreamPropertiesObject::guid()
