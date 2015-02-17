@@ -34,7 +34,14 @@ using namespace TagLib;
 class MP4::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : length(0), bitrate(0), sampleRate(0), channels(0), bitsPerSample(0), encrypted(false), codec(MP4::Properties::Unknown) {}
+  PropertiesPrivate() :
+    length(0),
+    bitrate(0),
+    sampleRate(0),
+    channels(0),
+    bitsPerSample(0),
+    encrypted(false),
+    codec(MP4::Properties::Unknown) {}
 
   int length;
   int bitrate;
@@ -45,11 +52,76 @@ public:
   Codec codec;
 };
 
-MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
-  : AudioProperties(style)
-{
-  d = new PropertiesPrivate;
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
+MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
+{
+  read(file, atoms);
+}
+
+MP4::Properties::~Properties()
+{
+  delete d;
+}
+
+int
+MP4::Properties::channels() const
+{
+  return d->channels;
+}
+
+int
+MP4::Properties::sampleRate() const
+{
+  return d->sampleRate;
+}
+
+int
+MP4::Properties::length() const
+{
+  return d->length / 1000;
+}
+
+int
+MP4::Properties::lengthInMilliseconds() const
+{
+  return d->length;
+}
+
+int
+MP4::Properties::bitrate() const
+{
+  return d->bitrate;
+}
+
+int
+MP4::Properties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
+bool
+MP4::Properties::isEncrypted() const
+{
+  return d->encrypted;
+}
+
+MP4::Properties::Codec MP4::Properties::codec() const
+{
+  return d->codec;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
+void
+MP4::Properties::read(File *file, Atoms *atoms)
+{
   MP4::Atom *moov = atoms->find("moov");
   if(!moov) {
     debug("MP4: Atom 'moov' not found");
@@ -59,9 +131,9 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
   MP4::Atom *trak = 0;
   ByteVector data;
 
-  MP4::AtomList trakList = moov->findall("trak");
-  for (unsigned int i = 0; i < trakList.size(); i++) {
-    trak = trakList[i];
+  const MP4::AtomList trakList = moov->findall("trak");
+  for(MP4::AtomList::ConstIterator it = trakList.begin(); it != trakList.end(); ++it) {
+    trak = *it;
     MP4::Atom *hdlr = trak->find("mdia", "hdlr");
     if(!hdlr) {
       debug("MP4: Atom 'trak.mdia.hdlr' not found");
@@ -74,7 +146,7 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
     }
     trak = 0;
   }
-  if (!trak) {
+  if(!trak) {
     debug("MP4: No audio tracks");
     return;
   }
@@ -89,22 +161,24 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
   data = file->readBlock(mdhd->length);
   uint version = data[8];
   if(version == 1) {
-    if (data.size() < 36 + 8) {
+    if(data.size() < 36 + 8) {
       debug("MP4: Atom 'trak.mdia.mdhd' is smaller than expected");
       return;
     }
     const long long unit   = data.toLongLong(28U);
     const long long length = data.toLongLong(36U);
-    d->length = unit ? int(length / unit) : 0;
+    if(unit > 0 && length > 0)
+      d->length = static_cast<int>(length * 1000.0 / unit);
   }
   else {
-    if (data.size() < 24 + 4) {
+    if(data.size() < 24 + 4) {
       debug("MP4: Atom 'trak.mdia.mdhd' is smaller than expected");
       return;
     }
     const unsigned int unit   = data.toUInt(20U);
     const unsigned int length = data.toUInt(24U);
-    d->length = unit ? length / unit : 0;
+    if(unit > 0 && length > 0)
+      d->length = static_cast<int>(length * 1000.0 / unit);
   }
 
   MP4::Atom *atom = trak->find("mdia", "minf", "stbl", "stsd");
@@ -150,50 +224,3 @@ MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style)
     d->encrypted = true;
   }
 }
-
-MP4::Properties::~Properties()
-{
-  delete d;
-}
-
-int
-MP4::Properties::channels() const
-{
-  return d->channels;
-}
-
-int
-MP4::Properties::sampleRate() const
-{
-  return d->sampleRate;
-}
-
-int
-MP4::Properties::length() const
-{
-  return d->length;
-}
-
-int
-MP4::Properties::bitrate() const
-{
-  return d->bitrate;
-}
-
-int
-MP4::Properties::bitsPerSample() const
-{
-  return d->bitsPerSample;
-}
-
-bool
-MP4::Properties::isEncrypted() const
-{
-  return d->encrypted;
-}
-
-MP4::Properties::Codec MP4::Properties::codec() const
-{
-  return d->codec;
-}
-
