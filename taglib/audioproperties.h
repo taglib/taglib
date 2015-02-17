@@ -77,7 +77,8 @@ namespace TagLib {
      *
      * \see length()
      */
-    virtual int lengthInMilliseconds() const = 0;
+    // BIC: make virtual
+    int lengthInMilliseconds() const;
 
     /*!
      * Returns the most appropriate bit rate for the file in kb/s.  For constant
