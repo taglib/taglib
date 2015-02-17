@@ -12,6 +12,7 @@ using namespace TagLib;
 class TestMPEG : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMPEG);
+  CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testVersion2DurationWithXingHeader);
   CPPUNIT_TEST(testSaveID3v24);
   CPPUNIT_TEST(testSaveID3v24WrongParam);
@@ -22,10 +23,23 @@ class TestMPEG : public CppUnit::TestFixture
 
 public:
 
+  void testAudioProperties()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("xing.mp3"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(2041, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+  }
+
   void testVersion2DurationWithXingHeader()
   {
     MPEG::File f(TEST_FILE_PATH_C("mpeg2.mp3"));
+    CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(5387284, f.audioProperties()->lengthInMilliseconds());
   }
 
   void testSaveID3v24()
