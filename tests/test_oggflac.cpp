@@ -15,6 +15,7 @@ class TestOggFLAC : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestOggFLAC);
   CPPUNIT_TEST(testFramingBit);
+  CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -37,6 +38,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(9134, size);
 
     delete f;
+  }
+
+  void testFuzzedFile()
+  {
+    Ogg::FLAC::File f(TEST_FILE_PATH_C("segfault.oga"));
+    CPPUNIT_ASSERT(!f.isValid());
   }
 
 };

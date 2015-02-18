@@ -131,6 +131,7 @@ void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
   d->channels       = data.toInt16BE(0);
   d->sampleFrames   = data.toUInt32BE(2);
   d->sampleWidth    = data.toInt16BE(6);
+
   const long double sampleRate = data.toFloat80BE(8);
   d->sampleRate     = static_cast<int>(sampleRate);
   d->bitrate        = static_cast<int>((sampleRate * d->sampleWidth * d->channels) / 1000.0);

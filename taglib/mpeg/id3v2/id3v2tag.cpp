@@ -52,7 +52,7 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() 
+  TagPrivate()
     : file(0)
     , tagOffset(-1)
     , extendedHeader(0)
@@ -90,6 +90,11 @@ namespace
 }
 
 const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
+
+namespace
+{
+  const uint DefaultPaddingSize = 1024;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Latin1StringHandler implementation
@@ -607,15 +612,21 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  size_t paddingSize = 0;
-  const size_t originalSize = d->header.tagSize();
+  size_t paddingSize = DefaultPaddingSize;
 
-  if(tagData.size() < originalSize)
-    paddingSize = originalSize - tagData.size();
-  else
-    paddingSize = 1024;
+  if(d->file && tagData.size() < d->header.tagSize()) {
+    paddingSize = d->header.tagSize() - tagData.size();
 
-  tagData.append(ByteVector(paddingSize, char(0)));
+    // Padding won't increase beyond 1% of the file size.
+
+    if(paddingSize > DefaultPaddingSize) {
+      const ulonglong threshold = d->file->length() / 100;
+      if(paddingSize > threshold)
+        paddingSize = DefaultPaddingSize;
+    }
+  }
+
+  tagData.append(ByteVector(paddingSize, '\0'));
 
   // Set the version and data size.
   d->header.setMajorVersion(version);

@@ -54,7 +54,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength, 
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength,
                                             ReadStyle style) :
   d(new PropertiesPrivate())
 {
@@ -108,7 +108,7 @@ TagLib::uint RIFF::WAV::AudioProperties::format() const
 void RIFF::WAV::AudioProperties::read(const ByteVector &data, uint streamLength)
 {
   if(data.size() < 16) {
-    debug("RIFF::WAV::AudioProperties::read() - \"fmt \" chunk is too short.");
+    debug("RIFF::WAV::AudioProperties::read() - \"fmt \" chunk is too short for WAV.");
     return;
   }
 
