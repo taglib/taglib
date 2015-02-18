@@ -27,6 +27,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCovrWrite);
   CPPUNIT_TEST(testCovrRead2);
   CPPUNIT_TEST(testProperties);
+  CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -280,6 +281,12 @@ public:
     CPPUNIT_ASSERT(f.tag()->itemListMap().contains("cpil"));
     CPPUNIT_ASSERT_EQUAL(false, f.tag()->itemListMap()["cpil"].toBool());
     CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["COMPILATION"]);
+  }
+
+  void testFuzzedFile()
+  {
+    MP4::File f(TEST_FILE_PATH_C("infloop.m4a"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };
