@@ -65,7 +65,6 @@ SET(test_runner_SRCS
   test_mpc.cpp
   test_opus.cpp
   test_speex.cpp
-  test_vorbis.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
