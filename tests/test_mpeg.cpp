@@ -3,6 +3,8 @@
 #include <tstring.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
+#include <mpegproperties.h>
+#include <xingheader.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -12,9 +14,10 @@ using namespace TagLib;
 class TestMPEG : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMPEG);
-  CPPUNIT_TEST(testAudioPropertiesLameCBR);
-  CPPUNIT_TEST(testAudioPropertiesLameVBR);
-  CPPUNIT_TEST(testAudioPropertiesBladeEnc);
+  CPPUNIT_TEST(testAudioPropertiesXingHeaderCBR);
+  CPPUNIT_TEST(testAudioPropertiesXingHeaderVBR);
+  CPPUNIT_TEST(testAudioPropertiesVBRIHeader);
+  CPPUNIT_TEST(testAudioPropertiesNoVBRHeaders);
   CPPUNIT_TEST(testVersion2DurationWithXingHeader);
   CPPUNIT_TEST(testSaveID3v24);
   CPPUNIT_TEST(testSaveID3v24WrongParam);
@@ -25,7 +28,7 @@ class TestMPEG : public CppUnit::TestFixture
 
 public:
 
-  void testAudioPropertiesLameCBR()
+  void testAudioPropertiesXingHeaderCBR()
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_cbr.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
@@ -34,9 +37,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::Xing, f.audioProperties()->xingHeader()->type());
   }
 
-  void testAudioPropertiesLameVBR()
+  void testAudioPropertiesXingHeaderVBR()
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_vbr.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
@@ -45,17 +49,31 @@ public:
     CPPUNIT_ASSERT_EQUAL(70, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::Xing, f.audioProperties()->xingHeader()->type());
   }
 
-  void testAudioPropertiesBladeEnc()
+  void testAudioPropertiesVBRIHeader()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("vbri.mp3"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(222198, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(233, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::VBRI, f.audioProperties()->xingHeader()->type());
+  }
+
+  void testAudioPropertiesNoVBRHeaders()
   {
     MPEG::File f(TEST_FILE_PATH_C("bladeenc.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3531, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(3540, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader()->isValid());
   }
 
   void testVersion2DurationWithXingHeader()

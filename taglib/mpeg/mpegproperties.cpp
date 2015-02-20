@@ -148,105 +148,80 @@ bool MPEG::Properties::isOriginal() const
 
 void MPEG::Properties::read(File *file)
 {
-  // Since we've likely just looked for the ID3v1 tag, start at the end of the
-  // file where we're least likely to have to have to move the disk head.
+  // Only the first frame is required if we have a VBR header.
 
-  long last = file->lastFrameOffset();
-
-  if(last < 0) {
-    debug("MPEG::Properties::read() -- Could not find a valid last MPEG frame in the stream.");
-    return;
-  }
-
-  file->seek(last);
-  Header lastHeader(file->readBlock(4));
-
-  long first = file->firstFrameOffset();
-
+  const long first = file->firstFrameOffset();
   if(first < 0) {
     debug("MPEG::Properties::read() -- Could not find a valid first MPEG frame in the stream.");
     return;
   }
 
-  if(!lastHeader.isValid()) {
-
-    long pos = last;
-
-    while(pos > first) {
-
-      pos = file->previousFrameOffset(pos);
-
-      if(pos < 0)
-        break;
-
-      file->seek(pos);
-      Header header(file->readBlock(4));
-
-      if(header.isValid()) {
-        lastHeader = header;
-        last = pos;
-        break;
-      }
-    }
-  }
-
-  // Now jump back to the front of the file and read what we need from there.
-
   file->seek(first);
-  Header firstHeader(file->readBlock(4));
+  const Header firstHeader(file->readBlock(4));
 
-  if(!firstHeader.isValid() || !lastHeader.isValid()) {
-    debug("MPEG::Properties::read() -- Page headers were invalid.");
+  if(!firstHeader.isValid()) {
+    debug("MPEG::Properties::read() -- The first page header is invalid.");
     return;
   }
 
-  // Check for a Xing header that will help us in gathering information about a
+  // Check for a VBR header that will help us in gathering information about a
   // VBR stream.
 
-  int xingHeaderOffset = MPEG::XingHeader::xingHeaderOffset(firstHeader.version(),
-                                                            firstHeader.channelMode());
-
-  file->seek(first + xingHeaderOffset);
-  d->xingHeader = new XingHeader(file->readBlock(16));
-
-  // Read the length and the bitrate from the Xing header.
+  file->seek(first + 4);
+  d->xingHeader = new XingHeader(file->readBlock(128));
 
   if(d->xingHeader->isValid() &&
      firstHeader.samplesPerFrame() > 0 &&
-     firstHeader.sampleRate() > 0 &&
-     d->xingHeader->totalFrames() > 0)
-  {
-      const double timePerFrame = firstHeader.samplesPerFrame() * 1000.0 / firstHeader.sampleRate();
-      const double length = timePerFrame * d->xingHeader->totalFrames();
+     firstHeader.sampleRate() > 0) {
 
-      d->length  = static_cast<int>(length + 0.5);
-      d->bitrate = static_cast<int>(d->xingHeader->totalSize() * 8.0 / length + 0.5);
+    // Read the length and the bitrate from the VBR header.
+
+    const double timePerFrame = firstHeader.samplesPerFrame() * 1000.0 / firstHeader.sampleRate();
+    const double length = timePerFrame * d->xingHeader->totalFrames();
+
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(d->xingHeader->totalSize() * 8.0 / length + 0.5);
   }
-  else {
-    // Since there was no valid Xing header found, we hope that we're in a constant
-    // bitrate file.
+  else if(firstHeader.bitrate() > 0) {
 
-    delete d->xingHeader;
-    d->xingHeader = 0;
+    // Since there was no valid VBR header found, we hope that we're in a constant
+    // bitrate file.
 
     // TODO: Make this more robust with audio property detection for VBR without a
     // Xing header.
 
-    if(firstHeader.frameLength() > 0 && firstHeader.bitrate() > 0) {
-      const long frames = (last - first) / firstHeader.frameLength() + 1;
-      const double length = firstHeader.frameLength() * frames * 8.0 / firstHeader.bitrate();
+    // We need the last frame to know the audio data length.
 
-      d->length  = static_cast<int>(length + 0.5);
-      d->bitrate = firstHeader.bitrate();
+    long last = file->lastFrameOffset();
+    if(last < 0) {
+      debug("MPEG::Properties::read() -- Could not find a valid last MPEG frame in the stream.");
+      return;
     }
+
+    file->seek(last);
+    Header lastHeader(file->readBlock(4));
+
+    while(!lastHeader.isValid()) {
+
+      last = file->previousFrameOffset(last);
+
+      file->seek(last);
+      lastHeader = Header(file->readBlock(4));
+    }
+
+    const double length
+      = (last - first + lastHeader.frameLength()) * 8.0 / firstHeader.bitrate();
+
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = firstHeader.bitrate();
   }
 
-  d->sampleRate = firstHeader.sampleRate();
-  d->channels = firstHeader.channelMode() == Header::SingleChannel ? 1 : 2;
-  d->version = firstHeader.version();
-  d->layer = firstHeader.layer();
+  d->sampleRate        = firstHeader.sampleRate();
+  d->channels          = firstHeader.channelMode() == Header::SingleChannel ? 1 : 2;
+  d->version           = firstHeader.version();
+  d->layer             = firstHeader.layer();
   d->protectionEnabled = firstHeader.protectionEnabled();
-  d->channelMode = firstHeader.channelMode();
-  d->isCopyrighted = firstHeader.isCopyrighted();
-  d->isOriginal = firstHeader.isOriginal();
+  d->channelMode       = firstHeader.channelMode();
+  d->isCopyrighted     = firstHeader.isCopyrighted();
+  d->isOriginal        = firstHeader.isOriginal();
 }

@@ -68,10 +68,8 @@ namespace TagLib {
       virtual int channels() const;
 
       /*!
-       * Returns a pointer to the XingHeader if one exists or null if no
-       * XingHeader was found.
+       * Returns a pointer to the XingHeader.
        */
-
       const XingHeader *xingHeader() const;
 
       /*!
