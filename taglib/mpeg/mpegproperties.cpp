@@ -219,8 +219,8 @@ void MPEG::Properties::read(File *file)
       const double timePerFrame = firstHeader.samplesPerFrame() * 1000.0 / firstHeader.sampleRate();
       const double length = timePerFrame * d->xingHeader->totalFrames();
 
-      d->length  = static_cast<int>(length);
-      d->bitrate = static_cast<int>(d->xingHeader->totalSize() * 8.0 / length);
+      d->length  = static_cast<int>(length + 0.5);
+      d->bitrate = static_cast<int>(d->xingHeader->totalSize() * 8.0 / length + 0.5);
   }
   else {
     // Since there was no valid Xing header found, we hope that we're in a constant
@@ -236,7 +236,7 @@ void MPEG::Properties::read(File *file)
       const long frames = (last - first) / firstHeader.frameLength() + 1;
       const double length = firstHeader.frameLength() * frames * 8.0 / firstHeader.bitrate();
 
-      d->length  = static_cast<int>(length);
+      d->length  = static_cast<int>(length + 0.5);
       d->bitrate = firstHeader.bitrate();
     }
   }
