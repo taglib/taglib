@@ -5,6 +5,7 @@
 #include <id3v2tag.h>
 #include <mpegproperties.h>
 #include <xingheader.h>
+#include <mpegheader.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -69,11 +70,27 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("bladeenc.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3540, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(3553, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader()->isValid());
+
+    long last = f.lastFrameOffset();
+
+    f.seek(last);
+    MPEG::Header lastHeader(f.readBlock(4));
+
+    while (!lastHeader.isValid()) {
+
+      last = f.previousFrameOffset(last);
+
+      f.seek(last);
+      lastHeader = MPEG::Header(f.readBlock(4));
+    }
+
+    CPPUNIT_ASSERT_EQUAL(28213L, last);
+    CPPUNIT_ASSERT_EQUAL(209, lastHeader.frameLength());
   }
 
   void testVersion2DurationWithXingHeader()

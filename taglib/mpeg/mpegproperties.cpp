@@ -168,7 +168,7 @@ void MPEG::Properties::read(File *file)
   // VBR stream.
 
   file->seek(first + 4);
-  d->xingHeader = new XingHeader(file->readBlock(128));
+  d->xingHeader = new XingHeader(file->readBlock(firstHeader.frameLength() - 4));
 
   if(d->xingHeader->isValid() &&
      firstHeader.samplesPerFrame() > 0 &&
