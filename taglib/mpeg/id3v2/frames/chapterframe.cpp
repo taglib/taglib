@@ -70,6 +70,8 @@ ChapterFrame::ChapterFrame(const ByteVector &eID, const TagLib::uint &sT, const 
 {
   d = new ChapterFramePrivate;
   d->elementID = eID;
+  if(eID.at(eID.size() - 1) != char(0))
+    d->elementID.append(char(0));
   d->startTime = sT;
   d->endTime = eT;
   d->startOffset = sO;
