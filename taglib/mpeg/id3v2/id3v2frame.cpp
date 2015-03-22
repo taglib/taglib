@@ -193,6 +193,9 @@ void Frame::setText(const String &)
 ByteVector Frame::render() const
 {
   ByteVector fieldData = renderFields();
+  if(fieldData.isEmpty())
+    fieldData = ByteVector("\x00", 1);
+
   d->header->setFrameSize(fieldData.size());
   ByteVector headerData = d->header->render();
 

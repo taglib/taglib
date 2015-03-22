@@ -92,6 +92,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseTableOfContentsFrame);
   CPPUNIT_TEST(testRenderTableOfContentsFrame);
   CPPUNIT_TEST(testShrinkPadding);
+  CPPUNIT_TEST(testEmptyFrame);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1036,6 +1037,35 @@ public:
 
       f.save();
       CPPUNIT_ASSERT(f.length() < 10 * 1024);
+    }
+  }
+
+  void testEmptyFrame()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    {
+      MPEG::File f(newname.c_str());
+      ID3v2::Tag *tag = f.ID3v2Tag(true);
+
+      ID3v2::UrlLinkFrame *frame1 = new ID3v2::UrlLinkFrame(
+        ByteVector("WOAF\x00\x00\x00\x01\x00\x00\x00", 11));
+      tag->addFrame(frame1);
+
+      ID3v2::TextIdentificationFrame *frame2 = new ID3v2::TextIdentificationFrame("TIT2");
+      frame2->setText("Title");
+      tag->addFrame(frame2);
+
+      f.save();
+    }
+
+    {
+      MPEG::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
+
+      ID3v2::Tag *tag = f.ID3v2Tag();
+      CPPUNIT_ASSERT_EQUAL(String("Title"), tag->title());
     }
   }
 
