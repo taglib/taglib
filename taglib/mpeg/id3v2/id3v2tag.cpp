@@ -597,7 +597,7 @@ ByteVector ID3v2::Tag::render(int version) const
     }
     if(!(*it)->header()->tagAlterPreservation()) {
       const ByteVector frameData = (*it)->render();
-      if(frameData.size() == Frame::headerSize()) {
+      if(frameData.size() == Frame::headerSize((*it)->header()->version())) {
         debug("An empty ID3v2 frame \'"
           + String((*it)->header()->frameID()) + "\' has been discarded");
         continue;
