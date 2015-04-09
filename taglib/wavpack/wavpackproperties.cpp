@@ -81,6 +81,11 @@ WavPack::Properties::~Properties()
 
 int WavPack::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int WavPack::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

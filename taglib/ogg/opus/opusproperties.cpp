@@ -73,10 +73,15 @@ Opus::Properties::~Properties()
 
 int Opus::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int Opus::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 
-int Ogg::Opus::Properties::lengthInMilliseconds() const
+int Opus::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }

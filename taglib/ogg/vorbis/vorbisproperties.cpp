@@ -82,6 +82,11 @@ Vorbis::Properties::~Properties()
 
 int Vorbis::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int Vorbis::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

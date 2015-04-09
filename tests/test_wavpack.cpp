@@ -35,6 +35,7 @@ public:
     WavPack::Properties *props = f.audioProperties();
     CPPUNIT_ASSERT(props);
     CPPUNIT_ASSERT_EQUAL(3, props->length());
+    CPPUNIT_ASSERT_EQUAL(3, props->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3705, props->lengthInMilliseconds());
   }
 

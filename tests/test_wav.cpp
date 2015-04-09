@@ -31,6 +31,7 @@ public:
     CPPUNIT_ASSERT(f.isValid());
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());

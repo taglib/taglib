@@ -63,6 +63,11 @@ ASF::Properties::~Properties()
 
 int ASF::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int ASF::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

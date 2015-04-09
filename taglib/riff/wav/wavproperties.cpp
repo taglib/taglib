@@ -78,6 +78,11 @@ RIFF::WAV::Properties::~Properties()
 
 int RIFF::WAV::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int RIFF::WAV::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

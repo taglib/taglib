@@ -34,6 +34,7 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("lame_cbr.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
@@ -46,6 +47,7 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("lame_vbr.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(70, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
@@ -58,6 +60,7 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("vbri.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(222198, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(233, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
@@ -70,6 +73,7 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("bladeenc.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3553, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
@@ -98,6 +102,7 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("mpeg2.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(5387285, f.audioProperties()->lengthInMilliseconds());
   }
 

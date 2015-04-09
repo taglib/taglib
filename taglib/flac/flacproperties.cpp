@@ -76,6 +76,11 @@ FLAC::Properties::~Properties()
 
 int FLAC::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int FLAC::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

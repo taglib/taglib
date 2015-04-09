@@ -88,6 +88,11 @@ MPEG::Properties::~Properties()
 
 int MPEG::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int MPEG::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

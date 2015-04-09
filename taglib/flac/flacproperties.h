@@ -67,6 +67,7 @@ namespace TagLib {
       // Reimplementations.
 
       virtual int length() const;
+      int lengthInSeconds() const;
       int lengthInMilliseconds() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;

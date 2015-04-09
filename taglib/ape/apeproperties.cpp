@@ -75,6 +75,11 @@ APE::Properties::~Properties()
 
 int APE::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int APE::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 

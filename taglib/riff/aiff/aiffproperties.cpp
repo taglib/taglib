@@ -72,6 +72,11 @@ RIFF::AIFF::Properties::~Properties()
 
 int RIFF::AIFF::Properties::length() const
 {
+  return lengthInSeconds();
+}
+
+int RIFF::AIFF::Properties::lengthInSeconds() const
+{
   return d->length / 1000;
 }
 
