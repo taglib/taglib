@@ -34,6 +34,9 @@
 
 #include "apeitem.h"
 
+#define FRONT_COVER "COVER ART (FRONT)"
+#define BACK_COVER "COVER ART (BACK)"
+
 namespace TagLib {
 
   class File;
@@ -95,6 +98,15 @@ namespace TagLib {
       virtual uint year() const;
       virtual uint track() const;
 
+      /**
+       * @brief pictures
+       * According to :
+       * http://www.hydrogenaud.io/forums/index.php?showtopic=40603&st=50&p=504669&#entry504669
+       * http://git.videolan.org/?p=vlc.git;a=blob;f=modules/meta_engine/taglib.cpp
+       * @return
+       */
+      virtual PictureMap pictures() const;
+
       virtual void setTitle(const String &s);
       virtual void setArtist(const String &s);
       virtual void setAlbum(const String &s);
@@ -102,6 +114,7 @@ namespace TagLib {
       virtual void setGenre(const String &s);
       virtual void setYear(uint i);
       virtual void setTrack(uint i);
+      virtual void setPictures(const PictureMap &l);
 
       /*!
        * Implements the unified tag dictionary interface -- export function.

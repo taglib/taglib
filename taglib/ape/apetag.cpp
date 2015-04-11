@@ -34,6 +34,7 @@
 #include <tfile.h>
 #include <tstring.h>
 #include <tmap.h>
+#include <tpicturemap.h>
 #include <tpropertymap.h>
 
 #include "apetag.h"
@@ -134,6 +135,48 @@ TagLib::uint APE::Tag::track() const
   return d->itemListMap["TRACK"].toString().toInt();
 }
 
+TagLib::PictureMap APE::Tag::pictures() const
+{
+    PictureMap map;
+    if( d->itemListMap.contains(FRONT_COVER))
+    {
+        Item front = d->itemListMap[FRONT_COVER];
+        if(Item::Binary == front.type())
+        {
+            ByteVector picture = front.value();
+            int index = picture.find('\0');
+            if( index < picture.size() )
+            {
+                ByteVector desc = picture.mid(0, index + 1);
+                String mime = "image/jpeg";
+                ByteVector data = picture.mid(index + 1);
+                Picture p(data, Picture::FrontCover, mime, desc);
+                map.insert(p);
+            }
+        }
+    }
+
+    if( d->itemListMap.contains(BACK_COVER))
+    {
+        Item back = d->itemListMap[BACK_COVER];
+        if(Item::Binary == back.type())
+        {
+            ByteVector picture = back.value();
+            int index = picture.find('\0');
+            if( index < picture.size() )
+            {
+                ByteVector desc = picture.mid(0, index + 1);
+                String mime = "image/jpeg";
+                ByteVector data = picture.mid(index + 1);
+                Picture p(data, Picture::BackCover, mime, desc);
+                map.insert(p);
+            }
+        }
+    }
+
+    return PictureMap(map);
+}
+
 void APE::Tag::setTitle(const String &s)
 {
   addValue("TITLE", s, true);
@@ -173,6 +216,68 @@ void APE::Tag::setTrack(uint i)
     removeItem("TRACK");
   else
     addValue("TRACK", String::number(i), true);
+}
+
+void APE::Tag::setPictures(const PictureMap &l)
+{
+    removeItem(FRONT_COVER);
+    removeItem(BACK_COVER);
+    for(PictureMap::ConstIterator pictureMapIt = l.begin();
+        pictureMapIt != l.end();
+        ++pictureMapIt)
+    {
+        Picture::Type type = pictureMapIt->first;
+        if(Picture::FrontCover != type && Picture::BackCover != type)
+        {
+            std::cout << "APE: Trying to add a picture with wrong type"
+                      << std::endl;
+            continue;
+        }
+
+        const char* id;
+        switch(type)
+        {
+        case Picture::FrontCover:
+            id = FRONT_COVER;
+            break;
+        case Picture::BackCover:
+            id = BACK_COVER;
+            break;
+        default:
+            id = FRONT_COVER;
+            break;
+        }
+
+        PictureList list = pictureMapIt->second;
+        for( PictureList::ConstIterator pictureListIt = list.begin();
+             pictureListIt != list.end();
+             ++pictureListIt)
+        {
+            Picture picture = *pictureListIt;
+            if(d->itemListMap.contains(id))
+            {
+                std::cout << "APE: Already added a picture of type "
+                          << id
+                          << " '"
+                          << picture.description()
+                          << "' "
+                          << "and next are being ignored"
+                          << std::endl;
+                break;
+            }
+
+            ByteVector data = picture.description().data(String::Latin1)
+                              .append('\0')
+                              .append(picture.data());
+
+            Item item;
+            item.setKey(id);
+            item.setType(Item::Binary);
+            item.setBinaryData(data);
+            setItem(item.key(), item);
+        }
+    }
+
 }
 
 // conversions of tag keys between what we use in PropertyMap and what's usual
