@@ -622,13 +622,11 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   const ptrdiff_t diff = withSize - patternSize;
 
   size_t offset = 0;
-  while (true)
-  {
+  while (true) {
+
     offset = find(pattern, offset);
     if(offset == static_cast<size_t>(-1)) // Use npos in taglib2.
       break;
-
-    detach();
 
     if(diff < 0) {
       ::memmove(
