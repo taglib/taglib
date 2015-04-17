@@ -171,7 +171,7 @@ void Speex::Properties::read(File *file)
   // unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
 
   const Ogg::PageHeader *first = file->firstPageHeader();
-  const Ogg::PageHeader *last = file->lastPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
     const long long start = first->absoluteGranularPosition();

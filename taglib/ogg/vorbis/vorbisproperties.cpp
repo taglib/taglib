@@ -175,11 +175,11 @@ void Vorbis::Properties::read(File *file)
   // for my notes on the topic.
 
   const Ogg::PageHeader *first = file->firstPageHeader();
-  const Ogg::PageHeader *last = file->lastPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
     const long long start = first->absoluteGranularPosition();
-    const long long end = last->absoluteGranularPosition();
+    const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0 && d->sampleRate > 0) {
       const long long frameCount = end - start;

@@ -201,7 +201,7 @@ void MPEG::Properties::read(File *file)
 
     d->bitrate = firstHeader.bitrate();
 
-    long streamLength = file->length();
+    long long streamLength = file->length();
 
     if(file->hasID3v1Tag())
       streamLength -= 128;

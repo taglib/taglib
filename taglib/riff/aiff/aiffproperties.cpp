@@ -27,8 +27,6 @@
 #include <tdebug.h>
 #include "aiffproperties.h"
 
-#include <limits>
-
 using namespace TagLib;
 
 class RIFF::AIFF::Properties::PropertiesPrivate
@@ -141,7 +139,7 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
   d->sampleWidth  = data.toShort(6U);
 
   const long double sampleRate = data.toFloat80BE(8);
-  if(sampleRate > std::numeric_limits<double>::epsilon()) {
+  if(sampleRate >= 1.0) {
     d->sampleRate = static_cast<int>(sampleRate + 0.5);
     d->bitrate    = static_cast<int>(sampleRate * d->sampleWidth * d->channels / 1000.0 + 0.5);
     d->length     = static_cast<int>(d->sampleFrames * 1000.0 / sampleRate + 0.5);
@@ -149,6 +147,6 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
 
   if(data.size() >= 23) {
     d->compressionType = data.mid(18, 4);
-    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
+    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])), String::Latin1);
   }
 }
