@@ -237,14 +237,14 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int pos = 0, embPos = 0;
+  int pos = 0;
+  TagLib::uint embPos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
   d->elementID.append(char(0));
   d->isTopLevel = (data.at(pos) & 2) > 0;
   d->isOrdered = (data.at(pos++) & 1) > 0;
   TagLib::uint entryCount = data.at(pos++);
-  for(TagLib::uint i = 0; i < entryCount; i++)
-  {
+  for(TagLib::uint i = 0; i < entryCount; i++) {
     ByteVector childElementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
     childElementID.append(char(0));
     d->childElements.append(childElementID);
