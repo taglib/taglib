@@ -56,17 +56,33 @@ public:
   ASF::File::MetadataLibraryObject *metadataLibraryObject;
 };
 
-static ByteVector headerGuid("\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
-static ByteVector filePropertiesGuid("\xA1\xDC\xAB\x8C\x47\xA9\xCF\x11\x8E\xE4\x00\xC0\x0C\x20\x53\x65", 16);
-static ByteVector streamPropertiesGuid("\x91\x07\xDC\xB7\xB7\xA9\xCF\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65", 16);
-static ByteVector contentDescriptionGuid("\x33\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
-static ByteVector extendedContentDescriptionGuid("\x40\xA4\xD0\xD2\x07\xE3\xD2\x11\x97\xF0\x00\xA0\xC9\x5E\xA8\x50", 16);
-static ByteVector headerExtensionGuid("\xb5\x03\xbf_.\xa9\xcf\x11\x8e\xe3\x00\xc0\x0c Se", 16);
-static ByteVector metadataGuid("\xEA\xCB\xF8\xC5\xAF[wH\204g\xAA\214D\xFAL\xCA", 16);
-static ByteVector metadataLibraryGuid("\224\034#D\230\224\321I\241A\x1d\x13NEpT", 16);
-static ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
-static ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
-static ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
+namespace
+{
+  static const ByteVector headerGuid("\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
+  static const ByteVector filePropertiesGuid("\xA1\xDC\xAB\x8C\x47\xA9\xCF\x11\x8E\xE4\x00\xC0\x0C\x20\x53\x65", 16);
+  static const ByteVector streamPropertiesGuid("\x91\x07\xDC\xB7\xB7\xA9\xCF\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65", 16);
+  static const ByteVector contentDescriptionGuid("\x33\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
+  static const ByteVector extendedContentDescriptionGuid("\x40\xA4\xD0\xD2\x07\xE3\xD2\x11\x97\xF0\x00\xA0\xC9\x5E\xA8\x50", 16);
+  static const ByteVector headerExtensionGuid("\xb5\x03\xbf_.\xa9\xcf\x11\x8e\xe3\x00\xc0\x0c Se", 16);
+  static const ByteVector metadataGuid("\xEA\xCB\xF8\xC5\xAF[wH\204g\xAA\214D\xFAL\xCA", 16);
+  static const ByteVector metadataLibraryGuid("\224\034#D\230\224\321I\241A\x1d\x13NEpT", 16);
+  static const ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
+  static const ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
+  static const ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
+
+  // Some known IDs should belong to MetadataLibraryObject.
+  // https://msdn.microsoft.com/en-us/library/windows/desktop/dd743066(v=vs.85).aspx
+
+  static const size_t MetadataLibraryObjectIDsSize = 5;
+  static const wchar_t *MetadataLibraryObjectIDs[] =
+  {
+    L"WM/MediaClassPrimaryID",
+    L"WM/MediaClassSecondaryID",
+    L"WM/WMCollectionGroupID",
+    L"WM/WMCollectionID",
+    L"WM/WMContentID"
+  };
+}
 
 class ASF::File::BaseObject
 {
@@ -524,18 +540,31 @@ bool ASF::File::save()
 
   ASF::AttributeListMap::ConstIterator it = d->tag->attributeListMap().begin();
   for(; it != d->tag->attributeListMap().end(); it++) {
+
     const String &name = it->first;
     const AttributeList &attributes = it->second;
+
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
+
+    bool inMetadataLibraryObject = false;
+    for(size_t i = 0; i < MetadataLibraryObjectIDsSize; ++i) {
+      if(name == MetadataLibraryObjectIDs[i]) {
+        inMetadataLibraryObject = true;
+        break;
+      }
+    }
+
     for(unsigned int j = 0; j < attributes.size(); j++) {
+
       const Attribute &attribute = attributes[j];
       bool largeValue = attribute.dataSize() > 65535;
-      if(!inExtendedContentDescriptionObject && !largeValue && attribute.language() == 0 && attribute.stream() == 0) {
+
+      if(!inExtendedContentDescriptionObject && !inMetadataLibraryObject && !largeValue && attribute.language() == 0 && attribute.stream() == 0) {
         d->extendedContentDescriptionObject->attributeData.append(attribute.render(name));
         inExtendedContentDescriptionObject = true;
       }
-      else if(!inMetadataObject && !largeValue && attribute.language() == 0 && attribute.stream() != 0) {
+      else if(!inMetadataObject && !inMetadataLibraryObject && !largeValue && attribute.language() == 0 && attribute.stream() != 0) {
         d->metadataObject->attributeData.append(attribute.render(name, 1));
         inMetadataObject = true;
       }
@@ -549,6 +578,7 @@ bool ASF::File::save()
   for(unsigned int i = 0; i < d->objects.size(); i++) {
     data.append(d->objects[i]->render(this));
   }
+
   data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;
   insert(data, 0, (TagLib::ulong)d->size);
 
