@@ -69,19 +69,6 @@ namespace
   static const ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
   static const ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
   static const ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
-
-  // Some known IDs should belong to MetadataLibraryObject.
-  // https://msdn.microsoft.com/en-us/library/windows/desktop/dd743066(v=vs.85).aspx
-
-  static const size_t MetadataLibraryObjectIDsSize = 5;
-  static const wchar_t *MetadataLibraryObjectIDs[] =
-  {
-    L"WM/MediaClassPrimaryID",
-    L"WM/MediaClassSecondaryID",
-    L"WM/WMCollectionGroupID",
-    L"WM/WMCollectionID",
-    L"WM/WMContentID"
-  };
 }
 
 class ASF::File::BaseObject
@@ -547,24 +534,17 @@ bool ASF::File::save()
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    bool inMetadataLibraryObject = false;
-    for(size_t i = 0; i < MetadataLibraryObjectIDsSize; ++i) {
-      if(name == MetadataLibraryObjectIDs[i]) {
-        inMetadataLibraryObject = true;
-        break;
-      }
-    }
-
     for(unsigned int j = 0; j < attributes.size(); j++) {
 
       const Attribute &attribute = attributes[j];
-      bool largeValue = attribute.dataSize() > 65535;
+      const bool largeValue = (attribute.dataSize() > 65535);
+      const bool guid       = (attribute.type() == Attribute::GuidType);
 
-      if(!inExtendedContentDescriptionObject && !inMetadataLibraryObject && !largeValue && attribute.language() == 0 && attribute.stream() == 0) {
+      if(!inExtendedContentDescriptionObject && !guid && !largeValue && attribute.language() == 0 && attribute.stream() == 0) {
         d->extendedContentDescriptionObject->attributeData.append(attribute.render(name));
         inExtendedContentDescriptionObject = true;
       }
-      else if(!inMetadataObject && !inMetadataLibraryObject && !largeValue && attribute.language() == 0 && attribute.stream() != 0) {
+      else if(!inMetadataObject && !guid && !largeValue && attribute.language() == 0 && attribute.stream() != 0) {
         d->metadataObject->attributeData.append(attribute.render(name, 1));
         inMetadataObject = true;
       }
