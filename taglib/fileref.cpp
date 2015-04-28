@@ -54,6 +54,10 @@
 
 using namespace TagLib;
 
+template <typename T>
+static File* createInternal(T arg, const String& filename, bool readAudioProperties,
+                            AudioProperties::ReadStyle audioPropertiesStyle);
+
 class FileRef::FileRefPrivate : public RefCounter
 {
 public:
@@ -81,6 +85,17 @@ FileRef::FileRef(FileName fileName, bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle)
 {
   d = new FileRefPrivate(create(fileName, readAudioProperties, audioPropertiesStyle));
+}
+
+FileRef::FileRef(IOStream* stream, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle)
+{
+  d = new FileRefPrivate(createInternal(stream, 
+#ifdef _WIN32
+  stream->name().toString()
+#else
+  stream->name()
+#endif
+  , readAudioProperties, audioPropertiesStyle));
 }
 
 FileRef::FileRef(File *file)
@@ -213,24 +228,25 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return file;
   }
 
+  return createInternal(fileName,
+#ifdef _WIN32
+  fileName.toString()
+#else
+  fileName
+#endif
+  , readAudioProperties, audioPropertiesStyle);
+}
+
+template <typename T>
+static File* createInternal(T fileName, const String& s, bool readAudioProperties,
+                            AudioProperties::ReadStyle audioPropertiesStyle)
+{
   // Ok, this is really dumb for now, but it works for testing.
 
   String ext;
-  {
-#ifdef _WIN32
-
-    String s = fileName.toString();
-
-#else
-
-    String s = fileName;
-
- #endif
-
-    const int pos = s.rfind(".");
-    if(pos != -1)
-      ext = s.substr(pos + 1).upper();
-  }
+  const int pos = s.rfind(".");
+  if(pos != -1)
+    ext = s.substr(pos + 1).upper();
 
   // If this list is updated, the method defaultFileExtensions() should also be
   // updated.  However at some point that list should be created at the same time
@@ -238,7 +254,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
 
   if(!ext.isEmpty()) {
     if(ext == "MP3")
-      return new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle);
+      return new MPEG::File(fileName, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     if(ext == "OGG")
       return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "OGA") {
@@ -250,7 +266,7 @@ File *FileRef::create(FileName fileName, bool readAudioProperties,
       return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     }
     if(ext == "FLAC")
-      return new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
+      return new FLAC::File(fileName, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     if(ext == "MPC")
       return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "WV")

@@ -6,6 +6,7 @@
 #include <vorbisfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <tfilestream.h>
 
 using namespace std;
 using namespace TagLib;
@@ -66,6 +67,17 @@ public:
     delete f;
 
     f = new FileRef(newname.c_str());
+    CPPUNIT_ASSERT(!f->isNull());
+    CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("ttest artist"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("ytest title"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->genre(), String("uTest!"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->album(), String("ialbummmm"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(7));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
+    delete f;
+
+    FileStream fs(newname.c_str());
+    f = new FileRef(&fs);
     CPPUNIT_ASSERT(!f->isNull());
     CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("ttest artist"));
     CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("ytest title"));
