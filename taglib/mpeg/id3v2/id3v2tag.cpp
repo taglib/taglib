@@ -24,10 +24,10 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-#include <tfile.h>
+#include "tfile.h"
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
@@ -37,7 +37,7 @@
 #include "tbytevector.h"
 #include "id3v1genres.h"
 #include "tpropertymap.h"
-#include <tdebug.h>
+#include "tdebug.h"
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
@@ -83,7 +83,7 @@ const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defau
 
 namespace
 {
-  const uint DefaultPaddingSize = 1024;
+  const TagLib::uint DefaultPaddingSize = 1024;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
