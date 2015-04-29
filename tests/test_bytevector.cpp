@@ -319,6 +319,10 @@ public:
     *it4 = 'A';
     CPPUNIT_ASSERT_EQUAL('a', *it3);
     CPPUNIT_ASSERT_EQUAL('A', *it4);
+
+    ByteVector v3;
+    v3 = ByteVector("taglib").mid(3);
+    CPPUNIT_ASSERT_EQUAL('l', *v3.begin());
   }
 
 };
