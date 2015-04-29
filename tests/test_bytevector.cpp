@@ -321,8 +321,17 @@ public:
     CPPUNIT_ASSERT_EQUAL('A', *it4);
 
     ByteVector v3;
-    v3 = ByteVector("taglib").mid(3);
-    CPPUNIT_ASSERT_EQUAL('l', *v3.begin());
+    v3 = ByteVector("0123456789").mid(3, 4);
+
+    it1 = v3.begin();
+    it2 = v3.end() - 1;
+    CPPUNIT_ASSERT_EQUAL('3', *it1);
+    CPPUNIT_ASSERT_EQUAL('6', *it2);
+
+    it3 = v3.rbegin();
+    it4 = v3.rend() - 1;
+    CPPUNIT_ASSERT_EQUAL('6', *it3);
+    CPPUNIT_ASSERT_EQUAL('3', *it4);
   }
 
 };
