@@ -123,6 +123,12 @@ public:
     CPPUNIT_ASSERT(i.containsAt(j, 5, 0));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
+
+    ByteVector k = ByteVector("0123456789").mid(3, 4);
+    k.resize(6, 'A');
+    CPPUNIT_ASSERT_EQUAL(uint(6), k.size());
+    CPPUNIT_ASSERT_EQUAL('6', k[3]);
+    CPPUNIT_ASSERT_EQUAL('A', k[4]);
   }
 
   void testFind1()

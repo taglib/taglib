@@ -702,6 +702,7 @@ ByteVector &ByteVector::resize(uint size, char padding)
 {
   if(size != d->length) {
     detach();
+    d->data->data.resize(d->offset + d->length);
     d->data->data.resize(d->offset + size, padding);
     d->length = size;
   }
