@@ -703,11 +703,15 @@ ByteVector &ByteVector::resize(uint size, char padding)
   if(size != d->length) {
     detach();
 
-    if(size > d->data->data.size() - d->offset)
-      d->data->data.resize(d->offset + size);
+    const size_t bufferSize = d->data->data.size();
 
-    if(size > d->length)
-      ::memset(DATA(d) + d->offset + d->length, padding, size - d->length);
+    if(size > bufferSize - d->offset) {
+      d->data->data.resize(d->offset + size, padding);
+      ::memset(&*end(), padding, bufferSize - (d->length + d->offset));
+    }
+    else if(size > d->length) {
+      ::memset(&*end(), padding, size - d->length);
+    }
 
     d->length = size;
   }
