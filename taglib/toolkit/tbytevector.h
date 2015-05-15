@@ -217,6 +217,12 @@ namespace TagLib {
      */
     ByteVector &resize(uint size, char padding = 0);
 
+
+    /*!
+     * Truncate the vector at offset. Returns a reference to the truncated vector.
+     */
+    ByteVector &truncate(uint offset);
+
     /*!
      * Returns an Iterator that points to the front of the vector.
      */

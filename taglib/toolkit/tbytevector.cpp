@@ -709,6 +709,16 @@ ByteVector &ByteVector::resize(uint size, char padding)
   return *this;
 }
 
+ByteVector &ByteVector::truncate(uint offset)
+{
+  if (offset<d->length) {
+    detach();
+    d->length = offset;
+  }
+
+  return *this;
+}
+
 ByteVector::Iterator ByteVector::begin()
 {
   detach();
