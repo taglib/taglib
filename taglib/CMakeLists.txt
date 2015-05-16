@@ -37,7 +37,7 @@ set(tag_HDRS
   fileref.h
   audioproperties.h
   taglib_export.h
-  ${CMAKE_BINARY_DIR}/taglib_config.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h
   toolkit/taglib.h
   toolkit/tstring.h
   toolkit/tlist.h
@@ -334,7 +334,11 @@ set(tag_LIB_SRCS
   audioproperties.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+if (${tag_LIB_BUILD_STATIC})
+  add_library(tag STATIC ${tag_LIB_SRCS} ${tag_HDRS})
+else()
+  add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+endif()
 
 if(ZLIB_FOUND)
   target_link_libraries(tag ${ZLIB_LIBRARIES})
