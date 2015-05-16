@@ -43,6 +43,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testResize);
+  CPPUNIT_TEST(testBase64);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -378,6 +379,45 @@ public:
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), c.size());
     CPPUNIT_ASSERT_EQUAL(-1, c.find('C'));
   }
+
+  void testBase64()
+  {
+    ByteVector sempty;
+    ByteVector t0("a"); // test 1 byte
+    ByteVector t1("any carnal pleasure.");
+    ByteVector t2("any carnal pleasure");
+    ByteVector t3("any carnal pleasur");
+    ByteVector s0("a"); // test 1 byte
+    ByteVector s1("any carnal pleasure.");
+    ByteVector s2("any carnal pleasure");
+    ByteVector s3("any carnal pleasur");
+    ByteVector eempty;
+    ByteVector e0("YQ==");
+    ByteVector e1("YW55IGNhcm5hbCBwbGVhc3VyZS4=");
+    ByteVector e2("YW55IGNhcm5hbCBwbGVhc3VyZQ==");
+    ByteVector e3("YW55IGNhcm5hbCBwbGVhc3Vy");
+
+    // Encode
+    CPPUNIT_ASSERT_EQUAL(eempty, sempty.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e0, s0.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e1, s1.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e2, s2.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e3, s3.toBase64());
+
+    // Decode
+    CPPUNIT_ASSERT_EQUAL(sempty, eempty.toBase64());
+    CPPUNIT_ASSERT_EQUAL(s0, e0.fromBase64());
+    CPPUNIT_ASSERT_EQUAL(s1, e1.fromBase64());
+    CPPUNIT_ASSERT_EQUAL(s2, e2.fromBase64());
+    CPPUNIT_ASSERT_EQUAL(s3, e3.fromBase64());
+
+    CPPUNIT_ASSERT_EQUAL(t0, s0.toBase64().fromBase64());
+    CPPUNIT_ASSERT_EQUAL(t1, s1.toBase64().fromBase64());
+    CPPUNIT_ASSERT_EQUAL(t2, s2.toBase64().fromBase64());
+    CPPUNIT_ASSERT_EQUAL(t3, s3.toBase64().fromBase64());
+
+  }
+
 
 };
 
