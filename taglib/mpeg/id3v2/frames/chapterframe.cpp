@@ -221,13 +221,13 @@ void ChapterFrame::parseFields(const ByteVector &data)
   int pos = 0, embPos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
   d->elementID.append(char(0));
-  d->startTime = data.toUInt(pos,true);
+  d->startTime = data.toUInt(pos, true);
   pos += 4;
-  d->endTime = data.toUInt(pos,true);
+  d->endTime = data.toUInt(pos, true);
   pos += 4;
-  d->startOffset = data.toUInt(pos,true);
+  d->startOffset = data.toUInt(pos, true);
   pos += 4;
-  d->endOffset = data.toUInt(pos,true);
+  d->endOffset = data.toUInt(pos, true);
   pos += 4;
   size -= pos;
 
