@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "tagunion.h"
+#include "tpicturemap.h"
 #include "tstringlist.h"
 
 using namespace TagLib;
@@ -45,6 +46,15 @@ using namespace TagLib;
   if(tag(2) && tag(2)->method() > 0)                                 \
     return tag(2)->method();                                         \
   return 0
+
+#define pictureMapUnion(method)                                      \
+    if(tag(0) && !tag(0)->method().isEmpty())                        \
+        return tag( 0 )->method();                                   \
+    if(tag(1) && !tag(1)->method().isEmpty())                        \
+      return tag( 1 )->method();                                     \
+    if(tag(2) && !tag(2)->method().isEmpty())                        \
+      return tag(2)->method();                                       \
+    return PictureMap();
 
 #define setUnion(method, value)                                      \
   if(tag(0))                                                         \
@@ -137,6 +147,11 @@ TagLib::uint TagUnion::track() const
   numberUnion(track);
 }
 
+TagLib::PictureMap TagUnion::pictures() const
+{
+  pictureMapUnion(pictures);
+}
+
 void TagUnion::setTitle(const String &s)
 {
   setUnion(Title, s);
@@ -170,6 +185,11 @@ void TagUnion::setYear(uint i)
 void TagUnion::setTrack(uint i)
 {
   setUnion(Track, i);
+}
+
+void TagUnion::setPictures(const PictureMap &l)
+{
+    setUnion(Pictures, l);
 }
 
 bool TagUnion::isEmpty() const

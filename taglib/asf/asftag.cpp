@@ -23,6 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <tpicturemap.h>
 #include <tpropertymap.h>
 #include "asftag.h"
 
@@ -111,6 +112,11 @@ String ASF::Tag::genre() const
   return String::null;
 }
 
+PictureMap ASF::Tag::pictures() const
+{
+    return PictureMap();
+}
+
 void ASF::Tag::setTitle(const String &value)
 {
   d->title = value;
@@ -154,6 +160,10 @@ void ASF::Tag::setYear(uint value)
 void ASF::Tag::setTrack(uint value)
 {
   setAttribute("WM/TrackNumber", String::number(value));
+}
+
+void ASF::Tag::setPictures(const PictureMap &l)
+{
 }
 
 ASF::AttributeListMap& ASF::Tag::attributeListMap()

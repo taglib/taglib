@@ -22,9 +22,10 @@
  *   License Version 1.1.  You may obtain a copy of the License at         *
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
-
+#include <cstring>
 #include <tdebug.h>
 #include <tstring.h>
+#include <tpicturemap.h>
 #include <tpropertymap.h>
 #include "mp4atom.h"
 #include "mp4tag.h"
@@ -718,6 +719,44 @@ MP4::Tag::track() const
   return 0;
 }
 
+PictureMap
+MP4::Tag::pictures() const
+{
+  if(!d->items.contains("covr"))
+    return PictureMap();
+
+  CoverArtList list = d->items["covr"].toCoverArtList();
+  if( list.isEmpty() )
+      return PictureMap();
+
+  PictureMap map;
+  for(CoverArtList::ConstIterator it = list.begin(); it != list.end(); ++it)
+  {
+      CoverArt art = *it;
+      String mime = "image/";
+      switch(art.format())
+      {
+      case CoverArt::BMP:
+          mime.append("bmp");
+        break;
+      case CoverArt::JPEG:
+        mime.append("jpeg");
+        break;
+      case CoverArt::GIF:
+        mime.append("gif");
+        break;
+      case CoverArt::PNG:
+        mime.append("png");
+        break;
+      case CoverArt::Unknown:
+        break;
+      }
+      Picture picture(art.data(), Picture::Other, mime);
+      map.insert(picture);
+  }
+  return PictureMap(map);
+}
+
 void
 MP4::Tag::setTitle(const String &value)
 {
@@ -758,6 +797,53 @@ void
 MP4::Tag::setTrack(uint value)
 {
   d->items["trkn"] = MP4::Item(value, 0);
+}
+
+void
+MP4::Tag::setPictures(const PictureMap &l)
+{
+    CoverArtList list;
+    for(PictureMap::ConstIterator pictureMapIt = l.begin();
+        pictureMapIt != l.end();
+        ++pictureMapIt)
+    {
+        PictureList pictures = pictureMapIt->second;
+        for(PictureList::ConstIterator pictureListIt = pictures.begin();
+            pictureListIt != pictures.end();
+            ++pictureListIt)
+        {
+            Picture picture = *pictureListIt;
+            CoverArt::Format format;
+            const char* mime = picture.mime().toCString();
+            if(std::strcmp("image/", mime) == 0)
+            {
+                format = CoverArt::Unknown;
+            }
+            else if(std::strcmp("image/bmp", mime) == 0)
+            {
+                format = CoverArt::BMP;
+            }
+            else if(std::strcmp("image/png", mime) == 0)
+            {
+                format = CoverArt::PNG;
+            }
+            else if(std::strcmp("image/gif", mime) == 0)
+            {
+                format = CoverArt::GIF;
+            }
+            else if(std::strcmp("image/jpeg", mime) == 0)
+            {
+                format = CoverArt::JPEG;
+            }
+            else
+            {
+                format = CoverArt::Unknown;
+            }
+            CoverArt art(format, picture.data());
+            list.append(art);
+        }
+    }
+    d->items["covr"] = list;
 }
 
 MP4::ItemListMap &
