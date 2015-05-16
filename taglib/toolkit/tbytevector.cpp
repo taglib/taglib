@@ -629,17 +629,19 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
       break;
 
     if(diff < 0) {
+      char *pData = data();
       ::memmove(
-        data() + offset + withSize,
-        data() + offset + patternSize,
+        pData + offset + withSize,
+        pData + offset + patternSize,
         size() - offset - patternSize);
       resize(size() + diff);
     }
     else if(diff > 0) {
       resize(size() + diff);
+      char *pData = data();
       ::memmove(
-        data() + offset + withSize,
-        data() + offset + patternSize,
+        pData + offset + withSize,
+        pData + offset + patternSize,
         size() - diff - offset - patternSize);
     }
 
