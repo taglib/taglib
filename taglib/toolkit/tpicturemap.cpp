@@ -23,76 +23,65 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_TAGUNION_H
-#define TAGLIB_TAGUNION_H
+#include "tpicturemap.h"
 
-#include "tag.h"
+using namespace TagLib;
 
-#ifndef DO_NOT_DOCUMENT
-
-namespace TagLib {
-
-  /*!
-   * \internal
-   */
-
-  class TagUnion : public Tag
-  {
-  public:
-
-    enum AccessType { Read, Write };
-
-    /*!
-     * Creates a TagLib::Tag that is the union of \a first, \a second, and
-     * \a third.  The TagUnion takes ownership of these tags and will handle
-     * their deletion.
-     */
-    TagUnion(Tag *first = 0, Tag *second = 0, Tag *third = 0);
-
-    virtual ~TagUnion();
-
-    Tag *operator[](int index) const;
-    Tag *tag(int index) const;
-
-    void set(int index, Tag *tag);
-
-    virtual String title() const;
-    virtual String artist() const;
-    virtual String album() const;
-    virtual String comment() const;
-    virtual String genre() const;
-    virtual uint year() const;
-    virtual uint track() const;
-    virtual PictureMap pictures() const;
-
-    virtual void setTitle(const String &s);
-    virtual void setArtist(const String &s);
-    virtual void setAlbum(const String &s);
-    virtual void setComment(const String &s);
-    virtual void setGenre(const String &s);
-    virtual void setYear(uint i);
-    virtual void setTrack(uint i);
-    virtual void setPictures( const PictureMap& l );
-
-    virtual bool isEmpty() const;
-
-    template <class T> T *access(int index, bool create)
-    {
-      if(!create || tag(index))
-        return static_cast<T *>(tag(index));
-
-      set(index, new T);
-      return static_cast<T *>(tag(index));
-    }
-
-  private:
-    TagUnion(const Tag &);
-    TagUnion &operator=(const Tag &);
-
-    class TagUnionPrivate;
-    TagUnionPrivate *d;
-  };
+PictureMap::PictureMap() : Map< Picture::Type, PictureList >()
+{
 }
 
-#endif
-#endif
+PictureMap::PictureMap(const PictureList& l)
+    : Map< Picture::Type, PictureList >()
+{
+    insert( l );
+}
+
+PictureMap::PictureMap(const Picture& p)
+    : Map< Picture::Type, PictureList >()
+{
+    insert( p );
+}
+
+void PictureMap::insert(const Picture& p)
+{
+    PictureList list;
+    if(contains(p.type()))
+    {
+        list = Map<Picture::Type, PictureList>::find(p.type())->second;
+        list.append( p );
+        Map<Picture::Type, PictureList>::insert(p.type(), list);
+    }
+    else{
+        list.append(p);
+        Map<Picture::Type, PictureList>::insert(p.type(), list);
+    }
+}
+
+void PictureMap::insert(const PictureList &l)
+{
+    for(PictureList::ConstIterator it = l.begin(); it != l.end(); ++it)
+    {
+        Picture picture = (*it);
+        insert(picture);
+    }
+}
+
+PictureMap::~PictureMap()
+{
+}
+
+std::ostream& operator<<(std::ostream& s, const PictureMap& map)
+{
+    for(PictureMap::ConstIterator it = map.begin(); it != map.end(); ++it)
+    {
+        PictureList list = it->second;
+        for(PictureList::ConstIterator it2 = list.begin();
+            it2 != list.end();
+            ++it2 )
+        {
+            s << *it2;
+        }
+    }
+    return s;
+}
