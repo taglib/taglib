@@ -979,7 +979,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
 
   ByteVector output(len);
 
-  const unsigned char * src = (unsigned char*) input.data();
+  const unsigned char * src = (const unsigned char*) input.data();
   unsigned char * dst = (unsigned char*)output.data();
   while(4<=len) {
     if(base64[src[0]]==0x80) break;
