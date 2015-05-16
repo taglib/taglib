@@ -193,7 +193,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     if(text.isNull() || pos + 4 > end)
       return;
 
-    uint time = data.mid(pos, 4).toUInt(true);
+    uint time = data.toUInt(pos,true);
     pos += 4;
 
     d->synchedText.append(SynchedText(time, text));
