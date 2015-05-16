@@ -42,6 +42,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testNumericCoversion);
   CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST(testIterator);
+  CPPUNIT_TEST(testResize);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -332,6 +333,50 @@ public:
     it4 = v3.rend() - 1;
     CPPUNIT_ASSERT_EQUAL('6', *it3);
     CPPUNIT_ASSERT_EQUAL('3', *it4);
+  }
+
+  void testResize()
+  {
+    ByteVector a = ByteVector("0123456789");
+    ByteVector b = a.mid(3, 4);
+    b.resize(6, 'A');
+    CPPUNIT_ASSERT_EQUAL(uint(6), b.size());
+    CPPUNIT_ASSERT_EQUAL('6', b[3]);
+    CPPUNIT_ASSERT_EQUAL('A', b[4]);
+    CPPUNIT_ASSERT_EQUAL('A', b[5]);
+    b.resize(10, 'B');
+    CPPUNIT_ASSERT_EQUAL(uint(10), b.size());
+    CPPUNIT_ASSERT_EQUAL('6', b[3]);
+    CPPUNIT_ASSERT_EQUAL('B', b[6]);
+    CPPUNIT_ASSERT_EQUAL('B', b[9]);
+    b.resize(3, 'C');
+    CPPUNIT_ASSERT_EQUAL(uint(3), b.size());
+    CPPUNIT_ASSERT_EQUAL(-1, b.find('C'));
+    b.resize(3);
+    CPPUNIT_ASSERT_EQUAL(uint(3), b.size());
+
+    // Check if a and b were properly detached.
+
+    CPPUNIT_ASSERT_EQUAL(uint(10), a.size());
+    CPPUNIT_ASSERT_EQUAL('3', a[3]);
+    CPPUNIT_ASSERT_EQUAL('5', a[5]);
+
+    // Special case that refCount == 1 and d->offset != 0.
+
+    ByteVector c = ByteVector("0123456789").mid(3, 4);
+    c.resize(6, 'A');
+    CPPUNIT_ASSERT_EQUAL(uint(6), c.size());
+    CPPUNIT_ASSERT_EQUAL('6', c[3]);
+    CPPUNIT_ASSERT_EQUAL('A', c[4]);
+    CPPUNIT_ASSERT_EQUAL('A', c[5]);
+    c.resize(10, 'B');
+    CPPUNIT_ASSERT_EQUAL(uint(10), c.size());
+    CPPUNIT_ASSERT_EQUAL('6', c[3]);
+    CPPUNIT_ASSERT_EQUAL('B', c[6]);
+    CPPUNIT_ASSERT_EQUAL('B', c[9]);
+    c.resize(3, 'C');
+    CPPUNIT_ASSERT_EQUAL(uint(3), c.size());
+    CPPUNIT_ASSERT_EQUAL(-1, c.find('C'));
   }
 
 };

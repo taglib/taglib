@@ -702,7 +702,14 @@ ByteVector &ByteVector::resize(uint size, char padding)
 {
   if(size != d->length) {
     detach();
+
+    // Remove the excessive length of the internal buffer first to pad correctly.
+    // This doesn't reallocate the buffer, since std::vector::resize() doesn't
+    // reallocate the buffer when shrinking.
+
+    d->data->data.resize(d->offset + d->length);
     d->data->data.resize(d->offset + size, padding);
+
     d->length = size;
   }
 
