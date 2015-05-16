@@ -954,7 +954,7 @@ ByteVector ByteVector::toHex() const
 
 
 
-ByteVector & ByteVector::fromBase64()
+ByteVector ByteVector::fromBase64(const ByteVector & input)
 {
   static const unsigned char base64[256]={
     0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
@@ -975,10 +975,12 @@ ByteVector & ByteVector::fromBase64()
     0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80
   };
 
-  detach();
-  uint len = size();
-  const unsigned char * src = (unsigned char*) data();
-  unsigned char * dst = (unsigned char*) data();
+  uint len = input.size();
+
+  ByteVector output(len);
+
+  const unsigned char * src = (unsigned char*) input.data();
+  unsigned char * dst = (unsigned char*)output.data();
   while(4<=len) {
     if(base64[src[0]]==0x80) break;
     if(base64[src[1]]==0x80) break;
@@ -1000,8 +1002,8 @@ ByteVector & ByteVector::fromBase64()
     src+=4;
     len-=4;
     }
-  resize(dst-(unsigned char*)data());
-  return *this;
+  output.resize(dst-(unsigned char*)output.data());
+  return output;
 }
 
 

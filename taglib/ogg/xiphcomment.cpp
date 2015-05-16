@@ -419,7 +419,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     if(entry.startsWith("METADATA_BLOCK_PICTURE=")) {
 
       // Decode base64 picture data
-      ByteVector picturedata = entry.mid(23, entry.size()-23).fromBase64();
+      ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
 
       if(picturedata.size()==0) {
         debug("Empty picture data. Discarding content");

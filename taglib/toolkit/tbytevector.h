@@ -579,12 +579,9 @@ namespace TagLib {
     ByteVector toBase64() const;
 
     /*!
-     * Decodes the base64 encoded byte vector in-memory. Returns a reference
-     * to this vector. Calls detach before decoding.
+     * Decodes the base64 encoded byte vector.      
      */
-    ByteVector & fromBase64();
-
-
+    static ByteVector fromBase64(const ByteVector &);
 
   protected:
     /*

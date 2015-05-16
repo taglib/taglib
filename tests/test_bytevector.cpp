@@ -406,15 +406,15 @@ public:
 
     // Decode
     CPPUNIT_ASSERT_EQUAL(sempty, eempty.toBase64());
-    CPPUNIT_ASSERT_EQUAL(s0, e0.fromBase64());
-    CPPUNIT_ASSERT_EQUAL(s1, e1.fromBase64());
-    CPPUNIT_ASSERT_EQUAL(s2, e2.fromBase64());
-    CPPUNIT_ASSERT_EQUAL(s3, e3.fromBase64());
+    CPPUNIT_ASSERT_EQUAL(s0, ByteVector::fromBase64(e0));
+    CPPUNIT_ASSERT_EQUAL(s1, ByteVector::fromBase64(e1));
+    CPPUNIT_ASSERT_EQUAL(s2, ByteVector::fromBase64(e2));
+    CPPUNIT_ASSERT_EQUAL(s3, ByteVector::fromBase64(e3));
 
-    CPPUNIT_ASSERT_EQUAL(t0, s0.toBase64().fromBase64());
-    CPPUNIT_ASSERT_EQUAL(t1, s1.toBase64().fromBase64());
-    CPPUNIT_ASSERT_EQUAL(t2, s2.toBase64().fromBase64());
-    CPPUNIT_ASSERT_EQUAL(t3, s3.toBase64().fromBase64());
+    CPPUNIT_ASSERT_EQUAL(t0, ByteVector::fromBase64(s0.toBase64()));
+    CPPUNIT_ASSERT_EQUAL(t1, ByteVector::fromBase64(s1.toBase64()));
+    CPPUNIT_ASSERT_EQUAL(t2, ByteVector::fromBase64(s2.toBase64()));
+    CPPUNIT_ASSERT_EQUAL(t3, ByteVector::fromBase64(s3.toBase64()));
 
   }
 
