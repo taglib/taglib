@@ -25,6 +25,7 @@
 
 #include <tdebug.h>
 #include <tfile.h>
+#include <tpicturemap.h>
 
 #include "id3v1tag.h"
 #include "id3v1genres.h"
@@ -157,6 +158,11 @@ TagLib::uint ID3v1::Tag::track() const
   return d->track;
 }
 
+TagLib::PictureMap ID3v1::Tag::pictures() const
+{
+    return PictureMap();
+}
+
 void ID3v1::Tag::setTitle(const String &s)
 {
   d->title = s;
@@ -190,6 +196,10 @@ void ID3v1::Tag::setYear(TagLib::uint i)
 void ID3v1::Tag::setTrack(TagLib::uint i)
 {
   d->track = i < 256 ? i : 0;
+}
+
+void ID3v1::Tag::setPictures(const PictureMap &l)
+{
 }
 
 TagLib::uint ID3v1::Tag::genreNumber() const
