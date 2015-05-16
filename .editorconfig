@@ -1,0 +1,21 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Non-specified newlines with a newline ending every file
+[*]
+insert_final_newline = true
+
+# 2 space indentation
+[*.{h,cpp,tcc,cmake}]
+indent_style = space
+indent_size = 2
+
+# Trim traling whitespaces
+[*.{h,cpp,tcc,cmake}]
+trim_trailing_whitespace = true
+
+# UTF-8 without BOM
+[*]
+charset = utf-8

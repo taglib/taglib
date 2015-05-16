@@ -39,7 +39,8 @@ public:
   FilePrivate() :
     properties(0),
     tag(0),
-    tagChunkID("ID3 ")
+    tagChunkID("ID3 "),
+    hasID3v2(false)
   {
 
   }
@@ -53,6 +54,8 @@ public:
   AudioProperties *properties;
   ID3v2::Tag *tag;
   ByteVector tagChunkID;
+
+  bool hasID3v2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +103,6 @@ PropertyMap RIFF::AIFF::File::setProperties(const PropertyMap &properties)
   return d->tag->setProperties(properties);
 }
 
-
 RIFF::AIFF::AudioProperties *RIFF::AIFF::File::audioProperties() const
 {
   return d->properties;
@@ -119,10 +121,15 @@ bool RIFF::AIFF::File::save()
   }
 
   setChunkData(d->tagChunkID, d->tag->render());
+  d->hasID3v2 = true;
 
   return true;
 }
 
+bool RIFF::AIFF::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
@@ -134,6 +141,7 @@ void RIFF::AIFF::File::read(bool readProperties, AudioProperties::ReadStyle prop
     if(chunkName(i) == "ID3 " || chunkName(i) == "id3 ") {
       d->tagChunkID = chunkName(i);
       d->tag = new ID3v2::Tag(this, chunkOffset(i));
+      d->hasID3v2 = true;
     }
     else if(chunkName(i) == "COMM" && readProperties)
       d->properties = new AudioProperties(chunkData(i), propertiesStyle);

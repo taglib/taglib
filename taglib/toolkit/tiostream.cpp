@@ -63,12 +63,12 @@ namespace
       debug("unicodeToAnsi() - Should not be used on WinNT systems.");
     }
 
-    const int len = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
+    const int len = ::WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
     if(len == 0)
       return std::string();
 
     std::string str(len, '\0');
-    WideCharToMultiByte(CP_ACP, 0, wstr, -1, &str[0], len, NULL, NULL);
+    ::WideCharToMultiByte(CP_ACP, 0, wstr, -1, &str[0], len, NULL, NULL);
 
     return str;
   }
@@ -145,12 +145,12 @@ String FileName::toString() const
     return String(d->data->wname);
   }
   else if(!d->data->name.empty()) {
-    const int len = MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, NULL, 0);
+    const int len = ::MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, NULL, 0);
     if(len == 0)
       return String::null;
 
     std::vector<wchar_t> buf(len);
-    MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, &buf[0], len);
+    ::MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, &buf[0], len);
 
     return String(&buf[0]);
   }
@@ -158,7 +158,6 @@ String FileName::toString() const
     return String::null;
   }
 }
-
 
 #endif  // _WIN32
 

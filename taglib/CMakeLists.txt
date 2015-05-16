@@ -330,8 +330,13 @@ set(toolkit_SRCS
   toolkit/tpropertymap.cpp
   toolkit/trefcounter.cpp
   toolkit/tdebuglistener.cpp
-  toolkit/unicode.cpp
 )
+
+if(NOT WIN32)
+  set(unicode_SRCS
+    toolkit/unicode.cpp
+  )
+endif()
 
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS
@@ -340,7 +345,6 @@ if(HAVE_ZLIB_SOURCE)
     ${ZLIB_SOURCE}/inffast.c
     ${ZLIB_SOURCE}/inflate.c
     ${ZLIB_SOURCE}/inftrees.c
-    ${ZLIB_SOURCE}/uncompr.c
     ${ZLIB_SOURCE}/zutil.c
   )
 endif()
@@ -351,13 +355,14 @@ set(tag_LIB_SRCS
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
   ${ebml_SRCS} ${matroska_SRCS} ${dsf_SRCS}
+  ${unicode_SRCS} ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
   audioproperties.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${zlib_SRCS} ${tag_HDRS})
+add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
   target_link_libraries(tag ${ZLIB_LIBRARIES})

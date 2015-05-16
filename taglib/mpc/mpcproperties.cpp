@@ -147,35 +147,43 @@ int MPC::AudioProperties::albumPeak() const
 
 namespace
 {
-  unsigned long readSize(File *file, size_t &sizelength)
+  unsigned long readSize(File *file, size_t &sizeLength, bool &eof)
   {
+    sizeLength = 0;
+    eof = false;
+
     unsigned char tmp;
     unsigned long size = 0;
 
     do {
-      ByteVector b = file->readBlock(1);
+      const ByteVector b = file->readBlock(1);
+      if(b.isEmpty()) {
+        eof = true;
+        break;
+      }
+
       tmp = b[0];
       size = (size << 7) | (tmp & 0x7F);
-      sizelength++;
+      sizeLength++;
     } while((tmp & 0x80));
     return size;
   }
 
-  unsigned long readSize(const ByteVector &data, size_t &sizelength)
+  unsigned long readSize(const ByteVector &data, size_t &pos)
   {
     unsigned char tmp;
     unsigned long size = 0;
-    unsigned long pos = 0;
 
     do {
       tmp = data[pos++];
       size = (size << 7) | (tmp & 0x7F);
-      sizelength++;
     } while((tmp & 0x80) && (pos < data.size()));
     return size;
   }
 
-  static const unsigned short sftable [4] = { 44100, 48000, 37800, 32000 };
+  // This array looks weird, but the same as original MusePack code found at:
+  // https://www.musepack.net/index.php?pg=src
+  static const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 }
 
 void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
@@ -183,40 +191,73 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
   bool readSH = false, readRG = false;
 
   while(!readSH && !readRG) {
-    ByteVector packetType = file->readBlock(2);
-    size_t packetSizeLength = 0;
-    size_t packetSize = readSize(file, packetSizeLength);
-    size_t dataSize = packetSize - 2 - packetSizeLength;
+    const ByteVector packetType = file->readBlock(2);
+
+    size_t packetSizeLength;
+    bool eof;
+    const size_t packetSize = readSize(file, packetSizeLength, eof);
+    if(eof) {
+      debug("MPC::Properties::readSV8() - Reached to EOF.");
+      break;
+    }
+
+    const size_t dataSize = packetSize - 2 - packetSizeLength;
+
+    const ByteVector data = file->readBlock(dataSize);
+    if(data.size() != dataSize) {
+      debug("MPC::Properties::readSV8() - dataSize doesn't match the actual data size.");
+      break;
+    }
 
     if(packetType == "SH") {
       // Stream Header
       // http://trac.musepack.net/wiki/SV8Specification#StreamHeaderPacket
-      ByteVector data = file->readBlock(dataSize);
+
+      if(dataSize <= 5) {
+        debug("MPC::Properties::readSV8() - \"SH\" packet is too short to parse.");
+        break;
+      }
+
       readSH = true;
 
       size_t pos = 4;
       d->version = data[pos];
       pos += 1;
-      d->sampleFrames = readSize(data.mid(pos), pos);
-      uint begSilence = readSize(data.mid(pos), pos);
 
-      std::bitset<16> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt16BE(pos)));
+      d->sampleFrames = readSize(data, pos);
+      if(pos > dataSize - 3) {
+        debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
+        break;
+      }
+
+      ulong begSilence = readSize(data, pos);
+      if(pos > dataSize - 2) {
+        debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
+        break;
+      }
+
+      const ushort flags = data.toUInt16BE(pos);
       pos += 2;
 
-      d->sampleRate = sftable[flags[15] * 4 + flags[14] * 2 + flags[13]];
-      d->channels = flags[7] * 8 + flags[6] * 4 + flags[5] * 2 + flags[4] + 1;
+      d->sampleRate = sftable[(flags >> 13) & 0x07];
+      d->channels   = ((flags >> 4) & 0x0F) + 1;
 
-      if((d->sampleFrames - begSilence) != 0)
-        d->bitrate = static_cast<int>(streamLength * 8.0 * d->sampleRate / (d->sampleFrames - begSilence));
-      d->bitrate = d->bitrate / 1000;
-
-      d->length = (d->sampleFrames - begSilence) / d->sampleRate;
+      const uint frameCount = d->sampleFrames - begSilence;
+      if(frameCount != 0 && d->sampleRate != 0) {
+        d->bitrate = (int)(streamLength * 8.0 * d->sampleRate / frameCount / 1000);
+        d->length  = frameCount / d->sampleRate;
+      }
     }
 
     else if (packetType == "RG") {
       // Replay Gain
       // http://trac.musepack.net/wiki/SV8Specification#ReplaygainPacket
-      ByteVector data = file->readBlock(dataSize);
+
+      if(dataSize <= 9) {
+        debug("MPC::Properties::readSV8() - \"RG\" packet is too short to parse.");
+        break;
+      }
+
       readRG = true;
 
       int replayGainVersion = data[0];
@@ -306,4 +347,3 @@ void MPC::AudioProperties::readSV7(const ByteVector &data, offset_t streamLength
   if(!d->bitrate)
     d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
 }
-

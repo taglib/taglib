@@ -61,7 +61,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+APE::AudioProperties::AudioProperties(File *file, ReadStyle style) :
   d(new PropertiesPrivate())
 {
   read(file);
@@ -219,11 +219,19 @@ void APE::AudioProperties::analyzeOld(File *file)
   else
     blocksPerFrame = 9216;
 
-  d->channels = header.toUInt16LE(4);
+  d->channels   = header.toUInt16LE(4);
   d->sampleRate = header.toUInt32LE(6);
+
   const uint finalFrameBlocks = header.toUInt32LE(22);
-  const uint totalBlocks = totalFrames > 0 ? (totalFrames - 1) * blocksPerFrame + finalFrameBlocks : 0;
-  d->length = totalBlocks / d->sampleRate;
-  d->bitrate = d->length > 0 ? static_cast<int>(file->length() * 8L / d->length / 1000) : 0;
+
+  uint totalBlocks = 0;
+  if(totalFrames > 0)
+    totalBlocks = (totalFrames - 1) * blocksPerFrame + finalFrameBlocks;
+
+  if(d->sampleRate > 0)
+    d->length = totalBlocks / d->sampleRate;
+
+  if(d->length > 0)
+    d->bitrate = ((file->length() * 8L) / d->length) / 1000;
 }
 
