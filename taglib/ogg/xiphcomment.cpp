@@ -441,7 +441,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
       // Parse key and value
       String key = String(entry.mid(0,sep), String::UTF8);
-      String value = String(entry.mid(sep+1, commentLength-sep), String::UTF8);
+      String value = String(entry.mid(sep+1), String::UTF8);
       addField(key, value, false);
     }
   }
