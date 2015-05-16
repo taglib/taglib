@@ -61,6 +61,7 @@ Ogg::XiphComment::XiphComment(const ByteVector &data) : TagLib::Tag()
 
 Ogg::XiphComment::~XiphComment()
 {
+  removePictures();
   delete d;
 }
 
