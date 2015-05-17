@@ -33,7 +33,7 @@
 using namespace TagLib;
 
 
-typedef List<FLAC::Picture*> PictureList;
+typedef List<FLAC::Picture *> PictureList;
 
 class Ogg::XiphComment::XiphCommentPrivate
 {
@@ -285,7 +285,7 @@ bool Ogg::XiphComment::contains(const String &key) const
 
 void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
 {
-  List<FLAC::Picture *>::Iterator it = d->pictureList.find(picture);
+  PictureList::Iterator it = d->pictureList.find(picture);
   if(it != d->pictureList.end())
     d->pictureList.erase(it);
 
@@ -410,9 +410,10 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
     ByteVector entry = data.mid(pos, commentLength);
 
+    pos += commentLength;
+
     // Don't go past data end
-    pos+=commentLength;
-    if (pos>data.size())
+    if (pos > data.size())
       break;
 
     // Handle Pictures separately
@@ -421,12 +422,13 @@ void Ogg::XiphComment::parse(const ByteVector &data)
       // Decode base64 picture data
       ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
 
-      if(picturedata.size()==0) {
+      if(picturedata.size() == 0) {
         debug("Empty picture data. Discarding content");
         continue;
-        }
+      }
 
       FLAC::Picture * picture = new FLAC::Picture();
+
       if(picture->parse(picturedata))
         d->pictureList.append(picture);
       else
@@ -436,11 +438,13 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
       // Check for field separator
       int sep = entry.find('=');
-      if (sep == -1)
-        break;
+      if (sep < 1) {
+        debug("Discarding invalid comment field.");
+        continue;
+      }
 
       // Parse key and value
-      String key = String(entry.mid(0,sep), String::UTF8);
+      String key = String(entry.mid(0, sep), String::UTF8);
       String value = String(entry.mid(sep+1), String::UTF8);
       addField(key, value, false);
     }

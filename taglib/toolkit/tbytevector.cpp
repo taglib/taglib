@@ -950,13 +950,9 @@ ByteVector ByteVector::toHex() const
   return encoded;
 }
 
-
-
-
-
 ByteVector ByteVector::fromBase64(const ByteVector & input)
 {
-  static const unsigned char base64[256]={
+  static const unsigned char base64[256] = {
     0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
     0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,
     0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x3e,0x80,0x80,0x80,0x3f,
@@ -980,61 +976,88 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
   ByteVector output(len);
 
   const unsigned char * src = (const unsigned char*) input.data();
-  unsigned char * dst = (unsigned char*)output.data();
-  while(4<=len) {
-    if(base64[src[0]]==0x80) break;
-    if(base64[src[1]]==0x80) break;
-    *dst++=((base64[src[0]]<<2)&0xfc)|((base64[src[1]]>>4)&0x03);
-    if(src[2]!='=') {
-      if(base64[src[2]]==0x80) break;
-      *dst++=((base64[src[1]]&0x0f)<<4)|((base64[src[2]]>>2)&0x0f);
-      if(src[3]!='=') {
-        if(base64[src[3]]==0x80) break;
-        *dst++=((base64[src[2]]&0x03)<<6)|(base64[src[3]]&0x3f);
+  unsigned char *       dst = (unsigned char*) output.data();
+
+  while(4 <= len) {
+
+    // Check invalid character
+    if(base64[src[0]] == 0x80) 
+      break;
+
+    // Check invalid character
+    if(base64[src[1]] == 0x80) 
+      break;
+
+    // Decode first byte
+    *dst++ = ((base64[src[0]] << 2) & 0xfc) | ((base64[src[1]] >> 4) & 0x03);
+
+    if(src[2] != '=') {
+
+      // Check invalid character
+      if(base64[src[2]] == 0x80) 
+        break;
+
+      // Decode second byte
+      *dst++ = ((base64[src[1]] & 0x0f) << 4) | ((base64[src[2]] >> 2) & 0x0f);
+
+      if(src[3] != '=') {
+
+        // Check invalid character
+        if(base64[src[3]] == 0x80) 
+          break;
+
+        // Decode third byte
+        *dst++ = ((base64[src[2]] & 0x03) << 6) | (base64[src[3]] & 0x3f);
       }
       else {
+        // assume end of data
+        len -= 4;
         break;
       }
     }
     else {
+      // assume end of data
+      len -= 4;
       break;
     }
-    src+=4;
-    len-=4;
+    src += 4;
+    len -= 4;
     }
-  output.resize(dst-(unsigned char*)output.data());
-  return output;
+
+  // Only return output if we processed all bytes
+  if(len == 0) {
+    output.resize(dst - (unsigned char*) output.data());
+    return output;
+  }
+  return ByteVector();
 }
-
-
-
 
 ByteVector ByteVector::toBase64() const
 {
-  static const char alphabet[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   if (size()) {
-    uint len=size();
-    ByteVector output(4 * ((len-1)/3+1)); // note roundup
+    uint len = size();
+    ByteVector output(4 * ((len - 1) / 3 + 1)); // note roundup
 
     const char * src = data();
     char * dst = output.data();
-    while(3<=len) {
-      *dst++=alphabet[(src[0]>>2)&0x3f];
-      *dst++=alphabet[((src[0]&0x03)<<4)|((src[1]>>4)&0x0f)];
-      *dst++=alphabet[((src[1]&0x0f)<<2)|((src[2]>>6)&0x03)];
-      *dst++=alphabet[src[2]&0x3f];
-      src+=3;
-      len-=3;
+    while(3 <= len) {
+      *dst++ = alphabet[(src[0] >> 2) & 0x3f];
+      *dst++ = alphabet[((src[0] & 0x03) << 4) | ((src[1] >> 4) & 0x0f)];
+      *dst++ = alphabet[((src[1] & 0x0f) << 2) | ((src[2] >> 6) & 0x03)];
+      *dst++ = alphabet[src[2] & 0x3f];
+      src += 3;
+      len -= 3;
     }
     if(len) {
-      *dst++=alphabet[(src[0]>>2)&0x3f];
+      *dst++ = alphabet[(src[0] >> 2) & 0x3f];
       if(len>1) {
-        *dst++=alphabet[((src[0]&0x03)<<4)|((src[1]>>4)&0x0f)];
-        *dst++=alphabet[((src[1]&0x0f)<<2)];
+        *dst++ = alphabet[((src[0] & 0x03) << 4)|((src[1] >> 4) & 0x0f)];
+        *dst++ = alphabet[((src[1] & 0x0f) << 2)];
       }
       else {
-        *dst++=alphabet[(src[0]&0x03)<<4];
-        *dst++='=';
+        *dst++ = alphabet[(src[0] & 0x03) << 4];
+        *dst++ = '=';
       }
     *dst++='=';
     }
