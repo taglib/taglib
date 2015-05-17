@@ -39,7 +39,7 @@ namespace TagLib {
   /*!
    * This class provides a byte vector with some methods that are useful for
    * tagging purposes.  Many of the search functions are tailored to what is
-   * useful for finding tag related paterns in a data array.
+   * useful for finding tag related patterns in a data array.
    */
 
   class TAGLIB_EXPORT ByteVector
@@ -493,7 +493,7 @@ namespace TagLib {
     static ByteVector fromCString(const char *s, uint length = 0xffffffff);
 
     /*!
-     * Returns a const refernence to the byte at \a index.
+     * Returns a const reference to the byte at \a index.
      */
     const char &operator[](int index) const;
 
