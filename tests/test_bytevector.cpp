@@ -25,7 +25,6 @@
 #include <cstring>
 #include <tbytevector.h>
 #include <tbytevectorlist.h>
-#include <tstring.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;

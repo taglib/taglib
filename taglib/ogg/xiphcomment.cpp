@@ -361,7 +361,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 
   for(PictureList::ConstIterator it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
     ByteVector picture = (*it)->render().toBase64();
-    data.append(ByteVector::fromUInt(picture.size()+23,false));
+    data.append(ByteVector::fromUInt(picture.size() + 23, false));
     data.append("METADATA_BLOCK_PICTURE=");
     data.append(picture);
   }
@@ -445,7 +445,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
       // Parse key and value
       String key = String(entry.mid(0, sep), String::UTF8);
-      String value = String(entry.mid(sep+1), String::UTF8);
+      String value = String(entry.mid(sep + 1), String::UTF8);
       addField(key, value, false);
     }
   }
