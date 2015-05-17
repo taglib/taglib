@@ -1052,7 +1052,7 @@ ByteVector ByteVector::toBase64() const
     if(len) {
       *dst++ = alphabet[(src[0] >> 2) & 0x3f];
       if(len>1) {
-        *dst++ = alphabet[((src[0] & 0x03) << 4)|((src[1] >> 4) & 0x0f)];
+        *dst++ = alphabet[((src[0] & 0x03) << 4) | ((src[1] >> 4) & 0x0f)];
         *dst++ = alphabet[((src[1] & 0x0f) << 2)];
       }
       else {
