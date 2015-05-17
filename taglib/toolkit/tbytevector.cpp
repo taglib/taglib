@@ -981,11 +981,11 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
   while(4 <= len) {
 
     // Check invalid character
-    if(base64[src[0]] == 0x80) 
+    if(base64[src[0]] == 0x80)
       break;
 
     // Check invalid character
-    if(base64[src[1]] == 0x80) 
+    if(base64[src[1]] == 0x80)
       break;
 
     // Decode first byte
@@ -994,7 +994,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
     if(src[2] != '=') {
 
       // Check invalid character
-      if(base64[src[2]] == 0x80) 
+      if(base64[src[2]] == 0x80)
         break;
 
       // Decode second byte
@@ -1003,7 +1003,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
       if(src[3] != '=') {
 
         // Check invalid character
-        if(base64[src[3]] == 0x80) 
+        if(base64[src[3]] == 0x80)
           break;
 
         // Decode third byte
@@ -1059,7 +1059,7 @@ ByteVector ByteVector::toBase64() const
         *dst++ = alphabet[(src[0] & 0x03) << 4];
         *dst++ = '=';
       }
-    *dst++='=';
+    *dst++ = '=';
     }
     return output;
   }
