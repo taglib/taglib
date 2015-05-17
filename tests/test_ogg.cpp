@@ -158,6 +158,14 @@ public:
     f = new Vorbis::File(newname.c_str());
     List<FLAC::Picture *> lst = f->tag()->pictureList();
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+    CPPUNIT_ASSERT_EQUAL(int(5), lst[0]->width());
+    CPPUNIT_ASSERT_EQUAL(int(6), lst[0]->height());
+    CPPUNIT_ASSERT_EQUAL(int(16), lst[0]->colorDepth());
+    CPPUNIT_ASSERT_EQUAL(int(7), lst[0]->numColors());
+    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
+    CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());
+  
     delete f;
   }
 
