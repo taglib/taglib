@@ -25,6 +25,7 @@
 #include <cstring>
 #include <tbytevector.h>
 #include <tbytevectorlist.h>
+#include <tstring.h>
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
@@ -415,6 +416,73 @@ public:
     CPPUNIT_ASSERT_EQUAL(t1, ByteVector::fromBase64(s1.toBase64()));
     CPPUNIT_ASSERT_EQUAL(t2, ByteVector::fromBase64(s2.toBase64()));
     CPPUNIT_ASSERT_EQUAL(t3, ByteVector::fromBase64(s3.toBase64()));
+
+    ByteVector all((uint)256);
+
+    // in order
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=(unsigned char)i;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // reverse
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=(unsigned char)255-i;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // all zeroes
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=0;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // all ones
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=0xff;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // Missing end bytes
+    {
+      // No missing bytes
+      ByteVector m0("YW55IGNhcm5hbCBwbGVhc3VyZQ==");
+      CPPUNIT_ASSERT_EQUAL(s2,ByteVector::fromBase64(m0));
+
+      // 1 missing byte
+      ByteVector m1("YW55IGNhcm5hbCBwbGVhc3VyZQ=");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(m1));
+
+      // 2 missing bytes
+      ByteVector m2("YW55IGNhcm5hbCBwbGVhc3VyZQ");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(m2));
+
+      // 3 missing bytes
+      ByteVector m3("YW55IGNhcm5hbCBwbGVhc3VyZ");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(m3));
+    }
+
+    // Grok invalid characters
+    {
+      ByteVector invalid("abd\x00\x01\x02\x03\x04");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(invalid));
+    }
 
   }
 
