@@ -237,7 +237,8 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  int pos = 0, embPos = 0;
+  int pos = 0;
+  unsigned embPos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
   d->elementID.append(char(0));
   d->isTopLevel = (data.at(pos) & 2) > 0;
