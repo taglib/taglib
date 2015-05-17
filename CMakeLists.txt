@@ -10,7 +10,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 
 option(BUILD_SHARED_LIBS "Build as shared library"  ON)
 
-if(DEFINED ENABLE_STATIC)
+if(ENABLE_STATIC)
   message(FATAL_ERROR "ENABLE_STATIC no longer supported. Use BUILD_SHARED_LIBS to control linkage")
 endif()
 
