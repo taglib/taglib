@@ -49,8 +49,6 @@
 //
 // http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
 
-#define DATA(x) (&(*(x)->data)[0])
-
 namespace TagLib {
 
 static const char hexTable[17] = "0123456789abcdef";
@@ -474,12 +472,12 @@ ByteVector &ByteVector::setData(const char *data)
 char *ByteVector::data()
 {
   detach();
-  return (size() > 0) ? (DATA(d) + d->offset) : 0;
+  return (size() > 0) ? (&d->data->front() + d->offset) : 0;
 }
 
 const char *ByteVector::data() const
 {
-  return (size() > 0) ? (DATA(d) + d->offset) : 0;
+  return (size() > 0) ? (&d->data->front() + d->offset) : 0;
 }
 
 ByteVector ByteVector::mid(uint index, uint length) const
@@ -492,7 +490,7 @@ ByteVector ByteVector::mid(uint index, uint length) const
 
 char ByteVector::at(uint index) const
 {
-  return (index < size()) ? DATA(d)[d->offset + index] : 0;
+  return (index < size()) ? (*d->data)[d->offset + index] : 0;
 }
 
 int ByteVector::find(const ByteVector &pattern, uint offset, int byteAlign) const
@@ -797,13 +795,13 @@ long double ByteVector::toFloat80BE(size_t offset) const
 
 const char &ByteVector::operator[](int index) const
 {
-  return DATA(d)[d->offset + index];
+  return (*d->data)[d->offset + index];
 }
 
 char &ByteVector::operator[](int index)
 {
   detach();
-  return DATA(d)[d->offset + index];
+  return (*d->data)[d->offset + index];
 }
 
 bool ByteVector::operator==(const ByteVector &v) const
@@ -900,7 +898,7 @@ void ByteVector::detach()
 {
   if(d->counter->count() > 1) {
     if(!isEmpty())
-      ByteVector(DATA(d) + d->offset, d->length).swap(*this);
+      ByteVector(&d->data->front() + d->offset, d->length).swap(*this);
     else
       ByteVector().swap(*this);
   }
