@@ -434,6 +434,23 @@ void Ogg::XiphComment::parse(const ByteVector &data)
       else
         debug("Unable to parse METADATA_BLOCK_PICTURE. Discarding content.");
     }
+    else if (entry.startsWith("COVERART=")) {
+
+      // Decode base64 picture data
+      ByteVector picturedata = ByteVector::fromBase64(entry.mid(9));
+
+      if (picturedata.size() == 0) {
+        debug("Empty coverart data. Discaring content");
+        continue;
+      }
+
+      // Assume it's some type of image file
+      FLAC::Picture * picture = new FLAC::Picture();
+      picture->setData(picturedata);
+      picture->setMimeType("image/");
+      picture->setType(FLAC::Picture::Other);
+      d->pictureList.append(picture);
+    }
     else {
 
       // Check for field separator
