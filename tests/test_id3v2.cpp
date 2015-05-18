@@ -895,7 +895,7 @@ public:
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
                  "\x00\x00"                 // Frame flags
-                 "\x43\x00"                 // Element ID
+                 "\x43\x00"                 // Element ID ("C")
                  "\x00\x00\x00\x03"         // Start time
                  "\x00\x00\x00\x05"         // End time
                  "\x00\x00\x00\x02"         // Start offset
@@ -909,7 +909,7 @@ public:
 
     ID3v2::ChapterFrame f1(&header, chapterData);
 
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2), f1.elementID());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f1.elementID());
     CPPUNIT_ASSERT((uint)0x03 == f1.startTime());
     CPPUNIT_ASSERT((uint)0x05 == f1.endTime());
     CPPUNIT_ASSERT((uint)0x02 == f1.startOffset());
@@ -918,7 +918,7 @@ public:
 
     ID3v2::ChapterFrame f2(&header, chapterData + embeddedFrameData);
 
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2), f2.elementID());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f2.elementID());
     CPPUNIT_ASSERT((uint)0x03 == f2.startTime());
     CPPUNIT_ASSERT((uint)0x05 == f2.endTime());
     CPPUNIT_ASSERT((uint)0x02 == f2.startOffset());
