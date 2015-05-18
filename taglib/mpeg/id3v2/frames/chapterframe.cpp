@@ -64,18 +64,21 @@ ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &dat
   setData(data);
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &eID, const TagLib::uint &sT, const TagLib::uint &eT,
-                           const TagLib::uint &sO, const TagLib::uint &eO, const FrameList &eF) :
+ChapterFrame::ChapterFrame(const ByteVector &elementID,
+                           const TagLib::uint &startTime, const TagLib::uint &endTime,
+                           const TagLib::uint &startOffset, const TagLib::uint &endOffset,
+                           const FrameList &embeddedFrames) :
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
-  d->elementID = eID;
-  d->startTime = sT;
-  d->endTime = eT;
-  d->startOffset = sO;
-  d->endOffset = eO;
-  FrameList l = eF;
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
+  d->elementID = elementID;
+  d->startTime = startTime;
+  d->endTime = endTime;
+  d->startOffset = startOffset;
+  d->endOffset = endOffset;
+
+  for(FrameList::ConstIterator it = embeddedFrames.begin();
+      it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
 
