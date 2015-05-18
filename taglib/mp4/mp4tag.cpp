@@ -760,6 +760,11 @@ MP4::Tag::setTrack(uint value)
   d->items["trkn"] = MP4::Item(value, 0);
 }
 
+bool MP4::Tag::isEmpty() const
+{
+  return d->items.isEmpty();
+}
+
 MP4::ItemListMap &
 MP4::Tag::itemListMap()
 {

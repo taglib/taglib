@@ -19,6 +19,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
+  CPPUNIT_TEST(testIsEmpty);
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
   CPPUNIT_TEST(test64BitAtom);
@@ -60,6 +61,18 @@ public:
     CPPUNIT_ASSERT(!f.isValid());
     MP4::File f2(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testIsEmpty()
+  {
+    MP4::Tag t1;
+    CPPUNIT_ASSERT(t1.isEmpty());
+    t1.setArtist("Foo");
+    CPPUNIT_ASSERT(!t1.isEmpty());
+
+    MP4::Tag t2;
+    t2.itemListMap()["foo"] = "bar";
+    CPPUNIT_ASSERT(!t2.isEmpty());
   }
 
   void testUpdateStco()

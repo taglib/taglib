@@ -65,6 +65,8 @@ namespace TagLib {
         void setYear(uint value);
         void setTrack(uint value);
 
+        virtual bool isEmpty() const;
+
         ItemListMap &itemListMap();
 
         PropertyMap properties() const;
