@@ -919,16 +919,17 @@ public:
   void testRenderChapterFrame()
   {
     ID3v2::Header header;
-    ID3v2::ChapterFrame f(&header, "CHAP");
-    f.setElementID(ByteVector("\x43\x00", 2));
-    f.setStartTime(3);
-    f.setEndTime(5);
-    f.setStartOffset(2);
-    f.setEndOffset(3);
+    ID3v2::ChapterFrame f1(&header, "CHAP");
+    f1.setElementID(ByteVector("\x43\x00", 2));
+    f1.setStartTime(3);
+    f1.setEndTime(5);
+    f1.setStartOffset(2);
+    f1.setEndOffset(3);
     ID3v2::TextIdentificationFrame *eF = new ID3v2::TextIdentificationFrame("TIT2");
     eF->setText("CH1");
-    f.addEmbeddedFrame(eF);
-    CPPUNIT_ASSERT_EQUAL(
+    f1.addEmbeddedFrame(eF);
+
+    ByteVector expected =
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
                  "\x00\x00"                 // Frame flags
@@ -941,8 +942,29 @@ public:
                  "\x00\x00\x00\x04"         // Embedded frame size
                  "\x00\x00"                 // Embedded frame flags
                  "\x00"                     // TIT2 frame text encoding
-                 "CH1", 42),                // Chapter title
-      f.render());
+                 "CH1", 42);                // Chapter title
+
+    CPPUNIT_ASSERT_EQUAL(expected, f1.render());
+
+    f1.setElementID("C");
+
+    CPPUNIT_ASSERT_EQUAL(expected, f1.render());
+
+    ID3v2::FrameList frames;
+    eF = new ID3v2::TextIdentificationFrame("TIT2");
+    eF->setText("CH1");
+    frames.append(eF);
+
+    ID3v2::ChapterFrame f2(ByteVector("\x43\x00", 2), 3, 5, 2, 3, frames);
+    CPPUNIT_ASSERT_EQUAL(expected, f2.render());
+
+    frames.clear();
+    eF = new ID3v2::TextIdentificationFrame("TIT2");
+    eF->setText("CH1");
+    frames.append(eF);
+
+    ID3v2::ChapterFrame f3(ByteVector("C\x00", 2), 3, 5, 2, 3, frames);
+    CPPUNIT_ASSERT_EQUAL(expected, f3.render());
   }
 
   void testParseTableOfContentsFrame()
