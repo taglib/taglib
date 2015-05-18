@@ -1066,6 +1066,7 @@ public:
 
       ID3v2::Tag *tag = f.ID3v2Tag();
       CPPUNIT_ASSERT_EQUAL(String("Title"), tag->title());
+      CPPUNIT_ASSERT_EQUAL(true, tag->frameListMap()["WOAF"].isEmpty());
     }
   }
 
