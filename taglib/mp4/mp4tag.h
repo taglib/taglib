@@ -39,7 +39,11 @@ namespace TagLib {
 
   namespace MP4 {
 
+    /*!
+     * \deprecated
+     */
     typedef TagLib::Map<String, Item> ItemListMap;
+    typedef TagLib::Map<String, Item> ItemMap;
 
     class TAGLIB_EXPORT Tag: public TagLib::Tag
     {
@@ -67,7 +71,36 @@ namespace TagLib {
 
         virtual bool isEmpty() const;
 
-        ItemListMap &itemListMap();
+        /*!
+         * \deprecated Use the item() and setItem() API instead
+         */
+        ItemMap &itemListMap();
+
+        /*!
+         * Returns a string-keyed map of the MP4::Items for this tag.
+         */
+        const ItemMap &itemMap() const;
+
+        /*!
+         * \return The item, if any, corresponding to \a key.
+         */
+        Item item(const String &key) const;
+
+        /*!
+         * Sets the value of \a key to \a value, overwriting any previous value.
+         */
+        void setItem(const String &key, const Item &value);
+
+        /*!
+         * Removes the entry with \a key from the tag, or does nothing if it does
+         * not exist.
+         */
+        void removeItem(const String &key);
+
+        /*!
+         * \return True if the tag contains an entry for \a key.
+         */
+        bool contains(const String &key) const;
 
         PropertyMap properties() const;
         void removeUnsupportedProperties(const StringList& properties);

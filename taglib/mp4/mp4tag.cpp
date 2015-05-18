@@ -39,7 +39,7 @@ public:
   ~TagPrivate() {}
   TagLib::File *file;
   Atoms *atoms;
-  ItemListMap items;
+  ItemMap items;
 };
 
 MP4::Tag::Tag()
@@ -451,7 +451,7 @@ bool
 MP4::Tag::save()
 {
   ByteVector data;
-  for(MP4::ItemListMap::Iterator i = d->items.begin(); i != d->items.end(); i++) {
+  for(MP4::ItemMap::Iterator i = d->items.begin(); i != d->items.end(); i++) {
     const String name = i->first;
     if(name.startsWith("----")) {
       data.append(renderFreeForm(name, i->second));
@@ -765,10 +765,34 @@ bool MP4::Tag::isEmpty() const
   return d->items.isEmpty();
 }
 
-MP4::ItemListMap &
-MP4::Tag::itemListMap()
+MP4::ItemMap &MP4::Tag::itemListMap()
 {
   return d->items;
+}
+
+const MP4::ItemMap &MP4::Tag::itemMap() const
+{
+  return d->items;
+}
+
+MP4::Item MP4::Tag::item(const String &key) const
+{
+  return d->items[key];
+}
+
+void MP4::Tag::setItem(const String &key, const Item &value)
+{
+  d->items[key] = value;
+}
+
+void MP4::Tag::removeItem(const String &key)
+{
+  d->items.erase(key);
+}
+
+bool MP4::Tag::contains(const String &key) const
+{
+  return d->items.contains(key);
 }
 
 static const char *keyTranslation[][2] = {
@@ -832,7 +856,7 @@ PropertyMap MP4::Tag::properties() const
   }
 
   PropertyMap props;
-  MP4::ItemListMap::ConstIterator it = d->items.begin();
+  MP4::ItemMap::ConstIterator it = d->items.begin();
   for(; it != d->items.end(); ++it) {
     if(keyMap.contains(it->first)) {
       String key = keyMap[it->first];
