@@ -907,17 +907,25 @@ public:
                  "\x00"                     // TIT2 frame text encoding
                  "CH1", 14);                // Chapter title
 
-    ID3v2::ChapterFrame f(&header, chapterData + embeddedFrameData);
+    ID3v2::ChapterFrame f1(&header, chapterData);
 
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
-                         f.elementID());
-    CPPUNIT_ASSERT((uint)0x03 == f.startTime());
-    CPPUNIT_ASSERT((uint)0x05 == f.endTime());
-    CPPUNIT_ASSERT((uint)0x02 == f.startOffset());
-    CPPUNIT_ASSERT((uint)0x03 == f.endOffset());
-    CPPUNIT_ASSERT((uint)0x01 == f.embeddedFrameList().size());
-    CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").size() == 1);
-    CPPUNIT_ASSERT(f.embeddedFrameList("TIT2")[0]->toString() == "CH1");
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2), f1.elementID());
+    CPPUNIT_ASSERT((uint)0x03 == f1.startTime());
+    CPPUNIT_ASSERT((uint)0x05 == f1.endTime());
+    CPPUNIT_ASSERT((uint)0x02 == f1.startOffset());
+    CPPUNIT_ASSERT((uint)0x03 == f1.endOffset());
+    CPPUNIT_ASSERT((uint)0x00 == f1.embeddedFrameList().size());
+
+    ID3v2::ChapterFrame f2(&header, chapterData + embeddedFrameData);
+
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2), f2.elementID());
+    CPPUNIT_ASSERT((uint)0x03 == f2.startTime());
+    CPPUNIT_ASSERT((uint)0x05 == f2.endTime());
+    CPPUNIT_ASSERT((uint)0x02 == f2.startOffset());
+    CPPUNIT_ASSERT((uint)0x03 == f2.endOffset());
+    CPPUNIT_ASSERT((uint)0x01 == f2.embeddedFrameList().size());
+    CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2").size() == 1);
+    CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2")[0]->toString() == "CH1");
   }
 
   void testRenderChapterFrame()

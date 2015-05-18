@@ -239,6 +239,11 @@ void ChapterFrame::parseFields(const ByteVector &data)
   pos += 4;
   size -= pos;
 
+  // Embedded frames are optional
+
+  if(size < header()->size())
+    return;
+
   while((uint)embPos < size - header()->size()) {
     Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
 
