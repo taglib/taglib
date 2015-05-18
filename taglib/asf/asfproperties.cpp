@@ -51,8 +51,7 @@ ASF::Properties::Properties() : AudioProperties(AudioProperties::Average)
 
 ASF::Properties::~Properties()
 {
-  if(d)
-    delete d;
+  delete d;
 }
 
 int ASF::Properties::length() const

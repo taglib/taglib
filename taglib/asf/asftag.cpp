@@ -47,8 +47,7 @@ ASF::Tag::Tag()
 
 ASF::Tag::~Tag()
 {
-  if(d)
-    delete d;
+  delete d;
 }
 
 String ASF::Tag::title() const

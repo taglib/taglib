@@ -41,18 +41,9 @@ public:
 
   ~FilePrivate()
   {
-    if(atoms) {
-        delete atoms;
-        atoms = 0;
-    }
-    if(tag) {
-        delete tag;
-        tag = 0;
-    }
-    if(properties) {
-        delete properties;
-        properties = 0;
-    }
+    delete atoms;
+    delete tag;
+    delete properties;
   }
 
   MP4::Tag *tag;
