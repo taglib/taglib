@@ -419,51 +419,74 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     // Handle Pictures separately
     if(entry.startsWith("METADATA_BLOCK_PICTURE=")) {
 
-      // Decode base64 picture data
-      ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
+      // We need base64 encoded data including padding
+      if((entry.size() - 23) > 3 && ((entry.size() - 23) % 4) == 0) {
 
-      if(picturedata.size() == 0) {
-        debug("Empty picture data. Discarding content");
-        continue;
+        // Decode base64 picture data
+        ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
+        if (picturedata.size()) {
+
+          // Decode Flac Picture
+          FLAC::Picture * picture = new FLAC::Picture();
+          if(picture->parse(picturedata)) {
+
+            d->pictureList.append(picture);
+
+            // continue to next field
+            continue;
+          }
+          else {
+            delete picture;
+            debug("Failed to decode FlacPicture block");
+          }
+        }
+        else {
+          debug("Failed to decode base64 encoded data");
+        }
       }
-
-      FLAC::Picture * picture = new FLAC::Picture();
-
-      if(picture->parse(picturedata))
-        d->pictureList.append(picture);
-      else
-        debug("Unable to parse METADATA_BLOCK_PICTURE. Discarding content.");
-    }
-    else if (entry.startsWith("COVERART=")) {
-
-      // Decode base64 picture data
-      ByteVector picturedata = ByteVector::fromBase64(entry.mid(9));
-
-      if (picturedata.size() == 0) {
-        debug("Empty coverart data. Discaring content");
-        continue;
+      else {
+        debug("Invalid base64 encoded data");
       }
-
-      // Assume it's some type of image file
-      FLAC::Picture * picture = new FLAC::Picture();
-      picture->setData(picturedata);
-      picture->setMimeType("image/");
-      picture->setType(FLAC::Picture::Other);
-      d->pictureList.append(picture);
     }
-    else {
 
-      // Check for field separator
-      int sep = entry.find('=');
-      if (sep < 1) {
-        debug("Discarding invalid comment field.");
-        continue;
+    // Handle old picture standard
+    if (entry.startsWith("COVERART=")) {
+
+      if((entry.size() - 9) > 3 && ((entry.size() - 9) % 4) == 0) {
+
+        // Decode base64 picture data
+        ByteVector picturedata = ByteVector::fromBase64(entry.mid(9));
+        if (picturedata.size()) {
+
+          // Assume it's some type of image file
+          FLAC::Picture * picture = new FLAC::Picture();
+          picture->setData(picturedata);
+          picture->setMimeType("image/");
+          picture->setType(FLAC::Picture::Other);
+          d->pictureList.append(picture);
+
+          // continue to next field
+          continue;
+        }
+        else {
+          debug("Failed to decode base64 encoded data");
+        }
       }
-
-      // Parse key and value
-      String key = String(entry.mid(0, sep), String::UTF8);
-      String value = String(entry.mid(sep + 1), String::UTF8);
-      addField(key, value, false);
+      else {
+        debug("Invalid base64 encoded data");
+      }
     }
+
+    // Check for field separator
+    int sep = entry.find('=');
+    if (sep < 1) {
+      debug("Discarding invalid comment field.");
+      continue;
+    }
+
+    // Parse key and value
+    String key = String(entry.mid(0, sep), String::UTF8);
+    String value = String(entry.mid(sep + 1), String::UTF8);
+    addField(key, value, false);
   }
 }
