@@ -107,38 +107,40 @@ namespace TagLib {
         PropertyMap setProperties(const PropertyMap &properties);
 
     private:
-        AtomDataList parseData2(Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
-        TagLib::ByteVectorList parseData(Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
-        void parseText(Atom *atom, TagLib::File *file, int expectedFlags = 1);
-        void parseFreeForm(Atom *atom, TagLib::File *file);
-        void parseInt(Atom *atom, TagLib::File *file);
-        void parseByte(Atom *atom, TagLib::File *file);
-        void parseUInt(Atom *atom, TagLib::File *file);
-        void parseLongLong(Atom *atom, TagLib::File *file);
-        void parseGnre(Atom *atom, TagLib::File *file);
-        void parseIntPair(Atom *atom, TagLib::File *file);
-        void parseBool(Atom *atom, TagLib::File *file);
-        void parseCovr(Atom *atom, TagLib::File *file);
+        AtomDataList parseData2(const Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
+        TagLib::ByteVectorList parseData(const Atom *atom, TagLib::File *file, int expectedFlags = -1, bool freeForm = false);
+        void parseText(const Atom *atom, TagLib::File *file, int expectedFlags = 1);
+        void parseFreeForm(const Atom *atom, TagLib::File *file);
+        void parseInt(const Atom *atom, TagLib::File *file);
+        void parseByte(const Atom *atom, TagLib::File *file);
+        void parseUInt(const Atom *atom, TagLib::File *file);
+        void parseLongLong(const Atom *atom, TagLib::File *file);
+        void parseGnre(const Atom *atom, TagLib::File *file);
+        void parseIntPair(const Atom *atom, TagLib::File *file);
+        void parseBool(const Atom *atom, TagLib::File *file);
+        void parseCovr(const Atom *atom, TagLib::File *file);
 
         TagLib::ByteVector padIlst(const ByteVector &data, int length = -1);
         TagLib::ByteVector renderAtom(const ByteVector &name, const TagLib::ByteVector &data);
-        TagLib::ByteVector renderData(const ByteVector &name, int flags, const TagLib::ByteVectorList &data);
-        TagLib::ByteVector renderText(const ByteVector &name, Item &item, int flags = TypeUTF8);
-        TagLib::ByteVector renderFreeForm(const String &name, Item &item);
-        TagLib::ByteVector renderBool(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderInt(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderByte(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderUInt(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderLongLong(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderIntPair(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderIntPairNoTrailing(const ByteVector &name, Item &item);
-        TagLib::ByteVector renderCovr(const ByteVector &name, Item &item);
+        TagLib::ByteVector renderData(const ByteVector &name, int flags,
+                                      const TagLib::ByteVectorList &data);
+        TagLib::ByteVector renderText(const ByteVector &name, const Item &item,
+                                      int flags = TypeUTF8);
+        TagLib::ByteVector renderFreeForm(const String &name, const Item &item);
+        TagLib::ByteVector renderBool(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderInt(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderByte(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderUInt(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderLongLong(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderIntPair(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item);
+        TagLib::ByteVector renderCovr(const ByteVector &name, const Item &item);
 
-        void updateParents(AtomList &path, long delta, int ignore = 0);
+        void updateParents(const AtomList &path, long delta, int ignore = 0);
         void updateOffsets(long delta, long offset);
 
-        void saveNew(TagLib::ByteVector &data);
-        void saveExisting(TagLib::ByteVector &data, AtomList &path);
+        void saveNew(ByteVector data);
+        void saveExisting(ByteVector data, const AtomList &path);
 
         void addItem(const String &name, const Item &value);
 
