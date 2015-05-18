@@ -71,7 +71,12 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
-  d->elementID = elementID;
+
+  // setElementID has a workaround for a previously silly API where you had to
+  // specifically include the null byte.
+
+  setElementID(elementID);
+
   d->startTime = startTime;
   d->endTime = endTime;
   d->startOffset = startOffset;
@@ -115,8 +120,9 @@ TagLib::uint ChapterFrame::endOffset() const
 void ChapterFrame::setElementID(const ByteVector &eID)
 {
   d->elementID = eID;
-  if(eID.at(eID.size() - 1) != char(0))
-    d->elementID.append(char(0));
+
+  if(d->elementID.endsWith(char(0)))
+    d->elementID = d->elementID.mid(0, d->elementID.size() - 1);
 }
 
 void ChapterFrame::setStartTime(const TagLib::uint &sT)
@@ -256,6 +262,7 @@ ByteVector ChapterFrame::renderFields() const
   ByteVector data;
 
   data.append(d->elementID);
+  data.append('\0');
   data.append(ByteVector::fromUInt(d->startTime, true));
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));

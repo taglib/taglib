@@ -965,7 +965,21 @@ public:
 
     ID3v2::ChapterFrame f3(ByteVector("C\x00", 2), 3, 5, 2, 3, frames);
     CPPUNIT_ASSERT_EQUAL(expected, f3.render());
-  }
+
+    frames.clear();
+    eF = new ID3v2::TextIdentificationFrame("TIT2");
+    eF->setText("CH1");
+    frames.append(eF);
+
+    ID3v2::ChapterFrame f4("C", 3, 5, 2, 3, frames);
+    CPPUNIT_ASSERT_EQUAL(expected, f4.render());
+
+    ID3v2::ChapterFrame f5("C", 3, 5, 2, 3);
+    eF = new ID3v2::TextIdentificationFrame("TIT2");
+    eF->setText("CH1");
+    f5.addEmbeddedFrame(eF);
+    CPPUNIT_ASSERT_EQUAL(expected, f5.render());
+}
 
   void testParseTableOfContentsFrame()
   {
