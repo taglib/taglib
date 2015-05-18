@@ -890,8 +890,8 @@ public:
   void testParseChapterFrame()
   {
     ID3v2::Header header;
-    ID3v2::ChapterFrame f(
-      &header,
+
+    ByteVector chapterData =
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
                  "\x00\x00"                 // Frame flags
@@ -899,12 +899,16 @@ public:
                  "\x00\x00\x00\x03"         // Start time
                  "\x00\x00\x00\x05"         // End time
                  "\x00\x00\x00\x02"         // Start offset
-                 "\x00\x00\x00\x03"         // End offset
-                 "TIT2"                     // Embedded frame ID
+                 "\x00\x00\x00\x03", 28);   // End offset
+    ByteVector embeddedFrameData =
+      ByteVector("TIT2"                     // Embedded frame ID
                  "\x00\x00\x00\x04"         // Embedded frame size
                  "\x00\x00"                 // Embedded frame flags
                  "\x00"                     // TIT2 frame text encoding
-                 "CH1", 42));               // Chapter title
+                 "CH1", 14);                // Chapter title
+
+    ID3v2::ChapterFrame f(&header, chapterData + embeddedFrameData);
+
     CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
                          f.elementID());
     CPPUNIT_ASSERT((uint)0x03 == f.startTime());
