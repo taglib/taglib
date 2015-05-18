@@ -103,7 +103,7 @@ MP4::Tag::~Tag()
 }
 
 MP4::AtomDataList
-MP4::Tag::parseData2(const MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool freeForm)
+MP4::Tag::parseData2(const MP4::Atom *atom, File *file, int expectedFlags, bool freeForm)
 {
   AtomDataList result;
   ByteVector data = file->readBlock(atom->length - 8);
@@ -145,7 +145,7 @@ MP4::Tag::parseData2(const MP4::Atom *atom, TagLib::File *file, int expectedFlag
 }
 
 ByteVectorList
-MP4::Tag::parseData(const MP4::Atom *atom, TagLib::File *file, int expectedFlags, bool freeForm)
+MP4::Tag::parseData(const MP4::Atom *atom, File *file, int expectedFlags, bool freeForm)
 {
   AtomDataList data = parseData2(atom, file, expectedFlags, freeForm);
   ByteVectorList result;
@@ -156,7 +156,7 @@ MP4::Tag::parseData(const MP4::Atom *atom, TagLib::File *file, int expectedFlags
 }
 
 void
-MP4::Tag::parseInt(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseInt(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -165,7 +165,7 @@ MP4::Tag::parseInt(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseUInt(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseUInt(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -174,7 +174,7 @@ MP4::Tag::parseUInt(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseLongLong(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseLongLong(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -183,7 +183,7 @@ MP4::Tag::parseLongLong(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseByte(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseByte(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -192,7 +192,7 @@ MP4::Tag::parseByte(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseGnre(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseGnre(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -204,7 +204,7 @@ MP4::Tag::parseGnre(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseIntPair(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseIntPair(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -215,7 +215,7 @@ MP4::Tag::parseIntPair(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseBool(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseBool(const MP4::Atom *atom, File *file)
 {
   ByteVectorList data = parseData(atom, file);
   if(data.size()) {
@@ -225,7 +225,7 @@ MP4::Tag::parseBool(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseText(const MP4::Atom *atom, TagLib::File *file, int expectedFlags)
+MP4::Tag::parseText(const MP4::Atom *atom, File *file, int expectedFlags)
 {
   ByteVectorList data = parseData(atom, file, expectedFlags);
   if(data.size()) {
@@ -238,7 +238,7 @@ MP4::Tag::parseText(const MP4::Atom *atom, TagLib::File *file, int expectedFlags
 }
 
 void
-MP4::Tag::parseFreeForm(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseFreeForm(const MP4::Atom *atom, File *file)
 {
   AtomDataList data = parseData2(atom, file, -1, true);
   if(data.size() > 2) {
@@ -272,7 +272,7 @@ MP4::Tag::parseFreeForm(const MP4::Atom *atom, TagLib::File *file)
 }
 
 void
-MP4::Tag::parseCovr(const MP4::Atom *atom, TagLib::File *file)
+MP4::Tag::parseCovr(const MP4::Atom *atom, File *file)
 {
   MP4::CoverArtList value;
   ByteVector data = file->readBlock(atom->length - 8);
@@ -290,7 +290,8 @@ MP4::Tag::parseCovr(const MP4::Atom *atom, TagLib::File *file)
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
       break;
     }
-    if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP || flags == TypeGIF || flags == TypeImplicit) {
+    if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP ||
+       flags == TypeGIF || flags == TypeImplicit) {
       value.append(MP4::CoverArt(MP4::CoverArt::Format(flags),
                                  data.mid(pos + 16, length - 16)));
     }
@@ -304,7 +305,7 @@ MP4::Tag::parseCovr(const MP4::Atom *atom, TagLib::File *file)
 }
 
 ByteVector
-MP4::Tag::padIlst(const ByteVector &data, int length)
+MP4::Tag::padIlst(const ByteVector &data, int length) const
 {
   if(length == -1) {
     length = ((data.size() + 1023) & ~1023) - data.size();
@@ -313,13 +314,13 @@ MP4::Tag::padIlst(const ByteVector &data, int length)
 }
 
 ByteVector
-MP4::Tag::renderAtom(const ByteVector &name, const ByteVector &data)
+MP4::Tag::renderAtom(const ByteVector &name, const ByteVector &data) const
 {
   return ByteVector::fromUInt(data.size() + 8) + name + data;
 }
 
 ByteVector
-MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data)
+MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data) const
 {
   ByteVector result;
   for(unsigned int i = 0; i < data.size(); i++) {
@@ -329,7 +330,7 @@ MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &da
 }
 
 ByteVector
-MP4::Tag::renderBool(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderBool(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector(1, item.toBool() ? '\1' : '\0'));
@@ -337,7 +338,7 @@ MP4::Tag::renderBool(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderInt(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderInt(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector::fromShort(item.toInt()));
@@ -345,7 +346,7 @@ MP4::Tag::renderInt(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderUInt(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderUInt(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector::fromUInt(item.toUInt()));
@@ -353,7 +354,7 @@ MP4::Tag::renderUInt(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderLongLong(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderLongLong(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector::fromLongLong(item.toLongLong()));
@@ -361,7 +362,7 @@ MP4::Tag::renderLongLong(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderByte(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderByte(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector(1, item.toByte()));
@@ -369,7 +370,7 @@ MP4::Tag::renderByte(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderIntPair(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderIntPair(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector(2, '\0') +
@@ -380,7 +381,7 @@ MP4::Tag::renderIntPair(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVectorList data;
   data.append(ByteVector(2, '\0') +
@@ -390,7 +391,7 @@ MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags)
+MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags) const
 {
   ByteVectorList data;
   StringList value = item.toStringList();
@@ -401,7 +402,7 @@ MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags)
 }
 
 ByteVector
-MP4::Tag::renderCovr(const ByteVector &name, const MP4::Item &item)
+MP4::Tag::renderCovr(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVector data;
   MP4::CoverArtList value = item.toCoverArtList();
@@ -413,7 +414,7 @@ MP4::Tag::renderCovr(const ByteVector &name, const MP4::Item &item)
 }
 
 ByteVector
-MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item)
+MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
 {
   StringList header = StringList::split(name, ":");
   if (header.size() != 3) {
@@ -597,8 +598,9 @@ MP4::Tag::updateOffsets(long delta, long offset)
 void
 MP4::Tag::saveNew(ByteVector data)
 {
-  data = renderAtom("meta", TagLib::ByteVector(4, '\0') +
-                    renderAtom("hdlr", TagLib::ByteVector(8, '\0') + TagLib::ByteVector("mdirappl") + TagLib::ByteVector(9, '\0')) +
+  data = renderAtom("meta", ByteVector(4, '\0') +
+                    renderAtom("hdlr", ByteVector(8, '\0') + ByteVector("mdirappl") +
+                               ByteVector(9, '\0')) +
                     data + padIlst(data));
 
   AtomList path = d->atoms->path("moov", "udta");
