@@ -190,7 +190,25 @@ void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 
 String ChapterFrame::toString() const
 {
-  return String::null;
+  String s = String(d->elementID) +
+             ": start time: " + String::number(d->startTime) +
+             ", end time: " + String::number(d->endTime);
+
+  if(d->startOffset != 0xFFFFFFFF)
+    s += ", start offset: " + String::number(d->startOffset);
+
+  if(d->endOffset != 0xFFFFFFFF)
+    s += ", start offset: " + String::number(d->endOffset);
+
+  if(!d->embeddedFrameList.isEmpty()) {
+    StringList frameIDs;
+    for(FrameList::ConstIterator it = d->embeddedFrameList.begin();
+        it != d->embeddedFrameList.end(); ++it)
+      frameIDs.append((*it)->frameID());
+    s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
+  }
+
+  return s;
 }
 
 PropertyMap ChapterFrame::asProperties() const
