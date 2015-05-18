@@ -221,6 +221,7 @@ namespace TagLib {
        * when
        *
        * \see ID3v2FrameFactory
+       * \deprecated This value should be passed in via the constructor
        */
       void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
