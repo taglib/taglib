@@ -87,16 +87,17 @@ TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader, const
   setData(data);
 }
 
-TableOfContentsFrame::TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch,
-                                           const FrameList &eF) :
+TableOfContentsFrame::TableOfContentsFrame(const ByteVector &elementID,
+                                           const ByteVectorList &children,
+                                           const FrameList &embeddedFrames) :
     ID3v2::Frame("CTOC")
 {
   d = new TableOfContentsFramePrivate;
-  d->elementID = eID;
+  d->elementID = elementID;
   strip(d->elementID);
-  d->childElements = ch;
-  FrameList l = eF;
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
+  d->childElements = children;
+
+  for(FrameList::ConstIterator it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
 

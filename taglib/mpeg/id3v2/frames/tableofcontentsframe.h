@@ -52,10 +52,13 @@ namespace TagLib {
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data);
 
       /*!
-       * Creates a table of contents frame with the element ID \a eID,
-       * the child elements \a ch and embedded frames, that are in \a eF.
+       * Creates a table of contents frame with the element ID \a elementID,
+       * the child elements \a children and embedded frames, which become owned
+       * by this frame, in \a embeddedFrames.
        */
-      TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch, const FrameList &eF);
+      TableOfContentsFrame(const ByteVector &elementID,
+                           const ByteVectorList &children = ByteVectorList(),
+                           const FrameList &embeddedFrames = FrameList());
 
       /*!
        * Destroys the frame.
