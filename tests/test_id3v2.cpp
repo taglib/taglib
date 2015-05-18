@@ -1001,25 +1001,22 @@ public:
       ByteVector("CTOC"                     // Frame ID
                  "\x00\x00\x00\x16"         // Frame size
                  "\x00\x00"                 // Frame flags
-                 "\x54\x00"                 // Element ID
+                 "\x54\x00"                 // Element ID ("T")
                  "\x01"                     // CTOC flags
                  "\x02"                     // Entry count
-                 "\x43\x00"                 // First entry
-                 "\x44\x00"                 // Second entry
+                 "\x43\x00"                 // First entry ("C")
+                 "\x44\x00"                 // Second entry ("D")
                  "TIT2"                     // Embedded frame ID
                  "\x00\x00\x00\x04"         // Embedded frame size
                  "\x00\x00"                 // Embedded frame flags
                  "\x00"                     // TIT2 frame text encoding
                  "TC1", 32));               // Table of contents title
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x54\x00", 2),
-                         f.elementID());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("T"), f.elementID());
     CPPUNIT_ASSERT(!f.isTopLevel());
     CPPUNIT_ASSERT(f.isOrdered());
     CPPUNIT_ASSERT((uint)0x02 == f.entryCount());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x43\x00", 2),
-                         f.childElements()[0]);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x44\x00", 2),
-                         f.childElements()[1]);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f.childElements()[0]);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("D"), f.childElements()[1]);
     CPPUNIT_ASSERT((uint)0x01 == f.embeddedFrameList().size());
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2")[0]->toString() == "TC1");
