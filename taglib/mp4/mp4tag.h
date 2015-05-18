@@ -107,24 +107,23 @@ namespace TagLib {
         PropertyMap setProperties(const PropertyMap &properties);
 
     private:
-        AtomDataList parseData2(const Atom *atom, File *file, int expectedFlags = -1,
+        AtomDataList parseData2(const Atom *atom, int expectedFlags = -1,
                                 bool freeForm = false);
-        ByteVectorList parseData(const Atom *atom, File *file, int expectedFlags = -1,
+        ByteVectorList parseData(const Atom *atom, int expectedFlags = -1,
                                  bool freeForm = false);
-        void parseText(const Atom *atom, File *file, int expectedFlags = 1);
-        void parseFreeForm(const Atom *atom, File *file);
-        void parseInt(const Atom *atom, File *file);
-        void parseByte(const Atom *atom, File *file);
-        void parseUInt(const Atom *atom, File *file);
-        void parseLongLong(const Atom *atom, File *file);
-        void parseGnre(const Atom *atom, File *file);
-        void parseIntPair(const Atom *atom, File *file);
-        void parseBool(const Atom *atom, File *file);
-        void parseCovr(const Atom *atom, File *file);
+        void parseText(const Atom *atom, int expectedFlags = 1);
+        void parseFreeForm(const Atom *atom);
+        void parseInt(const Atom *atom);
+        void parseByte(const Atom *atom);
+        void parseUInt(const Atom *atom);
+        void parseLongLong(const Atom *atom);
+        void parseGnre(const Atom *atom);
+        void parseIntPair(const Atom *atom);
+        void parseBool(const Atom *atom);
+        void parseCovr(const Atom *atom);
 
         ByteVector padIlst(const ByteVector &data, int length = -1) const;
-        ByteVector renderAtom(const ByteVector &name,
-                              const ByteVector &data) const;
+        ByteVector renderAtom(const ByteVector &name, const ByteVector &data) const;
         ByteVector renderData(const ByteVector &name, int flags,
                               const ByteVectorList &data) const;
         ByteVector renderText(const ByteVector &name, const Item &item,

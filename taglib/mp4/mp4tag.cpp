@@ -63,36 +63,36 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms)
     MP4::Atom *atom = ilst->children[i];
     file->seek(atom->offset + 8);
     if(atom->name == "----") {
-      parseFreeForm(atom, file);
+      parseFreeForm(atom);
     }
     else if(atom->name == "trkn" || atom->name == "disk") {
-      parseIntPair(atom, file);
+      parseIntPair(atom);
     }
     else if(atom->name == "cpil" || atom->name == "pgap" || atom->name == "pcst" ||
             atom->name == "hdvd") {
-      parseBool(atom, file);
+      parseBool(atom);
     }
     else if(atom->name == "tmpo") {
-      parseInt(atom, file);
+      parseInt(atom);
     }
     else if(atom->name == "tvsn" || atom->name == "tves" || atom->name == "cnID" ||
             atom->name == "sfID" || atom->name == "atID" || atom->name == "geID") {
-      parseUInt(atom, file);
+      parseUInt(atom);
     }
     else if(atom->name == "plID") {
-      parseLongLong(atom, file);
+      parseLongLong(atom);
     }
     else if(atom->name == "stik" || atom->name == "rtng" || atom->name == "akID") {
-      parseByte(atom, file);
+      parseByte(atom);
     }
     else if(atom->name == "gnre") {
-      parseGnre(atom, file);
+      parseGnre(atom);
     }
     else if(atom->name == "covr") {
-      parseCovr(atom, file);
+      parseCovr(atom);
     }
     else {
-      parseText(atom, file);
+      parseText(atom);
     }
   }
 }
@@ -103,10 +103,10 @@ MP4::Tag::~Tag()
 }
 
 MP4::AtomDataList
-MP4::Tag::parseData2(const MP4::Atom *atom, File *file, int expectedFlags, bool freeForm)
+MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
 {
   AtomDataList result;
-  ByteVector data = file->readBlock(atom->length - 8);
+  ByteVector data = d->file->readBlock(atom->length - 8);
   int i = 0;
   unsigned int pos = 0;
   while(pos < data.size()) {
@@ -145,9 +145,9 @@ MP4::Tag::parseData2(const MP4::Atom *atom, File *file, int expectedFlags, bool 
 }
 
 ByteVectorList
-MP4::Tag::parseData(const MP4::Atom *atom, File *file, int expectedFlags, bool freeForm)
+MP4::Tag::parseData(const MP4::Atom *atom, int expectedFlags, bool freeForm)
 {
-  AtomDataList data = parseData2(atom, file, expectedFlags, freeForm);
+  AtomDataList data = parseData2(atom, expectedFlags, freeForm);
   ByteVectorList result;
   for(uint i = 0; i < data.size(); i++) {
     result.append(data[i].data);
@@ -156,45 +156,45 @@ MP4::Tag::parseData(const MP4::Atom *atom, File *file, int expectedFlags, bool f
 }
 
 void
-MP4::Tag::parseInt(const MP4::Atom *atom, File *file)
+MP4::Tag::parseInt(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     addItem(atom->name, (int)data[0].toShort());
   }
 }
 
 void
-MP4::Tag::parseUInt(const MP4::Atom *atom, File *file)
+MP4::Tag::parseUInt(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     addItem(atom->name, data[0].toUInt());
   }
 }
 
 void
-MP4::Tag::parseLongLong(const MP4::Atom *atom, File *file)
+MP4::Tag::parseLongLong(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     addItem(atom->name, data[0].toLongLong());
   }
 }
 
 void
-MP4::Tag::parseByte(const MP4::Atom *atom, File *file)
+MP4::Tag::parseByte(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     addItem(atom->name, (uchar)data[0].at(0));
   }
 }
 
 void
-MP4::Tag::parseGnre(const MP4::Atom *atom, File *file)
+MP4::Tag::parseGnre(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     int idx = (int)data[0].toShort();
     if(idx > 0) {
@@ -204,9 +204,9 @@ MP4::Tag::parseGnre(const MP4::Atom *atom, File *file)
 }
 
 void
-MP4::Tag::parseIntPair(const MP4::Atom *atom, File *file)
+MP4::Tag::parseIntPair(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     const int a = data[0].toShort(2U);
     const int b = data[0].toShort(4U);
@@ -215,9 +215,9 @@ MP4::Tag::parseIntPair(const MP4::Atom *atom, File *file)
 }
 
 void
-MP4::Tag::parseBool(const MP4::Atom *atom, File *file)
+MP4::Tag::parseBool(const MP4::Atom *atom)
 {
-  ByteVectorList data = parseData(atom, file);
+  ByteVectorList data = parseData(atom);
   if(data.size()) {
     bool value = data[0].size() ? data[0][0] != '\0' : false;
     addItem(atom->name, value);
@@ -225,9 +225,9 @@ MP4::Tag::parseBool(const MP4::Atom *atom, File *file)
 }
 
 void
-MP4::Tag::parseText(const MP4::Atom *atom, File *file, int expectedFlags)
+MP4::Tag::parseText(const MP4::Atom *atom, int expectedFlags)
 {
-  ByteVectorList data = parseData(atom, file, expectedFlags);
+  ByteVectorList data = parseData(atom, expectedFlags);
   if(data.size()) {
     StringList value;
     for(unsigned int i = 0; i < data.size(); i++) {
@@ -238,9 +238,9 @@ MP4::Tag::parseText(const MP4::Atom *atom, File *file, int expectedFlags)
 }
 
 void
-MP4::Tag::parseFreeForm(const MP4::Atom *atom, File *file)
+MP4::Tag::parseFreeForm(const MP4::Atom *atom)
 {
-  AtomDataList data = parseData2(atom, file, -1, true);
+  AtomDataList data = parseData2(atom, -1, true);
   if(data.size() > 2) {
     String name = "----:" + String(data[0].data, String::UTF8) + ':' + String(data[1].data, String::UTF8);
     AtomDataType type = data[2].type;
@@ -272,10 +272,10 @@ MP4::Tag::parseFreeForm(const MP4::Atom *atom, File *file)
 }
 
 void
-MP4::Tag::parseCovr(const MP4::Atom *atom, File *file)
+MP4::Tag::parseCovr(const MP4::Atom *atom)
 {
   MP4::CoverArtList value;
-  ByteVector data = file->readBlock(atom->length - 8);
+  ByteVector data = d->file->readBlock(atom->length - 8);
   unsigned int pos = 0;
   while(pos < data.size()) {
     const int length = static_cast<int>(data.toUInt(pos));
