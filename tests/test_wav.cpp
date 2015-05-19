@@ -36,6 +36,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1U, f.audioProperties()->format());
   }
 
   void testZeroSizeDataChunk()

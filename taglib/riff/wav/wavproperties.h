@@ -75,8 +75,24 @@ namespace TagLib {
         virtual int sampleRate() const;
         virtual int channels() const;
 
+        /*!
+         * Returns the count of bits per sample.
+         */
         int sampleWidth() const;
+
+        /*!
+         * Returns the total number of the samples. If the format ID is not 1,
+         * always returns 0.
+         *
+         * \see format()
+         */
         uint sampleFrames() const;
+
+        /*!
+         * Returns the format ID of the WAVE file.  For example, 0 for Unknown,
+         * 1 for PCM and so forth.
+         */
+        uint format() const;
 
       private:
         Properties(const Properties &);

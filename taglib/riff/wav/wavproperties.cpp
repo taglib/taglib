@@ -116,6 +116,11 @@ TagLib::uint RIFF::WAV::Properties::sampleFrames() const
   return d->sampleFrames;
 }
 
+TagLib::uint RIFF::WAV::Properties::format() const
+{
+  return d->format;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +144,7 @@ void RIFF::WAV::Properties::read(const ByteVector &data, uint streamLength)
     if(byteRate > 0)
       d->length = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
 
-    if(d->channels > 0 && d->sampleWidth > 0) {
+    if(d->format == 1 && d->channels > 0 && d->sampleWidth > 0) {
       const int bytesPerSample = d->channels * ((d->sampleWidth + 7) / 8);
       d->sampleFrames = streamLength / bytesPerSample;
     }
