@@ -6,7 +6,7 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS 2.8.12)
   cmake_policy(SET CMP0022 OLD)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 option(ENABLE_STATIC "Make static version of libtag"  OFF)
 if(ENABLE_STATIC)
@@ -73,18 +73,18 @@ math(EXPR TAGLIB_SOVERSION_PATCH "${TAGLIB_SOVERSION_REVISION}")
 include(ConfigureChecks.cmake)
 
 if(NOT WIN32)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config )
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/taglib-config DESTINATION ${BIN_INSTALL_DIR})
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib-config")
+  install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config" DESTINATION "${BIN_INSTALL_DIR}")
 endif()
 
 if(WIN32)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmd.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd )
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd DESTINATION ${BIN_INSTALL_DIR})
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmd.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd")
+  install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd" DESTINATION "${BIN_INSTALL_DIR}")
 endif()
 
 if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc )
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc")
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc" DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
 endif()
 
 if(NOT HAVE_ZLIB AND ZLIB_SOURCE)
@@ -93,7 +93,7 @@ if(NOT HAVE_ZLIB AND ZLIB_SOURCE)
 endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/config.h")
 
 if(WITH_ASF)
   set(TAGLIB_WITH_ASF TRUE)
@@ -107,7 +107,7 @@ if(TRACE_IN_RELEASE)
   set(TRACE_IN_RELEASE TRUE)
 endif()
 
-configure_file(taglib/taglib_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h)
+configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h")
 
 add_subdirectory(taglib) 
 add_subdirectory(bindings)
@@ -117,7 +117,7 @@ if(BUILD_TESTS)
 endif(BUILD_TESTS)
 add_subdirectory(examples)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
 file(COPY doc/taglib.png DESTINATION doc)
 add_custom_target(docs doxygen)
 
@@ -128,4 +128,4 @@ configure_file(
   IMMEDIATE @ONLY)
 
 add_custom_target(uninstall
-  COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+  COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
