@@ -602,7 +602,7 @@ ByteVector ID3v2::Tag::render(int version) const
           + String((*it)->header()->frameID()) + "\' has been discarded");
         continue;
       }
-      tagData.append((*it)->render());
+      tagData.append(frameData);
     }
   }
 
