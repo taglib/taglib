@@ -1,29 +1,29 @@
 INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/asf
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2/frames
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpc
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/wav
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/vorbis
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/flac
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/speex
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/opus
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/flac
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/wavpack
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mod
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/s3m
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/it
-  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/xm
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/asf"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2/frames"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mp4"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/aiff"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/riff/wav"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/trueaudio"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/vorbis"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/flac"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/speex"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ogg/opus"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/flac"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/wavpack"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mod"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/s3m"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/it"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../taglib/xm"
 )
 
 SET(test_runner_SRCS
@@ -66,10 +66,10 @@ SET(test_runner_SRCS
   test_opus.cpp
 )
 
-INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
+INCLUDE_DIRECTORIES("${CPPUNIT_INCLUDE_DIR}")
 
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
-TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_runner tag "${CPPUNIT_LIBRARIES}")
 
 ADD_TEST(test_runner test_runner)
 ADD_CUSTOM_TARGET(check COMMAND ${CMAKE_CTEST_COMMAND} -V

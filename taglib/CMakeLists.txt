@@ -1,35 +1,35 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/toolkit
-  ${CMAKE_CURRENT_SOURCE_DIR}/asf
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg
-  ${CMAKE_CURRENT_SOURCE_DIR}/ogg
-  ${CMAKE_CURRENT_SOURCE_DIR}/ogg/flac
-  ${CMAKE_CURRENT_SOURCE_DIR}/flac
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpc
-  ${CMAKE_CURRENT_SOURCE_DIR}/mp4
-  ${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis
-  ${CMAKE_CURRENT_SOURCE_DIR}/ogg/speex
-  ${CMAKE_CURRENT_SOURCE_DIR}/ogg/opus
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/frames
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1
-  ${CMAKE_CURRENT_SOURCE_DIR}/ape
-  ${CMAKE_CURRENT_SOURCE_DIR}/wavpack
-  ${CMAKE_CURRENT_SOURCE_DIR}/trueaudio
-  ${CMAKE_CURRENT_SOURCE_DIR}/riff
-  ${CMAKE_CURRENT_SOURCE_DIR}/riff/aiff
-  ${CMAKE_CURRENT_SOURCE_DIR}/riff/wav
-  ${CMAKE_CURRENT_SOURCE_DIR}/mod
-  ${CMAKE_CURRENT_SOURCE_DIR}/s3m
-  ${CMAKE_CURRENT_SOURCE_DIR}/it
-  ${CMAKE_CURRENT_SOURCE_DIR}/xm
+  "${CMAKE_CURRENT_SOURCE_DIR}/toolkit"
+  "${CMAKE_CURRENT_SOURCE_DIR}/asf"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mpeg"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ogg"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ogg/flac"
+  "${CMAKE_CURRENT_SOURCE_DIR}/flac"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mpc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mp4"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ogg/speex"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ogg/opus"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/frames"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ape"
+  "${CMAKE_CURRENT_SOURCE_DIR}/wavpack"
+  "${CMAKE_CURRENT_SOURCE_DIR}/trueaudio"
+  "${CMAKE_CURRENT_SOURCE_DIR}/riff"
+  "${CMAKE_CURRENT_SOURCE_DIR}/riff/aiff"
+  "${CMAKE_CURRENT_SOURCE_DIR}/riff/wav"
+  "${CMAKE_CURRENT_SOURCE_DIR}/mod"
+  "${CMAKE_CURRENT_SOURCE_DIR}/s3m"
+  "${CMAKE_CURRENT_SOURCE_DIR}/it"
+  "${CMAKE_CURRENT_SOURCE_DIR}/xm"
 )
 
 if(ZLIB_FOUND)
-  include_directories(${ZLIB_INCLUDE_DIR})
+  include_directories("${ZLIB_INCLUDE_DIR}")
 elseif(HAVE_ZLIB_SOURCE)
-  include_directories(${ZLIB_SOURCE})
+  include_directories("${ZLIB_SOURCE}")
 endif()
 
 set(tag_HDRS
@@ -37,7 +37,7 @@ set(tag_HDRS
   fileref.h
   audioproperties.h
   taglib_export.h
-  ${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h
+  "${CMAKE_CURRENT_BINARY_DIR}/../taglib_config.h"
   toolkit/taglib.h
   toolkit/tstring.h
   toolkit/tlist.h
@@ -313,12 +313,12 @@ endif()
 
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS
-    ${ZLIB_SOURCE}/adler32.c
-    ${ZLIB_SOURCE}/crc32.c
-    ${ZLIB_SOURCE}/inffast.c
-    ${ZLIB_SOURCE}/inflate.c
-    ${ZLIB_SOURCE}/inftrees.c
-    ${ZLIB_SOURCE}/zutil.c
+    "${ZLIB_SOURCE}/adler32.c"
+    "${ZLIB_SOURCE}/crc32.c"
+    "${ZLIB_SOURCE}/inffast.c"
+    "${ZLIB_SOURCE}/inflate.c"
+    "${ZLIB_SOURCE}/inftrees.c"
+    "${ZLIB_SOURCE}/zutil.c"
   )
 endif()
 
@@ -337,13 +337,13 @@ set(tag_LIB_SRCS
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
-  target_link_libraries(tag ${ZLIB_LIBRARIES})
+  target_link_libraries(tag "${ZLIB_LIBRARIES}")
 endif()
 
 set_target_properties(tag PROPERTIES
   VERSION ${TAGLIB_SOVERSION_MAJOR}.${TAGLIB_SOVERSION_MINOR}.${TAGLIB_SOVERSION_PATCH}
   SOVERSION ${TAGLIB_SOVERSION_MAJOR}
-  INSTALL_NAME_DIR ${LIB_INSTALL_DIR}
+  INSTALL_NAME_DIR "${LIB_INSTALL_DIR}"
   DEFINE_SYMBOL MAKE_TAGLIB_LIB
   LINK_INTERFACE_LIBRARIES ""
   PUBLIC_HEADER "${tag_HDRS}"
@@ -353,9 +353,9 @@ if(BUILD_FRAMEWORK)
 endif()
 
 install(TARGETS tag
-  FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
-  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/taglib
+  FRAMEWORK DESTINATION "${FRAMEWORK_INSTALL_DIR}"
+  LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
+  RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
+  ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
+  PUBLIC_HEADER DESTINATION "${INCLUDE_INSTALL_DIR}/taglib"
 )
