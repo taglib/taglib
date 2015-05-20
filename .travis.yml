@@ -8,5 +8,5 @@ addons:
     packages:
       - libcppunit-dev 
       - zlib1g-dev
-script: cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON . && make && make check
+script: cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON . && make && make check
 
