@@ -39,7 +39,7 @@ inline string copyFile(const string &filename, const string &ext)
 #endif
 
   string sourceFileName = testFilePath(filename) + ext;
-  ifstream source(sourceFileName, std::ios::binary);
+  ifstream source(sourceFileName.c_str(), std::ios::binary);
   ofstream destination(testFileName, std::ios::binary);
   destination << source.rdbuf();
   return string(testFileName);
