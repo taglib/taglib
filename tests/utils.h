@@ -27,26 +27,22 @@ inline string testFilePath(const string &filename)
 
 inline string copyFile(const string &filename, const string &ext)
 {
+  char testFileName[1024];
+
 #ifdef _WIN32
   char *testFileNameBody = tempnam(NULL, NULL);
-  string testFileName = string(newname_c) + ext;
+  snprintf(testFileName, sizeof(testFileName), "%s%s", testFileNameBody, ext.c_str());
   free(testFileNameBody);
-  string sourceFileName = testFilePath(filename) + ext;
-
-  CopyFileA(sourceFileName.c_str(), testFileName.c_str(), FALSE);
-  SetFileAttributesA(testFileName, GetFileAttributesA(testFileName) & ~FILE_ATTRIBUTE_READONLY);
-  return testFileName;
 #else
-  char testFileName[1024];
   snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
   mkstemps(testFileName, 6);
-  string sourceFileName = testFilePath(filename) + ext;
+#endif
 
+  string sourceFileName = testFilePath(filename) + ext;
   ifstream source(sourceFileName, std::ios::binary);
   ofstream destination(testFileName, std::ios::binary);
   destination << source.rdbuf();
   return string(testFileName);
-#endif
 }
 
 inline void deleteFile(const string &filename)
