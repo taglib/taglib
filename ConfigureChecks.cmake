@@ -234,7 +234,7 @@ endif()
 
 if(BUILD_TESTS)
   find_package(CppUnit)
-  if(NOT CppUnit_FOUND AND BUILD_TESTS)
+  if(NOT CppUnit_FOUND)
     message(STATUS "CppUnit not found, disabling tests.")
     set(BUILD_TESTS OFF)
   endif()
