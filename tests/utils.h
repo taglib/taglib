@@ -30,9 +30,9 @@ inline string copyFile(const string &filename, const string &ext)
   char testFileName[1024];
 
 #ifdef _WIN32
-  char *testFileNameBody = tempnam(NULL, NULL);
-  snprintf(testFileName, sizeof(testFileName), "%s%s", testFileNameBody, ext.c_str());
-  free(testFileNameBody);
+  GetTempPathA(sizeof(testFileName), testFileName);
+  GetTempFileNameA(testFileName, "tag", 0, testFileName);
+  strcat(testFileName, ext.c_str());
 #else
   snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
   mkstemps(testFileName, 6);
