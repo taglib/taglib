@@ -28,7 +28,7 @@
 
 namespace TagLib {
   namespace XM {
-    class Properties : public AudioProperties {
+    class TAGLIB_EXPORT Properties : public AudioProperties {
       friend class File;
     public:
       /*! Flag bits. */
