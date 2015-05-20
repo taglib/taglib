@@ -51,16 +51,23 @@ namespace TagLib {
 
       // Reimplementations.
       virtual int length() const;
+      int lengthInSeconds() const;
+      int lengthInMilliseconds() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
+      int bitsPerSample() const;
       bool isEncrypted() const;
 
 #ifndef DO_NOT_DOCUMENT
+      // Do not use. Use setLengthInMilliseconds() instead.
       void setLength(int value);
+
+      void setLengthInMilliseconds(int value) const;
       void setBitrate(int value);
       void setSampleRate(int value);
       void setChannels(int value);
+      void setBitsPerSample(int value);
       void setEncrypted(bool value);
 #endif
 

@@ -12,7 +12,7 @@ using namespace TagLib;
 class TestAIFF : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestAIFF);
-  CPPUNIT_TEST(testReading);
+  CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testSaveID3v2);
   CPPUNIT_TEST(testAiffCProperties);
   CPPUNIT_TEST(testDuplicateID3v2);
@@ -22,10 +22,16 @@ class TestAIFF : public CppUnit::TestFixture
 
 public:
 
-  void testReading()
+  void testAudioProperties()
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("empty.aiff"));
-    CPPUNIT_ASSERT_EQUAL(705, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(67, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(706, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
   }
 
   void testSaveID3v2()

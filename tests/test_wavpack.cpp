@@ -22,6 +22,7 @@ public:
   {
     WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
     WavPack::Properties *props = f.audioProperties();
+    CPPUNIT_ASSERT(props);
     CPPUNIT_ASSERT_EQUAL(44100, props->sampleRate());
     CPPUNIT_ASSERT_EQUAL(2, props->channels());
     CPPUNIT_ASSERT_EQUAL(1, props->bitrate());
@@ -32,7 +33,10 @@ public:
   {
     WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
     WavPack::Properties *props = f.audioProperties();
-    CPPUNIT_ASSERT_EQUAL(4, props->length());
+    CPPUNIT_ASSERT(props);
+    CPPUNIT_ASSERT_EQUAL(3, props->length());
+    CPPUNIT_ASSERT_EQUAL(3, props->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3705, props->lengthInMilliseconds());
   }
 
 };

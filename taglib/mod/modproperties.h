@@ -36,6 +36,7 @@ namespace TagLib {
       virtual ~Properties();
 
       int length() const;
+      int lengthInMilliseconds() const;
       int bitrate() const;
       int sampleRate() const;
       int channels() const;

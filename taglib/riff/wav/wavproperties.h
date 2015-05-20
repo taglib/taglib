@@ -69,18 +69,36 @@ namespace TagLib {
         // Reimplementations.
 
         virtual int length() const;
+        int lengthInSeconds() const;
+        int lengthInMilliseconds() const;
         virtual int bitrate() const;
         virtual int sampleRate() const;
         virtual int channels() const;
 
+        /*!
+         * Returns the count of bits per sample.
+         */
         int sampleWidth() const;
+
+        /*!
+         * Returns the total number of the samples. If the format ID is not 1,
+         * always returns 0.
+         *
+         * \see format()
+         */
         uint sampleFrames() const;
+
+        /*!
+         * Returns the format ID of the WAVE file.  For example, 0 for Unknown,
+         * 1 for PCM, 2 for ADPCM, 3 for 32-bit float and so forth.
+         */
+        uint format() const;
 
       private:
         Properties(const Properties &);
         Properties &operator=(const Properties &);
 
-        void read(const ByteVector &data);
+        void read(const ByteVector &data, uint streamLength);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

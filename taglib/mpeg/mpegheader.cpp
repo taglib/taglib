@@ -253,13 +253,6 @@ void MPEG::Header::parse(const ByteVector &data)
   d->isCopyrighted = flags[3];
   d->isPadded = flags[9];
 
-  // Calculate the frame length
-
-  if(d->layer == 1)
-    d->frameLength = 24000 * 2 * d->bitrate / d->sampleRate + int(d->isPadded);
-  else
-    d->frameLength = 72000 * d->bitrate / d->sampleRate + int(d->isPadded);
-
   // Samples per frame
 
   static const int samplesPerFrame[3][2] = {
@@ -270,6 +263,15 @@ void MPEG::Header::parse(const ByteVector &data)
   };
 
   d->samplesPerFrame = samplesPerFrame[layerIndex][versionIndex];
+
+  // Calculate the frame length
+
+  const int paddingSize[3] = { 4, 1, 1 };
+
+  d->frameLength = d->samplesPerFrame * d->bitrate * 125 / d->sampleRate;
+
+  if(d->isPadded)
+    d->frameLength += paddingSize[layerIndex];
 
   // Now that we're done parsing, set this to be a valid frame.
 

@@ -32,11 +32,19 @@ using namespace TagLib;
 class ASF::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(): length(0), bitrate(0), sampleRate(0), channels(0), encrypted(false) {}
+  PropertiesPrivate() :
+    length(0),
+    bitrate(0),
+    sampleRate(0),
+    channels(0),
+    bitsPerSample(0),
+    encrypted(false) {}
+
   int length;
   int bitrate;
   int sampleRate;
   int channels;
+  int bitsPerSample;
   bool encrypted;
 };
 
@@ -44,9 +52,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::Properties::Properties() : AudioProperties(AudioProperties::Average)
+ASF::Properties::Properties() :
+  AudioProperties(AudioProperties::Average),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
 }
 
 ASF::Properties::~Properties()
@@ -55,6 +64,16 @@ ASF::Properties::~Properties()
 }
 
 int ASF::Properties::length() const
+{
+  return lengthInSeconds();
+}
+
+int ASF::Properties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int ASF::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -74,6 +93,11 @@ int ASF::Properties::channels() const
   return d->channels;
 }
 
+int ASF::Properties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 bool ASF::Properties::isEncrypted() const
 {
   return d->encrypted;
@@ -83,28 +107,37 @@ bool ASF::Properties::isEncrypted() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ASF::Properties::setLength(int length)
+void ASF::Properties::setLength(int /*length*/)
 {
-  d->length = length;
+  debug("ASF::Properties::setLength() - This method is no longer used.");
 }
 
-void ASF::Properties::setBitrate(int length)
+void ASF::Properties::setLengthInMilliseconds(int value) const
 {
-  d->bitrate = length;
+  d->length = value;
 }
 
-void ASF::Properties::setSampleRate(int length)
+void ASF::Properties::setBitrate(int value)
 {
-  d->sampleRate = length;
+  d->bitrate = value;
 }
 
-void ASF::Properties::setChannels(int length)
+void ASF::Properties::setSampleRate(int value)
 {
-  d->channels = length;
+  d->sampleRate = value;
 }
 
-void ASF::Properties::setEncrypted(bool encrypted)
+void ASF::Properties::setChannels(int value)
 {
-  d->encrypted = encrypted;
+  d->channels = value;
 }
 
+void ASF::Properties::setBitsPerSample(int value)
+{
+  d->bitsPerSample = value;
+}
+
+void ASF::Properties::setEncrypted(bool value)
+{
+  d->encrypted = value;
+}

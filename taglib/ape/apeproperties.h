@@ -63,6 +63,8 @@ namespace TagLib {
       // Reimplementations.
 
       virtual int length() const;
+      int lengthInSeconds() const;
+      int lengthInMilliseconds() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
@@ -82,13 +84,13 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read();
+      void read(File *file);
 
-      long findDescriptor();
-      long findID3v2();
+      long findDescriptor(File *file);
+      long findID3v2(File *file);
 
-      void analyzeCurrent();
-      void analyzeOld();
+      void analyzeCurrent(File *file);
+      void analyzeOld(File *file);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

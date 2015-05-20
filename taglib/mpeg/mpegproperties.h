@@ -62,15 +62,15 @@ namespace TagLib {
       // Reimplementations.
 
       virtual int length() const;
+      int lengthInSeconds() const;
+      int lengthInMilliseconds() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
 
       /*!
-       * Returns a pointer to the XingHeader if one exists or null if no
-       * XingHeader was found.
+       * Returns a pointer to the XingHeader.
        */
-
       const XingHeader *xingHeader() const;
 
       /*!
@@ -107,7 +107,7 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read();
+      void read(File *file);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

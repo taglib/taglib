@@ -50,6 +50,8 @@ namespace TagLib {
       virtual ~Properties();
 
       virtual int length() const;
+      int lengthInSeconds() const;
+      int lengthInMilliseconds() const;
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
@@ -60,6 +62,8 @@ namespace TagLib {
       Codec codec() const;
 
     private:
+      void read(File *file, Atoms *atoms);
+
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };

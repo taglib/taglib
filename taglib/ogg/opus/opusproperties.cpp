@@ -41,17 +41,13 @@ using namespace TagLib::Ogg;
 class Opus::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(File *f, ReadStyle s) :
-    file(f),
-    style(s),
+  PropertiesPrivate() :
     length(0),
     bitrate(0),
     inputSampleRate(0),
     channels(0),
     opusVersion(0) {}
 
-  File *file;
-  ReadStyle style;
   int length;
   int bitrate;
   int inputSampleRate;
@@ -63,10 +59,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Opus::Properties::Properties(File *file, ReadStyle style) : AudioProperties(style)
+Opus::Properties::Properties(File *file, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(file, style);
-  read();
+  read(file);
 }
 
 Opus::Properties::~Properties()
@@ -75,6 +72,16 @@ Opus::Properties::~Properties()
 }
 
 int Opus::Properties::length() const
+{
+  return lengthInSeconds();
+}
+
+int Opus::Properties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int Opus::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -111,13 +118,17 @@ int Opus::Properties::opusVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Opus::Properties::read()
+void Opus::Properties::read(File *file)
 {
   // Get the identification header from the Ogg implementation.
 
   // http://tools.ietf.org/html/draft-terriberry-oggopus-01#section-5.1
 
-  ByteVector data = d->file->packet(0);
+  const ByteVector data = file->packet(0);
+  if(data.size() < 19) {
+    debug("Opus::Properties::read() -- data is too short.");
+    return;
+  }
 
   // *Magic Signature*
   uint pos = 8;
@@ -144,16 +155,22 @@ void Opus::Properties::read()
   // *Channel Mapping Family* (8 bits, unsigned)
   pos += 1;
 
-  const Ogg::PageHeader *first = d->file->firstPageHeader();
-  const Ogg::PageHeader *last  = d->file->lastPageHeader();
+  const Ogg::PageHeader *first = file->firstPageHeader();
+  const Ogg::PageHeader *last  = file->lastPageHeader();
 
   if(first && last) {
     const long long start = first->absoluteGranularPosition();
     const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0) {
-      d->length  = (int)((end - start - preSkip) / 48000);
-      d->bitrate = (int)(d->file->length() * 8.0 / (1000.0 * d->length) + 0.5);
+      const long long frameCount = (end - start - preSkip);
+
+      if(frameCount > 0) {
+        const double length = frameCount * 1000.0 / 48000.0;
+
+        d->length  = static_cast<int>(length + 0.5);
+        d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
+      }
     }
     else {
       debug("Opus::Properties::read() -- The PCM values for the start or "

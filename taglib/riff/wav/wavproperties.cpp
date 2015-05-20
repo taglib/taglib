@@ -35,18 +35,14 @@ using namespace TagLib;
 class RIFF::WAV::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(uint streamLength = 0) :
+  PropertiesPrivate() :
     format(0),
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
     sampleWidth(0),
-    sampleFrames(0),
-    streamLength(streamLength)
-  {
-
-  }
+    sampleFrames(0) {}
 
   short format;
   int length;
@@ -55,23 +51,24 @@ public:
   int channels;
   int sampleWidth;
   uint sampleFrames;
-  uint streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::Properties::Properties(const ByteVector & /*data*/, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate();
-  read(data);
+  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(streamLength);
-  read(data);
+  read(data, streamLength);
 }
 
 RIFF::WAV::Properties::~Properties()
@@ -80,6 +77,16 @@ RIFF::WAV::Properties::~Properties()
 }
 
 int RIFF::WAV::Properties::length() const
+{
+  return lengthInSeconds();
+}
+
+int RIFF::WAV::Properties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int RIFF::WAV::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -109,11 +116,16 @@ TagLib::uint RIFF::WAV::Properties::sampleFrames() const
   return d->sampleFrames;
 }
 
+TagLib::uint RIFF::WAV::Properties::format() const
+{
+  return d->format;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::Properties::read(const ByteVector &data)
+void RIFF::WAV::Properties::read(const ByteVector &data, uint streamLength)
 {
   if(data.size() < 16) {
     debug("RIFF::WAV::Properties::read() - \"fmt \" chunk is too short for WAV.");
@@ -128,7 +140,13 @@ void RIFF::WAV::Properties::read(const ByteVector &data)
   const uint byteRate = data.toUInt(8, false);
   d->bitrate = byteRate * 8 / 1000;
 
-  d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
-  if(d->channels > 0 && d->sampleWidth > 0)
-    d->sampleFrames = d->streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
+  if(streamLength > 0) {
+    if(byteRate > 0)
+      d->length = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
+
+    if(d->format == 1 && d->channels > 0 && d->sampleWidth > 0) {
+      const int bytesPerSample = d->channels * ((d->sampleWidth + 7) / 8);
+      d->sampleFrames = streamLength / bytesPerSample;
+    }
+  }
 }
