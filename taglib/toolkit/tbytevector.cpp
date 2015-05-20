@@ -702,7 +702,14 @@ ByteVector &ByteVector::resize(uint size, char padding)
 {
   if(size != d->length) {
     detach();
+
+    // Remove the excessive length of the internal buffer first to pad correctly.
+    // This doesn't reallocate the buffer, since std::vector::resize() doesn't
+    // reallocate the buffer when shrinking.
+
+    d->data->data.resize(d->offset + d->length);
     d->data->data.resize(d->offset + size, padding);
+
     d->length = size;
   }
 
@@ -712,7 +719,7 @@ ByteVector &ByteVector::resize(uint size, char padding)
 ByteVector::Iterator ByteVector::begin()
 {
   detach();
-  return d->data->data.begin();
+  return d->data->data.begin() + d->offset;
 }
 
 ByteVector::ConstIterator ByteVector::begin() const
@@ -723,7 +730,7 @@ ByteVector::ConstIterator ByteVector::begin() const
 ByteVector::Iterator ByteVector::end()
 {
   detach();
-  return d->data->data.end();
+  return d->data->data.begin() + d->offset + d->length;
 }
 
 ByteVector::ConstIterator ByteVector::end() const
@@ -734,25 +741,23 @@ ByteVector::ConstIterator ByteVector::end() const
 ByteVector::ReverseIterator ByteVector::rbegin()
 {
   detach();
-  return d->data->data.rbegin();
+  return d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length));
 }
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  std::vector<char> &v = d->data->data;
-  return v.rbegin() + (v.size() - (d->offset + d->length));
+  return d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
 {
   detach();
-  return d->data->data.rend();
+  return d->data->data.rbegin() + (d->data->data.size() - d->offset);
 }
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  std::vector<char> &v = d->data->data;
-  return v.rbegin() + (v.size() - d->offset);
+  return d->data->data.rbegin() + (d->data->data.size() - d->offset);
 }
 
 bool ByteVector::isNull() const

@@ -64,18 +64,26 @@ ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &dat
   setData(data);
 }
 
-ChapterFrame::ChapterFrame(const ByteVector &eID, const TagLib::uint &sT, const TagLib::uint &eT,
-                           const TagLib::uint &sO, const TagLib::uint &eO, const FrameList &eF) :
+ChapterFrame::ChapterFrame(const ByteVector &elementID,
+                           const TagLib::uint &startTime, const TagLib::uint &endTime,
+                           const TagLib::uint &startOffset, const TagLib::uint &endOffset,
+                           const FrameList &embeddedFrames) :
     ID3v2::Frame("CHAP")
 {
   d = new ChapterFramePrivate;
-  d->elementID = eID;
-  d->startTime = sT;
-  d->endTime = eT;
-  d->startOffset = sO;
-  d->endOffset = eO;
-  FrameList l = eF;
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
+
+  // setElementID has a workaround for a previously silly API where you had to
+  // specifically include the null byte.
+
+  setElementID(elementID);
+
+  d->startTime = startTime;
+  d->endTime = endTime;
+  d->startOffset = startOffset;
+  d->endOffset = endOffset;
+
+  for(FrameList::ConstIterator it = embeddedFrames.begin();
+      it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
 
@@ -112,8 +120,9 @@ TagLib::uint ChapterFrame::endOffset() const
 void ChapterFrame::setElementID(const ByteVector &eID)
 {
   d->elementID = eID;
-  if(eID.at(eID.size() - 1) != char(0))
-    d->elementID.append(char(0));
+
+  if(d->elementID.endsWith(char(0)))
+    d->elementID = d->elementID.mid(0, d->elementID.size() - 1);
 }
 
 void ChapterFrame::setStartTime(const TagLib::uint &sT)
@@ -181,7 +190,25 @@ void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 
 String ChapterFrame::toString() const
 {
-  return String::null;
+  String s = String(d->elementID) +
+             ": start time: " + String::number(d->startTime) +
+             ", end time: " + String::number(d->endTime);
+
+  if(d->startOffset != 0xFFFFFFFF)
+    s += ", start offset: " + String::number(d->startOffset);
+
+  if(d->endOffset != 0xFFFFFFFF)
+    s += ", start offset: " + String::number(d->endOffset);
+
+  if(!d->embeddedFrameList.isEmpty()) {
+    StringList frameIDs;
+    for(FrameList::ConstIterator it = d->embeddedFrameList.begin();
+        it != d->embeddedFrameList.end(); ++it)
+      frameIDs.append((*it)->frameID());
+    s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
+  }
+
+  return s;
 }
 
 PropertyMap ChapterFrame::asProperties() const
@@ -220,16 +247,20 @@ void ChapterFrame::parseFields(const ByteVector &data)
 
   int pos = 0, embPos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
-  d->elementID.append(char(0));
-  d->startTime = data.mid(pos, 4).toUInt(true);
+  d->startTime = data.toUInt(pos, true);
   pos += 4;
-  d->endTime = data.mid(pos, 4).toUInt(true);
+  d->endTime = data.toUInt(pos, true);
   pos += 4;
-  d->startOffset = data.mid(pos, 4).toUInt(true);
+  d->startOffset = data.toUInt(pos, true);
   pos += 4;
-  d->endOffset = data.mid(pos, 4).toUInt(true);
+  d->endOffset = data.toUInt(pos, true);
   pos += 4;
   size -= pos;
+
+  // Embedded frames are optional
+
+  if(size < header()->size())
+    return;
 
   while((uint)embPos < size - header()->size()) {
     Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
@@ -253,6 +284,7 @@ ByteVector ChapterFrame::renderFields() const
   ByteVector data;
 
   data.append(d->elementID);
+  data.append('\0');
   data.append(ByteVector::fromUInt(d->startTime, true));
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));

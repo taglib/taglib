@@ -53,17 +53,24 @@ namespace TagLib {
       ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data);
 
       /*!
-       * Creates a chapter frame with the element ID \a eID,
-       * start time \a sT, end time \a eT, start offset \a sO,
-       * end offset \a eO and embedded frames, that are in \a eF.
+       * Creates a chapter frame with the element ID \a elementID, start time
+       * \a startTime, end time \a endTime, start offset \a startOffset,
+       * end offset \a endOffset and optionally a list of embeeded frames,
+       * whose ownership will then be taken over by this Frame, in
+       * \a embeededFrames;
+       *
+       * All times are in milliseconds.
        */
-      ChapterFrame(const ByteVector &eID, const uint &sT, const uint &eT, const uint &sO,
-                   const uint &eO, const FrameList &eF);
+      // BIC: There's no reason to use const-references with uints
+      ChapterFrame(const ByteVector &elementID,
+                   const uint &startTime, const uint &endTime,
+                   const uint &startOffset, const uint &endOffset,
+                   const FrameList &embeddedFrames = FrameList());
 
       /*!
        * Destroys the frame.
        */
-      ~ChapterFrame();
+      virtual ~ChapterFrame();
 
       /*!
        * Returns the element ID of the frame. Element ID

@@ -24,10 +24,10 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-#include <tfile.h>
+#include "tfile.h"
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
@@ -37,7 +37,7 @@
 #include "tbytevector.h"
 #include "id3v1genres.h"
 #include "tpropertymap.h"
-#include <tdebug.h>
+#include "tdebug.h"
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
@@ -83,7 +83,7 @@ const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defau
 
 namespace
 {
-  const uint DefaultPaddingSize = 1024;
+  const TagLib::uint DefaultPaddingSize = 1024;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -591,12 +591,19 @@ ByteVector ID3v2::Tag::render(int version) const
   for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
     if((*it)->header()->frameID().size() != 4) {
-      debug("A frame of unsupported or unknown type \'"
+      debug("An ID3v2 frame of unsupported or unknown type \'"
           + String((*it)->header()->frameID()) + "\' has been discarded");
       continue;
     }
-    if(!(*it)->header()->tagAlterPreservation())
-      tagData.append((*it)->render());
+    if(!(*it)->header()->tagAlterPreservation()) {
+      const ByteVector frameData = (*it)->render();
+      if(frameData.size() == Frame::headerSize((*it)->header()->version())) {
+        debug("An empty ID3v2 frame \'"
+          + String((*it)->header()->frameID()) + "\' has been discarded");
+        continue;
+      }
+      tagData.append(frameData);
+    }
   }
 
   // Compute the amount of padding, and append that to tagData.
