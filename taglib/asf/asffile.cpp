@@ -205,9 +205,10 @@ ByteVector ASF::File::StreamPropertiesObject::guid()
 void ASF::File::StreamPropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setChannels(data.toShort(56, false));
+  file->d->properties->setChannels(data.toUShort(56, false));
   file->d->properties->setSampleRate(data.toUInt(58, false));
-  file->d->properties->setBitrate(data.toUInt(62, false) * 8 / 1000);
+  file->d->properties->setBitrate(static_cast<int>(data.toUInt(62, false) * 8.0 / 1000.0 + 0.5));
+  file->d->properties->setBitsPerSample(data.toUShort(68, false));
 }
 
 ByteVector ASF::File::ContentDescriptionObject::guid()

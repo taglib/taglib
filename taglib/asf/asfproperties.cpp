@@ -37,12 +37,14 @@ public:
     bitrate(0),
     sampleRate(0),
     channels(0),
+    bitsPerSample(0),
     encrypted(false) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
+  int bitsPerSample;
   bool encrypted;
 };
 
@@ -91,6 +93,11 @@ int ASF::Properties::channels() const
   return d->channels;
 }
 
+int ASF::Properties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 bool ASF::Properties::isEncrypted() const
 {
   return d->encrypted;
@@ -123,6 +130,11 @@ void ASF::Properties::setSampleRate(int value)
 void ASF::Properties::setChannels(int value)
 {
   d->channels = value;
+}
+
+void ASF::Properties::setBitsPerSample(int value)
+{
+  d->bitsPerSample = value;
 }
 
 void ASF::Properties::setEncrypted(bool value)

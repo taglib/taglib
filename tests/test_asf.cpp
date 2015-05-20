@@ -37,6 +37,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(3712, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
   }
 
