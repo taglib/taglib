@@ -90,7 +90,7 @@ namespace TagLib {
 
         /*!
          * Returns the format ID of the WAVE file.  For example, 0 for Unknown,
-         * 1 for PCM and so forth.
+         * 1 for PCM, 2 for ADPCM, 3 for 32-bit float and so forth.
          */
         uint format() const;
 
