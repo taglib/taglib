@@ -272,10 +272,8 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
 
   // Look for WavPack audio properties
 
-  if(readProperties) {
-    seek(0);
+  if(readProperties)
     d->properties = new Properties(this, length() - d->APESize);
-  }
 }
 
 long WavPack::File::findAPE()
