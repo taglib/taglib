@@ -186,8 +186,14 @@ ByteVector ASF::File::FilePropertiesObject::guid()
 void ASF::File::FilePropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setLength(
-    (int)(data.toLongLong(40, false) / 10000000L - data.toLongLong(56, false) / 1000L));
+  if(data.size() < 64) {
+    debug("ASF::File::FilePropertiesObject::parse() -- data is too short.");
+    return;
+  }
+
+  const long long duration = data.toLongLong(40, false);
+  const long long preroll  = data.toLongLong(56, false);
+  file->d->properties->setLengthInMilliseconds(static_cast<int>(duration / 10000.0 - preroll + 0.5));
 }
 
 ByteVector ASF::File::StreamPropertiesObject::guid()
@@ -198,9 +204,15 @@ ByteVector ASF::File::StreamPropertiesObject::guid()
 void ASF::File::StreamPropertiesObject::parse(ASF::File *file, uint size)
 {
   BaseObject::parse(file, size);
-  file->d->properties->setChannels(data.toShort(56, false));
+  if(data.size() < 70) {
+    debug("ASF::File::StreamPropertiesObject::parse() -- data is too short.");
+    return;
+  }
+
+  file->d->properties->setChannels(data.toUShort(56, false));
   file->d->properties->setSampleRate(data.toUInt(58, false));
-  file->d->properties->setBitrate(data.toUInt(62, false) * 8 / 1000);
+  file->d->properties->setBitrate(static_cast<int>(data.toUInt(62, false) * 8.0 / 1000.0 + 0.5));
+  file->d->properties->setBitsPerSample(data.toUShort(68, false));
 }
 
 ByteVector ASF::File::ContentDescriptionObject::guid()
