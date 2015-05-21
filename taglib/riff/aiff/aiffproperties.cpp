@@ -37,14 +37,14 @@ public:
     bitrate(0),
     sampleRate(0),
     channels(0),
-    sampleWidth(0),
+    bitsPerSample(0),
     sampleFrames(0) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
-  int sampleWidth;
+  int bitsPerSample;
 
   ByteVector compressionType;
   String compressionName;
@@ -56,9 +56,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
   read(data);
 }
 
@@ -68,6 +69,16 @@ RIFF::AIFF::Properties::~Properties()
 }
 
 int RIFF::AIFF::Properties::length() const
+{
+  return lengthInSeconds();
+}
+
+int RIFF::AIFF::Properties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int RIFF::AIFF::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -87,9 +98,14 @@ int RIFF::AIFF::Properties::channels() const
   return d->channels;
 }
 
+int RIFF::AIFF::Properties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 int RIFF::AIFF::Properties::sampleWidth() const
 {
-  return d->sampleWidth;
+  return bitsPerSample();
 }
 
 TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
@@ -122,16 +138,19 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
     return;
   }
 
-  d->channels       = data.toShort(0U);
-  d->sampleFrames   = data.toUInt(2U);
-  d->sampleWidth    = data.toShort(6U);
+  d->channels      = data.toShort(0U);
+  d->sampleFrames  = data.toUInt(2U);
+  d->bitsPerSample = data.toShort(6U);
+
   const long double sampleRate = data.toFloat80BE(8);
-  d->sampleRate     = (int)sampleRate;
-  d->bitrate        = (int)((sampleRate * d->sampleWidth * d->channels) / 1000.0);
-  d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
+  if(sampleRate >= 1.0) {
+    d->sampleRate = static_cast<int>(sampleRate + 0.5);
+    d->bitrate    = static_cast<int>(sampleRate * d->bitsPerSample * d->channels / 1000.0 + 0.5);
+    d->length     = static_cast<int>(d->sampleFrames * 1000.0 / sampleRate + 0.5);
+  }
 
   if(data.size() >= 23) {
     d->compressionType = data.mid(18, 4);
-    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
+    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])), String::Latin1);
   }
 }

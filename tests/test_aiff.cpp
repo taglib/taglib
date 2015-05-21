@@ -12,9 +12,9 @@ using namespace TagLib;
 class TestAIFF : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestAIFF);
-  CPPUNIT_TEST(testReading);
-  CPPUNIT_TEST(testSaveID3v2);
+  CPPUNIT_TEST(testAiffProperties);
   CPPUNIT_TEST(testAiffCProperties);
+  CPPUNIT_TEST(testSaveID3v2);
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
@@ -22,10 +22,38 @@ class TestAIFF : public CppUnit::TestFixture
 
 public:
 
-  void testReading()
+  void testAiffProperties()
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("empty.aiff"));
-    CPPUNIT_ASSERT_EQUAL(705, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(67, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(706, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(2941U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isAiffC());
+  }
+
+  void testAiffCProperties()
+  {
+    RIFF::AIFF::File f(TEST_FILE_PATH_C("alaw.aifc"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(37, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(706, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(1622U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(true, f.audioProperties()->isAiffC());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("ALAW"), f.audioProperties()->compressionType());
+    CPPUNIT_ASSERT_EQUAL(String("SGI CCITT G.711 A-law"), f.audioProperties()->compressionName());
   }
 
   void testSaveID3v2()
@@ -45,14 +73,6 @@ public:
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String(L"TitleXXX"), f.tag()->title());
     }
-  }
-
-  void testAiffCProperties()
-  {
-    RIFF::AIFF::File f(TEST_FILE_PATH_C("alaw.aifc"));
-    CPPUNIT_ASSERT(f.audioProperties()->isAiffC());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("ALAW"), f.audioProperties()->compressionType());
-    CPPUNIT_ASSERT_EQUAL(String("SGI CCITT G.711 A-law"), f.audioProperties()->compressionName());
   }
 
   void testDuplicateID3v2()
