@@ -35,43 +35,47 @@ using namespace TagLib;
 class RIFF::WAV::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(uint streamLength = 0) :
+  PropertiesPrivate() :
     format(0),
     length(0),
     bitrate(0),
     sampleRate(0),
     channels(0),
-    sampleWidth(0),
-    sampleFrames(0),
-    streamLength(streamLength)
-  {
+    bitsPerSample(0),
+    sampleFrames(0) {}
 
-  }
-
-  short format;
+  int format;
   int length;
   int bitrate;
   int sampleRate;
   int channels;
-  int sampleWidth;
+  int bitsPerSample;
   uint sampleFrames;
-  uint streamLength;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::Properties::Properties(const ByteVector & /*data*/, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate();
-  read(data);
+  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) : AudioProperties(style)
+RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate(streamLength);
-  read(data);
+  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
+}
+
+TagLib::RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, uint totalSamples, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
+{
+  read(data, streamLength, totalSamples);
 }
 
 RIFF::WAV::Properties::~Properties()
@@ -80,6 +84,16 @@ RIFF::WAV::Properties::~Properties()
 }
 
 int RIFF::WAV::Properties::length() const
+{
+  return lengthInSeconds();
+}
+
+int RIFF::WAV::Properties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int RIFF::WAV::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -99,9 +113,14 @@ int RIFF::WAV::Properties::channels() const
   return d->channels;
 }
 
+int RIFF::WAV::Properties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 int RIFF::WAV::Properties::sampleWidth() const
 {
-  return d->sampleWidth;
+  return bitsPerSample();
 }
 
 TagLib::uint RIFF::WAV::Properties::sampleFrames() const
@@ -109,26 +128,42 @@ TagLib::uint RIFF::WAV::Properties::sampleFrames() const
   return d->sampleFrames;
 }
 
+int RIFF::WAV::Properties::format() const
+{
+  return d->format;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::Properties::read(const ByteVector &data)
+void RIFF::WAV::Properties::read(const ByteVector &data, uint streamLength, uint totalSamples)
 {
   if(data.size() < 16) {
     debug("RIFF::WAV::Properties::read() - \"fmt \" chunk is too short for WAV.");
     return;
   }
 
-  d->format      = data.toShort(0, false);
-  d->channels    = data.toShort(2, false);
-  d->sampleRate  = data.toUInt(4, false);
-  d->sampleWidth = data.toShort(14, false);
+  d->format        = data.toShort(0, false);
+  d->channels      = data.toShort(2, false);
+  d->sampleRate    = data.toUInt(4, false);
+  d->bitsPerSample = data.toShort(14, false);
 
-  const uint byteRate = data.toUInt(8, false);
-  d->bitrate = byteRate * 8 / 1000;
+  if(totalSamples > 0)
+    d->sampleFrames = totalSamples;
+  else if(d->channels > 0 && d->bitsPerSample > 0)
+    d->sampleFrames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
 
-  d->length = byteRate > 0 ? d->streamLength / byteRate : 0;
-  if(d->channels > 0 && d->sampleWidth > 0)
-    d->sampleFrames = d->streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+  }
+  else {
+    const uint byteRate = data.toUInt(8, false);
+    if(byteRate > 0) {
+      d->length  = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
+      d->bitrate = static_cast<int>(byteRate * 8.0 / 1000.0 + 0.5);
+    }
+  }
 }
