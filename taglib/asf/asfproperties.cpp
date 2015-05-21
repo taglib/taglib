@@ -38,6 +38,7 @@ public:
     sampleRate(0),
     channels(0),
     bitsPerSample(0),
+    codec(ASF::Properties::Unknown),
     encrypted(false) {}
 
   int length;
@@ -45,6 +46,9 @@ public:
   int sampleRate;
   int channels;
   int bitsPerSample;
+  ASF::Properties::Codec codec;
+  String codecName;
+  String codecDescription;
   bool encrypted;
 };
 
@@ -98,6 +102,21 @@ int ASF::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
+ASF::Properties::Codec ASF::Properties::codec() const
+{
+  return d->codec;
+}
+
+String ASF::Properties::codecName() const
+{
+  return d->codecName;
+}
+
+String ASF::Properties::codecDescription() const
+{
+  return d->codecDescription;
+}
+
 bool ASF::Properties::isEncrypted() const
 {
   return d->encrypted;
@@ -135,6 +154,38 @@ void ASF::Properties::setChannels(int value)
 void ASF::Properties::setBitsPerSample(int value)
 {
   d->bitsPerSample = value;
+}
+
+void ASF::Properties::setCodec(int value)
+{
+  switch(value)
+  {
+  case 0x0160:
+    d->codec = WMA1;
+    break;
+  case 0x0161:
+    d->codec = WMA2;
+    break;
+  case 0x0162:
+    d->codec = WMA9Pro;
+    break;
+  case 0x0163:
+    d->codec = WMA9Lossless;
+    break;
+  default:
+    d->codec = Unknown;
+    break;
+  }
+}
+
+void ASF::Properties::setCodecName(const String &value)
+{
+  d->codecName = value;
+}
+
+void ASF::Properties::setCodecDescription(const String &value)
+{
+  d->codecDescription = value;
 }
 
 void ASF::Properties::setEncrypted(bool value)

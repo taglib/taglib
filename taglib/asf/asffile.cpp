@@ -58,17 +58,18 @@ public:
 
 namespace
 {
-  static const ByteVector headerGuid("\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
-  static const ByteVector filePropertiesGuid("\xA1\xDC\xAB\x8C\x47\xA9\xCF\x11\x8E\xE4\x00\xC0\x0C\x20\x53\x65", 16);
-  static const ByteVector streamPropertiesGuid("\x91\x07\xDC\xB7\xB7\xA9\xCF\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65", 16);
-  static const ByteVector contentDescriptionGuid("\x33\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
-  static const ByteVector extendedContentDescriptionGuid("\x40\xA4\xD0\xD2\x07\xE3\xD2\x11\x97\xF0\x00\xA0\xC9\x5E\xA8\x50", 16);
-  static const ByteVector headerExtensionGuid("\xb5\x03\xbf_.\xa9\xcf\x11\x8e\xe3\x00\xc0\x0c Se", 16);
-  static const ByteVector metadataGuid("\xEA\xCB\xF8\xC5\xAF[wH\204g\xAA\214D\xFAL\xCA", 16);
-  static const ByteVector metadataLibraryGuid("\224\034#D\230\224\321I\241A\x1d\x13NEpT", 16);
-  static const ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
-  static const ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
-  static const ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
+  const ByteVector headerGuid("\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
+  const ByteVector filePropertiesGuid("\xA1\xDC\xAB\x8C\x47\xA9\xCF\x11\x8E\xE4\x00\xC0\x0C\x20\x53\x65", 16);
+  const ByteVector streamPropertiesGuid("\x91\x07\xDC\xB7\xB7\xA9\xCF\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65", 16);
+  const ByteVector contentDescriptionGuid("\x33\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
+  const ByteVector extendedContentDescriptionGuid("\x40\xA4\xD0\xD2\x07\xE3\xD2\x11\x97\xF0\x00\xA0\xC9\x5E\xA8\x50", 16);
+  const ByteVector headerExtensionGuid("\xb5\x03\xbf_.\xa9\xcf\x11\x8e\xe3\x00\xc0\x0c Se", 16);
+  const ByteVector metadataGuid("\xEA\xCB\xF8\xC5\xAF[wH\204g\xAA\214D\xFAL\xCA", 16);
+  const ByteVector metadataLibraryGuid("\224\034#D\230\224\321I\241A\x1d\x13NEpT", 16);
+  const ByteVector codecListGuid("\x40\x52\xd1\x86\x1d\x31\xd0\x11\xa3\xa4\x00\xa0\xc9\x03\x48\xf6", 16);
+  const ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
+  const ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
+  const ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
 }
 
 class ASF::File::BaseObject
@@ -148,6 +149,13 @@ public:
   ByteVector render(ASF::File *file);
 };
 
+class ASF::File::CodecListObject : public ASF::File::BaseObject
+{
+public:
+  ByteVector guid();
+  void parse(ASF::File *file, uint size);
+};
+
 ASF::File::HeaderExtensionObject::~HeaderExtensionObject()
 {
   for(unsigned int i = 0; i < objects.size(); i++) {
@@ -209,6 +217,7 @@ void ASF::File::StreamPropertiesObject::parse(ASF::File *file, uint size)
     return;
   }
 
+  file->d->properties->setCodec(data.toUShort(54, false));
   file->d->properties->setChannels(data.toUShort(56, false));
   file->d->properties->setSampleRate(data.toUInt(58, false));
   file->d->properties->setBitrate(static_cast<int>(data.toUInt(62, false) * 8.0 / 1000.0 + 0.5));
@@ -377,6 +386,61 @@ ByteVector ASF::File::HeaderExtensionObject::render(ASF::File *file)
   return BaseObject::render(file);
 }
 
+ByteVector ASF::File::CodecListObject::guid()
+{
+  return codecListGuid;
+}
+
+void ASF::File::CodecListObject::parse(ASF::File *file, uint size)
+{
+  BaseObject::parse(file, size);
+  if(data.size() <= 20) {
+    debug("ASF::File::CodecListObject::parse() -- data is too short.");
+    return;
+  }
+
+  uint pos = 16;
+
+  const int count = data.toUInt(pos, false);
+  pos += 4;
+
+  for(int i = 0; i < count; ++i) {
+
+    if(pos >= data.size())
+      break;
+
+    const int type = data.toUShort(pos, false);
+    pos += 2;
+
+    int nameLength = data.toUShort(pos, false);
+    pos += 2;
+
+    const uint namePos = pos;
+    pos += nameLength * 2;
+
+    const int descLength = data.toUShort(pos, false);
+    pos += 2;
+
+    const uint descPos = pos;
+    pos += descLength * 2;
+
+    const int infoLength = data.toUShort(pos, false);
+    pos += 2 + infoLength * 2;
+
+    if(type == 2) {
+      // First audio codec found.
+
+      const String name(data.mid(namePos, nameLength * 2), String::UTF16LE);
+      file->d->properties->setCodecName(name.stripWhiteSpace());
+
+      const String desc(data.mid(descPos, descLength * 2), String::UTF16LE);
+      file->d->properties->setCodecDescription(desc.stripWhiteSpace());
+
+      break;
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
@@ -490,6 +554,9 @@ void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*properties
     }
     else if(guid == headerExtensionGuid) {
       obj = new HeaderExtensionObject();
+    }
+    else if(guid == codecListGuid) {
+      obj = new CodecListObject();
     }
     else {
       if(guid == contentEncryptionGuid ||

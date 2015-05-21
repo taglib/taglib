@@ -15,6 +15,7 @@ class TestASF : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestASF);
   CPPUNIT_TEST(testAudioProperties);
+  CPPUNIT_TEST(testLosslessProperties);
   CPPUNIT_TEST(testRead);
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testSaveStream);
@@ -39,6 +40,26 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(ASF::Properties::WMA2, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("Windows Media Audio 9.1"), f.audioProperties()->codecName());
+    CPPUNIT_ASSERT_EQUAL(String("64 kbps, 48 kHz, stereo 2-pass CBR"), f.audioProperties()->codecDescription());
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+  }
+
+  void testLosslessProperties()
+  {
+    ASF::File f(TEST_FILE_PATH_C("lossless.wma"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3549, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(1152, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(ASF::Properties::WMA9Lossless, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("Windows Media Audio 9.2 Lossless"), f.audioProperties()->codecName());
+    CPPUNIT_ASSERT_EQUAL(String("VBR Quality 100, 44 kHz, 2 channel 16 bit 1-pass VBR"), f.audioProperties()->codecDescription());
     CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
   }
 

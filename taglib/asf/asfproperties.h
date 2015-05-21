@@ -40,7 +40,38 @@ namespace TagLib {
     public:
 
       /*!
-       * Create an instance of ASF::Properties.
+       * Audio codec types can be used in ASF file.
+       */
+      enum Codec
+      {
+        /*!
+         * Couldn't detect the codec.
+         */
+        Unknown = 0,
+
+        /*!
+         * Windows Media Audio 1
+         */
+        WMA1,
+
+        /*!
+         * Windows Media Audio 2 or above
+         */
+        WMA2,
+
+        /*!
+         * Windows Media Audio 9 Professional
+         */
+        WMA9Pro,
+
+        /*!
+         * Windows Media Audio 9 Lossless
+         */
+        WMA9Lossless,
+      };
+
+      /*!
+       * Creates an instance of ASF::Properties.
        */
       Properties();
 
@@ -85,6 +116,7 @@ namespace TagLib {
        * Returns the sample rate in Hz.
        */
       virtual int sampleRate() const;
+
       /*!
        * Returns the number of audio channels.
        */
@@ -94,6 +126,33 @@ namespace TagLib {
        * Returns the number of bits per audio sample.
        */
       int bitsPerSample() const;
+
+      /*!
+       * Returns the codec used in the file.
+       *
+       * \see codecName()
+       * \see codecDescription()
+       */
+      Codec codec() const;
+
+      /*!
+       * Returns the concrete codec name, for example "Windows Media Audio 9.1"
+       * used in the file if available, otherwise an empty string.
+       *
+       * \see codec()
+       * \see codecDescription()
+       */
+      String codecName() const;
+
+      /*!
+       * Returns the codec description, typically contains the encoder settings,
+       * for example "VBR Quality 50, 44kHz, stereo 1-pass VBR" if available,
+       * otherwise an empty string.
+       *
+       * \see codec()
+       * \see codecName()
+       */
+      String codecDescription() const;
 
       /*!
        * Returns whether or not the file is encrypted.
@@ -109,6 +168,9 @@ namespace TagLib {
       void setSampleRate(int value);
       void setChannels(int value);
       void setBitsPerSample(int value);
+      void setCodec(int value);
+      void setCodecName(const String &value);
+      void setCodecDescription(const String &value);
       void setEncrypted(bool value);
 #endif
 

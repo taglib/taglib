@@ -134,6 +134,7 @@ namespace TagLib {
       class ContentDescriptionObject;
       class ExtendedContentDescriptionObject;
       class HeaderExtensionObject;
+      class CodecListObject;
       class MetadataObject;
       class MetadataLibraryObject;
 
