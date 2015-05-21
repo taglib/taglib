@@ -60,17 +60,56 @@ namespace TagLib {
        */
       virtual ~Properties();
 
-      // Reimplementations.
-
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \note This method is just an alias of lengthInSeconds().
+       *
+       * \deprecated
+       */
       virtual int length() const;
+
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \see lengthInMilliseconds()
+       */
+      // BIC: make virtual
+      int lengthInSeconds() const;
+
+      /*!
+       * Returns the length of the file in milliseconds.
+       *
+       * \see lengthInSeconds()
+       */
+      // BIC: make virtual
+      int lengthInMilliseconds() const;
+
+      /*!
+       * Returns the average bit rate of the file in kb/s.
+       */
       virtual int bitrate() const;
+
+      /*!
+       * Returns the sample rate in Hz.
+       */
       virtual int sampleRate() const;
+
+      /*!
+       * Returns the number of audio channels.
+       */
       virtual int channels() const;
 
       /*!
-       * Returns number of bits per sample.
+       * Returns the number of bits per audio sample.
        */
       int bitsPerSample() const;
+
+      /*!
+       * Returns the total number of audio samples in file.
+       */
       uint sampleFrames() const;
 
       /*!
@@ -82,13 +121,13 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read();
+      void read(File *file);
 
-      long findDescriptor();
-      long findID3v2();
+      long findDescriptor(File *file);
+      long findID3v2(File *file);
 
-      void analyzeCurrent();
-      void analyzeOld();
+      void analyzeCurrent(File *file);
+      void analyzeOld(File *file);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;
