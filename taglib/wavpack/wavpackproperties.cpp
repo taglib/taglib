@@ -176,28 +176,25 @@ void WavPack::Properties::read()
 
 unsigned int WavPack::Properties::seekFinalIndex()
 {
-  ByteVector blockID("wvpk", 4);
+  const long offset = d->file->rfind("wvpk", d->streamLength);
+  if(offset == -1)
+    return 0;
 
-  long offset = d->streamLength;
-  while(offset > 0) {
-    offset = d->file->rfind(blockID, offset);
-    if(offset == -1)
-      return 0;
-    d->file->seek(offset);
-    ByteVector data = d->file->readBlock(32);
-    if(data.size() != 32)
-      return 0;
-    const int version = data.toShort(8, false);
-    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
-      continue;
-    const unsigned int flags = data.toUInt(24, false);
-    if(!(flags & FINAL_BLOCK))
-      return 0;
-    const unsigned int blockIndex   = data.toUInt(16, false);
-    const unsigned int blockSamples = data.toUInt(20, false);
-    return blockIndex + blockSamples;
-  }
+  d->file->seek(offset);
+  const ByteVector data = d->file->readBlock(32);
+  if(data.size() < 32)
+    return 0;
 
-  return 0;
+  const int version = data.toShort(8, false);
+  if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
+    return 0;
+
+  const unsigned int flags = data.toUInt(24, false);
+  if(!(flags & FINAL_BLOCK))
+    return 0;
+
+  const unsigned int blockIndex   = data.toUInt(16, false);
+  const unsigned int blockSamples = data.toUInt(20, false);
+
+  return blockIndex + blockSamples;
 }
-

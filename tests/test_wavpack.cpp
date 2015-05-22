@@ -35,6 +35,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(4, props->length());
   }
 
+  void testFuzzedFile()
+  {
+    WavPack::File f(TEST_FILE_PATH_C("infloop.wv"));
+    CPPUNIT_ASSERT(f.isValid());
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestWavPack);
