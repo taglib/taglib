@@ -38,6 +38,7 @@ SET(test_runner_SRCS
   test_bytevectorstream.cpp
   test_string.cpp
   test_propertymap.cpp
+  test_file.cpp
   test_fileref.cpp
   test_id3v1.cpp
   test_id3v2.cpp
