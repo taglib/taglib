@@ -284,9 +284,7 @@ const APE::ItemListMap& APE::Tag::itemListMap() const
 
 void APE::Tag::removeItem(const String &key)
 {
-  Map<const String, Item>::Iterator it = d->itemListMap.find(key.upper());
-  if(it != d->itemListMap.end())
-    d->itemListMap.erase(it);
+  d->itemListMap.erase(key.upper());
 }
 
 void APE::Tag::addValue(const String &key, const String &value, bool replace)

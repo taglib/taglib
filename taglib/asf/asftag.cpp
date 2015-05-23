@@ -172,9 +172,7 @@ bool ASF::Tag::contains(const String &key) const
 
 void ASF::Tag::removeItem(const String &key)
 {
-  AttributeListMap::Iterator it = d->attributeListMap.find(key);
-  if(it != d->attributeListMap.end())
-    d->attributeListMap.erase(it);
+  d->attributeListMap.erase(key);
 }
 
 ASF::AttributeList ASF::Tag::attribute(const String &name) const
