@@ -44,7 +44,17 @@ public:
     extendedContentDescriptionObject(0),
     headerExtensionObject(0),
     metadataObject(0),
-    metadataLibraryObject(0) {}
+    metadataLibraryObject(0)
+  {
+    objects.setAutoDelete(true);
+  }
+
+  ~FilePrivate()
+  {
+    delete tag;
+    delete properties;
+  }
+
   unsigned long long size;
   ASF::Tag *tag;
   ASF::Properties *properties;
@@ -142,17 +152,15 @@ class ASF::File::HeaderExtensionObject : public ASF::File::BaseObject
 {
 public:
   List<ASF::File::BaseObject *> objects;
-  ~HeaderExtensionObject();
+  HeaderExtensionObject();
   ByteVector guid();
   void parse(ASF::File *file, uint size);
   ByteVector render(ASF::File *file);
 };
 
-ASF::File::HeaderExtensionObject::~HeaderExtensionObject()
+ASF::File::HeaderExtensionObject::HeaderExtensionObject()
 {
-  for(unsigned int i = 0; i < objects.size(); i++) {
-    delete objects[i];
-  }
+  objects.setAutoDelete(true);
 }
 
 void ASF::File::BaseObject::parse(ASF::File *file, unsigned int size)
@@ -358,8 +366,8 @@ void ASF::File::HeaderExtensionObject::parse(ASF::File *file, uint /*size*/)
 ByteVector ASF::File::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(unsigned int i = 0; i < objects.size(); i++) {
-    data.append(objects[i]->render(file));
+  for(List<BaseObject *>::ConstIterator it = objects.begin(); it != objects.end(); ++it) {
+    data.append((*it)->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt(data.size(), false) + data;
   return BaseObject::render(file);
@@ -387,15 +395,6 @@ ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle pro
 
 ASF::File::~File()
 {
-  for(unsigned int i = 0; i < d->objects.size(); i++) {
-    delete d->objects[i];
-  }
-  if(d->tag) {
-    delete d->tag;
-  }
-  if(d->properties) {
-    delete d->properties;
-  }
   delete d;
 }
 
@@ -525,18 +524,19 @@ bool ASF::File::save()
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
-  ASF::AttributeListMap::ConstIterator it = d->tag->attributeListMap().begin();
-  for(; it != d->tag->attributeListMap().end(); it++) {
+  ASF::AttributeListMap::ConstIterator it1 = d->tag->attributeListMap().begin();
+  for(; it1 != d->tag->attributeListMap().end(); it1++) {
 
-    const String &name = it->first;
-    const AttributeList &attributes = it->second;
+    const String &name = it1->first;
+    const AttributeList &attributes = it1->second;
 
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(unsigned int j = 0; j < attributes.size(); j++) {
+    AttributeList::ConstIterator it2 = attributes.begin();
+    for(; it2 != attributes.end(); ++it2) {
 
-      const Attribute &attribute = attributes[j];
+      const Attribute &attribute = *it2;
       const bool largeValue = (attribute.dataSize() > 65535);
       const bool guid       = (attribute.type() == Attribute::GuidType);
 
@@ -555,8 +555,8 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(unsigned int i = 0; i < d->objects.size(); i++) {
-    data.append(d->objects[i]->render(this));
+  for(List<BaseObject *>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
+    data.append((*it)->render(this));
   }
 
   data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;

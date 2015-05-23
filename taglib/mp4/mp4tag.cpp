@@ -59,8 +59,8 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms)
     return;
   }
 
-  for(unsigned int i = 0; i < ilst->children.size(); i++) {
-    MP4::Atom *atom = ilst->children[i];
+  for(MP4::AtomList::ConstIterator it = ilst->children.begin(); it != ilst->children.end(); ++it) {
+    MP4::Atom *atom = *it;
     file->seek(atom->offset + 8);
     if(atom->name == "----") {
       parseFreeForm(atom);
@@ -149,8 +149,8 @@ MP4::Tag::parseData(const MP4::Atom *atom, int expectedFlags, bool freeForm)
 {
   AtomDataList data = parseData2(atom, expectedFlags, freeForm);
   ByteVectorList result;
-  for(uint i = 0; i < data.size(); i++) {
-    result.append(data[i].data);
+  for(AtomDataList::ConstIterator it = data.begin(); it != data.end(); ++it) {
+    result.append(it->data);
   }
   return result;
 }
@@ -230,8 +230,8 @@ MP4::Tag::parseText(const MP4::Atom *atom, int expectedFlags)
   ByteVectorList data = parseData(atom, expectedFlags);
   if(data.size()) {
     StringList value;
-    for(unsigned int i = 0; i < data.size(); i++) {
-      value.append(String(data[i], String::UTF8));
+    for(ByteVectorList::ConstIterator it = data.begin(); it != data.end(); ++it) {
+      value.append(String(*it, String::UTF8));
     }
     addItem(atom->name, value);
   }
@@ -242,18 +242,22 @@ MP4::Tag::parseFreeForm(const MP4::Atom *atom)
 {
   AtomDataList data = parseData2(atom, -1, true);
   if(data.size() > 2) {
-    String name = "----:" + String(data[0].data, String::UTF8) + ':' + String(data[1].data, String::UTF8);
-    AtomDataType type = data[2].type;
-    for(uint i = 2; i < data.size(); i++) {
-      if(data[i].type != type) {
+    AtomDataList::ConstIterator it = data.begin();
+    const ByteVector &data0 = (it++)->data;
+    const ByteVector &data1 = (it++)->data;
+    const String name = "----:" + String(data0, String::UTF8) + ':' + String(data1, String::UTF8);
+    const AtomDataType &type = it->type;
+    AtomDataList::ConstIterator begin = it;
+    for(; it != data.end(); ++it) {
+      if(it->type != type) {
         debug("MP4: We currently don't support values with multiple types");
         break;
       }
     }
     if(type == TypeUTF8) {
       StringList value;
-      for(uint i = 2; i < data.size(); i++) {
-        value.append(String(data[i].data, String::UTF8));
+      for(it = begin; it != data.end(); ++it) {
+        value.append(String(it->data, String::UTF8));
       }
       Item item(value);
       item.setAtomDataType(type);
@@ -261,8 +265,8 @@ MP4::Tag::parseFreeForm(const MP4::Atom *atom)
     }
     else {
       ByteVectorList value;
-      for(uint i = 2; i < data.size(); i++) {
-        value.append(data[i].data);
+      for(it = begin; it != data.end(); ++it) {
+        value.append(it->data);
       }
       Item item(value);
       item.setAtomDataType(type);
@@ -323,8 +327,8 @@ ByteVector
 MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data) const
 {
   ByteVector result;
-  for(unsigned int i = 0; i < data.size(); i++) {
-    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + data[i]));
+  for(ByteVectorList::ConstIterator it = data.begin(); it != data.end(); ++it) {
+    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + *it));
   }
   return renderAtom(name, result);
 }
@@ -395,8 +399,8 @@ MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags) c
 {
   ByteVectorList data;
   StringList value = item.toStringList();
-  for(unsigned int i = 0; i < value.size(); i++) {
-    data.append(value[i].data(String::UTF8));
+  for(StringList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+    data.append(it->data(String::UTF8));
   }
   return renderData(name, flags, data);
 }
@@ -406,9 +410,9 @@ MP4::Tag::renderCovr(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVector data;
   MP4::CoverArtList value = item.toCoverArtList();
-  for(unsigned int i = 0; i < value.size(); i++) {
-    data.append(renderAtom("data", ByteVector::fromUInt(value[i].format()) +
-                                   ByteVector(4, '\0') + value[i].data()));
+  for(MP4::CoverArtList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+    data.append(renderAtom("data", ByteVector::fromUInt(it->format()) +
+                                   ByteVector(4, '\0') + it->data()));
   }
   return renderAtom(name, data);
 }
@@ -417,7 +421,7 @@ ByteVector
 MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
 {
   StringList header = StringList::split(name, ":");
-  if (header.size() != 3) {
+  if(header.size() != 3) {
     debug("MP4: Invalid free-form item name \"" + name + "\"");
     return ByteVector::null;
   }
@@ -435,14 +439,14 @@ MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
   }
   if(type == TypeUTF8) {
     StringList value = item.toStringList();
-    for(unsigned int i = 0; i < value.size(); i++) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + value[i].data(String::UTF8)));
+    for(StringList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + it->data(String::UTF8)));
     }
   }
   else {
     ByteVectorList value = item.toByteVectorList();
-    for(unsigned int i = 0; i < value.size(); i++) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + value[i]));
+    for(ByteVectorList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + *it));
     }
   }
   return renderAtom("----", data);
@@ -505,20 +509,23 @@ MP4::Tag::save()
 void
 MP4::Tag::updateParents(const AtomList &path, long delta, int ignore)
 {
-  for(unsigned int i = 0; i < path.size() - ignore; i++) {
-    d->file->seek(path[i]->offset);
+  MP4::AtomList::ConstIterator end = path.end();
+  std::advance(end, -ignore);
+
+  for(MP4::AtomList::ConstIterator it = path.begin(); it != end; ++it) {
+    d->file->seek((*it)->offset);
     long size = d->file->readBlock(4).toUInt();
     // 64-bit
     if (size == 1) {
       d->file->seek(4, File::Current); // Skip name
       long long longSize = d->file->readBlock(8).toLongLong();
       // Seek the offset of the 64-bit size
-      d->file->seek(path[i]->offset + 8);
+      d->file->seek((*it)->offset + 8);
       d->file->writeBlock(ByteVector::fromLongLong(longSize + delta));
     }
     // 32-bit
     else {
-      d->file->seek(path[i]->offset);
+      d->file->seek((*it)->offset);
       d->file->writeBlock(ByteVector::fromUInt(size + delta));
     }
   }
@@ -530,8 +537,8 @@ MP4::Tag::updateOffsets(long delta, long offset)
   MP4::Atom *moov = d->atoms->find("moov");
   if(moov) {
     MP4::AtomList stco = moov->findall("stco", true);
-    for(unsigned int i = 0; i < stco.size(); i++) {
-      MP4::Atom *atom = stco[i];
+    for(MP4::AtomList::ConstIterator it = stco.begin(); it != stco.end(); ++it) {
+      MP4::Atom *atom = *it;
       if(atom->offset > offset) {
         atom->offset += delta;
       }
@@ -551,8 +558,8 @@ MP4::Tag::updateOffsets(long delta, long offset)
     }
 
     MP4::AtomList co64 = moov->findall("co64", true);
-    for(unsigned int i = 0; i < co64.size(); i++) {
-      MP4::Atom *atom = co64[i];
+    for(MP4::AtomList::ConstIterator it = co64.begin(); it != co64.end(); ++it) {
+      MP4::Atom *atom = *it;
       if(atom->offset > offset) {
         atom->offset += delta;
       }
@@ -575,8 +582,8 @@ MP4::Tag::updateOffsets(long delta, long offset)
   MP4::Atom *moof = d->atoms->find("moof");
   if(moof) {
     MP4::AtomList tfhd = moof->findall("tfhd", true);
-    for(unsigned int i = 0; i < tfhd.size(); i++) {
-      MP4::Atom *atom = tfhd[i];
+    for(MP4::AtomList::ConstIterator it = tfhd.begin(); it != tfhd.end(); ++it) {
+      MP4::Atom *atom = *it;
       if(atom->offset > offset) {
         atom->offset += delta;
       }
