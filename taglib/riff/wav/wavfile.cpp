@@ -217,10 +217,22 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
         }
       }
     }
-    else if(name == "fmt " && readProperties)
-      formatData = chunkData(i);
-    else if(name == "data" && readProperties)
-      streamLength = chunkDataSize(i);
+    else if(name == "fmt " && readProperties) {
+      if(formatData.isEmpty()) {
+        formatData = chunkData(i);
+      }
+      else {
+        debug("RIFF::WAV::File::read() - Duplicate 'fmt ' chunk found.");
+      }
+    }
+    else if(name == "data" && readProperties) {
+      if(streamLength == 0) {
+        streamLength = chunkDataSize(i);
+      }
+      else {
+        debug("RIFF::WAV::File::read() - Duplicate 'data' chunk found.");
+      }
+    }
   }
 
   if(!d->tag[ID3v2Index])

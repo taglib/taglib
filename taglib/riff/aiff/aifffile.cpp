@@ -150,8 +150,14 @@ void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertie
         debug("RIFF::AIFF::File::read() - Duplicate ID3v2 tag found.");
       }
     }
-    else if(name == "COMM" && readProperties)
-      formatData = chunkData(i);
+    else if(name == "COMM" && readProperties) {
+      if(formatData.isEmpty()) {
+        formatData = chunkData(i);
+      }
+      else {
+        debug("RIFF::AIFF::File::read() - Duplicate 'COMM' chunk found.");
+      }
+    }
   }
 
   if(!d->tag)
