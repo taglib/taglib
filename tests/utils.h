@@ -32,6 +32,7 @@ inline string copyFile(const string &filename, const string &ext)
 #ifdef _WIN32
   GetTempPathA(sizeof(testFileName), testFileName);
   GetTempFileNameA(testFileName, "tag", 0, testFileName);
+  DeleteFileA(testFileName);
   strcat(testFileName, ext.c_str());
 #else
   snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
