@@ -132,6 +132,8 @@ namespace TagLib {
 
         void read(bool readProperties, Properties::ReadStyle propertiesStyle);
 
+        friend class Properties;
+
         class FilePrivate;
         FilePrivate *d;
       };

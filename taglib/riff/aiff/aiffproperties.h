@@ -49,8 +49,16 @@ namespace TagLib {
         /*!
          * Create an instance of AIFF::Properties with the data read from the
          * ByteVector \a data.
+         *
+         * \deprecated
          */
         Properties(const ByteVector &data, ReadStyle style);
+
+        /*!
+         * Create an instance of AIFF::Properties with the data read from the
+         * AIFF::File \a file.
+         */
+        Properties(File *file, ReadStyle style);
 
         /*!
          * Destroys this AIFF::Properties instance.
@@ -146,7 +154,7 @@ namespace TagLib {
         Properties(const Properties &);
         Properties &operator=(const Properties &);
 
-        void read(const ByteVector &data);
+        void read(File *file);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

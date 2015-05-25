@@ -25,6 +25,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include "aifffile.h"
 #include "aiffproperties.h"
 
 using namespace TagLib;
@@ -56,11 +57,18 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &data, ReadStyle style) :
+RIFF::AIFF::Properties::Properties(const ByteVector & /*data*/, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
-  read(data);
+  debug("RIFF::AIFF::Properties::Properties() - This constructor is no longer used.");
+}
+
+RIFF::AIFF::Properties::Properties(File *file, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
+{
+  read(file);
 }
 
 RIFF::AIFF::Properties::~Properties()
@@ -127,14 +135,38 @@ String RIFF::AIFF::Properties::compressionName() const
 {
   return d->compressionName;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::Properties::read(const ByteVector &data)
+void RIFF::AIFF::Properties::read(File *file)
 {
+  ByteVector data;
+  uint streamLength = 0;
+  for(uint i = 0; i < file->chunkCount(); i++) {
+    const ByteVector name = file->chunkName(i);
+    if(name == "COMM") {
+      if(data.isEmpty())
+        data = file->chunkData(i);
+      else
+        debug("RIFF::AIFF::Properties::read() - Duplicate 'COMM' chunk found.");
+    }
+    else if(name == "SSND") {
+      if(streamLength == 0)
+        streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
+      else
+        debug("RIFF::AIFF::Properties::read() - Duplicate 'SSND' chunk found.");
+    }
+  }
+
   if(data.size() < 18) {
-    debug("RIFF::AIFF::Properties::read() - \"COMM\" chunk is too short for AIFF.");
+    debug("RIFF::AIFF::Properties::read() - 'COMM' chunk not found or too short.");
+    return;
+  }
+
+  if(streamLength == 0) {
+    debug("RIFF::AIFF::Properties::read() - 'SSND' chunk not found.");
     return;
   }
 
@@ -143,10 +175,13 @@ void RIFF::AIFF::Properties::read(const ByteVector &data)
   d->bitsPerSample = data.toShort(6U);
 
   const long double sampleRate = data.toFloat80BE(8);
-  if(sampleRate >= 1.0) {
+  if(sampleRate >= 1.0)
     d->sampleRate = static_cast<int>(sampleRate + 0.5);
-    d->bitrate    = static_cast<int>(sampleRate * d->bitsPerSample * d->channels / 1000.0 + 0.5);
-    d->length     = static_cast<int>(d->sampleFrames * 1000.0 / sampleRate + 0.5);
+
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
 
   if(data.size() >= 23) {
