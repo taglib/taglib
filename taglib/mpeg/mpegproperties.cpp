@@ -29,8 +29,6 @@
 #include "mpegproperties.h"
 #include "mpegfile.h"
 #include "xingheader.h"
-#include "id3v2tag.h"
-#include "id3v2header.h"
 #include "apetag.h"
 #include "apefooter.h"
 
@@ -203,13 +201,10 @@ void MPEG::Properties::read(File *file)
 
     d->bitrate = firstHeader.bitrate();
 
-    long long streamLength = file->length();
+    long streamLength = file->length() - first;
 
     if(file->hasID3v1Tag())
       streamLength -= 128;
-
-    if(file->hasID3v2Tag())
-      streamLength -= file->ID3v2Tag()->header()->completeTagSize();
 
     if(file->hasAPETag())
       streamLength -= file->APETag()->footer()->completeTagSize();
