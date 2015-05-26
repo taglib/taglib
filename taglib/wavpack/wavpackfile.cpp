@@ -272,8 +272,19 @@ void WavPack::File::read(bool readProperties, Properties::ReadStyle /* propertie
 
   // Look for WavPack audio properties
 
-  if(readProperties)
-    d->properties = new Properties(this, length() - d->APESize);
+  if(readProperties) {
+
+    long streamLength;
+
+    if(d->hasAPE)
+      streamLength = d->APELocation;
+    else if(d->hasID3v1)
+      streamLength = d->ID3v1Location;
+    else
+      streamLength = length();
+
+    d->properties = new Properties(this, streamLength);
+  }
 }
 
 long WavPack::File::findAPE()
