@@ -33,6 +33,8 @@
 #include "id3v2tag.h"
 #include "apeproperties.h"
 #include "apefile.h"
+#include "apetag.h"
+#include "apefooter.h"
 
 using namespace TagLib;
 
@@ -149,10 +151,18 @@ void APE::Properties::read(File *file)
   else
     analyzeOld(file);
 
+  long streamLength = file->length() - offset;
+
+  if(file->hasID3v1Tag())
+    streamLength -= 128;
+
+  if(file->hasAPETag())
+    streamLength -= file->APETag()->footer()->completeTagSize();
+
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const double length = d->sampleFrames * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
 }
 
