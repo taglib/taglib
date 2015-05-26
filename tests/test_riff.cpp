@@ -1,8 +1,8 @@
 #include <string>
 #include <stdio.h>
-#include <tag.h>
-#include <tbytevectorlist.h>
-#include <rifffile.h>
+#include "tag.h"
+#include "tbytevectorlist.h"
+#include "rifffile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -12,25 +12,65 @@ using namespace TagLib;
 class PublicRIFF : public RIFF::File
 {
 public:
-  PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
-  TagLib::uint riffSize() { return RIFF::File::riffSize(); };
-  TagLib::uint chunkCount() { return RIFF::File::chunkCount(); };
-  TagLib::uint chunkOffset(TagLib::uint i) { return RIFF::File::chunkOffset(i); };
-  TagLib::uint chunkPadding(TagLib::uint i) { return RIFF::File::chunkPadding(i); };
-  TagLib::uint chunkDataSize(TagLib::uint i) { return RIFF::File::chunkDataSize(i); };
-  ByteVector chunkName(TagLib::uint i) { return RIFF::File::chunkName(i); };
-  ByteVector chunkData(TagLib::uint i) { return RIFF::File::chunkData(i); };
-  void setChunkData(uint i, const ByteVector &data) {
+  PublicRIFF(FileName file) : RIFF::File(file, BigEndian)
+  {
+  };
+  TagLib::uint riffSize()
+  {
+    return RIFF::File::riffSize();
+  };
+  TagLib::uint chunkCount()
+  {
+    return RIFF::File::chunkCount();
+  };
+  TagLib::uint chunkOffset(TagLib::uint i)
+  {
+    return RIFF::File::chunkOffset(i);
+  };
+  TagLib::uint chunkPadding(TagLib::uint i)
+  {
+    return RIFF::File::chunkPadding(i);
+  };
+  TagLib::uint chunkDataSize(TagLib::uint i)
+  {
+    return RIFF::File::chunkDataSize(i);
+  };
+  ByteVector chunkName(TagLib::uint i)
+  {
+    return RIFF::File::chunkName(i);
+  };
+  ByteVector chunkData(TagLib::uint i)
+  {
+    return RIFF::File::chunkData(i);
+  };
+  void setChunkData(TagLib::uint i, const ByteVector &data) {
     RIFF::File::setChunkData(i, data);
   }
-  void setChunkData(const ByteVector &name, const ByteVector &data) {
+  void setChunkData(const ByteVector &name, const ByteVector &data)
+  {
     RIFF::File::setChunkData(name, data);
   };
-  virtual TagLib::Tag* tag() const { return 0; };
-  virtual TagLib::AudioProperties* audioProperties() const { return 0;};
-  virtual bool save() { return false; };
-  void removeChunk(uint i) { RIFF::File::removeChunk(i); }
-  void removeChunk(const ByteVector &name) { RIFF::File::removeChunk(name); }
+  virtual TagLib::Tag* tag() const
+  {
+    return 0;
+  };
+  virtual TagLib::AudioProperties* audioProperties() const
+  {
+    return 0;
+  };
+  virtual bool save()
+  {
+    return false;
+  };
+  void removeChunk(TagLib::uint i)
+  {
+    RIFF::File::removeChunk(i);
+  }
+  void removeChunk(const ByteVector &name)
+  {
+    RIFF::File::removeChunk(name);
+  }
+
 };
 
 class TestRIFF : public CppUnit::TestFixture
@@ -261,3 +301,4 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestRIFF);
+

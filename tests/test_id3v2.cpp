@@ -1,28 +1,28 @@
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <string>
 #include <stdio.h>
-#include <id3v2tag.h>
-#include <mpegfile.h>
-#include <id3v2frame.h>
-#include <uniquefileidentifierframe.h>
-#include <textidentificationframe.h>
-#include <attachedpictureframe.h>
-#include <unsynchronizedlyricsframe.h>
-#include <synchronizedlyricsframe.h>
-#include <eventtimingcodesframe.h>
-#include <generalencapsulatedobjectframe.h>
-#include <relativevolumeframe.h>
-#include <popularimeterframe.h>
-#include <urllinkframe.h>
-#include <ownershipframe.h>
-#include <unknownframe.h>
-#include <chapterframe.h>
-#include <tableofcontentsframe.h>
-#include <tdebug.h>
-#include <tpropertymap.h>
+#include "id3v2tag.h"
+#include "mpegfile.h"
+#include "id3v2frame.h"
+#include "uniquefileidentifierframe.h"
+#include "textidentificationframe.h"
+#include "attachedpictureframe.h"
+#include "unsynchronizedlyricsframe.h"
+#include "synchronizedlyricsframe.h"
+#include "eventtimingcodesframe.h"
+#include "generalencapsulatedobjectframe.h"
+#include "relativevolumeframe.h"
+#include "popularimeterframe.h"
+#include "urllinkframe.h"
+#include "ownershipframe.h"
+#include "unknownframe.h"
+#include "chapterframe.h"
+#include "tableofcontentsframe.h"
+#include "tdebug.h"
+#include "tpropertymap.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -33,12 +33,22 @@ class PublicFrame : public ID3v2::Frame
 {
   public:
     PublicFrame() : ID3v2::Frame(ByteVector("XXXX\0\0\0\0\0\0", 10)) {}
-    String readStringField(const ByteVector &data, String::Type encoding,
-                           int *positon = 0)
-      { return ID3v2::Frame::readStringField(data, encoding, positon); }
-    virtual String toString() const { return String::null; }
-    virtual void parseFields(const ByteVector &) {}
-    virtual ByteVector renderFields() const { return ByteVector::null; }
+    String readStringField(const ByteVector &data, String::Type encoding, int *positon = 0)
+    {
+      return ID3v2::Frame::readStringField(data, encoding, positon);
+    }
+    virtual String toString() const
+    {
+      return String::null;
+    }
+    virtual void parseFields(const ByteVector &)
+    {
+    }
+    virtual ByteVector renderFields() const
+    {
+      return ByteVector::null;
+    }
+
 };
 
 class TestID3v2 : public CppUnit::TestFixture
@@ -296,8 +306,7 @@ public:
     f.setEmail("email@example.com");
     f.setRating(2);
     f.setCounter(3);
-    CPPUNIT_ASSERT_EQUAL(
-      String("email@example.com rating=2 counter=3"), f.toString());
+    CPPUNIT_ASSERT_EQUAL(String("email@example.com rating=2 counter=3"), f.toString());
   }
 
   void testPOPMFromFile()
@@ -351,10 +360,8 @@ public:
                  "\x00\x00"             // Frame flags
                  "owner\x00"            // Owner identifier
                  "\x00\x01\x02", 19));  // Identifier
-    CPPUNIT_ASSERT_EQUAL(String("owner"),
-                         f.owner());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x00\x01\x02", 3),
-                         f.identifier());
+    CPPUNIT_ASSERT_EQUAL(String("owner"), f.owner());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x00\x01\x02", 3), f.identifier());
   }
 
   void testParseEmptyUniqueFileIdentifierFrame()
@@ -365,10 +372,8 @@ public:
                  "\x00\x00"             // Frame flags
                  "\x00"                 // Owner identifier
                  "", 11));              // Identifier
-    CPPUNIT_ASSERT_EQUAL(String(),
-                         f.owner());
-    CPPUNIT_ASSERT_EQUAL(ByteVector(),
-                         f.identifier());
+    CPPUNIT_ASSERT_EQUAL(String(), f.owner());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(), f.identifier());
   }
 
   void testParseUrlLinkFrame()
@@ -876,7 +881,6 @@ public:
       foo.tag()->setArtist("Artist");
       foo.save(MPEG::File::ID3v1 | MPEG::File::ID3v2);
     }
-
     {
       MPEG::File bar(newname.c_str());
       bar.ID3v2Tag()->removeFrames("TPE1");
@@ -911,20 +915,20 @@ public:
     ID3v2::ChapterFrame f1(&header, chapterData);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f1.elementID());
-    CPPUNIT_ASSERT((uint)0x03 == f1.startTime());
-    CPPUNIT_ASSERT((uint)0x05 == f1.endTime());
-    CPPUNIT_ASSERT((uint)0x02 == f1.startOffset());
-    CPPUNIT_ASSERT((uint)0x03 == f1.endOffset());
-    CPPUNIT_ASSERT((uint)0x00 == f1.embeddedFrameList().size());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f1.startTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x05 == f1.endTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x02 == f1.startOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f1.endOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x00 == f1.embeddedFrameList().size());
 
     ID3v2::ChapterFrame f2(&header, chapterData + embeddedFrameData);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f2.elementID());
-    CPPUNIT_ASSERT((uint)0x03 == f2.startTime());
-    CPPUNIT_ASSERT((uint)0x05 == f2.endTime());
-    CPPUNIT_ASSERT((uint)0x02 == f2.startOffset());
-    CPPUNIT_ASSERT((uint)0x03 == f2.endOffset());
-    CPPUNIT_ASSERT((uint)0x01 == f2.embeddedFrameList().size());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f2.startTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x05 == f2.endTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x02 == f2.startOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f2.endOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x01 == f2.embeddedFrameList().size());
     CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2")[0]->toString() == "CH1");
   }
@@ -1017,10 +1021,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("T"), f.elementID());
     CPPUNIT_ASSERT(!f.isTopLevel());
     CPPUNIT_ASSERT(f.isOrdered());
-    CPPUNIT_ASSERT((uint)0x02 == f.entryCount());
+    CPPUNIT_ASSERT((TagLib::uint)0x02 == f.entryCount());
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f.childElements()[0]);
     CPPUNIT_ASSERT_EQUAL(ByteVector("D"), f.childElements()[1]);
-    CPPUNIT_ASSERT((uint)0x01 == f.embeddedFrameList().size());
+    CPPUNIT_ASSERT((TagLib::uint)0x01 == f.embeddedFrameList().size());
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2")[0]->toString() == "TC1");
   }
@@ -1074,7 +1078,6 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.length() > 100 * 1024);
     }
-
     {
       MPEG::File f(newname.c_str());
       CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
@@ -1106,7 +1109,6 @@ public:
 
       f.save();
     }
-
     {
       MPEG::File f(newname.c_str());
       CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
@@ -1120,3 +1122,4 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v2);
+
