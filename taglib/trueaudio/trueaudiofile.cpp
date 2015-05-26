@@ -246,7 +246,6 @@ bool TrueAudio::File::hasID3v2Tag() const
   return d->hasID3v2;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -284,16 +283,23 @@ void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propert
   // Look for TrueAudio metadata
 
   if(readProperties) {
-    if(d->ID3v2Location >= 0) {
+
+    long streamLength;
+
+    if(d->hasID3v1)
+      streamLength = d->ID3v1Location;
+    else
+      streamLength = length();
+
+    if(d->hasID3v2) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      d->properties = new Properties(readBlock(TrueAudio::HeaderSize),
-                                     length() - d->ID3v2OriginalSize);
+      streamLength -= (d->ID3v2Location + d->ID3v2OriginalSize);
     }
     else {
       seek(0);
-      d->properties = new Properties(readBlock(TrueAudio::HeaderSize),
-                                     length());
     }
+
+    d->properties = new Properties(readBlock(TrueAudio::HeaderSize), streamLength);
   }
 }
 
