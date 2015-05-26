@@ -178,10 +178,12 @@ void MPEG::Properties::read(File *file)
 
   file->seek(first + 4);
   d->xingHeader = new XingHeader(file->readBlock(firstHeader.frameLength() - 4));
+  if(!d->xingHeader->isValid()) {
+    delete d->xingHeader;
+    d->xingHeader = 0;
+  }
 
-  if(d->xingHeader->isValid() &&
-     firstHeader.samplesPerFrame() > 0 &&
-     firstHeader.sampleRate() > 0) {
+  if(d->xingHeader && firstHeader.samplesPerFrame() > 0 && firstHeader.sampleRate() > 0) {
 
     // Read the length and the bitrate from the VBR header.
 

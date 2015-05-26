@@ -79,7 +79,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader()->isValid());
+    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
 
     long last = f.lastFrameOffset();
 
