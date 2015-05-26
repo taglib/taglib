@@ -213,16 +213,16 @@ MP4::Properties::read(File *file, Atoms *atoms)
           pos += 3;
         }
         pos += 10;
-        d->bitrate = (data.toUInt(pos) + 500) / 1000;
+        d->bitrate = static_cast<int>((data.toUInt(pos) + 500) / 1000.0 + 0.5);
       }
     }
   }
   else if(data.mid(20, 4) == "alac") {
-    if (atom->length == 88 && data.mid(56, 4) == "alac") {
+    if(atom->length == 88 && data.mid(56, 4) == "alac") {
       d->codec         = ALAC;
       d->bitsPerSample = data.at(69);
       d->channels      = data.at(73);
-      d->bitrate       = data.toUInt(80U) / 1000;
+      d->bitrate       = static_cast<int>(data.toUInt(80U) / 1000.0 + 0.5);
       d->sampleRate    = data.toUInt(84U);
     }
   }
