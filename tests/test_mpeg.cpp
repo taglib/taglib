@@ -18,6 +18,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v23);
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile);
+  CPPUNIT_TEST(testFrameOffset);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -109,6 +110,28 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("excessive_alloc.mp3"));
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testFrameOffset()
+  {
+    {
+      MPEG::File f(TEST_FILE_PATH_C("ape.mp3"));
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL((long)0x0000, f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL((long)0x1FD6, f.lastFrameOffset());
+    }
+    {
+      MPEG::File f(TEST_FILE_PATH_C("ape-id3v1.mp3"));
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL((long)0x0000, f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL((long)0x1FD6, f.lastFrameOffset());
+    }
+    {
+      MPEG::File f(TEST_FILE_PATH_C("ape-id3v2.mp3"));
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL((long)0x041A, f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL((long)0x23F0, f.lastFrameOffset());
+    }
   }
 
 };

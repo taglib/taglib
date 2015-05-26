@@ -433,7 +433,7 @@ long MPEG::File::firstFrameOffset()
 {
   long position = 0;
 
-  if(ID3v2Tag()) {
+  if(hasID3v2Tag()) {
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
 
     // Skip duplicate ID3v2 tags.
@@ -456,7 +456,7 @@ long MPEG::File::firstFrameOffset()
 
 long MPEG::File::lastFrameOffset()
 {
-  return previousFrameOffset(ID3v1Tag() ? d->ID3v1Location - 1 : length());
+  return previousFrameOffset(hasID3v1Tag() ? d->ID3v1Location - 1 : length());
 }
 
 bool MPEG::File::hasID3v1Tag() const
