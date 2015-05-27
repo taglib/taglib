@@ -911,20 +911,20 @@ public:
     ID3v2::ChapterFrame f1(&header, chapterData);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f1.elementID());
-    CPPUNIT_ASSERT((uint)0x03 == f1.startTime());
-    CPPUNIT_ASSERT((uint)0x05 == f1.endTime());
-    CPPUNIT_ASSERT((uint)0x02 == f1.startOffset());
-    CPPUNIT_ASSERT((uint)0x03 == f1.endOffset());
-    CPPUNIT_ASSERT((uint)0x00 == f1.embeddedFrameList().size());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f1.startTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x05 == f1.endTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x02 == f1.startOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f1.endOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x00 == f1.embeddedFrameList().size());
 
     ID3v2::ChapterFrame f2(&header, chapterData + embeddedFrameData);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f2.elementID());
-    CPPUNIT_ASSERT((uint)0x03 == f2.startTime());
-    CPPUNIT_ASSERT((uint)0x05 == f2.endTime());
-    CPPUNIT_ASSERT((uint)0x02 == f2.startOffset());
-    CPPUNIT_ASSERT((uint)0x03 == f2.endOffset());
-    CPPUNIT_ASSERT((uint)0x01 == f2.embeddedFrameList().size());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f2.startTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x05 == f2.endTime());
+    CPPUNIT_ASSERT((TagLib::uint)0x02 == f2.startOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x03 == f2.endOffset());
+    CPPUNIT_ASSERT((TagLib::uint)0x01 == f2.embeddedFrameList().size());
     CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2")[0]->toString() == "CH1");
   }
@@ -1017,10 +1017,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("T"), f.elementID());
     CPPUNIT_ASSERT(!f.isTopLevel());
     CPPUNIT_ASSERT(f.isOrdered());
-    CPPUNIT_ASSERT((uint)0x02 == f.entryCount());
+    CPPUNIT_ASSERT((TagLib::uint)0x02 == f.entryCount());
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f.childElements()[0]);
     CPPUNIT_ASSERT_EQUAL(ByteVector("D"), f.childElements()[1]);
-    CPPUNIT_ASSERT((uint)0x01 == f.embeddedFrameList().size());
+    CPPUNIT_ASSERT((TagLib::uint)0x01 == f.embeddedFrameList().size());
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2")[0]->toString() == "TC1");
   }
@@ -1120,3 +1120,4 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v2);
+

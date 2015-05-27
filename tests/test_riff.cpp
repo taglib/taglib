@@ -20,7 +20,7 @@ public:
   TagLib::uint chunkDataSize(TagLib::uint i) { return RIFF::File::chunkDataSize(i); };
   ByteVector chunkName(TagLib::uint i) { return RIFF::File::chunkName(i); };
   ByteVector chunkData(TagLib::uint i) { return RIFF::File::chunkData(i); };
-  void setChunkData(uint i, const ByteVector &data) {
+  void setChunkData(TagLib::uint i, const ByteVector &data) {
     RIFF::File::setChunkData(i, data);
   }
   void setChunkData(const ByteVector &name, const ByteVector &data) {
@@ -29,7 +29,7 @@ public:
   virtual TagLib::Tag* tag() const { return 0; };
   virtual TagLib::AudioProperties* audioProperties() const { return 0;};
   virtual bool save() { return false; };
-  void removeChunk(uint i) { RIFF::File::removeChunk(i); }
+  void removeChunk(TagLib::uint i) { RIFF::File::removeChunk(i); }
   void removeChunk(const ByteVector &name) { RIFF::File::removeChunk(name); }
 };
 
@@ -261,3 +261,4 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestRIFF);
+
