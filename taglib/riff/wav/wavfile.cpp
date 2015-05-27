@@ -191,10 +191,7 @@ bool RIFF::WAV::File::hasInfoTag() const
 
 void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
-  ByteVector formatData;
-  uint streamLength = 0;
-  uint totalSamples = 0;
-  for(uint i = 0; i < chunkCount(); i++) {
+  for(uint i = 0; i < chunkCount(); ++i) {
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag[ID3v2Index]) {
@@ -218,26 +215,6 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
         }
       }
     }
-    else if(readProperties) {
-      if(name == "fmt ") {
-        if(formatData.isEmpty())
-          formatData = chunkData(i);
-        else
-          debug("RIFF::WAV::File::read() - Duplicate 'fmt ' chunk found.");
-      }
-      else if(name == "data") {
-        if(streamLength == 0)
-          streamLength = chunkDataSize(i) + chunkPadding(i);
-        else
-          debug("RIFF::WAV::File::read() - Duplicate 'data' chunk found.");
-      }
-      else if(name == "fact") {
-        if(totalSamples == 0)
-          totalSamples = chunkData(i).toUInt(0, false);
-        else
-          debug("RIFF::WAV::File::read() - Duplicate 'fact' chunk found.");
-      }
-    }
   }
 
   if(!d->tag[ID3v2Index])
@@ -246,8 +223,8 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
   if(!d->tag[InfoIndex])
     d->tag.set(InfoIndex, new RIFF::Info::Tag);
 
-  if(!formatData.isEmpty())
-    d->properties = new Properties(formatData, streamLength, totalSamples, propertiesStyle);
+  if(readProperties)
+    d->properties = new Properties(this, propertiesStyle);
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)

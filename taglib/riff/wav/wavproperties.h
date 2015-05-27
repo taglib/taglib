@@ -67,12 +67,9 @@ namespace TagLib {
 
         /*!
          * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data and the length calculated using \a streamLength
-         * and \a totalSamples.
-         *
-         * \note totalSamples can be zero if the file doesn't have a 'fact' chunk.
+         * WAV::File \a file.
          */
-        Properties(const ByteVector &data, uint streamLength, uint totalSamples, ReadStyle style);
+        Properties(File *file, ReadStyle style);
 
         /*!
          * Destroys this WAV::Properties instance.
@@ -144,7 +141,7 @@ namespace TagLib {
          * Returns the format ID of the file.
          * 0 for unknown, 1 for PCM, 2 for ADPCM, 3 for 32/64-bit IEEE754, and so forth.
          *
-         * \note For further information, refer to \a mmreg.h in Windows Media SDK.
+         * \note For further information, refer to RFC 2361.
          */
         int format() const;
 
@@ -152,7 +149,7 @@ namespace TagLib {
         Properties(const Properties &);
         Properties &operator=(const Properties &);
 
-        void read(const ByteVector &data, uint streamLength, uint totalSamples);
+        void read(File *file);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

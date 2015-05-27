@@ -23,12 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "wavproperties.h"
-
-#include <tstring.h>
 #include <tdebug.h>
-#include <cmath>
-#include <math.h>
+#include "wavfile.h"
+#include "wavproperties.h"
 
 using namespace TagLib;
 
@@ -64,18 +61,18 @@ RIFF::WAV::Properties::Properties(const ByteVector & /*data*/, ReadStyle style) 
   debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, ReadStyle style) :
+RIFF::WAV::Properties::Properties(const ByteVector & /*data*/, uint /*streamLength*/, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
   debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
 }
 
-TagLib::RIFF::WAV::Properties::Properties(const ByteVector &data, uint streamLength, uint totalSamples, ReadStyle style) :
+TagLib::RIFF::WAV::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
-  read(data, streamLength, totalSamples);
+  read(file);
 }
 
 RIFF::WAV::Properties::~Properties()
@@ -137,14 +134,50 @@ int RIFF::WAV::Properties::format() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::Properties::read(const ByteVector &data, uint streamLength, uint totalSamples)
+void RIFF::WAV::Properties::read(File *file)
 {
+  ByteVector data;
+  uint streamLength = 0;
+  uint totalSamples = 0;
+
+  for(uint i = 0; i < file->chunkCount(); ++i) {
+    const ByteVector name = file->chunkName(i);
+    if(name == "fmt ") {
+      if(data.isEmpty())
+        data = file->chunkData(i);
+      else
+        debug("RIFF::WAV::Properties::read() - Duplicate 'fmt ' chunk found.");
+    }
+    else if(name == "data") {
+      if(streamLength == 0)
+        streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
+      else
+        debug("RIFF::WAV::Properties::read() - Duplicate 'data' chunk found.");
+    }
+    else if(name == "fact") {
+      if(totalSamples == 0)
+        totalSamples = file->chunkData(i).toUInt(0, false);
+      else
+        debug("RIFF::WAV::Properties::read() - Duplicate 'fact' chunk found.");
+    }
+  }
+
   if(data.size() < 16) {
-    debug("RIFF::WAV::Properties::read() - \"fmt \" chunk is too short for WAV.");
+    debug("RIFF::WAV::Properties::read() - 'fmt ' chunk not found or too short.");
     return;
   }
 
-  d->format        = data.toShort(0, false);
+  if(streamLength == 0) {
+    debug("RIFF::WAV::Properties::read() - 'data' chunk not found.");
+    return;
+  }
+
+  d->format = data.toShort(0, false);
+  if(d->format != 1 && totalSamples == 0) {
+    debug("RIFF::WAV::Properties::read() - Non-PCM format, but 'fact' chunk not found.");
+    return;
+  }
+
   d->channels      = data.toShort(2, false);
   d->sampleRate    = data.toUInt(4, false);
   d->bitsPerSample = data.toShort(14, false);

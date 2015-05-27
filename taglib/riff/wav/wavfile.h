@@ -179,6 +179,8 @@ namespace TagLib {
          */
         uint findInfoTagChunk();
 
+        friend class Properties;
+
         class FilePrivate;
         FilePrivate *d;
       };
