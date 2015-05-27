@@ -148,7 +148,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
     }
     file->seek(hdlr->offset);
     data = file->readBlock(hdlr->length);
-    if(data.mid(16, 4) == "soun") {
+    if(data.containsAt("soun", 16)) {
       break;
     }
     trak = 0;
@@ -196,20 +196,20 @@ MP4::Properties::read(File *file, Atoms *atoms)
 
   file->seek(atom->offset);
   data = file->readBlock(atom->length);
-  if(data.mid(20, 4) == "mp4a") {
+  if(data.containsAt("mp4a", 20)) {
     d->codec         = AAC;
     d->channels      = data.toShort(40U);
     d->bitsPerSample = data.toShort(42U);
     d->sampleRate    = data.toUInt(46U);
-    if(data.mid(56, 4) == "esds" && data[64] == 0x03) {
+    if(data.containsAt("esds", 56) && data[64] == 0x03) {
       uint pos = 65;
-      if(data.mid(pos, 3) == "\x80\x80\x80") {
+      if(data.containsAt("\x80\x80\x80", pos)) {
         pos += 3;
       }
       pos += 4;
       if(data[pos] == 0x04) {
         pos += 1;
-        if(data.mid(pos, 3) == "\x80\x80\x80") {
+        if(data.containsAt("\x80\x80\x80", pos)) {
           pos += 3;
         }
         pos += 10;
@@ -217,8 +217,8 @@ MP4::Properties::read(File *file, Atoms *atoms)
       }
     }
   }
-  else if(data.mid(20, 4) == "alac") {
-    if(atom->length == 88 && data.mid(56, 4) == "alac") {
+  else if(data.containsAt("alac", 20)) {
+    if(atom->length == 88 && data.containsAt("alac", 56)) {
       d->codec         = ALAC;
       d->bitsPerSample = data.at(69);
       d->channels      = data.at(73);
