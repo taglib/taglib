@@ -110,6 +110,6 @@ namespace TagLib {
  * \related TagLib::StringList
  * Send the StringList to an output stream.
  */
-std::ostream &operator<<(std::ostream &s, const TagLib::StringList &l);
+TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::StringList &l);
 
 #endif
