@@ -32,7 +32,7 @@ namespace TagLib {
 
     class File;
 
-    class AudioProperties : public TagLib::AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
       friend class File;
 

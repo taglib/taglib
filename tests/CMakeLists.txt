@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
@@ -29,7 +29,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ebml/matroska
 )
 
-SET(test_runner_SRCS
+set(test_runner_SRCS
   main.cpp
   test_list.cpp
   test_map.cpp
@@ -72,11 +72,32 @@ SET(test_runner_SRCS
   test_matroska.cpp
 )
 
-INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
+include_directories(${CPPUNIT_INCLUDE_DIR})
 
-ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
-TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
+add_executable(test_runner ${test_runner_SRCS})
+target_link_libraries(test_runner tag ${CPPUNIT_LIBRARIES})
 
-ADD_TEST(test_runner test_runner)
-ADD_CUSTOM_TARGET(check COMMAND ${CMAKE_CTEST_COMMAND} -V
-                  DEPENDS test_runner)
+if(WIN32 AND BUILD_SHARED_LIBS)
+  get_target_property(dll_location tag LOCATION)
+  get_filename_component(dll_location "${dll_location}" PATH)
+
+#  file(TO_NATIVE_PATH ... ...)
+#    leaves it with forward slashes on native windows with MinGW ?
+# So we do it the old fashion way ...
+  string(REPLACE "/" "\\" dll_location "${dll_location}")
+
+  set(varname "PATH")
+  set(pathvar "${dll_location};$ENV{PATH}")
+  # Protect Windows semi-colon seperated path environment variable
+  string(REPLACE ";" "\;" pathvar "${pathvar}")
+  unset(dll_location)
+endif()
+
+add_test(test_runner test_runner)
+
+if(WIN32 AND BUILD_SHARED_LIBS)
+  set_tests_properties(test_runner PROPERTIES ENVIRONMENT "${varname}=${pathvar}")
+endif()
+
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test_runner)
+
