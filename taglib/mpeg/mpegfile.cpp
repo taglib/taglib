@@ -433,23 +433,8 @@ long MPEG::File::firstFrameOffset()
 {
   long position = 0;
 
-  if(hasID3v2Tag()) {
+  if(hasID3v2Tag())
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
-
-    // Skip duplicate ID3v2 tags.
-
-    // Workaround for some faulty files that have duplicate ID3v2 tags.
-    // Combination of EAC and LAME creates such files when configured incorrectly.
-
-    long location;
-    while((location = findID3v2(position)) >= 0) {
-      seek(location);
-      const ID3v2::Header header(readBlock(ID3v2::Header::size()));
-      position = location + header.completeTagSize();
-
-      debug("MPEG::File::firstFrameOffset() - Duplicate ID3v2 tag found.");
-    }
-  }
 
   return nextFrameOffset(position);
 }
@@ -528,7 +513,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 long MPEG::File::findID3v2(long offset)
 {
   // This method is based on the contents of TagLib::File::find(), but because
-  // of some subtlteies -- specifically the need to look for the bit pattern of
+  // of some subtleties -- specifically the need to look for the bit pattern of
   // an MPEG sync, it has been modified for use here.
 
   if(isValid() && ID3v2::Header::fileIdentifier().size() <= bufferSize()) {

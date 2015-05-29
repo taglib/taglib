@@ -16,7 +16,6 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v24);
   CPPUNIT_TEST(testSaveID3v24WrongParam);
   CPPUNIT_TEST(testSaveID3v23);
-  CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testFrameOffset);
   CPPUNIT_TEST_SUITE_END();
@@ -93,17 +92,6 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
       CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
     }
-  }
-
-  void testDuplicateID3v2()
-  {
-    MPEG::File f(TEST_FILE_PATH_C("duplicate_id3v2.mp3"));
-
-    // duplicate_id3v2.mp3 has duplicate ID3v2 tags.
-    // Sample rate will be 32000 if can't skip the second tag.
-
-    CPPUNIT_ASSERT(f.hasID3v2Tag());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
   }
 
   void testFuzzedFile()
