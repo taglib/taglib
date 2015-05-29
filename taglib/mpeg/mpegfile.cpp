@@ -448,30 +448,24 @@ long MPEG::File::firstFrameOffset()
 {
   long position = 0;
 
-  if(hasID3v2Tag()) {
-    position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
-
-    // Skip duplicate ID3v2 tags.
-
-    // Workaround for some faulty files that have duplicate ID3v2 tags.
-    // Combination of EAC and LAME creates such files when configured incorrectly.
-
-    long location;
-    while((location = findID3v2(position)) >= 0) {
-      seek(location);
-      const ID3v2::Header header(readBlock(ID3v2::Header::size()));
-      position = location + header.completeTagSize();
-
-      debug("MPEG::File::firstFrameOffset() - Duplicate ID3v2 tag found.");
-    }
-  }
+  if(d->hasID3v2)
+    position = d->ID3v2Location + d->ID3v2OriginalSize;
 
   return nextFrameOffset(position);
 }
 
 long MPEG::File::lastFrameOffset()
 {
-  return previousFrameOffset(hasID3v1Tag() ? d->ID3v1Location - 1 : length());
+  long position;
+
+  if(d->hasAPE)
+    position = d->APELocation - 1;
+  else if(d->hasID3v1)
+    position = d->ID3v1Location - 1;
+  else
+    position = length();
+
+  return previousFrameOffset(position);
 }
 
 bool MPEG::File::hasID3v1Tag() const

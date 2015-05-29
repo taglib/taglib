@@ -616,13 +616,14 @@ ByteVector ID3v2::Tag::render(int version) const
     // Padding won't increase beyond 1% of the file size.
 
     if(paddingSize > DefaultPaddingSize) {
-      const uint threshold = d->file->length() / 100; // should be ulonglong in taglib2.
-      if(paddingSize > threshold)
+      const ulong threshold = d->file->length() / 100; // should be ulonglong in taglib2.
+      if(paddingSize > threshold) {
         paddingSize = DefaultPaddingSize;
+      }
     }
   }
 
-  tagData.append(ByteVector(paddingSize, '\0'));
+  tagData.resize(tagData.size() + paddingSize, '\0');
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
@@ -663,6 +664,24 @@ void ID3v2::Tag::read()
       return;
 
     parse(d->file->readBlock(d->header.tagSize()));
+
+    // Take duplicate ID3v2 tags into the first one as padding.
+
+    // Workaround for some faulty files that have duplicate ID3v2 tags.
+    // As far as we recognize, the combination of Exact Audio Copy and LAME
+    // creates such files when configured incorrectly.
+
+    while(true) {
+      d->file->seek(d->tagOffset + d->header.completeTagSize());
+      const ByteVector nextHeaderData = d->file->readBlock(ID3v2::Header::size());
+      if(!nextHeaderData.startsWith(ID3v2::Header::fileIdentifier()))
+        break;
+
+      const ID3v2::Header nextHeader(nextHeaderData);
+      d->header.setTagSize(d->header.tagSize() + nextHeader.completeTagSize());
+
+      debug("ID3v2::Tag::read() - Duplicate ID3v2 tag found.");
+    }
   }
 }
 

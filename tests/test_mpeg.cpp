@@ -25,6 +25,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v2Twice);
   CPPUNIT_TEST(testSaveAPETwice);
   CPPUNIT_TEST(testSaveTagCombination);
+  CPPUNIT_TEST(testSaveDuplicateTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -328,6 +329,49 @@ public:
     {
       MPEG::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+    }
+  }
+
+  void testSaveDuplicateTags()
+  {
+    ScopedFileCopy copy1("duplicate_id3v2", ".mp3");
+
+    {
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, false);
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, false);
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, false);
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+    }
+
+    {
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3887, f.length());
+      CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
