@@ -160,7 +160,7 @@ namespace TagLib
       va_list args;
       va_start(args, format);
 
-      char buf[BufferSize];
+      char buf[BufferSize] = {};
       int length;
 
 #if defined(HAVE_SNPRINTF)

@@ -27,7 +27,7 @@ inline string testFilePath(const string &filename)
 
 inline string copyFile(const string &filename, const string &ext)
 {
-  char testFileName[1024];
+  char testFileName[1024] = {};
 
 #ifdef _WIN32
   GetTempPathA(sizeof(testFileName), testFileName);
