@@ -197,33 +197,21 @@ bool FLAC::File::save()
 
   // Replace metadata blocks
 
-  bool foundVorbisCommentBlock = false;
-  List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    MetadataBlock *block = d->blocks[i];
-    if(block->code() == MetadataBlock::VorbisComment) {
-      // Set the new Vorbis Comment block
-      delete block;
-      block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
-      foundVorbisCommentBlock = true;
+  for(List<MetadataBlock *>::Iterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    if((*it)->code() == MetadataBlock::VorbisComment) {
+      delete *it;
+      d->blocks.erase(it);
+      break;
     }
-    if(block->code() == MetadataBlock::Padding) {
-      delete block;
-      continue;
-    }
-    newBlocks.append(block);
   }
-  if(!foundVorbisCommentBlock) {
-    newBlocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
-    foundVorbisCommentBlock = true;
-  }
-  d->blocks = newBlocks;
+
+  d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
 
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(uint i = 0; i < newBlocks.size(); i++) {
-    FLAC::MetadataBlock *block = newBlocks[i];
+  for(List<MetadataBlock *>::ConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    FLAC::MetadataBlock *block = *it;
     ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
     blockHeader[0] = block->code();
@@ -428,37 +416,29 @@ void FLAC::File::scan()
       return;
     }
 
-    MetadataBlock *block = 0;
-
     // Found the vorbis-comment
     if(blockType == MetadataBlock::VorbisComment) {
       if(!d->hasXiphComment) {
         d->xiphCommentData = data;
-        d->hasXiphComment = true;
+        d->hasXiphComment  = true;
+        d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, data));
       }
       else {
-        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, using the first one");
+        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, discarding");
       }
     }
     else if(blockType == MetadataBlock::Picture) {
       FLAC::Picture *picture = new FLAC::Picture();
       if(picture->parse(data)) {
-        block = picture;
+        d->blocks.append(picture);
       }
       else {
-        debug("FLAC::File::scan() -- invalid picture found, discarting");
+        debug("FLAC::File::scan() -- invalid picture found, discarding");
         delete picture;
       }
     }
-
-    if(!block) {
-      block = new UnknownMetadataBlock(blockType, data);
-    }
-    if(block->code() != MetadataBlock::Padding) {
-      d->blocks.append(block);
-    }
-    else {
-      delete block;
+    else if(blockType != MetadataBlock::Padding) {
+      d->blocks.append(new UnknownMetadataBlock(blockType, data));
     }
 
     nextBlockOffset += length + 4;
