@@ -179,6 +179,14 @@ namespace TagLib {
          */
         uint findInfoTagChunk();
 
+        /*!
+         * Removes the chunk \a that its name is "LIST" and list type is "INFO".
+         *
+         * \warning This will update the file immediately.
+         * \warning This removes all the chunks that meet the condition.
+         */
+        void removeInfoTagChunk();
+
         class FilePrivate;
         FilePrivate *d;
       };

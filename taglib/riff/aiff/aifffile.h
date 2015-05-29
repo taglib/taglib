@@ -120,6 +120,14 @@ namespace TagLib {
         virtual bool save();
 
         /*!
+         * Saves the file.
+         *
+         * The \a id3v2Version parameter specifies the version of the saved
+         * ID3v2 tag. It can be either 4 or 3.
+         */
+        bool save(int id3v2Version);
+
+        /*!
          * Returns whether or not the file on disk actually has an ID3v2 tag.
          *
          * \see ID3v2Tag()
