@@ -19,8 +19,8 @@
  *   MA  02110-1301  USA                                                   *
  ***************************************************************************/
 
-#ifndef PROPERTYMAP_H_
-#define PROPERTYMAP_H_
+#ifndef TAGLIB_PROPERTYMAP_H_
+#define TAGLIB_PROPERTYMAP_H_
 
 #include "tmap.h"
 #include "tstringlist.h"
@@ -230,4 +230,4 @@ namespace TagLib {
   };
 
 }
-#endif /* PROPERTYMAP_H_ */
+#endif /* TAGLIB_PROPERTYMAP_H_ */
