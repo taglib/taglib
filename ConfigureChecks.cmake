@@ -9,6 +9,7 @@ include(TestBigEndian)
 include(TestFloatFormat)
 
 # Check if the size of numeric types are suitable.
+
 check_type_size("short" SIZEOF_SHORT)
 if(NOT ${SIZEOF_SHORT} EQUAL 2)
   message(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
@@ -40,6 +41,7 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
 endif()
 
 # Determine the CPU byte order.
+
 test_big_endian(IS_BIG_ENDIAN)
 
 if(NOT IS_BIG_ENDIAN)
@@ -49,6 +51,7 @@ else()
 endif()
 
 # Check if the format of floating point types are suitable.
+
 test_float_format(FP_IEEE754)
 if(${FP_IEEE754} EQUAL 1)
   set(FLOAT_BYTEORDER 1)
@@ -59,6 +62,7 @@ else()
 endif()
 
 # Determine which kind of atomic operations your compiler supports.
+
 check_cxx_source_compiles("
   #include <atomic>
   int main() {
@@ -202,6 +206,7 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
 endif()
 
 # Determine whether your compiler supports some safer version of sprintf.
+
 check_cxx_source_compiles("
   #include <cstdio>
   int main() {
@@ -223,6 +228,7 @@ if(NOT HAVE_SNPRINTF)
 endif()
 
 # Check for libz using the cmake supplied FindZLIB.cmake
+
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
   if(ZLIB_FOUND)
