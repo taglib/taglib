@@ -750,7 +750,7 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data.resize(length);
 
-  if(length >  0) {
+  if(length > 0) {
     const size_t len = UTF8toUTF16(s, length, &d->data[0], d->data.size());
     d->data.resize(len);
   }
@@ -782,7 +782,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
         d->data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
     }
     else {
-      ::memcpy(&d->data[0], s, length * sizeof(wchar_t));
+      ::wmemcpy(&d->data[0], s, length);
     }
   }
 }
