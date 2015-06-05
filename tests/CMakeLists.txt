@@ -65,6 +65,7 @@ SET(test_runner_SRCS
   test_xm.cpp
   test_mpc.cpp
   test_opus.cpp
+  test_acid.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

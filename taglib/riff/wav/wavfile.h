@@ -30,6 +30,7 @@
 #include "id3v2tag.h"
 #include "infotag.h"
 #include "wavproperties.h"
+#include "acidinfo.h"
 
 namespace TagLib {
 
@@ -97,8 +98,8 @@ namespace TagLib {
 
         /*!
          * Returns the ID3v2 Tag for this file.
-         * 
-         * \note This method does not return all the tags for this file for 
+         *
+         * \note This method does not return all the tags for this file for
          * backward compatibility.  Will be fixed in TagLib 2.0.
          */
         ID3v2::Tag *tag() const;
@@ -106,8 +107,8 @@ namespace TagLib {
         /*!
          * Returns the ID3v2 Tag for this file.
          *
-         * \note This always returns a valid pointer regardless of whether or not 
-         * the file on disk has an ID3v2 tag.  Use hasID3v2Tag() to check if the 
+         * \note This always returns a valid pointer regardless of whether or not
+         * the file on disk has an ID3v2 tag.  Use hasID3v2Tag() to check if the
          * file on disk actually has an ID3v2 tag.
          *
          * \see hasID3v2Tag()
@@ -117,13 +118,18 @@ namespace TagLib {
         /*!
          * Returns the RIFF INFO Tag for this file.
          *
-         * \note This always returns a valid pointer regardless of whether or not 
-         * the file on disk has a RIFF INFO tag.  Use hasInfoTag() to check if the 
+         * \note This always returns a valid pointer regardless of whether or not
+         * the file on disk has a RIFF INFO tag.  Use hasInfoTag() to check if the
          * file on disk actually has a RIFF INFO tag.
          *
          * \see hasInfoTag()
          */
         Info::Tag *InfoTag() const;
+
+        /*!
+         * Returns the Acid loop information for this file
+         */
+        AcidInfo *acidInfo() const;
 
         /*!
          * Implements the unified property interface -- export function.
@@ -151,7 +157,7 @@ namespace TagLib {
         virtual bool save();
 
         bool save(TagTypes tags, bool stripOthers = true, int id3v2Version = 4);
-        
+
         /*!
          * Returns whether or not the file on disk actually has an ID3v2 tag.
          *
@@ -187,3 +193,4 @@ namespace TagLib {
 }
 
 #endif
+
