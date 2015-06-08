@@ -51,6 +51,11 @@ namespace TagLib {
        */
       virtual ~File();
 
+      /*!
+       * Returns whether or not \a name is valid as a chunk name.
+       */
+      static bool isValidChunkName(const ByteVector &name);
+
     protected:
 
       enum Endianness { BigEndian, LittleEndian };

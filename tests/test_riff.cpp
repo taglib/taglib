@@ -41,6 +41,7 @@ class TestRIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testLastChunkAtEvenPosition2);
   CPPUNIT_TEST(testLastChunkAtEvenPosition3);
   CPPUNIT_TEST(testChunkOffset);
+  CPPUNIT_TEST(testChunkName);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -258,6 +259,14 @@ public:
     delete f;
   }
 
+  void testChunkName()
+  {
+    CPPUNIT_ASSERT(RIFF::File::isValidChunkName("WAVE"));
+    CPPUNIT_ASSERT(RIFF::File::isValidChunkName("SND "));
+    CPPUNIT_ASSERT(!RIFF::File::isValidChunkName("WWAVE"));
+    CPPUNIT_ASSERT(!RIFF::File::isValidChunkName("XY\x83Z"));
+    CPPUNIT_ASSERT(!RIFF::File::isValidChunkName("SND\r"));
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestRIFF);
