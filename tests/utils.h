@@ -36,7 +36,7 @@ inline string copyFile(const string &filename, const string &ext)
   strcat(testFileName, ext.c_str());
 #else
   snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
-  mkstemps(testFileName, 6);
+  static_cast<void>(mkstemps(testFileName, 6));
 #endif
 
   string sourceFileName = testFilePath(filename) + ext;
