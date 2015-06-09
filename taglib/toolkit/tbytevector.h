@@ -144,7 +144,7 @@ namespace TagLib {
 
     /*!
      * Searches the char for \a c starting at \a offset and returns
-     * the offset.  Returns \a npos if the pattern was not found.  If \a byteAlign is
+     * the offset.  Returns \a -1 if the pattern was not found.  If \a byteAlign is
      * specified the pattern will only be matched if it starts on a byte divisible
      * by \a byteAlign (starting from \a offset).
      */

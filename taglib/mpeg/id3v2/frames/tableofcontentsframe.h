@@ -74,7 +74,7 @@ namespace TagLib {
       ByteVector elementID() const;
 
       /*!
-       * Returns true, if the frame is top-level (doen't have
+       * Returns true, if the frame is top-level (doesn't have
        * any parent CTOC frame).
        *
        * \see setIsTopLevel()
@@ -90,7 +90,7 @@ namespace TagLib {
       bool isOrdered() const;
 
       /*!
-       * Returns count of child elements of the frame. It allways
+       * Returns count of child elements of the frame. It always
        * corresponds to size of child elements list.
        *
        * \see childElements()
@@ -113,7 +113,7 @@ namespace TagLib {
       void setElementID(const ByteVector &eID);
 
       /*!
-       * Sets, if the frame is top-level (doen't have
+       * Sets, if the frame is top-level (doesn't have
        * any parent CTOC frame).
        *
        * \see isTopLevel()

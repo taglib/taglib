@@ -55,7 +55,7 @@ namespace TagLib {
       /*!
        * Creates a chapter frame with the element ID \a elementID, start time
        * \a startTime, end time \a endTime, start offset \a startOffset,
-       * end offset \a endOffset and optionally a list of embeeded frames,
+       * end offset \a endOffset and optionally a list of embedded frames,
        * whose ownership will then be taken over by this Frame, in
        * \a embeededFrames;
        *
@@ -81,14 +81,14 @@ namespace TagLib {
       ByteVector elementID() const;
 
       /*!
-       * Returns time of chapter's start (in miliseconds).
+       * Returns time of chapter's start (in milliseconds).
        *
        * \see setStartTime()
        */
       uint startTime() const;
 
       /*!
-       * Returns time of chapter's end (in miliseconds).
+       * Returns time of chapter's end (in milliseconds).
        *
        * \see setEndTime()
        */
@@ -121,14 +121,14 @@ namespace TagLib {
       void setElementID(const ByteVector &eID);
 
       /*!
-       * Sets time of chapter's start (in miliseconds) to \a sT.
+       * Sets time of chapter's start (in milliseconds) to \a sT.
        *
        * \see startTime()
        */
       void setStartTime(const uint &sT);
 
       /*!
-       * Sets time of chapter's end (in miliseconds) to \a eT.
+       * Sets time of chapter's end (in milliseconds) to \a eT.
        *
        * \see endTime()
        */

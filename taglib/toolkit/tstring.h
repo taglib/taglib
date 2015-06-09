@@ -355,7 +355,7 @@ namespace TagLib {
     /*!
      * Convert the string to an integer.
      *
-     * If the conversion was successfull, it sets the value of \a *ok to
+     * If the conversion was successful, it sets the value of \a *ok to
      * true and returns the integer. Otherwise it sets \a *ok to false
      * and the result is undefined.
      */
@@ -495,7 +495,7 @@ namespace TagLib {
 
     /*!
      * To be able to use this class in a Map, this operator needed to be
-     * implemented.  Returns true if \a s is less than this string in a bytewise
+     * implemented.  Returns true if \a s is less than this string in a byte-wise
      * comparison.
      */
     bool operator<(const String &s) const;
