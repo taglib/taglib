@@ -105,7 +105,7 @@ namespace TagLib {
        * Returns the default text encoding for text frames.  If setTextEncoding()
        * has not been explicitly called this will only be used for new text
        * frames.  However, if this value has been set explicitly all frames will be
-       * converted to this type (unless it's explitly set differently for the
+       * converted to this type (unless it's explicitly set differently for the
        * individual frame) when being rendered.
        *
        * \see setDefaultTextEncoding()
