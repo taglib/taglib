@@ -61,7 +61,7 @@ namespace TagLib
 
       return boost::endian::endian_reverse(x);
 
-#elif defined(HAVE_GCC_BYTESWAP_16)
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap16(x);
 
@@ -94,7 +94,7 @@ namespace TagLib
 
       return boost::endian::endian_reverse(x);
 
-#elif defined(HAVE_GCC_BYTESWAP_32)
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap32(x);
 
@@ -130,7 +130,7 @@ namespace TagLib
 
       return boost::endian::endian_reverse(x);
 
-#elif defined(HAVE_GCC_BYTESWAP_64)
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap64(x);
 
