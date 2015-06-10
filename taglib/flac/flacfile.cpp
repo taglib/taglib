@@ -46,6 +46,7 @@ namespace
 {
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
   enum { MinPaddingLength = 4096 };
+  enum { MaxBlockLength = 16777216 };
   enum { LastBlockFlag = 0x80 };
 }
 
@@ -211,24 +212,39 @@ bool FLAC::File::save()
 
   ByteVector data;
   for(List<MetadataBlock *>::ConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
-    FLAC::MetadataBlock *block = *it;
-    ByteVector blockData = block->render();
+    const ByteVector blockData = (*it)->render();
+    if(blockData.size() > MaxBlockLength) {
+      debug("FLAC::File::save() -- Too huge metadata block. Cannot save.");
+      return false;
+    }
+
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    blockHeader[0] = (*it)->code();
     data.append(blockHeader);
     data.append(blockData);
   }
 
-  // Adjust the padding block(s)
+  // Adjust the padding block(s). Should be calculated in offset_t in taglib2.
 
   long originalLength = d->streamStart - d->flacStart;
-  int paddingLength = originalLength - data.size() - 4;
-  if (paddingLength < 0) {
+  long paddingLength  = originalLength - data.size() - 4;
+  if(paddingLength < 0) {
     paddingLength = MinPaddingLength;
   }
+  else {
+    // Padding won't increase beyond 1% of the file size or 2^24 bytes.
+
+    long threshold = MinPaddingLength;
+    threshold = std::max<long>(threshold, length() / 100);
+    threshold = std::min<long>(threshold, MaxBlockLength);
+    if(paddingLength > threshold) {
+      paddingLength = MinPaddingLength;
+    }
+  }
+
   ByteVector padding = ByteVector::fromUInt(paddingLength);
-  padding.resize(paddingLength + 4);
-  padding[0] = (char)(FLAC::MetadataBlock::Padding | LastBlockFlag);
+  padding.resize(static_cast<uint>(paddingLength + 4));
+  padding[0] = static_cast<char>(FLAC::MetadataBlock::Padding | LastBlockFlag);
   data.append(padding);
 
   // Write the data to the file

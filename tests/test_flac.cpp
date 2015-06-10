@@ -27,6 +27,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
   CPPUNIT_TEST(testInvalid);
+  CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST(testSaveXiphTwice);
   CPPUNIT_TEST(testSaveID3v1Twice);
   CPPUNIT_TEST(testSaveID3v2Twice);
@@ -123,6 +124,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
     CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
     CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+
+    newpic = new FLAC::Picture();
+    newpic->setType(FLAC::Picture::Artist);
+    newpic->setWidth(5);
+    newpic->setHeight(6);
+    newpic->setColorDepth(16);
+    newpic->setNumColors(7);
+    newpic->setMimeType("image/jpeg");
+    newpic->setDescription("new image");
+    newpic->setData(ByteVector(16777216, '\x55'));
+    f->addPicture(newpic);
+    CPPUNIT_ASSERT(!f->save());
     delete f;
   }
 
@@ -258,6 +271,26 @@ public:
     PropertyMap invalid = f.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), invalid.size());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.properties().size());
+  }
+
+  void testShrinkPadding()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    string newname = copy.fileName();
+
+    {
+      FLAC::File f(newname.c_str());
+      f.addPicture(new FLAC::Picture(ByteVector(1000 * 1024, '\xff')));
+      f.save();
+      CPPUNIT_ASSERT(f.length() > 1000 * 1024);
+    }
+
+    {
+      FLAC::File f(newname.c_str());
+      f.removePictures();
+      f.save();
+      CPPUNIT_ASSERT(f.length() < 100 * 1024);
+    }
   }
 
   void testSaveXiphTwice()
