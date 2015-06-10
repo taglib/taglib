@@ -3,6 +3,7 @@
 #include <tstring.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
+#include <apetag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -19,6 +20,8 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testFrameOffset);
+  CPPUNIT_TEST(testSaveID3v2Twice);
+  CPPUNIT_TEST(testSaveAPETwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -134,6 +137,39 @@ public:
     }
   }
 
+  void testSaveID3v2Twice()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    {
+      MPEG::File f(newname.c_str());
+      f.ID3v2Tag()->setTitle(String(ByteVector(8192, 'X'), String::Latin1));
+      f.save(MPEG::File::AllTags, true, 4);
+      f.save(MPEG::File::AllTags, true, 4);
+    }
+    {
+      MPEG::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL((long)17573, f.length());
+    }
+  }
+
+  void testSaveAPETwice()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    string newname = copy.fileName();
+
+    {
+      MPEG::File f(newname.c_str());
+      f.APETag(true)->setTitle(String(ByteVector(8192, 'X'), String::Latin1));
+      f.save(MPEG::File::AllTags, true, 4);
+      f.save(MPEG::File::AllTags, true, 4);
+    }
+    {
+      MPEG::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL((long)16478, f.length());
+    }
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMPEG);

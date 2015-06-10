@@ -232,7 +232,7 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
         d->ID3v2Location = 0;
 
       insert(ID3v2Tag()->render(id3v2Version), d->ID3v2Location, d->ID3v2OriginalSize);
-
+      d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
       d->hasID3v2 = true;
 
       // v1 tag location has changed, update if it exists
