@@ -45,7 +45,8 @@ using namespace TagLib;
 namespace
 {
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
-  enum { MinPaddingLength = 4096, MaxPaddingLength = 16777216 };
+  enum { MinPaddingLength = 4096 };
+  enum { MaxBlockLength = 16777216 };
   enum { LastBlockFlag = 0x80 };
 }
 
@@ -211,10 +212,14 @@ bool FLAC::File::save()
 
   ByteVector data;
   for(List<MetadataBlock *>::ConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
-    FLAC::MetadataBlock *block = *it;
-    ByteVector blockData = block->render();
+    const ByteVector blockData = (*it)->render();
+    if(blockData.size() > MaxBlockLength) {
+      debug("FLAC::File::save() -- Too huge metadata block. Cannot save.");
+      return false;
+    }
+
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    blockHeader[0] = (*it)->code();
     data.append(blockHeader);
     data.append(blockData);
   }
@@ -231,7 +236,7 @@ bool FLAC::File::save()
 
     long threshold = MinPaddingLength;
     threshold = std::max<long>(threshold, length() / 100);
-    threshold = std::min<long>(threshold, MaxPaddingLength);
+    threshold = std::min<long>(threshold, MaxBlockLength);
     if(paddingLength > threshold) {
       paddingLength = MinPaddingLength;
     }

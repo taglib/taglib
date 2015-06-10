@@ -119,6 +119,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
     CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
     CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+
+    newpic = new FLAC::Picture();
+    newpic->setType(FLAC::Picture::Artist);
+    newpic->setWidth(5);
+    newpic->setHeight(6);
+    newpic->setColorDepth(16);
+    newpic->setNumColors(7);
+    newpic->setMimeType("image/jpeg");
+    newpic->setDescription("new image");
+    newpic->setData(ByteVector(16777216, '\x55'));
+    f->addPicture(newpic);
+    CPPUNIT_ASSERT(!f->save());
     delete f;
   }
 
