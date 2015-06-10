@@ -93,6 +93,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderTableOfContentsFrame);
   CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST(testEmptyFrame);
+  CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1114,6 +1115,43 @@ public:
       ID3v2::Tag *tag = f.ID3v2Tag();
       CPPUNIT_ASSERT_EQUAL(String("Title"), tag->title());
       CPPUNIT_ASSERT_EQUAL(true, tag->frameListMap()["WOAF"].isEmpty());
+    }
+  }
+
+  void testDuplicateTags()
+  {
+    ScopedFileCopy copy("duplicate_id3v2", ".mp3");
+    string newname = copy.fileName();
+
+    ByteVector audioStream;
+
+    {
+      MPEG::File f(newname.c_str());
+
+      // duplicate_id3v2.mp3 has duplicate ID3v2 tags.
+      // Sample rate will be 32000 if can't skip the second tag.
+
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((TagLib::uint)8049, f.ID3v2Tag()->header()->completeTagSize());
+
+      f.seek(f.ID3v2Tag()->header()->completeTagSize());
+      audioStream = f.readBlock(1024);
+
+      CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+
+      f.ID3v2Tag()->setArtist("Artist A");
+      f.save(MPEG::File::ID3v2, true);
+    }
+    {
+      MPEG::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((TagLib::uint)1505, f.ID3v2Tag()->header()->completeTagSize());
+
+      f.seek(f.ID3v2Tag()->header()->completeTagSize());
+      CPPUNIT_ASSERT_EQUAL(f.readBlock(1024), audioStream);
+
+      CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+      CPPUNIT_ASSERT_EQUAL(String("Artist A"), f.ID3v2Tag()->artist());
     }
   }
 
