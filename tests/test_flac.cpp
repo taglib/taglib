@@ -25,6 +25,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
   CPPUNIT_TEST(testInvalid);
+  CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -253,6 +254,26 @@ public:
     PropertyMap invalid = f.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), invalid.size());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.properties().size());
+  }
+
+  void testShrinkPadding()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    string newname = copy.fileName();
+
+    {
+      FLAC::File f(newname.c_str());
+      f.addPicture(new FLAC::Picture(ByteVector(1000 * 1024, '\xff')));
+      f.save();
+      CPPUNIT_ASSERT(f.length() > 1000 * 1024);
+    }
+
+    {
+      FLAC::File f(newname.c_str());
+      f.removePictures();
+      f.save();
+      CPPUNIT_ASSERT(f.length() < 100 * 1024);
+    }
   }
 
 };

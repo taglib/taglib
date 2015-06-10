@@ -45,7 +45,7 @@ using namespace TagLib;
 namespace
 {
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
-  enum { MinPaddingLength = 4096 };
+  enum { MinPaddingLength = 4096, MaxPaddingLength = 16777216 };
   enum { LastBlockFlag = 0x80 };
 }
 
@@ -219,16 +219,27 @@ bool FLAC::File::save()
     data.append(blockData);
   }
 
-  // Adjust the padding block(s)
+  // Adjust the padding block(s). Should be calculated in offset_t in taglib2.
 
   long originalLength = d->streamStart - d->flacStart;
-  int paddingLength = originalLength - data.size() - 4;
-  if (paddingLength < 0) {
+  long paddingLength  = originalLength - data.size() - 4;
+  if(paddingLength < 0) {
     paddingLength = MinPaddingLength;
   }
+  else {
+    // Padding won't increase beyond 1% of the file size or 2^24 bytes.
+
+    long threshold = MinPaddingLength;
+    threshold = std::max<long>(threshold, length() / 100);
+    threshold = std::min<long>(threshold, MaxPaddingLength);
+    if(paddingLength > threshold) {
+      paddingLength = MinPaddingLength;
+    }
+  }
+
   ByteVector padding = ByteVector::fromUInt(paddingLength);
-  padding.resize(paddingLength + 4);
-  padding[0] = (char)(FLAC::MetadataBlock::Padding | LastBlockFlag);
+  padding.resize(static_cast<uint>(paddingLength + 4));
+  padding[0] = static_cast<char>(FLAC::MetadataBlock::Padding | LastBlockFlag);
   data.append(padding);
 
   // Write the data to the file
