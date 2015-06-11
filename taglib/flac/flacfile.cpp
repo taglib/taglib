@@ -274,10 +274,14 @@ bool FLAC::File::save()
   }
 
   if(ID3v1Tag()) {
-    if(!d->hasID3v1)
-      d->ID3v1Location = length();
+    if(d->hasID3v1) {
+      seek(d->ID3v1Location);
+    }
+    else {
+      seek(0, End);
+      d->ID3v1Location = tell();
+    }
 
-    seek(d->ID3v1Location);
     writeBlock(ID3v1Tag()->render());
     d->hasID3v1 = true;
   }
