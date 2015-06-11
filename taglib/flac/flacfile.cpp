@@ -46,6 +46,7 @@ namespace
 {
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
   enum { MinPaddingLength = 4096 };
+  enum { MaxBlockLength = 16777216 };
   enum { LastBlockFlag = 0x80 };
 }
 
@@ -197,50 +198,53 @@ bool FLAC::File::save()
 
   // Replace metadata blocks
 
-  bool foundVorbisCommentBlock = false;
-  List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    MetadataBlock *block = d->blocks[i];
-    if(block->code() == MetadataBlock::VorbisComment) {
-      // Set the new Vorbis Comment block
-      delete block;
-      block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
-      foundVorbisCommentBlock = true;
+  for(List<MetadataBlock *>::Iterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    if((*it)->code() == MetadataBlock::VorbisComment) {
+      delete *it;
+      d->blocks.erase(it);
+      break;
     }
-    if(block->code() == MetadataBlock::Padding) {
-      delete block;
-      continue;
-    }
-    newBlocks.append(block);
   }
-  if(!foundVorbisCommentBlock) {
-    newBlocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
-    foundVorbisCommentBlock = true;
-  }
-  d->blocks = newBlocks;
+
+  d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
 
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(uint i = 0; i < newBlocks.size(); i++) {
-    FLAC::MetadataBlock *block = newBlocks[i];
-    ByteVector blockData = block->render();
+  for(List<MetadataBlock *>::ConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    const ByteVector blockData = (*it)->render();
+    if(blockData.size() > MaxBlockLength) {
+      debug("FLAC::File::save() -- Too huge metadata block. Cannot save.");
+      return false;
+    }
+
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    blockHeader[0] = (*it)->code();
     data.append(blockHeader);
     data.append(blockData);
   }
 
-  // Adjust the padding block(s)
+  // Adjust the padding block(s). Should be calculated in offset_t in taglib2.
 
   long originalLength = d->streamStart - d->flacStart;
-  int paddingLength = originalLength - data.size() - 4;
-  if (paddingLength < 0) {
+  long paddingLength  = originalLength - data.size() - 4;
+  if(paddingLength < 0) {
     paddingLength = MinPaddingLength;
   }
+  else {
+    // Padding won't increase beyond 1% of the file size or 2^24 bytes.
+
+    long threshold = MinPaddingLength;
+    threshold = std::max<long>(threshold, length() / 100);
+    threshold = std::min<long>(threshold, MaxBlockLength);
+    if(paddingLength > threshold) {
+      paddingLength = MinPaddingLength;
+    }
+  }
+
   ByteVector padding = ByteVector::fromUInt(paddingLength);
-  padding.resize(paddingLength + 4);
-  padding[0] = (char)(FLAC::MetadataBlock::Padding | LastBlockFlag);
+  padding.resize(static_cast<TagLib::uint>(paddingLength + 4));
+  padding[0] = static_cast<char>(FLAC::MetadataBlock::Padding | LastBlockFlag);
   data.append(padding);
 
   // Write the data to the file
@@ -252,19 +256,34 @@ bool FLAC::File::save()
 
   if(ID3v2Tag()) {
     if(d->hasID3v2) {
-      if(d->ID3v2Location < d->flacStart)
+      if(d->ID3v2Location < d->flacStart) {
         debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
               "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
-      else
+      }
+      else {
         insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+        d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
+      }
     }
-    else
+    else {
       insert(ID3v2Tag()->render(), 0, 0);
+      d->ID3v2Location = 0;
+      d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
+      d->hasID3v2 = true;
+    }
   }
 
   if(ID3v1Tag()) {
-    seek(-128, End);
+    if(d->hasID3v1) {
+      seek(d->ID3v1Location);
+    }
+    else {
+      seek(0, End);
+      d->ID3v1Location = tell();
+    }
+
     writeBlock(ID3v1Tag()->render());
+    d->hasID3v1 = true;
   }
 
   return true;
@@ -428,37 +447,29 @@ void FLAC::File::scan()
       return;
     }
 
-    MetadataBlock *block = 0;
-
     // Found the vorbis-comment
     if(blockType == MetadataBlock::VorbisComment) {
       if(!d->hasXiphComment) {
         d->xiphCommentData = data;
-        d->hasXiphComment = true;
+        d->hasXiphComment  = true;
+        d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, data));
       }
       else {
-        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, using the first one");
+        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, discarding");
       }
     }
     else if(blockType == MetadataBlock::Picture) {
       FLAC::Picture *picture = new FLAC::Picture();
       if(picture->parse(data)) {
-        block = picture;
+        d->blocks.append(picture);
       }
       else {
-        debug("FLAC::File::scan() -- invalid picture found, discarting");
+        debug("FLAC::File::scan() -- invalid picture found, discarding");
         delete picture;
       }
     }
-
-    if(!block) {
-      block = new UnknownMetadataBlock(blockType, data);
-    }
-    if(block->code() != MetadataBlock::Padding) {
-      d->blocks.append(block);
-    }
-    else {
-      delete block;
+    else if(blockType != MetadataBlock::Padding) {
+      d->blocks.append(new UnknownMetadataBlock(blockType, data));
     }
 
     nextBlockOffset += length + 4;

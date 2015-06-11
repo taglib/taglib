@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <s3mfile.h>
+#include <modtag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -56,6 +57,7 @@ class TestS3M : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestS3M);
   CPPUNIT_TEST(testReadTags);
   CPPUNIT_TEST(testWriteTags);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -79,6 +81,29 @@ public:
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
       TEST_FILE_PATH_C("changed.s3m")));
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("test", ".s3m");
+    ScopedFileCopy copy2("test", ".s3m");
+
+    {
+      S3M::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)544, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)544, f.length());
+    }
+
+    {
+      S3M::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)544, f.length());
+    }
   }
 
 private:

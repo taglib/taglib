@@ -149,6 +149,23 @@ MP4::File::save()
     return false;
   }
 
-  return d->tag->save();
+  const bool success = d->tag->save();
+  if(success) {
+    // Rebuild the internal structure for subsequent operations.
+    // This doesn't seem efficient, so may will be improved in the future.
+
+    FilePrivate *tmpD = new FilePrivate();
+
+    tmpD->atoms = new MP4::Atoms(this);
+    tmpD->tag = new Tag(this, tmpD->atoms);
+    if(d->properties) {
+      tmpD->properties = new Properties(this, tmpD->atoms, AudioProperties::Average);
+    }
+
+    std::swap(d, tmpD);
+    delete tmpD;
+  }
+
+  return success;
 }
 

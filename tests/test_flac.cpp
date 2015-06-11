@@ -6,6 +6,8 @@
 #include <tpropertymap.h>
 #include <flacfile.h>
 #include <xiphcomment.h>
+#include <id3v1tag.h>
+#include <id3v2tag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -25,6 +27,10 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
   CPPUNIT_TEST(testInvalid);
+  CPPUNIT_TEST(testShrinkPadding);
+  CPPUNIT_TEST(testSaveXiphTwice);
+  CPPUNIT_TEST(testSaveID3v1Twice);
+  CPPUNIT_TEST(testSaveID3v2Twice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -118,6 +124,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
     CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
     CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+
+    newpic = new FLAC::Picture();
+    newpic->setType(FLAC::Picture::Artist);
+    newpic->setWidth(5);
+    newpic->setHeight(6);
+    newpic->setColorDepth(16);
+    newpic->setNumColors(7);
+    newpic->setMimeType("image/jpeg");
+    newpic->setDescription("new image");
+    newpic->setData(ByteVector(16777216, '\x55'));
+    f->addPicture(newpic);
+    CPPUNIT_ASSERT(!f->save());
     delete f;
   }
 
@@ -253,6 +271,104 @@ public:
     PropertyMap invalid = f.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), invalid.size());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.properties().size());
+  }
+
+  void testShrinkPadding()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    string newname = copy.fileName();
+
+    {
+      FLAC::File f(newname.c_str());
+      f.addPicture(new FLAC::Picture(ByteVector(1000 * 1024, '\xff')));
+      f.save();
+      CPPUNIT_ASSERT(f.length() > 1000 * 1024);
+    }
+
+    {
+      FLAC::File f(newname.c_str());
+      f.removePictures();
+      f.save();
+      CPPUNIT_ASSERT(f.length() < 100 * 1024);
+    }
+  }
+
+  void testSaveXiphTwice()
+  {
+    ScopedFileCopy copy1("no-tags", ".flac");
+    ScopedFileCopy copy2("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasXiphComment());
+      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+
+      f.xiphComment(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+    }
+
+    {
+      FLAC::File f(copy2.fileName().c_str());
+      f.xiphComment(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+    }
+  }
+
+  void testSaveID3v1Twice()
+  {
+    ScopedFileCopy copy1("no-tags", ".flac");
+    ScopedFileCopy copy2("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+    }
+
+    {
+      FLAC::File f(copy2.fileName().c_str());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+    }
+  }
+
+  void testSaveID3v2Twice()
+  {
+    ScopedFileCopy copy1("no-tags", ".flac");
+    ScopedFileCopy copy2("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)5760, f.length());
+    }
+
+    {
+      FLAC::File f(copy2.fileName().c_str());
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)5760, f.length());
+    }
   }
 
 };

@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <modfile.h>
+#include <modtag.h>
 #include <tpropertymap.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -53,6 +54,7 @@ class TestMod : public CppUnit::TestFixture
   CPPUNIT_TEST(testReadTags);
   CPPUNIT_TEST(testWriteTags);
   CPPUNIT_TEST(testPropertyInterface);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -91,6 +93,29 @@ public:
     CPPUNIT_ASSERT(unsupported.contains("ARTIST"));
     CPPUNIT_ASSERT_EQUAL(properties["ARTIST"], unsupported["ARTIST"]);
     CPPUNIT_ASSERT(!unsupported.contains("TITLE"));
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("test", ".mod");
+    ScopedFileCopy copy2("test", ".mod");
+
+    {
+      Mod::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3132, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)3132, f.length());
+    }
+
+    {
+      Mod::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)3132, f.length());
+    }
   }
 
 private:

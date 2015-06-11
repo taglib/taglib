@@ -22,6 +22,8 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testSaveID3v2Twice);
+  CPPUNIT_TEST(testSaveInfoTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -166,6 +168,58 @@ public:
   {
     RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
     CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testSaveID3v2Twice()
+  {
+    ScopedFileCopy copy1("empty", ".wav");
+    ScopedFileCopy copy2("empty", ".wav");
+
+    {
+      RIFF::WAV::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)14744, f.length());
+
+      f.ID3v2Tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(RIFF::WAV::File::ID3v2, true);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)15820, f.length());
+    }
+
+    {
+      RIFF::WAV::File f(copy2.fileName().c_str());
+      f.ID3v2Tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(RIFF::WAV::File::ID3v2, true);
+      f.save(RIFF::WAV::File::ID3v2, true);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)15820, f.length());
+    }
+  }
+
+  void testSaveInfoTwice()
+  {
+    ScopedFileCopy copy1("empty", ".wav");
+    ScopedFileCopy copy2("empty", ".wav");
+
+    {
+      RIFF::WAV::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasInfoTag());
+      CPPUNIT_ASSERT_EQUAL((long)14744, f.length());
+
+      f.InfoTag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(RIFF::WAV::File::Info, true);
+      CPPUNIT_ASSERT(f.hasInfoTag());
+      CPPUNIT_ASSERT_EQUAL((long)14788, f.length());
+    }
+
+    {
+      RIFF::WAV::File f(copy2.fileName().c_str());
+      f.InfoTag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(RIFF::WAV::File::Info, true);
+      f.save(RIFF::WAV::File::Info, true);
+      CPPUNIT_ASSERT(f.hasInfoTag());
+      CPPUNIT_ASSERT_EQUAL((long)14788, f.length());
+    }
   }
 
 };

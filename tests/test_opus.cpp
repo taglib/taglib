@@ -3,6 +3,7 @@
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <opusfile.h>
+#include <xiphcomment.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -15,6 +16,7 @@ class TestOpus : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testReadComments);
   CPPUNIT_TEST(testWriteComments);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -54,6 +56,29 @@ public:
     CPPUNIT_ASSERT_EQUAL(StringList("Your Tester"), f->tag()->fieldListMap()["ARTIST"]);
     CPPUNIT_ASSERT_EQUAL(String("libopus 0.9.11-66-g64c2dd7"), f->tag()->vendorID());
     delete f;
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("correctness_gain_silent_output", ".opus");
+    ScopedFileCopy copy2("correctness_gain_silent_output", ".opus");
+
+    {
+      Ogg::Opus::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)35506, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)35539, f.length());
+    }
+
+    {
+      Ogg::Opus::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)35539, f.length());
+    }
   }
 
 };

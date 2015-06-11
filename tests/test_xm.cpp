@@ -106,6 +106,7 @@ class TestXM : public CppUnit::TestFixture
   CPPUNIT_TEST(testReadStrippedTags);
   CPPUNIT_TEST(testWriteTagsShort);
   CPPUNIT_TEST(testWriteTagsLong);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -156,6 +157,29 @@ public:
   void testWriteTagsLong()
   {
     testWriteTags(newCommentLong);
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("test", ".xm");
+    ScopedFileCopy copy2("test", ".xm");
+
+    {
+      XM::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)5471, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)5471, f.length());
+    }
+
+    {
+      XM::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)5471, f.length());
+    }
   }
 
 private:

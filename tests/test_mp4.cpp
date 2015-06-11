@@ -29,6 +29,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCovrRead2);
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testFuzzedFile);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -303,6 +304,29 @@ public:
   {
     MP4::File f(TEST_FILE_PATH_C("infloop.m4a"));
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("no-tags", ".m4a");
+    ScopedFileCopy copy2("no-tags", ".m4a");
+
+    {
+      MP4::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)2898, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)3975, f.length());
+    }
+
+    {
+      MP4::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)3975, f.length());
+    }
   }
 
 };

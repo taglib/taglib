@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <climits>
+
 #include <tdebug.h>
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
@@ -37,7 +39,7 @@ class ASF::File::FilePrivate
 {
 public:
   FilePrivate():
-    size(0),
+    headerSize(0),
     tag(0),
     properties(0),
     contentDescriptionObject(0),
@@ -45,7 +47,9 @@ public:
     headerExtensionObject(0),
     metadataObject(0),
     metadataLibraryObject(0) {}
-  unsigned long long size;
+
+  TagLib::uint headerSize;  // TODO: should be size_t in taglib2.
+
   ASF::Tag *tag;
   ASF::Properties *properties;
   List<ASF::File::BaseObject *> objects;
@@ -440,11 +444,13 @@ void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*properties
   d->properties = new ASF::Properties();
 
   bool ok;
-  d->size = readQWORD(&ok);
-  if(!ok) {
+  const long long headerSize = readQWORD(&ok);
+  if(!ok || headerSize > UINT_MAX) {
     setValid(false);
     return;
   }
+  d->headerSize = static_cast<TagLib::uint>(headerSize);
+
   int numObjects = readDWORD(&ok);
   if(!ok) {
     setValid(false);
@@ -525,6 +531,10 @@ bool ASF::File::save()
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
+  d->extendedContentDescriptionObject->attributeData.clear();
+  d->metadataObject->attributeData.clear();
+  d->metadataLibraryObject->attributeData.clear();
+
   ASF::AttributeListMap::ConstIterator it = d->tag->attributeListMap().begin();
   for(; it != d->tag->attributeListMap().end(); it++) {
 
@@ -559,8 +569,13 @@ bool ASF::File::save()
     data.append(d->objects[i]->render(this));
   }
 
-  data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;
-  insert(data, 0, (TagLib::ulong)d->size);
+  data = headerGuid
+    + ByteVector::fromLongLong(data.size() + 30, false)
+    + ByteVector::fromUInt(d->objects.size(), false)
+    + ByteVector("\x01\x02", 2) + data;
+
+  insert(data, 0, d->headerSize);
+  d->headerSize = data.size();
 
   return true;
 }

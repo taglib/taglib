@@ -1,9 +1,12 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <wavpackfile.h>
+#include <id3v1tag.h>
+#include <id3v2tag.h>
+#include <apetag.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -14,6 +17,8 @@ class TestWavPack : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestWavPack);
   CPPUNIT_TEST(testBasic);
   CPPUNIT_TEST(testLengthScan);
+  CPPUNIT_TEST(testSaveID3v1Twice);
+  CPPUNIT_TEST(testSaveAPETwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -40,6 +45,60 @@ public:
     WavPack::File f(TEST_FILE_PATH_C("infloop.wv"));
     CPPUNIT_ASSERT(f.isValid());
   }
+
+
+  void testSaveID3v1Twice()
+  {
+    ScopedFileCopy copy1("click", ".wv");
+    ScopedFileCopy copy2("click", ".wv");
+
+    {
+      WavPack::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)3176, f.length());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)3368, f.length());
+    }
+
+    {
+      WavPack::File f(copy2.fileName().c_str());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)3368, f.length());
+    }
+  }
+
+  void testSaveAPETwice()
+  {
+    ScopedFileCopy copy1("click", ".wv");
+    ScopedFileCopy copy2("click", ".wv");
+
+    {
+      WavPack::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)3176, f.length());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)3277, f.length());
+    }
+
+    {
+      WavPack::File f(copy2.fileName().c_str());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)3277, f.length());
+    }
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestWavPack);

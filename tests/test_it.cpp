@@ -20,6 +20,7 @@
  ***************************************************************************/
 
 #include <itfile.h>
+#include <modtag.h>
 #include <tstringlist.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -69,6 +70,7 @@ class TestIT : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestIT);
   CPPUNIT_TEST(testReadTags);
   CPPUNIT_TEST(testWriteTags);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -89,6 +91,29 @@ public:
       CPPUNIT_ASSERT(file.save());
     }
     testRead(copy.fileName().c_str(), titleAfter, commentAfter);
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("test", ".it");
+    ScopedFileCopy copy2("test", ".it");
+
+    {
+      IT::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)644, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)645, f.length());
+    }
+
+    {
+      IT::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)645, f.length());
+    }
   }
 
 private:
