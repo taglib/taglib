@@ -370,6 +370,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     const long removedSize = d->APEOriginalSize;
     d->APELocation = -1;
     d->APEFooterLocation = -1;
+    d->APEOriginalSize = 0;
     d->hasAPE = false;
 
     if(freeMemory)
@@ -681,6 +682,7 @@ void MPEG::File::findAPE()
 
   d->APELocation = -1;
   d->APEFooterLocation = -1;
+  d->APEOriginalSize = 0;
 }
 
 bool MPEG::File::secondSynchByte(char byte)
