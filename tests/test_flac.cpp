@@ -32,6 +32,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v1Twice);
   CPPUNIT_TEST(testSaveID3v2Twice);
   CPPUNIT_TEST(testSaveTagCombination);
+  CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -492,6 +493,35 @@ public:
     }
   }
 
+  void testStripTags()
+  {
+    ScopedFileCopy copy1("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy1.fileName().c_str());
+      f.xiphComment(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+    }
+
+    {
+      FLAC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      f.strip(FLAC::File::ID3v1 | FLAC::File::ID3v2);
+      f.save();
+    }
+
+    {
+      FLAC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.xiphComment()->title());
+    }
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestFLAC);

@@ -67,6 +67,23 @@ namespace TagLib {
     {
     public:
       /*!
+       * This set of flags is used for various operations and is suitable for
+       * being OR-ed together.
+       */
+      enum TagTypes {
+        //! Empty set.  Matches no tag types.
+        NoTags      = 0x0000,
+        //! Matches Xiph comments.
+        XiphComment = 0x0001,
+        //! Matches ID3v1 tags.
+        ID3v1       = 0x0002,
+        //! Matches ID3v2 tags.
+        ID3v2       = 0x0004,
+        //! Matches all tag types.
+        AllTags     = 0xffff
+      };
+
+      /*!
        * Constructs a FLAC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
@@ -264,6 +281,17 @@ namespace TagLib {
        * \note The file will be saved only after calling save().
        */
       void addPicture(Picture *picture);
+
+      /*!
+       * This will remove the tags that match the OR-ed together TagTypes from
+       * the file.  By default it removes all tags.
+       *
+       * \note This will also invalidate pointers to the tags as their memory
+       * will be freed.
+       * \note In order to make the removal permanent save() still needs to be
+       * called.
+       */
+      void strip(int tags = AllTags);
 
       /*!
        * Returns whether or not the file on disk actually has a XiphComment.

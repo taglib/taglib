@@ -257,7 +257,7 @@ bool FLAC::File::save()
 
   // Update ID3 tags
 
-  if(ID3v2Tag()) {
+  if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
     if(d->ID3v2Location > d->flacStart) {
       debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
         "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
@@ -280,8 +280,23 @@ bool FLAC::File::save()
         d->ID3v1Location += (d->ID3v2OriginalSize - prevOriginalSize);
     }
   }
+  else {
+    if(d->hasID3v2) {
+      removeBlock(d->ID3v2Location, d->ID3v2OriginalSize);
 
-  if(ID3v1Tag()) {
+      const long removedSize = d->ID3v2OriginalSize;
+      d->ID3v2Location = -1;
+      d->ID3v2OriginalSize = 0;
+      d->hasID3v2 = false;
+
+      // v1 tag location has changed, update if it exists
+
+      if(d->ID3v1Location >= 0)
+        d->ID3v1Location -= removedSize;
+    }
+  }
+
+  if(ID3v1Tag() && !ID3v1Tag()->isEmpty()) {
     if(d->hasID3v1) {
       seek(d->ID3v1Location);
     }
@@ -292,6 +307,14 @@ bool FLAC::File::save()
 
     writeBlock(ID3v1Tag()->render());
     d->hasID3v1 = true;
+  }
+  else {
+    if(d->hasID3v1) {
+      removeBlock(d->ID3v1Location, 128);
+
+      d->ID3v1Location = -1;
+      d->hasID3v1 = false;
+    }
   }
 
   return true;
@@ -569,6 +592,23 @@ void FLAC::File::removePictures()
     }
   }
   d->blocks = newBlocks;
+}
+
+void FLAC::File::strip(int tags)
+{
+  if(tags & ID3v1) {
+    d->tag.set(FlacID3v1Index, 0);
+  }
+
+  if(tags & ID3v2) {
+    d->tag.set(FlacID3v2Index, 0);
+  }
+
+  if(tags & XiphComment) {
+    d->tag.set(FlacXiphIndex, 0);
+  }
+
+  xiphComment(true);
 }
 
 bool FLAC::File::hasXiphComment() const
