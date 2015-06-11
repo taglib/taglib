@@ -609,11 +609,16 @@ MP4::Tag::saveNew(ByteVector data)
     data = renderAtom("udta", data);
   }
 
-  long offset = path[path.size() - 1]->offset + 8;
+  const long offset = path.back()->offset + 8;
   d->file->insert(data, offset, 0);
 
   updateParents(path, data.size());
   updateOffsets(data.size(), offset);
+
+  // Insert newly created atoms to keep the data structure up-to-date.
+
+  d->file->seek(offset);
+  path.back()->children.prepend(new Atom(d->file));
 }
 
 void
