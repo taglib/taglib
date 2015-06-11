@@ -252,6 +252,9 @@ bool FLAC::File::save()
   insert(data, d->flacStart, originalLength);
   d->hasXiphComment = true;
 
+  if(d->ID3v1Location >= 0)
+    d->ID3v1Location += (data.size() - originalLength);
+
   // Update ID3 tags
 
   if(ID3v2Tag()) {
@@ -267,10 +270,14 @@ bool FLAC::File::save()
 
       insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
 
+      const long prevOriginalSize = d->ID3v2OriginalSize;
       d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
       d->hasID3v2 = true;
 
-      d->flacStart = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize) + 4;
+      d->flacStart += (d->ID3v2OriginalSize - prevOriginalSize);
+
+      if(d->ID3v1Location >= 0)
+        d->ID3v1Location += (d->ID3v2OriginalSize - prevOriginalSize);
     }
   }
 
