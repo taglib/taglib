@@ -68,7 +68,7 @@ public:
       Ogg::FLAC::File f(copy2.fileName().c_str());
       f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
-      //f.save(); // Causes segfault.
+      f.save();
       CPPUNIT_ASSERT(f.hasXiphComment());
       CPPUNIT_ASSERT_EQUAL((long)9146, f.length());
     }

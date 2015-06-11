@@ -198,8 +198,12 @@ bool Ogg::File::save()
       pageGroup.append(*it);
   }
   writePageGroup(pageGroup);
-  d->dirtyPages.clear();
-  d->dirtyPackets.clear();
+
+  // Reset all the internal properties for subsequent operations.
+
+  FilePrivate *tmpD = new FilePrivate();
+  std::swap(d, tmpD);
+  delete tmpD;
 
   return true;
 }
@@ -279,7 +283,6 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
 {
   if(thePageGroup.isEmpty())
     return;
-
 
   // pages in the pageGroup and packets must be equivalent
   // (originalSize and size of packets would not work together),
