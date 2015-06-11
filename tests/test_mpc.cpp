@@ -4,6 +4,8 @@
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <mpcfile.h>
+#include <apetag.h>
+#include <id3v1tag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -21,6 +23,9 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST(testFuzzedFile3);
   CPPUNIT_TEST(testFuzzedFile4);
+  CPPUNIT_TEST(testSaveID3v1Twice);
+  CPPUNIT_TEST(testSaveAPETwice);
+  CPPUNIT_TEST(testSaveTagCombination);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -87,6 +92,117 @@ public:
   {
     MPC::File f(TEST_FILE_PATH_C("segfault2.mpc"));
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testSaveID3v1Twice()
+  {
+    ScopedFileCopy copy1("click", ".mpc");
+    ScopedFileCopy copy2("click", ".mpc");
+
+    {
+      MPC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)1588, f.length());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)1780, f.length());
+    }
+
+    {
+      MPC::File f(copy2.fileName().c_str());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)1780, f.length());
+    }
+  }
+
+  void testSaveAPETwice()
+  {
+    ScopedFileCopy copy1("click", ".mpc");
+    ScopedFileCopy copy2("click", ".mpc");
+
+    {
+      MPC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)1588, f.length());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)1689, f.length());
+    }
+
+    {
+      MPC::File f(copy2.fileName().c_str());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)1689, f.length());
+    }
+  }
+
+  void testSaveTagCombination()
+  {
+    ScopedFileCopy copy1("click", ".mpc");
+
+    {
+      MPC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+    }
+
+    {
+      MPC::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)1817, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+    }
+
+    ScopedFileCopy copy2("click", ".mpc");
+
+    {
+      MPC::File f(copy2.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+    }
+
+    {
+      MPC::File f(copy2.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)1817, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+    }
   }
 
 };
