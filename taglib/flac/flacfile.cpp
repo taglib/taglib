@@ -255,15 +255,23 @@ bool FLAC::File::save()
   // Update ID3 tags
 
   if(ID3v2Tag()) {
-    if(d->hasID3v2) {
-      if(d->ID3v2Location < d->flacStart)
-        debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
-              "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
-      else
-        insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+    if(d->ID3v2Location > d->flacStart) {
+      debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
+        "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
     }
-    else
-      insert(ID3v2Tag()->render(), 0, 0);
+    else {
+      if(!d->hasID3v2) {
+        d->ID3v2Location = 0;
+        d->ID3v2OriginalSize = 0;
+      }
+
+      insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+
+      d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
+      d->hasID3v2 = true;
+
+      d->flacStart = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize) + 4;
+    }
   }
 
   if(ID3v1Tag()) {
