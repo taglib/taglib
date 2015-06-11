@@ -5,6 +5,7 @@
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
 #include <asffile.h>
+#include <asftag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -24,6 +25,7 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSavePicture);
   CPPUNIT_TEST(testSaveMultiplePictures);
   CPPUNIT_TEST(testProperties);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -242,6 +244,29 @@ public:
     CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/PartOfSet"].size());
     CPPUNIT_ASSERT_EQUAL(String("3"), f.tag()->attribute("WM/PartOfSet").front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("3"), tags["DISCNUMBER"]);
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("silence-1", ".wma");
+    ScopedFileCopy copy2("silence-1", ".wma");
+
+    {
+      ASF::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)35416, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)35480, f.length());
+    }
+
+    {
+      ASF::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)35480, f.length());
+    }
   }
 
 };

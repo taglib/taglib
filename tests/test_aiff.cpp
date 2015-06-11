@@ -3,6 +3,7 @@
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <aifffile.h>
+#include <id3v2tag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -18,6 +19,7 @@ class TestAIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testSaveID3v2Twice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -76,6 +78,32 @@ public:
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("excessive_alloc.aif"));
     CPPUNIT_ASSERT(!f.isValid());
+  }
+
+  void testSaveID3v2Twice()
+  {
+    ScopedFileCopy copy1("empty", ".aiff");
+    ScopedFileCopy copy2("empty", ".aiff");
+
+    {
+      RIFF::AIFF::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)5936, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)7012, f.length());
+    }
+
+    {
+      RIFF::AIFF::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)7012, f.length());
+    }
   }
 
 };
