@@ -37,7 +37,7 @@ class ASF::File::FilePrivate
 {
 public:
   FilePrivate():
-    size(0),
+    headerSize(0),
     tag(0),
     properties(0),
     contentDescriptionObject(0),
@@ -45,7 +45,7 @@ public:
     headerExtensionObject(0),
     metadataObject(0),
     metadataLibraryObject(0) {}
-  unsigned long long size;
+  unsigned long long headerSize;
   ASF::Tag *tag;
   ASF::Properties *properties;
   List<ASF::File::BaseObject *> objects;
@@ -440,11 +440,12 @@ void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*properties
   d->properties = new ASF::Properties();
 
   bool ok;
-  d->size = readQWORD(&ok);
+  d->headerSize = readQWORD(&ok);
   if(!ok) {
     setValid(false);
     return;
   }
+
   int numObjects = readDWORD(&ok);
   if(!ok) {
     setValid(false);
@@ -525,6 +526,10 @@ bool ASF::File::save()
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
+  d->extendedContentDescriptionObject->attributeData.clear();
+  d->metadataObject->attributeData.clear();
+  d->metadataLibraryObject->attributeData.clear();
+
   ASF::AttributeListMap::ConstIterator it = d->tag->attributeListMap().begin();
   for(; it != d->tag->attributeListMap().end(); it++) {
 
@@ -559,8 +564,14 @@ bool ASF::File::save()
     data.append(d->objects[i]->render(this));
   }
 
-  data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;
-  insert(data, 0, (TagLib::ulong)d->size);
+  data = headerGuid
+    + ByteVector::fromLongLong(data.size() + 30, false)
+    + ByteVector::fromUInt(d->objects.size(), false)
+    + ByteVector("\x01\x02", 2)
+    + data;
+
+  insert(data, 0, static_cast<TagLib::uint>(d->headerSize));
+  d->headerSize = data.size();
 
   return true;
 }
