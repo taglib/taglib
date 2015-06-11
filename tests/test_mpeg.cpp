@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <tstring.h>
 #include <mpegfile.h>
+#include <id3v1tag.h>
 #include <id3v2tag.h>
 #include <apetag.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -20,6 +21,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testFrameOffset);
+  CPPUNIT_TEST(testSaveID3v1Twice);
   CPPUNIT_TEST(testSaveID3v2Twice);
   CPPUNIT_TEST(testSaveAPETwice);
   CPPUNIT_TEST_SUITE_END();
@@ -137,39 +139,84 @@ public:
     }
   }
 
-  void testSaveID3v2Twice()
+  void testSaveID3v1Twice()
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
+    ScopedFileCopy copy1("xing", ".mp3");
+    ScopedFileCopy copy2("xing", ".mp3");
 
     {
-      MPEG::File f(newname.c_str());
-      f.ID3v2Tag()->setTitle(String(ByteVector(8192, 'X'), String::Latin1));
-      f.save(MPEG::File::AllTags, true, 4);
-      f.save(MPEG::File::AllTags, true, 4);
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8208, f.length());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, true);
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8336, f.length());
     }
+
     {
-      MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL((long)17573, f.length());
+      MPEG::File f(copy2.fileName().c_str());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, true);
+      f.save(MPEG::File::ID3v1, true);
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8336, f.length());
+    }
+  }
+
+  void testSaveID3v2Twice()
+  {
+    ScopedFileCopy copy1("xing", ".mp3");
+    ScopedFileCopy copy2("xing", ".mp3");
+
+    {
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8208, f.length());
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, true);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)9276, f.length());
+    }
+
+    {
+      MPEG::File f(copy2.fileName().c_str());
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, true);
+      f.save(MPEG::File::ID3v2, true);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)9276, f.length());
     }
   }
 
   void testSaveAPETwice()
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
+    ScopedFileCopy copy1("xing", ".mp3");
+    ScopedFileCopy copy2("xing", ".mp3");
 
     {
-      MPEG::File f(newname.c_str());
-      f.APETag(true)->setTitle(String(ByteVector(8192, 'X'), String::Latin1));
-      f.save(MPEG::File::AllTags, true, 4);
-      f.save(MPEG::File::AllTags, true, 4);
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)8208, f.length());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, true);
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
     }
+
     {
-      MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL((long)16478, f.length());
+      MPEG::File f(copy2.fileName().c_str());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, true);
+      f.save(MPEG::File::APE, true);
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
     }
   }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMPEG);
