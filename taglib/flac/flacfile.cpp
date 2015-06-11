@@ -243,7 +243,7 @@ bool FLAC::File::save()
   }
 
   ByteVector padding = ByteVector::fromUInt(paddingLength);
-  padding.resize(static_cast<uint>(paddingLength + 4));
+  padding.resize(static_cast<TagLib::uint>(paddingLength + 4));
   padding[0] = static_cast<char>(FLAC::MetadataBlock::Padding | LastBlockFlag);
   data.append(padding);
 
@@ -256,19 +256,30 @@ bool FLAC::File::save()
 
   if(ID3v2Tag()) {
     if(d->hasID3v2) {
-      if(d->ID3v2Location < d->flacStart)
+      if(d->ID3v2Location < d->flacStart) {
         debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
               "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
-      else
+      }
+      else {
         insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+        d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
+      }
     }
-    else
+    else {
       insert(ID3v2Tag()->render(), 0, 0);
+      d->ID3v2Location = 0;
+      d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
+      d->hasID3v2 = true;
+    }
   }
 
   if(ID3v1Tag()) {
-    seek(-128, End);
+    if(!d->hasID3v1)
+      d->ID3v1Location = length();
+
+    seek(d->ID3v1Location);
     writeBlock(ID3v1Tag()->render());
+    d->hasID3v1 = true;
   }
 
   return true;
