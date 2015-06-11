@@ -20,6 +20,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSplitPackets);
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -102,6 +103,29 @@ public:
     CPPUNIT_ASSERT_EQUAL(false, f->tag()->properties().contains("UNUSUALTAG"));
 
     delete f;
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("empty", ".ogg");
+    ScopedFileCopy copy2("empty", ".ogg");
+
+    {
+      Vorbis::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)4328, f.length());
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)4361, f.length());
+    }
+
+    {
+      Vorbis::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)4361, f.length());
+    }
   }
 
 };

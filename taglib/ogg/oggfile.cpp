@@ -198,8 +198,11 @@ bool Ogg::File::save()
       pageGroup.append(*it);
   }
   writePageGroup(pageGroup);
-  d->dirtyPages.clear();
-  d->dirtyPackets.clear();
+
+  // Reset all the internal structures for subsequent operations.
+
+  delete d;
+  d = new FilePrivate();
 
   return true;
 }
@@ -208,14 +211,16 @@ bool Ogg::File::save()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::File::File(FileName file) : TagLib::File(file)
+Ogg::File::File(FileName file) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
 }
 
-Ogg::File::File(IOStream *stream) : TagLib::File(stream)
+Ogg::File::File(IOStream *stream) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
