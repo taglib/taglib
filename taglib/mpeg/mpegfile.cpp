@@ -225,74 +225,83 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
   bool success = true;
 
   if(ID3v2 & tags) {
-
     if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
-
       if(!d->hasID3v2)
         d->ID3v2Location = 0;
 
       insert(ID3v2Tag()->render(id3v2Version), d->ID3v2Location, d->ID3v2OriginalSize);
 
+      const long prevOriginalSize = d->ID3v2OriginalSize;
+      d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
       d->hasID3v2 = true;
 
       // v1 tag location has changed, update if it exists
 
-      if(ID3v1Tag())
-        d->ID3v1Location = findID3v1();
+      if(d->ID3v1Location >= 0)
+        d->ID3v1Location += (d->ID3v2OriginalSize - prevOriginalSize);
 
       // APE tag location has changed, update if it exists
 
-      if(APETag())
-        findAPE();
+      if(d->APELocation >= 0)
+        d->APELocation += (d->ID3v2OriginalSize - prevOriginalSize);
     }
-    else if(stripOthers)
+    else if(stripOthers) {
       success = strip(ID3v2, false) && success;
+    }
   }
-  else if(d->hasID3v2 && stripOthers)
+  else if(d->hasID3v2 && stripOthers) {
     success = strip(ID3v2) && success;
+  }
 
   if(ID3v1 & tags) {
     if(ID3v1Tag() && !ID3v1Tag()->isEmpty()) {
-      int offset = d->hasID3v1 ? -128 : 0;
-      seek(offset, End);
+      if(d->hasID3v1) {
+        seek(d->ID3v1Location);
+      }
+      else {
+        seek(0, End);
+        d->ID3v1Location = tell();
+      }
+
       writeBlock(ID3v1Tag()->render());
       d->hasID3v1 = true;
-      d->ID3v1Location = findID3v1();
     }
-    else if(stripOthers)
+    else if(stripOthers) {
       success = strip(ID3v1) && success;
+    }
   }
-  else if(d->hasID3v1 && stripOthers)
+  else if(d->hasID3v1 && stripOthers) {
     success = strip(ID3v1, false) && success;
+  }
 
   // Dont save an APE-tag unless one has been created
 
   if((APE & tags) && APETag()) {
-    if(d->hasAPE)
-      insert(APETag()->render(), d->APELocation, d->APEOriginalSize);
-    else {
+    if(!d->hasAPE) {
       if(d->hasID3v1) {
-        insert(APETag()->render(), d->ID3v1Location, 0);
-        d->APEOriginalSize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
         d->APELocation = d->ID3v1Location;
-        d->ID3v1Location += d->APEOriginalSize;
       }
       else {
         seek(0, End);
         d->APELocation = tell();
-        APE::Tag *apeTag = d->tag.access<APE::Tag>(APEIndex, false);
-        d->APEFooterLocation = d->APELocation
-                               + apeTag->footer()->completeTagSize()
-                               - APE::Footer::size();
-        writeBlock(APETag()->render());
-        d->APEOriginalSize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
       }
     }
+
+    insert(APETag()->render(), d->APELocation, d->APEOriginalSize);
+
+    const long prevOriginalSize = d->APEOriginalSize;
+    d->APEOriginalSize = APETag()->footer()->completeTagSize();
+    d->APEFooterLocation = d->APELocation + d->APEOriginalSize - APE::Footer::size();
+    d->hasAPE = true;
+
+    // v1 tag location has changed, update if it exists
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location += (d->APEOriginalSize - prevOriginalSize);
   }
-  else if(d->hasAPE && stripOthers)
+  else if(d->hasAPE && stripOthers) {
     success = strip(APE, false) && success;
+  }
 
   return success;
 }
@@ -326,6 +335,8 @@ bool MPEG::File::strip(int tags, bool freeMemory)
 
   if((tags & ID3v2) && d->hasID3v2) {
     removeBlock(d->ID3v2Location, d->ID3v2OriginalSize);
+
+    const long removedSize = d->ID3v2OriginalSize;
     d->ID3v2Location = -1;
     d->ID3v2OriginalSize = 0;
     d->hasID3v2 = false;
@@ -335,17 +346,17 @@ bool MPEG::File::strip(int tags, bool freeMemory)
 
     // v1 tag location has changed, update if it exists
 
-    if(ID3v1Tag())
-      d->ID3v1Location = findID3v1();
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location -= removedSize;
 
     // APE tag location has changed, update if it exists
 
-   if(APETag())
-      findAPE();
+    if(d->APELocation >= 0)
+      d->APELocation -= removedSize;
   }
 
   if((tags & ID3v1) && d->hasID3v1) {
-    truncate(d->ID3v1Location);
+    removeBlock(d->ID3v1Location, 128);
     d->ID3v1Location = -1;
     d->hasID3v1 = false;
 
@@ -355,16 +366,19 @@ bool MPEG::File::strip(int tags, bool freeMemory)
 
   if((tags & APE) && d->hasAPE) {
     removeBlock(d->APELocation, d->APEOriginalSize);
+
+    const long removedSize = d->APEOriginalSize;
     d->APELocation = -1;
     d->APEFooterLocation = -1;
     d->hasAPE = false;
-    if(d->hasID3v1) {
-      if(d->ID3v1Location > d->APELocation)
-        d->ID3v1Location -= d->APEOriginalSize;
-    }
 
     if(freeMemory)
       d->tag.set(APEIndex, 0);
+
+    // v1 tag location has changed, update if it exists
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location -= removedSize;
   }
 
   return true;
