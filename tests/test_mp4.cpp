@@ -69,6 +69,10 @@ public:
     CPPUNIT_ASSERT(!f.isValid());
     MP4::File f2(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f2.isValid());
+    CPPUNIT_ASSERT(f2.hasMP4Tag());
+    MP4::File f3(TEST_FILE_PATH_C("no-tags.m4a"));
+    CPPUNIT_ASSERT(f3.isValid());
+    CPPUNIT_ASSERT(!f3.hasMP4Tag());
   }
 
   void testIsEmpty()

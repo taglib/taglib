@@ -117,6 +117,11 @@ namespace TagLib {
        */
       bool save();
 
+      /*!
+       * Returns whether or not the file on disk actually has an MP4 tag.
+       */
+      bool hasMP4Tag() const;
+
     private:
       void read(bool readProperties);
 
