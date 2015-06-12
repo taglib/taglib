@@ -60,7 +60,6 @@ public:
     properties(0),
     flacStart(0),
     streamStart(0),
-    streamLength(0),
     scanned(false),
     hasXiphComment(false),
     hasID3v2(false),
@@ -86,13 +85,11 @@ public:
   TagUnion tag;
 
   Properties *properties;
-  ByteVector streamInfoData;
   ByteVector xiphCommentData;
   List<MetadataBlock *> blocks;
 
   long flacStart;
   long streamStart;
-  long streamLength;
   bool scanned;
 
   bool hasXiphComment;
@@ -175,7 +172,6 @@ FLAC::Properties *FLAC::File::audioProperties() const
 {
   return d->properties;
 }
-
 
 bool FLAC::File::save()
 {
@@ -294,7 +290,6 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
   d->ID3v2FrameFactory = factory;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -334,27 +329,35 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     return;
 
   if(d->hasXiphComment)
-    d->tag.set(FlacXiphIndex, new Ogg::XiphComment(xiphCommentData()));
+    d->tag.set(FlacXiphIndex, new Ogg::XiphComment(d->xiphCommentData));
   else
     d->tag.set(FlacXiphIndex, new Ogg::XiphComment);
 
-  if(readProperties)
-    d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
+  if(readProperties) {
+
+    // First block should be the stream_info metadata
+
+    const ByteVector infoData = d->blocks.front()->render();
+
+    long streamLength;
+
+    if(d->hasID3v1)
+      streamLength = d->ID3v1Location - d->streamStart;
+    else
+      streamLength = File::length() - d->streamStart;
+
+    d->properties = new Properties(infoData, streamLength, propertiesStyle);
+  }
 }
 
 ByteVector FLAC::File::streamInfoData()
 {
-  return isValid() ? d->streamInfoData : ByteVector();
-}
-
-ByteVector FLAC::File::xiphCommentData() const
-{
-  return (isValid() && d->hasXiphComment) ? d->xiphCommentData : ByteVector();
+  return ByteVector();
 }
 
 long FLAC::File::streamLength()
 {
-  return d->streamLength;
+  return 0;
 }
 
 void FLAC::File::scan()
@@ -409,8 +412,7 @@ void FLAC::File::scan()
     return;
   }
 
-  d->streamInfoData = readBlock(length);
-  d->blocks.append(new UnknownMetadataBlock(blockType, d->streamInfoData));
+  d->blocks.append(new UnknownMetadataBlock(blockType, readBlock(length)));
   nextBlockOffset += length + 4;
 
   // Search through the remaining metadata
@@ -480,10 +482,6 @@ void FLAC::File::scan()
   // End of metadata, now comes the datastream
 
   d->streamStart = nextBlockOffset;
-  d->streamLength = File::length() - d->streamStart;
-
-  if(d->hasID3v1)
-    d->streamLength -= 128;
 
   d->scanned = true;
 }
