@@ -23,6 +23,7 @@ class TestAPE : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v1Twice);
   CPPUNIT_TEST(testSaveAPETwice);
   CPPUNIT_TEST(testSaveTagCombination);
+  CPPUNIT_TEST(testStripID3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -184,6 +185,24 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+    }
+  }
+
+  void testStripID3v2()
+  {
+    ScopedFileCopy copy("mac-399-id3v2", ".ape");
+
+    {
+      APE::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)89155, f.length());
+      f.strip(APE::File::ID3v2);
+      f.save();
+    }
+    {
+      APE::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)85276, f.length());
     }
   }
 
