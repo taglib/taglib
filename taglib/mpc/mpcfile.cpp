@@ -296,7 +296,7 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   if(!d->hasID3v1)
     APETag(true);
 
-  // Look for and skip an ID3v2 tag
+  // Look for an ID3v2 tag
 
   d->ID3v2Location = findID3v2();
 
@@ -307,14 +307,10 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
     d->hasID3v2 = true;
   }
 
-  if(d->hasID3v2)
-    seek(d->ID3v2Location + d->ID3v2Size);
-  else
-    seek(0);
-
   // Look for MPC metadata
 
   if(readProperties) {
+
     long streamLength;
 
     if(d->hasAPE)
@@ -324,8 +320,13 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
     else
       streamLength = length();
 
-    if(d->hasID3v2)
+    if(d->hasID3v2) {
+      seek(d->ID3v2Location + d->ID3v2Size);
       streamLength -= (d->ID3v2Location + d->ID3v2Size);
+    }
+    else {
+      seek(0);
+    }
 
     d->properties = new Properties(this, streamLength);
   }
