@@ -275,7 +275,8 @@ bool FLAC::File::save()
 
     // FLAC metadata location has changed, update.
 
-    d->flacStart += (d->ID3v2OriginalSize - prevOriginalSize);
+    d->flacStart   += (d->ID3v2OriginalSize - prevOriginalSize);
+    d->streamStart += (d->ID3v2OriginalSize - prevOriginalSize);
 
     // v1 tag location has changed, update if it exists.
 
@@ -293,7 +294,8 @@ bool FLAC::File::save()
 
       // FLAC metadata location has changed, update.
 
-      d->flacStart -= removedSize;
+      d->flacStart   -= removedSize;
+      d->streamStart -= removedSize;
 
       // v1 tag location has changed, update if it exists
 
