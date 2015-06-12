@@ -226,7 +226,7 @@ bool FLAC::File::save()
 
   // Adjust the padding block(s). Should be calculated in offset_t in taglib2.
 
-  long originalLength = d->streamStart - d->flacStart;
+  const long originalLength = d->streamStart - d->flacStart;
   long paddingLength  = originalLength - data.size() - 4;
   if(paddingLength < 0) {
     paddingLength = MinPaddingLength;
@@ -250,7 +250,11 @@ bool FLAC::File::save()
   // Write the data to the file
 
   insert(data, d->flacStart, originalLength);
+
+  d->streamStart += (data.size() - originalLength);
   d->hasXiphComment = true;
+
+  // v1 tag location has changed, update if it exists.
 
   if(d->ID3v1Location >= 0)
     d->ID3v1Location += (data.size() - originalLength);
@@ -258,27 +262,25 @@ bool FLAC::File::save()
   // Update ID3 tags
 
   if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
-    if(d->ID3v2Location > d->flacStart) {
-      debug("FLAC::File::save() -- This can't be right -- an ID3v2 tag after the "
-        "start of the FLAC bytestream?  Not writing the ID3v2 tag.");
+    if(!d->hasID3v2) {
+      d->ID3v2Location = 0;
+      d->ID3v2OriginalSize = 0;
     }
-    else {
-      if(!d->hasID3v2) {
-        d->ID3v2Location = 0;
-        d->ID3v2OriginalSize = 0;
-      }
 
-      insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
+    insert(ID3v2Tag()->render(), d->ID3v2Location, d->ID3v2OriginalSize);
 
-      const long prevOriginalSize = d->ID3v2OriginalSize;
-      d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
-      d->hasID3v2 = true;
+    const long prevOriginalSize = d->ID3v2OriginalSize;
+    d->ID3v2OriginalSize = ID3v2Tag()->header()->completeTagSize();
+    d->hasID3v2 = true;
 
-      d->flacStart += (d->ID3v2OriginalSize - prevOriginalSize);
+    // FLAC metadata location has changed, update.
 
-      if(d->ID3v1Location >= 0)
-        d->ID3v1Location += (d->ID3v2OriginalSize - prevOriginalSize);
-    }
+    d->flacStart += (d->ID3v2OriginalSize - prevOriginalSize);
+
+    // v1 tag location has changed, update if it exists.
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location += (d->ID3v2OriginalSize - prevOriginalSize);
   }
   else {
     if(d->hasID3v2) {
@@ -288,6 +290,10 @@ bool FLAC::File::save()
       d->ID3v2Location = -1;
       d->ID3v2OriginalSize = 0;
       d->hasID3v2 = false;
+
+      // FLAC metadata location has changed, update.
+
+      d->flacStart -= removedSize;
 
       // v1 tag location has changed, update if it exists
 
@@ -343,7 +349,6 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 {
   d->ID3v2FrameFactory = factory;
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
