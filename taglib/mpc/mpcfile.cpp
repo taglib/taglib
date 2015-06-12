@@ -315,7 +315,19 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
   // Look for MPC metadata
 
   if(readProperties) {
-    d->properties = new Properties(this, length() - d->ID3v2Size - d->APESize);
+    long streamLength;
+
+    if(d->hasAPE)
+      streamLength = d->APELocation;
+    else if(d->hasID3v1)
+      streamLength = d->ID3v1Location;
+    else
+      streamLength = length();
+
+    if(d->hasID3v2)
+      streamLength -= (d->ID3v2Location + d->ID3v2Size);
+
+    d->properties = new Properties(this, streamLength);
   }
 }
 
