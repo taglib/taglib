@@ -371,7 +371,7 @@ namespace TagLib {
       File &operator=(const File &);
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
-      long findID3v2(long offset);
+      long findID3v2();
       long findID3v1();
       void findAPE();
 

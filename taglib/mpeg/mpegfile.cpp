@@ -491,7 +491,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 {
   // Look for an ID3v2 tag
 
-  d->ID3v2Location = findID3v2(0);
+  d->ID3v2Location = findID3v2();
 
   if(d->ID3v2Location >= 0) {
 
@@ -534,10 +534,10 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   ID3v1Tag(true);
 }
 
-long MPEG::File::findID3v2(long offset)
+long MPEG::File::findID3v2()
 {
   // This method is based on the contents of TagLib::File::find(), but because
-  // of some subtlteies -- specifically the need to look for the bit pattern of
+  // of some subtleties -- specifically the need to look for the bit pattern of
   // an MPEG sync, it has been modified for use here.
 
   if(isValid() && ID3v2::Header::fileIdentifier().size() <= bufferSize()) {
@@ -558,8 +558,9 @@ long MPEG::File::findID3v2(long offset)
 
     long originalPosition = tell();
 
-    // Start the search at the offset.
+    // Start the search at the beginning.
 
+    long offset = 0;
     seek(offset);
 
     // This loop is the crux of the find method.  There are three cases that we
