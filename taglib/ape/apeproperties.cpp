@@ -67,7 +67,14 @@ APE::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
-  read(file);
+  debug("APE::Properties::Properties() -- This constructor is no longer used.");
+}
+
+APE::Properties::Properties(File *file, long streamLength, ReadStyle style) :
+  AudioProperties(style),
+  d(new PropertiesPrivate())
+{
+  read(file, streamLength);
 }
 
 APE::Properties::~Properties()
@@ -124,23 +131,20 @@ TagLib::uint APE::Properties::sampleFrames() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void APE::Properties::read(File *file)
+void APE::Properties::read(File *file, long streamLength)
 {
   // First we are searching the descriptor
-  const long offset = findDescriptor(file);
-  if(offset < 0)
+  const long offset = file->find("MAC ", file->tell());
+  if(offset < 0) {
+    debug("APE::Properties::read() -- APE descriptor not found");
     return;
+  }
 
   // Then we read the header common for all versions of APE
   file->seek(offset);
   const ByteVector commonHeader = file->readBlock(6);
   if(commonHeader.size() < 6) {
     debug("APE::Properties::read() -- header is too short.");
-    return;
-  }
-
-  if(!commonHeader.startsWith("MAC ")) {
-    debug("APE::Properties::read() -- invalid header signiture.");
     return;
   }
 
@@ -151,58 +155,11 @@ void APE::Properties::read(File *file)
   else
     analyzeOld(file);
 
-  long streamLength = file->length() - offset;
-
-  if(file->hasID3v1Tag())
-    streamLength -= 128;
-
-  if(file->hasAPETag())
-    streamLength -= file->APETag()->footer()->completeTagSize();
-
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const double length = d->sampleFrames * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
-}
-
-long APE::Properties::findDescriptor(File *file)
-{
-  const long ID3v2Location = findID3v2(file);
-  long ID3v2OriginalSize = 0;
-  bool hasID3v2 = false;
-  if(ID3v2Location >= 0) {
-    const ID3v2::Tag tag(file, ID3v2Location);
-    ID3v2OriginalSize = tag.header()->completeTagSize();
-    if(tag.header()->tagSize() > 0)
-      hasID3v2 = true;
-  }
-
-  long offset = 0;
-  if(hasID3v2)
-    offset = file->find("MAC ", ID3v2Location + ID3v2OriginalSize);
-  else
-    offset = file->find("MAC ");
-
-  if(offset < 0) {
-    debug("APE::Properties::findDescriptor() -- APE descriptor not found");
-    return -1;
-  }
-
-  return offset;
-}
-
-long APE::Properties::findID3v2(File *file)
-{
-  if(!file->isValid())
-    return -1;
-
-  file->seek(0);
-
-  if(file->readBlock(3) == ID3v2::Header::fileIdentifier())
-    return 0;
-
-  return -1;
 }
 
 void APE::Properties::analyzeCurrent(File *file)

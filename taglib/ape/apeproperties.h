@@ -51,9 +51,17 @@ namespace TagLib {
     public:
       /*!
        * Create an instance of APE::Properties with the data read from the
-       * ByteVector \a data.
+       * APE::File \a file.
+       *
+       * \deprecated
        */
-      Properties(File *f, ReadStyle style = Average);
+      Properties(File *file, ReadStyle style = Average);
+
+      /*!
+       * Create an instance of APE::Properties with the data read from the
+       * APE::File \a file.
+       */
+      Properties(File *file, long streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this APE::Properties instance.
@@ -121,10 +129,7 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read(File *file);
-
-      long findDescriptor(File *file);
-      long findID3v2(File *file);
+      void read(File *file, long streamLength);
 
       void analyzeCurrent(File *file);
       void analyzeOld(File *file);

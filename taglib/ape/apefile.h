@@ -216,8 +216,9 @@ namespace TagLib {
       File &operator=(const File &);
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
-      long findID3v1();
       long findAPE();
+      long findID3v1();
+      long findID3v2();
 
       class FilePrivate;
       FilePrivate *d;
