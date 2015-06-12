@@ -201,8 +201,7 @@ bool Ogg::File::save()
 
   // Reset all the internal structures for subsequent operations.
 
-  delete d;
-  d = new FilePrivate();
+  *d = FilePrivate();
 
   return true;
 }
@@ -284,7 +283,6 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
 {
   if(thePageGroup.isEmpty())
     return;
-
 
   // pages in the pageGroup and packets must be equivalent
   // (originalSize and size of packets would not work together),
