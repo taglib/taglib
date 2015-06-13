@@ -42,6 +42,21 @@ using namespace TagLib;
 namespace
 {
   enum { ID3v2Index = 0, APEIndex = 1, ID3v1Index = 2 };
+
+  /*!
+   * MPEG frames can be recognized by the bit pattern 11111111 111, so the
+   * first byte is easy to check for, however checking to see if the second byte
+   * starts with \e 111 is a bit more tricky, hence this member function.
+   */
+  inline bool firstSynchByte(uchar byte)
+  {
+    return (byte == 0xFF);
+  }
+
+  inline bool secondSynchByte(uchar byte)
+  {
+    return ((byte & 0xE0) == 0xE0);
+  }
 }
 
 class MPEG::File::FilePrivate
@@ -54,13 +69,10 @@ public:
     APELocation(-1),
     APEOriginalSize(0),
     ID3v1Location(-1),
+    properties(0),
     hasID3v2(false),
     hasID3v1(false),
-    hasAPE(false),
-    properties(0)
-  {
-
-  }
+    hasAPE(false) {}
 
   ~FilePrivate()
   {
@@ -79,14 +91,14 @@ public:
 
   TagUnion tag;
 
+  Properties *properties;
+
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
 
   bool hasID3v2;
   bool hasID3v1;
   bool hasAPE;
-
-  Properties *properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -403,11 +415,11 @@ long MPEG::File::nextFrameOffset(long position)
       return position - 1;
 
     for(uint i = 0; i < buffer.size() - 1; i++) {
-      if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
+      if(firstSynchByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
 
-    foundLastSyncPattern = uchar(buffer[buffer.size() - 1]) == 0xff;
+    foundLastSyncPattern = firstSynchByte(buffer[buffer.size() - 1]);
     position += buffer.size();
   }
 }
@@ -427,11 +439,11 @@ long MPEG::File::previousFrameOffset(long position)
     if(buffer.size() <= 0)
       break;
 
-    if(foundFirstSyncPattern && uchar(buffer[buffer.size() - 1]) == 0xff)
+    if(foundFirstSyncPattern && firstSynchByte(buffer[buffer.size() - 1]))
       return position + buffer.size() - 1;
 
     for(int i = buffer.size() - 2; i >= 0; i--) {
-      if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
+      if(firstSynchByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
 
@@ -534,112 +546,36 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
 long MPEG::File::findID3v2()
 {
-  // This method is based on the contents of TagLib::File::find(), but because
-  // of some subtleties -- specifically the need to look for the bit pattern of
-  // an MPEG sync, it has been modified for use here.
+  if(!isValid())
+    return -1;
 
-  if(isValid() && ID3v2::Header::fileIdentifier().size() <= bufferSize()) {
+  // Look for an ID3v2 tag located before the first MPEG frame.
 
-    // The position in the file that the current buffer starts at.
+  // An ID3v2 tag or an MPEG frame is most likely at the beginning of the file.
+  // It's worth it to have a special check first.
 
-    long bufferOffset = 0;
-    ByteVector buffer;
+  seek(0);
 
-    // These variables are used to keep track of a partial match that happens at
-    // the end of a buffer.
+  const ByteVector buffer = readBlock(3);
+  if(buffer.size() < 3)
+    return -1;
 
-    int previousPartialMatch = -1;
-    bool previousPartialSynchMatch = false;
+  if(buffer == ID3v2::Header::fileIdentifier())
+    return 0;
 
-    // Save the location of the current read pointer.  We will restore the
-    // position using seek() before all returns.
+  if(firstSynchByte(buffer[0]) && secondSynchByte(buffer[1]))
+    return -1;
 
-    long originalPosition = tell();
+  // Neither an ID3v2 tag nor MPEG frame at the beginning of the file.
+  // It's a fall-back option, so have an easy check ignoring its inefficiency.
 
-    // Start the search at the beginning.
+  const long tagOffset = find(ID3v2::Header::fileIdentifier());
+  if(tagOffset < 0)
+    return -1;
 
-    long offset = 0;
-    seek(offset);
-
-    // This loop is the crux of the find method.  There are three cases that we
-    // want to account for:
-    // (1) The previously searched buffer contained a partial match of the search
-    // pattern and we want to see if the next one starts with the remainder of
-    // that pattern.
-    //
-    // (2) The search pattern is wholly contained within the current buffer.
-    //
-    // (3) The current buffer ends with a partial match of the pattern.  We will
-    // note this for use in the next iteration, where we will check for the rest
-    // of the pattern.
-
-    for(buffer = readBlock(bufferSize()); buffer.size() > 0; buffer = readBlock(bufferSize())) {
-
-      // (1) previous partial match
-
-      if(previousPartialSynchMatch && secondSynchByte(buffer[0]))
-        return -1;
-
-      if(previousPartialMatch >= 0 && int(bufferSize()) > previousPartialMatch) {
-        const int patternOffset = (bufferSize() - previousPartialMatch);
-        if(buffer.containsAt(ID3v2::Header::fileIdentifier(), 0, patternOffset)) {
-          seek(originalPosition);
-          return offset + bufferOffset - bufferSize() + previousPartialMatch;
-        }
-      }
-
-      // (2) pattern contained in current buffer
-
-      long location = buffer.find(ID3v2::Header::fileIdentifier());
-      if(location >= 0) {
-        seek(originalPosition);
-        return offset + bufferOffset + location;
-      }
-
-      int firstSynchByte = buffer.find(char(uchar(255)));
-
-      // Here we have to loop because there could be several of the first
-      // (11111111) byte, and we want to check all such instances until we find
-      // a full match (11111111 111) or hit the end of the buffer.
-
-      while(firstSynchByte >= 0) {
-
-        // if this *is not* at the end of the buffer
-
-        if(firstSynchByte < int(buffer.size()) - 1) {
-          if(secondSynchByte(buffer[firstSynchByte + 1])) {
-            // We've found the frame synch pattern.
-            seek(originalPosition);
-            return -1;
-          }
-          else {
-
-            // We found 11111111 at the end of the current buffer indicating a
-            // partial match of the synch pattern.  The find() below should
-            // return -1 and break out of the loop.
-
-            previousPartialSynchMatch = true;
-          }
-        }
-
-        // Check in the rest of the buffer.
-
-        firstSynchByte = buffer.find(char(uchar(255)), firstSynchByte + 1);
-      }
-
-      // (3) partial match
-
-      previousPartialMatch = buffer.endsWithPartialMatch(ID3v2::Header::fileIdentifier());
-
-      bufferOffset += bufferSize();
-    }
-
-    // Since we hit the end of the file, reset the status before continuing.
-
-    clear();
-
-    seek(originalPosition);
-  }
+  const long frameOffset = nextFrameOffset(0);
+  if(frameOffset < 0 || tagOffset < frameOffset)
+    return tagOffset;
 
   return -1;
 }
@@ -674,12 +610,4 @@ long MPEG::File::findAPE()
     return location;
   else
     return -1;
-}
-
-bool MPEG::File::secondSynchByte(char byte)
-{
-  std::bitset<8> b(byte);
-
-  // check to see if the byte matches 111xxxxx
-  return b.test(7) && b.test(6) && b.test(5);
 }

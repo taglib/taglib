@@ -375,13 +375,6 @@ namespace TagLib {
       long findID3v1();
       long findAPE();
 
-      /*!
-       * MPEG frames can be recognized by the bit pattern 11111111 111, so the
-       * first byte is easy to check for, however checking to see if the second byte
-       * starts with \e 111 is a bit more tricky, hence this member function.
-       */
-      static bool secondSynchByte(char byte);
-
       class FilePrivate;
       FilePrivate *d;
     };

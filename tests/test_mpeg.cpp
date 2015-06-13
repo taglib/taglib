@@ -26,6 +26,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveAPETwice);
   CPPUNIT_TEST(testSaveTagCombination);
   CPPUNIT_TEST(testSaveDuplicateTags);
+  CPPUNIT_TEST(testID3v2AfterMPEGFrame);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -382,6 +383,12 @@ public:
     }
   }
 
+  void testID3v2AfterMPEGFrame()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("id3v2_after_mpeg_frame.mp3"));
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(!f.hasID3v2Tag());
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMPEG);
