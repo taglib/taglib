@@ -55,7 +55,8 @@ public:
     delete properties;
   }
 
-  unsigned long long headerSize;
+  ulong headerSize; // TODO: should be offset_t in taglib2.
+
   ASF::Tag *tag;
   ASF::Properties *properties;
   List<ASF::File::BaseObject *> objects;
@@ -166,7 +167,7 @@ ASF::File::HeaderExtensionObject::HeaderExtensionObject()
 void ASF::File::BaseObject::parse(ASF::File *file, unsigned int size)
 {
   data.clear();
-  if (size > 24 && size <= (unsigned int)(file->length()))
+  if(size > 24 && size <= (unsigned int)(file->length()))
     data = file->readBlock(size - 24);
   else
     data = ByteVector::null;
@@ -366,8 +367,8 @@ void ASF::File::HeaderExtensionObject::parse(ASF::File *file, uint /*size*/)
 ByteVector ASF::File::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(unsigned int i = 0; i < objects.size(); i++) {
-    data.append(objects[i]->render(file));
+  for(List<BaseObject*>::ConstIterator it = objects.begin(); it != objects.end(); ++it) {
+    data.append((*it)->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt(data.size(), false) + data;
   return BaseObject::render(file);
@@ -439,11 +440,17 @@ void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*properties
   d->properties = new ASF::Properties();
 
   bool ok;
-  d->headerSize = readQWORD(&ok);
+  const long long size = readQWORD(&ok);
   if(!ok) {
     setValid(false);
     return;
   }
+  if(size > 0xFFFFFFFF) {
+    debug("ASF: Too huge metadata. Can't handle it.");
+    setValid(false);
+    return;
+  }
+  d->headerSize = static_cast<ulong>(size);
 
   int numObjects = readDWORD(&ok);
   if(!ok) {
@@ -560,18 +567,19 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(List<BaseObject*>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
+  for(List<BaseObject*>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it)
     data.append((*it)->render(this));
-  }
 
-  data = headerGuid
-    + ByteVector::fromLongLong(data.size() + 30, false)
-    + ByteVector::fromUInt(d->objects.size(), false)
-    + ByteVector("\x01\x02", 2)
-    + data;
+  seek(16);
+  writeBlock(ByteVector::fromLongLong(data.size() + 30, false));
+  seek(24);
+  writeBlock(ByteVector::fromUInt(d->objects.size(), false));
+  seek(28);
+  writeBlock(ByteVector("\x01\x02", 2));
 
-  insert(data, 0, static_cast<TagLib::uint>(d->headerSize));
-  d->headerSize = data.size();
+  insert(data, 30, static_cast<TagLib::uint>(d->headerSize - 30));
+
+  d->headerSize = data.size() + 30;
 
   return true;
 }
@@ -648,4 +656,3 @@ ByteVector ASF::File::renderString(const String &str, bool includeLength)
   }
   return data;
 }
-
