@@ -44,7 +44,17 @@ public:
     extendedContentDescriptionObject(0),
     headerExtensionObject(0),
     metadataObject(0),
-    metadataLibraryObject(0) {}
+    metadataLibraryObject(0)
+  {
+    objects.setAutoDelete(true);
+  }
+
+  ~FilePrivate()
+  {
+    delete tag;
+    delete properties;
+  }
+
   unsigned long long headerSize;
   ASF::Tag *tag;
   ASF::Properties *properties;
@@ -142,17 +152,15 @@ class ASF::File::HeaderExtensionObject : public ASF::File::BaseObject
 {
 public:
   List<ASF::File::BaseObject *> objects;
-  ~HeaderExtensionObject();
+  HeaderExtensionObject();
   ByteVector guid();
   void parse(ASF::File *file, uint size);
   ByteVector render(ASF::File *file);
 };
 
-ASF::File::HeaderExtensionObject::~HeaderExtensionObject()
+ASF::File::HeaderExtensionObject::HeaderExtensionObject()
 {
-  for(unsigned int i = 0; i < objects.size(); i++) {
-    delete objects[i];
-  }
+  objects.setAutoDelete(true);
 }
 
 void ASF::File::BaseObject::parse(ASF::File *file, unsigned int size)
@@ -369,33 +377,24 @@ ByteVector ASF::File::HeaderExtensionObject::render(ASF::File *file)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle)
-  : TagLib::File(file)
+ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
-ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle)
-  : TagLib::File(stream)
+ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 ASF::File::~File()
 {
-  for(unsigned int i = 0; i < d->objects.size(); i++) {
-    delete d->objects[i];
-  }
-  if(d->tag) {
-    delete d->tag;
-  }
-  if(d->properties) {
-    delete d->properties;
-  }
   delete d;
 }
 
@@ -539,9 +538,10 @@ bool ASF::File::save()
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(unsigned int j = 0; j < attributes.size(); j++) {
+    ASF::AttributeList::ConstIterator jt = attributes.begin();
+    for(; jt != attributes.end(); ++jt) {
 
-      const Attribute &attribute = attributes[j];
+      const Attribute &attribute = *jt;
       const bool largeValue = (attribute.dataSize() > 65535);
       const bool guid       = (attribute.type() == Attribute::GuidType);
 
@@ -560,8 +560,8 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(unsigned int i = 0; i < d->objects.size(); i++) {
-    data.append(d->objects[i]->render(this));
+  for(List<BaseObject*>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
+    data.append((*it)->render(this));
   }
 
   data = headerGuid
@@ -628,7 +628,7 @@ String ASF::File::readString(int length)
 {
   ByteVector data = readBlock(length);
   unsigned int size = data.size();
-  while (size >= 2) {
+  while(size >= 2) {
     if(data[size - 1] != '\0' || data[size - 2] != '\0') {
       break;
     }
