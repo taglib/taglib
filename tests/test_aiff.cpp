@@ -18,6 +18,7 @@ class TestAIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testInvalidChunk);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -76,6 +77,26 @@ public:
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("excessive_alloc.aif"));
     CPPUNIT_ASSERT(!f.isValid());
+  }
+
+  void testInvalidChunk()
+  {
+    ScopedFileCopy copy("empty", ".aiff");
+
+    {
+      RIFF::AIFF::File f(copy.fileName().c_str());
+      f.seek(12);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f.readBlock(4));
+      f.insert(ByteVector("C\x10O\x90"), 12, 4);
+    }
+
+    {
+      RIFF::AIFF::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.isValid());
+
+      f.seek(12);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("C\x10O\x90"), f.readBlock(4));
+    }
   }
 
 };
