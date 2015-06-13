@@ -52,7 +52,6 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     APELocation(-1),
-    APEFooterLocation(-1),
     APEOriginalSize(0),
     ID3v1Location(-1),
     hasID3v2(false),
@@ -74,7 +73,6 @@ public:
   uint ID3v2OriginalSize;
 
   long APELocation;
-  long APEFooterLocation;
   uint APEOriginalSize;
 
   long ID3v1Location;
@@ -291,7 +289,6 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
 
     const long prevOriginalSize = d->APEOriginalSize;
     d->APEOriginalSize = APETag()->footer()->completeTagSize();
-    d->APEFooterLocation = d->APELocation + d->APEOriginalSize - APE::Footer::size();
     d->hasAPE = true;
 
     // v1 tag location has changed, update if it exists
@@ -369,7 +366,6 @@ bool MPEG::File::strip(int tags, bool freeMemory)
 
     const long removedSize = d->APEOriginalSize;
     d->APELocation = -1;
-    d->APEFooterLocation = -1;
     d->APEOriginalSize = 0;
     d->hasAPE = false;
 
@@ -516,12 +512,14 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 
   // Look for an APE tag
 
-  findAPE();
+  d->APELocation = findAPE();
 
   if(d->APELocation >= 0) {
 
-    d->tag.set(APEIndex, new APE::Tag(this, d->APEFooterLocation));
+    d->tag.set(APEIndex, new APE::Tag(this, d->APELocation));
+
     d->APEOriginalSize = APETag()->footer()->completeTagSize();
+    d->APELocation = d->APELocation + APETag()->footer()->size() - d->APEOriginalSize;
     d->hasAPE = true;
   }
 
@@ -648,36 +646,34 @@ long MPEG::File::findID3v2()
 
 long MPEG::File::findID3v1()
 {
-  if(isValid()) {
-    seek(-128, End);
-    long p = tell();
+  if(!isValid())
+    return -1;
 
-    if(readBlock(3) == ID3v1::Tag::fileIdentifier())
-      return p;
-  }
-  return -1;
+  seek(-128, End);
+  const long location = tell();
+
+  if(readBlock(3) == ID3v1::Tag::fileIdentifier())
+    return location;
+  else
+    return -1;
 }
 
-void MPEG::File::findAPE()
+long MPEG::File::findAPE()
 {
-  if(isValid()) {
-    seek(d->hasID3v1 ? -160 : -32, End);
+  if(!isValid())
+    return -1;
 
-    long p = tell();
+  if(d->hasID3v1)
+    seek(-160, End);
+  else
+    seek(-32, End);
 
-    if(readBlock(8) == APE::Tag::fileIdentifier()) {
-      d->APEFooterLocation = p;
-      seek(d->APEFooterLocation);
-      APE::Footer footer(readBlock(APE::Footer::size()));
-      d->APELocation = d->APEFooterLocation - footer.completeTagSize()
-                       + APE::Footer::size();
-      return;
-    }
-  }
+  const long location = tell();
 
-  d->APELocation = -1;
-  d->APEFooterLocation = -1;
-  d->APEOriginalSize = 0;
+  if(readBlock(8) == APE::Tag::fileIdentifier())
+    return location;
+  else
+    return -1;
 }
 
 bool MPEG::File::secondSynchByte(char byte)
