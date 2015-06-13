@@ -199,7 +199,10 @@ bool Ogg::File::save()
   }
   writePageGroup(pageGroup);
 
-  // Reset all the internal structures for subsequent operations.
+  // Reset all the internal data, since the actual file has been updated.
+
+  // It's required to keep the consistency between this class and the actual
+  // file and avoid corrupting them by subsequent operations.
 
   *d = FilePrivate();
 
