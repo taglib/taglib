@@ -67,14 +67,11 @@ public:
     hasID3v2(false),
     hasID3v1(false)
   {
+    blocks.setAutoDelete(true);
   }
 
   ~FilePrivate()
   {
-    uint size = blocks.size();
-    for(uint i = 0; i < size; i++) {
-      delete blocks[i];
-    }
     delete properties;
   }
 
@@ -107,18 +104,18 @@ public:
 
 FLAC::File::File(FileName file, bool readProperties,
                  Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
     read(readProperties, propertiesStyle);
@@ -126,9 +123,9 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 
 FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
     read(readProperties, propertiesStyle);
@@ -176,7 +173,6 @@ FLAC::Properties *FLAC::File::audioProperties() const
 {
   return d->properties;
 }
-
 
 bool FLAC::File::save()
 {
@@ -561,11 +557,10 @@ long FLAC::File::findID3v2()
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
-    if(picture) {
+  for(List<MetadataBlock *>::Iterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    Picture *picture = dynamic_cast<Picture *>(*it);
+    if(picture)
       pictures.append(picture);
-    }
   }
   return pictures;
 }
@@ -577,8 +572,7 @@ void FLAC::File::addPicture(Picture *picture)
 
 void FLAC::File::removePicture(Picture *picture, bool del)
 {
-  MetadataBlock *block = picture;
-  List<MetadataBlock *>::Iterator it = d->blocks.find(block);
+  List<MetadataBlock *>::Iterator it = d->blocks.find(picture);
   if(it != d->blocks.end())
     d->blocks.erase(it);
 
@@ -588,17 +582,15 @@ void FLAC::File::removePicture(Picture *picture, bool del)
 
 void FLAC::File::removePictures()
 {
-  List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
-    if(picture) {
-      delete picture;
+  for(List<MetadataBlock *>::Iterator it = d->blocks.begin(); it != d->blocks.end(); ) {
+    if(dynamic_cast<Picture *>(*it)) {
+      delete *it;
+      it = d->blocks.erase(it);
     }
     else {
-      newBlocks.append(d->blocks[i]);
+      ++it;
     }
   }
-  d->blocks = newBlocks;
 }
 
 void FLAC::File::strip(int tags)
