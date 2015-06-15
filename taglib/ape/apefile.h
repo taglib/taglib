@@ -79,6 +79,8 @@ namespace TagLib {
         ID3v1   = 0x0001,
         //! Matches APE tags.
         APE     = 0x0002,
+        //! Matches ID3v2 tags.
+        ID3v2   = 0x0004,
         //! Matches all tag types.
         AllTags = 0xffff
       };
@@ -211,14 +213,25 @@ namespace TagLib {
        */
       bool hasID3v1Tag() const;
 
+      /*!
+       * Returns whether or not the file on disk actually has an ID3v2 tag.
+       *
+       * \note Checking purpose only. Reading or writing an ID3v2 tag is not
+       * allowed by design.
+       *
+       * \see strip()
+       */
+      bool hasID3v2Tag() const;
+
     private:
       File(const File &);
       File &operator=(const File &);
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       void scan();
-      long findID3v1();
       long findAPE();
+      long findID3v1();
+      long findID3v2();
 
       class FilePrivate;
       FilePrivate *d;

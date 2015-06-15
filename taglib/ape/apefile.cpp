@@ -36,6 +36,7 @@
 #include <tdebug.h>
 #include <tagunion.h>
 #include <id3v1tag.h>
+#include <id3v2header.h>
 #include <tpropertymap.h>
 
 #include "apefile.h"
@@ -57,12 +58,17 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
+    ID3v2Header(0),
+    ID3v2Location(-1),
+    ID3v2Size(0),
     properties(0),
     hasAPE(false),
-    hasID3v1(false) {}
+    hasID3v1(false),
+    hasID3v2(false) {}
 
   ~FilePrivate()
   {
+    delete ID3v2Header;
     delete properties;
   }
 
@@ -70,6 +76,10 @@ public:
   uint APESize;
 
   long ID3v1Location;
+
+  ID3v2::Header *ID3v2Header;
+  long ID3v2Location;
+  uint ID3v2Size;
 
   TagUnion tag;
 
@@ -80,6 +90,7 @@ public:
 
   bool hasAPE;
   bool hasID3v1;
+  bool hasID3v2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,66 +159,85 @@ bool APE::File::save()
     return false;
   }
 
+  // Possibly strip ID3v2 tag
+
+  if(d->hasID3v2 && !d->ID3v2Header) {
+    removeBlock(d->ID3v2Location, d->ID3v2Size);
+
+    const long removedSize = d->ID3v2Size;
+    d->ID3v2Location = -1;
+    d->ID3v2Size = 0;
+    d->hasID3v2 = false;
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location -= removedSize;
+
+    if(d->APELocation >= 0)
+      d->APELocation -= removedSize;
+  }
+
   // Update ID3v1 tag
 
   if(ID3v1Tag()) {
     if(d->hasID3v1) {
       seek(d->ID3v1Location);
-      writeBlock(ID3v1Tag()->render());
     }
     else {
       seek(0, End);
       d->ID3v1Location = tell();
-      writeBlock(ID3v1Tag()->render());
-      d->hasID3v1 = true;
     }
+
+    writeBlock(ID3v1Tag()->render());
+    d->hasID3v1 = true;
   }
   else {
     if(d->hasID3v1) {
       removeBlock(d->ID3v1Location, 128);
+
+      d->ID3v1Location = -1;
       d->hasID3v1 = false;
-      if(d->hasAPE) {
-        if(d->APELocation > d->ID3v1Location)
-          d->APELocation -= 128;
-      }
     }
   }
 
   // Update APE tag
 
   if(APETag()) {
-    if(d->hasAPE)
-      insert(APETag()->render(), d->APELocation, d->APESize);
-    else {
-      if(d->hasID3v1)  {
-        insert(APETag()->render(), d->ID3v1Location, 0);
-        d->APESize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
+    if(!d->hasAPE) {
+      if(d->hasID3v1) {
         d->APELocation = d->ID3v1Location;
-        d->ID3v1Location += d->APESize;
       }
       else {
         seek(0, End);
         d->APELocation = tell();
-        writeBlock(APETag()->render());
-        d->APESize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
       }
     }
+
+    insert(APETag()->render(), d->APELocation, d->APESize);
+
+    const long prevAPESize = d->APESize;
+    d->APESize = APETag()->footer()->completeTagSize();
+    d->hasAPE = true;
+
+    // v1 tag location has changed, update if it exists
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location += (d->APESize - prevAPESize);
   }
   else {
     if(d->hasAPE) {
       removeBlock(d->APELocation, d->APESize);
+
+      const long removedSize = d->APESize;
+      d->APELocation = -1;
+      d->APESize = 0;
       d->hasAPE = false;
-      if(d->hasID3v1) {
-        if(d->ID3v1Location > d->APELocation) {
-          d->ID3v1Location -= d->APESize;
-        }
-      }
+
+      if(d->ID3v1Location >= 0)
+        d->ID3v1Location -= removedSize;
     }
   }
 
-   return true;
+  return true;
 }
 
 ID3v1::Tag *APE::File::ID3v1Tag(bool create)
@@ -227,6 +257,11 @@ void APE::File::strip(int tags)
     APETag(true);
   }
 
+  if(tags & ID3v2) {
+    delete d->ID3v2Header;
+    d->ID3v2Header = 0;
+  }
+
   if(tags & APE) {
     d->tag.set(ApeAPEIndex, 0);
 
@@ -243,6 +278,11 @@ bool APE::File::hasAPETag() const
 bool APE::File::hasID3v1Tag() const
 {
   return d->hasID3v1;
+}
+
+bool APE::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -273,6 +313,24 @@ void APE::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
 
   if(!d->hasID3v1)
     APETag(true);
+
+  // Look for and skip an ID3v2 tag
+
+  d->ID3v2Location = findID3v2();
+
+  if(d->ID3v2Location >= 0) {
+    seek(d->ID3v2Location);
+    d->ID3v2Header = new ID3v2::Header(readBlock(ID3v2::Header::size()));
+    d->ID3v2Size = d->ID3v2Header->completeTagSize();
+    d->hasID3v2 = true;
+  }
+
+  if(d->hasID3v2)
+    seek(d->ID3v2Location + d->ID3v2Size);
+  else
+    seek(0);
+
+  // TODO: Make use of the file pointer in AudioProperties.
 
   // Look for APE audio properties
 
@@ -309,6 +367,20 @@ long APE::File::findID3v1()
 
   if(readBlock(3) == ID3v1::Tag::fileIdentifier())
     return p;
+
+  return -1;
+}
+
+
+long APE::File::findID3v2()
+{
+  if(!isValid())
+    return -1;
+
+  seek(0);
+
+  if(readBlock(3) == ID3v2::Header::fileIdentifier())
+    return 0;
 
   return -1;
 }
