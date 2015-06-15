@@ -295,7 +295,6 @@ namespace TagLib {
       long findID3v2();
       long findID3v1();
       ByteVector xiphCommentData() const;
-      long findPaddingBreak(long nextPageOffset, long targetOffset, bool *isLast);
 
       class FilePrivate;
       FilePrivate *d;

@@ -203,7 +203,6 @@ namespace TagLib {
       File &operator=(const File &);
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
-      void scan();
       long findID3v1();
       long findAPE();
 
