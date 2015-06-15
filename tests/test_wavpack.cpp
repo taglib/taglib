@@ -18,7 +18,10 @@ class TestWavPack : public CppUnit::TestFixture
   CPPUNIT_TEST(testLengthScan);
   CPPUNIT_TEST(testSaveID3v1Twice);
   CPPUNIT_TEST(testSaveAPETwice);
-  CPPUNIT_TEST(testSaveTagCombination);
+  CPPUNIT_TEST(testSaveTags1);
+  CPPUNIT_TEST(testSaveTags2);
+  CPPUNIT_TEST(testStripTags1);
+  CPPUNIT_TEST(testStripTags2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -98,12 +101,12 @@ public:
     }
   }
 
-  void testSaveTagCombination()
+  void testSaveTags1()
   {
-    ScopedFileCopy copy1("click", ".wv");
+    ScopedFileCopy copy("click", ".wv");
 
     {
-      WavPack::File f(copy1.fileName().c_str());
+      WavPack::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -119,7 +122,7 @@ public:
     }
 
     {
-      WavPack::File f(copy1.fileName().c_str());
+      WavPack::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL((long)3405, f.length());
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
@@ -127,11 +130,14 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
     }
+  }
 
-    ScopedFileCopy copy2("click", ".wv");
+  void testSaveTags2()
+  {
+    ScopedFileCopy copy("click", ".wv");
 
     {
-      WavPack::File f(copy2.fileName().c_str());
+      WavPack::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -147,13 +153,103 @@ public:
     }
 
     {
-      WavPack::File f(copy2.fileName().c_str());
+      WavPack::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL((long)3405, f.length());
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+    }
+  }
+
+  void testStripTags1()
+  {
+    ScopedFileCopy copy("click", ".wv");
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+    }
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3405, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.strip(WavPack::File::ID3v1);
+      f.save();
+    }
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3277, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.strip(WavPack::File::APE);
+      f.save();
+    }
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3240, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+    }
+  }
+
+  void testStripTags2()
+  {
+    ScopedFileCopy copy("click", ".wv");
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+    }
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3405, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.strip(WavPack::File::APE);
+      f.save();
+    }
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3304, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.strip(WavPack::File::ID3v1);
+      f.save();
+    }
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3240, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
     }
   }
 
