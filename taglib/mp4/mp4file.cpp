@@ -35,9 +35,10 @@ using namespace TagLib;
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() : tag(0), atoms(0), properties(0)
-  {
-  }
+  FilePrivate() :
+    tag(0),
+    atoms(0),
+    properties(0) {}
 
   ~FilePrivate()
   {
@@ -51,18 +52,18 @@ public:
   MP4::Properties *properties;
 };
 
-MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
-    : TagLib::File(file)
+MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, audioPropertiesStyle);
 }
 
-MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
-    : TagLib::File(stream)
+MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, audioPropertiesStyle);
 }
@@ -102,10 +103,10 @@ MP4::File::audioProperties() const
 bool
 MP4::File::checkValid(const MP4::AtomList &list)
 {
-  for(uint i = 0; i < list.size(); i++) {
-    if(list[i]->length == 0)
+  for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
+    if((*it)->length == 0)
       return false;
-    if(!checkValid(list[i]->children))
+    if(!checkValid((*it)->children))
       return false;
   }
   return true;
@@ -118,7 +119,7 @@ MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
     return;
 
   d->atoms = new Atoms(this);
-  if (!checkValid(d->atoms->atoms)) {
+  if(!checkValid(d->atoms->atoms)) {
     setValid(false);
     return;
   }
