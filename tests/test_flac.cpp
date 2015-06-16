@@ -304,15 +304,22 @@ public:
     ScopedFileCopy copy1("no-tags", ".flac");
     ScopedFileCopy copy2("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasXiphComment());
       CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
 
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       f.xiphComment(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasXiphComment());
       CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
 
     {
@@ -322,6 +329,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasXiphComment());
       CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+
+      f.xiphComment(true)->setTitle("");
+      f.save();
+
+      f.seek(0x00E0);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -330,15 +346,22 @@ public:
     ScopedFileCopy copy1("no-tags", ".flac");
     ScopedFileCopy copy2("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
 
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
 
     {
@@ -348,6 +371,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+
+      f.ID3v1Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -356,15 +388,22 @@ public:
     ScopedFileCopy copy1("no-tags", ".flac");
     ScopedFileCopy copy2("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
 
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL((long)5760, f.length());
+
+      f.seek(0x052C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
 
     {
@@ -374,6 +413,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL((long)5760, f.length());
+
+      f.seek(0x052C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+
+      f.ID3v2Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -381,8 +429,12 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(!f.hasXiphComment());
@@ -422,6 +474,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.xiphComment()->title());
+
+      f.seek(0x052C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -429,8 +484,12 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(!f.hasXiphComment());
@@ -471,6 +530,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.xiphComment()->title());
+
+      f.seek(0x052C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -478,8 +540,12 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(!f.hasXiphComment());
@@ -520,6 +586,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.xiphComment()->title());
+
+      f.seek(0x052C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -527,8 +596,12 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(!f.hasXiphComment());
@@ -578,6 +651,9 @@ public:
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(f.hasXiphComment());
+
+      f.seek(0x00E0);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -585,8 +661,12 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(!f.hasXiphComment());
@@ -636,6 +716,9 @@ public:
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(f.hasXiphComment());
+
+      f.seek(0x00E0);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
@@ -643,8 +726,12 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".flac");
 
+    ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(!f.hasXiphComment());
@@ -694,6 +781,9 @@ public:
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(f.hasXiphComment());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
     }
   }
 
