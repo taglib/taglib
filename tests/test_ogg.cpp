@@ -45,14 +45,30 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
-    Vorbis::File *f = new Vorbis::File(newname.c_str());
-    f->tag()->addField("test", ByteVector(128 * 1024, 'x') + ByteVector(1, '\0'));
-    f->save();
-    delete f;
+    String text(std::string(128 * 1024, ' '));
+    for (size_t i = 0; i < text.size(); ++i)
+      text[i] = static_cast<char>('A' + i % 26);
 
-    f = new Vorbis::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
-    delete f;
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(2, f.lastPageHeader()->pageSequenceNumber());
+      f.tag()->setTitle(text);
+      f.save();
+    }
+
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(19, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(text, f.tag()->title());
+      f.tag()->setTitle("");
+      f.save();
+    }
+
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(3, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(String(), f.tag()->title());
+    }
   }
 
   void testDictInterface1()
@@ -110,13 +126,20 @@ public:
     ScopedFileCopy copy1("empty", ".ogg");
     ScopedFileCopy copy2("empty", ".ogg");
 
+    ByteVector audioStream;
     {
       Vorbis::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL((long)4328, f.length());
 
+      f.seek(0x0093);
+      audioStream = f.readBlock(4096);
+
       f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT_EQUAL((long)4361, f.length());
+
+      f.seek(0x00B4);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4096));
     }
 
     {
@@ -125,6 +148,15 @@ public:
       f.save();
       f.save();
       CPPUNIT_ASSERT_EQUAL((long)4361, f.length());
+
+      f.seek(0x00B4);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4096));
+
+      f.tag()->setTitle("");
+      f.save();
+
+      f.seek(0x0093);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4096));
     }
   }
 
