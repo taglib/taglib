@@ -311,13 +311,20 @@ public:
     ScopedFileCopy copy1("no-tags", ".m4a");
     ScopedFileCopy copy2("no-tags", ".m4a");
 
+    ByteVector audioStream;
     {
       MP4::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL((long)2898, f.length());
 
+      f.seek(0x001C);
+      audioStream = f.readBlock(1465);
+
       f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT_EQUAL((long)3975, f.length());
+
+      f.seek(0x001C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1465));
     }
 
     {
@@ -326,6 +333,12 @@ public:
       f.save();
       f.save();
       CPPUNIT_ASSERT_EQUAL((long)3975, f.length());
+
+      f.tag()->setTitle("");
+      f.save();
+
+      f.seek(0x001C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1465));
     }
   }
 
