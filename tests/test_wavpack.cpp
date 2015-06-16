@@ -54,15 +54,22 @@ public:
     ScopedFileCopy copy1("click", ".wv");
     ScopedFileCopy copy2("click", ".wv");
 
+    ByteVector audioStream;
     {
       WavPack::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)3176, f.length());
 
+      f.seek(0x0000);
+      audioStream = f.readBlock(3176);
+
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)3368, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
 
     {
@@ -72,6 +79,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)3368, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
+
+      f.ID3v1Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
   }
 
@@ -80,15 +96,22 @@ public:
     ScopedFileCopy copy1("click", ".wv");
     ScopedFileCopy copy2("click", ".wv");
 
+    ByteVector audioStream;
     {
       WavPack::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)3176, f.length());
 
+      f.seek(0x0000);
+      audioStream = f.readBlock(3176);
+
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)3277, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
 
     {
@@ -98,6 +121,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)3277, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
+
+      f.APETag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
   }
 
@@ -105,8 +137,12 @@ public:
   {
     ScopedFileCopy copy("click", ".wv");
 
+    ByteVector audioStream;
     {
       WavPack::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(3176);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -129,6 +165,9 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
   }
 
@@ -136,8 +175,12 @@ public:
   {
     ScopedFileCopy copy("click", ".wv");
 
+    ByteVector audioStream;
     {
       WavPack::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(3176);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -160,6 +203,9 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
   }
 
@@ -167,8 +213,12 @@ public:
   {
     ScopedFileCopy copy("click", ".wv");
 
+    ByteVector audioStream;
     {
       WavPack::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(3176);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -205,6 +255,9 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)3240, f.length());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
   }
 
@@ -212,8 +265,12 @@ public:
   {
     ScopedFileCopy copy("click", ".wv");
 
+    ByteVector audioStream;
     {
       WavPack::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(3176);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -250,6 +307,9 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)3240, f.length());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(3176));
     }
   }
 
