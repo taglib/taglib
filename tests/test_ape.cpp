@@ -75,15 +75,22 @@ public:
     ScopedFileCopy copy1("mac-399", ".ape");
     ScopedFileCopy copy2("mac-399", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)172, f.length());
 
+      f.seek(0x0000);
+      audioStream = f.readBlock(172);
+
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)364, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
 
     {
@@ -93,6 +100,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)364, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
+
+      f.ID3v1Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
   }
 
@@ -101,15 +117,22 @@ public:
     ScopedFileCopy copy1("mac-399", ".ape");
     ScopedFileCopy copy2("mac-399", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)172, f.length());
 
+      f.seek(0x0000);
+      audioStream = f.readBlock(172);
+
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)273, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
 
     {
@@ -119,6 +142,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)273, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
+
+      f.APETag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
   }
 
@@ -126,13 +158,12 @@ public:
   {
     ScopedFileCopy copy("mac-399", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy.fileName().c_str());
-      f.strip();
-    }
+      f.seek(0x0000);
+      audioStream = f.readBlock(172);
 
-    {
-      APE::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -155,6 +186,9 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
   }
 
@@ -162,13 +196,12 @@ public:
   {
     ScopedFileCopy copy("mac-399", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy.fileName().c_str());
-      f.strip();
-    }
+      f.seek(0x0000);
+      audioStream = f.readBlock(172);
 
-    {
-      APE::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -191,6 +224,9 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
   }
 
@@ -198,8 +234,12 @@ public:
   {
     ScopedFileCopy copy("mac-399", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(172);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -236,6 +276,9 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)236, f.length());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
   }
 
@@ -243,8 +286,12 @@ public:
   {
     ScopedFileCopy copy("mac-399", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(172);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -281,6 +328,9 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)236, f.length());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(172));
     }
   }
 
@@ -288,8 +338,12 @@ public:
   {
     ScopedFileCopy copy("mac-399-id3v2", ".ape");
 
+    ByteVector audioStream;
     {
       APE::File f(copy.fileName().c_str());
+      f.seek(0x0F67);
+      audioStream = f.readBlock(16384);
+
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL((long)89155, f.length());
       f.strip(APE::File::ID3v2);
@@ -299,6 +353,9 @@ public:
       APE::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL((long)85276, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(16384));
     }
   }
 
