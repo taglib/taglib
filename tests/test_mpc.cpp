@@ -102,15 +102,22 @@ public:
     ScopedFileCopy copy1("click", ".mpc");
     ScopedFileCopy copy2("click", ".mpc");
 
+    ByteVector audioStream;
     {
       MPC::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)1588, f.length());
 
+      f.seek(0x0000);
+      audioStream = f.readBlock(1588);
+
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)1780, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
 
     {
@@ -120,6 +127,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
       CPPUNIT_ASSERT_EQUAL((long)1780, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
+
+      f.ID3v1Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
   }
 
@@ -128,15 +144,22 @@ public:
     ScopedFileCopy copy1("click", ".mpc");
     ScopedFileCopy copy2("click", ".mpc");
 
+    ByteVector audioStream;
     {
       MPC::File f(copy1.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)1588, f.length());
 
+      f.seek(0x0000);
+      audioStream = f.readBlock(1588);
+
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)1689, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
 
     {
@@ -146,6 +169,15 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.hasAPETag());
       CPPUNIT_ASSERT_EQUAL((long)1689, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
+
+      f.APETag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
   }
 
@@ -153,8 +185,12 @@ public:
   {
     ScopedFileCopy copy("click", ".mpc");
 
+    ByteVector audioStream;
     {
       MPC::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(1588);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -177,6 +213,9 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
   }
 
@@ -184,8 +223,12 @@ public:
   {
     ScopedFileCopy copy("click", ".mpc");
 
+    ByteVector audioStream;
     {
       MPC::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(1588);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -208,6 +251,9 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
   }
 
@@ -215,8 +261,12 @@ public:
   {
     ScopedFileCopy copy("click", ".mpc");
 
+    ByteVector audioStream;
     {
       MPC::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(1588);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -253,6 +303,9 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)1652, f.length());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
   }
 
@@ -260,8 +313,12 @@ public:
   {
     ScopedFileCopy copy("click", ".mpc");
 
+    ByteVector audioStream;
     {
       MPC::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(1588);
+
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(!f.hasAPETag());
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
@@ -298,6 +355,9 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)1652, f.length());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
       CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(1588));
     }
   }
 
