@@ -275,6 +275,8 @@ namespace TagLib {
 
     /*!
      * Returns a CRC checksum of the byte vector's data.
+     *
+     * \deprecated Always returns zero.
      */
     uint checksum() const;
 
