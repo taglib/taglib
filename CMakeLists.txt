@@ -82,7 +82,7 @@ if(WIN32)
   install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd" DESTINATION "${BIN_INSTALL_DIR}")
 endif()
 
-if(NOT WIN32 AND NOT BUILD_FRAMEWORK)
+if(NOT BUILD_FRAMEWORK)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc")
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc" DESTINATION "${LIB_INSTALL_DIR}/pkgconfig")
 endif()
