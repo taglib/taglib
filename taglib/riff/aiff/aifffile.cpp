@@ -40,10 +40,7 @@ public:
     properties(0),
     tag(0),
     tagChunkID("ID3 "),
-    hasID3v2(false)
-  {
-
-  }
+    id3v2Count(0) {}
 
   ~FilePrivate()
   {
@@ -53,9 +50,9 @@ public:
 
   Properties *properties;
   ID3v2::Tag *tag;
-  ByteVector tagChunkID;
 
-  bool hasID3v2;
+  ByteVector tagChunkID;
+  int id3v2Count;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +107,11 @@ RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
 
 bool RIFF::AIFF::File::save()
 {
+  return RIFF::AIFF::File::save(4);
+}
+
+bool RIFF::AIFF::File::save(int id3v2Version)
+{
   if(readOnly()) {
     debug("RIFF::AIFF::File::save() -- File is read only.");
     return false;
@@ -120,15 +122,23 @@ bool RIFF::AIFF::File::save()
     return false;
   }
 
-  setChunkData(d->tagChunkID, d->tag->render());
-  d->hasID3v2 = true;
+  if(d->id3v2Count >= 2 || d->tag->isEmpty()) {
+    removeChunk("ID3 ");
+    removeChunk("id3 ");
+    d->id3v2Count = 0;
+  }
+
+  if(!d->tag->isEmpty()) {
+    setChunkData(d->tagChunkID, d->tag->render(id3v2Version));
+    d->id3v2Count = 1;
+  }
 
   return true;
 }
 
 bool RIFF::AIFF::File::hasID3v2Tag() const
 {
-  return d->hasID3v2;
+  return (d->id3v2Count != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,10 +151,10 @@ void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertie
   for(uint i = 0; i < chunkCount(); i++) {
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
+      d->id3v2Count++;
       if(!d->tag) {
-        d->tagChunkID = name;
         d->tag = new ID3v2::Tag(this, chunkOffset(i));
-        d->hasID3v2 = true;
+        d->tagChunkID = name;
       }
       else {
         debug("RIFF::AIFF::File::read() - Duplicate ID3v2 tag found.");

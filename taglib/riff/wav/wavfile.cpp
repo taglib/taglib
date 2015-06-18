@@ -46,10 +46,8 @@ public:
   FilePrivate() :
     properties(0),
     tagChunkID("ID3 "),
-    hasID3v2(false),
-    hasInfo(false)
-  {
-  }
+    id3v2Count(0),
+    infoCount(0) {}
 
   ~FilePrivate()
   {
@@ -57,13 +55,11 @@ public:
   }
 
   Properties *properties;
-
-  ByteVector tagChunkID;
-
   TagUnion tag;
 
-  bool hasID3v2;
-  bool hasInfo;
+  ByteVector tagChunkID;
+  int id3v2Count;
+  int infoCount;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,29 +142,32 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
   if(stripOthers)
     strip(static_cast<TagTypes>(AllTags & ~tags));
 
-  const ID3v2::Tag *id3v2tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
   if(tags & ID3v2) {
-    if(d->hasID3v2) {
-      removeChunk(d->tagChunkID);
-      d->hasID3v2 = false;
+    const ID3v2::Tag *id3v2tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
+    if(d->id3v2Count >= 2 || id3v2tag->isEmpty()) {
+      strip(ID3v2);
     }
 
     if(!id3v2tag->isEmpty()) {
       setChunkData(d->tagChunkID, id3v2tag->render(id3v2Version));
-      d->hasID3v2 = true;
+      d->id3v2Count = 1;
     }
   }
 
-  const Info::Tag *infotag = d->tag.access<Info::Tag>(InfoIndex, false);
   if(tags & Info) {
-    if(d->hasInfo) {
-      removeChunk(findInfoTagChunk());
-      d->hasInfo = false;
+    const Info::Tag *infotag = d->tag.access<Info::Tag>(InfoIndex, false);
+    if(d->infoCount >= 2 || infotag->isEmpty()) {
+      strip(Info);
     }
 
     if(!infotag->isEmpty()) {
-      setChunkData("LIST", infotag->render(), true);
-      d->hasInfo = true;
+      const ByteVector data = infotag->render();
+      if(hasInfoTag())
+        setChunkData(findInfoTagChunk(), data);
+      else
+        setChunkData("LIST", data, true);
+
+      d->infoCount = 1;
     }
   }
 
@@ -177,12 +176,12 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
 
 bool RIFF::WAV::File::hasID3v2Tag() const
 {
-  return d->hasID3v2;
+  return (d->id3v2Count != 0);
 }
 
 bool RIFF::WAV::File::hasInfoTag() const
 {
-  return d->hasInfo;
+  return (d->infoCount != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,10 +195,10 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
   for(uint i = 0; i < chunkCount(); i++) {
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
+      d->id3v2Count++;
       if(!d->tag[ID3v2Index]) {
-        d->tagChunkID = name;
         d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i)));
-        d->hasID3v2 = true;
+        d->tagChunkID = name;
       }
       else {
         debug("RIFF::WAV::File::read() - Duplicate ID3v2 tag found.");
@@ -208,9 +207,9 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
     else if(name == "LIST") {
       const ByteVector data = chunkData(i);
       if(data.mid(0, 4) == "INFO") {
+        d->infoCount++;
         if(!d->tag[InfoIndex]) {
           d->tag.set(InfoIndex, new RIFF::Info::Tag(data));
-          d->hasInfo = true;
         }
         else {
           debug("RIFF::WAV::File::read() - Duplicate INFO tag found.");
@@ -248,16 +247,14 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
 void RIFF::WAV::File::strip(TagTypes tags)
 {
   if(tags & ID3v2) {
-    removeChunk(d->tagChunkID);
-    d->hasID3v2 = false;
+    removeChunk("ID3 ");
+    removeChunk("id3 ");
+    d->id3v2Count = 0;
   }
 
-  if(tags & Info){
-    TagLib::uint chunkId = findInfoTagChunk();
-    if(chunkId != TagLib::uint(-1)) {
-      removeChunk(chunkId);
-      d->hasInfo = false;
-    }
+  if(tags & Info) {
+    removeInfoTagChunk();
+    d->infoCount = 0;
   }
 }
 
@@ -270,4 +267,12 @@ TagLib::uint RIFF::WAV::File::findInfoTagChunk()
   }
 
   return TagLib::uint(-1);
+}
+
+void TagLib::RIFF::WAV::File::removeInfoTagChunk()
+{
+  TagLib::uint chunkId;
+  while((chunkId = findInfoTagChunk()) != TagLib::uint(-1)) {
+    removeChunk(chunkId);
+  }
 }
