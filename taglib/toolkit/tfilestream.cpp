@@ -45,7 +45,6 @@ namespace
   typedef FileName FileNameHandle;
   typedef HANDLE FileHandle;
 
-  const TagLib::uint BufferSize = 8192;
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -93,7 +92,6 @@ namespace
 
   typedef FILE* FileHandle;
 
-  const TagLib::uint BufferSize = 8192;
   const FileHandle InvalidFileHandle = 0;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -497,5 +495,5 @@ void FileStream::truncate(long length)
 
 TagLib::uint FileStream::bufferSize()
 {
-  return BufferSize;
+  return 1024;
 }

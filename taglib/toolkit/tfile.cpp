@@ -66,15 +66,6 @@
 
 using namespace TagLib;
 
-namespace
-{
-#ifdef _WIN32
-  const TagLib::uint BufferSize = 8192;
-#else
-  const TagLib::uint BufferSize = 1024;
-#endif
-}
-
 class File::FilePrivate
 {
 public:
@@ -499,7 +490,7 @@ bool File::isWritable(const char *file)
 
 TagLib::uint File::bufferSize()
 {
-  return BufferSize;
+  return 1024;
 }
 
 void File::setValid(bool valid)
