@@ -198,8 +198,13 @@ bool Ogg::File::save()
       pageGroup.append(*it);
   }
   writePageGroup(pageGroup);
-  d->dirtyPages.clear();
-  d->dirtyPackets.clear();
+
+  // Reset all the internal data, since the actual file has been updated.
+
+  // It's required to keep the consistency between this class and the actual
+  // file and avoid corrupting them by subsequent operations.
+
+  *d = FilePrivate();
 
   return true;
 }
@@ -208,14 +213,16 @@ bool Ogg::File::save()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::File::File(FileName file) : TagLib::File(file)
+Ogg::File::File(FileName file) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
 }
 
-Ogg::File::File(IOStream *stream) : TagLib::File(stream)
+Ogg::File::File(IOStream *stream) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -279,7 +286,6 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
 {
   if(thePageGroup.isEmpty())
     return;
-
 
   // pages in the pageGroup and packets must be equivalent
   // (originalSize and size of packets would not work together),

@@ -3,6 +3,7 @@
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <opusfile.h>
+#include <oggpageheader.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -15,6 +16,8 @@ class TestOpus : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testReadComments);
   CPPUNIT_TEST(testWriteComments);
+  CPPUNIT_TEST(testSplitPackets);
+  CPPUNIT_TEST(testSaveTagTwice);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -54,6 +57,76 @@ public:
     CPPUNIT_ASSERT_EQUAL(StringList("Your Tester"), f->tag()->fieldListMap()["ARTIST"]);
     CPPUNIT_ASSERT_EQUAL(String("libopus 0.9.11-66-g64c2dd7"), f->tag()->vendorID());
     delete f;
+  }
+
+  void testSplitPackets()
+  {
+    ScopedFileCopy copy("correctness_gain_silent_output", ".opus");
+    string newname = copy.fileName();
+
+    String text(std::string(128 * 1024, ' '));
+    for (size_t i = 0; i < text.size(); ++i)
+      text[i] = static_cast<char>('A' + i % 26);
+
+    {
+      Ogg::Opus::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(11, f.lastPageHeader()->pageSequenceNumber());
+      f.tag()->setTitle(text);
+      f.save();
+    }
+
+    {
+      Ogg::Opus::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(27, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(text, f.tag()->title());
+      f.tag()->setTitle("");
+      f.save();
+    }
+
+    {
+      Ogg::Opus::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(11, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(String(), f.tag()->title());
+    }
+  }
+
+  void testSaveTagTwice()
+  {
+    ScopedFileCopy copy1("correctness_gain_silent_output", ".opus");
+    ScopedFileCopy copy2("correctness_gain_silent_output", ".opus");
+
+    ByteVector audioStream;
+    {
+      Ogg::Opus::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)35506, f.length());
+
+      f.seek(0x0176);
+      audioStream = f.readBlock(8192);
+
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)35539, f.length());
+
+      f.seek(0x0197);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8192));
+    }
+
+    {
+      Ogg::Opus::File f(copy2.fileName().c_str());
+      f.tag()->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      f.save();
+      CPPUNIT_ASSERT_EQUAL((long)35539, f.length());
+
+      f.seek(0x0197);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8192));
+
+      f.tag()->setTitle("");
+      f.save();
+
+      f.seek(0x0176);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8192));
+    }
   }
 
 };
