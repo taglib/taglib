@@ -149,61 +149,63 @@ bool WavPack::File::save()
   if(ID3v1Tag()) {
     if(d->hasID3v1) {
       seek(d->ID3v1Location);
-      writeBlock(ID3v1Tag()->render());
     }
     else {
       seek(0, End);
       d->ID3v1Location = tell();
-      writeBlock(ID3v1Tag()->render());
-      d->hasID3v1 = true;
     }
+
+    writeBlock(ID3v1Tag()->render());
+    d->hasID3v1 = true;
   }
   else {
     if(d->hasID3v1) {
       removeBlock(d->ID3v1Location, 128);
+
+      d->ID3v1Location = -1;
       d->hasID3v1 = false;
-      if(d->hasAPE) {
-        if(d->APELocation > d->ID3v1Location)
-          d->APELocation -= 128;
-      }
     }
   }
 
   // Update APE tag
 
   if(APETag()) {
-    if(d->hasAPE)
-      insert(APETag()->render(), d->APELocation, d->APESize);
-    else {
-      if(d->hasID3v1)  {
-        insert(APETag()->render(), d->ID3v1Location, 0);
-        d->APESize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
+    if(!d->hasAPE) {
+      if(d->hasID3v1) {
         d->APELocation = d->ID3v1Location;
-        d->ID3v1Location += d->APESize;
       }
       else {
         seek(0, End);
         d->APELocation = tell();
-        writeBlock(APETag()->render());
-        d->APESize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
       }
     }
+
+    insert(APETag()->render(), d->APELocation, d->APESize);
+
+    const long prevAPESize = d->APESize;
+    d->APESize = APETag()->footer()->completeTagSize();
+    d->hasAPE = true;
+
+    // v1 tag location has changed, update if it exists
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location += (d->APESize - prevAPESize);
   }
   else {
     if(d->hasAPE) {
       removeBlock(d->APELocation, d->APESize);
+
+      const long removedSize = d->APESize;
+      d->APELocation = -1;
+      d->APESize = 0;
       d->hasAPE = false;
-      if(d->hasID3v1) {
-        if(d->ID3v1Location > d->APELocation) {
-          d->ID3v1Location -= d->APESize;
-        }
-      }
+
+      if(d->ID3v1Location >= 0)
+        d->ID3v1Location -= removedSize;
     }
   }
 
-   return true;
+  return true;
 }
 
 ID3v1::Tag *WavPack::File::ID3v1Tag(bool create)
