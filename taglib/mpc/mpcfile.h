@@ -212,6 +212,16 @@ namespace TagLib {
        */
       bool hasAPETag() const;
 
+      /*!
+       * Returns whether or not the file on disk actually has an ID3v2 tag.
+       *
+       * \note Checking purpose only. Reading or writing an ID3v2 tag is not
+       * allowed by design.
+       *
+       * \see strip()
+       */
+      bool hasID3v2Tag() const;
+
     private:
       File(const File &);
       File &operator=(const File &);
