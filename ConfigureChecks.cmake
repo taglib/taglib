@@ -220,6 +220,16 @@ if(NOT HAVE_SNPRINTF)
   " HAVE_SPRINTF_S)
 endif()
 
+# Determine whether your compiler supports the Boost CRC library.
+
+check_cxx_source_compiles("
+  #include <boost/crc.hpp>
+  int main() {
+    boost::crc_32_type crc;
+    return crc.checksum();
+  }
+" HAVE_BOOST_CRC)
+
 # Check for libz using the cmake supplied FindZLIB.cmake
 
 if(NOT ZLIB_SOURCE)

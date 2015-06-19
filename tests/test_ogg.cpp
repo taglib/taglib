@@ -6,6 +6,7 @@
 #include <tpropertymap.h>
 #include <oggfile.h>
 #include <vorbisfile.h>
+#include <oggpage.h>
 #include <oggpageheader.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -20,6 +21,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSplitPackets);
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
+  CPPUNIT_TEST(testRenderPage);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -102,6 +104,17 @@ public:
     CPPUNIT_ASSERT_EQUAL(false, f->tag()->properties().contains("UNUSUALTAG"));
 
     delete f;
+  }
+
+  void testRenderPage()
+  {
+    Vorbis::File f(TEST_FILE_PATH_C("empty.ogg"));
+
+    f.seek(58);
+    const ByteVector originalPage = f.readBlock(3921);
+
+    Ogg::Page page(&f, 58);
+    CPPUNIT_ASSERT_EQUAL(originalPage, page.render());
   }
 
 };
