@@ -55,6 +55,9 @@ namespace TagLib
 {
   namespace Utils
   {
+    /*!
+     * Reverses the order of bytes in an 16-bit integer.
+     */
     inline ushort byteSwap(ushort x)
     {
 #if defined(HAVE_BOOST_BYTESWAP)
@@ -88,6 +91,9 @@ namespace TagLib
 #endif
     }
 
+    /*!
+     * Reverses the order of bytes in an 32-bit integer.
+     */
     inline uint byteSwap(uint x)
     {
 #if defined(HAVE_BOOST_BYTESWAP)
@@ -124,6 +130,9 @@ namespace TagLib
 #endif
     }
 
+    /*!
+     * Reverses the order of bytes in an 64-bit integer.
+     */
     inline ulonglong byteSwap(ulonglong x)
     {
 #if defined(HAVE_BOOST_BYTESWAP)
@@ -164,6 +173,10 @@ namespace TagLib
 #endif
     }
 
+    /*!
+     * Returns a formatted string just like standard sprintf(), but makes use of
+     * safer functions such as snprintf() if available.
+     */
     inline String formatString(const char *format, ...)
     {
       // Sufficient buffer size for the current internal uses.
@@ -202,15 +215,23 @@ namespace TagLib
       if(length != -1)
         return String(buf);
       else
-        return String::null;
+        return String();
     }
 
+    /*!
+     * The types of byte order of the running system.
+     */
     enum ByteOrder
     {
+      //! Little endian systems.
       LittleEndian,
+      //! Big endian systems.
       BigEndian
     };
 
+    /*!
+     * Returns the integer byte order of the system.
+     */
     inline ByteOrder integerByteOrder()
     {
       union {
@@ -225,6 +246,9 @@ namespace TagLib
         return BigEndian;
     }
 
+    /*!
+     * Returns the IEEE754 byte order of the system.
+     */
     inline ByteOrder floatByteOrder()
     {
       union {
