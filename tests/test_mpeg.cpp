@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <tstring.h>
 #include <mpegfile.h>
+#include <id3v1tag.h>
 #include <id3v2tag.h>
+#include <apetag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -19,6 +21,17 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testFrameOffset);
+  CPPUNIT_TEST(testSaveID3v1Twice);
+  CPPUNIT_TEST(testSaveID3v2Twice);
+  CPPUNIT_TEST(testSaveAPETwice);
+  CPPUNIT_TEST(testSaveTags1);
+  CPPUNIT_TEST(testSaveTags2);
+  CPPUNIT_TEST(testSaveTags3);
+  CPPUNIT_TEST(testStripTags1);
+  CPPUNIT_TEST(testStripTags2);
+  CPPUNIT_TEST(testStripTags3);
+  CPPUNIT_TEST(testSaveDuplicateTags);
+  CPPUNIT_TEST(testID3v2AfterMPEGFrame);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -134,6 +147,542 @@ public:
     }
   }
 
+  void testSaveID3v1Twice()
+  {
+    ScopedFileCopy copy1("xing", ".mp3");
+    ScopedFileCopy copy2("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8208, f.length());
+
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, true);
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8336, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+
+    {
+      MPEG::File f(copy2.fileName().c_str());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, true);
+      f.save(MPEG::File::ID3v1, true);
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8336, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+
+      f.ID3v1Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testSaveID3v2Twice()
+  {
+    ScopedFileCopy copy1("xing", ".mp3");
+    ScopedFileCopy copy2("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)8208, f.length());
+
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, true);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)9276, f.length());
+
+      f.seek(0x042C);
+      audioStream = f.readBlock(8208);
+    }
+
+    {
+      MPEG::File f(copy2.fileName().c_str());
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, true);
+      f.save(MPEG::File::ID3v2, true);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL((long)9276, f.length());
+
+      f.seek(0x042C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+
+      f.ID3v2Tag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testSaveAPETwice()
+  {
+    ScopedFileCopy copy1("xing", ".mp3");
+    ScopedFileCopy copy2("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy1.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)8208, f.length());
+
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, true);
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+
+    {
+      MPEG::File f(copy2.fileName().c_str());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, true);
+      f.save(MPEG::File::APE, true);
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+
+      f.APETag(true)->setTitle("");
+      f.save();
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testSaveTags1()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)8336, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9404, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x042C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testSaveTags2()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9276, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9404, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x042C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testSaveTags3()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)8437, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, false);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x042C);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testStripTags1()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::AllTags);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::ID3v1);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9377, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::ID3v2);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::APE);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(fileEqual(copy.fileName().c_str(), TEST_FILE_PATH_C("xing.mp3")));
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testStripTags2()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::AllTags);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::ID3v2);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)8437, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::ID3v1);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)8309, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::APE);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(fileEqual(copy.fileName().c_str(), TEST_FILE_PATH_C("xing.mp3")));
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+  }
+
+  void testStripTags3()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x0000);
+      audioStream = f.readBlock(8208);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::AllTags);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9505, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      f.save(~MPEG::File::APE);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9404, f.length());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.save(~MPEG::File::ID3v1);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)9276, f.length());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.save(~MPEG::File::ID3v2);
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(fileEqual(copy.fileName().c_str(), TEST_FILE_PATH_C("xing.mp3")));
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+
+      f.seek(0x0000);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(8208));
+    }
+
+  }
+
+  void testSaveDuplicateTags()
+  {
+    ScopedFileCopy copy("duplicate_id3v2", ".mp3");
+
+    ByteVector audioStream;
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.seek(0x1F71);
+      audioStream = f.readBlock(2089);
+
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v1, false);
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::ID3v2, false);
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save(MPEG::File::APE, false);
+
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+    }
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL((long)3887, f.length());
+      CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasAPETag());
+
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("01234 56789 ABCDE FGHIJ"), f.APETag()->title());
+
+      f.seek(0x0621);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(2089));
+    }
+  }
+
+  void testID3v2AfterMPEGFrame()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("id3v2_after_mpeg_frame.mp3"));
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(!f.hasID3v2Tag());
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMPEG);
