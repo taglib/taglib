@@ -29,6 +29,9 @@
 #cmakedefine   HAVE_SNPRINTF 1
 #cmakedefine   HAVE_SPRINTF_S 1
 
+/* Defined if your compiler supports the Boost CRC library */
+#cmakedefine   HAVE_BOOST_CRC 1
+
 /* Defined if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 

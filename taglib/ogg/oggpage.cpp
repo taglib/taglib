@@ -23,7 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <algorithm>
+
+#ifdef HAVE_BOOST_CRC
+# include <boost/crc.hpp>
+#endif
 
 #include <tstring.h>
 #include <tdebug.h>
@@ -39,6 +47,15 @@ namespace
   inline TagLib::uint crc32(const ByteVector &data)
   {
     // This is an uncommon variant of CRC32 specializes in Ogg.
+
+#ifdef HAVE_BOOST_CRC
+
+    boost::crc_optimal<32, 0x04c11db7, 0, 0, false, false> crc;
+    crc.process_bytes(data.data(), data.size());
+
+    return crc.checksum();
+
+#else
 
     static const TagLib::uint Table[256] = {
       0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
@@ -91,6 +108,8 @@ namespace
       sum = (sum << 8) ^ Table[((sum >> 24) & 0xff) ^ static_cast<uchar>(*it)];
 
     return sum;
+
+#endif
   }
 }
 
