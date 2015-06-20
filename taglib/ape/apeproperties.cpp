@@ -131,24 +131,36 @@ TagLib::uint APE::Properties::sampleFrames() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
+namespace
+{
+  inline int headerVersion(const ByteVector &header)
+  {
+    if(header.size() < 6 || !header.startsWith("MAC "))
+      return -1;
+
+    return header.toUShort(4, false);
+  }
+}
+
 void APE::Properties::read(File *file, long streamLength)
 {
-  // First we are searching the descriptor
-  const long offset = file->find("MAC ", file->tell());
-  if(offset < 0) {
+  // First, we assume that the file pointer is set at the first descriptor.
+  long offset = file->tell();
+  int version = headerVersion(file->readBlock(6));
+
+  // Next, we look for the descriptor.
+  if(version < 0) {
+    offset = file->find("MAC ", offset);
+    file->seek(offset);
+    version = headerVersion(file->readBlock(6));
+  }
+
+  if(version < 0) {
     debug("APE::Properties::read() -- APE descriptor not found");
     return;
   }
 
-  // Then we read the header common for all versions of APE
-  file->seek(offset);
-  const ByteVector commonHeader = file->readBlock(6);
-  if(commonHeader.size() < 6) {
-    debug("APE::Properties::read() -- header is too short.");
-    return;
-  }
-
-  d->version = commonHeader.toUShort(4, false);
+  d->version = version;
 
   if(d->version >= 3980)
     analyzeCurrent(file);
@@ -228,18 +240,13 @@ void APE::Properties::analyzeOld(File *file)
   const uint finalFrameBlocks = header.toUInt(22, false);
   d->sampleFrames = (totalFrames - 1) * blocksPerFrame + finalFrameBlocks;
 
-  // Seek the RIFF chunk and get the bit depth
-  long offset = file->tell();
-  offset = file->find("WAVEfmt ", offset);
-  if(offset < 0)
-    return;
-
-  file->seek(offset + 12);
-  const ByteVector fmt = file->readBlock(16);
-  if(fmt.size() < 16) {
+  // Get the bit depth from the RIFF-fmt chunk.
+  file->seek(16, File::Current);
+  const ByteVector fmt = file->readBlock(28);
+  if(fmt.size() < 28 || !fmt.startsWith("WAVEfmt ")) {
     debug("APE::Properties::analyzeOld() -- fmt header is too short.");
     return;
   }
 
-  d->bitsPerSample = fmt.toShort(14, false);
+  d->bitsPerSample = fmt.toShort(26, false);
 }
