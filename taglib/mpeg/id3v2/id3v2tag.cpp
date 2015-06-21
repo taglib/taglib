@@ -24,20 +24,22 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
-#include "tfile.h"
+#include <algorithm>
+
+#include <tfile.h>
+#include <tbytevector.h>
+#include <tpropertymap.h>
+#include <tdebug.h>
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
-#include "tbytevector.h"
 #include "id3v1genres.h"
-#include "tpropertymap.h"
-#include "tdebug.h"
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
@@ -566,8 +568,6 @@ ByteVector ID3v2::Tag::render(int version) const
   // in ID3v2::Header::tagSize() -- includes the extended header, frames and
   // padding, but does not include the tag's header or footer.
 
-  ByteVector tagData;
-
   if(version != 3 && version != 4) {
     debug("Unknown ID3v2 version, using ID3v2.4");
     version = 4;
@@ -575,7 +575,7 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // TODO: Render the extended header.
 
-  // Loop through the frames rendering them and adding them to the tagData.
+  // Downgrade the frames that ID3v2.3 doesn't support.
 
   FrameList newFrames;
   newFrames.setAutoDelete(true);
@@ -587,6 +587,12 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     downgradeFrames(&frameList, &newFrames);
   }
+
+  // Reserve a 10-byte blank space for an ID3v2 tag header.
+
+  ByteVector tagData(Header::size(), '\0');
+
+  // Loop through the frames rendering them and adding them to the tagData.
 
   for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
@@ -609,7 +615,7 @@ ByteVector ID3v2::Tag::render(int version) const
   // Compute the amount of padding, and append that to tagData.
   // TODO: Should be calculated in offset_t in taglib2.
 
-  long paddingSize = d->header.tagSize() - tagData.size();
+  long paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
 
   if(paddingSize <= 0) {
     paddingSize = MinPaddingSize;
@@ -629,10 +635,13 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(tagData.size());
+  d->header.setTagSize(tagData.size() - Header::size());
 
   // TODO: This should eventually include d->footer->render().
-  return d->header.render() + tagData;
+  const ByteVector headerData = d->header.render();
+  std::copy(headerData.begin(), headerData.end(), tagData.begin());
+
+  return tagData;
 }
 
 Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
