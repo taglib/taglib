@@ -281,8 +281,6 @@ void MPC::File::read(bool readProperties, Properties::ReadStyle /* propertiesSty
 
   // Look for an APE tag
 
-  findAPE();
-
   d->APELocation = findAPE();
 
   if(d->APELocation >= 0) {
