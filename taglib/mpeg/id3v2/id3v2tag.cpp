@@ -24,20 +24,22 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
-#include "tfile.h"
+#include <algorithm>
+
+#include <tfile.h>
+#include <tbytevector.h>
+#include <tpropertymap.h>
+#include <tdebug.h>
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
-#include "tbytevector.h"
 #include "id3v1genres.h"
-#include "tpropertymap.h"
-#include "tdebug.h"
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
@@ -83,7 +85,8 @@ const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defau
 
 namespace
 {
-  const TagLib::uint DefaultPaddingSize = 1024;
+  const long MinPaddingSize = 1024;
+  const long MaxPaddingSize = 1024 * 1024;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -558,15 +561,12 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   }
 }
 
-
 ByteVector ID3v2::Tag::render(int version) const
 {
   // We need to render the "tag data" first so that we have to correct size to
   // render in the tag's header.  The "tag data" -- everything that is included
   // in ID3v2::Header::tagSize() -- includes the extended header, frames and
   // padding, but does not include the tag's header or footer.
-
-  ByteVector tagData;
 
   if(version != 3 && version != 4) {
     debug("Unknown ID3v2 version, using ID3v2.4");
@@ -575,7 +575,7 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // TODO: Render the extended header.
 
-  // Loop through the frames rendering them and adding them to the tagData.
+  // Downgrade the frames that ID3v2.3 doesn't support.
 
   FrameList newFrames;
   newFrames.setAutoDelete(true);
@@ -587,6 +587,12 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     downgradeFrames(&frameList, &newFrames);
   }
+
+  // Reserve a 10-byte blank space for an ID3v2 tag header.
+
+  ByteVector tagData(Header::size(), '\0');
+
+  // Loop through the frames rendering them and adding them to the tagData.
 
   for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
@@ -607,29 +613,35 @@ ByteVector ID3v2::Tag::render(int version) const
   }
 
   // Compute the amount of padding, and append that to tagData.
+  // TODO: Should be calculated in offset_t in taglib2.
 
-  uint paddingSize = DefaultPaddingSize;
+  long paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
 
-  if(d->file && tagData.size() < d->header.tagSize()) {
-    paddingSize = d->header.tagSize() - tagData.size();
+  if(paddingSize <= 0) {
+    paddingSize = MinPaddingSize;
+  }
+  else {
+    // Padding won't increase beyond 1% of the file size or 1MB.
 
-    // Padding won't increase beyond 1% of the file size.
+    long threshold = d->file ? d->file->length() / 100 : 0;
+    threshold = std::max(threshold, MinPaddingSize);
+    threshold = std::min(threshold, MaxPaddingSize);
 
-    if(paddingSize > DefaultPaddingSize) {
-      const uint threshold = d->file->length() / 100; // should be ulonglong in taglib2.
-      if(paddingSize > threshold)
-        paddingSize = DefaultPaddingSize;
-    }
+    if(paddingSize > threshold)
+      paddingSize = MinPaddingSize;
   }
 
-  tagData.append(ByteVector(paddingSize, '\0'));
+  tagData.resize(static_cast<uint>(tagData.size() + paddingSize), '\0');
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(tagData.size());
+  d->header.setTagSize(tagData.size() - Header::size());
 
   // TODO: This should eventually include d->footer->render().
-  return d->header.render() + tagData;
+  const ByteVector headerData = d->header.render();
+  std::copy(headerData.begin(), headerData.end(), tagData.begin());
+
+  return tagData;
 }
 
 Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
@@ -651,18 +663,43 @@ void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
 
 void ID3v2::Tag::read()
 {
-  if(d->file && d->file->isOpen()) {
+  if(!d->file)
+    return;
 
-    d->file->seek(d->tagOffset);
-    d->header.setData(d->file->readBlock(Header::size()));
+  if(!d->file->isOpen())
+    return;
 
-    // if the tag size is 0, then this is an invalid tag (tags must contain at
-    // least one frame)
+  d->file->seek(d->tagOffset);
+  d->header.setData(d->file->readBlock(Header::size()));
 
-    if(d->header.tagSize() == 0)
-      return;
+  // If the tag size is 0, then this is an invalid tag (tags must contain at
+  // least one frame)
 
+  if(d->header.tagSize() != 0)
     parse(d->file->readBlock(d->header.tagSize()));
+
+  // Look for duplicate ID3v2 tags and treat them as an extra blank of this one.
+  // It leads to overwriting them with zero when saving the tag.
+
+  // This is a workaround for some faulty files that have duplicate ID3v2 tags.
+  // Unfortunately, TagLib itself may write such duplicate tags until v1.9.1.
+
+  uint extraSize = 0;
+
+  while(true) {
+
+    d->file->seek(d->tagOffset + d->header.completeTagSize() + extraSize);
+
+    const ByteVector data = d->file->readBlock(Header::size());
+    if(data.size() < Header::size() || !data.startsWith(Header::fileIdentifier()))
+      break;
+
+    extraSize += Header(data).completeTagSize();
+  }
+
+  if(extraSize != 0) {
+    debug("ID3v2::Tag::read() - Duplicate ID3v2 tags found.");
+    d->header.setTagSize(d->header.tagSize() + extraSize);
   }
 }
 
