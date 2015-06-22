@@ -99,10 +99,6 @@ static const uint crcTable[256] = {
   0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
-/*!
-  * A templatized straightforward find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
 template <class TIterator>
 int findChar(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -125,10 +121,6 @@ int findChar(
   return -1;
 }
 
-/*!
-  * A templatized KMP find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
 template <class TIterator>
 int findVector(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -140,46 +132,33 @@ int findVector(
   if(patternSize == 0 || offset + patternSize > dataSize)
     return -1;
 
-  // n % 0 is invalid
-
-  if(byteAlign == 0)
-    return -1;
-
   // Special case that pattern contains just single char.
 
   if(patternSize == 1)
     return findChar(dataBegin, dataEnd, *patternBegin, offset, byteAlign);
 
-  size_t lastOccurrence[256];
+  // n % 0 is invalid
 
-  for(size_t i = 0; i < 256; ++i)
-    lastOccurrence[i] = patternSize;
+  if(byteAlign == 0)
+    return -1;
 
-  for(size_t i = 0; i < patternSize - 1; ++i)
-    lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
+  // We don't use sophisticated algorithms like Knuth-Morris-Pratt here.
 
-  TIterator it = dataBegin + patternSize - 1 + offset;
-  while(true) {
-    TIterator itBuffer = it;
-    TIterator itPattern = patternBegin + patternSize - 1;
+  // In the current implementation of TagLib, data and patterns are too small
+  // for such algorithms to work effectively.
 
-    while(*itBuffer == *itPattern) {
-      if(itPattern == patternBegin) {
-        if((itBuffer - dataBegin - offset) % byteAlign == 0)
-          return (itBuffer - dataBegin);
-        else
-          break;
-      }
+  for(TIterator it = dataBegin + offset; it < dataEnd - patternSize + 1; it += byteAlign) {
 
-      --itBuffer;
-      --itPattern;
+    TIterator itData    = it;
+    TIterator itPattern = patternBegin;
+
+    while(*itData == *itPattern) {
+      ++itData;
+      ++itPattern;
+
+      if(itPattern == patternEnd)
+        return (it - dataBegin);
     }
-
-    const size_t step = lastOccurrence[static_cast<uchar>(*it)];
-    if(dataEnd - step <= it)
-      break;
-
-    it += step;
   }
 
   return -1;
