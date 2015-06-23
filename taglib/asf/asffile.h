@@ -116,7 +116,6 @@ namespace TagLib {
       virtual bool save();
 
     private:
-      int readBYTE(bool *ok = 0);
       int readWORD(bool *ok = 0);
       unsigned int readDWORD(bool *ok = 0);
       long long readQWORD(bool *ok = 0);
@@ -126,17 +125,6 @@ namespace TagLib {
 
       friend class Attribute;
       friend class Picture;
-
-      class BaseObject;
-      class UnknownObject;
-      class FilePropertiesObject;
-      class StreamPropertiesObject;
-      class ContentDescriptionObject;
-      class ExtendedContentDescriptionObject;
-      class HeaderExtensionObject;
-      class CodecListObject;
-      class MetadataObject;
-      class MetadataLibraryObject;
 
       class FilePrivate;
       FilePrivate *d;
