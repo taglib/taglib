@@ -37,7 +37,7 @@ For a 10.6 Snow Leopard static library with both 32-bit and 64-bit code, use:
   cmake -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
     -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
-    -DENABLE_STATIC=ON \
+    -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_INSTALL_PREFIX="<folder you want to build to>"
 
 After 'make', and 'make install', add libtag.a to your XCode project, and add
@@ -140,8 +140,8 @@ The easiest way is at the Command Prompt.
        5. Select: Build Only INSTALL
 
 To build a static library enable the following two options with CMake.
-  -DENABLE_STATIC=ON -DENABLE_STATIC_RUNTIME=ON
-  
+  -DBUILD_SHARED_LIBS=OFF -DENABLE_STATIC_RUNTIME=ON
+
 Including ENABLE_STATIC_RUNTIME=ON indicates you want TagLib built using the
 static runtime library, rather than the DLL form of the runtime.
 
