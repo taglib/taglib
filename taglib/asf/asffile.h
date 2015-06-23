@@ -116,15 +116,7 @@ namespace TagLib {
       virtual bool save();
 
     private:
-      int readWORD(bool *ok = 0);
-      unsigned int readDWORD(bool *ok = 0);
-      long long readQWORD(bool *ok = 0);
-      static ByteVector renderString(const String &str, bool includeLength = false);
-      String readString(int len);
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
-
-      friend class Attribute;
-      friend class Picture;
 
       class FilePrivate;
       FilePrivate *d;
