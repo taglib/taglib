@@ -23,6 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+// The implementation of this class is based on the document found at:
+// http://download.microsoft.com/download/8/0/5/80506BEB-C95A-47AE-99CF-0D6D6D028ABA/ASF_Specification.pdf
+
 #include <tdebug.h>
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
@@ -55,7 +58,16 @@ public:
     extendedContentDescriptionObject(0),
     headerExtensionObject(0),
     metadataObject(0),
-    metadataLibraryObject(0) {}
+    metadataLibraryObject(0)
+  {
+    objects.setAutoDelete(true);
+  }
+
+  ~FilePrivate()
+  {
+    delete tag;
+    delete properties;
+  }
 
   unsigned long long size;
 
@@ -158,7 +170,7 @@ class ASF::File::FilePrivate::HeaderExtensionObject : public ASF::File::FilePriv
 {
 public:
   List<ASF::File::FilePrivate::BaseObject *> objects;
-  ~HeaderExtensionObject();
+  HeaderExtensionObject();
   ByteVector guid() const;
   void parse(ASF::File *file, uint size);
   ByteVector render(ASF::File *file);
@@ -179,17 +191,10 @@ private:
   };
 };
 
-ASF::File::FilePrivate::HeaderExtensionObject::~HeaderExtensionObject()
-{
-  for(unsigned int i = 0; i < objects.size(); i++) {
-    delete objects[i];
-  }
-}
-
 void ASF::File::FilePrivate::BaseObject::parse(ASF::File *file, unsigned int size)
 {
   data.clear();
-  if (size > 24 && size <= (unsigned int)(file->length()))
+  if(size > 24 && size <= (unsigned int)(file->length()))
     data = file->readBlock(size - 24);
   else
     data = ByteVector::null;
@@ -360,6 +365,11 @@ ByteVector ASF::File::FilePrivate::MetadataLibraryObject::render(ASF::File *file
   return BaseObject::render(file);
 }
 
+ASF::File::FilePrivate::HeaderExtensionObject::HeaderExtensionObject()
+{
+  objects.setAutoDelete(true);
+}
+
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::guid() const
 {
   return headerExtensionGuid;
@@ -402,8 +412,8 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, uint 
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(unsigned int i = 0; i < objects.size(); i++) {
-    data.append(objects[i]->render(file));
+  for(List<BaseObject *>::ConstIterator it = objects.begin(); it != objects.end(); ++it) {
+    data.append((*it)->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt(data.size(), false) + data;
   return BaseObject::render(file);
@@ -450,7 +460,7 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, uint size)
     const int infoLength = data.toUShort(pos, false);
     pos += 2 + infoLength * 2;
 
-    if(type == Audio) {
+    if(type == CodecListObject::Audio) {
       // First audio codec found.
 
       const String name(data.mid(namePos, nameLength * 2), String::UTF16LE);
@@ -468,33 +478,24 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, uint size)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle)
-  : TagLib::File(file)
+ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
-ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle)
-  : TagLib::File(stream)
+ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 ASF::File::~File()
 {
-  for(unsigned int i = 0; i < d->objects.size(); i++) {
-    delete d->objects[i];
-  }
-  if(d->tag) {
-    delete d->tag;
-  }
-  if(d->properties) {
-    delete d->properties;
-  }
   delete d;
 }
 
@@ -657,8 +658,8 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(unsigned int i = 0; i < d->objects.size(); i++) {
-    data.append(d->objects[i]->render(this));
+  for(List<FilePrivate::BaseObject *>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
+    data.append((*it)->render(this));
   }
 
   data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;
