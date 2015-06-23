@@ -154,6 +154,14 @@ class ASF::File::CodecListObject : public ASF::File::BaseObject
 public:
   ByteVector guid();
   void parse(ASF::File *file, uint size);
+
+private:
+  enum CodecType
+  {
+    Video   = 0x0001,
+    Audio   = 0x0002,
+    Unknown = 0xFFFF
+  };
 };
 
 ASF::File::HeaderExtensionObject::~HeaderExtensionObject()
@@ -409,7 +417,7 @@ void ASF::File::CodecListObject::parse(ASF::File *file, uint size)
     if(pos >= data.size())
       break;
 
-    const int type = data.toUShort(pos, false);
+    const CodecType type = static_cast<CodecType>(data.toUShort(pos, false));
     pos += 2;
 
     int nameLength = data.toUShort(pos, false);
@@ -427,7 +435,7 @@ void ASF::File::CodecListObject::parse(ASF::File *file, uint size)
     const int infoLength = data.toUShort(pos, false);
     pos += 2 + infoLength * 2;
 
-    if(type == 2) {
+    if(type == Audio) {
       // First audio codec found.
 
       const String name(data.mid(namePos, nameLength * 2), String::UTF16LE);
