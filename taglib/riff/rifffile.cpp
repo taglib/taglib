@@ -23,13 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <algorithm>
+#include <vector>
+
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <tstring.h>
 
 #include "rifffile.h"
-#include <algorithm>
-#include <vector>
+#include "riffutils.h"
 
 using namespace TagLib;
 
@@ -65,20 +67,6 @@ public:
 RIFF::File::~File()
 {
   delete d;
-}
-
-bool RIFF::File::isValidChunkName(const ByteVector &name)   // static
-{
-  if(name.size() != 4)
-    return false;
-
-  for(ByteVector::ConstIterator it = name.begin(); it != name.end(); ++it) {
-    const uchar c = static_cast<uchar>(*it);
-    if(c < 32 || 127 < c)
-      return false;
-  }
-
-  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

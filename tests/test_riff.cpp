@@ -3,6 +3,7 @@
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <rifffile.h>
+#include <riffutils.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -261,11 +262,11 @@ public:
 
   void testChunkName()
   {
-    CPPUNIT_ASSERT(RIFF::File::isValidChunkName("WAVE"));
-    CPPUNIT_ASSERT(RIFF::File::isValidChunkName("SND "));
-    CPPUNIT_ASSERT(!RIFF::File::isValidChunkName("WWAVE"));
-    CPPUNIT_ASSERT(!RIFF::File::isValidChunkName("XY\x83Z"));
-    CPPUNIT_ASSERT(!RIFF::File::isValidChunkName("SND\r"));
+    CPPUNIT_ASSERT(RIFF::isValidChunkName("WAVE"));
+    CPPUNIT_ASSERT(RIFF::isValidChunkName("SND "));
+    CPPUNIT_ASSERT(!RIFF::isValidChunkName("WWAVE"));
+    CPPUNIT_ASSERT(!RIFF::isValidChunkName("XY\x83Z"));
+    CPPUNIT_ASSERT(!RIFF::isValidChunkName("SND\r"));
   }
 };
 
