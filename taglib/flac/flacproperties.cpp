@@ -66,7 +66,7 @@ FLAC::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
-  read(file->streamInfoData(), file->streamLength());
+  debug("FLAC::Properties::Properties() - This constructor is no longer used.");
 }
 
 FLAC::Properties::~Properties()
