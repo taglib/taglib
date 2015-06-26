@@ -275,7 +275,10 @@ namespace TagLib {
 
     /*!
      * Returns a CRC checksum of the byte vector's data.
+     *
+     * \note This uses an uncommon variant of CRC32 specializes in Ogg.
      */
+    // BIC: Remove or make generic.
     uint checksum() const;
 
     /*!
