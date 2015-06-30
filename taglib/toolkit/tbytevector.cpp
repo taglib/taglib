@@ -746,7 +746,7 @@ ByteVector::ReverseIterator ByteVector::rbegin()
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  return d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length));
+  return ConstReverseIterator(static_cast<const char*>(&*(d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length)))));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
@@ -757,7 +757,7 @@ ByteVector::ReverseIterator ByteVector::rend()
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  return d->data->data.rbegin() + (d->data->data.size() - d->offset);
+  return ConstReverseIterator(static_cast<const char*>(&*(d->data->data.rbegin() + (d->data->data.size() - d->offset))));
 }
 
 bool ByteVector::isNull() const
