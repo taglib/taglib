@@ -139,9 +139,11 @@ namespace TagLib {
 
         /*!
          * Returns the format ID of the file.
-         * 0 for unknown, 1 for PCM, 2 for ADPCM, 3 for 32/64-bit IEEE754, and so forth.
+         * 0 for unknown, 1 for PCM, 2 for ADPCM, 3 for 32/64-bit IEEE754, and
+         * so forth.
          *
-         * \note For further information, refer to RFC 2361.
+         * \note For further information, refer to the WAVE Form Registration
+         * Numbers in RFC 2361.
          */
         int format() const;
 

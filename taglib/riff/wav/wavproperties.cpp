@@ -29,6 +29,16 @@
 
 using namespace TagLib;
 
+namespace
+{
+  // Quoted from RFC 2361.
+  enum WaveFormat
+  {
+    FORMAT_UNKNOWN = 0x0000,
+    FORMAT_PCM     = 0x0001
+  };
+}
+
 class RIFF::WAV::Properties::PropertiesPrivate
 {
 public:
@@ -173,7 +183,7 @@ void RIFF::WAV::Properties::read(File *file)
   }
 
   d->format = data.toShort(0, false);
-  if(d->format != 1 && totalSamples == 0) {
+  if(d->format != FORMAT_PCM && totalSamples == 0) {
     debug("RIFF::WAV::Properties::read() - Non-PCM format, but 'fact' chunk not found.");
     return;
   }
