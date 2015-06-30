@@ -1,7 +1,3 @@
-include(CheckIncludeFile)
-include(CheckIncludeFiles)
-include(CheckSymbolExists)
-include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
@@ -186,7 +182,7 @@ check_cxx_source_compiles("
   #include <cstdio>
   int main() {
     char buf[20];
-    snprintf(buf, 20, \"%d\", 1);
+    sprintf_s(buf, \"%d\", 1);
     return 0;
   }
 " HAVE_SNPRINTF)
@@ -196,13 +192,13 @@ if(NOT HAVE_SPRINTF_S)
     #include <cstdio>
     int main() {
       char buf[20];
-      sprintf_s(buf, \"%d\", 1);
+      snprintf(buf, 20, \"%d\", 1);
       return 0;
     }
   " HAVE_SPRINTF_S)
 endif()
 
-# Check for libz using the cmake supplied FindZLIB.cmake
+# Check for zlib.
 
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
