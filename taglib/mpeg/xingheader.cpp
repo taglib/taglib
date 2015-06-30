@@ -103,7 +103,7 @@ void MPEG::XingHeader::parse(const ByteVector &data)
 
     // Xing header found.
 
-    if(data.size() < offset + 16) {
+    if(data.size() < static_cast<ulong>(offset + 16)) {
       debug("MPEG::XingHeader::parse() -- Xing header found but too short.");
       return;
     }
@@ -127,7 +127,7 @@ void MPEG::XingHeader::parse(const ByteVector &data)
 
       // VBRI header found.
 
-      if(data.size() < offset + 32) {
+      if(data.size() < static_cast<ulong>(offset + 32)) {
         debug("MPEG::XingHeader::parse() -- VBRI header found but too short.");
         return;
       }
