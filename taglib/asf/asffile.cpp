@@ -27,6 +27,7 @@
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
 #include <tstring.h>
+#include <tutils.h>
 #include "asffile.h"
 #include "asftag.h"
 #include "asfproperties.h"
@@ -626,7 +627,7 @@ String ASF::File::readString(int length)
   if(size != data.size()) {
     data.resize(size);
   }
-  return String(data, String::UTF16LE);
+  return String(data, (Utils::SystemByteOrder == Utils::LittleEndian) ? String::UTF16LE : String::UTF16BE);
 }
 
 ByteVector ASF::File::renderString(const String &str, bool includeLength)
