@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef __SUNPRO_CC
+#if __SUNPRO_CC < 0x5130
 // Sun Studio finds multiple specializations of Map because
 // it considers specializations with and without class types
 // to be different; this define forces Map to use only the
