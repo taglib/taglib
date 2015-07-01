@@ -746,11 +746,8 @@ ByteVector::ReverseIterator ByteVector::rbegin()
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-#if defined(__SUNPRO_CC) && (__SUNPRO_CC >= 0x5130)
-  return ConstReverseIterator(static_cast<const char*>(&*(d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length)))));
-#else
-  return d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length));
-#endif
+  const std::vector<char> &v = d->data->data;
+  return v.rbegin() + (v.size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
@@ -761,11 +758,8 @@ ByteVector::ReverseIterator ByteVector::rend()
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-#if defined(__SUNPRO_CC) && (__SUNPRO_CC >= 0x5130)
-  return ConstReverseIterator(static_cast<const char*>(&*(d->data->data.rbegin() + (d->data->data.size() - d->offset))));
-#else
-  return d->data->data.rbegin() + (d->data->data.size() - d->offset);
-#endif
+  const std::vector<char> &v = d->data->data;
+  return v.rbegin() + (v.size() - d->offset);
 }
 
 bool ByteVector::isNull() const
