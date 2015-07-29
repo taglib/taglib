@@ -235,7 +235,7 @@ bool FLAC::File::save()
 
   long originalLength = d->streamStart - d->flacStart;
   int paddingLength = originalLength - data.size() - 4;
-  if (paddingLength < 0) {
+  if(paddingLength <= 0) {
     paddingLength = MinPaddingLength;
   }
   ByteVector padding = ByteVector::fromUInt(paddingLength);
