@@ -422,7 +422,7 @@ void FLAC::File::scan()
     length = header.toUInt(1U, 3U);
 
     if(length == 0 && blockType != MetadataBlock::Padding) {
-      debug("FLAC::File::scan() -- Zero-sized metadaba block found");
+      debug("FLAC::File::scan() -- Zero-sized metadata block found");
       setValid(false);
       return;
     }
