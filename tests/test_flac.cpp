@@ -25,6 +25,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
   CPPUNIT_TEST(testInvalid);
+  CPPUNIT_TEST(testZeroSizedPadding);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -253,6 +254,14 @@ public:
     PropertyMap invalid = f.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), invalid.size());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.properties().size());
+  }
+
+  void testZeroSizedPadding()
+  {
+    ScopedFileCopy copy("zero-sized-padding", ".flac");
+
+    FLAC::File f(copy.fileName().c_str());
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };

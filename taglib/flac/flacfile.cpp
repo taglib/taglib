@@ -235,7 +235,7 @@ bool FLAC::File::save()
 
   long originalLength = d->streamStart - d->flacStart;
   int paddingLength = originalLength - data.size() - 4;
-  if (paddingLength < 0) {
+  if(paddingLength <= 0) {
     paddingLength = MinPaddingLength;
   }
   ByteVector padding = ByteVector::fromUInt(paddingLength);
@@ -421,9 +421,15 @@ void FLAC::File::scan()
     isLastBlock = (header[0] & 0x80) != 0;
     length = header.toUInt(1U, 3U);
 
-    ByteVector data = readBlock(length);
-    if(data.size() != length || length == 0) {
-      debug("FLAC::File::scan() -- FLAC stream corrupted");
+    if(length == 0 && blockType != MetadataBlock::Padding) {
+      debug("FLAC::File::scan() -- Zero-sized metadaba block found");
+      setValid(false);
+      return;
+    }
+
+    const ByteVector data = readBlock(length);
+    if(data.size() != length) {
+      debug("FLAC::File::scan() -- Failed to read a metadata block");
       setValid(false);
       return;
     }
@@ -446,7 +452,7 @@ void FLAC::File::scan()
         block = picture;
       }
       else {
-        debug("FLAC::File::scan() -- invalid picture found, discarting");
+        debug("FLAC::File::scan() -- invalid picture found, discarding");
         delete picture;
       }
     }
