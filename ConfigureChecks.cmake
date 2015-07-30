@@ -185,7 +185,7 @@ check_cxx_source_compiles("
     sprintf_s(buf, \"%d\", 1);
     return 0;
   }
-" HAVE_SNPRINTF)
+" HAVE_SPRINTF_S)
 
 if(NOT HAVE_SPRINTF_S)
   check_cxx_source_compiles("
@@ -195,10 +195,10 @@ if(NOT HAVE_SPRINTF_S)
       snprintf(buf, 20, \"%d\", 1);
       return 0;
     }
-  " HAVE_SPRINTF_S)
+  " HAVE_SNPRINTF)
 endif()
 
-# Check for zlib.
+# Check for zlib if ZLIB_SOURCE is not specified.
 
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
@@ -209,6 +209,8 @@ if(NOT ZLIB_SOURCE)
   endif()
 endif()
 
+# Check for CppUnit if test is enabled.
+
 if(BUILD_TESTS)
   find_package(CppUnit)
   if(NOT CppUnit_FOUND)
@@ -216,4 +218,3 @@ if(BUILD_TESTS)
     set(BUILD_TESTS OFF)
   endif()
 endif()
-
