@@ -12,32 +12,32 @@ include(TestFloatFormat)
 
 check_type_size("short" SIZEOF_SHORT)
 if(NOT ${SIZEOF_SHORT} EQUAL 2)
-  MESSAGE(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
+  message(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
 endif()
 
 check_type_size("int" SIZEOF_INT)
 if(NOT ${SIZEOF_INT} EQUAL 4)
-  MESSAGE(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
+  message(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
 endif()
 
 check_type_size("long long" SIZEOF_LONGLONG)
 if(NOT ${SIZEOF_LONGLONG} EQUAL 8)
-  MESSAGE(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
+  message(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
 endif()
 
 check_type_size("wchar_t" SIZEOF_WCHAR_T)
 if(${SIZEOF_WCHAR_T} LESS 2)
-  MESSAGE(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
+  message(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
 endif()
 
 check_type_size("float" SIZEOF_FLOAT)
 if(NOT ${SIZEOF_FLOAT} EQUAL 4)
-  MESSAGE(FATAL_ERROR "TagLib requires that float is 32-bit wide.")
+  message(FATAL_ERROR "TagLib requires that float is 32-bit wide.")
 endif()
 
 check_type_size("double" SIZEOF_DOUBLE)
 if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
-  MESSAGE(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
+  message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
 # Determine the CPU byte order.
@@ -58,9 +58,8 @@ if(${FP_IEEE754} EQUAL 1)
 elseif(${FP_IEEE754} EQUAL 2)
   set(FLOAT_BYTEORDER 2)
 else()
-  MESSAGE(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
+  message(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
 endif()
-
 
 # Determine which kind of atomic operations your compiler supports.
 
@@ -210,13 +209,21 @@ endif()
 
 check_cxx_source_compiles("
   #include <cstdio>
-  int main() { char buf[20]; snprintf(buf, 20, \"%d\", 1); return 0; }
+  int main() {
+    char buf[20];
+    snprintf(buf, 20, \"%d\", 1);
+    return 0;
+  }
 " HAVE_SNPRINTF)
 
 if(NOT HAVE_SNPRINTF)
   check_cxx_source_compiles("
     #include <cstdio>
-    int main() { char buf[20]; sprintf_s(buf, \"%d\", 1);  return 0; }
+    int main() {
+      char buf[20];
+      sprintf_s(buf, \"%d\", 1);
+      return 0;
+    }
   " HAVE_SPRINTF_S)
 endif()
 
@@ -231,8 +238,11 @@ if(NOT ZLIB_SOURCE)
   endif()
 endif()
 
-find_package(CppUnit)
-if(NOT CppUnit_FOUND AND BUILD_TESTS)
-  message(STATUS "CppUnit not found, disabling tests.")
-  set(BUILD_TESTS OFF)
+if(BUILD_TESTS)
+  find_package(CppUnit)
+  if(NOT CppUnit_FOUND)
+    message(STATUS "CppUnit not found, disabling tests.")
+    set(BUILD_TESTS OFF)
+  endif()
 endif()
+
