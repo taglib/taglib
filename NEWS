@@ -33,6 +33,7 @@ TagLib 1.10 (??? ??, 2015)
  * Fixed seeking MPEG frames.
  * Allowed generating taglib.pc on Windows.
  * Fixed reading FLAC files with zero-sized padding blocks.
+ * New API for the audio length in milliseconds.
  * Many smaller bug fixes and performance improvements.
 
 TagLib 1.9.1 (Oct 8, 2013)
