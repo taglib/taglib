@@ -35,9 +35,10 @@ using namespace TagLib;
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() : tag(0), atoms(0), properties(0)
-  {
-  }
+  FilePrivate() :
+    tag(0),
+    atoms(0),
+    properties(0) {}
 
   ~FilePrivate()
   {
@@ -51,20 +52,20 @@ public:
   MP4::Properties *properties;
 };
 
-MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
-    : TagLib::File(file)
+MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, audioPropertiesStyle);
+    read(readProperties);
 }
 
-MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle)
-    : TagLib::File(stream)
+MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, audioPropertiesStyle);
+    read(readProperties);
 }
 
 MP4::File::~File()
@@ -112,7 +113,7 @@ MP4::File::checkValid(const MP4::AtomList &list)
 }
 
 void
-MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
+MP4::File::read(bool readProperties)
 {
   if(!isValid())
     return;
@@ -132,7 +133,7 @@ MP4::File::read(bool readProperties, Properties::ReadStyle audioPropertiesStyle)
 
   d->tag = new Tag(this, d->atoms);
   if(readProperties) {
-    d->properties = new Properties(this, d->atoms, audioPropertiesStyle);
+    d->properties = new Properties(this, d->atoms);
   }
 }
 

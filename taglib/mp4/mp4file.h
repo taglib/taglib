@@ -116,7 +116,7 @@ namespace TagLib {
 
     private:
 
-      void read(bool readProperties, Properties::ReadStyle audioPropertiesStyle);
+      void read(bool readProperties);
       bool checkValid(const MP4::AtomList &list);
 
       class FilePrivate;
