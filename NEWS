@@ -34,6 +34,8 @@ TagLib 1.10 (??? ??, 2015)
  * Allowed generating taglib.pc on Windows.
  * Fixed reading FLAC files with zero-sized padding blocks.
  * New API for the audio length in milliseconds.
+ * Marked FLAC::File::streamInfoData() deprecated. It returns an empty ByteVector.
+ * Marked FLAC::File::streamLength() deprecated. It returns zero.
  * Many smaller bug fixes and performance improvements.
 
 TagLib 1.9.1 (Oct 8, 2013)
