@@ -31,13 +31,30 @@
 #include <apetag.h>
 #include <tdebug.h>
 
-#include <bitset>
-
 #include "mpegfile.h"
 #include "mpegheader.h"
 #include "tpropertymap.h"
 
 using namespace TagLib;
+
+namespace
+{
+  /*!
+   * MPEG frames can be recognized by the bit pattern 11111111 111, so the
+   * first byte is easy to check for, however checking to see if the second byte
+   * starts with \e 111 is a bit more tricky, hence these functions.
+   */
+
+  inline bool firstSyncByte(uchar byte)
+  {
+    return (byte == 0xFF);
+  }
+
+  inline bool secondSynchByte(uchar byte)
+  {
+    return ((byte & 0xE0) == 0xE0);
+  }
+}
 
 namespace
 {
@@ -388,11 +405,11 @@ long MPEG::File::nextFrameOffset(long position)
       return position - 1;
 
     for(uint i = 0; i < buffer.size() - 1; i++) {
-      if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
+      if(firstSyncByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
 
-    foundLastSyncPattern = uchar(buffer[buffer.size() - 1]) == 0xff;
+    foundLastSyncPattern = firstSyncByte(buffer[buffer.size() - 1]);
     position += buffer.size();
   }
 }
@@ -412,11 +429,11 @@ long MPEG::File::previousFrameOffset(long position)
     if(buffer.size() <= 0)
       break;
 
-    if(foundFirstSyncPattern && uchar(buffer[buffer.size() - 1]) == 0xff)
+    if(foundFirstSyncPattern && firstSyncByte(buffer[buffer.size() - 1]))
       return position + buffer.size() - 1;
 
     for(int i = buffer.size() - 2; i >= 0; i--) {
-      if(uchar(buffer[i]) == 0xff && secondSynchByte(buffer[i + 1]))
+      if(firstSyncByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
 
@@ -524,7 +541,7 @@ void MPEG::File::read(bool readProperties)
 long MPEG::File::findID3v2(long offset)
 {
   // This method is based on the contents of TagLib::File::find(), but because
-  // of some subtlties -- specifically the need to look for the bit pattern of
+  // of some subtleties -- specifically the need to look for the bit pattern of
   // an MPEG sync, it has been modified for use here.
 
   if(isValid() && ID3v2::Header::fileIdentifier().size() <= bufferSize()) {
@@ -663,12 +680,4 @@ void MPEG::File::findAPE()
 
   d->APELocation = -1;
   d->APEFooterLocation = -1;
-}
-
-bool MPEG::File::secondSynchByte(char byte)
-{
-  std::bitset<8> b(byte);
-
-  // check to see if the byte matches 111xxxxx
-  return b.test(7) && b.test(6) && b.test(5);
 }
