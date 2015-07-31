@@ -480,20 +480,20 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, uint size)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) :
+ASF::File::File(FileName file, bool, Properties::ReadStyle) :
   TagLib::File(file),
   d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read();
 }
 
-ASF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) :
+ASF::File::File(IOStream *stream, bool, Properties::ReadStyle) :
   TagLib::File(stream),
   d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read();
 }
 
 ASF::File::~File()
@@ -559,8 +559,9 @@ bool ASF::File::save()
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
-  ASF::AttributeListMap::ConstIterator it = d->tag->attributeListMap().begin();
-  for(; it != d->tag->attributeListMap().end(); it++) {
+  const AttributeListMap allAttributes = d->tag->attributeListMap();
+
+  for(AttributeListMap::ConstIterator it = allAttributes.begin(); it != allAttributes.end(); ++it) {
 
     const String &name = it->first;
     const AttributeList &attributes = it->second;
@@ -568,9 +569,9 @@ bool ASF::File::save()
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(unsigned int j = 0; j < attributes.size(); j++) {
+    for(AttributeList::ConstIterator jt = attributes.begin(); jt != attributes.end(); ++jt) {
 
-      const Attribute &attribute = attributes[j];
+      const Attribute &attribute = *jt;
       const bool largeValue = (attribute.dataSize() > 65535);
       const bool guid       = (attribute.type() == Attribute::GuidType);
 
@@ -603,7 +604,7 @@ bool ASF::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*propertiesStyle*/)
+void ASF::File::read()
 {
   if(!isValid())
     return;
@@ -632,7 +633,7 @@ void ASF::File::read(bool /*readProperties*/, Properties::ReadStyle /*properties
   seek(2, Current);
 
   for(int i = 0; i < numObjects; i++) {
-    ByteVector guid = readBlock(16);
+    guid = readBlock(16);
     if(guid.size() != 16) {
       setValid(false);
       break;

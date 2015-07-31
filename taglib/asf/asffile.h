@@ -116,7 +116,7 @@ namespace TagLib {
       virtual bool save();
 
     private:
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read();
 
       class FilePrivate;
       FilePrivate *d;
