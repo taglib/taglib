@@ -59,12 +59,12 @@ MP4::Atom::Atom(File *file)
   if(length == 1) {
     const long long longLength = file->readBlock(8).toLongLong();
     if(sizeof(long) == sizeof(long long)) {
-      length = longLength;
+      length = static_cast<long>(longLength);
     }
     else {
       if(longLength <= LONG_MAX) {
         // The atom has a 64-bit length, but it's actually a 31-bit value
-        length = (long)longLength;
+        length = static_cast<long>(longLength);
       }
       else {
         debug("MP4: 64-bit atoms are not supported");
