@@ -57,7 +57,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector & /*data*/, ReadStyle style) :
+RIFF::AIFF::Properties::Properties(const ByteVector &, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
