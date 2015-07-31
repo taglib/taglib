@@ -34,7 +34,9 @@
 #include <config.h>
 #endif
 
-#if defined(HAVE_MSC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+# include <boost/endian/conversion.hpp>
+#elif defined(HAVE_MSC_BYTESWAP)
 # include <stdlib.h>
 #elif defined(HAVE_GLIBC_BYTESWAP)
 # include <byteswap.h>
@@ -53,9 +55,16 @@ namespace TagLib
 {
   namespace Utils
   {
+    /*!
+     * Reverses the order of bytes in an 16-bit integer.
+     */
     inline ushort byteSwap(ushort x)
     {
-#if defined(HAVE_GCC_BYTESWAP_16)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(x);
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap16(x);
 
@@ -82,9 +91,16 @@ namespace TagLib
 #endif
     }
 
+    /*!
+     * Reverses the order of bytes in an 32-bit integer.
+     */
     inline uint byteSwap(uint x)
     {
-#if defined(HAVE_GCC_BYTESWAP_32)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(x);
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap32(x);
 
@@ -114,9 +130,16 @@ namespace TagLib
 #endif
     }
 
+    /*!
+     * Reverses the order of bytes in an 64-bit integer.
+     */
     inline ulonglong byteSwap(ulonglong x)
     {
-#if defined(HAVE_GCC_BYTESWAP_64)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(x);
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap64(x);
 
@@ -150,6 +173,10 @@ namespace TagLib
 #endif
     }
 
+    /*!
+     * Returns a formatted string just like standard sprintf(), but makes use of
+     * safer functions such as snprintf() if available.
+     */
     inline String formatString(const char *format, ...)
     {
       // Sufficient buffer size for the current internal uses.
@@ -188,30 +215,24 @@ namespace TagLib
       if(length != -1)
         return String(buf);
       else
-        return String::null;
+        return String();
     }
 
+    /*!
+     * The types of byte order of the running system.
+     */
     enum ByteOrder
     {
+      //! Little endian systems.
       LittleEndian,
+      //! Big endian systems.
       BigEndian
     };
 
-#ifdef SYSTEM_BYTEORDER
-
-# if SYSTEM_BYTEORDER == 1
-
-    const ByteOrder SystemByteOrder = LittleEndian;
-
-# else
-
-    const ByteOrder SystemByteOrder = BigEndian;
-
-# endif
-
-#else
-
-    inline ByteOrder systemByteOrder()
+    /*!
+     * Returns the integer byte order of the system.
+     */
+    inline ByteOrder integerByteOrder()
     {
       union {
         int  i;
@@ -225,41 +246,23 @@ namespace TagLib
         return BigEndian;
     }
 
-    const ByteOrder SystemByteOrder = systemByteOrder();
-
-#endif
-
-#ifdef FLOAT_BYTEORDER
-
-# if FLOAT_BYTEORDER == 1
-
-    const ByteOrder FloatByteOrder = LittleEndian;
-
-# else
-
-    const ByteOrder FloatByteOrder = BigEndian;
-
-# endif
-
-#else
-
+    /*!
+     * Returns the IEEE754 byte order of the system.
+     */
     inline ByteOrder floatByteOrder()
     {
-        double bin[] = {
-            // "*TAGLIB*" encoded as a little-endian floating-point number
-            (double) 3.9865557444897601e-105, (double) 0.0
-        };
+      union {
+        double d;
+        char   c;
+      } u;
 
-        char *str = (char*)&bin[0];
-        if(strncmp(&str[1], "TAGLIB", 6) == 0)
-          return LittleEndian;
-        else
-          return BigEndian;
+      u.d = 1.0;
+      if(u.c == 0)
+        return LittleEndian;
+      else
+        return BigEndian;
     }
 
-    const ByteOrder FloatByteOrder = floatByteOrder();
-
-#endif
   }
 }
 

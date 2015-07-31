@@ -1,12 +1,6 @@
-include(CheckIncludeFile)
-include(CheckIncludeFiles)
-include(CheckSymbolExists)
-include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
-include(TestBigEndian)
-include(TestFloatFormat)
 
 # Check if the size of numeric types are suitable.
 
@@ -38,27 +32,6 @@ endif()
 check_type_size("double" SIZEOF_DOUBLE)
 if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
-endif()
-
-# Determine the CPU byte order.
-
-test_big_endian(IS_BIG_ENDIAN)
-
-if(NOT IS_BIG_ENDIAN)
-  set(SYSTEM_BYTEORDER 1)
-else()
-  set(SYSTEM_BYTEORDER 2)
-endif()
-
-# Check if the format of floating point types are suitable.
-
-test_float_format(FP_IEEE754)
-if(${FP_IEEE754} EQUAL 1)
-  set(FLOAT_BYTEORDER 1)
-elseif(${FP_IEEE754} EQUAL 2)
-  set(FLOAT_BYTEORDER 2)
-else()
-  message(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
 endif()
 
 # Determine which kind of atomic operations your compiler supports.
@@ -134,72 +107,70 @@ endif()
 
 # Determine which kind of byte swap functions your compiler supports.
 
-# GCC's __builtin_bswap* should be checked individually
-# because some of them can be missing depends on the GCC version.
 check_cxx_source_compiles("
+  #include <boost/endian/conversion.hpp>
   int main() {
-    __builtin_bswap16(0);
+    boost::endian::endian_reverse(static_cast<uint16_t>(0));
+    boost::endian::endian_reverse(static_cast<uint32_t>(0));
+    boost::endian::endian_reverse(static_cast<uint64_t>(0));
     return 0;
   }
-" HAVE_GCC_BYTESWAP_16)
+" HAVE_BOOST_BYTESWAP)
 
-check_cxx_source_compiles("
-  int main() {
-    __builtin_bswap32(0);
-    return 0;
-  }
-" HAVE_GCC_BYTESWAP_32)
-
-check_cxx_source_compiles("
-  int main() {
-    __builtin_bswap64(0);
-    return 0;
-  }
-" HAVE_GCC_BYTESWAP_64)
-
-if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP_64)
+if(NOT HAVE_BOOST_BYTESWAP)
   check_cxx_source_compiles("
-    #include <byteswap.h>
     int main() {
-      __bswap_16(0);
-      __bswap_32(0);
-      __bswap_64(0);
+      __builtin_bswap16(0);
+      __builtin_bswap32(0);
+      __builtin_bswap64(0);
       return 0;
     }
-  " HAVE_GLIBC_BYTESWAP)
+  " HAVE_GCC_BYTESWAP)
 
-  if(NOT HAVE_GLIBC_BYTESWAP)
+  if(NOT HAVE_GCC_BYTESWAP)
     check_cxx_source_compiles("
-      #include <stdlib.h>
+      #include <byteswap.h>
       int main() {
-        _byteswap_ushort(0);
-        _byteswap_ulong(0);
-        _byteswap_uint64(0);
+        __bswap_16(0);
+        __bswap_32(0);
+        __bswap_64(0);
         return 0;
       }
-    " HAVE_MSC_BYTESWAP)
+    " HAVE_GLIBC_BYTESWAP)
 
-    if(NOT HAVE_MSC_BYTESWAP)
+    if(NOT HAVE_GLIBC_BYTESWAP)
       check_cxx_source_compiles("
-        #include <libkern/OSByteOrder.h>
+        #include <stdlib.h>
         int main() {
-          OSSwapInt16(0);
-          OSSwapInt32(0);
-          OSSwapInt64(0);
+          _byteswap_ushort(0);
+          _byteswap_ulong(0);
+          _byteswap_uint64(0);
           return 0;
         }
-      " HAVE_MAC_BYTESWAP)
+      " HAVE_MSC_BYTESWAP)
 
-      if(NOT HAVE_MAC_BYTESWAP)
+      if(NOT HAVE_MSC_BYTESWAP)
         check_cxx_source_compiles("
-          #include <sys/endian.h>
+          #include <libkern/OSByteOrder.h>
           int main() {
-            swap16(0);
-            swap32(0);
-            swap64(0);
+            OSSwapInt16(0);
+            OSSwapInt32(0);
+            OSSwapInt64(0);
             return 0;
           }
-        " HAVE_OPENBSD_BYTESWAP)
+        " HAVE_MAC_BYTESWAP)
+
+        if(NOT HAVE_MAC_BYTESWAP)
+          check_cxx_source_compiles("
+            #include <sys/endian.h>
+            int main() {
+              swap16(0);
+              swap32(0);
+              swap64(0);
+              return 0;
+            }
+          " HAVE_OPENBSD_BYTESWAP)
+        endif()
       endif()
     endif()
   endif()
@@ -211,23 +182,23 @@ check_cxx_source_compiles("
   #include <cstdio>
   int main() {
     char buf[20];
-    snprintf(buf, 20, \"%d\", 1);
+    sprintf_s(buf, \"%d\", 1);
     return 0;
   }
-" HAVE_SNPRINTF)
+" HAVE_SPRINTF_S)
 
-if(NOT HAVE_SNPRINTF)
+if(NOT HAVE_SPRINTF_S)
   check_cxx_source_compiles("
     #include <cstdio>
     int main() {
       char buf[20];
-      sprintf_s(buf, \"%d\", 1);
+      snprintf(buf, 20, \"%d\", 1);
       return 0;
     }
-  " HAVE_SPRINTF_S)
+  " HAVE_SNPRINTF)
 endif()
 
-# Check for libz using the cmake supplied FindZLIB.cmake
+# Check for zlib if ZLIB_SOURCE is not specified.
 
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
@@ -238,6 +209,8 @@ if(NOT ZLIB_SOURCE)
   endif()
 endif()
 
+# Check for CppUnit if test is enabled.
+
 if(BUILD_TESTS)
   find_package(CppUnit)
   if(NOT CppUnit_FOUND)
@@ -245,4 +218,3 @@ if(BUILD_TESTS)
     set(BUILD_TESTS OFF)
   endif()
 endif()
-
