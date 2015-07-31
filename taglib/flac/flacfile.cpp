@@ -292,11 +292,13 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 
 ByteVector FLAC::File::streamInfoData()
 {
+  debug("FLAC::File::streamInfoData() -- This function is obsolete. Returning an empty ByteVector.");
   return ByteVector();
 }
 
 long FLAC::File::streamLength()
 {
+  debug("FLAC::File::streamLength() -- This function is obsolete. Returning zero.");
   return 0;
 }
 
