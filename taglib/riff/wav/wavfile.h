@@ -170,7 +170,7 @@ namespace TagLib {
         File(const File &);
         File &operator=(const File &);
 
-        void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+        void read(bool readProperties);
 
         void strip(TagTypes tags);
 
@@ -178,6 +178,8 @@ namespace TagLib {
          * Returns the index of the chunk that its name is "LIST" and list type is "INFO".
          */
         uint findInfoTagChunk();
+
+        friend class Properties;
 
         class FilePrivate;
         FilePrivate *d;

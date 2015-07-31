@@ -70,20 +70,20 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::File::File(FileName file, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(file, LittleEndian)
+RIFF::WAV::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+  RIFF::File(file, LittleEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
-RIFF::WAV::File::File(IOStream *stream, bool readProperties,
-                       Properties::ReadStyle propertiesStyle) : RIFF::File(stream, LittleEndian)
+RIFF::WAV::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
+  RIFF::File(stream, LittleEndian),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 RIFF::WAV::File::~File()
@@ -189,11 +189,9 @@ bool RIFF::WAV::File::hasInfoTag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void RIFF::WAV::File::read(bool readProperties)
 {
-  ByteVector formatData;
-  uint streamLength = 0;
-  for(uint i = 0; i < chunkCount(); i++) {
+  for(uint i = 0; i < chunkCount(); ++i) {
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag[ID3v2Index]) {
@@ -207,7 +205,7 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
     }
     else if(name == "LIST") {
       const ByteVector data = chunkData(i);
-      if(data.mid(0, 4) == "INFO") {
+      if(data.startsWith("INFO")) {
         if(!d->tag[InfoIndex]) {
           d->tag.set(InfoIndex, new RIFF::Info::Tag(data));
           d->hasInfo = true;
@@ -217,32 +215,16 @@ void RIFF::WAV::File::read(bool readProperties, Properties::ReadStyle properties
         }
       }
     }
-    else if(name == "fmt " && readProperties) {
-      if(formatData.isEmpty()) {
-        formatData = chunkData(i);
-      }
-      else {
-        debug("RIFF::WAV::File::read() - Duplicate 'fmt ' chunk found.");
-      }
-    }
-    else if(name == "data" && readProperties) {
-      if(streamLength == 0) {
-        streamLength = chunkDataSize(i);
-      }
-      else {
-        debug("RIFF::WAV::File::read() - Duplicate 'data' chunk found.");
-      }
-    }
   }
 
   if(!d->tag[ID3v2Index])
-    d->tag.set(ID3v2Index, new ID3v2::Tag);
+    d->tag.set(ID3v2Index, new ID3v2::Tag());
 
   if(!d->tag[InfoIndex])
-    d->tag.set(InfoIndex, new RIFF::Info::Tag);
+    d->tag.set(InfoIndex, new RIFF::Info::Tag());
 
-  if(!formatData.isEmpty())
-    d->properties = new Properties(formatData, streamLength, propertiesStyle);
+  if(readProperties)
+    d->properties = new Properties(this, Properties::Average);
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)
@@ -264,7 +246,7 @@ void RIFF::WAV::File::strip(TagTypes tags)
 TagLib::uint RIFF::WAV::File::findInfoTagChunk()
 {
   for(uint i = 0; i < chunkCount(); ++i) {
-    if(chunkName(i) == "LIST" && chunkData(i).mid(0, 4) == "INFO") {
+    if(chunkName(i) == "LIST" && chunkData(i).startsWith("INFO")) {
       return i;
     }
   }
