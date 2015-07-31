@@ -290,7 +290,7 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties);
       void scan();
       long findID3v2();
       long findID3v1();

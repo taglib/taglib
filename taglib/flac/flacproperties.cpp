@@ -62,7 +62,7 @@ FLAC::Properties::Properties(ByteVector data, long streamLength, ReadStyle style
   read(data, streamLength);
 }
 
-FLAC::Properties::Properties(File *file, ReadStyle style) :
+FLAC::Properties::Properties(File *, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {

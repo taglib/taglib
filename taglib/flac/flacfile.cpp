@@ -101,33 +101,32 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+FLAC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+                 bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
+                 bool readProperties, Properties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 FLAC::File::~File()
@@ -364,7 +363,7 @@ bool FLAC::File::hasID3v2Tag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void FLAC::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
@@ -416,7 +415,7 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     else
       streamLength = File::length() - d->streamStart;
 
-    d->properties = new Properties(infoData, streamLength, propertiesStyle);
+    d->properties = new Properties(infoData, streamLength);
   }
 }
 
