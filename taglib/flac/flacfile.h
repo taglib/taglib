@@ -229,7 +229,7 @@ namespace TagLib {
        * Returns the block of data used by FLAC::Properties for parsing the
        * stream properties.
        *
-       * \deprecated This method will not be public in a future release.
+       * \deprecated Always returns an empty vector.
        */
       ByteVector streamInfoData(); // BIC: remove
 
@@ -237,7 +237,7 @@ namespace TagLib {
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
        *
-       * \deprecated This method will not be public in a future release.
+       * \deprecated Always returns zero.
        */
       long streamLength();  // BIC: remove
 
@@ -290,11 +290,10 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties);
       void scan();
       long findID3v2();
       long findID3v1();
-      ByteVector xiphCommentData() const;
 
       class FilePrivate;
       FilePrivate *d;

@@ -60,7 +60,6 @@ public:
     properties(0),
     flacStart(0),
     streamStart(0),
-    streamLength(0),
     scanned(false),
     hasXiphComment(false),
     hasID3v2(false),
@@ -86,13 +85,11 @@ public:
   TagUnion tag;
 
   Properties *properties;
-  ByteVector streamInfoData;
   ByteVector xiphCommentData;
   List<MetadataBlock *> blocks;
 
   long flacStart;
   long streamStart;
-  long streamLength;
   bool scanned;
 
   bool hasXiphComment;
@@ -104,33 +101,32 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+FLAC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+                 bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
+                 bool readProperties, Properties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   d->ID3v2FrameFactory = frameFactory;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 FLAC::File::~File()
@@ -175,7 +171,6 @@ FLAC::Properties *FLAC::File::audioProperties() const
 {
   return d->properties;
 }
-
 
 bool FLAC::File::save()
 {
@@ -294,12 +289,81 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
   d->ID3v2FrameFactory = factory;
 }
 
+ByteVector FLAC::File::streamInfoData()
+{
+  debug("FLAC::File::streamInfoData() -- This function is obsolete. Returning an empty ByteVector.");
+  return ByteVector();
+}
+
+long FLAC::File::streamLength()
+{
+  debug("FLAC::File::streamLength() -- This function is obsolete. Returning zero.");
+  return 0;
+}
+
+List<FLAC::Picture *> FLAC::File::pictureList()
+{
+  List<Picture *> pictures;
+  for(uint i = 0; i < d->blocks.size(); i++) {
+    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
+    if(picture) {
+      pictures.append(picture);
+    }
+  }
+  return pictures;
+}
+
+void FLAC::File::addPicture(Picture *picture)
+{
+  d->blocks.append(picture);
+}
+
+void FLAC::File::removePicture(Picture *picture, bool del)
+{
+  MetadataBlock *block = picture;
+  List<MetadataBlock *>::Iterator it = d->blocks.find(block);
+  if(it != d->blocks.end())
+    d->blocks.erase(it);
+
+  if(del)
+    delete picture;
+}
+
+void FLAC::File::removePictures()
+{
+  List<MetadataBlock *> newBlocks;
+  for(uint i = 0; i < d->blocks.size(); i++) {
+    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
+    if(picture) {
+      delete picture;
+    }
+    else {
+      newBlocks.append(d->blocks[i]);
+    }
+  }
+  d->blocks = newBlocks;
+}
+
+bool FLAC::File::hasXiphComment() const
+{
+  return d->hasXiphComment;
+}
+
+bool FLAC::File::hasID3v1Tag() const
+{
+  return d->hasID3v1;
+}
+
+bool FLAC::File::hasID3v2Tag() const
+{
+  return d->hasID3v2;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void FLAC::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
@@ -334,27 +398,25 @@ void FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
     return;
 
   if(d->hasXiphComment)
-    d->tag.set(FlacXiphIndex, new Ogg::XiphComment(xiphCommentData()));
+    d->tag.set(FlacXiphIndex, new Ogg::XiphComment(d->xiphCommentData));
   else
     d->tag.set(FlacXiphIndex, new Ogg::XiphComment);
 
-  if(readProperties)
-    d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
-}
+  if(readProperties) {
 
-ByteVector FLAC::File::streamInfoData()
-{
-  return isValid() ? d->streamInfoData : ByteVector();
-}
+    // First block should be the stream_info metadata
 
-ByteVector FLAC::File::xiphCommentData() const
-{
-  return (isValid() && d->hasXiphComment) ? d->xiphCommentData : ByteVector();
-}
+    const ByteVector infoData = d->blocks.front()->render();
 
-long FLAC::File::streamLength()
-{
-  return d->streamLength;
+    long streamLength;
+
+    if(d->hasID3v1)
+      streamLength = d->ID3v1Location - d->streamStart;
+    else
+      streamLength = File::length() - d->streamStart;
+
+    d->properties = new Properties(infoData, streamLength);
+  }
 }
 
 void FLAC::File::scan()
@@ -409,8 +471,7 @@ void FLAC::File::scan()
     return;
   }
 
-  d->streamInfoData = readBlock(length);
-  d->blocks.append(new UnknownMetadataBlock(blockType, d->streamInfoData));
+  d->blocks.append(new UnknownMetadataBlock(blockType, readBlock(length)));
   nextBlockOffset += length + 4;
 
   // Search through the remaining metadata
@@ -480,10 +541,6 @@ void FLAC::File::scan()
   // End of metadata, now comes the datastream
 
   d->streamStart = nextBlockOffset;
-  d->streamLength = File::length() - d->streamStart;
-
-  if(d->hasID3v1)
-    d->streamLength -= 128;
 
   d->scanned = true;
 }
@@ -513,62 +570,4 @@ long FLAC::File::findID3v2()
     return 0;
 
   return -1;
-}
-
-List<FLAC::Picture *> FLAC::File::pictureList()
-{
-  List<Picture *> pictures;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
-    if(picture) {
-      pictures.append(picture);
-    }
-  }
-  return pictures;
-}
-
-void FLAC::File::addPicture(Picture *picture)
-{
-  d->blocks.append(picture);
-}
-
-void FLAC::File::removePicture(Picture *picture, bool del)
-{
-  MetadataBlock *block = picture;
-  List<MetadataBlock *>::Iterator it = d->blocks.find(block);
-  if(it != d->blocks.end())
-    d->blocks.erase(it);
-
-  if(del)
-    delete picture;
-}
-
-void FLAC::File::removePictures()
-{
-  List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
-    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
-    if(picture) {
-      delete picture;
-    }
-    else {
-      newBlocks.append(d->blocks[i]);
-    }
-  }
-  d->blocks = newBlocks;
-}
-
-bool FLAC::File::hasXiphComment() const
-{
-  return d->hasXiphComment;
-}
-
-bool FLAC::File::hasID3v1Tag() const
-{
-  return d->hasID3v1;
-}
-
-bool FLAC::File::hasID3v2Tag() const
-{
-  return d->hasID3v2;
 }
