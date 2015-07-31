@@ -370,17 +370,10 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+      void read(bool readProperties);
       long findID3v2(long offset);
       long findID3v1();
       void findAPE();
-
-      /*!
-       * MPEG frames can be recognized by the bit pattern 11111111 111, so the
-       * first byte is easy to check for, however checking to see if the second byte
-       * starts with \e 111 is a bit more tricky, hence this member function.
-       */
-      static bool secondSynchByte(char byte);
 
       class FilePrivate;
       FilePrivate *d;
