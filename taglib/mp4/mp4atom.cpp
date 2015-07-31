@@ -27,6 +27,8 @@
 #include <config.h>
 #endif
 
+#include <climits>
+
 #include <tdebug.h>
 #include <tstring.h>
 #include "mp4atom.h"
@@ -60,8 +62,8 @@ MP4::Atom::Atom(File *file)
       length = longLength;
     }
     else {
-      if(longLength <= 0xFFFFFFFF) {
-        // The atom has a 64-bit length, but it's actually a 32-bit value
+      if(longLength <= LONG_MAX) {
+        // The atom has a 64-bit length, but it's actually a 31-bit value
         length = (long)longLength;
       }
       else {
