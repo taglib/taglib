@@ -251,7 +251,7 @@ TFloat toFloat(const ByteVector &v, size_t offset)
   } tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(TInt));
 
-  if(ENDIAN != Utils::FloatByteOrder)
+  if(ENDIAN != Utils::floatByteOrder())
     tmp.i = Utils::byteSwap(tmp.i);
 
   return tmp.f;
@@ -266,7 +266,7 @@ ByteVector fromFloat(TFloat value)
   } tmp;
   tmp.f = value;
 
-  if(ENDIAN != Utils::FloatByteOrder)
+  if(ENDIAN != Utils::floatByteOrder())
     tmp.i = Utils::byteSwap(tmp.i);
 
   return ByteVector(reinterpret_cast<char *>(&tmp), sizeof(TInt));

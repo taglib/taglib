@@ -2,7 +2,6 @@ include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
 include(TestBigEndian)
-include(TestFloatFormat)
 
 # Check if the size of numeric types are suitable.
 
@@ -44,17 +43,6 @@ if(NOT IS_BIG_ENDIAN)
   set(SYSTEM_BYTEORDER 1)
 else()
   set(SYSTEM_BYTEORDER 2)
-endif()
-
-# Check if the format of floating point types are suitable.
-
-test_float_format(FP_IEEE754)
-if(${FP_IEEE754} EQUAL 1)
-  set(FLOAT_BYTEORDER 1)
-elseif(${FP_IEEE754} EQUAL 2)
-  set(FLOAT_BYTEORDER 2)
-else()
-  message(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
 endif()
 
 # Determine which kind of atomic operations your compiler supports.
