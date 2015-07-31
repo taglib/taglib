@@ -84,38 +84,38 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+TrueAudio::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+                      bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate(frameFactory))
 {
-  d = new FilePrivate(frameFactory);
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
-TrueAudio::File::File(IOStream *stream, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(stream)
+TrueAudio::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
+                      bool readProperties, Properties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate(frameFactory))
 {
-  d = new FilePrivate(frameFactory);
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 TrueAudio::File::~File()
@@ -250,7 +250,7 @@ bool TrueAudio::File::hasID3v2Tag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::File::read(bool readProperties, Properties::ReadStyle /* propertiesStyle */)
+void TrueAudio::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
