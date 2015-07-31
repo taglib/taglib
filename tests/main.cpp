@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
   // Create the event manager and test controller
   CppUnit::TestResult controller;
 
-  // Add a listener that colllects test result
+  // Add a listener that collects test result
   CppUnit::TestResultCollector result;
   controller.addListener(&result);
 
@@ -39,12 +39,20 @@ int main(int argc, char* argv[])
     CppUnit::CompilerOutputter outputter(&result, std::cerr);
     outputter.write();
 
+#if defined(_MSC_VER) && _MSC_VER > 1500
+    char *xml = NULL;
+    ::_dupenv_s(&xml, NULL, "CPPUNIT_XML");
+#else
     char *xml = ::getenv("CPPUNIT_XML");
+#endif
     if(xml && !::strcmp(xml, "1")) {
       std::ofstream xmlfileout("cpptestresults.xml");
       CppUnit::XmlOutputter xmlout(&result, xmlfileout);
       xmlout.write();
     }
+#if defined(_MSC_VER) && _MSC_VER > 1500
+    ::free(xml);
+#endif
   }
   catch(std::invalid_argument &e){
     std::cerr << std::endl

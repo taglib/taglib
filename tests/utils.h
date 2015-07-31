@@ -33,7 +33,11 @@ inline string copyFile(const string &filename, const string &ext)
   GetTempPathA(sizeof(testFileName), testFileName);
   GetTempFileNameA(testFileName, "tag", 0, testFileName);
   DeleteFileA(testFileName);
+# if defined(_MSC_VER) && _MSC_VER > 1500
+  strcat_s(testFileName, ext.c_str());
+# else
   strcat(testFileName, ext.c_str());
+# endif
 #else
   snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
   static_cast<void>(mkstemps(testFileName, 6));
@@ -74,7 +78,7 @@ inline bool fileEqual(const string &filename1, const string &filename2)
 
     if(n1 == 0) break;
 
-    if(memcmp(buf1, buf2, n1) != 0) return false;
+    if(memcmp(buf1, buf2, static_cast<size_t>(n1)) != 0) return false;
   }
 
   return stream1.good() == stream2.good();
