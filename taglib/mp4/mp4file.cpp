@@ -32,6 +32,23 @@
 
 using namespace TagLib;
 
+namespace
+{
+  bool checkValid(const MP4::AtomList &list)
+  {
+    for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
+
+      if((*it)->length == 0)
+        return false;
+
+      if(!checkValid((*it)->children))
+        return false;
+    }
+
+    return true;
+  }
+}
+
 class MP4::File::FilePrivate
 {
 public:
@@ -47,8 +64,8 @@ public:
     delete properties;
   }
 
-  MP4::Tag *tag;
-  MP4::Atoms *atoms;
+  MP4::Tag        *tag;
+  MP4::Atoms      *atoms;
   MP4::Properties *properties;
 };
 
@@ -100,18 +117,6 @@ MP4::File::audioProperties() const
   return d->properties;
 }
 
-bool
-MP4::File::checkValid(const MP4::AtomList &list)
-{
-  for(uint i = 0; i < list.size(); i++) {
-    if(list[i]->length == 0)
-      return false;
-    if(!checkValid(list[i]->children))
-      return false;
-  }
-  return true;
-}
-
 void
 MP4::File::read(bool readProperties)
 {
@@ -119,7 +124,7 @@ MP4::File::read(bool readProperties)
     return;
 
   d->atoms = new Atoms(this);
-  if (!checkValid(d->atoms->atoms)) {
+  if(!checkValid(d->atoms->atoms)) {
     setValid(false);
     return;
   }

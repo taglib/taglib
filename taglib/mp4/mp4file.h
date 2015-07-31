@@ -115,9 +115,7 @@ namespace TagLib {
       bool save();
 
     private:
-
       void read(bool readProperties);
-      bool checkValid(const MP4::AtomList &list);
 
       class FilePrivate;
       FilePrivate *d;
