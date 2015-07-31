@@ -211,20 +211,20 @@ check_cxx_source_compiles("
   #include <cstdio>
   int main() {
     char buf[20];
-    sprintf_s(buf, \"%d\", 1);
+    snprintf(buf, 20, \"%d\", 1);
     return 0;
   }
-" HAVE_SPRINTF_S)
+" HAVE_SNPRINTF)
 
-if(NOT HAVE_SPRINTF_S)
+if(NOT HAVE_SNPRINTF)
   check_cxx_source_compiles("
     #include <cstdio>
     int main() {
       char buf[20];
-      snprintf(buf, 20, \"%d\", 1);
+      sprintf_s(buf, \"%d\", 1);
       return 0;
     }
-  " HAVE_SNPRINTF)
+  " HAVE_SPRINTF_S)
 endif()
 
 # Check for libz using the cmake supplied FindZLIB.cmake
