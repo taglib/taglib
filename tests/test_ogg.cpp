@@ -20,6 +20,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSplitPackets);
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
+  CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -104,6 +105,21 @@ public:
     delete f;
   }
 
+  void testAudioProperties()
+  {
+    Ogg::Vorbis::File f(TEST_FILE_PATH_C("empty.ogg"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(9, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->vorbisVersion());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMaximum());
+    CPPUNIT_ASSERT_EQUAL(112000, f.audioProperties()->bitrateNominal());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMinimum());
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestOGG);
