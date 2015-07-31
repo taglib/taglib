@@ -65,7 +65,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::Properties::Properties(const ByteVector & /*data*/, long /*streamLength*/, ReadStyle style) :
+WavPack::Properties::Properties(const ByteVector &, long, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
