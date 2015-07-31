@@ -25,9 +25,9 @@
 #cmakedefine   HAVE_WIN_ATOMIC 1
 #cmakedefine   HAVE_IA64_ATOMIC 1
 
-/* Defined if your compiler supports some safer version of sprintf */
-#cmakedefine   HAVE_SNPRINTF 1
-#cmakedefine   HAVE_SPRINTF_S 1
+/* Defined if your compiler supports some safer version of vsprintf */
+#cmakedefine   HAVE_VSNPRINTF 1
+#cmakedefine   HAVE_VSPRINTF_S 1
 
 /* Defined if you have libz */
 #cmakedefine   HAVE_ZLIB 1

@@ -177,11 +177,11 @@ namespace TagLib
       char buf[BufferSize];
       int length;
 
-#if defined(HAVE_SNPRINTF)
+#if defined(HAVE_VSNPRINTF)
 
       length = vsnprintf(buf, BufferSize, format, args);
 
-#elif defined(HAVE_SPRINTF_S)
+#elif defined(HAVE_VSPRINTF_S)
 
       length = vsprintf_s(buf, format, args);
 
