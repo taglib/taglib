@@ -63,7 +63,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Properties::Properties(File *file, ReadStyle style) :
+APE::Properties::Properties(File *, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
