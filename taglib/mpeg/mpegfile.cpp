@@ -60,7 +60,6 @@ public:
     hasAPE(false),
     properties(0)
   {
-
   }
 
   ~FilePrivate()
@@ -95,33 +94,30 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::File::File(FileName file, bool readProperties,
-                 Properties::ReadStyle propertiesStyle) : TagLib::File(file)
+MPEG::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
-
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(file)
+                 bool readProperties, Properties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate(frameFactory))
 {
-  d = new FilePrivate(frameFactory);
-
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 MPEG::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-                 bool readProperties, Properties::ReadStyle propertiesStyle) :
-  TagLib::File(stream)
+                 bool readProperties, Properties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate(frameFactory))
 {
-  d = new FilePrivate(frameFactory);
-
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 MPEG::File::~File()
@@ -478,7 +474,7 @@ bool MPEG::File::hasAPETag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
+void MPEG::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
@@ -517,7 +513,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
   }
 
   if(readProperties)
-    d->properties = new Properties(this, propertiesStyle);
+    d->properties = new Properties(this);
 
   // Make sure that we have our default tag types available.
 
@@ -528,7 +524,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle propertiesStyle
 long MPEG::File::findID3v2(long offset)
 {
   // This method is based on the contents of TagLib::File::find(), but because
-  // of some subtlteies -- specifically the need to look for the bit pattern of
+  // of some subtlties -- specifically the need to look for the bit pattern of
   // an MPEG sync, it has been modified for use here.
 
   if(isValid() && ID3v2::Header::fileIdentifier().size() <= bufferSize()) {
