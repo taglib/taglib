@@ -130,7 +130,9 @@ namespace TagLib {
         File(const File &);
         File &operator=(const File &);
 
-        void read(bool readProperties, Properties::ReadStyle propertiesStyle);
+        void read(bool readProperties);
+
+        friend class Properties;
 
         class FilePrivate;
         FilePrivate *d;
