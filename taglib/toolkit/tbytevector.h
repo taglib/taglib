@@ -85,9 +85,10 @@ namespace TagLib {
 
     /*!
      * Constructs a byte vector that copies \a data up to the first null
-     * byte.  The behavior is undefined if \a data is not null terminated.
-     * This is particularly useful for constructing byte arrays from string
-     * constants.
+     * byte.  This is particularly useful for constructing byte arrays from
+     * string constants.
+     *
+     * \warning The behavior is undefined if \a data is not null terminated.
      */
     ByteVector(const char *data);
 
@@ -550,12 +551,14 @@ namespace TagLib {
     ByteVector &operator=(const ByteVector &v);
 
     /*!
-     * Copies ByteVector \a v.
+     * Copies a byte \a c.
      */
     ByteVector &operator=(char c);
 
     /*!
-     * Copies ByteVector \a v.
+     * Copies \a data up to the first null byte.
+     *
+     * \warning The behavior is undefined if \a data is not null terminated.
      */
     ByteVector &operator=(const char *data);
 

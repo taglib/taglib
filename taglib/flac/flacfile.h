@@ -79,7 +79,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs an APE file from \a file.  If \a readProperties is true the
+       * Constructs an FLAC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
        * If this file contains and ID3v2 tag the frames will be created using
