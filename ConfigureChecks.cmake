@@ -209,22 +209,22 @@ check_cxx_source_compiles("
   int main() {
     char buf[20];
     va_list args;
-    vsprintf_s(buf, \"%d\", args);
+    vsnprintf(buf, 20, \"%d\", args);
     return 0;
   }
-" HAVE_VSPRINTF_S)
+" HAVE_VSNPRINTF)
 
-if(NOT HAVE_VSPRINTF_S)
+if(NOT HAVE_VSNPRINTF)
   check_cxx_source_compiles("
     #include <cstdio>
     #include <cstdarg>
     int main() {
       char buf[20];
       va_list args;
-      vsnprintf(buf, 20, \"%d\", args);
+      vsprintf_s(buf, \"%d\", args);
       return 0;
     }
-  " HAVE_VSNPRINTF)
+  " HAVE_VSPRINTF_S)
 endif()
 
 # Check for libz using the cmake supplied FindZLIB.cmake
