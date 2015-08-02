@@ -23,13 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <algorithm>
+#include <vector>
+
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <tstring.h>
 
 #include "rifffile.h"
-#include <algorithm>
-#include <vector>
+#include "riffutils.h"
 
 using namespace TagLib;
 
@@ -235,19 +237,6 @@ void RIFF::File::removeChunk(const ByteVector &name)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool isValidChunkID(const ByteVector &name)
-{
-  if(name.size() != 4) {
-    return false;
-  }
-  for(int i = 0; i < 4; i++) {
-    if(name[i] < 32 || name[i] > 127) {
-      return false;
-    }
-  }
-  return true;
-}
-
 void RIFF::File::read()
 {
   bool bigEndian = (d->endianness == BigEndian);
@@ -261,7 +250,7 @@ void RIFF::File::read()
     ByteVector chunkName = readBlock(4);
     uint chunkSize = readBlock(4).toUInt(bigEndian);
 
-    if(!isValidChunkID(chunkName)) {
+    if(!isValidChunkName(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
       setValid(false);
       break;

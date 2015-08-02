@@ -3,6 +3,7 @@
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <rifffile.h>
+#include <riffutils.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -41,6 +42,7 @@ class TestRIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testLastChunkAtEvenPosition2);
   CPPUNIT_TEST(testLastChunkAtEvenPosition3);
   CPPUNIT_TEST(testChunkOffset);
+  CPPUNIT_TEST(testChunkName);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -258,6 +260,14 @@ public:
     delete f;
   }
 
+  void testChunkName()
+  {
+    CPPUNIT_ASSERT(RIFF::isValidChunkName("WAVE"));
+    CPPUNIT_ASSERT(RIFF::isValidChunkName("SND "));
+    CPPUNIT_ASSERT(!RIFF::isValidChunkName("WWAVE"));
+    CPPUNIT_ASSERT(!RIFF::isValidChunkName("XY\x83Z"));
+    CPPUNIT_ASSERT(!RIFF::isValidChunkName("SND\r"));
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestRIFF);

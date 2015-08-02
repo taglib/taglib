@@ -24,6 +24,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testInvalidChunk);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -209,6 +210,26 @@ public:
   {
     RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
     CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testInvalidChunk()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      f.seek(12);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("fmt "), f.readBlock(4));
+      f.insert(ByteVector("f\x10t\x90"), 12, 4);
+    }
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.isValid());
+
+      f.seek(12);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("f\x10t\x90"), f.readBlock(4));
+    }
   }
 
 };
