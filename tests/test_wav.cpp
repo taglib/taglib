@@ -1,9 +1,9 @@
 #include <string>
 #include <stdio.h>
-#include <tag.h>
 #include <id3v2tag.h>
 #include <infotag.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <wavfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -24,6 +24,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -209,6 +210,26 @@ public:
   {
     RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
     CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testStripAndProperties()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      f.ID3v2Tag()->setTitle("ID3v2");
+      f.InfoTag()->setTitle("INFO");
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2"), f.properties()["TITLE"].front());
+      f.strip(RIFF::WAV::File::ID3v2);
+      CPPUNIT_ASSERT_EQUAL(String("INFO"), f.properties()["TITLE"].front());
+      f.strip(RIFF::WAV::File::Info);
+      CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
   }
 
 };

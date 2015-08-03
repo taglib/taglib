@@ -119,17 +119,18 @@ void RIFF::WAV::File::strip(TagTypes tags)
 
 PropertyMap RIFF::WAV::File::properties() const
 {
-  return tag()->properties();
+  return d->tag.properties();
 }
 
 void RIFF::WAV::File::removeUnsupportedProperties(const StringList &unsupported)
 {
-  tag()->removeUnsupportedProperties(unsupported);
+  d->tag.removeUnsupportedProperties(unsupported);
 }
 
 PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 {
-  return tag()->setProperties(properties);
+  InfoTag()->setProperties(properties);
+  return ID3v2Tag()->setProperties(properties);
 }
 
 RIFF::WAV::Properties *RIFF::WAV::File::audioProperties() const

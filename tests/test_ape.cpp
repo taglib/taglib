@@ -1,8 +1,10 @@
 #include <string>
 #include <stdio.h>
-#include <tag.h>
+#include <apetag.h>
+#include <id3v1tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <apefile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -20,6 +22,7 @@ class TestAPE : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties390);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -109,6 +112,26 @@ public:
   {
     APE::File f(TEST_FILE_PATH_C("zerodiv.ape"));
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testStripAndProperties()
+  {
+    ScopedFileCopy copy("mac-399", ".ape");
+
+    {
+      APE::File f(copy.fileName().c_str());
+      f.APETag(true)->setTitle("APE");
+      f.ID3v1Tag(true)->setTitle("ID3v1");
+      f.save();
+    }
+    {
+      APE::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
+      f.strip(APE::File::APE);
+      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
+      f.strip(APE::File::ID3v1);
+      CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
   }
 
 };
