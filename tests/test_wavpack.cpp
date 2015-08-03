@@ -1,9 +1,9 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <wavpackfile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
