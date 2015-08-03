@@ -1,7 +1,6 @@
 include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXSourceCompiles)
-include(TestBigEndian)
 
 # Check if the size of numeric types are suitable.
 
@@ -33,16 +32,6 @@ endif()
 check_type_size("double" SIZEOF_DOUBLE)
 if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
-endif()
-
-# Determine the CPU byte order.
-
-test_big_endian(IS_BIG_ENDIAN)
-
-if(NOT IS_BIG_ENDIAN)
-  set(SYSTEM_BYTEORDER 1)
-else()
-  set(SYSTEM_BYTEORDER 2)
 endif()
 
 # Determine which kind of atomic operations your compiler supports.

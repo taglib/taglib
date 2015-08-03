@@ -216,20 +216,9 @@ namespace TagLib
       BigEndian
     };
 
-#ifdef SYSTEM_BYTEORDER
-
-# if SYSTEM_BYTEORDER == 1
-
-    const ByteOrder SystemByteOrder = LittleEndian;
-
-# else
-
-    const ByteOrder SystemByteOrder = BigEndian;
-
-# endif
-
-#else
-
+    /*!
+     * Returns the integer byte order of the system.
+     */
     inline ByteOrder systemByteOrder()
     {
       union {
@@ -243,10 +232,6 @@ namespace TagLib
       else
         return BigEndian;
     }
-
-    const ByteOrder SystemByteOrder = systemByteOrder();
-
-#endif
 
     /*!
      * Returns the IEEE754 byte order of the system.
