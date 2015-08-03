@@ -301,6 +301,8 @@ namespace TagLib {
        *
        * \note This will also invalidate pointers to the ID3 and APE tags
        * as their memory will be freed.
+       *
+       * \note This will update the file immediately.
        */
       bool strip(int tags = AllTags);
 
@@ -311,6 +313,8 @@ namespace TagLib {
        *
        * If \a freeMemory is true the ID3 and APE tags will be deleted and
        * pointers to them will be invalidated.
+       *
+       * \note This will update the file immediately.
        */
       // BIC: merge with the method above
       bool strip(int tags, bool freeMemory);
