@@ -36,6 +36,7 @@ TagLib 1.10 (??? ??, 2015)
  * New API for the audio length in milliseconds.
  * Marked FLAC::File::streamInfoData() deprecated. It returns an empty ByteVector.
  * Marked FLAC::File::streamLength() deprecated. It returns zero.
+ * Fixed possible file corruptions when adding an ID3v1 tag to FLAC files.
  * Many smaller bug fixes and performance improvements.
 
 TagLib 1.9.1 (Oct 8, 2013)

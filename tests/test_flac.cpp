@@ -6,6 +6,7 @@
 #include <tpropertymap.h>
 #include <flacfile.h>
 #include <xiphcomment.h>
+#include <id3v1tag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -27,6 +28,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testInvalid);
   CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testZeroSizedPadding);
+  CPPUNIT_TEST(testSaveID3v1);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -281,6 +283,29 @@ public:
 
     FLAC::File f(copy.fileName().c_str());
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testSaveID3v1()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    ByteVector audioStream;
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+    }
   }
 
 };
