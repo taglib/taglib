@@ -50,7 +50,7 @@ public:
   class MetadataLibraryObject;
 
   FilePrivate():
-    size(0),
+    headerSize(0),
     tag(0),
     properties(0),
     contentDescriptionObject(0),
@@ -68,7 +68,7 @@ public:
     delete properties;
   }
 
-  unsigned long long size;
+  unsigned long long headerSize;
 
   ASF::Tag *tag;
   ASF::Properties *properties;
@@ -556,6 +556,10 @@ bool ASF::File::save()
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
+  d->extendedContentDescriptionObject->attributeData.clear();
+  d->metadataObject->attributeData.clear();
+  d->metadataLibraryObject->attributeData.clear();
+
   const AttributeListMap allAttributes = d->tag->attributeListMap();
 
   for(AttributeListMap::ConstIterator it = allAttributes.begin(); it != allAttributes.end(); ++it) {
@@ -591,8 +595,14 @@ bool ASF::File::save()
     data.append((*it)->render(this));
   }
 
-  data = headerGuid + ByteVector::fromLongLong(data.size() + 30, false) + ByteVector::fromUInt(d->objects.size(), false) + ByteVector("\x01\x02", 2) + data;
-  insert(data, 0, (TagLib::ulong)d->size);
+  seek(16);
+  writeBlock(ByteVector::fromLongLong(data.size() + 30, false));
+  writeBlock(ByteVector::fromUInt(d->objects.size(), false));
+  writeBlock(ByteVector("\x01\x02", 2));
+
+  insert(data, 30, static_cast<ulong>(d->headerSize - 30));
+
+  d->headerSize = data.size() + 30;
 
   return true;
 }
@@ -617,7 +627,7 @@ void ASF::File::read()
   d->properties = new ASF::Properties();
 
   bool ok;
-  d->size = readQWORD(this, &ok);
+  d->headerSize = readQWORD(this, &ok);
   if(!ok) {
     setValid(false);
     return;

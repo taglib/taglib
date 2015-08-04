@@ -25,6 +25,7 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSavePicture);
   CPPUNIT_TEST(testSaveMultiplePictures);
   CPPUNIT_TEST(testProperties);
+  CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -268,6 +269,21 @@ public:
     CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/PartOfSet"].size());
     CPPUNIT_ASSERT_EQUAL(String("3"), f.tag()->attribute("WM/PartOfSet").front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("3"), tags["DISCNUMBER"]);
+  }
+
+  void testRepeatedSave()
+  {
+    ScopedFileCopy copy("silence-1", ".wma");
+
+    {
+      ASF::File f(copy.fileName().c_str());
+      f.tag()->setTitle(std::string(128 * 1024, 'X').c_str());
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(297578L, f.length());
+      f.tag()->setTitle(std::string(16 * 1024, 'X').c_str());
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(68202L, f.length());
+    }
   }
 
 };
