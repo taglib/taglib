@@ -34,6 +34,11 @@ TagLib 1.10 (??? ??, 2015)
  * Allowed generating taglib.pc on Windows.
  * Fixed reading FLAC files with zero-sized padding blocks.
  * New API for the audio length in milliseconds.
+ * Added support for reading the encoder information of WMA files.
+ * Added support for reading the codec of WAV files.
+ * Added support for multi channel WavPack files.
+ * Added support for reading the nominal bitrate of Ogg Speex files.
+ * Added support for VBR headers in MPEG files.
  * Marked FLAC::File::streamInfoData() deprecated. It returns an empty ByteVector.
  * Marked FLAC::File::streamLength() deprecated. It returns zero.
  * Fixed possible file corruptions when adding an ID3v1 tag to FLAC files.
