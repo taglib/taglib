@@ -46,7 +46,7 @@ TagLib 1.9.1 (Oct 8, 2013)
  * Fixed constructing String from ByteVector.
  * Fixed compilation on MSVC with the /Zc:wchar_t- option.
  * Fixed detecting of RIFF files with invalid chunk sizes.
- * Added TagLib::MP4::PropertyMap::codec().
+ * Added TagLib::MP4::Properties::codec().
 
 TagLib 1.9 (Oct 6, 2013)
 ========================
