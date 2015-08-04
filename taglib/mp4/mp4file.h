@@ -111,6 +111,9 @@ namespace TagLib {
        * Save the file.
        *
        * This returns true if the save was successful.
+       *
+       * \warning In the current implementation, it's dangerous to call save()
+       * repeatedly.  At worst it will corrupt the file.
        */
       bool save();
 
