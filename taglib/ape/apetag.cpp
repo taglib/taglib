@@ -46,14 +46,7 @@ using namespace APE;
 class APE::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), footerLocation(-1), tagLength(0) {}
-
-  TagLib::File *file;
-  long footerLocation;
-  long tagLength;
-
   Footer footer;
-
   ItemListMap itemListMap;
 };
 
@@ -61,18 +54,17 @@ public:
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Tag::Tag() : TagLib::Tag()
+APE::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
 }
 
-APE::Tag::Tag(TagLib::File *file, long footerLocation) : TagLib::Tag()
+APE::Tag::Tag(TagLib::File *file, long footerLocation) :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
-  d->file = file;
-  d->footerLocation = footerLocation;
-
-  read();
+  read(file, footerLocation);
 }
 
 APE::Tag::~Tag()
@@ -327,19 +319,19 @@ bool APE::Tag::isEmpty() const
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void APE::Tag::read()
+void APE::Tag::read(TagLib::File *file, long footerLocation)
 {
-  if(d->file && d->file->isValid()) {
+  if(file && file->isValid()) {
 
-    d->file->seek(d->footerLocation);
-    d->footer.setData(d->file->readBlock(Footer::size()));
+    file->seek(footerLocation);
+    d->footer.setData(file->readBlock(Footer::size()));
 
     if(d->footer.tagSize() <= Footer::size() ||
-       d->footer.tagSize() > uint(d->file->length()))
+       d->footer.tagSize() > uint(file->length()))
       return;
 
-    d->file->seek(d->footerLocation + Footer::size() - d->footer.tagSize());
-    parse(d->file->readBlock(d->footer.tagSize() - Footer::size()));
+    file->seek(footerLocation + Footer::size() - d->footer.tagSize());
+    parse(file->readBlock(d->footer.tagSize() - Footer::size()));
   }
 }
 
