@@ -210,7 +210,7 @@ void WavPack::Properties::read(File *file, long streamLength)
   }
 }
 
-uint WavPack::Properties::seekFinalIndex(File *file, long streamLength)
+TagLib::uint WavPack::Properties::seekFinalIndex(File *file, long streamLength)
 {
   const long offset = file->rfind("wvpk", streamLength);
   if(offset == -1)
