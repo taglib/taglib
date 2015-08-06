@@ -201,26 +201,30 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
-# Determine whether your compiler supports some safer version of sprintf.
+# Determine whether your compiler supports some safer version of vsprintf.
 
 check_cxx_source_compiles("
   #include <cstdio>
+  #include <cstdarg>
   int main() {
     char buf[20];
-    snprintf(buf, 20, \"%d\", 1);
+    va_list args;
+    vsnprintf(buf, 20, \"%d\", args);
     return 0;
   }
-" HAVE_SNPRINTF)
+" HAVE_VSNPRINTF)
 
-if(NOT HAVE_SNPRINTF)
+if(NOT HAVE_VSNPRINTF)
   check_cxx_source_compiles("
     #include <cstdio>
+    #include <cstdarg>
     int main() {
       char buf[20];
-      sprintf_s(buf, \"%d\", 1);
+      va_list args;
+      vsprintf_s(buf, \"%d\", args);
       return 0;
     }
-  " HAVE_SPRINTF_S)
+  " HAVE_VSPRINTF_S)
 endif()
 
 # Check for libz using the cmake supplied FindZLIB.cmake
