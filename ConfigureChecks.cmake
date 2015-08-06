@@ -107,30 +107,16 @@ endif()
 
 # Determine which kind of byte swap functions your compiler supports.
 
-# GCC's __builtin_bswap* should be checked individually
-# because some of them can be missing depends on the GCC version.
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap16(0);
-    return 0;
-  }
-" HAVE_GCC_BYTESWAP_16)
-
-check_cxx_source_compiles("
-  int main() {
     __builtin_bswap32(0);
-    return 0;
-  }
-" HAVE_GCC_BYTESWAP_32)
-
-check_cxx_source_compiles("
-  int main() {
     __builtin_bswap64(0);
     return 0;
   }
-" HAVE_GCC_BYTESWAP_64)
+" HAVE_GCC_BYTESWAP)
 
-if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP_64)
+if(NOT HAVE_GCC_BYTESWAP)
   check_cxx_source_compiles("
     #include <byteswap.h>
     int main() {

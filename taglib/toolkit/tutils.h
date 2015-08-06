@@ -44,7 +44,7 @@
 # include <sys/endian.h>
 #endif
 
-#include "tstring.h"
+#include <tstring.h>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -59,7 +59,7 @@ namespace TagLib
      */
     inline ushort byteSwap(ushort x)
     {
-#if defined(HAVE_GCC_BYTESWAP_16)
+#if defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap16(x);
 
@@ -91,7 +91,7 @@ namespace TagLib
      */
     inline uint byteSwap(uint x)
     {
-#if defined(HAVE_GCC_BYTESWAP_32)
+#if defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap32(x);
 
@@ -126,7 +126,7 @@ namespace TagLib
      */
     inline ulonglong byteSwap(ulonglong x)
     {
-#if defined(HAVE_GCC_BYTESWAP_64)
+#if defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap64(x);
 
