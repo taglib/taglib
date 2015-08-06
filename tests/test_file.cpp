@@ -40,6 +40,7 @@ class TestFile : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestFile);
   CPPUNIT_TEST(testFindInSmallFile);
   CPPUNIT_TEST(testRFindInSmallFile);
+  CPPUNIT_TEST(testSeek);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -98,6 +99,30 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 7), file.rfind("23", 7));
       CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 6), file.rfind("23", 6));
     }
+  }
+
+  void testSeek()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    std::string name = copy.fileName();
+
+    PlainFile f(name.c_str());
+    CPPUNIT_ASSERT_EQUAL((long)0, f.tell());
+    CPPUNIT_ASSERT_EQUAL((long)4328, f.length());
+
+    f.seek(100, File::Beginning);
+    CPPUNIT_ASSERT_EQUAL((long)100, f.tell());
+    f.seek(100, File::Current);
+    CPPUNIT_ASSERT_EQUAL((long)200, f.tell());
+    f.seek(-300, File::Current);
+    CPPUNIT_ASSERT_EQUAL((long)200, f.tell());
+
+    f.seek(-100, File::End);
+    CPPUNIT_ASSERT_EQUAL((long)4228, f.tell());
+    f.seek(-100, File::Current);
+    CPPUNIT_ASSERT_EQUAL((long)4128, f.tell());
+    f.seek(300, File::Current);
+    CPPUNIT_ASSERT_EQUAL((long)4428, f.tell());
   }
 
 };

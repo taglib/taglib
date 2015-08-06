@@ -365,13 +365,10 @@ void FileStream::seek(long offset, Position p)
 
   SetLastError(NO_ERROR);
   SetFilePointer(d->file, offset, NULL, whence);
-  if(GetLastError() == ERROR_NEGATIVE_SEEK) {
-    SetLastError(NO_ERROR);
-    SetFilePointer(d->file, 0, NULL, FILE_BEGIN);
-  }
-  if(GetLastError() != NO_ERROR) {
+
+  const int lastError = GetLastError();
+  if(lastError != NO_ERROR && lastError != ERROR_NEGATIVE_SEEK)
     debug("FileStream::seek() -- Failed to set the file pointer.");
-  }
 
 #else
 
@@ -442,7 +439,7 @@ long FileStream::length()
   SetLastError(NO_ERROR);
   const DWORD fileSize = GetFileSize(d->file, NULL);
   if(GetLastError() == NO_ERROR) {
-    return static_cast<ulong>(fileSize);
+    return static_cast<long>(fileSize);
   }
   else {
     debug("FileStream::length() -- Failed to get the file size.");
