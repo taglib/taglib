@@ -45,11 +45,8 @@ class RIFF::WAV::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tagChunkID("ID3 "),
     hasID3v2(false),
-    hasInfo(false)
-  {
-  }
+    hasInfo(false) {}
 
   ~FilePrivate()
   {
@@ -57,9 +54,6 @@ public:
   }
 
   Properties *properties;
-
-  ByteVector tagChunkID;
-
   TagUnion tag;
 
   bool hasID3v2;
@@ -162,7 +156,7 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
     removeTagChunks(ID3v2);
 
     if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
-      setChunkData(d->tagChunkID, ID3v2Tag()->render(id3v2Version));
+      setChunkData("ID3 ", ID3v2Tag()->render(id3v2Version));
       d->hasID3v2 = true;
     }
   }
@@ -199,7 +193,6 @@ void RIFF::WAV::File::read(bool readProperties)
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag[ID3v2Index]) {
-        d->tagChunkID = name;
         d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i)));
         d->hasID3v2 = true;
       }
