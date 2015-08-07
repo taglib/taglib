@@ -45,13 +45,18 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
+    String longText(std::string(128 * 1024, ' ').c_str());
+    for(size_t i = 0; i < longText.length(); ++i)
+      longText[i] = static_cast<wchar>(L'A' + (i % 26));
+
     Vorbis::File *f = new Vorbis::File(newname.c_str());
-    f->tag()->addField("test", ByteVector(128 * 1024, 'x') + ByteVector(1, '\0'));
+    f->tag()->setTitle(longText);
     f->save();
     delete f;
 
     f = new Vorbis::File(newname.c_str());
     CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
+    CPPUNIT_ASSERT_EQUAL(longText, f->tag()->title());
     delete f;
   }
 
