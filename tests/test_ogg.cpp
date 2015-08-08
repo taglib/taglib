@@ -46,7 +46,7 @@ public:
     string newname = copy.fileName();
 
     String longText(std::string(128 * 1024, ' ').c_str());
-    for(size_t i = 0; i < longText.length(); ++i)
+    for (size_t i = 0; i < longText.length(); ++i)
       longText[i] = static_cast<wchar>(L'A' + (i % 26));
 
     Vorbis::File *f = new Vorbis::File(newname.c_str());
@@ -55,8 +55,17 @@ public:
     delete f;
 
     f = new Vorbis::File(newname.c_str());
+    CPPUNIT_ASSERT(f->isValid());
     CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
     CPPUNIT_ASSERT_EQUAL(longText, f->tag()->title());
+    f->tag()->setTitle("ABCDE");
+    f->save();
+    delete f;
+
+    f = new Vorbis::File(newname.c_str());
+    CPPUNIT_ASSERT(f->isValid());
+    CPPUNIT_ASSERT_EQUAL(3, f->lastPageHeader()->pageSequenceNumber());
+    CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f->tag()->title());
     delete f;
   }
 
