@@ -77,6 +77,8 @@ namespace TagLib {
         virtual int sampleRate() const;
 
       private:
+        void read(File *document);
+
         class AudioPropertiesPrivate;
         AudioPropertiesPrivate *d;
       };

@@ -1,9 +1,9 @@
-#include <cppunit/extensions/HelperMacros.h>
 #include <string>
 #include <stdio.h>
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <dsffile.h>
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
@@ -21,10 +21,19 @@ public:
   void testBasic()
   {
     DSF::File f(TEST_FILE_PATH_C("empty.dsf"));
-    DSF::AudioProperties *props = f.audioProperties();
-    CPPUNIT_ASSERT_EQUAL(2822400, props->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1, props->channels());
-    CPPUNIT_ASSERT_EQUAL(1, props->bitsPerSample());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(2822, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(2822400, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->formatVersion());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->formatID());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channelType());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL((long long)0, f.audioProperties()->sampleCount());
+    CPPUNIT_ASSERT_EQUAL(4096, f.audioProperties()->blockSizePerChannel());
   }
 
   void testTags()

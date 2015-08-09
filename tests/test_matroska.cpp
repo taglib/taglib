@@ -99,14 +99,18 @@ public:
     EBML::Matroska::File f(filename.c_str());
     CPPUNIT_ASSERT(f.isValid());
 
-    AudioProperties* a = f.audioProperties();
-    CPPUNIT_ASSERT(a != 0);
+    CPPUNIT_ASSERT(f.audioProperties());
 
     // Not a very nice assertion...
-    CPPUNIT_ASSERT_EQUAL(a->length(), 0);
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(735, f.audioProperties()->lengthInMilliseconds());
+
     // Bitrate is not nice and thus not tested.
-    CPPUNIT_ASSERT_EQUAL(a->sampleRate(), 44100);
-    CPPUNIT_ASSERT_EQUAL(a->channels(), 2);
+    CPPUNIT_ASSERT_EQUAL(51, f.audioProperties()->bitrate());
+
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
   }
 };
 

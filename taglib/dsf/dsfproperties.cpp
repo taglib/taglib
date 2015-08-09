@@ -59,8 +59,8 @@ public:
   uint blockSizePerChannel;
 
   // Computed
-  uint bitrate;
-  uint length;
+  int bitrate;
+  int length;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,12 +85,12 @@ int DSF::AudioProperties::length() const
 
 int DSF::AudioProperties::lengthInSeconds() const
 {
-  return d->length;
+  return d->length / 1000;
 }
 
 int DSF::AudioProperties::lengthInMilliseconds() const
 {
-  return d->length * 1000;
+  return d->length;
 }
 
 int DSF::AudioProperties::bitrate() const
@@ -154,8 +154,8 @@ void DSF::AudioProperties::read(const ByteVector &data)
   d->sampleCount           = data.toInt64LE(24);
   d->blockSizePerChannel   = data.toUInt32LE(32);
 
-  d->bitrate
-    = static_cast<uint>((d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0);
-  d->length
-    = d->samplingFrequency > 0 ? static_cast<uint>(d->sampleCount / d->samplingFrequency) : 0;
+  d->bitrate = static_cast<int>(d->samplingFrequency * d->bitsPerSample * d->channelNum / 1000.0 + 0.5);
+
+  if(d->samplingFrequency > 0)
+    d->length = static_cast<int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5);
 }

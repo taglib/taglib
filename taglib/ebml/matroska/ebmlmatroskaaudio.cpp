@@ -32,41 +32,11 @@ class EBML::Matroska::AudioProperties::AudioPropertiesPrivate
 {
 public:
   // Constructor
-  AudioPropertiesPrivate(File *document) :
+  AudioPropertiesPrivate() :
     length(0),
     bitrate(0),
     channels(1),
-    samplerate(8000)
-  {
-    Element *elem = document->getDocumentRoot()->getChild(Constants::Segment);
-    Element *info = elem->getChild(Constants::SegmentInfo);
-    Element *value;
-
-    if(info && (value = info->getChild(Constants::Duration))) {
-      length = static_cast<int>(value->getAsFloat() / 1000000000.L);
-      if((value = info->getChild(Constants::TimecodeScale)))
-        length *= static_cast<int>(value->getAsUnsigned());
-      else
-        length *= 1000000;
-    }
-
-    info = elem->getChild(Constants::Tracks);
-    if(!info || !(info = info->getChild(Constants::TrackEntry)) ||
-      !(info = info->getChild(Constants::Audio))) {
-
-      return;
-    }
-
-    // Dirty bitrate:
-    document->seek(0, File::End);
-    bitrate = static_cast<int>(8 * document->tell() / ((length > 0) ? length : 1));
-
-    if((value = info->getChild(Constants::Channels)))
-      channels = static_cast<int>(value->getAsUnsigned());
-
-    if((value = info->getChild(Constants::SamplingFrequency)))
-      samplerate = static_cast<int>(value->getAsFloat());
-  }
+    samplerate(8000) {}
 
   // The length of the file
   int length;
@@ -86,8 +56,9 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 EBML::Matroska::AudioProperties::AudioProperties(File *document) :
-  d(new AudioPropertiesPrivate(document))
+  d(new AudioPropertiesPrivate())
 {
+  read(document);
 }
 
 EBML::Matroska::AudioProperties::~AudioProperties()
@@ -102,12 +73,12 @@ int EBML::Matroska::AudioProperties::length() const
 
 int EBML::Matroska::AudioProperties::lengthInSeconds() const
 {
-  return d->length;
+  return d->length / 1000;
 }
 
 int EBML::Matroska::AudioProperties::lengthInMilliseconds() const
 {
-  return d->length * 1000;
+  return d->length;
 }
 
 int EBML::Matroska::AudioProperties::bitrate() const
@@ -123,4 +94,42 @@ int EBML::Matroska::AudioProperties::channels() const
 int EBML::Matroska::AudioProperties::sampleRate() const
 {
   return d->samplerate;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
+void EBML::Matroska::AudioProperties::read(File *document)
+{
+  Element *elem = document->getDocumentRoot()->getChild(Constants::Segment);
+  Element *info = elem->getChild(Constants::SegmentInfo);
+  Element *value;
+
+  if(info && (value = info->getChild(Constants::Duration))) {
+
+    const double length = value->getAsFloat() / 1000000.0;
+
+    if((value = info->getChild(Constants::TimecodeScale)))
+      d->length = static_cast<int>(length * value->getAsUnsigned() + 0.5);
+    else
+      d->length = static_cast<int>(length * 1000000 + 0.5);
+  }
+
+  info = elem->getChild(Constants::Tracks);
+  if(!info || !(info = info->getChild(Constants::TrackEntry)) ||
+    !(info = info->getChild(Constants::Audio))) {
+
+    return;
+  }
+
+  // Dirty bitrate:
+  if(d->length > 0)
+    d->bitrate = static_cast<int>(document->length() * 8.0 / d->length + 0.5);
+
+  if((value = info->getChild(Constants::Channels)))
+    d->channels = static_cast<int>(value->getAsUnsigned());
+
+  if((value = info->getChild(Constants::SamplingFrequency)))
+    d->samplerate = static_cast<int>(value->getAsFloat());
 }
