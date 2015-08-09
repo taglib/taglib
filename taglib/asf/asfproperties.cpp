@@ -126,7 +126,6 @@ bool ASF::AudioProperties::isEncrypted() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-
 void ASF::AudioProperties::setLengthInMilliseconds(int value)
 {
   d->length = value;

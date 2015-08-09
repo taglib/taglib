@@ -57,13 +57,6 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &, ReadStyle) :
-  TagLib::AudioProperties(),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::AIFF::Properties::Properties() - This constructor is no longer used.");
-}
-
 RIFF::AIFF::AudioProperties::AudioProperties(File *file, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())

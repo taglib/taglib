@@ -51,25 +51,9 @@ namespace TagLib {
       public:
         /*!
          * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data.
-         *
-         * \deprecated
-         */
-        AudioProperties(const ByteVector &data, ReadStyle style);
-
-        /*!
-         * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data and the length calculated using \a streamLength.
-         *
-         * \deprecated
-         */
-        AudioProperties(const ByteVector &data, uint streamLength, ReadStyle style);
-
-        /*!
-         * Create an instance of WAV::Properties with the data read from the
          * WAV::File \a file.
          */
-        AudioProperties(File *file, ReadStyle style);
+        AudioProperties(File *file, ReadStyle style = Average);
 
         /*!
          * Destroys this WAV::Properties instance.

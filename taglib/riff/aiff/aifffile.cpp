@@ -152,5 +152,5 @@ void RIFF::AIFF::File::read(bool readProperties)
     d->tag = new ID3v2::Tag();
 
   if(readProperties)
-    d->properties = new AudioProperties(this, AudioProperties::Average);
+    d->properties = new AudioProperties(this);
 }

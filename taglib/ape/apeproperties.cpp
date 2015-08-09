@@ -63,13 +63,6 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::AudioProperties::AudioProperties(File *, ReadStyle) :
-  TagLib::AudioProperties(),
-  d(new PropertiesPrivate())
-{
-  debug("APE::Properties::Properties() -- This constructor is no longer used.");
-}
-
 APE::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())

@@ -224,7 +224,7 @@ void RIFF::WAV::File::read(bool readProperties)
     d->tag.set(InfoIndex, new RIFF::Info::Tag());
 
   if(readProperties)
-    d->properties = new AudioProperties(this, AudioProperties::Average);
+    d->properties = new AudioProperties(this);
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)

@@ -66,20 +66,6 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &, ReadStyle) :
-  TagLib::AudioProperties(),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
-}
-
-RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &, uint, ReadStyle) :
-  TagLib::AudioProperties(),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
-}
-
 TagLib::RIFF::WAV::AudioProperties::AudioProperties(File *file, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())

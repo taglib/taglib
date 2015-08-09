@@ -52,14 +52,6 @@ namespace TagLib {
       /*!
        * Create an instance of APE::Properties with the data read from the
        * APE::File \a file.
-       *
-       * \deprecated
-       */
-      AudioProperties(File *file, ReadStyle style = Average);
-
-      /*!
-       * Create an instance of APE::Properties with the data read from the
-       * APE::File \a file.
        */
       AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
 
