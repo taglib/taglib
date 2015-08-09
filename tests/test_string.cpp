@@ -38,6 +38,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testUTF16Decode);
   CPPUNIT_TEST(testUTF16DecodeInvalidBOM);
   CPPUNIT_TEST(testUTF16DecodeEmptyWithBOM);
+  CPPUNIT_TEST(testSurrogatePair);
   CPPUNIT_TEST(testAppendCharDetach);
   CPPUNIT_TEST(testAppendStringDetach);
   CPPUNIT_TEST(testToInt);
@@ -118,12 +119,10 @@ public:
     CPPUNIT_ASSERT(memcmp(String("foo").data(String::Latin1).data(), "foo", 3) == 0);
     CPPUNIT_ASSERT(memcmp(String("f").data(String::Latin1).data(), "f", 1) == 0);
 
-    ByteVector utf16 = unicode.data(String::UTF16);
+    // Check to make sure that the BOM is there and that the data size is correct
 
-  // Check to make sure that the BOM is there and that the data size is correct
-
+    const ByteVector utf16 = unicode.data(String::UTF16);
     CPPUNIT_ASSERT(utf16.size() == 2 + (unicode.size() * 2));
-
     CPPUNIT_ASSERT(unicode == String(utf16, String::UTF16));
   }
 
@@ -168,6 +167,21 @@ public:
     ByteVector b("\376\377", 2);
     CPPUNIT_ASSERT_EQUAL(String(), String(a, String::UTF16));
     CPPUNIT_ASSERT_EQUAL(String(), String(b, String::UTF16));
+  }
+
+  void testSurrogatePair()
+  {
+    // Make sure that a surrogate pair is converted into single UTF-8 char
+    // and vice versa.
+
+    const ByteVector v1("\xff\xfe\x42\xd8\xb7\xdf\xce\x91\x4b\x5c");
+    const ByteVector v2("\xf0\xa0\xae\xb7\xe9\x87\x8e\xe5\xb1\x8b");
+
+    const String s1(v1, String::UTF16);
+    CPPUNIT_ASSERT_EQUAL(s1.data(String::UTF8), v2);
+
+    const String s2(v2, String::UTF8);
+    CPPUNIT_ASSERT_EQUAL(s2.data(String::UTF16), v1);
   }
 
   void testAppendStringDetach()
@@ -336,3 +350,4 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestString);
+

@@ -665,7 +665,7 @@ void String::copyFromUTF8(const char *s, size_t length)
 {
   d->data->resize(length);
 
-  if(length >  0) {
+  if(length > 0) {
     const size_t len = UTF8toUTF16(s, length, &(*d->data)[0], d->data->size());
     d->data->resize(len);
   }
@@ -743,7 +743,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
 }
 
 const String::Type String::WCharByteOrder
-  = (Utils::SystemByteOrder == BigEndian) ? String::UTF16BE : String::UTF16LE;
+  = (Utils::systemByteOrder() == BigEndian) ? String::UTF16BE : String::UTF16LE;
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions

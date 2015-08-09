@@ -33,6 +33,9 @@
 #include "wavpackproperties.h"
 #include "wavpackfile.h"
 
+// Implementation of this class is based on the information at:
+// http://www.wavpack.com/file_format.txt
+
 using namespace TagLib;
 
 class WavPack::AudioProperties::PropertiesPrivate
@@ -45,6 +48,7 @@ public:
     channels(0),
     version(0),
     bitsPerSample(0),
+    lossless(false),
     sampleFrames(0) {}
 
   int length;
@@ -53,6 +57,7 @@ public:
   int channels;
   int version;
   int bitsPerSample;
+  bool lossless;
   uint sampleFrames;
 };
 
@@ -60,10 +65,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) :
+WavPack::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
-  read(file, streamLength, style);
+  read(file, streamLength);
 }
 
 WavPack::AudioProperties::~AudioProperties()
@@ -72,6 +78,16 @@ WavPack::AudioProperties::~AudioProperties()
 }
 
 int WavPack::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int WavPack::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int WavPack::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -101,6 +117,11 @@ int WavPack::AudioProperties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
+bool WavPack::AudioProperties::isLossless() const
+{
+  return d->lossless;
+}
+
 TagLib::uint WavPack::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
@@ -112,13 +133,14 @@ TagLib::uint WavPack::AudioProperties::sampleFrames() const
 
 namespace
 {
-  static const unsigned int sample_rates[] = { 
-     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000, 
+  const unsigned int sample_rates[] = {
+     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000,
     32000, 44100, 48000, 64000, 88200, 96000, 192000,     0 };
 }
 
 #define BYTES_STORED    3
 #define MONO_FLAG       4
+#define LOSSLESS_FLAG   8
 
 #define SHIFT_LSB       13
 #define SHIFT_MASK      (0x1fL << SHIFT_LSB)
@@ -131,61 +153,77 @@ namespace
 
 #define FINAL_BLOCK     0x1000
 
-void WavPack::AudioProperties::read(File *file, offset_t streamLength, ReadStyle style)
+void WavPack::AudioProperties::read(File *file, offset_t streamLength)
 {
-  const ByteVector data = file->readBlock(32);
-  if(!data.startsWith("wvpk"))
-    return;
+  long offset = 0;
 
-  d->version = data.toInt16LE(8);
-  if(d->version < MIN_STREAM_VERS || d->version > MAX_STREAM_VERS)
-    return;
+  while(true) {
+    file->seek(offset);
+    const ByteVector data = file->readBlock(32);
+
+    if(data.size() < 32) {
+      debug("WavPack::Properties::read() -- data is too short.");
+      break;
+    }
+
+    if(!data.startsWith("wvpk")) {
+      debug("WavPack::Properties::read() -- Block header not found.");
+      break;
+    }
+
+    const uint flags = data.toUInt32LE(24);
+
+    if(offset == 0) {
+      d->version = data.toUInt16LE(8);
+      if(d->version < MIN_STREAM_VERS || d->version > MAX_STREAM_VERS)
+        break;
+
+      d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB);
+      d->sampleRate    = sample_rates[(flags & SRATE_MASK) >> SRATE_LSB];
+      d->lossless      = !(flags & LOSSLESS_FLAG);
+      d->sampleFrames  = data.toUInt32LE(12);
+    }
+
+    d->channels += (flags & MONO_FLAG) ? 1 : 2;
+
+    if(flags & FINAL_BLOCK)
+      break;
+
+    const uint blockSize = data.toUInt32LE(4);
+    offset += blockSize + 8;
+  }
+
+  if(d->sampleFrames == ~0u)
+    d->sampleFrames = seekFinalIndex(file, streamLength);
+
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+  }
+}
+
+TagLib::uint WavPack::AudioProperties::seekFinalIndex(File *file, offset_t streamLength)
+{
+  const offset_t offset = file->rfind("wvpk", streamLength);
+  if(offset == -1)
+    return 0;
+
+  file->seek(offset);
+  const ByteVector data = file->readBlock(32);
+  if(data.size() < 32)
+    return 0;
+
+  const int version = data.toUInt16LE(8);
+  if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
+    return 0;
 
   const uint flags = data.toUInt32LE(24);
-  d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 -
-    ((flags & SHIFT_MASK) >> SHIFT_LSB);
-  d->sampleRate = sample_rates[(flags & SRATE_MASK) >> SRATE_LSB];
-  d->channels = (flags & MONO_FLAG) ? 1 : 2;
+  if(!(flags & FINAL_BLOCK))
+    return 0;
 
-  uint samples = data.toUInt32LE(12);
-  if(samples == ~0u) {
-    if(style != Fast) {
-      samples = seekFinalIndex(file, streamLength);
-    }
-    else {
-      samples = 0;
-    }
-  }
-  d->length = d->sampleRate > 0 ? (samples + (d->sampleRate / 2)) / d->sampleRate : 0;
-  d->sampleFrames = samples;
+  const uint blockIndex   = data.toUInt32LE(16);
+  const uint blockSamples = data.toUInt32LE(20);
 
-  d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
+  return blockIndex + blockSamples;
 }
-
-unsigned int WavPack::AudioProperties::seekFinalIndex(File *file, offset_t streamLength)
-{
-  ByteVector blockID("wvpk", 4);
-
-  offset_t offset = streamLength;
-  while(offset > 0) {
-    offset = file->rfind(blockID, offset);
-    if(offset == -1)
-      return 0;
-    file->seek(offset);
-    ByteVector data = file->readBlock(32);
-    if(data.size() != 32)
-      return 0;
-    const int version = data.toInt16LE(8);
-    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
-      continue;
-    const uint flags = data.toUInt32LE(24);
-    if(!(flags & FINAL_BLOCK))
-      return 0;
-    const uint blockIndex = data.toUInt32LE(16);
-    const uint blockSamples = data.toUInt32LE(20);
-    return blockIndex + blockSamples;
-  }
-
-  return 0;
-}
-

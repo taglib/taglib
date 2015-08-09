@@ -84,7 +84,7 @@ namespace TagLib {
     //! The main class in the ID3v1 implementation
 
     /*!
-     * This is an implementation of the ID3v1 format.  ID3v1 is both the simplist
+     * This is an implementation of the ID3v1 format.  ID3v1 is both the simplest
      * and most common of tag formats but is rather limited.  Because of its
      * pervasiveness and the way that applications have been written around the
      * fields that it provides, the generic TagLib::Tag API is a mirror of what is

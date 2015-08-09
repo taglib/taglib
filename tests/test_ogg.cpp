@@ -20,6 +20,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testSplitPackets);
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
+  CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -44,13 +45,27 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
+    String longText(std::string(128 * 1024, ' ').c_str());
+    for (size_t i = 0; i < longText.length(); ++i)
+      longText[i] = static_cast<wchar>(L'A' + (i % 26));
+
     Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
-    f->tag()->addField("test", ByteVector(128 * 1024, 'x') + ByteVector(1, '\0'));
+    f->tag()->setTitle(longText);
     f->save();
     delete f;
 
     f = new Ogg::Vorbis::File(newname.c_str());
+    CPPUNIT_ASSERT(f->isValid());
     CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
+    CPPUNIT_ASSERT_EQUAL(longText, f->tag()->title());
+    f->tag()->setTitle("ABCDE");
+    f->save();
+    delete f;
+
+    f = new Ogg::Vorbis::File(newname.c_str());
+    CPPUNIT_ASSERT(f->isValid());
+    CPPUNIT_ASSERT_EQUAL(3, f->lastPageHeader()->pageSequenceNumber());
+    CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f->tag()->title());
     delete f;
   }
 
@@ -104,6 +119,21 @@ public:
     delete f;
   }
 
+  void testAudioProperties()
+  {
+    Ogg::Vorbis::File f(TEST_FILE_PATH_C("empty.ogg"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(9, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->vorbisVersion());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMaximum());
+    CPPUNIT_ASSERT_EQUAL(112000, f.audioProperties()->bitrateNominal());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMinimum());
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestOGG);

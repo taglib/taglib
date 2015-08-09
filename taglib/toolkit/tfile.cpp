@@ -36,14 +36,10 @@ using namespace TagLib;
 class File::FilePrivateBase
 {
 public:
-  FilePrivateBase()
-    : valid(true)
-  {
-  }
+  FilePrivateBase() :
+    valid(true) {}
 
-  virtual ~FilePrivateBase()
-  {
-  }
+  virtual ~FilePrivateBase() {}
 
   virtual IOStream *stream() const = 0;
 
@@ -55,10 +51,8 @@ public:
 class File::ManagedFilePrivate : public File::FilePrivateBase
 {
 public:
-  ManagedFilePrivate(IOStream *stream)
-    : p(stream)
-  {
-  }
+  ManagedFilePrivate(IOStream *stream) :
+    p(stream) {}
 
   virtual IOStream *stream() const
   {
@@ -74,10 +68,8 @@ private:
 class File::UnmanagedFilePrivate : public File::FilePrivateBase
 {
 public:
-  UnmanagedFilePrivate(IOStream *stream)
-    : p(stream)
-  {
-  }
+  UnmanagedFilePrivate(IOStream *stream) :
+    p(stream) {}
 
   virtual IOStream *stream() const
   {
@@ -161,7 +153,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // (2) The search pattern is wholly contained within the current buffer.
   //
   // (3) The current buffer ends with a partial match of the pattern.  We will
-  // note this for use in the next itteration, where we will check for the rest
+  // note this for use in the next iteration, where we will check for the rest
   // of the pattern.
   //
   // All three of these are done in two steps.  First we check for the pattern
@@ -177,8 +169,8 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
     // (1) previous partial match
 
-    if(previousPartialMatch != ByteVector::npos 
-      && bufferSize() > previousPartialMatch) 
+    if(previousPartialMatch != ByteVector::npos
+      && bufferSize() > previousPartialMatch)
     {
       const size_t patternOffset = (bufferSize() - previousPartialMatch);
       if(buffer.containsAt(pattern, 0, patternOffset)) {
@@ -187,9 +179,9 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
       }
     }
 
-    if(!before.isNull() 
-      && beforePreviousPartialMatch != ByteVector::npos 
-      && bufferSize() > beforePreviousPartialMatch) 
+    if(!before.isNull()
+      && beforePreviousPartialMatch != ByteVector::npos
+      && bufferSize() > beforePreviousPartialMatch)
     {
       const size_t beforeOffset = (bufferSize() - beforePreviousPartialMatch);
       if(buffer.containsAt(before, 0, beforeOffset)) {
@@ -243,21 +235,26 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
   // Start the search at the offset.
 
-  offset_t bufferOffset;
-  if(fromOffset == 0) {
-    seek(-1 * int(bufferSize()), End);
-    bufferOffset = tell();
-  }
-  else {
-    seek(fromOffset + -1 * int(bufferSize()), Beginning);
-    bufferOffset = tell();
-  }
+  if(fromOffset == 0)
+    fromOffset = length();
+
+  offset_t bufferLength = bufferSize();
+  offset_t bufferOffset = fromOffset + pattern.size();
 
   // See the notes in find() for an explanation of this algorithm.
 
-  while(true)
-  {
-    ByteVector buffer = readBlock(bufferSize());
+  while(true) {
+
+    if(bufferOffset > bufferLength) {
+      bufferOffset -= bufferLength;
+    }
+    else {
+      bufferLength = bufferOffset;
+      bufferOffset = 0;
+    }
+    seek(bufferOffset);
+
+    const ByteVector buffer = readBlock(static_cast<size_t>(bufferLength));
     if(buffer.isEmpty())
       break;
 
@@ -277,9 +274,6 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
     }
 
     // TODO: (3) partial match
-
-    bufferOffset -= bufferSize();
-    seek(bufferOffset);
   }
 
   // Since we hit the end of the file, reset the status before continuing.

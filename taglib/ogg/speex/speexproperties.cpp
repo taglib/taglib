@@ -43,6 +43,7 @@ public:
   PropertiesPrivate() :
     length(0),
     bitrate(0),
+    bitrateNominal(0),
     sampleRate(0),
     channels(0),
     speexVersion(0),
@@ -51,6 +52,7 @@ public:
 
   int length;
   int bitrate;
+  int bitrateNominal;
   int sampleRate;
   int channels;
   int speexVersion;
@@ -62,7 +64,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Speex::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+Speex::AudioProperties::AudioProperties(File *file, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
   read(file);
@@ -75,12 +78,27 @@ Speex::AudioProperties::~AudioProperties()
 
 int Speex::AudioProperties::length() const
 {
+  return lengthInSeconds();
+}
+
+int Speex::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int Speex::AudioProperties::lengthInMilliseconds() const
+{
   return d->length;
 }
 
 int Speex::AudioProperties::bitrate() const
 {
-  return int(float(d->bitrate) / float(1000) + 0.5);
+  return d->bitrate;
+}
+
+int Speex::AudioProperties::bitrateNominal() const
+{
+  return d->bitrateNominal;
 }
 
 int Speex::AudioProperties::sampleRate() const
@@ -107,6 +125,10 @@ void Speex::AudioProperties::read(File *file)
   // Get the identification header from the Ogg implementation.
 
   const ByteVector data = file->packet(0);
+  if(data.size() < 64) {
+    debug("Speex::Properties::read() -- data is too short.");
+    return;
+  }
 
   size_t pos = 28;
 
@@ -133,7 +155,7 @@ void Speex::AudioProperties::read(File *file)
   pos += 4;
 
   // bitrate;                /**< Bit-rate used */
-  d->bitrate = data.toUInt32LE(pos);
+  d->bitrateNominal = data.toUInt32LE(pos);
   pos += 4;
 
   // frame_size;             /**< Size of frames */
@@ -154,12 +176,25 @@ void Speex::AudioProperties::read(File *file)
     const long long start = first->absoluteGranularPosition();
     const long long end   = last->absoluteGranularPosition();
 
-    if(start >= 0 && end >= 0 && d->sampleRate > 0)
-      d->length = (int) ((end - start) / (long long) d->sampleRate);
-    else
+    if(start >= 0 && end >= 0 && d->sampleRate > 0) {
+      const long long frameCount = end - start;
+
+      if(frameCount > 0) {
+        const double length = frameCount * 1000.0 / d->sampleRate;
+        d->length  = static_cast<int>(length + 0.5);
+        d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
+      }
+    }
+    else {
       debug("Speex::Properties::read() -- Either the PCM values for the start or "
             "end of this file was incorrect or the sample rate is zero.");
+    }
   }
   else
     debug("Speex::Properties::read() -- Could not find valid first and last Ogg pages.");
+
+  // Alternative to the actual average bitrate.
+
+  if(d->bitrate == 0 && d->bitrateNominal > 0)
+    d->bitrate = static_cast<int>(d->bitrateNominal / 1000.0 + 0.5);
 }

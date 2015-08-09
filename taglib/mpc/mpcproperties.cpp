@@ -33,6 +33,11 @@
 
 using namespace TagLib;
 
+namespace
+{
+  const TagLib::uint HeaderSize = 56;
+}
+
 class MPC::AudioProperties::PropertiesPrivate
 {
 public:
@@ -67,17 +72,18 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) :
+MPC::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
-  const ByteVector magic = file->readBlock(4);
+  ByteVector magic = file->readBlock(4);
   if(magic == "MPCK") {
     // Musepack version 8
     readSV8(file, streamLength);
   }
   else {
     // Musepack version 7 or older, fixed size header
-    readSV7(magic + file->readBlock(52), streamLength);
+    readSV7(magic + file->readBlock(HeaderSize - 4), streamLength);
   }
 }
 
@@ -87,6 +93,16 @@ MPC::AudioProperties::~AudioProperties()
 }
 
 int MPC::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int MPC::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int MPC::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -183,7 +199,7 @@ namespace
 
   // This array looks weird, but the same as original MusePack code found at:
   // https://www.musepack.net/index.php?pg=src
-  static const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
+  const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 }
 
 void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
@@ -230,7 +246,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
         break;
       }
 
-      ulong begSilence = readSize(data, pos);
+      const ulong begSilence = readSize(data, pos);
       if(pos > dataSize - 2) {
         debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
         break;
@@ -243,12 +259,12 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
       d->channels   = ((flags >> 4) & 0x0F) + 1;
 
       const uint frameCount = d->sampleFrames - begSilence;
-      if(frameCount != 0 && d->sampleRate != 0) {
-        d->bitrate = (int)(streamLength * 8.0 * d->sampleRate / frameCount / 1000);
-        d->length  = frameCount / d->sampleRate;
+      if(frameCount > 0 && d->sampleRate > 0) {
+        const double length = frameCount * 1000.0 / d->sampleRate;
+        d->length  = static_cast<int>(length + 0.5);
+        d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
       }
     }
-
     else if (packetType == "RG") {
       // Replay Gain
       // http://trac.musepack.net/wiki/SV8Specification#ReplaygainPacket
@@ -260,7 +276,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
 
       readRG = true;
 
-      int replayGainVersion = data[0];
+      const int replayGainVersion = data[0];
       if(replayGainVersion == 1) {
         d->trackGain = data.toUInt16BE(1);
         d->trackPeak = data.toUInt16BE(3);
@@ -288,9 +304,9 @@ void MPC::AudioProperties::readSV7(const ByteVector &data, offset_t streamLength
 
     d->totalFrames = data.toUInt32LE(4);
 
-    std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt32LE(8)));
-    d->sampleRate = sftable[flags[17] * 2 + flags[16]];
-    d->channels = 2;
+    const uint flags = data.toUInt32LE(8);
+    d->sampleRate = sftable[(flags >> 16) & 0x03];
+    d->channels   = 2;
 
     const uint gapless = data.toUInt32LE(5);
 
@@ -329,10 +345,10 @@ void MPC::AudioProperties::readSV7(const ByteVector &data, offset_t streamLength
   else {
     const uint headerData = data.toUInt32LE(0);
 
-    d->bitrate = (headerData >> 23) & 0x01ff;
-    d->version = (headerData >> 11) & 0x03ff;
+    d->bitrate    = (headerData >> 23) & 0x01ff;
+    d->version    = (headerData >> 11) & 0x03ff;
     d->sampleRate = 44100;
-    d->channels = 2;
+    d->channels   = 2;
 
     if(d->version >= 5)
       d->totalFrames = data.toUInt32LE(4);
@@ -342,8 +358,11 @@ void MPC::AudioProperties::readSV7(const ByteVector &data, offset_t streamLength
     d->sampleFrames = d->totalFrames * 1152 - 576;
   }
 
-  d->length = d->sampleRate > 0 ? (d->sampleFrames + (d->sampleRate / 2)) / d->sampleRate : 0;
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length = static_cast<int>(length + 0.5);
 
-  if(!d->bitrate)
-    d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
+    if(d->bitrate == 0)
+      d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+  }
 }

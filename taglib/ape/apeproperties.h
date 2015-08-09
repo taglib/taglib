@@ -50,27 +50,74 @@ namespace TagLib {
     {
     public:
       /*!
-       * Creates an instance of APE::AudioProperties with the data read from
-       * the ByteVector \a data.
+       * Create an instance of APE::Properties with the data read from the
+       * APE::File \a file.
+       *
+       * \deprecated
        */
       AudioProperties(File *file, ReadStyle style = Average);
+
+      /*!
+       * Create an instance of APE::Properties with the data read from the
+       * APE::File \a file.
+       */
+      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this APE::AudioProperties instance.
        */
       virtual ~AudioProperties();
 
-      // Reimplementations.
-
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \note This method is just an alias of lengthInSeconds().
+       *
+       * \deprecated
+       */
       virtual int length() const;
+
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \see lengthInMilliseconds()
+       */
+      // BIC: make virtual
+      int lengthInSeconds() const;
+
+      /*!
+       * Returns the length of the file in milliseconds.
+       *
+       * \see lengthInSeconds()
+       */
+      // BIC: make virtual
+      int lengthInMilliseconds() const;
+
+      /*!
+       * Returns the average bit rate of the file in kb/s.
+       */
       virtual int bitrate() const;
+
+      /*!
+       * Returns the sample rate in Hz.
+       */
       virtual int sampleRate() const;
+
+      /*!
+       * Returns the number of audio channels.
+       */
       virtual int channels() const;
 
       /*!
-       * Returns number of bits per sample.
+       * Returns the number of bits per audio sample.
        */
       int bitsPerSample() const;
+
+      /*!
+       * Returns the total number of audio samples in file.
+       */
       uint sampleFrames() const;
 
       /*!
@@ -79,11 +126,7 @@ namespace TagLib {
       int version() const;
 
     private:
-      void read(File *file);
-
-      offset_t findDescriptor(File *file);
-      offset_t findID3v2(File *file);
-
+      void read(File *file, offset_t streamLength);
       void analyzeCurrent(File *file);
       void analyzeOld(File *file);
 

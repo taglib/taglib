@@ -6,6 +6,7 @@
 #include <tpropertymap.h>
 #include <flacfile.h>
 #include <xiphcomment.h>
+#include <id3v1tag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -25,6 +26,9 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
   CPPUNIT_TEST(testInvalid);
+  CPPUNIT_TEST(testAudioProperties);
+  CPPUNIT_TEST(testZeroSizedPadding);
+  CPPUNIT_TEST(testSaveID3v1);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -252,6 +256,55 @@ public:
     PropertyMap invalid = f.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(size_t(1), invalid.size());
     CPPUNIT_ASSERT_EQUAL(size_t(0), f.properties().size());
+  }
+
+  void testAudioProperties()
+  {
+    FLAC::File f(TEST_FILE_PATH_C("sinewave.flac"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(145, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(156556ULL, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("\xcf\xe3\xd9\xda\xba\xde\xab\x2c\xbf\x2c\xa2\x35\x27\x4b\x7f\x76"),
+      f.audioProperties()->signature());
+  }
+
+  void testZeroSizedPadding()
+  {
+    ScopedFileCopy copy("zero-sized-padding", ".flac");
+
+    FLAC::File f(copy.fileName().c_str());
+    CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testSaveID3v1()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    ByteVector audioStream;
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((offset_t)4692, f.length());
+
+      f.seek(0x0100);
+      audioStream = f.readBlock(4436);
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT_EQUAL((offset_t)4820, f.length());
+
+      f.seek(0x0100);
+      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+    }
   }
 
 };

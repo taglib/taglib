@@ -49,7 +49,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Creates an instance of MPEG::AudioProperties with the data read from 
+       * Creates an instance of MPEG::AudioProperties with the data read from
        * the MPEG::File \a file.
        */
       AudioProperties(File *file, ReadStyle style = Average);
@@ -59,18 +59,52 @@ namespace TagLib {
        */
       virtual ~AudioProperties();
 
-      // Reimplementations.
-
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \note This method is just an alias of lengthInSeconds().
+       *
+       * \deprecated
+       */
       virtual int length() const;
+
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \see lengthInMilliseconds()
+       */
+      // BIC: make virtual
+      int lengthInSeconds() const;
+
+      /*!
+       * Returns the length of the file in milliseconds.
+       *
+       * \see lengthInSeconds()
+       */
+      // BIC: make virtual
+      int lengthInMilliseconds() const;
+
+      /*!
+       * Returns the average bit rate of the file in kb/s.
+       */
       virtual int bitrate() const;
+
+      /*!
+       * Returns the sample rate in Hz.
+       */
       virtual int sampleRate() const;
+
+      /*!
+       * Returns the number of audio channels.
+       */
       virtual int channels() const;
 
       /*!
-       * Returns a pointer to the XingHeader if one exists or null if no
-       * XingHeader was found.
+       * Returns a pointer to the Xing/VBRI header if one exists or null if no
+       * Xing/VBRI header was found.
        */
-
       const XingHeader *xingHeader() const;
 
       /*!

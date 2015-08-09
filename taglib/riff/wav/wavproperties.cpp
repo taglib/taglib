@@ -25,9 +25,21 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+
+#include "wavfile.h"
 #include "wavproperties.h"
 
 using namespace TagLib;
+
+namespace
+{
+  // Quoted from RFC 2361.
+  enum WaveFormat
+  {
+    FORMAT_UNKNOWN = 0x0000,
+    FORMAT_PCM     = 0x0001
+  };
+}
 
 class RIFF::WAV::AudioProperties::PropertiesPrivate
 {
@@ -38,15 +50,15 @@ public:
     bitrate(0),
     sampleRate(0),
     channels(0),
-    sampleWidth(0),
+    bitsPerSample(0),
     sampleFrames(0) {}
 
-  short format;
+  int format;
   int length;
   int bitrate;
   int sampleRate;
   int channels;
-  int sampleWidth;
+  int bitsPerSample;
   uint sampleFrames;
 };
 
@@ -54,11 +66,25 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &data, uint streamLength,
-                                            ReadStyle style) :
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
-  read(data, streamLength);
+  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
+}
+
+RIFF::WAV::AudioProperties::AudioProperties(const ByteVector &, uint, ReadStyle) :
+  TagLib::AudioProperties(),
+  d(new PropertiesPrivate())
+{
+  debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
+}
+
+TagLib::RIFF::WAV::AudioProperties::AudioProperties(File *file, ReadStyle) :
+  TagLib::AudioProperties(),
+  d(new PropertiesPrivate())
+{
+  read(file);
 }
 
 RIFF::WAV::AudioProperties::~AudioProperties()
@@ -67,6 +93,16 @@ RIFF::WAV::AudioProperties::~AudioProperties()
 }
 
 int RIFF::WAV::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int RIFF::WAV::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int RIFF::WAV::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -86,9 +122,14 @@ int RIFF::WAV::AudioProperties::channels() const
   return d->channels;
 }
 
+int RIFF::WAV::AudioProperties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 int RIFF::WAV::AudioProperties::sampleWidth() const
 {
-  return d->sampleWidth;
+  return bitsPerSample();
 }
 
 TagLib::uint RIFF::WAV::AudioProperties::sampleFrames() const
@@ -96,7 +137,7 @@ TagLib::uint RIFF::WAV::AudioProperties::sampleFrames() const
   return d->sampleFrames;
 }
 
-TagLib::uint RIFF::WAV::AudioProperties::format() const
+int RIFF::WAV::AudioProperties::format() const
 {
   return d->format;
 }
@@ -105,24 +146,69 @@ TagLib::uint RIFF::WAV::AudioProperties::format() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::WAV::AudioProperties::read(const ByteVector &data, uint streamLength)
+void RIFF::WAV::AudioProperties::read(File *file)
 {
+  ByteVector data;
+  uint streamLength = 0;
+  uint totalSamples = 0;
+
+  for(uint i = 0; i < file->chunkCount(); ++i) {
+    const ByteVector name = file->chunkName(i);
+    if(name == "fmt ") {
+      if(data.isEmpty())
+        data = file->chunkData(i);
+      else
+        debug("RIFF::WAV::Properties::read() - Duplicate 'fmt ' chunk found.");
+    }
+    else if(name == "data") {
+      if(streamLength == 0)
+        streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
+      else
+        debug("RIFF::WAV::Properties::read() - Duplicate 'data' chunk found.");
+    }
+    else if(name == "fact") {
+      if(totalSamples == 0)
+        totalSamples = file->chunkData(i).toUInt32LE(0);
+      else
+        debug("RIFF::WAV::Properties::read() - Duplicate 'fact' chunk found.");
+    }
+  }
+
   if(data.size() < 16) {
-    debug("RIFF::WAV::AudioProperties::read() - \"fmt \" chunk is too short for WAV.");
+    debug("RIFF::WAV::Properties::read() - 'fmt ' chunk not found or too short.");
     return;
   }
 
-  d->format      = data.toInt16LE(0);
-  d->channels    = data.toInt16LE(2);
-  d->sampleRate  = data.toUInt32LE(4);
-  d->sampleWidth = data.toInt16LE(14);
+  if(streamLength == 0) {
+    debug("RIFF::WAV::Properties::read() - 'data' chunk not found.");
+    return;
+  }
 
-  const uint byteRate = data.toUInt32LE(8);
-  d->bitrate = byteRate * 8 / 1000;
+  d->format = data.toUInt16LE(0);
+  if(d->format != FORMAT_PCM && totalSamples == 0) {
+    debug("RIFF::WAV::Properties::read() - Non-PCM format, but 'fact' chunk not found.");
+    return;
+  }
 
-  d->length = byteRate > 0 ? streamLength / byteRate : 0;
+  d->channels      = data.toUInt16LE(2);
+  d->sampleRate    = data.toUInt32LE(4);
+  d->bitsPerSample = data.toUInt16LE(14);
 
-  // format ID 1 means uncompressed PCM.
-  if(d->format == 1 && d->channels > 0 && d->sampleWidth > 0)
-    d->sampleFrames = streamLength / (d->channels * ((d->sampleWidth + 7) / 8));
+  if(totalSamples > 0)
+    d->sampleFrames = totalSamples;
+  else if(d->channels > 0 && d->bitsPerSample > 0)
+    d->sampleFrames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
+
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+  }
+  else {
+    const uint byteRate = data.toUInt32LE(8);
+    if(byteRate > 0) {
+      d->length  = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
+      d->bitrate = static_cast<int>(byteRate * 8.0 / 1000.0 + 0.5);
+    }
+  }
 }

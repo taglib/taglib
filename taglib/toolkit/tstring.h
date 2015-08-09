@@ -37,7 +37,12 @@
  * \note consider conversion via usual char-by-char for loop to avoid UTF16->UTF8->UTF16
  * conversion happening in the background
  */
+
+#if QT_VERSION >= 0x040000
+#define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
+#else
 #define QStringToTString(s) TagLib::String(s.utf8().data(), TagLib::String::UTF8)
+#endif
 
 /*!
  * \relates TagLib::String
@@ -48,6 +53,7 @@
  * conversion happening in the background
  *
  */
+
 #define TStringToQString(s) QString::fromUtf8(s.toCString(true))
 
 namespace TagLib {
@@ -482,7 +488,7 @@ namespace TagLib {
 
     /*!
      * To be able to use this class in a Map, this operator needed to be
-     * implemented.  Returns true if \a s is less than this string in a bytewise
+     * implemented.  Returns true if \a s is less than this string in a byte-wise
      * comparison.
      */
     bool operator<(const String &s) const;

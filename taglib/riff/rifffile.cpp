@@ -144,15 +144,7 @@ ByteVector RIFF::File::chunkData(uint i)
   if(i >= chunkCount())
     return ByteVector::null;
 
-  // Offset for the first subchunk's data
-
-  long begin = 12 + 8;
-
-  for(uint it = 0; it < i; it++)
-    begin += 8 + d->chunks[it].size + d->chunks[it].padding;
-
-  seek(begin);
-
+  seek(d->chunks[i].offset);
   return readBlock(d->chunks[i].size);
 }
 

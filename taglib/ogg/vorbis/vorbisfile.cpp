@@ -63,20 +63,20 @@ namespace TagLib {
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::Vorbis::File::File(FileName file, bool readProperties,
-                   AudioProperties::ReadStyle propertiesStyle) : Ogg::File(file)
+Ogg::Vorbis::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
+  Ogg::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
-Ogg::Vorbis::File::File(IOStream *stream, bool readProperties,
-                   AudioProperties::ReadStyle propertiesStyle) : Ogg::File(stream)
+Ogg::Vorbis::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
+  Ogg::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 Ogg::Vorbis::File::~File()
@@ -121,7 +121,7 @@ bool Ogg::Vorbis::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Ogg::Vorbis::File::read(bool readProperties, AudioProperties::ReadStyle propertiesStyle)
+void Ogg::Vorbis::File::read(bool readProperties)
 {
   ByteVector commentHeaderData = packet(1);
 
@@ -134,5 +134,5 @@ void Ogg::Vorbis::File::read(bool readProperties, AudioProperties::ReadStyle pro
   d->comment = new Ogg::XiphComment(commentHeaderData.mid(7));
 
   if(readProperties)
-    d->properties = new AudioProperties(this, propertiesStyle);
+    d->properties = new AudioProperties(this);
 }

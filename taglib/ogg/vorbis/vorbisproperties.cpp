@@ -68,7 +68,8 @@ namespace TagLib {
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::Vorbis::AudioProperties::AudioProperties(File *file, ReadStyle style) :
+Ogg::Vorbis::AudioProperties::AudioProperties(File *file, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
   read(file);
@@ -81,12 +82,22 @@ Ogg::Vorbis::AudioProperties::~AudioProperties()
 
 int Ogg::Vorbis::AudioProperties::length() const
 {
+  return lengthInSeconds();
+}
+
+int Ogg::Vorbis::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int Ogg::Vorbis::AudioProperties::lengthInMilliseconds() const
+{
   return d->length;
 }
 
 int Ogg::Vorbis::AudioProperties::bitrate() const
 {
-  return int(float(d->bitrate) / float(1000) + 0.5);
+  return d->bitrate;
 }
 
 int Ogg::Vorbis::AudioProperties::sampleRate() const
@@ -137,6 +148,10 @@ void Ogg::Vorbis::AudioProperties::read(File *file)
   // Get the identification header from the Ogg implementation.
 
   const ByteVector data = file->packet(0);
+  if(data.size() < 28) {
+    debug("Vorbis::Properties::read() -- data is too short.");
+    return;
+  }
 
   size_t pos = 0;
 
@@ -163,9 +178,7 @@ void Ogg::Vorbis::AudioProperties::read(File *file)
   pos += 4;
 
   d->bitrateMinimum = data.toUInt32LE(pos);
-
-  // TODO: Later this should be only the "fast" mode.
-  d->bitrate = d->bitrateNominal;
+  pos += 4;
 
   // Find the length of the file.  See http://wiki.xiph.org/Ogg::VorbisStreamLength/
   // for my notes on the topic.
@@ -177,12 +190,26 @@ void Ogg::Vorbis::AudioProperties::read(File *file)
     const long long start = first->absoluteGranularPosition();
     const long long end   = last->absoluteGranularPosition();
 
-    if(start >= 0 && end >= 0 && d->sampleRate > 0)
-      d->length = (int)((end - start) / (long long) d->sampleRate);
-    else
-      debug("Ogg::Vorbis::Properties::read() -- Either the PCM values for the start or "
+    if(start >= 0 && end >= 0 && d->sampleRate > 0) {
+      const long long frameCount = end - start;
+
+      if(frameCount > 0) {
+        const double length = frameCount * 1000.0 / d->sampleRate;
+
+        d->length  = static_cast<int>(length + 0.5);
+        d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
+      }
+    }
+    else {
+      debug("Vorbis::Properties::read() -- Either the PCM values for the start or "
             "end of this file was incorrect or the sample rate is zero.");
+    }
   }
   else
-    debug("Ogg::Vorbis::Properties::read() -- Could not find valid first and last Ogg pages.");
+    debug("Vorbis::Properties::read() -- Could not find valid first and last Ogg pages.");
+
+  // Alternative to the actual average bitrate.
+
+  if(d->bitrate == 0 && d->bitrateNominal > 0)
+    d->bitrate = static_cast<int>(d->bitrateNominal / 1000.0 + 0.5);
 }

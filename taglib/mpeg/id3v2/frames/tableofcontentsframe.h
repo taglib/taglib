@@ -52,10 +52,13 @@ namespace TagLib {
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data);
 
       /*!
-       * Creates a table of contents frame with the element ID \a eID,
-       * the child elements \a ch and embedded frames, that are in \a eF.
+       * Creates a table of contents frame with the element ID \a elementID,
+       * the child elements \a children and embedded frames, which become owned
+       * by this frame, in \a embeddedFrames.
        */
-      TableOfContentsFrame(const ByteVector &eID, const ByteVectorList &ch, const FrameList &eF);
+      TableOfContentsFrame(const ByteVector &elementID,
+                           const ByteVectorList &children = ByteVectorList(),
+                           const FrameList &embeddedFrames = FrameList());
 
       /*!
        * Destroys the frame.
@@ -71,7 +74,7 @@ namespace TagLib {
       ByteVector elementID() const;
 
       /*!
-       * Returns true, if the frame is top-level (doen't have
+       * Returns true, if the frame is top-level (doesn't have
        * any parent CTOC frame).
        *
        * \see setIsTopLevel()
@@ -87,7 +90,7 @@ namespace TagLib {
       bool isOrdered() const;
 
       /*!
-       * Returns count of child elements of the frame. It allways
+       * Returns count of child elements of the frame. It always
        * corresponds to size of child elements list.
        *
        * \see childElements()
@@ -110,7 +113,7 @@ namespace TagLib {
       void setElementID(const ByteVector &eID);
 
       /*!
-       * Sets, if the frame is top-level (doen't have
+       * Sets, if the frame is top-level (doesn't have
        * any parent CTOC frame).
        *
        * \see isTopLevel()

@@ -23,11 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "taglib.h"
-#include "tdebug.h"
-#include "tsmartptr.h"
+#include <taglib.h>
+#include <tdebug.h>
+#include <tsmartptr.h>
+
 #include "asfattribute.h"
 #include "asffile.h"
+#include "asfutils.h"
 
 using namespace TagLib;
 
@@ -53,8 +55,8 @@ namespace
 class ASF::Attribute::AttributePrivate
 {
 public:
-  AttributePrivate()
-    : data(new AttributeData())
+  AttributePrivate() :
+    data(new AttributeData())
   {
     data->pictureValue = ASF::Picture::fromInvalid();
     data->stream       = 0;
@@ -153,7 +155,7 @@ ByteVector ASF::Attribute::toByteVector() const
 {
   if(d->data->pictureValue.isValid())
     return d->data->pictureValue.render();
-  
+
   return d->data->byteVectorValue;
 }
 
@@ -189,23 +191,23 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
   d->data->pictureValue = Picture::fromInvalid();
   // extended content descriptor
   if(kind == 0) {
-    nameLength = f.readWORD();
-    name = f.readString(nameLength);
-    d->data->type = ASF::Attribute::AttributeTypes(f.readWORD());
-    size = f.readWORD();
+    nameLength = readWORD(&f);
+    name = readString(&f, nameLength);
+    d->data->type = ASF::Attribute::AttributeTypes(readWORD(&f));
+    size = readWORD(&f);
   }
   // metadata & metadata library
   else {
-    int temp = f.readWORD();
+    int temp = readWORD(&f);
     // metadata library
     if(kind == 2) {
       d->data->language = temp;
     }
-    d->data->stream = f.readWORD();
-    nameLength = f.readWORD();
-    d->data->type = ASF::Attribute::AttributeTypes(f.readWORD());
-    size = f.readDWORD();
-    name = f.readString(nameLength);
+    d->data->stream = readWORD(&f);
+    nameLength = readWORD(&f);
+    d->data->type = ASF::Attribute::AttributeTypes(readWORD(&f));
+    size = readDWORD(&f);
+    name = readString(&f, nameLength);
   }
 
   if(kind != 2 && size > 65535) {
@@ -214,28 +216,28 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
 
   switch(d->data->type) {
   case WordType:
-    d->data->shortValue = f.readWORD();
+    d->data->shortValue = readWORD(&f);
     break;
 
   case BoolType:
     if(kind == 0) {
-      d->data->boolValue = f.readDWORD() == 1;
+      d->data->boolValue = (readDWORD(&f) == 1);
     }
     else {
-      d->data->boolValue = f.readWORD() == 1;
+      d->data->boolValue = (readWORD(&f) == 1);
     }
     break;
 
   case DWordType:
-    d->data->intValue = f.readDWORD();
+    d->data->intValue = readDWORD(&f);
     break;
 
   case QWordType:
-    d->data->longLongValue = f.readQWORD();
+    d->data->longLongValue = readQWORD(&f);
     break;
 
   case UnicodeType:
-    d->data->stringValue = f.readString(size);
+    d->data->stringValue = readString(&f, size);
     break;
 
   case BytesType:
@@ -303,7 +305,7 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
     break;
 
   case UnicodeType:
-    data.append(File::renderString(d->data->stringValue));
+    data.append(renderString(d->data->stringValue));
     break;
 
   case BytesType:
@@ -317,13 +319,13 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
   }
 
   if(kind == 0) {
-    data = File::renderString(name, true) +
+    data = renderString(name, true) +
            ByteVector::fromUInt16LE((int)d->data->type) +
            ByteVector::fromUInt16LE(data.size()) +
            data;
   }
   else {
-    ByteVector nameData = File::renderString(name);
+    ByteVector nameData = renderString(name);
     data = ByteVector::fromUInt16LE(kind == 2 ? d->data->language : 0) +
            ByteVector::fromUInt16LE(d->data->stream) +
            ByteVector::fromUInt16LE(nameData.size()) +

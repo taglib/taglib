@@ -47,10 +47,18 @@ namespace TagLib {
       {
       public:
         /*!
-         * Creates an instance of AIFF::AudioProperties with the data read from
+         * Create an instance of AIFF::AudioProperties with the data read from
          * the ByteVector \a data.
+         *
+         * \deprecated
          */
         AudioProperties(const ByteVector &data, ReadStyle style);
+
+        /*!
+         * Create an instance of AIFF::AudioProperties with the data read from
+         * the AIFF::File \a file.
+         */
+        AudioProperties(File *file, ReadStyle style);
 
         /*!
          * Destroys this AIFF::AudioProperties instance.
@@ -59,14 +67,65 @@ namespace TagLib {
 
         virtual bool isNull() const;
 
-        // Reimplementations.
-
+        /*!
+         * Returns the length of the file in seconds.  The length is rounded down to
+         * the nearest whole second.
+         *
+         * \note This method is just an alias of lengthInSeconds().
+         *
+         * \deprecated
+         */
         virtual int length() const;
+
+        /*!
+         * Returns the length of the file in seconds.  The length is rounded down to
+         * the nearest whole second.
+         *
+         * \see lengthInMilliseconds()
+         */
+        // BIC: make virtual
+        int lengthInSeconds() const;
+
+        /*!
+         * Returns the length of the file in milliseconds.
+         *
+         * \see lengthInSeconds()
+         */
+        // BIC: make virtual
+        int lengthInMilliseconds() const;
+
+        /*!
+         * Returns the average bit rate of the file in kb/s.
+         */
         virtual int bitrate() const;
+
+        /*!
+         * Returns the sample rate in Hz.
+         */
         virtual int sampleRate() const;
+
+        /*!
+         * Returns the number of audio channels.
+         */
         virtual int channels() const;
 
+        /*!
+         * Returns the number of bits per audio sample.
+         */
+        int bitsPerSample() const;
+
+        /*!
+         * Returns the number of bits per audio sample.
+         *
+         * \note This method is just an alias of bitsPerSample().
+         *
+         * \deprecated
+         */
         int sampleWidth() const;
+
+        /*!
+         * Returns the number of sample frames
+         */
         uint sampleFrames() const;
 
         /*!
@@ -94,7 +153,7 @@ namespace TagLib {
         String compressionName() const;
 
       private:
-        void read(const ByteVector &data);
+        void read(File *file);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

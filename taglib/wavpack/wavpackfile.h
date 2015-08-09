@@ -124,6 +124,11 @@ namespace TagLib {
 
       /*!
        * Saves the file.
+       *
+       * This returns true if the save was successful.
+       *
+       * \warning In the current implementation, it's dangerous to call save()
+       * repeatedly.  At worst it will corrupt the file.
        */
       virtual bool save();
 
@@ -134,8 +139,8 @@ namespace TagLib {
        * if there is no valid ID3v1 tag.  If \a create is true it will create
        * an ID3v1 tag if one does not exist and returns a valid pointer.
        *
-       * \note This may return a valid pointer regardless of whether or not the 
-       * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file 
+       * \note This may return a valid pointer regardless of whether or not the
+       * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file
        * on disk actually has an ID3v1 tag.
        *
        * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
@@ -153,8 +158,8 @@ namespace TagLib {
        * if there is no valid APE tag.  If \a create is true it will create
        * an APE tag if one does not exist and returns a valid pointer.
        *
-       * \note This may return a valid pointer regardless of whether or not the 
-       * file on disk has an APE tag.  Use hasAPETag() to check if the file 
+       * \note This may return a valid pointer regardless of whether or not the
+       * file on disk has an APE tag.  Use hasAPETag() to check if the file
        * on disk actually has an APE tag.
        *
        * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
@@ -174,7 +179,7 @@ namespace TagLib {
        * \note In order to make the removal permanent save() still needs to be called
        */
       void strip(int tags = AllTags);
-      
+
       /*!
        * Returns whether or not the file on disk actually has an ID3v1 tag.
        *
@@ -188,13 +193,12 @@ namespace TagLib {
        * \see APETag()
        */
       bool hasAPETag() const;
-    
+
     private:
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
-      void scan();
+      void read(bool readProperties);
       offset_t findID3v1();
       offset_t findAPE();
 

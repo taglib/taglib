@@ -143,7 +143,7 @@ namespace TagLib {
        * Returns a reference to the item list map.  This is an ItemListMap of
        * all of the items in the tag.
        *
-       * This is the most powerfull structure for accessing the items of the tag.
+       * This is the most powerful structure for accessing the items of the tag.
        *
        * APE tags are case-insensitive, all keys in this map have been converted
        * to upper case.
@@ -188,7 +188,7 @@ namespace TagLib {
       /*!
        * Reads from the file specified in the constructor.
        */
-      void read();
+      void read(TagLib::File *file, offset_t footerLocation);
 
       /*!
        * Parses the body of the tag in \a data.

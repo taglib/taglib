@@ -22,8 +22,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cppunit/extensions/HelperMacros.h>
 #include <tlist.h>
+#include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
 using namespace TagLib;
@@ -51,7 +51,7 @@ public:
     l3.append(3);
     l3.append(4);
     CPPUNIT_ASSERT(l1 == l3);
-    
+
     List<int> l4 = l1;
     List<int>::Iterator it = l4.find(3);
     *it = 33;

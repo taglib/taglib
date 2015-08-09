@@ -32,17 +32,23 @@ using namespace TagLib;
 class ASF::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() : 
-    length(0), 
-    bitrate(0), 
-    sampleRate(0), 
-    channels(0), 
+  PropertiesPrivate() :
+    length(0),
+    bitrate(0),
+    sampleRate(0),
+    channels(0),
+    bitsPerSample(0),
+    codec(ASF::AudioProperties::Unknown),
     encrypted(false) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
+  int bitsPerSample;
+  ASF::AudioProperties::Codec codec;
+  String codecName;
+  String codecDescription;
   bool encrypted;
 };
 
@@ -51,6 +57,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::AudioProperties::AudioProperties() :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
 }
@@ -61,6 +68,16 @@ ASF::AudioProperties::~AudioProperties()
 }
 
 int ASF::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int ASF::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int ASF::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -80,6 +97,26 @@ int ASF::AudioProperties::channels() const
   return d->channels;
 }
 
+int ASF::AudioProperties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
+ASF::AudioProperties::Codec ASF::AudioProperties::codec() const
+{
+  return d->codec;
+}
+
+String ASF::AudioProperties::codecName() const
+{
+  return d->codecName;
+}
+
+String ASF::AudioProperties::codecDescription() const
+{
+  return d->codecDescription;
+}
+
 bool ASF::AudioProperties::isEncrypted() const
 {
   return d->encrypted;
@@ -89,28 +126,65 @@ bool ASF::AudioProperties::isEncrypted() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ASF::AudioProperties::setLength(int length)
+
+void ASF::AudioProperties::setLengthInMilliseconds(int value)
 {
-  d->length = length;
+  d->length = value;
 }
 
-void ASF::AudioProperties::setBitrate(int length)
+void ASF::AudioProperties::setBitrate(int value)
 {
-  d->bitrate = length;
+  d->bitrate = value;
 }
 
-void ASF::AudioProperties::setSampleRate(int length)
+void ASF::AudioProperties::setSampleRate(int value)
 {
-  d->sampleRate = length;
+  d->sampleRate = value;
 }
 
-void ASF::AudioProperties::setChannels(int length)
+void ASF::AudioProperties::setChannels(int value)
 {
-  d->channels = length;
+  d->channels = value;
 }
 
-void ASF::AudioProperties::setEncrypted(bool encrypted)
+void ASF::AudioProperties::setBitsPerSample(int value)
 {
-  d->encrypted = encrypted;
+  d->bitsPerSample = value;
 }
 
+void ASF::AudioProperties::setCodec(int value)
+{
+  switch(value)
+  {
+  case 0x0160:
+    d->codec = WMA1;
+    break;
+  case 0x0161:
+    d->codec = WMA2;
+    break;
+  case 0x0162:
+    d->codec = WMA9Pro;
+    break;
+  case 0x0163:
+    d->codec = WMA9Lossless;
+    break;
+  default:
+    d->codec = Unknown;
+    break;
+  }
+}
+
+void ASF::AudioProperties::setCodecName(const String &value)
+{
+  d->codecName = value;
+}
+
+void ASF::AudioProperties::setCodecDescription(const String &value)
+{
+  d->codecDescription = value;
+}
+
+void ASF::AudioProperties::setEncrypted(bool value)
+{
+  d->encrypted = value;
+}

@@ -32,10 +32,8 @@ namespace TagLib {
 
     class File;
 
-    class AudioProperties : public TagLib::AudioProperties
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
     {
-      friend class File;
-
     public:
       /*! Flag bits. */
       enum {
@@ -45,10 +43,12 @@ namespace TagLib {
       AudioProperties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~AudioProperties();
 
-      int length()     const;
-      int bitrate()    const;
-      int sampleRate() const;
-      int channels()   const;
+      int length()               const;
+      int lengthInSeconds()      const;
+      int lengthInMilliseconds() const;
+      int bitrate()              const;
+      int sampleRate()           const;
+      int channels()             const;
 
       ushort lengthInPatterns() const;
       ushort version()          const;
@@ -72,6 +72,8 @@ namespace TagLib {
       void setFlags(ushort flags);
       void setTempo(ushort tempo);
       void setBpmSpeed(ushort bpmSpeed);
+
+      friend class File;
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

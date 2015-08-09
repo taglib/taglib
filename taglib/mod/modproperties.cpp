@@ -41,7 +41,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle propertiesStyle) :
+Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate)
 {
 }
@@ -52,6 +53,16 @@ Mod::AudioProperties::~AudioProperties()
 }
 
 int Mod::AudioProperties::length() const
+{
+  return 0;
+}
+
+int Mod::AudioProperties::lengthInSeconds() const
+{
+  return 0;
+}
+
+int Mod::AudioProperties::lengthInMilliseconds() const
 {
   return 0;
 }

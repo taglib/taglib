@@ -82,20 +82,20 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::File::File(FileName file, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
+WavPack::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
-WavPack::File::File(IOStream *stream, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
+WavPack::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 WavPack::File::~File()
@@ -228,7 +228,7 @@ bool WavPack::File::hasAPETag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void WavPack::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
+void WavPack::File::read(bool readProperties)
 {
   // Look for an ID3v1 tag
 
@@ -256,8 +256,17 @@ void WavPack::File::read(bool readProperties, AudioProperties::ReadStyle /* prop
   // Look for WavPack audio properties
 
   if(readProperties) {
-    seek(0);
-    d->properties = new AudioProperties(this, length() - d->APESize);
+
+    offset_t streamLength;
+
+    if(d->hasAPE)
+      streamLength = d->APELocation;
+    else if(d->hasID3v1)
+      streamLength = d->ID3v1Location;
+    else
+      streamLength = length();
+
+    d->properties = new AudioProperties(this, streamLength);
   }
 }
 

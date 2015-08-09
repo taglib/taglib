@@ -72,7 +72,7 @@ namespace TagLib {
    *
    * class MyFileTypeResolver : FileTypeResolver
    * {
-   *   TagLib::File *createFile(TagLib::FileName *fileName, bool, AudioProperties::ReadStyle)
+   *   TagLib::File *createFile(TagLib::FileName *fileName, bool, AudioProperties::ReadStyle) const
    *   {
    *     if(someCheckForAnMP3File(fileName))
    *       return new TagLib::MPEG::File(fileName);
@@ -129,7 +129,7 @@ namespace TagLib {
                      audioPropertiesStyle = AudioProperties::Average);
 
     /*!
-     * Contruct a FileRef using \a file.  The FileRef now takes ownership of the
+     * Construct a FileRef using \a file.  The FileRef now takes ownership of the
      * pointer and will delete the File when it passes out of scope.
      */
     explicit FileRef(File *file);
@@ -227,7 +227,7 @@ namespace TagLib {
      * is tried.
      *
      * Returns a pointer to the added resolver (the same one that's passed in --
-     * this is mostly so that static inialializers have something to use for
+     * this is mostly so that static initializers have something to use for
      * assignment).
      *
      * \see FileTypeResolver
@@ -245,7 +245,7 @@ namespace TagLib {
      * by TagLib for resolution is case-insensitive.
      *
      * \note This does not account for any additional file type resolvers that
-     * are plugged in.  Also note that this is not intended to replace a propper
+     * are plugged in.  Also note that this is not intended to replace a proper
      * mime-type resolution system, but is just here for reference.
      *
      * \see FileTypeResolver

@@ -27,8 +27,8 @@
 #define TAGLIB_H
 
 #define TAGLIB_MAJOR_VERSION 1
-#define TAGLIB_MINOR_VERSION 9
-#define TAGLIB_PATCH_VERSION 1
+#define TAGLIB_MINOR_VERSION 10
+#define TAGLIB_PATCH_VERSION 0
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600)
 #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long long>(x)
@@ -85,7 +85,7 @@ namespace TagLib
  * - Full support for unicode and internationalized tags.
  * - Dual <a href="http://www.mozilla.org/MPL/MPL-1.1.html">MPL</a> and
  *   <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">LGPL</a> licenses.
- * - No external toolkit dependancies.
+ * - No external toolkit dependencies.
  *
  * \section why Why TagLib?
  *

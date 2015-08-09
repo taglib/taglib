@@ -34,8 +34,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
 
     f->seek(0, File::End);
-    int size = f->tell();
-    CPPUNIT_ASSERT_EQUAL(9134, size);
+    offset_t size = f->tell();
+    CPPUNIT_ASSERT_EQUAL((offset_t)9134, size);
 
     delete f;
   }

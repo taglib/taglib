@@ -25,6 +25,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include "aifffile.h"
 #include "aiffproperties.h"
 
 using namespace TagLib;
@@ -37,14 +38,14 @@ public:
     bitrate(0),
     sampleRate(0),
     channels(0),
-    sampleWidth(0),
+    bitsPerSample(0),
     sampleFrames(0) {}
 
   int length;
   int bitrate;
   int sampleRate;
   int channels;
-  int sampleWidth;
+  int bitsPerSample;
 
   ByteVector compressionType;
   String compressionName;
@@ -56,10 +57,18 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) :
+RIFF::AIFF::AudioProperties::AudioProperties(const ByteVector &, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
-  read(data);
+  debug("RIFF::AIFF::Properties::Properties() - This constructor is no longer used.");
+}
+
+RIFF::AIFF::AudioProperties::AudioProperties(File *file, ReadStyle) :
+  TagLib::AudioProperties(),
+  d(new PropertiesPrivate())
+{
+  read(file);
 }
 
 RIFF::AIFF::AudioProperties::~AudioProperties()
@@ -73,6 +82,16 @@ bool RIFF::AIFF::AudioProperties::isNull() const
 }
 
 int RIFF::AIFF::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int RIFF::AIFF::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int RIFF::AIFF::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -92,9 +111,14 @@ int RIFF::AIFF::AudioProperties::channels() const
   return d->channels;
 }
 
+int RIFF::AIFF::AudioProperties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 int RIFF::AIFF::AudioProperties::sampleWidth() const
 {
-  return d->sampleWidth;
+  return bitsPerSample();
 }
 
 TagLib::uint RIFF::AIFF::AudioProperties::sampleFrames() const
@@ -121,24 +145,52 @@ String RIFF::AIFF::AudioProperties::compressionName() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::AudioProperties::read(const ByteVector &data)
+void RIFF::AIFF::AudioProperties::read(File *file)
 {
+  ByteVector data;
+  uint streamLength = 0;
+  for(uint i = 0; i < file->chunkCount(); i++) {
+    const ByteVector name = file->chunkName(i);
+    if(name == "COMM") {
+      if(data.isEmpty())
+        data = file->chunkData(i);
+      else
+        debug("RIFF::AIFF::Properties::read() - Duplicate 'COMM' chunk found.");
+    }
+    else if(name == "SSND") {
+      if(streamLength == 0)
+        streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
+      else
+        debug("RIFF::AIFF::Properties::read() - Duplicate 'SSND' chunk found.");
+    }
+  }
+
   if(data.size() < 18) {
-    debug("RIFF::AIFF::AudioProperties::read() - \"COMM\" chunk is too short for AIFF.");
+    debug("RIFF::AIFF::Properties::read() - 'COMM' chunk not found or too short.");
     return;
   }
 
-  d->channels       = data.toInt16BE(0);
-  d->sampleFrames   = data.toUInt32BE(2);
-  d->sampleWidth    = data.toInt16BE(6);
+  if(streamLength == 0) {
+    debug("RIFF::AIFF::Properties::read() - 'SSND' chunk not found.");
+    return;
+  }
+
+  d->channels      = data.toUInt16BE(0);
+  d->sampleFrames  = data.toUInt32BE(2);
+  d->bitsPerSample = data.toUInt16BE(6);
 
   const long double sampleRate = data.toFloat80BE(8);
-  d->sampleRate     = static_cast<int>(sampleRate);
-  d->bitrate        = static_cast<int>((sampleRate * d->sampleWidth * d->channels) / 1000.0);
-  d->length         = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
+  if(sampleRate >= 1.0)
+    d->sampleRate = static_cast<int>(sampleRate + 0.5);
+
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+  }
 
   if(data.size() >= 23) {
     d->compressionType = data.mid(18, 4);
-    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])));
+    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])), String::Latin1);
   }
 }

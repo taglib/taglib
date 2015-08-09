@@ -15,6 +15,7 @@ class TestASF : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestASF);
   CPPUNIT_TEST(testAudioProperties);
+  CPPUNIT_TEST(testLosslessProperties);
   CPPUNIT_TEST(testRead);
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testSaveStream);
@@ -31,10 +32,35 @@ public:
   void testAudioProperties()
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->length());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3712, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(ASF::AudioProperties::WMA2, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("Windows Media Audio 9.1"), f.audioProperties()->codecName());
+    CPPUNIT_ASSERT_EQUAL(String("64 kbps, 48 kHz, stereo 2-pass CBR"), f.audioProperties()->codecDescription());
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+  }
+
+  void testLosslessProperties()
+  {
+    ASF::File f(TEST_FILE_PATH_C("lossless.wma"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3549, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(1152, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(ASF::AudioProperties::WMA9Lossless, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("Windows Media Audio 9.2 Lossless"), f.audioProperties()->codecName());
+    CPPUNIT_ASSERT_EQUAL(String("VBR Quality 100, 44 kHz, 2 channel 16 bit 1-pass VBR"), f.audioProperties()->codecDescription());
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
   }
 
   void testRead()
@@ -52,7 +78,7 @@ public:
     ASF::AttributeList values;
     values.append("Foo");
     values.append("Bar");
-    f->tag()->attributeListMap()["WM/AlbumTitle"] = values;
+    f->tag()->setAttribute("WM/AlbumTitle", values);
     f->save();
     delete f;
 
@@ -67,22 +93,24 @@ public:
     string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT(!f->tag()->attributeListMap().contains("WM/TrackNumber"));
+    CPPUNIT_ASSERT(!f->tag()->contains("WM/TrackNumber"));
     f->tag()->setAttribute("WM/TrackNumber", (unsigned int)(123));
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT(f->tag()->attributeListMap().contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType, f->tag()->attributeListMap()["WM/TrackNumber"].front().type());
+    CPPUNIT_ASSERT(f->tag()->contains("WM/TrackNumber"));
+    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
+                         f->tag()->attribute("WM/TrackNumber").front().type());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(123), f->tag()->track());
     f->tag()->setTrack(234);
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT(f->tag()->attributeListMap().contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType, f->tag()->attributeListMap()["WM/TrackNumber"].front().type());
+    CPPUNIT_ASSERT(f->tag()->contains("WM/TrackNumber"));
+    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
+                         f->tag()->attribute("WM/TrackNumber").front().type());
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(234), f->tag()->track());
     delete f;
   }
@@ -93,16 +121,14 @@ public:
     string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
-    ASF::AttributeList values;
     ASF::Attribute attr("Foo");
     attr.setStream(43);
-    values.append(attr);
-    f->tag()->attributeListMap()["WM/AlbumTitle"] = values;
+    f->tag()->setAttribute("WM/AlbumTitle", attr);
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(43, f->tag()->attributeListMap()["WM/AlbumTitle"][0].stream());
+    CPPUNIT_ASSERT_EQUAL(43, f->tag()->attribute("WM/AlbumTitle").front().stream());
     delete f;
   }
 
@@ -112,18 +138,16 @@ public:
     string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
-    ASF::AttributeList values;
     ASF::Attribute attr("Foo");
     attr.setStream(32);
     attr.setLanguage(56);
-    values.append(attr);
-    f->tag()->attributeListMap()["WM/AlbumTitle"] = values;
+    f->tag()->setAttribute("WM/AlbumTitle", attr);
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(32, f->tag()->attributeListMap()["WM/AlbumTitle"][0].stream());
-    CPPUNIT_ASSERT_EQUAL(56, f->tag()->attributeListMap()["WM/AlbumTitle"][0].language());
+    CPPUNIT_ASSERT_EQUAL(32, f->tag()->attribute("WM/AlbumTitle").front().stream());
+    CPPUNIT_ASSERT_EQUAL(56, f->tag()->attribute("WM/AlbumTitle").front().language());
     delete f;
   }
 
@@ -133,15 +157,14 @@ public:
     string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
-    ASF::AttributeList values;
     ASF::Attribute attr(ByteVector(70000, 'x'));
-    values.append(attr);
-    f->tag()->attributeListMap()["WM/Blob"] = values;
+    f->tag()->setAttribute("WM/Blob", attr);
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(ByteVector(70000, 'x'), f->tag()->attributeListMap()["WM/Blob"][0].toByteVector());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(70000, 'x'),
+                         f->tag()->attribute("WM/Blob").front().toByteVector());
     delete f;
   }
 
@@ -151,20 +174,17 @@ public:
     string newname = copy.fileName();
 
     ASF::File *f = new ASF::File(newname.c_str());
-    ASF::AttributeList values;
     ASF::Picture picture;
     picture.setMimeType("image/jpeg");
     picture.setType(ASF::Picture::FrontCover);
     picture.setDescription("description");
     picture.setPicture("data");
-    ASF::Attribute attr(picture);
-    values.append(attr);
-    f->tag()->attributeListMap()["WM/Picture"] = values;
+    f->tag()->setAttribute("WM/Picture", picture);
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    ASF::AttributeList values2 = f->tag()->attributeListMap()["WM/Picture"];
+    ASF::AttributeList values2 = f->tag()->attribute("WM/Picture");
     CPPUNIT_ASSERT_EQUAL(size_t(1), values2.size());
     ASF::Attribute attr2 = values2.front();
     ASF::Picture picture2 = attr2.toPicture();
@@ -195,12 +215,12 @@ public:
     picture2.setDescription("back cover");
     picture2.setPicture("PNG data");
     values.append(ASF::Attribute(picture2));
-    f->tag()->attributeListMap()["WM/Picture"] = values;
+    f->tag()->setAttribute("WM/Picture", values);
     f->save();
     delete f;
 
     f = new ASF::File(newname.c_str());
-    ASF::AttributeList values2 = f->tag()->attributeListMap()["WM/Picture"];
+    ASF::AttributeList values2 = f->tag()->attribute("WM/Picture");
     CPPUNIT_ASSERT_EQUAL(size_t(2), values2.size());
     ASF::Picture picture3 = values2[1].toPicture();
     CPPUNIT_ASSERT(picture3.isValid());
@@ -220,7 +240,7 @@ public:
   void testProperties()
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    
+
     PropertyMap tags = f.properties();
 
     tags["TRACKNUMBER"] = StringList("2");
@@ -234,19 +254,19 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Foo Bar"), f.tag()->artist());
     CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), tags["ARTIST"]);
 
-    CPPUNIT_ASSERT(f.tag()->attributeListMap().contains("WM/BeatsPerMinute"));
-    CPPUNIT_ASSERT_EQUAL((size_t)1u, f.tag()->attributeListMap()["WM/BeatsPerMinute"].size());
-    CPPUNIT_ASSERT_EQUAL(String("123"), f.tag()->attributeListMap()["WM/BeatsPerMinute"].front().toString());
+    CPPUNIT_ASSERT(f.tag()->contains("WM/BeatsPerMinute"));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, f.tag()->attributeListMap()["WM/BeatsPerMinute"].size());
+    CPPUNIT_ASSERT_EQUAL(String("123"), f.tag()->attribute("WM/BeatsPerMinute").front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("123"), tags["BPM"]);
 
-    CPPUNIT_ASSERT(f.tag()->attributeListMap().contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL((size_t)1u, f.tag()->attributeListMap()["WM/TrackNumber"].size());
-    CPPUNIT_ASSERT_EQUAL(String("2"), f.tag()->attributeListMap()["WM/TrackNumber"].front().toString());
+    CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, f.tag()->attributeListMap()["WM/TrackNumber"].size());
+    CPPUNIT_ASSERT_EQUAL(String("2"), f.tag()->attribute("WM/TrackNumber").front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("2"), tags["TRACKNUMBER"]);
 
-    CPPUNIT_ASSERT(f.tag()->attributeListMap().contains("WM/PartOfSet"));
-    CPPUNIT_ASSERT_EQUAL((size_t)1u, f.tag()->attributeListMap()["WM/PartOfSet"].size());
-    CPPUNIT_ASSERT_EQUAL(String("3"), f.tag()->attributeListMap()["WM/PartOfSet"].front().toString());
+    CPPUNIT_ASSERT(f.tag()->contains("WM/PartOfSet"));
+    CPPUNIT_ASSERT_EQUAL((size_t)1, f.tag()->attributeListMap()["WM/PartOfSet"].size());
+    CPPUNIT_ASSERT_EQUAL(String("3"), f.tag()->attribute("WM/PartOfSet").front().toString());
     CPPUNIT_ASSERT_EQUAL(StringList("3"), tags["DISCNUMBER"]);
   }
 

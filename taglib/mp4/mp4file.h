@@ -54,7 +54,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      File(FileName file, bool readProperties = true, 
+      File(FileName file, bool readProperties = true,
            AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
@@ -66,7 +66,7 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true, 
+      File(IOStream *stream, bool readProperties = true,
            AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
       /*!
@@ -95,13 +95,14 @@ namespace TagLib {
        * Save the file.
        *
        * This returns true if the save was successful.
+       *
+       * \warning In the current implementation, it's dangerous to call save()
+       * repeatedly.  At worst it will corrupt the file.
        */
       bool save();
 
     private:
-
-      void read(bool readProperties, AudioProperties::ReadStyle audioPropertiesStyle);
-      bool checkValid(const MP4::AtomList &list);
+      void read(bool readProperties);
 
       class FilePrivate;
       FilePrivate *d;

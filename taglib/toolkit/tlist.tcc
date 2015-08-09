@@ -299,9 +299,7 @@ template <class T>
 T &List<T>::operator[](size_t i)
 {
   Iterator it = d->list.begin();
-
-  for(uint j = 0; j < i; j++)
-    ++it;
+  std::advance(it, i);
 
   return *it;
 }
@@ -310,9 +308,7 @@ template <class T>
 const T &List<T>::operator[](size_t i) const
 {
   ConstIterator it = d->list.begin();
-
-  for(uint j = 0; j < i; j++)
-    ++it;
+  std::advance(it, i);
 
   return *it;
 }

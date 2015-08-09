@@ -27,24 +27,27 @@ inline string testFilePath(const string &filename)
 
 inline string copyFile(const string &filename, const string &ext)
 {
-  char *newname_c = tempnam(NULL, NULL);
-  string newname = string(newname_c) + ext;
-  free(newname_c);
-  string oldname = testFilePath(filename) + ext;
+  char testFileName[1024];
+
 #ifdef _WIN32
-  CopyFileA(oldname.c_str(), newname.c_str(), FALSE);
-  SetFileAttributesA(newname.c_str(), GetFileAttributesA(newname.c_str()) & ~FILE_ATTRIBUTE_READONLY);
+  GetTempPathA(sizeof(testFileName), testFileName);
+  GetTempFileNameA(testFileName, "tag", 0, testFileName);
+  DeleteFileA(testFileName);
+# if defined(_MSC_VER) && _MSC_VER > 1500
+  strcat_s(testFileName, ext.c_str());
+# else
+  strcat(testFileName, ext.c_str());
+# endif
 #else
-  char buffer[4096];
-  int bytes;
-  int inf = open(oldname.c_str(), O_RDONLY);
-  int outf = open(newname.c_str(), O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR);
-  while((bytes = read(inf, buffer, sizeof(buffer))) > 0)
-    write(outf, buffer, bytes);
-  close(outf);
-  close(inf);
+  snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
+  static_cast<void>(mkstemps(testFileName, 6));
 #endif
-  return newname;
+
+  string sourceFileName = testFilePath(filename) + ext;
+  ifstream source(sourceFileName.c_str(), std::ios::binary);
+  ofstream destination(testFileName, std::ios::binary);
+  destination << source.rdbuf();
+  return string(testFileName);
 }
 
 inline void deleteFile(const string &filename)
@@ -75,7 +78,7 @@ inline bool fileEqual(const string &filename1, const string &filename2)
 
     if(n1 == 0) break;
 
-    if(memcmp(buf1, buf2, n1) != 0) return false;
+    if(memcmp(buf1, buf2, static_cast<size_t>(n1)) != 0) return false;
   }
 
   return stream1.good() == stream2.good();

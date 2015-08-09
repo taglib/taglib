@@ -60,10 +60,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle style) : 
+TrueAudio::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
-  read(file, streamLength);
+  read(data, streamLength);
 }
 
 TrueAudio::AudioProperties::~AudioProperties()
@@ -72,6 +73,16 @@ TrueAudio::AudioProperties::~AudioProperties()
 }
 
 int TrueAudio::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int TrueAudio::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int TrueAudio::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -110,11 +121,17 @@ int TrueAudio::AudioProperties::ttaVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::AudioProperties::read(File *file, offset_t streamLength)
+void TrueAudio::AudioProperties::read(const ByteVector &data, offset_t streamLength)
 {
-  const ByteVector data = file->readBlock(18);
-  if(!data.startsWith("TTA"))
+  if(data.size() < 4) {
+    debug("TrueAudio::Properties::read() -- data is too short.");
     return;
+  }
+
+  if(!data.startsWith("TTA")) {
+    debug("TrueAudio::Properties::read() -- invalid header signature.");
+    return;
+  }
 
   size_t pos = 3;
 
@@ -124,21 +141,30 @@ void TrueAudio::AudioProperties::read(File *file, offset_t streamLength)
   // According to http://en.true-audio.com/TTA_Lossless_Audio_Codec_-_Format_Description
   // TTA2 headers are in development, and have a different format
   if(1 == d->version) {
+    if(data.size() < 18) {
+      debug("TrueAudio::Properties::read() -- data is too short.");
+      return;
+    }
+
     // Skip the audio format
     pos += 2;
 
-    d->channels = data.toInt16LE(pos);
+    d->channels = data.toUInt16LE(pos);
     pos += 2;
 
-    d->bitsPerSample = data.toInt16LE(pos);
+    d->bitsPerSample = data.toUInt16LE(pos);
     pos += 2;
 
     d->sampleRate = data.toUInt32LE(pos);
     pos += 4;
 
     d->sampleFrames = data.toUInt32LE(pos);
-    d->length = d->sampleRate > 0 ? d->sampleFrames / d->sampleRate : 0;
+    pos += 4;
 
-    d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
+    if(d->sampleFrames > 0 && d->sampleRate > 0) {
+      const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+      d->length  = static_cast<int>(length + 0.5);
+      d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+    }
   }
 }

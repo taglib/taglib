@@ -163,7 +163,10 @@ namespace TagLib {
        * This is the same as calling save(AllTags);
        *
        * If you would like more granular control over the content of the tags,
-       * with the concession of generality, use paramaterized save call below.
+       * with the concession of generality, use parameterized save call below.
+       *
+       * \warning In the current implementation, it's dangerous to call save()
+       * repeatedly.  At worst it will corrupt the file.
        *
        * \see save(int tags)
        */
@@ -180,26 +183,11 @@ namespace TagLib {
        *
        * The \a id3v2Version parameter specifies the version of the saved
        * ID3v2 tag. It can be either 4 or 3.
+       *
+       * \warning In the current implementation, it's dangerous to call save()
+       * repeatedly.  At worst it will corrupt the file.
        */
-      bool save(int tags, bool stripOthers = true, int id3v2Version = 4);
-
-      /*!
-       * Save the file.  This will attempt to save all of the tag types that are
-       * specified by OR-ing together TagTypes values.  The save() method above
-       * uses AllTags.  This returns true if saving was successful.
-       *
-       * If \a stripOthers is true this strips all tags not included in the mask,
-       * but does not modify them in memory, so later calls to save() which make
-       * use of these tags will remain valid.  This also strips empty tags.
-       *
-       * The \a id3v2Version parameter specifies the version of the saved
-       * ID3v2 tag. It can be either 4 or 3.
-       *
-       * If \a duplicateTags is true and at least one tag -- ID3v1 or ID3v2 --
-       * exists this will duplicate its content into the other tag.
-       */
-      // BIC: combine with the above method
-      bool save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags);
+      bool save(int tags, bool stripOthers = true, int id3v2Version = 4, bool duplicateTags = true);
 
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
@@ -267,6 +255,8 @@ namespace TagLib {
        *
        * \note This will also invalidate pointers to the ID3 and APE tags
        * as their memory will be freed.
+       *
+       * \note This will update the file immediately.
        */
       bool strip(int tags = AllTags);
 
@@ -277,6 +267,8 @@ namespace TagLib {
        *
        * If \a freeMemory is true the ID3 and APE tags will be deleted and
        * pointers to them will be invalidated.
+       *
+       * \note This will update the file immediately.
        */
       // BIC: merge with the method above
       bool strip(int tags, bool freeMemory);
@@ -285,6 +277,7 @@ namespace TagLib {
        * Set the ID3v2::FrameFactory to something other than the default.
        *
        * \see ID3v2FrameFactory
+       * \deprecated This value should be passed in via the constructor
        */
       void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
@@ -335,17 +328,10 @@ namespace TagLib {
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
+      void read(bool readProperties);
       offset_t findID3v2(offset_t offset);
       offset_t findID3v1();
       void findAPE();
-
-      /*!
-       * MPEG frames can be recognized by the bit pattern 11111111 111, so the
-       * first byte is easy to check for, however checking to see if the second byte
-       * starts with \e 111 is a bit more tricky, hence this member function.
-       */
-      static bool secondSynchByte(char byte);
 
       class FilePrivate;
       FilePrivate *d;

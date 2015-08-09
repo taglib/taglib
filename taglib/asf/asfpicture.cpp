@@ -23,12 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "taglib.h"
-#include "tdebug.h"
-#include "tsmartptr.h"
+#include <taglib.h>
+#include <tdebug.h>
+#include <tsmartptr.h>
+
 #include "asfattribute.h"
 #include "asffile.h"
 #include "asfpicture.h"
+#include "asfutils.h"
 
 using namespace TagLib;
 
@@ -44,13 +46,11 @@ namespace
   };
 }
 
-class ASF::Picture::PicturePrivate 
+class ASF::Picture::PicturePrivate
 {
 public:
-  PicturePrivate()
-    : data(new PictureData())
-  {
-  }
+  PicturePrivate() :
+    data(new PictureData()) {}
 
   SHARED_PTR<PictureData> data;
 };
@@ -141,8 +141,8 @@ ByteVector ASF::Picture::render() const
   return
     ByteVector((char)d->data->type) +
     ByteVector::fromUInt32LE(d->data->picture.size()) +
-    ASF::File::renderString(d->data->mimeType) +
-    ASF::File::renderString(d->data->description) +
+    renderString(d->data->mimeType) +
+    renderString(d->data->description) +
     d->data->picture;
 }
 

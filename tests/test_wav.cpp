@@ -14,23 +14,66 @@ using namespace TagLib;
 class TestWAV : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestWAV);
-  CPPUNIT_TEST(testLength);
+  CPPUNIT_TEST(testPCMProperties);
+  CPPUNIT_TEST(testALAWProperties);
+  CPPUNIT_TEST(testFloatProperties);
   CPPUNIT_TEST(testZeroSizeDataChunk);
   CPPUNIT_TEST(testID3v2Tag);
   CPPUNIT_TEST(testInfoTag);
   CPPUNIT_TEST(testStripTags);
-  CPPUNIT_TEST(testFormat);
+  CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void testLength()
+  void testPCMProperties()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("empty.wav"));
-    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
+  }
+
+  void testALAWProperties()
+  {
+    RIFF::WAV::File f(TEST_FILE_PATH_C("alaw.wav"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(128, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(8000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(28400U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(6, f.audioProperties()->format());
+  }
+
+  void testFloatProperties()
+  {
+    RIFF::WAV::File f(TEST_FILE_PATH_C("float64.wav"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(97, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(5645, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(4281U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->format());
   }
 
   void testZeroSizeDataChunk()
@@ -142,15 +185,18 @@ public:
     delete f;
   }
 
-  void testFormat()
+  void testDuplicateTags()
   {
-    RIFF::WAV::File f1(TEST_FILE_PATH_C("empty.wav"));
-    CPPUNIT_ASSERT_EQUAL(true, f1.isValid());
-    CPPUNIT_ASSERT_EQUAL((uint)1, f1.audioProperties()->format());
+    RIFF::WAV::File f(TEST_FILE_PATH_C("duplicate_tags.wav"));
 
-    RIFF::WAV::File f2(TEST_FILE_PATH_C("alaw.wav"));
-    CPPUNIT_ASSERT_EQUAL(true, f2.isValid());
-    CPPUNIT_ASSERT_EQUAL((uint)6, f2.audioProperties()->format());
+    // duplicate_tags.wav has duplicate ID3v2/INFO tags.
+    // title() returns "Title2" if can't skip the second tag.
+
+    CPPUNIT_ASSERT(f.hasID3v2Tag());
+    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.ID3v2Tag()->title());
+
+    CPPUNIT_ASSERT(f.hasInfoTag());
+    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.InfoTag()->title());
   }
 
   void testFuzzedFile1()

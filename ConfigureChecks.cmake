@@ -1,80 +1,39 @@
-include(CheckIncludeFile)
-include(CheckIncludeFiles)
-include(CheckSymbolExists)
-include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckTypeSize)
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
-include(TestBigEndian)
-include(TestFloatFormat)
 include(TestLargeFiles)
-
-# Determine whether your compiler supports C++0x/C++11 and enable it if possible.
-# This check covers GCC, Clang and ICC.
-
-if(NOT MSVC AND NOT CMAKE_CXX_FLAGS MATCHES "-std=^\\s+")
-  CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_FLAG_CXX11)
-  if(COMPILER_FLAG_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-  else()
-    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_FLAG_CXX0X)
-    if(COMPILER_FLAG_CXX0X)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    endif()
-  endif()
-endif()
 
 # Check if the size of numeric types are suitable.
 
 check_type_size("short" SIZEOF_SHORT)
 if(NOT ${SIZEOF_SHORT} EQUAL 2)
-  MESSAGE(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
+  message(FATAL_ERROR "TagLib requires that short is 16-bit wide.")
 endif()
 
 check_type_size("int" SIZEOF_INT)
 if(NOT ${SIZEOF_INT} EQUAL 4)
-  MESSAGE(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
+  message(FATAL_ERROR "TagLib requires that int is 32-bit wide.")
 endif()
 
 check_type_size("long long" SIZEOF_LONGLONG)
 if(NOT ${SIZEOF_LONGLONG} EQUAL 8)
-  MESSAGE(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
+  message(FATAL_ERROR "TagLib requires that long long is 64-bit wide.")
 endif()
 
 check_type_size("wchar_t" SIZEOF_WCHAR_T)
 if(${SIZEOF_WCHAR_T} LESS 2)
-  MESSAGE(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
+  message(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
 endif()
 
 check_type_size("float" SIZEOF_FLOAT)
 if(NOT ${SIZEOF_FLOAT} EQUAL 4)
-  MESSAGE(FATAL_ERROR "TagLib requires that float is 32-bit wide.")
+  message(FATAL_ERROR "TagLib requires that float is 32-bit wide.")
 endif()
 
 check_type_size("double" SIZEOF_DOUBLE)
 if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
-  MESSAGE(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
-endif()
-
-# Determine the CPU byte order.
-
-test_big_endian(IS_BIG_ENDIAN)
-if(NOT IS_BIG_ENDIAN)
-  set(SYSTEM_BYTEORDER 1)
-else()
-  set(SYSTEM_BYTEORDER 2)
-endif()
-
-# Check if the format of floating point types are suitable.
-
-test_float_format(FP_IEEE754)
-if(${FP_IEEE754} EQUAL 1)
-  set(FLOAT_BYTEORDER 1)
-elseif(${FP_IEEE754} EQUAL 2)
-  set(FLOAT_BYTEORDER 2)
-else()
-  MESSAGE(FATAL_ERROR "TagLib requires that floating point types are IEEE754 compliant.")
+  message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
 # Determine whether your compiler supports large files.
@@ -182,30 +141,16 @@ endif()
 
 # Determine which kind of byte swap functions your compiler supports.
 
-# GCC's __builtin_bswap* should be checked individually
-# because some of them can be missing depends on the GCC version.
 check_cxx_source_compiles("
   int main() {
     __builtin_bswap16(0);
-    return 0;
-  }
-" HAVE_GCC_BYTESWAP_16)
-
-check_cxx_source_compiles("
-  int main() {
     __builtin_bswap32(0);
-    return 0;
-  }
-" HAVE_GCC_BYTESWAP_32)
-
-check_cxx_source_compiles("
-  int main() {
     __builtin_bswap64(0);
     return 0;
   }
-" HAVE_GCC_BYTESWAP_64)
+" HAVE_GCC_BYTESWAP)
 
-if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP_64)
+if(NOT HAVE_GCC_BYTESWAP)
   check_cxx_source_compiles("
     #include <byteswap.h>
     int main() {
@@ -253,18 +198,30 @@ if(NOT HAVE_GCC_BYTESWAP_16 OR NOT HAVE_GCC_BYTESWAP_32 OR NOT HAVE_GCC_BYTESWAP
   endif()
 endif()
 
-# Determine whether your compiler supports snprintf or sprintf_s.
+# Determine whether your compiler supports some safer version of vsprintf.
 
 check_cxx_source_compiles("
   #include <cstdio>
-  int main() { char buf[20]; snprintf(buf, 20, \"%d\", 1); return 0; }
-" HAVE_SNPRINTF)
+  #include <cstdarg>
+  int main() {
+    char buf[20];
+    va_list args;
+    vsnprintf(buf, 20, \"%d\", args);
+    return 0;
+  }
+" HAVE_VSNPRINTF)
 
-if(NOT HAVE_SNPRINTF)
+if(NOT HAVE_VSNPRINTF)
   check_cxx_source_compiles("
     #include <cstdio>
-    int main() { char buf[20]; sprintf_s(buf, \"%d\", 1);  return 0; }
-  " HAVE_SPRINTF_S)
+    #include <cstdarg>
+    int main() {
+      char buf[20];
+      va_list args;
+      vsprintf_s(buf, \"%d\", args);
+      return 0;
+    }
+  " HAVE_VSPRINTF_S)
 endif()
 
 # Check which your compiler supports ISO _strdup.
@@ -290,8 +247,10 @@ endif()
 
 # Determine whether CppUnit is installed.
 
-find_package(CppUnit)
-if(NOT CppUnit_FOUND AND BUILD_TESTS)
-  message(STATUS "CppUnit not found, disabling tests.")
-  set(BUILD_TESTS OFF)
+if(BUILD_TESTS)
+  find_package(CppUnit)
+  if(NOT CppUnit_FOUND)
+    message(STATUS "CppUnit not found, disabling tests.")
+    set(BUILD_TESTS OFF)
+  endif()
 endif()

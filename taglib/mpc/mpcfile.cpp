@@ -53,7 +53,6 @@ public:
     ID3v2Location(-1),
     ID3v2Size(0),
     properties(0),
-    scanned(false),
     hasAPE(false),
     hasID3v1(false),
     hasID3v2(false) {}
@@ -76,7 +75,6 @@ public:
   DoubleTagUnion tag;
 
   AudioProperties *properties;
-  bool scanned;
 
   // These indicate whether the file *on disk* has these tags, not if
   // this data structure does.  This is used in computing offsets.
@@ -90,20 +88,20 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::File::File(FileName file, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
+MPC::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
-MPC::File::File(IOStream *stream, bool readProperties,
-                AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
+MPC::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
-    read(readProperties, propertiesStyle);
+    read(readProperties);
 }
 
 MPC::File::~File()
@@ -253,7 +251,7 @@ bool MPC::File::hasAPETag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* propertiesStyle */)
+void MPC::File::read(bool readProperties)
 {
   // Look for an ID3v1 tag
 
@@ -265,8 +263,6 @@ void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* properti
   }
 
   // Look for an APE tag
-
-  findAPE();
 
   d->APELocation = findAPE();
 
@@ -281,7 +277,7 @@ void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* properti
   if(!d->hasID3v1)
     APETag(true);
 
-  // Look for and skip an ID3v2 tag
+  // Look for an ID3v2 tag
 
   d->ID3v2Location = findID3v2();
 
@@ -292,15 +288,28 @@ void MPC::File::read(bool readProperties, AudioProperties::ReadStyle /* properti
     d->hasID3v2 = true;
   }
 
-  if(d->hasID3v2)
-    seek(d->ID3v2Location + d->ID3v2Size);
-  else
-    seek(0);
-
   // Look for MPC metadata
 
   if(readProperties) {
-    d->properties = new AudioProperties(this, length() - d->ID3v2Size - d->APESize);
+
+    offset_t streamLength;
+
+    if(d->hasAPE)
+      streamLength = d->APELocation;
+    else if(d->hasID3v1)
+      streamLength = d->ID3v1Location;
+    else
+      streamLength = length();
+
+    if(d->hasID3v2) {
+      seek(d->ID3v2Location + d->ID3v2Size);
+      streamLength -= (d->ID3v2Location + d->ID3v2Size);
+    }
+    else {
+      seek(0);
+    }
+
+    d->properties = new AudioProperties(this, streamLength);
   }
 }
 

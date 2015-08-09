@@ -58,7 +58,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Opus::AudioProperties::AudioProperties(File *file, ReadStyle style) : 
+Opus::AudioProperties::AudioProperties(File *file, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
   read(file);
@@ -70,6 +71,16 @@ Opus::AudioProperties::~AudioProperties()
 }
 
 int Opus::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int Opus::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int Opus::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -147,8 +158,13 @@ void Opus::AudioProperties::read(File *file)
     const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0) {
-      d->length  = (int)((end - start - preSkip) / 48000);
-      d->bitrate = (int)(file->length() * 8.0 / (1000.0 * d->length) + 0.5);
+      const long long frameCount = (end - start - preSkip);
+
+      if(frameCount > 0) {
+        const double length = frameCount * 1000.0 / 48000.0;
+        d->length  = static_cast<int>(length + 0.5);
+        d->bitrate = static_cast<int>(file->length() * 8.0 / length + 0.5);
+      }
     }
     else {
       debug("Opus::Properties::read() -- The PCM values for the start or "

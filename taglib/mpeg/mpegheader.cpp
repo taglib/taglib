@@ -53,8 +53,8 @@ namespace
 class MPEG::Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() 
-    : data(new HeaderData())
+  HeaderPrivate() :
+    data(new HeaderData())
   {
     data->isValid           = false;
     data->layer             = 0;
@@ -66,7 +66,7 @@ public:
     data->isCopyrighted     = false;
     data->isOriginal        = false;
     data->frameLength       = 0;
-    data->samplesPerFrame   = 0; 
+    data->samplesPerFrame   = 0;
   }
 
   SHARED_PTR<HeaderData> data;
@@ -76,14 +76,14 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::Header::Header(const ByteVector &data)
-  : d(new HeaderPrivate())
+MPEG::Header::Header(const ByteVector &data) :
+  d(new HeaderPrivate())
 {
   parse(data);
 }
 
-MPEG::Header::Header(const Header &h) 
-  : d(new HeaderPrivate(*h.d))
+MPEG::Header::Header(const Header &h) :
+  d(new HeaderPrivate(*h.d))
 {
 }
 
@@ -213,8 +213,8 @@ void MPEG::Header::parse(const ByteVector &data)
     }
   };
 
-  const int versionIndex = d->data->version == Version1 ? 0 : 1;
-  const int layerIndex = d->data->layer > 0 ? d->data->layer - 1 : 0;
+  const int versionIndex = (d->data->version == Version1) ? 0 : 1;
+  const int layerIndex   = (d->data->layer > 0) ? d->data->layer - 1 : 0;
 
   // The bitrate index is encoded as the first 4 bits of the 3rd byte,
   // i.e. 1111xxxx
@@ -253,13 +253,6 @@ void MPEG::Header::parse(const ByteVector &data)
   d->data->isCopyrighted = flags[3];
   d->data->isPadded = flags[9];
 
-  // Calculate the frame length
-
-  if(d->data->layer == 1)
-    d->data->frameLength = 24000 * 2 * d->data->bitrate / d->data->sampleRate + int(d->data->isPadded);
-  else
-    d->data->frameLength = 72000 * d->data->bitrate / d->data->sampleRate + int(d->data->isPadded);
-
   // Samples per frame
 
   static const int samplesPerFrame[3][2] = {
@@ -270,6 +263,15 @@ void MPEG::Header::parse(const ByteVector &data)
   };
 
   d->data->samplesPerFrame = samplesPerFrame[layerIndex][versionIndex];
+
+  // Calculate the frame length
+
+  static const int paddingSize[3] = { 4, 1, 1 };
+
+  d->data->frameLength = d->data->samplesPerFrame * d->data->bitrate * 125 / d->data->sampleRate;
+
+  if(d->data->isPadded)
+    d->data->frameLength += paddingSize[layerIndex];
 
   // Now that we're done parsing, set this to be a valid frame.
 

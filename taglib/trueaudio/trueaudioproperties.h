@@ -49,25 +49,60 @@ namespace TagLib {
     {
     public:
       /*!
-       * Creates an instance of TrueAudio::AudioProperties with the data read from 
+       * Creates an instance of TrueAudio::AudioProperties with the data read from
        * the ByteVector \a data.
        */
-      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this TrueAudio::AudioProperties instance.
        */
       virtual ~AudioProperties();
 
-      // Reimplementations.
-
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \note This method is just an alias of lengthInSeconds().
+       *
+       * \deprecated
+       */
       virtual int length() const;
+
+      /*!
+       * Returns the length of the file in seconds.  The length is rounded down to
+       * the nearest whole second.
+       *
+       * \see lengthInMilliseconds()
+       */
+      // BIC: make virtual
+      int lengthInSeconds() const;
+
+      /*!
+       * Returns the length of the file in milliseconds.
+       *
+       * \see lengthInSeconds()
+       */
+      // BIC: make virtual
+      int lengthInMilliseconds() const;
+
+      /*!
+       * Returns the average bit rate of the file in kb/s.
+       */
       virtual int bitrate() const;
+
+      /*!
+       * Returns the sample rate in Hz.
+       */
       virtual int sampleRate() const;
+
+      /*!
+       * Returns the number of audio channels.
+       */
       virtual int channels() const;
 
       /*!
-       * Returns number of bits per sample.
+       * Returns the number of bits per audio sample.
        */
       int bitsPerSample() const;
 
@@ -82,7 +117,7 @@ namespace TagLib {
       int ttaVersion() const;
 
     private:
-      void read(File *file, offset_t streamLength);
+      void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

@@ -50,25 +50,85 @@ namespace TagLib {
       {
       public:
         /*!
-         * Creates an instance of WAV::Properties with the data read from the
+         * Create an instance of WAV::Properties with the data read from the
+         * ByteVector \a data.
+         *
+         * \deprecated
+         */
+        AudioProperties(const ByteVector &data, ReadStyle style);
+
+        /*!
+         * Create an instance of WAV::Properties with the data read from the
          * ByteVector \a data and the length calculated using \a streamLength.
+         *
+         * \deprecated
          */
         AudioProperties(const ByteVector &data, uint streamLength, ReadStyle style);
 
         /*!
-         * Destroys this WAV::AudioProperties instance.
+         * Create an instance of WAV::Properties with the data read from the
+         * WAV::File \a file.
+         */
+        AudioProperties(File *file, ReadStyle style);
+
+        /*!
+         * Destroys this WAV::Properties instance.
          */
         virtual ~AudioProperties();
 
-        // Reimplementations.
-
+        /*!
+         * Returns the length of the file in seconds.  The length is rounded down to
+         * the nearest whole second.
+         *
+         * \note This method is just an alias of lengthInSeconds().
+         *
+         * \deprecated
+         */
         virtual int length() const;
+
+        /*!
+         * Returns the length of the file in seconds.  The length is rounded down to
+         * the nearest whole second.
+         *
+         * \see lengthInMilliseconds()
+         */
+        // BIC: make virtual
+        int lengthInSeconds() const;
+
+        /*!
+         * Returns the length of the file in milliseconds.
+         *
+         * \see lengthInSeconds()
+         */
+        // BIC: make virtual
+        int lengthInMilliseconds() const;
+
+        /*!
+         * Returns the average bit rate of the file in kb/s.
+         */
         virtual int bitrate() const;
+
+        /*!
+         * Returns the sample rate in Hz.
+         */
         virtual int sampleRate() const;
+
+        /*!
+         * Returns the number of audio channels.
+         */
         virtual int channels() const;
 
         /*!
-         * Returns the count of bits per sample.
+         * Returns the number of bits per audio sample.
+         */
+        int bitsPerSample() const;
+
+        /*!
+         * Returns the number of bits per audio sample.
+         *
+         * \note This method is just an alias of bitsPerSample().
+         *
+         * \deprecated
          */
         int sampleWidth() const;
 
@@ -82,13 +142,17 @@ namespace TagLib {
         uint sampleFrames() const;
 
         /*!
-         * Returns the format ID of the WAVE file.  For example, 0 for Unknown, 
-         * 1 for PCM and so forth.
+         * Returns the format ID of the file.
+         * 0 for unknown, 1 for PCM, 2 for ADPCM, 3 for 32/64-bit IEEE754, and
+         * so forth.
+         *
+         * \note For further information, refer to the WAVE Form Registration
+         * Numbers in RFC 2361.
          */
-        uint format() const;
+        int format() const;
 
       private:
-        void read(const ByteVector &data, uint streamLength);
+        void read(File *file);
 
         class PropertiesPrivate;
         PropertiesPrivate *d;

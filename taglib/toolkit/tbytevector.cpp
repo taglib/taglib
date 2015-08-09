@@ -195,7 +195,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
     T tmp;
     ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-    if(ENDIAN != Utils::SystemByteOrder)
+    if(ENDIAN != Utils::systemByteOrder())
       return Utils::byteSwap(tmp);
     else
       return tmp;
@@ -219,7 +219,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
 template <typename T, ByteOrder ENDIAN>
 inline ByteVector fromNumber(T value)
 {
-  if (ENDIAN != Utils::SystemByteOrder)
+  if (ENDIAN != Utils::systemByteOrder())
     value = Utils::byteSwap(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
@@ -239,7 +239,7 @@ TFloat toFloat(const ByteVector &v, size_t offset)
   } tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(TInt));
 
-  if(ENDIAN != Utils::FloatByteOrder)
+  if(ENDIAN != Utils::floatByteOrder())
     tmp.i = Utils::byteSwap(tmp.i);
 
   return tmp.f;
@@ -254,7 +254,7 @@ ByteVector fromFloat(TFloat value)
   } tmp;
   tmp.f = value;
 
-  if(ENDIAN != Utils::FloatByteOrder)
+  if(ENDIAN != Utils::floatByteOrder())
     tmp.i = Utils::byteSwap(tmp.i);
 
   return ByteVector(reinterpret_cast<char *>(&tmp), sizeof(TInt));
@@ -640,7 +640,14 @@ ByteVector &ByteVector::resize(size_t size, char padding)
 {
   if(size != d->length) {
     detach();
+
+    // Remove the excessive length of the internal buffer first to pad correctly.
+    // This doesn't reallocate the buffer, since std::vector::resize() doesn't
+    // reallocate the buffer when shrinking.
+
+    d->data->resize(d->offset + d->length);
     d->data->resize(d->offset + size, padding);
+
     d->length = size;
   }
 
@@ -650,7 +657,7 @@ ByteVector &ByteVector::resize(size_t size, char padding)
 ByteVector::Iterator ByteVector::begin()
 {
   detach();
-  return d->data->begin();
+  return d->data->begin() + d->offset;
 }
 
 ByteVector::ConstIterator ByteVector::begin() const
@@ -661,7 +668,7 @@ ByteVector::ConstIterator ByteVector::begin() const
 ByteVector::Iterator ByteVector::end()
 {
   detach();
-  return d->data->end();
+  return d->data->begin() + d->offset + d->length;
 }
 
 ByteVector::ConstIterator ByteVector::end() const
@@ -672,7 +679,7 @@ ByteVector::ConstIterator ByteVector::end() const
 ByteVector::ReverseIterator ByteVector::rbegin()
 {
   detach();
-  return d->data->rbegin();
+  return d->data->rbegin() + (d->data->size() - (d->offset + d->length));
 }
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
@@ -683,7 +690,7 @@ ByteVector::ConstReverseIterator ByteVector::rbegin() const
 ByteVector::ReverseIterator ByteVector::rend()
 {
   detach();
-  return d->data->rend();
+  return d->data->rbegin() + (d->data->size() - d->offset);
 }
 
 ByteVector::ConstReverseIterator ByteVector::rend() const

@@ -81,7 +81,7 @@ namespace TagLib {
      * names (uppercase Strings) to StringLists of tag values. Calls the according
      * specialization in the File subclasses.
      * For each metadata object of the file that could not be parsed into the PropertyMap
-     * format, the returend map's unsupportedData() list will contain one entry identifying
+     * format, the returned map's unsupportedData() list will contain one entry identifying
      * that object (e.g. the frame type for ID3v2 tags). Use removeUnsupportedProperties()
      * to remove (a subset of) them.
      * For files that contain more than one tag (e.g. an MP3 with both an ID3v1 and an ID3v2
@@ -102,7 +102,7 @@ namespace TagLib {
      * into the format-specific details.
      * If some value(s) could not be written imported to the specific metadata format,
      * the returned PropertyMap will contain those value(s). Otherwise it will be empty,
-     * indicating that no problems occured.
+     * indicating that no problems occurred.
      * With file types that support several tag formats (for instance, MP3 files can have
      * ID3v1, ID3v2, and APEv2 tags), this function will create the most appropriate one
      * (ID3v2 for MP3 files). Older formats will be updated as well, if they exist, but won't
@@ -110,7 +110,7 @@ namespace TagLib {
      * See the documentation of the subclass implementations for detailed descriptions.
      */
     virtual PropertyMap setProperties(const PropertyMap &properties);
-    
+
     /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were
@@ -150,12 +150,12 @@ namespace TagLib {
      * Returns the offset in the file that \a pattern occurs at or -1 if it can
      * not be found.  If \a before is set, the search will only continue until the
      * pattern \a before is found.  This is useful for tagging purposes to search
-     * for a tag before the synch frame.
+     * for a tag before the sync frame.
      *
      * Searching starts at \a fromOffset, which defaults to the beginning of the
      * file.
      *
-     * \note This has the practial limitation that \a pattern can not be longer
+     * \note This has the practical limitation that \a pattern can not be longer
      * than the buffer size used by readBlock().  Currently this is 1024 bytes.
      */
     offset_t find(const ByteVector &pattern,
@@ -166,12 +166,12 @@ namespace TagLib {
      * Returns the offset in the file that \a pattern occurs at or -1 if it can
      * not be found.  If \a before is set, the search will only continue until the
      * pattern \a before is found.  This is useful for tagging purposes to search
-     * for a tag before the synch frame.
+     * for a tag before the sync frame.
      *
      * Searching starts at \a fromOffset and proceeds from the that point to the
      * beginning of the file and defaults to the end of the file.
      *
-     * \note This has the practial limitation that \a pattern can not be longer
+     * \note This has the practical limitation that \a pattern can not be longer
      * than the buffer size used by readBlock().  Currently this is 1024 bytes.
      */
     offset_t rfind(const ByteVector &pattern,
@@ -242,7 +242,7 @@ namespace TagLib {
 
   protected:
     /*!
-     * Construct a File object and opens the file specified by \a fileName.  
+     * Construct a File object and opens the file specified by \a fileName.
      *
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.

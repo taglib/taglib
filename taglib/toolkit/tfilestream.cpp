@@ -50,7 +50,6 @@ namespace
   typedef FileName FileNameHandle;
   typedef HANDLE FileHandle;
 
-  const size_t BufferSize = 8192;
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -98,7 +97,6 @@ namespace
 
   typedef FILE* FileHandle;
 
-  const size_t BufferSize = 1024;
   const FileHandle InvalidFileHandle = 0;
 
   inline FileHandle openFile(const FileName &path, bool readOnly)
@@ -188,7 +186,7 @@ ByteVector FileStream::readBlock(size_t length)
     return ByteVector::null;
 
   const offset_t streamLength = FileStream::length();
-  if(length > BufferSize && static_cast<offset_t>(length) > streamLength)
+  if(length > bufferSize() && static_cast<offset_t>(length) > streamLength)
     length = static_cast<size_t>(streamLength);
 
   ByteVector buffer(length);
@@ -248,10 +246,10 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  size_t bufferLength = BufferSize;
+  size_t bufferLength = bufferSize();
 
   while(data.size() - replace > bufferLength)
-    bufferLength += BufferSize;
+    bufferLength += bufferSize();
 
   // Set where to start the reading and writing.
 
@@ -303,7 +301,7 @@ void FileStream::removeBlock(offset_t start, size_t length)
     return;
   }
 
-  size_t bufferLength = BufferSize;
+  size_t bufferLength = bufferSize();
 
   offset_t readPosition  = start + length;
   offset_t writePosition = start;
@@ -373,13 +371,10 @@ void FileStream::seek(offset_t offset, Position p)
 
   SetLastError(NO_ERROR);
   SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
-  if(GetLastError() == ERROR_NEGATIVE_SEEK) {
-    SetLastError(NO_ERROR);
-    SetFilePointer(d->file, 0, NULL, FILE_BEGIN);
-  }
-  if(GetLastError() != NO_ERROR) {
+
+  const int lastError = GetLastError();
+  if(lastError != NO_ERROR && lastError != ERROR_NEGATIVE_SEEK)
     debug("FileStream::seek() -- Failed to set the file pointer.");
-  }
 
 #else
 
@@ -480,7 +475,7 @@ offset_t FileStream::length()
 
 size_t FileStream::bufferSize()
 {
-  return BufferSize;
+  return 1024;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

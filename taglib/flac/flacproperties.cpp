@@ -38,14 +38,14 @@ public:
     length(0),
     bitrate(0),
     sampleRate(0),
-    sampleWidth(0),
+    bitsPerSample(0),
     channels(0),
     sampleFrames(0) {}
 
   int length;
   int bitrate;
   int sampleRate;
-  int sampleWidth;
+  int bitsPerSample;
   int channels;
   unsigned long long sampleFrames;
   ByteVector signature;
@@ -55,8 +55,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, 
-                                       ReadStyle style) :
+FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle) :
+  TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
   read(data, streamLength);
@@ -68,6 +68,16 @@ FLAC::AudioProperties::~AudioProperties()
 }
 
 int FLAC::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int FLAC::AudioProperties::lengthInSeconds() const
+{
+  return d->length / 1000;
+}
+
+int FLAC::AudioProperties::lengthInMilliseconds() const
 {
   return d->length;
 }
@@ -82,9 +92,14 @@ int FLAC::AudioProperties::sampleRate() const
   return d->sampleRate;
 }
 
+int FLAC::AudioProperties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
 int FLAC::AudioProperties::sampleWidth() const
 {
-  return d->sampleWidth;
+  return bitsPerSample();
 }
 
 int FLAC::AudioProperties::channels() const
@@ -130,9 +145,9 @@ void FLAC::AudioProperties::read(const ByteVector &data, offset_t streamLength)
   const uint flags = data.toUInt32BE(pos);
   pos += 4;
 
-  d->sampleRate = flags >> 12;
-  d->channels = ((flags >> 9) & 7) + 1;
-  d->sampleWidth = ((flags >> 4) & 31) + 1;
+  d->sampleRate    = flags >> 12;
+  d->channels      = ((flags >> 9) &  7) + 1;
+  d->bitsPerSample = ((flags >> 4) & 31) + 1;
 
   // The last 4 bits are the most significant 4 bits for the 36 bit
   // stream length in samples. (Audio files measured in days)
@@ -143,16 +158,12 @@ void FLAC::AudioProperties::read(const ByteVector &data, offset_t streamLength)
 
   d->sampleFrames = (hi << 32) | lo;
 
-  if(d->sampleRate > 0)
-    d->length = static_cast<int>(d->sampleFrames / d->sampleRate);
+  if(d->sampleFrames > 0 && d->sampleRate > 0) {
+    const double length = d->sampleFrames * 1000.0 / d->sampleRate;
+    d->length  = static_cast<int>(length + 0.5);
+    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+  }
 
-  // Uncompressed bitrate:
-
-  //d->bitrate = ((d->sampleRate * d->channels) / 1000) * d->sampleWidth;
-
-  // Real bitrate:
-
-  d->bitrate = d->length > 0 ? static_cast<int>(streamLength * 8L / d->length / 1000) : 0;
-
-  d->signature = data.mid(pos, 32);
+  if(data.size() >= pos + 16)
+    d->signature = data.mid(pos, 16);
 }
