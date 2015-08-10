@@ -167,10 +167,10 @@ void Opus::AudioProperties::read(File *file)
       }
     }
     else {
-      debug("Opus::Properties::read() -- The PCM values for the start or "
+      debug("Opus::AudioProperties::read() -- The PCM values for the start or "
             "end of this file was incorrect.");
     }
   }
   else
-    debug("Opus::Properties::read() -- Could not find valid first and last Ogg pages.");
+    debug("Opus::AudioProperties::read() -- Could not find valid first and last Ogg pages.");
 }

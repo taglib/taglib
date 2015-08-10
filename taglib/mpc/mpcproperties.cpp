@@ -213,7 +213,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
     bool eof;
     const size_t packetSize = readSize(file, packetSizeLength, eof);
     if(eof) {
-      debug("MPC::Properties::readSV8() - Reached to EOF.");
+      debug("MPC::AudioProperties::readSV8() - Reached to EOF.");
       break;
     }
 
@@ -221,7 +221,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
 
     const ByteVector data = file->readBlock(dataSize);
     if(data.size() != dataSize) {
-      debug("MPC::Properties::readSV8() - dataSize doesn't match the actual data size.");
+      debug("MPC::AudioProperties::readSV8() - dataSize doesn't match the actual data size.");
       break;
     }
 
@@ -230,7 +230,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
       // http://trac.musepack.net/wiki/SV8Specification#StreamHeaderPacket
 
       if(dataSize <= 5) {
-        debug("MPC::Properties::readSV8() - \"SH\" packet is too short to parse.");
+        debug("MPC::AudioProperties::readSV8() - \"SH\" packet is too short to parse.");
         break;
       }
 
@@ -242,13 +242,13 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
 
       d->sampleFrames = readSize(data, pos);
       if(pos > dataSize - 3) {
-        debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
+        debug("MPC::AudioProperties::readSV8() - \"SH\" packet is corrupt.");
         break;
       }
 
       const ulong begSilence = readSize(data, pos);
       if(pos > dataSize - 2) {
-        debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
+        debug("MPC::AudioProperties::readSV8() - \"SH\" packet is corrupt.");
         break;
       }
 
@@ -270,7 +270,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
       // http://trac.musepack.net/wiki/SV8Specification#ReplaygainPacket
 
       if(dataSize <= 9) {
-        debug("MPC::Properties::readSV8() - \"RG\" packet is too short to parse.");
+        debug("MPC::AudioProperties::readSV8() - \"RG\" packet is too short to parse.");
         break;
       }
 

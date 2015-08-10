@@ -162,12 +162,12 @@ void WavPack::AudioProperties::read(File *file, offset_t streamLength)
     const ByteVector data = file->readBlock(32);
 
     if(data.size() < 32) {
-      debug("WavPack::Properties::read() -- data is too short.");
+      debug("WavPack::AudioProperties::read() -- data is too short.");
       break;
     }
 
     if(!data.startsWith("wvpk")) {
-      debug("WavPack::Properties::read() -- Block header not found.");
+      debug("WavPack::AudioProperties::read() -- Block header not found.");
       break;
     }
 

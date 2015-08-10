@@ -154,7 +154,7 @@ void MPEG::AudioProperties::read(File *file)
 
   const offset_t first = file->firstFrameOffset();
   if(first < 0) {
-    debug("MPEG::Properties::read() -- Could not find a valid first MPEG frame in the stream.");
+    debug("MPEG::AudioProperties::read() -- Could not find a valid first MPEG frame in the stream.");
     return;
   }
 
@@ -162,7 +162,7 @@ void MPEG::AudioProperties::read(File *file)
   const Header firstHeader(file->readBlock(4));
 
   if(!firstHeader.isValid()) {
-    debug("MPEG::Properties::read() -- The first page header is invalid.");
+    debug("MPEG::AudioProperties::read() -- The first page header is invalid.");
     return;
   }
 

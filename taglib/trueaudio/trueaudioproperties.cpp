@@ -124,12 +124,12 @@ int TrueAudio::AudioProperties::ttaVersion() const
 void TrueAudio::AudioProperties::read(const ByteVector &data, offset_t streamLength)
 {
   if(data.size() < 4) {
-    debug("TrueAudio::Properties::read() -- data is too short.");
+    debug("TrueAudio::AudioProperties::read() -- data is too short.");
     return;
   }
 
   if(!data.startsWith("TTA")) {
-    debug("TrueAudio::Properties::read() -- invalid header signature.");
+    debug("TrueAudio::AudioProperties::read() -- invalid header signature.");
     return;
   }
 
@@ -142,7 +142,7 @@ void TrueAudio::AudioProperties::read(const ByteVector &data, offset_t streamLen
   // TTA2 headers are in development, and have a different format
   if(1 == d->version) {
     if(data.size() < 18) {
-      debug("TrueAudio::Properties::read() -- data is too short.");
+      debug("TrueAudio::AudioProperties::read() -- data is too short.");
       return;
     }
 

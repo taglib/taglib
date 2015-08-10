@@ -149,7 +149,7 @@ void APE::AudioProperties::read(File *file, offset_t streamLength)
   }
 
   if(version < 0) {
-    debug("APE::Properties::read() -- APE descriptor not found");
+    debug("APE::AudioProperties::read() -- APE descriptor not found");
     return;
   }
 
@@ -173,7 +173,7 @@ void APE::AudioProperties::analyzeCurrent(File *file)
   file->seek(2, File::Current);
   const ByteVector descriptor = file->readBlock(44);
   if(descriptor.size() < 44) {
-    debug("APE::Properties::analyzeCurrent() -- descriptor is too short.");
+    debug("APE::AudioProperties::analyzeCurrent() -- descriptor is too short.");
     return;
   }
 
@@ -185,7 +185,7 @@ void APE::AudioProperties::analyzeCurrent(File *file)
   // Read the header
   const ByteVector header = file->readBlock(24);
   if(header.size() < 24) {
-    debug("APE::Properties::analyzeCurrent() -- MAC header is too short.");
+    debug("APE::AudioProperties::analyzeCurrent() -- MAC header is too short.");
     return;
   }
 
@@ -207,7 +207,7 @@ void APE::AudioProperties::analyzeOld(File *file)
 {
   const ByteVector header = file->readBlock(26);
   if(header.size() < 26) {
-    debug("APE::Properties::analyzeOld() -- MAC header is too short.");
+    debug("APE::AudioProperties::analyzeOld() -- MAC header is too short.");
     return;
   }
 
@@ -237,7 +237,7 @@ void APE::AudioProperties::analyzeOld(File *file)
   file->seek(16, File::Current);
   const ByteVector fmt = file->readBlock(28);
   if(fmt.size() < 28 || !fmt.startsWith("WAVEfmt ")) {
-    debug("APE::Properties::analyzeOld() -- fmt header is too short.");
+    debug("APE::AudioProperties::analyzeOld() -- fmt header is too short.");
     return;
   }
 

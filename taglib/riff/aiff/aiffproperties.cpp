@@ -148,23 +148,23 @@ void RIFF::AIFF::AudioProperties::read(File *file)
       if(data.isEmpty())
         data = file->chunkData(i);
       else
-        debug("RIFF::AIFF::Properties::read() - Duplicate 'COMM' chunk found.");
+        debug("RIFF::AIFF::AudioProperties::read() - Duplicate 'COMM' chunk found.");
     }
     else if(name == "SSND") {
       if(streamLength == 0)
         streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
       else
-        debug("RIFF::AIFF::Properties::read() - Duplicate 'SSND' chunk found.");
+        debug("RIFF::AIFF::AudioProperties::read() - Duplicate 'SSND' chunk found.");
     }
   }
 
   if(data.size() < 18) {
-    debug("RIFF::AIFF::Properties::read() - 'COMM' chunk not found or too short.");
+    debug("RIFF::AIFF::AudioProperties::read() - 'COMM' chunk not found or too short.");
     return;
   }
 
   if(streamLength == 0) {
-    debug("RIFF::AIFF::Properties::read() - 'SSND' chunk not found.");
+    debug("RIFF::AIFF::AudioProperties::read() - 'SSND' chunk not found.");
     return;
   }
 

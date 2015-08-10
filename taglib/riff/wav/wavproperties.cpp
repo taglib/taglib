@@ -144,35 +144,35 @@ void RIFF::WAV::AudioProperties::read(File *file)
       if(data.isEmpty())
         data = file->chunkData(i);
       else
-        debug("RIFF::WAV::Properties::read() - Duplicate 'fmt ' chunk found.");
+        debug("RIFF::WAV::AudioProperties::read() - Duplicate 'fmt ' chunk found.");
     }
     else if(name == "data") {
       if(streamLength == 0)
         streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
       else
-        debug("RIFF::WAV::Properties::read() - Duplicate 'data' chunk found.");
+        debug("RIFF::WAV::AudioProperties::read() - Duplicate 'data' chunk found.");
     }
     else if(name == "fact") {
       if(totalSamples == 0)
         totalSamples = file->chunkData(i).toUInt32LE(0);
       else
-        debug("RIFF::WAV::Properties::read() - Duplicate 'fact' chunk found.");
+        debug("RIFF::WAV::AudioProperties::read() - Duplicate 'fact' chunk found.");
     }
   }
 
   if(data.size() < 16) {
-    debug("RIFF::WAV::Properties::read() - 'fmt ' chunk not found or too short.");
+    debug("RIFF::WAV::AudioProperties::read() - 'fmt ' chunk not found or too short.");
     return;
   }
 
   if(streamLength == 0) {
-    debug("RIFF::WAV::Properties::read() - 'data' chunk not found.");
+    debug("RIFF::WAV::AudioProperties::read() - 'data' chunk not found.");
     return;
   }
 
   d->format = data.toUInt16LE(0);
   if(d->format != FORMAT_PCM && totalSamples == 0) {
-    debug("RIFF::WAV::Properties::read() - Non-PCM format, but 'fact' chunk not found.");
+    debug("RIFF::WAV::AudioProperties::read() - Non-PCM format, but 'fact' chunk not found.");
     return;
   }
 

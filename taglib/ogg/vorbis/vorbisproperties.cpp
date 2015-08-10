@@ -149,14 +149,14 @@ void Ogg::Vorbis::AudioProperties::read(File *file)
 
   const ByteVector data = file->packet(0);
   if(data.size() < 28) {
-    debug("Vorbis::Properties::read() -- data is too short.");
+    debug("Ogg::Vorbis::AudioProperties::read() -- data is too short.");
     return;
   }
 
   size_t pos = 0;
 
   if(data.mid(pos, 7) != vorbisSetupHeaderID) {
-    debug("Ogg::Vorbis::Properties::read() -- invalid Ogg::Vorbis identification header");
+    debug("Ogg::Vorbis::AudioProperties::read() -- invalid Ogg::Vorbis identification header");
     return;
   }
 
@@ -201,12 +201,12 @@ void Ogg::Vorbis::AudioProperties::read(File *file)
       }
     }
     else {
-      debug("Vorbis::Properties::read() -- Either the PCM values for the start or "
+      debug("Ogg::Vorbis::AudioProperties::read() -- Either the PCM values for the start or "
             "end of this file was incorrect or the sample rate is zero.");
     }
   }
   else
-    debug("Vorbis::Properties::read() -- Could not find valid first and last Ogg pages.");
+    debug("Ogg::Vorbis::AudioProperties::read() -- Could not find valid first and last Ogg pages.");
 
   // Alternative to the actual average bitrate.
 

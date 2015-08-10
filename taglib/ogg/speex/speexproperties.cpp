@@ -126,7 +126,7 @@ void Speex::AudioProperties::read(File *file)
 
   const ByteVector data = file->packet(0);
   if(data.size() < 64) {
-    debug("Speex::Properties::read() -- data is too short.");
+    debug("Speex::AudioProperties::read() -- data is too short.");
     return;
   }
 
@@ -186,12 +186,12 @@ void Speex::AudioProperties::read(File *file)
       }
     }
     else {
-      debug("Speex::Properties::read() -- Either the PCM values for the start or "
+      debug("Speex::AudioProperties::read() -- Either the PCM values for the start or "
             "end of this file was incorrect or the sample rate is zero.");
     }
   }
   else
-    debug("Speex::Properties::read() -- Could not find valid first and last Ogg pages.");
+    debug("Speex::AudioProperties::read() -- Could not find valid first and last Ogg pages.");
 
   // Alternative to the actual average bitrate.
 

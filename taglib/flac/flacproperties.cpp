@@ -124,7 +124,7 @@ ByteVector FLAC::AudioProperties::signature() const
 void FLAC::AudioProperties::read(const ByteVector &data, offset_t streamLength)
 {
   if(data.size() < 18) {
-    debug("FLAC::Properties::read() - FLAC properties must contain at least 18 bytes.");
+    debug("FLAC::AudioProperties::read() - FLAC properties must contain at least 18 bytes.");
     return;
   }
 
