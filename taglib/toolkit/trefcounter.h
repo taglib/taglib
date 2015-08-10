@@ -48,6 +48,9 @@ namespace TagLib
     bool unique() const;
 
   private:
+    RefCounter(const RefCounter &);
+    RefCounter &operator=(const RefCounter &);
+
     class RefCounterPrivate;
     RefCounterPrivate *d;
   };
