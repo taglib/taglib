@@ -89,12 +89,12 @@ namespace TagLib {
     {
     public:
       /*!
-       * Constructs an empty Info tag.
+       * Constructs an empty INFO tag.
        */
       Tag();
 
       /*!
-       * Constructs an Info tag read from \a data which is contents of "LIST" chunk.
+       * Constructs an INFO tag read from \a data which is contents of "LIST" chunk.
        */
       Tag(const ByteVector &data);
 
