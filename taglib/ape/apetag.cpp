@@ -46,11 +46,12 @@ using namespace APE;
 class APE::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), footerLocation(-1), tagLength(0) {}
+  TagPrivate() :
+    file(0),
+    footerLocation(-1) {}
 
   TagLib::File *file;
   long footerLocation;
-  long tagLength;
 
   Footer footer;
 
@@ -61,14 +62,16 @@ public:
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Tag::Tag() : TagLib::Tag()
+APE::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
 }
 
-APE::Tag::Tag(TagLib::File *file, long footerLocation) : TagLib::Tag()
+APE::Tag::Tag(TagLib::File *file, long footerLocation) :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
   d->file = file;
   d->footerLocation = footerLocation;
 
