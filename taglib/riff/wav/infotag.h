@@ -48,11 +48,11 @@ namespace TagLib {
     //! A abstraction for the string to data encoding in Info tags.
 
     /*!
-     * RIFF Info tag has no clear definitions about character encodings.
+     * RIFF INFO tag has no clear definitions about character encodings.
      * In practice, local encoding of each system is largely used and UTF-8 is
      * popular too.
      *
-     * Here is an option to read and write tags in your preferrd encoding
+     * Here is an option to read and write tags in your preferred encoding
      * by subclassing this class, reimplementing parse() and render() and setting
      * your reimplementation as the default with Info::Tag::setStringHandler().
      *
@@ -91,12 +91,12 @@ namespace TagLib {
     {
     public:
       /*!
-       * Constructs an empty Info tag.
+       * Constructs an empty INFO tag.
        */
       Tag();
 
       /*!
-       * Constructs an Info tag read from \a data which is contents of "LIST" chunk.
+       * Constructs an INFO tag read from \a data which is contents of "LIST" chunk.
        */
       Tag(const ByteVector &data);
 

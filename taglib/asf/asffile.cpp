@@ -23,9 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-// The implementation of this class is based on the document found at:
-// http://download.microsoft.com/download/8/0/5/80506BEB-C95A-47AE-99CF-0D6D6D028ABA/ASF_Specification.pdf
-
 #include <tdebug.h>
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>

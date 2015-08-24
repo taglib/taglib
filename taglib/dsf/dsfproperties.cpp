@@ -43,10 +43,7 @@ public:
     sampleCount(0),
     blockSizePerChannel(0),
     bitrate(0),
-    length(0)
-  {
-
-  }
+    length(0) {}
 
   // Nomenclature is from DSF file format specification
   uint formatVersion;
@@ -67,9 +64,9 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DSF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style)
+DSF::AudioProperties::AudioProperties(const ByteVector &data, ReadStyle style) :
+  d(new PropertiesPrivate())
 {
-  d = new PropertiesPrivate;
   read(data);
 }
 
@@ -145,14 +142,14 @@ int DSF::AudioProperties::blockSizePerChannel() const
 
 void DSF::AudioProperties::read(const ByteVector &data)
 {
-  d->formatVersion         = data.toUInt32LE(0);
-  d->formatID              = data.toUInt32LE(4);
-  d->channelType           = data.toUInt32LE(8);
-  d->channelNum            = data.toUInt32LE(12);
-  d->samplingFrequency     = data.toUInt32LE(16);
-  d->bitsPerSample         = data.toUInt32LE(20);
-  d->sampleCount           = data.toInt64LE(24);
-  d->blockSizePerChannel   = data.toUInt32LE(32);
+  d->formatVersion       = data.toUInt32LE(0);
+  d->formatID            = data.toUInt32LE(4);
+  d->channelType         = data.toUInt32LE(8);
+  d->channelNum          = data.toUInt32LE(12);
+  d->samplingFrequency   = data.toUInt32LE(16);
+  d->bitsPerSample       = data.toUInt32LE(20);
+  d->sampleCount         = data.toInt64LE(24);
+  d->blockSizePerChannel = data.toUInt32LE(32);
 
   d->bitrate = static_cast<int>(d->samplingFrequency * d->bitsPerSample * d->channelNum / 1000.0 + 0.5);
 

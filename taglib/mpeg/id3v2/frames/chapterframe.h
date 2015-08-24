@@ -61,10 +61,9 @@ namespace TagLib {
        *
        * All times are in milliseconds.
        */
-      // BIC: There's no reason to use const-references with uints
       ChapterFrame(const ByteVector &elementID,
-                   const uint &startTime, const uint &endTime,
-                   const uint &startOffset, const uint &endOffset,
+                   uint startTime, uint endTime,
+                   uint startOffset, uint endOffset,
                    const FrameList &embeddedFrames = FrameList());
 
       /*!

@@ -92,7 +92,7 @@ public:
       CPPUNIT_ASSERT_EQUAL((offset_t)2, file.rfind(ByteVector("23", 2), 6));
 
       file.seek(0);
-      const ByteVector v = file.readBlock(file.length());
+      const ByteVector v = file.readBlock(static_cast<size_t>(file.length()));
       CPPUNIT_ASSERT_EQUAL((size_t)10, v.size());
 
       CPPUNIT_ASSERT_EQUAL((offset_t)v.rfind("23"),    file.rfind("23"));

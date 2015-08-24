@@ -47,6 +47,7 @@ class APE::Tag::TagPrivate
 {
 public:
   Footer footer;
+
   ItemListMap itemListMap;
 };
 

@@ -65,8 +65,8 @@ ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &dat
 }
 
 ChapterFrame::ChapterFrame(const ByteVector &elementID,
-                           const TagLib::uint &startTime, const TagLib::uint &endTime,
-                           const TagLib::uint &startOffset, const TagLib::uint &endOffset,
+                           TagLib::uint startTime, TagLib::uint endTime,
+                           TagLib::uint startOffset, TagLib::uint endOffset,
                            const FrameList &embeddedFrames) :
     ID3v2::Frame("CHAP")
 {

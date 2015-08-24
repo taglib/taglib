@@ -40,10 +40,7 @@ class DSF::File::FilePrivate
 public:
   FilePrivate() :
     properties(0),
-    tag(0)
-  {
-
-  }
+    tag(0) {}
 
   ~FilePrivate()
   {
@@ -62,17 +59,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 DSF::File::File(FileName file, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : TagLib::File(file)
+                AudioProperties::ReadStyle propertiesStyle) :
+  TagLib::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 DSF::File::File(IOStream *stream, bool readProperties,
-                       AudioProperties::ReadStyle propertiesStyle) : TagLib::File(stream)
+                AudioProperties::ReadStyle propertiesStyle) :
+  TagLib::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
@@ -168,7 +167,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
 {
   // A DSF file consists of four chunks: DSD chunk, format chunk, data chunk, and metadata chunk
   // The file format is not chunked in the sense of a RIFF File, though
-  
+
   // DSD chunk
   ByteVector chunkName = readBlock(4);
   if(chunkName != "DSD ") {
@@ -178,14 +177,14 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   }
 
   long long chunkSize = readBlock(8).toInt64LE(0);
-  
+
   // Integrity check
   if(28 != chunkSize) {
     debug("DSF::File::read() -- File is corrupted.");
     setValid(false);
     return;
   }
-  
+
   d->fileSize = readBlock(8).toInt64LE(0);
 
   // File is malformed or corrupted
@@ -213,10 +212,10 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   }
 
   chunkSize = readBlock(8).toInt64LE(0);
-  
-  d->properties 
+
+  d->properties
     = new AudioProperties(readBlock(static_cast<size_t>(chunkSize)), propertiesStyle);
-  
+
   // Skip the data chunk
 
   // A metadata offset of 0 indicates the absence of an ID3v2 tag

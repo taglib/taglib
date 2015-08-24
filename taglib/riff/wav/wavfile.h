@@ -63,7 +63,7 @@ namespace TagLib {
           NoTags  = 0x0000,
           //! Matches ID3v2 tags.
           ID3v2   = 0x0001,
-          //! Matches Info tags.
+          //! Matches INFO tags.
           Info    = 0x0002,
           //! Matches all tag types.
           AllTags = 0xffff
