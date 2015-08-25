@@ -56,7 +56,11 @@ set(TAGLIB_LIB_MAJOR_VERSION "1")
 set(TAGLIB_LIB_MINOR_VERSION "10")
 set(TAGLIB_LIB_PATCH_VERSION "0")
 
-set(TAGLIB_LIB_VERSION_STRING "${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}.${TAGLIB_LIB_PATCH_VERSION}")
+if("${TAGLIB_LIB_PATCH_VERSION}" EQUAL "0")
+  set(TAGLIB_LIB_VERSION_STRING "${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}")
+else()
+  set(TAGLIB_LIB_VERSION_STRING "${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}.${TAGLIB_LIB_PATCH_VERSION}")
+endif()
 
 # 1. If the library source code has changed at all since the last update, then increment revision.
 # 2. If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
