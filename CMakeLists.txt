@@ -38,15 +38,15 @@ set(LIB_INSTALL_DIR "${EXEC_INSTALL_PREFIX}/lib${LIB_SUFFIX}" CACHE PATH "The su
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The subdirectory to the header prefix" FORCE)
 
 if(APPLE)
-	option(BUILD_FRAMEWORK "Build an OS X framework" OFF)
-	set(FRAMEWORK_INSTALL_DIR "/Library/Frameworks" CACHE STRING "Directory to install frameworks to.")
+  option(BUILD_FRAMEWORK "Build an OS X framework" OFF)
+  set(FRAMEWORK_INSTALL_DIR "/Library/Frameworks" CACHE STRING "Directory to install frameworks to.")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
-if (MSVC AND ENABLE_STATIC_RUNTIME)
+if(MSVC AND ENABLE_STATIC_RUNTIME)
   foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
     string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
   endforeach(flag_var)
@@ -116,8 +116,8 @@ configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_
 add_subdirectory(taglib) 
 add_subdirectory(bindings)
 if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
+  enable_testing()
+  add_subdirectory(tests)
 endif(BUILD_TESTS)
 add_subdirectory(examples)
 
@@ -131,7 +131,7 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
 
-if (NOT TARGET uninstall)
+if(NOT TARGET uninstall)
   add_custom_target(uninstall
   COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 endif()
