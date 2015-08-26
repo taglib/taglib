@@ -451,12 +451,12 @@ ByteVector &ByteVector::setData(const char *data)
 char *ByteVector::data()
 {
   detach();
-  return (size() > 0) ? (&d->data->front() + d->offset) : 0;
+  return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
 const char *ByteVector::data() const
 {
-  return (size() > 0) ? (&d->data->front() + d->offset) : 0;
+  return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
 ByteVector ByteVector::mid(uint index, uint length) const
