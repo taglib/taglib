@@ -197,7 +197,8 @@ namespace TagLib {
 
     /*!
      * Returns a deep copy of this String as a wstring.  The returned string is
-     * encoded in UTF-16 (without BOM/CPU byte order).
+     * encoded in UTF-16 (without BOM/CPU byte order), not UTF-32 even if wchar_t
+     * is 32-bit wide.
      *
      * \see toCWString()
      */
@@ -226,7 +227,7 @@ namespace TagLib {
     /*!
      * Returns a standard C-style (null-terminated) wide character version of
      * this String.  The returned string is encoded in UTF-16 (without BOM/CPU byte
-     * order).
+     * order), not UTF-32 even if wchar_t is 32-bit wide.
      *
      * The returned string is still owned by this String and should not be deleted
      * by the user.
