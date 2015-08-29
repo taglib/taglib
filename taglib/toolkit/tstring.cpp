@@ -49,6 +49,14 @@ namespace
 {
   using namespace TagLib;
 
+  inline String::Type wcharByteOrder()
+  {
+    if(Utils::systemByteOrder() == Utils::LittleEndian)
+      return String::UTF16LE;
+    else
+      return String::UTF16BE;
+  }
+
   inline size_t UTF16toUTF8(
     const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
@@ -183,9 +191,9 @@ String::String(const wstring &s, Type t)
     // This looks ugly but needed for the compatibility with TagLib1.8.
     // Should be removed in TabLib2.0.
     if (t == UTF16BE)
-      t = WCharByteOrder;
+      t = wcharByteOrder();
     else if (t == UTF16LE)
-      t = (WCharByteOrder == UTF16LE ? UTF16BE : UTF16LE);
+      t = (wcharByteOrder() == UTF16LE ? UTF16BE : UTF16LE);
 
     copyFromUTF16(s.c_str(), s.length(), t);
   }
@@ -201,9 +209,9 @@ String::String(const wchar_t *s, Type t)
     // This looks ugly but needed for the compatibility with TagLib1.8.
     // Should be removed in TabLib2.0.
     if (t == UTF16BE)
-      t = WCharByteOrder;
+      t = wcharByteOrder();
     else if (t == UTF16LE)
-      t = (WCharByteOrder == UTF16LE ? UTF16BE : UTF16LE);
+      t = (wcharByteOrder() == UTF16LE ? UTF16BE : UTF16LE);
 
     copyFromUTF16(s, ::wcslen(s), t);
   }
@@ -773,7 +781,7 @@ void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
     length--;
   }
   else
-    swap = (t != WCharByteOrder);
+    swap = (t != wcharByteOrder());
 
   d->data.resize(length);
   if(length > 0) {
@@ -813,7 +821,7 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     length -= 2;
   }
   else
-    swap = (t != WCharByteOrder);
+    swap = (t != wcharByteOrder());
 
   d->data.resize(length / 2);
   for(size_t i = 0; i < length / 2; ++i) {
@@ -826,9 +834,6 @@ void String::copyFromUTF16(const char *s, size_t length, Type t)
     s += 2;
   }
 }
-
-const String::Type String::WCharByteOrder
-  = (Utils::systemByteOrder() == Utils::BigEndian) ? String::UTF16BE : String::UTF16LE;
 
 }
 
