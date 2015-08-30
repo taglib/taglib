@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <xiphcomment.h>
 #include <tpropertymap.h>
+#include <flacfile.h>
 #include <tdebug.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -17,6 +18,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrack);
   CPPUNIT_TEST(testSetTrack);
   CPPUNIT_TEST(testInvalidKeys);
+  CPPUNIT_TEST(testRemoveFields);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -72,6 +74,39 @@ public:
     PropertyMap unsuccessful = cmt.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
+  }
+
+  void testRemoveFields()
+  {
+    ScopedFileCopy copy("sinewave", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("reference libFLAC 1.3.1 20141125"), f.xiphComment()->vendorID());
+      f.xiphComment()->addField("TITLE", "Title1");
+      f.xiphComment()->addField("TITLE", "Title2", false);
+      f.xiphComment()->addField("TITLE", "Title2", false);
+      f.xiphComment()->addField("ARTIST", "Artist1");
+      f.xiphComment()->addField("ARTIST", "Artist2", false);
+      f.xiphComment()->addField("ALBUM", "Album1");
+      f.xiphComment()->addField("ALBUM", "Album2", false);
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("Title1 Title2 Title2"), f.xiphComment()->title());
+      f.xiphComment()->removeFields("TITLE", "Title2");
+      CPPUNIT_ASSERT_EQUAL(String("Title1"), f.xiphComment()->title());
+      f.xiphComment()->removeFields("ARTIST");
+      CPPUNIT_ASSERT_EQUAL(String(), f.xiphComment()->artist());
+      f.xiphComment()->removeAllFields();
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("reference libFLAC 1.3.1 20141125"), f.xiphComment()->vendorID());
+      CPPUNIT_ASSERT(f.xiphComment()->fieldListMap().isEmpty());
+    }
   }
 
 };
