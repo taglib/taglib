@@ -57,7 +57,7 @@ AudioProperties::~AudioProperties()
 
 }
 
-int AudioProperties::lengthInSeconds() const
+int TagLib::AudioProperties::lengthInSeconds() const
 {
   // This is an ugly workaround but we can't add a virtual function.
   // Should be virtual in taglib2.
@@ -105,7 +105,7 @@ int AudioProperties::lengthInSeconds() const
     return 0;
 }
 
-int AudioProperties::lengthInMilliseconds() const
+int TagLib::AudioProperties::lengthInMilliseconds() const
 {
   // This is an ugly workaround but we can't add a virtual function.
   // Should be virtual in taglib2.
