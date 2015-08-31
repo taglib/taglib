@@ -39,14 +39,15 @@ using namespace ID3v2;
 class Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() :
-    majorVersion(4),
-    revisionNumber(0),
-    unsynchronisation(false),
-    extendedHeader(false),
-    experimentalIndicator(false),
-    footerPresent(false),
-    tagSize(0) {}
+  HeaderPrivate() : majorVersion(4),
+                    revisionNumber(0),
+                    unsynchronisation(false),
+                    extendedHeader(false),
+                    experimentalIndicator(false),
+                    footerPresent(false),
+                    tagSize(0) {}
+
+  ~HeaderPrivate() {}
 
   uint majorVersion;
   uint revisionNumber;
@@ -57,6 +58,8 @@ public:
   bool footerPresent;
 
   uint tagSize;
+
+  static const uint size = 10;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +68,7 @@ public:
 
 TagLib::uint Header::size()
 {
-  return 10;
+  return HeaderPrivate::size;
 }
 
 ByteVector Header::fileIdentifier()
@@ -77,14 +80,14 @@ ByteVector Header::fileIdentifier()
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Header::Header() :
-  d(new HeaderPrivate())
+Header::Header()
 {
+  d = new HeaderPrivate;
 }
 
-Header::Header(const ByteVector &data) :
-  d(new HeaderPrivate())
+Header::Header(const ByteVector &data)
 {
+  d = new HeaderPrivate;
   parse(data);
 }
 
@@ -136,9 +139,9 @@ TagLib::uint Header::tagSize() const
 TagLib::uint Header::completeTagSize() const
 {
   if(d->footerPresent)
-    return d->tagSize + size() + Footer::size();
+    return d->tagSize + d->size + Footer::size();
   else
-    return d->tagSize + size();
+    return d->tagSize + d->size;
 }
 
 void Header::setTagSize(uint s)
@@ -195,6 +198,7 @@ void Header::parse(const ByteVector &data)
 {
   if(data.size() < size())
     return;
+
 
   // do some sanity checking -- even in ID3v2.3.0 and less the tag size is a
   // synch-safe integer, so all bytes must be less than 128.  If this is not
