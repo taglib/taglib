@@ -164,7 +164,7 @@ if(NOT HAVE_GCC_BYTESWAP)
   endif()
 endif()
 
-# Check if your compiler supports some safer version of vsprintf.
+# Determine whether your compiler supports some safer version of vsprintf.
 
 check_cxx_source_compiles("
   #include <cstdio>
@@ -190,14 +190,16 @@ if(NOT HAVE_VSNPRINTF)
   " HAVE_VSPRINTF_S)
 endif()
 
-# Check if zlib is installed.
+# Check for libz using the cmake supplied FindZLIB.cmake
 
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
-  set(HAVE_ZLIB ZLIB_FOUND)
+  if(ZLIB_FOUND)
+    set(HAVE_ZLIB 1)
+  else()
+    set(HAVE_ZLIB 0)
+  endif()
 endif()
-
-# Check if CppUnit is installed.
 
 if(BUILD_TESTS)
   find_package(CppUnit)
