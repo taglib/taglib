@@ -469,16 +469,7 @@ long MPEG::File::firstFrameOffset()
 
 long MPEG::File::lastFrameOffset()
 {
-  long position;
-
-  if(hasAPETag())
-    position = d->APELocation - 1;
-  else if(hasID3v1Tag())
-    position = d->ID3v1Location - 1;
-  else
-    position = length();
-
-  return previousFrameOffset(position);
+  return previousFrameOffset(hasID3v1Tag() ? d->ID3v1Location - 1 : length());
 }
 
 bool MPEG::File::hasID3v1Tag() const
