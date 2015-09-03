@@ -137,7 +137,14 @@ void Ogg::XiphComment::setAlbum(const String &s)
 
 void Ogg::XiphComment::setComment(const String &s)
 {
-  addField(d->commentField.isEmpty() ? "DESCRIPTION" : d->commentField, s);
+  if(d->commentField.isEmpty()) {
+    if(!d->fieldListMap["DESCRIPTION"].isEmpty())
+      d->commentField = "DESCRIPTION";
+    else
+      d->commentField = "COMMENT";
+  }
+
+  addField(d->commentField, s);
 }
 
 void Ogg::XiphComment::setGenre(const String &s)
