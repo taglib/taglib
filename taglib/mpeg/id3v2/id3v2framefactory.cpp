@@ -49,6 +49,7 @@
 #include "frames/eventtimingcodesframe.h"
 #include "frames/chapterframe.h"
 #include "frames/tableofcontentsframe.h"
+#include "frames/podcastframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -287,6 +288,11 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
 
   if(frameID == "CTOC")
     return new TableOfContentsFrame(tagHeader, data, header);
+
+  // Apple proprietary PCST (Podcast)
+
+  if(frameID == "PCST")
+    return new PodcastFrame(data, header);
 
   return new UnknownFrame(data, header);
 }
