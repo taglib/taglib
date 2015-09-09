@@ -41,7 +41,7 @@ public:
 };
 
 Picture::Picture()
-  : _p(new PicturePrivate())
+  : d(new PicturePrivate())
 {
 }
 
@@ -49,44 +49,44 @@ Picture::Picture(const ByteVector &data,
                  Type type,
                  const String &mime,
                  const String &description)
-  : _p(new PicturePrivate())
+  : d(new PicturePrivate())
 {
-  _p->mime = mime;
-  _p->description = description;
-  _p->type = type;
-  _p->data = data;
+  d->mime = mime;
+  d->description = description;
+  d->type = type;
+  d->data = data;
 }
 
 Picture::Picture(const Picture &p)
-  : _p(p.p())
+  : d(p.d)
 {
-  _p->ref();
+  d->ref();
 }
 
 const String &Picture::description() const
 {
-  return _p->description;
+  return d->description;
 }
 
 const ByteVector &Picture::data() const
 {
-  return _p->data;
+  return d->data;
 }
 
 const String &Picture::mime() const
 {
-  return _p->mime;
+  return d->mime;
 }
 
 Picture::Type Picture::type() const
 {
-  return _p->type;
+  return d->type;
 }
 
 Picture::~Picture()
 {
-  if(_p->deref())
-    delete _p;
+  if(d->deref())
+    delete d;
 }
 
 /* =========== OPERATORS =========== */
@@ -96,11 +96,11 @@ Picture &Picture::operator =(const Picture &p)
   if(&p == this)
     return *this;
 
-  if(_p && _p->deref())
-    delete _p;
+  if(d && d->deref())
+    delete d;
 
-  _p = p.p();
-  _p->ref();
+  d = p.d;
+  d->ref();
   return *this;
 }
 

@@ -128,11 +128,7 @@ namespace TagLib {
     Picture &operator=(const Picture &p);
 
   private:
-    PicturePrivate *p() const
-    {
-      return _p;
-    }
-    PicturePrivate *_p;
+    PicturePrivate *d;
   };
 
 }
