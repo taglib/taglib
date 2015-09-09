@@ -63,17 +63,17 @@ Picture::Picture(const Picture &p)
   d->ref();
 }
 
-const String &Picture::description() const
+String Picture::description() const
 {
   return d->description;
 }
 
-const ByteVector &Picture::data() const
+ByteVector Picture::data() const
 {
   return d->data;
 }
 
-const String &Picture::mime() const
+String Picture::mime() const
 {
   return d->mime;
 }

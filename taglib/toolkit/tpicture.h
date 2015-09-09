@@ -116,10 +116,10 @@ namespace TagLib {
      */
     virtual ~Picture();
 
-    const String &mime() const;
-    const String &description() const;
+    String mime() const;
+    String description() const;
     Type type() const;
-    const ByteVector &data() const;
+    ByteVector data() const;
 
     /*!
      * Performs a shallow, implicitly shared, copy of \a p, overwriting the
