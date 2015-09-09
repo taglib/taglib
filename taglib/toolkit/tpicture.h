@@ -40,8 +40,8 @@ namespace TagLib {
 
   public:
 
-    /**
-     * @brief The Type enum is based on types in id3v2 tags
+    /*!
+     * The Type enum is based on types in id3v2 tags
      */
     enum Type {
       //! A type not enumerated below
@@ -90,21 +90,18 @@ namespace TagLib {
 
     /*!
      * Constructs an empty Picture.
-    */
+     */
     Picture();
 
-    /**
-     * @brief Picture
-     * @param p
+    /*!
+     * Constructs a Picture object base on an other Picture
      */
     Picture(const Picture &p);
 
-    /**
-     * @brief Picture
-     * @param type
-     * @param data
-     * @param mime
-     * @param description
+    /*!
+     * Constructs a Picture object based on the \a ByteVector given.
+     *
+     * \note type, mime and description are optional
      */
     Picture(const ByteVector &data,
             Type type = Other,
@@ -116,9 +113,24 @@ namespace TagLib {
      */
     virtual ~Picture();
 
+    /*!
+     * Returns the mime of the picture
+     */
     String mime() const;
+
+    /*!
+     * Returns the descritpion of the picture
+     */
     String description() const;
+
+    /*!
+     * Returns the type of the picture
+     */
     Type type() const;
+
+    /*!
+     * Returns datas of the picture
+     */
     ByteVector data() const;
 
     /*!

@@ -34,7 +34,6 @@
 namespace TagLib {
 
   //! A list of pictures
-
   typedef List<Picture> PictureList;
 
   /*!
@@ -64,21 +63,24 @@ namespace TagLib {
      */
     virtual ~PictureMap();
 
-    /**
-     * @brief insert
-     * @param l
+    /*!
+     * Inserts a PictureList into the picture map
      */
     void insert(const PictureList &l);
 
-    /**
-     * @brief insert
-     * @param p
+    /*!
+     * Inserts a Picture into the picture map
      */
     void insert(const Picture &p);
   };
 
 }
 
+/*!
+ * \relates TagLib::PictureMap
+ *
+ * Send the PictureMap to on output stream
+ */
 TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::PictureMap &map);
 
 #endif // TAGLIB_PICTUREMAP_H
