@@ -113,89 +113,87 @@ String ASF::Tag::genre() const
 
 PictureMap ASF::Tag::pictures() const
 {
-    PictureMap map;
-    if(d->attributeListMap.contains("WM/Picture"))
-    {
-        AttributeList list = d->attributeListMap["WM/Picture"];
-        for( AttributeList::ConstIterator it = list.begin();
-             it != list.end();
-             ++it)
-        {
-            ASF::Picture asfPicture = (*it).toPicture();
-            TagLib::Picture::Type type;
-            switch (asfPicture.type()) {
-            case ASF::Picture::Other:
-                type = TagLib::Picture::Other;
-                break;
-            case ASF::Picture::FileIcon:
-                type = TagLib::Picture::FileIcon;
-                break;
-            case ASF::Picture::OtherFileIcon:
-                type = TagLib::Picture::OtherFileIcon;
-                break;
-            case ASF::Picture::FrontCover:
-                type = TagLib::Picture::FrontCover;
-                break;
-            case ASF::Picture::BackCover:
-                type = TagLib::Picture::BackCover;
-                break;
-            case ASF::Picture::LeafletPage:
-                type = TagLib::Picture::LeafletPage;
-                break;
-            case ASF::Picture::Media:
-                type = TagLib::Picture::Media;
-                break;
-            case ASF::Picture::LeadArtist:
-                type = TagLib::Picture::LeadArtist;
-                break;
-            case ASF::Picture::Artist:
-                type = TagLib::Picture::Artist;
-                break;
-            case ASF::Picture::Conductor:
-                type = TagLib::Picture::Conductor;
-                break;
-            case ASF::Picture::Band:
-                type = TagLib::Picture::Band;
-                break;
-            case ASF::Picture::Composer:
-                type = TagLib::Picture::Composer;
-                break;
-            case ASF::Picture::Lyricist:
-                type = TagLib::Picture::Lyricist;
-                break;
-            case ASF::Picture::RecordingLocation:
-                type = TagLib::Picture::RecordingLocation;
-                break;
-            case ASF::Picture::DuringRecording:
-                type = TagLib::Picture::DuringRecording;
-                break;
-            case ASF::Picture::DuringPerformance:
-                type = TagLib::Picture::DuringPerformance;
-                break;
-            case ASF::Picture::MovieScreenCapture:
-                type = TagLib::Picture::MovieScreenCapture;
-                break;
-            case ASF::Picture::ColouredFish:
-                type = TagLib::Picture::ColouredFish;
-                break;
-            case ASF::Picture::Illustration:
-                type = TagLib::Picture::Illustration;
-                break;
-            case ASF::Picture::BandLogo:
-                type = TagLib::Picture::BandLogo;
-                break;
-            case ASF::Picture::PublisherLogo:
-                type = TagLib::Picture::PublisherLogo;
-                break;
-            }
-            TagLib::Picture picture(asfPicture.picture(),
-                                    type,
-                                    asfPicture.mimeType(),
-                                    asfPicture.description());
-            map.insert(picture);
-        }
+  PictureMap map;
+  if(d->attributeListMap.contains("WM/Picture")) {
+    AttributeList list = d->attributeListMap["WM/Picture"];
+    for(AttributeList::ConstIterator it = list.begin();
+        it != list.end();
+        ++it) {
+      ASF::Picture asfPicture = (*it).toPicture();
+      TagLib::Picture::Type type;
+      switch(asfPicture.type()) {
+      case ASF::Picture::Other:
+        type = TagLib::Picture::Other;
+        break;
+      case ASF::Picture::FileIcon:
+        type = TagLib::Picture::FileIcon;
+        break;
+      case ASF::Picture::OtherFileIcon:
+        type = TagLib::Picture::OtherFileIcon;
+        break;
+      case ASF::Picture::FrontCover:
+        type = TagLib::Picture::FrontCover;
+        break;
+      case ASF::Picture::BackCover:
+        type = TagLib::Picture::BackCover;
+        break;
+      case ASF::Picture::LeafletPage:
+        type = TagLib::Picture::LeafletPage;
+        break;
+      case ASF::Picture::Media:
+        type = TagLib::Picture::Media;
+        break;
+      case ASF::Picture::LeadArtist:
+        type = TagLib::Picture::LeadArtist;
+        break;
+      case ASF::Picture::Artist:
+        type = TagLib::Picture::Artist;
+        break;
+      case ASF::Picture::Conductor:
+        type = TagLib::Picture::Conductor;
+        break;
+      case ASF::Picture::Band:
+        type = TagLib::Picture::Band;
+        break;
+      case ASF::Picture::Composer:
+        type = TagLib::Picture::Composer;
+        break;
+      case ASF::Picture::Lyricist:
+        type = TagLib::Picture::Lyricist;
+        break;
+      case ASF::Picture::RecordingLocation:
+        type = TagLib::Picture::RecordingLocation;
+        break;
+      case ASF::Picture::DuringRecording:
+        type = TagLib::Picture::DuringRecording;
+        break;
+      case ASF::Picture::DuringPerformance:
+        type = TagLib::Picture::DuringPerformance;
+        break;
+      case ASF::Picture::MovieScreenCapture:
+        type = TagLib::Picture::MovieScreenCapture;
+        break;
+      case ASF::Picture::ColouredFish:
+        type = TagLib::Picture::ColouredFish;
+        break;
+      case ASF::Picture::Illustration:
+        type = TagLib::Picture::Illustration;
+        break;
+      case ASF::Picture::BandLogo:
+        type = TagLib::Picture::BandLogo;
+        break;
+      case ASF::Picture::PublisherLogo:
+        type = TagLib::Picture::PublisherLogo;
+        break;
+      }
+      TagLib::Picture picture(asfPicture.picture(),
+                              type,
+                              asfPicture.mimeType(),
+                              asfPicture.description());
+      map.insert(picture);
     }
-    return PictureMap(map);
+  }
+  return PictureMap(map);
 }
 
 void ASF::Tag::setTitle(const String &value)
