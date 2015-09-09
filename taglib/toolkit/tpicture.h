@@ -33,12 +33,12 @@
 
 namespace TagLib {
 
-class TAGLIB_EXPORT Picture
-{
+  class TAGLIB_EXPORT Picture
+  {
 
-class PicturePrivate;
+    class PicturePrivate;
 
-public:
+  public:
 
     /**
      * @brief The Type enum is based on types in id3v2 tags
@@ -97,7 +97,7 @@ public:
      * @brief Picture
      * @param p
      */
-    Picture(const Picture& p);
+    Picture(const Picture &p);
 
     /**
      * @brief Picture
@@ -106,31 +106,34 @@ public:
      * @param mime
      * @param description
      */
-    Picture(const ByteVector& data,
+    Picture(const ByteVector &data,
             Type type = Other,
-            const String& mime = "image/",
-            const String& description = String());
+            const String &mime = "image/",
+            const String &description = String());
 
     /*!
      * Destroys this Picture instance.
      */
     virtual ~Picture();
 
-    const String& mime() const;
-    const String& description() const;
+    const String &mime() const;
+    const String &description() const;
     Type type() const;
-    const ByteVector& data() const;
+    const ByteVector &data() const;
 
     /*!
      * Performs a shallow, implicitly shared, copy of \a p, overwriting the
      * Picture's current data.
      */
-    Picture& operator=(const Picture& p);
+    Picture &operator=(const Picture &p);
 
-private:
-    PicturePrivate* p() const{ return _p; }
-    PicturePrivate* _p;
-};
+  private:
+    PicturePrivate *p() const
+    {
+      return _p;
+    }
+    PicturePrivate *_p;
+  };
 
 }
 

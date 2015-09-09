@@ -30,162 +30,155 @@ using namespace TagLib;
 class Picture::PicturePrivate : public RefCounter
 {
 public:
-    PicturePrivate() : RefCounter()
-    {
-    }
+  PicturePrivate() : RefCounter()
+  {
+  }
 
-    String     description;
-    String     mime;
-    Type       type;
-    ByteVector data;
+  String     description;
+  String     mime;
+  Type       type;
+  ByteVector data;
 };
 
 Picture::Picture()
-    : _p(new PicturePrivate())
+  : _p(new PicturePrivate())
 {
 }
 
-Picture::Picture(const ByteVector& data,
+Picture::Picture(const ByteVector &data,
                  Type type,
-                 const String& mime,
-                 const String& description)
-    : _p(new PicturePrivate())
+                 const String &mime,
+                 const String &description)
+  : _p(new PicturePrivate())
 {
-    _p->mime = mime;
-    _p->description = description;
-    _p->type = type;
-    _p->data = data;
+  _p->mime = mime;
+  _p->description = description;
+  _p->type = type;
+  _p->data = data;
 }
 
-Picture::Picture(const Picture& p)
-    : _p( p.p() )
+Picture::Picture(const Picture &p)
+  : _p(p.p())
 {
-    _p->ref();
+  _p->ref();
 }
 
-const String& Picture::description() const
+const String &Picture::description() const
 {
-    return _p->description;
+  return _p->description;
 }
 
-const ByteVector& Picture::data() const
+const ByteVector &Picture::data() const
 {
-    return _p->data;
+  return _p->data;
 }
 
-const String& Picture::mime() const
+const String &Picture::mime() const
 {
-    return _p->mime;
+  return _p->mime;
 }
 
 Picture::Type Picture::type() const
 {
-    return _p->type;
+  return _p->type;
 }
 
 Picture::~Picture()
 {
-    if( _p->deref() )
-    {
-        delete _p;
-    }
+  if(_p->deref())
+    delete _p;
 }
 
 /* =========== OPERATORS =========== */
 
-Picture& Picture::operator =(const Picture& p)
+Picture &Picture::operator =(const Picture &p)
 {
-    if( &p == this )
-    {
-        return *this;
-    }
-
-    if( _p && _p->deref() )
-    {
-        delete _p;
-    }
-
-    _p = p.p();
-    _p->ref();
+  if(&p == this)
     return *this;
+
+  if(_p && _p->deref())
+    delete _p;
+
+  _p = p.p();
+  _p->ref();
+  return *this;
 }
 
-std::ostream& operator<<(std::ostream& s, const Picture& p)
+std::ostream &operator<<(std::ostream &s, const Picture &p)
 {
-    String type;
-    switch(p.type())
-    {
-    case Picture::Other:
-        type = "Other";
-        break;
-    case Picture::FileIcon:
-        type = "FileIcon";
-        break;
-    case Picture::OtherFileIcon:
-        type = "OtherFileIcon";
-        break;
-    case Picture::FrontCover:
-        type = "FrontCover";
-        break;
-    case Picture::BackCover:
-        type = "BackCover";
-        break;
-    case Picture::LeafletPage:
-        type = "LeafletPage";
-        break;
-    case Picture::Media:
-        type = "Media";
-        break;
-    case Picture::LeadArtist:
-        type = "LeadArtist";
-        break;
-    case Picture::Artist:
-        type = "Artist";
-        break;
-    case Picture::Conductor:
-        type = "Conductor";
-        break;
-    case Picture::Band:
-        type = "Band";
-        break;
-    case Picture::Composer:
-        type = "Composer";
-        break;
-    case Picture::Lyricist:
-        type = "Lyricist";
-        break;
-    case Picture::RecordingLocation:
-        type = "RecordingLocation";
-        break;
-    case Picture::DuringRecording:
-        type = "DuringRecording";
-        break;
-    case Picture::DuringPerformance:
-        type = "DuringPerformance";
-        break;
-    case Picture::MovieScreenCapture:
-        type = "MovieScreenCapture";
-        break;
-    case Picture::ColouredFish:
-        type = "ColouredFish";
-        break;
-    case Picture::Illustration:
-        type = "Illustration";
-        break;
-    case Picture::BandLogo:
-        type = "BandLogo";
-        break;
-    case Picture::PublisherLogo:
-        type = "PublisherLogo";
-        break;
-    }
+  String type;
+  switch(p.type()) {
+  case Picture::Other:
+    type = "Other";
+    break;
+  case Picture::FileIcon:
+    type = "FileIcon";
+    break;
+  case Picture::OtherFileIcon:
+    type = "OtherFileIcon";
+    break;
+  case Picture::FrontCover:
+    type = "FrontCover";
+    break;
+  case Picture::BackCover:
+    type = "BackCover";
+    break;
+  case Picture::LeafletPage:
+    type = "LeafletPage";
+    break;
+  case Picture::Media:
+    type = "Media";
+    break;
+  case Picture::LeadArtist:
+    type = "LeadArtist";
+    break;
+  case Picture::Artist:
+    type = "Artist";
+    break;
+  case Picture::Conductor:
+    type = "Conductor";
+    break;
+  case Picture::Band:
+    type = "Band";
+    break;
+  case Picture::Composer:
+    type = "Composer";
+    break;
+  case Picture::Lyricist:
+    type = "Lyricist";
+    break;
+  case Picture::RecordingLocation:
+    type = "RecordingLocation";
+    break;
+  case Picture::DuringRecording:
+    type = "DuringRecording";
+    break;
+  case Picture::DuringPerformance:
+    type = "DuringPerformance";
+    break;
+  case Picture::MovieScreenCapture:
+    type = "MovieScreenCapture";
+    break;
+  case Picture::ColouredFish:
+    type = "ColouredFish";
+    break;
+  case Picture::Illustration:
+    type = "Illustration";
+    break;
+  case Picture::BandLogo:
+    type = "BandLogo";
+    break;
+  case Picture::PublisherLogo:
+    type = "PublisherLogo";
+    break;
+  }
 
-    ByteVector displayableData = p.data().mid(0,20).toHex();
-    s << "\nPicture:\n"
-      << "\ttype: " << type.to8Bit()                        << std::endl
-      << "\tdesc: " << p.description().to8Bit()             << std::endl
-      << "\tmime: " << p.mime().to8Bit()                    << std::endl
-      << "\tdata: " << std::hex << displayableData << "..." << std::endl;
+  ByteVector displayableData = p.data().mid(0, 20).toHex();
+  s << "\nPicture:\n"
+    << "\ttype: " << type.to8Bit()                        << std::endl
+    << "\tdesc: " << p.description().to8Bit()             << std::endl
+    << "\tmime: " << p.mime().to8Bit()                    << std::endl
+    << "\tdata: " << std::hex << displayableData << "..." << std::endl;
 
-    return s;
+  return s;
 }

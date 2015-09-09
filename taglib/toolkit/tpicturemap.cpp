@@ -31,57 +31,52 @@ PictureMap::PictureMap() : Map< Picture::Type, PictureList >()
 {
 }
 
-PictureMap::PictureMap(const PictureList& l)
-    : Map< Picture::Type, PictureList >()
+PictureMap::PictureMap(const PictureList &l)
+  : Map< Picture::Type, PictureList >()
 {
-    insert( l );
+  insert(l);
 }
 
-PictureMap::PictureMap(const Picture& p)
-    : Map< Picture::Type, PictureList >()
+PictureMap::PictureMap(const Picture &p)
+  : Map< Picture::Type, PictureList >()
 {
-    insert( p );
+  insert(p);
 }
 
-void PictureMap::insert(const Picture& p)
+void PictureMap::insert(const Picture &p)
 {
-    PictureList list;
-    if(contains(p.type()))
-    {
-        list = Map<Picture::Type, PictureList>::find(p.type())->second;
-        list.append( p );
-        Map<Picture::Type, PictureList>::insert(p.type(), list);
-    }
-    else{
-        list.append(p);
-        Map<Picture::Type, PictureList>::insert(p.type(), list);
-    }
+  PictureList list;
+  if(contains(p.type())) {
+    list = Map<Picture::Type, PictureList>::find(p.type())->second;
+    list.append(p);
+    Map<Picture::Type, PictureList>::insert(p.type(), list);
+  }
+  else {
+    list.append(p);
+    Map<Picture::Type, PictureList>::insert(p.type(), list);
+  }
 }
 
 void PictureMap::insert(const PictureList &l)
 {
-    for(PictureList::ConstIterator it = l.begin(); it != l.end(); ++it)
-    {
-        Picture picture = (*it);
-        insert(picture);
-    }
+  for(PictureList::ConstIterator it = l.begin(); it != l.end(); ++it) {
+    Picture picture = (*it);
+    insert(picture);
+  }
 }
 
 PictureMap::~PictureMap()
 {
 }
 
-std::ostream& operator<<(std::ostream& s, const PictureMap& map)
+std::ostream &operator<<(std::ostream &s, const PictureMap &map)
 {
-    for(PictureMap::ConstIterator it = map.begin(); it != map.end(); ++it)
-    {
-        PictureList list = it->second;
-        for(PictureList::ConstIterator it2 = list.begin();
-            it2 != list.end();
-            ++it2 )
-        {
-            s << *it2;
-        }
-    }
-    return s;
+  for(PictureMap::ConstIterator it = map.begin(); it != map.end(); ++it) {
+    PictureList list = it->second;
+    for(PictureList::ConstIterator it2 = list.begin();
+        it2 != list.end();
+        ++it2)
+      s << *it2;
+  }
+  return s;
 }

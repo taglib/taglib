@@ -33,16 +33,16 @@
 
 namespace TagLib {
 
-//! A list of pictures
+  //! A list of pictures
 
-typedef List<Picture> PictureList;
+  typedef List<Picture> PictureList;
 
-/*!
-* This is a spcialization of the List class with some members.
-*/
-class TAGLIB_EXPORT PictureMap : public Map< Picture::Type, PictureList >
-{
-public:
+  /*!
+  * This is a spcialization of the List class with some members.
+  */
+  class TAGLIB_EXPORT PictureMap : public Map< Picture::Type, PictureList >
+  {
+  public:
 
     /*!
      * Constructs an empty PictureList.
@@ -52,12 +52,12 @@ public:
     /*!
      * Constructs a PictureMap with \a Picture.
      */
-    PictureMap(const Picture& p);
+    PictureMap(const Picture &p);
 
     /*!
      * Constructs a PictureMap with \a PictureList as a member.
      */
-    PictureMap(const PictureList& l);
+    PictureMap(const PictureList &l);
 
     /*!
      * Destroys this PictureList instance.
@@ -68,17 +68,17 @@ public:
      * @brief insert
      * @param l
      */
-    void insert(const PictureList& l);
+    void insert(const PictureList &l);
 
     /**
      * @brief insert
      * @param p
      */
-    void insert(const Picture& p);
-};
+    void insert(const Picture &p);
+  };
 
 }
 
-TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::PictureMap& map);
+TAGLIB_EXPORT std::ostream &operator<<(std::ostream &s, const TagLib::PictureMap &map);
 
 #endif // TAGLIB_PICTUREMAP_H
