@@ -56,10 +56,10 @@ namespace
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
-    if(!path.wstr().empty())
-      return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    else if(!path.str().empty())
-      return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if(path.wstr()[0] != L'\0')
+      return CreateFileW(path.wstr(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    else if(path.str()[0] != '\0')
+      return CreateFileA(path.str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else
       return InvalidFileHandle;
   }

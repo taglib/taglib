@@ -46,8 +46,8 @@ namespace TagLib {
 
     FileName &operator=(const FileName &name);
 
-    const std::wstring &wstr() const;
-    const std::string  &str() const;
+    const wchar_t *wstr() const;
+    const char *str() const;
 
     String toString() const;
 

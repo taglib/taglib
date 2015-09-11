@@ -129,14 +129,14 @@ FileName &FileName::operator=(const FileName &name)
   return *this;
 }
 
-const std::wstring &FileName::wstr() const
+const wchar_t *FileName::wstr() const
 {
-  return d->data->wname;
+  return d->data->wname.c_str();
 }
 
-const std::string &FileName::str() const
+const char *FileName::str() const
 {
-  return d->data->name;
+  return d->data->name.c_str();
 }
 
 String FileName::toString() const
