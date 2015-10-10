@@ -305,6 +305,14 @@ public:
     CPPUNIT_ASSERT(f.tag()->contains("cpil"));
     CPPUNIT_ASSERT_EQUAL(false, f.tag()->item("cpil").toBool());
     CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["COMPILATION"]);
+
+    // Empty properties do not result in access violations
+    // when converting integers
+    tags["TRACKNUMBER"] = StringList();
+    tags["DISCNUMBER"] = StringList();
+    tags["BPM"] = StringList();
+    tags["COMPILATION"] = StringList();
+    f.setProperties(tags);
   }
 
   void testFuzzedFile()
