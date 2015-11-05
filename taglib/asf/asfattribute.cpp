@@ -72,10 +72,12 @@ ASF::Attribute::Attribute(const ASF::Attribute &other)
 
 ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
 {
-  if(d->deref())
-    delete d;
-  d = other.d;
-  d->ref();
+  if(&other != this) {
+    if(d->deref())
+      delete d;
+    d = other.d;
+    d->ref();
+  }
   return *this;
 }
 
