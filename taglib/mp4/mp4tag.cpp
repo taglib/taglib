@@ -917,7 +917,7 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
   for(; it != props.end(); ++it) {
     if(reverseKeyMap.contains(it->first)) {
       String name = reverseKeyMap[it->first];
-      if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && it->second.size() > 0) {
+      if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && !it->second.isEmpty()) {
         int first = 0, second = 0;
         StringList parts = StringList::split(it->second.front(), "/");
         if(parts.size() > 0) {
@@ -928,11 +928,11 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
           d->items[name] = MP4::Item(first, second);
         }
       }
-      else if(it->first == "BPM" && it->second.size() > 0) {
+      else if(it->first == "BPM" && !it->second.isEmpty()) {
         int value = it->second.front().toInt();
         d->items[name] = MP4::Item(value);
       }
-      else if(it->first == "COMPILATION" && it->second.size() > 0) {
+      else if(it->first == "COMPILATION" && !it->second.isEmpty()) {
         bool value = (it->second.front().toInt() != 0);
         d->items[name] = MP4::Item(value);
       }
