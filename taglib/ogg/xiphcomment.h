@@ -181,8 +181,28 @@ namespace TagLib {
       /*!
        * Remove the field specified by \a key with the data \a value.  If
        * \a value is null, all of the fields with the given key will be removed.
+       *
+       * \see removeFields()
+       *
+       * \deprecated May cause a linkage error depending on the situation.  Use
+       * removeFields() instead.
        */
       void removeField(const String &key, const String &value = String::null);
+
+      /*!
+       * Remove all the fields specified by \a key.
+       */
+      void removeFields(const String &key);
+
+      /*!
+       * Remove the fields specified by \a key with the data \a value.
+       */
+      void removeFields(const String &key, const String &value);
+
+      /*!
+       * Remove all the fields in the XiphComment.  Vendor ID will be preserved.
+       */
+      void removeAllFields();
 
       /*!
        * Returns true if the field is contained within the comment.
