@@ -36,7 +36,6 @@ class Ogg::XiphComment::XiphCommentPrivate
 public:
   FieldListMap fieldListMap;
   String vendorID;
-  String commentField;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,16 +81,10 @@ String Ogg::XiphComment::album() const
 
 String Ogg::XiphComment::comment() const
 {
-  if(!d->fieldListMap["DESCRIPTION"].isEmpty()) {
-    d->commentField = "DESCRIPTION";
-    return d->fieldListMap["DESCRIPTION"].toString();
-  }
-
-  if(!d->fieldListMap["COMMENT"].isEmpty()) {
-    d->commentField = "COMMENT";
+  if(!d->fieldListMap["COMMENT"].isEmpty())
     return d->fieldListMap["COMMENT"].toString();
-  }
-
+  if(!d->fieldListMap["DESCRIPTION"].isEmpty())
+    return d->fieldListMap["DESCRIPTION"].toString();
   return String::null;
 }
 
@@ -137,14 +130,8 @@ void Ogg::XiphComment::setAlbum(const String &s)
 
 void Ogg::XiphComment::setComment(const String &s)
 {
-  if(d->commentField.isEmpty()) {
-    if(!d->fieldListMap["DESCRIPTION"].isEmpty())
-      d->commentField = "DESCRIPTION";
-    else
-      d->commentField = "COMMENT";
-  }
-
-  addField(d->commentField, s);
+  removeField("DESCRIPTION");
+  addField("COMMENT", s);
 }
 
 void Ogg::XiphComment::setGenre(const String &s)
