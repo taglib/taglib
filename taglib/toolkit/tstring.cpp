@@ -114,6 +114,114 @@ namespace
 
     return len;
   }
+
+  // Returns the native format of std::wstring.
+  inline String::Type wcharByteOrder()
+  {
+    if(Utils::systemByteOrder() == Utils::LittleEndian)
+      return String::UTF16LE;
+    else
+      return String::UTF16BE;
+  }
+
+  // Converts a Latin-1 string into UTF-16(without BOM/CPU byte order)
+  // and copies it to the internal buffer.
+  inline void copyFromLatin1(std::wstring &data, const char *s, size_t length)
+  {
+    data.resize(length);
+
+    for(size_t i = 0; i < length; ++i)
+      data[i] = static_cast<uchar>(s[i]);
+  }
+
+  // Converts a UTF-8 string into UTF-16(without BOM/CPU byte order)
+  // and copies it to the internal buffer.
+  inline void copyFromUTF8(std::wstring &data, const char *s, size_t length)
+  {
+    data.resize(length);
+
+    if(length > 0) {
+      const size_t len = UTF8toUTF16(s, length, &data[0], data.size());
+      data.resize(len);
+    }
+  }
+
+  // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
+  // UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
+  inline void copyFromUTF16(std::wstring &data, const wchar_t *s, size_t length, String::Type t)
+  {
+    bool swap;
+    if(t == String::UTF16) {
+      if(length >= 1 && s[0] == 0xfeff)
+        swap = false; // Same as CPU endian. No need to swap bytes.
+      else if(length >= 1 && s[0] == 0xfffe)
+        swap = true;  // Not same as CPU endian. Need to swap bytes.
+      else {
+        debug("String::copyFromUTF16() - Invalid UTF16 string.");
+        return;
+      }
+
+      s++;
+      length--;
+    }
+    else {
+      swap = (t != wcharByteOrder());
+    }
+
+    data.resize(length);
+    if(length > 0) {
+      if(swap) {
+        for(size_t i = 0; i < length; ++i)
+          data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+      }
+      else {
+        ::wmemcpy(&data[0], s, length);
+      }
+    }
+  }
+
+  // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
+  // UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
+  inline void copyFromUTF16(std::wstring &data, const char *s, size_t length, String::Type t)
+  {
+    bool swap;
+    if(t == String::UTF16) {
+      if(length < 2) {
+        debug("String::copyFromUTF16() - Invalid UTF16 string.");
+        return;
+      }
+
+      // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
+      ushort bom;
+      ::memcpy(&bom, s, 2);
+
+      if(bom == 0xfeff)
+        swap = false; // Same as CPU endian. No need to swap bytes.
+      else if(bom == 0xfffe)
+        swap = true;  // Not same as CPU endian. Need to swap bytes.
+      else {
+        debug("String::copyFromUTF16() - Invalid UTF16 string.");
+        return;
+      }
+
+      s += 2;
+      length -= 2;
+    }
+    else {
+      swap = (t != wcharByteOrder());
+    }
+
+    data.resize(length / 2);
+    for(size_t i = 0; i < length / 2; ++i) {
+      ushort c;
+      ::memcpy(&c, s, 2);
+      if(swap)
+        c = Utils::byteSwap(c);
+
+      data[i] = static_cast<wchar_t>(c);
+      s += 2;
+    }
+  }
 }
 
 namespace TagLib {
@@ -152,6 +260,8 @@ public:
 String String::null;
 
 ////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
 String::String()
   : d(new StringPrivate())
@@ -168,9 +278,9 @@ String::String(const std::string &s, Type t)
   : d(new StringPrivate())
 {
   if(t == Latin1)
-    copyFromLatin1(s.c_str(), s.length());
+    copyFromLatin1(d->data, s.c_str(), s.length());
   else if(t == String::UTF8)
-    copyFromUTF8(s.c_str(), s.length());
+    copyFromUTF8(d->data, s.c_str(), s.length());
   else {
     debug("String::String() -- std::string should not contain UTF16.");
   }
@@ -183,11 +293,11 @@ String::String(const wstring &s, Type t)
     // This looks ugly but needed for the compatibility with TagLib1.8.
     // Should be removed in TabLib2.0.
     if (t == UTF16BE)
-      t = WCharByteOrder;
+      t = wcharByteOrder();
     else if (t == UTF16LE)
-      t = (WCharByteOrder == UTF16LE ? UTF16BE : UTF16LE);
+      t = (wcharByteOrder() == UTF16LE ? UTF16BE : UTF16LE);
 
-    copyFromUTF16(s.c_str(), s.length(), t);
+    copyFromUTF16(d->data, s.c_str(), s.length(), t);
   }
   else {
     debug("String::String() -- TagLib::wstring should not contain Latin1 or UTF-8.");
@@ -201,11 +311,11 @@ String::String(const wchar_t *s, Type t)
     // This looks ugly but needed for the compatibility with TagLib1.8.
     // Should be removed in TabLib2.0.
     if (t == UTF16BE)
-      t = WCharByteOrder;
+      t = wcharByteOrder();
     else if (t == UTF16LE)
-      t = (WCharByteOrder == UTF16LE ? UTF16BE : UTF16LE);
+      t = (wcharByteOrder() == UTF16LE ? UTF16BE : UTF16LE);
 
-    copyFromUTF16(s, ::wcslen(s), t);
+    copyFromUTF16(d->data, s, ::wcslen(s), t);
   }
   else {
     debug("String::String() -- const wchar_t * should not contain Latin1 or UTF-8.");
@@ -216,9 +326,9 @@ String::String(const char *s, Type t)
   : d(new StringPrivate())
 {
   if(t == Latin1)
-    copyFromLatin1(s, ::strlen(s));
+    copyFromLatin1(d->data, s, ::strlen(s));
   else if(t == String::UTF8)
-    copyFromUTF8(s, ::strlen(s));
+    copyFromUTF8(d->data, s, ::strlen(s));
   else {
     debug("String::String() -- const char * should not contain UTF16.");
   }
@@ -228,7 +338,7 @@ String::String(wchar_t c, Type t)
   : d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
-    copyFromUTF16(&c, 1, t);
+    copyFromUTF16(d->data, &c, 1, t);
   else {
     debug("String::String() -- wchar_t should not contain Latin1 or UTF-8.");
   }
@@ -249,11 +359,11 @@ String::String(const ByteVector &v, Type t)
     return;
 
   if(t == Latin1)
-    copyFromLatin1(v.data(), v.size());
+    copyFromLatin1(d->data, v.data(), v.size());
   else if(t == UTF8)
-    copyFromUTF8(v.data(), v.size());
+    copyFromUTF8(d->data, v.data(), v.size());
   else
-    copyFromUTF16(v.data(), v.size(), t);
+    copyFromUTF16(d->data, v.data(), v.size(), t);
 
   // If we hit a null in the ByteVector, shrink the string again.
   d->data.resize(::wcslen(d->data.c_str()));
@@ -652,7 +762,7 @@ String &String::operator=(const std::string &s)
     delete d;
 
   d = new StringPrivate;
-  copyFromLatin1(s.c_str(), s.length());
+  copyFromLatin1(d->data, s.c_str(), s.length());
 
   return *this;
 }
@@ -698,7 +808,7 @@ String &String::operator=(const char *s)
     delete d;
 
   d = new StringPrivate;
-  copyFromLatin1(s, ::strlen(s));
+  copyFromLatin1(d->data, s, ::strlen(s));
 
   return *this;
 }
@@ -709,7 +819,7 @@ String &String::operator=(const ByteVector &v)
     delete d;
 
   d = new StringPrivate;
-  copyFromLatin1(v.data(), v.size());
+  copyFromLatin1(d->data, v.data(), v.size());
 
   // If we hit a null in the ByteVector, shrink the string again.
   d->data.resize(::wcslen(d->data.c_str()));
@@ -733,107 +843,10 @@ void String::detach()
     d = new StringPrivate(d->data);
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// private members
-////////////////////////////////////////////////////////////////////////////////
-
-void String::copyFromLatin1(const char *s, size_t length)
-{
-  d->data.resize(length);
-
-  for(size_t i = 0; i < length; ++i)
-    d->data[i] = static_cast<uchar>(s[i]);
-}
-
-void String::copyFromUTF8(const char *s, size_t length)
-{
-  d->data.resize(length);
-
-  if(length > 0) {
-    const size_t len = UTF8toUTF16(s, length, &d->data[0], d->data.size());
-    d->data.resize(len);
-  }
-}
-
-void String::copyFromUTF16(const wchar_t *s, size_t length, Type t)
-{
-  bool swap;
-  if(t == UTF16) {
-    if(length >= 1 && s[0] == 0xfeff)
-      swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(length >= 1 && s[0] == 0xfffe)
-      swap = true;  // Not same as CPU endian. Need to swap bytes.
-    else {
-      debug("String::copyFromUTF16() - Invalid UTF16 string.");
-      return;
-    }
-
-    s++;
-    length--;
-  }
-  else
-    swap = (t != WCharByteOrder);
-
-  d->data.resize(length);
-  if(length > 0) {
-    if(swap) {
-      for(size_t i = 0; i < length; ++i)
-        d->data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
-    }
-    else {
-      ::wmemcpy(&d->data[0], s, length);
-    }
-  }
-}
-
-void String::copyFromUTF16(const char *s, size_t length, Type t)
-{
-  bool swap;
-  if(t == UTF16) {
-    if(length < 2) {
-      debug("String::copyFromUTF16() - Invalid UTF16 string.");
-      return;
-    }
-
-    // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
-    ushort bom;
-    ::memcpy(&bom, s, 2);
-
-    if(bom == 0xfeff)
-      swap = false; // Same as CPU endian. No need to swap bytes.
-    else if(bom == 0xfffe)
-      swap = true;  // Not same as CPU endian. Need to swap bytes.
-    else {
-      debug("String::copyFromUTF16() - Invalid UTF16 string.");
-      return;
-    }
-
-    s += 2;
-    length -= 2;
-  }
-  else
-    swap = (t != WCharByteOrder);
-
-  d->data.resize(length / 2);
-  for(size_t i = 0; i < length / 2; ++i) {
-    ushort c;
-    ::memcpy(&c, s, 2);
-    if(swap)
-      c = Utils::byteSwap(c);
-
-    d->data[i] = static_cast<wchar_t>(c);
-    s += 2;
-  }
-}
-
-const String::Type String::WCharByteOrder
-  = (Utils::systemByteOrder() == Utils::BigEndian) ? String::UTF16BE : String::UTF16LE;
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// related functions
+// related non-member functions
 ////////////////////////////////////////////////////////////////////////////////
 
 const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2)

@@ -515,37 +515,6 @@ namespace TagLib {
     void detach();
 
   private:
-    /*!
-     * Converts a \e Latin-1 string into \e UTF-16(without BOM/CPU byte order)
-     * and copies it to the internal buffer.
-     */
-    void copyFromLatin1(const char *s, size_t length);
-
-    /*!
-     * Converts a \e UTF-8 string into \e UTF-16(without BOM/CPU byte order)
-     * and copies it to the internal buffer.
-     */
-    void copyFromUTF8(const char *s, size_t length);
-
-    /*!
-     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
-     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-     */
-    void copyFromUTF16(const wchar_t *s, size_t length, Type t);
-
-    /*!
-     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
-     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-     */
-    void copyFromUTF16(const char *s, size_t length, Type t);
-
-    /*!
-     * Indicates which byte order of UTF-16 is used to store strings internally.
-     *
-     * \note \e String::UTF16BE or \e String::UTF16LE
-     */
-    static const Type WCharByteOrder;
-
     class StringPrivate;
     StringPrivate *d;
   };
