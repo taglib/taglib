@@ -17,6 +17,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testSetYear);
   CPPUNIT_TEST(testTrack);
   CPPUNIT_TEST(testSetTrack);
+  CPPUNIT_TEST(testSetComment);
   CPPUNIT_TEST(testInvalidKeys);
   CPPUNIT_TEST(testClearComment);
   CPPUNIT_TEST_SUITE_END();
@@ -61,6 +62,16 @@ public:
     cmt.setTrack(3);
     CPPUNIT_ASSERT(cmt.fieldListMap()["TRACKNUM"].isEmpty());
     CPPUNIT_ASSERT_EQUAL(String("3"), cmt.fieldListMap()["TRACKNUMBER"].front());
+  }
+
+  void testSetComment()
+  {
+    Ogg::XiphComment cmt;
+    cmt.addField("DESCRIPTION", "Test Comment 1");
+    cmt.addField("COMMENT", "Test Comment 2");
+    cmt.setComment("Test Comment 3");
+    CPPUNIT_ASSERT(cmt.fieldListMap()["DESCRIPTION"].isEmpty());
+    CPPUNIT_ASSERT_EQUAL(String("Test Comment 3"), cmt.fieldListMap()["COMMENT"].front());
   }
 
   void testInvalidKeys()
