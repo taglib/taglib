@@ -52,10 +52,15 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), tagOffset(-1), extendedHeader(0), footer(0), paddingSize(0)
+  TagPrivate() :
+    file(0),
+    tagOffset(-1),
+    extendedHeader(0),
+    footer(0)
   {
     frameList.setAutoDelete(true);
   }
+
   ~TagPrivate()
   {
     delete extendedHeader;
@@ -69,8 +74,6 @@ public:
   Header header;
   ExtendedHeader *extendedHeader;
   Footer *footer;
-
-  int paddingSize;
 
   FrameListMap frameListMap;
   FrameList frameList;
@@ -107,17 +110,17 @@ String Latin1StringHandler::parse(const ByteVector &data) const
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ID3v2::Tag::Tag() : TagLib::Tag()
+ID3v2::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
   d->factory = FrameFactory::instance();
 }
 
 ID3v2::Tag::Tag(File *file, long tagOffset, const FrameFactory *factory) :
-  TagLib::Tag()
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
-
   d->file = file;
   d->tagOffset = tagOffset;
   d->factory = factory;
@@ -710,7 +713,6 @@ void ID3v2::Tag::parse(const ByteVector &origData)
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
       }
 
-      d->paddingSize = frameDataLength - frameDataPosition;
       break;
     }
 
