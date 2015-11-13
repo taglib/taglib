@@ -27,6 +27,8 @@
 #include "config.h"
 #endif
 
+#include <algorithm>
+
 #include "tfile.h"
 
 #include "id3v2tag.h"
@@ -86,7 +88,8 @@ const ID3v2::Latin1StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defau
 
 namespace
 {
-  const TagLib::uint DefaultPaddingSize = 1024;
+  const long MinPaddingSize = 1024;
+  const long MaxPaddingSize = 1024 * 1024;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -569,8 +572,6 @@ ByteVector ID3v2::Tag::render(int version) const
   // in ID3v2::Header::tagSize() -- includes the extended header, frames and
   // padding, but does not include the tag's header or footer.
 
-  ByteVector tagData;
-
   if(version != 3 && version != 4) {
     debug("Unknown ID3v2 version, using ID3v2.4");
     version = 4;
@@ -578,7 +579,7 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // TODO: Render the extended header.
 
-  // Loop through the frames rendering them and adding them to the tagData.
+  // Downgrade the frames that ID3v2.3 doesn't support.
 
   FrameList newFrames;
   newFrames.setAutoDelete(true);
@@ -590,6 +591,12 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     downgradeFrames(&frameList, &newFrames);
   }
+
+  // Reserve a 10-byte blank space for an ID3v2 tag header.
+
+  ByteVector tagData(Header::size(), '\0');
+
+  // Loop through the frames rendering them and adding them to the tagData.
 
   for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
@@ -610,29 +617,35 @@ ByteVector ID3v2::Tag::render(int version) const
   }
 
   // Compute the amount of padding, and append that to tagData.
+  // TODO: Should be calculated in offset_t in taglib2.
 
-  uint paddingSize = DefaultPaddingSize;
+  long paddingSize = d->header.tagSize() - tagData.size();
 
-  if(d->file && tagData.size() < d->header.tagSize()) {
-    paddingSize = d->header.tagSize() - tagData.size();
+  if(paddingSize <= 0) {
+    paddingSize = MinPaddingSize;
+  }
+  else {
+    // Padding won't increase beyond 1% of the file size or 1MB.
 
-    // Padding won't increase beyond 1% of the file size.
+    long threshold = d->file ? d->file->length() / 100 : 0;
+    threshold = std::max(threshold, MinPaddingSize);
+    threshold = std::min(threshold, MaxPaddingSize);
 
-    if(paddingSize > DefaultPaddingSize) {
-      const uint threshold = d->file->length() / 100; // should be ulonglong in taglib2.
-      if(paddingSize > threshold)
-        paddingSize = DefaultPaddingSize;
-    }
+    if(paddingSize > threshold)
+      paddingSize = MinPaddingSize;
   }
 
-  tagData.append(ByteVector(paddingSize, '\0'));
+  tagData.resize(static_cast<uint>(tagData.size() + paddingSize), '\0');
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(tagData.size());
+  d->header.setTagSize(tagData.size() - Header::size());
 
   // TODO: This should eventually include d->footer->render().
-  return d->header.render() + tagData;
+  const ByteVector headerData = d->header.render();
+  std::copy(headerData.begin(), headerData.end(), tagData.begin());
+
+  return tagData;
 }
 
 Latin1StringHandler const *ID3v2::Tag::latin1StringHandler()
