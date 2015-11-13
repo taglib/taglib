@@ -19,6 +19,9 @@
 #cmakedefine   HAVE_VSNPRINTF 1
 #cmakedefine   HAVE_VSPRINTF_S 1
 
+/* Defined if your compiler supports ISO _strdup. */
+#cmakedefine   HAVE_ISO_STRDUP 1
+
 /* Defined if you have libz */
 #cmakedefine   HAVE_ZLIB 1
 

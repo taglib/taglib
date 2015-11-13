@@ -19,6 +19,10 @@
  *   USA                                                                   *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 #include <fileref.h>
 #include <tfile.h>
@@ -40,9 +44,32 @@
 
 using namespace TagLib;
 
-static List<char *> strings;
-static bool unicodeStrings = true;
-static bool stringManagementEnabled = true;
+namespace
+{
+  List<char *> strings;
+  bool unicodeStrings = true;
+  bool stringManagementEnabled = true;
+
+  inline char *stringToCharArray(const String &s)
+  {
+    const std::string str = s.to8Bit(unicodeStrings);
+
+#ifdef HAVE_ISO_STRDUP
+
+    return ::_strdup(str.c_str());
+
+#else
+
+    return ::strdup(str.c_str());
+
+#endif
+  }
+
+  inline String charArrayToString(const char *s)
+  {
+    return String(s, unicodeStrings ? String::UTF8 : String::Latin1);
+  }
+}
 
 void taglib_set_strings_unicode(BOOL unicode)
 {
@@ -132,7 +159,7 @@ BOOL taglib_file_save(TagLib_File *file)
 char *taglib_tag_title(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->title().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->title().toCString(unicodeStrings));
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -141,7 +168,7 @@ char *taglib_tag_title(const TagLib_Tag *tag)
 char *taglib_tag_artist(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->artist().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->artist().toCString(unicodeStrings));
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -150,7 +177,7 @@ char *taglib_tag_artist(const TagLib_Tag *tag)
 char *taglib_tag_album(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->album().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->album().toCString(unicodeStrings));
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -159,7 +186,7 @@ char *taglib_tag_album(const TagLib_Tag *tag)
 char *taglib_tag_comment(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->comment().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->comment().toCString(unicodeStrings));
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -168,7 +195,7 @@ char *taglib_tag_comment(const TagLib_Tag *tag)
 char *taglib_tag_genre(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = ::strdup(t->genre().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->genre().toCString(unicodeStrings));
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -189,31 +216,31 @@ unsigned int taglib_tag_track(const TagLib_Tag *tag)
 void taglib_tag_set_title(TagLib_Tag *tag, const char *title)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setTitle(String(title, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setTitle(charArrayToString(title));
 }
 
 void taglib_tag_set_artist(TagLib_Tag *tag, const char *artist)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setArtist(String(artist, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setArtist(charArrayToString(artist));
 }
 
 void taglib_tag_set_album(TagLib_Tag *tag, const char *album)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setAlbum(String(album, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setAlbum(charArrayToString(album));
 }
 
 void taglib_tag_set_comment(TagLib_Tag *tag, const char *comment)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setComment(String(comment, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setComment(charArrayToString(comment));
 }
 
 void taglib_tag_set_genre(TagLib_Tag *tag, const char *genre)
 {
   Tag *t = reinterpret_cast<Tag *>(tag);
-  t->setGenre(String(genre, unicodeStrings ? String::UTF8 : String::Latin1));
+  t->setGenre(charArrayToString(genre));
 }
 
 void taglib_tag_set_year(TagLib_Tag *tag, unsigned int year)

@@ -190,6 +190,16 @@ if(NOT HAVE_VSNPRINTF)
   " HAVE_VSPRINTF_S)
 endif()
 
+# Determine whether your compiler supports ISO _strdup.
+
+check_cxx_source_compiles("
+  #include <cstring>
+  int main() {
+    _strdup(0);
+    return 0;
+}
+" HAVE_ISO_STRDUP)
+
 # Check for libz using the cmake supplied FindZLIB.cmake
 
 if(NOT ZLIB_SOURCE)
