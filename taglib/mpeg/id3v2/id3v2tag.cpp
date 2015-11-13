@@ -619,7 +619,7 @@ ByteVector ID3v2::Tag::render(int version) const
   // Compute the amount of padding, and append that to tagData.
   // TODO: Should be calculated in offset_t in taglib2.
 
-  long paddingSize = d->header.tagSize() - tagData.size();
+  long paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
 
   if(paddingSize <= 0) {
     paddingSize = MinPaddingSize;
