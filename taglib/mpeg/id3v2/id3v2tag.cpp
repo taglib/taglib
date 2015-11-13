@@ -24,22 +24,22 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+# include "config.h"
 #endif
 
 #include <algorithm>
 
-#include "tfile.h"
+#include <tfile.h>
+#include <tbytevector.h>
+#include <tpropertymap.h>
+#include <tdebug.h>
 
 #include "id3v2tag.h"
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
-#include "tbytevector.h"
 #include "id3v1genres.h"
-#include "tpropertymap.h"
-#include "tdebug.h"
 
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
@@ -135,7 +135,6 @@ ID3v2::Tag::~Tag()
 {
   delete d;
 }
-
 
 String ID3v2::Tag::title() const
 {
@@ -564,7 +563,6 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   }
 }
 
-
 ByteVector ID3v2::Tag::render(int version) const
 {
   // We need to render the "tag data" first so that we have to correct size to
@@ -667,18 +665,43 @@ void ID3v2::Tag::setLatin1StringHandler(const Latin1StringHandler *handler)
 
 void ID3v2::Tag::read()
 {
-  if(d->file && d->file->isOpen()) {
+  if(!d->file)
+    return;
 
-    d->file->seek(d->tagOffset);
-    d->header.setData(d->file->readBlock(Header::size()));
+  if(!d->file->isOpen())
+    return;
 
-    // if the tag size is 0, then this is an invalid tag (tags must contain at
-    // least one frame)
+  d->file->seek(d->tagOffset);
+  d->header.setData(d->file->readBlock(Header::size()));
 
-    if(d->header.tagSize() == 0)
-      return;
+  // If the tag size is 0, then this is an invalid tag (tags must contain at
+  // least one frame)
 
+  if(d->header.tagSize() != 0)
     parse(d->file->readBlock(d->header.tagSize()));
+
+  // Look for duplicate ID3v2 tags and treat them as an extra blank of this one.
+  // It leads to overwriting them with zero when saving the tag.
+
+  // This is a workaround for some faulty files that have duplicate ID3v2 tags.
+  // Unfortunately, TagLib itself may write such duplicate tags until v1.10.
+
+  uint extraSize = 0;
+
+  while(true) {
+
+    d->file->seek(d->tagOffset + d->header.completeTagSize() + extraSize);
+
+    const ByteVector data = d->file->readBlock(Header::size());
+    if(data.size() < Header::size() || !data.startsWith(Header::fileIdentifier()))
+      break;
+
+    extraSize += Header(data).completeTagSize();
+  }
+
+  if(extraSize != 0) {
+    debug("ID3v2::Tag::read() - Duplicate ID3v2 tags found.");
+    d->header.setTagSize(d->header.tagSize() + extraSize);
   }
 }
 
