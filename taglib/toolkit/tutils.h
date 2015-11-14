@@ -63,7 +63,7 @@ namespace TagLib
     {
 #if defined(HAVE_BOOST_BYTESWAP)
 
-      return boost::endian::endian_reverse(x);
+      return boost::endian::endian_reverse(static_cast<uint16_t>(x));
 
 #elif defined(HAVE_GCC_BYTESWAP)
 
@@ -99,7 +99,7 @@ namespace TagLib
     {
 #if defined(HAVE_BOOST_BYTESWAP)
 
-      return boost::endian::endian_reverse(x);
+      return boost::endian::endian_reverse(static_cast<uint32_t>(x));
 
 #elif defined(HAVE_GCC_BYTESWAP)
 
@@ -138,7 +138,7 @@ namespace TagLib
     {
 #if defined(HAVE_BOOST_BYTESWAP)
 
-      return boost::endian::endian_reverse(x);
+      return boost::endian::endian_reverse(static_cast<uint64_t>(x));
 
 #elif defined(HAVE_GCC_BYTESWAP)
 
