@@ -124,6 +124,10 @@ public:
     CPPUNIT_ASSERT(i.containsAt(j, 5, 0));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
+
+    i.clear();
+    CPPUNIT_ASSERT(i.isEmpty());
+    CPPUNIT_ASSERT(!i.isNull());
   }
 
   void testFind1()
