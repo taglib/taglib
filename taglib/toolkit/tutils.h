@@ -213,10 +213,10 @@ namespace TagLib
 
       va_end(args);
 
-      if(length != -1)
+      if(length > 0)
         return String(buf);
       else
-        return String::null;
+        return String();
     }
 
     /*!
