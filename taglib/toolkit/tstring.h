@@ -332,7 +332,9 @@ namespace TagLib {
      * Returns true if this string is null -- i.e. it is a copy of the
      * String::null string.
      *
-     * \note A string can be empty and not null.
+     * \note A string can be empty and not null.  So do not use this method to
+     * check if the string is empty.
+     *
      * \see isEmpty()
      */
     bool isNull() const;
@@ -508,6 +510,9 @@ namespace TagLib {
 
     /*!
      * A null string provided for convenience.
+     *
+     * \warning Do not modify this variable.  It will mess up the internal state
+     * of TagLib.
      */
     static String null;
 
