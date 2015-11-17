@@ -300,6 +300,11 @@ namespace TagLib {
     String &append(const String &s);
 
     /*!
+     * Clears the string.
+     */
+    String &clear();
+
+    /*!
      * Returns an upper case version of the string.
      *
      * \warning This only works for the characters in US-ASCII, i.e. A-Z.

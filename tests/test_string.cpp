@@ -67,6 +67,10 @@ public:
     CPPUNIT_ASSERT(s != L"taglib");
     CPPUNIT_ASSERT(s != L"taglib string taglib");
 
+    s.clear();
+    CPPUNIT_ASSERT(s.isEmpty());
+    CPPUNIT_ASSERT(!s.isNull());
+
     String unicode("José Carlos", String::UTF8);
     CPPUNIT_ASSERT(strcmp(unicode.toCString(), "Jos\xe9 Carlos") == 0);
 

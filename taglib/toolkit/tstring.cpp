@@ -358,6 +358,12 @@ String &String::append(const String &s)
   return *this;
 }
 
+String & String::clear()
+{
+  *this = String();
+  return *this;
+}
+
 String String::upper() const
 {
   String s;
