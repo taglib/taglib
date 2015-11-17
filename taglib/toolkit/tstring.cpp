@@ -386,7 +386,7 @@ TagLib::uint String::length() const
 
 bool String::isEmpty() const
 {
-  return d->data.size() == 0;
+  return d->data.empty();
 }
 
 bool String::isNull() const
