@@ -34,7 +34,7 @@ using namespace TagLib;
 
 namespace
 {
-  bool checkValid(const MP4::AtomList &list)
+  inline bool checkValid(const MP4::AtomList &list)
   {
     for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
 
@@ -55,7 +55,8 @@ public:
   FilePrivate() :
     tag(0),
     atoms(0),
-    properties(0) {}
+    properties(0),
+    hasMP4Tag(false) {}
 
   ~FilePrivate()
   {
@@ -67,6 +68,8 @@ public:
   MP4::Tag        *tag;
   MP4::Atoms      *atoms;
   MP4::Properties *properties;
+
+  bool hasMP4Tag;
 };
 
 MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
@@ -130,10 +133,13 @@ MP4::File::read(bool readProperties)
   }
 
   // must have a moov atom, otherwise consider it invalid
-  MP4::Atom *moov = d->atoms->find("moov");
-  if(!moov) {
+  if(!d->atoms->find("moov")) {
     setValid(false);
     return;
+  }
+
+  if(d->atoms->find("moov", "udta", "meta", "ilst")) {
+    d->hasMP4Tag = true;
   }
 
   d->tag = new Tag(this, d->atoms);
@@ -155,6 +161,16 @@ MP4::File::save()
     return false;
   }
 
-  return d->tag->save();
+  const bool success = d->tag->save();
+  if(success) {
+    d->hasMP4Tag = true;
+  }
+
+  return success;
 }
 
+bool
+MP4::File::hasMP4Tag() const
+{
+  return d->hasMP4Tag;
+}
