@@ -19,6 +19,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
+  CPPUNIT_TEST(testHasTag);
   CPPUNIT_TEST(testIsEmpty);
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
@@ -67,12 +68,30 @@ public:
   {
     MP4::File f(TEST_FILE_PATH_C("empty.aiff"));
     CPPUNIT_ASSERT(!f.isValid());
-    MP4::File f2(TEST_FILE_PATH_C("has-tags.m4a"));
-    CPPUNIT_ASSERT(f2.isValid());
-    CPPUNIT_ASSERT(f2.hasMP4Tag());
-    MP4::File f3(TEST_FILE_PATH_C("no-tags.m4a"));
-    CPPUNIT_ASSERT(f3.isValid());
-    CPPUNIT_ASSERT(!f3.hasMP4Tag());
+  }
+
+  void testHasTag()
+  {
+    {
+      MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+    }
+
+    ScopedFileCopy copy("no-tags", ".m4a");
+
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasMP4Tag());
+      f.tag()->setTitle("TITLE");
+      f.save();
+    }
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+    }
   }
 
   void testIsEmpty()
