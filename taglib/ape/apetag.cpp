@@ -344,13 +344,9 @@ ByteVector APE::Tag::render() const
   ByteVector data;
   uint itemCount = 0;
 
-  {
-    for(Map<const String, Item>::ConstIterator it = d->itemListMap.begin();
-        it != d->itemListMap.end(); ++it)
-    {
-      data.append(it->second.render());
-      itemCount++;
-    }
+  for(ItemListMap::ConstIterator it = d->itemListMap.begin(); it != d->itemListMap.end(); ++it) {
+    data.append(it->second.render());
+    itemCount++;
   }
 
   d->footer.setItemCount(itemCount);
