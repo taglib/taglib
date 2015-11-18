@@ -746,7 +746,9 @@ ByteVector::ReverseIterator ByteVector::rbegin()
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  return d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length));
+  // we need a const reference to the data vector so we can ensure the const version of rbegin() is called
+  const std::vector<char> &v = d->data->data;
+  return v.rbegin() + (v.size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
@@ -757,7 +759,9 @@ ByteVector::ReverseIterator ByteVector::rend()
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  return d->data->data.rbegin() + (d->data->data.size() - d->offset);
+  // we need a const reference to the data vector so we can ensure the const version of rbegin() is called
+  const std::vector<char> &v = d->data->data;
+  return v.rbegin() + (v.size() - d->offset);
 }
 
 bool ByteVector::isNull() const
