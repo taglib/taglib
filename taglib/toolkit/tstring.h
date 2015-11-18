@@ -495,6 +495,11 @@ namespace TagLib {
     String &operator=(const ByteVector &v);
 
     /*!
+     * Exchanges the content of the String by the content of \a s.
+     */
+    void swap(String &s);
+
+    /*!
      * To be able to use this class in a Map, this operator needed to be
      * implemented.  Returns true if \a s is less than this string in a byte-wise
      * comparison.
