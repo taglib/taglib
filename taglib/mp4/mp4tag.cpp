@@ -332,8 +332,8 @@ ByteVector
 MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data) const
 {
   ByteVector result;
-  for(unsigned int i = 0; i < data.size(); i++) {
-    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + data[i]));
+  for(ByteVectorList::ConstIterator it = data.begin(); it != data.end(); ++it) {
+    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + *it));
   }
   return renderAtom(name, result);
 }
@@ -404,8 +404,8 @@ MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags) c
 {
   ByteVectorList data;
   StringList value = item.toStringList();
-  for(unsigned int i = 0; i < value.size(); i++) {
-    data.append(value[i].data(String::UTF8));
+  for(StringList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+    data.append(it->data(String::UTF8));
   }
   return renderData(name, flags, data);
 }
@@ -444,14 +444,14 @@ MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
   }
   if(type == TypeUTF8) {
     StringList value = item.toStringList();
-    for(unsigned int i = 0; i < value.size(); i++) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + value[i].data(String::UTF8)));
+    for(StringList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + it->data(String::UTF8)));
     }
   }
   else {
     ByteVectorList value = item.toByteVectorList();
-    for(unsigned int i = 0; i < value.size(); i++) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + value[i]));
+    for(ByteVectorList::ConstIterator it = value.begin(); it != value.end(); ++it) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + *it));
     }
   }
   return renderAtom("----", data);
@@ -875,8 +875,7 @@ PropertyMap MP4::Tag::properties() const
   }
 
   PropertyMap props;
-  MP4::ItemMap::ConstIterator it = d->items.begin();
-  for(; it != d->items.end(); ++it) {
+  for(MP4::ItemMap::ConstIterator it = d->items.begin(); it != d->items.end(); ++it) {
     if(keyMap.contains(it->first)) {
       String key = keyMap[it->first];
       if(key == "TRACKNUMBER" || key == "DISCNUMBER") {
@@ -906,8 +905,7 @@ PropertyMap MP4::Tag::properties() const
 
 void MP4::Tag::removeUnsupportedProperties(const StringList &props)
 {
-  StringList::ConstIterator it = props.begin();
-  for(; it != props.end(); ++it)
+  for(StringList::ConstIterator it = props.begin(); it != props.end(); ++it)
     d->items.erase(*it);
 }
 
@@ -922,16 +920,14 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
   }
 
   PropertyMap origProps = properties();
-  PropertyMap::ConstIterator it = origProps.begin();
-  for(; it != origProps.end(); ++it) {
+  for(PropertyMap::ConstIterator it = origProps.begin(); it != origProps.end(); ++it) {
     if(!props.contains(it->first) || props[it->first].isEmpty()) {
       d->items.erase(reverseKeyMap[it->first]);
     }
   }
 
   PropertyMap ignoredProps;
-  it = props.begin();
-  for(; it != props.end(); ++it) {
+  for(PropertyMap::ConstIterator it = props.begin(); it != props.end(); ++it) {
     if(reverseKeyMap.contains(it->first)) {
       String name = reverseKeyMap[it->first];
       if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && !it->second.isEmpty()) {
