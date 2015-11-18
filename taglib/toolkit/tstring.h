@@ -336,7 +336,10 @@ namespace TagLib {
      * check if the string is empty.
      *
      * \see isEmpty()
+     *
+     * \deprecated
      */
+     // BIC: remove
     bool isNull() const;
 
     /*!
@@ -513,7 +516,10 @@ namespace TagLib {
      *
      * \warning Do not modify this variable.  It will mess up the internal state
      * of TagLib.
+     *
+     * \deprecated
      */
+     // BIC: remove
     static String null;
 
   protected:
