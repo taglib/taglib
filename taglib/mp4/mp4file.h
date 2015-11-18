@@ -118,7 +118,8 @@ namespace TagLib {
       bool save();
 
       /*!
-       * Returns whether or not the file on disk actually has an MP4 tag.
+       * Returns whether or not the file on disk actually has an MP4 tag, or the
+       * file has a Metadata Item List (ilst) atom.
        */
       bool hasMP4Tag() const;
 
