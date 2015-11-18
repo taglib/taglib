@@ -635,7 +635,7 @@ void XM::File::read(bool)
 
   d->properties.setSampleCount(sumSampleCount);
   String comment(intrumentNames.toString("\n"));
-  if(sampleNames.size() > 0) {
+  if(!sampleNames.isEmpty()) {
     comment += "\n";
     comment += sampleNames.toString("\n");
   }

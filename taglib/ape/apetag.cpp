@@ -247,7 +247,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
     if(!checkKey(tagName))
       invalid.insert(it->first, it->second);
     else if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == it->second)) {
-      if(it->second.size() == 0)
+      if(it->second.isEmpty())
         removeItem(tagName);
       else {
         StringList::ConstIterator valueIt = it->second.begin();

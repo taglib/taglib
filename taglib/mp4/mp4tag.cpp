@@ -161,7 +161,7 @@ void
 MP4::Tag::parseInt(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     addItem(atom->name, (int)data[0].toShort());
   }
 }
@@ -170,7 +170,7 @@ void
 MP4::Tag::parseUInt(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     addItem(atom->name, data[0].toUInt());
   }
 }
@@ -179,7 +179,7 @@ void
 MP4::Tag::parseLongLong(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     addItem(atom->name, data[0].toLongLong());
   }
 }
@@ -188,7 +188,7 @@ void
 MP4::Tag::parseByte(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     addItem(atom->name, (uchar)data[0].at(0));
   }
 }
@@ -197,7 +197,7 @@ void
 MP4::Tag::parseGnre(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     int idx = (int)data[0].toShort();
     if(idx > 0) {
       addItem("\251gen", StringList(ID3v1::genre(idx - 1)));
@@ -209,7 +209,7 @@ void
 MP4::Tag::parseIntPair(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     const int a = data[0].toShort(2U);
     const int b = data[0].toShort(4U);
     addItem(atom->name, MP4::Item(a, b));
@@ -220,7 +220,7 @@ void
 MP4::Tag::parseBool(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     bool value = data[0].size() ? data[0][0] != '\0' : false;
     addItem(atom->name, value);
   }
@@ -230,7 +230,7 @@ void
 MP4::Tag::parseText(const MP4::Atom *atom, int expectedFlags)
 {
   ByteVectorList data = parseData(atom, expectedFlags);
-  if(data.size()) {
+  if(!data.isEmpty()) {
     StringList value;
     for(ByteVectorList::ConstIterator it = data.begin(); it != data.end(); ++it) {
       value.append(String(*it, String::UTF8));
@@ -426,7 +426,7 @@ ByteVector
 MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
 {
   StringList header = StringList::split(name, ":");
-  if (header.size() != 3) {
+  if(header.size() != 3) {
     debug("MP4: Invalid free-form item name \"" + name + "\"");
     return ByteVector::null;
   }
@@ -937,7 +937,7 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
       if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && !it->second.isEmpty()) {
         int first = 0, second = 0;
         StringList parts = StringList::split(it->second.front(), "/");
-        if(parts.size() > 0) {
+        if(!parts.isEmpty()) {
           first = parts[0].toInt();
           if(parts.size() > 1) {
             second = parts[1].toInt();

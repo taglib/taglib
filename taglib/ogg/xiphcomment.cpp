@@ -214,7 +214,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
       invalid.insert(it->first, it->second);
     else if(!d->fieldListMap.contains(it->first) || !(it->second == d->fieldListMap[it->first])) {
       const StringList &sl = it->second;
-      if(sl.size() == 0)
+      if(sl.isEmpty())
         // zero size string list -> remove the tag with all values
         removeField(it->first);
       else {
