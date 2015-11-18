@@ -146,8 +146,16 @@ namespace TagLib {
 
     /*!
      * Returns the number of elements in the list.
+     *
+     * \see isEmpty()
      */
     uint size() const;
+
+    /*!
+     * Returns whether or not the list is empty.
+     *
+     * \see size()
+     */
     bool isEmpty() const;
 
     /*!
