@@ -43,6 +43,8 @@ const char *MP4::Atom::containers[11] = {
 
 MP4::Atom::Atom(File *file)
 {
+  children.setAutoDelete(true);
+
   offset = file->tell();
   ByteVector header = file->readBlock(8);
   if (header.size() != 8) {
@@ -106,10 +108,6 @@ MP4::Atom::Atom(File *file)
 
 MP4::Atom::~Atom()
 {
-  for(unsigned int i = 0; i < children.size(); i++) {
-    delete children[i];
-  }
-  children.clear();
 }
 
 MP4::Atom *
@@ -118,9 +116,9 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
   if(name1 == 0) {
     return this;
   }
-  for(unsigned int i = 0; i < children.size(); i++) {
-    if(children[i]->name == name1) {
-      return children[i]->find(name2, name3, name4);
+  for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
+    if((*it)->name == name1) {
+      return (*it)->find(name2, name3, name4);
     }
   }
   return 0;
@@ -130,12 +128,12 @@ MP4::AtomList
 MP4::Atom::findall(const char *name, bool recursive)
 {
   MP4::AtomList result;
-  for(unsigned int i = 0; i < children.size(); i++) {
-    if(children[i]->name == name) {
-      result.append(children[i]);
+  for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
+    if((*it)->name == name) {
+      result.append(*it);
     }
     if(recursive) {
-      result.append(children[i]->findall(name, recursive));
+      result.append((*it)->findall(name, recursive));
     }
   }
   return result;
@@ -148,9 +146,9 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
   if(name1 == 0) {
     return true;
   }
-  for(unsigned int i = 0; i < children.size(); i++) {
-    if(children[i]->name == name1) {
-      return children[i]->path(path, name2, name3);
+  for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
+    if((*it)->name == name1) {
+      return (*it)->path(path, name2, name3);
     }
   }
   return false;
@@ -158,6 +156,8 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
 
 MP4::Atoms::Atoms(File *file)
 {
+  atoms.setAutoDelete(true);
+
   file->seek(0, File::End);
   long end = file->tell();
   file->seek(0);
@@ -171,18 +171,14 @@ MP4::Atoms::Atoms(File *file)
 
 MP4::Atoms::~Atoms()
 {
-  for(unsigned int i = 0; i < atoms.size(); i++) {
-    delete atoms[i];
-  }
-  atoms.clear();
 }
 
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)
 {
-  for(unsigned int i = 0; i < atoms.size(); i++) {
-    if(atoms[i]->name == name1) {
-      return atoms[i]->find(name2, name3, name4);
+  for(AtomList::ConstIterator it = atoms.begin(); it != atoms.end(); ++it) {
+    if((*it)->name == name1) {
+      return (*it)->find(name2, name3, name4);
     }
   }
   return 0;
@@ -192,9 +188,9 @@ MP4::AtomList
 MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const char *name4)
 {
   MP4::AtomList path;
-  for(unsigned int i = 0; i < atoms.size(); i++) {
-    if(atoms[i]->name == name1) {
-      if(!atoms[i]->path(path, name2, name3, name4)) {
+  for(AtomList::ConstIterator it = atoms.begin(); it != atoms.end(); ++it) {
+    if((*it)->name == name1) {
+      if(!(*it)->path(path, name2, name3, name4)) {
         path.clear();
       }
       return path;
@@ -202,4 +198,3 @@ MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const 
   }
   return path;
 }
-
