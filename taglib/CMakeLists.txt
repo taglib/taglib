@@ -83,6 +83,7 @@ set(tag_HDRS
   mpeg/id3v2/frames/urllinkframe.h
   mpeg/id3v2/frames/chapterframe.h
   mpeg/id3v2/frames/tableofcontentsframe.h
+  mpeg/id3v2/frames/podcastframe.h
   ogg/oggfile.h
   ogg/oggpage.h
   ogg/oggpageheader.h
@@ -177,6 +178,7 @@ set(frames_SRCS
   mpeg/id3v2/frames/urllinkframe.cpp
   mpeg/id3v2/frames/chapterframe.cpp
   mpeg/id3v2/frames/tableofcontentsframe.cpp
+  mpeg/id3v2/frames/podcastframe.cpp
 )
 
 set(ogg_SRCS
