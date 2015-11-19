@@ -26,7 +26,7 @@
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #include "tstring.h"
@@ -36,6 +36,8 @@
 #include "tutils.h"
 
 #include <iostream>
+#include <cerrno>
+#include <climits>
 #include <cstdio>
 #include <cstring>
 
@@ -229,16 +231,12 @@ namespace TagLib {
 class String::StringPrivate : public RefCounter
 {
 public:
-  StringPrivate()
-    : RefCounter()
-  {
-  }
+  StringPrivate() :
+    RefCounter() {}
 
-  StringPrivate(uint n, wchar_t c)
-    : RefCounter()
-    , data(static_cast<size_t>(n), c)
-  {
-  }
+  StringPrivate(uint n, wchar_t c) :
+    RefCounter(),
+    data(static_cast<size_t>(n), c) {}
 
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian.
@@ -257,19 +255,19 @@ String String::null;
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-String::String()
-  : d(new StringPrivate())
+String::String() :
+  d(new StringPrivate())
 {
 }
 
-String::String(const String &s)
-  : d(s.d)
+String::String(const String &s) :
+  d(s.d)
 {
   d->ref();
 }
 
-String::String(const std::string &s, Type t)
-  : d(new StringPrivate())
+String::String(const std::string &s, Type t) :
+  d(new StringPrivate())
 {
   if(t == Latin1)
     copyFromLatin1(d->data, s.c_str(), s.length());
@@ -280,8 +278,8 @@ String::String(const std::string &s, Type t)
   }
 }
 
-String::String(const wstring &s, Type t)
-  : d(new StringPrivate())
+String::String(const wstring &s, Type t) :
+  d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     // This looks ugly but needed for the compatibility with TagLib1.8.
@@ -298,8 +296,8 @@ String::String(const wstring &s, Type t)
   }
 }
 
-String::String(const wchar_t *s, Type t)
-  : d(new StringPrivate())
+String::String(const wchar_t *s, Type t) :
+  d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     // This looks ugly but needed for the compatibility with TagLib1.8.
@@ -316,8 +314,8 @@ String::String(const wchar_t *s, Type t)
   }
 }
 
-String::String(const char *s, Type t)
-  : d(new StringPrivate())
+String::String(const char *s, Type t) :
+  d(new StringPrivate())
 {
   if(t == Latin1)
     copyFromLatin1(d->data, s, ::strlen(s));
@@ -328,8 +326,8 @@ String::String(const char *s, Type t)
   }
 }
 
-String::String(wchar_t c, Type t)
-  : d(new StringPrivate())
+String::String(wchar_t c, Type t) :
+  d(new StringPrivate())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(d->data, &c, 1, t);
@@ -338,16 +336,16 @@ String::String(wchar_t c, Type t)
   }
 }
 
-String::String(char c, Type t)
-  : d(new StringPrivate(1, static_cast<uchar>(c)))
+String::String(char c, Type t) :
+  d(new StringPrivate(1, static_cast<uchar>(c)))
 {
   if(t != Latin1 && t != UTF8) {
     debug("String::String() -- char should not contain UTF16.");
   }
 }
 
-String::String(const ByteVector &v, Type t)
-  : d(new StringPrivate())
+String::String(const ByteVector &v, Type t) :
+  d(new StringPrivate())
 {
   if(v.isEmpty())
     return;
@@ -582,49 +580,29 @@ int String::toInt() const
 
 int String::toInt(bool *ok) const
 {
-  int value = 0;
+  const wchar_t *begin = d->data.c_str();
+  wchar_t *end;
+  errno = 0;
+  const long value = ::wcstol(begin, &end, 10);
 
-  uint size = d->data.size();
-  bool negative = size > 0 && d->data[0] == '-';
-  uint start = negative ? 1 : 0;
-  uint i = start;
+  // Has wcstol() consumed the entire string and not overflowed?
+  if(ok) {
+    *ok = (errno == 0 && end > begin && *end == L'\0');
+    *ok = (*ok && value > INT_MIN && value < INT_MAX);
+  }
 
-  for(; i < size && d->data[i] >= '0' && d->data[i] <= '9'; i++)
-    value = value * 10 + (d->data[i] - '0');
-
-  if(negative)
-    value = value * -1;
-
-  if(ok)
-    *ok = (size > start && i == size);
-
-  return value;
-}
+  return static_cast<int>(value);}
 
 String String::stripWhiteSpace() const
 {
-  wstring::const_iterator begin = d->data.begin();
-  wstring::const_iterator end = d->data.end();
+  static const wchar_t *WhiteSpaceChars = L"\t\n\f\r ";
 
-  while(begin != end &&
-        (*begin == '\t' || *begin == '\n' || *begin == '\f' ||
-         *begin == '\r' || *begin == ' '))
-  {
-    ++begin;
-  }
+  const size_t pos1 = d->data.find_first_not_of(WhiteSpaceChars);
+  if(pos1 == std::wstring::npos)
+    return String();
 
-  if(begin == end)
-    return null;
-
-  // There must be at least one non-whitespace character here for us to have
-  // gotten this far, so we should be safe not doing bounds checking.
-
-  do {
-    --end;
-  } while(*end == '\t' || *end == '\n' ||
-          *end == '\f' || *end == '\r' || *end == ' ');
-
-  return String(wstring(begin, end + 1));
+  const size_t pos2 = d->data.find_last_not_of(WhiteSpaceChars);
+  return substr(pos1, pos2 - pos1 + 1);
 }
 
 bool String::isLatin1() const
