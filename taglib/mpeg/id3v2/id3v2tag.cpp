@@ -51,6 +51,29 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace
+{
+  class DefaultStringHandler : public TagLib::StringHandler
+  {
+    virtual String parse(const ByteVector &data) const
+    {
+      return String(data, String::Latin1);
+    }
+
+    virtual ByteVector render(const String &s) const
+    {
+      // Not implemented on purpose. This function is never used.
+      return ByteVector();
+    }
+  };
+
+  const DefaultStringHandler defaultStringHandler;
+  const TagLib::StringHandler *stringHandler = &defaultStringHandler;
+
+  const offset_t MinPaddingSize = 1024;
+  const offset_t MaxPaddingSize = 1024 * 1024;
+}
+
 class ID3v2::Tag::TagPrivate
 {
 public:
@@ -79,40 +102,7 @@ public:
 
   FrameListMap frameListMap;
   FrameList frameList;
-
-  static const TagLib::StringHandler *stringHandler;
 };
-
-namespace
-{
-  const ID3v2::Latin1StringHandler defaultStringHandler;
-}
-
-const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStringHandler;
-
-namespace
-{
-  const offset_t MinPaddingSize = 1024;
-  const offset_t MaxPaddingSize = 1024 * 1024;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Latin1StringHandler implementation
-////////////////////////////////////////////////////////////////////////////////
-
-ID3v2::Latin1StringHandler::Latin1StringHandler()
-{
-}
-
-String ID3v2::Latin1StringHandler::parse(const ByteVector &data) const
-{
-  return String(data, String::Latin1);
-}
-
-ByteVector ID3v2::Latin1StringHandler::render(const String &) const
-{
-  return ByteVector();
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -140,7 +130,6 @@ ID3v2::Tag::~Tag()
 {
   delete d;
 }
-
 
 String ID3v2::Tag::title() const
 {
@@ -654,15 +643,15 @@ ByteVector ID3v2::Tag::render(int version) const
 
 TagLib::StringHandler const *ID3v2::Tag::latin1StringHandler()
 {
-  return TagPrivate::stringHandler;
+  return stringHandler;
 }
 
 void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    stringHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    stringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

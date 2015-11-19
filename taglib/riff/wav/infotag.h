@@ -45,38 +45,6 @@ namespace TagLib {
 
     typedef Map<ByteVector, String> FieldMap;
 
-    //! A abstraction for the string to data encoding in Info tags.
-
-    /*!
-     * RIFF INFO tag has no clear definitions about character encodings.
-     * In practice, local encoding of each system is largely used and UTF-8 is
-     * popular too.
-     *
-     * Here is an option to read and write tags in your preferred encoding
-     * by subclassing this class, reimplementing parse() and render() and setting
-     * your reimplementation as the default with Info::Tag::setStringHandler().
-     *
-     * \see ID3v1::Tag::setStringHandler()
-     */
-
-    class TAGLIB_EXPORT StringHandler : public TagLib::StringHandler
-    {
-    public:
-      StringHandler();
-
-      /*!
-       * Decode a string from \a data.  The default implementation assumes that
-       * \a data is an UTF-8 character array.
-       */
-      virtual String parse(const ByteVector &data) const;
-
-      /*!
-       * Encode a ByteVector with the data from \a s.  The default implementation
-       * assumes that \a s is an UTF-8 string.
-       */
-      virtual ByteVector render(const String &s) const;
-    };
-
     //! The main class in the RIFF INFO tag implementation
 
     /*!
@@ -169,8 +137,6 @@ namespace TagLib {
        *
        * \note The caller is responsible for deleting the previous handler
        * as needed after it is released.
-       *
-       * \see StringHandler
        */
       static void setStringHandler(const TagLib::StringHandler *handler);
 

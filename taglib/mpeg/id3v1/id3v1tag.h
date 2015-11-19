@@ -39,48 +39,6 @@ namespace TagLib {
 
   namespace ID3v1 {
 
-    //! A abstraction for the string to data encoding in ID3v1 tags.
-
-    /*!
-     * ID3v1 should in theory always contain ISO-8859-1 (Latin1) data.  In
-     * practice it does not.  TagLib by default only supports ISO-8859-1 data
-     * in ID3v1 tags.
-     *
-     * However by subclassing TagLib::StringHandler class and reimplementing 
-     * parse() and render() and setting your reimplementation as the default 
-     * with ID3v1::Tag::setStringHandler() you can define how you would like 
-     * these transformations to be done.
-     *
-     * \warning It is advisable <b>not</b> to write non-ISO-8859-1 data to ID3v1
-     * tags.  Please consider disabling the writing of ID3v1 tags in the case
-     * that the data is not ISO-8859-1.
-     *
-     * \see ID3v1::Tag::setStringHandler()
-     */
-
-    class TAGLIB_EXPORT StringHandler : public TagLib::StringHandler
-    {
-    public:
-      StringHandler();
-
-      /*!
-       * Decode a string from \a data.  The default implementation assumes that
-       * \a data is an ISO-8859-1 (Latin1) character array.
-       */
-      virtual String parse(const ByteVector &data) const;
-
-      /*!
-       * Encode a ByteVector with the data from \a s.  The default implementation
-       * assumes that \a s is an ISO-8859-1 (Latin1) string.  If the string is
-       * does not conform to ISO-8859-1, no value is written.
-       *
-       * \warning It is recommended that you <b>not</b> override this method, but
-       * instead do not write an ID3v1 tag in the case that the data is not
-       * ISO-8859-1.
-       */
-      virtual ByteVector render(const String &s) const;
-    };
-
     //! The main class in the ID3v1 implementation
 
     /*!
@@ -173,8 +131,6 @@ namespace TagLib {
        *
        * \note The caller is responsible for deleting the previous handler
        * as needed after it is released.
-       *
-       * \see StringHandler
        */
       static void setStringHandler(const TagLib::StringHandler *handler);
 
