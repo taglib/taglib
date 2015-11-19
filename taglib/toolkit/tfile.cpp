@@ -179,7 +179,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
       }
     }
 
-    if(!before.isNull()
+    if(!before.isEmpty()
       && beforePreviousPartialMatch != ByteVector::npos
       && bufferSize() > beforePreviousPartialMatch)
     {
@@ -198,7 +198,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
       return bufferOffset + location;
     }
 
-    if(!before.isNull() && buffer.find(before) != ByteVector::npos) {
+    if(!before.isEmpty() && buffer.find(before) != ByteVector::npos) {
       seek(originalPosition);
       return -1;
     }
@@ -207,7 +207,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
     previousPartialMatch = buffer.endsWithPartialMatch(pattern);
 
-    if(!before.isNull())
+    if(!before.isEmpty())
       beforePreviousPartialMatch = buffer.endsWithPartialMatch(before);
 
     bufferOffset += bufferSize();
@@ -268,7 +268,7 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
       return bufferOffset + location;
     }
 
-    if(!before.isNull() && buffer.find(before) != ByteVector::npos) {
+    if(!before.isEmpty() && buffer.find(before) != ByteVector::npos) {
       seek(originalPosition);
       return -1;
     }

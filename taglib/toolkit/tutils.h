@@ -34,7 +34,9 @@
 # include <config.h>
 #endif
 
-#if defined(HAVE_MSC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+# include <boost/endian/conversion.hpp>
+#elif defined(HAVE_MSC_BYTESWAP)
 # include <stdlib.h>
 #elif defined(HAVE_GLIBC_BYTESWAP)
 # include <byteswap.h>
@@ -59,7 +61,11 @@ namespace TagLib
      */
     inline ushort byteSwap(ushort x)
     {
-#if defined(HAVE_GCC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(static_cast<uint16_t>(x));
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap16(x);
 
@@ -91,7 +97,11 @@ namespace TagLib
      */
     inline uint byteSwap(uint x)
     {
-#if defined(HAVE_GCC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(static_cast<uint32_t>(x));
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap32(x);
 
@@ -126,7 +136,11 @@ namespace TagLib
      */
     inline ulonglong byteSwap(ulonglong x)
     {
-#if defined(HAVE_GCC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(static_cast<uint64_t>(x));
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap64(x);
 
@@ -199,10 +213,10 @@ namespace TagLib
 
       va_end(args);
 
-      if(length != -1)
+      if(length > 0)
         return String(buf);
       else
-        return String::null;
+        return String();
     }
 
     /*!

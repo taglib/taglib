@@ -38,7 +38,7 @@
  * conversion happening in the background
  */
 
-#if QT_VERSION >= 0x040000
+#if defined(QT_VERSION) && (QT_VERSION >= 0x040000)
 #define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
 #else
 #define QStringToTString(s) TagLib::String(s.utf8().data(), TagLib::String::UTF8)
@@ -199,7 +199,8 @@ namespace TagLib {
 
     /*!
      * Returns a deep copy of this String as a wstring.  The returned string is
-     * encoded in UTF-16 (without BOM/CPU byte order).
+     * encoded in UTF-16 (without BOM/CPU byte order), not UTF-32 even if wchar_t
+     * is 32-bit wide.
      *
      * \see toCWString()
      */
@@ -228,7 +229,7 @@ namespace TagLib {
     /*!
      * Returns a standard C-style (null-terminated) wide character version of
      * this String.  The returned string is encoded in UTF-16 (without BOM/CPU byte
-     * order).
+     * order), not UTF-32 even if wchar_t is 32-bit wide.
      *
      * The returned string is still owned by this String and should not be deleted
      * by the user.
@@ -301,6 +302,11 @@ namespace TagLib {
     String &append(const String &s);
 
     /*!
+     * Clears the string.
+     */
+    String &clear();
+
+    /*!
      * Returns an upper case version of the string.
      *
      * \warning This only works for the characters in US-ASCII, i.e. A-Z.
@@ -328,9 +334,14 @@ namespace TagLib {
      * Returns true if this string is null -- i.e. it is a copy of the
      * String::null string.
      *
-     * \note A string can be empty and not null.
+     * \note A string can be empty and not null.  So do not use this method to
+     * check if the string is empty.
+     *
      * \see isEmpty()
+     *
+     * \deprecated
      */
+     // BIC: remove
     bool isNull() const;
 
     /*!
@@ -495,14 +506,19 @@ namespace TagLib {
 
     /*!
      * A null string provided for convenience.
+     *
+     * \warning Do not modify this variable.  It will mess up the internal state
+     * of TagLib.
+     *
+     * \deprecated
      */
     static const String null;
 
     /*!
-    * When used as the value for a \a length parameter in String's member
-    * functions, means "until the end of the string".
-    * As a return value, it is usually used to indicate no matches.
-    */
+     * When used as the value for a \a length parameter in String's member
+     * functions, means "until the end of the string".
+     * As a return value, it is usually used to indicate no matches.
+     */
     static const size_t npos;
 
   protected:

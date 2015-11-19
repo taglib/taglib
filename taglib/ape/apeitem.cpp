@@ -86,8 +86,10 @@ APE::Item::~Item()
 
 Item &APE::Item::operator=(const Item &item)
 {
-  delete d;
-  d = new ItemPrivate(*item.d);
+  if(&item != this) {
+    delete d;
+    d = new ItemPrivate(*item.d);
+  }
   return *this;
 }
 
@@ -167,7 +169,7 @@ int APE::Item::size() const
   size_t result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
   switch (d->type) {
     case Text:
-      if(d->text.size()) {
+      if(!d->text.isEmpty()) {
         StringList::ConstIterator it = d->text.begin();
 
         result += it->data(String::UTF8).size();
@@ -234,7 +236,7 @@ void APE::Item::parse(const ByteVector &data)
   setReadOnly(flags & 1);
   setType(ItemTypes((flags >> 1) & 3));
 
-  if(Text == d->type) 
+  if(Text == d->type)
     d->text = StringList(ByteVectorList::split(value, '\0'), String::UTF8);
   else
     d->value = value;

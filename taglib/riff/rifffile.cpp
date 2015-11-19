@@ -134,7 +134,7 @@ TagLib::uint RIFF::File::chunkPadding(uint i) const
 ByteVector RIFF::File::chunkName(uint i) const
 {
   if(i >= chunkCount())
-    return ByteVector::null;
+    return ByteVector();
 
   return d->chunks[i].name;
 }
@@ -142,7 +142,7 @@ ByteVector RIFF::File::chunkName(uint i) const
 ByteVector RIFF::File::chunkData(uint i)
 {
   if(i >= chunkCount())
-    return ByteVector::null;
+    return ByteVector();
 
   seek(d->chunks[i].offset);
   return readBlock(d->chunks[i].size);

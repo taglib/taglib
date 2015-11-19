@@ -103,7 +103,7 @@ public:
   {
     APE::Item item = APE::Item("DUMMY", "Test Text");
     CPPUNIT_ASSERT_EQUAL(String("Test Text"), item.toString());
-    CPPUNIT_ASSERT_EQUAL(ByteVector::null, item.binaryData());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(), item.binaryData());
 
     ByteVector data("Test Data");
     item.setBinaryData(data);
@@ -113,7 +113,7 @@ public:
 
     item.setValue("Test Text 2");
     CPPUNIT_ASSERT_EQUAL(String("Test Text 2"), item.toString());
-    CPPUNIT_ASSERT_EQUAL(ByteVector::null, item.binaryData());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(), item.binaryData());
   }
 
 };

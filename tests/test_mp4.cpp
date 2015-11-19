@@ -19,6 +19,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
+  CPPUNIT_TEST(testHasTag);
   CPPUNIT_TEST(testIsEmpty);
   CPPUNIT_TEST(testUpdateStco);
   CPPUNIT_TEST(testSaveExisingWhenIlstIsLast);
@@ -67,8 +68,30 @@ public:
   {
     MP4::File f(TEST_FILE_PATH_C("empty.aiff"));
     CPPUNIT_ASSERT(!f.isValid());
-    MP4::File f2(TEST_FILE_PATH_C("has-tags.m4a"));
-    CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testHasTag()
+  {
+    {
+      MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+    }
+
+    ScopedFileCopy copy("no-tags", ".m4a");
+
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasMP4Tag());
+      f.tag()->setTitle("TITLE");
+      f.save();
+    }
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+    }
   }
 
   void testIsEmpty()
@@ -305,6 +328,14 @@ public:
     CPPUNIT_ASSERT(f.tag()->contains("cpil"));
     CPPUNIT_ASSERT_EQUAL(false, f.tag()->item("cpil").toBool());
     CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["COMPILATION"]);
+
+    // Empty properties do not result in access violations
+    // when converting integers
+    tags["TRACKNUMBER"] = StringList();
+    tags["DISCNUMBER"] = StringList();
+    tags["BPM"] = StringList();
+    tags["COMPILATION"] = StringList();
+    f.setProperties(tags);
   }
 
   void testFuzzedFile()

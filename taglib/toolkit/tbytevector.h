@@ -266,9 +266,14 @@ namespace TagLib {
     /*!
      * Returns true if the vector is null.
      *
-     * \note A vector may be empty without being null.
+     * \note A vector may be empty without being null.  So do not use this
+     * method to check if the vector is empty.
+     *
      * \see isEmpty()
+     *
+     * \deprecated
      */
+     // BIC: remove
     bool isNull() const;
 
     /*!
@@ -559,8 +564,18 @@ namespace TagLib {
     ByteVector &operator=(const char *data);
 
     /*!
+     * Exchanges the content of the ByteVector by the content of \a v.
+     */
+    void swap(ByteVector &v);
+
+    /*!
      * A static, empty ByteVector which is convenient and fast (since returning
      * an empty or "null" value does not require instantiating a new ByteVector).
+     *
+     * \warning Do not modify this variable.  It will mess up the internal state
+     * of TagLib.
+     *
+     * \deprecated
      */
     static const ByteVector null;
 

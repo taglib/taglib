@@ -43,6 +43,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testResize);
+  CPPUNIT_TEST(testAppend);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -81,6 +82,10 @@ public:
     CPPUNIT_ASSERT(i.containsAt(j, 5, 0));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1));
     CPPUNIT_ASSERT(i.containsAt(j, 6, 1, 3));
+
+    i.clear();
+    CPPUNIT_ASSERT(i.isEmpty());
+    CPPUNIT_ASSERT(!i.isNull()); // deprecated, but worth it to check.
   }
 
   void testFind1()
@@ -292,6 +297,8 @@ public:
     *it2 = 'I';
     CPPUNIT_ASSERT_EQUAL('i', *it1);
     CPPUNIT_ASSERT_EQUAL('I', *it2);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v1);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("taglIb"), v2);
 
     ByteVector::ReverseIterator it3 = v1.rbegin();
     ByteVector::ReverseIterator it4 = v2.rbegin();
@@ -304,6 +311,8 @@ public:
     *it4 = 'A';
     CPPUNIT_ASSERT_EQUAL('a', *it3);
     CPPUNIT_ASSERT_EQUAL('A', *it4);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v1);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("tAglIb"), v2);
 
     ByteVector v3;
     v3 = ByteVector("0123456789").mid(3, 4);
@@ -361,6 +370,20 @@ public:
     c.resize(3, 'C');
     CPPUNIT_ASSERT_EQUAL(size_t(3), c.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector::npos, c.find('C'));
+  }
+
+  void testAppend()
+  {
+    ByteVector v1("taglib");
+    ByteVector v2 = v1;
+
+    v1.append("ABC");
+    CPPUNIT_ASSERT_EQUAL(ByteVector("taglibABC"), v1);
+    v1.append('1');
+    v1.append('2');
+    v1.append('3');
+    CPPUNIT_ASSERT_EQUAL(ByteVector("taglibABC123"), v1);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v2);
   }
 
 };

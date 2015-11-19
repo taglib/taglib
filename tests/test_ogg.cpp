@@ -21,6 +21,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
   CPPUNIT_TEST(testAudioProperties);
+  CPPUNIT_TEST(testPageChecksum);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -134,6 +135,30 @@ public:
     CPPUNIT_ASSERT_EQUAL(112000, f.audioProperties()->bitrateNominal());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMinimum());
   }
+
+  void testPageChecksum()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+
+    {
+      Ogg::Vorbis::File f(copy.fileName().c_str());
+      f.tag()->setArtist("The Artist");
+      f.save();
+
+      f.seek(0x50);
+      CPPUNIT_ASSERT_EQUAL((TagLib::uint)0x3d3bd92d, f.readBlock(4).toUInt32BE(0));
+    }
+    {
+      Ogg::Vorbis::File f(copy.fileName().c_str());
+      f.tag()->setArtist("The Artist 2");
+      f.save();
+
+      f.seek(0x50);
+      CPPUNIT_ASSERT_EQUAL((TagLib::uint)0xd985291c, f.readBlock(4).toUInt32BE(0));
+    }
+
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestOGG);

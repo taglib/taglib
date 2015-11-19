@@ -160,7 +160,7 @@ namespace TagLib {
      */
     offset_t find(const ByteVector &pattern,
               offset_t fromOffset = 0,
-              const ByteVector &before = ByteVector::null);
+              const ByteVector &before = ByteVector());
 
     /*!
      * Returns the offset in the file that \a pattern occurs at or -1 if it can
@@ -176,7 +176,7 @@ namespace TagLib {
      */
     offset_t rfind(const ByteVector &pattern,
                offset_t fromOffset = 0,
-               const ByteVector &before = ByteVector::null);
+               const ByteVector &before = ByteVector());
 
     /*!
      * Insert \a data at position \a start in the file overwriting \a replace

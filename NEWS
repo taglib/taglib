@@ -1,5 +1,11 @@
-TagLib 1.10 (Aug 23, 2015)
+TagLib 1.10 (Nov 11, 2015)
 ==========================
+
+1.10:
+
+ * Added new options to the tagwriter example.
+ * Fixed self-assignment operator in some types.
+ * Fixed extraction of MP4 tag keys with an empty list.
 
 1.10 BETA:
 

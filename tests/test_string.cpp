@@ -73,6 +73,10 @@ public:
     char str[] = "taglib string";
     CPPUNIT_ASSERT(strcmp(s.toCString(), str) == 0);
 
+    s.clear();
+    CPPUNIT_ASSERT(s.isEmpty());
+    CPPUNIT_ASSERT(!s.isNull());
+
     String unicode("José Carlos", String::UTF8);
     CPPUNIT_ASSERT(strcmp(unicode.toCString(), "Jos\xe9 Carlos") == 0);
 

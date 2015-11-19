@@ -1,11 +1,11 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2015 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
  ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Lesser General Public License version   *
+ *   it  under the terms of the GNU Lesser General Public License version  *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
  *   This library is distributed in the hope that it will be useful, but   *
@@ -23,69 +23,57 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tbytevectorlist.h"
+#include "podcastframe.h"
 
 using namespace TagLib;
+using namespace ID3v2;
 
-////////////////////////////////////////////////////////////////////////////////
-// static members
-////////////////////////////////////////////////////////////////////////////////
-
-ByteVectorList ByteVectorList::split(
-  const ByteVector &v, const ByteVector &pattern, size_t byteAlign, size_t max)
+class PodcastFrame::PodcastFramePrivate
 {
-  ByteVectorList l;
-
-  size_t previousOffset = 0;
-  for(size_t offset = v.find(pattern, 0, byteAlign);
-      offset != ByteVector::npos && (max == 0 || max > l.size() + 1);
-      offset = v.find(pattern, offset + pattern.size(), byteAlign))
-  {
-    if(offset - previousOffset >= 1)
-      l.append(v.mid(previousOffset, offset - previousOffset));
-    else
-      l.append(ByteVector());
-
-    previousOffset = offset + pattern.size();
-  }
-
-  if(previousOffset < v.size())
-    l.append(v.mid(previousOffset, v.size() - previousOffset));
-
-  return l;
-}
+public:
+  ByteVector fieldData;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorList::ByteVectorList() : List<ByteVector>()
+PodcastFrame::PodcastFrame() : Frame("PCST")
 {
-
+  d = new PodcastFramePrivate;
+  d->fieldData = ByteVector(4, '\0');
 }
 
-ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
+PodcastFrame::~PodcastFrame()
 {
+  delete d;
 }
 
-ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
+String PodcastFrame::toString() const
 {
-  List<ByteVector>::operator=(l);
-  return *this;
+  return String();
 }
 
-ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
+////////////////////////////////////////////////////////////////////////////////
+// protected members
+////////////////////////////////////////////////////////////////////////////////
+
+void PodcastFrame::parseFields(const ByteVector &data)
 {
-  ByteVector v;
+  d->fieldData = data;
+}
 
-  ConstIterator it = begin();
+ByteVector PodcastFrame::renderFields() const
+{
+  return d->fieldData;
+}
 
-  while(it != end()) {
-    v.append(*it);
-    it++;
-    if(it != end())
-      v.append(separator);
-  }
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
 
-  return v;
+PodcastFrame::PodcastFrame(const ByteVector &data, Header *h) : Frame(h)
+{
+  d = new PodcastFramePrivate;
+  parseFields(fieldData(data));
 }

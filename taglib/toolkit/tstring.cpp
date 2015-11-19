@@ -335,6 +335,12 @@ String &String::append(const String &s)
   return *this;
 }
 
+String & String::clear()
+{
+  *this = String();
+  return *this;
+}
+
 String String::upper() const
 {
   static const int shift = 'A' - 'a';
@@ -394,7 +400,7 @@ ByteVector String::data(Type t) const
       return v;
     }
     else {
-      return ByteVector::null;
+      return ByteVector();
     }
   case UTF16:
     {
@@ -440,7 +446,7 @@ ByteVector String::data(Type t) const
   default:
     {
       debug("String::data() - Invalid Type value.");
-      return ByteVector::null;
+      return ByteVector();
     }
   }
 }

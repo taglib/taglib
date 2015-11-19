@@ -137,7 +137,8 @@ ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
 ByteVector ASF::Picture::render() const
 {
   if(!isValid())
-    return ByteVector::null;
+    return ByteVector();
+
   return
     ByteVector((char)d->data->type) +
     ByteVector::fromUInt32LE(d->data->picture.size()) +

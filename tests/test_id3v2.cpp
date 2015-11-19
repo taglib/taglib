@@ -40,7 +40,7 @@ class PublicFrame : public ID3v2::Frame
     }
     virtual String toString() const { return String::null; }
     virtual void parseFields(const ByteVector &) {}
-    virtual ByteVector renderFields() const { return ByteVector::null; }
+    virtual ByteVector renderFields() const { return ByteVector(); }
 };
 
 class TestID3v2 : public CppUnit::TestFixture

@@ -92,7 +92,7 @@ ByteVector Ogg::File::packet(uint i)
   while(d->packetToPageMap.size() <= i) {
     if(!nextPage()) {
       debug("Ogg::File::packet() -- Could not find the requested packet.");
-      return ByteVector::null;
+      return ByteVector();
     }
   }
 
@@ -125,7 +125,7 @@ ByteVector Ogg::File::packet(uint i)
     if(pageIndex == d->pages.size()) {
       if(!nextPage()) {
         debug("Ogg::File::packet() -- Could not find the requested packet.");
-        return ByteVector::null;
+        return ByteVector();
       }
     }
     d->currentPacketPage = d->pages[pageIndex];

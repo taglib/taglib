@@ -116,8 +116,9 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
 {
   // check if the key is contained in the key<=>frameID mapping
   ByteVector frameID = keyToFrameID(key);
-  if(!frameID.isNull()) {
-    if(frameID[0] == 'T'){ // text frame
+  if(!frameID.isEmpty()) {
+    // Apple proprietary WFED (Podcast URL) is in fact a text frame.
+    if(frameID[0] == 'T' || frameID == "WFED"){ // text frame
       TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
@@ -169,7 +170,7 @@ ByteVector Frame::frameID() const
   if(d->header)
     return d->header->frameID();
   else
-    return ByteVector::null;
+    return ByteVector();
 }
 
 TagLib::uint Frame::size() const
@@ -357,165 +358,142 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
-namespace
-{
-  static const TagLib::uint frameTranslationSize = 51;
-  static const char *frameTranslation[][2] = {
-    // Text information frames
-    { "TALB", "ALBUM" },
-    { "TBPM", "BPM" },
-    { "TCOM", "COMPOSER" },
-    { "TCON", "GENRE" },
-    { "TCOP", "COPYRIGHT" },
-    { "TDEN", "ENCODINGTIME" },
-    { "TDLY", "PLAYLISTDELAY" },
-    { "TDOR", "ORIGINALDATE" },
-    { "TDRC", "DATE" },
-    // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-    // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-    // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-    // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-    { "TDRL", "RELEASEDATE" },
-    { "TDTG", "TAGGINGDATE" },
-    { "TENC", "ENCODEDBY" },
-    { "TEXT", "LYRICIST" },
-    { "TFLT", "FILETYPE" },
-    //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
-    { "TIT1", "CONTENTGROUP" },
-    { "TIT2", "TITLE"},
-    { "TIT3", "SUBTITLE" },
-    { "TKEY", "INITIALKEY" },
-    { "TLAN", "LANGUAGE" },
-    { "TLEN", "LENGTH" },
-    //{ "TMCL", "MUSICIANCREDITS" }, handled separately
-    { "TMED", "MEDIA" },
-    { "TMOO", "MOOD" },
-    { "TOAL", "ORIGINALALBUM" },
-    { "TOFN", "ORIGINALFILENAME" },
-    { "TOLY", "ORIGINALLYRICIST" },
-    { "TOPE", "ORIGINALARTIST" },
-    { "TOWN", "OWNER" },
-    { "TPE1", "ARTIST"},
-    { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
-    { "TPE3", "CONDUCTOR" },
-    { "TPE4", "REMIXER" }, // could also be ARRANGER
-    { "TPOS", "DISCNUMBER" },
-    { "TPRO", "PRODUCEDNOTICE" },
-    { "TPUB", "LABEL" },
-    { "TRCK", "TRACKNUMBER" },
-    { "TRSN", "RADIOSTATION" },
-    { "TRSO", "RADIOSTATIONOWNER" },
-    { "TSOA", "ALBUMSORT" },
-    { "TSOP", "ARTISTSORT" },
-    { "TSOT", "TITLESORT" },
-    { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
-    { "TSRC", "ISRC" },
-    { "TSSE", "ENCODING" },
-    // URL frames
-    { "WCOP", "COPYRIGHTURL" },
-    { "WOAF", "FILEWEBPAGE" },
-    { "WOAR", "ARTISTWEBPAGE" },
-    { "WOAS", "AUDIOSOURCEWEBPAGE" },
-    { "WORS", "RADIOSTATIONWEBPAGE" },
-    { "WPAY", "PAYMENTWEBPAGE" },
-    { "WPUB", "PUBLISHERWEBPAGE" },
-    //{ "WXXX", "URL"}, handled specially
-    // Other frames
-    { "COMM", "COMMENT" },
-    //{ "USLT", "LYRICS" }, handled specially
-  };
+static const size_t frameTranslationSize = 51;
+static const char *frameTranslation[][2] = {
+  // Text information frames
+  { "TALB", "ALBUM"},
+  { "TBPM", "BPM" },
+  { "TCOM", "COMPOSER" },
+  { "TCON", "GENRE" },
+  { "TCOP", "COPYRIGHT" },
+  { "TDEN", "ENCODINGTIME" },
+  { "TDLY", "PLAYLISTDELAY" },
+  { "TDOR", "ORIGINALDATE" },
+  { "TDRC", "DATE" },
+  // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+  { "TDRL", "RELEASEDATE" },
+  { "TDTG", "TAGGINGDATE" },
+  { "TENC", "ENCODEDBY" },
+  { "TEXT", "LYRICIST" },
+  { "TFLT", "FILETYPE" },
+  //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
+  { "TIT1", "CONTENTGROUP" },
+  { "TIT2", "TITLE"},
+  { "TIT3", "SUBTITLE" },
+  { "TKEY", "INITIALKEY" },
+  { "TLAN", "LANGUAGE" },
+  { "TLEN", "LENGTH" },
+  //{ "TMCL", "MUSICIANCREDITS" }, handled separately
+  { "TMED", "MEDIA" },
+  { "TMOO", "MOOD" },
+  { "TOAL", "ORIGINALALBUM" },
+  { "TOFN", "ORIGINALFILENAME" },
+  { "TOLY", "ORIGINALLYRICIST" },
+  { "TOPE", "ORIGINALARTIST" },
+  { "TOWN", "OWNER" },
+  { "TPE1", "ARTIST"},
+  { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
+  { "TPE3", "CONDUCTOR" },
+  { "TPE4", "REMIXER" }, // could also be ARRANGER
+  { "TPOS", "DISCNUMBER" },
+  { "TPRO", "PRODUCEDNOTICE" },
+  { "TPUB", "LABEL" },
+  { "TRCK", "TRACKNUMBER" },
+  { "TRSN", "RADIOSTATION" },
+  { "TRSO", "RADIOSTATIONOWNER" },
+  { "TSOA", "ALBUMSORT" },
+  { "TSOP", "ARTISTSORT" },
+  { "TSOT", "TITLESORT" },
+  { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
+  { "TSRC", "ISRC" },
+  { "TSSE", "ENCODING" },
+  // URL frames
+  { "WCOP", "COPYRIGHTURL" },
+  { "WOAF", "FILEWEBPAGE" },
+  { "WOAR", "ARTISTWEBPAGE" },
+  { "WOAS", "AUDIOSOURCEWEBPAGE" },
+  { "WORS", "RADIOSTATIONWEBPAGE" },
+  { "WPAY", "PAYMENTWEBPAGE" },
+  { "WPUB", "PUBLISHERWEBPAGE" },
+  //{ "WXXX", "URL"}, handled specially
+  // Other frames
+  { "COMM", "COMMENT" },
+  //{ "USLT", "LYRICS" }, handled specially
+  // Apple iTunes proprietary frames
+  { "PCST", "PODCAST" },
+  { "TCAT", "PODCASTCATEGORY" },
+  { "TDES", "PODCASTDESC" },
+  { "TGID", "PODCASTID" },
+  { "WFED", "PODCASTURL" },
+};
 
-  static const TagLib::uint txxxFrameTranslationSize = 8;
-  static const char *txxxFrameTranslation[][2] = {
-    { "MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
-    { "MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
-    { "MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
-    { "MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
-    { "MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
-    { "Acoustid Id", "ACOUSTID_ID" },
-    { "Acoustid Fingerprint", "ACOUSTID_FINGERPRINT" },
-    { "MusicIP PUID", "MUSICIP_PUID" },
-  };
+static const size_t txxxFrameTranslationSize = 8;
+static const char *txxxFrameTranslation[][2] = {
+  { "MUSICBRAINZ ALBUM ID",         "MUSICBRAINZ_ALBUMID" },
+  { "MUSICBRAINZ ARTIST ID",        "MUSICBRAINZ_ARTISTID" },
+  { "MUSICBRAINZ ALBUM ARTIST ID",  "MUSICBRAINZ_ALBUMARTISTID" },
+  { "MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID" },
+  { "MUSICBRAINZ WORK ID",          "MUSICBRAINZ_WORKID" },
+  { "ACOUSTID ID",                  "ACOUSTID_ID" },
+  { "ACOUSTID FINGERPRINT",         "ACOUSTID_FINGERPRINT" },
+  { "MUSICIP PUID",                 "MUSICIP_PUID" },
+};
 
-  Map<ByteVector, String> &idMap()
-  {
-    static Map<ByteVector, String> m;
-    if(m.isEmpty())
-      for(size_t i = 0; i < frameTranslationSize; ++i)
-        m[frameTranslation[i][0]] = frameTranslation[i][1];
-    return m;
-  }
-
-  Map<String, String> &txxxMap()
-  {
-    static Map<String, String> m;
-    if(m.isEmpty()) {
-      for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-        String key = String(txxxFrameTranslation[i][0]).upper();
-        m[key] = txxxFrameTranslation[i][1];
-      }
-    }
-    return m;
-  }
-
-  // list of deprecated frames and their successors
-  static const TagLib::uint deprecatedFramesSize = 4;
-  static const char *deprecatedFrames[][2] = {
-    {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
-    {"TDAT", "TDRC"}, // 2.3 -> 2.4
-    {"TYER", "TDRC"}, // 2.3 -> 2.4
-    {"TIME", "TDRC"}, // 2.3 -> 2.4
-  };
-
-
-  Map<ByteVector,ByteVector> &deprecationMap()
-  {
-    static Map<ByteVector,ByteVector> depMap;
-    if(depMap.isEmpty())
-      for(TagLib::uint i = 0; i < deprecatedFramesSize; ++i)
-        depMap[deprecatedFrames[i][0]] = deprecatedFrames[i][1];
-    return depMap;
-  }
-}
+// list of deprecated frames and their successors
+static const size_t deprecatedFramesSize = 4;
+static const char *deprecatedFrames[][2] = {
+  {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+  {"TDAT", "TDRC"}, // 2.3 -> 2.4
+  {"TYER", "TDRC"}, // 2.3 -> 2.4
+  {"TIME", "TDRC"}, // 2.3 -> 2.4
+};
 
 String Frame::frameIDToKey(const ByteVector &id)
 {
-  Map<ByteVector, String> &m = idMap();
-  if(m.contains(id))
-    return m[id];
-  if(deprecationMap().contains(id))
-    return m[deprecationMap()[id]];
-  return String::null;
+  ByteVector id24 = id;
+  for(size_t i = 0; i < deprecatedFramesSize; ++i) {
+    if(id24 == deprecatedFrames[i][0]) {
+      id24 = deprecatedFrames[i][1];
+      break;
+    }
+  }
+  for(size_t i = 0; i < frameTranslationSize; ++i) {
+    if(id24 == frameTranslation[i][0])
+      return frameTranslation[i][1];
+  }
+  return String();
 }
 
 ByteVector Frame::keyToFrameID(const String &s)
 {
-  static Map<String, ByteVector> m;
-  if(m.isEmpty())
-    for(size_t i = 0; i < frameTranslationSize; ++i)
-      m[frameTranslation[i][1]] = frameTranslation[i][0];
-  if(m.contains(s.upper()))
-    return m[s];
-  return ByteVector::null;
+  const String key = s.upper();
+  for(size_t i = 0; i < frameTranslationSize; ++i) {
+    if(key == frameTranslation[i][1])
+      return frameTranslation[i][0];
+  }
+  return ByteVector();
 }
 
 String Frame::txxxToKey(const String &description)
 {
-  Map<String, String> &m = txxxMap();
-  String d = description.upper();
-  if(m.contains(d))
-    return m[d];
+  const String d = description.upper();
+  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
+    if(d == txxxFrameTranslation[i][0])
+      return txxxFrameTranslation[i][1];
+  }
   return d;
 }
 
 String Frame::keyToTXXX(const String &s)
 {
-  static Map<String, String> m;
-  if(m.isEmpty())
-    for(size_t i = 0; i < txxxFrameTranslationSize; ++i)
-      m[txxxFrameTranslation[i][1]] = txxxFrameTranslation[i][0];
-  if(m.contains(s.upper()))
-    return m[s];
+  const String key = s.upper();
+  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
+    if(key == txxxFrameTranslation[i][1])
+      return txxxFrameTranslation[i][0];
+  }
   return s;
 }
 
@@ -530,7 +508,8 @@ PropertyMap Frame::asProperties() const
   // workaround until this function is virtual
   if(id == "TXXX")
     return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
-  else if(id[0] == 'T')
+  // Apple proprietary WFED (Podcast URL) is in fact a text frame.
+  else if(id[0] == 'T' || id == "WFED")
     return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
   else if(id == "WXXX")
     return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
@@ -550,7 +529,6 @@ PropertyMap Frame::asProperties() const
 void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFrameProperties,
           PropertyMap &tiplProperties, PropertyMap &tmclProperties)
 {
-
   singleFrameProperties.clear();
   tiplProperties.clear();
   tmclProperties.clear();

@@ -49,8 +49,6 @@
 //
 // http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
 
-#define DATA(x) (&(*(x->data))[0])
-
 namespace TagLib {
 
 static const char hexTable[17] = "0123456789abcdef";
@@ -101,10 +99,6 @@ static const uint crcTable[256] = {
   0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
-/*!
-  * A templatized straightforward find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
 template <class TIterator>
 size_t findChar(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -127,10 +121,6 @@ size_t findChar(
   return ByteVector::npos;
 }
 
-/*!
-  * A templatized KMP find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
 template <class TIterator>
 size_t findVector(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -142,46 +132,33 @@ size_t findVector(
   if(patternSize == 0 || offset + patternSize > dataSize)
     return ByteVector::npos;
 
-  // n % 0 is invalid
-
-  if(byteAlign == 0)
-    return ByteVector::npos;
-
-  // Special case that the pattern contains just single char.
+  // Special case that pattern contains just single char.
 
   if(patternSize == 1)
     return findChar(dataBegin, dataEnd, *patternBegin, offset, byteAlign);
 
-  size_t lastOccurrence[256];
+  // n % 0 is invalid
 
-  for(size_t i = 0; i < 256; ++i)
-    lastOccurrence[i] = patternSize;
+  if(byteAlign == 0)
+    return -1;
 
-  for(size_t i = 0; i < patternSize - 1; ++i)
-    lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
+  // We don't use sophisticated algorithms like Knuth-Morris-Pratt here.
 
-  TIterator it = dataBegin + patternSize - 1 + offset;
-  while(true) {
-    TIterator itBuffer  = it;
-    TIterator itPattern = patternBegin + patternSize - 1;
+  // In the current implementation of TagLib, data and patterns are too small
+  // for such algorithms to work effectively.
 
-    while(*itBuffer == *itPattern) {
-      if(itPattern == patternBegin) {
-        if((itBuffer - dataBegin - offset) % byteAlign == 0)
-          return (itBuffer - dataBegin);
-        else
-          break;
-      }
+  for(TIterator it = dataBegin + offset; it < dataEnd - patternSize + 1; it += byteAlign) {
 
-      --itBuffer;
-      --itPattern;
+    TIterator itData    = it;
+    TIterator itPattern = patternBegin;
+
+    while(*itData == *itPattern) {
+      ++itData;
+      ++itPattern;
+
+      if(itPattern == patternEnd)
+        return (it - dataBegin);
     }
-
-    const size_t step = lastOccurrence[static_cast<uchar>(*it)];
-    if(dataEnd - step <= it)
-      break;
-
-    it += step;
   }
 
   return ByteVector::npos;
@@ -263,6 +240,8 @@ ByteVector fromFloat(TFloat value)
 template <ByteOrder ENDIAN>
 long double toFloat80(const ByteVector &v, size_t offset)
 {
+  using std::swap;
+
   if(offset > v.size() - 10) {
     debug("toFloat80() - offset is out of range. Returning 0.");
     return 0.0;
@@ -272,11 +251,11 @@ long double toFloat80(const ByteVector &v, size_t offset)
   ::memcpy(bytes, v.data() + offset, 10);
 
   if(ENDIAN == LittleEndian) {
-    std::swap(bytes[0], bytes[9]);
-    std::swap(bytes[1], bytes[8]);
-    std::swap(bytes[2], bytes[7]);
-    std::swap(bytes[3], bytes[6]);
-    std::swap(bytes[4], bytes[5]);
+    swap(bytes[0], bytes[9]);
+    swap(bytes[1], bytes[8]);
+    swap(bytes[2], bytes[7]);
+    swap(bytes[3], bytes[6]);
+    swap(bytes[4], bytes[5]);
   }
 
   // 1-bit sign
@@ -456,25 +435,25 @@ ByteVector::~ByteVector()
 
 ByteVector &ByteVector::setData(const char *data, size_t length)
 {
-  *this = ByteVector(data, length);
+  ByteVector(data, length).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::setData(const char *data)
 {
-  *this = ByteVector(data);
+  ByteVector(data).swap(*this);
   return *this;
 }
 
 char *ByteVector::data()
 {
   detach();
-  return !isEmpty() ? (DATA(d) + d->offset) : 0;
+  return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
 const char *ByteVector::data() const
 {
-  return !isEmpty() ? (DATA(d) + d->offset) : 0;
+  return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
 ByteVector ByteVector::mid(size_t index, size_t length) const
@@ -487,7 +466,7 @@ ByteVector ByteVector::mid(size_t index, size_t length) const
 
 char ByteVector::at(size_t index) const
 {
-  return index < size() ? DATA(d)[d->offset + index] : 0;
+  return (index < size()) ? (*d->data)[d->offset + index] : 0;
 }
 
 size_t ByteVector::find(const ByteVector &pattern, size_t offset, size_t byteAlign) const
@@ -605,11 +584,9 @@ size_t ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
 
 ByteVector &ByteVector::append(const ByteVector &v)
 {
-  if(!v.isEmpty())
-  {
+  if(v.d->length != 0) {
     detach();
-
-    const size_t originalSize = size();
+    size_t originalSize = size();
     resize(originalSize + v.size());
     ::memcpy(data() + originalSize, v.data(), v.size());
   }
@@ -625,9 +602,7 @@ ByteVector &ByteVector::append(char c)
 
 ByteVector &ByteVector::clear()
 {
-  detach();
-  *d = *ByteVector::null.d;
-
+  ByteVector().swap(*this);
   return *this;
 }
 
@@ -684,7 +659,10 @@ ByteVector::ReverseIterator ByteVector::rbegin()
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  return d->data->rbegin() + (d->data->size() - (d->offset + d->length));
+  // Workaround for the Solaris Studio 12.4 compiler.
+  // We need a const reference to the data vector so we can ensure the const version of rbegin() is called.
+  const std::vector<char> &v = *d->data;
+  return v.rbegin() + (v.size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
@@ -695,7 +673,10 @@ ByteVector::ReverseIterator ByteVector::rend()
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  return d->data->rbegin() + (d->data->size() - d->offset);
+  // Workaround for the Solaris Studio 12.4 compiler.
+  // We need a const reference to the data vector so we can ensure the const version of rbegin() is called.
+  const std::vector<char> &v = *d->data;
+  return v.rbegin() + (v.size() - d->offset);
 }
 
 bool ByteVector::isNull() const
@@ -798,13 +779,13 @@ long double ByteVector::toFloat80BE(size_t offset) const
 
 const char &ByteVector::operator[](size_t index) const
 {
-  return DATA(d)[d->offset + index];
+  return (*d->data)[d->offset + index];
 }
 
 char &ByteVector::operator[](size_t index)
 {
   detach();
-  return DATA(d)[d->offset + index];
+  return (*d->data)[d->offset + index];
 }
 
 bool ByteVector::operator==(const ByteVector &v) const
@@ -817,7 +798,7 @@ bool ByteVector::operator==(const ByteVector &v) const
 
 bool ByteVector::operator!=(const ByteVector &v) const
 {
-  return !operator==(v);
+  return !(*this == v);
 }
 
 bool ByteVector::operator==(const char *s) const
@@ -830,7 +811,7 @@ bool ByteVector::operator==(const char *s) const
 
 bool ByteVector::operator!=(const char *s) const
 {
-  return !operator==(s);
+  return !(*this == s);
 }
 
 bool ByteVector::operator<(const ByteVector &v) const
@@ -844,7 +825,7 @@ bool ByteVector::operator<(const ByteVector &v) const
 
 bool ByteVector::operator>(const ByteVector &v) const
 {
-  return v < *this;
+  return (v < *this);
 }
 
 ByteVector ByteVector::operator+(const ByteVector &v) const
@@ -856,20 +837,27 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
-  *d = *v.d;
+  ByteVector(v).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(char c)
 {
-  *this = ByteVector(c);
+  ByteVector(c).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(const char *data)
 {
-  *this = ByteVector(data);
+  ByteVector(data).swap(*this);
   return *this;
+}
+
+void ByteVector::swap(ByteVector &v)
+{
+  using std::swap;
+
+  swap(d, v.d);
 }
 
 ByteVector ByteVector::toHex() const
@@ -893,10 +881,10 @@ ByteVector ByteVector::toHex() const
 void ByteVector::detach()
 {
   if(!d->data.unique()) {
-    std::vector<char>::const_iterator begin = d->data->begin() + d->offset;
-    std::vector<char>::const_iterator end   = begin + d->length;
-    d->data.reset(new std::vector<char>(begin, end));
-    d->offset = 0;
+    if(!isEmpty())
+      ByteVector(&d->data->front() + d->offset, d->length).swap(*this);
+    else
+      ByteVector().swap(*this);
   }
 }
 

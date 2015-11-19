@@ -179,11 +179,11 @@ ByteVector FileStream::readBlock(size_t length)
 {
   if(!isOpen()) {
     debug("FileStream::readBlock() -- invalid file.");
-    return ByteVector::null;
+    return ByteVector();
   }
 
   if(length == 0)
-    return ByteVector::null;
+    return ByteVector();
 
   const offset_t streamLength = FileStream::length();
   if(length > bufferSize() && static_cast<offset_t>(length) > streamLength)

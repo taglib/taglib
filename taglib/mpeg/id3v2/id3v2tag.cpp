@@ -27,6 +27,8 @@
 #include "config.h"
 #endif
 
+#include <algorithm>
+
 #include "tfile.h"
 
 #include "id3v2tag.h"
@@ -52,12 +54,11 @@ using namespace ID3v2;
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate()
-    : file(0)
-    , tagOffset(-1)
-    , extendedHeader(0)
-    , footer(0)
-    , paddingSize(0)
+  TagPrivate() :
+    file(0),
+    tagOffset(-1),
+    extendedHeader(0),
+    footer(0)
   {
     frameList.setAutoDelete(true);
   }
@@ -76,8 +77,6 @@ public:
   ExtendedHeader *extendedHeader;
   Footer *footer;
 
-  int paddingSize;
-
   FrameListMap frameListMap;
   FrameList frameList;
 
@@ -93,7 +92,8 @@ const TagLib::StringHandler *ID3v2::Tag::TagPrivate::stringHandler = &defaultStr
 
 namespace
 {
-  const TagLib::uint DefaultPaddingSize = 1024;
+  const offset_t MinPaddingSize = 1024;
+  const offset_t MaxPaddingSize = 1024 * 1024;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,17 +118,17 @@ ByteVector ID3v2::Latin1StringHandler::render(const String &) const
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ID3v2::Tag::Tag() : TagLib::Tag()
+ID3v2::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
   d->factory = FrameFactory::instance();
 }
 
 ID3v2::Tag::Tag(File *file, offset_t tagOffset, const FrameFactory *factory) :
-  TagLib::Tag()
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
-
   d->file = file;
   d->tagOffset = tagOffset;
   d->factory = factory;
@@ -577,8 +577,6 @@ ByteVector ID3v2::Tag::render(int version) const
   // in ID3v2::Header::tagSize() -- includes the extended header, frames and
   // padding, but does not include the tag's header or footer.
 
-  ByteVector tagData;
-
   if(version != 3 && version != 4) {
     debug("Unknown ID3v2 version, using ID3v2.4");
     version = 4;
@@ -586,7 +584,7 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // TODO: Render the extended header.
 
-  // Loop through the frames rendering them and adding them to the tagData.
+  // Downgrade the frames that ID3v2.3 doesn't support.
 
   FrameList newFrames;
   newFrames.setAutoDelete(true);
@@ -598,6 +596,12 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     downgradeFrames(&frameList, &newFrames);
   }
+
+  // Reserve a 10-byte blank space for an ID3v2 tag header.
+
+  ByteVector tagData(Header::size(), '\0');
+
+  // Loop through the frames rendering them and adding them to the tagData.
 
   for(FrameList::ConstIterator it = frameList.begin(); it != frameList.end(); it++) {
     (*it)->header()->setVersion(version);
@@ -619,28 +623,33 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  size_t paddingSize = DefaultPaddingSize;
+  offset_t paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
 
-  if(d->file && tagData.size() < d->header.tagSize()) {
-    paddingSize = d->header.tagSize() - tagData.size();
+  if(paddingSize <= 0) {
+    paddingSize = MinPaddingSize;
+  }
+  else {
+    // Padding won't increase beyond 1% of the file size or 1MB.
 
-    // Padding won't increase beyond 1% of the file size.
+    offset_t threshold = d->file ? d->file->length() / 100 : 0;
+    threshold = std::max(threshold, MinPaddingSize);
+    threshold = std::min(threshold, MaxPaddingSize);
 
-    if(paddingSize > DefaultPaddingSize) {
-      const ulonglong threshold = d->file->length() / 100;
-      if(paddingSize > threshold)
-        paddingSize = DefaultPaddingSize;
-    }
+    if(paddingSize > threshold)
+      paddingSize = MinPaddingSize;
   }
 
-  tagData.append(ByteVector(paddingSize, '\0'));
+  tagData.resize(static_cast<uint>(tagData.size() + paddingSize), '\0');
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(static_cast<uint>(tagData.size()));
+  d->header.setTagSize(static_cast<TagLib::uint>(tagData.size() - Header::size()));
 
   // TODO: This should eventually include d->footer->render().
-  return d->header.render() + tagData;
+  const ByteVector headerData = d->header.render();
+  std::copy(headerData.begin(), headerData.end(), tagData.begin());
+
+  return tagData;
 }
 
 TagLib::StringHandler const *ID3v2::Tag::latin1StringHandler()
@@ -721,7 +730,6 @@ void ID3v2::Tag::parse(const ByteVector &origData)
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
       }
 
-      d->paddingSize = static_cast<int>(frameDataLength - frameDataPosition);
       break;
     }
 

@@ -84,7 +84,7 @@ PropertyMap UrlLinkFrame::asProperties() const
 {
   String key = frameIDToKey(frameID());
   PropertyMap map;
-  if(key.isNull())
+  if(key.isEmpty())
     // unknown W*** frame - this normally shouldn't happen
     map.unsupportedData().append(frameID());
   else
