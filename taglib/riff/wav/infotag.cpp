@@ -36,6 +36,10 @@ namespace
 {
   class DefaultStringHandler : public TagLib::StringHandler
   {
+  public:
+    DefaultStringHandler() :
+      TagLib::StringHandler() {}
+
     virtual String parse(const ByteVector &data) const
     {
       return String(data, String::UTF8);
