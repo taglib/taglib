@@ -49,8 +49,6 @@
 //
 // http://www.informit.com/isapi/product_id~{9C84DAB4-FE6E-49C5-BB0A-FB50331233EA}/content/index.asp
 
-#define DATA(x) (&(x->data->data[0]))
-
 namespace TagLib {
 
 static const char hexTable[17] = "0123456789abcdef";
@@ -101,10 +99,6 @@ static const uint crcTable[256] = {
   0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
 };
 
-/*!
-  * A templatized straightforward find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
 template <class TIterator>
 int findChar(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -127,10 +121,6 @@ int findChar(
   return -1;
 }
 
-/*!
-  * A templatized KMP find that works with the types
-  * std::vector<char>::iterator and std::vector<char>::reverse_iterator.
-  */
 template <class TIterator>
 int findVector(
   const TIterator dataBegin, const TIterator dataEnd,
@@ -142,46 +132,33 @@ int findVector(
   if(patternSize == 0 || offset + patternSize > dataSize)
     return -1;
 
-  // n % 0 is invalid
-
-  if(byteAlign == 0)
-    return -1;
-
   // Special case that pattern contains just single char.
 
   if(patternSize == 1)
     return findChar(dataBegin, dataEnd, *patternBegin, offset, byteAlign);
 
-  size_t lastOccurrence[256];
+  // n % 0 is invalid
 
-  for(size_t i = 0; i < 256; ++i)
-    lastOccurrence[i] = patternSize;
+  if(byteAlign == 0)
+    return -1;
 
-  for(size_t i = 0; i < patternSize - 1; ++i)
-    lastOccurrence[static_cast<uchar>(*(patternBegin + i))] = patternSize - i - 1;
+  // We don't use sophisticated algorithms like Knuth-Morris-Pratt here.
 
-  TIterator it = dataBegin + patternSize - 1 + offset;
-  while(true) {
-    TIterator itBuffer = it;
-    TIterator itPattern = patternBegin + patternSize - 1;
+  // In the current implementation of TagLib, data and patterns are too small
+  // for such algorithms to work effectively.
 
-    while(*itBuffer == *itPattern) {
-      if(itPattern == patternBegin) {
-        if((itBuffer - dataBegin - offset) % byteAlign == 0)
-          return (itBuffer - dataBegin);
-        else
-          break;
-      }
+  for(TIterator it = dataBegin + offset; it < dataEnd - patternSize + 1; it += byteAlign) {
 
-      --itBuffer;
-      --itPattern;
+    TIterator itData    = it;
+    TIterator itPattern = patternBegin;
+
+    while(*itData == *itPattern) {
+      ++itData;
+      ++itPattern;
+
+      if(itPattern == patternEnd)
+        return (it - dataBegin);
     }
-
-    const size_t step = lastOccurrence[static_cast<uchar>(*it)];
-    if(dataEnd - step <= it)
-      break;
-
-    it += step;
   }
 
   return -1;
@@ -275,6 +252,8 @@ ByteVector fromFloat(TFloat value)
 template <Utils::ByteOrder ENDIAN>
 long double toFloat80(const ByteVector &v, size_t offset)
 {
+  using std::swap;
+
   if(offset > v.size() - 10) {
     debug("toFloat80() - offset is out of range. Returning 0.");
     return 0.0;
@@ -284,11 +263,11 @@ long double toFloat80(const ByteVector &v, size_t offset)
   ::memcpy(bytes, v.data() + offset, 10);
 
   if(ENDIAN == Utils::LittleEndian) {
-    std::swap(bytes[0], bytes[9]);
-    std::swap(bytes[1], bytes[8]);
-    std::swap(bytes[2], bytes[7]);
-    std::swap(bytes[3], bytes[6]);
-    std::swap(bytes[4], bytes[5]);
+    swap(bytes[0], bytes[9]);
+    swap(bytes[1], bytes[8]);
+    swap(bytes[2], bytes[7]);
+    swap(bytes[3], bytes[6]);
+    swap(bytes[4], bytes[5]);
   }
 
   // 1-bit sign
@@ -326,108 +305,42 @@ long double toFloat80(const ByteVector &v, size_t offset)
     return val;
 }
 
-class DataPrivate : public RefCounter
+class ByteVector::ByteVectorPrivate
 {
 public:
-  DataPrivate()
-  {
-  }
+  ByteVectorPrivate(uint l, char c) :
+    counter(new RefCounter()),
+    data(new std::vector<char>(l, c)),
+    offset(0),
+    length(l) {}
 
-  DataPrivate(const std::vector<char> &v, uint offset, uint length)
-    : data(v.begin() + offset, v.begin() + offset + length)
-  {
-  }
+  ByteVectorPrivate(const char *s, uint l) :
+    counter(new RefCounter()),
+    data(new std::vector<char>(s, s + l)),
+    offset(0),
+    length(l) {}
 
-  // A char* can be an iterator.
-  DataPrivate(const char *begin, const char *end)
-    : data(begin, end)
+  ByteVectorPrivate(const ByteVectorPrivate &d, uint o, uint l) :
+    counter(d.counter),
+    data(d.data),
+    offset(d.offset + o),
+    length(l)
   {
-  }
-
-  DataPrivate(uint len, char c)
-    : data(len, c)
-  {
-  }
-
-  std::vector<char> data;
-};
-
-class ByteVector::ByteVectorPrivate : public RefCounter
-{
-public:
-  ByteVectorPrivate()
-    : RefCounter()
-    , data(new DataPrivate())
-    , offset(0)
-    , length(0)
-  {
-  }
-
-  ByteVectorPrivate(ByteVectorPrivate *d, uint o, uint l)
-    : RefCounter()
-    , data(d->data)
-    , offset(d->offset + o)
-    , length(l)
-  {
-    data->ref();
-  }
-
-  ByteVectorPrivate(const std::vector<char> &v, uint o, uint l)
-    : RefCounter()
-    , data(new DataPrivate(v, o, l))
-    , offset(0)
-    , length(l)
-  {
-  }
-
-  ByteVectorPrivate(uint l, char c)
-    : RefCounter()
-    , data(new DataPrivate(l, c))
-    , offset(0)
-    , length(l)
-  {
-  }
-
-  ByteVectorPrivate(const char *s, uint l)
-    : RefCounter()
-    , data(new DataPrivate(s, s + l))
-    , offset(0)
-    , length(l)
-  {
-  }
-
-  void detach()
-  {
-    if(data->count() > 1) {
-      data->deref();
-      data = new DataPrivate(data->data, offset, length);
-      offset = 0;
-    }
+    counter->ref();
   }
 
   ~ByteVectorPrivate()
   {
-    if(data->deref())
+    if(counter->deref()) {
+      delete counter;
       delete data;
-  }
-
-  ByteVectorPrivate &operator=(const ByteVectorPrivate &x)
-  {
-    if(&x != this)
-    {
-      if(data->deref())
-        delete data;
-
-      data = x.data;
-      data->ref();
     }
-
-    return *this;
   }
 
-  DataPrivate *data;
-  uint offset;
-  uint length;
+  RefCounter        *counter;
+  std::vector<char> *data;
+  uint               offset;
+  uint               length;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -483,69 +396,67 @@ ByteVector ByteVector::fromFloat64BE(double value)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVector::ByteVector()
-  : d(new ByteVectorPrivate())
+ByteVector::ByteVector() :
+  d(new ByteVectorPrivate(0, '\0'))
 {
 }
 
-ByteVector::ByteVector(uint size, char value)
-  : d(new ByteVectorPrivate(size, value))
+ByteVector::ByteVector(uint size, char value) :
+  d(new ByteVectorPrivate(size, value))
 {
 }
 
-ByteVector::ByteVector(const ByteVector &v)
-  : d(v.d)
-{
-  d->ref();
-}
-
-ByteVector::ByteVector(const ByteVector &v, uint offset, uint length)
-  : d(new ByteVectorPrivate(v.d, offset, length))
+ByteVector::ByteVector(const ByteVector &v) :
+  d(new ByteVectorPrivate(*v.d, 0, v.d->length))
 {
 }
 
-ByteVector::ByteVector(char c)
-  : d(new ByteVectorPrivate(1, c))
+ByteVector::ByteVector(const ByteVector &v, uint offset, uint length) :
+  d(new ByteVectorPrivate(*v.d, offset, length))
 {
 }
 
-ByteVector::ByteVector(const char *data, uint length)
-  : d(new ByteVectorPrivate(data, length))
+ByteVector::ByteVector(char c) :
+  d(new ByteVectorPrivate(1, c))
 {
 }
 
-ByteVector::ByteVector(const char *data)
-  : d(new ByteVectorPrivate(data, ::strlen(data)))
+ByteVector::ByteVector(const char *data, uint length) :
+  d(new ByteVectorPrivate(data, length))
+{
+}
+
+ByteVector::ByteVector(const char *data) :
+  d(new ByteVectorPrivate(data, ::strlen(data)))
 {
 }
 
 ByteVector::~ByteVector()
 {
-  if(d->deref())
-    delete d;
+  delete d;
 }
 
 ByteVector &ByteVector::setData(const char *s, uint length)
 {
-  *this = ByteVector(s, length);
+  ByteVector(s, length).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::setData(const char *data)
 {
-  *this = ByteVector(data);
+  ByteVector(data).swap(*this);
   return *this;
 }
 
 char *ByteVector::data()
 {
   detach();
-  return size() > 0 ? (DATA(d) + d->offset) : 0;
+  return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
 const char *ByteVector::data() const
 {
-  return size() > 0 ? (DATA(d) + d->offset) : 0;
+  return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
 ByteVector ByteVector::mid(uint index, uint length) const
@@ -558,7 +469,7 @@ ByteVector ByteVector::mid(uint index, uint length) const
 
 char ByteVector::at(uint index) const
 {
-  return index < size() ? DATA(d)[d->offset + index] : 0;
+  return (index < size()) ? (*d->data)[d->offset + index] : 0;
 }
 
 int ByteVector::find(const ByteVector &pattern, uint offset, int byteAlign) const
@@ -675,10 +586,8 @@ int ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
 
 ByteVector &ByteVector::append(const ByteVector &v)
 {
-  if(v.d->length != 0)
-  {
+  if(v.d->length != 0) {
     detach();
-
     uint originalSize = size();
     resize(originalSize + v.size());
     ::memcpy(data() + originalSize, v.data(), v.size());
@@ -687,9 +596,15 @@ ByteVector &ByteVector::append(const ByteVector &v)
   return *this;
 }
 
+ByteVector &ByteVector::append(char c)
+{
+  resize(size() + 1, c);
+  return *this;
+}
+
 ByteVector &ByteVector::clear()
 {
-  *this = ByteVector();
+  ByteVector().swap(*this);
   return *this;
 }
 
@@ -707,8 +622,8 @@ ByteVector &ByteVector::resize(uint size, char padding)
     // This doesn't reallocate the buffer, since std::vector::resize() doesn't
     // reallocate the buffer when shrinking.
 
-    d->data->data.resize(d->offset + d->length);
-    d->data->data.resize(d->offset + size, padding);
+    d->data->resize(d->offset + d->length);
+    d->data->resize(d->offset + size, padding);
 
     d->length = size;
   }
@@ -719,48 +634,50 @@ ByteVector &ByteVector::resize(uint size, char padding)
 ByteVector::Iterator ByteVector::begin()
 {
   detach();
-  return d->data->data.begin() + d->offset;
+  return d->data->begin() + d->offset;
 }
 
 ByteVector::ConstIterator ByteVector::begin() const
 {
-  return d->data->data.begin() + d->offset;
+  return d->data->begin() + d->offset;
 }
 
 ByteVector::Iterator ByteVector::end()
 {
   detach();
-  return d->data->data.begin() + d->offset + d->length;
+  return d->data->begin() + d->offset + d->length;
 }
 
 ByteVector::ConstIterator ByteVector::end() const
 {
-  return d->data->data.begin() + d->offset + d->length;
+  return d->data->begin() + d->offset + d->length;
 }
 
 ByteVector::ReverseIterator ByteVector::rbegin()
 {
   detach();
-  return d->data->data.rbegin() + (d->data->data.size() - (d->offset + d->length));
+  return d->data->rbegin() + (d->data->size() - (d->offset + d->length));
 }
 
 ByteVector::ConstReverseIterator ByteVector::rbegin() const
 {
-  // we need a const reference to the data vector so we can ensure the const version of rbegin() is called
-  const std::vector<char> &v = d->data->data;
+  // Workaround for the Solaris Studio 12.4 compiler.
+  // We need a const reference to the data vector so we can ensure the const version of rbegin() is called.
+  const std::vector<char> &v = *d->data;
   return v.rbegin() + (v.size() - (d->offset + d->length));
 }
 
 ByteVector::ReverseIterator ByteVector::rend()
 {
   detach();
-  return d->data->data.rbegin() + (d->data->data.size() - d->offset);
+  return d->data->rbegin() + (d->data->size() - d->offset);
 }
 
 ByteVector::ConstReverseIterator ByteVector::rend() const
 {
-  // we need a const reference to the data vector so we can ensure the const version of rbegin() is called
-  const std::vector<char> &v = d->data->data;
+  // Workaround for the Solaris Studio 12.4 compiler.
+  // We need a const reference to the data vector so we can ensure the const version of rbegin() is called.
+  const std::vector<char> &v = *d->data;
   return v.rbegin() + (v.size() - d->offset);
 }
 
@@ -859,13 +776,13 @@ long double ByteVector::toFloat80BE(size_t offset) const
 
 const char &ByteVector::operator[](int index) const
 {
-  return d->data->data[d->offset + index];
+  return (*d->data)[d->offset + index];
 }
 
 char &ByteVector::operator[](int index)
 {
   detach();
-  return d->data->data[d->offset + index];
+  return (*d->data)[d->offset + index];
 }
 
 bool ByteVector::operator==(const ByteVector &v) const
@@ -878,7 +795,7 @@ bool ByteVector::operator==(const ByteVector &v) const
 
 bool ByteVector::operator!=(const ByteVector &v) const
 {
-  return !operator==(v);
+  return !(*this == v);
 }
 
 bool ByteVector::operator==(const char *s) const
@@ -891,7 +808,7 @@ bool ByteVector::operator==(const char *s) const
 
 bool ByteVector::operator!=(const char *s) const
 {
-  return !operator==(s);
+  return !(*this == s);
 }
 
 bool ByteVector::operator<(const ByteVector &v) const
@@ -905,7 +822,7 @@ bool ByteVector::operator<(const ByteVector &v) const
 
 bool ByteVector::operator>(const ByteVector &v) const
 {
-  return v < *this;
+  return (v < *this);
 }
 
 ByteVector ByteVector::operator+(const ByteVector &v) const
@@ -917,27 +834,27 @@ ByteVector ByteVector::operator+(const ByteVector &v) const
 
 ByteVector &ByteVector::operator=(const ByteVector &v)
 {
-  if(&v == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-
-  d = v.d;
-  d->ref();
+  ByteVector(v).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(char c)
 {
-  *this = ByteVector(c);
+  ByteVector(c).swap(*this);
   return *this;
 }
 
 ByteVector &ByteVector::operator=(const char *data)
 {
-  *this = ByteVector(data);
+  ByteVector(data).swap(*this);
   return *this;
+}
+
+void ByteVector::swap(ByteVector &v)
+{
+  using std::swap;
+
+  swap(d, v.d);
 }
 
 ByteVector ByteVector::toHex() const
@@ -960,15 +877,11 @@ ByteVector ByteVector::toHex() const
 
 void ByteVector::detach()
 {
-  if(d->data->count() > 1) {
-    d->data->deref();
-    d->data = new DataPrivate(d->data->data, d->offset, d->length);
-    d->offset = 0;
-  }
-
-  if(d->count() > 1) {
-    d->deref();
-    d = new ByteVectorPrivate(d->data->data, d->offset, d->length);
+  if(d->counter->count() > 1) {
+    if(!isEmpty())
+      ByteVector(&d->data->front() + d->offset, d->length).swap(*this);
+    else
+      ByteVector().swap(*this);
   }
 }
 }
