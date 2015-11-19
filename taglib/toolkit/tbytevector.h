@@ -264,19 +264,6 @@ namespace TagLib {
     ConstReverseIterator rend() const;
 
     /*!
-     * Returns true if the vector is null.
-     *
-     * \note A vector may be empty without being null.  So do not use this
-     * method to check if the vector is empty.
-     *
-     * \see isEmpty()
-     *
-     * \deprecated
-     */
-     // BIC: remove
-    bool isNull() const;
-
-    /*!
      * Returns true if the ByteVector is empty.
      *
      * \see size()
@@ -567,17 +554,6 @@ namespace TagLib {
      * Exchanges the content of the ByteVector by the content of \a v.
      */
     void swap(ByteVector &v);
-
-    /*!
-     * A static, empty ByteVector which is convenient and fast (since returning
-     * an empty or "null" value does not require instantiating a new ByteVector).
-     *
-     * \warning Do not modify this variable.  It will mess up the internal state
-     * of TagLib.
-     *
-     * \deprecated
-     */
-    static const ByteVector null;
 
     /*!
     * When used as the value for a \a length or \a patternLength parameter

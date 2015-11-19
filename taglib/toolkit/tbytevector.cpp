@@ -327,8 +327,6 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-const ByteVector ByteVector::null;
-
 const size_t ByteVector::npos = static_cast<size_t>(-1);
 
 ByteVector ByteVector::fromCString(const char *s, size_t length)
@@ -677,11 +675,6 @@ ByteVector::ConstReverseIterator ByteVector::rend() const
   // We need a const reference to the data vector so we can ensure the const version of rbegin() is called.
   const std::vector<char> &v = *d->data;
   return v.rbegin() + (v.size() - d->offset);
-}
-
-bool ByteVector::isNull() const
-{
-  return (d == null.d);
 }
 
 bool ByteVector::isEmpty() const
