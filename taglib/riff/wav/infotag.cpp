@@ -38,7 +38,7 @@ public:
   TagPrivate()
   {}
 
-  FieldListMap fieldListMap;
+  FieldMap fieldMap;
 
   static const TagLib::StringHandler *stringHandler;
 };
@@ -155,7 +155,7 @@ void RIFF::Info::Tag::setYear(uint i)
   if(i != 0)
     setFieldText("ICRD", String::number(i));
   else
-    d->fieldListMap.erase("ICRD");
+    d->fieldMap.erase("ICRD");
 }
 
 void RIFF::Info::Tag::setTrack(uint i)
@@ -163,23 +163,23 @@ void RIFF::Info::Tag::setTrack(uint i)
   if(i != 0)
     setFieldText("IPRT", String::number(i));
   else
-    d->fieldListMap.erase("IPRT");
+    d->fieldMap.erase("IPRT");
 }
 
 bool RIFF::Info::Tag::isEmpty() const
 {
-  return d->fieldListMap.isEmpty();
+  return d->fieldMap.isEmpty();
 }
 
-FieldListMap RIFF::Info::Tag::fieldListMap() const
+FieldMap RIFF::Info::Tag::fieldMap() const
 {
-  return d->fieldListMap;
+  return d->fieldMap;
 }
 
 String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 {
-  if(d->fieldListMap.contains(id))
-    return String(d->fieldListMap[id]);
+  if(d->fieldMap.contains(id))
+    return String(d->fieldMap[id]);
   else
     return String();
 }
@@ -191,23 +191,23 @@ void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
     return;
 
   if(!s.isEmpty())
-    d->fieldListMap[id] = s;
+    d->fieldMap[id] = s;
   else
     removeField(id);
 }
 
 void RIFF::Info::Tag::removeField(const ByteVector &id)
 {
-  if(d->fieldListMap.contains(id))
-    d->fieldListMap.erase(id);
+  if(d->fieldMap.contains(id))
+    d->fieldMap.erase(id);
 }
 
 ByteVector RIFF::Info::Tag::render() const
 {
   ByteVector data("INFO");
 
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it) {
+  FieldMap::ConstIterator it = d->fieldMap.begin();
+  for(; it != d->fieldMap.end(); ++it) {
     ByteVector text = TagPrivate::stringHandler->render(it->second);
     if(text.isEmpty())
       continue;
@@ -250,7 +250,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
     const ByteVector id = data.mid(p, 4);
     if(RIFF::File::isValidChunkName(id)) {
       const String text = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
-      d->fieldListMap[id] = text;
+      d->fieldMap[id] = text;
     }
 
     p += ((size + 1) & ~1) + 8;

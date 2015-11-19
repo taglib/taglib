@@ -43,7 +43,7 @@ namespace TagLib {
   namespace RIFF {
   namespace Info {
 
-    typedef Map<ByteVector, String> FieldListMap;
+    typedef Map<ByteVector, String> FieldMap;
 
     //! A abstraction for the string to data encoding in Info tags.
 
@@ -132,7 +132,7 @@ namespace TagLib {
        * \see setFieldText()
        * \see removeField()
        */
-      FieldListMap fieldListMap() const;
+      FieldMap fieldMap() const;
 
       /*
        * Gets the value of the field with the ID \a id.
