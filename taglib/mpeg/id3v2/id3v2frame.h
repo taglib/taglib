@@ -264,13 +264,13 @@ namespace TagLib {
 
       /*!
        * Returns an appropriate ID3 frame ID for the given free-form tag key. This method
-       * will return ByteVector::null if no specialized translation is found.
+       * will return an empty ByteVector if no specialized translation is found.
        */
       static ByteVector keyToFrameID(const String &);
 
       /*!
        * Returns a free-form tag name for the given ID3 frame ID. Note that this does not work
-       * for general frame IDs such as TXXX or WXXX; in such a case String::null is returned.
+       * for general frame IDs such as TXXX or WXXX; in such a case an empty string is returned.
        */
       static String frameIDToKey(const ByteVector &);
 

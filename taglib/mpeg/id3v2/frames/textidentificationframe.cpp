@@ -146,7 +146,7 @@ PropertyMap TextIdentificationFrame::asProperties() const
     return makeTMCLProperties();
   PropertyMap map;
   String tagName = frameIDToKey(frameID());
-  if(tagName.isNull()) {
+  if(tagName.isEmpty()) {
     map.unsupportedData().append(frameID());
     return map;
   }
