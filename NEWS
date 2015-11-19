@@ -1,3 +1,11 @@
+==========================
+
+ * Added support for ID3v2 PCST and WFED frames.
+ * Added String::clear().
+ * Marked ByteVector::null and ByteVector::isNull() deprecated.
+ * Marked String::null and ByteVector::isNull() deprecated.
+ * Many smaller bug fixes and performance improvements.
+
 TagLib 1.10 (Nov 11, 2015)
 ==========================
 
