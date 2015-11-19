@@ -310,7 +310,7 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, siz
   ByteVector delimiter = textDelimiter(encoding);
 
   const size_t end = data.find(delimiter, position, delimiter.size());
-  if(end == ByteVector::npos || end < position)
+  if(end == ByteVector::npos() || end < position)
     return String::null;
 
   String str;

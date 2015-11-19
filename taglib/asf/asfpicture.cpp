@@ -159,13 +159,13 @@ void ASF::Picture::parse(const ByteVector& bytes)
   const ByteVector nullStringTerminator(2, 0);
 
   size_t endPos = bytes.find(nullStringTerminator, pos, 2);
-  if(endPos == ByteVector::npos)
+  if(endPos == ByteVector::npos())
     return;
   d->data->mimeType = String(bytes.mid(pos, endPos - pos), String::UTF16LE);
   pos = endPos+2;
 
   endPos = bytes.find(nullStringTerminator, pos, 2);
-  if(endPos == ByteVector::npos)
+  if(endPos == ByteVector::npos())
     return;
   d->data->description = String(bytes.mid(pos, endPos - pos), String::UTF16LE);
   pos = endPos+2;

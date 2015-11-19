@@ -45,8 +45,7 @@ bool Mod::FileBase::readString(String &s, uint size)
   ByteVector data(readBlock(size));
   if(data.size() < size) return false;
   const size_t index = data.find((char) 0);
-  if(index != ByteVector::npos)
-  {
+  if(index != ByteVector::npos()) {
     data.resize(index);
   }
   data.replace((char) 0xff, ' ');

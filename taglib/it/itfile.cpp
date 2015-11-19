@@ -225,7 +225,7 @@ void IT::File::read(bool)
     ByteVector messageBytes = readBlock(messageLength);
     READ_ASSERT(messageBytes.size() == messageLength);
     const size_t index = messageBytes.find((char) 0);
-    if(index != ByteVector::npos)
+    if(index != ByteVector::npos())
       messageBytes.resize(index, 0);
     messageBytes.replace('\r', '\n');
     message = messageBytes;

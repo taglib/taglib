@@ -126,7 +126,7 @@ namespace TagLib {
      * for \a length bytes.  If \a length is not specified it will return the bytes
      * from \a index to the end of the vector.
      */
-    ByteVector mid(size_t index, size_t length = npos) const;
+    ByteVector mid(size_t index, size_t length = npos()) const;
 
     /*!
      * This essentially performs the same as operator[](), but instead of causing
@@ -136,7 +136,7 @@ namespace TagLib {
 
     /*!
      * Searches the ByteVector for \a pattern starting at \a offset and returns
-     * the offset.  Returns \a npos if the pattern was not found.  If \a byteAlign is
+     * the offset.  Returns npos() if the pattern was not found.  If \a byteAlign is
      * specified the pattern will only be matched if it starts on a byte divisible
      * by \a byteAlign (starting from \a offset).
      */
@@ -152,7 +152,7 @@ namespace TagLib {
 
     /*!
      * Searches the ByteVector for \a pattern starting from either the end of the
-     * vector or \a offset and returns the offset.  Returns \ npos if the pattern was
+     * vector or \a offset and returns the offset.  Returns npos() if the pattern was
      * not found.  If \a byteAlign is specified the pattern will only be matched
      * if it starts on a byte divisible by \a byteAlign (starting from \a offset).
      */
@@ -166,7 +166,7 @@ namespace TagLib {
      * the \a patternLength argument.
      */
     bool containsAt(
-      const ByteVector &pattern, size_t offset, size_t patternOffset = 0, size_t patternLength = npos) const;
+      const ByteVector &pattern, size_t offset, size_t patternOffset = 0, size_t patternLength = npos()) const;
 
     /*!
      * Returns true if the vector starts with \a pattern.
@@ -186,7 +186,7 @@ namespace TagLib {
 
     /*!
      * Checks for a partial match of \a pattern at the end of the vector.  It
-     * returns the offset of the partial match within the vector, or \a npos if the
+     * returns the offset of the partial match within the vector, or npos() if the
      * pattern is not found.  This method is particularly useful when searching for
      * patterns that start in one vector and end in another.  When combined with
      * startsWith() it can be used to find a pattern that overlaps two buffers.
@@ -267,7 +267,6 @@ namespace TagLib {
      * Returns true if the ByteVector is empty.
      *
      * \see size()
-     * \see isNull()
      */
     bool isEmpty() const;
 
@@ -482,7 +481,7 @@ namespace TagLib {
     /*!
      * Returns a ByteVector based on the CString \a s.
      */
-    static ByteVector fromCString(const char *s, size_t length = npos);
+    static ByteVector fromCString(const char *s, size_t length = npos());
 
     /*!
      * Returns a const reference to the byte at \a index.
@@ -556,11 +555,11 @@ namespace TagLib {
     void swap(ByteVector &v);
 
     /*!
-    * When used as the value for a \a length or \a patternLength parameter
-    * in ByteVector's member functions, means "until the end of the data".
-    * As a return value, it is usually used to indicate no matches.
-    */
-    static const size_t npos;
+     * Returns a special value used for \a length or \a patternLength parameters
+     * of ByteVector's member functions, means "until the end of the data".
+     * As a return value, it is usually used to indicate no matches.
+     */
+    static size_t npos();
 
     /*!
      * Returns a hex-encoded copy of the byte vector.

@@ -90,10 +90,10 @@ void MPEG::XingHeader::parse(const ByteVector &data)
   // Look for a Xing header.
 
   size_t offset = data.find("Xing");
-  if(offset == ByteVector::npos)
+  if(offset == ByteVector::npos())
     offset = data.find("Info");
 
-  if(offset != ByteVector::npos) {
+  if(offset != ByteVector::npos()) {
 
     // Xing header found.
 
@@ -117,7 +117,7 @@ void MPEG::XingHeader::parse(const ByteVector &data)
 
     offset = data.find("VBRI");
 
-    if(offset != ByteVector::npos) {
+    if(offset != ByteVector::npos()) {
 
       // VBRI header found.
 

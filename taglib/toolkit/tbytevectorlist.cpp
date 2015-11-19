@@ -38,7 +38,7 @@ ByteVectorList ByteVectorList::split(
 
   size_t previousOffset = 0;
   for(size_t offset = v.find(pattern, 0, byteAlign);
-      offset != ByteVector::npos && (max == 0 || max > l.size() + 1);
+      offset != ByteVector::npos() && (max == 0 || max > l.size() + 1);
       offset = v.find(pattern, offset + pattern.size(), byteAlign))
   {
     if(offset - previousOffset >= 1)

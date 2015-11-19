@@ -131,8 +131,8 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // These variables are used to keep track of a partial match that happens at
   // the end of a buffer.
 
-  size_t previousPartialMatch = ByteVector::npos;
-  size_t beforePreviousPartialMatch = ByteVector::npos;
+  size_t previousPartialMatch = ByteVector::npos();
+  size_t beforePreviousPartialMatch = ByteVector::npos();
 
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
@@ -169,7 +169,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
     // (1) previous partial match
 
-    if(previousPartialMatch != ByteVector::npos
+    if(previousPartialMatch != ByteVector::npos()
       && bufferSize() > previousPartialMatch)
     {
       const size_t patternOffset = (bufferSize() - previousPartialMatch);
@@ -180,7 +180,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
     }
 
     if(!before.isEmpty()
-      && beforePreviousPartialMatch != ByteVector::npos
+      && beforePreviousPartialMatch != ByteVector::npos()
       && bufferSize() > beforePreviousPartialMatch)
     {
       const size_t beforeOffset = (bufferSize() - beforePreviousPartialMatch);
@@ -193,12 +193,12 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
     // (2) pattern contained in current buffer
 
     size_t location = buffer.find(pattern);
-    if(location != ByteVector::npos) {
+    if(location != ByteVector::npos()) {
       seek(originalPosition);
       return bufferOffset + location;
     }
 
-    if(!before.isEmpty() && buffer.find(before) != ByteVector::npos) {
+    if(!before.isEmpty() && buffer.find(before) != ByteVector::npos()) {
       seek(originalPosition);
       return -1;
     }
@@ -263,12 +263,12 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
     // (2) pattern contained in current buffer
 
     const size_t location = buffer.rfind(pattern);
-    if(location != ByteVector::npos) {
+    if(location != ByteVector::npos()) {
       seek(originalPosition);
       return bufferOffset + location;
     }
 
-    if(!before.isEmpty() && buffer.find(before) != ByteVector::npos) {
+    if(!before.isEmpty() && buffer.find(before) != ByteVector::npos()) {
       seek(originalPosition);
       return -1;
     }

@@ -95,24 +95,24 @@ public:
     CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 2));
     CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 3));
     CPPUNIT_ASSERT_EQUAL((size_t)4, ByteVector("....SggO."). find("SggO", 4));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 5));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 6));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 7));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("....SggO."). find("SggO", 8));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), ByteVector("....SggO."). find("SggO", 5));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), ByteVector("....SggO."). find("SggO", 6));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), ByteVector("....SggO."). find("SggO", 7));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), ByteVector("....SggO."). find("SggO", 8));
 
     // Intentional out-of-bounds access.
     ByteVector v("0123456789x");
     v.resize(10);
     v.data()[10] = 'x';
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, v.find("789x", 7));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), v.find("789x", 7));
   }
 
   void testFind2()
   {
     CPPUNIT_ASSERT_EQUAL((size_t)0, ByteVector("\x01", 1).find("\x01"));
     CPPUNIT_ASSERT_EQUAL((size_t)0, ByteVector("\x01\x02", 2).find("\x01\x02"));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("\x01", 1).find("\x02"));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, ByteVector("\x01\x02", 2).find("\x01\x03"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), ByteVector("\x01", 1).find("\x02"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), ByteVector("\x01\x02", 2).find("\x01\x03"));
   }
 
   void testRfind1()
@@ -137,8 +137,8 @@ public:
     ByteVector r3("OggS******OggS");
     ByteVector r4("OggS*OggS*OggS");
 
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, r0.find("OggS"));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, r0.rfind("OggS"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), r0.find("OggS"));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), r0.rfind("OggS"));
     CPPUNIT_ASSERT_EQUAL((size_t)0, r1.find("OggS"));
     CPPUNIT_ASSERT_EQUAL((size_t)0, r1.rfind("OggS"));
     CPPUNIT_ASSERT_EQUAL((size_t)10, r2.find("OggS"));
@@ -343,7 +343,7 @@ public:
     CPPUNIT_ASSERT_EQUAL('B', b[9]);
     b.resize(3, 'C');
     CPPUNIT_ASSERT_EQUAL(size_t(3), b.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, b.find('C'));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), b.find('C'));
     b.resize(3);
     CPPUNIT_ASSERT_EQUAL(size_t(3), b.size());
 
@@ -368,7 +368,7 @@ public:
     CPPUNIT_ASSERT_EQUAL('B', c[9]);
     c.resize(3, 'C');
     CPPUNIT_ASSERT_EQUAL(size_t(3), c.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector::npos, c.find('C'));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::npos(), c.find('C'));
   }
 
   void testAppend()

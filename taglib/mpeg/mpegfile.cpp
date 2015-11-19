@@ -525,7 +525,7 @@ offset_t MPEG::File::findID3v2(offset_t offset)
     // These variables are used to keep track of a partial match that happens at
     // the end of a buffer.
 
-    size_t previousPartialMatch = ByteVector::npos;
+    size_t previousPartialMatch = ByteVector::npos();
     bool previousPartialSynchMatch = false;
 
     // Save the location of the current read pointer.  We will restore the
@@ -560,7 +560,7 @@ offset_t MPEG::File::findID3v2(offset_t offset)
       if(previousPartialSynchMatch && secondSynchByte(buffer[0]))
         return -1;
 
-      if(previousPartialMatch != ByteVector::npos && bufferSize() > previousPartialMatch) {
+      if(previousPartialMatch != ByteVector::npos() && bufferSize() > previousPartialMatch) {
         const size_t patternOffset = (bufferSize() - previousPartialMatch);
         if(buffer.containsAt(ID3v2::Header::fileIdentifier(), 0, patternOffset)) {
           seek(originalPosition);
@@ -571,7 +571,7 @@ offset_t MPEG::File::findID3v2(offset_t offset)
       // (2) pattern contained in current buffer
 
       const size_t location = buffer.find(ID3v2::Header::fileIdentifier());
-      if(location != ByteVector::npos) {
+      if(location != ByteVector::npos()) {
         seek(originalPosition);
         return offset + bufferOffset + location;
       }
@@ -582,7 +582,7 @@ offset_t MPEG::File::findID3v2(offset_t offset)
       // (11111111) byte, and we want to check all such instances until we find
       // a full match (11111111 111) or hit the end of the buffer.
 
-      while(firstSynchByte != ByteVector::npos) {
+      while(firstSynchByte != ByteVector::npos()) {
 
         // if this *is not* at the end of the buffer
 

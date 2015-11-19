@@ -132,7 +132,7 @@ namespace
       ByteVector data = file.readBlock(std::min(m_size, limit));
       size_t count = data.size();
       const size_t index = data.find((char) 0);
-      if(index != ByteVector::npos) {
+      if(index != ByteVector::npos()) {
         data.resize(index);
       }
       data.replace((char) 0xff, ' ');

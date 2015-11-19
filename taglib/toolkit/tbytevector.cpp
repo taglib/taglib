@@ -106,19 +106,19 @@ size_t findChar(
 {
   const size_t dataSize = dataEnd - dataBegin;
   if(offset + 1 > dataSize)
-    return ByteVector::npos;
+    return ByteVector::npos();
 
   // n % 0 is invalid
 
   if(byteAlign == 0)
-    return ByteVector::npos;
+    return ByteVector::npos();
 
   for(TIterator it = dataBegin + offset; it < dataEnd; it += byteAlign) {
     if(*it == c)
       return (it - dataBegin);
   }
 
-  return ByteVector::npos;
+  return ByteVector::npos();
 }
 
 template <class TIterator>
@@ -130,7 +130,7 @@ size_t findVector(
   const size_t dataSize    = dataEnd    - dataBegin;
   const size_t patternSize = patternEnd - patternBegin;
   if(patternSize == 0 || offset + patternSize > dataSize)
-    return ByteVector::npos;
+    return ByteVector::npos();
 
   // Special case that pattern contains just single char.
 
@@ -161,7 +161,7 @@ size_t findVector(
     }
   }
 
-  return ByteVector::npos;
+  return ByteVector::npos();
 }
 
 template <typename T, size_t LENGTH, ByteOrder ENDIAN>
@@ -327,11 +327,14 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-const size_t ByteVector::npos = static_cast<size_t>(-1);
+size_t ByteVector::npos()
+{
+  return static_cast<size_t>(-1);
+}
 
 ByteVector ByteVector::fromCString(const char *s, size_t length)
 {
-  if(length == npos)
+  if(length == npos())
     return ByteVector(s);
   else
     return ByteVector(s, length);
@@ -489,8 +492,8 @@ size_t ByteVector::rfind(const ByteVector &pattern, size_t offset, size_t byteAl
   const size_t pos = findVector<ConstReverseIterator>(
     rbegin(), rend(), pattern.rbegin(), pattern.rend(), offset, byteAlign);
 
-  if(pos == npos)
-    return npos;
+  if(pos == npos())
+    return npos();
   else
     return size() - pos - pattern.size();
 }
@@ -532,7 +535,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   while (true)
   {
     offset = find(pattern, offset);
-    if(offset == npos)
+    if(offset == npos())
       break;
 
     detach();
@@ -565,7 +568,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
 size_t ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
 {
   if(pattern.size() > size())
-    return npos;
+    return npos();
 
   const size_t startIndex = size() - pattern.size();
 
@@ -577,7 +580,7 @@ size_t ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
       return startIndex + i;
   }
 
-  return npos;
+  return npos();
 }
 
 ByteVector &ByteVector::append(const ByteVector &v)

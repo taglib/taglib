@@ -191,7 +191,7 @@ void UserUrlLinkFrame::parseFields(const ByteVector &data)
 
   if(d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8) {
     const size_t offset = data.find(textDelimiter(d->textEncoding), pos);
-    if(offset == ByteVector::npos || offset < pos)
+    if(offset == ByteVector::npos() || offset < pos)
       return;
 
     d->description = String(data.mid(pos, offset - pos), d->textEncoding);
@@ -199,7 +199,7 @@ void UserUrlLinkFrame::parseFields(const ByteVector &data)
   }
   else {
     const size_t len = data.mid(pos).find(textDelimiter(d->textEncoding), 0, 2);
-    if(len == ByteVector::npos)
+    if(len == ByteVector::npos())
       return;
 
     d->description = String(data.mid(pos, len), d->textEncoding);
