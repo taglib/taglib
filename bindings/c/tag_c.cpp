@@ -159,7 +159,7 @@ BOOL taglib_file_save(TagLib_File *file)
 char *taglib_tag_title(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = stringToCharArray(t->title().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->title());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -168,7 +168,7 @@ char *taglib_tag_title(const TagLib_Tag *tag)
 char *taglib_tag_artist(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = stringToCharArray(t->artist().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->artist());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -177,7 +177,7 @@ char *taglib_tag_artist(const TagLib_Tag *tag)
 char *taglib_tag_album(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = stringToCharArray(t->album().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->album());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -186,7 +186,7 @@ char *taglib_tag_album(const TagLib_Tag *tag)
 char *taglib_tag_comment(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = stringToCharArray(t->comment().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->comment());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
@@ -195,7 +195,7 @@ char *taglib_tag_comment(const TagLib_Tag *tag)
 char *taglib_tag_genre(const TagLib_Tag *tag)
 {
   const Tag *t = reinterpret_cast<const Tag *>(tag);
-  char *s = stringToCharArray(t->genre().toCString(unicodeStrings));
+  char *s = stringToCharArray(t->genre());
   if(stringManagementEnabled)
     strings.append(s);
   return s;
