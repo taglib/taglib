@@ -210,58 +210,64 @@ bool ASF::Tag::isEmpty() const
          d->attributeListMap.isEmpty();
 }
 
-static const char *keyTranslation[][2] = {
-  { "WM/AlbumTitle", "ALBUM" },
-  { "WM/AlbumArtist", "ALBUMARTIST" },
-  { "WM/Composer", "COMPOSER" },
-  { "WM/Writer", "WRITER" },
-  { "WM/Conductor", "CONDUCTOR" },
-  { "WM/ModifiedBy", "REMIXER" },
-  { "WM/Year", "DATE" },
-  { "WM/OriginalReleaseYear", "ORIGINALDATE" },
-  { "WM/Producer", "PRODUCER" },
-  { "WM/ContentGroupDescription", "GROUPING" },
-  { "WM/SubTitle", "SUBTITLE" },
-  { "WM/SetSubTitle", "DISCSUBTITLE" },
-  { "WM/TrackNumber", "TRACKNUMBER" },
-  { "WM/PartOfSet", "DISCNUMBER" },
-  { "WM/Genre", "GENRE" },
-  { "WM/BeatsPerMinute", "BPM" },
-  { "WM/Mood", "MOOD" },
-  { "WM/ISRC", "ISRC" },
-  { "WM/Lyrics", "LYRICS" },
-  { "WM/Media", "MEDIA" },
-  { "WM/Publisher", "LABEL" },
-  { "WM/CatalogNo", "CATALOGNUMBER" },
-  { "WM/Barcode", "BARCODE" },
-  { "WM/EncodedBy", "ENCODEDBY" },
-  { "WM/AlbumSortOrder", "ALBUMSORT" },
-  { "WM/AlbumArtistSortOrder", "ALBUMARTISTSORT" },
-  { "WM/ArtistSortOrder", "ARTISTSORT" },
-  { "WM/TitleSortOrder", "TITLESORT" },
-  { "WM/Script", "SCRIPT" },
-  { "WM/Language", "LANGUAGE" },
-  { "MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID" },
-  { "MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID" },
-  { "MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID" },
-  { "MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
-  { "MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
-  { "MusicBrainz/Work Id", "MUSICBRAINZ_WORKID" },
-  { "MusicIP/PUID", "MUSICIP_PUID" },
-  { "Acoustid/Id", "ACOUSTID_ID" },
-  { "Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT" },
-};
+namespace
+{
+  const char *keyTranslation[][2] = {
+    { "WM/AlbumTitle", "ALBUM" },
+    { "WM/AlbumArtist", "ALBUMARTIST" },
+    { "WM/Composer", "COMPOSER" },
+    { "WM/Writer", "WRITER" },
+    { "WM/Conductor", "CONDUCTOR" },
+    { "WM/ModifiedBy", "REMIXER" },
+    { "WM/Year", "DATE" },
+    { "WM/OriginalReleaseYear", "ORIGINALDATE" },
+    { "WM/Producer", "PRODUCER" },
+    { "WM/ContentGroupDescription", "GROUPING" },
+    { "WM/SubTitle", "SUBTITLE" },
+    { "WM/SetSubTitle", "DISCSUBTITLE" },
+    { "WM/TrackNumber", "TRACKNUMBER" },
+    { "WM/PartOfSet", "DISCNUMBER" },
+    { "WM/Genre", "GENRE" },
+    { "WM/BeatsPerMinute", "BPM" },
+    { "WM/Mood", "MOOD" },
+    { "WM/ISRC", "ISRC" },
+    { "WM/Lyrics", "LYRICS" },
+    { "WM/Media", "MEDIA" },
+    { "WM/Publisher", "LABEL" },
+    { "WM/CatalogNo", "CATALOGNUMBER" },
+    { "WM/Barcode", "BARCODE" },
+    { "WM/EncodedBy", "ENCODEDBY" },
+    { "WM/AlbumSortOrder", "ALBUMSORT" },
+    { "WM/AlbumArtistSortOrder", "ALBUMARTISTSORT" },
+    { "WM/ArtistSortOrder", "ARTISTSORT" },
+    { "WM/TitleSortOrder", "TITLESORT" },
+    { "WM/Script", "SCRIPT" },
+    { "WM/Language", "LANGUAGE" },
+    { "MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID" },
+    { "MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID" },
+    { "MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID" },
+    { "MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
+    { "MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "MusicBrainz/Work Id", "MUSICBRAINZ_WORKID" },
+    { "MusicIP/PUID", "MUSICIP_PUID" },
+    { "Acoustid/Id", "ACOUSTID_ID" },
+    { "Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT" },
+  };
+  const size_t keyTranslationSize = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
+
+  String translateKey(const String &key)
+  {
+    for(size_t i = 0; i < keyTranslationSize; ++i) {
+      if(key == keyTranslation[i][0])
+        return keyTranslation[i][1];
+    }
+
+    return String();
+  }
+}
 
 PropertyMap ASF::Tag::properties() const
 {
-  static Map<String, String> keyMap;
-  if(keyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      keyMap[keyTranslation[i][0]] = keyTranslation[i][1];
-    }
-  }
-
   PropertyMap props;
 
   if(!d->title.isEmpty()) {
@@ -279,8 +285,8 @@ PropertyMap ASF::Tag::properties() const
 
   ASF::AttributeListMap::ConstIterator it = d->attributeListMap.begin();
   for(; it != d->attributeListMap.end(); ++it) {
-    if(keyMap.contains(it->first)) {
-      String key = keyMap[it->first];
+    const String key = translateKey(it->first);
+    if(!key.isEmpty()) {
       AttributeList::ConstIterator it2 = it->second.begin();
       for(; it2 != it->second.end(); ++it2) {
         if(key == "TRACKNUMBER") {

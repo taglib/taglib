@@ -364,98 +364,101 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   return checkEncoding(fields, encoding, header()->version());
 }
 
-static const size_t frameTranslationSize = 51;
-static const char *frameTranslation[][2] = {
-  // Text information frames
-  { "TALB", "ALBUM"},
-  { "TBPM", "BPM" },
-  { "TCOM", "COMPOSER" },
-  { "TCON", "GENRE" },
-  { "TCOP", "COPYRIGHT" },
-  { "TDEN", "ENCODINGTIME" },
-  { "TDLY", "PLAYLISTDELAY" },
-  { "TDOR", "ORIGINALDATE" },
-  { "TDRC", "DATE" },
-  // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
-  { "TDRL", "RELEASEDATE" },
-  { "TDTG", "TAGGINGDATE" },
-  { "TENC", "ENCODEDBY" },
-  { "TEXT", "LYRICIST" },
-  { "TFLT", "FILETYPE" },
-  //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
-  { "TIT1", "CONTENTGROUP" },
-  { "TIT2", "TITLE"},
-  { "TIT3", "SUBTITLE" },
-  { "TKEY", "INITIALKEY" },
-  { "TLAN", "LANGUAGE" },
-  { "TLEN", "LENGTH" },
-  //{ "TMCL", "MUSICIANCREDITS" }, handled separately
-  { "TMED", "MEDIA" },
-  { "TMOO", "MOOD" },
-  { "TOAL", "ORIGINALALBUM" },
-  { "TOFN", "ORIGINALFILENAME" },
-  { "TOLY", "ORIGINALLYRICIST" },
-  { "TOPE", "ORIGINALARTIST" },
-  { "TOWN", "OWNER" },
-  { "TPE1", "ARTIST"},
-  { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
-  { "TPE3", "CONDUCTOR" },
-  { "TPE4", "REMIXER" }, // could also be ARRANGER
-  { "TPOS", "DISCNUMBER" },
-  { "TPRO", "PRODUCEDNOTICE" },
-  { "TPUB", "LABEL" },
-  { "TRCK", "TRACKNUMBER" },
-  { "TRSN", "RADIOSTATION" },
-  { "TRSO", "RADIOSTATIONOWNER" },
-  { "TSOA", "ALBUMSORT" },
-  { "TSOP", "ARTISTSORT" },
-  { "TSOT", "TITLESORT" },
-  { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
-  { "TSRC", "ISRC" },
-  { "TSSE", "ENCODING" },
-  // URL frames
-  { "WCOP", "COPYRIGHTURL" },
-  { "WOAF", "FILEWEBPAGE" },
-  { "WOAR", "ARTISTWEBPAGE" },
-  { "WOAS", "AUDIOSOURCEWEBPAGE" },
-  { "WORS", "RADIOSTATIONWEBPAGE" },
-  { "WPAY", "PAYMENTWEBPAGE" },
-  { "WPUB", "PUBLISHERWEBPAGE" },
-  //{ "WXXX", "URL"}, handled specially
-  // Other frames
-  { "COMM", "COMMENT" },
-  //{ "USLT", "LYRICS" }, handled specially
-  // Apple iTunes proprietary frames
-  { "PCST", "PODCAST" },
-  { "TCAT", "PODCASTCATEGORY" },
-  { "TDES", "PODCASTDESC" },
-  { "TGID", "PODCASTID" },
-  { "WFED", "PODCASTURL" },
-};
+namespace
+{
+  const char *frameTranslation[][2] = {
+    // Text information frames
+    { "TALB", "ALBUM"},
+    { "TBPM", "BPM" },
+    { "TCOM", "COMPOSER" },
+    { "TCON", "GENRE" },
+    { "TCOP", "COPYRIGHT" },
+    { "TDEN", "ENCODINGTIME" },
+    { "TDLY", "PLAYLISTDELAY" },
+    { "TDOR", "ORIGINALDATE" },
+    { "TDRC", "DATE" },
+    // { "TRDA", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    // { "TDAT", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    // { "TYER", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    // { "TIME", "DATE" }, // id3 v2.3, replaced by TDRC in v2.4
+    { "TDRL", "RELEASEDATE" },
+    { "TDTG", "TAGGINGDATE" },
+    { "TENC", "ENCODEDBY" },
+    { "TEXT", "LYRICIST" },
+    { "TFLT", "FILETYPE" },
+    //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
+    { "TIT1", "CONTENTGROUP" },
+    { "TIT2", "TITLE"},
+    { "TIT3", "SUBTITLE" },
+    { "TKEY", "INITIALKEY" },
+    { "TLAN", "LANGUAGE" },
+    { "TLEN", "LENGTH" },
+    //{ "TMCL", "MUSICIANCREDITS" }, handled separately
+    { "TMED", "MEDIA" },
+    { "TMOO", "MOOD" },
+    { "TOAL", "ORIGINALALBUM" },
+    { "TOFN", "ORIGINALFILENAME" },
+    { "TOLY", "ORIGINALLYRICIST" },
+    { "TOPE", "ORIGINALARTIST" },
+    { "TOWN", "OWNER" },
+    { "TPE1", "ARTIST"},
+    { "TPE2", "ALBUMARTIST" }, // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
+    { "TPE3", "CONDUCTOR" },
+    { "TPE4", "REMIXER" }, // could also be ARRANGER
+    { "TPOS", "DISCNUMBER" },
+    { "TPRO", "PRODUCEDNOTICE" },
+    { "TPUB", "LABEL" },
+    { "TRCK", "TRACKNUMBER" },
+    { "TRSN", "RADIOSTATION" },
+    { "TRSO", "RADIOSTATIONOWNER" },
+    { "TSOA", "ALBUMSORT" },
+    { "TSOP", "ARTISTSORT" },
+    { "TSOT", "TITLESORT" },
+    { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
+    { "TSRC", "ISRC" },
+    { "TSSE", "ENCODING" },
+    // URL frames
+    { "WCOP", "COPYRIGHTURL" },
+    { "WOAF", "FILEWEBPAGE" },
+    { "WOAR", "ARTISTWEBPAGE" },
+    { "WOAS", "AUDIOSOURCEWEBPAGE" },
+    { "WORS", "RADIOSTATIONWEBPAGE" },
+    { "WPAY", "PAYMENTWEBPAGE" },
+    { "WPUB", "PUBLISHERWEBPAGE" },
+    //{ "WXXX", "URL"}, handled specially
+    // Other frames
+    { "COMM", "COMMENT" },
+    //{ "USLT", "LYRICS" }, handled specially
+    // Apple iTunes proprietary frames
+    { "PCST", "PODCAST" },
+    { "TCAT", "PODCASTCATEGORY" },
+    { "TDES", "PODCASTDESC" },
+    { "TGID", "PODCASTID" },
+    { "WFED", "PODCASTURL" },
+  };
+  const size_t frameTranslationSize = sizeof(frameTranslation) / sizeof(frameTranslation[0]);
 
-static const size_t txxxFrameTranslationSize = 8;
-static const char *txxxFrameTranslation[][2] = {
-  { "MUSICBRAINZ ALBUM ID",         "MUSICBRAINZ_ALBUMID" },
-  { "MUSICBRAINZ ARTIST ID",        "MUSICBRAINZ_ARTISTID" },
-  { "MUSICBRAINZ ALBUM ARTIST ID",  "MUSICBRAINZ_ALBUMARTISTID" },
-  { "MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID" },
-  { "MUSICBRAINZ WORK ID",          "MUSICBRAINZ_WORKID" },
-  { "ACOUSTID ID",                  "ACOUSTID_ID" },
-  { "ACOUSTID FINGERPRINT",         "ACOUSTID_FINGERPRINT" },
-  { "MUSICIP PUID",                 "MUSICIP_PUID" },
-};
+  const char *txxxFrameTranslation[][2] = {
+    { "MUSICBRAINZ ALBUM ID",         "MUSICBRAINZ_ALBUMID" },
+    { "MUSICBRAINZ ARTIST ID",        "MUSICBRAINZ_ARTISTID" },
+    { "MUSICBRAINZ ALBUM ARTIST ID",  "MUSICBRAINZ_ALBUMARTISTID" },
+    { "MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "MUSICBRAINZ WORK ID",          "MUSICBRAINZ_WORKID" },
+    { "ACOUSTID ID",                  "ACOUSTID_ID" },
+    { "ACOUSTID FINGERPRINT",         "ACOUSTID_FINGERPRINT" },
+    { "MUSICIP PUID",                 "MUSICIP_PUID" },
+  };
+  const size_t txxxFrameTranslationSize = sizeof(txxxFrameTranslation) / sizeof(txxxFrameTranslation[0]);
 
-// list of deprecated frames and their successors
-static const size_t deprecatedFramesSize = 4;
-static const char *deprecatedFrames[][2] = {
-  {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
-  {"TDAT", "TDRC"}, // 2.3 -> 2.4
-  {"TYER", "TDRC"}, // 2.3 -> 2.4
-  {"TIME", "TDRC"}, // 2.3 -> 2.4
-};
+  // list of deprecated frames and their successors
+  const char *deprecatedFrames[][2] = {
+    {"TRDA", "TDRC"}, // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+    {"TDAT", "TDRC"}, // 2.3 -> 2.4
+    {"TYER", "TDRC"}, // 2.3 -> 2.4
+    {"TIME", "TDRC"}, // 2.3 -> 2.4
+  };
+  const size_t deprecatedFramesSize = sizeof(deprecatedFrames) / sizeof(deprecatedFrames[0]);;
+}
 
 String Frame::frameIDToKey(const ByteVector &id)
 {
