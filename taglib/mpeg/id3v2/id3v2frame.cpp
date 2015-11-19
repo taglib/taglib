@@ -170,7 +170,7 @@ ByteVector Frame::frameID() const
   if(d->header)
     return d->header->frameID();
   else
-    return ByteVector::null;
+    return ByteVector();
 }
 
 TagLib::uint Frame::size() const

@@ -426,7 +426,7 @@ ByteVector String::data(Type t) const
       return v;
     }
     else {
-      return ByteVector::null;
+      return ByteVector();
     }
   case UTF16:
     {
@@ -472,7 +472,7 @@ ByteVector String::data(Type t) const
   default:
     {
       debug("String::data() - Invalid Type value.");
-      return ByteVector::null;
+      return ByteVector();
     }
   }
 }

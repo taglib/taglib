@@ -55,7 +55,7 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
     if(offset - previousOffset >= 1)
       l.append(v.mid(previousOffset, offset - previousOffset));
     else
-      l.append(ByteVector::null);
+      l.append(ByteVector());
 
     previousOffset = offset + pattern.size();
   }

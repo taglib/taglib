@@ -196,7 +196,7 @@ void ASF::File::FilePrivate::BaseObject::parse(ASF::File *file, unsigned int siz
   if(size > 24 && size <= (unsigned int)(file->length()))
     data = file->readBlock(size - 24);
   else
-    data = ByteVector::null;
+    data = ByteVector();
 }
 
 ByteVector ASF::File::FilePrivate::BaseObject::render(ASF::File * /*file*/)
@@ -312,7 +312,7 @@ ByteVector ASF::File::FilePrivate::ExtendedContentDescriptionObject::render(ASF:
 {
   data.clear();
   data.append(ByteVector::fromShort(attributeData.size(), false));
-  data.append(attributeData.toByteVector(ByteVector::null));
+  data.append(attributeData.toByteVector(""));
   return BaseObject::render(file);
 }
 
@@ -336,7 +336,7 @@ ByteVector ASF::File::FilePrivate::MetadataObject::render(ASF::File *file)
 {
   data.clear();
   data.append(ByteVector::fromShort(attributeData.size(), false));
-  data.append(attributeData.toByteVector(ByteVector::null));
+  data.append(attributeData.toByteVector(""));
   return BaseObject::render(file);
 }
 
@@ -360,7 +360,7 @@ ByteVector ASF::File::FilePrivate::MetadataLibraryObject::render(ASF::File *file
 {
   data.clear();
   data.append(ByteVector::fromShort(attributeData.size(), false));
-  data.append(attributeData.toByteVector(ByteVector::null));
+  data.append(attributeData.toByteVector(""));
   return BaseObject::render(file);
 }
 

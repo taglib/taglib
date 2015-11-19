@@ -38,7 +38,7 @@ class PublicFrame : public ID3v2::Frame
       { return ID3v2::Frame::readStringField(data, encoding, positon); }
     virtual String toString() const { return String::null; }
     virtual void parseFields(const ByteVector &) {}
-    virtual ByteVector renderFields() const { return ByteVector::null; }
+    virtual ByteVector renderFields() const { return ByteVector(); }
 };
 
 class TestID3v2 : public CppUnit::TestFixture

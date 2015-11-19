@@ -176,11 +176,11 @@ ByteVector FileStream::readBlock(ulong length)
 {
   if(!isOpen()) {
     debug("FileStream::readBlock() -- invalid file.");
-    return ByteVector::null;
+    return ByteVector();
   }
 
   if(length == 0)
-    return ByteVector::null;
+    return ByteVector();
 
   const ulong streamLength = static_cast<ulong>(FileStream::length());
   if(length > bufferSize() && length > streamLength)

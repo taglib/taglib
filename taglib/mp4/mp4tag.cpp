@@ -428,7 +428,7 @@ MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
   StringList header = StringList::split(name, ":");
   if(header.size() != 3) {
     debug("MP4: Invalid free-form item name \"" + name + "\"");
-    return ByteVector::null;
+    return ByteVector();
   }
   ByteVector data;
   data.append(renderAtom("mean", ByteVector::fromUInt(0) + header[1].data(String::UTF8)));

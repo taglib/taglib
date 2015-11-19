@@ -56,7 +56,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("a"), stream.readBlock(1));
     CPPUNIT_ASSERT_EQUAL(ByteVector("bc"), stream.readBlock(2));
     CPPUNIT_ASSERT_EQUAL(ByteVector("d"), stream.readBlock(3));
-    CPPUNIT_ASSERT_EQUAL(ByteVector::null, stream.readBlock(3));
+    CPPUNIT_ASSERT_EQUAL(ByteVector(""), stream.readBlock(3));
   }
 
   void testRemoveBlock()

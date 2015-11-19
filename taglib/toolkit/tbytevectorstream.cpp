@@ -71,7 +71,7 @@ FileName ByteVectorStream::name() const
 ByteVector ByteVectorStream::readBlock(ulong length)
 {
   if(length == 0)
-    return ByteVector::null;
+    return ByteVector();
 
   ByteVector v = d->data.mid(d->position, length);
   d->position += v.size();
