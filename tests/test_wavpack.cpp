@@ -1,7 +1,9 @@
 #include <string>
 #include <stdio.h>
-#include <tag.h>
+#include <apetag.h>
+#include <id3v1tag.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <wavpackfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -16,6 +18,7 @@ class TestWavPack : public CppUnit::TestFixture
   CPPUNIT_TEST(testMultiChannelProperties);
   CPPUNIT_TEST(testTaggedProperties);
   CPPUNIT_TEST(testFuzzedFile);
+  CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -73,6 +76,27 @@ public:
     WavPack::File f(TEST_FILE_PATH_C("infloop.wv"));
     CPPUNIT_ASSERT(f.isValid());
   }
+
+  void testStripAndProperties()
+  {
+    ScopedFileCopy copy("click", ".wv");
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      f.APETag(true)->setTitle("APE");
+      f.ID3v1Tag(true)->setTitle("ID3v1");
+      f.save();
+    }
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
+      f.strip(WavPack::File::APE);
+      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
+      f.strip(WavPack::File::ID3v1);
+      CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestWavPack);

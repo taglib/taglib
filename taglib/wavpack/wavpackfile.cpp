@@ -110,26 +110,20 @@ TagLib::Tag *WavPack::File::tag() const
 
 PropertyMap WavPack::File::properties() const
 {
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(WavAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(WavID3v1Index, false)->properties();
-  return PropertyMap();
+  return d->tag.properties();
 }
-
 
 void WavPack::File::removeUnsupportedProperties(const StringList &unsupported)
 {
-  if(d->hasAPE)
-    d->tag.access<APE::Tag>(WavAPEIndex, false)->removeUnsupportedProperties(unsupported);
+  d->tag.removeUnsupportedProperties(unsupported);
 }
-
 
 PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(WavID3v1Index, false)->setProperties(properties);
-  return d->tag.access<APE::Tag>(WavAPEIndex, true)->setProperties(properties);
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return APETag(true)->setProperties(properties);
 }
 
 WavPack::Properties *WavPack::File::audioProperties() const

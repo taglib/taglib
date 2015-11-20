@@ -125,26 +125,20 @@ TagLib::Tag *APE::File::tag() const
 
 PropertyMap APE::File::properties() const
 {
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(ApeAPEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->properties();
-  return PropertyMap();
+  return d->tag.properties();
 }
 
 void APE::File::removeUnsupportedProperties(const StringList &properties)
 {
-  if(d->hasAPE)
-    d->tag.access<APE::Tag>(ApeAPEIndex, false)->removeUnsupportedProperties(properties);
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->removeUnsupportedProperties(properties);
+  d->tag.removeUnsupportedProperties(properties);
 }
 
 PropertyMap APE::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->setProperties(properties);
-  return d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return APETag(true)->setProperties(properties);
 }
 
 APE::Properties *APE::File::audioProperties() const

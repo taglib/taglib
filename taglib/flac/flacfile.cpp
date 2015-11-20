@@ -141,30 +141,17 @@ TagLib::Tag *FLAC::File::tag() const
 
 PropertyMap FLAC::File::properties() const
 {
-  // once Tag::properties() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if(d->hasXiphComment)
-    return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->properties();
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->properties();
-  return PropertyMap();
+  return d->tag.properties();
 }
 
 void FLAC::File::removeUnsupportedProperties(const StringList &unsupported)
 {
-  if(d->hasXiphComment)
-    d->tag.access<Ogg::XiphComment>(FlacXiphIndex, false)->removeUnsupportedProperties(unsupported);
-  if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(FlacID3v2Index, false)->removeUnsupportedProperties(unsupported);
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(FlacID3v1Index, false)->removeUnsupportedProperties(unsupported);
+  d->tag.removeUnsupportedProperties(unsupported);
 }
 
 PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 {
-  return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, true)->setProperties(properties);
+  return xiphComment(true)->setProperties(properties);
 }
 
 FLAC::Properties *FLAC::File::audioProperties() const

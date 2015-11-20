@@ -149,33 +149,22 @@ TagLib::Tag *MPEG::File::tag() const
 
 PropertyMap MPEG::File::properties() const
 {
-  // once Tag::properties() is virtual, this case distinction could actually be done
-  // within TagUnion.
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->properties();
-  if(d->hasAPE)
-    return d->tag.access<APE::Tag>(APEIndex, false)->properties();
-  if(d->hasID3v1)
-    return d->tag.access<ID3v1::Tag>(ID3v1Index, false)->properties();
-  return PropertyMap();
+  return d->tag.properties();
 }
 
 void MPEG::File::removeUnsupportedProperties(const StringList &properties)
 {
-  if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->removeUnsupportedProperties(properties);
-  else if(d->hasAPE)
-    d->tag.access<APE::Tag>(APEIndex, false)->removeUnsupportedProperties(properties);
-  else if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->removeUnsupportedProperties(properties);
+  d->tag.removeUnsupportedProperties(properties);
 }
 
 PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    // update ID3v1 tag if it exists, but ignore the return value
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
+  // update ID3v1 tag if it exists, but ignore the return value
+
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return ID3v2Tag(true)->setProperties(properties);
 }
 
 MPEG::Properties *MPEG::File::audioProperties() const
