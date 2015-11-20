@@ -5,6 +5,7 @@
  * Better handling of duplicate ID3v2 tags in all kinds of files.
  * Better handling of duplicate tags in WAV files.
  * Fixed crash when calling File::properties() after strip().
+ * Fixed possible file corruptions when saving ASF files.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Many smaller bug fixes and performance improvements.
