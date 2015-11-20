@@ -6,6 +6,7 @@
  * Better handling of duplicate tags in WAV files.
  * Fixed crash when calling File::properties() after strip().
  * Fixed possible file corruptions when saving ASF files.
+ * Fixed updating the comment field of Vorbis comments.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Many smaller bug fixes and performance improvements.
