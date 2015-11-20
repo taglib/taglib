@@ -2,6 +2,7 @@
 
  * Added support for ID3v2 PCST and WFED frames.
  * Added String::clear().
+ * Better handling of duplicate ID3v2 tags in all kinds of files.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Many smaller bug fixes and performance improvements.
