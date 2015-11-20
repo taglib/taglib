@@ -29,7 +29,7 @@
 // This file is not a part of TagLib public interface. This is not installed.
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+# include <config.h>
 #endif
 
 #ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
@@ -37,22 +37,20 @@
  * \warning This <b>is not</b> part of the TagLib public API!
  */
 
-#if defined(HAVE_STD_SHARED_PTR)
+#if defined(HAVE_STD_SMART_PTR)
 
 # include <memory>
 # define SHARED_PTR std::shared_ptr
+# define SCOPED_PTR std::unique_ptr
 
-#elif defined(HAVE_TR1_SHARED_PTR)
-
-# include <tr1/memory>
-# define SHARED_PTR std::tr1::shared_ptr
-
-#elif defined(HAVE_BOOST_SHARED_PTR)
+#elif defined(HAVE_BOOST_SMART_PTR)
 
 # include <boost/shared_ptr.hpp>
+# include <boost/scoped_ptr.hpp>
 # define SHARED_PTR boost::shared_ptr
+# define SCOPED_PTR boost::scoped_ptr
 
-#else // !HAVE_STD_SHARED_PTR && !HAVE_TR1_SHARED_PTR && !HAVE_BOOST_SHARED_PTR
+#else // !HAVE_STD_SMART_PTR && !HAVE_BOOST_SMART_PTR
 
 # include <algorithm>
 # include <trefcounter.h>
@@ -68,13 +66,9 @@ namespace TagLib
   {
   public:
     CounterBase() :
-      RefCounter()
-    {
-    }
+      RefCounter() {}
 
-    virtual ~CounterBase()
-    {
-    }
+    virtual ~CounterBase() {}
 
     void addref()
     {
@@ -104,9 +98,7 @@ namespace TagLib
   {
   public:
     CounterImpl(T *p) :
-      p(p)
-    {
-    }
+      p(p) {}
 
     virtual void dispose()
     {
@@ -128,16 +120,12 @@ namespace TagLib
   public:
     RefCountPtr() :
       px(0),
-      counter(0)
-    {
-    }
+      counter(0) {}
 
     template <typename U>
     explicit RefCountPtr(U *p) :
       px(p),
-      counter(new CounterImpl<U>(p))
-    {
-    }
+      counter(new CounterImpl<U>(p)) {}
 
     RefCountPtr(const RefCountPtr<T> &x) :
       px(x.px),
@@ -255,28 +243,7 @@ namespace TagLib
   {
     a.swap(b);
   }
-}
 
-# define SHARED_PTR TagLib::RefCountPtr
-
-#endif  // HAVE_STD_SHARED_PTR etc.
-
-#if defined(HAVE_STD_UNIQUE_PTR)
-
-# include <memory>
-# define SCOPED_PTR std::unique_ptr
-
-#elif defined(HAVE_BOOST_SCOPED_PTR)
-
-# include <boost/scoped_ptr.hpp>
-# define SCOPED_PTR boost::scoped_ptr
-
-#else // !HAVE_STD_UNIQUE_PTR && !HAVE_BOOST_SCOPED_PTR
-
-# include <algorithm>
-
-namespace TagLib
-{
   // Self-implements NonRefCountPtr<T> if unique_ptr<T> is not available.
   // I STRONGLY RECOMMEND using standard unique_ptr<T> rather than this class.
 
@@ -285,9 +252,7 @@ namespace TagLib
   {
   public:
     explicit NonRefCountPtr(T *p = 0) :
-      px(p)
-    {
-    }
+      px(p) {}
 
     ~NonRefCountPtr()
     {
@@ -348,9 +313,10 @@ namespace TagLib
   }
 }
 
+# define SHARED_PTR TagLib::RefCountPtr
 # define SCOPED_PTR TagLib::NonRefCountPtr
 
-#endif  // HAVE_STD_UNIQUE_PTR etc.
+#endif  // HAVE_STD_SMART_PTR etc.
 
 #endif // DO_NOT_DOCUMENT
 #endif
