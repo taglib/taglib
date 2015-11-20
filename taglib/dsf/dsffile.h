@@ -81,18 +81,6 @@ namespace TagLib {
       virtual ID3v2::Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       * This method forwards to ID3v2::Tag::properties().
-       */
-      PropertyMap properties() const;
-
-      /*!
-       * Implements the unified property interface -- import function.
-       * This method forwards to ID3v2::Tag::setProperties().
-       */
-      PropertyMap setProperties(const PropertyMap &);
-
-      /*!
        * Returns the DSF::AudioProperties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */

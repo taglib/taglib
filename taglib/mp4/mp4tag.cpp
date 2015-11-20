@@ -824,71 +824,76 @@ MP4::Tag::toString() const
   return desc.toString("\n");
 }
 
+namespace
+{
+  const char *keyTranslation[][2] = {
+    { "\251nam", "TITLE" },
+    { "\251ART", "ARTIST" },
+    { "\251alb", "ALBUM" },
+    { "\251cmt", "COMMENT" },
+    { "\251gen", "GENRE" },
+    { "\251day", "DATE" },
+    { "\251wrt", "COMPOSER" },
+    { "\251grp", "GROUPING" },
+    { "aART", "ALBUMARTIST" },
+    { "trkn", "TRACKNUMBER" },
+    { "disk", "DISCNUMBER" },
+    { "cpil", "COMPILATION" },
+    { "tmpo", "BPM" },
+    { "cprt", "COPYRIGHT" },
+    { "\251lyr", "LYRICS" },
+    { "\251too", "ENCODEDBY" },
+    { "soal", "ALBUMSORT" },
+    { "soaa", "ALBUMARTISTSORT" },
+    { "soar", "ARTISTSORT" },
+    { "sonm", "TITLESORT" },
+    { "soco", "COMPOSERSORT" },
+    { "sosn", "SHOWSORT" },
+    { "----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID" },
+    { "----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
+    { "----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
+    { "----:com.apple.iTunes:MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
+    { "----:com.apple.iTunes:MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "----:com.apple.iTunes:MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
+    { "----:com.apple.iTunes:ASIN", "ASIN" },
+    { "----:com.apple.iTunes:LABEL", "LABEL" },
+    { "----:com.apple.iTunes:LYRICIST", "LYRICIST" },
+    { "----:com.apple.iTunes:CONDUCTOR", "CONDUCTOR" },
+    { "----:com.apple.iTunes:REMIXER", "REMIXER" },
+    { "----:com.apple.iTunes:ENGINEER", "ENGINEER" },
+    { "----:com.apple.iTunes:PRODUCER", "PRODUCER" },
+    { "----:com.apple.iTunes:DJMIXER", "DJMIXER" },
+    { "----:com.apple.iTunes:MIXER", "MIXER" },
+    { "----:com.apple.iTunes:SUBTITLE", "SUBTITLE" },
+    { "----:com.apple.iTunes:DISCSUBTITLE", "DISCSUBTITLE" },
+    { "----:com.apple.iTunes:MOOD", "MOOD" },
+    { "----:com.apple.iTunes:ISRC", "ISRC" },
+    { "----:com.apple.iTunes:CATALOGNUMBER", "CATALOGNUMBER" },
+    { "----:com.apple.iTunes:BARCODE", "BARCODE" },
+    { "----:com.apple.iTunes:SCRIPT", "SCRIPT" },
+    { "----:com.apple.iTunes:LANGUAGE", "LANGUAGE" },
+    { "----:com.apple.iTunes:LICENSE", "LICENSE" },
+    { "----:com.apple.iTunes:MEDIA", "MEDIA" },
+  };
+  const size_t keyTranslationSize = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
 
-static const char *keyTranslation[][2] = {
-  { "\251nam", "TITLE" },
-  { "\251ART", "ARTIST" },
-  { "\251alb", "ALBUM" },
-  { "\251cmt", "COMMENT" },
-  { "\251gen", "GENRE" },
-  { "\251day", "DATE" },
-  { "\251wrt", "COMPOSER" },
-  { "\251grp", "GROUPING" },
-  { "aART", "ALBUMARTIST" },
-  { "trkn", "TRACKNUMBER" },
-  { "disk", "DISCNUMBER" },
-  { "cpil", "COMPILATION" },
-  { "tmpo", "BPM" },
-  { "cprt", "COPYRIGHT" },
-  { "\251lyr", "LYRICS" },
-  { "\251too", "ENCODEDBY" },
-  { "soal", "ALBUMSORT" },
-  { "soaa", "ALBUMARTISTSORT" },
-  { "soar", "ARTISTSORT" },
-  { "sonm", "TITLESORT" },
-  { "soco", "COMPOSERSORT" },
-  { "sosn", "SHOWSORT" },
-  { "----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID" },
-  { "----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
-  { "----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
-  { "----:com.apple.iTunes:MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
-  { "----:com.apple.iTunes:MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
-  { "----:com.apple.iTunes:MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
-  { "----:com.apple.iTunes:ASIN", "ASIN" },
-  { "----:com.apple.iTunes:LABEL", "LABEL" },
-  { "----:com.apple.iTunes:LYRICIST", "LYRICIST" },
-  { "----:com.apple.iTunes:CONDUCTOR", "CONDUCTOR" },
-  { "----:com.apple.iTunes:REMIXER", "REMIXER" },
-  { "----:com.apple.iTunes:ENGINEER", "ENGINEER" },
-  { "----:com.apple.iTunes:PRODUCER", "PRODUCER" },
-  { "----:com.apple.iTunes:DJMIXER", "DJMIXER" },
-  { "----:com.apple.iTunes:MIXER", "MIXER" },
-  { "----:com.apple.iTunes:SUBTITLE", "SUBTITLE" },
-  { "----:com.apple.iTunes:DISCSUBTITLE", "DISCSUBTITLE" },
-  { "----:com.apple.iTunes:MOOD", "MOOD" },
-  { "----:com.apple.iTunes:ISRC", "ISRC" },
-  { "----:com.apple.iTunes:CATALOGNUMBER", "CATALOGNUMBER" },
-  { "----:com.apple.iTunes:BARCODE", "BARCODE" },
-  { "----:com.apple.iTunes:SCRIPT", "SCRIPT" },
-  { "----:com.apple.iTunes:LANGUAGE", "LANGUAGE" },
-  { "----:com.apple.iTunes:LICENSE", "LICENSE" },
-  { "----:com.apple.iTunes:MEDIA", "MEDIA" },
-};
+  String translateKey(const String &key)
+  {
+    for(size_t i = 0; i < keyTranslationSize; ++i) {
+      if(key == keyTranslation[i][0])
+        return keyTranslation[i][1];
+    }
+
+    return String();
+  }
+}
 
 PropertyMap MP4::Tag::properties() const
 {
-  static Map<String, String> keyMap;
-  if(keyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      keyMap[keyTranslation[i][0]] = keyTranslation[i][1];
-    }
-  }
-
   PropertyMap props;
   for(MP4::ItemMap::ConstIterator it = d->items.begin(); it != d->items.end(); ++it) {
-    if(keyMap.contains(it->first)) {
-      String key = keyMap[it->first];
+    const String key = translateKey(it->first);
+    if(!key.isEmpty()) {
       if(key == "TRACKNUMBER" || key == "DISCNUMBER") {
         MP4::Item::IntPair ip = it->second.toIntPair();
         String value = String::number(ip.first);

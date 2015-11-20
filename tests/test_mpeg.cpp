@@ -1,8 +1,11 @@
 #include <string>
 #include <stdio.h>
 #include <tstring.h>
+#include <tpropertymap.h>
 #include <mpegfile.h>
 #include <id3v2tag.h>
+#include <id3v1tag.h>
+#include <apetag.h>
 #include <mpegproperties.h>
 #include <xingheader.h>
 #include <mpegheader.h>
@@ -26,6 +29,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testFrameOffset);
+  CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -209,6 +213,29 @@ public:
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT_EQUAL((offset_t)0x041A, f.firstFrameOffset());
       CPPUNIT_ASSERT_EQUAL((offset_t)0x23F0, f.lastFrameOffset());
+    }
+  }
+
+  void testStripAndProperties()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.ID3v2Tag(true)->setTitle("ID3v2");
+      f.APETag(true)->setTitle("APE");
+      f.ID3v1Tag(true)->setTitle("ID3v1");
+      f.save();
+    }
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2"), f.properties()["TITLE"].front());
+      f.strip(MPEG::File::ID3v2);
+      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
+      f.strip(MPEG::File::APE);
+      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
+      f.strip(MPEG::File::ID3v1);
+      CPPUNIT_ASSERT(f.properties().isEmpty());
     }
   }
 

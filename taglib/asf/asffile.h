@@ -92,22 +92,6 @@ namespace TagLib {
       virtual Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       */
-      PropertyMap properties() const;
-
-      /*!
-       * Removes unsupported properties. Forwards to the actual Tag's
-       * removeUnsupportedProperties() function.
-       */
-      void removeUnsupportedProperties(const StringList &properties);
-
-      /*!
-       * Implements the unified property interface -- import function.
-       */
-      PropertyMap setProperties(const PropertyMap &);
-
-      /*!
        * Returns the ASF audio properties for this file.
        */
       virtual AudioProperties *audioProperties() const;
@@ -116,9 +100,6 @@ namespace TagLib {
        * Save the file.
        *
        * This returns true if the save was successful.
-       *
-       * \warning In the current implementation, it's dangerous to call save()
-       * repeatedly.  At worst it will corrupt the file.
        */
       virtual bool save();
 

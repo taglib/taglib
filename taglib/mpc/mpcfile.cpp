@@ -116,9 +116,10 @@ TagLib::Tag *MPC::File::tag() const
 
 PropertyMap MPC::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    d->tag.access<APE::Tag>(MPCID3v1Index, false)->setProperties(properties);
-  return d->tag.access<APE::Tag>(MPCAPEIndex, true)->setProperties(properties);
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return APETag(true)->setProperties(properties);
 }
 
 MPC::AudioProperties *MPC::File::audioProperties() const

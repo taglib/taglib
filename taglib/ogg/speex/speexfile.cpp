@@ -83,16 +83,6 @@ Ogg::XiphComment *Speex::File::tag() const
   return d->comment;
 }
 
-PropertyMap Speex::File::properties() const
-{
-  return d->comment->properties();
-}
-
-PropertyMap Speex::File::setProperties(const PropertyMap &properties)
-{
-  return d->comment->setProperties(properties);
-}
-
 Speex::AudioProperties *Speex::File::audioProperties() const
 {
   return d->properties;

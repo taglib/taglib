@@ -144,7 +144,7 @@ namespace TagLib {
        * limitations of that format.
        * The returned PropertyMap refers to the ID3v2 tag only.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Returns the MPEG::Properties for this file.  If no audio properties
@@ -329,7 +329,7 @@ namespace TagLib {
       File &operator=(const File &);
 
       void read(bool readProperties);
-      offset_t findID3v2(offset_t offset);
+      offset_t findID3v2();
       offset_t findID3v1();
       void findAPE();
 

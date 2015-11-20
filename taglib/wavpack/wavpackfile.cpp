@@ -110,9 +110,10 @@ TagLib::Tag *WavPack::File::tag() const
 
 PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(WavID3v1Index, false)->setProperties(properties);
-  return d->tag.access<APE::Tag>(WavAPEIndex, true)->setProperties(properties);
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return APETag(true)->setProperties(properties);
 }
 
 WavPack::AudioProperties *WavPack::File::audioProperties() const

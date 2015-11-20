@@ -120,7 +120,7 @@ namespace TagLib {
        * Creates an APEv2 tag if necessary. A potentially existing ID3v1
        * tag will be updated as well.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Returns the APE::Properties for this file.  If no audio properties

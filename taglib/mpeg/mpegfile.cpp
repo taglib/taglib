@@ -149,10 +149,12 @@ TagLib::Tag *MPEG::File::tag() const
 
 PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    // update ID3v1 tag if it exists, but ignore the return value
-    d->tag.access<ID3v1::Tag>(ID3v1Index, false)->setProperties(properties);
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
+  // update ID3v1 tag if it exists, but ignore the return value
+
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return ID3v2Tag(true)->setProperties(properties);
 }
 
 MPEG::AudioProperties *MPEG::File::audioProperties() const
@@ -409,23 +411,8 @@ offset_t MPEG::File::firstFrameOffset()
 {
   offset_t position = 0;
 
-  if(hasID3v2Tag()) {
+  if(hasID3v2Tag())
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
-
-    // Skip duplicate ID3v2 tags.
-
-    // Workaround for some faulty files that have duplicate ID3v2 tags.
-    // Combination of EAC and LAME creates such files when configured incorrectly.
-
-    offset_t location;
-    while((location = findID3v2(position)) >= 0) {
-      seek(location);
-      const ID3v2::Header header(readBlock(ID3v2::Header::size()));
-      position = location + header.completeTagSize();
-
-      debug("MPEG::File::firstFrameOffset() - Duplicate ID3v2 tag found.");
-    }
-  }
 
   return nextFrameOffset(position);
 }
@@ -467,7 +454,7 @@ void MPEG::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
-  d->ID3v2Location = findID3v2(0);
+  d->ID3v2Location = findID3v2();
 
   if(d->ID3v2Location >= 0) {
 
@@ -510,118 +497,40 @@ void MPEG::File::read(bool readProperties)
   ID3v1Tag(true);
 }
 
-offset_t MPEG::File::findID3v2(offset_t offset)
+offset_t MPEG::File::findID3v2()
 {
-  // This method is based on the contents of TagLib::File::find(), but because
-  // of some subtleties -- specifically the need to look for the bit pattern of
-  // an MPEG sync, it has been modified for use here.
+  if(!isValid())
+    return -1;
 
-  if(isValid() && ID3v2::Header::fileIdentifier().size() <= bufferSize()) {
+  // An ID3v2 tag or MPEG frame is most likely be at the beginning of the file.
 
-    // The position in the file that the current buffer starts at.
+  const ByteVector headerID = ID3v2::Header::fileIdentifier();
 
-    offset_t bufferOffset = 0;
+  seek(0);
 
-    // These variables are used to keep track of a partial match that happens at
-    // the end of a buffer.
+  const ByteVector data = readBlock(headerID.size());
+  if(data.size() < headerID.size())
+    return -1;
 
-    size_t previousPartialMatch = ByteVector::npos();
-    bool previousPartialSynchMatch = false;
+  if(data == headerID)
+    return 0;
 
-    // Save the location of the current read pointer.  We will restore the
-    // position using seek() before all returns.
+  if(firstSyncByte(data[0]) && secondSynchByte(data[1]))
+    return -1;
 
-    const offset_t originalPosition = tell();
+  // Look for the entire file, if neither an MEPG frame or ID3v2 tag was found
+  // at the beginning of the file.
+  // We don't care about the inefficiency of the code, since this is a seldom case.
 
-    // Start the search at the offset.
+  const offset_t tagOffset = find(headerID);
+  if(tagOffset < 0)
+    return -1;
 
-    seek(offset);
+  const offset_t frameOffset = firstFrameOffset();
+  if(frameOffset < tagOffset)
+    return -1;
 
-    // This loop is the crux of the find method.  There are three cases that we
-    // want to account for:
-    // (1) The previously searched buffer contained a partial match of the search
-    // pattern and we want to see if the next one starts with the remainder of
-    // that pattern.
-    //
-    // (2) The search pattern is wholly contained within the current buffer.
-    //
-    // (3) The current buffer ends with a partial match of the pattern.  We will
-    // note this for use in the next iteration, where we will check for the rest
-    // of the pattern.
-
-    while(true)
-    {
-      ByteVector buffer = readBlock(bufferSize());
-      if(buffer.isEmpty())
-        break;
-
-      // (1) previous partial match
-
-      if(previousPartialSynchMatch && secondSynchByte(buffer[0]))
-        return -1;
-
-      if(previousPartialMatch != ByteVector::npos() && bufferSize() > previousPartialMatch) {
-        const size_t patternOffset = (bufferSize() - previousPartialMatch);
-        if(buffer.containsAt(ID3v2::Header::fileIdentifier(), 0, patternOffset)) {
-          seek(originalPosition);
-          return offset + bufferOffset - bufferSize() + previousPartialMatch;
-        }
-      }
-
-      // (2) pattern contained in current buffer
-
-      const size_t location = buffer.find(ID3v2::Header::fileIdentifier());
-      if(location != ByteVector::npos()) {
-        seek(originalPosition);
-        return offset + bufferOffset + location;
-      }
-
-      size_t firstSynchByte = buffer.find(char(uchar(255)));
-
-      // Here we have to loop because there could be several of the first
-      // (11111111) byte, and we want to check all such instances until we find
-      // a full match (11111111 111) or hit the end of the buffer.
-
-      while(firstSynchByte != ByteVector::npos()) {
-
-        // if this *is not* at the end of the buffer
-
-        if(firstSynchByte < buffer.size() - 1) {
-          if(secondSynchByte(buffer[firstSynchByte + 1])) {
-            // We've found the frame synch pattern.
-            seek(originalPosition);
-            return -1;
-          }
-          else {
-
-            // We found 11111111 at the end of the current buffer indicating a
-            // partial match of the synch pattern.  The find() below should
-            // return -1 and break out of the loop.
-
-            previousPartialSynchMatch = true;
-          }
-        }
-
-        // Check in the rest of the buffer.
-
-        firstSynchByte = buffer.find(char(uchar(255)), firstSynchByte + 1);
-      }
-
-      // (3) partial match
-
-      previousPartialMatch = buffer.endsWithPartialMatch(ID3v2::Header::fileIdentifier());
-
-      bufferOffset += bufferSize();
-    }
-
-    // Since we hit the end of the file, reset the status before continuing.
-
-    clear();
-
-    seek(originalPosition);
-  }
-
-  return -1;
+  return tagOffset;
 }
 
 offset_t MPEG::File::findID3v1()

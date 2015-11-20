@@ -135,7 +135,7 @@ TagLib::Tag *FLAC::File::tag() const
 
 PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 {
-  return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, true)->setProperties(properties);
+  return xiphComment(true)->setProperties(properties);
 }
 
 FLAC::AudioProperties *FLAC::File::audioProperties() const

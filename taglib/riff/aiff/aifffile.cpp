@@ -85,21 +85,6 @@ ID3v2::Tag *RIFF::AIFF::File::tag() const
   return d->tag;
 }
 
-PropertyMap RIFF::AIFF::File::properties() const
-{
-  return d->tag->properties();
-}
-
-void RIFF::AIFF::File::removeUnsupportedProperties(const StringList &unsupported)
-{
-  d->tag->removeUnsupportedProperties(unsupported);
-}
-
-PropertyMap RIFF::AIFF::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag->setProperties(properties);
-}
-
 RIFF::AIFF::AudioProperties *RIFF::AIFF::File::audioProperties() const
 {
   return d->properties;

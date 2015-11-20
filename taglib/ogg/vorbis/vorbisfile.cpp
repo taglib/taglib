@@ -89,16 +89,6 @@ Ogg::XiphComment *Ogg::Vorbis::File::tag() const
   return d->comment;
 }
 
-PropertyMap Ogg::Vorbis::File::properties() const
-{
-  return d->comment->properties();
-}
-
-PropertyMap Ogg::Vorbis::File::setProperties(const PropertyMap &properties)
-{
-  return d->comment->setProperties(properties);
-}
-
 Ogg::Vorbis::AudioProperties *Ogg::Vorbis::File::audioProperties() const
 {
   return d->properties;

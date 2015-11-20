@@ -120,7 +120,7 @@ namespace TagLib {
        * Affects only the APEv2 tag which will be created if necessary.
        * If an ID3v1 tag exists, it will be updated as well.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      virtual PropertyMap setProperties(const PropertyMap &);
 
       /*!
        * Returns the MPC::Properties for this file.  If no audio properties

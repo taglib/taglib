@@ -83,16 +83,6 @@ Ogg::XiphComment *Opus::File::tag() const
   return d->comment;
 }
 
-PropertyMap Opus::File::properties() const
-{
-  return d->comment->properties();
-}
-
-PropertyMap Opus::File::setProperties(const PropertyMap &properties)
-{
-  return d->comment->setProperties(properties);
-}
-
 Opus::AudioProperties *Opus::File::audioProperties() const
 {
   return d->properties;

@@ -1,8 +1,10 @@
 #include <string>
 #include <stdio.h>
-#include <tag.h>
+#include <apetag.h>
+#include <id3v1tag.h>
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
+#include <tpropertymap.h>
 #include <mpcfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -21,6 +23,7 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST(testFuzzedFile3);
   CPPUNIT_TEST(testFuzzedFile4);
+  CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -107,6 +110,26 @@ public:
   {
     MPC::File f(TEST_FILE_PATH_C("segfault2.mpc"));
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testStripAndProperties()
+  {
+    ScopedFileCopy copy("click", ".mpc");
+
+    {
+      MPC::File f(copy.fileName().c_str());
+      f.APETag(true)->setTitle("APE");
+      f.ID3v1Tag(true)->setTitle("ID3v1");
+      f.save();
+    }
+    {
+      MPC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
+      f.strip(MPC::File::APE);
+      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
+      f.strip(MPC::File::ID3v1);
+      CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
   }
 
 };

@@ -132,9 +132,10 @@ TagLib::Tag *TrueAudio::File::tag() const
 
 PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, false)->setProperties(properties);
-  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, true)->setProperties(properties);
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return ID3v2Tag(true)->setProperties(properties);
 }
 
 TrueAudio::AudioProperties *TrueAudio::File::audioProperties() const

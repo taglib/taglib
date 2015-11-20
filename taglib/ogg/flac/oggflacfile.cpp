@@ -95,21 +95,10 @@ Ogg::XiphComment *Ogg::FLAC::File::tag() const
   return d->comment;
 }
 
-PropertyMap Ogg::FLAC::File::properties() const
-{
-  return d->comment->properties();
-}
-
-PropertyMap Ogg::FLAC::File::setProperties(const PropertyMap &properties)
-{
-  return d->comment->setProperties(properties);
-}
-
 FLAC::AudioProperties *Ogg::FLAC::File::audioProperties() const
 {
   return d->properties;
 }
-
 
 bool Ogg::FLAC::File::save()
 {

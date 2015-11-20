@@ -124,18 +124,19 @@ namespace TagLib {
         Info::Tag *InfoTag() const;
 
         /*!
-         * Implements the unified property interface -- export function.
-         * This method forwards to ID3v2::Tag::properties().
+         * This will strip the tags that match the OR-ed together TagTypes from the
+         * file.  By default it strips all tags.  It returns true if the tags are
+         * successfully stripped.
+         *
+         * \note This will update the file immediately.
          */
-        PropertyMap properties() const;
-
-        void removeUnsupportedProperties(const StringList &properties);
+        void strip(TagTypes tags = AllTags);
 
         /*!
          * Implements the unified property interface -- import function.
          * This method forwards to ID3v2::Tag::setProperties().
          */
-        PropertyMap setProperties(const PropertyMap &);
+        virtual PropertyMap setProperties(const PropertyMap &);
 
         /*!
          * Returns the WAV::Properties for this file.  If no audio properties
@@ -169,13 +170,7 @@ namespace TagLib {
         File &operator=(const File &);
 
         void read(bool readProperties);
-
-        void strip(TagTypes tags);
-
-        /*!
-         * Returns the index of the chunk that its name is "LIST" and list type is "INFO".
-         */
-        uint findInfoTagChunk();
+        void removeTagChunks(TagTypes tags);
 
         friend class AudioProperties;
 

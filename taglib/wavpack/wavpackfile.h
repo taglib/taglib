@@ -114,7 +114,7 @@ namespace TagLib {
        * Creates an APE tag if it does not exists and calls setProperties() on
        * that. Any existing ID3v1 tag will be updated as well.
        */
-      PropertyMap setProperties(const PropertyMap&);
+      virtual PropertyMap setProperties(const PropertyMap&);
 
       /*!
        * Returns the MPC::Properties for this file.  If no audio properties

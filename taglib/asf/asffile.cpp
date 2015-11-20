@@ -50,7 +50,7 @@ public:
   class MetadataLibraryObject;
 
   FilePrivate():
-    size(0),
+    headerSize(0),
     tag(0),
     properties(0),
     contentDescriptionObject(0),
@@ -68,7 +68,7 @@ public:
     delete properties;
   }
 
-  unsigned long long size;
+  unsigned long long headerSize;
 
   ASF::Tag *tag;
   ASF::AudioProperties *properties;
@@ -503,21 +503,6 @@ ASF::Tag *ASF::File::tag() const
   return d->tag;
 }
 
-PropertyMap ASF::File::properties() const
-{
-  return d->tag->properties();
-}
-
-void ASF::File::removeUnsupportedProperties(const StringList &properties)
-{
-  d->tag->removeUnsupportedProperties(properties);
-}
-
-PropertyMap ASF::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag->setProperties(properties);
-}
-
 ASF::AudioProperties *ASF::File::audioProperties() const
 {
   return d->properties;
@@ -556,6 +541,10 @@ bool ASF::File::save()
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
+  d->extendedContentDescriptionObject->attributeData.clear();
+  d->metadataObject->attributeData.clear();
+  d->metadataLibraryObject->attributeData.clear();
+
   const AttributeListMap allAttributes = d->tag->attributeListMap();
 
   for(AttributeListMap::ConstIterator it = allAttributes.begin(); it != allAttributes.end(); ++it) {
@@ -590,8 +579,15 @@ bool ASF::File::save()
   for(List<FilePrivate::BaseObject *>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
     data.append((*it)->render(this));
   }
-  data = headerGuid + ByteVector::fromUInt64LE(data.size() + 30) + ByteVector::fromUInt32LE(d->objects.size()) + ByteVector("\x01\x02", 2) + data;
-  insert(data, 0, static_cast<size_t>(d->size));
+
+  seek(16);
+  writeBlock(ByteVector::fromUInt64LE(data.size() + 30));
+  writeBlock(ByteVector::fromUInt32LE(d->objects.size()));
+  writeBlock(ByteVector("\x01\x02", 2));
+
+  insert(data, 30, static_cast<size_t>(d->headerSize - 30));
+
+  d->headerSize = data.size() + 30;
 
   return true;
 }
@@ -616,7 +612,7 @@ void ASF::File::read()
   d->properties = new ASF::AudioProperties();
 
   bool ok;
-  d->size = readQWORD(this, &ok);
+  d->headerSize = readQWORD(this, &ok);
   if(!ok) {
     setValid(false);
     return;

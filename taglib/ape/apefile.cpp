@@ -125,9 +125,10 @@ TagLib::Tag *APE::File::tag() const
 
 PropertyMap APE::File::setProperties(const PropertyMap &properties)
 {
-  if(d->hasID3v1)
-    d->tag.access<ID3v1::Tag>(ApeID3v1Index, false)->setProperties(properties);
-  return d->tag.access<APE::Tag>(ApeAPEIndex, true)->setProperties(properties);
+  if(ID3v1Tag())
+    ID3v1Tag()->setProperties(properties);
+
+  return APETag(true)->setProperties(properties);
 }
 
 APE::AudioProperties *APE::File::audioProperties() const

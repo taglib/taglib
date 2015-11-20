@@ -93,7 +93,7 @@ namespace TagLib
   PropertyMap TagUnion<COUNT>::properties() const
   {
     for(size_t i = 0; i < COUNT; ++i) {
-      if(d->tags[i])
+      if(d->tags[i] && !d->tags[i]->isEmpty())
         return d->tags[i]->properties();
     }
 

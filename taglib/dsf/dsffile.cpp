@@ -86,16 +86,6 @@ ID3v2::Tag *DSF::File::tag() const
   return d->tag;
 }
 
-PropertyMap DSF::File::properties() const
-{
-  return d->tag->properties();
-}
-
-PropertyMap DSF::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag->setProperties(properties);
-}
-
 DSF::AudioProperties *DSF::File::audioProperties() const
 {
   return d->properties;
