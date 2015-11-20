@@ -168,7 +168,7 @@ PropertyMap TextIdentificationFrame::asProperties() const
       // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
       // Since this is unusual in other formats, the T is removed.
       const size_t tpos = it->find("T");
-      if(tpos != String::npos)
+      if(tpos != String::npos())
         (*it)[tpos] = ' ';
     }
   }

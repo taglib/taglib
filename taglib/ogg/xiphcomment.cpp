@@ -376,7 +376,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     }
 
     const size_t commentSeparatorPosition = comment.find("=");
-    if(commentSeparatorPosition == String::npos) {
+    if(commentSeparatorPosition == String::npos()) {
       break;
     }
 

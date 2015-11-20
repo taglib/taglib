@@ -139,9 +139,17 @@ public:
 
 const String String::null;
 
-// Actual value is -1.
-const size_t String::npos = std::wstring::npos;
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
 
+size_t String::npos()
+{
+  return std::wstring::npos;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
 ////////////////////////////////////////////////////////////////////////////////
 
 String::String() :
@@ -303,7 +311,7 @@ StringList String::split(const String &separator) const
   StringList list;
   for(size_t index = 0;;) {
     const size_t sep = find(separator, index);
-    if(sep == npos) {
+    if(sep == npos()) {
       list.append(substr(index, size() - index));
       break;
     }

@@ -487,7 +487,7 @@ void FrameFactory::updateGenre(TextIdentificationFrame *frame) const
     String s = *it;
     const size_t end = s.find(")");
 
-    if(s.startsWith("(") && end != String::npos) {
+    if(s.startsWith("(") && end != String::npos()) {
       // "(12)Genre"
       String text = s.substr(end + 1);
       bool ok;

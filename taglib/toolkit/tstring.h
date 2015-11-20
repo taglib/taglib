@@ -277,7 +277,7 @@ namespace TagLib {
      * either from the end of the string or starting from \a offset. If the pattern
      * is not found, \a npos is returned.
      */
-    size_t rfind(const String &s, size_t offset = npos) const;
+    size_t rfind(const String &s, size_t offset = npos()) const;
 
     /*!
      * Splits the string on each occurrence of \a separator.
@@ -293,7 +293,7 @@ namespace TagLib {
      * Extract a substring from this string starting at \a position and
      * continuing for \a n characters.
      */
-    String substr(size_t position, size_t n = npos) const;
+    String substr(size_t position, size_t n = npos()) const;
 
     /*!
      * Append \a s to the current string and return a reference to the current
@@ -515,11 +515,11 @@ namespace TagLib {
     static const String null;
 
     /*!
-     * When used as the value for a \a length parameter in String's member
+     * Returns a special value used for \a length parameter in String's member
      * functions, means "until the end of the string".
      * As a return value, it is usually used to indicate no matches.
      */
-    static const size_t npos;
+    static size_t npos();
 
   protected:
     /*!

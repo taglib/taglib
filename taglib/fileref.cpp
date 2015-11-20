@@ -88,7 +88,7 @@ namespace
 #endif
 
       const size_t pos = s.rfind(".");
-      if(pos != String::npos)
+      if(pos != String::npos())
         ext = s.substr(pos + 1).upper();
     }
 
