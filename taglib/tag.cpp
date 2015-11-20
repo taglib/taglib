@@ -58,15 +58,15 @@ bool Tag::isEmpty() const
 PropertyMap Tag::properties() const
 {
   PropertyMap map;
-  if(!(title().isNull()))
+  if(!(title().isEmpty()))
     map["TITLE"].append(title());
-  if(!(artist().isNull()))
+  if(!(artist().isEmpty()))
     map["ARTIST"].append(artist());
-  if(!(album().isNull()))
+  if(!(album().isEmpty()))
     map["ALBUM"].append(album());
-  if(!(comment().isNull()))
+  if(!(comment().isEmpty()))
     map["COMMENT"].append(comment());
-  if(!(genre().isNull()))
+  if(!(genre().isEmpty()))
     map["GENRE"].append(genre());
   if(!(year() == 0))
     map["DATE"].append(String::number(year()));

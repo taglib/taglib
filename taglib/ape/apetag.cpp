@@ -195,7 +195,7 @@ PropertyMap APE::Tag::properties() const
     String tagName = it->first.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
-    if(it->second.type() != Item::Text || tagName.isNull())
+    if(it->second.type() != Item::Text || tagName.isEmpty())
       properties.unsupportedData().append(it->first);
     else {
       // Some tags need to be handled specially
@@ -232,7 +232,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   for(; remIt != itemListMap().end(); ++remIt) {
     String key = remIt->first.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
-    if(!key.isNull() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
+    if(!key.isEmpty() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
       toRemove.append(remIt->first);
   }
 

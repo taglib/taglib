@@ -292,7 +292,7 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
   StringList l = fieldList();
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     String instrument = it->upper();
-    if(instrument.isNull()) {
+    if(instrument.isEmpty()) {
       // instrument is not a valid key -> frame unsupported
       map.clear();
       map.unsupportedData().append(frameID());

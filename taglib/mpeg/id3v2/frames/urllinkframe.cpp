@@ -159,8 +159,6 @@ PropertyMap UserUrlLinkFrame::asProperties() const
   String key = description().upper();
   if(key.isEmpty() || key.upper() == "URL")
     map.insert("URL", url());
-  else if(key.isNull())
-    map.unsupportedData().append(L"WXXX/" + description());
   else
     map.insert("URL:" + key, url());
   return map;
