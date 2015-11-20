@@ -118,7 +118,7 @@ bool IT::File::save()
     if(i < lines.size())
       writeString(lines[i], 25);
     else
-      writeString(String::null, 25);
+      writeString(String(), 25);
     writeByte(0);
   }
 
@@ -133,7 +133,7 @@ bool IT::File::save()
     if((TagLib::uint)(i + instrumentCount) < lines.size())
       writeString(lines[i + instrumentCount], 25);
     else
-      writeString(String::null, 25);
+      writeString(String(), 25);
     writeByte(0);
   }
 

@@ -64,7 +64,7 @@ String ASF::Tag::album() const
 {
   if(d->attributeListMap.contains("WM/AlbumTitle"))
     return d->attributeListMap["WM/AlbumTitle"][0].toString();
-  return String::null;
+  return String();
 }
 
 String ASF::Tag::copyright() const
@@ -107,7 +107,7 @@ String ASF::Tag::genre() const
 {
   if(d->attributeListMap.contains("WM/Genre"))
     return d->attributeListMap["WM/Genre"][0].toString();
-  return String::null;
+  return String();
 }
 
 void ASF::Tag::setTitle(const String &value)
@@ -329,16 +329,16 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   for(; it != origProps.end(); ++it) {
     if(!props.contains(it->first) || props[it->first].isEmpty()) {
       if(it->first == "TITLE") {
-        d->title = String::null;
+        d->title.clear();
       }
       else if(it->first == "ARTIST") {
-        d->artist = String::null;
+        d->artist.clear();
       }
       else if(it->first == "COMMENT") {
-        d->comment = String::null;
+        d->comment.clear();
       }
       else if(it->first == "COPYRIGHT") {
-        d->copyright = String::null;
+        d->copyright.clear();
       }
       else {
         d->attributeListMap.erase(reverseKeyMap[it->first]);

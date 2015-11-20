@@ -89,31 +89,31 @@ PropertyMap Tag::setProperties(const PropertyMap &origProps)
     setTitle(properties["TITLE"].front());
     oneValueSet.append("TITLE");
   } else
-    setTitle(String::null);
+    setTitle(String());
 
   if(properties.contains("ARTIST")) {
     setArtist(properties["ARTIST"].front());
     oneValueSet.append("ARTIST");
   } else
-    setArtist(String::null);
+    setArtist(String());
 
   if(properties.contains("ALBUM")) {
     setAlbum(properties["ALBUM"].front());
     oneValueSet.append("ALBUM");
   } else
-    setAlbum(String::null);
+    setAlbum(String());
 
   if(properties.contains("COMMENT")) {
     setComment(properties["COMMENT"].front());
     oneValueSet.append("COMMENT");
   } else
-    setComment(String::null);
+    setComment(String());
 
   if(properties.contains("GENRE")) {
     setGenre(properties["GENRE"].front());
     oneValueSet.append("GENRE");
   } else
-    setGenre(String::null);
+    setGenre(String());
 
   if(properties.contains("DATE")) {
     bool ok;

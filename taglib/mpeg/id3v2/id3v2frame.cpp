@@ -317,7 +317,7 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   int end = data.find(delimiter, *position, delimiter.size());
 
   if(end < *position)
-    return String::null;
+    return String();
 
   String str;
   if(encoding == String::Latin1)

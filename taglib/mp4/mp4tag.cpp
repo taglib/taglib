@@ -686,7 +686,7 @@ MP4::Tag::title() const
 {
   if(d->items.contains("\251nam"))
     return d->items["\251nam"].toStringList().toString(", ");
-  return String::null;
+  return String();
 }
 
 String
@@ -694,7 +694,7 @@ MP4::Tag::artist() const
 {
   if(d->items.contains("\251ART"))
     return d->items["\251ART"].toStringList().toString(", ");
-  return String::null;
+  return String();
 }
 
 String
@@ -702,7 +702,7 @@ MP4::Tag::album() const
 {
   if(d->items.contains("\251alb"))
     return d->items["\251alb"].toStringList().toString(", ");
-  return String::null;
+  return String();
 }
 
 String
@@ -710,7 +710,7 @@ MP4::Tag::comment() const
 {
   if(d->items.contains("\251cmt"))
     return d->items["\251cmt"].toStringList().toString(", ");
-  return String::null;
+  return String();
 }
 
 String
@@ -718,7 +718,7 @@ MP4::Tag::genre() const
 {
   if(d->items.contains("\251gen"))
     return d->items["\251gen"].toStringList().toString(", ");
-  return String::null;
+  return String();
 }
 
 unsigned int

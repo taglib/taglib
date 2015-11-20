@@ -214,7 +214,7 @@ void TableOfContentsFrame::removeEmbeddedFrames(const ByteVector &id)
 
 String TableOfContentsFrame::toString() const
 {
-  return String::null;
+  return String();
 }
 
 PropertyMap TableOfContentsFrame::asProperties() const

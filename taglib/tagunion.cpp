@@ -42,7 +42,7 @@ using namespace TagLib;
     return tag(1)->method();                                         \
   if(tag(2) && !tag(2)->method().isEmpty())                          \
     return tag(2)->method();                                         \
-  return String::null                                                \
+  return String();                                                   \
 
 #define numberUnion(method)                                          \
   if(tag(0) && tag(0)->method() > 0)                                 \

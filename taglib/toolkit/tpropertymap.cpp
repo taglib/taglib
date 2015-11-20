@@ -144,7 +144,8 @@ bool PropertyMap::operator!=(const PropertyMap &other) const
 
 String PropertyMap::toString() const
 {
-  String ret = "";
+  String ret;
+
   for(ConstIterator it = begin(); it != end(); ++it)
     ret += it->first+"="+it->second.toString(", ") + "\n";
   if(!unsupported.isEmpty())

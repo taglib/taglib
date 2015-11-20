@@ -108,7 +108,7 @@ public:
     ByteVector data("Test Data");
     item.setBinaryData(data);
     CPPUNIT_ASSERT(item.values().isEmpty());
-    CPPUNIT_ASSERT_EQUAL(String::null, item.toString());
+    CPPUNIT_ASSERT_EQUAL(String(), item.toString());
     CPPUNIT_ASSERT_EQUAL(data, item.binaryData());
 
     item.setValue("Test Text 2");

@@ -99,7 +99,7 @@ bool Mod::File::save()
   }
 
   for(uint i = n; i < d->properties.instrumentCount(); ++ i) {
-    writeString(String::null, 22);
+    writeString(String(), 22);
     seek(8, Current);
   }
   return true;
