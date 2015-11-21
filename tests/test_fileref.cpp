@@ -4,12 +4,25 @@
 #include <fileref.h>
 #include <oggflacfile.h>
 #include <vorbisfile.h>
+#include <mpegfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 #include <tfilestream.h>
 
 using namespace std;
 using namespace TagLib;
+
+namespace
+{
+  class DummyResolver : public FileRef::FileTypeResolver
+  {
+  public:
+    virtual File *createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+    {
+      return new Ogg::Vorbis::File(fileName);
+    }
+  };
+}
 
 class TestFileRef : public CppUnit::TestFixture
 {
@@ -29,6 +42,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
   CPPUNIT_TEST(testUnsupported);
+  CPPUNIT_TEST(testFileResolver);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -168,10 +182,25 @@ public:
   {
     FileRef f1(TEST_FILE_PATH_C("no-extension"));
     CPPUNIT_ASSERT(f1.isNull());
-    
+
     FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xxx"));
     CPPUNIT_ASSERT(f2.isNull());
   }
+
+  void testFileResolver()
+  {
+    FileRef *f = new FileRef(TEST_FILE_PATH_C("xing.mp3"));
+    CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f->file()) != NULL);
+    delete f;
+
+    DummyResolver resolver;
+    FileRef::addFileTypeResolver(&resolver);
+
+    f = new FileRef(TEST_FILE_PATH_C("xing.mp3"));
+    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) != NULL);
+    delete f;
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestFileRef);

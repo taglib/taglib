@@ -56,7 +56,8 @@ using namespace TagLib;
 
 namespace
 {
-  List<const FileRef::FileTypeResolver *> fileTypeResolvers;
+  typedef List<const FileRef::FileTypeResolver *> ResolverList;
+  ResolverList fileTypeResolvers;
 
   // Templatized internal functions. T should be String or IOStream*.
 
@@ -79,8 +80,41 @@ namespace
   }
 
   template <typename T>
-  File* createInternal(T arg, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle)
+  inline File *resolveFileType(T arg, bool readProperties,
+                               AudioProperties::ReadStyle style)
   {
+    // Should never be called.
+  }
+
+  template <>
+  inline File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
+                                           AudioProperties::ReadStyle style)
+  {
+    return 0;
+  }
+
+  template <>
+  inline File *resolveFileType<FileName>(FileName arg, bool readProperties,
+                                         AudioProperties::ReadStyle style)
+  {
+    ResolverList::ConstIterator it = fileTypeResolvers.begin();
+    for(; it != fileTypeResolvers.end(); ++it) {
+      File *file = (*it)->createFile(arg, readProperties, style);
+      if(file)
+        return file;
+    }
+
+    return 0;
+  }
+
+  template <typename T>
+  File* createInternal(T arg, bool readAudioProperties,
+                       AudioProperties::ReadStyle audioPropertiesStyle)
+  {
+    File *file = resolveFileType(arg, readAudioProperties, audioPropertiesStyle);
+    if(file)
+      return file;
+
 #ifdef _WIN32
     const String s = toFileName(arg).toString();
 #else
@@ -302,14 +336,5 @@ bool FileRef::operator!=(const FileRef &ref) const
 File *FileRef::create(FileName fileName, bool readAudioProperties,
                       AudioProperties::ReadStyle audioPropertiesStyle) // static
 {
-
-  List<const FileTypeResolver *>::ConstIterator it = fileTypeResolvers.begin();
-
-  for(; it != fileTypeResolvers.end(); ++it) {
-    File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
-    if(file)
-      return file;
-  }
-
   return createInternal(fileName, readAudioProperties, audioPropertiesStyle);
 }
