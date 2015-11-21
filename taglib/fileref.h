@@ -241,6 +241,11 @@ namespace TagLib {
     FileRef &operator=(const FileRef &ref);
 
     /*!
+     * Exchanges the content of the FileRef by the content of \a ref.
+     */
+    void swap(FileRef &ref);
+
+    /*!
      * Returns true if this FileRef and \a ref point to the same File object.
      */
     bool operator==(const FileRef &ref) const;
