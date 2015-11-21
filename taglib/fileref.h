@@ -142,7 +142,7 @@ namespace TagLib {
                      audioPropertiesStyle = AudioProperties::Average);
 
     /*!
-     * Contruct a FileRef using \a file.  The FileRef now takes ownership of the
+     * Construct a FileRef using \a file.  The FileRef now takes ownership of the
      * pointer and will delete the File when it passes out of scope.
      */
     explicit FileRef(File *file);
