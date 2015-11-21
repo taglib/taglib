@@ -295,8 +295,6 @@ namespace TagLib {
 
       void read(bool readProperties);
       void scan();
-      long findID3v2();
-      long findID3v1();
 
       class FilePrivate;
       FilePrivate *d;

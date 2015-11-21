@@ -29,6 +29,7 @@
 #include <tdebug.h>
 #include <tagunion.h>
 #include <tpropertymap.h>
+#include <tagutils.h>
 
 #include <id3v2header.h>
 #include <id3v2tag.h>
@@ -362,7 +363,7 @@ void FLAC::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
-  d->ID3v2Location = findID3v2();
+  d->ID3v2Location = Utils::findID3v2(this);
 
   if(d->ID3v2Location >= 0) {
 
@@ -378,7 +379,7 @@ void FLAC::File::read(bool readProperties)
 
   // Look for an ID3v1 tag
 
-  d->ID3v1Location = findID3v1();
+  d->ID3v1Location = Utils::findID3v1(this);
 
   if(d->ID3v1Location >= 0) {
     d->tag.set(FlacID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
@@ -538,31 +539,4 @@ void FLAC::File::scan()
   d->streamStart = nextBlockOffset;
 
   d->scanned = true;
-}
-
-long FLAC::File::findID3v1()
-{
-  if(!isValid())
-    return -1;
-
-  seek(-128, End);
-  long p = tell();
-
-  if(readBlock(3) == ID3v1::Tag::fileIdentifier())
-    return p;
-
-  return -1;
-}
-
-long FLAC::File::findID3v2()
-{
-  if(!isValid())
-    return -1;
-
-  seek(0);
-
-  if(readBlock(3) == ID3v2::Header::fileIdentifier())
-    return 0;
-
-  return -1;
 }
