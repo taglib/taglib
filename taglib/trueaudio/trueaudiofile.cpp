@@ -33,6 +33,7 @@
 #include <tagunion.h>
 #include <tstringlist.h>
 #include <tpropertymap.h>
+#include <tagutils.h>
 
 #include "trueaudiofile.h"
 #include "id3v1tag.h"
@@ -240,7 +241,7 @@ void TrueAudio::File::read(bool readProperties)
 {
   // Look for an ID3v2 tag
 
-  d->ID3v2Location = findID3v2();
+  d->ID3v2Location = Utils::findID3v2(this);
 
   if(d->ID3v2Location >= 0) {
 
@@ -256,7 +257,7 @@ void TrueAudio::File::read(bool readProperties)
 
   // Look for an ID3v1 tag
 
-  d->ID3v1Location = findID3v1();
+  d->ID3v1Location = Utils::findID3v1(this);
 
   if(d->ID3v1Location >= 0) {
     d->tag.set(TrueAudioID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
@@ -287,31 +288,4 @@ void TrueAudio::File::read(bool readProperties)
 
     d->properties = new AudioProperties(readBlock(HeaderSize), streamLength);
   }
-}
-
-offset_t TrueAudio::File::findID3v1()
-{
-  if(!isValid())
-    return -1;
-
-  seek(-128, End);
-  offset_t p = tell();
-
-  if(readBlock(3) == ID3v1::Tag::fileIdentifier())
-    return p;
-
-  return -1;
-}
-
-offset_t TrueAudio::File::findID3v2()
-{
-  if(!isValid())
-    return -1;
-
-  seek(0);
-
-  if(readBlock(3) == ID3v2::Header::fileIdentifier())
-    return 0;
-
-  return -1;
 }

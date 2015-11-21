@@ -55,12 +55,12 @@ String Mod::Tag::title() const
 
 String Mod::Tag::artist() const
 {
-  return String::null;
+  return String();
 }
 
 String Mod::Tag::album() const
 {
-  return String::null;
+  return String();
 }
 
 String Mod::Tag::comment() const
@@ -70,7 +70,7 @@ String Mod::Tag::comment() const
 
 String Mod::Tag::genre() const
 {
-  return String::null;
+  return String();
 }
 
 TagLib::uint Mod::Tag::year() const
@@ -128,7 +128,7 @@ PropertyMap Mod::Tag::properties() const
   PropertyMap properties;
   properties["TITLE"] = d->title;
   properties["COMMENT"] = d->comment;
-  if(!(d->trackerName.isNull()))
+  if(!(d->trackerName.isEmpty()))
     properties["TRACKERNAME"] = d->trackerName;
   return properties;
 }
@@ -142,19 +142,19 @@ PropertyMap Mod::Tag::setProperties(const PropertyMap &origProps)
     d->title = properties["TITLE"].front();
     oneValueSet.append("TITLE");
   } else
-    d->title = String::null;
+    d->title.clear();
 
   if(properties.contains("COMMENT")) {
     d->comment = properties["COMMENT"].front();
     oneValueSet.append("COMMENT");
   } else
-    d->comment = String::null;
+    d->comment.clear();
 
   if(properties.contains("TRACKERNAME")) {
     d->trackerName = properties["TRACKERNAME"].front();
     oneValueSet.append("TRACKERNAME");
   } else
-    d->trackerName = String::null;
+    d->trackerName.clear();
 
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.

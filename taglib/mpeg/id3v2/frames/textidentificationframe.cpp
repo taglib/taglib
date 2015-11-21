@@ -295,7 +295,7 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
   StringList l = fieldList();
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     String instrument = it->upper();
-    if(instrument.isNull()) {
+    if(instrument.isEmpty()) {
       // instrument is not a valid key -> frame unsupported
       map.clear();
       map.unsupportedData().append(frameID());
@@ -315,8 +315,8 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(String::Type encoding) 
   d(0)
 {
   StringList l;
-  l.append(String::null);
-  l.append(String::null);
+  l.append(String());
+  l.append(String());
   setText(l);
 }
 
@@ -344,7 +344,7 @@ String UserTextIdentificationFrame::description() const
 {
   return !TextIdentificationFrame::fieldList().isEmpty()
     ? TextIdentificationFrame::fieldList().front()
-    : String::null;
+    : String();
 }
 
 StringList UserTextIdentificationFrame::fieldList() const
@@ -357,7 +357,7 @@ StringList UserTextIdentificationFrame::fieldList() const
 void UserTextIdentificationFrame::setText(const String &text)
 {
   if(description().isEmpty())
-    setDescription(String::null);
+    setDescription(String());
 
   TextIdentificationFrame::setText(StringList(description()).append(text));
 }
@@ -365,7 +365,7 @@ void UserTextIdentificationFrame::setText(const String &text)
 void UserTextIdentificationFrame::setText(const StringList &fields)
 {
   if(description().isEmpty())
-    setDescription(String::null);
+    setDescription(String());
 
   TextIdentificationFrame::setText(StringList(description()).append(fields));
 }
@@ -420,7 +420,7 @@ void UserTextIdentificationFrame::checkFields()
   const size_t fields = fieldList().size();
 
   if(fields == 0)
-    setDescription(String::null);
+    setDescription(String());
   if(fields <= 1)
-    setText(String::null);
+    setText(String());
 }

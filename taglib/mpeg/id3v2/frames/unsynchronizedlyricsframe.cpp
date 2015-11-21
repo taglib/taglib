@@ -119,8 +119,6 @@ PropertyMap UnsynchronizedLyricsFrame::asProperties() const
   String key = description().upper();
   if(key.isEmpty() || key.upper() == "LYRICS")
     map.insert("LYRICS", text());
-  else if(key.isNull())
-    map.unsupportedData().append(L"USLT/" + description());
   else
     map.insert("LYRICS:" + key, text());
   return map;
@@ -164,7 +162,7 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
     } else {
       d->description = String(l.front(), d->textEncoding);
       d->text = String(l.back(), d->textEncoding);
-    }  
+    }
   }
 }
 

@@ -124,7 +124,7 @@ bool S3M::File::save()
     if(i < lines.size())
       writeString(lines[i], 27);
     else
-      writeString(String::null, 27);
+      writeString(String(), 27);
     // string terminating NUL is not optional:
     writeByte(0);
   }

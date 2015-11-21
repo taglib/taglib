@@ -81,35 +81,35 @@ ByteVector APE::Tag::fileIdentifier()
 String APE::Tag::title() const
 {
   if(d->itemListMap["TITLE"].isEmpty())
-    return String::null;
+    return String();
   return d->itemListMap["TITLE"].values().toString();
 }
 
 String APE::Tag::artist() const
 {
   if(d->itemListMap["ARTIST"].isEmpty())
-    return String::null;
+    return String();
   return d->itemListMap["ARTIST"].values().toString();
 }
 
 String APE::Tag::album() const
 {
   if(d->itemListMap["ALBUM"].isEmpty())
-    return String::null;
+    return String();
   return d->itemListMap["ALBUM"].values().toString();
 }
 
 String APE::Tag::comment() const
 {
   if(d->itemListMap["COMMENT"].isEmpty())
-    return String::null;
+    return String();
   return d->itemListMap["COMMENT"].values().toString();
 }
 
 String APE::Tag::genre() const
 {
   if(d->itemListMap["GENRE"].isEmpty())
-    return String::null;
+    return String();
   return d->itemListMap["GENRE"].values().toString();
 }
 
@@ -188,7 +188,7 @@ PropertyMap APE::Tag::properties() const
     String tagName = it->first.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
-    if(it->second.type() != Item::Text || tagName.isNull())
+    if(it->second.type() != Item::Text || tagName.isEmpty())
       properties.unsupportedData().append(it->first);
     else {
       // Some tags need to be handled specially
@@ -225,7 +225,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   for(; remIt != itemListMap().end(); ++remIt) {
     String key = remIt->first.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
-    if(!key.isNull() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
+    if(!key.isEmpty() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
       toRemove.append(remIt->first);
   }
 

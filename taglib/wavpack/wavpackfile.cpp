@@ -32,6 +32,7 @@
 #include <tdebug.h>
 #include <tagunion.h>
 #include <tpropertymap.h>
+#include <tagutils.h>
 
 #include "wavpackfile.h"
 #include "id3v1tag.h"
@@ -233,7 +234,7 @@ void WavPack::File::read(bool readProperties)
 {
   // Look for an ID3v1 tag
 
-  d->ID3v1Location = findID3v1();
+  d->ID3v1Location = Utils::findID3v1(this);
 
   if(d->ID3v1Location >= 0) {
     d->tag.set(WavID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
@@ -242,7 +243,7 @@ void WavPack::File::read(bool readProperties)
 
   // Look for an APE tag
 
-  d->APELocation = findAPE();
+  d->APELocation = Utils::findAPE(this, d->ID3v1Location);
 
   if(d->APELocation >= 0) {
     d->tag.set(WavAPEIndex, new APE::Tag(this, d->APELocation));
@@ -269,36 +270,4 @@ void WavPack::File::read(bool readProperties)
 
     d->properties = new AudioProperties(this, streamLength);
   }
-}
-
-offset_t WavPack::File::findAPE()
-{
-  if(!isValid())
-    return -1;
-
-  if(d->hasID3v1)
-    seek(-160, End);
-  else
-    seek(-32, End);
-
-  offset_t p = tell();
-
-  if(readBlock(8) == APE::Tag::fileIdentifier())
-    return p;
-
-  return -1;
-}
-
-offset_t WavPack::File::findID3v1()
-{
-  if(!isValid())
-    return -1;
-
-  seek(-128, End);
-  offset_t p = tell();
-
-  if(readBlock(3) == ID3v1::Tag::fileIdentifier())
-    return p;
-
-  return -1;
 }

@@ -4,11 +4,25 @@
 #include <fileref.h>
 #include <oggflacfile.h>
 #include <vorbisfile.h>
+#include <mpegfile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <tfilestream.h>
 
 using namespace std;
 using namespace TagLib;
+
+namespace
+{
+  class DummyResolver : public FileRef::FileTypeResolver
+  {
+  public:
+    virtual File *createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+    {
+      return new Ogg::Vorbis::File(fileName);
+    }
+  };
+}
 
 class TestFileRef : public CppUnit::TestFixture
 {
@@ -30,6 +44,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testAIFF);
   CPPUNIT_TEST(testAIFC);
   CPPUNIT_TEST(testUnsupported);
+  CPPUNIT_TEST(testFileResolver);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -80,26 +95,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
     delete f;
 
-    f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
+    FileStream fs(newname.c_str());
+    f = new FileRef(&fs);
     CPPUNIT_ASSERT(!f->isNull());
-    PropertyMap prop = f->properties();
-    CPPUNIT_ASSERT_EQUAL(prop["ARTIST"].front(), String("ttest artist"));
-    CPPUNIT_ASSERT_EQUAL(prop["TITLE" ].front(), String("ytest title"));
-    prop["ARTIST"].front() = "a test artist";
-    prop["TITLE" ].front() = "b test title";
-    f->setProperties(prop);
-    f->save();
+    CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("ttest artist"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("ytest title"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->genre(), String("uTest!"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->album(), String("ialbummmm"));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(7));
+    CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
     delete f;
-    
-    f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
-    CPPUNIT_ASSERT(!f->isNull());
-    prop = f->properties();
-    CPPUNIT_ASSERT_EQUAL(prop["ARTIST"].front(), String("a test artist"));
-    CPPUNIT_ASSERT_EQUAL(prop["TITLE" ].front(), String("b test title"));
-    delete f;
-    
   }
 
   void testMusepack()
@@ -192,10 +197,25 @@ public:
   {
     FileRef f1(TEST_FILE_PATH_C("no-extension"));
     CPPUNIT_ASSERT(f1.isNull());
-    
+
     FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xxx"));
     CPPUNIT_ASSERT(f2.isNull());
   }
+
+  void testFileResolver()
+  {
+    FileRef *f = new FileRef(TEST_FILE_PATH_C("xing.mp3"));
+    CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f->file()) != NULL);
+    delete f;
+
+    DummyResolver resolver;
+    FileRef::addFileTypeResolver(&resolver);
+
+    f = new FileRef(TEST_FILE_PATH_C("xing.mp3"));
+    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) != NULL);
+    delete f;
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestFileRef);

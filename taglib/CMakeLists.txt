@@ -362,6 +362,7 @@ set(tag_LIB_SRCS
   tagunion.cpp
   fileref.cpp
   audioproperties.cpp
+  tagutils.cpp
 )
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})

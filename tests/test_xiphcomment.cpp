@@ -1,5 +1,6 @@
 #include <string>
 #include <stdio.h>
+#include <flacfile.h>
 #include <xiphcomment.h>
 #include <tpropertymap.h>
 #include <tdebug.h>
@@ -17,6 +18,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrack);
   CPPUNIT_TEST(testSetTrack);
   CPPUNIT_TEST(testInvalidKeys);
+  CPPUNIT_TEST(testClearComment);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -72,6 +74,22 @@ public:
     PropertyMap unsuccessful = cmt.setProperties(map);
     CPPUNIT_ASSERT_EQUAL(size_t(3), unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
+  }
+
+  void testClearComment()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment()->addField("COMMENT", "Comment1");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment()->setComment("");
+      CPPUNIT_ASSERT_EQUAL(String(""), f.xiphComment()->comment());
+    }
   }
 
 };

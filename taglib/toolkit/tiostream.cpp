@@ -147,7 +147,7 @@ String FileName::toString() const
   else if(!d->data->name.empty()) {
     const int len = ::MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, NULL, 0);
     if(len == 0)
-      return String::null;
+      return String();
 
     std::vector<wchar_t> buf(len);
     ::MultiByteToWideChar(CP_ACP, 0, d->data->name.c_str(), -1, &buf[0], len);
@@ -155,7 +155,7 @@ String FileName::toString() const
     return String(&buf[0]);
   }
   else {
-    return String::null;
+    return String();
   }
 }
 

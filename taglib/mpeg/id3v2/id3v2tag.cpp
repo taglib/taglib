@@ -139,21 +139,21 @@ String ID3v2::Tag::title() const
 {
   if(!d->frameListMap["TIT2"].isEmpty())
     return d->frameListMap["TIT2"].front()->toString();
-  return String::null;
+  return String();
 }
 
 String ID3v2::Tag::artist() const
 {
   if(!d->frameListMap["TPE1"].isEmpty())
     return d->frameListMap["TPE1"].front()->toString();
-  return String::null;
+  return String();
 }
 
 String ID3v2::Tag::album() const
 {
   if(!d->frameListMap["TALB"].isEmpty())
     return d->frameListMap["TALB"].front()->toString();
-  return String::null;
+  return String();
 }
 
 String ID3v2::Tag::comment() const
@@ -161,7 +161,7 @@ String ID3v2::Tag::comment() const
   const FrameList &comments = d->frameListMap["COMM"];
 
   if(comments.isEmpty())
-    return String::null;
+    return String();
 
   for(FrameList::ConstIterator it = comments.begin(); it != comments.end(); ++it)
   {
@@ -183,7 +183,7 @@ String ID3v2::Tag::genre() const
   if(d->frameListMap["TCON"].isEmpty() ||
      !dynamic_cast<TextIdentificationFrame *>(d->frameListMap["TCON"].front()))
   {
-    return String::null;
+    return String();
   }
 
   // ID3v2.4 lists genres as the fields in its frames field list.  If the field

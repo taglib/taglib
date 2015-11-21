@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2015 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,62 +23,27 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "unknownframe.h"
+#ifndef TAGLIB_TAGUTILS_H
+#define TAGLIB_TAGUTILS_H
 
-using namespace TagLib;
-using namespace ID3v2;
+// THIS FILE IS NOT A PART OF THE TAGLIB API
 
-class UnknownFrame::UnknownFramePrivate
-{
-public:
-  ByteVector fieldData;
-};
+#ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
-////////////////////////////////////////////////////////////////////////////////
-// public members
-////////////////////////////////////////////////////////////////////////////////
+namespace TagLib {
 
-UnknownFrame::UnknownFrame(const ByteVector &data) : Frame(data)
-{
-  d = new UnknownFramePrivate;
-  setData(data);
+  class File;
+
+  namespace Utils {
+
+    offset_t findID3v1(File *file);
+
+    offset_t findID3v2(File *file);
+
+    offset_t findAPE(File *file, offset_t id3v1Location);
+  }
 }
 
-UnknownFrame::~UnknownFrame()
-{
-  delete d;
-}
+#endif
 
-String UnknownFrame::toString() const
-{
-  return String();
-}
-
-ByteVector UnknownFrame::data() const
-{
-  return d->fieldData;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// protected members
-////////////////////////////////////////////////////////////////////////////////
-
-void UnknownFrame::parseFields(const ByteVector &data)
-{
-  d->fieldData = data;
-}
-
-ByteVector UnknownFrame::renderFields() const
-{
-  return d->fieldData;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// private members
-////////////////////////////////////////////////////////////////////////////////
-
-UnknownFrame::UnknownFrame(const ByteVector &data, Header *h) : Frame(h)
-{
-  d = new UnknownFramePrivate;
-  parseFields(fieldData(data));
-}
+#endif

@@ -35,7 +35,7 @@ PropertyMap::PropertyMap(const SimplePropertyMap &m)
 {
   for(SimplePropertyMap::ConstIterator it = m.begin(); it != m.end(); ++it){
     String key = it->first.upper();
-    if(!key.isNull())
+    if(!key.isEmpty())
       insert(it->first, it->second);
     else
       unsupported.append(it->first);
@@ -144,7 +144,8 @@ bool PropertyMap::operator!=(const PropertyMap &other) const
 
 String PropertyMap::toString() const
 {
-  String ret = "";
+  String ret;
+
   for(ConstIterator it = begin(); it != end(); ++it)
     ret += it->first+"="+it->second.toString(", ") + "\n";
   if(!unsupported.isEmpty())

@@ -504,7 +504,7 @@ void FrameFactory::updateGenre(TextIdentificationFrame *frame) const
   }
 
   if(newfields.isEmpty())
-    fields.append(String::null);
+    fields.append(String());
 
   frame->setText(newfields);
 

@@ -38,7 +38,7 @@ class PublicFrame : public ID3v2::Frame
       size_t position = 0;
       return ID3v2::Frame::readStringField(data, encoding, position);
     }
-    virtual String toString() const { return String::null; }
+    virtual String toString() const { return String(); }
     virtual void parseFields(const ByteVector &) {}
     virtual ByteVector renderFields() const { return ByteVector(); }
 };

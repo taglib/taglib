@@ -27,10 +27,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tfile.h"
-#include "tstring.h"
-#include "tdebug.h"
-#include "tsmartptr.h"
+#include <tfile.h>
+#include <tstring.h>
+#include <tdebug.h>
+#include <tsmartptr.h>
 
 #include "fileref.h"
 #include "asffile.h"
@@ -58,91 +58,129 @@ using namespace TagLib;
 namespace
 {
   typedef List<const FileRef::FileTypeResolver *> ResolverList;
-  typedef ResolverList::ConstIterator ResolverConstIterator;
-
   ResolverList fileTypeResolvers;
 
-  SHARED_PTR<File> create(
-    FileName fileName,
-    bool readAudioProperties,
-    AudioProperties::ReadStyle audioPropertiesStyle)
+  // Templatized internal functions. T should be String or IOStream*.
+
+  template <typename T>
+  inline FileName toFileName(T arg)
   {
-    SHARED_PTR<File> file;
-    for(ResolverConstIterator it = fileTypeResolvers.begin(); it != fileTypeResolvers.end(); ++it)
-    {
-      file.reset((*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle));
+    // Should never be called.
+  }
+
+  template <>
+  inline FileName toFileName<IOStream *>(IOStream *arg)
+  {
+    return arg->name();
+  }
+
+  template <>
+  inline FileName toFileName<FileName>(FileName arg)
+  {
+    return arg;
+  }
+
+  template <typename T>
+  inline File *resolveFileType(T arg, bool readProperties,
+                               AudioProperties::ReadStyle style)
+  {
+    // Should never be called.
+  }
+
+  template <>
+  inline File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
+                                           AudioProperties::ReadStyle style)
+  {
+    return 0;
+  }
+
+  template <>
+  inline File *resolveFileType<FileName>(FileName arg, bool readProperties,
+                                         AudioProperties::ReadStyle style)
+  {
+    ResolverList::ConstIterator it = fileTypeResolvers.begin();
+    for(; it != fileTypeResolvers.end(); ++it) {
+      File *file = (*it)->createFile(arg, readProperties, style);
       if(file)
         return file;
     }
 
-    String ext;
-    {
+    return 0;
+  }
+
+  template <typename T>
+  File* createInternal(T arg, bool readAudioProperties,
+                       AudioProperties::ReadStyle audioPropertiesStyle)
+  {
+    File *file = resolveFileType(arg, readAudioProperties, audioPropertiesStyle);
+    if(file)
+      return file;
+
 #ifdef _WIN32
-
-      String s = fileName.toString();
-
+    const String s = toFileName(arg).toString();
 #else
-
-      String s = fileName;
-
+    const String s(toFileName(arg));
 #endif
 
-      const size_t pos = s.rfind(".");
-      if(pos != String::npos())
-        ext = s.substr(pos + 1).upper();
-    }
+    String ext;
+    const int pos = s.rfind(".");
+    if(pos != -1)
+      ext = s.substr(pos + 1).upper();
 
     // If this list is updated, the method defaultFileExtensions() should also be
     // updated.  However at some point that list should be created at the same time
     // that a default file type resolver is created.
 
-    if(!ext.isEmpty()) {
-      if(ext == "MP3")
-        file.reset(new MPEG::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "OGG")
-        file.reset(new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "OGA") {
-        /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
-        file.reset(new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle));
-        if(!file->isValid())
-          file.reset(new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle));
-      }
-      else if(ext == "FLAC")
-        file.reset(new FLAC::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "MPC")
-        file.reset(new MPC::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "WV")
-        file.reset(new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "SPX")
-        file.reset(new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "OPUS")
-        file.reset(new Ogg::Opus::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "TTA")
-        file.reset(new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
-        file.reset(new MP4::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "WMA" || ext == "ASF")
-        file.reset(new ASF::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
-        file.reset(new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "WAV")
-        file.reset(new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "APE")
-        file.reset(new APE::File(fileName, readAudioProperties, audioPropertiesStyle));
-      // module, nst and wow are possible but uncommon extensions
-      else if(ext == "MOD" || ext == "MODULE" || ext == "NST" || ext == "WOW")
-        file.reset(new Mod::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "S3M")
-        file.reset(new S3M::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "IT")
-        file.reset(new IT::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "XM")
-        file.reset(new XM::File(fileName, readAudioProperties, audioPropertiesStyle));
-      else if(ext == "DSF")
-        file.reset(new DSF::File(fileName, readAudioProperties, audioPropertiesStyle));
-    }
+    if(ext.isEmpty())
+      return 0;
 
-    return file;
+    if(ext == "MP3")
+      return new MPEG::File(arg, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
+    if(ext == "OGG")
+      return new Ogg::Vorbis::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "OGA") {
+      /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
+      File *file = new Ogg::FLAC::File(arg, readAudioProperties, audioPropertiesStyle);
+      if(file->isValid())
+        return file;
+      delete file;
+      return new Ogg::Vorbis::File(arg, readAudioProperties, audioPropertiesStyle);
+    }
+    if(ext == "FLAC")
+      return new FLAC::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "MPC")
+      return new MPC::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "WV")
+      return new WavPack::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "SPX")
+      return new Ogg::Speex::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "OPUS")
+      return new Ogg::Opus::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "TTA")
+      return new TrueAudio::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
+      return new MP4::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "WMA" || ext == "ASF")
+      return new ASF::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
+      return new RIFF::AIFF::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "WAV")
+      return new RIFF::WAV::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "APE")
+      return new APE::File(arg, readAudioProperties, audioPropertiesStyle);
+    // module, nst and wow are possible but uncommon extensions
+    if(ext == "MOD" || ext == "MODULE" || ext == "NST" || ext == "WOW")
+      return new Mod::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "S3M")
+      return new S3M::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "IT")
+      return new IT::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "XM")
+      return new XM::File(arg, readAudioProperties, audioPropertiesStyle);
+    if (ext == "DSF")
+      return new DSF::File(arg, readAudioProperties, audioPropertiesStyle);
+
+    return 0;
   }
 }
 
@@ -170,8 +208,14 @@ FileRef::FileRef() :
 {
 }
 
-FileRef::FileRef(FileName fileName, bool readAudioProperties, AudioProperties::ReadStyle style) :
-  d(new FileRefPrivate(create(fileName, readAudioProperties, style)))
+FileRef::FileRef(FileName fileName, bool readAudioProperties,
+                 AudioProperties::ReadStyle audioPropertiesStyle) :
+  d(new FileRefPrivate(createInternal(fileName, readAudioProperties, audioPropertiesStyle)))
+{
+}
+
+FileRef::FileRef(IOStream* stream, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle) :
+  d(new FileRefPrivate(createInternal(stream, readAudioProperties, audioPropertiesStyle)))
 {
 }
 
@@ -306,16 +350,23 @@ bool FileRef::isNull() const
 
 FileRef &FileRef::operator=(const FileRef &ref)
 {
-  *d = *ref.d;
+  FileRef(ref).swap(*this);
   return *this;
+}
+
+void FileRef::swap(FileRef &ref)
+{
+  using std::swap;
+
+  swap(d, ref.d);
 }
 
 bool FileRef::operator==(const FileRef &ref) const
 {
-  return (d->file == ref.d->file);
+  return (ref.d->file == d->file);
 }
 
 bool FileRef::operator!=(const FileRef &ref) const
 {
-  return (d->file != ref.d->file);
+  return (ref.d->file != d->file);
 }

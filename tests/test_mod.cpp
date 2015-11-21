@@ -113,10 +113,10 @@ private:
     CPPUNIT_ASSERT_EQUAL(31U, p->instrumentCount());
     CPPUNIT_ASSERT_EQUAL((uchar)1, p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->artist());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->album());
+    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
+    CPPUNIT_ASSERT_EQUAL(String(), t->album());
     CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->genre());
+    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
     CPPUNIT_ASSERT_EQUAL(0U, t->year());
     CPPUNIT_ASSERT_EQUAL(0U, t->track());
     CPPUNIT_ASSERT_EQUAL(String("StarTrekker"), t->trackerName());

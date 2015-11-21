@@ -311,7 +311,7 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, siz
 
   const size_t end = data.find(delimiter, position, delimiter.size());
   if(end == ByteVector::npos() || end < position)
-    return String::null;
+    return String();
 
   String str;
   if(encoding == String::Latin1)

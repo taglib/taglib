@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright            : (C) 2015 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,62 +23,57 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "unknownframe.h"
+#include <tfile.h>
+
+#include "id3v1tag.h"
+#include "id3v2header.h"
+#include "apetag.h"
+
+#include "tagutils.h"
 
 using namespace TagLib;
-using namespace ID3v2;
 
-class UnknownFrame::UnknownFramePrivate
+offset_t Utils::findID3v1(File *file)
 {
-public:
-  ByteVector fieldData;
-};
+  if(!file->isValid())
+    return -1;
 
-////////////////////////////////////////////////////////////////////////////////
-// public members
-////////////////////////////////////////////////////////////////////////////////
+  file->seek(-128, File::End);
+  const offset_t p = file->tell();
 
-UnknownFrame::UnknownFrame(const ByteVector &data) : Frame(data)
-{
-  d = new UnknownFramePrivate;
-  setData(data);
+  if(file->readBlock(3) == ID3v1::Tag::fileIdentifier())
+    return p;
+
+  return -1;
 }
 
-UnknownFrame::~UnknownFrame()
+offset_t Utils::findID3v2(File *file)
 {
-  delete d;
+  if(!file->isValid())
+    return -1;
+
+  file->seek(0);
+
+  if(file->readBlock(3) == ID3v2::Header::fileIdentifier())
+    return 0;
+
+  return -1;
 }
 
-String UnknownFrame::toString() const
+offset_t Utils::findAPE(File *file, offset_t id3v1Location)
 {
-  return String();
-}
+  if(!file->isValid())
+    return -1;
 
-ByteVector UnknownFrame::data() const
-{
-  return d->fieldData;
-}
+  if(id3v1Location >= 0)
+    file->seek(id3v1Location - 32, File::Beginning);
+  else
+    file->seek(-32, File::End);
 
-////////////////////////////////////////////////////////////////////////////////
-// protected members
-////////////////////////////////////////////////////////////////////////////////
+  const offset_t p = file->tell();
 
-void UnknownFrame::parseFields(const ByteVector &data)
-{
-  d->fieldData = data;
-}
+  if(file->readBlock(8) == APE::Tag::fileIdentifier())
+    return p;
 
-ByteVector UnknownFrame::renderFields() const
-{
-  return d->fieldData;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// private members
-////////////////////////////////////////////////////////////////////////////////
-
-UnknownFrame::UnknownFrame(const ByteVector &data, Header *h) : Frame(h)
-{
-  d = new UnknownFramePrivate;
-  parseFields(fieldData(data));
+  return -1;
 }

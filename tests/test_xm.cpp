@@ -139,13 +139,13 @@ public:
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  6, p->tempo());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)125, p->bpmSpeed());
     CPPUNIT_ASSERT_EQUAL(titleBefore, t->title());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->artist());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->album());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->genre());
+    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
+    CPPUNIT_ASSERT_EQUAL(String(), t->album());
+    CPPUNIT_ASSERT_EQUAL(String(), t->comment());
+    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
     CPPUNIT_ASSERT_EQUAL(0U, t->year());
     CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->trackerName());
+    CPPUNIT_ASSERT_EQUAL(String(), t->trackerName());
   }
 
   void testWriteTagsShort()
@@ -185,10 +185,10 @@ private:
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  6, p->tempo());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)125, p->bpmSpeed());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->artist());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->album());
+    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
+    CPPUNIT_ASSERT_EQUAL(String(), t->album());
     CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String::null, t->genre());
+    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
     CPPUNIT_ASSERT_EQUAL(0U, t->year());
     CPPUNIT_ASSERT_EQUAL(0U, t->track());
     CPPUNIT_ASSERT_EQUAL(trackerName, t->trackerName());

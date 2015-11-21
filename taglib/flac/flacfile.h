@@ -257,8 +257,6 @@ namespace TagLib {
 
       void read(bool readProperties);
       void scan();
-      offset_t findID3v2();
-      offset_t findID3v1();
 
       class FilePrivate;
       FilePrivate *d;

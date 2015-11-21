@@ -452,7 +452,7 @@ bool XM::File::save()
     seek(pos + 4);
     const uint len = std::min(22U, instrumentHeaderSize - 4U);
     if(i >= lines.size())
-      writeString(String::null, len);
+      writeString(String(), len);
     else
       writeString(lines[i], len);
 
@@ -483,7 +483,7 @@ bool XM::File::save()
           seek(pos + 18);
           const uint len = std::min(sampleHeaderSize - 18U, 22U);
           if(sampleNameIndex >= lines.size())
-            writeString(String::null, len);
+            writeString(String(), len);
           else
             writeString(lines[sampleNameIndex ++], len);
         }

@@ -159,7 +159,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
   size_t pos = 6;
 
   d->description = readStringField(data, d->textEncoding, pos);
-  if(d->description.isNull())
+  if(d->description.isEmpty())
     return;
 
   /*
@@ -190,7 +190,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
       }
     }
     String text = readStringField(data, enc, pos);
-    if(text.isNull() || pos + 4 > end)
+    if(text.isEmpty() || pos + 4 > end)
       return;
 
     uint time = data.toUInt32BE(pos);

@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tagunion.h"
-#include "tstringlist.h"
-#include "tpropertymap.h"
-#include "tsmartptr.h"
+#include <tagunion.h>
+#include <tstringlist.h>
+#include <tpropertymap.h>
+#include <tsmartptr.h>
 
 #define stringUnion(method)                                               \
   for(size_t j = 0; j < COUNT; ++j) {                                     \
@@ -34,7 +34,7 @@
     if(!val.isEmpty())                                                    \
       return val;                                                         \
   }                                                                       \
-  return String::null;
+  return String();
 
 #define numberUnion(method)                                               \
   for(size_t j = 0; j < COUNT; ++j) {                                     \
