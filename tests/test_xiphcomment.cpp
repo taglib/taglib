@@ -1,7 +1,7 @@
 #include <string>
 #include <stdio.h>
-#include <flacfile.h>
 #include <xiphcomment.h>
+#include <vorbisfile.h>
 #include <tpropertymap.h>
 #include <tdebug.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -19,6 +19,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testSetTrack);
   CPPUNIT_TEST(testInvalidKeys);
   CPPUNIT_TEST(testClearComment);
+  CPPUNIT_TEST(testRemoveFields);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -78,18 +79,44 @@ public:
 
   void testClearComment()
   {
-    ScopedFileCopy copy("no-tags", ".flac");
+    ScopedFileCopy copy("empty", ".ogg");
 
     {
-      FLAC::File f(copy.fileName().c_str());
-      f.xiphComment()->addField("COMMENT", "Comment1");
+      Ogg::Vorbis::File f(copy.fileName().c_str());
+      f.tag()->addField("COMMENT", "Comment1");
       f.save();
     }
     {
-      FLAC::File f(copy.fileName().c_str());
-      f.xiphComment()->setComment("");
-      CPPUNIT_ASSERT_EQUAL(String(""), f.xiphComment()->comment());
+      Ogg::Vorbis::File f(copy.fileName().c_str());
+      f.tag()->setComment("");
+      CPPUNIT_ASSERT_EQUAL(String(""), f.tag()->comment());
     }
+  }
+
+  void testRemoveFields()
+  {
+    Ogg::Vorbis::File f(TEST_FILE_PATH_C("empty.ogg"));
+    f.tag()->addField("title", "Title1");
+    f.tag()->addField("Title", "Title1", false);
+    f.tag()->addField("titlE", "Title2", false);
+    f.tag()->addField("TITLE", "Title3", false);
+    f.tag()->addField("artist", "Artist1");
+    f.tag()->addField("ARTIST", "Artist2", false);
+    CPPUNIT_ASSERT_EQUAL(String("Title1 Title1 Title2 Title3"), f.tag()->title());
+    CPPUNIT_ASSERT_EQUAL(String("Artist1 Artist2"), f.tag()->artist());
+
+    f.tag()->removeFields("title", "Title1");
+    CPPUNIT_ASSERT_EQUAL(String("Title2 Title3"), f.tag()->title());
+    CPPUNIT_ASSERT_EQUAL(String("Artist1 Artist2"), f.tag()->artist());
+
+    f.tag()->removeFields("Artist");
+    CPPUNIT_ASSERT_EQUAL(String("Title2 Title3"), f.tag()->title());
+    CPPUNIT_ASSERT(f.tag()->artist().isEmpty());
+
+    f.tag()->removeAllFields();
+    CPPUNIT_ASSERT(f.tag()->title().isEmpty());
+    CPPUNIT_ASSERT(f.tag()->artist().isEmpty());
+    CPPUNIT_ASSERT_EQUAL(String("Xiph.Org libVorbis I 20050304"), f.tag()->vendorID());
   }
 
 };

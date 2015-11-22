@@ -274,22 +274,36 @@ void Ogg::XiphComment::addField(const String &key, const String &value, bool rep
 
 void Ogg::XiphComment::removeField(const String &key, const String &value)
 {
-  if(!value.isNull()) {
-    StringList::Iterator it = d->fieldListMap[key].begin();
-    while(it != d->fieldListMap[key].end()) {
-      if(value == *it)
-        it = d->fieldListMap[key].erase(it);
-      else
-        it++;
-    }
-  }
+  if(!value.isNull())
+    removeFields(key, value);
   else
-    d->fieldListMap.erase(key);
+    removeFields(key);
+}
+
+void Ogg::XiphComment::removeFields(const String &key)
+{
+  d->fieldListMap.erase(key.upper());
+}
+
+void Ogg::XiphComment::removeFields(const String &key, const String &value)
+{
+  StringList &fields = d->fieldListMap[key.upper()];
+  for(StringList::Iterator it = fields.begin(); it != fields.end(); ) {
+    if(*it == value)
+      it = fields.erase(it);
+    else
+      ++it;
+  }
+}
+
+void Ogg::XiphComment::removeAllFields()
+{
+  d->fieldListMap.clear();
 }
 
 bool Ogg::XiphComment::contains(const String &key) const
 {
-  return d->fieldListMap.contains(key) && !d->fieldListMap[key].isEmpty();
+  return !d->fieldListMap[key.upper()].isEmpty();
 }
 
 ByteVector Ogg::XiphComment::render(bool addFramingBit) const

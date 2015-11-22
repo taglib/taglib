@@ -184,8 +184,32 @@ namespace TagLib {
       /*!
        * Remove the field specified by \a key with the data \a value.  If
        * \a value is null, all of the fields with the given key will be removed.
+       *
+       * \deprecated Using this method may lead to a linkage error.
        */
+      // BIC: remove and merge with below
       void removeField(const String &key, const String &value = String::null);
+
+      /*!
+       * Remove all the fields specified by \a key.
+       *
+       * \see removeAllFields()
+       */
+      void removeFields(const String &key);
+
+      /*!
+       * Remove all the fields specified by \a key with the data \a value.
+       *
+       * \see removeAllFields()
+       */
+      void removeFields(const String &key, const String &value);
+
+      /*!
+       * Remove all the fields in the comment.
+       *
+       * \see removeFields()
+       */
+      void removeAllFields();
 
       /*!
        * Returns true if the field is contained within the comment.

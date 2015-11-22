@@ -52,9 +52,21 @@ if(MSVC AND ENABLE_STATIC_RUNTIME)
   endforeach(flag_var)
 endif()
 
-set(TAGLIB_LIB_MAJOR_VERSION "1")
-set(TAGLIB_LIB_MINOR_VERSION "10")
-set(TAGLIB_LIB_PATCH_VERSION "0")
+# Read version information from file taglib/toolkit/taglib.h into variables
+# TAGLIB_LIB_MAJOR_VERSION, TAGLIB_LIB_MINOR_VERSION, TAGLIB_LIB_PATCH_VERSION.
+foreach(version_part MAJOR MINOR PATCH)
+  set(version_var_name "TAGLIB_${version_part}_VERSION")
+  file(STRINGS taglib/toolkit/taglib.h version_line
+       REGEX "^#define +${version_var_name}")
+  if(NOT version_line)
+    message(FATAL_ERROR "${version_var_name} not found in taglib.h")
+  endif()
+  string(REGEX MATCH "${version_var_name} +([^ ]+)" result ${version_line})
+  set(TAGLIB_LIB_${version_part}_VERSION ${CMAKE_MATCH_1})
+endforeach(version_part)
+
+# Only used to force cmake rerun when taglib.h changes.
+configure_file(taglib/toolkit/taglib.h ${CMAKE_CURRENT_BINARY_DIR}/taglib.h.stamp)
 
 if("${TAGLIB_LIB_PATCH_VERSION}" EQUAL "0")
   set(TAGLIB_LIB_VERSION_STRING "${TAGLIB_LIB_MAJOR_VERSION}.${TAGLIB_LIB_MINOR_VERSION}")
