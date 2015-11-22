@@ -135,7 +135,7 @@ TagLib::PictureMap APE::Tag::pictures() const
     Item front = d->itemListMap[FRONT_COVER];
     if(Item::Binary == front.type()) {
       ByteVector picture = front.binaryData();
-      int index = picture.find('\0');
+      const size_t index = picture.find('\0');
       if(index < picture.size()) {
         ByteVector desc = picture.mid(0, index + 1);
         String mime = "image/jpeg";
@@ -150,7 +150,7 @@ TagLib::PictureMap APE::Tag::pictures() const
     Item back = d->itemListMap[BACK_COVER];
     if(Item::Binary == back.type()) {
       ByteVector picture = back.binaryData();
-      int index = picture.find('\0');
+      const size_t index = picture.find('\0');
       if(index < picture.size()) {
         ByteVector desc = picture.mid(0, index + 1);
         String mime = "image/jpeg";
