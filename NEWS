@@ -3,6 +3,7 @@
  * New API for creating FileRef from IOStream.
  * Added support for ID3v2 PCST and WFED frames.
  * Added String::clear().
+ * Added alternative functions to XiphComment::removeField().
  * Better handling of duplicate ID3v2 tags in all kinds of files.
  * Better handling of duplicate tags in WAV files.
  * Fixed crash when calling File::properties() after strip().
@@ -10,6 +11,7 @@
  * Fixed updating the comment field of Vorbis comments.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
+ * Marked XiphComment::removeField() deprecated.
  * Many smaller bug fixes and performance improvements.
 
 TagLib 1.10 (Nov 11, 2015)
