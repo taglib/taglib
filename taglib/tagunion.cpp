@@ -26,6 +26,7 @@
 #include <tagunion.h>
 #include <tstringlist.h>
 #include <tpropertymap.h>
+#include <tpicturemap.h>
 #include <tsmartptr.h>
 
 #define stringUnion(method)                                               \
@@ -43,6 +44,14 @@
       return val;                                                         \
   }                                                                       \
   return 0;
+
+#define pictureMapUnion(method)                                           \
+  for(size_t j = 0; j < COUNT; ++j) {                                     \
+    PictureMap val = d->tags[j] ? d->tags[j]->method() : PictureMap();    \
+    if(!val.isEmpty())                                                    \
+      return val;                                                         \
+  }                                                                       \
+  return PictureMap();                                                    \
 
 #define setUnion(method, value)                                           \
   for(size_t j = 0; j < COUNT; ++j) {                                     \
@@ -164,6 +173,12 @@ namespace TagLib
   }
 
   template <size_t COUNT>
+  TagLib::PictureMap TagUnion<COUNT>::pictures() const
+  {
+    pictureMapUnion(pictures);
+  }
+
+  template <size_t COUNT>
   void TagUnion<COUNT>::setAlbum(const String &s)
   {
     setUnion(Album, s);
@@ -191,6 +206,12 @@ namespace TagLib
   void TagUnion<COUNT>::setTrack(uint i)
   {
     setUnion(Track, i);
+  }
+
+  template <size_t COUNT>
+  void TagUnion<COUNT>::setPictures(const PictureMap &l)
+  {
+      setUnion(Pictures, l);
   }
 
   template <size_t COUNT>

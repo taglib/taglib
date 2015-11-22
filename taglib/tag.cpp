@@ -25,6 +25,7 @@
 
 #include "tag.h"
 #include "tstringlist.h"
+#include "tpicturemap.h"
 #include "tpropertymap.h"
 
 using namespace TagLib;
@@ -52,7 +53,8 @@ bool Tag::isEmpty() const
           comment().isEmpty() &&
           genre().isEmpty() &&
           year() == 0 &&
-          track() == 0);
+          track() == 0 &&
+          pictures().isEmpty());
 }
 
 PropertyMap Tag::properties() const
@@ -160,6 +162,7 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
     target->setGenre(source->genre());
     target->setYear(source->year());
     target->setTrack(source->track());
+    target->setPictures(source->pictures());
   }
   else {
     if(target->title().isEmpty())
@@ -176,6 +179,8 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
       target->setYear(source->year());
     if(target->track() <= 0)
       target->setTrack(source->track());
+    if(target->pictures().isEmpty() )
+        target->setPictures(source->pictures());
   }
 }
 

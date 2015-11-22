@@ -34,6 +34,7 @@
 #include <tfile.h>
 #include <tstring.h>
 #include <tmap.h>
+#include <tpicturemap.h>
 #include <tpropertymap.h>
 
 #include "apetag.h"
@@ -127,6 +128,11 @@ TagLib::uint APE::Tag::track() const
   return d->itemListMap["TRACK"].toString().toInt();
 }
 
+TagLib::PictureMap APE::Tag::pictures() const
+{
+    return PictureMap();
+}
+
 void APE::Tag::setTitle(const String &s)
 {
   addValue("TITLE", s, true);
@@ -168,17 +174,18 @@ void APE::Tag::setTrack(uint i)
     addValue("TRACK", String::number(i), true);
 }
 
-namespace
+void APE::Tag::setPictures(const PictureMap &l)
 {
-  // conversions of tag keys between what we use in PropertyMap and what's usual
-  // for APE tags
-  static const TagLib::uint keyConversionsSize = 5; //usual,         APE
-  static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
-                                             {"DATE",        "YEAR"        },
-                                             {"ALBUMARTIST", "ALBUM ARTIST"},
-                                             {"DISCNUMBER",  "DISC"        },
-                                             {"REMIXER",     "MIXARTIST"   }};
 }
+
+// conversions of tag keys between what we use in PropertyMap and what's usual
+// for APE tags
+static const TagLib::uint keyConversionsSize = 5; //usual,         APE
+static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
+                                           {"DATE",        "YEAR"        },
+                                           {"ALBUMARTIST", "ALBUM ARTIST"},
+                                           {"DISCNUMBER",  "DISC"        },
+                                           {"REMIXER",     "MIXARTIST"   }};
 
 PropertyMap APE::Tag::properties() const
 {
