@@ -34,6 +34,9 @@
 
 #include "apeitem.h"
 
+#define FRONT_COVER "COVER ART (FRONT)"
+#define BACK_COVER "COVER ART (BACK)"
+
 namespace TagLib {
 
   class File;
@@ -94,6 +97,14 @@ namespace TagLib {
       virtual String genre() const;
       virtual uint year() const;
       virtual uint track() const;
+
+      /**
+       * @brief pictures
+       * According to :
+       * http://www.hydrogenaud.io/forums/index.php?showtopic=40603&st=50&p=504669&#entry504669
+       * http://git.videolan.org/?p=vlc.git;a=blob;f=modules/meta_engine/taglib.cpp
+       * @return
+       */
       virtual PictureMap pictures() const;
 
       virtual void setTitle(const String &s);
