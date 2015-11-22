@@ -153,16 +153,6 @@ namespace TagLib {
       FrameFactory(const FrameFactory &);
       FrameFactory &operator=(const FrameFactory &);
 
-      /*!
-       * This method is used internally to convert a frame from ID \a from to ID
-       * \a to.  If the frame matches the \a from pattern and converts the frame
-       * ID in the \a header or simply does nothing if the frame ID does not match.
-       */
-      void convertFrame(const char *from, const char *to,
-                        Frame::Header *header) const;
-
-      void updateGenre(TextIdentificationFrame *frame) const;
-
       class FrameFactoryPrivate;
       FrameFactoryPrivate *d;
     };
