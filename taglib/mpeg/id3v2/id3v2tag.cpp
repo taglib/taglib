@@ -42,6 +42,7 @@
 #include "id3v2synchdata.h"
 #include "id3v1genres.h"
 
+#include "frames/attachedpictureframe.h"
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
 #include "frames/urllinkframe.h"
@@ -194,7 +195,7 @@ String ID3v2::Tag::genre() const
   // string is built.
 
   TextIdentificationFrame *f = static_cast<TextIdentificationFrame *>(
-    d->frameListMap["TCON"].front());
+                                 d->frameListMap["TCON"].front());
 
   StringList fields = f->fieldList();
 
@@ -234,7 +235,88 @@ TagLib::uint ID3v2::Tag::track() const
 
 TagLib::PictureMap ID3v2::Tag::pictures() const
 {
+  if(!d->frameListMap.contains("APIC"))
     return PictureMap();
+
+  PictureMap map;
+  FrameList frameListMap = d->frameListMap["APIC"];
+  for(FrameList::ConstIterator it = frameListMap.begin();
+      it != frameListMap.end();
+      ++it) {
+    const AttachedPictureFrame *frame = static_cast<AttachedPictureFrame *>(*it);
+    Picture::Type type;
+    switch(frame->type()) {
+    case AttachedPictureFrame::Other:
+      type = Picture::Other;
+      break;
+    case AttachedPictureFrame::FileIcon:
+      type = Picture::FileIcon;
+      break;
+    case AttachedPictureFrame::OtherFileIcon:
+      type = Picture::OtherFileIcon;
+      break;
+    case AttachedPictureFrame::FrontCover:
+      type = Picture::FrontCover;
+      break;
+    case AttachedPictureFrame::BackCover:
+      type = Picture::BackCover;
+      break;
+    case AttachedPictureFrame::LeafletPage:
+      type = Picture::LeafletPage;
+      break;
+    case AttachedPictureFrame::Media:
+      type = Picture::Media;
+      break;
+    case AttachedPictureFrame::LeadArtist:
+      type = Picture::LeadArtist;
+      break;
+    case AttachedPictureFrame::Artist:
+      type = Picture::Artist;
+      break;
+    case AttachedPictureFrame::Conductor:
+      type = Picture::Conductor;
+      break;
+    case AttachedPictureFrame::Band:
+      type = Picture::Band;
+      break;
+    case AttachedPictureFrame::Composer:
+      type = Picture::Composer;
+      break;
+    case AttachedPictureFrame::Lyricist:
+      type = Picture::Lyricist;
+      break;
+    case AttachedPictureFrame::RecordingLocation:
+      type = Picture::RecordingLocation;
+      break;
+    case AttachedPictureFrame::DuringRecording:
+      type = Picture::DuringRecording;
+      break;
+    case AttachedPictureFrame::DuringPerformance:
+      type = Picture::DuringPerformance;
+      break;
+    case AttachedPictureFrame::MovieScreenCapture:
+      type = Picture::MovieScreenCapture;
+      break;
+    case AttachedPictureFrame::ColouredFish:
+      type = Picture::ColouredFish;
+      break;
+    case AttachedPictureFrame::Illustration:
+      type = Picture::Illustration;
+      break;
+    case AttachedPictureFrame::BandLogo:
+      type = Picture::BandLogo;
+      break;
+    case AttachedPictureFrame::PublisherLogo:
+      type = Picture::PublisherLogo;
+      break;
+    }
+    Picture picture(frame->picture(),
+                    type,
+                    frame->mimeType(),
+                    frame->description());
+    map.insert(picture);
+  }
+  return PictureMap(map);
 }
 
 void ID3v2::Tag::setTitle(const String &s)
@@ -314,6 +396,93 @@ void ID3v2::Tag::setTrack(uint i)
 
 void ID3v2::Tag::setPictures(const PictureMap &l)
 {
+  removeFrames("APIC");
+
+  for(PictureMap::ConstIterator it = l.begin();
+      it != l.end();
+      ++it) {
+    PictureList list = it->second;
+    FrameList framesAdded;
+    for(PictureList::ConstIterator it2 = list.begin();
+        it2 != list.end();
+        ++it2) {
+      const Picture picture = (*it2);
+      AttachedPictureFrame *frame = new AttachedPictureFrame();
+      frame->setPicture(picture.data());
+      frame->setMimeType(picture.mime());
+      frame->setDescription(picture.description());
+      switch(picture.type()) {
+      case Picture::Other:
+        frame->setType(AttachedPictureFrame::Other);
+        break;
+      case Picture::FileIcon:
+        frame->setType(AttachedPictureFrame::FileIcon);
+        break;
+      case Picture::OtherFileIcon:
+        frame->setType(AttachedPictureFrame::OtherFileIcon);
+        break;
+      case Picture::FrontCover:
+        frame->setType(AttachedPictureFrame::FrontCover);
+        break;
+      case Picture::BackCover:
+        frame->setType(AttachedPictureFrame::BackCover);
+        break;
+      case Picture::LeafletPage:
+        frame->setType(AttachedPictureFrame::LeafletPage);
+        break;
+      case Picture::Media:
+        frame->setType(AttachedPictureFrame::Media);
+        break;
+      case Picture::LeadArtist:
+        frame->setType(AttachedPictureFrame::LeadArtist);
+        break;
+      case Picture::Artist:
+        frame->setType(AttachedPictureFrame::Artist);
+        break;
+      case Picture::Conductor:
+        frame->setType(AttachedPictureFrame::Conductor);
+        break;
+      case Picture::Band:
+        frame->setType(AttachedPictureFrame::Band);
+        break;
+      case Picture::Composer:
+        frame->setType(AttachedPictureFrame::Composer);
+        break;
+      case Picture::Lyricist:
+        frame->setType(AttachedPictureFrame::Lyricist);
+        break;
+      case Picture::RecordingLocation:
+        frame->setType(AttachedPictureFrame::RecordingLocation);
+        break;
+      case Picture::DuringRecording:
+        frame->setType(AttachedPictureFrame::DuringRecording);
+        break;
+      case Picture::DuringPerformance:
+        frame->setType(AttachedPictureFrame::DuringPerformance);
+        break;
+      case Picture::MovieScreenCapture:
+        frame->setType(AttachedPictureFrame::MovieScreenCapture);
+        break;
+      case Picture::ColouredFish:
+        frame->setType(AttachedPictureFrame::ColouredFish);
+        break;
+      case Picture::Illustration:
+        frame->setType(AttachedPictureFrame::Illustration);
+        break;
+      case Picture::BandLogo:
+        frame->setType(AttachedPictureFrame::BandLogo);
+        break;
+      case Picture::PublisherLogo:
+        frame->setType(AttachedPictureFrame::PublisherLogo);
+        break;
+      }
+      framesAdded.append(frame);
+    }
+    for(FrameList::ConstIterator it = framesAdded.begin();
+        it != framesAdded.end();
+        ++it)
+      addFrame(*it);
+  }
 }
 
 bool ID3v2::Tag::isEmpty() const
