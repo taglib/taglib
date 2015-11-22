@@ -43,7 +43,17 @@ namespace TagLib {
 
       Item();
       Item(const Item &item);
+
+      /*!
+       * Copies the contents of \a item into this Item.
+       */
       Item &operator=(const Item &item);
+
+      /*!
+       * Exchanges the content of the Item by the content of \a item.
+       */
+      void swap(Item &item);
+
       ~Item();
 
       Item(int value);

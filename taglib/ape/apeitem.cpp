@@ -43,28 +43,32 @@ public:
   bool readOnly;
 };
 
-APE::Item::Item()
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+APE::Item::Item() :
+  d(new ItemPrivate())
 {
-  d = new ItemPrivate;
 }
 
-APE::Item::Item(const String &key, const String &value)
+APE::Item::Item(const String &key, const String &value) :
+  d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->key = key;
   d->text.append(value);
 }
 
-APE::Item::Item(const String &key, const StringList &values)
+APE::Item::Item(const String &key, const StringList &values) :
+  d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->key = key;
   d->text = values;
 }
 
-APE::Item::Item(const String &key, const ByteVector &value, bool binary)
+APE::Item::Item(const String &key, const ByteVector &value, bool binary) :
+  d(new ItemPrivate())
 {
-  d = new ItemPrivate;
   d->key = key;
   if(binary) {
     d->type = Binary;
@@ -74,9 +78,9 @@ APE::Item::Item(const String &key, const ByteVector &value, bool binary)
     d->text.append(value);
 }
 
-APE::Item::Item(const Item &item)
+APE::Item::Item(const Item &item) :
+  d(new ItemPrivate(*item.d))
 {
-  d = new ItemPrivate(*item.d);
 }
 
 APE::Item::~Item()
@@ -86,11 +90,15 @@ APE::Item::~Item()
 
 Item &APE::Item::operator=(const Item &item)
 {
-  if(&item != this) {
-    delete d;
-    d = new ItemPrivate(*item.d);
-  }
+  Item(item).swap(*this);
   return *this;
+}
+
+void APE::Item::swap(Item &item)
+{
+  using std::swap;
+
+  swap(d, item.d);
 }
 
 void APE::Item::setReadOnly(bool readOnly)

@@ -48,14 +48,14 @@ public:
 // Picture class members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::Picture::Picture()
+ASF::Picture::Picture() :
+  d(new PicturePrivate())
 {
-  d = new PicturePrivate();
   d->valid = true;
 }
 
-ASF::Picture::Picture(const Picture& other)
-  : d(other.d)
+ASF::Picture::Picture(const Picture& other) :
+  d(other.d)
 {
   d->ref();
 }
@@ -120,13 +120,15 @@ int ASF::Picture::dataSize() const
 
 ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
 {
-  if(other.d != d) {
-    if(d->deref())
-      delete d;
-    d = other.d;
-    d->ref();
-  }
+  Picture(other).swap(*this);
   return *this;
+}
+
+void ASF::Picture::swap(Picture &other)
+{
+  using std::swap;
+
+  swap(d, other.d);
 }
 
 ByteVector ASF::Picture::render() const
@@ -179,4 +181,3 @@ ASF::Picture ASF::Picture::fromInvalid()
   ret.d->valid = false;
   return ret;
 }
-
