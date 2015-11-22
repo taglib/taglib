@@ -64,7 +64,8 @@ namespace
   template <typename T>
   inline FileName toFileName(T arg)
   {
-    // Should never be called.
+    debug("FileRef::toFileName<T>(): This version should never be called.");
+    return FileName(L"");
   }
 
   template <>
@@ -83,7 +84,8 @@ namespace
   inline File *resolveFileType(T arg, bool readProperties,
                                AudioProperties::ReadStyle style)
   {
-    // Should never be called.
+    debug("FileRef::resolveFileType<T>(): This version should never be called.");
+    return 0;
   }
 
   template <>
