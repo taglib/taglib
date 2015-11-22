@@ -38,14 +38,13 @@ using namespace APE;
 class APE::Footer::FooterPrivate
 {
 public:
-  FooterPrivate() : version(0),
-                    footerPresent(true),
-                    headerPresent(false),
-                    isHeader(false),
-                    itemCount(0),
-                    tagSize(0) {}
-
-  ~FooterPrivate() {}
+  FooterPrivate() :
+    version(0),
+    footerPresent(true),
+    headerPresent(false),
+    isHeader(false),
+    itemCount(0),
+    tagSize(0) {}
 
   uint version;
 
@@ -56,8 +55,6 @@ public:
 
   uint itemCount;
   uint tagSize;
-
-  static const uint size = 32;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,26 +63,26 @@ public:
 
 TagLib::uint APE::Footer::size()
 {
-  return FooterPrivate::size;
+  return 32;
 }
 
 ByteVector APE::Footer::fileIdentifier()
 {
-  return ByteVector::fromCString("APETAGEX");
+  return ByteVector("APETAGEX");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Footer::Footer()
+APE::Footer::Footer() :
+  d(new FooterPrivate())
 {
-  d = new FooterPrivate;
 }
 
-APE::Footer::Footer(const ByteVector &data)
+APE::Footer::Footer(const ByteVector &data) :
+  d(new FooterPrivate())
 {
-  d = new FooterPrivate;
   parse(data);
 }
 
@@ -137,7 +134,7 @@ TagLib::uint APE::Footer::tagSize() const
 TagLib::uint APE::Footer::completeTagSize() const
 {
   if(d->headerPresent)
-    return d->tagSize + d->size;
+    return d->tagSize + size();
   else
     return d->tagSize;
 }
@@ -154,13 +151,14 @@ void APE::Footer::setData(const ByteVector &data)
 
 ByteVector APE::Footer::renderFooter() const
 {
-    return render(false);
+  return render(false);
 }
 
 ByteVector APE::Footer::renderHeader() const
 {
-    if (!d->headerPresent) return ByteVector();
-
+  if(!d->headerPresent)
+    return ByteVector();
+  else
     return render(true);
 }
 
