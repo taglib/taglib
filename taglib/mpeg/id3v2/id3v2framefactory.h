@@ -66,6 +66,7 @@ namespace TagLib {
     {
     public:
       static FrameFactory *instance();
+
       /*!
        * Create a frame based on \a data.  \a synchSafeInts should only be set
        * false if we are parsing an old tag (v2.3 or older) that does not support
@@ -161,8 +162,6 @@ namespace TagLib {
                         Frame::Header *header) const;
 
       void updateGenre(TextIdentificationFrame *frame) const;
-
-      static FrameFactory factory;
 
       class FrameFactoryPrivate;
       FrameFactoryPrivate *d;

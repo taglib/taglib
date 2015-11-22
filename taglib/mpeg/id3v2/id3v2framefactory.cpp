@@ -71,14 +71,13 @@ public:
   }
 };
 
-FrameFactory FrameFactory::factory;
-
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
 FrameFactory *FrameFactory::instance()
 {
+  static FrameFactory factory;
   return &factory;
 }
 
@@ -519,5 +518,4 @@ void FrameFactory::updateGenre(TextIdentificationFrame *frame) const
     fields.append(String());
 
   frame->setText(newfields);
-
 }
