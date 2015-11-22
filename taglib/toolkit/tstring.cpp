@@ -137,8 +137,6 @@ public:
   SHARED_PTR<std::string> cstring;
 };
 
-const String String::null;
-
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
@@ -377,11 +375,6 @@ bool String::isEmpty() const
   return d->data->empty();
 }
 
-bool String::isNull() const
-{
-  return (d == null.d);
-}
-
 ByteVector String::data(Type t) const
 {
   switch(t)
@@ -483,7 +476,7 @@ String String::stripWhiteSpace() const
 
   const size_t pos1 = d->data->find_first_not_of(WhiteSpaceChars);
   if(pos1 == std::wstring::npos)
-    return String::null;
+    return String();
 
   const size_t pos2 = d->data->find_last_not_of(WhiteSpaceChars);
   return substr(pos1, pos2 - pos1 + 1);

@@ -160,18 +160,18 @@ void Ogg::XiphComment::setGenre(const String &s)
 
 void Ogg::XiphComment::setYear(uint i)
 {
-  removeField("YEAR");
+  removeFields("YEAR");
   if(i == 0)
-    removeField("DATE");
+    removeFields("DATE");
   else
     addField("DATE", String::number(i));
 }
 
 void Ogg::XiphComment::setTrack(uint i)
 {
-  removeField("TRACKNUM");
+  removeFields("TRACKNUM");
   if(i == 0)
-    removeField("TRACKNUMBER");
+    removeFields("TRACKNUMBER");
   else
     addField("TRACKNUMBER", String::number(i));
 }
@@ -220,7 +220,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
       toRemove.append(it->first);
 
   for(StringList::ConstIterator it = toRemove.begin(); it != toRemove.end(); ++it)
-      removeField(*it);
+      removeFields(*it);
 
   // now go through keys in \a properties and check that the values match those in the xiph comment
   PropertyMap invalid;
@@ -233,7 +233,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
       const StringList &sl = it->second;
       if(sl.isEmpty())
         // zero size string list -> remove the tag with all values
-        removeField(it->first);
+        removeFields(it->first);
       else {
         // replace all strings in the list for the tag
         StringList::ConstIterator valueIterator = sl.begin();
@@ -266,18 +266,10 @@ String Ogg::XiphComment::vendorID() const
 void Ogg::XiphComment::addField(const String &key, const String &value, bool replace)
 {
   if(replace)
-    removeField(key.upper());
+    removeFields(key.upper());
 
   if(!key.isEmpty() && !value.isEmpty())
     d->fieldListMap[key.upper()].append(value);
-}
-
-void Ogg::XiphComment::removeField(const String &key, const String &value)
-{
-  if(!value.isNull())
-    removeFields(key, value);
-  else
-    removeFields(key);
 }
 
 void Ogg::XiphComment::removeFields(const String &key)

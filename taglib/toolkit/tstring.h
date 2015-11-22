@@ -331,20 +331,6 @@ namespace TagLib {
     bool isEmpty() const;
 
     /*!
-     * Returns true if this string is null -- i.e. it is a copy of the
-     * String::null string.
-     *
-     * \note A string can be empty and not null.  So do not use this method to
-     * check if the string is empty.
-     *
-     * \see isEmpty()
-     *
-     * \deprecated
-     */
-     // BIC: remove
-    bool isNull() const;
-
-    /*!
      * Returns a ByteVector containing the string's data.  If \a t is Latin1 or
      * UTF8, this will return a vector of 8 bit characters, otherwise it will use
      * 16 bit characters.
@@ -503,16 +489,6 @@ namespace TagLib {
      * comparison.
      */
     bool operator<(const String &s) const;
-
-    /*!
-     * A null string provided for convenience.
-     *
-     * \warning Do not modify this variable.  It will mess up the internal state
-     * of TagLib.
-     *
-     * \deprecated
-     */
-    static const String null;
 
     /*!
      * Returns a special value used for \a length parameter in String's member

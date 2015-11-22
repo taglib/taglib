@@ -31,7 +31,7 @@
 
 #define stringUnion(method)                                               \
   for(size_t j = 0; j < COUNT; ++j) {                                     \
-    String val = d->tags[j] ? d->tags[j]->method() : String::null;        \
+    String val = d->tags[j] ? d->tags[j]->method() : String();            \
     if(!val.isEmpty())                                                    \
       return val;                                                         \
   }                                                                       \

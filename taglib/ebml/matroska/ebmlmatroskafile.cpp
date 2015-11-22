@@ -443,7 +443,7 @@ String EBML::Matroska::File::Tag::title() const
   if(e->title != e->document->d->tags.end())
     return e->title->first.find(Constants::TITLE)->second.front();
   else
-    return String::null;
+    return String();
 }
 
 String EBML::Matroska::File::Tag::artist() const
@@ -451,7 +451,7 @@ String EBML::Matroska::File::Tag::artist() const
   if(e->artist != e->document->d->tags.end())
     return e->artist->first.find(Constants::ARTIST)->second.front();
   else
-    return String::null;
+    return String();
 }
 
 String EBML::Matroska::File::Tag::album() const
@@ -459,7 +459,7 @@ String EBML::Matroska::File::Tag::album() const
   if(e->album != e->document->d->tags.end())
     return e->album->first.find(Constants::TITLE)->second.front();
   else
-    return String::null;
+    return String();
 }
 
 PictureMap EBML::Matroska::File::Tag::pictures() const
@@ -472,7 +472,7 @@ String EBML::Matroska::File::Tag::comment() const
   if(e->comment != e->document->d->tags.end())
     return e->comment->first.find(Constants::COMMENT)->second.front();
   else
-    return String::null;
+    return String();
 }
 
 String EBML::Matroska::File::Tag::genre() const
@@ -480,7 +480,7 @@ String EBML::Matroska::File::Tag::genre() const
   if(e->genre != e->document->d->tags.end())
     return e->genre->first.find(Constants::GENRE)->second.front();
   else
-    return String::null;
+    return String();
 }
 
 uint EBML::Matroska::File::Tag::year() const
