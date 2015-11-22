@@ -22,8 +22,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 #include <string.h>
 
 #include <stdio.h>
@@ -34,6 +36,8 @@
 #include <tlist.h>
 #include <fileref.h>
 #include <tfile.h>
+#include <tpicturemap.h>
+
 #include <tag.h>
 #include <tpropertymap.h>
 
@@ -70,6 +74,7 @@ void usage()
   cout << "  -R <tagname> <tagvalue>"   << endl;
   cout << "  -I <tagname> <tagvalue>"   << endl;
   cout << "  -D <tagname>"   << endl;
+  cout << "  -p <picture(jpg only, file between double quotes)>" << endl;
   cout << endl;
 
   exit(1);
@@ -110,14 +115,16 @@ int main(int argc, char *argv[])
   if(fileList.isEmpty())
     usage();
 
+  if(argv[argc-1][1] == 'p')
+    argc++;
+
   for(int i = 1; i < argc - 1; i += 2) {
 
     if(isArgument(argv[i]) && i + 1 < argc && !isArgument(argv[i + 1])) {
 
       char field = argv[i][1];
       TagLib::String value = argv[i + 1];
-
-      TagLib::List<TagLib::FileRef>::ConstIterator it;
+      TagLib::List<TagLib::FileRef>::Iterator it;
       for(it = fileList.begin(); it != fileList.end(); ++it) {
 
         TagLib::Tag *t = (*it).tag();
@@ -167,6 +174,31 @@ int main(int argc, char *argv[])
           checkForRejectedProperties((*it).file()->setProperties(map));
           break;
         }
+        case 'p':
+          {
+            if(!isFile(value.toCString())) {
+              cout << value.toCString() << " not found." << endl;
+              return 1;
+            }
+            ifstream picture;
+            picture.open(value.toCString());
+            stringstream buffer;
+            buffer << picture.rdbuf();
+            picture.close();
+            TagLib::String buf(buffer.str());
+            TagLib::ByteVector data(buf.data(TagLib::String::Latin1));
+            if(!data.find("JFIF")) {
+              cout << value.toCString() << " is not a JPEG." << endl;
+              return 1;
+            }
+            TagLib::Picture pic(data,
+              TagLib::Picture::FrontCover,
+              "image/jpeg",
+              "Added with taglib");
+            TagLib::PictureMap picMap(pic);
+            t->setPictures(picMap);
+          }
+          break;
         default:
           usage();
           break;
