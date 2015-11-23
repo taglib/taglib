@@ -30,9 +30,8 @@ using namespace TagLib;
 class Picture::PicturePrivate : public RefCounter
 {
 public:
-  PicturePrivate() : RefCounter()
-  {
-  }
+  PicturePrivate() :
+    RefCounter() {}
 
   String     description;
   String     mime;
@@ -40,16 +39,16 @@ public:
   ByteVector data;
 };
 
-Picture::Picture()
-  : d(new PicturePrivate())
+Picture::Picture() :
+  d(new PicturePrivate())
 {
 }
 
 Picture::Picture(const ByteVector &data,
                  Type type,
                  const String &mime,
-                 const String &description)
-  : d(new PicturePrivate())
+                 const String &description) :
+  d(new PicturePrivate())
 {
   d->mime = mime;
   d->description = description;
@@ -108,9 +107,6 @@ std::ostream &operator<<(std::ostream &s, const Picture &p)
 {
   String type;
   switch(p.type()) {
-  case Picture::Other:
-    type = "Other";
-    break;
   case Picture::FileIcon:
     type = "FileIcon";
     break;
@@ -170,6 +166,9 @@ std::ostream &operator<<(std::ostream &s, const Picture &p)
     break;
   case Picture::PublisherLogo:
     type = "PublisherLogo";
+    break;
+  default:
+    type = "Other";
     break;
   }
 

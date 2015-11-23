@@ -27,18 +27,19 @@
 
 using namespace TagLib;
 
-PictureMap::PictureMap() : Map< Picture::Type, PictureList >()
+PictureMap::PictureMap() :
+  Map< Picture::Type, PictureList >()
 {
 }
 
-PictureMap::PictureMap(const PictureList &l)
-  : Map< Picture::Type, PictureList >()
+PictureMap::PictureMap(const PictureList &l) :
+  Map< Picture::Type, PictureList >()
 {
   insert(l);
 }
 
-PictureMap::PictureMap(const Picture &p)
-  : Map< Picture::Type, PictureList >()
+PictureMap::PictureMap(const Picture &p) :
+  Map< Picture::Type, PictureList >()
 {
   insert(p);
 }

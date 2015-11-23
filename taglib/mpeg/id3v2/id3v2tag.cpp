@@ -246,9 +246,6 @@ TagLib::PictureMap ID3v2::Tag::pictures() const
     const AttachedPictureFrame *frame = static_cast<AttachedPictureFrame *>(*it);
     Picture::Type type;
     switch(frame->type()) {
-    case AttachedPictureFrame::Other:
-      type = Picture::Other;
-      break;
     case AttachedPictureFrame::FileIcon:
       type = Picture::FileIcon;
       break;
@@ -308,6 +305,9 @@ TagLib::PictureMap ID3v2::Tag::pictures() const
       break;
     case AttachedPictureFrame::PublisherLogo:
       type = Picture::PublisherLogo;
+      break;
+    default:
+      type = Picture::Other;
       break;
     }
     Picture picture(frame->picture(),

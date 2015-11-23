@@ -122,9 +122,6 @@ PictureMap ASF::Tag::pictures() const
       ASF::Picture asfPicture = (*it).toPicture();
       TagLib::Picture::Type type;
       switch(asfPicture.type()) {
-      case ASF::Picture::Other:
-        type = TagLib::Picture::Other;
-        break;
       case ASF::Picture::FileIcon:
         type = TagLib::Picture::FileIcon;
         break;
@@ -184,6 +181,9 @@ PictureMap ASF::Tag::pictures() const
         break;
       case ASF::Picture::PublisherLogo:
         type = TagLib::Picture::PublisherLogo;
+        break;
+      default:
+        type = TagLib::Picture::Other;
         break;
       }
       TagLib::Picture picture(asfPicture.picture(),
