@@ -57,8 +57,8 @@ namespace
 class MP4::Item::ItemPrivate
 {
 public:
-  ItemPrivate()
-    : data(new ItemData())
+  ItemPrivate() :
+    data(new ItemData())
   {
     data->valid        = true;
     data->atomDataType = MP4::TypeUndefined;
@@ -68,89 +68,96 @@ public:
   SHARED_PTR<ItemData> data;
 };
 
-MP4::Item::Item()
-  : d(new ItemPrivate())
+MP4::Item::Item() :
+  d(new ItemPrivate())
 {
   d->data->valid = false;
 }
 
-MP4::Item::Item(const Item &item)
-  : d(new ItemPrivate(*item.d))
+MP4::Item::Item(const Item &item) :
+  d(new ItemPrivate(*item.d))
 {
 }
 
 MP4::Item &
-  MP4::Item::operator=(const Item &item)
+MP4::Item::operator=(const Item &item)
 {
-  *d = *item.d;
+  Item(item).swap(*this);
   return *this;
 }
 
+void
+MP4::Item::swap(Item &item)
+{
+  using std::swap;
+
+  swap(d, item.d);
+}
 
 MP4::Item::~Item()
 {
   delete d;
 }
 
-MP4::Item::Item(bool value)
-  : d(new ItemPrivate())
+MP4::Item::Item(bool value) :
+  d(new ItemPrivate())
 {
   d->data->m_bool = value;
   d->data->type = TypeBool;
 }
 
-MP4::Item::Item(int value)
-  : d(new ItemPrivate())
+MP4::Item::Item(int value) :
+  d(new ItemPrivate())
 {
   d->data->m_int = value;
   d->data->type = TypeInt;
 }
 
-MP4::Item::Item(uchar value)
-  : d(new ItemPrivate())
+MP4::Item::Item(uchar value) :
+  d(new ItemPrivate())
 {
   d->data->m_byte = value;
   d->data->type = TypeByte;
 }
 
-MP4::Item::Item(uint value)
-  : d(new ItemPrivate())
+MP4::Item::Item(uint value) :
+  d(new ItemPrivate())
 {
   d->data->m_uint = value;
   d->data->type = TypeUInt;
 }
 
-MP4::Item::Item(long long value)
-  : d(new ItemPrivate())
+MP4::Item::Item(long long value) :
+  d(new ItemPrivate())
 {
   d->data->m_longlong = value;
   d->data->type = TypeLongLong;
 }
 
-MP4::Item::Item(int value1, int value2)
-  : d(new ItemPrivate())
+MP4::Item::Item(int value1, int value2) :
+  d(new ItemPrivate())
 {
   d->data->m_intPair.first = value1;
   d->data->m_intPair.second = value2;
   d->data->type = TypeIntPair;
 }
 
-MP4::Item::Item(const ByteVectorList &value)
-  : d(new ItemPrivate())
+MP4::Item::Item(const ByteVectorList &value) :
+  d(new ItemPrivate())
 {
   d->data->m_byteVectorList = value;
   d->data->type = TypeByteVectorList;
 }
 
-MP4::Item::Item(const StringList &value)
-  : d(new ItemPrivate())
+MP4::Item::Item(const StringList &value) :
+  d(new ItemPrivate())
 {
   d->data->m_stringList = value;
   d->data->type = TypeStringList;
 }
 
-MP4::Item::Item(const MP4::CoverArtList &value)
-  : d(new ItemPrivate())
+MP4::Item::Item(const MP4::CoverArtList &value) :
+  d(new ItemPrivate())
 {
   d->data->m_coverArtList = value;
   d->data->type = TypeCoverArtList;
@@ -262,4 +269,3 @@ MP4::Item::toString() const
   }
   return String();
 }
-

@@ -70,61 +70,61 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::Attribute::Attribute()
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute() :
+  d(new AttributePrivate())
 {
   d->data->type = UnicodeType;
 }
 
-ASF::Attribute::Attribute(const ASF::Attribute &other)
-  : d(new AttributePrivate(*other.d))
+ASF::Attribute::Attribute(const ASF::Attribute &other) :
+  d(new AttributePrivate(*other.d))
 {
 }
 
-ASF::Attribute::Attribute(const String &value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(const String &value) :
+  d(new AttributePrivate())
 {
   d->data->type = UnicodeType;
   d->data->stringValue = value;
 }
 
-ASF::Attribute::Attribute(const ByteVector &value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(const ByteVector &value) :
+  d(new AttributePrivate())
 {
   d->data->type = BytesType;
   d->data->byteVectorValue = value;
 }
 
-ASF::Attribute::Attribute(const ASF::Picture &value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(const ASF::Picture &value) :
+  d(new AttributePrivate())
 {
   d->data->type = BytesType;
   d->data->pictureValue = value;
 }
 
-ASF::Attribute::Attribute(unsigned int value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(unsigned int value) :
+  d(new AttributePrivate())
 {
   d->data->type = DWordType;
   d->data->intValue = value;
 }
 
-ASF::Attribute::Attribute(unsigned long long value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(unsigned long long value) :
+  d(new AttributePrivate())
 {
   d->data->type = QWordType;
   d->data->longLongValue = value;
 }
 
-ASF::Attribute::Attribute(unsigned short value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(unsigned short value) :
+  d(new AttributePrivate())
 {
   d->data->type = WordType;
   d->data->shortValue = value;
 }
 
-ASF::Attribute::Attribute(bool value)
-  : d(new AttributePrivate())
+ASF::Attribute::Attribute(bool value) :
+  d(new AttributePrivate())
 {
   d->data->type = BoolType;
   d->data->boolValue = value;
@@ -137,8 +137,15 @@ ASF::Attribute::~Attribute()
 
 ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
 {
-  *d = *other.d;
+  Attribute(other).swap(*this);
   return *this;
+}
+
+void ASF::Attribute::swap(Attribute &other)
+{
+  using std::swap;
+
+  swap(d, other.d);
 }
 
 ASF::Attribute::AttributeTypes ASF::Attribute::type() const
@@ -357,4 +364,3 @@ void ASF::Attribute::setStream(int value)
 {
   d->data->stream = value;
 }
-

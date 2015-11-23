@@ -77,13 +77,18 @@ public:
 
   void testDuplicateID3v2()
   {
-    RIFF::AIFF::File f(TEST_FILE_PATH_C("duplicate_id3v2.aiff"));
+    ScopedFileCopy copy("duplicate_id3v2", ".aiff");
 
-    // duplicate_id3v2.aiff has duplicate ID3v2 tags.
+    // duplicate_id3v2.aiff has duplicate ID3v2 tag chunks.
     // title() returns "Title2" if can't skip the second tag.
 
+    RIFF::AIFF::File f(copy.fileName().c_str());
     CPPUNIT_ASSERT(f.hasID3v2Tag());
     CPPUNIT_ASSERT_EQUAL(String("Title1"), f.tag()->title());
+
+    f.save();
+    CPPUNIT_ASSERT_EQUAL((offset_t)7030, f.length());
+    CPPUNIT_ASSERT_EQUAL((offset_t)-1, f.find("Title2"));
   }
 
   void testFuzzedFile1()

@@ -42,8 +42,8 @@ namespace
 class MP4::CoverArt::CoverArtPrivate
 {
 public:
-  CoverArtPrivate(Format f, const ByteVector &v)
-    : data(new CoverArtData())
+  CoverArtPrivate(Format f, const ByteVector &v) :
+    data(new CoverArtData())
   {
     data->format = f;
     data->data   = v;
@@ -52,21 +52,33 @@ public:
   SHARED_PTR<CoverArtData> data;
 };
 
-MP4::CoverArt::CoverArt(Format format, const ByteVector &data)
-  : d(new CoverArtPrivate(format, data))
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+MP4::CoverArt::CoverArt(Format format, const ByteVector &data) :
+  d(new CoverArtPrivate(format, data))
 {
 }
 
-MP4::CoverArt::CoverArt(const CoverArt &item)
-  : d(new CoverArtPrivate(*item.d))
+MP4::CoverArt::CoverArt(const CoverArt &item) :
+  d(new CoverArtPrivate(*item.d))
 {
 }
 
 MP4::CoverArt &
 MP4::CoverArt::operator=(const CoverArt &item)
 {
-  *d = *item.d;
+  CoverArt(item).swap(*this);
   return *this;
+}
+
+void
+MP4::CoverArt::swap(CoverArt &item)
+{
+  using std::swap;
+
+  swap(d, item.d);
 }
 
 MP4::CoverArt::~CoverArt()
@@ -85,4 +97,3 @@ MP4::CoverArt::data() const
 {
   return d->data->data;
 }
-

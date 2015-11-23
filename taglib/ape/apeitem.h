@@ -90,6 +90,11 @@ namespace TagLib {
       Item &operator=(const Item &item);
 
       /*!
+       * Exchanges the content of this item by the content of \a item.
+       */
+      void swap(Item &item);
+
+      /*!
        * Returns the key.
        */
       String key() const;

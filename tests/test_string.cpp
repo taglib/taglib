@@ -257,6 +257,12 @@ public:
 
     String("9999999999").toInt(&ok);
     CPPUNIT_ASSERT_EQUAL(ok, false);
+
+    String("2147483648").toInt(&ok);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
+
+    String("-2147483649").toInt(&ok);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
   }
 
   void testFromInt()

@@ -110,7 +110,11 @@ namespace TagLib {
       /*!
        * UTF16 <i>little endian</i>.  16 bit characters.
        */
-      UTF16LE = 4
+      UTF16LE = 4,
+      /*!
+       * UTF16 in the <i>native byte order</i> of the system.  16 bit characters.
+       */
+      UTF16Native = 5
     };
 
     /*!
@@ -141,7 +145,7 @@ namespace TagLib {
      * exit.  UTF16BE or UTF16LE is automatically chosen as default according
      * to the CPU byte order
      */
-    String(const std::wstring &s, Type t = WCharByteOrder);
+    String(const std::wstring &s, Type t = UTF16Native);
 
     /*!
      * Makes a deep copy of the data in \a s.
@@ -151,7 +155,7 @@ namespace TagLib {
      * exit.  UTF16BE or UTF16LE is automatically chosen as default according
      * to the CPU byte order
      */
-    String(const wchar_t *s, Type t = WCharByteOrder);
+    String(const wchar_t *s, Type t = UTF16Native);
 
     /*!
      * Makes a deep copy of the data in \a c.
@@ -169,7 +173,7 @@ namespace TagLib {
      * exit.  UTF16BE or UTF16LE is automatically chosen as default according
      * to the CPU byte order
      */
-    String(wchar_t c, Type t = WCharByteOrder);
+    String(wchar_t c, Type t = UTF16Native);
 
     /*!
      * Makes a deep copy of the data in \a s.
@@ -484,6 +488,11 @@ namespace TagLib {
     String &operator=(const ByteVector &v);
 
     /*!
+     * Exchanges the content of the String by the content of \a s.
+     */
+    void swap(String &s);
+
+    /*!
      * To be able to use this class in a Map, this operator needed to be
      * implemented.  Returns true if \a s is less than this string in a byte-wise
      * comparison.
@@ -506,37 +515,6 @@ namespace TagLib {
     void detach();
 
   private:
-    /*!
-     * Converts a \e Latin-1 string into \e UTF-16(without BOM/CPU byte order)
-     * and copies it to the internal buffer.
-     */
-    void copyFromLatin1(const char *s, size_t length);
-
-    /*!
-     * Converts a \e UTF-8 string into \e UTF-16(without BOM/CPU byte order)
-     * and copies it to the internal buffer.
-     */
-    void copyFromUTF8(const char *s, size_t length);
-
-    /*!
-     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
-     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-     */
-    void copyFromUTF16(const wchar_t *s, size_t length, Type t);
-
-    /*!
-     * Converts a \e UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
-     * \e UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-     */
-    void copyFromUTF16(const char *s, size_t length, Type t);
-
-    /*!
-     * Indicates which byte order of UTF-16 is used to store strings internally.
-     *
-     * \note \e String::UTF16BE or \e String::UTF16LE
-     */
-    static const Type WCharByteOrder;
-
     class StringPrivate;
     StringPrivate *d;
   };

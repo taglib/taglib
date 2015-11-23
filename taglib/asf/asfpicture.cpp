@@ -55,19 +55,18 @@ public:
   SHARED_PTR<PictureData> data;
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Picture class members
 ////////////////////////////////////////////////////////////////////////////////
 
-ASF::Picture::Picture()
-  : d(new PicturePrivate())
+ASF::Picture::Picture() :
+  d(new PicturePrivate())
 {
   d->data->valid = true;
 }
 
-ASF::Picture::Picture(const Picture& other)
-  : d(new PicturePrivate(*other.d))
+ASF::Picture::Picture(const Picture& other) :
+  d(new PicturePrivate(*other.d))
 {
 }
 
@@ -130,8 +129,15 @@ int ASF::Picture::dataSize() const
 
 ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
 {
-  *d = *other.d;
+  Picture(other).swap(*this);
   return *this;
+}
+
+void ASF::Picture::swap(Picture &other)
+{
+  using std::swap;
+
+  swap(d, other.d);
 }
 
 ByteVector ASF::Picture::render() const
@@ -184,4 +190,3 @@ ASF::Picture ASF::Picture::fromInvalid()
   ret.d->data->valid = false;
   return ret;
 }
-
