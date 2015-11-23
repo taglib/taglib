@@ -245,6 +245,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("-123").toInt(), -123);
     CPPUNIT_ASSERT_EQUAL(String("123aa").toInt(), 123);
     CPPUNIT_ASSERT_EQUAL(String("-123aa").toInt(), -123);
+
+    String("2147483648").toInt(&ok);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
+
+    String("-2147483649").toInt(&ok);
+    CPPUNIT_ASSERT_EQUAL(ok, false);
   }
 
   void testSubstr()
