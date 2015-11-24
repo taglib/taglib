@@ -597,7 +597,8 @@ int String::toInt(bool *ok) const
     *ok = (*ok && value > INT_MIN && value < INT_MAX);
   }
 
-  return static_cast<int>(value);}
+  return static_cast<int>(value);
+}
 
 String String::stripWhiteSpace() const
 {
