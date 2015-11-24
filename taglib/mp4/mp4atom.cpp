@@ -47,7 +47,7 @@ MP4::Atom::Atom(File *file)
 
   offset = file->tell();
   ByteVector header = file->readBlock(8);
-  if (header.size() != 8) {
+  if(header.size() != 8) {
     // The atom header must be 8 bytes long, otherwise there is either
     // trailing garbage or the file is truncated
     debug("MP4: Couldn't read 8 bytes of data for atom header");
@@ -96,7 +96,7 @@ MP4::Atom::Atom(File *file)
       while(file->tell() < offset + length) {
         MP4::Atom *child = new MP4::Atom(file);
         children.append(child);
-        if (child->length == 0)
+        if(child->length == 0)
           return;
       }
       return;
