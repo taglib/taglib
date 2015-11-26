@@ -130,7 +130,7 @@ add_subdirectory(bindings)
 if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
-endif(BUILD_TESTS)
+endif()
 add_subdirectory(examples)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
@@ -141,7 +141,7 @@ find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif(CCACHE_FOUND)
+endif()
 
 # uninstall target
 configure_file(
