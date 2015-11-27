@@ -52,54 +52,55 @@ public:
     ScopedFileCopy copy(filename, ext);
     string newname = copy.fileName();
 
-    FileRef *f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(!f->isNull());
-    f->tag()->setArtist("test artist");
-    f->tag()->setTitle("test title");
-    f->tag()->setGenre("Test!");
-    f->tag()->setAlbum("albummmm");
-    f->tag()->setTrack(5);
-    f->tag()->setYear(2020);
-    f->save();
-    delete f;
-
-    f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(!f->isNull());
-    CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("test artist"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("test title"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->genre(), String("Test!"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->album(), String("albummmm"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(5));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2020));
-    f->tag()->setArtist("ttest artist");
-    f->tag()->setTitle("ytest title");
-    f->tag()->setGenre("uTest!");
-    f->tag()->setAlbum("ialbummmm");
-    f->tag()->setTrack(7);
-    f->tag()->setYear(2080);
-    f->save();
-    delete f;
-
-    f = new FileRef(newname.c_str());
-    CPPUNIT_ASSERT(!f->isNull());
-    CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("ttest artist"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("ytest title"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->genre(), String("uTest!"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->album(), String("ialbummmm"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(7));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
-    delete f;
-
-    FileStream fs(newname.c_str());
-    f = new FileRef(&fs);
-    CPPUNIT_ASSERT(!f->isNull());
-    CPPUNIT_ASSERT_EQUAL(f->tag()->artist(), String("ttest artist"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->title(), String("ytest title"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->genre(), String("uTest!"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->album(), String("ialbummmm"));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->track(), TagLib::uint(7));
-    CPPUNIT_ASSERT_EQUAL(f->tag()->year(), TagLib::uint(2080));
-    delete f;
+    {
+      FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(!f.isNull());
+      f.tag()->setArtist("test artist");
+      f.tag()->setTitle("test title");
+      f.tag()->setGenre("Test!");
+      f.tag()->setAlbum("albummmm");
+      f.tag()->setTrack(5);
+      f.tag()->setYear(2020);
+      f.save();
+    }
+    {
+      FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(!f.isNull());
+      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("test artist"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("test title"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), TagLib::uint(5));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), TagLib::uint(2020));
+      f.tag()->setArtist("ttest artist");
+      f.tag()->setTitle("ytest title");
+      f.tag()->setGenre("uTest!");
+      f.tag()->setAlbum("ialbummmm");
+      f.tag()->setTrack(7);
+      f.tag()->setYear(2080);
+      f.save();
+    }
+    {
+      FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(!f.isNull());
+      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), TagLib::uint(7));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), TagLib::uint(2080));
+    }
+    {
+      FileStream fs(newname.c_str());
+      FileRef f(&fs);
+      CPPUNIT_ASSERT(!f.isNull());
+      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), TagLib::uint(7));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), TagLib::uint(2080));
+    }
   }
 
   void testMusepack()
@@ -159,18 +160,16 @@ public:
 
   void testOGA_FLAC()
   {
-      FileRef *f = new FileRef(TEST_FILE_PATH_C("empty_flac.oga"));
-      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) == NULL);
-      CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) != NULL);
-      delete f;
+    FileRef f(TEST_FILE_PATH_C("empty_flac.oga"));
+    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) == NULL);
+    CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f.file()) != NULL);
   }
 
   void testOGA_Vorbis()
   {
-      FileRef *f = new FileRef(TEST_FILE_PATH_C("empty_vorbis.oga"));
-      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) != NULL);
-      CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f->file()) == NULL);
-      delete f;
+    FileRef f(TEST_FILE_PATH_C("empty_vorbis.oga"));
+    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != NULL);
+    CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f.file()) == NULL);
   }
 
   void testAPE()
@@ -189,16 +188,18 @@ public:
 
   void testFileResolver()
   {
-    FileRef *f = new FileRef(TEST_FILE_PATH_C("xing.mp3"));
-    CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f->file()) != NULL);
-    delete f;
+    {
+      FileRef f(TEST_FILE_PATH_C("xing.mp3"));
+      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()) != NULL);
+    }
 
     DummyResolver resolver;
     FileRef::addFileTypeResolver(&resolver);
 
-    f = new FileRef(TEST_FILE_PATH_C("xing.mp3"));
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f->file()) != NULL);
-    delete f;
+    {
+      FileRef f(TEST_FILE_PATH_C("xing.mp3"));
+      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != NULL);
+    }
   }
 
 };

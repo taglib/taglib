@@ -25,19 +25,18 @@ public:
     ScopedFileCopy copy("empty_flac", ".oga");
     string newname = copy.fileName();
 
-    Ogg::FLAC::File *f = new Ogg::FLAC::File(newname.c_str());
-    f->tag()->setArtist("The Artist");
-    f->save();
-    delete f;
+    {
+      Ogg::FLAC::File f(newname.c_str());
+      f.tag()->setArtist("The Artist");
+      f.save();
+    }
+    {
+      Ogg::FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
 
-    f = new Ogg::FLAC::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
-
-    f->seek(0, File::End);
-    int size = f->tell();
-    CPPUNIT_ASSERT_EQUAL(9134, size);
-
-    delete f;
+      f.seek(0, File::End);
+      CPPUNIT_ASSERT_EQUAL(9134L, f.tell());
+    }
   }
 
   void testFuzzedFile()

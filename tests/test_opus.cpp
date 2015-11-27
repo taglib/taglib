@@ -47,17 +47,18 @@ public:
     ScopedFileCopy copy("correctness_gain_silent_output", ".opus");
     string filename = copy.fileName();
 
-    Ogg::Opus::File *f = new Ogg::Opus::File(filename.c_str());
-    f->tag()->setArtist("Your Tester");
-    f->save();
-    delete f;
-
-    f = new Ogg::Opus::File(filename.c_str());
-    CPPUNIT_ASSERT_EQUAL(StringList("Xiph.Org Opus testvectormaker"), f->tag()->fieldListMap()["ENCODER"]);
-    CPPUNIT_ASSERT(f->tag()->fieldListMap().contains("TESTDESCRIPTION"));
-    CPPUNIT_ASSERT_EQUAL(StringList("Your Tester"), f->tag()->fieldListMap()["ARTIST"]);
-    CPPUNIT_ASSERT_EQUAL(String("libopus 0.9.11-66-g64c2dd7"), f->tag()->vendorID());
-    delete f;
+    {
+      Ogg::Opus::File f(filename.c_str());
+      f.tag()->setArtist("Your Tester");
+      f.save();
+    }
+    {
+      Ogg::Opus::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(StringList("Xiph.Org Opus testvectormaker"), f.tag()->fieldListMap()["ENCODER"]);
+      CPPUNIT_ASSERT(f.tag()->fieldListMap().contains("TESTDESCRIPTION"));
+      CPPUNIT_ASSERT_EQUAL(StringList("Your Tester"), f.tag()->fieldListMap()["ARTIST"]);
+      CPPUNIT_ASSERT_EQUAL(String("libopus 0.9.11-66-g64c2dd7"), f.tag()->vendorID());
+    }
   }
 
 };
