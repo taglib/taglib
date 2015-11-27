@@ -10,6 +10,7 @@
  * Fixed crash when calling File::properties() after strip().
  * Fixed possible file corruptions when saving ASF files.
  * Fixed updating the comment field of Vorbis comments.
+ * Added BUILD_BINDINGS build option.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.
