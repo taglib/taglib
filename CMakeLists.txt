@@ -8,24 +8,25 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-option(ENABLE_STATIC "Make static version of libtag"  OFF)
+option(ENABLE_STATIC "Make static version of libtag" OFF)
 if(ENABLE_STATIC)
   add_definitions(-DTAGLIB_STATIC)
   set(BUILD_SHARED_LIBS OFF)
 else()
   set(BUILD_SHARED_LIBS ON)
 endif()
-OPTION(ENABLE_STATIC_RUNTIME "Visual Studio, link with runtime statically"  OFF)
+option(ENABLE_STATIC_RUNTIME "Visual Studio, link with runtime statically" OFF)
 
-option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden"  OFF)
+option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden" OFF)
 if(VISIBILITY_HIDDEN)
-  add_definitions (-fvisibility=hidden)
+  add_definitions(-fvisibility=hidden)
 endif()
 
-option(BUILD_TESTS "Build the test suite"  OFF)
-option(BUILD_EXAMPLES "Build the examples"  OFF)
+option(BUILD_TESTS "Build the test suite" OFF)
+option(BUILD_EXAMPLES "Build the examples" OFF)
+option(BUILD_BINDINGS "Build the bindings" ON)
 
-option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs"  OFF)
+option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs" OFF)
 
 add_definitions(-DHAVE_CONFIG_H)
 set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
@@ -46,6 +47,7 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
+
 if(MSVC AND ENABLE_STATIC_RUNTIME)
   foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
     string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
@@ -77,7 +79,7 @@ endif()
 # 1. If the library source code has changed at all since the last update, then increment revision.
 # 2. If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
 # 3. If any interfaces have been added since the last public release, then increment age.
-# 4. If any interfaces have been removed since the last public release, then set age to 0. 
+# 4. If any interfaces have been removed since the last public release, then set age to 0.
 set(TAGLIB_SOVERSION_CURRENT  16)
 set(TAGLIB_SOVERSION_REVISION 1)
 set(TAGLIB_SOVERSION_AGE      15)
@@ -125,13 +127,20 @@ endif()
 
 configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h")
 
-add_subdirectory(taglib) 
-add_subdirectory(bindings)
+add_subdirectory(taglib)
+
+if(BUILD_BINDINGS)
+  add_subdirectory(bindings)
+endif()
+
 if(BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
-add_subdirectory(examples)
+
+if(BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
 file(COPY doc/taglib.png DESTINATION doc)
@@ -144,12 +153,8 @@ if(CCACHE_FOUND)
 endif()
 
 # uninstall target
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-  IMMEDIATE @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 
 if(NOT TARGET uninstall)
-  add_custom_target(uninstall
-  COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+  add_custom_target(uninstall COMMAND "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 endif()

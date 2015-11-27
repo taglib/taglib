@@ -1,50 +1,39 @@
-if(BUILD_EXAMPLES)
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
-		     ${CMAKE_CURRENT_SOURCE_DIR}/../bindings/c/  )
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
+  ${CMAKE_CURRENT_SOURCE_DIR}/../bindings/c/
+)
 
 if(ENABLE_STATIC)
-    add_definitions(-DTAGLIB_STATIC)
+  add_definitions(-DTAGLIB_STATIC)
 endif(ENABLE_STATIC)
 
 ########### next target ###############
 
-ADD_EXECUTABLE(tagreader tagreader.cpp)
-
-TARGET_LINK_LIBRARIES(tagreader  tag )
-
+add_executable(tagreader tagreader.cpp)
+target_link_libraries(tagreader tag)
 
 ########### next target ###############
 
-ADD_EXECUTABLE(tagreader_c tagreader_c.c)
-
-TARGET_LINK_LIBRARIES(tagreader_c  tag_c )
-
+add_executable(tagreader_c tagreader_c.c)
+target_link_libraries(tagreader_c tag_c)
 
 ########### next target ###############
 
-ADD_EXECUTABLE(tagwriter tagwriter.cpp)
-
-TARGET_LINK_LIBRARIES(tagwriter  tag )
-
+add_executable(tagwriter tagwriter.cpp)
+target_link_libraries(tagwriter tag)
 
 ########### next target ###############
 
-ADD_EXECUTABLE(framelist framelist.cpp)
-
-TARGET_LINK_LIBRARIES(framelist  tag )
-
+add_executable(framelist framelist.cpp)
+target_link_libraries(framelist tag)
 
 ########### next target ###############
 
-ADD_EXECUTABLE(strip-id3v1 strip-id3v1.cpp)
-
-TARGET_LINK_LIBRARIES(strip-id3v1  tag )
-
-
-endif(BUILD_EXAMPLES)
+add_executable(strip-id3v1 strip-id3v1.cpp)
+target_link_libraries(strip-id3v1 tag)
 
