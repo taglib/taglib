@@ -17,6 +17,15 @@ else()
 endif()
 option(ENABLE_STATIC_RUNTIME "Visual Studio, link with runtime statically" OFF)
 
+option(ENABLE_CCACHE "Use ccache when building libtag" OFF)
+if(ENABLE_CCACHE)
+  find_program(CCACHE_FOUND ccache)
+  if(CCACHE_FOUND)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+  endif()
+endif()
+
 option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden" OFF)
 if(VISIBILITY_HIDDEN)
   add_definitions(-fvisibility=hidden)
@@ -145,12 +154,6 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
 file(COPY doc/taglib.png DESTINATION doc)
 add_custom_target(docs doxygen)
-
-find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
-  set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-endif()
 
 # uninstall target
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
