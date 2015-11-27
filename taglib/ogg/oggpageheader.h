@@ -219,7 +219,7 @@ namespace TagLib {
       PageHeader(const PageHeader &);
       PageHeader &operator=(const PageHeader &);
 
-      void read();
+      void read(Ogg::File *file, long pageOffset);
       ByteVector lacingValues() const;
 
       class PageHeaderPrivate;
