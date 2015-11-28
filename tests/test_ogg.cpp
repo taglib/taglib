@@ -59,16 +59,31 @@ public:
     {
       Vorbis::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(136383L, f.length());
       CPPUNIT_ASSERT_EQUAL(19, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(30U, f.packet(0).size());
+      CPPUNIT_ASSERT_EQUAL(131127U, f.packet(1).size());
+      CPPUNIT_ASSERT_EQUAL(3832U, f.packet(2).size());
       CPPUNIT_ASSERT_EQUAL(longText, f.tag()->title());
+
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
+
       f.tag()->setTitle("ABCDE");
       f.save();
     }
     {
       Vorbis::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(4370L, f.length());
       CPPUNIT_ASSERT_EQUAL(3, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(30U, f.packet(0).size());
+      CPPUNIT_ASSERT_EQUAL(60U, f.packet(1).size());
+      CPPUNIT_ASSERT_EQUAL(3832U, f.packet(2).size());
       CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
+
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
     }
   }
 

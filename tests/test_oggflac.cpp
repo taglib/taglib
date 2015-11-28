@@ -5,6 +5,7 @@
 #include <tbytevectorlist.h>
 #include <oggfile.h>
 #include <oggflacfile.h>
+#include <oggpageheader.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -16,6 +17,7 @@ class TestOggFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestOggFLAC);
   CPPUNIT_TEST(testFramingBit);
   CPPUNIT_TEST(testFuzzedFile);
+  CPPUNIT_TEST(testSplitPackets);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -43,6 +45,53 @@ public:
   {
     Ogg::FLAC::File f(TEST_FILE_PATH_C("segfault.oga"));
     CPPUNIT_ASSERT(!f.isValid());
+  }
+
+  void testSplitPackets()
+  {
+    ScopedFileCopy copy("empty_flac", ".oga");
+    string newname = copy.fileName();
+
+    String longText(std::string(128 * 1024, ' ').c_str());
+    for(size_t i = 0; i < longText.length(); ++i)
+      longText[i] = static_cast<wchar>(L'A' + (i % 26));
+
+    {
+      Ogg::FLAC::File f(newname.c_str());
+      f.tag()->setTitle(longText);
+      f.save();
+    }
+    {
+      Ogg::FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(141141L, f.length());
+      CPPUNIT_ASSERT_EQUAL(21, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(51U, f.packet(0).size());
+      CPPUNIT_ASSERT_EQUAL(131126U, f.packet(1).size());
+      CPPUNIT_ASSERT_EQUAL(22U, f.packet(2).size());
+      CPPUNIT_ASSERT_EQUAL(8196U, f.packet(3).size());
+      CPPUNIT_ASSERT_EQUAL(longText, f.tag()->title());
+
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());
+
+      f.tag()->setTitle("ABCDE");
+      f.save();
+    }
+    {
+      Ogg::FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(9128L, f.length());
+      CPPUNIT_ASSERT_EQUAL(5, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL(51U, f.packet(0).size());
+      CPPUNIT_ASSERT_EQUAL(59U, f.packet(1).size());
+      CPPUNIT_ASSERT_EQUAL(22U, f.packet(2).size());
+      CPPUNIT_ASSERT_EQUAL(8196U, f.packet(3).size());
+      CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
+
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());
+    }
   }
 
 };
