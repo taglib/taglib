@@ -91,26 +91,29 @@ public:
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
 
       f.ID3v2Tag()->setTitle(L"Title");
       f.ID3v2Tag()->setArtist(L"Artist");
       f.save();
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
     }
-
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String(L"Title"),  f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String(L"Artist"), f.ID3v2Tag()->artist());
 
       f.ID3v2Tag()->setTitle(L"");
       f.ID3v2Tag()->setArtist(L"");
       f.save();
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
     }
-
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String(L""), f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String(L""), f.ID3v2Tag()->artist());
     }
@@ -124,26 +127,30 @@ public:
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasInfoTag());
 
       f.InfoTag()->setTitle(L"Title");
       f.InfoTag()->setArtist(L"Artist");
       f.save();
+      CPPUNIT_ASSERT(f.hasInfoTag());
     }
-
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasInfoTag());
       CPPUNIT_ASSERT_EQUAL(String(L"Title"),  f.InfoTag()->title());
       CPPUNIT_ASSERT_EQUAL(String(L"Artist"), f.InfoTag()->artist());
 
       f.InfoTag()->setTitle(L"");
       f.InfoTag()->setArtist(L"");
       f.save();
+      CPPUNIT_ASSERT(!f.hasInfoTag());
     }
 
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasInfoTag());
       CPPUNIT_ASSERT_EQUAL(String(L""), f.InfoTag()->title());
       CPPUNIT_ASSERT_EQUAL(String(L""), f.InfoTag()->artist());
     }
