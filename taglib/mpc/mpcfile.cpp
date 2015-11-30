@@ -272,7 +272,7 @@ void MPC::File::read(bool readProperties)
     d->tag.set(MPCAPEIndex, new APE::Tag(this, d->APELocation));
 
     d->APESize = APETag()->footer()->completeTagSize();
-    d->APELocation = d->APELocation + APETag()->footer()->size() - d->APESize;
+    d->APELocation = d->APELocation + APE::Footer::size() - d->APESize;
     d->hasAPE = true;
   }
 

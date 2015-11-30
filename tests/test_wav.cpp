@@ -154,36 +154,37 @@ public:
     ScopedFileCopy copy("empty", ".wav");
     string filename = copy.fileName();
 
-    RIFF::WAV::File *f = new RIFF::WAV::File(filename.c_str());
-    f->ID3v2Tag()->setTitle("test title");
-    f->InfoTag()->setTitle("test title");
-    f->save();
-    delete f;
-
-    f = new RIFF::WAV::File(filename.c_str());
-    CPPUNIT_ASSERT(f->hasID3v2Tag());
-    CPPUNIT_ASSERT(f->hasInfoTag());
-    f->save(RIFF::WAV::File::ID3v2, true);
-    delete f;
-
-    f = new RIFF::WAV::File(filename.c_str());
-    CPPUNIT_ASSERT(f->hasID3v2Tag());
-    CPPUNIT_ASSERT(!f->hasInfoTag());
-    f->ID3v2Tag()->setTitle("test title");
-    f->InfoTag()->setTitle("test title");
-    f->save();
-    delete f;
-
-    f = new RIFF::WAV::File(filename.c_str());
-    CPPUNIT_ASSERT(f->hasID3v2Tag());
-    CPPUNIT_ASSERT(f->hasInfoTag());
-    f->save(RIFF::WAV::File::Info, true);
-    delete f;
-
-    f = new RIFF::WAV::File(filename.c_str());
-    CPPUNIT_ASSERT(!f->hasID3v2Tag());
-    CPPUNIT_ASSERT(f->hasInfoTag());
-    delete f;
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.ID3v2Tag()->setTitle("test title");
+      f.InfoTag()->setTitle("test title");
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasInfoTag());
+      f.save(RIFF::WAV::File::ID3v2, true);
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasInfoTag());
+      f.ID3v2Tag()->setTitle("test title");
+      f.InfoTag()->setTitle("test title");
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasInfoTag());
+      f.save(RIFF::WAV::File::Info, true);
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasInfoTag());
+    }
   }
 
   void testDuplicateTags()

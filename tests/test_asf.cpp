@@ -75,17 +75,18 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    ASF::AttributeList values;
-    values.append("Foo");
-    values.append("Bar");
-    f->tag()->setAttribute("WM/AlbumTitle", values);
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(2, (int)f->tag()->attributeListMap()["WM/AlbumTitle"].size());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      ASF::AttributeList values;
+      values.append("Foo");
+      values.append("Bar");
+      f.tag()->setAttribute("WM/AlbumTitle", values);
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(2, (int)f.tag()->attributeListMap()["WM/AlbumTitle"].size());
+    }
   }
 
   void testDWordTrackNumber()
@@ -93,27 +94,28 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT(!f->tag()->contains("WM/TrackNumber"));
-    f->tag()->setAttribute("WM/TrackNumber", (unsigned int)(123));
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT(f->tag()->contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
-                         f->tag()->attribute("WM/TrackNumber").front().type());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(123), f->tag()->track());
-    f->tag()->setTrack(234);
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT(f->tag()->contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
-                         f->tag()->attribute("WM/TrackNumber").front().type());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(234), f->tag()->track());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.tag()->contains("WM/TrackNumber"));
+      f.tag()->setAttribute("WM/TrackNumber", (unsigned int)(123));
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
+      CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
+                           f.tag()->attribute("WM/TrackNumber").front().type());
+      CPPUNIT_ASSERT_EQUAL(TagLib::uint(123), f.tag()->track());
+      f.tag()->setTrack(234);
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
+      CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
+                           f.tag()->attribute("WM/TrackNumber").front().type());
+      CPPUNIT_ASSERT_EQUAL(TagLib::uint(234), f.tag()->track());
+    }
   }
 
   void testSaveStream()
@@ -121,16 +123,18 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    ASF::Attribute attr("Foo");
-    attr.setStream(43);
-    f->tag()->setAttribute("WM/AlbumTitle", attr);
-    f->save();
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      ASF::Attribute attr("Foo");
+      attr.setStream(43);
+      f.tag()->setAttribute("WM/AlbumTitle", attr);
+      f.save();
+    }
 
-    f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(43, f->tag()->attribute("WM/AlbumTitle").front().stream());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(43, f.tag()->attribute("WM/AlbumTitle").front().stream());
+    }
   }
 
   void testSaveLanguage()
@@ -138,18 +142,19 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    ASF::Attribute attr("Foo");
-    attr.setStream(32);
-    attr.setLanguage(56);
-    f->tag()->setAttribute("WM/AlbumTitle", attr);
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(32, f->tag()->attribute("WM/AlbumTitle").front().stream());
-    CPPUNIT_ASSERT_EQUAL(56, f->tag()->attribute("WM/AlbumTitle").front().language());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      ASF::Attribute attr("Foo");
+      attr.setStream(32);
+      attr.setLanguage(56);
+      f.tag()->setAttribute("WM/AlbumTitle", attr);
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(32, f.tag()->attribute("WM/AlbumTitle").front().stream());
+      CPPUNIT_ASSERT_EQUAL(56, f.tag()->attribute("WM/AlbumTitle").front().language());
+    }
   }
 
   void testSaveLargeValue()
@@ -157,16 +162,17 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    ASF::Attribute attr(ByteVector(70000, 'x'));
-    f->tag()->setAttribute("WM/Blob", attr);
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(ByteVector(70000, 'x'),
-                         f->tag()->attribute("WM/Blob").front().toByteVector());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      ASF::Attribute attr(ByteVector(70000, 'x'));
+      f.tag()->setAttribute("WM/Blob", attr);
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(ByteVector(70000, 'x'),
+                           f.tag()->attribute("WM/Blob").front().toByteVector());
+    }
   }
 
   void testSavePicture()
@@ -174,27 +180,28 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    ASF::Picture picture;
-    picture.setMimeType("image/jpeg");
-    picture.setType(ASF::Picture::FrontCover);
-    picture.setDescription("description");
-    picture.setPicture("data");
-    f->tag()->setAttribute("WM/Picture", picture);
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    ASF::AttributeList values2 = f->tag()->attribute("WM/Picture");
-    CPPUNIT_ASSERT_EQUAL(size_t(1), values2.size());
-    ASF::Attribute attr2 = values2.front();
-    ASF::Picture picture2 = attr2.toPicture();
-    CPPUNIT_ASSERT(picture2.isValid());
-    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture2.mimeType());
-    CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, picture2.type());
-    CPPUNIT_ASSERT_EQUAL(String("description"), picture2.description());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("data"), picture2.picture());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      ASF::Picture picture;
+      picture.setMimeType("image/jpeg");
+      picture.setType(ASF::Picture::FrontCover);
+      picture.setDescription("description");
+      picture.setPicture("data");
+      f.tag()->setAttribute("WM/Picture", picture);
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      ASF::AttributeList values2 = f.tag()->attribute("WM/Picture");
+      CPPUNIT_ASSERT_EQUAL(size_t(1), values2.size());
+      ASF::Attribute attr2 = values2.front();
+      ASF::Picture picture2 = attr2.toPicture();
+      CPPUNIT_ASSERT(picture2.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture2.mimeType());
+      CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, picture2.type());
+      CPPUNIT_ASSERT_EQUAL(String("description"), picture2.description());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("data"), picture2.picture());
+    }
   }
 
   void testSaveMultiplePictures()
@@ -202,40 +209,41 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     string newname = copy.fileName();
 
-    ASF::File *f = new ASF::File(newname.c_str());
-    ASF::AttributeList values;
-    ASF::Picture picture;
-    picture.setMimeType("image/jpeg");
-    picture.setType(ASF::Picture::FrontCover);
-    picture.setDescription("description");
-    picture.setPicture("data");
-    values.append(ASF::Attribute(picture));
-    ASF::Picture picture2;
-    picture2.setMimeType("image/png");
-    picture2.setType(ASF::Picture::BackCover);
-    picture2.setDescription("back cover");
-    picture2.setPicture("PNG data");
-    values.append(ASF::Attribute(picture2));
-    f->tag()->setAttribute("WM/Picture", values);
-    f->save();
-    delete f;
-
-    f = new ASF::File(newname.c_str());
-    ASF::AttributeList values2 = f->tag()->attribute("WM/Picture");
-    CPPUNIT_ASSERT_EQUAL(size_t(2), values2.size());
-    ASF::Picture picture3 = values2[1].toPicture();
-    CPPUNIT_ASSERT(picture3.isValid());
-    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture3.mimeType());
-    CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, picture3.type());
-    CPPUNIT_ASSERT_EQUAL(String("description"), picture3.description());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("data"), picture3.picture());
-    ASF::Picture picture4 = values2[0].toPicture();
-    CPPUNIT_ASSERT(picture4.isValid());
-    CPPUNIT_ASSERT_EQUAL(String("image/png"), picture4.mimeType());
-    CPPUNIT_ASSERT_EQUAL(ASF::Picture::BackCover, picture4.type());
-    CPPUNIT_ASSERT_EQUAL(String("back cover"), picture4.description());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("PNG data"), picture4.picture());
-    delete f;
+    {
+      ASF::File f(newname.c_str());
+      ASF::AttributeList values;
+      ASF::Picture picture;
+      picture.setMimeType("image/jpeg");
+      picture.setType(ASF::Picture::FrontCover);
+      picture.setDescription("description");
+      picture.setPicture("data");
+      values.append(ASF::Attribute(picture));
+      ASF::Picture picture2;
+      picture2.setMimeType("image/png");
+      picture2.setType(ASF::Picture::BackCover);
+      picture2.setDescription("back cover");
+      picture2.setPicture("PNG data");
+      values.append(ASF::Attribute(picture2));
+      f.tag()->setAttribute("WM/Picture", values);
+      f.save();
+    }
+    {
+      ASF::File f(newname.c_str());
+      ASF::AttributeList values2 = f.tag()->attribute("WM/Picture");
+      CPPUNIT_ASSERT_EQUAL(size_t(2), values2.size());
+      ASF::Picture picture3 = values2[1].toPicture();
+      CPPUNIT_ASSERT(picture3.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture3.mimeType());
+      CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, picture3.type());
+      CPPUNIT_ASSERT_EQUAL(String("description"), picture3.description());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("data"), picture3.picture());
+      ASF::Picture picture4 = values2[0].toPicture();
+      CPPUNIT_ASSERT(picture4.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("image/png"), picture4.mimeType());
+      CPPUNIT_ASSERT_EQUAL(ASF::Picture::BackCover, picture4.type());
+      CPPUNIT_ASSERT_EQUAL(String("back cover"), picture4.description());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("PNG data"), picture4.picture());
+    }
   }
 
   void testProperties()

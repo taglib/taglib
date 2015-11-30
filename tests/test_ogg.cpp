@@ -31,14 +31,15 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
-    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
-    f->tag()->setArtist("The Artist");
-    f->save();
-    delete f;
-
-    f = new Ogg::Vorbis::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
-    delete f;
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      f.tag()->setArtist("The Artist");
+      f.save();
+    }
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
+    }
   }
 
   void testSplitPackets()
@@ -50,24 +51,40 @@ public:
     for (size_t i = 0; i < longText.length(); ++i)
       longText[i] = static_cast<wchar>(L'A' + (i % 26));
 
-    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
-    f->tag()->setTitle(longText);
-    f->save();
-    delete f;
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      f.tag()->setTitle(longText);
+      f.save();
+    }
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL((offset_t)136383, f.length());
+      CPPUNIT_ASSERT_EQUAL(19, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL((size_t)30, f.packet(0).size());
+      CPPUNIT_ASSERT_EQUAL((size_t)131127, f.packet(1).size());
+      CPPUNIT_ASSERT_EQUAL((size_t)3832, f.packet(2).size());
+      CPPUNIT_ASSERT_EQUAL(longText, f.tag()->title());
 
-    f = new Ogg::Vorbis::File(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
-    CPPUNIT_ASSERT_EQUAL(19, f->lastPageHeader()->pageSequenceNumber());
-    CPPUNIT_ASSERT_EQUAL(longText, f->tag()->title());
-    f->tag()->setTitle("ABCDE");
-    f->save();
-    delete f;
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
 
-    f = new Ogg::Vorbis::File(newname.c_str());
-    CPPUNIT_ASSERT(f->isValid());
-    CPPUNIT_ASSERT_EQUAL(3, f->lastPageHeader()->pageSequenceNumber());
-    CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f->tag()->title());
-    delete f;
+      f.tag()->setTitle("ABCDE");
+      f.save();
+    }
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL((offset_t)4370, f.length());
+      CPPUNIT_ASSERT_EQUAL(3, f.lastPageHeader()->pageSequenceNumber());
+      CPPUNIT_ASSERT_EQUAL((size_t)30, f.packet(0).size());
+      CPPUNIT_ASSERT_EQUAL((size_t)60, f.packet(1).size());
+      CPPUNIT_ASSERT_EQUAL((size_t)3832, f.packet(2).size());
+      CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
+
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
+    }
   }
 
   void testDictInterface1()
@@ -75,22 +92,20 @@ public:
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
 
-    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
+    Ogg::Vorbis::File f(newname.c_str());
 
-    CPPUNIT_ASSERT_EQUAL(size_t(0), f->tag()->properties().size());
+    CPPUNIT_ASSERT_EQUAL(size_t(0), f.tag()->properties().size());
 
     PropertyMap newTags;
     StringList values("value 1");
     values.append("value 2");
     newTags["ARTIST"] = values;
-    f->tag()->setProperties(newTags);
+    f.tag()->setProperties(newTags);
 
-    PropertyMap map = f->tag()->properties();
+    PropertyMap map = f.tag()->properties();
     CPPUNIT_ASSERT_EQUAL(size_t(1), map.size());
     CPPUNIT_ASSERT_EQUAL(size_t(2), map["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("value 1"), map["ARTIST"][0]);
-    delete f;
-
   }
 
   void testDictInterface2()
@@ -98,8 +113,8 @@ public:
     ScopedFileCopy copy("test", ".ogg");
     string newname = copy.fileName();
 
-    Ogg::Vorbis::File *f = new Ogg::Vorbis::File(newname.c_str());
-    PropertyMap tags = f->tag()->properties();
+    Ogg::Vorbis::File f(newname.c_str());
+    PropertyMap tags = f.tag()->properties();
 
     CPPUNIT_ASSERT_EQUAL(size_t(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
@@ -111,13 +126,11 @@ public:
     tags["UNICODETAG"][0] = String(
       "\xCE\xBD\xCE\xB5\xCF\x89\x20\xCE\xBD\xCE\xB1\xCE\xBB\xCF\x85\xCE\xB5", String::UTF8);
     tags.erase("UNUSUALTAG");
-    f->tag()->setProperties(tags);
+    f.tag()->setProperties(tags);
     CPPUNIT_ASSERT_EQUAL(
       String("\xCE\xBD\xCE\xB5\xCF\x89\x20\xCE\xBD\xCE\xB1\xCE\xBB\xCF\x85\xCE\xB5", String::UTF8),
-      f->tag()->properties()["UNICODETAG"][0]);
-    CPPUNIT_ASSERT_EQUAL(false, f->tag()->properties().contains("UNUSUALTAG"));
-
-    delete f;
+      f.tag()->properties()["UNICODETAG"][0]);
+    CPPUNIT_ASSERT_EQUAL(false, f.tag()->properties().contains("UNUSUALTAG"));
   }
 
   void testAudioProperties()

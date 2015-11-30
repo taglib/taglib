@@ -273,7 +273,7 @@ void APE::File::read(bool readProperties)
   if(d->APELocation >= 0) {
     d->tag.set(ApeAPEIndex, new APE::Tag(this, d->APELocation));
     d->APESize = APETag()->footer()->completeTagSize();
-    d->APELocation = d->APELocation + APETag()->footer()->size() - d->APESize;
+    d->APELocation = d->APELocation + APE::Footer::size() - d->APESize;
     d->hasAPE = true;
   }
 

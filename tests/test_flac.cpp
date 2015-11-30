@@ -44,15 +44,16 @@ public:
     ScopedFileCopy copy("multiple-vc", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("Artist 1"), f->tag()->artist());
-    f->tag()->setArtist("The Artist");
-    f->save();
-    delete f;
-
-    f = new FLAC::File(newname.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
-    delete f;
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("Artist 1"), f.tag()->artist());
+      f.tag()->setArtist("The Artist");
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
+    }
   }
 
   void testReadPicture()
@@ -60,8 +61,8 @@ public:
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    List<FLAC::Picture *> lst = f->pictureList();
+    FLAC::File f(newname.c_str());
+    List<FLAC::Picture *> lst = f.pictureList();
     CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
     FLAC::Picture *pic = lst.front();
@@ -73,7 +74,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
     CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
     CPPUNIT_ASSERT_EQUAL(size_t(150), pic->data().size());
-    delete f;
   }
 
   void testAddPicture()
@@ -81,47 +81,48 @@ public:
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    List<FLAC::Picture *> lst = f->pictureList();
-    CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
+    {
+      FLAC::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
-    FLAC::Picture *newpic = new FLAC::Picture();
-    newpic->setType(FLAC::Picture::BackCover);
-    newpic->setWidth(5);
-    newpic->setHeight(6);
-    newpic->setColorDepth(16);
-    newpic->setNumColors(7);
-    newpic->setMimeType("image/jpeg");
-    newpic->setDescription("new image");
-    newpic->setData("JPEG data");
-    f->addPicture(newpic);
-    f->save();
-    delete f;
+      FLAC::Picture *newpic = new FLAC::Picture();
+      newpic->setType(FLAC::Picture::BackCover);
+      newpic->setWidth(5);
+      newpic->setHeight(6);
+      newpic->setColorDepth(16);
+      newpic->setNumColors(7);
+      newpic->setMimeType("image/jpeg");
+      newpic->setDescription("new image");
+      newpic->setData("JPEG data");
+      f.addPicture(newpic);
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(size_t(2), lst.size());
 
-    f = new FLAC::File(newname.c_str());
-    lst = f->pictureList();
-    CPPUNIT_ASSERT_EQUAL(size_t(2), lst.size());
+      FLAC::Picture *pic = lst[0];
+      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pic->type());
+      CPPUNIT_ASSERT_EQUAL(1, pic->width());
+      CPPUNIT_ASSERT_EQUAL(1, pic->height());
+      CPPUNIT_ASSERT_EQUAL(24, pic->colorDepth());
+      CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
+      CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
+      CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
+      CPPUNIT_ASSERT_EQUAL(size_t(150), pic->data().size());
 
-    FLAC::Picture *pic = lst[0];
-    CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pic->type());
-    CPPUNIT_ASSERT_EQUAL(1, pic->width());
-    CPPUNIT_ASSERT_EQUAL(1, pic->height());
-    CPPUNIT_ASSERT_EQUAL(24, pic->colorDepth());
-    CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
-    CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
-    CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
-    CPPUNIT_ASSERT_EQUAL(size_t(150), pic->data().size());
-
-    pic = lst[1];
-    CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
-    CPPUNIT_ASSERT_EQUAL(5, pic->width());
-    CPPUNIT_ASSERT_EQUAL(6, pic->height());
-    CPPUNIT_ASSERT_EQUAL(16, pic->colorDepth());
-    CPPUNIT_ASSERT_EQUAL(7, pic->numColors());
-    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
-    CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
-    delete f;
+      pic = lst[1];
+      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
+      CPPUNIT_ASSERT_EQUAL(5, pic->width());
+      CPPUNIT_ASSERT_EQUAL(6, pic->height());
+      CPPUNIT_ASSERT_EQUAL(16, pic->colorDepth());
+      CPPUNIT_ASSERT_EQUAL(7, pic->numColors());
+      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
+      CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+    }
   }
 
   void testReplacePicture()
@@ -129,38 +130,39 @@ public:
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    List<FLAC::Picture *> lst = f->pictureList();
-    CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
+    {
+      FLAC::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
-    FLAC::Picture *newpic = new FLAC::Picture();
-    newpic->setType(FLAC::Picture::BackCover);
-    newpic->setWidth(5);
-    newpic->setHeight(6);
-    newpic->setColorDepth(16);
-    newpic->setNumColors(7);
-    newpic->setMimeType("image/jpeg");
-    newpic->setDescription("new image");
-    newpic->setData("JPEG data");
-    f->removePictures();
-    f->addPicture(newpic);
-    f->save();
-    delete f;
+      FLAC::Picture *newpic = new FLAC::Picture();
+      newpic->setType(FLAC::Picture::BackCover);
+      newpic->setWidth(5);
+      newpic->setHeight(6);
+      newpic->setColorDepth(16);
+      newpic->setNumColors(7);
+      newpic->setMimeType("image/jpeg");
+      newpic->setDescription("new image");
+      newpic->setData("JPEG data");
+      f.removePictures();
+      f.addPicture(newpic);
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
-    f = new FLAC::File(newname.c_str());
-    lst = f->pictureList();
-    CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
-
-    FLAC::Picture *pic = lst[0];
-    CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
-    CPPUNIT_ASSERT_EQUAL(5, pic->width());
-    CPPUNIT_ASSERT_EQUAL(6, pic->height());
-    CPPUNIT_ASSERT_EQUAL(16, pic->colorDepth());
-    CPPUNIT_ASSERT_EQUAL(7, pic->numColors());
-    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
-    CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
-    delete f;
+      FLAC::Picture *pic = lst[0];
+      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
+      CPPUNIT_ASSERT_EQUAL(5, pic->width());
+      CPPUNIT_ASSERT_EQUAL(6, pic->height());
+      CPPUNIT_ASSERT_EQUAL(16, pic->colorDepth());
+      CPPUNIT_ASSERT_EQUAL(7, pic->numColors());
+      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
+      CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+    }
   }
 
   void testRemoveAllPictures()
@@ -168,18 +170,19 @@ public:
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    List<FLAC::Picture *> lst = f->pictureList();
-    CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
+    {
+      FLAC::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(size_t(1), lst.size());
 
-    f->removePictures();
-    f->save();
-    delete f;
-
-    f = new FLAC::File(newname.c_str());
-    lst = f->pictureList();
-    CPPUNIT_ASSERT_EQUAL(size_t(0), lst.size());
-    delete f;
+      f.removePictures();
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(size_t(0), lst.size());
+    }
   }
 
   void testRepeatedSave()
@@ -187,21 +190,20 @@ public:
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    Tag *tag = f->tag();
-    CPPUNIT_ASSERT_EQUAL(String("Silence"), tag->title());
-    tag->setTitle("NEW TITLE");
-    f->save();
-    CPPUNIT_ASSERT_EQUAL(String("NEW TITLE"), tag->title());
-    tag->setTitle("NEW TITLE 2");
-    f->save();
-    CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), tag->title());
-    delete f;
-
-    f = new FLAC::File(newname.c_str());
-    tag = f->tag();
-    CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), tag->title());
-    delete f;
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("Silence"), f.tag()->title());
+      f.tag()->setTitle("NEW TITLE");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(String("NEW TITLE"), f.tag()->title());
+      f.tag()->setTitle("NEW TITLE 2");
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), f.tag()->title());
+    }
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), f.tag()->title());
+    }
   }
 
   void testSaveMultipleValues()
@@ -209,20 +211,19 @@ public:
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
 
-    FLAC::File *f = new FLAC::File(newname.c_str());
-    Ogg::XiphComment* c = f->xiphComment(true);
-    c->addField("ARTIST", "artist 1", true);
-    c->addField("ARTIST", "artist 2", false);
-    f->save();
-    delete f;
-
-    f = new FLAC::File(newname.c_str());
-    c = f->xiphComment(true);
-    Ogg::FieldListMap m = c->fieldListMap();
-    CPPUNIT_ASSERT_EQUAL(size_t(2), m["ARTIST"].size());
-    CPPUNIT_ASSERT_EQUAL(String("artist 1"), m["ARTIST"][0]);
-    CPPUNIT_ASSERT_EQUAL(String("artist 2"), m["ARTIST"][1]);
-    delete f;
+    {
+      FLAC::File f(newname.c_str());
+      f.xiphComment(true)->addField("ARTIST", "artist 1", true);
+      f.xiphComment(true)->addField("ARTIST", "artist 2", false);
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      Ogg::FieldListMap m = f.xiphComment()->fieldListMap();
+      CPPUNIT_ASSERT_EQUAL(size_t(2), m["ARTIST"].size());
+      CPPUNIT_ASSERT_EQUAL(String("artist 1"), m["ARTIST"][0]);
+      CPPUNIT_ASSERT_EQUAL(String("artist 2"), m["ARTIST"][1]);
+    }
   }
 
   void testDict()

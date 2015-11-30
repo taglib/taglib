@@ -111,46 +111,45 @@ public:
     ScopedFileCopy copy("no-tags", ".3g2");
     string filename = copy.fileName();
 
-    MP4::File *f = new MP4::File(filename.c_str());
-    f->tag()->setArtist(ByteVector(3000, 'x'));
-
     ByteVectorList data1;
+
     {
-      MP4::Atoms a(f);
+      MP4::File f(filename.c_str());
+      f.tag()->setArtist(ByteVector(3000, 'x'));
+
+      MP4::Atoms a(&f);
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
-      f->seek(stco->offset + 12);
-      ByteVector data = f->readBlock(static_cast<size_t>(stco->length - 12));
-      unsigned int count = data.toUInt32BE(0);
-      size_t pos = 4;
+      f.seek(stco->offset + 12);
+      ByteVector data = f.readBlock(static_cast<size_t>(stco->length - 12));
+      unsigned int count = data.mid(0, 4).toUInt32BE(0);
+      int pos = 4;
       while (count--) {
-        unsigned int offset = data.toUInt32BE(pos);
-        f->seek(offset);
-        data1.append(f->readBlock(20));
+        unsigned int offset = data.mid(pos, 4).toUInt32BE(0);
+        f.seek(offset);
+        data1.append(f.readBlock(20));
         pos += 4;
       }
+
+      f.save();
     }
 
-    f->save();
-    delete f;
-    f = new MP4::File(filename.c_str());
-
     {
-      MP4::Atoms a(f);
+      MP4::File f(filename.c_str());
+
+      MP4::Atoms a(&f);
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
-      f->seek(stco->offset + 12);
-      ByteVector data = f->readBlock(static_cast<size_t>(stco->length - 12));
-      unsigned int count = data.toUInt32BE(0);
-      size_t pos = 4, i = 0;
+      f.seek(stco->offset + 12);
+      ByteVector data = f.readBlock(static_cast<size_t>(stco->length - 12));
+      unsigned int count = data.mid(0, 4).toUInt32BE(0);
+      int pos = 4, i = 0;
       while (count--) {
-        unsigned int offset = data.toUInt32BE(pos);
-        f->seek(offset);
-        CPPUNIT_ASSERT_EQUAL(data1[i], f->readBlock(20));
+        unsigned int offset = data.mid(pos, 4).toUInt32BE(0);
+        f.seek(offset);
+        CPPUNIT_ASSERT_EQUAL(data1[i], f.readBlock(20));
         pos += 4;
         i++;
       }
     }
-
-    delete f;
   }
 
   void testFreeForm()
@@ -158,18 +157,19 @@ public:
     ScopedFileCopy copy("has-tags", ".m4a");
     string filename = copy.fileName();
 
-    MP4::File *f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT(f->tag()->contains("----:com.apple.iTunes:iTunNORM"));
-    f->tag()->setItem("----:org.kde.TagLib:Foo", StringList("Bar"));
-    f->save();
-    delete f;
-
-    f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT(f->tag()->contains("----:org.kde.TagLib:Foo"));
-    CPPUNIT_ASSERT_EQUAL(String("Bar"),
-                         f->tag()->item("----:org.kde.TagLib:Foo").toStringList().front());
-    f->save();
-    delete f;
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.tag()->contains("----:com.apple.iTunes:iTunNORM"));
+      f.tag()->setItem("----:org.kde.TagLib:Foo", StringList("Bar"));
+      f.save();
+    }
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.tag()->contains("----:org.kde.TagLib:Foo"));
+      CPPUNIT_ASSERT_EQUAL(String("Bar"),
+                           f.tag()->item("----:org.kde.TagLib:Foo").toStringList().front());
+      f.save();
+    }
   }
 
   void testSaveExisingWhenIlstIsLast()
@@ -177,20 +177,21 @@ public:
     ScopedFileCopy copy("ilst-is-last", ".m4a");
     string filename = copy.fileName();
 
-    MP4::File *f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("82,164"),
-                         f->tag()->item("----:com.apple.iTunes:replaygain_track_minmax").toStringList().front());
-    CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
-    f->tag()->setComment("foo");
-    f->save();
-    delete f;
-
-    f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT_EQUAL(String("82,164"),
-                         f->tag()->item("----:com.apple.iTunes:replaygain_track_minmax").toStringList().front());
-    CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f->tag()->artist());
-    CPPUNIT_ASSERT_EQUAL(String("foo"), f->tag()->comment());
-    delete f;
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("82,164"),
+        f.tag()->item("----:com.apple.iTunes:replaygain_track_minmax").toStringList().front());
+      CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f.tag()->artist());
+      f.tag()->setComment("foo");
+      f.save();
+    }
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("82,164"),
+                           f.tag()->item("----:com.apple.iTunes:replaygain_track_minmax").toStringList().front());
+      CPPUNIT_ASSERT_EQUAL(String("Pearl Jam"), f.tag()->artist());
+      CPPUNIT_ASSERT_EQUAL(String("foo"), f.tag()->comment());
+    }
   }
 
   void test64BitAtom()
@@ -198,48 +199,45 @@ public:
     ScopedFileCopy copy("64bit", ".mp4");
     string filename = copy.fileName();
 
-    MP4::File *f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT_EQUAL(true, f->tag()->itemMap()["cpil"].toBool());
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(true, f.tag()->itemMap()["cpil"].toBool());
 
-    MP4::Atoms *atoms = new MP4::Atoms(f);
-    MP4::Atom *moov = atoms->atoms[0];
-    CPPUNIT_ASSERT_EQUAL(offset_t(77), moov->length);
+      MP4::Atoms atoms(&f);
+      MP4::Atom *moov = atoms.atoms[0];
+      CPPUNIT_ASSERT_EQUAL(offset_t(77), moov->length);
 
-    f->tag()->setItem("pgap", true);
-    f->save();
-    delete atoms;
-    delete f;
+      f.tag()->setItem("pgap", true);
+      f.save();
+    }
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(true, f.tag()->item("cpil").toBool());
+      CPPUNIT_ASSERT_EQUAL(true, f.tag()->item("pgap").toBool());
 
-    f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT_EQUAL(true, f->tag()->item("cpil").toBool());
-    CPPUNIT_ASSERT_EQUAL(true, f->tag()->item("pgap").toBool());
-
-    atoms = new MP4::Atoms(f);
-    moov = atoms->atoms[0];
-    // original size + 'pgap' size + padding
-    CPPUNIT_ASSERT_EQUAL(offset_t(77 + 25 + 974), moov->length);
-    delete atoms;
-    delete f;
+      MP4::Atoms atoms(&f);
+      MP4::Atom *moov = atoms.atoms[0];
+      // original size + 'pgap' size + padding
+      CPPUNIT_ASSERT_EQUAL(offset_t(77 + 25 + 974), moov->length);
+    }
   }
 
   void testGnre()
   {
-    MP4::File *f = new MP4::File(TEST_FILE_PATH_C("gnre.m4a"));
-    CPPUNIT_ASSERT_EQUAL(TagLib::String("Ska"), f->tag()->genre());
-    delete f;
+    MP4::File f(TEST_FILE_PATH_C("gnre.m4a"));
+    CPPUNIT_ASSERT_EQUAL(TagLib::String("Ska"), f.tag()->genre());
   }
 
   void testCovrRead()
   {
-    MP4::File *f = new MP4::File(TEST_FILE_PATH_C("has-tags.m4a"));
-    CPPUNIT_ASSERT(f->tag()->contains("covr"));
-    MP4::CoverArtList l = f->tag()->item("covr").toCoverArtList();
+    MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+    CPPUNIT_ASSERT(f.tag()->contains("covr"));
+    MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
     CPPUNIT_ASSERT_EQUAL(size_t(2), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
     CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
     CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
-    delete f;
   }
 
   void testCovrWrite()
@@ -247,38 +245,38 @@ public:
     ScopedFileCopy copy("has-tags", ".m4a");
     string filename = copy.fileName();
 
-    MP4::File *f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT(f->tag()->contains("covr"));
-    MP4::CoverArtList l = f->tag()->item("covr").toCoverArtList();
-    l.append(MP4::CoverArt(MP4::CoverArt::PNG, "foo"));
-    f->tag()->setItem("covr", l);
-    f->save();
-    delete f;
-
-    f = new MP4::File(filename.c_str());
-    CPPUNIT_ASSERT(f->tag()->contains("covr"));
-    l = f->tag()->item("covr").toCoverArtList();
-    CPPUNIT_ASSERT_EQUAL(size_t(3), l.size());
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
-    CPPUNIT_ASSERT_EQUAL(size_t(3), l[2].data().size());
-    delete f;
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.tag()->contains("covr"));
+      MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
+      l.append(MP4::CoverArt(MP4::CoverArt::PNG, "foo"));
+      f.tag()->setItem("covr", l);
+      f.save();
+    }
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.tag()->contains("covr"));
+      MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
+      CPPUNIT_ASSERT_EQUAL(size_t(3), l.size());
+      CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
+      CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
+      CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
+      CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
+      CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
+      CPPUNIT_ASSERT_EQUAL(size_t(3), l[2].data().size());
+    }
   }
 
   void testCovrRead2()
   {
-    MP4::File *f = new MP4::File(TEST_FILE_PATH_C("covr-junk.m4a"));
-    CPPUNIT_ASSERT(f->tag()->contains("covr"));
-    MP4::CoverArtList l = f->tag()->item("covr").toCoverArtList();
+    MP4::File f(TEST_FILE_PATH_C("covr-junk.m4a"));
+    CPPUNIT_ASSERT(f.tag()->contains("covr"));
+    MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
     CPPUNIT_ASSERT_EQUAL(size_t(2), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
     CPPUNIT_ASSERT_EQUAL(size_t(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
     CPPUNIT_ASSERT_EQUAL(size_t(287), l[1].data().size());
-    delete f;
   }
 
   void testProperties()

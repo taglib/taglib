@@ -30,17 +30,11 @@ inline string copyFile(const string &filename, const string &ext)
   char testFileName[1024];
 
 #ifdef _WIN32
-  GetTempPathA(sizeof(testFileName), testFileName);
-  GetTempFileNameA(testFileName, "tag", 0, testFileName);
-  DeleteFileA(testFileName);
-# if defined(_MSC_VER) && _MSC_VER > 1500
-  strcat_s(testFileName, ext.c_str());
-# else
-  strcat(testFileName, ext.c_str());
-# endif
+  char tempDir[MAX_PATH + 1];
+  GetTempPathA(sizeof(tempDir), tempDir);
+  wsprintfA(testFileName, "%s\\taglib-test%s", tempDir, ext.c_str());
 #else
-  snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test-XXXXXX%s", P_tmpdir, ext.c_str());
-  static_cast<void>(mkstemps(testFileName, 6));
+  snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test%s", P_tmpdir, ext.c_str());
 #endif
 
   string sourceFileName = testFilePath(filename) + ext;

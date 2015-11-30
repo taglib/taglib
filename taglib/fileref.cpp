@@ -195,9 +195,6 @@ public:
   FileRefPrivate(File *f) :
     file(f) {}
 
-  FileRefPrivate(const SHARED_PTR<File> &f) :
-    file(f) {}
-
   SHARED_PTR<File> file;
 };
 
@@ -227,7 +224,7 @@ FileRef::FileRef(File *file) :
 }
 
 FileRef::FileRef(const FileRef &ref) :
-  d(new FileRefPrivate(ref.d->file))
+  d(new FileRefPrivate(*ref.d))
 {
 }
 
