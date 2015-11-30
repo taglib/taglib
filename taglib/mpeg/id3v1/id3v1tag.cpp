@@ -35,10 +35,9 @@ using namespace ID3v1;
 class ID3v1::Tag::TagPrivate
 {
 public:
-  TagPrivate() : file(0), tagOffset(-1), track(0), genre(255) {}
-
-  File *file;
-  long tagOffset;
+  TagPrivate() :
+    track(0),
+    genre(255) {}
 
   String title;
   String artist;
@@ -81,18 +80,17 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-ID3v1::Tag::Tag() : TagLib::Tag()
+ID3v1::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
 }
 
-ID3v1::Tag::Tag(File *file, long tagOffset) : TagLib::Tag()
+ID3v1::Tag::Tag(File *file, long tagOffset) :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
-  d = new TagPrivate;
-  d->file = file;
-  d->tagOffset = tagOffset;
-
-  read();
+  read(file, tagOffset);
 }
 
 ID3v1::Tag::~Tag()
@@ -214,12 +212,12 @@ void ID3v1::Tag::setStringHandler(const StringHandler *handler)
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v1::Tag::read()
+void ID3v1::Tag::read(File *file, long tagOffset)
 {
-  if(d->file && d->file->isValid()) {
-    d->file->seek(d->tagOffset);
+  if(file && file->isValid()) {
+    file->seek(tagOffset);
     // read the tag -- always 128 bytes
-    ByteVector data = d->file->readBlock(128);
+    const ByteVector data = file->readBlock(128);
 
     // some initial sanity checking
     if(data.size() == 128 && data.startsWith("TAG"))
