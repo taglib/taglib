@@ -153,6 +153,11 @@ public:
     fileRefSave("no-tags", ".3g2");
   }
 
+  void testMP4_4()
+  {
+    fileRefSave("blank_video", ".m4v");
+  }
+
   void testWav()
   {
     fileRefSave("empty", ".wav");
