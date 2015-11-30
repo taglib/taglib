@@ -159,7 +159,7 @@ namespace
       return new Ogg::Opus::File(arg, readAudioProperties, audioPropertiesStyle);
     if(ext == "TTA")
       return new TrueAudio::File(arg, readAudioProperties, audioPropertiesStyle);
-    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2")
+    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V")
       return new MP4::File(arg, readAudioProperties, audioPropertiesStyle);
     if(ext == "WMA" || ext == "ASF")
       return new ASF::File(arg, readAudioProperties, audioPropertiesStyle);
@@ -290,6 +290,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("m4p");
   l.append("3g2");
   l.append("mp4");
+  l.append("m4v");
   l.append("wma");
   l.append("asf");
   l.append("aif");
