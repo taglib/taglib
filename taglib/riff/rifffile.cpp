@@ -44,13 +44,11 @@ struct Chunk
 class RIFF::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    endianness(BigEndian),
-    size(0)
-  {
+  FilePrivate(Endianness endianness) :
+    endianness(endianness),
+    size(0) {}
 
-  }
-  Endianness endianness;
+  const Endianness endianness;
   ByteVector type;
   TagLib::uint size;
   ByteVector format;
@@ -71,20 +69,18 @@ RIFF::File::~File()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::File::File(FileName file, Endianness endianness) : TagLib::File(file)
+RIFF::File::File(FileName file, Endianness endianness) :
+  TagLib::File(file),
+  d(new FilePrivate(endianness))
 {
-  d = new FilePrivate;
-  d->endianness = endianness;
-
   if(isOpen())
     read();
 }
 
-RIFF::File::File(IOStream *stream, Endianness endianness) : TagLib::File(stream)
+RIFF::File::File(IOStream *stream, Endianness endianness) :
+  TagLib::File(stream),
+  d(new FilePrivate(endianness))
 {
-  d = new FilePrivate;
-  d->endianness = endianness;
-
   if(isOpen())
     read();
 }
