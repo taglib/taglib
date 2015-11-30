@@ -31,8 +31,9 @@
 using namespace TagLib;
 using namespace RIFF::Info;
 
-namespace {
-  static bool isValidChunkID(const ByteVector &name)
+namespace
+{
+  inline bool isValidChunkID(const ByteVector &name)
   {
     if(name.size() != 4)
       return false;
@@ -44,17 +45,15 @@ namespace {
 
     return true;
   }
+
+  const RIFF::Info::StringHandler defaultStringHandler;
+  const RIFF::Info::StringHandler *stringHandler = &defaultStringHandler;
 }
 
 class RIFF::Info::Tag::TagPrivate
 {
 public:
-  TagPrivate()
-  {}
-
   FieldListMap fieldListMap;
-
-  static const StringHandler *stringHandler;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,19 +82,16 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-static const StringHandler defaultStringHandler;
-const RIFF::Info::StringHandler *RIFF::Info::Tag::TagPrivate::stringHandler = &defaultStringHandler;
-
-RIFF::Info::Tag::Tag(const ByteVector &data)
-  : TagLib::Tag()
-  , d(new TagPrivate())
+RIFF::Info::Tag::Tag(const ByteVector &data) :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
   parse(data);
 }
 
-RIFF::Info::Tag::Tag()
-  : TagLib::Tag()
-  , d(new TagPrivate())
+RIFF::Info::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
 }
 
@@ -222,7 +218,7 @@ ByteVector RIFF::Info::Tag::render() const
 
   FieldListMap::ConstIterator it = d->fieldListMap.begin();
   for(; it != d->fieldListMap.end(); ++it) {
-    ByteVector text = TagPrivate::stringHandler->render(it->second);
+    ByteVector text = stringHandler->render(it->second);
     if(text.isEmpty())
       continue;
 
@@ -244,9 +240,9 @@ ByteVector RIFF::Info::Tag::render() const
 void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)
 {
   if(handler)
-    TagPrivate::stringHandler = handler;
+    stringHandler = handler;
   else
-    TagPrivate::stringHandler = &defaultStringHandler;
+    stringHandler = &defaultStringHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,7 +259,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
 
     const ByteVector id = data.mid(p, 4);
     if(isValidChunkID(id)) {
-      const String text = TagPrivate::stringHandler->parse(data.mid(p + 8, size));
+      const String text = stringHandler->parse(data.mid(p + 8, size));
       d->fieldListMap[id] = text;
     }
 
