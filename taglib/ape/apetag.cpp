@@ -62,7 +62,7 @@ APE::Tag::Tag() :
 {
 }
 
-APE::Tag::Tag(TagLib::File *file, offset_t footerLocation) :
+APE::Tag::Tag(TagLib::File *file, long long footerLocation) :
   TagLib::Tag(),
   d(new TagPrivate())
 {
@@ -414,7 +414,7 @@ bool APE::Tag::isEmpty() const
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void APE::Tag::read(TagLib::File *file, offset_t footerLocation)
+void APE::Tag::read(TagLib::File *file, long long footerLocation)
 {
   if(file && file->isValid()) {
 

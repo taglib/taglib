@@ -114,7 +114,7 @@ namespace TagLib {
      * \note This method is slow since it requires rewriting all of the file
      * after the insertion point.
      */
-    virtual void insert(const ByteVector &data, offset_t start = 0, size_t replace = 0) = 0;
+    virtual void insert(const ByteVector &data, long long start = 0, size_t replace = 0) = 0;
 
     /*!
      * Removes a block of the file starting a \a start and continuing for
@@ -123,7 +123,7 @@ namespace TagLib {
      * \note This method is slow since it involves rewriting all of the file
      * after the removed portion.
      */
-    virtual void removeBlock(offset_t start = 0, size_t length = 0) = 0;
+    virtual void removeBlock(long long start = 0, size_t length = 0) = 0;
 
     /*!
      * Returns true if the file is read only (or if the file can not be opened).
@@ -142,7 +142,7 @@ namespace TagLib {
      *
      * \see Position
      */
-    virtual void seek(offset_t offset, Position p = Beginning) = 0;
+    virtual void seek(long long offset, Position p = Beginning) = 0;
 
     /*!
      * Reset the end-of-stream and error flags on the stream.
@@ -152,17 +152,17 @@ namespace TagLib {
     /*!
      * Returns the current offset within the stream.
      */
-    virtual offset_t tell() const = 0;
+    virtual long long tell() const = 0;
 
     /*!
      * Returns the length of the stream.
      */
-    virtual offset_t length() = 0;
+    virtual long long length() = 0;
 
     /*!
      * Truncates the stream to a \a length.
      */
-    virtual void truncate(offset_t length) = 0;
+    virtual void truncate(long long length) = 0;
 
   private:
     // Noncopyable. Derived classes as well.

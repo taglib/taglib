@@ -38,7 +38,7 @@ namespace
   struct Chunk
   {
     ByteVector name;
-    offset_t offset;
+    long long offset;
     TagLib::uint size;
     char padding;
   };
@@ -121,7 +121,7 @@ TagLib::uint RIFF::File::chunkDataSize(uint i) const
   return d->chunks[i].size;
 }
 
-offset_t RIFF::File::chunkOffset(uint i) const
+long long RIFF::File::chunkOffset(uint i) const
 {
   return d->chunks[i].offset;
 }
@@ -199,7 +199,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  offset_t offset = d->chunks.back().offset + d->chunks.back().size;
+  long long offset = d->chunks.back().offset + d->chunks.back().size;
 
   // First we update the global size
 
@@ -212,10 +212,10 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // Now add the chunk to the file
 
   writeChunk(
-    name, 
-    data, 
-    offset, 
-    static_cast<uint>(std::max<offset_t>(0, length() - offset)), 
+    name,
+    data,
+    offset,
+    static_cast<uint>(std::max(0LL, length() - offset)),
     static_cast<uint>(offset & 1));
 
   // And update our internal structure
@@ -303,7 +303,7 @@ void RIFF::File::read()
 
     // check padding
     chunk.padding = 0;
-    offset_t uPosNotPadded = tell();
+    long long uPosNotPadded = tell();
     if(uPosNotPadded & 1) {
       ByteVector iByte = readBlock(1);
       if((iByte.size() != 1) || (iByte[0] != 0)) {
@@ -320,7 +320,8 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            offset_t offset, TagLib::uint replace, TagLib::uint leadingPadding)
+                            long long offset, TagLib::uint replace,
+                            TagLib::uint leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {

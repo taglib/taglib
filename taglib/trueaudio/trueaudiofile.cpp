@@ -67,10 +67,10 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  offset_t ID3v2Location;
+  long long ID3v2Location;
   uint ID3v2OriginalSize;
 
-  offset_t ID3v1Location;
+  long long ID3v1Location;
 
   DoubleTagUnion tag;
 
@@ -271,7 +271,7 @@ void TrueAudio::File::read(bool readProperties)
 
   if(readProperties) {
 
-    offset_t streamLength;
+    long long streamLength;
 
     if(d->hasID3v1)
       streamLength = d->ID3v1Location;

@@ -45,7 +45,7 @@ public:
     {
       Ogg::Speex::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)156330, f.length());
+      CPPUNIT_ASSERT_EQUAL(156330LL, f.length());
       CPPUNIT_ASSERT_EQUAL(23, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)80, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)131116, f.packet(1).size());
@@ -62,7 +62,7 @@ public:
     {
       Ogg::Speex::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)24317, f.length());
+      CPPUNIT_ASSERT_EQUAL(24317LL, f.length());
       CPPUNIT_ASSERT_EQUAL(7, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)80, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)49, f.packet(1).size());

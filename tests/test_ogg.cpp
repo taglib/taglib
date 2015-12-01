@@ -59,7 +59,7 @@ public:
     {
       Ogg::Vorbis::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)136383, f.length());
+      CPPUNIT_ASSERT_EQUAL(136383LL, f.length());
       CPPUNIT_ASSERT_EQUAL(19, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)30, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)131127, f.packet(1).size());
@@ -75,7 +75,7 @@ public:
     {
       Ogg::Vorbis::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)4370, f.length());
+      CPPUNIT_ASSERT_EQUAL(4370LL, f.length());
       CPPUNIT_ASSERT_EQUAL(3, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)30, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)60, f.packet(1).size());

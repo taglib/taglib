@@ -49,7 +49,7 @@ namespace TagLib {
        * Creates an instance of MPC::AudioProperties with the data read directly
        * from a MPC::File.
        */
-      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(File *file, long long streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this MPC::Properties instance.
@@ -131,8 +131,8 @@ namespace TagLib {
       int albumPeak() const;
 
     private:
-      void readSV7(const ByteVector &data, offset_t streamLength);
-      void readSV8(File *file, offset_t streamLength);
+      void readSV7(const ByteVector &data, long long streamLength);
+      void readSV8(File *file, long long streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

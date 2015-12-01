@@ -80,7 +80,7 @@ public:
     {
       Ogg::Opus::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)167534, f.length());
+      CPPUNIT_ASSERT_EQUAL(167534LL, f.length());
       CPPUNIT_ASSERT_EQUAL(27, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)19, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)131380, f.packet(1).size());
@@ -97,7 +97,7 @@ public:
     {
       Ogg::Opus::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)35521, f.length());
+      CPPUNIT_ASSERT_EQUAL(35521LL, f.length());
       CPPUNIT_ASSERT_EQUAL(11, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)19, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)313, f.packet(1).size());

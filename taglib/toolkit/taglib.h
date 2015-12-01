@@ -57,9 +57,6 @@ namespace TagLib
   // long/ulong can be either 32-bit or 64-bit wide.
   typedef unsigned long      ulong;
 
-  // Offset or length type for I/O streams. Always signed 64-bit.
-  typedef long long          offset_t;
-
   enum ByteOrder
   {
     LittleEndian,

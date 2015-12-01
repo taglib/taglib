@@ -152,7 +152,7 @@ void MPEG::AudioProperties::read(File *file)
 {
   // Only the first frame is required if we have a VBR header.
 
-  const offset_t first = file->firstFrameOffset();
+  const long long first = file->firstFrameOffset();
   if(first < 0) {
     debug("MPEG::AudioProperties::read() -- Could not find a valid first MPEG frame in the stream.");
     return;
@@ -194,7 +194,7 @@ void MPEG::AudioProperties::read(File *file)
 
     d->bitrate = firstHeader.bitrate();
 
-    offset_t streamLength = file->length() - first;
+    long long streamLength = file->length() - first;
 
     if(file->hasID3v1Tag())
       streamLength -= 128;

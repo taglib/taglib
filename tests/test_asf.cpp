@@ -287,10 +287,10 @@ public:
       ASF::File f(copy.fileName().c_str());
       f.tag()->setTitle(std::string(128 * 1024, 'X').c_str());
       f.save();
-      CPPUNIT_ASSERT_EQUAL((offset_t)297578, f.length());
+      CPPUNIT_ASSERT_EQUAL(297578LL, f.length());
       f.tag()->setTitle(std::string(16 * 1024, 'X').c_str());
       f.save();
-      CPPUNIT_ASSERT_EQUAL((offset_t)68202, f.length());
+      CPPUNIT_ASSERT_EQUAL(68202LL, f.length());
     }
   }
 

@@ -65,7 +65,7 @@ public:
   TagPrivate() : file(0), tagOffset(-1), track(0), genre(255) {}
 
   File *file;
-  offset_t tagOffset;
+  long long tagOffset;
 
   String title;
   String artist;
@@ -85,7 +85,7 @@ ID3v1::Tag::Tag() : TagLib::Tag()
   d = new TagPrivate;
 }
 
-ID3v1::Tag::Tag(File *file, offset_t tagOffset) : TagLib::Tag()
+ID3v1::Tag::Tag(File *file, long long tagOffset) : TagLib::Tag()
 {
   d = new TagPrivate;
   d->file = file;

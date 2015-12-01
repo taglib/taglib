@@ -55,14 +55,14 @@ namespace TagLib {
       /*!
        * Read an Ogg page from the \a file at the position \a pageOffset.
        */
-      Page(File *file, offset_t pageOffset);
+      Page(File *file, long long pageOffset);
 
       virtual ~Page();
 
       /*!
        * Returns the page's position within the file (in bytes).
        */
-      offset_t fileOffset() const;
+      long long fileOffset() const;
 
       /*!
        * Returns a pointer to the header for this page.  This pointer will become

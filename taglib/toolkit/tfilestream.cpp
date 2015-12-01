@@ -185,8 +185,8 @@ ByteVector FileStream::readBlock(size_t length)
   if(length == 0)
     return ByteVector();
 
-  const offset_t streamLength = FileStream::length();
-  if(length > bufferSize() && static_cast<offset_t>(length) > streamLength)
+  const long long streamLength = FileStream::length();
+  if(length > bufferSize() && static_cast<long long>(length) > streamLength)
     length = static_cast<size_t>(streamLength);
 
   ByteVector buffer(length);
@@ -212,7 +212,7 @@ void FileStream::writeBlock(const ByteVector &data)
   writeFile(d->file, data);
 }
 
-void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
+void FileStream::insert(const ByteVector &data, long long start, size_t replace)
 {
   if(!isOpen()) {
     debug("FileStream::insert() -- invalid file.");
@@ -253,8 +253,8 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
 
   // Set where to start the reading and writing.
 
-  offset_t readPosition  = start + replace;
-  offset_t writePosition = start;
+  long long readPosition  = start + replace;
+  long long writePosition = start;
 
   ByteVector buffer = data;
   ByteVector aboutToOverwrite(bufferLength);
@@ -294,7 +294,7 @@ void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
   }
 }
 
-void FileStream::removeBlock(offset_t start, size_t length)
+void FileStream::removeBlock(long long start, size_t length)
 {
   if(!isOpen()) {
     debug("FileStream::removeBlock() -- invalid file.");
@@ -303,8 +303,8 @@ void FileStream::removeBlock(offset_t start, size_t length)
 
   size_t bufferLength = bufferSize();
 
-  offset_t readPosition  = start + length;
-  offset_t writePosition = start;
+  long long readPosition  = start + length;
+  long long writePosition = start;
 
   ByteVector buffer(bufferLength, 0);
 
@@ -341,7 +341,7 @@ bool FileStream::isOpen() const
   return (d->file != InvalidFileHandle);
 }
 
-void FileStream::seek(offset_t offset, Position p)
+void FileStream::seek(long long offset, Position p)
 {
   if(!isOpen()) {
     debug("FileStream::seek() -- invalid file.");
@@ -412,7 +412,7 @@ void FileStream::clear()
 #endif
 }
 
-offset_t FileStream::tell() const
+long long FileStream::tell() const
 {
 #ifdef _WIN32
 
@@ -437,7 +437,7 @@ offset_t FileStream::tell() const
 #endif
 }
 
-offset_t FileStream::length()
+long long FileStream::length()
 {
   if(!isOpen()) {
     debug("FileStream::length() -- invalid file.");
@@ -461,10 +461,10 @@ offset_t FileStream::length()
 
 #else
 
-  const offset_t currentPosition = tell();
+  const long long currentPosition = tell();
 
   seek(0, End);
-  offset_t endPosition = tell();
+  long long endPosition = tell();
 
   seek(currentPosition, Beginning);
 
@@ -482,11 +482,11 @@ size_t FileStream::bufferSize()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FileStream::truncate(offset_t length)
+void FileStream::truncate(long long length)
 {
 #ifdef _WIN32
 
-  const offset_t currentPos = tell();
+  const long long currentPos = tell();
 
   seek(length);
 

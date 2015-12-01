@@ -60,7 +60,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle) :
+TrueAudio::AudioProperties::AudioProperties(const ByteVector &data, long long streamLength, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
@@ -121,7 +121,7 @@ int TrueAudio::AudioProperties::ttaVersion() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void TrueAudio::AudioProperties::read(const ByteVector &data, offset_t streamLength)
+void TrueAudio::AudioProperties::read(const ByteVector &data, long long streamLength)
 {
   if(data.size() < 4) {
     debug("TrueAudio::AudioProperties::read() -- data is too short.");

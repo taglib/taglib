@@ -293,7 +293,7 @@ public:
     {
       FLAC::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL((offset_t)4692, f.length());
+      CPPUNIT_ASSERT_EQUAL(4692LL, f.length());
 
       f.seek(0x0100);
       audioStream = f.readBlock(4436);
@@ -301,7 +301,7 @@ public:
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL((offset_t)4820, f.length());
+      CPPUNIT_ASSERT_EQUAL(4820LL, f.length());
 
       f.seek(0x0100);
       CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));

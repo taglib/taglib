@@ -65,7 +65,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-WavPack::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle) :
+WavPack::AudioProperties::AudioProperties(File *file, long long streamLength, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
@@ -153,7 +153,7 @@ namespace
 
 #define FINAL_BLOCK     0x1000
 
-void WavPack::AudioProperties::read(File *file, offset_t streamLength)
+void WavPack::AudioProperties::read(File *file, long long streamLength)
 {
   long offset = 0;
 
@@ -203,9 +203,9 @@ void WavPack::AudioProperties::read(File *file, offset_t streamLength)
   }
 }
 
-TagLib::uint WavPack::AudioProperties::seekFinalIndex(File *file, offset_t streamLength)
+TagLib::uint WavPack::AudioProperties::seekFinalIndex(File *file, long long streamLength)
 {
-  const offset_t offset = file->rfind("wvpk", streamLength);
+  const long long offset = file->rfind("wvpk", streamLength);
   if(offset == -1)
     return 0;
 

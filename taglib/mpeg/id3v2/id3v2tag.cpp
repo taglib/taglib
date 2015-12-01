@@ -76,8 +76,8 @@ namespace
   const DefaultStringHandler defaultStringHandler;
   const TagLib::StringHandler *stringHandler = &defaultStringHandler;
 
-  const offset_t MinPaddingSize = 1024;
-  const offset_t MaxPaddingSize = 1024 * 1024;
+  const long long MinPaddingSize = 1024;
+  const long long MaxPaddingSize = 1024 * 1024;
 }
 
 class ID3v2::Tag::TagPrivate
@@ -99,7 +99,7 @@ public:
   }
 
   File *file;
-  offset_t tagOffset;
+  long long tagOffset;
   const FrameFactory *factory;
 
   Header header;
@@ -121,7 +121,7 @@ ID3v2::Tag::Tag() :
   d->factory = FrameFactory::instance();
 }
 
-ID3v2::Tag::Tag(File *file, offset_t tagOffset, const FrameFactory *factory) :
+ID3v2::Tag::Tag(File *file, long long tagOffset, const FrameFactory *factory) :
   TagLib::Tag(),
   d(new TagPrivate())
 {
@@ -794,7 +794,7 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  offset_t paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
+  long long paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
 
   if(paddingSize <= 0) {
     paddingSize = MinPaddingSize;
@@ -802,7 +802,7 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     // Padding won't increase beyond 1% of the file size or 1MB.
 
-    offset_t threshold = d->file ? d->file->length() / 100 : 0;
+    long long threshold = d->file ? d->file->length() / 100 : 0;
     threshold = std::max(threshold, MinPaddingSize);
     threshold = std::min(threshold, MaxPaddingSize);
 

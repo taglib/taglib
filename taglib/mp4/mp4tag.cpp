@@ -541,7 +541,7 @@ MP4::Tag::updateParents(const AtomList &path, long delta, int ignore)
 }
 
 void
-MP4::Tag::updateOffsets(long delta, offset_t offset)
+MP4::Tag::updateOffsets(long delta, long long offset)
 {
   MP4::Atom *moov = d->atoms->find("moov");
   if(moov) {
@@ -625,11 +625,11 @@ MP4::Tag::saveNew(ByteVector data)
     data = renderAtom("udta", data);
   }
 
-  offset_t offset = path.back()->offset + 8;
+  long long offset = path.back()->offset + 8;
   d->file->insert(data, offset, 0);
 
-  updateParents(path, static_cast<long>(data.size()));
-  updateOffsets(static_cast<long>(data.size()), offset);
+  updateParents(path, data.size());
+  updateOffsets(data.size(), offset);
 }
 
 void
@@ -638,8 +638,8 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   AtomList::ConstIterator it = path.end();
 
   MP4::Atom *ilst = *(--it);
-  offset_t offset = ilst->offset;
-  offset_t length = ilst->length;
+  long long offset = ilst->offset;
+  long long length = ilst->length;
 
   MP4::Atom *meta = *(--it);
   AtomList::ConstIterator index = meta->children.find(ilst);

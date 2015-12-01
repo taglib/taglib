@@ -30,32 +30,32 @@ using namespace TagLib;
 
 class EBML::Element::ElementPrivate
 {
-public:  
+public:
   // The id of this element.
   ulli id;
-  
+
   // The position of the element, where the header begins.
-  offset_t position;
-  
+  long long position;
+
   // The size of the element as read from the header. Note: Actually an ulli but
-  // due to the variable integer size limited, thus offset_t is ok.
-  offset_t size;
-  
+  // due to the variable integer size limited, thus long long is ok.
+  long long size;
+
   // The position of the element's data.
-  offset_t data;
-  
+  long long data;
+
   // The element's children.
   List<Element *> children;
-  
+
   // True: Treated this element as container and read children.
   bool populated;
-  
+
   // The parent element. If NULL (0) this is the document root.
   Element *parent;
-  
+
   // The file used to read and write.
   File *document;
-  
+
   // Destructor: Clean up all children.
   ~ElementPrivate()
   {
@@ -63,36 +63,36 @@ public:
       delete *i;
     }
   }
-  
+
   // Reads a variable length integer from the file at the given position
   // and saves its value to result. If cutOne is true the first one of the
   // binary representation of the result is removed (required for size). If
   // cutOne is false the one will remain in the result (required for id).
   // This method returns the position directly after the read integer.
-  offset_t readVInt(offset_t position, ulli *result, bool cutOne = true)
+  long long readVInt(long long position, ulli *result, bool cutOne = true)
   {
     document->seek(position);
-    
+
     // Determine the length of the integer
     char firstByte = document->readBlock(1)[0];
     uint byteSize = 1;
     for(uint i = 0; i < 8 && ((firstByte << i) & (1 << 7)) == 0; ++i)
       ++byteSize;
-    
+
     // Load the integer
     document->seek(position);
     ByteVector vint = document->readBlock(byteSize);
-    
+
     // Cut the one if requested
     if(cutOne)
       vint[0] = (vint[0] & (~(1 << (8 - byteSize))));
-  
+
     // Store the result and return the current position
     if(result)
       *result = static_cast<ulli>(vint.toInt64BE(0));
     return position + byteSize;
   }
-  
+
   // Returns a BytVector containing the given number in the variable integer
   // format. Truncates numbers > 2^56 (^ means potency in this case).
   // If addOne is true, the ByteVector will remain the One to determine the
@@ -102,7 +102,7 @@ public:
   ByteVector createVInt(ulli number, bool addOne = true, bool shortest = true)
   {
     ByteVector vint = ByteVector::fromUInt64BE(number);
-    
+
     // Do we actually need to calculate the length of the variable length
     // integer? If not, then prepend the 0b0000 0001 if necessary and return the
     // vint.
@@ -111,15 +111,15 @@ public:
         vint[0] = 1;
       return vint;
     }
-    
+
     // Calculate the minimal length of the variable length integer
     size_t byteSize = vint.size();
     for(size_t i = 0; byteSize > 0 && vint[i] == 0; ++i)
       --byteSize;
-    
+
     if(!addOne)
       return ByteVector(vint.data() + vint.size() - byteSize, byteSize);
-    
+
     ulli firstByte = (1 << (vint.size() - byteSize));
     // The most significant byte loses #bytSize bits for storing information.
     // Therefore, we might need to increase byteSize.
@@ -130,11 +130,11 @@ public:
     vint[firstBytePosition] |= (1 << firstBytePosition);
     return ByteVector(vint.data() + firstBytePosition, byteSize);
   }
-  
+
   // Returns a void element within this element which is at least "least" in
   // size. Uses best fit method. Returns a null pointer if no suitable element
   // was found.
-  Element *searchVoid(offset_t least = 0L)
+  Element *searchVoid(long long least = 0L)
   {
     Element *currentBest = 0;
     for(List<Element *>::Iterator i = children.begin(); i != children.end(); ++i) {
@@ -149,7 +149,7 @@ public:
     }
     return currentBest;
   }
-  
+
   // Replaces this element by a Void element. Returns true on success and false
   // on error.
   bool makeVoid()
@@ -168,12 +168,12 @@ public:
     data = position + header.size();
     size = leftSize;
     return true;
-    
+
     // XXX: We actually should merge Voids, if possible.
   }
-  
+
     // Reading constructor: Reads all unknown information from the file.
-  ElementPrivate(File *p_document, Element *p_parent = 0, offset_t p_position = 0) :
+  ElementPrivate(File *p_document, Element *p_parent = 0, long long p_position = 0) :
     id(0),
     position(p_position),
     data(0),
@@ -184,19 +184,19 @@ public:
     if(parent) {
       ulli ssize;
       data = readVInt(readVInt(position, &id, false), &ssize);
-      size = static_cast<offset_t>(ssize);
+      size = static_cast<long long>(ssize);
     }
     else {
       document->seek(0, File::End);
       size = document->tell();
     }
   }
-  
+
   // Writing constructor: Takes given information, calculates missing information
   // and writes everything to the file.
   // Tries to use void elements if available in the parent.
   ElementPrivate(ulli p_id, File *p_document, Element *p_parent,
-    offset_t p_position, offset_t p_size) :
+    long long p_position, long long p_size) :
       id(p_id),
       position(p_position),
       size(p_size),
@@ -209,7 +209,7 @@ public:
     data = position + content.size();
     // space for children
     content.resize(static_cast<size_t>(data - position + size));
-    
+
     Element *freeSpace;
     if (!(freeSpace = searchVoid(content.size()))) {
       // We have to make room
@@ -237,7 +237,7 @@ public:
     else {
       document->seek(freeSpace->d->position);
       if((freeSpace->d->size + freeSpace->d->data - freeSpace->d->position)
-        == static_cast<offset_t>(content.size())) {
+        == static_cast<long long>(content.size())) {
         // Write to file
         document->writeBlock(content);
         // Update parent
@@ -251,9 +251,9 @@ public:
       else {
         ulli newSize = freeSpace->d->size - content.size();
         ByteVector newVoid(createVInt(Void, false).append(createVInt(newSize, true, false)));
-        
+
         // Check if the original size of the size field was really 8 byte
-        if (static_cast<offset_t>(newVoid.size()) != (freeSpace->d->data - freeSpace->d->position))
+        if (static_cast<long long>(newVoid.size()) != (freeSpace->d->data - freeSpace->d->position))
           newVoid = createVInt(Void, false).append(createVInt(newSize));
         // Update freeSpace
         freeSpace->d->size = newSize;
@@ -414,7 +414,7 @@ bool EBML::Element::removeChildren(bool useVoid)
   // in a row where a huge Void would be more appropriate.
   if (d->children.isEmpty())
     return false;
-  
+
   for(List<Element *>::Iterator i = d->children.begin(); i != d->children.end(); ++i)
     removeChild(*i, useVoid);
   return true;
@@ -424,7 +424,7 @@ bool EBML::Element::removeChild(Element *element, bool useVoid)
 {
   if (!d->children.contains(element))
     return false;
-  
+
   if(!useVoid || !element->d->makeVoid()) {
     d->document->removeBlock(element->d->position, static_cast<size_t>(element->d->size));
     // Update parents
@@ -473,9 +473,9 @@ void EBML::Element::populate()
 {
   if(!d->populated) {
     d->populated = true;
-    offset_t end = d->data + d->size;
-    
-    for(offset_t i = d->data; i < end;) {
+    long long end = d->data + d->size;
+
+    for(long long i = d->data; i < end;) {
       Element *elem = new Element(
         new ElementPrivate(d->document, this, i)
       );

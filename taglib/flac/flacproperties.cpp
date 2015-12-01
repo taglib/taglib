@@ -55,7 +55,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::AudioProperties::AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle) :
+FLAC::AudioProperties::AudioProperties(const ByteVector &data, long long streamLength, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
@@ -121,7 +121,7 @@ ByteVector FLAC::AudioProperties::signature() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FLAC::AudioProperties::read(const ByteVector &data, offset_t streamLength)
+void FLAC::AudioProperties::read(const ByteVector &data, long long streamLength)
 {
   if(data.size() < 18) {
     debug("FLAC::AudioProperties::read() - FLAC properties must contain at least 18 bytes.");

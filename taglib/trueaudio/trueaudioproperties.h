@@ -52,7 +52,7 @@ namespace TagLib {
        * Creates an instance of TrueAudio::AudioProperties with the data read from
        * the ByteVector \a data.
        */
-      AudioProperties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(const ByteVector &data, long long streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this TrueAudio::AudioProperties instance.
@@ -115,7 +115,7 @@ namespace TagLib {
       int ttaVersion() const;
 
     private:
-      void read(const ByteVector &data, offset_t streamLength);
+      void read(const ByteVector &data, long long streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

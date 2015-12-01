@@ -1153,7 +1153,7 @@ public:
     {
       MPEG::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL((offset_t)3594, f.length());
+      CPPUNIT_ASSERT_EQUAL(3594LL, f.length());
       CPPUNIT_ASSERT_EQUAL((TagLib::uint)1505, f.ID3v2Tag()->header()->completeTagSize());
       CPPUNIT_ASSERT_EQUAL(String("Artist A"), f.ID3v2Tag()->artist());
       CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());

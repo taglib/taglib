@@ -85,7 +85,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
 
-    offset_t last = f.lastFrameOffset();
+    long long last = f.lastFrameOffset();
 
     f.seek(last);
     MPEG::Header lastHeader(f.readBlock(4));
@@ -98,7 +98,7 @@ public:
       lastHeader = MPEG::Header(f.readBlock(4));
     }
 
-    CPPUNIT_ASSERT_EQUAL((offset_t)28213, last);
+    CPPUNIT_ASSERT_EQUAL(28213LL, last);
     CPPUNIT_ASSERT_EQUAL(209, lastHeader.frameLength());
   }
 
@@ -199,20 +199,20 @@ public:
     {
       MPEG::File f(TEST_FILE_PATH_C("ape.mp3"));
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)0x0000, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL((offset_t)0x1FD6, f.lastFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(0x0000LL, f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(0x1FD6LL, f.lastFrameOffset());
     }
     {
       MPEG::File f(TEST_FILE_PATH_C("ape-id3v1.mp3"));
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)0x0000, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL((offset_t)0x1FD6, f.lastFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(0x0000LL, f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(0x1FD6LL, f.lastFrameOffset());
     }
     {
       MPEG::File f(TEST_FILE_PATH_C("ape-id3v2.mp3"));
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)0x041A, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL((offset_t)0x23F0, f.lastFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(0x041ALL, f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(0x23F0LL, f.lastFrameOffset());
     }
   }
 

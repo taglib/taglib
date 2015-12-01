@@ -72,7 +72,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPC::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle) :
+MPC::AudioProperties::AudioProperties(File *file, long long streamLength, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
@@ -202,7 +202,7 @@ namespace
   const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 }
 
-void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
+void MPC::AudioProperties::readSV8(File *file, long long streamLength)
 {
   bool readSH = false, readRG = false;
 
@@ -295,7 +295,7 @@ void MPC::AudioProperties::readSV8(File *file, offset_t streamLength)
   }
 }
 
-void MPC::AudioProperties::readSV7(const ByteVector &data, offset_t streamLength)
+void MPC::AudioProperties::readSV7(const ByteVector &data, long long streamLength)
 {
   if(data.startsWith("MP+")) {
     d->version = data[3] & 15;

@@ -123,7 +123,7 @@ namespace TagLib {
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
        */
-      offset_t streamLength();
+      long long streamLength();
 
       /*!
        * Returns whether or not the file on disk actually has a XiphComment.

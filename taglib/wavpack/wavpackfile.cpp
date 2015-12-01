@@ -63,10 +63,10 @@ public:
     delete properties;
   }
 
-  offset_t APELocation;
+  long long APELocation;
   uint APESize;
 
-  offset_t ID3v1Location;
+  long long ID3v1Location;
 
   DoubleTagUnion tag;
 
@@ -259,7 +259,7 @@ void WavPack::File::read(bool readProperties)
 
   if(readProperties) {
 
-    offset_t streamLength;
+    long long streamLength;
 
     if(d->hasAPE)
       streamLength = d->APELocation;

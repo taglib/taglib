@@ -72,13 +72,13 @@ public:
     delete properties;
   }
 
-  offset_t APELocation;
+  long long APELocation;
   uint APESize;
 
-  offset_t ID3v1Location;
+  long long ID3v1Location;
 
   ID3v2::Header *ID3v2Header;
-  offset_t ID3v2Location;
+  long long ID3v2Location;
   uint ID3v2Size;
 
   DoubleTagUnion tag;
@@ -284,7 +284,7 @@ void APE::File::read(bool readProperties)
 
   if(readProperties) {
 
-    offset_t streamLength;
+    long long streamLength;
 
     if(d->hasAPE)
       streamLength = d->APELocation;

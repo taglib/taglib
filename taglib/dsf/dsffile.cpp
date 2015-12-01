@@ -143,7 +143,7 @@ bool DSF::File::save()
     }
 
     // Delete the old tag and write the new one
-    insert(tagData, static_cast<offset_t>(newMetadataOffset), static_cast<size_t>(oldTagSize));
+    insert(tagData, newMetadataOffset, static_cast<size_t>(oldTagSize));
   }
 
   return true;

@@ -37,7 +37,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
 
       f.seek(0, File::End);
-      CPPUNIT_ASSERT_EQUAL((offset_t)9134, f.tell());
+      CPPUNIT_ASSERT_EQUAL(9134LL, f.tell());
     }
   }
 
@@ -64,7 +64,7 @@ public:
     {
       Ogg::FLAC::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)141141, f.length());
+      CPPUNIT_ASSERT_EQUAL(141141LL, f.length());
       CPPUNIT_ASSERT_EQUAL(21, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)51, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)131126, f.packet(1).size());
@@ -81,7 +81,7 @@ public:
     {
       Ogg::FLAC::File f(newname.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((offset_t)9128, f.length());
+      CPPUNIT_ASSERT_EQUAL(9128LL, f.length());
       CPPUNIT_ASSERT_EQUAL(5, f.lastPageHeader()->pageSequenceNumber());
       CPPUNIT_ASSERT_EQUAL((size_t)51, f.packet(0).size());
       CPPUNIT_ASSERT_EQUAL((size_t)59, f.packet(1).size());

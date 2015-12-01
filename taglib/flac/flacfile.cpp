@@ -78,10 +78,10 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  offset_t ID3v2Location;
+  long long ID3v2Location;
   uint ID3v2OriginalSize;
 
-  offset_t ID3v1Location;
+  long long ID3v1Location;
 
   TripleTagUnion tag;
 
@@ -89,8 +89,8 @@ public:
   ByteVector xiphCommentData;
   List<MetadataBlock *> blocks;
 
-  offset_t flacStart;
-  offset_t streamStart;
+  long long flacStart;
+  long long streamStart;
   bool scanned;
 
   bool hasXiphComment;
@@ -372,7 +372,7 @@ void FLAC::File::read(bool readProperties)
 
     const ByteVector infoData = d->blocks.front()->render();
 
-    offset_t streamLength;
+    long long streamLength;
 
     if(d->hasID3v1)
       streamLength = d->ID3v1Location - d->streamStart;
@@ -393,7 +393,7 @@ void FLAC::File::scan()
   if(!isValid())
     return;
 
-  offset_t nextBlockOffset;
+  long long nextBlockOffset;
 
   if(d->hasID3v2)
     nextBlockOffset = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize);

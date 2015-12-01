@@ -54,7 +54,7 @@ namespace TagLib {
       /*!
        * Creates an instance of WavPack::AudioProperties.
        */
-      AudioProperties(File *file, offset_t streamLength, ReadStyle style = Average);
+      AudioProperties(File *file, long long streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this WavPack::AudioProperties instance.
@@ -122,8 +122,8 @@ namespace TagLib {
       int version() const;
 
     private:
-      void read(File *file, offset_t streamLength);
-      uint seekFinalIndex(File *file, offset_t streamLength);
+      void read(File *file, long long streamLength);
+      uint seekFinalIndex(File *file, long long streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

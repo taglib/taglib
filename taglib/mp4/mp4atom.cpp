@@ -142,7 +142,7 @@ MP4::Atoms::Atoms(File *file)
   atoms.setAutoDelete(true);
 
   file->seek(0, File::End);
-  offset_t end = file->tell();
+  long long end = file->tell();
   file->seek(0);
   while(file->tell() + 8 <= end) {
     MP4::Atom *atom = new MP4::Atom(file);

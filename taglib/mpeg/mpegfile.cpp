@@ -86,14 +86,14 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
-  offset_t ID3v2Location;
+  long long ID3v2Location;
   uint ID3v2OriginalSize;
 
-  offset_t APELocation;
-  offset_t APEFooterLocation;
+  long long APELocation;
+  long long APEFooterLocation;
   uint APEOriginalSize;
 
-  offset_t ID3v1Location;
+  long long ID3v1Location;
 
   TripleTagUnion tag;
 
@@ -352,7 +352,7 @@ void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
   d->ID3v2FrameFactory = factory;
 }
 
-offset_t MPEG::File::nextFrameOffset(offset_t position)
+long long MPEG::File::nextFrameOffset(long long position)
 {
   bool foundLastSyncPattern = false;
 
@@ -378,13 +378,13 @@ offset_t MPEG::File::nextFrameOffset(offset_t position)
   }
 }
 
-offset_t MPEG::File::previousFrameOffset(offset_t position)
+long long MPEG::File::previousFrameOffset(long long position)
 {
   bool foundFirstSyncPattern = false;
   ByteVector buffer;
 
   while (position > 0) {
-    size_t size = position < static_cast<offset_t>(bufferSize())
+    size_t size = position < static_cast<long long>(bufferSize())
       ? static_cast<size_t>(position) : bufferSize();
     position -= size;
 
@@ -407,9 +407,9 @@ offset_t MPEG::File::previousFrameOffset(offset_t position)
   return -1;
 }
 
-offset_t MPEG::File::firstFrameOffset()
+long long MPEG::File::firstFrameOffset()
 {
-  offset_t position = 0;
+  long long position = 0;
 
   if(hasID3v2Tag())
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
@@ -417,9 +417,9 @@ offset_t MPEG::File::firstFrameOffset()
   return nextFrameOffset(position);
 }
 
-offset_t MPEG::File::lastFrameOffset()
+long long MPEG::File::lastFrameOffset()
 {
-  offset_t position;
+  long long position;
 
   if(hasAPETag())
     position = d->APELocation - 1;
@@ -497,7 +497,7 @@ void MPEG::File::read(bool readProperties)
   ID3v1Tag(true);
 }
 
-offset_t MPEG::File::findID3v2()
+long long MPEG::File::findID3v2()
 {
   if(!isValid())
     return -1;
@@ -522,22 +522,22 @@ offset_t MPEG::File::findID3v2()
   // at the beginning of the file.
   // We don't care about the inefficiency of the code, since this is a seldom case.
 
-  const offset_t tagOffset = find(headerID);
+  const long long tagOffset = find(headerID);
   if(tagOffset < 0)
     return -1;
 
-  const offset_t frameOffset = firstFrameOffset();
+  const long long frameOffset = firstFrameOffset();
   if(frameOffset < tagOffset)
     return -1;
 
   return tagOffset;
 }
 
-offset_t MPEG::File::findID3v1()
+long long MPEG::File::findID3v1()
 {
   if(isValid()) {
     seek(-128, End);
-    offset_t p = tell();
+    long long p = tell();
 
     if(readBlock(3) == ID3v1::Tag::fileIdentifier())
       return p;
@@ -550,7 +550,7 @@ void MPEG::File::findAPE()
   if(isValid()) {
     seek(d->hasID3v1 ? -160 : -32, End);
 
-    offset_t p = tell();
+    long long p = tell();
 
     if(readBlock(8) == APE::Tag::fileIdentifier()) {
       d->APEFooterLocation = p;

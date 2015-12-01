@@ -63,7 +63,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::AudioProperties::AudioProperties(File *file, offset_t streamLength, ReadStyle) :
+APE::AudioProperties::AudioProperties(File *file, long long streamLength, ReadStyle) :
   TagLib::AudioProperties(),
   d(new PropertiesPrivate())
 {
@@ -135,10 +135,10 @@ namespace
   }
 }
 
-void APE::AudioProperties::read(File *file, offset_t streamLength)
+void APE::AudioProperties::read(File *file, long long streamLength)
 {
   // First, we assume that the file pointer is set at the first descriptor.
-  offset_t offset = file->tell();
+  long long offset = file->tell();
   int version = headerVersion(file->readBlock(6));
 
   // Next, we look for the descriptor.

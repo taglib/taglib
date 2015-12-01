@@ -40,7 +40,7 @@ public:
   ByteVectorStreamPrivate(const ByteVector &data);
 
   ByteVector data;
-  offset_t position;
+  long long position;
 };
 
 ByteVectorStream::ByteVectorStreamPrivate::ByteVectorStreamPrivate(const ByteVector &data) :
@@ -81,14 +81,14 @@ ByteVector ByteVectorStream::readBlock(size_t length)
 void ByteVectorStream::writeBlock(const ByteVector &data)
 {
   const size_t size = data.size();
-  if(static_cast<offset_t>(d->position + size) > length())
+  if(static_cast<long long>(d->position + size) > length())
     truncate(d->position + size);
-  
+
   ::memcpy(d->data.data() + d->position, data.data(), size);
   d->position += size;
 }
 
-void ByteVectorStream::insert(const ByteVector &data, offset_t start, size_t replace)
+void ByteVectorStream::insert(const ByteVector &data, long long start, size_t replace)
 {
   if(data.size() < replace) {
     removeBlock(start + data.size(), replace - data.size());
@@ -100,23 +100,23 @@ void ByteVectorStream::insert(const ByteVector &data, offset_t start, size_t rep
     const size_t readPosition  = static_cast<size_t>(start + replace);
     const size_t writePosition = static_cast<size_t>(start + data.size());
     ::memmove(
-      d->data.data() + writePosition, 
-      d->data.data() + readPosition, 
+      d->data.data() + writePosition,
+      d->data.data() + readPosition,
       static_cast<size_t>(length() - sizeDiff - readPosition));
   }
   seek(start);
   writeBlock(data);
 }
 
-void ByteVectorStream::removeBlock(offset_t start, size_t length)
+void ByteVectorStream::removeBlock(long long start, size_t length)
 {
-  const offset_t readPosition  = start + length;
-  offset_t writePosition = start;
+  const long long readPosition  = start + length;
+  long long writePosition = start;
   if(readPosition < ByteVectorStream::length()) {
     size_t bytesToMove = static_cast<size_t>(ByteVectorStream::length() - readPosition);
     ::memmove(
-      d->data.data() + static_cast<ptrdiff_t>(writePosition), 
-      d->data.data() + static_cast<ptrdiff_t>(readPosition), 
+      d->data.data() + static_cast<ptrdiff_t>(writePosition),
+      d->data.data() + static_cast<ptrdiff_t>(readPosition),
       bytesToMove);
     writePosition += bytesToMove;
   }
@@ -134,7 +134,7 @@ bool ByteVectorStream::isOpen() const
   return true;
 }
 
-void ByteVectorStream::seek(offset_t offset, Position p)
+void ByteVectorStream::seek(long long offset, Position p)
 {
   switch(p) {
   case Beginning:
@@ -153,19 +153,19 @@ void ByteVectorStream::clear()
 {
 }
 
-offset_t ByteVectorStream::tell() const
+long long ByteVectorStream::tell() const
 {
   return d->position;
 }
 
-offset_t ByteVectorStream::length()
+long long ByteVectorStream::length()
 {
-  return static_cast<offset_t>(d->data.size());
+  return static_cast<long long>(d->data.size());
 }
 
-void ByteVectorStream::truncate(offset_t length)
+void ByteVectorStream::truncate(long long length)
 {
-  d->data.resize(static_cast<uint>(length));
+  d->data.resize(static_cast<size_t>(length));
 }
 
 ByteVector *ByteVectorStream::data()

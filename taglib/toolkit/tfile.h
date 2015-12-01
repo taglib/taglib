@@ -158,9 +158,9 @@ namespace TagLib {
      * \note This has the practical limitation that \a pattern can not be longer
      * than the buffer size used by readBlock().  Currently this is 1024 bytes.
      */
-    offset_t find(const ByteVector &pattern,
-              offset_t fromOffset = 0,
-              const ByteVector &before = ByteVector());
+    long long find(const ByteVector &pattern,
+                   long long fromOffset = 0,
+                   const ByteVector &before = ByteVector());
 
     /*!
      * Returns the offset in the file that \a pattern occurs at or -1 if it can
@@ -174,9 +174,9 @@ namespace TagLib {
      * \note This has the practical limitation that \a pattern can not be longer
      * than the buffer size used by readBlock().  Currently this is 1024 bytes.
      */
-    offset_t rfind(const ByteVector &pattern,
-               offset_t fromOffset = 0,
-               const ByteVector &before = ByteVector());
+    long long rfind(const ByteVector &pattern,
+                    long long fromOffset = 0,
+                    const ByteVector &before = ByteVector());
 
     /*!
      * Insert \a data at position \a start in the file overwriting \a replace
@@ -185,7 +185,7 @@ namespace TagLib {
      * \note This method is slow since it requires rewriting all of the file
      * after the insertion point.
      */
-    void insert(const ByteVector &data, offset_t start = 0, size_t replace = 0);
+    void insert(const ByteVector &data, long long start = 0, size_t replace = 0);
 
     /*!
      * Removes a block of the file starting a \a start and continuing for
@@ -194,7 +194,7 @@ namespace TagLib {
      * \note This method is slow since it involves rewriting all of the file
      * after the removed portion.
      */
-    void removeBlock(offset_t start = 0, size_t length = 0);
+    void removeBlock(long long start = 0, size_t length = 0);
 
     /*!
      * Returns true if the file is read only (or if the file can not be opened).
@@ -218,7 +218,7 @@ namespace TagLib {
      *
      * \see Position
      */
-    void seek(offset_t offset, Position p = Beginning);
+    void seek(long long offset, Position p = Beginning);
 
     /*!
      * Reset the end-of-file and error flags on the file.
@@ -228,12 +228,12 @@ namespace TagLib {
     /*!
      * Returns the current offset within the file.
      */
-    offset_t tell() const;
+    long long tell() const;
 
     /*!
      * Returns the length of the file.
      */
-    offset_t length();
+    long long length();
 
     /*!
      * Returns description of the audio file and its tags.
@@ -270,7 +270,7 @@ namespace TagLib {
     /*!
      * Truncates the file to a \a length.
      */
-    void truncate(offset_t length);
+    void truncate(long long length);
 
     /*!
      * Returns the buffer size that is used for internal buffering.

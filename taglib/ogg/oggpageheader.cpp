@@ -39,7 +39,7 @@ using namespace TagLib;
 class Ogg::PageHeader::PageHeaderPrivate
 {
 public:
-  PageHeaderPrivate(File *f, offset_t pageOffset) :
+  PageHeaderPrivate(File *f, long long pageOffset) :
     file(f),
     fileOffset(pageOffset),
     isValid(false),
@@ -55,7 +55,7 @@ public:
     {}
 
   File *file;
-  offset_t fileOffset;
+  long long fileOffset;
   bool isValid;
   List<int> packetSizes;
   bool firstPacketContinued;
@@ -73,7 +73,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::PageHeader::PageHeader(Ogg::File *file, offset_t pageOffset)
+Ogg::PageHeader::PageHeader(Ogg::File *file, long long pageOffset)
 {
   d = new PageHeaderPrivate(file, pageOffset);
   if(file && pageOffset >= 0)

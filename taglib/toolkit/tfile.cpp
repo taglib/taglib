@@ -119,14 +119,14 @@ void File::writeBlock(const ByteVector &data)
   d->stream()->writeBlock(data);
 }
 
-offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVector &before)
+long long File::find(const ByteVector &pattern, long long fromOffset, const ByteVector &before)
 {
   if(!d->stream() || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
 
-  offset_t bufferOffset = fromOffset;
+  long long bufferOffset = fromOffset;
 
   // These variables are used to keep track of a partial match that happens at
   // the end of a buffer.
@@ -137,7 +137,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
 
-  offset_t originalPosition = tell();
+  long long originalPosition = tell();
 
   // Start the search at the offset.
 
@@ -223,7 +223,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 }
 
 
-offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteVector &before)
+long long File::rfind(const ByteVector &pattern, long long fromOffset, const ByteVector &before)
 {
   if(!d->stream() || pattern.size() > bufferSize())
       return -1;
@@ -231,15 +231,15 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
 
-  offset_t originalPosition = tell();
+  long long originalPosition = tell();
 
   // Start the search at the offset.
 
   if(fromOffset == 0)
     fromOffset = length();
 
-  offset_t bufferLength = bufferSize();
-  offset_t bufferOffset = fromOffset + pattern.size();
+  long long bufferLength = bufferSize();
+  long long bufferOffset = fromOffset + pattern.size();
 
   // See the notes in find() for an explanation of this algorithm.
 
@@ -285,12 +285,12 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
   return -1;
 }
 
-void File::insert(const ByteVector &data, offset_t start, size_t replace)
+void File::insert(const ByteVector &data, long long start, size_t replace)
 {
   d->stream()->insert(data, start, replace);
 }
 
-void File::removeBlock(offset_t start, size_t length)
+void File::removeBlock(long long start, size_t length)
 {
   d->stream()->removeBlock(start, length);
 }
@@ -310,12 +310,12 @@ bool File::isValid() const
   return isOpen() && d->valid;
 }
 
-void File::seek(offset_t offset, Position p)
+void File::seek(long long offset, Position p)
 {
   d->stream()->seek(offset, IOStream::Position(p));
 }
 
-void File::truncate(offset_t length)
+void File::truncate(long long length)
 {
   d->stream()->truncate(length);
 }
@@ -325,12 +325,12 @@ void File::clear()
   d->stream()->clear();
 }
 
-offset_t File::tell() const
+long long File::tell() const
 {
   return d->stream()->tell();
 }
 
-offset_t File::length()
+long long File::length()
 {
   return d->stream()->length();
 }
