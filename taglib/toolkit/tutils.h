@@ -134,7 +134,7 @@ namespace TagLib
     /*!
      * Reverses the order of bytes in an 64-bit integer.
      */
-    inline ulonglong byteSwap(ulonglong x)
+    inline unsigned long long byteSwap(unsigned long long x)
     {
 #if defined(HAVE_BOOST_BYTESWAP)
 

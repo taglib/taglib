@@ -252,7 +252,7 @@ void RIFF::File::read()
       break;
     }
 
-    if(static_cast<ulonglong>(tell()) + chunkSize > static_cast<ulonglong>(length())) {
+    if(static_cast<long long>(tell()) + chunkSize > length()) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
       setValid(false);
       break;
@@ -278,8 +278,8 @@ void RIFF::File::read()
         chunk.padding = 1;
       }
     }
-    d->chunks.push_back(chunk);
 
+    d->chunks.push_back(chunk);
   }
 }
 
