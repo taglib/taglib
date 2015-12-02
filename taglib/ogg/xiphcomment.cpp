@@ -441,7 +441,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     pos += commentLength;
 
     // Don't go past data end
-    if (pos > data.size())
+    if(pos > data.size())
       break;
 
     // Handle Pictures separately
@@ -452,7 +452,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
         // Decode base64 picture data
         ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
-        if (picturedata.size()) {
+        if(picturedata.size()) {
 
           // Decode Flac Picture
           FLAC::Picture * picture = new FLAC::Picture();
@@ -478,7 +478,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     }
 
     // Handle old picture standard
-    if (entry.startsWith("COVERART=")) {
+    if(entry.startsWith("COVERART=")) {
 
       if((entry.size() - 9) > 3 && ((entry.size() - 9) % 4) == 0) {
 
@@ -507,7 +507,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
     // Check for field separator
     int sep = entry.find('=');
-    if (sep < 1) {
+    if(sep < 1) {
       debug("Discarding invalid comment field.");
       continue;
     }
