@@ -46,15 +46,15 @@ public:
   {
   }
 
-  int    channels;
-  ushort lengthInPatterns;
-  ushort instrumentCount;
-  ushort sampleCount;
-  ushort patternCount;
-  ushort version;
-  ushort compatibleVersion;
-  ushort flags;
-  ushort special;
+  int            channels;
+  unsigned short lengthInPatterns;
+  unsigned short instrumentCount;
+  unsigned short sampleCount;
+  unsigned short patternCount;
+  unsigned short version;
+  unsigned short compatibleVersion;
+  unsigned short flags;
+  unsigned short special;
   unsigned char  globalVolume;
   unsigned char  mixVolume;
   unsigned char  tempo;
@@ -104,7 +104,7 @@ int IT::Properties::channels() const
   return d->channels;
 }
 
-TagLib::ushort IT::Properties::lengthInPatterns() const
+unsigned short IT::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -114,37 +114,37 @@ bool IT::Properties::stereo() const
   return d->flags & Stereo;
 }
 
-TagLib::ushort IT::Properties::instrumentCount() const
+unsigned short IT::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-TagLib::ushort IT::Properties::sampleCount() const
+unsigned short IT::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-TagLib::ushort IT::Properties::patternCount() const
+unsigned short IT::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-TagLib::ushort IT::Properties::version() const
+unsigned short IT::Properties::version() const
 {
   return d->version;
 }
 
-TagLib::ushort IT::Properties::compatibleVersion() const
+unsigned short IT::Properties::compatibleVersion() const
 {
   return d->compatibleVersion;
 }
 
-TagLib::ushort IT::Properties::flags() const
+unsigned short IT::Properties::flags() const
 {
   return d->flags;
 }
 
-TagLib::ushort IT::Properties::special() const
+unsigned short IT::Properties::special() const
 {
   return d->special;
 }
@@ -184,42 +184,42 @@ void IT::Properties::setChannels(int channels)
   d->channels = channels;
 }
 
-void IT::Properties::setLengthInPatterns(ushort lengthInPatterns)
+void IT::Properties::setLengthInPatterns(unsigned short lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }
 
-void IT::Properties::setInstrumentCount(ushort instrumentCount)
+void IT::Properties::setInstrumentCount(unsigned short instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void IT::Properties::setSampleCount(ushort sampleCount)
+void IT::Properties::setSampleCount(unsigned short sampleCount)
 {
   d->sampleCount = sampleCount;
 }
 
-void IT::Properties::setPatternCount(ushort patternCount)
+void IT::Properties::setPatternCount(unsigned short patternCount)
 {
   d->patternCount = patternCount;
 }
 
-void IT::Properties::setFlags(ushort flags)
+void IT::Properties::setFlags(unsigned short flags)
 {
   d->flags = flags;
 }
 
-void IT::Properties::setSpecial(ushort special)
+void IT::Properties::setSpecial(unsigned short special)
 {
   d->special = special;
 }
 
-void IT::Properties::setCompatibleVersion(ushort compatibleVersion)
+void IT::Properties::setCompatibleVersion(unsigned short compatibleVersion)
 {
   d->compatibleVersion = compatibleVersion;
 }
 
-void IT::Properties::setVersion(ushort version)
+void IT::Properties::setVersion(unsigned short version)
 {
   d->version = version;
 }

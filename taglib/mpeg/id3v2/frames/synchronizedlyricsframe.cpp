@@ -171,7 +171,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
    */
   String::Type encWithEndianness = d->textEncoding;
   if(d->textEncoding == String::UTF16) {
-    ushort bom = data.toUShort(6, true);
+    unsigned short bom = data.toUShort(6, true);
     if(bom == 0xfffe) {
       encWithEndianness = String::UTF16LE;
     } else if(bom == 0xfeff) {
@@ -184,7 +184,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     String::Type enc = d->textEncoding;
     // If a UTF16 string has no BOM, use the encoding found above.
     if(enc == String::UTF16 && pos + 1 < end) {
-      ushort bom = data.toUShort(pos, true);
+      unsigned short bom = data.toUShort(pos, true);
       if(bom != 0xfffe && bom != 0xfeff) {
         enc = encWithEndianness;
       }

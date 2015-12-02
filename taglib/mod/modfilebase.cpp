@@ -61,7 +61,7 @@ void Mod::FileBase::writeByte(unsigned char byte)
   writeBlock(data);
 }
 
-void Mod::FileBase::writeU16L(ushort number)
+void Mod::FileBase::writeU16L(unsigned short number)
 {
   writeBlock(ByteVector::fromShort(number, false));
 }
@@ -71,7 +71,7 @@ void Mod::FileBase::writeU32L(ulong number)
   writeBlock(ByteVector::fromUInt(number, false));
 }
 
-void Mod::FileBase::writeU16B(ushort number)
+void Mod::FileBase::writeU16B(unsigned short number)
 {
   writeBlock(ByteVector::fromShort(number, true));
 }
@@ -89,7 +89,7 @@ bool Mod::FileBase::readByte(unsigned char &byte)
   return true;
 }
 
-bool Mod::FileBase::readU16L(ushort &number)
+bool Mod::FileBase::readU16L(unsigned short &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;
@@ -104,7 +104,7 @@ bool Mod::FileBase::readU32L(ulong &number) {
   return true;
 }
 
-bool Mod::FileBase::readU16B(ushort &number)
+bool Mod::FileBase::readU16B(unsigned short &number)
 {
   ByteVector data(readBlock(2));
   if(data.size() < 2) return false;

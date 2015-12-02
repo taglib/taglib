@@ -35,7 +35,7 @@ namespace TagLib
   namespace ASF
   {
 
-    inline ushort readWORD(File *file, bool *ok = 0)
+    inline unsigned short readWORD(File *file, bool *ok = 0)
     {
       const ByteVector v = file->readBlock(2);
       if(v.size() != 2) {

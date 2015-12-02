@@ -42,16 +42,16 @@ namespace TagLib {
 
       void writeString(const String &s, ulong size, char padding = 0);
       void writeByte(unsigned char byte);
-      void writeU16L(ushort number);
+      void writeU16L(unsigned short number);
       void writeU32L(ulong number);
-      void writeU16B(ushort number);
+      void writeU16B(unsigned short number);
       void writeU32B(ulong number);
 
       bool readString(String &s, ulong size);
       bool readByte(unsigned char &byte);
-      bool readU16L(ushort &number);
+      bool readU16L(unsigned short &number);
       bool readU32L(ulong &number);
-      bool readU16B(ushort &number);
+      bool readU16B(unsigned short &number);
       bool readU32B(ulong &number);
     };
 

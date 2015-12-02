@@ -138,7 +138,7 @@ void Opus::Properties::read(File *file)
   pos += 1;
 
   // *Pre-skip* (16 bits, unsigned, little endian)
-  const ushort preSkip = data.toUShort(pos, false);
+  const unsigned short preSkip = data.toUShort(pos, false);
   pos += 2;
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)

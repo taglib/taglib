@@ -59,7 +59,7 @@ namespace TagLib
     /*!
      * Reverses the order of bytes in an 16-bit integer.
      */
-    inline ushort byteSwap(ushort x)
+    inline unsigned short byteSwap(unsigned short x)
     {
 #if defined(HAVE_BOOST_BYTESWAP)
 

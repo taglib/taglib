@@ -96,9 +96,9 @@ bool IT::File::save()
 
   seek(2, Current);
 
-  ushort length = 0;
-  ushort instrumentCount = 0;
-  ushort sampleCount = 0;
+  unsigned short length = 0;
+  unsigned short instrumentCount = 0;
+  unsigned short sampleCount = 0;
 
   if(!readU16L(length) || !readU16L(instrumentCount) || !readU16L(sampleCount))
     return false;
@@ -107,7 +107,7 @@ bool IT::File::save()
 
   // write comment as instrument and sample names:
   StringList lines = d->tag.comment().split("\n");
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(unsigned short i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
     ulong instrumentOffset = 0;
     if(!readU32L(instrumentOffset))
@@ -122,7 +122,7 @@ bool IT::File::save()
     writeByte(0);
   }
 
-  for(ushort i = 0; i < sampleCount; ++ i) {
+  for(unsigned short i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     ulong sampleOffset = 0;
     if(!readU32L(sampleOffset))
@@ -149,8 +149,8 @@ bool IT::File::save()
     message.resize(7999);
   message.append((char)0);
 
-  ushort special = 0;
-  ushort messageLength = 0;
+  unsigned short special = 0;
+  unsigned short messageLength = 0;
   ulong  messageOffset = 0;
 
   seek(46);
@@ -259,8 +259,8 @@ void IT::File::read(bool)
   d->properties.setChannels(channels);
 
   // real length might be shorter because of skips and terminator
-  ushort realLength = 0;
-  for(ushort i = 0; i < length; ++ i) {
+  unsigned short realLength = 0;
+  for(unsigned short i = 0; i < length; ++ i) {
     READ_BYTE_AS(order);
     if(order == 255) break;
     if(order != 254) ++ realLength;
@@ -274,7 +274,7 @@ void IT::File::read(bool)
   //       Currently I just discard anything after a nil, but
   //       e.g. VLC seems to interprete a nil as a space. I
   //       don't know what is the proper behaviour.
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(unsigned short i = 0; i < instrumentCount; ++ i) {
     seek(192L + length + ((long)i << 2));
     READ_U32L_AS(instrumentOffset);
     seek(instrumentOffset);
@@ -290,7 +290,7 @@ void IT::File::read(bool)
     comment.append(instrumentName);
   }
 
-  for(ushort i = 0; i < sampleCount; ++ i) {
+  for(unsigned short i = 0; i < sampleCount; ++ i) {
     seek(192L + length + ((long)instrumentCount << 2) + ((long)i << 2));
     READ_U32L_AS(sampleOffset);
 

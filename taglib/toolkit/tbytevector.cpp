@@ -364,7 +364,7 @@ ByteVector ByteVector::fromUInt(uint value, bool mostSignificantByteFirst)
 
 ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
 {
-  return fromNumber<ushort>(value, mostSignificantByteFirst);
+  return fromNumber<unsigned short>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)

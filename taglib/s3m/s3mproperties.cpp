@@ -43,14 +43,14 @@ public:
   {
   }
 
-  ushort lengthInPatterns;
-  int    channels;
-  bool   stereo;
-  ushort sampleCount;
-  ushort patternCount;
-  ushort flags;
-  ushort trackerVersion;
-  ushort fileFormatVersion;
+  unsigned short lengthInPatterns;
+  int            channels;
+  bool           stereo;
+  unsigned short sampleCount;
+  unsigned short patternCount;
+  unsigned short flags;
+  unsigned short trackerVersion;
+  unsigned short fileFormatVersion;
   unsigned char  globalVolume;
   unsigned char  masterVolume;
   unsigned char  tempo;
@@ -98,7 +98,7 @@ int S3M::Properties::channels() const
   return d->channels;
 }
 
-TagLib::ushort S3M::Properties::lengthInPatterns() const
+unsigned short S3M::Properties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -108,27 +108,27 @@ bool S3M::Properties::stereo() const
   return d->stereo;
 }
 
-TagLib::ushort S3M::Properties::sampleCount() const
+unsigned short S3M::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-TagLib::ushort S3M::Properties::patternCount() const
+unsigned short S3M::Properties::patternCount() const
 {
   return d->patternCount;
 }
 
-TagLib::ushort S3M::Properties::flags() const
+unsigned short S3M::Properties::flags() const
 {
   return d->flags;
 }
 
-TagLib::ushort S3M::Properties::trackerVersion() const
+unsigned short S3M::Properties::trackerVersion() const
 {
   return d->trackerVersion;
 }
 
-TagLib::ushort S3M::Properties::fileFormatVersion() const
+unsigned short S3M::Properties::fileFormatVersion() const
 {
   return d->fileFormatVersion;
 }
@@ -153,7 +153,7 @@ unsigned char S3M::Properties::bpmSpeed() const
   return d->bpmSpeed;
 }
 
-void S3M::Properties::setLengthInPatterns(ushort lengthInPatterns)
+void S3M::Properties::setLengthInPatterns(unsigned short lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }
@@ -168,27 +168,27 @@ void S3M::Properties::setStereo(bool stereo)
   d->stereo = stereo;
 }
 
-void S3M::Properties::setSampleCount(ushort sampleCount)
+void S3M::Properties::setSampleCount(unsigned short sampleCount)
 {
   d->sampleCount = sampleCount;
 }
 
-void S3M::Properties::setPatternCount(ushort patternCount)
+void S3M::Properties::setPatternCount(unsigned short patternCount)
 {
   d->patternCount = patternCount;
 }
 
-void S3M::Properties::setFlags(ushort flags)
+void S3M::Properties::setFlags(unsigned short flags)
 {
   d->flags = flags;
 }
 
-void S3M::Properties::setTrackerVersion(ushort trackerVersion)
+void S3M::Properties::setTrackerVersion(unsigned short trackerVersion)
 {
   d->trackerVersion = trackerVersion;
 }
 
-void S3M::Properties::setFileFormatVersion(ushort fileFormatVersion)
+void S3M::Properties::setFileFormatVersion(unsigned short fileFormatVersion)
 {
   d->fileFormatVersion = fileFormatVersion;
 }

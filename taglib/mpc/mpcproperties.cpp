@@ -253,7 +253,7 @@ void MPC::Properties::readSV8(File *file, long streamLength)
         break;
       }
 
-      const ushort flags = data.toUShort(pos, true);
+      const unsigned short flags = data.toUShort(pos, true);
       pos += 2;
 
       d->sampleRate = sftable[(flags >> 13) & 0x07];

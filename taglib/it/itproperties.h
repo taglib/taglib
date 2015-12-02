@@ -58,15 +58,15 @@ namespace TagLib {
       int sampleRate()           const;
       int channels()             const;
 
-      ushort lengthInPatterns()  const;
-      bool   stereo()            const;
-      ushort instrumentCount()   const;
-      ushort sampleCount()       const;
-      ushort patternCount()      const;
-      ushort version()           const;
-      ushort compatibleVersion() const;
-      ushort flags()             const;
-      ushort special()           const;
+      unsigned short lengthInPatterns()  const;
+      bool           stereo()            const;
+      unsigned short instrumentCount()   const;
+      unsigned short sampleCount()       const;
+      unsigned short patternCount()      const;
+      unsigned short version()           const;
+      unsigned short compatibleVersion() const;
+      unsigned short flags()             const;
+      unsigned short special()           const;
       unsigned char  globalVolume()      const;
       unsigned char  mixVolume()         const;
       unsigned char  tempo()             const;
@@ -75,14 +75,14 @@ namespace TagLib {
       unsigned char  pitchWheelDepth()   const;
 
       void setChannels(int channels);
-      void setLengthInPatterns(ushort lengthInPatterns);
-      void setInstrumentCount(ushort instrumentCount);
-      void setSampleCount (ushort sampleCount);
-      void setPatternCount(ushort patternCount);
-      void setVersion     (ushort version);
-      void setCompatibleVersion(ushort compatibleVersion);
-      void setFlags       (ushort flags);
-      void setSpecial     (ushort special);
+      void setLengthInPatterns(unsigned short lengthInPatterns);
+      void setInstrumentCount(unsigned short instrumentCount);
+      void setSampleCount (unsigned short sampleCount);
+      void setPatternCount(unsigned short patternCount);
+      void setVersion     (unsigned short version);
+      void setCompatibleVersion(unsigned short compatibleVersion);
+      void setFlags       (unsigned short flags);
+      void setSpecial     (unsigned short special);
       void setGlobalVolume(unsigned char globalVolume);
       void setMixVolume   (unsigned char mixVolume);
       void setTempo       (unsigned char tempo);

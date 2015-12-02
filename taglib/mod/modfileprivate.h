@@ -38,9 +38,9 @@
   }
 
 #define READ_BYTE(setter) READ(setter,unsigned char,readByte)
-#define READ_U16L(setter) READ(setter,ushort,readU16L)
+#define READ_U16L(setter) READ(setter,unsigned short,readU16L)
 #define READ_U32L(setter) READ(setter,ulong,readU32L)
-#define READ_U16B(setter) READ(setter,ushort,readU16B)
+#define READ_U16B(setter) READ(setter,unsigned short,readU16B)
 #define READ_U32B(setter) READ(setter,ulong,readU32B)
 
 #define READ_STRING(setter,size) \
@@ -55,9 +55,9 @@
   READ_ASSERT(read(name));
 
 #define READ_BYTE_AS(name) READ_AS(unsigned char,name,readByte)
-#define READ_U16L_AS(name) READ_AS(ushort,name,readU16L)
+#define READ_U16L_AS(name) READ_AS(unsigned short,name,readU16L)
 #define READ_U32L_AS(name) READ_AS(ulong,name,readU32L)
-#define READ_U16B_AS(name) READ_AS(ushort,name,readU16B)
+#define READ_U16B_AS(name) READ_AS(unsigned short,name,readU16B)
 #define READ_U32B_AS(name) READ_AS(ulong,name,readU32B)
 
 #define READ_STRING_AS(name,size) \

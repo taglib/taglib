@@ -51,13 +51,13 @@ namespace TagLib {
       int sampleRate()           const;
       int channels()             const;
 
-      ushort lengthInPatterns()  const;
-      bool   stereo()            const;
-      ushort sampleCount()       const;
-      ushort patternCount()      const;
-      ushort flags()             const;
-      ushort trackerVersion()    const;
-      ushort fileFormatVersion() const;
+      unsigned short lengthInPatterns()  const;
+      bool           stereo()            const;
+      unsigned short sampleCount()       const;
+      unsigned short patternCount()      const;
+      unsigned short flags()             const;
+      unsigned short trackerVersion()    const;
+      unsigned short fileFormatVersion() const;
       unsigned char  globalVolume()      const;
       unsigned char  masterVolume()      const;
       unsigned char  tempo()             const;
@@ -65,13 +65,13 @@ namespace TagLib {
 
       void setChannels(int channels);
 
-      void setLengthInPatterns (ushort lengthInPatterns);
+      void setLengthInPatterns (unsigned short lengthInPatterns);
       void setStereo           (bool stereo);
-      void setSampleCount      (ushort sampleCount);
-      void setPatternCount     (ushort patternCount);
-      void setFlags            (ushort flags);
-      void setTrackerVersion   (ushort trackerVersion);
-      void setFileFormatVersion(ushort fileFormatVersion);
+      void setSampleCount      (unsigned short sampleCount);
+      void setPatternCount     (unsigned short patternCount);
+      void setFlags            (unsigned short flags);
+      void setTrackerVersion   (unsigned short trackerVersion);
+      void setFileFormatVersion(unsigned short fileFormatVersion);
       void setGlobalVolume     (unsigned char globalVolume);
       void setMasterVolume     (unsigned char masterVolume);
       void setTempo            (unsigned char tempo);

@@ -31,7 +31,6 @@
 using namespace TagLib;
 using namespace XM;
 using TagLib::uint;
-using TagLib::ushort;
 using TagLib::ulong;
 
 /*!
@@ -180,11 +179,11 @@ protected:
   bool bigEndian;
 };
 
-class U16Reader : public NumberReader<ushort>
+class U16Reader : public NumberReader<unsigned short>
 {
 public:
-  U16Reader(ushort &value, bool bigEndian)
-  : NumberReader<ushort>(value, bigEndian) {}
+  U16Reader(unsigned short &value, bool bigEndian)
+  : NumberReader<unsigned short>(value, bigEndian) {}
 
   uint read(TagLib::File &file, uint limit)
   {
@@ -268,7 +267,7 @@ public:
    * Read a unsigned 16 Bit integer into \a number. The byte order
    * is controlled by \a bigEndian.
    */
-  StructReader &u16(ushort &number, bool bigEndian)
+  StructReader &u16(unsigned short &number, bool bigEndian)
   {
     m_readers.append(new U16Reader(number, bigEndian));
     return *this;
@@ -277,7 +276,7 @@ public:
   /*!
    * Read a unsigned 16 Bit little endian integer into \a number.
    */
-  StructReader &u16L(ushort &number)
+  StructReader &u16L(unsigned short &number)
   {
     return u16(number, false);
   }
@@ -285,7 +284,7 @@ public:
   /*!
    * Read a unsigned 16 Bit big endian integer into \a number.
    */
-  StructReader &u16B(ushort &number)
+  StructReader &u16B(unsigned short &number)
   {
     return u16(number, true);
   }
@@ -416,22 +415,22 @@ bool XM::File::save()
     return false;
 
   seek(70);
-  ushort patternCount = 0;
-  ushort instrumentCount = 0;
+  unsigned short patternCount = 0;
+  unsigned short instrumentCount = 0;
   if(!readU16L(patternCount) || !readU16L(instrumentCount))
     return false;
 
   long pos = 60 + headerSize; // should be long long in taglib2.
 
   // need to read patterns again in order to seek to the instruments:
-  for(ushort i = 0; i < patternCount; ++ i) {
+  for(unsigned short i = 0; i < patternCount; ++ i) {
     seek(pos);
     ulong patternHeaderLength = 0;
     if(!readU32L(patternHeaderLength) || patternHeaderLength < 4)
       return false;
 
     seek(pos + 7);
-    ushort dataSize = 0;
+    unsigned short dataSize = 0;
     if (!readU16L(dataSize))
       return false;
 
@@ -440,7 +439,7 @@ bool XM::File::save()
 
   const StringList lines = d->tag.comment().split("\n");
   uint sampleNameIndex = instrumentCount;
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(unsigned short i = 0; i < instrumentCount; ++ i) {
     seek(pos);
     ulong instrumentHeaderSize = 0;
     if(!readU32L(instrumentHeaderSize) || instrumentHeaderSize < 4)
@@ -453,7 +452,7 @@ bool XM::File::save()
     else
       writeString(lines[i], len);
 
-    ushort sampleCount = 0;
+    unsigned short sampleCount = 0;
     if(instrumentHeaderSize >= 29U) {
       seek(pos + 27);
       if(!readU16L(sampleCount))
@@ -469,7 +468,7 @@ bool XM::File::save()
 
     pos += instrumentHeaderSize;
 
-    for(ushort j = 0; j < sampleCount; ++ j) {
+    for(unsigned short j = 0; j < sampleCount; ++ j) {
       if(sampleHeaderSize > 4U) {
         seek(pos);
         ulong sampleLength = 0;
@@ -513,14 +512,14 @@ void XM::File::read(bool)
   READ_U32L_AS(headerSize);
   READ_ASSERT(headerSize >= 4);
 
-  ushort length          = 0;
-  ushort restartPosition = 0;
-  ushort channels        = 0;
-  ushort patternCount    = 0;
-  ushort instrumentCount = 0;
-  ushort flags    = 0;
-  ushort tempo    = 0;
-  ushort bpmSpeed = 0;
+  unsigned short length          = 0;
+  unsigned short restartPosition = 0;
+  unsigned short channels        = 0;
+  unsigned short patternCount    = 0;
+  unsigned short instrumentCount = 0;
+  unsigned short flags    = 0;
+  unsigned short tempo    = 0;
+  unsigned short bpmSpeed = 0;
 
   StructReader header;
   header.u16L(length)
@@ -549,13 +548,13 @@ void XM::File::read(bool)
   seek(60 + headerSize);
 
   // read patterns:
-  for(ushort i = 0; i < patternCount; ++ i) {
+  for(unsigned short i = 0; i < patternCount; ++ i) {
     READ_U32L_AS(patternHeaderLength);
     READ_ASSERT(patternHeaderLength >= 4);
 
     unsigned char  packingType = 0;
-    ushort rowCount = 0;
-    ushort dataSize = 0;
+    unsigned short rowCount = 0;
+    unsigned short dataSize = 0;
     StructReader pattern;
     pattern.byte(packingType).u16L(rowCount).u16L(dataSize);
 
@@ -570,13 +569,13 @@ void XM::File::read(bool)
   uint sumSampleCount = 0;
 
   // read instruments:
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(unsigned short i = 0; i < instrumentCount; ++ i) {
     READ_U32L_AS(instrumentHeaderSize);
     READ_ASSERT(instrumentHeaderSize >= 4);
 
     String instrumentName;
     unsigned char  instrumentType = 0;
-    ushort sampleCount = 0;
+    unsigned short sampleCount = 0;
 
     StructReader instrument;
     instrument.string(instrumentName, 22).byte(instrumentType).u16L(sampleCount);
@@ -594,7 +593,7 @@ void XM::File::read(bool)
       // skip unhandeled header proportion:
       seek(instrumentHeaderSize - count - 4, Current);
 
-      for(ushort j = 0; j < sampleCount; ++ j) {
+      for(unsigned short j = 0; j < sampleCount; ++ j) {
         ulong sampleLength = 0;
         ulong loopStart    = 0;
         ulong loopLength   = 0;
