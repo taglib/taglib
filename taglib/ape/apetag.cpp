@@ -167,14 +167,18 @@ void APE::Tag::setTrack(uint i)
     addValue("TRACK", String::number(i), true);
 }
 
-// conversions of tag keys between what we use in PropertyMap and what's usual
-// for APE tags
-static const TagLib::uint keyConversionsSize = 5; //usual,         APE
-static const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
-                                           {"DATE",        "YEAR"        },
-                                           {"ALBUMARTIST", "ALBUM ARTIST"},
-                                           {"DISCNUMBER",  "DISC"        },
-                                           {"REMIXER",     "MIXARTIST"   }};
+namespace
+{
+  // conversions of tag keys between what we use in PropertyMap and what's usual
+  // for APE tags
+  //                                    usual,         APE
+  const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
+                                      {"DATE",        "YEAR"        },
+                                      {"ALBUMARTIST", "ALBUM ARTIST"},
+                                      {"DISCNUMBER",  "DISC"        },
+                                      {"REMIXER",     "MIXARTIST"   }};
+  const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);
+}
 
 PropertyMap APE::Tag::properties() const
 {
@@ -184,14 +188,16 @@ PropertyMap APE::Tag::properties() const
     String tagName = it->first.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
-    if(it->second.type() != Item::Text || tagName.isEmpty())
+    if(it->second.type() != Item::Text || tagName.isEmpty()) {
       properties.unsupportedData().append(it->first);
+    }
     else {
       // Some tags need to be handled specially
-      for(uint i = 0; i < keyConversionsSize; ++i)
+      for(size_t i = 0; i < keyConversionsSize; ++i) {
         if(tagName == keyConversions[i][1])
           tagName = keyConversions[i][0];
-        properties[tagName].append(it->second.toStringList());
+      }
+      properties[tagName].append(it->second.toStringList());
     }
   }
   return properties;

@@ -163,42 +163,42 @@ int MPC::Properties::albumPeak() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned long readSize(File *file, TagLib::uint &sizeLength, bool &eof)
-{
-  sizeLength = 0;
-  eof = false;
-
-  unsigned char tmp;
-  unsigned long size = 0;
-
-  do {
-    const ByteVector b = file->readBlock(1);
-    if(b.isEmpty()) {
-      eof = true;
-      break;
-    }
-
-    tmp = b[0];
-    size = (size << 7) | (tmp & 0x7F);
-    sizeLength++;
-  } while((tmp & 0x80));
-  return size;
-}
-
-unsigned long readSize(const ByteVector &data, TagLib::uint &pos)
-{
-  unsigned char tmp;
-  unsigned long size = 0;
-
-  do {
-    tmp = data[pos++];
-    size = (size << 7) | (tmp & 0x7F);
-  } while((tmp & 0x80) && (pos < data.size()));
-  return size;
-}
-
 namespace
 {
+  unsigned long readSize(File *file, TagLib::uint &sizeLength, bool &eof)
+  {
+    sizeLength = 0;
+    eof = false;
+
+    unsigned char tmp;
+    unsigned long size = 0;
+
+    do {
+      const ByteVector b = file->readBlock(1);
+      if(b.isEmpty()) {
+        eof = true;
+        break;
+      }
+
+      tmp = b[0];
+      size = (size << 7) | (tmp & 0x7F);
+      sizeLength++;
+    } while((tmp & 0x80));
+    return size;
+  }
+
+  unsigned long readSize(const ByteVector &data, TagLib::uint &pos)
+  {
+    unsigned char tmp;
+    unsigned long size = 0;
+
+    do {
+      tmp = data[pos++];
+      size = (size << 7) | (tmp & 0x7F);
+    } while((tmp & 0x80) && (pos < data.size()));
+    return size;
+  }
+
   // This array looks weird, but the same as original MusePack code found at:
   // https://www.musepack.net/index.php?pg=src
   const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };

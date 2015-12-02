@@ -155,8 +155,8 @@ namespace
 #define SRATE_LSB       23
 #define SRATE_MASK      (0xfL << SRATE_LSB)
 
-#define MIN_STREAM_VERS     0x402
-#define MAX_STREAM_VERS     0x410
+#define MIN_STREAM_VERS 0x402
+#define MAX_STREAM_VERS 0x410
 
 #define FINAL_BLOCK     0x1000
 
