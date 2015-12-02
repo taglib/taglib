@@ -12,6 +12,7 @@
  * Fixed updating the comment field of Vorbis comments.
  * Added BUILD_BINDINGS build option.
  * Added ENABLE_CCACHE build option.
+ * Replaced ENABLE_STATIC build option with BUILD_SHARED_LIBS.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.
