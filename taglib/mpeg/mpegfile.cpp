@@ -87,11 +87,11 @@ public:
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
   long ID3v2Location;
-  uint ID3v2OriginalSize;
+  unsigned int ID3v2OriginalSize;
 
   long APELocation;
   long APEFooterLocation;
-  uint APEOriginalSize;
+  unsigned int APEOriginalSize;
 
   long ID3v1Location;
 
@@ -393,7 +393,7 @@ long MPEG::File::nextFrameOffset(long position)
     if(foundLastSyncPattern && secondSynchByte(buffer[0]))
       return position - 1;
 
-    for(uint i = 0; i < buffer.size() - 1; i++) {
+    for(unsigned int i = 0; i < buffer.size() - 1; i++) {
       if(firstSyncByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
         return position + i;
     }

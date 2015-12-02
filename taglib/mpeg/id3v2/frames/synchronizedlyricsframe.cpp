@@ -117,8 +117,7 @@ void SynchronizedLyricsFrame::setLanguage(const ByteVector &languageEncoding)
   d->language = languageEncoding.mid(0, 3);
 }
 
-void SynchronizedLyricsFrame::setTimestampFormat(
-    SynchronizedLyricsFrame::TimestampFormat f)
+void SynchronizedLyricsFrame::setTimestampFormat(SynchronizedLyricsFrame::TimestampFormat f)
 {
   d->timestampFormat = f;
 }
@@ -193,7 +192,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     if(text.isEmpty() || pos + 4 > end)
       return;
 
-    uint time = data.toUInt(pos, true);
+    unsigned int time = data.toUInt(pos, true);
     pos += 4;
 
     d->synchedText.append(SynchedText(time, text));

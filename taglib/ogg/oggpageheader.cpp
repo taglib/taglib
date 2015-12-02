@@ -63,7 +63,7 @@ public:
   bool firstPageOfStream;
   bool lastPageOfStream;
   long long absoluteGranularPosition;
-  uint streamSerialNumber;
+  unsigned int streamSerialNumber;
   int pageSequenceNumber;
   int size;
   int dataSize;
@@ -160,12 +160,12 @@ void Ogg::PageHeader::setPageSequenceNumber(int sequenceNumber)
   d->pageSequenceNumber = sequenceNumber;
 }
 
-TagLib::uint Ogg::PageHeader::streamSerialNumber() const
+unsigned int Ogg::PageHeader::streamSerialNumber() const
 {
   return d->streamSerialNumber;
 }
 
-void Ogg::PageHeader::setStreamSerialNumber(uint n)
+void Ogg::PageHeader::setStreamSerialNumber(unsigned int n)
 {
   d->streamSerialNumber = n;
 }

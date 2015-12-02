@@ -58,16 +58,16 @@ namespace TagLib {
         String album() const;
         String comment() const;
         String genre() const;
-        uint year() const;
-        uint track() const;
+        unsigned int year() const;
+        unsigned int track() const;
 
         void setTitle(const String &value);
         void setArtist(const String &value);
         void setAlbum(const String &value);
         void setComment(const String &value);
         void setGenre(const String &value);
-        void setYear(uint value);
-        void setTrack(uint value);
+        void setYear(unsigned int value);
+        void setTrack(unsigned int value);
 
         virtual bool isEmpty() const;
 

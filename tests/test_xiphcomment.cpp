@@ -27,11 +27,11 @@ public:
   void testYear()
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), cmt.year());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.year());
     cmt.addField("YEAR", "2009");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2009), cmt.year());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2009, cmt.year());
     cmt.addField("DATE", "2008");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2008), cmt.year());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2008, cmt.year());
   }
 
   void testSetYear()
@@ -47,11 +47,11 @@ public:
   void testTrack()
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), cmt.track());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.track());
     cmt.addField("TRACKNUM", "7");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(7), cmt.track());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)7, cmt.track());
     cmt.addField("TRACKNUMBER", "8");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(8), cmt.track());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)8, cmt.track());
   }
 
   void testSetTrack()
@@ -73,7 +73,7 @@ public:
 
     Ogg::XiphComment cmt;
     PropertyMap unsuccessful = cmt.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(3), unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)3, unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
   }
 

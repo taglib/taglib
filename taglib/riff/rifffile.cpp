@@ -37,10 +37,10 @@ using namespace TagLib;
 
 struct Chunk
 {
-  ByteVector name;
-  TagLib::uint offset;
-  TagLib::uint size;
-  char padding;
+  ByteVector   name;
+  unsigned int offset;
+  unsigned int size;
+  unsigned int padding;
 };
 
 class RIFF::File::FilePrivate
@@ -51,9 +51,9 @@ public:
     size(0) {}
 
   const Endianness endianness;
-  ByteVector type;
-  TagLib::uint size;
-  ByteVector format;
+  ByteVector   type;
+  unsigned int size;
+  ByteVector   format;
 
   std::vector<Chunk> chunks;
 };
@@ -87,32 +87,32 @@ RIFF::File::File(IOStream *stream, Endianness endianness) :
     read();
 }
 
-TagLib::uint RIFF::File::riffSize() const
+unsigned int RIFF::File::riffSize() const
 {
   return d->size;
 }
 
-TagLib::uint RIFF::File::chunkCount() const
+unsigned int RIFF::File::chunkCount() const
 {
   return d->chunks.size();
 }
 
-TagLib::uint RIFF::File::chunkDataSize(uint i) const
+unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 {
   return d->chunks[i].size;
 }
 
-TagLib::uint RIFF::File::chunkOffset(uint i) const
+unsigned int RIFF::File::chunkOffset(unsigned int i) const
 {
   return d->chunks[i].offset;
 }
 
-TagLib::uint RIFF::File::chunkPadding(uint i) const
+unsigned int RIFF::File::chunkPadding(unsigned int i) const
 {
   return d->chunks[i].padding;
 }
 
-ByteVector RIFF::File::chunkName(uint i) const
+ByteVector RIFF::File::chunkName(unsigned int i) const
 {
   if(i >= chunkCount())
     return ByteVector();
@@ -120,7 +120,7 @@ ByteVector RIFF::File::chunkName(uint i) const
   return d->chunks[i].name;
 }
 
-ByteVector RIFF::File::chunkData(uint i)
+ByteVector RIFF::File::chunkData(unsigned int i)
 {
   if(i >= chunkCount())
     return ByteVector();
@@ -129,7 +129,7 @@ ByteVector RIFF::File::chunkData(uint i)
   return readBlock(d->chunks[i].size);
 }
 
-void RIFF::File::setChunkData(uint i, const ByteVector &data)
+void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 {
   // First we update the global size
 
@@ -167,7 +167,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   }
 
   if(!alwaysCreate) {
-    for(uint i = 0; i < d->chunks.size(); i++) {
+    for(unsigned int i = 0; i < d->chunks.size(); i++) {
       if(d->chunks[i].name == name) {
         setChunkData(i, data);
         return;
@@ -177,7 +177,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  uint i = d->chunks.size() - 1;
+  unsigned int i = d->chunks.size() - 1;
   unsigned long offset = d->chunks[i].offset + d->chunks[i].size;
 
   // First we update the global size
@@ -205,7 +205,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   d->chunks.push_back(chunk);
 }
 
-void RIFF::File::removeChunk(uint i)
+void RIFF::File::removeChunk(unsigned int i)
 {
   if(i >= d->chunks.size())
     return;
@@ -213,7 +213,7 @@ void RIFF::File::removeChunk(uint i)
   std::vector<Chunk>::iterator it = d->chunks.begin();
   std::advance(it, i);
 
-  const uint removeSize = it->size + it->padding + 8;
+  const unsigned int removeSize = it->size + it->padding + 8;
   removeBlock(it->offset - 8, removeSize);
   it = d->chunks.erase(it);
 
@@ -244,7 +244,7 @@ void RIFF::File::read()
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
-    uint chunkSize = readBlock(4).toUInt(bigEndian);
+    unsigned int chunkSize = readBlock(4).toUInt(bigEndian);
 
     if(!isValidChunkName(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
@@ -284,7 +284,8 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            unsigned long offset, unsigned long replace, uint leadingPadding)
+                            unsigned long offset, unsigned long replace,
+                            unsigned int leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {

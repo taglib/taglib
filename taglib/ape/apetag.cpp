@@ -112,14 +112,14 @@ String APE::Tag::genre() const
   return d->itemListMap["GENRE"].values().toString();
 }
 
-TagLib::uint APE::Tag::year() const
+unsigned int APE::Tag::year() const
 {
   if(d->itemListMap["YEAR"].isEmpty())
     return 0;
   return d->itemListMap["YEAR"].toString().toInt();
 }
 
-TagLib::uint APE::Tag::track() const
+unsigned int APE::Tag::track() const
 {
   if(d->itemListMap["TRACK"].isEmpty())
     return 0;
@@ -151,7 +151,7 @@ void APE::Tag::setGenre(const String &s)
   addValue("GENRE", s, true);
 }
 
-void APE::Tag::setYear(uint i)
+void APE::Tag::setYear(unsigned int i)
 {
   if(i <= 0)
     removeItem("YEAR");
@@ -159,7 +159,7 @@ void APE::Tag::setYear(uint i)
     addValue("YEAR", String::number(i), true);
 }
 
-void APE::Tag::setTrack(uint i)
+void APE::Tag::setTrack(unsigned int i)
 {
   if(i <= 0)
     removeItem("TRACK");
@@ -215,7 +215,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap properties(origProps); // make a local copy that can be modified
 
   // see comment in properties()
-  for(uint i = 0; i < keyConversionsSize; ++i)
+  for(size_t i = 0; i < keyConversionsSize; ++i)
     if(properties.contains(keyConversions[i][0])) {
       properties.insert(keyConversions[i][1], properties[keyConversions[i][0]]);
       properties.erase(keyConversions[i][0]);
@@ -333,7 +333,7 @@ void APE::Tag::read(TagLib::File *file, long footerLocation)
     d->footer.setData(file->readBlock(Footer::size()));
 
     if(d->footer.tagSize() <= Footer::size() ||
-       d->footer.tagSize() > uint(file->length()))
+       d->footer.tagSize() > static_cast<unsigned long>(file->length()))
       return;
 
     file->seek(footerLocation + Footer::size() - d->footer.tagSize());
@@ -344,7 +344,7 @@ void APE::Tag::read(TagLib::File *file, long footerLocation)
 ByteVector APE::Tag::render() const
 {
   ByteVector data;
-  uint itemCount = 0;
+  unsigned int itemCount = 0;
 
   for(ItemListMap::ConstIterator it = d->itemListMap.begin(); it != d->itemListMap.end(); ++it) {
     data.append(it->second.render());
@@ -365,9 +365,9 @@ void APE::Tag::parse(const ByteVector &data)
   if(data.size() < 11)
     return;
 
-  uint pos = 0;
+  unsigned int pos = 0;
 
-  for(uint i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
+  for(unsigned int i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
     APE::Item item;
     item.parse(data.mid(pos));
 

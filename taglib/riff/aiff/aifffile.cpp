@@ -140,7 +140,7 @@ bool RIFF::AIFF::File::hasID3v2Tag() const
 
 void RIFF::AIFF::File::read(bool readProperties)
 {
-  for(uint i = 0; i < chunkCount(); ++i) {
+  for(unsigned int i = 0; i < chunkCount(); ++i) {
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag) {

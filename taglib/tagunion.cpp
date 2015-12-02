@@ -190,12 +190,12 @@ String TagUnion::genre() const
   stringUnion(genre);
 }
 
-TagLib::uint TagUnion::year() const
+unsigned int TagUnion::year() const
 {
   numberUnion(year);
 }
 
-TagLib::uint TagUnion::track() const
+unsigned int TagUnion::track() const
 {
   numberUnion(track);
 }
@@ -225,12 +225,12 @@ void TagUnion::setGenre(const String &s)
   setUnion(Genre, s);
 }
 
-void TagUnion::setYear(uint i)
+void TagUnion::setYear(unsigned int i)
 {
   setUnion(Year, i);
 }
 
-void TagUnion::setTrack(uint i)
+void TagUnion::setTrack(unsigned int i)
 {
   setUnion(Track, i);
 }

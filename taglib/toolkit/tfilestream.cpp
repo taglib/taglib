@@ -186,10 +186,10 @@ ByteVector FileStream::readBlock(unsigned long length)
   if(length > bufferSize() && length > streamLength)
     length = streamLength;
 
-  ByteVector buffer(static_cast<uint>(length));
+  ByteVector buffer(static_cast<unsigned int>(length));
 
   const size_t count = readFile(d->file, buffer);
-  buffer.resize(static_cast<uint>(count));
+  buffer.resize(static_cast<unsigned int>(count));
 
   return buffer;
 }
@@ -254,7 +254,7 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
   long writePosition = start;
 
   ByteVector buffer = data;
-  ByteVector aboutToOverwrite(static_cast<uint>(bufferLength));
+  ByteVector aboutToOverwrite(static_cast<unsigned int>(bufferLength));
 
   while(true)
   {
@@ -303,7 +303,7 @@ void FileStream::removeBlock(unsigned long start, unsigned long length)
   long readPosition = start + length;
   long writePosition = start;
 
-  ByteVector buffer(static_cast<uint>(bufferLength));
+  ByteVector buffer(static_cast<unsigned int>(bufferLength));
 
   for(size_t bytesRead = -1; bytesRead != 0;)
   {
@@ -490,7 +490,7 @@ void FileStream::truncate(long length)
 #endif
 }
 
-TagLib::uint FileStream::bufferSize()
+unsigned int FileStream::bufferSize()
 {
   return 1024;
 }

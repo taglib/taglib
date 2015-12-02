@@ -73,12 +73,12 @@ String Mod::Tag::genre() const
   return String();
 }
 
-TagLib::uint Mod::Tag::year() const
+unsigned int Mod::Tag::year() const
 {
   return 0;
 }
 
-TagLib::uint Mod::Tag::track() const
+unsigned int Mod::Tag::track() const
 {
   return 0;
 }
@@ -110,11 +110,11 @@ void Mod::Tag::setGenre(const String &)
 {
 }
 
-void Mod::Tag::setYear(uint)
+void Mod::Tag::setYear(unsigned int)
 {
 }
 
-void Mod::Tag::setTrack(uint)
+void Mod::Tag::setTrack(unsigned int)
 {
 }
 

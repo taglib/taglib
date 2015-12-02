@@ -66,7 +66,7 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   long ID3v2Location;
-  uint ID3v2OriginalSize;
+  unsigned int ID3v2OriginalSize;
 
   long ID3v1Location;
 

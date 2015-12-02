@@ -46,22 +46,22 @@ public:
     itemCount(0),
     tagSize(0) {}
 
-  uint version;
+  unsigned int version;
 
   bool footerPresent;
   bool headerPresent;
 
   bool isHeader;
 
-  uint itemCount;
-  uint tagSize;
+  unsigned int itemCount;
+  unsigned int tagSize;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint APE::Footer::size()
+unsigned int APE::Footer::size()
 {
   return 32;
 }
@@ -91,7 +91,7 @@ APE::Footer::~Footer()
   delete d;
 }
 
-TagLib::uint APE::Footer::version() const
+unsigned int APE::Footer::version() const
 {
   return d->version;
 }
@@ -116,22 +116,22 @@ void APE::Footer::setHeaderPresent(bool b) const
   d->headerPresent = b;
 }
 
-TagLib::uint APE::Footer::itemCount() const
+unsigned int APE::Footer::itemCount() const
 {
   return d->itemCount;
 }
 
-void APE::Footer::setItemCount(uint s)
+void APE::Footer::setItemCount(unsigned int s)
 {
   d->itemCount = s;
 }
 
-TagLib::uint APE::Footer::tagSize() const
+unsigned int APE::Footer::tagSize() const
 {
   return d->tagSize;
 }
 
-TagLib::uint APE::Footer::completeTagSize() const
+unsigned int APE::Footer::completeTagSize() const
 {
   if(d->headerPresent)
     return d->tagSize + size();
@@ -139,7 +139,7 @@ TagLib::uint APE::Footer::completeTagSize() const
     return d->tagSize;
 }
 
-void APE::Footer::setTagSize(uint s)
+void APE::Footer::setTagSize(unsigned int s)
 {
   d->tagSize = s;
 }

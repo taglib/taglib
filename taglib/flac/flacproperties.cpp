@@ -135,7 +135,7 @@ void FLAC::Properties::read(const ByteVector &data, long streamLength)
     return;
   }
 
-  uint pos = 0;
+  unsigned int pos = 0;
 
   // Minimum block size (in samples)
   pos += 2;
@@ -149,7 +149,7 @@ void FLAC::Properties::read(const ByteVector &data, long streamLength)
   // Maximum frame size (in bytes)
   pos += 3;
 
-  const uint flags = data.toUInt(pos, true);
+  const unsigned int flags = data.toUInt(pos, true);
   pos += 4;
 
   d->sampleRate    = flags >> 12;

@@ -130,7 +130,7 @@ bool IT::File::save()
 
     seek(sampleOffset + 20);
 
-    if((TagLib::uint)(i + instrumentCount) < lines.size())
+    if((unsigned int)(i + instrumentCount) < lines.size())
       writeString(lines[i + instrumentCount], 25);
     else
       writeString(String(), 25);
@@ -139,7 +139,7 @@ bool IT::File::save()
 
   // write rest as message:
   StringList messageLines;
-  for(uint i = instrumentCount + sampleCount; i < lines.size(); ++ i)
+  for(unsigned int i = instrumentCount + sampleCount; i < lines.size(); ++ i)
     messageLines.append(lines[i]);
   ByteVector message = messageLines.toString("\r").data(String::Latin1);
 

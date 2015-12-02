@@ -60,14 +60,14 @@ namespace TagLib {
 
   class String;
 
+  // These integer types are deprecated. Do not use them.
+
   typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
   typedef unsigned char      uchar;
   typedef unsigned short     ushort;
   typedef unsigned int       uint;
+  typedef unsigned long      ulong;
   typedef unsigned long long ulonglong;
-
-  // long/ulong can be either 32-bit or 64-bit wide.
-  typedef unsigned long  ulong;
 
   /*!
    * Unfortunately std::wstring isn't defined on some systems, (i.e. GCC < 3)

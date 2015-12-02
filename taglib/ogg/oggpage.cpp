@@ -131,7 +131,7 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
   return flags;
 }
 
-TagLib::uint Ogg::Page::packetCount() const
+unsigned int Ogg::Page::packetCount() const
 {
   return d->header.packetSizes().size();
 }
@@ -197,7 +197,7 @@ ByteVector Ogg::Page::render() const
 
 List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
                                       PaginationStrategy strategy,
-                                      uint streamSerialNumber,
+                                      unsigned int streamSerialNumber,
                                       int firstPage,
                                       bool firstPacketContinued,
                                       bool lastPacketCompleted,
@@ -310,7 +310,7 @@ Ogg::Page* Ogg::Page::getCopyWithNewPageSequenceNumber(int sequenceNumber)
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::Page::Page(const ByteVectorList &packets,
-                uint streamSerialNumber,
+                unsigned int streamSerialNumber,
                 int pageNumber,
                 bool firstPacketContinued,
                 bool lastPacketCompleted,

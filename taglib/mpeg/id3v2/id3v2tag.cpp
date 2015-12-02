@@ -212,14 +212,14 @@ String ID3v2::Tag::genre() const
   return genres.toString();
 }
 
-TagLib::uint ID3v2::Tag::year() const
+unsigned int ID3v2::Tag::year() const
 {
   if(!d->frameListMap["TDRC"].isEmpty())
     return d->frameListMap["TDRC"].front()->toString().substr(0, 4).toInt();
   return 0;
 }
 
-TagLib::uint ID3v2::Tag::track() const
+unsigned int ID3v2::Tag::track() const
 {
   if(!d->frameListMap["TRCK"].isEmpty())
     return d->frameListMap["TRCK"].front()->toString().toInt();
@@ -283,7 +283,7 @@ void ID3v2::Tag::setGenre(const String &s)
 #endif
 }
 
-void ID3v2::Tag::setYear(uint i)
+void ID3v2::Tag::setYear(unsigned int i)
 {
   if(i <= 0) {
     removeFrames("TDRC");
@@ -292,7 +292,7 @@ void ID3v2::Tag::setYear(uint i)
   setTextFrame("TDRC", String::number(i));
 }
 
-void ID3v2::Tag::setTrack(uint i)
+void ID3v2::Tag::setTrack(unsigned int i)
 {
   if(i <= 0) {
     removeFrames("TRCK");
@@ -539,14 +539,14 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     StringList people;
     if(frameTMCL) {
       StringList v24People = frameTMCL->fieldList();
-      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+      for(unsigned int i = 0; i + 1 < v24People.size(); i += 2) {
         people.append(v24People[i]);
         people.append(v24People[i+1]);
       }
     }
     if(frameTIPL) {
       StringList v24People = frameTIPL->fieldList();
-      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+      for(unsigned int i = 0; i + 1 < v24People.size(); i += 2) {
         people.append(v24People[i]);
         people.append(v24People[i+1]);
       }
@@ -628,7 +628,7 @@ ByteVector ID3v2::Tag::render(int version) const
       paddingSize = MinPaddingSize;
   }
 
-  tagData.resize(static_cast<uint>(tagData.size() + paddingSize), '\0');
+  tagData.resize(static_cast<unsigned int>(tagData.size() + paddingSize), '\0');
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
@@ -686,7 +686,7 @@ void ID3v2::Tag::read(TagLib::File *file, long offset)
   // This is a workaround for some faulty files that have duplicate ID3v2 tags.
   // Unfortunately, TagLib itself may write such duplicate tags until v1.10.
 
-  uint extraSize = 0;
+  unsigned int extraSize = 0;
 
   while(true) {
 
@@ -712,8 +712,8 @@ void ID3v2::Tag::parse(const ByteVector &origData)
   if(d->header.unsynchronisation() && d->header.majorVersion() <= 3)
     data = SynchData::decode(data);
 
-  uint frameDataPosition = 0;
-  uint frameDataLength = data.size();
+  unsigned int frameDataPosition = 0;
+  unsigned int frameDataLength = data.size();
 
   // check for extended header
 

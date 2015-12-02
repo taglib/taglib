@@ -40,8 +40,8 @@ public:
     size(0),
     type(MPEG::XingHeader::Invalid) {}
 
-  uint frames;
-  uint size;
+  unsigned int frames;
+  unsigned int size;
 
   MPEG::XingHeader::HeaderType type;
 };
@@ -66,12 +66,12 @@ bool MPEG::XingHeader::isValid() const
   return (d->type != Invalid && d->frames > 0 && d->size > 0);
 }
 
-TagLib::uint MPEG::XingHeader::totalFrames() const
+unsigned int MPEG::XingHeader::totalFrames() const
 {
   return d->frames;
 }
 
-TagLib::uint MPEG::XingHeader::totalSize() const
+unsigned int MPEG::XingHeader::totalSize() const
 {
   return d->size;
 }

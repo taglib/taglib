@@ -30,9 +30,9 @@
 using namespace TagLib;
 using namespace ID3v2;
 
-TagLib::uint SynchData::toUInt(const ByteVector &data)
+unsigned int SynchData::toUInt(const ByteVector &data)
 {
-  uint sum = 0;
+  unsigned int sum = 0;
   bool notSynchSafe = false;
   int last = data.size() > 4 ? 3 : data.size() - 1;
 
@@ -62,7 +62,7 @@ TagLib::uint SynchData::toUInt(const ByteVector &data)
   return sum;
 }
 
-ByteVector SynchData::fromUInt(uint value)
+ByteVector SynchData::fromUInt(unsigned int value)
 {
   ByteVector v(4, 0);
 

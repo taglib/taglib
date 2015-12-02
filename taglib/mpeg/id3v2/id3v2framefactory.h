@@ -85,7 +85,7 @@ namespace TagLib {
        * \deprecated Please use the method below that accepts a ID3v2::Header
        * instance in new code.
        */
-      Frame *createFrame(const ByteVector &data, uint version = 4) const;
+      Frame *createFrame(const ByteVector &data, unsigned int version = 4) const;
 
       /*!
        * Create a frame based on \a data.  \a tagHeader should be a valid

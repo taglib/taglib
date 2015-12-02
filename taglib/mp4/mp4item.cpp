@@ -45,7 +45,7 @@ public:
     int m_int;
     IntPair m_intPair;
     unsigned char m_byte;
-    uint m_uint;
+    unsigned int m_uint;
     long long m_longlong;
   };
   StringList m_stringList;
@@ -104,7 +104,7 @@ MP4::Item::Item(unsigned char value) :
   d->m_byte = value;
 }
 
-MP4::Item::Item(uint value) :
+MP4::Item::Item(unsigned int value) :
   d(new ItemPrivate())
 {
   d->m_uint = value;
@@ -169,7 +169,7 @@ MP4::Item::toByte() const
   return d->m_byte;
 }
 
-TagLib::uint
+unsigned int
 MP4::Item::toUInt() const
 {
   return d->m_uint;

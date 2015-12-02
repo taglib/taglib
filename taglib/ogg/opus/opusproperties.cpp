@@ -127,7 +127,7 @@ void Opus::Properties::read(File *file)
   const ByteVector data = file->packet(0);
 
   // *Magic Signature*
-  uint pos = 8;
+  unsigned int pos = 8;
 
   // *Version* (8 bits, unsigned)
   d->opusVersion = static_cast<unsigned char>(data.at(pos));

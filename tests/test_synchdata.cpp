@@ -47,7 +47,7 @@ public:
     char data[] = { 0, 0, 0, 127 };
     ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), TagLib::uint(127));
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)127);
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(127), v);
   }
 
@@ -56,7 +56,7 @@ public:
     char data[] = { 0, 0, 1, 0 };
     ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), TagLib::uint(128));
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)128);
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(128), v);
   }
 
@@ -65,7 +65,7 @@ public:
     char data[] = { 0, 0, 1, 1 };
     ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), TagLib::uint(129));
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)129);
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(129), v);
   }
 
@@ -74,8 +74,8 @@ public:
     char data[] = { 0, 0, 0, -1 };
     char data2[] = { 0, 0, -1, -1 };
 
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(255), ID3v2::SynchData::toUInt(ByteVector(data, 4)));
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(65535), ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
+    CPPUNIT_ASSERT_EQUAL((unsigned int)255, ID3v2::SynchData::toUInt(ByteVector(data, 4)));
+    CPPUNIT_ASSERT_EQUAL((unsigned int)65535, ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
   }
 
   void testToUIntBrokenAndTooLarge()
@@ -83,7 +83,7 @@ public:
     char data[] = { 0, 0, 0, -1, 0 };
     ByteVector v(data, 5);
 
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(255), ID3v2::SynchData::toUInt(v));
+    CPPUNIT_ASSERT_EQUAL((unsigned int)255, ID3v2::SynchData::toUInt(v));
   }
 
   void testDecode1()

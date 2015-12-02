@@ -47,7 +47,7 @@ public:
   unsigned short restartPosition;
   unsigned short patternCount;
   unsigned short instrumentCount;
-  uint   sampleCount;
+  unsigned int   sampleCount;
   unsigned short flags;
   unsigned short tempo;
   unsigned short bpmSpeed;
@@ -119,7 +119,7 @@ unsigned short XM::Properties::instrumentCount() const
   return d->instrumentCount;
 }
 
-TagLib::uint XM::Properties::sampleCount() const
+unsigned int XM::Properties::sampleCount() const
 {
   return d->sampleCount;
 }
@@ -169,7 +169,7 @@ void XM::Properties::setInstrumentCount(unsigned short instrumentCount)
   d->instrumentCount = instrumentCount;
 }
 
-void XM::Properties::setSampleCount(uint sampleCount)
+void XM::Properties::setSampleCount(unsigned int sampleCount)
 {
   d->sampleCount = sampleCount;
 }

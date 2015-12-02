@@ -291,7 +291,7 @@ namespace TagLib {
     /*!
      * Returns the buffer size that is used for internal buffering.
      */
-    static uint bufferSize();
+    static unsigned int bufferSize();
 
   private:
     File(const File &);

@@ -95,7 +95,7 @@ namespace TagLib
     /*!
      * Reverses the order of bytes in an 32-bit integer.
      */
-    inline uint byteSwap(uint x)
+    inline unsigned int byteSwap(unsigned int x)
     {
 #if defined(HAVE_BOOST_BYTESWAP)
 

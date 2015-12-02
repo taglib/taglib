@@ -554,7 +554,7 @@ MP4::Tag::updateOffsets(long delta, long offset)
       ByteVector data = d->file->readBlock(atom->length - 12);
       unsigned int count = data.toUInt();
       d->file->seek(atom->offset + 16);
-      uint pos = 4;
+      unsigned int pos = 4;
       while(count--) {
         long o = static_cast<long>(data.toUInt(pos));
         if(o > offset) {
@@ -575,7 +575,7 @@ MP4::Tag::updateOffsets(long delta, long offset)
       ByteVector data = d->file->readBlock(atom->length - 12);
       unsigned int count = data.toUInt();
       d->file->seek(atom->offset + 16);
-      uint pos = 4;
+      unsigned int pos = 4;
       while(count--) {
         long long o = data.toLongLong(pos);
         if(o > offset) {
@@ -768,13 +768,13 @@ MP4::Tag::setGenre(const String &value)
 }
 
 void
-MP4::Tag::setYear(uint value)
+MP4::Tag::setYear(unsigned int value)
 {
   d->items["\251day"] = StringList(String::number(value));
 }
 
 void
-MP4::Tag::setTrack(uint value)
+MP4::Tag::setTrack(unsigned int value)
 {
   d->items["trkn"] = MP4::Item(value, 0);
 }

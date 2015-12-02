@@ -291,7 +291,7 @@ namespace TagLib {
      * Extract a substring from this string starting at \a position and
      * continuing for \a n characters.
      */
-    String substr(uint position, uint n = 0xffffffff) const;
+    String substr(unsigned int position, unsigned int n = 0xffffffff) const;
 
     /*!
      * Append \a s to the current string and return a reference to the current
@@ -314,12 +314,12 @@ namespace TagLib {
     /*!
      * Returns the size of the string.
      */
-    uint size() const;
+    unsigned int size() const;
 
     /*!
      * Returns the length of the string.  Equivalent to size().
      */
-    uint length() const;
+    unsigned int length() const;
 
     /*!
      * Returns true if the string is empty.

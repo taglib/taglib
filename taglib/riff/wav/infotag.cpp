@@ -113,12 +113,12 @@ String RIFF::Info::Tag::genre() const
   return fieldText("IGNR");
 }
 
-TagLib::uint RIFF::Info::Tag::year() const
+unsigned int RIFF::Info::Tag::year() const
 {
   return fieldText("ICRD").substr(0, 4).toInt();
 }
 
-TagLib::uint RIFF::Info::Tag::track() const
+unsigned int RIFF::Info::Tag::track() const
 {
   return fieldText("IPRT").toInt();
 }
@@ -148,7 +148,7 @@ void RIFF::Info::Tag::setGenre(const String &s)
   setFieldText("IGNR", s);
 }
 
-void RIFF::Info::Tag::setYear(uint i)
+void RIFF::Info::Tag::setYear(unsigned int i)
 {
   if(i != 0)
     setFieldText("ICRD", String::number(i));
@@ -156,7 +156,7 @@ void RIFF::Info::Tag::setYear(uint i)
     d->fieldListMap.erase("ICRD");
 }
 
-void RIFF::Info::Tag::setTrack(uint i)
+void RIFF::Info::Tag::setTrack(unsigned int i)
 {
   if(i != 0)
     setFieldText("IPRT", String::number(i));
@@ -239,9 +239,9 @@ void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)
 
 void RIFF::Info::Tag::parse(const ByteVector &data)
 {
-  uint p = 4;
+  unsigned int p = 4;
   while(p < data.size()) {
-    const uint size = data.toUInt(p + 4, false);
+    const unsigned int size = data.toUInt(p + 4, false);
     if(size > data.size() - p - 8)
       break;
 

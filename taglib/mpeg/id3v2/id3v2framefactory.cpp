@@ -117,10 +117,10 @@ FrameFactory *FrameFactory::instance()
 
 Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) const
 {
-  return createFrame(data, uint(synchSafeInts ? 4 : 3));
+  return createFrame(data, static_cast<unsigned int>(synchSafeInts ? 4 : 3));
 }
 
-Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
+Frame *FrameFactory::createFrame(const ByteVector &data, unsigned int version) const
 {
   Header tagHeader;
   tagHeader.setMajorVersion(version);
@@ -130,7 +130,7 @@ Frame *FrameFactory::createFrame(const ByteVector &data, uint version) const
 Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) const
 {
   ByteVector data = origData;
-  uint version = tagHeader->majorVersion();
+  unsigned int version = tagHeader->majorVersion();
   Frame::Header *header = new Frame::Header(data, version);
   ByteVector frameID = header->frameID();
 
@@ -138,7 +138,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) 
   // characters.  Also make sure that there is data in the frame.
 
   if(frameID.size() != (version < 3 ? 3 : 4) ||
-     header->frameSize() <= uint(header->dataLengthIndicator() ? 4 : 0) ||
+     header->frameSize() <= static_cast<unsigned int>(header->dataLengthIndicator() ? 4 : 0) ||
      header->frameSize() > data.size())
   {
     delete header;

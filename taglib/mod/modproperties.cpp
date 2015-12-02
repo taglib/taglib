@@ -34,8 +34,8 @@ public:
   {
   }
 
-  int   channels;
-  uint  instrumentCount;
+  int           channels;
+  unsigned int  instrumentCount;
   unsigned char lengthInPatterns;
 };
 
@@ -80,7 +80,7 @@ int Mod::Properties::channels() const
   return d->channels;
 }
 
-TagLib::uint Mod::Properties::instrumentCount() const
+unsigned int Mod::Properties::instrumentCount() const
 {
   return d->instrumentCount;
 }
@@ -95,7 +95,7 @@ void Mod::Properties::setChannels(int channels)
   d->channels = channels;
 }
 
-void Mod::Properties::setInstrumentCount(uint instrumentCount)
+void Mod::Properties::setInstrumentCount(unsigned int instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }

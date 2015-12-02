@@ -119,22 +119,26 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
   d->textEncoding = encoding;
 }
 
-// array of allowed TIPL prefixes and their corresponding key value
-static const TagLib::uint involvedPeopleSize = 5;
-static const char* involvedPeople[][2] = {
-    {"ARRANGER", "ARRANGER"},
-    {"ENGINEER", "ENGINEER"},
-    {"PRODUCER", "PRODUCER"},
-    {"DJ-MIX", "DJMIXER"},
-    {"MIX", "MIXER"},
-};
+namespace
+{
+  // array of allowed TIPL prefixes and their corresponding key value
+  const char* involvedPeople[][2] = {
+      {"ARRANGER", "ARRANGER"},
+      {"ENGINEER", "ENGINEER"},
+      {"PRODUCER", "PRODUCER"},
+      {"DJ-MIX", "DJMIXER"},
+      {"MIX", "MIXER"},
+  };
+  const size_t involvedPeopleSize = sizeof(involvedPeople) / sizeof(involvedPeople[0]);
+}
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {
   static KeyConversionMap m;
-  if(m.isEmpty())
-    for(uint i = 0; i < involvedPeopleSize; ++i)
+  if(m.isEmpty()) {
+    for(size_t i = 0; i < involvedPeopleSize; ++i)
       m.insert(involvedPeople[i][1], involvedPeople[i][0]);
+  }
   return m;
 }
 
@@ -265,7 +269,7 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   StringList l = fieldList();
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     bool found = false;
-    for(uint i = 0; i < involvedPeopleSize; ++i)
+    for(size_t i = 0; i < involvedPeopleSize; ++i)
       if(*it == involvedPeople[i][0]) {
         map.insert(involvedPeople[i][1], (++it)->split(","));
         found = true;

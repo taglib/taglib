@@ -26,7 +26,6 @@
 
 using namespace std;
 using namespace TagLib;
-using TagLib::uint;
 
 static const String titleBefore("test song name");
 static const String titleAfter("changed title");

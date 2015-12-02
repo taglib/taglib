@@ -144,7 +144,7 @@ void Vorbis::Properties::read(File *file)
     return;
   }
 
-  uint pos = 0;
+  unsigned int pos = 0;
 
   if(data.mid(pos, 7) != vorbisSetupHeaderID) {
     debug("Vorbis::Properties::read() -- invalid Vorbis identification header");

@@ -53,7 +53,7 @@ namespace TagLib {
 
 static const char hexTable[17] = "0123456789abcdef";
 
-static const uint crcTable[256] = {
+static const unsigned int crcTable[256] = {
   0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b,
   0x1a864db2, 0x1e475005, 0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
   0x350c9b64, 0x31cd86d3, 0x3c8ea00a, 0x384fbdbd, 0x4c11db70, 0x48d0c6c7,
@@ -102,7 +102,7 @@ static const uint crcTable[256] = {
 template <class TIterator>
 int findChar(
   const TIterator dataBegin, const TIterator dataEnd,
-  char c, uint offset, int byteAlign)
+  char c, unsigned int offset, int byteAlign)
 {
   const size_t dataSize = dataEnd - dataBegin;
   if(offset + 1 > dataSize)
@@ -125,7 +125,7 @@ template <class TIterator>
 int findVector(
   const TIterator dataBegin, const TIterator dataEnd,
   const TIterator patternBegin, const TIterator patternEnd,
-  uint offset, int byteAlign)
+  unsigned int offset, int byteAlign)
 {
   const size_t dataSize    = dataEnd    - dataBegin;
   const size_t patternSize = patternEnd - patternBegin;
@@ -308,19 +308,19 @@ long double toFloat80(const ByteVector &v, size_t offset)
 class ByteVector::ByteVectorPrivate
 {
 public:
-  ByteVectorPrivate(uint l, char c) :
+  ByteVectorPrivate(unsigned int l, char c) :
     counter(new RefCounter()),
     data(new std::vector<char>(l, c)),
     offset(0),
     length(l) {}
 
-  ByteVectorPrivate(const char *s, uint l) :
+  ByteVectorPrivate(const char *s, unsigned int l) :
     counter(new RefCounter()),
     data(new std::vector<char>(s, s + l)),
     offset(0),
     length(l) {}
 
-  ByteVectorPrivate(const ByteVectorPrivate &d, uint o, uint l) :
+  ByteVectorPrivate(const ByteVectorPrivate &d, unsigned int o, unsigned int l) :
     counter(d.counter),
     data(d.data),
     offset(d.offset + o),
@@ -339,8 +339,8 @@ public:
 
   RefCounter        *counter;
   std::vector<char> *data;
-  uint               offset;
-  uint               length;
+  unsigned int       offset;
+  unsigned int       length;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -349,7 +349,7 @@ public:
 
 ByteVector ByteVector::null;
 
-ByteVector ByteVector::fromCString(const char *s, uint length)
+ByteVector ByteVector::fromCString(const char *s, unsigned int length)
 {
   if(length == 0xffffffff)
     return ByteVector(s, ::strlen(s));
@@ -357,9 +357,9 @@ ByteVector ByteVector::fromCString(const char *s, uint length)
     return ByteVector(s, length);
 }
 
-ByteVector ByteVector::fromUInt(uint value, bool mostSignificantByteFirst)
+ByteVector ByteVector::fromUInt(unsigned int value, bool mostSignificantByteFirst)
 {
-  return fromNumber<uint>(value, mostSignificantByteFirst);
+  return fromNumber<unsigned int>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
@@ -374,12 +374,12 @@ ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFir
 
 ByteVector ByteVector::fromFloat32LE(float value)
 {
-  return fromFloat<float, uint, Utils::LittleEndian>(value);
+  return fromFloat<float, unsigned int, Utils::LittleEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat32BE(float value)
 {
-  return fromFloat<float, uint, Utils::BigEndian>(value);
+  return fromFloat<float, unsigned int, Utils::BigEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat64LE(double value)
@@ -401,7 +401,7 @@ ByteVector::ByteVector() :
 {
 }
 
-ByteVector::ByteVector(uint size, char value) :
+ByteVector::ByteVector(unsigned int size, char value) :
   d(new ByteVectorPrivate(size, value))
 {
 }
@@ -411,7 +411,7 @@ ByteVector::ByteVector(const ByteVector &v) :
 {
 }
 
-ByteVector::ByteVector(const ByteVector &v, uint offset, uint length) :
+ByteVector::ByteVector(const ByteVector &v, unsigned int offset, unsigned int length) :
   d(new ByteVectorPrivate(*v.d, offset, length))
 {
 }
@@ -421,7 +421,7 @@ ByteVector::ByteVector(char c) :
 {
 }
 
-ByteVector::ByteVector(const char *data, uint length) :
+ByteVector::ByteVector(const char *data, unsigned int length) :
   d(new ByteVectorPrivate(data, length))
 {
 }
@@ -436,7 +436,7 @@ ByteVector::~ByteVector()
   delete d;
 }
 
-ByteVector &ByteVector::setData(const char *s, uint length)
+ByteVector &ByteVector::setData(const char *s, unsigned int length)
 {
   ByteVector(s, length).swap(*this);
   return *this;
@@ -459,7 +459,7 @@ const char *ByteVector::data() const
   return (size() > 0) ? (&(*d->data)[d->offset]) : 0;
 }
 
-ByteVector ByteVector::mid(uint index, uint length) const
+ByteVector ByteVector::mid(unsigned int index, unsigned int length) const
 {
   index  = std::min(index, size());
   length = std::min(length, size() - index);
@@ -467,23 +467,23 @@ ByteVector ByteVector::mid(uint index, uint length) const
   return ByteVector(*this, index, length);
 }
 
-char ByteVector::at(uint index) const
+char ByteVector::at(unsigned int index) const
 {
   return (index < size()) ? (*d->data)[d->offset + index] : 0;
 }
 
-int ByteVector::find(const ByteVector &pattern, uint offset, int byteAlign) const
+int ByteVector::find(const ByteVector &pattern, unsigned int offset, int byteAlign) const
 {
   return findVector<ConstIterator>(
     begin(), end(), pattern.begin(), pattern.end(), offset, byteAlign);
 }
 
-int ByteVector::find(char c, uint offset, int byteAlign) const
+int ByteVector::find(char c, unsigned int offset, int byteAlign) const
 {
   return findChar<ConstIterator>(begin(), end(), c, offset, byteAlign);
 }
 
-int ByteVector::rfind(const ByteVector &pattern, uint offset, int byteAlign) const
+int ByteVector::rfind(const ByteVector &pattern, unsigned int offset, int byteAlign) const
 {
   if(offset > 0) {
     offset = size() - offset - pattern.size();
@@ -500,13 +500,13 @@ int ByteVector::rfind(const ByteVector &pattern, uint offset, int byteAlign) con
     return size() - pos - pattern.size();
 }
 
-bool ByteVector::containsAt(const ByteVector &pattern, uint offset, uint patternOffset, uint patternLength) const
+bool ByteVector::containsAt(const ByteVector &pattern, unsigned int offset, unsigned int patternOffset, unsigned int patternLength) const
 {
   if(pattern.size() < patternLength)
     patternLength = pattern.size();
 
   // do some sanity checking -- all of these things are needed for the search to be valid
-  const uint compareLength = patternLength - patternOffset;
+  const unsigned int compareLength = patternLength - patternOffset;
   if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)
     return false;
 
@@ -576,7 +576,7 @@ int ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
   // try to match the last n-1 bytes from the vector (where n is the pattern
   // size) -- continue trying to match n-2, n-3...1 bytes
 
-  for(uint i = 1; i < pattern.size(); i++) {
+  for(unsigned int i = 1; i < pattern.size(); i++) {
     if(containsAt(pattern, startIndex + i, 0, pattern.size() - i))
       return startIndex + i;
   }
@@ -588,7 +588,7 @@ ByteVector &ByteVector::append(const ByteVector &v)
 {
   if(v.d->length != 0) {
     detach();
-    uint originalSize = size();
+    unsigned int originalSize = size();
     resize(originalSize + v.size());
     ::memcpy(data() + originalSize, v.data(), v.size());
   }
@@ -608,12 +608,12 @@ ByteVector &ByteVector::clear()
   return *this;
 }
 
-TagLib::uint ByteVector::size() const
+unsigned int ByteVector::size() const
 {
   return d->length;
 }
 
-ByteVector &ByteVector::resize(uint size, char padding)
+ByteVector &ByteVector::resize(unsigned int size, char padding)
 {
   if(size != d->length) {
     detach();
@@ -691,27 +691,27 @@ bool ByteVector::isEmpty() const
   return (d->length == 0);
 }
 
-TagLib::uint ByteVector::checksum() const
+unsigned int ByteVector::checksum() const
 {
-  uint sum = 0;
+  unsigned int sum = 0;
   for(ByteVector::ConstIterator it = begin(); it != end(); ++it)
     sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(*it)];
   return sum;
 }
 
-TagLib::uint ByteVector::toUInt(bool mostSignificantByteFirst) const
+unsigned int ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, 0, mostSignificantByteFirst);
+  return toNumber<unsigned int>(*this, 0, mostSignificantByteFirst);
 }
 
-TagLib::uint ByteVector::toUInt(uint offset, bool mostSignificantByteFirst) const
+unsigned int ByteVector::toUInt(unsigned int offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, offset, mostSignificantByteFirst);
+  return toNumber<unsigned int>(*this, offset, mostSignificantByteFirst);
 }
 
-TagLib::uint ByteVector::toUInt(uint offset, uint length, bool mostSignificantByteFirst) const
+unsigned int ByteVector::toUInt(unsigned int offset, unsigned int length, bool mostSignificantByteFirst) const
 {
-  return toNumber<uint>(*this, offset, length, mostSignificantByteFirst);
+  return toNumber<unsigned int>(*this, offset, length, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
@@ -719,7 +719,7 @@ short ByteVector::toShort(bool mostSignificantByteFirst) const
   return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
 }
 
-short ByteVector::toShort(uint offset, bool mostSignificantByteFirst) const
+short ByteVector::toShort(unsigned int offset, bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
 }
@@ -729,7 +729,7 @@ unsigned short ByteVector::toUShort(bool mostSignificantByteFirst) const
   return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
 }
 
-unsigned short ByteVector::toUShort(uint offset, bool mostSignificantByteFirst) const
+unsigned short ByteVector::toUShort(unsigned int offset, bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
 }
@@ -739,19 +739,19 @@ long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
   return toNumber<unsigned long long>(*this, 0, mostSignificantByteFirst);
 }
 
-long long ByteVector::toLongLong(uint offset, bool mostSignificantByteFirst) const
+long long ByteVector::toLongLong(unsigned int offset, bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
 }
 
 float ByteVector::toFloat32LE(size_t offset) const
 {
-  return toFloat<float, uint, Utils::LittleEndian>(*this, offset);
+  return toFloat<float, unsigned int, Utils::LittleEndian>(*this, offset);
 }
 
 float ByteVector::toFloat32BE(size_t offset) const
 {
-  return toFloat<float, uint, Utils::BigEndian>(*this, offset);
+  return toFloat<float, unsigned int, Utils::BigEndian>(*this, offset);
 }
 
 double ByteVector::toFloat64LE(size_t offset) const
@@ -862,7 +862,7 @@ ByteVector ByteVector::toHex() const
   ByteVector encoded(size() * 2);
   char *p = encoded.data();
 
-  for(uint i = 0; i < size(); i++) {
+  for(unsigned int i = 0; i < size(); i++) {
     unsigned char c = data()[i];
     *p++ = hexTable[(c >> 4) & 0x0F];
     *p++ = hexTable[(c     ) & 0x0F];
@@ -892,7 +892,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
     0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80,0x80
   };
 
-  uint len = input.size();
+  unsigned int len = input.size();
 
   ByteVector output(len);
 
@@ -957,7 +957,7 @@ ByteVector ByteVector::toBase64() const
 {
   static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   if (size()) {
-    uint len = size();
+    unsigned int len = size();
     ByteVector output(4 * ((len - 1) / 3 + 1)); // note roundup
 
     const char * src = data();
@@ -1009,7 +1009,7 @@ void ByteVector::detach()
 
 std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v)
 {
-  for(TagLib::uint i = 0; i < v.size(); i++)
+  for(unsigned int i = 0; i < v.size(); i++)
     s << v[i];
   return s;
 }

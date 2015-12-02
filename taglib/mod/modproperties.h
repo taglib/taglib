@@ -42,12 +42,12 @@ namespace TagLib {
       int sampleRate()           const;
       int channels()             const;
 
-      uint instrumentCount()   const;
+      unsigned int  instrumentCount()  const;
       unsigned char lengthInPatterns() const;
 
       void setChannels(int channels);
 
-      void setInstrumentCount(uint sampleCount);
+      void setInstrumentCount(unsigned int sampleCount);
       void setLengthInPatterns(unsigned char lengthInPatterns);
 
     private:

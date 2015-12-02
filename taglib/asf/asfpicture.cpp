@@ -151,7 +151,7 @@ void ASF::Picture::parse(const ByteVector& bytes)
     return;
   int pos = 0;
   d->type = (Type)bytes[0]; ++pos;
-  const uint dataLen = bytes.toUInt(pos, false); pos+=4;
+  const unsigned int dataLen = bytes.toUInt(pos, false); pos+=4;
 
   const ByteVector nullStringTerminator(2, 0);
 

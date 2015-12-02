@@ -58,7 +58,7 @@ namespace TagLib {
 
       Item(int value);
       Item(unsigned char value);
-      Item(uint value);
+      Item(unsigned int value);
       Item(long long value);
       Item(bool value);
       Item(int first, int second);
@@ -71,7 +71,7 @@ namespace TagLib {
 
       int toInt() const;
       unsigned char toByte() const;
-      uint toUInt() const;
+      unsigned int toUInt() const;
       long long toLongLong() const;
       bool toBool() const;
       IntPair toIntPair() const;

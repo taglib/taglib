@@ -234,7 +234,7 @@ public:
   StringPrivate() :
     RefCounter() {}
 
-  StringPrivate(uint n, wchar_t c) :
+  StringPrivate(unsigned int n, wchar_t c) :
     RefCounter(),
     data(static_cast<size_t>(n), c) {}
 
@@ -448,7 +448,7 @@ bool String::startsWith(const String &s) const
   return substr(0, s.length()) == s;
 }
 
-String String::substr(uint position, uint n) const
+String String::substr(unsigned int position, unsigned int n) const
 {
   return String(d->data.substr(position, n));
 }
@@ -482,12 +482,12 @@ String String::upper() const
   return s;
 }
 
-TagLib::uint String::size() const
+unsigned int String::size() const
 {
   return d->data.size();
 }
 
-TagLib::uint String::length() const
+unsigned int String::length() const
 {
   return size();
 }

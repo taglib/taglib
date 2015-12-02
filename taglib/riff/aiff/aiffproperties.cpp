@@ -50,7 +50,7 @@ public:
   ByteVector compressionType;
   String compressionName;
 
-  uint sampleFrames;
+  unsigned int sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ int RIFF::AIFF::Properties::sampleWidth() const
   return bitsPerSample();
 }
 
-TagLib::uint RIFF::AIFF::Properties::sampleFrames() const
+unsigned int RIFF::AIFF::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -143,8 +143,8 @@ String RIFF::AIFF::Properties::compressionName() const
 void RIFF::AIFF::Properties::read(File *file)
 {
   ByteVector data;
-  uint streamLength = 0;
-  for(uint i = 0; i < file->chunkCount(); i++) {
+  unsigned int streamLength = 0;
+  for(unsigned int i = 0; i < file->chunkCount(); i++) {
     const ByteVector name = file->chunkName(i);
     if(name == "COMM") {
       if(data.isEmpty())

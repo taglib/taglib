@@ -80,7 +80,7 @@ ByteVector ByteVectorStream::readBlock(unsigned long length)
 
 void ByteVectorStream::writeBlock(const ByteVector &data)
 {
-  uint size = data.size();
+  unsigned int size = data.size();
   if(long(d->position + size) > length()) {
     truncate(d->position + size);
   }

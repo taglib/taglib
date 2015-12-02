@@ -46,7 +46,7 @@ namespace TagLib
       return v.toUShort(false);
     }
 
-    inline uint readDWORD(File *file, bool *ok = 0)
+    inline unsigned int readDWORD(File *file, bool *ok = 0)
     {
       const ByteVector v = file->readBlock(4);
       if(v.size() != 4) {

@@ -51,7 +51,7 @@ namespace TagLib {
       unsigned short restartPosition()  const;
       unsigned short patternCount()     const;
       unsigned short instrumentCount()  const;
-      uint   sampleCount()      const;
+      unsigned int   sampleCount()      const;
       unsigned short flags()            const;
       unsigned short tempo()            const;
       unsigned short bpmSpeed()         const;
@@ -63,7 +63,7 @@ namespace TagLib {
       void setRestartPosition(unsigned short restartPosition);
       void setPatternCount(unsigned short patternCount);
       void setInstrumentCount(unsigned short instrumentCount);
-      void setSampleCount(uint sampleCount);
+      void setSampleCount(unsigned int sampleCount);
       void setFlags(unsigned short flags);
       void setTempo(unsigned short tempo);
       void setBpmSpeed(unsigned short bpmSpeed);

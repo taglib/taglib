@@ -48,22 +48,22 @@ public:
     footerPresent(false),
     tagSize(0) {}
 
-  uint majorVersion;
-  uint revisionNumber;
+  unsigned int majorVersion;
+  unsigned int revisionNumber;
 
   bool unsynchronisation;
   bool extendedHeader;
   bool experimentalIndicator;
   bool footerPresent;
 
-  uint tagSize;
+  unsigned int tagSize;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint Header::size()
+unsigned int Header::size()
 {
   return 10;
 }
@@ -93,17 +93,17 @@ Header::~Header()
   delete d;
 }
 
-TagLib::uint Header::majorVersion() const
+unsigned int Header::majorVersion() const
 {
   return d->majorVersion;
 }
 
-void Header::setMajorVersion(TagLib::uint version)
+void Header::setMajorVersion(unsigned int version)
 {
   d->majorVersion = version;
 }
 
-TagLib::uint Header::revisionNumber() const
+unsigned int Header::revisionNumber() const
 {
   return d->revisionNumber;
 }
@@ -128,12 +128,12 @@ bool Header::footerPresent() const
   return d->footerPresent;
 }
 
-TagLib::uint Header::tagSize() const
+unsigned int Header::tagSize() const
 {
   return d->tagSize;
 }
 
-TagLib::uint Header::completeTagSize() const
+unsigned int Header::completeTagSize() const
 {
   if(d->footerPresent)
     return d->tagSize + size() + Footer::size();
@@ -141,7 +141,7 @@ TagLib::uint Header::completeTagSize() const
     return d->tagSize + size();
 }
 
-void Header::setTagSize(uint s)
+void Header::setTagSize(unsigned int s)
 {
   d->tagSize = s;
 }

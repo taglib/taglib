@@ -70,8 +70,8 @@ public:
 
   ~FilePrivate()
   {
-    uint size = blocks.size();
-    for(uint i = 0; i < size; i++) {
+    unsigned int size = blocks.size();
+    for(unsigned int i = 0; i < size; i++) {
       delete blocks[i];
     }
     delete properties;
@@ -79,7 +79,7 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   long ID3v2Location;
-  uint ID3v2OriginalSize;
+  unsigned int ID3v2OriginalSize;
 
   long ID3v1Location;
 
@@ -182,7 +182,7 @@ bool FLAC::File::save()
 
   bool foundVorbisCommentBlock = false;
   List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(unsigned int i = 0; i < d->blocks.size(); i++) {
     MetadataBlock *block = d->blocks[i];
     if(block->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
@@ -205,7 +205,7 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(uint i = 0; i < newBlocks.size(); i++) {
+  for(unsigned int i = 0; i < newBlocks.size(); i++) {
     FLAC::MetadataBlock *block = newBlocks[i];
     ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
@@ -300,7 +300,7 @@ long FLAC::File::streamLength()
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(unsigned int i = 0; i < d->blocks.size(); i++) {
     Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
     if(picture) {
       pictures.append(picture);
@@ -328,7 +328,7 @@ void FLAC::File::removePicture(Picture *picture, bool del)
 void FLAC::File::removePictures()
 {
   List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(unsigned int i = 0; i < d->blocks.size(); i++) {
     Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
     if(picture) {
       delete picture;
@@ -457,7 +457,7 @@ void FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool isLastBlock = (header[0] & 0x80) != 0;
-  uint length = header.toUInt(1U, 3U);
+  unsigned int length = header.toUInt(1U, 3U);
 
   // First block should be the stream_info metadata
 

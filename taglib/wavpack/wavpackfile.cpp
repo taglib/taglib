@@ -64,7 +64,7 @@ public:
   }
 
   long APELocation;
-  uint APESize;
+  unsigned int APESize;
 
   long ID3v1Location;
 

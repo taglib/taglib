@@ -488,7 +488,7 @@ bool File::isWritable(const char *file)
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint File::bufferSize()
+unsigned int File::bufferSize()
 {
   return 1024;
 }

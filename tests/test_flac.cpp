@@ -63,7 +63,7 @@ public:
 
     FLAC::File f(newname.c_str());
     List<FLAC::Picture *> lst = f.pictureList();
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
     FLAC::Picture *pic = lst.front();
     CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pic->type());
@@ -73,7 +73,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
     CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
     CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(150), pic->data().size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)150, pic->data().size());
   }
 
   void testAddPicture()
@@ -84,7 +84,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
       FLAC::Picture *newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
@@ -101,7 +101,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), lst.size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)2, lst.size());
 
       FLAC::Picture *pic = lst[0];
       CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pic->type());
@@ -111,7 +111,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
       CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
       CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(150), pic->data().size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)150, pic->data().size());
 
       pic = lst[1];
       CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
@@ -133,7 +133,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
       FLAC::Picture *newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
@@ -151,7 +151,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
       FLAC::Picture *pic = lst[0];
       CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
@@ -173,7 +173,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), lst.size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
       f.removePictures();
       f.save();
@@ -181,7 +181,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), lst.size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)0, lst.size());
     }
   }
 
@@ -220,7 +220,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       Ogg::FieldListMap m = f.xiphComment()->fieldListMap();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), m["ARTIST"].size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)2, m["ARTIST"].size());
       CPPUNIT_ASSERT_EQUAL(String("artist 1"), m["ARTIST"][0]);
       CPPUNIT_ASSERT_EQUAL(String("artist 2"), m["ARTIST"][1]);
     }
@@ -243,7 +243,7 @@ public:
     {
       FLAC::File f(newname.c_str());
       PropertyMap dict = f.properties();
-      CPPUNIT_ASSERT_EQUAL(TagLib::uint(2), dict["ARTIST"].size());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)2, dict["ARTIST"].size());
       CPPUNIT_ASSERT_EQUAL(String("artøst 1"), dict["ARTIST"][0]);
       CPPUNIT_ASSERT_EQUAL(String("artöst 2"), dict["ARTIST"][1]);
     }
@@ -256,8 +256,8 @@ public:
     map[L"H\x00c4\x00d6"] = String("bla");
     FLAC::File f(copy.fileName().c_str());
     PropertyMap invalid = f.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(1), invalid.size());
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), f.properties().size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)1, invalid.size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)0, f.properties().size());
   }
 
   void testAudioProperties()

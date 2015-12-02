@@ -121,7 +121,7 @@ String Ogg::XiphComment::genre() const
   return d->fieldListMap["GENRE"].toString();
 }
 
-TagLib::uint Ogg::XiphComment::year() const
+unsigned int Ogg::XiphComment::year() const
 {
   if(!d->fieldListMap["DATE"].isEmpty())
     return d->fieldListMap["DATE"].front().toInt();
@@ -130,7 +130,7 @@ TagLib::uint Ogg::XiphComment::year() const
   return 0;
 }
 
-TagLib::uint Ogg::XiphComment::track() const
+unsigned int Ogg::XiphComment::track() const
 {
   if(!d->fieldListMap["TRACKNUMBER"].isEmpty())
     return d->fieldListMap["TRACKNUMBER"].front().toInt();
@@ -171,7 +171,7 @@ void Ogg::XiphComment::setGenre(const String &s)
   addField("GENRE", s);
 }
 
-void Ogg::XiphComment::setYear(uint i)
+void Ogg::XiphComment::setYear(unsigned int i)
 {
   removeFields("YEAR");
   if(i == 0)
@@ -180,7 +180,7 @@ void Ogg::XiphComment::setYear(uint i)
     addField("DATE", String::number(i));
 }
 
-void Ogg::XiphComment::setTrack(uint i)
+void Ogg::XiphComment::setTrack(unsigned int i)
 {
   removeFields("TRACKNUM");
   if(i == 0)
@@ -199,9 +199,9 @@ bool Ogg::XiphComment::isEmpty() const
   return true;
 }
 
-TagLib::uint Ogg::XiphComment::fieldCount() const
+unsigned int Ogg::XiphComment::fieldCount() const
 {
-  uint count = 0;
+  unsigned int count = 0;
 
   for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
     count += (*it).second.size();
@@ -411,9 +411,9 @@ void Ogg::XiphComment::parse(const ByteVector &data)
   // The first thing in the comment data is the vendor ID length, followed by a
   // UTF8 string with the vendor ID.
 
-  uint pos = 0;
+  unsigned int pos = 0;
 
-  const uint vendorLength = data.toUInt(0, false);
+  const unsigned int vendorLength = data.toUInt(0, false);
   pos += 4;
 
   d->vendorID = String(data.mid(pos, vendorLength), String::UTF8);
@@ -421,19 +421,19 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   // Next the number of fields in the comment vector.
 
-  const uint commentFields = data.toUInt(pos, false);
+  const unsigned int commentFields = data.toUInt(pos, false);
   pos += 4;
 
   if(commentFields > (data.size() - 8) / 4) {
     return;
   }
 
-  for(uint i = 0; i < commentFields; i++) {
+  for(unsigned int i = 0; i < commentFields; i++) {
 
     // Each comment field is in the format "KEY=value" in a UTF8 string and has
     // 4 bytes before the text starts that gives the length.
 
-    const uint commentLength = data.toUInt(pos, false);
+    const unsigned int commentLength = data.toUInt(pos, false);
     pos += 4;
 
     ByteVector entry = data.mid(pos, commentLength);

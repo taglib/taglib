@@ -182,7 +182,7 @@ ASF::Picture ASF::Attribute::toPicture() const
 
 String ASF::Attribute::parse(ASF::File &f, int kind)
 {
-  uint size, nameLength;
+  unsigned int size, nameLength;
   String name;
   d->pictureValue = Picture::fromInvalid();
   // extended content descriptor

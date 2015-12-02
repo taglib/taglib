@@ -169,7 +169,7 @@ namespace TagLib {
        *
        * \see setStreamSerialNumber()
        */
-      uint streamSerialNumber() const;
+      unsigned int streamSerialNumber() const;
 
       /*!
        * Every Ogg logical stream is given a random serial number which is common
@@ -179,7 +179,7 @@ namespace TagLib {
        *
        * \see streamSerialNumber()
        */
-      void setStreamSerialNumber(uint n);
+      void setStreamSerialNumber(unsigned int n);
 
       /*!
        * Returns the index of the page within the Ogg stream.  This helps make it
