@@ -33,14 +33,14 @@ Mod::FileBase::FileBase(IOStream *stream) : TagLib::File(stream)
 {
 }
 
-void Mod::FileBase::writeString(const String &s, ulong size, char padding)
+void Mod::FileBase::writeString(const String &s, unsigned long size, char padding)
 {
   ByteVector data(s.data(String::Latin1));
   data.resize(size, padding);
   writeBlock(data);
 }
 
-bool Mod::FileBase::readString(String &s, ulong size)
+bool Mod::FileBase::readString(String &s, unsigned long size)
 {
   ByteVector data(readBlock(size));
   if(data.size() < size) return false;
@@ -66,7 +66,7 @@ void Mod::FileBase::writeU16L(unsigned short number)
   writeBlock(ByteVector::fromShort(number, false));
 }
 
-void Mod::FileBase::writeU32L(ulong number)
+void Mod::FileBase::writeU32L(unsigned long number)
 {
   writeBlock(ByteVector::fromUInt(number, false));
 }
@@ -76,7 +76,7 @@ void Mod::FileBase::writeU16B(unsigned short number)
   writeBlock(ByteVector::fromShort(number, true));
 }
 
-void Mod::FileBase::writeU32B(ulong number)
+void Mod::FileBase::writeU32B(unsigned long number)
 {
   writeBlock(ByteVector::fromUInt(number, true));
 }
@@ -97,7 +97,7 @@ bool Mod::FileBase::readU16L(unsigned short &number)
   return true;
 }
 
-bool Mod::FileBase::readU32L(ulong &number) {
+bool Mod::FileBase::readU32L(unsigned long &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
   number = data.toUInt(false);
@@ -112,7 +112,7 @@ bool Mod::FileBase::readU16B(unsigned short &number)
   return true;
 }
 
-bool Mod::FileBase::readU32B(ulong &number) {
+bool Mod::FileBase::readU32B(unsigned long &number) {
   ByteVector data(readBlock(4));
   if(data.size() < 4) return false;
   number = data.toUInt(true);

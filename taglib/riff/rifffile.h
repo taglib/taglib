@@ -145,7 +145,7 @@ namespace TagLib {
 
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,
-                      ulong offset, ulong replace = 0,
+                      unsigned long offset, unsigned long replace = 0,
                       uint leadingPadding = 0);
 
       class FilePrivate;

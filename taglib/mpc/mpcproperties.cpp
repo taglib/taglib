@@ -247,7 +247,7 @@ void MPC::Properties::readSV8(File *file, long streamLength)
         break;
       }
 
-      const ulong begSilence = readSize(data, pos);
+      const unsigned long begSilence = readSize(data, pos);
       if(pos > dataSize - 2) {
         debug("MPC::Properties::readSV8() - \"SH\" packet is corrupt.");
         break;

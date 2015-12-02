@@ -31,7 +31,6 @@
 using namespace TagLib;
 using namespace XM;
 using TagLib::uint;
-using TagLib::ulong;
 
 /*!
  * The Reader classes are helpers to make handling of the stripped XM
@@ -198,11 +197,11 @@ public:
   }
 };
 
-class U32Reader : public NumberReader<ulong>
+class U32Reader : public NumberReader<unsigned long>
 {
 public:
-  U32Reader(ulong &value, bool bigEndian = true) :
-    NumberReader<ulong>(value, bigEndian)
+  U32Reader(unsigned long &value, bool bigEndian = true) :
+    NumberReader<unsigned long>(value, bigEndian)
   {
   }
 
@@ -293,7 +292,7 @@ public:
    * Read a unsigned 32 Bit integer into \a number. The byte order
    * is controlled by \a bigEndian.
    */
-  StructReader &u32(ulong &number, bool bigEndian)
+  StructReader &u32(unsigned long &number, bool bigEndian)
   {
     m_readers.append(new U32Reader(number, bigEndian));
     return *this;
@@ -302,7 +301,7 @@ public:
   /*!
    * Read a unsigned 32 Bit little endian integer into \a number.
    */
-  StructReader &u32L(ulong &number)
+  StructReader &u32L(unsigned long &number)
   {
     return u32(number, false);
   }
@@ -310,7 +309,7 @@ public:
   /*!
    * Read a unsigned 32 Bit big endian integer into \a number.
    */
-  StructReader &u32B(ulong &number)
+  StructReader &u32B(unsigned long &number)
   {
     return u32(number, true);
   }
@@ -410,7 +409,7 @@ bool XM::File::save()
   writeString(d->tag.trackerName(), 20);
 
   seek(60);
-  ulong headerSize = 0;
+  unsigned long headerSize = 0;
   if(!readU32L(headerSize))
     return false;
 
@@ -425,7 +424,7 @@ bool XM::File::save()
   // need to read patterns again in order to seek to the instruments:
   for(unsigned short i = 0; i < patternCount; ++ i) {
     seek(pos);
-    ulong patternHeaderLength = 0;
+    unsigned long patternHeaderLength = 0;
     if(!readU32L(patternHeaderLength) || patternHeaderLength < 4)
       return false;
 
@@ -441,7 +440,7 @@ bool XM::File::save()
   uint sampleNameIndex = instrumentCount;
   for(unsigned short i = 0; i < instrumentCount; ++ i) {
     seek(pos);
-    ulong instrumentHeaderSize = 0;
+    unsigned long instrumentHeaderSize = 0;
     if(!readU32L(instrumentHeaderSize) || instrumentHeaderSize < 4)
       return false;
 
@@ -459,7 +458,7 @@ bool XM::File::save()
         return false;
     }
 
-    ulong sampleHeaderSize = 0;
+    unsigned long sampleHeaderSize = 0;
     if(sampleCount > 0) {
       seek(pos + 29);
       if(instrumentHeaderSize < 33U || !readU32L(sampleHeaderSize))
@@ -471,7 +470,7 @@ bool XM::File::save()
     for(unsigned short j = 0; j < sampleCount; ++ j) {
       if(sampleHeaderSize > 4U) {
         seek(pos);
-        ulong sampleLength = 0;
+        unsigned long sampleLength = 0;
         if(!readU32L(sampleLength))
           return false;
 
@@ -532,7 +531,7 @@ void XM::File::read(bool)
         .u16L(bpmSpeed);
 
   uint count = header.read(*this, headerSize - 4U);
-  uint size = std::min(headerSize - 4U, (ulong)header.size());
+  uint size = std::min(headerSize - 4U, (unsigned long)header.size());
 
   READ_ASSERT(count == size);
 
@@ -559,7 +558,7 @@ void XM::File::read(bool)
     pattern.byte(packingType).u16L(rowCount).u16L(dataSize);
 
     uint count = pattern.read(*this, patternHeaderLength - 4U);
-    READ_ASSERT(count == std::min(patternHeaderLength - 4U, (ulong)pattern.size()));
+    READ_ASSERT(count == std::min(patternHeaderLength - 4U, (unsigned long)pattern.size()));
 
     seek(patternHeaderLength - (4 + count) + dataSize, Current);
   }
@@ -582,9 +581,9 @@ void XM::File::read(bool)
 
     // 4 for instrumentHeaderSize
     uint count = 4 + instrument.read(*this, instrumentHeaderSize - 4U);
-    READ_ASSERT(count == std::min(instrumentHeaderSize, (ulong)instrument.size() + 4));
+    READ_ASSERT(count == std::min(instrumentHeaderSize, (unsigned long)instrument.size() + 4));
 
-    ulong sampleHeaderSize = 0;
+    unsigned long sampleHeaderSize = 0;
     long offset = 0;
     if(sampleCount > 0) {
       sumSampleCount += sampleCount;
@@ -594,9 +593,9 @@ void XM::File::read(bool)
       seek(instrumentHeaderSize - count - 4, Current);
 
       for(unsigned short j = 0; j < sampleCount; ++ j) {
-        ulong sampleLength = 0;
-        ulong loopStart    = 0;
-        ulong loopLength   = 0;
+        unsigned long sampleLength = 0;
+        unsigned long loopStart    = 0;
+        unsigned long loopLength   = 0;
         unsigned char volume       = 0;
         unsigned char finetune     = 0;
         unsigned char sampleType   = 0;
@@ -617,7 +616,7 @@ void XM::File::read(bool)
               .string(sampleName, 22);
 
         uint count = sample.read(*this, sampleHeaderSize);
-        READ_ASSERT(count == std::min(sampleHeaderSize, (ulong)sample.size()));
+        READ_ASSERT(count == std::min(sampleHeaderSize, (unsigned long)sample.size()));
         // skip unhandeled header proportion:
         seek(sampleHeaderSize - count, Current);
 

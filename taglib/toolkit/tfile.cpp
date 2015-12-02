@@ -224,7 +224,7 @@ PropertyMap File::setProperties(const PropertyMap &properties)
     return tag()->setProperties(properties);
 }
 
-ByteVector File::readBlock(ulong length)
+ByteVector File::readBlock(unsigned long length)
 {
   return d->stream->readBlock(length);
 }
@@ -404,12 +404,12 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
   return -1;
 }
 
-void File::insert(const ByteVector &data, ulong start, ulong replace)
+void File::insert(const ByteVector &data, unsigned long start, unsigned long replace)
 {
   d->stream->insert(data, start, replace);
 }
 
-void File::removeBlock(ulong start, ulong length)
+void File::removeBlock(unsigned long start, unsigned long length)
 {
   d->stream->removeBlock(start, length);
 }

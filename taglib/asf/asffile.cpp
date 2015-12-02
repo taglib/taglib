@@ -600,7 +600,7 @@ bool ASF::File::save()
   writeBlock(ByteVector::fromUInt(d->objects.size(), false));
   writeBlock(ByteVector("\x01\x02", 2));
 
-  insert(data, 30, static_cast<ulong>(d->headerSize - 30));
+  insert(data, 30, static_cast<unsigned long>(d->headerSize - 30));
 
   d->headerSize = data.size() + 30;
 

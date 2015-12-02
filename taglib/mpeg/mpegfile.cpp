@@ -409,7 +409,7 @@ long MPEG::File::previousFrameOffset(long position)
   ByteVector buffer;
 
   while (position > 0) {
-    long size = ulong(position) < bufferSize() ? position : bufferSize();
+    long size = std::min<long>(position, bufferSize());
     position -= size;
 
     seek(position);

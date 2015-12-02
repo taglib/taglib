@@ -178,7 +178,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // Couldn't find an existing chunk, so let's create a new one.
 
   uint i = d->chunks.size() - 1;
-  ulong offset = d->chunks[i].offset + d->chunks[i].size;
+  unsigned long offset = d->chunks[i].offset + d->chunks[i].size;
 
   // First we update the global size
 
@@ -284,7 +284,7 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            ulong offset, ulong replace, uint leadingPadding)
+                            unsigned long offset, unsigned long replace, uint leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {

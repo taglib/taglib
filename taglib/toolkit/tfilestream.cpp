@@ -172,7 +172,7 @@ FileName FileStream::name() const
   return d->name;
 }
 
-ByteVector FileStream::readBlock(ulong length)
+ByteVector FileStream::readBlock(unsigned long length)
 {
   if(!isOpen()) {
     debug("FileStream::readBlock() -- invalid file.");
@@ -182,7 +182,7 @@ ByteVector FileStream::readBlock(ulong length)
   if(length == 0)
     return ByteVector();
 
-  const ulong streamLength = static_cast<ulong>(FileStream::length());
+  const unsigned long streamLength = static_cast<unsigned long>(FileStream::length());
   if(length > bufferSize() && length > streamLength)
     length = streamLength;
 
@@ -209,7 +209,7 @@ void FileStream::writeBlock(const ByteVector &data)
   writeFile(d->file, data);
 }
 
-void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
+void FileStream::insert(const ByteVector &data, unsigned long start, unsigned long replace)
 {
   if(!isOpen()) {
     debug("FileStream::insert() -- invalid file.");
@@ -243,7 +243,7 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   // the *differnce* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  ulong bufferLength = bufferSize();
+  unsigned long bufferLength = bufferSize();
 
   while(data.size() - replace > bufferLength)
     bufferLength += bufferSize();
@@ -291,14 +291,14 @@ void FileStream::insert(const ByteVector &data, ulong start, ulong replace)
   }
 }
 
-void FileStream::removeBlock(ulong start, ulong length)
+void FileStream::removeBlock(unsigned long start, unsigned long length)
 {
   if(!isOpen()) {
     debug("FileStream::removeBlock() -- invalid file.");
     return;
   }
 
-  ulong bufferLength = bufferSize();
+  unsigned long bufferLength = bufferSize();
 
   long readPosition = start + length;
   long writePosition = start;
