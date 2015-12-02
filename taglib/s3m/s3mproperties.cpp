@@ -51,10 +51,10 @@ public:
   ushort flags;
   ushort trackerVersion;
   ushort fileFormatVersion;
-  uchar  globalVolume;
-  uchar  masterVolume;
-  uchar  tempo;
-  uchar  bpmSpeed;
+  unsigned char  globalVolume;
+  unsigned char  masterVolume;
+  unsigned char  tempo;
+  unsigned char  bpmSpeed;
 };
 
 S3M::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -133,22 +133,22 @@ TagLib::ushort S3M::Properties::fileFormatVersion() const
   return d->fileFormatVersion;
 }
 
-uchar S3M::Properties::globalVolume() const
+unsigned char S3M::Properties::globalVolume() const
 {
   return d->globalVolume;
 }
 
-uchar S3M::Properties::masterVolume() const
+unsigned char S3M::Properties::masterVolume() const
 {
   return d->masterVolume;
 }
 
-uchar S3M::Properties::tempo() const
+unsigned char S3M::Properties::tempo() const
 {
   return d->tempo;
 }
 
-uchar S3M::Properties::bpmSpeed() const
+unsigned char S3M::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
@@ -193,22 +193,22 @@ void S3M::Properties::setFileFormatVersion(ushort fileFormatVersion)
   d->fileFormatVersion = fileFormatVersion;
 }
 
-void S3M::Properties::setGlobalVolume(uchar globalVolume)
+void S3M::Properties::setGlobalVolume(unsigned char globalVolume)
 {
   d->globalVolume = globalVolume;
 }
 
-void S3M::Properties::setMasterVolume(uchar masterVolume)
+void S3M::Properties::setMasterVolume(unsigned char masterVolume)
 {
   d->masterVolume = masterVolume;
 }
 
-void S3M::Properties::setTempo(uchar tempo)
+void S3M::Properties::setTempo(unsigned char tempo)
 {
   d->tempo = tempo;
 }
 
-void S3M::Properties::setBpmSpeed(uchar bpmSpeed)
+void S3M::Properties::setBpmSpeed(unsigned char bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
 }

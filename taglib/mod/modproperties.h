@@ -43,12 +43,12 @@ namespace TagLib {
       int channels()             const;
 
       uint instrumentCount()   const;
-      uchar lengthInPatterns() const;
+      unsigned char lengthInPatterns() const;
 
       void setChannels(int channels);
 
       void setInstrumentCount(uint sampleCount);
-      void setLengthInPatterns(uchar lengthInPatterns);
+      void setLengthInPatterns(unsigned char lengthInPatterns);
 
     private:
       friend class File;

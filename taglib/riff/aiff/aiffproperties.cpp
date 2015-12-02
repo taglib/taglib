@@ -186,6 +186,7 @@ void RIFF::AIFF::Properties::read(File *file)
 
   if(data.size() >= 23) {
     d->compressionType = data.mid(18, 4);
-    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])), String::Latin1);
+    d->compressionName
+      = String(data.mid(23, static_cast<unsigned char>(data[22])), String::Latin1);
   }
 }

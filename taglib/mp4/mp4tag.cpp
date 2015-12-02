@@ -189,7 +189,7 @@ MP4::Tag::parseByte(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
   if(!data.isEmpty()) {
-    addItem(atom->name, (uchar)data[0].at(0));
+    addItem(atom->name, static_cast<unsigned char>(data[0].at(0)));
   }
 }
 

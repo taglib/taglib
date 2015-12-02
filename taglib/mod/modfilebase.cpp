@@ -55,7 +55,7 @@ bool Mod::FileBase::readString(String &s, ulong size)
   return true;
 }
 
-void Mod::FileBase::writeByte(uchar byte)
+void Mod::FileBase::writeByte(unsigned char byte)
 {
   ByteVector data(1, byte);
   writeBlock(data);
@@ -81,7 +81,7 @@ void Mod::FileBase::writeU32B(ulong number)
   writeBlock(ByteVector::fromUInt(number, true));
 }
 
-bool Mod::FileBase::readByte(uchar &byte)
+bool Mod::FileBase::readByte(unsigned char &byte)
 {
   ByteVector data(readBlock(1));
   if(data.size() < 1) return false;

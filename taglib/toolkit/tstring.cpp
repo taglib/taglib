@@ -133,7 +133,7 @@ namespace
     data.resize(length);
 
     for(size_t i = 0; i < length; ++i)
-      data[i] = static_cast<uchar>(s[i]);
+      data[i] = static_cast<unsigned char>(s[i]);
   }
 
   // Converts a UTF-8 string into UTF-16(without BOM/CPU byte order)
@@ -337,7 +337,7 @@ String::String(wchar_t c, Type t) :
 }
 
 String::String(char c, Type t) :
-  d(new StringPrivate(1, static_cast<uchar>(c)))
+  d(new StringPrivate(1, static_cast<unsigned char>(c)))
 {
   if(t != Latin1 && t != UTF8) {
     debug("String::String() -- char should not contain UTF16.");
@@ -661,7 +661,7 @@ bool String::operator==(const char *s) const
   const wchar_t *p = toCWString();
 
   while(*p != L'\0' || *s != '\0') {
-    if(*p++ != static_cast<uchar>(*s++))
+    if(*p++ != static_cast<unsigned char>(*s++))
       return false;
   }
   return true;
@@ -703,7 +703,7 @@ String &String::operator+=(const char *s)
   detach();
 
   for(int i = 0; s[i] != 0; i++)
-    d->data += uchar(s[i]);
+    d->data += static_cast<unsigned char>(s[i]);
   return *this;
 }
 
@@ -719,7 +719,7 @@ String &String::operator+=(char c)
 {
   detach();
 
-  d->data += uchar(c);
+  d->data += static_cast<unsigned char>(c);
   return *this;
 }
 

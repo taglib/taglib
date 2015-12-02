@@ -222,7 +222,7 @@ ByteVector Ogg::PageHeader::render() const
 
   ByteVector pageSegments = lacingValues();
 
-  data.append(char(uchar(pageSegments.size())));
+  data.append(static_cast<unsigned char>(pageSegments.size()));
   data.append(pageSegments);
 
   return data;
@@ -263,7 +263,7 @@ void Ogg::PageHeader::read()
   // length portion of the page header.  After reading the number of page
   // segments we'll then read in the corresponding data for this count.
 
-  int pageSegmentCount = uchar(data[26]);
+  int pageSegmentCount = static_cast<unsigned char>(data[26]);
 
   ByteVector pageSegments = d->file->readBlock(pageSegmentCount);
 
@@ -279,10 +279,10 @@ void Ogg::PageHeader::read()
   int packetSize = 0;
 
   for(int i = 0; i < pageSegmentCount; i++) {
-    d->dataSize += uchar(pageSegments[i]);
-    packetSize += uchar(pageSegments[i]);
+    d->dataSize += static_cast<unsigned char>(pageSegments[i]);
+    packetSize += static_cast<unsigned char>(pageSegments[i]);
 
-    if(uchar(pageSegments[i]) < 255) {
+    if(static_cast<unsigned char>(pageSegments[i]) < 255) {
       d->packetSizes.append(packetSize);
       packetSize = 0;
     }
@@ -313,10 +313,10 @@ ByteVector Ogg::PageHeader::lacingValues() const
     div_t n = div(*it, 255);
 
     for(int i = 0; i < n.quot; i++)
-      data.append(char(uchar(255)));
+      data.append(static_cast<unsigned char>(255));
 
     if(it != --sizes.end() || d->lastPacketCompleted)
-      data.append(char(uchar(n.rem)));
+      data.append(static_cast<unsigned char>(n.rem));
   }
 
   return data;

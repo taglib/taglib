@@ -130,11 +130,11 @@ void Opus::Properties::read(File *file)
   uint pos = 8;
 
   // *Version* (8 bits, unsigned)
-  d->opusVersion = uchar(data.at(pos));
+  d->opusVersion = static_cast<unsigned char>(data.at(pos));
   pos += 1;
 
   // *Output Channel Count* 'C' (8 bits, unsigned)
-  d->channels = uchar(data.at(pos));
+  d->channels = static_cast<unsigned char>(data.at(pos));
   pos += 1;
 
   // *Pre-skip* (16 bits, unsigned, little endian)

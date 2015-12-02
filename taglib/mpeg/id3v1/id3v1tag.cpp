@@ -50,8 +50,8 @@ public:
   String album;
   String year;
   String comment;
-  uchar track;
-  uchar genre;
+  unsigned char track;
+  unsigned char genre;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -251,12 +251,12 @@ void ID3v1::Tag::parse(const ByteVector &data)
     // ID3v1.1 detected
 
     d->comment = stringHandler->parse(data.mid(offset, 28));
-    d->track = uchar(data[offset + 29]);
+    d->track   = static_cast<unsigned char>(data[offset + 29]);
   }
   else
     d->comment = data.mid(offset, 30);
 
   offset += 30;
 
-  d->genre = uchar(data[offset]);
+  d->genre = static_cast<unsigned char>(data[offset]);
 }

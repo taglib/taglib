@@ -37,7 +37,7 @@
     setter(number); \
   }
 
-#define READ_BYTE(setter) READ(setter,uchar,readByte)
+#define READ_BYTE(setter) READ(setter,unsigned char,readByte)
 #define READ_U16L(setter) READ(setter,ushort,readU16L)
 #define READ_U32L(setter) READ(setter,ulong,readU32L)
 #define READ_U16B(setter) READ(setter,ushort,readU16B)
@@ -54,7 +54,7 @@
   type name = 0; \
   READ_ASSERT(read(name));
 
-#define READ_BYTE_AS(name) READ_AS(uchar,name,readByte)
+#define READ_BYTE_AS(name) READ_AS(unsigned char,name,readByte)
 #define READ_U16L_AS(name) READ_AS(ushort,name,readU16L)
 #define READ_U32L_AS(name) READ_AS(ulong,name,readU32L)
 #define READ_U16B_AS(name) READ_AS(ushort,name,readU16B)

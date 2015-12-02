@@ -164,7 +164,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 
 void MPEG::Header::parse(const ByteVector &data)
 {
-  if(data.size() < 4 || uchar(data[0]) != 0xff) {
+  if(data.size() < 4 || static_cast<unsigned char>(data[0]) != 0xff) {
     debug("MPEG::Header::parse() -- First byte did not match MPEG synch.");
     return;
   }
@@ -219,7 +219,7 @@ void MPEG::Header::parse(const ByteVector &data)
   // The bitrate index is encoded as the first 4 bits of the 3rd byte,
   // i.e. 1111xxxx
 
-  int i = uchar(data[2]) >> 4;
+  int i = static_cast<unsigned char>(data[2]) >> 4;
 
   d->bitrate = bitrates[versionIndex][layerIndex][i];
 
@@ -233,7 +233,7 @@ void MPEG::Header::parse(const ByteVector &data)
 
   // The sample rate index is encoded as two bits in the 3nd byte, i.e. xxxx11xx
 
-  i = uchar(data[2]) >> 2 & 0x03;
+  i = static_cast<unsigned char>(data[2]) >> 2 & 0x03;
 
   d->sampleRate = sampleRates[d->version][i];
 
@@ -245,7 +245,7 @@ void MPEG::Header::parse(const ByteVector &data)
   // The channel mode is encoded as a 2 bit value at the end of the 3nd byte,
   // i.e. xxxxxx11
 
-  d->channelMode = ChannelMode((uchar(data[3]) & 0xC0) >> 6);
+  d->channelMode = static_cast<ChannelMode>((static_cast<unsigned char>(data[3]) & 0xC0) >> 6);
 
   // TODO: Add mode extension for completeness
 

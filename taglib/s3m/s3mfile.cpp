@@ -110,7 +110,7 @@ bool S3M::File::save()
 
   int channels = 0;
   for(int i = 0; i < 32; ++ i) {
-    uchar setting = 0;
+    unsigned char setting = 0;
     if(!readByte(setting))
       return false;
     // or if(setting >= 128)?

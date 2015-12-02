@@ -45,12 +45,12 @@ namespace
    * starts with \e 111 is a bit more tricky, hence these functions.
    */
 
-  inline bool firstSyncByte(uchar byte)
+  inline bool firstSyncByte(unsigned char byte)
   {
     return (byte == 0xFF);
   }
 
-  inline bool secondSynchByte(uchar byte)
+  inline bool secondSynchByte(unsigned char byte)
   {
     return ((byte & 0xE0) == 0xE0);
   }

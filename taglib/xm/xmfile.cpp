@@ -147,10 +147,10 @@ private:
   uint m_size;
 };
 
-class ByteReader : public ValueReader<uchar>
+class ByteReader : public ValueReader<unsigned char>
 {
 public:
-  ByteReader(uchar &byte) : ValueReader<uchar>(byte) {}
+  ByteReader(unsigned char &byte) : ValueReader<unsigned char>(byte) {}
 
   uint read(TagLib::File &file, uint limit)
   {
@@ -258,7 +258,7 @@ public:
   /*!
    * Read a byte into \a byte.
    */
-  StructReader &byte(uchar &byte)
+  StructReader &byte(unsigned char &byte)
   {
     m_readers.append(new ByteReader(byte));
     return *this;
@@ -553,7 +553,7 @@ void XM::File::read(bool)
     READ_U32L_AS(patternHeaderLength);
     READ_ASSERT(patternHeaderLength >= 4);
 
-    uchar  packingType = 0;
+    unsigned char  packingType = 0;
     ushort rowCount = 0;
     ushort dataSize = 0;
     StructReader pattern;
@@ -575,7 +575,7 @@ void XM::File::read(bool)
     READ_ASSERT(instrumentHeaderSize >= 4);
 
     String instrumentName;
-    uchar  instrumentType = 0;
+    unsigned char  instrumentType = 0;
     ushort sampleCount = 0;
 
     StructReader instrument;
@@ -598,12 +598,12 @@ void XM::File::read(bool)
         ulong sampleLength = 0;
         ulong loopStart    = 0;
         ulong loopLength   = 0;
-        uchar volume       = 0;
-        uchar finetune     = 0;
-        uchar sampleType   = 0;
-        uchar panning      = 0;
-        uchar noteNumber   = 0;
-        uchar compression  = 0;
+        unsigned char volume       = 0;
+        unsigned char finetune     = 0;
+        unsigned char sampleType   = 0;
+        unsigned char panning      = 0;
+        unsigned char noteNumber   = 0;
+        unsigned char compression  = 0;
         String sampleName;
         StructReader sample;
         sample.u32L(sampleLength)

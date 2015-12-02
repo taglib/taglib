@@ -105,10 +105,10 @@ private:
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)   0, p->flags());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)4896, p->trackerVersion());
     CPPUNIT_ASSERT_EQUAL((TagLib::ushort)   2, p->fileFormatVersion());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar) 64, p->globalVolume());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar) 48, p->masterVolume());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)125, p->tempo());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)  6, p->bpmSpeed());
+    CPPUNIT_ASSERT_EQUAL((unsigned char) 64, p->globalVolume());
+    CPPUNIT_ASSERT_EQUAL((unsigned char) 48, p->masterVolume());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)125, p->tempo());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)  6, p->bpmSpeed());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
     CPPUNIT_ASSERT_EQUAL(String(), t->artist());
     CPPUNIT_ASSERT_EQUAL(String(), t->album());

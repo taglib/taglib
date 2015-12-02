@@ -67,7 +67,7 @@ ByteVector SynchData::fromUInt(uint value)
   ByteVector v(4, 0);
 
   for(int i = 0; i < 4; i++)
-    v[i] = uchar(value >> ((3 - i) * 7) & 0x7f);
+    v[i] = static_cast<unsigned char>(value >> ((3 - i) * 7) & 0x7f);
 
   return v;
 }

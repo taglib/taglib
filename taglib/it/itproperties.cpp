@@ -55,12 +55,12 @@ public:
   ushort compatibleVersion;
   ushort flags;
   ushort special;
-  uchar  globalVolume;
-  uchar  mixVolume;
-  uchar  tempo;
-  uchar  bpmSpeed;
-  uchar  panningSeparation;
-  uchar  pitchWheelDepth;
+  unsigned char  globalVolume;
+  unsigned char  mixVolume;
+  unsigned char  tempo;
+  unsigned char  bpmSpeed;
+  unsigned char  panningSeparation;
+  unsigned char  pitchWheelDepth;
 };
 
 IT::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
@@ -149,32 +149,32 @@ TagLib::ushort IT::Properties::special() const
   return d->special;
 }
 
-uchar IT::Properties::globalVolume() const
+unsigned char IT::Properties::globalVolume() const
 {
   return d->globalVolume;
 }
 
-uchar IT::Properties::mixVolume() const
+unsigned char IT::Properties::mixVolume() const
 {
   return d->mixVolume;
 }
 
-uchar IT::Properties::tempo() const
+unsigned char IT::Properties::tempo() const
 {
   return d->tempo;
 }
 
-uchar IT::Properties::bpmSpeed() const
+unsigned char IT::Properties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
 
-uchar IT::Properties::panningSeparation() const
+unsigned char IT::Properties::panningSeparation() const
 {
   return d->panningSeparation;
 }
 
-uchar IT::Properties::pitchWheelDepth() const
+unsigned char IT::Properties::pitchWheelDepth() const
 {
   return d->pitchWheelDepth;
 }
@@ -224,32 +224,32 @@ void IT::Properties::setVersion(ushort version)
   d->version = version;
 }
 
-void IT::Properties::setGlobalVolume(uchar globalVolume)
+void IT::Properties::setGlobalVolume(unsigned char globalVolume)
 {
   d->globalVolume = globalVolume;
 }
 
-void IT::Properties::setMixVolume(uchar mixVolume)
+void IT::Properties::setMixVolume(unsigned char mixVolume)
 {
   d->mixVolume = mixVolume;
 }
 
-void IT::Properties::setTempo(uchar tempo)
+void IT::Properties::setTempo(unsigned char tempo)
 {
   d->tempo = tempo;
 }
 
-void IT::Properties::setBpmSpeed(uchar bpmSpeed)
+void IT::Properties::setBpmSpeed(unsigned char bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
 }
 
-void IT::Properties::setPanningSeparation(uchar panningSeparation)
+void IT::Properties::setPanningSeparation(unsigned char panningSeparation)
 {
   d->panningSeparation = panningSeparation;
 }
 
-void IT::Properties::setPitchWheelDepth(uchar pitchWheelDepth)
+void IT::Properties::setPitchWheelDepth(unsigned char pitchWheelDepth)
 {
   d->pitchWheelDepth = pitchWheelDepth;
 }

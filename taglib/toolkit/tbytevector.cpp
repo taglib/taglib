@@ -177,7 +177,7 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
   T sum = 0;
   for(size_t i = 0; i < length; i++) {
     const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
-    sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
+    sum |= static_cast<T>(static_cast<unsigned char>(v[offset + i])) << shift;
   }
 
   return sum;
@@ -259,7 +259,7 @@ long double toFloat80(const ByteVector &v, size_t offset)
     return 0.0;
   }
 
-  uchar bytes[10];
+  unsigned char bytes[10];
   ::memcpy(bytes, v.data() + offset, 10);
 
   if(ENDIAN == Utils::LittleEndian) {
@@ -695,7 +695,7 @@ TagLib::uint ByteVector::checksum() const
 {
   uint sum = 0;
   for(ByteVector::ConstIterator it = begin(); it != end(); ++it)
-    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ uchar(*it)];
+    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(*it)];
   return sum;
 }
 

@@ -67,12 +67,12 @@ namespace TagLib {
       ushort compatibleVersion() const;
       ushort flags()             const;
       ushort special()           const;
-      uchar  globalVolume()      const;
-      uchar  mixVolume()         const;
-      uchar  tempo()             const;
-      uchar  bpmSpeed()          const;
-      uchar  panningSeparation() const;
-      uchar  pitchWheelDepth()   const;
+      unsigned char  globalVolume()      const;
+      unsigned char  mixVolume()         const;
+      unsigned char  tempo()             const;
+      unsigned char  bpmSpeed()          const;
+      unsigned char  panningSeparation() const;
+      unsigned char  pitchWheelDepth()   const;
 
       void setChannels(int channels);
       void setLengthInPatterns(ushort lengthInPatterns);
@@ -83,12 +83,12 @@ namespace TagLib {
       void setCompatibleVersion(ushort compatibleVersion);
       void setFlags       (ushort flags);
       void setSpecial     (ushort special);
-      void setGlobalVolume(uchar globalVolume);
-      void setMixVolume   (uchar mixVolume);
-      void setTempo       (uchar tempo);
-      void setBpmSpeed    (uchar bpmSpeed);
-      void setPanningSeparation(uchar panningSeparation);
-      void setPitchWheelDepth  (uchar pitchWheelDepth);
+      void setGlobalVolume(unsigned char globalVolume);
+      void setMixVolume   (unsigned char mixVolume);
+      void setTempo       (unsigned char tempo);
+      void setBpmSpeed    (unsigned char bpmSpeed);
+      void setPanningSeparation(unsigned char panningSeparation);
+      void setPitchWheelDepth  (unsigned char pitchWheelDepth);
 
     private:
       Properties(const Properties&);

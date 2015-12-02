@@ -58,10 +58,10 @@ namespace TagLib {
       ushort flags()             const;
       ushort trackerVersion()    const;
       ushort fileFormatVersion() const;
-      uchar  globalVolume()      const;
-      uchar  masterVolume()      const;
-      uchar  tempo()             const;
-      uchar  bpmSpeed()          const;
+      unsigned char  globalVolume()      const;
+      unsigned char  masterVolume()      const;
+      unsigned char  tempo()             const;
+      unsigned char  bpmSpeed()          const;
 
       void setChannels(int channels);
 
@@ -72,10 +72,10 @@ namespace TagLib {
       void setFlags            (ushort flags);
       void setTrackerVersion   (ushort trackerVersion);
       void setFileFormatVersion(ushort fileFormatVersion);
-      void setGlobalVolume     (uchar globalVolume);
-      void setMasterVolume     (uchar masterVolume);
-      void setTempo            (uchar tempo);
-      void setBpmSpeed         (uchar bpmSpeed);
+      void setGlobalVolume     (unsigned char globalVolume);
+      void setMasterVolume     (unsigned char masterVolume);
+      void setTempo            (unsigned char tempo);
+      void setBpmSpeed         (unsigned char bpmSpeed);
 
     private:
       Properties(const Properties&);

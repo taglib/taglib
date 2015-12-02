@@ -44,7 +44,7 @@ public:
     bool m_bool;
     int m_int;
     IntPair m_intPair;
-    uchar m_byte;
+    unsigned char m_byte;
     uint m_uint;
     long long m_longlong;
   };
@@ -98,7 +98,7 @@ MP4::Item::Item(int value) :
   d->m_int = value;
 }
 
-MP4::Item::Item(uchar value) :
+MP4::Item::Item(unsigned char value) :
   d(new ItemPrivate())
 {
   d->m_byte = value;
@@ -163,7 +163,7 @@ MP4::Item::toInt() const
   return d->m_int;
 }
 
-uchar
+unsigned char
 MP4::Item::toByte() const
 {
   return d->m_byte;

@@ -57,7 +57,7 @@ namespace TagLib {
       ~Item();
 
       Item(int value);
-      Item(uchar value);
+      Item(unsigned char value);
       Item(uint value);
       Item(long long value);
       Item(bool value);
@@ -70,7 +70,7 @@ namespace TagLib {
       AtomDataType atomDataType() const;
 
       int toInt() const;
-      uchar toByte() const;
+      unsigned char toByte() const;
       uint toUInt() const;
       long long toLongLong() const;
       bool toBool() const;
