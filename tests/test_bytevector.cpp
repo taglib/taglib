@@ -44,6 +44,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testResize);
   CPPUNIT_TEST(testAppend);
+  CPPUNIT_TEST(testBase64);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -400,6 +401,111 @@ public:
     v1.append('3');
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglibABC123"), v1);
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v2);
+  }
+
+  void testBase64()
+  {
+    ByteVector sempty;
+    ByteVector t0("a"); // test 1 byte
+    ByteVector t1("any carnal pleasure.");
+    ByteVector t2("any carnal pleasure");
+    ByteVector t3("any carnal pleasur");
+    ByteVector s0("a"); // test 1 byte
+    ByteVector s1("any carnal pleasure.");
+    ByteVector s2("any carnal pleasure");
+    ByteVector s3("any carnal pleasur");
+    ByteVector eempty;
+    ByteVector e0("YQ==");
+    ByteVector e1("YW55IGNhcm5hbCBwbGVhc3VyZS4=");
+    ByteVector e2("YW55IGNhcm5hbCBwbGVhc3VyZQ==");
+    ByteVector e3("YW55IGNhcm5hbCBwbGVhc3Vy");
+
+    // Encode
+    CPPUNIT_ASSERT_EQUAL(eempty, sempty.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e0, s0.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e1, s1.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e2, s2.toBase64());
+    CPPUNIT_ASSERT_EQUAL(e3, s3.toBase64());
+
+    // Decode
+    CPPUNIT_ASSERT_EQUAL(sempty, eempty.toBase64());
+    CPPUNIT_ASSERT_EQUAL(s0, ByteVector::fromBase64(e0));
+    CPPUNIT_ASSERT_EQUAL(s1, ByteVector::fromBase64(e1));
+    CPPUNIT_ASSERT_EQUAL(s2, ByteVector::fromBase64(e2));
+    CPPUNIT_ASSERT_EQUAL(s3, ByteVector::fromBase64(e3));
+
+    CPPUNIT_ASSERT_EQUAL(t0, ByteVector::fromBase64(s0.toBase64()));
+    CPPUNIT_ASSERT_EQUAL(t1, ByteVector::fromBase64(s1.toBase64()));
+    CPPUNIT_ASSERT_EQUAL(t2, ByteVector::fromBase64(s2.toBase64()));
+    CPPUNIT_ASSERT_EQUAL(t3, ByteVector::fromBase64(s3.toBase64()));
+
+    ByteVector all((uint)256);
+
+    // in order
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=(unsigned char)i;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // reverse
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=(unsigned char)255-i;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // all zeroes
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=0;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // all ones
+    {
+      for(int i = 0; i < 256; i++){
+        all[i]=(unsigned char)0xff;
+        }
+      ByteVector b64 = all.toBase64();
+      ByteVector original = ByteVector::fromBase64(b64);
+      CPPUNIT_ASSERT_EQUAL(all,original);
+    }
+
+    // Missing end bytes
+    {
+      // No missing bytes
+      ByteVector m0("YW55IGNhcm5hbCBwbGVhc3VyZQ==");
+      CPPUNIT_ASSERT_EQUAL(s2,ByteVector::fromBase64(m0));
+
+      // 1 missing byte
+      ByteVector m1("YW55IGNhcm5hbCBwbGVhc3VyZQ=");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(m1));
+
+      // 2 missing bytes
+      ByteVector m2("YW55IGNhcm5hbCBwbGVhc3VyZQ");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(m2));
+
+      // 3 missing bytes
+      ByteVector m3("YW55IGNhcm5hbCBwbGVhc3VyZ");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(m3));
+    }
+
+    // Grok invalid characters
+    {
+      ByteVector invalid("abd\x00\x01\x02\x03\x04");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(invalid));
+    }
+
   }
 
 };

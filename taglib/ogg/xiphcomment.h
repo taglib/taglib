@@ -32,6 +32,7 @@
 #include "tstring.h"
 #include "tstringlist.h"
 #include "tbytevector.h"
+#include "flacpicture.h"
 #include "taglib_export.h"
 
 namespace TagLib {
@@ -228,6 +229,31 @@ namespace TagLib {
        * in place.
        */
       ByteVector render(bool addFramingBit) const;
+
+
+      /*!
+       * Returns a list of pictures attached to the xiph comment.
+       */
+      List<FLAC::Picture *> pictureList();
+
+      /*!
+       * Removes an picture. If \a del is true the picture's memory
+       * will be freed; if it is false, it must be deleted by the user.
+       */
+      void removePicture(FLAC::Picture *picture, bool del = true);
+
+      /*!
+       * Remove all pictures.
+       */
+      void removePictures();
+
+      /*!
+       * Add a new picture to the comment block. The comment block takes ownership of the
+       * picture and will handle freeing its memory.
+       *
+       * \note The file will be saved only after calling save().
+       */
+      void addPicture(FLAC::Picture *picture);
 
     protected:
       /*!

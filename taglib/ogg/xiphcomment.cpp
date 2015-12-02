@@ -26,10 +26,14 @@
 #include <tbytevector.h>
 #include <tdebug.h>
 
+#include <flacpicture.h>
 #include <xiphcomment.h>
 #include <tpropertymap.h>
 
 using namespace TagLib;
+
+
+typedef List<FLAC::Picture *> PictureList;
 
 class Ogg::XiphComment::XiphCommentPrivate
 {
@@ -37,6 +41,7 @@ public:
   FieldListMap fieldListMap;
   String vendorID;
   String commentField;
+  PictureList pictureList;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +61,7 @@ Ogg::XiphComment::XiphComment(const ByteVector &data) : TagLib::Tag()
 
 Ogg::XiphComment::~XiphComment()
 {
+  removePictures();
   delete d;
 }
 
@@ -188,6 +194,8 @@ TagLib::uint Ogg::XiphComment::fieldCount() const
   for(; it != d->fieldListMap.end(); ++it)
     count += (*it).second.size();
 
+  count += d->pictureList.size();
+
   return count;
 }
 
@@ -296,6 +304,36 @@ bool Ogg::XiphComment::contains(const String &key) const
   return !d->fieldListMap[key.upper()].isEmpty();
 }
 
+void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
+{
+  PictureList::Iterator it = d->pictureList.find(picture);
+  if(it != d->pictureList.end())
+    d->pictureList.erase(it);
+
+  if(del)
+    delete picture;
+}
+
+void Ogg::XiphComment::removePictures()
+{
+  PictureList newList;
+  for(uint i = 0; i < d->pictureList.size(); i++) {
+    delete d->pictureList[i];
+  }
+  d->pictureList = newList;
+}
+
+void Ogg::XiphComment::addPicture(FLAC::Picture * picture)
+{
+  d->pictureList.append(picture);
+}
+
+
+List<FLAC::Picture *> Ogg::XiphComment::pictureList()
+{
+  return d->pictureList;
+}
+
 ByteVector Ogg::XiphComment::render() const
 {
   return render(true);
@@ -342,6 +380,13 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     }
   }
 
+  for(PictureList::ConstIterator it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
+    ByteVector picture = (*it)->render().toBase64();
+    data.append(ByteVector::fromUInt(picture.size() + 23, false));
+    data.append("METADATA_BLOCK_PICTURE=");
+    data.append(picture);
+  }
+
   // Append the "framing bit".
 
   if(addFramingBit)
@@ -384,20 +429,85 @@ void Ogg::XiphComment::parse(const ByteVector &data)
     const uint commentLength = data.toUInt(pos, false);
     pos += 4;
 
-    String comment = String(data.mid(pos, commentLength), String::UTF8);
+    ByteVector entry = data.mid(pos, commentLength);
+
     pos += commentLength;
-    if(pos > data.size()) {
+
+    // Don't go past data end
+    if (pos > data.size())
       break;
+
+    // Handle Pictures separately
+    if(entry.startsWith("METADATA_BLOCK_PICTURE=")) {
+
+      // We need base64 encoded data including padding
+      if((entry.size() - 23) > 3 && ((entry.size() - 23) % 4) == 0) {
+
+        // Decode base64 picture data
+        ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
+        if (picturedata.size()) {
+
+          // Decode Flac Picture
+          FLAC::Picture * picture = new FLAC::Picture();
+          if(picture->parse(picturedata)) {
+
+            d->pictureList.append(picture);
+
+            // continue to next field
+            continue;
+          }
+          else {
+            delete picture;
+            debug("Failed to decode FlacPicture block");
+          }
+        }
+        else {
+          debug("Failed to decode base64 encoded data");
+        }
+      }
+      else {
+        debug("Invalid base64 encoded data");
+      }
     }
 
-    int commentSeparatorPosition = comment.find("=");
-    if(commentSeparatorPosition == -1) {
-      break;
+    // Handle old picture standard
+    if (entry.startsWith("COVERART=")) {
+
+      if((entry.size() - 9) > 3 && ((entry.size() - 9) % 4) == 0) {
+
+        // Decode base64 picture data
+        ByteVector picturedata = ByteVector::fromBase64(entry.mid(9));
+        if (picturedata.size()) {
+
+          // Assume it's some type of image file
+          FLAC::Picture * picture = new FLAC::Picture();
+          picture->setData(picturedata);
+          picture->setMimeType("image/");
+          picture->setType(FLAC::Picture::Other);
+          d->pictureList.append(picture);
+
+          // continue to next field
+          continue;
+        }
+        else {
+          debug("Failed to decode base64 encoded data");
+        }
+      }
+      else {
+        debug("Invalid base64 encoded data");
+      }
     }
 
-    String key = comment.substr(0, commentSeparatorPosition);
-    String value = comment.substr(commentSeparatorPosition + 1);
+    // Check for field separator
+    int sep = entry.find('=');
+    if (sep < 1) {
+      debug("Discarding invalid comment field.");
+      continue;
+    }
 
+    // Parse key and value
+    String key = String(entry.mid(0, sep), String::UTF8);
+    String value = String(entry.mid(sep + 1), String::UTF8);
     addField(key, value, false);
   }
 }

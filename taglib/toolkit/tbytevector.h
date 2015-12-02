@@ -594,6 +594,16 @@ namespace TagLib {
      */
     ByteVector toHex() const;
 
+    /*!
+     * Returns a base64 encoded copy of the byte vector
+     */
+    ByteVector toBase64() const;
+
+    /*!
+     * Decodes the base64 encoded byte vector.      
+     */
+    static ByteVector fromBase64(const ByteVector &);
+
   protected:
     /*
      * If this ByteVector is being shared via implicit sharing, do a deep copy
