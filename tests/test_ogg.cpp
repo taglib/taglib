@@ -49,7 +49,7 @@ public:
 
     String longText(std::string(128 * 1024, ' ').c_str());
     for (size_t i = 0; i < longText.length(); ++i)
-      longText[i] = static_cast<wchar>(L'A' + (i % 26));
+      longText[i] = static_cast<wchar_t>(L'A' + (i % 26));
 
     {
       Vorbis::File f(newname.c_str());

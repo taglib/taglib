@@ -29,7 +29,7 @@ using namespace TagLib;
 
 namespace
 {
-  const wchar *genres[] = {
+  const wchar_t *genres[] = {
     L"Blues",
     L"Classic Rock",
     L"Country",

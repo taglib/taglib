@@ -635,13 +635,13 @@ String String::number(int n) // static
   return Utils::formatString("%d", n);
 }
 
-TagLib::wchar &String::operator[](int i)
+wchar_t &String::operator[](int i)
 {
   detach();
   return d->data[i];
 }
 
-const TagLib::wchar &String::operator[](int i) const
+const wchar_t &String::operator[](int i) const
 {
   return d->data[i];
 }
