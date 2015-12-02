@@ -32,12 +32,24 @@
 
 using namespace TagLib;
 
+namespace
+{
+  typedef Ogg::FieldListMap::Iterator FieldIterator;
+  typedef Ogg::FieldListMap::ConstIterator FieldConstIterator;
 
-typedef List<FLAC::Picture *> PictureList;
+  typedef List<FLAC::Picture *> PictureList;
+  typedef PictureList::Iterator PictureIterator;
+  typedef PictureList::Iterator PictureConstIterator;
+}
 
 class Ogg::XiphComment::XiphCommentPrivate
 {
 public:
+  XiphCommentPrivate()
+  {
+    pictureList.setAutoDelete(true);
+  }
+
   FieldListMap fieldListMap;
   String vendorID;
   String commentField;
@@ -48,20 +60,21 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::XiphComment::XiphComment() : TagLib::Tag()
+Ogg::XiphComment::XiphComment() :
+  TagLib::Tag(),
+  d(new XiphCommentPrivate())
 {
-  d = new XiphCommentPrivate;
 }
 
-Ogg::XiphComment::XiphComment(const ByteVector &data) : TagLib::Tag()
+Ogg::XiphComment::XiphComment(const ByteVector &data) :
+  TagLib::Tag(),
+  d(new XiphCommentPrivate())
 {
-  d = new XiphCommentPrivate;
   parse(data);
 }
 
 Ogg::XiphComment::~XiphComment()
 {
-  removePictures();
   delete d;
 }
 
@@ -178,10 +191,10 @@ void Ogg::XiphComment::setTrack(uint i)
 
 bool Ogg::XiphComment::isEmpty() const
 {
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it) {
     if(!(*it).second.isEmpty())
       return false;
+  }
 
   return true;
 }
@@ -190,8 +203,7 @@ TagLib::uint Ogg::XiphComment::fieldCount() const
 {
   uint count = 0;
 
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
     count += (*it).second.size();
 
   count += d->pictureList.size();
@@ -213,7 +225,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
 {
   // check which keys are to be deleted
   StringList toRemove;
-  for(FieldListMap::ConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
     if (!properties.contains(it->first))
       toRemove.append(it->first);
 
@@ -306,7 +318,7 @@ bool Ogg::XiphComment::contains(const String &key) const
 
 void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
 {
-  PictureList::Iterator it = d->pictureList.find(picture);
+  PictureIterator it = d->pictureList.find(picture);
   if(it != d->pictureList.end())
     d->pictureList.erase(it);
 
@@ -316,18 +328,13 @@ void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
 
 void Ogg::XiphComment::removePictures()
 {
-  PictureList newList;
-  for(uint i = 0; i < d->pictureList.size(); i++) {
-    delete d->pictureList[i];
-  }
-  d->pictureList = newList;
+  d->pictureList.clear();
 }
 
 void Ogg::XiphComment::addPicture(FLAC::Picture * picture)
 {
   d->pictureList.append(picture);
 }
-
 
 List<FLAC::Picture *> Ogg::XiphComment::pictureList()
 {
@@ -380,7 +387,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     }
   }
 
-  for(PictureList::ConstIterator it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
+  for(PictureConstIterator it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
     ByteVector picture = (*it)->render().toBase64();
     data.append(ByteVector::fromUInt(picture.size() + 23, false));
     data.append("METADATA_BLOCK_PICTURE=");
