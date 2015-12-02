@@ -840,7 +840,7 @@ void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v2::Tag::read(TagLib::File *file, long offset)
+void ID3v2::Tag::read(TagLib::File *file, long long offset)
 {
   if(!file)
     return;

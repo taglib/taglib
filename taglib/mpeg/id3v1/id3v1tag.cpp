@@ -220,7 +220,7 @@ void ID3v1::Tag::setStringHandler(const TagLib::StringHandler *handler)
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v1::Tag::read(File *file, long tagOffset)
+void ID3v1::Tag::read(File *file, long long tagOffset)
 {
   if(file && file->isValid()) {
     file->seek(tagOffset);
