@@ -174,7 +174,7 @@ namespace
     if(length > 0) {
       if(swap) {
         for(size_t i = 0; i < length; ++i)
-          data[i] = Utils::byteSwap(static_cast<ushort>(s[i]));
+          data[i] = Utils::byteSwap(static_cast<TagLib::ushort>(s[i]));
       }
       else {
         ::wmemcpy(&data[0], s, length);
@@ -194,7 +194,7 @@ namespace
       }
 
       // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
-      ushort bom;
+      TagLib::ushort bom;
       ::memcpy(&bom, s, 2);
 
       if(bom == 0xfeff)
@@ -215,7 +215,7 @@ namespace
 
     data.resize(length / 2);
     for(size_t i = 0; i < length / 2; ++i) {
-      ushort c;
+      TagLib::ushort c;
       ::memcpy(&c, s, 2);
       if(swap)
         c = Utils::byteSwap(c);

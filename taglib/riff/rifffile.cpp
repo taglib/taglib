@@ -23,13 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <algorithm>
+#include <vector>
+
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <tstring.h>
 
 #include "rifffile.h"
-#include <algorithm>
-#include <vector>
+#include "riffutils.h"
 
 using namespace TagLib;
 
@@ -47,13 +49,11 @@ namespace
 class RIFF::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    endianness(BigEndian),
-    size(0)
-  {
-  }
+  FilePrivate(ByteOrder endianness) :
+    endianness(endianness),
+    size(0) {}
 
-  ByteOrder endianness;
+  const ByteOrder endianness;
   ByteVector type;
   TagLib::uint size;
   ByteVector format;
@@ -88,20 +88,18 @@ bool RIFF::File::isValidChunkName(const ByteVector &name)   // static
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::File::File(FileName file, ByteOrder endianness) : TagLib::File(file)
+RIFF::File::File(FileName file, ByteOrder endianness) :
+  TagLib::File(file),
+  d(new FilePrivate(endianness))
 {
-  d = new FilePrivate;
-  d->endianness = endianness;
-
   if(isOpen())
     read();
 }
 
-RIFF::File::File(IOStream *stream, ByteOrder endianness) : TagLib::File(stream)
+RIFF::File::File(IOStream *stream, ByteOrder endianness) :
+  TagLib::File(stream),
+  d(new FilePrivate(endianness))
 {
-  d = new FilePrivate;
-  d->endianness = endianness;
-
   if(isOpen())
     read();
 }
@@ -288,7 +286,7 @@ void RIFF::File::read()
       break;
     }
 
-    if(static_cast<ulonglong>(tell()) + chunkSize > static_cast<ulonglong>(length())) {
+    if(tell() + chunkSize > length()) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
       setValid(false);
       break;
@@ -314,8 +312,8 @@ void RIFF::File::read()
         chunk.padding = 1;
       }
     }
-    d->chunks.push_back(chunk);
 
+    d->chunks.push_back(chunk);
   }
 }
 

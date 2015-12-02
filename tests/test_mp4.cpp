@@ -17,6 +17,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestMP4);
   CPPUNIT_TEST(testPropertiesAAC);
   CPPUNIT_TEST(testPropertiesALAC);
+  CPPUNIT_TEST(testPropertiesM4V);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
   CPPUNIT_TEST(testHasTag);
@@ -62,6 +63,21 @@ public:
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
     CPPUNIT_ASSERT_EQUAL(MP4::AudioProperties::ALAC, f.audioProperties()->codec());
+  }
+
+  void testPropertiesM4V()
+  {
+    MP4::File f(TEST_FILE_PATH_C("blank_video.m4v"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(975, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(96, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::AudioProperties::AAC, f.audioProperties()->codec());
   }
 
   void testCheckValid()

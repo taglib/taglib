@@ -100,11 +100,16 @@ bool RIFF::AIFF::File::save()
     return false;
   }
 
-  removeChunk("ID3 ");
-  removeChunk("id3 ");
+  if(d->hasID3v2) {
+    removeChunk("ID3 ");
+    removeChunk("id3 ");
+    d->hasID3v2 = false;
+  }
 
-  setChunkData("ID3 ", d->tag->render());
-  d->hasID3v2 = true;
+  if(tag() && !tag()->isEmpty()) {
+    setChunkData("ID3 ", d->tag->render());
+    d->hasID3v2 = true;
+  }
 
   return true;
 }

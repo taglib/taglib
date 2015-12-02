@@ -29,6 +29,7 @@
 
 #include "rifffile.h"
 #include "infotag.h"
+#include "riffutils.h"
 
 using namespace TagLib;
 using namespace RIFF::Info;
@@ -66,16 +67,16 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::Info::Tag::Tag(const ByteVector &data)
-  : TagLib::Tag()
-  , d(new TagPrivate())
+RIFF::Info::Tag::Tag(const ByteVector &data) :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
   parse(data);
 }
 
-RIFF::Info::Tag::Tag()
-  : TagLib::Tag()
-  , d(new TagPrivate())
+RIFF::Info::Tag::Tag() :
+  TagLib::Tag(),
+  d(new TagPrivate())
 {
 }
 
@@ -189,8 +190,8 @@ String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
 {
-  // id must be four-byte long pure ASCII string.
-  if(!RIFF::File::isValidChunkName(id))
+  // id must be four-byte long pure ascii string.
+  if(!isValidChunkName(id))
     return;
 
   if(!s.isEmpty())
@@ -209,8 +210,7 @@ ByteVector RIFF::Info::Tag::render() const
 {
   ByteVector data("INFO");
 
-  FieldMap::ConstIterator it = d->fieldMap.begin();
-  for(; it != d->fieldMap.end(); ++it) {
+  for(FieldMap::ConstIterator it = d->fieldMap.begin(); it != d->fieldMap.end(); ++it) {
     ByteVector text = stringHandler->render(it->second);
     if(text.isEmpty())
       continue;
@@ -251,7 +251,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
       break;
 
     const ByteVector id = data.mid(p, 4);
-    if(RIFF::File::isValidChunkName(id)) {
+    if(isValidChunkName(id)) {
       const String text = stringHandler->parse(data.mid(p + 8, size));
       d->fieldMap[id] = text;
     }

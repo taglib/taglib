@@ -152,8 +152,8 @@ void FLAC::AudioProperties::read(const ByteVector &data, long long streamLength)
   // The last 4 bits are the most significant 4 bits for the 36 bit
   // stream length in samples. (Audio files measured in days)
 
-  const ulonglong hi = flags & 0xf;
-  const ulonglong lo = data.toUInt32BE(pos);
+  const unsigned long long hi = flags & 0xf;
+  const unsigned long long lo = data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleFrames = (hi << 32) | lo;

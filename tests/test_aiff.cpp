@@ -64,14 +64,23 @@ public:
     {
       RIFF::AIFF::File f(newname.c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
+
       f.tag()->setTitle(L"TitleXXX");
       f.save();
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
     }
-
     {
       RIFF::AIFF::File f(newname.c_str());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String(L"TitleXXX"), f.tag()->title());
+
+      f.tag()->setTitle("");
+      f.save();
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+    }
+    {
+      RIFF::AIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
     }
   }
 

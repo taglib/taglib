@@ -265,15 +265,15 @@ long double toFloat80(const ByteVector &v, size_t offset)
   const int exponent = ((bytes[0] & 0x7F) << 8) | bytes[1];
 
   // 64-bit fraction. Leading 1 is explicit.
-  const ulonglong fraction
-    = (static_cast<ulonglong>(bytes[2]) << 56)
-    | (static_cast<ulonglong>(bytes[3]) << 48)
-    | (static_cast<ulonglong>(bytes[4]) << 40)
-    | (static_cast<ulonglong>(bytes[5]) << 32)
-    | (static_cast<ulonglong>(bytes[6]) << 24)
-    | (static_cast<ulonglong>(bytes[7]) << 16)
-    | (static_cast<ulonglong>(bytes[8]) <<  8)
-    | (static_cast<ulonglong>(bytes[9]));
+  const unsigned long long fraction
+    = (static_cast<unsigned long long>(bytes[2]) << 56)
+    | (static_cast<unsigned long long>(bytes[3]) << 48)
+    | (static_cast<unsigned long long>(bytes[4]) << 40)
+    | (static_cast<unsigned long long>(bytes[5]) << 32)
+    | (static_cast<unsigned long long>(bytes[6]) << 24)
+    | (static_cast<unsigned long long>(bytes[7]) << 16)
+    | (static_cast<unsigned long long>(bytes[8]) <<  8)
+    | (static_cast<unsigned long long>(bytes[9]));
 
   long double val;
   if(exponent == 0 && fraction == 0)
@@ -382,12 +382,12 @@ ByteVector ByteVector::fromFloat32BE(float value)
 
 ByteVector ByteVector::fromFloat64LE(double value)
 {
-  return fromFloat<double, ulonglong, LittleEndian>(value);
+  return fromFloat<double, unsigned long long, LittleEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat64BE(double value)
 {
-  return fromFloat<double, ulonglong, BigEndian>(value);
+  return fromFloat<double, unsigned long long, BigEndian>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -755,12 +755,12 @@ float ByteVector::toFloat32BE(size_t offset) const
 
 double ByteVector::toFloat64LE(size_t offset) const
 {
-  return toFloat<double, ulonglong, LittleEndian>(*this, offset);
+  return toFloat<double, unsigned long long, LittleEndian>(*this, offset);
 }
 
 double ByteVector::toFloat64BE(size_t offset) const
 {
-  return toFloat<double, ulonglong, BigEndian>(*this, offset);
+  return toFloat<double, unsigned long long, BigEndian>(*this, offset);
 }
 
 long double ByteVector::toFloat80LE(size_t offset) const

@@ -38,6 +38,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testMP4_1);
   CPPUNIT_TEST(testMP4_2);
   CPPUNIT_TEST(testMP4_3);
+  CPPUNIT_TEST(testMP4_4);
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
@@ -153,6 +154,11 @@ public:
   void testMP4_3()
   {
     fileRefSave("no-tags", ".3g2");
+  }
+
+  void testMP4_4()
+  {
+    fileRefSave("blank_video", ".m4v");
   }
 
   void testWav()

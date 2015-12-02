@@ -356,7 +356,7 @@ namespace TagLib {
        * the Header, the body of the tag  (which contains the ExtendedHeader and
        * frames) and Footer.
        */
-      void read();
+      void read(TagLib::File *file, long offset);
 
       /*!
        * This is called by read to parse the body of the tag.  It determines if an

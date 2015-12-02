@@ -84,8 +84,7 @@ class ID3v2::Tag::TagPrivate
 {
 public:
   TagPrivate() :
-    file(0),
-    tagOffset(-1),
+    fileLength(0),
     extendedHeader(0),
     footer(0)
   {
@@ -98,8 +97,7 @@ public:
     delete footer;
   }
 
-  File *file;
-  long long tagOffset;
+  long long fileLength;
   const FrameFactory *factory;
 
   Header header;
@@ -125,11 +123,9 @@ ID3v2::Tag::Tag(File *file, long long tagOffset, const FrameFactory *factory) :
   TagLib::Tag(),
   d(new TagPrivate())
 {
-  d->file = file;
-  d->tagOffset = tagOffset;
   d->factory = factory;
 
-  read();
+  read(file, tagOffset);
 }
 
 ID3v2::Tag::~Tag()
@@ -794,7 +790,8 @@ ByteVector ID3v2::Tag::render(int version) const
 
   // Compute the amount of padding, and append that to tagData.
 
-  long long paddingSize = d->header.tagSize() - (tagData.size() - Header::size());
+  long long originalSize = d->header.tagSize();
+  long long paddingSize = originalSize - (tagData.size() - Header::size());
 
   if(paddingSize <= 0) {
     paddingSize = MinPaddingSize;
@@ -802,7 +799,7 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     // Padding won't increase beyond 1% of the file size or 1MB.
 
-    long long threshold = d->file ? d->file->length() / 100 : 0;
+    long long threshold = d->fileLength / 100;
     threshold = std::max(threshold, MinPaddingSize);
     threshold = std::min(threshold, MaxPaddingSize);
 
@@ -815,6 +812,9 @@ ByteVector ID3v2::Tag::render(int version) const
   // Set the version and data size.
   d->header.setMajorVersion(version);
   d->header.setTagSize(static_cast<TagLib::uint>(tagData.size() - Header::size()));
+
+  if(d->fileLength > 0)
+    d->fileLength += (d->header.tagSize() - originalSize);
 
   // TODO: This should eventually include d->footer->render().
   const ByteVector headerData = d->header.render();
@@ -840,22 +840,24 @@ void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v2::Tag::read()
+void ID3v2::Tag::read(TagLib::File *file, long offset)
 {
-  if(!d->file)
+  if(!file)
     return;
 
-  if(!d->file->isOpen())
+  if(!file->isOpen())
     return;
 
-  d->file->seek(d->tagOffset);
-  d->header.setData(d->file->readBlock(Header::size()));
+  d->fileLength = file->length();
+
+  file->seek(offset);
+  d->header.setData(file->readBlock(Header::size()));
 
   // If the tag size is 0, then this is an invalid tag (tags must contain at
   // least one frame)
 
   if(d->header.tagSize() != 0)
-    parse(d->file->readBlock(d->header.tagSize()));
+    parse(file->readBlock(d->header.tagSize()));
 
   // Look for duplicate ID3v2 tags and treat them as an extra blank of this one.
   // It leads to overwriting them with zero when saving the tag.
@@ -867,9 +869,9 @@ void ID3v2::Tag::read()
 
   while(true) {
 
-    d->file->seek(d->tagOffset + d->header.completeTagSize() + extraSize);
+    file->seek(offset + d->header.completeTagSize() + extraSize);
 
-    const ByteVector data = d->file->readBlock(Header::size());
+    const ByteVector data = file->readBlock(Header::size());
     if(data.size() < Header::size() || !data.startsWith(Header::fileIdentifier()))
       break;
 
