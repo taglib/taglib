@@ -598,7 +598,7 @@ MP4::Tag::updateOffsets(long delta, long long offset)
       }
       d->file->seek(atom->offset + 9);
       ByteVector data = d->file->readBlock(static_cast<size_t>(atom->length - 9));
-      const uint flags = data.toUInt24BE(0);
+      const unsigned int flags = data.toUInt24BE(0);
       if(flags & 1) {
         long long o = data.toInt64BE(7);
         if(o > offset) {

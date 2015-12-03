@@ -46,7 +46,7 @@ namespace
 {
   enum { TrueAudioID3v2Index = 0, TrueAudioID3v1Index = 1 };
 
-  const TagLib::uint HeaderSize = 18;
+  const unsigned int HeaderSize = 18;
 }
 
 class TrueAudio::File::FilePrivate
@@ -166,7 +166,7 @@ bool TrueAudio::File::save()
     ByteVector data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
     d->ID3v1Location -= d->ID3v2OriginalSize - data.size();
-    d->ID3v2OriginalSize = static_cast<uint>(data.size());
+    d->ID3v2OriginalSize = static_cast<unsigned int>(data.size());
     d->hasID3v2 = true;
   }
   else if(d->hasID3v2) {

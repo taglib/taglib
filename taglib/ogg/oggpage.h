@@ -121,7 +121,7 @@ namespace TagLib {
       /*!
        * Returns the number of packets (whole or partial) in this page.
        */
-      unsigned int packetCount() const;
+      size_t packetCount() const;
 
       /*!
        * Returns a list of the packets in this page.

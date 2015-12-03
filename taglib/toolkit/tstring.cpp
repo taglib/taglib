@@ -708,7 +708,7 @@ String &String::operator+=(char c)
 {
   detach();
 
-  *d->data += uchar(c);
+  *d->data += static_cast<unsigned char>(c);
   return *this;
 }
 

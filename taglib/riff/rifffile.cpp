@@ -95,9 +95,9 @@ unsigned int RIFF::File::riffSize() const
   return d->size;
 }
 
-unsigned int RIFF::File::chunkCount() const
+size_t RIFF::File::chunkCount() const
 {
-  return static_cast<TagLib::uint>(d->chunks.size());
+  return d->chunks.size();
 }
 
 unsigned int RIFF::File::chunkDataSize(unsigned int i) const
@@ -105,7 +105,7 @@ unsigned int RIFF::File::chunkDataSize(unsigned int i) const
   return d->chunks[i].size;
 }
 
-long long RIFF::File::chunkOffset(uint i) const
+long long RIFF::File::chunkOffset(unsigned int i) const
 {
   return d->chunks[i].offset;
 }
@@ -187,7 +187,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // First we update the global size
 
-  d->size += static_cast<uint>((offset & 1) + data.size() + 8);
+  d->size += static_cast<unsigned int>((offset & 1) + data.size() + 8);
   if(d->endianness == BigEndian)
     insert(ByteVector::fromUInt32BE(d->size), 4, 4);
   else
@@ -199,8 +199,8 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
     name,
     data,
     offset,
-    static_cast<uint>(std::max(0LL, length() - offset)),
-    static_cast<uint>(offset & 1));
+    static_cast<size_t>(std::max(0LL, length() - offset)),
+    static_cast<unsigned int>(offset & 1));
 
   // And update our internal structure
 
@@ -211,7 +211,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   Chunk chunk;
   chunk.name    = name;
-  chunk.size    = static_cast<uint>(data.size());
+  chunk.size    = static_cast<unsigned int>(data.size());
   chunk.offset  = offset + 8;
   chunk.padding = static_cast<char>(data.size() & 1);
 

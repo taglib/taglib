@@ -48,15 +48,6 @@
 
 namespace TagLib
 {
-  // These integer types are deprecated. Do not use them.
-
-  typedef wchar_t            wchar;   // Assumed to be sufficient to store a UTF-16 char.
-  typedef unsigned char      uchar;
-  typedef unsigned short     ushort;
-  typedef unsigned int       uint;
-  typedef unsigned long      ulong;
-  typedef unsigned long long ulonglong;
-
   enum ByteOrder
   {
     LittleEndian,

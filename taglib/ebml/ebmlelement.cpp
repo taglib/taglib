@@ -75,8 +75,8 @@ public:
 
     // Determine the length of the integer
     char firstByte = document->readBlock(1)[0];
-    uint byteSize = 1;
-    for(uint i = 0; i < 8 && ((firstByte << i) & (1 << 7)) == 0; ++i)
+    size_t byteSize = 1;
+    for(size_t i = 0; i < 8 && ((firstByte << i) & (1 << 7)) == 0; ++i)
       ++byteSize;
 
     // Load the integer
@@ -325,7 +325,7 @@ String EBML::Element::getAsString()
   return String(getAsBinary(), String::UTF8);
 }
 
-signed long long EBML::Element::getAsInt()
+long long EBML::Element::getAsInt()
 {
   // The debug note about returning 0 because of empty data is irrelevant. The
   // behavior is as expected.

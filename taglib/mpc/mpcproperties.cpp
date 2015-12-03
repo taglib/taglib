@@ -35,7 +35,7 @@ using namespace TagLib;
 
 namespace
 {
-  const TagLib::uint HeaderSize = 56;
+  const unsigned int HeaderSize = 56;
 }
 
 class MPC::AudioProperties::PropertiesPrivate

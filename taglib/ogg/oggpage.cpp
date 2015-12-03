@@ -131,9 +131,9 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
   return flags;
 }
 
-unsigned int Ogg::Page::packetCount() const
+size_t Ogg::Page::packetCount() const
 {
-  return static_cast<uint>(d->header.packetSizes().size());
+  return d->header.packetSizes().size();
 }
 
 ByteVectorList Ogg::Page::packets() const

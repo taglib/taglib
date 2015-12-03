@@ -63,7 +63,7 @@ namespace TagLib {
       /*!
        * \return The number of chunks in the file.
        */
-      unsigned int chunkCount() const;
+      size_t chunkCount() const;
 
       /*!
        * \return The offset within the file for the selected chunk number.

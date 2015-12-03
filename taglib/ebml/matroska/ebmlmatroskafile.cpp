@@ -483,7 +483,7 @@ String EBML::Matroska::File::Tag::genre() const
     return String();
 }
 
-uint EBML::Matroska::File::Tag::year() const
+unsigned int EBML::Matroska::File::Tag::year() const
 {
   if(e->year != e->document->d->tags.end())
     return e->year->first.find(Constants::DATE_RELEASE)->second.front().toInt();
@@ -491,7 +491,7 @@ uint EBML::Matroska::File::Tag::year() const
     return 0;
 }
 
-uint EBML::Matroska::File::Tag::track() const
+unsigned int EBML::Matroska::File::Tag::track() const
 {
   if(e->track != e->document->d->tags.end())
     return e->track->first.find(Constants::PART_NUMBER)->second.front().toInt();
@@ -544,7 +544,7 @@ void EBML::Matroska::File::Tag::setGenre(const String &s)
     e->insert(Constants::GENRE, Constants::MostCommonPartValue, s);
 }
 
-void EBML::Matroska::File::Tag::setYear(uint i)
+void EBML::Matroska::File::Tag::setYear(unsigned int i)
 {
   String s = String::number(i);
   if(e->year != e->document->d->tags.end())
@@ -553,7 +553,7 @@ void EBML::Matroska::File::Tag::setYear(uint i)
     e->insert(Constants::DATE_RELEASE, Constants::MostCommonPartValue, s);
 }
 
-void EBML::Matroska::File::Tag::setTrack(uint i)
+void EBML::Matroska::File::Tag::setTrack(unsigned int i)
 {
   String s = String::number(i);
   if(e->track != e->document->d->tags.end())

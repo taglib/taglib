@@ -46,14 +46,14 @@ public:
     length(0) {}
 
   // Nomenclature is from DSF file format specification
-  uint formatVersion;
-  uint formatID;
-  uint channelType;
-  uint channelNum;
-  uint samplingFrequency;
-  uint bitsPerSample;
+  unsigned int formatVersion;
+  unsigned int formatID;
+  unsigned int channelType;
+  unsigned int channelNum;
+  unsigned int samplingFrequency;
+  unsigned int bitsPerSample;
   long long sampleCount;
-  uint blockSizePerChannel;
+  unsigned int blockSizePerChannel;
 
   // Computed
   int bitrate;

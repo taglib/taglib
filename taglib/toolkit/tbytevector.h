@@ -295,48 +295,48 @@ namespace TagLib {
     short toInt16BE(size_t offset) const;
 
     /*!
-     * Converts the 2 bytes at \a offset of the vector to a ushort as an unsigned
-     * 16-bit little-endian integer.
+     * Converts the 2 bytes at \a offset of the vector to a unsigned short as an
+     * unsigned 16-bit little-endian integer.
      *
      * \see fromUInt16LE()
      */
-    ushort toUInt16LE(size_t offset) const;
+    unsigned short toUInt16LE(size_t offset) const;
 
     /*!
-     * Converts the 2 bytes at \a offset of the vector to a ushort as an unsigned
-     * 16-bit big-endian integer.
+     * Converts the 2 bytes at \a offset of the vector to a unsigned short as an
+     * unsigned 16-bit big-endian integer.
      *
      * \see fromUInt16BE()
      */
-    ushort toUInt16BE(size_t offset) const;
+    unsigned short toUInt16BE(size_t offset) const;
 
     /*!
-     * Converts the 3 bytes at \a offset of the vector to a uint as an unsigned
-     * 24-bit little-endian integer.
+     * Converts the 3 bytes at \a offset of the vector to a unsigned int as an
+     * unsigned 24-bit little-endian integer.
      */
-    uint toUInt24LE(size_t offset) const;
+    unsigned int toUInt24LE(size_t offset) const;
 
     /*!
-     * Converts the 3 bytes at \a offset of the vector to a uint as an unsigned
-     * 24-bit big-endian integer.
+     * Converts the 3 bytes at \a offset of the vector to a unsigned int as an
+     * unsigned 24-bit big-endian integer.
      */
-    uint toUInt24BE(size_t offset) const;
+    unsigned int toUInt24BE(size_t offset) const;
 
     /*!
-     * Converts the 4 bytes at \a offset of the vector to a uint as an unsigned
-     * 32-bit little-endian integer.
+     * Converts the 4 bytes at \a offset of the vector to a unsigned int as an
+     * unsigned 32-bit little-endian integer.
      *
      * \see fromUInt32LE()
      */
-    uint toUInt32LE(size_t offset) const;
+    unsigned int toUInt32LE(size_t offset) const;
 
     /*!
-     * Converts the 4 bytes at \a offset of the vector to a ushort as an unsigned
-     * 32-bit big-endian integer.
+     * Converts the 4 bytes at \a offset of the vector to a unsigned int as an
+     * unsigned 32-bit big-endian integer.
      *
      * \see fromUInt32BE()
      */
-    uint toUInt32BE(size_t offset) const;
+    unsigned int toUInt32BE(size_t offset) const;
 
     /*!
      * Converts the 8 bytes at \a offset of the vector to a long long as a signed
@@ -436,7 +436,7 @@ namespace TagLib {
      *
      * \see toUInt64LE()
      */
-    static ByteVector fromUInt64LE(ulonglong value);
+    static ByteVector fromUInt64LE(unsigned long long value);
 
     /*!
      * Creates a 8 byte ByteVector based on \a value as an unsigned 64-bit
@@ -444,7 +444,7 @@ namespace TagLib {
      *
      * \see toUInt64BE()
      */
-    static ByteVector fromUInt64BE(ulonglong value);
+    static ByteVector fromUInt64BE(unsigned long long value);
 
     /*!
      * Creates a 4 byte ByteVector based on \a value as an IEEE754 32-bit

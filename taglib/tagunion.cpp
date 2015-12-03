@@ -39,7 +39,7 @@
 
 #define numberUnion(method)                                               \
   for(size_t j = 0; j < COUNT; ++j) {                                     \
-    uint val = d->tags[j] ? d->tags[j]->method() : 0;                     \
+    unsigned int val = d->tags[j] ? d->tags[j]->method() : 0;             \
     if(val > 0)                                                           \
       return val;                                                         \
   }                                                                       \

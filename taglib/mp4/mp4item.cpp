@@ -44,8 +44,8 @@ namespace
       bool m_bool;
       int m_int;
       MP4::Item::IntPair m_intPair;
-      uchar m_byte;
-      uint m_uint;
+      unsigned char m_byte;
+      unsigned int m_uint;
       long long m_longlong;
     };
     StringList m_stringList;
@@ -253,13 +253,13 @@ MP4::Item::toString() const
     case TypeStringList:
       return d->data->m_stringList.toString(" / ");
     case TypeByteVectorList:
-      for(TagLib::uint i = 0; i < d->data->m_byteVectorList.size(); i++) {
+      for(size_t i = 0; i < d->data->m_byteVectorList.size(); i++) {
         desc.append(Utils::formatString(
           "[%d bytes of data]", static_cast<int>(d->data->m_byteVectorList[i].size())));
       }
       return desc.toString(", ");
     case TypeCoverArtList:
-      for(TagLib::uint i = 0; i < d->data->m_coverArtList.size(); i++) {
+      for(size_t i = 0; i < d->data->m_coverArtList.size(); i++) {
         desc.append(Utils::formatString(
           "[%d bytes of data]", static_cast<int>(d->data->m_coverArtList[i].data().size())));
       }

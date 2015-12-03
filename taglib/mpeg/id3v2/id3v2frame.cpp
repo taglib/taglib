@@ -194,7 +194,7 @@ void Frame::setText(const String &)
 ByteVector Frame::render() const
 {
   ByteVector fieldData = renderFields();
-  d->header->setFrameSize(static_cast<uint>(fieldData.size()));
+  d->header->setFrameSize(static_cast<unsigned int>(fieldData.size()));
   ByteVector headerData = d->header->render();
 
   return headerData + fieldData;
@@ -733,7 +733,7 @@ void Frame::Header::setData(const ByteVector &data, unsigned int version)
     // iTunes writes v2.4 tags with v2.3-like frame sizes
     if(d->frameSize > 127) {
       if(!isValidFrameID(data.mid(d->frameSize + 10, 4))) {
-        const uint uintSize = data.toUInt32BE(4);
+        const unsigned int uintSize = data.toUInt32BE(4);
         if(isValidFrameID(data.mid(uintSize + 10, 4))) {
           d->frameSize = uintSize;
         }

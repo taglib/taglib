@@ -74,35 +74,35 @@ namespace
      * Reads associated values from \a file, but never reads more
      * then \a limit bytes.
      */
-    virtual uint read(TagLib::File &file, uint limit) = 0;
+    virtual unsigned int read(TagLib::File &file, unsigned int limit) = 0;
 
     /*!
      * Returns the number of bytes this reader would like to read.
      */
-    virtual uint size() const = 0;
+    virtual unsigned int size() const = 0;
   };
 
   class SkipReader : public Reader
   {
   public:
-    SkipReader(uint size) : m_size(size)
+    SkipReader(unsigned int size) : m_size(size)
     {
     }
 
-    uint read(TagLib::File &file, uint limit)
+    unsigned int read(TagLib::File &file, unsigned int limit)
     {
-      uint count = std::min(m_size, limit);
+      unsigned int count = std::min(m_size, limit);
       file.seek(count, TagLib::File::Current);
       return count;
     }
 
-    uint size() const
+    unsigned int size() const
     {
       return m_size;
     }
 
   private:
-    uint m_size;
+    unsigned int m_size;
   };
 
   template<typename T>
@@ -120,12 +120,12 @@ namespace
   class StringReader : public ValueReader<String>
   {
   public:
-    StringReader(String &string, uint size) :
+    StringReader(String &string, unsigned int size) :
       ValueReader<String>(string), m_size(size)
     {
     }
 
-    uint read(TagLib::File &file, uint limit)
+    unsigned int read(TagLib::File &file, unsigned int limit)
     {
       ByteVector data = file.readBlock(std::min(m_size, limit));
       size_t count = data.size();
@@ -135,33 +135,33 @@ namespace
       }
       data.replace((char) 0xff, ' ');
       value = data;
-      return static_cast<uint>(count);
+      return static_cast<unsigned int>(count);
     }
 
-    uint size() const
+    unsigned int size() const
     {
       return m_size;
     }
 
   private:
-    uint m_size;
+    unsigned int m_size;
   };
 
-  class ByteReader : public ValueReader<uchar>
+  class ByteReader : public ValueReader<unsigned char>
   {
   public:
-    ByteReader(uchar &byte) : ValueReader<uchar>(byte) {}
+    ByteReader(unsigned char &byte) : ValueReader<unsigned char>(byte) {}
 
-    uint read(TagLib::File &file, uint limit)
+    unsigned int read(TagLib::File &file, unsigned int limit)
     {
       ByteVector data = file.readBlock(std::min(1U,limit));
       if(data.size() > 0) {
         value = data[0];
       }
-      return static_cast<uint>(data.size());
+      return static_cast<unsigned int>(data.size());
     }
 
-    uint size() const
+    unsigned int size() const
     {
       return 1;
     }
@@ -180,13 +180,13 @@ namespace
     bool bigEndian;
   };
 
-  class U16Reader : public NumberReader<ushort>
+  class U16Reader : public NumberReader<unsigned short>
   {
   public:
-    U16Reader(ushort &value, bool bigEndian)
-    : NumberReader<ushort>(value, bigEndian) {}
+    U16Reader(unsigned short &value, bool bigEndian)
+    : NumberReader<unsigned short>(value, bigEndian) {}
 
-    uint read(TagLib::File &file, uint limit)
+    unsigned int read(TagLib::File &file, unsigned int limit)
     {
       ByteVector data = file.readBlock(std::min(2U,limit));
 
@@ -195,24 +195,24 @@ namespace
       else
         value = data.toUInt16LE(0);
 
-      return static_cast<uint>(data.size());
+      return static_cast<unsigned int>(data.size());
     }
 
-    uint size() const
+    unsigned int size() const
     {
       return 2;
     }
   };
 
-  class U32Reader : public NumberReader<uint>
+  class U32Reader : public NumberReader<unsigned int>
   {
   public:
-    U32Reader(uint &value, bool bigEndian = true) :
-      NumberReader<uint>(value, bigEndian)
+    U32Reader(unsigned int &value, bool bigEndian = true) :
+      NumberReader<unsigned int>(value, bigEndian)
     {
     }
 
-    uint read(TagLib::File &file, uint limit)
+    unsigned int read(TagLib::File &file, unsigned int limit)
     {
       ByteVector data = file.readBlock(std::min(4U,limit));
 
@@ -221,10 +221,10 @@ namespace
       else
         value = data.toUInt32LE(0);
 
-      return static_cast<uint>(data.size());
+      return static_cast<unsigned int>(data.size());
     }
 
-    uint size() const
+    unsigned int size() const
     {
       return 4;
     }
@@ -250,7 +250,7 @@ namespace
     /*!
      * Don't read anything but skip \a size bytes.
      */
-    StructReader &skip(uint size)
+    StructReader &skip(unsigned int size)
     {
       m_readers.append(new SkipReader(size));
       return *this;
@@ -259,7 +259,7 @@ namespace
     /*!
      * Read a string of \a size characters (bytes) into \a string.
      */
-    StructReader &string(String &string, uint size)
+    StructReader &string(String &string, unsigned int size)
     {
       m_readers.append(new StringReader(string, size));
       return *this;
@@ -268,7 +268,7 @@ namespace
     /*!
      * Read a byte into \a byte.
      */
-    StructReader &byte(uchar &byte)
+    StructReader &byte(unsigned char &byte)
     {
       m_readers.append(new ByteReader(byte));
       return *this;
@@ -278,7 +278,7 @@ namespace
      * Read a unsigned 16 Bit integer into \a number. The byte order
      * is controlled by \a bigEndian.
      */
-    StructReader &u16(ushort &number, bool bigEndian)
+    StructReader &u16(unsigned short &number, bool bigEndian)
     {
       m_readers.append(new U16Reader(number, bigEndian));
       return *this;
@@ -287,7 +287,7 @@ namespace
     /*!
      * Read a unsigned 16 Bit little endian integer into \a number.
      */
-    StructReader &u16L(ushort &number)
+    StructReader &u16L(unsigned short &number)
     {
       return u16(number, false);
     }
@@ -295,7 +295,7 @@ namespace
     /*!
      * Read a unsigned 16 Bit big endian integer into \a number.
      */
-    StructReader &u16B(ushort &number)
+    StructReader &u16B(unsigned short &number)
     {
       return u16(number, true);
     }
@@ -304,7 +304,7 @@ namespace
      * Read a unsigned 32 Bit integer into \a number. The byte order
      * is controlled by \a bigEndian.
      */
-    StructReader &u32(uint &number, bool bigEndian)
+    StructReader &u32(unsigned int &number, bool bigEndian)
     {
       m_readers.append(new U32Reader(number, bigEndian));
       return *this;
@@ -313,7 +313,7 @@ namespace
     /*!
      * Read a unsigned 32 Bit little endian integer into \a number.
      */
-    StructReader &u32L(uint &number)
+    StructReader &u32L(unsigned int &number)
     {
       return u32(number, false);
     }
@@ -321,14 +321,14 @@ namespace
     /*!
      * Read a unsigned 32 Bit big endian integer into \a number.
      */
-    StructReader &u32B(uint &number)
+    StructReader &u32B(unsigned int &number)
     {
       return u32(number, true);
     }
 
-    uint size() const
+    unsigned int size() const
     {
-      uint size = 0;
+      unsigned int size = 0;
       for(List<Reader*>::ConstIterator i = m_readers.begin();
           i != m_readers.end(); ++ i) {
         size += (*i)->size();
@@ -336,12 +336,12 @@ namespace
       return size;
     }
 
-    uint read(TagLib::File &file, uint limit)
+    unsigned int read(TagLib::File &file, unsigned int limit)
     {
-      uint sumcount = 0;
+      unsigned int sumcount = 0;
       for(List<Reader*>::ConstIterator i = m_readers.begin();
           limit > 0 && i != m_readers.end(); ++ i) {
-        uint count = (*i)->read(file, limit);
+        unsigned int count = (*i)->read(file, limit);
         limit    -= count;
         sumcount += count;
       }
@@ -595,7 +595,7 @@ void XM::File::read(bool)
       // skip unhandeled header proportion:
       seek(instrumentHeaderSize - count - 4, Current);
 
-      for(ushort j = 0; j < sampleCount; ++ j) {
+      for(unsigned short j = 0; j < sampleCount; ++ j) {
         unsigned int  sampleLength = 0;
         unsigned int  loopStart    = 0;
         unsigned int  loopLength   = 0;

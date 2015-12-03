@@ -142,13 +142,13 @@ namespace TagLib {
           /*!
            * Returns the year; if there is no year set, this will return 0.
            */
-          virtual uint year() const;
+          virtual unsigned int year() const;
 
           /*!
            * Returns the track number; if there is no track number set, this will
            * return 0.
            */
-          virtual uint track() const;
+          virtual unsigned int track() const;
 
           /*!
            * Sets the title to s. If s is String::null then this value will be
@@ -189,12 +189,12 @@ namespace TagLib {
           /*!
            * Sets the year to i. If s is 0 then this value will be cleared.
            */
-          virtual void setYear(uint i);
+          virtual void setYear(unsigned int i);
 
           /*!
            * Sets the track to i. If s is 0 then this value will be cleared.
            */
-          virtual void setTrack(uint i);
+          virtual void setTrack(unsigned int i);
 
         private:
           class TagPrivate;

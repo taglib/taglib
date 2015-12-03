@@ -134,7 +134,7 @@ inline T toNumber(const ByteVector &v, size_t offset)
     T sum = 0;
     for(size_t i = 0; i < length; ++i) {
       const size_t shift = (ENDIAN == BigEndian ? length - 1 - i : i) * 8;
-      sum |= static_cast<T>(static_cast<uchar>(v[offset + i])) << shift;
+      sum |= static_cast<T>(static_cast<unsigned char>(v[offset + i])) << shift;
     }
 
     return sum;
@@ -292,42 +292,42 @@ ByteVector ByteVector::fromCString(const char *s, size_t length)
 
 ByteVector ByteVector::fromUInt16LE(size_t value)
 {
-  return fromNumber<ushort, LittleEndian>(static_cast<ushort>(value));
+  return fromNumber<unsigned short, LittleEndian>(static_cast<unsigned short>(value));
 }
 
 ByteVector ByteVector::fromUInt16BE(size_t value)
 {
-  return fromNumber<ushort, BigEndian>(static_cast<ushort>(value));
+  return fromNumber<unsigned short, BigEndian>(static_cast<unsigned short>(value));
 }
 
 ByteVector ByteVector::fromUInt32LE(size_t value)
 {
-  return fromNumber<uint, LittleEndian>(static_cast<uint>(value));
+  return fromNumber<unsigned int, LittleEndian>(static_cast<unsigned int>(value));
 }
 
 ByteVector ByteVector::fromUInt32BE(size_t value)
 {
-  return fromNumber<uint, BigEndian>(static_cast<uint>(value));
+  return fromNumber<unsigned int, BigEndian>(static_cast<unsigned int>(value));
 }
 
-ByteVector ByteVector::fromUInt64LE(ulonglong value)
+ByteVector ByteVector::fromUInt64LE(unsigned long long value)
 {
-  return fromNumber<ulonglong, LittleEndian>(value);
+  return fromNumber<unsigned long long, LittleEndian>(value);
 }
 
-ByteVector ByteVector::fromUInt64BE(ulonglong value)
+ByteVector ByteVector::fromUInt64BE(unsigned long long value)
 {
-  return fromNumber<ulonglong, BigEndian>(value);
+  return fromNumber<unsigned long long, BigEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat32LE(float value)
 {
-  return fromFloat<float, uint, LittleEndian>(value);
+  return fromFloat<float, unsigned int, LittleEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat32BE(float value)
 {
-  return fromFloat<float, uint, BigEndian>(value);
+  return fromFloat<float, unsigned int, BigEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat64LE(double value)
@@ -691,62 +691,62 @@ unsigned int ByteVector::checksum() const
 
 short ByteVector::toInt16LE(size_t offset) const
 {
-  return static_cast<short>(toNumber<ushort, 2, LittleEndian>(*this, offset));
+  return static_cast<short>(toNumber<unsigned short, 2, LittleEndian>(*this, offset));
 }
 
 short ByteVector::toInt16BE(size_t offset) const
 {
-  return static_cast<short>(toNumber<ushort, 2, BigEndian>(*this, offset));
+  return static_cast<short>(toNumber<unsigned short, 2, BigEndian>(*this, offset));
 }
 
-ushort ByteVector::toUInt16LE(size_t offset) const
+unsigned short ByteVector::toUInt16LE(size_t offset) const
 {
-  return toNumber<ushort, 2, LittleEndian>(*this, offset);
+  return toNumber<unsigned short, 2, LittleEndian>(*this, offset);
 }
 
-ushort ByteVector::toUInt16BE(size_t offset) const
+unsigned short ByteVector::toUInt16BE(size_t offset) const
 {
-  return toNumber<ushort, 2, BigEndian>(*this, offset);
+  return toNumber<unsigned short, 2, BigEndian>(*this, offset);
 }
 
-uint ByteVector::toUInt24LE(size_t offset) const
+unsigned int ByteVector::toUInt24LE(size_t offset) const
 {
-  return toNumber<uint, 3, LittleEndian>(*this, offset);
+  return toNumber<unsigned int, 3, LittleEndian>(*this, offset);
 }
 
-uint ByteVector::toUInt24BE(size_t offset) const
+unsigned int ByteVector::toUInt24BE(size_t offset) const
 {
-  return toNumber<uint, 3, BigEndian>(*this, offset);
+  return toNumber<unsigned int, 3, BigEndian>(*this, offset);
 }
 
-uint ByteVector::toUInt32LE(size_t offset) const
+unsigned int ByteVector::toUInt32LE(size_t offset) const
 {
-  return toNumber<uint, 4, LittleEndian>(*this, offset);
+  return toNumber<unsigned int, 4, LittleEndian>(*this, offset);
 }
 
-uint ByteVector::toUInt32BE(size_t offset) const
+unsigned int ByteVector::toUInt32BE(size_t offset) const
 {
-  return toNumber<uint, 4, BigEndian>(*this, offset);
+  return toNumber<unsigned int, 4, BigEndian>(*this, offset);
 }
 
 long long ByteVector::toInt64LE(size_t offset) const
 {
-  return static_cast<long long>(toNumber<ulonglong, 8, LittleEndian>(*this, offset));
+  return static_cast<long long>(toNumber<unsigned long long, 8, LittleEndian>(*this, offset));
 }
 
 long long ByteVector::toInt64BE(size_t offset) const
 {
-  return static_cast<long long>(toNumber<ulonglong, 8, BigEndian>(*this, offset));
+  return static_cast<long long>(toNumber<unsigned long long, 8, BigEndian>(*this, offset));
 }
 
 float ByteVector::toFloat32LE(size_t offset) const
 {
-  return toFloat<float, uint, LittleEndian>(*this, offset);
+  return toFloat<float, unsigned int, LittleEndian>(*this, offset);
 }
 
 float ByteVector::toFloat32BE(size_t offset) const
 {
-  return toFloat<float, uint, BigEndian>(*this, offset);
+  return toFloat<float, unsigned int, BigEndian>(*this, offset);
 }
 
 double ByteVector::toFloat64LE(size_t offset) const

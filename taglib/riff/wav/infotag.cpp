@@ -246,7 +246,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
 {
   size_t p = 4;
   while(p < data.size()) {
-    const uint size = data.toUInt32LE(p + 4);
+    const unsigned int size = data.toUInt32LE(p + 4);
     if(size > data.size() - p - 8)
       break;
 

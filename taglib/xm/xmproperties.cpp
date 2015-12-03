@@ -174,7 +174,7 @@ void XM::AudioProperties::setInstrumentCount(unsigned short instrumentCount)
   d->instrumentCount = instrumentCount;
 }
 
-void XM::AudioProperties::setSampleCount(uint sampleCount)
+void XM::AudioProperties::setSampleCount(unsigned int sampleCount)
 {
   d->sampleCount = sampleCount;
 }
