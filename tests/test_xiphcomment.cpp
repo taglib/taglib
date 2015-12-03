@@ -142,7 +142,7 @@ public:
     {
       Ogg::Vorbis::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.tag()->pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      CPPUNIT_ASSERT_EQUAL((size_t)1, lst.size());
       CPPUNIT_ASSERT_EQUAL((int)5, lst[0]->width());
       CPPUNIT_ASSERT_EQUAL((int)6, lst[0]->height());
       CPPUNIT_ASSERT_EQUAL((int)16, lst[0]->colorDepth());
