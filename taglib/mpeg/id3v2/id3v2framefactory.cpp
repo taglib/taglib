@@ -118,7 +118,7 @@ FrameFactory *FrameFactory::instance()
 Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHeader) const
 {
   ByteVector data = origData;
-  uint version = tagHeader->majorVersion();
+  unsigned int version = tagHeader->majorVersion();
   Frame::Header *header = new Frame::Header(data, version);
   ByteVector frameID = header->frameID();
 
@@ -126,7 +126,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // characters.  Also make sure that there is data in the frame.
 
   if(frameID.size() != (version < 3 ? 3 : 4) ||
-     header->frameSize() <= uint(header->dataLengthIndicator() ? 4 : 0) ||
+     header->frameSize() <= static_cast<unsigned int>(header->dataLengthIndicator() ? 4 : 0) ||
      header->frameSize() > data.size())
   {
     delete header;
@@ -324,18 +324,27 @@ void FrameFactory::rebuildAggregateFrames(ID3v2::Tag *tag) const
      tag->frameList("TDRC").size() == 1 &&
      tag->frameList("TDAT").size() == 1)
   {
-    TextIdentificationFrame *trdc =
+    TextIdentificationFrame *tdrc =
       static_cast<TextIdentificationFrame *>(tag->frameList("TDRC").front());
-    UnknownFrame *tdat =
-      static_cast<UnknownFrame *>(tag->frameList("TDAT").front());
+    UnknownFrame *tdat = static_cast<UnknownFrame *>(tag->frameList("TDAT").front());
 
-    if(trdc->fieldList().size() == 1 &&
-       trdc->fieldList().front().size() == 4 &&
+    if(tdrc->fieldList().size() == 1 &&
+       tdrc->fieldList().front().size() == 4 &&
        tdat->data().size() >= 5)
     {
       String date(tdat->data().mid(1), String::Type(tdat->data()[0]));
-      if(date.length() == 4)
-        trdc->setText(trdc->toString() + '-' + date.substr(2, 2) + '-' + date.substr(0, 2));
+      if(date.length() == 4) {
+        tdrc->setText(tdrc->toString() + '-' + date.substr(2, 2) + '-' + date.substr(0, 2));
+        if(tag->frameList("TIME").size() == 1) {
+          UnknownFrame *timeframe = static_cast<UnknownFrame *>(tag->frameList("TIME").front());
+          if(timeframe->data().size() >= 5) {
+            String time(timeframe->data().mid(1), String::Type(timeframe->data()[0]));
+            if(time.length() == 4) {
+              tdrc->setText(tdrc->toString() + 'T' + time.substr(0, 2) + ':' + time.substr(2, 2));
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -521,3 +530,4 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 
   return true;
 }
+

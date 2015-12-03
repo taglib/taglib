@@ -63,16 +63,21 @@ class ID3v1::Tag::TagPrivate
 {
 public:
   TagPrivate() :
+    file(0),
+    tagOffset(0),
     track(0),
     genre(255) {}
+
+  File *file;
+  long long tagOffset;
 
   String title;
   String artist;
   String album;
   String year;
   String comment;
-  uchar track;
-  uchar genre;
+  unsigned char track;
+  unsigned char genre;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +94,10 @@ ID3v1::Tag::Tag(File *file, long long tagOffset) :
   TagLib::Tag(),
   d(new TagPrivate())
 {
-  read(file, tagOffset);
+  d->file = file;
+  d->tagOffset = tagOffset;
+
+  read();
 }
 
 ID3v1::Tag::~Tag()
@@ -144,12 +152,12 @@ String ID3v1::Tag::genre() const
   return ID3v1::genre(d->genre);
 }
 
-TagLib::uint ID3v1::Tag::year() const
+unsigned int ID3v1::Tag::year() const
 {
   return d->year.toInt();
 }
 
-TagLib::uint ID3v1::Tag::track() const
+unsigned int ID3v1::Tag::track() const
 {
   return d->track;
 }
@@ -184,12 +192,12 @@ void ID3v1::Tag::setGenre(const String &s)
   d->genre = ID3v1::genreIndex(s);
 }
 
-void ID3v1::Tag::setYear(TagLib::uint i)
+void ID3v1::Tag::setYear(unsigned int i)
 {
   d->year = i > 0 ? String::number(i) : String();
 }
 
-void ID3v1::Tag::setTrack(TagLib::uint i)
+void ID3v1::Tag::setTrack(unsigned int i)
 {
   d->track = i < 256 ? i : 0;
 }
@@ -198,12 +206,12 @@ void ID3v1::Tag::setPictures(const PictureMap &l)
 {
 }
 
-TagLib::uint ID3v1::Tag::genreNumber() const
+unsigned int ID3v1::Tag::genreNumber() const
 {
   return d->genre;
 }
 
-void ID3v1::Tag::setGenreNumber(TagLib::uint i)
+void ID3v1::Tag::setGenreNumber(unsigned int i)
 {
   d->genre = i < 256 ? i : 255;
 }
@@ -220,12 +228,12 @@ void ID3v1::Tag::setStringHandler(const TagLib::StringHandler *handler)
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v1::Tag::read(File *file, long long tagOffset)
+void ID3v1::Tag::read()
 {
-  if(file && file->isValid()) {
-    file->seek(tagOffset);
+  if(d->file && d->file->isValid()) {
+    d->file->seek(d->tagOffset);
     // read the tag -- always 128 bytes
-    const ByteVector data = file->readBlock(128);
+    const ByteVector data = d->file->readBlock(128);
 
     // some initial sanity checking
     if(data.size() == 128 && data.startsWith("TAG"))
@@ -260,12 +268,12 @@ void ID3v1::Tag::parse(const ByteVector &data)
     // ID3v1.1 detected
 
     d->comment = stringHandler->parse(data.mid(offset, 28));
-    d->track = uchar(data[offset + 29]);
+    d->track   = static_cast<unsigned char>(data[offset + 29]);
   }
   else
     d->comment = data.mid(offset, 30);
 
   offset += 30;
 
-  d->genre = uchar(data[offset]);
+  d->genre = static_cast<unsigned char>(data[offset]);
 }

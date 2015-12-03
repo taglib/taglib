@@ -46,14 +46,14 @@ namespace TagLib {
       int sampleRate()           const;
       int channels()             const;
 
-      uint instrumentCount()   const;
-      uchar lengthInPatterns() const;
+      unsigned int  instrumentCount()  const;
+      unsigned char lengthInPatterns() const;
 
     private:
       void setChannels(int channels);
 
-      void setInstrumentCount(uint sampleCount);
-      void setLengthInPatterns(uchar lengthInPatterns);
+      void setInstrumentCount(unsigned int sampleCount);
+      void setLengthInPatterns(unsigned char lengthInPatterns);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

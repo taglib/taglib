@@ -78,8 +78,8 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long long ID3v2Location;
-  uint ID3v2OriginalSize;
+  long long    ID3v2Location;
+  unsigned int ID3v2OriginalSize;
 
   long long ID3v1Location;
 
@@ -166,7 +166,7 @@ bool FLAC::File::save()
 
   bool foundVorbisCommentBlock = false;
   List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(unsigned int i = 0; i < d->blocks.size(); i++) {
     MetadataBlock *block = d->blocks[i];
     if(block->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
@@ -189,7 +189,7 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(uint i = 0; i < newBlocks.size(); i++) {
+  for(unsigned int i = 0; i < newBlocks.size(); i++) {
     FLAC::MetadataBlock *block = newBlocks[i];
     ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt32BE(blockData.size());
@@ -268,7 +268,7 @@ void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(unsigned int i = 0; i < d->blocks.size(); i++) {
     Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
     if(picture) {
       pictures.append(picture);
@@ -296,7 +296,7 @@ void FLAC::File::removePicture(Picture *picture, bool del)
 void FLAC::File::removePictures()
 {
   List<MetadataBlock *> newBlocks;
-  for(uint i = 0; i < d->blocks.size(); i++) {
+  for(unsigned int i = 0; i < d->blocks.size(); i++) {
     Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
     if(picture) {
       delete picture;
@@ -425,7 +425,7 @@ void FLAC::File::scan()
 
   char blockType = header[0] & 0x7f;
   bool isLastBlock = (header[0] & 0x80) != 0;
-  uint length = header.toUInt24BE(1);
+  size_t length = header.toUInt24BE(1);
 
   // First block should be the stream_info metadata
 

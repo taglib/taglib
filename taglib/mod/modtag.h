@@ -77,12 +77,12 @@ namespace TagLib {
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      uint year() const;
+      unsigned int year() const;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      uint track() const;
+      unsigned int track() const;
 
       PictureMap pictures() const;
 
@@ -142,12 +142,12 @@ namespace TagLib {
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setYear(uint year);
+      void setYear(unsigned int year);
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setTrack(uint track);
+      void setTrack(unsigned int track);
 
       void setPictures(const PictureMap &l);
 

@@ -45,12 +45,12 @@ namespace
    * starts with \e 111 is a bit more tricky, hence these functions.
    */
 
-  inline bool firstSyncByte(uchar byte)
+  inline bool firstSyncByte(unsigned char byte)
   {
     return (byte == 0xFF);
   }
 
-  inline bool secondSynchByte(uchar byte)
+  inline bool secondSynchByte(unsigned char byte)
   {
     return ((byte & 0xE0) == 0xE0);
   }
@@ -86,12 +86,12 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
-  long long ID3v2Location;
-  uint ID3v2OriginalSize;
+  long long    ID3v2Location;
+  unsigned int ID3v2OriginalSize;
 
-  long long APELocation;
-  long long APEFooterLocation;
-  uint APEOriginalSize;
+  long long    APELocation;
+  long long    APEFooterLocation;
+  unsigned int APEOriginalSize;
 
   long long ID3v1Location;
 
@@ -368,7 +368,7 @@ long long MPEG::File::nextFrameOffset(long long position)
     if(foundLastSyncPattern && secondSynchByte(buffer[0]))
       return position - 1;
 
-    for(uint i = 0; i < buffer.size() - 1; i++) {
+    for(unsigned int i = 0; i < buffer.size() - 1; i++) {
       if(firstSyncByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
         return position + i;
     }
@@ -383,9 +383,8 @@ long long MPEG::File::previousFrameOffset(long long position)
   bool foundFirstSyncPattern = false;
   ByteVector buffer;
 
-  while (position > 0) {
-    size_t size = position < static_cast<long long>(bufferSize())
-      ? static_cast<size_t>(position) : bufferSize();
+  while(position > 0) {
+    size_t size = static_cast<size_t>(std::min<long long>(position, bufferSize()));
     position -= size;
 
     seek(position);

@@ -90,8 +90,8 @@ bool S3M::File::save()
 
   seek(32);
 
-  ushort length = 0;
-  ushort sampleCount = 0;
+  unsigned short length = 0;
+  unsigned short sampleCount = 0;
 
   if(!readU16L(length) || !readU16L(sampleCount))
     return false;
@@ -100,7 +100,7 @@ bool S3M::File::save()
 
   int channels = 0;
   for(int i = 0; i < 32; ++ i) {
-    uchar setting = 0;
+    unsigned char setting = 0;
     if(!readByte(setting))
       return false;
     // or if(setting >= 128)?
@@ -113,10 +113,10 @@ bool S3M::File::save()
 
   StringList lines = d->tag.comment().split("\n");
   // write comment as sample names:
-  for(ushort i = 0; i < sampleCount; ++ i) {
+  for(unsigned short i = 0; i < sampleCount; ++ i) {
     seek(96L + length + ((long)i << 1));
 
-    ushort instrumentOffset = 0;
+    unsigned short instrumentOffset = 0;
     if(!readU16L(instrumentOffset))
       return false;
     seek(((long)instrumentOffset << 4) + 48);
@@ -183,8 +183,8 @@ void S3M::File::read(bool)
   d->properties.setChannels(channels);
 
   seek(96);
-  ushort realLength = 0;
-  for(ushort i = 0; i < length; ++ i) {
+  unsigned short realLength = 0;
+  for(unsigned short i = 0; i < length; ++ i) {
     READ_BYTE_AS(order);
     if(order == 255) break;
     if(order != 254) ++ realLength;
@@ -198,7 +198,7 @@ void S3M::File::read(bool)
   //       However, there I never found instruments (SCRI) but
   //       instead samples (SCRS).
   StringList comment;
-  for(ushort i = 0; i < sampleCount; ++ i) {
+  for(unsigned short i = 0; i < sampleCount; ++ i) {
     seek(96L + length + ((long)i << 1));
 
     READ_U16L_AS(sampleHeaderOffset);

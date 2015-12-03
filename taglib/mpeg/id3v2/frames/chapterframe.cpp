@@ -44,10 +44,10 @@ public:
 
   const ID3v2::Header *tagHeader;
   ByteVector elementID;
-  TagLib::uint startTime;
-  TagLib::uint endTime;
-  TagLib::uint startOffset;
-  TagLib::uint endOffset;
+  unsigned int startTime;
+  unsigned int endTime;
+  unsigned int startOffset;
+  unsigned int endOffset;
   FrameListMap embeddedFrameListMap;
   FrameList embeddedFrameList;
 };
@@ -65,8 +65,8 @@ ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &dat
 }
 
 ChapterFrame::ChapterFrame(const ByteVector &elementID,
-                           TagLib::uint startTime, TagLib::uint endTime,
-                           TagLib::uint startOffset, TagLib::uint endOffset,
+                           unsigned int startTime, unsigned int endTime,
+                           unsigned int startOffset, unsigned int endOffset,
                            const FrameList &embeddedFrames) :
     ID3v2::Frame("CHAP")
 {
@@ -97,22 +97,22 @@ ByteVector ChapterFrame::elementID() const
   return d->elementID;
 }
 
-TagLib::uint ChapterFrame::startTime() const
+unsigned int ChapterFrame::startTime() const
 {
   return d->startTime;
 }
 
-TagLib::uint ChapterFrame::endTime() const
+unsigned int ChapterFrame::endTime() const
 {
   return d->endTime;
 }
 
-TagLib::uint ChapterFrame::startOffset() const
+unsigned int ChapterFrame::startOffset() const
 {
   return d->startOffset;
 }
 
-TagLib::uint ChapterFrame::endOffset() const
+unsigned int ChapterFrame::endOffset() const
 {
   return d->endOffset;
 }
@@ -125,22 +125,22 @@ void ChapterFrame::setElementID(const ByteVector &eID)
     d->elementID = d->elementID.mid(0, d->elementID.size() - 1);
 }
 
-void ChapterFrame::setStartTime(const TagLib::uint &sT)
+void ChapterFrame::setStartTime(const unsigned int &sT)
 {
   d->startTime = sT;
 }
 
-void ChapterFrame::setEndTime(const TagLib::uint &eT)
+void ChapterFrame::setEndTime(const unsigned int &eT)
 {
   d->endTime = eT;
 }
 
-void ChapterFrame::setStartOffset(const TagLib::uint &sO)
+void ChapterFrame::setStartOffset(const unsigned int &sO)
 {
   d->startOffset = sO;
 }
 
-void ChapterFrame::setEndOffset(const TagLib::uint &eO)
+void ChapterFrame::setEndOffset(const unsigned int &eO)
 {
   d->endOffset = eO;
 }

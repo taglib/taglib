@@ -110,13 +110,13 @@ namespace TagLib {
     /*!
      * Returns the year; if there is no year set, this will return 0.
      */
-    virtual uint year() const = 0;
+    virtual unsigned int year() const = 0;
 
     /*!
      * Returns the track number; if there is no track number set, this will
      * return 0.
      */
-    virtual uint track() const = 0;
+    virtual unsigned int track() const = 0;
 
     /*!
      * Returns a list of pictures available; if there is no picture, the list
@@ -160,12 +160,12 @@ namespace TagLib {
     /*!
      * Sets the year to \a i.  If \a s is 0 then this value will be cleared.
      */
-    virtual void setYear(uint i) = 0;
+    virtual void setYear(unsigned int i) = 0;
 
     /*!
      * Sets the track to \a i.  If \a s is 0 then this value will be cleared.
      */
-    virtual void setTrack(uint i) = 0;
+    virtual void setTrack(unsigned int i) = 0;
 
     /*!
      *  Sets the list of pictures

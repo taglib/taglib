@@ -48,22 +48,22 @@ public:
     footerPresent(false),
     tagSize(0) {}
 
-  uint majorVersion;
-  uint revisionNumber;
+  unsigned int majorVersion;
+  unsigned int revisionNumber;
 
   bool unsynchronisation;
   bool extendedHeader;
   bool experimentalIndicator;
   bool footerPresent;
 
-  uint tagSize;
+  unsigned int tagSize;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint Header::size()
+unsigned int Header::size()
 {
   return 10;
 }
@@ -93,17 +93,17 @@ Header::~Header()
   delete d;
 }
 
-TagLib::uint Header::majorVersion() const
+unsigned int Header::majorVersion() const
 {
   return d->majorVersion;
 }
 
-void Header::setMajorVersion(TagLib::uint version)
+void Header::setMajorVersion(unsigned int version)
 {
   d->majorVersion = version;
 }
 
-TagLib::uint Header::revisionNumber() const
+unsigned int Header::revisionNumber() const
 {
   return d->revisionNumber;
 }
@@ -128,12 +128,12 @@ bool Header::footerPresent() const
   return d->footerPresent;
 }
 
-TagLib::uint Header::tagSize() const
+unsigned int Header::tagSize() const
 {
   return d->tagSize;
 }
 
-TagLib::uint Header::completeTagSize() const
+unsigned int Header::completeTagSize() const
 {
   if(d->footerPresent)
     return d->tagSize + size() + Footer::size();
@@ -141,7 +141,7 @@ TagLib::uint Header::completeTagSize() const
     return d->tagSize + size();
 }
 
-void Header::setTagSize(uint s)
+void Header::setTagSize(unsigned int s)
 {
   d->tagSize = s;
 }
@@ -212,7 +212,7 @@ void Header::parse(const ByteVector &data)
   }
 
   for(ByteVector::ConstIterator it = sizeData.begin(); it != sizeData.end(); it++) {
-    if(uchar(*it) >= 128) {
+    if(static_cast<unsigned char>(*it) >= 128) {
       d->tagSize = 0;
       debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
       return;

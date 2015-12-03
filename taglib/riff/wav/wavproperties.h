@@ -121,7 +121,7 @@ namespace TagLib {
          *
          * \see format()
          */
-        uint sampleFrames() const;
+        unsigned int sampleFrames() const;
 
         /*!
          * Returns the format ID of the file.

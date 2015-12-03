@@ -2,16 +2,18 @@
 
  * New API for creating FileRef from IOStream.
  * Added support for ID3v2 PCST and WFED frames.
+ * Added support for pictures in XiphComment.
  * Added String::clear().
  * Added alternative functions to XiphComment::removeField().
+ * Added BUILD_BINDINGS build option.
+ * Added ENABLE_CCACHE build option.
  * Better handling of duplicate ID3v2 tags in all kinds of files.
  * Better handling of duplicate tag chunks in WAV files.
  * Better handling of duplicate tag chunks in AIFF files.
  * Fixed crash when calling File::properties() after strip().
  * Fixed possible file corruptions when saving ASF files.
  * Fixed updating the comment field of Vorbis comments.
- * Added BUILD_BINDINGS build option.
- * Added ENABLE_CCACHE build option.
+ * Replaced ENABLE_STATIC build option with BUILD_SHARED_LIBS.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.

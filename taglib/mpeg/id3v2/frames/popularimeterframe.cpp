@@ -36,7 +36,7 @@ public:
   PopularimeterFramePrivate() : rating(0), counter(0) {}
   String email;
   int rating;
-  TagLib::uint counter;
+  unsigned int counter;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,12 +84,12 @@ void PopularimeterFrame::setRating(int s)
   d->rating = s;
 }
 
-TagLib::uint PopularimeterFrame::counter() const
+unsigned int PopularimeterFrame::counter() const
 {
   return d->counter;
 }
 
-void PopularimeterFrame::setCounter(TagLib::uint s)
+void PopularimeterFrame::setCounter(unsigned int s)
 {
   d->counter = s;
 }

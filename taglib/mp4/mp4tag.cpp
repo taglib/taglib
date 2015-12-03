@@ -190,7 +190,7 @@ MP4::Tag::parseByte(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
   if(!data.isEmpty()) {
-    addItem(atom->name, (uchar)data[0].at(0));
+    addItem(atom->name, static_cast<unsigned char>(data[0].at(0)));
   }
 }
 
@@ -805,13 +805,13 @@ MP4::Tag::setGenre(const String &value)
 }
 
 void
-MP4::Tag::setYear(uint value)
+MP4::Tag::setYear(unsigned int value)
 {
   d->items["\251day"] = StringList(String::number(value));
 }
 
 void
-MP4::Tag::setTrack(uint value)
+MP4::Tag::setTrack(unsigned int value)
 {
   d->items["trkn"] = MP4::Item(value, 0);
 }

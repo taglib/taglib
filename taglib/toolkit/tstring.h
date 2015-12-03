@@ -82,8 +82,8 @@ namespace TagLib {
   public:
 
 #ifndef DO_NOT_DOCUMENT
-    typedef std::basic_string<wchar>::iterator Iterator;
-    typedef std::basic_string<wchar>::const_iterator ConstIterator;
+    typedef std::wstring::iterator Iterator;
+    typedef std::wstring::const_iterator ConstIterator;
 #endif
 
     /**
@@ -378,12 +378,12 @@ namespace TagLib {
     /*!
      * Returns a reference to the character at position \a i.
      */
-    wchar &operator[](size_t i);
+    wchar_t &operator[](size_t i);
 
     /*!
      * Returns a const reference to the character at position \a i.
      */
-    const wchar &operator[](size_t i) const;
+    const wchar_t &operator[](size_t i) const;
 
     /*!
      * Compares each character of the String with each character in \a s and

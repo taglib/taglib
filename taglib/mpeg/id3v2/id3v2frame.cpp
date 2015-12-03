@@ -85,12 +85,12 @@ namespace
 // static methods
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint Frame::headerSize()
+unsigned int Frame::headerSize()
 {
   return Header::size();
 }
 
-TagLib::uint Frame::headerSize(uint version)
+unsigned int Frame::headerSize(unsigned int version)
 {
   return Header::size(version);
 }
@@ -173,7 +173,7 @@ ByteVector Frame::frameID() const
     return ByteVector();
 }
 
-TagLib::uint Frame::size() const
+unsigned int Frame::size() const
 {
   if(d->header)
     return d->header->frameSize();
@@ -329,7 +329,7 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
   return checkEncoding(fields, encoding, 4);
 }
 
-String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding, uint version) // static
+String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding, unsigned int version) // static
 {
   if((encoding == String::UTF8 || encoding == String::UTF16BE) && version != 4)
     return String::UTF16;
@@ -566,8 +566,8 @@ public:
     {}
 
   ByteVector frameID;
-  uint frameSize;
-  uint version;
+  unsigned int frameSize;
+  unsigned int version;
 
   // flags
 
@@ -585,12 +585,12 @@ public:
 // static members (Frame::Header)
 ////////////////////////////////////////////////////////////////////////////////
 
-TagLib::uint Frame::Header::size()
+unsigned int Frame::Header::size()
 {
   return size(4);
 }
 
-TagLib::uint Frame::Header::size(uint version)
+unsigned int Frame::Header::size(unsigned int version)
 {
   switch(version) {
   case 0:
@@ -614,7 +614,7 @@ Frame::Header::Header(const ByteVector &data, bool synchSafeInts)
   setData(data, synchSafeInts);
 }
 
-Frame::Header::Header(const ByteVector &data, uint version)
+Frame::Header::Header(const ByteVector &data, unsigned int version)
 {
   d = new HeaderPrivate;
   setData(data, version);
@@ -627,10 +627,10 @@ Frame::Header::~Header()
 
 void Frame::Header::setData(const ByteVector &data, bool synchSafeInts)
 {
-  setData(data, uint(synchSafeInts ? 4 : 3));
+  setData(data, static_cast<unsigned int>(synchSafeInts ? 4 : 3));
 }
 
-void Frame::Header::setData(const ByteVector &data, uint version)
+void Frame::Header::setData(const ByteVector &data, unsigned int version)
 {
   d->version = version;
 
@@ -771,22 +771,22 @@ void Frame::Header::setFrameID(const ByteVector &id)
   d->frameID = id.mid(0, 4);
 }
 
-TagLib::uint Frame::Header::frameSize() const
+unsigned int Frame::Header::frameSize() const
 {
   return d->frameSize;
 }
 
-void Frame::Header::setFrameSize(uint size)
+void Frame::Header::setFrameSize(unsigned int size)
 {
   d->frameSize = size;
 }
 
-TagLib::uint Frame::Header::version() const
+unsigned int Frame::Header::version() const
 {
   return d->version;
 }
 
-void Frame::Header::setVersion(TagLib::uint version)
+void Frame::Header::setVersion(unsigned int version)
 {
   d->version = version;
 }

@@ -165,7 +165,7 @@ void Ogg::Vorbis::AudioProperties::read(File *file)
   d->vorbisVersion = data.toUInt32LE(pos);
   pos += 4;
 
-  d->channels = uchar(data[pos]);
+  d->channels = static_cast<unsigned char>(data[pos]);
   pos += 1;
 
   d->sampleRate = data.toUInt32LE(pos);

@@ -32,9 +32,9 @@ public:
     instrumentCount(0),
     lengthInPatterns(0) {}
 
-  int   channels;
-  uint  instrumentCount;
-  uchar lengthInPatterns;
+  int           channels;
+  unsigned int  instrumentCount;
+  unsigned char lengthInPatterns;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,12 +82,12 @@ int Mod::AudioProperties::channels() const
   return d->channels;
 }
 
-TagLib::uint Mod::AudioProperties::instrumentCount() const
+unsigned int Mod::AudioProperties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-uchar Mod::AudioProperties::lengthInPatterns() const
+unsigned char Mod::AudioProperties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -101,12 +101,12 @@ void Mod::AudioProperties::setChannels(int channels)
   d->channels = channels;
 }
 
-void Mod::AudioProperties::setInstrumentCount(uint instrumentCount)
+void Mod::AudioProperties::setInstrumentCount(unsigned int instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void Mod::AudioProperties::setLengthInPatterns(uchar lengthInPatterns)
+void Mod::AudioProperties::setLengthInPatterns(unsigned char lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }

@@ -187,7 +187,7 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
   file->seek(mdhd->offset);
   data = file->readBlock(static_cast<size_t>(mdhd->length));
 
-  const uint version = data[8];
+  const unsigned int version = data[8];
   long long unit;
   long long length;
   if(version == 1) {
@@ -222,7 +222,7 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
     d->bitsPerSample = data.toUInt16BE(42);
     d->sampleRate    = data.toUInt32BE(46);
     if(data.containsAt("esds", 56) && data[64] == 0x03) {
-      uint pos = 65;
+      unsigned int pos = 65;
       if(data.containsAt("\x80\x80\x80", pos)) {
         pos += 3;
       }

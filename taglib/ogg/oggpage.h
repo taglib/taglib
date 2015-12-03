@@ -121,7 +121,7 @@ namespace TagLib {
       /*!
        * Returns the number of packets (whole or partial) in this page.
        */
-      uint packetCount() const;
+      unsigned int packetCount() const;
 
       /*!
        * Returns a list of the packets in this page.
@@ -181,7 +181,7 @@ namespace TagLib {
        */
       static List<Page *> paginate(const ByteVectorList &packets,
                                    PaginationStrategy strategy,
-                                   uint streamSerialNumber,
+                                   unsigned int streamSerialNumber,
                                    int firstPage,
                                    bool firstPacketContinued = false,
                                    bool lastPacketCompleted = true,
@@ -193,7 +193,7 @@ namespace TagLib {
        * for each page will be set to \a pageNumber.
        */
       Page(const ByteVectorList &packets,
-           uint streamSerialNumber,
+           unsigned int streamSerialNumber,
            int pageNumber,
            bool firstPacketContinued = false,
            bool lastPacketCompleted = true,

@@ -20,6 +20,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testInvalidKeys);
   CPPUNIT_TEST(testClearComment);
   CPPUNIT_TEST(testRemoveFields);
+  CPPUNIT_TEST(testPicture);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -27,11 +28,11 @@ public:
   void testYear()
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), cmt.year());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.year());
     cmt.addField("YEAR", "2009");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2009), cmt.year());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2009, cmt.year());
     cmt.addField("DATE", "2008");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(2008), cmt.year());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2008, cmt.year());
   }
 
   void testSetYear()
@@ -47,11 +48,11 @@ public:
   void testTrack()
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(0), cmt.track());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.track());
     cmt.addField("TRACKNUM", "7");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(7), cmt.track());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)7, cmt.track());
     cmt.addField("TRACKNUMBER", "8");
-    CPPUNIT_ASSERT_EQUAL(TagLib::uint(8), cmt.track());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)8, cmt.track());
   }
 
   void testSetTrack()
@@ -73,7 +74,7 @@ public:
 
     Ogg::XiphComment cmt;
     PropertyMap unsuccessful = cmt.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL(size_t(3), unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)3, unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
   }
 
@@ -117,6 +118,39 @@ public:
     CPPUNIT_ASSERT(f.tag()->title().isEmpty());
     CPPUNIT_ASSERT(f.tag()->artist().isEmpty());
     CPPUNIT_ASSERT_EQUAL(String("Xiph.Org libVorbis I 20050304"), f.tag()->vendorID());
+  }
+
+  void testPicture()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    string newname = copy.fileName();
+
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      FLAC::Picture *newpic = new FLAC::Picture();
+      newpic->setType(FLAC::Picture::BackCover);
+      newpic->setWidth(5);
+      newpic->setHeight(6);
+      newpic->setColorDepth(16);
+      newpic->setNumColors(7);
+      newpic->setMimeType("image/jpeg");
+      newpic->setDescription("new image");
+      newpic->setData("JPEG data");
+      f.tag()->addPicture(newpic);
+      f.save();
+    }
+    {
+      Ogg::Vorbis::File f(newname.c_str());
+      List<FLAC::Picture *> lst = f.tag()->pictureList();
+      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      CPPUNIT_ASSERT_EQUAL((int)5, lst[0]->width());
+      CPPUNIT_ASSERT_EQUAL((int)6, lst[0]->height());
+      CPPUNIT_ASSERT_EQUAL((int)16, lst[0]->colorDepth());
+      CPPUNIT_ASSERT_EQUAL((int)7, lst[0]->numColors());
+      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
+      CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());
+    }
   }
 
 };

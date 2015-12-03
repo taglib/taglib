@@ -56,7 +56,7 @@ public:
   int channels;
   int version;
   int bitsPerSample;
-  uint sampleFrames;
+  unsigned int sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ int APE::AudioProperties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
-TagLib::uint APE::AudioProperties::sampleFrames() const
+unsigned int APE::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -177,7 +177,7 @@ void APE::AudioProperties::analyzeCurrent(File *file)
     return;
   }
 
-  const uint descriptorBytes = descriptor.toUInt32LE(0);
+  const unsigned int descriptorBytes = descriptor.toUInt32LE(0);
 
   if((descriptorBytes - 52) > 0)
     file->seek(descriptorBytes - 52, File::Current);
@@ -194,12 +194,12 @@ void APE::AudioProperties::analyzeCurrent(File *file)
   d->sampleRate    = header.toUInt32LE(20);
   d->bitsPerSample = header.toUInt16LE(16);
 
-  const uint totalFrames = header.toUInt32LE(12);
+  const unsigned int totalFrames = header.toUInt32LE(12);
   if(totalFrames == 0)
     return;
 
-  const uint blocksPerFrame   = header.toUInt32LE(4);
-  const uint finalFrameBlocks = header.toUInt32LE(8);
+  const unsigned int blocksPerFrame   = header.toUInt32LE(4);
+  const unsigned int finalFrameBlocks = header.toUInt32LE(8);
   d->sampleFrames = (totalFrames - 1) * blocksPerFrame + finalFrameBlocks;
 }
 
@@ -211,14 +211,14 @@ void APE::AudioProperties::analyzeOld(File *file)
     return;
   }
 
-  const uint totalFrames = header.toUInt32LE(18);
+  const unsigned int totalFrames = header.toUInt32LE(18);
 
   // Fail on 0 length APE files (catches non-finalized APE files)
   if(totalFrames == 0)
     return;
 
   const short compressionLevel = header.toUInt32LE(0);
-  uint blocksPerFrame;
+  unsigned int blocksPerFrame;
   if(d->version >= 3950)
     blocksPerFrame = 73728 * 4;
   else if(d->version >= 3900 || (d->version >= 3800 && compressionLevel == 4000))
@@ -230,7 +230,7 @@ void APE::AudioProperties::analyzeOld(File *file)
   d->channels   = header.toUInt16LE(4);
   d->sampleRate = header.toUInt32LE(6);
 
-  const uint finalFrameBlocks = header.toUInt32LE(22);
+  const unsigned int finalFrameBlocks = header.toUInt32LE(22);
   d->sampleFrames = (totalFrames - 1) * blocksPerFrame + finalFrameBlocks;
 
   // Get the bit depth from the RIFF-fmt chunk.

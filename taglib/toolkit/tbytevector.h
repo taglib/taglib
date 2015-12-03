@@ -165,8 +165,8 @@ namespace TagLib {
      * specify to only check for the first \a patternLength bytes of \a pattern with
      * the \a patternLength argument.
      */
-    bool containsAt(
-      const ByteVector &pattern, size_t offset, size_t patternOffset = 0, size_t patternLength = npos()) const;
+    bool containsAt(const ByteVector &pattern, size_t offset,
+                    size_t patternOffset = 0, size_t patternLength = npos()) const;
 
     /*!
      * Returns true if the vector starts with \a pattern.
@@ -276,7 +276,7 @@ namespace TagLib {
      * \note This uses an uncommon variant of CRC32 specializes in Ogg.
      */
     // BIC: Remove or make generic.
-    uint checksum() const;
+    unsigned int checksum() const;
 
     /*!
      * Converts the 2 bytes at \a offset of the vector to a short as a signed
@@ -565,6 +565,16 @@ namespace TagLib {
      * Returns a hex-encoded copy of the byte vector.
      */
     ByteVector toHex() const;
+
+    /*!
+     * Returns a base64 encoded copy of the byte vector
+     */
+    ByteVector toBase64() const;
+
+    /*!
+     * Decodes the base64 encoded byte vector.
+     */
+    static ByteVector fromBase64(const ByteVector &);
 
   protected:
     /*

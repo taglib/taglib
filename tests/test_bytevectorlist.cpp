@@ -19,7 +19,7 @@ public:
     ByteVector v("a b");
 
     ByteVectorList l = ByteVectorList::split(v, " ");
-    CPPUNIT_ASSERT_EQUAL(size_t(2), l.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, l.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("a"), l[0]);
     CPPUNIT_ASSERT_EQUAL(ByteVector("b"), l[1]);
   }
@@ -29,7 +29,7 @@ public:
     ByteVector v("a");
 
     ByteVectorList l = ByteVectorList::split(v, " ");
-    CPPUNIT_ASSERT_EQUAL(size_t(1), l.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)1, l.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("a"), l[0]);
   }
 

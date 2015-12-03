@@ -40,19 +40,19 @@ namespace TagLib {
       FileBase(FileName file);
       FileBase(IOStream *stream);
 
-      void writeString(const String &s, uint size, char padding = 0);
-      void writeByte(uchar byte);
-      void writeU16L(ushort number);
-      void writeU32L(uint number);
-      void writeU16B(ushort number);
-      void writeU32B(uint number);
+      void writeString(const String &s, unsigned int size, char padding = 0);
+      void writeByte(unsigned char byte);
+      void writeU16L(unsigned short number);
+      void writeU32L(unsigned int number);
+      void writeU16B(unsigned short number);
+      void writeU32B(unsigned int number);
 
-      bool readString(String &s, uint size);
-      bool readByte(uchar &byte);
-      bool readU16L(ushort &number);
-      bool readU32L(uint &number);
-      bool readU16B(ushort &number);
-      bool readU32B(uint &number);
+      bool readString(String &s, unsigned int size);
+      bool readByte(unsigned char &byte);
+      bool readU16L(unsigned short &number);
+      bool readU32L(unsigned int &number);
+      bool readU16B(unsigned short &number);
+      bool readU32B(unsigned int &number);
     };
 
   }

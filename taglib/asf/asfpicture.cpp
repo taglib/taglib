@@ -160,7 +160,7 @@ void ASF::Picture::parse(const ByteVector& bytes)
     return;
   size_t pos = 0;
   d->data->type = (Type)bytes[0]; ++pos;
-  const uint dataLen = bytes.toUInt32LE(pos); pos+=4;
+  const unsigned int dataLen = bytes.toUInt32LE(pos); pos+=4;
 
   const ByteVector nullStringTerminator(2, 0);
 

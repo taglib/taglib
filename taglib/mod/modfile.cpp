@@ -82,13 +82,13 @@ bool Mod::File::save()
   seek(0);
   writeString(d->tag.title(), 20);
   StringList lines = d->tag.comment().split("\n");
-  uint n = std::min(static_cast<uint>(lines.size()), d->properties.instrumentCount());
-  for(uint i = 0; i < n; ++ i) {
+  unsigned int n = std::min<unsigned int>(lines.size(), d->properties.instrumentCount());
+  for(unsigned int i = 0; i < n; ++ i) {
     writeString(lines[i], 22);
     seek(8, Current);
   }
 
-  for(uint i = n; i < d->properties.instrumentCount(); ++ i) {
+  for(unsigned int i = n; i < d->properties.instrumentCount(); ++ i) {
     writeString(String(), 22);
     seek(8, Current);
   }
@@ -104,8 +104,8 @@ void Mod::File::read(bool)
   ByteVector modId = readBlock(4);
   READ_ASSERT(modId.size() == 4);
 
-  int  channels    =  4;
-  uint instruments = 31;
+  int          channels    =  4;
+  unsigned int instruments = 31;
   if(modId == "M.K." || modId == "M!K!" || modId == "M&K!" || modId == "N.T.") {
     d->tag.setTrackerName("ProTracker");
     channels = 4;
@@ -149,7 +149,7 @@ void Mod::File::read(bool)
   READ_STRING(d->tag.setTitle, 20);
 
   StringList comment;
-  for(uint i = 0; i < instruments; ++ i) {
+  for(unsigned int i = 0; i < instruments; ++ i) {
     READ_STRING_AS(instrumentName, 22);
     // value in words, * 2 (<< 1) for bytes:
     READ_U16B_AS(sampleLength);

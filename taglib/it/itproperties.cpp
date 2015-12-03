@@ -44,21 +44,21 @@ public:
     panningSeparation(0),
     pitchWheelDepth(0) {}
 
-  int    channels;
-  ushort lengthInPatterns;
-  ushort instrumentCount;
-  ushort sampleCount;
-  ushort patternCount;
-  ushort version;
-  ushort compatibleVersion;
-  ushort flags;
-  ushort special;
-  uchar  globalVolume;
-  uchar  mixVolume;
-  uchar  tempo;
-  uchar  bpmSpeed;
-  uchar  panningSeparation;
-  uchar  pitchWheelDepth;
+  int            channels;
+  unsigned short lengthInPatterns;
+  unsigned short instrumentCount;
+  unsigned short sampleCount;
+  unsigned short patternCount;
+  unsigned short version;
+  unsigned short compatibleVersion;
+  unsigned short flags;
+  unsigned short special;
+  unsigned char  globalVolume;
+  unsigned char  mixVolume;
+  unsigned char  tempo;
+  unsigned char  bpmSpeed;
+  unsigned char  panningSeparation;
+  unsigned char  pitchWheelDepth;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ int IT::AudioProperties::channels() const
   return d->channels;
 }
 
-TagLib::ushort IT::AudioProperties::lengthInPatterns() const
+unsigned short IT::AudioProperties::lengthInPatterns() const
 {
   return d->lengthInPatterns;
 }
@@ -116,67 +116,67 @@ bool IT::AudioProperties::stereo() const
   return d->flags & Stereo;
 }
 
-TagLib::ushort IT::AudioProperties::instrumentCount() const
+unsigned short IT::AudioProperties::instrumentCount() const
 {
   return d->instrumentCount;
 }
 
-TagLib::ushort IT::AudioProperties::sampleCount() const
+unsigned short IT::AudioProperties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-TagLib::ushort IT::AudioProperties::patternCount() const
+unsigned short IT::AudioProperties::patternCount() const
 {
   return d->patternCount;
 }
 
-TagLib::ushort IT::AudioProperties::version() const
+unsigned short IT::AudioProperties::version() const
 {
   return d->version;
 }
 
-TagLib::ushort IT::AudioProperties::compatibleVersion() const
+unsigned short IT::AudioProperties::compatibleVersion() const
 {
   return d->compatibleVersion;
 }
 
-TagLib::ushort IT::AudioProperties::flags() const
+unsigned short IT::AudioProperties::flags() const
 {
   return d->flags;
 }
 
-TagLib::ushort IT::AudioProperties::special() const
+unsigned short IT::AudioProperties::special() const
 {
   return d->special;
 }
 
-uchar IT::AudioProperties::globalVolume() const
+unsigned char IT::AudioProperties::globalVolume() const
 {
   return d->globalVolume;
 }
 
-uchar IT::AudioProperties::mixVolume() const
+unsigned char IT::AudioProperties::mixVolume() const
 {
   return d->mixVolume;
 }
 
-uchar IT::AudioProperties::tempo() const
+unsigned char IT::AudioProperties::tempo() const
 {
   return d->tempo;
 }
 
-uchar IT::AudioProperties::bpmSpeed() const
+unsigned char IT::AudioProperties::bpmSpeed() const
 {
   return d->bpmSpeed;
 }
 
-uchar IT::AudioProperties::panningSeparation() const
+unsigned char IT::AudioProperties::panningSeparation() const
 {
   return d->panningSeparation;
 }
 
-uchar IT::AudioProperties::pitchWheelDepth() const
+unsigned char IT::AudioProperties::pitchWheelDepth() const
 {
   return d->pitchWheelDepth;
 }
@@ -190,72 +190,72 @@ void IT::AudioProperties::setChannels(int channels)
   d->channels = channels;
 }
 
-void IT::AudioProperties::setLengthInPatterns(ushort lengthInPatterns)
+void IT::AudioProperties::setLengthInPatterns(unsigned short lengthInPatterns)
 {
   d->lengthInPatterns = lengthInPatterns;
 }
 
-void IT::AudioProperties::setInstrumentCount(ushort instrumentCount)
+void IT::AudioProperties::setInstrumentCount(unsigned short instrumentCount)
 {
   d->instrumentCount = instrumentCount;
 }
 
-void IT::AudioProperties::setSampleCount(ushort sampleCount)
+void IT::AudioProperties::setSampleCount(unsigned short sampleCount)
 {
   d->sampleCount = sampleCount;
 }
 
-void IT::AudioProperties::setPatternCount(ushort patternCount)
+void IT::AudioProperties::setPatternCount(unsigned short patternCount)
 {
   d->patternCount = patternCount;
 }
 
-void IT::AudioProperties::setFlags(ushort flags)
+void IT::AudioProperties::setFlags(unsigned short flags)
 {
   d->flags = flags;
 }
 
-void IT::AudioProperties::setSpecial(ushort special)
+void IT::AudioProperties::setSpecial(unsigned short special)
 {
   d->special = special;
 }
 
-void IT::AudioProperties::setCompatibleVersion(ushort compatibleVersion)
+void IT::AudioProperties::setCompatibleVersion(unsigned short compatibleVersion)
 {
   d->compatibleVersion = compatibleVersion;
 }
 
-void IT::AudioProperties::setVersion(ushort version)
+void IT::AudioProperties::setVersion(unsigned short version)
 {
   d->version = version;
 }
 
-void IT::AudioProperties::setGlobalVolume(uchar globalVolume)
+void IT::AudioProperties::setGlobalVolume(unsigned char globalVolume)
 {
   d->globalVolume = globalVolume;
 }
 
-void IT::AudioProperties::setMixVolume(uchar mixVolume)
+void IT::AudioProperties::setMixVolume(unsigned char mixVolume)
 {
   d->mixVolume = mixVolume;
 }
 
-void IT::AudioProperties::setTempo(uchar tempo)
+void IT::AudioProperties::setTempo(unsigned char tempo)
 {
   d->tempo = tempo;
 }
 
-void IT::AudioProperties::setBpmSpeed(uchar bpmSpeed)
+void IT::AudioProperties::setBpmSpeed(unsigned char bpmSpeed)
 {
   d->bpmSpeed = bpmSpeed;
 }
 
-void IT::AudioProperties::setPanningSeparation(uchar panningSeparation)
+void IT::AudioProperties::setPanningSeparation(unsigned char panningSeparation)
 {
   d->panningSeparation = panningSeparation;
 }
 
-void IT::AudioProperties::setPitchWheelDepth(uchar pitchWheelDepth)
+void IT::AudioProperties::setPitchWheelDepth(unsigned char pitchWheelDepth)
 {
   d->pitchWheelDepth = pitchWheelDepth;
 }

@@ -26,32 +26,51 @@
 #include <tbytevector.h>
 #include <tdebug.h>
 
+#include <flacpicture.h>
 #include <xiphcomment.h>
 #include <tpicturemap.h>
 #include <tpropertymap.h>
 
 using namespace TagLib;
 
+namespace
+{
+  typedef Ogg::FieldListMap::Iterator FieldIterator;
+  typedef Ogg::FieldListMap::ConstIterator FieldConstIterator;
+
+  typedef List<FLAC::Picture *> XiphPictureList;
+  typedef XiphPictureList::Iterator PictureIterator;
+  typedef XiphPictureList::Iterator PictureConstIterator;
+}
+
 class Ogg::XiphComment::XiphCommentPrivate
 {
 public:
+  XiphCommentPrivate()
+  {
+    pictureList.setAutoDelete(true);
+  }
+
   FieldListMap fieldListMap;
   String vendorID;
   String commentField;
+  XiphPictureList pictureList;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::XiphComment::XiphComment() : TagLib::Tag()
+Ogg::XiphComment::XiphComment() :
+  TagLib::Tag(),
+  d(new XiphCommentPrivate())
 {
-  d = new XiphCommentPrivate;
 }
 
-Ogg::XiphComment::XiphComment(const ByteVector &data) : TagLib::Tag()
+Ogg::XiphComment::XiphComment(const ByteVector &data) :
+  TagLib::Tag(),
+  d(new XiphCommentPrivate())
 {
-  d = new XiphCommentPrivate;
   parse(data);
 }
 
@@ -103,7 +122,7 @@ String Ogg::XiphComment::genre() const
   return d->fieldListMap["GENRE"].toString();
 }
 
-TagLib::uint Ogg::XiphComment::year() const
+unsigned int Ogg::XiphComment::year() const
 {
   if(!d->fieldListMap["DATE"].isEmpty())
     return d->fieldListMap["DATE"].front().toInt();
@@ -112,7 +131,7 @@ TagLib::uint Ogg::XiphComment::year() const
   return 0;
 }
 
-TagLib::uint Ogg::XiphComment::track() const
+unsigned int Ogg::XiphComment::track() const
 {
   if(!d->fieldListMap["TRACKNUMBER"].isEmpty())
     return d->fieldListMap["TRACKNUMBER"].front().toInt();
@@ -158,7 +177,7 @@ void Ogg::XiphComment::setGenre(const String &s)
   addField("GENRE", s);
 }
 
-void Ogg::XiphComment::setYear(uint i)
+void Ogg::XiphComment::setYear(unsigned int i)
 {
   removeFields("YEAR");
   if(i == 0)
@@ -167,7 +186,7 @@ void Ogg::XiphComment::setYear(uint i)
     addField("DATE", String::number(i));
 }
 
-void Ogg::XiphComment::setTrack(uint i)
+void Ogg::XiphComment::setTrack(unsigned int i)
 {
   removeFields("TRACKNUM");
   if(i == 0)
@@ -182,21 +201,22 @@ void Ogg::XiphComment::setPictures(const PictureMap &l)
 
 bool Ogg::XiphComment::isEmpty() const
 {
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it) {
     if(!(*it).second.isEmpty())
       return false;
+  }
 
   return true;
 }
 
-TagLib::uint Ogg::XiphComment::fieldCount() const
+unsigned int Ogg::XiphComment::fieldCount() const
 {
-  uint count = 0;
+  unsigned int count = 0;
 
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it)
-    count += static_cast<uint>((*it).second.size());
+  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
+    count += (*it).second.size();
+
+  count += d->pictureList.size();
 
   return count;
 }
@@ -215,7 +235,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
 {
   // check which keys are to be deleted
   StringList toRemove;
-  for(FieldListMap::ConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
     if (!properties.contains(it->first))
       toRemove.append(it->first);
 
@@ -298,6 +318,31 @@ bool Ogg::XiphComment::contains(const String &key) const
   return !d->fieldListMap[key.upper()].isEmpty();
 }
 
+void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
+{
+  PictureIterator it = d->pictureList.find(picture);
+  if(it != d->pictureList.end())
+    d->pictureList.erase(it);
+
+  if(del)
+    delete picture;
+}
+
+void Ogg::XiphComment::removePictures()
+{
+  d->pictureList.clear();
+}
+
+void Ogg::XiphComment::addPicture(FLAC::Picture * picture)
+{
+  d->pictureList.append(picture);
+}
+
+List<FLAC::Picture *> Ogg::XiphComment::pictureList()
+{
+  return d->pictureList;
+}
+
 ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 {
   ByteVector data;
@@ -339,6 +384,13 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     }
   }
 
+  for(PictureConstIterator it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
+    ByteVector picture = (*it)->render().toBase64();
+    data.append(ByteVector::fromUInt32LE(picture.size() + 23));
+    data.append("METADATA_BLOCK_PICTURE=");
+    data.append(picture);
+  }
+
   // Append the "framing bit".
 
   if(addFramingBit)
@@ -369,7 +421,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   size_t pos = 0;
 
-  const uint vendorLength = data.toUInt32LE(0);
+  const unsigned int vendorLength = data.toUInt32LE(0);
   pos += 4;
 
   d->vendorID = String(data.mid(pos, vendorLength), String::UTF8);
@@ -377,35 +429,101 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
   // Next the number of fields in the comment vector.
 
-  const uint commentFields = data.toUInt32LE(pos);
+  const unsigned int commentFields = data.toUInt32LE(pos);
   pos += 4;
 
   if(commentFields > (data.size() - 8) / 4) {
     return;
   }
 
-  for(uint i = 0; i < commentFields; i++) {
+  for(unsigned int i = 0; i < commentFields; i++) {
 
     // Each comment field is in the format "KEY=value" in a UTF8 string and has
     // 4 bytes before the text starts that gives the length.
 
-    const uint commentLength = data.toUInt32LE(pos);
+    const unsigned int commentLength = data.toUInt32LE(pos);
     pos += 4;
 
-    String comment = String(data.mid(pos, commentLength), String::UTF8);
+    ByteVector entry = data.mid(pos, commentLength);
+
     pos += commentLength;
-    if(pos > data.size()) {
+
+    // Don't go past data end
+    if(pos > data.size())
       break;
+
+    // Handle Pictures separately
+    if(entry.startsWith("METADATA_BLOCK_PICTURE=")) {
+
+      // We need base64 encoded data including padding
+      if((entry.size() - 23) > 3 && ((entry.size() - 23) % 4) == 0) {
+
+        // Decode base64 picture data
+        ByteVector picturedata = ByteVector::fromBase64(entry.mid(23));
+        if(picturedata.size()) {
+
+          // Decode Flac Picture
+          FLAC::Picture * picture = new FLAC::Picture();
+          if(picture->parse(picturedata)) {
+
+            d->pictureList.append(picture);
+
+            // continue to next field
+            continue;
+          }
+          else {
+            delete picture;
+            debug("Failed to decode FlacPicture block");
+          }
+        }
+        else {
+          debug("Failed to decode base64 encoded data");
+        }
+      }
+      else {
+        debug("Invalid base64 encoded data");
+      }
     }
 
-    const size_t commentSeparatorPosition = comment.find("=");
-    if(commentSeparatorPosition == String::npos()) {
-      break;
+
+    // Handle old picture standard
+    if(entry.startsWith("COVERART=")) {
+
+      if((entry.size() - 9) > 3 && ((entry.size() - 9) % 4) == 0) {
+
+        // Decode base64 picture data
+        ByteVector picturedata = ByteVector::fromBase64(entry.mid(9));
+        if (picturedata.size()) {
+
+          // Assume it's some type of image file
+          FLAC::Picture * picture = new FLAC::Picture();
+          picture->setData(picturedata);
+          picture->setMimeType("image/");
+          picture->setType(FLAC::Picture::Other);
+          d->pictureList.append(picture);
+
+          // continue to next field
+          continue;
+        }
+        else {
+          debug("Failed to decode base64 encoded data");
+        }
+      }
+      else {
+        debug("Invalid base64 encoded data");
+      }
     }
 
-    String key = comment.substr(0, commentSeparatorPosition);
-    String value = comment.substr(commentSeparatorPosition + 1);
+    // Check for field separator
+    size_t sep = entry.find('=');
+    if(sep == ByteVector::npos()) {
+      debug("Discarding invalid comment field.");
+      continue;
+    }
 
+    // Parse key and value
+    String key = String(entry.mid(0, sep), String::UTF8);
+    String value = String(entry.mid(sep + 1), String::UTF8);
     addField(key, value, false);
   }
 }

@@ -84,7 +84,8 @@ class ID3v2::Tag::TagPrivate
 {
 public:
   TagPrivate() :
-    fileLength(0),
+    file(0),
+    tagOffset(0),
     extendedHeader(0),
     footer(0)
   {
@@ -97,8 +98,10 @@ public:
     delete footer;
   }
 
-  long long fileLength;
   const FrameFactory *factory;
+
+  File *file;
+  long long tagOffset;
 
   Header header;
   ExtendedHeader *extendedHeader;
@@ -124,8 +127,10 @@ ID3v2::Tag::Tag(File *file, long long tagOffset, const FrameFactory *factory) :
   d(new TagPrivate())
 {
   d->factory = factory;
+  d->file = file;
+  d->tagOffset = tagOffset;
 
-  read(file, tagOffset);
+  read();
 }
 
 ID3v2::Tag::~Tag()
@@ -215,14 +220,14 @@ String ID3v2::Tag::genre() const
   return genres.toString();
 }
 
-TagLib::uint ID3v2::Tag::year() const
+unsigned int ID3v2::Tag::year() const
 {
   if(!d->frameListMap["TDRC"].isEmpty())
     return d->frameListMap["TDRC"].front()->toString().substr(0, 4).toInt();
   return 0;
 }
 
-TagLib::uint ID3v2::Tag::track() const
+unsigned int ID3v2::Tag::track() const
 {
   if(!d->frameListMap["TRCK"].isEmpty())
     return d->frameListMap["TRCK"].front()->toString().toInt();
@@ -372,7 +377,7 @@ void ID3v2::Tag::setGenre(const String &s)
 #endif
 }
 
-void ID3v2::Tag::setYear(uint i)
+void ID3v2::Tag::setYear(unsigned int i)
 {
   if(i <= 0) {
     removeFrames("TDRC");
@@ -381,7 +386,7 @@ void ID3v2::Tag::setYear(uint i)
   setTextFrame("TDRC", String::number(i));
 }
 
-void ID3v2::Tag::setTrack(uint i)
+void ID3v2::Tag::setTrack(unsigned int i)
 {
   if(i <= 0) {
     removeFrames("TRCK");
@@ -719,14 +724,14 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     StringList people;
     if(frameTMCL) {
       StringList v24People = frameTMCL->fieldList();
-      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+      for(unsigned int i = 0; i + 1 < v24People.size(); i += 2) {
         people.append(v24People[i]);
         people.append(v24People[i+1]);
       }
     }
     if(frameTIPL) {
       StringList v24People = frameTIPL->fieldList();
-      for(uint i = 0; i + 1 < v24People.size(); i += 2) {
+      for(unsigned int i = 0; i + 1 < v24People.size(); i += 2) {
         people.append(v24People[i]);
         people.append(v24People[i+1]);
       }
@@ -799,7 +804,7 @@ ByteVector ID3v2::Tag::render(int version) const
   else {
     // Padding won't increase beyond 1% of the file size or 1MB.
 
-    long long threshold = d->fileLength / 100;
+    long long threshold = d->file ? d->file->length() / 100 : 0;
     threshold = std::max(threshold, MinPaddingSize);
     threshold = std::min(threshold, MaxPaddingSize);
 
@@ -807,14 +812,11 @@ ByteVector ID3v2::Tag::render(int version) const
       paddingSize = MinPaddingSize;
   }
 
-  tagData.resize(static_cast<uint>(tagData.size() + paddingSize), '\0');
+  tagData.resize(static_cast<unsigned int>(tagData.size() + paddingSize), '\0');
 
   // Set the version and data size.
   d->header.setMajorVersion(version);
-  d->header.setTagSize(static_cast<TagLib::uint>(tagData.size() - Header::size()));
-
-  if(d->fileLength > 0)
-    d->fileLength += (d->header.tagSize() - originalSize);
+  d->header.setTagSize(static_cast<unsigned int>(tagData.size() - Header::size()));
 
   // TODO: This should eventually include d->footer->render().
   const ByteVector headerData = d->header.render();
@@ -840,24 +842,22 @@ void ID3v2::Tag::setLatin1StringHandler(const TagLib::StringHandler *handler)
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v2::Tag::read(TagLib::File *file, long long offset)
+void ID3v2::Tag::read()
 {
-  if(!file)
+  if(!d->file)
     return;
 
-  if(!file->isOpen())
+  if(!d->file->isOpen())
     return;
 
-  d->fileLength = file->length();
-
-  file->seek(offset);
-  d->header.setData(file->readBlock(Header::size()));
+  d->file->seek(d->tagOffset);
+  d->header.setData(d->file->readBlock(Header::size()));
 
   // If the tag size is 0, then this is an invalid tag (tags must contain at
   // least one frame)
 
   if(d->header.tagSize() != 0)
-    parse(file->readBlock(d->header.tagSize()));
+    parse(d->file->readBlock(d->header.tagSize()));
 
   // Look for duplicate ID3v2 tags and treat them as an extra blank of this one.
   // It leads to overwriting them with zero when saving the tag.
@@ -865,13 +865,13 @@ void ID3v2::Tag::read(TagLib::File *file, long long offset)
   // This is a workaround for some faulty files that have duplicate ID3v2 tags.
   // Unfortunately, TagLib itself may write such duplicate tags until v1.10.
 
-  uint extraSize = 0;
+  unsigned int extraSize = 0;
 
   while(true) {
 
-    file->seek(offset + d->header.completeTagSize() + extraSize);
+    d->file->seek(d->tagOffset + d->header.completeTagSize() + extraSize);
 
-    const ByteVector data = file->readBlock(Header::size());
+    const ByteVector data = d->file->readBlock(Header::size());
     if(data.size() < Header::size() || !data.startsWith(Header::fileIdentifier()))
       break;
 

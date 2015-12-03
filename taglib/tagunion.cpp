@@ -149,13 +149,13 @@ namespace TagLib
   }
 
   template <size_t COUNT>
-  TagLib::uint TagUnion<COUNT>::year() const
+  unsigned int TagUnion<COUNT>::year() const
   {
     numberUnion(year);
   }
 
   template <size_t COUNT>
-  TagLib::uint TagUnion<COUNT>::track() const
+  unsigned int TagUnion<COUNT>::track() const
   {
     numberUnion(track);
   }
@@ -197,13 +197,13 @@ namespace TagLib
   }
 
   template <size_t COUNT>
-  void TagUnion<COUNT>::setYear(uint i)
+  void TagUnion<COUNT>::setYear(unsigned int i)
   {
     setUnion(Year, i);
   }
 
   template <size_t COUNT>
-  void TagUnion<COUNT>::setTrack(uint i)
+  void TagUnion<COUNT>::setTrack(unsigned int i)
   {
     setUnion(Track, i);
   }

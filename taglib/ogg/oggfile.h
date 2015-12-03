@@ -59,12 +59,12 @@ namespace TagLib {
        * \warning The requires reading at least the packet header for every page
        * up to the requested page.
        */
-      ByteVector packet(uint i);
+      ByteVector packet(unsigned int i);
 
       /*!
        * Sets the packet with index \a i to the value \a p.
        */
-      void setPacket(uint i, const ByteVector &p);
+      void setPacket(unsigned int i, const ByteVector &p);
 
       /*!
        * Returns a pointer to the PageHeader for the first page in the stream or

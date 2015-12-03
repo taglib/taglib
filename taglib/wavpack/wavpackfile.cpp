@@ -63,8 +63,8 @@ public:
     delete properties;
   }
 
-  long long APELocation;
-  uint APESize;
+  long long    APELocation;
+  unsigned int APESize;
 
   long long ID3v1Location;
 

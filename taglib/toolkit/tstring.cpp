@@ -133,7 +133,7 @@ namespace
     data.resize(length);
 
     for(size_t i = 0; i < length; ++i)
-      data[i] = static_cast<uchar>(s[i]);
+      data[i] = static_cast<unsigned char>(s[i]);
   }
 
   // Converts a UTF-8 string into UTF-16(without BOM/CPU byte order)
@@ -174,7 +174,7 @@ namespace
     if(length > 0) {
       if(swap) {
         for(size_t i = 0; i < length; ++i)
-          data[i] = Utils::byteSwap(static_cast<TagLib::ushort>(s[i]));
+          data[i] = Utils::byteSwap(static_cast<unsigned short>(s[i]));
       }
       else {
         ::wmemcpy(&data[0], s, length);
@@ -194,7 +194,7 @@ namespace
       }
 
       // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
-      TagLib::ushort bom;
+      unsigned short bom;
       ::memcpy(&bom, s, 2);
 
       if(bom == 0xfeff)
@@ -215,7 +215,7 @@ namespace
 
     data.resize(length / 2);
     for(size_t i = 0; i < length / 2; ++i) {
-      TagLib::ushort c;
+      unsigned short c;
       ::memcpy(&c, s, 2);
       if(swap)
         c = Utils::byteSwap(c);
@@ -623,13 +623,13 @@ String String::number(int n) // static
   return Utils::formatString("%d", n);
 }
 
-TagLib::wchar &String::operator[](size_t i)
+wchar_t &String::operator[](size_t i)
 {
   detach();
   return (*d->data)[i];
 }
 
-const TagLib::wchar &String::operator[](size_t i) const
+const wchar_t &String::operator[](size_t i) const
 {
   return (*d->data)[i];
 }
@@ -649,7 +649,7 @@ bool String::operator==(const char *s) const
   const wchar_t *p = toCWString();
 
   while(*p != L'\0' || *s != '\0') {
-    if(*p++ != static_cast<uchar>(*s++))
+    if(*p++ != static_cast<unsigned char>(*s++))
       return false;
   }
   return true;
@@ -691,7 +691,8 @@ String &String::operator+=(const char *s)
   detach();
 
   for(int i = 0; s[i] != 0; i++)
-    *d->data += uchar(s[i]);
+    *d->data += static_cast<unsigned char>(s[i]);
+
   return *this;
 }
 

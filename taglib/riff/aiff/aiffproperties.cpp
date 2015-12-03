@@ -50,7 +50,7 @@ public:
   ByteVector compressionType;
   String compressionName;
 
-  uint sampleFrames;
+  unsigned int sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ int RIFF::AIFF::AudioProperties::sampleWidth() const
   return bitsPerSample();
 }
 
-TagLib::uint RIFF::AIFF::AudioProperties::sampleFrames() const
+unsigned int RIFF::AIFF::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -141,8 +141,8 @@ String RIFF::AIFF::AudioProperties::compressionName() const
 void RIFF::AIFF::AudioProperties::read(File *file)
 {
   ByteVector data;
-  uint streamLength = 0;
-  for(uint i = 0; i < file->chunkCount(); i++) {
+  unsigned int streamLength = 0;
+  for(unsigned int i = 0; i < file->chunkCount(); i++) {
     const ByteVector name = file->chunkName(i);
     if(name == "COMM") {
       if(data.isEmpty())
@@ -184,6 +184,7 @@ void RIFF::AIFF::AudioProperties::read(File *file)
 
   if(data.size() >= 23) {
     d->compressionType = data.mid(18, 4);
-    d->compressionName = String(data.mid(23, static_cast<uchar>(data[22])), String::Latin1);
+    d->compressionName
+      = String(data.mid(23, static_cast<unsigned char>(data[22])), String::Latin1);
   }
 }

@@ -81,7 +81,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   size_t pos = 0;
   d->type = FLAC::Picture::Type(data.toUInt32BE(pos));
   pos += 4;
-  const uint mimeTypeLength = data.toUInt32BE(pos);
+  const unsigned int mimeTypeLength = data.toUInt32BE(pos);
   pos += 4;
   if(pos + mimeTypeLength + 24 > data.size()) {
     debug("Invalid picture block.");
@@ -89,7 +89,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
   d->mimeType = String(data.mid(pos, mimeTypeLength), String::UTF8);
   pos += mimeTypeLength;
-  const uint descriptionLength = data.toUInt32BE(pos);
+  const unsigned int descriptionLength = data.toUInt32BE(pos);
   pos += 4;
   if(pos + descriptionLength + 20 > data.size()) {
     debug("Invalid picture block.");
@@ -105,7 +105,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   pos += 4;
   d->numColors = data.toUInt32BE(pos);
   pos += 4;
-  const uint dataLength = data.toUInt32BE(pos);
+  const unsigned int dataLength = data.toUInt32BE(pos);
   pos += 4;
   if(pos + dataLength > data.size()) {
     debug("Invalid picture block.");

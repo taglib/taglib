@@ -97,8 +97,8 @@ namespace TagLib {
       virtual String album() const;
       virtual String comment() const;
       virtual String genre() const;
-      virtual TagLib::uint year() const;
-      virtual TagLib::uint track() const;
+      virtual unsigned int year() const;
+      virtual unsigned int track() const;
       virtual PictureMap pictures() const;
 
       virtual void setTitle(const String &s);
@@ -106,8 +106,8 @@ namespace TagLib {
       virtual void setAlbum(const String &s);
       virtual void setComment(const String &s);
       virtual void setGenre(const String &s);
-      virtual void setYear(TagLib::uint i);
-      virtual void setTrack(TagLib::uint i);
+      virtual void setYear(unsigned int i);
+      virtual void setTrack(unsigned int i);
       virtual void setPictures(const PictureMap &l);
 
       /*!
@@ -115,7 +115,7 @@ namespace TagLib {
        *
        * \note Normally 255 indicates that this tag contains no genre.
        */
-      TagLib::uint genreNumber() const;
+      unsigned int genreNumber() const;
 
       /*!
        * Sets the genre in number to \a i.
@@ -123,7 +123,7 @@ namespace TagLib {
        * \note Valid value is from 0 up to 255. Normally 255 indicates that
        * this tag contains no genre.
        */
-      void setGenreNumber(TagLib::uint i);
+      void setGenreNumber(unsigned int i);
 
       /*!
        * Sets the string handler that decides how the ID3v1 data will be
@@ -140,7 +140,8 @@ namespace TagLib {
       /*!
        * Reads from the file specified in the constructor.
        */
-      void read(File *file, long long tagOffset);
+      void read();
+
       /*!
        * Pareses the body of the tag in \a data.
        */

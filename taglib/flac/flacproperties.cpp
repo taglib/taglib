@@ -142,7 +142,7 @@ void FLAC::AudioProperties::read(const ByteVector &data, long long streamLength)
   // Maximum frame size (in bytes)
   pos += 3;
 
-  const uint flags = data.toUInt32BE(pos);
+  const unsigned int flags = data.toUInt32BE(pos);
   pos += 4;
 
   d->sampleRate    = flags >> 12;

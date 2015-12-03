@@ -53,7 +53,7 @@ public:
   int sampleRate;
   int channels;
   int bitsPerSample;
-  uint sampleFrames;
+  unsigned int sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ int TrueAudio::AudioProperties::channels() const
   return d->channels;
 }
 
-TagLib::uint TrueAudio::AudioProperties::sampleFrames() const
+unsigned int TrueAudio::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }

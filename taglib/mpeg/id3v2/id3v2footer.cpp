@@ -42,7 +42,7 @@ Footer::~Footer()
 {
 }
 
-TagLib::uint Footer::size()
+unsigned int Footer::size()
 {
   return 10;
 }

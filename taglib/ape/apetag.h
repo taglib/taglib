@@ -95,8 +95,8 @@ namespace TagLib {
       virtual String album() const;
       virtual String comment() const;
       virtual String genre() const;
-      virtual uint year() const;
-      virtual uint track() const;
+      virtual unsigned int year() const;
+      virtual unsigned int track() const;
 
       /**
        * @brief pictures
@@ -112,8 +112,8 @@ namespace TagLib {
       virtual void setAlbum(const String &s);
       virtual void setComment(const String &s);
       virtual void setGenre(const String &s);
-      virtual void setYear(uint i);
-      virtual void setTrack(uint i);
+      virtual void setYear(unsigned int i);
+      virtual void setTrack(unsigned int i);
       virtual void setPictures(const PictureMap &l);
 
       /*!
@@ -201,7 +201,7 @@ namespace TagLib {
       /*!
        * Reads from the file specified in the constructor.
        */
-      void read(TagLib::File *file, long long footerLocation);
+      void read();
 
       /*!
        * Parses the body of the tag in \a data.

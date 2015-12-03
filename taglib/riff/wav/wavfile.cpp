@@ -179,7 +179,7 @@ bool RIFF::WAV::File::hasInfoTag() const
 
 void RIFF::WAV::File::read(bool readProperties)
 {
-  for(uint i = 0; i < chunkCount(); ++i) {
+  for(unsigned int i = 0; i < chunkCount(); ++i) {
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag[ID3v2Index]) {

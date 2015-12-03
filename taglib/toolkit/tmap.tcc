@@ -36,17 +36,17 @@ template <class KeyP, class TP>
 class Map<Key, T>::MapPrivate : public RefCounter
 {
 public:
-  MapPrivate() 
-    : RefCounter() 
+  MapPrivate()
+    : RefCounter()
   {
   }
 
-  MapPrivate(const MapType &m) 
+  MapPrivate(const MapType &m)
     : RefCounter()
-    , map(m) 
+    , map(m)
   {
   }
-  
+
   MapType map;
 };
 

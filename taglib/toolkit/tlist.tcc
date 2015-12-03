@@ -43,16 +43,16 @@ template <class T>
 template <class TP> class List<T>::ListPrivate : public RefCounter
 {
 public:
-  ListPrivate() 
+  ListPrivate()
   {
   }
 
-  ListPrivate(const std::list<TP> &l) 
-    : list(l) 
+  ListPrivate(const std::list<TP> &l)
+    : list(l)
   {
   }
 
-  void clear() 
+  void clear()
   {
     std::list<TP>().swap(list);
   }
@@ -71,23 +71,23 @@ template <class T>
 template <class TP> class List<T>::ListPrivate<TP *> : public RefCounter
 {
 public:
-  ListPrivate() 
+  ListPrivate()
     : autoDelete(false)
   {
   }
 
-  ListPrivate(const std::list<TP *> &l) 
-    : list(l) 
+  ListPrivate(const std::list<TP *> &l)
+    : list(l)
     , autoDelete(false)
   {
   }
 
-  ~ListPrivate() 
+  ~ListPrivate()
   {
     deletePointers();
   }
 
-  void clear() 
+  void clear()
   {
     deletePointers();
     std::list<TP *>().swap(list);
@@ -124,7 +124,7 @@ List<T>::List()
 }
 
 template <class T>
-List<T>::List(const List<T> &l) 
+List<T>::List(const List<T> &l)
   : d(l.d)
 {
   d->ref();

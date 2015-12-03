@@ -231,12 +231,12 @@ void ASF::Tag::setGenre(const String &value)
   setAttribute("WM/Genre", value);
 }
 
-void ASF::Tag::setYear(uint value)
+void ASF::Tag::setYear(unsigned int value)
 {
   setAttribute("WM/Year", String::number(value));
 }
 
-void ASF::Tag::setTrack(uint value)
+void ASF::Tag::setTrack(unsigned int value)
 {
   setAttribute("WM/TrackNumber", String::number(value));
 }

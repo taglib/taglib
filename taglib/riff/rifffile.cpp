@@ -39,10 +39,10 @@ namespace
 {
   struct Chunk
   {
-    ByteVector name;
-    long long offset;
-    TagLib::uint size;
-    char padding;
+    ByteVector   name;
+    long long    offset;
+    unsigned int size;
+    unsigned int padding;
   };
 }
 
@@ -55,7 +55,7 @@ public:
 
   const ByteOrder endianness;
   ByteVector type;
-  TagLib::uint size;
+  unsigned int size;
   ByteVector format;
 
   std::vector<Chunk> chunks;
@@ -90,17 +90,17 @@ RIFF::File::File(IOStream *stream, ByteOrder endianness) :
     read();
 }
 
-TagLib::uint RIFF::File::riffSize() const
+unsigned int RIFF::File::riffSize() const
 {
   return d->size;
 }
 
-TagLib::uint RIFF::File::chunkCount() const
+unsigned int RIFF::File::chunkCount() const
 {
   return static_cast<TagLib::uint>(d->chunks.size());
 }
 
-TagLib::uint RIFF::File::chunkDataSize(uint i) const
+unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 {
   return d->chunks[i].size;
 }
@@ -110,12 +110,12 @@ long long RIFF::File::chunkOffset(uint i) const
   return d->chunks[i].offset;
 }
 
-TagLib::uint RIFF::File::chunkPadding(uint i) const
+unsigned int RIFF::File::chunkPadding(unsigned int i) const
 {
   return d->chunks[i].padding;
 }
 
-ByteVector RIFF::File::chunkName(uint i) const
+ByteVector RIFF::File::chunkName(unsigned int i) const
 {
   if(i >= chunkCount())
     return ByteVector();
@@ -123,7 +123,7 @@ ByteVector RIFF::File::chunkName(uint i) const
   return d->chunks[i].name;
 }
 
-ByteVector RIFF::File::chunkData(uint i)
+ByteVector RIFF::File::chunkData(unsigned int i)
 {
   if(i >= chunkCount())
     return ByteVector();
@@ -132,7 +132,7 @@ ByteVector RIFF::File::chunkData(uint i)
   return readBlock(d->chunks[i].size);
 }
 
-void RIFF::File::setChunkData(uint i, const ByteVector &data)
+void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 {
   // First we update the global size
 
@@ -146,7 +146,7 @@ void RIFF::File::setChunkData(uint i, const ByteVector &data)
 
   writeChunk(chunkName(i), data, d->chunks[i].offset - 8, d->chunks[i].size + d->chunks[i].padding + 8);
 
-  d->chunks[i].size = static_cast<uint>(data.size());
+  d->chunks[i].size = static_cast<unsigned int>(data.size());
   d->chunks[i].padding = (data.size() & 0x01) ? 1 : 0;
 
   // Now update the internal offsets
@@ -173,7 +173,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   }
 
   if(!alwaysCreate) {
-    for(uint i = 0; i < d->chunks.size(); i++) {
+    for(unsigned int i = 0; i < d->chunks.size(); i++) {
       if(d->chunks[i].name == name) {
         setChunkData(i, data);
         return;
@@ -210,15 +210,15 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   }
 
   Chunk chunk;
-  chunk.name = name;
-  chunk.size = static_cast<uint>(data.size());
-  chunk.offset = offset + 8;
+  chunk.name    = name;
+  chunk.size    = static_cast<uint>(data.size());
+  chunk.offset  = offset + 8;
   chunk.padding = static_cast<char>(data.size() & 1);
 
   d->chunks.push_back(chunk);
 }
 
-void RIFF::File::removeChunk(uint i)
+void RIFF::File::removeChunk(unsigned int i)
 {
   if(i >= d->chunks.size())
     return;
@@ -226,7 +226,7 @@ void RIFF::File::removeChunk(uint i)
   std::vector<Chunk>::iterator it = d->chunks.begin();
   std::advance(it, i);
 
-  const uint removeSize = it->size + it->padding + 8;
+  const unsigned int removeSize = it->size + it->padding + 8;
   removeBlock(it->offset - 8, removeSize);
   it = d->chunks.erase(it);
 
@@ -260,7 +260,7 @@ void RIFF::File::read()
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
     ByteVector chunkName = readBlock(4);
-    uint chunkSize;
+    unsigned int chunkSize;
     if(d->endianness == BigEndian)
       chunkSize = readBlock(4).toUInt32BE(0);
     else
@@ -304,8 +304,8 @@ void RIFF::File::read()
 }
 
 void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
-                            long long offset, TagLib::uint replace,
-                            TagLib::uint leadingPadding)
+                            long long offset, size_t replace,
+                            unsigned int leadingPadding)
 {
   ByteVector combined;
   if(leadingPadding) {

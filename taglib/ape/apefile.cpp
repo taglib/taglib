@@ -72,14 +72,14 @@ public:
     delete properties;
   }
 
-  long long APELocation;
-  uint APESize;
+  long long    APELocation;
+  unsigned int APESize;
 
   long long ID3v1Location;
 
   ID3v2::Header *ID3v2Header;
-  long long ID3v2Location;
-  uint ID3v2Size;
+  long long    ID3v2Location;
+  unsigned int ID3v2Size;
 
   DoubleTagUnion tag;
 

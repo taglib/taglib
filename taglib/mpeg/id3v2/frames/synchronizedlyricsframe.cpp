@@ -117,8 +117,7 @@ void SynchronizedLyricsFrame::setLanguage(const ByteVector &languageEncoding)
   d->language = languageEncoding.mid(0, 3);
 }
 
-void SynchronizedLyricsFrame::setTimestampFormat(
-    SynchronizedLyricsFrame::TimestampFormat f)
+void SynchronizedLyricsFrame::setTimestampFormat(SynchronizedLyricsFrame::TimestampFormat f)
 {
   d->timestampFormat = f;
 }
@@ -171,7 +170,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
    */
   String::Type encWithEndianness = d->textEncoding;
   if(d->textEncoding == String::UTF16) {
-    ushort bom = data.toUInt16BE(6);
+    unsigned short bom = data.toUInt16BE(6);
     if(bom == 0xfffe) {
       encWithEndianness = String::UTF16LE;
     } else if(bom == 0xfeff) {
@@ -184,7 +183,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     String::Type enc = d->textEncoding;
     // If a UTF16 string has no BOM, use the encoding found above.
     if(enc == String::UTF16 && pos + 1 < end) {
-      ushort bom = data.toUInt16BE(pos);
+      unsigned short bom = data.toUInt16BE(pos);
       if(bom != 0xfffe && bom != 0xfeff) {
         enc = encWithEndianness;
       }
@@ -193,7 +192,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     if(text.isEmpty() || pos + 4 > end)
       return;
 
-    uint time = data.toUInt32BE(pos);
+    unsigned int time = data.toUInt32BE(pos);
     pos += 4;
 
     d->synchedText.append(SynchedText(time, text));

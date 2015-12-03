@@ -8,9 +8,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../bindings/c/
 )
 
-if(ENABLE_STATIC)
+if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DTAGLIB_STATIC)
-endif(ENABLE_STATIC)
+endif()
 
 ########### next target ###############
 

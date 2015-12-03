@@ -30,8 +30,6 @@
 
 using namespace TagLib;
 using namespace XM;
-using TagLib::uint;
-using TagLib::ushort;
 
 /*!
  * The Reader classes are helpers to make handling of the stripped XM
@@ -414,27 +412,27 @@ bool XM::File::save()
   writeString(d->tag.trackerName(), 20);
 
   seek(60);
-  uint headerSize = 0;
+  unsigned int headerSize = 0;
   if(!readU32L(headerSize))
     return false;
 
   seek(70);
-  ushort patternCount = 0;
-  ushort instrumentCount = 0;
+  unsigned short patternCount = 0;
+  unsigned short instrumentCount = 0;
   if(!readU16L(patternCount) || !readU16L(instrumentCount))
     return false;
 
-  long pos = 60 + headerSize; // should be offset_t in taglib2.
+  long pos = 60 + headerSize; // should be long long in taglib2.
 
   // need to read patterns again in order to seek to the instruments:
-  for(ushort i = 0; i < patternCount; ++ i) {
+  for(unsigned short i = 0; i < patternCount; ++ i) {
     seek(pos);
-    uint patternHeaderLength = 0;
+    unsigned int patternHeaderLength = 0;
     if(!readU32L(patternHeaderLength) || patternHeaderLength < 4)
       return false;
 
     seek(pos + 7);
-    ushort dataSize = 0;
+    unsigned short dataSize = 0;
     if (!readU16L(dataSize))
       return false;
 
@@ -442,28 +440,28 @@ bool XM::File::save()
   }
 
   const StringList lines = d->tag.comment().split("\n");
-  uint sampleNameIndex = instrumentCount;
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  unsigned int sampleNameIndex = instrumentCount;
+  for(unsigned short i = 0; i < instrumentCount; ++ i) {
     seek(pos);
-    uint instrumentHeaderSize = 0;
+    unsigned int instrumentHeaderSize = 0;
     if(!readU32L(instrumentHeaderSize) || instrumentHeaderSize < 4)
       return false;
 
     seek(pos + 4);
-    const uint len = std::min(22U, instrumentHeaderSize - 4U);
+    const unsigned int len = std::min(22U, instrumentHeaderSize - 4U);
     if(i >= lines.size())
       writeString(String(), len);
     else
       writeString(lines[i], len);
 
-    ushort sampleCount = 0;
+    unsigned short sampleCount = 0;
     if(instrumentHeaderSize >= 29U) {
       seek(pos + 27);
       if(!readU16L(sampleCount))
         return false;
     }
 
-    uint sampleHeaderSize = 0;
+    unsigned int sampleHeaderSize = 0;
     if(sampleCount > 0) {
       seek(pos + 29);
       if(instrumentHeaderSize < 33U || !readU32L(sampleHeaderSize))
@@ -472,16 +470,16 @@ bool XM::File::save()
 
     pos += instrumentHeaderSize;
 
-    for(ushort j = 0; j < sampleCount; ++ j) {
+    for(unsigned short j = 0; j < sampleCount; ++ j) {
       if(sampleHeaderSize > 4U) {
         seek(pos);
-        uint sampleLength = 0;
+        unsigned int sampleLength = 0;
         if(!readU32L(sampleLength))
           return false;
 
         if(sampleHeaderSize > 18U) {
           seek(pos + 18);
-          const uint len = std::min(sampleHeaderSize - 18U, 22U);
+          const unsigned int len = std::min(sampleHeaderSize - 18U, 22U);
           if(sampleNameIndex >= lines.size())
             writeString(String(), len);
           else
@@ -516,14 +514,14 @@ void XM::File::read(bool)
   READ_U32L_AS(headerSize);
   READ_ASSERT(headerSize >= 4);
 
-  ushort length          = 0;
-  ushort restartPosition = 0;
-  ushort channels        = 0;
-  ushort patternCount    = 0;
-  ushort instrumentCount = 0;
-  ushort flags    = 0;
-  ushort tempo    = 0;
-  ushort bpmSpeed = 0;
+  unsigned short length          = 0;
+  unsigned short restartPosition = 0;
+  unsigned short channels        = 0;
+  unsigned short patternCount    = 0;
+  unsigned short instrumentCount = 0;
+  unsigned short flags    = 0;
+  unsigned short tempo    = 0;
+  unsigned short bpmSpeed = 0;
 
   StructReader header;
   header.u16L(length)
@@ -535,8 +533,8 @@ void XM::File::read(bool)
         .u16L(tempo)
         .u16L(bpmSpeed);
 
-  uint count = header.read(*this, headerSize - 4U);
-  uint size = std::min(headerSize - 4U, header.size());
+  unsigned int count = header.read(*this, headerSize - 4U);
+  unsigned int size = std::min(headerSize - 4U, header.size());
 
   READ_ASSERT(count == size);
 
@@ -552,17 +550,17 @@ void XM::File::read(bool)
   seek(60 + headerSize);
 
   // read patterns:
-  for(ushort i = 0; i < patternCount; ++ i) {
+  for(unsigned short i = 0; i < patternCount; ++ i) {
     READ_U32L_AS(patternHeaderLength);
     READ_ASSERT(patternHeaderLength >= 4);
 
-    uchar  packingType = 0;
-    ushort rowCount = 0;
-    ushort dataSize = 0;
+    unsigned char  packingType = 0;
+    unsigned short rowCount = 0;
+    unsigned short dataSize = 0;
     StructReader pattern;
     pattern.byte(packingType).u16L(rowCount).u16L(dataSize);
 
-    uint count = pattern.read(*this, patternHeaderLength - 4U);
+    unsigned int count = pattern.read(*this, patternHeaderLength - 4U);
     READ_ASSERT(count == std::min(patternHeaderLength - 4U, pattern.size()));
 
     seek(patternHeaderLength - (4 + count) + dataSize, Current);
@@ -570,25 +568,25 @@ void XM::File::read(bool)
 
   StringList intrumentNames;
   StringList sampleNames;
-  uint sumSampleCount = 0;
+  unsigned int sumSampleCount = 0;
 
   // read instruments:
-  for(ushort i = 0; i < instrumentCount; ++ i) {
+  for(unsigned short i = 0; i < instrumentCount; ++ i) {
     READ_U32L_AS(instrumentHeaderSize);
     READ_ASSERT(instrumentHeaderSize >= 4);
 
     String instrumentName;
-    uchar  instrumentType = 0;
-    ushort sampleCount = 0;
+    unsigned char  instrumentType = 0;
+    unsigned short sampleCount = 0;
 
     StructReader instrument;
     instrument.string(instrumentName, 22).byte(instrumentType).u16L(sampleCount);
 
     // 4 for instrumentHeaderSize
-    uint count = 4 + instrument.read(*this, instrumentHeaderSize - 4U);
+    unsigned int count = 4 + instrument.read(*this, instrumentHeaderSize - 4U);
     READ_ASSERT(count == std::min(instrumentHeaderSize, instrument.size() + 4));
 
-    uint sampleHeaderSize = 0;
+    unsigned int sampleHeaderSize = 0;
     long offset = 0;
     if(sampleCount > 0) {
       sumSampleCount += sampleCount;
@@ -598,15 +596,15 @@ void XM::File::read(bool)
       seek(instrumentHeaderSize - count - 4, Current);
 
       for(ushort j = 0; j < sampleCount; ++ j) {
-        uint  sampleLength = 0;
-        uint  loopStart    = 0;
-        uint  loopLength   = 0;
-        uchar volume       = 0;
-        uchar finetune     = 0;
-        uchar sampleType   = 0;
-        uchar panning      = 0;
-        uchar noteNumber   = 0;
-        uchar compression  = 0;
+        unsigned int  sampleLength = 0;
+        unsigned int  loopStart    = 0;
+        unsigned int  loopLength   = 0;
+        unsigned char volume       = 0;
+        unsigned char finetune     = 0;
+        unsigned char sampleType   = 0;
+        unsigned char panning      = 0;
+        unsigned char noteNumber   = 0;
+        unsigned char compression  = 0;
         String sampleName;
         StructReader sample;
         sample.u32L(sampleLength)
@@ -620,7 +618,7 @@ void XM::File::read(bool)
               .byte(compression)
               .string(sampleName, 22);
 
-        uint count = sample.read(*this, sampleHeaderSize);
+        unsigned int count = sample.read(*this, sampleHeaderSize);
         READ_ASSERT(count == std::min(sampleHeaderSize, sample.size()));
         // skip unhandeled header proportion:
         seek(sampleHeaderSize - count, Current);

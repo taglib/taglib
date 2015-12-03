@@ -32,6 +32,7 @@
 #include "tstring.h"
 #include "tstringlist.h"
 #include "tbytevector.h"
+#include "flacpicture.h"
 #include "taglib_export.h"
 
 namespace TagLib {
@@ -84,8 +85,8 @@ namespace TagLib {
       virtual String album() const;
       virtual String comment() const;
       virtual String genre() const;
-      virtual uint year() const;
-      virtual uint track() const;
+      virtual unsigned int year() const;
+      virtual unsigned int track() const;
       virtual PictureMap pictures() const;
 
       virtual void setTitle(const String &s);
@@ -93,8 +94,8 @@ namespace TagLib {
       virtual void setAlbum(const String &s);
       virtual void setComment(const String &s);
       virtual void setGenre(const String &s);
-      virtual void setYear(uint i);
-      virtual void setTrack(uint i);
+      virtual void setYear(unsigned int i);
+      virtual void setTrack(unsigned int i);
       virtual void setPictures( const PictureMap &l );
 
       virtual bool isEmpty() const;
@@ -103,7 +104,7 @@ namespace TagLib {
       /*!
        * Returns the number of fields present in the comment.
        */
-      uint fieldCount() const;
+      unsigned int fieldCount() const;
 
       /*!
        * Returns a reference to the map of field lists.  Because Xiph comments
@@ -217,6 +218,31 @@ namespace TagLib {
        * in place.
        */
       ByteVector render(bool addFramingBit = true) const;
+
+
+      /*!
+       * Returns a list of pictures attached to the xiph comment.
+       */
+      List<FLAC::Picture *> pictureList();
+
+      /*!
+       * Removes an picture. If \a del is true the picture's memory
+       * will be freed; if it is false, it must be deleted by the user.
+       */
+      void removePicture(FLAC::Picture *picture, bool del = true);
+
+      /*!
+       * Remove all pictures.
+       */
+      void removePictures();
+
+      /*!
+       * Add a new picture to the comment block. The comment block takes ownership of the
+       * picture and will handle freeing its memory.
+       *
+       * \note The file will be saved only after calling save().
+       */
+      void addPicture(FLAC::Picture *picture);
 
     protected:
       /*!

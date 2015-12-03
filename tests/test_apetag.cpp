@@ -94,7 +94,7 @@ public:
 
     APE::Tag tag;
     PropertyMap unsuccessful = tag.setProperties(properties);
-    CPPUNIT_ASSERT_EQUAL(size_t(2), unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, unsuccessful.size());
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
   }

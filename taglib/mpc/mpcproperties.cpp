@@ -54,18 +54,18 @@ public:
     albumGain(0),
     albumPeak(0) {}
 
-  int version;
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  uint totalFrames;
-  uint sampleFrames;
-  uint trackGain;
-  uint trackPeak;
-  uint albumGain;
-  uint albumPeak;
-  String flags;
+  int          version;
+  int          length;
+  int          bitrate;
+  int          sampleRate;
+  int          channels;
+  unsigned int totalFrames;
+  unsigned int sampleFrames;
+  unsigned int trackGain;
+  unsigned int trackPeak;
+  unsigned int albumGain;
+  unsigned int albumPeak;
+  String       flags;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -127,12 +127,12 @@ int MPC::AudioProperties::mpcVersion() const
   return d->version;
 }
 
-TagLib::uint MPC::AudioProperties::totalFrames() const
+unsigned int MPC::AudioProperties::totalFrames() const
 {
   return d->totalFrames;
 }
 
-TagLib::uint MPC::AudioProperties::sampleFrames() const
+unsigned int MPC::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -246,19 +246,19 @@ void MPC::AudioProperties::readSV8(File *file, long long streamLength)
         break;
       }
 
-      const ulong begSilence = readSize(data, pos);
+      const unsigned long begSilence = readSize(data, pos);
       if(pos > dataSize - 2) {
         debug("MPC::AudioProperties::readSV8() - \"SH\" packet is corrupt.");
         break;
       }
 
-      const ushort flags = data.toUInt16BE(pos);
+      const unsigned short flags = data.toUInt16BE(pos);
       pos += 2;
 
       d->sampleRate = sftable[(flags >> 13) & 0x07];
       d->channels   = ((flags >> 4) & 0x0F) + 1;
 
-      const uint frameCount = d->sampleFrames - begSilence;
+      const unsigned int frameCount = d->sampleFrames - begSilence;
       if(frameCount > 0 && d->sampleRate > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
         d->length  = static_cast<int>(length + 0.5);
@@ -304,11 +304,11 @@ void MPC::AudioProperties::readSV7(const ByteVector &data, long long streamLengt
 
     d->totalFrames = data.toUInt32LE(4);
 
-    const uint flags = data.toUInt32LE(8);
+    const unsigned int flags = data.toUInt32LE(8);
     d->sampleRate = sftable[(flags >> 16) & 0x03];
     d->channels   = 2;
 
-    const uint gapless = data.toUInt32LE(5);
+    const unsigned int gapless = data.toUInt32LE(5);
 
     d->trackGain = data.toUInt16LE(14);
     d->trackPeak = data.toUInt16LE(12);
@@ -336,14 +336,14 @@ void MPC::AudioProperties::readSV7(const ByteVector &data, long long streamLengt
 
     bool trueGapless = (gapless >> 31) & 0x0001;
     if(trueGapless) {
-      uint lastFrameSamples = (gapless >> 20) & 0x07FF;
+      unsigned int lastFrameSamples = (gapless >> 20) & 0x07FF;
       d->sampleFrames = d->totalFrames * 1152 - lastFrameSamples;
     }
     else
       d->sampleFrames = d->totalFrames * 1152 - 576;
   }
   else {
-    const uint headerData = data.toUInt32LE(0);
+    const unsigned int headerData = data.toUInt32LE(0);
 
     d->bitrate    = (headerData >> 23) & 0x01ff;
     d->version    = (headerData >> 11) & 0x03ff;

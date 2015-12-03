@@ -26,7 +26,6 @@
 
 using namespace std;
 using namespace TagLib;
-using TagLib::uint;
 
 static const String titleBefore("test song name");
 static const String titleAfter("changed title");
@@ -108,20 +107,20 @@ private:
     CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL( 0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(64, p->channels());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0, p->lengthInPatterns());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL(true, p->stereo());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  0, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  5, p->sampleCount());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  1, p->patternCount());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)535, p->version());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)532, p->compatibleVersion());
-    CPPUNIT_ASSERT_EQUAL((TagLib::ushort)  9, p->flags());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)128, p->globalVolume());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar) 48, p->mixVolume());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)125, p->tempo());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)  6, p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)128, p->panningSeparation());
-    CPPUNIT_ASSERT_EQUAL((TagLib::uchar)  0, p->pitchWheelDepth());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->instrumentCount());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)  5, p->sampleCount());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->patternCount());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)535, p->version());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)532, p->compatibleVersion());
+    CPPUNIT_ASSERT_EQUAL((unsigned short)  9, p->flags());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)128, p->globalVolume());
+    CPPUNIT_ASSERT_EQUAL((unsigned char) 48, p->mixVolume());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)125, p->tempo());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)  6, p->bpmSpeed());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)128, p->panningSeparation());
+    CPPUNIT_ASSERT_EQUAL((unsigned char)  0, p->pitchWheelDepth());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
     CPPUNIT_ASSERT_EQUAL(String(), t->artist());
     CPPUNIT_ASSERT_EQUAL(String(), t->album());

@@ -110,12 +110,12 @@ String RIFF::Info::Tag::genre() const
   return fieldText("IGNR");
 }
 
-TagLib::uint RIFF::Info::Tag::year() const
+unsigned int RIFF::Info::Tag::year() const
 {
   return fieldText("ICRD").substr(0, 4).toInt();
 }
 
-TagLib::uint RIFF::Info::Tag::track() const
+unsigned int RIFF::Info::Tag::track() const
 {
   return fieldText("IPRT").toInt();
 }
@@ -150,7 +150,7 @@ void RIFF::Info::Tag::setGenre(const String &s)
   setFieldText("IGNR", s);
 }
 
-void RIFF::Info::Tag::setYear(uint i)
+void RIFF::Info::Tag::setYear(unsigned int i)
 {
   if(i != 0)
     setFieldText("ICRD", String::number(i));
@@ -158,7 +158,7 @@ void RIFF::Info::Tag::setYear(uint i)
     d->fieldMap.erase("ICRD");
 }
 
-void RIFF::Info::Tag::setTrack(uint i)
+void RIFF::Info::Tag::setTrack(unsigned int i)
 {
   if(i != 0)
     setFieldText("IPRT", String::number(i));

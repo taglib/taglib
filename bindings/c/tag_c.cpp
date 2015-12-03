@@ -121,8 +121,6 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   default:
     return 0;
   }
-
-  return 0;
 }
 
 void taglib_file_free(TagLib_File *file)

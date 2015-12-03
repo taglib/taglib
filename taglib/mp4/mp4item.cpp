@@ -113,14 +113,14 @@ MP4::Item::Item(int value) :
   d->data->type = TypeInt;
 }
 
-MP4::Item::Item(uchar value) :
+MP4::Item::Item(unsigned char value) :
   d(new ItemPrivate())
 {
   d->data->m_byte = value;
   d->data->type = TypeByte;
 }
 
-MP4::Item::Item(uint value) :
+MP4::Item::Item(unsigned int value) :
   d(new ItemPrivate())
 {
   d->data->m_uint = value;
@@ -185,13 +185,13 @@ MP4::Item::toInt() const
   return d->data->m_int;
 }
 
-uchar
+unsigned char
 MP4::Item::toByte() const
 {
   return d->data->m_byte;
 }
 
-TagLib::uint
+unsigned int
 MP4::Item::toUInt() const
 {
   return d->data->m_uint;

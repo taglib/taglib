@@ -58,8 +58,8 @@ namespace TagLib {
         String album() const;
         String comment() const;
         String genre() const;
-        uint year() const;
-        uint track() const;
+        unsigned int year() const;
+        unsigned int track() const;
         PictureMap pictures() const;
 
         void setTitle(const String &value);
@@ -67,8 +67,8 @@ namespace TagLib {
         void setAlbum(const String &value);
         void setComment(const String &value);
         void setGenre(const String &value);
-        void setYear(uint value);
-        void setTrack(uint value);
+        void setYear(unsigned int value);
+        void setTrack(unsigned int value);
         void setPictures(const PictureMap &l);
 
         virtual bool isEmpty() const;

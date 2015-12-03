@@ -50,28 +50,28 @@ namespace TagLib {
       int sampleRate()           const;
       int channels()             const;
 
-      ushort lengthInPatterns() const;
-      ushort version()          const;
-      ushort restartPosition()  const;
-      ushort patternCount()     const;
-      ushort instrumentCount()  const;
-      uint   sampleCount()      const;
-      ushort flags()            const;
-      ushort tempo()            const;
-      ushort bpmSpeed()         const;
+      unsigned short lengthInPatterns() const;
+      unsigned short version()          const;
+      unsigned short restartPosition()  const;
+      unsigned short patternCount()     const;
+      unsigned short instrumentCount()  const;
+      unsigned int   sampleCount()      const;
+      unsigned short flags()            const;
+      unsigned short tempo()            const;
+      unsigned short bpmSpeed()         const;
 
     private:
       void setChannels(int channels);
 
-      void setLengthInPatterns(ushort lengthInPatterns);
-      void setVersion(ushort version);
-      void setRestartPosition(ushort restartPosition);
-      void setPatternCount(ushort patternCount);
-      void setInstrumentCount(ushort instrumentCount);
-      void setSampleCount(uint sampleCount);
-      void setFlags(ushort flags);
-      void setTempo(ushort tempo);
-      void setBpmSpeed(ushort bpmSpeed);
+      void setLengthInPatterns(unsigned short lengthInPatterns);
+      void setVersion(unsigned short version);
+      void setRestartPosition(unsigned short restartPosition);
+      void setPatternCount(unsigned short patternCount);
+      void setInstrumentCount(unsigned short instrumentCount);
+      void setSampleCount(unsigned int sampleCount);
+      void setFlags(unsigned short flags);
+      void setTempo(unsigned short tempo);
+      void setBpmSpeed(unsigned short bpmSpeed);
 
       friend class File;
 

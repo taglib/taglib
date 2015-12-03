@@ -40,7 +40,7 @@ namespace TagLib
         return false;
 
       for(ByteVector::ConstIterator it = name.begin(); it != name.end(); ++it) {
-        const uchar c = static_cast<uchar>(*it);
+        const int c = static_cast<unsigned char>(*it);
         if(c < 32 || 127 < c)
           return false;
       }

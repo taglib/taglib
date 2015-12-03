@@ -58,7 +58,7 @@ public:
   int version;
   int bitsPerSample;
   bool lossless;
-  uint sampleFrames;
+  unsigned int sampleFrames;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ bool WavPack::AudioProperties::isLossless() const
   return d->lossless;
 }
 
-TagLib::uint WavPack::AudioProperties::sampleFrames() const
+unsigned int WavPack::AudioProperties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -148,8 +148,8 @@ namespace
 #define SRATE_LSB       23
 #define SRATE_MASK      (0xfL << SRATE_LSB)
 
-#define MIN_STREAM_VERS     0x402
-#define MAX_STREAM_VERS     0x410
+#define MIN_STREAM_VERS 0x402
+#define MAX_STREAM_VERS 0x410
 
 #define FINAL_BLOCK     0x1000
 
@@ -171,7 +171,7 @@ void WavPack::AudioProperties::read(File *file, long long streamLength)
       break;
     }
 
-    const uint flags = data.toUInt32LE(24);
+    const unsigned int flags = data.toUInt32LE(24);
 
     if(offset == 0) {
       d->version = data.toUInt16LE(8);
@@ -189,7 +189,7 @@ void WavPack::AudioProperties::read(File *file, long long streamLength)
     if(flags & FINAL_BLOCK)
       break;
 
-    const uint blockSize = data.toUInt32LE(4);
+    const unsigned int blockSize = data.toUInt32LE(4);
     offset += blockSize + 8;
   }
 
@@ -203,7 +203,7 @@ void WavPack::AudioProperties::read(File *file, long long streamLength)
   }
 }
 
-TagLib::uint WavPack::AudioProperties::seekFinalIndex(File *file, long long streamLength)
+unsigned int WavPack::AudioProperties::seekFinalIndex(File *file, long long streamLength)
 {
   const long long offset = file->rfind("wvpk", streamLength);
   if(offset == -1)
@@ -218,12 +218,12 @@ TagLib::uint WavPack::AudioProperties::seekFinalIndex(File *file, long long stre
   if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
     return 0;
 
-  const uint flags = data.toUInt32LE(24);
+  const unsigned int flags = data.toUInt32LE(24);
   if(!(flags & FINAL_BLOCK))
     return 0;
 
-  const uint blockIndex   = data.toUInt32LE(16);
-  const uint blockSamples = data.toUInt32LE(20);
+  const unsigned int blockIndex   = data.toUInt32LE(16);
+  const unsigned int blockSamples = data.toUInt32LE(20);
 
   return blockIndex + blockSamples;
 }
