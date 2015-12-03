@@ -51,10 +51,8 @@ public:
     size(0) {}
 
   const Endianness endianness;
-  ByteVector   type;
-  unsigned int size;
-  ByteVector   format;
 
+  unsigned int size;
   std::vector<Chunk> chunks;
 };
 
@@ -177,8 +175,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  unsigned int i = d->chunks.size() - 1;
-  unsigned long offset = d->chunks[i].offset + d->chunks[i].size;
+  unsigned long offset = d->chunks.back().offset + d->chunks.back().size;
 
   // First we update the global size
 
@@ -192,7 +189,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   // And update our internal structure
 
   if(offset & 1) {
-    d->chunks[i].padding = 1;
+    d->chunks.back().padding = 1;
     offset++;
   }
 
@@ -235,11 +232,13 @@ void RIFF::File::removeChunk(const ByteVector &name)
 
 void RIFF::File::read()
 {
-  bool bigEndian = (d->endianness == BigEndian);
+  const bool bigEndian = (d->endianness == BigEndian);
+  const long baseOffset = tell();
 
-  d->type = readBlock(4);
+  seek(baseOffset + 4);
   d->size = readBlock(4).toUInt(bigEndian);
-  d->format = readBlock(4);
+
+  seek(baseOffset + 12);
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {
