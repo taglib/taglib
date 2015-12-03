@@ -188,7 +188,7 @@ namespace TagLib {
       /*!
        * Reads from the file specified in the constructor.
        */
-      void read(TagLib::File *file, long footerLocation);
+      void read();
 
       /*!
        * Parses the body of the tag in \a data.

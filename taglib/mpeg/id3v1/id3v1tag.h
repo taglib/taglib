@@ -183,7 +183,7 @@ namespace TagLib {
       /*!
        * Reads from the file specified in the constructor.
        */
-      void read(File *file, long tagOffset);
+      void read();
       /*!
        * Pareses the body of the tag in \a data.
        */

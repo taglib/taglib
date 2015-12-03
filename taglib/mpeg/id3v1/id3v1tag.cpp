@@ -42,8 +42,13 @@ class ID3v1::Tag::TagPrivate
 {
 public:
   TagPrivate() :
+    file(0),
+    tagOffset(0),
     track(0),
     genre(255) {}
+
+  File *file;
+  long tagOffset;
 
   String title;
   String artist;
@@ -89,7 +94,10 @@ ID3v1::Tag::Tag(File *file, long tagOffset) :
   TagLib::Tag(),
   d(new TagPrivate())
 {
-  read(file, tagOffset);
+  d->file = file;
+  d->tagOffset = tagOffset;
+
+  read();
 }
 
 ID3v1::Tag::~Tag()
@@ -211,12 +219,12 @@ void ID3v1::Tag::setStringHandler(const StringHandler *handler)
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-void ID3v1::Tag::read(File *file, long tagOffset)
+void ID3v1::Tag::read()
 {
-  if(file && file->isValid()) {
-    file->seek(tagOffset);
+  if(d->file && d->file->isValid()) {
+    d->file->seek(d->tagOffset);
     // read the tag -- always 128 bytes
-    const ByteVector data = file->readBlock(128);
+    const ByteVector data = d->file->readBlock(128);
 
     // some initial sanity checking
     if(data.size() == 128 && data.startsWith("TAG"))
