@@ -192,7 +192,7 @@ public:
 
     CPPUNIT_ASSERT(ByteVector::fromUInt16LE(4386) == ByteVector::fromUInt16BE(8721));
     CPPUNIT_ASSERT(ByteVector::fromUInt32LE(287454020) == ByteVector::fromUInt32BE(1144201745));
-    CPPUNIT_ASSERT(ByteVector::fromUInt64LE(1234605615291183940) == ByteVector::fromUInt64BE(4914309075945333265));
+    CPPUNIT_ASSERT(ByteVector::fromUInt64LE(1234605615291183940ll) == ByteVector::fromUInt64BE(4914309075945333265ll));
 
     const unsigned char PI32LE[] = { 0x00, 0xdb, 0x0f, 0x49, 0x40 };
     const unsigned char PI32BE[] = { 0x00, 0x40, 0x49, 0x0f, 0xdb };
