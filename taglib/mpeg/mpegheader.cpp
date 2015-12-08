@@ -23,8 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <bitset>
-
 #include <tbytevector.h>
 #include <tstring.h>
 #include <tdebug.h>
@@ -68,20 +66,21 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::Header::Header(const ByteVector &data)
+MPEG::Header::Header(const ByteVector &data) :
+  d(new HeaderPrivate())
 {
-  d = new HeaderPrivate;
   parse(data);
 }
 
-MPEG::Header::Header(const Header &h) : d(h.d)
+MPEG::Header::Header(const Header &h) :
+  d(h.d)
 {
   d->ref();
 }
 
 MPEG::Header::~Header()
 {
-  if (d->deref())
+  if(d->deref())
     delete d;
 }
 
@@ -164,39 +163,54 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 
 void MPEG::Header::parse(const ByteVector &data)
 {
-  if(data.size() < 4 || static_cast<unsigned char>(data[0]) != 0xff) {
+  if(data.size() < 4) {
+    debug("MPEG::Header::parse() -- data is too short for an MPEG frame header.");
+    return;
+  }
+
+  // Check for the MPEG synch bytes.
+
+  if(static_cast<unsigned char>(data[0]) != 0xFF) {
     debug("MPEG::Header::parse() -- First byte did not match MPEG synch.");
     return;
   }
 
-  std::bitset<32> flags(TAGLIB_CONSTRUCT_BITSET(data.toUInt()));
-
-  // Check for the second byte's part of the MPEG synch
-
-  if(!flags[23] || !flags[22] || !flags[21]) {
+  if((static_cast<unsigned char>(data[1]) & 0xE0) != 0xE0) {
     debug("MPEG::Header::parse() -- Second byte did not match MPEG synch.");
     return;
   }
 
   // Set the MPEG version
 
-  if(!flags[20] && !flags[19])
+  const int versionBits = (static_cast<unsigned char>(data[1]) >> 3) & 0x03;
+
+  if(versionBits == 0)
     d->version = Version2_5;
-  else if(flags[20] && !flags[19])
+  else if(versionBits == 2)
     d->version = Version2;
-  else if(flags[20] && flags[19])
+  else if(versionBits == 3)
     d->version = Version1;
+  else {
+    debug("MPEG::Header::parse() -- Invalid MPEG version bits.");
+    return;
+  }
 
   // Set the MPEG layer
 
-  if(!flags[18] && flags[17])
-    d->layer = 3;
-  else if(flags[18] && !flags[17])
-    d->layer = 2;
-  else if(flags[18] && flags[17])
-    d->layer = 1;
+  const int layerBits = (static_cast<unsigned char>(data[1]) >> 1) & 0x03;
 
-  d->protectionEnabled = !flags[16];
+  if(layerBits == 1)
+    d->layer = 3;
+  else if(layerBits == 2)
+    d->layer = 2;
+  else if(layerBits == 3)
+    d->layer = 1;
+  else {
+    debug("MPEG::Header::parse() -- Invalid MPEG layer bits.");
+    return;
+  }
+
+  d->protectionEnabled = (static_cast<unsigned char>(data[1] & 0x01) == 0);
 
   // Set the bitrate
 
@@ -219,9 +233,14 @@ void MPEG::Header::parse(const ByteVector &data)
   // The bitrate index is encoded as the first 4 bits of the 3rd byte,
   // i.e. 1111xxxx
 
-  int i = static_cast<unsigned char>(data[2]) >> 4;
+  const int bitrateIndex = (static_cast<unsigned char>(data[2]) >> 4) & 0x0F;
 
-  d->bitrate = bitrates[versionIndex][layerIndex][i];
+  d->bitrate = bitrates[versionIndex][layerIndex][bitrateIndex];
+
+  if(d->bitrate == 0) {
+    debug("MPEG::Header::parse() -- Invalid bit rate.");
+    return;
+  }
 
   // Set the sample rate
 
@@ -233,9 +252,9 @@ void MPEG::Header::parse(const ByteVector &data)
 
   // The sample rate index is encoded as two bits in the 3nd byte, i.e. xxxx11xx
 
-  i = static_cast<unsigned char>(data[2]) >> 2 & 0x03;
+  const int samplerateIndex = (static_cast<unsigned char>(data[2]) >> 2) & 0x03;
 
-  d->sampleRate = sampleRates[d->version][i];
+  d->sampleRate = sampleRates[d->version][samplerateIndex];
 
   if(d->sampleRate == 0) {
     debug("MPEG::Header::parse() -- Invalid sample rate.");
@@ -245,13 +264,13 @@ void MPEG::Header::parse(const ByteVector &data)
   // The channel mode is encoded as a 2 bit value at the end of the 3nd byte,
   // i.e. xxxxxx11
 
-  d->channelMode = static_cast<ChannelMode>((static_cast<unsigned char>(data[3]) & 0xC0) >> 6);
+  d->channelMode = static_cast<ChannelMode>((static_cast<unsigned char>(data[3]) >> 6) & 0x03);
 
   // TODO: Add mode extension for completeness
 
-  d->isOriginal = flags[2];
-  d->isCopyrighted = flags[3];
-  d->isPadded = flags[9];
+  d->isOriginal    = ((static_cast<unsigned char>(data[3]) & 0x04) != 0);
+  d->isCopyrighted = ((static_cast<unsigned char>(data[3]) & 0x08) != 0);
+  d->isPadded      = ((static_cast<unsigned char>(data[2]) & 0x02) != 0);
 
   // Samples per frame
 
