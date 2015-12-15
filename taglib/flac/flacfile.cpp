@@ -45,6 +45,10 @@ using namespace TagLib;
 
 namespace
 {
+  typedef List<FLAC::MetadataBlock *> BlockList;
+  typedef BlockList::Iterator BlockIterator;
+  typedef BlockList::Iterator BlockConstIterator;
+
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
 
   const long MinPaddingLength = 4096;
@@ -64,14 +68,13 @@ public:
     properties(0),
     flacStart(0),
     streamStart(0),
-    scanned(false) {}
+    scanned(false)
+  {
+    blocks.setAutoDelete(true);
+  }
 
   ~FilePrivate()
   {
-    unsigned int size = blocks.size();
-    for(unsigned int i = 0; i < size; i++) {
-      delete blocks[i];
-    }
     delete properties;
   }
 
@@ -85,7 +88,7 @@ public:
 
   Properties *properties;
   ByteVector xiphCommentData;
-  List<MetadataBlock *> blocks;
+  BlockList blocks;
 
   long flacStart;
   long streamStart;
@@ -173,35 +176,28 @@ bool FLAC::File::save()
   // Replace metadata blocks
 
   bool foundVorbisCommentBlock = false;
-  List<MetadataBlock *> newBlocks;
-  for(unsigned int i = 0; i < d->blocks.size(); i++) {
-    MetadataBlock *block = d->blocks[i];
-    if(block->code() == MetadataBlock::VorbisComment) {
+
+  for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    if((*it)->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
-      delete block;
-      block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
+      delete *it;
+      *it = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
       foundVorbisCommentBlock = true;
     }
-    if(block->code() == MetadataBlock::Padding) {
-      delete block;
-      continue;
-    }
-    newBlocks.append(block);
   }
+
   if(!foundVorbisCommentBlock) {
-    newBlocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
+    d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
     foundVorbisCommentBlock = true;
   }
-  d->blocks = newBlocks;
 
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(unsigned int i = 0; i < newBlocks.size(); i++) {
-    FLAC::MetadataBlock *block = newBlocks[i];
-    ByteVector blockData = block->render();
+  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    ByteVector blockData = (*it)->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    blockHeader[0] = (*it)->code();
     data.append(blockHeader);
     data.append(blockData);
   }
@@ -344,8 +340,8 @@ long FLAC::File::streamLength()
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(unsigned int i = 0; i < d->blocks.size(); i++) {
-    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
+  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    Picture *picture = dynamic_cast<Picture *>(*it);
     if(picture) {
       pictures.append(picture);
     }
@@ -360,8 +356,7 @@ void FLAC::File::addPicture(Picture *picture)
 
 void FLAC::File::removePicture(Picture *picture, bool del)
 {
-  MetadataBlock *block = picture;
-  List<MetadataBlock *>::Iterator it = d->blocks.find(block);
+  BlockIterator it = d->blocks.find(picture);
   if(it != d->blocks.end())
     d->blocks.erase(it);
 
@@ -371,17 +366,15 @@ void FLAC::File::removePicture(Picture *picture, bool del)
 
 void FLAC::File::removePictures()
 {
-  List<MetadataBlock *> newBlocks;
-  for(unsigned int i = 0; i < d->blocks.size(); i++) {
-    Picture *picture = dynamic_cast<Picture *>(d->blocks[i]);
-    if(picture) {
-      delete picture;
+  for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ) {
+    if(dynamic_cast<Picture *>(*it)) {
+      delete *it;
+      it = d->blocks.erase(it);
     }
     else {
-      newBlocks.append(d->blocks[i]);
+      ++it;
     }
   }
-  d->blocks = newBlocks;
 }
 
 bool FLAC::File::hasXiphComment() const
