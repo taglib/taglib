@@ -47,9 +47,9 @@ namespace TagLib {
      * Reimplementing this factory is the key to adding support for frame types
      * not directly supported by TagLib to your application.  To do so you would
      * subclass this factory reimplement createFrame().  Then by setting your
-     * factory to be the default factory in ID3v2::Tag constructor or with
-     * MPEG::File::setID3v2FrameFactory() you can implement behavior that will
-     * allow for new ID3v2::Frame subclasses (also provided by you) to be used.
+     * factory to be the default factory in ID3v2::Tag constructor you can
+     * implement behavior that will allow for new ID3v2::Frame subclasses (also
+     * provided by you) to be used.
      *
      * This implements both <i>abstract factory</i> and <i>singleton</i> patterns
      * of which more information is available on the web and in software design
