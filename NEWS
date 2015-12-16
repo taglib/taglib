@@ -11,12 +11,17 @@
  * Better handling of duplicate tag chunks in WAV files.
  * Better handling of duplicate tag chunks in AIFF files.
  * Fixed crash when calling File::properties() after strip().
+ * Fixed crash when parsing certain MPEG files.
  * Fixed possible file corruptions when saving ASF files.
+ * Fixed possible file corruptions when saving FLAC files.
+ * Fixed possible file corruptions when saving MP4 files.
  * Fixed updating the comment field of Vorbis comments.
+ * Fixed reading date and time in ID3v2.3 tags.
  * Replaced ENABLE_STATIC build option with BUILD_SHARED_LIBS.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.
+ * Marked custom integer types deprecated.
  * Many smaller bug fixes and performance improvements.
 
 TagLib 1.10 (Nov 11, 2015)

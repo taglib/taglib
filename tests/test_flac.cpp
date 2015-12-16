@@ -7,6 +7,7 @@
 #include <flacfile.h>
 #include <xiphcomment.h>
 #include <id3v1tag.h>
+#include <id3v2tag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -22,13 +23,19 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testAddPicture);
   CPPUNIT_TEST(testReplacePicture);
   CPPUNIT_TEST(testRemoveAllPictures);
-  CPPUNIT_TEST(testRepeatedSave);
+  CPPUNIT_TEST(testRepeatedSave1);
+  CPPUNIT_TEST(testRepeatedSave2);
+  CPPUNIT_TEST(testRepeatedSave3);
   CPPUNIT_TEST(testSaveMultipleValues);
   CPPUNIT_TEST(testDict);
   CPPUNIT_TEST(testInvalid);
   CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testZeroSizedPadding);
+  CPPUNIT_TEST(testZeroSizedPadding1);
+  CPPUNIT_TEST(testZeroSizedPadding2);
+  CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST(testSaveID3v1);
+  CPPUNIT_TEST(testUpdateID3v2);
+  CPPUNIT_TEST(testEmptyID3v2);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -185,7 +192,7 @@ public:
     }
   }
 
-  void testRepeatedSave()
+  void testRepeatedSave1()
   {
     ScopedFileCopy copy("silence-44-s", ".flac");
     string newname = copy.fileName();
@@ -204,6 +211,31 @@ public:
       FLAC::File f(newname.c_str());
       CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), f.tag()->title());
     }
+  }
+
+  void testRepeatedSave2()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    FLAC::File f(copy.fileName().c_str());
+    f.ID3v2Tag(true)->setTitle("0123456789");
+    f.save();
+    CPPUNIT_ASSERT_EQUAL(5735LL, f.length());
+    f.save();
+    CPPUNIT_ASSERT_EQUAL(5735LL, f.length());
+    CPPUNIT_ASSERT(f.find("fLaC") >= 0);
+  }
+
+  void testRepeatedSave3()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    FLAC::File f(copy.fileName().c_str());
+    f.xiphComment()->setTitle(std::string(8 * 1024, 'X').c_str());
+    f.save();
+    CPPUNIT_ASSERT_EQUAL(12862LL, f.length());
+    f.save();
+    CPPUNIT_ASSERT_EQUAL(12862LL, f.length());
   }
 
   void testSaveMultipleValues()
@@ -278,12 +310,50 @@ public:
       f.audioProperties()->signature());
   }
 
-  void testZeroSizedPadding()
+  void testZeroSizedPadding1()
   {
     ScopedFileCopy copy("zero-sized-padding", ".flac");
 
     FLAC::File f(copy.fileName().c_str());
     CPPUNIT_ASSERT(f.isValid());
+  }
+
+  void testZeroSizedPadding2()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment()->setTitle("ABC");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment()->setTitle(std::string(3067, 'X').c_str());
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+    }
+  }
+
+  void testShrinkPadding()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment()->setTitle(std::wstring(128 * 1024, L'X').c_str());
+      f.save();
+      CPPUNIT_ASSERT(f.length() > 128 * 1024);
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment()->setTitle("0123456789");
+      f.save();
+      CPPUNIT_ASSERT(f.length() < 8 * 1024);
+    }
   }
 
   void testSaveID3v1()
@@ -306,6 +376,41 @@ public:
 
       f.seek(0x0100);
       CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+    }
+  }
+
+  void testUpdateID3v2()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.ID3v2Tag(true)->setTitle("0123456789");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.ID3v2Tag()->setTitle("ABCDEFGHIJ");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("ABCDEFGHIJ"), f.ID3v2Tag()->title());
+    }
+  }
+
+  void testEmptyID3v2()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.ID3v2Tag(true);
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
     }
   }
 

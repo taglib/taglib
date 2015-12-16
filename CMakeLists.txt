@@ -133,7 +133,7 @@ if(BUILD_BINDINGS)
   add_subdirectory(bindings)
 endif()
 
-if(BUILD_TESTS)
+if(BUILD_TESTS AND NOT BUILD_SHARED_LIBS)
   enable_testing()
   add_subdirectory(tests)
 endif()

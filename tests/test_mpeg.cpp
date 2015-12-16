@@ -22,6 +22,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testAudioPropertiesXingHeaderVBR);
   CPPUNIT_TEST(testAudioPropertiesVBRIHeader);
   CPPUNIT_TEST(testAudioPropertiesNoVBRHeaders);
+  CPPUNIT_TEST(testSkipInvalidFrames);
   CPPUNIT_TEST(testVersion2DurationWithXingHeader);
   CPPUNIT_TEST(testSaveID3v24);
   CPPUNIT_TEST(testSaveID3v24WrongParam);
@@ -100,6 +101,19 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(28213LL, last);
     CPPUNIT_ASSERT_EQUAL(209, lastHeader.frameLength());
+  }
+
+  void testSkipInvalidFrames()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("invalid-frames.mp3"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(393, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(160, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
   }
 
   void testVersion2DurationWithXingHeader()

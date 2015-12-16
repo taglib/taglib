@@ -54,10 +54,8 @@ public:
     size(0) {}
 
   const ByteOrder endianness;
-  ByteVector type;
-  unsigned int size;
-  ByteVector format;
 
+  unsigned int size;
   std::vector<Chunk> chunks;
 };
 
@@ -248,14 +246,16 @@ void RIFF::File::removeChunk(const ByteVector &name)
 
 void RIFF::File::read()
 {
-  d->type = readBlock(4);
+  const long long baseOffset = tell();
+
+  seek(baseOffset + 4);
 
   if(d->endianness == BigEndian)
     d->size = readBlock(4).toUInt32BE(0);
   else
     d->size = readBlock(4).toUInt32LE(0);
 
-  d->format = readBlock(4);
+  seek(baseOffset + 12);
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(tell() + 8 <= length()) {

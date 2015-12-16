@@ -31,6 +31,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCovrRead2);
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testFuzzedFile);
+  CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -358,6 +359,17 @@ public:
     CPPUNIT_ASSERT(f.isValid());
   }
 
+  void testRepeatedSave()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+
+    MP4::File f(copy.fileName().c_str());
+    f.tag()->setTitle("0123456789");
+    f.save();
+    f.save();
+    CPPUNIT_ASSERT_EQUAL(2862LL, f.find("0123456789"));
+    CPPUNIT_ASSERT_EQUAL(-1LL, f.find("0123456789", 2863));
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMP4);

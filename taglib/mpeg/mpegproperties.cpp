@@ -150,27 +150,33 @@ bool MPEG::AudioProperties::isOriginal() const
 
 void MPEG::AudioProperties::read(File *file)
 {
-  // Only the first frame is required if we have a VBR header.
+  // Only the first valid frame is required if we have a VBR header.
 
-  const long long first = file->firstFrameOffset();
-  if(first < 0) {
-    debug("MPEG::AudioProperties::read() -- Could not find a valid first MPEG frame in the stream.");
+  long long firstFrameOffset = file->firstFrameOffset();
+  if(firstFrameOffset < 0) {
+    debug("MPEG::Properties::read() -- Could not find an MPEG frame in the stream.");
     return;
   }
 
-  file->seek(first);
-  const Header firstHeader(file->readBlock(4));
+  file->seek(firstFrameOffset);
+  Header firstHeader(file->readBlock(4));
 
-  if(!firstHeader.isValid()) {
-    debug("MPEG::AudioProperties::read() -- The first page header is invalid.");
-    return;
+  while(!firstHeader.isValid()) {
+    firstFrameOffset = file->nextFrameOffset(firstFrameOffset + 1);
+    if(firstFrameOffset < 0) {
+      debug("MPEG::Properties::read() -- Could not find a valid first MPEG frame in the stream.");
+      return;
+    }
+
+    file->seek(firstFrameOffset);
+    firstHeader = Header(file->readBlock(4));
   }
 
   // Check for a VBR header that will help us in gathering information about a
   // VBR stream.
 
-  file->seek(first + 4);
-  d->xingHeader.reset(new XingHeader(file->readBlock(firstHeader.frameLength() - 4)));
+  file->seek(firstFrameOffset);
+  d->xingHeader.reset(new XingHeader(file->readBlock(firstHeader.frameLength())));
   if(!d->xingHeader->isValid())
     d->xingHeader.reset();
 
@@ -194,7 +200,7 @@ void MPEG::AudioProperties::read(File *file)
 
     d->bitrate = firstHeader.bitrate();
 
-    long long streamLength = file->length() - first;
+    long long streamLength = file->length() - firstFrameOffset;
 
     if(file->hasID3v1Tag())
       streamLength -= 128;

@@ -234,7 +234,7 @@ namespace TagLib {
       /*!
        * Remove all pictures.
        */
-      void removePictures();
+      void removeAllPictures();
 
       /*!
        * Add a new picture to the comment block. The comment block takes ownership of the
