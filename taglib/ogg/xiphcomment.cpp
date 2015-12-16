@@ -326,7 +326,7 @@ void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
     delete picture;
 }
 
-void Ogg::XiphComment::removePictures()
+void Ogg::XiphComment::removeAllPictures()
 {
   d->pictureList.clear();
 }
