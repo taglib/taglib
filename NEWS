@@ -14,6 +14,7 @@
  * Fixed crash when parsing certain MPEG files.
  * Fixed possible file corruptions when saving ASF files.
  * Fixed possible file corruptions when saving FLAC files.
+ * Fixed possible file corruptions when saving MP4 files.
  * Fixed updating the comment field of Vorbis comments.
  * Fixed reading date and time in ID3v2.3 tags.
  * Replaced ENABLE_STATIC build option with BUILD_SHARED_LIBS.
