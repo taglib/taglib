@@ -225,7 +225,7 @@ bool FLAC::File::save()
   ByteVector paddingHeader = ByteVector::fromUInt(paddingLength);
   paddingHeader[0] = static_cast<char>(MetadataBlock::Padding | LastBlockFlag);
   data.append(paddingHeader);
-  data.resize(static_cast<TagLib::uint>(data.size() + paddingLength));
+  data.resize(static_cast<unsigned int>(data.size() + paddingLength));
 
   // Write the data to the file
 
