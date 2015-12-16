@@ -175,21 +175,16 @@ bool FLAC::File::save()
 
   // Replace metadata blocks
 
-  bool foundVorbisCommentBlock = false;
-
   for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
     if((*it)->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
       delete *it;
-      *it = new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData);
-      foundVorbisCommentBlock = true;
+      d->blocks.erase(it);
+      break;
     }
   }
 
-  if(!foundVorbisCommentBlock) {
-    d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
-    foundVorbisCommentBlock = true;
-  }
+  d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
 
   // Render data for the metadata blocks
 
@@ -469,51 +464,43 @@ void FLAC::File::scan()
   nextBlockOffset += 4;
   d->flacStart = nextBlockOffset;
 
-  seek(nextBlockOffset);
+  while(true) {
 
-  ByteVector header = readBlock(4);
+    seek(nextBlockOffset);
+    const ByteVector header = readBlock(4);
 
-  // Header format (from spec):
-  // <1> Last-metadata-block flag
-  // <7> BLOCK_TYPE
-  //    0 : STREAMINFO
-  //    1 : PADDING
-  //    ..
-  //    4 : VORBIS_COMMENT
-  //    ..
-  // <24> Length of metadata to follow
+    // Header format (from spec):
+    // <1> Last-metadata-block flag
+    // <7> BLOCK_TYPE
+    //    0 : STREAMINFO
+    //    1 : PADDING
+    //    ..
+    //    4 : VORBIS_COMMENT
+    //    ..
+    //    6 : PICTURE
+    //    ..
+    // <24> Length of metadata to follow
 
-  char blockType = header[0] & 0x7f;
-  bool isLastBlock = (header[0] & 0x80) != 0;
-  unsigned int length = header.toUInt(1U, 3U);
+    const char blockType = header[0] & ~LastBlockFlag;
+    const bool isLastBlock = (header[0] & LastBlockFlag) != 0;
+    const unsigned int blockLength = header.toUInt(1U, 3U);
 
-  // First block should be the stream_info metadata
+    // First block should be the stream_info metadata
 
-  if(blockType != MetadataBlock::StreamInfo) {
-    debug("FLAC::File::scan() -- invalid FLAC stream");
-    setValid(false);
-    return;
-  }
+    if(d->blocks.isEmpty() && blockType != MetadataBlock::StreamInfo) {
+      debug("FLAC::File::scan() -- First block should be the stream_info metadata");
+      setValid(false);
+      return;
+    }
 
-  d->blocks.append(new UnknownMetadataBlock(blockType, readBlock(length)));
-  nextBlockOffset += length + 4;
-
-  // Search through the remaining metadata
-  while(!isLastBlock) {
-
-    header = readBlock(4);
-    blockType = header[0] & 0x7f;
-    isLastBlock = (header[0] & 0x80) != 0;
-    length = header.toUInt(1U, 3U);
-
-    if(length == 0 && blockType != MetadataBlock::Padding) {
+    if(blockLength == 0 && blockType != MetadataBlock::Padding) {
       debug("FLAC::File::scan() -- Zero-sized metadata block found");
       setValid(false);
       return;
     }
 
-    const ByteVector data = readBlock(length);
-    if(data.size() != length) {
+    const ByteVector data = readBlock(blockLength);
+    if(data.size() != blockLength) {
       debug("FLAC::File::scan() -- Failed to read a metadata block");
       setValid(false);
       return;
@@ -525,9 +512,10 @@ void FLAC::File::scan()
     if(blockType == MetadataBlock::VorbisComment) {
       if(d->xiphCommentData.isEmpty()) {
         d->xiphCommentData = data;
+        block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, data);
       }
       else {
-        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, using the first one");
+        debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, discarding");
       }
     }
     else if(blockType == MetadataBlock::Picture) {
@@ -540,25 +528,20 @@ void FLAC::File::scan()
         delete picture;
       }
     }
-
-    if(!block) {
-      block = new UnknownMetadataBlock(blockType, data);
-    }
-    if(block->code() != MetadataBlock::Padding) {
-      d->blocks.append(block);
+    else if(blockType == MetadataBlock::Padding) {
+      // Skip all padding blocks.
     }
     else {
-      delete block;
+      block = new UnknownMetadataBlock(blockType, data);
     }
 
-    nextBlockOffset += length + 4;
+    if(block)
+      d->blocks.append(block);
 
-    if(nextBlockOffset >= File::length()) {
-      debug("FLAC::File::scan() -- FLAC stream corrupted");
-      setValid(false);
-      return;
-    }
-    seek(nextBlockOffset);
+    nextBlockOffset += blockLength + 4;
+
+    if(isLastBlock)
+      break;
   }
 
   // End of metadata, now comes the datastream
