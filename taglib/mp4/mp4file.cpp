@@ -55,8 +55,7 @@ public:
   FilePrivate() :
     tag(0),
     atoms(0),
-    properties(0),
-    hasMP4Tag(false) {}
+    properties(0) {}
 
   ~FilePrivate()
   {
@@ -68,8 +67,6 @@ public:
   MP4::Tag        *tag;
   MP4::Atoms      *atoms;
   MP4::Properties *properties;
-
-  bool hasMP4Tag;
 };
 
 MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
@@ -138,10 +135,6 @@ MP4::File::read(bool readProperties)
     return;
   }
 
-  if(d->atoms->find("moov", "udta", "meta", "ilst")) {
-    d->hasMP4Tag = true;
-  }
-
   d->tag = new Tag(this, d->atoms);
   if(readProperties) {
     d->properties = new Properties(this, d->atoms);
@@ -161,16 +154,11 @@ MP4::File::save()
     return false;
   }
 
-  const bool success = d->tag->save();
-  if(success) {
-    d->hasMP4Tag = true;
-  }
-
-  return success;
+  return d->tag->save();
 }
 
 bool
 MP4::File::hasMP4Tag() const
 {
-  return d->hasMP4Tag;
+  return (d->atoms->find("moov", "udta", "meta", "ilst") != 0);
 }

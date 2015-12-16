@@ -629,6 +629,11 @@ MP4::Tag::saveNew(ByteVector data)
 
   updateParents(path, data.size());
   updateOffsets(data.size(), offset);
+
+  // Insert the newly created atoms into the tree to keep it up-to-date.
+
+  d->file->seek(offset);
+  path.back()->children.prepend(new Atom(d->file));
 }
 
 void
