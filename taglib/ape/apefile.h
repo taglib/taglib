@@ -146,9 +146,6 @@ namespace TagLib {
        *
        * \note According to the official Monkey's Audio SDK, an APE file
        * can only have either ID3V1 or APE tags, so a parameter is used here.
-       *
-       * \warning In the current implementation, it's dangerous to call save()
-       * repeatedly.  At worst it will corrupt the file.
        */
       virtual bool save();
 
