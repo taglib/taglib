@@ -53,10 +53,7 @@ public:
     ID3v2Header(0),
     ID3v2Location(-1),
     ID3v2Size(0),
-    properties(0),
-    hasAPE(false),
-    hasID3v1(false),
-    hasID3v2(false) {}
+    properties(0) {}
 
   ~FilePrivate()
   {
@@ -76,13 +73,6 @@ public:
   TagUnion tag;
 
   Properties *properties;
-
-  // These indicate whether the file *on disk* has these tags, not if
-  // this data structure does.  This is used in computing offsets.
-
-  bool hasAPE;
-  bool hasID3v1;
-  bool hasID3v2;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,69 +137,80 @@ bool MPC::File::save()
 
   // Possibly strip ID3v2 tag
 
-  if(d->hasID3v2 && !d->ID3v2Header) {
+  if(!d->ID3v2Header && d->ID3v2Location >= 0) {
     removeBlock(d->ID3v2Location, d->ID3v2Size);
-    d->hasID3v2 = false;
-    if(d->hasID3v1)
-      d->ID3v1Location -= d->ID3v2Size;
-    if(d->hasAPE)
+
+    if(d->APELocation >= 0)
       d->APELocation -= d->ID3v2Size;
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location -= d->ID3v2Size;
+
+    d->ID3v2Location = -1;
+    d->ID3v2Size = 0;
   }
 
   // Update ID3v1 tag
 
-  if(ID3v1Tag()) {
-    if(d->hasID3v1) {
+  if(ID3v1Tag() && !ID3v1Tag()->isEmpty()) {
+
+    // ID3v1 tag is not empty. Update the old one or create a new one.
+
+    if(d->ID3v1Location >= 0) {
       seek(d->ID3v1Location);
-      writeBlock(ID3v1Tag()->render());
     }
     else {
       seek(0, End);
       d->ID3v1Location = tell();
-      writeBlock(ID3v1Tag()->render());
-      d->hasID3v1 = true;
     }
-  } else
-    if(d->hasID3v1) {
-      removeBlock(d->ID3v1Location, 128);
-      d->hasID3v1 = false;
-      if(d->hasAPE) {
-        if(d->APELocation > d->ID3v1Location)
-          d->APELocation -= 128;
-      }
+
+    writeBlock(ID3v1Tag()->render());
+  }
+  else {
+
+    // ID3v1 tag is empty. Remove the old one.
+
+    if(d->ID3v1Location >= 0) {
+      truncate(d->ID3v1Location);
+      d->ID3v1Location = -1;
     }
+  }
 
   // Update APE tag
 
-  if(APETag()) {
-    if(d->hasAPE)
-      insert(APETag()->render(), d->APELocation, d->APESize);
-    else {
-      if(d->hasID3v1)  {
-        insert(APETag()->render(), d->ID3v1Location, 0);
-        d->APESize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
+  if(APETag() && !APETag()->isEmpty()) {
+
+    // APE tag is not empty. Update the old one or create a new one.
+
+    if(d->APELocation < 0) {
+      if(d->ID3v1Location >= 0)
         d->APELocation = d->ID3v1Location;
-        d->ID3v1Location += d->APESize;
-      }
-      else {
-        seek(0, End);
-        d->APELocation = tell();
-        writeBlock(APETag()->render());
-        d->APESize = APETag()->footer()->completeTagSize();
-        d->hasAPE = true;
-      }
+      else
+        d->APELocation = length();
+    }
+
+    const ByteVector data = APETag()->render();
+    insert(data, d->APELocation, d->APESize);
+
+    if(d->ID3v1Location >= 0)
+      d->ID3v1Location += (data.size() - d->APESize);
+
+    d->APESize = data.size();
+  }
+  else {
+
+    // APE tag is empty. Remove the old one.
+
+    if(d->APELocation >= 0) {
+      removeBlock(d->APELocation, d->APESize);
+
+      if(d->ID3v1Location >= 0)
+        d->ID3v1Location -= d->APESize;
+
+      d->APELocation = -1;
+      d->APESize = 0;
     }
   }
-  else
-    if(d->hasAPE) {
-      removeBlock(d->APELocation, d->APESize);
-      d->hasAPE = false;
-      if(d->hasID3v1) {
-        if(d->ID3v1Location > d->APELocation)
-          d->ID3v1Location -= d->APESize;
-      }
-    }
 
   return true;
 }
@@ -226,21 +227,18 @@ APE::Tag *MPC::File::APETag(bool create)
 
 void MPC::File::strip(int tags)
 {
-  if(tags & ID3v1) {
+  if(tags & ID3v1)
     d->tag.set(MPCID3v1Index, 0);
+
+  if(tags & APE)
+    d->tag.set(MPCAPEIndex, 0);
+
+  if(!ID3v1Tag())
     APETag(true);
-  }
 
   if(tags & ID3v2) {
     delete d->ID3v2Header;
     d->ID3v2Header = 0;
-  }
-
-  if(tags & APE) {
-    d->tag.set(MPCAPEIndex, 0);
-
-    if(!ID3v1Tag())
-      APETag(true);
   }
 }
 
@@ -251,12 +249,12 @@ void MPC::File::remove(int tags)
 
 bool MPC::File::hasID3v1Tag() const
 {
-  return d->hasID3v1;
+  return (d->ID3v1Location >= 0);
 }
 
 bool MPC::File::hasAPETag() const
 {
-  return d->hasAPE;
+  return (d->APELocation >= 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -265,30 +263,6 @@ bool MPC::File::hasAPETag() const
 
 void MPC::File::read(bool readProperties)
 {
-  // Look for an ID3v1 tag
-
-  d->ID3v1Location = Utils::findID3v1(this);
-
-  if(d->ID3v1Location >= 0) {
-    d->tag.set(MPCID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
-    d->hasID3v1 = true;
-  }
-
-  // Look for an APE tag
-
-  d->APELocation = Utils::findAPE(this, d->ID3v1Location);
-
-  if(d->APELocation >= 0) {
-    d->tag.set(MPCAPEIndex, new APE::Tag(this, d->APELocation));
-
-    d->APESize = APETag()->footer()->completeTagSize();
-    d->APELocation = d->APELocation + APE::Footer::size() - d->APESize;
-    d->hasAPE = true;
-  }
-
-  if(!d->hasID3v1)
-    APETag(true);
-
   // Look for an ID3v2 tag
 
   d->ID3v2Location = Utils::findID3v2(this);
@@ -297,8 +271,27 @@ void MPC::File::read(bool readProperties)
     seek(d->ID3v2Location);
     d->ID3v2Header = new ID3v2::Header(readBlock(ID3v2::Header::size()));
     d->ID3v2Size = d->ID3v2Header->completeTagSize();
-    d->hasID3v2 = true;
   }
+
+  // Look for an ID3v1 tag
+
+  d->ID3v1Location = Utils::findID3v1(this);
+
+  if(d->ID3v1Location >= 0)
+    d->tag.set(MPCID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
+
+  // Look for an APE tag
+
+  d->APELocation = Utils::findAPE(this, d->ID3v1Location);
+
+  if(d->APELocation >= 0) {
+    d->tag.set(MPCAPEIndex, new APE::Tag(this, d->APELocation));
+    d->APESize = APETag()->footer()->completeTagSize();
+    d->APELocation = d->APELocation + APE::Footer::size() - d->APESize;
+  }
+
+  if(d->ID3v1Location < 0)
+    APETag(true);
 
   // Look for MPC metadata
 
@@ -306,14 +299,14 @@ void MPC::File::read(bool readProperties)
 
     long streamLength;
 
-    if(d->hasAPE)
+    if(d->APELocation >= 0)
       streamLength = d->APELocation;
-    else if(d->hasID3v1)
+    else if(d->ID3v1Location >= 0)
       streamLength = d->ID3v1Location;
     else
       streamLength = length();
 
-    if(d->hasID3v2) {
+    if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2Size);
       streamLength -= (d->ID3v2Location + d->ID3v2Size);
     }
