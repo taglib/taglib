@@ -18,6 +18,7 @@
  * Fixed possible file corruptions when saving MPEG files.
  * Fixed possible file corruptions when saving APE files.
  * Fixed possible file corruptions when saving Musepack files.
+ * Fixed possible file corruptions when saving WavPack files.
  * Fixed updating the comment field of Vorbis comments.
  * Fixed reading date and time in ID3v2.3 tags.
  * Replaced ENABLE_STATIC build option with BUILD_SHARED_LIBS.
