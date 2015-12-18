@@ -19,6 +19,7 @@ class TestWavPack : public CppUnit::TestFixture
   CPPUNIT_TEST(testTaggedProperties);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testStripAndProperties);
+  CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -94,6 +95,32 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
       f.strip(WavPack::File::ID3v1);
       CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
+  }
+
+  void testRepeatedSave()
+  {
+    ScopedFileCopy copy("click", ".wv");
+
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+
+      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      f.APETag()->setTitle("0");
+      f.save();
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
+      f.save();
+    }
+    {
+      WavPack::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasAPETag());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
     }
   }
 
