@@ -209,7 +209,7 @@ check_cxx_source_compiles("
   int main() {
     _strdup(0);
     return 0;
-}
+  }
 " HAVE_ISO_STRDUP)
 
 # Check for libz using the cmake supplied FindZLIB.cmake
