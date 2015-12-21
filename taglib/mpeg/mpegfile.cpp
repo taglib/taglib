@@ -82,10 +82,10 @@ public:
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
   long ID3v2Location;
-  unsigned int ID3v2OriginalSize;
+  long ID3v2OriginalSize;
 
   long APELocation;
-  unsigned int APEOriginalSize;
+  long APEOriginalSize;
 
   long ID3v1Location;
 
@@ -274,7 +274,7 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
       insert(data, d->APELocation, d->APEOriginalSize);
 
       if(d->ID3v1Location >= 0)
-        d->ID3v1Location += (data.size() - d->APEOriginalSize);
+        d->ID3v1Location += (static_cast<long>(data.size()) - d->APEOriginalSize);
 
       d->APEOriginalSize = data.size();
     }

@@ -62,7 +62,7 @@ public:
   }
 
   long APELocation;
-  unsigned int APESize;
+  long APESize;
 
   long ID3v1Location;
 
@@ -174,7 +174,7 @@ bool WavPack::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (data.size() - d->APESize);
+      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
 
     d->APESize = data.size();
   }

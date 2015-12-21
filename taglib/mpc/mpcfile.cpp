@@ -62,13 +62,13 @@ public:
   }
 
   long APELocation;
-  unsigned int APESize;
+  long APESize;
 
   long ID3v1Location;
 
   ID3v2::Header *ID3v2Header;
   long ID3v2Location;
-  unsigned int ID3v2Size;
+  long ID3v2Size;
 
   TagUnion tag;
 
@@ -193,7 +193,7 @@ bool MPC::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (data.size() - d->APESize);
+      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
 
     d->APESize = data.size();
   }

@@ -80,7 +80,7 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   long ID3v2Location;
-  unsigned int ID3v2OriginalSize;
+  long ID3v2OriginalSize;
 
   long ID3v1Location;
 
@@ -226,10 +226,10 @@ bool FLAC::File::save()
 
   insert(data, d->flacStart, originalLength);
 
-  d->streamStart += (data.size() - originalLength);
+  d->streamStart += (static_cast<long>(data.size()) - originalLength);
 
   if(d->ID3v1Location >= 0)
-    d->ID3v1Location += (data.size() - originalLength);
+    d->ID3v1Location += (static_cast<long>(data.size()) - originalLength);
 
   // Update ID3 tags
 
@@ -243,11 +243,11 @@ bool FLAC::File::save()
     data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
-    d->flacStart   += (data.size() - d->ID3v2OriginalSize);
-    d->streamStart += (data.size() - d->ID3v2OriginalSize);
+    d->flacStart   += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+    d->streamStart += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (data.size() - d->ID3v2OriginalSize);
+      d->ID3v1Location += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
 
     d->ID3v2OriginalSize = data.size();
   }
