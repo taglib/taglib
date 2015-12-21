@@ -60,6 +60,8 @@ public:
     {
       FLAC::File f(newname.c_str());
       CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
+      CPPUNIT_ASSERT_EQUAL(69L, f.find("Artist"));
+      CPPUNIT_ASSERT_EQUAL(-1L, f.find("Artist", 70));
     }
   }
 
