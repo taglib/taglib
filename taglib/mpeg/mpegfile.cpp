@@ -218,10 +218,10 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
       insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
       if(d->APELocation >= 0)
-        d->APELocation += (data.size() - d->ID3v2OriginalSize);
+        d->APELocation += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
 
       if(d->ID3v1Location >= 0)
-        d->ID3v1Location += (data.size() - d->ID3v2OriginalSize);
+        d->ID3v1Location += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
 
       d->ID3v2OriginalSize = data.size();
     }
