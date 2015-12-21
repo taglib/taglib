@@ -165,9 +165,6 @@ namespace TagLib {
        * If you would like more granular control over the content of the tags,
        * with the concession of generality, use parameterized save call below.
        *
-       * \warning In the current implementation, it's dangerous to call save()
-       * repeatedly.  At worst it will corrupt the file.
-       *
        * \see save(int tags)
        */
       virtual bool save();
@@ -184,8 +181,8 @@ namespace TagLib {
        * The \a id3v2Version parameter specifies the version of the saved
        * ID3v2 tag. It can be either 4 or 3.
        *
-       * \warning In the current implementation, it's dangerous to call save()
-       * repeatedly.  At worst it will corrupt the file.
+       * If \a duplicateTags is true and at least one tag -- ID3v1 or ID3v2 --
+       * exists this will duplicate its content into the other tag.
        */
       bool save(int tags, bool stripOthers = true, int id3v2Version = 4, bool duplicateTags = true);
 
@@ -330,8 +327,6 @@ namespace TagLib {
 
       void read(bool readProperties);
       long long findID3v2();
-      long long findID3v1();
-      void findAPE();
 
       class FilePrivate;
       FilePrivate *d;

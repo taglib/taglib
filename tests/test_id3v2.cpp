@@ -1073,29 +1073,20 @@ public:
 
     {
       MPEG::File f(newname.c_str());
-      ID3v2::Tag *tag = f.ID3v2Tag(true);
-
-      ID3v2::TextIdentificationFrame *frame1 = new ID3v2::TextIdentificationFrame("TIT2");
-      frame1->setText("Title");
-      tag->addFrame(frame1);
-
-      ID3v2::AttachedPictureFrame *frame2 = new ID3v2::AttachedPictureFrame();
-      frame2->setPicture(ByteVector(100 * 1024, '\xff'));
-      tag->addFrame(frame2);
-
-      f.save();
-      CPPUNIT_ASSERT(f.length() > 100 * 1024);
+      f.ID3v2Tag()->setTitle(std::wstring(64 * 1024, L'X').c_str());
+      f.save(MPEG::File::ID3v2, true);
     }
-
     {
       MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
-
-      ID3v2::Tag *tag = f.ID3v2Tag();
-      tag->removeFrames("APIC");
-
-      f.save();
-      CPPUNIT_ASSERT(f.length() < 10 * 1024);
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(74789LL, f.length());
+      f.ID3v2Tag()->setTitle("ABCDEFGHIJ");
+      f.save(MPEG::File::ID3v2, true);
+    }
+    {
+      MPEG::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(9263LL, f.length());
     }
   }
 

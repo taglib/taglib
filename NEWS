@@ -10,11 +10,16 @@
  * Better handling of duplicate ID3v2 tags in all kinds of files.
  * Better handling of duplicate tag chunks in WAV files.
  * Better handling of duplicate tag chunks in AIFF files.
+ * Better handling of duplicate Vorbis comment blocks in FLAC files.
  * Fixed crash when calling File::properties() after strip().
  * Fixed crash when parsing certain MPEG files.
  * Fixed possible file corruptions when saving ASF files.
  * Fixed possible file corruptions when saving FLAC files.
  * Fixed possible file corruptions when saving MP4 files.
+ * Fixed possible file corruptions when saving MPEG files.
+ * Fixed possible file corruptions when saving APE files.
+ * Fixed possible file corruptions when saving Musepack files.
+ * Fixed possible file corruptions when saving WavPack files.
  * Fixed updating the comment field of Vorbis comments.
  * Fixed reading date and time in ID3v2.3 tags.
  * Replaced ENABLE_STATIC build option with BUILD_SHARED_LIBS.
