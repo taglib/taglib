@@ -10,6 +10,7 @@
  * Better handling of duplicate ID3v2 tags in all kinds of files.
  * Better handling of duplicate tag chunks in WAV files.
  * Better handling of duplicate tag chunks in AIFF files.
+ * Better handling of duplicate Vorbis comment blocks in FLAC files.
  * Fixed crash when calling File::properties() after strip().
  * Fixed crash when parsing certain MPEG files.
  * Fixed possible file corruptions when saving ASF files.
