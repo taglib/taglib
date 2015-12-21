@@ -85,7 +85,6 @@ public:
   unsigned int ID3v2OriginalSize;
 
   long APELocation;
-  long APEFooterLocation;
   unsigned int APEOriginalSize;
 
   long ID3v1Location;
