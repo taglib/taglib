@@ -265,17 +265,19 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     if(inflateInit(&stream) != Z_OK)
       return ByteVector();
 
-    stream.avail_in = (uLongf) frameData.size() - frameDataOffset;
-    stream.next_in = (Bytef *) frameData.data() + frameDataOffset;
+    ByteVector inData = frameData;
+
+    stream.avail_in = static_cast<uInt>(inData.size() - frameDataOffset);
+    stream.next_in = reinterpret_cast<Bytef *>(inData.data() + frameDataOffset);
 
     static const unsigned int chunkSize = 1024;
 
-    ByteVector data;
+    ByteVector outData;
     ByteVector chunk(chunkSize);
 
     do {
-      stream.avail_out = (uLongf) chunk.size();
-      stream.next_out = (Bytef *) chunk.data();
+      stream.avail_out = static_cast<uInt>(chunk.size());
+      stream.next_out = reinterpret_cast<Bytef *>(chunk.data());
 
       int result = inflate(&stream, Z_NO_FLUSH);
 
@@ -290,15 +292,15 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
         return ByteVector();
       }
 
-      data.append(stream.avail_out == 0 ? chunk : chunk.mid(0, chunk.size() - stream.avail_out));
+      outData.append(stream.avail_out == 0 ? chunk : chunk.mid(0, chunk.size() - stream.avail_out));
     } while(stream.avail_out == 0);
 
     inflateEnd(&stream);
 
-    if(frameDataLength != data.size())
+    if(frameDataLength != outData.size())
       debug("frameDataLength does not match the data length returned by zlib");
 
-    return data;
+    return outData;
   }
   else
 #endif
