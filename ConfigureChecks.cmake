@@ -212,7 +212,7 @@ check_cxx_source_compiles("
   }
 " HAVE_ISO_STRDUP)
 
-# Check for libz using the cmake supplied FindZLIB.cmake
+# Determine whether zlib is installed.
 
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
@@ -222,6 +222,8 @@ if(NOT ZLIB_SOURCE)
     set(HAVE_ZLIB 0)
   endif()
 endif()
+
+# Determine whether CppUnit is installed.
 
 if(BUILD_TESTS AND NOT BUILD_SHARED_LIBS)
   find_package(CppUnit)
