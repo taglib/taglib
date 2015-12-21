@@ -211,14 +211,14 @@ bool Ogg::XiphComment::isEmpty() const
 
 unsigned int Ogg::XiphComment::fieldCount() const
 {
-  unsigned int count = 0;
+  size_t count = 0;
 
   for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
     count += (*it).second.size();
 
   count += d->pictureList.size();
 
-  return count;
+  return static_cast<unsigned int>(count);
 }
 
 const Ogg::FieldListMap &Ogg::XiphComment::fieldListMap() const

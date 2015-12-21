@@ -58,7 +58,8 @@ namespace
 
 #ifdef _WIN32
 
-    len = ::WideCharToMultiByte(CP_UTF8, 0, src, srcLength, dst, dstLength, NULL, NULL);
+    len = ::WideCharToMultiByte(
+      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength), NULL, NULL);
 
 #else
 
@@ -91,7 +92,8 @@ namespace
 
 #ifdef _WIN32
 
-    len = ::MultiByteToWideChar(CP_UTF8, 0, src, srcLength, dst, dstLength);
+    len = ::MultiByteToWideChar(
+      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
 
 #else
 

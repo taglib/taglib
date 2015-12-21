@@ -82,13 +82,13 @@ bool Mod::File::save()
   seek(0);
   writeString(d->tag.title(), 20);
   StringList lines = d->tag.comment().split("\n");
-  unsigned int n = std::min<unsigned int>(lines.size(), d->properties.instrumentCount());
-  for(unsigned int i = 0; i < n; ++ i) {
+  size_t n = std::min<size_t>(lines.size(), d->properties.instrumentCount());
+  for(size_t i = 0; i < n; ++ i) {
     writeString(lines[i], 22);
     seek(8, Current);
   }
 
-  for(unsigned int i = n; i < d->properties.instrumentCount(); ++ i) {
+  for(size_t i = n; i < d->properties.instrumentCount(); ++ i) {
     writeString(String(), 22);
     seek(8, Current);
   }

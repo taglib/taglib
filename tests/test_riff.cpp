@@ -14,7 +14,7 @@ class PublicRIFF : public RIFF::File
 public:
   PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
   unsigned int riffSize() { return RIFF::File::riffSize(); };
-  unsigned int chunkCount() { return RIFF::File::chunkCount(); };
+  size_t chunkCount() { return RIFF::File::chunkCount(); };
   long long chunkOffset(unsigned int i) { return RIFF::File::chunkOffset(i); };
   unsigned int chunkPadding(unsigned int i) { return RIFF::File::chunkPadding(i); };
   unsigned int chunkDataSize(unsigned int i) { return RIFF::File::chunkDataSize(i); };

@@ -224,7 +224,7 @@ void RIFF::File::removeChunk(unsigned int i)
   std::vector<Chunk>::iterator it = d->chunks.begin();
   std::advance(it, i);
 
-  const unsigned int removeSize = it->size + it->padding + 8;
+  const size_t removeSize = it->size + it->padding + 8;
   removeBlock(it->offset - 8, removeSize);
   it = d->chunks.erase(it);
 
@@ -234,7 +234,7 @@ void RIFF::File::removeChunk(unsigned int i)
 
 void RIFF::File::removeChunk(const ByteVector &name)
 {
-  for(int i = d->chunks.size() - 1; i >= 0; --i) {
+  for(int i = static_cast<int>(d->chunks.size()) - 1; i >= 0; --i) {
     if(d->chunks[i].name == name)
       removeChunk(i);
   }

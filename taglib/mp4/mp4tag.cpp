@@ -628,8 +628,8 @@ MP4::Tag::saveNew(ByteVector data)
   long long offset = path.back()->offset + 8;
   d->file->insert(data, offset, 0);
 
-  updateParents(path, data.size());
-  updateOffsets(data.size(), offset);
+  updateParents(path, static_cast<long>(data.size()));
+  updateOffsets(static_cast<long>(data.size()), offset);
 
   // Insert the newly created atoms into the tree to keep it up-to-date.
 

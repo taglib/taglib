@@ -71,8 +71,8 @@ namespace TagLib
     inline String readString(File *file, int length)
     {
       ByteVector data = file->readBlock(length);
-      unsigned int size = data.size();
-      while (size >= 2) {
+      size_t size = data.size();
+      while(size >= 2) {
         if(data[size - 1] != '\0' || data[size - 2] != '\0') {
           break;
         }

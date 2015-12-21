@@ -63,7 +63,7 @@ namespace
 
     for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
       String s = *it;
-      int end = s.find(")");
+      size_t end = s.find(")");
 
       if(s.startsWith("(") && end > 0) {
         // "(12)Genre"
