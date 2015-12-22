@@ -93,10 +93,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
 
+    // This actually finds the second last valid frame, since MPEG::Header requires
+    // the next frame header to check if the frame length is calculated correctly.
+
     long last = f.lastFrameOffset();
     MPEG::Header lastHeader(&f, last);
 
-    while (!lastHeader.isValid()) {
+    while(!lastHeader.isValid()) {
       last = f.previousFrameOffset(last);
       lastHeader = MPEG::Header(&f, last);
     }

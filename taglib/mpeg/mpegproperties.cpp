@@ -205,6 +205,11 @@ void MPEG::Properties::read(File *file)
 
     d->bitrate = firstHeader.bitrate();
 
+    // Look for the last MPEG audio frame to calculate the stream length.
+
+    // This actually finds the second last valid frame, since MPEG::Header requires
+    // the next frame header to check if the frame length is calculated correctly.
+
     long lastFrameOffset = file->lastFrameOffset();
     if(lastFrameOffset < 0) {
       debug("MPEG::Properties::read() -- Could not find an MPEG frame in the stream.");
