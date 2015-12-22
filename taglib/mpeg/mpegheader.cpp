@@ -74,10 +74,10 @@ MPEG::Header::Header(const ByteVector &data) :
   debug("MPEG::Header::Header() - This constructor is no longer used.");
 }
 
-MPEG::Header::Header(File *file, long offset) :
+MPEG::Header::Header(File *file, long offset, bool checkLength) :
   d(new HeaderPrivate())
 {
-  parse(file, offset);
+  parse(file, offset, checkLength);
 }
 
 MPEG::Header::Header(const Header &h) :
@@ -169,7 +169,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::Header::parse(File *file, long offset)
+void MPEG::Header::parse(File *file, long offset, bool checkLength)
 {
   file->seek(offset);
   const ByteVector data = file->readBlock(4);
@@ -301,12 +301,26 @@ void MPEG::Header::parse(File *file, long offset)
   // Check if the frame length has been calculated correctly, or the next frame
   // synch bytes are right next to the end of this frame.
 
-  file->seek(offset + d->frameLength);
-  const ByteVector nextSynch = file->readBlock(2);
+  // We read some extra bytes to be a bit tolerant.
 
-  if(nextSynch.size() < 2 || !firstSyncByte(nextSynch[0]) || !secondSynchByte(nextSynch[1])) {
-    debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
-    return;
+  if(checkLength) {
+
+    bool nextFrameFound = false;
+
+    file->seek(offset + d->frameLength);
+    const ByteVector nextSynch = file->readBlock(4);
+
+    for(int i = 0; i < static_cast<int>(nextSynch.size()) - 1; ++i) {
+      if(firstSyncByte(nextSynch[0]) && secondSynchByte(nextSynch[1])) {
+        nextFrameFound = true;
+        break;
+      }
+    }
+
+    if(!nextFrameFound) {
+      debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
+      return;
+    }
   }
 
   // Now that we're done parsing, set this to be a valid frame.
