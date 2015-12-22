@@ -299,13 +299,13 @@ void MPEG::Header::parse(File *file, long offset)
     d->frameLength += paddingSize[layerIndex];
 
   // Check if the frame length has been calculated correctly, or the next frame
-  // header is near the end of this frame.
+  // synch bytes are right next to the end of this frame.
 
   file->seek(offset + d->frameLength);
   const ByteVector nextSynch = file->readBlock(2);
 
   if(nextSynch.size() < 2 || !firstSyncByte(nextSynch[0]) || !secondSynchByte(nextSynch[1])) {
-    debug("MPEG::Header::parse() -- Frame length seems to be wrong.");
+    debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
     return;
   }
 
