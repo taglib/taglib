@@ -34,28 +34,10 @@
 
 #include "mpegfile.h"
 #include "mpegheader.h"
+#include "mpegutils.h"
 #include "tpropertymap.h"
 
 using namespace TagLib;
-
-namespace
-{
-  /*!
-   * MPEG frames can be recognized by the bit pattern 11111111 111, so the
-   * first byte is easy to check for, however checking to see if the second byte
-   * starts with \e 111 is a bit more tricky, hence these functions.
-   */
-
-  inline bool firstSyncByte(unsigned char byte)
-  {
-    return (byte == 0xFF);
-  }
-
-  inline bool secondSynchByte(unsigned char byte)
-  {
-    return ((byte & 0xE0) == 0xE0);
-  }
-}
 
 namespace
 {

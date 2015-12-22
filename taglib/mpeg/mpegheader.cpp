@@ -26,9 +26,10 @@
 #include <tbytevector.h>
 #include <tstring.h>
 #include <tdebug.h>
-#include "trefcounter.h"
+#include <trefcounter.h>
 
 #include "mpegheader.h"
+#include "mpegutils.h"
 
 using namespace TagLib;
 
@@ -170,13 +171,8 @@ void MPEG::Header::parse(const ByteVector &data)
 
   // Check for the MPEG synch bytes.
 
-  if(static_cast<unsigned char>(data[0]) != 0xFF) {
-    debug("MPEG::Header::parse() -- First byte did not match MPEG synch.");
-    return;
-  }
-
-  if((static_cast<unsigned char>(data[1]) & 0xE0) != 0xE0) {
-    debug("MPEG::Header::parse() -- Second byte did not match MPEG synch.");
+  if(!firstSyncByte(data[0]) || !secondSynchByte(data[1])) {
+    debug("MPEG::Header::parse() -- MPEG header did not match MPEG synch.");
     return;
   }
 
