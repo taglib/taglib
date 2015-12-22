@@ -31,6 +31,7 @@
 namespace TagLib {
 
   class ByteVector;
+  class File;
 
   namespace MPEG {
 
@@ -48,8 +49,15 @@ namespace TagLib {
     public:
       /*!
        * Parses an MPEG header based on \a data.
+       *
+       * \deprecated
        */
       Header(const ByteVector &data);
+
+      /*!
+       * Parses an MPEG header based on \a file and \a offset.
+       */
+      Header(File *file, long offset);
 
       /*!
        * Does a shallow copy of \a h.
@@ -155,7 +163,7 @@ namespace TagLib {
       Header &operator=(const Header &h);
 
     private:
-      void parse(const ByteVector &data);
+      void parse(File *file, long offset);
 
       class HeaderPrivate;
       HeaderPrivate *d;
