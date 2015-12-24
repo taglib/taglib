@@ -36,6 +36,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v1);
   CPPUNIT_TEST(testUpdateID3v2);
   CPPUNIT_TEST(testEmptyID3v2);
+  CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -413,6 +414,57 @@ public:
     {
       FLAC::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
+    }
+  }
+
+  void testStripTags()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment(true)->setTitle("XiphComment Title");
+      f.ID3v1Tag(true)->setTitle("ID3v1 Title");
+      f.ID3v2Tag(true)->setTitle("ID3v2 Title");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v1 Title"), f.ID3v1Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      f.strip(FLAC::File::ID3v2);
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v1 Title"), f.ID3v1Tag()->title());
+      f.strip(FLAC::File::ID3v1);
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
+      f.strip(FLAC::File::XiphComment);
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.xiphComment()->isEmpty());
+      CPPUNIT_ASSERT_EQUAL(String("reference libFLAC 1.1.0 20030126"), f.xiphComment()->vendorID());
     }
   }
 

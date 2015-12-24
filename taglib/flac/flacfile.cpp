@@ -372,6 +372,20 @@ void FLAC::File::removePictures()
   }
 }
 
+void FLAC::File::strip(int tags)
+{
+  if(tags & ID3v1)
+    d->tag.set(FlacID3v1Index, 0);
+
+  if(tags & ID3v2)
+    d->tag.set(FlacID3v2Index, 0);
+
+  if(tags & XiphComment) {
+    xiphComment()->removeAllFields();
+    xiphComment()->removeAllPictures();
+  }
+}
+
 bool FLAC::File::hasXiphComment() const
 {
   return !d->xiphCommentData.isEmpty();
