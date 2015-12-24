@@ -4,6 +4,7 @@
  * Added support for ID3v2 PCST and WFED frames.
  * Added support for pictures in XiphComment.
  * Added String::clear().
+ * Added FLAC::File::strip() for removing non-standard tags.
  * Added alternative functions to XiphComment::removeField().
  * Added BUILD_BINDINGS build option.
  * Added ENABLE_CCACHE build option.
