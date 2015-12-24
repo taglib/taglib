@@ -25,6 +25,7 @@
 
 #include <tbytevector.h>
 #include <tstring.h>
+#include <tfile.h>
 #include <tdebug.h>
 #include <trefcounter.h>
 
@@ -70,7 +71,13 @@ public:
 MPEG::Header::Header(const ByteVector &data) :
   d(new HeaderPrivate())
 {
-  parse(data);
+  debug("MPEG::Header::Header() - This constructor is no longer used.");
+}
+
+MPEG::Header::Header(File *file, long offset, bool checkLength) :
+  d(new HeaderPrivate())
+{
+  parse(file, offset, checkLength);
 }
 
 MPEG::Header::Header(const Header &h) :
@@ -162,8 +169,11 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::Header::parse(const ByteVector &data)
+void MPEG::Header::parse(File *file, long offset, bool checkLength)
 {
+  file->seek(offset);
+  const ByteVector data = file->readBlock(4);
+
   if(data.size() < 4) {
     debug("MPEG::Header::parse() -- data is too short for an MPEG frame header.");
     return;
@@ -287,6 +297,31 @@ void MPEG::Header::parse(const ByteVector &data)
 
   if(d->isPadded)
     d->frameLength += paddingSize[layerIndex];
+
+  // Check if the frame length has been calculated correctly, or the next frame
+  // synch bytes are right next to the end of this frame.
+
+  // We read some extra bytes to be a bit tolerant.
+
+  if(checkLength) {
+
+    bool nextFrameFound = false;
+
+    file->seek(offset + d->frameLength);
+    const ByteVector nextSynch = file->readBlock(4);
+
+    for(int i = 0; i < static_cast<int>(nextSynch.size()) - 1; ++i) {
+      if(firstSyncByte(nextSynch[0]) && secondSynchByte(nextSynch[1])) {
+        nextFrameFound = true;
+        break;
+      }
+    }
+
+    if(!nextFrameFound) {
+      debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
+      return;
+    }
+  }
 
   // Now that we're done parsing, set this to be a valid frame.
 
