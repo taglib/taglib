@@ -311,7 +311,7 @@ void MPEG::Header::parse(File *file, long offset, bool checkLength)
     const ByteVector nextSynch = file->readBlock(4);
 
     for(int i = 0; i < static_cast<int>(nextSynch.size()) - 1; ++i) {
-      if(firstSyncByte(nextSynch[0]) && secondSynchByte(nextSynch[1])) {
+      if(firstSyncByte(nextSynch[i]) && secondSynchByte(nextSynch[i + 1])) {
         nextFrameFound = true;
         break;
       }
