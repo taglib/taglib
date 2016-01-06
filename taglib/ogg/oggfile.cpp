@@ -271,30 +271,14 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
 
   // Write the pages.
 
+  ByteVector data;
+  for(it = pages.begin(); it != pages.end(); ++it)
+    data.append((*it)->render());
+
   const unsigned long originalOffset = firstPage->fileOffset();
   const unsigned long originalLength = lastPage->fileOffset() + lastPage->size() - originalOffset;
 
-  unsigned long writtenLength = 0;
-
-  for(it = pages.begin(); it != pages.end(); ++it) {
-    const ByteVector data = (*it)->render();
-
-    unsigned long replace;
-
-    if(writtenLength + data.size() <= originalLength)
-      replace = data.size();
-    else if(writtenLength <= originalLength)
-      replace = originalLength - writtenLength;
-    else
-      replace = 0;
-
-    insert(data, originalOffset + writtenLength, replace);
-
-    writtenLength += data.size();
-  }
-
-  if(writtenLength < originalLength)
-    removeBlock(originalOffset + writtenLength, originalLength - writtenLength);
+  insert(data, originalOffset, originalLength);
 
   // Renumber the following pages if the pages have been split or merged.
 
@@ -302,7 +286,7 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
     = pages.back()->pageSequenceNumber() - lastPage->pageSequenceNumber();
 
   if(numberOfNewPages != 0) {
-    long pageOffset = originalOffset + writtenLength;
+    long pageOffset = originalOffset + data.size();
 
     while(true) {
       Page page(this, pageOffset);
