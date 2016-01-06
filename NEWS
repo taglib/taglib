@@ -15,6 +15,7 @@
  * Better handling of broken MPEG audio frames.
  * Fixed crash when calling File::properties() after strip().
  * Fixed crash when parsing certain MPEG files.
+ * Fixed crash when saving Ogg files.
  * Fixed possible file corruptions when saving ASF files.
  * Fixed possible file corruptions when saving FLAC files.
  * Fixed possible file corruptions when saving MP4 files.
