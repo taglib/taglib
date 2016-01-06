@@ -4,6 +4,7 @@
  * Added support for ID3v2 PCST and WFED frames.
  * Added support for pictures in XiphComment.
  * Added String::clear().
+ * Added FLAC::File::strip() for removing non-standard tags.
  * Added alternative functions to XiphComment::removeField().
  * Added BUILD_BINDINGS build option.
  * Added ENABLE_CCACHE build option.
@@ -11,6 +12,7 @@
  * Better handling of duplicate tag chunks in WAV files.
  * Better handling of duplicate tag chunks in AIFF files.
  * Better handling of duplicate Vorbis comment blocks in FLAC files.
+ * Better handling of broken MPEG audio frames.
  * Fixed crash when calling File::properties() after strip().
  * Fixed crash when parsing certain MPEG files.
  * Fixed possible file corruptions when saving ASF files.

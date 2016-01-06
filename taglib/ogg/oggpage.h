@@ -71,10 +71,27 @@ namespace TagLib {
       const PageHeader *header() const;
 
       /*!
+       * Returns the index of the page within the Ogg stream.  This helps make it
+       * possible to determine if pages have been lost.
+       *
+       * \see setPageSequenceNumber()
+       */
+      int pageSequenceNumber() const;
+
+      /*!
+       * Sets the page's position in the stream to \a sequenceNumber.
+       *
+       * \see pageSequenceNumber()
+       */
+      void setPageSequenceNumber(int sequenceNumber);
+
+      /*!
        * Returns a copy of the page with \a sequenceNumber set as sequence number.
        *
        * \see header()
        * \see PageHeader::setPageSequenceNumber()
+       *
+       * \deprecated
        */
       Page* getCopyWithNewPageSequenceNumber(int sequenceNumber);
 
