@@ -306,19 +306,10 @@ void MPEG::Header::parse(File *file, long offset, bool checkLength)
 
   if(checkLength) {
 
-    bool nextFrameFound = false;
-
     file->seek(offset + d->frameLength);
-    const ByteVector nextSynch = file->readBlock(16);
+    const ByteVector nextSynch = file->readBlock(2);
 
-    for(int i = 0; i < static_cast<int>(nextSynch.size()) - 1; ++i) {
-      if(firstSyncByte(nextSynch[i]) && secondSynchByte(nextSynch[i + 1])) {
-        nextFrameFound = true;
-        break;
-      }
-    }
-
-    if(!nextFrameFound) {
+    if(nextSynch.size() < 2 || !firstSyncByte(nextSynch[0]) || !secondSynchByte(nextSynch[1])) {
       debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
       return;
     }
