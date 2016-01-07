@@ -42,6 +42,7 @@ public:
     version(Version1),
     layer(0),
     protectionEnabled(false),
+    bitrate(0),
     sampleRate(0),
     isPadded(false),
     channelMode(Stereo),
@@ -308,7 +309,7 @@ void MPEG::Header::parse(File *file, long offset, bool checkLength)
     bool nextFrameFound = false;
 
     file->seek(offset + d->frameLength);
-    const ByteVector nextSynch = file->readBlock(4);
+    const ByteVector nextSynch = file->readBlock(16);
 
     for(int i = 0; i < static_cast<int>(nextSynch.size()) - 1; ++i) {
       if(firstSyncByte(nextSynch[i]) && secondSynchByte(nextSynch[i + 1])) {
