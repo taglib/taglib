@@ -48,7 +48,9 @@ namespace TagLib
 
     inline bool secondSynchByte(unsigned char byte)
     {
-      return ((byte & 0xE0) == 0xE0);
+      // 0xFF is possible in theory, but it's very unlikely be a header.
+
+      return (byte != 0xFF && ((byte & 0xE0) == 0xE0));
     }
 
   }
