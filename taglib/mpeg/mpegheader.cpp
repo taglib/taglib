@@ -307,10 +307,24 @@ void MPEG::Header::parse(File *file, long offset, bool checkLength)
   if(checkLength) {
 
     file->seek(offset + d->frameLength);
-    const ByteVector nextSynch = file->readBlock(2);
+    const ByteVector nextData = file->readBlock(4);
 
-    if(nextSynch.size() < 2 || !firstSyncByte(nextSynch[0]) || !secondSynchByte(nextSynch[1])) {
-      debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
+    if(nextData.size() < 4) {
+      debug("MPEG::Header::parse() -- Could not read the next frame header.");
+      return;
+    }
+
+    // The MPEG versions, layers and sample rates of the two frames should be
+    // consistent. Otherwise, we assume that either or both of the frames are
+    // broken.
+
+    const unsigned int HeaderMask = 0xfffe0c00;
+
+    const unsigned int header     = data.toUInt(0, true)     & HeaderMask;
+    const unsigned int nextHeader = nextData.toUInt(0, true) & HeaderMask;
+
+    if(header != nextHeader) {
+      debug("MPEG::Header::parse() -- The next frame was not consistent with this frame.");
       return;
     }
   }
