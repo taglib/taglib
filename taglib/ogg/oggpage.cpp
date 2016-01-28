@@ -269,27 +269,10 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
   return l;
 }
 
-Ogg::Page* Ogg::Page::getCopyWithNewPageSequenceNumber(int sequenceNumber)
+Ogg::Page* Ogg::Page::getCopyWithNewPageSequenceNumber(int /*sequenceNumber*/)
 {
-  Page *pResultPage = NULL;
-
-  // TODO: a copy constructor would be helpful
-
-  if(d->file == 0) {
-    pResultPage = new Page(
-        d->packets,
-        d->header.streamSerialNumber(),
-        sequenceNumber,
-        d->header.firstPacketContinued(),
-        d->header.lastPacketCompleted(),
-        d->header.lastPageOfStream());
-  }
-  else
-  {
-    pResultPage = new Page(d->file, d->fileOffset);
-    pResultPage->d->header.setPageSequenceNumber(sequenceNumber);
-  }
-  return pResultPage;
+  debug("Ogg::Page::getCopyWithNewPageSequenceNumber() -- This function is obsolete. Returning null.");
+  return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

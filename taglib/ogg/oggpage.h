@@ -91,7 +91,7 @@ namespace TagLib {
        * \see header()
        * \see PageHeader::setPageSequenceNumber()
        *
-       * \deprecated
+       * \deprecated Always returns null.
        */
       Page* getCopyWithNewPageSequenceNumber(int sequenceNumber);
 

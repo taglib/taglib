@@ -29,6 +29,7 @@
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
  * Marked String::null and ByteVector::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.
+ * Marked Ogg::Page::getCopyWithNewPageSequenceNumber() deprecated. It returns null.
  * Marked custom integer types deprecated.
  * Many smaller bug fixes and performance improvements.
 
