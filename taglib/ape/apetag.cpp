@@ -303,39 +303,41 @@ void APE::Tag::removeItem(const String &key)
 
 void APE::Tag::addValue(const String &key, const String &value, bool replace)
 {
-  if(!checkKey(key)) {
-    debug("APE::Tag::addValue() - Couldn't add a value due to an invalid key.");
-    return;
-  }
-
   if(replace)
     removeItem(key);
 
-  if(!value.isEmpty()) {
-    if(!replace && d->itemListMap.contains(key)) {
-      // Text items may contain more than one value
-      if(APE::Item::Text == d->itemListMap.begin()->second.type())
-        d->itemListMap[key.upper()].appendValue(value);
-      // Binary or locator items may have only one value
-      else
-        setItem(key, Item(key, value));
-    }
-    else
-      setItem(key, Item(key, value));
-  }
+  if(value.isEmpty())
+    return;
+
+  // Text items may contain more than one value.
+  // Binary or locator items may have only one value, hence always replaced.
+
+  ItemListMap::Iterator it = d->itemListMap.find(key.upper());
+
+  if(it != d->itemListMap.end() && it->second.type() == Item::Text)
+    it->second.appendValue(value);
+  else
+    setItem(key, Item(key, value));
 }
 
 void APE::Tag::setData(const String &key, const ByteVector &value)
 {
   removeItem(key);
-  if(!key.isEmpty() && !value.isEmpty())
-    setItem(key, Item(key, value, true));
+
+  if(value.isEmpty())
+    return;
+
+  setItem(key, Item(key, value, true));
 }
 
 void APE::Tag::setItem(const String &key, const Item &item)
 {
-  if(!key.isEmpty())
-    d->itemListMap.insert(key.upper(), item);
+  if(!checkKey(key)) {
+    debug("APE::Tag::setItem() - Couldn't set an item due to an invalid key.");
+    return;
+  }
+
+  d->itemListMap[key.upper()] = item;
 }
 
 bool APE::Tag::isEmpty() const
