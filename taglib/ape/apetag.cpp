@@ -35,6 +35,7 @@
 #include <tstring.h>
 #include <tmap.h>
 #include <tpropertymap.h>
+#include <tdebug.h>
 
 #include "apetag.h"
 #include "apefooter.h"
@@ -42,20 +43,6 @@
 
 using namespace TagLib;
 using namespace APE;
-
-namespace
-{
-  inline bool isValidItemKey(const String &key)
-  {
-    for(String::ConstIterator it = key.begin(); it != key.end(); ++it) {
-      const int c = static_cast<unsigned short>(*it);
-      if(c < 0x20 || 0x7E < c)
-        return false;
-    }
-
-    return true;
-  }
-}
 
 class APE::Tag::TagPrivate
 {
@@ -283,15 +270,20 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 bool APE::Tag::checkKey(const String &key)
 {
   if(key.size() < 2 || key.size() > 16)
+    return false;
+
+  for(String::ConstIterator it = key.begin(); it != key.end(); it++) {
+    // only allow printable ASCII including space (32..126)
+    const int c = static_cast<unsigned short>(*it);
+    if(c < 32 || c > 126)
       return false;
-    for(String::ConstIterator it = key.begin(); it != key.end(); it++)
-        // only allow printable ASCII including space (32..127)
-        if (*it < 32 || *it >= 128)
-          return false;
-    String upperKey = key.upper();
-    if (upperKey=="ID3" || upperKey=="TAG" || upperKey=="OGGS" || upperKey=="MP+")
-      return false;
-    return true;
+  }
+
+  const String upperKey = key.upper();
+  if(upperKey == "ID3" || upperKey == "TAG" || upperKey == "OGGS" || upperKey == "MP+")
+    return false;
+
+  return true;
 }
 
 APE::Footer *APE::Tag::footer() const
@@ -311,9 +303,15 @@ void APE::Tag::removeItem(const String &key)
 
 void APE::Tag::addValue(const String &key, const String &value, bool replace)
 {
+  if(!checkKey(key)) {
+    debug("APE::Tag::addValue() - Couldn't add a value due to an invalid key.");
+    return;
+  }
+
   if(replace)
     removeItem(key);
-  if(!key.isEmpty() && !value.isEmpty()) {
+
+  if(!value.isEmpty()) {
     if(!replace && d->itemListMap.contains(key)) {
       // Text items may contain more than one value
       if(APE::Item::Text == d->itemListMap.begin()->second.type())
@@ -395,8 +393,12 @@ void APE::Tag::parse(const ByteVector &data)
     APE::Item item;
     item.parse(data.mid(pos));
 
-    if(isValidItemKey(item.key()))
+    if(checkKey(item.key())) {
       d->itemListMap.insert(item.key().upper(), item);
+    }
+    else {
+      debug("APE::Tag::parse() - Skipped an item due to an invalid key.");
+    }
 
     pos += item.size();
   }
