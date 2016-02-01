@@ -43,6 +43,20 @@
 using namespace TagLib;
 using namespace APE;
 
+namespace
+{
+  inline bool isValidItemKey(const String &key)
+  {
+    for(String::ConstIterator it = key.begin(); it != key.end(); ++it) {
+      const int c = static_cast<unsigned short>(*it);
+      if(c < 0x20 || 0x7E < c)
+        return false;
+    }
+
+    return true;
+  }
+}
+
 class APE::Tag::TagPrivate
 {
 public:
@@ -381,7 +395,8 @@ void APE::Tag::parse(const ByteVector &data)
     APE::Item item;
     item.parse(data.mid(pos));
 
-    d->itemListMap.insert(item.key().upper(), item);
+    if(isValidItemKey(item.key()))
+      d->itemListMap.insert(item.key().upper(), item);
 
     pos += item.size();
   }

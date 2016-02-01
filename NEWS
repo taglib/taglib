@@ -2,7 +2,8 @@ TagLib 1.11 (Jan 30, 2016)
 ==========================
 
  * Better handling of PCM WAV files with a 'fact' chunk.
-
+ * Better handling of corrupted APE tags.
+ 
 1.11 BETA:
 
  * New API for creating FileRef from IOStream.
