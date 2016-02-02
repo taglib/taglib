@@ -36,13 +36,41 @@
 #include <tmap.h>
 #include <tpropertymap.h>
 #include <tdebug.h>
+#include <tutils.h>
 
 #include "apetag.h"
 #include "apefooter.h"
 #include "apeitem.h"
 
+
 using namespace TagLib;
 using namespace APE;
+
+namespace
+{
+  inline bool isKeyValid(const char *key, size_t length)
+  {
+    const char *invalidKeys[] = { "ID3", "TAG", "OGGS", "MP+", 0 };
+
+    if(length < 2 || length > 16)
+      return false;
+
+    // only allow printable ASCII including space (32..126)
+
+    for(const char *p = key; p < key + length; ++p) {
+      const int c = static_cast<unsigned char>(*p);
+      if(c < 32 || c > 126)
+        return false;
+    }
+
+    for(size_t i = 0; invalidKeys[i] != 0; ++i) {
+      if(Utils::equalsIgnoreCase(key, invalidKeys[i]))
+        return false;
+    }
+
+    return true;
+  }
+}
 
 class APE::Tag::TagPrivate
 {
@@ -269,21 +297,11 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
 bool APE::Tag::checkKey(const String &key)
 {
-  if(key.size() < 2 || key.size() > 16)
+  if(!key.isLatin1())
     return false;
 
-  for(String::ConstIterator it = key.begin(); it != key.end(); it++) {
-    // only allow printable ASCII including space (32..126)
-    const int c = static_cast<unsigned short>(*it);
-    if(c < 32 || c > 126)
-      return false;
-  }
-
-  const String upperKey = key.upper();
-  if(upperKey == "ID3" || upperKey == "TAG" || upperKey == "OGGS" || upperKey == "MP+")
-    return false;
-
-  return true;
+  const std::string data = key.to8Bit(false);
+  return isKeyValid(data.c_str(), data.size());
 }
 
 APE::Footer *APE::Tag::footer() const
@@ -392,16 +410,21 @@ void APE::Tag::parse(const ByteVector &data)
   unsigned int pos = 0;
 
   for(unsigned int i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
-    APE::Item item;
-    item.parse(data.mid(pos));
 
-    if(checkKey(item.key())) {
+    const char *key = &data[pos + 8];
+    const size_t keyLength = ::strnlen(key, data.size() - pos - 8);
+    const size_t valLegnth = data.toUInt(pos, false);
+
+    if(isKeyValid(key, keyLength)){
+      APE::Item item;
+      item.parse(data.mid(pos));
+
       d->itemListMap.insert(item.key().upper(), item);
     }
     else {
       debug("APE::Tag::parse() - Skipped an item due to an invalid key.");
     }
 
-    pos += item.size();
+    pos += static_cast<unsigned int>(keyLength + valLegnth + 9);
   }
 }

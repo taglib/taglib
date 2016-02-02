@@ -253,8 +253,9 @@ void APE::Item::parse(const ByteVector &data)
   const unsigned int flags        = data.toUInt(4, false);
 
   // An item key can contain ASCII characters from 0x20 up to 0x7E, not UTF-8.
+  // We assume that the validity of the given key has been checked.
 
-  d->key = String(data.mid(8), String::Latin1);
+  d->key = String(&data[8], String::Latin1);
 
   const ByteVector value = data.mid(8 + d->key.size() + 1, valueLength);
 
