@@ -42,7 +42,6 @@
 #include "apefooter.h"
 #include "apeitem.h"
 
-
 using namespace TagLib;
 using namespace APE;
 
@@ -411,11 +410,16 @@ void APE::Tag::parse(const ByteVector &data)
 
   for(unsigned int i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
 
-    const char *key = &data[pos + 8];
-    const size_t keyLength = ::strnlen(key, data.size() - pos - 8);
-    const size_t valLegnth = data.toUInt(pos, false);
+    const int nullPos = data.find('\0', pos + 8);
+    if(nullPos < 0) {
+      debug("APE::Tag::parse() - Couldn't find a key/value separator. Stopped parsing.");
+      return;
+    }
 
-    if(isKeyValid(key, keyLength)){
+    const unsigned int keyLength = nullPos - pos - 8;
+    const unsigned int valLegnth = data.toUInt(pos, false);
+
+    if(isKeyValid(&data[pos + 8], keyLength)){
       APE::Item item;
       item.parse(data.mid(pos));
 
@@ -425,6 +429,6 @@ void APE::Tag::parse(const ByteVector &data)
       debug("APE::Tag::parse() - Skipped an item due to an invalid key.");
     }
 
-    pos += static_cast<unsigned int>(keyLength + valLegnth + 9);
+    pos += keyLength + valLegnth + 9;
   }
 }
