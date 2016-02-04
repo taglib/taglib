@@ -97,6 +97,11 @@ public:
     CPPUNIT_ASSERT_EQUAL((size_t)2, unsuccessful.size());
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
+
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, tag.itemListMap().size());
+    tag.addValue("VALID KEY", "Test Value 1");
+    tag.addValue("INVALID KEY \x7f", "Test Value 2");
+    CPPUNIT_ASSERT_EQUAL((unsigned int)3, tag.itemListMap().size());
   }
 
   void testTextBinary()

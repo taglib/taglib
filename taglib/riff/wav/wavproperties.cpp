@@ -180,7 +180,7 @@ void RIFF::WAV::AudioProperties::read(File *file)
   d->sampleRate    = data.toUInt32LE(4);
   d->bitsPerSample = data.toUInt16LE(14);
 
-  if(totalSamples > 0)
+  if(d->format != FORMAT_PCM)
     d->sampleFrames = totalSamples;
   else if(d->channels > 0 && d->bitsPerSample > 0)
     d->sampleFrames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));

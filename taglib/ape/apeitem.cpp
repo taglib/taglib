@@ -34,7 +34,9 @@ using namespace APE;
 class APE::Item::ItemPrivate
 {
 public:
-  ItemPrivate() : type(Text), readOnly(false) {}
+  ItemPrivate() :
+    type(Text),
+    readOnly(false) {}
 
   Item::ItemTypes type;
   String key;
@@ -74,8 +76,9 @@ APE::Item::Item(const String &key, const ByteVector &value, bool binary) :
     d->type = Binary;
     d->value = value;
   }
-  else
+  else {
     d->text.append(value);
+  }
 }
 
 APE::Item::Item(const Item &item) :
@@ -173,9 +176,8 @@ void APE::Item::appendValues(const StringList &values)
 
 int APE::Item::size() const
 {
-  // SFB: Why is d->key.size() used when size() returns the length in UniChars and not UTF-8?
-  size_t result = 8 + d->key.size() /* d->key.data(String::UTF8).size() */ + 1;
-  switch (d->type) {
+  size_t result = 8 + d->key.size() + 1;
+  switch(d->type) {
     case Text:
       if(!d->text.isEmpty()) {
         StringList::ConstIterator it = d->text.begin();
@@ -237,7 +239,10 @@ void APE::Item::parse(const ByteVector &data)
   const unsigned int valueLength  = data.toUInt32LE(0);
   const unsigned int flags        = data.toUInt32LE(4);
 
-  d->key = String(data.mid(8), String::UTF8);
+  // An item key can contain ASCII characters from 0x20 up to 0x7E, not UTF-8.
+  // We assume that the validity of the given key has been checked.
+
+  d->key = String(&data[8], String::Latin1);
 
   const ByteVector value = data.mid(8 + d->key.size() + 1, valueLength);
 
@@ -275,7 +280,7 @@ ByteVector APE::Item::render() const
 
   data.append(ByteVector::fromUInt32LE(value.size()));
   data.append(ByteVector::fromUInt32LE(flags));
-  data.append(d->key.data(String::UTF8));
+  data.append(d->key.data(String::Latin1));
   data.append(ByteVector('\0'));
   data.append(value);
 

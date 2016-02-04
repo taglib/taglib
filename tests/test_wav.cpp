@@ -25,6 +25,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST(testStripAndProperties);
+  CPPUNIT_TEST(testPCMWithFactChunk);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -245,6 +246,22 @@ public:
       f.strip(RIFF::WAV::File::Info);
       CPPUNIT_ASSERT(f.properties().isEmpty());
     }
+  }
+
+  void testPCMWithFactChunk()
+  {
+    RIFF::WAV::File f(TEST_FILE_PATH_C("pcm_with_fact_chunk.wav"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
+    CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
   }
 
 };

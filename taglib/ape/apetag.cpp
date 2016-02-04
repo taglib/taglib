@@ -36,6 +36,8 @@
 #include <tmap.h>
 #include <tpicturemap.h>
 #include <tpropertymap.h>
+#include <tdebug.h>
+#include <tutils.h>
 
 #include "apetag.h"
 #include "apefooter.h"
@@ -43,6 +45,32 @@
 
 using namespace TagLib;
 using namespace APE;
+
+namespace
+{
+  inline bool isKeyValid(const char *key, size_t length)
+  {
+    const char *invalidKeys[] = { "ID3", "TAG", "OGGS", "MP+", 0 };
+
+    if(length < 2 || length > 16)
+      return false;
+
+    // only allow printable ASCII including space (32..126)
+
+    for(const char *p = key; p < key + length; ++p) {
+      const int c = static_cast<unsigned char>(*p);
+      if(c < 32 || c > 126)
+        return false;
+    }
+
+    for(size_t i = 0; invalidKeys[i] != 0; ++i) {
+      if(Utils::equalsIgnoreCase(key, invalidKeys[i]))
+        return false;
+    }
+
+    return true;
+  }
+}
 
 class APE::Tag::TagPrivate
 {
@@ -362,16 +390,11 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
 bool APE::Tag::checkKey(const String &key)
 {
-  if(key.size() < 2 || key.size() > 16)
-      return false;
-    for(String::ConstIterator it = key.begin(); it != key.end(); it++)
-        // only allow printable ASCII including space (32..127)
-        if (*it < 32 || *it >= 128)
-          return false;
-    String upperKey = key.upper();
-    if (upperKey=="ID3" || upperKey=="TAG" || upperKey=="OGGS" || upperKey=="MP+")
-      return false;
-    return true;
+  if(!key.isLatin1())
+    return false;
+
+  const std::string data = key.to8Bit(false);
+  return isKeyValid(data.c_str(), data.size());
 }
 
 APE::Footer *APE::Tag::footer() const
@@ -393,31 +416,39 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
 {
   if(replace)
     removeItem(key);
-  if(!key.isEmpty() && !value.isEmpty()) {
-    if(!replace && d->itemListMap.contains(key)) {
-      // Text items may contain more than one value
-      if(APE::Item::Text == d->itemListMap.begin()->second.type())
-        d->itemListMap[key.upper()].appendValue(value);
-      // Binary or locator items may have only one value
-      else
-        setItem(key, Item(key, value));
-    }
-    else
-      setItem(key, Item(key, value));
-  }
+
+  if(value.isEmpty())
+    return;
+
+  // Text items may contain more than one value.
+  // Binary or locator items may have only one value, hence always replaced.
+
+  ItemListMap::Iterator it = d->itemListMap.find(key.upper());
+
+  if(it != d->itemListMap.end() && it->second.type() == Item::Text)
+    it->second.appendValue(value);
+  else
+    setItem(key, Item(key, value));
 }
 
 void APE::Tag::setData(const String &key, const ByteVector &value)
 {
   removeItem(key);
-  if(!key.isEmpty() && !value.isEmpty())
-    setItem(key, Item(key, value, true));
+
+  if(value.isEmpty())
+    return;
+
+  setItem(key, Item(key, value, true));
 }
 
 void APE::Tag::setItem(const String &key, const Item &item)
 {
-  if(!key.isEmpty())
-    d->itemListMap.insert(key.upper(), item);
+  if(!checkKey(key)) {
+    debug("APE::Tag::setItem() - Couldn't set an item due to an invalid key.");
+    return;
+  }
+
+  d->itemListMap[key.upper()] = item;
 }
 
 bool APE::Tag::isEmpty() const
@@ -469,14 +500,29 @@ void APE::Tag::parse(const ByteVector &data)
   if(data.size() < 11)
     return;
 
-  unsigned int pos = 0;
+  size_t pos = 0;
 
   for(unsigned int i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
-    APE::Item item;
-    item.parse(data.mid(pos));
 
-    d->itemListMap.insert(item.key().upper(), item);
+    const size_t nullPos = data.find('\0', pos + 8);
+    if(nullPos == ByteVector::npos()) {
+      debug("APE::Tag::parse() - Couldn't find a key/value separator. Stopped parsing.");
+      return;
+    }
 
-    pos += item.size();
+    const size_t keyLength = nullPos - pos - 8;
+    const size_t valLegnth = data.toUInt32LE(pos);
+
+    if(isKeyValid(&data[pos + 8], keyLength)){
+      APE::Item item;
+      item.parse(data.mid(pos));
+
+      d->itemListMap.insert(item.key().upper(), item);
+    }
+    else {
+      debug("APE::Tag::parse() - Skipped an item due to an invalid key.");
+    }
+
+    pos += keyLength + valLegnth + 9;
   }
 }

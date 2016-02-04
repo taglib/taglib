@@ -299,27 +299,30 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
   if(d->data->isPadded)
     d->data->frameLength += paddingSize[layerIndex];
 
-  // Check if the frame length has been calculated correctly, or the next frame
-  // synch bytes are right next to the end of this frame.
-
-  // We read some extra bytes to be a bit tolerant.
-
   if(checkLength) {
 
-    bool nextFrameFound = false;
+    // Check if the frame length has been calculated correctly, or the next frame
+    // header is right next to the end of this frame.
+
+    // The MPEG versions, layers and sample rates of the two frames should be
+    // consistent. Otherwise, we assume that either or both of the frames are
+    // broken.
 
     file->seek(offset + d->data->frameLength);
-    const ByteVector nextSynch = file->readBlock(4);
+    const ByteVector nextData = file->readBlock(4);
 
-    for(int i = 0; i < static_cast<int>(nextSynch.size()) - 1; ++i) {
-      if(firstSyncByte(nextSynch[i]) && secondSynchByte(nextSynch[i + 1])) {
-        nextFrameFound = true;
-        break;
-      }
+    if(nextData.size() < 4) {
+      debug("MPEG::Header::parse() -- Could not read the next frame header.");
+      return;
     }
 
-    if(!nextFrameFound) {
-      debug("MPEG::Header::parse() -- Calculated frame length did not match the actual length.");
+    const unsigned int HeaderMask = 0xfffe0c00;
+
+    const unsigned int header     = data.toUInt32BE(0)     & HeaderMask;
+    const unsigned int nextHeader = nextData.toUInt32BE(0) & HeaderMask;
+
+    if(header != nextHeader) {
+      debug("MPEG::Header::parse() -- The next frame was not consistent with this frame.");
       return;
     }
   }
