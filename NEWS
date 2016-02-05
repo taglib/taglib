@@ -34,7 +34,7 @@ TagLib 1.11 (Jan 30, 2016)
  * Fixed updating the comment field of Vorbis comments.
  * Fixed reading date and time in ID3v2.3 tags.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
- * Marked String::null and String:isNull() deprecated.
+ * Marked String::null and String::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.
  * Marked Ogg::Page::getCopyWithNewPageSequenceNumber() deprecated. It returns null.
  * Marked custom integer types deprecated.
