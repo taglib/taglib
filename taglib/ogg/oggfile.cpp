@@ -262,12 +262,13 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
   // TODO: This pagination method isn't accurate for what's being done here.
   // This should account for real possibilities like non-aligned packets and such.
 
-  const List<Page *> pages = Page::paginate(packets,
-                                            Page::SinglePagePerGroup,
-                                            firstPage->header()->streamSerialNumber(),
-                                            firstPage->pageSequenceNumber(),
-                                            firstPage->header()->firstPacketContinued(),
-                                            lastPage->header()->lastPacketCompleted());
+  List<Page *> pages = Page::paginate(packets,
+                                      Page::SinglePagePerGroup,
+                                      firstPage->header()->streamSerialNumber(),
+                                      firstPage->pageSequenceNumber(),
+                                      firstPage->header()->firstPacketContinued(),
+                                      lastPage->header()->lastPacketCompleted());
+  pages.setAutoDelete(true);
 
   // Write the pages.
 
