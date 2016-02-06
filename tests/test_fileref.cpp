@@ -30,6 +30,14 @@
 #include <oggflacfile.h>
 #include <vorbisfile.h>
 #include <mpegfile.h>
+#include <mpcfile.h>
+#include <asffile.h>
+#include <speexfile.h>
+#include <flacfile.h>
+#include <trueaudiofile.h>
+#include <mp4file.h>
+#include <wavfile.h>
+#include <apefile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 #include <tfilestream.h>
@@ -73,6 +81,7 @@ class TestFileRef : public CppUnit::TestFixture
 
 public:
 
+  template <typename T>
   void fileRefSave(const string &filename, const string &ext)
   {
     ScopedFileCopy copy(filename, ext);
@@ -80,6 +89,7 @@ public:
 
     {
       FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
       CPPUNIT_ASSERT(!f.isNull());
       f.tag()->setArtist("test artist");
       f.tag()->setTitle("test title");
@@ -119,6 +129,7 @@ public:
     {
       FileStream fs(newname.c_str());
       FileRef f(&fs);
+      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
       CPPUNIT_ASSERT(!f.isNull());
       CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
@@ -131,81 +142,77 @@ public:
 
   void testMusepack()
   {
-    fileRefSave("click", ".mpc");
+    fileRefSave<MPC::File>("click", ".mpc");
   }
 
   void testASF()
   {
-    fileRefSave("silence-1", ".wma");
+    fileRefSave<ASF::File>("silence-1", ".wma");
   }
 
   void testVorbis()
   {
-    fileRefSave("empty", ".ogg");
+    fileRefSave<Ogg::Vorbis::File>("empty", ".ogg");
   }
 
   void testSpeex()
   {
-    fileRefSave("empty", ".spx");
+    fileRefSave<Ogg::Speex::File>("empty", ".spx");
   }
 
   void testFLAC()
   {
-    fileRefSave("no-tags", ".flac");
+    fileRefSave<FLAC::File>("no-tags", ".flac");
   }
 
   void testMP3()
   {
-    fileRefSave("xing", ".mp3");
+    fileRefSave<MPEG::File>("xing", ".mp3");
   }
 
   void testTrueAudio()
   {
-    fileRefSave("empty", ".tta");
+    fileRefSave<TrueAudio::File>("empty", ".tta");
   }
 
   void testMP4_1()
   {
-    fileRefSave("has-tags", ".m4a");
+    fileRefSave<MP4::File>("has-tags", ".m4a");
   }
 
   void testMP4_2()
   {
-    fileRefSave("no-tags", ".m4a");
+    fileRefSave<MP4::File>("no-tags", ".m4a");
   }
 
   void testMP4_3()
   {
-    fileRefSave("no-tags", ".3g2");
+    fileRefSave<MP4::File>("no-tags", ".3g2");
   }
 
   void testMP4_4()
   {
-    fileRefSave("blank_video", ".m4v");
+    fileRefSave<MP4::File>("blank_video", ".m4v");
   }
 
   void testWav()
   {
-    fileRefSave("empty", ".wav");
+    fileRefSave<RIFF::WAV::File>("empty", ".wav");
   }
 
   void testOGA_FLAC()
   {
-    FileRef f(TEST_FILE_PATH_C("empty_flac.oga"));
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) == NULL);
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f.file()) != NULL);
+    fileRefSave<Ogg::FLAC::File>("empty_flac", ".oga");
   }
 
   void testOGA_Vorbis()
   {
-    FileRef f(TEST_FILE_PATH_C("empty_vorbis.oga"));
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != NULL);
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::FLAC::File *>(f.file()) == NULL);
+    fileRefSave<Ogg::Vorbis::File>("empty_vorbis", ".oga");
   }
 
   void testAPE()
   {
-    fileRefSave("mac-399", ".ape");
+    fileRefSave<APE::File>("mac-399", ".ape");
   }
 
   void testUnsupported()
