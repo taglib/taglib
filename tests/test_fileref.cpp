@@ -38,6 +38,7 @@
 #include <mp4file.h>
 #include <wavfile.h>
 #include <apefile.h>
+#include <aifffile.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 #include <tfilestream.h>
@@ -75,6 +76,8 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testTrueAudio);
   CPPUNIT_TEST(testAPE);
   CPPUNIT_TEST(testWav);
+  CPPUNIT_TEST(testAIFF_1);
+  CPPUNIT_TEST(testAIFF_2);
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST(testFileResolver);
   CPPUNIT_TEST_SUITE_END();
@@ -213,6 +216,16 @@ public:
   void testAPE()
   {
     fileRefSave<APE::File>("mac-399", ".ape");
+  }
+
+  void testAIFF_1()
+  {
+    fileRefSave<RIFF::AIFF::File>("empty", ".aiff");
+  }
+
+  void testAIFF_2()
+  {
+    fileRefSave<RIFF::AIFF::File>("alaw", ".aifc");
   }
 
   void testUnsupported()
