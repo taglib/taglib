@@ -54,39 +54,39 @@ namespace TagLib {
        * Returns the track name; if no track name is present in the tag
        * String::null will be returned.
        */
-      String title() const;
+      virtual String title() const;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      String artist() const;
+      virtual String artist() const;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      String album() const;
+      virtual String album() const;
 
       /*!
        * Returns the track comment derived from the instrument/sample/pattern
        * names; if no comment is present in the tag String::null will be
        * returned.
        */
-      String comment() const;
+      virtual String comment() const;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      String genre() const;
+      virtual String genre() const;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      unsigned int year() const;
+      virtual unsigned int year() const;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      unsigned int track() const;
+      virtual unsigned int track() const;
 
       /*!
        * Returns the name of the tracker used to create/edit the module file.
@@ -105,17 +105,17 @@ namespace TagLib {
        * Mod 20 characters, S3M 27 characters, IT 25 characters and XM 20
        * characters.
        */
-      void setTitle(const String &title);
+      virtual void setTitle(const String &title);
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setArtist(const String &artist);
+      virtual void setArtist(const String &artist);
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setAlbum(const String &album);
+      virtual void setAlbum(const String &album);
 
       /*!
        * Sets the comment to \a comment.  If \a comment is String::null then
@@ -134,22 +134,22 @@ namespace TagLib {
        * Mod 22 characters, S3M 27 characters, IT 25 characters and XM 22
        * characters.
        */
-      void setComment(const String &comment);
+      virtual void setComment(const String &comment);
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setGenre(const String &genre);
+      virtual void setGenre(const String &genre);
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setYear(unsigned int year);
+      virtual void setYear(unsigned int year);
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      void setTrack(unsigned int track);
+      virtual void setTrack(unsigned int track);
 
       /*!
        * Sets the tracker name to \a trackerName.  If \a trackerName is
