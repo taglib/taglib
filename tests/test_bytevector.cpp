@@ -429,7 +429,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(e3, s3.toBase64());
 
     // Decode
-    CPPUNIT_ASSERT_EQUAL(sempty, eempty.toBase64());
+    CPPUNIT_ASSERT_EQUAL(sempty, ByteVector::fromBase64(eempty));
     CPPUNIT_ASSERT_EQUAL(s0, ByteVector::fromBase64(e0));
     CPPUNIT_ASSERT_EQUAL(s1, ByteVector::fromBase64(e1));
     CPPUNIT_ASSERT_EQUAL(s2, ByteVector::fromBase64(e2));
