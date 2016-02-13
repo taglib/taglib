@@ -32,7 +32,7 @@ elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
 endif()
 
-if(HAVE_BOOST_ATOMIC OR HAVE_BOOST_BYTESWAP)
+if(HAVE_BOOST_ATOMIC)
   include_directories(${Boost_INCLUDE_DIR})
 endif()
 
