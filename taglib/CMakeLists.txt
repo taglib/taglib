@@ -32,6 +32,10 @@ elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
 endif()
 
+if(HAVE_BOOST_ATOMIC OR HAVE_BOOST_BYTESWAP)
+  include_directories(${Boost_INCLUDE_DIR})
+endif()
+
 set(tag_HDRS
   tag.h
   fileref.h
@@ -341,6 +345,10 @@ add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 if(ZLIB_FOUND)
   target_link_libraries(tag ${ZLIB_LIBRARIES})
+endif()
+
+if(HAVE_BOOST_ATOMIC)
+  target_link_libraries(tag ${Boost_ATOMIC_LIBRARY})
 endif()
 
 set_target_properties(tag PROPERTIES

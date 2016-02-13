@@ -34,6 +34,13 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
+# Determine whether Boost "header-only" libraries are installed.
+
+find_package(Boost)
+if(Boost_FOUND)
+  set(Boost_VERSION "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}")
+endif()
+
 # Determine which kind of atomic operations your compiler supports.
 
 check_cxx_source_compiles("
@@ -47,15 +54,10 @@ check_cxx_source_compiles("
 " HAVE_STD_ATOMIC)
 
 if(NOT HAVE_STD_ATOMIC)
-  check_cxx_source_compiles("
-    #include <boost/atomic.hpp>
-    int main() {
-      boost::atomic<unsigned int> x(1);
-      x.fetch_add(1);
-      x.fetch_sub(1);
-      return 0;
-    }
-  " HAVE_BOOST_ATOMIC)
+  find_package(Boost COMPONENTS atomic)
+  if(Boost_ATOMIC_FOUND)
+    set(HAVE_BOOST_ATOMIC 1)
+  endif()
 
   if(NOT HAVE_BOOST_ATOMIC)
     check_cxx_source_compiles("
@@ -107,15 +109,9 @@ endif()
 
 # Determine which kind of byte swap functions your compiler supports.
 
-check_cxx_source_compiles("
-  #include <boost/endian/conversion.hpp>
-  int main() {
-    boost::endian::endian_reverse(static_cast<uint16_t>(1));
-    boost::endian::endian_reverse(static_cast<uint32_t>(1));
-    boost::endian::endian_reverse(static_cast<uint64_t>(1));
-    return 0;
-  }
-" HAVE_BOOST_BYTESWAP)
+if(Boost_FOUND AND NOT (Boost_VERSION VERSION_LESS "1.58.0"))
+  set(HAVE_BOOST_BYTESWAP 1)
+endif()
 
 if(NOT HAVE_BOOST_BYTESWAP)
   check_cxx_source_compiles("
