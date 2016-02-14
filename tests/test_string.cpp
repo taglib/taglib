@@ -43,9 +43,11 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testAppendCharDetach);
   CPPUNIT_TEST(testAppendStringDetach);
   CPPUNIT_TEST(testToInt);
+  CPPUNIT_TEST(testFromInt);
   CPPUNIT_TEST(testSubstr);
   CPPUNIT_TEST(testNewline);
-  CPPUNIT_TEST(testEncode);
+  CPPUNIT_TEST(testEncodeNonLatin1);
+  CPPUNIT_TEST(testEncodeEmpty);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST_SUITE_END();
 
@@ -105,31 +107,12 @@ public:
     String unicode7(stduni, String::UTF16LE);
     CPPUNIT_ASSERT(unicode7[1] == L'\u2c67');
 
-    CPPUNIT_ASSERT(strcmp(String::number(0).toCString(), "0") == 0);
-    CPPUNIT_ASSERT(strcmp(String::number(12345678).toCString(), "12345678") == 0);
-    CPPUNIT_ASSERT(strcmp(String::number(-12345678).toCString(), "-12345678") == 0);
-
-    String n = "123";
-    CPPUNIT_ASSERT(n.toInt() == 123);
-
-    n = "-123";
-    CPPUNIT_ASSERT(n.toInt() == -123);
-
-    CPPUNIT_ASSERT(String("0").toInt() == 0);
-    CPPUNIT_ASSERT(String("1").toInt() == 1);
-
     CPPUNIT_ASSERT(String("  foo  ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("foo    ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("    foo").stripWhiteSpace() == String("foo"));
 
     CPPUNIT_ASSERT(memcmp(String("foo").data(String::Latin1).data(), "foo", 3) == 0);
     CPPUNIT_ASSERT(memcmp(String("f").data(String::Latin1).data(), "f", 1) == 0);
-
-    // Check to make sure that the BOM is there and that the data size is correct
-
-    const ByteVector utf16 = unicode.data(String::UTF16);
-    CPPUNIT_ASSERT(utf16.size() == 2 + (unicode.size() * 2));
-    CPPUNIT_ASSERT(unicode == String(utf16, String::UTF16));
   }
 
   void testUTF16Encode()
@@ -247,11 +230,21 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("123aa").toInt(), 123);
     CPPUNIT_ASSERT_EQUAL(String("-123aa").toInt(), -123);
 
+    CPPUNIT_ASSERT_EQUAL(String("0000").toInt(), 0);
+    CPPUNIT_ASSERT_EQUAL(String("0001").toInt(), 1);
+
     String("2147483648").toInt(&ok);
     CPPUNIT_ASSERT_EQUAL(ok, false);
 
     String("-2147483649").toInt(&ok);
     CPPUNIT_ASSERT_EQUAL(ok, false);
+  }
+
+  void testFromInt()
+  {
+    CPPUNIT_ASSERT_EQUAL(String::number(0), String("0"));
+    CPPUNIT_ASSERT_EQUAL(String::number(12345678), String("12345678"));
+    CPPUNIT_ASSERT_EQUAL(String::number(-12345678), String("-12345678"));
   }
 
   void testSubstr()
@@ -277,41 +270,28 @@ public:
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
   }
 
-  void testEncode()
+  void testEncodeNonLatin1()
   {
-    String jpn(L"\u65E5\u672C\u8A9E");
-    ByteVector jpn1 = jpn.data(String::Latin1);
-    ByteVector jpn2 = jpn.data(String::UTF8);
-    ByteVector jpn3 = jpn.data(String::UTF16);
-    ByteVector jpn4 = jpn.data(String::UTF16LE);
-    ByteVector jpn5 = jpn.data(String::UTF16BE);
-    std::string jpn6 = jpn.to8Bit(false);
-    std::string jpn7 = jpn.to8Bit(true);
+    const String jpn(L"\u65E5\u672C\u8A9E");
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE5\x2C\x9E"), jpn.data(String::Latin1));
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"), jpn.data(String::UTF8));
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xFF\xFE\xE5\x65\x2C\x67\x9E\x8A"), jpn.data(String::UTF16));
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE5\x65\x2C\x67\x9E\x8A"), jpn.data(String::UTF16LE));
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\x65\xE5\x67\x2C\x8A\x9E"), jpn.data(String::UTF16BE));
+    CPPUNIT_ASSERT_EQUAL(std::string("\xE5\x2C\x9E"), jpn.to8Bit(false));
+    CPPUNIT_ASSERT_EQUAL(std::string("\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"), jpn.to8Bit(true));
+  }
 
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE5\x2C\x9E"), jpn1);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"), jpn2);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xFF\xFE\xE5\x65\x2C\x67\x9E\x8A"), jpn3);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE5\x65\x2C\x67\x9E\x8A"), jpn4);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\x65\xE5\x67\x2C\x8A\x9E"), jpn5);
-    CPPUNIT_ASSERT_EQUAL(std::string("\xE5\x2C\x9E"), jpn6);
-    CPPUNIT_ASSERT_EQUAL(std::string("\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E"), jpn7);
-
-    String empty;
-    ByteVector empty1 = empty.data(String::Latin1);
-    ByteVector empty2 = empty.data(String::UTF8);
-    ByteVector empty3 = empty.data(String::UTF16);
-    ByteVector empty4 = empty.data(String::UTF16LE);
-    ByteVector empty5 = empty.data(String::UTF16BE);
-    std::string empty6 = empty.to8Bit(false);
-    std::string empty7 = empty.to8Bit(true);
-
-    CPPUNIT_ASSERT(empty1.isEmpty());
-    CPPUNIT_ASSERT(empty2.isEmpty());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xFF\xFE"), empty3);
-    CPPUNIT_ASSERT(empty4.isEmpty());
-    CPPUNIT_ASSERT(empty5.isEmpty());
-    CPPUNIT_ASSERT(empty6.empty());
-    CPPUNIT_ASSERT(empty7.empty());
+  void testEncodeEmpty()
+  {
+    const String empty;
+    CPPUNIT_ASSERT(empty.data(String::Latin1).isEmpty());
+    CPPUNIT_ASSERT(empty.data(String::UTF8).isEmpty());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xFF\xFE"), empty.data(String::UTF16));
+    CPPUNIT_ASSERT(empty.data(String::UTF16LE).isEmpty());
+    CPPUNIT_ASSERT(empty.data(String::UTF16BE).isEmpty());
+    CPPUNIT_ASSERT(empty.to8Bit(false).empty());
+    CPPUNIT_ASSERT(empty.to8Bit(true).empty());
   }
 
   void testIterator()
