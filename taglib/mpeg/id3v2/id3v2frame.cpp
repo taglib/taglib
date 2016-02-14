@@ -97,10 +97,10 @@ unsigned int Frame::headerSize(unsigned int version)
 
 ByteVector Frame::textDelimiter(String::Type t)
 {
-  ByteVector d = char(0);
   if(t == String::UTF16 || t == String::UTF16BE || t == String::UTF16LE)
-    d.append(char(0));
-  return d;
+    return ByteVector(2, '\0');
+  else
+    return ByteVector(1, '\0');
 }
 
 const String Frame::instrumentPrefix("PERFORMER:");

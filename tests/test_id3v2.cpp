@@ -70,7 +70,8 @@ class TestID3v2 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v2);
   CPPUNIT_TEST(testUnsynchDecode);
-  CPPUNIT_TEST(testDowngradeUTF8ForID3v23);
+  CPPUNIT_TEST(testDowngradeUTF8ForID3v23_1);
+  CPPUNIT_TEST(testDowngradeUTF8ForID3v23_2);
   CPPUNIT_TEST(testUTF16BEDelimiter);
   CPPUNIT_TEST(testUTF16Delimiter);
   CPPUNIT_TEST(testReadStringField);
@@ -130,7 +131,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("My babe just cares for me"), f.tag()->title());
   }
 
-  void testDowngradeUTF8ForID3v23()
+  void testDowngradeUTF8ForID3v23_1()
   {
     ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
@@ -151,6 +152,27 @@ public:
 
     ID3v2::TextIdentificationFrame f2(data);
     CPPUNIT_ASSERT_EQUAL(sl, f2.fieldList());
+    CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
+  }
+
+  void testDowngradeUTF8ForID3v23_2()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ID3v2::UnsynchronizedLyricsFrame *f
+      = new ID3v2::UnsynchronizedLyricsFrame(String::UTF8);
+    f->setText("Foo");
+
+    MPEG::File file(copy.fileName().c_str());
+    file.ID3v2Tag(true)->addFrame(f);
+    file.save(MPEG::File::ID3v2, true, 3);
+    CPPUNIT_ASSERT(file.hasID3v2Tag());
+
+    ByteVector data = f->render();
+    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+3+2+2+6+2), data.size());
+
+    ID3v2::UnsynchronizedLyricsFrame f2(data);
+    CPPUNIT_ASSERT_EQUAL(String("Foo"), f2.text());
     CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
   }
 

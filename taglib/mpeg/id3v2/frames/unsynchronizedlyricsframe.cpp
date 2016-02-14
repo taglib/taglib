@@ -169,13 +169,19 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
 
 ByteVector UnsynchronizedLyricsFrame::renderFields() const
 {
+  StringList sl;
+  sl.append(d->description);
+  sl.append(d->text);
+
+  const String::Type encoding = checkTextEncoding(sl, d->textEncoding);
+
   ByteVector v;
 
-  v.append(char(d->textEncoding));
+  v.append(char(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
-  v.append(d->description.data(d->textEncoding));
-  v.append(textDelimiter(d->textEncoding));
-  v.append(d->text.data(d->textEncoding));
+  v.append(d->description.data(encoding));
+  v.append(textDelimiter(encoding));
+  v.append(d->text.data(encoding));
 
   return v;
 }
