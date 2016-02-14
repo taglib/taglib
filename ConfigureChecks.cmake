@@ -34,6 +34,13 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
+# Enable check_cxx_source_compiles() to work with Boost "header-only" libraries.
+
+find_package(Boost)
+if(Boost_FOUND)
+  set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${Boost_INCLUDE_DIRS}")
+endif()
+
 # Determine which kind of atomic operations your compiler supports.
 
 check_cxx_source_compiles("
@@ -103,57 +110,69 @@ endif()
 # Determine which kind of byte swap functions your compiler supports.
 
 check_cxx_source_compiles("
+  #include <boost/endian/conversion.hpp>
   int main() {
-    __builtin_bswap16(0);
-    __builtin_bswap32(0);
-    __builtin_bswap64(0);
+    boost::endian::endian_reverse(static_cast<uint16_t>(1));
+    boost::endian::endian_reverse(static_cast<uint32_t>(1));
+    boost::endian::endian_reverse(static_cast<uint64_t>(1));
     return 0;
   }
-" HAVE_GCC_BYTESWAP)
+" HAVE_BOOST_BYTESWAP)
 
-if(NOT HAVE_GCC_BYTESWAP)
+if(NOT HAVE_BOOST_BYTESWAP)
   check_cxx_source_compiles("
-    #include <byteswap.h>
     int main() {
-      __bswap_16(0);
-      __bswap_32(0);
-      __bswap_64(0);
+      __builtin_bswap16(0);
+      __builtin_bswap32(0);
+      __builtin_bswap64(0);
       return 0;
     }
-  " HAVE_GLIBC_BYTESWAP)
+  " HAVE_GCC_BYTESWAP)
 
-  if(NOT HAVE_GLIBC_BYTESWAP)
+  if(NOT HAVE_GCC_BYTESWAP)
     check_cxx_source_compiles("
-      #include <stdlib.h>
+      #include <byteswap.h>
       int main() {
-        _byteswap_ushort(0);
-        _byteswap_ulong(0);
-        _byteswap_uint64(0);
+        __bswap_16(0);
+        __bswap_32(0);
+        __bswap_64(0);
         return 0;
       }
-    " HAVE_MSC_BYTESWAP)
+    " HAVE_GLIBC_BYTESWAP)
 
-    if(NOT HAVE_MSC_BYTESWAP)
+    if(NOT HAVE_GLIBC_BYTESWAP)
       check_cxx_source_compiles("
-        #include <libkern/OSByteOrder.h>
+        #include <stdlib.h>
         int main() {
-          OSSwapInt16(0);
-          OSSwapInt32(0);
-          OSSwapInt64(0);
+          _byteswap_ushort(0);
+          _byteswap_ulong(0);
+          _byteswap_uint64(0);
           return 0;
         }
-      " HAVE_MAC_BYTESWAP)
+      " HAVE_MSC_BYTESWAP)
 
-      if(NOT HAVE_MAC_BYTESWAP)
+      if(NOT HAVE_MSC_BYTESWAP)
         check_cxx_source_compiles("
-          #include <sys/endian.h>
+          #include <libkern/OSByteOrder.h>
           int main() {
-            swap16(0);
-            swap32(0);
-            swap64(0);
+            OSSwapInt16(0);
+            OSSwapInt32(0);
+            OSSwapInt64(0);
             return 0;
           }
-        " HAVE_OPENBSD_BYTESWAP)
+        " HAVE_MAC_BYTESWAP)
+
+        if(NOT HAVE_MAC_BYTESWAP)
+          check_cxx_source_compiles("
+            #include <sys/endian.h>
+            int main() {
+              swap16(0);
+              swap32(0);
+              swap64(0);
+              return 0;
+            }
+          " HAVE_OPENBSD_BYTESWAP)
+        endif()
       endif()
     endif()
   endif()

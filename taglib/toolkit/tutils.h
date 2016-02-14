@@ -34,7 +34,9 @@
 # include <config.h>
 #endif
 
-#if defined(HAVE_MSC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+# include <boost/endian/conversion.hpp>
+#elif defined(HAVE_MSC_BYTESWAP)
 # include <stdlib.h>
 #elif defined(HAVE_GLIBC_BYTESWAP)
 # include <byteswap.h>
@@ -59,7 +61,11 @@ namespace TagLib
      */
     inline unsigned short byteSwap(unsigned short x)
     {
-#if defined(HAVE_GCC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(x);
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap16(x);
 
@@ -91,7 +97,11 @@ namespace TagLib
      */
     inline unsigned int byteSwap(unsigned int x)
     {
-#if defined(HAVE_GCC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(x);
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap32(x);
 
@@ -126,7 +136,11 @@ namespace TagLib
      */
     inline unsigned long long byteSwap(unsigned long long x)
     {
-#if defined(HAVE_GCC_BYTESWAP)
+#if defined(HAVE_BOOST_BYTESWAP)
+
+      return boost::endian::endian_reverse(x);
+
+#elif defined(HAVE_GCC_BYTESWAP)
 
       return __builtin_bswap64(x);
 
