@@ -57,6 +57,8 @@ if(NOT HAVE_STD_ATOMIC)
   find_package(Boost COMPONENTS atomic)
   if(Boost_ATOMIC_FOUND)
     set(HAVE_BOOST_ATOMIC 1)
+  else()
+    set(HAVE_BOOST_ATOMIC 0)
   endif()
 
   if(NOT HAVE_BOOST_ATOMIC)
