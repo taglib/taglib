@@ -47,7 +47,7 @@ using namespace APE;
 
 namespace
 {
-  inline bool isKeyValid(const char *key, size_t length)
+  bool isKeyValid(const char *key, size_t length)
   {
     const char *invalidKeys[] = { "ID3", "TAG", "OGGS", "MP+", 0 };
 

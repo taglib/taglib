@@ -37,7 +37,7 @@ using namespace TagLib;
 namespace
 {
   // Returns the first packet index of the right next page to the given one.
-  inline unsigned int nextPacketIndex(const Ogg::Page *page)
+  unsigned int nextPacketIndex(const Ogg::Page *page)
   {
     if(page->header()->lastPacketCompleted())
       return page->firstPacketIndex() + page->packetCount();

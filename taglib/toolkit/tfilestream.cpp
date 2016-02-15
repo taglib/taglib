@@ -47,7 +47,7 @@ namespace
 
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
-  inline FileHandle openFile(const FileName &path, bool readOnly)
+  FileHandle openFile(const FileName &path, bool readOnly)
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
@@ -59,12 +59,12 @@ namespace
       return InvalidFileHandle;
   }
 
-  inline void closeFile(FileHandle file)
+  void closeFile(FileHandle file)
   {
     CloseHandle(file);
   }
 
-  inline size_t readFile(FileHandle file, ByteVector &buffer)
+  size_t readFile(FileHandle file, ByteVector &buffer)
   {
     DWORD length;
     if(ReadFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
@@ -73,7 +73,7 @@ namespace
       return 0;
   }
 
-  inline size_t writeFile(FileHandle file, const ByteVector &buffer)
+  size_t writeFile(FileHandle file, const ByteVector &buffer)
   {
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
@@ -94,22 +94,22 @@ namespace
 
   const FileHandle InvalidFileHandle = 0;
 
-  inline FileHandle openFile(const FileName &path, bool readOnly)
+  FileHandle openFile(const FileName &path, bool readOnly)
   {
     return fopen(path, readOnly ? "rb" : "rb+");
   }
 
-  inline void closeFile(FileHandle file)
+  void closeFile(FileHandle file)
   {
     fclose(file);
   }
 
-  inline size_t readFile(FileHandle file, ByteVector &buffer)
+  size_t readFile(FileHandle file, ByteVector &buffer)
   {
     return fread(buffer.data(), sizeof(char), buffer.size(), file);
   }
 
-  inline size_t writeFile(FileHandle file, const ByteVector &buffer)
+  size_t writeFile(FileHandle file, const ByteVector &buffer)
   {
     return fwrite(buffer.data(), sizeof(char), buffer.size(), file);
   }

@@ -34,7 +34,7 @@ using namespace TagLib;
 
 namespace
 {
-  inline bool checkValid(const MP4::AtomList &list)
+  bool checkValid(const MP4::AtomList &list)
   {
     for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
 
