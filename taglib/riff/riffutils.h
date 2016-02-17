@@ -37,7 +37,7 @@ namespace TagLib
     namespace
     {
 
-      bool isValidChunkName(const ByteVector &name)
+      inline bool isValidChunkName(const ByteVector &name)
       {
         if(name.size() != 4)
           return false;

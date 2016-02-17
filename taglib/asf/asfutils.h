@@ -37,7 +37,7 @@ namespace TagLib
     namespace
     {
 
-      unsigned short readWORD(File *file, bool *ok = 0)
+      inline unsigned short readWORD(File *file, bool *ok = 0)
       {
         const ByteVector v = file->readBlock(2);
         if(v.size() != 2) {
@@ -48,7 +48,7 @@ namespace TagLib
         return v.toUShort(false);
       }
 
-      unsigned int readDWORD(File *file, bool *ok = 0)
+      inline unsigned int readDWORD(File *file, bool *ok = 0)
       {
         const ByteVector v = file->readBlock(4);
         if(v.size() != 4) {
@@ -59,7 +59,7 @@ namespace TagLib
         return v.toUInt(false);
       }
 
-      long long readQWORD(File *file, bool *ok = 0)
+      inline long long readQWORD(File *file, bool *ok = 0)
       {
         const ByteVector v = file->readBlock(8);
         if(v.size() != 8) {
@@ -70,7 +70,7 @@ namespace TagLib
         return v.toLongLong(false);
       }
 
-      String readString(File *file, int length)
+      inline String readString(File *file, int length)
       {
         ByteVector data = file->readBlock(length);
         unsigned int size = data.size();
@@ -86,7 +86,7 @@ namespace TagLib
         return String(data, String::UTF16LE);
       }
 
-      ByteVector renderString(const String &str, bool includeLength = false)
+      inline ByteVector renderString(const String &str, bool includeLength = false)
       {
         ByteVector data = str.data(String::UTF16LE) + ByteVector::fromShort(0, false);
         if(includeLength) {
