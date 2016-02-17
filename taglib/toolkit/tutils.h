@@ -61,7 +61,7 @@ namespace TagLib
       /*!
        * Reverses the order of bytes in an 16-bit integer.
        */
-      inline unsigned short byteSwap(unsigned short x)
+      unsigned short byteSwap(unsigned short x)
       {
 #if defined(HAVE_BOOST_BYTESWAP)
 
@@ -97,7 +97,7 @@ namespace TagLib
       /*!
        * Reverses the order of bytes in an 32-bit integer.
        */
-      inline unsigned int byteSwap(unsigned int x)
+      unsigned int byteSwap(unsigned int x)
       {
 #if defined(HAVE_BOOST_BYTESWAP)
 
@@ -136,7 +136,7 @@ namespace TagLib
       /*!
        * Reverses the order of bytes in an 64-bit integer.
        */
-      inline unsigned long long byteSwap(unsigned long long x)
+      unsigned long long byteSwap(unsigned long long x)
       {
 #if defined(HAVE_BOOST_BYTESWAP)
 
@@ -180,7 +180,7 @@ namespace TagLib
        * Returns a formatted string just like standard sprintf(), but makes use of
        * safer functions such as snprintf() if available.
        */
-      inline String formatString(const char *format, ...)
+      String formatString(const char *format, ...)
       {
         // Sufficient buffer size for the current internal uses.
         // Consider changing this value when you use this function.
@@ -228,7 +228,7 @@ namespace TagLib
        * We took the trouble to define this one here, since there are some
        * incompatible variations of case insensitive strcmp().
        */
-      inline bool equalsIgnoreCase(const char *s1, const char *s2)
+      bool equalsIgnoreCase(const char *s1, const char *s2)
       {
         while(*s1 != '\0' && *s2 != '\0' && ::tolower(*s1) == ::tolower(*s2)) {
           s1++;
@@ -252,7 +252,7 @@ namespace TagLib
       /*!
        * Returns the integer byte order of the system.
        */
-      inline ByteOrder systemByteOrder()
+      ByteOrder systemByteOrder()
       {
         union {
           int  i;
@@ -269,7 +269,7 @@ namespace TagLib
       /*!
        * Returns the IEEE754 byte order of the system.
        */
-      inline ByteOrder floatByteOrder()
+      ByteOrder floatByteOrder()
       {
         union {
           double d;

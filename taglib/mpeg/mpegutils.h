@@ -42,12 +42,12 @@ namespace TagLib
        * first byte is easy to check for, however checking to see if the second byte
        * starts with \e 111 is a bit more tricky, hence these functions.
        */
-      inline bool firstSyncByte(unsigned char byte)
+      bool firstSyncByte(unsigned char byte)
       {
         return (byte == 0xFF);
       }
 
-      inline bool secondSynchByte(unsigned char byte)
+      bool secondSynchByte(unsigned char byte)
       {
         // 0xFF is possible in theory, but it's very unlikely be a header.
 
