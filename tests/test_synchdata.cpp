@@ -40,6 +40,7 @@ class TestID3v2SynchData : public CppUnit::TestFixture
   CPPUNIT_TEST(testToUIntBrokenAndTooLarge);
   CPPUNIT_TEST(testDecode1);
   CPPUNIT_TEST(testDecode2);
+  CPPUNIT_TEST(testDecode3);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -102,6 +103,14 @@ public:
     a = ID3v2::SynchData::decode(a);
     CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x44", 2), a);
+  }
+
+  void testDecode3()
+  {
+    ByteVector a("\xff\xff\x00", 3);
+    a = ID3v2::SynchData::decode(a);
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff", 2), a);
   }
 
 };

@@ -74,11 +74,29 @@ ByteVector SynchData::fromUInt(unsigned int value)
 
 ByteVector SynchData::decode(const ByteVector &data)
 {
+  // We have this optimized method instead of using ByteVector::replace(),
+  // since it makes a great difference when decoding huge unsynchronized frames.
+
+  if(data.size() < 2)
+    return data;
+
   ByteVector result = data;
 
-  ByteVector pattern(2, char(0));
-  pattern[0] = '\xFF';
-  pattern[1] = '\x00';
+  char *begin = result.data();
+  char *end = begin + result.size();
 
-  return result.replace(pattern, '\xFF');
+  char *dst = begin;
+  const char *src = begin;
+
+  do {
+    *dst++ = *src++;
+
+    if(*(src - 1) == '\xff' && *src == '\x00')
+      src++;
+
+  } while (src < end);
+
+  result.resize(static_cast<unsigned int>(dst - begin));
+
+  return result;
 }
