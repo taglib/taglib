@@ -54,7 +54,7 @@ bool Mod::FileBase::readString(String &s, unsigned long size)
   {
     data.resize(index);
   }
-  data.replace((char) 0xff, ' ');
+  data.replace('\xff', ' ');
 
   s = data;
   return true;

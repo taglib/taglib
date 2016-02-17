@@ -268,6 +268,11 @@ public:
     }
     {
       ByteVector a("abcdabf");
+      a.replace('a', 'x');
+      CPPUNIT_ASSERT_EQUAL(ByteVector("xbcdxbf"), a);
+    }
+    {
+      ByteVector a("abcdabf");
       a.replace(ByteVector("ab"), ByteVector("xy"));
       CPPUNIT_ASSERT_EQUAL(ByteVector("xycdxyf"), a);
     }

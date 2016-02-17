@@ -134,7 +134,7 @@ public:
     if(index > -1) {
       data.resize(index);
     }
-    data.replace((char) 0xff, ' ');
+    data.replace('\xff', ' ');
     value = data;
     return count;
   }

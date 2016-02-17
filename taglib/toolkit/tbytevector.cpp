@@ -475,18 +475,32 @@ bool ByteVector::endsWith(const ByteVector &pattern) const
   return containsAt(pattern, size() - pattern.size());
 }
 
+ByteVector &ByteVector::replace(char oldByte, char newByte)
+{
+  detach();
+
+  for(ByteVector::Iterator it = begin(); it != end(); ++it) {
+    if(*it == oldByte)
+      *it = newByte;
+  }
+
+  return *this;
+}
+
 ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &with)
 {
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
+
+  if(pattern.size() == 1 && with.size() == 1)
+    return replace(pattern[0], with[0]);
 
   const size_t withSize    = with.size();
   const size_t patternSize = pattern.size();
   const ptrdiff_t diff = withSize - patternSize;
 
   size_t offset = 0;
-  while (true)
-  {
+  while (true) {
     offset = find(pattern, offset);
     if(offset == static_cast<size_t>(-1)) // Use npos in taglib2.
       break;
