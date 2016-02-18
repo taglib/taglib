@@ -94,7 +94,7 @@ ByteVector SynchData::decode(const ByteVector &data)
     if(*(src - 1) == '\xff' && *src == '\x00')
       src++;
 
-  } while (src < end);
+  } while(src < end);
 
   result.resize(static_cast<unsigned int>(dst - begin));
 
