@@ -489,6 +489,8 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 
 ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &with)
 {
+  // TODO: This takes O(n!) time in the worst case. Rewrite it to run in O(n) time.
+
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
 
