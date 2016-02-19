@@ -77,26 +77,22 @@ ByteVector SynchData::decode(const ByteVector &data)
   // We have this optimized method instead of using ByteVector::replace(),
   // since it makes a great difference when decoding huge unsynchronized frames.
 
-  if(data.size() < 2)
-    return data;
+  ByteVector result(data.size());
 
-  ByteVector result = data;
+  ByteVector::ConstIterator src = data.begin();
+  ByteVector::Iterator dst = result.begin();
 
-  char *begin = result.data();
-  char *end = begin + result.size();
-
-  char *dst = begin;
-  const char *src = begin;
-
-  do {
+  while(src < data.end() - 1) {
     *dst++ = *src++;
 
     if(*(src - 1) == '\xff' && *src == '\x00')
       src++;
+  }
 
-  } while(src < end);
+  if(src < data.end())
+    *dst++ = *src++;
 
-  result.resize(static_cast<unsigned int>(dst - begin));
+  result.resize(static_cast<unsigned int>(dst - result.begin()));
 
   return result;
 }
