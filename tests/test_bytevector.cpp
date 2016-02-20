@@ -265,36 +265,50 @@ public:
       ByteVector a("abcdabf");
       a.replace(ByteVector("a"), ByteVector("x"));
       CPPUNIT_ASSERT_EQUAL(ByteVector("xbcdxbf"), a);
+      a.replace(ByteVector("x"), ByteVector("a"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
     }
     {
       ByteVector a("abcdabf");
       a.replace('a', 'x');
       CPPUNIT_ASSERT_EQUAL(ByteVector("xbcdxbf"), a);
+      a.replace('x', 'a');
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
     }
     {
       ByteVector a("abcdabf");
       a.replace(ByteVector("ab"), ByteVector("xy"));
       CPPUNIT_ASSERT_EQUAL(ByteVector("xycdxyf"), a);
+      a.replace(ByteVector("xy"), ByteVector("ab"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
     }
     {
       ByteVector a("abcdabf");
       a.replace(ByteVector("a"), ByteVector("<a>"));
       CPPUNIT_ASSERT_EQUAL(ByteVector("<a>bcd<a>bf"), a);
+      a.replace(ByteVector("<a>"), ByteVector("a"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
     }
     {
       ByteVector a("abcdabf");
-      a.replace(ByteVector("ab"), ByteVector("x"));
-      CPPUNIT_ASSERT_EQUAL(ByteVector("xcdxf"), a);
+      a.replace(ByteVector("b"), ByteVector("<b>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("a<b>cda<b>f"), a);
+      a.replace(ByteVector("<b>"), ByteVector("b"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), a);
     }
     {
-      ByteVector a("abcdabf");
-      a.replace(ByteVector("ab"), ByteVector());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("cdf"), a);
+      ByteVector a("abcdabc");
+      a.replace(ByteVector("c"), ByteVector("<c>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("ab<c>dab<c>"), a);
+      a.replace(ByteVector("<c>"), ByteVector("c"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabc"), a);
     }
     {
-      ByteVector a("abcdabf");
-      a.replace(ByteVector("bf"), ByteVector("x"));
-      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdax"), a);
+      ByteVector a("abcdaba");
+      a.replace(ByteVector("a"), ByteVector("<a>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("<a>bcd<a>b<a>"), a);
+      a.replace(ByteVector("<a>"), ByteVector("a"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdaba"), a);
     }
   }
 
