@@ -48,7 +48,8 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testResize);
-  CPPUNIT_TEST(testAppend);
+  CPPUNIT_TEST(testAppend1);
+  CPPUNIT_TEST(testAppend2);
   CPPUNIT_TEST(testBase64);
   CPPUNIT_TEST_SUITE_END();
 
@@ -403,7 +404,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(-1, c.find('C'));
   }
 
-  void testAppend()
+  void testAppend1()
   {
     ByteVector v1("foo");
     v1.append("bar");
@@ -439,6 +440,13 @@ public:
     v7.append('3');
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglibABC123"), v7);
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v8);
+  }
+
+  void testAppend2()
+  {
+    ByteVector a("1234");
+    a.append(a);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("12341234"), a);
   }
 
   void testBase64()

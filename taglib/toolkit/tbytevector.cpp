@@ -554,12 +554,16 @@ int ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
 
 ByteVector &ByteVector::append(const ByteVector &v)
 {
-  if(v.d->length != 0) {
-    detach();
-    unsigned int originalSize = size();
-    resize(originalSize + v.size());
-    ::memcpy(data() + originalSize, v.data(), v.size());
-  }
+  if(v.isEmpty())
+    return *this;
+
+  detach();
+
+  const unsigned int originalSize = size();
+  const unsigned int appendSize = v.size();
+
+  resize(originalSize + v.size());
+  ::memcpy(data() + originalSize, v.data(), appendSize);
 
   return *this;
 }
