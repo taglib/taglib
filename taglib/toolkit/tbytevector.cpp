@@ -562,7 +562,7 @@ ByteVector &ByteVector::append(const ByteVector &v)
   const unsigned int originalSize = size();
   const unsigned int appendSize = v.size();
 
-  resize(originalSize + v.size());
+  resize(originalSize + appendSize);
   ::memcpy(data() + originalSize, v.data(), appendSize);
 
   return *this;
