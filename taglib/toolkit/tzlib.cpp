@@ -55,49 +55,49 @@ ByteVector zlib::decompress(const ByteVector &data)
 {
 #ifdef HAVE_ZLIB
 
-    z_stream stream = {};
+  z_stream stream = {};
 
-    if(inflateInit(&stream) != Z_OK) {
-      debug("zlib::decompress() - Failed to initizlize zlib.");
+  if(inflateInit(&stream) != Z_OK) {
+    debug("zlib::decompress() - Failed to initizlize zlib.");
+    return ByteVector();
+  }
+
+  ByteVector inData = data;
+
+  stream.avail_in = static_cast<uInt>(inData.size());
+  stream.next_in  = reinterpret_cast<Bytef *>(inData.data());
+
+  const unsigned int chunkSize = 1024;
+
+  ByteVector outData;
+
+  do {
+    const size_t offset = outData.size();
+    outData.resize(outData.size() + chunkSize);
+
+    stream.avail_out = static_cast<uInt>(chunkSize);
+    stream.next_out  = reinterpret_cast<Bytef *>(outData.data() + offset);
+
+    const int result = inflate(&stream, Z_NO_FLUSH);
+
+    if(result == Z_STREAM_ERROR ||
+        result == Z_NEED_DICT ||
+        result == Z_DATA_ERROR ||
+        result == Z_MEM_ERROR)
+    {
+      if(result != Z_STREAM_ERROR)
+        inflateEnd(&stream);
+
+      debug("zlib::decompress() - Error reading compressed stream.");
       return ByteVector();
     }
 
-    ByteVector inData = data;
+    outData.resize(outData.size() - stream.avail_out);
+  } while(stream.avail_out == 0);
 
-    stream.avail_in = static_cast<uInt>(inData.size());
-    stream.next_in  = reinterpret_cast<Bytef *>(inData.data());
+  inflateEnd(&stream);
 
-    const unsigned int chunkSize = 1024;
-
-    ByteVector outData;
-
-    do {
-      const size_t offset = outData.size();
-      outData.resize(outData.size() + chunkSize);
-
-      stream.avail_out = static_cast<uInt>(chunkSize);
-      stream.next_out  = reinterpret_cast<Bytef *>(outData.data() + offset);
-
-      const int result = inflate(&stream, Z_NO_FLUSH);
-
-      if(result == Z_STREAM_ERROR ||
-         result == Z_NEED_DICT ||
-         result == Z_DATA_ERROR ||
-         result == Z_MEM_ERROR)
-      {
-        if(result != Z_STREAM_ERROR)
-          inflateEnd(&stream);
-
-        debug("zlib::decompress() - Error reading compressed stream.");
-        return ByteVector();
-      }
-
-      outData.resize(outData.size() - stream.avail_out);
-    } while(stream.avail_out == 0);
-
-    inflateEnd(&stream);
-
-    return outData;
+  return outData;
 
 #else
 
