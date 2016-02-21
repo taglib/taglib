@@ -23,22 +23,16 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#if HAVE_ZLIB
-#include <zlib.h>
-#endif
-
 #include <bitset>
 
 #include <tdebug.h>
 #include <tstringlist.h>
+#include <tzlib.h>
 
 #include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "id3v2synchdata.h"
+
 #include "tpropertymap.h"
 #include "frames/textidentificationframe.h"
 #include "frames/urllinkframe.h"
@@ -251,60 +245,21 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     frameDataOffset += 4;
   }
 
-#if HAVE_ZLIB
-  if(d->header->compression() &&
-     !d->header->encryption())
-  {
+  if(zlib::isAvailable() && d->header->compression() && !d->header->encryption()) {
     if(frameData.size() <= frameDataOffset) {
       debug("Compressed frame doesn't have enough data to decode");
       return ByteVector();
     }
 
-    z_stream stream = {};
-
-    if(inflateInit(&stream) != Z_OK)
-      return ByteVector();
-
-    ByteVector inData = frameData;
-
-    stream.avail_in = static_cast<uInt>(inData.size() - frameDataOffset);
-    stream.next_in = reinterpret_cast<Bytef *>(inData.data() + frameDataOffset);
-
-    static const unsigned int chunkSize = 1024;
-
-    ByteVector outData;
-    ByteVector chunk(chunkSize);
-
-    do {
-      stream.avail_out = static_cast<uInt>(chunk.size());
-      stream.next_out = reinterpret_cast<Bytef *>(chunk.data());
-
-      int result = inflate(&stream, Z_NO_FLUSH);
-
-      if(result == Z_STREAM_ERROR ||
-         result == Z_NEED_DICT ||
-         result == Z_DATA_ERROR ||
-         result == Z_MEM_ERROR)
-      {
-        if(result != Z_STREAM_ERROR)
-          inflateEnd(&stream);
-        debug("Error reading compressed stream");
-        return ByteVector();
-      }
-
-      outData.append(stream.avail_out == 0 ? chunk : chunk.mid(0, chunk.size() - stream.avail_out));
-    } while(stream.avail_out == 0);
-
-    inflateEnd(&stream);
-
-    if(frameDataLength != outData.size())
+    const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset));
+    if(frameDataLength != outData.size()) {
       debug("frameDataLength does not match the data length returned by zlib");
+    }
 
     return outData;
   }
-  else
-#endif
-    return frameData.mid(frameDataOffset, frameDataLength);
+
+  return frameData.mid(frameDataOffset, frameDataLength);
 }
 
 String Frame::readStringField(const ByteVector &data, String::Type encoding, int *position)

@@ -309,6 +309,7 @@ set(toolkit_SRCS
   toolkit/tpropertymap.cpp
   toolkit/trefcounter.cpp
   toolkit/tdebuglistener.cpp
+  toolkit/tzlib.cpp
 )
 
 if(NOT WIN32)

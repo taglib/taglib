@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <string>
 #include <stdio.h>
 #include <id3v2tag.h>
@@ -48,6 +44,7 @@
 #include <tableofcontentsframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <tzlib.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -767,26 +764,23 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("compressed_id3_frame.mp3"), false);
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("APIC"));
 
-#ifdef HAVE_ZLIB
+    if(zlib::isAvailable()) {
+      ID3v2::AttachedPictureFrame *frame
+        = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
+      CPPUNIT_ASSERT(frame);
+      CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
+      CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
+      CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)86414, frame->picture().size());
+    }
+    else {
+      // Skip the test if ZLIB is not installed.
+      // The message "Compressed frames are currently not supported." will be displayed.
 
-    ID3v2::AttachedPictureFrame *frame
-      = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
-    CPPUNIT_ASSERT(frame);
-    CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
-    CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
-    CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)86414, frame->picture().size());
-
-#else
-
-    // Skip the test if ZLIB is not installed.
-    // The message "Compressed frames are currently not supported." will be displayed.
-
-    ID3v2::UnknownFrame *frame
-      = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
-    CPPUNIT_ASSERT(frame);
-
-#endif
+      ID3v2::UnknownFrame *frame
+        = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
+      CPPUNIT_ASSERT(frame);
+    }
   }
 
   void testW000()
