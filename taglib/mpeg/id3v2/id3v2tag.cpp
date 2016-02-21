@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #include <algorithm>
 
 #include <tfile.h>
@@ -470,7 +466,7 @@ ByteVector ID3v2::Tag::render() const
 
 void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
 {
-#ifdef NO_ITUNES_HACKS 
+#ifdef NO_ITUNES_HACKS
   const char *unsupportedFrames[] = {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
     "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP", 0

@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -37,8 +33,8 @@
 
 #include <tstring.h>
 #include <tdebug.h>
-#include "trefcounter.h"
-#include "tutils.h"
+#include <trefcounter.h>
+#include <tutils.h>
 
 #include "tbytevector.h"
 

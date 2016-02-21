@@ -25,10 +25,6 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #include <iostream>
 #include <cerrno>
 #include <climits>
@@ -41,11 +37,12 @@
 # include "unicode.h"
 #endif
 
-#include <tstring.h>
 #include <tdebug.h>
 #include <tstringlist.h>
 #include <trefcounter.h>
 #include <tutils.h>
+
+#include "tstring.h"
 
 namespace
 {
