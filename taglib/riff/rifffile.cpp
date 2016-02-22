@@ -48,11 +48,14 @@ class RIFF::File::FilePrivate
 public:
   FilePrivate(Endianness endianness) :
     endianness(endianness),
-    size(0) {}
+    size(0),
+    sizeOffset(0) {}
 
   const Endianness endianness;
 
   unsigned int size;
+  long sizeOffset;
+
   std::vector<Chunk> chunks;
 };
 
@@ -129,11 +132,6 @@ ByteVector RIFF::File::chunkData(unsigned int i)
 
 void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 {
-  // First we update the global size
-
-  d->size += ((data.size() + 1) & ~1) - (d->chunks[i].size + d->chunks[i].padding);
-  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
-
   // Now update the specific chunk
 
   writeChunk(chunkName(i), data, d->chunks[i].offset - 8, d->chunks[i].size + d->chunks[i].padding + 8);
@@ -145,6 +143,10 @@ void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 
   for(i++; i < d->chunks.size(); i++)
     d->chunks[i].offset = d->chunks[i-1].offset + 8 + d->chunks[i-1].size + d->chunks[i-1].padding;
+
+  // Update the global size.
+
+  updateGlobalSize();
 }
 
 void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
@@ -177,11 +179,6 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   unsigned long offset = d->chunks.back().offset + d->chunks.back().size;
 
-  // First we update the global size
-
-  d->size += (offset & 1) + data.size() + 8;
-  insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), 4, 4);
-
   // Now add the chunk to the file
 
   writeChunk(name, data, offset, std::max<long>(0, length() - offset), (offset & 1) ? 1 : 0);
@@ -200,6 +197,10 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   chunk.padding = (data.size() & 0x01) ? 1 : 0;
 
   d->chunks.push_back(chunk);
+
+  // Update the global size.
+
+  updateGlobalSize();
 }
 
 void RIFF::File::removeChunk(unsigned int i)
@@ -216,6 +217,10 @@ void RIFF::File::removeChunk(unsigned int i)
 
   for(; it != d->chunks.end(); ++it)
     it->offset -= removeSize;
+
+  // Update the global size.
+
+  updateGlobalSize();
 }
 
 void RIFF::File::removeChunk(const ByteVector &name)
@@ -237,6 +242,7 @@ void RIFF::File::read()
 
   seek(baseOffset + 4);
   d->size = readBlock(4).toUInt(bigEndian);
+  d->sizeOffset = baseOffset + 4;
 
   seek(baseOffset + 12);
 
@@ -297,4 +303,14 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
     combined.append('\x00');
   }
   insert(combined, offset, replace);
+}
+
+void RIFF::File::updateGlobalSize()
+{
+  const Chunk first = d->chunks.front();
+  const Chunk last = d->chunks.back();
+  d->size = last.offset + last.size + last.padding - first.offset + 12;
+
+  const ByteVector data = ByteVector::fromUInt(d->size, d->endianness == BigEndian);
+  insert(data, d->sizeOffset, 4);
 }

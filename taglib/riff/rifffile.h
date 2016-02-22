@@ -148,6 +148,11 @@ namespace TagLib {
                       unsigned long offset, unsigned long replace = 0,
                       unsigned int leadingPadding = 0);
 
+      /*!
+       * Update the global RIFF size based on the current internal structure.
+       */
+      void updateGlobalSize();
+
       class FilePrivate;
       FilePrivate *d;
     };

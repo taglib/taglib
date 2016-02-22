@@ -211,7 +211,7 @@ public:
       CPPUNIT_ASSERT_EQUAL((unsigned int)(3), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(3));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4411 - 8), f.riffSize());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)(4412 - 8), f.riffSize());
     }
     {
       PublicRIFF f(filename.c_str());
@@ -234,6 +234,8 @@ public:
 
     PublicRIFF f(filename.c_str());
 
+    CPPUNIT_ASSERT_EQUAL(5928U, f.riffSize());
+    CPPUNIT_ASSERT_EQUAL(5936L, f.length());
     CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f.chunkName(0));
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(1));
@@ -243,6 +245,8 @@ public:
 
     const ByteVector data(0x400, ' ');
     f.setChunkData("SSND", data);
+    CPPUNIT_ASSERT_EQUAL(1070U, f.riffSize());
+    CPPUNIT_ASSERT_EQUAL(1078L, f.length());
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0026 + 8), f.chunkOffset(1));
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x042E + 8), f.chunkOffset(2));
@@ -255,6 +259,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.readBlock(4));
 
     f.setChunkData(0, data);
+    CPPUNIT_ASSERT_EQUAL(2076U, f.riffSize());
+    CPPUNIT_ASSERT_EQUAL(2084L, f.length());
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0414 + 8), f.chunkOffset(1));
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x081C + 8), f.chunkOffset(2));
@@ -267,6 +273,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.readBlock(4));
 
     f.removeChunk("SSND");
+    CPPUNIT_ASSERT_EQUAL(1044U, f.riffSize());
+    CPPUNIT_ASSERT_EQUAL(1052L, f.length());
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0414 + 8), f.chunkOffset(1));
 
@@ -276,6 +284,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.readBlock(4));
 
     f.removeChunk(0);
+    CPPUNIT_ASSERT_EQUAL(12U, f.riffSize());
+    CPPUNIT_ASSERT_EQUAL(20L, f.length());
     CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
 
     f.seek(f.chunkOffset(0) - 8);
