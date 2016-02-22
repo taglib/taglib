@@ -100,31 +100,50 @@ unsigned int RIFF::File::chunkCount() const
 
 unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 {
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::chunkPadding() - Index out of range. Returning 0.");
+    return 0;
+  }
+
   return d->chunks[i].size;
 }
 
 unsigned int RIFF::File::chunkOffset(unsigned int i) const
 {
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::chunkPadding() - Index out of range. Returning 0.");
+    return 0;
+  }
+
   return d->chunks[i].offset;
 }
 
 unsigned int RIFF::File::chunkPadding(unsigned int i) const
 {
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::chunkPadding() - Index out of range. Returning 0.");
+    return 0;
+  }
+
   return d->chunks[i].padding;
 }
 
 ByteVector RIFF::File::chunkName(unsigned int i) const
 {
-  if(i >= chunkCount())
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::chunkName() - Index out of range. Returning an empty vector.");
     return ByteVector();
+  }
 
   return d->chunks[i].name;
 }
 
 ByteVector RIFF::File::chunkData(unsigned int i)
 {
-  if(i >= chunkCount())
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::chunkData() - Index out of range. Returning an empty vector.");
     return ByteVector();
+  }
 
   seek(d->chunks[i].offset);
   return readBlock(d->chunks[i].size);
@@ -132,6 +151,11 @@ ByteVector RIFF::File::chunkData(unsigned int i)
 
 void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 {
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::setChunkData() - Index out of range.");
+    return;
+  }
+
   // Now update the specific chunk
 
   std::vector<Chunk>::iterator it = d->chunks.begin();
@@ -223,6 +247,11 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
 void RIFF::File::removeChunk(unsigned int i)
 {
+  if(i >= d->chunks.size()) {
+    debug("RIFF::File::removeChunk() - Index out of range.");
+    return;
+  }
+
   std::vector<Chunk>::iterator it = d->chunks.begin();
   std::advance(it, i);
 
