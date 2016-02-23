@@ -225,6 +225,15 @@ if(NOT ZLIB_SOURCE)
   else()
     set(HAVE_ZLIB 0)
   endif()
+
+  if(NOT HAVE_ZLIB)
+    find_package(Boost COMPONENTS iostreams zlib)
+    if(Boost_IOSTREAMS_FOUND AND Boost_ZLIB_FOUND)
+      set(HAVE_BOOST_ZLIB 1)
+    else()
+      set(HAVE_BOOST_ZLIB 0)
+    endif()
+  endif()
 endif()
 
 # Determine whether CppUnit is installed.
