@@ -252,7 +252,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     }
 
     const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset));
-    if(frameDataLength != outData.size()) {
+    if(!outData.isEmpty() && frameDataLength != outData.size()) {
       debug("frameDataLength does not match the data length returned by zlib");
     }
 
