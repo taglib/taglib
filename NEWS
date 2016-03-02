@@ -1,5 +1,7 @@
-TagLib 1.11 (Jan 30, 2016)
-==========================
+TagLib 1.11 (Mar 4, 2016)
+=========================
+
+1.11 BETA 2:
 
  * Better handling of PCM WAV files with a 'fact' chunk.
  * Better handling of corrupted APE tags.
