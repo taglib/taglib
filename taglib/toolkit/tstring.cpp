@@ -25,16 +25,6 @@
 
 // This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-#include "tstring.h"
-#include "tdebug.h"
-#include "tstringlist.h"
-#include "trefcounter.h"
-#include "tutils.h"
-
 #include <iostream>
 #include <cerrno>
 #include <climits>
@@ -47,12 +37,18 @@
 # include "unicode.h"
 #endif
 
+#include <tdebug.h>
+#include <tstringlist.h>
+#include <trefcounter.h>
+#include <tutils.h>
+
+#include "tstring.h"
+
 namespace
 {
   using namespace TagLib;
 
-  inline size_t UTF16toUTF8(
-    const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
+  size_t UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
   {
     size_t len = 0;
 
@@ -84,8 +80,7 @@ namespace
     return len;
   }
 
-  inline size_t UTF8toUTF16(
-    const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
+  size_t UTF8toUTF16(const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
   {
     size_t len = 0;
 
@@ -118,7 +113,7 @@ namespace
   }
 
   // Returns the native format of std::wstring.
-  inline String::Type wcharByteOrder()
+  String::Type wcharByteOrder()
   {
     if(Utils::systemByteOrder() == Utils::LittleEndian)
       return String::UTF16LE;
@@ -128,7 +123,7 @@ namespace
 
   // Converts a Latin-1 string into UTF-16(without BOM/CPU byte order)
   // and copies it to the internal buffer.
-  inline void copyFromLatin1(std::wstring &data, const char *s, size_t length)
+  void copyFromLatin1(std::wstring &data, const char *s, size_t length)
   {
     data.resize(length);
 
@@ -138,7 +133,7 @@ namespace
 
   // Converts a UTF-8 string into UTF-16(without BOM/CPU byte order)
   // and copies it to the internal buffer.
-  inline void copyFromUTF8(std::wstring &data, const char *s, size_t length)
+  void copyFromUTF8(std::wstring &data, const char *s, size_t length)
   {
     data.resize(length);
 
@@ -150,7 +145,7 @@ namespace
 
   // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
   // UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-  inline void copyFromUTF16(std::wstring &data, const wchar_t *s, size_t length, String::Type t)
+  void copyFromUTF16(std::wstring &data, const wchar_t *s, size_t length, String::Type t)
   {
     bool swap;
     if(t == String::UTF16) {
@@ -184,7 +179,7 @@ namespace
 
   // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
   // UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-  inline void copyFromUTF16(std::wstring &data, const char *s, size_t length, String::Type t)
+  void copyFromUTF16(std::wstring &data, const char *s, size_t length, String::Type t)
   {
     bool swap;
     if(t == String::UTF16) {

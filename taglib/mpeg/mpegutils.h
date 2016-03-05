@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright           : (C) 2007 by Lukas Lalinsky
-    email               : lukas@oxygene.sk
+    copyright            : (C) 2015 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,40 +23,41 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tmap.h>
-#include <cppunit/extensions/HelperMacros.h>
+#ifndef TAGLIB_MPEGUTILS_H
+#define TAGLIB_MPEGUTILS_H
 
-using namespace std;
-using namespace TagLib;
+// THIS FILE IS NOT A PART OF THE TAGLIB API
 
-class TestMap : public CppUnit::TestFixture
+#ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
+
+namespace TagLib
 {
-  CPPUNIT_TEST_SUITE(TestMap);
-  CPPUNIT_TEST(testInsert);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testInsert()
+  namespace MPEG
   {
-    Map<String, int> m1;
-    m1.insert("foo", 3);
-    CPPUNIT_ASSERT_EQUAL(3, m1["foo"]);
-    m1.insert("foo", 7);
-    CPPUNIT_ASSERT_EQUAL(7, m1["foo"]);
+    namespace
+    {
 
-    m1.insert("alice",  5);
-    m1.insert("bob",    9);
-    m1.insert("carol", 11);
+      /*!
+       * MPEG frames can be recognized by the bit pattern 11111111 111, so the
+       * first byte is easy to check for, however checking to see if the second byte
+       * starts with \e 111 is a bit more tricky, hence these functions.
+       */
+      inline bool firstSyncByte(unsigned char byte)
+      {
+        return (byte == 0xFF);
+      }
 
-    Map<String, int> m2 = m1;
-    Map<String, int>::Iterator it = m2.find("bob");
-    (*it).second = 99;
-    CPPUNIT_ASSERT_EQUAL(m1["bob"], 9);
-    CPPUNIT_ASSERT_EQUAL(m2["bob"], 99);
+      inline bool secondSynchByte(unsigned char byte)
+      {
+        // 0xFF is possible in theory, but it's very unlikely be a header.
+
+        return (byte != 0xFF && ((byte & 0xE0) == 0xE0));
+      }
+
+    }
   }
+}
 
-};
+#endif
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMap);
+#endif

@@ -1,3 +1,28 @@
+/***************************************************************************
+    copyright           : (C) 2007 by Lukas Lalinsky
+    email               : lukas@oxygene.sk
+ ***************************************************************************/
+
+/***************************************************************************
+ *   This library is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License version   *
+ *   2.1 as published by the Free Software Foundation.                     *
+ *                                                                         *
+ *   This library is distributed in the hope that it will be useful, but   *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   Lesser General Public License for more details.                       *
+ *                                                                         *
+ *   You should have received a copy of the GNU Lesser General Public      *
+ *   License along with this library; if not, write to the Free Software   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
+ ***************************************************************************/
+
 #include <string>
 #include <stdio.h>
 #include <id3v1tag.h>
@@ -16,6 +41,7 @@ class TestTrueAudio : public CppUnit::TestFixture
   CPPUNIT_TEST(testReadPropertiesWithoutID3v2);
   CPPUNIT_TEST(testReadPropertiesWithTags);
   CPPUNIT_TEST(testStripAndProperties);
+  CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -67,6 +93,32 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
       f.strip(TrueAudio::File::ID3v1);
       CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
+  }
+
+  void testRepeatedSave()
+  {
+    ScopedFileCopy copy("empty", ".tta");
+
+    {
+      TrueAudio::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+
+      f.ID3v2Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.save();
+
+      f.ID3v2Tag()->setTitle("0");
+      f.save();
+
+      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+      f.ID3v2Tag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
+      f.save();
+    }
+    {
+      TrueAudio::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
     }
   }
 

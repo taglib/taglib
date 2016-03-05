@@ -34,6 +34,13 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
+# Enable check_cxx_source_compiles() to work with Boost "header-only" libraries.
+
+find_package(Boost)
+if(Boost_FOUND)
+  set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${Boost_INCLUDE_DIRS}")
+endif()
+
 # Determine which kind of atomic operations your compiler supports.
 
 check_cxx_source_compiles("
@@ -47,15 +54,12 @@ check_cxx_source_compiles("
 " HAVE_STD_ATOMIC)
 
 if(NOT HAVE_STD_ATOMIC)
-  check_cxx_source_compiles("
-    #include <boost/atomic.hpp>
-    int main() {
-      boost::atomic<unsigned int> x(1);
-      x.fetch_add(1);
-      x.fetch_sub(1);
-      return 0;
-    }
-  " HAVE_BOOST_ATOMIC)
+  find_package(Boost COMPONENTS atomic)
+  if(Boost_ATOMIC_FOUND)
+    set(HAVE_BOOST_ATOMIC 1)
+  else()
+    set(HAVE_BOOST_ATOMIC 0)
+  endif()
 
   if(NOT HAVE_BOOST_ATOMIC)
     check_cxx_source_compiles("
@@ -209,10 +213,10 @@ check_cxx_source_compiles("
   int main() {
     _strdup(0);
     return 0;
-}
+  }
 " HAVE_ISO_STRDUP)
 
-# Check for libz using the cmake supplied FindZLIB.cmake
+# Determine whether zlib is installed.
 
 if(NOT ZLIB_SOURCE)
   find_package(ZLIB)
@@ -221,7 +225,18 @@ if(NOT ZLIB_SOURCE)
   else()
     set(HAVE_ZLIB 0)
   endif()
+
+  if(NOT HAVE_ZLIB)
+    find_package(Boost COMPONENTS iostreams zlib)
+    if(Boost_IOSTREAMS_FOUND AND Boost_ZLIB_FOUND)
+      set(HAVE_BOOST_ZLIB 1)
+    else()
+      set(HAVE_BOOST_ZLIB 0)
+    endif()
+  endif()
 endif()
+
+# Determine whether CppUnit is installed.
 
 if(BUILD_TESTS AND NOT BUILD_SHARED_LIBS)
   find_package(CppUnit)

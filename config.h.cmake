@@ -20,11 +20,12 @@
 #cmakedefine   HAVE_VSNPRINTF 1
 #cmakedefine   HAVE_VSPRINTF_S 1
 
-/* Defined if your compiler supports ISO _strdup. */
+/* Defined if your compiler supports ISO _strdup */
 #cmakedefine   HAVE_ISO_STRDUP 1
 
-/* Defined if you have libz */
+/* Defined if zlib is installed */
 #cmakedefine   HAVE_ZLIB 1
+#cmakedefine   HAVE_BOOST_ZLIB 1
 
 /* Indicates whether debug messages are shown even in release mode */
 #cmakedefine   TRACE_IN_RELEASE 1

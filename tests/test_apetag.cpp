@@ -1,3 +1,28 @@
+/***************************************************************************
+    copyright           : (C) 2010 by Lukas Lalinsky
+    email               : lukas@oxygene.sk
+ ***************************************************************************/
+
+/***************************************************************************
+ *   This library is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License version   *
+ *   2.1 as published by the Free Software Foundation.                     *
+ *                                                                         *
+ *   This library is distributed in the hope that it will be useful, but   *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   Lesser General Public License for more details.                       *
+ *                                                                         *
+ *   You should have received a copy of the GNU Lesser General Public      *
+ *   License along with this library; if not, write to the Free Software   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
+ ***************************************************************************/
+
 #include <string>
 #include <stdio.h>
 #include <tag.h>
@@ -97,6 +122,11 @@ public:
     CPPUNIT_ASSERT_EQUAL((unsigned int)2, unsuccessful.size());
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
+
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, tag.itemListMap().size());
+    tag.addValue("VALID KEY", "Test Value 1");
+    tag.addValue("INVALID KEY \x7f", "Test Value 2");
+    CPPUNIT_ASSERT_EQUAL((unsigned int)3, tag.itemListMap().size());
   }
 
   void testTextBinary()

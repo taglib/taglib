@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright           : (C) 2007 by Lukas Lalinsky
-    email               : lukas@oxygene.sk
+    copyright            : (C) 2016 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,40 +23,32 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tmap.h>
-#include <cppunit/extensions/HelperMacros.h>
+#ifndef TAGLIB_TZLIB_H
+#define TAGLIB_TZLIB_H
 
-using namespace std;
-using namespace TagLib;
+#include <tbytevector.h>
 
-class TestMap : public CppUnit::TestFixture
-{
-  CPPUNIT_TEST_SUITE(TestMap);
-  CPPUNIT_TEST(testInsert);
-  CPPUNIT_TEST_SUITE_END();
+// THIS FILE IS NOT A PART OF THE TAGLIB API
 
-public:
+#ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
-  void testInsert()
-  {
-    Map<String, int> m1;
-    m1.insert("foo", 3);
-    CPPUNIT_ASSERT_EQUAL(3, m1["foo"]);
-    m1.insert("foo", 7);
-    CPPUNIT_ASSERT_EQUAL(7, m1["foo"]);
+namespace TagLib {
 
-    m1.insert("alice",  5);
-    m1.insert("bob",    9);
-    m1.insert("carol", 11);
+  namespace zlib {
 
-    Map<String, int> m2 = m1;
-    Map<String, int>::Iterator it = m2.find("bob");
-    (*it).second = 99;
-    CPPUNIT_ASSERT_EQUAL(m1["bob"], 9);
-    CPPUNIT_ASSERT_EQUAL(m2["bob"], 99);
+     /*!
+      * Returns whether or not zlib is installed and ready to use.
+      */
+     bool isAvailable();
+
+     /*!
+      * Decompress \a data by zlib.
+      */
+     ByteVector decompress(const ByteVector &data);
+
   }
+}
 
-};
+#endif
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMap);
+#endif
