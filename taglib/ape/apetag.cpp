@@ -51,7 +51,7 @@ namespace
   {
     const char *invalidKeys[] = { "ID3", "TAG", "OGGS", "MP+", 0 };
 
-    if(length < 2 || length > 16)
+    if(length < 2 || length > 255)
       return false;
 
     // only allow printable ASCII including space (32..126)
