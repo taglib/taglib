@@ -1,6 +1,8 @@
 TagLib 1.11 (Mar 4, 2016)
 =========================
 
+ * Fixed reading APE items with long keys.
+
 1.11 BETA 2:
 
  * Better handling of PCM WAV files with a 'fact' chunk.
