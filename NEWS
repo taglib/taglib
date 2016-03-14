@@ -2,6 +2,7 @@ TagLib 1.11 (Mar 4, 2016)
 =========================
 
  * Fixed reading APE items with long keys.
+ * Fixed reading ID3v2 SYLT frames when description is empty.
 
 1.11 BETA 2:
 

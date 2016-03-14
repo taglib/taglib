@@ -94,6 +94,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseOwnershipFrame);
   CPPUNIT_TEST(testRenderOwnershipFrame);
   CPPUNIT_TEST(testParseSynchronizedLyricsFrame);
+  CPPUNIT_TEST(testParseSynchronizedLyricsFrameWithEmptyDescritpion);
   CPPUNIT_TEST(testRenderSynchronizedLyricsFrame);
   CPPUNIT_TEST(testParseEventTimingCodesFrame);
   CPPUNIT_TEST(testRenderEventTimingCodesFrame);
@@ -519,6 +520,35 @@ public:
                          f.timestampFormat());
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::Lyrics, f.type());
     CPPUNIT_ASSERT_EQUAL(String("foo"), f.description());
+    ID3v2::SynchronizedLyricsFrame::SynchedTextList stl = f.synchedText();
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, stl.size());
+    CPPUNIT_ASSERT_EQUAL(String("Example"), stl[0].text);
+    CPPUNIT_ASSERT_EQUAL((unsigned int)1234, stl[0].time);
+    CPPUNIT_ASSERT_EQUAL(String("Lyrics"), stl[1].text);
+    CPPUNIT_ASSERT_EQUAL((unsigned int)4567, stl[1].time);
+  }
+
+  void testParseSynchronizedLyricsFrameWithEmptyDescritpion()
+  {
+    ID3v2::SynchronizedLyricsFrame f(
+      ByteVector("SYLT"                      // Frame ID
+                 "\x00\x00\x00\x21"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "\x00"                      // Text encoding
+                 "eng"                       // Language
+                 "\x02"                      // Time stamp format
+                 "\x01"                      // Content type
+                 "\x00"                      // Content descriptor
+                 "Example\x00"               // 1st text
+                 "\x00\x00\x04\xd2"          // 1st time stamp
+                 "Lyrics\x00"                // 2nd text
+                 "\x00\x00\x11\xd7", 40));   // 2nd time stamp
+    CPPUNIT_ASSERT_EQUAL(String::Latin1, f.textEncoding());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("eng", 3), f.language());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::AbsoluteMilliseconds,
+                         f.timestampFormat());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::Lyrics, f.type());
+    CPPUNIT_ASSERT(f.description().isEmpty());
     ID3v2::SynchronizedLyricsFrame::SynchedTextList stl = f.synchedText();
     CPPUNIT_ASSERT_EQUAL((unsigned int)2, stl.size());
     CPPUNIT_ASSERT_EQUAL(String("Example"), stl[0].text);
