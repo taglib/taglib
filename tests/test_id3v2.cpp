@@ -249,7 +249,7 @@ public:
                                  "d\x00"
                                  "\x00", 14);
     ID3v2::AttachedPictureFrame *frame =
-        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, (unsigned int)2));
+        dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, (unsigned int)2));
 
     CPPUNIT_ASSERT(frame);
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), frame->mimeType());
@@ -269,8 +269,8 @@ public:
                                  "\x01"
                                  "d\x00"
                                  "\x00", 14);
-    ID3v2::AttachedPictureFrame *frame =
-        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, (unsigned int)2));
+    ID3v2::UnknownFrame *frame =
+        dynamic_cast<TagLib::ID3v2::UnknownFrame*>(factory->createFrame(data, (unsigned int)2));
 
     CPPUNIT_ASSERT(frame);
 
@@ -663,7 +663,7 @@ public:
                                  "\x00"                 // Encoding
                                  "(22)Death Metal", 26);     // Text
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, (unsigned int)3));
+        dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, (unsigned int)3));
     CPPUNIT_ASSERT_EQUAL((unsigned int)1, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("Death Metal"), frame->fieldList()[0]);
 
@@ -682,7 +682,7 @@ public:
                                  "\x00"                 // Encoding
                                  "(4)Eurodisco", 23);   // Text
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, (unsigned int)3));
+        dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, (unsigned int)3));
     CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("4"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
@@ -701,7 +701,7 @@ public:
                                  "\0"                   // Encoding
                                  "14\0Eurodisco", 23);     // Text
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, (unsigned int)4));
+        dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, (unsigned int)4));
     CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("14"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
@@ -757,11 +757,11 @@ public:
     }
     {
       MPEG::File bar(newname.c_str());
-      tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
       CPPUNIT_ASSERT(tf);
       CPPUNIT_ASSERT_EQUAL((unsigned int)1, tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("2011"), tf->fieldList().front());
-      tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
       CPPUNIT_ASSERT(tf);
       CPPUNIT_ASSERT_EQUAL((unsigned int)1, tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("2012-04-17T12:01"), tf->fieldList().front());
