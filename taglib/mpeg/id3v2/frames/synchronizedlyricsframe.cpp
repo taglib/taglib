@@ -158,7 +158,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
   int pos = 6;
 
   d->description = readStringField(data, d->textEncoding, &pos);
-  if(d->description.isEmpty())
+  if(pos == 6)
     return;
 
   /*
