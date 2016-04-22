@@ -102,13 +102,14 @@ public:
   }
 };
 
+FrameFactory FrameFactory::factory;
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
 FrameFactory *FrameFactory::instance()
 {
-  static FrameFactory factory;
   return &factory;
 }
 
@@ -538,4 +539,3 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 
   return true;
 }
-
