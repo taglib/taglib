@@ -36,6 +36,9 @@ namespace TagLib {
   //! A list of pictures
   typedef List<Picture> PictureList;
 
+  /// TODO: review this interface before the release of TagLib v2.x in light of
+  /// https://github.com/taglib/taglib/issues/734#issuecomment-214001325
+
   /*!
   * This is a spcialization of the List class with some members.
   */
