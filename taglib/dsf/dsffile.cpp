@@ -193,7 +193,7 @@ void DSF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 
   // File is malformed or corrupted
   if(d->fileSize != length()) {
-    printf("DSF::File::read() -- File is corrupted wrong length");
+    debug("DSF::File::read() -- File is corrupted wrong length");
     setValid(false);
     return;
   }
