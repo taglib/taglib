@@ -64,13 +64,13 @@ namespace TagLib {
       virtual int sampleRate() const;
       virtual int channels() const;
       
-      enum ChannelType {
-        mono = 1, stereo, ch_3_channels, quad, ch_4_channels, ch_5_channels, ch_5_1_channel
-      };
-      
       int formatVersion() const;
       int formatID() const;
-      ChannelType channelType() const;
+      
+      /*!
+       * Channel type values: 1 = mono, 2 = stereo, 3 = 3 channels, 4 = quad, 5 = 4 channels, 6 = 5 channels, 7 = 5.1 channels
+       */
+      int channelType() const;
       int bitsPerSample() const;
       long long sampleCount() const;
       int blockSizePerChannel() const;

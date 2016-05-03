@@ -119,9 +119,9 @@ int DSF::Properties::formatID() const
   return d->formatID;
 }
 
-TagLib::DSF::Properties::ChannelType DSF::Properties::channelType() const
+int DSF::Properties::channelType() const
 {
-  return static_cast<ChannelType>(d->channelType);
+  return d->channelType;
 }
 
 int DSF::Properties::bitsPerSample() const
