@@ -242,14 +242,14 @@ bool DSDIFF::File::save()
     if (data.isNull()) {
       //Null data: remove chunk
       //Update global size
-      uint64_t removedChunkTotalSize = d->chunks[i].size + d->chunks[i].padding +12;
+      unsigned long long removedChunkTotalSize = d->chunks[i].size + d->chunks[i].padding +12;
       d->size -= removedChunkTotalSize;
       insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
 
       removeBlock(d->chunks[i].offset-12,removedChunkTotalSize);
       
       //Update the internal offsets
-      for (int r = i + 1; r < d->chunks.size(); r++) {
+      for (unsigned long r = i + 1; r < d->chunks.size(); r++) {
         d->chunks[r].offset = d->chunks[r - 1].offset + 12 + d->chunks[r - 1].size + d->chunks[r - 1].padding;
       }
       
@@ -315,7 +315,7 @@ bool DSDIFF::File::save()
     if (data.isNull()) {
       //Null data: remove chunk
       //Update global size
-      uint64_t removedChunkTotalSize = childChunks[i].size + childChunks[i].padding +12;
+      unsigned long long removedChunkTotalSize = childChunks[i].size + childChunks[i].padding +12;
       d->size -= removedChunkTotalSize;
       insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
       //Update child chunk size
@@ -402,7 +402,7 @@ bool DSDIFF::File::save()
     
     // Now add the chunk to the file
     ulonglong nextRootChunkIdx = length();
-    if ((d->childChunkIndex[childChunkNum]+1)<d->chunks.size())
+    if ((d->childChunkIndex[childChunkNum] + 1) < static_cast<int>(d->chunks.size()))
       nextRootChunkIdx = d->chunks[d->childChunkIndex[childChunkNum]+1].offset-12;
     writeChunk(name, data, offset, std::max<ulonglong>(0, nextRootChunkIdx - offset), (offset & 1) ? 1 : 0);
     
@@ -439,7 +439,7 @@ bool DSDIFF::File::save()
     }
     
     //Update childchunks structure as well
-    if (d->childChunkIndex[PROPChunk] >= startingChunk) {
+    if (d->childChunkIndex[PROPChunk] >= static_cast<int>(startingChunk)) {
       std::vector<Chunk64> &childChunksToUpdate = d->childChunks[PROPChunk];
       if (childChunksToUpdate.size()>0) {
         childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[PROPChunk]].offset + 12;
@@ -448,7 +448,7 @@ bool DSDIFF::File::save()
         }
       }
     }
-    if (d->childChunkIndex[DIINChunk] >= startingChunk) {
+    if (d->childChunkIndex[DIINChunk] >= static_cast<int>(startingChunk)) {
       std::vector<Chunk64> &childChunksToUpdate = d->childChunks[DIINChunk];
       if (childChunksToUpdate.size()>0) {
         childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[DIINChunk]].offset + 12;
@@ -523,14 +523,14 @@ bool DSDIFF::File::save()
       else if(d->chunks[i].name == "DST ")
       {
         //Now decode the chunks inside the DST chunk to read the DST Frame Information one
-        ulonglong dstChunkEnd = d->chunks[i].offset + d->chunks[i].size;
+        long long dstChunkEnd = d->chunks[i].offset + d->chunks[i].size;
         seek(d->chunks[i].offset);
         
         audioDataSizeinBytes = d->chunks[i].size;
         
         while (tell() +12 <= dstChunkEnd) {
           ByteVector dstChunkName = readBlock(4);
-          ulonglong dstChunkSize = readBlock(8).toLongLong(bigEndian);
+          long long dstChunkSize = readBlock(8).toLongLong(bigEndian);
           
           if(!isValidChunkID(dstChunkName)) {
             debug("DSDIFF::File::read() -- DST Chunk '" + dstChunkName + "' has invalid ID");
@@ -538,7 +538,7 @@ bool DSDIFF::File::save()
             break;
           }
           
-          if(static_cast<ulonglong>(tell()) + dstChunkSize > dstChunkEnd) {
+          if(static_cast<long long>(tell()) + dstChunkSize > dstChunkEnd) {
             debug("DSDIFF::File::read() -- DST Chunk '" + dstChunkName + "' has invalid size (larger than the DST chunk)");
             setValid(false);
             break;
@@ -568,11 +568,11 @@ bool DSDIFF::File::save()
       {
         d->childChunkIndex[PROPChunk] = i;
         //Now decodes the chunks inside the PROP chunk
-        ulonglong propChunkEnd = d->chunks[i].offset + d->chunks[i].size;
+        long long propChunkEnd = d->chunks[i].offset + d->chunks[i].size;
         seek(d->chunks[i].offset+4); //+4 to remove the 'SND ' marker at beginning of 'PROP' chunk
         while(tell() + 12 <= propChunkEnd) {
           ByteVector propChunkName = readBlock(4);
-          ulonglong propChunkSize = readBlock(8).toLongLong(bigEndian);
+          long long propChunkSize = readBlock(8).toLongLong(bigEndian);
           
           if(!isValidChunkID(propChunkName)) {
             debug("DSDIFF::File::read() -- PROP Chunk '" + propChunkName + "' has invalid ID");
@@ -580,7 +580,7 @@ bool DSDIFF::File::save()
             break;
           }
           
-          if(static_cast<ulonglong>(tell()) + propChunkSize > propChunkEnd) {
+          if(static_cast<long long>(tell()) + propChunkSize > propChunkEnd) {
             debug("DSDIFF::File::read() -- PROP Chunk '" + propChunkName + "' has invalid size (larger than the PROP chunk)");
             setValid(false);
             break;
@@ -615,12 +615,12 @@ bool DSDIFF::File::save()
         d->childChunkIndex[DIINChunk] = i;
         d->hasDiin = true;
         //Now decode the chunks inside the DIIN chunk
-        ulonglong diinChunkEnd = d->chunks[i].offset + d->chunks[i].size;
+        long long diinChunkEnd = d->chunks[i].offset + d->chunks[i].size;
         seek(d->chunks[i].offset);
         
         while (tell() +12 <= diinChunkEnd) {
           ByteVector diinChunkName = readBlock(4);
-          ulonglong diinChunkSize = readBlock(8).toLongLong(bigEndian);
+          long long diinChunkSize = readBlock(8).toLongLong(bigEndian);
           
           if(!isValidChunkID(diinChunkName)) {
             debug("DSDIFF::File::read() -- DIIN Chunk '" + diinChunkName + "' has invalid ID");
@@ -628,7 +628,7 @@ bool DSDIFF::File::save()
             break;
           }
           
-          if(static_cast<ulonglong>(tell()) + diinChunkSize > diinChunkEnd) {
+          if(static_cast<long long>(tell()) + diinChunkSize > diinChunkEnd) {
             debug("DSDIFF::File::read() -- DIIN Chunk '" + diinChunkName + "' has invalid size (larger than the DIIN chunk)");
             setValid(false);
             break;

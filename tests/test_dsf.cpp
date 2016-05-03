@@ -30,7 +30,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(2822400, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->formatVersion());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->formatID());
-    CPPUNIT_ASSERT_EQUAL(TagLib::DSF::Properties::ChannelType::stereo, f.audioProperties()->channelType());
+    DSF::Properties::ChannelType stereoChannels = DSF::Properties::ChannelType::stereo;
+    CPPUNIT_ASSERT_EQUAL(stereoChannels, f.audioProperties()->channelType());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL((long long)28224, f.audioProperties()->sampleCount());
     CPPUNIT_ASSERT_EQUAL(4096, f.audioProperties()->blockSizePerChannel());
