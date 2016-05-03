@@ -38,6 +38,8 @@
 #include "vorbisproperties.h"
 #include "wavproperties.h"
 #include "wavpackproperties.h"
+#include "dsfproperties.h"
+#include "dsdiffproperties.h"
 
 #include "audioproperties.h"
 
@@ -100,6 +102,12 @@ int AudioProperties::lengthInSeconds() const
 
   else if(dynamic_cast<const WavPack::Properties*>(this))
     return dynamic_cast<const WavPack::Properties*>(this)->lengthInSeconds();
+  
+  else if(dynamic_cast<const DSF::Properties*>(this))
+    return dynamic_cast<const DSF::Properties*>(this)->lengthInSeconds();
+  
+  else if(dynamic_cast<const DSDIFF::Properties*>(this))
+    return dynamic_cast<const DSDIFF::Properties*>(this)->lengthInSeconds();
 
   else
     return 0;
@@ -148,6 +156,12 @@ int AudioProperties::lengthInMilliseconds() const
 
   else if(dynamic_cast<const WavPack::Properties*>(this))
     return dynamic_cast<const WavPack::Properties*>(this)->lengthInMilliseconds();
+  
+  else if(dynamic_cast<const DSF::Properties*>(this))
+    return dynamic_cast<const DSF::Properties*>(this)->lengthInMilliseconds();
+  
+  else if(dynamic_cast<const DSDIFF::Properties*>(this))
+    return dynamic_cast<const DSDIFF::Properties*>(this)->lengthInMilliseconds();
 
   else
     return 0;

@@ -51,6 +51,8 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
+#include "dsffile.h"
+#include "dsdifffile.h"
 
 using namespace TagLib;
 
@@ -178,6 +180,10 @@ namespace
       return new IT::File(arg, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "DFF" || ext == "DSDIFF")
+      return new DSDIFF::File(arg, readAudioProperties, audioPropertiesStyle);
+    if(ext == "DSF")
+      return new DSF::File(arg, readAudioProperties, audioPropertiesStyle);
 
     return 0;
   }
@@ -304,6 +310,9 @@ StringList FileRef::defaultFileExtensions()
   l.append("s3m");
   l.append("it");
   l.append("xm");
+  l.append("dsf");
+  l.append("dff");
+  l.append("dsdiff"); // alias for "dff"
 
   return l;
 }
