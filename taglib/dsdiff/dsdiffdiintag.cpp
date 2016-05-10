@@ -72,12 +72,12 @@ String DSDIFF::DIIN::Tag::genre() const
   return String::null;
 }
 
-TagLib::uint DSDIFF::DIIN::Tag::year() const
+unsigned int DSDIFF::DIIN::Tag::year() const
 {
   return 0;
 }
 
-TagLib::uint DSDIFF::DIIN::Tag::track() const
+unsigned int DSDIFF::DIIN::Tag::track() const
 {
   return 0;
 }
@@ -110,11 +110,11 @@ void DSDIFF::DIIN::Tag::setGenre(const String &)
 {
 }
 
-void DSDIFF::DIIN::Tag::setYear(uint)
+void DSDIFF::DIIN::Tag::setYear(unsigned int)
 {
 }
 
-void DSDIFF::DIIN::Tag::setTrack(uint)
+void DSDIFF::DIIN::Tag::setTrack(unsigned int)
 {
 }
 

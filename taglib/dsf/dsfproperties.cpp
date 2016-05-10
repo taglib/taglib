@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2013 by Stephen F. Booth
-    email                : me@sbooth.org
+ copyright            : (C) 2013 by Stephen F. Booth
+ email                : me@sbooth.org
  ***************************************************************************/
 
 /***************************************************************************
@@ -34,20 +34,20 @@ class DSF::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    formatVersion(0),
-    formatID(0),
-    channelType(0),
-    channelNum(0),
-    samplingFrequency(0),
-    bitsPerSample(0),
-    sampleCount(0),
-    blockSizePerChannel(0),
-    bitrate(0),
-    length(0)
+  formatVersion(0),
+  formatID(0),
+  channelType(0),
+  channelNum(0),
+  samplingFrequency(0),
+  bitsPerSample(0),
+  sampleCount(0),
+  blockSizePerChannel(0),
+  bitrate(0),
+  length(0)
   {
-
+    
   }
-
+  
   // Nomenclature is from DSF file format specification
   unsigned int formatVersion;
   unsigned int formatID;
@@ -57,7 +57,7 @@ public:
   unsigned int bitsPerSample;
   long long sampleCount;
   unsigned int blockSizePerChannel;
-
+  
   // Computed
   unsigned int bitrate;
   unsigned int length;
@@ -145,17 +145,17 @@ int DSF::Properties::blockSizePerChannel() const
 
 void DSF::Properties::read(const ByteVector &data)
 {
-    d->formatVersion         = data.toUInt(0U,false);
-    d->formatID              = data.toUInt(4U,false);
-    d->channelType           = data.toUInt(8U,false);
-    d->channelNum            = data.toUInt(12U,false);
-    d->samplingFrequency     = data.toUInt(16U,false);
-    d->bitsPerSample         = data.toUInt(20U,false);
-    d->sampleCount           = data.toLongLong(24U,false);
-    d->blockSizePerChannel   = data.toUInt(32U,false);
-
-  d->bitrate               
-    = static_cast<uint>((d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0 + 0.5);
-  d->length                
-    = d->samplingFrequency > 0 ? static_cast<uint>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5) : 0;
+  d->formatVersion         = data.toUInt(0U,false);
+  d->formatID              = data.toUInt(4U,false);
+  d->channelType           = data.toUInt(8U,false);
+  d->channelNum            = data.toUInt(12U,false);
+  d->samplingFrequency     = data.toUInt(16U,false);
+  d->bitsPerSample         = data.toUInt(20U,false);
+  d->sampleCount           = data.toLongLong(24U,false);
+  d->blockSizePerChannel   = data.toUInt(32U,false);
+  
+  d->bitrate
+  = static_cast<unsigned int>((d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0 + 0.5);
+  d->length
+  = d->samplingFrequency > 0 ? static_cast<unsigned int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5) : 0;
 }

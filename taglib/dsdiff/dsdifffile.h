@@ -202,7 +202,7 @@ namespace TagLib {
              *
              * \warning This will update the file immediately.
              */
-            void setRootChunkData(uint i, const ByteVector &data);
+            void setRootChunkData(unsigned int i, const ByteVector &data);
             
             /*!
              * Sets the data for the root-level chunk \a name to \a data.  If a root-level chunk with the
@@ -220,7 +220,7 @@ namespace TagLib {
              *
              * \warning This will update the file immediately.
              */
-            void setChildChunkData(uint i, const ByteVector &data, uint childChunkNum);
+            void setChildChunkData(unsigned int i, const ByteVector &data, unsigned int childChunkNum);
             
             /*!
              * Sets the data for the child chunk \a name to \a data.  If a chunk with the
@@ -231,14 +231,14 @@ namespace TagLib {
              *
              * \warning This will update the file immediately.
              */
-            void setChildChunkData(const ByteVector &name, const ByteVector &data, uint childChunkNum);
+            void setChildChunkData(const ByteVector &name, const ByteVector &data, unsigned int childChunkNum);
             
-            void updateRootChunksStructure(uint startingChunk);
+            void updateRootChunksStructure(unsigned int startingChunk);
             
             void read(bool readProperties, Properties::ReadStyle propertiesStyle);
             void writeChunk(const ByteVector &name, const ByteVector &data,
-                            ulonglong offset, ulong replace = 0,
-                            uint leadingPadding = 0);
+                            unsigned long long offset, unsigned long replace = 0,
+                            unsigned int leadingPadding = 0);
             
             
             class FilePrivate;

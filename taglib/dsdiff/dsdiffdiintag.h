@@ -70,12 +70,12 @@ namespace TagLib {
                 /*!
                  * Not supported.  Therefore always returns 0.
                  */
-                uint year() const;
+                unsigned int year() const;
                 
                 /*!
                  * Not supported.  Therefore always returns 0.
                  */
-                uint track() const;
+                unsigned int track() const;
                 
                 /*!
                  * Sets the title to \a title.  If \a title is String::null then this
@@ -107,12 +107,12 @@ namespace TagLib {
                 /*!
                  * Not supported and therefore ignored.
                  */
-                void setYear(uint year);
+                void setYear(unsigned int year);
                 
                 /*!
                  * Not supported and therefore ignored.
                  */
-                void setTrack(uint track);
+                void setTrack(unsigned int track);
                 
                 /*!
                  * Implements the unified property interface -- export function.

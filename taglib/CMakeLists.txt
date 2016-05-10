@@ -384,15 +384,7 @@ set_target_properties(tag PROPERTIES
 )
 
 if(BUILD_FRAMEWORK)
-  set(BUILD_SHARED_LIBS On)
-  set(CMAKE_MACOSX_RPATH 1)
-  unset(INSTALL_NAME_DIR)
-  set_target_properties(tag PROPERTIES 
-      FRAMEWORK TRUE
-      MACOSX_RPATH 1
-      VERSION "A"
-      SOVERSION "A"
-      )
+  set_target_properties(tag PROPERTIES FRAMEWORK TRUE)
 endif()
 
 install(TARGETS tag

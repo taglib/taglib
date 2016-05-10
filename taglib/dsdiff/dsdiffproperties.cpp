@@ -49,14 +49,14 @@ public:
   int sampleRate;
   int channels;
   int sampleWidth;
-  ulonglong sampleCount;
+  unsigned long long sampleCount;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DSDIFF::Properties::Properties(const uint sampleRate, const ushort channels, const ulonglong samplesCount, const int bitrate, ReadStyle style) : AudioProperties(style)
+DSDIFF::Properties::Properties(const unsigned int sampleRate, const unsigned short channels, const unsigned long long samplesCount, const int bitrate, ReadStyle style) : AudioProperties(style)
 {
   d = new PropertiesPrivate;
   
@@ -87,8 +87,6 @@ int DSDIFF::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
-
-
 
 int DSDIFF::Properties::bitrate() const
 {
