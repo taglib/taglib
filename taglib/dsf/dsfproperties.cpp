@@ -45,9 +45,8 @@ public:
   bitrate(0),
   length(0)
   {
-    
   }
-  
+
   // Nomenclature is from DSF file format specification
   unsigned int formatVersion;
   unsigned int formatID;
@@ -57,7 +56,7 @@ public:
   unsigned int bitsPerSample;
   long long sampleCount;
   unsigned int blockSizePerChannel;
-  
+
   // Computed
   unsigned int bitrate;
   unsigned int length;
@@ -153,9 +152,10 @@ void DSF::Properties::read(const ByteVector &data)
   d->bitsPerSample         = data.toUInt(20U,false);
   d->sampleCount           = data.toLongLong(24U,false);
   d->blockSizePerChannel   = data.toUInt(32U,false);
-  
+
   d->bitrate
   = static_cast<unsigned int>((d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0 + 0.5);
   d->length
   = d->samplingFrequency > 0 ? static_cast<unsigned int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5) : 0;
 }
+

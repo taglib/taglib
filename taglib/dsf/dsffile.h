@@ -32,19 +32,19 @@
 
 namespace TagLib {
 
-    //! An implementation of DSF metadata
+  //! An implementation of DSF metadata
 
-    /*!
-     * This is implementation of DSF metadata.
-     *
-     * This supports an ID3v2 tag as well as properties from the file.
-     */
+  /*!
+   * This is implementation of DSF metadata.
+   *
+   * This supports an ID3v2 tag as well as properties from the file.
+   */
 
   namespace DSF {
 
-   //! An implementation of TagLib::File with DSF specific methods
+    //! An implementation of TagLib::File with DSF specific methods
 
-   /*!
+    /*!
      * This implements and provides an interface for DSF files to the
      * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
      * the abstract TagLib::File API as well as providing some additional
@@ -59,16 +59,16 @@ namespace TagLib {
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
        */
-        File(FileName file, bool readProperties = true,
-             Properties::ReadStyle propertiesStyle = Properties::Average);
+      File(FileName file, bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
        * Contructs an DSF file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
        */
-        File(IOStream *stream, bool readProperties = true,
-             Properties::ReadStyle propertiesStyle = Properties::Average);
+      File(IOStream *stream, bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
        * Destroys this instance of the File.
@@ -116,3 +116,4 @@ namespace TagLib {
 }
 
 #endif
+

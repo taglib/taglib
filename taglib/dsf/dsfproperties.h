@@ -63,10 +63,10 @@ namespace TagLib {
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
-      
+
       int formatVersion() const;
       int formatID() const;
-      
+
       /*!
        * Channel type values: 1 = mono, 2 = stereo, 3 = 3 channels, 4 = quad, 5 = 4 channels, 6 = 5 channels, 7 = 5.1 channels
        */
@@ -88,3 +88,4 @@ namespace TagLib {
 }
 
 #endif
+

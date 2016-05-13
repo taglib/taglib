@@ -5,7 +5,7 @@
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
- *   it  under the terms of the GNU Lesser General Public License version  *
+ *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
  *   This library is distributed in the hope that it will be useful, but   *
@@ -15,8 +15,12 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,            *
- *   MA  02110-1301  USA                                                   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
 #include "dsdiffdiintag.h"
@@ -32,7 +36,7 @@ public:
   TagPrivate()
   {
   }
-  
+
   String title;
   String artist;
 };
@@ -59,17 +63,17 @@ String DSDIFF::DIIN::Tag::artist() const
 
 String DSDIFF::DIIN::Tag::album() const
 {
-  return String::null;
+  return String();
 }
 
 String DSDIFF::DIIN::Tag::comment() const
 {
-  return String::null;
+  return String();
 }
 
 String DSDIFF::DIIN::Tag::genre() const
 {
-  return String::null;
+  return String();
 }
 
 unsigned int DSDIFF::DIIN::Tag::year() const
@@ -85,7 +89,7 @@ unsigned int DSDIFF::DIIN::Tag::track() const
 void DSDIFF::DIIN::Tag::setTitle(const String &title)
 {
   if (title.isNull() || title.isEmpty())
-    d->title = String::null;
+    d->title = String();
   else
     d->title = title;
 }
@@ -93,7 +97,7 @@ void DSDIFF::DIIN::Tag::setTitle(const String &title)
 void DSDIFF::DIIN::Tag::setArtist(const String &artist)
 {
   if (artist.isNull() || artist.isEmpty())
-    d->artist = String::null;
+    d->artist = String();
   else
     d->artist = artist;
 }
@@ -131,25 +135,28 @@ PropertyMap DSDIFF::DIIN::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap properties(origProps);
   properties.removeEmpty();
   StringList oneValueSet;
+
   if(properties.contains("TITLE")) {
     d->title = properties["TITLE"].front();
     oneValueSet.append("TITLE");
   } else
-    d->title = String::null;
-  
+    d->title = String();
+
   if(properties.contains("ARTIST")) {
     d->artist = properties["ARTIST"].front();
     oneValueSet.append("ARTIST");
   } else
-    d->artist = String::null;
-  
+    d->artist = String();
+
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.
   for(StringList::Iterator it = oneValueSet.begin(); it != oneValueSet.end(); ++it) {
     if(properties[*it].size() == 1)
       properties.erase(*it);
     else
-      properties[*it].erase( properties[*it].begin() );
+      properties[*it].erase(properties[*it].begin());
   }
+
   return properties;
 }
+

@@ -30,51 +30,52 @@
 
 namespace TagLib {
 
-    namespace DSDIFF {
+  namespace DSDIFF {
 
-      class File;
+    class File;
 
-      //! An implementation of audio property reading for DSDIFF
+    //! An implementation of audio property reading for DSDIFF
+
+    /*!
+     * This reads the data from an DSDIFF stream found in the AudioProperties
+     * API.
+     */
+
+    class TAGLIB_EXPORT Properties : public AudioProperties
+    {
+    public:
+      /*!
+       * Create an instance of DSDIFF::Properties with the data read from the
+       * ByteVector \a data.
+       */
+      Properties(const unsigned int sampleRate, const unsigned short channels, const unsigned long long samplesCount, const int bitrate, ReadStyle style);
 
       /*!
-       * This reads the data from an DSDIFF stream found in the AudioProperties
-       * API.
+       * Destroys this DSDIFF::Properties instance.
        */
+      virtual ~Properties();
 
-      class TAGLIB_EXPORT Properties : public AudioProperties
-      {
-      public:
-        /*!
-         * Create an instance of DSDIFF::Properties with the data read from the
-         * ByteVector \a data.
-         */
-        Properties(const unsigned int sampleRate, const unsigned short channels, const unsigned long long samplesCount, const int bitrate, ReadStyle style);
+      // Reimplementations.
 
-        /*!
-         * Destroys this DSDIFF::Properties instance.
-         */
-        virtual ~Properties();
+      virtual int length() const;
+      virtual int lengthInSeconds() const;
+      virtual int lengthInMilliseconds() const;
+      virtual int bitrate() const;
+      virtual int sampleRate() const;
+      virtual int channels() const;
 
-        // Reimplementations.
+      int bitsPerSample() const;
+      long long sampleCount() const;
 
-        virtual int length() const;
-        virtual int lengthInSeconds() const;
-        virtual int lengthInMilliseconds() const;
-        virtual int bitrate() const;
-        virtual int sampleRate() const;
-        virtual int channels() const;
+    private:
+      Properties(const Properties &);
+      Properties &operator=(const Properties &);
 
-        int bitsPerSample() const;
-        long long sampleCount() const;
-
-      private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
-
-        class PropertiesPrivate;
-        PropertiesPrivate *d;
-      };
-    }
+      class PropertiesPrivate;
+      PropertiesPrivate *d;
+    };
+  }
 }
 
 #endif
+
