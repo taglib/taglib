@@ -1,3 +1,7 @@
+==========================
+
+ * Fixed reading ID3v2 CTOC frames with a lot of entries.
+
 TagLib 1.11 (Apr 29, 2016)
 ==========================
 
