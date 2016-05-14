@@ -118,6 +118,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST(testEmptyFrame);
   CPPUNIT_TEST(testDuplicateTags);
+  CPPUNIT_TEST(testParseTOCFrameWithManyChildren);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1215,6 +1216,12 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.readBlock(2089), audioStream);
 
     }
+  }
+
+  void testParseTOCFrameWithManyChildren()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("toc_many_children.mp3"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };
