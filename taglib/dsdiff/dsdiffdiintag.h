@@ -1,5 +1,5 @@
 /***************************************************************************
- copyright            : (C) 2014 by Damien Plisson, Audirvana
+ copyright            : (C) 2016 by Damien Plisson, Audirvana
  email                : damien78@audirvana.com
  ***************************************************************************/
 

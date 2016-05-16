@@ -298,7 +298,7 @@ void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &da
   }
 
   // Couldn't find an existing chunk, so let's create a new one.
-  unsigned int i =  d->chunks.size() - 1;
+  unsigned int i = d->chunks.size() - 1;
   unsigned long offset = d->chunks[i].offset + d->chunks[i].size + d->chunks[i].padding;
 
   // First we update the global size
@@ -455,7 +455,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
   }
   if(d->childChunkIndex[DIINChunk] >= static_cast<int>(startingChunk)) {
     std::vector<Chunk64> &childChunksToUpdate = d->childChunks[DIINChunk];
-    if(childChunksToUpdate.size()>0) {
+    if(childChunksToUpdate.size() > 0) {
       childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[DIINChunk]].offset + 12;
       for(unsigned int i = 1; i < childChunksToUpdate.size(); i++)
         childChunksToUpdate[i].offset = childChunksToUpdate[i - 1].offset + 12 + childChunksToUpdate[i - 1].size + childChunksToUpdate[i - 1].padding;
@@ -658,7 +658,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
   if(!isValid())
     return;
 
-  if(d->childChunkIndex[PROPChunk]<0) {
+  if(d->childChunkIndex[PROPChunk] < 0) {
     debug("DSDIFF::File::read() -- no PROP chunk found");
     setValid(false);
     return;
@@ -700,15 +700,15 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
       if(d->childChunks[DIINChunk][i].name == "DITI") {
         seek(d->childChunks[DIINChunk][i].offset);
         unsigned int titleStrLength = readBlock(4).toUInt(0, 4, bigEndian);
-        if(titleStrLength<= d->childChunks[DIINChunk][i].size) {
+        if(titleStrLength <= d->childChunks[DIINChunk][i].size) {
           ByteVector titleStr = readBlock(titleStrLength);
           d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false)->setTitle(titleStr);
         }
       }
-      else if (d->childChunks[DIINChunk][i].name == "DIAR") {
+      else if(d->childChunks[DIINChunk][i].name == "DIAR") {
         seek(d->childChunks[DIINChunk][i].offset);
         unsigned int artistStrLength = readBlock(4).toUInt(0, 4, bigEndian);
-        if(artistStrLength<= d->childChunks[DIINChunk][i].size) {
+        if(artistStrLength <= d->childChunks[DIINChunk][i].size) {
           ByteVector artistStr = readBlock(artistStrLength);
           d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false)->setArtist(artistStr);
         }

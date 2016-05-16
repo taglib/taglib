@@ -151,9 +151,9 @@ PropertyMap File::properties() const
     return dynamic_cast<const MP4::File* >(this)->properties();
   if(dynamic_cast<const ASF::File* >(this))
     return dynamic_cast<const ASF::File* >(this)->properties();
-  if (dynamic_cast<const DSF::File* >(this))
+  if(dynamic_cast<const DSF::File* >(this))
     return dynamic_cast<const DSF::File* >(this)->properties();
-  if (dynamic_cast<const DSDIFF::File* >(this))
+  if(dynamic_cast<const DSDIFF::File* >(this))
     return dynamic_cast<const DSDIFF::File* >(this)->properties();
   return tag()->properties();
 }
@@ -184,9 +184,9 @@ void File::removeUnsupportedProperties(const StringList &properties)
     dynamic_cast<MP4::File* >(this)->removeUnsupportedProperties(properties);
   else if(dynamic_cast<ASF::File* >(this))
     dynamic_cast<ASF::File* >(this)->removeUnsupportedProperties(properties);
-  else if (dynamic_cast<DSF::File* >(this))
+  else if(dynamic_cast<DSF::File* >(this))
     dynamic_cast<DSF::File* >(this)->removeUnsupportedProperties(properties);
-  else if (dynamic_cast<DSDIFF::File* >(this))
+  else if(dynamic_cast<DSDIFF::File* >(this))
     dynamic_cast<DSDIFF::File* >(this)->removeUnsupportedProperties(properties);
   else
     tag()->removeUnsupportedProperties(properties);
