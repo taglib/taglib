@@ -48,7 +48,9 @@ namespace TagLib {
        * Create an instance of DSDIFF::Properties with the data read from the
        * ByteVector \a data.
        */
-      Properties(const unsigned int sampleRate, const unsigned short channels, const unsigned long long samplesCount, const int bitrate, ReadStyle style);
+      Properties(const unsigned int sampleRate, const unsigned short channels,
+                 const unsigned long long samplesCount, const int bitrate,
+                 ReadStyle style);
 
       /*!
        * Destroys this DSDIFF::Properties instance.

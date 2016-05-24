@@ -68,7 +68,8 @@ namespace TagLib {
       int formatID() const;
 
       /*!
-       * Channel type values: 1 = mono, 2 = stereo, 3 = 3 channels, 4 = quad, 5 = 4 channels, 6 = 5 channels, 7 = 5.1 channels
+       * Channel type values: 1 = mono, 2 = stereo, 3 = 3 channels, 
+       * 4 = quad, 5 = 4 channels, 6 = 5 channels, 7 = 5.1 channels
        */
       int channelType() const;
       int bitsPerSample() const;
