@@ -53,6 +53,7 @@
 #include "itfile.h"
 #include "xmfile.h"
 #include "dsffile.h"
+#include "ebmlmatroskafile.h"
 
 using namespace TagLib;
 
@@ -136,6 +137,9 @@ namespace
       return new IT::File(stream, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(stream, readAudioProperties, audioPropertiesStyle);
+    if (ext == "MKA" || ext == "MKV") {
+      return new EBML::Matroska::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
 
     return 0;
   }
@@ -352,6 +356,8 @@ StringList FileRef::defaultFileExtensions()
   l.append("it");
   l.append("xm");
   l.append("dsf");
+  l.append("mka");
+  l.append("mkv");
 
   return l;
 }
