@@ -131,7 +131,7 @@ EBML::Matroska::File::~File()
   delete d;
 }
 
-EBML::Matroska::File::File(FileName file) : EBML::File(file), d(0)
+EBML::Matroska::File::File(FileName file, bool, AudioProperties::ReadStyle) : EBML::File(file), d(0)
 {
   if(isValid() && isOpen()) {
     d = FilePrivate::checkAndCreate(this);
@@ -142,7 +142,7 @@ EBML::Matroska::File::File(FileName file) : EBML::File(file), d(0)
   }
 }
 
-EBML::Matroska::File::File(IOStream *stream) : EBML::File(stream), d(0)
+EBML::Matroska::File::File(IOStream *stream, bool, AudioProperties::ReadStyle) : EBML::File(stream), d(0)
 {
   if(isValid() && isOpen()) {
     d = FilePrivate::checkAndCreate(this);

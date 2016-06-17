@@ -52,6 +52,7 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
+#include "ebml/matroska/ebmlmatroskafile.h"
 
 using namespace TagLib;
 
@@ -255,6 +256,9 @@ namespace
       return new IT::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if (ext == "MKA" || ext == "MKV") {
+      return new EBML::Matroska::File(fileName, readAudioProperties, audioPropertiesStyle);
+    }
 
     return 0;
   }
@@ -387,6 +391,8 @@ StringList FileRef::defaultFileExtensions()
   l.append("s3m");
   l.append("it");
   l.append("xm");
+  l.append("mka");
+  l.append("mkv");
 
   return l;
 }
