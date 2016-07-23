@@ -46,6 +46,8 @@
  * \endcode
  */
 
+#include <tuple>
+
 namespace TagLib
 {
   enum ByteOrder
@@ -53,6 +55,13 @@ namespace TagLib
     LittleEndian,
     BigEndian
   };
+  /*!
+   * Returns the library's version information as 3-tuple of ints (for major, minor, patch version).
+   */
+  std::tuple<int, int, int> version()
+  {
+      return std::make_tuple(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION);
+  }
 }
 
 /*!
