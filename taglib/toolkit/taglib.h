@@ -46,8 +46,6 @@
  * \endcode
  */
 
-#include <tuple>
-
 namespace TagLib
 {
   enum ByteOrder
@@ -55,13 +53,35 @@ namespace TagLib
     LittleEndian,
     BigEndian
   };
+  class String;
   /*!
-   * Returns the library's version information as 3-tuple of ints (for major, minor, patch version).
+   * Returns the version as a string in the form
+   * (Major Version).(Minor Version).(Patch Version), e.g. "4.2.0".
    */
-  std::tuple<int, int, int> version()
-  {
-      return std::make_tuple(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION);
-  }
+  String GetVersionString();
+
+  /*!
+   * Returns the version as an unsigned integer in the form
+   * (Major Version << 16) | (Minor Version << 8) | (Patch Version), e.g. 0x040200
+   * Use this for simple and consistent version comparison, e.g.
+   *     if (TagLib::GetVersion() <= ((1 << 16) | (11 << 8))) return false;
+   */
+  unsigned int GetVersion();
+
+  /*!
+   * Returns the major version, e.g. 4
+   */
+  unsigned int GetMajorVersion();
+
+  /*!
+   * Returns the minor version, e.g. 2
+   */
+  unsigned int GetMinorVersion();
+
+  /*!
+   * Returns the patch version, e.g. 0
+   */
+  unsigned int GetPatchVersion();
 }
 
 /*!

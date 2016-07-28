@@ -321,6 +321,7 @@ set(matroska_SRCS
 )
 
 set(toolkit_SRCS
+  toolkit/taglib.cpp
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
   toolkit/tstringhandler.cpp
