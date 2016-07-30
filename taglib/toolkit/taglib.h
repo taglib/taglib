@@ -54,34 +54,37 @@ namespace TagLib
     BigEndian
   };
   class String;
-  /*!
-   * Returns the version as a string in the form
-   * (Major Version).(Minor Version).(Patch Version), e.g. "4.2.0".
-   */
-  String GetVersionString();
+  namespace Version
+  {
+    /*!
+     * Returns the version as a string in the form
+     * (Major Version).(Minor Version).(Patch Version), e.g. "4.2.0".
+     */
+    String string();
 
-  /*!
-   * Returns the version as an unsigned integer in the form
-   * (Major Version << 16) | (Minor Version << 8) | (Patch Version), e.g. 0x040200
-   * Use this for simple and consistent version comparison, e.g.
-   *     if (TagLib::GetVersion() <= ((1 << 16) | (11 << 8))) return false;
-   */
-  unsigned int GetVersion();
+    /*!
+     * Returns the version as an unsigned integer in the form
+     * (Major Version << 16) | (Minor Version << 8) | (Patch Version), e.g. 0x040200
+     * Use this for simple and consistent version comparison, e.g.
+     *     if (TagLib::GetVersion() <= ((1 << 16) | (11 << 8))) return false;
+     */
+    unsigned int combined();
 
-  /*!
-   * Returns the major version, e.g. 4
-   */
-  unsigned int GetMajorVersion();
+    /*!
+     * Returns the major version, e.g. 4
+     */
+    unsigned int (major)();
 
-  /*!
-   * Returns the minor version, e.g. 2
-   */
-  unsigned int GetMinorVersion();
+    /*!
+     * Returns the minor version, e.g. 2
+     */
+    unsigned int (minor)();
 
-  /*!
-   * Returns the patch version, e.g. 0
-   */
-  unsigned int GetPatchVersion();
+    /*!
+     * Returns the patch version, e.g. 0
+     */
+    unsigned int patch();
+  }
 }
 
 /*!
