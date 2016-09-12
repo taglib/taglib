@@ -1,6 +1,6 @@
-project(taglib)
-
 cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
+
+project(taglib)
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS 2.8.12)
   cmake_policy(SET CMP0022 OLD)
