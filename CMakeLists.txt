@@ -12,6 +12,7 @@ if(DEFINED ENABLE_STATIC)
   message(FATAL_ERROR "This option is no longer available, use BUILD_SHARED_LIBS instead")
 endif()
 
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DTAGLIB_STATIC)
 endif()
