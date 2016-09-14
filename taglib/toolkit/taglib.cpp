@@ -4,7 +4,6 @@
 
 using namespace TagLib;
 
-
 String TagLib::Version::string()
 {
   return String::number(TAGLIB_MAJOR_VERSION)
@@ -14,11 +13,10 @@ String TagLib::Version::string()
 
 unsigned int TagLib::Version::combined()
 {
-  return (TAGLIB_MAJOR_VERSION << 16)
-          || (TAGLIB_MINOR_VERSION << 8)
-          || (TAGLIB_PATCH_VERSION << 4);
+  return (TAGLIB_MAJOR_VERSION << 16) |
+      (TAGLIB_MINOR_VERSION << 8) |
+      (TAGLIB_PATCH_VERSION << 4);
 }
-
 
 unsigned int (TagLib::Version::major)()
 {
