@@ -6,8 +6,8 @@ using namespace TagLib;
 String TagLib::Version::string()
 {
   return String::number(TAGLIB_MAJOR_VERSION)
-      + "." + String::number(TAGLIB_MINOR_VERSION)
-      + "." + String::number(TAGLIB_PATCH_VERSION);
+    + "." + String::number(TAGLIB_MINOR_VERSION)
+    + "." + String::number(TAGLIB_PATCH_VERSION);
 }
 
 unsigned int TagLib::Version::combined()
