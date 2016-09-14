@@ -1,6 +1,5 @@
 #include "taglib.h"
 #include "tstring.h"
-#include <string>
 
 using namespace TagLib;
 
