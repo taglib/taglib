@@ -137,7 +137,7 @@ void ByteVectorStream::seek(long offset, Position p)
     d->position += offset;
     break;
   case End:
-    d->position = length() - offset;
+    d->position = length() + offset; // offset is expected to be negative
     break;
   }
 }
