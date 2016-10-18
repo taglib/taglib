@@ -109,6 +109,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testW000);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
+  CPPUNIT_TEST(testPropertiesMovement);
   CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST(testParseChapterFrame);
@@ -919,6 +920,47 @@ public:
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
     CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)0, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
     CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
+  }
+
+  void testPropertiesMovement()
+  {
+    ID3v2::Tag tag;
+    ID3v2::TextIdentificationFrame *frameMvnm = new ID3v2::TextIdentificationFrame("MVNM");
+    frameMvnm->setText("Movement Name");
+    tag.addFrame(frameMvnm);
+
+    ID3v2::TextIdentificationFrame *frameMvin = new ID3v2::TextIdentificationFrame("MVIN");
+    frameMvin->setText("2/3");
+    tag.addFrame(frameMvin);
+
+    PropertyMap properties = tag.properties();
+    CPPUNIT_ASSERT(properties.contains("MOVEMENTNAME"));
+    CPPUNIT_ASSERT(properties.contains("MOVEMENTNUMBER"));
+    CPPUNIT_ASSERT_EQUAL(String("Movement Name"), properties["MOVEMENTNAME"].front());
+    CPPUNIT_ASSERT_EQUAL(String("2/3"), properties["MOVEMENTNUMBER"].front());
+
+    ByteVector frameDataMvnm("MVNM"
+                             "\x00\x00\x00\x0e"
+                             "\x00\x00"
+                             "\x00"
+                             "Movement Name", 24);
+    CPPUNIT_ASSERT_EQUAL(frameDataMvnm, frameMvnm->render());
+    ByteVector frameDataMvin("MVIN"
+                             "\x00\x00\x00\x04"
+                             "\x00\x00"
+                             "\x00"
+                             "2/3", 14);
+    CPPUNIT_ASSERT_EQUAL(frameDataMvin, frameMvin->render());
+
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ID3v2::TextIdentificationFrame *parsedFrameMvnm =
+        dynamic_cast<ID3v2::TextIdentificationFrame *>(factory->createFrame(frameDataMvnm));
+    ID3v2::TextIdentificationFrame *parsedFrameMvin =
+        dynamic_cast<ID3v2::TextIdentificationFrame *>(factory->createFrame(frameDataMvin));
+    CPPUNIT_ASSERT(parsedFrameMvnm);
+    CPPUNIT_ASSERT(parsedFrameMvin);
+    CPPUNIT_ASSERT_EQUAL(String("Movement Name"), parsedFrameMvnm->toString());
+    CPPUNIT_ASSERT_EQUAL(String("2/3"), parsedFrameMvin->toString());
   }
 
   void testDeleteFrame()
