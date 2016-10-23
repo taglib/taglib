@@ -52,21 +52,17 @@ namespace
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
 	if(!path.wstr().empty())
-	{
 #if (_WIN32_WINNT >= 0x0602)
-		return CreateFile2(path.wstr().c_str(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
+	  return CreateFile2(path.wstr().c_str(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
 #else
-		return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	  return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 #endif
-	}
 	else if(!path.str().empty())
-	{
 #if (_WIN32_WINNT >= 0x0602)
-		return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
+	  return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
 #else
-		return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	  return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 #endif
-	}
     else
       return InvalidFileHandle;
   }
