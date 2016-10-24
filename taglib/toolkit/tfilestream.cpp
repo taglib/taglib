@@ -50,21 +50,17 @@ namespace
   FileHandle openFile(const FileName &path, bool readOnly)
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
-
+	
+#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
+	return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
+#else
 	if(!path.wstr().empty())
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
-	  return CreateFile2(path.wstr().c_str(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
-#else
 	  return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-#endif
 	else if(!path.str().empty())
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
-	  return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
-#else
 	  return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-#endif
     else
       return InvalidFileHandle;
+#endif
   }
 
   void closeFile(FileHandle file)
