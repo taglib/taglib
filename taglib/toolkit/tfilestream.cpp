@@ -50,7 +50,7 @@ namespace
   FileHandle openFile(const FileName &path, bool readOnly)
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
-	
+
 #if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
     return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
 #else
@@ -442,14 +442,14 @@ long FileStream::length()
 
   SetLastError(NO_ERROR);
 #if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
-  LARGE_INTEGER fSize;
-  GetFileSizeEx(d->file, &fSize);
-  LONGLONG fileSize = fSize.QuadPart;
+  LARGE_INTEGER fileSize;
+  GetFileSizeEx(d->file, &fileSize);
 #else
-  const DWORD fileSize = GetFileSize(d->file, NULL);
+  ULARGE_INTEGER fileSize;
+  fileSize.LowPart = GetFileSize(d->file, &fileSize.HighPart);
 #endif
-  if(GetLastError() == NO_ERROR) {
-    return static_cast<long>(fileSize);
+  if(GetLastError() == NO_ERROR && fileSize.QuadPart <= LONG_MAX) {
+    return static_cast<long>(fileSize.QuadPart);
   }
   else {
     debug("FileStream::length() -- Failed to get the file size.");
