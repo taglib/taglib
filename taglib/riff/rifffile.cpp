@@ -292,7 +292,6 @@ void RIFF::File::read()
   d->size = readBlock(4).toUInt(bigEndian);
 
   offset += 8;
-  seek(offset);
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(offset + 8 <= length()) {
@@ -307,28 +306,24 @@ void RIFF::File::read()
       break;
     }
 
-    if(static_cast<long long>(tell()) + chunkSize > length()) {
+    if(static_cast<long long>(offset) + 8 + chunkSize > length()) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
       setValid(false);
       break;
     }
 
-    offset += 8;
-
     Chunk chunk;
-    chunk.name   = chunkName;
-    chunk.size   = chunkSize;
-    chunk.offset = offset;
+    chunk.name    = chunkName;
+    chunk.size    = chunkSize;
+    chunk.offset  = offset + 8;
+    chunk.padding = 0;
 
-    offset += chunk.size;
-
-    seek(offset);
+    offset = chunk.offset + chunk.size;
 
     // Check padding
 
-    chunk.padding = 0;
-
     if(offset & 1) {
+      seek(offset);
       const ByteVector iByte = readBlock(1);
       if(iByte.size() == 1 && iByte[0] == '\0') {
         chunk.padding = 1;
