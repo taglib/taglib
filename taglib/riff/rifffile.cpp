@@ -161,19 +161,19 @@ void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
   std::vector<Chunk>::iterator it = d->chunks.begin();
   std::advance(it, i);
 
-  const int originalSize = it->size + it->padding;
+  const long long originalSize = static_cast<long long>(it->size) + it->padding;
 
   writeChunk(it->name, data, it->offset - 8, it->size + it->padding + 8);
 
   it->size    = data.size();
-  it->padding = data.size() % 1;
+  it->padding = data.size() % 2;
 
-  const int diff = it->size + it->padding - originalSize;
+  const long long diff = static_cast<long long>(it->size) + it->padding - originalSize;
 
   // Now update the internal offsets
 
   for(++it; it != d->chunks.end(); ++it)
-    it->offset += diff;
+    it->offset += static_cast<int>(diff);
 
   // Update the global size.
 
