@@ -27,6 +27,8 @@
 #include <config.h>
 #endif
 
+#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
+
 #include "tdebug.h"
 #include "tstring.h"
 #include "tdebuglistener.h"
@@ -43,17 +45,11 @@ namespace TagLib
 
   void debug(const String &s)
   {
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
-
     debugListener->printMessage("TagLib: " + s + "\n");
-
-#endif
   }
 
   void debugData(const ByteVector &v)
   {
-#if !defined(NDEBUG) || defined(TRACE_IN_RELEASE)
-
     for(size_t i = 0; i < v.size(); ++i)
     {
       std::string bits = std::bitset<8>(v[i]).to_string();
@@ -63,7 +59,7 @@ namespace TagLib
 
       debugListener->printMessage(msg);
     }
-
-#endif
   }
 }
+
+#endif
