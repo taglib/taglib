@@ -120,7 +120,7 @@ public:
     if(!addOne)
       return ByteVector(vint.data() + vint.size() - byteSize, byteSize);
 
-    ulli firstByte = (1 << (vint.size() - byteSize));
+    ulli firstByte = (1ULL << (vint.size() - byteSize));
     // The most significant byte loses #bytSize bits for storing information.
     // Therefore, we might need to increase byteSize.
     if(number >= (firstByte << (8 * (byteSize - 1))) && byteSize < vint.size())
