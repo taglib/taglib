@@ -1,6 +1,6 @@
-project(taglib)
-
 cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
+
+project(taglib)
 
 if(NOT ${CMAKE_VERSION} VERSION_LESS 2.8.12)
   cmake_policy(SET CMP0022 OLD)
@@ -12,6 +12,7 @@ if(DEFINED ENABLE_STATIC)
   message(FATAL_ERROR "This option is no longer available, use BUILD_SHARED_LIBS instead")
 endif()
 
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if(NOT BUILD_SHARED_LIBS)
   add_definitions(-DTAGLIB_STATIC)
 endif()
@@ -89,9 +90,9 @@ endif()
 # 2. If any interfaces have been added, removed, or changed since the last update, increment current, and set revision to 0.
 # 3. If any interfaces have been added since the last public release, then increment age.
 # 4. If any interfaces have been removed since the last public release, then set age to 0.
-set(TAGLIB_SOVERSION_CURRENT  17)
+set(TAGLIB_SOVERSION_CURRENT  18)
 set(TAGLIB_SOVERSION_REVISION 0)
-set(TAGLIB_SOVERSION_AGE      16)
+set(TAGLIB_SOVERSION_AGE      17)
 
 math(EXPR TAGLIB_SOVERSION_MAJOR "${TAGLIB_SOVERSION_CURRENT} - ${TAGLIB_SOVERSION_AGE}")
 math(EXPR TAGLIB_SOVERSION_MINOR "${TAGLIB_SOVERSION_AGE}")

@@ -1,11 +1,11 @@
 /***************************************************************************
-    copyright           : (C) 2014 by Lukas Lalinsky
-    email               : lukas@oxygene.sk
+    copyright           : (C) 2015 by Tsuda Kageyu
+    email               : tsuda.kageyu@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
- *   it  under the terms of the GNU Lesser General Public License version  *
+ *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
  *   This library is distributed in the hope that it will be useful, but   *
@@ -15,8 +15,12 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,            *
- *   MA  02110-1301  USA                                                   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
 #include <tfile.h>
@@ -41,6 +45,7 @@ class TestFile : public CppUnit::TestFixture
   CPPUNIT_TEST(testFindInSmallFile);
   CPPUNIT_TEST(testRFindInSmallFile);
   CPPUNIT_TEST(testSeek);
+  CPPUNIT_TEST(testTruncate);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -123,6 +128,24 @@ public:
     CPPUNIT_ASSERT_EQUAL(4128LL, f.tell());
     f.seek(300, File::Current);
     CPPUNIT_ASSERT_EQUAL(4428LL, f.tell());
+  }
+
+  void testTruncate()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    std::string name = copy.fileName();
+
+    {
+      PlainFile f(name.c_str());
+      CPPUNIT_ASSERT_EQUAL(4328LL, f.length());
+
+      f.truncate(2000);
+      CPPUNIT_ASSERT_EQUAL(2000LL, f.length());
+    }
+    {
+      PlainFile f(name.c_str());
+      CPPUNIT_ASSERT_EQUAL(2000LL, f.length());
+    }
   }
 
 };

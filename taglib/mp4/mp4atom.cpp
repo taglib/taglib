@@ -23,20 +23,17 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <tdebug.h>
 #include <tstring.h>
+
 #include "mp4atom.h"
 
 using namespace TagLib;
 
 const char *MP4::Atom::containers[11] = {
-    "moov", "udta", "mdia", "meta", "ilst",
-    "stbl", "minf", "moof", "traf", "trak",
-    "stsd"
+  "moov", "udta", "mdia", "meta", "ilst",
+  "stbl", "minf", "moof", "traf", "trak",
+  "stsd"
 };
 
 MP4::Atom::Atom(File *file)

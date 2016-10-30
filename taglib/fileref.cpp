@@ -63,42 +63,42 @@ namespace
   // Templatized internal functions. T should be String or IOStream*.
 
   template <typename T>
-  inline FileName toFileName(T arg)
+  FileName toFileName(T arg)
   {
     debug("FileRef::toFileName<T>(): This version should never be called.");
     return FileName(L"");
   }
 
   template <>
-  inline FileName toFileName<IOStream *>(IOStream *arg)
+  FileName toFileName<IOStream *>(IOStream *arg)
   {
     return arg->name();
   }
 
   template <>
-  inline FileName toFileName<FileName>(FileName arg)
+  FileName toFileName<FileName>(FileName arg)
   {
     return arg;
   }
 
   template <typename T>
-  inline File *resolveFileType(T arg, bool readProperties,
-                               AudioProperties::ReadStyle style)
+  File *resolveFileType(T arg, bool readProperties,
+                        AudioProperties::ReadStyle style)
   {
     debug("FileRef::resolveFileType<T>(): This version should never be called.");
     return 0;
   }
 
   template <>
-  inline File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
-                                           AudioProperties::ReadStyle style)
+  File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
+                                    AudioProperties::ReadStyle style)
   {
     return 0;
   }
 
   template <>
-  inline File *resolveFileType<FileName>(FileName arg, bool readProperties,
-                                         AudioProperties::ReadStyle style)
+  File *resolveFileType<FileName>(FileName arg, bool readProperties,
+                                  AudioProperties::ReadStyle style)
   {
     ResolverList::ConstIterator it = fileTypeResolvers.begin();
     for(; it != fileTypeResolvers.end(); ++it) {

@@ -5,7 +5,7 @@
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
- *   it  under the terms of the GNU Lesser General Public License version  *
+ *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
  *   This library is distributed in the hope that it will be useful, but   *
@@ -15,8 +15,12 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,            *
- *   MA  02110-1301  USA                                                   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
 #include "tstringlist.h"
@@ -129,11 +133,11 @@ namespace
     {
       ByteVector data = file.readBlock(std::min(m_size, limit));
       size_t count = data.size();
-      const size_t index = data.find((char) 0);
-      if(index != ByteVector::npos()) {
+      int index = data.find((char) 0);
+      if(index > -1) {
         data.resize(index);
       }
-      data.replace((char) 0xff, ' ');
+      data.replace('\xff', ' ');
       value = data;
       return static_cast<unsigned int>(count);
     }

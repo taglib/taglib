@@ -23,11 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <tdebug.h>
+#include <tzlib.h>
 
 #include "id3v2framefactory.h"
 #include "id3v2synchdata.h"
@@ -105,13 +102,14 @@ public:
   }
 };
 
+FrameFactory FrameFactory::factory;
+
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
 FrameFactory *FrameFactory::instance()
 {
-  static FrameFactory factory;
   return &factory;
 }
 
@@ -162,12 +160,11 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // TagLib doesn't mess with encrypted frames, so just treat them
   // as unknown frames.
 
-#if !defined(HAVE_ZLIB) || HAVE_ZLIB == 0
-  if(header->compression()) {
+  if(!zlib::isAvailable() && header->compression()) {
     debug("Compressed frames are currently not supported.");
     return new UnknownFrame(data, header);
   }
-#endif
+
   if(header->encryption()) {
     debug("Encrypted frames are currently not supported.");
     return new UnknownFrame(data, header);
@@ -530,4 +527,3 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 
   return true;
 }
-

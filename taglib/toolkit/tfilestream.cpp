@@ -52,24 +52,28 @@ namespace
 
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
-  inline FileHandle openFile(const FileName &path, bool readOnly)
+  FileHandle openFile(const FileName &path, bool readOnly)
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
+#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
+    return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
+#else
     if(!path.wstr().empty())
       return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else if(!path.str().empty())
       return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     else
       return InvalidFileHandle;
+#endif
   }
 
-  inline void closeFile(FileHandle file)
+  void closeFile(FileHandle file)
   {
     CloseHandle(file);
   }
 
-  inline size_t readFile(FileHandle file, ByteVector &buffer)
+  size_t readFile(FileHandle file, ByteVector &buffer)
   {
     DWORD length;
     if(ReadFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
@@ -78,7 +82,7 @@ namespace
       return 0;
   }
 
-  inline size_t writeFile(FileHandle file, const ByteVector &buffer)
+  size_t writeFile(FileHandle file, const ByteVector &buffer)
   {
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
@@ -99,22 +103,22 @@ namespace
 
   const FileHandle InvalidFileHandle = 0;
 
-  inline FileHandle openFile(const FileName &path, bool readOnly)
+  FileHandle openFile(const FileName &path, bool readOnly)
   {
     return fopen(path, readOnly ? "rb" : "rb+");
   }
 
-  inline void closeFile(FileHandle file)
+  void closeFile(FileHandle file)
   {
     fclose(file);
   }
 
-  inline size_t readFile(FileHandle file, ByteVector &buffer)
+  size_t readFile(FileHandle file, ByteVector &buffer)
   {
     return fread(buffer.data(), sizeof(char), buffer.size(), file);
   }
 
-  inline size_t writeFile(FileHandle file, const ByteVector &buffer)
+  size_t writeFile(FileHandle file, const ByteVector &buffer)
   {
     return fwrite(buffer.data(), sizeof(char), buffer.size(), file);
   }
@@ -446,13 +450,16 @@ long long FileStream::length()
 
 #ifdef _WIN32
 
-  LARGE_INTEGER fileSize;
-  fileSize.QuadPart = 0;
-
   SetLastError(NO_ERROR);
-  fileSize.LowPart = GetFileSize(d->file, reinterpret_cast<LPDWORD>(&fileSize.HighPart));
+#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
+  LARGE_INTEGER fileSize;
+  GetFileSizeEx(d->file, &fileSize);
+#else
+  ULARGE_INTEGER fileSize;
+  fileSize.LowPart = GetFileSize(d->file, &fileSize.HighPart);
+#endif
   if(GetLastError() == NO_ERROR) {
-    return fileSize.QuadPart;
+    return static_cast<long long>(fileSize.QuadPart);
   }
   else {
     debug("FileStream::length() -- Failed to get the file size.");

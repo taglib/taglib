@@ -34,25 +34,27 @@ namespace TagLib
 {
   namespace MPEG
   {
-
-    /*!
-     * MPEG frames can be recognized by the bit pattern 11111111 111, so the
-     * first byte is easy to check for, however checking to see if the second byte
-     * starts with \e 111 is a bit more tricky, hence these functions.
-     */
-
-    inline bool firstSyncByte(unsigned char byte)
+    namespace
     {
-      return (byte == 0xFF);
+
+      /*!
+       * MPEG frames can be recognized by the bit pattern 11111111 111, so the
+       * first byte is easy to check for, however checking to see if the second byte
+       * starts with \e 111 is a bit more tricky, hence these functions.
+       */
+      inline bool firstSyncByte(unsigned char byte)
+      {
+        return (byte == 0xFF);
+      }
+
+      inline bool secondSynchByte(unsigned char byte)
+      {
+        // 0xFF is possible in theory, but it's very unlikely be a header.
+
+        return (byte != 0xFF && ((byte & 0xE0) == 0xE0));
+      }
+
     }
-
-    inline bool secondSynchByte(unsigned char byte)
-    {
-      // 0xFF is possible in theory, but it's very unlikely be a header.
-
-      return (byte != 0xFF && ((byte & 0xE0) == 0xE0));
-    }
-
   }
 }
 

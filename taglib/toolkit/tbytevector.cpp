@@ -23,10 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -35,10 +31,10 @@
 #include <cstring>
 #include <cstddef>
 
-#include "tstring.h"
-#include "tdebug.h"
-#include "tsmartptr.h"
-#include "tutils.h"
+#include <tstring.h>
+#include <tdebug.h>
+#include <tsmartptr.h>
+#include <tutils.h>
 
 #include "tbytevector.h"
 
@@ -472,18 +468,34 @@ bool ByteVector::endsWith(const ByteVector &pattern) const
   return containsAt(pattern, size() - pattern.size());
 }
 
+ByteVector &ByteVector::replace(char oldByte, char newByte)
+{
+  detach();
+
+  for(ByteVector::Iterator it = begin(); it != end(); ++it) {
+    if(*it == oldByte)
+      *it = newByte;
+  }
+
+  return *this;
+}
+
 ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &with)
 {
+  // TODO: This takes O(n!) time in the worst case. Rewrite it to run in O(n) time.
+
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
+
+  if(pattern.size() == 1 && with.size() == 1)
+    return replace(pattern[0], with[0]);
 
   const size_t withSize    = with.size();
   const size_t patternSize = pattern.size();
   const ptrdiff_t diff = withSize - patternSize;
 
   size_t offset = 0;
-  while (true)
-  {
+  while (true) {
     offset = find(pattern, offset);
     if(offset == npos())
       break;
@@ -535,12 +547,16 @@ size_t ByteVector::endsWithPartialMatch(const ByteVector &pattern) const
 
 ByteVector &ByteVector::append(const ByteVector &v)
 {
-  if(v.d->length != 0) {
-    detach();
-    size_t originalSize = size();
-    resize(originalSize + v.size());
-    ::memcpy(data() + originalSize, v.data(), v.size());
-  }
+  if(v.isEmpty())
+    return *this;
+
+  detach();
+
+  const size_t originalSize = size();
+  const size_t appendSize = v.size();
+
+  resize(originalSize + appendSize);
+  ::memcpy(data() + originalSize, v.data(), appendSize);
 
   return *this;
 }

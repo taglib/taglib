@@ -1,8 +1,29 @@
-TagLib 1.11 (Jan 30, 2016)
+============================
+
+ * Added support for WinRT.
+
+TagLib 1.11.1 (Oct 24, 2016)
+============================
+
+ * Fixed binary incompatible change in TagLib::String.
+ * Fixed reading ID3v2 CTOC frames with a lot of entries.
+ * Fixed seeking ByteVectorStream from the end.
+
+TagLib 1.11 (Apr 29, 2016)
 ==========================
+
+1.11:
+
+ * Fixed reading APE items with long keys.
+ * Fixed reading ID3v2 SYLT frames when description is empty.
+
+1.11 BETA 2:
 
  * Better handling of PCM WAV files with a 'fact' chunk.
  * Better handling of corrupted APE tags.
+ * Efficient decoding of unsynchronized ID3v2 frames.
+ * Fixed text encoding when saving certain frames in ID3v2.3 tags.
+ * Fixed updating the size of RIFF files when removing chunks.
  * Several smaller bug fixes and performance improvements.
 
 1.11 BETA:
@@ -34,7 +55,7 @@ TagLib 1.11 (Jan 30, 2016)
  * Fixed updating the comment field of Vorbis comments.
  * Fixed reading date and time in ID3v2.3 tags.
  * Marked ByteVector::null and ByteVector::isNull() deprecated.
- * Marked String::null and ByteVector::isNull() deprecated.
+ * Marked String::null and String::isNull() deprecated.
  * Marked XiphComment::removeField() deprecated.
  * Marked Ogg::Page::getCopyWithNewPageSequenceNumber() deprecated. It returns null.
  * Marked custom integer types deprecated.

@@ -50,7 +50,7 @@ namespace
   bool unicodeStrings = true;
   bool stringManagementEnabled = true;
 
-  inline char *stringToCharArray(const String &s)
+  char *stringToCharArray(const String &s)
   {
     const std::string str = s.to8Bit(unicodeStrings);
 
@@ -65,7 +65,7 @@ namespace
 #endif
   }
 
-  inline String charArrayToString(const char *s)
+  String charArrayToString(const char *s)
   {
     return String(s, unicodeStrings ? String::UTF8 : String::Latin1);
   }

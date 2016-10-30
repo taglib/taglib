@@ -179,6 +179,12 @@ namespace TagLib {
     bool endsWith(const ByteVector &pattern) const;
 
     /*!
+     * Replaces \a oldByte with \a newByte and returns a reference to the
+     * ByteVector after the operation.  This \e does modify the vector.
+     */
+    ByteVector &replace(char oldByte, char newByte);
+
+    /*!
      * Replaces \a pattern with \a with and returns a reference to the ByteVector
      * after the operation.  This \e does modify the vector.
      */

@@ -37,7 +37,7 @@ using namespace TagLib;
 namespace
 {
   // Returns the first packet index of the right next page to the given one.
-  inline unsigned int nextPacketIndex(const Ogg::Page *page)
+  unsigned int nextPacketIndex(const Ogg::Page *page)
   {
     if(page->header()->lastPacketCompleted())
       return page->firstPacketIndex() + page->packetCount();
@@ -262,12 +262,13 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
   // TODO: This pagination method isn't accurate for what's being done here.
   // This should account for real possibilities like non-aligned packets and such.
 
-  const List<Page *> pages = Page::paginate(packets,
-                                            Page::SinglePagePerGroup,
-                                            firstPage->header()->streamSerialNumber(),
-                                            firstPage->pageSequenceNumber(),
-                                            firstPage->header()->firstPacketContinued(),
-                                            lastPage->header()->lastPacketCompleted());
+  List<Page *> pages = Page::paginate(packets,
+                                      Page::SinglePagePerGroup,
+                                      firstPage->header()->streamSerialNumber(),
+                                      firstPage->pageSequenceNumber(),
+                                      firstPage->header()->firstPacketContinued(),
+                                      lastPage->header()->lastPacketCompleted());
+  pages.setAutoDelete(true);
 
   // Write the pages.
 

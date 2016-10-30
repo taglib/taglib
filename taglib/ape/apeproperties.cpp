@@ -126,7 +126,7 @@ unsigned int APE::AudioProperties::sampleFrames() const
 
 namespace
 {
-  inline int headerVersion(const ByteVector &header)
+  int headerVersion(const ByteVector &header)
   {
     if(header.size() < 6 || !header.startsWith("MAC "))
       return -1;

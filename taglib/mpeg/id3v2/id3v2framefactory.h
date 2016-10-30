@@ -66,7 +66,6 @@ namespace TagLib {
     {
     public:
       static FrameFactory *instance();
-
       /*!
        * Create a frame based on \a data.  \a tagHeader should be a valid
        * ID3v2::Header instance.
@@ -131,6 +130,8 @@ namespace TagLib {
     private:
       FrameFactory(const FrameFactory &);
       FrameFactory &operator=(const FrameFactory &);
+
+      static FrameFactory factory;
 
       class FrameFactoryPrivate;
       FrameFactoryPrivate *d;

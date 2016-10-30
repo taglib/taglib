@@ -1,6 +1,27 @@
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
+/***************************************************************************
+    copyright           : (C) 2007 by Lukas Lalinsky
+    email               : lukas@oxygene.sk
+ ***************************************************************************/
+
+/***************************************************************************
+ *   This library is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License version   *
+ *   2.1 as published by the Free Software Foundation.                     *
+ *                                                                         *
+ *   This library is distributed in the hope that it will be useful, but   *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   Lesser General Public License for more details.                       *
+ *                                                                         *
+ *   You should have received a copy of the GNU Lesser General Public      *
+ *   License along with this library; if not, write to the Free Software   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
+ ***************************************************************************/
 
 #include <string>
 #include <stdio.h>
@@ -23,6 +44,7 @@
 #include <tableofcontentsframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <tzlib.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -47,7 +69,8 @@ class TestID3v2 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v2);
   CPPUNIT_TEST(testUnsynchDecode);
-  CPPUNIT_TEST(testDowngradeUTF8ForID3v23);
+  CPPUNIT_TEST(testDowngradeUTF8ForID3v23_1);
+  CPPUNIT_TEST(testDowngradeUTF8ForID3v23_2);
   CPPUNIT_TEST(testUTF16BEDelimiter);
   CPPUNIT_TEST(testUTF16Delimiter);
   CPPUNIT_TEST(testReadStringField);
@@ -73,6 +96,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseOwnershipFrame);
   CPPUNIT_TEST(testRenderOwnershipFrame);
   CPPUNIT_TEST(testParseSynchronizedLyricsFrame);
+  CPPUNIT_TEST(testParseSynchronizedLyricsFrameWithEmptyDescritpion);
   CPPUNIT_TEST(testRenderSynchronizedLyricsFrame);
   CPPUNIT_TEST(testParseEventTimingCodesFrame);
   CPPUNIT_TEST(testRenderEventTimingCodesFrame);
@@ -96,6 +120,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST(testEmptyFrame);
   CPPUNIT_TEST(testDuplicateTags);
+  CPPUNIT_TEST(testParseTOCFrameWithManyChildren);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -107,7 +132,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("My babe just cares for me"), f.tag()->title());
   }
 
-  void testDowngradeUTF8ForID3v23()
+  void testDowngradeUTF8ForID3v23_1()
   {
     ScopedFileCopy copy("xing", ".mp3");
     string newname = copy.fileName();
@@ -128,6 +153,27 @@ public:
 
     ID3v2::TextIdentificationFrame f2(data);
     CPPUNIT_ASSERT_EQUAL(sl, f2.fieldList());
+    CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
+  }
+
+  void testDowngradeUTF8ForID3v23_2()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+
+    ID3v2::UnsynchronizedLyricsFrame *f
+      = new ID3v2::UnsynchronizedLyricsFrame(String::UTF8);
+    f->setText("Foo");
+
+    MPEG::File file(copy.fileName().c_str());
+    file.ID3v2Tag(true)->addFrame(f);
+    file.save(MPEG::File::ID3v2, true, 3);
+    CPPUNIT_ASSERT(file.hasID3v2Tag());
+
+    ByteVector data = f->render();
+    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+3+2+2+6+2), data.size());
+
+    ID3v2::UnsynchronizedLyricsFrame f2(data);
+    CPPUNIT_ASSERT_EQUAL(String("Foo"), f2.text());
     CPPUNIT_ASSERT_EQUAL(String::UTF16, f2.textEncoding());
   }
 
@@ -208,7 +254,7 @@ public:
     ID3v2::Header header;
     header.setMajorVersion(2);
     ID3v2::AttachedPictureFrame *frame =
-        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, &header));
+        dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, &header));
 
     CPPUNIT_ASSERT(frame);
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), frame->mimeType());
@@ -230,8 +276,8 @@ public:
                                  "\x00", 14);
     ID3v2::Header header;
     header.setMajorVersion(2);
-    ID3v2::AttachedPictureFrame *frame =
-        static_cast<TagLib::ID3v2::AttachedPictureFrame*>(factory->createFrame(data, &header));
+    ID3v2::UnknownFrame *frame =
+        dynamic_cast<TagLib::ID3v2::UnknownFrame*>(factory->createFrame(data, &header));
 
     CPPUNIT_ASSERT(frame);
 
@@ -489,6 +535,35 @@ public:
     CPPUNIT_ASSERT_EQUAL((unsigned int)4567, stl[1].time);
   }
 
+  void testParseSynchronizedLyricsFrameWithEmptyDescritpion()
+  {
+    ID3v2::SynchronizedLyricsFrame f(
+      ByteVector("SYLT"                      // Frame ID
+                 "\x00\x00\x00\x21"          // Frame size
+                 "\x00\x00"                  // Frame flags
+                 "\x00"                      // Text encoding
+                 "eng"                       // Language
+                 "\x02"                      // Time stamp format
+                 "\x01"                      // Content type
+                 "\x00"                      // Content descriptor
+                 "Example\x00"               // 1st text
+                 "\x00\x00\x04\xd2"          // 1st time stamp
+                 "Lyrics\x00"                // 2nd text
+                 "\x00\x00\x11\xd7", 40));   // 2nd time stamp
+    CPPUNIT_ASSERT_EQUAL(String::Latin1, f.textEncoding());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("eng", 3), f.language());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::AbsoluteMilliseconds,
+                         f.timestampFormat());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::Lyrics, f.type());
+    CPPUNIT_ASSERT(f.description().isEmpty());
+    ID3v2::SynchronizedLyricsFrame::SynchedTextList stl = f.synchedText();
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, stl.size());
+    CPPUNIT_ASSERT_EQUAL(String("Example"), stl[0].text);
+    CPPUNIT_ASSERT_EQUAL((unsigned int)1234, stl[0].time);
+    CPPUNIT_ASSERT_EQUAL(String("Lyrics"), stl[1].text);
+    CPPUNIT_ASSERT_EQUAL((unsigned int)4567, stl[1].time);
+  }
+
   void testRenderSynchronizedLyricsFrame()
   {
     ID3v2::SynchronizedLyricsFrame f;
@@ -597,8 +672,8 @@ public:
     ID3v2::Header header;
     header.setMajorVersion(3);
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((size_t)1, frame->fieldList().size());
+        dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
+    CPPUNIT_ASSERT_EQUAL((unsigned int)1, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("Death Metal"), frame->fieldList()[0]);
 
     ID3v2::Tag tag;
@@ -618,8 +693,8 @@ public:
     ID3v2::Header header;
     header.setMajorVersion(3);
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((size_t)2, frame->fieldList().size());
+        dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("4"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
 
@@ -638,8 +713,8 @@ public:
                                  "14\0Eurodisco", 23);     // Text
     ID3v2::Header header;
     ID3v2::TextIdentificationFrame *frame =
-        static_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((size_t)2, frame->fieldList().size());
+        dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
+    CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("14"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
 
@@ -694,11 +769,11 @@ public:
     }
     {
       MPEG::File bar(newname.c_str());
-      tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
       CPPUNIT_ASSERT(tf);
       CPPUNIT_ASSERT_EQUAL((size_t)1, tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("2011"), tf->fieldList().front());
-      tf = static_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
       CPPUNIT_ASSERT(tf);
       CPPUNIT_ASSERT_EQUAL((size_t)1, tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("2012-04-17T12:01"), tf->fieldList().front());
@@ -731,26 +806,23 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("compressed_id3_frame.mp3"), false);
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("APIC"));
 
-#ifdef HAVE_ZLIB
+    if(zlib::isAvailable()) {
+      ID3v2::AttachedPictureFrame *frame
+        = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
+      CPPUNIT_ASSERT(frame);
+      CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
+      CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
+      CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)86414, frame->picture().size());
+    }
+    else {
+      // Skip the test if ZLIB is not installed.
+      // The message "Compressed frames are currently not supported." will be displayed.
 
-    ID3v2::AttachedPictureFrame *frame
-      = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
-    CPPUNIT_ASSERT(frame);
-    CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
-    CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
-    CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
-    CPPUNIT_ASSERT_EQUAL((size_t)86414, frame->picture().size());
-
-#else
-
-    // Skip the test if ZLIB is not installed.
-    // The message "Compressed frames are currently not supported." will be displayed.
-
-    ID3v2::UnknownFrame *frame
-      = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
-    CPPUNIT_ASSERT(frame);
-
-#endif
+      ID3v2::UnknownFrame *frame
+        = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
+      CPPUNIT_ASSERT(frame);
+    }
   }
 
   void testW000()
@@ -1155,6 +1227,12 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.readBlock(2089), audioStream);
 
     }
+  }
+
+  void testParseTOCFrameWithManyChildren()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("toc_many_children.mp3"));
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };

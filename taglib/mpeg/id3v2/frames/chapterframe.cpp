@@ -198,7 +198,7 @@ String ChapterFrame::toString() const
     s += ", start offset: " + String::number(d->startOffset);
 
   if(d->endOffset != 0xFFFFFFFF)
-    s += ", start offset: " + String::number(d->endOffset);
+    s += ", end offset: " + String::number(d->endOffset);
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;

@@ -129,13 +129,16 @@ namespace TagLib {
                      audioPropertiesStyle = AudioProperties::Average);
 
     /*!
-     * Construct a FileRef from an opened \a IOStream.  If \a readAudioProperties is true then
-     * the audio properties will be read using \a audioPropertiesStyle.  If
-     * \a readAudioProperties is false then \a audioPropertiesStyle will be
+     * Construct a FileRef from an opened \a IOStream.  If \a readAudioProperties
+     * is true then the audio properties will be read using \a audioPropertiesStyle.
+     * If \a readAudioProperties is false then \a audioPropertiesStyle will be
      * ignored.
      *
      * Also see the note in the class documentation about why you may not want to
      * use this method in your application.
+     *
+     * \note TagLib will *not* take ownership of the stream, the caller is
+     * responsible for deleting it after the File object.
      */
     explicit FileRef(IOStream* stream,
                      bool readAudioProperties = true,

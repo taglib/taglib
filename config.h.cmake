@@ -34,6 +34,7 @@
 
 /* Defined if zlib is installed */
 #cmakedefine   HAVE_ZLIB 1
+#cmakedefine   HAVE_BOOST_ZLIB 1
 
 /* Indicates whether debug messages are shown even in release mode */
 #cmakedefine   TRACE_IN_RELEASE 1
