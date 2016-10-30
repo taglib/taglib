@@ -63,9 +63,9 @@ public:
     CPPUNIT_ASSERT(ByteVectorList::split(s2, " ").size() == 1);
 
     CPPUNIT_ASSERT(ByteVector().isEmpty());
-    CPPUNIT_ASSERT_EQUAL(0U, ByteVector().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)0, ByteVector().size());
     CPPUNIT_ASSERT(ByteVector("asdf").clear().isEmpty());
-    CPPUNIT_ASSERT_EQUAL(0U, ByteVector("asdf").clear().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)0, ByteVector("asdf").clear().size());
     CPPUNIT_ASSERT_EQUAL(ByteVector(), ByteVector("asdf").clear());
 
     ByteVector i("blah blah");

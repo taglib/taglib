@@ -110,7 +110,7 @@ public:
   {
     ByteVector a("\xff\xff\x00", 3);
     a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff", 2), a);
   }
 
@@ -118,7 +118,7 @@ public:
   {
     ByteVector a("\xff\xff\xff", 3);
     a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, a.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)3, a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff\xff", 3), a);
   }
 

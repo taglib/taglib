@@ -170,7 +170,7 @@ public:
     CPPUNIT_ASSERT(file.hasID3v2Tag());
 
     ByteVector data = f->render();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+3+2+2+6+2), data.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)(4+4+2+1+3+2+2+6+2), data.size());
 
     ID3v2::UnsynchronizedLyricsFrame f2(data);
     CPPUNIT_ASSERT_EQUAL(String("Foo"), f2.text());
@@ -557,7 +557,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::Lyrics, f.type());
     CPPUNIT_ASSERT(f.description().isEmpty());
     ID3v2::SynchronizedLyricsFrame::SynchedTextList stl = f.synchedText();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, stl.size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, stl.size());
     CPPUNIT_ASSERT_EQUAL(String("Example"), stl[0].text);
     CPPUNIT_ASSERT_EQUAL((unsigned int)1234, stl[0].time);
     CPPUNIT_ASSERT_EQUAL(String("Lyrics"), stl[1].text);
@@ -673,7 +673,7 @@ public:
     header.setMajorVersion(3);
     ID3v2::TextIdentificationFrame *frame =
         dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)1, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("Death Metal"), frame->fieldList()[0]);
 
     ID3v2::Tag tag;
@@ -694,7 +694,7 @@ public:
     header.setMajorVersion(3);
     ID3v2::TextIdentificationFrame *frame =
         dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("4"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
 
@@ -714,7 +714,7 @@ public:
     ID3v2::Header header;
     ID3v2::TextIdentificationFrame *frame =
         dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL((size_t)2, frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("14"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
 
@@ -813,7 +813,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
       CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
       CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)86414, frame->picture().size());
+      CPPUNIT_ASSERT_EQUAL((size_t)86414, frame->picture().size());
     }
     else {
       // Skip the test if ZLIB is not installed.
