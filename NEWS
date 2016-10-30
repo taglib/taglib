@@ -1,6 +1,8 @@
 ============================
 
  * Added support for WinRT.
+ * Dropped support for Windows 9x and NT 4.0 or older.
+ * Several smaller bug fixes and performance improvements.
 
 TagLib 1.11.1 (Oct 24, 2016)
 ============================
