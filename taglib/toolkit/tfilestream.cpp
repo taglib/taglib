@@ -261,7 +261,7 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
     // to overwrite.  Appropriately increment the readPosition.
 
     seek(readPosition);
-    const size_t bytesRead = readFile(d->file, aboutToOverwrite);
+    const unsigned int bytesRead = static_cast<unsigned int>(readFile(d->file, aboutToOverwrite));
     aboutToOverwrite.resize(bytesRead);
     readPosition += bufferLength;
 
@@ -304,10 +304,10 @@ void FileStream::removeBlock(unsigned long start, unsigned long length)
 
   ByteVector buffer(static_cast<unsigned int>(bufferLength));
 
-  for(size_t bytesRead = -1; bytesRead != 0;)
+  for(unsigned int bytesRead = -1; bytesRead != 0;)
   {
     seek(readPosition);
-    bytesRead = readFile(d->file, buffer);
+    bytesRead = static_cast<unsigned int>(readFile(d->file, buffer));
     readPosition += bytesRead;
 
     // Check to see if we just read the last block.  We need to call clear()

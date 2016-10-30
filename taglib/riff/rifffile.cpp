@@ -95,7 +95,7 @@ unsigned int RIFF::File::riffSize() const
 
 unsigned int RIFF::File::chunkCount() const
 {
-  return d->chunks.size();
+  return static_cast<unsigned int>(d->chunks.size());
 }
 
 unsigned int RIFF::File::chunkDataSize(unsigned int i) const
@@ -269,7 +269,7 @@ void RIFF::File::removeChunk(unsigned int i)
 
 void RIFF::File::removeChunk(const ByteVector &name)
 {
-  for(int i = d->chunks.size() - 1; i >= 0; --i) {
+  for(int i = static_cast<int>(d->chunks.size()) - 1; i >= 0; --i) {
     if(d->chunks[i].name == name)
       removeChunk(i);
   }

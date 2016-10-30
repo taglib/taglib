@@ -152,7 +152,7 @@ Map<Key, T> &Map<Key,T>::erase(const Key &key)
 template <class Key, class T>
 unsigned int Map<Key, T>::size() const
 {
-  return d->map.size();
+  return static_cast<unsigned int>(d->map.size());
 }
 
 template <class Key, class T>

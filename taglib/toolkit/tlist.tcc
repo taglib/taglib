@@ -196,7 +196,7 @@ List<T> &List<T>::clear()
 template <class T>
 unsigned int List<T>::size() const
 {
-  return d->list.size();
+  return static_cast<unsigned int>(d->list.size());
 }
 
 template <class T>

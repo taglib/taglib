@@ -54,7 +54,8 @@ namespace
 
 #ifdef _WIN32
 
-    len = ::WideCharToMultiByte(CP_UTF8, 0, src, srcLength, dst, dstLength, NULL, NULL);
+    len = ::WideCharToMultiByte(
+      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength), NULL, NULL);
 
 #else
 
@@ -86,7 +87,8 @@ namespace
 
 #ifdef _WIN32
 
-    len = ::MultiByteToWideChar(CP_UTF8, 0, src, srcLength, dst, dstLength);
+    len = ::MultiByteToWideChar(
+      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
 
 #else
 
@@ -410,12 +412,12 @@ String::ConstIterator String::end() const
 
 int String::find(const String &s, int offset) const
 {
-  return d->data.find(s.d->data, offset);
+  return static_cast<int>(d->data.find(s.d->data, offset));
 }
 
 int String::rfind(const String &s, int offset) const
 {
-  return d->data.rfind(s.d->data, offset);
+  return static_cast<int>(d->data.rfind(s.d->data, offset));
 }
 
 StringList String::split(const String &separator) const
@@ -479,7 +481,7 @@ String String::upper() const
 
 unsigned int String::size() const
 {
-  return d->data.size();
+  return static_cast<unsigned int>(d->data.size());
 }
 
 unsigned int String::length() const
@@ -518,7 +520,7 @@ ByteVector String::data(Type t) const
 
       const size_t len = UTF16toUTF8(
         d->data.c_str(), d->data.size(), v.data(), v.size());
-      v.resize(len);
+      v.resize(static_cast<unsigned int>(len));
 
       return v;
     }
@@ -604,7 +606,7 @@ String String::stripWhiteSpace() const
     return String();
 
   const size_t pos2 = d->data.find_last_not_of(WhiteSpaceChars);
-  return substr(pos1, pos2 - pos1 + 1);
+  return substr(static_cast<unsigned int>(pos1), static_cast<unsigned int>(pos2 - pos1 + 1));
 }
 
 bool String::isLatin1() const
