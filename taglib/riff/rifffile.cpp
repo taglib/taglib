@@ -184,7 +184,7 @@ void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 
   writeChunk(it->name, data, it->offset - 8, it->size + it->padding + 8);
 
-  it->size    = data.size();
+  it->size    = static_cast<unsigned int>(data.size());
   it->padding = data.size() % 2;
 
   const long long diff = static_cast<long long>(it->size) + it->padding - originalSize;
@@ -253,7 +253,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   Chunk chunk;
   chunk.name    = name;
-  chunk.size    = data.size();
+  chunk.size    = static_cast<unsigned int>(data.size());
   chunk.offset  = offset + 8;
   chunk.padding = data.size() % 2;
 

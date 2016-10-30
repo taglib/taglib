@@ -119,7 +119,7 @@ namespace
       return file;
 
 #ifdef _WIN32
-    const String s = toFileName(arg).toString();
+    const String s(toFileName(arg).wstr());
 #else
     const String s(toFileName(arg));
 #endif

@@ -133,8 +133,8 @@ namespace
     {
       ByteVector data = file.readBlock(std::min(m_size, limit));
       size_t count = data.size();
-      int index = data.find((char) 0);
-      if(index > -1) {
+      size_t index = data.find('\0');
+      if(index != ByteVector::npos()) {
         data.resize(index);
       }
       data.replace('\xff', ' ');

@@ -115,9 +115,9 @@ ByteVector zlib::decompress(const ByteVector &data)
 
     std::streamsize write(char const* s, std::streamsize n)
     {
-      const unsigned int originalSize = data.size();
+      const size_t originalSize = data.size();
 
-      data.resize(static_cast<unsigned int>(originalSize + n));
+      data.resize(static_cast<size_t>(originalSize + n));
       ::memcpy(data.data() + originalSize, s, static_cast<size_t>(n));
 
       return n;
