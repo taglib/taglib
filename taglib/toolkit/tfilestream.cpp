@@ -362,12 +362,12 @@ void FileStream::seek(long offset, Position p)
     return;
   }
 
-  SetLastError(NO_ERROR);
-  SetFilePointer(d->file, offset, NULL, whence);
+  LARGE_INTEGER liOffset;
+  liOffset.QuadPart = offset;
 
-  const int lastError = GetLastError();
-  if(lastError != NO_ERROR && lastError != ERROR_NEGATIVE_SEEK)
+  if(!SetFilePointerEx(d->file, liOffset, NULL, whence)) {
     debug("FileStream::seek() -- Failed to set the file pointer.");
+  }
 
 #else
 
@@ -409,10 +409,11 @@ long FileStream::tell() const
 {
 #ifdef _WIN32
 
-  SetLastError(NO_ERROR);
-  const DWORD position = SetFilePointer(d->file, 0, NULL, FILE_CURRENT);
-  if(GetLastError() == NO_ERROR) {
-    return static_cast<long>(position);
+  const LARGE_INTEGER zero = {};
+  LARGE_INTEGER position;
+
+  if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT) && position.QuadPart <= LONG_MAX) {
+    return static_cast<long>(position.QuadPart);
   }
   else {
     debug("FileStream::tell() -- Failed to get the file pointer.");
@@ -435,15 +436,9 @@ long FileStream::length()
 
 #ifdef _WIN32
 
-  SetLastError(NO_ERROR);
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
   LARGE_INTEGER fileSize;
-  GetFileSizeEx(d->file, &fileSize);
-#else
-  ULARGE_INTEGER fileSize;
-  fileSize.LowPart = GetFileSize(d->file, &fileSize.HighPart);
-#endif
-  if(GetLastError() == NO_ERROR && fileSize.QuadPart <= LONG_MAX) {
+
+  if(GetFileSizeEx(d->file, &fileSize) && fileSize.QuadPart <= LONG_MAX) {
     return static_cast<long>(fileSize.QuadPart);
   }
   else {
@@ -477,9 +472,7 @@ void FileStream::truncate(long length)
 
   seek(length);
 
-  SetLastError(NO_ERROR);
-  SetEndOfFile(d->file);
-  if(GetLastError() != NO_ERROR) {
+  if(!SetEndOfFile(d->file)) {
     debug("FileStream::truncate() -- Failed to truncate the file.");
   }
 
