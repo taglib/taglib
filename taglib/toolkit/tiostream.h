@@ -37,7 +37,6 @@ namespace TagLib {
   class TAGLIB_EXPORT FileName
   {
   public:
-    FileName();
     FileName(const wchar_t *name);
     FileName(const char *name);
     FileName(const FileName &name);
@@ -46,10 +45,7 @@ namespace TagLib {
 
     FileName &operator=(const FileName &name);
 
-    const std::wstring &wstr() const;
-    const std::string  &str() const;
-
-    String toString() const;
+    const wchar_t *wstr() const;
 
   private:
     class FileNamePrivate;

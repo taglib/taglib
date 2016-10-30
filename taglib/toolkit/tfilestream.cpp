@@ -57,14 +57,9 @@ namespace
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
 #if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
-    return CreateFile2(path.toString().toCWString(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
+    return CreateFile2(path.wstr(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
 #else
-    if(!path.wstr().empty())
-      return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    else if(!path.str().empty())
-      return CreateFileA(path.str().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    else
-      return InvalidFileHandle;
+    return CreateFileW(path.wstr(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 #endif
   }
 
@@ -159,7 +154,7 @@ FileStream::FileStream(FileName fileName, bool openReadOnly) :
   if(d->file == InvalidFileHandle)
   {
 # ifdef _WIN32
-    debug("Could not open file " + fileName.toString());
+    debug("Could not open file " + String(fileName.wstr()));
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
 # endif
@@ -269,7 +264,7 @@ void FileStream::insert(const ByteVector &data, long long start, size_t replace)
     // to overwrite.  Appropriately increment the readPosition.
 
     seek(readPosition);
-    const size_t bytesRead = readFile(d->file, aboutToOverwrite);
+    const unsigned int bytesRead = static_cast<unsigned int>(readFile(d->file, aboutToOverwrite));
     aboutToOverwrite.resize(bytesRead);
     readPosition += bufferLength;
 
@@ -312,10 +307,10 @@ void FileStream::removeBlock(long long start, size_t length)
 
   ByteVector buffer(bufferLength, 0);
 
-  for(size_t bytesRead = -1; bytesRead != 0;)
+  for(unsigned int bytesRead = -1; bytesRead != 0;)
   {
     seek(readPosition);
-    bytesRead = readFile(d->file, buffer);
+    bytesRead = static_cast<unsigned int>(readFile(d->file, buffer));
     readPosition += bytesRead;
 
     // Check to see if we just read the last block.  We need to call clear()
@@ -373,12 +368,9 @@ void FileStream::seek(long long offset, Position p)
   LARGE_INTEGER liOffset;
   liOffset.QuadPart = offset;
 
-  SetLastError(NO_ERROR);
-  SetFilePointer(d->file, liOffset.LowPart, &liOffset.HighPart, whence);
-
-  const int lastError = GetLastError();
-  if(lastError != NO_ERROR && lastError != ERROR_NEGATIVE_SEEK)
+  if(!SetFilePointerEx(d->file, liOffset, NULL, whence)) {
     debug("FileStream::seek() -- Failed to set the file pointer.");
+  }
 
 #else
 
@@ -420,13 +412,10 @@ long long FileStream::tell() const
 {
 #ifdef _WIN32
 
+  const LARGE_INTEGER zero = {};
   LARGE_INTEGER position;
-  position.QuadPart = 0;
 
-  SetLastError(NO_ERROR);
-  position.LowPart = SetFilePointer(
-    d->file, position.LowPart, &position.HighPart, FILE_CURRENT);
-  if(GetLastError() == NO_ERROR) {
+  if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT)) {
     return position.QuadPart;
   }
   else {
@@ -450,16 +439,10 @@ long long FileStream::length()
 
 #ifdef _WIN32
 
-  SetLastError(NO_ERROR);
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
   LARGE_INTEGER fileSize;
-  GetFileSizeEx(d->file, &fileSize);
-#else
-  ULARGE_INTEGER fileSize;
-  fileSize.LowPart = GetFileSize(d->file, &fileSize.HighPart);
-#endif
-  if(GetLastError() == NO_ERROR) {
-    return static_cast<long long>(fileSize.QuadPart);
+
+  if(GetFileSizeEx(d->file, &fileSize)) {
+    return fileSize.QuadPart;
   }
   else {
     debug("FileStream::length() -- Failed to get the file size.");
@@ -497,9 +480,7 @@ void FileStream::truncate(long long length)
 
   seek(length);
 
-  SetLastError(NO_ERROR);
-  SetEndOfFile(d->file);
-  if(GetLastError() != NO_ERROR) {
+  if(!SetEndOfFile(d->file)) {
     debug("FileStream::truncate() -- Failed to truncate the file.");
   }
 

@@ -511,8 +511,7 @@ ByteVector String::data(Type t) const
     {
       ByteVector v(size() * 4 + 1, 0);
 
-      const size_t len = UTF16toUTF8(
-        d->data->c_str(), d->data->size(), v.data(), v.size());
+      const size_t len = UTF16toUTF8(d->data->c_str(), d->data->size(), v.data(), v.size());
       v.resize(len);
 
       return v;
