@@ -1136,7 +1136,7 @@ public:
 
     {
       MPEG::File f(newname.c_str());
-      f.ID3v2Tag()->setTitle(std::wstring(64 * 1024, L'X').c_str());
+      f.ID3v2Tag()->setTitle(longText(64 * 1024));
       f.save(MPEG::File::ID3v2, true);
     }
     {
