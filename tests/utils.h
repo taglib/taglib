@@ -106,10 +106,10 @@ inline bool fileEqual(const string &filename1, const string &filename2)
 class ScopedFileCopy
 {
 public:
-  ScopedFileCopy(const string &filename, const string &ext, bool deleteFile=true)
+  ScopedFileCopy(const string &filename, const string &ext, bool deleteFile=true) :
+    m_deleteFile(deleteFile),
+    m_filename(copyFile(filename, ext))
   {
-    m_deleteFile = deleteFile;
-    m_filename = copyFile(filename, ext);
   }
 
   ~ScopedFileCopy()
@@ -118,12 +118,12 @@ public:
       deleteFile(m_filename);
   }
 
-  string fileName()
+  string fileName() const
   {
     return m_filename;
   }
 
 private:
-  bool m_deleteFile;
-  string m_filename;
+  const bool m_deleteFile;
+  const string m_filename;
 };
