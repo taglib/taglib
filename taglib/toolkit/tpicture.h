@@ -119,7 +119,7 @@ namespace TagLib {
     String mime() const;
 
     /*!
-     * Returns the descritpion of the picture
+     * Returns the description of the picture
      */
     String description() const;
 
@@ -129,7 +129,7 @@ namespace TagLib {
     Type type() const;
 
     /*!
-     * Returns datas of the picture
+     * Returns data of the picture
      */
     ByteVector data() const;
 
@@ -139,7 +139,12 @@ namespace TagLib {
      */
     Picture &operator=(const Picture &p);
 
-  private:
+    /*!
+     * Exchanges the content of the Picture by the content of \a p.
+     */
+    void swap(Picture &p);
+
+private:
     PicturePrivate *d;
   };
 

@@ -23,21 +23,38 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <algorithm>
+#include <tsmartptr.h>
 #include "tpicture.h"
 
 using namespace TagLib;
 
-class Picture::PicturePrivate : public RefCounter
+namespace
+{
+  struct PictureData
+  {
+    PictureData() :
+      type(Picture::Other) {}
+
+    ByteVector    data;
+    Picture::Type type;
+    String        mime;
+    String        description;
+  };
+}
+
+class Picture::PicturePrivate
 {
 public:
   PicturePrivate() :
-    RefCounter() {}
+    data(new PictureData()) {}
 
-  String     description;
-  String     mime;
-  Type       type;
-  ByteVector data;
+  SHARED_PTR<PictureData> data;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
 Picture::Picture() :
   d(new PicturePrivate())
@@ -50,56 +67,54 @@ Picture::Picture(const ByteVector &data,
                  const String &description) :
   d(new PicturePrivate())
 {
-  d->mime = mime;
-  d->description = description;
-  d->type = type;
-  d->data = data;
+  d->data->data = data;
+  d->data->type = type;
+  d->data->mime = mime;
+  d->data->description = description;
 }
 
-Picture::Picture(const Picture &p)
-  : d(p.d)
+Picture::Picture(const Picture &p) :
+  d(new PicturePrivate(*p.d))
 {
-  d->ref();
-}
-
-String Picture::description() const
-{
-  return d->description;
-}
-
-ByteVector Picture::data() const
-{
-  return d->data;
-}
-
-String Picture::mime() const
-{
-  return d->mime;
-}
-
-Picture::Type Picture::type() const
-{
-  return d->type;
 }
 
 Picture::~Picture()
 {
-  if(d->deref())
-    delete d;
+  delete d;
+}
+
+String Picture::description() const
+{
+  return d->data->description;
+}
+
+ByteVector Picture::data() const
+{
+  return d->data->data;
+}
+
+String Picture::mime() const
+{
+  return d->data->mime;
+}
+
+Picture::Type Picture::type() const
+{
+  return d->data->type;
+}
+
+void Picture::swap(Picture &other)
+{
+  using std::swap;
+
+  swap(d, other.d);
 }
 
 /* =========== OPERATORS =========== */
 
 Picture &Picture::operator =(const Picture &p)
 {
-  if(&p == this)
-    return *this;
-
-  if(d && d->deref())
-    delete d;
-
-  d = p.d;
-  d->ref();
+  Picture(p).swap(*this);
   return *this;
 }
 
