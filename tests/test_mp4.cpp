@@ -57,6 +57,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testRepeatedSave);
+  CPPUNIT_TEST(testWithZeroLengthAtom);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -395,6 +396,15 @@ public:
     CPPUNIT_ASSERT_EQUAL(2862L, f.find("0123456789"));
     CPPUNIT_ASSERT_EQUAL(-1L, f.find("0123456789", 2863));
   }
+
+  void testWithZeroLengthAtom()
+  {
+    MP4::File f(TEST_FILE_PATH_C("zero-length-mdat.m4a"));
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT_EQUAL(1115, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(22050, f.audioProperties()->sampleRate());
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMP4);
