@@ -329,8 +329,6 @@ namespace TagLib {
 
     /*!
      * Returns true if the string is empty.
-     *
-     * \see isNull()
      */
     bool isEmpty() const;
 
