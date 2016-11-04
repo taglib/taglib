@@ -118,8 +118,8 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-List<T>::List()
-  : d(new ListPrivate<T>())
+List<T>::List() :
+  d(new ListPrivate<T>())
 {
 }
 
@@ -316,14 +316,16 @@ const T &List<T>::operator[](size_t i) const
 template <class T>
 List<T> &List<T>::operator=(const List<T> &l)
 {
-  if(&l == this)
-    return *this;
-
-  if(d->deref())
-    delete d;
-  d = l.d;
-  d->ref();
+  List<T>(l).swap(*this);
   return *this;
+}
+
+template <class T>
+void List<T>::swap(List<T> &l)
+{
+  using std::swap;
+
+  swap(d, l.d);
 }
 
 template <class T>

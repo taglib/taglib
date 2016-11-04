@@ -259,7 +259,7 @@ public:
     ScopedFileCopy copy("no-tags", ".flac");
 
     FLAC::File f(copy.fileName().c_str());
-    f.xiphComment()->setTitle(std::string(8 * 1024, 'X').c_str());
+    f.xiphComment()->setTitle(longText(8 * 1024));
     f.save();
     CPPUNIT_ASSERT_EQUAL(12862LL, f.length());
     f.save();
@@ -372,7 +372,7 @@ public:
 
     {
       FLAC::File f(copy.fileName().c_str());
-      f.xiphComment()->setTitle(std::wstring(128 * 1024, L'X').c_str());
+      f.xiphComment()->setTitle(longText(128 * 1024));
       f.save();
       CPPUNIT_ASSERT(f.length() > 128 * 1024);
     }
