@@ -46,6 +46,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testFromInt);
   CPPUNIT_TEST(testSubstr);
   CPPUNIT_TEST(testNewline);
+  CPPUNIT_TEST(testUpper);
   CPPUNIT_TEST(testEncodeNonLatin1);
   CPPUNIT_TEST(testEncodeEmpty);
   CPPUNIT_TEST(testIterator);
@@ -268,6 +269,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(lf)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0d', String(crlf)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
+  }
+
+  void testUpper()
+  {
+    String s1 = "tagLIB 012 strING";
+    String s2 = s1.upper();
+    CPPUNIT_ASSERT_EQUAL(String("tagLIB 012 strING"), s1);
+    CPPUNIT_ASSERT_EQUAL(String("TAGLIB 012 STRING"), s2);
   }
 
   void testEncodeNonLatin1()

@@ -272,9 +272,9 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
   int pos = 0;
   unsigned int embPos = 0;
   d->elementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
-  d->isTopLevel = (data.at(pos) & 2) > 0;
-  d->isOrdered = (data.at(pos++) & 1) > 0;
-  unsigned int entryCount = data.at(pos++);
+  d->isTopLevel = (data.at(pos) & 2) != 0;
+  d->isOrdered = (data.at(pos++) & 1) != 0;
+  unsigned int entryCount = static_cast<unsigned char>(data.at(pos++));
   for(unsigned int i = 0; i < entryCount; i++) {
     ByteVector childElementID = readStringField(data, String::Latin1, &pos).data(String::Latin1);
     d->childElements.append(childElementID);

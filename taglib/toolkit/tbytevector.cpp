@@ -63,7 +63,7 @@ int findChar(
 
   for(TIterator it = dataBegin + offset; it < dataEnd; it += byteAlign) {
     if(*it == c)
-      return (it - dataBegin);
+      return static_cast<int>(it - dataBegin);
   }
 
   return -1;
@@ -105,7 +105,7 @@ int findVector(
       ++itPattern;
 
       if(itPattern == patternEnd)
-        return (it - dataBegin);
+        return static_cast<int>(it - dataBegin);
     }
   }
 
@@ -125,7 +125,7 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
   T sum = 0;
   for(size_t i = 0; i < length; i++) {
     const size_t shift = (mostSignificantByteFirst ? length - 1 - i : i) * 8;
-    sum |= static_cast<T>(static_cast<unsigned char>(v[offset + i])) << shift;
+    sum |= static_cast<T>(static_cast<unsigned char>(v[static_cast<int>(offset + i)])) << shift;
   }
 
   return sum;
@@ -300,7 +300,7 @@ ByteVector ByteVector::null;
 ByteVector ByteVector::fromCString(const char *s, unsigned int length)
 {
   if(length == 0xffffffff)
-    return ByteVector(s, ::strlen(s));
+    return ByteVector(s, static_cast<unsigned int>(::strlen(s)));
   else
     return ByteVector(s, length);
 }
@@ -375,7 +375,7 @@ ByteVector::ByteVector(const char *data, unsigned int length) :
 }
 
 ByteVector::ByteVector(const char *data) :
-  d(new ByteVectorPrivate(data, ::strlen(data)))
+  d(new ByteVectorPrivate(data, static_cast<unsigned int>(::strlen(data))))
 {
 }
 
@@ -493,14 +493,14 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   if(pattern.size() == 1 && with.size() == 1)
     return replace(pattern[0], with[0]);
 
-  const size_t withSize    = with.size();
-  const size_t patternSize = pattern.size();
-  const ptrdiff_t diff = withSize - patternSize;
+  const unsigned int withSize    = with.size();
+  const unsigned int patternSize = pattern.size();
+  const int diff = withSize - patternSize;
 
-  size_t offset = 0;
+  unsigned int offset = 0;
   while (true) {
     offset = find(pattern, offset);
-    if(offset == static_cast<size_t>(-1)) // Use npos in taglib2.
+    if(offset == static_cast<unsigned int>(-1))
       break;
 
     detach();
@@ -963,7 +963,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
 
   // Only return output if we processed all bytes
   if(len == 0) {
-    output.resize(dst - (unsigned char*) output.data());
+    output.resize(static_cast<unsigned int>(dst - (unsigned char*) output.data()));
     return output;
   }
   return ByteVector();

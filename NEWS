@@ -1,3 +1,16 @@
+============================
+
+ * Added support for WinRT.
+ * Dropped support for Windows 9x and NT 4.0 or older.
+ * Several smaller bug fixes and performance improvements.
+
+TagLib 1.11.1 (Oct 24, 2016)
+============================
+
+ * Fixed binary incompatible change in TagLib::String.
+ * Fixed reading ID3v2 CTOC frames with a lot of entries.
+ * Fixed seeking ByteVectorStream from the end.
+
 TagLib 1.11 (Apr 29, 2016)
 ==========================
 
