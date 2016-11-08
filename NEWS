@@ -1,7 +1,9 @@
 ============================
 
  * Added support for WinRT.
+ * Added support for classical music tags of iTunes 12.5.
  * Dropped support for Windows 9x and NT 4.0 or older.
+ * Fixed reading MP4 atoms with zero length.
  * Several smaller bug fixes and performance improvements.
 
 TagLib 1.11.1 (Oct 24, 2016)
