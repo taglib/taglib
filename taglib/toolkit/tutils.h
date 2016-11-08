@@ -222,35 +222,6 @@ namespace TagLib
       }
 
       /*!
-       * Converts the letter c to lower case, not depending on the locale.
-       */
-      inline int toLowerCase(char c)
-      {
-        if('A' <= c && c <= 'Z')
-          return c + ('a' - 'A');
-        else
-          return c;
-      }
-
-      /*!
-       * Returns whether the two strings s1 and s2 are equal, ignoring the case
-       * of the characters.  This only supports US-ASCII and does not depend on
-       * the current locale.
-       *
-       * We took the trouble to define this one here, since there are some
-       * incompatible variations of case insensitive strcmp().
-       */
-      inline bool equalsIgnoreCase(const char *s1, const char *s2)
-      {
-        while(*s1 != '\0' && *s2 != '\0' && toLowerCase(*s1) == toLowerCase(*s2)) {
-          s1++;
-          s2++;
-        }
-
-        return (*s1 == '\0' && *s2 == '\0');
-      }
-
-      /*!
        * The types of byte order of the running system.
        */
       enum ByteOrder
