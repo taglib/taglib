@@ -55,6 +55,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCovrWrite);
   CPPUNIT_TEST(testCovrRead2);
   CPPUNIT_TEST(testProperties);
+  CPPUNIT_TEST(testPropertiesMovement);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
@@ -375,6 +376,58 @@ public:
     tags["DISCNUMBER"] = StringList();
     tags["BPM"] = StringList();
     tags["COMPILATION"] = StringList();
+    f.setProperties(tags);
+  }
+
+  void testPropertiesMovement()
+  {
+    MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+
+    PropertyMap tags = f.properties();
+
+    tags["WORK"] = StringList("Foo");
+    tags["MOVEMENTNAME"] = StringList("Bar");
+    tags["MOVEMENTNUMBER"] = StringList("2");
+    tags["MOVEMENTCOUNT"] = StringList("3");
+    tags["SHOWWORKMOVEMENT"] = StringList("1");
+    f.setProperties(tags);
+
+    tags = f.properties();
+
+    CPPUNIT_ASSERT(f.tag()->contains("\251wrk"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Foo"), f.tag()->item("\251wrk").toStringList());
+    CPPUNIT_ASSERT_EQUAL(StringList("Foo"), tags["WORK"]);
+
+    CPPUNIT_ASSERT(f.tag()->contains("\251mvn"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Bar"), f.tag()->item("\251mvn").toStringList());
+    CPPUNIT_ASSERT_EQUAL(StringList("Bar"), tags["MOVEMENTNAME"]);
+
+    CPPUNIT_ASSERT(f.tag()->contains("\251mvi"));
+    CPPUNIT_ASSERT_EQUAL(2, f.tag()->item("\251mvi").toInt());
+    CPPUNIT_ASSERT_EQUAL(StringList("2"), tags["MOVEMENTNUMBER"]);
+
+    CPPUNIT_ASSERT(f.tag()->contains("\251mvc"));
+    CPPUNIT_ASSERT_EQUAL(3, f.tag()->item("\251mvc").toInt());
+    CPPUNIT_ASSERT_EQUAL(StringList("3"), tags["MOVEMENTCOUNT"]);
+
+    CPPUNIT_ASSERT(f.tag()->contains("shwm"));
+    CPPUNIT_ASSERT_EQUAL(true, f.tag()->item("shwm").toBool());
+    CPPUNIT_ASSERT_EQUAL(StringList("1"), tags["SHOWWORKMOVEMENT"]);
+
+    tags["SHOWWORKMOVEMENT"] = StringList("0");
+    f.setProperties(tags);
+
+    tags = f.properties();
+
+    CPPUNIT_ASSERT(f.tag()->contains("shwm"));
+    CPPUNIT_ASSERT_EQUAL(false, f.tag()->item("shwm").toBool());
+    CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["SHOWWORKMOVEMENT"]);
+
+    tags["WORK"] = StringList();
+    tags["MOVEMENTNAME"] = StringList();
+    tags["MOVEMENTNUMBER"] = StringList();
+    tags["MOVEMENTCOUNT"] = StringList();
+    tags["SHOWWORKMOVEMENT"] = StringList();
     f.setProperties(tags);
   }
 

@@ -71,10 +71,10 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
       parseIntPair(atom);
     }
     else if(atom->name == "cpil" || atom->name == "pgap" || atom->name == "pcst" ||
-            atom->name == "hdvd") {
+            atom->name == "hdvd" || atom->name == "shwm") {
       parseBool(atom);
     }
-    else if(atom->name == "tmpo") {
+    else if(atom->name == "tmpo" || atom->name == "\251mvi" || atom->name == "\251mvc") {
       parseInt(atom);
     }
     else if(atom->name == "tvsn" || atom->name == "tves" || atom->name == "cnID" ||
@@ -472,10 +472,11 @@ MP4::Tag::save()
     else if(name == "disk") {
       data.append(renderIntPairNoTrailing(name.data(String::Latin1), it->second));
     }
-    else if(name == "cpil" || name == "pgap" || name == "pcst" || name == "hdvd") {
+    else if(name == "cpil" || name == "pgap" || name == "pcst" || name == "hdvd" ||
+            name == "shwm") {
       data.append(renderBool(name.data(String::Latin1), it->second));
     }
-    else if(name == "tmpo") {
+    else if(name == "tmpo" || name == "\251mvi" || name == "\251mvc") {
       data.append(renderInt(name.data(String::Latin1), it->second));
     }
     else if(name == "tvsn" || name == "tves" || name == "cnID" ||
@@ -844,6 +845,11 @@ namespace
     { "sonm", "TITLESORT" },
     { "soco", "COMPOSERSORT" },
     { "sosn", "SHOWSORT" },
+    { "shwm", "SHOWWORKMOVEMENT" },
+    { "\251wrk", "WORK" },
+    { "\251mvn", "MOVEMENTNAME" },
+    { "\251mvi", "MOVEMENTNUMBER" },
+    { "\251mvc", "MOVEMENTCOUNT" },
     { "----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID" },
     { "----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID" },
     { "----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
@@ -897,10 +903,10 @@ PropertyMap MP4::Tag::properties() const
         }
         props[key] = value;
       }
-      else if(key == "BPM") {
+      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT") {
         props[key] = String::number(it->second.toInt());
       }
-      else if(key == "COMPILATION") {
+      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT") {
         props[key] = String::number(it->second.toBool());
       }
       else {
@@ -952,11 +958,11 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
           d->items[name] = MP4::Item(first, second);
         }
       }
-      else if(it->first == "BPM" && !it->second.isEmpty()) {
+      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" || it->first == "MOVEMENTCOUNT") && !it->second.isEmpty()) {
         int value = it->second.front().toInt();
         d->items[name] = MP4::Item(value);
       }
-      else if(it->first == "COMPILATION" && !it->second.isEmpty()) {
+      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT") && !it->second.isEmpty()) {
         bool value = (it->second.front().toInt() != 0);
         d->items[name] = MP4::Item(value);
       }
