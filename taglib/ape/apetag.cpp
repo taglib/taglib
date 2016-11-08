@@ -299,7 +299,7 @@ bool APE::Tag::checkKey(const String &key)
   if(key.size() < MinKeyLength || key.size() > MaxKeyLength)
     return false;
 
-  return isKeyValid(key.data(String::Latin1));
+  return isKeyValid(key.data(String::UTF8));
 }
 
 APE::Footer *APE::Tag::footer() const
