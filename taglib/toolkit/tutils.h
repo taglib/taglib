@@ -222,25 +222,8 @@ namespace TagLib
       }
 
       /*!
-       * Returns whether the two strings s1 and s2 are equal, ignoring the case of
-       * the characters.
-       *
-       * We took the trouble to define this one here, since there are some
-       * incompatible variations of case insensitive strcmp().
+       * Returns the integer byte order of the system.
        */
-      inline bool equalsIgnoreCase(const char *s1, const char *s2)
-      {
-        while(*s1 != '\0' && *s2 != '\0' && ::tolower(*s1) == ::tolower(*s2)) {
-          s1++;
-          s2++;
-        }
-
-        return (*s1 == '\0' && *s2 == '\0');
-      }
-
-      /*!
-        * Returns the integer byte order of the system.
-        */
       inline ByteOrder systemByteOrder()
       {
         union {

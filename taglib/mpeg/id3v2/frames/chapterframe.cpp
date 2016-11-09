@@ -37,7 +37,11 @@ class ChapterFrame::ChapterFramePrivate
 {
 public:
   ChapterFramePrivate() :
-    tagHeader(0)
+    tagHeader(0),
+    startTime(0),
+    endTime(0),
+    startOffset(0),
+    endOffset(0)
   {
     embeddedFrameList.setAutoDelete(true);
   }

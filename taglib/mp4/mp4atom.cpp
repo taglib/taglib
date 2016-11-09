@@ -53,8 +53,14 @@ MP4::Atom::Atom(File *file)
 
   length = header.toUInt32BE(0);
 
-  if(length == 1)
+  if(length == 0) {
+    // The last atom which extends to the end of the file.
+    length = file->length() - offset;
+  }
+  else if(length == 1) {
+    // The atom has a 64-bit length.
     length = file->readBlock(8).toInt64BE(0);
+  }
 
   if(length < 8) {
     debug("MP4: Invalid atom size");

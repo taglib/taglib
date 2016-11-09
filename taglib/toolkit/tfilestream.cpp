@@ -349,18 +349,7 @@ void FileStream::seek(long long offset, Position p)
 
 #ifdef _WIN32
 
-  DWORD whence;
-  switch(p) {
-  case Beginning:
-    whence = FILE_BEGIN;
-    break;
-  case Current:
-    whence = FILE_CURRENT;
-    break;
-  case End:
-    whence = FILE_END;
-    break;
-  default:
+  if(p != Beginning && p != Current && p != End) {
     debug("FileStream::seek() -- Invalid Position value.");
     return;
   }
@@ -368,7 +357,7 @@ void FileStream::seek(long long offset, Position p)
   LARGE_INTEGER liOffset;
   liOffset.QuadPart = offset;
 
-  if(!SetFilePointerEx(d->file, liOffset, NULL, whence)) {
+  if(!SetFilePointerEx(d->file, liOffset, NULL, static_cast<DWORD>(p))) {
     debug("FileStream::seek() -- Failed to set the file pointer.");
   }
 
