@@ -47,6 +47,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testClearComment);
   CPPUNIT_TEST(testRemoveFields);
   CPPUNIT_TEST(testPicture);
+  CPPUNIT_TEST(testLowercaseFields);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -189,6 +190,23 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
       CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
       CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());
+    }
+  }
+
+  void testLowercaseFields()
+  {
+    const ScopedFileCopy copy("lowercase-fields", ".ogg");
+    {
+      Vorbis::File f(copy.fileName().c_str());
+      List<FLAC::Picture *> lst = f.tag()->pictureList();
+      CPPUNIT_ASSERT_EQUAL(String("TEST TITLE"), f.tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("TEST ARTIST"), f.tag()->artist());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      f.save();
+    }
+    {
+      Vorbis::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.find("METADATA_BLOCK_PICTURE") > 0);
     }
   }
 
