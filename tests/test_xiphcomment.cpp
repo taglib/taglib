@@ -42,7 +42,8 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testSetYear);
   CPPUNIT_TEST(testTrack);
   CPPUNIT_TEST(testSetTrack);
-  CPPUNIT_TEST(testInvalidKeys);
+  CPPUNIT_TEST(testInvalidKeys1);
+  CPPUNIT_TEST(testInvalidKeys2);
   CPPUNIT_TEST(testClearComment);
   CPPUNIT_TEST(testRemoveFields);
   CPPUNIT_TEST(testPicture);
@@ -90,17 +91,30 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("3"), cmt.fieldListMap()["TRACKNUMBER"].front());
   }
 
-  void testInvalidKeys()
+  void testInvalidKeys1()
   {
     PropertyMap map;
     map[""] = String("invalid key: empty string");
     map["A=B"] = String("invalid key: contains '='");
     map["A~B"] = String("invalid key: contains '~'");
+    map["A\x7F\B"] = String("invalid key: contains '\x7F'");
+    map[L"A\x3456\B"] = String("invalid key: Unicode");
 
     Ogg::XiphComment cmt;
     PropertyMap unsuccessful = cmt.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL((unsigned int)5, unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
+  }
+
+  void testInvalidKeys2()
+  {
+    Ogg::XiphComment cmt;
+    cmt.addField("", "invalid key: empty string");
+    cmt.addField("A=B", "invalid key: contains '='");
+    cmt.addField("A~B", "invalid key: contains '~'");
+    cmt.addField("A\x7F\B", "invalid key: contains '\x7F'");
+    cmt.addField(L"A\x3456\B", "invalid key: Unicode");
+    CPPUNIT_ASSERT_EQUAL(0U, cmt.fieldCount());
   }
 
   void testClearComment()

@@ -261,10 +261,14 @@ bool Ogg::XiphComment::checkKey(const String &key)
 {
   if(key.size() < 1)
     return false;
-  for(String::ConstIterator it = key.begin(); it != key.end(); it++)
-      // forbid non-printable, non-ascii, '=' (#61) and '~' (#126)
-      if (*it < 32 || *it >= 128 || *it == 61 || *it == 126)
+
+  // A key may consist of ASCII 0x20 through 0x7D, 0x3D ('=') excluded.
+
+  for(String::ConstIterator it = key.begin(); it != key.end(); it++) {
+      if(*it < 0x20 || *it > 0x7D || *it == 0x3D)
         return false;
+  }
+
   return true;
 }
 
@@ -275,11 +279,18 @@ String Ogg::XiphComment::vendorID() const
 
 void Ogg::XiphComment::addField(const String &key, const String &value, bool replace)
 {
+  if(!checkKey(key)) {
+    debug("Ogg::XiphComment::addField() - Invalid key. Field not added.");
+    return;
+  }
+
+  const String upperKey = key.upper();
+
   if(replace)
-    removeFields(key.upper());
+    removeFields(upperKey);
 
   if(!key.isEmpty() && !value.isEmpty())
-    d->fieldListMap[key.upper()].append(value);
+    d->fieldListMap[upperKey].append(value);
 }
 
 void Ogg::XiphComment::removeField(const String &key, const String &value)
