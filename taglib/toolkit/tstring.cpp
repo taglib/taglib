@@ -88,7 +88,7 @@ namespace
 #ifdef _WIN32
 
     len = ::MultiByteToWideChar(
-      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
+      CP_UTF8, MB_ERR_INVALID_CHARS, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
 
 #else
 

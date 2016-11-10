@@ -50,6 +50,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testEncodeNonLatin1);
   CPPUNIT_TEST(testEncodeEmpty);
   CPPUNIT_TEST(testIterator);
+  CPPUNIT_TEST(testRedundantUTF8);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -319,6 +320,14 @@ public:
     *it2 = L'I';
     CPPUNIT_ASSERT_EQUAL(L'i', *it1);
     CPPUNIT_ASSERT_EQUAL(L'I', *it2);
+  }
+
+  void testRedundantUTF8()
+  {
+    CPPUNIT_ASSERT_EQUAL(String("/"), String(ByteVector("\x2F"), String::UTF8));
+    CPPUNIT_ASSERT(String(ByteVector("\xC0\xAF"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xE0\x80\xAF"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF0\x80\x80\xAF"), String::UTF8).isEmpty());
   }
 
 };
