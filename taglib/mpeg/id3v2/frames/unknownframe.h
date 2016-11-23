@@ -51,7 +51,7 @@ namespace TagLib {
       friend class FrameFactory;
 
     public:
-      UnknownFrame(const ByteVector &data);
+      explicit UnknownFrame(const ByteVector &data);
       virtual ~UnknownFrame();
 
       virtual String toString() const;
