@@ -36,7 +36,7 @@ namespace TagLib {
     class TAGLIB_EXPORT Properties : public AudioProperties
     {
     public:
-      Properties(AudioProperties::ReadStyle propertiesStyle);
+      explicit Properties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~Properties();
 
       int length()               const;

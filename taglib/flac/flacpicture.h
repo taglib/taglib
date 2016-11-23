@@ -89,7 +89,7 @@ namespace TagLib {
       };
 
       Picture();
-      Picture(const ByteVector &data);
+      explicit Picture(const ByteVector &data);
       ~Picture();
 
       /*!

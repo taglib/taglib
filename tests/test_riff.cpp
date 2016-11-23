@@ -37,7 +37,7 @@ using namespace TagLib;
 class PublicRIFF : public RIFF::File
 {
 public:
-  PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
+  explicit PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
   unsigned int riffSize() { return RIFF::File::riffSize(); };
   unsigned int chunkCount() { return RIFF::File::chunkCount(); };
   unsigned int chunkOffset(unsigned int i) { return RIFF::File::chunkOffset(i); };

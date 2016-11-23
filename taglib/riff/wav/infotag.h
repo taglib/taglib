@@ -96,7 +96,7 @@ namespace TagLib {
       /*!
        * Constructs an INFO tag read from \a data which is contents of "LIST" chunk.
        */
-      Tag(const ByteVector &data);
+      explicit Tag(const ByteVector &data);
 
       virtual ~Tag();
 
