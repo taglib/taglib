@@ -948,10 +948,10 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
     if(reverseKeyMap.contains(it->first)) {
       String name = reverseKeyMap[it->first];
       if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && !it->second.isEmpty()) {
-        int first = 0, second = 0;
         StringList parts = StringList::split(it->second.front(), "/");
         if(!parts.isEmpty()) {
-          first = parts[0].toInt();
+          int first = parts[0].toInt();
+          int second = 0;
           if(parts.size() > 1) {
             second = parts[1].toInt();
           }

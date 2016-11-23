@@ -36,7 +36,9 @@ class TableOfContentsFrame::TableOfContentsFramePrivate
 {
 public:
   TableOfContentsFramePrivate() :
-    tagHeader(0)
+    tagHeader(0),
+    isTopLevel(false),
+    isOrdered(false)
   {
     embeddedFrameList.setAutoDelete(true);
   }

@@ -60,6 +60,7 @@ class ID3v2::Tag::TagPrivate
 {
 public:
   TagPrivate() :
+    factory(0),
     file(0),
     tagOffset(0),
     extendedHeader(0),
@@ -286,7 +287,7 @@ void ID3v2::Tag::setGenre(const String &s)
 
 void ID3v2::Tag::setYear(unsigned int i)
 {
-  if(i <= 0) {
+  if(i == 0) {
     removeFrames("TDRC");
     return;
   }
@@ -295,7 +296,7 @@ void ID3v2::Tag::setYear(unsigned int i)
 
 void ID3v2::Tag::setTrack(unsigned int i)
 {
-  if(i <= 0) {
+  if(i == 0) {
     removeFrames("TRCK");
     return;
   }
