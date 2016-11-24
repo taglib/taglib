@@ -98,8 +98,8 @@ public:
     map[""] = String("invalid key: empty string");
     map["A=B"] = String("invalid key: contains '='");
     map["A~B"] = String("invalid key: contains '~'");
-    map["A\x7F\B"] = String("invalid key: contains '\x7F'");
-    map[L"A\x3456\B"] = String("invalid key: Unicode");
+    map["A\x7F" "B"] = String("invalid key: contains '\x7F'");
+    map[L"A\x3456" "B"] = String("invalid key: Unicode");
 
     Ogg::XiphComment cmt;
     PropertyMap unsuccessful = cmt.setProperties(map);
@@ -113,8 +113,8 @@ public:
     cmt.addField("", "invalid key: empty string");
     cmt.addField("A=B", "invalid key: contains '='");
     cmt.addField("A~B", "invalid key: contains '~'");
-    cmt.addField("A\x7F\B", "invalid key: contains '\x7F'");
-    cmt.addField(L"A\x3456\B", "invalid key: Unicode");
+    cmt.addField("A\x7F" "B", "invalid key: contains '\x7F'");
+    cmt.addField(L"A\x3456" "B", "invalid key: Unicode");
     CPPUNIT_ASSERT_EQUAL(0U, cmt.fieldCount());
   }
 
