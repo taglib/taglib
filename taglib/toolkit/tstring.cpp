@@ -447,7 +447,10 @@ bool String::startsWith(const String &s) const
 
 String String::substr(unsigned int position, unsigned int n) const
 {
-  return String(d->data.substr(position, n));
+  if(position == 0 && n == size())
+    return *this;
+  else
+    return String(d->data.substr(position, n));
 }
 
 String &String::append(const String &s)
