@@ -112,6 +112,9 @@ public:
     CPPUNIT_ASSERT(String("  foo  ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("foo    ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("    foo").stripWhiteSpace() == String("foo"));
+    CPPUNIT_ASSERT(String("foo").stripWhiteSpace() == String("foo"));
+    CPPUNIT_ASSERT(String("f o o").stripWhiteSpace() == String("f o o"));
+    CPPUNIT_ASSERT(String(" f o o ").stripWhiteSpace() == String("f o o"));
 
     CPPUNIT_ASSERT(memcmp(String("foo").data(String::Latin1).data(), "foo", 3) == 0);
     CPPUNIT_ASSERT(memcmp(String("f").data(String::Latin1).data(), "f", 1) == 0);
