@@ -257,6 +257,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("01"), String("0123456").substr(0, 2));
     CPPUNIT_ASSERT_EQUAL(String("12"), String("0123456").substr(1, 2));
     CPPUNIT_ASSERT_EQUAL(String("123456"), String("0123456").substr(1, 200));
+    CPPUNIT_ASSERT_EQUAL(String("0123456"), String("0123456").substr(0, 7));
+    CPPUNIT_ASSERT_EQUAL(String("0123456"), String("0123456").substr(0, 200));
   }
 
   void testNewline()
