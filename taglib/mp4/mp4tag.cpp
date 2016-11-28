@@ -835,7 +835,7 @@ MP4::Tag::setPictures(const PictureMap &l)
         ++pictureListIt) {
       Picture picture = *pictureListIt;
       CoverArt::Format format;
-	    String mime = picture.mime();
+      String mime = picture.mime();
       if(String("image/") == mime)
         format = CoverArt::Unknown;
       else if(String("image/bmp") == mime)
