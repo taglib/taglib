@@ -168,9 +168,8 @@ bool FLAC::File::save()
   }
 
   // Create new vorbis comments
-  if (!hasXiphComment())
+  if(!hasXiphComment())
     Tag::duplicate(&d->tag, xiphComment(true), false);
-  
 
   d->xiphCommentData = xiphComment()->render(false);
 
