@@ -233,7 +233,7 @@ namespace TagLib
       };
 
       /*!
-       * Returns the integer byte order of the system.
+       * Returns the byte order of the system.
        */
       inline ByteOrder systemByteOrder()
       {
@@ -244,26 +244,6 @@ namespace TagLib
 
         u.i = 1;
         if(u.c == 1)
-          return LittleEndian;
-        else
-          return BigEndian;
-      }
-
-      /*!
-       * Returns the IEEE754 byte order of the system.
-       */
-      inline ByteOrder floatByteOrder()
-      {
-        union {
-          double d;
-          char   c;
-        } u;
-
-        // 1.0 is stored in memory like 0x3FF0000000000000 in canonical form.
-        // So the first byte is zero if little endian.
-
-        u.d = 1.0;
-        if(u.c == 0)
           return LittleEndian;
         else
           return BigEndian;
