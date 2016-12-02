@@ -313,6 +313,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(ByteVector("abcdaba"), a);
     }
   }
+
   void testReplaceAndDetach()
   {
     {

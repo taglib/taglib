@@ -29,7 +29,6 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <cstddef>
 
 #include <tstring.h>
 #include <tdebug.h>
@@ -485,46 +484,60 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 
 ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &with)
 {
-  // TODO: This takes O(n!) time in the worst case. Rewrite it to run in O(n) time.
-
-  if(pattern.size() == 0 || pattern.size() > size())
-    return *this;
-
   if(pattern.size() == 1 && with.size() == 1)
     return replace(pattern[0], with[0]);
 
-  const unsigned int withSize    = with.size();
-  const unsigned int patternSize = pattern.size();
-  const int diff = withSize - patternSize;
+  // Check if there is at least one occurrence of the pattern.
 
-  unsigned int offset = 0;
-  while (true) {
-    offset = find(pattern, offset);
-    if(offset == static_cast<unsigned int>(-1))
-      break;
+  int offset = find(pattern, 0);
+  if(offset == -1)
+    return *this;
+
+  if(pattern.size() == with.size()) {
+
+    // We think this case might be common enough to optimize it.
 
     detach();
+    do
+    {
+      ::memcpy(data() + offset, with.data(), with.size());
+      offset = find(pattern, offset + pattern.size());
+    } while(offset != -1);
+  }
+  else {
 
-    if(diff < 0) {
-      ::memmove(
-        data() + offset + withSize,
-        data() + offset + patternSize,
-        size() - offset - patternSize);
-      resize(size() + diff);
+    // Loop once to calculate the result size.
+
+    unsigned int dstSize = size();
+    do
+    {
+      dstSize += with.size() - pattern.size();
+      offset = find(pattern, offset + pattern.size());
+    } while(offset != -1);
+
+    // Loop again to copy modified data to the new vector.
+
+    ByteVector dst(dstSize);
+    int dstOffset = 0;
+
+    offset = 0;
+    while(true) {
+      const int next = find(pattern, offset);
+      if(next == -1) {
+        ::memcpy(dst.data() + dstOffset, data() + offset, size() - offset);
+        break;
+      }
+
+      ::memcpy(dst.data() + dstOffset, data() + offset, next - offset);
+      dstOffset += next - offset;
+
+      ::memcpy(dst.data() + dstOffset, with.data(), with.size());
+      dstOffset += with.size();
+
+      offset = next + pattern.size();
     }
-    else if(diff > 0) {
-      resize(size() + diff);
-      ::memmove(
-        data() + offset + withSize,
-        data() + offset + patternSize,
-        size() - diff - offset - patternSize);
-    }
 
-    ::memcpy(data() + offset, with.data(), with.size());
-
-    offset += withSize;
-    if(offset > size() - patternSize)
-      break;
+    swap(dst);
   }
 
   return *this;
