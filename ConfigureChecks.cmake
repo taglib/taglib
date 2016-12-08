@@ -54,11 +54,16 @@ check_cxx_source_compiles("
 " HAVE_STD_ATOMIC)
 
 if(NOT HAVE_STD_ATOMIC)
-  find_package(Boost COMPONENTS atomic)
-  if(Boost_ATOMIC_FOUND)
-    set(HAVE_BOOST_ATOMIC 1)
-  else()
-    set(HAVE_BOOST_ATOMIC 0)
+  
+  # We will not find BOOST_ATOMIC on macOS when BUILD_FRAMEWORK is set, since we don't want to link
+  # to `libboost_atomic-mt.dylib` within `tag.framework`. 
+  if(NOT BUILD_FRAMEWORK)
+    find_package(Boost COMPONENTS atomic)
+    if(Boost_ATOMIC_FOUND)
+      set(HAVE_BOOST_ATOMIC 1)
+    else()
+      set(HAVE_BOOST_ATOMIC 0)
+    endif()
   endif()
 
   if(NOT HAVE_BOOST_ATOMIC)
