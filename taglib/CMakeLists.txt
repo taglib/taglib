@@ -365,7 +365,13 @@ set_target_properties(tag PROPERTIES
   PUBLIC_HEADER "${tag_HDRS}"
 )
 if(BUILD_FRAMEWORK)
-  set_target_properties(tag PROPERTIES FRAMEWORK TRUE)
+  unset(INSTALL_NAME_DIR)
+  set_target_properties(tag PROPERTIES 
+      FRAMEWORK TRUE
+      MACOSX_RPATH 1
+      VERSION "A"
+      SOVERSION "A"
+      )
 endif()
 
 install(TARGETS tag
