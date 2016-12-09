@@ -34,11 +34,6 @@
 # define ATOMIC_INT std::atomic<unsigned int>
 # define ATOMIC_INC(x) x.fetch_add(1)
 # define ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
-#elif defined(HAVE_BOOST_ATOMIC)
-# include <boost/atomic.hpp>
-# define ATOMIC_INT boost::atomic<unsigned int>
-# define ATOMIC_INC(x) x.fetch_add(1)
-# define ATOMIC_DEC(x) (x.fetch_sub(1) - 1)
 #elif defined(HAVE_GCC_ATOMIC)
 # define ATOMIC_INT int
 # define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
