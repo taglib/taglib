@@ -46,9 +46,9 @@ endif()
 check_cxx_source_compiles("
   #include <atomic>
   int main() {
-    std::atomic<unsigned int> x;
-    x.fetch_add(1);
-    x.fetch_sub(1);
+    std::atomic_int x;
+    ++x;
+    --x;
     return 0;
   }
 " HAVE_STD_ATOMIC)
