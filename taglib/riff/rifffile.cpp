@@ -65,7 +65,7 @@ namespace
 class RIFF::File::FilePrivate
 {
 public:
-  FilePrivate(ByteOrder endianness) :
+  explicit FilePrivate(ByteOrder endianness) :
     endianness(endianness),
     size(0),
     sizeOffset(0) {}

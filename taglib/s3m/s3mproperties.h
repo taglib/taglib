@@ -51,7 +51,7 @@ namespace TagLib {
         CustomData           = 128
       };
 
-      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      explicit AudioProperties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~AudioProperties();
 
       int length()               const;

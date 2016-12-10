@@ -48,7 +48,7 @@ public:
     return true;
   }
 
-  FilePrivate(File *p_document) : tag(0), document(p_document)
+  explicit FilePrivate(File *p_document) : tag(0), document(p_document)
   {
     // Just get the first segment, because "Typically a Matroska file is
     // composed of 1 segment."
@@ -286,7 +286,7 @@ class EBML::Matroska::File::Tag::TagPrivate
 {
 public:
   // Creates a TagPrivate instance
-  TagPrivate(File *p_document) :
+  explicit TagPrivate(File *p_document) :
     document(p_document),
     title(document->d->tags.end()),
     artist(document->d->tags.end()),

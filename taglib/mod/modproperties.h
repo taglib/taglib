@@ -40,7 +40,7 @@ namespace TagLib {
       friend class File;
 
     public:
-      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      explicit AudioProperties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~AudioProperties();
 
       int length()               const;

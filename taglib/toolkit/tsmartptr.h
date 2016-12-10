@@ -97,7 +97,7 @@ namespace TagLib
   class CounterImpl : public CounterBase
   {
   public:
-    CounterImpl(T *p) :
+    explicit CounterImpl(T *p) :
       p(p) {}
 
     virtual void dispose()

@@ -37,8 +37,8 @@ namespace TagLib {
   class TAGLIB_EXPORT FileName
   {
   public:
-    FileName(const wchar_t *name);
-    FileName(const char *name);
+    explicit FileName(const wchar_t *name);
+    explicit FileName(const char *name);
     FileName(const FileName &name);
 
     ~FileName();

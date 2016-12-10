@@ -46,7 +46,7 @@ namespace TagLib {
      * Construct a File object and opens the \a file.  \a file should be a
      * be a C-string in the local file system encoding.
      */
-    ByteVectorStream(const ByteVector &data);
+    explicit ByteVectorStream(const ByteVector &data);
 
     /*!
      * Destroys this ByteVectorStream instance.

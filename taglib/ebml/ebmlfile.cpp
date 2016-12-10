@@ -30,7 +30,7 @@ using namespace TagLib;
 class EBML::File::FilePrivate
 {
 public:
-  FilePrivate(File *document) : root(document)
+  explicit FilePrivate(File *document) : root(document)
   {
   }
   
