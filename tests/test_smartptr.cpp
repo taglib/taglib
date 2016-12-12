@@ -92,7 +92,7 @@ private:
   class DummyBase
   {
   public:
-    DummyBase(int x) : value(x)
+    explicit DummyBase(int x) : value(x)
     {
     }
   
@@ -113,7 +113,7 @@ private:
   class DummyDerived : public DummyBase
   {
   public:
-    DummyDerived(int x) : DummyBase(x)
+    explicit DummyDerived(int x) : DummyBase(x)
     {
     }
   

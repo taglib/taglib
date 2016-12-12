@@ -50,7 +50,7 @@ namespace TagLib {
         /*!
          * Constructs an instance from a file.
          */
-        AudioProperties(File *document);
+        explicit AudioProperties(File *document);
 
         /*!
          * Returns the length of the file.

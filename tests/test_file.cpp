@@ -32,7 +32,7 @@ using namespace TagLib;
 // File subclass that gives tests access to filesystem operations
 class PlainFile : public File {
 public:
-  PlainFile(FileName name) : File(name) { }
+  explicit PlainFile(FileName name) : File(name) { }
   Tag *tag() const { return NULL; }
   AudioProperties *audioProperties() const { return NULL; }
   bool save(){ return false; }

@@ -49,12 +49,12 @@ namespace TagLib {
         /*!
          * Constructs a Matroska File from a file name.
          */
-        File(FileName file);
+        explicit File(FileName file);
 
         /*!
          *  Constructs a Matroska File from a stream.
          */
-        File(IOStream *stream);
+        explicit File(IOStream *stream);
 
         /*!
          * Returns the pointer to a tag that allow access on common tags.
@@ -101,7 +101,7 @@ namespace TagLib {
            * Creates a new Tag for Matroska files. The given properties are gained
            * by the Matroska::File.
            */
-          Tag(File *document);
+          explicit Tag(File *document);
 
           /*!
            * Returns the track name; if no track name is present in the tag

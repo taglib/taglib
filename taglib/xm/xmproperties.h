@@ -44,7 +44,7 @@ namespace TagLib {
         LinearFreqTable = 1 // otherwise its the amiga freq. table
       };
 
-      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      explicit AudioProperties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~AudioProperties();
 
       int length()               const;

@@ -192,7 +192,7 @@ public:
   FileRefPrivate() :
     file() {}
 
-  FileRefPrivate(File *f) :
+  explicit FileRefPrivate(File *f) :
     file(f) {}
 
   SHARED_PTR<File> file;

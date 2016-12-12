@@ -61,7 +61,7 @@ namespace TagLib {
       /*!
        * Creates an root element using document.
        */
-      Element(File *document);
+      explicit Element(File *document);
 
       /*!
        * Returns the first found child element with the given id. Returns a null

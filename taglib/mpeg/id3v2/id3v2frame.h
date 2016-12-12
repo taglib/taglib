@@ -175,7 +175,7 @@ namespace TagLib {
        * The ownership of this header will be assigned to the frame and the
        * header will be deleted when the frame is destroyed.
        */
-      Frame(Header *h);
+      explicit Frame(Header *h);
 
       /*!
        * Returns a pointer to the frame header.

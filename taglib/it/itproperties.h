@@ -58,7 +58,7 @@ namespace TagLib {
         MidiConfEmbedded = 8
       };
 
-      AudioProperties(AudioProperties::ReadStyle propertiesStyle);
+      explicit AudioProperties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~AudioProperties();
 
       int length()               const;

@@ -61,7 +61,7 @@ namespace TagLib {
        * This constructor is protected since an object should be created
        * through a specific subclass.
        */
-      File(FileName file);
+      explicit File(FileName file);
       
       /*!
        * Constructs an instance of an EBML file from an IOStream.
@@ -69,7 +69,7 @@ namespace TagLib {
        * This constructor is protected since an object should be created
        * through a specific subclass.
        */
-      File(IOStream *stream);
+      explicit File(IOStream *stream);
     
     private:
       //! Non-copyable
