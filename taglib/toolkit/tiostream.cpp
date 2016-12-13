@@ -56,10 +56,10 @@ public:
   FileNamePrivate() :
     data(new std::wstring()) {}
 
-  explicit FileNamePrivate(const wchar_t *name) :
+  FileNamePrivate(const wchar_t *name) :
     data(new std::wstring(name)) {}
 
-  explicit FileNamePrivate(const char *name) :
+  FileNamePrivate(const char *name) :
     data(new std::wstring(ansiToUnicode(name))) {}
 
   SHARED_PTR<std::wstring> data;
