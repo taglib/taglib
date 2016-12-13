@@ -35,7 +35,7 @@ elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
 endif()
 
-if(HAVE_BOOST_BYTESWAP OR HAVE_BOOST_ATOMIC OR HAVE_BOOST_ZLIB)
+if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIR})
 endif()
 
@@ -377,16 +377,8 @@ set(tag_LIB_SRCS
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
-if(ZLIB_FOUND)
+if(HAVE_ZLIB AND NOT HAVE_ZLIB_SOURCE)
   target_link_libraries(tag ${ZLIB_LIBRARIES})
-endif()
-
-if(HAVE_BOOST_ATOMIC)
-  target_link_libraries(tag ${Boost_ATOMIC_LIBRARY})
-endif()
-
-if(HAVE_BOOST_ZLIB)
-  target_link_libraries(tag ${Boost_IOSTREAMS_LIBRARY} ${Boost_ZLIB_LIBRARY})
 endif()
 
 set_target_properties(tag PROPERTIES
@@ -398,7 +390,13 @@ set_target_properties(tag PROPERTIES
   PUBLIC_HEADER "${tag_HDRS}"
 )
 if(BUILD_FRAMEWORK)
-  set_target_properties(tag PROPERTIES FRAMEWORK TRUE)
+  unset(INSTALL_NAME_DIR)
+  set_target_properties(tag PROPERTIES 
+      FRAMEWORK TRUE
+      MACOSX_RPATH 1
+      VERSION "A"
+      SOVERSION "A"
+      )
 endif()
 
 install(TARGETS tag

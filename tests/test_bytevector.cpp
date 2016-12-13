@@ -46,6 +46,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testIntegerConversion);
   CPPUNIT_TEST(testFloatingPointConversion);
   CPPUNIT_TEST(testReplace);
+  CPPUNIT_TEST(testReplaceAndDetach);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testResize);
   CPPUNIT_TEST(testAppend1);
@@ -309,6 +310,45 @@ public:
       CPPUNIT_ASSERT_EQUAL(ByteVector("<a>bcd<a>b<a>"), a);
       a.replace(ByteVector("<a>"), ByteVector("a"));
       CPPUNIT_ASSERT_EQUAL(ByteVector("abcdaba"), a);
+    }
+  }
+
+  void testReplaceAndDetach()
+  {
+    {
+      ByteVector a("abcdabf");
+      ByteVector b = a;
+      a.replace(ByteVector("a"), ByteVector("x"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("xbcdxbf"), a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), b);
+    }
+    {
+      ByteVector a("abcdabf");
+      ByteVector b = a;
+      a.replace('a', 'x');
+      CPPUNIT_ASSERT_EQUAL(ByteVector("xbcdxbf"), a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), b);
+    }
+    {
+      ByteVector a("abcdabf");
+      ByteVector b = a;
+      a.replace(ByteVector("ab"), ByteVector("xy"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("xycdxyf"), a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), b);
+    }
+    {
+      ByteVector a("abcdabf");
+      ByteVector b = a;
+      a.replace(ByteVector("a"), ByteVector("<a>"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("<a>bcd<a>bf"), a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabf"), b);
+    }
+    {
+      ByteVector a("ab<c>dab<c>");
+      ByteVector b = a;
+      a.replace(ByteVector("<c>"), ByteVector("c"));
+      CPPUNIT_ASSERT_EQUAL(ByteVector("abcdabc"), a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("ab<c>dab<c>"), b);
     }
   }
 

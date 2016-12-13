@@ -88,7 +88,7 @@ namespace
 #ifdef _WIN32
 
     len = ::MultiByteToWideChar(
-      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
+      CP_UTF8, MB_ERR_INVALID_CHARS, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
 
 #else
 
@@ -448,7 +448,10 @@ bool String::startsWith(const String &s) const
 
 String String::substr(size_t position, size_t length) const
 {
-  return String(d->data->substr(position, length));
+  if(position == 0 && length >= size())
+    return *this;
+  else
+    return String(d->data->substr(position, length));
 }
 
 String &String::append(const String &s)
@@ -501,7 +504,7 @@ ByteVector String::data(Type t) const
       ByteVector v(size(), 0);
       char *p = v.data();
 
-      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++)
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); ++it)
         *p++ = static_cast<char>(*it);
 
       return v;
@@ -529,7 +532,7 @@ ByteVector String::data(Type t) const
       *p++ = '\xff';
       *p++ = '\xfe';
 
-      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); ++it) {
         *p++ = static_cast<char>(*it & 0xff);
         *p++ = static_cast<char>(*it >> 8);
       }
@@ -541,7 +544,7 @@ ByteVector String::data(Type t) const
       ByteVector v(size() * 2, 0);
       char *p = v.data();
 
-      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); ++it) {
         *p++ = static_cast<char>(*it >> 8);
         *p++ = static_cast<char>(*it & 0xff);
       }
@@ -553,7 +556,7 @@ ByteVector String::data(Type t) const
       ByteVector v(size() * 2, 0);
       char *p = v.data();
 
-      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+      for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); ++it) {
         *p++ = static_cast<char>(*it & 0xff);
         *p++ = static_cast<char>(*it >> 8);
       }
@@ -598,7 +601,7 @@ String String::stripWhiteSpace() const
 
 bool String::isLatin1() const
 {
-  for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+  for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); ++it) {
     if(*it >= 256)
       return false;
   }
@@ -607,7 +610,7 @@ bool String::isLatin1() const
 
 bool String::isAscii() const
 {
-  for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); it++) {
+  for(std::wstring::const_iterator it = d->data->begin(); it != d->data->end(); ++it) {
     if(*it >= 128)
       return false;
   }

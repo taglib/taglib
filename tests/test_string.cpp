@@ -50,6 +50,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testEncodeNonLatin1);
   CPPUNIT_TEST(testEncodeEmpty);
   CPPUNIT_TEST(testIterator);
+  CPPUNIT_TEST(testRedundantUTF8);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -109,6 +110,9 @@ public:
     CPPUNIT_ASSERT(String("  foo  ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("foo    ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("    foo").stripWhiteSpace() == String("foo"));
+    CPPUNIT_ASSERT(String("foo").stripWhiteSpace() == String("foo"));
+    CPPUNIT_ASSERT(String("f o o").stripWhiteSpace() == String("f o o"));
+    CPPUNIT_ASSERT(String(" f o o ").stripWhiteSpace() == String("f o o"));
 
     CPPUNIT_ASSERT(memcmp(String("foo").data(String::Latin1).data(), "foo", 3) == 0);
     CPPUNIT_ASSERT(memcmp(String("f").data(String::Latin1).data(), "f", 1) == 0);
@@ -265,6 +269,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("01"), String("0123456").substr(0, 2));
     CPPUNIT_ASSERT_EQUAL(String("12"), String("0123456").substr(1, 2));
     CPPUNIT_ASSERT_EQUAL(String("123456"), String("0123456").substr(1, 200));
+    CPPUNIT_ASSERT_EQUAL(String("0123456"), String("0123456").substr(0, 7));
+    CPPUNIT_ASSERT_EQUAL(String("0123456"), String("0123456").substr(0, 200));
   }
 
   void testNewline()
@@ -332,6 +338,15 @@ public:
     CPPUNIT_ASSERT_EQUAL(L'i', *it1);
     CPPUNIT_ASSERT_EQUAL(L'I', *it2);
   }
+
+  void testRedundantUTF8()
+  {
+    CPPUNIT_ASSERT_EQUAL(String("/"), String(ByteVector("\x2F"), String::UTF8));
+    CPPUNIT_ASSERT(String(ByteVector("\xC0\xAF"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xE0\x80\xAF"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF0\x80\x80\xAF"), String::UTF8).isEmpty());
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestString);
