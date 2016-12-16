@@ -39,6 +39,7 @@
 #include <id3v2header.h>
 #include <tpropertymap.h>
 #include <tagutils.h>
+#include <tsmartptr.h>
 
 #include "apefile.h"
 #include "apetag.h"
@@ -58,29 +59,21 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
-    ID3v2Header(0),
     ID3v2Location(-1),
-    ID3v2Size(0),
-    properties(0) {}
-
-  ~FilePrivate()
-  {
-    delete ID3v2Header;
-    delete properties;
-  }
+    ID3v2Size(0) {}
 
   long long APELocation;
   long long APESize;
 
   long long ID3v1Location;
 
-  ID3v2::Header *ID3v2Header;
+  SCOPED_PTR<ID3v2::Header> ID3v2Header;
   long long ID3v2Location;
   long long ID3v2Size;
 
   DoubleTagUnion tag;
 
-  AudioProperties *properties;
+  SCOPED_PTR<AudioProperties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +116,7 @@ PropertyMap APE::File::setProperties(const PropertyMap &properties)
 
 APE::AudioProperties *APE::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool APE::File::save()
@@ -242,7 +235,7 @@ void APE::File::read(bool readProperties)
 
   if(d->ID3v2Location >= 0) {
     seek(d->ID3v2Location);
-    d->ID3v2Header = new ID3v2::Header(readBlock(ID3v2::Header::size()));
+    d->ID3v2Header.reset(new ID3v2::Header(readBlock(ID3v2::Header::size())));
     d->ID3v2Size = d->ID3v2Header->completeTagSize();
   }
 
@@ -287,6 +280,6 @@ void APE::File::read(bool readProperties)
       seek(0);
     }
 
-    d->properties = new AudioProperties(this, streamLength);
+    d->properties.reset(new AudioProperties(this, streamLength));
   }
 }
