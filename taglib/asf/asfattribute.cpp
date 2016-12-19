@@ -217,10 +217,10 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
 
   case BoolType:
     if(kind == 0) {
-      d->boolValue = (readDWORD(&f) == 1);
+      d->boolValue = (readDWORD(&f) != 0);
     }
     else {
-      d->boolValue = (readWORD(&f) == 1);
+      d->boolValue = (readWORD(&f) != 0);
     }
     break;
 
