@@ -34,13 +34,6 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
-# Enable check_cxx_source_compiles() to work with Boost "header-only" libraries.
-
-find_package(Boost)
-if(Boost_FOUND)
-  set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${Boost_INCLUDE_DIRS}")
-endif()
-
 # Determine which kind of atomic operations your compiler supports.
 
 check_cxx_source_compiles("
