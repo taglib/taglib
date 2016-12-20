@@ -46,7 +46,7 @@ endif()
 check_cxx_source_compiles("
   #include <atomic>
   int main() {
-    std::atomic_int x;
+    std::atomic_int x(1);
     ++x;
     --x;
     return 0;
