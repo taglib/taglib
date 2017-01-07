@@ -198,7 +198,6 @@ bool FLAC::File::save()
   }
 
   // Compute the amount of padding, and append that to data.
-  // TODO: Should be calculated in offset_t in taglib2.
 
   long originalLength = d->streamStart - d->flacStart;
   long paddingLength = originalLength - data.size() - 4;
