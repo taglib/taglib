@@ -63,6 +63,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyID3v2);
   CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST(testRemoveXiphField);
+  CPPUNIT_TEST(testEmptySeekTable);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -513,6 +514,24 @@ public:
     {
       FLAC::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL(String(), f.xiphComment()->title());
+    }
+  }
+
+  void testEmptySeekTable()
+  {
+    ScopedFileCopy copy("empty-seektable", ".flac");
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.xiphComment(true)->setTitle("XiphComment Title");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.seek(42);
+      const ByteVector data = f.readBlock(4);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("\x03\x00\x00\x00", 4), data);
     }
   }
 
