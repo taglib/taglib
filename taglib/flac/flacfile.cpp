@@ -506,7 +506,9 @@ void FLAC::File::scan()
       return;
     }
 
-    if(blockLength == 0 && blockType != MetadataBlock::Padding) {
+    if(blockLength == 0
+      && blockType != MetadataBlock::Padding && blockType != MetadataBlock::SeekTable)
+    {
       debug("FLAC::File::scan() -- Zero-sized metadata block found");
       setValid(false);
       return;
