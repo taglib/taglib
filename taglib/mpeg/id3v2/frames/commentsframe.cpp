@@ -190,8 +190,9 @@ ByteVector CommentsFrame::renderFields() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-CommentsFrame::CommentsFrame(const ByteVector &data, Header *h) : Frame(h)
+CommentsFrame::CommentsFrame(const ByteVector &data, Header *h) :
+  Frame(h),
+  d(new CommentsFramePrivate())
 {
-  d = new CommentsFramePrivate();
   parseFields(fieldData(data));
 }

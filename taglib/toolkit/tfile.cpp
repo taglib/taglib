@@ -87,15 +87,14 @@ File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(FileName fileName)
+File::File(FileName fileName) :
+  d(new FilePrivate(new FileStream(fileName), true))
 {
-  IOStream *stream = new FileStream(fileName);
-  d = new FilePrivate(stream, true);
 }
 
-File::File(IOStream *stream)
+File::File(IOStream *stream) :
+  d(new FilePrivate(stream, false))
 {
-  d = new FilePrivate(stream, false);
 }
 
 File::~File()

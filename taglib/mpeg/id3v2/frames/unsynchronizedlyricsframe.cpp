@@ -190,9 +190,9 @@ ByteVector UnsynchronizedLyricsFrame::renderFields() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data, Header *h)
-  : Frame(h)
+UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data, Header *h) :
+  Frame(h),
+  d(new UnsynchronizedLyricsFramePrivate())
 {
-  d = new UnsynchronizedLyricsFramePrivate();
   parseFields(fieldData(data));
 }

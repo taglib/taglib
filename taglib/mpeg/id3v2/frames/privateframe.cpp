@@ -123,8 +123,9 @@ ByteVector PrivateFrame::renderFields() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-PrivateFrame::PrivateFrame(const ByteVector &data, Header *h) : Frame(h)
+PrivateFrame::PrivateFrame(const ByteVector &data, Header *h) :
+  Frame(h),
+  d(new PrivateFramePrivate())
 {
-  d = new PrivateFramePrivate();
   parseFields(fieldData(data));
 }

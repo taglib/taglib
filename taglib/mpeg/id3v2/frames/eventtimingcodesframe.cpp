@@ -136,9 +136,9 @@ ByteVector EventTimingCodesFrame::renderFields() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-EventTimingCodesFrame::EventTimingCodesFrame(const ByteVector &data, Header *h)
-  : Frame(h)
+EventTimingCodesFrame::EventTimingCodesFrame(const ByteVector &data, Header *h) :
+  Frame(h),
+  d(new EventTimingCodesFramePrivate())
 {
-  d = new EventTimingCodesFramePrivate();
   parseFields(fieldData(data));
 }
