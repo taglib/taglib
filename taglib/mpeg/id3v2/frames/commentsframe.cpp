@@ -48,15 +48,17 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-CommentsFrame::CommentsFrame(String::Type encoding) : Frame("COMM")
+CommentsFrame::CommentsFrame(String::Type encoding) :
+  Frame("COMM"),
+  d(new CommentsFramePrivate())
 {
-  d = new CommentsFramePrivate;
   d->textEncoding = encoding;
 }
 
-CommentsFrame::CommentsFrame(const ByteVector &data) : Frame(data)
+CommentsFrame::CommentsFrame(const ByteVector &data) :
+  Frame(data),
+  d(new CommentsFramePrivate())
 {
-  d = new CommentsFramePrivate;
   setData(data);
 }
 

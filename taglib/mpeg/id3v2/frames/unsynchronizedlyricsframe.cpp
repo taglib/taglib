@@ -50,16 +50,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(String::Type encoding) :
-  Frame("USLT")
+  Frame("USLT"),
+  d(new UnsynchronizedLyricsFramePrivate())
 {
-  d = new UnsynchronizedLyricsFramePrivate;
   d->textEncoding = encoding;
 }
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data) :
-  Frame(data)
+  Frame(data),
+  d(new UnsynchronizedLyricsFramePrivate())
 {
-  d = new UnsynchronizedLyricsFramePrivate;
   setData(data);
 }
 

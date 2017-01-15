@@ -723,7 +723,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
 
   if(d->header.extendedHeader()) {
     if(!d->extendedHeader)
-      d->extendedHeader = new ExtendedHeader;
+      d->extendedHeader = new ExtendedHeader();
     d->extendedHeader->setData(data);
     if(d->extendedHeader->size() <= data.size()) {
       frameDataPosition += d->extendedHeader->size();

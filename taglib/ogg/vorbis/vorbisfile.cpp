@@ -109,7 +109,7 @@ bool Vorbis::File::save()
   ByteVector v(vorbisCommentHeaderID);
 
   if(!d->comment)
-    d->comment = new Ogg::XiphComment;
+    d->comment = new Ogg::XiphComment();
   v.append(d->comment->render());
 
   setPacket(1, v);

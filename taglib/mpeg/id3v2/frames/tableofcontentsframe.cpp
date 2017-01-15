@@ -82,9 +82,9 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////
 
 TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data) :
-    ID3v2::Frame(data)
+  ID3v2::Frame(data),
+  d(new TableOfContentsFramePrivate())
 {
-  d = new TableOfContentsFramePrivate;
   d->tagHeader = tagHeader;
   setData(data);
 }
@@ -92,9 +92,9 @@ TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader, const
 TableOfContentsFrame::TableOfContentsFrame(const ByteVector &elementID,
                                            const ByteVectorList &children,
                                            const FrameList &embeddedFrames) :
-    ID3v2::Frame("CTOC")
+  ID3v2::Frame("CTOC"),
+  d(new TableOfContentsFramePrivate())
 {
-  d = new TableOfContentsFramePrivate;
   d->elementID = elementID;
   strip(d->elementID);
   d->childElements = children;
@@ -332,9 +332,9 @@ ByteVector TableOfContentsFrame::renderFields() const
 
 TableOfContentsFrame::TableOfContentsFrame(const ID3v2::Header *tagHeader,
                                            const ByteVector &data, Header *h) :
-  Frame(h)
+  Frame(h),
+  d(new TableOfContentsFramePrivate())
 {
-  d = new TableOfContentsFramePrivate;
   d->tagHeader = tagHeader;
   parseFields(fieldData(data));
 }

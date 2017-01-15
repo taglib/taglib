@@ -46,15 +46,15 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 EventTimingCodesFrame::EventTimingCodesFrame() :
-  Frame("ETCO")
+  Frame("ETCO"),
+  d(new EventTimingCodesFramePrivate())
 {
-  d = new EventTimingCodesFramePrivate;
 }
 
 EventTimingCodesFrame::EventTimingCodesFrame(const ByteVector &data) :
-  Frame(data)
+  Frame(data),
+  d(new EventTimingCodesFramePrivate())
 {
-  d = new EventTimingCodesFramePrivate;
   setData(data);
 }
 

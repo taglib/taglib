@@ -45,14 +45,16 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-PrivateFrame::PrivateFrame() : Frame("PRIV")
+PrivateFrame::PrivateFrame() :
+  Frame("PRIV"),
+  d(new PrivateFramePrivate())
 {
-  d = new PrivateFramePrivate;
 }
 
-PrivateFrame::PrivateFrame(const ByteVector &data) : Frame(data)
+PrivateFrame::PrivateFrame(const ByteVector &data) :
+  Frame(data),
+  d(new PrivateFramePrivate())
 {
-  d = new PrivateFramePrivate;
   setData(data);
 }
 

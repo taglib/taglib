@@ -101,7 +101,7 @@ Opus::Properties *Opus::File::audioProperties() const
 bool Opus::File::save()
 {
   if(!d->comment)
-    d->comment = new Ogg::XiphComment;
+    d->comment = new Ogg::XiphComment();
 
   setPacket(1, ByteVector("OpusTags", 8) + d->comment->render(false));
 

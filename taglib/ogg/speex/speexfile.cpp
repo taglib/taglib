@@ -101,7 +101,7 @@ Speex::Properties *Speex::File::audioProperties() const
 bool Speex::File::save()
 {
   if(!d->comment)
-    d->comment = new Ogg::XiphComment;
+    d->comment = new Ogg::XiphComment();
 
   setPacket(1, d->comment->render());
 

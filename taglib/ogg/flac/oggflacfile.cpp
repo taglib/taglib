@@ -70,17 +70,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::FLAC::File::File(FileName file, bool readProperties,
-                      Properties::ReadStyle propertiesStyle) : Ogg::File(file)
+                      Properties::ReadStyle propertiesStyle) :
+  Ogg::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 Ogg::FLAC::File::File(IOStream *stream, bool readProperties,
-                      Properties::ReadStyle propertiesStyle) : Ogg::File(stream)
+                      Properties::ReadStyle propertiesStyle) :
+  Ogg::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
@@ -172,7 +174,7 @@ void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle properties
   if(d->hasXiphComment)
     d->comment = new Ogg::XiphComment(xiphCommentData());
   else
-    d->comment = new Ogg::XiphComment;
+    d->comment = new Ogg::XiphComment();
 
 
   if(readProperties)

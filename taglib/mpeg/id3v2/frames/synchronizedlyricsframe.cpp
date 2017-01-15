@@ -52,16 +52,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 SynchronizedLyricsFrame::SynchronizedLyricsFrame(String::Type encoding) :
-  Frame("SYLT")
+  Frame("SYLT"),
+  d(new SynchronizedLyricsFramePrivate())
 {
-  d = new SynchronizedLyricsFramePrivate;
   d->textEncoding = encoding;
 }
 
 SynchronizedLyricsFrame::SynchronizedLyricsFrame(const ByteVector &data) :
-  Frame(data)
+  Frame(data),
+  d(new SynchronizedLyricsFramePrivate())
 {
-  d = new SynchronizedLyricsFramePrivate;
   setData(data);
 }
 
