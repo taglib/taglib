@@ -346,55 +346,52 @@ void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 
 long MPEG::File::nextFrameOffset(long position)
 {
-  bool foundLastSyncPattern = false;
-
-  ByteVector buffer;
+  char frameSyncBytes[2] = {};
 
   while(true) {
     seek(position);
-    buffer = readBlock(bufferSize());
-
-    if(buffer.size() <= 0)
+    const ByteVector buffer = readBlock(bufferSize());
+    if(buffer.size() == 0)
       return -1;
 
-    if(foundLastSyncPattern && secondSynchByte(buffer[0]))
-      return position - 1;
-
-    for(unsigned int i = 0; i < buffer.size() - 1; i++) {
-      if(firstSyncByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
-        return position + i;
+    for(unsigned int i = 0; i < buffer.size(); ++i) {
+      frameSyncBytes[0] = frameSyncBytes[1];
+      frameSyncBytes[1] = buffer[i];
+      if(firstSyncByte(frameSyncBytes[0]) && secondSynchByte(frameSyncBytes[1])) {
+        Header header(this, position + i - 1, true);
+        if(header.isValid())
+          return position + i - 1;
+      }
     }
 
-    foundLastSyncPattern = firstSyncByte(buffer[buffer.size() - 1]);
-    position += buffer.size();
+    position += bufferSize();
   }
 }
 
 long MPEG::File::previousFrameOffset(long position)
 {
-  bool foundFirstSyncPattern = false;
-  ByteVector buffer;
+  char frameSyncBytes[2] = {};
 
-  while (position > 0) {
-    long size = std::min<long>(position, bufferSize());
+  while(position > 0) {
+    const long size = std::min<long>(position, bufferSize());
     position -= size;
 
     seek(position);
-    buffer = readBlock(size);
+    const ByteVector buffer = readBlock(bufferSize());
+    if(buffer.size() == 0)
+      return -1;
 
-    if(buffer.size() <= 0)
-      break;
-
-    if(foundFirstSyncPattern && firstSyncByte(buffer[buffer.size() - 1]))
-      return position + buffer.size() - 1;
-
-    for(int i = buffer.size() - 2; i >= 0; i--) {
-      if(firstSyncByte(buffer[i]) && secondSynchByte(buffer[i + 1]))
-        return position + i;
+    for(int i = buffer.size() - 1; i >= 0; i--) {
+      frameSyncBytes[1] = frameSyncBytes[0];
+      frameSyncBytes[0] = buffer[i];
+      if(firstSyncByte(frameSyncBytes[0]) && secondSynchByte(frameSyncBytes[1])) {
+        Header header(this, position + i, true);
+        if(header.isValid())
+          return position + i + header.frameLength();
+      }
     }
-
-    foundFirstSyncPattern = secondSynchByte(buffer[0]);
   }
+
   return -1;
 }
 
