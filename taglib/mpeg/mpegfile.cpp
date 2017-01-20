@@ -346,7 +346,7 @@ void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
 
 long MPEG::File::nextFrameOffset(long position)
 {
-  char frameSyncBytes[2] = {};
+  ByteVector frameSyncBytes(2, '\0');
 
   while(true) {
     seek(position);
@@ -357,7 +357,7 @@ long MPEG::File::nextFrameOffset(long position)
     for(unsigned int i = 0; i < buffer.size(); ++i) {
       frameSyncBytes[0] = frameSyncBytes[1];
       frameSyncBytes[1] = buffer[i];
-      if(firstSyncByte(frameSyncBytes[0]) && secondSynchByte(frameSyncBytes[1])) {
+      if(isFrameSync(frameSyncBytes)) {
         Header header(this, position + i - 1, true);
         if(header.isValid())
           return position + i - 1;
@@ -370,7 +370,7 @@ long MPEG::File::nextFrameOffset(long position)
 
 long MPEG::File::previousFrameOffset(long position)
 {
-  char frameSyncBytes[2] = {};
+  ByteVector frameSyncBytes(2, '\0');
 
   while(position > 0) {
     const long size = std::min<long>(position, bufferSize());
@@ -384,7 +384,7 @@ long MPEG::File::previousFrameOffset(long position)
     for(int i = buffer.size() - 1; i >= 0; i--) {
       frameSyncBytes[1] = frameSyncBytes[0];
       frameSyncBytes[0] = buffer[i];
-      if(firstSyncByte(frameSyncBytes[0]) && secondSynchByte(frameSyncBytes[1])) {
+      if(isFrameSync(frameSyncBytes)) {
         Header header(this, position + i, true);
         if(header.isValid())
           return position + i + header.frameLength();
@@ -494,8 +494,8 @@ long MPEG::File::findID3v2()
 
   // Look for an ID3v2 tag until reaching the first valid MPEG frame.
 
-  char frameSyncBytes[2] = {};
-  char tagHeaderBytes[4] = {};
+  ByteVector frameSyncBytes(2, '\0');
+  ByteVector tagHeaderBytes(3, '\0');
   long position = 0;
 
   while(true) {
@@ -507,7 +507,7 @@ long MPEG::File::findID3v2()
     for(unsigned int i = 0; i < buffer.size(); ++i) {
       frameSyncBytes[0] = frameSyncBytes[1];
       frameSyncBytes[1] = buffer[i];
-      if(firstSyncByte(frameSyncBytes[0]) && secondSynchByte(frameSyncBytes[1])) {
+      if(isFrameSync(frameSyncBytes)) {
         Header header(this, position + i - 1, true);
         if(header.isValid())
           return -1;
@@ -516,7 +516,7 @@ long MPEG::File::findID3v2()
       tagHeaderBytes[0] = tagHeaderBytes[1];
       tagHeaderBytes[1] = tagHeaderBytes[2];
       tagHeaderBytes[2] = buffer[i];
-      if(headerID == tagHeaderBytes)
+      if(tagHeaderBytes == headerID)
         return position + i - 2;
     }
 
