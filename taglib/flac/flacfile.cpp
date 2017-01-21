@@ -297,11 +297,7 @@ bool FLAC::File::save()
 
 ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
 {
-  if(!create || d->tag[FlacID3v2Index])
-    return static_cast<ID3v2::Tag *>(d->tag[FlacID3v2Index]);
-
-  d->tag.set(FlacID3v2Index, new ID3v2::Tag());
-  return static_cast<ID3v2::Tag *>(d->tag[FlacID3v2Index]);
+  return d->tag.access<ID3v2::Tag>(FlacID3v2Index, create);
 }
 
 ID3v1::Tag *FLAC::File::ID3v1Tag(bool create)
