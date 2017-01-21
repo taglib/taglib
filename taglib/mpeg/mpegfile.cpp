@@ -351,7 +351,7 @@ long MPEG::File::nextFrameOffset(long position)
   while(true) {
     seek(position);
     const ByteVector buffer = readBlock(bufferSize());
-    if(buffer.size() == 0)
+    if(buffer.isEmpty())
       return -1;
 
     for(unsigned int i = 0; i < buffer.size(); ++i) {
@@ -378,7 +378,7 @@ long MPEG::File::previousFrameOffset(long position)
 
     seek(position);
     const ByteVector buffer = readBlock(bufferSize());
-    if(buffer.size() == 0)
+    if(buffer.isEmpty())
       return -1;
 
     for(int i = buffer.size() - 1; i >= 0; i--) {

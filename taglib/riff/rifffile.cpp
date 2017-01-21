@@ -187,7 +187,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data)
 
 void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bool alwaysCreate)
 {
-  if(d->chunks.size() == 0) {
+  if(d->chunks.empty()) {
     debug("RIFF::File::setChunkData - No valid chunks found.");
     return;
   }
