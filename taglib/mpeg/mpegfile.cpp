@@ -358,7 +358,7 @@ long MPEG::File::nextFrameOffset(long position)
       frameSyncBytes[0] = frameSyncBytes[1];
       frameSyncBytes[1] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
-        Header header(this, position + i - 1, true);
+        const Header header(this, position + i - 1, true);
         if(header.isValid())
           return position + i - 1;
       }
@@ -385,7 +385,7 @@ long MPEG::File::previousFrameOffset(long position)
       frameSyncBytes[1] = frameSyncBytes[0];
       frameSyncBytes[0] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
-        Header header(this, position + i, true);
+        const Header header(this, position + i, true);
         if(header.isValid())
           return position + i + header.frameLength();
       }
@@ -488,7 +488,7 @@ long MPEG::File::findID3v2()
   if(readBlock(headerID.size()) == headerID)
     return 0;
 
-  Header firstHeader(this, 0, true);
+  const Header firstHeader(this, 0, true);
   if(firstHeader.isValid())
     return -1;
 
@@ -508,7 +508,7 @@ long MPEG::File::findID3v2()
       frameSyncBytes[0] = frameSyncBytes[1];
       frameSyncBytes[1] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
-        Header header(this, position + i - 1, true);
+        const Header header(this, position + i - 1, true);
         if(header.isValid())
           return -1;
       }
