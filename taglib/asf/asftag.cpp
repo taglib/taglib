@@ -60,6 +60,13 @@ String ASF::Tag::artist() const
   return d->artist;
 }
 
+String ASF::Tag::albumArtist() const
+{
+  if(d->attributeListMap.contains("WM/AlbumArtist"))
+    return d->attributeListMap["WM/AlbumArtist"][0].toString();
+  return String();
+}
+
 String ASF::Tag::album() const
 {
   if(d->attributeListMap.contains("WM/AlbumTitle"))

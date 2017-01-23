@@ -129,6 +129,11 @@ String APE::Tag::artist() const
   return d->itemListMap["ARTIST"].values().toString();
 }
 
+String APE::Tag::albumArtist() const
+{
+  return artist();
+}
+
 String APE::Tag::album() const
 {
   if(d->itemListMap["ALBUM"].isEmpty())

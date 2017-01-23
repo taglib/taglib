@@ -166,6 +166,7 @@ namespace TagLib {
 
       virtual String title() const;
       virtual String artist() const;
+      virtual String albumArtist() const;
       virtual String album() const;
       virtual String comment() const;
       virtual String genre() const;

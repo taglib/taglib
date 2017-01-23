@@ -704,6 +704,12 @@ MP4::Tag::artist() const
 }
 
 String
+MP4::Tag::albumArtist() const {
+  if(d->items.contains("aART"))
+    return d->items["aART"].toStringList().toString(", ");
+}
+
+String
 MP4::Tag::album() const
 {
   if(d->items.contains("\251alb"))
