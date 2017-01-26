@@ -176,6 +176,10 @@ public:
 
     const String s2(v2, String::UTF8);
     CPPUNIT_ASSERT_EQUAL(s2.data(String::UTF16), v1);
+
+    const ByteVector v3("\xff\xfe\xb7\xdf\xce\x91\x4b\x5c");
+    const String s3(v2, String::UTF16);
+    CPPUNIT_ASSERT(s3.isEmpty());
   }
 
   void testAppendStringDetach()
