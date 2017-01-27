@@ -472,7 +472,7 @@ String String::upper() const
 
   static int shift = 'A' - 'a';
 
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+  for(ConstIterator it = begin(); it != end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
       s.d->data.push_back(*it + shift);
     else
@@ -511,7 +511,7 @@ ByteVector String::data(Type t) const
       ByteVector v(size(), 0);
       char *p = v.data();
 
-      for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it)
+      for(ConstIterator it = begin(); it != end(); ++it)
         *p++ = static_cast<char>(*it);
 
       return v;
@@ -540,7 +540,7 @@ ByteVector String::data(Type t) const
       *p++ = '\xff';
       *p++ = '\xfe';
 
-      for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+      for(ConstIterator it = begin(); it != end(); ++it) {
         *p++ = static_cast<char>(*it & 0xff);
         *p++ = static_cast<char>(*it >> 8);
       }
@@ -552,7 +552,7 @@ ByteVector String::data(Type t) const
       ByteVector v(size() * 2, 0);
       char *p = v.data();
 
-      for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+      for(ConstIterator it = begin(); it != end(); ++it) {
         *p++ = static_cast<char>(*it >> 8);
         *p++ = static_cast<char>(*it & 0xff);
       }
@@ -564,7 +564,7 @@ ByteVector String::data(Type t) const
       ByteVector v(size() * 2, 0);
       char *p = v.data();
 
-      for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+      for(ConstIterator it = begin(); it != end(); ++it) {
         *p++ = static_cast<char>(*it & 0xff);
         *p++ = static_cast<char>(*it >> 8);
       }
@@ -614,7 +614,7 @@ String String::stripWhiteSpace() const
 
 bool String::isLatin1() const
 {
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+  for(ConstIterator it = begin(); it != end(); ++it) {
     if(*it >= 256)
       return false;
   }
@@ -623,7 +623,7 @@ bool String::isLatin1() const
 
 bool String::isAscii() const
 {
-  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+  for(ConstIterator it = begin(); it != end(); ++it) {
     if(*it >= 128)
       return false;
   }
