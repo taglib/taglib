@@ -97,7 +97,7 @@ public:
 
   void testAudioPropertiesVBRIHeader()
   {
-    MPEG::File f(TEST_FILE_PATH_C("vbri.mp3"));
+    MPEG::File f(TEST_FILE_PATH_C("rare_frames.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->lengthInSeconds());
