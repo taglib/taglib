@@ -469,12 +469,11 @@ String & String::clear()
 String String::upper() const
 {
   String s;
-
-  static int shift = 'A' - 'a';
+  s.d->data.reserve(size());
 
   for(ConstIterator it = begin(); it != end(); ++it) {
     if(*it >= 'a' && *it <= 'z')
-      s.d->data.push_back(*it + shift);
+      s.d->data.push_back(*it + 'A' - 'a');
     else
       s.d->data.push_back(*it);
   }

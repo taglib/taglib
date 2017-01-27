@@ -118,7 +118,7 @@ PropertyMap UnsynchronizedLyricsFrame::asProperties() const
 {
   PropertyMap map;
   String key = description().upper();
-  if(key.isEmpty() || key.upper() == "LYRICS")
+  if(key.isEmpty() || key == "LYRICS")
     map.insert("LYRICS", text());
   else
     map.insert("LYRICS:" + key, text());

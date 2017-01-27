@@ -170,7 +170,7 @@ PropertyMap UserUrlLinkFrame::asProperties() const
 {
   PropertyMap map;
   String key = description().upper();
-  if(key.isEmpty() || key.upper() == "URL")
+  if(key.isEmpty() || key == "URL")
     map.insert("URL", url());
   else
     map.insert("URL:" + key, url());
