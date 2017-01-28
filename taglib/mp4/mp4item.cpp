@@ -23,8 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "config.h"
-
 #include "taglib.h"
 #include "tdebug.h"
 #include "tsmartptr.h"
