@@ -23,8 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-// This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
-
 #include <iostream>
 #include <cerrno>
 #include <climits>
@@ -101,14 +99,12 @@ namespace
     }
 
     data.resize(length);
-    if(length > 0) {
-      if(swap) {
-        for(size_t i = 0; i < length; ++i)
-          data[i] = Utils::byteSwap(static_cast<unsigned short>(s[i]));
-      }
-      else {
-        ::wmemcpy(&data[0], s, length);
-      }
+    for(size_t i = 0; i < length; ++i) {
+      unsigned short c = static_cast<unsigned short>(s[i]);
+      if(swap)
+        c = Utils::byteSwap(c);
+
+      data[i] = c;
     }
   }
 
