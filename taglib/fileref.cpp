@@ -62,11 +62,7 @@ namespace
   // Templatized internal functions. T should be String or IOStream*.
 
   template <typename T>
-  FileName toFileName(T arg)
-  {
-    debug("FileRef::toFileName<T>(): This version should never be called.");
-    return FileName(L"");
-  }
+  FileName toFileName(T arg);
 
   template <>
   FileName toFileName<IOStream *>(IOStream *arg)
@@ -82,11 +78,7 @@ namespace
 
   template <typename T>
   File *resolveFileType(T arg, bool readProperties,
-                        AudioProperties::ReadStyle style)
-  {
-    debug("FileRef::resolveFileType<T>(): This version should never be called.");
-    return 0;
-  }
+                        AudioProperties::ReadStyle style);
 
   template <>
   File *resolveFileType<IOStream *>(IOStream *arg, bool readProperties,
