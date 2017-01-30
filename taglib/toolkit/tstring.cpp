@@ -231,10 +231,6 @@ public:
   StringPrivate() :
     RefCounter() {}
 
-  StringPrivate(unsigned int n, wchar_t c) :
-    RefCounter(),
-    data(static_cast<size_t>(n), c) {}
-
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian.
    */
@@ -334,9 +330,13 @@ String::String(wchar_t c, Type t) :
 }
 
 String::String(char c, Type t) :
-  d(new StringPrivate(1, static_cast<unsigned char>(c)))
+  d(new StringPrivate())
 {
-  if(t != Latin1 && t != UTF8) {
+  if(t == Latin1)
+    copyFromLatin1(d->data, &c, 1);
+  else if(t == String::UTF8)
+    copyFromUTF8(d->data, &c, 1);
+  else {
     debug("String::String() -- char should not contain UTF16.");
   }
 }
