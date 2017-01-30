@@ -23,96 +23,23 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-// This class assumes that std::basic_string<T> has a contiguous and null-terminated buffer.
-
 #include <iostream>
 #include <cerrno>
 #include <climits>
 #include <cstdio>
 #include <cstring>
 
-#ifdef _WIN32
-# include <windows.h>
-#else
-# include "unicode.h"
-#endif
-
 #include <tdebug.h>
 #include <tstringlist.h>
 #include <trefcounter.h>
 #include <tutils.h>
+#include <utf8/checked.h>
 
 #include "tstring.h"
 
 namespace
 {
   using namespace TagLib;
-
-  size_t UTF16toUTF8(const wchar_t *src, size_t srcLength, char *dst, size_t dstLength)
-  {
-    size_t len = 0;
-
-#ifdef _WIN32
-
-    len = ::WideCharToMultiByte(
-      CP_UTF8, 0, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength), NULL, NULL);
-
-#else
-
-    using namespace Unicode;
-
-    const UTF16 *srcBegin = src;
-    const UTF16 *srcEnd   = srcBegin + srcLength;
-
-    UTF8 *dstBegin = reinterpret_cast<UTF8*>(dst);
-    UTF8 *dstEnd   = dstBegin + dstLength;
-
-    ConversionResult result = ConvertUTF16toUTF8(
-      &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
-
-    if(result == conversionOK)
-      len = dstBegin - reinterpret_cast<UTF8*>(dst);
-
-#endif
-
-    if(len == 0)
-      debug("String::UTF16toUTF8() - Unicode conversion error.");
-
-    return len;
-  }
-
-  size_t UTF8toUTF16(const char *src, size_t srcLength, wchar_t *dst, size_t dstLength)
-  {
-    size_t len = 0;
-
-#ifdef _WIN32
-
-    len = ::MultiByteToWideChar(
-      CP_UTF8, MB_ERR_INVALID_CHARS, src, static_cast<int>(srcLength), dst, static_cast<int>(dstLength));
-
-#else
-
-    using namespace Unicode;
-
-    const UTF8 *srcBegin = reinterpret_cast<const UTF8*>(src);
-    const UTF8 *srcEnd   = srcBegin + srcLength;
-
-    UTF16 *dstBegin = dst;
-    UTF16 *dstEnd   = dstBegin + dstLength;
-
-    ConversionResult result = ConvertUTF8toUTF16(
-      &srcBegin, srcEnd, &dstBegin, dstEnd, lenientConversion);
-
-    if(result == conversionOK)
-      len = dstBegin - dst;
-
-#endif
-
-    if(len == 0)
-      debug("String::UTF8toUTF16() - Unicode conversion error.");
-
-    return len;
-  }
 
   // Returns the native format of std::wstring.
   String::Type wcharByteOrder()
@@ -139,9 +66,13 @@ namespace
   {
     data.resize(length);
 
-    if(length > 0) {
-      const size_t len = UTF8toUTF16(s, length, &data[0], data.size());
-      data.resize(len);
+    try {
+      const std::wstring::iterator dstEnd = utf8::utf8to16(s, s + length, data.begin());
+      data.resize(dstEnd - data.begin());
+    }
+    catch(const utf8::exception &e) {
+      debug(String("String::copyFromUTF8() - UTF8-CPP error: ") + e.what());
+      data.clear();
     }
   }
 
@@ -168,14 +99,12 @@ namespace
     }
 
     data.resize(length);
-    if(length > 0) {
-      if(swap) {
-        for(size_t i = 0; i < length; ++i)
-          data[i] = Utils::byteSwap(static_cast<unsigned short>(s[i]));
-      }
-      else {
-        ::wmemcpy(&data[0], s, length);
-      }
+    for(size_t i = 0; i < length; ++i) {
+      unsigned short c = static_cast<unsigned short>(s[i]);
+      if(swap)
+        c = Utils::byteSwap(c);
+
+      data[i] = c;
     }
   }
 
@@ -516,18 +445,19 @@ ByteVector String::data(Type t) const
       return v;
     }
   case UTF8:
-    if(!d->data.empty())
     {
-      ByteVector v(size() * 4 + 1, 0);
+      ByteVector v(size() * 4, 0);
 
-      const size_t len = UTF16toUTF8(
-        d->data.c_str(), d->data.size(), v.data(), v.size());
-      v.resize(static_cast<unsigned int>(len));
+      try {
+        const ByteVector::Iterator dstEnd = utf8::utf16to8(begin(), end(), v.begin());
+        v.resize(static_cast<unsigned int>(dstEnd - v.begin()));
+      }
+      catch(const utf8::exception &e) {
+        debug(String("String::data() - UTF8-CPP error: ") + e.what());
+        v.clear();
+      }
 
       return v;
-    }
-    else {
-      return ByteVector();
     }
   case UTF16:
     {

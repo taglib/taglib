@@ -49,6 +49,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpper);
   CPPUNIT_TEST(testEncodeNonLatin1);
   CPPUNIT_TEST(testEncodeEmpty);
+  CPPUNIT_TEST(testEncodeNonBMP);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testInvalidUTF8);
   CPPUNIT_TEST_SUITE_END();
@@ -311,6 +312,13 @@ public:
     CPPUNIT_ASSERT(empty.data(String::UTF16BE).isEmpty());
     CPPUNIT_ASSERT(empty.to8Bit(false).empty());
     CPPUNIT_ASSERT(empty.to8Bit(true).empty());
+  }
+
+  void testEncodeNonBMP()
+  {
+    const ByteVector a("\xFF\xFE\x3C\xD8\x50\xDD\x40\xD8\xF5\xDC\x3C\xD8\x00\xDE", 14);
+    const ByteVector b("\xF0\x9F\x85\x90\xF0\xA0\x83\xB5\xF0\x9F\x88\x80");
+    CPPUNIT_ASSERT_EQUAL(b, String(a, String::UTF16).data(String::UTF8));
   }
 
   void testIterator()
