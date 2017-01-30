@@ -23,11 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <iostream>
 #include <cerrno>
 #include <climits>
-#include <cstdio>
-#include <cstring>
 
 #include <tdebug.h>
 #include <tstringlist.h>
@@ -76,22 +73,50 @@ namespace
     }
   }
 
+  // Helper functions to read a UTF-16 character from an array.
+  template <typename T>
+  unsigned short nextUTF16(const T **p);
+
+  template <>
+  unsigned short nextUTF16<wchar_t>(const wchar_t **p)
+  {
+    return static_cast<unsigned short>(*(*p)++);
+  }
+
+  template <>
+  unsigned short nextUTF16<char>(const char **p)
+  {
+    union {
+      unsigned short w;
+      char c[2];
+    } u;
+    u.c[0] = *(*p)++;
+    u.c[1] = *(*p)++;
+    return u.w;
+  }
+
   // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
   // UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-  void copyFromUTF16(std::wstring &data, const wchar_t *s, size_t length, String::Type t)
+  template <typename T>
+  void copyFromUTF16(std::wstring &data, const T *s, size_t length, String::Type t)
   {
     bool swap;
     if(t == String::UTF16) {
-      if(length >= 1 && s[0] == 0xfeff)
-        swap = false; // Same as CPU endian. No need to swap bytes.
-      else if(length >= 1 && s[0] == 0xfffe)
-        swap = true;  // Not same as CPU endian. Need to swap bytes.
-      else {
-        debug("String::copyFromUTF16() - Invalid UTF16 string.");
+      if(length < 1) {
+        debug("String::copyFromUTF16() - Invalid UTF16 string. Too short to have a BOM.");
         return;
       }
 
-      s++;
+      const unsigned short bom = nextUTF16(&s);
+      if(bom == 0xfeff)
+        swap = false; // Same as CPU endian. No need to swap bytes.
+      else if(bom == 0xfffe)
+        swap = true;  // Not same as CPU endian. Need to swap bytes.
+      else {
+        debug("String::copyFromUTF16() - Invalid UTF16 string. BOM is broken.");
+        return;
+      }
+
       length--;
     }
     else {
@@ -100,54 +125,11 @@ namespace
 
     data.resize(length);
     for(size_t i = 0; i < length; ++i) {
-      unsigned short c = static_cast<unsigned short>(s[i]);
+      const unsigned short c = nextUTF16(&s);
       if(swap)
-        c = Utils::byteSwap(c);
-
-      data[i] = c;
-    }
-  }
-
-  // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
-  // UTF-16(without BOM/CPU byte order) and copies it to the internal buffer.
-  void copyFromUTF16(std::wstring &data, const char *s, size_t length, String::Type t)
-  {
-    bool swap;
-    if(t == String::UTF16) {
-      if(length < 2) {
-        debug("String::copyFromUTF16() - Invalid UTF16 string.");
-        return;
-      }
-
-      // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
-      unsigned short bom;
-      ::memcpy(&bom, s, 2);
-
-      if(bom == 0xfeff)
-        swap = false; // Same as CPU endian. No need to swap bytes.
-      else if(bom == 0xfffe)
-        swap = true;  // Not same as CPU endian. Need to swap bytes.
-      else {
-        debug("String::copyFromUTF16() - Invalid UTF16 string.");
-        return;
-      }
-
-      s += 2;
-      length -= 2;
-    }
-    else {
-      swap = (t != wcharByteOrder());
-    }
-
-    data.resize(length / 2);
-    for(size_t i = 0; i < length / 2; ++i) {
-      unsigned short c;
-      ::memcpy(&c, s, 2);
-      if(swap)
-        c = Utils::byteSwap(c);
-
-      data[i] = static_cast<wchar_t>(c);
-      s += 2;
+        data[i] = Utils::byteSwap(c);
+      else
+        data[i] = c;
     }
   }
 }
@@ -281,7 +263,7 @@ String::String(const ByteVector &v, Type t) :
   else if(t == UTF8)
     copyFromUTF8(d->data, v.data(), v.size());
   else
-    copyFromUTF16(d->data, v.data(), v.size(), t);
+    copyFromUTF16(d->data, v.data(), v.size() / 2, t);
 
   // If we hit a null in the ByteVector, shrink the string again.
   d->data.resize(::wcslen(d->data.c_str()));
