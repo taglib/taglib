@@ -178,9 +178,14 @@ public:
     const String s2(v2, String::UTF8);
     CPPUNIT_ASSERT_EQUAL(s2.data(String::UTF16), v1);
 
-    const ByteVector v3("\xff\xfe\xb7\xdf\xce\x91\x4b\x5c");
-    const String s3(v2, String::UTF16);
-    CPPUNIT_ASSERT(s3.isEmpty());
+    const ByteVector v3("\xfe\xff\xd8\x01\x30\x42");
+    CPPUNIT_ASSERT(String(v3, String::UTF16).data(String::UTF8).isEmpty());
+
+    const ByteVector v4("\xfe\xff\x30\x42\xdc\x01");
+    CPPUNIT_ASSERT(String(v4, String::UTF16).data(String::UTF8).isEmpty());
+
+    const ByteVector v5("\xfe\xff\xdc\x01\xd8\x01");
+    CPPUNIT_ASSERT(String(v5, String::UTF16).data(String::UTF8).isEmpty());
   }
 
   void testAppendStringDetach()
