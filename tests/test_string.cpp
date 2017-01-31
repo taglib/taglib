@@ -354,6 +354,12 @@ public:
     CPPUNIT_ASSERT(String(ByteVector("\xF8\x80\x80\x80\x80"), String::UTF8).isEmpty());
     CPPUNIT_ASSERT(String(ByteVector("\xFC\x80\x80\x80\x80\x80"), String::UTF8).isEmpty());
 
+    CPPUNIT_ASSERT(String(ByteVector("\xC2"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xE0\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF0\x80\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF8\x80\x80\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xFC\x80\x80\x80\x80"), String::UTF8).isEmpty());
+
     CPPUNIT_ASSERT(String('\x80', String::UTF8).isEmpty());
 
     CPPUNIT_ASSERT(String(ByteVector("\xED\xA0\x80\xED\xB0\x80"), String::UTF8).isEmpty());
