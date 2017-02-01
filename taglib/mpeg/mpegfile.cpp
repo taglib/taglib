@@ -373,15 +373,13 @@ long MPEG::File::previousFrameOffset(long position)
   ByteVector frameSyncBytes(2, '\0');
 
   while(position > 0) {
-    const long size = std::min<long>(position, bufferSize());
-    position -= size;
+    const long bufferLength = std::min<long>(position, bufferSize());
+    position -= bufferLength;
 
     seek(position);
-    const ByteVector buffer = readBlock(bufferSize());
-    if(buffer.isEmpty())
-      return -1;
+    const ByteVector buffer = readBlock(bufferLength);
 
-    for(int i = buffer.size() - 1; i >= 0; i--) {
+    for(int i = buffer.size() - 1; i >= 0; --i) {
       frameSyncBytes[1] = frameSyncBytes[0];
       frameSyncBytes[0] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
