@@ -83,12 +83,6 @@ namespace
 
 #else   // _WIN32
 
-  struct FileNameHandle : public std::string
-  {
-    FileNameHandle(FileName name) : std::string(name) {}
-    operator FileName () const { return c_str(); }
-  };
-
   typedef FILE* FileHandle;
 
   const FileHandle InvalidFileHandle = 0;
