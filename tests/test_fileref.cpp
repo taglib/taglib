@@ -39,9 +39,10 @@
 #include <wavfile.h>
 #include <apefile.h>
 #include <aifffile.h>
+#include <tfilestream.h>
+#include <tbytevectorstream.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
-#include <tfilestream.h>
 
 using namespace std;
 using namespace TagLib;
@@ -129,9 +130,68 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)7);
       CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2080);
     }
+
     {
       FileStream fs(newname.c_str());
       FileRef f(&fs);
+      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
+      CPPUNIT_ASSERT(!f.isNull());
+      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)7);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2080);
+      f.tag()->setArtist("test artist");
+      f.tag()->setTitle("test title");
+      f.tag()->setGenre("Test!");
+      f.tag()->setAlbum("albummmm");
+      f.tag()->setTrack(5);
+      f.tag()->setYear(2020);
+      f.save();
+    }
+
+    ByteVector fileContent;
+    {
+      FileStream fs(newname.c_str());
+      FileRef f(&fs);
+      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
+      CPPUNIT_ASSERT(!f.isNull());
+      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("test artist"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("test title"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)5);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2020);
+
+      fs.seek(0);
+      fileContent = fs.readBlock(fs.length());
+    }
+
+    {
+      ByteVectorStream bs(fileContent, newname.c_str());
+      FileRef f(&bs);
+      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
+      CPPUNIT_ASSERT(!f.isNull());
+      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("test artist"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("test title"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)5);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2020);
+      f.tag()->setArtist("ttest artist");
+      f.tag()->setTitle("ytest title");
+      f.tag()->setGenre("uTest!");
+      f.tag()->setAlbum("ialbummmm");
+      f.tag()->setTrack(7);
+      f.tag()->setYear(2080);
+      f.save();
+
+      fileContent = *bs.data();
+    }
+    {
+      ByteVectorStream bs(fileContent, newname.c_str());
+      FileRef f(&bs);
       CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
       CPPUNIT_ASSERT(!f.isNull());
       CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
