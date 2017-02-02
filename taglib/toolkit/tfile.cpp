@@ -235,171 +235,122 @@ void File::writeBlock(const ByteVector &data)
 
 long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > bufferSize())
+  if(!d->stream || pattern.isEmpty())
       return -1;
 
   // The position in the file that the current buffer starts at.
 
   long bufferOffset = fromOffset;
-  ByteVector buffer;
-
-  // These variables are used to keep track of a partial match that happens at
-  // the end of a buffer.
-
-  int previousPartialMatch = -1;
-  int beforePreviousPartialMatch = -1;
 
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
 
-  long originalPosition = tell();
+  const long originalPosition = tell();
 
-  // Start the search at the offset.
+  // Loop until we find either 'pattern' or 'before'.
 
-  seek(fromOffset);
+  unsigned int patternIndex = 0;
+  unsigned int beforeIndex  = 0;
 
-  // This loop is the crux of the find method.  There are three cases that we
-  // want to account for:
-  //
-  // (1) The previously searched buffer contained a partial match of the search
-  // pattern and we want to see if the next one starts with the remainder of
-  // that pattern.
-  //
-  // (2) The search pattern is wholly contained within the current buffer.
-  //
-  // (3) The current buffer ends with a partial match of the pattern.  We will
-  // note this for use in the next iteration, where we will check for the rest
-  // of the pattern.
-  //
-  // All three of these are done in two steps.  First we check for the pattern
-  // and do things appropriately if a match (or partial match) is found.  We
-  // then check for "before".  The order is important because it gives priority
-  // to "real" matches.
+  while(true) {
+    seek(bufferOffset);
+    const ByteVector buffer = readBlock(bufferSize());
+    if(buffer.isEmpty())
+      break;
 
-  for(buffer = readBlock(bufferSize()); buffer.size() > 0; buffer = readBlock(bufferSize())) {
+    // Search the buffer for either 'pattern' or 'before' simultaneously.
 
-    // (1) previous partial match
+    for(unsigned int i = 0; i < buffer.size(); ++i) {
+      if(buffer[i] == pattern[patternIndex])
+        patternIndex++;
+      else
+        patternIndex = 0;
 
-    if(previousPartialMatch >= 0 && int(bufferSize()) > previousPartialMatch) {
-      const int patternOffset = (bufferSize() - previousPartialMatch);
-      if(buffer.containsAt(pattern, 0, patternOffset)) {
+      if(patternIndex == pattern.size()) {
         seek(originalPosition);
-        return bufferOffset - bufferSize() + previousPartialMatch;
+        return bufferOffset + i + 1 - pattern.size();
+      }
+
+      if(!before.isEmpty()) {
+        if(buffer[i] == before[beforeIndex])
+          beforeIndex++;
+        else
+          beforeIndex = 0;
+
+        if(beforeIndex == before.size()) {
+          seek(originalPosition);
+          return -1;
+        }
       }
     }
 
-    if(!before.isEmpty() && beforePreviousPartialMatch >= 0 && int(bufferSize()) > beforePreviousPartialMatch) {
-      const int beforeOffset = (bufferSize() - beforePreviousPartialMatch);
-      if(buffer.containsAt(before, 0, beforeOffset)) {
-        seek(originalPosition);
-        return -1;
-      }
-    }
-
-    // (2) pattern contained in current buffer
-
-    long location = buffer.find(pattern);
-    if(location >= 0) {
-      seek(originalPosition);
-      return bufferOffset + location;
-    }
-
-    if(!before.isEmpty() && buffer.find(before) >= 0) {
-      seek(originalPosition);
-      return -1;
-    }
-
-    // (3) partial match
-
-    previousPartialMatch = buffer.endsWithPartialMatch(pattern);
-
-    if(!before.isEmpty())
-      beforePreviousPartialMatch = buffer.endsWithPartialMatch(before);
-
-    bufferOffset += bufferSize();
+    bufferOffset += buffer.size();
   }
 
   // Since we hit the end of the file, reset the status before continuing.
 
   clear();
-
   seek(originalPosition);
-
   return -1;
 }
 
-
 long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > bufferSize())
+  if(!d->stream || pattern.isEmpty())
       return -1;
-
-  // The position in the file that the current buffer starts at.
-
-  ByteVector buffer;
-
-  // These variables are used to keep track of a partial match that happens at
-  // the end of a buffer.
-
-  /*
-  int previousPartialMatch = -1;
-  int beforePreviousPartialMatch = -1;
-  */
-
-  // Save the location of the current read pointer.  We will restore the
-  // position using seek() before all returns.
-
-  long originalPosition = tell();
-
-  // Start the search at the offset.
 
   if(fromOffset == 0)
     fromOffset = length();
 
-  long bufferLength = bufferSize();
-  long bufferOffset = fromOffset + pattern.size();
+  // The position in the file that the current buffer starts at.
 
-  // See the notes in find() for an explanation of this algorithm.
+  long bufferOffset = std::min<long>(fromOffset + pattern.size(), length());
 
-  while(true) {
+  // Save the location of the current read pointer.  We will restore the
+  // position using seek() before all returns.
 
-    if(bufferOffset > bufferLength) {
-      bufferOffset -= bufferLength;
-    }
-    else {
-      bufferLength = bufferOffset;
-      bufferOffset = 0;
-    }
+  const long originalPosition = tell();
+
+  // Loop until we find either 'pattern' or 'before'.
+
+  int patternIndex = pattern.size() - 1;
+  int beforeIndex  = before.size()  - 1;
+
+  while(bufferOffset > 0) {
+    const long bufferLength = std::min<long>(bufferOffset, bufferSize());
+    bufferOffset -= bufferLength;
+
     seek(bufferOffset);
+    const ByteVector buffer = readBlock(bufferLength);
 
-    buffer = readBlock(bufferLength);
-    if(buffer.isEmpty())
-      break;
+    // Search the buffer for either 'pattern' or 'before' simultaneously.
 
-    // TODO: (1) previous partial match
+    for(int i = buffer.size() - 1; i >= 0; --i) {
+      if(buffer[i] == pattern[patternIndex])
+        patternIndex--;
+      else
+        patternIndex = pattern.size() - 1;
 
-    // (2) pattern contained in current buffer
+      if(patternIndex == -1) {
+        seek(originalPosition);
+        return bufferOffset + i;
+      }
 
-    const long location = buffer.rfind(pattern);
-    if(location >= 0) {
-      seek(originalPosition);
-      return bufferOffset + location;
+      if(!before.isEmpty()) {
+        if(buffer[i] == before[beforeIndex])
+          beforeIndex--;
+        else
+          beforeIndex = before.size() - 1;
+
+        if(beforeIndex == -1) {
+          seek(originalPosition);
+          return -1;
+        }
+      }
     }
-
-    if(!before.isEmpty() && buffer.find(before) >= 0) {
-      seek(originalPosition);
-      return -1;
-    }
-
-    // TODO: (3) partial match
   }
 
-  // Since we hit the end of the file, reset the status before continuing.
-
-  clear();
-
   seek(originalPosition);
-
   return -1;
 }
 

@@ -46,6 +46,10 @@ class TestFile : public CppUnit::TestFixture
   CPPUNIT_TEST(testRFindInSmallFile);
   CPPUNIT_TEST(testSeek);
   CPPUNIT_TEST(testTruncate);
+  CPPUNIT_TEST(testFindLargePattern);
+  CPPUNIT_TEST(testRFindLargePattern);
+  CPPUNIT_TEST(testFindPartialMatch);
+  CPPUNIT_TEST(testRFindPartialMatch);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -75,6 +79,14 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)v.find("23"),    file.find("23"));
       CPPUNIT_ASSERT_EQUAL((long)v.find("23", 2), file.find("23", 2));
       CPPUNIT_ASSERT_EQUAL((long)v.find("23", 3), file.find("23", 3));
+
+      file.seek(5);
+      CPPUNIT_ASSERT_EQUAL(0l, file.find("0123456239"));
+      CPPUNIT_ASSERT_EQUAL(-1l, file.find("0123456239", 1));
+      CPPUNIT_ASSERT_EQUAL(3l, file.find("34", 0, "56"));
+      CPPUNIT_ASSERT_EQUAL(3l, file.find("34", 0, "34"));
+      CPPUNIT_ASSERT_EQUAL(-1l, file.find("56", 0, "34"));
+      CPPUNIT_ASSERT_EQUAL(5l, file.tell());
     }
   }
 
@@ -103,6 +115,14 @@ public:
       CPPUNIT_ASSERT_EQUAL((long)v.rfind("23"),    file.rfind("23"));
       CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 7), file.rfind("23", 7));
       CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 6), file.rfind("23", 6));
+
+      file.seek(5);
+      CPPUNIT_ASSERT_EQUAL(0l, file.rfind("0123456239"));
+      CPPUNIT_ASSERT_EQUAL(0l, file.rfind("0123456239", 1));
+      CPPUNIT_ASSERT_EQUAL(-1l, file.rfind("34", 0, "56"));
+      CPPUNIT_ASSERT_EQUAL(5l, file.rfind("56", 0, "34"));
+      CPPUNIT_ASSERT_EQUAL(5l, file.rfind("56", 0, "34"));
+      CPPUNIT_ASSERT_EQUAL(5l, file.tell());
     }
   }
 
@@ -146,6 +166,47 @@ public:
       PlainFile f(name.c_str());
       CPPUNIT_ASSERT_EQUAL(2000L, f.length());
     }
+  }
+
+  void testFindLargePattern()
+  {
+    ByteVector pattern;
+    {
+      PlainFile f(TEST_FILE_PATH_C("random.bin"));
+      f.seek(567);
+      pattern = f.readBlock(8 * 1024);
+    }
+    {
+      PlainFile f(TEST_FILE_PATH_C("random.bin"));
+      CPPUNIT_ASSERT_EQUAL(567L, f.find(pattern));
+    }
+  }
+
+  void testRFindLargePattern()
+  {
+    ByteVector pattern;
+    {
+      PlainFile f(TEST_FILE_PATH_C("random.bin"));
+      f.seek(765);
+      pattern = f.readBlock(8 * 1024);
+    }
+    {
+      PlainFile f(TEST_FILE_PATH_C("random.bin"));
+      CPPUNIT_ASSERT_EQUAL(765L, f.rfind(pattern));
+    }
+  }
+
+  void testFindPartialMatch()
+  {
+    PlainFile f(TEST_FILE_PATH_C("random.bin"));
+    CPPUNIT_ASSERT_EQUAL(1022L, f.find(ByteVector("\x7b\x8e\xac\xaf", 4)));
+  }
+
+  void testRFindPartialMatch()
+  {
+    PlainFile f(TEST_FILE_PATH_C("random.bin"));
+    CPPUNIT_ASSERT_EQUAL(15362L, f.rfind(ByteVector("\x7b\x80\xa3\xa8", 4)));
+    CPPUNIT_ASSERT_EQUAL(15358L, f.rfind(ByteVector("\x09\xc3\xe1\x2c", 4)));
   }
 
 };
