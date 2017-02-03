@@ -45,12 +45,12 @@ namespace TagLib
        * \note This does not check the length of the vector, since this is an
        * internal utility function.
        */
-      inline bool isFrameSync(const ByteVector &bytes)
+      inline bool isFrameSync(const ByteVector &bytes, unsigned int offset = 0)
       {
         // 0xFF in the second byte is possible in theory, but it's very unlikely.
 
-        const unsigned char b1 = bytes[0];
-        const unsigned char b2 = bytes[1];
+        const unsigned char b1 = bytes[offset + 0];
+        const unsigned char b2 = bytes[offset + 1];
         return (b1 == 0xFF && b2 != 0xFF && (b2 & 0xE0) == 0xE0);
       }
 

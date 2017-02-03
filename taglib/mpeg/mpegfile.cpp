@@ -77,6 +77,63 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+namespace
+{
+  // Dummy file class to make a stream work with MPEG::Header.
+
+  class AdapterFile : public TagLib::File
+  {
+  public:
+    AdapterFile(IOStream *stream) : File(stream) {}
+
+    Tag *tag() const { return 0; }
+    AudioProperties *audioProperties() const { return 0; }
+    bool save() { return false; }
+  };
+}
+
+bool MPEG::File::isValidStream(IOStream *stream)
+{
+  if(!stream || !stream->isOpen())
+    return false;
+
+  // An MPEG file has MPEG frame headers. An ID3v2 tag may precede.
+
+  // MPEG frame headers are really confusing with irrelevant binary data.
+  // So we check if a frame header is really valid.
+
+  const long originalPosition = stream->tell();
+
+  long bufferOffset = 0;
+
+  stream->seek(0);
+  const ByteVector data = stream->readBlock(ID3v2::Header::size());
+  if(data.startsWith(ID3v2::Header::fileIdentifier()))
+    bufferOffset = ID3v2::Header(data).completeTagSize();
+
+  stream->seek(bufferOffset);
+  const ByteVector buffer = stream->readBlock(bufferSize());
+
+  AdapterFile file(stream);
+
+  for(unsigned int i = 0; i < buffer.size() - 1; ++i) {
+    if(isFrameSync(buffer, i)) {
+      const Header header(&file, bufferOffset + i, true);
+      if(header.isValid()) {
+        stream->seek(originalPosition);
+        return true;
+      }
+    }
+  }
+
+  stream->seek(originalPosition);
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
