@@ -127,9 +127,6 @@ namespace TagLib {
       /*!
        * Save the file.  This will primarily save and update the XiphComment.
        * Returns true if the save is successful.
-       *
-       * \warning In the current implementation, it's dangerous to call save()
-       * repeatedly.  It leads to a segfault.
        */
       virtual bool save();
 
