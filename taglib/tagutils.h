@@ -45,7 +45,8 @@ namespace TagLib {
 
     long findAPE(File *file, long id3v1Location);
 
-    ByteVector readHeader(IOStream *stream, unsigned int length, bool skipID3v2);
+    ByteVector readHeader(IOStream *stream, unsigned int length, bool skipID3v2,
+                          long *headerOffset = 0);
   }
 }
 
