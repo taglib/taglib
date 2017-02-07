@@ -58,7 +58,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Ogg::Opus::File::isValidStream(IOStream *stream)
+bool Ogg::Opus::File::isSupported(IOStream *stream)
 {
   // An Opus file has IDs "OggS" and "OpusHead" somewhere.
 

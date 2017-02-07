@@ -146,36 +146,36 @@ namespace
   {
     File *file = 0;
 
-    if(MPEG::File::isValidStream(stream))
+    if(MPEG::File::isSupported(stream))
       file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
-    else if(Ogg::Vorbis::File::isValidStream(stream))
+    else if(Ogg::Vorbis::File::isSupported(stream))
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(Ogg::FLAC::File::isValidStream(stream))
+    else if(Ogg::FLAC::File::isSupported(stream))
       file = new Ogg::FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(FLAC::File::isValidStream(stream))
+    else if(FLAC::File::isSupported(stream))
       file = new FLAC::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
-    else if(MPC::File::isValidStream(stream))
+    else if(MPC::File::isSupported(stream))
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(WavPack::File::isValidStream(stream))
+    else if(WavPack::File::isSupported(stream))
       file = new WavPack::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(Ogg::Speex::File::isValidStream(stream))
+    else if(Ogg::Speex::File::isSupported(stream))
       file = new Ogg::Speex::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(Ogg::Opus::File::isValidStream(stream))
+    else if(Ogg::Opus::File::isSupported(stream))
       file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(TrueAudio::File::isValidStream(stream))
+    else if(TrueAudio::File::isSupported(stream))
       file = new TrueAudio::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(MP4::File::isValidStream(stream))
+    else if(MP4::File::isSupported(stream))
       file = new MP4::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ASF::File::isValidStream(stream))
+    else if(ASF::File::isSupported(stream))
       file = new ASF::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(RIFF::AIFF::File::isValidStream(stream))
+    else if(RIFF::AIFF::File::isSupported(stream))
       file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(RIFF::WAV::File::isValidStream(stream))
+    else if(RIFF::WAV::File::isSupported(stream))
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(APE::File::isValidStream(stream))
+    else if(APE::File::isSupported(stream))
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 
-    // isValidStream() only does a quick check, so double check the file here.
+    // isSupported() only does a quick check, so double check the file here.
 
     if(file) {
       if(file->isValid())

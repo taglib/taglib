@@ -75,7 +75,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool WavPack::File::isValidStream(IOStream *stream)
+bool WavPack::File::isSupported(IOStream *stream)
 {
   // A WavPack file has to start with "wvpk".
 

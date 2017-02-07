@@ -77,7 +77,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool TrueAudio::File::isValidStream(IOStream *stream)
+bool TrueAudio::File::isSupported(IOStream *stream)
 {
   // A TrueAudio file has to start with "TTA". An ID3v2 tag may precede.
 

@@ -478,7 +478,7 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, unsigned in
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool ASF::File::isValidStream(IOStream *stream)
+bool ASF::File::isSupported(IOStream *stream)
 {
   // An ASF file has to start with the designated GUID.
 

@@ -58,7 +58,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool RIFF::AIFF::File::isValidStream(IOStream *stream)
+bool RIFF::AIFF::File::isSupported(IOStream *stream)
 {
   // An AIFF file has to start with "FORM????AIFF" or "FORM????AIFC".
 

@@ -95,7 +95,7 @@ namespace
   };
 }
 
-bool MPEG::File::isValidStream(IOStream *stream)
+bool MPEG::File::isSupported(IOStream *stream)
 {
   if(!stream || !stream->isOpen())
     return false;

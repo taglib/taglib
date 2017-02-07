@@ -75,7 +75,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool MP4::File::isValidStream(IOStream *stream)
+bool MP4::File::isSupported(IOStream *stream)
 {
   // An MP4 file has to have an "ftyp" box first.
 

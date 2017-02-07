@@ -99,7 +99,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool FLAC::File::isValidStream(IOStream *stream)
+bool FLAC::File::isSupported(IOStream *stream)
 {
   // A FLAC file has an ID "fLaC" somewhere. An ID3v2 tag may precede.
 

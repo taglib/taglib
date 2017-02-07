@@ -79,7 +79,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool MPC::File::isValidStream(IOStream *stream)
+bool MPC::File::isSupported(IOStream *stream)
 {
   // A newer MPC file has to start with "MPCK" or "MP+", but older files don't
   // have keys to do a quick check.

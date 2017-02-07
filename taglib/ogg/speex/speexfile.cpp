@@ -58,7 +58,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Ogg::Speex::File::isValidStream(IOStream *stream)
+bool Ogg::Speex::File::isSupported(IOStream *stream)
 {
   // A Speex file has IDs "OggS" and "Speex   " somewhere.
 

@@ -65,7 +65,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool RIFF::WAV::File::isValidStream(IOStream *stream)
+bool RIFF::WAV::File::isSupported(IOStream *stream)
 {
   // A WAV file has to start with "RIFF????WAVE".
 

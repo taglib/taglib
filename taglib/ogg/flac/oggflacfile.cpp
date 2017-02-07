@@ -70,7 +70,7 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Ogg::FLAC::File::isValidStream(IOStream *stream)
+bool Ogg::FLAC::File::isSupported(IOStream *stream)
 {
   // An Ogg FLAC file has IDs "OggS" and "fLaC" somewhere.
 

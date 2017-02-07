@@ -122,7 +122,7 @@ namespace TagLib {
        * \note This method is designed to do a quick check.  The result may
        * not necessarily be correct.
        */
-      static bool isValidStream(IOStream *stream);
+      static bool isSupported(IOStream *stream);
 
     private:
       void read();

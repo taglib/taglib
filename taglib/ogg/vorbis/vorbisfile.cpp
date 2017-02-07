@@ -63,7 +63,7 @@ namespace TagLib {
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Vorbis::File::isValidStream(IOStream *stream)
+bool Vorbis::File::isSupported(IOStream *stream)
 {
   // An Ogg Vorbis file has IDs "OggS" and "\x01vorbis" somewhere.
 
