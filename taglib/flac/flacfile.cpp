@@ -183,7 +183,6 @@ bool FLAC::File::save()
   }
 
   // Compute the amount of padding, and append that to data.
-  // TODO: Should be calculated in offset_t in taglib2.
 
   long long originalLength = d->streamStart - d->flacStart;
   long long paddingLength = originalLength - data.size() - 4;
@@ -476,7 +475,9 @@ void FLAC::File::scan()
       return;
     }
 
-    if(blockLength == 0 && blockType != MetadataBlock::Padding) {
+    if(blockLength == 0
+      && blockType != MetadataBlock::Padding && blockType != MetadataBlock::SeekTable)
+    {
       debug("FLAC::File::scan() -- Zero-sized metadata block found");
       setValid(false);
       return;

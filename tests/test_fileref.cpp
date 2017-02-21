@@ -233,7 +233,7 @@ public:
     FileRef f1(TEST_FILE_PATH_C("no-extension"));
     CPPUNIT_ASSERT(f1.isNull());
 
-    FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xxx"));
+    FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xx"));
     CPPUNIT_ASSERT(f2.isNull());
   }
 

@@ -4,9 +4,10 @@
  * Added support for classical music tags of iTunes 12.5.
  * Dropped support for Windows 9x and NT 4.0 or older.
  * Fixed reading MP4 atoms with zero length.
- * Fixed handling of redundant UTF-8 sequences in Win32.
  * Fixed handling of lowercase field names in Vorbis Comments.
  * Fixed possible file corruptions when saving Ogg files.
+ * Fixed reading FLAC files with zero-sized seektables.
+ * Better handling of invalid UTF-8 sequences.
  * Several smaller bug fixes and performance improvements.
 
 TagLib 1.11.1 (Oct 24, 2016)

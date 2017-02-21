@@ -182,7 +182,7 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
 
   // Check for the MPEG synch bytes.
 
-  if(!firstSyncByte(data[0]) || !secondSynchByte(data[1])) {
+  if(!isFrameSync(data)) {
     debug("MPEG::Header::parse() -- MPEG header did not match MPEG synch.");
     return;
   }

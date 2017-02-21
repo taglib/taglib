@@ -15,6 +15,7 @@ addons:
     packages:
       - libcppunit-dev
       - zlib1g-dev
+      - libboost-dev
 
 matrix:
   exclude:

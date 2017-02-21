@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
     copyright           : (C) 2011 by Mathias Panzenböck
     email               : grosser.meister.morti@gmx.net
  ***************************************************************************/
@@ -48,7 +48,7 @@ public:
 
 Mod::AudioProperties::AudioProperties(AudioProperties::ReadStyle) :
   TagLib::AudioProperties(),
-  d(new PropertiesPrivate)
+  d(new PropertiesPrivate())
 {
 }
 

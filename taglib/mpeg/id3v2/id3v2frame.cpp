@@ -198,15 +198,15 @@ ByteVector Frame::render() const
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-Frame::Frame(const ByteVector &data)
+Frame::Frame(const ByteVector &data) :
+  d(new FramePrivate())
 {
-  d = new FramePrivate;
   d->header = new Header(data);
 }
 
-Frame::Frame(Header *h)
+Frame::Frame(Header *h) :
+  d(new FramePrivate())
 {
-  d = new FramePrivate;
   d->header = h;
 }
 
@@ -567,15 +567,15 @@ unsigned int Frame::Header::size(unsigned int version)
 // public members (Frame::Header)
 ////////////////////////////////////////////////////////////////////////////////
 
-Frame::Header::Header(const ByteVector &data, bool synchSafeInts)
+Frame::Header::Header(const ByteVector &data, bool synchSafeInts) :
+  d(new HeaderPrivate())
 {
-  d = new HeaderPrivate;
   setData(data, synchSafeInts);
 }
 
-Frame::Header::Header(const ByteVector &data, unsigned int version)
+Frame::Header::Header(const ByteVector &data, unsigned int version) :
+  d(new HeaderPrivate())
 {
-  d = new HeaderPrivate;
   setData(data, version);
 }
 

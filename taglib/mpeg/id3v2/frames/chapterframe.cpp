@@ -61,9 +61,9 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data) :
-    ID3v2::Frame(data)
+  ID3v2::Frame(data),
+  d(new ChapterFramePrivate())
 {
-  d = new ChapterFramePrivate;
   d->tagHeader = tagHeader;
   setData(data);
 }
@@ -72,10 +72,9 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
                            unsigned int startTime, unsigned int endTime,
                            unsigned int startOffset, unsigned int endOffset,
                            const FrameList &embeddedFrames) :
-    ID3v2::Frame("CHAP")
+  ID3v2::Frame("CHAP"),
+  d(new ChapterFramePrivate())
 {
-  d = new ChapterFramePrivate;
-
   // setElementID has a workaround for a previously silly API where you had to
   // specifically include the null byte.
 
@@ -303,9 +302,9 @@ ByteVector ChapterFrame::renderFields() const
 }
 
 ChapterFrame::ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h) :
-  Frame(h)
+  Frame(h),
+  d(new ChapterFramePrivate())
 {
-  d = new ChapterFramePrivate;
   d->tagHeader = tagHeader;
   parseFields(fieldData(data));
 }

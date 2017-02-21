@@ -63,8 +63,9 @@ namespace
         return false;
     }
 
+    const String upperKey = String(key).upper();
     for(size_t i = 0; invalidKeys[i] != 0; ++i) {
-      if(String(key).upper() == invalidKeys[i])
+      if(upperKey == invalidKeys[i])
         return false;
     }
 

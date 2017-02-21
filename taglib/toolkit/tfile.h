@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
     copyright            : (C) 2002 - 2008 by Scott Wheeler
     email                : wheeler@kde.org
  ***************************************************************************/
@@ -282,10 +282,8 @@ namespace TagLib {
     File(const File &);
     File &operator=(const File &);
 
-    class FilePrivateBase;
-    class ManagedFilePrivate;
-    class UnmanagedFilePrivate;
-    FilePrivateBase *d;
+    class FilePrivate;
+    FilePrivate *d;
   };
 
 }

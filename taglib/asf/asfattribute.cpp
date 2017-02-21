@@ -1,4 +1,4 @@
-/**************************************************************************
+﻿/**************************************************************************
     copyright            : (C) 2005-2007 by Lukáš Lalinský
     email                : lalinsky@gmail.com
  **************************************************************************/
@@ -37,16 +37,16 @@ namespace
 {
   struct AttributeData
   {
+    AttributeData() :
+      numericValue(0),
+      stream(0),
+      language(0) {}
+
     ASF::Attribute::AttributeTypes type;
     String stringValue;
     ByteVector byteVectorValue;
     ASF::Picture pictureValue;
-    union {
-      unsigned int intValue;
-      unsigned short shortValue;
-      unsigned long long longLongValue;
-      bool boolValue;
-    };
+    unsigned long long numericValue;
     int stream;
     int language;
   };
@@ -59,8 +59,6 @@ public:
     data(new AttributeData())
   {
     data->pictureValue = ASF::Picture::fromInvalid();
-    data->stream       = 0;
-    data->language     = 0;
   }
 
   SHARED_PTR<AttributeData> data;
@@ -106,33 +104,28 @@ ASF::Attribute::Attribute(unsigned int value) :
   d(new AttributePrivate())
 {
   d->data->type = DWordType;
-  d->data->intValue = value;
+  d->data->numericValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned long long value) :
   d(new AttributePrivate())
 {
   d->data->type = QWordType;
-  d->data->longLongValue = value;
+  d->data->numericValue = value;
 }
 
 ASF::Attribute::Attribute(unsigned short value) :
   d(new AttributePrivate())
 {
   d->data->type = WordType;
-  d->data->shortValue = value;
+  d->data->numericValue = value;
 }
 
 ASF::Attribute::Attribute(bool value) :
   d(new AttributePrivate())
 {
   d->data->type = BoolType;
-  d->data->boolValue = value;
-}
-
-ASF::Attribute::~Attribute()
-{
-  delete d;
+  d->data->numericValue = value;
 }
 
 ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &other)
@@ -146,6 +139,11 @@ void ASF::Attribute::swap(Attribute &other)
   using std::swap;
 
   swap(d, other.d);
+}
+
+ASF::Attribute::~Attribute()
+{
+  delete d;
 }
 
 ASF::Attribute::AttributeTypes ASF::Attribute::type() const
@@ -168,22 +166,22 @@ ByteVector ASF::Attribute::toByteVector() const
 
 unsigned short ASF::Attribute::toBool() const
 {
-  return d->data->shortValue;
+  return d->data->numericValue ? 1 : 0;
 }
 
 unsigned short ASF::Attribute::toUShort() const
 {
-  return d->data->shortValue;
+  return static_cast<unsigned short>(d->data->numericValue);
 }
 
 unsigned int ASF::Attribute::toUInt() const
 {
-  return d->data->intValue;
+  return static_cast<unsigned int>(d->data->numericValue);
 }
 
 unsigned long long ASF::Attribute::toULongLong() const
 {
-  return d->data->longLongValue;
+  return static_cast<unsigned long long>(d->data->numericValue);
 }
 
 ASF::Picture ASF::Attribute::toPicture() const
@@ -223,24 +221,24 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
 
   switch(d->data->type) {
   case WordType:
-    d->data->shortValue = readWORD(&f);
+    d->data->numericValue = readWORD(&f);
     break;
 
   case BoolType:
     if(kind == 0) {
-      d->data->boolValue = (readDWORD(&f) == 1);
+      d->data->numericValue = (readDWORD(&f) != 0);
     }
     else {
-      d->data->boolValue = (readWORD(&f) == 1);
+      d->data->numericValue = (readWORD(&f) != 0);
     }
     break;
 
   case DWordType:
-    d->data->intValue = readDWORD(&f);
+    d->data->numericValue = readDWORD(&f);
     break;
 
   case QWordType:
-    d->data->longLongValue = readQWORD(&f);
+    d->data->numericValue = readQWORD(&f);
     break;
 
   case UnicodeType:
@@ -291,24 +289,24 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   switch (d->data->type) {
   case WordType:
-    data.append(ByteVector::fromUInt16LE(d->data->shortValue));
+    data.append(ByteVector::fromUInt16LE(toUShort()));
     break;
 
   case BoolType:
     if(kind == 0) {
-      data.append(ByteVector::fromUInt32LE(d->data->boolValue ? 1 : 0));
+      data.append(ByteVector::fromUInt32LE(toBool()));
     }
     else {
-      data.append(ByteVector::fromUInt16LE(d->data->boolValue ? 1 : 0));
+      data.append(ByteVector::fromUInt16LE(toBool()));
     }
     break;
 
   case DWordType:
-    data.append(ByteVector::fromUInt32LE(d->data->intValue));
+    data.append(ByteVector::fromUInt32LE(toUInt()));
     break;
 
   case QWordType:
-    data.append(ByteVector::fromUInt64LE(d->data->longLongValue));
+    data.append(ByteVector::fromUInt64LE(toULongLong()));
     break;
 
   case UnicodeType:

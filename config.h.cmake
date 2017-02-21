@@ -9,7 +9,6 @@
 #cmakedefine   _FILE_OFFSET_BITS ${_FILE_OFFSET_BITS}
 
 /* Defined if your compiler supports some byte swap functions */
-#cmakedefine   HAVE_BOOST_BYTESWAP 1
 #cmakedefine   HAVE_GCC_BYTESWAP 1
 #cmakedefine   HAVE_GLIBC_BYTESWAP 1
 #cmakedefine   HAVE_MSC_BYTESWAP 1

@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
     copyright            : (C) 2004-2005 by Allan Sandfeld Jensen
     email                : kde@carewolf.org
  ***************************************************************************/
@@ -70,17 +70,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::FLAC::File::File(FileName file, bool readProperties,
-                      AudioProperties::ReadStyle propertiesStyle) : Ogg::File(file)
+                      AudioProperties::ReadStyle propertiesStyle) :
+  Ogg::File(file),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 Ogg::FLAC::File::File(IOStream *stream, bool readProperties,
-                      AudioProperties::ReadStyle propertiesStyle) : Ogg::File(stream)
+                      AudioProperties::ReadStyle propertiesStyle) :
+  Ogg::File(stream),
+  d(new FilePrivate())
 {
-  d = new FilePrivate;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
@@ -161,7 +163,7 @@ void Ogg::FLAC::File::read(bool readProperties, AudioProperties::ReadStyle prope
   if(d->hasXiphComment)
     d->comment = new Ogg::XiphComment(xiphCommentData());
   else
-    d->comment = new Ogg::XiphComment;
+    d->comment = new Ogg::XiphComment();
 
 
   if(readProperties)

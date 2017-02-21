@@ -53,9 +53,9 @@ ByteVectorStream::ByteVectorStreamPrivate::ByteVectorStreamPrivate(const ByteVec
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorStream::ByteVectorStream(const ByteVector &data)
+ByteVectorStream::ByteVectorStream(const ByteVector &data) :
+  d(new ByteVectorStreamPrivate(data))
 {
-  d = new ByteVectorStreamPrivate(data);
 }
 
 ByteVectorStream::~ByteVectorStream()

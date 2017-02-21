@@ -344,12 +344,6 @@ set(toolkit_SRCS
   toolkit/tzlib.cpp
 )
 
-if(NOT WIN32)
-  set(unicode_SRCS
-    toolkit/unicode.cpp
-  )
-endif()
-
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS
     ${ZLIB_SOURCE}/adler32.c
@@ -367,7 +361,7 @@ set(tag_LIB_SRCS
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
   ${ebml_SRCS} ${matroska_SRCS} ${dsf_SRCS}
-  ${unicode_SRCS} ${zlib_SRCS}
+  ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp

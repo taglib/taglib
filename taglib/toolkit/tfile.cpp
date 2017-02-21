@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
     copyright            : (C) 2002 - 2008 by Scott Wheeler
     email                : wheeler@kde.org
  ***************************************************************************/
@@ -33,51 +33,23 @@
 
 using namespace TagLib;
 
-class File::FilePrivateBase
+class File::FilePrivate
 {
 public:
-  FilePrivateBase() :
+  FilePrivate(IOStream *stream, bool owner) :
+    stream(stream),
+    streamOwner(owner),
     valid(true) {}
 
-  virtual ~FilePrivateBase() {}
+  ~FilePrivate()
+  {
+    if(streamOwner)
+      delete stream;
+  }
 
-  virtual IOStream *stream() const = 0;
-
+  IOStream *stream;
+  bool streamOwner;
   bool valid;
-};
-
-// FilePrivate implementation which takes ownership of the stream.
-
-class File::ManagedFilePrivate : public File::FilePrivateBase
-{
-public:
-  ManagedFilePrivate(IOStream *stream) :
-    p(stream) {}
-
-  virtual IOStream *stream() const
-  {
-    return p.get();
-  }
-
-private:
-  SCOPED_PTR<IOStream> p;
-};
-
-// FilePrivate implementation which doesn't take ownership of the stream.
-
-class File::UnmanagedFilePrivate : public File::FilePrivateBase
-{
-public:
-  UnmanagedFilePrivate(IOStream *stream) :
-    p(stream) {}
-
-  virtual IOStream *stream() const
-  {
-    return p;
-  }
-
-private:
-  IOStream *p;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +63,7 @@ File::~File()
 
 FileName File::name() const
 {
-  return d->stream()->name();
+  return d->stream->name();
 }
 
 PropertyMap File::properties() const
@@ -111,17 +83,17 @@ PropertyMap File::setProperties(const PropertyMap &properties)
 
 ByteVector File::readBlock(size_t length)
 {
-  return d->stream()->readBlock(length);
+  return d->stream->readBlock(length);
 }
 
 void File::writeBlock(const ByteVector &data)
 {
-  d->stream()->writeBlock(data);
+  d->stream->writeBlock(data);
 }
 
 long long File::find(const ByteVector &pattern, long long fromOffset, const ByteVector &before)
 {
-  if(!d->stream() || pattern.size() > bufferSize())
+  if(!d->stream || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
@@ -225,7 +197,7 @@ long long File::find(const ByteVector &pattern, long long fromOffset, const Byte
 
 long long File::rfind(const ByteVector &pattern, long long fromOffset, const ByteVector &before)
 {
-  if(!d->stream() || pattern.size() > bufferSize())
+  if(!d->stream || pattern.size() > bufferSize())
       return -1;
 
   // Save the location of the current read pointer.  We will restore the
@@ -287,22 +259,22 @@ long long File::rfind(const ByteVector &pattern, long long fromOffset, const Byt
 
 void File::insert(const ByteVector &data, long long start, size_t replace)
 {
-  d->stream()->insert(data, start, replace);
+  d->stream->insert(data, start, replace);
 }
 
 void File::removeBlock(long long start, size_t length)
 {
-  d->stream()->removeBlock(start, length);
+  d->stream->removeBlock(start, length);
 }
 
 bool File::readOnly() const
 {
-  return d->stream()->readOnly();
+  return d->stream->readOnly();
 }
 
 bool File::isOpen() const
 {
-  return d->stream()->isOpen();
+  return d->stream->isOpen();
 }
 
 bool File::isValid() const
@@ -312,27 +284,27 @@ bool File::isValid() const
 
 void File::seek(long long offset, Position p)
 {
-  d->stream()->seek(offset, IOStream::Position(p));
+  d->stream->seek(offset, IOStream::Position(p));
 }
 
 void File::truncate(long long length)
 {
-  d->stream()->truncate(length);
+  d->stream->truncate(length);
 }
 
 void File::clear()
 {
-  d->stream()->clear();
+  d->stream->clear();
 }
 
 long long File::tell() const
 {
-  return d->stream()->tell();
+  return d->stream->tell();
 }
 
 long long File::length()
 {
-  return d->stream()->length();
+  return d->stream->length();
 }
 
 String File::toString() const
@@ -353,13 +325,13 @@ String File::toString() const
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(const FileName &fileName)
-  : d(new ManagedFilePrivate(new FileStream(fileName)))
+File::File(const FileName &fileName) :
+  d(new FilePrivate(new FileStream(fileName), true))
 {
 }
 
-File::File(IOStream *stream)
-  : d(new UnmanagedFilePrivate(stream))
+File::File(IOStream *stream) :
+  d(new FilePrivate(stream, false))
 {
 }
 
