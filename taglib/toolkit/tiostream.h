@@ -33,21 +33,21 @@
 namespace TagLib {
 
 #ifdef _WIN32
-  class TAGLIB_EXPORT FileName
+  class FileName
   {
   public:
-    FileName(const wchar_t *name);
-    FileName(const char *name);
+    TAGLIB_EXPORT FileName(const wchar_t *name);
+    TAGLIB_EXPORT FileName(const char *name);
 
-    FileName(const FileName &name);
+    TAGLIB_EXPORT FileName(const FileName &name);
 
-    operator const wchar_t *() const;
-    operator const char *() const;
+    TAGLIB_EXPORT operator const wchar_t *() const;
+    TAGLIB_EXPORT operator const char *() const;
 
-    const std::wstring &wstr() const;
-    const std::string  &str() const;
+    TAGLIB_EXPORT const std::wstring &wstr() const;
+    TAGLIB_EXPORT const std::string  &str() const;
 
-    String toString() const;
+    TAGLIB_EXPORT String toString() const;
 
   private:
     const std::string  m_name;
