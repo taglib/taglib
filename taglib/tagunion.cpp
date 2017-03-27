@@ -119,6 +119,38 @@ namespace TagLib
   }
 
   template <size_t COUNT>
+  PropertyMap TagUnion<COUNT>::setProperties(const PropertyMap &properties)
+  {
+    //Record unassigned properties for each tag in the union
+    std::vector<PropertyMap> returnCandidates(COUNT);
+    for (size_t i = 0; i < COUNT; ++i) {
+      if (d->tags[i])
+        returnCandidates.insert(returnCandidates.end(), d->tags[i]->setProperties(properties));
+    }
+
+    if (!returnCandidates.empty()) {
+      //Only one tag present, return its unassigned properties
+      if (returnCandidates.size() == 1) {
+        return returnCandidates.front();
+      }
+
+      //Multiple tags in union: if a property has been assigned in any member tag, remove it from ignored properties to return
+      PropertyMap propertiesCopy(properties);
+      for (PropertyMap::Iterator i = propertiesCopy.begin(); i != propertiesCopy.end(); i++) {
+        for (auto j : returnCandidates) {
+          if (j.contains(i->first)) {
+            i = propertiesCopy.erase(i->first).begin();
+            continue;
+          }
+        }
+      }
+    }
+
+    //No assignments made by union member tags. Return input (this should not happen)
+    return properties;
+  }
+
+  template <size_t COUNT>
   String TagUnion<COUNT>::title() const
   {
     stringUnion(title);
