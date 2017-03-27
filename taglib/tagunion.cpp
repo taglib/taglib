@@ -122,7 +122,7 @@ namespace TagLib
   PropertyMap TagUnion<COUNT>::setProperties(const PropertyMap &properties)
   {
     //Record unassigned properties for each tag in the union
-    std::vector<PropertyMap> returnCandidates();
+    std::vector<PropertyMap> returnCandidates;
     for (size_t i = 0; i < COUNT; ++i) {
       if (d->tags[i])
         returnCandidates.insert(returnCandidates.end(), d->tags[i]->setProperties(properties));
