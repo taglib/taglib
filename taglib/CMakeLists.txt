@@ -56,7 +56,6 @@ set(tag_HDRS
   toolkit/tmap.h
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
-  toolkit/trefcounter.h
   toolkit/tdebuglistener.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
