@@ -95,7 +95,12 @@ namespace
 
   FileHandle openFile(const FileName &path, bool readOnly)
   {
+    // Open file with O_CLOEXEC set. Available in glibc 2.7
+#if defined(__GLIBC__) && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 7))
+    return fopen(path, readOnly ? "rbe" : "rb+e");
+#else
     return fopen(path, readOnly ? "rb" : "rb+");
+#endif
   }
 
   void closeFile(FileHandle file)
