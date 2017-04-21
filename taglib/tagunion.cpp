@@ -125,7 +125,8 @@ namespace TagLib
     std::vector<PropertyMap> returnCandidates;
     for (size_t i = 0; i < COUNT; ++i) {
       if (d->tags[i])
-        returnCandidates.insert(returnCandidates.end(), d->tags[i]->setProperties(properties));
+        returnCandidates.insert(returnCandidates.end(),
+          d->tags[i]->setProperties(properties));
     }
 
     if (!returnCandidates.empty()) {
@@ -134,10 +135,14 @@ namespace TagLib
         return returnCandidates.front();
       }
 
-      //Multiple tags in union: if a property has been assigned in any member tag, remove it from ignored properties to return
+      //Multiple tags in union:
+      //if a property has been assigned in any member tag
+      //remove it from ignored properties to return
       PropertyMap propertiesCopy(properties);
-      for (std::vector<PropertyMap>::iterator i = returnCandidates.begin(); i != returnCandidates.end(); i++) {
-        for (PropertyMap::Iterator j = propertiesCopy.begin(); j != propertiesCopy.end();) {
+      for (std::vector<PropertyMap>::iterator i = returnCandidates.begin();
+        i != returnCandidates.end(); i++) {
+        for (PropertyMap::Iterator j = propertiesCopy.begin();
+          j != propertiesCopy.end();) {
           if (!i->contains(j->first)) {
             j = propertiesCopy.erase(j->first).begin();
           }
@@ -148,7 +153,8 @@ namespace TagLib
       }
     }
 
-    //No assignments made by union member tags. Return input (this should not happen)
+    //No assignments made by union member tags.
+    //Return input (this should not happen)
     return properties;
   }
 
