@@ -268,7 +268,7 @@ namespace TagLib {
      * \note You generally shouldn't use this method, but instead the constructor
      * directly.
      *
-     * \deprecated
+     * \deprecated Always returns null.
      */
     static File *create(FileName fileName,
                         bool readAudioProperties = true,

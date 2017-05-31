@@ -8,6 +8,7 @@
  * Fixed possible file corruptions when saving Ogg files.
  * Fixed reading FLAC files with zero-sized seektables.
  * Better handling of invalid UTF-8 sequences.
+ * Marked FileRef::create() deprecated. It returns null.
  * Several smaller bug fixes and performance improvements.
 
 TagLib 1.11.1 (Oct 24, 2016)
