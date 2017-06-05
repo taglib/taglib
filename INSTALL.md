@@ -50,7 +50,7 @@ It's Windows ... Systems vary!
 This means you need to adjust things to suit your system, especially paths.
 
 Tested with:
-* Microsoft Visual Studio 2010, 2015
+* Microsoft Visual Studio 2010, 2015, 2017
 * Microsoft C++ Build Tools 2015, 2017 (standalone packages not requiring Visual Studio)
 * Gcc by mingw-w64.sf.net v4.6.3 (Strawberry Perl 32b)
 * MinGW32-4.8.0
@@ -84,7 +84,10 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
 1.  **Build the Makefiles:**
 
     Replace "GENERATOR" with your needs.
-    * For MSVS: `Visual Studio XX YYYY`, e.g. `Visual Studio 14 2015`
+    * For MSVS: `Visual Studio XX YYYY`, e.g. `Visual Studio 14 2015`.
+    
+      **Note**: As Visual Studio 2017 supports CMake, you can skip this step and open the taglib
+      folder in VS instead.
     * For MinGW: `MinGW Makefiles`
        
           C:\GitRoot\taglib> cmake -G "GENERATOR"  -DCMAKE_INSTALL_PREFIX=C:\Libraries\taglib
