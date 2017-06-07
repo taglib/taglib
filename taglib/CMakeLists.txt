@@ -32,10 +32,6 @@ elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
 endif()
 
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIR})
-endif()
-
 set(tag_HDRS
   tag.h
   fileref.h
