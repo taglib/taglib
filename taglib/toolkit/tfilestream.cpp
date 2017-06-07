@@ -85,7 +85,7 @@ namespace
 
   struct FileNameHandle : public std::string
   {
-    FileNameHandle(FileName name) : std::string(name) {}
+    explicit FileNameHandle(FileName name) : std::string(name) {}
     operator FileName () const { return c_str(); }
   };
 
@@ -119,7 +119,7 @@ namespace
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName)
+  explicit FileStreamPrivate(const FileName &fileName)
     : file(InvalidFileHandle)
     , name(fileName)
     , readOnly(true)

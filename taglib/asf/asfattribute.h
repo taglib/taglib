@@ -83,27 +83,27 @@ namespace TagLib
        * WM/Picture attributes added with TagLib::ASF are not automatically validated to conform to ID3 specifications.
        * You must add code in your application to perform validations if you want to maintain complete compatibility with ID3.
        */
-      Attribute(const Picture &value);
+      explicit Attribute(const Picture &value);
 
       /*!
        * Constructs an attribute with \a key and a DWordType \a value.
        */
-      Attribute(unsigned int value);
+      explicit Attribute(unsigned int value);
 
       /*!
        * Constructs an attribute with \a key and a QWordType \a value.
        */
-      Attribute(unsigned long long value);
+      explicit Attribute(unsigned long long value);
 
       /*!
        * Constructs an attribute with \a key and a WordType \a value.
        */
-      Attribute(unsigned short value);
+      explicit Attribute(unsigned short value);
 
       /*!
        * Constructs an attribute with \a key and a BoolType \a value.
        */
-      Attribute(bool value);
+      explicit Attribute(bool value);
 
       /*!
        * Construct an attribute as a copy of \a other.

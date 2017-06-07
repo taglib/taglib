@@ -178,7 +178,7 @@ namespace
 class FileRef::FileRefPrivate : public RefCounter
 {
 public:
-  FileRefPrivate(File *f) :
+  explicit FileRefPrivate(File *f) :
     RefCounter(),
     file(f) {}
 

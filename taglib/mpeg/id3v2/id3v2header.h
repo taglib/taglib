@@ -56,7 +56,7 @@ namespace TagLib {
        * Constructs an ID3v2 header based on \a data.  parse() is called
        * immediately.
        */
-      Header(const ByteVector &data);
+      explicit Header(const ByteVector &data);
 
       /*!
        * Destroys the header.

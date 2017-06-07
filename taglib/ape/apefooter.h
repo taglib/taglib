@@ -54,7 +54,7 @@ namespace TagLib {
        * Constructs an APE footer based on \a data.  parse() is called
        * immediately.
        */
-      Footer(const ByteVector &data);
+      explicit Footer(const ByteVector &data);
 
       /*!
        * Destroys the footer.

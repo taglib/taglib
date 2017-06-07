@@ -109,7 +109,7 @@ namespace TagLib {
       /*!
        * Constructs a RelativeVolumeFrame based on the contents of \a data.
        */
-      RelativeVolumeFrame(const ByteVector &data);
+      explicit RelativeVolumeFrame(const ByteVector &data);
 
       /*!
        * Destroys the RelativeVolumeFrame instance.
