@@ -112,7 +112,7 @@ namespace TagLib {
      *
      * \see ReadStyle
      */
-    AudioProperties(ReadStyle style);
+    explicit AudioProperties(ReadStyle style);
 
   private:
     AudioProperties(const AudioProperties &);

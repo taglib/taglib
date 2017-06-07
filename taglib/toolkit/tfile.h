@@ -263,7 +263,7 @@ namespace TagLib {
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */
-    File(FileName file);
+    explicit File(FileName file);
 
     /*!
      * Construct a File object and use the \a stream instance.
@@ -274,7 +274,7 @@ namespace TagLib {
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.
      */
-    File(IOStream *stream);
+    explicit File(IOStream *stream);
 
     /*!
      * Marks the file as valid or invalid.
