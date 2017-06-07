@@ -23,198 +23,184 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <catch/catch.hpp>
 #include <xmfile.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-static const String titleBefore("title of song");
-static const String titleAfter("changed title");
-
-static const String trackerNameBefore("MilkyTracker        ");
-static const String trackerNameAfter("TagLib");
-
-static const String commentBefore(
-  "Instrument names\n"
-  "are abused as\n"
-  "comments in\n"
-  "module file formats.\n"
-  "-+-+-+-+-+-+-+-+-+-+-+\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n"
-  "Sample\n"
-  "names\n"
-  "are sometimes\n"
-  "also abused as\n"
-  "comments.");
-
-static const String newCommentShort(
-  "Instrument names\n"
-  "are abused as\n"
-  "comments in\n"
-  "module file formats.\n"
-  "======================\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n"
-  "Sample names\n"
-  "are sometimes\n"
-  "also abused as\n"
-  "comments.");
-
-static const String newCommentLong(
-  "Instrument names\n"
-  "are abused as\n"
-  "comments in\n"
-  "module file formats.\n"
-  "======================\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n"
-  "Sample names\n"
-  "are sometimes\n"
-  "also abused as\n"
-  "comments.\n"
-  "\n\n\n\n\n\n\n"
-  "TEST");
-
-static const String commentAfter(
-  "Instrument names\n"
-  "are abused as\n"
-  "comments in\n"
-  "module file formats.\n"
-  "======================\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-  "\n\n\n"
-  "Sample names\n"
-  "are sometimes\n"
-  "also abused as\n"
-  "comments.\n");
-
-class TestXM : public CppUnit::TestFixture
+namespace
 {
-  CPPUNIT_TEST_SUITE(TestXM);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testReadStrippedTags);
-  CPPUNIT_TEST(testWriteTagsShort);
-  CPPUNIT_TEST(testWriteTagsLong);
-  CPPUNIT_TEST_SUITE_END();
+  const String titleBefore("title of song");
+  const String titleAfter("changed title");
 
-public:
-  void testReadTags()
-  {
-    testRead(TEST_FILE_PATH_C("test.xm"), titleBefore,
-             commentBefore, trackerNameBefore);
-  }
+  const String trackerNameBefore("MilkyTracker        ");
+  const String trackerNameAfter("TagLib");
 
-  void testReadStrippedTags()
-  {
-    XM::File file(TEST_FILE_PATH_C("stripped.xm"));
-    CPPUNIT_ASSERT(file.isValid());
+  const String commentBefore(
+    "Instrument names\n"
+    "are abused as\n"
+    "comments in\n"
+    "module file formats.\n"
+    "-+-+-+-+-+-+-+-+-+-+-+\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n"
+    "Sample\n"
+    "names\n"
+    "are sometimes\n"
+    "also abused as\n"
+    "comments.");
 
-    XM::Properties *p = file.audioProperties();
-    Mod::Tag *t = file.tag();
+  const String newCommentShort(
+    "Instrument names\n"
+    "are abused as\n"
+    "comments in\n"
+    "module file formats.\n"
+    "======================\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n"
+    "Sample names\n"
+    "are sometimes\n"
+    "also abused as\n"
+    "comments.");
 
-    CPPUNIT_ASSERT(0 != p);
-    CPPUNIT_ASSERT(0 != t);
+  const String newCommentLong(
+    "Instrument names\n"
+    "are abused as\n"
+    "comments in\n"
+    "module file formats.\n"
+    "======================\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n"
+    "Sample names\n"
+    "are sometimes\n"
+    "also abused as\n"
+    "comments.\n"
+    "\n\n\n\n\n\n\n"
+    "TEST");
 
-    CPPUNIT_ASSERT_EQUAL(0, p->length());
-    CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->version());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  0 , p->restartPosition());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->patternCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->flags());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  6, p->tempo());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)125, p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(titleBefore, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(String(), t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String(), t->trackerName());
-  }
+  const String commentAfter(
+    "Instrument names\n"
+    "are abused as\n"
+    "comments in\n"
+    "module file formats.\n"
+    "======================\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    "\n\n\n"
+    "Sample names\n"
+    "are sometimes\n"
+    "also abused as\n"
+    "comments.\n");
 
-  void testWriteTagsShort()
-  {
-    testWriteTags(newCommentShort);
-  }
-
-  void testWriteTagsLong()
-  {
-    testWriteTags(newCommentLong);
-  }
-
-private:
   void testRead(FileName fileName, const String &title,
                 const String &comment, const String &trackerName)
   {
     XM::File file(fileName);
 
-    CPPUNIT_ASSERT(file.isValid());
+    REQUIRE(file.isValid());
 
     XM::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
-    CPPUNIT_ASSERT(0 != p);
-    CPPUNIT_ASSERT(0 != t);
+    REQUIRE(p);
+    REQUIRE(t);
 
-    CPPUNIT_ASSERT_EQUAL(0, p->length());
-    CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)260, p->version());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->restartPosition());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->patternCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)128, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->flags());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  6, p->tempo());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)125, p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(trackerName, t->trackerName());
+    REQUIRE(p->length() == 0);
+    REQUIRE(p->bitrate() == 0);
+    REQUIRE(p->sampleRate() == 0);
+    REQUIRE(p->channels() == 8);
+    REQUIRE(p->lengthInPatterns() == 1);
+    REQUIRE(p->version() == 260);
+    REQUIRE(p->restartPosition() == 0);
+    REQUIRE(p->patternCount() == 1);
+    REQUIRE(p->instrumentCount() == 128);
+    REQUIRE(p->flags() == 1);
+    REQUIRE(p->tempo() == 6);
+    REQUIRE(p->bpmSpeed() == 125);
+    REQUIRE(t->title() == title);
+    REQUIRE(t->artist().isEmpty());
+    REQUIRE(t->album().isEmpty());
+    REQUIRE(t->comment() == comment);
+    REQUIRE(t->genre().isEmpty());
+    REQUIRE(t->year() == 0);
+    REQUIRE(t->track() == 0);
+    REQUIRE(t->trackerName() == trackerName);
   }
 
   void testWriteTags(const String &comment)
   {
-    ScopedFileCopy copy("test", ".xm");
+    const ScopedFileCopy copy("test", ".xm");
     {
       XM::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != 0);
+      REQUIRE(file.tag() != 0);
       file.tag()->setTitle(titleAfter);
       file.tag()->setComment(comment);
       file.tag()->setTrackerName(trackerNameAfter);
-      CPPUNIT_ASSERT(file.save());
+      REQUIRE(file.save());
     }
     testRead(copy.fileName().c_str(), titleAfter,
-             commentAfter, trackerNameAfter);
-    CPPUNIT_ASSERT(fileEqual(
-      copy.fileName(),
-      TEST_FILE_PATH_C("changed.xm")));
+      commentAfter, trackerNameAfter);
+    REQUIRE(fileEqual(copy.fileName(), TEST_FILE_PATH_C("changed.xm")));
   }
-};
+}
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestXM);
+TEST_CASE("XM File")
+{
+  SECTION("Read tags")
+  {
+    testRead(TEST_FILE_PATH_C("test.xm"), titleBefore,
+      commentBefore, trackerNameBefore);
+  }
+  SECTION("Read stripped tags")
+  {
+    XM::File file(TEST_FILE_PATH_C("stripped.xm"));
+    REQUIRE(file.isValid());
+
+    XM::Properties *p = file.audioProperties();
+    Mod::Tag *t = file.tag();
+
+    REQUIRE(p);
+    REQUIRE(t);
+
+    REQUIRE(p->length() == 0);
+    REQUIRE(p->bitrate() == 0);
+    REQUIRE(p->sampleRate() == 0);
+    REQUIRE(p->channels() == 8);
+    REQUIRE(p->lengthInPatterns() == 1);
+    REQUIRE(p->version() == 0);
+    REQUIRE(p->restartPosition() == 0);
+    REQUIRE(p->patternCount() == 1);
+    REQUIRE(p->instrumentCount() == 0);
+    REQUIRE(p->flags() == 1);
+    REQUIRE(p->tempo() == 6);
+    REQUIRE(p->bpmSpeed() == 125);
+    REQUIRE(t->title() == titleBefore);
+    REQUIRE(t->artist().isEmpty());
+    REQUIRE(t->album().isEmpty());
+    REQUIRE(t->comment().isEmpty());
+    REQUIRE(t->genre().isEmpty());
+    REQUIRE(t->year() == 0);
+    REQUIRE(t->track() == 0);
+    REQUIRE(t->trackerName().isEmpty());
+  }
+  SECTION("Write short comment")
+  {
+    testWriteTags(newCommentShort);
+  }
+  SECTION("Write long comment")
+  {
+    testWriteTags(newCommentLong);
+  }
+}

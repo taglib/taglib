@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
@@ -24,9 +24,10 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/it
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/xm
+  ${CMAKE_SOURCE_DIR}/3rdparty
 )
 
-SET(test_runner_SRCS
+set(test_runner_SRCS
   main.cpp
   test_list.cpp
   test_map.cpp
@@ -45,11 +46,10 @@ SET(test_runner_SRCS
   test_xiphcomment.cpp
   test_aiff.cpp
   test_riff.cpp
-  test_ogg.cpp
+  test_vorbis.cpp
   test_oggflac.cpp
   test_flac.cpp
-  test_flacpicture.cpp
-  test_flacunknownmetadatablock.cpp
+  test_flacmetadatablock.cpp
   test_ape.cpp
   test_apetag.cpp
   test_wav.cpp
@@ -57,7 +57,6 @@ SET(test_runner_SRCS
   test_wavpack.cpp
   test_mp4.cpp
   test_mp4item.cpp
-  test_mp4coverart.cpp
   test_asf.cpp
   test_mod.cpp
   test_s3m.cpp
@@ -68,11 +67,8 @@ SET(test_runner_SRCS
   test_speex.cpp
 )
 
-INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
+add_executable(test_runner ${test_runner_SRCS})
+target_link_libraries(test_runner tag)
 
-ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
-TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
-
-ADD_TEST(test_runner test_runner)
-ADD_CUSTOM_TARGET(check COMMAND ${CMAKE_CTEST_COMMAND} -V
-                  DEPENDS test_runner)
+add_test(test_runner test_runner)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -V DEPENDS test_runner)

@@ -23,50 +23,39 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
+#include <catch/catch.hpp>
 #include <tmap.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <tstring.h>
+#include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestMap : public CppUnit::TestFixture
+TEST_CASE("Generic Map")
 {
-  CPPUNIT_TEST_SUITE(TestMap);
-  CPPUNIT_TEST(testInsert);
-  CPPUNIT_TEST(testDetach);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testInsert()
+  SECTION("Insert elements")
   {
     Map<String, int> m1;
     m1.insert("foo", 3);
     m1.insert("bar", 5);
-    CPPUNIT_ASSERT_EQUAL(2U, m1.size());
-    CPPUNIT_ASSERT_EQUAL(3, m1["foo"]);
-    CPPUNIT_ASSERT_EQUAL(5, m1["bar"]);
+    REQUIRE(m1.size() == 2);
+    REQUIRE(m1["foo"] == 3);
+    REQUIRE(m1["bar"] == 5);
     m1.insert("foo", 7);
-    CPPUNIT_ASSERT_EQUAL(2U, m1.size());
-    CPPUNIT_ASSERT_EQUAL(7, m1["foo"]);
-    CPPUNIT_ASSERT_EQUAL(5, m1["bar"]);
+    REQUIRE(m1.size() == 2);
+    REQUIRE(m1["foo"] == 7);
+    REQUIRE(m1["bar"] == 5);
   }
-
-  void testDetach()
+  SECTION("Detach when returning non-const iterator")
   {
     Map<String, int> m1;
     m1.insert("alice", 5);
     m1.insert("bob", 9);
     m1.insert("carol", 11);
-
+    
     Map<String, int> m2 = m1;
     Map<String, int>::Iterator it = m2.find("bob");
     (*it).second = 99;
-    CPPUNIT_ASSERT_EQUAL(9,  m1["bob"]);
-    CPPUNIT_ASSERT_EQUAL(99, m2["bob"]);
+    REQUIRE(m1["bob"] == 9);
+    REQUIRE(m2["bob"] == 99);
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMap);
+}

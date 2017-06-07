@@ -23,127 +23,100 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
+#include <catch/catch.hpp>
+#include <apefile.h>
 #include <apetag.h>
 #include <id3v1tag.h>
-#include <tstringlist.h>
-#include <tbytevectorlist.h>
 #include <tpropertymap.h>
-#include <apefile.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestAPE : public CppUnit::TestFixture
+TEST_CASE("APE File")
 {
-  CPPUNIT_TEST_SUITE(TestAPE);
-  CPPUNIT_TEST(testProperties399);
-  CPPUNIT_TEST(testProperties399Tagged);
-  CPPUNIT_TEST(testProperties399Id3v2);
-  CPPUNIT_TEST(testProperties396);
-  CPPUNIT_TEST(testProperties390);
-  CPPUNIT_TEST(testFuzzedFile1);
-  CPPUNIT_TEST(testFuzzedFile2);
-  CPPUNIT_TEST(testStripAndProperties);
-  CPPUNIT_TEST(testRepeatedSave);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testProperties399()
+  SECTION("Read audio properties (v3.99 without tags)")
   {
     APE::File f(TEST_FILE_PATH_C("mac-399.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3990, f.audioProperties()->version());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3550);
+    REQUIRE(f.audioProperties()->bitrate() == 192);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 156556);
+    REQUIRE(f.audioProperties()->version() == 3990);
   }
-
-  void testProperties399Tagged()
+  SECTION("Read audio properties (v3.99 with APE tag)")
   {
     APE::File f(TEST_FILE_PATH_C("mac-399-tagged.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3990, f.audioProperties()->version());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3550);
+    REQUIRE(f.audioProperties()->bitrate() == 192);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 156556);
+    REQUIRE(f.audioProperties()->version() == 3990);
   }
-
-  void testProperties399Id3v2()
+  SECTION("Read audio properties (v3.99 with ID3v2 tag)")
   {
     APE::File f(TEST_FILE_PATH_C("mac-399-id3v2.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3990, f.audioProperties()->version());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3550);
+    REQUIRE(f.audioProperties()->bitrate() == 192);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 156556);
+    REQUIRE(f.audioProperties()->version() == 3990);
   }
-
-  void testProperties396()
+  SECTION("Read audio properties (v3.96)")
   {
     APE::File f(TEST_FILE_PATH_C("mac-396.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(162496U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3960, f.audioProperties()->version());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3685);
+    REQUIRE(f.audioProperties()->bitrate() == 0);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 162496);
+    REQUIRE(f.audioProperties()->version() == 3960);
   }
-
-  void testProperties390()
+  SECTION("Read audio properties (v3.90)")
   {
     APE::File f(TEST_FILE_PATH_C("mac-390-hdr.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(15, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(15, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(15630, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(689262U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3900, f.audioProperties()->version());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 15);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 15);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 15630);
+    REQUIRE(f.audioProperties()->bitrate() == 0);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 689262);
+    REQUIRE(f.audioProperties()->version() == 3900);
   }
-
-  void testFuzzedFile1()
+  SECTION("Open fuzzed file without crashing (1)")
   {
     APE::File f(TEST_FILE_PATH_C("longloop.ape"));
-    CPPUNIT_ASSERT(f.isValid());
+    REQUIRE(f.isValid());
   }
-
-  void testFuzzedFile2()
+  SECTION("Open fuzzed file without crashing (2)")
   {
     APE::File f(TEST_FILE_PATH_C("zerodiv.ape"));
-    CPPUNIT_ASSERT(f.isValid());
+    REQUIRE(f.isValid());
   }
-
-  void testStripAndProperties()
+  SECTION("Read properties correctly after stripping tags")
   {
-    ScopedFileCopy copy("mac-399", ".ape");
-
+    const ScopedFileCopy copy("mac-399", ".ape");
     {
       APE::File f(copy.fileName().c_str());
       f.APETag(true)->setTitle("APE");
@@ -152,22 +125,20 @@ public:
     }
     {
       APE::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
+      REQUIRE(f.properties()["TITLE"].front() == "APE");
       f.strip(APE::File::APE);
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
+      REQUIRE(f.properties()["TITLE"].front() == "ID3v1");
       f.strip(APE::File::ID3v1);
-      CPPUNIT_ASSERT(f.properties().isEmpty());
+      REQUIRE(f.properties().isEmpty());
     }
   }
-
-  void testRepeatedSave()
+  SECTION("Save tags repeatedly without breaking file")
   {
-    ScopedFileCopy copy("mac-399", ".ape");
-
+    const ScopedFileCopy copy("mac-399", ".ape");
     {
       APE::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      REQUIRE_FALSE(f.hasAPETag());
+      REQUIRE_FALSE(f.hasID3v1Tag());
 
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
@@ -181,11 +152,8 @@ public:
     }
     {
       APE::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasAPETag());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      REQUIRE(f.hasAPETag());
+      REQUIRE(f.hasID3v1Tag());
     }
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestAPE);
+}

@@ -23,79 +23,67 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <catch/catch.hpp>
 #include <tpropertymap.h>
-#include <tag.h>
 #include <id3v1tag.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace TagLib;
 
-class TestPropertyMap : public CppUnit::TestFixture
+TEST_CASE("PropertyMap")
 {
-  CPPUNIT_TEST_SUITE(TestPropertyMap);
-  CPPUNIT_TEST(testInvalidKeys);
-  CPPUNIT_TEST(testGetSet);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-  void testInvalidKeys()
+  SECTION("Safely handle invalid keys")
   {
     PropertyMap map1;
-    CPPUNIT_ASSERT(map1.isEmpty());
+    REQUIRE(map1.isEmpty());
     map1[L"\x00c4\x00d6\x00dc"].append("test");
-    CPPUNIT_ASSERT_EQUAL(map1.size(), 1u);
-
+    REQUIRE(map1.size() == 1);
+    
     PropertyMap map2;
     map2[L"\x00c4\x00d6\x00dc"].append("test");
-    CPPUNIT_ASSERT(map1 == map2);
-    CPPUNIT_ASSERT(map1.contains(map2));
-
+    REQUIRE(map1 == map2);
+    REQUIRE(map1.contains(map2));
+    
     map2["ARTIST"] = String("Test Artist");
-    CPPUNIT_ASSERT(map1 != map2);
-    CPPUNIT_ASSERT(map2.contains(map1));
-
+    REQUIRE(map1 != map2);
+    REQUIRE(map2.contains(map1));
+    
     map2[L"\x00c4\x00d6\x00dc"].append("test 2");
-    CPPUNIT_ASSERT(!map2.contains(map1));
-
+    REQUIRE_FALSE(map2.contains(map1));
   }
-
-  void testGetSet()
+  SECTION("Get and set properties")
   {
     ID3v1::Tag tag;
-
+    
     tag.setTitle("Test Title");
     tag.setArtist("Test Artist");
     tag.setAlbum("Test Album");
     tag.setYear(2015);
     tag.setTrack(10);
-
+    
     {
       PropertyMap prop = tag.properties();
-      CPPUNIT_ASSERT_EQUAL(String("Test Title"),  prop["TITLE"      ].front());
-      CPPUNIT_ASSERT_EQUAL(String("Test Artist"), prop["ARTIST"     ].front());
-      CPPUNIT_ASSERT_EQUAL(String("Test Album"),  prop["ALBUM"      ].front());
-      CPPUNIT_ASSERT_EQUAL(String("2015"),        prop["DATE"       ].front());
-      CPPUNIT_ASSERT_EQUAL(String("10"),          prop["TRACKNUMBER"].front());
-
+      REQUIRE(prop["TITLE"      ].front() == "Test Title");
+      REQUIRE(prop["ARTIST"     ].front() == "Test Artist");
+      REQUIRE(prop["ALBUM"      ].front() == "Test Album");
+      REQUIRE(prop["DATE"       ].front() == "2015");
+      REQUIRE(prop["TRACKNUMBER"].front() == "10");
+    
       prop["TITLE"      ].front() = "Test Title 2";
       prop["ARTIST"     ].front() = "Test Artist 2";
       prop["TRACKNUMBER"].front() = "5";
-
+    
       tag.setProperties(prop);
     }
-
-    CPPUNIT_ASSERT_EQUAL(String("Test Title 2"),  tag.title());
-    CPPUNIT_ASSERT_EQUAL(String("Test Artist 2"), tag.artist());
-    CPPUNIT_ASSERT_EQUAL(5U, tag.track());
-
+    
+    REQUIRE(tag.title() == "Test Title 2");
+    REQUIRE(tag.artist() == "Test Artist 2");
+    REQUIRE(tag.track() == 5);
+    
     tag.setProperties(PropertyMap());
-
-    CPPUNIT_ASSERT_EQUAL(String(""), tag.title());
-    CPPUNIT_ASSERT_EQUAL(String(""), tag.artist());
-    CPPUNIT_ASSERT_EQUAL(0U, tag.track());
+    
+    REQUIRE(tag.title().isEmpty());
+    REQUIRE(tag.artist().isEmpty());
+    REQUIRE(tag.track() == 0);
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestPropertyMap);
+}

@@ -148,3 +148,55 @@ private:
   const bool m_deleteFile;
   const string m_filename;
 };
+
+// Helper functions that enables Catch to print TagLib types.
+
+namespace Catch {
+
+#ifdef TAGLIB_BYTEVECTOR_H
+
+  inline std::string toString(TagLib::ByteVector const& value) 
+  {
+    std::stringstream ss;
+    ss << '\"';
+    for(TagLib::ByteVector::ConstIterator it = value.begin(); it != value.end(); ++it) {
+      if(' ' <= *it && *it <= '~')
+        ss << *it;
+      else
+        ss << ' ';
+    }
+    ss << '\"';
+    return ss.str();
+  }
+
+#endif
+
+#ifdef TAGLIB_STRING_H
+
+  inline std::string toString(TagLib::String const& value) 
+  {
+    std::stringstream ss;
+    ss << '\"' << value.to8Bit(true) << '\"';
+    return ss.str();
+  }
+
+#endif
+
+#ifdef TAGLIB_LIST_H
+  
+  template <typename T>
+  inline std::string toString(TagLib::List<T> const &value)
+  {
+    std::stringstream ss;
+    ss << "[ ";
+    for(typename TagLib::List<T>::ConstIterator it = value.begin(); it != value.end(); ++it) {
+      ss << *it;
+      if(it != --value.end())
+        ss << ", ";
+    }
+    ss << " ]";
+    return ss.str();
+  }
+  
+#endif
+}

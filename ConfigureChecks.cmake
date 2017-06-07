@@ -199,17 +199,8 @@ if(NOT ZLIB_SOURCE)
   endif()
 endif()
 
-# Determine whether CppUnit is installed.
-
-if(BUILD_TESTS AND NOT BUILD_SHARED_LIBS)
-  find_package(CppUnit)
-  if(NOT CppUnit_FOUND)
-    message(STATUS "CppUnit not found, disabling tests.")
-    set(BUILD_TESTS OFF)
-  endif()
-endif()
-
 # Detect WinRT mode
+
 if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
 	set(PLATFORM WINRT 1)
 endif()

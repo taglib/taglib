@@ -23,91 +23,53 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
+#include <catch/catch.hpp>
 #include <xiphcomment.h>
 #include <vorbisfile.h>
 #include <tpropertymap.h>
-#include <tdebug.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestXiphComment : public CppUnit::TestFixture
+TEST_CASE("Xiph comment")
 {
-  CPPUNIT_TEST_SUITE(TestXiphComment);
-  CPPUNIT_TEST(testYear);
-  CPPUNIT_TEST(testSetYear);
-  CPPUNIT_TEST(testTrack);
-  CPPUNIT_TEST(testSetTrack);
-  CPPUNIT_TEST(testInvalidKeys1);
-  CPPUNIT_TEST(testInvalidKeys2);
-  CPPUNIT_TEST(testClearComment);
-  CPPUNIT_TEST(testRemoveFields);
-  CPPUNIT_TEST(testPicture);
-  CPPUNIT_TEST(testLowercaseFields);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testYear()
+  SECTION("Year")
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.year());
+    REQUIRE(cmt.year() == 0);
     cmt.addField("YEAR", "2009");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2009, cmt.year());
+    REQUIRE(cmt.year() == 2009);
     cmt.addField("DATE", "2008");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2008, cmt.year());
+    REQUIRE(cmt.year() == 2008);
   }
-
-  void testSetYear()
+  SECTION("Set year")
   {
     Ogg::XiphComment cmt;
     cmt.addField("YEAR", "2009");
     cmt.addField("DATE", "2008");
     cmt.setYear(1995);
-    CPPUNIT_ASSERT(cmt.fieldListMap()["YEAR"].isEmpty());
-    CPPUNIT_ASSERT_EQUAL(String("1995"), cmt.fieldListMap()["DATE"].front());
+    REQUIRE(cmt.fieldListMap()["YEAR"].isEmpty());
+    REQUIRE(cmt.fieldListMap()["DATE"].front() == "1995");
   }
-
-  void testTrack()
+  SECTION("Track")
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.track());
+    REQUIRE(cmt.track() == 0);
     cmt.addField("TRACKNUM", "7");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)7, cmt.track());
+    REQUIRE(cmt.track() == 7);
     cmt.addField("TRACKNUMBER", "8");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)8, cmt.track());
+    REQUIRE(cmt.track() == 8);
   }
-
-  void testSetTrack()
+  SECTION("Set track")
   {
     Ogg::XiphComment cmt;
     cmt.addField("TRACKNUM", "7");
     cmt.addField("TRACKNUMBER", "8");
     cmt.setTrack(3);
-    CPPUNIT_ASSERT(cmt.fieldListMap()["TRACKNUM"].isEmpty());
-    CPPUNIT_ASSERT_EQUAL(String("3"), cmt.fieldListMap()["TRACKNUMBER"].front());
+    REQUIRE(cmt.fieldListMap()["TRACKNUM"].isEmpty());
+    REQUIRE(cmt.fieldListMap()["TRACKNUMBER"].front() == "3");
   }
-
-  void testInvalidKeys1()
-  {
-    PropertyMap map;
-    map[""] = String("invalid key: empty string");
-    map["A=B"] = String("invalid key: contains '='");
-    map["A~B"] = String("invalid key: contains '~'");
-    map["A\x7F" "B"] = String("invalid key: contains '\x7F'");
-    map[L"A\x3456" "B"] = String("invalid key: Unicode");
-
-    Ogg::XiphComment cmt;
-    PropertyMap unsuccessful = cmt.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)5, unsuccessful.size());
-    CPPUNIT_ASSERT(cmt.properties().isEmpty());
-  }
-
-  void testInvalidKeys2()
+  SECTION("Skip invalid keys")
   {
     Ogg::XiphComment cmt;
     cmt.addField("", "invalid key: empty string");
@@ -115,13 +77,26 @@ public:
     cmt.addField("A~B", "invalid key: contains '~'");
     cmt.addField("A\x7F" "B", "invalid key: contains '\x7F'");
     cmt.addField(L"A\x3456" "B", "invalid key: Unicode");
-    CPPUNIT_ASSERT_EQUAL(0U, cmt.fieldCount());
+    REQUIRE(cmt.fieldCount() == 0);
+    REQUIRE(cmt.isEmpty());
   }
-
-  void testClearComment()
+  SECTION("Skip invalid keys in PropertyMap")
   {
-    ScopedFileCopy copy("empty", ".ogg");
-
+    PropertyMap map;
+    map[""] = String("invalid key: empty string");
+    map["A=B"] = String("invalid key: contains '='");
+    map["A~B"] = String("invalid key: contains '~'");
+    map["A\x7F" "B"] = String("invalid key: contains '\x7F'");
+    map[L"A\x3456" "B"] = String("invalid key: Unicode");
+    
+    Ogg::XiphComment cmt;
+    PropertyMap unsuccessful = cmt.setProperties(map);
+    REQUIRE(unsuccessful.size() == 5);
+    REQUIRE(cmt.properties().isEmpty());
+  }
+  SECTION("Clear comment")
+  {
+    const ScopedFileCopy copy("empty", ".ogg");
     {
       Ogg::Vorbis::File f(copy.fileName().c_str());
       f.tag()->addField("COMMENT", "Comment1");
@@ -130,11 +105,10 @@ public:
     {
       Ogg::Vorbis::File f(copy.fileName().c_str());
       f.tag()->setComment("");
-      CPPUNIT_ASSERT_EQUAL(String(""), f.tag()->comment());
+      REQUIRE(f.tag()->comment().isEmpty());
     }
   }
-
-  void testRemoveFields()
+  SECTION("Remove fields")
   {
     Ogg::Vorbis::File f(TEST_FILE_PATH_C("empty.ogg"));
     f.tag()->addField("title", "Title1");
@@ -143,30 +117,27 @@ public:
     f.tag()->addField("TITLE", "Title3", false);
     f.tag()->addField("artist", "Artist1");
     f.tag()->addField("ARTIST", "Artist2", false);
-    CPPUNIT_ASSERT_EQUAL(String("Title1 Title1 Title2 Title3"), f.tag()->title());
-    CPPUNIT_ASSERT_EQUAL(String("Artist1 Artist2"), f.tag()->artist());
-
+    REQUIRE(f.tag()->title() == "Title1 Title1 Title2 Title3");
+    REQUIRE(f.tag()->artist() == "Artist1 Artist2");
+    
     f.tag()->removeFields("title", "Title1");
-    CPPUNIT_ASSERT_EQUAL(String("Title2 Title3"), f.tag()->title());
-    CPPUNIT_ASSERT_EQUAL(String("Artist1 Artist2"), f.tag()->artist());
-
+    REQUIRE(f.tag()->title() == "Title2 Title3");
+    REQUIRE(f.tag()->artist() == "Artist1 Artist2");
+    
     f.tag()->removeFields("Artist");
-    CPPUNIT_ASSERT_EQUAL(String("Title2 Title3"), f.tag()->title());
-    CPPUNIT_ASSERT(f.tag()->artist().isEmpty());
-
+    REQUIRE(f.tag()->title() == "Title2 Title3");
+    REQUIRE(f.tag()->artist().isEmpty());
+    
     f.tag()->removeAllFields();
-    CPPUNIT_ASSERT(f.tag()->title().isEmpty());
-    CPPUNIT_ASSERT(f.tag()->artist().isEmpty());
-    CPPUNIT_ASSERT_EQUAL(String("Xiph.Org libVorbis I 20050304"), f.tag()->vendorID());
+    REQUIRE(f.tag()->title().isEmpty());
+    REQUIRE(f.tag()->artist().isEmpty());
+    REQUIRE(f.tag()->vendorID() == "Xiph.Org libVorbis I 20050304");
   }
-
-  void testPicture()
+  SECTION("Remove fields")
   {
-    ScopedFileCopy copy("empty", ".ogg");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("empty", ".ogg");
     {
-      Vorbis::File f(newname.c_str());
+      Ogg::Vorbis::File f(copy.fileName().c_str());
       FLAC::Picture *newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
       newpic->setWidth(5);
@@ -180,36 +151,31 @@ public:
       f.save();
     }
     {
-      Vorbis::File f(newname.c_str());
-      List<FLAC::Picture *> lst = f.tag()->pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
-      CPPUNIT_ASSERT_EQUAL((int)5, lst[0]->width());
-      CPPUNIT_ASSERT_EQUAL((int)6, lst[0]->height());
-      CPPUNIT_ASSERT_EQUAL((int)16, lst[0]->colorDepth());
-      CPPUNIT_ASSERT_EQUAL((int)7, lst[0]->numColors());
-      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
-      CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());
+      Ogg::Vorbis::File f(copy.fileName().c_str());
+      const List<FLAC::Picture *> lst = f.tag()->pictureList();
+      REQUIRE(lst.size() == 1);
+      REQUIRE(lst[0]->width() == 5);
+      REQUIRE(lst[0]->height() == 6);
+      REQUIRE(lst[0]->colorDepth() == 16);
+      REQUIRE(lst[0]->numColors() == 7);
+      REQUIRE(lst[0]->mimeType() == "image/jpeg");
+      REQUIRE(lst[0]->description() == "new image");
+      REQUIRE(lst[0]->data() == "JPEG data");
     }
   }
-
-  void testLowercaseFields()
+  SECTION("Field name in lower case")
   {
     const ScopedFileCopy copy("lowercase-fields", ".ogg");
     {
       Vorbis::File f(copy.fileName().c_str());
-      List<FLAC::Picture *> lst = f.tag()->pictureList();
-      CPPUNIT_ASSERT_EQUAL(String("TEST TITLE"), f.tag()->title());
-      CPPUNIT_ASSERT_EQUAL(String("TEST ARTIST"), f.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      REQUIRE(f.tag()->title() == "TEST TITLE");
+      REQUIRE(f.tag()->artist() == "TEST ARTIST");
+      REQUIRE(f.tag()->pictureList().size() == 1);
       f.save();
     }
     {
       Vorbis::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.find("METADATA_BLOCK_PICTURE") > 0);
+      REQUIRE(f.find("METADATA_BLOCK_PICTURE") > 0);
     }
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestXiphComment);
+}

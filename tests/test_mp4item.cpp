@@ -23,40 +23,41 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
-#include <tag.h>
-#include <mp4coverart.h>
+#include <catch/catch.hpp>
 #include <mp4item.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <mp4coverart.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestMP4Item : public CppUnit::TestFixture
+TEST_CASE("MP4 Item")
 {
-  CPPUNIT_TEST_SUITE(TestMP4Item);
-  CPPUNIT_TEST(testCoverArtList);
-  CPPUNIT_TEST_SUITE_END();
+  SECTION("Copy cover art")
+  {
+    MP4::CoverArt c(MP4::CoverArt::PNG, "foo");
+    REQUIRE(c.format() == MP4::CoverArt::PNG);
+    REQUIRE(c.data() == "foo");
 
-public:
+    MP4::CoverArt c2(c);
+    REQUIRE(c2.format() == MP4::CoverArt::PNG);
+    REQUIRE(c2.data() == "foo");
 
-  void testCoverArtList()
+    MP4::CoverArt c3 = c;
+    REQUIRE(c3.format() == MP4::CoverArt::PNG);
+    REQUIRE(c3.data() == "foo");
+  }
+  SECTION("Read and write cover art list")
   {
     MP4::CoverArtList l;
     l.append(MP4::CoverArt(MP4::CoverArt::PNG, "foo"));
     l.append(MP4::CoverArt(MP4::CoverArt::JPEG, "bar"));
-
+    
     MP4::Item i(l);
     MP4::CoverArtList l2 = i.toCoverArtList();
-
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), l[0].data());
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("bar"), l[1].data());
+    
+    REQUIRE(l[0].format() == MP4::CoverArt::PNG);
+    REQUIRE(l[0].data() == "foo");
+    REQUIRE(l[1].format() == MP4::CoverArt::JPEG);
+    REQUIRE(l[1].data() == "bar");
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMP4Item);
+}

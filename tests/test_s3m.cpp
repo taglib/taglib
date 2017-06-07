@@ -23,105 +23,96 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <catch/catch.hpp>
 #include <s3mfile.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-static const String titleBefore("test song name");
-static const String titleAfter("changed title");
-
-static const String commentBefore(
-  "This is an instrument name.\n"
-  "Module file formats\n"
-  "abuse instrument names\n"
-  "as multiline comments.\n"
-  " ");
-
-static const String newComment(
-  "This is an instrument name!\n"
-  "Module file formats\n"
-  "abuse instrument names\n"
-  "as multiline comments.\n"
-  "-----------------------------------\n"
-  "This line will be dropped and the previous is truncated.");
-
-static const String commentAfter(
-  "This is an instrument name!\n"
-  "Module file formats\n"
-  "abuse instrument names\n"
-  "as multiline comments.\n"
-  "---------------------------");
-
-class TestS3M : public CppUnit::TestFixture
+namespace
 {
-  CPPUNIT_TEST_SUITE(TestS3M);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testWriteTags);
-  CPPUNIT_TEST_SUITE_END();
+  const String titleBefore("test song name");
+  const String titleAfter("changed title");
 
-public:
-  void testReadTags()
-  {
-    testRead(TEST_FILE_PATH_C("test.s3m"), titleBefore, commentBefore);
-  }
+  const String commentBefore(
+    "This is an instrument name.\n"
+    "Module file formats\n"
+    "abuse instrument names\n"
+    "as multiline comments.\n"
+    " ");
 
-  void testWriteTags()
-  {
-    ScopedFileCopy copy("test", ".s3m");
-    {
-      S3M::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != 0);
-      file.tag()->setTitle(titleAfter);
-      file.tag()->setComment(newComment);
-      file.tag()->setTrackerName("won't be saved");
-      CPPUNIT_ASSERT(file.save());
-    }
-    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
-    CPPUNIT_ASSERT(fileEqual(
-      copy.fileName(),
-      TEST_FILE_PATH_C("changed.s3m")));
-  }
+  const String newComment(
+    "This is an instrument name!\n"
+    "Module file formats\n"
+    "abuse instrument names\n"
+    "as multiline comments.\n"
+    "-----------------------------------\n"
+    "This line will be dropped and the previous is truncated.");
 
-private:
+  const String commentAfter(
+    "This is an instrument name!\n"
+    "Module file formats\n"
+    "abuse instrument names\n"
+    "as multiline comments.\n"
+    "---------------------------");
+
   void testRead(FileName fileName, const String &title, const String &comment)
   {
     S3M::File file(fileName);
 
-    CPPUNIT_ASSERT(file.isValid());
+    REQUIRE(file.isValid());
 
     S3M::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
-    CPPUNIT_ASSERT(0 != p);
-    CPPUNIT_ASSERT(0 != t);
+    REQUIRE(p);
+    REQUIRE(t);
 
-    CPPUNIT_ASSERT_EQUAL( 0, p->length());
-    CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL( 0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, p->channels());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)   0, p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(false, p->stereo());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)   5, p->sampleCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)   1, p->patternCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)   0, p->flags());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)4896, p->trackerVersion());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)   2, p->fileFormatVersion());
-    CPPUNIT_ASSERT_EQUAL((unsigned char) 64, p->globalVolume());
-    CPPUNIT_ASSERT_EQUAL((unsigned char) 48, p->masterVolume());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)125, p->tempo());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)  6, p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String("ScreamTracker III"), t->trackerName());
+    REQUIRE(p->length() == 0);
+    REQUIRE(p->bitrate() == 0);
+    REQUIRE(p->sampleRate() == 0);
+    REQUIRE(p->channels() == 16);
+    REQUIRE(p->lengthInPatterns() == 0);
+    REQUIRE_FALSE(p->stereo());
+    REQUIRE(p->sampleCount() == 5);
+    REQUIRE(p->patternCount() == 1);
+    REQUIRE(p->flags() == 0);
+    REQUIRE(p->trackerVersion() == 4896);
+    REQUIRE(p->fileFormatVersion() == 2);
+    REQUIRE(p->globalVolume() == 64);
+    REQUIRE(p->masterVolume() == 48);
+    REQUIRE(p->tempo() == 125);
+    REQUIRE(p->bpmSpeed() == 6);
+    REQUIRE(t->title() == title);
+    REQUIRE(t->artist().isEmpty());
+    REQUIRE(t->album().isEmpty());
+    REQUIRE(t->comment() == comment);
+    REQUIRE(t->genre().isEmpty());
+    REQUIRE(t->year() == 0);
+    REQUIRE(t->track() == 0);
+    REQUIRE(t->trackerName() == "ScreamTracker III");
   }
-};
+}
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestS3M);
+TEST_CASE("S3M File")
+{
+  SECTION("Read tags")
+  {
+    testRead(TEST_FILE_PATH_C("test.s3m"), titleBefore, commentBefore);
+  }
+  SECTION("Write tags")
+  {
+    const ScopedFileCopy copy("test", ".s3m");
+    {
+      S3M::File file(copy.fileName().c_str());
+      REQUIRE(file.tag() != 0);
+      file.tag()->setTitle(titleAfter);
+      file.tag()->setComment(newComment);
+      file.tag()->setTrackerName("won't be saved");
+      REQUIRE(file.save());
+    }
+    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
+    REQUIRE(fileEqual(copy.fileName(), TEST_FILE_PATH_C("changed.s3m")));
+  }
+}

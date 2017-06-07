@@ -23,117 +23,109 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <catch/catch.hpp>
 #include <itfile.h>
-#include <tstringlist.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-static const String titleBefore("test song name");
-static const String titleAfter("changed title");
-
-static const String commentBefore(
-  "This is a sample name.\n"
-  "In module file formats\n"
-  "sample names are abused\n"
-  "as multiline comments.\n"
-  " ");
-
-static const String newComment(
-  "This is a sample name!\n"
-  "In module file formats\n"
-  "sample names are abused\n"
-  "as multiline comments.\n"
-  "-----------------------------------\n"
-  "The previous line is truncated but starting with this line\n"
-  "the comment is not limeted in the line length but to 8000\n"
-  "additional characters (bytes).\n"
-  "\n"
-  "This is because it is saved in the 'message' proportion of\n"
-  "IT files.");
-
-static const String commentAfter(
-  "This is a sample name!\n"
-  "In module file formats\n"
-  "sample names are abused\n"
-  "as multiline comments.\n"
-  "-------------------------\n"
-  "The previous line is truncated but starting with this line\n"
-  "the comment is not limeted in the line length but to 8000\n"
-  "additional characters (bytes).\n"
-  "\n"
-  "This is because it is saved in the 'message' proportion of\n"
-  "IT files.");
-
-class TestIT : public CppUnit::TestFixture
+namespace
 {
-  CPPUNIT_TEST_SUITE(TestIT);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testWriteTags);
-  CPPUNIT_TEST_SUITE_END();
+  const String titleBefore("test song name");
+  const String titleAfter("changed title");
 
-public:
-  void testReadTags()
-  {
-    testRead(TEST_FILE_PATH_C("test.it"), titleBefore, commentBefore);
-  }
+  const String commentBefore(
+    "This is a sample name.\n"
+    "In module file formats\n"
+    "sample names are abused\n"
+    "as multiline comments.\n"
+    " ");
 
-  void testWriteTags()
-  {
-    ScopedFileCopy copy("test", ".it");
-    {
-      IT::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != 0);
-      file.tag()->setTitle(titleAfter);
-      file.tag()->setComment(newComment);
-      file.tag()->setTrackerName("won't be saved");
-      CPPUNIT_ASSERT(file.save());
-    }
-    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
-  }
+  const String newComment(
+    "This is a sample name!\n"
+    "In module file formats\n"
+    "sample names are abused\n"
+    "as multiline comments.\n"
+    "-----------------------------------\n"
+    "The previous line is truncated but starting with this line\n"
+    "the comment is not limeted in the line length but to 8000\n"
+    "additional characters (bytes).\n"
+    "\n"
+    "This is because it is saved in the 'message' proportion of\n"
+    "IT files.");
 
-private:
+  const String commentAfter(
+    "This is a sample name!\n"
+    "In module file formats\n"
+    "sample names are abused\n"
+    "as multiline comments.\n"
+    "-------------------------\n"
+    "The previous line is truncated but starting with this line\n"
+    "the comment is not limeted in the line length but to 8000\n"
+    "additional characters (bytes).\n"
+    "\n"
+    "This is because it is saved in the 'message' proportion of\n"
+    "IT files.");
+
   void testRead(FileName fileName, const String &title, const String &comment)
   {
     IT::File file(fileName);
 
-    CPPUNIT_ASSERT(file.isValid());
+    REQUIRE(file.isValid());
 
     IT::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
-    CPPUNIT_ASSERT(0 != p);
-    CPPUNIT_ASSERT(0 != t);
+    REQUIRE(p);
+    REQUIRE(t);
 
-    CPPUNIT_ASSERT_EQUAL( 0, p->length());
-    CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL( 0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(64, p->channels());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(true, p->stereo());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  0, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  5, p->sampleCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  1, p->patternCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)535, p->version());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)532, p->compatibleVersion());
-    CPPUNIT_ASSERT_EQUAL((unsigned short)  9, p->flags());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)128, p->globalVolume());
-    CPPUNIT_ASSERT_EQUAL((unsigned char) 48, p->mixVolume());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)125, p->tempo());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)  6, p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)128, p->panningSeparation());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)  0, p->pitchWheelDepth());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String("Impulse Tracker"), t->trackerName());
+    REQUIRE(p->length() == 0);
+    REQUIRE(p->bitrate() == 0);
+    REQUIRE(p->sampleRate() == 0);
+    REQUIRE(p->channels() == 64);
+    REQUIRE(p->lengthInPatterns() == 0);
+    REQUIRE(p->stereo() == true);
+    REQUIRE(p->instrumentCount() == 0);
+    REQUIRE(p->sampleCount() == 5);
+    REQUIRE(p->patternCount() == 1);
+    REQUIRE(p->version() == 535);
+    REQUIRE(p->compatibleVersion() == 532);
+    REQUIRE(p->flags() == 9);
+    REQUIRE(p->globalVolume() == 128);
+    REQUIRE(p->mixVolume() == 48);
+    REQUIRE(p->tempo() == 125);
+    REQUIRE(p->bpmSpeed() == 6);
+    REQUIRE(p->panningSeparation() == 128);
+    REQUIRE(p->pitchWheelDepth() == 0);
+    REQUIRE(t->title() == title);
+    REQUIRE(t->artist().isEmpty());
+    REQUIRE(t->album().isEmpty());
+    REQUIRE(t->comment() == comment);
+    REQUIRE(t->genre().isEmpty());
+    REQUIRE(t->year() == 0);
+    REQUIRE(t->track() == 0);
+    REQUIRE(t->trackerName() == "Impulse Tracker");
   }
-};
+}
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestIT);
+TEST_CASE("IT File")
+{
+  SECTION("Read tags")
+  {
+    testRead(TEST_FILE_PATH_C("test.it"), titleBefore, commentBefore);
+  }
+  SECTION("Write tags")
+  {
+    ScopedFileCopy copy("test", ".it");
+    {
+      IT::File file(copy.fileName().c_str());
+      REQUIRE(file.tag() != 0);
+      file.tag()->setTitle(titleAfter);
+      file.tag()->setComment(newComment);
+      file.tag()->setTrackerName("won't be saved");
+      REQUIRE(file.save());
+    }
+    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
+  }
+}

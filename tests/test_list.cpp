@@ -23,22 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <catch/catch.hpp>
 #include <tlist.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestList : public CppUnit::TestFixture
+TEST_CASE("Generic List")
 {
-  CPPUNIT_TEST_SUITE(TestList);
-  CPPUNIT_TEST(testAppend);
-  CPPUNIT_TEST(testDetach);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testAppend()
+  SECTION("Append and prepend elements")
   {
     List<int> l1;
     List<int> l2;
@@ -52,25 +45,21 @@ public:
     l3.append(2);
     l3.append(3);
     l3.append(4);
-    CPPUNIT_ASSERT_EQUAL(4U, l1.size());
-    CPPUNIT_ASSERT(l1 == l3);
+    REQUIRE(l1.size() == 4);
+    REQUIRE(l1 == l3);
   }
-
-  void testDetach()
+  SECTION("Detach when returning non-const iterator")
   {
-    List<int> l1;
-    l1.append(1);
-    l1.append(2);
-    l1.append(3);
-    l1.append(4);
-
-    List<int> l2 = l1;
-    List<int>::Iterator it = l2.find(3);
-    *it = 33;
-    CPPUNIT_ASSERT_EQUAL(3,  l1[2]);
-    CPPUNIT_ASSERT_EQUAL(33, l2[2]);
+      List<int> l1;
+      l1.append(1);
+      l1.append(2);
+      l1.append(3);
+      l1.append(4);
+    
+      List<int> l2 = l1;
+      List<int>::Iterator it = l2.find(3);
+      *it = 33;
+      REQUIRE(l1[2] == 3);
+      REQUIRE(l2[2] == 33);
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestList);
+}
