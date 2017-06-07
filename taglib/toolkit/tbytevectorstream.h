@@ -43,10 +43,17 @@ namespace TagLib {
   {
   public:
     /*!
-     * Construct a File object and opens the \a file.  \a file should be a
-     * be a C-string in the local file system encoding.
+     * Construct an in-memory stream based on \a data.
      */
+    // BIC: Merge with the constructor below.
     ByteVectorStream(const ByteVector &data);
+
+    /*!
+     * Construct an in-memory stream based on \a data and \a fileName.
+     *
+     * \note FileRef requires ByteVectorStream to hold a file name to work with.
+     */
+    ByteVectorStream(const ByteVector &data, FileName fileName);
 
     /*!
      * Destroys this ByteVectorStream instance.

@@ -23,16 +23,17 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tfilestream.h"
-#include "tstring.h"
-#include "tdebug.h"
-
 #ifdef _WIN32
 # include <windows.h>
 #else
 # include <stdio.h>
 # include <unistd.h>
 #endif
+
+#include "tstring.h"
+#include "tdebug.h"
+#include "tfilenamehandle.h"
+#include "tfilestream.h"
 
 using namespace TagLib;
 
@@ -42,7 +43,6 @@ namespace
 
   // Uses Win32 native API instead of POSIX API to reduce the resource consumption.
 
-  typedef FileName FileNameHandle;
   typedef HANDLE FileHandle;
 
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
@@ -82,12 +82,6 @@ namespace
   }
 
 #else   // _WIN32
-
-  struct FileNameHandle : public std::string
-  {
-    FileNameHandle(FileName name) : std::string(name) {}
-    operator FileName () const { return c_str(); }
-  };
 
   typedef FILE* FileHandle;
 

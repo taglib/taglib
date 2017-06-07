@@ -23,38 +23,40 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tbytevectorstream.h"
+#include <cstring>
+#include <cstdlib>
+
 #include "tstring.h"
 #include "tdebug.h"
-
-#include <stdio.h>
-#include <string.h>
-
-#include <stdlib.h>
+#include "tfilenamehandle.h"
+#include "tbytevectorstream.h"
 
 using namespace TagLib;
 
 class ByteVectorStream::ByteVectorStreamPrivate
 {
 public:
-  ByteVectorStreamPrivate(const ByteVector &data);
+  ByteVectorStreamPrivate(const ByteVector &data, FileName name) :
+    data(data),
+    name(name),
+    position(0) {}
 
-  ByteVector data;
-  long position;
+  ByteVector     data;
+  FileNameHandle name;
+  long           position;
 };
-
-ByteVectorStream::ByteVectorStreamPrivate::ByteVectorStreamPrivate(const ByteVector &data) :
-  data(data),
-  position(0)
-{
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
 ByteVectorStream::ByteVectorStream(const ByteVector &data) :
-  d(new ByteVectorStreamPrivate(data))
+  d(new ByteVectorStreamPrivate(data, ""))
+{
+}
+
+TagLib::ByteVectorStream::ByteVectorStream(const ByteVector &data, FileName fileName) :
+  d(new ByteVectorStreamPrivate(data, fileName))
 {
 }
 
@@ -65,7 +67,7 @@ ByteVectorStream::~ByteVectorStream()
 
 FileName ByteVectorStream::name() const
 {
-  return FileName(""); // XXX do we need a name?
+  return d->name;
 }
 
 ByteVector ByteVectorStream::readBlock(unsigned long length)
