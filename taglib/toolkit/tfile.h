@@ -159,9 +159,6 @@ namespace TagLib {
      *
      * Searching starts at \a fromOffset, which defaults to the beginning of the
      * file.
-     *
-     * \note This has the practical limitation that \a pattern can not be longer
-     * than the buffer size used by readBlock().  Currently this is 1024 bytes.
      */
     long find(const ByteVector &pattern,
               long fromOffset = 0,
@@ -175,9 +172,6 @@ namespace TagLib {
      *
      * Searching starts at \a fromOffset and proceeds from the that point to the
      * beginning of the file and defaults to the end of the file.
-     *
-     * \note This has the practical limitation that \a pattern can not be longer
-     * than the buffer size used by readBlock().  Currently this is 1024 bytes.
      */
     long rfind(const ByteVector &pattern,
                long fromOffset = 0,
