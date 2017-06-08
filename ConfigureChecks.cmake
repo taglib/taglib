@@ -209,3 +209,7 @@ if(BUILD_TESTS AND NOT BUILD_SHARED_LIBS)
   endif()
 endif()
 
+# Detect WinRT mode
+if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
+	set(PLATFORM WINRT 1)
+endif()
