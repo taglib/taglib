@@ -27,16 +27,13 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/ebml
   ${CMAKE_CURRENT_SOURCE_DIR}/ebml/matroska
   ${CMAKE_CURRENT_SOURCE_DIR}/dsf
+  ${CMAKE_SOURCE_DIR}/3rdparty
 )
 
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
 elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
-endif()
-
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIR})
 endif()
 
 set(tag_HDRS

@@ -56,7 +56,7 @@ namespace
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
+#if defined (PLATFORM_WINRT)
     return CreateFile2(path.wstr(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
 #else
     return CreateFileW(path.wstr(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
