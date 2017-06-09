@@ -43,14 +43,7 @@
 # define SHARED_PTR std::shared_ptr
 # define SCOPED_PTR std::unique_ptr
 
-#elif defined(HAVE_BOOST_SMART_PTR)
-
-# include <boost/shared_ptr.hpp>
-# include <boost/scoped_ptr.hpp>
-# define SHARED_PTR boost::shared_ptr
-# define SCOPED_PTR boost::scoped_ptr
-
-#else // !HAVE_STD_SMART_PTR && !HAVE_BOOST_SMART_PTR
+#else // !HAVE_STD_SMART_PTR
 
 # include <algorithm>
 # include <trefcounter.h>

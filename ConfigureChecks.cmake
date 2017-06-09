@@ -122,18 +122,6 @@ check_cxx_source_compiles("
   }
 " HAVE_STD_SMART_PTR)
 
-if(NOT HAVE_STD_SMART_PTR)
-  check_cxx_source_compiles("
-    #include <boost/shared_ptr.hpp>
-    #include <boost/scoped_ptr.hpp>
-    int main() {
-      boost::shared_ptr<int> x;
-      boost::scoped_ptr<int> y;
-      return 0;
-    }
-  " HAVE_BOOST_SMART_PTR)
-endif()
-
 # Determine which kind of byte swap functions your compiler supports.
 
 check_cxx_source_compiles("

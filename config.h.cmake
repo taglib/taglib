@@ -24,7 +24,6 @@
 
 /* Defined if your compiler supports shared_ptr */
 #cmakedefine   HAVE_STD_SMART_PTR 1
-#cmakedefine   HAVE_BOOST_SMART_PTR 1
 
 /* Defined if your compiler supports some safer version of vsprintf */
 #cmakedefine   HAVE_VSNPRINTF 1
