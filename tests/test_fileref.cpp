@@ -73,6 +73,7 @@ namespace
     }
     {
       FileRef f(copy.fileName().c_str());
+      REQUIRE(dynamic_cast<T*>(f.file()));
       REQUIRE_FALSE(f.isNull());
       REQUIRE(f.tag()->artist() == "test artist");
       REQUIRE(f.tag()->title() == "test title");
@@ -90,6 +91,7 @@ namespace
     }
     {
       FileRef f(copy.fileName().c_str());
+      REQUIRE(dynamic_cast<T*>(f.file()));
       REQUIRE_FALSE(f.isNull());
       REQUIRE(f.tag()->artist() == "ttest artist");
       REQUIRE(f.tag()->title() == "ytest title");
@@ -99,6 +101,7 @@ namespace
       REQUIRE(f.tag()->year() == 2080);
     }
 
+    // Open FileStream associated with file name.
     {
       FileStream fs(copy.fileName().c_str());
       FileRef f(&fs);
@@ -118,7 +121,6 @@ namespace
       f.tag()->setYear(2020);
       f.save();
     }
-
     ByteVector fileContent;
     {
       FileStream fs(copy.fileName().c_str());
@@ -136,6 +138,7 @@ namespace
       fileContent = fs.readBlock(fs.length());
     }
 
+    // Open ByteVectorStream not associated with file name.
     {
       ByteVectorStream bs(fileContent);
       FileRef f(&bs);
