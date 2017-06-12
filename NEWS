@@ -2,13 +2,15 @@
 
  * Added support for WinRT.
  * Added support for classical music tags of iTunes 12.5.
+ * Enabled FileRef to detect file types based on the stream content.
  * Dropped support for Windows 9x and NT 4.0 or older.
  * Fixed reading MP4 atoms with zero length.
  * Fixed reading FLAC files with zero-sized seektables.
  * Fixed handling of lowercase field names in Vorbis Comments.
  * Fixed handling of 'rate' atoms in MP4 files.
+ * Fixed handling of invalid UTF-8 sequences.
  * Fixed possible file corruptions when saving Ogg files.
- * Better handling of invalid UTF-8 sequences.
+ * Marked FileRef::create() deprecated.
  * Several smaller bug fixes and performance improvements.
 
 TagLib 1.11.1 (Oct 24, 2016)

@@ -77,3 +77,29 @@ long long Utils::findAPE(File *file, long long id3v1Location)
 
   return -1;
 }
+
+ByteVector TagLib::Utils::readHeader(IOStream *stream, size_t length,
+                                     bool skipID3v2, long long *headerOffset)
+{
+  if(!stream || !stream->isOpen())
+    return ByteVector();
+
+  const long long originalPosition = stream->tell();
+  long long bufferOffset = 0;
+
+  if(skipID3v2) {
+    stream->seek(0);
+    const ByteVector data = stream->readBlock(ID3v2::Header::size());
+    if(data.startsWith(ID3v2::Header::fileIdentifier()))
+      bufferOffset = ID3v2::Header(data).completeTagSize();
+  }
+
+  stream->seek(bufferOffset);
+  const ByteVector header = stream->readBlock(length);
+  stream->seek(originalPosition);
+
+  if(headerOffset)
+    *headerOffset = bufferOffset;
+
+  return header;
+}

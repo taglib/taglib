@@ -30,6 +30,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <tagutils.h>
 
 #include "speexfile.h"
 
@@ -52,6 +53,19 @@ public:
   Ogg::XiphComment *comment;
   AudioProperties *properties;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+bool Ogg::Speex::File::isSupported(IOStream *stream)
+{
+  // A Speex file has IDs "OggS" and "Speex   " somewhere.
+
+  const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
+  return (buffer.find("OggS") != ByteVector::npos()
+    && buffer.find("Speex   ") != ByteVector::npos());
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members

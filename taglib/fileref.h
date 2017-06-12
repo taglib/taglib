@@ -304,7 +304,25 @@ namespace TagLib {
      */
     bool operator!=(const FileRef &ref) const;
 
+    /*!
+     * A simple implementation of file type guessing.  If \a readAudioProperties
+     * is true then the audio properties will be read using
+     * \a audioPropertiesStyle.  If \a readAudioProperties is false then
+     * \a audioPropertiesStyle will be ignored.
+     *
+     * \note You generally shouldn't use this method, but instead the constructor
+     * directly.
+     *
+     * \deprecated
+     */
+    static File *create(FileName fileName,
+                        bool readAudioProperties = true,
+                        AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
+
   private:
+    void parse(FileName fileName, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle);
+    void parse(IOStream *stream, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle);
+
     class FileRefPrivate;
     FileRefPrivate *d;
   };

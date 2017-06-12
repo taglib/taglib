@@ -197,10 +197,8 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
     d->data->version = Version2;
   else if(versionBits == 3)
     d->data->version = Version1;
-  else {
-    debug("MPEG::Header::parse() -- Invalid MPEG version bits.");
+  else
     return;
-  }
 
   // Set the MPEG layer
 
@@ -212,10 +210,8 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
     d->data->layer = 2;
   else if(layerBits == 3)
     d->data->layer = 1;
-  else {
-    debug("MPEG::Header::parse() -- Invalid MPEG layer bits.");
+  else
     return;
-  }
 
   d->data->protectionEnabled = (static_cast<unsigned char>(data[1] & 0x01) == 0);
 
@@ -244,10 +240,8 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
 
   d->data->bitrate = bitrates[versionIndex][layerIndex][bitrateIndex];
 
-  if(d->data->bitrate == 0) {
-    debug("MPEG::Header::parse() -- Invalid bit rate.");
+  if(d->data->bitrate == 0)
     return;
-  }
 
   // Set the sample rate
 
@@ -264,7 +258,6 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
   d->data->sampleRate = sampleRates[d->data->version][samplerateIndex];
 
   if(d->data->sampleRate == 0) {
-    debug("MPEG::Header::parse() -- Invalid sample rate.");
     return;
   }
 
@@ -311,20 +304,16 @@ void MPEG::Header::parse(File *file, long long offset, bool checkLength)
     file->seek(offset + d->data->frameLength);
     const ByteVector nextData = file->readBlock(4);
 
-    if(nextData.size() < 4) {
-      debug("MPEG::Header::parse() -- Could not read the next frame header.");
+    if(nextData.size() < 4)
       return;
-    }
 
     const unsigned int HeaderMask = 0xfffe0c00;
 
     const unsigned int header     = data.toUInt32BE(0)     & HeaderMask;
     const unsigned int nextHeader = nextData.toUInt32BE(0) & HeaderMask;
 
-    if(header != nextHeader) {
-      debug("MPEG::Header::parse() -- The next frame was not consistent with this frame.");
+    if(header != nextHeader)
       return;
-    }
   }
 
   // Now that we're done parsing, set this to be a valid frame.
