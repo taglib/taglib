@@ -80,7 +80,6 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testAIFF_1);
   CPPUNIT_TEST(testAIFF_2);
   CPPUNIT_TEST(testUnsupported);
-  CPPUNIT_TEST(testCreate);
   CPPUNIT_TEST(testFileResolver);
   CPPUNIT_TEST_SUITE_END();
 
@@ -296,19 +295,6 @@ public:
 
     FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xx"));
     CPPUNIT_ASSERT(f2.isNull());
-  }
-
-  void testCreate()
-  {
-    // This is depricated. But worth it to test.
-
-    File *f = FileRef::create(TEST_FILE_PATH_C("empty_vorbis.oga"));
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File*>(f));
-    delete f;
-
-    f = FileRef::create(TEST_FILE_PATH_C("xing.mp3"));
-    CPPUNIT_ASSERT(dynamic_cast<MPEG::File*>(f));
-    delete f;
   }
 
   void testFileResolver()
