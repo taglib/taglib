@@ -121,6 +121,14 @@ namespace TagLib {
        */
       virtual bool save();
 
+      /*!
+       * Check if the given \a stream can be opened as an Ogg Vorbis file.
+       *
+       * \note This method is designed to do a quick check.  The result may
+       * not necessarily be correct.
+       */
+      static bool isSupported(IOStream *stream);
+
     private:
       File(const File &);
       File &operator=(const File &);

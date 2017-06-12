@@ -27,6 +27,7 @@
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
 #include <tstring.h>
+#include <tagutils.h>
 
 #include "asffile.h"
 #include "asftag.h"
@@ -471,6 +472,18 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, unsigned in
       break;
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+bool ASF::File::isSupported(IOStream *stream)
+{
+  // An ASF file has to start with the designated GUID.
+
+  const ByteVector id = Utils::readHeader(stream, 16, false);
+  return (id == headerGuid);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
