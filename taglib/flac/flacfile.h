@@ -211,16 +211,6 @@ namespace TagLib {
       Ogg::XiphComment *xiphComment(bool create = false);
 
       /*!
-       * Set the ID3v2::FrameFactory to something other than the default.  This
-       * can be used to specify the way that ID3v2 frames will be interpreted
-       * when
-       *
-       * \see ID3v2FrameFactory
-       * \deprecated This value should be passed in via the constructor
-       */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
-
-      /*!
        * Returns a list of pictures attached to the FLAC file.
        */
       List<Picture *> pictureList();

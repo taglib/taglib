@@ -271,14 +271,6 @@ namespace TagLib {
       bool strip(int tags, bool freeMemory);
 
       /*!
-       * Set the ID3v2::FrameFactory to something other than the default.
-       *
-       * \see ID3v2FrameFactory
-       * \deprecated This value should be passed in via the constructor
-       */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
-
-      /*!
        * Returns the position in the file of the first MPEG frame.
        */
       long long firstFrameOffset();

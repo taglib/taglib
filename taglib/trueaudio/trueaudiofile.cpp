@@ -148,11 +148,6 @@ TrueAudio::AudioProperties *TrueAudio::File::audioProperties() const
   return d->properties;
 }
 
-void TrueAudio::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
-}
-
 bool TrueAudio::File::save()
 {
   if(readOnly()) {

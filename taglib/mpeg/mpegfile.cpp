@@ -363,11 +363,6 @@ bool MPEG::File::strip(int tags, bool freeMemory)
   return true;
 }
 
-void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
-}
-
 long long MPEG::File::nextFrameOffset(long long position)
 {
   ByteVector frameSyncBytes(2, '\0');
