@@ -277,14 +277,6 @@ namespace TagLib {
     bool isEmpty() const;
 
     /*!
-     * Returns a CRC checksum of the byte vector's data.
-     *
-     * \note This uses an uncommon variant of CRC32 specializes in Ogg.
-     */
-    // BIC: Remove or make generic.
-    unsigned int checksum() const;
-
-    /*!
      * Converts the 2 bytes at \a offset of the vector to a short as a signed
      * 16-bit little-endian integer.
      *
