@@ -23,41 +23,38 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
+#include <catch/catch.hpp>
 #include <tbytevectorlist.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestByteVectorList : public CppUnit::TestFixture
+TEST_CASE("ByteVectorList")
 {
-  CPPUNIT_TEST_SUITE(TestByteVectorList);
-  CPPUNIT_TEST(testSplitSingleChar);
-  CPPUNIT_TEST(testSplitSingleChar_2);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testSplitSingleChar()
+  SECTION("Split by single char")
   {
-    ByteVector v("a b");
+    const ByteVector v1("a b");
+    const ByteVectorList l1 = ByteVectorList::split(v1, " ");
+    REQUIRE(l1.size() == 2);
+    REQUIRE(l1[0] == "a");
+    REQUIRE(l1[1] == "b");
 
-    ByteVectorList l = ByteVectorList::split(v, " ");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, l.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("a"), l[0]);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("b"), l[1]);
+    const ByteVector v2("a");
+    const ByteVectorList l2 = ByteVectorList::split(v2, " ");
+    REQUIRE(l2.size() == 1);
+    REQUIRE(l2[0] == "a");
   }
-
-  void testSplitSingleChar_2()
+  SECTION("Split by string")
   {
-    ByteVector v("a");
+    const ByteVector v1("ab01cd");
+    const ByteVectorList l1 = ByteVectorList::split(v1, "01");
+    REQUIRE(l1.size() == 2);
+    REQUIRE(l1[0] == "ab");
+    REQUIRE(l1[1] == "cd");
 
-    ByteVectorList l = ByteVectorList::split(v, " ");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1, l.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("a"), l[0]);
+    const ByteVector v2("ab");
+    const ByteVectorList l2 = ByteVectorList::split(v2, "01");
+    REQUIRE(l2.size() == 1);
+    REQUIRE(l2[0] == "ab");
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestByteVectorList);
+}

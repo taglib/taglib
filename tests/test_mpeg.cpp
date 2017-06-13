@@ -23,267 +23,240 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
-#include <tstring.h>
-#include <tpropertymap.h>
+#include <catch/catch.hpp>
 #include <mpegfile.h>
+#include <xingheader.h>
 #include <id3v2tag.h>
 #include <id3v1tag.h>
 #include <apetag.h>
-#include <mpegproperties.h>
-#include <xingheader.h>
-#include <mpegheader.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestMPEG : public CppUnit::TestFixture
+TEST_CASE("MPEG File")
 {
-  CPPUNIT_TEST_SUITE(TestMPEG);
-  CPPUNIT_TEST(testAudioPropertiesXingHeaderCBR);
-  CPPUNIT_TEST(testAudioPropertiesXingHeaderVBR);
-  CPPUNIT_TEST(testAudioPropertiesVBRIHeader);
-  CPPUNIT_TEST(testAudioPropertiesNoVBRHeaders);
-  CPPUNIT_TEST(testSkipInvalidFrames1);
-  CPPUNIT_TEST(testSkipInvalidFrames2);
-  CPPUNIT_TEST(testSkipInvalidFrames3);
-  CPPUNIT_TEST(testVersion2DurationWithXingHeader);
-  CPPUNIT_TEST(testSaveID3v24);
-  CPPUNIT_TEST(testSaveID3v24WrongParam);
-  CPPUNIT_TEST(testSaveID3v23);
-  CPPUNIT_TEST(testDuplicateID3v2);
-  CPPUNIT_TEST(testFuzzedFile);
-  CPPUNIT_TEST(testFrameOffset);
-  CPPUNIT_TEST(testStripAndProperties);
-  CPPUNIT_TEST(testRepeatedSave1);
-  CPPUNIT_TEST(testRepeatedSave2);
-  CPPUNIT_TEST(testRepeatedSave3);
-  CPPUNIT_TEST(testEmptyID3v2);
-  CPPUNIT_TEST(testEmptyID3v1);
-  CPPUNIT_TEST(testEmptyAPE);
-  CPPUNIT_TEST(testIgnoreGarbage);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testAudioPropertiesXingHeaderCBR()
+  SECTION("Read audio properties (CBR with Xing header)")
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_cbr.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::Xing, f.audioProperties()->xingHeader()->type());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 1887);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 1887);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 1887164);
+    REQUIRE(f.audioProperties()->bitrate() == 64);
+    REQUIRE(f.audioProperties()->channels() == 1);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->xingHeader()->type() == MPEG::XingHeader::Xing);
   }
-
-  void testAudioPropertiesXingHeaderVBR()
+  SECTION("Read audio properties (VBR with Xing header)")
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_vbr.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(70, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::Xing, f.audioProperties()->xingHeader()->type());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 1887);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 1887);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 1887164);
+    REQUIRE(f.audioProperties()->bitrate() == 70);
+    REQUIRE(f.audioProperties()->channels() == 1);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->xingHeader()->type() == MPEG::XingHeader::Xing);
   }
-
-  void testAudioPropertiesVBRIHeader()
+  SECTION("Read audio properties (VBR with VBRI header)")
   {
     MPEG::File f(TEST_FILE_PATH_C("rare_frames.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(222198, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(233, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::VBRI, f.audioProperties()->xingHeader()->type());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 222);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 222);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 222198);
+    REQUIRE(f.audioProperties()->bitrate() == 233);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->xingHeader()->type() == MPEG::XingHeader::VBRI);
   }
-
-  void testAudioPropertiesNoVBRHeaders()
+  SECTION("Read audio properties (CBR without VBR headers)")
   {
     MPEG::File f(TEST_FILE_PATH_C("bladeenc.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3553, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3553);
+    REQUIRE(f.audioProperties()->bitrate() == 64);
+    REQUIRE(f.audioProperties()->channels() == 1);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE_FALSE(f.audioProperties()->xingHeader());
 
     const long last = f.lastFrameOffset();
     const MPEG::Header lastHeader(&f, last, false);
 
-    CPPUNIT_ASSERT_EQUAL(28213L, last);
-    CPPUNIT_ASSERT_EQUAL(209, lastHeader.frameLength());
+    REQUIRE(last == 28213);
+    REQUIRE(lastHeader.frameLength() == 209);
   }
-
-  void testSkipInvalidFrames1()
-  {
-    MPEG::File f(TEST_FILE_PATH_C("invalid-frames1.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(392, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(160, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
-  }
-
-  void testSkipInvalidFrames2()
-  {
-    MPEG::File f(TEST_FILE_PATH_C("invalid-frames2.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(314, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
-  }
-
-  void testSkipInvalidFrames3()
-  {
-    MPEG::File f(TEST_FILE_PATH_C("invalid-frames3.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(183, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(320, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
-  }
-
-  void testVersion2DurationWithXingHeader()
+  SECTION("Read audio properties (MPEG2 with Xing header)")
   {
     MPEG::File f(TEST_FILE_PATH_C("mpeg2.mp3"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(5387285, f.audioProperties()->lengthInMilliseconds());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 5387);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 5387);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 5387285);
+    REQUIRE(f.audioProperties()->bitrate() == 25);
+    REQUIRE(f.audioProperties()->channels() == 1);
+    REQUIRE(f.audioProperties()->sampleRate() == 22050);
+    REQUIRE(f.audioProperties()->xingHeader()->type() == MPEG::XingHeader::Xing);
   }
-
-  void testSaveID3v24()
+  SECTION("Skip broken MPEG frames (1)")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
-
-    String xxx = ByteVector(254, 'X');
+    MPEG::File f(TEST_FILE_PATH_C("invalid-frames1.mp3"));
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 0);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 0);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 392);
+    REQUIRE(f.audioProperties()->bitrate() == 160);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE_FALSE(f.audioProperties()->xingHeader());
+  }
+  SECTION("Skip broken MPEG frames (2)")
+  {
+    MPEG::File f(TEST_FILE_PATH_C("invalid-frames2.mp3"));
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 0);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 0);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 314);
+    REQUIRE(f.audioProperties()->bitrate() == 192);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE_FALSE(f.audioProperties()->xingHeader());
+  }
+  SECTION("Skip broken MPEG frames (3)")
+  {
+    MPEG::File f(TEST_FILE_PATH_C("invalid-frames3.mp3"));
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 0);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 0);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 183);
+    REQUIRE(f.audioProperties()->bitrate() == 320);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE_FALSE(f.audioProperties()->xingHeader());
+  }
+  SECTION("Skip garbage and update ID3v2 tag correctly")
+  {
+    const ScopedFileCopy copy("garbage", ".mp3");
     {
-      MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(false, f.hasID3v2Tag());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.isValid());
+      REQUIRE(f.hasID3v2Tag());
+      REQUIRE(f.firstFrameOffset() == 2255);
+      REQUIRE(f.lastFrameOffset() == 6015);
+      REQUIRE(f.ID3v2Tag()->title() == "Title A");
+      f.ID3v2Tag()->setTitle("Title B");
+      f.save();
+    }
+    {
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.isValid());
+      REQUIRE(f.hasID3v2Tag());
+      REQUIRE(f.ID3v2Tag()->title() == "Title B");
+    }
+  }
+  SECTION("Save ID3v2.4 tag")
+  {
+    const ScopedFileCopy copy("xing", ".mp3");
+    const String xxx = longText(254);
+    {
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v2Tag());
 
       f.tag()->setTitle(xxx);
       f.tag()->setArtist("Artist A");
       f.save(MPEG::File::AllTags, true, 4);
-      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
+      REQUIRE(f.hasID3v2Tag());
     }
     {
-      MPEG::File f2(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)4, f2.ID3v2Tag()->header()->majorVersion());
-      CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.ID3v2Tag()->header()->majorVersion() == 4);
+      REQUIRE(f.tag()->artist() == "Artist A");
+      REQUIRE(f.tag()->title() == xxx);
     }
   }
-
-  void testSaveID3v24WrongParam()
+  SECTION("Save ID3v2.4 tag with wrong parameter")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
-
-    String xxx = ByteVector(254, 'X');
+    const ScopedFileCopy copy("xing", ".mp3");
+    const String xxx = longText(254);
     {
-      MPEG::File f(newname.c_str());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v2Tag());
+
       f.tag()->setTitle(xxx);
       f.tag()->setArtist("Artist A");
       f.save(MPEG::File::AllTags, true, 8);
+      REQUIRE(f.hasID3v2Tag());
     }
     {
-      MPEG::File f2(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)4, f2.ID3v2Tag()->header()->majorVersion());
-      CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.ID3v2Tag()->header()->majorVersion() == 4);
+      REQUIRE(f.tag()->artist() == "Artist A");
+      REQUIRE(f.tag()->title() == xxx);
     }
   }
-
-  void testSaveID3v23()
+  SECTION("Save ID3v2.3 tag")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
-
-    String xxx = ByteVector(254, 'X');
+    const ScopedFileCopy copy("xing", ".mp3");
+    const String xxx = longText(254);
     {
-      MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(false, f.hasID3v2Tag());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v2Tag());
 
       f.tag()->setTitle(xxx);
       f.tag()->setArtist("Artist A");
       f.save(MPEG::File::AllTags, true, 3);
-      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
+      REQUIRE(f.hasID3v2Tag());
     }
     {
-      MPEG::File f2(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)3, f2.ID3v2Tag()->header()->majorVersion());
-      CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.ID3v2Tag()->header()->majorVersion() == (unsigned int)3);
+      REQUIRE(f.tag()->artist() == "Artist A");
+      REQUIRE(f.tag()->title() == xxx);
     }
   }
-
-  void testDuplicateID3v2()
+  SECTION("Skip duplicate ID3v2 tags")
   {
     MPEG::File f(TEST_FILE_PATH_C("duplicate_id3v2.mp3"));
 
     // duplicate_id3v2.mp3 has duplicate ID3v2 tags.
     // Sample rate will be 32000 if can't skip the second tag.
 
-    CPPUNIT_ASSERT(f.hasID3v2Tag());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    REQUIRE(f.hasID3v2Tag());
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
   }
-
-  void testFuzzedFile()
+  SECTION("Open fuzzed file without crashing")
   {
     MPEG::File f(TEST_FILE_PATH_C("excessive_alloc.mp3"));
-    CPPUNIT_ASSERT(f.isValid());
+    REQUIRE(f.isValid());
   }
-
-  void testFrameOffset()
+  SECTION("Locate MPEG frames in tagged files")
   {
     {
       MPEG::File f(TEST_FILE_PATH_C("ape.mp3"));
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((long)0x0000, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL((long)0x1FD6, f.lastFrameOffset());
+      REQUIRE(f.isValid());
+      REQUIRE(f.firstFrameOffset() == 0x0000);
+      REQUIRE(f.lastFrameOffset() == 0x1FD6);
     }
     {
       MPEG::File f(TEST_FILE_PATH_C("ape-id3v1.mp3"));
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((long)0x0000, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL((long)0x1FD6, f.lastFrameOffset());
+      REQUIRE(f.isValid());
+      REQUIRE(f.firstFrameOffset() == 0x0000);
+      REQUIRE(f.lastFrameOffset() == 0x1FD6);
     }
     {
       MPEG::File f(TEST_FILE_PATH_C("ape-id3v2.mp3"));
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL((long)0x041A, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL((long)0x23F0, f.lastFrameOffset());
+      REQUIRE(f.isValid());
+      REQUIRE(f.firstFrameOffset() == 0x041A);
+      REQUIRE(f.lastFrameOffset() == 0x23F0);
     }
   }
-
-  void testStripAndProperties()
+  SECTION("Read property map correctly after stripping tags")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-
+    const ScopedFileCopy copy("xing", ".mp3");
     {
       MPEG::File f(copy.fileName().c_str());
       f.ID3v2Tag(true)->setTitle("ID3v2");
@@ -293,54 +266,50 @@ public:
     }
     {
       MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("ID3v2"), f.properties()["TITLE"].front());
+      REQUIRE(f.properties()["TITLE"].front() == "ID3v2");
       f.strip(MPEG::File::ID3v2);
-      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
+      REQUIRE(f.properties()["TITLE"].front() == "APE");
       f.strip(MPEG::File::APE);
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
+      REQUIRE(f.properties()["TITLE"].front() == "ID3v1");
       f.strip(MPEG::File::ID3v1);
-      CPPUNIT_ASSERT(f.properties().isEmpty());
+      REQUIRE(f.properties().isEmpty());
     }
   }
-
-  void testRepeatedSave1()
+  SECTION("Save tags repeatedly without breaking file (1)")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-
+    const ScopedFileCopy copy("xing", ".mp3");
+    const String text = longText(4096);
     {
       MPEG::File f(copy.fileName().c_str());
-      f.ID3v2Tag(true)->setTitle(std::string(4096, 'X').c_str());
+      f.ID3v2Tag(true)->setTitle(text);
       f.save();
     }
     {
       MPEG::File f(copy.fileName().c_str());
       f.ID3v2Tag(true)->setTitle("");
       f.save();
-      f.ID3v2Tag(true)->setTitle(std::string(4096, 'X').c_str());
+      f.ID3v2Tag(true)->setTitle(text);
       f.save();
-      CPPUNIT_ASSERT_EQUAL(5141L, f.firstFrameOffset());
+      REQUIRE(f.firstFrameOffset() == 5141);
     }
   }
-
-  void testRepeatedSave2()
+  SECTION("Save tags repeatedly without breaking file (2)")
   {
-    ScopedFileCopy copy("xing", ".mp3");
+    const ScopedFileCopy copy("xing", ".mp3");
 
     MPEG::File f(copy.fileName().c_str());
     f.ID3v2Tag(true)->setTitle("0123456789");
     f.save();
     f.save();
-    CPPUNIT_ASSERT_EQUAL(-1L, f.find("ID3", 3));
+    REQUIRE(f.find("ID3", 3) == -1);
   }
-
-  void testRepeatedSave3()
+  SECTION("Save tags repeatedly without breaking file (3)")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-
+    const ScopedFileCopy copy("xing", ".mp3");
     {
       MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      REQUIRE_FALSE(f.hasAPETag());
+      REQUIRE_FALSE(f.hasID3v1Tag());
 
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
@@ -352,92 +321,68 @@ public:
     }
     {
       MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasAPETag());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      REQUIRE(f.hasAPETag());
+      REQUIRE(f.hasID3v1Tag());
     }
   }
-
-  void testEmptyID3v2()
+  SECTION("Create and remove ID3v2 tag")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-
+    const ScopedFileCopy copy("xing", ".mp3");
     {
       MPEG::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v2Tag());
       f.ID3v2Tag(true)->setTitle("0123456789");
       f.save(MPEG::File::ID3v2);
     }
     {
       MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.hasID3v2Tag());
       f.ID3v2Tag(true)->setTitle("");
       f.save(MPEG::File::ID3v2, false);
     }
     {
       MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      REQUIRE_FALSE(f.hasID3v2Tag());
     }
   }
-
-  void testEmptyID3v1()
+  SECTION("Create and remove ID3v1 tag")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-
+    const ScopedFileCopy copy("xing", ".mp3");
     {
       MPEG::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v1Tag());
       f.ID3v1Tag(true)->setTitle("0123456789");
       f.save(MPEG::File::ID3v1);
     }
     {
       MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.hasID3v1Tag());
       f.ID3v1Tag(true)->setTitle("");
       f.save(MPEG::File::ID3v1, false);
     }
     {
       MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      REQUIRE_FALSE(f.hasID3v1Tag());
     }
   }
-
-  void testEmptyAPE()
+  SECTION("Create and remove APE tag")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-
+    const ScopedFileCopy copy("xing", ".mp3");
     {
       MPEG::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasAPETag());
       f.APETag(true)->setTitle("0123456789");
       f.save(MPEG::File::APE);
     }
     {
       MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.hasAPETag());
       f.APETag(true)->setTitle("");
       f.save(MPEG::File::APE, false);
     }
     {
       MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
+      REQUIRE_FALSE(f.hasAPETag());
     }
   }
-
-  void testIgnoreGarbage()
-  {
-    const ScopedFileCopy copy("garbage", ".mp3");
-    {
-      MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL(2255L, f.firstFrameOffset());
-      CPPUNIT_ASSERT_EQUAL(6015L, f.lastFrameOffset());
-      CPPUNIT_ASSERT_EQUAL(String("Title A"), f.ID3v2Tag()->title());
-      f.ID3v2Tag()->setTitle("Title B");
-      f.save();
-    }
-    {
-      MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL(String("Title B"), f.ID3v2Tag()->title());
-    }
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMPEG);
+}

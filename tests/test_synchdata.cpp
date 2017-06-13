@@ -23,105 +23,40 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
+#include <catch/catch.hpp>
 #include <id3v2synchdata.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestID3v2SynchData : public CppUnit::TestFixture
+TEST_CASE("ID3v2 SynchData") 
 {
-  CPPUNIT_TEST_SUITE(TestID3v2SynchData);
-  CPPUNIT_TEST(test1);
-  CPPUNIT_TEST(test2);
-  CPPUNIT_TEST(test3);
-  CPPUNIT_TEST(testToUIntBroken);
-  CPPUNIT_TEST(testToUIntBrokenAndTooLarge);
-  CPPUNIT_TEST(testDecode1);
-  CPPUNIT_TEST(testDecode2);
-  CPPUNIT_TEST(testDecode3);
-  CPPUNIT_TEST(testDecode4);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void test1()
+  SECTION("Decode and encode normal integers")
   {
-    char data[] = { 0, 0, 0, 127 };
-    ByteVector v(data, 4);
+    const ByteVector v1("\x00\x00\x00\x7F", 4);
+    REQUIRE(ID3v2::SynchData::toUInt(v1) == 127);
+    REQUIRE(ID3v2::SynchData::fromUInt(127) == v1);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)127);
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(127), v);
+    const ByteVector v2("\x00\x00\x01\x00", 4);
+    REQUIRE(ID3v2::SynchData::toUInt(v2) == 128);
+    REQUIRE(ID3v2::SynchData::fromUInt(128) == v2);
+
+    const ByteVector v3("\x00\x00\x01\x01", 4);
+    REQUIRE(ID3v2::SynchData::toUInt(v3) == 129);
+    REQUIRE(ID3v2::SynchData::fromUInt(129) == v3);
   }
-
-  void test2()
+  SECTION("Decode broken and/or too large integers")
   {
-    char data[] = { 0, 0, 1, 0 };
-    ByteVector v(data, 4);
-
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)128);
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(128), v);
+    REQUIRE(ID3v2::SynchData::toUInt(ByteVector("\x00\x00\x00\xFF", 4)) == 255);
+    REQUIRE(ID3v2::SynchData::toUInt(ByteVector("\x00\x00\xFF\xFF", 4)) == 65535);
+    REQUIRE(ID3v2::SynchData::toUInt(ByteVector("\x00\x00\x01\x00\x00", 5)) == 128);
+    REQUIRE(ID3v2::SynchData::toUInt(ByteVector("\x00\x00\x00\xFF\x00", 5)) == 255);
   }
-
-  void test3()
+  SECTION("Decode unsynchronised data")
   {
-    char data[] = { 0, 0, 1, 1 };
-    ByteVector v(data, 4);
-
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)129);
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(129), v);
+    REQUIRE(ID3v2::SynchData::decode(ByteVector("\xFF\x00\x00", 3)) == ByteVector("\xFF\x00", 2));
+    REQUIRE(ID3v2::SynchData::decode(ByteVector("\xFF\x44\x00", 3)) == ByteVector("\xFF\x44\x00", 3));
+    REQUIRE(ID3v2::SynchData::decode(ByteVector("\xFF\xFF\x00", 3)) == ByteVector("\xFF\xFF", 2));
+    REQUIRE(ID3v2::SynchData::decode(ByteVector("\xFF\xFF\xFF", 3)) == ByteVector("\xFF\xFF\xFF", 3));
   }
-
-  void testToUIntBroken()
-  {
-    char data[] = { 0, 0, 0, -1 };
-    char data2[] = { 0, 0, -1, -1 };
-
-    CPPUNIT_ASSERT_EQUAL((unsigned int)255, ID3v2::SynchData::toUInt(ByteVector(data, 4)));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)65535, ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
-  }
-
-  void testToUIntBrokenAndTooLarge()
-  {
-    char data[] = { 0, 0, 0, -1, 0 };
-    ByteVector v(data, 5);
-
-    CPPUNIT_ASSERT_EQUAL((unsigned int)255, ID3v2::SynchData::toUInt(v));
-  }
-
-  void testDecode1()
-  {
-    ByteVector a("\xff\x00\x00", 3);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x00", 2), a);
-  }
-
-  void testDecode2()
-  {
-    ByteVector a("\xff\x44", 2);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x44", 2), a);
-  }
-
-  void testDecode3()
-  {
-    ByteVector a("\xff\xff\x00", 3);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff", 2), a);
-  }
-
-  void testDecode4()
-  {
-    ByteVector a("\xff\xff\xff", 3);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff\xff", 3), a);
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v2SynchData);
+}

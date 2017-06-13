@@ -15,7 +15,6 @@ compiler:
 addons:
   apt:
     packages:
-      - libcppunit-dev
       - zlib1g-dev
 
 matrix:
@@ -23,7 +22,4 @@ matrix:
     - os: osx
       compiler: gcc
 
-install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install cppunit; fi
-
-script: cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON -DCMAKE_CXX_FLAGS="-std=c++11" . && make && make check
+script: cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON . && make && make check

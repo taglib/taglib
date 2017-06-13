@@ -23,105 +23,74 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
-#include <tag.h>
-#include <tstringlist.h>
-#include <tbytevectorlist.h>
-#include <tpropertymap.h>
+#include <catch/catch.hpp>
 #include <flacfile.h>
 #include <xiphcomment.h>
-#include <id3v1tag.h>
 #include <id3v2tag.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <id3v1tag.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestFLAC : public CppUnit::TestFixture
+TEST_CASE("FLAC File")
 {
-  CPPUNIT_TEST_SUITE(TestFLAC);
-  CPPUNIT_TEST(testSignature);
-  CPPUNIT_TEST(testMultipleCommentBlocks);
-  CPPUNIT_TEST(testReadPicture);
-  CPPUNIT_TEST(testAddPicture);
-  CPPUNIT_TEST(testReplacePicture);
-  CPPUNIT_TEST(testRemoveAllPictures);
-  CPPUNIT_TEST(testRepeatedSave1);
-  CPPUNIT_TEST(testRepeatedSave2);
-  CPPUNIT_TEST(testRepeatedSave3);
-  CPPUNIT_TEST(testSaveMultipleValues);
-  CPPUNIT_TEST(testDict);
-  CPPUNIT_TEST(testInvalid);
-  CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testZeroSizedPadding1);
-  CPPUNIT_TEST(testZeroSizedPadding2);
-  CPPUNIT_TEST(testShrinkPadding);
-  CPPUNIT_TEST(testSaveID3v1);
-  CPPUNIT_TEST(testUpdateID3v2);
-  CPPUNIT_TEST(testEmptyID3v2);
-  CPPUNIT_TEST(testStripTags);
-  CPPUNIT_TEST(testRemoveXiphField);
-  CPPUNIT_TEST(testEmptySeekTable);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testSignature()
+  SECTION("Read audio properties")
   {
-    FLAC::File f(TEST_FILE_PATH_C("no-tags.flac"));
-    CPPUNIT_ASSERT_EQUAL(ByteVector("a1b141f766e9849ac3db1030a20a3c77"), f.audioProperties()->signature().toHex());
+    FLAC::File f(TEST_FILE_PATH_C("sinewave.flac"));
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3550);
+    REQUIRE(f.audioProperties()->bitrate() == 145);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleWidth() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 156556);
+    REQUIRE(f.audioProperties()->signature().toHex() == "cfe3d9dabadeab2cbf2ca235274b7f76");
   }
-
-  void testMultipleCommentBlocks()
+  SECTION("Skip and remove multiple comment blocks")
   {
-    ScopedFileCopy copy("multiple-vc", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("multiple-vc", ".flac");
     {
-      FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(String("Artist 1"), f.tag()->artist());
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->artist() == "Artist 1");
       f.tag()->setArtist("The Artist");
       f.save();
     }
     {
-      FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL(69L, f.find("Artist"));
-      CPPUNIT_ASSERT_EQUAL(-1L, f.find("Artist", 70));
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->artist() == "The Artist");
+      REQUIRE(f.find("Artist") == 69L);
+      REQUIRE(f.find("Artist", 70) == -1);
     }
   }
-
-  void testReadPicture()
+  SECTION("Read picture")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
+    const ScopedFileCopy copy("silence-44-s", ".flac");
 
-    FLAC::File f(newname.c_str());
-    List<FLAC::Picture *> lst = f.pictureList();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+    FLAC::File f(copy.fileName().c_str());
+    const List<FLAC::Picture *> lst = f.pictureList();
+    REQUIRE(lst.size() == 1);
 
-    FLAC::Picture *pic = lst.front();
-    CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pic->type());
-    CPPUNIT_ASSERT_EQUAL(1, pic->width());
-    CPPUNIT_ASSERT_EQUAL(1, pic->height());
-    CPPUNIT_ASSERT_EQUAL(24, pic->colorDepth());
-    CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
-    CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
-    CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)150, pic->data().size());
+    const FLAC::Picture *pic = lst.front();
+    REQUIRE(pic->type() == FLAC::Picture::FrontCover);
+    REQUIRE(pic->width() == 1);
+    REQUIRE(pic->height() == 1);
+    REQUIRE(pic->colorDepth() == 24);
+    REQUIRE(pic->numColors() == 0);
+    REQUIRE(pic->mimeType() == "image/png");
+    REQUIRE(pic->description() == "A pixel.");
+    REQUIRE(pic->data().size() == 150);
   }
-
-  void testAddPicture()
+  SECTION("Add picture")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
-      FLAC::File f(newname.c_str());
+      FLAC::File f(copy.fileName().c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      REQUIRE(lst.size() == 1);
 
       FLAC::Picture *newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
@@ -136,41 +105,36 @@ public:
       f.save();
     }
     {
-      FLAC::File f(newname.c_str());
-      List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)2, lst.size());
+      FLAC::File f(copy.fileName().c_str());
+      const List<FLAC::Picture *> lst = f.pictureList();
+      REQUIRE(lst.size() == 2);
 
-      FLAC::Picture *pic = lst[0];
-      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pic->type());
-      CPPUNIT_ASSERT_EQUAL(1, pic->width());
-      CPPUNIT_ASSERT_EQUAL(1, pic->height());
-      CPPUNIT_ASSERT_EQUAL(24, pic->colorDepth());
-      CPPUNIT_ASSERT_EQUAL(0, pic->numColors());
-      CPPUNIT_ASSERT_EQUAL(String("image/png"), pic->mimeType());
-      CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic->description());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)150, pic->data().size());
+      REQUIRE(lst[0]->type() == FLAC::Picture::FrontCover);
+      REQUIRE(lst[0]->width() == 1);
+      REQUIRE(lst[0]->height() == 1);
+      REQUIRE(lst[0]->colorDepth() == 24);
+      REQUIRE(lst[0]->numColors() == 0);
+      REQUIRE(lst[0]->mimeType() == "image/png");
+      REQUIRE(lst[0]->description() == "A pixel.");
+      REQUIRE(lst[0]->data().size() == 150);
 
-      pic = lst[1];
-      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
-      CPPUNIT_ASSERT_EQUAL(5, pic->width());
-      CPPUNIT_ASSERT_EQUAL(6, pic->height());
-      CPPUNIT_ASSERT_EQUAL(16, pic->colorDepth());
-      CPPUNIT_ASSERT_EQUAL(7, pic->numColors());
-      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
-      CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+      REQUIRE(lst[1]->type() == FLAC::Picture::BackCover);
+      REQUIRE(lst[1]->width() == 5);
+      REQUIRE(lst[1]->height() == 6);
+      REQUIRE(lst[1]->colorDepth() == 16);
+      REQUIRE(lst[1]->numColors() == 7);
+      REQUIRE(lst[1]->mimeType() == "image/jpeg");
+      REQUIRE(lst[1]->description() == "new image");
+      REQUIRE(lst[1]->data() == "JPEG data");
     }
   }
-
-  void testReplacePicture()
+  SECTION("Replace picture")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
-      FLAC::File f(newname.c_str());
+      FLAC::File f(copy.fileName().c_str());
       List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      REQUIRE(lst.size() == 1);
 
       FLAC::Picture *newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
@@ -186,116 +150,99 @@ public:
       f.save();
     }
     {
-      FLAC::File f(newname.c_str());
-      List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      FLAC::File f(copy.fileName().c_str());
+      const List<FLAC::Picture *> lst = f.pictureList();
+      REQUIRE(lst.size() == 1);
 
-      FLAC::Picture *pic = lst[0];
-      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::BackCover, pic->type());
-      CPPUNIT_ASSERT_EQUAL(5, pic->width());
-      CPPUNIT_ASSERT_EQUAL(6, pic->height());
-      CPPUNIT_ASSERT_EQUAL(16, pic->colorDepth());
-      CPPUNIT_ASSERT_EQUAL(7, pic->numColors());
-      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), pic->mimeType());
-      CPPUNIT_ASSERT_EQUAL(String("new image"), pic->description());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), pic->data());
+      REQUIRE(lst[0]->type() == FLAC::Picture::BackCover);
+      REQUIRE(lst[0]->width() == 5);
+      REQUIRE(lst[0]->height() == 6);
+      REQUIRE(lst[0]->colorDepth() == 16);
+      REQUIRE(lst[0]->numColors() == 7);
+      REQUIRE(lst[0]->mimeType() == "image/jpeg");
+      REQUIRE(lst[0]->description() == "new image");
+      REQUIRE(lst[0]->data() == "JPEG data");
     }
   }
-
-  void testRemoveAllPictures()
+  SECTION("Remove all pictures")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
-      FLAC::File f(newname.c_str());
-      List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.pictureList().size() == 1);
 
       f.removePictures();
       f.save();
     }
     {
-      FLAC::File f(newname.c_str());
-      List<FLAC::Picture *> lst = f.pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)0, lst.size());
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.pictureList().isEmpty());
     }
   }
-
-  void testRepeatedSave1()
+  SECTION("Save tags repeatedly without breaking file (1)")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
-      FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(String("Silence"), f.tag()->title());
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->title() == "Silence");
       f.tag()->setTitle("NEW TITLE");
       f.save();
-      CPPUNIT_ASSERT_EQUAL(String("NEW TITLE"), f.tag()->title());
+      REQUIRE(f.tag()->title() == "NEW TITLE");
       f.tag()->setTitle("NEW TITLE 2");
       f.save();
-      CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), f.tag()->title());
+      REQUIRE(f.tag()->title() == "NEW TITLE 2");
     }
     {
-      FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), f.tag()->title());
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->title() == "NEW TITLE 2");
     }
   }
-
-  void testRepeatedSave2()
+  SECTION("Save tags repeatedly without breaking file (2)")
   {
-    ScopedFileCopy copy("no-tags", ".flac");
+    const ScopedFileCopy copy("no-tags", ".flac");
 
     FLAC::File f(copy.fileName().c_str());
     f.ID3v2Tag(true)->setTitle("0123456789");
     f.save();
-    CPPUNIT_ASSERT_EQUAL(5735L, f.length());
+    REQUIRE(f.length() == 5735);
     f.save();
-    CPPUNIT_ASSERT_EQUAL(5735L, f.length());
-    CPPUNIT_ASSERT(f.find("fLaC") >= 0);
+    REQUIRE(f.length() == 5735);
+    REQUIRE(f.find("fLaC") >= 0);
   }
-
-  void testRepeatedSave3()
+  SECTION("Save tags repeatedly without breaking file (3)")
   {
-    ScopedFileCopy copy("no-tags", ".flac");
+    const ScopedFileCopy copy("no-tags", ".flac");
 
     FLAC::File f(copy.fileName().c_str());
     f.xiphComment()->setTitle(longText(8 * 1024));
     f.save();
-    CPPUNIT_ASSERT_EQUAL(12862L, f.length());
+    REQUIRE(f.length() == 12862);
     f.save();
-    CPPUNIT_ASSERT_EQUAL(12862L, f.length());
+    REQUIRE(f.length() == 12862);
   }
-
-  void testSaveMultipleValues()
+  SECTION("Save multiple values")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
-      FLAC::File f(newname.c_str());
+      FLAC::File f(copy.fileName().c_str());
       f.xiphComment(true)->addField("ARTIST", "artist 1", true);
       f.xiphComment(true)->addField("ARTIST", "artist 2", false);
       f.save();
     }
     {
-      FLAC::File f(newname.c_str());
-      Ogg::FieldListMap m = f.xiphComment()->fieldListMap();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)2, m["ARTIST"].size());
-      CPPUNIT_ASSERT_EQUAL(String("artist 1"), m["ARTIST"][0]);
-      CPPUNIT_ASSERT_EQUAL(String("artist 2"), m["ARTIST"][1]);
+      FLAC::File f(copy.fileName().c_str());
+      const Ogg::FieldListMap m = f.xiphComment()->fieldListMap();
+      REQUIRE(m["ARTIST"].size() == 2);
+      REQUIRE(m["ARTIST"][0] == "artist 1");
+      REQUIRE(m["ARTIST"][1] == "artist 2");
     }
   }
-
-  void testDict()
+  SECTION("Read and write property map")
   {
     // test unicode & multiple values with dict interface
-    ScopedFileCopy copy("silence-44-s", ".flac");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
-      FLAC::File f(newname.c_str());
+      FLAC::File f(copy.fileName().c_str());
       PropertyMap dict;
       dict["ARTIST"].append("artøst 1");
       dict["ARTIST"].append("artöst 2");
@@ -303,55 +250,35 @@ public:
       f.save();
     }
     {
-      FLAC::File f(newname.c_str());
-      PropertyMap dict = f.properties();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)2, dict["ARTIST"].size());
-      CPPUNIT_ASSERT_EQUAL(String("artøst 1"), dict["ARTIST"][0]);
-      CPPUNIT_ASSERT_EQUAL(String("artöst 2"), dict["ARTIST"][1]);
+      FLAC::File f(copy.fileName().c_str());
+      const PropertyMap dict = f.properties();
+      REQUIRE(dict["ARTIST"].size() == 2);
+      REQUIRE(dict["ARTIST"][0] == "artøst 1");
+      REQUIRE(dict["ARTIST"][1] == "artöst 2");
     }
   }
-
-  void testInvalid()
+  SECTION("Skip invalid property map fields")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
+    const ScopedFileCopy copy("silence-44-s", ".flac");
+    FLAC::File f(copy.fileName().c_str());
+
     PropertyMap map;
     map[L"H\x00c4\x00d6"] = String("bla");
-    FLAC::File f(copy.fileName().c_str());
     PropertyMap invalid = f.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1, invalid.size());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, f.properties().size());
+    REQUIRE(invalid.size() == 1);
+    REQUIRE(f.properties().isEmpty());
   }
-
-  void testAudioProperties()
+  SECTION("Don't treat zero-sized padding as error")
   {
-    FLAC::File f(TEST_FILE_PATH_C("sinewave.flac"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(145, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
-    CPPUNIT_ASSERT_EQUAL(156556ULL, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(
-      ByteVector("\xcf\xe3\xd9\xda\xba\xde\xab\x2c\xbf\x2c\xa2\x35\x27\x4b\x7f\x76"),
-      f.audioProperties()->signature());
-  }
-
-  void testZeroSizedPadding1()
-  {
-    ScopedFileCopy copy("zero-sized-padding", ".flac");
+    const ScopedFileCopy copy("zero-sized-padding", ".flac");
 
     FLAC::File f(copy.fileName().c_str());
-    CPPUNIT_ASSERT(f.isValid());
+    REQUIRE(f.isValid());
   }
-
-  void testZeroSizedPadding2()
+  SECTION("Don't create zero-sized padding")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
+    const String text = longText(3067);
     {
       FLAC::File f(copy.fileName().c_str());
       f.xiphComment()->setTitle("ABC");
@@ -359,60 +286,73 @@ public:
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      f.xiphComment()->setTitle(std::string(3067, 'X').c_str());
+      f.xiphComment()->setTitle(text);
       f.save();
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.isValid());
+      REQUIRE(f.isValid());
+      REQUIRE(f.xiphComment()->title() == text);
     }
   }
-
-  void testShrinkPadding()
+  SECTION("Shrink too large padding")
   {
-    ScopedFileCopy copy("no-tags", ".flac");
-
+    const ScopedFileCopy copy("no-tags", ".flac");
     {
       FLAC::File f(copy.fileName().c_str());
       f.xiphComment()->setTitle(longText(128 * 1024));
       f.save();
-      CPPUNIT_ASSERT(f.length() > 128 * 1024);
+      REQUIRE(f.length() > 128 * 1024);
     }
     {
       FLAC::File f(copy.fileName().c_str());
       f.xiphComment()->setTitle("0123456789");
       f.save();
-      CPPUNIT_ASSERT(f.length() < 8 * 1024);
+      REQUIRE(f.length() < 8 * 1024);
     }
   }
-
-  void testSaveID3v1()
+  SECTION("Don't treat empty seektable as error and keep it untouched")
   {
-    ScopedFileCopy copy("no-tags", ".flac");
+    const ScopedFileCopy copy("empty-seektable", ".flac");
+    {
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.isValid());
+      f.xiphComment(true)->setTitle("XiphComment Title");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      REQUIRE(f.isValid());
+      f.seek(42);
+      const ByteVector data = f.readBlock(4);
+      REQUIRE(data == ByteVector("\x03\x00\x00\x00", 4));
+    }
+  }
+  SECTION("Save ID3v1 tag without breaking the audio stream")
+  {
+    const ScopedFileCopy copy("no-tags", ".flac");
 
     ByteVector audioStream;
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+      REQUIRE_FALSE(f.hasID3v1Tag());
+      REQUIRE(f.length() == (long)4692);
 
       f.seek(0x0100);
       audioStream = f.readBlock(4436);
 
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+      REQUIRE(f.hasID3v1Tag());
+      REQUIRE(f.length() == (long)4820);
 
       f.seek(0x0100);
-      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
+      REQUIRE(f.readBlock(4436) == audioStream);
     }
   }
-
-  void testUpdateID3v2()
+  SECTION("Update ID3v2 tag")
   {
-    ScopedFileCopy copy("no-tags", ".flac");
-
+    const ScopedFileCopy copy("no-tags", ".flac");
     {
       FLAC::File f(copy.fileName().c_str());
       f.ID3v2Tag(true)->setTitle("0123456789");
@@ -425,14 +365,12 @@ public:
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("ABCDEFGHIJ"), f.ID3v2Tag()->title());
+      REQUIRE(f.ID3v2Tag()->title() == "ABCDEFGHIJ");
     }
   }
-
-  void testEmptyID3v2()
+  SECTION("Don't create empty ID3v2 tag")
   {
-    ScopedFileCopy copy("no-tags", ".flac");
-
+    const ScopedFileCopy copy("no-tags", ".flac");
     {
       FLAC::File f(copy.fileName().c_str());
       f.ID3v2Tag(true);
@@ -440,14 +378,12 @@ public:
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      REQUIRE_FALSE(f.hasID3v2Tag());
     }
   }
-
-  void testStripTags()
+  SECTION("Create and strip tags")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
       FLAC::File f(copy.fileName().c_str());
       f.xiphComment(true)->setTitle("XiphComment Title");
@@ -457,48 +393,46 @@ public:
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasXiphComment());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-      CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1 Title"), f.ID3v1Tag()->title());
-      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      REQUIRE(f.hasXiphComment());
+      REQUIRE(f.hasID3v1Tag());
+      REQUIRE(f.hasID3v2Tag());
+      REQUIRE(f.xiphComment()->title() == "XiphComment Title");
+      REQUIRE(f.ID3v1Tag()->title() == "ID3v1 Title");
+      REQUIRE(f.ID3v2Tag()->title() == "ID3v2 Title");
       f.strip(FLAC::File::ID3v2);
       f.save();
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasXiphComment());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1 Title"), f.ID3v1Tag()->title());
+      REQUIRE(f.hasXiphComment());
+      REQUIRE(f.hasID3v1Tag());
+      REQUIRE_FALSE(f.hasID3v2Tag());
+      REQUIRE(f.xiphComment()->title() == "XiphComment Title");
+      REQUIRE(f.ID3v1Tag()->title() == "ID3v1 Title");
       f.strip(FLAC::File::ID3v1);
       f.save();
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasXiphComment());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
+      REQUIRE(f.hasXiphComment());
+      REQUIRE_FALSE(f.hasID3v1Tag());
+      REQUIRE_FALSE(f.hasID3v2Tag());
+      REQUIRE(f.xiphComment()->title() == "XiphComment Title");
       f.strip(FLAC::File::XiphComment);
       f.save();
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasXiphComment());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
-      CPPUNIT_ASSERT(f.xiphComment()->isEmpty());
-      CPPUNIT_ASSERT_EQUAL(String("reference libFLAC 1.1.0 20030126"), f.xiphComment()->vendorID());
+      REQUIRE(f.hasXiphComment());
+      REQUIRE_FALSE(f.hasID3v1Tag());
+      REQUIRE_FALSE(f.hasID3v2Tag());
+      REQUIRE(f.xiphComment()->isEmpty());
+      REQUIRE(f.xiphComment()->vendorID() == "reference libFLAC 1.1.0 20030126");
     }
   }
-
-  void testRemoveXiphField()
+  SECTION("Remove fields from Xiph comment")
   {
-    ScopedFileCopy copy("silence-44-s", ".flac");
-
+    const ScopedFileCopy copy("silence-44-s", ".flac");
     {
       FLAC::File f(copy.fileName().c_str());
       f.xiphComment(true)->setTitle("XiphComment Title");
@@ -507,34 +441,13 @@ public:
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
+      REQUIRE(f.xiphComment()->title() == "XiphComment Title");
       f.xiphComment()->removeFields("TITLE");
       f.save();
     }
     {
       FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String(), f.xiphComment()->title());
+      REQUIRE(f.xiphComment()->title().isEmpty());
     }
   }
-
-  void testEmptySeekTable()
-  {
-    ScopedFileCopy copy("empty-seektable", ".flac");
-    {
-      FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      f.xiphComment(true)->setTitle("XiphComment Title");
-      f.save();
-    }
-    {
-      FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      f.seek(42);
-      const ByteVector data = f.readBlock(4);
-      CPPUNIT_ASSERT_EQUAL(ByteVector("\x03\x00\x00\x00", 4), data);
-    }
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestFLAC);
+}

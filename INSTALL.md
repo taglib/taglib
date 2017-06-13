@@ -165,9 +165,7 @@ static runtime library, rather than the DLL form of the runtime.
 Unit Tests
 ----------
 
-If you want to run the test suite to make sure TagLib works properly on your
-system, you need to have cppunit installed. To build the tests, include
-the option `-DBUILD_TESTS=on` when running cmake.
+To build the tests, include the option `-DBUILD_TESTS=on` when running cmake.
 
 The test suite has a custom target in the build system, so you can run
 the tests using make:

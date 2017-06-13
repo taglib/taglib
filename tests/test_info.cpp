@@ -23,53 +23,40 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
+#include <catch/catch.hpp>
 #include <infotag.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestInfoTag : public CppUnit::TestFixture
+TEST_CASE("INFO Tag")
 {
-  CPPUNIT_TEST_SUITE(TestInfoTag);
-  CPPUNIT_TEST(testTitle);
-  CPPUNIT_TEST(testNumericFields);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-  void testTitle()
+  SECTION("Read and write text values")
   {
     RIFF::Info::Tag tag;
-
-    CPPUNIT_ASSERT_EQUAL(String(""), tag.title());
+    
+    REQUIRE(tag.title().isEmpty());
     tag.setTitle("Test title 1");
     tag.setFieldText("TEST", "Dummy Text");
-
-    CPPUNIT_ASSERT_EQUAL(String("Test title 1"), tag.title());
-
-    RIFF::Info::FieldListMap map = tag.fieldListMap();
-    CPPUNIT_ASSERT_EQUAL(String("Test title 1"), map["INAM"]);
-    CPPUNIT_ASSERT_EQUAL(String("Dummy Text"), map["TEST"]);
+    
+    REQUIRE(tag.title() == "Test title 1");
+    
+    const RIFF::Info::FieldListMap map = tag.fieldListMap();
+    REQUIRE(map["INAM"] == "Test title 1");
+    REQUIRE(map["TEST"] == "Dummy Text");
   }
-
-  void testNumericFields()
+  SECTION("Read and write numeric values")
   {
     RIFF::Info::Tag tag;
-
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, tag.track());
+    
+    REQUIRE(tag.track() == 0);
     tag.setTrack(1234);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1234, tag.track());
-    CPPUNIT_ASSERT_EQUAL(String("1234"), tag.fieldText("IPRT"));
-
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, tag.year());
+    REQUIRE(tag.track() == 1234);
+    REQUIRE(tag.fieldText("IPRT") == "1234");
+    
+    REQUIRE(tag.year() == 0);
     tag.setYear(1234);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1234, tag.year());
-    CPPUNIT_ASSERT_EQUAL(String("1234"), tag.fieldText("ICRD"));
+    REQUIRE(tag.year() == 1234);
+    REQUIRE(tag.fieldText("ICRD") == "1234");
   }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestInfoTag);
-
+}

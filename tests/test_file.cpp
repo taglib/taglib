@@ -23,132 +23,114 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <catch/catch.hpp>
 #include <tfile.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace TagLib;
 
-// File subclass that gives tests access to filesystem operations
-class PlainFile : public File {
-public:
-  PlainFile(FileName name) : File(name) { }
-  Tag *tag() const { return NULL; }
-  AudioProperties *audioProperties() const { return NULL; }
-  bool save(){ return false; }
-  void truncate(long length) { File::truncate(length); }
-};
-
-class TestFile : public CppUnit::TestFixture
+namespace
 {
-  CPPUNIT_TEST_SUITE(TestFile);
-  CPPUNIT_TEST(testFindInSmallFile);
-  CPPUNIT_TEST(testRFindInSmallFile);
-  CPPUNIT_TEST(testSeek);
-  CPPUNIT_TEST(testTruncate);
-  CPPUNIT_TEST_SUITE_END();
+  // File subclass that gives tests access to filesystem operations
+  class PlainFile : public File {
+  public:
+    PlainFile(FileName name) : File(name) { }
+    Tag *tag() const { return NULL; }
+    AudioProperties *audioProperties() const { return NULL; }
+    bool save(){ return false; }
+    void truncate(long length) { File::truncate(length); }
+  };
+}
 
-public:
-
-  void testFindInSmallFile()
+TEST_CASE("Abstract file")
+{
+  SECTION("Find in small file")
   {
-    ScopedFileCopy copy("empty", ".ogg");
-    std::string name = copy.fileName();
+    const ScopedFileCopy copy("empty", ".ogg");
     {
-      PlainFile file(name.c_str());
+      PlainFile file(copy.fileName().c_str());
       file.seek(0);
       file.writeBlock(ByteVector("0123456239", 10));
       file.truncate(10);
     }
     {
-      PlainFile file(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(10l, file.length());
-
-      CPPUNIT_ASSERT_EQUAL(2l, file.find(ByteVector("23", 2)));
-      CPPUNIT_ASSERT_EQUAL(2l, file.find(ByteVector("23", 2), 2));
-      CPPUNIT_ASSERT_EQUAL(7l, file.find(ByteVector("23", 2), 3));
-
+      PlainFile file(copy.fileName().c_str());
+      REQUIRE(file.length() == 10);
+    
+      REQUIRE(file.find(ByteVector("23", 2)) == 2);
+      REQUIRE(file.find(ByteVector("23", 2), 2) == 2);
+      REQUIRE(file.find(ByteVector("23", 2), 3) == 7);
+    
       file.seek(0);
       const ByteVector v = file.readBlock(file.length());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)10, v.size());
-
-      CPPUNIT_ASSERT_EQUAL((long)v.find("23"),    file.find("23"));
-      CPPUNIT_ASSERT_EQUAL((long)v.find("23", 2), file.find("23", 2));
-      CPPUNIT_ASSERT_EQUAL((long)v.find("23", 3), file.find("23", 3));
+      REQUIRE(v.size() == 10);
+    
+      REQUIRE(file.find("23") == v.find("23"));
+      REQUIRE(file.find("23", 2) == v.find("23", 2));
+      REQUIRE(file.find("23", 3) == v.find("23", 3));
     }
   }
-
-  void testRFindInSmallFile()
+  SECTION("RFind in small file")
   {
-    ScopedFileCopy copy("empty", ".ogg");
-    std::string name = copy.fileName();
+    const ScopedFileCopy copy("empty", ".ogg");
     {
-      PlainFile file(name.c_str());
+      PlainFile file(copy.fileName().c_str());
       file.seek(0);
       file.writeBlock(ByteVector("0123456239", 10));
       file.truncate(10);
     }
     {
-      PlainFile file(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(10l, file.length());
-
-      CPPUNIT_ASSERT_EQUAL(7l, file.rfind(ByteVector("23", 2)));
-      CPPUNIT_ASSERT_EQUAL(7l, file.rfind(ByteVector("23", 2), 7));
-      CPPUNIT_ASSERT_EQUAL(2l, file.rfind(ByteVector("23", 2), 6));
-
+      PlainFile file(copy.fileName().c_str());
+      REQUIRE(file.length() == 10);
+    
+      REQUIRE(file.rfind(ByteVector("23", 2)) == 7);
+      REQUIRE(file.rfind(ByteVector("23", 2), 7) == 7);
+      REQUIRE(file.rfind(ByteVector("23", 2), 6) == 2);
+    
       file.seek(0);
       const ByteVector v = file.readBlock(file.length());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)10, v.size());
-
-      CPPUNIT_ASSERT_EQUAL((long)v.rfind("23"),    file.rfind("23"));
-      CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 7), file.rfind("23", 7));
-      CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 6), file.rfind("23", 6));
+      REQUIRE(v.size() == 10);
+    
+      REQUIRE(file.rfind("23") == v.rfind("23"));
+      REQUIRE(file.rfind("23", 7) == v.rfind("23", 7));
+      REQUIRE(file.rfind("23", 6) == v.rfind("23", 6));
     }
   }
-
-  void testSeek()
+  SECTION("Seek")
   {
-    ScopedFileCopy copy("empty", ".ogg");
-    std::string name = copy.fileName();
+    const ScopedFileCopy copy("empty", ".ogg");
 
-    PlainFile f(name.c_str());
-    CPPUNIT_ASSERT_EQUAL((long)0, f.tell());
-    CPPUNIT_ASSERT_EQUAL((long)4328, f.length());
-
+    PlainFile f(copy.fileName().c_str());
+    REQUIRE(f.tell() == 0);
+    REQUIRE(f.length() == 4328);
+    
     f.seek(100, File::Beginning);
-    CPPUNIT_ASSERT_EQUAL((long)100, f.tell());
+    REQUIRE(f.tell() == 100);
     f.seek(100, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)200, f.tell());
+    REQUIRE(f.tell() == 200);
     f.seek(-300, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)200, f.tell());
-
+    REQUIRE(f.tell() == 200);
+    
     f.seek(-100, File::End);
-    CPPUNIT_ASSERT_EQUAL((long)4228, f.tell());
+    REQUIRE(f.tell() == 4228);
     f.seek(-100, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)4128, f.tell());
+    REQUIRE(f.tell() == 4128);
     f.seek(300, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)4428, f.tell());
+    REQUIRE(f.tell() == 4428);
   }
-
-  void testTruncate()
+  SECTION("Truncate")
   {
-    ScopedFileCopy copy("empty", ".ogg");
-    std::string name = copy.fileName();
-
+    const ScopedFileCopy copy("empty", ".ogg");
     {
-      PlainFile f(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(4328L, f.length());
-
+      PlainFile f(copy.fileName().c_str());
+      REQUIRE(f.length() == 4328);
+    
       f.truncate(2000);
-      CPPUNIT_ASSERT_EQUAL(2000L, f.length());
+      REQUIRE(f.length() == 2000);
     }
     {
-      PlainFile f(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(2000L, f.length());
+      PlainFile f(copy.fileName().c_str());
+      REQUIRE(f.length() == 2000);
     }
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestFile);
-
+}

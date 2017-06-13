@@ -23,51 +23,33 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
-#include <tstring.h>
-#include <mpegfile.h>
+#include <catch/catch.hpp>
 #include <id3v1tag.h>
 #include <id3v1genres.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <mpegfile.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestID3v1 : public CppUnit::TestFixture
+TEST_CASE("ID3v1 Tag")
 {
-  CPPUNIT_TEST_SUITE(TestID3v1);
-  CPPUNIT_TEST(testStripWhiteSpace);
-  CPPUNIT_TEST(testGenres);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testStripWhiteSpace()
+  SECTION("Strip whitespaces")
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("xing", ".mp3");
     {
-      MPEG::File f(newname.c_str());
+      MPEG::File f(copy.fileName().c_str());
       f.ID3v1Tag(true)->setArtist("Artist     ");
       f.save();
     }
-
     {
-      MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.ID3v1Tag(false));
-      CPPUNIT_ASSERT_EQUAL(String("Artist"), f.ID3v1Tag(false)->artist());
+      MPEG::File f(copy.fileName().c_str());
+      REQUIRE(f.hasID3v1Tag());
+      REQUIRE(f.ID3v1Tag(false)->artist() == "Artist");
     }
   }
-
-  void testGenres()
+  SECTION("Convert between genre names and numbers")
   {
-    CPPUNIT_ASSERT_EQUAL(String("Darkwave"), ID3v1::genre(50));
-    CPPUNIT_ASSERT_EQUAL(100, ID3v1::genreIndex("Humour"));
+    REQUIRE(ID3v1::genre(50) == "Darkwave");
+    REQUIRE(ID3v1::genreIndex("Humour") == 100);
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v1);
+}

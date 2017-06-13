@@ -23,85 +23,57 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
-#include <tag.h>
-#include <tstringlist.h>
-#include <tbytevectorlist.h>
-#include <tpropertymap.h>
+#include <catch/catch.hpp>
 #include <asffile.h>
-#include <cppunit/extensions/HelperMacros.h>
+#include <tpropertymap.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestASF : public CppUnit::TestFixture
+TEST_CASE("ASF File")
 {
-  CPPUNIT_TEST_SUITE(TestASF);
-  CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testLosslessProperties);
-  CPPUNIT_TEST(testRead);
-  CPPUNIT_TEST(testSaveMultipleValues);
-  CPPUNIT_TEST(testSaveStream);
-  CPPUNIT_TEST(testSaveLanguage);
-  CPPUNIT_TEST(testDWordTrackNumber);
-  CPPUNIT_TEST(testSaveLargeValue);
-  CPPUNIT_TEST(testSavePicture);
-  CPPUNIT_TEST(testSaveMultiplePictures);
-  CPPUNIT_TEST(testProperties);
-  CPPUNIT_TEST(testRepeatedSave);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testAudioProperties()
+  SECTION("Read audio properties (WMA)")
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3712, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(ASF::Properties::WMA2, f.audioProperties()->codec());
-    CPPUNIT_ASSERT_EQUAL(String("Windows Media Audio 9.1"), f.audioProperties()->codecName());
-    CPPUNIT_ASSERT_EQUAL(String("64 kbps, 48 kHz, stereo 2-pass CBR"), f.audioProperties()->codecDescription());
-    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3712);
+    REQUIRE(f.audioProperties()->bitrate() == 64);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 48000);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->codec() == ASF::Properties::WMA2);
+    REQUIRE(f.audioProperties()->codecName() == "Windows Media Audio 9.1");
+    REQUIRE(f.audioProperties()->codecDescription() == "64 kbps, 48 kHz, stereo 2-pass CBR");
+    REQUIRE_FALSE(f.audioProperties()->isEncrypted());
   }
-
-  void testLosslessProperties()
+  SECTION("Read audio properties (WMA Lossless)")
   {
     ASF::File f(TEST_FILE_PATH_C("lossless.wma"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3549, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(1152, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(ASF::Properties::WMA9Lossless, f.audioProperties()->codec());
-    CPPUNIT_ASSERT_EQUAL(String("Windows Media Audio 9.2 Lossless"), f.audioProperties()->codecName());
-    CPPUNIT_ASSERT_EQUAL(String("VBR Quality 100, 44 kHz, 2 channel 16 bit 1-pass VBR"), f.audioProperties()->codecDescription());
-    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 3);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 3);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 3549);
+    REQUIRE(f.audioProperties()->bitrate() == 1152);
+    REQUIRE(f.audioProperties()->channels() == 2);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->codec() == ASF::Properties::WMA9Lossless);
+    REQUIRE(f.audioProperties()->codecName() == "Windows Media Audio 9.2 Lossless");
+    REQUIRE(f.audioProperties()->codecDescription() == "VBR Quality 100, 44 kHz, 2 channel 16 bit 1-pass VBR");
+    REQUIRE_FALSE(f.audioProperties()->isEncrypted());
   }
-
-  void testRead()
+  SECTION("Read tag")
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-    CPPUNIT_ASSERT_EQUAL(String("test"), f.tag()->title());
+    REQUIRE(f.tag()->title() == "test");
   }
-
-  void testSaveMultipleValues()
+  SECTION("Save multiple values")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::AttributeList values;
       values.append("Foo");
       values.append("Bar");
@@ -109,66 +81,54 @@ public:
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(2, (int)f.tag()->attributeListMap()["WM/AlbumTitle"].size());
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->attributeListMap()["WM/AlbumTitle"].size() == 2);
     }
   }
-
-  void testDWordTrackNumber()
+  SECTION("Read and write DWORD track number")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT(!f.tag()->contains("WM/TrackNumber"));
-      f.tag()->setAttribute("WM/TrackNumber", (unsigned int)(123));
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.tag()->contains("WM/TrackNumber"));
+      f.tag()->setAttribute("WM/TrackNumber", 123U);
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
-      CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
-                           f.tag()->attribute("WM/TrackNumber").front().type());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)123, f.tag()->track());
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->contains("WM/TrackNumber"));
+      REQUIRE(f.tag()->attribute("WM/TrackNumber").front().type() == ASF::Attribute::DWordType);
+      REQUIRE(f.tag()->track() == 123);
       f.tag()->setTrack(234);
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
-      CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
-                           f.tag()->attribute("WM/TrackNumber").front().type());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)234, f.tag()->track());
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->contains("WM/TrackNumber"));
+      REQUIRE(f.tag()->attribute("WM/TrackNumber").front().type() == ASF::Attribute::UnicodeType);
+      REQUIRE(f.tag()->track() == 234);
     }
   }
-
-  void testSaveStream()
+  SECTION("Save stream")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::Attribute attr("Foo");
       attr.setStream(43);
       f.tag()->setAttribute("WM/AlbumTitle", attr);
       f.save();
     }
-
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(43, f.tag()->attribute("WM/AlbumTitle").front().stream());
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->attribute("WM/AlbumTitle").front().stream() == 43);
     }
   }
-
-  void testSaveLanguage()
+  SECTION("Save language")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::Attribute attr("Foo");
       attr.setStream(32);
       attr.setLanguage(56);
@@ -176,37 +136,31 @@ public:
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(32, f.tag()->attribute("WM/AlbumTitle").front().stream());
-      CPPUNIT_ASSERT_EQUAL(56, f.tag()->attribute("WM/AlbumTitle").front().language());
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->attribute("WM/AlbumTitle").front().stream() == 32);
+      REQUIRE(f.tag()->attribute("WM/AlbumTitle").front().language() == 56);
     }
   }
-
-  void testSaveLargeValue()
+  SECTION("Save large value")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
+    const ByteVector blob(70000, 'x');
     {
-      ASF::File f(newname.c_str());
-      ASF::Attribute attr(ByteVector(70000, 'x'));
+      ASF::File f(copy.fileName().c_str());
+      ASF::Attribute attr(blob);
       f.tag()->setAttribute("WM/Blob", attr);
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(ByteVector(70000, 'x'),
-                           f.tag()->attribute("WM/Blob").front().toByteVector());
+      ASF::File f(copy.fileName().c_str());
+      REQUIRE(f.tag()->attribute("WM/Blob").front().toByteVector() == blob);
     }
   }
-
-  void testSavePicture()
+  SECTION("Save picture")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::Picture picture;
       picture.setMimeType("image/jpeg");
       picture.setType(ASF::Picture::FrontCover);
@@ -216,26 +170,23 @@ public:
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::AttributeList values2 = f.tag()->attribute("WM/Picture");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, values2.size());
+      REQUIRE(values2.size() == (unsigned int)1);
       ASF::Attribute attr2 = values2.front();
       ASF::Picture picture2 = attr2.toPicture();
-      CPPUNIT_ASSERT(picture2.isValid());
-      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture2.mimeType());
-      CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, picture2.type());
-      CPPUNIT_ASSERT_EQUAL(String("description"), picture2.description());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("data"), picture2.picture());
+      REQUIRE(picture2.isValid());
+      REQUIRE(picture2.mimeType() == "image/jpeg");
+      REQUIRE(picture2.type() == ASF::Picture::FrontCover);
+      REQUIRE(picture2.description() == "description");
+      REQUIRE(picture2.picture() == "data");
     }
   }
-
-  void testSaveMultiplePictures()
+  SECTION("Save multiple pictures")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::AttributeList values;
       ASF::Picture picture;
       picture.setMimeType("image/jpeg");
@@ -253,72 +204,66 @@ public:
       f.save();
     }
     {
-      ASF::File f(newname.c_str());
+      ASF::File f(copy.fileName().c_str());
       ASF::AttributeList values2 = f.tag()->attribute("WM/Picture");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)2, values2.size());
+      REQUIRE(values2.size() == (unsigned int)2);
       ASF::Picture picture3 = values2[1].toPicture();
-      CPPUNIT_ASSERT(picture3.isValid());
-      CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture3.mimeType());
-      CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, picture3.type());
-      CPPUNIT_ASSERT_EQUAL(String("description"), picture3.description());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("data"), picture3.picture());
+      REQUIRE(picture3.isValid());
+      REQUIRE(picture3.mimeType() == "image/jpeg");
+      REQUIRE(picture3.type() == ASF::Picture::FrontCover);
+      REQUIRE(picture3.description() == "description");
+      REQUIRE(picture3.picture() == "data");
       ASF::Picture picture4 = values2[0].toPicture();
-      CPPUNIT_ASSERT(picture4.isValid());
-      CPPUNIT_ASSERT_EQUAL(String("image/png"), picture4.mimeType());
-      CPPUNIT_ASSERT_EQUAL(ASF::Picture::BackCover, picture4.type());
-      CPPUNIT_ASSERT_EQUAL(String("back cover"), picture4.description());
-      CPPUNIT_ASSERT_EQUAL(ByteVector("PNG data"), picture4.picture());
+      REQUIRE(picture4.isValid());
+      REQUIRE(picture4.mimeType() == "image/png");
+      REQUIRE(picture4.type() == ASF::Picture::BackCover);
+      REQUIRE(picture4.description() == "back cover");
+      REQUIRE(picture4.picture() == "PNG data");
     }
   }
-
-  void testProperties()
+  SECTION("Read and write property map")
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
-
+    
     PropertyMap tags = f.properties();
-
+    
     tags["TRACKNUMBER"] = StringList("2");
     tags["DISCNUMBER"] = StringList("3");
     tags["BPM"] = StringList("123");
     tags["ARTIST"] = StringList("Foo Bar");
     f.setProperties(tags);
-
+    
     tags = f.properties();
-
-    CPPUNIT_ASSERT_EQUAL(String("Foo Bar"), f.tag()->artist());
-    CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), tags["ARTIST"]);
-
-    CPPUNIT_ASSERT(f.tag()->contains("WM/BeatsPerMinute"));
-    CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/BeatsPerMinute"].size());
-    CPPUNIT_ASSERT_EQUAL(String("123"), f.tag()->attribute("WM/BeatsPerMinute").front().toString());
-    CPPUNIT_ASSERT_EQUAL(StringList("123"), tags["BPM"]);
-
-    CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
-    CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/TrackNumber"].size());
-    CPPUNIT_ASSERT_EQUAL(String("2"), f.tag()->attribute("WM/TrackNumber").front().toString());
-    CPPUNIT_ASSERT_EQUAL(StringList("2"), tags["TRACKNUMBER"]);
-
-    CPPUNIT_ASSERT(f.tag()->contains("WM/PartOfSet"));
-    CPPUNIT_ASSERT_EQUAL(1u, f.tag()->attributeListMap()["WM/PartOfSet"].size());
-    CPPUNIT_ASSERT_EQUAL(String("3"), f.tag()->attribute("WM/PartOfSet").front().toString());
-    CPPUNIT_ASSERT_EQUAL(StringList("3"), tags["DISCNUMBER"]);
+    
+    REQUIRE(f.tag()->artist() == String("Foo Bar"));
+    REQUIRE(tags["ARTIST"] == StringList("Foo Bar"));
+    
+    REQUIRE(f.tag()->contains("WM/BeatsPerMinute"));
+    REQUIRE(f.tag()->attributeListMap()["WM/BeatsPerMinute"].size() == 1);
+    REQUIRE(f.tag()->attribute("WM/BeatsPerMinute").front().toString() == "123");
+    REQUIRE(tags["BPM"] == StringList("123"));
+    
+    REQUIRE(f.tag()->contains("WM/TrackNumber"));
+    REQUIRE(f.tag()->attributeListMap()["WM/TrackNumber"].size() == 1);
+    REQUIRE(f.tag()->attribute("WM/TrackNumber").front().toString() == "2");
+    REQUIRE(tags["TRACKNUMBER"] == StringList("2"));
+    
+    REQUIRE(f.tag()->contains("WM/PartOfSet"));
+    REQUIRE(f.tag()->attributeListMap()["WM/PartOfSet"].size() == 1);
+    REQUIRE(f.tag()->attribute("WM/PartOfSet").front().toString() == "3");
+    REQUIRE(tags["DISCNUMBER"] == StringList("3"));
   }
-
-  void testRepeatedSave()
+  SECTION("Save tags repeatedly without breaking file")
   {
-    ScopedFileCopy copy("silence-1", ".wma");
-
+    const ScopedFileCopy copy("silence-1", ".wma");
     {
       ASF::File f(copy.fileName().c_str());
       f.tag()->setTitle(longText(128 * 1024));
       f.save();
-      CPPUNIT_ASSERT_EQUAL(297578L, f.length());
+      REQUIRE(f.length() == 297578);
       f.tag()->setTitle(longText(16 * 1024));
       f.save();
-      CPPUNIT_ASSERT_EQUAL(68202L, f.length());
+      REQUIRE(f.length() == 68202);
     }
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestASF);
+}

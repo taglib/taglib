@@ -23,120 +23,103 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <stdio.h>
-#include <tag.h>
-#include <tbytevectorlist.h>
+#include <catch/catch.hpp>
 #include <aifffile.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
-class TestAIFF : public CppUnit::TestFixture
+TEST_CASE("AIFF File")
 {
-  CPPUNIT_TEST_SUITE(TestAIFF);
-  CPPUNIT_TEST(testAiffProperties);
-  CPPUNIT_TEST(testAiffCProperties);
-  CPPUNIT_TEST(testSaveID3v2);
-  CPPUNIT_TEST(testDuplicateID3v2);
-  CPPUNIT_TEST(testFuzzedFile1);
-  CPPUNIT_TEST(testFuzzedFile2);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testAiffProperties()
+  SECTION("Read audio properties (AIFF)")
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("empty.aiff"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(67, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(706, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
-    CPPUNIT_ASSERT_EQUAL(2941U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isAiffC());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 0);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 0);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 67);
+    REQUIRE(f.audioProperties()->bitrate() == 706);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->channels() == 1);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleWidth() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 2941);
+    REQUIRE_FALSE(f.audioProperties()->isAiffC());
   }
-
-  void testAiffCProperties()
+  SECTION("Read audio properties (AIFF-C)")
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("alaw.aifc"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(37, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(355, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
-    CPPUNIT_ASSERT_EQUAL(1622U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(true, f.audioProperties()->isAiffC());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("ALAW"), f.audioProperties()->compressionType());
-    CPPUNIT_ASSERT_EQUAL(String("SGI CCITT G.711 A-law"), f.audioProperties()->compressionName());
+    REQUIRE(f.audioProperties());
+    REQUIRE(f.audioProperties()->length() == 0);
+    REQUIRE(f.audioProperties()->lengthInSeconds() == 0);
+    REQUIRE(f.audioProperties()->lengthInMilliseconds() == 37);
+    REQUIRE(f.audioProperties()->bitrate() == 355);
+    REQUIRE(f.audioProperties()->sampleRate() == 44100);
+    REQUIRE(f.audioProperties()->channels() == 1);
+    REQUIRE(f.audioProperties()->bitsPerSample() == 16);
+    REQUIRE(f.audioProperties()->sampleWidth() == 16);
+    REQUIRE(f.audioProperties()->sampleFrames() == 1622);
+    REQUIRE(f.audioProperties()->isAiffC());
+    REQUIRE(f.audioProperties()->compressionType() == "ALAW");
+    REQUIRE(f.audioProperties()->compressionName() == "SGI CCITT G.711 A-law");
   }
-
-  void testSaveID3v2()
+  SECTION("Create and update ID3v2 tag")
   {
-    ScopedFileCopy copy("empty", ".aiff");
-    string newname = copy.fileName();
-
+    const ScopedFileCopy copy("empty", ".aiff");
     {
-      RIFF::AIFF::File f(newname.c_str());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      RIFF::AIFF::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v2Tag());
 
       f.tag()->setTitle(L"TitleXXX");
       f.save();
-      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      REQUIRE(f.hasID3v2Tag());
     }
     {
-      RIFF::AIFF::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL(String(L"TitleXXX"), f.tag()->title());
+      RIFF::AIFF::File f(copy.fileName().c_str());
+      REQUIRE(f.hasID3v2Tag());
+      REQUIRE(f.tag()->title() == "TitleXXX");
+
+      f.tag()->setTitle("TitleYYY");
+      f.save();
+      REQUIRE(f.hasID3v2Tag());
+    }
+    {
+      RIFF::AIFF::File f(copy.fileName().c_str());
+      REQUIRE(f.hasID3v2Tag());
+      REQUIRE(f.tag()->title() == "TitleYYY");
 
       f.tag()->setTitle("");
       f.save();
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      REQUIRE_FALSE(f.hasID3v2Tag());
     }
     {
-      RIFF::AIFF::File f(newname.c_str());
-      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      RIFF::AIFF::File f(copy.fileName().c_str());
+      REQUIRE_FALSE(f.hasID3v2Tag());
     }
   }
-
-  void testDuplicateID3v2()
+  SECTION("Skip and remove duplicate ID3v2 tags")
   {
-    ScopedFileCopy copy("duplicate_id3v2", ".aiff");
+    const ScopedFileCopy copy("duplicate_id3v2", ".aiff");
 
     // duplicate_id3v2.aiff has duplicate ID3v2 tag chunks.
     // title() returns "Title2" if can't skip the second tag.
 
     RIFF::AIFF::File f(copy.fileName().c_str());
-    CPPUNIT_ASSERT(f.hasID3v2Tag());
-    CPPUNIT_ASSERT_EQUAL(String("Title1"), f.tag()->title());
+    REQUIRE(f.hasID3v2Tag());
+    REQUIRE(f.tag()->title() == "Title1");
 
     f.save();
-    CPPUNIT_ASSERT_EQUAL(7030L, f.length());
-    CPPUNIT_ASSERT_EQUAL(-1L, f.find("Title2"));
+    REQUIRE(f.length() == 7030);
+    REQUIRE(f.find("Title2") == -1);
   }
-
-  void testFuzzedFile1()
+  SECTION("Open fuzzed file without crashing (1)")
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("segfault.aif"));
-    CPPUNIT_ASSERT(!f.isValid());
+    REQUIRE_FALSE(f.isValid());
   }
-
-  void testFuzzedFile2()
+  SECTION("Open fuzzed file without crashing (2)")
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("excessive_alloc.aif"));
-    CPPUNIT_ASSERT(!f.isValid());
+    REQUIRE_FALSE(f.isValid());
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestAIFF);
+}
