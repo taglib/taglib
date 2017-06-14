@@ -28,6 +28,7 @@
 #include <id3v2tag.h>
 #include <tstringlist.h>
 #include <tpropertymap.h>
+#include <tsmartptr.h>
 
 #include "dsffile.h"
 
@@ -39,19 +40,14 @@ class DSF::File::FilePrivate
 {
 public:
   FilePrivate() :
-    properties(0),
-    tag(0) {}
-
-  ~FilePrivate()
-  {
-    delete properties;
-    delete tag;
-  }
+    fileSize(0),
+    metadataOffset(0) {}
 
   long long fileSize;
   long long metadataOffset;
-  AudioProperties *properties;
-  ID3v2::Tag *tag;
+
+  SCOPED_PTR<AudioProperties> properties;
+  SCOPED_PTR<ID3v2::Tag> tag;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,12 +79,12 @@ DSF::File::~File()
 
 ID3v2::Tag *DSF::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 DSF::AudioProperties *DSF::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool DSF::File::save()
@@ -203,15 +199,15 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
 
   chunkSize = readBlock(8).toInt64LE(0);
 
-  d->properties
-    = new AudioProperties(readBlock(static_cast<size_t>(chunkSize)), propertiesStyle);
+  d->properties.reset(
+    new AudioProperties(readBlock(static_cast<size_t>(chunkSize)), propertiesStyle));
 
   // Skip the data chunk
 
   // A metadata offset of 0 indicates the absence of an ID3v2 tag
   if(0 == d->metadataOffset)
-    d->tag = new ID3v2::Tag();
+    d->tag.reset(new ID3v2::Tag());
   else
-    d->tag = new ID3v2::Tag(this, d->metadataOffset);
+    d->tag.reset(new ID3v2::Tag(this, d->metadataOffset));
 }
 
