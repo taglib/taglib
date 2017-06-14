@@ -30,6 +30,7 @@
 #include <tagunion.h>
 #include <tpropertymap.h>
 #include <tagutils.h>
+#include <tsmartptr.h>
 
 #include <id3v2header.h>
 #include <id3v2tag.h>
@@ -45,7 +46,7 @@ using namespace TagLib;
 
 namespace
 {
-  typedef List<FLAC::MetadataBlock *> BlockList;
+  typedef List<SHARED_PTR<FLAC::MetadataBlock> > BlockList;
   typedef BlockList::Iterator BlockIterator;
   typedef BlockList::Iterator BlockConstIterator;
 
@@ -57,6 +58,19 @@ namespace
   const char LastBlockFlag = '\x80';
 }
 
+namespace TagLib
+{
+  namespace FLAC
+  {
+    // Enables BlockList::find() to take raw pointers.
+
+    bool operator==(SHARED_PTR<MetadataBlock> lhs, MetadataBlock *rhs)
+    {
+      return lhs.get() == rhs;
+    }
+  }
+}
+
 class FLAC::File::FilePrivate
 {
 public:
@@ -65,20 +79,12 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
-    properties(0),
     flacStart(0),
     streamStart(0),
     scanned(false)
   {
     if(frameFactory)
       ID3v2FrameFactory = frameFactory;
-
-    blocks.setAutoDelete(true);
-  }
-
-  ~FilePrivate()
-  {
-    delete properties;
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
@@ -89,7 +95,7 @@ public:
 
   TripleTagUnion tag;
 
-  AudioProperties *properties;
+  SCOPED_PTR<AudioProperties> properties;
   ByteVector xiphCommentData;
   BlockList blocks;
 
@@ -149,7 +155,7 @@ PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
 
 FLAC::AudioProperties *FLAC::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool FLAC::File::save()
@@ -175,13 +181,13 @@ bool FLAC::File::save()
   for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
     if((*it)->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
-      delete *it;
       d->blocks.erase(it);
       break;
     }
   }
 
-  d->blocks.append(new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData));
+  d->blocks.append(SHARED_PTR<MetadataBlock>(
+    new UnknownMetadataBlock(MetadataBlock::VorbisComment, d->xiphCommentData)));
 
   // Render data for the metadata blocks
 
@@ -311,7 +317,7 @@ List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
   for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
-    Picture *picture = dynamic_cast<Picture *>(*it);
+    Picture *picture = dynamic_cast<Picture *>(it->get());
     if(picture) {
       pictures.append(picture);
     }
@@ -321,24 +327,20 @@ List<FLAC::Picture *> FLAC::File::pictureList()
 
 void FLAC::File::addPicture(Picture *picture)
 {
-  d->blocks.append(picture);
+  d->blocks.append(SHARED_PTR<Picture>(picture));
 }
 
-void FLAC::File::removePicture(Picture *picture, bool del)
+void FLAC::File::removePicture(Picture *picture)
 {
   BlockIterator it = d->blocks.find(picture);
   if(it != d->blocks.end())
     d->blocks.erase(it);
-
-  if(del)
-    delete picture;
 }
 
 void FLAC::File::removePictures()
 {
   for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ) {
-    if(dynamic_cast<Picture *>(*it)) {
-      delete *it;
+    if(dynamic_cast<Picture *>(it->get())) {
       it = d->blocks.erase(it);
     }
     else {
@@ -423,7 +425,7 @@ void FLAC::File::read(bool readProperties)
     else
       streamLength = length() - d->streamStart;
 
-    d->properties = new AudioProperties(infoData, streamLength);
+    d->properties.reset(new AudioProperties(infoData, streamLength));
   }
 }
 
@@ -497,33 +499,32 @@ void FLAC::File::scan()
       return;
     }
 
-    MetadataBlock *block = 0;
+    SHARED_PTR<MetadataBlock> block;
 
     // Found the vorbis-comment
     if(blockType == MetadataBlock::VorbisComment) {
       if(d->xiphCommentData.isEmpty()) {
         d->xiphCommentData = data;
-        block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, data);
+        block.reset(new UnknownMetadataBlock(MetadataBlock::VorbisComment, data));
       }
       else {
         debug("FLAC::File::scan() -- multiple Vorbis Comment blocks found, discarding");
       }
     }
     else if(blockType == MetadataBlock::Picture) {
-      FLAC::Picture *picture = new FLAC::Picture();
+      SHARED_PTR<FLAC::Picture> picture(new FLAC::Picture());
       if(picture->parse(data)) {
         block = picture;
       }
       else {
         debug("FLAC::File::scan() -- invalid picture found, discarding");
-        delete picture;
       }
     }
     else if(blockType == MetadataBlock::Padding) {
       // Skip all padding blocks.
     }
     else {
-      block = new UnknownMetadataBlock(blockType, data);
+      block.reset(new UnknownMetadataBlock(blockType, data));
     }
 
     if(block)

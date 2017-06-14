@@ -216,10 +216,9 @@ namespace TagLib {
       List<Picture *> pictureList();
 
       /*!
-       * Removes an attached picture. If \a del is true the picture's memory
-       * will be freed; if it is false, it must be deleted by the user.
+       * Removes an attached picture. The picture's memory will be freed.
        */
-      void removePicture(Picture *picture, bool del = true);
+      void removePicture(Picture *picture);
 
       /*!
        * Remove all attached images.
