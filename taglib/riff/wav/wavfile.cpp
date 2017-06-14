@@ -28,6 +28,7 @@
 #include <tstringlist.h>
 #include <tpropertymap.h>
 #include <tagutils.h>
+#include <tsmartptr.h>
 
 #include "wavfile.h"
 #include "id3v2tag.h"
@@ -45,16 +46,10 @@ class RIFF::WAV::File::FilePrivate
 {
 public:
   FilePrivate() :
-    properties(0),
     hasID3v2(false),
     hasInfo(false) {}
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
-
-  AudioProperties *properties;
+  SCOPED_PTR<AudioProperties> properties;
   DoubleTagUnion tag;
 
   bool hasID3v2;
@@ -132,7 +127,7 @@ PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 
 RIFF::WAV::AudioProperties *RIFF::WAV::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool RIFF::WAV::File::save()
@@ -224,7 +219,7 @@ void RIFF::WAV::File::read(bool readProperties)
     d->tag.set(InfoIndex, new RIFF::Info::Tag());
 
   if(readProperties)
-    d->properties = new AudioProperties(this);
+    d->properties.reset(new AudioProperties(this));
 }
 
 void RIFF::WAV::File::removeTagChunks(TagTypes tags)
