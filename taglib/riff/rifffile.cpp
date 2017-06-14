@@ -120,7 +120,7 @@ size_t RIFF::File::chunkCount() const
 unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 {
   if(i >= d->chunks.size()) {
-    debug("RIFF::File::chunkPadding() - Index out of range. Returning 0.");
+    debug("RIFF::File::chunkDataSize() - Index out of range. Returning 0.");
     return 0;
   }
 
@@ -130,7 +130,7 @@ unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 long long RIFF::File::chunkOffset(unsigned int i) const
 {
   if(i >= d->chunks.size()) {
-    debug("RIFF::File::chunkPadding() - Index out of range. Returning 0.");
+    debug("RIFF::File::chunkOffset() - Index out of range. Returning 0.");
     return 0;
   }
 
