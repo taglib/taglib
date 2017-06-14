@@ -28,6 +28,7 @@
 #include <tpropertymap.h>
 #include <tstring.h>
 #include <tagutils.h>
+#include <tsmartptr.h>
 
 #include "asffile.h"
 #include "asftag.h"
@@ -50,37 +51,24 @@ public:
   class MetadataObject;
   class MetadataLibraryObject;
 
-  FilePrivate():
-    headerSize(0),
-    tag(0),
-    properties(0),
-    contentDescriptionObject(0),
-    extendedContentDescriptionObject(0),
-    headerExtensionObject(0),
-    metadataObject(0),
-    metadataLibraryObject(0)
-  {
-    objects.setAutoDelete(true);
-  }
+  typedef List<SHARED_PTR<BaseObject> > ObjectList;
+  typedef ObjectList::ConstIterator     ObjectConstIterator;
 
-  ~FilePrivate()
-  {
-    delete tag;
-    delete properties;
-  }
+  FilePrivate():
+    headerSize(0) {}
 
   unsigned long long headerSize;
 
-  ASF::Tag *tag;
-  ASF::AudioProperties *properties;
+  SCOPED_PTR<ASF::Tag> tag;
+  SCOPED_PTR<ASF::AudioProperties> properties;
 
-  List<BaseObject *> objects;
+  ObjectList objects;
 
-  ContentDescriptionObject         *contentDescriptionObject;
-  ExtendedContentDescriptionObject *extendedContentDescriptionObject;
-  HeaderExtensionObject            *headerExtensionObject;
-  MetadataObject                   *metadataObject;
-  MetadataLibraryObject            *metadataLibraryObject;
+  SHARED_PTR<ContentDescriptionObject>         contentDescriptionObject;
+  SHARED_PTR<ExtendedContentDescriptionObject> extendedContentDescriptionObject;
+  SHARED_PTR<HeaderExtensionObject>            headerExtensionObject;
+  SHARED_PTR<MetadataObject>                   metadataObject;
+  SHARED_PTR<MetadataLibraryObject>            metadataLibraryObject;
 };
 
 namespace
@@ -169,7 +157,7 @@ public:
 class ASF::File::FilePrivate::HeaderExtensionObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
-  List<ASF::File::FilePrivate::BaseObject *> objects;
+  ObjectList objects;
   HeaderExtensionObject();
   ByteVector guid() const;
   void parse(ASF::File *file, unsigned int size);
@@ -363,7 +351,6 @@ ByteVector ASF::File::FilePrivate::MetadataLibraryObject::render(ASF::File *file
 
 ASF::File::FilePrivate::HeaderExtensionObject::HeaderExtensionObject()
 {
-  objects.setAutoDelete(true);
 }
 
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::guid() const
@@ -388,17 +375,17 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
       file->setValid(false);
       break;
     }
-    BaseObject *obj;
+    SHARED_PTR<BaseObject> obj;
     if(guid == metadataGuid) {
-      file->d->metadataObject = new MetadataObject();
+      file->d->metadataObject.reset(new MetadataObject());
       obj = file->d->metadataObject;
     }
     else if(guid == metadataLibraryGuid) {
-      file->d->metadataLibraryObject = new MetadataLibraryObject();
+      file->d->metadataLibraryObject.reset(new MetadataLibraryObject());
       obj = file->d->metadataLibraryObject;
     }
     else {
-      obj = new UnknownObject(guid);
+      obj.reset(new UnknownObject(guid));
     }
     obj->parse(file, (unsigned int)size);
     objects.append(obj);
@@ -409,7 +396,7 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(List<BaseObject *>::ConstIterator it = objects.begin(); it != objects.end(); ++it) {
+  for(ObjectConstIterator it = objects.begin(); it != objects.end(); ++it) {
     data.append((*it)->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt32LE(data.size()) + data;
@@ -510,12 +497,12 @@ ASF::File::~File()
 
 ASF::Tag *ASF::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 ASF::AudioProperties *ASF::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool ASF::File::save()
@@ -531,23 +518,23 @@ bool ASF::File::save()
   }
 
   if(!d->contentDescriptionObject) {
-    d->contentDescriptionObject = new FilePrivate::ContentDescriptionObject();
+    d->contentDescriptionObject.reset(new FilePrivate::ContentDescriptionObject());
     d->objects.append(d->contentDescriptionObject);
   }
   if(!d->extendedContentDescriptionObject) {
-    d->extendedContentDescriptionObject = new FilePrivate::ExtendedContentDescriptionObject();
+    d->extendedContentDescriptionObject.reset(new FilePrivate::ExtendedContentDescriptionObject());
     d->objects.append(d->extendedContentDescriptionObject);
   }
   if(!d->headerExtensionObject) {
-    d->headerExtensionObject = new FilePrivate::HeaderExtensionObject();
+    d->headerExtensionObject.reset(new FilePrivate::HeaderExtensionObject());
     d->objects.append(d->headerExtensionObject);
   }
   if(!d->metadataObject) {
-    d->metadataObject = new FilePrivate::MetadataObject();
+    d->metadataObject.reset(new FilePrivate::MetadataObject());
     d->headerExtensionObject->objects.append(d->metadataObject);
   }
   if(!d->metadataLibraryObject) {
-    d->metadataLibraryObject = new FilePrivate::MetadataLibraryObject();
+    d->metadataLibraryObject.reset(new FilePrivate::MetadataLibraryObject());
     d->headerExtensionObject->objects.append(d->metadataLibraryObject);
   }
 
@@ -586,7 +573,7 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(List<FilePrivate::BaseObject *>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
+  for(FilePrivate::ObjectConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
     data.append((*it)->render(this));
   }
 
@@ -617,8 +604,8 @@ void ASF::File::read()
     return;
   }
 
-  d->tag = new ASF::Tag();
-  d->properties = new ASF::AudioProperties();
+  d->tag.reset(new ASF::Tag());
+  d->properties.reset(new ASF::AudioProperties());
 
   bool ok;
   d->headerSize = readQWORD(this, &ok);
@@ -633,8 +620,8 @@ void ASF::File::read()
   }
   seek(2, Current);
 
-  FilePrivate::FilePropertiesObject   *filePropertiesObject   = 0;
-  FilePrivate::StreamPropertiesObject *streamPropertiesObject = 0;
+  SHARED_PTR<FilePrivate::FilePropertiesObject>   filePropertiesObject;
+  SHARED_PTR<FilePrivate::StreamPropertiesObject> streamPropertiesObject;
   for(int i = 0; i < numObjects; i++) {
     const ByteVector guid = readBlock(16);
     if(guid.size() != 16) {
@@ -646,29 +633,29 @@ void ASF::File::read()
       setValid(false);
       break;
     }
-    FilePrivate::BaseObject *obj;
+    SHARED_PTR<FilePrivate::BaseObject> obj;
     if(guid == filePropertiesGuid) {
-      filePropertiesObject = new FilePrivate::FilePropertiesObject();
+      filePropertiesObject.reset(new FilePrivate::FilePropertiesObject());
       obj = filePropertiesObject;
     }
     else if(guid == streamPropertiesGuid) {
-      streamPropertiesObject = new FilePrivate::StreamPropertiesObject();
+      streamPropertiesObject.reset(new FilePrivate::StreamPropertiesObject());
       obj = streamPropertiesObject;
     }
     else if(guid == contentDescriptionGuid) {
-      d->contentDescriptionObject = new FilePrivate::ContentDescriptionObject();
+      d->contentDescriptionObject.reset(new FilePrivate::ContentDescriptionObject());
       obj = d->contentDescriptionObject;
     }
     else if(guid == extendedContentDescriptionGuid) {
-      d->extendedContentDescriptionObject = new FilePrivate::ExtendedContentDescriptionObject();
+      d->extendedContentDescriptionObject.reset(new FilePrivate::ExtendedContentDescriptionObject());
       obj = d->extendedContentDescriptionObject;
     }
     else if(guid == headerExtensionGuid) {
-      d->headerExtensionObject = new FilePrivate::HeaderExtensionObject();
+      d->headerExtensionObject.reset(new FilePrivate::HeaderExtensionObject());
       obj = d->headerExtensionObject;
     }
     else if(guid == codecListGuid) {
-      obj = new FilePrivate::CodecListObject();
+      obj.reset(new FilePrivate::CodecListObject());
     }
     else {
       if(guid == contentEncryptionGuid ||
@@ -676,7 +663,7 @@ void ASF::File::read()
          guid == advancedContentEncryptionGuid) {
         d->properties->setEncrypted(true);
       }
-      obj = new FilePrivate::UnknownObject(guid);
+      obj.reset(new FilePrivate::UnknownObject(guid));
     }
     obj->parse(this, size);
     d->objects.append(obj);
