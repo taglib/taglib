@@ -173,7 +173,8 @@ void RIFF::WAV::AudioProperties::read(File *file)
   d->format = data.toUInt16LE(0);
   if(d->format != FORMAT_PCM && totalSamples == 0) {
     debug("RIFF::WAV::AudioProperties::read() - Non-PCM format, but 'fact' chunk not found.");
-    return;
+    // Ignore this error to get the length of non-FORMAT_PCM format audio files.
+    //return;
   }
 
   d->channels      = data.toUInt16LE(2);
