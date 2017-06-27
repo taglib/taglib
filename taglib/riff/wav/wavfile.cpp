@@ -150,21 +150,21 @@ bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
   if(stripOthers)
     strip(static_cast<TagTypes>(AllTags & ~tags));
 
-  if(tags & ID3v2) {
-    removeTagChunks(ID3v2);
-
-    if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
-      setChunkData("ID3 ", ID3v2Tag()->render(id3v2Version));
-      d->hasID3v2 = true;
-    }
-  }
-
   if(tags & Info) {
     removeTagChunks(Info);
 
     if(InfoTag() && !InfoTag()->isEmpty()) {
       setChunkData("LIST", InfoTag()->render(), true);
       d->hasInfo = true;
+    }
+  }
+  
+  if(tags & ID3v2) {
+    removeTagChunks(ID3v2);
+
+    if(ID3v2Tag() && !ID3v2Tag()->isEmpty()) {
+      setChunkData("ID3 ", ID3v2Tag()->render(id3v2Version));
+      d->hasID3v2 = true;
     }
   }
 
