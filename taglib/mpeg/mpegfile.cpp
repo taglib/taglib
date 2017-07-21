@@ -110,7 +110,7 @@ bool MPEG::File::isSupported(IOStream *stream)
 
   if (buffer.isEmpty())
   {
-	  return false;
+	   return false;
   }
   
   const long originalPosition = stream->tell();
