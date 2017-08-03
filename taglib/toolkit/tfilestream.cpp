@@ -58,6 +58,11 @@ namespace
 #endif
   }
 
+  FileHandle openFile(const int fileDescriptor, bool readOnly)
+  {
+    return InvalidFileHandle;
+  }
+
   void closeFile(FileHandle file)
   {
     CloseHandle(file);
@@ -96,6 +101,11 @@ namespace
   FileHandle openFile(const FileName &path, bool readOnly)
   {
     return fopen(path, readOnly ? "rb" : "rb+");
+  }
+
+  FileHandle openFile(const int fileDescriptor, bool readOnly)
+  {
+    return fdopen(fileDescriptor, readOnly ? "rb" : "rb+");
   }
 
   void closeFile(FileHandle file)
@@ -154,6 +164,29 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
     debug("Could not open file " + fileName.toString());
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
+# endif
+  }
+}
+
+FileStream::FileStream(int fileDescriptor, bool openReadOnly)
+  : d(new FileStreamPrivate(""))
+{
+  // First try with read / write mode, if that fails, fall back to read only.
+
+  if(!openReadOnly)
+    d->file = openFile(fileDescriptor, false);
+
+  if(d->file != InvalidFileHandle)
+    d->readOnly = false;
+  else
+    d->file = openFile(fileDescriptor, true);
+
+  if(d->file == InvalidFileHandle)
+  {
+# ifdef _WIN32
+    debug("Could not open file using file descriptor");
+# else
+    debug("Could not open file file using file descriptor");
 # endif
   }
 }
