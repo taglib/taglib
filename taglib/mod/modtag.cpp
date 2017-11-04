@@ -64,6 +64,11 @@ String Mod::Tag::artist() const
   return String();
 }
 
+String Mod::Tag::albumArtist() const
+{
+  return String();
+}
+
 String Mod::Tag::album() const
 {
   return String();

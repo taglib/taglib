@@ -98,6 +98,11 @@ String RIFF::Info::Tag::artist() const
   return fieldText("IART");
 }
 
+String RIFF::Info::Tag::albumArtist() const
+{
+  return fieldText("IMUS");
+}
+
 String RIFF::Info::Tag::album() const
 {
   return fieldText("IPRD");

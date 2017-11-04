@@ -91,6 +91,12 @@ namespace TagLib {
     virtual String artist() const = 0;
 
     /*!
+     * Returns the album artist name; if no album artist is present in the tag
+     * String:null will be returned
+     */
+    virtual String albumArtist() const = 0;
+
+    /*!
      * Returns the album name; if no album name is present in the tag
      * String::null will be returned.
      */

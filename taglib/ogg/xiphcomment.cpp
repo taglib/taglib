@@ -92,6 +92,13 @@ String Ogg::XiphComment::artist() const
   return d->fieldListMap["ARTIST"].toString();
 }
 
+String Ogg::XiphComment::albumArtist() const 
+{
+  if(d->fieldListMap["ALBUMARTIST"].isEmpty())
+    return String();
+  return d->fieldListMap["ALBUMARTIST"].toString();
+}
+
 String Ogg::XiphComment::album() const
 {
   if(d->fieldListMap["ALBUM"].isEmpty())

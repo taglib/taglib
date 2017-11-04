@@ -146,6 +146,13 @@ String ID3v2::Tag::artist() const
   return String();
 }
 
+String ID3v2::Tag::albumArtist() const
+{
+  if(!d->frameListMap["TPE2"].isEmpty())
+    return d->frameListMap["TPE2"].front()->toString();
+  return String();
+}
+
 String ID3v2::Tag::album() const
 {
   if(!d->frameListMap["TALB"].isEmpty())

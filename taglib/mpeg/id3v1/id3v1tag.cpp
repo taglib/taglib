@@ -137,6 +137,11 @@ String ID3v1::Tag::artist() const
   return d->artist;
 }
 
+String ID3v1::Tag::albumArtist() const
+{
+  return d->artist;
+}
+
 String ID3v1::Tag::album() const
 {
   return d->album;

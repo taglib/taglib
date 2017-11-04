@@ -174,6 +174,11 @@ String TagUnion::artist() const
   stringUnion(artist);
 }
 
+String TagUnion::albumArtist() const
+{
+  stringUnion(albumArtist);
+}
+
 String TagUnion::album() const
 {
   stringUnion(album);
