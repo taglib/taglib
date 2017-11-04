@@ -281,10 +281,10 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
 
   case BoolType:
     if(kind == 0) {
-      data.append(ByteVector::fromUInt(toBool()));
+      data.append(ByteVector::fromUInt(toBool(), false));
     }
     else {
-      data.append(ByteVector::fromShort(toBool()));
+      data.append(ByteVector::fromShort(toBool(), false));
     }
     break;
 

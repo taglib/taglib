@@ -189,7 +189,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
       }
     }
     String text = readStringField(data, enc, &pos);
-    if(text.isEmpty() || pos + 4 > end)
+    if(pos + 4 > end)
       return;
 
     unsigned int time = data.toUInt(pos, true);

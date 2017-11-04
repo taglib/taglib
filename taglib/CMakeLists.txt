@@ -24,16 +24,13 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/it
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
+  ${CMAKE_SOURCE_DIR}/3rdparty
 )
 
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
 elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
-endif()
-
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIR})
 endif()
 
 set(tag_HDRS
@@ -312,12 +309,6 @@ set(toolkit_SRCS
   toolkit/tzlib.cpp
 )
 
-if(NOT WIN32)
-  set(unicode_SRCS
-    toolkit/unicode.cpp
-  )
-endif()
-
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS
     ${ZLIB_SOURCE}/adler32.c
@@ -334,7 +325,7 @@ set(tag_LIB_SRCS
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${unicode_SRCS} ${zlib_SRCS}
+  ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp

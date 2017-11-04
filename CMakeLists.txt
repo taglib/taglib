@@ -46,6 +46,11 @@ option(BUILD_BINDINGS "Build the bindings" ON)
 
 option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs" OFF)
 
+option(PLATFORM_WINRT "Enable WinRT support" OFF)
+if(PLATFORM_WINRT)
+  add_definitions(-DPLATFORM_WINRT)
+endif()
+
 add_definitions(-DHAVE_CONFIG_H)
 set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 

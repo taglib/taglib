@@ -77,6 +77,55 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+namespace
+{
+  // Dummy file class to make a stream work with MPEG::Header.
+
+  class AdapterFile : public TagLib::File
+  {
+  public:
+    AdapterFile(IOStream *stream) : File(stream) {}
+
+    Tag *tag() const { return 0; }
+    AudioProperties *audioProperties() const { return 0; }
+    bool save() { return false; }
+  };
+}
+
+bool MPEG::File::isSupported(IOStream *stream)
+{
+  if(!stream || !stream->isOpen())
+    return false;
+
+  // An MPEG file has MPEG frame headers. An ID3v2 tag may precede.
+
+  // MPEG frame headers are really confusing with irrelevant binary data.
+  // So we check if a frame header is really valid.
+
+  long headerOffset;
+  const ByteVector buffer = Utils::readHeader(stream, bufferSize(), true, &headerOffset);
+
+  const long originalPosition = stream->tell();
+  AdapterFile file(stream);
+
+  for(unsigned int i = 0; i < buffer.size() - 1; ++i) {
+    if(isFrameSync(buffer, i)) {
+      const Header header(&file, headerOffset + i, true);
+      if(header.isValid()) {
+        stream->seek(originalPosition);
+        return true;
+      }
+    }
+  }
+
+  stream->seek(originalPosition);
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -373,15 +422,13 @@ long MPEG::File::previousFrameOffset(long position)
   ByteVector frameSyncBytes(2, '\0');
 
   while(position > 0) {
-    const long size = std::min<long>(position, bufferSize());
-    position -= size;
+    const long bufferLength = std::min<long>(position, bufferSize());
+    position -= bufferLength;
 
     seek(position);
-    const ByteVector buffer = readBlock(bufferSize());
-    if(buffer.isEmpty())
-      return -1;
+    const ByteVector buffer = readBlock(bufferLength);
 
-    for(int i = buffer.size() - 1; i >= 0; i--) {
+    for(int i = buffer.size() - 1; i >= 0; --i) {
       frameSyncBytes[1] = frameSyncBytes[0];
       frameSyncBytes[0] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {

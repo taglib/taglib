@@ -27,6 +27,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <tagutils.h>
 
 #include <xiphcomment.h>
 #include "oggflacfile.h"
@@ -64,6 +65,18 @@ public:
   bool hasXiphComment;
   int commentPacket;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+bool Ogg::FLAC::File::isSupported(IOStream *stream)
+{
+  // An Ogg FLAC file has IDs "OggS" and "fLaC" somewhere.
+
+  const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
+  return (buffer.find("OggS") >= 0 && buffer.find("fLaC") >= 0);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members

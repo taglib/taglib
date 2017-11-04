@@ -30,6 +30,7 @@
 #include <tstring.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+#include <tagutils.h>
 
 #include "opusfile.h"
 
@@ -52,6 +53,18 @@ public:
   Ogg::XiphComment *comment;
   Properties *properties;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+bool Ogg::Opus::File::isSupported(IOStream *stream)
+{
+  // An Opus file has IDs "OggS" and "OpusHead" somewhere.
+
+  const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
+  return (buffer.find("OggS") >= 0 && buffer.find("OpusHead") >= 0);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members

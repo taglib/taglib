@@ -961,6 +961,9 @@ public:
     CPPUNIT_ASSERT(parsedFrameMvin);
     CPPUNIT_ASSERT_EQUAL(String("Movement Name"), parsedFrameMvnm->toString());
     CPPUNIT_ASSERT_EQUAL(String("2/3"), parsedFrameMvin->toString());
+
+    tag.addFrame(parsedFrameMvnm);
+    tag.addFrame(parsedFrameMvin);
   }
 
   void testDeleteFrame()
