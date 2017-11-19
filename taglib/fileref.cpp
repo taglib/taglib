@@ -355,6 +355,8 @@ const FileRef::FileTypeResolver *FileRef::addFileTypeResolver(const FileRef::Fil
   return resolver;
 }
 
+FileRef::FileTypeResolver::~FileTypeResolver() { }
+
 StringList FileRef::defaultFileExtensions()
 {
   StringList l;
