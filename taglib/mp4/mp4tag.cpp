@@ -97,6 +97,35 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
       parseText(atom);
     }
   }
+
+  MP4::Atom *xtra = atoms->find("moov", "udta", "Xtra");
+  if(!xtra) {
+    //debug("Atom moov.udta.Xtra not found.");
+    return;
+  }
+  else {
+    for(unsigned int i = 0; i < xtra->children.size(); i++) {
+      MP4::Atom *atom = xtra->children[i];
+      file->seek(atom->offset + 8);
+      ByteVector data = file->readBlock(atom->length - 8);
+      String name = String(data.data(), String::UTF8);
+      if(name == "WM/InitialKey") {
+        unsigned int pos = name.size();
+        const unsigned int length = static_cast<unsigned int>(data.mid(pos, 4).toUInt());
+        pos += 4;
+        for(unsigned int item = 0; item < length; ++item) {
+          // 4 bytes for block length
+          pos += 4;
+          // another 2 bytes for encoding
+          pos += 2;
+          StringList valueList;
+          String value = String(data.mid(pos), String::UTF16LE);
+          valueList.append(value);
+          addItem(String("WM/InitialKey"), valueList);
+        }
+      }
+    }
+  }
 }
 
 MP4::Tag::~Tag()

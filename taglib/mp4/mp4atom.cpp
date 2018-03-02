@@ -31,10 +31,10 @@
 
 using namespace TagLib;
 
-const char *MP4::Atom::containers[11] = {
+const char *MP4::Atom::containers[12] = {
     "moov", "udta", "mdia", "meta", "ilst",
     "stbl", "minf", "moof", "traf", "trak",
-    "stsd"
+    "stsd", "Xtra"
 };
 
 MP4::Atom::Atom(File *file)
