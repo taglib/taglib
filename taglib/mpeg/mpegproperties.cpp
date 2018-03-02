@@ -25,9 +25,11 @@
 
 #include "mpegproperties.h"
 
+#include "taglib.h"
 #include "tdebug.h"
 #include "mpegfile.h"
 #include "xingheader.h"
+#include "adtsheader.h"
 #include "apetag.h"
 #include "apefooter.h"
 
@@ -123,6 +125,31 @@ bool MPEG::Properties::isOriginal() const
 
 void MPEG::Properties::read(File *file)
 {
+  if(file->containerFormat() == File::ADTS) {
+    const MPEG::ADTSHeader firstHeader(file, 0);
+
+    if(firstHeader.bitrate() > 0) {
+      d->bitrate = firstHeader.bitrate();
+      d->length = file->length() / d->bitrate / 8;
+    }
+
+    d->sampleRate        = firstHeader.sampleRate();
+    if(firstHeader.channelMode() != ADTSHeader::FrontCenterLeftRightSideLeftRightBackLeftRightLFE)
+      d->channels        = static_cast<int>(firstHeader.channelMode());
+    else
+      d->channels        = 8;
+    d->version           = firstHeader.version();
+    d->layer             = 0;
+    d->protectionEnabled = firstHeader.protectionEnabled();
+    if(firstHeader.channelMode() != ADTSHeader::FrontCenter)
+      d->channelMode     = Header::JointStereo;
+    else
+      d->channelMode     = Header::SingleChannel;
+    d->isCopyrighted     = firstHeader.isCopyrighted();
+    d->isOriginal        = firstHeader.isOriginal();
+    return;
+  }
+
   // Only the first valid frame is required if we have a VBR header.
 
   const offset_t firstFrameOffset = file->firstFrameOffset();

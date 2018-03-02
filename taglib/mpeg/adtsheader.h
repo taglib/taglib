@@ -1,6 +1,5 @@
 /***************************************************************************
-    copyright            : (C) 2002 - 2008 by Scott Wheeler
-    email                : wheeler@kde.org
+    copyright           : (C) 2018 inMusic brands, inc.
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,13 +22,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_MPEGHEADER_H
-#define TAGLIB_MPEGHEADER_H
+#ifndef TAGLIB_ADTSHEADER_H
+#define TAGLIB_ADTSHEADER_H
 
 #include <memory>
 
 #include "taglib.h"
 #include "taglib_export.h"
+#include "mpegheader.h"
 
 namespace TagLib {
 
@@ -38,36 +38,31 @@ namespace TagLib {
 
   namespace MPEG {
 
-    //! An implementation of MP3 frame headers
+    //! An implementation of ADTS frame headers
 
     /*!
-     * This is an implementation of MPEG Layer III headers.  The API follows more
-     * or less the binary format of these headers.  I've used
-     * <a href="http://www.mp3-tech.org/programmer/frame_header.html">this</a>
+     * This is an implementation of ADTS headers used for .aac files.
+     * I've used <a href="https://wiki.multimedia.cx/index.php/ADTS">this</a>
      * document as a reference.
      */
 
-    class TAGLIB_EXPORT Header
+    class TAGLIB_EXPORT ADTSHeader
     {
     public:
       /*!
-       * Parses an MPEG header based on \a file and \a offset.
-       *
-       * \note If \a checkLength is true, this requires the next MPEG frame to
-       * check if the frame length is parsed and calculated correctly.  So it's
-       * suitable for seeking for the first valid frame.
+       * Parses an ADTS header based on \a file and \a offset.
        */
-      Header(File *file, offset_t offset, bool checkLength = true);
+      ADTSHeader(TagLib::File *file, offset_t offset);
 
       /*!
        * Does a shallow copy of \a h.
        */
-      Header(const Header &h);
+      ADTSHeader(const ADTSHeader &h);
 
       /*!
        * Destroys this Header instance.
        */
-      virtual ~Header();
+      virtual ~ADTSHeader();
 
       /*!
        * Returns true if the frame is at least an appropriate size and has
@@ -76,28 +71,9 @@ namespace TagLib {
       bool isValid() const;
 
       /*!
-       * The MPEG Version.
-       */
-      enum Version {
-        //! MPEG Version 1
-        Version1 = 0,
-        //! MPEG Version 2
-        Version2 = 1,
-        //! MPEG Version 2.5
-        Version2_5 = 2,
-        //! MPEG Version 4
-        Version4 = 3
-      };
-
-      /*!
        * Returns the MPEG Version of the header.
        */
-      Version version() const;
-
-      /*!
-       * Returns the layer version.  This will be between the values 1-3.
-       */
-      int layer() const;
+      Header::Version version() const;
 
       /*!
        * Returns true if the MPEG protection bit is enabled.
@@ -105,7 +81,7 @@ namespace TagLib {
       bool protectionEnabled() const;
 
       /*!
-       * Returns the bitrate encoded in the header.
+       * Returns the approximate bitrate.
        */
       int bitrate() const;
 
@@ -115,23 +91,17 @@ namespace TagLib {
       int sampleRate() const;
 
       /*!
-       * Returns true if the frame is padded.
-       */
-      bool isPadded() const;
-
-      /*!
-       * There are a few combinations or one or two channel audio that are
-       * possible:
+       * Channel configurations.
        */
       enum ChannelMode {
-        //! Stereo
-        Stereo        = 0,
-        //! Stereo
-        JointStereo   = 1,
-        //! Dual Mono
-        DualChannel   = 2,
-        //! Mono
-        SingleChannel = 3
+        Custom = 0,
+        FrontCenter = 1,
+        FrontLeftRight = 2,
+        FrontCenterLeftRight = 3,
+        FrontCenterLeftRightBackCenter = 4,
+        FrontCenterLeftRightBackLeftRight = 5,
+        FrontCenterLeftRightBackLeftRightLFE = 6,
+        FrontCenterLeftRightSideLeftRightBackLeftRightLFE = 7,
       };
 
       /*!
@@ -162,10 +132,10 @@ namespace TagLib {
       /*!
        * Makes a shallow copy of the header.
        */
-      Header &operator=(const Header &h);
+      ADTSHeader &operator=(const ADTSHeader &h);
 
     private:
-      void parse(File *file, offset_t offset, bool checkLength);
+      void parse(File *file, offset_t offset);
 
       class HeaderPrivate;
       std::shared_ptr<HeaderPrivate> d;
