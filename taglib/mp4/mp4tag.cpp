@@ -754,7 +754,8 @@ MP4::Tag::track() const
 unsigned int 
 MP4::Tag::bpm() const
 {
-  // TODO: proper bpm information 
+  if(d->items.contains("tmpo"))
+    return d->items["tmpo"].toIntPair().first;
   return 0;
 }
 
