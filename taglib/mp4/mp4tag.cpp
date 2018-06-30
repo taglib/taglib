@@ -751,6 +751,13 @@ MP4::Tag::track() const
   return 0;
 }
 
+unsigned int 
+MP4::Tag::bpm() const
+{
+  // TODO: proper bpm information 
+  return 0;
+}
+
 void
 MP4::Tag::setTitle(const String &value)
 {

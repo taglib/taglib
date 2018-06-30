@@ -139,6 +139,12 @@ unsigned int Ogg::XiphComment::track() const
   return 0;
 }
 
+unsigned int Ogg::XiphComment::bpm() const 
+{ 
+  // TODO: proper bpm information 
+  return 0;
+}
+
 void Ogg::XiphComment::setTitle(const String &s)
 {
   addField("TITLE", s);

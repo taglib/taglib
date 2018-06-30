@@ -103,6 +103,12 @@ unsigned int ASF::Tag::track() const
   return 0;
 }
 
+unsigned int ASF::Tag::bpm() const 
+{ 
+  // TODO: proper bpm information 
+  return 0;
+}
+
 String ASF::Tag::genre() const
 {
   if(d->attributeListMap.contains("WM/Genre"))

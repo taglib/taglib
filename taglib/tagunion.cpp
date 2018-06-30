@@ -199,6 +199,11 @@ unsigned int TagUnion::track() const
   numberUnion(track);
 }
 
+unsigned int TagUnion::bpm() const
+{
+  numberUnion(bpm);
+}
+
 void TagUnion::setTitle(const String &s)
 {
   setUnion(Title, s);

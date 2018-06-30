@@ -120,6 +120,12 @@ namespace TagLib {
     virtual unsigned int track() const = 0;
 
     /*!
+     * Returns the beats-per-minute (bpm) of the track; if there is no bpm 
+     * set, or bpm tag in the metadata, this will return 0.
+     */ 
+    virtual unsigned int bpm() const = 0; 
+
+    /*!
      * Sets the title to \a s.  If \a s is String::null then this value will be
      * cleared.
      */

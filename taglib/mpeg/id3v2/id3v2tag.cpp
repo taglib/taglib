@@ -228,6 +228,11 @@ unsigned int ID3v2::Tag::track() const
   return 0;
 }
 
+unsigned int ID3v2::Tag::bpm() const { 
+  // TODO: proper bpm information 
+  return 0;
+}
+
 void ID3v2::Tag::setTitle(const String &s)
 {
   setTextFrame("TIT2", s);

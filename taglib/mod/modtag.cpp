@@ -89,6 +89,11 @@ unsigned int Mod::Tag::track() const
   return 0;
 }
 
+unsigned int Mod::Tag::bpm() const
+{
+  return 0;
+}
+
 String Mod::Tag::trackerName() const
 {
   return d->trackerName;
