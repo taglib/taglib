@@ -125,7 +125,8 @@ unsigned int RIFF::Info::Tag::track() const
 
 unsigned int RIFF::Info::Tag::bpm() const 
 {
-  // TODO: proper bpm information 
+  // TODO: proper bpm information
+  // RIFF doesn't seem to support BPM information. 
   return 0;
 }
 
