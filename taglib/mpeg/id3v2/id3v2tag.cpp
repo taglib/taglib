@@ -228,6 +228,12 @@ unsigned int ID3v2::Tag::track() const
   return 0;
 }
 
+unsigned int ID3v2::Tag::bpm() const { 
+  if(!d->frameListMap["TBPM"].isEmpty())
+    return d->frameListMap["TBPM"].front()->toString().toInt();
+  return 0;
+}
+
 void ID3v2::Tag::setTitle(const String &s)
 {
   setTextFrame("TIT2", s);

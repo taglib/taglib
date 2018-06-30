@@ -751,6 +751,14 @@ MP4::Tag::track() const
   return 0;
 }
 
+unsigned int 
+MP4::Tag::bpm() const
+{
+  if(d->items.contains("tmpo"))
+    return d->items["tmpo"].toIntPair().first;
+  return 0;
+}
+
 void
 MP4::Tag::setTitle(const String &value)
 {

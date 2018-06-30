@@ -165,6 +165,12 @@ unsigned int APE::Tag::track() const
   return d->itemListMap["TRACK"].toString().toInt();
 }
 
+unsigned int APE::Tag::bpm() const 
+{ 
+  // APE tags don't implement BPM information
+  return 0;
+}
+
 void APE::Tag::setTitle(const String &s)
 {
   addValue("TITLE", s, true);

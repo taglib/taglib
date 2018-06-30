@@ -123,6 +123,13 @@ unsigned int RIFF::Info::Tag::track() const
   return fieldText("IPRT").toInt();
 }
 
+unsigned int RIFF::Info::Tag::bpm() const 
+{
+  // TODO: proper bpm information
+  // RIFF doesn't seem to support BPM information. 
+  return 0;
+}
+
 void RIFF::Info::Tag::setTitle(const String &s)
 {
   setFieldText("INAM", s);

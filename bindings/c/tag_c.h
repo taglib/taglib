@@ -202,6 +202,12 @@ TAGLIB_C_EXPORT unsigned int taglib_tag_year(const TagLib_Tag *tag);
 TAGLIB_C_EXPORT unsigned int taglib_tag_track(const TagLib_Tag *tag);
 
 /*!
+ * Returns the beats-per-minute (bpm) of the track; if there is no bpm 
+ * set, or bpm tag in the metadata, this will return 0.
+ */ 
+TAGLIB_C_EXPORT unsigned int taglib_tag_bpm(const TagLib_Tag *tag); 
+
+/*!
  * Sets the tag's title.
  *
  * \note By default this string should be UTF8 encoded.

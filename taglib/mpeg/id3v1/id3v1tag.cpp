@@ -162,6 +162,11 @@ unsigned int ID3v1::Tag::track() const
   return d->track;
 }
 
+unsigned int ID3v1::Tag::bpm() const { 
+  // TODO: proper bpm information 
+  return 0;
+}
+
 void ID3v1::Tag::setTitle(const String &s)
 {
   d->title = s;
