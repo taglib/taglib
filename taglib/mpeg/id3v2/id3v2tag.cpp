@@ -229,7 +229,8 @@ unsigned int ID3v2::Tag::track() const
 }
 
 unsigned int ID3v2::Tag::bpm() const { 
-  // TODO: proper bpm information 
+  if(!d->frameListMap["TBPM"].isEmpty())
+    return d->frameListMap["TBPM"].front()->toString().toInt();
   return 0;
 }
 

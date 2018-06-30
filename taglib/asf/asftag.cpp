@@ -105,7 +105,8 @@ unsigned int ASF::Tag::track() const
 
 unsigned int ASF::Tag::bpm() const 
 { 
-  // TODO: proper bpm information 
+  if(d->attributeListMap.contains("WM/BeatsPerMinute"))
+    return d->attributeListMap["WM/BeatsPerMinute"][0].toUInt();
   return 0;
 }
 

@@ -167,7 +167,7 @@ unsigned int APE::Tag::track() const
 
 unsigned int APE::Tag::bpm() const 
 { 
-  // TODO: proper bpm information 
+  // APE tags don't implement BPM information
   return 0;
 }
 
