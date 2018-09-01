@@ -51,7 +51,7 @@ namespace
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
 
-#if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0602)
+#if defined (PLATFORM_WINRT)
     return CreateFile2(path.wstr().c_str(), access, FILE_SHARE_READ, OPEN_EXISTING, NULL);
 #else
     return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
@@ -346,18 +346,7 @@ void FileStream::seek(long offset, Position p)
 
 #ifdef _WIN32
 
-  DWORD whence;
-  switch(p) {
-  case Beginning:
-    whence = FILE_BEGIN;
-    break;
-  case Current:
-    whence = FILE_CURRENT;
-    break;
-  case End:
-    whence = FILE_END;
-    break;
-  default:
+  if(p != Beginning && p != Current && p != End) {
     debug("FileStream::seek() -- Invalid Position value.");
     return;
   }
@@ -365,7 +354,7 @@ void FileStream::seek(long offset, Position p)
   LARGE_INTEGER liOffset;
   liOffset.QuadPart = offset;
 
-  if(!SetFilePointerEx(d->file, liOffset, NULL, whence)) {
+  if(!SetFilePointerEx(d->file, liOffset, NULL, static_cast<DWORD>(p))) {
     debug("FileStream::seek() -- Failed to set the file pointer.");
   }
 

@@ -26,16 +26,13 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
   ${CMAKE_CURRENT_SOURCE_DIR}/dsf
   ${CMAKE_CURRENT_SOURCE_DIR}/dsdiff
+  ${CMAKE_SOURCE_DIR}/3rdparty
 )
 
 if(ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
 elseif(HAVE_ZLIB_SOURCE)
   include_directories(${ZLIB_SOURCE})
-endif()
-
-if(HAVE_BOOST_BYTESWAP OR HAVE_BOOST_ATOMIC OR HAVE_BOOST_ZLIB)
-  include_directories(${Boost_INCLUDE_DIR})
 endif()
 
 set(tag_HDRS
@@ -330,12 +327,6 @@ set(toolkit_SRCS
   toolkit/tzlib.cpp
 )
 
-if(NOT WIN32)
-  set(unicode_SRCS
-    toolkit/unicode.cpp
-  )
-endif()
-
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS
     ${ZLIB_SOURCE}/adler32.c
@@ -351,8 +342,8 @@ set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
-  ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${dsf_SRCS} ${dsdiff_SRCS} ${opus_SRCS}
-  ${unicode_SRCS} ${zlib_SRCS}
+  ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS} ${dsf_SRCS} ${dsdiff_SRCS}
+  ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
@@ -362,16 +353,8 @@ set(tag_LIB_SRCS
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
-if(ZLIB_FOUND)
+if(HAVE_ZLIB AND NOT HAVE_ZLIB_SOURCE)
   target_link_libraries(tag ${ZLIB_LIBRARIES})
-endif()
-
-if(HAVE_BOOST_ATOMIC)
-  target_link_libraries(tag ${Boost_ATOMIC_LIBRARY})
-endif()
-
-if(HAVE_BOOST_ZLIB)
-  target_link_libraries(tag ${Boost_IOSTREAMS_LIBRARY} ${Boost_ZLIB_LIBRARY})
 endif()
 
 set_target_properties(tag PROPERTIES
@@ -384,7 +367,13 @@ set_target_properties(tag PROPERTIES
 )
 
 if(BUILD_FRAMEWORK)
-  set_target_properties(tag PROPERTIES FRAMEWORK TRUE)
+  unset(INSTALL_NAME_DIR)
+  set_target_properties(tag PROPERTIES 
+      FRAMEWORK TRUE
+      MACOSX_RPATH 1
+      VERSION "A"
+      SOVERSION "A"
+      )
 endif()
 
 install(TARGETS tag

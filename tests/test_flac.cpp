@@ -62,6 +62,8 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpdateID3v2);
   CPPUNIT_TEST(testEmptyID3v2);
   CPPUNIT_TEST(testStripTags);
+  CPPUNIT_TEST(testRemoveXiphField);
+  CPPUNIT_TEST(testEmptySeekTable);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -490,6 +492,46 @@ public:
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
       CPPUNIT_ASSERT(f.xiphComment()->isEmpty());
       CPPUNIT_ASSERT_EQUAL(String("reference libFLAC 1.1.0 20030126"), f.xiphComment()->vendorID());
+    }
+  }
+
+  void testRemoveXiphField()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+
+    {
+      FLAC::File f(copy.fileName().c_str());
+      f.xiphComment(true)->setTitle("XiphComment Title");
+      f.ID3v2Tag(true)->setTitle("ID3v2 Title");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String("XiphComment Title"), f.xiphComment()->title());
+      f.xiphComment()->removeFields("TITLE");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(String(), f.xiphComment()->title());
+    }
+  }
+
+  void testEmptySeekTable()
+  {
+    ScopedFileCopy copy("empty-seektable", ".flac");
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.xiphComment(true)->setTitle("XiphComment Title");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.seek(42);
+      const ByteVector data = f.readBlock(4);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("\x03\x00\x00\x00", 4), data);
     }
   }
 

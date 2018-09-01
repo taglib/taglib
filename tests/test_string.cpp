@@ -49,7 +49,9 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testUpper);
   CPPUNIT_TEST(testEncodeNonLatin1);
   CPPUNIT_TEST(testEncodeEmpty);
+  CPPUNIT_TEST(testEncodeNonBMP);
   CPPUNIT_TEST(testIterator);
+  CPPUNIT_TEST(testInvalidUTF8);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -111,6 +113,9 @@ public:
     CPPUNIT_ASSERT(String("  foo  ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("foo    ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("    foo").stripWhiteSpace() == String("foo"));
+    CPPUNIT_ASSERT(String("foo").stripWhiteSpace() == String("foo"));
+    CPPUNIT_ASSERT(String("f o o").stripWhiteSpace() == String("f o o"));
+    CPPUNIT_ASSERT(String(" f o o ").stripWhiteSpace() == String("f o o"));
 
     CPPUNIT_ASSERT(memcmp(String("foo").data(String::Latin1).data(), "foo", 3) == 0);
     CPPUNIT_ASSERT(memcmp(String("f").data(String::Latin1).data(), "f", 1) == 0);
@@ -172,6 +177,15 @@ public:
 
     const String s2(v2, String::UTF8);
     CPPUNIT_ASSERT_EQUAL(s2.data(String::UTF16), v1);
+
+    const ByteVector v3("\xfe\xff\xd8\x01\x30\x42");
+    CPPUNIT_ASSERT(String(v3, String::UTF16).data(String::UTF8).isEmpty());
+
+    const ByteVector v4("\xfe\xff\x30\x42\xdc\x01");
+    CPPUNIT_ASSERT(String(v4, String::UTF16).data(String::UTF8).isEmpty());
+
+    const ByteVector v5("\xfe\xff\xdc\x01\xd8\x01");
+    CPPUNIT_ASSERT(String(v5, String::UTF16).data(String::UTF8).isEmpty());
   }
 
   void testAppendStringDetach()
@@ -253,6 +267,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("01"), String("0123456").substr(0, 2));
     CPPUNIT_ASSERT_EQUAL(String("12"), String("0123456").substr(1, 2));
     CPPUNIT_ASSERT_EQUAL(String("123456"), String("0123456").substr(1, 200));
+    CPPUNIT_ASSERT_EQUAL(String("0123456"), String("0123456").substr(0, 7));
+    CPPUNIT_ASSERT_EQUAL(String("0123456"), String("0123456").substr(0, 200));
   }
 
   void testNewline()
@@ -303,6 +319,13 @@ public:
     CPPUNIT_ASSERT(empty.to8Bit(true).empty());
   }
 
+  void testEncodeNonBMP()
+  {
+    const ByteVector a("\xFF\xFE\x3C\xD8\x50\xDD\x40\xD8\xF5\xDC\x3C\xD8\x00\xDE", 14);
+    const ByteVector b("\xF0\x9F\x85\x90\xF0\xA0\x83\xB5\xF0\x9F\x88\x80");
+    CPPUNIT_ASSERT_EQUAL(b, String(a, String::UTF16).data(String::UTF8));
+  }
+
   void testIterator()
   {
     String s1 = "taglib string";
@@ -319,6 +342,28 @@ public:
     *it2 = L'I';
     CPPUNIT_ASSERT_EQUAL(L'i', *it1);
     CPPUNIT_ASSERT_EQUAL(L'I', *it2);
+  }
+
+  void testInvalidUTF8()
+  {
+    CPPUNIT_ASSERT_EQUAL(String("/"), String(ByteVector("\x2F"), String::UTF8));
+    CPPUNIT_ASSERT(String(ByteVector("\xC0\xAF"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xE0\x80\xAF"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF0\x80\x80\xAF"), String::UTF8).isEmpty());
+
+    CPPUNIT_ASSERT(String(ByteVector("\xF8\x80\x80\x80\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xFC\x80\x80\x80\x80\x80"), String::UTF8).isEmpty());
+
+    CPPUNIT_ASSERT(String(ByteVector("\xC2"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xE0\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF0\x80\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xF8\x80\x80\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xFC\x80\x80\x80\x80"), String::UTF8).isEmpty());
+
+    CPPUNIT_ASSERT(String('\x80', String::UTF8).isEmpty());
+
+    CPPUNIT_ASSERT(String(ByteVector("\xED\xA0\x80\xED\xB0\x80"), String::UTF8).isEmpty());
+    CPPUNIT_ASSERT(String(ByteVector("\xED\xB0\x80\xED\xA0\x80"), String::UTF8).isEmpty());
   }
 
 };

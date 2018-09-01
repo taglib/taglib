@@ -42,7 +42,8 @@ class TestOGG : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestOGG);
   CPPUNIT_TEST(testSimple);
-  CPPUNIT_TEST(testSplitPackets);
+  CPPUNIT_TEST(testSplitPackets1);
+  CPPUNIT_TEST(testSplitPackets2);
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
   CPPUNIT_TEST(testAudioProperties);
@@ -67,7 +68,7 @@ public:
     }
   }
 
-  void testSplitPackets()
+  void testSplitPackets1()
   {
     ScopedFileCopy copy("empty", ".ogg");
     string newname = copy.fileName();
@@ -107,6 +108,33 @@ public:
 
       CPPUNIT_ASSERT(f.audioProperties());
       CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
+    }
+  }
+
+  void testSplitPackets2()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    string newname = copy.fileName();
+
+    const String text = longText(60890, true);
+
+    {
+      Vorbis::File f(newname.c_str());
+      f.tag()->setTitle(text);
+      f.save();
+    }
+    {
+      Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(text, f.tag()->title());
+
+      f.tag()->setTitle("ABCDE");
+      f.save();
+    }
+    {
+      Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
     }
   }
 
