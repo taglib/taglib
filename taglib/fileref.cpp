@@ -137,6 +137,10 @@ namespace
       return new IT::File(stream, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(stream, readAudioProperties, audioPropertiesStyle);
+    if(ext == "DFF" || ext == "DSDIFF")
+      return new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
+    if(ext == "DSF")
+      return new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
 
     return 0;
   }
