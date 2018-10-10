@@ -183,11 +183,7 @@ FileStream::FileStream(int fileDescriptor, bool openReadOnly)
 
   if(d->file == InvalidFileHandle)
   {
-# ifdef _WIN32
     debug("Could not open file using file descriptor");
-# else
-    debug("Could not open file file using file descriptor");
-# endif
   }
 }
 
