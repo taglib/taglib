@@ -159,13 +159,11 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
     d->file = openFile(fileName, true);
 
   if(d->file == InvalidFileHandle)
-  {
 # ifdef _WIN32
     debug("Could not open file " + fileName.toString());
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
 # endif
-  }
 }
 
 FileStream::FileStream(int fileDescriptor, bool openReadOnly)
@@ -182,9 +180,7 @@ FileStream::FileStream(int fileDescriptor, bool openReadOnly)
     d->file = openFile(fileDescriptor, true);
 
   if(d->file == InvalidFileHandle)
-  {
     debug("Could not open file using file descriptor");
-  }
 }
 
 FileStream::~FileStream()
@@ -284,8 +280,7 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
   ByteVector buffer = data;
   ByteVector aboutToOverwrite(static_cast<unsigned int>(bufferLength));
 
-  while(true)
-  {
+  while(true) {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
 
@@ -333,8 +328,7 @@ void FileStream::removeBlock(unsigned long start, unsigned long length)
 
   ByteVector buffer(static_cast<unsigned int>(bufferLength));
 
-  for(unsigned int bytesRead = -1; bytesRead != 0;)
-  {
+  for(unsigned int bytesRead = -1; bytesRead != 0;) {
     seek(readPosition);
     bytesRead = static_cast<unsigned int>(readFile(d->file, buffer));
     readPosition += bytesRead;
@@ -430,7 +424,8 @@ long FileStream::tell() const
   const LARGE_INTEGER zero = {};
   LARGE_INTEGER position;
 
-  if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT) && position.QuadPart <= LONG_MAX) {
+  if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT) &&
+     position.QuadPart <= LONG_MAX) {
     return static_cast<long>(position.QuadPart);
   }
   else {
@@ -499,9 +494,8 @@ void FileStream::truncate(long length)
 #else
 
   const int error = ftruncate(fileno(d->file), length);
-  if(error != 0) {
+  if(error != 0)
     debug("FileStream::truncate() -- Coundn't truncate the file.");
-  }
 
 #endif
 }
