@@ -36,10 +36,6 @@ if(ENABLE_CCACHE)
 endif()
 
 option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden" OFF)
-if(VISIBILITY_HIDDEN)
-  add_definitions(-fvisibility=hidden)
-endif()
-
 option(BUILD_TESTS "Build the test suite" OFF)
 option(BUILD_EXAMPLES "Build the examples" OFF)
 option(BUILD_BINDINGS "Build the bindings" ON)

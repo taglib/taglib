@@ -347,6 +347,11 @@ set_target_properties(tag PROPERTIES
   LINK_INTERFACE_LIBRARIES ""
   PUBLIC_HEADER "${tag_HDRS}"
 )
+if(VISIBILITY_HIDDEN)
+	set_target_properties(tag PROPERTIES C_VISIBILITY_PRESET hidden
+	)
+endif()
+
 if(BUILD_FRAMEWORK)
   unset(INSTALL_NAME_DIR)
   set_target_properties(tag PROPERTIES 
