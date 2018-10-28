@@ -19,8 +19,10 @@ CMakeFiles/
 /taglib.pc
 /tests/test_runner
 /tests/Testing
+/taglib/libtag.a
 /taglib_config.h
 /taglib-config
+/bindings/c/libtag_c.a
 /bindings/c/taglib_c.pc
 /bindings/c/Debug
 /bindings/c/MinSizeRel
@@ -42,5 +44,6 @@ CMakeFiles/
 /taglib/tag.dir/Release
 /ALL_BUILD.dir
 /ZERO_CHECK.dir
+taglib.h.stamp
 taglib.xcodeproj
 CMakeScripts

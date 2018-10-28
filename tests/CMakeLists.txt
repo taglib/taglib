@@ -27,6 +27,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/dsf
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ebml
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ebml/matroska
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/dsdiff
 )
 
 SET(test_runner_SRCS
@@ -72,6 +73,7 @@ SET(test_runner_SRCS
   test_speex.cpp
   test_dsf.cpp
   test_matroska.cpp
+  test_dsdiff.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

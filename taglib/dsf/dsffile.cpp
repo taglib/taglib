@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright            : (C) 2013 by Stephen F. Booth
-    email                : me@sbooth.org
+   copyright            : (C) 2013 - 2018 by Stephen F. Booth
+   email                : me@sbooth.org
  ***************************************************************************/
 
 /***************************************************************************
@@ -29,6 +29,7 @@
 #include <tstringlist.h>
 #include <tpropertymap.h>
 #include <tsmartptr.h>
+#include <tagutils.h>
 
 #include "dsffile.h"
 
@@ -49,6 +50,17 @@ public:
   SCOPED_PTR<AudioProperties> properties;
   SCOPED_PTR<ID3v2::Tag> tag;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+bool DSF::File::isSupported(IOStream *stream)
+{
+    // A DSF file has to start with "DSD "
+    const ByteVector id = Utils::readHeader(stream, 4, false);
+    return id.startsWith("DSD ");
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
@@ -85,6 +97,16 @@ ID3v2::Tag *DSF::File::tag() const
 DSF::AudioProperties *DSF::File::audioProperties() const
 {
   return d->properties.get();
+}
+
+PropertyMap DSF::File::properties() const
+{
+  return d->tag->properties();
+}
+
+PropertyMap DSF::File::setProperties(const PropertyMap &properties)
+{
+  return d->tag->setProperties(properties);
 }
 
 bool DSF::File::save()
@@ -210,4 +232,3 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   else
     d->tag.reset(new ID3v2::Tag(this, d->metadataOffset));
 }
-

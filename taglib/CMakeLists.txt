@@ -27,6 +27,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/ebml
   ${CMAKE_CURRENT_SOURCE_DIR}/ebml/matroska
   ${CMAKE_CURRENT_SOURCE_DIR}/dsf
+  ${CMAKE_CURRENT_SOURCE_DIR}/dsdiff
   ${CMAKE_SOURCE_DIR}/3rdparty
 )
 
@@ -151,6 +152,9 @@ set(tag_HDRS
   ebml/matroska/ebmlmatroskaaudio.h
   dsf/dsffile.h
   dsf/dsfproperties.h
+  dsdiff/dsdifffile.h
+  dsdiff/dsdiffproperties.h
+  dsdiff/dsdiffdiintag.h
 )
 
 set(mpeg_SRCS
@@ -321,6 +325,12 @@ set(matroska_SRCS
   ebml/matroska/ebmlmatroskaaudio.cpp
 )
 
+set(dsdiff_SRCS
+  dsdiff/dsdifffile.cpp
+  dsdiff/dsdiffproperties.cpp
+  dsdiff/dsdiffdiintag.cpp
+)
+
 set(toolkit_SRCS
   toolkit/taglib.cpp
   toolkit/tstring.cpp
@@ -357,7 +367,7 @@ set(tag_LIB_SRCS
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${ebml_SRCS} ${matroska_SRCS} ${dsf_SRCS}
+  ${ebml_SRCS} ${matroska_SRCS} ${dsf_SRCS} ${dsdiff_SRCS}
   ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
@@ -380,6 +390,11 @@ set_target_properties(tag PROPERTIES
   LINK_INTERFACE_LIBRARIES ""
   PUBLIC_HEADER "${tag_HDRS}"
 )
+if(VISIBILITY_HIDDEN)
+	set_target_properties(tag PROPERTIES C_VISIBILITY_PRESET hidden
+	)
+endif()
+
 if(BUILD_FRAMEWORK)
   unset(INSTALL_NAME_DIR)
   set_target_properties(tag PROPERTIES 

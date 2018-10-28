@@ -1,5 +1,5 @@
 /***************************************************************************
-    copyright            : (C) 2013 by Stephen F. Booth
+    copyright            : (C) 2013 - 2018 by Stephen F. Booth
     email                : me@sbooth.org
  ***************************************************************************/
 
@@ -32,19 +32,19 @@
 
 namespace TagLib {
 
-    //! An implementation of DSF metadata
+  //! An implementation of DSF metadata
 
-    /*!
-     * This is implementation of DSF metadata.
-     *
-     * This supports an ID3v2 tag as well as properties from the file.
-     */
+  /*!
+   * This is implementation of DSF metadata.
+   *
+   * This supports an ID3v2 tag as well as properties from the file.
+   */
 
   namespace DSF {
 
-   //! An implementation of TagLib::File with DSF specific methods
+    //! An implementation of TagLib::File with DSF specific methods
 
-   /*!
+    /*!
      * This implements and provides an interface for DSF files to the
      * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
      * the abstract TagLib::File API as well as providing some additional
@@ -86,10 +86,31 @@ namespace TagLib {
        */
       virtual AudioProperties *audioProperties() const;
 
+       /*!
+        * Implements the unified property interface -- export function.
+        * This method forwards to ID3v2::Tag::properties().
+        */
+      virtual PropertyMap properties() const;
+
+       /*!
+        * Implements the unified property interface -- import function.
+        * This method forwards to ID3v2::Tag::setProperties().
+        */
+       virtual PropertyMap setProperties(const PropertyMap &);
+
       /*!
        * Saves the file.
        */
       virtual bool save();
+
+      /*!
+       * Returns whether or not the given \a stream can be opened as a DSF
+       * file.
+       *
+       * \note This method is designed to do a quick check.  The result may
+       * not necessarily be correct.
+       */
+      static bool isSupported(IOStream *stream);
 
     private:
       File(const File &);
