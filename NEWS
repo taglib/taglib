@@ -1,15 +1,23 @@
 ============================
 
+ * Added support for DSF and DSDIFF files.
  * Added support for WinRT.
  * Added support for classical music tags of iTunes 12.5.
+ * Added support for file descriptor to FileStream.
+ * Added support for 'cmID', 'purl', 'egid' MP4 atoms.
  * Enabled FileRef to detect file types based on the stream content.
  * Dropped support for Windows 9x and NT 4.0 or older.
+ * Check for mandatory header objects in ASF files.
+ * Fixed OOB read on invalid Ogg FLAC files (CVE-2018-11439).
+ * Fixed handling of empty MPEG files.
  * Fixed reading MP4 atoms with zero length.
  * Fixed reading FLAC files with zero-sized seektables.
  * Fixed handling of lowercase field names in Vorbis Comments.
  * Fixed handling of 'rate' atoms in MP4 files.
  * Fixed handling of invalid UTF-8 sequences.
  * Fixed possible file corruptions when saving Ogg files.
+ * TableOfContentsFrame::toString() improved.
+ * UserTextIdentificationFrame::toString() improved.
  * Marked FileRef::create() deprecated.
  * Several smaller bug fixes and performance improvements.
 
