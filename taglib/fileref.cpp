@@ -54,6 +54,7 @@
 #include "xmfile.h"
 #include "dsffile.h"
 #include "dsdifffile.h"
+#include "ebmlmatroskafile.h"
 
 using namespace TagLib;
 
@@ -141,6 +142,9 @@ namespace
       return new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
     if(ext == "DSF")
       return new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
+    if (ext == "MKA" || ext == "MKV") {
+      return new EBML::Matroska::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
 
     return 0;
   }
@@ -363,6 +367,8 @@ StringList FileRef::defaultFileExtensions()
   l.append("dsf");
   l.append("dff");
   l.append("dsdiff"); // alias for "dff"
+  l.append("mka");
+  l.append("mkv");
 
   return l;
 }
