@@ -1,6 +1,8 @@
 # TagLib
 
 [![Build Status](https://travis-ci.org/taglib/taglib.svg?branch=master)](https://travis-ci.org/taglib/taglib)
+[![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/taglib/taglib.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/taglib/taglib/context:cpp)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/taglib/taglib.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/taglib/taglib/alerts)
 
 ### TagLib Audio Metadata Library
 
