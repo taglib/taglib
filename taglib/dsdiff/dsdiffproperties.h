@@ -1,7 +1,7 @@
 /***************************************************************************
-    copyright            : (C) 2013 by Stephen F. Booth
-    email                : me@sbooth.org
- ***************************************************************************/
+    copyright            : (C) 2016 by Damien Plisson, Audirvana
+    email                : damien78@audirvana.com
+***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -23,21 +23,21 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_DSFPROPERTIES_H
-#define TAGLIB_DSFPROPERTIES_H
+#ifndef TAGLIB_DSDIFFPROPERTIES_H
+#define TAGLIB_DSDIFFPROPERTIES_H
 
 #include "audioproperties.h"
 
 namespace TagLib {
 
-  namespace DSF {
+  namespace DSDIFF {
 
     class File;
 
-    //! An implementation of audio property reading for DSF
+    //! An implementation of audio property reading for DSDIFF
 
     /*!
-     * This reads the data from a DSF stream found in the AudioProperties
+     * This reads the data from an DSDIFF stream found in the AudioProperties
      * API.
      */
 
@@ -45,14 +45,16 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of DSF::AudioProperties with the data read from the
+       * Create an instance of DSDIFF::AudioProperties with the data read from the
        * ByteVector \a data.
        */
-      AudioProperties(const ByteVector &data, ReadStyle style);
+      AudioProperties(const unsigned int sampleRate, const unsigned short channels,
+                      const unsigned long long samplesCount, const int bitrate,
+                      ReadStyle style);
 
       /*!
-       * Destroys this DSF::AudioProperties instance.
-        */
+       * Destroys this DSDIFF::AudioProperties instance.
+       */
       virtual ~AudioProperties();
 
       // Reimplementations.
@@ -64,28 +66,18 @@ namespace TagLib {
       virtual int sampleRate() const;
       virtual int channels() const;
 
-      int formatVersion() const;
-      int formatID() const;
-
-      /*!
-       * Channel type values: 1 = mono, 2 = stereo, 3 = 3 channels,
-       * 4 = quad, 5 = 4 channels, 6 = 5 channels, 7 = 5.1 channels
-       */
-      int channelType() const;
       int bitsPerSample() const;
       long long sampleCount() const;
-      int blockSizePerChannel() const;
 
     private:
       AudioProperties(const AudioProperties &);
       AudioProperties &operator=(const AudioProperties &);
 
-      void read(const ByteVector &data);
-
-      class PropertiesPrivate;
-      PropertiesPrivate *d;
+      class AudioPropertiesPrivate;
+      AudioPropertiesPrivate *d;
     };
   }
 }
 
 #endif
+

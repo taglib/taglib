@@ -63,6 +63,11 @@ namespace
 #endif
   }
 
+  FileHandle openFile(const int fileDescriptor, bool readOnly)
+  {
+    return InvalidFileHandle;
+  }
+
   void closeFile(FileHandle file)
   {
     CloseHandle(file);
@@ -101,6 +106,11 @@ namespace
   FileHandle openFile(const FileName &path, bool readOnly)
   {
     return fopen(path, readOnly ? "rb" : "rb+");
+  }
+
+  FileHandle openFile(const int fileDescriptor, bool readOnly)
+  {
+    return fdopen(fileDescriptor, readOnly ? "rb" : "rb+");
   }
 
   void closeFile(FileHandle file)
@@ -152,13 +162,28 @@ FileStream::FileStream(FileName fileName, bool openReadOnly) :
     d->file = openFile(fileName, true);
 
   if(d->file == InvalidFileHandle)
-  {
 # ifdef _WIN32
     debug("Could not open file " + String(fileName.wstr()));
 # else
     debug("Could not open file " + String(static_cast<const char *>(d->name)));
 # endif
-  }
+}
+
+FileStream::FileStream(int fileDescriptor, bool openReadOnly)
+  : d(new FileStreamPrivate(""))
+{
+  // First try with read / write mode, if that fails, fall back to read only.
+
+  if(!openReadOnly)
+    d->file = openFile(fileDescriptor, false);
+
+  if(d->file != InvalidFileHandle)
+    d->readOnly = false;
+  else
+    d->file = openFile(fileDescriptor, true);
+
+  if(d->file == InvalidFileHandle)
+    debug("Could not open file using file descriptor");
 }
 
 FileStream::~FileStream()
@@ -258,8 +283,7 @@ void FileStream::insert(const ByteVector &data, long long start, size_t replace)
   ByteVector buffer = data;
   ByteVector aboutToOverwrite(bufferLength);
 
-  while(true)
-  {
+  while(true) {
     // Seek to the current read position and read the data that we're about
     // to overwrite.  Appropriately increment the readPosition.
 
@@ -307,8 +331,7 @@ void FileStream::removeBlock(long long start, size_t length)
 
   ByteVector buffer(bufferLength, 0);
 
-  for(unsigned int bytesRead = -1; bytesRead != 0;)
-  {
+  for(unsigned int bytesRead = -1; bytesRead != 0;) {
     seek(readPosition);
     bytesRead = static_cast<unsigned int>(readFile(d->file, buffer));
     readPosition += bytesRead;
@@ -478,9 +501,8 @@ void FileStream::truncate(long long length)
 #else
 
   const int error = ftruncate(fileno(d->file), length);
-  if(error != 0) {
+  if(error != 0)
     debug("FileStream::truncate() -- Coundn't truncate the file.");
-  }
 
 #endif
 }

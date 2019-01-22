@@ -240,5 +240,5 @@ endif()
 
 # Detect WinRT mode
 if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-	set(PLATFORM WINRT 1)
+	set(PLATFORM_WINRT 1)
 endif()
