@@ -40,26 +40,27 @@ namespace TagLib {
   class PropertyMap;
 
   enum class FileTypes {
-      APE,
-      ASF,
-      DSDIFF,
-      DSF,
-      FLAC,
-      Mod,
-      ModIT,
-      ModS3M,
-      ModXM,
-      MP4,
-      MPC,
-      MPEG,
-      OggFLAC,
-      OggOpus,
-      OggSpeex,
-      OggVorbis,
-      RIFFAIFF,
-      RIFFWAV,
-      TrueAudio,
-      WavPack
+    NONE,
+    APE,
+    ASF,
+    DSDIFF,
+    DSF,
+    FLAC,
+    Mod,
+    ModIT,
+    ModS3M,
+    ModXM,
+    MP4,
+    MPC,
+    MPEG,
+    OggFLAC,
+    OggOpus,
+    OggSpeex,
+    OggVorbis,
+    RIFFAIFF,
+    RIFFWAV,
+    TrueAudio,
+    WavPack
   };
 
   //! A file class with some useful methods for tag manipulation

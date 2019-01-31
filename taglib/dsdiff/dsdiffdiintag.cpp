@@ -42,7 +42,7 @@ public:
 };
 
 DSDIFF::DIIN::Tag::Tag() :
-  TagLib::Tag(TagTypes::DSDIFF)
+  TagLib::Tag()
 {
   d = new TagPrivate;
 }
@@ -122,6 +122,12 @@ void DSDIFF::DIIN::Tag::setYear(unsigned int)
 void DSDIFF::DIIN::Tag::setTrack(unsigned int)
 {
 }
+
+TagTypes DSDIFF::DIIN::Tag::getType()
+{
+  return TagTypes::DSDIFF;
+}
+
 
 PropertyMap DSDIFF::DIIN::Tag::properties() const
 {

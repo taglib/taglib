@@ -61,13 +61,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::XiphComment::XiphComment() :
-  TagLib::Tag(TagTypes::Ogg),
+  TagLib::Tag(),
   d(new XiphCommentPrivate())
 {
 }
 
 Ogg::XiphComment::XiphComment(const ByteVector &data) :
-  TagLib::Tag(TagTypes::Ogg),
+  TagLib::Tag(),
   d(new XiphCommentPrivate())
 {
   parse(data);
@@ -197,6 +197,11 @@ bool Ogg::XiphComment::isEmpty() const
   }
 
   return true;
+}
+
+TagTypes Ogg::XiphComment::getType()
+{
+  return TagTypes::Ogg;
 }
 
 unsigned int Ogg::XiphComment::fieldCount() const

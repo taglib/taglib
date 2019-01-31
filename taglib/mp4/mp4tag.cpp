@@ -45,13 +45,13 @@ public:
 };
 
 MP4::Tag::Tag() :
-  TagLib::Tag(TagTypes::MP4),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
 
 MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
-  TagLib::Tag(TagTypes::MP4),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->file = file;
@@ -798,6 +798,11 @@ MP4::Tag::setTrack(unsigned int value)
 bool MP4::Tag::isEmpty() const
 {
   return d->items.isEmpty();
+}
+
+TagTypes MP4::Tag::getType()
+{
+  return TagTypes::MP4;
 }
 
 MP4::ItemMap &MP4::Tag::itemListMap()

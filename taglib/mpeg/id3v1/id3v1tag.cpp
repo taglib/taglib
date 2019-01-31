@@ -85,13 +85,13 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v1::Tag::Tag() :
-  TagLib::Tag(TagTypes::ID3v1),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
 
 ID3v1::Tag::Tag(File *file, long tagOffset) :
-  TagLib::Tag(TagTypes::ID3v1),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->file = file;
@@ -213,6 +213,11 @@ void ID3v1::Tag::setStringHandler(const StringHandler *handler)
     stringHandler = handler;
   else
     stringHandler = &defaultStringHandler;
+}
+
+TagTypes ID3v1::Tag::getType()
+{
+  return TagTypes::ID3v1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

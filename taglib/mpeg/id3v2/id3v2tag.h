@@ -181,6 +181,7 @@ namespace TagLib {
       virtual void setTrack(unsigned int i);
 
       virtual bool isEmpty() const;
+      virtual TagTypes getType();
 
       /*!
        * Returns a pointer to the tag's header.

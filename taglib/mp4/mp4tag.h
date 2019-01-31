@@ -70,6 +70,7 @@ namespace TagLib {
         virtual void setTrack(unsigned int value);
 
         virtual bool isEmpty() const;
+        virtual TagTypes getType();
 
         /*!
          * \deprecated Use the item() and setItem() API instead

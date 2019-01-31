@@ -91,13 +91,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::Tag::Tag() :
-  TagLib::Tag(TagTypes::APE),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
 
 APE::Tag::Tag(TagLib::File *file, long footerLocation) :
-  TagLib::Tag(TagTypes::APE),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->file = file;
@@ -360,6 +360,11 @@ void APE::Tag::setItem(const String &key, const Item &item)
 bool APE::Tag::isEmpty() const
 {
   return d->itemListMap.isEmpty();
+}
+
+TagTypes APE::Tag::getType()
+{
+  return TagTypes::APE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

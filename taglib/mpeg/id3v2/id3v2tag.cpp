@@ -110,14 +110,14 @@ String Latin1StringHandler::parse(const ByteVector &data) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v2::Tag::Tag() :
-  TagLib::Tag(TagTypes::ID3v2),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->factory = FrameFactory::instance();
 }
 
 ID3v2::Tag::Tag(File *file, long tagOffset, const FrameFactory *factory) :
-  TagLib::Tag(TagTypes::ID3v2),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->factory = factory;
@@ -306,6 +306,11 @@ void ID3v2::Tag::setTrack(unsigned int i)
 bool ID3v2::Tag::isEmpty() const
 {
   return d->frameList.isEmpty();
+}
+
+TagTypes ID3v2::Tag::getType()
+{
+  return TagTypes::ID3v2;
 }
 
 Header *ID3v2::Tag::header() const
