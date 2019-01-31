@@ -246,3 +246,9 @@ bool TagUnion::isEmpty() const
   return true;
 }
 
+TagTypes TagUnion::getType()
+{
+  if (tag(0)) return tag(0)->getType();
+  if (tag(1)) return tag(0)->getType();
+  if (tag(2)) return tag(0)->getType();
+}

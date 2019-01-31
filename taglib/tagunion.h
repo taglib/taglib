@@ -75,6 +75,7 @@ namespace TagLib {
     virtual void setYear(unsigned int i);
     virtual void setTrack(unsigned int i);
     virtual bool isEmpty() const;
+    virtual TagTypes getType();
 
     template <class T> T *access(int index, bool create)
     {

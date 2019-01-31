@@ -39,11 +39,6 @@ Tag::Tag()
 
 }
 
-Tag::Tag(TagTypes t)
-{
-  type = t;
-}
-
 Tag::~Tag()
 {
 
@@ -182,8 +177,4 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
     if(target->track() <= 0)
       target->setTrack(source->track());
   }
-}
-
-TagTypes Tag::getType() {
-    return type;
 }

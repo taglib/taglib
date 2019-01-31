@@ -150,6 +150,7 @@ namespace TagLib {
       virtual void setGenre(const String &s);
       virtual void setYear(unsigned int i);
       virtual void setTrack(unsigned int i);
+      virtual TagTypes getType();
 
       /*!
        * Returns the genre in number.

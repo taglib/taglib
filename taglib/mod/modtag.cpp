@@ -44,7 +44,7 @@ public:
 };
 
 Mod::Tag::Tag() :
-  TagLib::Tag(TagTypes::Mod),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
@@ -127,6 +127,11 @@ void Mod::Tag::setTrack(unsigned int)
 void Mod::Tag::setTrackerName(const String &trackerName)
 {
   d->trackerName = trackerName;
+}
+
+TagTypes Mod::Tag::getType()
+{
+  return TagTypes::Mod;
 }
 
 PropertyMap Mod::Tag::properties() const

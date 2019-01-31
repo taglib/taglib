@@ -97,6 +97,7 @@ namespace TagLib {
       virtual void setTrack(unsigned int i);
 
       virtual bool isEmpty() const;
+      virtual TagTypes getType();
 
       /*!
        * Returns the number of fields present in the comment.

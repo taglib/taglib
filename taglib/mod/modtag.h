@@ -163,6 +163,8 @@ namespace TagLib {
        */
       void setTrackerName(const String &trackerName);
 
+      virtual TagTypes getType();
+
       /*!
        * Implements the unified property interface -- export function.
        * Since the module tag is very limited, the exported map is as well.

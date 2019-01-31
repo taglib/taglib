@@ -118,6 +118,7 @@ namespace TagLib {
          * Not supported and therefore ignored.
          */
         void setTrack(unsigned int track);
+        virtual TagTypes getType();
 
         /*!
          * Implements the unified property interface -- export function.

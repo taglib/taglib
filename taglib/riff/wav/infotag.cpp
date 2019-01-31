@@ -71,14 +71,14 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::Info::Tag::Tag(const ByteVector &data) :
-  TagLib::Tag(TagTypes::RIFF),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
   parse(data);
 }
 
 RIFF::Info::Tag::Tag() :
-  TagLib::Tag(TagTypes::RIFF),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
@@ -167,6 +167,11 @@ void RIFF::Info::Tag::setTrack(unsigned int i)
 bool RIFF::Info::Tag::isEmpty() const
 {
   return d->fieldListMap.isEmpty();
+}
+
+TagTypes RIFF::Info::Tag::getType()
+{
+  return TagTypes::RIFF;
 }
 
 FieldListMap RIFF::Info::Tag::fieldListMap() const

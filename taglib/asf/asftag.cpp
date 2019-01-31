@@ -40,7 +40,7 @@ public:
 };
 
 ASF::Tag::Tag() :
-  TagLib::Tag(TagTypes::ASF),
+  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
@@ -209,6 +209,12 @@ bool ASF::Tag::isEmpty() const
          rating().isEmpty() &&
          d->attributeListMap.isEmpty();
 }
+
+TagTypes ASF::Tag::getType()
+{
+  return TagTypes::ASF;
+}
+
 
 namespace
 {
