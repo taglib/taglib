@@ -229,6 +229,11 @@ bool TrueAudio::File::save()
   return true;
 }
 
+FileTypes TrueAudio::File::getType()
+{
+  return FileTypes::TrueAudio;
+}
+
 ID3v1::Tag *TrueAudio::File::ID3v1Tag(bool create)
 {
   return d->tag.access<ID3v1::Tag>(TrueAudioID3v1Index, create);

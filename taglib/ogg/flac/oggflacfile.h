@@ -131,6 +131,11 @@ namespace TagLib {
       virtual bool save();
 
       /*!
+       * Returns the type of this file
+       */
+      virtual FileTypes getType();
+
+      /*!
        * Returns the length of the audio-stream, used by FLAC::Properties for
        * calculating the bitrate.
        */

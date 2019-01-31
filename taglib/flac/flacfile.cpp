@@ -307,6 +307,11 @@ bool FLAC::File::save()
   return true;
 }
 
+FileTypes FLAC::File::getType()
+{
+  return FileTypes::FLAC;
+}
+
 ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
 {
   return d->tag.access<ID3v2::Tag>(FlacID3v2Index, create);

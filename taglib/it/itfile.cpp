@@ -199,6 +199,11 @@ bool IT::File::save()
   return true;
 }
 
+FileTypes IT::File::getType()
+{
+  return FileTypes::ModIT;
+}
+
 void IT::File::read(bool)
 {
   if(!isOpen())

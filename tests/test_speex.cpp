@@ -39,10 +39,10 @@ class TestSpeex : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testAudioProperties()
   {
     Ogg::Speex::File f(TEST_FILE_PATH_C("empty.spx"));
+    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::OggSpeex);
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());

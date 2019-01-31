@@ -110,6 +110,11 @@ bool Mod::File::save()
   return true;
 }
 
+FileTypes Mod::File::getType()
+{
+  return FileTypes::Mod;
+}
+
 void Mod::File::read(bool)
 {
   if(!isOpen())

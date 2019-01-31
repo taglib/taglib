@@ -142,6 +142,11 @@ bool RIFF::AIFF::File::save()
   return true;
 }
 
+FileTypes RIFF::AIFF::File::getType()
+{
+  return FileTypes::RIFFAIFF;
+}
+
 bool RIFF::AIFF::File::hasID3v2Tag() const
 {
   return d->hasID3v2;

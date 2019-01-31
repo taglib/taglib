@@ -122,6 +122,11 @@ namespace TagLib {
       virtual bool save();
 
       /*!
+       * Returns the type of this file
+       */
+      virtual FileTypes getType();
+
+      /*!
        * Check if the given \a stream can be opened as an Ogg Vorbis file.
        *
        * \note This method is designed to do a quick check.  The result may

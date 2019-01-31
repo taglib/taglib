@@ -46,7 +46,6 @@ class TestOggFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testFramingBit()
   {
     ScopedFileCopy copy("empty_flac", ".oga");
@@ -54,6 +53,7 @@ public:
 
     {
       Ogg::FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::OggFLAC);
       f.tag()->setArtist("The Artist");
       f.save();
     }

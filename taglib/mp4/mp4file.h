@@ -115,6 +115,11 @@ namespace TagLib {
       bool save();
 
       /*!
+       * Returns the type of this file
+       */
+      virtual FileTypes getType();
+
+      /*!
        * Returns whether or not the file on disk actually has an MP4 tag, or the
        * file has a Metadata Item List (ilst) atom.
        */

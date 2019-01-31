@@ -175,6 +175,11 @@ MP4::File::save()
   return d->tag->save();
 }
 
+FileTypes MP4::File::getType()
+{
+  return FileTypes::MP4;
+}
+
 bool
 MP4::File::hasMP4Tag() const
 {

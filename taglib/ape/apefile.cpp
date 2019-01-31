@@ -220,6 +220,11 @@ bool APE::File::save()
   return true;
 }
 
+FileTypes APE::File::getType()
+{
+  return FileTypes::APE;
+}
+
 ID3v1::Tag *APE::File::ID3v1Tag(bool create)
 {
   return d->tag.access<ID3v1::Tag>(ApeID3v1Index, create);

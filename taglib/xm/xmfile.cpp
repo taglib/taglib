@@ -493,6 +493,11 @@ bool XM::File::save()
   return true;
 }
 
+FileTypes XM::File::getType()
+{
+  return FileTypes::ModXM;
+}
+
 void XM::File::read(bool)
 {
   if(!isOpen())

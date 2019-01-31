@@ -17,10 +17,10 @@ class TestDSF : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testBasic()
   {
     DSF::File f(TEST_FILE_PATH_C("empty10ms.dsf"));
+    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::DSF);
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());

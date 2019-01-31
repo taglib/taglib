@@ -159,6 +159,11 @@ namespace TagLib {
          */
         virtual bool save();
 
+        /*!
+         * Returns the type of this file
+         */
+        virtual FileTypes getType();
+
         bool save(TagTypes tags, bool stripOthers = true, int id3v2Version = 4);
 
         /*!

@@ -92,6 +92,7 @@ namespace
     Tag *tag() const { return 0; }
     AudioProperties *audioProperties() const { return 0; }
     bool save() { return false; }
+    FileTypes getType() { return FileTypes::MPEG; }
   };
 }
 
@@ -196,6 +197,11 @@ MPEG::Properties *MPEG::File::audioProperties() const
 bool MPEG::File::save()
 {
   return save(AllTags);
+}
+
+FileTypes MPEG::File::getType()
+{
+  return FileTypes::MPEG;
 }
 
 bool MPEG::File::save(int tags)

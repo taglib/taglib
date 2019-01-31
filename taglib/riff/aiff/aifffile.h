@@ -120,6 +120,11 @@ namespace TagLib {
         virtual bool save();
 
         /*!
+         * Returns the type of this file
+         */
+        virtual FileTypes getType();
+
+        /*!
          * Returns whether or not the file on disk actually has an ID3v2 tag.
          *
          * \see ID3v2Tag()

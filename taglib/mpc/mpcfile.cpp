@@ -228,6 +228,11 @@ bool MPC::File::save()
   return true;
 }
 
+FileTypes MPC::File::getType()
+{
+  return FileTypes::MPC;
+}
+
 ID3v1::Tag *MPC::File::ID3v1Tag(bool create)
 {
   return d->tag.access<ID3v1::Tag>(MPCID3v1Index, create);

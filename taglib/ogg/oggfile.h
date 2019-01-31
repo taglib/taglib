@@ -80,6 +80,8 @@ namespace TagLib {
 
       virtual bool save();
 
+      virtual FileTypes getType() = 0;
+
     protected:
       /*!
        * Constructs an Ogg file from \a file.

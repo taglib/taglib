@@ -53,10 +53,10 @@ class TestMPC : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testPropertiesSV8()
   {
     MPC::File f(TEST_FILE_PATH_C("sv8_header.mpc"));
+    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::MPC);
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->mpcVersion());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->length());
