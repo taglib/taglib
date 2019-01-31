@@ -40,6 +40,7 @@ using namespace TagLib;
 class TestMP4 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMP4);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testPropertiesAAC);
   CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testPropertiesM4V);
@@ -62,6 +63,10 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    MP4::Tag tag;
+    CPPUNIT_ASSERT_EQUAL(TagTypes::MP4, tag.getType());
+  }
 
   void testPropertiesAAC()
   {

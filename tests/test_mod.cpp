@@ -54,12 +54,18 @@ static const String commentAfter(
 class TestMod : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMod);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testReadTags);
   CPPUNIT_TEST(testWriteTags);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    Mod::Tag tag;
+    CPPUNIT_ASSERT_EQUAL(TagTypes::Mod, tag.getType());
+  }
+
   void testReadTags()
   {
     testRead(TEST_FILE_PATH_C("test.mod"), titleBefore, commentBefore);

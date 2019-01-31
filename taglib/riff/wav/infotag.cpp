@@ -71,14 +71,14 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::Info::Tag::Tag(const ByteVector &data) :
-  TagLib::Tag(),
+  TagLib::Tag(TagTypes::RIFF),
   d(new TagPrivate())
 {
   parse(data);
 }
 
 RIFF::Info::Tag::Tag() :
-  TagLib::Tag(),
+  TagLib::Tag(TagTypes::RIFF),
   d(new TagPrivate())
 {
 }

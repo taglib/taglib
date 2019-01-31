@@ -40,7 +40,7 @@ public:
 };
 
 ASF::Tag::Tag() :
-  TagLib::Tag(),
+  TagLib::Tag(TagTypes::ASF),
   d(new TagPrivate())
 {
 }

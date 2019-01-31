@@ -38,6 +38,7 @@ using namespace TagLib;
 class TestXiphComment : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestXiphComment);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testYear);
   CPPUNIT_TEST(testSetYear);
   CPPUNIT_TEST(testTrack);
@@ -51,6 +52,10 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    Ogg::XiphComment cmt;
+    CPPUNIT_ASSERT_EQUAL(TagTypes::Ogg, cmt.getType());
+  }
 
   void testYear()
   {

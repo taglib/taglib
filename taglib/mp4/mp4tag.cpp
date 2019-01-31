@@ -45,11 +45,13 @@ public:
 };
 
 MP4::Tag::Tag() :
+  TagLib::Tag(TagTypes::MP4),
   d(new TagPrivate())
 {
 }
 
 MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
+  TagLib::Tag(TagTypes::MP4),
   d(new TagPrivate())
 {
   d->file = file;

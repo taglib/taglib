@@ -41,7 +41,8 @@ public:
   String artist;
 };
 
-DSDIFF::DIIN::Tag::Tag() : TagLib::Tag()
+DSDIFF::DIIN::Tag::Tag() :
+  TagLib::Tag(TagTypes::DSDIFF)
 {
   d = new TagPrivate;
 }

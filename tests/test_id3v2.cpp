@@ -66,6 +66,7 @@ class PublicFrame : public ID3v2::Frame
 class TestID3v2 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v2);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testUnsynchDecode);
   CPPUNIT_TEST(testDowngradeUTF8ForID3v23_1);
   CPPUNIT_TEST(testDowngradeUTF8ForID3v23_2);
@@ -123,6 +124,10 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    ID3v2::Tag tag;
+    CPPUNIT_ASSERT_EQUAL(TagTypes::ID3v2, tag.getType());
+  }
 
   void testUnsynchDecode()
   {

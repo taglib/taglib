@@ -19,6 +19,10 @@ class TestDSDIFF : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    DSDIFF::DIIN::Tag tag;
+    CPPUNIT_ASSERT_EQUAL(TagTypes::DSDIFF, tag.getType());
+  }
 
   void testProperties()
   {

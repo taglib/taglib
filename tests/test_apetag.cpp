@@ -40,6 +40,7 @@ using namespace TagLib;
 class TestAPETag : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestAPETag);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testIsEmpty);
   CPPUNIT_TEST(testIsEmpty2);
   CPPUNIT_TEST(testPropertyInterface1);
@@ -49,6 +50,10 @@ class TestAPETag : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    APE::Tag tag;
+    CPPUNIT_ASSERT_EQUAL(TagTypes::APE, tag.getType());
+  }
 
   void testIsEmpty()
   {

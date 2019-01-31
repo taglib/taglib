@@ -30,6 +30,17 @@
 #include "tstring.h"
 
 namespace TagLib {
+    enum class TagTypes {
+        APE,
+        ASF,
+        DSDIFF,
+        ID3v1,
+        ID3v2,
+        Mod,
+        MP4,
+        Ogg,
+        RIFF
+    };
 
   //! A simple, generic interface to common audio meta data fields
 
@@ -170,6 +181,11 @@ namespace TagLib {
     virtual bool isEmpty() const;
 
     /*!
+     * Returns the type of this tag
+     */
+    TagTypes getType();
+
+    /*!
      * Copies the generic data from one tag to another.
      *
      * \note This will no affect any of the lower level details of the tag.  For
@@ -189,12 +205,20 @@ namespace TagLib {
      */
     Tag();
 
+    /*!
+     * Construct a Tag and set the tagtype to t.  This is protected since tags should only be instantiated
+     * through subclasses.
+     */
+    Tag(TagTypes t);
+
+
   private:
     Tag(const Tag &);
     Tag &operator=(const Tag &);
 
     class TagPrivate;
     TagPrivate *d;
+    TagTypes type;
   };
 }
 

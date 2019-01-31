@@ -93,6 +93,7 @@ public:
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
     CPPUNIT_ASSERT_EQUAL(String("test"), f.tag()->title());
+    CPPUNIT_ASSERT_EQUAL(TagTypes::ASF, f.tag()->getType());
   }
 
   void testSaveMultipleValues()
