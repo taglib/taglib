@@ -58,7 +58,7 @@ public:
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::ASF);
+    CPPUNIT_ASSERT(f.getType() == FileTypes::ASF);
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3712, f.audioProperties()->lengthInMilliseconds());
@@ -93,7 +93,7 @@ public:
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
     CPPUNIT_ASSERT_EQUAL(String("test"), f.tag()->title());
-    CPPUNIT_ASSERT_EQUAL(TagTypes::ASF, f.tag()->getType());
+    CPPUNIT_ASSERT(f.getType() == FileTypes::ASF);
   }
 
   void testSaveMultipleValues()

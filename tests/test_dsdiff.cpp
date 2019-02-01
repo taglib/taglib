@@ -21,14 +21,14 @@ class TestDSDIFF : public CppUnit::TestFixture
 public:
   void testTagType() {
     DSDIFF::DIIN::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::DSDIFF, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::DSDIFF);
   }
 
   void testProperties()
   {
     DSDIFF::File f(TEST_FILE_PATH_C("empty10ms.dff"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::DSDIFF);
+    CPPUNIT_ASSERT(f.getType() == FileTypes::DSDIFF);
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(10, f.audioProperties()->lengthInMilliseconds());

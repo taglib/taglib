@@ -63,7 +63,7 @@ class TestMod : public CppUnit::TestFixture
 public:
   void testTagType() {
     Mod::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::Mod, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::Mod);
   }
 
   void testReadTags()
@@ -76,7 +76,7 @@ public:
     ScopedFileCopy copy("test", ".mod");
     {
       Mod::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(file.getType(), FileTypes::Mod);
+      CPPUNIT_ASSERT(file.getType() == FileTypes::Mod);
       CPPUNIT_ASSERT(file.tag() != 0);
       file.tag()->setTitle(titleAfter);
       file.tag()->setComment(newComment);

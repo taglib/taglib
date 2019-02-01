@@ -43,7 +43,7 @@ class TestInfoTag : public CppUnit::TestFixture
 public:
   void testTagType() {
     RIFF::Info::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::RIFF, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::RIFF);
   }
 
   void testTitle()

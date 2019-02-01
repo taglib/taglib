@@ -123,7 +123,7 @@ public:
   {
     XM::File file(TEST_FILE_PATH_C("stripped.xm"));
     CPPUNIT_ASSERT(file.isValid());
-    CPPUNIT_ASSERT_EQUAL(file.getType(), FileTypes::ModXM);
+    CPPUNIT_ASSERT(file.getType() == FileTypes::ModXM);
 
     XM::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();

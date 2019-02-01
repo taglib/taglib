@@ -65,14 +65,14 @@ class TestMP4 : public CppUnit::TestFixture
 public:
   void testTagType() {
     MP4::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::MP4, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::MP4);
   }
 
   void testPropertiesAAC()
   {
     MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::MP4);
+    CPPUNIT_ASSERT(f.getType() == FileTypes::MP4);
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3708, f.audioProperties()->lengthInMilliseconds());

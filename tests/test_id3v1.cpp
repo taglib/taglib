@@ -46,7 +46,7 @@ class TestID3v1 : public CppUnit::TestFixture
 public:
   void testTagType() {
     ID3v1::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::ID3v1, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::ID3v1);
   }
 
   void testStripWhiteSpace()

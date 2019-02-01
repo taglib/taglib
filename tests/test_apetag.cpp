@@ -52,7 +52,7 @@ class TestAPETag : public CppUnit::TestFixture
 public:
   void testTagType() {
     APE::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::APE, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::APE);
   }
 
   void testIsEmpty()

@@ -126,7 +126,7 @@ class TestID3v2 : public CppUnit::TestFixture
 public:
   void testTagType() {
     ID3v2::Tag tag;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::ID3v2, tag.getType());
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::ID3v2);
   }
 
   void testUnsynchDecode()

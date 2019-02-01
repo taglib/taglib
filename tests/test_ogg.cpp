@@ -58,7 +58,7 @@ public:
 
     {
       Vorbis::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::OggVorbis);
+      CPPUNIT_ASSERT(f.getType() == FileTypes::OggVorbis);
       f.tag()->setArtist("The Artist");
       f.save();
     }

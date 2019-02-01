@@ -36,7 +36,7 @@ public:
   Tag *tag() const { return NULL; }
   AudioProperties *audioProperties() const { return NULL; }
   bool save(){ return false; }
-  FileTypes getType() { return FileTypes::RIFFAIFF; }
+  FileTypes getType() { return FileTypes::NONE; }
   void truncate(long length) { File::truncate(length); }
 };
 

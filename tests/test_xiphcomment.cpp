@@ -54,7 +54,7 @@ class TestXiphComment : public CppUnit::TestFixture
 public:
   void testTagType() {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL(TagTypes::Ogg, cmt.getType());
+    CPPUNIT_ASSERT(cmt.getType() == TagTypes::Ogg);
   }
 
   void testYear()

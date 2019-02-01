@@ -53,7 +53,7 @@ public:
 
     {
       Ogg::FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::OggFLAC);
+      CPPUNIT_ASSERT(f.getType() == FileTypes::OggFLAC);
       f.tag()->setArtist("The Artist");
       f.save();
     }

@@ -48,8 +48,8 @@ public:
   void testReadPropertiesWithoutID3v2()
   {
     TrueAudio::File f(TEST_FILE_PATH_C("empty.tta"));
-    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::TrueAudio);
     CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT(f.getType() == FileTypes::TrueAudio);
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());

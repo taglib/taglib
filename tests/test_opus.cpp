@@ -48,8 +48,8 @@ public:
   void testAudioProperties()
   {
     Ogg::Opus::File f(TEST_FILE_PATH_C("correctness_gain_silent_output.opus"));
-    CPPUNIT_ASSERT_EQUAL(f.getType(), FileTypes::OggOpus);
     CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT(f.getType() == FileTypes::OggOpus);
     CPPUNIT_ASSERT_EQUAL(7, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(7, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(7737, f.audioProperties()->lengthInMilliseconds());
