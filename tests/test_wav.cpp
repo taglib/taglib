@@ -54,11 +54,11 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testPCMProperties()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("empty.wav"));
     CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT(f.getType() == FileTypes::RIFFWAV);
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());

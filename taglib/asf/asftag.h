@@ -155,6 +155,8 @@ namespace TagLib {
        */
       virtual bool isEmpty() const;
 
+      virtual TagTypes getType();
+
       /*!
        * \deprecated
        */

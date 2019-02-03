@@ -54,12 +54,18 @@ static const String commentAfter(
 class TestMod : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMod);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testReadTags);
   CPPUNIT_TEST(testWriteTags);
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    Mod::Tag tag;
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::Mod);
+  }
+
   void testReadTags()
   {
     testRead(TEST_FILE_PATH_C("test.mod"), titleBefore, commentBefore);
@@ -70,6 +76,7 @@ public:
     ScopedFileCopy copy("test", ".mod");
     {
       Mod::File file(copy.fileName().c_str());
+      CPPUNIT_ASSERT(file.getType() == FileTypes::Mod);
       CPPUNIT_ASSERT(file.tag() != 0);
       file.tag()->setTitle(titleAfter);
       file.tag()->setComment(newComment);

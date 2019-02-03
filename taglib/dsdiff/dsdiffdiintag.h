@@ -129,6 +129,8 @@ namespace TagLib {
          */
         virtual void setPictures( const PictureMap& l );
 
+        virtual TagTypes getType();
+
         /*!
          * Implements the unified property interface -- export function.
          * Since the DIIN tag is very limited, the exported map is as well.

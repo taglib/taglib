@@ -384,6 +384,12 @@ bool ASF::Tag::isEmpty() const
          d->attributeListMap.isEmpty();
 }
 
+TagTypes ASF::Tag::getType()
+{
+  return TagTypes::ASF;
+}
+
+
 namespace
 {
   const char *keyTranslation[][2] = {

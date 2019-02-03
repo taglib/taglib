@@ -160,6 +160,11 @@ namespace TagLib {
       virtual bool save();
 
       /*!
+       * Returns the type of this file
+       */
+      virtual FileTypes getType();
+
+      /*!
        * Save the file.  This will attempt to save all of the tag types that are
        * specified by OR-ing together TagTypes values.  The save() method above
        * uses AllTags.  This returns true if saving was successful.

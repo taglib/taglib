@@ -175,6 +175,11 @@ bool RIFF::Info::Tag::isEmpty() const
   return d->fieldMap.isEmpty();
 }
 
+TagTypes RIFF::Info::Tag::getType()
+{
+  return TagTypes::RIFF;
+}
+
 FieldMap RIFF::Info::Tag::fieldMap() const
 {
   return d->fieldMap;

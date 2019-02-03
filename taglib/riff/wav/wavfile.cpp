@@ -135,6 +135,11 @@ bool RIFF::WAV::File::save()
   return RIFF::WAV::File::save(AllTags);
 }
 
+FileTypes RIFF::WAV::File::getType()
+{
+  return FileTypes::RIFFWAV;
+}
+
 bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
 {
   if(readOnly()) {

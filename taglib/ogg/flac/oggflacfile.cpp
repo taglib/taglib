@@ -142,6 +142,11 @@ bool Ogg::FLAC::File::save()
   return Ogg::File::save();
 }
 
+FileTypes Ogg::FLAC::File::getType()
+{
+  return FileTypes::OggFLAC;
+}
+
 bool Ogg::FLAC::File::hasXiphComment() const
 {
   return d->hasXiphComment;

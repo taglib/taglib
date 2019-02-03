@@ -43,10 +43,12 @@ public:
     {
       EBML::Matroska::File f1(filename.c_str());
       CPPUNIT_ASSERT(f1.isValid());
+      CPPUNIT_ASSERT(f1.getType() == FileTypes::EBMLMatroska);
 
       Tag* t = f1.tag();
 
       CPPUNIT_ASSERT(t != 0);
+      CPPUNIT_ASSERT(t->getType() == TagTypes::EBMLMatroska);
       t->setTitle("Seconds of Silence");
       t->setArtist("Nobody");
       t->setAlbum("TagLib Test Suite");

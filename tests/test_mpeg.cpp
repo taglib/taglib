@@ -68,10 +68,10 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testAudioPropertiesXingHeaderCBR()
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_cbr.mp3"));
+    CPPUNIT_ASSERT(f.getType() == FileTypes::MPEG);
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());

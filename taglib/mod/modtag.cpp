@@ -139,6 +139,11 @@ void Mod::Tag::setTrackerName(const String &trackerName)
   d->trackerName = trackerName;
 }
 
+TagTypes Mod::Tag::getType()
+{
+  return TagTypes::Mod;
+}
+
 PropertyMap Mod::Tag::properties() const
 {
   PropertyMap properties;

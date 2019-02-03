@@ -54,6 +54,7 @@ public:
   virtual TagLib::Tag* tag() const { return 0; };
   virtual TagLib::AudioProperties* audioProperties() const { return 0;};
   virtual bool save() { return false; };
+  virtual FileTypes getType() { return FileTypes::RIFFAIFF; }
   void removeChunk(unsigned int i) { RIFF::File::removeChunk(i); }
   void removeChunk(const ByteVector &name) { RIFF::File::removeChunk(name); }
 };

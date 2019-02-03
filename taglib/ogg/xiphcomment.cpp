@@ -209,6 +209,11 @@ bool Ogg::XiphComment::isEmpty() const
   return true;
 }
 
+TagTypes Ogg::XiphComment::getType()
+{
+  return TagTypes::Ogg;
+}
+
 unsigned int Ogg::XiphComment::fieldCount() const
 {
   size_t count = 0;

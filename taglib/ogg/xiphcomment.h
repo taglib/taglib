@@ -101,6 +101,8 @@ namespace TagLib {
       virtual bool isEmpty() const;
       virtual String toString() const;
 
+      virtual TagTypes getType();
+
       /*!
        * Returns the number of fields present in the comment.
        */

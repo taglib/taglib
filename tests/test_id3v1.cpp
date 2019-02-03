@@ -38,11 +38,16 @@ using namespace TagLib;
 class TestID3v1 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v1);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testStripWhiteSpace);
   CPPUNIT_TEST(testGenres);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    ID3v1::Tag tag;
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::ID3v1);
+  }
 
   void testStripWhiteSpace()
   {

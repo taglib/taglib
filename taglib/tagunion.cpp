@@ -265,8 +265,20 @@ namespace TagLib
     return true;
   }
 
+  template<size_t COUNT>
+  TagTypes TagUnion<COUNT>::getType()
+  {
+    for (size_t i = 0; i < COUNT; ++i) {
+      if(d->tags[i] && !d->tags[i]->isEmpty())
+        return d->tags[i]->getType();
+    }
+
+    return TagTypes::NONE;
+  }
+
   // All the versions of TagUnion should be explicitly instantiated here.
 
   template class TagUnion<2>;
   template class TagUnion<3>;
 }
+

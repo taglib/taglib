@@ -136,6 +136,11 @@ namespace TagLib {
       virtual bool save();
 
       /*!
+       * Returns the type of this file
+       */
+      virtual FileTypes getType();
+
+      /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
        * If \a create is false (the default) this returns a null pointer

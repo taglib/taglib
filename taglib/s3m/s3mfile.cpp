@@ -136,6 +136,11 @@ bool S3M::File::save()
   return true;
 }
 
+FileTypes S3M::File::getType()
+{
+  return FileTypes::ModS3M;
+}
+
 void S3M::File::read(bool)
 {
   if(!isOpen())

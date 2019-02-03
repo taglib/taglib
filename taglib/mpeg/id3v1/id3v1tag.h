@@ -110,6 +110,8 @@ namespace TagLib {
       virtual void setTrack(unsigned int i);
       virtual void setPictures(const PictureMap &l);
 
+      virtual TagTypes getType();
+
       /*!
        * Returns the genre in number.
        *

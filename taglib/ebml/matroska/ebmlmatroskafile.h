@@ -104,6 +104,11 @@ namespace TagLib {
         bool save();
 
         /*!
+         * Gets the type of the file
+         */
+        virtual FileTypes getType();
+
+        /*!
          * Offers access to a few common tag entries.
          */
         class Tag : public TagLib::Tag
@@ -210,6 +215,11 @@ namespace TagLib {
            * Sets the track to i. If s is 0 then this value will be cleared.
            */
           virtual void setTrack(unsigned int i);
+
+          /*!
+           * Returns the type of this tag
+           */
+          virtual TagTypes getType();
 
         private:
           class TagPrivate;

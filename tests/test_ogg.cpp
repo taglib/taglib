@@ -51,7 +51,6 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testSimple()
   {
     ScopedFileCopy copy("empty", ".ogg");
@@ -59,6 +58,7 @@ public:
 
     {
       Ogg::Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.getType() == FileTypes::OggVorbis);
       f.tag()->setArtist("The Artist");
       f.save();
     }

@@ -37,6 +37,31 @@ namespace TagLib {
   class AudioProperties;
   class PropertyMap;
 
+  enum class FileTypes {
+    NONE,
+    APE,
+    ASF,
+    DSDIFF,
+    DSF,
+    EBMLMatroska,
+    FLAC,
+    Mod,
+    ModIT,
+    ModS3M,
+    ModXM,
+    MP4,
+    MPC,
+    MPEG,
+    OggFLAC,
+    OggOpus,
+    OggSpeex,
+    OggVorbis,
+    RIFFAIFF,
+    RIFFWAV,
+    TrueAudio,
+    WavPack
+  };
+
   //! A file class with some useful methods for tag manipulation
 
   /*!
@@ -129,6 +154,11 @@ namespace TagLib {
      * of them.
      */
     virtual bool save() = 0;
+
+    /*!
+     * Returns the type of this file
+     */
+    virtual FileTypes getType() = 0;
 
     /*!
      * Reads a block of size \a length at the current get pointer.
@@ -271,6 +301,7 @@ namespace TagLib {
      * Truncates the file to a \a length.
      */
     void truncate(long long length);
+
 
     /*!
      * Returns the buffer size that is used for internal buffering.

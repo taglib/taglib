@@ -35,11 +35,17 @@ using namespace TagLib;
 class TestInfoTag : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestInfoTag);
+  CPPUNIT_TEST(testTagType);
   CPPUNIT_TEST(testTitle);
   CPPUNIT_TEST(testNumericFields);
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  void testTagType() {
+    RIFF::Info::Tag tag;
+    CPPUNIT_ASSERT(tag.getType() == TagTypes::RIFF);
+  }
+
   void testTitle()
   {
     RIFF::Info::Tag tag;

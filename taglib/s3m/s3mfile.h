@@ -85,6 +85,11 @@ namespace TagLib {
          */
         bool save();
 
+        /*!
+         * Returns the type of this file
+         */
+        virtual FileTypes getType();
+
       private:
         File(const File &);
         File &operator=(const File &);

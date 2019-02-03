@@ -104,6 +104,11 @@ namespace TagLib {
       virtual bool save();
 
       /*!
+       * Returns the type of this file
+       */
+      virtual FileTypes getType();
+
+      /*!
        * Returns whether or not the given \a stream can be opened as an ASF
        * file.
        *

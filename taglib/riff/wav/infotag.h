@@ -93,6 +93,11 @@ namespace TagLib {
       virtual bool isEmpty() const;
 
       /*!
+       * Returns the type of this tag
+       */
+      virtual TagTypes getType();
+
+      /*!
        * Returns a copy of the internal fields of the tag.  The returned map directly
        * reflects the contents of the "INFO" chunk.
        *

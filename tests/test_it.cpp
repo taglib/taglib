@@ -85,6 +85,7 @@ public:
     ScopedFileCopy copy("test", ".it");
     {
       IT::File file(copy.fileName().c_str());
+      CPPUNIT_ASSERT(file.getType() == FileTypes::ModIT);
       CPPUNIT_ASSERT(file.tag() != 0);
       file.tag()->setTitle(titleAfter);
       file.tag()->setComment(newComment);

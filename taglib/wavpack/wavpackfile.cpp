@@ -198,6 +198,11 @@ bool WavPack::File::save()
   return true;
 }
 
+FileTypes WavPack::File::getType()
+{
+  return FileTypes::WavPack;
+}
+
 ID3v1::Tag *WavPack::File::ID3v1Tag(bool create)
 {
   return d->tag.access<ID3v1::Tag>(WavID3v1Index, create);

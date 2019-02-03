@@ -195,6 +195,7 @@ namespace TagLib {
        * Returns true if the tag does not contain any data.
        */
       bool isEmpty() const;
+      virtual TagTypes getType();
 
     protected:
 

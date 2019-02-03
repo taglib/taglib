@@ -42,7 +42,8 @@ public:
   String artist;
 };
 
-DSDIFF::DIIN::Tag::Tag() : TagLib::Tag()
+DSDIFF::DIIN::Tag::Tag() :
+  TagLib::Tag()
 {
   d = new TagPrivate;
 }
@@ -124,6 +125,11 @@ void DSDIFF::DIIN::Tag::setTrack(unsigned int)
 
 void DSDIFF::DIIN::Tag::setPictures( const PictureMap& l )
 {
+}
+
+TagTypes DSDIFF::DIIN::Tag::getType()
+{
+  return TagTypes::DSDIFF;
 }
 
 PropertyMap DSDIFF::DIIN::Tag::properties() const

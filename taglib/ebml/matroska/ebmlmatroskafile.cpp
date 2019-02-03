@@ -275,6 +275,11 @@ bool EBML::Matroska::File::save()
   return true;
 }
 
+FileTypes EBML::Matroska::File::getType() 
+{
+  return FileTypes::EBMLMatroska;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Tag
@@ -560,4 +565,9 @@ void EBML::Matroska::File::Tag::setTrack(unsigned int i)
     e->update(e->track, Constants::PART_NUMBER, s);
   else
     e->insert(Constants::PART_NUMBER, Constants::MostCommonPartValue, s);
+}
+
+TagTypes EBML::Matroska::File::Tag::getType()
+{
+  return TagTypes::EBMLMatroska;
 }

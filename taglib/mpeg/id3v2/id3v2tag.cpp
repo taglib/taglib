@@ -488,6 +488,11 @@ bool ID3v2::Tag::isEmpty() const
   return d->frameList.isEmpty();
 }
 
+TagTypes ID3v2::Tag::getType()
+{
+  return TagTypes::ID3v2;
+}
+
 Header *ID3v2::Tag::header() const
 {
   return &(d->header);

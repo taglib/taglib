@@ -48,11 +48,11 @@ class TestWavPack : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void testNoLengthProperties()
   {
     WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
     CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT(f.getType() == FileTypes::WavPack);
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());

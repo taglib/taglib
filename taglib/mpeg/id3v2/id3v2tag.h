@@ -154,6 +154,7 @@ namespace TagLib {
       virtual void setPictures(const PictureMap &l);
 
       virtual bool isEmpty() const;
+      virtual TagTypes getType();
 
       /*!
        * Returns a pointer to the tag's header.

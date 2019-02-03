@@ -80,6 +80,7 @@ namespace TagLib {
     virtual void setPictures( const PictureMap& l );
 
     virtual bool isEmpty() const;
+    virtual TagTypes getType();
 
     template <class T> T *access(size_t index, bool create)
     {

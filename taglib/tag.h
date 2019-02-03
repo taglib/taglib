@@ -31,6 +31,19 @@
 #include "tstring.h"
 
 namespace TagLib {
+    enum class TagTypes {
+      NONE,
+      APE,
+      ASF,
+      DSDIFF,
+      EBMLMatroska,
+      ID3v1,
+      ID3v2,
+      Mod,
+      MP4,
+      Ogg,
+      RIFF
+    };
 
   //! A simple, generic interface to common audio meta data fields
 
@@ -178,6 +191,11 @@ namespace TagLib {
      * abilities in this class.
      */
     virtual bool isEmpty() const;
+
+    /*!
+     * Returns the type of this tag
+     */
+    virtual TagTypes getType() = 0;
 
     /*!
      * Copies the generic data from one tag to another.
