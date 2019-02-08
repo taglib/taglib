@@ -102,7 +102,7 @@ namespace
 
     // .oga can be any audio in the Ogg container. So leave it to content-based detection.
 
-    if(ext == "MP3")
+    if(ext == "MP3" || ext == "AAC")
       return new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     if(ext == "OGG")
       return new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
