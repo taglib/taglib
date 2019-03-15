@@ -74,8 +74,19 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
             atom->name == "hdvd" || atom->name == "shwm") {
       parseBool(atom);
     }
-    else if(atom->name == "tmpo" || atom->name == "rate" || atom->name == "\251mvi" || atom->name == "\251mvc") {
+    else if(atom->name == "tmpo" || atom->name == "\251mvi" || atom->name == "\251mvc") {
       parseInt(atom);
+    }
+    else if(atom->name == "rate") {
+      AtomDataList data = parseData2(atom);
+      if(!data.isEmpty()) {
+        AtomData val = data[0];
+        if (val.type == TypeUTF8) {
+          addItem(atom->name, StringList(String(val.data, String::UTF8)));
+        } else {
+          addItem(atom->name, (int)(val.data.toShort()));
+        }
+      }
     }
     else if(atom->name == "tvsn" || atom->name == "tves" || atom->name == "cnID" ||
             atom->name == "sfID" || atom->name == "atID" || atom->name == "geID" ||
