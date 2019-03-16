@@ -199,7 +199,7 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
     length = data.toInt64BE(32);
   }
   else {
-    if(data.size() < 24 + 4) {
+    if(data.size() < 24 + 8) {
       debug("MP4: Atom 'trak.mdia.mdhd' is smaller than expected");
       return;
     }
