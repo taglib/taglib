@@ -195,8 +195,8 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
       debug("MP4: Atom 'trak.mdia.mdhd' is smaller than expected");
       return;
     }
-    unit   = data.toInt64BE(28);
-    length = data.toInt64BE(36);
+    unit   = data.toUInt32BE(28);
+    length = data.toInt64BE(32);
   }
   else {
     if(data.size() < 24 + 4) {
