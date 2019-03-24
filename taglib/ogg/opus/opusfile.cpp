@@ -132,6 +132,7 @@ void Opus::File::read(bool readProperties)
   if(!opusHeaderData.startsWith("OpusHead")) {
     setValid(false);
     debug("Opus::File::read() -- invalid Opus identification header");
+    d->comment = new Ogg::XiphComment();
     return;
   }
 
@@ -140,6 +141,7 @@ void Opus::File::read(bool readProperties)
   if(!commentHeaderData.startsWith("OpusTags")) {
     setValid(false);
     debug("Opus::File::read() -- invalid Opus tags header");
+    d->comment = new Ogg::XiphComment();
     return;
   }
 

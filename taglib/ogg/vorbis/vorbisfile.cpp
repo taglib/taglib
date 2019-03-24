@@ -140,6 +140,7 @@ void Vorbis::File::read(bool readProperties)
   if(commentHeaderData.mid(0, 7) != vorbisCommentHeaderID) {
     debug("Vorbis::File::read() - Could not find the Vorbis comment header.");
     setValid(false);
+    d->comment = new Ogg::XiphComment();
     return;
   }
 

@@ -180,6 +180,7 @@ void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle properties
 
   if (!d->scanned) {
     setValid(false);
+    d->comment = new Ogg::XiphComment();
     return;
   }
 
