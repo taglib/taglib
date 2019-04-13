@@ -491,8 +491,18 @@ MP4::Tag::save()
             name == "shwm") {
       data.append(renderBool(name.data(String::Latin1), it->second));
     }
-    else if(name == "tmpo" || name == "rate" || name == "\251mvi" || name == "\251mvc") {
+    else if(name == "tmpo" || name == "\251mvi" || name == "\251mvc") {
       data.append(renderInt(name.data(String::Latin1), it->second));
+    }
+    else if (name == "rate") {
+      const MP4::Item& item = it->second;
+      StringList value = item.toStringList();
+      if (value.isEmpty()) {
+        data.append(renderInt(name.data(String::Latin1), item));
+      }
+      else {
+        data.append(renderText(name.data(String::Latin1), item));
+      }
     }
     else if(name == "tvsn" || name == "tves" || name == "cnID" ||
             name == "sfID" || name == "atID" || name == "geID" ||
