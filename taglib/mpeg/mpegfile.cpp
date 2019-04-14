@@ -110,7 +110,7 @@ bool MPEG::File::isSupported(IOStream *stream)
 
   if(buffer.isEmpty())
 	  return false;
-  
+
   const long originalPosition = stream->tell();
   AdapterFile file(stream);
 
@@ -195,7 +195,11 @@ MPEG::Properties *MPEG::File::audioProperties() const
 
 bool MPEG::File::save()
 {
-  return save(AllTags);
+  if (hasID3v1Tag() || !ID3v1Tag()->isEmpty()) {
+    return save(AllTags, true, 4, true);
+  } else {
+    return save(AllTags, true, 4, false);
+  }
 }
 
 bool MPEG::File::save(int tags)
