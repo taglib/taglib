@@ -34,7 +34,8 @@ class Tag::TagPrivate
 
 };
 
-Tag::Tag()
+Tag::Tag() :
+d(nullptr)
 {
 
 }
