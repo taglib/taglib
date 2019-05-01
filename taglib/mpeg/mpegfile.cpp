@@ -182,7 +182,7 @@ PropertyMap MPEG::File::setProperties(const PropertyMap &properties)
 {
   // update ID3v1 tag if it exists, but ignore the return value
 
-  if(ID3v1Tag())
+  if(hasID3v1Tag())
     ID3v1Tag()->setProperties(properties);
 
   return ID3v2Tag(true)->setProperties(properties);
