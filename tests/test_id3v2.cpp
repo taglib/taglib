@@ -110,6 +110,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertyInterface);
   CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST(testPropertiesMovement);
+  CPPUNIT_TEST(testPropertyGrouping);
   CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST(testParseChapterFrame);
@@ -964,6 +965,33 @@ public:
 
     tag.addFrame(parsedFrameMvnm);
     tag.addFrame(parsedFrameMvin);
+  }
+
+  void testPropertyGrouping()
+  {
+    ID3v2::Tag tag;
+    ID3v2::TextIdentificationFrame *frameGrp1 = new ID3v2::TextIdentificationFrame("GRP1");
+    frameGrp1->setText("Grouping");
+    tag.addFrame(frameGrp1);
+
+    PropertyMap properties = tag.properties();
+    CPPUNIT_ASSERT(properties.contains("GROUPING"));
+    CPPUNIT_ASSERT_EQUAL(String("Grouping"), properties["GROUPING"].front());
+
+    ByteVector frameDataGrp1("GRP1"
+                             "\x00\x00\x00\x09"
+                             "\x00\x00"
+                             "\x00"
+                             "Grouping", 19);
+    CPPUNIT_ASSERT_EQUAL(frameDataGrp1, frameGrp1->render());
+
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ID3v2::TextIdentificationFrame *parsedFrameGrp1 =
+        dynamic_cast<ID3v2::TextIdentificationFrame *>(factory->createFrame(frameDataGrp1));
+    CPPUNIT_ASSERT(parsedFrameGrp1);
+    CPPUNIT_ASSERT_EQUAL(String("Grouping"), parsedFrameGrp1->toString());
+
+    tag.addFrame(parsedFrameGrp1);
   }
 
   void testDeleteFrame()
