@@ -1,11 +1,11 @@
 #include <iostream>
 
-#include <taglib/attachedpictureframe.h>
-#include <taglib/id3v2tag.h>
-#include <taglib/mpegfile.h>
-#include <taglib/tag.h>
-#include <taglib/tbytevector.h>
-#include <taglib/tfile.h>
+#include <attachedpictureframe.h>
+#include <id3v2tag.h>
+#include <mpegfile.h>
+#include <tag.h>
+#include <tbytevector.h>
+#include <tfile.h>
 
 using namespace std;
 
