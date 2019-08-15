@@ -37,3 +37,6 @@ target_link_libraries(framelist tag)
 add_executable(strip-id3v1 strip-id3v1.cpp)
 target_link_libraries(strip-id3v1 tag)
 
+########### next target ###############
+add_executable(update-mp3-image updatemp3apicframe.cpp)
+target_link_libraries(update-mp3-image tag)
