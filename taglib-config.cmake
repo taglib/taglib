@@ -14,8 +14,8 @@ EOH
 	exit 1;
 }
 
-prefix=@CMAKE_SYSROOT@@CMAKE_INSTALL_PREFIX@
-exec_prefix=@CMAKE_SYSROOT@@CMAKE_INSTALL_PREFIX@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
