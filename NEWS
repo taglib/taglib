@@ -245,7 +245,7 @@ TagLib 1.6.3 (Apr 17, 2010)
  * Fixed definitions of the TAGLIB_WITH_MP4 and TAGLIB_WITH_ASF macros.
  * Fixed upgrading of ID3v2.3 genre frame with ID3v1 code 0 (Blues).
  * New method `int String::toInt(bool *ok)` which can return whether the
-   conversion to a number was successfull.
+   conversion to a number was successful.
  * Fixed parsing of incorrectly written lengths in ID3v2 (affects mainly
    compressed frames). (BUG:231075)
 
@@ -253,7 +253,7 @@ TagLib 1.6.2 (Apr 9, 2010)
 ==========================
 
  * Read Vorbis Comments from the first FLAC metadata block, if there are
-   multipe ones. (BUG:211089)
+   multiple ones. (BUG:211089)
  * Fixed a memory leak in FileRef's OGA format detection.
  * Fixed compilation with the Sun Studio compiler. (BUG:215225)
  * Handle WM/TrackNumber attributes with DWORD content in WMA files.
@@ -288,7 +288,7 @@ TagLib 1.6 (Sep 13, 2009)
  * Added support for disabling dllimport/dllexport on Windows using the
    TAGLIB_STATIC macro.
  * Support for parsing the obsolete 'gnre' MP4 atom.
- * New cpp macros TAGLIB_WITH_MP4 and TAGLIB_WITH_ASF to determin if
+ * New cpp macros TAGLIB_WITH_MP4 and TAGLIB_WITH_ASF to determine if
    TagLib was built with MP4/ASF support.
 
 1.6 RC1:

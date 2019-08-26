@@ -292,12 +292,12 @@ public:
   {
     fileRefSave<RIFF::AIFF::File>("alaw", ".aifc");
   }
-  
+
   void testDSF()
   {
     fileRefSave<DSF::File>("empty10ms",".dsf");
   }
-  
+
   void testDSDIFF()
   {
     fileRefSave<DSDIFF::File>("empty10ms",".dff");
@@ -314,7 +314,7 @@ public:
 
   void testCreate()
   {
-    // This is depricated. But worth it to test.
+    // This is deprecated. But worth it to test.
 
     File *f = FileRef::create(TEST_FILE_PATH_C("empty_vorbis.oga"));
     CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File*>(f));

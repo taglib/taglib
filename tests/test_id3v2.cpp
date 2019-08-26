@@ -56,8 +56,8 @@ class PublicFrame : public ID3v2::Frame
   public:
     PublicFrame() : ID3v2::Frame(ByteVector("XXXX\0\0\0\0\0\0", 10)) {}
     String readStringField(const ByteVector &data, String::Type encoding,
-                           int *positon = 0)
-      { return ID3v2::Frame::readStringField(data, encoding, positon); }
+                           int *position = 0)
+      { return ID3v2::Frame::readStringField(data, encoding, position); }
     virtual String toString() const { return String(); }
     virtual void parseFields(const ByteVector &) {}
     virtual ByteVector renderFields() const { return ByteVector(); }

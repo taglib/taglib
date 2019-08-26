@@ -40,9 +40,9 @@ namespace TagLib {
    *
    * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
    * chunk as well as properties from the file.
-   * Description of the DSDIFF format is available 
+   * Description of the DSDIFF format is available
    * at http://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf
-   * DSDIFF standard does not explictly specify the ID3V2 chunk
+   * DSDIFF standard does not explicitly specify the ID3V2 chunk
    * It can be found at the root level, but also sometimes inside the PROP chunk
    * In addition, title and artist info are stored as part of the standard
    */
@@ -178,7 +178,7 @@ namespace TagLib {
       bool hasID3v2Tag() const;
 
       /*!
-       * Returns whether or not the file on disk actually has the DSDIFF 
+       * Returns whether or not the file on disk actually has the DSDIFF
        * Title & Artist tag.
        *
        * \see DIINTag()
