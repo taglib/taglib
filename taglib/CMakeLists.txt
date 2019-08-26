@@ -26,7 +26,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
   ${CMAKE_CURRENT_SOURCE_DIR}/dsf
   ${CMAKE_CURRENT_SOURCE_DIR}/dsdiff
-  ${CMAKE_SOURCE_DIR}/3rdparty
+  ${taglib_SOURCE_DIR}/3rdparty
 )
 
 if(ZLIB_FOUND)
