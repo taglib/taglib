@@ -187,7 +187,7 @@ public:
 
       f.tag()->setTitle(xxx);
       f.tag()->setArtist("Artist A");
-      f.save(MPEG::File::AllTags, true, 4);
+      f.save(MPEG::File::AllTags, File::StripOthers, ID3v2::v4);
       CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
     }
     {
@@ -230,7 +230,7 @@ public:
 
       f.tag()->setTitle(xxx);
       f.tag()->setArtist("Artist A");
-      f.save(MPEG::File::AllTags, true, 3);
+      f.save(MPEG::File::AllTags, File::StripOthers, ID3v2::v3);
       CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
     }
     {
@@ -369,7 +369,7 @@ public:
     {
       MPEG::File f(copy.fileName().c_str());
       f.ID3v2Tag(true)->setTitle("");
-      f.save(MPEG::File::ID3v2, false);
+      f.save(MPEG::File::ID3v2, File::StripNone);
     }
     {
       MPEG::File f(copy.fileName().c_str());
@@ -389,7 +389,7 @@ public:
     {
       MPEG::File f(copy.fileName().c_str());
       f.ID3v1Tag(true)->setTitle("");
-      f.save(MPEG::File::ID3v1, false);
+      f.save(MPEG::File::ID3v1, File::StripNone);
     }
     {
       MPEG::File f(copy.fileName().c_str());
@@ -409,7 +409,7 @@ public:
     {
       MPEG::File f(copy.fileName().c_str());
       f.APETag(true)->setTitle("");
-      f.save(MPEG::File::APE, false);
+      f.save(MPEG::File::APE, File::StripNone);
     }
     {
       MPEG::File f(copy.fileName().c_str());

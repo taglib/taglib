@@ -145,7 +145,7 @@ public:
 
     MPEG::File file(newname.c_str());
     file.ID3v2Tag(true)->addFrame(f);
-    file.save(MPEG::File::ID3v2, true, 3);
+    file.save(MPEG::File::ID3v2, File::StripOthers, ID3v2::v3);
     CPPUNIT_ASSERT_EQUAL(true, file.hasID3v2Tag());
 
     ByteVector data = f->render();
@@ -166,7 +166,7 @@ public:
 
     MPEG::File file(copy.fileName().c_str());
     file.ID3v2Tag(true)->addFrame(f);
-    file.save(MPEG::File::ID3v2, true, 3);
+    file.save(MPEG::File::ID3v2, File::StripOthers, ID3v2::v3);
     CPPUNIT_ASSERT(file.hasID3v2Tag());
 
     ByteVector data = f->render();
@@ -756,7 +756,7 @@ public:
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOT", String::Latin1));
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSST", String::Latin1));
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TSOP", String::Latin1));
-      foo.save(MPEG::File::AllTags, true, 3);
+      foo.save(MPEG::File::AllTags, File::StripOthers, ID3v2::v3);
     }
     {
       MPEG::File bar(newname.c_str());
@@ -1029,7 +1029,7 @@ public:
       MPEG::File bar(newname.c_str());
       bar.ID3v2Tag()->removeFrames("TPE1");
       // Should strip ID3v1 here and not add old values to ID3v2 again
-      bar.save(MPEG::File::ID3v2, true);
+      bar.save(MPEG::File::ID3v2, File::StripOthers);
     }
 
     MPEG::File f(newname.c_str());
@@ -1275,7 +1275,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
 
       f.ID3v2Tag()->setArtist("Artist A");
-      f.save(MPEG::File::ID3v2, true);
+      f.save(MPEG::File::ID3v2, File::StripOthers);
     }
     {
       MPEG::File f(copy.fileName().c_str());

@@ -33,20 +33,12 @@
 #include "tmap.h"
 #include "taglib_export.h"
 
+#include "id3v2.h"
 #include "id3v2framefactory.h"
 
 namespace TagLib {
 
   class File;
-
-  //! An ID3v2 implementation
-
-  /*!
-   * This is a relatively complete and flexible framework for working with ID3v2
-   * tags.
-   *
-   * \see ID3v2::Tag
-   */
 
   namespace ID3v2 {
 
@@ -346,13 +338,17 @@ namespace TagLib {
       ByteVector render() const;
 
       /*!
+       * \deprecated
+       */
+      ByteVector render(int version) const;
+
+      /*!
        * Render the tag back to binary data, suitable to be written to disk.
        *
-       * The \a version parameter specifies the version of the rendered
-       * ID3v2 tag. It can be either 4 or 3.
+       * The \a version parameter specifies whether ID3v2.4 (default) or ID3v2.3
+       * should be used.
        */
-      // BIC: combine with the above method
-      ByteVector render(int version) const;
+      ByteVector render(Version version) const;
 
       /*!
        * Gets the current string handler that decides how the "Latin-1" data

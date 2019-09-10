@@ -215,6 +215,14 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
 
 bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags)
 {
+  return save(tags,
+              stripOthers ? StripOthers : StripNone,
+              id3v2Version == 3 ? ID3v2::v3 : ID3v2::v4,
+              duplicateTags ? Duplicate : DoNotDuplicate);
+}
+
+bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, DuplicateTags duplicate)
+{
   if(readOnly()) {
     debug("MPEG::File::save() -- File is read only.");
     return false;
@@ -222,22 +230,22 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
 
   // Create the tags if we've been asked to.
 
-  if(duplicateTags) {
+  if(duplicate == Duplicate) {
 
     // Copy the values from the tag that does exist into the new tag,
     // except if the existing tag is to be stripped.
 
-    if((tags & ID3v2) && ID3v1Tag() && !(stripOthers && !(tags & ID3v1)))
+    if((tags & ID3v2) && ID3v1Tag() && !(strip == StripOthers && !(tags & ID3v1)))
       Tag::duplicate(ID3v1Tag(), ID3v2Tag(true), false);
 
-    if((tags & ID3v1) && d->tag[ID3v2Index] && !(stripOthers && !(tags & ID3v2)))
+    if((tags & ID3v1) && d->tag[ID3v2Index] && !(strip == StripOthers && !(tags & ID3v2)))
       Tag::duplicate(ID3v2Tag(), ID3v1Tag(true), false);
   }
 
   // Remove all the tags not going to be saved.
 
-  if(stripOthers)
-    strip(~tags, false);
+  if(strip == StripOthers)
+    File::strip(~tags, false);
 
   if(ID3v2 & tags) {
 
@@ -248,7 +256,7 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
       if(d->ID3v2Location < 0)
         d->ID3v2Location = 0;
 
-      const ByteVector data = ID3v2Tag()->render(id3v2Version);
+      const ByteVector data = ID3v2Tag()->render(version);
       insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
       if(d->APELocation >= 0)
@@ -263,7 +271,7 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
 
       // ID3v2 tag is empty. Remove the old one.
 
-      strip(ID3v2, false);
+      File::strip(ID3v2, false);
     }
   }
 
@@ -287,7 +295,7 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
 
       // ID3v1 tag is empty. Remove the old one.
 
-      strip(ID3v1, false);
+      File::strip(ID3v1, false);
     }
   }
 
@@ -316,7 +324,7 @@ bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplica
 
       // APE tag is empty. Remove the old one.
 
-      strip(APE, false);
+      File::strip(APE, false);
     }
   }
 

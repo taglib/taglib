@@ -63,6 +63,24 @@ namespace TagLib {
     };
 
     /*!
+     * Specify which tags to strip either explicitly, or on save.
+     */
+    enum StripTags {
+      StripNone,  //<! Don't strip any tags
+      StripAll,   //<! Strip all tags
+      StripOthers //<! Strip all tags not explicitly referenced in method call
+    };
+
+    /*!
+     * Used to specify if when saving files, if values between different tag
+     * types should be syncronized.
+     */
+    enum DuplicateTags {
+      Duplicate,     //<! Syncronize values between different tag types
+      DoNotDuplicate //<! Do not syncronize values between different tag types
+    };
+
+    /*!
      * Destroys this File instance.
      */
     virtual ~File();
