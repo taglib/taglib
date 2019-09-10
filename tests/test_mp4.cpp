@@ -67,7 +67,6 @@ public:
   {
     MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3708, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
@@ -82,7 +81,6 @@ public:
   {
     MP4::File f(TEST_FILE_PATH_C("empty_alac.m4a"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
@@ -97,7 +95,6 @@ public:
   {
     MP4::File f(TEST_FILE_PATH_C("blank_video.m4v"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(975, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(96, f.audioProperties()->bitrate());

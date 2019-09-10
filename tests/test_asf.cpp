@@ -59,7 +59,6 @@ public:
   {
     ASF::File f(TEST_FILE_PATH_C("silence-1.wma"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3712, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
@@ -76,7 +75,6 @@ public:
   {
     ASF::File f(TEST_FILE_PATH_C("lossless.wma"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3549, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(1152, f.audioProperties()->bitrate());

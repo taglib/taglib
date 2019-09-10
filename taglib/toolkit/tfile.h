@@ -264,14 +264,14 @@ namespace TagLib {
      *
      * \deprecated
      */
-    static bool isReadable(const char *file);
+    TAGLIB_DEPRECATED static bool isReadable(const char *file);
 
     /*!
      * Returns true if \a file can be opened for writing.
      *
      * \deprecated
      */
-    static bool isWritable(const char *name);
+    TAGLIB_DEPRECATED static bool isWritable(const char *name);
 
   protected:
     /*!

@@ -73,7 +73,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_cbr.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
@@ -86,7 +85,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("lame_vbr.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(70, f.audioProperties()->bitrate());
@@ -99,7 +97,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("rare_frames.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(222, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(222198, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(233, f.audioProperties()->bitrate());
@@ -112,7 +109,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("bladeenc.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3553, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
@@ -131,7 +127,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("invalid-frames1.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(392, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(160, f.audioProperties()->bitrate());
@@ -144,7 +139,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("invalid-frames2.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(314, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
@@ -157,7 +151,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("invalid-frames3.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(183, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(320, f.audioProperties()->bitrate());
@@ -170,7 +163,6 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("mpeg2.mp3"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(5387, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(5387285, f.audioProperties()->lengthInMilliseconds());
   }

@@ -230,7 +230,7 @@ bool DSDIFF::File::save()
   if(d->hasDiin) {
     DSDIFF::DIIN::Tag *diinTag = d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false);
 
-    if(!diinTag->title().isNull() && !diinTag->title().isEmpty()) {
+    if(!diinTag->title().isEmpty()) {
       ByteVector diinTitle;
       diinTitle.append(ByteVector::fromUInt(diinTag->title().size(), d->endianness == BigEndian));
       diinTitle.append(ByteVector::fromCString(diinTag->title().toCString()));
@@ -239,7 +239,7 @@ bool DSDIFF::File::save()
     else
       setChildChunkData("DITI", ByteVector(), DIINChunk);
 
-    if(!diinTag->artist().isNull() && !diinTag->artist().isEmpty()) {
+    if(!diinTag->artist().isEmpty()) {
       ByteVector diinArtist;
       diinArtist.append(ByteVector::fromUInt(diinTag->artist().size(), d->endianness == BigEndian));
       diinArtist.append(ByteVector::fromCString(diinTag->artist().toCString()));
@@ -264,7 +264,7 @@ bool DSDIFF::File::save()
 
 void DSDIFF::File::setRootChunkData(unsigned int i, const ByteVector &data)
 {
-  if(data.isNull() || data.isEmpty()) {
+  if(data.isEmpty()) {
     // Null data: remove chunk
     // Update global size
     unsigned long long removedChunkTotalSize = d->chunks[i].size + d->chunks[i].padding + 12;
@@ -344,7 +344,7 @@ void DSDIFF::File::setChildChunkData(unsigned int i,
 {
   std::vector<Chunk64> &childChunks = d->childChunks[childChunkNum];
 
-  if(data.isNull() || data.isEmpty()) {
+  if(data.isEmpty()) {
     // Null data: remove chunk
     // Update global size
     unsigned long long removedChunkTotalSize = childChunks[i].size + childChunks[i].padding + 12;
@@ -426,7 +426,7 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
   }
 
   // Do not attempt to remove a non existing chunk
-  if(data.isNull() || data.isEmpty())
+  if(data.isEmpty())
     return;
 
   // Couldn't find an existing chunk, so let's create a new one.

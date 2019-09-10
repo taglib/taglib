@@ -88,7 +88,7 @@ unsigned int DSDIFF::DIIN::Tag::track() const
 
 void DSDIFF::DIIN::Tag::setTitle(const String &title)
 {
-  if(title.isNull() || title.isEmpty())
+  if(title.isEmpty())
     d->title = String();
   else
     d->title = title;
@@ -96,7 +96,7 @@ void DSDIFF::DIIN::Tag::setTitle(const String &title)
 
 void DSDIFF::DIIN::Tag::setArtist(const String &artist)
 {
-  if(artist.isNull() || artist.isEmpty())
+  if(artist.isEmpty())
     d->artist = String();
   else
     d->artist = artist;

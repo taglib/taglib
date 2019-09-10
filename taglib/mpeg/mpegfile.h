@@ -196,19 +196,19 @@ namespace TagLib {
        * \deprecated
        */
       // BIC: combine with the above method
-      bool save(int tags, bool stripOthers);
+      TAGLIB_DEPRECATED bool save(int tags, bool stripOthers);
 
       /*!
        * \deprecated
        */
       // BIC: combine with the above method
-      bool save(int tags, bool stripOthers, int id3v2Version);
+      TAGLIB_DEPRECATED bool save(int tags, bool stripOthers, int id3v2Version);
 
       /*!
        * \deprecated
        */
       // BIC: combine with the above method
-      bool save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags);
+      TAGLIB_DEPRECATED bool save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags);
 
       /*!
        * Save the file.  This will attempt to save all of the tag types that are
@@ -317,7 +317,7 @@ namespace TagLib {
        * \see ID3v2FrameFactory
        * \deprecated This value should be passed in via the constructor
        */
-      void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
+      TAGLIB_DEPRECATED void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
       /*!
        * Returns the position in the file of the first MPEG frame.

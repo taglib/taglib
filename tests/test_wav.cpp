@@ -59,14 +59,12 @@ public:
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("empty.wav"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
     CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
   }
@@ -75,14 +73,12 @@ public:
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("alaw.wav"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(128, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(8000, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->sampleWidth());
     CPPUNIT_ASSERT_EQUAL(28400U, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(6, f.audioProperties()->format());
   }
@@ -91,14 +87,12 @@ public:
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("float64.wav"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(97, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(5645, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->sampleWidth());
     CPPUNIT_ASSERT_EQUAL(4281U, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->format());
   }
@@ -277,14 +271,12 @@ public:
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("pcm_with_fact_chunk.wav"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(32, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
     CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
   }

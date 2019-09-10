@@ -193,7 +193,7 @@ namespace TagLib {
        * prone to change my mind, so this gets to stay around until near a
        * release.
        */
-      Footer *footer() const;
+      TAGLIB_DEPRECATED Footer *footer() const;
 
       /*!
        * Returns a reference to the frame list map.  This is an FrameListMap of
@@ -340,7 +340,7 @@ namespace TagLib {
       /*!
        * \deprecated
        */
-      ByteVector render(int version) const;
+      TAGLIB_DEPRECATED ByteVector render(int version) const;
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.

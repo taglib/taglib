@@ -326,14 +326,12 @@ public:
   {
     FLAC::File f(TEST_FILE_PATH_C("sinewave.flac"));
     CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->length());
     CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
     CPPUNIT_ASSERT_EQUAL(145, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->sampleWidth());
     CPPUNIT_ASSERT_EQUAL(156556ULL, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(
       ByteVector("\xcf\xe3\xd9\xda\xba\xde\xab\x2c\xbf\x2c\xa2\x35\x27\x4b\x7f\x76"),

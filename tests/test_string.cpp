@@ -75,7 +75,6 @@ public:
 
     s.clear();
     CPPUNIT_ASSERT(s.isEmpty());
-    CPPUNIT_ASSERT(!s.isNull()); // deprecated, but still worth it to check.
 
     String unicode("José Carlos", String::UTF8);
     CPPUNIT_ASSERT(strcmp(unicode.toCString(), "Jos\xe9 Carlos") == 0);
