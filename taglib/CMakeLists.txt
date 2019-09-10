@@ -366,8 +366,7 @@ set_target_properties(tag PROPERTIES
   PUBLIC_HEADER "${tag_HDRS}"
 )
 if(VISIBILITY_HIDDEN)
-	set_target_properties(tag PROPERTIES C_VISIBILITY_PRESET hidden
-	)
+  set_target_properties(tag PROPERTIES C_VISIBILITY_PRESET hidden)
 endif()
 
 if(BUILD_FRAMEWORK)
