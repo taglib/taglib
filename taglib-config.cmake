@@ -29,7 +29,7 @@ while test $# -gt 0
 do
   case $1 in
     --libs)
-	  flags="$flags -L$libdir -ltag"
+	  flags="$flags -L$libdir -ltag @ZLIB_LIBRARIES_FLAGS@"
 	  ;;
     --cflags)
 	  flags="$flags -I$includedir/taglib"
