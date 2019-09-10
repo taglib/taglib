@@ -169,7 +169,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   if(version > 3 && (tagHeader->unsynchronisation() || header->unsynchronisation())) {
     // Data lengths are not part of the encoded data, but since they are synch-safe
     // integers they will be never actually encoded.
-    ByteVector frameData = data.mid(header->size(), header->frameSize());
+    ByteVector frameData = data.mid(Frame::Header::size(version), header->frameSize());
     frameData = SynchData::decode(frameData);
     data = data.mid(0, Frame::Header::size(version)) + frameData;
   }
