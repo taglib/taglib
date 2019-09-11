@@ -40,6 +40,7 @@ class TestAIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testAiffProperties);
   CPPUNIT_TEST(testAiffCProperties);
   CPPUNIT_TEST(testSaveID3v2);
+  CPPUNIT_TEST(testSaveID3v23);
   CPPUNIT_TEST(testDuplicateID3v2);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
@@ -102,6 +103,29 @@ public:
     {
       RIFF::AIFF::File f(newname.c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
+    }
+  }
+
+  void testSaveID3v23()
+  {
+    ScopedFileCopy copy("empty", ".aiff");
+    string newname = copy.fileName();
+
+    String xxx = ByteVector(254, 'X');
+    {
+      RIFF::AIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(false, f.hasID3v2Tag());
+
+      f.tag()->setTitle(xxx);
+      f.tag()->setArtist("Artist A");
+      f.save(ID3v2::v3);
+      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
+    }
+    {
+      RIFF::AIFF::File f2(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)3, f2.tag()->header()->majorVersion());
+      CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
+      CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
     }
   }
 
