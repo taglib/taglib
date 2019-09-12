@@ -60,7 +60,6 @@ public:
   unsigned int trackPeak;
   unsigned int albumGain;
   unsigned int albumPeak;
-  String       flags;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
