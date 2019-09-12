@@ -35,16 +35,28 @@
 
 using namespace TagLib;
 
-struct Chunk64
-{
-  ByteVector name;
-  unsigned long long offset;
-  unsigned long long size;
-  char padding;
-};
-
 namespace
 {
+  struct Chunk64
+  {
+    ByteVector name;
+    unsigned long long offset;
+    unsigned long long size;
+    char padding;
+  };
+
+  typedef std::vector<Chunk64> ChunkList;
+
+  int chunkIndex(const ChunkList &chunks, const ByteVector &id)
+  {
+    for(int i = 0; i < chunks.size(); i++) {
+      if(chunks[i].name == id)
+        return i;
+    }
+
+    return -1;
+  }
+
   enum {
     ID3v2Index = 0,
     DIINIndex = 1
@@ -81,8 +93,8 @@ public:
   ByteVector type;
   unsigned long long size;
   ByteVector format;
-  std::vector<Chunk64> chunks;
-  std::vector<Chunk64> childChunks[2];
+  ChunkList chunks;
+  ChunkList childChunks[2];
   int childChunkIndex[2];
   bool isID3InPropChunk; // Two possibilities can be found: ID3V2 chunk inside PROP chunk or at root level
   int duplicateID3V2chunkIndex; // 2 ID3 chunks are present. This is then the index of the one in
@@ -142,9 +154,9 @@ TagLib::Tag *DSDIFF::File::tag() const
   return &d->tag;
 }
 
-ID3v2::Tag *DSDIFF::File::ID3v2Tag() const
+ID3v2::Tag *DSDIFF::File::ID3v2Tag(bool create) const
 {
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, false);
+  return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
 }
 
 bool DSDIFF::File::hasID3v2Tag() const
@@ -152,9 +164,9 @@ bool DSDIFF::File::hasID3v2Tag() const
   return d->hasID3v2;
 }
 
-DSDIFF::DIIN::Tag *DSDIFF::File::DIINTag() const
+DSDIFF::DIIN::Tag *DSDIFF::File::DIINTag(bool create) const
 {
-  return d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false);
+  return d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, create);
 }
 
 bool DSDIFF::File::hasDIINTag() const
@@ -191,6 +203,11 @@ DSDIFF::Properties *DSDIFF::File::audioProperties() const
 
 bool DSDIFF::File::save()
 {
+  return save(AllTags);
+}
+
+bool DSDIFF::File::save(TagTypes tags, StripTags strip, ID3v2::Version version)
+{
   if(readOnly()) {
     debug("DSDIFF::File::save() -- File is read only.");
     return false;
@@ -201,35 +218,41 @@ bool DSDIFF::File::save()
     return false;
   }
 
+  if(strip == StripOthers || strip == StripAll)
+    File::strip(static_cast<TagTypes>(AllTags & ~tags));
+
   // First: save ID3V2 chunk
   ID3v2::Tag *id3v2Tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
-  if(d->isID3InPropChunk) {
-    if(id3v2Tag != NULL && !id3v2Tag->isEmpty()) {
-      setChildChunkData(d->id3v2TagChunkID, id3v2Tag->render(), PROPChunk);
-      d->hasID3v2 = true;
+
+  if(tags & ID3v2 && id3v2Tag) {
+    if(d->isID3InPropChunk) {
+      if(id3v2Tag != NULL && !id3v2Tag->isEmpty()) {
+        setChildChunkData(d->id3v2TagChunkID, id3v2Tag->render(version), PROPChunk);
+        d->hasID3v2 = true;
+      }
+      else {
+        // Empty tag: remove it
+        setChildChunkData(d->id3v2TagChunkID, ByteVector(), PROPChunk);
+        d->hasID3v2 = false;
+      }
     }
     else {
-      // Empty tag: remove it
-      setChildChunkData(d->id3v2TagChunkID, ByteVector(), PROPChunk);
-      d->hasID3v2 = false;
-    }
-  }
-  else {
-    if(id3v2Tag != NULL && !id3v2Tag->isEmpty()) {
-      setRootChunkData(d->id3v2TagChunkID, id3v2Tag->render());
-      d->hasID3v2 = true;
-    }
-    else {
-      // Empty tag: remove it
-      setRootChunkData(d->id3v2TagChunkID, ByteVector());
-      d->hasID3v2 = false;
+      if(id3v2Tag != NULL && !id3v2Tag->isEmpty()) {
+        setRootChunkData(d->id3v2TagChunkID, id3v2Tag->render(version));
+        d->hasID3v2 = true;
+      }
+      else {
+        // Empty tag: remove it
+        setRootChunkData(d->id3v2TagChunkID, ByteVector());
+        d->hasID3v2 = false;
+      }
     }
   }
 
   // Second: save the DIIN chunk
-  if(d->hasDiin) {
-    DSDIFF::DIIN::Tag *diinTag = d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false);
+  DSDIFF::DIIN::Tag *diinTag = d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false);
 
+  if(tags & DIIN && diinTag) {
     if(!diinTag->title().isEmpty()) {
       ByteVector diinTitle;
       diinTitle.append(ByteVector::fromUInt(diinTag->title().size(), d->endianness == BigEndian));
@@ -258,46 +281,77 @@ bool DSDIFF::File::save()
   return true;
 }
 
+void DSDIFF::File::strip(TagTypes tags)
+{
+  if(tags & ID3v2) {
+    removeRootChunk("ID3 ");
+    removeRootChunk("id3 ");
+    d->hasID3v2 = false;
+    d->tag.set(ID3v2Index, new ID3v2::Tag);
+
+    /// TODO: needs to also account for ID3v2 tags under the PROP chunk
+  }
+  if(tags & DIIN) {
+    removeRootChunk("DITI");
+    removeRootChunk("DIAR");
+    d->hasDiin = false;
+    d->tag.set(DIINIndex, new DIIN::Tag);
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void DSDIFF::File::setRootChunkData(unsigned int i, const ByteVector &data)
+void DSDIFF::File::removeRootChunk(unsigned int i)
 {
-  if(data.isEmpty()) {
-    // Null data: remove chunk
-    // Update global size
-    unsigned long long removedChunkTotalSize = d->chunks[i].size + d->chunks[i].padding + 12;
-    d->size -= removedChunkTotalSize;
+    unsigned long long chunkSize = d->chunks[i].size + d->chunks[i].padding + 12;
+
+    d->size -= chunkSize;
     insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
 
-    removeBlock(d->chunks[i].offset - 12, removedChunkTotalSize);
+    removeBlock(d->chunks[i].offset - 12, chunkSize);
 
     // Update the internal offsets
+
     for(unsigned long r = i + 1; r < d->chunks.size(); r++)
       d->chunks[r].offset = d->chunks[r - 1].offset + 12
         + d->chunks[r - 1].size + d->chunks[r - 1].padding;
 
     d->chunks.erase(d->chunks.begin() + i);
+}
+
+void DSDIFF::File::removeRootChunk(const ByteVector &id)
+{
+  int i = chunkIndex(d->chunks, id);
+
+  if(i >= 0)
+    removeRootChunk(i);
+}
+
+void DSDIFF::File::setRootChunkData(unsigned int i, const ByteVector &data)
+{
+  if(data.isEmpty()) {
+    removeRootChunk(i);
+    return;
   }
-  else {
-    // Non null data: update chunk
-    // First we update the global size
-    d->size += ((data.size() + 1) & ~1) - (d->chunks[i].size + d->chunks[i].padding);
-    insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
 
-    // Now update the specific chunk
-    writeChunk(d->chunks[i].name,
-               data,
-               d->chunks[i].offset - 12,
-               d->chunks[i].size + d->chunks[i].padding + 12);
+  // Non null data: update chunk
+  // First we update the global size
+  d->size += ((data.size() + 1) & ~1) - (d->chunks[i].size + d->chunks[i].padding);
+  insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
 
-    d->chunks[i].size = data.size();
-    d->chunks[i].padding = (data.size() & 0x01) ? 1 : 0;
+  // Now update the specific chunk
+  writeChunk(d->chunks[i].name,
+             data,
+             d->chunks[i].offset - 12,
+             d->chunks[i].size + d->chunks[i].padding + 12);
 
-    // Finally update the internal offsets
-    updateRootChunksStructure(i + 1);
-  }
+  d->chunks[i].size = data.size();
+  d->chunks[i].padding = (data.size() & 0x01) ? 1 : 0;
+
+  // Finally update the internal offsets
+  updateRootChunksStructure(i + 1);
 }
 
 void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &data)
@@ -307,15 +361,15 @@ void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &da
     return;
   }
 
-  for(unsigned int i = 0; i < d->chunks.size(); i++) {
-    if(d->chunks[i].name == name) {
-      setRootChunkData(i, data);
-      return;
-    }
+  int i = chunkIndex(d->chunks, name);
+
+  if(i >= 0) {
+    setRootChunkData(i, data);
+    return;
   }
 
   // Couldn't find an existing chunk, so let's create a new one.
-  unsigned int i = d->chunks.size() - 1;
+  i = d->chunks.size() - 1;
   unsigned long offset = d->chunks[i].offset + d->chunks[i].size + d->chunks[i].padding;
 
   // First we update the global size
@@ -338,15 +392,12 @@ void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &da
   d->chunks.push_back(chunk);
 }
 
-void DSDIFF::File::setChildChunkData(unsigned int i,
-                                     const ByteVector &data,
-                                     unsigned int childChunkNum)
+void DSDIFF::File::removeChildChunk(unsigned int i, unsigned int childChunkNum)
 {
-  std::vector<Chunk64> &childChunks = d->childChunks[childChunkNum];
+    ChunkList &childChunks = d->childChunks[childChunkNum];
 
-  if(data.isEmpty()) {
-    // Null data: remove chunk
     // Update global size
+
     unsigned long long removedChunkTotalSize = childChunks[i].size + childChunks[i].padding + 12;
     d->size -= removedChunkTotalSize;
     insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
@@ -374,44 +425,54 @@ void DSDIFF::File::setChildChunkData(unsigned int i,
         + d->chunks[i - 1].size + d->chunks[i - 1].padding;
 
     childChunks.erase(childChunks.begin() + i);
+}
+
+void DSDIFF::File::setChildChunkData(unsigned int i,
+                                     const ByteVector &data,
+                                     unsigned int childChunkNum)
+{
+  ChunkList &childChunks = d->childChunks[childChunkNum];
+
+  if(data.isEmpty()) {
+    removeChildChunk(i, childChunkNum);
+    return;
   }
-  else {
-    // Non null data: update chunk
-    // First we update the global size
-    d->size += ((data.size() + 1) & ~1) - (childChunks[i].size + childChunks[i].padding);
-    insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
-    // And the PROP chunk size
-    d->chunks[d->childChunkIndex[childChunkNum]].size += ((data.size() + 1) & ~1)
-      - (childChunks[i].size + childChunks[i].padding);
-    insert(ByteVector::fromLongLong(d->chunks[d->childChunkIndex[childChunkNum]].size,
-                                    d->endianness == BigEndian),
-           d->chunks[d->childChunkIndex[childChunkNum]].offset - 8, 8);
 
-    // Now update the specific chunk
-    writeChunk(childChunks[i].name,
-               data,
-               childChunks[i].offset - 12,
-               childChunks[i].size + childChunks[i].padding + 12);
+  // Non null data: update chunk
+  // First we update the global size
+  d->size += ((data.size() + 1) & ~1) - (childChunks[i].size + childChunks[i].padding);
+  insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
+  // And the PROP chunk size
+  d->chunks[d->childChunkIndex[childChunkNum]].size += ((data.size() + 1) & ~1)
+                                                       - (childChunks[i].size + childChunks[i].padding);
+  insert(ByteVector::fromLongLong(d->chunks[d->childChunkIndex[childChunkNum]].size,
+                                  d->endianness == BigEndian),
+         d->chunks[d->childChunkIndex[childChunkNum]].offset - 8, 8);
 
-    childChunks[i].size = data.size();
-    childChunks[i].padding = (data.size() & 0x01) ? 1 : 0;
+  // Now update the specific chunk
+  writeChunk(childChunks[i].name,
+             data,
+             childChunks[i].offset - 12,
+             childChunks[i].size + childChunks[i].padding + 12);
 
-    // Now update the internal offsets
-    // For child Chunks
-    for(i++; i < childChunks.size(); i++)
-      childChunks[i].offset = childChunks[i - 1].offset + 12
-      + childChunks[i - 1].size + childChunks[i - 1].padding;
+  childChunks[i].size = data.size();
+  childChunks[i].padding = (data.size() & 0x01) ? 1 : 0;
 
-    // And for root chunks
-    updateRootChunksStructure(d->childChunkIndex[childChunkNum] + 1);
-  }
+  // Now update the internal offsets
+  // For child Chunks
+  for(i++; i < childChunks.size(); i++)
+    childChunks[i].offset = childChunks[i - 1].offset + 12
+                            + childChunks[i - 1].size + childChunks[i - 1].padding;
+
+  // And for root chunks
+  updateRootChunksStructure(d->childChunkIndex[childChunkNum] + 1);
 }
 
 void DSDIFF::File::setChildChunkData(const ByteVector &name,
                                      const ByteVector &data,
                                      unsigned int childChunkNum)
 {
-  std::vector<Chunk64> &childChunks = d->childChunks[childChunkNum];
+  ChunkList &childChunks = d->childChunks[childChunkNum];
 
   if(childChunks.size() == 0) {
     debug("DSDIFF::File::setPropChunkData - No valid chunks found.");
@@ -485,7 +546,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
 
   // Update childchunks structure as well
   if(d->childChunkIndex[PROPChunk] >= static_cast<int>(startingChunk)) {
-    std::vector<Chunk64> &childChunksToUpdate = d->childChunks[PROPChunk];
+    ChunkList &childChunksToUpdate = d->childChunks[PROPChunk];
     if(childChunksToUpdate.size() > 0) {
       childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[PROPChunk]].offset + 12;
       for(unsigned int i = 1; i < childChunksToUpdate.size(); i++)
@@ -494,7 +555,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
     }
   }
   if(d->childChunkIndex[DIINChunk] >= static_cast<int>(startingChunk)) {
-    std::vector<Chunk64> &childChunksToUpdate = d->childChunks[DIINChunk];
+    ChunkList &childChunksToUpdate = d->childChunks[DIINChunk];
     if(childChunksToUpdate.size() > 0) {
       childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[DIINChunk]].offset + 12;
       for(unsigned int i = 1; i < childChunksToUpdate.size(); i++)

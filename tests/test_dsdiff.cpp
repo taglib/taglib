@@ -15,6 +15,8 @@ class TestDSDIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testTags);
   CPPUNIT_TEST(testSaveID3v2);
+  CPPUNIT_TEST(testSaveID3v23);
+  CPPUNIT_TEST(testStrip);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
@@ -49,16 +51,16 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("The Artist"), f->tag()->artist());
     delete f;
   }
-  
+
   void testSaveID3v2()
   {
     ScopedFileCopy copy("empty10ms", ".dff");
     string newname = copy.fileName();
-    
+
     {
       DSDIFF::File f(newname.c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
-      
+
       f.tag()->setTitle(L"TitleXXX");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v2Tag());
@@ -67,7 +69,7 @@ public:
       DSDIFF::File f(newname.c_str());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String(L"TitleXXX"), f.tag()->title());
-      
+
       f.tag()->setTitle("");
       f.save();
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
@@ -85,12 +87,100 @@ public:
       CPPUNIT_ASSERT_EQUAL(String(L"TitleXXX"), f.tag()->title());
     }
   }
-  
+
+  void testSaveID3v23()
+  {
+    ScopedFileCopy copy("empty10ms", ".dff");
+    string newname = copy.fileName();
+
+    String xxx = ByteVector(254, 'X');
+    {
+      DSDIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(false, f.hasID3v2Tag());
+
+      f.tag()->setTitle(xxx);
+      f.tag()->setArtist("Artist A");
+      f.save(DSDIFF::File::AllTags, File::StripOthers, ID3v2::v3);
+      CPPUNIT_ASSERT_EQUAL(true, f.hasID3v2Tag());
+    }
+    {
+      DSDIFF::File f2(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL((unsigned int)3, f2.ID3v2Tag()->header()->majorVersion());
+      CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
+      CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
+    }
+  }
+
+  void testStrip()
+  {
+    {
+      ScopedFileCopy copy("empty10ms", ".dff");
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        f.tag()->setArtist("X");
+        f.save();
+      }
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(f.hasID3v2Tag());
+        CPPUNIT_ASSERT(f.hasDIINTag());
+        f.strip();
+      }
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(!f.hasID3v2Tag());
+        CPPUNIT_ASSERT(!f.hasDIINTag());
+      }
+    }
+
+    {
+      ScopedFileCopy copy("empty10ms", ".dff");
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        f.ID3v2Tag(true);
+        f.DIINTag(true);
+        f.tag()->setArtist("X");
+        f.save();
+      }
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(f.hasID3v2Tag());
+        CPPUNIT_ASSERT(f.hasDIINTag());
+        f.strip(DSDIFF::File::ID3v2);
+      }
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(!f.hasID3v2Tag());
+        CPPUNIT_ASSERT(f.hasDIINTag());
+      }
+    }
+
+    {
+      ScopedFileCopy copy("empty10ms", ".dff");
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        f.tag()->setArtist("X");
+        f.save();
+      }
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(f.hasID3v2Tag());
+        CPPUNIT_ASSERT(f.hasDIINTag());
+        f.strip(DSDIFF::File::DIIN);
+      }
+      {
+        DSDIFF::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(f.hasID3v2Tag());
+        CPPUNIT_ASSERT(!f.hasDIINTag());
+      }
+    }
+  }
+
   void testRepeatedSave()
   {
     ScopedFileCopy copy("empty10ms", ".dff");
     string newname = copy.fileName();
-    
+
     {
       DSDIFF::File f(newname.c_str());
       CPPUNIT_ASSERT_EQUAL(String(""), f.tag()->title());
@@ -109,8 +199,6 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("NEW TITLE 2"), f.tag()->title());
     }
   }
-  
-
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestDSDIFF);
