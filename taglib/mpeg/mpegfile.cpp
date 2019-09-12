@@ -244,7 +244,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
 
   // Remove all the tags not going to be saved.
 
-  if(strip == StripOthers)
+  if(strip == StripOthers || strip == StripAll)
     File::strip(~tags, false);
 
   if(ID3v2 & tags) {

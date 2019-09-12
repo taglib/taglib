@@ -169,7 +169,7 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
     return false;
   }
 
-  if(strip == StripOthers)
+  if(strip == StripOthers || strip == StripAll)
     File::strip(static_cast<TagTypes>(AllTags & ~tags));
 
   if(tags & ID3v2) {
