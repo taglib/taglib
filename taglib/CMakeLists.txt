@@ -141,11 +141,6 @@ set(tag_HDRS
   s3m/s3mproperties.h
   xm/xmfile.h
   xm/xmproperties.h
-  dsf/dsffile.h
-  dsf/dsfproperties.h
-  dsdiff/dsdifffile.h
-  dsdiff/dsdiffproperties.h
-  dsdiff/dsdiffdiintag.h
 )
 
 set(mpeg_SRCS
@@ -301,17 +296,6 @@ set(xm_SRCS
   xm/xmproperties.cpp
 )
 
-set(dsf_SRCS
-  dsf/dsffile.cpp
-  dsf/dsfproperties.cpp
-)
-
-set(dsdiff_SRCS
-  dsdiff/dsdifffile.cpp
-  dsdiff/dsdiffproperties.cpp
-  dsdiff/dsdiffdiintag.cpp
-)
-
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
@@ -343,7 +327,7 @@ set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
-  ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS} ${dsf_SRCS} ${dsdiff_SRCS}
+  ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
   ${zlib_SRCS}
   tag.cpp
   tagunion.cpp

@@ -39,8 +39,6 @@
 #include <wavfile.h>
 #include <apefile.h>
 #include <aifffile.h>
-#include <dsffile.h>
-#include <dsdifffile.h>
 #include <tfilestream.h>
 #include <tbytevectorstream.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -81,8 +79,6 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testWav);
   CPPUNIT_TEST(testAIFF_1);
   CPPUNIT_TEST(testAIFF_2);
-  CPPUNIT_TEST(testDSF);
-  CPPUNIT_TEST(testDSDIFF);
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST(testCreate);
   CPPUNIT_TEST(testFileResolver);
@@ -291,16 +287,6 @@ public:
   void testAIFF_2()
   {
     fileRefSave<RIFF::AIFF::File>("alaw", ".aifc");
-  }
-
-  void testDSF()
-  {
-    fileRefSave<DSF::File>("empty10ms",".dsf");
-  }
-
-  void testDSDIFF()
-  {
-    fileRefSave<DSDIFF::File>("empty10ms",".dff");
   }
 
   void testUnsupported()
