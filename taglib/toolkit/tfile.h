@@ -67,7 +67,6 @@ namespace TagLib {
      */
     enum StripTags {
       StripNone,  //<! Don't strip any tags
-      StripAll,   //<! Strip all tags
       StripOthers //<! Strip all tags not explicitly referenced in method call
     };
 
