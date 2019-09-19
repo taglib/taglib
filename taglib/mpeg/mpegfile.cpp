@@ -205,12 +205,14 @@ bool MPEG::File::save(int tags)
 
 bool MPEG::File::save(int tags, bool stripOthers)
 {
-  return save(tags, stripOthers, ID3v2::v4);
+  return save(tags, stripOthers ? StripOthers : StripNone, ID3v2::v4);
 }
 
 bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
 {
-  return save(tags, stripOthers, id3v2Version, true);
+  return save(tags,
+              stripOthers ? StripOthers : StripNone,
+              id3v2Version == 3 ? ID3v2::v3 : ID3v2::v4);
 }
 
 bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags)
