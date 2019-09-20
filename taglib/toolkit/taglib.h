@@ -50,6 +50,8 @@
 #define TAGLIB_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER)
 #define TAGLIB_DEPRECATED __declspec(deprecated)
+#else
+#define TAGLIB_DEPRECATED
 #endif
 
 #include <string>
