@@ -775,31 +775,46 @@ MP4::Tag::track() const
 void
 MP4::Tag::setTitle(const String &value)
 {
-  d->items["\251nam"] = StringList(value);
+  if (value == String())
+    d->items.erase("\251nam");
+  else
+    d->items["\251nam"] = StringList(value);
 }
 
 void
 MP4::Tag::setArtist(const String &value)
 {
-  d->items["\251ART"] = StringList(value);
+  if (value == String())
+    d->items.erase("\251ART");
+  else
+    d->items["\251ART"] = StringList(value);
 }
 
 void
 MP4::Tag::setAlbum(const String &value)
 {
-  d->items["\251alb"] = StringList(value);
+  if (value == String())
+    d->items.erase("\251alb");
+  else
+    d->items["\251alb"] = StringList(value);
 }
 
 void
 MP4::Tag::setComment(const String &value)
 {
-  d->items["\251cmt"] = StringList(value);
+  if (value == String())
+    d->items.erase("\251cmt");
+  else
+    d->items["\251cmt"] = StringList(value);
 }
 
 void
 MP4::Tag::setGenre(const String &value)
 {
-  d->items["\251gen"] = StringList(value);
+  if (value == String())
+    d->items.erase("\251gen");
+  else
+    d->items["\251gen"] = StringList(value);
 }
 
 void
