@@ -78,35 +78,34 @@ Ogg::XiphComment::~XiphComment()
 
 String Ogg::XiphComment::title() const
 {
-  if(d->fieldListMap["TITLE"].isEmpty())
-    return String();
-  return d->fieldListMap["TITLE"].toString();
+  StringList value = d->fieldListMap.value("TITLE");
+  return value.isEmpty() ? String() : value.toString();
 }
 
 String Ogg::XiphComment::artist() const
 {
-  if(d->fieldListMap["ARTIST"].isEmpty())
-    return String();
-  return d->fieldListMap["ARTIST"].toString();
+  StringList value = d->fieldListMap.value("ARTIST");
+  return value.isEmpty() ? String() : value.toString();
 }
 
 String Ogg::XiphComment::album() const
 {
-  if(d->fieldListMap["ALBUM"].isEmpty())
-    return String();
-  return d->fieldListMap["ALBUM"].toString();
+  StringList value = d->fieldListMap.value("ALBUM");
+  return value.isEmpty() ? String() : value.toString();
 }
 
 String Ogg::XiphComment::comment() const
 {
-  if(!d->fieldListMap["DESCRIPTION"].isEmpty()) {
+  StringList value = d->fieldListMap.value("DESCRIPTION");
+  if(!value.isEmpty()) {
     d->commentField = "DESCRIPTION";
-    return d->fieldListMap["DESCRIPTION"].toString();
+    return value.toString();
   }
 
-  if(!d->fieldListMap["COMMENT"].isEmpty()) {
+  value = d->fieldListMap.value("COMMENT");
+  if(!value.isEmpty()) {
     d->commentField = "COMMENT";
-    return d->fieldListMap["COMMENT"].toString();
+    return value.toString();
   }
 
   return String();
@@ -114,26 +113,29 @@ String Ogg::XiphComment::comment() const
 
 String Ogg::XiphComment::genre() const
 {
-  if(d->fieldListMap["GENRE"].isEmpty())
-    return String();
-  return d->fieldListMap["GENRE"].toString();
+  StringList value = d->fieldListMap.value("GENRE");
+  return value.isEmpty() ? String() : value.toString();
 }
 
 unsigned int Ogg::XiphComment::year() const
 {
-  if(!d->fieldListMap["DATE"].isEmpty())
-    return d->fieldListMap["DATE"].front().toInt();
-  if(!d->fieldListMap["YEAR"].isEmpty())
-    return d->fieldListMap["YEAR"].front().toInt();
+  StringList value = d->fieldListMap.value("DATE");
+  if(!value.isEmpty())
+    return value.front().toInt();
+  value = d->fieldListMap.value("YEAR");
+  if(!value.isEmpty())
+    return value.front().toInt();
   return 0;
 }
 
 unsigned int Ogg::XiphComment::track() const
 {
-  if(!d->fieldListMap["TRACKNUMBER"].isEmpty())
-    return d->fieldListMap["TRACKNUMBER"].front().toInt();
-  if(!d->fieldListMap["TRACKNUM"].isEmpty())
-    return d->fieldListMap["TRACKNUM"].front().toInt();
+  StringList value = d->fieldListMap.value("TRACKNUMBER");
+  if(!value.isEmpty())
+    return value.front().toInt();
+  value = d->fieldListMap.value("TRACKNUM");
+  if(!value.isEmpty())
+    return value.front().toInt();
   return 0;
 }
 
@@ -155,7 +157,7 @@ void Ogg::XiphComment::setAlbum(const String &s)
 void Ogg::XiphComment::setComment(const String &s)
 {
   if(d->commentField.isEmpty()) {
-    if(!d->fieldListMap["DESCRIPTION"].isEmpty())
+    if(!d->fieldListMap.value("DESCRIPTION").isEmpty())
       d->commentField = "DESCRIPTION";
     else
       d->commentField = "COMMENT";
@@ -322,7 +324,7 @@ void Ogg::XiphComment::removeAllFields()
 
 bool Ogg::XiphComment::contains(const String &key) const
 {
-  return !d->fieldListMap[key.upper()].isEmpty();
+  return !d->fieldListMap.value(key.upper()).isEmpty();
 }
 
 void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
