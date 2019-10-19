@@ -16,8 +16,8 @@ EOH
 
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=@CMAKE_INSTALL_PREFIX@
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
+libdir=@LIB_INSTALL_DIR@
+includedir=@INCLUDE_INSTALL_DIR@
 
 flags=""
 
