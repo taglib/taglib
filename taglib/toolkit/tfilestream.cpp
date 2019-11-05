@@ -90,8 +90,8 @@ namespace
 
   struct FileNameHandle : public std::string
   {
-    FileNameHandle(FileName name) : std::string(name) {}
-    operator FileName () const { return c_str(); }
+    explicit FileNameHandle(FileName name) : std::string(name) {}
+    explicit operator FileName () const { return c_str(); }
   };
 
   typedef FILE* FileHandle;
@@ -129,7 +129,7 @@ namespace
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName)
+  explicit FileStreamPrivate(const FileName &fileName)
     : file(InvalidFileHandle)
     , name(fileName)
     , readOnly(true)
@@ -193,7 +193,7 @@ FileStream::~FileStream()
 
 FileName FileStream::name() const
 {
-  return d->name;
+  return static_cast<TagLib::FileName>(d->name);
 }
 
 ByteVector FileStream::readBlock(unsigned long length)

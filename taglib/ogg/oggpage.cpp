@@ -37,7 +37,7 @@ using namespace TagLib;
 class Ogg::Page::PagePrivate
 {
 public:
-  PagePrivate(File *f = 0, long pageOffset = -1) :
+  explicit PagePrivate(File *f = 0, long pageOffset = -1) :
     file(f),
     fileOffset(pageOffset),
     header(f, pageOffset),

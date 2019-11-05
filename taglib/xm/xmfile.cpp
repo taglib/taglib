@@ -86,7 +86,7 @@ public:
 class SkipReader : public Reader
 {
 public:
-  SkipReader(unsigned int size) : m_size(size)
+  explicit SkipReader(unsigned int size) : m_size(size)
   {
   }
 
@@ -110,7 +110,7 @@ template<typename T>
 class ValueReader : public Reader
 {
 public:
-  ValueReader(T &value) : value(value)
+  explicit ValueReader(T &value) : value(value)
   {
   }
 
@@ -151,7 +151,7 @@ private:
 class ByteReader : public ValueReader<unsigned char>
 {
 public:
-  ByteReader(unsigned char &byte) : ValueReader<unsigned char>(byte) {}
+  explicit ByteReader(unsigned char &byte) : ValueReader<unsigned char>(byte) {}
 
   virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
@@ -203,7 +203,7 @@ public:
 class U32Reader : public NumberReader<unsigned long>
 {
 public:
-  U32Reader(unsigned long &value, bool bigEndian = true) :
+  explicit U32Reader(unsigned long &value, bool bigEndian = true) :
     NumberReader<unsigned long>(value, bigEndian)
   {
   }
@@ -346,7 +346,7 @@ private:
 class XM::File::FilePrivate
 {
 public:
-  FilePrivate(AudioProperties::ReadStyle propertiesStyle)
+  explicit FilePrivate(AudioProperties::ReadStyle propertiesStyle)
     : properties(propertiesStyle)
   {
   }
