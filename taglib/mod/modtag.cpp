@@ -44,7 +44,6 @@ public:
 };
 
 Mod::Tag::Tag() :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
 }

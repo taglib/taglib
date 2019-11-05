@@ -347,7 +347,7 @@ class XM::File::FilePrivate
 {
 public:
   FilePrivate(AudioProperties::ReadStyle propertiesStyle)
-    : tag(), properties(propertiesStyle)
+    : properties(propertiesStyle)
   {
   }
 

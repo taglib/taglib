@@ -28,7 +28,7 @@
 using namespace TagLib;
 
 
-PropertyMap::PropertyMap() : SimplePropertyMap()
+PropertyMap::PropertyMap()
 {
 }
 
