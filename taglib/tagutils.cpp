@@ -41,10 +41,7 @@ long Utils::findID3v1(File *file)
   file->seek(-128, File::End);
   const long p = file->tell();
 
-  if(file->readBlock(3) == ID3v1::Tag::fileIdentifier())
-    return p;
-
-  return -1;
+  return file->readBlock(3) == ID3v1::Tag::fileIdentifier() ? p : -1;
 }
 
 long Utils::findID3v2(File *file)
@@ -54,10 +51,7 @@ long Utils::findID3v2(File *file)
 
   file->seek(0);
 
-  if(file->readBlock(3) == ID3v2::Header::fileIdentifier())
-    return 0;
-
-  return -1;
+  return file->readBlock(3) == ID3v2::Header::fileIdentifier() ? 0 : -1;
 }
 
 long Utils::findAPE(File *file, long id3v1Location)
@@ -72,10 +66,7 @@ long Utils::findAPE(File *file, long id3v1Location)
 
   const long p = file->tell();
 
-  if(file->readBlock(8) == APE::Tag::fileIdentifier())
-    return p;
-
-  return -1;
+  return (file->readBlock(8) == APE::Tag::fileIdentifier()) ? p : -1;
 }
 
 ByteVector TagLib::Utils::readHeader(IOStream *stream, unsigned int length,

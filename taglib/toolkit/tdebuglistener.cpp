@@ -56,7 +56,7 @@ namespace
 
       std::cerr << msg;
 
-#endif 
+#endif
     }
   };
 
