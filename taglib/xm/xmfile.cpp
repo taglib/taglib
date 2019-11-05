@@ -90,14 +90,14 @@ public:
   {
   }
 
-  unsigned int read(TagLib::File &file, unsigned int limit)
+  virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
     unsigned int count = std::min(m_size, limit);
     file.seek(count, TagLib::File::Current);
     return count;
   }
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     return m_size;
   }
@@ -126,7 +126,7 @@ public:
   {
   }
 
-  unsigned int read(TagLib::File &file, unsigned int limit)
+  virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
     ByteVector data = file.readBlock(std::min(m_size, limit));
     unsigned int count = data.size();
@@ -139,7 +139,7 @@ public:
     return count;
   }
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     return m_size;
   }
@@ -153,7 +153,7 @@ class ByteReader : public ValueReader<unsigned char>
 public:
   ByteReader(unsigned char &byte) : ValueReader<unsigned char>(byte) {}
 
-  unsigned int read(TagLib::File &file, unsigned int limit)
+  virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
     ByteVector data = file.readBlock(std::min(1U,limit));
     if(data.size() > 0) {
@@ -162,7 +162,7 @@ public:
     return data.size();
   }
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     return 1;
   }
@@ -187,14 +187,14 @@ public:
   U16Reader(unsigned short &value, bool bigEndian)
   : NumberReader<unsigned short>(value, bigEndian) {}
 
-  unsigned int read(TagLib::File &file, unsigned int limit)
+  virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
     ByteVector data = file.readBlock(std::min(2U,limit));
     value = data.toUShort(bigEndian);
     return data.size();
   }
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     return 2;
   }
@@ -208,14 +208,14 @@ public:
   {
   }
 
-  unsigned int read(TagLib::File &file, unsigned int limit)
+  virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
     ByteVector data = file.readBlock(std::min(4U,limit));
     value = data.toUInt(bigEndian);
     return data.size();
   }
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     return 4;
   }
@@ -317,7 +317,7 @@ public:
     return u32(number, true);
   }
 
-  unsigned int size() const
+  virtual unsigned int size() const
   {
     unsigned int size = 0;
     for(List<Reader*>::ConstIterator i = m_readers.begin();
@@ -327,7 +327,7 @@ public:
     return size;
   }
 
-  unsigned int read(TagLib::File &file, unsigned int limit)
+  virtual unsigned int read(TagLib::File &file, unsigned int limit)
   {
     unsigned int sumcount = 0;
     for(List<Reader*>::ConstIterator i = m_readers.begin();
