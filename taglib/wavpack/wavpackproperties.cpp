@@ -200,7 +200,7 @@ void WavPack::Properties::read(File *file, long streamLength)
     offset += blockSize + 8;
   }
 
-  if(d->sampleFrames == ~0u)
+  if(d->sampleFrames == ~0U)
     d->sampleFrames = seekFinalIndex(file, streamLength);
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
