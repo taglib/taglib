@@ -73,7 +73,7 @@ namespace
     }
     return true;
   }
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 // static methods
@@ -413,7 +413,7 @@ namespace
     {"TIME", "TDRC"}, // 2.3 -> 2.4
   };
   const size_t deprecatedFramesSize = sizeof(deprecatedFrames) / sizeof(deprecatedFrames[0]);;
-}
+}  // namespace
 
 String Frame::frameIDToKey(const ByteVector &id)
 {

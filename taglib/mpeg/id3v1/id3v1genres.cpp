@@ -224,7 +224,7 @@ namespace
     L"Psybient"
   };
   const int genresSize = sizeof(genres) / sizeof(genres[0]);
-}
+}  // namespace
 
 StringList ID3v1::genreList()
 {

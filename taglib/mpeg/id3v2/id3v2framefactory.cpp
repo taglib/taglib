@@ -83,7 +83,7 @@ namespace
 
     frame->setText(newfields);
   }
-}
+}  // namespace
 
 class FrameFactory::FrameFactoryPrivate
 {
@@ -474,7 +474,7 @@ namespace
     { "IPLS", "TIPL" },
   };
   const size_t frameConversion3Size = sizeof(frameConversion3) / sizeof(frameConversion3[0]);
-}
+}  // namespace
 
 bool FrameFactory::updateFrame(Frame::Header *header) const
 {

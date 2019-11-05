@@ -93,7 +93,7 @@ namespace
     virtual AudioProperties *audioProperties() const { return 0; }
     virtual bool save() { return false; }
   };
-}
+}  // namespace
 
 bool MPEG::File::isSupported(IOStream *stream)
 {

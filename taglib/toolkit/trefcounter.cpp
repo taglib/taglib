@@ -98,4 +98,4 @@ namespace TagLib
   {
     return static_cast<int>(d->refCount);
   }
-}
+}  // namespace TagLib
