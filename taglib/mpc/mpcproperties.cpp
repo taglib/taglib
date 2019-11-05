@@ -261,8 +261,8 @@ void MPC::Properties::readSV8(File *file, long streamLength)
       const unsigned int frameCount = d->sampleFrames - begSilence;
       if(frameCount > 0 && d->sampleRate > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
-        d->length  = static_cast<int>(length + 0.5);
-        d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+        d->length  = static_cast<int>(lround(length));
+        d->bitrate = static_cast<int>(lround(streamLength * 8.0 / length));
       }
     }
     else if (packetType == "RG") {
@@ -360,9 +360,9 @@ void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const double length = d->sampleFrames * 1000.0 / d->sampleRate;
-    d->length = static_cast<int>(length + 0.5);
+    d->length = static_cast<int>(lround(length));
 
     if(d->bitrate == 0)
-      d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+      d->bitrate = static_cast<int>(lround(streamLength * 8.0 / length));
   }
 }
