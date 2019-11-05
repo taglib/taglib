@@ -76,7 +76,7 @@ namespace TagLib {
      * (artist, album, ...), and only one value per key; the rest will be contained
      * in the returned PropertyMap.
      */
-    PropertyMap setProperties(const PropertyMap &properties);
+    PropertyMap setProperties(const PropertyMap &origProps);
 
     /*!
      * Returns the track name; if no track name is present in the tag

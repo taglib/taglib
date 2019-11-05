@@ -152,7 +152,7 @@ namespace TagLib {
        */
       PropertyMap setProperties(const PropertyMap &);
 
-      void removeUnsupportedProperties(const StringList &properties);
+      void removeUnsupportedProperties(const StringList &unsupported);
 
       /*!
        * Returns the TrueAudio::Properties for this file.  If no audio properties
