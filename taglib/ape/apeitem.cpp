@@ -217,10 +217,7 @@ StringList APE::Item::values() const
 
 String APE::Item::toString() const
 {
-  if(d->type == Text && !isEmpty())
-    return d->text.front();
-  else
-    return String();
+  return (d->type == Text && !isEmpty()) ? d->text.front() : String();
 }
 
 bool APE::Item::isEmpty() const

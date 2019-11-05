@@ -185,42 +185,41 @@ PropertyMap File::setProperties(const PropertyMap &properties)
 {
   if(dynamic_cast<APE::File* >(this))
     return dynamic_cast<APE::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<FLAC::File* >(this))
+  if(dynamic_cast<FLAC::File* >(this))
     return dynamic_cast<FLAC::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<IT::File* >(this))
+  if(dynamic_cast<IT::File* >(this))
     return dynamic_cast<IT::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<Mod::File* >(this))
+  if(dynamic_cast<Mod::File* >(this))
     return dynamic_cast<Mod::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<MPC::File* >(this))
+  if(dynamic_cast<MPC::File* >(this))
     return dynamic_cast<MPC::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<MPEG::File* >(this))
-    return dynamic_cast<MPEG::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<Ogg::FLAC::File* >(this))
+  if(dynamic_cast<MPEG::File* >(this))
+   return dynamic_cast<MPEG::File* >(this)->setProperties(properties);
+  if(dynamic_cast<Ogg::FLAC::File* >(this))
     return dynamic_cast<Ogg::FLAC::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<Ogg::Speex::File* >(this))
+  if(dynamic_cast<Ogg::Speex::File* >(this))
     return dynamic_cast<Ogg::Speex::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<Ogg::Opus::File* >(this))
+  if(dynamic_cast<Ogg::Opus::File* >(this))
     return dynamic_cast<Ogg::Opus::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<Ogg::Vorbis::File* >(this))
+  if(dynamic_cast<Ogg::Vorbis::File* >(this))
     return dynamic_cast<Ogg::Vorbis::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<RIFF::AIFF::File* >(this))
+  if(dynamic_cast<RIFF::AIFF::File* >(this))
     return dynamic_cast<RIFF::AIFF::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<RIFF::WAV::File* >(this))
+  if(dynamic_cast<RIFF::WAV::File* >(this))
     return dynamic_cast<RIFF::WAV::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<S3M::File* >(this))
+  if(dynamic_cast<S3M::File* >(this))
     return dynamic_cast<S3M::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<TrueAudio::File* >(this))
+  if(dynamic_cast<TrueAudio::File* >(this))
     return dynamic_cast<TrueAudio::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<WavPack::File* >(this))
+  if(dynamic_cast<WavPack::File* >(this))
     return dynamic_cast<WavPack::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<XM::File* >(this))
+  if(dynamic_cast<XM::File* >(this))
     return dynamic_cast<XM::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<MP4::File* >(this))
+  if(dynamic_cast<MP4::File* >(this))
     return dynamic_cast<MP4::File* >(this)->setProperties(properties);
-  else if(dynamic_cast<ASF::File* >(this))
+  if(dynamic_cast<ASF::File* >(this))
     return dynamic_cast<ASF::File* >(this)->setProperties(properties);
-  else
-    return tag()->setProperties(properties);
+  return tag()->setProperties(properties);
 }
 
 ByteVector File::readBlock(unsigned long length)

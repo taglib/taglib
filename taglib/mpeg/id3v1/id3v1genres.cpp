@@ -250,8 +250,8 @@ String ID3v1::genre(int i)
 {
   if(i >= 0 && i < genresSize)
     return String(genres[i]); // always make a copy
-  else
-    return String();
+
+  return String();
 }
 
 int ID3v1::genreIndex(const String &name)

@@ -143,10 +143,7 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   T tmp;
   ::memcpy(&tmp, v.data() + offset, sizeof(T));
 
-  if(swap)
-    return Utils::byteSwap(tmp);
-  else
-    return tmp;
+  return swap ? Utils::byteSwap(tmp) : tmp;
 }
 
 template <class T>
@@ -242,14 +239,10 @@ long double toFloat80(const ByteVector &v, size_t offset)
       debug("toFloat80() - can't handle the infinity or NaN. Returning 0.");
       return 0.0;
     }
-    else
-      val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
+    val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
   }
 
-  if(negative)
-    return -val;
-  else
-    return val;
+  return negative ? -val : val;
 }
 
 class ByteVector::ByteVectorPrivate
@@ -300,8 +293,8 @@ ByteVector ByteVector::fromCString(const char *s, unsigned int length)
 {
   if(length == 0xffffffff)
     return ByteVector(s, static_cast<unsigned int>(::strlen(s)));
-  else
-    return ByteVector(s, length);
+
+  return ByteVector(s, length);
 }
 
 ByteVector ByteVector::fromUInt(unsigned int value, bool mostSignificantByteFirst)
@@ -441,10 +434,7 @@ int ByteVector::rfind(const ByteVector &pattern, unsigned int offset, int byteAl
   const int pos = findVector<ConstReverseIterator>(
     rbegin(), rend(), pattern.rbegin(), pattern.rend(), offset, byteAlign);
 
-  if(pos == -1)
-    return -1;
-  else
-    return size() - pos - pattern.size();
+  return (pos != -1) ? size() - pos - pattern.size() : -1;
 }
 
 bool ByteVector::containsAt(const ByteVector &pattern, unsigned int offset, unsigned int patternOffset, unsigned int patternLength) const
@@ -841,10 +831,8 @@ bool ByteVector::operator!=(const char *s) const
 bool ByteVector::operator<(const ByteVector &v) const
 {
   const int result = ::memcmp(data(), v.data(), std::min(size(), v.size()));
-  if(result != 0)
-    return result < 0;
-  else
-    return size() < v.size();
+
+  return (result != 0) ? result < 0 : size() < v.size();
 }
 
 bool ByteVector::operator>(const ByteVector &v) const

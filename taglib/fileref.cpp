@@ -180,8 +180,8 @@ namespace
     if(file) {
       if(file->isValid())
         return file;
-      else
-        delete file;
+
+      delete file;
     }
 
     return 0;

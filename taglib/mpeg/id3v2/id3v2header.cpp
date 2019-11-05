@@ -137,8 +137,8 @@ unsigned int Header::completeTagSize() const
 {
   if(d->footerPresent)
     return d->tagSize + size() + Footer::size();
-  else
-    return d->tagSize + size();
+
+  return d->tagSize + size();
 }
 
 void Header::setTagSize(unsigned int s)

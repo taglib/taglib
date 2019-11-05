@@ -120,16 +120,16 @@ PropertyMap TagUnion::properties() const
       if(dynamic_cast<const ID3v1::Tag *>(d->tags[i]))
         return dynamic_cast<const ID3v1::Tag *>(d->tags[i])->properties();
 
-      else if(dynamic_cast<const ID3v2::Tag *>(d->tags[i]))
+      if(dynamic_cast<const ID3v2::Tag *>(d->tags[i]))
         return dynamic_cast<const ID3v2::Tag *>(d->tags[i])->properties();
 
-      else if(dynamic_cast<const APE::Tag *>(d->tags[i]))
+      if(dynamic_cast<const APE::Tag *>(d->tags[i]))
         return dynamic_cast<const APE::Tag *>(d->tags[i])->properties();
 
-      else if(dynamic_cast<const Ogg::XiphComment *>(d->tags[i]))
+      if(dynamic_cast<const Ogg::XiphComment *>(d->tags[i]))
         return dynamic_cast<const Ogg::XiphComment *>(d->tags[i])->properties();
 
-      else if(dynamic_cast<const RIFF::Info::Tag *>(d->tags[i]))
+      if(dynamic_cast<const RIFF::Info::Tag *>(d->tags[i]))
         return dynamic_cast<const RIFF::Info::Tag *>(d->tags[i])->properties();
     }
   }
