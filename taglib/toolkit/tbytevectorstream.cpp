@@ -27,10 +27,10 @@
 #include "tstring.h"
 #include "tdebug.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace TagLib;
 

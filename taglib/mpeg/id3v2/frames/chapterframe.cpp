@@ -26,7 +26,7 @@
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
 #include <tdebug.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "chapterframe.h"
 
