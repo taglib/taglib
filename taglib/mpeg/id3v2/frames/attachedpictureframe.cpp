@@ -144,7 +144,7 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->type = (TagLib::ID3v2::AttachedPictureFrame::Type)data[pos++];
+  d->type = static_cast<TagLib::ID3v2::AttachedPictureFrame::Type>(data[pos++]);
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);
@@ -205,7 +205,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
     d->mimeType = "image/" + fixedString;
   }
 
-  d->type = (TagLib::ID3v2::AttachedPictureFrame::Type)data[pos++];
+  d->type = static_cast<TagLib::ID3v2::AttachedPictureFrame::Type>(data[pos++]);
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);

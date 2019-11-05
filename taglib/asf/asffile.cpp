@@ -194,7 +194,7 @@ private:
 void ASF::File::FilePrivate::BaseObject::parse(ASF::File *file, unsigned int size)
 {
   data.clear();
-  if(size > 24 && size <= (unsigned int)(file->length()))
+  if(size > 24 && size <= static_cast<unsigned int>(file->length()))
     data = file->readBlock(size - 24);
   else
     data = ByteVector();
@@ -400,7 +400,7 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
     else {
       obj = new UnknownObject(guid);
     }
-    obj->parse(file, (unsigned int)size);
+    obj->parse(file, static_cast<unsigned int>(size));
     objects.append(obj);
     dataPos += size;
   }
@@ -656,7 +656,7 @@ void ASF::File::read()
       setValid(false);
       break;
     }
-    long size = (long)readQWORD(this, &ok);
+    long size = static_cast<long>(readQWORD(this, &ok));
     if(!ok) {
       setValid(false);
       break;
