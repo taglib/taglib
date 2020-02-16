@@ -36,11 +36,11 @@
 using namespace TagLib;
 
 #define stringUnion(method)                                          \
-  if(tag(0) && !tag(0)->method().isEmpty())                          \
+  if(tag(0) && !tag(0)->method(separator).isEmpty())                 \
     return tag(0)->method(separator);                                \
-  if(tag(1) && !tag(1)->method().isEmpty())                          \
+  if(tag(1) && !tag(1)->method(separator).isEmpty())                 \
     return tag(1)->method(separator);                                \
-  if(tag(2) && !tag(2)->method().isEmpty())                          \
+  if(tag(2) && !tag(2)->method(separator).isEmpty())                 \
     return tag(2)->method(separator);                                \
   return String();                                                   \
 
