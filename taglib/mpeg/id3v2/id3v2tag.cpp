@@ -131,28 +131,28 @@ ID3v2::Tag::~Tag()
   delete d;
 }
 
-String ID3v2::Tag::title() const
+String ID3v2::Tag::title(const String &separator) const
 {
   if(!d->frameListMap["TIT2"].isEmpty())
     return d->frameListMap["TIT2"].front()->toString();
   return String();
 }
 
-String ID3v2::Tag::artist() const
+String ID3v2::Tag::artist(const String &separator) const
 {
   if(!d->frameListMap["TPE1"].isEmpty())
     return d->frameListMap["TPE1"].front()->toString();
   return String();
 }
 
-String ID3v2::Tag::album() const
+String ID3v2::Tag::album(const String &separator) const
 {
   if(!d->frameListMap["TALB"].isEmpty())
     return d->frameListMap["TALB"].front()->toString();
   return String();
 }
 
-String ID3v2::Tag::comment() const
+String ID3v2::Tag::comment(const String &separator) const
 {
   const FrameList &comments = d->frameListMap["COMM"];
 
@@ -170,7 +170,7 @@ String ID3v2::Tag::comment() const
   return comments.front()->toString();
 }
 
-String ID3v2::Tag::genre() const
+String ID3v2::Tag::genre(const String &separator) const
 {
   // TODO: In the next major version (TagLib 2.0) a list of multiple genres
   // should be separated by " / " instead of " ".  For the moment to keep
@@ -210,7 +210,7 @@ String ID3v2::Tag::genre() const
       genres.append(*it);
   }
 
-  return genres.toString();
+  return genres.toString(separator);
 }
 
 unsigned int ID3v2::Tag::year() const

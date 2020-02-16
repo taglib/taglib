@@ -52,29 +52,29 @@ namespace TagLib {
       /*!
        * Returns the track name.
        */
-      virtual String title() const;
+      virtual String title(const String &separator = " ") const;
 
       /*!
        * Returns the artist name.
        */
-      virtual String artist() const;
+      virtual String artist(const String &separator = " ") const;
 
       /*!
        * Returns the album name; if no album name is present in the tag
        * String::null will be returned.
        */
-      virtual String album() const;
+      virtual String album(const String &separator = " ") const;
 
       /*!
        * Returns the track comment.
        */
-      virtual String comment() const;
+      virtual String comment(const String &separator = " ") const;
 
       /*!
        * Returns the genre name; if no genre is present in the tag String::null
        * will be returned.
        */
-      virtual String genre() const;
+      virtual String genre(const String &separator = " ") const;
 
       /*!
        * Returns the rating.

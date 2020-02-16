@@ -165,27 +165,27 @@ void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
   }
 }
 
-String TagUnion::title() const
+String TagUnion::title(const String &separator) const
 {
   stringUnion(title);
 }
 
-String TagUnion::artist() const
+String TagUnion::artist(const String &separator) const
 {
   stringUnion(artist);
 }
 
-String TagUnion::album() const
+String TagUnion::album(const String &separator) const
 {
   stringUnion(album);
 }
 
-String TagUnion::comment() const
+String TagUnion::comment(const String &separator) const
 {
   stringUnion(comment);
 }
 
-String TagUnion::genre() const
+String TagUnion::genre(const String &separator) const
 {
   stringUnion(genre);
 }

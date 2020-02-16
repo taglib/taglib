@@ -102,11 +102,11 @@ namespace TagLib {
 
       // Reimplementations
 
-      virtual String title() const;
-      virtual String artist() const;
-      virtual String album() const;
-      virtual String comment() const;
-      virtual String genre() const;
+      virtual String title(const String &separator = " ") const;
+      virtual String artist(const String &separator = " ") const;
+      virtual String album(const String &separator = " ") const;
+      virtual String comment(const String &separator = " ") const;
+      virtual String genre(const String &separator = " ") const;
       virtual unsigned int year() const;
       virtual unsigned int track() const;
 

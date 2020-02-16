@@ -687,42 +687,42 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
 }
 
 String
-MP4::Tag::title() const
+MP4::Tag::title(const String &separator) const
 {
   if(d->items.contains("\251nam"))
-    return d->items["\251nam"].toStringList().toString(", ");
+    return d->items["\251nam"].toStringList().toString(separator);
   return String();
 }
 
 String
-MP4::Tag::artist() const
+MP4::Tag::artist(const String &separator) const
 {
   if(d->items.contains("\251ART"))
-    return d->items["\251ART"].toStringList().toString(", ");
+    return d->items["\251ART"].toStringList().toString(separator);
   return String();
 }
 
 String
-MP4::Tag::album() const
+MP4::Tag::album(const String &separator) const
 {
   if(d->items.contains("\251alb"))
-    return d->items["\251alb"].toStringList().toString(", ");
+    return d->items["\251alb"].toStringList().toString(separator);
   return String();
 }
 
 String
-MP4::Tag::comment() const
+MP4::Tag::comment(const String &separator) const
 {
   if(d->items.contains("\251cmt"))
-    return d->items["\251cmt"].toStringList().toString(", ");
+    return d->items["\251cmt"].toStringList().toString(separator);
   return String();
 }
 
 String
-MP4::Tag::genre() const
+MP4::Tag::genre(const String &separator) const
 {
   if(d->items.contains("\251gen"))
-    return d->items["\251gen"].toStringList().toString(", ");
+    return d->items["\251gen"].toStringList().toString(separator);
   return String();
 }
 

@@ -54,29 +54,29 @@ namespace TagLib {
        * Returns the track name; if no track name is present in the tag
        * String::null will be returned.
        */
-      virtual String title() const;
+      virtual String title(const String &separator = " ") const;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      virtual String artist() const;
+      virtual String artist(const String &separator = " ") const;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      virtual String album() const;
+      virtual String album(const String &separator = " ") const;
 
       /*!
        * Returns the track comment derived from the instrument/sample/pattern
        * names; if no comment is present in the tag String::null will be
        * returned.
        */
-      virtual String comment() const;
+      virtual String comment(const String &separator = " ") const;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      virtual String genre() const;
+      virtual String genre(const String &separator = " ") const;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.

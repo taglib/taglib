@@ -50,17 +50,17 @@ ASF::Tag::~Tag()
   delete d;
 }
 
-String ASF::Tag::title() const
+String ASF::Tag::title(const String &separator) const
 {
   return d->title;
 }
 
-String ASF::Tag::artist() const
+String ASF::Tag::artist(const String &separator) const
 {
   return d->artist;
 }
 
-String ASF::Tag::album() const
+String ASF::Tag::album(const String &separator) const
 {
   if(d->attributeListMap.contains("WM/AlbumTitle"))
     return d->attributeListMap["WM/AlbumTitle"][0].toString();
@@ -72,7 +72,7 @@ String ASF::Tag::copyright() const
   return d->copyright;
 }
 
-String ASF::Tag::comment() const
+String ASF::Tag::comment(const String &separator) const
 {
   return d->comment;
 }
@@ -103,7 +103,7 @@ unsigned int ASF::Tag::track() const
   return 0;
 }
 
-String ASF::Tag::genre() const
+String ASF::Tag::genre(const String &separator) const
 {
   if(d->attributeListMap.contains("WM/Genre"))
     return d->attributeListMap["WM/Genre"][0].toString();

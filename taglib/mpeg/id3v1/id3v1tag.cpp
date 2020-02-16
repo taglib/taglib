@@ -127,27 +127,27 @@ ByteVector ID3v1::Tag::fileIdentifier()
   return ByteVector::fromCString("TAG");
 }
 
-String ID3v1::Tag::title() const
+String ID3v1::Tag::title(const String &separator) const
 {
   return d->title;
 }
 
-String ID3v1::Tag::artist() const
+String ID3v1::Tag::artist(const String &separator) const
 {
   return d->artist;
 }
 
-String ID3v1::Tag::album() const
+String ID3v1::Tag::album(const String &separator) const
 {
   return d->album;
 }
 
-String ID3v1::Tag::comment() const
+String ID3v1::Tag::comment(const String &separator) const
 {
   return d->comment;
 }
 
-String ID3v1::Tag::genre() const
+String ID3v1::Tag::genre(const String &separator) const
 {
   return ID3v1::genre(d->genre);
 }

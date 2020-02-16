@@ -53,27 +53,27 @@ Mod::Tag::~Tag()
   delete d;
 }
 
-String Mod::Tag::title() const
+String Mod::Tag::title(const String &separator) const
 {
   return d->title;
 }
 
-String Mod::Tag::artist() const
+String Mod::Tag::artist(const String &separator) const
 {
   return String();
 }
 
-String Mod::Tag::album() const
+String Mod::Tag::album(const String &separator) const
 {
   return String();
 }
 
-String Mod::Tag::comment() const
+String Mod::Tag::comment(const String &separator) const
 {
   return d->comment;
 }
 
-String Mod::Tag::genre() const
+String Mod::Tag::genre(const String &separator) const
 {
   return String();
 }

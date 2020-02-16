@@ -82,31 +82,31 @@ namespace TagLib {
      * Returns the track name; if no track name is present in the tag
      * String::null will be returned.
      */
-    virtual String title() const = 0;
+    virtual String title(const String &separator = " ") const = 0;
 
     /*!
      * Returns the artist name; if no artist name is present in the tag
      * String::null will be returned.
      */
-    virtual String artist() const = 0;
+    virtual String artist(const String &separator = " ") const = 0;
 
     /*!
      * Returns the album name; if no album name is present in the tag
      * String::null will be returned.
      */
-    virtual String album() const = 0;
+    virtual String album(const String &separator = " ") const = 0;
 
     /*!
      * Returns the track comment; if no comment is present in the tag
      * String::null will be returned.
      */
-    virtual String comment() const = 0;
+    virtual String comment(const String &separator = " ") const = 0;
 
     /*!
      * Returns the genre name; if no genre is present in the tag String::null
      * will be returned.
      */
-    virtual String genre() const = 0;
+    virtual String genre(const String &separator = " ") const = 0;
 
     /*!
      * Returns the year; if there is no year set, this will return 0.

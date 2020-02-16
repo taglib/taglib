@@ -88,27 +88,27 @@ RIFF::Info::Tag::~Tag()
   delete d;
 }
 
-String RIFF::Info::Tag::title() const
+String RIFF::Info::Tag::title(const String &separator) const
 {
   return fieldText("INAM");
 }
 
-String RIFF::Info::Tag::artist() const
+String RIFF::Info::Tag::artist(const String &separator) const
 {
   return fieldText("IART");
 }
 
-String RIFF::Info::Tag::album() const
+String RIFF::Info::Tag::album(const String &separator) const
 {
   return fieldText("IPRD");
 }
 
-String RIFF::Info::Tag::comment() const
+String RIFF::Info::Tag::comment(const String &separator) const
 {
   return fieldText("ICMT");
 }
 
-String RIFF::Info::Tag::genre() const
+String RIFF::Info::Tag::genre(const String &separator) const
 {
   return fieldText("IGNR");
 }
