@@ -250,13 +250,24 @@ void ID3v2::Tag::setComment(const String &s)
     return;
   }
 
-  if(!d->frameListMap["COMM"].isEmpty())
-    d->frameListMap["COMM"].front()->setText(s);
-  else {
-    CommentsFrame *f = new CommentsFrame(d->factory->defaultTextEncoding());
-    addFrame(f);
-    f->setText(s);
+  const FrameList &comments = d->frameListMap["COMM"];
+
+  if(!comments.isEmpty()) {
+    for(FrameList::ConstIterator it = comments.begin(); it != comments.end(); ++it) {
+      CommentsFrame *frame = dynamic_cast<CommentsFrame *>(*it);
+      if(frame && frame->description().isEmpty()) {
+        (*it)->setText(s);
+        return;
+      }
+    }
+
+    comments.front()->setText(s);
+    return;
   }
+
+  CommentsFrame *f = new CommentsFrame(d->factory->defaultTextEncoding());
+  addFrame(f);
+  f->setText(s);
 }
 
 void ID3v2::Tag::setGenre(const String &s)
