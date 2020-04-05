@@ -52,15 +52,3 @@ CMakeScripts
 /out/build/x64-Debug/taglib
 /out/build/x64-Debug/Testing/Temporary
 /out/build/x64-Debug
-/taglib/ttaglib.cpp
-/taglib/tp_stub.h
-/taglib/tp_stub.cpp
-/taglib/taglib_config.h
-/taglib/taglib.vcxproj.filters
-/taglib/taglib.vcxproj
-/taglib/propmacros.h
-/taglib/ncb_invoke.hpp
-/taglib/ncb_foreach.h
-/taglib/ncbind.hpp
-/taglib/ncbind.cpp
-/testflac
