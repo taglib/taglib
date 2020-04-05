@@ -100,6 +100,7 @@ namespace TagLib {
 
   typedef TagUnion<2> DoubleTagUnion;
   typedef TagUnion<3> TripleTagUnion;
+  typedef TagUnion<4> QuadTagUnion;
 }
 
 #endif

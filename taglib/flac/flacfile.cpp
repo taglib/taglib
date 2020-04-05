@@ -41,6 +41,7 @@
 #include "flacfile.h"
 #include "flacmetadatablock.h"
 #include "flacunknownmetadatablock.h"
+#include "flacpicturetag.h"
 
 using namespace TagLib;
 
@@ -50,7 +51,7 @@ namespace
   typedef BlockList::Iterator BlockIterator;
   typedef BlockList::Iterator BlockConstIterator;
 
-  enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
+  enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2,FlacPictureIndex = 3 };
 
   const long long MinPaddingLength = 4096;
   const long long MaxPaddingLegnth = 1024 * 1024;
@@ -93,7 +94,7 @@ public:
 
   long long ID3v1Location;
 
-  TripleTagUnion tag;
+  QuadTagUnion tag;
 
   SCOPED_PTR<AudioProperties> properties;
   ByteVector xiphCommentData;
@@ -412,6 +413,7 @@ void FLAC::File::read(bool readProperties)
   else
     d->tag.set(FlacXiphIndex, new Ogg::XiphComment());
 
+  d->tag.set(FlacPictureIndex, new FlacPictureTag(this));
   if(readProperties) {
 
     // First block should be the stream_info metadata
