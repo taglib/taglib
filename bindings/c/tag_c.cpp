@@ -24,6 +24,9 @@
 #endif
 
 #include <stdlib.h>
+#include <attachedpictureframe.h>
+#include <id3v2tag.h>
+#include <tbytevector.h>
 #include <fileref.h>
 #include <tfile.h>
 #include <asffile.h>
@@ -71,6 +74,33 @@ namespace
   }
 }
 
+// Image file
+class Image : public File
+{
+public:
+  Image(const char *filename): File(filename) { }
+
+  ByteVector data()
+  {
+    return readBlock(length());
+  }
+private:
+  virtual Tag* tag() const
+  {
+    return 0;
+  }
+
+  virtual AudioProperties* audioProperties() const
+  {
+    return 0;
+  }
+
+  virtual bool save()
+  {
+    return 0;
+  }
+};
+
 void taglib_set_strings_unicode(BOOL unicode)
 {
   unicodeStrings = (unicode != 0);
@@ -84,6 +114,91 @@ void taglib_set_string_management_enabled(BOOL management)
 void taglib_free(void* pointer)
 {
   free(pointer);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Simple, basic, generic wrapper for covers
+////////////////////////////////////////////////////////////////////////////////
+
+int taglib_is_cover_empty(const char *filename, TagLib_File_Type type)
+{
+  switch (type) {
+  case TagLib_File_MPEG:
+    break;
+  default:
+    return -1;
+  }
+
+  int result = 1;
+
+  MPEG::File *f = new MPEG::File(filename);
+  ID3v2::Tag *tag = f->ID3v2Tag();
+
+  const ID3v2::FrameList fl = tag->frameListMap()["APIC"];
+  if (fl.isEmpty()) {
+    result = 0;
+  }
+
+  free(tag);
+  free(f);
+
+  return result;
+}
+
+int taglib_remove_cover(const char *filename)
+{
+  int result = 1;
+
+  MPEG::File *f = new MPEG::File(filename);
+  ID3v2::Tag *tag = f->ID3v2Tag();
+
+  ID3v2::FrameList fl = tag->frameListMap()["APIC"];
+
+  for (auto it = tag->frameList().begin(); it != tag->frameList().end(); ++it) {
+    auto frameID = (*it)->frameID();
+	std::string fsv(frameID.data(), frameID.size());
+
+	if (fsv.compare("APIC") == 0) {
+	  tag->removeFrame(*it);
+	  it = tag->frameList().begin();
+	  result = 0;
+	}
+  }
+
+  free(tag);
+  free(f);
+
+  return result;
+}
+
+int taglib_update_cover(const char *filename, const char *img_path, TagLib_Img_Type type)
+{
+  int result = 1;
+  switch (type) {
+  case TagLib_Img_Front_Cover:
+    break;
+  default:
+	return -1;
+  }
+
+  MPEG::File *f = new MPEG::File(filename);
+  ID3v2::Tag *tag = f->ID3v2Tag();
+
+  TagLib::ID3v2::AttachedPictureFrame *picFrame = new TagLib::ID3v2::AttachedPictureFrame;
+  Image img(img_path);
+  picFrame->setPicture(img.data());
+  picFrame->setType(TagLib::ID3v2::AttachedPictureFrame::FrontCover);
+
+  tag->addFrame(picFrame);
+
+  f->save();
+  result = 0;
+
+  free(picFrame);
+  free(tag);
+  free(f);
+
+  return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

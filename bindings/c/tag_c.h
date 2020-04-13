@@ -103,6 +103,28 @@ typedef enum {
   TagLib_File_ASF
 } TagLib_File_Type;
 
+/*******************************************************************************
+ * Image types
+ ******************************************************************************/
+
+typedef enum {
+  TagLib_Img_Front_Cover
+} TagLib_Img_Type;
+
+// Returns 0 if empty, 1 if not empty, and -1 if the type is not a MPEG file
+//TagLib_File *taglib_file_new(const char *filename, TagLib_File_Type type)
+//TAGLIB_C_EXPORT int taglib_is_cover_empty(TagLib_File *file, TagLib_File_Type type);
+TAGLIB_C_EXPORT int taglib_is_cover_empty(const char *filename, TagLib_File_Type type);
+
+// Returns 0 if successful in removing cover and 1 if unsuccessful
+// Assumes the file is an MPEG file
+TAGLIB_C_EXPORT int taglib_remove_cover(const char *filename);
+
+// Returns 0 if successful updating cover, 1 if unsuccessful, and -1 if not a front cover
+// Assumes file is an MPEF file
+// TAGLIB_C_EXPORT int taglib_update_cover(TagLib_File *file, TagLib_Img_Type type);
+TAGLIB_C_EXPORT int taglib_update_cover(const char *filename, const char *img_path, TagLib_Img_Type type);
+
 /*!
  * Creates a TagLib file based on \a filename.  TagLib will try to guess the file
  * type.
