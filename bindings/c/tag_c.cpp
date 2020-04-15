@@ -29,6 +29,7 @@
 #include <tbytevector.h>
 #include <fileref.h>
 #include <tfile.h>
+#include <tlist.h>
 #include <asffile.h>
 #include <vorbisfile.h>
 #include <mpegfile.h>
@@ -42,6 +43,7 @@
 #include <tag.h>
 #include <string.h>
 #include <id3v2framefactory.h>
+#include <id3v2frame.h>
 
 #include "tag_c.h"
 
@@ -79,6 +81,7 @@ class Image : public File
 {
 public:
   Image(const char *filename): File(filename) { }
+  ~Image() = default;
 
   ByteVector data()
   {
@@ -116,6 +119,134 @@ void taglib_free(void* pointer)
   free(pointer);
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Cover stuff
+////////////////////////////////////////////////////////////////////////////////
+
+TagLib_Mpeg_File *taglib_mpeg_file_new(const char *filename)
+{
+  return reinterpret_cast<TagLib_Mpeg_File *>(new MPEG::File(filename));
+}
+
+void taglib_mpef_file_free(TagLib_Mpeg_File *file)
+{
+  MPEG::File *f = reinterpret_cast<MPEG::File *>(file);
+  free(f);
+  file = NULL;
+}
+
+BOOL taglib_mpeg_file_save(TagLib_Mpeg_File *file)
+{
+  MPEG::File *song_file = reinterpret_cast<MPEG::File *>(file);
+  return song_file->save();
+}
+
+
+TagLib_ID3v2_Tag *taglib_id3v2_tag_new(TagLib_Mpeg_File *file)
+{
+  MPEG::File *song_file = reinterpret_cast<MPEG::File *>(file);
+  return reinterpret_cast<TagLib_ID3v2_Tag *>(song_file->ID3v2Tag());
+}
+
+void taglib_id3v2_tag_add_frame(TagLib_ID3v2_Tag *tag, TagLib_ID3v2_AttachedPictureFrame *frame)
+{
+  ID3v2::Tag *t = reinterpret_cast<ID3v2::Tag *>(tag);
+  ID3v2::AttachedPictureFrame *f = reinterpret_cast<ID3v2::AttachedPictureFrame *>(frame);
+
+  t->addFrame(f);
+  tag = reinterpret_cast<TagLib_ID3v2_Tag *>(t);
+}
+
+
+TagLib_ID3v2_Image *taglib_id3v2_image_new(const char *filename)
+{
+  return reinterpret_cast<TagLib_ID3v2_Image *>(new Image(filename));
+}
+
+void taglib_id3v2_image_free(TagLib_ID3v2_Image *image)
+{
+  Image *img = reinterpret_cast<Image *>(image);
+  delete img;
+  img = NULL;
+  image = reinterpret_cast<TagLib_ID3v2_Image *>(img);
+}
+
+
+int taglib_is_picture_frame_list_empty(TagLib_ID3v2_Tag *tag)
+{
+  ID3v2::Tag *t = reinterpret_cast<ID3v2::Tag *>(tag);
+  ID3v2::FrameList f = t->frameListMap()["APIC"];
+
+  if (f.isEmpty())
+    return 0;
+  else
+    return 1;
+}
+
+void taglib_remove_picture_frame_lists(TagLib_ID3v2_Tag *tag)
+{
+  ID3v2::Tag *t = reinterpret_cast<ID3v2::Tag *>(tag);
+  ID3v2::FrameList f = t->frameListMap()["APIC"];
+
+  for (ID3v2::FrameList::ConstIterator it = t->frameList().begin(); it != t->frameList().end(); ++it)
+  {
+    ByteVector frame_id = (*it)->frameID();
+    std::string frame_name(frame_id.data(), frame_id.size());
+
+    if (frame_name.compare("APIC") == 0)
+    {
+      t->removeFrame((*it));
+      it = t->frameList().begin();
+    }
+  }
+
+  tag = reinterpret_cast<TagLib_ID3v2_Tag *>(t);
+}
+
+
+TagLib_ID3v2_AttachedPictureFrame *taglib_id3v2_attached_picture_frame_new()
+{
+  return reinterpret_cast<TagLib_ID3v2_AttachedPictureFrame *>(new ID3v2::AttachedPictureFrame);
+}
+
+void taglib_id3v2_attached_picture_frame_free(TagLib_ID3v2_AttachedPictureFrame *picture_frame)
+{
+  ID3v2::AttachedPictureFrame *pf = reinterpret_cast<ID3v2::AttachedPictureFrame *>(picture_frame);
+  delete pf;
+  pf = NULL;
+  picture_frame = NULL;
+}
+
+void taglib_id3v2_attached_picture_frame_set_picture(TagLib_ID3v2_AttachedPictureFrame *picture_frame, TagLib_ID3v2_Image *image)
+{
+  ID3v2::AttachedPictureFrame *pf = reinterpret_cast<ID3v2::AttachedPictureFrame *>(picture_frame);
+  Image *img = reinterpret_cast<Image *>(image);
+  pf->setPicture(img->data());
+  picture_frame = reinterpret_cast<TagLib_ID3v2_AttachedPictureFrame *>(pf);
+}
+
+int taglib_id3v2_attached_picture_frame_set_type(TagLib_ID3v2_AttachedPictureFrame *picture_frame, TagLib_Img_Type type)
+{
+  int result = 0;
+  ID3v2::AttachedPictureFrame *pf = reinterpret_cast<ID3v2::AttachedPictureFrame *>(picture_frame);
+  switch (type)
+  {
+    case TagLib_Img_Front_Cover:
+      pf->setType(ID3v2::AttachedPictureFrame::FrontCover);
+      picture_frame = reinterpret_cast<TagLib_ID3v2_AttachedPictureFrame *>(pf);
+      result = 0;
+      break;
+    default:
+      result = -1;
+      break;
+  }
+
+  return result;
+}
+
+
+/** Ignore
 ////////////////////////////////////////////////////////////////////////////////
 // Simple, basic, generic wrapper for covers
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +331,7 @@ int taglib_update_cover(const char *filename, const char *img_path, TagLib_Img_T
 
   return result;
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // TagLib::File wrapper
