@@ -65,12 +65,10 @@ extern "C" {
 typedef struct { int dummy; } TagLib_File;
 typedef struct { int dummy; } TagLib_Tag;
 typedef struct { int dummy; } TagLib_AudioProperties;
-// Added
 typedef struct { int dummy; } TagLib_Mpeg_File;
 typedef struct { int dummy; } TagLib_ID3v2_Tag;
-typedef struct { int dummy; } TagLib_ID3v2_AttachedPictureFrame;
+typedef struct { int dummy; } TagLib_ID3v2_Attached_Picture_Frame;
 typedef struct { int dummy; } TagLib_ID3v2_Picture_Frame_List;
-// typedef struct { int dummy; } TagLib_ID3v2_FrameListMap;
 typedef struct { int dummy; } TagLib_ID3v2_Image;
 
 /*!
@@ -114,28 +112,17 @@ typedef enum {
  * Image types
  ******************************************************************************/
 
+// Front covers only supported, to add more support, update this enum and the
+// taglib_id3v2_attached_picture_frame_set_type() function
 typedef enum {
   TagLib_Img_Front_Cover
 } TagLib_Img_Type;
-
-/** Ignore
-// Returns 0 if empty, 1 if not empty, and -1 if the type is not a MPEG file
-TAGLIB_C_EXPORT int taglib_is_cover_empty(const char *filename, TagLib_File_Type type);
-
-// Returns 0 if successful in removing cover and 1 if unsuccessful
-// Assumes the file is an MPEG file
-TAGLIB_C_EXPORT int taglib_remove_cover(const char *filename);
-
-// Returns 0 if successful updating cover, 1 if unsuccessful, and -1 if not a front cover
-// Assumes file is an MPEF file
-// TAGLIB_C_EXPORT int taglib_update_cover(TagLib_File *file, TagLib_Img_Type type);
-TAGLIB_C_EXPORT int taglib_update_cover(const char *filename, const char *img_path, TagLib_Img_Type type);
-*/
 
 
 /* 
  * Creates MPEG::File wrapper. File must be of type mp3
  * 
+ * Returns a MPEG::File wrapper if open and valid and returns NULL if not
  */
 TAGLIB_C_EXPORT TagLib_Mpeg_File *taglib_mpeg_file_new(const char *filename);
 /* 
@@ -151,13 +138,16 @@ TAGLIB_C_EXPORT BOOL taglib_mpeg_file_save(TagLib_Mpeg_File *file);
 
 /* 
  * Once a MPEG::File wrapper is created, you must create a ID3v2::Tag wrapper in order to add the frame
+ * 
+ * Returns ID3v2::Tag wrapper if file contains a ID3v2 tag and NULL if the MPEG::File wrapper parameter
+ * passed is NULL or if the MPEG::File does not contain a ID3v2 tag
  */ 
 TAGLIB_C_EXPORT TagLib_ID3v2_Tag *taglib_id3v2_tag_new(TagLib_Mpeg_File *file);
 /* 
  * After the ID3v2::Tag wrapper is created and the ID3v2::AttachedPictureFrame wrapper contains
  * an image. add the frame to the tag
  */ 
-TAGLIB_C_EXPORT void taglib_id3v2_tag_add_frame(TagLib_ID3v2_Tag *tag, TagLib_ID3v2_AttachedPictureFrame *frame);
+TAGLIB_C_EXPORT void taglib_id3v2_tag_add_frame(TagLib_ID3v2_Tag *tag, TagLib_ID3v2_Attached_Picture_Frame *frame);
 
 /* 
  * Wrapper for the Image class that will contain the content of the image
@@ -167,11 +157,14 @@ TAGLIB_C_EXPORT TagLib_ID3v2_Image *taglib_id3v2_image_new(const char *filename)
 /* 
  * Checks to see if the 'APIC' frame is empty. 
  * 
- * Returns 0 if so and a non-zero number if not
+ * Returns 0 if so, number greater than 0 if not, and a negative number if the ID3v2::Tag wrapper
+ * parameter is NULL
  */ 
 TAGLIB_C_EXPORT int taglib_is_picture_frame_list_empty(TagLib_ID3v2_Tag *tag);
 /* 
  * Removes all 'APIC' frames from the tag
+ * 
+ * Nothing happens if the ID3v2::Tag wrapper paramater passed is NULL
  */ 
 TAGLIB_C_EXPORT void taglib_remove_picture_frame_lists(TagLib_ID3v2_Tag *tag);
 
@@ -179,7 +172,7 @@ TAGLIB_C_EXPORT void taglib_remove_picture_frame_lists(TagLib_ID3v2_Tag *tag);
  * Creates ID3v2::AttachedPictureFrame wrapper necessary to attached the desired
  * Image (Image class or TagLib_ID3v2_Image)
  */ 
-TAGLIB_C_EXPORT TagLib_ID3v2_AttachedPictureFrame *taglib_id3v2_attached_picture_frame_new();
+TAGLIB_C_EXPORT TagLib_ID3v2_Attached_Picture_Frame *taglib_id3v2_attached_picture_frame_new();
 /* 
  * After all is said and done, free this frame and you have won
  */ 
@@ -189,13 +182,20 @@ TAGLIB_C_EXPORT void taglib_id3v2_attached_picture_frame_free();
  * 
  * Note: Set the type before hand
  */ 
-TAGLIB_C_EXPORT void taglib_id3v2_attached_picture_frame_set_picture(TagLib_ID3v2_AttachedPictureFrame *picture_frame, TagLib_ID3v2_Image *img);
+TAGLIB_C_EXPORT void taglib_id3v2_attached_picture_frame_set_picture(TagLib_ID3v2_Attached_Picture_Frame *picture_frame, TagLib_ID3v2_Image *img);
 /* 
  * Sets the picture type of the ID3v2::AttachedPictureFrame wrapper. Only Front covers are supported
  * 
  * Returns 0 if successful and negative interger if not
  */ 
-TAGLIB_C_EXPORT int taglib_id3v2_attached_picture_frame_set_type(TagLib_ID3v2_AttachedPictureFrame *picture_frame, TagLib_Img_Type type);
+TAGLIB_C_EXPORT int taglib_id3v2_attached_picture_frame_set_type(TagLib_ID3v2_Attached_Picture_Frame *picture_frame, TagLib_Img_Type type);
+/*
+ * Sets the mime type
+ * 
+ * Nothing happens if the ID3v2::AttachedPictureFrame wrapper is NULL or if the mime type char string contains
+ * no characters
+ */
+TAGLIB_C_EXPORT void taglib_id3v2_attached_picture_frame_set_mime_type(TagLib_ID3v2_Attached_Picture_Frame *picture_frame, const char *type);
 
 
 /*!
