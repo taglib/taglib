@@ -80,7 +80,7 @@ public:
     footerLocation(0) {}
 
   File *file;
-  long footerLocation;
+  offset_t footerLocation;
 
   Footer footer;
   ItemListMap itemListMap;
@@ -95,7 +95,7 @@ APE::Tag::Tag() :
 {
 }
 
-APE::Tag::Tag(TagLib::File *file, long footerLocation) :
+APE::Tag::Tag(TagLib::File *file, offset_t footerLocation) :
   d(new TagPrivate())
 {
   d->file = file;

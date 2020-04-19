@@ -146,7 +146,7 @@ namespace TagLib {
        *
        * \see FrameFactory
        */
-      Tag(File *file, long tagOffset,
+      Tag(File *file, offset_t tagOffset,
           const FrameFactory *factory = FrameFactory::instance());
 
       /*!

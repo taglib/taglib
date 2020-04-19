@@ -53,19 +53,19 @@ public:
     }
     {
       PlainFile file(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(10l, file.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(10), file.length());
 
-      CPPUNIT_ASSERT_EQUAL(2l, file.find(ByteVector("23", 2)));
-      CPPUNIT_ASSERT_EQUAL(2l, file.find(ByteVector("23", 2), 2));
-      CPPUNIT_ASSERT_EQUAL(7l, file.find(ByteVector("23", 2), 3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2), file.find(ByteVector("23", 2)));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2), file.find(ByteVector("23", 2), 2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(7), file.find(ByteVector("23", 2), 3));
 
       file.seek(0);
       const ByteVector v = file.readBlock(file.length());
       CPPUNIT_ASSERT_EQUAL((unsigned int)10, v.size());
 
-      CPPUNIT_ASSERT_EQUAL((long)v.find("23"),    file.find("23"));
-      CPPUNIT_ASSERT_EQUAL((long)v.find("23", 2), file.find("23", 2));
-      CPPUNIT_ASSERT_EQUAL((long)v.find("23", 3), file.find("23", 3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.find("23")),    file.find("23"));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.find("23", 2)), file.find("23", 2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.find("23", 3)), file.find("23", 3));
     }
   }
 
@@ -81,19 +81,19 @@ public:
     }
     {
       PlainFile file(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(10l, file.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(10), file.length());
 
-      CPPUNIT_ASSERT_EQUAL(7l, file.rfind(ByteVector("23", 2)));
-      CPPUNIT_ASSERT_EQUAL(7l, file.rfind(ByteVector("23", 2), 7));
-      CPPUNIT_ASSERT_EQUAL(2l, file.rfind(ByteVector("23", 2), 6));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(7), file.rfind(ByteVector("23", 2)));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(7), file.rfind(ByteVector("23", 2), 7));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2), file.rfind(ByteVector("23", 2), 6));
 
       file.seek(0);
       const ByteVector v = file.readBlock(file.length());
       CPPUNIT_ASSERT_EQUAL((unsigned int)10, v.size());
 
-      CPPUNIT_ASSERT_EQUAL((long)v.rfind("23"),    file.rfind("23"));
-      CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 7), file.rfind("23", 7));
-      CPPUNIT_ASSERT_EQUAL((long)v.rfind("23", 6), file.rfind("23", 6));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23")),    file.rfind("23"));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23", 7)), file.rfind("23", 7));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23", 6)), file.rfind("23", 6));
     }
   }
 
@@ -103,22 +103,22 @@ public:
     std::string name = copy.fileName();
 
     PlainFile f(name.c_str());
-    CPPUNIT_ASSERT_EQUAL((long)0, f.tell());
-    CPPUNIT_ASSERT_EQUAL((long)4328, f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0), f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4328), f.length());
 
     f.seek(100, File::Beginning);
-    CPPUNIT_ASSERT_EQUAL((long)100, f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(100), f.tell());
     f.seek(100, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)200, f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(200), f.tell());
     f.seek(-300, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)200, f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(200), f.tell());
 
     f.seek(-100, File::End);
-    CPPUNIT_ASSERT_EQUAL((long)4228, f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4228), f.tell());
     f.seek(-100, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)4128, f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4128), f.tell());
     f.seek(300, File::Current);
-    CPPUNIT_ASSERT_EQUAL((long)4428, f.tell());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4428), f.tell());
   }
 
   void testTruncate()
@@ -128,18 +128,17 @@ public:
 
     {
       PlainFile f(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(4328L, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4328), f.length());
 
       f.truncate(2000);
-      CPPUNIT_ASSERT_EQUAL(2000L, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2000), f.length());
     }
     {
       PlainFile f(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(2000L, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2000), f.length());
     }
   }
 
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestFile);
-

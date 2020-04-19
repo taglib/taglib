@@ -93,7 +93,7 @@ MP4::Atom::Atom(File *file)
   for(int i = 0; i < numContainers; i++) {
     if(name == containers[i]) {
       if(name == "meta") {
-        long posAfterMeta = file->tell();
+        offset_t posAfterMeta = file->tell();
         ByteVector nextSize = file->readBlock(8).mid(4, 4);
         static const char *const metaChildrenNames[] = {
             "hdlr", "ilst", "mhdr", "ctry", "lang"
@@ -182,7 +182,7 @@ MP4::Atoms::Atoms(File *file)
   atoms.setAutoDelete(true);
 
   file->seek(0, File::End);
-  long end = file->tell();
+  offset_t end = file->tell();
   file->seek(0);
   while(file->tell() + 8 <= end) {
     MP4::Atom *atom = new MP4::Atom(file);

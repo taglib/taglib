@@ -26,6 +26,7 @@
 #ifndef TAGLIB_MPEGHEADER_H
 #define TAGLIB_MPEGHEADER_H
 
+#include "taglib.h"
 #include "taglib_export.h"
 
 namespace TagLib {
@@ -61,7 +62,7 @@ namespace TagLib {
        * check if the frame length is parsed and calculated correctly.  So it's
        * suitable for seeking for the first valid frame.
        */
-      Header(File *file, long offset, bool checkLength = true);
+      Header(File *file, offset_t offset, bool checkLength = true);
 
       /*!
        * Does a shallow copy of \a h.
@@ -167,7 +168,7 @@ namespace TagLib {
       Header &operator=(const Header &h);
 
     private:
-      void parse(File *file, long offset, bool checkLength);
+      void parse(File *file, offset_t offset, bool checkLength);
 
       class HeaderPrivate;
       HeaderPrivate *d;

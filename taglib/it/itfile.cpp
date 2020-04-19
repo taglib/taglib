@@ -162,7 +162,7 @@ bool IT::File::save()
   if(!readU16L(special))
     return false;
 
-  unsigned long fileSize = File::length();
+  unsigned long fileSize = static_cast<unsigned long>(File::length());
   if(special & Properties::MessageAttached) {
     seek(54);
     if(!readU16L(messageLength) || !readU32L(messageOffset))

@@ -63,7 +63,7 @@ namespace
       int offset = 0;
       int end = 0;
 
-      while(s.length() > offset && s[offset] == '(' &&
+      while(static_cast<int>(s.length()) > offset && s[offset] == '(' &&
             (end = s.find(")", offset + 1)) > offset) {
         // "(12)Genre"
         const String genreCode = s.substr(offset + 1, end - 1);

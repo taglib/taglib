@@ -75,7 +75,7 @@ MPEG::Header::Header(const ByteVector &data) :
   debug("MPEG::Header::Header() - This constructor is no longer used.");
 }
 
-MPEG::Header::Header(File *file, long offset, bool checkLength) :
+MPEG::Header::Header(File *file, offset_t offset, bool checkLength) :
   d(new HeaderPrivate())
 {
   parse(file, offset, checkLength);
@@ -170,7 +170,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void MPEG::Header::parse(File *file, long offset, bool checkLength)
+void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
 {
   file->seek(offset);
   const ByteVector data = file->readBlock(4);

@@ -58,8 +58,8 @@ public:
   Properties *properties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
-  long streamStart;
-  long streamLength;
+  offset_t streamStart;
+  offset_t streamLength;
   bool scanned;
 
   bool hasXiphComment;
@@ -206,7 +206,7 @@ ByteVector Ogg::FLAC::File::xiphCommentData()
   return d->xiphCommentData;
 }
 
-long Ogg::FLAC::File::streamLength()
+offset_t Ogg::FLAC::File::streamLength()
 {
   scan();
   return d->streamLength;
@@ -223,7 +223,7 @@ void Ogg::FLAC::File::scan()
     return;
 
   int ipacket = 0;
-  long overhead = 0;
+  offset_t overhead = 0;
 
   ByteVector metadataHeader = packet(ipacket);
   if(metadataHeader.isEmpty())

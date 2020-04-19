@@ -322,24 +322,24 @@ namespace TagLib {
       /*!
        * Returns the position in the file of the first MPEG frame.
        */
-      long firstFrameOffset();
+      offset_t firstFrameOffset();
 
       /*!
        * Returns the position in the file of the next MPEG frame,
        * using the current position as start
        */
-      long nextFrameOffset(long position);
+      offset_t nextFrameOffset(offset_t position);
 
       /*!
        * Returns the position in the file of the previous MPEG frame,
        * using the current position as start
        */
-      long previousFrameOffset(long position);
+      offset_t previousFrameOffset(offset_t position);
 
       /*!
        * Returns the position in the file of the last MPEG frame.
        */
-      long lastFrameOffset();
+      offset_t lastFrameOffset();
 
       /*!
        * Returns whether or not the file on disk actually has an ID3v1 tag.
@@ -376,7 +376,7 @@ namespace TagLib {
       File &operator=(const File &);
 
       void read(bool readProperties);
-      long findID3v2();
+      offset_t findID3v2();
 
       class FilePrivate;
       FilePrivate *d;

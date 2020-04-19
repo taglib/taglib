@@ -148,8 +148,8 @@ namespace TagLib {
         ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item) const;
         ByteVector renderCovr(const ByteVector &name, const Item &item) const;
 
-        void updateParents(const AtomList &path, long delta, int ignore = 0);
-        void updateOffsets(long delta, long offset);
+        void updateParents(const AtomList &path, offset_t delta, int ignore = 0);
+        void updateOffsets(offset_t delta, offset_t offset);
 
         void saveNew(ByteVector data);
         void saveExisting(ByteVector data, const AtomList &path);

@@ -298,7 +298,7 @@ public:
 
       MP4::Atoms atoms(&f);
       MP4::Atom *moov = atoms.atoms[0];
-      CPPUNIT_ASSERT_EQUAL(long(77), moov->length);
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(77), moov->length);
 
       f.tag()->setItem("pgap", true);
       f.save();
@@ -311,7 +311,7 @@ public:
       MP4::Atoms atoms(&f);
       MP4::Atom *moov = atoms.atoms[0];
       // original size + 'pgap' size + padding
-      CPPUNIT_ASSERT_EQUAL(long(77 + 25 + 974), moov->length);
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(77 + 25 + 974), moov->length);
     }
   }
 
@@ -589,8 +589,8 @@ public:
     f.tag()->setTitle("0123456789");
     f.save();
     f.save();
-    CPPUNIT_ASSERT_EQUAL(2862L, f.find("0123456789"));
-    CPPUNIT_ASSERT_EQUAL(-1L, f.find("0123456789", 2863));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2862), f.find("0123456789"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(-1), f.find("0123456789", 2863));
   }
 
   void testWithZeroLengthAtom()

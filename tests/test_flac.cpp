@@ -91,8 +91,8 @@ public:
     {
       FLAC::File f(newname.c_str());
       CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL(69L, f.find("Artist"));
-      CPPUNIT_ASSERT_EQUAL(-1L, f.find("Artist", 70));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(69), f.find("Artist"));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(-1), f.find("Artist", 70));
     }
   }
 
@@ -253,9 +253,9 @@ public:
     FLAC::File f(copy.fileName().c_str());
     f.ID3v2Tag(true)->setTitle("0123456789");
     f.save();
-    CPPUNIT_ASSERT_EQUAL(5735L, f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(5735), f.length());
     f.save();
-    CPPUNIT_ASSERT_EQUAL(5735L, f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(5735), f.length());
     CPPUNIT_ASSERT(f.find("fLaC") >= 0);
   }
 
@@ -266,9 +266,9 @@ public:
     FLAC::File f(copy.fileName().c_str());
     f.xiphComment()->setTitle(longText(8 * 1024));
     f.save();
-    CPPUNIT_ASSERT_EQUAL(12862L, f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(12862), f.length());
     f.save();
-    CPPUNIT_ASSERT_EQUAL(12862L, f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(12862), f.length());
   }
 
   void testSaveMultipleValues()
@@ -449,7 +449,7 @@ public:
     {
       FLAC::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL((long)4692, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4692), f.length());
 
       f.seek(0x0100);
       audioStream = f.readBlock(4436);
@@ -457,7 +457,7 @@ public:
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       CPPUNIT_ASSERT(f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL((long)4820, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4820), f.length());
 
       f.seek(0x0100);
       CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));

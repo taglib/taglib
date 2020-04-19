@@ -40,7 +40,7 @@ public:
   PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
   unsigned int riffSize() { return RIFF::File::riffSize(); };
   unsigned int chunkCount() { return RIFF::File::chunkCount(); };
-  unsigned int chunkOffset(unsigned int i) { return RIFF::File::chunkOffset(i); };
+  offset_t chunkOffset(unsigned int i) { return RIFF::File::chunkOffset(i); };
   unsigned int chunkPadding(unsigned int i) { return RIFF::File::chunkPadding(i); };
   unsigned int chunkDataSize(unsigned int i) { return RIFF::File::chunkDataSize(i); };
   ByteVector chunkName(unsigned int i) { return RIFF::File::chunkName(i); };
@@ -78,7 +78,7 @@ public:
     {
       PublicRIFF f(filename.c_str());
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(0x1728 + 8), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x1728 + 8), f.chunkOffset(2));
 
       f.setChunkData("TEST", "foo");
     }
@@ -87,7 +87,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), f.chunkData(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(3), f.chunkDataSize(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(0x1728 + 8), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x1728 + 8), f.chunkOffset(2));
 
       f.setChunkData("SSND", "abcd");
 
@@ -120,18 +120,18 @@ public:
 
     {
       PublicRIFF f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(0xff0 + 8), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0xff0 + 8), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL(long(4400), f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4400), f.length());
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4399 - 8), f.riffSize());
       f.setChunkData("TEST", "abcd");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4088), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4088), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4408), f.chunkOffset(3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4408), f.chunkOffset(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(0), f.chunkPadding(3));
@@ -139,15 +139,15 @@ public:
     }
     {
       PublicRIFF f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4088), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4088), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4408), f.chunkOffset(3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4408), f.chunkOffset(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(0), f.chunkPadding(3));
-      CPPUNIT_ASSERT_EQUAL(long(4412), f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4412), f.length());
     }
   }
 
@@ -158,18 +158,18 @@ public:
 
     {
       PublicRIFF f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(0xff0 + 8), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0xff0 + 8), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(0), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL(long(4399), f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4399), f.length());
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4399 - 8), f.riffSize());
       f.setChunkData("TEST", "abcd");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4088), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4088), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4408), f.chunkOffset(3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4408), f.chunkOffset(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(0), f.chunkPadding(3));
@@ -177,15 +177,15 @@ public:
     }
     {
       PublicRIFF f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4088), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4088), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4408), f.chunkOffset(3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4408), f.chunkOffset(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(0), f.chunkPadding(3));
-      CPPUNIT_ASSERT_EQUAL(long(4412), f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4412), f.length());
     }
   }
 
@@ -196,18 +196,18 @@ public:
 
     {
       PublicRIFF f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(0xff0 + 8), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0xff0 + 8), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(0), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL(long(4399), f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4399), f.length());
       CPPUNIT_ASSERT_EQUAL((unsigned int)(4399 - 8), f.riffSize());
       f.setChunkData("TEST", "abc");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4088), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4088), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4408), f.chunkOffset(3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4408), f.chunkOffset(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(3), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(3));
@@ -215,15 +215,15 @@ public:
     }
     {
       PublicRIFF f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4088), f.chunkOffset(2));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4088), f.chunkOffset(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(311), f.chunkDataSize(2));
       CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(2));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(2));
-      CPPUNIT_ASSERT_EQUAL((unsigned int)(4408), f.chunkOffset(3));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4408), f.chunkOffset(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(3), f.chunkDataSize(3));
       CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(3));
       CPPUNIT_ASSERT_EQUAL((unsigned int)(1), f.chunkPadding(3));
-      CPPUNIT_ASSERT_EQUAL(long(4412), f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4412), f.length());
     }
   }
 
@@ -235,21 +235,21 @@ public:
     PublicRIFF f(filename.c_str());
 
     CPPUNIT_ASSERT_EQUAL(5928U, f.riffSize());
-    CPPUNIT_ASSERT_EQUAL(5936L, f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(5936), f.length());
     CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f.chunkName(0));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x000C + 8), f.chunkOffset(0));
     CPPUNIT_ASSERT_EQUAL(ByteVector("SSND"), f.chunkName(1));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0026 + 8), f.chunkOffset(1));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x0026 + 8), f.chunkOffset(1));
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.chunkName(2));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x1728 + 8), f.chunkOffset(2));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x1728 + 8), f.chunkOffset(2));
 
     const ByteVector data(0x400, ' ');
     f.setChunkData("SSND", data);
     CPPUNIT_ASSERT_EQUAL(1070U, f.riffSize());
-    CPPUNIT_ASSERT_EQUAL(1078L, f.length());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0026 + 8), f.chunkOffset(1));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x042E + 8), f.chunkOffset(2));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(1078), f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x000C + 8), f.chunkOffset(0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x0026 + 8), f.chunkOffset(1));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x042E + 8), f.chunkOffset(2));
 
     f.seek(f.chunkOffset(0) - 8);
     CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f.readBlock(4));
@@ -260,10 +260,10 @@ public:
 
     f.setChunkData(0, data);
     CPPUNIT_ASSERT_EQUAL(2076U, f.riffSize());
-    CPPUNIT_ASSERT_EQUAL(2084L, f.length());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0414 + 8), f.chunkOffset(1));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x081C + 8), f.chunkOffset(2));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2084), f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x000C + 8), f.chunkOffset(0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x0414 + 8), f.chunkOffset(1));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x081C + 8), f.chunkOffset(2));
 
     f.seek(f.chunkOffset(0) - 8);
     CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f.readBlock(4));
@@ -274,9 +274,9 @@ public:
 
     f.removeChunk("SSND");
     CPPUNIT_ASSERT_EQUAL(1044U, f.riffSize());
-    CPPUNIT_ASSERT_EQUAL(1052L, f.length());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x0414 + 8), f.chunkOffset(1));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(1052), f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x000C + 8), f.chunkOffset(0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x0414 + 8), f.chunkOffset(1));
 
     f.seek(f.chunkOffset(0) - 8);
     CPPUNIT_ASSERT_EQUAL(ByteVector("COMM"), f.readBlock(4));
@@ -285,8 +285,8 @@ public:
 
     f.removeChunk(0);
     CPPUNIT_ASSERT_EQUAL(12U, f.riffSize());
-    CPPUNIT_ASSERT_EQUAL(20L, f.length());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(0x000C + 8), f.chunkOffset(0));
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(20), f.length());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0x000C + 8), f.chunkOffset(0));
 
     f.seek(f.chunkOffset(0) - 8);
     CPPUNIT_ASSERT_EQUAL(ByteVector("TEST"), f.readBlock(4));
@@ -295,4 +295,3 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestRIFF);
-

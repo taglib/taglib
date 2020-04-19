@@ -79,10 +79,10 @@ public:
   }
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long ID3v2Location;
+  offset_t ID3v2Location;
   long ID3v2OriginalSize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -90,8 +90,8 @@ public:
   ByteVector xiphCommentData;
   BlockList blocks;
 
-  long flacStart;
-  long streamStart;
+  offset_t flacStart;
+  offset_t streamStart;
   bool scanned;
 };
 
@@ -219,8 +219,8 @@ bool FLAC::File::save()
 
   // Compute the amount of padding, and append that to data.
 
-  long originalLength = d->streamStart - d->flacStart;
-  long paddingLength = originalLength - data.size() - 4;
+  offset_t originalLength = d->streamStart - d->flacStart;
+  offset_t paddingLength = originalLength - data.size() - 4;
 
   if(paddingLength <= 0) {
     paddingLength = MinPaddingLength;
@@ -228,15 +228,15 @@ bool FLAC::File::save()
   else {
     // Padding won't increase beyond 1% of the file size or 1MB.
 
-    long threshold = length() / 100;
-    threshold = std::max(threshold, MinPaddingLength);
-    threshold = std::min(threshold, MaxPaddingLegnth);
+    offset_t threshold = length() / 100;
+    threshold = std::max<offset_t>(threshold, MinPaddingLength);
+    threshold = std::min<offset_t>(threshold, MaxPaddingLegnth);
 
     if(paddingLength > threshold)
       paddingLength = MinPaddingLength;
   }
 
-  ByteVector paddingHeader = ByteVector::fromUInt(paddingLength);
+  ByteVector paddingHeader = ByteVector::fromUInt(static_cast<unsigned int>(paddingLength));
   paddingHeader[0] = static_cast<char>(MetadataBlock::Padding | LastBlockFlag);
   data.append(paddingHeader);
   data.resize(static_cast<unsigned int>(data.size() + paddingLength));
@@ -341,7 +341,7 @@ ByteVector FLAC::File::streamInfoData()
   return ByteVector();
 }
 
-long FLAC::File::streamLength()
+offset_t FLAC::File::streamLength()
 {
   debug("FLAC::File::streamLength() -- This function is obsolete. Returning zero.");
   return 0;
@@ -456,7 +456,7 @@ void FLAC::File::read(bool readProperties)
 
     const ByteVector infoData = d->blocks.front()->render();
 
-    long streamLength;
+    offset_t streamLength;
 
     if(d->ID3v1Location >= 0)
       streamLength = d->ID3v1Location - d->streamStart;
@@ -477,7 +477,7 @@ void FLAC::File::scan()
   if(!isValid())
     return;
 
-  long nextBlockOffset;
+  offset_t nextBlockOffset;
 
   if(d->ID3v2Location >= 0)
     nextBlockOffset = find("fLaC", d->ID3v2Location + d->ID3v2OriginalSize);
