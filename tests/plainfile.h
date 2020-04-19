@@ -41,7 +41,7 @@ public:
 
   ByteVector readAll() {
     seek(0, End);
-    long end = tell();
+    offset_t end = tell();
     seek(0);
     return readBlock(end);
   }

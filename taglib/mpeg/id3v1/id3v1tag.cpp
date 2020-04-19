@@ -48,7 +48,7 @@ public:
     genre(255) {}
 
   File *file;
-  long tagOffset;
+  offset_t tagOffset;
 
   String title;
   String artist;
@@ -88,7 +88,7 @@ ID3v1::Tag::Tag() :
 {
 }
 
-ID3v1::Tag::Tag(File *file, long tagOffset) :
+ID3v1::Tag::Tag(File *file, offset_t tagOffset) :
   d(new TagPrivate())
 {
   d->file = file;

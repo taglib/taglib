@@ -389,10 +389,10 @@ public:
       ASF::File f(copy.fileName().c_str());
       f.tag()->setTitle(longText(128 * 1024));
       f.save();
-      CPPUNIT_ASSERT_EQUAL(297578L, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(297578), f.length());
       f.tag()->setTitle(longText(16 * 1024));
       f.save();
-      CPPUNIT_ASSERT_EQUAL(68202L, f.length());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(68202), f.length());
     }
   }
 

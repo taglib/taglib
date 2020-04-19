@@ -39,14 +39,14 @@ namespace TagLib {
 
   namespace Utils {
 
-    long findID3v1(File *file);
+    offset_t findID3v1(File *file);
 
-    long findID3v2(File *file);
+    offset_t findID3v2(File *file);
 
-    long findAPE(File *file, long id3v1Location);
+    offset_t findAPE(File *file, offset_t id3v1Location);
 
     ByteVector readHeader(IOStream *stream, unsigned int length, bool skipID3v2,
-                          long *headerOffset = 0);
+                          offset_t *headerOffset = 0);
   }  // namespace Utils
 }  // namespace TagLib
 

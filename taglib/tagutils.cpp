@@ -33,7 +33,7 @@
 
 using namespace TagLib;
 
-long Utils::findID3v1(File *file)
+offset_t Utils::findID3v1(File *file)
 {
   if(!file->isValid())
     return -1;
@@ -42,14 +42,14 @@ long Utils::findID3v1(File *file)
 
   if (file->length() >= 131) {
     file->seek(-131, File::End);
-    const long p = file->tell() + 3;
+    const offset_t p = file->tell() + 3;
     const TagLib::ByteVector data = file->readBlock(8);
 
     if(data.containsAt(ID3v1::Tag::fileIdentifier(), 3) && (data != APE::Tag::fileIdentifier()))
       return p;
   } else {
     file->seek(-128, File::End);
-    const long p = file->tell();
+    const offset_t p = file->tell();
 
     if(file->readBlock(3) == ID3v1::Tag::fileIdentifier())
       return p;
@@ -58,7 +58,7 @@ long Utils::findID3v1(File *file)
   return -1;
 }
 
-long Utils::findID3v2(File *file)
+offset_t Utils::findID3v2(File *file)
 {
   if(!file->isValid())
     return -1;
@@ -71,7 +71,7 @@ long Utils::findID3v2(File *file)
   return -1;
 }
 
-long Utils::findAPE(File *file, long id3v1Location)
+offset_t Utils::findAPE(File *file, offset_t id3v1Location)
 {
   if(!file->isValid())
     return -1;
@@ -81,7 +81,7 @@ long Utils::findAPE(File *file, long id3v1Location)
   else
     file->seek(-32, File::End);
 
-  const long p = file->tell();
+  const offset_t p = file->tell();
 
   if(file->readBlock(8) == APE::Tag::fileIdentifier())
     return p;
@@ -90,13 +90,13 @@ long Utils::findAPE(File *file, long id3v1Location)
 }
 
 ByteVector TagLib::Utils::readHeader(IOStream *stream, unsigned int length,
-                                     bool skipID3v2, long *headerOffset)
+                                     bool skipID3v2, offset_t *headerOffset)
 {
   if(!stream || !stream->isOpen())
     return ByteVector();
 
-  const long originalPosition = stream->tell();
-  long bufferOffset = 0;
+  const offset_t originalPosition = stream->tell();
+  offset_t bufferOffset = 0;
 
   if(skipID3v2) {
     stream->seek(0);

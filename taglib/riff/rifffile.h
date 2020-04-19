@@ -71,7 +71,7 @@ namespace TagLib {
       /*!
        * \return The offset within the file for the selected chunk number.
        */
-      unsigned int chunkOffset(unsigned int i) const;
+      offset_t chunkOffset(unsigned int i) const;
 
       /*!
        * \return The size of the chunk data.
@@ -145,7 +145,7 @@ namespace TagLib {
 
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,
-                      unsigned long offset, unsigned long replace = 0);
+                      offset_t offset, unsigned long replace = 0);
 
       /*!
        * Update the global RIFF size based on the current internal structure.

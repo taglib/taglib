@@ -555,7 +555,7 @@ MP4::Tag::strip()
 }
 
 void
-MP4::Tag::updateParents(const AtomList &path, long delta, int ignore)
+MP4::Tag::updateParents(const AtomList &path, offset_t delta, int ignore)
 {
   if(static_cast<int>(path.size()) <= ignore)
     return;
@@ -577,13 +577,13 @@ MP4::Tag::updateParents(const AtomList &path, long delta, int ignore)
     // 32-bit
     else {
       d->file->seek((*it)->offset);
-      d->file->writeBlock(ByteVector::fromUInt(size + delta));
+      d->file->writeBlock(ByteVector::fromUInt(static_cast<unsigned int>(size + delta)));
     }
   }
 }
 
 void
-MP4::Tag::updateOffsets(long delta, long offset)
+MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
 {
   MP4::Atom *moov = d->atoms->find("moov");
   if(moov) {
@@ -599,11 +599,11 @@ MP4::Tag::updateOffsets(long delta, long offset)
       d->file->seek(atom->offset + 16);
       unsigned int pos = 4;
       while(count--) {
-        long o = static_cast<long>(data.toUInt(pos));
+        offset_t o = static_cast<offset_t>(data.toUInt(pos));
         if(o > offset) {
           o += delta;
         }
-        d->file->writeBlock(ByteVector::fromUInt(o));
+        d->file->writeBlock(ByteVector::fromUInt(static_cast<unsigned int>(o)));
         pos += 4;
       }
     }
@@ -667,7 +667,7 @@ MP4::Tag::saveNew(ByteVector data)
     data = renderAtom("udta", data);
   }
 
-  long offset = path.back()->offset + 8;
+  offset_t offset = path.back()->offset + 8;
   d->file->insert(data, offset, 0);
 
   updateParents(path, data.size());
@@ -685,8 +685,8 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   AtomList::ConstIterator it = path.end();
 
   MP4::Atom *ilst = *(--it);
-  long offset = ilst->offset;
-  long length = ilst->length;
+  offset_t offset = ilst->offset;
+  offset_t length = ilst->length;
 
   MP4::Atom *meta = *(--it);
   AtomList::ConstIterator index = meta->children.find(ilst);
@@ -711,14 +711,14 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
     }
   }
 
-  long delta = data.size() - length;
+  offset_t delta = data.size() - length;
   if(!data.isEmpty()) {
     if(delta > 0 || (delta < 0 && delta > -8)) {
       data.append(padIlst(data));
       delta = data.size() - length;
     }
     else if(delta < 0) {
-      data.append(padIlst(data, -delta - 8));
+      data.append(padIlst(data, static_cast<int>(-delta - 8)));
       delta = 0;
     }
 

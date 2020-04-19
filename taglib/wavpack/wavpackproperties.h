@@ -30,6 +30,7 @@
 #ifndef TAGLIB_WVPROPERTIES_H
 #define TAGLIB_WVPROPERTIES_H
 
+#include "tbytevector.h"
 #include "taglib_export.h"
 #include "audioproperties.h"
 
@@ -58,13 +59,13 @@ namespace TagLib {
        * \deprecated This constructor will be dropped in favor of the one below
        * in a future version.
        */
-      TAGLIB_DEPRECATED Properties(const ByteVector &data, long streamLength,
+      TAGLIB_DEPRECATED Properties(const ByteVector &data, offset_t streamLength,
                                    ReadStyle style = Average);
 
       /*!
        * Create an instance of WavPack::Properties.
        */
-      Properties(File *file, long streamLength, ReadStyle style = Average);
+      Properties(File *file, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this WavPack::Properties instance.
@@ -137,8 +138,8 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read(File *file, long streamLength);
-      unsigned int seekFinalIndex(File *file, long streamLength);
+      void read(File *file, offset_t streamLength);
+      unsigned int seekFinalIndex(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

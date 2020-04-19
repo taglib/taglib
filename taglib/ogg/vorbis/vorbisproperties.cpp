@@ -186,7 +186,7 @@ void Vorbis::Properties::read(File *file)
 
       if(frameCount > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
-        long fileLengthWithoutOverhead = file->length();
+        offset_t fileLengthWithoutOverhead = file->length();
         // Ignore the three initial header packets, see "1.3.1. Decode Setup" in
         // https://xiph.org/vorbis/doc/Vorbis_I_spec.html
         for (unsigned int i = 0; i < 3; ++i) {

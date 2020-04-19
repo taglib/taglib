@@ -196,7 +196,7 @@ FileName FileStream::name() const
   return d->name;
 }
 
-ByteVector FileStream::readBlock(unsigned long length)
+ByteVector FileStream::readBlock(size_t length)
 {
   if(!isOpen()) {
     debug("FileStream::readBlock() -- invalid file.");
@@ -207,7 +207,7 @@ ByteVector FileStream::readBlock(unsigned long length)
     return ByteVector();
 
   if(length > bufferSize()) {
-    const unsigned long streamLength = static_cast<unsigned long>(FileStream::length());
+    const size_t streamLength = static_cast<size_t>(FileStream::length());
     if(length > streamLength) {
       length = streamLength;
     }
@@ -236,7 +236,7 @@ void FileStream::writeBlock(const ByteVector &data)
   writeFile(d->file, data);
 }
 
-void FileStream::insert(const ByteVector &data, unsigned long start, unsigned long replace)
+void FileStream::insert(const ByteVector &data, offset_t start, size_t replace)
 {
   if(!isOpen()) {
     debug("FileStream::insert() -- invalid file.");
@@ -270,15 +270,15 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
   // the *difference* in the tag sizes.  We want to avoid overwriting parts
   // that aren't yet in memory, so this is necessary.
 
-  unsigned long bufferLength = bufferSize();
+  size_t bufferLength = bufferSize();
 
   while(data.size() - replace > bufferLength)
     bufferLength += bufferSize();
 
   // Set where to start the reading and writing.
 
-  long readPosition = start + replace;
-  long writePosition = start;
+  offset_t readPosition = start + replace;
+  offset_t writePosition = start;
 
   ByteVector buffer = data;
   ByteVector aboutToOverwrite(static_cast<unsigned int>(bufferLength));
@@ -317,19 +317,19 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
   }
 }
 
-void FileStream::removeBlock(unsigned long start, unsigned long length)
+void FileStream::removeBlock(offset_t start, size_t length)
 {
   if(!isOpen()) {
     debug("FileStream::removeBlock() -- invalid file.");
     return;
   }
 
-  unsigned long bufferLength = bufferSize();
+  unsigned int bufferLength = bufferSize();
 
-  long readPosition = start + length;
-  long writePosition = start;
+  offset_t readPosition = start + length;
+  offset_t writePosition = start;
 
-  ByteVector buffer(static_cast<unsigned int>(bufferLength));
+  ByteVector buffer(bufferLength);
 
   for(unsigned int bytesRead = -1; bytesRead != 0;) {
     seek(readPosition);
@@ -363,7 +363,7 @@ bool FileStream::isOpen() const
   return (d->file != InvalidFileHandle);
 }
 
-void FileStream::seek(long offset, Position p)
+void FileStream::seek(offset_t offset, Position p)
 {
   if(!isOpen()) {
     debug("FileStream::seek() -- invalid file.");
@@ -420,16 +420,15 @@ void FileStream::clear()
 #endif
 }
 
-long FileStream::tell() const
+offset_t FileStream::tell() const
 {
 #ifdef _WIN32
 
   const LARGE_INTEGER zero = {};
   LARGE_INTEGER position;
 
-  if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT) &&
-     position.QuadPart <= LONG_MAX) {
-    return static_cast<long>(position.QuadPart);
+  if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT)) {
+    return position.QuadPart;
   }
   else {
     debug("FileStream::tell() -- Failed to get the file pointer.");
@@ -443,7 +442,7 @@ long FileStream::tell() const
 #endif
 }
 
-long FileStream::length()
+offset_t FileStream::length()
 {
   if(!isOpen()) {
     debug("FileStream::length() -- invalid file.");
@@ -454,8 +453,8 @@ long FileStream::length()
 
   LARGE_INTEGER fileSize;
 
-  if(GetFileSizeEx(d->file, &fileSize) && fileSize.QuadPart <= LONG_MAX) {
-    return static_cast<long>(fileSize.QuadPart);
+  if(GetFileSizeEx(d->file, &fileSize)) {
+    return fileSize.QuadPart;
   }
   else {
     debug("FileStream::length() -- Failed to get the file size.");
@@ -464,10 +463,10 @@ long FileStream::length()
 
 #else
 
-  const long curpos = tell();
+  const offset_t curpos = tell();
 
   seek(0, End);
-  const long endpos = tell();
+  const offset_t endpos = tell();
 
   seek(curpos, Beginning);
 
@@ -480,11 +479,11 @@ long FileStream::length()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FileStream::truncate(long length)
+void FileStream::truncate(offset_t length)
 {
 #ifdef _WIN32
 
-  const long currentPos = tell();
+  const offset_t currentPos = tell();
 
   seek(length);
 

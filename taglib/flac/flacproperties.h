@@ -26,6 +26,7 @@
 #ifndef TAGLIB_FLACPROPERTIES_H
 #define TAGLIB_FLACPROPERTIES_H
 
+#include "tbytevector.h"
 #include "taglib_export.h"
 #include "audioproperties.h"
 
@@ -50,7 +51,7 @@ namespace TagLib {
        * ByteVector \a data.
        */
        // BIC: switch to const reference
-      Properties(ByteVector data, long streamLength, ReadStyle style = Average);
+      Properties(ByteVector data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Create an instance of FLAC::Properties with the data read from the
@@ -137,7 +138,7 @@ namespace TagLib {
       Properties(const Properties &);
       Properties &operator=(const Properties &);
 
-      void read(const ByteVector &data, long streamLength);
+      void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

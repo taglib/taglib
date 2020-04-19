@@ -63,13 +63,13 @@ public:
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
-  long ID3v2Location;
+  offset_t ID3v2Location;
   long ID3v2OriginalSize;
 
-  long APELocation;
+  offset_t APELocation;
   long APEOriginalSize;
 
-  long ID3v1Location;
+  offset_t ID3v1Location;
 
   TagUnion tag;
 
@@ -105,13 +105,13 @@ bool MPEG::File::isSupported(IOStream *stream)
   // MPEG frame headers are really confusing with irrelevant binary data.
   // So we check if a frame header is really valid.
 
-  long headerOffset;
+  offset_t headerOffset;
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), true, &headerOffset);
 
   if(buffer.isEmpty())
       return false;
 
-  const long originalPosition = stream->tell();
+  const offset_t originalPosition = stream->tell();
   AdapterFile file(stream);
 
   for(unsigned int i = 0; i < buffer.size() - 1; ++i) {
@@ -406,7 +406,7 @@ void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
   d->ID3v2FrameFactory = factory;
 }
 
-long MPEG::File::nextFrameOffset(long position)
+offset_t MPEG::File::nextFrameOffset(offset_t position)
 {
   ByteVector frameSyncBytes(2, '\0');
 
@@ -430,12 +430,12 @@ long MPEG::File::nextFrameOffset(long position)
   }
 }
 
-long MPEG::File::previousFrameOffset(long position)
+offset_t MPEG::File::previousFrameOffset(offset_t position)
 {
   ByteVector frameSyncBytes(2, '\0');
 
   while(position > 0) {
-    const long bufferLength = std::min<long>(position, bufferSize());
+    const offset_t bufferLength = std::min<offset_t>(position, bufferSize());
     position -= bufferLength;
 
     seek(position);
@@ -455,9 +455,9 @@ long MPEG::File::previousFrameOffset(long position)
   return -1;
 }
 
-long MPEG::File::firstFrameOffset()
+offset_t MPEG::File::firstFrameOffset()
 {
-  long position = 0;
+  offset_t position = 0;
 
   if(hasID3v2Tag())
     position = d->ID3v2Location + ID3v2Tag()->header()->completeTagSize();
@@ -465,9 +465,9 @@ long MPEG::File::firstFrameOffset()
   return nextFrameOffset(position);
 }
 
-long MPEG::File::lastFrameOffset()
+offset_t MPEG::File::lastFrameOffset()
 {
-  long position;
+  offset_t position;
 
   if(hasAPETag())
     position = d->APELocation - 1;
@@ -535,7 +535,7 @@ void MPEG::File::read(bool readProperties)
   ID3v1Tag(true);
 }
 
-long MPEG::File::findID3v2()
+offset_t MPEG::File::findID3v2()
 {
   if(!isValid())
     return -1;

@@ -256,7 +256,7 @@ namespace TagLib {
        *
        * \deprecated Always returns zero.
        */
-      TAGLIB_DEPRECATED long streamLength();  // BIC: remove
+      TAGLIB_DEPRECATED offset_t streamLength();  // BIC: remove
 
       /*!
        * Returns a list of pictures attached to the FLAC file.

@@ -80,8 +80,8 @@ namespace TagLib {
       Atom *find(const char *name1, const char *name2 = 0, const char *name3 = 0, const char *name4 = 0);
       bool path(AtomList &path, const char *name1, const char *name2 = 0, const char *name3 = 0);
       AtomList findall(const char *name, bool recursive = false);
-      long offset;
-      long length;
+      offset_t offset;
+      offset_t length;
       TagLib::ByteVector name;
       AtomList children;
     private:

@@ -66,7 +66,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::PageHeader::PageHeader(Ogg::File *file, long pageOffset) :
+Ogg::PageHeader::PageHeader(Ogg::File *file, offset_t pageOffset) :
   d(new PageHeaderPrivate())
 {
   if(file && pageOffset >= 0)
@@ -225,7 +225,7 @@ ByteVector Ogg::PageHeader::render() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Ogg::PageHeader::read(Ogg::File *file, long pageOffset)
+void Ogg::PageHeader::read(Ogg::File *file, offset_t pageOffset)
 {
   file->seek(pageOffset);
 

@@ -88,7 +88,7 @@ public:
   const FrameFactory *factory;
 
   File *file;
-  long tagOffset;
+  offset_t tagOffset;
 
   Header header;
   ExtendedHeader *extendedHeader;
@@ -125,7 +125,7 @@ ID3v2::Tag::Tag() :
   d->factory = FrameFactory::instance();
 }
 
-ID3v2::Tag::Tag(File *file, long tagOffset, const FrameFactory *factory) :
+ID3v2::Tag::Tag(File *file, offset_t tagOffset, const FrameFactory *factory) :
   d(new TagPrivate())
 {
   d->factory = factory;
@@ -686,9 +686,9 @@ ByteVector ID3v2::Tag::render(Version version) const
   else {
     // Padding won't increase beyond 1% of the file size or 1MB.
 
-    long threshold = d->file ? d->file->length() / 100 : 0;
-    threshold = std::max(threshold, MinPaddingSize);
-    threshold = std::min(threshold, MaxPaddingSize);
+    offset_t threshold = d->file ? d->file->length() / 100 : 0;
+    threshold = std::max<offset_t>(threshold, MinPaddingSize);
+    threshold = std::min<offset_t>(threshold, MaxPaddingSize);
 
     if(paddingSize > threshold)
       paddingSize = MinPaddingSize;
