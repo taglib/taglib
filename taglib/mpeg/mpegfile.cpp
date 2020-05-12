@@ -114,14 +114,34 @@ bool MPEG::File::isSupported(IOStream *stream)
   const long long originalPosition = stream->tell();
   AdapterFile file(stream);
 
-  for(unsigned int i = 0; i < buffer.size() - 1; ++i) {
-    if(isFrameSync(buffer, i)) {
-      const Header header(&file, headerOffset + i, true);
-      if(header.isValid()) {
-        stream->seek(originalPosition);
-        return true;
+  ByteVector frameSyncBytes(2, '\0');
+  long long position = headerOffset;
+  while(true) {
+    stream->seek(position);
+    buffer = stream->readBlock(bufferSize());
+    if(buffer.isEmpty()) {
+      return false;
+    }
+
+    for(size_t i = 0; i < buffer.size(); ++i) {
+      frameSyncBytes[0] = frameSyncBytes[1];
+      frameSyncBytes[1] = buffer[i];
+      if(isFrameSync(frameSyncBytes)) {
+        const Header header(&file, position + i - 1, true);
+        if (header.isValid()) {
+          stream->seek(originalPosition);
+          return true;
+        }
       }
     }
+
+    if(headerOffset == 0) {
+      // No ID3v2 tag or MPEG frame header was found at the start of the file, and we haven't
+      // encountered any frame sync bytes. Don't bother searching the remainder of the file.
+      break;
+    }
+
+    position += bufferSize();
   }
 
   stream->seek(originalPosition);
