@@ -269,25 +269,25 @@ void taglib_tag_free_strings()
 
 int taglib_audioproperties_length(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->length();
 }
 
 int taglib_audioproperties_bitrate(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->bitrate();
 }
 
 int taglib_audioproperties_samplerate(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->sampleRate();
 }
 
 int taglib_audioproperties_channels(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->channels();
 }
 

@@ -187,7 +187,7 @@ bool FLAC::File::save()
 
   // Replace metadata blocks
 
-  for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+  for(auto it = d->blocks.begin(); it != d->blocks.end(); ++it) {
     if((*it)->code() == MetadataBlock::VorbisComment) {
       // Set the new Vorbis Comment block
       delete *it;
@@ -201,7 +201,7 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+  for(auto it = d->blocks.begin(); it != d->blocks.end(); ++it) {
     ByteVector blockData = (*it)->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
     blockHeader[0] = (*it)->code();
@@ -342,8 +342,8 @@ long FLAC::File::streamLength()
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
-    Picture *picture = dynamic_cast<Picture *>(*it);
+  for(auto it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+    auto picture = dynamic_cast<Picture *>(*it);
     if(picture) {
       pictures.append(picture);
     }
@@ -358,7 +358,7 @@ void FLAC::File::addPicture(Picture *picture)
 
 void FLAC::File::removePicture(Picture *picture, bool del)
 {
-  BlockIterator it = d->blocks.find(picture);
+  auto it = d->blocks.find(picture);
   if(it != d->blocks.end())
     d->blocks.erase(it);
 
@@ -368,7 +368,7 @@ void FLAC::File::removePicture(Picture *picture, bool del)
 
 void FLAC::File::removePictures()
 {
-  for(BlockIterator it = d->blocks.begin(); it != d->blocks.end(); ) {
+  for(auto it = d->blocks.begin(); it != d->blocks.end(); ) {
     if(dynamic_cast<Picture *>(*it)) {
       delete *it;
       it = d->blocks.erase(it);
@@ -542,7 +542,7 @@ void FLAC::File::scan()
       }
     }
     else if(blockType == MetadataBlock::Picture) {
-      FLAC::Picture *picture = new FLAC::Picture();
+      auto picture = new FLAC::Picture();
       if(picture->parse(data)) {
         block = picture;
       }

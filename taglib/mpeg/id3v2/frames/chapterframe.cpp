@@ -85,7 +85,7 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
   d->startOffset = startOffset;
   d->endOffset = endOffset;
 
-  for(FrameList::ConstIterator it = embeddedFrames.begin();
+  for(auto it = embeddedFrames.begin();
       it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
@@ -172,7 +172,7 @@ void ChapterFrame::addEmbeddedFrame(Frame *frame)
 void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 {
   // remove the frame from the frame list
-  FrameList::Iterator it = d->embeddedFrameList.find(frame);
+  auto it = d->embeddedFrameList.find(frame);
   d->embeddedFrameList.erase(it);
 
   // ...and from the frame list map
@@ -231,7 +231,7 @@ ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVec
       it != comments.end();
       ++it)
   {
-    ChapterFrame *frame = dynamic_cast<ChapterFrame *>(*it);
+    auto frame = dynamic_cast<ChapterFrame *>(*it);
     if(frame && frame->elementID() == eID)
       return frame;
   }

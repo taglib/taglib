@@ -56,7 +56,7 @@ namespace
 
     // only allow printable ASCII including space (32..126)
 
-    for(ByteVector::ConstIterator it = key.begin(); it != key.end(); ++it) {
+    for(auto it = key.begin(); it != key.end(); ++it) {
       const int c = static_cast<unsigned char>(*it);
       if(c < 32 || c > 126)
         return false;
@@ -220,7 +220,7 @@ namespace
 PropertyMap APE::Tag::properties() const
 {
   PropertyMap properties;
-  ItemListMap::ConstIterator it = itemListMap().begin();
+  auto it = itemListMap().begin();
   for(; it != itemListMap().end(); ++it) {
     String tagName = it->first.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
@@ -242,7 +242,7 @@ PropertyMap APE::Tag::properties() const
 
 void APE::Tag::removeUnsupportedProperties(const StringList &properties)
 {
-  StringList::ConstIterator it = properties.begin();
+  auto it = properties.begin();
   for(; it != properties.end(); ++it)
     removeItem(*it);
 }
@@ -260,7 +260,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
   // first check if tags need to be removed completely
   StringList toRemove;
-  ItemListMap::ConstIterator remIt = itemListMap().begin();
+  auto remIt = itemListMap().begin();
   for(; remIt != itemListMap().end(); ++remIt) {
     String key = remIt->first.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
@@ -282,7 +282,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
       if(it->second.isEmpty())
         removeItem(tagName);
       else {
-        StringList::ConstIterator valueIt = it->second.begin();
+        auto valueIt = it->second.begin();
         addValue(tagName, *valueIt, true);
         ++valueIt;
         for(; valueIt != it->second.end(); ++valueIt)
@@ -327,7 +327,7 @@ void APE::Tag::addValue(const String &key, const String &value, bool replace)
   // Text items may contain more than one value.
   // Binary or locator items may have only one value, hence always replaced.
 
-  ItemListMap::Iterator it = d->itemListMap.find(key.upper());
+  auto it = d->itemListMap.find(key.upper());
 
   if(it != d->itemListMap.end() && it->second.type() == Item::Text)
     it->second.appendValue(value);

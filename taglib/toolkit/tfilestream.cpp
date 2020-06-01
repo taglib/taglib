@@ -206,7 +206,7 @@ ByteVector FileStream::readBlock(unsigned long length)
   if(length == 0)
     return ByteVector();
 
-  const unsigned long streamLength = static_cast<unsigned long>(FileStream::length());
+  const auto streamLength = static_cast<unsigned long>(FileStream::length());
   if(length > bufferSize() && length > streamLength)
     length = streamLength;
 
@@ -285,7 +285,7 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
     // to overwrite.  Appropriately increment the readPosition.
 
     seek(readPosition);
-    const unsigned int bytesRead = static_cast<unsigned int>(readFile(d->file, aboutToOverwrite));
+    const auto bytesRead = static_cast<unsigned int>(readFile(d->file, aboutToOverwrite));
     aboutToOverwrite.resize(bytesRead);
     readPosition += bufferLength;
 

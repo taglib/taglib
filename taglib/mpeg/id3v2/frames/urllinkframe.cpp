@@ -181,7 +181,7 @@ UserUrlLinkFrame *UserUrlLinkFrame::find(ID3v2::Tag *tag, const String &descript
 {
   FrameList l = tag->frameList("WXXX");
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
-    UserUrlLinkFrame *f = dynamic_cast<UserUrlLinkFrame *>(*it);
+    auto f = dynamic_cast<UserUrlLinkFrame *>(*it);
     if(f && f->description() == description)
       return f;
   }

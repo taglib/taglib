@@ -60,9 +60,9 @@ TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data) :
 
 TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const PropertyMap &properties) // static
 {
-  TextIdentificationFrame *frame = new TextIdentificationFrame("TIPL");
+  auto frame = new TextIdentificationFrame("TIPL");
   StringList l;
-  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
+  for(auto it = properties.begin(); it != properties.end(); ++it){
     l.append(it->first);
     l.append(it->second.toString(",")); // comma-separated list of names
   }
@@ -72,9 +72,9 @@ TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const Property
 
 TextIdentificationFrame *TextIdentificationFrame::createTMCLFrame(const PropertyMap &properties) // static
 {
-  TextIdentificationFrame *frame = new TextIdentificationFrame("TMCL");
+  auto frame = new TextIdentificationFrame("TMCL");
   StringList l;
-  for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
+  for(auto it = properties.begin(); it != properties.end(); ++it){
     if(!it->first.startsWith(instrumentPrefix)) // should not happen
       continue;
     l.append(it->first.substr(instrumentPrefix.size()));
@@ -158,14 +158,14 @@ PropertyMap TextIdentificationFrame::asProperties() const
   if(tagName == "GENRE") {
     // Special case: Support ID3v1-style genre numbers. They are not officially supported in
     // ID3v2, however it seems that still a lot of programs use them.
-    for(StringList::Iterator it = values.begin(); it != values.end(); ++it) {
+    for(auto it = values.begin(); it != values.end(); ++it) {
       bool ok = false;
       int test = it->toInt(&ok); // test if the genre value is an integer
       if(ok)
         *it = ID3v1::genre(test);
     }
   } else if(tagName == "DATE") {
-    for(StringList::Iterator it = values.begin(); it != values.end(); ++it) {
+    for(auto it = values.begin(); it != values.end(); ++it) {
       // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
       // Since this is unusual in other formats, the T is removed.
       int tpos = it->find("T");
@@ -341,7 +341,7 @@ String UserTextIdentificationFrame::toString() const
 {
   // first entry is the description itself, drop from values list
   StringList l = fieldList();
-  for(StringList::Iterator it = l.begin(); it != l.end(); ++it) {
+  for(auto it = l.begin(); it != l.end(); ++it) {
     l.erase(it);
     break;
   }
@@ -406,7 +406,7 @@ UserTextIdentificationFrame *UserTextIdentificationFrame::find(
 {
   FrameList l = tag->frameList("TXXX");
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
-    UserTextIdentificationFrame *f = dynamic_cast<UserTextIdentificationFrame *>(*it);
+    auto f = dynamic_cast<UserTextIdentificationFrame *>(*it);
     if(f && f->description() == description)
       return f;
   }

@@ -182,7 +182,7 @@ void RelativeVolumeFrame::parseFields(const ByteVector &data)
 
   while(pos <= (int)data.size() - 4) {
 
-    ChannelType type = ChannelType(data[pos]);
+    auto type = ChannelType(data[pos]);
     pos += 1;
 
     ChannelData &channel = d->channels[type];

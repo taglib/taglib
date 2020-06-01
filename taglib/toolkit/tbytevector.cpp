@@ -474,7 +474,7 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 {
   detach();
 
-  for(ByteVector::Iterator it = begin(); it != end(); ++it) {
+  for(auto it = begin(); it != end(); ++it) {
     if(*it == oldByte)
       *it = newByte;
   }
@@ -721,7 +721,7 @@ unsigned int ByteVector::checksum() const
   };
 
   unsigned int sum = 0;
-  for(ByteVector::ConstIterator it = begin(); it != end(); ++it)
+  for(auto it = begin(); it != end(); ++it)
     sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(*it)];
   return sum;
 }
@@ -925,8 +925,8 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
 
   ByteVector output(len);
 
-  const unsigned char * src = (const unsigned char*) input.data();
-  unsigned char *       dst = (unsigned char*) output.data();
+  auto src = (const unsigned char*) input.data();
+  auto dst = (unsigned char*) output.data();
 
   while(4 <= len) {
 

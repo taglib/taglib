@@ -130,7 +130,7 @@ UnsynchronizedLyricsFrame *UnsynchronizedLyricsFrame::findByDescription(const ID
   ID3v2::FrameList lyrics = tag->frameList("USLT");
 
   for(ID3v2::FrameList::ConstIterator it = lyrics.begin(); it != lyrics.end(); ++it){
-    UnsynchronizedLyricsFrame *frame = dynamic_cast<UnsynchronizedLyricsFrame *>(*it);
+    auto frame = dynamic_cast<UnsynchronizedLyricsFrame *>(*it);
     if(frame && frame->description() == d)
       return frame;
   }

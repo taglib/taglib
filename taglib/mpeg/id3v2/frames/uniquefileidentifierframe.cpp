@@ -109,7 +109,7 @@ UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::T
       it != comments.end();
       ++it)
   {
-    UniqueFileIdentifierFrame *frame = dynamic_cast<UniqueFileIdentifierFrame *>(*it);
+    auto frame = dynamic_cast<UniqueFileIdentifierFrame *>(*it);
     if(frame && frame->owner() == o)
       return frame;
   }

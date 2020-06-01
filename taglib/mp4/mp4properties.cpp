@@ -139,7 +139,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
   ByteVector data;
 
   const MP4::AtomList trakList = moov->findall("trak");
-  for(MP4::AtomList::ConstIterator it = trakList.begin(); it != trakList.end(); ++it) {
+  for(auto it = trakList.begin(); it != trakList.end(); ++it) {
     trak = *it;
     MP4::Atom *hdlr = trak->find("mdia", "hdlr");
     if(!hdlr) {

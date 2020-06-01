@@ -318,7 +318,7 @@ public:
   unsigned int size() const override
   {
     unsigned int size = 0;
-    for(List<Reader*>::ConstIterator i = m_readers.begin();
+    for(auto i = m_readers.begin();
         i != m_readers.end(); ++ i) {
       size += (*i)->size();
     }

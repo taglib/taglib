@@ -439,7 +439,7 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, unsigned in
     if(pos >= data.size())
       break;
 
-    const CodecType type = static_cast<CodecType>(data.toUShort(pos, false));
+    const auto type = static_cast<CodecType>(data.toUShort(pos, false));
     pos += 2;
 
     int nameLength = data.toUShort(pos, false);
@@ -572,7 +572,7 @@ bool ASF::File::save()
 
   const AttributeListMap allAttributes = d->tag->attributeListMap();
 
-  for(AttributeListMap::ConstIterator it = allAttributes.begin(); it != allAttributes.end(); ++it) {
+  for(auto it = allAttributes.begin(); it != allAttributes.end(); ++it) {
 
     const String &name = it->first;
     const AttributeList &attributes = it->second;
@@ -580,7 +580,7 @@ bool ASF::File::save()
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(AttributeList::ConstIterator jt = attributes.begin(); jt != attributes.end(); ++jt) {
+    for(auto jt = attributes.begin(); jt != attributes.end(); ++jt) {
 
       const Attribute &attribute = *jt;
       const bool largeValue = (attribute.dataSize() > 65535);

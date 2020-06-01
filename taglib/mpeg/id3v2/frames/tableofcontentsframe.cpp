@@ -69,7 +69,7 @@ namespace {
 
   ByteVectorList &strip(ByteVectorList &l)
   {
-    for(ByteVectorList::Iterator it = l.begin(); it != l.end(); ++it)
+    for(auto it = l.begin(); it != l.end(); ++it)
     {
       strip(*it);
     }
@@ -99,7 +99,7 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &elementID,
   strip(d->elementID);
   d->childElements = children;
 
-  for(FrameList::ConstIterator it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
+  for(auto it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
 
@@ -163,7 +163,7 @@ void TableOfContentsFrame::addChildElement(const ByteVector &cE)
 
 void TableOfContentsFrame::removeChildElement(const ByteVector &cE)
 {
-  ByteVectorList::Iterator it = d->childElements.find(cE);
+  auto it = d->childElements.find(cE);
 
   if(it == d->childElements.end())
     it = d->childElements.find(cE + ByteVector("\0"));
@@ -195,7 +195,7 @@ void TableOfContentsFrame::addEmbeddedFrame(Frame *frame)
 void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 {
   // remove the frame from the frame list
-  FrameList::Iterator it = d->embeddedFrameList.find(frame);
+  auto it = d->embeddedFrameList.find(frame);
   d->embeddedFrameList.erase(it);
 
   // ...and from the frame list map
@@ -253,7 +253,7 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
       it != tablesOfContents.end();
       ++it)
   {
-    TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
+    auto frame = dynamic_cast<TableOfContentsFrame *>(*it);
     if(frame && frame->elementID() == eID)
       return frame;
   }
@@ -269,7 +269,7 @@ TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) 
       it != tablesOfContents.end();
       ++it)
   {
-    TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
+    auto frame = dynamic_cast<TableOfContentsFrame *>(*it);
     if(frame && frame->isTopLevel() == true)
       return frame;
   }

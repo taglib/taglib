@@ -213,7 +213,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
   if(strategy != Repaginate) {
 
     size_t tableSize = 0;
-    for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it)
+    for(auto it = packets.begin(); it != packets.end(); ++it)
       tableSize += it->size() / 255 + 1;
 
     if(tableSize > 255)
@@ -228,7 +228,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 
     int pageIndex = firstPage;
 
-    for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it) {
+    for(auto it = packets.begin(); it != packets.end(); ++it) {
 
       const bool lastPacketInList = (it == --packets.end());
 
@@ -299,7 +299,7 @@ Ogg::Page::Page(const ByteVectorList &packets,
   ByteVector data;
   List<int> packetSizes;
 
-  for(ByteVectorList::ConstIterator it = packets.begin(); it != packets.end(); ++it) {
+  for(auto it = packets.begin(); it != packets.end(); ++it) {
     packetSizes.append((*it).size());
     data.append(*it);
   }

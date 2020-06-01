@@ -69,7 +69,7 @@ StringList::StringList(const String &s)
 
 StringList::StringList(const ByteVectorList &bl, String::Type t)
 {
-  ByteVectorList::ConstIterator i = bl.begin();
+  auto i = bl.begin();
   for(;i != bl.end(); i++) {
     append(String(*i, t));
   }
@@ -81,8 +81,8 @@ String StringList::toString(const String &separator) const
 {
   String s;
 
-  ConstIterator it = begin();
-  ConstIterator itEnd = end();
+  auto it = begin();
+  auto itEnd = end();
 
   while(it != itEnd) {
     s += *it;
