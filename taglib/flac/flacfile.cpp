@@ -46,8 +46,8 @@ using namespace TagLib;
 namespace
 {
   typedef List<FLAC::MetadataBlock *> BlockList;
-  typedef BlockList::Iterator BlockIterator;
-  typedef BlockList::Iterator BlockConstIterator;
+  using BlockIterator = BlockList::Iterator;
+  using BlockConstIterator = BlockList::Iterator;
 
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
 
