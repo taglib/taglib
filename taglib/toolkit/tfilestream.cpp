@@ -96,7 +96,7 @@ namespace
 
   typedef FILE* FileHandle;
 
-  const FileHandle InvalidFileHandle = nullptr;
+  const auto InvalidFileHandle = (FileHandle)nullptr;
 
   FileHandle openFile(const FileName &path, bool readOnly)
   {
