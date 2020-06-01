@@ -92,13 +92,9 @@ public:
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-Latin1StringHandler::Latin1StringHandler()
-{
-}
+Latin1StringHandler::Latin1StringHandler() = default;
 
-Latin1StringHandler::~Latin1StringHandler()
-{
-}
+Latin1StringHandler::~Latin1StringHandler() = default;
 
 String Latin1StringHandler::parse(const ByteVector &data) const
 {

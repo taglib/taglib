@@ -141,8 +141,7 @@ namespace TagLib {
 class String::StringPrivate : public RefCounter
 {
 public:
-  StringPrivate()
-    {}
+  StringPrivate() = default;
 
   /*!
    * Stores string in UTF-16. The byte order depends on the CPU endian.

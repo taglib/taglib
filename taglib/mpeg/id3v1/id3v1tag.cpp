@@ -63,9 +63,7 @@ public:
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-StringHandler::StringHandler()
-{
-}
+StringHandler::StringHandler() = default;
 
 String ID3v1::StringHandler::parse(const ByteVector &data) const
 {

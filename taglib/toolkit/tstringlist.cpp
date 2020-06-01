@@ -55,10 +55,7 @@ StringList StringList::split(const String &s, const String &pattern)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-StringList::StringList()
-{
-
-}
+StringList::StringList() = default;
 
 StringList::StringList(const StringList &l) : List<String>(l)
 {
@@ -78,10 +75,7 @@ StringList::StringList(const ByteVectorList &bl, String::Type t)
   }
 }
 
-StringList::~StringList()
-{
-
-}
+StringList::~StringList() = default;
 
 String StringList::toString(const String &separator) const
 {

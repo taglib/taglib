@@ -28,13 +28,9 @@
 using namespace TagLib;
 
 
-PropertyMap::PropertyMap()
-{
-}
+PropertyMap::PropertyMap() = default;
 
-PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m), unsupported(m.unsupported)
-{
-}
+PropertyMap::PropertyMap(const PropertyMap &m) = default;
 
 PropertyMap::PropertyMap(const SimplePropertyMap &m)
 {
@@ -47,9 +43,7 @@ PropertyMap::PropertyMap(const SimplePropertyMap &m)
   }
 }
 
-PropertyMap::~PropertyMap()
-{
-}
+PropertyMap::~PropertyMap() = default;
 
 bool PropertyMap::insert(const String &key, const StringList &values)
 {

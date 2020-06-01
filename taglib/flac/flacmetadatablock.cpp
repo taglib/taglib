@@ -32,7 +32,7 @@ using namespace TagLib;
 class FLAC::MetadataBlock::MetadataBlockPrivate
 {
 public:
-  MetadataBlockPrivate() {}
+  MetadataBlockPrivate() = default;
 
 };
 
@@ -41,7 +41,5 @@ FLAC::MetadataBlock::MetadataBlock()
   d = nullptr;
 }
 
-FLAC::MetadataBlock::~MetadataBlock()
-{
-}
+FLAC::MetadataBlock::~MetadataBlock() = default;
 

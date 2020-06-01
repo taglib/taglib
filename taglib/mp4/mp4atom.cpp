@@ -103,9 +103,7 @@ MP4::Atom::Atom(File *file)
   file->seek(offset + length);
 }
 
-MP4::Atom::~Atom()
-{
-}
+MP4::Atom::~Atom() = default;
 
 MP4::Atom *
 MP4::Atom::find(const char *name1, const char *name2, const char *name3, const char *name4)
@@ -166,9 +164,7 @@ MP4::Atoms::Atoms(File *file)
   }
 }
 
-MP4::Atoms::~Atoms()
-{
-}
+MP4::Atoms::~Atoms() = default;
 
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)

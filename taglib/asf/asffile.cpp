@@ -103,7 +103,7 @@ class ASF::File::FilePrivate::BaseObject
 {
 public:
   ByteVector data;
-  virtual ~BaseObject() {}
+  virtual ~BaseObject() = default;
   virtual ByteVector guid() const = 0;
   virtual void parse(ASF::File *file, unsigned int size);
   virtual ByteVector render(ASF::File *file);

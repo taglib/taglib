@@ -100,13 +100,9 @@ String FileName::toString() const
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-IOStream::IOStream()
-{
-}
+IOStream::IOStream() = default;
 
-IOStream::~IOStream()
-{
-}
+IOStream::~IOStream() = default;
 
 void IOStream::clear()
 {

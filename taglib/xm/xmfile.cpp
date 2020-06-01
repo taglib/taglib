@@ -67,9 +67,7 @@ using namespace XM;
 class Reader
 {
 public:
-  virtual ~Reader()
-  {
-  }
+  virtual ~Reader() = default;
 
   /*!
    * Reads associated values from \a file, but never reads more
