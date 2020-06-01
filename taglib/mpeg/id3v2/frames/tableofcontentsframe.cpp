@@ -270,7 +270,7 @@ TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) 
       ++it)
   {
     auto frame = dynamic_cast<TableOfContentsFrame *>(*it);
-    if(frame && frame->isTopLevel() == true)
+    if(frame && frame->isTopLevel())
       return frame;
   }
 
