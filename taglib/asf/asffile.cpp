@@ -52,13 +52,13 @@ public:
 
   FilePrivate():
     headerSize(0),
-    tag(0),
-    properties(0),
-    contentDescriptionObject(0),
-    extendedContentDescriptionObject(0),
-    headerExtensionObject(0),
-    metadataObject(0),
-    metadataLibraryObject(0)
+    tag(nullptr),
+    properties(nullptr),
+    contentDescriptionObject(nullptr),
+    extendedContentDescriptionObject(nullptr),
+    headerExtensionObject(nullptr),
+    metadataObject(nullptr),
+    metadataLibraryObject(nullptr)
   {
     objects.setAutoDelete(true);
   }
@@ -648,8 +648,8 @@ void ASF::File::read()
   }
   seek(2, Current);
 
-  FilePrivate::FilePropertiesObject   *filePropertiesObject   = 0;
-  FilePrivate::StreamPropertiesObject *streamPropertiesObject = 0;
+  FilePrivate::FilePropertiesObject   *filePropertiesObject   = nullptr;
+  FilePrivate::StreamPropertiesObject *streamPropertiesObject = nullptr;
   for(int i = 0; i < numObjects; i++) {
     const ByteVector guid = readBlock(16);
     if(guid.size() != 16) {

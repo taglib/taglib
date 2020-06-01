@@ -110,7 +110,7 @@ MP4::Atom::~Atom()
 MP4::Atom *
 MP4::Atom::find(const char *name1, const char *name2, const char *name3, const char *name4)
 {
-  if(name1 == 0) {
+  if(name1 == nullptr) {
     return this;
   }
   for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
@@ -118,7 +118,7 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
       return (*it)->find(name2, name3, name4);
     }
   }
-  return 0;
+  return nullptr;
 }
 
 MP4::AtomList
@@ -140,7 +140,7 @@ bool
 MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const char *name3)
 {
   path.append(this);
-  if(name1 == 0) {
+  if(name1 == nullptr) {
     return true;
   }
   for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
@@ -178,7 +178,7 @@ MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const 
       return (*it)->find(name2, name3, name4);
     }
   }
-  return 0;
+  return nullptr;
 }
 
 MP4::AtomList

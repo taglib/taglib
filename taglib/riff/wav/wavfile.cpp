@@ -45,7 +45,7 @@ class RIFF::WAV::File::FilePrivate
 {
 public:
   FilePrivate() :
-    properties(0),
+    properties(nullptr),
     hasID3v2(false),
     hasInfo(false) {}
 

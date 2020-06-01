@@ -37,7 +37,7 @@ using namespace TagLib;
 class Ogg::Page::PagePrivate
 {
 public:
-  PagePrivate(File *f = 0, long pageOffset = -1) :
+  PagePrivate(File *f = nullptr, long pageOffset = -1) :
     file(f),
     fileOffset(pageOffset),
     header(f, pageOffset),
@@ -272,7 +272,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 Ogg::Page* Ogg::Page::getCopyWithNewPageSequenceNumber(int /*sequenceNumber*/)
 {
   debug("Ogg::Page::getCopyWithNewPageSequenceNumber() -- This function is obsolete. Returning null.");
-  return 0;
+  return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

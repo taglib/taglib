@@ -42,7 +42,7 @@ class ID3v1::Tag::TagPrivate
 {
 public:
   TagPrivate() :
-    file(0),
+    file(nullptr),
     tagOffset(0),
     track(0),
     genre(255) {}

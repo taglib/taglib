@@ -65,7 +65,7 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
-    properties(0),
+    properties(nullptr),
     flacStart(0),
     streamStart(0),
     scanned(false)
@@ -382,10 +382,10 @@ void FLAC::File::removePictures()
 void FLAC::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(FlacID3v1Index, 0);
+    d->tag.set(FlacID3v1Index, nullptr);
 
   if(tags & ID3v2)
-    d->tag.set(FlacID3v2Index, 0);
+    d->tag.set(FlacID3v2Index, nullptr);
 
   if(tags & XiphComment) {
     xiphComment()->removeAllFields();
@@ -529,7 +529,7 @@ void FLAC::File::scan()
       return;
     }
 
-    MetadataBlock *block = 0;
+    MetadataBlock *block = nullptr;
 
     // Found the vorbis-comment
     if(blockType == MetadataBlock::VorbisComment) {

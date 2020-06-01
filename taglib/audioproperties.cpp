@@ -105,7 +105,7 @@ int AudioProperties::lengthInMilliseconds() const
 ////////////////////////////////////////////////////////////////////////////////
 
 AudioProperties::AudioProperties(ReadStyle) :
-  d(0)
+  d(nullptr)
 {
 
 }

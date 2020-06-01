@@ -36,8 +36,8 @@ class MP4::Tag::TagPrivate
 {
 public:
   TagPrivate() :
-    file(0),
-    atoms(0) {}
+    file(nullptr),
+    atoms(nullptr) {}
 
   TagLib::File *file;
   Atoms *atoms;

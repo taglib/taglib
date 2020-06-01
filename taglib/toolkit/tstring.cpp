@@ -495,7 +495,7 @@ ByteVector String::data(Type t) const
 
 int String::toInt() const
 {
-  return toInt(0);
+  return toInt(nullptr);
 }
 
 int String::toInt(bool *ok) const

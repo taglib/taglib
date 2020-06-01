@@ -60,11 +60,11 @@ class ID3v2::Tag::TagPrivate
 {
 public:
   TagPrivate() :
-    factory(0),
-    file(0),
+    factory(nullptr),
+    file(nullptr),
     tagOffset(0),
-    extendedHeader(0),
-    footer(0)
+    extendedHeader(nullptr),
+    footer(nullptr)
   {
     frameList.setAutoDelete(true);
   }
@@ -396,7 +396,7 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
       // delete all unknown frames of given type
       FrameList l = frameList(id);
       for(FrameList::ConstIterator fit = l.begin(); fit != l.end(); fit++)
-        if (dynamic_cast<const UnknownFrame *>(*fit) != 0)
+        if (dynamic_cast<const UnknownFrame *>(*fit) != nullptr)
           removeFrame(*fit);
     }
     else if(it->size() == 4){
@@ -408,7 +408,7 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
       if(it->size() <= 5)
         continue; // invalid specification
       String description = it->substr(5);
-      Frame *frame = 0;
+      Frame *frame = nullptr;
       if(id == "TXXX")
         frame = UserTextIdentificationFrame::find(this, description);
       else if(id == "WXXX")
@@ -485,13 +485,13 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   // iTunes writes and reads TSOA, TSOT, TSOP to ID3v2.3.
   const char *unsupportedFrames[] = {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
-    "TMOO", "TPRO", "TSST", 0
+    "TMOO", "TPRO", "TSST", nullptr
   };
 #endif
-  ID3v2::TextIdentificationFrame *frameTDOR = 0;
-  ID3v2::TextIdentificationFrame *frameTDRC = 0;
-  ID3v2::TextIdentificationFrame *frameTIPL = 0;
-  ID3v2::TextIdentificationFrame *frameTMCL = 0;
+  ID3v2::TextIdentificationFrame *frameTDOR = nullptr;
+  ID3v2::TextIdentificationFrame *frameTDRC = nullptr;
+  ID3v2::TextIdentificationFrame *frameTIPL = nullptr;
+  ID3v2::TextIdentificationFrame *frameTMCL = nullptr;
   for(FrameList::ConstIterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
     ID3v2::Frame *frame = *it;
     ByteVector frameID = frame->header()->frameID();
@@ -499,25 +499,25 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
       if(frameID == unsupportedFrames[i]) {
         debug("A frame that is not supported in ID3v2.3 \'"
           + String(frameID) + "\' has been discarded");
-        frame = 0;
+        frame = nullptr;
         break;
       }
     }
     if(frame && frameID == "TDOR") {
       frameTDOR = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
-      frame = 0;
+      frame = nullptr;
     }
     if(frame && frameID == "TDRC") {
       frameTDRC = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
-      frame = 0;
+      frame = nullptr;
     }
     if(frame && frameID == "TIPL") {
       frameTIPL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
-      frame = 0;
+      frame = nullptr;
     }
     if(frame && frameID == "TMCL") {
       frameTMCL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
-      frame = 0;
+      frame = nullptr;
     }
     if(frame) {
       frames->append(frame);

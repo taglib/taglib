@@ -64,7 +64,7 @@ using namespace TagLib;
 class TagUnion::TagUnionPrivate
 {
 public:
-  TagUnionPrivate() : tags(3, static_cast<Tag *>(0))
+  TagUnionPrivate() : tags(3, static_cast<Tag *>(nullptr))
   {
 
   }

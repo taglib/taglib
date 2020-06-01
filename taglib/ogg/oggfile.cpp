@@ -50,8 +50,8 @@ class Ogg::File::FilePrivate
 {
 public:
   FilePrivate() :
-    firstPageHeader(0),
-    lastPageHeader(0)
+    firstPageHeader(nullptr),
+    lastPageHeader(nullptr)
   {
     pages.setAutoDelete(true);
   }
@@ -132,12 +132,12 @@ const Ogg::PageHeader *Ogg::File::firstPageHeader()
   if(!d->firstPageHeader) {
     const long firstPageHeaderOffset = find("OggS");
     if(firstPageHeaderOffset < 0)
-      return 0;
+      return nullptr;
 
     d->firstPageHeader = new PageHeader(this, firstPageHeaderOffset);
   }
 
-  return d->firstPageHeader->isValid() ? d->firstPageHeader : 0;
+  return d->firstPageHeader->isValid() ? d->firstPageHeader : nullptr;
 }
 
 const Ogg::PageHeader *Ogg::File::lastPageHeader()
@@ -145,12 +145,12 @@ const Ogg::PageHeader *Ogg::File::lastPageHeader()
   if(!d->lastPageHeader) {
     const long lastPageHeaderOffset = rfind("OggS");
     if(lastPageHeaderOffset < 0)
-      return 0;
+      return nullptr;
 
     d->lastPageHeader = new PageHeader(this, lastPageHeaderOffset);
   }
 
-  return d->lastPageHeader->isValid() ? d->lastPageHeader : 0;
+  return d->lastPageHeader->isValid() ? d->lastPageHeader : nullptr;
 }
 
 bool Ogg::File::save()

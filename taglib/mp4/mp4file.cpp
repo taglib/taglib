@@ -55,9 +55,9 @@ class MP4::File::FilePrivate
 {
 public:
   FilePrivate() :
-    tag(0),
-    atoms(0),
-    properties(0) {}
+    tag(nullptr),
+    atoms(nullptr),
+    properties(nullptr) {}
 
   ~FilePrivate()
   {
@@ -178,5 +178,5 @@ MP4::File::save()
 bool
 MP4::File::hasMP4Tag() const
 {
-  return (d->atoms->find("moov", "udta", "meta", "ilst") != 0);
+  return (d->atoms->find("moov", "udta", "meta", "ilst") != nullptr);
 }

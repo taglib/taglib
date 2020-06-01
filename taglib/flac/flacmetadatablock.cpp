@@ -38,7 +38,7 @@ public:
 
 FLAC::MetadataBlock::MetadataBlock()
 {
-  d = 0;
+  d = nullptr;
 }
 
 FLAC::MetadataBlock::~MetadataBlock()
