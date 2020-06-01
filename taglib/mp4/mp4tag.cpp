@@ -137,18 +137,18 @@ MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
     const int flags = static_cast<int>(data.toUInt(pos + 8));
     if(freeForm && i < 2) {
       if(i == 0 && name != "mean") {
-        debug("MP4: Unexpected atom \"" + name + "\", expecting \"mean\"");
+        debug(R"(MP4: Unexpected atom ")" + name + R"(", expecting "mean")");
         return result;
       }
       else if(i == 1 && name != "name") {
-        debug("MP4: Unexpected atom \"" + name + "\", expecting \"name\"");
+        debug(R"(MP4: Unexpected atom ")" + name + R"(", expecting "name")");
         return result;
       }
       result.append(AtomData(AtomDataType(flags), data.mid(pos + 12, length - 12)));
     }
     else {
       if(name != "data") {
-        debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
+        debug(R"(MP4: Unexpected atom ")" + name + R"(", expecting "data")");
         return result;
       }
       if(expectedFlags == -1 || flags == expectedFlags) {
@@ -311,7 +311,7 @@ MP4::Tag::parseCovr(const MP4::Atom *atom)
     const ByteVector name = data.mid(pos + 4, 4);
     const int flags = static_cast<int>(data.toUInt(pos + 8));
     if(name != "data") {
-      debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
+      debug(R"(MP4: Unexpected atom ")" + name + R"(", expecting "data")");
       break;
     }
     if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP ||
