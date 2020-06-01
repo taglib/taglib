@@ -23,7 +23,7 @@
 # include <config.h>
 #endif
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <fileref.h>
 #include <tfile.h>
 #include <asffile.h>
@@ -37,7 +37,7 @@
 #include <trueaudiofile.h>
 #include <mp4file.h>
 #include <tag.h>
-#include <string.h>
+#include <cstring>
 #include <id3v2framefactory.h>
 
 #include "tag_c.h"
