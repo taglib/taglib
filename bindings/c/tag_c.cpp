@@ -69,7 +69,7 @@ namespace
   {
     return String(s, unicodeStrings ? String::UTF8 : String::Latin1);
   }
-}
+}  // namespace
 
 void taglib_set_strings_unicode(BOOL unicode)
 {

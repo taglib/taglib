@@ -926,7 +926,7 @@ namespace
 
     return String();
   }
-}
+}  // namespace
 
 PropertyMap MP4::Tag::properties() const
 {

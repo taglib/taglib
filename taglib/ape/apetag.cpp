@@ -70,7 +70,7 @@ namespace
 
     return true;
   }
-}
+}  // namespace
 
 class APE::Tag::TagPrivate
 {
@@ -215,7 +215,7 @@ namespace
                                       {"DISCNUMBER",  "DISC"        },
                                       {"REMIXER",     "MIXARTIST"   }};
   const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);
-}
+}  // namespace
 
 PropertyMap APE::Tag::properties() const
 {

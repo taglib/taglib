@@ -49,7 +49,7 @@ namespace
 
     return true;
   }
-}
+}  // namespace
 
 class MP4::File::FilePrivate
 {

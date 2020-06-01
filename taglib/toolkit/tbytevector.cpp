@@ -1016,7 +1016,7 @@ void ByteVector::detach()
       ByteVector().swap(*this);
   }
 }
-}
+}  // namespace TagLib
 
 ////////////////////////////////////////////////////////////////////////////////
 // related functions

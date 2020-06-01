@@ -69,7 +69,7 @@ namespace
     return std::none_of(frameID.begin(), frameID.end(),
       [](char c){ return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); });
   }
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 // static methods
@@ -406,7 +406,7 @@ namespace
     {"TIME", "TDRC"}, // 2.3 -> 2.4
   };
   const size_t deprecatedFramesSize = sizeof(deprecatedFrames) / sizeof(deprecatedFrames[0]);;
-}
+}  // namespace
 
 String Frame::frameIDToKey(const ByteVector &id)
 {

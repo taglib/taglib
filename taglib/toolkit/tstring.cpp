@@ -133,7 +133,7 @@ namespace
         data[i] = c;
     }
   }
-}
+}  // namespace
 
 namespace TagLib {
 
@@ -701,7 +701,7 @@ void String::detach()
 ////////////////////////////////////////////////////////////////////////////////
 
 const String::Type String::WCharByteOrder = wcharByteOrder();
-}
+}  // namespace TagLib
 
 ////////////////////////////////////////////////////////////////////////////////
 // related non-member functions

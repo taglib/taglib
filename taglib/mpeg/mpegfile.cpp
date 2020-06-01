@@ -93,7 +93,7 @@ namespace
     AudioProperties *audioProperties() const override { return nullptr; }
     bool save() override { return false; }
   };
-}
+}  // namespace
 
 bool MPEG::File::isSupported(IOStream *stream)
 {
