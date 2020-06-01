@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <numeric>
 
 #include <tstring.h>
 #include <tdebug.h>
@@ -212,9 +213,8 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 
   if(strategy != Repaginate) {
 
-    size_t tableSize = 0;
-    for(const auto & packet : packets)
-      tableSize += packet.size() / 255 + 1;
+    size_t tableSize = std::accumulate(packets.begin(), packets.end(), 0,
+        [](size_t table, const TagLib::ByteVector &packet){ return table + packet.size() / 255 + 1; });
 
     if(tableSize > 255)
       strategy = Repaginate;

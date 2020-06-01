@@ -262,12 +262,8 @@ bool Ogg::XiphComment::checkKey(const String &key)
 
   // A key may consist of ASCII 0x20 through 0x7D, 0x3D ('=') excluded.
 
-  for(wchar_t it : key) {
-      if(it < 0x20 || it > 0x7D || it == 0x3D)
-        return false;
-  }
-
-  return true;
+  return std::none_of(key.begin(), key.end(),
+    [](wchar_t c){return c < 0x20 || c > 0x7D || c == 0x3D; });
 }
 
 String Ogg::XiphComment::vendorID() const

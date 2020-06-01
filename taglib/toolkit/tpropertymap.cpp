@@ -25,6 +25,9 @@
 
 
 #include "tpropertymap.h"
+
+#include <numeric>
+
 using namespace TagLib;
 
 
@@ -143,10 +146,10 @@ bool PropertyMap::operator!=(const PropertyMap &other) const
 
 String PropertyMap::toString() const
 {
-  String ret;
+  String ret = std::accumulate(this->begin(), this->end(), String(""),
+    [](const String &r, const std::pair<const TagLib::String, TagLib::StringList> &it)
+      { return r + it.first+"=" + it.second.toString(", ") + "\n"; });
 
-  for(const auto & it : *this)
-    ret += it.first+"="+it.second.toString(", ") + "\n";
   if(!unsupported.isEmpty())
     ret += "Unsupported Data: " + unsupported.toString(", ") + "\n";
   return ret;

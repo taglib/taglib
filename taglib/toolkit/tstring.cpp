@@ -527,20 +527,14 @@ String String::stripWhiteSpace() const
 
 bool String::isLatin1() const
 {
-  for(wchar_t it : *this) {
-    if(it >= 256)
-      return false;
-  }
-  return true;
+  return std::none_of(this->begin(), this->end(),
+    [](wchar_t c){ return c >= 256; });
 }
 
 bool String::isAscii() const
 {
-  for(wchar_t it : *this) {
-    if(it >= 128)
-      return false;
-  }
-  return true;
+  return std::none_of(this->begin(), this->end(),
+    [](wchar_t c){ return c >= 128; });
 }
 
 String String::number(int n) // static

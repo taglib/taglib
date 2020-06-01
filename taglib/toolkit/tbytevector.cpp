@@ -474,11 +474,7 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 {
   detach();
 
-  for(char & it : *this) {
-    if(it == oldByte)
-      it = newByte;
-  }
-
+  std::replace(this->begin(), this->end(), oldByte, newByte);
   return *this;
 }
 
