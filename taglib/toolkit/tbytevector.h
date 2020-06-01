@@ -100,7 +100,7 @@ namespace TagLib {
     /*!
      * Sets the data for the byte array using the first \a length bytes of \a data
      */
-    ByteVector &setData(const char *data, unsigned int length);
+    ByteVector &setData(const char *s, unsigned int length);
 
     /*!
      * Sets the data for the byte array copies \a data up to the first null

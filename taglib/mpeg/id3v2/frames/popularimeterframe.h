@@ -79,7 +79,7 @@ namespace TagLib {
        *
        * \see email()
        */
-      void setEmail(const String &email);
+      void setEmail(const String &s);
 
       /*!
        * Returns the rating.
@@ -93,7 +93,7 @@ namespace TagLib {
        *
        * \see rating()
        */
-      void setRating(int rating);
+      void setRating(int s);
 
       /*!
        * Returns the counter.
@@ -107,7 +107,7 @@ namespace TagLib {
        *
        * \see counter()
        */
-      void setCounter(unsigned int counter);
+      void setCounter(unsigned int s);
 
     protected:
       // Reimplementations.

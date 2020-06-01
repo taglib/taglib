@@ -178,7 +178,7 @@ namespace TagLib {
        *
        * \see language()
        */
-      void setLanguage(const ByteVector &languageCode);
+      void setLanguage(const ByteVector &languageEncoding);
 
       /*!
        * Set the timestamp format.

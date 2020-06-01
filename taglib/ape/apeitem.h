@@ -199,7 +199,7 @@ namespace TagLib {
        *
        * \see ItemTypes
        */
-      void setType(ItemTypes type);
+      void setType(ItemTypes val);
 
       /*!
        * Returns the type of the item.
