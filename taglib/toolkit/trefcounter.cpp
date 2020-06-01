@@ -32,8 +32,8 @@
 #if defined(HAVE_STD_ATOMIC)
 # include <atomic>
 # define ATOMIC_INT std::atomic_int
-# define ATOMIC_INC(x) (++x)
-# define ATOMIC_DEC(x) (--x)
+# define ATOMIC_INC(x) (++(x))
+# define ATOMIC_DEC(x) (--(x))
 #elif defined(HAVE_GCC_ATOMIC)
 # define ATOMIC_INT int
 # define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
