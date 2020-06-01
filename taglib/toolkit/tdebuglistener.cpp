@@ -39,7 +39,7 @@ namespace
   class DefaultListener : public DebugListener
   {
   public:
-    virtual void printMessage(const String &msg)
+    void printMessage(const String &msg) override
     {
 #ifdef _WIN32
 

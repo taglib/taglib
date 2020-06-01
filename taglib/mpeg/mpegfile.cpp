@@ -89,9 +89,9 @@ namespace
   public:
     AdapterFile(IOStream *stream) : File(stream) {}
 
-    Tag *tag() const { return 0; }
-    AudioProperties *audioProperties() const { return 0; }
-    bool save() { return false; }
+    Tag *tag() const override { return 0; }
+    AudioProperties *audioProperties() const override { return 0; }
+    bool save() override { return false; }
   };
 }
 
