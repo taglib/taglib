@@ -69,9 +69,9 @@ namespace {
 
   ByteVectorList &strip(ByteVectorList &l)
   {
-    for(auto it = l.begin(); it != l.end(); ++it)
+    for(auto & it : l)
     {
-      strip(*it);
+      strip(it);
     }
     return l;
   }
@@ -99,8 +99,8 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &elementID,
   strip(d->elementID);
   d->childElements = children;
 
-  for(auto it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
-    addEmbeddedFrame(*it);
+  for(auto embeddedFrame : embeddedFrames)
+    addEmbeddedFrame(embeddedFrame);
 }
 
 TableOfContentsFrame::~TableOfContentsFrame()

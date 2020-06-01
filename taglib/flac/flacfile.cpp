@@ -201,10 +201,10 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(auto it = d->blocks.begin(); it != d->blocks.end(); ++it) {
-    ByteVector blockData = (*it)->render();
+  for(auto & block : d->blocks) {
+    ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = (*it)->code();
+    blockHeader[0] = block->code();
     data.append(blockHeader);
     data.append(blockData);
   }
@@ -342,8 +342,8 @@ long FLAC::File::streamLength()
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(auto it = d->blocks.begin(); it != d->blocks.end(); ++it) {
-    auto picture = dynamic_cast<Picture *>(*it);
+  for(auto & block : d->blocks) {
+    auto picture = dynamic_cast<Picture *>(block);
     if(picture) {
       pictures.append(picture);
     }

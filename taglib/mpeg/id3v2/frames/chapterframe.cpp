@@ -85,9 +85,8 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
   d->startOffset = startOffset;
   d->endOffset = endOffset;
 
-  for(auto it = embeddedFrames.begin();
-      it != embeddedFrames.end(); ++it)
-    addEmbeddedFrame(*it);
+  for(auto embeddedFrame : embeddedFrames)
+    addEmbeddedFrame(embeddedFrame);
 }
 
 ChapterFrame::~ChapterFrame()

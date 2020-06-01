@@ -572,17 +572,16 @@ bool ASF::File::save()
 
   const AttributeListMap allAttributes = d->tag->attributeListMap();
 
-  for(auto it = allAttributes.begin(); it != allAttributes.end(); ++it) {
+  for(const auto & allAttribute : allAttributes) {
 
-    const String &name = it->first;
-    const AttributeList &attributes = it->second;
+    const String &name = allAttribute.first;
+    const AttributeList &attributes = allAttribute.second;
 
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(auto jt = attributes.begin(); jt != attributes.end(); ++jt) {
+    for(const auto & attribute : attributes) {
 
-      const Attribute &attribute = *jt;
       const bool largeValue = (attribute.dataSize() > 65535);
       const bool guid       = (attribute.type() == Attribute::GuidType);
 

@@ -229,8 +229,8 @@ namespace
 StringList ID3v1::genreList()
 {
   StringList l;
-  for(int i = 0; i < genresSize; i++) {
-    l.append(genres[i]);
+  for(auto & genre : genres) {
+    l.append(genre);
   }
 
   return l;

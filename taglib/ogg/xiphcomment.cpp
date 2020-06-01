@@ -262,8 +262,8 @@ bool Ogg::XiphComment::checkKey(const String &key)
 
   // A key may consist of ASCII 0x20 through 0x7D, 0x3D ('=') excluded.
 
-  for(String::ConstIterator it = key.begin(); it != key.end(); it++) {
-      if(*it < 0x20 || *it > 0x7D || *it == 0x3D)
+  for(wchar_t it : key) {
+      if(it < 0x20 || it > 0x7D || it == 0x3D)
         return false;
   }
 
@@ -396,8 +396,8 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     }
   }
 
-  for(auto it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
-    ByteVector picture = (*it)->render().toBase64();
+  for(auto & it : d->pictureList) {
+    ByteVector picture = it->render().toBase64();
     data.append(ByteVector::fromUInt(picture.size() + 23, false));
     data.append("METADATA_BLOCK_PICTURE=");
     data.append(picture);

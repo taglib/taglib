@@ -159,8 +159,8 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   }
 #endif
 
-  for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
-    if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
+  for(char it : frameID) {
+    if( (it < 'A' || it > 'Z') && (it < '0' || it > '9') ) {
       delete header;
       return nullptr;
     }
@@ -501,9 +501,9 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     // ID3v2.2 only used 3 bytes for the frame ID, so we need to convert all of
     // the frames to their 4 byte ID3v2.4 equivalent.
 
-    for(size_t i = 0; i < frameConversion2Size; ++i) {
-      if(frameID == frameConversion2[i][0]) {
-        header->setFrameID(frameConversion2[i][1]);
+    for(auto & i : frameConversion2) {
+      if(frameID == i[0]) {
+        header->setFrameID(i[1]);
         break;
       }
     }
@@ -525,9 +525,9 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
       return false;
     }
 
-    for(size_t i = 0; i < frameConversion3Size; ++i) {
-      if(frameID == frameConversion3[i][0]) {
-        header->setFrameID(frameConversion3[i][1]);
+    for(auto & i : frameConversion3) {
+      if(frameID == i[0]) {
+        header->setFrameID(i[1]);
         break;
       }
     }

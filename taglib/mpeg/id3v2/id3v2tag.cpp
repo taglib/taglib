@@ -154,12 +154,12 @@ String ID3v2::Tag::comment() const
   if(comments.isEmpty())
     return String();
 
-  for(auto it = comments.begin(); it != comments.end(); ++it)
+  for(auto comment : comments)
   {
-    auto frame = dynamic_cast<CommentsFrame *>(*it);
+    auto frame = dynamic_cast<CommentsFrame *>(comment);
 
     if(frame && frame->description().isEmpty())
-      return (*it)->toString();
+      return comment->toString();
   }
 
   return comments.front()->toString();
@@ -190,19 +190,19 @@ String ID3v2::Tag::genre() const
 
   StringList genres;
 
-  for(auto it = fields.begin(); it != fields.end(); ++it) {
+  for(auto & field : fields) {
 
-    if((*it).isEmpty())
+    if(field.isEmpty())
       continue;
 
     bool ok;
-    int number = (*it).toInt(&ok);
+    int number = field.toInt(&ok);
     if(ok && number >= 0 && number <= 255) {
-      *it = ID3v1::genre(number);
+      field = ID3v1::genre(number);
     }
 
-    if(std::find(genres.begin(), genres.end(), *it) == genres.end())
-      genres.append(*it);
+    if(std::find(genres.begin(), genres.end(), field) == genres.end())
+      genres.append(field);
   }
 
   return genres.toString();
@@ -247,10 +247,10 @@ void ID3v2::Tag::setComment(const String &s)
   const FrameList &comments = d->frameListMap["COMM"];
 
   if(!comments.isEmpty()) {
-    for(auto it = comments.begin(); it != comments.end(); ++it) {
-      auto frame = dynamic_cast<CommentsFrame *>(*it);
+    for(auto comment : comments) {
+      auto frame = dynamic_cast<CommentsFrame *>(comment);
       if(frame && frame->description().isEmpty()) {
-        (*it)->setText(s);
+        comment->setText(s);
         return;
       }
     }
@@ -374,8 +374,8 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-  for(auto it = frameList().begin(); it != frameList().end(); ++it) {
-    PropertyMap props = (*it)->asProperties();
+  for(auto it : frameList()) {
+    PropertyMap props = it->asProperties();
     properties.merge(props);
   }
   return properties;
@@ -383,9 +383,9 @@ PropertyMap ID3v2::Tag::properties() const
 
 void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
 {
-  for(auto it = properties.begin(); it != properties.end(); ++it){
-    if(it->startsWith("UNKNOWN/")) {
-      String frameID = it->substr(String("UNKNOWN/").size());
+  for(const auto & propertie : properties){
+    if(propertie.startsWith("UNKNOWN/")) {
+      String frameID = propertie.substr(String("UNKNOWN/").size());
       if(frameID.size() != 4)
         continue; // invalid specification
       ByteVector id = frameID.data(String::Latin1);
@@ -395,15 +395,15 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
         if (dynamic_cast<const UnknownFrame *>(*fit) != nullptr)
           removeFrame(*fit);
     }
-    else if(it->size() == 4){
-      ByteVector id = it->data(String::Latin1);
+    else if(propertie.size() == 4){
+      ByteVector id = propertie.data(String::Latin1);
       removeFrames(id);
     }
     else {
-      ByteVector id = it->substr(0,4).data(String::Latin1);
-      if(it->size() <= 5)
+      ByteVector id = propertie.substr(0,4).data(String::Latin1);
+      if(propertie.size() <= 5)
         continue; // invalid specification
-      String description = it->substr(5);
+      String description = propertie.substr(5);
       Frame *frame = nullptr;
       if(id == "TXXX")
         frame = UserTextIdentificationFrame::find(this, description);
@@ -430,15 +430,15 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap tiplProperties;
   PropertyMap tmclProperties;
   Frame::splitProperties(origProps, properties, tiplProperties, tmclProperties);
-  for(auto it = frameListMap().begin(); it != frameListMap().end(); ++it){
-    for(auto lit = it->second.begin(); lit != it->second.end(); ++lit){
+  for(const auto & it : frameListMap()){
+    for(auto lit = it.second.begin(); lit != it.second.end(); ++lit){
       PropertyMap frameProperties = (*lit)->asProperties();
-      if(it->first == "TIPL") {
+      if(it.first == "TIPL") {
         if (tiplProperties != frameProperties)
           framesToDelete.append(*lit);
         else
           tiplProperties.erase(frameProperties);
-      } else if(it->first == "TMCL") {
+      } else if(it.first == "TMCL") {
         if (tmclProperties != frameProperties)
           framesToDelete.append(*lit);
         else

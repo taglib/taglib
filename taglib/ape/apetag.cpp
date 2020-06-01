@@ -56,8 +56,8 @@ namespace
 
     // only allow printable ASCII including space (32..126)
 
-    for(auto it = key.begin(); it != key.end(); ++it) {
-      const int c = static_cast<unsigned char>(*it);
+    for(char it : key) {
+      const int c = static_cast<unsigned char>(it);
       if(c < 32 || c > 126)
         return false;
     }
@@ -230,9 +230,9 @@ PropertyMap APE::Tag::properties() const
     }
     else {
       // Some tags need to be handled specially
-      for(size_t i = 0; i < keyConversionsSize; ++i) {
-        if(tagName == keyConversions[i][1])
-          tagName = keyConversions[i][0];
+      for(auto & keyConversion : keyConversions) {
+        if(tagName == keyConversion[1])
+          tagName = keyConversion[0];
       }
       properties[tagName].append(it->second.toStringList());
     }
@@ -252,10 +252,10 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap properties(origProps); // make a local copy that can be modified
 
   // see comment in properties()
-  for(size_t i = 0; i < keyConversionsSize; ++i)
-    if(properties.contains(keyConversions[i][0])) {
-      properties.insert(keyConversions[i][1], properties[keyConversions[i][0]]);
-      properties.erase(keyConversions[i][0]);
+  for(auto & keyConversion : keyConversions)
+    if(properties.contains(keyConversion[0])) {
+      properties.insert(keyConversion[1], properties[keyConversion[0]]);
+      properties.erase(keyConversion[0]);
     }
 
   // first check if tags need to be removed completely

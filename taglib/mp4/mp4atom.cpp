@@ -82,8 +82,8 @@ MP4::Atom::Atom(File *file)
 
   name = header.mid(4, 4);
 
-  for(int i = 0; i < numContainers; i++) {
-    if(name == containers[i]) {
+  for(auto & container : containers) {
+    if(name == container) {
       if(name == "meta") {
         file->seek(4, File::Current);
       }

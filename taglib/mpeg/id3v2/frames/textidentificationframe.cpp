@@ -62,9 +62,9 @@ TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const Property
 {
   auto frame = new TextIdentificationFrame("TIPL");
   StringList l;
-  for(auto it = properties.begin(); it != properties.end(); ++it){
-    l.append(it->first);
-    l.append(it->second.toString(",")); // comma-separated list of names
+  for(const auto & propertie : properties){
+    l.append(propertie.first);
+    l.append(propertie.second.toString(",")); // comma-separated list of names
   }
   frame->setText(l);
   return frame;
@@ -74,11 +74,11 @@ TextIdentificationFrame *TextIdentificationFrame::createTMCLFrame(const Property
 {
   auto frame = new TextIdentificationFrame("TMCL");
   StringList l;
-  for(auto it = properties.begin(); it != properties.end(); ++it){
-    if(!it->first.startsWith(instrumentPrefix)) // should not happen
+  for(const auto & propertie : properties){
+    if(!propertie.first.startsWith(instrumentPrefix)) // should not happen
       continue;
-    l.append(it->first.substr(instrumentPrefix.size()));
-    l.append(it->second.toString(","));
+    l.append(propertie.first.substr(instrumentPrefix.size()));
+    l.append(propertie.second.toString(","));
   }
   frame->setText(l);
   return frame;
@@ -136,8 +136,8 @@ const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {
   static KeyConversionMap m;
   if(m.isEmpty()) {
-    for(size_t i = 0; i < involvedPeopleSize; ++i)
-      m.insert(involvedPeople[i][1], involvedPeople[i][0]);
+    for(auto & i : involvedPeople)
+      m.insert(i[1], i[0]);
   }
   return m;
 }
@@ -158,19 +158,19 @@ PropertyMap TextIdentificationFrame::asProperties() const
   if(tagName == "GENRE") {
     // Special case: Support ID3v1-style genre numbers. They are not officially supported in
     // ID3v2, however it seems that still a lot of programs use them.
-    for(auto it = values.begin(); it != values.end(); ++it) {
+    for(auto & value : values) {
       bool ok = false;
-      int test = it->toInt(&ok); // test if the genre value is an integer
+      int test = value.toInt(&ok); // test if the genre value is an integer
       if(ok)
-        *it = ID3v1::genre(test);
+        value = ID3v1::genre(test);
     }
   } else if(tagName == "DATE") {
-    for(auto it = values.begin(); it != values.end(); ++it) {
+    for(auto & value : values) {
       // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
       // Since this is unusual in other formats, the T is removed.
-      int tpos = it->find("T");
+      int tpos = value.find("T");
       if(tpos != -1)
-        (*it)[tpos] = ' ';
+        value[tpos] = ' ';
     }
   }
   PropertyMap ret;
@@ -270,9 +270,9 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   StringList l = fieldList();
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     bool found = false;
-    for(size_t i = 0; i < involvedPeopleSize; ++i)
-      if(*it == involvedPeople[i][0]) {
-        map.insert(involvedPeople[i][1], (++it)->split(","));
+    for(auto & i : involvedPeople)
+      if(*it == i[0]) {
+        map.insert(i[1], (++it)->split(","));
         found = true;
         break;
       }

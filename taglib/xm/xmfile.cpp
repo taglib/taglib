@@ -318,9 +318,8 @@ public:
   unsigned int size() const override
   {
     unsigned int size = 0;
-    for(auto i = m_readers.begin();
-        i != m_readers.end(); ++ i) {
-      size += (*i)->size();
+    for(auto m_reader : m_readers) {
+      size += m_reader->size();
     }
     return size;
   }

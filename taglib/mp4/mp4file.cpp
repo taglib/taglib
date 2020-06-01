@@ -38,12 +38,12 @@ namespace
 {
   bool checkValid(const MP4::AtomList &list)
   {
-    for(auto it = list.begin(); it != list.end(); ++it) {
+    for(auto it : list) {
 
-      if((*it)->length == 0)
+      if(it->length == 0)
         return false;
 
-      if(!checkValid((*it)->children))
+      if(!checkValid(it->children))
         return false;
     }
 

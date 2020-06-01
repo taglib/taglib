@@ -347,8 +347,8 @@ ByteVector
 MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data) const
 {
   ByteVector result;
-  for(auto it = data.begin(); it != data.end(); ++it) {
-    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + *it));
+  for(const auto & it : data) {
+    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + it));
   }
   return renderAtom(name, result);
 }
@@ -919,9 +919,9 @@ namespace
 
   String translateKey(const String &key)
   {
-    for(size_t i = 0; i < keyTranslationSize; ++i) {
-      if(key == keyTranslation[i][0])
-        return keyTranslation[i][1];
+    for(auto & i : keyTranslation) {
+      if(key == i[0])
+        return i[1];
     }
 
     return String();
@@ -961,8 +961,8 @@ PropertyMap MP4::Tag::properties() const
 
 void MP4::Tag::removeUnsupportedProperties(const StringList &props)
 {
-  for(auto it = props.begin(); it != props.end(); ++it)
-    d->items.erase(*it);
+  for(const auto & prop : props)
+    d->items.erase(prop);
 }
 
 PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
@@ -983,11 +983,11 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
   }
 
   PropertyMap ignoredProps;
-  for(auto it = props.begin(); it != props.end(); ++it) {
-    if(reverseKeyMap.contains(it->first)) {
-      String name = reverseKeyMap[it->first];
-      if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && !it->second.isEmpty()) {
-        StringList parts = StringList::split(it->second.front(), "/");
+  for(const auto & prop : props) {
+    if(reverseKeyMap.contains(prop.first)) {
+      String name = reverseKeyMap[prop.first];
+      if((prop.first == "TRACKNUMBER" || prop.first == "DISCNUMBER") && !prop.second.isEmpty()) {
+        StringList parts = StringList::split(prop.second.front(), "/");
         if(!parts.isEmpty()) {
           int first = parts[0].toInt();
           int second = 0;
@@ -997,20 +997,20 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
           d->items[name] = MP4::Item(first, second);
         }
       }
-      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" || it->first == "MOVEMENTCOUNT") && !it->second.isEmpty()) {
-        int value = it->second.front().toInt();
+      else if((prop.first == "BPM" || prop.first == "MOVEMENTNUMBER" || prop.first == "MOVEMENTCOUNT") && !prop.second.isEmpty()) {
+        int value = prop.second.front().toInt();
         d->items[name] = MP4::Item(value);
       }
-      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT") && !it->second.isEmpty()) {
-        bool value = (it->second.front().toInt() != 0);
+      else if((prop.first == "COMPILATION" || prop.first == "SHOWWORKMOVEMENT") && !prop.second.isEmpty()) {
+        bool value = (prop.second.front().toInt() != 0);
         d->items[name] = MP4::Item(value);
       }
       else {
-        d->items[name] = it->second;
+        d->items[name] = prop.second;
       }
     }
     else {
-      ignoredProps.insert(it->first, it->second);
+      ignoredProps.insert(prop.first, prop.second);
     }
   }
 

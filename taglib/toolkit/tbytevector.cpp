@@ -474,9 +474,9 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 {
   detach();
 
-  for(auto it = begin(); it != end(); ++it) {
-    if(*it == oldByte)
-      *it = newByte;
+  for(char & it : *this) {
+    if(it == oldByte)
+      it = newByte;
   }
 
   return *this;
@@ -721,8 +721,8 @@ unsigned int ByteVector::checksum() const
   };
 
   unsigned int sum = 0;
-  for(auto it = begin(); it != end(); ++it)
-    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(*it)];
+  for(char it : *this)
+    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(it)];
   return sum;
 }
 
@@ -1038,7 +1038,7 @@ void ByteVector::detach()
 
 std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v)
 {
-  for(unsigned int i = 0; i < v.size(); i++)
-    s << v[i];
+  for(char i : v)
+    s << i;
   return s;
 }

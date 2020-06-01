@@ -256,9 +256,9 @@ namespace
 
   String translateKey(const String &key)
   {
-    for(size_t i = 0; i < keyTranslationSize; ++i) {
-      if(key == keyTranslation[i][0])
-        return keyTranslation[i][1];
+    for(auto & i : keyTranslation) {
+      if(key == i[0])
+        return i[1];
     }
 
     return String();

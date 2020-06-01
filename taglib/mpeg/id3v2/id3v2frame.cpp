@@ -66,8 +66,8 @@ namespace
     if(frameID.size() != 4)
       return false;
 
-    for(auto it = frameID.begin(); it != frameID.end(); it++) {
-      if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
+    for(char it : frameID) {
+      if( (it < 'A' || it > 'Z') && (it < '0' || it > '9') ) {
         return false;
       }
     }
@@ -300,8 +300,8 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
   if(encoding != String::Latin1)
     return encoding;
 
-  for(auto it = fields.begin(); it != fields.end(); ++it) {
-    if(!(*it).isLatin1()) {
+  for(const auto & field : fields) {
+    if(!field.isLatin1()) {
       if(version == 4) {
         debug("Frame::checkEncoding() -- Rendering using UTF8.");
         return String::UTF8;
@@ -423,15 +423,15 @@ namespace
 String Frame::frameIDToKey(const ByteVector &id)
 {
   ByteVector id24 = id;
-  for(size_t i = 0; i < deprecatedFramesSize; ++i) {
-    if(id24 == deprecatedFrames[i][0]) {
-      id24 = deprecatedFrames[i][1];
+  for(auto & deprecatedFrame : deprecatedFrames) {
+    if(id24 == deprecatedFrame[0]) {
+      id24 = deprecatedFrame[1];
       break;
     }
   }
-  for(size_t i = 0; i < frameTranslationSize; ++i) {
-    if(id24 == frameTranslation[i][0])
-      return frameTranslation[i][1];
+  for(auto & i : frameTranslation) {
+    if(id24 == i[0])
+      return i[1];
   }
   return String();
 }
@@ -439,9 +439,9 @@ String Frame::frameIDToKey(const ByteVector &id)
 ByteVector Frame::keyToFrameID(const String &s)
 {
   const String key = s.upper();
-  for(size_t i = 0; i < frameTranslationSize; ++i) {
-    if(key == frameTranslation[i][1])
-      return frameTranslation[i][0];
+  for(auto & i : frameTranslation) {
+    if(key == i[1])
+      return i[0];
   }
   return ByteVector();
 }
@@ -449,9 +449,9 @@ ByteVector Frame::keyToFrameID(const String &s)
 String Frame::txxxToKey(const String &description)
 {
   const String d = description.upper();
-  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-    if(d == txxxFrameTranslation[i][0])
-      return txxxFrameTranslation[i][1];
+  for(auto & i : txxxFrameTranslation) {
+    if(d == i[0])
+      return i[1];
   }
   return d;
 }
@@ -459,9 +459,9 @@ String Frame::txxxToKey(const String &description)
 String Frame::keyToTXXX(const String &s)
 {
   const String key = s.upper();
-  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-    if(key == txxxFrameTranslation[i][1])
-      return txxxFrameTranslation[i][0];
+  for(auto & i : txxxFrameTranslation) {
+    if(key == i[1])
+      return i[0];
   }
   return s;
 }
@@ -501,13 +501,13 @@ void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFram
   singleFrameProperties.clear();
   tiplProperties.clear();
   tmclProperties.clear();
-  for(auto it = original.begin(); it != original.end(); ++it) {
-    if(TextIdentificationFrame::involvedPeopleMap().contains(it->first))
-      tiplProperties.insert(it->first, it->second);
-    else if(it->first.startsWith(TextIdentificationFrame::instrumentPrefix))
-      tmclProperties.insert(it->first, it->second);
+  for(const auto & it : original) {
+    if(TextIdentificationFrame::involvedPeopleMap().contains(it.first))
+      tiplProperties.insert(it.first, it.second);
+    else if(it.first.startsWith(TextIdentificationFrame::instrumentPrefix))
+      tmclProperties.insert(it.first, it.second);
     else
-      singleFrameProperties.insert(it->first, it->second);
+      singleFrameProperties.insert(it.first, it.second);
   }
 }
 

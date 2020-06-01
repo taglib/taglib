@@ -383,11 +383,11 @@ String String::upper() const
   String s;
   s.d->data.reserve(size());
 
-  for(ConstIterator it = begin(); it != end(); ++it) {
-    if(*it >= 'a' && *it <= 'z')
-      s.d->data.push_back(*it + 'A' - 'a');
+  for(wchar_t it : *this) {
+    if(it >= 'a' && it <= 'z')
+      s.d->data.push_back(it + 'A' - 'a');
     else
-      s.d->data.push_back(*it);
+      s.d->data.push_back(it);
   }
 
   return s;
@@ -422,8 +422,8 @@ ByteVector String::data(Type t) const
       ByteVector v(size(), 0);
       char *p = v.data();
 
-      for(ConstIterator it = begin(); it != end(); ++it)
-        *p++ = static_cast<char>(*it);
+      for(wchar_t it : *this)
+        *p++ = static_cast<char>(it);
 
       return v;
     }
@@ -453,9 +453,9 @@ ByteVector String::data(Type t) const
       *p++ = '\xff';
       *p++ = '\xfe';
 
-      for(ConstIterator it = begin(); it != end(); ++it) {
-        *p++ = static_cast<char>(*it & 0xff);
-        *p++ = static_cast<char>(*it >> 8);
+      for(wchar_t it : *this) {
+        *p++ = static_cast<char>(it & 0xff);
+        *p++ = static_cast<char>(it >> 8);
       }
 
       return v;
@@ -465,9 +465,9 @@ ByteVector String::data(Type t) const
       ByteVector v(size() * 2, 0);
       char *p = v.data();
 
-      for(ConstIterator it = begin(); it != end(); ++it) {
-        *p++ = static_cast<char>(*it >> 8);
-        *p++ = static_cast<char>(*it & 0xff);
+      for(wchar_t it : *this) {
+        *p++ = static_cast<char>(it >> 8);
+        *p++ = static_cast<char>(it & 0xff);
       }
 
       return v;
@@ -477,9 +477,9 @@ ByteVector String::data(Type t) const
       ByteVector v(size() * 2, 0);
       char *p = v.data();
 
-      for(ConstIterator it = begin(); it != end(); ++it) {
-        *p++ = static_cast<char>(*it & 0xff);
-        *p++ = static_cast<char>(*it >> 8);
+      for(wchar_t it : *this) {
+        *p++ = static_cast<char>(it & 0xff);
+        *p++ = static_cast<char>(it >> 8);
       }
 
       return v;
@@ -527,8 +527,8 @@ String String::stripWhiteSpace() const
 
 bool String::isLatin1() const
 {
-  for(ConstIterator it = begin(); it != end(); ++it) {
-    if(*it >= 256)
+  for(wchar_t it : *this) {
+    if(it >= 256)
       return false;
   }
   return true;
@@ -536,8 +536,8 @@ bool String::isLatin1() const
 
 bool String::isAscii() const
 {
-  for(ConstIterator it = begin(); it != end(); ++it) {
-    if(*it >= 128)
+  for(wchar_t it : *this) {
+    if(it >= 128)
       return false;
   }
   return true;
