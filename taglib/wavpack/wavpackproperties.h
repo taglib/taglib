@@ -139,6 +139,8 @@ namespace TagLib {
 
       void read(File *file, long streamLength);
       unsigned int seekFinalIndex(File *file, long streamLength);
+      int getNonStandardRate(unsigned char const *buffer, int bcount);
+      int getDsdRateShifter(unsigned char const *buffer, int bcount);
 
       class PropertiesPrivate;
       PropertiesPrivate *d;
