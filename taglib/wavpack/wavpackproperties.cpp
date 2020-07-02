@@ -256,7 +256,7 @@ unsigned int WavPack::Properties::seekFinalIndex(File *file, long streamLength)
   long offset = streamLength;
 
   while (offset >= 32) {
-    offset = file->rfind("wvpk", offset - 32);
+    offset = file->rfind("wvpk", offset - 4);
 
     if(offset == -1)
       return 0;
@@ -266,13 +266,17 @@ unsigned int WavPack::Properties::seekFinalIndex(File *file, long streamLength)
     if(data.size() < 32)
       return 0;
 
-    const int version = data.toShort(8, false);
-    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
-      return 0;
-
+    const unsigned int blockSize    = data.toUInt(4, false);
     const unsigned int blockIndex   = data.toUInt(16, false);
     const unsigned int blockSamples = data.toUInt(20, false);
     const unsigned int flags        = data.toUInt(24, false);
+    const int version               = data.toShort(8, false);
+
+    // try not to trigger on a spurious "wvpk" in WavPack binary block data
+
+    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS || (blockSize & 1) ||
+      blockSize < 24 || blockSize >= 1048576 || blockSamples > 131072)
+        continue;
 
     if (blockSamples && (flags & FINAL_BLOCK))
       return blockIndex + blockSamples;
