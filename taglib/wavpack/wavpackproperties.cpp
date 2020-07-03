@@ -324,7 +324,7 @@ int WavPack::Properties::getNonStandardRate(unsigned char const *buffer, int bco
         // only use 4th byte if it's really there
 
         if (!(meta_id & ID_ODD_SIZE))
-          sample_rate |= static_cast<int32_t>(buffer[3] & 0x7f) << 24;
+          sample_rate |= static_cast<int32_t>(*buffer & 0x7f) << 24;
 
         return sample_rate;
       }
