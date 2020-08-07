@@ -25,6 +25,8 @@
 
 #include "ebmlelement.h"
 
+#include <cassert>
+
 using namespace TagLib;
 
 class EBML::Element::ElementPrivate
@@ -448,6 +450,13 @@ bool EBML::Element::removeChild(Element *element, bool useVoid)
 
 void EBML::Element::setAsBinary(const ByteVector &binary)
 {
+  assert(binary.size() == d->size);
+
+  if (binary.size() != d->size) {
+    std::cerr << "Refusing to write invalid amount of data, old size " << d->size << ", new size " << binary.size();
+    return;
+  }
+
   // Maybe: Search for void element after this one
   d->document->insert(binary, d->data, d->size);
 }
