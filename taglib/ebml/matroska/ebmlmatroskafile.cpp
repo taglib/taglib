@@ -210,7 +210,43 @@ bool EBML::Matroska::File::save()
   // Well, here we just iterate over each extracted element.
   for(List<std::pair<PropertyMap, std::pair<Element *, ulli> > >::Iterator i = d->tags.begin();
     i != d->tags.end(); ++i) {
-    
+
+      // If the size of the tag has changed, we can't reuse
+      if(i->second.first) {
+          bool needRewrite = false;
+          for(PropertyMap::Iterator j = i->first.begin(); j != i->first.end(); ++j) {
+              List<Element *> simpleTags = i->second.first->getChildren(Constants::SimpleTag);
+              StringList::Iterator str = j->second.begin();
+              List<Element *>::Iterator k = simpleTags.begin();
+              for(; k != simpleTags.end(); ++k) {
+                  String name, value;
+                  if(!d->extractContent(*k, name, value))
+                      continue;
+
+
+                  if(name != j->first) {
+                      continue;
+                  }
+                  if(value.size() != str->size()) {
+                      needRewrite = true;
+                      break;
+                  }
+                  ++str;
+              }
+
+              if (needRewrite) {
+                  break;
+              }
+          }
+
+          if (needRewrite) {
+              Element *container = d->document->getDocumentRoot()
+                  ->getChild(Constants::Segment)->getChild(Constants::Tags);
+              container->removeChild(i->second.first);
+              i->second.first = nullptr;
+          }
+      }
+
     for(PropertyMap::Iterator j = i->first.begin(); j != i->first.end(); ++j) {
       
       // No element? Create it!
