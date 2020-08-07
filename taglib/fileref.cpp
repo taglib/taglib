@@ -136,6 +136,8 @@ namespace
       return new IT::File(stream, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(stream, readAudioProperties, audioPropertiesStyle);
+    if (ext == "MKA" || ext == "MKV")
+      return new EBML::Matroska::File(stream, readAudioProperties, audioPropertiesStyle);
 
     return 0;
   }
@@ -175,6 +177,8 @@ namespace
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(APE::File::isSupported(stream))
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(EBML::Matroska::File::isSupported(stream))
+      file = new EBML::Matroska::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // isSupported() only does a quick check, so double check the file here.
 

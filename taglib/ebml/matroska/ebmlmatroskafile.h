@@ -102,6 +102,11 @@ namespace TagLib {
          * Saves the file. Returns true on success.
          */
         bool save();
+
+        /*!
+         * Lightweight function that checks if the stream is a valid Matroska file.
+         */
+        static bool isSupported(IOStream *stream);
         
         /*!
          * Offers access to a few common tag entries.
@@ -205,6 +210,14 @@ namespace TagLib {
         };
         
       private:
+        // Only used for checking if a stream is a valid matroska file
+        // Only difference from the normal constructor is that it skips
+        // lateCreate().
+        enum ForCheckIsValid {
+            CheckIfValidOnly // Quick hack to make the constructor unambigous
+        };
+        File(IOStream *stream, const ForCheckIsValid);
+
         class FilePrivate;
         FilePrivate *d;
       };

@@ -153,6 +153,17 @@ EBML::Matroska::File::File(IOStream *stream, bool, AudioProperties::ReadStyle) :
   }
 }
 
+EBML::Matroska::File::File(IOStream *stream, const ForCheckIsValid) : EBML::File(stream), d(0)
+{
+  if(isValid() && isOpen()) {
+    d = FilePrivate::checkAndCreate(this);
+    if(!d)
+      setValid(false);
+    else
+      setValid(true);
+  }
+}
+
 Tag *EBML::Matroska::File::tag() const
 {
   return d->tag;
@@ -546,4 +557,11 @@ void EBML::Matroska::File::Tag::setTrack(uint i)
     e->update(e->track, Constants::PART_NUMBER, s);
   else
     e->insert(Constants::PART_NUMBER, Constants::MostCommonPartValue, s);
+}
+
+bool EBML::Matroska::File::isSupported(IOStream *stream)
+{
+  // This is a fairly lightweight operation
+  File testFile(stream, CheckIfValidOnly);
+  return testFile.isValid();
 }
