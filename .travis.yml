@@ -12,6 +12,9 @@ compiler:
   - gcc
   - clang
 
+arch:
+  - ppc64le
+
 addons:
   apt:
     packages:
