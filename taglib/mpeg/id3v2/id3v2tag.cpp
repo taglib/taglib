@@ -480,13 +480,13 @@ ByteVector ID3v2::Tag::render() const
 void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
 {
 #ifdef NO_ITUNES_HACKS
-  static std::array<ByteVector, 13> unsupportedFrames = {
+  static const std::array<ByteVector, 13> unsupportedFrames = {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
     "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP"
   };
 #else
   // iTunes writes and reads TSOA, TSOT, TSOP to ID3v2.3.
-  static std::array<ByteVector, 10> unsupportedFrames = {
+  static const std::array<ByteVector, 10> unsupportedFrames = {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
     "TMOO", "TPRO", "TSST"
   };
