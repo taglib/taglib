@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
     copyright           : (C) 2007 by Lukas Lalinsky
     email               : lukas@oxygene.sk
  ***************************************************************************/
@@ -798,7 +798,16 @@ public:
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
 #endif
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
-}
+    }
+
+    ScopedFileCopy rareFramesCopy("rare_frames", ".mp3");
+
+    {
+      MPEG::File f(rareFramesCopy.fileName().c_str());
+      f.save(MPEG::File::AllTags, File::StripOthers, ID3v2::v3);
+      f.seek(f.find("TCON") + 11);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("(13)"), f.readBlock(4));
+    }
   }
 
   void testCompressedFrameWithBrokenLength()

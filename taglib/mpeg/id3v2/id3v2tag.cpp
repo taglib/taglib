@@ -495,6 +495,7 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   ID3v2::TextIdentificationFrame *frameTDRC = 0;
   ID3v2::TextIdentificationFrame *frameTIPL = 0;
   ID3v2::TextIdentificationFrame *frameTMCL = 0;
+  ID3v2::TextIdentificationFrame *frameTCON = 0;
 
   for(FrameList::ConstIterator it = d->frameList.begin(); it != d->frameList.end(); it++) {
     ID3v2::Frame *frame = *it;
@@ -516,6 +517,8 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
       frameTIPL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
     else if(frameID == "TMCL")
       frameTMCL = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
+    else if(frame && frameID == "TCON")
+      frameTCON = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);
     else
       frames->append(frame);
   }
@@ -581,6 +584,22 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     frameIPLS->setText(people);
     frames->append(frameIPLS);
     newFrames->append(frameIPLS);
+  }
+
+  if(frameTCON) {
+    StringList genres = frameTCON->fieldList();
+    String combined;
+
+    for(StringList::ConstIterator it = genres.begin(); it != genres.end(); ++it) {
+      bool ok = false;
+      int number = it->toInt(&ok);
+      combined += (ok && number >= 0 && number <= 255) ? ('(' + *it + ')') : *it;
+    }
+
+    frameTCON = new ID3v2::TextIdentificationFrame("TCON", String::Latin1);
+    frameTCON->setText(combined);
+    frames->append(frameTCON);
+    newFrames->append(frameTCON);
   }
 }
 
