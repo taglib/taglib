@@ -57,6 +57,8 @@ set(tag_HDRS
   toolkit/tpropertymap.h
   toolkit/trefcounter.h
   toolkit/tdebuglistener.h
+  toolkit/fastsearch.h
+  toolkit/cpuFeaturesCheck.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
@@ -310,7 +312,17 @@ set(toolkit_SRCS
   toolkit/trefcounter.cpp
   toolkit/tdebuglistener.cpp
   toolkit/tzlib.cpp
+  toolkit/avx2search.cpp
+  toolkit/cpuFeaturesCheck.cpp
 )
+
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag(-mavx2  COMPILER_SUPPORTS_AVX2)
+check_cxx_compiler_flag(-mxsave COMPILER_SUPPORTS_XSAVE)
+set(IS_X86_BASED CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
+if(COMPILER_SUPPORTS_AVX2 AND COMPILER_SUPPORTS_XSAVE AND IS_X86_BASED)
+  set_source_files_properties(toolkit/avx2search.cpp toolkit/cpuFeaturesCheck.cpp PROPERTIES COMPILE_FLAGS "-mavx2 -mxsave")
+endif()
 
 if(HAVE_ZLIB_SOURCE)
   set(zlib_SRCS

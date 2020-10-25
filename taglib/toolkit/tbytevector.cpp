@@ -36,6 +36,7 @@
 #include <tutils.h>
 
 #include "tbytevector.h"
+#include "fastsearch.h"
 
 // This is a bit ugly to keep writing over and over again.
 
@@ -52,15 +53,32 @@ int findChar(
   char c, unsigned int offset, int byteAlign)
 {
   const size_t dataSize = dataEnd - dataBegin;
-  if(offset + 1 > dataSize)
-    return -1;
-
-  // n % 0 is invalid
-
-  if(byteAlign == 0)
+  if(byteAlign <= 0 || offset + 1 > dataSize)
     return -1;
 
   for(TIterator it = dataBegin + offset; it < dataEnd; it += byteAlign) {
+    if(*it == c)
+      return (it - dataBegin);
+  }
+
+  return -1;
+}
+
+template<>
+int findChar(
+  const ByteVector::ConstIterator dataBegin, const ByteVector::ConstIterator dataEnd,
+  char c, unsigned int offset, int byteAlign)
+{
+  const size_t dataSize = dataEnd - dataBegin;
+  if(byteAlign <= 0 || offset + 1 > dataSize)
+    return -1;
+
+  const auto fastResult = findCharFast(reinterpret_cast<const char*>(&*dataBegin), dataSize, c, offset);
+  if(fastResult != -1)
+    return fastResult;
+
+  for(auto it = dataBegin + offset; it < dataEnd; it += byteAlign)
+  {
     if(*it == c)
       return static_cast<int>(it - dataBegin);
   }
@@ -76,18 +94,13 @@ int findVector(
 {
   const size_t dataSize    = dataEnd    - dataBegin;
   const size_t patternSize = patternEnd - patternBegin;
-  if(patternSize == 0 || offset + patternSize > dataSize)
+  if(byteAlign <= 0 || patternSize == 0 || offset + patternSize > dataSize)
     return -1;
 
   // Special case that pattern contains just single char.
 
   if(patternSize == 1)
     return findChar(dataBegin, dataEnd, *patternBegin, offset, byteAlign);
-
-  // n % 0 is invalid
-
-  if(byteAlign == 0)
-    return -1;
 
   // We don't use sophisticated algorithms like Knuth-Morris-Pratt here.
 
@@ -100,6 +113,50 @@ int findVector(
     TIterator itPattern = patternBegin;
 
     while(*itData == *itPattern) {
+      ++itData;
+      ++itPattern;
+
+      if(itPattern == patternEnd)
+        return (it - dataBegin);
+    }
+  }
+
+  return -1;
+}
+
+template<>
+int findVector(
+  const ByteVector::ConstIterator dataBegin, const ByteVector::ConstIterator dataEnd,
+  const ByteVector::ConstIterator patternBegin, const ByteVector::ConstIterator patternEnd,
+  unsigned int offset, int byteAlign)
+{
+  const size_t dataSize = dataEnd - dataBegin;
+  const size_t patternSize = patternEnd - patternBegin;
+  if(byteAlign <= 0 || patternSize == 0 || offset + patternSize > dataSize)
+    return -1;
+
+  // Special case that pattern contains just single char.
+
+  if(patternSize == 1)
+    return findChar(dataBegin, dataEnd, *patternBegin, offset, byteAlign);
+
+  const auto fastResult = findVectorFast(reinterpret_cast<const char*>(&*dataBegin),
+    dataSize, reinterpret_cast<const char*>(&*patternBegin), patternSize, offset);
+  if(fastResult != -1)
+    return fastResult;
+  // We don't use sophisticated algorithms like Knuth-Morris-Pratt here.
+
+  // In the current implementation of TagLib, data and patterns are too small
+  // for such algorithms to work effectively.
+
+  for(auto it = dataBegin + offset; it < dataEnd - patternSize + 1; it += byteAlign)
+  {
+
+    auto itData = it;
+    auto itPattern = patternBegin;
+
+    while(*itData == *itPattern)
+    {
       ++itData;
       ++itPattern;
 
