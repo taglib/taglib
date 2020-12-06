@@ -28,6 +28,7 @@
 #include <id3v2tag.h>
 #include <infotag.h>
 #include <tbytevectorlist.h>
+#include <tfilestream.h>
 #include <tpropertymap.h>
 #include <wavfile.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -50,6 +51,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
+  CPPUNIT_TEST(testFileWithGarbageAppended);
   CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST(testPCMWithFactChunk);
   CPPUNIT_TEST_SUITE_END();
@@ -101,7 +103,7 @@ public:
   void testZeroSizeDataChunk()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("zero-size-chunk.wav"));
-    CPPUNIT_ASSERT(!f.isValid());
+    CPPUNIT_ASSERT(f.isValid());
   }
 
   void testID3v2Tag()
@@ -262,13 +264,53 @@ public:
   void testFuzzedFile1()
   {
     RIFF::WAV::File f1(TEST_FILE_PATH_C("infloop.wav"));
-    CPPUNIT_ASSERT(!f1.isValid());
+    CPPUNIT_ASSERT(f1.isValid());
+    // The file has problems:
+    // Chunk 'ISTt' has invalid size (larger than the file size).
+    // Its properties can nevertheless be read.
+    RIFF::WAV::Properties* properties = f1.audioProperties();
+    CPPUNIT_ASSERT_EQUAL(1, properties->channels());
+    CPPUNIT_ASSERT_EQUAL(88, properties->bitrate());
+    CPPUNIT_ASSERT_EQUAL(8, properties->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(11025, properties->sampleRate());
+    CPPUNIT_ASSERT(!f1.hasInfoTag());
+    CPPUNIT_ASSERT(!f1.hasID3v2Tag());
   }
 
   void testFuzzedFile2()
   {
     RIFF::WAV::File f2(TEST_FILE_PATH_C("segfault.wav"));
     CPPUNIT_ASSERT(f2.isValid());
+  }
+
+  void testFileWithGarbageAppended()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    ByteVector contentsBeforeModification;
+    {
+      FileStream stream(copy.fileName().c_str());
+      stream.seek(0, IOStream::End);
+      const char garbage[] = "12345678";
+      stream.writeBlock(ByteVector(garbage, sizeof(garbage) - 1));
+      stream.seek(0);
+      contentsBeforeModification = stream.readBlock(stream.length());
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.InfoTag()->setTitle("INFO Title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      f.strip();
+    }
+    {
+      FileStream stream(copy.fileName().c_str());
+      ByteVector contentsAfterModification = stream.readBlock(stream.length());
+      CPPUNIT_ASSERT_EQUAL(contentsBeforeModification, contentsAfterModification);
+    }
   }
 
   void testStripAndProperties()

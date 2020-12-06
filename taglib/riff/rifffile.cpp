@@ -302,13 +302,11 @@ void RIFF::File::read()
 
     if(!isValidChunkName(chunkName)) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
-      setValid(false);
       break;
     }
 
     if(static_cast<long long>(offset) + 8 + chunkSize > length()) {
       debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
-      setValid(false);
       break;
     }
 

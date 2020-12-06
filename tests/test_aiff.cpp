@@ -148,13 +148,13 @@ public:
   void testFuzzedFile1()
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("segfault.aif"));
-    CPPUNIT_ASSERT(!f.isValid());
+    CPPUNIT_ASSERT(f.isValid());
   }
 
   void testFuzzedFile2()
   {
     RIFF::AIFF::File f(TEST_FILE_PATH_C("excessive_alloc.aif"));
-    CPPUNIT_ASSERT(!f.isValid());
+    CPPUNIT_ASSERT(f.isValid());
   }
 
 };
