@@ -106,6 +106,13 @@ namespace TagLib {
         void removeUnsupportedProperties(const StringList& properties);
         PropertyMap setProperties(const PropertyMap &properties);
 
+    protected:
+        /*!
+         * Sets the value of \a key to \a value, overwriting any previous value.
+         * If \a value is empty, the item is removed.
+         */
+        void setTextItem(const String &key, const String &value);
+
     private:
         AtomDataList parseData2(const Atom *atom, int expectedFlags = -1,
                                 bool freeForm = false);
