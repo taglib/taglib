@@ -59,6 +59,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST(testWithZeroLengthAtom);
+  CPPUNIT_TEST(testEmptyValuesRemoveItems);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -455,6 +456,64 @@ public:
     CPPUNIT_ASSERT_EQUAL(22050, f.audioProperties()->sampleRate());
   }
 
+  void testEmptyValuesRemoveItems()
+  {
+    const MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
+    MP4::Tag *tag = f.tag();
+    const String testTitle("Title");
+    const String testArtist("Artist");
+    const String testAlbum("Album");
+    const String testComment("Comment");
+    const String testGenre("Genre");
+    const String nullString;
+    const unsigned int testYear = 2020;
+    const unsigned int testTrack = 1;
+    const unsigned int zeroUInt = 0;
+
+    tag->setTitle(testTitle);
+    CPPUNIT_ASSERT_EQUAL(testTitle, tag->title());
+    CPPUNIT_ASSERT(tag->contains("\251nam"));
+    tag->setArtist(testArtist);
+    CPPUNIT_ASSERT_EQUAL(testArtist, tag->artist());
+    CPPUNIT_ASSERT(tag->contains("\251ART"));
+    tag->setAlbum(testAlbum);
+    CPPUNIT_ASSERT_EQUAL(testAlbum, tag->album());
+    CPPUNIT_ASSERT(tag->contains("\251alb"));
+    tag->setComment(testComment);
+    CPPUNIT_ASSERT_EQUAL(testComment, tag->comment());
+    CPPUNIT_ASSERT(tag->contains("\251cmt"));
+    tag->setGenre(testGenre);
+    CPPUNIT_ASSERT_EQUAL(testGenre, tag->genre());
+    CPPUNIT_ASSERT(tag->contains("\251gen"));
+    tag->setYear(testYear);
+    CPPUNIT_ASSERT_EQUAL(testYear, tag->year());
+    CPPUNIT_ASSERT(tag->contains("\251day"));
+    tag->setTrack(testTrack);
+    CPPUNIT_ASSERT_EQUAL(testTrack, tag->track());
+    CPPUNIT_ASSERT(tag->contains("trkn"));
+
+    tag->setTitle(nullString);
+    CPPUNIT_ASSERT_EQUAL(nullString, tag->title());
+    CPPUNIT_ASSERT(!tag->contains("\251nam"));
+    tag->setArtist(nullString);
+    CPPUNIT_ASSERT_EQUAL(nullString, tag->artist());
+    CPPUNIT_ASSERT(!tag->contains("\251ART"));
+    tag->setAlbum(nullString);
+    CPPUNIT_ASSERT_EQUAL(nullString, tag->album());
+    CPPUNIT_ASSERT(!tag->contains("\251alb"));
+    tag->setComment(nullString);
+    CPPUNIT_ASSERT_EQUAL(nullString, tag->comment());
+    CPPUNIT_ASSERT(!tag->contains("\251cmt"));
+    tag->setGenre(nullString);
+    CPPUNIT_ASSERT_EQUAL(nullString, tag->genre());
+    CPPUNIT_ASSERT(!tag->contains("\251gen"));
+    tag->setYear(zeroUInt);
+    CPPUNIT_ASSERT_EQUAL(zeroUInt, tag->year());
+    CPPUNIT_ASSERT(!tag->contains("\251day"));
+    tag->setTrack(zeroUInt);
+    CPPUNIT_ASSERT_EQUAL(zeroUInt, tag->track());
+    CPPUNIT_ASSERT(!tag->contains("trkn"));
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMP4);
