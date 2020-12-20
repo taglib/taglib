@@ -11,7 +11,6 @@
 #cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
 /* Defined if your compiler supports some atomic operations */
-#cmakedefine   HAVE_STD_ATOMIC 1
 #cmakedefine   HAVE_GCC_ATOMIC 1
 #cmakedefine   HAVE_MAC_ATOMIC 1
 #cmakedefine   HAVE_WIN_ATOMIC 1
