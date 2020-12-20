@@ -32,7 +32,7 @@ do
 	  flags="$flags -L$libdir -ltag @ZLIB_LIBRARIES_FLAGS@"
 	  ;;
     --cflags)
-	  flags="$flags -I$includedir/taglib"
+	  flags="$flags -I$includedir -I$includedir/taglib"
 	  ;;
     --version)
 	  echo @TAGLIB_LIB_VERSION_STRING@
