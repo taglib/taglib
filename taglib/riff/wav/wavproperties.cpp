@@ -183,6 +183,14 @@ void RIFF::WAV::Properties::read(File *file)
   }
 
   d->format = data.toShort(0, false);
+  if((d->format & 0xffff) == 0xfffe) {
+    // if extensible then read the format from the subformat
+    if(data.size() != 40) {
+      debug("RIFF::WAV::Properties::read() - extensible size incorrect");
+      return;
+    }
+    d->format = data.toShort(24, false);
+  }
   if(d->format != FORMAT_PCM && totalSamples == 0) {
     debug("RIFF::WAV::Properties::read() - Non-PCM format, but 'fact' chunk not found.");
     return;
