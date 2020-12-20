@@ -337,6 +337,7 @@ set(tag_LIB_SRCS
 )
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+set_property(TARGET tag PROPERTY CXX_STANDARD 98)
 
 if(HAVE_ZLIB AND NOT HAVE_ZLIB_SOURCE)
   target_link_libraries(tag ${ZLIB_LIBRARIES})
