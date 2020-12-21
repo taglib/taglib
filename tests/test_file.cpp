@@ -25,19 +25,10 @@
 
 #include <tfile.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "plainfile.h"
 #include "utils.h"
 
 using namespace TagLib;
-
-// File subclass that gives tests access to filesystem operations
-class PlainFile : public File {
-public:
-  PlainFile(FileName name) : File(name) { }
-  Tag *tag() const { return NULL; }
-  AudioProperties *audioProperties() const { return NULL; }
-  bool save(){ return false; }
-  void truncate(long length) { File::truncate(length); }
-};
 
 class TestFile : public CppUnit::TestFixture
 {
