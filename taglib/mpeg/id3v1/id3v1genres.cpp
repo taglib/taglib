@@ -261,5 +261,26 @@ int ID3v1::genreIndex(const String &name)
       return i;
   }
 
+  // If the name was not found, try the names which have been changed
+  static const struct {
+    const wchar_t *genre;
+    int code;
+  } fixUpGenres[] = {
+    { L"Jazz+Funk", 29 },
+    { L"Folk/Rock", 81 },
+    { L"Bebob", 85 },
+    { L"Avantgarde", 90 },
+    { L"Dance Hall", 125 },
+    { L"Hardcore", 129 },
+    { L"BritPop", 132 },
+    { L"Negerpunk", 133 }
+  };
+  static const int fixUpGenresSize =
+      sizeof(fixUpGenres) / sizeof(fixUpGenres[0]);
+  for(int i = 0; i < fixUpGenresSize; ++i) {
+    if(name == fixUpGenres[i].genre)
+      return fixUpGenres[i].code;
+  }
+
   return 255;
 }
