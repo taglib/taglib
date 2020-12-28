@@ -27,6 +27,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <cstring>
+
 #include <tfile.h>
 #include <tfilestream.h>
 #include <tstring.h>
@@ -65,6 +67,8 @@ namespace
   File *detectByResolvers(FileName fileName, bool readAudioProperties,
                           AudioProperties::ReadStyle audioPropertiesStyle)
   {
+    if(::strlen(fileName) == 0)
+      return 0;
     ResolverList::ConstIterator it = fileTypeResolvers.begin();
     for(; it != fileTypeResolvers.end(); ++it) {
       File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
@@ -460,7 +464,11 @@ void FileRef::parse(FileName fileName, bool readAudioProperties,
 void FileRef::parse(IOStream *stream, bool readAudioProperties,
                     AudioProperties::ReadStyle audioPropertiesStyle)
 {
-  // User-defined resolvers won't work with a stream.
+  // Try user-defined resolvers.
+
+  d->file = detectByResolvers(stream->name(), readAudioProperties, audioPropertiesStyle);
+  if(d->file)
+    return;
 
   // Try to resolve file types based on the file extension.
 
