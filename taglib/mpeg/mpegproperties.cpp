@@ -200,13 +200,14 @@ void MPEG::Properties::read(File *file)
     const long lastFrameOffset = file->lastFrameOffset();
     if(lastFrameOffset < 0) {
       debug("MPEG::Properties::read() -- Could not find an MPEG frame in the stream.");
-      return;
     }
-
-    const Header lastHeader(file, lastFrameOffset, false);
-    const long streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
-    if(streamLength > 0)
-      d->length = static_cast<int>(streamLength * 8.0 / d->bitrate + 0.5);
+    else
+    {
+      const Header lastHeader(file, lastFrameOffset, false);
+      const long streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
+      if (streamLength > 0)
+        d->length = static_cast<int>(streamLength * 8.0 / d->bitrate + 0.5);
+    }
   }
 
   d->sampleRate        = firstHeader.sampleRate();
