@@ -27,6 +27,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <stdint.h>
 #include <tstring.h>
 #include <tdebug.h>
 
@@ -138,16 +139,10 @@ unsigned int WavPack::Properties::sampleFrames() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace
-{
-  const unsigned int sample_rates[] = {
-     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000,
-    32000, 44100, 48000, 64000, 88200, 96000, 192000,     0 };
-}
-
 #define BYTES_STORED    3
 #define MONO_FLAG       4
-#define LOSSLESS_FLAG   8
+#define HYBRID_FLAG     8
+#define DSD_FLAG        0x80000000      // block is encoded DSD (1-bit PCM)
 
 #define SHIFT_LSB       13
 #define SHIFT_MASK      (0x1fL << SHIFT_LSB)
@@ -158,7 +153,109 @@ namespace
 #define MIN_STREAM_VERS 0x402
 #define MAX_STREAM_VERS 0x410
 
+#define INITIAL_BLOCK   0x800
 #define FINAL_BLOCK     0x1000
+
+#define ID_DSD_BLOCK            0x0e
+#define ID_OPTIONAL_DATA        0x20
+#define ID_UNIQUE               0x3f
+#define ID_ODD_SIZE             0x40
+#define ID_LARGE                0x80
+#define ID_SAMPLE_RATE          (ID_OPTIONAL_DATA | 0x7)
+
+namespace
+{
+  const unsigned int sampleRates[] = {
+     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000,
+    32000, 44100, 48000, 64000, 88200, 96000, 192000,     0 };
+
+  /*!
+   * Given a WavPack \a block (complete, but not including the 32-byte header),
+   * parse the metadata blocks until an \a id block is found and return the
+   * contained data, or zero if no such block is found.
+   * Supported values for \a id are ID_SAMPLE_RATE and ID_DSD_BLOCK.
+  */
+  int getMetaDataChunk(const ByteVector &block, unsigned char id)
+  {
+    if(id != ID_SAMPLE_RATE && id != ID_DSD_BLOCK)
+      return 0;
+
+    const int blockSize = static_cast<int>(block.size());
+    int index = 0;
+
+    while(index + 1 < blockSize) {
+      const unsigned char metaId = static_cast<unsigned char>(block[index]);
+      int metaBc = static_cast<unsigned char>(block[index + 1]) << 1;
+      index += 2;
+
+      if(metaId & ID_LARGE) {
+        if(index + 2 > blockSize)
+          return 0;
+
+        metaBc += (static_cast<uint32_t>(static_cast<unsigned char>(block[index])) << 9)
+                + (static_cast<uint32_t>(static_cast<unsigned char>(block[index + 1])) << 17);
+        index += 2;
+      }
+
+      if(index + metaBc > blockSize)
+        return 0;
+
+      // if we got a sample rate, return it
+
+      if(id == ID_SAMPLE_RATE && (metaId & ID_UNIQUE) == ID_SAMPLE_RATE && metaBc == 4) {
+        int sampleRate = static_cast<int32_t>(static_cast<unsigned char>(block[index]));
+        sampleRate |= static_cast<int32_t>(static_cast<unsigned char>(block[index + 1])) << 8;
+        sampleRate |= static_cast<int32_t>(static_cast<unsigned char>(block[index + 2])) << 16;
+
+        // only use 4th byte if it's really there
+
+        if(!(metaId & ID_ODD_SIZE))
+          sampleRate |= static_cast<int32_t>(static_cast<unsigned char>(block[index + 3]) & 0x7f) << 24;
+
+        return sampleRate;
+      }
+
+      // if we got DSD block, return the specified rate shift amount
+
+      if(id == ID_DSD_BLOCK && (metaId & ID_UNIQUE) == ID_DSD_BLOCK && metaBc > 0) {
+        const unsigned char rateShift = static_cast<unsigned char>(block[index]);
+        if(rateShift <= 31)
+          return rateShift;
+      }
+
+      index += metaBc;
+    }
+
+    return 0;
+  }
+
+  /*!
+   * Given a WavPack block (complete, but not including the 32-byte header),
+   * parse the metadata blocks until an ID_SAMPLE_RATE block is found and
+   * return the non-standard sample rate contained there, or zero if no such
+   * block is found.
+   */
+  int getNonStandardRate(const ByteVector &block)
+  {
+    return getMetaDataChunk(block, ID_SAMPLE_RATE);
+  }
+
+  /*!
+   * Given a WavPack block (complete, but not including the 32-byte header),
+   * parse the metadata blocks until a DSD audio data block is found and return
+   * the sample-rate shift value contained there, or zero if no such block is
+   * found. The nominal sample rate of DSD audio files (found in the header)
+   * must be left-shifted by this amount to get the actual "byte" sample rate.
+   * Note that 8-bit bytes are the "atoms" of the DSD audio coding (for
+   * decoding, seeking, etc), so the shifted rate must be further multiplied by
+   * 8 to get the actual DSD bit sample rate.
+  */
+  int getDsdRateShifter(const ByteVector &block)
+  {
+    return getMetaDataChunk(block, ID_DSD_BLOCK);
+  }
+
+}
 
 void WavPack::Properties::read(File *file, long streamLength)
 {
@@ -178,17 +275,50 @@ void WavPack::Properties::read(File *file, long streamLength)
       break;
     }
 
+    const unsigned int blockSize = data.toUInt(4, false);
+    const unsigned int sampleFrames  = data.toUInt(12, false);
+    const unsigned int blockSamples = data.toUInt(20, false);
     const unsigned int flags = data.toUInt(24, false);
+    unsigned int sampleRate = sampleRates[(flags & SRATE_MASK) >> SRATE_LSB];
 
-    if(offset == 0) {
+    if(!blockSamples) {        // ignore blocks with no samples
+      offset += blockSize + 8;
+      continue;
+    }
+
+    if(blockSize < 24 || blockSize > 1048576) {
+      debug("WavPack::Properties::read() -- Invalid block header found.");
+      break;
+    }
+
+    // For non-standard sample rates or DSD audio files, we must read and parse the block
+    // to actually determine the sample rate.
+
+    if(!sampleRate || (flags & DSD_FLAG)) {
+      const unsigned int adjustedBlockSize = blockSize - 24;
+      const ByteVector block = file->readBlock(adjustedBlockSize);
+
+      if(block.size() < adjustedBlockSize) {
+        debug("WavPack::Properties::read() -- block is too short.");
+        break;
+      }
+
+      if(!sampleRate)
+        sampleRate = static_cast<unsigned int>(getNonStandardRate(block));
+
+      if(sampleRate && (flags & DSD_FLAG))
+        sampleRate <<= getDsdRateShifter(block);
+    }
+
+    if(flags & INITIAL_BLOCK) {
       d->version = data.toShort(8, false);
       if(d->version < MIN_STREAM_VERS || d->version > MAX_STREAM_VERS)
         break;
 
       d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB);
-      d->sampleRate    = sample_rates[(flags & SRATE_MASK) >> SRATE_LSB];
-      d->lossless      = !(flags & LOSSLESS_FLAG);
-      d->sampleFrames  = data.toUInt(12, false);
+      d->sampleRate    = static_cast<int>(sampleRate);
+      d->lossless      = !(flags & HYBRID_FLAG);
+      d->sampleFrames  = sampleFrames;
     }
 
     d->channels += (flags & MONO_FLAG) ? 1 : 2;
@@ -196,7 +326,6 @@ void WavPack::Properties::read(File *file, long streamLength)
     if(flags & FINAL_BLOCK)
       break;
 
-    const unsigned int blockSize = data.toUInt(4, false);
     offset += blockSize + 8;
   }
 
@@ -212,25 +341,34 @@ void WavPack::Properties::read(File *file, long streamLength)
 
 unsigned int WavPack::Properties::seekFinalIndex(File *file, long streamLength)
 {
-  const long offset = file->rfind("wvpk", streamLength);
-  if(offset == -1)
-    return 0;
+  long offset = streamLength;
 
-  file->seek(offset);
-  const ByteVector data = file->readBlock(32);
-  if(data.size() < 32)
-    return 0;
+  while (offset >= 32) {
+    offset = file->rfind("wvpk", offset - 4);
 
-  const int version = data.toShort(8, false);
-  if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS)
-    return 0;
+    if(offset == -1)
+      return 0;
 
-  const unsigned int flags = data.toUInt(24, false);
-  if(!(flags & FINAL_BLOCK))
-    return 0;
+    file->seek(offset);
+    const ByteVector data = file->readBlock(32);
+    if(data.size() < 32)
+      return 0;
 
-  const unsigned int blockIndex   = data.toUInt(16, false);
-  const unsigned int blockSamples = data.toUInt(20, false);
+    const unsigned int blockSize    = data.toUInt(4, false);
+    const unsigned int blockIndex   = data.toUInt(16, false);
+    const unsigned int blockSamples = data.toUInt(20, false);
+    const unsigned int flags        = data.toUInt(24, false);
+    const int version               = data.toShort(8, false);
 
-  return blockIndex + blockSamples;
+    // try not to trigger on a spurious "wvpk" in WavPack binary block data
+
+    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS || (blockSize & 1) ||
+      blockSize < 24 || blockSize >= 1048576 || blockSamples > 131072)
+        continue;
+
+    if (blockSamples && (flags & FINAL_BLOCK))
+      return blockIndex + blockSamples;
+  }
+
+  return 0;
 }
