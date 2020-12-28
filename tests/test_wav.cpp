@@ -28,10 +28,12 @@
 #include <id3v2tag.h>
 #include <infotag.h>
 #include <tbytevectorlist.h>
+#include <tbytevectorstream.h>
 #include <tfilestream.h>
 #include <tpropertymap.h>
 #include <wavfile.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "plainfile.h"
 #include "utils.h"
 
 using namespace std;
@@ -43,6 +45,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testPCMProperties);
   CPPUNIT_TEST(testALAWProperties);
   CPPUNIT_TEST(testFloatProperties);
+  CPPUNIT_TEST(testFloatWithoutFactChunkProperties);
   CPPUNIT_TEST(testZeroSizeDataChunk);
   CPPUNIT_TEST(testID3v2Tag);
   CPPUNIT_TEST(testSaveID3v23);
@@ -89,6 +92,25 @@ public:
   void testFloatProperties()
   {
     RIFF::WAV::File f(TEST_FILE_PATH_C("float64.wav"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(97, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(5645, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(4281U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->format());
+  }
+
+  void testFloatWithoutFactChunkProperties()
+  {
+    ByteVector wavData = PlainFile(TEST_FILE_PATH_C("float64.wav")).readAll();
+    CPPUNIT_ASSERT_EQUAL(ByteVector("fact"), wavData.mid(36, 4));
+    // Remove the fact chunk by renaming it to fakt
+    wavData[38] = 'k';
+    ByteVectorStream wavStream(wavData);
+    RIFF::WAV::File f(&wavStream);
     CPPUNIT_ASSERT(f.audioProperties());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(97, f.audioProperties()->lengthInMilliseconds());
