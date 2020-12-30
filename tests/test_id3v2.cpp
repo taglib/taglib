@@ -46,6 +46,7 @@
 #include <tpropertymap.h>
 #include <tzlib.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "plainfile.h"
 #include "utils.h"
 
 using namespace std;
@@ -781,6 +782,9 @@ public:
       tf = new ID3v2::TextIdentificationFrame("TIPL", String::Latin1);
       tf->setText(StringList().append("Producer").append("Artist 3").append("Mastering").append("Artist 4"));
       foo.ID3v2Tag()->addFrame(tf);
+      tf = new ID3v2::TextIdentificationFrame("TCON", String::Latin1);
+      tf->setText(StringList().append("51").append("Noise").append("Power Noise"));
+      foo.ID3v2Tag()->addFrame(tf);
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDRL", String::Latin1));
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDTG", String::Latin1));
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TMOO", String::Latin1));
@@ -812,6 +816,12 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[5]);
       CPPUNIT_ASSERT_EQUAL(String("Mastering"), tf->fieldList()[6]);
       CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[7]);
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TCON").front());
+      CPPUNIT_ASSERT(tf);
+      CPPUNIT_ASSERT_EQUAL(3U, tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(String("51"), tf->fieldList()[0]);
+      CPPUNIT_ASSERT_EQUAL(String("39"), tf->fieldList()[1]);
+      CPPUNIT_ASSERT_EQUAL(String("Power Noise"), tf->fieldList()[2]);
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDRL"));
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDTG"));
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TMOO"));
@@ -822,6 +832,24 @@ public:
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
 #endif
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
+    }
+    {
+      const ByteVector expectedId3v23Data(
+            "ID3" "\x03\x00\x00\x00\x00\x09\x49"
+            "TSOA" "\x00\x00\x00\x01\x00\x00\x00"
+            "TSOT" "\x00\x00\x00\x01\x00\x00\x00"
+            "TSOP" "\x00\x00\x00\x01\x00\x00\x00"
+            "TORY" "\x00\x00\x00\x05\x00\x00\x00" "2011"
+            "TYER" "\x00\x00\x00\x05\x00\x00\x00" "2012"
+            "TDAT" "\x00\x00\x00\x05\x00\x00\x00" "1704"
+            "TIME" "\x00\x00\x00\x05\x00\x00\x00" "1201"
+            "IPLS" "\x00\x00\x00\x44\x00\x00\x00" "Guitar" "\x00"
+            "Artist 1" "\x00" "Drums" "\x00" "Artist 2" "\x00" "Producer" "\x00"
+            "Artist 3" "\x00" "Mastering" "\x00" "Artist 4"
+            "TCON" "\x00\x00\x00\x14\x00\x00\x00" "(51)(39)Power Noise", 211);
+      const ByteVector actualId3v23Data =
+          PlainFile(newname.c_str()).readBlock(expectedId3v23Data.size());
+      CPPUNIT_ASSERT_EQUAL(expectedId3v23Data, actualId3v23Data);
     }
 
     ScopedFileCopy rareFramesCopy("rare_frames", ".mp3");

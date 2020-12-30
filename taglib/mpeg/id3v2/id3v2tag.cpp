@@ -597,12 +597,24 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   if(frameTCON) {
     StringList genres = frameTCON->fieldList();
     String combined;
+    String genreText;
+    const bool hasMultipleGenres = genres.size() > 1;
 
+    // If there are multiple genres, add them as multiple references to ID3v1
+    // genres if such a reference exists. The first genre for which no ID3v1
+    // genre number exists can be finally added as a refinement.
     for(StringList::ConstIterator it = genres.begin(); it != genres.end(); ++it) {
       bool ok = false;
       int number = it->toInt(&ok);
-      combined += (ok && number >= 0 && number <= 255) ? ('(' + *it + ')') : *it;
+      if((ok && number >= 0 && number <= 255) || *it == "RX" || *it == "CR")
+        combined += '(' + *it + ')';
+      else if(hasMultipleGenres && (number = ID3v1::genreIndex(*it)) != 255)
+        combined += '(' + String::number(number) + ')';
+      else if(genreText.isEmpty())
+        genreText = *it;
     }
+    if(!genreText.isEmpty())
+      combined += genreText;
 
     frameTCON = new ID3v2::TextIdentificationFrame("TCON", String::Latin1);
     frameTCON->setText(combined);
