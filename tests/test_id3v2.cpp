@@ -101,6 +101,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
+  CPPUNIT_TEST(testUpdateGenre23_3);
   CPPUNIT_TEST(testUpdateGenre24);
   CPPUNIT_TEST(testUpdateDate22);
   CPPUNIT_TEST(testDowngradeTo23);
@@ -686,7 +687,7 @@ public:
     // "Refinement" is different from the ID3v1 genre
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
     ByteVector data = ByteVector("TCON"                 // Frame ID
-                                 "\x00\x00\x00\x13"     // Frame size
+                                 "\x00\x00\x00\x0d"     // Frame size
                                  "\x00\x00"             // Frame flags
                                  "\x00"                 // Encoding
                                  "(4)Eurodisco", 23);   // Text
@@ -701,6 +702,29 @@ public:
     ID3v2::Tag tag;
     tag.addFrame(frame);
     CPPUNIT_ASSERT_EQUAL(String("Disco Eurodisco"), tag.genre());
+  }
+
+  void testUpdateGenre23_3()
+  {
+    // Multiple references and a refinement
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("TCON"                 // Frame ID
+                                 "\x00\x00\x00\x15"     // Frame size
+                                 "\x00\x00"             // Frame flags
+                                 "\x00"                 // Encoding
+                                 "(9)(138)Viking Metal", 31);   // Text
+    ID3v2::Header header;
+    header.setMajorVersion(3);
+    ID3v2::TextIdentificationFrame *frame =
+      dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
+    CPPUNIT_ASSERT_EQUAL(3U, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("9"), frame->fieldList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("138"), frame->fieldList()[1]);
+    CPPUNIT_ASSERT_EQUAL(String("Viking Metal"), frame->fieldList()[2]);
+
+    ID3v2::Tag tag;
+    tag.addFrame(frame);
+    CPPUNIT_ASSERT_EQUAL(String("Metal Black Metal Viking Metal"), tag.genre());
   }
 
   void testUpdateGenre24()

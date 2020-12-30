@@ -60,22 +60,24 @@ namespace
 
     for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
       String s = *it;
-      int end = s.find(")");
+      int offset = 0;
+      int end = 0;
 
-      if(s.startsWith("(") && end > 0) {
+      while(s.length() > offset && s[offset] == '(' &&
+            (end = s.find(")", offset + 1)) > offset) {
         // "(12)Genre"
-        String text = s.substr(end + 1);
+        const String genreCode = s.substr(offset + 1, end - 1);
+        s = s.substr(end + 1);
         bool ok;
-        int number = s.substr(1, end - 1).toInt(&ok);
-        if(ok && number >= 0 && number <= 255 && !(ID3v1::genre(number) == text))
-          newfields.append(s.substr(1, end - 1));
-        if(!text.isEmpty())
-          newfields.append(text);
+        int number = genreCode.toInt(&ok);
+        if((ok && number >= 0 && number <= 255 &&
+            !(ID3v1::genre(number) == s)) ||
+           genreCode == "RX" || genreCode == "CR")
+          newfields.append(genreCode);
       }
-      else {
+      if(!s.isEmpty())
         // "Genre" or "12"
         newfields.append(s);
-      }
     }
 
     if(newfields.isEmpty())
