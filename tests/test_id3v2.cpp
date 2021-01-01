@@ -46,6 +46,7 @@
 #include <tpropertymap.h>
 #include <tzlib.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "plainfile.h"
 #include "utils.h"
 
 using namespace std;
@@ -101,6 +102,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
+  CPPUNIT_TEST(testUpdateGenre23_3);
   CPPUNIT_TEST(testUpdateGenre24);
   CPPUNIT_TEST(testUpdateDate22);
   CPPUNIT_TEST(testDowngradeTo23);
@@ -686,7 +688,7 @@ public:
     // "Refinement" is different from the ID3v1 genre
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
     ByteVector data = ByteVector("TCON"                 // Frame ID
-                                 "\x00\x00\x00\x13"     // Frame size
+                                 "\x00\x00\x00\x0d"     // Frame size
                                  "\x00\x00"             // Frame flags
                                  "\x00"                 // Encoding
                                  "(4)Eurodisco", 23);   // Text
@@ -701,6 +703,29 @@ public:
     ID3v2::Tag tag;
     tag.addFrame(frame);
     CPPUNIT_ASSERT_EQUAL(String("Disco Eurodisco"), tag.genre());
+  }
+
+  void testUpdateGenre23_3()
+  {
+    // Multiple references and a refinement
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("TCON"                 // Frame ID
+                                 "\x00\x00\x00\x15"     // Frame size
+                                 "\x00\x00"             // Frame flags
+                                 "\x00"                 // Encoding
+                                 "(9)(138)Viking Metal", 31);   // Text
+    ID3v2::Header header;
+    header.setMajorVersion(3);
+    ID3v2::TextIdentificationFrame *frame =
+      dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
+    CPPUNIT_ASSERT_EQUAL(3U, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(String("9"), frame->fieldList()[0]);
+    CPPUNIT_ASSERT_EQUAL(String("138"), frame->fieldList()[1]);
+    CPPUNIT_ASSERT_EQUAL(String("Viking Metal"), frame->fieldList()[2]);
+
+    ID3v2::Tag tag;
+    tag.addFrame(frame);
+    CPPUNIT_ASSERT_EQUAL(String("Metal Black Metal Viking Metal"), tag.genre());
   }
 
   void testUpdateGenre24()
@@ -757,6 +782,9 @@ public:
       tf = new ID3v2::TextIdentificationFrame("TIPL", String::Latin1);
       tf->setText(StringList().append("Producer").append("Artist 3").append("Mastering").append("Artist 4"));
       foo.ID3v2Tag()->addFrame(tf);
+      tf = new ID3v2::TextIdentificationFrame("TCON", String::Latin1);
+      tf->setText(StringList().append("51").append("Noise").append("Power Noise"));
+      foo.ID3v2Tag()->addFrame(tf);
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDRL", String::Latin1));
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TDTG", String::Latin1));
       foo.ID3v2Tag()->addFrame(new ID3v2::TextIdentificationFrame("TMOO", String::Latin1));
@@ -788,6 +816,12 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[5]);
       CPPUNIT_ASSERT_EQUAL(String("Mastering"), tf->fieldList()[6]);
       CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[7]);
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TCON").front());
+      CPPUNIT_ASSERT(tf);
+      CPPUNIT_ASSERT_EQUAL(3U, tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(String("51"), tf->fieldList()[0]);
+      CPPUNIT_ASSERT_EQUAL(String("39"), tf->fieldList()[1]);
+      CPPUNIT_ASSERT_EQUAL(String("Power Noise"), tf->fieldList()[2]);
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDRL"));
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TDTG"));
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TMOO"));
@@ -798,6 +832,24 @@ public:
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSOP"));
 #endif
       CPPUNIT_ASSERT(!bar.ID3v2Tag()->frameListMap().contains("TSST"));
+    }
+    {
+      const ByteVector expectedId3v23Data(
+            "ID3" "\x03\x00\x00\x00\x00\x09\x49"
+            "TSOA" "\x00\x00\x00\x01\x00\x00\x00"
+            "TSOT" "\x00\x00\x00\x01\x00\x00\x00"
+            "TSOP" "\x00\x00\x00\x01\x00\x00\x00"
+            "TORY" "\x00\x00\x00\x05\x00\x00\x00" "2011"
+            "TYER" "\x00\x00\x00\x05\x00\x00\x00" "2012"
+            "TDAT" "\x00\x00\x00\x05\x00\x00\x00" "1704"
+            "TIME" "\x00\x00\x00\x05\x00\x00\x00" "1201"
+            "IPLS" "\x00\x00\x00\x44\x00\x00\x00" "Guitar" "\x00"
+            "Artist 1" "\x00" "Drums" "\x00" "Artist 2" "\x00" "Producer" "\x00"
+            "Artist 3" "\x00" "Mastering" "\x00" "Artist 4"
+            "TCON" "\x00\x00\x00\x14\x00\x00\x00" "(51)(39)Power Noise", 211);
+      const ByteVector actualId3v23Data =
+          PlainFile(newname.c_str()).readBlock(expectedId3v23Data.size());
+      CPPUNIT_ASSERT_EQUAL(expectedId3v23Data, actualId3v23Data);
     }
 
     ScopedFileCopy rareFramesCopy("rare_frames", ".mp3");
