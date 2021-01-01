@@ -57,6 +57,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testFileWithGarbageAppended);
   CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST(testPCMWithFactChunk);
+  CPPUNIT_TEST(testWaveFormatExtensible);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -366,6 +367,20 @@ public:
     CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
+  }
+
+  void testWaveFormatExtensible()
+  {
+    RIFF::WAV::File f(TEST_FILE_PATH_C("uint8we.wav"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(2937, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(128, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(8000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(23493U, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
   }
 
