@@ -34,6 +34,7 @@
 #include <id3v1tag.h>
 #include <id3v2tag.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "plainfile.h"
 #include "utils.h"
 
 using namespace std;
@@ -64,6 +65,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testStripTags);
   CPPUNIT_TEST(testRemoveXiphField);
   CPPUNIT_TEST(testEmptySeekTable);
+  CPPUNIT_TEST(testPictureStoredAfterComment);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -531,6 +533,83 @@ public:
       const ByteVector data = f.readBlock(4);
       CPPUNIT_ASSERT_EQUAL(ByteVector("\x03\x00\x00\x00", 4), data);
     }
+  }
+
+  void testPictureStoredAfterComment()
+  {
+    // Blank.png from https://commons.wikimedia.org/wiki/File:Blank.png
+    const unsigned char blankPngData[] = {
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+      0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02,
+      0x08, 0x06, 0x00, 0x00, 0x00, 0x9d, 0x74, 0x66, 0x1a, 0x00, 0x00, 0x00,
+      0x01, 0x73, 0x52, 0x47, 0x42, 0x00, 0xae, 0xce, 0x1c, 0xe9, 0x00, 0x00,
+      0x00, 0x04, 0x67, 0x41, 0x4d, 0x41, 0x00, 0x00, 0xb1, 0x8f, 0x0b, 0xfc,
+      0x61, 0x05, 0x00, 0x00, 0x00, 0x09, 0x70, 0x48, 0x59, 0x73, 0x00, 0x00,
+      0x0e, 0xc3, 0x00, 0x00, 0x0e, 0xc3, 0x01, 0xc7, 0x6f, 0xa8, 0x64, 0x00,
+      0x00, 0x00, 0x0c, 0x49, 0x44, 0x41, 0x54, 0x18, 0x57, 0x63, 0xc0, 0x01,
+      0x18, 0x18, 0x00, 0x00, 0x1a, 0x00, 0x01, 0x82, 0x92, 0x4d, 0x60, 0x00,
+      0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82
+    };
+    const ByteVector picData(reinterpret_cast<const char *>(blankPngData),
+                             sizeof(blankPngData));
+
+    ScopedFileCopy copy("no-tags", ".flac");
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasXiphComment());
+      CPPUNIT_ASSERT(f.pictureList().isEmpty());
+
+      FLAC::Picture *pic = new FLAC::Picture;
+      pic->setData(picData);
+      pic->setType(FLAC::Picture::FrontCover);
+      pic->setMimeType("image/png");
+      pic->setDescription("blank.png");
+      pic->setWidth(3);
+      pic->setHeight(2);
+      pic->setColorDepth(32);
+      pic->setNumColors(0);
+      f.addPicture(pic);
+      f.xiphComment(true)->setTitle("Title");
+      f.save();
+    }
+    {
+      FLAC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasXiphComment());
+      const List<FLAC::Picture *> pictures = f.pictureList();
+      CPPUNIT_ASSERT_EQUAL(1U, pictures.size());
+      CPPUNIT_ASSERT_EQUAL(picData, pictures[0]->data());
+      CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, pictures[0]->type());
+      CPPUNIT_ASSERT_EQUAL(String("image/png"), pictures[0]->mimeType());
+      CPPUNIT_ASSERT_EQUAL(String("blank.png"), pictures[0]->description());
+      CPPUNIT_ASSERT_EQUAL(3, pictures[0]->width());
+      CPPUNIT_ASSERT_EQUAL(2, pictures[0]->height());
+      CPPUNIT_ASSERT_EQUAL(32, pictures[0]->colorDepth());
+      CPPUNIT_ASSERT_EQUAL(0, pictures[0]->numColors());
+      CPPUNIT_ASSERT_EQUAL(String("Title"), f.xiphComment(false)->title());
+    }
+
+    const unsigned char expectedHeadData[] = {
+       'f',  'L',  'a',  'C', 0x00, 0x00, 0x00, 0x22, 0x12, 0x00, 0x12, 0x00,
+      0x00, 0x00, 0x0e, 0x00, 0x00, 0x10, 0x0a, 0xc4, 0x42, 0xf0, 0x00, 0x02,
+      0x7a, 0xc0, 0xa1, 0xb1, 0x41, 0xf7, 0x66, 0xe9, 0x84, 0x9a, 0xc3, 0xdb,
+      0x10, 0x30, 0xa2, 0x0a, 0x3c, 0x77, 0x04, 0x00, 0x00, 0x17, 0x00, 0x00,
+      0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0b, 0x00, 0x00, 0x00,  'T',  'I',
+       'T',  'L',  'E',  '=',  'T',  'i',  't',  'l',  'e', 0x06, 0x00, 0x00,
+      0xa9, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x09,  'i',  'm',  'a',
+       'g',  'e',  '/',  'p',  'n',  'g', 0x00, 0x00, 0x00, 0x09,  'b',  'l',
+       'a',  'n',  'k',  '.',  'p',  'n',  'g', 0x00, 0x00, 0x00, 0x03, 0x00,
+      0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00, 0x00, 0x77
+    };
+    ByteVector expectedData(reinterpret_cast<const char *>(expectedHeadData),
+                            sizeof(expectedHeadData));
+    expectedData.append(picData);
+    const ByteVector fileData = PlainFile(copy.fileName().c_str()).readAll();
+    CPPUNIT_ASSERT(fileData.startsWith(expectedData));
   }
 
 };
