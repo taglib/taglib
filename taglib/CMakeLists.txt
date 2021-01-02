@@ -24,8 +24,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/it
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
-  ${CMAKE_CURRENT_SOURCE_DIR}/dsf
-  ${CMAKE_CURRENT_SOURCE_DIR}/dsdiff
   ${taglib_SOURCE_DIR}/3rdparty
 )
 

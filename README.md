@@ -10,7 +10,7 @@ TagLib is a library for reading and editing the metadata of several
 popular audio formats. Currently it supports both ID3v1 and [ID3v2][]
 for MP3 files, [Ogg Vorbis][] comments and ID3 tags 
 in [FLAC][], MPC, Speex, WavPack, TrueAudio, WAV, AIFF, MP4, APE,
-DSF, DFF, and ASF files.
+and ASF files.
 
 TagLib is distributed under the [GNU Lesser General Public License][]
 (LGPL) and [Mozilla Public License][] (MPL). Essentially that means that
