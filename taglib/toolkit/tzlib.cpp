@@ -57,7 +57,7 @@ ByteVector zlib::decompress(const ByteVector &data)
   z_stream stream = {};
 
   if(inflateInit(&stream) != Z_OK) {
-    debug("zlib::decompress() - Failed to initizlize zlib.");
+    debug("zlib::decompress() - Failed to initialize zlib.");
     return ByteVector();
   }
 

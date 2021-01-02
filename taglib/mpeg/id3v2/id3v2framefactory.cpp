@@ -284,7 +284,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
     return f;
   }
 
-  // Synchronised lyrics/text (frames 4.9)
+  // Synchronized lyrics/text (frames 4.9)
 
   if(frameID == "SYLT") {
     SynchronizedLyricsFrame *f = new SynchronizedLyricsFrame(data, header);

@@ -566,7 +566,7 @@ void XM::File::read(bool)
     seek(patternHeaderLength - (4 + count) + dataSize, Current);
   }
 
-  StringList intrumentNames;
+  StringList instrumentNames;
   StringList sampleNames;
   unsigned int sumSampleCount = 0;
 
@@ -630,12 +630,12 @@ void XM::File::read(bool)
     else {
       offset = instrumentHeaderSize - count;
     }
-    intrumentNames.append(instrumentName);
+    instrumentNames.append(instrumentName);
     seek(offset, Current);
   }
 
   d->properties.setSampleCount(sumSampleCount);
-  String comment(intrumentNames.toString("\n"));
+  String comment(instrumentNames.toString("\n"));
   if(!sampleNames.isEmpty()) {
     comment += "\n";
     comment += sampleNames.toString("\n");

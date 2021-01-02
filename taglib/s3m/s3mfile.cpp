@@ -183,7 +183,7 @@ void S3M::File::read(bool)
   // "ultra click" and "use panning values" (if == 0xFC).
   // I don't see them in any spec, though.
   // Hm, but there is "UltraClick-removal" and some other
-  // variables in ScreamTracker IIIs GUI.
+  // variables in ScreamTracker III's GUI.
 
   seek(12, Current);
 

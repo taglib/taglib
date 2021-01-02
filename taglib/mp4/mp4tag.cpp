@@ -305,7 +305,7 @@ MP4::Tag::parseCovr(const MP4::Atom *atom)
     const int length = static_cast<int>(data.toUInt(pos));
     if(length < 12) {
       debug("MP4: Too short atom");
-      break;;
+      break;
     }
 
     const ByteVector name = data.mid(pos + 4, 4);

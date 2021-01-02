@@ -57,7 +57,7 @@ namespace TagLib {
        * \a startTime, end time \a endTime, start offset \a startOffset,
        * end offset \a endOffset and optionally a list of embedded frames,
        * whose ownership will then be taken over by this Frame, in
-       * \a embeededFrames;
+       * \a embeddedFrames;
        *
        * All times are in milliseconds.
        */

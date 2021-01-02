@@ -155,7 +155,7 @@ namespace TagLib {
        * available and returns 0 if the specified channel does not exist.
        *
        * \see setVolumeAdjustmentIndex()
-       * \see volumeAjustment()
+       * \see volumeAdjustment()
        */
       short volumeAdjustmentIndex(ChannelType type = MasterVolume) const;
 
@@ -167,7 +167,7 @@ namespace TagLib {
        * By default this sets the value for the master volume.
        *
        * \see volumeAdjustmentIndex()
-       * \see setVolumeAjustment()
+       * \see setVolumeAdjustment()
        */
       void setVolumeAdjustmentIndex(short index, ChannelType type = MasterVolume);
 
