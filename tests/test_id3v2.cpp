@@ -42,6 +42,9 @@
 #include <unknownframe.h>
 #include <chapterframe.h>
 #include <tableofcontentsframe.h>
+#include <commentsframe.h>
+#include <podcastframe.h>
+#include <privateframe.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
 #include <tzlib.h>
@@ -76,16 +79,20 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testParseAPIC);
   CPPUNIT_TEST(testParseAPIC_UTF16_BOM);
   CPPUNIT_TEST(testParseAPICv22);
+  CPPUNIT_TEST(testRenderAPIC);
   CPPUNIT_TEST(testDontRender22);
   CPPUNIT_TEST(testParseGEOB);
+  CPPUNIT_TEST(testRenderGEOB);
   CPPUNIT_TEST(testPOPMtoString);
   CPPUNIT_TEST(testParsePOPM);
   CPPUNIT_TEST(testParsePOPMWithoutCounter);
   CPPUNIT_TEST(testRenderPOPM);
   CPPUNIT_TEST(testPOPMFromFile);
   CPPUNIT_TEST(testParseRelativeVolumeFrame);
+  CPPUNIT_TEST(testRenderRelativeVolumeFrame);
   CPPUNIT_TEST(testParseUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testParseEmptyUniqueFileIdentifierFrame);
+  CPPUNIT_TEST(testRenderUniqueFileIdentifierFrame);
   CPPUNIT_TEST(testBrokenFrame1);
   CPPUNIT_TEST(testItunes24FrameSize);
   CPPUNIT_TEST(testParseUrlLinkFrame);
@@ -99,6 +106,12 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderSynchronizedLyricsFrame);
   CPPUNIT_TEST(testParseEventTimingCodesFrame);
   CPPUNIT_TEST(testRenderEventTimingCodesFrame);
+  CPPUNIT_TEST(testParseCommentsFrame);
+  CPPUNIT_TEST(testRenderCommentsFrame);
+  CPPUNIT_TEST(testParsePodcastFrame);
+  CPPUNIT_TEST(testRenderPodcastFrame);
+  CPPUNIT_TEST(testParsePrivateFrame);
+  CPPUNIT_TEST(testRenderPrivateFrame);
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
@@ -266,6 +279,26 @@ public:
     delete frame;
   }
 
+  void testRenderAPIC()
+  {
+    ID3v2::AttachedPictureFrame f;
+    f.setTextEncoding(String::UTF8);
+    f.setMimeType("image/png");
+    f.setType(ID3v2::AttachedPictureFrame::BackCover);
+    f.setDescription("Description");
+    f.setPicture("PNG data");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("APIC"
+                 "\x00\x00\x00\x20"
+                 "\x00\x00"
+                 "\x03"
+                 "image/png\x00"
+                 "\x04"
+                 "Description\x00"
+                 "PNG data", 42),
+      f.render());
+  }
+
   void testDontRender22()
   {
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
@@ -302,6 +335,26 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("m"), f.mimeType());
     CPPUNIT_ASSERT_EQUAL(String("f"), f.fileName());
     CPPUNIT_ASSERT_EQUAL(String("d"), f.description());
+  }
+
+  void testRenderGEOB()
+  {
+    ID3v2::GeneralEncapsulatedObjectFrame f;
+    f.setTextEncoding(String::Latin1);
+    f.setMimeType("application/octet-stream");
+    f.setFileName("test.bin");
+    f.setDescription("Description");
+    f.setObject(ByteVector(3, '\x01'));
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("GEOB"
+                 "\x00\x00\x00\x32"
+                 "\x00\x00"
+                 "\x00"
+                 "application/octet-stream\x00"
+                 "test.bin\x00"
+                 "Description\x00"
+                 "\x01\x01\x01", 60),
+      f.render());
   }
 
   void testParsePOPM()
@@ -392,10 +445,36 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("ident"), f.identification());
     CPPUNIT_ASSERT_EQUAL(15.0f / 512.0f,
                          f.volumeAdjustment(ID3v2::RelativeVolumeFrame::FrontRight));
+    CPPUNIT_ASSERT_EQUAL(static_cast<short>(15),
+                         f.volumeAdjustmentIndex(ID3v2::RelativeVolumeFrame::FrontRight));
     CPPUNIT_ASSERT_EQUAL((unsigned char)8,
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).bitsRepresentingPeak);
     CPPUNIT_ASSERT_EQUAL(ByteVector("\x45"),
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).peakVolume);
+    const List<ID3v2::RelativeVolumeFrame::ChannelType> channels = f.channels();
+    CPPUNIT_ASSERT_EQUAL(1U, channels.size());
+    CPPUNIT_ASSERT_EQUAL(ID3v2::RelativeVolumeFrame::FrontRight, channels[0]);
+  }
+
+  void testRenderRelativeVolumeFrame()
+  {
+    ID3v2::RelativeVolumeFrame f;
+    f.setIdentification("ident");
+    f.setVolumeAdjustment(15.0f / 512.0f, ID3v2::RelativeVolumeFrame::FrontRight);
+    ID3v2::RelativeVolumeFrame::PeakVolume peakVolume;
+    peakVolume.bitsRepresentingPeak = 8;
+    peakVolume.peakVolume.setData("\x45");
+    f.setPeakVolume(peakVolume, ID3v2::RelativeVolumeFrame::FrontRight);
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("RVA2"
+                 "\x00\x00\x00\x0B"
+                 "\x00\x00"
+                 "ident\x00"
+                 "\x02"
+                 "\x00\x0F"
+                 "\x08"
+                 "\x45", 21),
+      f.render());
   }
 
   void testParseUniqueFileIdentifierFrame()
@@ -424,6 +503,18 @@ public:
                          f.owner());
     CPPUNIT_ASSERT_EQUAL(ByteVector(),
                          f.identifier());
+  }
+
+  void testRenderUniqueFileIdentifierFrame()
+  {
+    ID3v2::UniqueFileIdentifierFrame f("owner", "\x01\x02\x03");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("UFID"
+                 "\x00\x00\x00\x09"
+                 "\x00\x00"
+                 "owner\x00"
+                 "\x01\x02\x03", 19),
+      f.render());
   }
 
   void testParseUrlLinkFrame()
@@ -632,6 +723,89 @@ public:
                  "\x00\x00\xf3\x5c"          // 1st time stamp
                  "\xfe"                      // 2nd event
                  "\x00\x36\xee\x80", 21),    // 2nd time stamp
+      f.render());
+  }
+
+  void testParseCommentsFrame()
+  {
+    ID3v2::CommentsFrame f(
+      ByteVector("COMM"
+                 "\x00\x00\x00\x14"
+                 "\x00\x00"
+                 "\x03"
+                 "deu"
+                 "Description\x00"
+                 "Text", 30));
+    CPPUNIT_ASSERT_EQUAL(String::UTF8, f.textEncoding());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), f.language());
+    CPPUNIT_ASSERT_EQUAL(String("Description"), f.description());
+    CPPUNIT_ASSERT_EQUAL(String("Text"), f.text());
+  }
+
+  void testRenderCommentsFrame()
+  {
+    ID3v2::CommentsFrame f;
+    f.setTextEncoding(String::UTF16);
+    f.setLanguage("eng");
+    f.setDescription("Description");
+    f.setText("Text");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("COMM"
+                 "\x00\x00\x00\x28"
+                 "\x00\x00"
+                 "\x01"
+                 "eng"
+                 "\xff\xfe" "D\0e\0s\0c\0r\0i\0p\0t\0i\0o\0n\0" "\x00\x00"
+                 "\xff\xfe" "T\0e\0x\0t\0", 50),
+      f.render());
+  }
+
+  void testParsePodcastFrame()
+  {
+    ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
+    ByteVector data = ByteVector("PCST"
+                                 "\x00\x00\x00\x04"
+                                 "\x00\x00"
+                                 "\x00\x00\x00\x00", 14);
+    const ID3v2::Header header;
+    CPPUNIT_ASSERT(dynamic_cast<ID3v2::PodcastFrame *>(
+                     factory->createFrame(data, &header)));
+  }
+
+  void testRenderPodcastFrame()
+  {
+    ID3v2::PodcastFrame f;
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("PCST"
+                 "\x00\x00\x00\x04"
+                 "\x00\x00"
+                 "\x00\x00\x00\x00", 14),
+      f.render());
+  }
+
+  void testParsePrivateFrame()
+  {
+    ID3v2::PrivateFrame f(
+      ByteVector("PRIV"
+                 "\x00\x00\x00\x0e"
+                 "\x00\x00"
+                 "WM/Provider\x00"
+                 "TL", 24));
+    CPPUNIT_ASSERT_EQUAL(String("WM/Provider"), f.owner());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("TL"), f.data());
+  }
+
+  void testRenderPrivateFrame()
+  {
+    ID3v2::PrivateFrame f;
+    f.setOwner("WM/Provider");
+    f.setData("TL");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("PRIV"
+                 "\x00\x00\x00\x0e"
+                 "\x00\x00"
+                 "WM/Provider\x00"
+                 "TL", 24),
       f.render());
   }
 
@@ -1246,6 +1420,16 @@ public:
     CPPUNIT_ASSERT((unsigned int)0x01 == f.embeddedFrameList().size());
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2")[0]->toString() == "TC1");
+
+    f.removeChildElement("E"); // not existing
+    CPPUNIT_ASSERT_EQUAL(2U, f.entryCount());
+    f.removeChildElement("C");
+    CPPUNIT_ASSERT_EQUAL(1U, f.entryCount());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("D"), f.childElements()[0]);
+
+    ID3v2::Frame *frame = f.embeddedFrameList("TIT2")[0];
+    f.removeEmbeddedFrame(frame);
+    CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").isEmpty());
   }
 
   void testRenderTableOfContentsFrame()

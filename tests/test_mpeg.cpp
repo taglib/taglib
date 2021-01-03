@@ -58,6 +58,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testFrameOffset);
   CPPUNIT_TEST(testStripAndProperties);
+  CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testRepeatedSave1);
   CPPUNIT_TEST(testRepeatedSave2);
   CPPUNIT_TEST(testRepeatedSave3);
@@ -292,6 +293,93 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
       f.strip(MPEG::File::ID3v1);
       CPPUNIT_ASSERT(f.properties().isEmpty());
+    }
+  }
+
+  void testProperties()
+  {
+    PropertyMap tags;
+    tags["ALBUM"] = StringList("Album");
+    tags["ALBUMARTIST"] = StringList("Album Artist");
+    tags["ALBUMARTISTSORT"] = StringList("Album Artist Sort");
+    tags["ALBUMSORT"] = StringList("Album Sort");
+    tags["ARRANGER"] = StringList("Arranger");
+    tags["ARTIST"] = StringList("Artist");
+    tags["ARTISTWEBPAGE"] = StringList("Artist Web Page");
+    tags["AUDIOSOURCEWEBPAGE"] = StringList("Audio Source Web Page");
+    tags["BPM"] = StringList("123");
+    tags["COMMENT"] = StringList("Comment");
+    tags["COMMENT:CDESC"] = StringList("Comment with Description");
+    tags["COMPOSER"] = StringList("Composer");
+    tags["CONDUCTOR"] = StringList("Conductor");
+    tags["CONTENTGROUP"] = StringList("Content Group");
+    tags["COPYRIGHT"] = StringList("2021 Copyright");
+    tags["COPYRIGHTURL"] = StringList("Copyright URL");
+    tags["DATE"] = StringList("2021-01-03 12:29:23");
+    tags["DISCNUMBER"] = StringList("3/5");
+    tags["DJMIXER"] = StringList("DJ Mixer");
+    tags["ENCODEDBY"] = StringList("Encoded by");
+    tags["ENCODING"] = StringList("Encoding");
+    tags["ENCODINGTIME"] = StringList("2021-01-03 13:48:44");
+    tags["ENGINEER"] = StringList("Engineer");
+    tags["FILETYPE"] = StringList("File Type");
+    tags["FILEWEBPAGE"] = StringList("File Web Page");
+    tags["GENRE"] = StringList("Genre");
+    tags["GROUPING"] = StringList("Grouping");
+    tags["INITIALKEY"] = StringList("Dbm");
+    tags["ISRC"] = StringList("UKAAA0500001");
+    tags["LABEL"] = StringList("Label");
+    tags["LANGUAGE"] = StringList("eng");
+    tags["LENGTH"] = StringList("1234");
+    tags["LYRICIST"] = StringList("Lyricist");
+    tags["LYRICS:LDESC"] = StringList("Lyrics");
+    tags["MEDIA"] = StringList("Media");
+    tags["MIXER"] = StringList("Mixer");
+    tags["MOOD"] = StringList("Mood");
+    tags["MOVEMENTNAME"] = StringList("Movement Name");
+    tags["MOVEMENTNUMBER"] = StringList("2");
+    tags["ORIGINALALBUM"] = StringList("Original Album");
+    tags["ORIGINALARTIST"] = StringList("Original Artist");
+    tags["ORIGINALDATE"] = StringList("2021-01-03 13:52:19");
+    tags["ORIGINALFILENAME"] = StringList("Original Filename");
+    tags["ORIGINALLYRICIST"] = StringList("Original Lyricist");
+    tags["OWNER"] = StringList("Owner");
+    tags["PAYMENTWEBPAGE"] = StringList("Payment Web Page");
+    tags["PERFORMER:DRUMS"] = StringList("Drummer");
+    tags["PERFORMER:GUITAR"] = StringList("Guitarist");
+    tags["PLAYLISTDELAY"] = StringList("10");
+    tags["PODCAST"] = StringList();
+    tags["PODCASTCATEGORY"] = StringList("Podcast Category");
+    tags["PODCASTDESC"] = StringList("Podcast Description");
+    tags["PODCASTID"] = StringList("Podcast ID");
+    tags["PODCASTURL"] = StringList("Podcast URL");
+    tags["PRODUCEDNOTICE"] = StringList("2021 Produced Notice");
+    tags["PRODUCER"] = StringList("Producer");
+    tags["PUBLISHERWEBPAGE"] = StringList("Publisher Web Page");
+    tags["RADIOSTATION"] = StringList("Radio Station");
+    tags["RADIOSTATIONOWNER"] = StringList("Radio Station Owner");
+    tags["REMIXER"] = StringList("Remixer");
+    tags["SUBTITLE"] = StringList("Subtitle");
+    tags["TITLE"] = StringList("Title");
+    tags["TITLESORT"] = StringList("Title Sort");
+    tags["TRACKNUMBER"] = StringList("2/4");
+    tags["URL:UDESC"] = StringList("URL");
+
+    ScopedFileCopy copy("xing", ".mp3");
+    {
+      MPEG::File f(copy.fileName().c_str());
+      PropertyMap properties = f.properties();
+      CPPUNIT_ASSERT(properties.isEmpty());
+      f.setProperties(tags);
+      f.save();
+    }
+    {
+      const MPEG::File f(copy.fileName().c_str());
+      PropertyMap properties = f.properties();
+      if (tags != properties) {
+        CPPUNIT_ASSERT_EQUAL(tags.toString(), properties.toString());
+      }
+      CPPUNIT_ASSERT(tags == properties);
     }
   }
 
