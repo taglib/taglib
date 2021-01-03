@@ -366,6 +366,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("ogg");
   l.append("flac");
   l.append("oga");
+  l.append("opus");
   l.append("mp3");
   l.append("mpc");
   l.append("wv");
@@ -382,6 +383,8 @@ StringList FileRef::defaultFileExtensions()
   l.append("asf");
   l.append("aif");
   l.append("aiff");
+  l.append("afc");
+  l.append("aifc");
   l.append("wav");
   l.append("ape");
   l.append("mod");
