@@ -40,6 +40,7 @@
 #include "frames/commentsframe.h"
 #include "frames/uniquefileidentifierframe.h"
 #include "frames/unknownframe.h"
+#include "frames/podcastframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -120,6 +121,8 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
         UrlLinkFrame* frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;
+    } else if(frameID == "PCST") {
+      return new PodcastFrame();
     }
   }
   if(key == "MUSICBRAINZ_TRACKID" && values.size() == 1) {
@@ -490,6 +493,8 @@ PropertyMap Frame::asProperties() const
     return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
   else if(id == "UFID")
     return dynamic_cast< const UniqueFileIdentifierFrame* >(this)->asProperties();
+  else if(id == "PCST")
+    return dynamic_cast< const PodcastFrame* >(this)->asProperties();
   PropertyMap m;
   m.unsupportedData().append(id);
   return m;
