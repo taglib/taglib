@@ -347,7 +347,7 @@ namespace
     { "TEXT", "LYRICIST" },
     { "TFLT", "FILETYPE" },
     //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
-    { "TIT1", "CONTENTGROUP" },
+    { "TIT1", "CONTENTGROUP" }, // 'Work' in iTunes
     { "TIT2", "TITLE"},
     { "TIT3", "SUBTITLE" },
     { "TKEY", "INITIALKEY" },
@@ -372,6 +372,7 @@ namespace
     { "TRSN", "RADIOSTATION" },
     { "TRSO", "RADIOSTATIONOWNER" },
     { "TSOA", "ALBUMSORT" },
+    { "TSOC", "COMPOSERSORT" },
     { "TSOP", "ARTISTSORT" },
     { "TSOT", "TITLESORT" },
     { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes

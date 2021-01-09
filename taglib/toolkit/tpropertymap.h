@@ -68,6 +68,7 @@ namespace TagLib {
    *  - ALBUMSORT
    *  - ARTISTSORT
    *  - ALBUMARTISTSORT
+   *  - COMPOSERSORT
    *
    * Credits:
    *
