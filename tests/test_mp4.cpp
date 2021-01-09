@@ -59,6 +59,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testCovrWrite);
   CPPUNIT_TEST(testCovrRead2);
   CPPUNIT_TEST(testProperties);
+  CPPUNIT_TEST(testPropertiesAllSupported);
   CPPUNIT_TEST(testPropertiesMovement);
   CPPUNIT_TEST(testFuzzedFile);
   CPPUNIT_TEST(testRepeatedSave);
@@ -424,6 +425,91 @@ public:
     tags["BPM"] = StringList();
     tags["COMPILATION"] = StringList();
     f.setProperties(tags);
+  }
+
+  void testPropertiesAllSupported()
+  {
+    PropertyMap tags;
+    tags["ALBUM"] = StringList("Album");
+    tags["ALBUMARTIST"] = StringList("Album Artist");
+    tags["ALBUMARTISTSORT"] = StringList("Album Artist Sort");
+    tags["ALBUMSORT"] = StringList("Album Sort");
+    tags["ARTIST"] = StringList("Artist");
+    tags["ARTISTSORT"] = StringList("Artist Sort");
+    tags["ASIN"] = StringList("ASIN");
+    tags["BARCODE"] = StringList("Barcode");
+    tags["BPM"] = StringList("123");
+    tags["CATALOGNUMBER"] = StringList("Catalog Number");
+    tags["COMMENT"] = StringList("Comment");
+    tags["COMPILATION"] = StringList("1");
+    tags["COMPOSER"] = StringList("Composer");
+    tags["COMPOSERSORT"] = StringList("Composer Sort");
+    tags["CONDUCTOR"] = StringList("Conductor");
+    tags["COPYRIGHT"] = StringList("2021 Copyright");
+    tags["DATE"] = StringList("2021-01-03 12:29:23");
+    tags["DISCNUMBER"] = StringList("3/5");
+    tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
+    tags["DJMIXER"] = StringList("DJ Mixer");
+    tags["ENCODEDBY"] = StringList("Encoded by");
+    tags["ENGINEER"] = StringList("Engineer");
+    tags["GAPLESSPLAYBACK"] = StringList("1");
+    tags["GENRE"] = StringList("Genre");
+    tags["GROUPING"] = StringList("Grouping");
+    tags["ISRC"] = StringList("UKAAA0500001");
+    tags["LABEL"] = StringList("Label");
+    tags["LANGUAGE"] = StringList("eng");
+    tags["LICENSE"] = StringList("License");
+    tags["LYRICIST"] = StringList("Lyricist");
+    tags["LYRICS"] = StringList("Lyrics");
+    tags["MEDIA"] = StringList("Media");
+    tags["MIXER"] = StringList("Mixer");
+    tags["MOOD"] = StringList("Mood");
+    tags["MOVEMENTCOUNT"] = StringList("3");
+    tags["MOVEMENTNAME"] = StringList("Movement Name");
+    tags["MOVEMENTNUMBER"] = StringList("2");
+    tags["MUSICBRAINZ_ALBUMARTISTID"] = StringList("MusicBrainz_AlbumartistID");
+    tags["MUSICBRAINZ_ALBUMID"] = StringList("MusicBrainz_AlbumID");
+    tags["MUSICBRAINZ_ARTISTID"] = StringList("MusicBrainz_ArtistID");
+    tags["MUSICBRAINZ_RELEASEGROUPID"] = StringList("MusicBrainz_ReleasegroupID");
+    tags["MUSICBRAINZ_TRACKID"] = StringList("MusicBrainz_TrackID");
+    tags["MUSICBRAINZ_WORKID"] = StringList("MusicBrainz_WorkID");
+    tags["PODCAST"] = StringList("1");
+    tags["PODCASTCATEGORY"] = StringList("Podcast Category");
+    tags["PODCASTDESC"] = StringList("Podcast Description");
+    tags["PODCASTID"] = StringList("Podcast ID");
+    tags["PODCASTURL"] = StringList("Podcast URL");
+    tags["PRODUCER"] = StringList("Producer");
+    tags["REMIXER"] = StringList("Remixer");
+    tags["SCRIPT"] = StringList("Script");
+    tags["SHOWSORT"] = StringList("Show Sort");
+    tags["SHOWWORKMOVEMENT"] = StringList("1");
+    tags["SUBTITLE"] = StringList("Subtitle");
+    tags["TITLE"] = StringList("Title");
+    tags["TITLESORT"] = StringList("Title Sort");
+    tags["TRACKNUMBER"] = StringList("2/4");
+    tags["TVEPISODE"] = StringList("3");
+    tags["TVEPISODEID"] = StringList("TV Episode ID");
+    tags["TVNETWORK"] = StringList("TV Network");
+    tags["TVSEASON"] = StringList("2");
+    tags["TVSHOW"] = StringList("TV Show");
+    tags["WORK"] = StringList("Work");
+
+    ScopedFileCopy copy("no-tags", ".m4a");
+    {
+      MP4::File f(copy.fileName().c_str());
+      PropertyMap properties = f.properties();
+      CPPUNIT_ASSERT(properties.isEmpty());
+      f.setProperties(tags);
+      f.save();
+    }
+    {
+      const MP4::File f(copy.fileName().c_str());
+      PropertyMap properties = f.properties();
+      if (tags != properties) {
+        CPPUNIT_ASSERT_EQUAL(tags.toString(), properties.toString());
+      }
+      CPPUNIT_ASSERT(tags == properties);
+    }
   }
 
   void testPropertiesMovement()

@@ -895,6 +895,17 @@ namespace
     { "soco", "COMPOSERSORT" },
     { "sosn", "SHOWSORT" },
     { "shwm", "SHOWWORKMOVEMENT" },
+    { "pgap", "GAPLESSPLAYBACK" },
+    { "pcst", "PODCAST" },
+    { "catg", "PODCASTCATEGORY" },
+    { "desc", "PODCASTDESC" },
+    { "egid", "PODCASTID" },
+    { "purl", "PODCASTURL" },
+    { "tves", "TVEPISODE" },
+    { "tven", "TVEPISODEID" },
+    { "tvnn", "TVNETWORK" },
+    { "tvsn", "TVSEASON" },
+    { "tvsh", "TVSHOW" },
     { "\251wrk", "WORK" },
     { "\251mvn", "MOVEMENTNAME" },
     { "\251mvi", "MOVEMENTNUMBER" },
@@ -952,10 +963,12 @@ PropertyMap MP4::Tag::properties() const
         }
         props[key] = value;
       }
-      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT") {
+      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT" ||
+              key == "TVEPISODE" || key == "TVSEASON") {
         props[key] = String::number(it->second.toInt());
       }
-      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT") {
+      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT" ||
+              key == "GAPLESSPLAYBACK" || key == "PODCAST") {
         props[key] = String::number(it->second.toBool());
       }
       else {
@@ -1007,11 +1020,15 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
           d->items[name] = MP4::Item(first, second);
         }
       }
-      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" || it->first == "MOVEMENTCOUNT") && !it->second.isEmpty()) {
+      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" ||
+               it->first == "MOVEMENTCOUNT" || it->first == "TVEPISODE" ||
+               it->first == "TVSEASON") && !it->second.isEmpty()) {
         int value = it->second.front().toInt();
         d->items[name] = MP4::Item(value);
       }
-      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT") && !it->second.isEmpty()) {
+      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT" ||
+               it->first == "GAPLESSPLAYBACK" || it->first == "PODCAST") &&
+              !it->second.isEmpty()) {
         bool value = (it->second.front().toInt() != 0);
         d->items[name] = MP4::Item(value);
       }
