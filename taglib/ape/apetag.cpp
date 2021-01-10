@@ -215,7 +215,9 @@ namespace
                                       {"DATE",        "YEAR"        },
                                       {"ALBUMARTIST", "ALBUM ARTIST"},
                                       {"DISCNUMBER",  "DISC"        },
-                                      {"REMIXER",     "MIXARTIST"   }};
+                                      {"REMIXER",     "MIXARTIST"   },
+                                      {"RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS" },
+                                      {"RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE" }};
   const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);
 }
 

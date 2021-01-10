@@ -435,6 +435,7 @@ public:
     tags["ALBUMARTISTSORT"] = StringList("Album Artist Sort");
     tags["ALBUMSORT"] = StringList("Album Sort");
     tags["ARTIST"] = StringList("Artist");
+    tags["ARTISTS"] = StringList("Artists");
     tags["ARTISTSORT"] = StringList("Artist Sort");
     tags["ASIN"] = StringList("ASIN");
     tags["BARCODE"] = StringList("Barcode");
@@ -471,14 +472,19 @@ public:
     tags["MUSICBRAINZ_ALBUMID"] = StringList("MusicBrainz_AlbumID");
     tags["MUSICBRAINZ_ARTISTID"] = StringList("MusicBrainz_ArtistID");
     tags["MUSICBRAINZ_RELEASEGROUPID"] = StringList("MusicBrainz_ReleasegroupID");
+    tags["MUSICBRAINZ_RELEASETRACKID"] = StringList("MusicBrainz_ReleasetrackID");
     tags["MUSICBRAINZ_TRACKID"] = StringList("MusicBrainz_TrackID");
     tags["MUSICBRAINZ_WORKID"] = StringList("MusicBrainz_WorkID");
+    tags["ORIGINALDATE"] = StringList("2021-01-03 13:52:19");
     tags["PODCAST"] = StringList("1");
     tags["PODCASTCATEGORY"] = StringList("Podcast Category");
     tags["PODCASTDESC"] = StringList("Podcast Description");
     tags["PODCASTID"] = StringList("Podcast ID");
     tags["PODCASTURL"] = StringList("Podcast URL");
     tags["PRODUCER"] = StringList("Producer");
+    tags["RELEASECOUNTRY"] = StringList("Release Country");
+    tags["RELEASESTATUS"] = StringList("Release Status");
+    tags["RELEASETYPE"] = StringList("Release Type");
     tags["REMIXER"] = StringList("Remixer");
     tags["SCRIPT"] = StringList("Script");
     tags["SHOWSORT"] = StringList("Show Sort");

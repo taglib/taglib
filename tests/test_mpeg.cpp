@@ -347,6 +347,7 @@ public:
     tags["MUSICBRAINZ_ALBUMARTISTID"] = StringList("MusicBrainz_AlbumartistID");
     tags["MUSICBRAINZ_ARTISTID"] = StringList("MusicBrainz_ArtistID");
     tags["MUSICBRAINZ_RELEASEGROUPID"] = StringList("MusicBrainz_ReleasegroupID");
+    tags["MUSICBRAINZ_RELEASETRACKID"] = StringList("MusicBrainz_ReleasetrackID");
     tags["MUSICBRAINZ_TRACKID"] = StringList("MusicBrainz_TrackID");
     tags["MUSICBRAINZ_WORKID"] = StringList("MusicBrainz_WorkID");
     tags["ORIGINALALBUM"] = StringList("Original Album");
@@ -369,6 +370,9 @@ public:
     tags["PUBLISHERWEBPAGE"] = StringList("Publisher Web Page");
     tags["RADIOSTATION"] = StringList("Radio Station");
     tags["RADIOSTATIONOWNER"] = StringList("Radio Station Owner");
+    tags["RELEASECOUNTRY"] = StringList("Release Country");
+    tags["RELEASESTATUS"] = StringList("Release Status");
+    tags["RELEASETYPE"] = StringList("Release Type");
     tags["REMIXER"] = StringList("Remixer");
     tags["SCRIPT"] = StringList("Script");
     tags["SUBTITLE"] = StringList("Subtitle");
