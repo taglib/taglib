@@ -40,6 +40,7 @@
 #include "frames/commentsframe.h"
 #include "frames/uniquefileidentifierframe.h"
 #include "frames/unknownframe.h"
+#include "frames/podcastframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -120,6 +121,8 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
         UrlLinkFrame* frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;
+    } else if(frameID == "PCST") {
+      return new PodcastFrame();
     }
   }
   if(key == "MUSICBRAINZ_TRACKID" && values.size() == 1) {
@@ -344,7 +347,7 @@ namespace
     { "TEXT", "LYRICIST" },
     { "TFLT", "FILETYPE" },
     //{ "TIPL", "INVOLVEDPEOPLE" }, handled separately
-    { "TIT1", "CONTENTGROUP" },
+    { "TIT1", "CONTENTGROUP" }, // 'Work' in iTunes
     { "TIT2", "TITLE"},
     { "TIT3", "SUBTITLE" },
     { "TKEY", "INITIALKEY" },
@@ -369,6 +372,7 @@ namespace
     { "TRSN", "RADIOSTATION" },
     { "TRSO", "RADIOSTATIONOWNER" },
     { "TSOA", "ALBUMSORT" },
+    { "TSOC", "COMPOSERSORT" },
     { "TSOP", "ARTISTSORT" },
     { "TSOT", "TITLESORT" },
     { "TSO2", "ALBUMARTISTSORT" }, // non-standard, used by iTunes
@@ -402,7 +406,11 @@ namespace
     { "MUSICBRAINZ ALBUM ID",         "MUSICBRAINZ_ALBUMID" },
     { "MUSICBRAINZ ARTIST ID",        "MUSICBRAINZ_ARTISTID" },
     { "MUSICBRAINZ ALBUM ARTIST ID",  "MUSICBRAINZ_ALBUMARTISTID" },
+    { "MUSICBRAINZ ALBUM RELEASE COUNTRY", "RELEASECOUNTRY" },
+    { "MUSICBRAINZ ALBUM STATUS", "RELEASESTATUS" },
+    { "MUSICBRAINZ ALBUM TYPE", "RELEASETYPE" },
     { "MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "MUSICBRAINZ RELEASE TRACK ID", "MUSICBRAINZ_RELEASETRACKID" },
     { "MUSICBRAINZ WORK ID",          "MUSICBRAINZ_WORKID" },
     { "ACOUSTID ID",                  "ACOUSTID_ID" },
     { "ACOUSTID FINGERPRINT",         "ACOUSTID_FINGERPRINT" },
@@ -490,6 +498,8 @@ PropertyMap Frame::asProperties() const
     return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
   else if(id == "UFID")
     return dynamic_cast< const UniqueFileIdentifierFrame* >(this)->asProperties();
+  else if(id == "PCST")
+    return dynamic_cast< const PodcastFrame* >(this)->asProperties();
   PropertyMap m;
   m.unsupportedData().append(id);
   return m;

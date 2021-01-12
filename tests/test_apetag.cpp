@@ -79,6 +79,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(2u, tag.itemListMap()["ARTIST"].values().size());
     CPPUNIT_ASSERT_EQUAL(String("artist 1 artist 2"), tag.artist());
     CPPUNIT_ASSERT_EQUAL(17u, tag.track());
+    const APE::Item &textItem = tag.itemListMap()["TRACK"];
+    CPPUNIT_ASSERT_EQUAL(APE::Item::Text, textItem.type());
+    CPPUNIT_ASSERT(!textItem.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(9 + 5 + 2, textItem.size());
   }
 
   void testPropertyInterface2()
@@ -89,6 +93,8 @@ public:
 
     APE::Item item2 = APE::Item();
     item2.setType(APE::Item::Binary);
+    ByteVector binaryData1("first");
+    item2.setBinaryData(binaryData1);
     tag.setItem("TESTBINARY", item2);
 
     PropertyMap properties = tag.properties();
@@ -96,6 +102,16 @@ public:
     CPPUNIT_ASSERT(properties.contains("TRACKNUMBER"));
     CPPUNIT_ASSERT(!properties.contains("TRACK"));
     CPPUNIT_ASSERT(tag.itemListMap().contains("TESTBINARY"));
+    CPPUNIT_ASSERT_EQUAL(binaryData1,
+                         tag.itemListMap()["TESTBINARY"].binaryData());
+    ByteVector binaryData2("second");
+    tag.setData("TESTBINARY", binaryData2);
+    const APE::Item &binaryItem = tag.itemListMap()["TESTBINARY"];
+    CPPUNIT_ASSERT_EQUAL(APE::Item::Binary, binaryItem.type());
+    CPPUNIT_ASSERT(!binaryItem.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(9 + 10 + static_cast<int>(binaryData2.size()),
+                         binaryItem.size());
+    CPPUNIT_ASSERT_EQUAL(binaryData2, binaryItem.binaryData());
 
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(!tag.itemListMap().contains("TESTBINARY"));

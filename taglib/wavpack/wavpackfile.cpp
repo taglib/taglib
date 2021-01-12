@@ -263,7 +263,7 @@ void WavPack::File::read(bool readProperties)
     d->APELocation = d->APELocation + APE::Footer::size() - d->APESize;
   }
 
-  if(d->ID3v1Location >= 0)
+  if(d->ID3v1Location < 0)
     APETag(true);
 
   // Look for WavPack audio properties

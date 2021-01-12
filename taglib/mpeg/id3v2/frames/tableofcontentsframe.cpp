@@ -168,7 +168,8 @@ void TableOfContentsFrame::removeChildElement(const ByteVector &cE)
   if(it == d->childElements.end())
     it = d->childElements.find(cE + ByteVector("\0"));
 
-  d->childElements.erase(it);
+  if(it != d->childElements.end())
+    d->childElements.erase(it);
 }
 
 const FrameListMap &TableOfContentsFrame::embeddedFrameListMap() const
@@ -196,11 +197,14 @@ void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 {
   // remove the frame from the frame list
   FrameList::Iterator it = d->embeddedFrameList.find(frame);
-  d->embeddedFrameList.erase(it);
+  if(it != d->embeddedFrameList.end())
+    d->embeddedFrameList.erase(it);
 
   // ...and from the frame list map
-  it = d->embeddedFrameListMap[frame->frameID()].find(frame);
-  d->embeddedFrameListMap[frame->frameID()].erase(it);
+  FrameList &mappedList = d->embeddedFrameListMap[frame->frameID()];
+  it = mappedList.find(frame);
+  if(it != mappedList.end())
+    mappedList.erase(it);
 
   // ...and delete as desired
   if(del)

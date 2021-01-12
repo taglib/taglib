@@ -895,6 +895,17 @@ namespace
     { "soco", "COMPOSERSORT" },
     { "sosn", "SHOWSORT" },
     { "shwm", "SHOWWORKMOVEMENT" },
+    { "pgap", "GAPLESSPLAYBACK" },
+    { "pcst", "PODCAST" },
+    { "catg", "PODCASTCATEGORY" },
+    { "desc", "PODCASTDESC" },
+    { "egid", "PODCASTID" },
+    { "purl", "PODCASTURL" },
+    { "tves", "TVEPISODE" },
+    { "tven", "TVEPISODEID" },
+    { "tvnn", "TVNETWORK" },
+    { "tvsn", "TVSEASON" },
+    { "tvsh", "TVSHOW" },
     { "\251wrk", "WORK" },
     { "\251mvn", "MOVEMENTNAME" },
     { "\251mvi", "MOVEMENTNUMBER" },
@@ -904,7 +915,13 @@ namespace
     { "----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID" },
     { "----:com.apple.iTunes:MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
     { "----:com.apple.iTunes:MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
+    { "----:com.apple.iTunes:MusicBrainz Release Track Id", "MUSICBRAINZ_RELEASETRACKID" },
     { "----:com.apple.iTunes:MusicBrainz Work Id", "MUSICBRAINZ_WORKID" },
+    { "----:com.apple.iTunes:MusicBrainz Album Release Country", "RELEASECOUNTRY" },
+    { "----:com.apple.iTunes:MusicBrainz Album Status", "RELEASESTATUS" },
+    { "----:com.apple.iTunes:MusicBrainz Album Type", "RELEASETYPE" },
+    { "----:com.apple.iTunes:ARTISTS", "ARTISTS" },
+    { "----:com.apple.iTunes:originaldate", "ORIGINALDATE" },
     { "----:com.apple.iTunes:ASIN", "ASIN" },
     { "----:com.apple.iTunes:LABEL", "LABEL" },
     { "----:com.apple.iTunes:LYRICIST", "LYRICIST" },
@@ -952,10 +969,12 @@ PropertyMap MP4::Tag::properties() const
         }
         props[key] = value;
       }
-      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT") {
+      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT" ||
+              key == "TVEPISODE" || key == "TVSEASON") {
         props[key] = String::number(it->second.toInt());
       }
-      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT") {
+      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT" ||
+              key == "GAPLESSPLAYBACK" || key == "PODCAST") {
         props[key] = String::number(it->second.toBool());
       }
       else {
@@ -1007,11 +1026,15 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
           d->items[name] = MP4::Item(first, second);
         }
       }
-      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" || it->first == "MOVEMENTCOUNT") && !it->second.isEmpty()) {
+      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" ||
+               it->first == "MOVEMENTCOUNT" || it->first == "TVEPISODE" ||
+               it->first == "TVSEASON") && !it->second.isEmpty()) {
         int value = it->second.front().toInt();
         d->items[name] = MP4::Item(value);
       }
-      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT") && !it->second.isEmpty()) {
+      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT" ||
+               it->first == "GAPLESSPLAYBACK" || it->first == "PODCAST") &&
+              !it->second.isEmpty()) {
         bool value = (it->second.front().toInt() != 0);
         d->items[name] = MP4::Item(value);
       }

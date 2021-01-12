@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "podcastframe.h"
+#include <tpropertymap.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -53,6 +54,13 @@ PodcastFrame::~PodcastFrame()
 String PodcastFrame::toString() const
 {
   return String();
+}
+
+PropertyMap PodcastFrame::asProperties() const
+{
+  PropertyMap map;
+  map.insert("PODCAST", StringList());
+  return map;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

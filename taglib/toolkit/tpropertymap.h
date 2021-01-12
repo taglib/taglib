@@ -68,6 +68,7 @@ namespace TagLib {
    *  - ALBUMSORT
    *  - ARTISTSORT
    *  - ALBUMARTISTSORT
+   *  - COMPOSERSORT
    *
    * Credits:
    *
@@ -90,12 +91,16 @@ namespace TagLib {
    *  - LABEL
    *  - CATALOGNUMBER
    *  - BARCODE
+   *  - RELEASECOUNTRY
+   *  - RELEASESTATUS
+   *  - RELEASETYPE
    *
    * MusicBrainz identifiers:
    *
    *  - MUSICBRAINZ_TRACKID
    *  - MUSICBRAINZ_ALBUMID
    *  - MUSICBRAINZ_RELEASEGROUPID
+   *  - MUSICBRAINZ_RELEASETRACKID
    *  - MUSICBRAINZ_WORKID
    *  - MUSICBRAINZ_ARTISTID
    *  - MUSICBRAINZ_ALBUMARTISTID

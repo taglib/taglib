@@ -55,7 +55,7 @@ PrivateFrame::PrivateFrame(const ByteVector &data) :
   Frame(data),
   d(new PrivateFramePrivate())
 {
-  setData(data);
+  Frame::setData(data);
 }
 
 PrivateFrame::~PrivateFrame()

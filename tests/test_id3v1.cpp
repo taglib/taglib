@@ -67,6 +67,8 @@ public:
   {
     CPPUNIT_ASSERT_EQUAL(String("Darkwave"), ID3v1::genre(50));
     CPPUNIT_ASSERT_EQUAL(100, ID3v1::genreIndex("Humour"));
+    CPPUNIT_ASSERT(ID3v1::genreList().contains("Heavy Metal"));
+    CPPUNIT_ASSERT_EQUAL(79, ID3v1::genreMap()["Hard Rock"]);
   }
 
   void testRenamedGenres()

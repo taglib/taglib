@@ -63,7 +63,10 @@ TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const Property
   TextIdentificationFrame *frame = new TextIdentificationFrame("TIPL");
   StringList l;
   for(PropertyMap::ConstIterator it = properties.begin(); it != properties.end(); ++it){
-    l.append(it->first);
+    const String role = involvedPeopleMap()[it->first];
+    if(role.isEmpty()) // should not happen
+      continue;
+    l.append(role);
     l.append(it->second.toString(",")); // comma-separated list of names
   }
   frame->setText(l);
