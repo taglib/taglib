@@ -1554,6 +1554,57 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("toc_many_children.mp3"));
     CPPUNIT_ASSERT(f.isValid());
+
+    ID3v2::Tag *tag = f.ID3v2Tag();
+    const ID3v2::FrameList &frames = tag->frameList();
+    CPPUNIT_ASSERT_EQUAL(130U, frames.size());
+    int i = 0;
+    for(ID3v2::FrameList::ConstIterator it = frames.begin(); it != frames.end();
+        ++it, ++i) {
+      if(i > 0) {
+        CPPUNIT_ASSERT_EQUAL(ByteVector("CHAP"), (*it)->frameID());
+        const ID3v2::ChapterFrame *chapFrame =
+            dynamic_cast<const ID3v2::ChapterFrame *>(*it);
+        CPPUNIT_ASSERT_EQUAL(ByteVector("chapter") +
+                             ByteVector(String::number(i - 1).toCString()),
+                             chapFrame->elementID());
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(100 * i),
+                             chapFrame->startTime());
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(100 * i),
+                             chapFrame->endTime());
+        const ID3v2::FrameList &embeddedFrames = chapFrame->embeddedFrameList();
+        CPPUNIT_ASSERT_EQUAL(1U, embeddedFrames.size());
+        const ID3v2::TextIdentificationFrame *tit2Frame =
+            dynamic_cast<const ID3v2::TextIdentificationFrame *>(
+              embeddedFrames.front());
+        CPPUNIT_ASSERT(tit2Frame);
+        CPPUNIT_ASSERT_EQUAL(String("Marker ") + String::number(i),
+                             tit2Frame->fieldList().front());
+      }
+      else {
+        CPPUNIT_ASSERT_EQUAL(ByteVector("CTOC"), (*it)->frameID());
+        const ID3v2::TableOfContentsFrame *ctocFrame =
+            dynamic_cast<const ID3v2::TableOfContentsFrame *>(*it);
+        CPPUNIT_ASSERT_EQUAL(ByteVector("toc"), ctocFrame->elementID());
+        CPPUNIT_ASSERT(!ctocFrame->isTopLevel());
+        CPPUNIT_ASSERT(!ctocFrame->isOrdered());
+        CPPUNIT_ASSERT_EQUAL(129U, ctocFrame->entryCount());
+        const ID3v2::FrameList &embeddedFrames = ctocFrame->embeddedFrameList();
+        CPPUNIT_ASSERT_EQUAL(1U, embeddedFrames.size());
+        const ID3v2::TextIdentificationFrame *tit2Frame =
+            dynamic_cast<const ID3v2::TextIdentificationFrame *>(
+              embeddedFrames.front());
+        CPPUNIT_ASSERT(tit2Frame);
+        CPPUNIT_ASSERT_EQUAL(StringList("toplevel toc"), tit2Frame->fieldList());
+      }
+    }
+
+    CPPUNIT_ASSERT(!ID3v2::ChapterFrame::findByElementID(tag, "chap2"));
+    CPPUNIT_ASSERT(ID3v2::ChapterFrame::findByElementID(tag, "chapter2"));
+
+    CPPUNIT_ASSERT(!ID3v2::TableOfContentsFrame::findTopLevel(tag));
+    CPPUNIT_ASSERT(!ID3v2::TableOfContentsFrame::findByElementID(tag, "ctoc"));
+    CPPUNIT_ASSERT(ID3v2::TableOfContentsFrame::findByElementID(tag, "toc"));
   }
 
 };

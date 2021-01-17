@@ -151,6 +151,14 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
       f.strip(MPC::File::ID3v1);
       CPPUNIT_ASSERT(f.properties().isEmpty());
+      f.save();
+    }
+    {
+      MPC::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasAPETag());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.properties()["TITLE"].isEmpty());
+      CPPUNIT_ASSERT(f.properties().isEmpty());
     }
   }
 

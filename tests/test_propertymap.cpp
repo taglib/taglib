@@ -89,6 +89,19 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Test Artist 2"), tag.artist());
     CPPUNIT_ASSERT_EQUAL(5U, tag.track());
 
+    PropertyMap props = tag.properties();
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Artist 2"), props.find("ARTIST")->second);
+    CPPUNIT_ASSERT(props.find("COMMENT") == props.end());
+    props.replace("ARTIST", StringList("Test Artist 3"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Artist 3"), props["ARTIST"]);
+
+    PropertyMap eraseMap;
+    eraseMap.insert("ARTIST", StringList());
+    eraseMap.insert("ALBUM", StringList());
+    eraseMap.insert("TITLE", StringList());
+    props.erase(eraseMap);
+    CPPUNIT_ASSERT_EQUAL(String("DATE=2015\nTRACKNUMBER=5\n"), props.toString());
+
     tag.setProperties(PropertyMap());
 
     CPPUNIT_ASSERT_EQUAL(String(""), tag.title());

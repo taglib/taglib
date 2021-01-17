@@ -86,10 +86,20 @@ public:
     }
     {
       TrueAudio::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.hasID3v1Tag());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String("ID3v2"), f.properties()["TITLE"].front());
       f.strip(TrueAudio::File::ID3v2);
       CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
       f.strip(TrueAudio::File::ID3v1);
+      CPPUNIT_ASSERT(f.properties().isEmpty());
+      f.save();
+    }
+    {
+      TrueAudio::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.properties()["TITLE"].isEmpty());
       CPPUNIT_ASSERT(f.properties().isEmpty());
     }
   }
