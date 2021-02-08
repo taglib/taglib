@@ -48,6 +48,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDictInterface2);
   CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testPageChecksum);
+  CPPUNIT_TEST(testPageGranulePosition);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -222,6 +223,33 @@ public:
 
   }
 
+  void testPageGranulePosition()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    {
+      Vorbis::File f(copy.fileName().c_str());
+      // Force the Vorbis comment packet to span more than one page and
+      // check if the granule position is -1 indicating that no packets
+      // finish on this page.
+      f.tag()->setComment(String(ByteVector(70000, 'A')));
+      f.save();
+
+      f.seek(0x3a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("OggS\0\0", 6), f.readBlock(6));
+      CPPUNIT_ASSERT_EQUAL(static_cast<long long>(-1), f.readBlock(8).toLongLong());
+    }
+    {
+      Vorbis::File f(copy.fileName().c_str());
+      // Use a small Vorbis comment package which ends on the seconds page and
+      // check if the granule position is zero.
+      f.tag()->setComment("A small comment");
+      f.save();
+
+      f.seek(0x3a);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("OggS\0\0", 6), f.readBlock(6));
+      CPPUNIT_ASSERT_EQUAL(static_cast<long long>(0), f.readBlock(8).toLongLong());
+    }
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestOGG);
