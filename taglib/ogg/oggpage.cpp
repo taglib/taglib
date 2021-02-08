@@ -305,4 +305,10 @@ Ogg::Page::Page(const ByteVectorList &packets,
   }
   d->packets = packets;
   d->header.setPacketSizes(packetSizes);
+
+  // https://xiph.org/ogg/doc/framing.html, absolute granule position:
+  // A special value of '-1' (in two's complement) indicates that no packets
+  // finish on this page.
+  if(!lastPacketCompleted && packets.size() <= 1)
+    d->header.setAbsoluteGranularPosition(-1);
 }
