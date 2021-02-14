@@ -67,8 +67,13 @@ namespace
   File *detectByResolvers(FileName fileName, bool readAudioProperties,
                           AudioProperties::ReadStyle audioPropertiesStyle)
   {
+#ifdef _WIN32
+    if(::strlen(fileName) == 0 && ::wcslen(fileName) == 0)
+      return 0;
+#else
     if(::strlen(fileName) == 0)
       return 0;
+#endif
     ResolverList::ConstIterator it = fileTypeResolvers.begin();
     for(; it != fileTypeResolvers.end(); ++it) {
       File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
