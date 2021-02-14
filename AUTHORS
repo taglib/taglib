@@ -16,6 +16,8 @@ Mathias Panzenböck <grosser.meister.morti@gmx.net>
  Mod, S3M, IT and XM metadata implementations
 Damien Plisson <damien78@audirvana.com>
  DSDIFF metadata implementation
+Urs Fleisch <ufleisch@users.sourceforge.net>
+ Bug fixes, maintainer.
 
 Please send all patches and questions to taglib-devel@kde.org rather than to
 individual developers!

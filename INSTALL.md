@@ -38,7 +38,7 @@ For a 10.6 Snow Leopard static library with both 32-bit and 64-bit code, use:
       -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
       -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
       -DBUILD_SHARED_LIBS=OFF \
-      -DCMAKE_INSTALL_PREFIX="<folder you want to build to>"
+      -DCMAKE_INSTALL_PREFIX="<folder you want to install to>"
 
 After `make`, and `make install`, add `libtag.` to your XCode project, and add
 the include folder to the project's User Header Search Paths.
@@ -52,7 +52,7 @@ This means you need to adjust things to suit your system, especially paths.
 Tested with:
 * Microsoft Visual Studio 2010, 2015, 2017
 * Microsoft C++ Build Tools 2015, 2017 (standalone packages not requiring Visual Studio)
-* Gcc by mingw-w64.sf.net v4.6.3 (Strawberry Perl 32b)
+* GCC by mingw-w64.sf.net v4.6.3 (Strawberry Perl 32b)
 * MinGW32-4.8.0
 
 Requirements:
@@ -69,15 +69,15 @@ Optional:
 Useful configuration options used with CMake (GUI and/or command line):
   Any of the `ZLIB_` variables may be used at the command line, `ZLIB_ROOT` is only
   available on the command line.
-  
-  | option               | description |
-   ---------------------| ------------|
-  `ZLIB_ROOT=`         | Where to find ZLib's root directory. Assumes parent of: `\include` and `\lib.`|
-   `ZLIB_INCLUDE_DIR=`  | Where to find ZLib's Include directory.|
-   `ZLIB_LIBRARY=`      | Where to find ZLib's Library.
-   `ZLIB_SOURCE=`       | Where to find ZLib's Source Code. Alternative to `ZLIB_INCLUDE_DIR` and `ZLIB_LIBRARY`.
-   `CMAKE_INSTALL_PREFIX=` | Where to install Taglib. |
-   `CMAKE_BUILD_TYPE=`  | Release, Debug, etc ... (Not available in MSVC) |
+
+  | option                  | description |
+  | ----------------------- | ----------- |
+  | `ZLIB_ROOT=`            | Where to find ZLib's root directory. Assumes parent of: `\include` and `\lib.`|
+  | `ZLIB_INCLUDE_DIR=`     | Where to find ZLib's Include directory.|
+  | `ZLIB_LIBRARY=`         | Where to find ZLib's Library.
+  | `ZLIB_SOURCE=`          | Where to find ZLib's Source Code. Alternative to `ZLIB_INCLUDE_DIR` and `ZLIB_LIBRARY`.
+  | `CMAKE_INSTALL_PREFIX=` | Where to install Taglib. |
+  | `CMAKE_BUILD_TYPE=`     | Release, Debug, etc ... (Not available in MSVC) |
 
 The easiest way is at the command prompt (Visual C++ command prompt for MSVS users – batch file and/or shortcuts are your friends).
 
@@ -85,11 +85,11 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
 
     Replace "GENERATOR" with your needs.
     * For MSVS: `Visual Studio XX YYYY`, e.g. `Visual Studio 14 2015`.
-    
+
       **Note**: As Visual Studio 2017 supports CMake, you can skip this step and open the taglib
       folder in VS instead.
     * For MinGW: `MinGW Makefiles`
-       
+
           C:\GitRoot\taglib> cmake -G "GENERATOR"  -DCMAKE_INSTALL_PREFIX=C:\Libraries\taglib
 
     Or use the CMake GUI:
@@ -126,13 +126,13 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
           C:\GitRoot\taglib> gmake
 
       OR (Depending on MinGW install)
-      
+
           C:\GitRoot\taglib> mingw32-make
 
 
 
 3.  **Install the project**
-  
+
     (Change `install` to `uninstall` to uninstall the project)
     * MSVS:
 
@@ -140,7 +140,7 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
       OR (Depending on MSVC version or personal choice)
 
           C:\GitRoot\taglib> devenv install.vcxproj
-      
+
       Or in the MSVS GUI:
         1. Open project.
         2. Open Solution Explorer.
@@ -151,7 +151,7 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
 
           C:\GitRoot\taglib> gmake install
       OR (Depending on MinGW install)
-          
+
           C:\GitRoot\taglib> mingw32-make install
 
 
@@ -167,9 +167,53 @@ Unit Tests
 
 If you want to run the test suite to make sure TagLib works properly on your
 system, you need to have cppunit installed. To build the tests, include
-the option `-DBUILD_TESTS=on` when running cmake.
+the option `-DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF` when running cmake.
 
 The test suite has a custom target in the build system, so you can run
 the tests using make:
 
     make check
+
+Windows MinGW:
+
+* Get cppunit from https://www.freedesktop.org/wiki/Software/cppunit/
+* Build it for MinGW:
+  - `./autogen.sh`
+  - `./configure --disable-shared`
+  - `mingw32-make; mingw32-make install DESTDIR=/path/to/install/dir`
+* Build TagLib with testing enabled:
+  - ```
+    cmake -G "MinGW Makefiles" -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=OFF \
+    -DCPPUNIT_INCLUDE_DIR=/path/to/cppunit/include \
+    -DCPPUNIT_LIBRARIES=/path/to/cppunit/lib/libcppunit.a \
+    -DCPPUNIT_INSTALLED_VERSION=1.15.1
+    ```
+  - `mingw32-make`
+  - `mingw32-make check`
+
+Windows MSVS:
+
+* Get cppunit from https://www.freedesktop.org/wiki/Software/cppunit/
+* Build it in Visual Studio:
+  - Open examples/examples2008.sln, convert all, do not overwrite.
+  - Set architecture to x64, build configuration, e.g. Debug DLL.
+  - It may fail, but the needed libraries should be available in src\cppunit\DebugDll.
+* Build TagLib with testing enabled:
+  - ```
+    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+    -DBUILD_SHARED_LIBS=OFF -DENABLE_STATIC_RUNTIME=ON
+    -DCPPUNIT_INCLUDE_DIR=\path\to\cppunit\include
+    -DCPPUNIT_LIBRARIES=\path\to\cppunit\DebugDll\cppunitd_dll.lib
+    -DCPPUNIT_INSTALLED_VERSION=1.15.1
+    ```
+  - `msbuild all_build.vcxproj /p:Configuration=Debug`
+  - `path %path%;\path\to\cppunit\DebugDll`
+  - `tests\Debug\test_runner.exe`
+
+macOS:
+
+* Install cppunit using a package manager, e.g. `brew install cppunit`
+* Build TagLib with testing enabled:
+  - `cmake -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=OFF`
+  - `make`
+  - `make check`
