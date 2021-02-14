@@ -76,7 +76,7 @@ namespace TagLib {
    *  - LYRICIST
    *  - CONDUCTOR
    *  - REMIXER
-   *  - PERFORMER:<XXXX>
+   *  - PERFORMER:\<XXXX>
    *
    * Other tags:
    *
@@ -204,12 +204,12 @@ namespace TagLib {
     StringList &operator[](const String &key);
 
     /*!
-     * Returns true if and only if \other has the same contents as this map.
+     * Returns true if and only if \a other has the same contents as this map.
      */
     bool operator==(const PropertyMap &other) const;
 
     /*!
-     * Returns false if and only \other has the same contents as this map.
+     * Returns false if and only \a other has the same contents as this map.
      */
     bool operator!=(const PropertyMap &other) const;
 
