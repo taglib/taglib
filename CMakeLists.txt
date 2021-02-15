@@ -2,15 +2,11 @@ cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 project(taglib)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(CTest)
 include(FeatureSummary)
 include(GNUInstallDirs)
-
-if(DEFINED ENABLE_STATIC)
-  message(FATAL_ERROR "This option is no longer available, use BUILD_SHARED_LIBS instead")
-endif()
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if(APPLE)
