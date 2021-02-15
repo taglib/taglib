@@ -1,11 +1,11 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=@CMAKE_INSTALL_PREFIX@
-libdir=@LIB_INSTALL_DIR@
-includedir=@INCLUDE_INSTALL_DIR@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 
 Name: TagLib
 Description: Audio meta-data library
-Requires: 
+Requires:
 Version: @TAGLIB_LIB_VERSION_STRING@
 Libs: -L${libdir} -ltag @ZLIB_LIBRARIES_FLAGS@
 Cflags: -I${includedir} -I${includedir}/taglib

@@ -27,8 +27,8 @@ goto theend
   *       to allow for static, shared or debug builds.
   * It would be preferable if the top level CMakeLists.txt provided the library name during config. ??
 :doit
-if /i "%1#" == "--libs#"    echo -L${LIB_INSTALL_DIR} -llibtag
-if /i "%1#" == "--cflags#"  echo -I${INCLUDE_INSTALL_DIR} -I${INCLUDE_INSTALL_DIR}/taglib
+if /i "%1#" == "--libs#"    echo -L${CMAKE_INSTALL_FULL_LIBDIR} -llibtag
+if /i "%1#" == "--cflags#"  echo -I${CMAKE_INSTALL_FULL_INCLUDEDIR} -I${CMAKE_INSTALL_FULL_INCLUDEDIR}/taglib
 if /i "%1#" == "--version#" echo ${TAGLIB_LIB_VERSION_STRING}
 if /i "%1#" == "--prefix#"  echo ${CMAKE_INSTALL_PREFIX}
 
