@@ -176,17 +176,6 @@ check_cxx_source_compiles("
   }
 " HAVE_ISO_STRDUP)
 
-# Determine whether zlib is installed.
-
-if(NOT ZLIB_SOURCE)
-  find_package(ZLIB)
-  if(ZLIB_FOUND)
-    set(HAVE_ZLIB 1)
-  else()
-    set(HAVE_ZLIB 0)
-  endif()
-endif()
-
 # Detect WinRT mode
 if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
 	set(PLATFORM WINRT 1)
