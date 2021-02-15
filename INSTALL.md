@@ -167,7 +167,7 @@ Unit Tests
 
 If you want to run the test suite to make sure TagLib works properly on your
 system, you need to have cppunit installed. To build the tests, include
-the option `-DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF` when running cmake.
+the option `-DBUILD_TESTING=ON` when running cmake.
 
 The test suite has a custom target in the build system, so you can run
 the tests using make:
@@ -183,7 +183,7 @@ Windows MinGW:
   - `mingw32-make; mingw32-make install DESTDIR=/path/to/install/dir`
 * Build TagLib with testing enabled:
   - ```
-    cmake -G "MinGW Makefiles" -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=OFF \
+    cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=OFF \
     -DCPPUNIT_INCLUDE_DIR=/path/to/cppunit/include \
     -DCPPUNIT_LIBRARIES=/path/to/cppunit/lib/libcppunit.a \
     -DCPPUNIT_INSTALLED_VERSION=1.15.1
@@ -200,7 +200,7 @@ Windows MSVS:
   - It may fail, but the needed libraries should be available in src\cppunit\DebugDll.
 * Build TagLib with testing enabled:
   - ```
-    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+    cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON
     -DBUILD_SHARED_LIBS=OFF -DENABLE_STATIC_RUNTIME=ON
     -DCPPUNIT_INCLUDE_DIR=\path\to\cppunit\include
     -DCPPUNIT_LIBRARIES=\path\to\cppunit\DebugDll\cppunitd_dll.lib

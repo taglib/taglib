@@ -4,6 +4,8 @@ project(taglib)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
+include(CTest)
+
 if(DEFINED ENABLE_STATIC)
   message(FATAL_ERROR "This option is no longer available, use BUILD_SHARED_LIBS instead")
 endif()
@@ -32,7 +34,6 @@ if(ENABLE_CCACHE)
 endif()
 
 option(VISIBILITY_HIDDEN "Build with -fvisibility=hidden" OFF)
-option(BUILD_TESTS "Build the test suite" OFF)
 option(BUILD_EXAMPLES "Build the examples" OFF)
 option(BUILD_BINDINGS "Build the bindings" ON)
 
@@ -147,9 +148,13 @@ if(BUILD_BINDINGS)
   add_subdirectory(bindings)
 endif()
 
-if(BUILD_TESTS AND NOT BUILD_SHARED_LIBS)
-  enable_testing()
-  add_subdirectory(tests)
+if(BUILD_TESTING)
+  find_package(CppUnit)
+  if(CppUnit_FOUND)
+    add_subdirectory(tests)
+  else()
+    message(WARNING "BUILD_TESTING requested, but CppUnit not found, skipping tests.")
+  endif()
 endif()
 
 if(BUILD_EXAMPLES)
