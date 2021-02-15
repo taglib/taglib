@@ -161,7 +161,7 @@ if(BUILD_EXAMPLES)
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
-file(COPY doc/taglib.png DESTINATION doc)
+file(COPY doc/taglib.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/doc/html)
 add_custom_target(docs doxygen)
 
 # uninstall target
