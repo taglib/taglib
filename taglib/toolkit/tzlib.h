@@ -39,7 +39,7 @@ namespace TagLib {
      /*!
       * Returns whether or not zlib is installed and ready to use.
       */
-     bool isAvailable();
+     bool TAGLIB_EXPORT isAvailable();
 
      /*!
       * Decompress \a data by zlib.

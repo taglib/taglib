@@ -177,3 +177,12 @@ const StringList &PropertyMap::unsupportedData() const
 {
   return unsupported;
 }
+
+#ifdef _MSC_VER
+// When building with shared libraries and tests, MSVC will fail with
+// "already defined in test_opus.obj" as soon as operator[] of
+// Ogg::FieldListMap is used because this will instantiate the same template
+// Map<String, StringList>. Therefore this template is instantiated here
+// and declared extern in the headers using it.
+template class TagLib::Map<TagLib::String, TagLib::StringList>;
+#endif
