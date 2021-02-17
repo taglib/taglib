@@ -169,9 +169,7 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = 
 INCLUDE_FILE_PATTERNS  = 
 PREDEFINED             = DO_NOT_DOCUMENT \
-                         DOXYGEN \
-                         WITH_MP4 \
-                         WITH_ASF
+                         DOXYGEN
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
