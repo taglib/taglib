@@ -22,23 +22,25 @@ Mac OS X
 On Mac OS X, you might want to build a framework that can be easily integrated
 into your application. If you set the BUILD_FRAMEWORK option on, it will compile
 TagLib as a framework. For example, the following command can be used to build
-an Universal Binary framework with Mac OS X 10.4 as the deployment target:
+a framework with Mac OS X 10.10 as the deployment target:
 
-    cmake -DCMAKE_BUILD_TYPE=Release \
+    mkdir build; cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_TESTING=OFF \
       -DBUILD_FRAMEWORK=ON \
-      -DCMAKE_C_COMPILER=/usr/bin/gcc-4.0 \
-      -DCMAKE_CXX_COMPILER=/usr/bin/c++-4.0 \
-      -DCMAKE_OSX_SYSROOT=/Developer/SDKs/MacOSX10.4u.sdk/ \
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=10.4 \
-      -DCMAKE_OSX_ARCHITECTURES="ppc;i386;x86_64"
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=10.10 \
+      -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+    make
 
-For a 10.6 Snow Leopard static library with both 32-bit and 64-bit code, use:
+For a 10.10 static library, use:
 
-    cmake -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 \
-      -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" \
+    mkdir build; cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_TESTING=OFF \
       -DBUILD_SHARED_LIBS=OFF \
-      -DCMAKE_INSTALL_PREFIX="<folder you want to install to>"
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=10.10 \
+      -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+    make
 
 After `make`, and `make install`, add `libtag.` to your XCode project, and add
 the include folder to the project's User Header Search Paths.
