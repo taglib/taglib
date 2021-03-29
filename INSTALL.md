@@ -13,6 +13,12 @@ In order to build the included examples, use the `BUILD_EXAMPLES` option:
 
     cmake -DBUILD_EXAMPLES=ON [...]
 
+If you want to build TagLib without ZLib, you can use
+
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DWITH_ZLIB=OFF .
+    make
+    sudo make install
+
 See http://www.cmake.org/cmake/help/runningcmake.html for generic help on
 running CMake.
 
@@ -74,6 +80,7 @@ Useful configuration options used with CMake (GUI and/or command line):
 
   | option                  | description |
   | ----------------------- | ----------- |
+  | `WITH_ZLIB=`            | Whether to build with ZLib |
   | `ZLIB_ROOT=`            | Where to find ZLib's root directory. Assumes parent of: `\include` and `\lib.`|
   | `ZLIB_INCLUDE_DIR=`     | Where to find ZLib's Include directory.|
   | `ZLIB_LIBRARY=`         | Where to find ZLib's Library.
