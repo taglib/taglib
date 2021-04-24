@@ -419,9 +419,9 @@ void APE::Tag::parse(const ByteVector &data)
     }
 
     const unsigned int keyLength = nullPos - pos - 8;
-    const unsigned int valLegnth = data.toUInt(pos, false);
+    const unsigned int valLength = data.toUInt(pos, false);
 
-    if(valLegnth >= data.size() || pos > data.size() - valLegnth) {
+    if(valLength >= data.size() || pos > data.size() - valLength) {
       debug("APE::Tag::parse() - Invalid val length. Stopped parsing.");
       return;
     }
@@ -439,6 +439,6 @@ void APE::Tag::parse(const ByteVector &data)
       debug("APE::Tag::parse() - Skipped an item due to an invalid key.");
     }
 
-    pos += keyLength + valLegnth + 9;
+    pos += keyLength + valLength + 9;
   }
 }
