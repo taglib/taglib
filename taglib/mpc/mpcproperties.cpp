@@ -298,6 +298,9 @@ void MPC::Properties::readSV8(File *file, long streamLength)
 void MPC::Properties::readSV7(const ByteVector &data, long streamLength)
 {
   if(data.startsWith("MP+")) {
+    if(data.size() < 4)
+      return;
+
     d->version = data[3] & 15;
     if(d->version < 7)
       return;
