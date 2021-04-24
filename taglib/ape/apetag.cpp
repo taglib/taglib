@@ -421,6 +421,11 @@ void APE::Tag::parse(const ByteVector &data)
     const unsigned int keyLength = nullPos - pos - 8;
     const unsigned int valLegnth = data.toUInt(pos, false);
 
+    if(valLegnth >= data.size() || pos > data.size() - valLegnth) {
+      debug("APE::Tag::parse() - Invalid val length. Stopped parsing.");
+      return;
+    }
+
     if(keyLength >= MinKeyLength
       && keyLength <= MaxKeyLength
       && isKeyValid(data.mid(pos + 8, keyLength)))
