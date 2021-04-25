@@ -384,7 +384,7 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
     }
     bool ok;
     long long size = readQWORD(file, &ok);
-    if(!ok) {
+    if(!ok || size < 0 || size > dataSize - dataPos) {
       file->setValid(false);
       break;
     }
