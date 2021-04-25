@@ -74,6 +74,10 @@ ByteVector SynchData::fromUInt(unsigned int value)
 
 ByteVector SynchData::decode(const ByteVector &data)
 {
+  if (data.size() == 0) {
+    return ByteVector();
+  }
+
   // We have this optimized method instead of using ByteVector::replace(),
   // since it makes a great difference when decoding huge unsynchronized frames.
 
