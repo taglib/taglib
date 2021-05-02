@@ -118,7 +118,7 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   int pos = 0;
 
   // Need at least 1 byte for the encoding
-  if(data.size() - pos < 1) {
+  if(data.isEmpty()) {
     return;
   }
 
