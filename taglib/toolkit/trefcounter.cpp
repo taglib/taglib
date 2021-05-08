@@ -66,7 +66,7 @@ namespace TagLib
     RefCounterPrivate() :
       refCount(1) {}
 
-    volatile ATOMIC_INT refCount;
+    ATOMIC_INT refCount;
   };
 
   RefCounter::RefCounter() :
