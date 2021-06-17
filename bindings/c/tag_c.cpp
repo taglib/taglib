@@ -258,8 +258,7 @@ void taglib_tag_free_strings()
   if(!stringManagementEnabled)
     return;
 
-  for(List<char *>::ConstIterator it = strings.begin(); it != strings.end(); ++it)
-    free(*it);
+  std::for_each(strings.begin(), strings.end(), ::free);
   strings.clear();
 }
 
