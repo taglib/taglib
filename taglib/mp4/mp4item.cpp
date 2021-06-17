@@ -34,7 +34,6 @@ class MP4::Item::ItemPrivate : public RefCounter
 {
 public:
   ItemPrivate() :
-    RefCounter(),
     valid(true),
     atomDataType(TypeUndefined) {}
 

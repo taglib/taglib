@@ -120,14 +120,12 @@ String Latin1StringHandler::parse(const ByteVector &data) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v2::Tag::Tag() :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->factory = FrameFactory::instance();
 }
 
 ID3v2::Tag::Tag(File *file, long tagOffset, const FrameFactory *factory) :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->factory = factory;

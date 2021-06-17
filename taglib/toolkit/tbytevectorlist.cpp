@@ -70,7 +70,7 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorList::ByteVectorList() : List<ByteVector>()
+ByteVectorList::ByteVectorList()
 {
 
 }

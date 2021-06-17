@@ -85,13 +85,11 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v1::Tag::Tag() :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
 
 ID3v1::Tag::Tag(File *file, long tagOffset) :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->file = file;
