@@ -229,9 +229,7 @@ bool APE::Item::isEmpty() const
     case Text:
       if(d->text.isEmpty())
         return true;
-      if(d->text.size() == 1 && d->text.front().isEmpty())
-        return true;
-      return false;
+      return d->text.size() == 1 && d->text.front().isEmpty();
     case Binary:
     case Locator:
       return d->value.isEmpty();
