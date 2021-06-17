@@ -176,8 +176,7 @@ String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 {
   if(d->fieldListMap.contains(id))
     return String(d->fieldListMap[id]);
-  else
-    return String();
+  return String();
 }
 
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
@@ -219,8 +218,7 @@ ByteVector RIFF::Info::Tag::render() const
 
   if(data.size() == 4)
     return ByteVector();
-  else
-    return data;
+  return data;
 }
 
 void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)

@@ -250,7 +250,7 @@ void FileStream::insert(const ByteVector &data, unsigned long start, unsigned lo
     writeBlock(data);
     return;
   }
-  else if(data.size() < replace) {
+  if(data.size() < replace) {
     seek(start);
     writeBlock(data);
     removeBlock(start + data.size(), replace - data.size());

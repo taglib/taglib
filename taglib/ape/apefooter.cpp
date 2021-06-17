@@ -135,8 +135,7 @@ unsigned int APE::Footer::completeTagSize() const
 {
   if(d->headerPresent)
     return d->tagSize + size();
-  else
-    return d->tagSize;
+  return d->tagSize;
 }
 
 void APE::Footer::setTagSize(unsigned int s)
@@ -158,8 +157,7 @@ ByteVector APE::Footer::renderHeader() const
 {
   if(!d->headerPresent)
     return ByteVector();
-  else
-    return render(true);
+  return render(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
