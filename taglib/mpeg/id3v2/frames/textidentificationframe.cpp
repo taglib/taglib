@@ -125,12 +125,12 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 namespace
 {
   // array of allowed TIPL prefixes and their corresponding key value
-  const char* involvedPeople[][2] = {
-      {"ARRANGER", "ARRANGER"},
-      {"ENGINEER", "ENGINEER"},
-      {"PRODUCER", "PRODUCER"},
-      {"DJ-MIX", "DJMIXER"},
-      {"MIX", "MIXER"},
+  const std::pair<const char*, const char*> involvedPeople[] = {
+      std::make_pair("ARRANGER", "ARRANGER"),
+      std::make_pair("ENGINEER", "ENGINEER"),
+      std::make_pair("PRODUCER", "PRODUCER"),
+      std::make_pair("DJ-MIX", "DJMIXER"),
+      std::make_pair("MIX", "MIXER"),
   };
   const size_t involvedPeopleSize = sizeof(involvedPeople) / sizeof(involvedPeople[0]);
 }
@@ -140,7 +140,7 @@ const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
   static KeyConversionMap m;
   if(m.isEmpty()) {
     for(size_t i = 0; i < involvedPeopleSize; ++i)
-      m.insert(involvedPeople[i][1], involvedPeople[i][0]);
+      m.insert(involvedPeople[i].second, involvedPeople[i].first);
   }
   return m;
 }
@@ -274,8 +274,8 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     bool found = false;
     for(size_t i = 0; i < involvedPeopleSize; ++i)
-      if(*it == involvedPeople[i][0]) {
-        map.insert(involvedPeople[i][1], (++it)->split(","));
+      if(*it == involvedPeople[i].first) {
+        map.insert(involvedPeople[i].second, (++it)->split(","));
         found = true;
         break;
       }

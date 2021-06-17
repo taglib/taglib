@@ -394,87 +394,87 @@ FrameFactory::~FrameFactory()
 namespace
 {
   // Frame conversion table ID3v2.2 -> 2.4
-  const char *frameConversion2[][2] = {
-    { "BUF", "RBUF" },
-    { "CNT", "PCNT" },
-    { "COM", "COMM" },
-    { "CRA", "AENC" },
-    { "ETC", "ETCO" },
-    { "GEO", "GEOB" },
-    { "IPL", "TIPL" },
-    { "MCI", "MCDI" },
-    { "MLL", "MLLT" },
-    { "POP", "POPM" },
-    { "REV", "RVRB" },
-    { "SLT", "SYLT" },
-    { "STC", "SYTC" },
-    { "TAL", "TALB" },
-    { "TBP", "TBPM" },
-    { "TCM", "TCOM" },
-    { "TCO", "TCON" },
-    { "TCP", "TCMP" },
-    { "TCR", "TCOP" },
-    { "TDY", "TDLY" },
-    { "TEN", "TENC" },
-    { "TFT", "TFLT" },
-    { "TKE", "TKEY" },
-    { "TLA", "TLAN" },
-    { "TLE", "TLEN" },
-    { "TMT", "TMED" },
-    { "TOA", "TOAL" },
-    { "TOF", "TOFN" },
-    { "TOL", "TOLY" },
-    { "TOR", "TDOR" },
-    { "TOT", "TOAL" },
-    { "TP1", "TPE1" },
-    { "TP2", "TPE2" },
-    { "TP3", "TPE3" },
-    { "TP4", "TPE4" },
-    { "TPA", "TPOS" },
-    { "TPB", "TPUB" },
-    { "TRC", "TSRC" },
-    { "TRD", "TDRC" },
-    { "TRK", "TRCK" },
-    { "TS2", "TSO2" },
-    { "TSA", "TSOA" },
-    { "TSC", "TSOC" },
-    { "TSP", "TSOP" },
-    { "TSS", "TSSE" },
-    { "TST", "TSOT" },
-    { "TT1", "TIT1" },
-    { "TT2", "TIT2" },
-    { "TT3", "TIT3" },
-    { "TXT", "TOLY" },
-    { "TXX", "TXXX" },
-    { "TYE", "TDRC" },
-    { "UFI", "UFID" },
-    { "ULT", "USLT" },
-    { "WAF", "WOAF" },
-    { "WAR", "WOAR" },
-    { "WAS", "WOAS" },
-    { "WCM", "WCOM" },
-    { "WCP", "WCOP" },
-    { "WPB", "WPUB" },
-    { "WXX", "WXXX" },
+  const std::pair<const char *, const char *> frameConversion2[] = {
+    std::make_pair("BUF", "RBUF"),
+    std::make_pair("CNT", "PCNT"),
+    std::make_pair("COM", "COMM"),
+    std::make_pair("CRA", "AENC"),
+    std::make_pair("ETC", "ETCO"),
+    std::make_pair("GEO", "GEOB"),
+    std::make_pair("IPL", "TIPL"),
+    std::make_pair("MCI", "MCDI"),
+    std::make_pair("MLL", "MLLT"),
+    std::make_pair("POP", "POPM"),
+    std::make_pair("REV", "RVRB"),
+    std::make_pair("SLT", "SYLT"),
+    std::make_pair("STC", "SYTC"),
+    std::make_pair("TAL", "TALB"),
+    std::make_pair("TBP", "TBPM"),
+    std::make_pair("TCM", "TCOM"),
+    std::make_pair("TCO", "TCON"),
+    std::make_pair("TCP", "TCMP"),
+    std::make_pair("TCR", "TCOP"),
+    std::make_pair("TDY", "TDLY"),
+    std::make_pair("TEN", "TENC"),
+    std::make_pair("TFT", "TFLT"),
+    std::make_pair("TKE", "TKEY"),
+    std::make_pair("TLA", "TLAN"),
+    std::make_pair("TLE", "TLEN"),
+    std::make_pair("TMT", "TMED"),
+    std::make_pair("TOA", "TOAL"),
+    std::make_pair("TOF", "TOFN"),
+    std::make_pair("TOL", "TOLY"),
+    std::make_pair("TOR", "TDOR"),
+    std::make_pair("TOT", "TOAL"),
+    std::make_pair("TP1", "TPE1"),
+    std::make_pair("TP2", "TPE2"),
+    std::make_pair("TP3", "TPE3"),
+    std::make_pair("TP4", "TPE4"),
+    std::make_pair("TPA", "TPOS"),
+    std::make_pair("TPB", "TPUB"),
+    std::make_pair("TRC", "TSRC"),
+    std::make_pair("TRD", "TDRC"),
+    std::make_pair("TRK", "TRCK"),
+    std::make_pair("TS2", "TSO2"),
+    std::make_pair("TSA", "TSOA"),
+    std::make_pair("TSC", "TSOC"),
+    std::make_pair("TSP", "TSOP"),
+    std::make_pair("TSS", "TSSE"),
+    std::make_pair("TST", "TSOT"),
+    std::make_pair("TT1", "TIT1"),
+    std::make_pair("TT2", "TIT2"),
+    std::make_pair("TT3", "TIT3"),
+    std::make_pair("TXT", "TOLY"),
+    std::make_pair("TXX", "TXXX"),
+    std::make_pair("TYE", "TDRC"),
+    std::make_pair("UFI", "UFID"),
+    std::make_pair("ULT", "USLT"),
+    std::make_pair("WAF", "WOAF"),
+    std::make_pair("WAR", "WOAR"),
+    std::make_pair("WAS", "WOAS"),
+    std::make_pair("WCM", "WCOM"),
+    std::make_pair("WCP", "WCOP"),
+    std::make_pair("WPB", "WPUB"),
+    std::make_pair("WXX", "WXXX"),
 
     // Apple iTunes nonstandard frames
-    { "PCS", "PCST" },
-    { "TCT", "TCAT" },
-    { "TDR", "TDRL" },
-    { "TDS", "TDES" },
-    { "TID", "TGID" },
-    { "WFD", "WFED" },
-    { "MVN", "MVNM" },
-    { "MVI", "MVIN" },
-    { "GP1", "GRP1" },
+    std::make_pair("PCS", "PCST"),
+    std::make_pair("TCT", "TCAT"),
+    std::make_pair("TDR", "TDRL"),
+    std::make_pair("TDS", "TDES"),
+    std::make_pair("TID", "TGID"),
+    std::make_pair("WFD", "WFED"),
+    std::make_pair("MVN", "MVNM"),
+    std::make_pair("MVI", "MVIN"),
+    std::make_pair("GP1", "GRP1"),
   };
   const size_t frameConversion2Size = sizeof(frameConversion2) / sizeof(frameConversion2[0]);
 
   // Frame conversion table ID3v2.3 -> 2.4
-  const char *frameConversion3[][2] = {
-    { "TORY", "TDOR" },
-    { "TYER", "TDRC" },
-    { "IPLS", "TIPL" },
+  const std::pair<const char *, const char *> frameConversion3[] = {
+    std::make_pair("TORY", "TDOR"),
+    std::make_pair("TYER", "TDRC"),
+    std::make_pair("IPLS", "TIPL"),
   };
   const size_t frameConversion3Size = sizeof(frameConversion3) / sizeof(frameConversion3[0]);
 }
@@ -504,8 +504,8 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     // the frames to their 4 byte ID3v2.4 equivalent.
 
     for(size_t i = 0; i < frameConversion2Size; ++i) {
-      if(frameID == frameConversion2[i][0]) {
-        header->setFrameID(frameConversion2[i][1]);
+      if(frameID == frameConversion2[i].first) {
+        header->setFrameID(frameConversion2[i].second);
         break;
       }
     }
@@ -528,8 +528,8 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
     }
 
     for(size_t i = 0; i < frameConversion3Size; ++i) {
-      if(frameID == frameConversion3[i][0]) {
-        header->setFrameID(frameConversion3[i][1]);
+      if(frameID == frameConversion3[i].first) {
+        header->setFrameID(frameConversion3[i].second);
         break;
       }
     }
