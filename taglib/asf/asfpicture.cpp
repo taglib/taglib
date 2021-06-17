@@ -137,7 +137,7 @@ ByteVector ASF::Picture::render() const
     return ByteVector();
 
   return
-    ByteVector((char)d->type) +
+    ByteVector(static_cast<char>(d->type)) +
     ByteVector::fromUInt(d->picture.size(), false) +
     renderString(d->mimeType) +
     renderString(d->description) +
@@ -150,7 +150,7 @@ void ASF::Picture::parse(const ByteVector& bytes)
   if(bytes.size() < 9)
     return;
   int pos = 0;
-  d->type = (Type)bytes[0]; ++pos;
+  d->type = static_cast<Type>(bytes[0]); ++pos;
   const unsigned int dataLen = bytes.toUInt(pos, false); pos+=4;
 
   const ByteVector nullStringTerminator(2, 0);
