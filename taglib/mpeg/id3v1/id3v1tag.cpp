@@ -76,8 +76,7 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
 {
   if(s.isLatin1())
     return s.data(String::Latin1);
-  else
-    return ByteVector();
+  return ByteVector();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

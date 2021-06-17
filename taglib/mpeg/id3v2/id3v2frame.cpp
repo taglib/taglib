@@ -94,8 +94,7 @@ ByteVector Frame::textDelimiter(String::Type t)
 {
   if(t == String::UTF16 || t == String::UTF16BE || t == String::UTF16LE)
     return ByteVector(2, '\0');
-  else
-    return ByteVector(1, '\0');
+  return ByteVector(1, '\0');
 }
 
 const String Frame::instrumentPrefix("PERFORMER:");
@@ -117,11 +116,11 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
       TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
-    } else if((frameID[0] == 'W') && (values.size() == 1)){  // URL frame (not WXXX); support only one value
+    } if((frameID[0] == 'W') && (values.size() == 1)){  // URL frame (not WXXX); support only one value
         UrlLinkFrame* frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;
-    } else if(frameID == "PCST") {
+    } if(frameID == "PCST") {
       return new PodcastFrame();
     }
   }
@@ -166,16 +165,14 @@ ByteVector Frame::frameID() const
 {
   if(d->header)
     return d->header->frameID();
-  else
-    return ByteVector();
+  return ByteVector();
 }
 
 unsigned int Frame::size() const
 {
   if(d->header)
     return d->header->frameSize();
-  else
-    return 0;
+  return 0;
 }
 
 void Frame::setData(const ByteVector &data)
@@ -309,10 +306,8 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
         debug("Frame::checkEncoding() -- Rendering using UTF8.");
         return String::UTF8;
       }
-      else {
-        debug("Frame::checkEncoding() -- Rendering using UTF16.");
-        return String::UTF16;
-      }
+      debug("Frame::checkEncoding() -- Rendering using UTF16.");
+      return String::UTF16;
     }
   }
 
@@ -486,19 +481,19 @@ PropertyMap Frame::asProperties() const
   if(id == "TXXX")
     return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
   // Apple proprietary WFED (Podcast URL), MVNM (Movement Name), MVIN (Movement Number), GRP1 (Grouping) are in fact text frames.
-  else if(id[0] == 'T' || id == "WFED" || id == "MVNM" || id == "MVIN" || id == "GRP1")
+  if(id[0] == 'T' || id == "WFED" || id == "MVNM" || id == "MVIN" || id == "GRP1")
     return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
-  else if(id == "WXXX")
+  if(id == "WXXX")
     return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
-  else if(id[0] == 'W')
+  if(id[0] == 'W')
     return dynamic_cast< const UrlLinkFrame* >(this)->asProperties();
-  else if(id == "COMM")
+  if(id == "COMM")
     return dynamic_cast< const CommentsFrame* >(this)->asProperties();
-  else if(id == "USLT")
+  if(id == "USLT")
     return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
-  else if(id == "UFID")
+  if(id == "UFID")
     return dynamic_cast< const UniqueFileIdentifierFrame* >(this)->asProperties();
-  else if(id == "PCST")
+  if(id == "PCST")
     return dynamic_cast< const PodcastFrame* >(this)->asProperties();
   PropertyMap m;
   m.unsupportedData().append(id);

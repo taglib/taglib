@@ -44,8 +44,7 @@ namespace
   {
     if(Utils::systemByteOrder() == Utils::LittleEndian)
       return String::UTF16LE;
-    else
-      return String::UTF16BE;
+    return String::UTF16BE;
   }
 
   // Converts a Latin-1 string into UTF-16(without BOM/CPU byte order)
@@ -342,10 +341,8 @@ StringList String::split(const String &separator) const
       list.append(substr(index, size() - index));
       break;
     }
-    else {
-      list.append(substr(index, sep - index));
-      index = sep + separator.size();
-    }
+    list.append(substr(index, sep - index));
+    index = sep + separator.size();
   }
   return list;
 }
@@ -362,8 +359,7 @@ String String::substr(unsigned int position, unsigned int n) const
 {
   if(position == 0 && n >= size())
     return *this;
-  else
-    return String(d->data.substr(position, n));
+  return String(d->data.substr(position, n));
 }
 
 String &String::append(const String &s)

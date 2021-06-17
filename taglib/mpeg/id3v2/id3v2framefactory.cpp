@@ -268,11 +268,9 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
     if(frameID != "WXXX") {
       return new UrlLinkFrame(data, header);
     }
-    else {
-      UserUrlLinkFrame *f = new UserUrlLinkFrame(data, header);
-      d->setTextEncoding(f);
-      return f;
-    }
+    UserUrlLinkFrame *f = new UserUrlLinkFrame(data, header);
+    d->setTextEncoding(f);
+    return f;
   }
 
   // Unsynchronized lyric/text transcription (frames 4.8)

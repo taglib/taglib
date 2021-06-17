@@ -94,8 +94,7 @@ unsigned int ASF::Tag::track() const
     const ASF::Attribute attr = d->attributeListMap["WM/TrackNumber"][0];
     if(attr.type() == ASF::Attribute::DWordType)
       return attr.toUInt();
-    else
-      return attr.toString().toInt();
+    return attr.toString().toInt();
   }
   if(d->attributeListMap.contains("WM/Track"))
     return d->attributeListMap["WM/Track"][0].toUInt();

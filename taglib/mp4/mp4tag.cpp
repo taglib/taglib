@@ -140,7 +140,7 @@ MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"mean\"");
         return result;
       }
-      else if(i == 1 && name != "name") {
+      if(i == 1 && name != "name") {
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"name\"");
         return result;
       }
