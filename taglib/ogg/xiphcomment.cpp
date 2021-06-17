@@ -61,13 +61,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::XiphComment::XiphComment() :
-  TagLib::Tag(),
   d(new XiphCommentPrivate())
 {
 }
 
 Ogg::XiphComment::XiphComment(const ByteVector &data) :
-  TagLib::Tag(),
   d(new XiphCommentPrivate())
 {
   parse(data);

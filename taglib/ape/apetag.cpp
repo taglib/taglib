@@ -91,13 +91,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::Tag::Tag() :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
 }
 
 APE::Tag::Tag(TagLib::File *file, long footerLocation) :
-  TagLib::Tag(),
   d(new TagPrivate())
 {
   d->file = file;

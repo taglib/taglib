@@ -284,7 +284,6 @@ class FileRef::FileRefPrivate : public RefCounter
 {
 public:
   FileRefPrivate() :
-    RefCounter(),
     file(0),
     stream(0) {}
 
