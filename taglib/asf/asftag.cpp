@@ -269,7 +269,7 @@ namespace
 
     return String();
   }
-}
+}  // namespace
 
 PropertyMap ASF::Tag::properties() const
 {

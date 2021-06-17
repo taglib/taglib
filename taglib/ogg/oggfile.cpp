@@ -44,7 +44,7 @@ namespace
     else
       return page->firstPacketIndex() + page->packetCount() - 1;
   }
-}
+}  // namespace
 
 class Ogg::File::FilePrivate
 {

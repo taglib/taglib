@@ -50,7 +50,7 @@ namespace
 
     return totalLength;
   }
-}
+}  // namespace
 
 class MP4::Properties::PropertiesPrivate
 {

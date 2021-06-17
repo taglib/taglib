@@ -278,7 +278,7 @@ namespace
 
     return 0;
   }
-}
+}  // namespace
 
 class FileRef::FileRefPrivate : public RefCounter
 {

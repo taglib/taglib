@@ -59,6 +59,6 @@ namespace TagLib
       debugListener->printMessage(msg);
     }
   }
-}
+}  // namespace TagLib
 
 #endif
