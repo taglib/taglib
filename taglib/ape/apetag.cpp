@@ -70,7 +70,7 @@ namespace
 
     return true;
   }
-}
+}  // namespace
 
 class APE::Tag::TagPrivate
 {
@@ -217,7 +217,7 @@ namespace
                                       {"RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS" },
                                       {"RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE" }};
   const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);
-}
+}  // namespace
 
 PropertyMap APE::Tag::properties() const
 {

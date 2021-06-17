@@ -64,7 +64,7 @@ namespace
     }
     return false;
   }
-}
+}  // namespace
 
 class ID3v2::Tag::TagPrivate
 {

@@ -55,7 +55,7 @@ namespace
   const long MaxPaddingLegnth = 1024 * 1024;
 
   const char LastBlockFlag = '\x80';
-}
+}  // namespace
 
 class FLAC::File::FilePrivate
 {

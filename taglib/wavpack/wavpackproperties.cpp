@@ -255,7 +255,7 @@ namespace
     return getMetaDataChunk(block, ID_DSD_BLOCK);
   }
 
-}
+}  // namespace
 
 void WavPack::Properties::read(File *file, long streamLength)
 {

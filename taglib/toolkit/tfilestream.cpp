@@ -124,7 +124,7 @@ namespace
   }
 
 #endif  // _WIN32
-}
+}  // namespace
 
 class FileStream::FileStreamPrivate
 {

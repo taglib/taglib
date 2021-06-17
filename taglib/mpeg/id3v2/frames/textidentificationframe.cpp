@@ -133,7 +133,7 @@ namespace
       {"MIX", "MIXER"},
   };
   const size_t involvedPeopleSize = sizeof(involvedPeople) / sizeof(involvedPeople[0]);
-}
+}  // namespace
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {
