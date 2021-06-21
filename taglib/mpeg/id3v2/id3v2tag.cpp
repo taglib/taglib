@@ -197,7 +197,7 @@ String ID3v2::Tag::genre() const
   // appended to the genre string.  Multiple fields will be appended as the
   // string is built.
 
-  TextIdentificationFrame *f = static_cast<TextIdentificationFrame *>(
+  TextIdentificationFrame *f = dynamic_cast<TextIdentificationFrame *>(
     d->frameListMap["TCON"].front());
 
   StringList fields = f->fieldList();
