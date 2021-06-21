@@ -210,60 +210,60 @@ bool ASF::Tag::isEmpty() const
 
 namespace
 {
-  const char *keyTranslation[][2] = {
-    { "WM/AlbumTitle", "ALBUM" },
-    { "WM/AlbumArtist", "ALBUMARTIST" },
-    { "WM/Composer", "COMPOSER" },
-    { "WM/Writer", "LYRICIST" },
-    { "WM/Conductor", "CONDUCTOR" },
-    { "WM/ModifiedBy", "REMIXER" },
-    { "WM/Year", "DATE" },
-    { "WM/OriginalReleaseYear", "ORIGINALDATE" },
-    { "WM/Producer", "PRODUCER" },
-    { "WM/ContentGroupDescription", "GROUPING" },
-    { "WM/SubTitle", "SUBTITLE" },
-    { "WM/SetSubTitle", "DISCSUBTITLE" },
-    { "WM/TrackNumber", "TRACKNUMBER" },
-    { "WM/PartOfSet", "DISCNUMBER" },
-    { "WM/Genre", "GENRE" },
-    { "WM/BeatsPerMinute", "BPM" },
-    { "WM/Mood", "MOOD" },
-    { "WM/ISRC", "ISRC" },
-    { "WM/Lyrics", "LYRICS" },
-    { "WM/Media", "MEDIA" },
-    { "WM/Publisher", "LABEL" },
-    { "WM/CatalogNo", "CATALOGNUMBER" },
-    { "WM/Barcode", "BARCODE" },
-    { "WM/EncodedBy", "ENCODEDBY" },
-    { "WM/AlbumSortOrder", "ALBUMSORT" },
-    { "WM/AlbumArtistSortOrder", "ALBUMARTISTSORT" },
-    { "WM/ArtistSortOrder", "ARTISTSORT" },
-    { "WM/TitleSortOrder", "TITLESORT" },
-    { "WM/Script", "SCRIPT" },
-    { "WM/Language", "LANGUAGE" },
-    { "WM/ARTISTS", "ARTISTS" },
-    { "ASIN", "ASIN" },
-    { "MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID" },
-    { "MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID" },
-    { "MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID" },
-    { "MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID" },
-    { "MusicBrainz/Album Release Country", "RELEASECOUNTRY" },
-    { "MusicBrainz/Album Status", "RELEASESTATUS" },
-    { "MusicBrainz/Album Type", "RELEASETYPE" },
-    { "MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID" },
-    { "MusicBrainz/Release Track Id", "MUSICBRAINZ_RELEASETRACKID" },
-    { "MusicBrainz/Work Id", "MUSICBRAINZ_WORKID" },
-    { "MusicIP/PUID", "MUSICIP_PUID" },
-    { "Acoustid/Id", "ACOUSTID_ID" },
-    { "Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT" },
+  const std::pair<const char *, const char *> keyTranslation[] = {
+    std::make_pair("WM/AlbumTitle", "ALBUM"),
+    std::make_pair("WM/AlbumArtist", "ALBUMARTIST"),
+    std::make_pair("WM/Composer", "COMPOSER"),
+    std::make_pair("WM/Writer", "LYRICIST"),
+    std::make_pair("WM/Conductor", "CONDUCTOR"),
+    std::make_pair("WM/ModifiedBy", "REMIXER"),
+    std::make_pair("WM/Year", "DATE"),
+    std::make_pair("WM/OriginalReleaseYear", "ORIGINALDATE"),
+    std::make_pair("WM/Producer", "PRODUCER"),
+    std::make_pair("WM/ContentGroupDescription", "GROUPING"),
+    std::make_pair("WM/SubTitle", "SUBTITLE"),
+    std::make_pair("WM/SetSubTitle", "DISCSUBTITLE"),
+    std::make_pair("WM/TrackNumber", "TRACKNUMBER"),
+    std::make_pair("WM/PartOfSet", "DISCNUMBER"),
+    std::make_pair("WM/Genre", "GENRE"),
+    std::make_pair("WM/BeatsPerMinute", "BPM"),
+    std::make_pair("WM/Mood", "MOOD"),
+    std::make_pair("WM/ISRC", "ISRC"),
+    std::make_pair("WM/Lyrics", "LYRICS"),
+    std::make_pair("WM/Media", "MEDIA"),
+    std::make_pair("WM/Publisher", "LABEL"),
+    std::make_pair("WM/CatalogNo", "CATALOGNUMBER"),
+    std::make_pair("WM/Barcode", "BARCODE"),
+    std::make_pair("WM/EncodedBy", "ENCODEDBY"),
+    std::make_pair("WM/AlbumSortOrder", "ALBUMSORT"),
+    std::make_pair("WM/AlbumArtistSortOrder", "ALBUMARTISTSORT"),
+    std::make_pair("WM/ArtistSortOrder", "ARTISTSORT"),
+    std::make_pair("WM/TitleSortOrder", "TITLESORT"),
+    std::make_pair("WM/Script", "SCRIPT"),
+    std::make_pair("WM/Language", "LANGUAGE"),
+    std::make_pair("WM/ARTISTS", "ARTISTS"),
+    std::make_pair("ASIN", "ASIN"),
+    std::make_pair("MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID"),
+    std::make_pair("MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID"),
+    std::make_pair("MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID"),
+    std::make_pair("MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"),
+    std::make_pair("MusicBrainz/Album Release Country", "RELEASECOUNTRY"),
+    std::make_pair("MusicBrainz/Album Status", "RELEASESTATUS"),
+    std::make_pair("MusicBrainz/Album Type", "RELEASETYPE"),
+    std::make_pair("MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"),
+    std::make_pair("MusicBrainz/Release Track Id", "MUSICBRAINZ_RELEASETRACKID"),
+    std::make_pair("MusicBrainz/Work Id", "MUSICBRAINZ_WORKID"),
+    std::make_pair("MusicIP/PUID", "MUSICIP_PUID"),
+    std::make_pair("Acoustid/Id", "ACOUSTID_ID"),
+    std::make_pair("Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT"),
   };
   const size_t keyTranslationSize = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
 
   String translateKey(const String &key)
   {
     for(size_t i = 0; i < keyTranslationSize; ++i) {
-      if(key == keyTranslation[i][0])
-        return keyTranslation[i][1];
+      if(key == keyTranslation[i].first)
+        return keyTranslation[i].second;
     }
 
     return String();
@@ -322,9 +322,8 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
 {
   static Map<String, String> reverseKeyMap;
   if(reverseKeyMap.isEmpty()) {
-    int numKeys = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
-    for(int i = 0; i < numKeys; i++) {
-      reverseKeyMap[keyTranslation[i][1]] = keyTranslation[i][0];
+    for(size_t i = 0; i < keyTranslationSize; i++) {
+      reverseKeyMap[keyTranslation[i].second] = keyTranslation[i].first;
     }
   }
 

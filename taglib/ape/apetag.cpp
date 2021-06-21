@@ -208,14 +208,16 @@ namespace
 {
   // conversions of tag keys between what we use in PropertyMap and what's usual
   // for APE tags
-  //                                    usual,         APE
-  const char *keyConversions[][2] =  {{"TRACKNUMBER", "TRACK"       },
-                                      {"DATE",        "YEAR"        },
-                                      {"ALBUMARTIST", "ALBUM ARTIST"},
-                                      {"DISCNUMBER",  "DISC"        },
-                                      {"REMIXER",     "MIXARTIST"   },
-                                      {"RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS" },
-                                      {"RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE" }};
+  //                usual,         APE
+  const std::pair<const char *, const char *> keyConversions[] = {
+    std::make_pair("TRACKNUMBER", "TRACK"),
+    std::make_pair("DATE",        "YEAR"),
+    std::make_pair("ALBUMARTIST", "ALBUM ARTIST"),
+    std::make_pair("DISCNUMBER",  "DISC"),
+    std::make_pair("REMIXER",     "MIXARTIST"),
+    std::make_pair("RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS"),
+    std::make_pair("RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE"),
+  };
   const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);
 }  // namespace
 
@@ -233,8 +235,8 @@ PropertyMap APE::Tag::properties() const
     else {
       // Some tags need to be handled specially
       for(size_t i = 0; i < keyConversionsSize; ++i) {
-        if(tagName == keyConversions[i][1])
-          tagName = keyConversions[i][0];
+        if(tagName == keyConversions[i].second)
+          tagName = keyConversions[i].first;
       }
       properties[tagName].append(it->second.toStringList());
     }
@@ -255,9 +257,9 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
   // see comment in properties()
   for(size_t i = 0; i < keyConversionsSize; ++i)
-    if(properties.contains(keyConversions[i][0])) {
-      properties.insert(keyConversions[i][1], properties[keyConversions[i][0]]);
-      properties.erase(keyConversions[i][0]);
+    if(properties.contains(keyConversions[i].first)) {
+      properties.insert(keyConversions[i].second, properties[keyConversions[i].first]);
+      properties.erase(keyConversions[i].first);
     }
 
   // first check if tags need to be removed completely
