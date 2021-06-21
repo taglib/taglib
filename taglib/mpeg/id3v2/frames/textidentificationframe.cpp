@@ -125,7 +125,7 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 namespace
 {
   // array of allowed TIPL prefixes and their corresponding key value
-  const std::pair<const char*, const char*> involvedPeople[] = {
+  const std::pair<const char *, const char *> involvedPeople[] = {
       std::make_pair("ARRANGER", "ARRANGER"),
       std::make_pair("ENGINEER", "ENGINEER"),
       std::make_pair("PRODUCER", "PRODUCER"),

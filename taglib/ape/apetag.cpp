@@ -210,14 +210,14 @@ namespace
 {
   // conversions of tag keys between what we use in PropertyMap and what's usual
   // for APE tags
-  //                                    usual,         APE
-  const std::pair<const char*, const char*> keyConversions[] = {
-    std::make_pair("TRACKNUMBER", "TRACK"       ),
-    std::make_pair("DATE",        "YEAR"        ),
+  //                usual,         APE
+  const std::pair<const char *, const char *> keyConversions[] = {
+    std::make_pair("TRACKNUMBER", "TRACK"),
+    std::make_pair("DATE",        "YEAR"),
     std::make_pair("ALBUMARTIST", "ALBUM ARTIST"),
-    std::make_pair("DISCNUMBER",  "DISC"        ),
-    std::make_pair("REMIXER",     "MIXARTIST"   ),
-    std::make_pair("RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS" ),
+    std::make_pair("DISCNUMBER",  "DISC"),
+    std::make_pair("REMIXER",     "MIXARTIST"),
+    std::make_pair("RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS"),
     std::make_pair("RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE"),
   };
   const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);

@@ -326,7 +326,7 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
 
 namespace
 {
-  const std::pair<const char *, const char*> frameTranslation[] = {
+  const std::pair<const char *, const char *> frameTranslation[] = {
     // Text information frames
     std::make_pair("TALB", "ALBUM"),
     std::make_pair("TBPM", "BPM"),
@@ -419,7 +419,7 @@ namespace
   const size_t txxxFrameTranslationSize = sizeof(txxxFrameTranslation) / sizeof(txxxFrameTranslation[0]);
 
   // list of deprecated frames and their successors
-  const std::pair<const char *, const char*> deprecatedFrames[] = {
+  const std::pair<const char *, const char *> deprecatedFrames[] = {
     std::make_pair("TRDA", "TDRC"), // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
     std::make_pair("TDAT", "TDRC"), // 2.3 -> 2.4
     std::make_pair("TYER", "TDRC"), // 2.3 -> 2.4

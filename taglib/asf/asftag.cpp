@@ -212,7 +212,7 @@ bool ASF::Tag::isEmpty() const
 
 namespace
 {
-  const std::pair<const char *, const char*> keyTranslation[] = {
+  const std::pair<const char *, const char *> keyTranslation[] = {
     std::make_pair("WM/AlbumTitle", "ALBUM"),
     std::make_pair("WM/AlbumArtist", "ALBUMARTIST"),
     std::make_pair("WM/Composer", "COMPOSER"),
