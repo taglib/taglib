@@ -185,8 +185,10 @@ String ID3v2::Tag::genre() const
   // should be separated by " / " instead of " ".  For the moment to keep
   // the behavior the same as released versions it is being left with " ".
 
-  if(d->frameListMap["TCON"].isEmpty() ||
-     !dynamic_cast<TextIdentificationFrame *>(d->frameListMap["TCON"].front()))
+  const FrameList &tconFrames = d->frameListMap["TCON"];
+  TextIdentificationFrame *f;
+  if(tconFrames.isEmpty() ||
+     !(f = dynamic_cast<TextIdentificationFrame *>(tconFrames.front())))
   {
     return String();
   }
@@ -196,9 +198,6 @@ String ID3v2::Tag::genre() const
   // Here was assume that if an ID3v1 string is present that it should be
   // appended to the genre string.  Multiple fields will be appended as the
   // string is built.
-
-  TextIdentificationFrame *f = static_cast<TextIdentificationFrame *>(
-    d->frameListMap["TCON"].front());
 
   StringList fields = f->fieldList();
 
