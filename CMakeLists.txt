@@ -45,8 +45,11 @@ endif()
 add_definitions(-DHAVE_CONFIG_H)
 set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_C_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
 
