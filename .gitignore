@@ -47,3 +47,8 @@ CMakeFiles/
 taglib.h.stamp
 taglib.xcodeproj
 CMakeScripts
+/.clang-format
+/compile_commands.json
+.clangd
+.cache
+.idea
