@@ -26,6 +26,7 @@
 #ifndef TAGLIB_FILE_H
 #define TAGLIB_FILE_H
 
+#include <sys/types.h>
 #include "taglib_export.h"
 #include "taglib.h"
 #include "tag.h"
@@ -240,7 +241,7 @@ namespace TagLib {
      *
      * \see Position
      */
-    void seek(long offset, Position p = Beginning);
+    void seek(off_t offset, Position p = Beginning);
 
     /*!
      * Reset the end-of-file and error flags on the file.
@@ -250,12 +251,12 @@ namespace TagLib {
     /*!
      * Returns the current offset within the file.
      */
-    long tell() const;
+    off_t tell() const;
 
     /*!
      * Returns the length of the file.
      */
-    long length();
+    off_t length();
 
     /*!
      * Returns true if \a file can be opened for reading.  If the file does not
@@ -303,7 +304,7 @@ namespace TagLib {
     /*!
      * Truncates the file to a \a length.
      */
-    void truncate(long length);
+    void truncate(off_t length);
 
     /*!
      * Returns the buffer size that is used for internal buffering.

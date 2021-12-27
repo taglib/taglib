@@ -427,12 +427,12 @@ bool File::isValid() const
   return isOpen() && d->valid;
 }
 
-void File::seek(off_t offset, Position p)
+void File::seek(long offset, Position p)
 {
   d->stream->seek(offset, IOStream::Position(p));
 }
 
-void File::truncate(off_t length)
+void File::truncate(long length)
 {
   d->stream->truncate(length);
 }
@@ -442,12 +442,12 @@ void File::clear()
   d->stream->clear();
 }
 
-off_t File::tell() const
+long File::tell() const
 {
   return d->stream->tell();
 }
 
-off_t File::length()
+long File::length()
 {
   return d->stream->length();
 }

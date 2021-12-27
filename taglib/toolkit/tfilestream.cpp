@@ -360,7 +360,7 @@ bool FileStream::isOpen() const
   return (d->file != InvalidFileHandle);
 }
 
-void FileStream::seek(long offset, Position p)
+void FileStream::seek(off_t offset, Position p)
 {
   if(!isOpen()) {
     debug("FileStream::seek() -- invalid file.");
@@ -417,7 +417,7 @@ void FileStream::clear()
 #endif
 }
 
-long FileStream::tell() const
+off_t FileStream::tell() const
 {
 #ifdef _WIN32
 
@@ -440,7 +440,7 @@ long FileStream::tell() const
 #endif
 }
 
-long FileStream::length()
+off_t FileStream::length()
 {
   if(!isOpen()) {
     debug("FileStream::length() -- invalid file.");
@@ -461,10 +461,10 @@ long FileStream::length()
 
 #else
 
-  const long curpos = tell();
+  const off_t curpos = tell();
 
   seek(0, End);
-  const long endpos = tell();
+  const off_t endpos = tell();
 
   seek(curpos, Beginning);
 
@@ -477,7 +477,7 @@ long FileStream::length()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-void FileStream::truncate(long length)
+void FileStream::truncate(off_t length)
 {
 #ifdef _WIN32
 

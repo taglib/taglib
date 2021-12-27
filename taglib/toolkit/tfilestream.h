@@ -26,6 +26,7 @@
 #ifndef TAGLIB_FILESTREAM_H
 #define TAGLIB_FILESTREAM_H
 
+#include <sys/types.h>
 #include "taglib_export.h"
 #include "taglib.h"
 #include "tbytevector.h"
@@ -120,7 +121,7 @@ namespace TagLib {
      *
      * \see Position
      */
-    void seek(long offset, Position p = Beginning);
+    void seek(off_t offset, Position p = Beginning);
 
     /*!
      * Reset the end-of-file and error flags on the file.
@@ -130,17 +131,17 @@ namespace TagLib {
     /*!
      * Returns the current offset within the file.
      */
-    long tell() const;
+    off_t tell() const;
 
     /*!
      * Returns the length of the file.
      */
-    long length();
+    off_t length();
 
     /*!
      * Truncates the file to a \a length.
      */
-    void truncate(long length);
+    void truncate(off_t length);
 
   protected:
 

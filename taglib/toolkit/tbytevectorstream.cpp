@@ -127,7 +127,7 @@ bool ByteVectorStream::isOpen() const
   return true;
 }
 
-void ByteVectorStream::seek(long offset, Position p)
+void ByteVectorStream::seek(off_t offset, Position p)
 {
   switch(p) {
   case Beginning:
@@ -146,17 +146,17 @@ void ByteVectorStream::clear()
 {
 }
 
-long ByteVectorStream::tell() const
+off_t ByteVectorStream::tell() const
 {
   return d->position;
 }
 
-long ByteVectorStream::length()
+off_t ByteVectorStream::length()
 {
   return d->data.size();
 }
 
-void ByteVectorStream::truncate(long length)
+void ByteVectorStream::truncate(off_t length)
 {
   d->data.resize(length);
 }
