@@ -528,7 +528,11 @@ MP4::Tag::save()
       debug("MP4: Unknown item name \"" + name + "\"");
     }
   }
-  data = renderAtom("ilst", data);
+  // Leave data empty if there are no items. This will ensure that no meta atom
+  // is saved.
+  if (!data.isEmpty()) {
+    data = renderAtom("ilst", data);
+  }
 
   AtomList path = d->atoms->path("moov", "udta", "meta", "ilst");
   if(path.size() == 4) {
@@ -643,6 +647,9 @@ MP4::Tag::updateOffsets(long delta, long offset)
 void
 MP4::Tag::saveNew(ByteVector data)
 {
+  if(data.isEmpty())
+    return;
+
   data = renderAtom("meta", ByteVector(4, '\0') +
                     renderAtom("hdlr", ByteVector(8, '\0') + ByteVector("mdirappl") +
                                ByteVector(9, '\0')) +
@@ -699,20 +706,40 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   }
 
   long delta = data.size() - length;
-  if(delta > 0 || (delta < 0 && delta > -8)) {
-    data.append(padIlst(data));
-    delta = data.size() - length;
-  }
-  else if(delta < 0) {
-    data.append(padIlst(data, -delta - 8));
-    delta = 0;
-  }
+  if(!data.isEmpty()) {
+    if(delta > 0 || (delta < 0 && delta > -8)) {
+      data.append(padIlst(data));
+      delta = data.size() - length;
+    }
+    else if(delta < 0) {
+      data.append(padIlst(data, -delta - 8));
+      delta = 0;
+    }
 
-  d->file->insert(data, offset, length);
+    d->file->insert(data, offset, length);
 
-  if(delta) {
-    updateParents(path, delta, 1);
-    updateOffsets(delta, offset);
+    if(delta) {
+      updateParents(path, delta, 1);
+      updateOffsets(delta, offset);
+    }
+  }
+  else {
+    // Strip meta
+    MP4::Atom *udta = *(--it);
+    AtomList &udtaChildren = udta->children;
+    AtomList::Iterator metaIt = udtaChildren.find(meta);
+    if (metaIt != udtaChildren.end()) {
+      offset = meta->offset;
+      delta = - meta->length;
+      udtaChildren.erase(metaIt);
+      d->file->removeBlock(meta->offset, meta->length);
+      delete meta;
+
+      if(delta) {
+        updateParents(path, delta, 2);
+        updateOffsets(delta, offset);
+      }
+    }
   }
 }
 
