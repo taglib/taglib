@@ -528,11 +528,7 @@ MP4::Tag::save()
       debug("MP4: Unknown item name \"" + name + "\"");
     }
   }
-  // Leave data empty if there are no items. This will ensure that no meta atom
-  // is saved.
-  if (!data.isEmpty()) {
-    data = renderAtom("ilst", data);
-  }
+  data = renderAtom("ilst", data);
 
   AtomList path = d->atoms->path("moov", "udta", "meta", "ilst");
   if(path.size() == 4) {
@@ -540,6 +536,19 @@ MP4::Tag::save()
   }
   else {
     saveNew(data);
+  }
+
+  return true;
+}
+
+bool
+MP4::Tag::strip()
+{
+  d->items.clear();
+
+  AtomList path = d->atoms->path("moov", "udta", "meta", "ilst");
+  if(path.size() == 4) {
+    saveExisting(ByteVector(), path);
   }
 
   return true;
@@ -647,9 +656,6 @@ MP4::Tag::updateOffsets(long delta, long offset)
 void
 MP4::Tag::saveNew(ByteVector data)
 {
-  if(data.isEmpty())
-    return;
-
   data = renderAtom("meta", ByteVector(4, '\0') +
                     renderAtom("hdlr", ByteVector(8, '\0') + ByteVector("mdirappl") +
                                ByteVector(9, '\0')) +
@@ -724,11 +730,11 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
     }
   }
   else {
-    // Strip meta
+    // Strip meta if data is empty, only the case when called from strip().
     MP4::Atom *udta = *(--it);
     AtomList &udtaChildren = udta->children;
     AtomList::Iterator metaIt = udtaChildren.find(meta);
-    if (metaIt != udtaChildren.end()) {
+    if(metaIt != udtaChildren.end()) {
       offset = meta->offset;
       delta = - meta->length;
       udtaChildren.erase(metaIt);

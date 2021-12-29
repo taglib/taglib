@@ -49,6 +49,19 @@ namespace TagLib {
     {
     public:
       /*!
+       * This set of flags is used for strip() and is suitable for
+       * being OR-ed together.
+       */
+      enum TagTypes {
+        //! Empty set.  Matches no tag types.
+        NoTags  = 0x0000,
+        //! Matches MP4 tags.
+        MP4     = 0x0001,
+        //! Matches all tag types.
+        AllTags = 0xffff
+      };
+
+      /*!
        * Constructs an MP4 file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
@@ -113,6 +126,15 @@ namespace TagLib {
        * This returns true if the save was successful.
        */
       bool save();
+
+      /*!
+       * This will strip the tags that match the OR-ed together TagTypes from the
+       * file.  By default it strips all tags.  It returns true if the tags are
+       * successfully stripped.
+       *
+       * \note This will update the file immediately.
+       */
+      bool strip(int tags = AllTags);
 
       /*!
        * Returns whether or not the file on disk actually has an MP4 tag, or the

@@ -102,6 +102,11 @@ namespace TagLib {
          */
         bool contains(const String &key) const;
 
+        /*!
+         * Saves the associated file with the tag stripped.
+         */
+        bool strip();
+
         PropertyMap properties() const;
         void removeUnsupportedProperties(const StringList& properties);
         PropertyMap setProperties(const PropertyMap &properties);
