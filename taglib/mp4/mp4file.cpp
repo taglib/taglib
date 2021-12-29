@@ -176,6 +176,26 @@ MP4::File::save()
 }
 
 bool
+MP4::File::strip(int tags)
+{
+  if(readOnly()) {
+    debug("MP4::File::strip() - Cannot strip tags from a read only file.");
+    return false;
+  }
+
+  if(!isValid()) {
+    debug("MP4::File::strip() -- Cannot strip tags from an invalid file.");
+    return false;
+  }
+
+  if(tags & MP4) {
+    return d->tag->strip();
+  }
+
+  return true;
+}
+
+bool
 MP4::File::hasMP4Tag() const
 {
   return (d->atoms->find("moov", "udta", "meta", "ilst") != 0);

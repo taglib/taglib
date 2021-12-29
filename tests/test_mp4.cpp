@@ -673,10 +673,8 @@ public:
       MP4::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(f.hasMP4Tag());
-      MP4::Tag *tag = f.tag();
-      CPPUNIT_ASSERT(!tag->isEmpty());
-      tag->setTitle("");
-      f.save();
+      CPPUNIT_ASSERT(!f.tag()->isEmpty());
+      f.strip();
     }
     {
       MP4::File f(copy.fileName().c_str());
