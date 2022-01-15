@@ -35,6 +35,9 @@
 using namespace TagLib;
 using namespace XM;
 
+namespace
+{
+
 /*!
  * The Reader classes are helpers to make handling of the stripped XM
  * format more easy. In the stripped XM format certain header sizes might
@@ -342,6 +345,8 @@ public:
 private:
   List<Reader*> m_readers;
 };
+
+} // namespace
 
 class XM::File::FilePrivate
 {
