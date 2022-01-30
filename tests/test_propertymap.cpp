@@ -25,7 +25,13 @@
 
 #include <tpropertymap.h>
 #include <tag.h>
+#include <apetag.h>
+#include <asftag.h>
 #include <id3v1tag.h>
+#include <id3v2tag.h>
+#include <infotag.h>
+#include <mp4tag.h>
+#include <xiphcomment.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -35,6 +41,13 @@ class TestPropertyMap : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPropertyMap);
   CPPUNIT_TEST(testInvalidKeys);
+  CPPUNIT_TEST(testGetSetApe);
+  CPPUNIT_TEST(testGetSetAsf);
+  CPPUNIT_TEST(testGetSetId3v1);
+  CPPUNIT_TEST(testGetSetId3v2);
+  CPPUNIT_TEST(testGetSetInfo);
+  CPPUNIT_TEST(testGetSetMp4);
+  CPPUNIT_TEST(testGetSetXiphComment);
   CPPUNIT_TEST(testGetSet);
   CPPUNIT_TEST_SUITE_END();
 
@@ -60,9 +73,10 @@ public:
 
   }
 
-  void testGetSet()
+  template <typename T>
+  void tagGetSet()
   {
-    ID3v1::Tag tag;
+    T tag;
 
     tag.setTitle("Test Title");
     tag.setArtist("Test Artist");
@@ -88,6 +102,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Test Title 2"),  tag.title());
     CPPUNIT_ASSERT_EQUAL(String("Test Artist 2"), tag.artist());
     CPPUNIT_ASSERT_EQUAL(5U, tag.track());
+    CPPUNIT_ASSERT(!tag.isEmpty());
 
     PropertyMap props = tag.properties();
     CPPUNIT_ASSERT_EQUAL(StringList("Test Artist 2"), props.find("ARTIST")->second);
@@ -104,9 +119,83 @@ public:
 
     tag.setProperties(PropertyMap());
 
+    CPPUNIT_ASSERT(tag.isEmpty());
+    CPPUNIT_ASSERT(tag.properties().isEmpty());
     CPPUNIT_ASSERT_EQUAL(String(""), tag.title());
     CPPUNIT_ASSERT_EQUAL(String(""), tag.artist());
+    CPPUNIT_ASSERT_EQUAL(String(""), tag.album());
+    CPPUNIT_ASSERT_EQUAL(String(""), tag.comment());
+    CPPUNIT_ASSERT_EQUAL(String(""), tag.genre());
     CPPUNIT_ASSERT_EQUAL(0U, tag.track());
+    CPPUNIT_ASSERT(tag.isEmpty());
+    CPPUNIT_ASSERT(tag.properties().isEmpty());
+  }
+
+  void testGetSetId3v1()
+  {
+    tagGetSet<ID3v1::Tag>();
+  }
+
+  void testGetSetId3v2()
+  {
+    tagGetSet<ID3v2::Tag>();
+  }
+
+  void testGetSetXiphComment()
+  {
+    tagGetSet<Ogg::XiphComment>();
+  }
+
+  void testGetSetApe()
+  {
+    tagGetSet<APE::Tag>();
+  }
+
+  void testGetSetAsf()
+  {
+    tagGetSet<ASF::Tag>();
+  }
+
+  void testGetSetMp4()
+  {
+    tagGetSet<MP4::Tag>();
+  }
+
+  void testGetSetInfo()
+  {
+    tagGetSet<RIFF::Info::Tag>();
+  }
+
+  void testGetSet()
+  {
+    PropertyMap props;
+    props["Title"] = String("Test Title");
+    StringList artists("Artist 1");
+    artists.append("Artist 2");
+    props.insert("Artist", artists);
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Title"), props.value("TITLE"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Title"), props.value("Title"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Title"), props["TITLE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Title"), props["Title"]);
+    CPPUNIT_ASSERT(props.contains("title"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Test Title"), props.find("TITLE")->second);
+    CPPUNIT_ASSERT_EQUAL(2U, props.size());
+    CPPUNIT_ASSERT(!props.isEmpty());
+    props.clear();
+    CPPUNIT_ASSERT(props.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(StringList(), props.value("TITLE"));
+    CPPUNIT_ASSERT_EQUAL(StringList(), props.value("Title"));
+    CPPUNIT_ASSERT_EQUAL(artists, props.value("Title", artists));
+    CPPUNIT_ASSERT(!props.contains("title"));
+    CPPUNIT_ASSERT(props.find("TITLE") == props.end());
+    CPPUNIT_ASSERT_EQUAL(0U, props.size());
+    CPPUNIT_ASSERT(props.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(StringList(), props["TITLE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList(), props["Title"]);
+    CPPUNIT_ASSERT(props.contains("title"));
+    CPPUNIT_ASSERT(props.find("TITLE") != props.end());
+    CPPUNIT_ASSERT_EQUAL(1U, props.size());
+    CPPUNIT_ASSERT(!props.isEmpty());
   }
 
 };
