@@ -116,51 +116,44 @@ ByteVector APE::Tag::fileIdentifier()
 
 String APE::Tag::title() const
 {
-  if(d->itemListMap["TITLE"].isEmpty())
-    return String();
-  return d->itemListMap["TITLE"].values().toString();
+  Item value = d->itemListMap.value("TITLE");
+  return value.isEmpty() ? String() : value.values().toString();
 }
 
 String APE::Tag::artist() const
 {
-  if(d->itemListMap["ARTIST"].isEmpty())
-    return String();
-  return d->itemListMap["ARTIST"].values().toString();
+  Item value = d->itemListMap.value("ARTIST");
+  return value.isEmpty() ? String() : value.values().toString();
 }
 
 String APE::Tag::album() const
 {
-  if(d->itemListMap["ALBUM"].isEmpty())
-    return String();
-  return d->itemListMap["ALBUM"].values().toString();
+  Item value = d->itemListMap.value("ALBUM");
+  return value.isEmpty() ? String() : value.values().toString();
 }
 
 String APE::Tag::comment() const
 {
-  if(d->itemListMap["COMMENT"].isEmpty())
-    return String();
-  return d->itemListMap["COMMENT"].values().toString();
+  Item value = d->itemListMap.value("COMMENT");
+  return value.isEmpty() ? String() : value.values().toString();
 }
 
 String APE::Tag::genre() const
 {
-  if(d->itemListMap["GENRE"].isEmpty())
-    return String();
-  return d->itemListMap["GENRE"].values().toString();
+  Item value = d->itemListMap.value("GENRE");
+  return value.isEmpty() ? String() : value.values().toString();
 }
 
 unsigned int APE::Tag::year() const
 {
-  if(d->itemListMap["YEAR"].isEmpty())
-    return 0;
-  return d->itemListMap["YEAR"].toString().toInt();
+  Item value = d->itemListMap.value("YEAR");
+  return value.isEmpty() ? 0 : value.toString().toInt();
 }
 
 unsigned int APE::Tag::track() const
 {
-  if(d->itemListMap["TRACK"].isEmpty())
-    return 0;
-  return d->itemListMap["TRACK"].toString().toInt();
+  Item value = d->itemListMap.value("TRACK");
+  return value.isEmpty() ? 0 : value.toString().toInt();
 }
 
 void APE::Tag::setTitle(const String &s)
