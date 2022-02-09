@@ -108,6 +108,16 @@ namespace TagLib {
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
     };
 
+    class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
+    {
+        TAGLIB_IGNORE_MISSING_DESTRUCTOR
+      public:
+        virtual File *createFileFromStream(IOStream* stream,
+                                 bool readAudioProperties = true,
+                                 AudioProperties::ReadStyle
+                                 audioPropertiesStyle = AudioProperties::Average) const = 0;
+    };
+
     /*!
      * Creates a null FileRef.
      */
