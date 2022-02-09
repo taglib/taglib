@@ -84,6 +84,23 @@ namespace
     return 0;
   }
 
+  File *detectByResolvers(IOStream* stream, bool readAudioProperties,
+                          AudioProperties::ReadStyle audioPropertiesStyle)
+  {
+    ResolverList::ConstIterator it = fileTypeResolvers.begin();
+    for(; it != fileTypeResolvers.end(); ++it) {
+      const FileRef::StreamTypeResolver* streamResolver =
+        dynamic_cast<const FileRef::StreamTypeResolver*>(*it);
+      if (!streamResolver)
+        continue;
+      File *file = streamResolver->createFileFromStream(stream, readAudioProperties, audioPropertiesStyle);
+      if(file)
+        return file;
+    }
+
+    return 0;
+  }
+
   // Detect the file type based on the file extension.
 
   File* detectByExtension(IOStream *stream, bool readAudioProperties,
@@ -482,7 +499,7 @@ void FileRef::parse(IOStream *stream, bool readAudioProperties,
 {
   // Try user-defined resolvers.
 
-  d->file = detectByResolvers(stream->name(), readAudioProperties, audioPropertiesStyle);
+  d->file = detectByResolvers(stream, readAudioProperties, audioPropertiesStyle);
   if(d->file)
     return;
 
