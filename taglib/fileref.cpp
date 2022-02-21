@@ -497,9 +497,15 @@ void FileRef::parse(FileName fileName, bool readAudioProperties,
 void FileRef::parse(IOStream *stream, bool readAudioProperties,
                     AudioProperties::ReadStyle audioPropertiesStyle)
 {
-  // Try user-defined resolvers.
+  // Try user-defined stream resolvers.
 
   d->file = detectByResolvers(stream, readAudioProperties, audioPropertiesStyle);
+  if(d->file)
+    return;
+
+  // Try user-defined resolvers.
+
+  d->file = detectByResolvers(stream->name(), readAudioProperties, audioPropertiesStyle);
   if(d->file)
     return;
 
