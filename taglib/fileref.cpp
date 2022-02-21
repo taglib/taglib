@@ -87,15 +87,13 @@ namespace
   File *detectByResolvers(IOStream* stream, bool readAudioProperties,
                           AudioProperties::ReadStyle audioPropertiesStyle)
   {
-    ResolverList::ConstIterator it = fileTypeResolvers.begin();
-    for(; it != fileTypeResolvers.end(); ++it) {
-      const FileRef::StreamTypeResolver* streamResolver =
-        dynamic_cast<const FileRef::StreamTypeResolver*>(*it);
-      if (!streamResolver)
-        continue;
-      File *file = streamResolver->createFileFromStream(stream, readAudioProperties, audioPropertiesStyle);
-      if(file)
-        return file;
+    for(ResolverList::ConstIterator it = fileTypeResolvers.begin();
+        it != fileTypeResolvers.end(); ++it) {
+      if (const FileRef::StreamTypeResolver* streamResolver =
+            dynamic_cast<const FileRef::StreamTypeResolver*>(*it)) {
+        if(File *file = streamResolver->createFileFromStream(stream, readAudioProperties, audioPropertiesStyle))
+          return file;
+      }
     }
 
     return 0;
