@@ -60,6 +60,18 @@ namespace
       return new Ogg::Vorbis::File(fileName);
     }
   };
+  class DummyStreamResolver : public FileRef::StreamTypeResolver
+  {
+  public:
+    virtual File *createFile(FileName, bool, AudioProperties::ReadStyle) const
+    {
+      return 0;
+    }
+    virtual File *createFileFromStream(IOStream *s, bool, AudioProperties::ReadStyle) const
+    {
+      return new MP4::File(s);
+    }
+  };
 }
 
 class TestFileRef : public CppUnit::TestFixture
@@ -386,6 +398,15 @@ public:
     {
       FileRef f(TEST_FILE_PATH_C("xing.mp3"));
       CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != NULL);
+    }
+
+    DummyStreamResolver streamResolver;
+    FileRef::addFileTypeResolver(&streamResolver);
+
+    {
+      FileStream s(TEST_FILE_PATH_C("xing.mp3"));
+      FileRef f(&s);
+      CPPUNIT_ASSERT(dynamic_cast<MP4::File *>(f.file()) != NULL);
     }
   }
 
