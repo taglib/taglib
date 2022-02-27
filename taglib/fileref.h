@@ -110,12 +110,12 @@ namespace TagLib {
 
     class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
     {
-        TAGLIB_IGNORE_MISSING_DESTRUCTOR
-      public:
-        virtual File *createFileFromStream(IOStream* stream,
-                                 bool readAudioProperties = true,
-                                 AudioProperties::ReadStyle
-                                 audioPropertiesStyle = AudioProperties::Average) const = 0;
+      TAGLIB_IGNORE_MISSING_DESTRUCTOR
+    public:
+      virtual File *createFileFromStream(IOStream *stream,
+                               bool readAudioProperties = true,
+                               AudioProperties::ReadStyle
+                               audioPropertiesStyle = AudioProperties::Average) const = 0;
     };
 
     /*!

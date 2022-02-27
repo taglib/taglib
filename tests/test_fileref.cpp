@@ -60,6 +60,7 @@ namespace
       return new Ogg::Vorbis::File(fileName);
     }
   };
+
   class DummyStreamResolver : public FileRef::StreamTypeResolver
   {
   public:
@@ -67,6 +68,7 @@ namespace
     {
       return 0;
     }
+
     virtual File *createFileFromStream(IOStream *s, bool, AudioProperties::ReadStyle) const
     {
       return new MP4::File(s);
