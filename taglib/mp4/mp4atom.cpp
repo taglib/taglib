@@ -85,7 +85,25 @@ MP4::Atom::Atom(File *file)
   for(int i = 0; i < numContainers; i++) {
     if(name == containers[i]) {
       if(name == "meta") {
-        file->seek(4, File::Current);
+        long posAfterMeta = file->tell();
+        ByteVector nextSize = file->readBlock(8).mid(4, 4);
+        static const char *const metaChildrenNames[] = {
+            "hdlr", "ilst", "mhdr", "ctry", "lang"
+        };
+        bool metaIsFullAtom = true;
+        for(size_t j = 0;
+            j < sizeof(metaChildrenNames) / sizeof(metaChildrenNames[0]);
+            ++j) {
+          if(nextSize == metaChildrenNames[j]) {
+            // meta is not a full atom (i.e. not followed by version, flags). It
+            // is followed by the size and type of the first child atom.
+            metaIsFullAtom = false;
+            break;
+          }
+        }
+        // Only skip next four bytes, which contain version and flags, if meta
+        // is a full atom.
+        file->seek(posAfterMeta + (metaIsFullAtom ? 4 : 0));
       }
       else if(name == "stsd") {
         file->seek(8, File::Current);
