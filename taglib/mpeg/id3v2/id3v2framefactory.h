@@ -127,6 +127,31 @@ namespace TagLib {
        */
       virtual bool updateFrame(Frame::Header *header) const;
 
+      /*!
+       * Creates and prepares the frame header for createFrame().
+       *
+       * \param data data of the frame (might be modified)
+       * \param tagHeader the tag header
+       * \param header reference to frame header pointer, will be set to
+       *               nullptr if the frame is invalid
+       * \return {header, ok}: header is a created frame header or nullptr
+       *         if the frame is invalid; ok is true if the frame is supported.
+       */
+      std::pair<Frame::Header *, bool> prepareFrameHeader(
+          ByteVector &data, const Header *tagHeader) const;
+
+      /*!
+       * Create a frame based on \a data.  \a header should be a valid frame
+       * header and \a tagHeader a valid ID3v2::Header instance.
+       *
+       * This method is called by the public overloaded method
+       * createFrame(const ByteVector &, const Header *) after creating
+       * \a header from verified \a data using prepareFrameHeader(), so
+       * this method is provided to be reimplemented in derived classes.
+       */
+      virtual Frame *createFrame(const ByteVector &data, Frame::Header *header,
+                                 const Header *tagHeader) const;
+
     private:
       FrameFactory(const FrameFactory &) = delete;
       FrameFactory &operator=(const FrameFactory &) = delete;
