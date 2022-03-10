@@ -38,11 +38,22 @@ long Utils::findID3v1(File *file)
   if(!file->isValid())
     return -1;
 
-  file->seek(-128, File::End);
-  const long p = file->tell();
+  // Differentiate between a match of APEv2 magic and a match of ID3v1 magic.
 
-  if(file->readBlock(3) == ID3v1::Tag::fileIdentifier())
-    return p;
+  if (file->length() >= 131) {
+    file->seek(-131, File::End);
+    const long p = file->tell() + 3;
+    const TagLib::ByteVector data = file->readBlock(8);
+
+    if(data.containsAt(ID3v1::Tag::fileIdentifier(), 3) && (data != APE::Tag::fileIdentifier()))
+      return p;
+  } else {
+    file->seek(-128, File::End);
+    const long p = file->tell();
+
+    if(file->readBlock(3) == ID3v1::Tag::fileIdentifier())
+      return p;
+  }
 
   return -1;
 }
