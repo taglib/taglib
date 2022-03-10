@@ -29,6 +29,7 @@
 #include <tstringlist.h>
 #include <tbytevectorlist.h>
 #include <tpropertymap.h>
+#include <apefile.h>
 #include <apetag.h>
 #include <tdebug.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -46,6 +47,7 @@ class TestAPETag : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST(testInvalidKeys);
   CPPUNIT_TEST(testTextBinary);
+  CPPUNIT_TEST(testID3v1Collision);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -163,6 +165,24 @@ public:
     item.setValue("Test Text 2");
     CPPUNIT_ASSERT_EQUAL(String("Test Text 2"), item.toString());
     CPPUNIT_ASSERT_EQUAL(ByteVector(), item.binaryData());
+  }
+
+  void testID3v1Collision()
+  {
+    ScopedFileCopy copy("no-tags", ".mpc");
+    string newname = copy.fileName();
+
+    {
+      APE::File f(newname.c_str());
+      f.APETag(true)->setArtist("Filltointersect    ");
+      f.APETag()->setTitle("Filltointersect    ");
+      f.save();
+    }
+
+    {
+      APE::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v1Tag());
+    }
   }
 
 };
