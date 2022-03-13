@@ -220,7 +220,7 @@ namespace
     std::make_pair("WM/Year", "DATE"),
     std::make_pair("WM/OriginalReleaseYear", "ORIGINALDATE"),
     std::make_pair("WM/Producer", "PRODUCER"),
-    std::make_pair("WM/ContentGroupDescription", "GROUPING"),
+    std::make_pair("WM/ContentGroupDescription", "WORK"),
     std::make_pair("WM/SubTitle", "SUBTITLE"),
     std::make_pair("WM/SetSubTitle", "DISCSUBTITLE"),
     std::make_pair("WM/TrackNumber", "TRACKNUMBER"),

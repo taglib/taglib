@@ -328,7 +328,7 @@ public:
     tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
     tags["ENCODEDBY"] = StringList("Encoded by");
     tags["GENRE"] = StringList("Genre");
-    tags["GROUPING"] = StringList("Grouping");
+    tags["WORK"] = StringList("Grouping");
     tags["ISRC"] = StringList("UKAAA0500001");
     tags["LABEL"] = StringList("Label");
     tags["LANGUAGE"] = StringList("eng");

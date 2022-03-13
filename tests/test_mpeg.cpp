@@ -314,10 +314,11 @@ public:
     tags["CATALOGNUMBER"] = StringList("Catalog Number");
     tags["COMMENT"] = StringList("Comment");
     tags["COMMENT:CDESC"] = StringList("Comment with Description");
+    tags["COMPILATION"] = StringList("1");
     tags["COMPOSER"] = StringList("Composer");
     tags["COMPOSERSORT"] = StringList("Composer Sort");
     tags["CONDUCTOR"] = StringList("Conductor");
-    tags["CONTENTGROUP"] = StringList("Content Group");
+    tags["WORK"] = StringList("Content Group");
     tags["COPYRIGHT"] = StringList("2021 Copyright");
     tags["COPYRIGHTURL"] = StringList("Copyright URL");
     tags["DATE"] = StringList("2021-01-03 12:29:23");

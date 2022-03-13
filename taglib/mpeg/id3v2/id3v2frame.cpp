@@ -342,7 +342,7 @@ namespace
     std::make_pair("TEXT", "LYRICIST"),
     std::make_pair("TFLT", "FILETYPE"),
     //std::make_pair("TIPL", "INVOLVEDPEOPLE"), handled separately
-    std::make_pair("TIT1", "CONTENTGROUP"), // 'Work' in iTunes
+    std::make_pair("TIT1", "WORK"), // 'Work' in iTunes
     std::make_pair("TIT2", "TITLE"),
     std::make_pair("TIT3", "SUBTITLE"),
     std::make_pair("TKEY", "INITIALKEY"),
@@ -394,6 +394,7 @@ namespace
     std::make_pair("MVNM", "MOVEMENTNAME"),
     std::make_pair("MVIN", "MOVEMENTNUMBER"),
     std::make_pair("GRP1", "GROUPING"),
+    std::make_pair("TCMP", "COMPILATION"),
   };
   const size_t frameTranslationSize = sizeof(frameTranslation) / sizeof(frameTranslation[0]);
 
