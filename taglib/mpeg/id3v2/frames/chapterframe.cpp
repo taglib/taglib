@@ -294,8 +294,10 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
   FrameList l = d->embeddedFrameList;
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
+  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
+    (*it)->header()->setVersion(header()->version());
     data.append((*it)->render());
+  }
 
   return data;
 }

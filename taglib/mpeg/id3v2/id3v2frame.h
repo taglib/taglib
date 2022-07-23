@@ -55,6 +55,8 @@ namespace TagLib {
     {
       friend class Tag;
       friend class FrameFactory;
+      friend class TableOfContentsFrame;
+      friend class ChapterFrame;
 
     public:
 
