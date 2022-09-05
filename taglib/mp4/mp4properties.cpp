@@ -188,7 +188,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
   file->seek(mdhd->offset);
   data = file->readBlock(mdhd->length);
 
-  const unsigned int version = data[8];
+  const unsigned int version = data.at(8);
   long long unit;
   long long length;
   if(version == 1) {
@@ -222,13 +222,13 @@ MP4::Properties::read(File *file, Atoms *atoms)
     d->channels      = data.toShort(40U);
     d->bitsPerSample = data.toShort(42U);
     d->sampleRate    = data.toUInt(46U);
-    if(data.containsAt("esds", 56) && data[64] == 0x03) {
+    if(data.containsAt("esds", 56) && data.at(64) == 0x03) {
       unsigned int pos = 65;
       if(data.containsAt("\x80\x80\x80", pos)) {
         pos += 3;
       }
       pos += 4;
-      if(data[pos] == 0x04) {
+      if(data.at(pos) == 0x04) {
         pos += 1;
         if(data.containsAt("\x80\x80\x80", pos)) {
           pos += 3;
