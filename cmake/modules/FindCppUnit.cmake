@@ -33,7 +33,7 @@ ELSE(CPPUNIT_INCLUDE_DIR AND CPPUNIT_LIBRARIES)
         FIND_PATH(CPPUNIT_CFLAGS cppunit/TestRunner.h PATHS /usr/include /usr/local/include )
         FIND_LIBRARY(CPPUNIT_LIBRARIES NAMES cppunit PATHS /usr/lib /usr/local/lib )
         # how can we find cppunit version?
-        MESSAGE (STATUS "Ensure you cppunit installed version is at least ${CPPUNIT_MIN_VERSION}")
+        MESSAGE (STATUS "Ensure your cppunit installed version is at least ${CPPUNIT_MIN_VERSION}")
         SET (CPPUNIT_INSTALLED_VERSION ${CPPUNIT_MIN_VERSION})
     ENDIF(CPPUNIT_CONFIG_EXECUTABLE)
 
