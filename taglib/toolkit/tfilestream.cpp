@@ -206,9 +206,12 @@ ByteVector FileStream::readBlock(unsigned long length)
   if(length == 0)
     return ByteVector();
 
-  const unsigned long streamLength = static_cast<unsigned long>(FileStream::length());
-  if(length > bufferSize() && length > streamLength)
-    length = streamLength;
+  if(length > bufferSize()) {
+    const unsigned long streamLength = static_cast<unsigned long>(FileStream::length());
+    if(length > streamLength) {
+      length = streamLength;
+    }
+  }
 
   ByteVector buffer(static_cast<unsigned int>(length));
 
