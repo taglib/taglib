@@ -1,0 +1,54 @@
+name: Build
+
+on: [push, pull_request, workflow_dispatch]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: windows-latest
+            cmake_extra_args: '-DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"'
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Ubuntu
+      run: sudo apt install -y libcppunit-dev zlib1g-dev
+      if: matrix.os == 'ubuntu-latest'
+
+    - name: Set up macOS
+      run: brew install cppunit
+      if: matrix.os == 'macos-latest'
+
+    - name: Set up Windows
+      run: vcpkg install cppunit --triplet x64-windows
+      if: matrix.os == 'windows-latest'
+
+    - name: Configure
+      run: >
+        cmake -B${{github.workspace}}/build
+        -DBUILD_SHARED_LIBS=ON -DVISIBILITY_HIDDEN=ON
+        -DBUILD_TESTING=ON -DBUILD_EXAMPLES=ON -DBUILD_BINDINGS=ON
+        -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        ${{ matrix.cmake_extra_args }}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
+      if: matrix.os != 'windows-latest'
+
+    - name: Test Windows
+      working-directory: ${{github.workspace}}/build
+      run: |
+        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\cppunit_x64-windows\bin;$PWD\taglib\Release"
+        ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
+      if: matrix.os == 'windows-latest'

@@ -1,6 +1,6 @@
 # TagLib
 
-[![Build Status](https://travis-ci.org/taglib/taglib.svg?branch=master)](https://travis-ci.org/taglib/taglib)
+[![Build Status](../../actions/workflows/build.yml/badge.svg)](../../actions)
 
 ### TagLib Audio Metadata Library
 
@@ -23,4 +23,3 @@ licenses if you are considering using TagLib in your project.
   [FLAC]: https://xiph.org/flac/
   [GNU Lesser General Public License]: https://www.gnu.org/licenses/lgpl.html
   [Mozilla Public License]: https://www.mozilla.org/MPL/MPL-1.1.html
-
