@@ -115,7 +115,7 @@ if(WITH_ZLIB)
       set(HAVE_ZLIB 0)
     endif()
   endif()
-  
+
   if(NOT HAVE_ZLIB AND ZLIB_SOURCE)
     set(HAVE_ZLIB 1)
     set(HAVE_ZLIB_SOURCE 1)
@@ -169,7 +169,6 @@ if(BUILD_EXAMPLES)
 endif()
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.cmake" "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
-file(COPY doc/taglib.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/doc/html)
 add_custom_target(docs doxygen)
 
 # uninstall target
