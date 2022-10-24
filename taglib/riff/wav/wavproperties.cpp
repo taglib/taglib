@@ -201,7 +201,7 @@ void RIFF::WAV::Properties::read(File *file)
   d->sampleRate    = data.toUInt(4, false);
   d->bitsPerSample = data.toShort(14, false);
 
-  if(d->format != FORMAT_PCM && !(d->format == FORMAT_IEEE_FLOAT && totalSamples == 0))
+  if(d->format != FORMAT_PCM && (d->format != FORMAT_IEEE_FLOAT || totalSamples != 0))
     d->sampleFrames = totalSamples;
   else if(d->channels > 0 && d->bitsPerSample > 0)
     d->sampleFrames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
