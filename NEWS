@@ -1,3 +1,4 @@
+TagLib 1.13 (Oct 27, 2022)
 ==========================
 
  * Added interface StreamTypeResolver to support streams which cannot be
@@ -11,7 +12,7 @@
    BUILD_TESTS, GNUInstallDirs, FeatureSummary, tests with BUILD_SHARED_LIBS,
    cross compilation with Buildroot, systems without HAVE_GCC_ATOMIC, Clang.
  * Fixed heap-buffer-overflows when handling ASF, APE, FLAC, ID3v2, MP4, MPC
-   tags. 
+   tags.
  * Fixed detection of invalid file by extension when correct type can be
    detected by contents.
  * Fixed unnecessary creation of map entries in APE and FLAC tags if looked up
