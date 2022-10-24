@@ -237,10 +237,10 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
     // Copy the values from the tag that does exist into the new tag,
     // except if the existing tag is to be stripped.
 
-    if((tags & ID3v2) && ID3v1Tag() && !(strip == StripOthers && !(tags & ID3v1)))
+    if((tags & ID3v2) && ID3v1Tag() && (strip != StripOthers || (tags & ID3v1)))
       Tag::duplicate(ID3v1Tag(), ID3v2Tag(true), false);
 
-    if((tags & ID3v1) && d->tag[ID3v2Index] && !(strip == StripOthers && !(tags & ID3v2)))
+    if((tags & ID3v1) && d->tag[ID3v2Index] && (strip != StripOthers || (tags & ID3v2)))
       Tag::duplicate(ID3v2Tag(), ID3v1Tag(true), false);
   }
 
