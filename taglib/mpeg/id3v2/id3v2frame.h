@@ -505,7 +505,7 @@ namespace TagLib {
       ByteVector render() const;
 
       /*!
-       * \deprecated
+       * \deprecated Use fileAlterPreservation().
        */
       TAGLIB_DEPRECATED bool frameAlterPreservation() const;
 
