@@ -337,7 +337,7 @@ namespace TagLib {
      *
      * \see isEmpty()
      *
-     * \deprecated
+     * \deprecated Use isEmpty(), do not differentiate between null and empty.
      */
      // BIC: remove
     TAGLIB_DEPRECATED bool isNull() const;
@@ -522,7 +522,7 @@ namespace TagLib {
      * \warning Do not modify this variable.  It will mess up the internal state
      * of TagLib.
      *
-     * \deprecated
+     * \deprecated Use String().
      */
      // BIC: remove
     TAGLIB_DEPRECATED static String null;

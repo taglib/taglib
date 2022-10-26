@@ -73,7 +73,7 @@ namespace TagLib {
        *
        * \note This method is just an alias of lengthInSeconds().
        *
-       * \deprecated
+       * \deprecated Use lengthInSeconds().
        */
       TAGLIB_DEPRECATED virtual int length() const;
 

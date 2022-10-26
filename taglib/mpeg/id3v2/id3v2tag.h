@@ -338,7 +338,7 @@ namespace TagLib {
       ByteVector render() const;
 
       /*!
-       * \deprecated
+       * \deprecated Use render(Version) const.
        */
       TAGLIB_DEPRECATED ByteVector render(int version) const;
 

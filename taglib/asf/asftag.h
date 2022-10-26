@@ -152,7 +152,8 @@ namespace TagLib {
       virtual bool isEmpty() const;
 
       /*!
-       * \deprecated
+       * \deprecated Use attributeListMap() const, contains(), removeItem(),
+       * attribute(), setAttribute(), addAttribute().
        */
       AttributeListMap &attributeListMap();
 
