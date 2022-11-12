@@ -112,6 +112,8 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderPodcastFrame);
   CPPUNIT_TEST(testParsePrivateFrame);
   CPPUNIT_TEST(testRenderPrivateFrame);
+  CPPUNIT_TEST(testParseUserTextIdentificationFrame);
+  CPPUNIT_TEST(testRenderUserTextIdentificationFrame);
   CPPUNIT_TEST(testSaveUTF16Comment);
   CPPUNIT_TEST(testUpdateGenre23_1);
   CPPUNIT_TEST(testUpdateGenre23_2);
@@ -838,6 +840,51 @@ public:
                  "\x00\x00"
                  "WM/Provider\x00"
                  "TL", 24),
+      f.render());
+  }
+
+  void testParseUserTextIdentificationFrame()
+  {
+    ID3v2::UserTextIdentificationFrame frameWithoutDescription(
+      ByteVector("TXXX"
+                 "\x00\x00\x00\x06"
+                 "\x00\x00\x00"
+                 "\x00"
+                 "Text", 16));
+    CPPUNIT_ASSERT_EQUAL(String(""), frameWithoutDescription.description());
+    CPPUNIT_ASSERT_EQUAL(String("Text"), frameWithoutDescription.fieldList()[1]);
+
+    ID3v2::UserTextIdentificationFrame frameWithDescription(
+      ByteVector("TXXX"
+                 "\x00\x00\x00\x11"
+                 "\x00\x00\x00"
+                 "Description\x00"
+                 "Text", 27));
+    CPPUNIT_ASSERT_EQUAL(String("Description"), frameWithDescription.description());
+    CPPUNIT_ASSERT_EQUAL(String("Text"), frameWithDescription.fieldList()[1]);
+  }
+
+  void testRenderUserTextIdentificationFrame()
+  {
+    ID3v2::UserTextIdentificationFrame f;
+    f.setDescription("");
+    f.setText("Text");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("TXXX"
+                 "\x00\x00\x00\x06"
+                 "\x00\x00\x00"
+                 "\x00"
+                 "Text", 16),
+      f.render());
+
+    f.setDescription("Description");
+    f.setText("Text");
+    CPPUNIT_ASSERT_EQUAL(
+      ByteVector("TXXX"
+                 "\x00\x00\x00\x11"
+                 "\x00\x00\x00"
+                 "Description\x00"
+                 "Text", 27),
       f.render());
   }
 
