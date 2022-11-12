@@ -220,7 +220,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
   unsigned short firstBom = 0;
   for(ByteVectorList::ConstIterator it = l.begin(); it != l.end(); it++) {
-    if(!(*it).isEmpty()) {
+    if(!it->isEmpty() || (it == l.begin() && frameID() == "TXXX")) {
       if(d->textEncoding == String::Latin1) {
         d->fieldList.append(Tag::latin1StringHandler()->parse(*it));
       }
