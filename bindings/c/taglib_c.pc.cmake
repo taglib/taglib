@@ -1,7 +1,7 @@
-prefix=${CMAKE_INSTALL_PREFIX}
-exec_prefix=${CMAKE_INSTALL_PREFIX}
-libdir=${CMAKE_INSTALL_FULL_LIBDIR}
-includedir=${CMAKE_INSTALL_FULL_INCLUDEDIR}
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
 
 
 Name: TagLib C Bindings
