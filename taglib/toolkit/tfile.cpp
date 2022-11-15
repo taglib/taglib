@@ -62,7 +62,6 @@
 #include "s3mfile.h"
 #include "itfile.h"
 #include "xmfile.h"
-#include "mp4file.h"
 
 using namespace TagLib;
 
