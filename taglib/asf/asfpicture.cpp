@@ -172,7 +172,6 @@ void ASF::Picture::parse(const ByteVector& bytes)
 
   d->picture = bytes.mid(pos, dataLen);
   d->valid = true;
-  return;
 }
 
 ASF::Picture ASF::Picture::fromInvalid()
