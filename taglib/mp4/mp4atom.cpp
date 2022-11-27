@@ -38,10 +38,10 @@ const char *const MP4::Atom::containers[11] = {
 };
 
 MP4::Atom::Atom(File *file)
+  : offset(file->tell())
 {
   children.setAutoDelete(true);
 
-  offset = file->tell();
   ByteVector header = file->readBlock(8);
   if(header.size() != 8) {
     // The atom header must be 8 bytes long, otherwise there is either
