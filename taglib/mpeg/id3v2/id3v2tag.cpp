@@ -186,9 +186,13 @@ String ID3v2::Tag::genre() const
   // the behavior the same as released versions it is being left with " ".
 
   const FrameList &tconFrames = d->frameListMap["TCON"];
-  TextIdentificationFrame *f;
-  if(tconFrames.isEmpty() ||
-     !(f = dynamic_cast<TextIdentificationFrame *>(tconFrames.front())))
+  if(tconFrames.isEmpty())
+  {
+    return String();
+  }
+
+  TextIdentificationFrame *f = dynamic_cast<TextIdentificationFrame *>(tconFrames.front());
+  if(!f)
   {
     return String();
   }
