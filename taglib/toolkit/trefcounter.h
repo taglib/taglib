@@ -83,25 +83,25 @@ namespace TagLib
 #ifdef TAGLIB_ATOMIC_MAC
     void ref() { OSAtomicIncrement32Barrier(const_cast<int32_t*>(&refCount)); }
     bool deref() { return ! OSAtomicDecrement32Barrier(const_cast<int32_t*>(&refCount)); }
-    int32_t count() { return refCount; }
+    int32_t count() const { return refCount; }
   private:
     volatile int32_t refCount;
 #elif defined(TAGLIB_ATOMIC_WIN)
     void ref() { InterlockedIncrement(&refCount); }
     bool deref() { return ! InterlockedDecrement(&refCount); }
-    long count() { return refCount; }
+    long count() const { return refCount; }
   private:
     volatile long refCount;
 #elif defined(TAGLIB_ATOMIC_GCC)
     void ref() { __sync_add_and_fetch(&refCount, 1); }
     bool deref() { return ! __sync_sub_and_fetch(&refCount, 1); }
-    int count() { return refCount; }
+    int count() const { return refCount; }
   private:
     volatile int refCount;
 #else
     void ref() { refCount++; }
     bool deref() { return ! --refCount; }
-    int count() { return refCount; }
+    int count() const { return refCount; }
   private:
     unsigned int refCount;
 #endif
