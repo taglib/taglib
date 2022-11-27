@@ -47,8 +47,8 @@ namespace TagLib {
 
     ByteVector readHeader(IOStream *stream, unsigned int length, bool skipID3v2,
                           long *headerOffset = 0);
-  }
-}
+  }  // namespace Utils
+}  // namespace TagLib
 
 #endif
 

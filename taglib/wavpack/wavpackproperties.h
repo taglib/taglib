@@ -143,7 +143,7 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-  }
-}
+  }  // namespace WavPack
+}  // namespace TagLib
 
 #endif

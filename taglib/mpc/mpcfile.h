@@ -232,7 +232,7 @@ namespace TagLib {
       class FilePrivate;
       FilePrivate *d;
     };
-  }
-}
+  }  // namespace MPC
+}  // namespace TagLib
 
 #endif

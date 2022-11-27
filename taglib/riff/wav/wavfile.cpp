@@ -39,7 +39,7 @@ using namespace TagLib;
 namespace
 {
   enum { ID3v2Index = 0, InfoIndex = 1 };
-}
+} // namespace
 
 class RIFF::WAV::File::FilePrivate
 {

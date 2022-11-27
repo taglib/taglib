@@ -232,9 +232,9 @@ namespace TagLib
           return LittleEndian;
         return BigEndian;
       }
-    }
-  }
-}
+    }  // namespace
+  }  // namespace Utils
+}  // namespace TagLib
 
 #endif
 

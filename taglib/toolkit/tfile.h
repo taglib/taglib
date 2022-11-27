@@ -318,6 +318,6 @@ namespace TagLib {
     FilePrivate *d;
   };
 
-}
+}  // namespace TagLib
 
 #endif

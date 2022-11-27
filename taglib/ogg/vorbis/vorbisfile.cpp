@@ -57,7 +57,7 @@ namespace TagLib {
    * an Ogg stream.  0x03 indicates the comment header.
    */
   static const char vorbisCommentHeaderID[] = { 0x03, 'v', 'o', 'r', 'b', 'i', 's', 0 };
-}
+} // namespace TagLib
 
 ////////////////////////////////////////////////////////////////////////////////
 // static members

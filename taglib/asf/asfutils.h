@@ -95,9 +95,9 @@ namespace TagLib
         return data;
       }
 
-    }
-  }
-}
+    }  // namespace
+  }  // namespace ASF
+}  // namespace TagLib
 
 #endif
 

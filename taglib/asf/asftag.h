@@ -206,6 +206,6 @@ namespace TagLib {
       class TagPrivate;
       TagPrivate *d;
     };
-  }
-}
+  }  // namespace ASF
+}  // namespace TagLib
 #endif

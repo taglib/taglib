@@ -40,7 +40,7 @@ namespace
   typedef List<FLAC::Picture *> PictureList;
   typedef PictureList::Iterator PictureIterator;
   typedef PictureList::Iterator PictureConstIterator;
-}
+} // namespace
 
 class Ogg::XiphComment::XiphCommentPrivate
 {

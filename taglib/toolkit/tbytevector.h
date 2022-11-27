@@ -624,7 +624,7 @@ namespace TagLib {
     class ByteVectorPrivate;
     ByteVectorPrivate *d;
   };
-}
+}  // namespace TagLib
 
 /*!
  * \relates TagLib::ByteVector

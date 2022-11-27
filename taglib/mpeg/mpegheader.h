@@ -172,7 +172,7 @@ namespace TagLib {
       class HeaderPrivate;
       HeaderPrivate *d;
     };
-  }
-}
+  }  // namespace MPEG
+}  // namespace TagLib
 
 #endif

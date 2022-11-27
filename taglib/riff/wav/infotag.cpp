@@ -36,7 +36,7 @@ namespace
 {
   const RIFF::Info::StringHandler defaultStringHandler;
   const RIFF::Info::StringHandler *stringHandler = &defaultStringHandler;
-}
+} // namespace
 
 class RIFF::Info::Tag::TagPrivate
 {

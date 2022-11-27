@@ -49,7 +49,7 @@ using namespace TagLib;
 namespace
 {
   enum { ApeAPEIndex = 0, ApeID3v1Index = 1 };
-}
+} // namespace
 
 class APE::File::FilePrivate
 {

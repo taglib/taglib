@@ -45,7 +45,7 @@ using namespace TagLib;
 namespace
 {
   enum { WavAPEIndex, WavID3v1Index };
-}
+} // namespace
 
 class WavPack::File::FilePrivate
 {

@@ -46,8 +46,8 @@ namespace TagLib {
       */
      ByteVector decompress(const ByteVector &data);
 
-  }
-}
+  }  // namespace zlib
+}  // namespace TagLib
 
 #endif
 
