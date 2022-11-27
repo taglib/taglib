@@ -49,7 +49,7 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
 
   unsigned int previousOffset = 0;
   for(int offset = v.find(pattern, 0, byteAlign);
-      offset != -1 && (max == 0 || max > int(l.size()) + 1);
+      offset != -1 && (max == 0 || max > static_cast<int>(l.size()) + 1);
       offset = v.find(pattern, offset + pattern.size(), byteAlign))
   {
     if(offset - previousOffset >= 1)

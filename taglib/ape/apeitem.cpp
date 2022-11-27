@@ -257,7 +257,7 @@ void APE::Item::parse(const ByteVector &data)
   const ByteVector value = data.mid(8 + d->key.size() + 1, valueLength);
 
   setReadOnly(flags & 1);
-  setType(ItemTypes((flags >> 1) & 3));
+  setType(static_cast<ItemTypes>((flags >> 1) & 3));
 
   if(Text == d->type)
     d->text = StringList(ByteVectorList::split(value, '\0'), String::UTF8);

@@ -408,7 +408,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   // Append the "framing bit".
 
   if(addFramingBit)
-    data.append(char(1));
+    data.append(static_cast<char>(1));
 
   return data;
 }

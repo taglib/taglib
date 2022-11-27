@@ -142,7 +142,7 @@ void GeneralEncapsulatedObjectFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
 
   int pos = 1;
 
@@ -163,7 +163,7 @@ ByteVector GeneralEncapsulatedObjectFrame::renderFields() const
 
   ByteVector data;
 
-  data.append(char(encoding));
+  data.append(static_cast<char>(encoding));
   data.append(d->mimeType.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
   data.append(d->fileName.data(encoding));

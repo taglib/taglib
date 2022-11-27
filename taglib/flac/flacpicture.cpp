@@ -79,7 +79,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   }
 
   unsigned int pos = 0;
-  d->type = FLAC::Picture::Type(data.toUInt(pos));
+  d->type = static_cast<FLAC::Picture::Type>(data.toUInt(pos));
   pos += 4;
   unsigned int mimeTypeLength = data.toUInt(pos);
   pos += 4;

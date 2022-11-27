@@ -150,7 +150,7 @@ void CommentsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
   d->language = data.mid(1, 3);
 
   int byteAlign = d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8 ? 1 : 2;
@@ -177,7 +177,7 @@ ByteVector CommentsFrame::renderFields() const
   encoding = checkTextEncoding(d->description, encoding);
   encoding = checkTextEncoding(d->text, encoding);
 
-  v.append(char(encoding));
+  v.append(static_cast<char>(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
   v.append(d->description.data(encoding));
   v.append(textDelimiter(encoding));

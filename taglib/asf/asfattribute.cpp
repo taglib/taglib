@@ -185,7 +185,7 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
   if(kind == 0) {
     nameLength = readWORD(&f);
     name = readString(&f, nameLength);
-    d->type = ASF::Attribute::AttributeTypes(readWORD(&f));
+    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&f));
     size = readWORD(&f);
   }
   // metadata & metadata library
@@ -197,7 +197,7 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
     }
     d->stream = readWORD(&f);
     nameLength = readWORD(&f);
-    d->type = ASF::Attribute::AttributeTypes(readWORD(&f));
+    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&f));
     size = readDWORD(&f);
     name = readString(&f, nameLength);
   }

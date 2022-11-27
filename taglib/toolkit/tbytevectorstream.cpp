@@ -65,7 +65,7 @@ ByteVectorStream::~ByteVectorStream()
 
 FileName ByteVectorStream::name() const
 {
-  return FileName(""); // XXX do we need a name?
+  return ""; // XXX do we need a name?
 }
 
 ByteVector ByteVectorStream::readBlock(unsigned long length)
@@ -81,7 +81,7 @@ ByteVector ByteVectorStream::readBlock(unsigned long length)
 void ByteVectorStream::writeBlock(const ByteVector &data)
 {
   unsigned int size = data.size();
-  if(long(d->position + size) > length()) {
+  if(d->position + size > length()) {
     truncate(d->position + size);
   }
   memcpy(d->data.data() + d->position, data.data(), size);

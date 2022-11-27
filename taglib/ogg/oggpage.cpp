@@ -103,10 +103,10 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
   ContainsPacketFlags flags = DoesNotContainPacket;
 
   if(index == d->firstPacketIndex)
-    flags = ContainsPacketFlags(flags | BeginsWithPacket);
+    flags = static_cast<ContainsPacketFlags>(flags | BeginsWithPacket);
 
   if(index == lastPacketIndex)
-    flags = ContainsPacketFlags(flags | EndsWithPacket);
+    flags = static_cast<ContainsPacketFlags>(flags | EndsWithPacket);
 
   // If there's only one page and it's complete:
 
@@ -114,7 +114,7 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
      !d->header.firstPacketContinued() &&
      d->header.lastPacketCompleted())
   {
-    flags = ContainsPacketFlags(flags | CompletePacket);
+    flags = static_cast<ContainsPacketFlags>(flags | CompletePacket);
   }
 
   // Or if there is more than one page and the page is
@@ -126,7 +126,7 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
            (flags & EndsWithPacket && d->header.lastPacketCompleted()) ||
            (!(flags & BeginsWithPacket) && !(flags & EndsWithPacket))))
   {
-    flags = ContainsPacketFlags(flags | CompletePacket);
+    flags = static_cast<ContainsPacketFlags>(flags | CompletePacket);
   }
 
   return flags;

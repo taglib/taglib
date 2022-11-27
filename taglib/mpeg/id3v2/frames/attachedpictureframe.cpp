@@ -133,7 +133,7 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
 
   int pos = 1;
 
@@ -156,10 +156,10 @@ ByteVector AttachedPictureFrame::renderFields() const
 
   String::Type encoding = checkTextEncoding(d->description, d->textEncoding);
 
-  data.append(char(encoding));
+  data.append(static_cast<char>(encoding));
   data.append(d->mimeType.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
-  data.append(char(d->type));
+  data.append(static_cast<char>(d->type));
   data.append(d->description.data(encoding));
   data.append(textDelimiter(encoding));
   data.append(d->data);
@@ -189,7 +189,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
 
   int pos = 1;
 

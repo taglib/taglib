@@ -124,7 +124,7 @@ void ChapterFrame::setElementID(const ByteVector &eID)
 {
   d->elementID = eID;
 
-  if(d->elementID.endsWith(char(0)))
+  if(d->elementID.endsWith(static_cast<char>(0)))
     d->elementID = d->elementID.mid(0, d->elementID.size() - 1);
 }
 

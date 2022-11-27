@@ -150,10 +150,10 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
   d->language = data.mid(1, 3);
-  d->timestampFormat = TimestampFormat(data[4]);
-  d->type = Type(data[5]);
+  d->timestampFormat = static_cast<TimestampFormat>(data[4]);
+  d->type = static_cast<Type>(data[5]);
 
   int pos = 6;
 
@@ -212,10 +212,10 @@ ByteVector SynchronizedLyricsFrame::renderFields() const
     encoding = checkTextEncoding(it->text, encoding);
   }
 
-  v.append(char(encoding));
+  v.append(static_cast<char>(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
-  v.append(char(d->timestampFormat));
-  v.append(char(d->type));
+  v.append(static_cast<char>(d->timestampFormat));
+  v.append(static_cast<char>(d->type));
   v.append(d->description.data(encoding));
   v.append(textDelimiter(encoding));
   for(SynchedTextList::ConstIterator it = d->synchedText.begin();

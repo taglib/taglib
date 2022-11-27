@@ -134,7 +134,7 @@ ByteVector UniqueFileIdentifierFrame::renderFields() const
   ByteVector data;
 
   data.append(d->owner.data(String::Latin1));
-  data.append(char(0));
+  data.append(static_cast<char>(0));
   data.append(d->identifier);
 
   return data;
