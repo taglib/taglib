@@ -51,9 +51,9 @@ namespace TagLib
         return true;
       }
 
-    }
-  }
-}
+    }  // namespace
+  }  // namespace RIFF
+}  // namespace TagLib
 
 #endif
 

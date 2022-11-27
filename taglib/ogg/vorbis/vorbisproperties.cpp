@@ -62,7 +62,7 @@ namespace TagLib {
    * an Ogg stream.  0x01 indicates the setup header.
    */
   static const char vorbisSetupHeaderID[] = { 0x01, 'v', 'o', 'r', 'b', 'i', 's', 0 };
-}
+} // namespace TagLib
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members

@@ -54,9 +54,9 @@ namespace TagLib
         return (b1 == 0xFF && b2 != 0xFF && (b2 & 0xE0) == 0xE0);
       }
 
-    }
-  }
-}
+    }  // namespace
+  }  // namespace MPEG
+}  // namespace TagLib
 
 #endif
 

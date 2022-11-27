@@ -64,7 +64,7 @@ namespace TagLib {
   #define debugData(x)  ((void)0)
 
 #endif
-}
+}  // namespace TagLib
 
 #endif
 #endif

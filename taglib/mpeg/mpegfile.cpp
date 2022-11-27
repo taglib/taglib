@@ -42,7 +42,7 @@ using namespace TagLib;
 namespace
 {
   enum { ID3v2Index = 0, APEIndex = 1, ID3v1Index = 2 };
-}
+} // namespace
 
 class MPEG::File::FilePrivate
 {

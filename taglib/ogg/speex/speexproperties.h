@@ -122,8 +122,8 @@ namespace TagLib {
         class PropertiesPrivate;
         PropertiesPrivate *d;
       };
-    }
-  }
-}
+    }  // namespace Speex
+  }  // namespace Ogg
+}  // namespace TagLib
 
 #endif

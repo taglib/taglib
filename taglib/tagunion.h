@@ -92,7 +92,7 @@ namespace TagLib {
     class TagUnionPrivate;
     TagUnionPrivate *d;
   };
-}
+}  // namespace TagLib
 
 #endif
 #endif

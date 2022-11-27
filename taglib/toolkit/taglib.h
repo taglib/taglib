@@ -84,7 +84,7 @@ namespace TagLib {
    * so I'm providing something here that should be constant.
    */
   typedef std::basic_string<wchar_t> wstring;
-}
+}  // namespace TagLib
 
 /*!
  * \mainpage TagLib

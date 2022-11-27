@@ -38,7 +38,7 @@ namespace
     FORMAT_PCM     = 0x0001,
     FORMAT_IEEE_FLOAT = 0x0003
   };
-}
+} // namespace
 
 class RIFF::WAV::Properties::PropertiesPrivate
 {

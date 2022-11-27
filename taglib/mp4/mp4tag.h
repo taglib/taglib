@@ -36,9 +36,7 @@
 #include "mp4item.h"
 
 namespace TagLib {
-
   namespace MP4 {
-
     /*!
      * \deprecated Use ItemMap.
      */
@@ -161,9 +159,6 @@ namespace TagLib {
         class TagPrivate;
         TagPrivate *d;
     };
-
-  }
-
-}
-
+  }  // namespace MP4
+}  // namespace TagLib
 #endif

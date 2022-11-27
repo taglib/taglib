@@ -159,8 +159,8 @@ namespace TagLib {
         class PropertiesPrivate;
         PropertiesPrivate *d;
       };
-    }
-  }
-}
+    }  // namespace AIFF
+  }  // namespace RIFF
+}  // namespace TagLib
 
 #endif

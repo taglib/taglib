@@ -252,5 +252,5 @@ namespace TagLib {
     StringList unsupported;
   };
 
-}
+}  // namespace TagLib
 #endif /* TAGLIB_PROPERTYMAP_H_ */

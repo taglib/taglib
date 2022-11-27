@@ -274,7 +274,7 @@ namespace TagLib {
       class XiphCommentPrivate;
       XiphCommentPrivate *d;
     };
-  }
-}
+  }  // namespace Ogg
+}  // namespace TagLib
 
 #endif

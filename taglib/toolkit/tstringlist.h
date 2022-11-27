@@ -104,7 +104,7 @@ namespace TagLib {
     StringListPrivate *d;
   };
 
-}
+}  // namespace TagLib
 
 /*!
  * \related TagLib::StringList

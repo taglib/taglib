@@ -34,9 +34,7 @@
 #include "tlist.h"
 
 namespace TagLib {
-
   namespace MP4 {
-
     class Atom;
     typedef TagLib::List<Atom *> AtomList;
 
@@ -101,10 +99,8 @@ namespace TagLib {
       AtomList path(const char *name1, const char *name2 = 0, const char *name3 = 0, const char *name4 = 0);
       AtomList atoms;
     };
-
-  }
-
-}
+  }  // namespace MP4
+}  // namespace TagLib
 
 #endif
 

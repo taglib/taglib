@@ -405,7 +405,7 @@ namespace TagLib {
       TagPrivate *d;
     };
 
-  }
-}
+  }  // namespace ID3v2
+}  // namespace TagLib
 
 #endif

@@ -137,7 +137,7 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-  }
-}
+  }  // namespace APE
+}  // namespace TagLib
 
 #endif

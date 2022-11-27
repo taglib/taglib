@@ -45,7 +45,7 @@ using namespace TagLib;
 namespace
 {
   enum { TrueAudioID3v2Index = 0, TrueAudioID3v1Index = 1 };
-}
+} // namespace
 
 class TrueAudio::File::FilePrivate
 {

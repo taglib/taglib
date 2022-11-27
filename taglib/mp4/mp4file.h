@@ -33,10 +33,8 @@
 #include "mp4tag.h"
 
 namespace TagLib {
-
   //! An implementation of MP4 (AAC, ALAC, ...) metadata
   namespace MP4 {
-
     class Atoms;
 
     /*!
@@ -157,9 +155,6 @@ namespace TagLib {
       class FilePrivate;
       FilePrivate *d;
     };
-
-  }
-
-}
-
+  }  // namespace MP4
+}  // namespace TagLib
 #endif

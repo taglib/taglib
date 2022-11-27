@@ -208,8 +208,8 @@ namespace TagLib {
         class FilePrivate;
         FilePrivate *d;
       };
-    }
-  }
-}
+    }  // namespace WAV
+  }  // namespace RIFF
+}  // namespace TagLib
 
 #endif

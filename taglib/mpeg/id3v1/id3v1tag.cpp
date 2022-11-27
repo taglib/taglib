@@ -36,7 +36,7 @@ namespace
 {
   const ID3v1::StringHandler defaultStringHandler;
   const ID3v1::StringHandler *stringHandler = &defaultStringHandler;
-}
+} // namespace
 
 class ID3v1::Tag::TagPrivate
 {

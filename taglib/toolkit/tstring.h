@@ -546,7 +546,7 @@ namespace TagLib {
     class StringPrivate;
     StringPrivate *d;
   };
-}
+}  // namespace TagLib
 
 /*!
  * \relates TagLib::String

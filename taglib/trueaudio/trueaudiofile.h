@@ -253,7 +253,7 @@ namespace TagLib {
       class FilePrivate;
       FilePrivate *d;
     };
-  }
-}
+  }  // namespace TrueAudio
+}  // namespace TagLib
 
 #endif

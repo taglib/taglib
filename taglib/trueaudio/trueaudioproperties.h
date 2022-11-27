@@ -127,7 +127,7 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-  }
-}
+  }  // namespace TrueAudio
+}  // namespace TagLib
 
 #endif

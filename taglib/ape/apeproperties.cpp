@@ -140,7 +140,7 @@ namespace
 
     return header.toUShort(4, false);
   }
-}
+} // namespace
 
 void APE::Properties::read(File *file, long streamLength)
 {

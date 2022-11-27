@@ -41,7 +41,7 @@ using namespace TagLib;
 namespace
 {
   enum { MPCAPEIndex = 0, MPCID3v1Index = 1 };
-}
+} // namespace
 
 class MPC::File::FilePrivate
 {

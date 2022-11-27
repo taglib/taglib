@@ -337,7 +337,7 @@ namespace TagLib {
       class FilePrivate;
       FilePrivate *d;
     };
-  }
-}
+  }  // namespace FLAC
+}  // namespace TagLib
 
 #endif

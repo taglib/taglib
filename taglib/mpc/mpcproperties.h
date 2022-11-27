@@ -152,7 +152,7 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-  }
-}
+  }  // namespace MPC
+}  // namespace TagLib
 
 #endif

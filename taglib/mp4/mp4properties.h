@@ -30,9 +30,7 @@
 #include "audioproperties.h"
 
 namespace TagLib {
-
   namespace MP4 {
-
     class Atoms;
     class File;
 
@@ -112,9 +110,6 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-
-  }
-
-}
-
+  }  // namespace MP4
+}  // namespace TagLib
 #endif

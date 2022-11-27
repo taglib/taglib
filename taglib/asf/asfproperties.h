@@ -31,9 +31,7 @@
 #include "taglib_export.h"
 
 namespace TagLib {
-
   namespace ASF {
-
     //! An implementation of ASF audio properties
     class TAGLIB_EXPORT Properties : public AudioProperties
     {
@@ -178,9 +176,6 @@ namespace TagLib {
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };
-
-  }
-
-}
-
+  }  // namespace ASF
+}  // namespace TagLib
 #endif
