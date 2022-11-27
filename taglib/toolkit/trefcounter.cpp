@@ -31,8 +31,8 @@
 
 #if defined(HAVE_GCC_ATOMIC)
 # define ATOMIC_INT int
-# define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
+# define ATOMIC_INC(x) __sync_add_and_fetch(&(x), 1)
+# define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)
 #elif defined(HAVE_WIN_ATOMIC)
 # if !defined(NOMINMAX)
 #   define NOMINMAX
