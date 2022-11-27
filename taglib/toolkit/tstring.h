@@ -45,7 +45,7 @@
 #if defined(QT_VERSION) && (QT_VERSION >= 0x040000)
 #define QStringToTString(s) TagLib::String(s.toUtf8().data(), TagLib::String::UTF8)
 #else
-#define QStringToTString(s) TagLib::String(s.utf8().data(), TagLib::String::UTF8)
+#define QStringToTString(s) TagLib::String((s).utf8().data(), TagLib::String::UTF8)
 #endif
 
 /*!
@@ -58,7 +58,7 @@
  *
  */
 
-#define TStringToQString(s) QString::fromUtf8(s.toCString(true))
+#define TStringToQString(s) QString::fromUtf8((s).toCString(true))
 
 namespace TagLib {
 
