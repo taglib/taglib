@@ -102,7 +102,7 @@ void PopularimeterFrame::setCounter(unsigned int s)
 
 void PopularimeterFrame::parseFields(const ByteVector &data)
 {
-  int pos = 0, size = int(data.size());
+  int pos = 0, size = static_cast<int>(data.size());
 
   d->email = readStringField(data, String::Latin1, &pos);
 
@@ -122,7 +122,7 @@ ByteVector PopularimeterFrame::renderFields() const
 
   data.append(d->email.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
-  data.append(char(d->rating));
+  data.append(static_cast<char>(d->rating));
   data.append(ByteVector::fromUInt(d->counter));
 
   return data;

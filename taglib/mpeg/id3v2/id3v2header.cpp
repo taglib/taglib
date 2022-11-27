@@ -160,8 +160,8 @@ ByteVector Header::render() const
   // add the version number -- we always render a 2.4.0 tag regardless of what
   // the tag originally was.
 
-  v.append(char(majorVersion()));
-  v.append(char(0));
+  v.append(static_cast<char>(majorVersion()));
+  v.append(static_cast<char>(0));
 
   // Currently we don't actually support writing extended headers, footers or
   // unsynchronized tags, make sure that the flags are set accordingly.
@@ -178,7 +178,7 @@ ByteVector Header::render() const
   flags[5] = d->experimentalIndicator;
   flags[4] = d->footerPresent;
 
-  v.append(char(flags.to_ulong()));
+  v.append(static_cast<char>(flags.to_ulong()));
 
   // add the size
   v.append(SynchData::fromUInt(d->tagSize));

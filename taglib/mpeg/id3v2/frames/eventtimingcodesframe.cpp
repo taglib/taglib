@@ -104,7 +104,7 @@ void EventTimingCodesFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->timestampFormat = TimestampFormat(data[0]);
+  d->timestampFormat = static_cast<TimestampFormat>(data[0]);
 
   int pos = 1;
   d->synchedEvents.clear();
@@ -120,12 +120,12 @@ ByteVector EventTimingCodesFrame::renderFields() const
 {
   ByteVector v;
 
-  v.append(char(d->timestampFormat));
+  v.append(static_cast<char>(d->timestampFormat));
   for(SynchedEventList::ConstIterator it = d->synchedEvents.begin();
       it != d->synchedEvents.end();
       ++it) {
     const SynchedEvent &entry = *it;
-    v.append(char(entry.type));
+    v.append(static_cast<char>(entry.type));
     v.append(ByteVector::fromUInt(entry.time));
   }
 

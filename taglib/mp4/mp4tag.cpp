@@ -144,7 +144,7 @@ MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"name\"");
         return result;
       }
-      result.append(AtomData(AtomDataType(flags), data.mid(pos + 12, length - 12)));
+      result.append(AtomData(static_cast<AtomDataType>(flags), data.mid(pos + 12, length - 12)));
     }
     else {
       if(name != "data") {
@@ -152,7 +152,7 @@ MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
         return result;
       }
       if(expectedFlags == -1 || flags == expectedFlags) {
-        result.append(AtomData(AtomDataType(flags), data.mid(pos + 16, length - 16)));
+        result.append(AtomData(static_cast<AtomDataType>(flags), data.mid(pos + 16, length - 16)));
       }
     }
     pos += length;
@@ -316,7 +316,7 @@ MP4::Tag::parseCovr(const MP4::Atom *atom)
     }
     if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP ||
        flags == TypeGIF || flags == TypeImplicit) {
-      value.append(MP4::CoverArt(MP4::CoverArt::Format(flags),
+      value.append(MP4::CoverArt(static_cast<MP4::CoverArt::Format>(flags),
                                  data.mid(pos + 16, length - 16)));
     }
     else {

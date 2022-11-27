@@ -147,7 +147,7 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
   d->language = data.mid(1, 3);
 
   int byteAlign
@@ -177,7 +177,7 @@ ByteVector UnsynchronizedLyricsFrame::renderFields() const
 
   ByteVector v;
 
-  v.append(char(encoding));
+  v.append(static_cast<char>(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
   v.append(d->description.data(encoding));
   v.append(textDelimiter(encoding));

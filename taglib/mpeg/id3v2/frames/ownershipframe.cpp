@@ -123,7 +123,7 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   }
 
   // Get the text encoding
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
   pos += 1;
 
   // Read the price paid this is a null terminate string
@@ -155,7 +155,7 @@ ByteVector OwnershipFrame::renderFields() const
 
   ByteVector v;
 
-  v.append(char(encoding));
+  v.append(static_cast<char>(encoding));
   v.append(d->pricePaid.data(String::Latin1));
   v.append(textDelimiter(String::Latin1));
   v.append(d->datePurchased.data(String::Latin1));

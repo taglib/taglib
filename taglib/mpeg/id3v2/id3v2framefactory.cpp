@@ -348,13 +348,13 @@ void FrameFactory::rebuildAggregateFrames(ID3v2::Tag *tag) const
        tdat &&
        tdat->data().size() >= 5)
     {
-      String date(tdat->data().mid(1), String::Type(tdat->data()[0]));
+      String date(tdat->data().mid(1), static_cast<String::Type>(tdat->data()[0]));
       if(date.length() == 4) {
         tdrc->setText(tdrc->toString() + '-' + date.substr(2, 2) + '-' + date.substr(0, 2));
         if(tag->frameList("TIME").size() == 1) {
           UnknownFrame *timeframe = dynamic_cast<UnknownFrame *>(tag->frameList("TIME").front());
           if(timeframe && timeframe->data().size() >= 5) {
-            String time(timeframe->data().mid(1), String::Type(timeframe->data()[0]));
+            String time(timeframe->data().mid(1), static_cast<String::Type>(timeframe->data()[0]));
             if(time.length() == 4) {
               tdrc->setText(tdrc->toString() + 'T' + time.substr(0, 2) + ':' + time.substr(2, 2));
             }

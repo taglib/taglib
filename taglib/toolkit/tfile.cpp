@@ -278,7 +278,7 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
 
     // (1) previous partial match
 
-    if(previousPartialMatch >= 0 && int(bufferSize()) > previousPartialMatch) {
+    if(previousPartialMatch >= 0 && static_cast<int>(bufferSize()) > previousPartialMatch) {
       const int patternOffset = (bufferSize() - previousPartialMatch);
       if(buffer.containsAt(pattern, 0, patternOffset)) {
         seek(originalPosition);
@@ -286,7 +286,7 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
       }
     }
 
-    if(!before.isEmpty() && beforePreviousPartialMatch >= 0 && int(bufferSize()) > beforePreviousPartialMatch) {
+    if(!before.isEmpty() && beforePreviousPartialMatch >= 0 && static_cast<int>(bufferSize()) > beforePreviousPartialMatch) {
       const int beforeOffset = (bufferSize() - beforePreviousPartialMatch);
       if(buffer.containsAt(before, 0, beforeOffset)) {
         seek(originalPosition);
@@ -428,7 +428,7 @@ bool File::isValid() const
 
 void File::seek(long offset, Position p)
 {
-  d->stream->seek(offset, IOStream::Position(p));
+  d->stream->seek(offset, static_cast<IOStream::Position>(p));
 }
 
 void File::truncate(long length)

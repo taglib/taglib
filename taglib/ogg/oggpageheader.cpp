@@ -183,7 +183,7 @@ ByteVector Ogg::PageHeader::render() const
 
   // stream structure version
 
-  data.append(char(0));
+  data.append(static_cast<char>(0));
 
   // header type flag
 
@@ -192,7 +192,7 @@ ByteVector Ogg::PageHeader::render() const
   flags[1] = d->pageSequenceNumber == 0;
   flags[2] = d->lastPageOfStream;
 
-  data.append(char(flags.to_ulong()));
+  data.append(static_cast<char>(flags.to_ulong()));
 
   // absolute granular position
 
@@ -262,7 +262,7 @@ void Ogg::PageHeader::read(Ogg::File *file, long pageOffset)
 
   // Another sanity check.
 
-  if(pageSegmentCount < 1 || int(pageSegments.size()) != pageSegmentCount)
+  if(pageSegmentCount < 1 || static_cast<int>(pageSegments.size()) != pageSegmentCount)
     return;
 
   // The base size of an Ogg page 27 bytes plus the number of lacing values.

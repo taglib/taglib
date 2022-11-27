@@ -121,7 +121,7 @@ void RelativeVolumeFrame::setVolumeAdjustmentIndex(short index)
 
 float RelativeVolumeFrame::volumeAdjustment(ChannelType type) const
 {
-  return d->channels.contains(type) ? float(d->channels[type].volumeAdjustment) / float(512) : 0;
+  return d->channels.contains(type) ? static_cast<float>(d->channels[type].volumeAdjustment) / static_cast<float>(512) : 0;
 }
 
 float RelativeVolumeFrame::volumeAdjustment() const
@@ -131,7 +131,7 @@ float RelativeVolumeFrame::volumeAdjustment() const
 
 void RelativeVolumeFrame::setVolumeAdjustment(float adjustment, ChannelType type)
 {
-  d->channels[type].volumeAdjustment = short(adjustment * float(512));
+  d->channels[type].volumeAdjustment = static_cast<short>(adjustment * static_cast<float>(512));
 }
 
 void RelativeVolumeFrame::setVolumeAdjustment(float adjustment)
@@ -182,7 +182,7 @@ void RelativeVolumeFrame::parseFields(const ByteVector &data)
 
   while(pos <= static_cast<int>(data.size()) - 4) {
 
-    ChannelType type = ChannelType(data[pos]);
+    ChannelType type = static_cast<ChannelType>(data[pos]);
     pos += 1;
 
     ChannelData &channel = d->channels[type];
@@ -212,9 +212,9 @@ ByteVector RelativeVolumeFrame::renderFields() const
     ChannelType type = (*it).first;
     const ChannelData &channel = (*it).second;
 
-    data.append(char(type));
+    data.append(static_cast<char>(type));
     data.append(ByteVector::fromShort(channel.volumeAdjustment));
-    data.append(char(channel.peakVolume.bitsRepresentingPeak));
+    data.append(static_cast<char>(channel.peakVolume.bitsRepresentingPeak));
     data.append(channel.peakVolume.peakVolume);
   }
 

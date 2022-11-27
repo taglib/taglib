@@ -201,7 +201,7 @@ void UserUrlLinkFrame::parseFields(const ByteVector &data)
 
   int pos = 0;
 
-  d->textEncoding = String::Type(data[0]);
+  d->textEncoding = static_cast<String::Type>(data[0]);
   pos += 1;
 
   if(d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8) {
@@ -230,7 +230,7 @@ ByteVector UserUrlLinkFrame::renderFields() const
 
   String::Type encoding = checkTextEncoding(d->description, d->textEncoding);
 
-  v.append(char(encoding));
+  v.append(static_cast<char>(encoding));
   v.append(d->description.data(encoding));
   v.append(textDelimiter(encoding));
   v.append(url().data(String::Latin1));
