@@ -69,11 +69,7 @@ install(TARGETS tag_c
 )
 
 if(NOT BUILD_FRAMEWORK)
-  set (prefix ${CMAKE_INSTALL_PREFIX})
-  set (exec_prefix "\${prefix}")
-  set (libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
-  set (includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/taglib_c.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc @ONLY)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/taglib_c.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 
