@@ -117,7 +117,7 @@ PropertyMap &PropertyMap::merge(const PropertyMap &other)
   return *this;
 }
 
-const StringList PropertyMap::value(const String &key,
+StringList PropertyMap::value(const String &key,
                                     const StringList &defaultValue) const
 {
   return SimplePropertyMap::value(key.upper(), defaultValue);

@@ -714,21 +714,21 @@ const String::Type String::WCharByteOrder = wcharByteOrder();
 // related non-member functions
 ////////////////////////////////////////////////////////////////////////////////
 
-const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2)
+TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2)
 {
   TagLib::String s(s1);
   s.append(s2);
   return s;
 }
 
-const TagLib::String operator+(const char *s1, const TagLib::String &s2)
+TagLib::String operator+(const char *s1, const TagLib::String &s2)
 {
   TagLib::String s(s1);
   s.append(s2);
   return s;
 }
 
-const TagLib::String operator+(const TagLib::String &s1, const char *s2)
+TagLib::String operator+(const TagLib::String &s1, const char *s2)
 {
   TagLib::String s(s1);
   s.append(s2);

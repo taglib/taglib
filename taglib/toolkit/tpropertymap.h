@@ -197,7 +197,7 @@ namespace TagLib {
      * If the map does not contain \a key, it returns defaultValue.
      * If no defaultValue is specified, it returns an empty string list.
      */
-    const StringList value(const String &key,
+    StringList value(const String &key,
                            const StringList &defaultValue = StringList()) const;
 
     /*!

@@ -553,21 +553,21 @@ namespace TagLib {
  *
  * Concatenates \a s1 and \a s2 and returns the result as a string.
  */
-TAGLIB_EXPORT const TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2);
+TAGLIB_EXPORT TagLib::String operator+(const TagLib::String &s1, const TagLib::String &s2);
 
 /*!
  * \relates TagLib::String
  *
  * Concatenates \a s1 and \a s2 and returns the result as a string.
  */
-TAGLIB_EXPORT const TagLib::String operator+(const char *s1, const TagLib::String &s2);
+TAGLIB_EXPORT TagLib::String operator+(const char *s1, const TagLib::String &s2);
 
 /*!
  * \relates TagLib::String
  *
  * Concatenates \a s1 and \a s2 and returns the result as a string.
  */
-TAGLIB_EXPORT const TagLib::String operator+(const TagLib::String &s1, const char *s2);
+TAGLIB_EXPORT TagLib::String operator+(const TagLib::String &s1, const char *s2);
 
 
 /*!

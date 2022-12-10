@@ -156,7 +156,7 @@ unsigned int Map<Key, T>::size() const
 }
 
 template <class Key, class T>
-const T Map<Key, T>::value(const Key &key, const T &defaultValue) const
+T Map<Key, T>::value(const Key &key, const T &defaultValue) const
 {
   ConstIterator it = d->map.find(key);
   return it != d->map.end() ? it->second : defaultValue;

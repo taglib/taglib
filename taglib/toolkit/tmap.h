@@ -159,7 +159,7 @@ namespace TagLib {
      * If the map does not contain \a key, it returns defaultValue.
      * If no defaultValue is specified, it returns a default-constructed value.
      */
-    const T value(const Key &key, const T &defaultValue = T()) const;
+    T value(const Key &key, const T &defaultValue = T()) const;
 
     /*!
      * Returns a reference to the value associated with \a key.
