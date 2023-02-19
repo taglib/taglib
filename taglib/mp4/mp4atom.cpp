@@ -73,7 +73,7 @@ MP4::Atom::Atom(File *file)
     }
   }
 
-  if(length < 8) {
+  if(length < 8 || length > file->length() - offset) {
     debug("MP4: Invalid atom size");
     length = 0;
     file->seek(0, File::End);

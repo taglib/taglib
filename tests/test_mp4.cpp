@@ -575,7 +575,10 @@ public:
   void testFuzzedFile()
   {
     MP4::File f(TEST_FILE_PATH_C("infloop.m4a"));
-    CPPUNIT_ASSERT(f.isValid());
+    // The file has an invalid atom length of 2775 in the last atom
+    // ("free", offset 0xc521, 00000ad7 66726565), whereas the remaining file
+    // length is 2727 bytes, therefore the file is now considered invalid.
+    CPPUNIT_ASSERT(!f.isValid());
   }
 
   void testRepeatedSave()
