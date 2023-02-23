@@ -34,6 +34,7 @@
 #include <mpegproperties.h>
 #include <xingheader.h>
 #include <mpegheader.h>
+#include <id3v2extendedheader.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -66,6 +67,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyID3v1);
   CPPUNIT_TEST(testEmptyAPE);
   CPPUNIT_TEST(testIgnoreGarbage);
+  CPPUNIT_TEST(testExtendedHeader);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -532,6 +534,28 @@ public:
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String("Title B"), f.ID3v2Tag()->title());
+    }
+  }
+
+  void testExtendedHeader()
+  {
+    const ScopedFileCopy copy("extended-header", ".mp3");
+    {
+      MPEG::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      ID3v2::Tag *tag = f.ID3v2Tag();
+      ID3v2::ExtendedHeader *ext = tag->extendedHeader();
+      CPPUNIT_ASSERT(ext);
+      CPPUNIT_ASSERT_EQUAL(12U, ext->size());
+      CPPUNIT_ASSERT_EQUAL(String("Druids"), tag->title());
+      CPPUNIT_ASSERT_EQUAL(String("Excelsis"), tag->artist());
+      CPPUNIT_ASSERT_EQUAL(String("Vo Chrieger U Drache"), tag->album());
+      CPPUNIT_ASSERT_EQUAL(2013U, tag->year());
+      CPPUNIT_ASSERT_EQUAL(String("Folk/Power Metal"), tag->genre());
+      CPPUNIT_ASSERT_EQUAL(3U, tag->track());
+      CPPUNIT_ASSERT_EQUAL(String("2013"),
+                           f.properties().value("ORIGINALDATE").front());
     }
   }
 
