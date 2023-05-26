@@ -325,6 +325,7 @@ public:
     tags["COPYRIGHTURL"] = StringList("Copyright URL");
     tags["DATE"] = StringList("2021-01-03 12:29:23");
     tags["DISCNUMBER"] = StringList("3/5");
+    tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
     tags["DJMIXER"] = StringList("DJ Mixer");
     tags["ENCODEDBY"] = StringList("Encoded by");
     tags["ENCODING"] = StringList("Encoding");

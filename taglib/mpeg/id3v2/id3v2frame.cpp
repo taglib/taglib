@@ -373,6 +373,7 @@ namespace
     std::make_pair("TSO2", "ALBUMARTISTSORT"), // non-standard, used by iTunes
     std::make_pair("TSRC", "ISRC"),
     std::make_pair("TSSE", "ENCODING"),
+    std::make_pair("TSST", "DISCSUBTITLE"),
     // URL frames
     std::make_pair("WCOP", "COPYRIGHTURL"),
     std::make_pair("WOAF", "FILEWEBPAGE"),
