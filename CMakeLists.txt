@@ -93,7 +93,7 @@ endif()
 # 3. If any interfaces have been added since the last public release, then increment age.
 # 4. If any interfaces have been removed since the last public release, then set age to 0.
 set(TAGLIB_SOVERSION_CURRENT  20)
-set(TAGLIB_SOVERSION_REVISION 0)
+set(TAGLIB_SOVERSION_REVISION 1)
 set(TAGLIB_SOVERSION_AGE      19)
 
 math(EXPR TAGLIB_SOVERSION_MAJOR "${TAGLIB_SOVERSION_CURRENT} - ${TAGLIB_SOVERSION_AGE}")

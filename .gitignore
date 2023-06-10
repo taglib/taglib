@@ -3,6 +3,7 @@ cmake_uninstall.cmake
 Makefile
 CTestTestfile.cmake
 CMakeFiles/
+CMakeLists.txt.user*
 *.so
 *.so.*
 *.dylib
@@ -50,6 +51,7 @@ taglib.xcodeproj
 CMakeScripts
 /.clang-format
 /compile_commands.json
+/build/
 .clangd
 .cache
 .idea
