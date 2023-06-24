@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 project(taglib)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include(CTest)
