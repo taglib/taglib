@@ -1,3 +1,9 @@
+TagLib 2.0 (Jan 24, 2024)
+=========================
+
+ * New major version, binary incompatible, but source-compatible with the
+   latest 1.x release if no deprecated features are used.
+
 TagLib 1.13.1 (Jul 1, 2023)
 ===========================
 
