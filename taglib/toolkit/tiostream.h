@@ -42,15 +42,12 @@ namespace TagLib {
     FileName(const FileName &name);
 
     operator const wchar_t *() const;
-    operator const char *() const;
 
     const std::wstring &wstr() const;
-    const std::string  &str() const;
 
     String toString() const;
 
   private:
-    const std::string  m_name;
     const std::wstring m_wname;
   };
 #else

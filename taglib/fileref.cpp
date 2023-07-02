@@ -68,7 +68,7 @@ namespace
                           AudioProperties::ReadStyle audioPropertiesStyle)
   {
 #ifdef _WIN32
-    if(::strlen(fileName) == 0 && ::wcslen(fileName) == 0)
+    if(::wcslen(fileName) == 0)
       return 0;
 #else
     if(::strlen(fileName) == 0)
