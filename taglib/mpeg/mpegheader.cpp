@@ -69,12 +69,6 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::Header::Header(const ByteVector &data) :
-  d(new HeaderPrivate())
-{
-  debug("MPEG::Header::Header() - This constructor is no longer used.");
-}
-
 MPEG::Header::Header(File *file, offset_t offset, bool checkLength) :
   d(new HeaderPrivate())
 {

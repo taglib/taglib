@@ -269,12 +269,6 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
   return l;
 }
 
-Ogg::Page* Ogg::Page::getCopyWithNewPageSequenceNumber(int /*sequenceNumber*/)
-{
-  debug("Ogg::Page::getCopyWithNewPageSequenceNumber() -- This function is obsolete. Returning null.");
-  return 0;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

@@ -323,24 +323,8 @@ namespace TagLib {
 
     /*!
      * Returns true if the string is empty.
-     *
-     * \see isNull()
      */
     bool isEmpty() const;
-
-    /*!
-     * Returns true if this string is null -- i.e. it is a copy of the
-     * String::null string.
-     *
-     * \note A string can be empty and not null.  So do not use this method to
-     * check if the string is empty.
-     *
-     * \see isEmpty()
-     *
-     * \deprecated Use isEmpty(), do not differentiate between null and empty.
-     */
-     // BIC: remove
-    TAGLIB_DEPRECATED bool isNull() const;
 
     /*!
      * Returns a ByteVector containing the string's data.  If \a t is Latin1 or
@@ -516,17 +500,6 @@ namespace TagLib {
      */
     bool operator<(const String &s) const;
 
-    /*!
-     * A null string provided for convenience.
-     *
-     * \warning Do not modify this variable.  It will mess up the internal state
-     * of TagLib.
-     *
-     * \deprecated Use String().
-     */
-     // BIC: remove
-    TAGLIB_DEPRECATED static String null;
-
   protected:
     /*!
      * If this String is being shared via implicit sharing, do a deep copy of the
@@ -536,13 +509,6 @@ namespace TagLib {
     void detach();
 
   private:
-    /*!
-     * \deprecated This variable is no longer used, but NEVER remove this. It
-     * may lead to a linkage error.
-     */
-     // BIC: remove
-    TAGLIB_DEPRECATED static const Type WCharByteOrder;
-
     class StringPrivate;
     StringPrivate *d;
   };

@@ -53,14 +53,6 @@ namespace TagLib {
       /*!
        * Create an instance of APE::Properties with the data read from the
        * APE::File \a file.
-       *
-       * \deprecated Use Properties(File *, long, ReadStyle).
-       */
-      TAGLIB_DEPRECATED Properties(File *file, ReadStyle style = Average);
-
-      /*!
-       * Create an instance of APE::Properties with the data read from the
-       * APE::File \a file.
        */
       Properties(File *file, offset_t streamLength, ReadStyle style = Average);
 
@@ -68,16 +60,6 @@ namespace TagLib {
        * Destroys this APE::Properties instance.
        */
       virtual ~Properties();
-
-      /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
-       * \note This method is just an alias of lengthInSeconds().
-       *
-       * \deprecated Use lengthInSeconds().
-       */
-      TAGLIB_DEPRECATED virtual int length() const;
 
       /*!
        * Returns the length of the file in seconds.  The length is rounded down to

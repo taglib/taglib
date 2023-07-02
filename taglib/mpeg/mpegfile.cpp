@@ -198,31 +198,6 @@ bool MPEG::File::save()
   return save(AllTags);
 }
 
-bool MPEG::File::save(int tags)
-{
-  return save(tags, StripOthers);
-}
-
-bool MPEG::File::save(int tags, bool stripOthers)
-{
-  return save(tags, stripOthers ? StripOthers : StripNone, ID3v2::v4);
-}
-
-bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version)
-{
-  return save(tags,
-              stripOthers ? StripOthers : StripNone,
-              id3v2Version == 3 ? ID3v2::v3 : ID3v2::v4);
-}
-
-bool MPEG::File::save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags)
-{
-  return save(tags,
-              stripOthers ? StripOthers : StripNone,
-              id3v2Version == 3 ? ID3v2::v3 : ID3v2::v4,
-              duplicateTags ? Duplicate : DoNotDuplicate);
-}
-
 bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, DuplicateTags duplicate)
 {
   if(readOnly()) {
@@ -399,11 +374,6 @@ bool MPEG::File::strip(int tags, bool freeMemory)
   }
 
   return true;
-}
-
-void MPEG::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
 }
 
 offset_t MPEG::File::nextFrameOffset(offset_t position)

@@ -63,13 +63,6 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-APE::Properties::Properties(File *, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("APE::Properties::Properties() -- This constructor is no longer used.");
-}
-
 APE::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
@@ -80,11 +73,6 @@ APE::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) 
 APE::Properties::~Properties()
 {
   delete d;
-}
-
-int APE::Properties::length() const
-{
-  return lengthInSeconds();
 }
 
 int APE::Properties::lengthInSeconds() const

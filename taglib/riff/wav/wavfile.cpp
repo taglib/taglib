@@ -150,13 +150,6 @@ bool RIFF::WAV::File::save()
   return RIFF::WAV::File::save(AllTags);
 }
 
-bool RIFF::WAV::File::save(TagTypes tags, bool stripOthers, int id3v2Version)
-{
-  return save(tags,
-              stripOthers ? StripOthers : StripNone,
-              id3v2Version == 3 ? ID3v2::v3 : ID3v2::v4);
-}
-
 bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version version)
 {
   if(readOnly()) {

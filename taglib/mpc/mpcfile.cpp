@@ -255,11 +255,6 @@ void MPC::File::strip(int tags)
   }
 }
 
-void MPC::File::remove(int tags)
-{
-  strip(tags);
-}
-
 bool MPC::File::hasID3v1Tag() const
 {
   return (d->ID3v1Location >= 0);

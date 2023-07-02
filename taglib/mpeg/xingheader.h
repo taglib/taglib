@@ -105,15 +105,6 @@ namespace TagLib {
        */
       HeaderType type() const;
 
-      /*!
-       * Returns the offset for the start of this Xing header, given the
-       * version and channels of the frame
-       *
-       * \deprecated Always returns 0.
-       */
-      TAGLIB_DEPRECATED static int xingHeaderOffset(TagLib::MPEG::Header::Version v,
-                                                    TagLib::MPEG::Header::ChannelMode c);
-
     private:
       XingHeader(const XingHeader &);
       XingHeader &operator=(const XingHeader &);

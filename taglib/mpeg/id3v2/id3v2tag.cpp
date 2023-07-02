@@ -340,11 +340,6 @@ ExtendedHeader *ID3v2::Tag::extendedHeader() const
   return d->extendedHeader;
 }
 
-Footer *ID3v2::Tag::footer() const
-{
-  return d->footer;
-}
-
 const FrameListMap &ID3v2::Tag::frameListMap() const
 {
   return d->frameListMap;
@@ -622,11 +617,6 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     frames->append(frameTCON);
     newFrames->append(frameTCON);
   }
-}
-
-ByteVector ID3v2::Tag::render(int version) const
-{
-  return render(version == 3 ? v3 : v4);
 }
 
 ByteVector ID3v2::Tag::render(Version version) const

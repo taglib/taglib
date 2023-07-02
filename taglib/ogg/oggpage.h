@@ -86,16 +86,6 @@ namespace TagLib {
       void setPageSequenceNumber(int sequenceNumber);
 
       /*!
-       * Returns a copy of the page with \a sequenceNumber set as sequence number.
-       *
-       * \see header()
-       * \see PageHeader::setPageSequenceNumber()
-       *
-       * \deprecated Always returns null.
-       */
-      TAGLIB_DEPRECATED Page *getCopyWithNewPageSequenceNumber(int sequenceNumber);
-
-      /*!
        * Returns the index of the first packet wholly or partially contained in
        * this page.
        *

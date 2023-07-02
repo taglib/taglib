@@ -257,21 +257,6 @@ namespace TagLib {
      */
     offset_t length();
 
-    /*!
-     * Returns true if \a file can be opened for reading.  If the file does not
-     * exist, this will return false.
-     *
-     * \deprecated Use system functions, e.g. access() (_access_s() on Windows).
-     */
-    TAGLIB_DEPRECATED static bool isReadable(const char *file);
-
-    /*!
-     * Returns true if \a file can be opened for writing.
-     *
-     * \deprecated Use system functions, e.g. access() (_access_s() on Windows).
-     */
-    TAGLIB_DEPRECATED static bool isWritable(const char *name);
-
   protected:
     /*!
      * Construct a File object and opens the \a file.  \a file should be a

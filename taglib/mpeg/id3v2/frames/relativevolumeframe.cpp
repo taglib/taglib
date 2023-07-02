@@ -85,20 +85,6 @@ List<RelativeVolumeFrame::ChannelType> RelativeVolumeFrame::channels() const
   return l;
 }
 
-// deprecated
-
-RelativeVolumeFrame::ChannelType RelativeVolumeFrame::channelType() const
-{
-  return MasterVolume;
-}
-
-// deprecated
-
-void RelativeVolumeFrame::setChannelType(ChannelType)
-{
-
-}
-
 short RelativeVolumeFrame::volumeAdjustmentIndex(ChannelType type) const
 {
   return d->channels.contains(type) ? d->channels[type].volumeAdjustment : 0;

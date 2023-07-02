@@ -69,16 +69,6 @@ namespace TagLib {
        * Returns the length of the file in seconds.  The length is rounded down to
        * the nearest whole second.
        *
-       * \note This method is just an alias of lengthInSeconds().
-       *
-       * \deprecated Use lengthInSeconds().
-       */
-      TAGLIB_DEPRECATED virtual int length() const;
-
-      /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
        * \see lengthInMilliseconds()
        */
       // BIC: make virtual
@@ -112,16 +102,6 @@ namespace TagLib {
        * identification header.
        */
       int bitsPerSample() const;
-
-      /*!
-       * Returns the sample width as read from the FLAC identification
-       * header.
-       *
-       * \note This method is just an alias of bitsPerSample().
-       *
-       * \deprecated Use bitsPerSample().
-       */
-      TAGLIB_DEPRECATED int sampleWidth() const;
 
       /*!
        * Return the number of sample frames.

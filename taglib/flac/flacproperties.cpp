@@ -74,11 +74,6 @@ FLAC::Properties::~Properties()
   delete d;
 }
 
-int FLAC::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
 int FLAC::Properties::lengthInSeconds() const
 {
   return d->length / 1000;
@@ -102,11 +97,6 @@ int FLAC::Properties::sampleRate() const
 int FLAC::Properties::bitsPerSample() const
 {
   return d->bitsPerSample;
-}
-
-int FLAC::Properties::sampleWidth() const
-{
-  return bitsPerSample();
 }
 
 int FLAC::Properties::channels() const

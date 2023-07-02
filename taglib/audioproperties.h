@@ -65,26 +65,19 @@ namespace TagLib {
     virtual ~AudioProperties();
 
     /*!
-     * Returns the length of the file in seconds.
-     */
-    virtual int length() const = 0;
-
-    /*!
      * Returns the length of the file in seconds.  The length is rounded down to
      * the nearest whole second.
      *
      * \see lengthInMilliseconds()
      */
-    // BIC: make virtual
-    int lengthInSeconds() const;
+    virtual int lengthInSeconds() const = 0;
 
     /*!
      * Returns the length of the file in milliseconds.
      *
      * \see lengthInSeconds()
      */
-    // BIC: make virtual
-    int lengthInMilliseconds() const;
+    virtual int lengthInMilliseconds() const = 0;
 
     /*!
      * Returns the most appropriate bit rate for the file in kb/s.  For constant

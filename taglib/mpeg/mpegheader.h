@@ -49,13 +49,6 @@ namespace TagLib {
     {
     public:
       /*!
-       * Parses an MPEG header based on \a data.
-       *
-       * \deprecated Use Header(File *, long, bool).
-       */
-      TAGLIB_DEPRECATED Header(const ByteVector &data);
-
-      /*!
        * Parses an MPEG header based on \a file and \a offset.
        *
        * \note If \a checkLength is true, this requires the next MPEG frame to

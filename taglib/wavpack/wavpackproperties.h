@@ -53,16 +53,6 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of WavPack::Properties with the data read from the
-       * ByteVector \a data.
-       *
-       * \deprecated This constructor will be dropped in favor of the one below
-       * in a future version.
-       */
-      TAGLIB_DEPRECATED Properties(const ByteVector &data, offset_t streamLength,
-                                   ReadStyle style = Average);
-
-      /*!
        * Create an instance of WavPack::Properties.
        */
       Properties(File *file, offset_t streamLength, ReadStyle style = Average);
@@ -71,16 +61,6 @@ namespace TagLib {
        * Destroys this WavPack::Properties instance.
        */
       virtual ~Properties();
-
-      /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
-       * \note This method is just an alias of lengthInSeconds().
-       *
-       * \deprecated Use lengthInSeconds().
-       */
-      TAGLIB_DEPRECATED virtual int length() const;
 
       /*!
        * Returns the length of the file in seconds.  The length is rounded down to
