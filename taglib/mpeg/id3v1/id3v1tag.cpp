@@ -67,6 +67,10 @@ StringHandler::StringHandler()
 {
 }
 
+StringHandler::~StringHandler()
+{
+}
+
 String ID3v1::StringHandler::parse(const ByteVector &data) const
 {
   return String(data, String::Latin1).stripWhiteSpace();

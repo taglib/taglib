@@ -518,3 +518,11 @@ void FileRef::parse(IOStream *stream, bool readAudioProperties,
 
   d->file = detectByContent(stream, readAudioProperties, audioPropertiesStyle);
 }
+
+FileRef::FileTypeResolver::~FileTypeResolver()
+{
+}
+
+FileRef::StreamTypeResolver::~StreamTypeResolver()
+{
+}

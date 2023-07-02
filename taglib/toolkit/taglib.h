@@ -32,12 +32,6 @@
 #define TAGLIB_MINOR_VERSION 0
 #define TAGLIB_PATCH_VERSION 0
 
-#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 1)) || defined(__clang__)
-#define TAGLIB_IGNORE_MISSING_DESTRUCTOR _Pragma("GCC diagnostic ignored \"-Wnon-virtual-dtor\"")
-#else
-#define TAGLIB_IGNORE_MISSING_DESTRUCTOR
-#endif
-
 #if (defined(_MSC_VER) && _MSC_VER >= 1600)
 #define TAGLIB_CONSTRUCT_BITSET(x) static_cast<unsigned long long>(x)
 #else

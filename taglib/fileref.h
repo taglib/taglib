@@ -91,8 +91,12 @@ namespace TagLib {
 
     class TAGLIB_EXPORT FileTypeResolver
     {
-      TAGLIB_IGNORE_MISSING_DESTRUCTOR
     public:
+      /*!
+       * Destroys this FileTypeResolver instance.
+       */
+      virtual ~FileTypeResolver() = 0;
+
       /*!
        * This method must be overridden to provide an additional file type
        * resolver.  If the resolver is able to determine the file type it should
@@ -110,8 +114,12 @@ namespace TagLib {
 
     class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
     {
-      TAGLIB_IGNORE_MISSING_DESTRUCTOR
     public:
+      /*!
+       * Destroys this StreamTypeResolver instance.
+       */
+      virtual ~StreamTypeResolver() = 0;
+
       virtual File *createFileFromStream(IOStream *stream,
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
