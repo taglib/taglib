@@ -63,8 +63,10 @@ if(MSVC)
   # Disable warnings for internal invocations of API functions
   # that have been marked with TAGLIB_DEPRECATED
   # https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/compiler-warning-level-3-c4996
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
+  # Also disable C4910: '__declspec(dllexport)' and 'extern' are incompatible on an explicit instantiation
+  # and C4251: needs to have dll-interface to be used by clients.
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996 /wd4910 /wd4251")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996 /wd4910 /wd4251")
 endif()
 
 # Read version information from file taglib/toolkit/taglib.h into variables
