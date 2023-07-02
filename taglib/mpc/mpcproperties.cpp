@@ -93,11 +93,6 @@ MPC::Properties::~Properties()
   delete d;
 }
 
-int MPC::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
 int MPC::Properties::lengthInSeconds() const
 {
   return d->length / 1000;

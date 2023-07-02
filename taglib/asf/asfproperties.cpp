@@ -67,11 +67,6 @@ ASF::Properties::~Properties()
   delete d;
 }
 
-int ASF::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
 int ASF::Properties::lengthInSeconds() const
 {
   return d->length / 1000;

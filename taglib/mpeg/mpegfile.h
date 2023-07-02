@@ -183,35 +183,6 @@ namespace TagLib {
 
       /*!
        * Save the file.  This will attempt to save all of the tag types that are
-       * specified by OR-ing together TagTypes values.  The save() method above
-       * uses AllTags.  This returns true if saving was successful.
-       *
-       * This strips all tags not included in the mask, but does not modify them
-       * in memory, so later calls to save() which make use of these tags will
-       * remain valid.  This also strips empty tags.
-       */
-      bool save(int tags);
-
-      /*!
-       * \deprecated Use save(int, StripTags, ID3v2::Version, DuplicateTags).
-       */
-      // BIC: combine with the above method
-      TAGLIB_DEPRECATED bool save(int tags, bool stripOthers);
-
-      /*!
-       * \deprecated Use save(int, StripTags, ID3v2::Version, DuplicateTags).
-       */
-      // BIC: combine with the above method
-      TAGLIB_DEPRECATED bool save(int tags, bool stripOthers, int id3v2Version);
-
-      /*!
-       * \deprecated Use save(int, StripTags, ID3v2::Version, DuplicateTags).
-       */
-      // BIC: combine with the above method
-      TAGLIB_DEPRECATED bool save(int tags, bool stripOthers, int id3v2Version, bool duplicateTags);
-
-      /*!
-       * Save the file.  This will attempt to save all of the tag types that are
        * specified by OR-ing together TagTypes values.
        *
        * \a strip can be set to strip all tags except those in \a tags.  Those
@@ -223,7 +194,7 @@ namespace TagLib {
        * If \a duplicate is set to DuplicateTags and at least one tag -- ID3v1
        * or ID3v2 -- exists this will duplicate its content into the other tag.
        */
-      bool save(int tags, StripTags strip,
+      bool save(int tags, StripTags strip = StripOthers,
                 ID3v2::Version version = ID3v2::v4,
                 DuplicateTags duplicate = Duplicate);
 
@@ -310,14 +281,6 @@ namespace TagLib {
        */
       // BIC: merge with the method above
       bool strip(int tags, bool freeMemory);
-
-      /*!
-       * Set the ID3v2::FrameFactory to something other than the default.
-       *
-       * \see ID3v2FrameFactory
-       * \deprecated This value should be passed in via the constructor.
-       */
-      TAGLIB_DEPRECATED void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
 
       /*!
        * Returns the position in the file of the first MPEG frame.

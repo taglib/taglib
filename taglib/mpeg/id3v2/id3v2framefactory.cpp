@@ -115,18 +115,6 @@ FrameFactory *FrameFactory::instance()
   return &factory;
 }
 
-Frame *FrameFactory::createFrame(const ByteVector &data, bool synchSafeInts) const
-{
-  return createFrame(data, static_cast<unsigned int>(synchSafeInts ? 4 : 3));
-}
-
-Frame *FrameFactory::createFrame(const ByteVector &data, unsigned int version) const
-{
-  Header tagHeader;
-  tagHeader.setMajorVersion(version);
-  return createFrame(data, &tagHeader);
-}
-
 Frame *FrameFactory::createFrame(const ByteVector &origData, Header *tagHeader) const
 {
     return createFrame(origData, const_cast<const Header *>(tagHeader));

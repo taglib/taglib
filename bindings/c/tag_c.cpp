@@ -270,7 +270,7 @@ void taglib_tag_free_strings()
 int taglib_audioproperties_length(const TagLib_AudioProperties *audioProperties)
 {
   const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
-  return p->length();
+  return p->lengthInSeconds();
 }
 
 int taglib_audioproperties_bitrate(const TagLib_AudioProperties *audioProperties)

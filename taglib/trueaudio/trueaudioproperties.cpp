@@ -73,11 +73,6 @@ TrueAudio::Properties::~Properties()
   delete d;
 }
 
-int TrueAudio::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
 int TrueAudio::Properties::lengthInSeconds() const
 {
   return d->length / 1000;

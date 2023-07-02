@@ -57,13 +57,6 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("RIFF::AIFF::Properties::Properties() - This constructor is no longer used.");
-}
-
 RIFF::AIFF::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
@@ -74,11 +67,6 @@ RIFF::AIFF::Properties::Properties(File *file, ReadStyle style) :
 RIFF::AIFF::Properties::~Properties()
 {
   delete d;
-}
-
-int RIFF::AIFF::Properties::length() const
-{
-  return lengthInSeconds();
 }
 
 int RIFF::AIFF::Properties::lengthInSeconds() const
@@ -109,11 +97,6 @@ int RIFF::AIFF::Properties::channels() const
 int RIFF::AIFF::Properties::bitsPerSample() const
 {
   return d->bitsPerSample;
-}
-
-int RIFF::AIFF::Properties::sampleWidth() const
-{
-  return bitsPerSample();
 }
 
 unsigned int RIFF::AIFF::Properties::sampleFrames() const

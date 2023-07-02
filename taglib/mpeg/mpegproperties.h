@@ -63,16 +63,6 @@ namespace TagLib {
        * Returns the length of the file in seconds.  The length is rounded down to
        * the nearest whole second.
        *
-       * \note This method is just an alias of lengthInSeconds().
-       *
-       * \deprecated Use lengthInSeconds().
-       */
-      TAGLIB_DEPRECATED virtual int length() const;
-
-      /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
        * \see lengthInMilliseconds()
        */
       // BIC: make virtual

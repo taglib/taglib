@@ -160,11 +160,6 @@ namespace TagLib {
         virtual bool save();
 
         /*!
-         * \deprecated Use save(TagTypes, StripTags, ID3v2::Version).
-         */
-        TAGLIB_DEPRECATED bool save(TagTypes tags, bool stripOthers, int id3v2Version = 4);
-
-        /*!
          * Save the file.  If \a strip is specified, it is possible to choose if
          * tags not specified in \a tags should be stripped from the file or
          * retained.  With \a version, it is possible to specify whether ID3v2.4

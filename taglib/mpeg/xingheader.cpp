@@ -81,12 +81,6 @@ MPEG::XingHeader::HeaderType MPEG::XingHeader::type() const
   return d->type;
 }
 
-int MPEG::XingHeader::xingHeaderOffset(TagLib::MPEG::Header::Version /*v*/,
-                                       TagLib::MPEG::Header::ChannelMode /*c*/)
-{
-  return 0;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////

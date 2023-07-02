@@ -451,36 +451,6 @@ offset_t File::length()
   return d->stream->length();
 }
 
-bool File::isReadable(const char *file)
-{
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
-
-  return _access_s(file, R_OK) == 0;
-
-#else
-
-  return access(file, R_OK) == 0;
-
-#endif
-
-}
-
-bool File::isWritable(const char *file)
-{
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
-
-  return _access_s(file, W_OK) == 0;
-
-#else
-
-  return access(file, W_OK) == 0;
-
-#endif
-
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

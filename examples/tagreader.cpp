@@ -75,8 +75,8 @@ int main(int argc, char *argv[])
 
       TagLib::AudioProperties *properties = f.audioProperties();
 
-      int seconds = properties->length() % 60;
-      int minutes = (properties->length() - seconds) / 60;
+      int seconds = properties->lengthInSeconds() % 60;
+      int minutes = (properties->lengthInSeconds() - seconds) / 60;
 
       cout << "-- AUDIO --" << endl;
       cout << "bitrate     - " << properties->bitrate() << endl;

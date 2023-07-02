@@ -334,16 +334,6 @@ namespace TagLib {
        * contain a 4 byte frame ID, and optionally can contain flag data and the
        * frame size.  i.e. Just the frame id -- "TALB" -- is a valid value.
        *
-       * \deprecated Please use the constructor below that accepts a version
-       * number.
-       */
-      TAGLIB_DEPRECATED Header(const ByteVector &data, bool synchSafeInts);
-
-      /*!
-       * Construct a Frame Header based on \a data.  \a data must at least
-       * contain a 4 byte frame ID, and optionally can contain flag data and the
-       * frame size.  i.e. Just the frame id -- "TALB" -- is a valid value.
-       *
        * \a version should be the ID3v2 version of the tag.
        */
       explicit Header(const ByteVector &data, unsigned int version = 4);
@@ -352,14 +342,6 @@ namespace TagLib {
        * Destroys this Header instance.
        */
       virtual ~Header();
-
-      /*!
-       * Sets the data for the Header.
-       *
-       * \deprecated Please use the version below that accepts an ID3v2 version
-       * number.
-       */
-      TAGLIB_DEPRECATED void setData(const ByteVector &data, bool synchSafeInts);
 
       /*!
        * Sets the data for the Header.  \a version should indicate the ID3v2
@@ -503,11 +485,6 @@ namespace TagLib {
        * Render the Header back to binary format in a ByteVector.
        */
       ByteVector render() const;
-
-      /*!
-       * \deprecated Use fileAlterPreservation().
-       */
-      TAGLIB_DEPRECATED bool frameAlterPreservation() const;
 
     private:
       Header(const Header &);

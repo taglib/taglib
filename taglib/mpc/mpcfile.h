@@ -195,12 +195,6 @@ namespace TagLib {
       void strip(int tags = AllTags);
 
       /*!
-       * \deprecated Use strip().
-       * \see strip
-       */
-      TAGLIB_DEPRECATED void remove(int tags = AllTags);
-
-      /*!
        * Returns whether or not the file on disk actually has an ID3v1 tag.
        *
        * \see ID3v1Tag()

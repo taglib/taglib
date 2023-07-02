@@ -51,22 +51,6 @@ namespace TagLib {
       public:
         /*!
          * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data.
-         *
-         * \deprecated Use Properties(File *, ReadStyle).
-         */
-        TAGLIB_DEPRECATED Properties(const ByteVector &data, ReadStyle style);
-
-        /*!
-         * Create an instance of WAV::Properties with the data read from the
-         * ByteVector \a data and the length calculated using \a streamLength.
-         *
-         * \deprecated Use Properties(File *, ReadStyle).
-         */
-        TAGLIB_DEPRECATED Properties(const ByteVector &data, unsigned int streamLength, ReadStyle style);
-
-        /*!
-         * Create an instance of WAV::Properties with the data read from the
          * WAV::File \a file.
          */
         Properties(File *file, ReadStyle style);
@@ -75,16 +59,6 @@ namespace TagLib {
          * Destroys this WAV::Properties instance.
          */
         virtual ~Properties();
-
-        /*!
-         * Returns the length of the file in seconds.  The length is rounded down to
-         * the nearest whole second.
-         *
-         * \note This method is just an alias of lengthInSeconds().
-         *
-         * \deprecated Use lengthInSeconds().
-         */
-        TAGLIB_DEPRECATED virtual int length() const;
 
         /*!
          * Returns the length of the file in seconds.  The length is rounded down to
@@ -122,15 +96,6 @@ namespace TagLib {
          * Returns the number of bits per audio sample.
          */
         int bitsPerSample() const;
-
-        /*!
-         * Returns the number of bits per audio sample.
-         *
-         * \note This method is just an alias of bitsPerSample().
-         *
-         * \deprecated Use bitsPerSample().
-         */
-        TAGLIB_DEPRECATED int sampleWidth() const;
 
         /*!
          * Returns the number of sample frames.

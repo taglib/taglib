@@ -271,23 +271,9 @@ namespace TagLib {
     ConstReverseIterator rend() const;
 
     /*!
-     * Returns true if the vector is null.
-     *
-     * \note A vector may be empty without being null.  So do not use this
-     * method to check if the vector is empty.
-     *
-     * \see isEmpty()
-     *
-     * \deprecated Use isEmpty(), do not differentiate between null and empty.
-     */
-     // BIC: remove
-    TAGLIB_DEPRECATED bool isNull() const;
-
-    /*!
      * Returns true if the ByteVector is empty.
      *
      * \see size()
-     * \see isNull()
      */
     bool isEmpty() const;
 
@@ -584,18 +570,6 @@ namespace TagLib {
      * Exchanges the content of the ByteVector by the content of \a v.
      */
     void swap(ByteVector &v);
-
-    /*!
-     * A static, empty ByteVector which is convenient and fast (since returning
-     * an empty or "null" value does not require instantiating a new ByteVector).
-     *
-     * \warning Do not modify this variable.  It will mess up the internal state
-     * of TagLib.
-     *
-     * \deprecated Use ByteVector().
-     */
-    // BIC: remove
-    TAGLIB_DEPRECATED static ByteVector null;
 
     /*!
      * Returns a hex-encoded copy of the byte vector.

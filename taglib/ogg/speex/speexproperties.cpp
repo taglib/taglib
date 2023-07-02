@@ -77,11 +77,6 @@ Speex::Properties::~Properties()
   delete d;
 }
 
-int Speex::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
 int Speex::Properties::lengthInSeconds() const
 {
   return d->length / 1000;

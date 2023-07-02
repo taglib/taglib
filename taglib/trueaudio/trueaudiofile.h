@@ -161,14 +161,6 @@ namespace TagLib {
       virtual Properties *audioProperties() const;
 
       /*!
-       * Set the ID3v2::FrameFactory to something other than the default.
-       *
-       * \see ID3v2FrameFactory
-       * \deprecated This value should be passed in via the constructor.
-       */
-      TAGLIB_DEPRECATED void setID3v2FrameFactory(const ID3v2::FrameFactory *factory);
-
-      /*!
        * Saves the file.
        */
       virtual bool save();

@@ -71,11 +71,6 @@ Opus::Properties::~Properties()
   delete d;
 }
 
-int Opus::Properties::length() const
-{
-  return lengthInSeconds();
-}
-
 int Ogg::Opus::Properties::lengthInSeconds() const
 {
   return d->length / 1000;

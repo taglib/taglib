@@ -330,23 +330,6 @@ Ogg::XiphComment *FLAC::File::xiphComment(bool create)
   return d->tag.access<Ogg::XiphComment>(FlacXiphIndex, create);
 }
 
-void FLAC::File::setID3v2FrameFactory(const ID3v2::FrameFactory *factory)
-{
-  d->ID3v2FrameFactory = factory;
-}
-
-ByteVector FLAC::File::streamInfoData()
-{
-  debug("FLAC::File::streamInfoData() -- This function is obsolete. Returning an empty ByteVector.");
-  return ByteVector();
-}
-
-offset_t FLAC::File::streamLength()
-{
-  debug("FLAC::File::streamLength() -- This function is obsolete. Returning zero.");
-  return 0;
-}
-
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;

@@ -872,11 +872,6 @@ bool MP4::Tag::isEmpty() const
   return d->items.isEmpty();
 }
 
-MP4::ItemMap &MP4::Tag::itemListMap()
-{
-  return d->items;
-}
-
 const MP4::ItemMap &MP4::Tag::itemMap() const
 {
   return d->items;

@@ -581,12 +581,6 @@ unsigned int Frame::Header::size(unsigned int version)
 // public members (Frame::Header)
 ////////////////////////////////////////////////////////////////////////////////
 
-Frame::Header::Header(const ByteVector &data, bool synchSafeInts) :
-  d(new HeaderPrivate())
-{
-  setData(data, synchSafeInts);
-}
-
 Frame::Header::Header(const ByteVector &data, unsigned int version) :
   d(new HeaderPrivate())
 {
@@ -596,11 +590,6 @@ Frame::Header::Header(const ByteVector &data, unsigned int version) :
 Frame::Header::~Header()
 {
   delete d;
-}
-
-void Frame::Header::setData(const ByteVector &data, bool synchSafeInts)
-{
-  setData(data, static_cast<unsigned int>(synchSafeInts ? 4 : 3));
 }
 
 void Frame::Header::setData(const ByteVector &data, unsigned int version)
@@ -825,9 +814,4 @@ ByteVector Frame::Header::render() const
     flags;
 
   return v;
-}
-
-bool Frame::Header::frameAlterPreservation() const
-{
-  return fileAlterPreservation();
 }
