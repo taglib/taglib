@@ -37,8 +37,12 @@ int main(int argc, char *argv[])
   TagLib_File *file;
   TagLib_Tag *tag;
   const TagLib_AudioProperties *properties;
+  char **propertiesMap;
+  char **propertyValues;
+  char **pp;
+  char **pp1;
 
-  taglib_set_strings_unicode(FALSE);
+  taglib_set_strings_unicode(1);
 
   for(i = 1; i < argc; i++) {
     printf("******************** \"%s\" ********************\n", argv[i]);
@@ -50,6 +54,7 @@ int main(int argc, char *argv[])
 
     tag = taglib_file_tag(file);
     properties = taglib_file_audioproperties(file);
+    propertiesMap = taglib_property_keys(file);
 
     if(tag != NULL) {
       printf("-- TAG --\n");
@@ -73,6 +78,26 @@ int main(int argc, char *argv[])
       printf("length      - %i:%02i\n", minutes, seconds);
     }
 
+    if(propertiesMap)
+    {
+      printf("-- PROPERITES --\n");
+      pp = propertiesMap;
+      while (*pp)
+      {
+        printf("\"%s\"\n", *pp);
+	propertyValues = pp1 = taglib_property_get(file, *pp);
+
+	while (pp1 && *pp1) {
+	  printf("  \"%s\"\n", *pp1);
+	  ++pp1;
+	}
+	taglib_property_free(propertyValues);
+
+        ++pp;
+      }
+    }
+
+    taglib_property_free(propertiesMap);
     taglib_tag_free_strings();
     taglib_file_free(file);
   }
