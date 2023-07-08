@@ -422,15 +422,15 @@ char** taglib_property_keys(TagLib_File *file)
   if (file== NULL)
     return NULL;
 
-  PropertyMap  map = _taglib_property_get(file);
+  const PropertyMap  map = _taglib_property_get(file);
   if (map.isEmpty()) 
     return NULL;
 
   char** props = (char**)malloc(sizeof(char*)*(sizeof(char*) * (map.size()+1)) );
   char** pp = props;
 
-  for (const auto& i : map) {
-    (*pp) = strdup(i.first.toCString());
+  for (PropertyMap::ConstIterator i=map.begin(); i!=map.end(); ++i) {
+    (*pp) = strdup(i->first.toCString());
     ++pp;
   }
   *pp = NULL;
@@ -443,17 +443,17 @@ char** taglib_property_get(TagLib_File *file, const char* prop)
   if (file == NULL || prop == NULL)
     return NULL;
 
-  PropertyMap  map = _taglib_property_get(file);
+  const PropertyMap  map = _taglib_property_get(file);
 
-  TagLib::PropertyMap::Iterator  property = map.find(prop);
+  TagLib::PropertyMap::ConstIterator  property = map.find(prop);
   if (property == map.end())
     return NULL;
 
   char** props = (char**)malloc(sizeof(char*) * (property->second.size()+1) );
   char** pp = props;
 
-  for (const auto& i : property->second) {
-    (*pp) = strdup(i.toCString());
+  for (StringList::ConstIterator i= property->second.begin(); i!=property->second.end(); ++i) {
+    (*pp) = strdup(i->toCString());
     ++pp;
   }
   *pp = NULL;
