@@ -39,6 +39,7 @@
 #include <tag.h>
 #include <string.h>
 #include <id3v2framefactory.h>
+#include <tpropertymap.h>
 
 #include "tag_c.h"
 
@@ -312,4 +313,163 @@ void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding)
   }
 
   ID3v2::FrameFactory::instance()->setDefaultTextEncoding(type);
+}
+
+
+/******************************************************************************
+ * Properties API
+ ******************************************************************************/
+namespace {
+PropertyMap  _taglib_property_get(TagLib_File *cfile)
+{
+   const File*  file = reinterpret_cast<const File *>(cfile);
+
+// same ugly cast as tfile.cpp
+  if(dynamic_cast<const FLAC::File* >(file))
+    return  dynamic_cast<const FLAC::File* >(file)->properties();
+  if(dynamic_cast<const MPC::File* >(file))
+    return  dynamic_cast<const MPC::File* >(file)->properties();
+  if(dynamic_cast<const MPEG::File* >(file))
+    return  dynamic_cast<const MPEG::File* >(file)->properties();
+  if(dynamic_cast<const Ogg::FLAC::File* >(file))
+    return  dynamic_cast<const Ogg::FLAC::File* >(file)->properties();
+  if(dynamic_cast<const Ogg::Speex::File* >(file))
+    return  dynamic_cast<const Ogg::Speex::File* >(file)->properties();
+  if(dynamic_cast<const TrueAudio::File*>(file))
+    return dynamic_cast<const TrueAudio::File *>(file)->properties();
+  if(dynamic_cast<const Ogg::Vorbis::File* >(file))
+    return  dynamic_cast<const Ogg::Vorbis::File* >(file)->properties();
+  if(dynamic_cast<const WavPack::File* >(file))
+     return dynamic_cast<const WavPack::File* >(file)->properties();
+  if(dynamic_cast<const MP4::File* >(file))
+    return  dynamic_cast<const MP4::File* >(file)->properties();
+  if(dynamic_cast<const ASF::File* >(file))
+    return  dynamic_cast<const ASF::File* >(file)->properties();
+
+  return file->tag() ? file->tag()->properties() : PropertyMap();
+}
+
+void _taglib_property_set(TagLib_File *cfile, PropertyMap& map)
+{
+   File*  file = reinterpret_cast<File *>(cfile);
+// same ugly cast as tfile.cpp
+  if(dynamic_cast<FLAC::File* >(file))
+     dynamic_cast<FLAC::File* >(file)->setProperties(map);
+  if(dynamic_cast<MPC::File* >(file))
+     dynamic_cast<MPC::File* >(file)->setProperties(map);
+  if(dynamic_cast<MPEG::File* >(file))
+     dynamic_cast<MPEG::File* >(file)->setProperties(map);
+  if(dynamic_cast<Ogg::FLAC::File* >(file))
+     dynamic_cast<Ogg::FLAC::File* >(file)->setProperties(map);
+  if(dynamic_cast<Ogg::Speex::File* >(file))
+     dynamic_cast<Ogg::Speex::File* >(file)->setProperties(map);
+  if(dynamic_cast<TrueAudio::File*>(file))
+    dynamic_cast<TrueAudio::File *>(file)->setProperties(map);
+  if(dynamic_cast<Ogg::Vorbis::File* >(file))
+     dynamic_cast<Ogg::Vorbis::File* >(file)->setProperties(map);
+  if(dynamic_cast<WavPack::File* >(file))
+     dynamic_cast<WavPack::File* >(file)->setProperties(map);
+  if(dynamic_cast<MP4::File* >(file))
+     dynamic_cast<MP4::File* >(file)->setProperties(map);
+  if(dynamic_cast<ASF::File* >(file))
+     dynamic_cast<ASF::File* >(file)->setProperties(map);
+  file->tag()->setProperties(map);
+}
+
+
+void _taglib_property_set(TagLib_File *file, const char* prop, const char* value, bool append)
+{
+  if (file == NULL || prop == NULL)
+    return;
+
+  PropertyMap  map = _taglib_property_get(file);
+
+  if (value) {
+    TagLib::PropertyMap::Iterator  property = map.find(prop);
+    if (property == map.end()) {
+      map.insert(prop, StringList(value));
+    }
+    else
+    {
+      if (append) {
+        property->second.append(value);
+      }
+      else {
+        property->second = StringList(value);
+      }
+    }
+  }
+  else {
+    map.erase(prop);
+  }
+
+  _taglib_property_set(file, map);
+}
+}
+
+void taglib_property_set(TagLib_File *f, const char* prop, const char* value)
+{
+  _taglib_property_set(f, prop, value, false);
+}
+
+void taglib_property_set_append(TagLib_File *f, const char* prop, const char* value)
+{
+  _taglib_property_set(f, prop, value, true);
+}
+
+char** taglib_property_keys(TagLib_File *file)
+{
+  if (file== NULL)
+    return NULL;
+
+  PropertyMap  map = _taglib_property_get(file);
+  if (map.isEmpty()) 
+    return NULL;
+
+  char** props = (char**)malloc(sizeof(char*)*(sizeof(char*) * (map.size()+1)) );
+  char** pp = props;
+
+  for (const auto& i : map) {
+    (*pp) = strdup(i.first.toCString());
+    ++pp;
+  }
+  *pp = NULL;
+
+  return props;
+}
+
+char** taglib_property_get(TagLib_File *file, const char* prop)
+{
+  if (file == NULL || prop == NULL)
+    return NULL;
+
+  PropertyMap  map = _taglib_property_get(file);
+
+  TagLib::PropertyMap::Iterator  property = map.find(prop);
+  if (property == map.end())
+    return NULL;
+
+  char** props = (char**)malloc(sizeof(char*) * (property->second.size()+1) );
+  char** pp = props;
+
+  for (const auto& i : property->second) {
+    (*pp) = strdup(i.toCString());
+    ++pp;
+  }
+  *pp = NULL;
+
+  return props;
+}
+
+void taglib_property_free(char** props)
+{
+  if (props == NULL)
+    return;
+
+  char**  p = props;
+  while (*p) {
+      free(*p);
+      ++p;
+  }
+  free(props);
 }

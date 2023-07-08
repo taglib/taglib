@@ -292,6 +292,27 @@ typedef enum {
 
 TAGLIB_C_EXPORT void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding);
 
+/******************************************************************************
+ * Properties API
+ ******************************************************************************/
+
+/*!
+ * Sets the property with value.  value=null to remove, append to existing property or to replace
+ */
+TAGLIB_C_EXPORT void taglib_property_set(TagLib_File *file, const char* prop, const char* value);
+TAGLIB_C_EXPORT void taglib_property_set_append(TagLib_File *file, const char* prop, const char* value);
+
+/*!
+ * Get they keys of the property map.  returns NULL if empty otherwise null term array of strings (client must free)
+ */
+TAGLIB_C_EXPORT char** taglib_property_keys(TagLib_File *file);
+
+/*!
+ * Get properties with 'prop';  returns null term array of strings (client must free) or null if not found
+ */
+TAGLIB_C_EXPORT char** taglib_property_get(TagLib_File *file, const char* prop);
+TAGLIB_C_EXPORT void taglib_property_free(char** prop);
+
 #ifdef __cplusplus
 }
 #endif
