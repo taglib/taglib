@@ -73,31 +73,6 @@ S3M::Properties::~Properties()
   delete d;
 }
 
-int S3M::Properties::length() const
-{
-  return 0;
-}
-
-int S3M::Properties::lengthInSeconds() const
-{
-  return 0;
-}
-
-int S3M::Properties::lengthInMilliseconds() const
-{
-  return 0;
-}
-
-int S3M::Properties::bitrate() const
-{
-  return 0;
-}
-
-int S3M::Properties::sampleRate() const
-{
-  return 0;
-}
-
 int S3M::Properties::channels() const
 {
   return d->channels;

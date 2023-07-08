@@ -93,7 +93,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      // BIC: merge with the above constructor
+      // BIC: merge with the above constructor, kept for source compatibility
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
@@ -260,27 +260,12 @@ namespace TagLib {
        * file.  By default it strips all tags.  It returns true if the tags are
        * successfully stripped.
        *
-       * This is equivalent to strip(tags, true)
-       *
-       * \note This will also invalidate pointers to the ID3 and APE tags
-       * as their memory will be freed.
-       *
-       * \note This will update the file immediately.
-       */
-      bool strip(int tags = AllTags);
-
-      /*!
-       * This will strip the tags that match the OR-ed together TagTypes from the
-       * file.  By default it strips all tags.  It returns true if the tags are
-       * successfully stripped.
-       *
        * If \a freeMemory is true the ID3 and APE tags will be deleted and
        * pointers to them will be invalidated.
        *
        * \note This will update the file immediately.
        */
-      // BIC: merge with the method above
-      bool strip(int tags, bool freeMemory);
+      bool strip(int tags = AllTags, bool freeMemory = true);
 
       /*!
        * Returns the position in the file of the first MPEG frame.

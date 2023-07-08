@@ -69,7 +69,7 @@ namespace TagLib {
 
       virtual void setText(const String &s);
       virtual String toString() const;
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
     protected:
       virtual void parseFields(const ByteVector &data);
@@ -160,7 +160,7 @@ namespace TagLib {
        *   characters), the returned map will contain an entry "WXXX/<description>"
        *   in its unsupportedData() list.
        */
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * Searches for the user defined url frame with the description \a description

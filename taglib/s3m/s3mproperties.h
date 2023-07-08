@@ -48,11 +48,6 @@ namespace TagLib {
       Properties(AudioProperties::ReadStyle propertiesStyle);
       virtual ~Properties();
 
-      int length()               const;
-      int lengthInSeconds()      const;
-      int lengthInMilliseconds() const;
-      int bitrate()              const;
-      int sampleRate()           const;
       int channels()             const;
 
       unsigned short lengthInPatterns()  const;

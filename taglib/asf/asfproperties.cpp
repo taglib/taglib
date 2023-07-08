@@ -67,11 +67,6 @@ ASF::Properties::~Properties()
   delete d;
 }
 
-int ASF::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
 int ASF::Properties::lengthInMilliseconds() const
 {
   return d->length;
@@ -120,11 +115,6 @@ bool ASF::Properties::isEncrypted() const
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
-
-void ASF::Properties::setLength(int /*length*/)
-{
-  debug("ASF::Properties::setLength() -- This method is deprecated. Do not use.");
-}
 
 void ASF::Properties::setLengthInMilliseconds(int value)
 {

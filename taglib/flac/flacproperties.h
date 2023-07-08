@@ -50,15 +50,7 @@ namespace TagLib {
        * Create an instance of FLAC::Properties with the data read from the
        * ByteVector \a data.
        */
-       // BIC: switch to const reference
-      Properties(ByteVector data, offset_t streamLength, ReadStyle style = Average);
-
-      /*!
-       * Create an instance of FLAC::Properties with the data read from the
-       * FLAC::File \a file.
-       */
-       // BIC: remove
-      Properties(File *file, ReadStyle style = Average);
+      Properties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
 
       /*!
        * Destroys this FLAC::Properties instance.
@@ -66,21 +58,11 @@ namespace TagLib {
       virtual ~Properties();
 
       /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
-       * \see lengthInMilliseconds()
-       */
-      // BIC: make virtual
-      int lengthInSeconds() const;
-
-      /*!
        * Returns the length of the file in milliseconds.
        *
        * \see lengthInSeconds()
        */
-      // BIC: make virtual
-      int lengthInMilliseconds() const;
+      virtual int lengthInMilliseconds() const;
 
       /*!
        * Returns the average bit rate of the file in kb/s.

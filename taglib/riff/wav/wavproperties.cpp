@@ -77,11 +77,6 @@ RIFF::WAV::Properties::~Properties()
   delete d;
 }
 
-int RIFF::WAV::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
 int RIFF::WAV::Properties::lengthInMilliseconds() const
 {
   return d->length;

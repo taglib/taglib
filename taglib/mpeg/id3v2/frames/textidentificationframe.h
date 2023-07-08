@@ -195,7 +195,7 @@ namespace TagLib {
        */
       static const KeyConversionMap &involvedPeopleMap();
 
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
     protected:
       // Reimplementations.
@@ -289,7 +289,7 @@ namespace TagLib {
        *   in the value list, in order to be compatible with TagLib which copies
        *   the description() into the fieldList().
        */
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * Searches for the user defined text frame with the description \a description

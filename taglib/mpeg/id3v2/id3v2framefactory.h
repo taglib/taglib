@@ -68,24 +68,17 @@ namespace TagLib {
       static FrameFactory *instance();
 
       /*!
-       * \deprecated Use createFrame(const ByteVector &, const Header *) const.
-       */
-      // BIC: remove
-      Frame *createFrame(const ByteVector &data, Header *tagHeader) const;
-      /*!
        * Create a frame based on \a data.  \a tagHeader should be a valid
        * ID3v2::Header instance.
        */
-      // BIC: make virtual
-      Frame *createFrame(const ByteVector &data, const Header *tagHeader) const;
+      virtual Frame *createFrame(const ByteVector &data, const Header *tagHeader) const;
 
       /*!
        * After a tag has been read, this tries to rebuild some of them
        * information, most notably the recording date, from frames that
        * have been deprecated and can't be upgraded directly.
        */
-      // BIC: Make virtual
-      void rebuildAggregateFrames(ID3v2::Tag *tag) const;
+      virtual void rebuildAggregateFrames(ID3v2::Tag *tag) const;
 
       /*!
        * Returns the default text encoding for text frames.  If setTextEncoding()

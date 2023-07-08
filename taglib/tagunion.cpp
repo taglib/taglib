@@ -110,27 +110,9 @@ void TagUnion::set(int index, Tag *tag)
 
 PropertyMap TagUnion::properties() const
 {
-  // This is an ugly workaround but we can't add a virtual function.
-  // Should be virtual in taglib2.
-
   for(size_t i = 0; i < 3; ++i) {
-
     if(d->tags[i] && !d->tags[i]->isEmpty()) {
-
-      if(dynamic_cast<const ID3v1::Tag *>(d->tags[i]))
-        return dynamic_cast<const ID3v1::Tag *>(d->tags[i])->properties();
-
-      if(dynamic_cast<const ID3v2::Tag *>(d->tags[i]))
-        return dynamic_cast<const ID3v2::Tag *>(d->tags[i])->properties();
-
-      if(dynamic_cast<const APE::Tag *>(d->tags[i]))
-        return dynamic_cast<const APE::Tag *>(d->tags[i])->properties();
-
-      if(dynamic_cast<const Ogg::XiphComment *>(d->tags[i]))
-        return dynamic_cast<const Ogg::XiphComment *>(d->tags[i])->properties();
-
-      if(dynamic_cast<const RIFF::Info::Tag *>(d->tags[i]))
-        return dynamic_cast<const RIFF::Info::Tag *>(d->tags[i])->properties();
+      return d->tags[i]->properties();
     }
   }
 
@@ -139,27 +121,9 @@ PropertyMap TagUnion::properties() const
 
 void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
 {
-  // This is an ugly workaround but we can't add a virtual function.
-  // Should be virtual in taglib2.
-
   for(size_t i = 0; i < 3; ++i) {
-
     if(d->tags[i]) {
-
-      if(dynamic_cast<ID3v1::Tag *>(d->tags[i]))
-        dynamic_cast<ID3v1::Tag *>(d->tags[i])->removeUnsupportedProperties(unsupported);
-
-      else if(dynamic_cast<ID3v2::Tag *>(d->tags[i]))
-        dynamic_cast<ID3v2::Tag *>(d->tags[i])->removeUnsupportedProperties(unsupported);
-
-      else if(dynamic_cast<APE::Tag *>(d->tags[i]))
-        dynamic_cast<APE::Tag *>(d->tags[i])->removeUnsupportedProperties(unsupported);
-
-      else if(dynamic_cast<Ogg::XiphComment *>(d->tags[i]))
-        dynamic_cast<Ogg::XiphComment *>(d->tags[i])->removeUnsupportedProperties(unsupported);
-
-      else if(dynamic_cast<RIFF::Info::Tag *>(d->tags[i]))
-        dynamic_cast<RIFF::Info::Tag *>(d->tags[i])->removeUnsupportedProperties(unsupported);
+      d->tags[i]->removeUnsupportedProperties(unsupported);
     }
   }
 }
@@ -245,4 +209,3 @@ bool TagUnion::isEmpty() const
 
   return true;
 }
-

@@ -49,14 +49,6 @@ namespace TagLib {
     {
     public:
       /*!
-       * Create an instance of MPC::Properties with the data read from the
-       * ByteVector \a data.
-       *
-       * This constructor is deprecated. It only works for MPC version up to 7.
-       */
-      Properties(const ByteVector &data, offset_t streamLength, ReadStyle style = Average);
-
-      /*!
        * Create an instance of MPC::Properties with the data read directly
        * from a MPC::File.
        */
@@ -68,21 +60,11 @@ namespace TagLib {
       virtual ~Properties();
 
       /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
-       * \see lengthInMilliseconds()
-       */
-      // BIC: make virtual
-      int lengthInSeconds() const;
-
-      /*!
        * Returns the length of the file in milliseconds.
        *
        * \see lengthInSeconds()
        */
-      // BIC: make virtual
-      int lengthInMilliseconds() const;
+      virtual int lengthInMilliseconds() const;
 
       /*!
        * Returns the average bit rate of the file in kb/s.

@@ -58,17 +58,14 @@ namespace TagLib {
      * The default implementation in this class considers only the usual built-in
      * tags (artist, album, ...) and only one value per key.
      */
-    PropertyMap properties() const;
+    virtual PropertyMap properties() const;
 
     /*!
      * Removes unsupported properties, or a subset of them, from the tag.
      * The parameter \a properties must contain only entries from
      * properties().unsupportedData().
-     * BIC: Will become virtual in future releases. Currently the non-virtual
-     * standard implementation of TagLib::Tag does nothing, since there are
-     * no unsupported elements.
      */
-    void removeUnsupportedProperties(const StringList& properties);
+    virtual void removeUnsupportedProperties(const StringList& properties);
 
     /*!
      * Sets the tags of this File to those specified in \a properties. This default
@@ -76,7 +73,7 @@ namespace TagLib {
      * (artist, album, ...), and only one value per key; the rest will be contained
      * in the returned PropertyMap.
      */
-    PropertyMap setProperties(const PropertyMap &properties);
+    virtual PropertyMap setProperties(const PropertyMap &properties);
 
     /*!
      * Returns the track name; if no track name is present in the tag

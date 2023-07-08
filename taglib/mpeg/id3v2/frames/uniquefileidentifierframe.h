@@ -94,7 +94,7 @@ namespace TagLib {
 
       virtual String toString() const;
 
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * UFID frames each have a unique owner. This searches for a UFID

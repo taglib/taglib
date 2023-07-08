@@ -656,7 +656,7 @@ ByteVector ID3v2::Tag::render(Version version) const
     }
     if(!(*it)->header()->tagAlterPreservation()) {
       const ByteVector frameData = (*it)->render();
-      if(frameData.size() == Frame::headerSize((*it)->header()->version())) {
+      if(frameData.size() == (*it)->headerSize()) {
         debug("An empty ID3v2 frame \'"
           + String((*it)->header()->frameID()) + "\' has been discarded");
         continue;
@@ -789,7 +789,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
   // Make sure that there is at least enough room in the remaining frame data for
   // a frame header.
 
-  while(frameDataPosition < frameDataLength - Frame::headerSize(d->header.majorVersion())) {
+  while(frameDataPosition < frameDataLength - d->header.size()) {
 
     // If the next data is position is 0, assume that we've hit the padding
     // portion of the frame data.
@@ -815,7 +815,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       return;
     }
 
-    frameDataPosition += frame->size() + Frame::headerSize(d->header.majorVersion());
+    frameDataPosition += frame->size() + frame->headerSize();
     addFrame(frame);
   }
 

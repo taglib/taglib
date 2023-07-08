@@ -69,11 +69,6 @@ RIFF::AIFF::Properties::~Properties()
   delete d;
 }
 
-int RIFF::AIFF::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
 int RIFF::AIFF::Properties::lengthInMilliseconds() const
 {
   return d->length;

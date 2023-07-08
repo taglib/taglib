@@ -145,7 +145,7 @@ namespace TagLib {
        * Note that currently the language() field is not supported by the PropertyMap
        * interface.
        */
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * LyricsFrames each have a unique description.  This searches for a lyrics

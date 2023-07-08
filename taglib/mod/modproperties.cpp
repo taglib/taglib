@@ -55,21 +55,6 @@ Mod::Properties::~Properties()
   delete d;
 }
 
-int Mod::Properties::length() const
-{
-  return 0;
-}
-
-int Mod::Properties::lengthInSeconds() const
-{
-  return 0;
-}
-
-int Mod::Properties::lengthInMilliseconds() const
-{
-  return 0;
-}
-
 int Mod::Properties::bitrate() const
 {
   return 0;

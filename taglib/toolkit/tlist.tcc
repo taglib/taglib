@@ -39,8 +39,7 @@ namespace TagLib {
 // A base for the generic and specialized private class types.  New
 // non-templatized members should be added here.
 
-// BIC change to RefCounter
-class ListPrivateBase : public RefCounterOld
+class ListPrivateBase : public RefCounter
 {
 public:
   ListPrivateBase() : autoDelete(false) {}

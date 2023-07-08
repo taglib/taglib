@@ -80,11 +80,6 @@ Vorbis::Properties::~Properties()
   delete d;
 }
 
-int Vorbis::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
 int Vorbis::Properties::lengthInMilliseconds() const
 {
   return d->length;

@@ -323,11 +323,6 @@ APE::Tag *MPEG::File::APETag(bool create)
   return d->tag.access<APE::Tag>(APEIndex, create);
 }
 
-bool MPEG::File::strip(int tags)
-{
-  return strip(tags, true);
-}
-
 bool MPEG::File::strip(int tags, bool freeMemory)
 {
   if(readOnly()) {

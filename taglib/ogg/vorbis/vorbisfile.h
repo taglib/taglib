@@ -39,6 +39,8 @@ namespace TagLib {
  * documentation.  The typedef below will make this work with the current code.
  * In the next BIC version of TagLib this will be really moved into the Ogg
  * namespace.
+ * Kept for source compatibility, the typedef in vorbisproperties.h was not
+ * correct in TagLib 1.
  */
 
 #ifdef DOXYGEN
@@ -144,6 +146,8 @@ namespace TagLib {
  * To keep compatibility with the current version put Vorbis in the Ogg namespace
  * only in the docs and provide a typedef to make it work.  In the next BIC
  * version this will be removed and it will only exist in the Ogg namespace.
+ * Kept for source compatibility, the typedef in vorbisproperties.h was not
+ * correct in TagLib 1.
  */
 
 #ifdef DOXYGEN

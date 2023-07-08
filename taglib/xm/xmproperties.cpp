@@ -69,31 +69,6 @@ XM::Properties::~Properties()
   delete d;
 }
 
-int XM::Properties::length() const
-{
-  return 0;
-}
-
-int XM::Properties::lengthInSeconds() const
-{
-  return 0;
-}
-
-int XM::Properties::lengthInMilliseconds() const
-{
-  return 0;
-}
-
-int XM::Properties::bitrate() const
-{
-  return 0;
-}
-
-int XM::Properties::sampleRate() const
-{
-  return 0;
-}
-
 int XM::Properties::channels() const
 {
   return d->channels;
