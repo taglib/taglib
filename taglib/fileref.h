@@ -288,6 +288,7 @@ namespace TagLib {
      *
      * \deprecated Use FileRef(FileName, bool, AudioProperties::ReadStyle).
      */
+     // Kept because it is used for the C bindings
     static File *create(FileName fileName,
                         bool readAudioProperties = true,
                         AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);

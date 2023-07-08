@@ -57,12 +57,6 @@ namespace TagLib {
       Item();
 
       /*!
-       * Constructs a text item with \a key and \a value.
-       */
-      // BIC: Remove this, StringList has a constructor from a single string
-      Item(const String &key, const String &value);
-
-      /*!
        * Constructs a text item with \a key and \a values.
        */
       Item(const String &key, const StringList &values);

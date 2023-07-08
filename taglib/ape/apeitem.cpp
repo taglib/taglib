@@ -54,13 +54,6 @@ APE::Item::Item() :
 {
 }
 
-APE::Item::Item(const String &key, const String &value) :
-  d(new ItemPrivate())
-{
-  d->key = key;
-  d->text.append(value);
-}
-
 APE::Item::Item(const String &key, const StringList &values) :
   d(new ItemPrivate())
 {

@@ -214,17 +214,12 @@ namespace TagLib {
 
       /*!
        * Renders the comment to a ByteVector suitable for inserting into a file.
-       */
-      ByteVector render() const; // BIC: remove and merge with below
-
-      /*!
-       * Renders the comment to a ByteVector suitable for inserting into a file.
        *
        * If \a addFramingBit is true the standard Vorbis comment framing bit will
        * be appended.  However some formats (notably FLAC) do not work with this
        * in place.
        */
-      ByteVector render(bool addFramingBit) const;
+      ByteVector render(bool addFramingBit = true) const;
 
 
       /*!

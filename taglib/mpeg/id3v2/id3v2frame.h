@@ -85,21 +85,8 @@ namespace TagLib {
 
       /*!
        * Returns the size of the frame header
-       *
-       * \deprecated This is only accurate for ID3v2.3 or ID3v2.4.  Please use
-       * the call below which accepts an ID3v2 version number.  In the next
-       * non-binary compatible release this will be made into a non-static
-       * member that checks the internal ID3v2 version.
        */
-      static unsigned int headerSize(); // BIC: make non-static
-
-      /*!
-       * Returns the size of the frame header for the given ID3v2 version.
-       *
-       * \deprecated Please see the explanation above.
-       */
-      // BIC: remove
-      static unsigned int headerSize(unsigned int version);
+      unsigned int headerSize();
 
       /*!
        * Sets the data that will be used as the frame.  Since the length is not
@@ -231,24 +218,6 @@ namespace TagLib {
 
       /*!
        * Checks a the list of string values to see if they can be used with the
-       * specified encoding and returns the recommended encoding.
-       */
-      // BIC: remove and make non-static
-      static String::Type checkEncoding(const StringList &fields,
-                                        String::Type encoding);
-
-      /*!
-       * Checks a the list of string values to see if they can be used with the
-       * specified encoding and returns the recommended encoding. This method
-       * also checks the ID3v2 version and makes sure the encoding can be used
-       * in the specified version.
-       */
-      // BIC: remove and make non-static
-      static String::Type checkEncoding(const StringList &fields,
-                                        String::Type encoding, unsigned int version);
-
-      /*!
-       * Checks a the list of string values to see if they can be used with the
        * specified encoding and returns the recommended encoding. This method
        * also checks the ID3v2 version and makes sure the encoding can be used
        * in the version specified by the frame's header.
@@ -261,9 +230,8 @@ namespace TagLib {
        * Parses the contents of this frame as PropertyMap. If that fails, the returned
        * PropertyMap will be empty, and its unsupportedData() will contain this frame's
        * ID.
-       * BIC: Will be a virtual function in future releases.
        */
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * Returns an appropriate ID3 frame ID for the given free-form tag key. This method
@@ -390,23 +358,8 @@ namespace TagLib {
 
       /*!
        * Returns the size of the frame header in bytes.
-       *
-       * \deprecated Please use the version of this method that accepts a
-       * version.  This is only accurate for ID3v2.3 and ID3v2.4.  This will be
-       * removed in the next binary incompatible release (2.0) and will be
-       * replaced with a non-static method that checks the frame version.
        */
-      // BIC: make non-static
-      static unsigned int size();
-
-      /*!
-       * Returns the size of the frame header in bytes for the ID3v2 version
-       * that's given.
-       *
-       * \deprecated Please see the explanation in the version above.
-       */
-      // BIC: remove
-      static unsigned int size(unsigned int version);
+      unsigned int size();
 
       /*!
        * Returns true if the flag for tag alter preservation is set.

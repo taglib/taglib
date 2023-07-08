@@ -36,6 +36,8 @@ namespace TagLib {
  * documentation.  The typedef below will make this work with the current code.
  * In the next BIC version of TagLib this will be really moved into the Ogg
  * namespace.
+ * Kept for source compatibility, the typedef in vorbisproperties.h was not
+ * correct in TagLib 1.
  */
 
 #ifdef DOXYGEN
@@ -68,21 +70,11 @@ namespace TagLib {
       virtual ~Properties();
 
       /*!
-       * Returns the length of the file in seconds.  The length is rounded down to
-       * the nearest whole second.
-       *
-       * \see lengthInMilliseconds()
-       */
-      // BIC: make virtual
-      int lengthInSeconds() const;
-
-      /*!
        * Returns the length of the file in milliseconds.
        *
        * \see lengthInSeconds()
        */
-      // BIC: make virtual
-      int lengthInMilliseconds() const;
+      virtual int lengthInMilliseconds() const;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
@@ -137,12 +129,14 @@ namespace TagLib {
  * To keep compatibility with the current version put Vorbis in the Ogg namespace
  * only in the docs and provide a typedef to make it work.  In the next BIC
  * version this will be removed and it will only exist in the Ogg namespace.
+ * Kept for source compatibility, the typedef in vorbisproperties.h was not
+ * correct in TagLib 1.
  */
 
 #ifdef DOXYGEN
   }
 #else
-  namespace Ogg { namespace Vorbis { typedef TagLib::AudioProperties AudioProperties; } }
+  namespace Ogg { namespace Vorbis { typedef TagLib::Vorbis::Properties Properties; } }
 #endif
 
 }  // namespace TagLib

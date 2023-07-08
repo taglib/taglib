@@ -482,11 +482,6 @@ ByteVector String::data(Type t) const
   }
 }
 
-int String::toInt() const
-{
-  return toInt(0);
-}
-
 int String::toInt(bool *ok) const
 {
   const wchar_t *begin = d->data.c_str();

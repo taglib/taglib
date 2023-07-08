@@ -102,12 +102,6 @@ MP4::Properties::sampleRate() const
 }
 
 int
-MP4::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
-int
 MP4::Properties::lengthInMilliseconds() const
 {
   return d->length;

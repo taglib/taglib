@@ -56,8 +56,8 @@ namespace TagLib {
 
     void set(int index, Tag *tag);
 
-    PropertyMap properties() const;
-    void removeUnsupportedProperties(const StringList &unsupported);
+    virtual PropertyMap properties() const;
+    virtual void removeUnsupportedProperties(const StringList &unsupported);
 
     virtual String title() const;
     virtual String artist() const;

@@ -75,11 +75,6 @@ APE::Properties::~Properties()
   delete d;
 }
 
-int APE::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
 int APE::Properties::lengthInMilliseconds() const
 {
   return d->length;

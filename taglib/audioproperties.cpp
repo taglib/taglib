@@ -41,6 +41,31 @@ AudioProperties::~AudioProperties()
 
 }
 
+int AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int AudioProperties::lengthInSeconds() const
+{
+  return lengthInMilliseconds() / 1000;
+}
+
+int AudioProperties::lengthInMilliseconds() const
+{
+  return 0;
+}
+
+int AudioProperties::bitrate() const
+{
+  return 0;
+}
+
+int AudioProperties::sampleRate() const
+{
+  return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////

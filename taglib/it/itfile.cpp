@@ -73,16 +73,6 @@ Mod::Tag *IT::File::tag() const
   return &d->tag;
 }
 
-PropertyMap IT::File::properties() const
-{
-  return d->tag.properties();
-}
-
-PropertyMap IT::File::setProperties(const PropertyMap &properties)
-{
-  return d->tag.setProperties(properties);
-}
-
 IT::Properties *IT::File::audioProperties() const
 {
   return &d->properties;

@@ -341,20 +341,11 @@ namespace TagLib {
     /*!
      * Convert the string to an integer.
      *
-     * Returns the integer if the conversion was successful or 0 if the
-     * string does not represent a number.
-     */
-    // BIC: merge with the method below
-    int toInt() const;
-
-    /*!
-     * Convert the string to an integer.
-     *
      * If the conversion was successful, it sets the value of \a *ok to
      * true and returns the integer. Otherwise it sets \a *ok to false
      * and the result is undefined.
      */
-    int toInt(bool *ok) const;
+    int toInt(bool *ok = 0) const;
 
     /*!
      * Returns a string with the leading and trailing whitespace stripped.

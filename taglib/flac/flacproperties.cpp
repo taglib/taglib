@@ -55,28 +55,16 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::Properties::Properties(ByteVector data, offset_t streamLength, ReadStyle style) :
+FLAC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
   read(data, streamLength);
 }
 
-FLAC::Properties::Properties(File *, ReadStyle style) :
-  AudioProperties(style),
-  d(new PropertiesPrivate())
-{
-  debug("FLAC::Properties::Properties() - This constructor is no longer used.");
-}
-
 FLAC::Properties::~Properties()
 {
   delete d;
-}
-
-int FLAC::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
 }
 
 int FLAC::Properties::lengthInMilliseconds() const

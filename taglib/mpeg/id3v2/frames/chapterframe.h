@@ -220,7 +220,7 @@ namespace TagLib {
 
       virtual String toString() const;
 
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * CHAP frames each have a unique element ID. This searches for a CHAP

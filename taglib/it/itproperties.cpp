@@ -79,31 +79,6 @@ IT::Properties::~Properties()
   delete d;
 }
 
-int IT::Properties::length() const
-{
-  return 0;
-}
-
-int IT::Properties::lengthInSeconds() const
-{
-  return 0;
-}
-
-int IT::Properties::lengthInMilliseconds() const
-{
-  return 0;
-}
-
-int IT::Properties::bitrate() const
-{
-  return 0;
-}
-
-int IT::Properties::sampleRate() const
-{
-  return 0;
-}
-
 int IT::Properties::channels() const
 {
   return d->channels;

@@ -145,7 +145,7 @@ namespace TagLib {
        * - otherwise, the key will be "COMMENT:<description>"
        * - The single value will be the frame's text().
        */
-      PropertyMap asProperties() const;
+      virtual PropertyMap asProperties() const;
 
       /*!
        * Comments each have a unique description.  This searches for a comment

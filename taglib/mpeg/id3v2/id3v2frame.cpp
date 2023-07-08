@@ -80,16 +80,6 @@ namespace
 // static methods
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned int Frame::headerSize()
-{
-  return Header::size();
-}
-
-unsigned int Frame::headerSize(unsigned int version)
-{
-  return Header::size(version);
-}
-
 ByteVector Frame::textDelimiter(String::Type t)
 {
   if(t == String::UTF16 || t == String::UTF16BE || t == String::UTF16LE)
@@ -105,6 +95,11 @@ const String Frame::urlPrefix("URL:");
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
+
+unsigned int Frame::headerSize()
+{
+  return d->header->size();
+}
 
 Frame *Frame::createTextualFrame(const String &key, const StringList &values) //static
 {
@@ -235,7 +230,7 @@ void Frame::parse(const ByteVector &data)
 
 ByteVector Frame::fieldData(const ByteVector &frameData) const
 {
-  unsigned int headerSize = Header::size(d->header->version());
+  unsigned int headerSize = d->header->size();
 
   unsigned int frameDataOffset = headerSize;
   unsigned int frameDataLength = size();
@@ -287,14 +282,9 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   return str;
 }
 
-String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding) // static
+String::Type Frame::checkTextEncoding(const StringList &fields, String::Type encoding) const
 {
-  return checkEncoding(fields, encoding, 4);
-}
-
-String::Type Frame::checkEncoding(const StringList &fields, String::Type encoding, unsigned int version) // static
-{
-  if((encoding == String::UTF8 || encoding == String::UTF16BE) && version != 4)
+  if((encoding == String::UTF8 || encoding == String::UTF16BE) && header()->version() != 4)
     return String::UTF16;
 
   if(encoding != String::Latin1)
@@ -302,7 +292,7 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
 
   for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
     if(!(*it).isLatin1()) {
-      if(version == 4) {
+      if(header()->version() == 4) {
         debug("Frame::checkEncoding() -- Rendering using UTF8.");
         return String::UTF8;
       }
@@ -312,11 +302,6 @@ String::Type Frame::checkEncoding(const StringList &fields, String::Type encodin
   }
 
   return String::Latin1;
-}
-
-String::Type Frame::checkTextEncoding(const StringList &fields, String::Type encoding) const
-{
-  return checkEncoding(fields, encoding, header()->version());
 }
 
 namespace
@@ -479,24 +464,6 @@ PropertyMap Frame::asProperties() const
     return m;
   }
   const ByteVector &id = frameID();
-  // workaround until this function is virtual
-  if(id == "TXXX")
-    return dynamic_cast< const UserTextIdentificationFrame* >(this)->asProperties();
-  // Apple proprietary WFED (Podcast URL), MVNM (Movement Name), MVIN (Movement Number), GRP1 (Grouping) are in fact text frames.
-  if(id[0] == 'T' || id == "WFED" || id == "MVNM" || id == "MVIN" || id == "GRP1")
-    return dynamic_cast< const TextIdentificationFrame* >(this)->asProperties();
-  if(id == "WXXX")
-    return dynamic_cast< const UserUrlLinkFrame* >(this)->asProperties();
-  if(id[0] == 'W')
-    return dynamic_cast< const UrlLinkFrame* >(this)->asProperties();
-  if(id == "COMM")
-    return dynamic_cast< const CommentsFrame* >(this)->asProperties();
-  if(id == "USLT")
-    return dynamic_cast< const UnsynchronizedLyricsFrame* >(this)->asProperties();
-  if(id == "UFID")
-    return dynamic_cast< const UniqueFileIdentifierFrame* >(this)->asProperties();
-  if(id == "PCST")
-    return dynamic_cast< const PodcastFrame* >(this)->asProperties();
   PropertyMap m;
   m.unsupportedData().append(id);
   return m;
@@ -555,17 +522,12 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// static members (Frame::Header)
+// public members (Frame::Header)
 ////////////////////////////////////////////////////////////////////////////////
 
 unsigned int Frame::Header::size()
 {
-  return size(4);
-}
-
-unsigned int Frame::Header::size(unsigned int version)
-{
-  switch(version) {
+  switch(d->version) {
   case 0:
   case 1:
   case 2:
@@ -576,10 +538,6 @@ unsigned int Frame::Header::size(unsigned int version)
     return 10;
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// public members (Frame::Header)
-////////////////////////////////////////////////////////////////////////////////
 
 Frame::Header::Header(const ByteVector &data, unsigned int version) :
   d(new HeaderPrivate())

@@ -104,7 +104,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      // BIC: merge with the above constructor
+      // BIC: merge with the above constructor, kept for source compatibility
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
@@ -121,7 +121,6 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      // BIC: merge with the above constructor
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);

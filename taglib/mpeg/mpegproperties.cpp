@@ -84,11 +84,6 @@ MPEG::Properties::~Properties()
   delete d;
 }
 
-int MPEG::Properties::lengthInSeconds() const
-{
-  return d->length / 1000;
-}
-
 int MPEG::Properties::lengthInMilliseconds() const
 {
   return d->length;
