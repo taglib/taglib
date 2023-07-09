@@ -375,7 +375,7 @@ char** taglib_property_keys(TagLib_File *file)
   char **pp = props;
 
   for(const auto &i : map) {
-    *pp++ = strdup(i.first.toCString());
+    *pp++ = stringToCharArray(i.first);
   }
   *pp = NULL;
 
@@ -397,7 +397,7 @@ char **taglib_property_get(TagLib_File *file, const char *prop)
   char **pp = props;
 
   for(const auto &i : property->second) {
-    *pp++ = strdup(i.toCString());
+    *pp++ = stringToCharArray(i);
   }
   *pp = NULL;
 
