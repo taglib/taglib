@@ -23,6 +23,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <tag_c.h>
 
 #ifndef FALSE
@@ -37,8 +38,9 @@ int main(int argc, char *argv[])
   TagLib_File *file;
   TagLib_Tag *tag;
   const TagLib_AudioProperties *properties;
+  char **propertiesMap;
 
-  taglib_set_strings_unicode(FALSE);
+  taglib_set_strings_unicode(1);
 
   for(i = 1; i < argc; i++) {
     printf("******************** \"%s\" ********************\n", argv[i]);
@@ -50,9 +52,10 @@ int main(int argc, char *argv[])
 
     tag = taglib_file_tag(file);
     properties = taglib_file_audioproperties(file);
+    propertiesMap = taglib_property_keys(file);
 
     if(tag != NULL) {
-      printf("-- TAG --\n");
+      printf("-- TAG (basic) --\n");
       printf("title   - \"%s\"\n", taglib_tag_title(tag));
       printf("artist  - \"%s\"\n", taglib_tag_artist(tag));
       printf("album   - \"%s\"\n", taglib_tag_album(tag));
@@ -60,6 +63,31 @@ int main(int argc, char *argv[])
       printf("comment - \"%s\"\n", taglib_tag_comment(tag));
       printf("track   - \"%i\"\n", taglib_tag_track(tag));
       printf("genre   - \"%s\"\n", taglib_tag_genre(tag));
+    }
+
+
+    if(propertiesMap != NULL) {
+      char **keyPtr = propertiesMap;
+      int longest = 0;
+      while(*keyPtr) {
+        int len = (int)strlen(*keyPtr++);
+        if(len > longest) {
+          longest = len;
+        }
+      }
+      keyPtr = propertiesMap;
+
+      printf("-- TAG (properties) --\n");
+      while(*keyPtr) {
+        char **valPtr;
+        char **propertyValues = valPtr = taglib_property_get(file, *keyPtr);
+        while(valPtr && *valPtr)
+        {
+          printf("%-*s - \"%s\"\n", longest, *keyPtr, *valPtr++);
+        }
+        taglib_property_free(propertyValues);
+        ++keyPtr;
+      }
     }
 
     if(properties != NULL) {
@@ -73,6 +101,7 @@ int main(int argc, char *argv[])
       printf("length      - %i:%02i\n", minutes, seconds);
     }
 
+    taglib_property_free(propertiesMap);
     taglib_tag_free_strings();
     taglib_file_free(file);
   }

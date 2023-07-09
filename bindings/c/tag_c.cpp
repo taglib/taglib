@@ -39,6 +39,7 @@
 #include <tag.h>
 #include <string.h>
 #include <id3v2framefactory.h>
+#include <tpropertymap.h>
 
 #include "tag_c.h"
 
@@ -312,4 +313,105 @@ void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding)
   }
 
   ID3v2::FrameFactory::instance()->setDefaultTextEncoding(type);
+}
+
+
+/******************************************************************************
+ * Properties API
+ ******************************************************************************/
+namespace {
+
+void _taglib_property_set(TagLib_File *file, const char* prop, const char* value, bool append)
+{
+  if(file == NULL || prop == NULL)
+    return;
+
+  File *tfile = reinterpret_cast<File *>(file);
+  PropertyMap map = tfile->tag()->properties();
+
+  if(value) {
+    TagLib::PropertyMap::Iterator property = map.find(prop);
+    if(property == map.end()) {
+      map.insert(prop, StringList(value));
+    }
+    else {
+      if(append) {
+        property->second.append(value);
+      }
+      else {
+        property->second = StringList(value);
+      }
+    }
+  }
+  else {
+    map.erase(prop);
+  }
+
+  tfile->setProperties(map);
+}
+
+}  // namespace
+
+void taglib_property_set(TagLib_File *f, const char *prop, const char *value)
+{
+  _taglib_property_set(f, prop, value, false);
+}
+
+void taglib_property_set_append(TagLib_File *f, const char *prop, const char *value)
+{
+  _taglib_property_set(f, prop, value, true);
+}
+
+char** taglib_property_keys(TagLib_File *file)
+{
+  if(file == NULL)
+    return NULL;
+
+  const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
+  if(map.isEmpty())
+    return NULL;
+
+  char **props = static_cast<char **>(malloc(sizeof(char *) * (map.size() + 1)));
+  char **pp = props;
+
+  for(const auto &i : map) {
+    *pp++ = stringToCharArray(i.first);
+  }
+  *pp = NULL;
+
+  return props;
+}
+
+char **taglib_property_get(TagLib_File *file, const char *prop)
+{
+  if(file == NULL || prop == NULL)
+    return NULL;
+
+  const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
+
+  TagLib::PropertyMap::ConstIterator property = map.find(prop);
+  if(property == map.end())
+    return NULL;
+
+  char **props = static_cast<char **>(malloc(sizeof(char *) * (property->second.size() + 1)));
+  char **pp = props;
+
+  for(const auto &i : property->second) {
+    *pp++ = stringToCharArray(i);
+  }
+  *pp = NULL;
+
+  return props;
+}
+
+void taglib_property_free(char **props)
+{
+  if(props == NULL)
+    return;
+
+  char **p = props;
+  while(*p) {
+      free(*p++);
+  }
+  free(props);
 }

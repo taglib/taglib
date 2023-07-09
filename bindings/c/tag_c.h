@@ -292,6 +292,43 @@ typedef enum {
 
 TAGLIB_C_EXPORT void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding);
 
+/******************************************************************************
+ * Properties API
+ ******************************************************************************/
+
+/*!
+ * Sets the property \a prop with \a value.  Use \a value = NULL to remove
+ * the property, otherwise it will be replaced.
+ */
+TAGLIB_C_EXPORT void taglib_property_set(TagLib_File *file, const char *prop, const char *value);
+
+/*!
+ * Appends \a value to the property \a prop (sets it if non-existing).
+ * Use \a value = NULL to remove all values associated with the property.
+ */
+TAGLIB_C_EXPORT void taglib_property_set_append(TagLib_File *file, const char *prop, const char *value);
+
+/*!
+ * Get the keys of the property map.
+ *
+ * \return NULL terminated array of C-strings (char *), only NULL if empty.
+ * It must be freed by the client using taglib_property_free().
+ */
+TAGLIB_C_EXPORT char** taglib_property_keys(TagLib_File *file);
+
+/*!
+ * Get value(s) of property \a prop.
+ *
+ * \return NULL terminated array of C-strings (char *), only NULL if empty.
+   It must be freed by the client using taglib_property_free().
+ */
+TAGLIB_C_EXPORT char** taglib_property_get(TagLib_File *file, const char *prop);
+
+/*!
+ * Frees the NULL terminated array \a props and the C-strings it contains.
+ */
+TAGLIB_C_EXPORT void taglib_property_free(char **props);
+
 #ifdef __cplusplus
 }
 #endif
