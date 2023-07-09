@@ -319,8 +319,8 @@ void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding)
 /******************************************************************************
  * Properties API
  ******************************************************************************/
-namespace
-{
+namespace {
+
 void _taglib_property_set(TagLib_File *file, const char* prop, const char* value, bool append)
 {
   if(file == NULL || prop == NULL)
@@ -349,7 +349,8 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
 
   tfile->setProperties(map);
 }
-}
+
+}  // namespace
 
 void taglib_property_set(TagLib_File *f, const char *prop, const char *value)
 {
@@ -367,22 +368,21 @@ char** taglib_property_keys(TagLib_File *file)
     return NULL;
 
   const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
-  if(map.isEmpty()) 
+  if(map.isEmpty())
     return NULL;
 
-  char **props = (char**)malloc(sizeof(char*)*(sizeof(char*) * (map.size()+1)) );
+  char **props = static_cast<char **>(malloc(sizeof(char *) * (map.size() + 1)));
   char **pp = props;
 
-  for(const auto& i : map) {
-    *pp = strdup(i.first.toCString());
-    ++pp;
+  for(const auto &i : map) {
+    *pp++ = strdup(i.first.toCString());
   }
   *pp = NULL;
 
   return props;
 }
 
-char** taglib_property_get(TagLib_File *file, const char *prop)
+char **taglib_property_get(TagLib_File *file, const char *prop)
 {
   if(file == NULL || prop == NULL)
     return NULL;
@@ -390,15 +390,14 @@ char** taglib_property_get(TagLib_File *file, const char *prop)
   const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
 
   TagLib::PropertyMap::ConstIterator property = map.find(prop);
-  if (property == map.end())
+  if(property == map.end())
     return NULL;
 
-  char **props = (char**)malloc(sizeof(char*) * (property->second.size()+1) );
+  char **props = static_cast<char **>(malloc(sizeof(char *) * (property->second.size() + 1)));
   char **pp = props;
 
-  for(const auto& i : property->second) {
-    *pp = strdup(i.toCString());
-    ++pp;
+  for(const auto &i : property->second) {
+    *pp++ = strdup(i.toCString());
   }
   *pp = NULL;
 
@@ -412,8 +411,7 @@ void taglib_property_free(char **props)
 
   char **p = props;
   while(*p) {
-      free(*p);
-      ++p;
+      free(*p++);
   }
   free(props);
 }

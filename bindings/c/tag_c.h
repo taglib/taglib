@@ -298,36 +298,34 @@ TAGLIB_C_EXPORT void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encodin
 
 /*!
  * Sets the property \a prop with \a value.  Use \a value = NULL to remove
- * property otherwise property/properties will be replaced
+ * the property, otherwise it will be replaced.
  */
 TAGLIB_C_EXPORT void taglib_property_set(TagLib_File *file, const char *prop, const char *value);
 
 /*!
- * Appends (or creates if non-existant) to the property \a prop with \a value.
- * Use \a value = NULL to remove all values assocaited to property
+ * Appends \a value to the property \a prop (sets it if non-existing).
+ * Use \a value = NULL to remove all values associated with the property.
  */
 TAGLIB_C_EXPORT void taglib_property_set_append(TagLib_File *file, const char *prop, const char *value);
 
 /*!
- * Get they keys of the property map
+ * Get the keys of the property map.
  *
- * \returns NULL if no properties defined, otherwise a NULL terminated array of
- * C-strings (char*).  Client MUST free using convience function
- * taglib_property_free()
+ * \return NULL terminated array of C-strings (char *), only NULL if empty.
+ * It must be freed by the client using taglib_property_free().
  */
 TAGLIB_C_EXPORT char** taglib_property_keys(TagLib_File *file);
 
 /*!
- * Get properties for \a prop
+ * Get value(s) of property \a prop.
  *
- * \returns NULL if \a prop not found otherwise a NULL terminated array of
- * C-strings (char*).  Client MUST free using convience function
- * taglib_property_free()
+ * \return NULL terminated array of C-strings (char *), only NULL if empty.
+   It must be freed by the client using taglib_property_free().
  */
 TAGLIB_C_EXPORT char** taglib_property_get(TagLib_File *file, const char *prop);
 
 /*!
- * Frees all C-strings and the NULL terminated array \props
+ * Frees the NULL terminated array \a props and the C-strings it contains.
  */
 TAGLIB_C_EXPORT void taglib_property_free(char **props);
 
