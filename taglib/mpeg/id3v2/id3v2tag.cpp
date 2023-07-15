@@ -789,7 +789,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
   // Make sure that there is at least enough room in the remaining frame data for
   // a frame header.
 
-  while(frameDataPosition < frameDataLength - d->header.size()) {
+  while(frameDataPosition < frameDataLength - TagLib::ID3v2::Header::size()) {
 
     // If the next data is position is 0, assume that we've hit the padding
     // portion of the frame data.
