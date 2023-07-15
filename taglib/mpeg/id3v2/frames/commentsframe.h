@@ -59,14 +59,14 @@ namespace TagLib {
       /*!
        * Destroys this CommentFrame instance.
        */
-      virtual ~CommentsFrame();
+      ~CommentsFrame() override;
 
       /*!
        * Returns the text of this comment.
        *
        * \see text()
        */
-      virtual String toString() const;
+      String toString() const override;
 
       /*!
        * Returns the language encoding as a 3 byte encoding as specified by
@@ -115,7 +115,7 @@ namespace TagLib {
        *
        * \see text()
        */
-      virtual void setText(const String &s);
+      void setText(const String &s) override;
 
       /*!
        * Returns the text encoding that will be used in rendering this frame.
@@ -145,7 +145,7 @@ namespace TagLib {
        * - otherwise, the key will be "COMMENT:<description>"
        * - The single value will be the frame's text().
        */
-      virtual PropertyMap asProperties() const;
+      PropertyMap asProperties() const override;
 
       /*!
        * Comments each have a unique description.  This searches for a comment
@@ -159,8 +159,8 @@ namespace TagLib {
     protected:
       // Reimplementations.
 
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
     private:
       /*!

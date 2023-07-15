@@ -46,35 +46,35 @@ namespace TagLib {
       };
 
       Properties(AudioProperties::ReadStyle propertiesStyle);
-      virtual ~Properties();
+      ~Properties() override;
 
-      int channels()             const;
+      int channels() const override;
 
-      unsigned short lengthInPatterns()  const;
-      bool           stereo()            const;
-      unsigned short sampleCount()       const;
-      unsigned short patternCount()      const;
-      unsigned short flags()             const;
-      unsigned short trackerVersion()    const;
+      unsigned short lengthInPatterns() const;
+      bool stereo() const;
+      unsigned short sampleCount() const;
+      unsigned short patternCount() const;
+      unsigned short flags() const;
+      unsigned short trackerVersion() const;
       unsigned short fileFormatVersion() const;
-      unsigned char  globalVolume()      const;
-      unsigned char  masterVolume()      const;
-      unsigned char  tempo()             const;
-      unsigned char  bpmSpeed()          const;
+      unsigned char globalVolume() const;
+      unsigned char masterVolume() const;
+      unsigned char tempo() const;
+      unsigned char bpmSpeed() const;
 
       void setChannels(int channels);
 
-      void setLengthInPatterns (unsigned short lengthInPatterns);
-      void setStereo           (bool stereo);
-      void setSampleCount      (unsigned short sampleCount);
-      void setPatternCount     (unsigned short patternCount);
-      void setFlags            (unsigned short flags);
-      void setTrackerVersion   (unsigned short trackerVersion);
+      void setLengthInPatterns(unsigned short lengthInPatterns);
+      void setStereo(bool stereo);
+      void setSampleCount(unsigned short sampleCount);
+      void setPatternCount(unsigned short patternCount);
+      void setFlags(unsigned short flags);
+      void setTrackerVersion(unsigned short trackerVersion);
       void setFileFormatVersion(unsigned short fileFormatVersion);
-      void setGlobalVolume     (unsigned char globalVolume);
-      void setMasterVolume     (unsigned char masterVolume);
-      void setTempo            (unsigned char tempo);
-      void setBpmSpeed         (unsigned char bpmSpeed);
+      void setGlobalVolume(unsigned char globalVolume);
+      void setMasterVolume(unsigned char masterVolume);
+      void setTempo(unsigned char tempo);
+      void setBpmSpeed(unsigned char bpmSpeed);
 
     private:
       Properties(const Properties&);

@@ -59,19 +59,19 @@ namespace TagLib {
         /*!
          * Destroys this Speex::Properties instance.
          */
-        virtual ~Properties();
+        ~Properties() override;
 
         /*!
          * Returns the length of the file in milliseconds.
          *
          * \see lengthInSeconds()
          */
-        virtual int lengthInMilliseconds() const;
+        int lengthInMilliseconds() const override;
 
         /*!
          * Returns the average bit rate of the file in kb/s.
          */
-        virtual int bitrate() const;
+        int bitrate() const override;
 
         /*!
          * Returns the nominal bit rate as read from the Speex header in kb/s.
@@ -81,12 +81,12 @@ namespace TagLib {
         /*!
          * Returns the sample rate in Hz.
          */
-        virtual int sampleRate() const;
+        int sampleRate() const override;
 
         /*!
          * Returns the number of audio channels.
          */
-        virtual int channels() const;
+        int channels() const override;
 
         /*!
          * Returns the Speex version, currently "0" (as specified by the spec).

@@ -34,9 +34,9 @@ using namespace TagLib;
 class PlainFile : public File {
 public:
   explicit PlainFile(FileName name) : File(name) { }
-  Tag *tag() const { return NULL; }
-  AudioProperties *audioProperties() const { return NULL; }
-  bool save() { return false; }
+  Tag *tag() const override { return NULL; }
+  AudioProperties *audioProperties() const override { return NULL; }
+  bool save() override { return false; }
   void truncate(long length) { File::truncate(length); }
 
   ByteVector readAll() {

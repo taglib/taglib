@@ -51,9 +51,9 @@ public:
   void setChunkData(const ByteVector &name, const ByteVector &data) {
     RIFF::File::setChunkData(name, data);
   };
-  virtual TagLib::Tag* tag() const { return 0; };
-  virtual TagLib::AudioProperties* audioProperties() const { return 0;};
-  virtual bool save() { return false; };
+  TagLib::Tag* tag() const override { return 0; };
+  TagLib::AudioProperties* audioProperties() const override { return 0;};
+  bool save() override { return false; };
   void removeChunk(unsigned int i) { RIFF::File::removeChunk(i); }
   void removeChunk(const ByteVector &name) { RIFF::File::removeChunk(name); }
 };

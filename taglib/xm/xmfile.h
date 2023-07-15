@@ -67,27 +67,27 @@ namespace TagLib {
         /*!
          * Destroys this instance of the File.
          */
-        virtual ~File();
+        ~File() override;
 
-        Mod::Tag *tag() const;
+        Mod::Tag *tag() const override;
 
         /*!
          * Implements the unified property interface -- export function.
          * Forwards to Mod::Tag::properties().
          */
-        PropertyMap properties() const;
+        PropertyMap properties() const override;
 
         /*!
          * Implements the unified property interface -- import function.
          * Forwards to Mod::Tag::setProperties().
          */
-        PropertyMap setProperties(const PropertyMap &);
+        PropertyMap setProperties(const PropertyMap &) override;
 
         /*!
          * Returns the XM::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */
-        XM::Properties *audioProperties() const;
+        XM::Properties *audioProperties() const override;
 
         /*!
          * Save the file.
@@ -95,7 +95,7 @@ namespace TagLib {
          *
          * \note Saving Extended Module tags is not supported.
          */
-        bool save();
+        bool save() override;
 
       private:
         File(const File &);

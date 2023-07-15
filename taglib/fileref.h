@@ -118,7 +118,7 @@ namespace TagLib {
       /*!
        * Destroys this StreamTypeResolver instance.
        */
-      virtual ~StreamTypeResolver() = 0;
+      ~StreamTypeResolver() override = 0;
 
       virtual File *createFileFromStream(IOStream *stream,
                                bool readAudioProperties = true,

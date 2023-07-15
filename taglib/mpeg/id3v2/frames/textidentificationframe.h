@@ -142,7 +142,7 @@ namespace TagLib {
       /*!
        * Destroys this TextIdentificationFrame instance.
        */
-      virtual ~TextIdentificationFrame();
+      ~TextIdentificationFrame() override;
 
       /*!
        * Text identification frames are a list of string fields.
@@ -158,8 +158,8 @@ namespace TagLib {
 
       // Reimplementations.
 
-      virtual void setText(const String &s);
-      virtual String toString() const;
+      void setText(const String &s) override;
+      String toString() const override;
 
       /*!
        * Returns the text encoding that will be used in rendering this frame.
@@ -195,13 +195,13 @@ namespace TagLib {
        */
       static const KeyConversionMap &involvedPeopleMap();
 
-      virtual PropertyMap asProperties() const;
+      PropertyMap asProperties() const override;
 
     protected:
       // Reimplementations.
 
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
       /*!
        * The constructor used by the FrameFactory.
@@ -258,7 +258,7 @@ namespace TagLib {
        */
       UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding = String::UTF8);
 
-      virtual String toString() const;
+      String toString() const override;
 
       /*!
        * Returns the description for this frame.
@@ -273,7 +273,7 @@ namespace TagLib {
       void setDescription(const String &s);
 
       StringList fieldList() const;
-      void setText(const String &text);
+      void setText(const String &text) override;
       void setText(const StringList &fields);
 
       /*!
@@ -289,7 +289,7 @@ namespace TagLib {
        *   in the value list, in order to be compatible with TagLib which copies
        *   the description() into the fieldList().
        */
-      virtual PropertyMap asProperties() const;
+      PropertyMap asProperties() const override;
 
       /*!
        * Searches for the user defined text frame with the description \a description

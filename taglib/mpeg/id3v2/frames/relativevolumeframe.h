@@ -114,14 +114,14 @@ namespace TagLib {
       /*!
        * Destroys the RelativeVolumeFrame instance.
        */
-      virtual ~RelativeVolumeFrame();
+      ~RelativeVolumeFrame() override;
 
       /*!
        * Returns the frame's identification.
        *
        * \see identification()
        */
-      virtual String toString() const;
+      String toString() const override;
 
       /*!
        * Returns a list of channels with information currently in the frame.
@@ -214,8 +214,8 @@ namespace TagLib {
       void setIdentification(const String &s);
 
     protected:
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
     private:
       RelativeVolumeFrame(const ByteVector &data, Header *h);

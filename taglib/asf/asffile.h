@@ -71,7 +71,7 @@ namespace TagLib {
       /*!
        * Destroys this instance of the File.
        */
-      virtual ~File();
+      ~File() override;
 
       /*!
        * Returns a pointer to the ASF tag of the file.
@@ -83,35 +83,35 @@ namespace TagLib {
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        */
-      virtual Tag *tag() const;
+      Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
        */
-      PropertyMap properties() const;
+      PropertyMap properties() const override;
 
       /*!
        * Removes unsupported properties. Forwards to the actual Tag's
        * removeUnsupportedProperties() function.
        */
-      void removeUnsupportedProperties(const StringList &properties);
+      void removeUnsupportedProperties(const StringList &properties) override;
 
       /*!
        * Implements the unified property interface -- import function.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      PropertyMap setProperties(const PropertyMap &) override;
 
       /*!
        * Returns the ASF audio properties for this file.
        */
-      virtual Properties *audioProperties() const;
+      Properties *audioProperties() const override;
 
       /*!
        * Save the file.
        *
        * This returns true if the save was successful.
        */
-      virtual bool save();
+      bool save() override;
 
       /*!
        * Returns whether or not the given \a stream can be opened as an ASF

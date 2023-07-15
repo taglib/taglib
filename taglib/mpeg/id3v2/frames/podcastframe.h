@@ -50,20 +50,20 @@ namespace TagLib {
       /*!
        * Destroys this PodcastFrame instance.
        */
-      virtual ~PodcastFrame();
+      ~PodcastFrame() override;
 
       /*!
        * Returns a null string.
        */
-      virtual String toString() const;
+      String toString() const override;
 
-      virtual PropertyMap asProperties() const;
+      PropertyMap asProperties() const override;
 
     protected:
       // Reimplementations.
 
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
     private:
       /*!

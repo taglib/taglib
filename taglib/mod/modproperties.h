@@ -35,13 +35,13 @@ namespace TagLib {
     {
     public:
       Properties(AudioProperties::ReadStyle propertiesStyle);
-      virtual ~Properties();
+      ~Properties() override;
 
-      int bitrate()              const;
-      int sampleRate()           const;
-      int channels()             const;
+      int bitrate() const override;
+      int sampleRate() const override;
+      int channels() const override;
 
-      unsigned int  instrumentCount()  const;
+      unsigned int instrumentCount() const;
       unsigned char lengthInPatterns() const;
 
       void setChannels(int channels);

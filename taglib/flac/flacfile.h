@@ -128,7 +128,7 @@ namespace TagLib {
       /*!
        * Destroys this instance of the File.
        */
-      virtual ~File();
+      ~File() override;
 
       /*!
        * Returns the Tag for this file.  This will be a union of XiphComment,
@@ -138,7 +138,7 @@ namespace TagLib {
        * \see ID3v1Tag()
        * \see XiphComment()
        */
-      virtual TagLib::Tag *tag() const;
+      TagLib::Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
@@ -146,9 +146,9 @@ namespace TagLib {
        * only the first one (in the order XiphComment, ID3v2, ID3v1) will be
        * converted to the PropertyMap.
        */
-      PropertyMap properties() const;
+      PropertyMap properties() const override;
 
-      void removeUnsupportedProperties(const StringList &);
+      void removeUnsupportedProperties(const StringList &) override;
 
       /*!
        * Implements the unified property interface -- import function.
@@ -157,13 +157,13 @@ namespace TagLib {
        * Ignores any changes to ID3v1 or ID3v2 comments since they are not allowed
        * in the FLAC specification.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      PropertyMap setProperties(const PropertyMap &) override;
 
       /*!
        * Returns the FLAC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      Properties *audioProperties() const override;
 
       /*!
        * Save the file.  This will primarily save the XiphComment, but
@@ -172,7 +172,7 @@ namespace TagLib {
        *
        * This returns true if the save was successful.
        */
-      virtual bool save();
+      bool save() override;
 
       /*!
        * Returns a pointer to the ID3v2 tag of the file.

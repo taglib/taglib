@@ -301,7 +301,7 @@ public:
     file(0),
     stream(0) {}
 
-  ~FileRefPrivate() {
+  ~FileRefPrivate() override {
     delete file;
     delete stream;
   }

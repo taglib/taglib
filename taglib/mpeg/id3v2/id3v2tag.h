@@ -152,27 +152,27 @@ namespace TagLib {
       /*!
        * Destroys this Tag instance.
        */
-      virtual ~Tag();
+      ~Tag() override;
 
       // Reimplementations.
 
-      virtual String title() const;
-      virtual String artist() const;
-      virtual String album() const;
-      virtual String comment() const;
-      virtual String genre() const;
-      virtual unsigned int year() const;
-      virtual unsigned int track() const;
+      String title() const override;
+      String artist() const override;
+      String album() const override;
+      String comment() const override;
+      String genre() const override;
+      unsigned int year() const override;
+      unsigned int track() const override;
 
-      virtual void setTitle(const String &s);
-      virtual void setArtist(const String &s);
-      virtual void setAlbum(const String &s);
-      virtual void setComment(const String &s);
-      virtual void setGenre(const String &s);
-      virtual void setYear(unsigned int i);
-      virtual void setTrack(unsigned int i);
+      void setTitle(const String &s) override;
+      void setArtist(const String &s) override;
+      void setAlbum(const String &s) override;
+      void setComment(const String &s) override;
+      void setGenre(const String &s) override;
+      void setYear(unsigned int i) override;
+      void setTrack(unsigned int i) override;
 
-      virtual bool isEmpty() const;
+      bool isEmpty() const override;
 
       /*!
        * Returns a pointer to the tag's header.
@@ -301,7 +301,7 @@ namespace TagLib {
        *  once, the description, separated by a "/".
        *
        */
-      PropertyMap properties() const;
+      PropertyMap properties() const override;
 
       /*!
        * Removes unsupported frames given by \a properties. The elements of
@@ -314,13 +314,13 @@ namespace TagLib {
        *  - "UNKNOWN/" + frameID, for frames that could not be parsed by TagLib.
        *    In that case, *all* unknown frames with the given ID will be removed.
        */
-      void removeUnsupportedProperties(const StringList &properties);
+      void removeUnsupportedProperties(const StringList &properties) override;
 
       /*!
        * Implements the unified property interface -- import function.
        * See the comments in properties().
        */
-      PropertyMap setProperties(const PropertyMap &);
+      PropertyMap setProperties(const PropertyMap &) override;
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.

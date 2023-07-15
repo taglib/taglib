@@ -117,7 +117,7 @@ namespace TagLib {
       /*!
        * Destroys this instance of the File.
        */
-      virtual ~File();
+      ~File() override;
 
       /*!
        * Returns a pointer to a tag that is the union of the ID3v2 and ID3v1
@@ -136,7 +136,7 @@ namespace TagLib {
        * \see ID3v2Tag()
        * \see APETag()
        */
-      virtual Tag *tag() const;
+      Tag *tag() const override;
 
       /*!
        * Implements the reading part of the unified property interface.
@@ -144,9 +144,9 @@ namespace TagLib {
        * first one (in the order ID3v2, APE, ID3v1) will be converted to the
        * PropertyMap.
        */
-      PropertyMap properties() const;
+      PropertyMap properties() const override;
 
-      void removeUnsupportedProperties(const StringList &properties);
+      void removeUnsupportedProperties(const StringList &properties) override;
 
       /*!
        * Implements the writing part of the unified tag dictionary interface.
@@ -156,13 +156,13 @@ namespace TagLib {
        * limitations of that format.
        * The returned PropertyMap refers to the ID3v2 tag only.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      PropertyMap setProperties(const PropertyMap &) override;
 
       /*!
        * Returns the MPEG::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      Properties *audioProperties() const override;
 
       /*!
        * Save the file.  If at least one tag -- ID3v1 or ID3v2 -- exists this
@@ -179,7 +179,7 @@ namespace TagLib {
        *
        * \see save(int tags)
        */
-      virtual bool save();
+      bool save() override;
 
       /*!
        * Save the file.  This will attempt to save all of the tag types that are

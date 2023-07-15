@@ -47,34 +47,34 @@ namespace TagLib {
 
       Tag();
 
-      virtual ~Tag();
+      ~Tag() override;
 
       /*!
        * Returns the track name.
        */
-      virtual String title() const;
+      String title() const override;
 
       /*!
        * Returns the artist name.
        */
-      virtual String artist() const;
+      String artist() const override;
 
       /*!
        * Returns the album name; if no album name is present in the tag
        * String::null will be returned.
        */
-      virtual String album() const;
+      String album() const override;
 
       /*!
        * Returns the track comment.
        */
-      virtual String comment() const;
+      String comment() const override;
 
       /*!
        * Returns the genre name; if no genre is present in the tag String::null
        * will be returned.
        */
-      virtual String genre() const;
+      String genre() const override;
 
       /*!
        * Returns the rating.
@@ -90,34 +90,34 @@ namespace TagLib {
       /*!
        * Returns the year; if there is no year set, this will return 0.
        */
-      virtual unsigned int year() const;
+      unsigned int year() const override;
 
       /*!
        * Returns the track number; if there is no track number set, this will
        * return 0.
        */
-      virtual unsigned int track() const;
+      unsigned int track() const override;
 
       /*!
        * Sets the title to \a s.
        */
-      virtual void setTitle(const String &s);
+      void setTitle(const String &s) override;
 
       /*!
        * Sets the artist to \a s.
        */
-      virtual void setArtist(const String &s);
+      void setArtist(const String &s) override;
 
       /*!
        * Sets the album to \a s.  If \a s is String::null then this value will be
        * cleared.
        */
-      virtual void setAlbum(const String &s);
+      void setAlbum(const String &s) override;
 
       /*!
        * Sets the comment to \a s.
        */
-      virtual void setComment(const String &s);
+      void setComment(const String &s) override;
 
       /*!
        * Sets the rating to \a s.
@@ -132,24 +132,24 @@ namespace TagLib {
       /*!
        * Sets the genre to \a s.
        */
-      virtual void setGenre(const String &s);
+      void setGenre(const String &s) override;
 
       /*!
        * Sets the year to \a i.  If \a s is 0 then this value will be cleared.
        */
-      virtual void setYear(unsigned int i);
+      void setYear(unsigned int i) override;
 
       /*!
        * Sets the track to \a i.  If \a s is 0 then this value will be cleared.
        */
-      virtual void setTrack(unsigned int i);
+      void setTrack(unsigned int i) override;
 
       /*!
        * Returns true if the tag does not contain any data.  This should be
        * reimplemented in subclasses that provide more than the basic tagging
        * abilities in this class.
        */
-      virtual bool isEmpty() const;
+      bool isEmpty() const override;
 
       /*!
        * \warning You should not modify this data structure directly, instead
@@ -197,9 +197,9 @@ namespace TagLib {
        */
       void addAttribute(const String &name, const Attribute &attribute);
 
-      PropertyMap properties() const;
-      void removeUnsupportedProperties(const StringList& properties);
-      PropertyMap setProperties(const PropertyMap &properties);
+      PropertyMap properties() const override;
+      void removeUnsupportedProperties(const StringList& properties) override;
+      PropertyMap setProperties(const PropertyMap &properties) override;
 
     private:
 

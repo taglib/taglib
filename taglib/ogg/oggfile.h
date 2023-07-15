@@ -50,7 +50,7 @@ namespace TagLib {
     class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
-      virtual ~File();
+      ~File() override;
 
       /*!
        * Returns the packet contents for the i-th packet (starting from zero)
@@ -78,7 +78,7 @@ namespace TagLib {
        */
       const PageHeader *lastPageHeader();
 
-      virtual bool save();
+      bool save() override;
 
     protected:
       /*!

@@ -49,32 +49,32 @@ namespace TagLib {
      */
     TagUnion(Tag *first = 0, Tag *second = 0, Tag *third = 0);
 
-    virtual ~TagUnion();
+    ~TagUnion() override;
 
     Tag *operator[](int index) const;
     Tag *tag(int index) const;
 
     void set(int index, Tag *tag);
 
-    virtual PropertyMap properties() const;
-    virtual void removeUnsupportedProperties(const StringList &unsupported);
+    PropertyMap properties() const override;
+    void removeUnsupportedProperties(const StringList &unsupported) override;
 
-    virtual String title() const;
-    virtual String artist() const;
-    virtual String album() const;
-    virtual String comment() const;
-    virtual String genre() const;
-    virtual unsigned int year() const;
-    virtual unsigned int track() const;
+    String title() const override;
+    String artist() const override;
+    String album() const override;
+    String comment() const override;
+    String genre() const override;
+    unsigned int year() const override;
+    unsigned int track() const override;
 
-    virtual void setTitle(const String &s);
-    virtual void setArtist(const String &s);
-    virtual void setAlbum(const String &s);
-    virtual void setComment(const String &s);
-    virtual void setGenre(const String &s);
-    virtual void setYear(unsigned int i);
-    virtual void setTrack(unsigned int i);
-    virtual bool isEmpty() const;
+    void setTitle(const String &s) override;
+    void setArtist(const String &s) override;
+    void setAlbum(const String &s) override;
+    void setComment(const String &s) override;
+    void setGenre(const String &s) override;
+    void setYear(unsigned int i) override;
+    void setTrack(unsigned int i) override;
+    bool isEmpty() const override;
 
     template <class T> T *access(int index, bool create)
     {

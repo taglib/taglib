@@ -41,19 +41,19 @@ namespace TagLib {
       };
 
       Properties(AudioProperties::ReadStyle propertiesStyle);
-      virtual ~Properties();
+      ~Properties() override;
 
-      int channels()             const;
+      int channels() const override;
 
       unsigned short lengthInPatterns() const;
-      unsigned short version()          const;
-      unsigned short restartPosition()  const;
-      unsigned short patternCount()     const;
-      unsigned short instrumentCount()  const;
-      unsigned int   sampleCount()      const;
-      unsigned short flags()            const;
-      unsigned short tempo()            const;
-      unsigned short bpmSpeed()         const;
+      unsigned short version() const;
+      unsigned short restartPosition() const;
+      unsigned short patternCount() const;
+      unsigned short instrumentCount() const;
+      unsigned int sampleCount() const;
+      unsigned short flags() const;
+      unsigned short tempo() const;
+      unsigned short bpmSpeed() const;
 
       void setChannels(int channels);
 

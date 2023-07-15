@@ -55,7 +55,7 @@ namespace
   class DummyResolver : public FileRef::FileTypeResolver
   {
   public:
-    virtual File *createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+    File *createFile(FileName fileName, bool, AudioProperties::ReadStyle) const override
     {
       return new Ogg::Vorbis::File(fileName);
     }
@@ -64,12 +64,12 @@ namespace
   class DummyStreamResolver : public FileRef::StreamTypeResolver
   {
   public:
-    virtual File *createFile(FileName, bool, AudioProperties::ReadStyle) const
+    File *createFile(FileName, bool, AudioProperties::ReadStyle) const override
     {
       return 0;
     }
 
-    virtual File *createFileFromStream(IOStream *s, bool, AudioProperties::ReadStyle) const
+    File *createFileFromStream(IOStream *s, bool, AudioProperties::ReadStyle) const override
     {
       return new MP4::File(s);
     }

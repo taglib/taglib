@@ -58,14 +58,14 @@ namespace TagLib {
       /*!
        * Destroys this PopularimeterFrame instance.
        */
-      virtual ~PopularimeterFrame();
+      ~PopularimeterFrame() override;
 
       /*!
        * Returns the text of this popularimeter.
        *
        * \see text()
        */
-      virtual String toString() const;
+      String toString() const override;
 
       /*!
        * Returns the email.
@@ -112,8 +112,8 @@ namespace TagLib {
     protected:
       // Reimplementations.
 
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
     private:
       /*!
