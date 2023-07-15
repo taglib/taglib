@@ -309,6 +309,11 @@ String::ConstIterator String::begin() const
   return d->data.begin();
 }
 
+String::ConstIterator String::cbegin() const
+{
+  return d->data.cbegin();
+}
+
 String::Iterator String::end()
 {
   detach();
@@ -318,6 +323,11 @@ String::Iterator String::end()
 String::ConstIterator String::end() const
 {
   return d->data.end();
+}
+
+String::ConstIterator String::cend() const
+{
+  return d->data.cend();
 }
 
 int String::find(const String &s, int offset) const

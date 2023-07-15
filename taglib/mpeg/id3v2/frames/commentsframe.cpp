@@ -125,7 +125,7 @@ PropertyMap CommentsFrame::asProperties() const
 
 CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
-  ID3v2::FrameList comments = tag->frameList("COMM");
+  const ID3v2::FrameList comments = tag->frameList("COMM");
 
   for(ID3v2::FrameList::ConstIterator it = comments.begin();
       it != comments.end();

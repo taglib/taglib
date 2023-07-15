@@ -333,8 +333,8 @@ public:
   unsigned int read(TagLib::File &file, unsigned int limit) override
   {
     unsigned int sumcount = 0;
-    for(List<Reader*>::ConstIterator i = m_readers.begin();
-        limit > 0 && i != m_readers.end(); ++ i) {
+    for(List<Reader*>::ConstIterator i = m_readers.cbegin();
+        limit > 0 && i != m_readers.cend(); ++ i) {
       unsigned int count = (*i)->read(file, limit);
       limit    -= count;
       sumcount += count;

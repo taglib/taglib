@@ -241,6 +241,11 @@ namespace TagLib {
     ConstIterator begin() const;
 
     /*!
+     * Returns a ConstIterator that points to the front of the vector.
+     */
+    ConstIterator cbegin() const;
+
+    /*!
      * Returns an Iterator that points to the back of the vector.
      */
     Iterator end();
@@ -249,6 +254,11 @@ namespace TagLib {
      * Returns a ConstIterator that points to the back of the vector.
      */
     ConstIterator end() const;
+
+    /*!
+     * Returns a ConstIterator that points to the back of the vector.
+     */
+    ConstIterator cend() const;
 
     /*!
      * Returns a ReverseIterator that points to the front of the vector.

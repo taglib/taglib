@@ -616,6 +616,11 @@ ByteVector::ConstIterator ByteVector::begin() const
   return d->data->begin() + d->offset;
 }
 
+ByteVector::ConstIterator ByteVector::cbegin() const
+{
+  return d->data->cbegin() + d->offset;
+}
+
 ByteVector::Iterator ByteVector::end()
 {
   detach();
@@ -625,6 +630,11 @@ ByteVector::Iterator ByteVector::end()
 ByteVector::ConstIterator ByteVector::end() const
 {
   return d->data->begin() + d->offset + d->length;
+}
+
+ByteVector::ConstIterator ByteVector::cend() const
+{
+  return d->data->cbegin() + d->offset + d->length;
 }
 
 ByteVector::ReverseIterator ByteVector::rbegin()

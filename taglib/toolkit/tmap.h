@@ -91,6 +91,12 @@ namespace TagLib {
     ConstIterator begin() const;
 
     /*!
+     * Returns an STL style iterator to the beginning of the map.  See
+     * std::map::const_iterator for the semantics.
+     */
+    ConstIterator cbegin() const;
+
+    /*!
      * Returns an STL style iterator to the end of the map.  See
      * std::map::iterator for the semantics.
      */
@@ -101,6 +107,12 @@ namespace TagLib {
      * std::map::const_iterator for the semantics.
      */
     ConstIterator end() const;
+
+    /*!
+     * Returns an STL style iterator to the end of the map.  See
+     * std::map::const_iterator for the semantics.
+     */
+    ConstIterator cend() const;
 
     /*!
      * Inserts \a value under \a key in the map.  If a value for \a key already

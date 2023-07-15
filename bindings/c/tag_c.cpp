@@ -259,7 +259,7 @@ void taglib_tag_free_strings()
   if(!stringManagementEnabled)
     return;
 
-  for(List<char *>::ConstIterator it = strings.begin(); it != strings.end(); ++it)
+  for(List<char *>::ConstIterator it = strings.cbegin(); it != strings.cend(); ++it)
     free(*it);
   strings.clear();
 }

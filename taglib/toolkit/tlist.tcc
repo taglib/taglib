@@ -120,6 +120,12 @@ typename List<T>::ConstIterator List<T>::begin() const
 }
 
 template <class T>
+typename List<T>::ConstIterator List<T>::cbegin() const
+{
+  return d->list.cbegin();
+}
+
+template <class T>
 typename List<T>::Iterator List<T>::end()
 {
   detach();
@@ -130,6 +136,12 @@ template <class T>
 typename List<T>::ConstIterator List<T>::end() const
 {
   return d->list.end();
+}
+
+template <class T>
+typename List<T>::ConstIterator List<T>::cend() const
+{
+  return d->list.cend();
 }
 
 template <class T>
@@ -215,6 +227,12 @@ template <class T>
 typename List<T>::ConstIterator List<T>::find(const T &value) const
 {
   return std::find(d->list.begin(), d->list.end(), value);
+}
+
+template <class T>
+typename List<T>::ConstIterator List<T>::cfind(const T &value) const
+{
+  return std::find(d->list.cbegin(), d->list.cend(), value);
 }
 
 template <class T>

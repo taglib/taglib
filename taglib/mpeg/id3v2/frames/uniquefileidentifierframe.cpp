@@ -103,7 +103,7 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
 
 UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::Tag *tag, const String &o) // static
 {
-  ID3v2::FrameList comments = tag->frameList("UFID");
+  const ID3v2::FrameList comments = tag->frameList("UFID");
 
   for(ID3v2::FrameList::ConstIterator it = comments.begin();
       it != comments.end();

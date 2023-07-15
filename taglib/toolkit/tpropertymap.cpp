@@ -167,7 +167,7 @@ String PropertyMap::toString() const
 void PropertyMap::removeEmpty()
 {
   PropertyMap m;
-  for(ConstIterator it = begin(); it != end(); ++it) {
+  for(ConstIterator it = cbegin(); it != cend(); ++it) {
     if(!it->second.isEmpty())
       m.insert(it->first, it->second);
   }

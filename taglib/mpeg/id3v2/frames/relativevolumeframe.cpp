@@ -78,8 +78,8 @@ List<RelativeVolumeFrame::ChannelType> RelativeVolumeFrame::channels() const
 {
   List<ChannelType> l;
 
-  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.begin();
-  for(; it != d->channels.end(); ++it)
+  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.cbegin();
+  for(; it != d->channels.cend(); ++it)
     l.append((*it).first);
 
   return l;
@@ -162,9 +162,9 @@ ByteVector RelativeVolumeFrame::renderFields() const
   data.append(d->identification.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
 
-  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.begin();
+  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.cbegin();
 
-  for(; it != d->channels.end(); ++it) {
+  for(; it != d->channels.cend(); ++it) {
     ChannelType type = (*it).first;
     const ChannelData &channel = (*it).second;
 

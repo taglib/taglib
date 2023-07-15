@@ -95,7 +95,7 @@ ByteVector Ogg::File::packet(unsigned int i)
 
   // Look for the first page in which the requested packet starts.
 
-  List<Page *>::ConstIterator it = d->pages.begin();
+  List<Page *>::ConstIterator it = d->pages.cbegin();
   while((*it)->containsPacket(i) == Page::DoesNotContainPacket)
     ++it;
 
@@ -160,7 +160,7 @@ bool Ogg::File::save()
   }
 
   Map<unsigned int, ByteVector>::ConstIterator it;
-  for(it = d->dirtyPackets.begin(); it != d->dirtyPackets.end(); ++it)
+  for(it = d->dirtyPackets.cbegin(); it != d->dirtyPackets.cend(); ++it)
     writePacket(it->first, it->second);
 
   d->dirtyPackets.clear();
@@ -236,7 +236,7 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
 
   // Look for the pages where the requested packet should belong to.
 
-  List<Page *>::ConstIterator it = d->pages.begin();
+  List<Page *>::ConstIterator it = d->pages.cbegin();
   while((*it)->containsPacket(i) == Page::DoesNotContainPacket)
     ++it;
 

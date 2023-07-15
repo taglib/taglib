@@ -39,7 +39,7 @@ namespace
 
   typedef List<FLAC::Picture *> PictureList;
   typedef PictureList::Iterator PictureIterator;
-  typedef PictureList::Iterator PictureConstIterator;
+  typedef PictureList::ConstIterator PictureConstIterator;
 } // namespace
 
 class Ogg::XiphComment::XiphCommentPrivate
@@ -191,7 +191,7 @@ void Ogg::XiphComment::setTrack(unsigned int i)
 
 bool Ogg::XiphComment::isEmpty() const
 {
-  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it) {
+  for(FieldConstIterator it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
     if(!(*it).second.isEmpty())
       return false;
   }
@@ -203,7 +203,7 @@ unsigned int Ogg::XiphComment::fieldCount() const
 {
   unsigned int count = 0;
 
-  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
     count += (*it).second.size();
 
   count += d->pictureList.size();
@@ -225,11 +225,11 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
 {
   // check which keys are to be deleted
   StringList toRemove;
-  for(FieldConstIterator it = d->fieldListMap.begin(); it != d->fieldListMap.end(); ++it)
+  for(FieldConstIterator it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
     if (!properties.contains(it->first))
       toRemove.append(it->first);
 
-  for(StringList::ConstIterator it = toRemove.begin(); it != toRemove.end(); ++it)
+  for(StringList::ConstIterator it = toRemove.cbegin(); it != toRemove.cend(); ++it)
       removeFields(*it);
 
   // now go through keys in \a properties and check that the values match those in the xiph comment
@@ -366,13 +366,13 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   // std::pair<String, StringList> where the first String is the field name and
   // the StringList is the values associated with that field.
 
-  FieldListMap::ConstIterator it = d->fieldListMap.begin();
-  for(; it != d->fieldListMap.end(); ++it) {
+  FieldListMap::ConstIterator it = d->fieldListMap.cbegin();
+  for(; it != d->fieldListMap.cend(); ++it) {
 
     // And now iterate over the values of the current list.
 
     String fieldName = (*it).first;
-    StringList values = (*it).second;
+    const StringList values = (*it).second;
 
     StringList::ConstIterator valuesIt = values.begin();
     for(; valuesIt != values.end(); ++valuesIt) {
@@ -385,7 +385,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     }
   }
 
-  for(PictureConstIterator it = d->pictureList.begin(); it != d->pictureList.end(); ++it) {
+  for(PictureConstIterator it = d->pictureList.cbegin(); it != d->pictureList.cend(); ++it) {
     ByteVector picture = (*it)->render().toBase64();
     data.append(ByteVector::fromUInt(picture.size() + 23, false));
     data.append("METADATA_BLOCK_PICTURE=");

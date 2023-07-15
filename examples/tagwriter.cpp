@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
       TagLib::String value = argv[i + 1];
 
       TagLib::List<TagLib::FileRef>::ConstIterator it;
-      for(it = fileList.begin(); it != fileList.end(); ++it) {
+      for(it = fileList.cbegin(); it != fileList.cend(); ++it) {
 
         TagLib::Tag *t = (*it).tag();
 
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
   }
 
   TagLib::List<TagLib::FileRef>::ConstIterator it;
-  for(it = fileList.begin(); it != fileList.end(); ++it)
+  for(it = fileList.cbegin(); it != fileList.cend(); ++it)
     (*it).file()->save();
 
   return 0;

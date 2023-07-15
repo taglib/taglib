@@ -253,6 +253,11 @@ namespace TagLib {
     ConstIterator begin() const;
 
     /*!
+     * Returns a const iterator pointing to the beginning of the string.
+     */
+    ConstIterator cbegin() const;
+
+    /*!
      * Returns an iterator pointing to the end of the string (the position
      * after the last character).
      */
@@ -263,6 +268,12 @@ namespace TagLib {
      * after the last character).
      */
     ConstIterator end() const;
+
+    /*!
+     * Returns a const iterator pointing to the end of the string (the position
+     * after the last character).
+     */
+    ConstIterator cend() const;
 
     /*!
      * Finds the first occurrence of pattern \a s in this string starting from

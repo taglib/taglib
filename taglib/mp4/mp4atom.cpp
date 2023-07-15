@@ -139,7 +139,7 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
   if(name1 == nullptr) {
     return this;
   }
-  for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
+  for(AtomList::ConstIterator it = children.cbegin(); it != children.cend(); ++it) {
     if((*it)->name == name1) {
       return (*it)->find(name2, name3, name4);
     }
@@ -151,7 +151,7 @@ MP4::AtomList
 MP4::Atom::findall(const char *name, bool recursive)
 {
   MP4::AtomList result;
-  for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
+  for(AtomList::ConstIterator it = children.cbegin(); it != children.cend(); ++it) {
     if((*it)->name == name) {
       result.append(*it);
     }
@@ -169,7 +169,7 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
   if(name1 == nullptr) {
     return true;
   }
-  for(AtomList::ConstIterator it = children.begin(); it != children.end(); ++it) {
+  for(AtomList::ConstIterator it = children.cbegin(); it != children.cend(); ++it) {
     if((*it)->name == name1) {
       return (*it)->path(path, name2, name3);
     }
@@ -199,7 +199,7 @@ MP4::Atoms::~Atoms()
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)
 {
-  for(AtomList::ConstIterator it = atoms.begin(); it != atoms.end(); ++it) {
+  for(AtomList::ConstIterator it = atoms.cbegin(); it != atoms.cend(); ++it) {
     if((*it)->name == name1) {
       return (*it)->find(name2, name3, name4);
     }
@@ -211,7 +211,7 @@ MP4::AtomList
 MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const char *name4)
 {
   MP4::AtomList path;
-  for(AtomList::ConstIterator it = atoms.begin(); it != atoms.end(); ++it) {
+  for(AtomList::ConstIterator it = atoms.cbegin(); it != atoms.cend(); ++it) {
     if((*it)->name == name1) {
       if(!(*it)->path(path, name2, name3, name4)) {
         path.clear();

@@ -89,6 +89,12 @@ namespace TagLib {
     ConstIterator begin() const;
 
     /*!
+     * Returns an STL style constant iterator to the beginning of the list.  See
+     * std::list::iterator for the semantics.
+     */
+    ConstIterator cbegin() const;
+
+    /*!
      * Returns an STL style iterator to the end of the list.  See
      * std::list::iterator for the semantics.
      */
@@ -99,6 +105,12 @@ namespace TagLib {
      * std::list::const_iterator for the semantics.
      */
     ConstIterator end() const;
+
+    /*!
+     * Returns an STL style constant iterator to the end of the list.  See
+     * std::list::const_iterator for the semantics.
+     */
+    ConstIterator cend() const;
 
     /*!
      * Inserts a copy of \a value before \a it.
@@ -167,6 +179,11 @@ namespace TagLib {
      * Find the first occurrence of \a value.
      */
     ConstIterator find(const T &value) const;
+
+    /*!
+     * Find the first occurrence of \a value.
+     */
+    ConstIterator cfind(const T &value) const;
 
     /*!
      * Returns true if the list contains \a value.
