@@ -34,7 +34,7 @@ class Footer::FooterPrivate
 };
 
 Footer::Footer() :
-  d(0)
+  d(nullptr)
 {
 }
 

@@ -73,7 +73,7 @@ public:
     ScopedFileCopy copy("test", ".s3m");
     {
       S3M::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != 0);
+      CPPUNIT_ASSERT(file.tag() != nullptr);
       file.tag()->setTitle(titleAfter);
       file.tag()->setComment(newComment);
       file.tag()->setTrackerName("won't be saved");
@@ -95,8 +95,8 @@ private:
     S3M::Properties *p = file.audioProperties();
     Mod::Tag *t = file.tag();
 
-    CPPUNIT_ASSERT(0 != p);
-    CPPUNIT_ASSERT(0 != t);
+    CPPUNIT_ASSERT(nullptr != p);
+    CPPUNIT_ASSERT(nullptr != t);
 
     CPPUNIT_ASSERT_EQUAL( 0, p->length());
     CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());

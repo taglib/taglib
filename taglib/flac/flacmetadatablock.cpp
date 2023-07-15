@@ -37,7 +37,7 @@ public:
 };
 
 FLAC::MetadataBlock::MetadataBlock()
-  : d(0)
+  : d(nullptr)
 {
 }
 

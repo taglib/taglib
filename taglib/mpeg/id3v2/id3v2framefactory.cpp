@@ -130,7 +130,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
      header->frameSize() > data.size())
   {
     delete header;
-    return 0;
+    return nullptr;
   }
 
 #ifndef NO_ITUNES_HACKS
@@ -147,7 +147,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
     if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
       delete header;
-      return 0;
+      return nullptr;
     }
   }
 

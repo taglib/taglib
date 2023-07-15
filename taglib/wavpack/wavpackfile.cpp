@@ -54,7 +54,7 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
-    properties(0) {}
+    properties(nullptr) {}
 
   ~FilePrivate()
   {
@@ -221,10 +221,10 @@ APE::Tag *WavPack::File::APETag(bool create)
 void WavPack::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(WavID3v1Index, 0);
+    d->tag.set(WavID3v1Index, nullptr);
 
   if(tags & APE)
-    d->tag.set(WavAPEIndex, 0);
+    d->tag.set(WavAPEIndex, nullptr);
 
   if(!ID3v1Tag())
     APETag(true);

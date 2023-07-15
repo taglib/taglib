@@ -72,7 +72,7 @@ namespace
       return 0;
 #else
     if(::strlen(fileName) == 0)
-      return 0;
+      return nullptr;
 #endif
     ResolverList::ConstIterator it = fileTypeResolvers.begin();
     for(; it != fileTypeResolvers.end(); ++it) {
@@ -81,7 +81,7 @@ namespace
         return file;
     }
 
-    return 0;
+    return nullptr;
   }
 
   File *detectByResolvers(IOStream* stream, bool readAudioProperties,
@@ -97,7 +97,7 @@ namespace
       }
     }
 
-    return 0;
+    return nullptr;
   }
 
   // Detect the file type based on the file extension.
@@ -121,11 +121,11 @@ namespace
     // that a default file type resolver is created.
 
     if(ext.isEmpty())
-      return 0;
+      return nullptr;
 
     // .oga can be any audio in the Ogg container. So leave it to content-based detection.
 
-    File *file = 0;
+    File *file = nullptr;
 
     if(ext == "MP3")
       file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
@@ -171,7 +171,7 @@ namespace
       delete file;
     }
 
-    return 0;
+    return nullptr;
   }
 
   // Detect the file type based on the actual content of the stream.
@@ -179,7 +179,7 @@ namespace
   File *detectByContent(IOStream *stream, bool readAudioProperties,
                         AudioProperties::ReadStyle audioPropertiesStyle)
   {
-    File *file = 0;
+    File *file = nullptr;
 
     if(MPEG::File::isSupported(stream))
       file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
@@ -218,7 +218,7 @@ namespace
       delete file;
     }
 
-    return 0;
+    return nullptr;
   }
 
   // Internal function that supports FileRef::create().
@@ -244,7 +244,7 @@ namespace
       ext = s.substr(pos + 1).upper();
 
     if(ext.isEmpty())
-      return 0;
+      return nullptr;
 
     if(ext == "MP3")
       return new MPEG::File(fileName, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
@@ -290,7 +290,7 @@ namespace
     if(ext == "XM")
       return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
 
-    return 0;
+    return nullptr;
   }
 }  // namespace
 
@@ -298,8 +298,8 @@ class FileRef::FileRefPrivate : public RefCounter
 {
 public:
   FileRefPrivate() :
-    file(0),
-    stream(0) {}
+    file(nullptr),
+    stream(nullptr) {}
 
   ~FileRefPrivate() override {
     delete file;
@@ -354,7 +354,7 @@ Tag *FileRef::tag() const
 {
   if(isNull()) {
     debug("FileRef::tag() - Called without a valid file.");
-    return 0;
+    return nullptr;
   }
   return d->file->tag();
 }
@@ -363,7 +363,7 @@ AudioProperties *FileRef::audioProperties() const
 {
   if(isNull()) {
     debug("FileRef::audioProperties() - Called without a valid file.");
-    return 0;
+    return nullptr;
   }
   return d->file->audioProperties();
 }
@@ -490,7 +490,7 @@ void FileRef::parse(FileName fileName, bool readAudioProperties,
   // Stream have to be closed here if failed to resolve file types.
 
   delete d->stream;
-  d->stream = 0;
+  d->stream = nullptr;
 }
 
 void FileRef::parse(IOStream *stream, bool readAudioProperties,

@@ -214,7 +214,7 @@ namespace TagLib {
        * This is useful for reading strings sequentially.
        */
       String readStringField(const ByteVector &data, String::Type encoding,
-                             int *position = 0);
+                             int *position = nullptr);
 
       /*!
        * Checks a the list of string values to see if they can be used with the

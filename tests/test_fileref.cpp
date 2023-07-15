@@ -66,7 +66,7 @@ namespace
   public:
     File *createFile(FileName, bool, AudioProperties::ReadStyle) const override
     {
-      return 0;
+      return nullptr;
     }
 
     File *createFileFromStream(IOStream *s, bool, AudioProperties::ReadStyle) const override
@@ -391,7 +391,7 @@ public:
   {
     {
       FileRef f(TEST_FILE_PATH_C("xing.mp3"));
-      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()) != NULL);
+      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()) != nullptr);
     }
 
     DummyResolver resolver;
@@ -399,7 +399,7 @@ public:
 
     {
       FileRef f(TEST_FILE_PATH_C("xing.mp3"));
-      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != NULL);
+      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != nullptr);
     }
 
     DummyStreamResolver streamResolver;
@@ -408,7 +408,7 @@ public:
     {
       FileStream s(TEST_FILE_PATH_C("xing.mp3"));
       FileRef f(&s);
-      CPPUNIT_ASSERT(dynamic_cast<MP4::File *>(f.file()) != NULL);
+      CPPUNIT_ASSERT(dynamic_cast<MP4::File *>(f.file()) != nullptr);
     }
   }
 

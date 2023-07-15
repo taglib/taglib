@@ -55,7 +55,7 @@ public:
     ID3v2Location(-1),
     ID3v2OriginalSize(0),
     ID3v1Location(-1),
-    properties(0) {}
+    properties(nullptr) {}
 
   ~FilePrivate()
   {
@@ -237,10 +237,10 @@ ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
 void TrueAudio::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(TrueAudioID3v1Index, 0);
+    d->tag.set(TrueAudioID3v1Index, nullptr);
 
   if(tags & ID3v2)
-    d->tag.set(TrueAudioID3v2Index, 0);
+    d->tag.set(TrueAudioID3v2Index, nullptr);
 
   if(!ID3v1Tag())
     ID3v2Tag(true);

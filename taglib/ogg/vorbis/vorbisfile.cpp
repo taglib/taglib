@@ -38,8 +38,8 @@ class Vorbis::File::FilePrivate
 {
 public:
   FilePrivate() :
-    comment(0),
-    properties(0) {}
+    comment(nullptr),
+    properties(nullptr) {}
 
   ~FilePrivate()
   {

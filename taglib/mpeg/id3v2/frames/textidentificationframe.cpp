@@ -337,7 +337,7 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
 
 UserTextIdentificationFrame::UserTextIdentificationFrame(String::Type encoding) :
   TextIdentificationFrame("TXXX", encoding),
-  d(0)
+  d(nullptr)
 {
   StringList l;
   l.append(String());
@@ -354,7 +354,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data)
 
 UserTextIdentificationFrame::UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding) :
     TextIdentificationFrame("TXXX", encoding),
-    d(0)
+    d(nullptr)
 {
   setDescription(description);
   setText(values);
@@ -433,7 +433,7 @@ UserTextIdentificationFrame *UserTextIdentificationFrame::find(
     if(f && f->description() == description)
       return f;
   }
-  return 0;
+  return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

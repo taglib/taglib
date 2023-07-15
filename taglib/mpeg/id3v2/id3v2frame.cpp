@@ -49,7 +49,7 @@ class Frame::FramePrivate
 {
 public:
   FramePrivate() :
-    header(0)
+    header(nullptr)
     {}
 
   ~FramePrivate()
