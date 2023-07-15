@@ -133,7 +133,7 @@ namespace TagLib {
      */
     PropertyMap(const SimplePropertyMap &m);
 
-    virtual ~PropertyMap();
+    ~PropertyMap() override;
 
     /*!
      * Inserts \a values under \a key in the map.  If \a key already exists,

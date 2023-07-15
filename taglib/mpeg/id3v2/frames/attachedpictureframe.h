@@ -111,12 +111,12 @@ namespace TagLib {
       /*!
        * Destroys the AttahcedPictureFrame instance.
        */
-      virtual ~AttachedPictureFrame();
+      ~AttachedPictureFrame() override;
 
       /*!
        * Returns a string containing the description and mime-type
        */
-      virtual String toString() const;
+      String toString() const override;
 
       /*!
        * Returns the text encoding used for the description.
@@ -203,8 +203,8 @@ namespace TagLib {
       void setPicture(const ByteVector &p);
 
     protected:
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
       class AttachedPictureFramePrivate;
       AttachedPictureFramePrivate *d;
 
@@ -219,7 +219,7 @@ namespace TagLib {
     class TAGLIB_EXPORT AttachedPictureFrameV22 : public AttachedPictureFrame
     {
     protected:
-      virtual void parseFields(const ByteVector &data);
+      void parseFields(const ByteVector &data) override;
     private:
       AttachedPictureFrameV22(const ByteVector &data, Header *h);
       friend class FrameFactory;

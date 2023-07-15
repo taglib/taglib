@@ -79,39 +79,39 @@ namespace TagLib {
         /*!
          * Destroys this instance of the File.
          */
-        virtual ~File();
+        ~File() override;
 
         /*!
          * Returns the XiphComment for this file.  XiphComment implements the tag
          * interface, so this serves as the reimplementation of
          * TagLib::File::tag().
          */
-        virtual Ogg::XiphComment *tag() const;
+        Ogg::XiphComment *tag() const override;
 
         /*!
          * Implements the unified property interface -- export function.
          * This forwards directly to XiphComment::properties().
          */
-        PropertyMap properties() const;
+        PropertyMap properties() const override;
 
         /*!
          * Implements the unified tag dictionary interface -- import function.
          * Like properties(), this is a forwarder to the file's XiphComment.
          */
-        PropertyMap setProperties(const PropertyMap &);
+        PropertyMap setProperties(const PropertyMap &) override;
 
         /*!
          * Returns the Opus::Properties for this file.  If no audio properties
          * were read then this will return a null pointer.
          */
-        virtual Properties *audioProperties() const;
+        Properties *audioProperties() const override;
 
         /*!
          * Save the file.
          *
          * This returns true if the save was successful.
          */
-        virtual bool save();
+        bool save() override;
 
         /*!
          * Returns whether or not the given \a stream can be opened as an Opus

@@ -88,7 +88,7 @@ namespace TagLib {
 
       Picture();
       Picture(const ByteVector &data);
-      ~Picture();
+      ~Picture() override;
 
       /*!
        * Returns the type of the image.
@@ -177,12 +177,12 @@ namespace TagLib {
       /*!
        * Returns the FLAC metadata block type.
        */
-      int code() const;
+      int code() const override;
 
       /*!
        * Render the content to the FLAC picture block format.
        */
-      ByteVector render() const;
+      ByteVector render() const override;
 
       /*!
        * Parse the picture data in the FLAC picture block format.

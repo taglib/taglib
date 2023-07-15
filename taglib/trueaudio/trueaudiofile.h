@@ -131,39 +131,39 @@ namespace TagLib {
       /*!
        * Destroys this instance of the File.
        */
-      virtual ~File();
+      ~File() override;
 
       /*!
        * Returns the Tag for this file.
        */
-      virtual TagLib::Tag *tag() const;
+      TagLib::Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
        * If the file contains both ID3v1 and v2 tags, only ID3v2 will be
        * converted to the PropertyMap.
        */
-      PropertyMap properties() const;
+      PropertyMap properties() const override;
 
       /*!
        * Implements the unified property interface -- import function.
        * Creates in ID3v2 tag if necessary. If an ID3v1 tag exists, it will
        * be updated as well, within the limitations of ID3v1.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      PropertyMap setProperties(const PropertyMap &) override;
 
-      void removeUnsupportedProperties(const StringList &properties);
+      void removeUnsupportedProperties(const StringList &properties) override;
 
       /*!
        * Returns the TrueAudio::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      virtual Properties *audioProperties() const;
+      Properties *audioProperties() const override;
 
       /*!
        * Saves the file.
        */
-      virtual bool save();
+      bool save() override;
 
       /*!
        * Returns a pointer to the ID3v1 tag of the file.

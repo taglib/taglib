@@ -52,9 +52,9 @@ namespace TagLib {
 
     public:
       UnknownFrame(const ByteVector &data);
-      virtual ~UnknownFrame();
+      ~UnknownFrame() override;
 
-      virtual String toString() const;
+      String toString() const override;
 
       /*!
        * Returns the field data (everything but the header) for this frame.
@@ -62,8 +62,8 @@ namespace TagLib {
       ByteVector data() const;
 
     protected:
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
     private:
       UnknownFrame(const ByteVector &data, Header *h);

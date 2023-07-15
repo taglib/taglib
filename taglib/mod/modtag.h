@@ -46,45 +46,45 @@ namespace TagLib {
     {
     public:
       Tag();
-      virtual ~Tag();
+      ~Tag() override;
 
       /*!
        * Returns the track name; if no track name is present in the tag
        * String::null will be returned.
        */
-      virtual String title() const;
+      String title() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      virtual String artist() const;
+      String artist() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      virtual String album() const;
+      String album() const override;
 
       /*!
        * Returns the track comment derived from the instrument/sample/pattern
        * names; if no comment is present in the tag String::null will be
        * returned.
        */
-      virtual String comment() const;
+      String comment() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      virtual String genre() const;
+      String genre() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      virtual unsigned int year() const;
+      unsigned int year() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      virtual unsigned int track() const;
+      unsigned int track() const override;
 
       /*!
        * Returns the name of the tracker used to create/edit the module file.
@@ -103,17 +103,17 @@ namespace TagLib {
        * Mod 20 characters, S3M 27 characters, IT 25 characters and XM 20
        * characters.
        */
-      virtual void setTitle(const String &title);
+      void setTitle(const String &title) override;
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      virtual void setArtist(const String &artist);
+      void setArtist(const String &artist) override;
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      virtual void setAlbum(const String &album);
+      void setAlbum(const String &album) override;
 
       /*!
        * Sets the comment to \a comment.  If \a comment is String::null then
@@ -132,22 +132,22 @@ namespace TagLib {
        * Mod 22 characters, S3M 27 characters, IT 25 characters and XM 22
        * characters.
        */
-      virtual void setComment(const String &comment);
+      void setComment(const String &comment) override;
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      virtual void setGenre(const String &genre);
+      void setGenre(const String &genre) override;
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      virtual void setYear(unsigned int year);
+      void setYear(unsigned int year) override;
 
       /*!
        * Not supported by module files and therefore ignored.
        */
-      virtual void setTrack(unsigned int track);
+      void setTrack(unsigned int track) override;
 
       /*!
        * Sets the tracker name to \a trackerName.  If \a trackerName is
@@ -165,7 +165,7 @@ namespace TagLib {
        * Implements the unified property interface -- export function.
        * Since the module tag is very limited, the exported map is as well.
        */
-      PropertyMap properties() const;
+      PropertyMap properties() const override;
 
       /*!
        * Implements the unified property interface -- import function.
@@ -175,7 +175,7 @@ namespace TagLib {
        * all but the first will be contained in the returned map of unsupported
        * properties.
        */
-      PropertyMap setProperties(const PropertyMap &);
+      PropertyMap setProperties(const PropertyMap &) override;
 
     private:
       Tag(const Tag &);

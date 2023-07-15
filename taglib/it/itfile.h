@@ -63,15 +63,15 @@ namespace TagLib {
         /*!
          * Destroys this instance of the File.
          */
-        virtual ~File();
+        ~File() override;
 
-        Mod::Tag *tag() const;
+        Mod::Tag *tag() const override;
 
         /*!
          * Returns the IT::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */
-        IT::Properties *audioProperties() const;
+        IT::Properties *audioProperties() const override;
 
         /*!
          * Save the file.
@@ -79,7 +79,7 @@ namespace TagLib {
          *
          * \note Saving Impulse Tracker tags is not supported.
          */
-        bool save();
+        bool save() override;
 
 
       private:

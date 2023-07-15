@@ -59,7 +59,7 @@ namespace TagLib {
       /*!
        * Destroys the frame.
        */
-      ~UniqueFileIdentifierFrame();
+      ~UniqueFileIdentifierFrame() override;
 
       /*!
        * Returns the owner for the frame; essentially this is the key for
@@ -92,9 +92,9 @@ namespace TagLib {
        */
       void setIdentifier(const ByteVector &v);
 
-      virtual String toString() const;
+      String toString() const override;
 
-      virtual PropertyMap asProperties() const;
+      PropertyMap asProperties() const override;
 
       /*!
        * UFID frames each have a unique owner. This searches for a UFID
@@ -105,8 +105,8 @@ namespace TagLib {
       static UniqueFileIdentifierFrame *findByOwner(const Tag *tag, const String &o);
 
     protected:
-      virtual void parseFields(const ByteVector &data);
-      virtual ByteVector renderFields() const;
+      void parseFields(const ByteVector &data) override;
+      ByteVector renderFields() const override;
 
     private:
       UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &);
