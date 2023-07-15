@@ -38,7 +38,7 @@ class MPEG::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() :
-    xingHeader(0),
+    xingHeader(nullptr),
     length(0),
     bitrate(0),
     sampleRate(0),
@@ -162,7 +162,7 @@ void MPEG::Properties::read(File *file)
   d->xingHeader = new XingHeader(file->readBlock(firstHeader.frameLength()));
   if(!d->xingHeader->isValid()) {
     delete d->xingHeader;
-    d->xingHeader = 0;
+    d->xingHeader = nullptr;
   }
 
   if(d->xingHeader && firstHeader.samplesPerFrame() > 0 && firstHeader.sampleRate() > 0) {

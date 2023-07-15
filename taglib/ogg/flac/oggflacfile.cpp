@@ -39,8 +39,8 @@ class Ogg::FLAC::File::FilePrivate
 {
 public:
   FilePrivate() :
-    comment(0),
-    properties(0),
+    comment(nullptr),
+    properties(nullptr),
     streamStart(0),
     streamLength(0),
     scanned(false),

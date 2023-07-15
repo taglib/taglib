@@ -36,7 +36,7 @@ class TableOfContentsFrame::TableOfContentsFramePrivate
 {
 public:
   TableOfContentsFramePrivate() :
-    tagHeader(0),
+    tagHeader(nullptr),
     isTopLevel(false),
     isOrdered(false)
   {
@@ -262,7 +262,7 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
       return frame;
   }
 
-  return 0;
+  return nullptr;
 }
 
 TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) // static
@@ -278,7 +278,7 @@ TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) 
       return frame;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void TableOfContentsFrame::parseFields(const ByteVector &data)

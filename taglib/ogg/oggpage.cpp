@@ -100,7 +100,7 @@ unsigned int pageChecksum(const ByteVector &data)
 class Ogg::Page::PagePrivate
 {
 public:
-  PagePrivate(File *f = 0, offset_t pageOffset = -1) :
+  PagePrivate(File *f = nullptr, offset_t pageOffset = -1) :
     file(f),
     fileOffset(pageOffset),
     header(f, pageOffset),

@@ -47,7 +47,7 @@ namespace TagLib {
      * \a third.  The TagUnion takes ownership of these tags and will handle
      * their deletion.
      */
-    TagUnion(Tag *first = 0, Tag *second = 0, Tag *third = 0);
+    TagUnion(Tag *first = nullptr, Tag *second = nullptr, Tag *third = nullptr);
 
     ~TagUnion() override;
 

@@ -37,7 +37,7 @@ class ChapterFrame::ChapterFramePrivate
 {
 public:
   ChapterFramePrivate() :
-    tagHeader(0),
+    tagHeader(nullptr),
     startTime(0),
     endTime(0),
     startOffset(0),
@@ -236,7 +236,7 @@ ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVec
       return frame;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void ChapterFrame::parseFields(const ByteVector &data)

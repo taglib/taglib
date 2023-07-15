@@ -54,7 +54,7 @@ public:
     APELocation(-1),
     APEOriginalSize(0),
     ID3v1Location(-1),
-    properties(0) {}
+    properties(nullptr) {}
 
   ~FilePrivate()
   {
@@ -89,8 +89,8 @@ namespace
   public:
     AdapterFile(IOStream *stream) : File(stream) {}
 
-    Tag *tag() const override { return 0; }
-    AudioProperties *audioProperties() const override { return 0; }
+    Tag *tag() const override { return nullptr; }
+    AudioProperties *audioProperties() const override { return nullptr; }
     bool save() override { return false; }
   };
 }  // namespace
@@ -343,7 +343,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     d->ID3v2OriginalSize = 0;
 
     if(freeMemory)
-      d->tag.set(ID3v2Index, 0);
+      d->tag.set(ID3v2Index, nullptr);
   }
 
   if((tags & ID3v1) && d->ID3v1Location >= 0) {
@@ -352,7 +352,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     d->ID3v1Location = -1;
 
     if(freeMemory)
-      d->tag.set(ID3v1Index, 0);
+      d->tag.set(ID3v1Index, nullptr);
   }
 
   if((tags & APE) && d->APELocation >= 0) {
@@ -365,7 +365,7 @@ bool MPEG::File::strip(int tags, bool freeMemory)
     d->APEOriginalSize = 0;
 
     if(freeMemory)
-      d->tag.set(APEIndex, 0);
+      d->tag.set(APEIndex, nullptr);
   }
 
   return true;

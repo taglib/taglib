@@ -38,8 +38,8 @@ class RIFF::AIFF::File::FilePrivate
 {
 public:
   FilePrivate() :
-    properties(0),
-    tag(0),
+    properties(nullptr),
+    tag(nullptr),
     hasID3v2(false) {}
 
   ~FilePrivate()

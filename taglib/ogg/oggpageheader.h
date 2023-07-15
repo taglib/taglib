@@ -52,7 +52,7 @@ namespace TagLib {
        * create a page with no (and as such, invalid) data that must be set
        * later.
        */
-      PageHeader(File *file = 0, offset_t pageOffset = -1);
+      PageHeader(File *file = nullptr, offset_t pageOffset = -1);
 
       /*!
        * Deletes this instance of the PageHeader.

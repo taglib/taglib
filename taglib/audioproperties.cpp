@@ -71,7 +71,7 @@ int AudioProperties::sampleRate() const
 ////////////////////////////////////////////////////////////////////////////////
 
 AudioProperties::AudioProperties(ReadStyle) :
-  d(0)
+  d(nullptr)
 {
 
 }

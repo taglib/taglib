@@ -144,7 +144,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
     return;
   }
 
-  MP4::Atom *trak = 0;
+  MP4::Atom *trak = nullptr;
   ByteVector data;
 
   const MP4::AtomList trakList = moov->findall("trak");
@@ -160,7 +160,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
     if(data.containsAt("soun", 16)) {
       break;
     }
-    trak = 0;
+    trak = nullptr;
   }
   if(!trak) {
     debug("MP4: No audio tracks");

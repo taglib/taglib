@@ -58,10 +58,10 @@ public:
     APELocation(-1),
     APESize(0),
     ID3v1Location(-1),
-    ID3v2Header(0),
+    ID3v2Header(nullptr),
     ID3v2Location(-1),
     ID3v2Size(0),
-    properties(0) {}
+    properties(nullptr) {}
 
   ~FilePrivate()
   {
@@ -233,10 +233,10 @@ APE::Tag *APE::File::APETag(bool create)
 void APE::File::strip(int tags)
 {
   if(tags & ID3v1)
-    d->tag.set(ApeID3v1Index, 0);
+    d->tag.set(ApeID3v1Index, nullptr);
 
   if(tags & APE)
-    d->tag.set(ApeAPEIndex, 0);
+    d->tag.set(ApeAPEIndex, nullptr);
 
   if(!ID3v1Tag())
     APETag(true);

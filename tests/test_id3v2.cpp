@@ -60,7 +60,7 @@ class PublicFrame : public ID3v2::Frame
   public:
     PublicFrame() : ID3v2::Frame(ByteVector("XXXX\0\0\0\0\0\0", 10)) {}
     String readStringField(const ByteVector &data, String::Type encoding,
-                           int *position = 0)
+                           int *position = nullptr)
       { return ID3v2::Frame::readStringField(data, encoding, position); }
     String toString() const override { return String(); }
     void parseFields(const ByteVector &) override {}
@@ -1242,7 +1242,7 @@ public:
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
-    CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)0, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
+    CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)nullptr, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
     CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
   }
 
