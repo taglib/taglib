@@ -79,6 +79,12 @@ typename Map<Key, T>::ConstIterator Map<Key, T>::begin() const
 }
 
 template <class Key, class T>
+typename Map<Key, T>::ConstIterator Map<Key, T>::cbegin() const
+{
+  return d->map.cbegin();
+}
+
+template <class Key, class T>
 typename Map<Key, T>::Iterator Map<Key, T>::end()
 {
   detach();
@@ -89,6 +95,12 @@ template <class Key, class T>
 typename Map<Key, T>::ConstIterator Map<Key, T>::end() const
 {
   return d->map.end();
+}
+
+template <class Key, class T>
+typename Map<Key, T>::ConstIterator Map<Key, T>::cend() const
+{
+  return d->map.cend();
 }
 
 template <class Key, class T>

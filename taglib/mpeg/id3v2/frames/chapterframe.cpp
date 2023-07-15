@@ -186,7 +186,7 @@ void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 
 void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 {
-  FrameList l = d->embeddedFrameListMap[id];
+  const FrameList l = d->embeddedFrameListMap[id];
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     removeEmbeddedFrame(*it, true);
 }
@@ -205,8 +205,8 @@ String ChapterFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(FrameList::ConstIterator it = d->embeddedFrameList.begin();
-        it != d->embeddedFrameList.end(); ++it)
+    for(FrameList::ConstIterator it = d->embeddedFrameList.cbegin();
+        it != d->embeddedFrameList.cend(); ++it)
       frameIDs.append((*it)->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
   }
@@ -227,8 +227,8 @@ ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVec
 {
   ID3v2::FrameList comments = tag->frameList("CHAP");
 
-  for(ID3v2::FrameList::ConstIterator it = comments.begin();
-      it != comments.end();
+  for(ID3v2::FrameList::ConstIterator it = comments.cbegin();
+      it != comments.cend();
       ++it)
   {
     ChapterFrame *frame = dynamic_cast<ChapterFrame *>(*it);
@@ -293,7 +293,7 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
-  FrameList l = d->embeddedFrameList;
+  const FrameList l = d->embeddedFrameList;
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     (*it)->header()->setVersion(header()->version());
     data.append((*it)->render());

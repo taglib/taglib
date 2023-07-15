@@ -213,7 +213,7 @@ void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 
 void TableOfContentsFrame::removeEmbeddedFrames(const ByteVector &id)
 {
-  FrameList l = d->embeddedFrameListMap[id];
+  const FrameList l = d->embeddedFrameListMap[id];
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
     removeEmbeddedFrame(*it, true);
 }
@@ -230,8 +230,8 @@ String TableOfContentsFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(FrameList::ConstIterator it = d->embeddedFrameList.begin();
-        it != d->embeddedFrameList.end(); ++it)
+    for(FrameList::ConstIterator it = d->embeddedFrameList.cbegin();
+        it != d->embeddedFrameList.cend(); ++it)
       frameIDs.append((*it)->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
   }
@@ -251,7 +251,7 @@ PropertyMap TableOfContentsFrame::asProperties() const
 TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag,
                                                             const ByteVector &eID) // static
 {
-  ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
+  const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
   for(ID3v2::FrameList::ConstIterator it = tablesOfContents.begin();
       it != tablesOfContents.end();
@@ -267,7 +267,7 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
 
 TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) // static
 {
-  ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
+  const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
   for(ID3v2::FrameList::ConstIterator it = tablesOfContents.begin();
       it != tablesOfContents.end();
@@ -337,13 +337,13 @@ ByteVector TableOfContentsFrame::renderFields() const
     flags += 1;
   data.append(flags);
   data.append(static_cast<char>(entryCount()));
-  ByteVectorList::ConstIterator it = d->childElements.begin();
-  while(it != d->childElements.end()) {
+  ByteVectorList::ConstIterator it = d->childElements.cbegin();
+  while(it != d->childElements.cend()) {
     data.append(*it);
     data.append('\0');
     it++;
   }
-  FrameList l = d->embeddedFrameList;
+  const FrameList l = d->embeddedFrameList;
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     (*it)->header()->setVersion(header()->version());
     data.append((*it)->render());

@@ -181,11 +181,11 @@ int APE::Item::size() const
   switch(d->type) {
     case Text:
       if(!d->text.isEmpty()) {
-        StringList::ConstIterator it = d->text.begin();
+        StringList::ConstIterator it = d->text.cbegin();
 
         result += it->data(String::UTF8).size();
         it++;
-        for(; it != d->text.end(); ++it)
+        for(; it != d->text.cend(); ++it)
           result += 1 + it->data(String::UTF8).size();
       }
       break;
@@ -268,11 +268,11 @@ ByteVector APE::Item::render() const
     return data;
 
   if(d->type == Text) {
-    StringList::ConstIterator it = d->text.begin();
+    StringList::ConstIterator it = d->text.cbegin();
 
     value.append(it->data(String::UTF8));
     it++;
-    for(; it != d->text.end(); ++it) {
+    for(; it != d->text.cend(); ++it) {
       value.append('\0');
       value.append(it->data(String::UTF8));
     }

@@ -121,8 +121,8 @@ ByteVector EventTimingCodesFrame::renderFields() const
   ByteVector v;
 
   v.append(static_cast<char>(d->timestampFormat));
-  for(SynchedEventList::ConstIterator it = d->synchedEvents.begin();
-      it != d->synchedEvents.end();
+  for(SynchedEventList::ConstIterator it = d->synchedEvents.cbegin();
+      it != d->synchedEvents.cend();
       ++it) {
     const SynchedEvent &entry = *it;
     v.append(static_cast<char>(entry.type));

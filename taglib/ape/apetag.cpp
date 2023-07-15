@@ -265,13 +265,13 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
       toRemove.append(remIt->first);
   }
 
-  for(StringList::ConstIterator removeIt = toRemove.begin(); removeIt != toRemove.end(); removeIt++)
+  for(StringList::ConstIterator removeIt = toRemove.cbegin(); removeIt != toRemove.cend(); removeIt++)
     removeItem(*removeIt);
 
   // now sync in the "forward direction"
-  PropertyMap::ConstIterator it = properties.begin();
+  PropertyMap::ConstIterator it = properties.cbegin();
   PropertyMap invalid;
-  for(; it != properties.end(); ++it) {
+  for(; it != properties.cend(); ++it) {
     const String &tagName = it->first;
     if(!checkKey(tagName))
       invalid.insert(it->first, it->second);
@@ -382,7 +382,7 @@ ByteVector APE::Tag::render() const
   ByteVector data;
   unsigned int itemCount = 0;
 
-  for(ItemListMap::ConstIterator it = d->itemListMap.begin(); it != d->itemListMap.end(); ++it) {
+  for(ItemListMap::ConstIterator it = d->itemListMap.cbegin(); it != d->itemListMap.cend(); ++it) {
     data.append(it->second.render());
     itemCount++;
   }

@@ -47,7 +47,7 @@ namespace
 {
   typedef List<FLAC::MetadataBlock *> BlockList;
   typedef BlockList::Iterator BlockIterator;
-  typedef BlockList::Iterator BlockConstIterator;
+  typedef BlockList::ConstIterator BlockConstIterator;
 
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
 
@@ -209,7 +209,7 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+  for(BlockConstIterator it = d->blocks.cbegin(); it != d->blocks.cend(); ++it) {
     ByteVector blockData = (*it)->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
     blockHeader[0] = (*it)->code();
@@ -333,7 +333,7 @@ Ogg::XiphComment *FLAC::File::xiphComment(bool create)
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(BlockConstIterator it = d->blocks.begin(); it != d->blocks.end(); ++it) {
+  for(BlockConstIterator it = d->blocks.cbegin(); it != d->blocks.cend(); ++it) {
     Picture *picture = dynamic_cast<Picture *>(*it);
     if(picture) {
       pictures.append(picture);

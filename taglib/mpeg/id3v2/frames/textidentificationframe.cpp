@@ -211,7 +211,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
   while(dataLength % byteAlign != 0)
     dataLength++;
 
-  ByteVectorList l = ByteVectorList::split(data.mid(1, dataLength), textDelimiter(d->textEncoding), byteAlign);
+  const ByteVectorList l = ByteVectorList::split(data.mid(1, dataLength), textDelimiter(d->textEncoding), byteAlign);
 
   d->fieldList.clear();
 
@@ -256,13 +256,13 @@ ByteVector TextIdentificationFrame::renderFields() const
 
   v.append(static_cast<char>(encoding));
 
-  for(StringList::ConstIterator it = d->fieldList.begin(); it != d->fieldList.end(); it++) {
+  for(StringList::ConstIterator it = d->fieldList.cbegin(); it != d->fieldList.cend(); it++) {
 
     // Since the field list is null delimited, if this is not the first
     // element in the list, append the appropriate delimiter for this
     // encoding.
 
-    if(it != d->fieldList.begin())
+    if(it != d->fieldList.cbegin())
       v.append(textDelimiter(encoding));
 
     v.append((*it).data(encoding));
@@ -290,7 +290,7 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
     map.unsupportedData().append(frameID());
     return map;
   }
-  StringList l = fieldList();
+  const StringList l = fieldList();
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     bool found = false;
     for(size_t i = 0; i < involvedPeopleSize; ++i)
@@ -317,7 +317,7 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
     map.unsupportedData().append(frameID());
     return map;
   }
-  StringList l = fieldList();
+  const StringList l = fieldList();
   for(StringList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     String instrument = it->upper();
     if(instrument.isEmpty()) {
@@ -417,7 +417,7 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
 {
   PropertyMap map;
   String tagName = txxxToKey(description());
-  StringList v = fieldList();
+  const StringList v = fieldList();
   for(StringList::ConstIterator it = v.begin(); it != v.end(); ++it)
     if(it != v.begin())
       map.insert(tagName, *it);
@@ -427,7 +427,7 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
 UserTextIdentificationFrame *UserTextIdentificationFrame::find(
   ID3v2::Tag *tag, const String &description) // static
 {
-  FrameList l = tag->frameList("TXXX");
+  const FrameList l = tag->frameList("TXXX");
   for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
     UserTextIdentificationFrame *f = dynamic_cast<UserTextIdentificationFrame *>(*it);
     if(f && f->description() == description)

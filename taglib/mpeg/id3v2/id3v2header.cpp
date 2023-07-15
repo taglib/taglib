@@ -202,7 +202,7 @@ void Header::parse(const ByteVector &data)
   // note that we're doing things a little out of order here -- the size is
   // later in the bytestream than the version
 
-  ByteVector sizeData = data.mid(6, 4);
+  const ByteVector sizeData = data.mid(6, 4);
 
   if(sizeData.size() != 4) {
     d->tagSize = 0;

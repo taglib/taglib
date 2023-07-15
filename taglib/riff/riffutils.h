@@ -26,6 +26,8 @@
 #ifndef TAGLIB_RIFFUTILS_H
 #define TAGLIB_RIFFUTILS_H
 
+#include "tbytevector.h"
+
 // THIS FILE IS NOT A PART OF THE TAGLIB API
 
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header

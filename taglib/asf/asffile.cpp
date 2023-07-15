@@ -409,7 +409,7 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(List<BaseObject *>::ConstIterator it = objects.begin(); it != objects.end(); ++it) {
+  for(List<BaseObject *>::ConstIterator it = objects.cbegin(); it != objects.cend(); ++it) {
     data.append((*it)->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt(data.size(), false) + data;
@@ -601,7 +601,7 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(List<FilePrivate::BaseObject *>::ConstIterator it = d->objects.begin(); it != d->objects.end(); ++it) {
+  for(List<FilePrivate::BaseObject *>::ConstIterator it = d->objects.cbegin(); it != d->objects.cend(); ++it) {
     data.append((*it)->render(this));
   }
 

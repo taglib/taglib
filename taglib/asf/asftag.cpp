@@ -287,8 +287,8 @@ PropertyMap ASF::Tag::properties() const
     props["COMMENT"] = d->comment;
   }
 
-  ASF::AttributeListMap::ConstIterator it = d->attributeListMap.begin();
-  for(; it != d->attributeListMap.end(); ++it) {
+  ASF::AttributeListMap::ConstIterator it = d->attributeListMap.cbegin();
+  for(; it != d->attributeListMap.cend(); ++it) {
     const String key = translateKey(it->first);
     if(!key.isEmpty()) {
       AttributeList::ConstIterator it2 = it->second.begin();
@@ -327,7 +327,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
     }
   }
 
-  PropertyMap origProps = properties();
+  const PropertyMap origProps = properties();
   PropertyMap::ConstIterator it = origProps.begin();
   for(; it != origProps.end(); ++it) {
     if(!props.contains(it->first) || props[it->first].isEmpty()) {
