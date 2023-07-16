@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tzlib.h>
+#include "tdebug.h"
+#include "tzlib.h"
 
 #include "id3v2framefactory.h"
 #include "id3v2synchdata.h"

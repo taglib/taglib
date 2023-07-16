@@ -27,10 +27,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
+#include "tstring.h"
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
 
 #include "opusfile.h"
 

@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <taglib.h>
-#include <tdebug.h>
-#include <tstring.h>
+#include "taglib.h"
+#include "tdebug.h"
+#include "tstring.h"
 #include "flacunknownmetadatablock.h"
 
 using namespace TagLib;
@@ -75,4 +75,3 @@ ByteVector FLAC::UnknownMetadataBlock::render() const
 {
   return d->data;
 }
-

@@ -31,12 +31,12 @@
 #define WANT_CLASS_INSTANTIATION_OF_MAP (1)
 #endif
 
-#include <tfile.h>
-#include <tstring.h>
-#include <tmap.h>
-#include <tpropertymap.h>
-#include <tdebug.h>
-#include <tutils.h>
+#include "tfile.h"
+#include "tstring.h"
+#include "tmap.h"
+#include "tpropertymap.h"
+#include "tdebug.h"
+#include "tutils.h"
 
 #include "apetag.h"
 #include "apefooter.h"

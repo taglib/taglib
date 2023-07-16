@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tfile.h>
+#include "tdebug.h"
+#include "tfile.h"
 
 #include "infotag.h"
 #include "riffutils.h"

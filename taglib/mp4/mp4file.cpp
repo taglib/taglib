@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tstring.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
+#include "tdebug.h"
+#include "tstring.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
 
 #include "mp4atom.h"
 #include "mp4tag.h"

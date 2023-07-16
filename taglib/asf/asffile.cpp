@@ -23,11 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tbytevectorlist.h>
-#include <tpropertymap.h>
-#include <tstring.h>
-#include <tagutils.h>
+#include "tdebug.h"
+#include "tbytevectorlist.h"
+#include "tpropertymap.h"
+#include "tstring.h"
+#include "tagutils.h"
 
 #include "asffile.h"
 #include "asftag.h"

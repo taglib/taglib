@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <s3mfile.h>
+#include "s3mfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

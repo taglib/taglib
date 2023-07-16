@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 
-#include <id3v2synchdata.h>
+#include "id3v2synchdata.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;

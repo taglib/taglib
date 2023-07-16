@@ -23,15 +23,15 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tpropertymap.h>
-#include <tag.h>
-#include <apetag.h>
-#include <asftag.h>
-#include <id3v1tag.h>
-#include <id3v2tag.h>
-#include <infotag.h>
-#include <mp4tag.h>
-#include <xiphcomment.h>
+#include "tpropertymap.h"
+#include "tag.h"
+#include "apetag.h"
+#include "asftag.h"
+#include "id3v1tag.h"
+#include "id3v2tag.h"
+#include "infotag.h"
+#include "mp4tag.h"
+#include "xiphcomment.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

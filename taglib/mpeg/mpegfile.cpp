@@ -23,14 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tagunion.h>
-#include <tagutils.h>
-#include <id3v2tag.h>
-#include <id3v2header.h>
-#include <id3v1tag.h>
-#include <apefooter.h>
-#include <apetag.h>
-#include <tdebug.h>
+#include "tagunion.h"
+#include "tagutils.h"
+#include "id3v2tag.h"
+#include "id3v2header.h"
+#include "id3v1tag.h"
+#include "apefooter.h"
+#include "apetag.h"
+#include "tdebug.h"
 
 #include "mpegfile.h"
 #include "mpegheader.h"

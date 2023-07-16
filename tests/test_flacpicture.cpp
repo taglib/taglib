@@ -25,11 +25,11 @@
 
 #include <string>
 #include <cstdio>
-#include <tag.h>
-#include <tstringlist.h>
-#include <tbytevectorlist.h>
-#include <flacfile.h>
-#include <flacmetadatablock.h>
+#include "tag.h"
+#include "tstringlist.h"
+#include "tbytevectorlist.h"
+#include "flacfile.h"
+#include "flacmetadatablock.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

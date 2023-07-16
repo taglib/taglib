@@ -25,8 +25,8 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include <tbytevector.h>
-#include <tbytevectorlist.h>
+#include "tbytevector.h"
+#include "tbytevectorlist.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
@@ -596,4 +596,3 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestByteVector);
-

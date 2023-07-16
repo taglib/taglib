@@ -25,9 +25,9 @@
 
 #include <bitset>
 
-#include <tdebug.h>
-#include <tstringlist.h>
-#include <tzlib.h>
+#include "tdebug.h"
+#include "tstringlist.h"
+#include "tzlib.h"
 
 #include "id3v2tag.h"
 #include "id3v2frame.h"

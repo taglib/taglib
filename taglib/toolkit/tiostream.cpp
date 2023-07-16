@@ -25,7 +25,7 @@
 
 #ifdef _WIN32
 # include <windows.h>
-# include <tstring.h>
+# include "tstring.h"
 #endif
 
 #include "tiostream.h"

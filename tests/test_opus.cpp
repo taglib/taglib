@@ -25,10 +25,10 @@
 
 #include <string>
 #include <cstdio>
-#include <tag.h>
-#include <tbytevectorlist.h>
-#include <opusfile.h>
-#include <oggpageheader.h>
+#include "tag.h"
+#include "tbytevectorlist.h"
+#include "opusfile.h"
+#include "oggpageheader.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

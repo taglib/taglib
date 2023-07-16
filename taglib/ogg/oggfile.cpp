@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevectorlist.h>
-#include <tmap.h>
-#include <tstring.h>
-#include <tdebug.h>
+#include "tbytevectorlist.h"
+#include "tmap.h"
+#include "tstring.h"
+#include "tdebug.h"
 
 #include "oggfile.h"
 #include "oggpage.h"

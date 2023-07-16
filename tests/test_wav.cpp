@@ -25,13 +25,13 @@
 
 #include <string>
 #include <cstdio>
-#include <id3v2tag.h>
-#include <infotag.h>
-#include <tbytevectorlist.h>
-#include <tbytevectorstream.h>
-#include <tfilestream.h>
-#include <tpropertymap.h>
-#include <wavfile.h>
+#include "id3v2tag.h"
+#include "infotag.h"
+#include "tbytevectorlist.h"
+#include "tbytevectorstream.h"
+#include "tfilestream.h"
+#include "tpropertymap.h"
+#include "wavfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "plainfile.h"
 #include "utils.h"

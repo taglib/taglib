@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
+#include "tstring.h"
+#include "tdebug.h"
 
-#include <oggpageheader.h>
+#include "oggpageheader.h"
 
 #include "vorbisproperties.h"
 #include "vorbisfile.h"

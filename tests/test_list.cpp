@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tlist.h>
+#include "tlist.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;

@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tdebug.h>
+#include "tbytevector.h"
+#include "tstring.h"
+#include "tdebug.h"
 
 #include "xingheader.h"
 #include "mpegfile.h"

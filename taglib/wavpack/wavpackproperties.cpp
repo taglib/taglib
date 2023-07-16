@@ -28,8 +28,8 @@
  ***************************************************************************/
 
 #include <cstdint>
-#include <tstring.h>
-#include <tdebug.h>
+#include "tstring.h"
+#include "tdebug.h"
 
 #include "wavpackproperties.h"
 #include "wavpackfile.h"

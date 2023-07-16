@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tfile.h>
+#include "tfile.h"
 
 #include "id3v1tag.h"
 #include "id3v2header.h"

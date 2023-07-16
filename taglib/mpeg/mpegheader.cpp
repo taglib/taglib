@@ -23,11 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tfile.h>
-#include <tdebug.h>
-#include <trefcounter.h>
+#include "tbytevector.h"
+#include "tstring.h"
+#include "tfile.h"
+#include "tdebug.h"
+#include "trefcounter.h"
 
 #include "mpegheader.h"
 #include "mpegutils.h"

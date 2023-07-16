@@ -25,16 +25,16 @@
 
 #include <string>
 #include <cstdio>
-#include <tstring.h>
-#include <tpropertymap.h>
-#include <mpegfile.h>
-#include <id3v2tag.h>
-#include <id3v1tag.h>
-#include <apetag.h>
-#include <mpegproperties.h>
-#include <xingheader.h>
-#include <mpegheader.h>
-#include <id3v2extendedheader.h>
+#include "tstring.h"
+#include "tpropertymap.h"
+#include "mpegfile.h"
+#include "id3v2tag.h"
+#include "id3v1tag.h"
+#include "apetag.h"
+#include "mpegproperties.h"
+#include "xingheader.h"
+#include "mpegheader.h"
+#include "id3v2extendedheader.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

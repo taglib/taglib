@@ -23,18 +23,18 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tlist.h>
-#include <tdebug.h>
-#include <tagunion.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
+#include "tbytevector.h"
+#include "tstring.h"
+#include "tlist.h"
+#include "tdebug.h"
+#include "tagunion.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
 
-#include <id3v2header.h>
-#include <id3v2tag.h>
-#include <id3v1tag.h>
-#include <xiphcomment.h>
+#include "id3v2header.h"
+#include "id3v2tag.h"
+#include "id3v1tag.h"
+#include "xiphcomment.h"
 
 #include "flacpicture.h"
 #include "flacfile.h"

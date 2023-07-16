@@ -23,8 +23,8 @@
  */
 
 #include <iostream>
-#include <mpegfile.h>
-#include <tstring.h>
+#include "mpegfile.h"
+#include "tstring.h"
 
 using namespace TagLib;
 

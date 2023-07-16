@@ -28,9 +28,9 @@
 
 #include "urllinkframe.h"
 #include "id3v2tag.h"
-#include <tdebug.h>
-#include <tstringlist.h>
-#include <tpropertymap.h>
+#include "tdebug.h"
+#include "tstringlist.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace ID3v2;
