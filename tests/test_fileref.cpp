@@ -134,8 +134,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("a comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)5);
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2020);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(5));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2020));
       f.tag()->setArtist("ttest artist");
       f.tag()->setTitle("ytest title");
       f.tag()->setGenre("uTest!");
@@ -153,8 +153,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("another comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)7);
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2080);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(7));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2080));
     }
 
     {
@@ -167,8 +167,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("another comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)7);
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2080);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(7));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2080));
       f.tag()->setArtist("test artist");
       f.tag()->setTitle("test title");
       f.tag()->setGenre("Test!");
@@ -190,8 +190,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("a comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)5);
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2020);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(5));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2020));
 
       fs.seek(0);
       fileContent = fs.readBlock(fs.length());
@@ -207,8 +207,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("a comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)5);
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2020);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(5));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2020));
       f.tag()->setArtist("ttest artist");
       f.tag()->setTitle("ytest title");
       f.tag()->setGenre("uTest!");
@@ -230,8 +230,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
       CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("another comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), (unsigned int)7);
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), (unsigned int)2080);
+      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(7));
+      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2080));
     }
   }
 

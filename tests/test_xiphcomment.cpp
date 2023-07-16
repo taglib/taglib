@@ -55,11 +55,11 @@ public:
   void testYear()
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.year());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), cmt.year());
     cmt.addField("YEAR", "2009");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2009, cmt.year());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2009), cmt.year());
     cmt.addField("DATE", "2008");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2008, cmt.year());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2008), cmt.year());
   }
 
   void testSetYear()
@@ -75,11 +75,11 @@ public:
   void testTrack()
   {
     Ogg::XiphComment cmt;
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, cmt.track());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), cmt.track());
     cmt.addField("TRACKNUM", "7");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)7, cmt.track());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(7), cmt.track());
     cmt.addField("TRACKNUMBER", "8");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)8, cmt.track());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8), cmt.track());
   }
 
   void testSetTrack()
@@ -103,7 +103,7 @@ public:
 
     Ogg::XiphComment cmt;
     PropertyMap unsuccessful = cmt.setProperties(map);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)5, unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(5), unsuccessful.size());
     CPPUNIT_ASSERT(cmt.properties().isEmpty());
   }
 
@@ -182,11 +182,11 @@ public:
     {
       Vorbis::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.tag()->pictureList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
-      CPPUNIT_ASSERT_EQUAL((int)5, lst[0]->width());
-      CPPUNIT_ASSERT_EQUAL((int)6, lst[0]->height());
-      CPPUNIT_ASSERT_EQUAL((int)16, lst[0]->colorDepth());
-      CPPUNIT_ASSERT_EQUAL((int)7, lst[0]->numColors());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), lst.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<int>(5), lst[0]->width());
+      CPPUNIT_ASSERT_EQUAL(static_cast<int>(6), lst[0]->height());
+      CPPUNIT_ASSERT_EQUAL(static_cast<int>(16), lst[0]->colorDepth());
+      CPPUNIT_ASSERT_EQUAL(static_cast<int>(7), lst[0]->numColors());
       CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
       CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
       CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());
@@ -201,7 +201,7 @@ public:
       List<FLAC::Picture *> lst = f.tag()->pictureList();
       CPPUNIT_ASSERT_EQUAL(String("TEST TITLE"), f.tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("TEST ARTIST"), f.tag()->artist());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), lst.size());
       f.save();
     }
     {

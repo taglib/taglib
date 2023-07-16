@@ -565,7 +565,8 @@ void XM::File::read(bool)
     pattern.byte(packingType).u16L(rowCount).u16L(dataSize);
 
     unsigned int count = pattern.read(*this, patternHeaderLength - 4U);
-    READ_ASSERT(count == std::min(patternHeaderLength - 4U, (unsigned long)pattern.size()));
+    READ_ASSERT(count == std::min(patternHeaderLength - 4U,
+                                  static_cast<unsigned long>(pattern.size())));
 
     seek(patternHeaderLength - (4 + count) + dataSize, Current);
   }
@@ -588,7 +589,8 @@ void XM::File::read(bool)
 
     // 4 for instrumentHeaderSize
     unsigned int count = 4 + instrument.read(*this, instrumentHeaderSize - 4U);
-    READ_ASSERT(count == std::min(instrumentHeaderSize, (unsigned long)instrument.size() + 4));
+    READ_ASSERT(count == std::min(instrumentHeaderSize,
+                                  static_cast<unsigned long>(instrument.size() + 4)));
 
     offset_t offset = 0;
     if(sampleCount > 0) {
@@ -623,7 +625,8 @@ void XM::File::read(bool)
               .string(sampleName, 22);
 
         unsigned int count = sample.read(*this, sampleHeaderSize);
-        READ_ASSERT(count == std::min(sampleHeaderSize, (unsigned long)sample.size()));
+        READ_ASSERT(count == std::min(sampleHeaderSize,
+                                      static_cast<unsigned long>(sample.size())));
         // skip unhandled header proportion:
         seek(sampleHeaderSize - count, Current);
 

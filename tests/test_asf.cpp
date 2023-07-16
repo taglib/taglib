@@ -109,7 +109,8 @@ public:
     }
     {
       ASF::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(2, (int)f.tag()->attributeListMap()["WM/AlbumTitle"].size());
+      CPPUNIT_ASSERT_EQUAL(2, static_cast<int>(
+        f.tag()->attributeListMap()["WM/AlbumTitle"].size()));
     }
   }
 
@@ -121,7 +122,7 @@ public:
     {
       ASF::File f(newname.c_str());
       CPPUNIT_ASSERT(!f.tag()->contains("WM/TrackNumber"));
-      f.tag()->setAttribute("WM/TrackNumber", (unsigned int)(123));
+      f.tag()->setAttribute("WM/TrackNumber", static_cast<unsigned int>(123));
       f.save();
     }
     {
@@ -129,7 +130,7 @@ public:
       CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
       CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
                            f.tag()->attribute("WM/TrackNumber").front().type());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)123, f.tag()->track());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(123), f.tag()->track());
       f.tag()->setTrack(234);
       f.save();
     }
@@ -138,7 +139,7 @@ public:
       CPPUNIT_ASSERT(f.tag()->contains("WM/TrackNumber"));
       CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
                            f.tag()->attribute("WM/TrackNumber").front().type());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)234, f.tag()->track());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(234), f.tag()->track());
     }
   }
 
@@ -217,7 +218,7 @@ public:
     {
       ASF::File f(newname.c_str());
       ASF::AttributeList values2 = f.tag()->attribute("WM/Picture");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, values2.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), values2.size());
       ASF::Attribute attr2 = values2.front();
       ASF::Picture picture2 = attr2.toPicture();
       CPPUNIT_ASSERT(picture2.isValid());
@@ -254,7 +255,7 @@ public:
     {
       ASF::File f(newname.c_str());
       ASF::AttributeList values2 = f.tag()->attribute("WM/Picture");
-      CPPUNIT_ASSERT_EQUAL((unsigned int)2, values2.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), values2.size());
       ASF::Picture picture3 = values2[1].toPicture();
       CPPUNIT_ASSERT(picture3.isValid());
       CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), picture3.mimeType());
