@@ -192,8 +192,8 @@ namespace TagLib {
         static bool isSupported(IOStream *stream);
 
       private:
-        File(const File &);
-        File &operator=(const File &);
+        File(const File &) = delete;
+        File &operator=(const File &) = delete;
 
         void read(bool readProperties);
         void removeTagChunks(TagTypes tags);

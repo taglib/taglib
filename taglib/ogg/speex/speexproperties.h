@@ -94,8 +94,8 @@ namespace TagLib {
         int speexVersion() const;
 
       private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
+        Properties(const Properties &) = delete;
+        Properties &operator=(const Properties &) = delete;
 
         void read(File *file);
 

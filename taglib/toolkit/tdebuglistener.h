@@ -54,8 +54,8 @@ namespace TagLib
 
   private:
     // Noncopyable
-    DebugListener(const DebugListener &);
-    DebugListener &operator=(const DebugListener &);
+    DebugListener(const DebugListener &) = delete;
+    DebugListener &operator=(const DebugListener &) = delete;
   };
 
   /*!

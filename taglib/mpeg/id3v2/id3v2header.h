@@ -163,8 +163,8 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      Header(const Header &);
-      Header &operator=(const Header &);
+      Header(const Header &) = delete;
+      Header &operator=(const Header &) = delete;
 
       class HeaderPrivate;
       HeaderPrivate *d;

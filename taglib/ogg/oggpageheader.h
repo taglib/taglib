@@ -216,8 +216,8 @@ namespace TagLib {
       ByteVector render() const;
 
     private:
-      PageHeader(const PageHeader &);
-      PageHeader &operator=(const PageHeader &);
+      PageHeader(const PageHeader &) = delete;
+      PageHeader &operator=(const PageHeader &) = delete;
 
       void read(Ogg::File *file, offset_t pageOffset);
       ByteVector lacingValues() const;

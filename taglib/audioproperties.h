@@ -118,8 +118,8 @@ namespace TagLib {
     AudioProperties(ReadStyle style);
 
   private:
-    AudioProperties(const AudioProperties &);
-    AudioProperties &operator=(const AudioProperties &);
+    AudioProperties(const AudioProperties &) = delete;
+    AudioProperties &operator=(const AudioProperties &) = delete;
 
     class AudioPropertiesPrivate;
     AudioPropertiesPrivate *d;

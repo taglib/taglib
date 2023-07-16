@@ -219,8 +219,8 @@ namespace TagLib {
 
     private:
       RelativeVolumeFrame(const ByteVector &data, Header *h);
-      RelativeVolumeFrame(const RelativeVolumeFrame &);
-      RelativeVolumeFrame &operator=(const RelativeVolumeFrame &);
+      RelativeVolumeFrame(const RelativeVolumeFrame &) = delete;
+      RelativeVolumeFrame &operator=(const RelativeVolumeFrame &) = delete;
 
       class RelativeVolumeFramePrivate;
       RelativeVolumeFramePrivate *d;

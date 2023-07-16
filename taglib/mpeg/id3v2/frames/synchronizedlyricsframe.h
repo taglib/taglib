@@ -219,8 +219,8 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       SynchronizedLyricsFrame(const ByteVector &data, Header *h);
-      SynchronizedLyricsFrame(const SynchronizedLyricsFrame &);
-      SynchronizedLyricsFrame &operator=(const SynchronizedLyricsFrame &);
+      SynchronizedLyricsFrame(const SynchronizedLyricsFrame &) = delete;
+      SynchronizedLyricsFrame &operator=(const SynchronizedLyricsFrame &) = delete;
 
       class SynchronizedLyricsFramePrivate;
       SynchronizedLyricsFramePrivate *d;

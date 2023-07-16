@@ -81,8 +81,8 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      ExtendedHeader(const ExtendedHeader &);
-      ExtendedHeader &operator=(const ExtendedHeader &);
+      ExtendedHeader(const ExtendedHeader &) = delete;
+      ExtendedHeader &operator=(const ExtendedHeader &) = delete;
 
       class ExtendedHeaderPrivate;
       ExtendedHeaderPrivate *d;

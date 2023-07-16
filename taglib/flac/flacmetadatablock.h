@@ -59,8 +59,8 @@ namespace TagLib {
       virtual ByteVector render() const = 0;
 
     private:
-      MetadataBlock(const MetadataBlock &item);
-      MetadataBlock &operator=(const MetadataBlock &item);
+      MetadataBlock(const MetadataBlock &item) = delete;
+      MetadataBlock &operator=(const MetadataBlock &item) = delete;
 
       class MetadataBlockPrivate;
       MetadataBlockPrivate *d;

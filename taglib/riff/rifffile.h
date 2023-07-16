@@ -140,8 +140,8 @@ namespace TagLib {
       void removeChunk(const ByteVector &name);
 
     private:
-      File(const File &);
-      File &operator=(const File &);
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
 
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,

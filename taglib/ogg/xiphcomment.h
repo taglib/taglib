@@ -254,8 +254,8 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      XiphComment(const XiphComment &);
-      XiphComment &operator=(const XiphComment &);
+      XiphComment(const XiphComment &) = delete;
+      XiphComment &operator=(const XiphComment &) = delete;
 
       class XiphCommentPrivate;
       XiphCommentPrivate *d;

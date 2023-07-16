@@ -272,8 +272,8 @@ namespace TagLib {
           PropertyMap &tiplProperties, PropertyMap &tmclProperties);
 
     private:
-      Frame(const Frame &);
-      Frame &operator=(const Frame &);
+      Frame(const Frame &) = delete;
+      Frame &operator=(const Frame &) = delete;
 
       class FramePrivate;
       friend class FramePrivate;
@@ -440,8 +440,8 @@ namespace TagLib {
       ByteVector render() const;
 
     private:
-      Header(const Header &);
-      Header &operator=(const Header &);
+      Header(const Header &) = delete;
+      Header &operator=(const Header &) = delete;
 
       class HeaderPrivate;
       HeaderPrivate *d;

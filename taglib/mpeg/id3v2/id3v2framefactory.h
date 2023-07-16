@@ -128,8 +128,8 @@ namespace TagLib {
       virtual bool updateFrame(Frame::Header *header) const;
 
     private:
-      FrameFactory(const FrameFactory &);
-      FrameFactory &operator=(const FrameFactory &);
+      FrameFactory(const FrameFactory &) = delete;
+      FrameFactory &operator=(const FrameFactory &) = delete;
 
       static FrameFactory factory;
 

@@ -120,8 +120,8 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       PopularimeterFrame(const ByteVector &data, Header *h);
-      PopularimeterFrame(const PopularimeterFrame &);
-      PopularimeterFrame &operator=(const PopularimeterFrame &);
+      PopularimeterFrame(const PopularimeterFrame &) = delete;
+      PopularimeterFrame &operator=(const PopularimeterFrame &) = delete;
 
       class PopularimeterFramePrivate;
       PopularimeterFramePrivate *d;

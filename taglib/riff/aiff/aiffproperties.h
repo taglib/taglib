@@ -114,8 +114,8 @@ namespace TagLib {
         String compressionName() const;
 
       private:
-        Properties(const Properties &);
-        Properties &operator=(const Properties &);
+        Properties(const Properties &) = delete;
+        Properties &operator=(const Properties &) = delete;
 
         void read(File *file);
 

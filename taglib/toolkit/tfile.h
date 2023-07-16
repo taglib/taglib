@@ -293,8 +293,8 @@ namespace TagLib {
     static unsigned int bufferSize();
 
   private:
-    File(const File &);
-    File &operator=(const File &);
+    File(const File &) = delete;
+    File &operator=(const File &) = delete;
 
     class FilePrivate;
     FilePrivate *d;

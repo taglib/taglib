@@ -99,8 +99,8 @@ namespace TagLib {
       int version() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
 
       void read(File *file, offset_t streamLength);
 

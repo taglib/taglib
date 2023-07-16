@@ -106,8 +106,8 @@ namespace TagLib {
       HeaderType type() const;
 
     private:
-      XingHeader(const XingHeader &);
-      XingHeader &operator=(const XingHeader &);
+      XingHeader(const XingHeader &) = delete;
+      XingHeader &operator=(const XingHeader &) = delete;
 
       void parse(const ByteVector &data);
 

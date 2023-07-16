@@ -173,8 +173,8 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       EventTimingCodesFrame(const ByteVector &data, Header *h);
-      EventTimingCodesFrame(const EventTimingCodesFrame &);
-      EventTimingCodesFrame &operator=(const EventTimingCodesFrame &);
+      EventTimingCodesFrame(const EventTimingCodesFrame &) = delete;
+      EventTimingCodesFrame &operator=(const EventTimingCodesFrame &) = delete;
 
       class EventTimingCodesFramePrivate;
       EventTimingCodesFramePrivate *d;

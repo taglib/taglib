@@ -103,8 +103,8 @@ namespace TagLib {
       File(IOStream *stream);
 
     private:
-      File(const File &);
-      File &operator=(const File &);
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
 
       /*!
        * Reads the pages from the beginning of the file until enough to compose

@@ -152,8 +152,8 @@ namespace TagLib {
       static bool isSupported(IOStream *stream);
 
     private:
-      File(const File &);
-      File &operator=(const File &);
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
 
       void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       void scan();

@@ -99,8 +99,8 @@ namespace TagLib {
        */
       PrivateFrame(const ByteVector &data, Header *h);
 
-      PrivateFrame(const PrivateFrame &);
-      PrivateFrame &operator=(const PrivateFrame &);
+      PrivateFrame(const PrivateFrame &) = delete;
+      PrivateFrame &operator=(const PrivateFrame &) = delete;
 
       class PrivateFramePrivate;
       PrivateFramePrivate *d;

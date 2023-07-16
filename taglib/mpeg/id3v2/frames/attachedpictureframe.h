@@ -209,8 +209,8 @@ namespace TagLib {
       AttachedPictureFramePrivate *d;
 
     private:
-      AttachedPictureFrame(const AttachedPictureFrame &);
-      AttachedPictureFrame &operator=(const AttachedPictureFrame &);
+      AttachedPictureFrame(const AttachedPictureFrame &) = delete;
+      AttachedPictureFrame &operator=(const AttachedPictureFrame &) = delete;
       AttachedPictureFrame(const ByteVector &data, Header *h);
 
     };
