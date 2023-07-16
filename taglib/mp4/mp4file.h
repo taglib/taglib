@@ -26,11 +26,11 @@
 #ifndef TAGLIB_MP4FILE_H
 #define TAGLIB_MP4FILE_H
 
+#include "mp4tag.h"
 #include "tag.h"
 #include "tfile.h"
 #include "taglib_export.h"
 #include "mp4properties.h"
-#include "mp4tag.h"
 
 namespace TagLib {
   //! An implementation of MP4 (AAC, ALAC, ...) metadata

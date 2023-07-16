@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "apeitem.h"
+
 #include "tbytevectorlist.h"
 #include "tdebug.h"
-
-#include "apeitem.h"
 
 using namespace TagLib;
 using namespace APE;

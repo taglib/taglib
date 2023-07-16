@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "flacfile.h"
+
 #include "tbytevector.h"
 #include "tstring.h"
 #include "tlist.h"
@@ -37,7 +39,6 @@
 #include "xiphcomment.h"
 
 #include "flacpicture.h"
-#include "flacfile.h"
 #include "flacmetadatablock.h"
 #include "flacunknownmetadatablock.h"
 

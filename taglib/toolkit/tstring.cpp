@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tstring.h"
+
 #include <cerrno>
 #include <climits>
 
@@ -32,8 +34,6 @@
 #include "tstringlist.h"
 #include "trefcounter.h"
 #include "tutils.h"
-
-#include "tstring.h"
 
 namespace
 {

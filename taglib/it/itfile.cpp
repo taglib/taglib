@@ -24,8 +24,8 @@
  ***************************************************************************/
 
 
-#include "tstringlist.h"
 #include "itfile.h"
+#include "tstringlist.h"
 #include "tdebug.h"
 #include "modfileprivate.h"
 #include "tpropertymap.h"

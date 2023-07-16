@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tzlib.h"
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -32,8 +34,6 @@
 # include "tstring.h"
 # include "tdebug.h"
 #endif
-
-#include "tzlib.h"
 
 using namespace TagLib;
 

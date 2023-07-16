@@ -27,6 +27,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "fileref.h"
+
 #include <cstring>
 
 #include "tfile.h"
@@ -35,7 +37,6 @@
 #include "tdebug.h"
 #include "trefcounter.h"
 
-#include "fileref.h"
 #include "asffile.h"
 #include "mpegfile.h"
 #include "vorbisfile.h"

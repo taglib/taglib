@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tbytevector.h"
+
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -34,8 +36,6 @@
 #include "tdebug.h"
 #include "trefcounter.h"
 #include "tutils.h"
-
-#include "tbytevector.h"
 
 // This is a bit ugly to keep writing over and over again.
 

@@ -23,13 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tagutils.h"
+
 #include "tfile.h"
 
 #include "id3v1tag.h"
 #include "id3v2header.h"
 #include "apetag.h"
-
-#include "tagutils.h"
 
 using namespace TagLib;
 

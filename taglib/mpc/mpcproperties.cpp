@@ -23,12 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "mpcproperties.h"
+
 #include "tstring.h"
 #include "tdebug.h"
 #include <bitset>
 #include <cmath>
 
-#include "mpcproperties.h"
 #include "mpcfile.h"
 
 using namespace TagLib;

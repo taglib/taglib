@@ -23,11 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tableofcontentsframe.h"
+
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tdebug.h"
-
-#include "tableofcontentsframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;

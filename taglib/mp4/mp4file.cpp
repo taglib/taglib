@@ -23,14 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "mp4file.h"
+
 #include "tdebug.h"
 #include "tstring.h"
 #include "tpropertymap.h"
 #include "tagutils.h"
-
-#include "mp4atom.h"
-#include "mp4tag.h"
-#include "mp4file.h"
 
 using namespace TagLib;
 

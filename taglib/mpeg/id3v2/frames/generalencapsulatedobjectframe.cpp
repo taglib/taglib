@@ -26,10 +26,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "generalencapsulatedobjectframe.h"
+
 #include "tdebug.h"
 #include "tstringlist.h"
-
-#include "generalencapsulatedobjectframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;

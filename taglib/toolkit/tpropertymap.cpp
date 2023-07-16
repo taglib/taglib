@@ -23,10 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "tpropertymap.h"
-using namespace TagLib;
 
+using namespace TagLib;
 
 PropertyMap::PropertyMap() = default;
 

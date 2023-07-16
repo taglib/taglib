@@ -24,13 +24,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "apefooter.h"
+
 #include <iostream>
 #include <bitset>
 
 #include "tstring.h"
 #include "tdebug.h"
-
-#include "apefooter.h"
 
 using namespace TagLib;
 using namespace APE;

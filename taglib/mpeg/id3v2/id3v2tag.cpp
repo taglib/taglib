@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "id3v2tag.h"
+
 #include <algorithm>
 
 #include "tfile.h"
@@ -30,7 +32,6 @@
 #include "tpropertymap.h"
 #include "tdebug.h"
 
-#include "id3v2tag.h"
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
