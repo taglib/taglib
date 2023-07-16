@@ -25,8 +25,8 @@
 
 #include "attachedpictureframe.h"
 
-#include <tstringlist.h>
-#include <tdebug.h>
+#include "tstringlist.h"
+#include "tdebug.h"
 
 using namespace TagLib;
 using namespace ID3v2;

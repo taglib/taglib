@@ -31,11 +31,11 @@
 #include <sys/stat.h>
 #include <cstdlib>
 
-#include <tlist.h>
-#include <fileref.h>
-#include <tfile.h>
-#include <tag.h>
-#include <tpropertymap.h>
+#include "tlist.h"
+#include "fileref.h"
+#include "tfile.h"
+#include "tag.h"
+#include "tpropertymap.h"
 
 using namespace std;
 

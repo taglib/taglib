@@ -20,26 +20,26 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include  "config.h"
 #endif
 
 #include <cstdlib>
-#include <fileref.h>
-#include <tfile.h>
-#include <asffile.h>
-#include <vorbisfile.h>
-#include <mpegfile.h>
-#include <flacfile.h>
-#include <oggflacfile.h>
-#include <mpcfile.h>
-#include <wavpackfile.h>
-#include <speexfile.h>
-#include <trueaudiofile.h>
-#include <mp4file.h>
-#include <tag.h>
+#include "fileref.h"
+#include "tfile.h"
+#include "asffile.h"
+#include "vorbisfile.h"
+#include "mpegfile.h"
+#include "flacfile.h"
+#include "oggflacfile.h"
+#include "mpcfile.h"
+#include "wavpackfile.h"
+#include "speexfile.h"
+#include "trueaudiofile.h"
+#include "mp4file.h"
+#include "tag.h"
 #include <cstring>
-#include <id3v2framefactory.h>
-#include <tpropertymap.h>
+#include "id3v2framefactory.h"
+#include "tpropertymap.h"
 
 #include "tag_c.h"
 

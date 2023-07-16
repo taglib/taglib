@@ -25,9 +25,9 @@
 
 #include <bitset>
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <taglib.h>
+#include "tstring.h"
+#include "tdebug.h"
+#include "taglib.h"
 
 #include "oggpageheader.h"
 #include "oggfile.h"

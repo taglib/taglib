@@ -31,20 +31,20 @@
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #if defined(HAVE_MSC_BYTESWAP)
-# include <stdlib.h>
+# include "stdlib.h"
 #elif defined(HAVE_GLIBC_BYTESWAP)
-# include <byteswap.h>
+# include "byteswap.h"
 #elif defined(HAVE_MAC_BYTESWAP)
 # include <libkern/OSByteOrder.h>
 #elif defined(HAVE_OPENBSD_BYTESWAP)
 # include <sys/endian.h>
 #endif
 
-#include <tstring.h>
+#include "tstring.h"
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>

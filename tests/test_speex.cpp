@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <speexfile.h>
-#include <oggpageheader.h>
+#include "speexfile.h"
+#include "oggpageheader.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

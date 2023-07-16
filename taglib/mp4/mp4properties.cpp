@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tstring.h>
+#include "tdebug.h"
+#include "tstring.h"
 #include "mp4file.h"
 #include "mp4atom.h"
 #include "mp4properties.h"

@@ -31,14 +31,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevector.h>
-#include <tstring.h>
-#include <tdebug.h>
-#include <tagunion.h>
-#include <id3v1tag.h>
-#include <id3v2header.h>
-#include <tpropertymap.h>
-#include <tagutils.h>
+#include "tbytevector.h"
+#include "tstring.h"
+#include "tdebug.h"
+#include "tagunion.h"
+#include "id3v1tag.h"
+#include "id3v2header.h"
+#include "tpropertymap.h"
+#include "tagutils.h"
 
 #include "apefile.h"
 #include "apetag.h"

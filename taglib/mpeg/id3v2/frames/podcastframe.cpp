@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include "podcastframe.h"
-#include <tpropertymap.h>
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace ID3v2;

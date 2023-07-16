@@ -28,10 +28,10 @@
 
 #include <utf8-cpp/checked.h>
 
-#include <tdebug.h>
-#include <tstringlist.h>
-#include <trefcounter.h>
-#include <tutils.h>
+#include "tdebug.h"
+#include "tstringlist.h"
+#include "trefcounter.h"
+#include "tutils.h"
 
 #include "tstring.h"
 

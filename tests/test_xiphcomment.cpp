@@ -25,10 +25,10 @@
 
 #include <string>
 #include <cstdio>
-#include <xiphcomment.h>
-#include <vorbisfile.h>
-#include <tpropertymap.h>
-#include <tdebug.h>
+#include "xiphcomment.h"
+#include "vorbisfile.h"
+#include "tpropertymap.h"
+#include "tdebug.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

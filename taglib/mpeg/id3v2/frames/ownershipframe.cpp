@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tstringlist.h>
-#include <id3v2tag.h>
+#include "tdebug.h"
+#include "tstringlist.h"
+#include "id3v2tag.h"
 
 #include "ownershipframe.h"
 

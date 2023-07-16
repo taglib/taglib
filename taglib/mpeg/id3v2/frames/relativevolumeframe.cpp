@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tdebug.h>
-#include <tmap.h>
+#include "tdebug.h"
+#include "tmap.h"
 
 #include "relativevolumeframe.h"
 

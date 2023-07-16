@@ -24,13 +24,13 @@
  ***************************************************************************/
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #ifdef HAVE_ZLIB
 # include <zlib.h>
-# include <tstring.h>
-# include <tdebug.h>
+# include "tstring.h"
+# include "tdebug.h"
 #endif
 
 #include "tzlib.h"

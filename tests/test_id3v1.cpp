@@ -25,10 +25,10 @@
 
 #include <string>
 #include <cstdio>
-#include <tstring.h>
-#include <mpegfile.h>
-#include <id3v1tag.h>
-#include <id3v1genres.h>
+#include "tstring.h"
+#include "mpegfile.h"
+#include "id3v1tag.h"
+#include "id3v1genres.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

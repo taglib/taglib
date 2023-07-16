@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevectorstream.h>
+#include "tbytevectorstream.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;

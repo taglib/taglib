@@ -26,7 +26,7 @@
 #ifndef TAGLIB_PLAINFILE_H
 #define TAGLIB_PLAINFILE_H
 
-#include <tfile.h>
+#include "tfile.h"
 
 using namespace TagLib;
 

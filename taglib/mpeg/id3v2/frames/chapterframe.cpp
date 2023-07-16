@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tbytevectorlist.h>
-#include <tpropertymap.h>
-#include <tdebug.h>
+#include "tbytevectorlist.h"
+#include "tpropertymap.h"
+#include "tdebug.h"
 #include <cstdio>
 
 #include "chapterframe.h"

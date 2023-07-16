@@ -27,10 +27,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <tstring.h>
-#include <tdebug.h>
+#include "tstring.h"
+#include "tdebug.h"
 
-#include <oggpageheader.h>
+#include "oggpageheader.h"
 
 #include "opusproperties.h"
 #include "opusfile.h"

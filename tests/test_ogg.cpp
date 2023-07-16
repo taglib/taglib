@@ -25,13 +25,13 @@
 
 #include <string>
 #include <cstdio>
-#include <tag.h>
-#include <tstringlist.h>
-#include <tbytevectorlist.h>
-#include <tpropertymap.h>
-#include <oggfile.h>
-#include <vorbisfile.h>
-#include <oggpageheader.h>
+#include "tag.h"
+#include "tstringlist.h"
+#include "tbytevectorlist.h"
+#include "tpropertymap.h"
+#include "oggfile.h"
+#include "vorbisfile.h"
+#include "oggpageheader.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

@@ -30,10 +30,10 @@
 #include <cstdio>
 #include <cstring>
 
-#include <tstring.h>
-#include <tdebug.h>
-#include <trefcounter.h>
-#include <tutils.h>
+#include "tstring.h"
+#include "tdebug.h"
+#include "trefcounter.h"
+#include "tutils.h"
 
 #include "tbytevector.h"
 
