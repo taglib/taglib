@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <xiphcomment.h>
 #include <vorbisfile.h>
 #include <tpropertymap.h>

@@ -24,7 +24,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include <stdio.h>
+#include <cstdio>
 
 #include <fileref.h>
 #include <tag.h>

@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <id3v2tag.h>
 #include <infotag.h>
 #include <tbytevectorlist.h>

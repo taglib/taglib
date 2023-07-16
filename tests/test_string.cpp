@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <tstring.h>
-#include <string.h>
+#include <cstring>
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
@@ -368,4 +368,3 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestString);
-

@@ -27,7 +27,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <stdint.h>
+#include <cstdint>
 #include <tstring.h>
 #include <tdebug.h>
 

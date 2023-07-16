@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <id3v1tag.h>
 #include <id3v2tag.h>
 #include <tpropertymap.h>
