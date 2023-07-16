@@ -48,13 +48,9 @@ public:
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
 
-StringHandler::StringHandler()
-{
-}
+StringHandler::StringHandler() = default;
 
-StringHandler::~StringHandler()
-{
-}
+StringHandler::~StringHandler() = default;
 
 String RIFF::Info::StringHandler::parse(const ByteVector &data) const
 {

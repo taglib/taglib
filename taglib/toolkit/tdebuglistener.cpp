@@ -56,7 +56,7 @@ namespace
 
       std::cerr << msg;
 
-#endif 
+#endif
     }
   };
 
@@ -67,13 +67,9 @@ namespace TagLib
 {
   DebugListener *debugListener = &defaultListener;
 
-  DebugListener::DebugListener()
-  {
-  }
+  DebugListener::DebugListener() = default;
 
-  DebugListener::~DebugListener()
-  {
-  }
+  DebugListener::~DebugListener() = default;
 
   void setDebugListener(DebugListener *listener)
   {

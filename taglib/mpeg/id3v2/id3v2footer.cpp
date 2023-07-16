@@ -38,9 +38,7 @@ Footer::Footer() :
 {
 }
 
-Footer::~Footer()
-{
-}
+Footer::~Footer() = default;
 
 unsigned int Footer::size()
 {

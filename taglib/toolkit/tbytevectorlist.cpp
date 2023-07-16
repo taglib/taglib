@@ -64,20 +64,14 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-ByteVectorList::ByteVectorList()
-{
-
-}
+ByteVectorList::ByteVectorList() = default;
 
 ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
 {
 
 }
 
-ByteVectorList::~ByteVectorList()
-{
-
-}
+ByteVectorList::~ByteVectorList() = default;
 
 ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {

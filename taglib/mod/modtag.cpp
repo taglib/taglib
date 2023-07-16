@@ -34,9 +34,7 @@ using namespace Mod;
 class Mod::Tag::TagPrivate
 {
 public:
-  TagPrivate()
-  {
-  }
+  TagPrivate() = default;
 
   String title;
   String comment;
