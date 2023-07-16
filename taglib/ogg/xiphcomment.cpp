@@ -234,8 +234,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
 
   // now go through keys in \a properties and check that the values match those in the xiph comment
   PropertyMap invalid;
-  auto it = properties.begin();
-  for(; it != properties.end(); ++it)
+  for(auto it = properties.begin(); it != properties.end(); ++it)
   {
     if(!checkKey(it->first))
       invalid.insert(it->first, it->second);
@@ -366,16 +365,14 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   // std::pair<String, StringList> where the first String is the field name and
   // the StringList is the values associated with that field.
 
-  auto it = d->fieldListMap.cbegin();
-  for(; it != d->fieldListMap.cend(); ++it) {
+  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
 
     // And now iterate over the values of the current list.
 
     String fieldName = (*it).first;
     const StringList values = (*it).second;
 
-    auto valuesIt = values.begin();
-    for(; valuesIt != values.end(); ++valuesIt) {
+    for(auto valuesIt = values.begin(); valuesIt != values.end(); ++valuesIt) {
       ByteVector fieldData = fieldName.data(String::UTF8);
       fieldData.append('=');
       fieldData.append((*valuesIt).data(String::UTF8));

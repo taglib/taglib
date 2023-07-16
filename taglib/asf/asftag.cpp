@@ -287,12 +287,10 @@ PropertyMap ASF::Tag::properties() const
     props["COMMENT"] = d->comment;
   }
 
-  auto it = d->attributeListMap.cbegin();
-  for(; it != d->attributeListMap.cend(); ++it) {
+  for(auto it = d->attributeListMap.cbegin(); it != d->attributeListMap.cend(); ++it) {
     const String key = translateKey(it->first);
     if(!key.isEmpty()) {
-      auto it2 = it->second.begin();
-      for(; it2 != it->second.end(); ++it2) {
+      for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
         if(key == "TRACKNUMBER") {
           if(it2->type() == ASF::Attribute::DWordType)
             props.insert(key, String::number(it2->toUInt()));
@@ -313,8 +311,7 @@ PropertyMap ASF::Tag::properties() const
 
 void ASF::Tag::removeUnsupportedProperties(const StringList &props)
 {
-  auto it = props.begin();
-  for(; it != props.end(); ++it)
+  for(auto it = props.begin(); it != props.end(); ++it)
     d->attributeListMap.erase(*it);
 }
 
@@ -355,8 +352,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
     if(reverseKeyMap.contains(it->first)) {
       String name = reverseKeyMap[it->first];
       removeItem(name);
-      auto it2 = it->second.begin();
-      for(; it2 != it->second.end(); ++it2) {
+      for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
         addAttribute(name, *it2);
       }
     }

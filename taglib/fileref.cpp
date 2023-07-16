@@ -74,8 +74,7 @@ namespace
     if(::strlen(fileName) == 0)
       return nullptr;
 #endif
-    auto it = fileTypeResolvers.cbegin();
-    for(; it != fileTypeResolvers.cend(); ++it) {
+    for(auto it = fileTypeResolvers.cbegin(); it != fileTypeResolvers.cend(); ++it) {
       File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
       if(file)
         return file;
@@ -87,10 +86,8 @@ namespace
   File *detectByResolvers(IOStream* stream, bool readAudioProperties,
                           AudioProperties::ReadStyle audioPropertiesStyle)
   {
-    for(auto it = fileTypeResolvers.cbegin();
-        it != fileTypeResolvers.cend(); ++it) {
-      if(auto streamResolver =
-           dynamic_cast<const FileRef::StreamTypeResolver*>(*it)) {
+    for(auto it = fileTypeResolvers.cbegin(); it != fileTypeResolvers.cend(); ++it) {
+      if(auto streamResolver = dynamic_cast<const FileRef::StreamTypeResolver*>(*it)) {
         if(File *file = streamResolver->createFileFromStream(
              stream, readAudioProperties, audioPropertiesStyle))
           return file;
