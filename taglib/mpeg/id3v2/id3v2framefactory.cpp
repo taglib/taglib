@@ -58,7 +58,7 @@ namespace
     StringList fields = frame->fieldList();
     StringList newfields;
 
-    for(StringList::ConstIterator it = fields.cbegin(); it != fields.cend(); ++it) {
+    for(auto it = fields.cbegin(); it != fields.cend(); ++it) {
       String s = *it;
       int offset = 0;
       int end = 0;
@@ -119,7 +119,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
 {
   ByteVector data = origData;
   unsigned int version = tagHeader->majorVersion();
-  Frame::Header *header = new Frame::Header(data, version);
+  auto header = new Frame::Header(data, version);
   ByteVector frameID = header->frameID();
 
   // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
@@ -144,7 +144,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   }
 #endif
 
-  for(ByteVector::ConstIterator it = frameID.cbegin(); it != frameID.cend(); it++) {
+  for(auto it = frameID.cbegin(); it != frameID.cend(); it++) {
     if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
       delete header;
       return nullptr;
@@ -206,7 +206,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // Comments (frames 4.10)
 
   if(frameID == "COMM") {
-    CommentsFrame *f = new CommentsFrame(data, header);
+    auto f = new CommentsFrame(data, header);
     d->setTextEncoding(f);
     return f;
   }
@@ -214,7 +214,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // Attached Picture (frames 4.14)
 
   if(frameID == "APIC") {
-    AttachedPictureFrame *f = new AttachedPictureFrame(data, header);
+    auto f = new AttachedPictureFrame(data, header);
     d->setTextEncoding(f);
     return f;
   }
@@ -240,7 +240,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // General Encapsulated Object (frames 4.15)
 
   if(frameID == "GEOB") {
-    GeneralEncapsulatedObjectFrame *f = new GeneralEncapsulatedObjectFrame(data, header);
+    auto f = new GeneralEncapsulatedObjectFrame(data, header);
     d->setTextEncoding(f);
     return f;
   }
@@ -251,7 +251,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
     if(frameID != "WXXX") {
       return new UrlLinkFrame(data, header);
     }
-    UserUrlLinkFrame *f = new UserUrlLinkFrame(data, header);
+    auto f = new UserUrlLinkFrame(data, header);
     d->setTextEncoding(f);
     return f;
   }
@@ -259,7 +259,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // Unsynchronized lyric/text transcription (frames 4.8)
 
   if(frameID == "USLT") {
-    UnsynchronizedLyricsFrame *f = new UnsynchronizedLyricsFrame(data, header);
+    auto f = new UnsynchronizedLyricsFrame(data, header);
     if(d->useDefaultEncoding)
       f->setTextEncoding(d->defaultEncoding);
     return f;
@@ -268,7 +268,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // Synchronized lyrics/text (frames 4.9)
 
   if(frameID == "SYLT") {
-    SynchronizedLyricsFrame *f = new SynchronizedLyricsFrame(data, header);
+    auto f = new SynchronizedLyricsFrame(data, header);
     if(d->useDefaultEncoding)
       f->setTextEncoding(d->defaultEncoding);
     return f;
@@ -292,7 +292,7 @@ Frame *FrameFactory::createFrame(const ByteVector &origData, const Header *tagHe
   // Ownership (frames 4.22)
 
   if(frameID == "OWNE") {
-    OwnershipFrame *f = new OwnershipFrame(data, header);
+    auto f = new OwnershipFrame(data, header);
     d->setTextEncoding(f);
     return f;
   }

@@ -95,7 +95,7 @@ ByteVector Ogg::File::packet(unsigned int i)
 
   // Look for the first page in which the requested packet starts.
 
-  List<Page *>::ConstIterator it = d->pages.cbegin();
+  auto it = d->pages.cbegin();
   while((*it)->containsPacket(i) == Page::DoesNotContainPacket)
     ++it;
 
@@ -213,7 +213,7 @@ bool Ogg::File::readPages(unsigned int i)
 
     // Read the next page and add it to the page list.
 
-    Page *nextPage = new Page(this, offset);
+    auto nextPage = new Page(this, offset);
     if(!nextPage->header()->isValid()) {
       delete nextPage;
       return false;
@@ -236,7 +236,7 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
 
   // Look for the pages where the requested packet should belong to.
 
-  List<Page *>::ConstIterator it = d->pages.cbegin();
+  auto it = d->pages.cbegin();
   while((*it)->containsPacket(i) == Page::DoesNotContainPacket)
     ++it;
 

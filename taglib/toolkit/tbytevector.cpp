@@ -467,7 +467,7 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 {
   detach();
 
-  for(ByteVector::Iterator it = begin(); it != end(); ++it) {
+  for(auto it = begin(); it != end(); ++it) {
     if(*it == oldByte)
       *it = newByte;
   }
@@ -868,8 +868,8 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
 
   ByteVector output(len);
 
-  const unsigned char * src = reinterpret_cast<const unsigned char*>(input.data());
-  unsigned char *       dst = reinterpret_cast<unsigned char*>(output.data());
+  auto src = reinterpret_cast<const unsigned char*>(input.data());
+  auto dst = reinterpret_cast<unsigned char*>(output.data());
 
   while(4 <= len) {
 

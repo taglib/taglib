@@ -67,7 +67,7 @@ namespace
     if(frameID.size() != 4)
       return false;
 
-    for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
+    for(auto it = frameID.begin(); it != frameID.end(); it++) {
       if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
         return false;
       }
@@ -108,11 +108,11 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   if(!frameID.isEmpty()) {
     // Apple proprietary WFED (Podcast URL), MVNM (Movement Name), MVIN (Movement Number), GRP1 (Grouping) are in fact text frames.
     if(frameID[0] == 'T' || frameID == "WFED" || frameID == "MVNM" || frameID == "MVIN" || frameID == "GRP1"){ // text frame
-      TextIdentificationFrame *frame = new TextIdentificationFrame(frameID, String::UTF8);
+      auto frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
     } if((frameID[0] == 'W') && (values.size() == 1)){  // URL frame (not WXXX); support only one value
-        UrlLinkFrame* frame = new UrlLinkFrame(frameID);
+        auto frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;
     } if(frameID == "PCST") {
@@ -120,27 +120,27 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
     }
   }
   if(key == "MUSICBRAINZ_TRACKID" && values.size() == 1) {
-    UniqueFileIdentifierFrame *frame = new UniqueFileIdentifierFrame("http://musicbrainz.org", values.front().data(String::UTF8));
+    auto frame = new UniqueFileIdentifierFrame("http://musicbrainz.org", values.front().data(String::UTF8));
     return frame;
   }
   // now we check if it's one of the "special" cases:
   // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
   if((key == "LYRICS" || key.startsWith(lyricsPrefix)) && values.size() == 1){
-    UnsynchronizedLyricsFrame *frame = new UnsynchronizedLyricsFrame(String::UTF8);
+    auto frame = new UnsynchronizedLyricsFrame(String::UTF8);
     frame->setDescription(key == "LYRICS" ? key : key.substr(lyricsPrefix.size()));
     frame->setText(values.front());
     return frame;
   }
   // -URL: depending on the number of values, use WXXX or TXXX (with description=URL)
   if((key == "URL" || key.startsWith(urlPrefix)) && values.size() == 1){
-    UserUrlLinkFrame *frame = new UserUrlLinkFrame(String::UTF8);
+    auto frame = new UserUrlLinkFrame(String::UTF8);
     frame->setDescription(key == "URL" ? key : key.substr(urlPrefix.size()));
     frame->setUrl(values.front());
     return frame;
   }
   // -COMMENT: depending on the number of values, use COMM or TXXX (with description=COMMENT)
   if((key == "COMMENT" || key.startsWith(commentPrefix)) && values.size() == 1){
-    CommentsFrame *frame = new CommentsFrame(String::UTF8);
+    auto frame = new CommentsFrame(String::UTF8);
     if (key != "COMMENT"){
       frame->setDescription(key.substr(commentPrefix.size()));
     }
@@ -290,7 +290,7 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   if(encoding != String::Latin1)
     return encoding;
 
-  for(StringList::ConstIterator it = fields.begin(); it != fields.end(); ++it) {
+  for(auto it = fields.begin(); it != fields.end(); ++it) {
     if(!(*it).isLatin1()) {
       if(header()->version() == 4) {
         debug("Frame::checkEncoding() -- Rendering using UTF8.");
@@ -475,7 +475,7 @@ void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFram
   singleFrameProperties.clear();
   tiplProperties.clear();
   tmclProperties.clear();
-  for(PropertyMap::ConstIterator it = original.begin(); it != original.end(); ++it) {
+  for(auto it = original.begin(); it != original.end(); ++it) {
     if(TextIdentificationFrame::involvedPeopleMap().contains(it->first))
       tiplProperties.insert(it->first, it->second);
     else if(it->first.startsWith(TextIdentificationFrame::instrumentPrefix))

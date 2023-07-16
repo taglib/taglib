@@ -38,7 +38,7 @@ PropertyMap::PropertyMap(const PropertyMap &m) : SimplePropertyMap(m), unsupport
 
 PropertyMap::PropertyMap(const SimplePropertyMap &m)
 {
-  for(SimplePropertyMap::ConstIterator it = m.begin(); it != m.end(); ++it){
+  for(auto it = m.begin(); it != m.end(); ++it){
     String key = it->first.upper();
     if(!key.isEmpty())
       insert(it->first, it->second);
@@ -54,7 +54,7 @@ PropertyMap::~PropertyMap()
 bool PropertyMap::insert(const String &key, const StringList &values)
 {
   String realKey = key.upper();
-  Iterator result = SimplePropertyMap::find(realKey);
+  auto result = SimplePropertyMap::find(realKey);
   if(result == end())
     SimplePropertyMap::insert(realKey, values);
   else
@@ -87,7 +87,7 @@ bool PropertyMap::contains(const String &key) const
 
 bool PropertyMap::contains(const PropertyMap &other) const
 {
-  for(ConstIterator it = other.begin(); it != other.end(); ++it) {
+  for(auto it = other.begin(); it != other.end(); ++it) {
     if(!SimplePropertyMap::contains(it->first))
       return false;
     if ((*this)[it->first] != it->second)
@@ -104,14 +104,14 @@ PropertyMap &PropertyMap::erase(const String &key)
 
 PropertyMap &PropertyMap::erase(const PropertyMap &other)
 {
-  for(ConstIterator it = other.begin(); it != other.end(); ++it)
+  for(auto it = other.begin(); it != other.end(); ++it)
     erase(it->first);
   return *this;
 }
 
 PropertyMap &PropertyMap::merge(const PropertyMap &other)
 {
-  for(PropertyMap::ConstIterator it = other.begin(); it != other.end(); ++it)
+  for(auto it = other.begin(); it != other.end(); ++it)
     insert(it->first, it->second);
   unsupported.append(other.unsupported);
   return *this;
@@ -135,13 +135,13 @@ StringList &PropertyMap::operator[](const String &key)
 
 bool PropertyMap::operator==(const PropertyMap &other) const
 {
-  for(ConstIterator it = other.begin(); it != other.end(); ++it) {
-    ConstIterator thisFind = find(it->first);
+  for(auto it = other.begin(); it != other.end(); ++it) {
+    auto thisFind = find(it->first);
     if( thisFind == end() || (thisFind->second != it->second) )
       return false;
   }
-  for(ConstIterator it = begin(); it != end(); ++it) {
-    ConstIterator otherFind = other.find(it->first);
+  for(auto it = begin(); it != end(); ++it) {
+    auto otherFind = other.find(it->first);
     if( otherFind == other.end() || (otherFind->second != it->second) )
       return false;
   }
@@ -157,7 +157,7 @@ String PropertyMap::toString() const
 {
   String ret;
 
-  for(ConstIterator it = begin(); it != end(); ++it)
+  for(auto it = begin(); it != end(); ++it)
     ret += it->first+"="+it->second.toString(", ") + "\n";
   if(!unsupported.isEmpty())
     ret += "Unsupported Data: " + unsupported.toString(", ") + "\n";
@@ -167,7 +167,7 @@ String PropertyMap::toString() const
 void PropertyMap::removeEmpty()
 {
   PropertyMap m;
-  for(ConstIterator it = cbegin(); it != cend(); ++it) {
+  for(auto it = cbegin(); it != cend(); ++it) {
     if(!it->second.isEmpty())
       m.insert(it->first, it->second);
   }

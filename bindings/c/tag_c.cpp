@@ -136,13 +136,13 @@ BOOL taglib_file_is_valid(const TagLib_File *file)
 
 TagLib_Tag *taglib_file_tag(const TagLib_File *file)
 {
-  const File *f = reinterpret_cast<const File *>(file);
+  auto f = reinterpret_cast<const File *>(file);
   return reinterpret_cast<TagLib_Tag *>(f->tag());
 }
 
 const TagLib_AudioProperties *taglib_file_audioproperties(const TagLib_File *file)
 {
-  const File *f = reinterpret_cast<const File *>(file);
+  auto f = reinterpret_cast<const File *>(file);
   return reinterpret_cast<const TagLib_AudioProperties *>(f->audioProperties());
 }
 
@@ -259,7 +259,7 @@ void taglib_tag_free_strings()
   if(!stringManagementEnabled)
     return;
 
-  for(List<char *>::ConstIterator it = strings.cbegin(); it != strings.cend(); ++it)
+  for(auto it = strings.cbegin(); it != strings.cend(); ++it)
     free(*it);
   strings.clear();
 }
@@ -270,25 +270,25 @@ void taglib_tag_free_strings()
 
 int taglib_audioproperties_length(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->lengthInSeconds();
 }
 
 int taglib_audioproperties_bitrate(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->bitrate();
 }
 
 int taglib_audioproperties_samplerate(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->sampleRate();
 }
 
 int taglib_audioproperties_channels(const TagLib_AudioProperties *audioProperties)
 {
-  const AudioProperties *p = reinterpret_cast<const AudioProperties *>(audioProperties);
+  auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->channels();
 }
 
@@ -326,11 +326,11 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
   if(file == NULL || prop == NULL)
     return;
 
-  File *tfile = reinterpret_cast<File *>(file);
+  auto tfile = reinterpret_cast<File *>(file);
   PropertyMap map = tfile->tag()->properties();
 
   if(value) {
-    TagLib::PropertyMap::Iterator property = map.find(prop);
+    auto property = map.find(prop);
     if(property == map.end()) {
       map.insert(prop, StringList(value));
     }
@@ -371,7 +371,7 @@ char** taglib_property_keys(TagLib_File *file)
   if(map.isEmpty())
     return NULL;
 
-  char **props = static_cast<char **>(malloc(sizeof(char *) * (map.size() + 1)));
+  auto props = static_cast<char **>(malloc(sizeof(char *) * (map.size() + 1)));
   char **pp = props;
 
   for(const auto &i : map) {
@@ -389,11 +389,11 @@ char **taglib_property_get(TagLib_File *file, const char *prop)
 
   const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
 
-  TagLib::PropertyMap::ConstIterator property = map.find(prop);
+  auto property = map.find(prop);
   if(property == map.end())
     return NULL;
 
-  char **props = static_cast<char **>(malloc(sizeof(char *) * (property->second.size() + 1)));
+  auto props = static_cast<char **>(malloc(sizeof(char *) * (property->second.size() + 1)));
   char **pp = props;
 
   for(const auto &i : property->second) {

@@ -167,7 +167,7 @@ public:
 
     {
       Vorbis::File f(newname.c_str());
-      FLAC::Picture *newpic = new FLAC::Picture();
+      auto newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
       newpic->setWidth(5);
       newpic->setHeight(6);

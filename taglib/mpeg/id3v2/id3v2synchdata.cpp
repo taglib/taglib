@@ -83,8 +83,8 @@ ByteVector SynchData::decode(const ByteVector &data)
 
   ByteVector result(data.size());
 
-  ByteVector::ConstIterator src = data.begin();
-  ByteVector::Iterator dst = result.begin();
+  auto src = data.begin();
+  auto dst = result.begin();
 
   while(src < data.end() - 1) {
     *dst++ = *src++;

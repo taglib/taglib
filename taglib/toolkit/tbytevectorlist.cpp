@@ -83,7 +83,7 @@ ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {
   ByteVector v;
 
-  ConstIterator it = begin();
+  auto it = begin();
 
   while(it != end()) {
     v.append(*it);

@@ -126,7 +126,7 @@ public:
       List<FLAC::Picture *> lst = f.pictureList();
       CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
-      FLAC::Picture *newpic = new FLAC::Picture();
+      auto newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
       newpic->setWidth(5);
       newpic->setHeight(6);
@@ -175,7 +175,7 @@ public:
       List<FLAC::Picture *> lst = f.pictureList();
       CPPUNIT_ASSERT_EQUAL((unsigned int)1, lst.size());
 
-      FLAC::Picture *newpic = new FLAC::Picture();
+      auto newpic = new FLAC::Picture();
       newpic->setType(FLAC::Picture::BackCover);
       newpic->setWidth(5);
       newpic->setHeight(6);
@@ -616,7 +616,7 @@ public:
       CPPUNIT_ASSERT(!f.hasXiphComment());
       CPPUNIT_ASSERT(f.pictureList().isEmpty());
 
-      FLAC::Picture *pic = new FLAC::Picture;
+      auto pic = new FLAC::Picture;
       pic->setData(picData);
       pic->setType(FLAC::Picture::FrontCover);
       pic->setMimeType("image/png");

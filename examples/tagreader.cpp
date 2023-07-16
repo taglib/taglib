@@ -56,15 +56,15 @@ int main(int argc, char *argv[])
       TagLib::PropertyMap tags = f.file()->properties();
 
       unsigned int longest = 0;
-      for(TagLib::PropertyMap::ConstIterator i = tags.cbegin(); i != tags.cend(); ++i) {
+      for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
         if (i->first.size() > longest) {
           longest = i->first.size();
         }
       }
 
       cout << "-- TAG (properties) --" << endl;
-      for(TagLib::PropertyMap::ConstIterator i = tags.cbegin(); i != tags.cend(); ++i) {
-        for(TagLib::StringList::ConstIterator j = i->second.begin(); j != i->second.end(); ++j) {
+      for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
+        for(auto j = i->second.begin(); j != i->second.end(); ++j) {
           cout << left << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
         }
       }

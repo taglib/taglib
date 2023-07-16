@@ -287,11 +287,11 @@ PropertyMap ASF::Tag::properties() const
     props["COMMENT"] = d->comment;
   }
 
-  ASF::AttributeListMap::ConstIterator it = d->attributeListMap.cbegin();
+  auto it = d->attributeListMap.cbegin();
   for(; it != d->attributeListMap.cend(); ++it) {
     const String key = translateKey(it->first);
     if(!key.isEmpty()) {
-      AttributeList::ConstIterator it2 = it->second.begin();
+      auto it2 = it->second.begin();
       for(; it2 != it->second.end(); ++it2) {
         if(key == "TRACKNUMBER") {
           if(it2->type() == ASF::Attribute::DWordType)
@@ -313,7 +313,7 @@ PropertyMap ASF::Tag::properties() const
 
 void ASF::Tag::removeUnsupportedProperties(const StringList &props)
 {
-  StringList::ConstIterator it = props.begin();
+  auto it = props.begin();
   for(; it != props.end(); ++it)
     d->attributeListMap.erase(*it);
 }
@@ -328,7 +328,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   }
 
   const PropertyMap origProps = properties();
-  PropertyMap::ConstIterator it = origProps.begin();
+  auto it = origProps.begin();
   for(; it != origProps.end(); ++it) {
     if(!props.contains(it->first) || props[it->first].isEmpty()) {
       if(it->first == "TITLE") {
@@ -355,7 +355,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
     if(reverseKeyMap.contains(it->first)) {
       String name = reverseKeyMap[it->first];
       removeItem(name);
-      StringList::ConstIterator it2 = it->second.begin();
+      auto it2 = it->second.begin();
       for(; it2 != it->second.end(); ++it2) {
         addAttribute(name, *it2);
       }

@@ -191,7 +191,7 @@ void Ogg::XiphComment::setTrack(unsigned int i)
 
 bool Ogg::XiphComment::isEmpty() const
 {
-  for(FieldConstIterator it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
+  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
     if(!(*it).second.isEmpty())
       return false;
   }
@@ -203,7 +203,7 @@ unsigned int Ogg::XiphComment::fieldCount() const
 {
   unsigned int count = 0;
 
-  for(FieldConstIterator it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
+  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
     count += (*it).second.size();
 
   count += d->pictureList.size();
@@ -225,16 +225,16 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
 {
   // check which keys are to be deleted
   StringList toRemove;
-  for(FieldConstIterator it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
+  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
     if (!properties.contains(it->first))
       toRemove.append(it->first);
 
-  for(StringList::ConstIterator it = toRemove.cbegin(); it != toRemove.cend(); ++it)
+  for(auto it = toRemove.cbegin(); it != toRemove.cend(); ++it)
       removeFields(*it);
 
   // now go through keys in \a properties and check that the values match those in the xiph comment
   PropertyMap invalid;
-  PropertyMap::ConstIterator it = properties.begin();
+  auto it = properties.begin();
   for(; it != properties.end(); ++it)
   {
     if(!checkKey(it->first))
@@ -246,7 +246,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
         removeFields(it->first);
       else {
         // replace all strings in the list for the tag
-        StringList::ConstIterator valueIterator = sl.begin();
+        auto valueIterator = sl.begin();
         addField(it->first, *valueIterator, true);
         ++valueIterator;
         for(; valueIterator != sl.end(); ++valueIterator)
@@ -301,7 +301,7 @@ void Ogg::XiphComment::removeFields(const String &key)
 void Ogg::XiphComment::removeFields(const String &key, const String &value)
 {
   StringList &fields = d->fieldListMap[key.upper()];
-  for(StringList::Iterator it = fields.begin(); it != fields.end(); ) {
+  for(auto it = fields.begin(); it != fields.end(); ) {
     if(*it == value)
       it = fields.erase(it);
     else
@@ -321,7 +321,7 @@ bool Ogg::XiphComment::contains(const String &key) const
 
 void Ogg::XiphComment::removePicture(FLAC::Picture *picture, bool del)
 {
-  PictureIterator it = d->pictureList.find(picture);
+  auto it = d->pictureList.find(picture);
   if(it != d->pictureList.end())
     d->pictureList.erase(it);
 
@@ -366,7 +366,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   // std::pair<String, StringList> where the first String is the field name and
   // the StringList is the values associated with that field.
 
-  FieldListMap::ConstIterator it = d->fieldListMap.cbegin();
+  auto it = d->fieldListMap.cbegin();
   for(; it != d->fieldListMap.cend(); ++it) {
 
     // And now iterate over the values of the current list.
@@ -374,7 +374,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     String fieldName = (*it).first;
     const StringList values = (*it).second;
 
-    StringList::ConstIterator valuesIt = values.begin();
+    auto valuesIt = values.begin();
     for(; valuesIt != values.end(); ++valuesIt) {
       ByteVector fieldData = fieldName.data(String::UTF8);
       fieldData.append('=');
@@ -385,7 +385,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
     }
   }
 
-  for(PictureConstIterator it = d->pictureList.cbegin(); it != d->pictureList.cend(); ++it) {
+  for(auto it = d->pictureList.cbegin(); it != d->pictureList.cend(); ++it) {
     ByteVector picture = (*it)->render().toBase64();
     data.append(ByteVector::fromUInt(picture.size() + 23, false));
     data.append("METADATA_BLOCK_PICTURE=");
@@ -472,7 +472,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
         // Decode FLAC Picture
 
-        FLAC::Picture * picture = new FLAC::Picture();
+        auto picture = new FLAC::Picture();
         if(picture->parse(picturedata)) {
           d->pictureList.append(picture);
         }
@@ -485,7 +485,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
         // Assume it's some type of image file
 
-        FLAC::Picture * picture = new FLAC::Picture();
+        auto picture = new FLAC::Picture();
         picture->setData(picturedata);
         picture->setMimeType("image/");
         picture->setType(FLAC::Picture::Other);

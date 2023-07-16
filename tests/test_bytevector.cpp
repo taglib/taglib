@@ -357,8 +357,8 @@ public:
     ByteVector v1("taglib");
     ByteVector v2 = v1;
 
-    ByteVector::Iterator it1 = v1.begin();
-    ByteVector::Iterator it2 = v2.begin();
+    auto it1 = v1.begin();
+    auto it2 = v2.begin();
 
     CPPUNIT_ASSERT_EQUAL('t', *it1);
     CPPUNIT_ASSERT_EQUAL('t', *it2);
@@ -371,8 +371,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v1);
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglIb"), v2);
 
-    ByteVector::ReverseIterator it3 = v1.rbegin();
-    ByteVector::ReverseIterator it4 = v2.rbegin();
+    auto it3 = v1.rbegin();
+    auto it4 = v2.rbegin();
 
     CPPUNIT_ASSERT_EQUAL('b', *it3);
     CPPUNIT_ASSERT_EQUAL('b', *it4);

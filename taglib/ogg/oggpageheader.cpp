@@ -295,7 +295,7 @@ ByteVector Ogg::PageHeader::lacingValues() const
 {
   ByteVector data;
 
-  for(List<int>::ConstIterator it = d->packetSizes.cbegin(); it != d->packetSizes.cend(); ++it) {
+  for(auto it = d->packetSizes.cbegin(); it != d->packetSizes.cend(); ++it) {
 
     // The size of a packet in an Ogg page is indicated by a series of "lacing
     // values" where the sum of the values is the packet size in bytes.  Each of
