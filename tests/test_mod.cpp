@@ -118,7 +118,7 @@ private:
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
     CPPUNIT_ASSERT_EQUAL(31U, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL((unsigned char)1, p->lengthInPatterns());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(1), p->lengthInPatterns());
     CPPUNIT_ASSERT_EQUAL(title, t->title());
     CPPUNIT_ASSERT_EQUAL(String(), t->artist());
     CPPUNIT_ASSERT_EQUAL(String(), t->album());

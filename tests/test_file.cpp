@@ -61,7 +61,7 @@ public:
 
       file.seek(0);
       const ByteVector v = file.readBlock(file.length());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)10, v.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(10), v.size());
 
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.find("23")),    file.find("23"));
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.find("23", 2)), file.find("23", 2));
@@ -89,7 +89,7 @@ public:
 
       file.seek(0);
       const ByteVector v = file.readBlock(file.length());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)10, v.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(10), v.size());
 
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23")),    file.rfind("23"));
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23", 7)), file.rfind("23", 7));

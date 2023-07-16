@@ -276,9 +276,9 @@ public:
     ByteVector lf("abc\x0axyz", 7);
     ByteVector crlf("abc\x0d\x0axyz", 8);
 
-    CPPUNIT_ASSERT_EQUAL((unsigned int)7, String(cr).size());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)7, String(lf).size());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)8, String(crlf).size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(7), String(cr).size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(7), String(lf).size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8), String(crlf).size());
 
     CPPUNIT_ASSERT_EQUAL(L'\x0d', String(cr)[3]);
     CPPUNIT_ASSERT_EQUAL(L'\x0a', String(lf)[3]);

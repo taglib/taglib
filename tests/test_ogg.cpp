@@ -146,7 +146,7 @@ public:
 
     Vorbis::File f(newname.c_str());
 
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, f.tag()->properties().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), f.tag()->properties().size());
 
     PropertyMap newTags;
     StringList values("value 1");
@@ -155,8 +155,8 @@ public:
     f.tag()->setProperties(newTags);
 
     PropertyMap map = f.tag()->properties();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1, map.size());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, map["ARTIST"].size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), map.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), map["ARTIST"].size());
     CPPUNIT_ASSERT_EQUAL(String("value 1"), map["ARTIST"][0]);
   }
 
@@ -168,7 +168,7 @@ public:
     Vorbis::File f(newname.c_str());
     PropertyMap tags = f.tag()->properties();
 
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, tags["UNUSUALTAG"].size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), tags["UNUSUALTAG"].size());
     CPPUNIT_ASSERT_EQUAL(String("usual value"), tags["UNUSUALTAG"][0]);
     CPPUNIT_ASSERT_EQUAL(String("another value"), tags["UNUSUALTAG"][1]);
     CPPUNIT_ASSERT_EQUAL(
@@ -210,7 +210,7 @@ public:
       f.save();
 
       f.seek(0x50);
-      CPPUNIT_ASSERT_EQUAL((unsigned int)0x3d3bd92d, f.readBlock(4).toUInt(0, true));
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0x3d3bd92d), f.readBlock(4).toUInt(0, true));
     }
     {
       Vorbis::File f(copy.fileName().c_str());
@@ -218,7 +218,7 @@ public:
       f.save();
 
       f.seek(0x50);
-      CPPUNIT_ASSERT_EQUAL((unsigned int)0xd985291c, f.readBlock(4).toUInt(0, true));
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0xd985291c), f.readBlock(4).toUInt(0, true));
     }
 
   }

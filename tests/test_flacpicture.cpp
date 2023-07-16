@@ -59,7 +59,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, pic.numColors());
     CPPUNIT_ASSERT_EQUAL(String("image/png"), pic.mimeType());
     CPPUNIT_ASSERT_EQUAL(String("A pixel."), pic.description());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)150, pic.data().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(150), pic.data().size());
   }
 
   void testPassThrough()

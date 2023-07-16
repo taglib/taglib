@@ -51,7 +51,7 @@ public:
     char data[] = { 0, 0, 0, 127 };
     ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)127);
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(127));
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(127), v);
   }
 
@@ -60,7 +60,7 @@ public:
     char data[] = { 0, 0, 1, 0 };
     ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)128);
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(128));
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(128), v);
   }
 
@@ -69,32 +69,32 @@ public:
     char data[] = { 0, 0, 1, 1 };
     ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), (unsigned int)129);
+    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(129));
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(129), v);
   }
 
   void testToUIntBroken()
   {
-    char data[] = { 0, 0, 0, (char)-1 };
-    char data2[] = { 0, 0, (char)-1, (char)-1 };
+    char data[] = { 0, 0, 0, static_cast<char>(-1) };
+    char data2[] = { 0, 0, static_cast<char>(-1), static_cast<char>(-1) };
 
-    CPPUNIT_ASSERT_EQUAL((unsigned int)255, ID3v2::SynchData::toUInt(ByteVector(data, 4)));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)65535, ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(255), ID3v2::SynchData::toUInt(ByteVector(data, 4)));
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(65535), ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
   }
 
   void testToUIntBrokenAndTooLarge()
   {
-    char data[] = { 0, 0, 0, (char)-1, 0 };
+    char data[] = { 0, 0, 0, static_cast<char>(-1), 0 };
     ByteVector v(data, 5);
 
-    CPPUNIT_ASSERT_EQUAL((unsigned int)255, ID3v2::SynchData::toUInt(v));
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(255), ID3v2::SynchData::toUInt(v));
   }
 
   void testDecode1()
   {
     ByteVector a("\xff\x00\x00", 3);
     a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x00", 2), a);
   }
 
@@ -102,7 +102,7 @@ public:
   {
     ByteVector a("\xff\x44", 2);
     a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x44", 2), a);
   }
 
@@ -110,7 +110,7 @@ public:
   {
     ByteVector a("\xff\xff\x00", 3);
     a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, a.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff", 2), a);
   }
 
@@ -118,7 +118,7 @@ public:
   {
     ByteVector a("\xff\xff\xff", 3);
     a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, a.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), a.size());
     CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff\xff", 3), a);
   }
 

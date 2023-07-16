@@ -326,11 +326,11 @@ public:
     MP4::File f(TEST_FILE_PATH_C("has-tags.m4a"));
     CPPUNIT_ASSERT(f.tag()->contains("covr"));
     MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, l.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)79, l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)287, l[1].data().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(287), l[1].data().size());
   }
 
   void testCovrWrite()
@@ -350,13 +350,13 @@ public:
       MP4::File f(filename.c_str());
       CPPUNIT_ASSERT(f.tag()->contains("covr"));
       MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)3, l.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), l.size());
       CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)79, l[0].data().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(79), l[0].data().size());
       CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)287, l[1].data().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(287), l[1].data().size());
       CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[2].format());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)3, l[2].data().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), l[2].data().size());
     }
   }
 
@@ -365,11 +365,11 @@ public:
     MP4::File f(TEST_FILE_PATH_C("covr-junk.m4a"));
     CPPUNIT_ASSERT(f.tag()->contains("covr"));
     MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, l.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), l.size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)79, l[0].data().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(79), l[0].data().size());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)287, l[1].data().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(287), l[1].data().size());
   }
 
   void testProperties()
@@ -700,11 +700,11 @@ public:
 
       CPPUNIT_ASSERT(f.tag()->contains("covr"));
       MP4::CoverArtList l = f.tag()->item("covr").toCoverArtList();
-      CPPUNIT_ASSERT_EQUAL((unsigned int)2, l.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), l.size());
       CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)79, l[0].data().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(79), l[0].data().size());
       CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)287, l[1].data().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(287), l[1].data().size());
 
       PropertyMap properties = f.properties();
       CPPUNIT_ASSERT_EQUAL(StringList("Test Artist!!!!"), properties["ARTIST"]);

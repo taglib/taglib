@@ -166,7 +166,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(true, file.hasID3v2Tag());
 
     ByteVector data = f->render();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+6+2), data.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4+4+2+1+6+2), data.size());
 
     ID3v2::TextIdentificationFrame f2(data);
     CPPUNIT_ASSERT_EQUAL(sl, f2.fieldList());
@@ -186,7 +186,7 @@ public:
     CPPUNIT_ASSERT(file.hasID3v2Tag());
 
     ByteVector data = f->render();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+3+2+2+6+2), data.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4+4+2+1+3+2+2+6+2), data.size());
 
     ID3v2::UnsynchronizedLyricsFrame f2(data);
     CPPUNIT_ASSERT_EQUAL(String("Foo"), f2.text());
@@ -201,7 +201,7 @@ public:
     sl.append("Bar");
     f.setText(sl);
     ByteVector data = f.render();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+6+2+6), data.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4+4+2+1+6+2+6), data.size());
     ByteVector noBomBeData("TPE1\x00\x00\x00\x0f\x00\x00\x02"
                            "\0F\0o\0o\0\0"
                            "\0B\0a\0r", 25);
@@ -218,7 +218,7 @@ public:
     sl.append("Bar");
     f.setText(sl);
     ByteVector data = f.render();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)(4+4+2+1+8+2+8), data.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4+4+2+1+8+2+8), data.size());
     ByteVector multiBomLeData("TPE1\x00\x00\x00\x13\x00\x00\x01\xff\xfe"
                               "F\0o\0o\0\0\0" "\xff\xfe"
                               "B\0a\0r\0", 29);
@@ -351,7 +351,7 @@ public:
 
     ID3v2::Tag tag;
     tag.addFrame(frame);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1034, tag.render().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1034), tag.render().size());
   }
 
   // http://bugs.kde.org/show_bug.cgi?id=151078
@@ -400,7 +400,7 @@ public:
                                            "\x00\x00\x00\x03", 33));
     CPPUNIT_ASSERT_EQUAL(String("email@example.com"), f.email());
     CPPUNIT_ASSERT_EQUAL(2, f.rating());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, f.counter());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), f.counter());
   }
 
   void testParsePOPMWithoutCounter()
@@ -412,7 +412,7 @@ public:
                                            "\x02", 29));
     CPPUNIT_ASSERT_EQUAL(String("email@example.com"), f.email());
     CPPUNIT_ASSERT_EQUAL(2, f.rating());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)0, f.counter());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), f.counter());
   }
 
   void testRenderPOPM()
@@ -480,7 +480,7 @@ public:
                          f.volumeAdjustment(ID3v2::RelativeVolumeFrame::FrontRight));
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(15),
                          f.volumeAdjustmentIndex(ID3v2::RelativeVolumeFrame::FrontRight));
-    CPPUNIT_ASSERT_EQUAL((unsigned char)8,
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(8),
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).bitsRepresentingPeak);
     CPPUNIT_ASSERT_EQUAL(ByteVector("\x45"),
                          f.peakVolume(ID3v2::RelativeVolumeFrame::FrontRight).peakVolume);
@@ -654,11 +654,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::Lyrics, f.type());
     CPPUNIT_ASSERT_EQUAL(String("foo"), f.description());
     ID3v2::SynchronizedLyricsFrame::SynchedTextList stl = f.synchedText();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, stl.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), stl.size());
     CPPUNIT_ASSERT_EQUAL(String("Example"), stl[0].text);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1234, stl[0].time);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1234), stl[0].time);
     CPPUNIT_ASSERT_EQUAL(String("Lyrics"), stl[1].text);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)4567, stl[1].time);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4567), stl[1].time);
   }
 
   void testParseSynchronizedLyricsFrameWithEmptyDescritpion()
@@ -683,11 +683,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::SynchronizedLyricsFrame::Lyrics, f.type());
     CPPUNIT_ASSERT(f.description().isEmpty());
     ID3v2::SynchronizedLyricsFrame::SynchedTextList stl = f.synchedText();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, stl.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), stl.size());
     CPPUNIT_ASSERT_EQUAL(String("Example"), stl[0].text);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1234, stl[0].time);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1234), stl[0].time);
     CPPUNIT_ASSERT_EQUAL(String("Lyrics"), stl[1].text);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)4567, stl[1].time);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4567), stl[1].time);
   }
 
   void testRenderSynchronizedLyricsFrame()
@@ -732,11 +732,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::EventTimingCodesFrame::AbsoluteMilliseconds,
                          f.timestampFormat());
     ID3v2::EventTimingCodesFrame::SynchedEventList sel = f.synchedEvents();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, sel.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), sel.size());
     CPPUNIT_ASSERT_EQUAL(ID3v2::EventTimingCodesFrame::IntroStart, sel[0].type);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)62300, sel[0].time);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(62300), sel[0].time);
     CPPUNIT_ASSERT_EQUAL(ID3v2::EventTimingCodesFrame::AudioFileEnds, sel[1].type);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3600000, sel[1].time);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3600000), sel[1].time);
   }
 
   void testRenderEventTimingCodesFrame()
@@ -927,7 +927,7 @@ public:
     header.setMajorVersion(3);
     auto frame =
       dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)1, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("Death Metal"), frame->fieldList()[0]);
 
     ID3v2::Tag tag;
@@ -948,7 +948,7 @@ public:
     header.setMajorVersion(3);
     auto frame =
       dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("4"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
 
@@ -991,7 +991,7 @@ public:
     ID3v2::Header header;
     auto frame =
       dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, frame->fieldList().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), frame->fieldList().size());
     CPPUNIT_ASSERT_EQUAL(String("14"), frame->fieldList()[0]);
     CPPUNIT_ASSERT_EQUAL(String("Eurodisco"), frame->fieldList()[1]);
 
@@ -1004,7 +1004,7 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("id3v22-tda.mp3"), false);
     CPPUNIT_ASSERT(f.tag());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2010, f.tag()->year());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2010), f.tag()->year());
   }
 
   void testUpdateFullDate22()
@@ -1051,15 +1051,15 @@ public:
       MPEG::File bar(newname.c_str());
       tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDOR").front());
       CPPUNIT_ASSERT(tf);
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("2011"), tf->fieldList().front());
       tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TDRC").front());
       CPPUNIT_ASSERT(tf);
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1, tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("2012-04-17T12:01"), tf->fieldList().front());
       tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TIPL").front());
       CPPUNIT_ASSERT(tf);
-      CPPUNIT_ASSERT_EQUAL((unsigned int)8, tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8), tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("Guitar"), tf->fieldList()[0]);
       CPPUNIT_ASSERT_EQUAL(String("Artist 1"), tf->fieldList()[1]);
       CPPUNIT_ASSERT_EQUAL(String("Drums"), tf->fieldList()[2]);
@@ -1126,7 +1126,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
       CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
       CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)86414, frame->picture().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(86414), frame->picture().size());
     }
     else {
       // Skip the test if ZLIB is not installed.
@@ -1154,12 +1154,12 @@ public:
     string newname = copy.fileName();
     MPEG::File f(newname.c_str());
     PropertyMap dict = f.ID3v2Tag(false)->properties();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)6, dict.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(6), dict.size());
 
     CPPUNIT_ASSERT(dict.contains("USERTEXTDESCRIPTION1"));
     CPPUNIT_ASSERT(dict.contains("QuodLibet::USERTEXTDESCRIPTION2"));
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, dict["USERTEXTDESCRIPTION1"].size());
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, dict["QuodLibet::USERTEXTDESCRIPTION2"].size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), dict["USERTEXTDESCRIPTION1"].size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), dict["QuodLibet::USERTEXTDESCRIPTION2"].size());
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["USERTEXTDESCRIPTION1"][0]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData2"), dict["USERTEXTDESCRIPTION1"][1]);
     CPPUNIT_ASSERT_EQUAL(String("userTextData1"), dict["QuodLibet::USERTEXTDESCRIPTION2"][0]);
@@ -1241,7 +1241,7 @@ public:
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
-    CPPUNIT_ASSERT_EQUAL((ID3v2::UniqueFileIdentifierFrame *)nullptr, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::UniqueFileIdentifierFrame *>(nullptr), ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
     CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
   }
 
@@ -1383,20 +1383,20 @@ public:
     ID3v2::ChapterFrame f1(&header, chapterData);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f1.elementID());
-    CPPUNIT_ASSERT((unsigned int)0x03 == f1.startTime());
-    CPPUNIT_ASSERT((unsigned int)0x05 == f1.endTime());
-    CPPUNIT_ASSERT((unsigned int)0x02 == f1.startOffset());
-    CPPUNIT_ASSERT((unsigned int)0x03 == f1.endOffset());
-    CPPUNIT_ASSERT((unsigned int)0x00 == f1.embeddedFrameList().size());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x03) == f1.startTime());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x05) == f1.endTime());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x02) == f1.startOffset());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x03) == f1.endOffset());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x00) == f1.embeddedFrameList().size());
 
     ID3v2::ChapterFrame f2(&header, chapterData + embeddedFrameData);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f2.elementID());
-    CPPUNIT_ASSERT((unsigned int)0x03 == f2.startTime());
-    CPPUNIT_ASSERT((unsigned int)0x05 == f2.endTime());
-    CPPUNIT_ASSERT((unsigned int)0x02 == f2.startOffset());
-    CPPUNIT_ASSERT((unsigned int)0x03 == f2.endOffset());
-    CPPUNIT_ASSERT((unsigned int)0x01 == f2.embeddedFrameList().size());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x03) == f2.startTime());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x05) == f2.endTime());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x02) == f2.startOffset());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x03) == f2.endOffset());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x01) == f2.embeddedFrameList().size());
     CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f2.embeddedFrameList("TIT2")[0]->toString() == "CH1");
   }
@@ -1489,10 +1489,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("T"), f.elementID());
     CPPUNIT_ASSERT(!f.isTopLevel());
     CPPUNIT_ASSERT(f.isOrdered());
-    CPPUNIT_ASSERT((unsigned int)0x02 == f.entryCount());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x02) == f.entryCount());
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f.childElements()[0]);
     CPPUNIT_ASSERT_EQUAL(ByteVector("D"), f.childElements()[1]);
-    CPPUNIT_ASSERT((unsigned int)0x01 == f.embeddedFrameList().size());
+    CPPUNIT_ASSERT(static_cast<unsigned int>(0x01) == f.embeddedFrameList().size());
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2").size() == 1);
     CPPUNIT_ASSERT(f.embeddedFrameList("TIT2")[0]->toString() == "TC1");
 
@@ -1604,7 +1604,7 @@ public:
       // Sample rate will be 32000 if we can't skip the second tag.
 
       CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)8049, f.ID3v2Tag()->header()->completeTagSize());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8049), f.ID3v2Tag()->header()->completeTagSize());
 
       CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
 
@@ -1615,7 +1615,7 @@ public:
       MPEG::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(3594), f.length());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)1505, f.ID3v2Tag()->header()->completeTagSize());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1505), f.ID3v2Tag()->header()->completeTagSize());
       CPPUNIT_ASSERT_EQUAL(String("Artist A"), f.ID3v2Tag()->artist());
       CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
 

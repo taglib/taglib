@@ -121,7 +121,7 @@ public:
     APE::Item item3 = APE::Item("TRACKNUMBER", String("29"));
     tag.setItem("TRACKNUMBER", item3);
     properties = tag.properties();
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, properties["TRACKNUMBER"].size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), properties["TRACKNUMBER"].size());
     CPPUNIT_ASSERT_EQUAL(String("17"), properties["TRACKNUMBER"][0]);
     CPPUNIT_ASSERT_EQUAL(String("29"), properties["TRACKNUMBER"][1]);
 
@@ -138,16 +138,16 @@ public:
 
     APE::Tag tag;
     PropertyMap unsuccessful = tag.setProperties(properties);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, unsuccessful.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), unsuccessful.size());
     CPPUNIT_ASSERT(unsuccessful.contains("A"));
     CPPUNIT_ASSERT(unsuccessful.contains("MP+"));
     CPPUNIT_ASSERT(unsuccessful.contains(L"\x1234\x3456"));
 
-    CPPUNIT_ASSERT_EQUAL((unsigned int)2, tag.itemListMap().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), tag.itemListMap().size());
     tag.addValue("VALID KEY", "Test Value 1");
     tag.addValue("INVALID KEY \x7f", "Test Value 2");
     tag.addValue(L"INVALID KEY \x1234\x3456", "Test Value 3");
-    CPPUNIT_ASSERT_EQUAL((unsigned int)3, tag.itemListMap().size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), tag.itemListMap().size());
   }
 
   void testTextBinary()
