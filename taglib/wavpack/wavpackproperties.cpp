@@ -167,7 +167,7 @@ namespace
     int index = 0;
 
     while(index + 1 < blockSize) {
-      const unsigned char metaId = static_cast<unsigned char>(block[index]);
+      const auto metaId = static_cast<unsigned char>(block[index]);
       int metaBc = static_cast<unsigned char>(block[index + 1]) << 1;
       index += 2;
 
@@ -201,7 +201,7 @@ namespace
       // if we got DSD block, return the specified rate shift amount
 
       if(id == ID_DSD_BLOCK && (metaId & ID_UNIQUE) == ID_DSD_BLOCK && metaBc > 0) {
-        const unsigned char rateShift = static_cast<unsigned char>(block[index]);
+        const auto rateShift = static_cast<unsigned char>(block[index]);
         if(rateShift <= 31)
           return rateShift;
       }

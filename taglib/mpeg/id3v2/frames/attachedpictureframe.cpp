@@ -219,7 +219,7 @@ AttachedPictureFrameV22::AttachedPictureFrameV22(const ByteVector &data, Header 
   parseFields(fieldData(data));
 
   // now set the v2.4 header
-  Frame::Header *newHeader = new Frame::Header("APIC");
+  auto newHeader = new Frame::Header("APIC");
   newHeader->setFrameSize(h->frameSize());
   setHeader(newHeader, true);
 }

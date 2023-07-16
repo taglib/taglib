@@ -409,7 +409,7 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(List<BaseObject *>::ConstIterator it = objects.cbegin(); it != objects.cend(); ++it) {
+  for(auto it = objects.cbegin(); it != objects.cend(); ++it) {
     data.append((*it)->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt(data.size(), false) + data;
@@ -439,7 +439,7 @@ void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, unsigned in
     if(pos >= data.size())
       break;
 
-    const CodecType type = static_cast<CodecType>(data.toUShort(pos, false));
+    const auto type = static_cast<CodecType>(data.toUShort(pos, false));
     pos += 2;
 
     int nameLength = data.toUShort(pos, false);
@@ -572,7 +572,7 @@ bool ASF::File::save()
 
   const AttributeListMap allAttributes = d->tag->attributeListMap();
 
-  for(AttributeListMap::ConstIterator it = allAttributes.begin(); it != allAttributes.end(); ++it) {
+  for(auto it = allAttributes.begin(); it != allAttributes.end(); ++it) {
 
     const String &name = it->first;
     const AttributeList &attributes = it->second;
@@ -580,7 +580,7 @@ bool ASF::File::save()
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(AttributeList::ConstIterator jt = attributes.begin(); jt != attributes.end(); ++jt) {
+    for(auto jt = attributes.begin(); jt != attributes.end(); ++jt) {
 
       const Attribute &attribute = *jt;
       const bool largeValue = (attribute.dataSize() > 65535);
@@ -601,7 +601,7 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(List<FilePrivate::BaseObject *>::ConstIterator it = d->objects.cbegin(); it != d->objects.cend(); ++it) {
+  for(auto it = d->objects.cbegin(); it != d->objects.cend(); ++it) {
     data.append((*it)->render(this));
   }
 

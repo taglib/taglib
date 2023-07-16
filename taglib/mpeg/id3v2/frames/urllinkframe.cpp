@@ -180,8 +180,8 @@ PropertyMap UserUrlLinkFrame::asProperties() const
 UserUrlLinkFrame *UserUrlLinkFrame::find(ID3v2::Tag *tag, const String &description) // static
 {
   const FrameList l = tag->frameList("WXXX");
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
-    UserUrlLinkFrame *f = dynamic_cast<UserUrlLinkFrame *>(*it);
+  for(auto it = l.begin(); it != l.end(); ++it) {
+    auto f = dynamic_cast<UserUrlLinkFrame *>(*it);
     if(f && f->description() == description)
       return f;
   }

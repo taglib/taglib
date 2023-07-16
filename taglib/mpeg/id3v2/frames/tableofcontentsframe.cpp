@@ -69,7 +69,7 @@ namespace {
 
   ByteVectorList &strip(ByteVectorList &l)
   {
-    for(ByteVectorList::Iterator it = l.begin(); it != l.end(); ++it)
+    for(auto it = l.begin(); it != l.end(); ++it)
     {
       strip(*it);
     }
@@ -99,7 +99,7 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &elementID,
   strip(d->elementID);
   d->childElements = children;
 
-  for(FrameList::ConstIterator it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
+  for(auto it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
 
@@ -163,7 +163,7 @@ void TableOfContentsFrame::addChildElement(const ByteVector &cE)
 
 void TableOfContentsFrame::removeChildElement(const ByteVector &cE)
 {
-  ByteVectorList::Iterator it = d->childElements.find(cE);
+  auto it = d->childElements.find(cE);
 
   if(it == d->childElements.end())
     it = d->childElements.find(cE + ByteVector("\0"));
@@ -196,7 +196,7 @@ void TableOfContentsFrame::addEmbeddedFrame(Frame *frame)
 void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 {
   // remove the frame from the frame list
-  FrameList::Iterator it = d->embeddedFrameList.find(frame);
+  auto it = d->embeddedFrameList.find(frame);
   if(it != d->embeddedFrameList.end())
     d->embeddedFrameList.erase(it);
 
@@ -214,7 +214,7 @@ void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 void TableOfContentsFrame::removeEmbeddedFrames(const ByteVector &id)
 {
   const FrameList l = d->embeddedFrameListMap[id];
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
+  for(auto it = l.begin(); it != l.end(); ++it)
     removeEmbeddedFrame(*it, true);
 }
 
@@ -230,7 +230,7 @@ String TableOfContentsFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(FrameList::ConstIterator it = d->embeddedFrameList.cbegin();
+    for(auto it = d->embeddedFrameList.cbegin();
         it != d->embeddedFrameList.cend(); ++it)
       frameIDs.append((*it)->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
@@ -253,11 +253,11 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
 {
   const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
-  for(ID3v2::FrameList::ConstIterator it = tablesOfContents.begin();
+  for(auto it = tablesOfContents.begin();
       it != tablesOfContents.end();
       ++it)
   {
-    TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
+    auto frame = dynamic_cast<TableOfContentsFrame *>(*it);
     if(frame && frame->elementID() == eID)
       return frame;
   }
@@ -269,11 +269,11 @@ TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) 
 {
   const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
-  for(ID3v2::FrameList::ConstIterator it = tablesOfContents.begin();
+  for(auto it = tablesOfContents.begin();
       it != tablesOfContents.end();
       ++it)
   {
-    TableOfContentsFrame *frame = dynamic_cast<TableOfContentsFrame *>(*it);
+    auto frame = dynamic_cast<TableOfContentsFrame *>(*it);
     if(frame && frame->isTopLevel())
       return frame;
   }
@@ -337,14 +337,14 @@ ByteVector TableOfContentsFrame::renderFields() const
     flags += 1;
   data.append(flags);
   data.append(static_cast<char>(entryCount()));
-  ByteVectorList::ConstIterator it = d->childElements.cbegin();
+  auto it = d->childElements.cbegin();
   while(it != d->childElements.cend()) {
     data.append(*it);
     data.append('\0');
     it++;
   }
   const FrameList l = d->embeddedFrameList;
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
+  for(auto it = l.begin(); it != l.end(); ++it) {
     (*it)->header()->setVersion(header()->version());
     data.append((*it)->render());
   }

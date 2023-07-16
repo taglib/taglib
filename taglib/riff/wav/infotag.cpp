@@ -201,7 +201,7 @@ ByteVector RIFF::Info::Tag::render() const
 {
   ByteVector data("INFO");
 
-  FieldListMap::ConstIterator it = d->fieldListMap.cbegin();
+  auto it = d->fieldListMap.cbegin();
   for(; it != d->fieldListMap.cend(); ++it) {
     ByteVector text = stringHandler->render(it->second);
     if(text.isEmpty())

@@ -78,7 +78,7 @@ List<RelativeVolumeFrame::ChannelType> RelativeVolumeFrame::channels() const
 {
   List<ChannelType> l;
 
-  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.cbegin();
+  auto it = d->channels.cbegin();
   for(; it != d->channels.cend(); ++it)
     l.append((*it).first);
 
@@ -138,7 +138,7 @@ void RelativeVolumeFrame::parseFields(const ByteVector &data)
 
   while(pos <= static_cast<int>(data.size()) - 4) {
 
-    ChannelType type = static_cast<ChannelType>(data[pos]);
+    auto type = static_cast<ChannelType>(data[pos]);
     pos += 1;
 
     ChannelData &channel = d->channels[type];
@@ -162,7 +162,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
   data.append(d->identification.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
 
-  Map<ChannelType, ChannelData>::ConstIterator it = d->channels.cbegin();
+  auto it = d->channels.cbegin();
 
   for(; it != d->channels.cend(); ++it) {
     ChannelType type = (*it).first;

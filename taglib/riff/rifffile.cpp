@@ -158,7 +158,7 @@ void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 
   // Now update the specific chunk
 
-  std::vector<Chunk>::iterator it = d->chunks.begin();
+  auto it = d->chunks.begin();
   std::advance(it, i);
 
   const long long originalSize = static_cast<long long>(it->size) + it->padding;
@@ -252,7 +252,7 @@ void RIFF::File::removeChunk(unsigned int i)
     return;
   }
 
-  std::vector<Chunk>::iterator it = d->chunks.begin();
+  auto it = d->chunks.begin();
   std::advance(it, i);
 
   const unsigned int removeSize = it->size + it->padding + 8;

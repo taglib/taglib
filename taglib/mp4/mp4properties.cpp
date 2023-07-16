@@ -37,7 +37,7 @@ namespace
   long long calculateMdatLength(const MP4::AtomList &list)
   {
     long long totalLength = 0;
-    for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
+    for(auto it = list.begin(); it != list.end(); ++it) {
       offset_t length = (*it)->length;
       if(length == 0)
         return 0; // for safety, see checkValid() in mp4file.cpp
@@ -148,7 +148,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
   ByteVector data;
 
   const MP4::AtomList trakList = moov->findall("trak");
-  for(MP4::AtomList::ConstIterator it = trakList.begin(); it != trakList.end(); ++it) {
+  for(auto it = trakList.begin(); it != trakList.end(); ++it) {
     trak = *it;
     MP4::Atom *hdlr = trak->find("mdia", "hdlr");
     if(!hdlr) {

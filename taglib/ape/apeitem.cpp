@@ -181,7 +181,7 @@ int APE::Item::size() const
   switch(d->type) {
     case Text:
       if(!d->text.isEmpty()) {
-        StringList::ConstIterator it = d->text.cbegin();
+        auto it = d->text.cbegin();
 
         result += it->data(String::UTF8).size();
         it++;
@@ -268,7 +268,7 @@ ByteVector APE::Item::render() const
     return data;
 
   if(d->type == Text) {
-    StringList::ConstIterator it = d->text.cbegin();
+    auto it = d->text.cbegin();
 
     value.append(it->data(String::UTF8));
     it++;

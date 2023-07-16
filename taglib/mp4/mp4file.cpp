@@ -38,7 +38,7 @@ namespace
 {
   bool checkValid(const MP4::AtomList &list)
   {
-    for(MP4::AtomList::ConstIterator it = list.begin(); it != list.end(); ++it) {
+    for(auto it = list.begin(); it != list.end(); ++it) {
 
       if((*it)->length == 0)
         return false;

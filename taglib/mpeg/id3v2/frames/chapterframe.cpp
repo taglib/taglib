@@ -85,7 +85,7 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
   d->startOffset = startOffset;
   d->endOffset = endOffset;
 
-  for(FrameList::ConstIterator it = embeddedFrames.begin();
+  for(auto it = embeddedFrames.begin();
       it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
@@ -172,7 +172,7 @@ void ChapterFrame::addEmbeddedFrame(Frame *frame)
 void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 {
   // remove the frame from the frame list
-  FrameList::Iterator it = d->embeddedFrameList.find(frame);
+  auto it = d->embeddedFrameList.find(frame);
   d->embeddedFrameList.erase(it);
 
   // ...and from the frame list map
@@ -187,7 +187,7 @@ void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 {
   const FrameList l = d->embeddedFrameListMap[id];
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it)
+  for(auto it = l.begin(); it != l.end(); ++it)
     removeEmbeddedFrame(*it, true);
 }
 
@@ -205,7 +205,7 @@ String ChapterFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(FrameList::ConstIterator it = d->embeddedFrameList.cbegin();
+    for(auto it = d->embeddedFrameList.cbegin();
         it != d->embeddedFrameList.cend(); ++it)
       frameIDs.append((*it)->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
@@ -227,11 +227,11 @@ ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVec
 {
   ID3v2::FrameList comments = tag->frameList("CHAP");
 
-  for(ID3v2::FrameList::ConstIterator it = comments.cbegin();
+  for(auto it = comments.cbegin();
       it != comments.cend();
       ++it)
   {
-    ChapterFrame *frame = dynamic_cast<ChapterFrame *>(*it);
+    auto frame = dynamic_cast<ChapterFrame *>(*it);
     if(frame && frame->elementID() == eID)
       return frame;
   }
@@ -294,7 +294,7 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
   const FrameList l = d->embeddedFrameList;
-  for(FrameList::ConstIterator it = l.begin(); it != l.end(); ++it) {
+  for(auto it = l.begin(); it != l.end(); ++it) {
     (*it)->header()->setVersion(header()->version());
     data.append((*it)->render());
   }
