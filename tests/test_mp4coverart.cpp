@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <tag.h>
 #include <mp4coverart.h>
 #include <cppunit/extensions/HelperMacros.h>

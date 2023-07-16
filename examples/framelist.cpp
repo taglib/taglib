@@ -23,7 +23,7 @@
  */
 
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <tbytevector.h>
 

@@ -105,7 +105,7 @@ if(NOT HAVE_GCC_BYTESWAP)
 
   if(NOT HAVE_GLIBC_BYTESWAP)
     check_cxx_source_compiles("
-      #include <stdlib.h>
+      #include <cstdlib>
       int main() {
         _byteswap_ushort(0);
         _byteswap_ulong(0);

@@ -24,12 +24,12 @@
 
 #include <iostream>
 #include <iomanip>
-#include <string.h>
+#include <cstring>
 
-#include <stdio.h>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <tlist.h>
 #include <fileref.h>

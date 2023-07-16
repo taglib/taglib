@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <tag.h>
 #include <tbytevectorlist.h>
 #include <aifffile.h>

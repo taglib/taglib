@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <infotag.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -72,4 +72,3 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestInfoTag);
-

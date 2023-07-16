@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <apetag.h>
 #include <id3v1tag.h>
 #include <tbytevectorlist.h>
