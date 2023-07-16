@@ -67,8 +67,8 @@ namespace TagLib {
 
     private:
       UnknownFrame(const ByteVector &data, Header *h);
-      UnknownFrame(const UnknownFrame &);
-      UnknownFrame &operator=(const UnknownFrame &);
+      UnknownFrame(const UnknownFrame &) = delete;
+      UnknownFrame &operator=(const UnknownFrame &) = delete;
 
       class UnknownFramePrivate;
       UnknownFramePrivate *d;

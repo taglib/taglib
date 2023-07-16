@@ -190,8 +190,8 @@ namespace TagLib {
       bool parse(const ByteVector &rawData);
 
     private:
-      Picture(const Picture &item);
-      Picture &operator=(const Picture &item);
+      Picture(const Picture &item) = delete;
+      Picture &operator=(const Picture &item) = delete;
 
       class PicturePrivate;
       PicturePrivate *d;

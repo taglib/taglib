@@ -81,8 +81,8 @@ namespace TagLib {
       UrlLinkFrame(const ByteVector &data, Header *h);
 
     private:
-      UrlLinkFrame(const UrlLinkFrame &);
-      UrlLinkFrame &operator=(const UrlLinkFrame &);
+      UrlLinkFrame(const UrlLinkFrame &) = delete;
+      UrlLinkFrame &operator=(const UrlLinkFrame &) = delete;
 
       class UrlLinkFramePrivate;
       UrlLinkFramePrivate *d;
@@ -178,8 +178,8 @@ namespace TagLib {
       UserUrlLinkFrame(const ByteVector &data, Header *h);
 
     private:
-      UserUrlLinkFrame(const UserUrlLinkFrame &);
-      UserUrlLinkFrame &operator=(const UserUrlLinkFrame &);
+      UserUrlLinkFrame(const UserUrlLinkFrame &) = delete;
+      UserUrlLinkFrame &operator=(const UserUrlLinkFrame &) = delete;
 
       class UserUrlLinkFramePrivate;
       UserUrlLinkFramePrivate *d;

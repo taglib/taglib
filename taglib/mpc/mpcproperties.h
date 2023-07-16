@@ -116,8 +116,8 @@ namespace TagLib {
       int albumPeak() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
 
       void readSV7(const ByteVector &data, offset_t streamLength);
       void readSV8(File *file, offset_t streamLength);

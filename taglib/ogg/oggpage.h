@@ -207,8 +207,8 @@ namespace TagLib {
            bool containsLastPacket = false);
 
     private:
-      Page(const Page &);
-      Page &operator=(const Page &);
+      Page(const Page &) = delete;
+      Page &operator=(const Page &) = delete;
 
       class PagePrivate;
       PagePrivate *d;

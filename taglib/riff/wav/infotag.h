@@ -180,8 +180,8 @@ namespace TagLib {
 
 
     private:
-      Tag(const Tag &);
-      Tag &operator=(const Tag &);
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
 
       class TagPrivate;
       TagPrivate *d;

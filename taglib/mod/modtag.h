@@ -178,8 +178,8 @@ namespace TagLib {
       PropertyMap setProperties(const PropertyMap &) override;
 
     private:
-      Tag(const Tag &);
-      Tag &operator=(const Tag &);
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
 
       class TagPrivate;
       TagPrivate *d;

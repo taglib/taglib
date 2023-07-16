@@ -70,8 +70,8 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       PodcastFrame(const ByteVector &data, Header *h);
-      PodcastFrame(const PodcastFrame &);
-      PodcastFrame &operator=(const PodcastFrame &);
+      PodcastFrame(const PodcastFrame &) = delete;
+      PodcastFrame &operator=(const PodcastFrame &) = delete;
 
       class PodcastFramePrivate;
       PodcastFramePrivate *d;

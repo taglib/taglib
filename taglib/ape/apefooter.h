@@ -160,8 +160,8 @@ namespace TagLib {
       ByteVector render(bool isHeader) const;
 
     private:
-      Footer(const Footer &);
-      Footer &operator=(const Footer &);
+      Footer(const Footer &) = delete;
+      Footer &operator=(const Footer &) = delete;
 
       class FooterPrivate;
       FooterPrivate *d;

@@ -68,8 +68,8 @@ namespace TagLib {
       void setBpmSpeed(unsigned short bpmSpeed);
 
     private:
-      Properties(const Properties&);
-      Properties &operator=(const Properties&);
+      Properties(const Properties&) = delete;
+      Properties &operator=(const Properties&) = delete;
 
       class PropertiesPrivate;
       PropertiesPrivate *d;

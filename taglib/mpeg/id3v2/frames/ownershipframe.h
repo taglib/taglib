@@ -139,8 +139,8 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       OwnershipFrame(const ByteVector &data, Header *h);
-      OwnershipFrame(const OwnershipFrame &);
-      OwnershipFrame &operator=(const OwnershipFrame &);
+      OwnershipFrame(const OwnershipFrame &) = delete;
+      OwnershipFrame &operator=(const OwnershipFrame &) = delete;
 
       class OwnershipFramePrivate;
       OwnershipFramePrivate *d;

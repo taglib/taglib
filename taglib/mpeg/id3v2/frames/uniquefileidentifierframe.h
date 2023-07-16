@@ -109,8 +109,8 @@ namespace TagLib {
       ByteVector renderFields() const override;
 
     private:
-      UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &);
-      UniqueFileIdentifierFrame &operator=(const UniqueFileIdentifierFrame &);
+      UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &) = delete;
+      UniqueFileIdentifierFrame &operator=(const UniqueFileIdentifierFrame &) = delete;
 
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);
 

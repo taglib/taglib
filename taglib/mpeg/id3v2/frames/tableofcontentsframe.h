@@ -248,8 +248,8 @@ namespace TagLib {
 
     private:
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
-      TableOfContentsFrame(const TableOfContentsFrame &);
-      TableOfContentsFrame &operator=(const TableOfContentsFrame &);
+      TableOfContentsFrame(const TableOfContentsFrame &) = delete;
+      TableOfContentsFrame &operator=(const TableOfContentsFrame &) = delete;
 
       class TableOfContentsFramePrivate;
       TableOfContentsFramePrivate *d;

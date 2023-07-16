@@ -83,8 +83,8 @@ namespace TagLib {
 
 
       private:
-        File(const File &);
-        File &operator=(const File &);
+        File(const File &) = delete;
+        File &operator=(const File &) = delete;
 
         void read(bool readProperties);
 

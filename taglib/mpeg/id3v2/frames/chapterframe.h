@@ -237,8 +237,8 @@ namespace TagLib {
 
     private:
       ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
-      ChapterFrame(const ChapterFrame &);
-      ChapterFrame &operator=(const ChapterFrame &);
+      ChapterFrame(const ChapterFrame &) = delete;
+      ChapterFrame &operator=(const ChapterFrame &) = delete;
 
       class ChapterFramePrivate;
       ChapterFramePrivate *d;
