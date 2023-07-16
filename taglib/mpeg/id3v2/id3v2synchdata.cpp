@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <iostream>
-
 #include "id3v2synchdata.h"
+
+#include <iostream>
 
 using namespace TagLib;
 using namespace ID3v2;

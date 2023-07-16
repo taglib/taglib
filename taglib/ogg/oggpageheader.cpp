@@ -23,13 +23,14 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "oggpageheader.h"
+
 #include <bitset>
 
 #include "tstring.h"
 #include "tdebug.h"
 #include "taglib.h"
 
-#include "oggpageheader.h"
 #include "oggfile.h"
 
 using namespace TagLib;

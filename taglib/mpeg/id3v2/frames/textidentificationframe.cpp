@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "textidentificationframe.h"
 #include "tbytevectorlist.h"
 #include "id3v2tag.h"
-#include "textidentificationframe.h"
 #include "tpropertymap.h"
 #include "id3v1genres.h"
 

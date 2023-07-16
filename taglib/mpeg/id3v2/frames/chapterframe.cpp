@@ -23,12 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "chapterframe.h"
+
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tdebug.h"
 #include <cstdio>
-
-#include "chapterframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;

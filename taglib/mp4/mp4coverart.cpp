@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "mp4coverart.h"
 #include "taglib.h"
 #include "tdebug.h"
 #include "trefcounter.h"
-#include "mp4coverart.h"
 
 using namespace TagLib;
 

@@ -23,10 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "mpegproperties.h"
+
 #include "tdebug.h"
 #include "tstring.h"
 
-#include "mpegproperties.h"
 #include "mpegfile.h"
 #include "xingheader.h"
 #include "apetag.h"

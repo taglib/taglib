@@ -27,11 +27,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "apeproperties.h"
 #include "tstring.h"
 #include "tdebug.h"
 #include <bitset>
 #include "id3v2tag.h"
-#include "apeproperties.h"
 #include "apefile.h"
 #include "apetag.h"
 #include "apefooter.h"

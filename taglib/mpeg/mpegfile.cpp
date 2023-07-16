@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "mpegfile.h"
+
 #include "tagunion.h"
 #include "tagutils.h"
 #include "id3v2tag.h"
@@ -32,7 +34,6 @@
 #include "apetag.h"
 #include "tdebug.h"
 
-#include "mpegfile.h"
 #include "mpegheader.h"
 #include "mpegutils.h"
 #include "tpropertymap.h"

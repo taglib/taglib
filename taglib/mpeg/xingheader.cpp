@@ -23,11 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "xingheader.h"
+
 #include "tbytevector.h"
 #include "tstring.h"
 #include "tdebug.h"
 
-#include "xingheader.h"
 #include "mpegfile.h"
 
 using namespace TagLib;

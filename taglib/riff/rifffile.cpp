@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "rifffile.h"
+
 #include <algorithm>
 #include <vector>
 
@@ -30,7 +32,6 @@
 #include "tdebug.h"
 #include "tstring.h"
 
-#include "rifffile.h"
 #include "riffutils.h"
 
 using namespace TagLib;

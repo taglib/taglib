@@ -23,11 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "ownershipframe.h"
+
 #include "tdebug.h"
 #include "tstringlist.h"
 #include "id3v2tag.h"
-
-#include "ownershipframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;

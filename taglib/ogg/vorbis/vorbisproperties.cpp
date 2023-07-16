@@ -23,12 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "vorbisproperties.h"
+
 #include "tstring.h"
 #include "tdebug.h"
 
 #include "oggpageheader.h"
 
-#include "vorbisproperties.h"
 #include "vorbisfile.h"
 
 using namespace TagLib;

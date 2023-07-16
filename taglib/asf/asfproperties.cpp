@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "asfproperties.h"
 #include "tdebug.h"
 #include "tstring.h"
-#include "asfproperties.h"
 
 using namespace TagLib;
 

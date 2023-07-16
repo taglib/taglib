@@ -23,10 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "id3v1tag.h"
+
 #include "tdebug.h"
 #include "tfile.h"
 
-#include "id3v1tag.h"
 #include "id3v1genres.h"
 
 using namespace TagLib;

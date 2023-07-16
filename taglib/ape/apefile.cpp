@@ -31,6 +31,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "apefile.h"
+
 #include "tbytevector.h"
 #include "tstring.h"
 #include "tdebug.h"
@@ -40,7 +42,6 @@
 #include "tpropertymap.h"
 #include "tagutils.h"
 
-#include "apefile.h"
 #include "apetag.h"
 #include "apefooter.h"
 

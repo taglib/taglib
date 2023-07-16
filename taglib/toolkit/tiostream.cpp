@@ -23,12 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tiostream.h"
+
 #ifdef _WIN32
 # include <windows.h>
 # include "tstring.h"
 #endif
-
-#include "tiostream.h"
 
 using namespace TagLib;
 

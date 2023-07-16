@@ -27,11 +27,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "wavpackproperties.h"
+
 #include <cstdint>
 #include "tstring.h"
 #include "tdebug.h"
 
-#include "wavpackproperties.h"
 #include "wavpackfile.h"
 
 // Implementation of this class is based on the information at:

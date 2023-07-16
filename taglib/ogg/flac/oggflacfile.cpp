@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "oggflacfile.h"
+
 #include "tbytevector.h"
 #include "tstring.h"
 #include "tdebug.h"
@@ -30,7 +32,6 @@
 #include "tagutils.h"
 
 #include "xiphcomment.h"
-#include "oggflacfile.h"
 
 using namespace TagLib;
 using TagLib::FLAC::Properties;

@@ -23,10 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "relativevolumeframe.h"
+
 #include "tdebug.h"
 #include "tmap.h"
-
-#include "relativevolumeframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;

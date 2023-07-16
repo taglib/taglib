@@ -23,9 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "xmfile.h"
+
 #include "tstringlist.h"
 #include "tdebug.h"
-#include "xmfile.h"
 #include "modfileprivate.h"
 #include "tpropertymap.h"
 

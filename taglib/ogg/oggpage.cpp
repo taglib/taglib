@@ -23,12 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "oggpage.h"
+
 #include <algorithm>
 
 #include "tstring.h"
 #include "tdebug.h"
 
-#include "oggpage.h"
 #include "oggpageheader.h"
 #include "oggfile.h"
 

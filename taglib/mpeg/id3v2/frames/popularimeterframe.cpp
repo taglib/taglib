@@ -23,9 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tdebug.h"
-
 #include "popularimeterframe.h"
+
+#include "tdebug.h"
 
 using namespace TagLib;
 using namespace ID3v2;

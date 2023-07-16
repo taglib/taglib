@@ -27,6 +27,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "wavpackfile.h"
+
 #include "tbytevector.h"
 #include "tstring.h"
 #include "tdebug.h"
@@ -34,7 +36,6 @@
 #include "tpropertymap.h"
 #include "tagutils.h"
 
-#include "wavpackfile.h"
 #include "id3v1tag.h"
 #include "id3v2header.h"
 #include "apetag.h"
