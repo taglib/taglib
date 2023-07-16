@@ -34,15 +34,9 @@ class Tag::TagPrivate
 
 };
 
-Tag::Tag()
-{
+Tag::Tag() = default;
 
-}
-
-Tag::~Tag()
-{
-
-}
+Tag::~Tag() = default;
 
 bool Tag::isEmpty() const
 {

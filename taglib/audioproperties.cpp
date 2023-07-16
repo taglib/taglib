@@ -36,10 +36,7 @@ class AudioProperties::AudioPropertiesPrivate
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
 
-AudioProperties::~AudioProperties()
-{
-
-}
+AudioProperties::~AudioProperties() = default;
 
 int AudioProperties::length() const
 {
