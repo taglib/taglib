@@ -127,9 +127,7 @@ CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const Str
 {
   const ID3v2::FrameList comments = tag->frameList("COMM");
 
-  for(auto it = comments.begin();
-      it != comments.end();
-      ++it)
+  for(auto it = comments.begin(); it != comments.end(); ++it)
   {
     auto frame = dynamic_cast<CommentsFrame *>(*it);
     if(frame && frame->description() == d)

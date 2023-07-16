@@ -85,8 +85,7 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
   d->startOffset = startOffset;
   d->endOffset = endOffset;
 
-  for(auto it = embeddedFrames.begin();
-      it != embeddedFrames.end(); ++it)
+  for(auto it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
     addEmbeddedFrame(*it);
 }
 
@@ -205,8 +204,7 @@ String ChapterFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(auto it = d->embeddedFrameList.cbegin();
-        it != d->embeddedFrameList.cend(); ++it)
+    for(auto it = d->embeddedFrameList.cbegin(); it != d->embeddedFrameList.cend(); ++it)
       frameIDs.append((*it)->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
   }

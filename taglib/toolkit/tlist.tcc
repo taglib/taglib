@@ -74,8 +74,7 @@ public:
   }
   void clear() {
     if(autoDelete) {
-      auto it = list.begin();
-      for(; it != list.end(); ++it)
+      for(auto it = list.begin(); it != list.end(); ++it)
         delete *it;
     }
     list.clear();

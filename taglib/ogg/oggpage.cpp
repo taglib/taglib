@@ -213,8 +213,7 @@ ByteVectorList Ogg::Page::packets() const
 
     const List<int> packetSizes = d->header.packetSizes();
 
-    auto it = packetSizes.begin();
-    for(; it != packetSizes.end(); ++it)
+    for(auto it = packetSizes.begin(); it != packetSizes.end(); ++it)
       l.append(d->file->readBlock(*it));
   }
   else
@@ -243,8 +242,7 @@ ByteVector Ogg::Page::render() const
       debug("Ogg::Page::render() -- this page is empty!");
   }
   else {
-    auto it = d->packets.cbegin();
-    for(; it != d->packets.cend(); ++it)
+    for(auto it = d->packets.cbegin(); it != d->packets.cend(); ++it)
       data.append(*it);
   }
 

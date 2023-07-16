@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
            << " bytes in tag"
            << endl;
 
-      auto it = id3v2tag->frameList().begin();
-      for(; it != id3v2tag->frameList().end(); it++) {
+      const auto &frames = id3v2tag->frameList();
+      for(auto it = frames.begin(); it != frames.end(); it++) {
         cout << (*it)->frameID();
 
         if(auto comment = dynamic_cast<ID3v2::CommentsFrame *>(*it))
@@ -100,8 +100,8 @@ int main(int argc, char *argv[])
     cout << endl << "APE" << endl;
 
     if(ape) {
-      for(auto it = ape->itemListMap().begin();
-          it != ape->itemListMap().end(); ++it)
+      const auto &items = ape->itemListMap();
+      for(auto it = items.begin(); it != items.end(); ++it)
       {
         if((*it).second.type() != APE::Item::Binary)
           cout << (*it).first << " - \"" << (*it).second.toString() << "\"" << endl;

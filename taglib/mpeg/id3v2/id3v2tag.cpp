@@ -386,7 +386,8 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-  for(auto it = frameList().begin(); it != frameList().end(); ++it) {
+  const auto &frames = frameList();
+  for(auto it = frames.begin(); it != frames.end(); ++it) {
     PropertyMap props = (*it)->asProperties();
     properties.merge(props);
   }
@@ -442,7 +443,8 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap tiplProperties;
   PropertyMap tmclProperties;
   Frame::splitProperties(origProps, properties, tiplProperties, tmclProperties);
-  for(auto it = frameListMap().begin(); it != frameListMap().end(); ++it){
+  const auto &frames = frameListMap();
+  for(auto it = frames.begin(); it != frames.end(); ++it){
     for(auto lit = it->second.begin(); lit != it->second.end(); ++lit){
       PropertyMap frameProperties = (*lit)->asProperties();
       if(it->first == "TIPL") {
@@ -531,8 +533,7 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     String content = frameTDOR->toString();
 
     if(content.size() >= 4) {
-      auto frameTORY =
-          new ID3v2::TextIdentificationFrame("TORY", String::Latin1);
+      auto frameTORY = new ID3v2::TextIdentificationFrame("TORY", String::Latin1);
       frameTORY->setText(content.substr(0, 4));
       frames->append(frameTORY);
       newFrames->append(frameTORY);
@@ -542,20 +543,17 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   if(frameTDRC) {
     String content = frameTDRC->toString();
     if(content.size() >= 4) {
-      auto frameTYER =
-          new ID3v2::TextIdentificationFrame("TYER", String::Latin1);
+      auto frameTYER = new ID3v2::TextIdentificationFrame("TYER", String::Latin1);
       frameTYER->setText(content.substr(0, 4));
       frames->append(frameTYER);
       newFrames->append(frameTYER);
       if(content.size() >= 10 && content[4] == '-' && content[7] == '-') {
-        auto frameTDAT =
-            new ID3v2::TextIdentificationFrame("TDAT", String::Latin1);
+        auto frameTDAT = new ID3v2::TextIdentificationFrame("TDAT", String::Latin1);
         frameTDAT->setText(content.substr(8, 2) + content.substr(5, 2));
         frames->append(frameTDAT);
         newFrames->append(frameTDAT);
         if(content.size() >= 16 && content[10] == 'T' && content[13] == ':') {
-          auto frameTIME =
-              new ID3v2::TextIdentificationFrame("TIME", String::Latin1);
+          auto frameTIME = new ID3v2::TextIdentificationFrame("TIME", String::Latin1);
           frameTIME->setText(content.substr(11, 2) + content.substr(14, 2));
           frames->append(frameTIME);
           newFrames->append(frameTIME);
@@ -565,8 +563,7 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   }
 
   if(frameTIPL || frameTMCL) {
-    auto frameIPLS =
-      new ID3v2::TextIdentificationFrame("IPLS", String::Latin1);
+    auto frameIPLS = new ID3v2::TextIdentificationFrame("IPLS", String::Latin1);
 
     StringList people;
 

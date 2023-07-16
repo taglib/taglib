@@ -218,9 +218,7 @@ ByteVector SynchronizedLyricsFrame::renderFields() const
   v.append(static_cast<char>(d->type));
   v.append(d->description.data(encoding));
   v.append(textDelimiter(encoding));
-  for(auto it = d->synchedText.cbegin();
-      it != d->synchedText.cend();
-      ++it) {
+  for(auto it = d->synchedText.cbegin(); it != d->synchedText.cend(); ++it) {
     const SynchedText &entry = *it;
     v.append(entry.text.data(encoding));
     v.append(textDelimiter(encoding));

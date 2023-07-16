@@ -217,8 +217,8 @@ namespace
 PropertyMap APE::Tag::properties() const
 {
   PropertyMap properties;
-  auto it = itemListMap().begin();
-  for(; it != itemListMap().end(); ++it) {
+  const auto &items = itemListMap();
+  for(auto it = items.begin(); it != items.end(); ++it) {
     String tagName = it->first.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
@@ -239,8 +239,7 @@ PropertyMap APE::Tag::properties() const
 
 void APE::Tag::removeUnsupportedProperties(const StringList &properties)
 {
-  auto it = properties.begin();
-  for(; it != properties.end(); ++it)
+  for(auto it = properties.begin(); it != properties.end(); ++it)
     removeItem(*it);
 }
 
@@ -257,8 +256,8 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
   // first check if tags need to be removed completely
   StringList toRemove;
-  auto remIt = itemListMap().begin();
-  for(; remIt != itemListMap().end(); ++remIt) {
+  const auto &items = itemListMap();
+  for(auto remIt = items.begin(); remIt != items.end(); ++remIt) {
     String key = remIt->first.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
     if(!key.isEmpty() && remIt->second.type() == APE::Item::Text && !properties.contains(key))
@@ -269,9 +268,8 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
     removeItem(*removeIt);
 
   // now sync in the "forward direction"
-  auto it = properties.cbegin();
   PropertyMap invalid;
-  for(; it != properties.cend(); ++it) {
+  for(auto it = properties.begin(); it != properties.cend(); ++it) {
     const String &tagName = it->first;
     if(!checkKey(tagName))
       invalid.insert(it->first, it->second);

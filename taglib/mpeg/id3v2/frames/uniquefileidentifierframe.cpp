@@ -105,9 +105,7 @@ UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::T
 {
   const ID3v2::FrameList comments = tag->frameList("UFID");
 
-  for(auto it = comments.begin();
-      it != comments.end();
-      ++it)
+  for(auto it = comments.begin(); it != comments.end(); ++it)
   {
     auto frame = dynamic_cast<UniqueFileIdentifierFrame *>(*it);
     if(frame && frame->owner() == o)

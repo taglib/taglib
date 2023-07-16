@@ -72,8 +72,7 @@ StringList::StringList(const String &s)
 
 StringList::StringList(const ByteVectorList &bl, String::Type t)
 {
-  auto i = bl.begin();
-  for(;i != bl.end(); i++) {
+  for(auto i = bl.begin(); i != bl.end(); i++) {
     append(String(*i, t));
   }
 }

@@ -230,8 +230,7 @@ String TableOfContentsFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(auto it = d->embeddedFrameList.cbegin();
-        it != d->embeddedFrameList.cend(); ++it)
+    for(auto it = d->embeddedFrameList.cbegin(); it != d->embeddedFrameList.cend(); ++it)
       frameIDs.append((*it)->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
   }
@@ -269,9 +268,7 @@ TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) 
 {
   const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
 
-  for(auto it = tablesOfContents.begin();
-      it != tablesOfContents.end();
-      ++it)
+  for(auto it = tablesOfContents.begin(); it != tablesOfContents.end(); ++it)
   {
     auto frame = dynamic_cast<TableOfContentsFrame *>(*it);
     if(frame && frame->isTopLevel())
