@@ -27,10 +27,6 @@
 
 using namespace TagLib;
 
-PropertyMap::PropertyMap() = default;
-
-PropertyMap::PropertyMap(const PropertyMap &m) = default;
-
 PropertyMap::PropertyMap(const SimplePropertyMap &m)
 {
   for(auto it = m.begin(); it != m.end(); ++it){
@@ -41,8 +37,6 @@ PropertyMap::PropertyMap(const SimplePropertyMap &m)
       unsupported.append(it->first);
   }
 }
-
-PropertyMap::~PropertyMap() = default;
 
 bool PropertyMap::insert(const String &key, const StringList &values)
 {

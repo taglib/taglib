@@ -44,20 +44,9 @@ namespace TagLib {
 
   class TAGLIB_EXPORT StringList : public List<String>
   {
+    using List<String>::List;
+
   public:
-
-    /*!
-     * Constructs an empty StringList.
-     */
-    StringList();
-
-    /*!
-     * Make a shallow, implicitly shared, copy of \a l.  Because this is
-     * implicitly shared, this method is lightweight and suitable for
-     * pass-by-value usage.
-     */
-    StringList(const StringList &l);
-
     /*!
      * Constructs a StringList with \a s as a member.
      */
@@ -70,11 +59,6 @@ namespace TagLib {
      * used with other codecs it will simply print a warning and exit.
      */
     StringList(const ByteVectorList &vl, String::Type t = String::Latin1);
-
-    /*!
-     * Destroys this StringList instance.
-     */
-    ~StringList() override;
 
     /*!
      * Concatenate the list of strings into one string separated by \a separator.

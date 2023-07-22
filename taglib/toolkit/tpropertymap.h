@@ -117,14 +117,12 @@ namespace TagLib {
 
   class TAGLIB_EXPORT PropertyMap: public SimplePropertyMap
   {
+    using SimplePropertyMap::SimplePropertyMap;
+
   public:
 
     typedef SimplePropertyMap::Iterator Iterator;
     typedef SimplePropertyMap::ConstIterator ConstIterator;
-
-    PropertyMap();
-
-    PropertyMap(const PropertyMap &m);
 
     /*!
      * Creates a PropertyMap initialized from a SimplePropertyMap. Copies all
@@ -132,8 +130,6 @@ namespace TagLib {
      * Invalid keys will be appended to the unsupportedData() list.
      */
     PropertyMap(const SimplePropertyMap &m);
-
-    ~PropertyMap() override;
 
     /*!
      * Inserts \a values under \a key in the map.  If \a key already exists,
