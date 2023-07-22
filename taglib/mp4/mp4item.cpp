@@ -26,11 +26,10 @@
 #include "mp4item.h"
 #include "taglib.h"
 #include "tdebug.h"
-#include "trefcounter.h"
 
 using namespace TagLib;
 
-class MP4::Item::ItemPrivate : public RefCounter
+class MP4::Item::ItemPrivate
 {
 public:
   ItemPrivate() :
@@ -53,16 +52,12 @@ public:
 };
 
 MP4::Item::Item() :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->valid = false;
 }
 
-MP4::Item::Item(const Item &item) :
-  d(item.d)
-{
-  d->ref();
-}
+MP4::Item::Item(const Item &item) = default;
 
 MP4::Item &
 MP4::Item::operator=(const Item &item)
@@ -79,63 +74,59 @@ MP4::Item::swap(Item &item)
   swap(d, item.d);
 }
 
-MP4::Item::~Item()
-{
-  if(d->deref())
-    delete d;
-}
+MP4::Item::~Item() = default;
 
 MP4::Item::Item(bool value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_bool = value;
 }
 
 MP4::Item::Item(int value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_int = value;
 }
 
 MP4::Item::Item(unsigned char value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_byte = value;
 }
 
 MP4::Item::Item(unsigned int value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_uint = value;
 }
 
 MP4::Item::Item(long long value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_longlong = value;
 }
 
 MP4::Item::Item(int value1, int value2) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_intPair.first = value1;
   d->m_intPair.second = value2;
 }
 
 MP4::Item::Item(const ByteVectorList &value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_byteVectorList = value;
 }
 
 MP4::Item::Item(const StringList &value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_stringList = value;
 }
 
 MP4::Item::Item(const MP4::CoverArtList &value) :
-  d(new ItemPrivate())
+  d(std::make_shared<ItemPrivate>())
 {
   d->m_coverArtList = value;
 }

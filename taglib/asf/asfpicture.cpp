@@ -27,7 +27,6 @@
 
 #include "taglib.h"
 #include "tdebug.h"
-#include "trefcounter.h"
 
 #include "asfattribute.h"
 #include "asffile.h"
@@ -35,7 +34,7 @@
 
 using namespace TagLib;
 
-class ASF::Picture::PicturePrivate : public RefCounter
+class ASF::Picture::PicturePrivate
 {
 public:
   bool valid;
@@ -50,22 +49,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ASF::Picture::Picture() :
-  d(new PicturePrivate())
+  d(std::make_shared<PicturePrivate>())
 {
   d->valid = true;
 }
 
-ASF::Picture::Picture(const Picture& other) :
-  d(other.d)
-{
-  d->ref();
-}
+ASF::Picture::Picture(const Picture &other) = default;
 
-ASF::Picture::~Picture()
-{
-  if(d->deref())
-    delete d;
-}
+ASF::Picture::~Picture() = default;
 
 bool ASF::Picture::isValid() const
 {

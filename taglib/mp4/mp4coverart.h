@@ -70,7 +70,7 @@ namespace TagLib {
 
     private:
       class CoverArtPrivate;
-      CoverArtPrivate *d;
+      std::shared_ptr<CoverArtPrivate> d;
     };
 
     typedef List<CoverArt> CoverArtList;

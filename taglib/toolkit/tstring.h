@@ -30,8 +30,8 @@
 #include "taglib.h"
 #include "tbytevector.h"
 
-#include <string>
 #include <iostream>
+#include <string>
 
 /*!
  * \relates TagLib::String
@@ -512,7 +512,7 @@ namespace TagLib {
 
   private:
     class StringPrivate;
-    StringPrivate *d;
+    std::shared_ptr<StringPrivate> d;
   };
 }  // namespace TagLib
 

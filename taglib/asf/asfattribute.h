@@ -197,7 +197,7 @@ namespace TagLib
       ByteVector render(const String &name, int kind = 0) const;
 
       class AttributePrivate;
-      AttributePrivate *d;
+      std::shared_ptr<AttributePrivate> d;
     };
   }  // namespace ASF
 }  // namespace TagLib

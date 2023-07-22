@@ -32,9 +32,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include "tstring.h"
 #include "tdebug.h"
-#include "trefcounter.h"
+#include "tstring.h"
 #include "tutils.h"
 
 // This is a bit ugly to keep writing over and over again.
@@ -253,36 +252,23 @@ class ByteVector::ByteVectorPrivate
 {
 public:
   ByteVectorPrivate(unsigned int l, char c) :
-    counter(new RefCounter()),
-    data(new std::vector<char>(l, c)),
+    data(std::make_shared<std::vector<char>>(l, c)),
     offset(0),
-    length(l) {}
+    length(l) { }
 
   ByteVectorPrivate(const char *s, unsigned int l) :
-    counter(new RefCounter()),
-    data(new std::vector<char>(s, s + l)),
+    data(std::make_shared<std::vector<char>>(s, s + l)),
     offset(0),
-    length(l) {}
+    length(l) { }
 
   ByteVectorPrivate(const ByteVectorPrivate &d, unsigned int o, unsigned int l) :
-    counter(d.counter),
     data(d.data),
     offset(d.offset + o),
     length(l)
   {
-    counter->ref();
   }
 
-  ~ByteVectorPrivate()
-  {
-    if(counter->deref()) {
-      delete counter;
-      delete data;
-    }
-  }
-
-  RefCounter        *counter;
-  std::vector<char> *data;
+  std::shared_ptr<std::vector<char>> data;
   unsigned int       offset;
   unsigned int       length;
 };
@@ -966,7 +952,7 @@ ByteVector ByteVector::toBase64() const
 
 void ByteVector::detach()
 {
-  if(d->counter->count() > 1) {
+  if(d->data.use_count() > 1) {
     if(!isEmpty())
       ByteVector(&d->data->front() + d->offset, d->length).swap(*this);
     else

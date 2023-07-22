@@ -27,6 +27,7 @@
 #define TAGLIB_MAP_H
 
 #include <map>
+#include <memory>
 
 #include "taglib.h"
 
@@ -210,7 +211,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class KeyP, class TP> class MapPrivate;
-    MapPrivate<Key, T> *d;
+    std::shared_ptr<MapPrivate<Key, T>> d;
 #endif
   };
 

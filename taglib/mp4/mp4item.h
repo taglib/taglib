@@ -81,7 +81,7 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
-      ItemPrivate *d;
+      std::shared_ptr<ItemPrivate> d;
     };
   }  // namespace MP4
 }  // namespace TagLib
