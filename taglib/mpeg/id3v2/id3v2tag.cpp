@@ -86,6 +86,9 @@ public:
     delete footer;
   }
 
+  TagPrivate(const TagPrivate &) = delete;
+  TagPrivate &operator=(const TagPrivate &) = delete;
+
   const FrameFactory *factory;
 
   File *file;

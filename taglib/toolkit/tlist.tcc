@@ -71,6 +71,8 @@ public:
   ~ListPrivate() {
     clear();
   }
+  ListPrivate(const ListPrivate &) = delete;
+  ListPrivate &operator=(const ListPrivate &) = delete;
   void clear() {
     if(autoDelete) {
       for(auto &m : list)

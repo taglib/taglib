@@ -62,6 +62,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   offset_t APELocation;
   long APESize;
 

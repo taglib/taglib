@@ -54,6 +54,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   Ogg::XiphComment *comment;
 
   Properties *properties;

@@ -62,6 +62,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
   offset_t ID3v2Location;

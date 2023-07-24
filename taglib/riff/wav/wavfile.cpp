@@ -55,6 +55,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   Properties *properties;
   TagUnion tag;
 

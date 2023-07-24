@@ -64,6 +64,9 @@ namespace TagLib {
 
       virtual ~StringHandler();
 
+      StringHandler(const StringHandler &) = delete;
+      StringHandler &operator=(const StringHandler &) = delete;
+
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.

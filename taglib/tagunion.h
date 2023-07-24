@@ -51,6 +51,9 @@ namespace TagLib {
 
     ~TagUnion() override;
 
+    TagUnion(const TagUnion &) = delete;
+    TagUnion &operator=(const TagUnion &) = delete;
+
     Tag *operator[](int index) const;
     Tag *tag(int index) const;
 

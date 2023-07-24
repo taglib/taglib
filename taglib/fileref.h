@@ -92,10 +92,14 @@ namespace TagLib {
     class TAGLIB_EXPORT FileTypeResolver
     {
     public:
+      FileTypeResolver();
       /*!
        * Destroys this FileTypeResolver instance.
        */
       virtual ~FileTypeResolver() = 0;
+
+      FileTypeResolver(const FileTypeResolver &) = delete;
+      FileTypeResolver &operator=(const FileTypeResolver &) = delete;
 
       /*!
        * This method must be overridden to provide an additional file type
@@ -118,10 +122,14 @@ namespace TagLib {
     class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
     {
     public:
+      StreamTypeResolver();
       /*!
        * Destroys this StreamTypeResolver instance.
        */
       ~StreamTypeResolver() override = 0;
+
+      StreamTypeResolver(const StreamTypeResolver &) = delete;
+      StreamTypeResolver &operator=(const StreamTypeResolver &) = delete;
 
       virtual File *createFileFromStream(IOStream *stream,
                                bool readAudioProperties = true,

@@ -48,6 +48,9 @@ public:
     delete tag;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   Properties *properties;
   ID3v2::Tag *tag;
 

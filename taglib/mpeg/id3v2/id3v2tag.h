@@ -70,6 +70,8 @@ namespace TagLib {
     public:
       Latin1StringHandler();
       virtual ~Latin1StringHandler();
+      Latin1StringHandler(const Latin1StringHandler &) = delete;
+      Latin1StringHandler &operator=(const Latin1StringHandler &) = delete;
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that

@@ -79,6 +79,9 @@ public:
       delete stream;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   IOStream *stream;
   bool streamOwner;
   bool valid;

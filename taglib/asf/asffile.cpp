@@ -70,6 +70,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   unsigned long long headerSize;
 
   ASF::Tag *tag;

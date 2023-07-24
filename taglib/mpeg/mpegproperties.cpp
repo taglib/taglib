@@ -56,6 +56,9 @@ public:
     delete xingHeader;
   }
 
+  PropertiesPrivate(const PropertiesPrivate &) = delete;
+  PropertiesPrivate &operator=(const PropertiesPrivate &) = delete;
+
   XingHeader *xingHeader;
   int length;
   int bitrate;

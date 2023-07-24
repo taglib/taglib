@@ -53,6 +53,9 @@ namespace TagLib {
      */
     ~ByteVectorStream() override;
 
+    ByteVectorStream(const ByteVectorStream &) = delete;
+    ByteVectorStream &operator=(const ByteVectorStream &) = delete;
+
     /*!
      * Returns the file name in the local file system encoding.
      */

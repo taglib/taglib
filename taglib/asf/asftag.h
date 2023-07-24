@@ -49,6 +49,9 @@ namespace TagLib {
 
       ~Tag() override;
 
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
+
       /*!
        * Returns the track name.
        */

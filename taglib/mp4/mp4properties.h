@@ -47,6 +47,9 @@ namespace TagLib {
       Properties(File *file, Atoms *atoms, ReadStyle style = Average);
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       /*!
        * Returns the length of the file in milliseconds.
        *

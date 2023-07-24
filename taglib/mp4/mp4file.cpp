@@ -64,6 +64,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   MP4::Tag        *tag;
   MP4::Atoms      *atoms;
   MP4::Properties *properties;

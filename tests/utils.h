@@ -139,6 +139,9 @@ public:
       deleteFile(m_filename);
   }
 
+  ScopedFileCopy(const ScopedFileCopy &) = delete;
+  ScopedFileCopy &operator=(const ScopedFileCopy &) = delete;
+
   string fileName() const
   {
     return m_filename;

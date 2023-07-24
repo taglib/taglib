@@ -45,6 +45,8 @@ namespace TagLib {
         Tag();
         Tag(TagLib::File *file, Atoms *atoms);
         ~Tag() override;
+        Tag(const Tag &) = delete;
+        Tag &operator=(const Tag &) = delete;
         bool save();
 
         String title() const override;

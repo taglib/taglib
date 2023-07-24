@@ -304,6 +304,9 @@ public:
     delete stream;
   }
 
+  FileRefPrivate(const FileRefPrivate &) = delete;
+  FileRefPrivate &operator=(const FileRefPrivate &) = delete;
+
   File     *file;
   IOStream *stream;
 };
@@ -509,6 +512,8 @@ void FileRef::parse(IOStream *stream, bool readAudioProperties,
   d->file = detectByContent(stream, readAudioProperties, audioPropertiesStyle);
 }
 
+FileRef::FileTypeResolver::FileTypeResolver() = default;
 FileRef::FileTypeResolver::~FileTypeResolver() = default;
 
+FileRef::StreamTypeResolver::StreamTypeResolver() = default;
 FileRef::StreamTypeResolver::~StreamTypeResolver() = default;

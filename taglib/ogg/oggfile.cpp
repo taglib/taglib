@@ -62,6 +62,9 @@ public:
     delete lastPageHeader;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   unsigned int streamSerialNumber;
   List<Page *> pages;
   PageHeader *firstPageHeader;

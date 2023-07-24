@@ -59,6 +59,9 @@ public:
     delete header;
   }
 
+  FramePrivate(const FramePrivate &) = delete;
+  FramePrivate &operator=(const FramePrivate &) = delete;
+
   Frame::Header *header;
 };
 
