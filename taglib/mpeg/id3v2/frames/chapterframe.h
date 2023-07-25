@@ -242,7 +242,7 @@ namespace TagLib {
       ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
 
       class ChapterFramePrivate;
-      ChapterFramePrivate *d;
+      std::unique_ptr<ChapterFramePrivate> d;
     };
   }  // namespace ID3v2
 }  // namespace TagLib

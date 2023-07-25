@@ -223,7 +223,7 @@ namespace TagLib {
       ByteVector lacingValues() const;
 
       class PageHeaderPrivate;
-      PageHeaderPrivate *d;
+      std::unique_ptr<PageHeaderPrivate> d;
     };
 
   }  // namespace Ogg

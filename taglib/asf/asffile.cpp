@@ -493,7 +493,7 @@ bool ASF::File::isSupported(IOStream *stream)
 
 ASF::File::File(FileName file, bool, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read();
@@ -501,16 +501,13 @@ ASF::File::File(FileName file, bool, Properties::ReadStyle) :
 
 ASF::File::File(IOStream *stream, bool, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read();
 }
 
-ASF::File::~File()
-{
-  delete d;
-}
+ASF::File::~File() = default;
 
 ASF::Tag *ASF::File::tag() const
 {

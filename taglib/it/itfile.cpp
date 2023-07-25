@@ -48,7 +48,7 @@ public:
 IT::File::File(FileName file, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+  d(std::make_unique<FilePrivate>(propertiesStyle))
 {
   if(isOpen())
     read(readProperties);
@@ -57,16 +57,13 @@ IT::File::File(FileName file, bool readProperties,
 IT::File::File(IOStream *stream, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+  d(std::make_unique<FilePrivate>(propertiesStyle))
 {
   if(isOpen())
     read(readProperties);
 }
 
-IT::File::~File()
-{
-  delete d;
-}
+IT::File::~File() = default;
 
 Mod::Tag *IT::File::tag() const
 {

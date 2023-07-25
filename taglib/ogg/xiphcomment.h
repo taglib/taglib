@@ -258,7 +258,7 @@ namespace TagLib {
 
     private:
       class XiphCommentPrivate;
-      XiphCommentPrivate *d;
+      std::unique_ptr<XiphCommentPrivate> d;
     };
   }  // namespace Ogg
 }  // namespace TagLib

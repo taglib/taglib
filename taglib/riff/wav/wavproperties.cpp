@@ -67,15 +67,12 @@ public:
 
 TagLib::RIFF::WAV::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-RIFF::WAV::Properties::~Properties()
-{
-  delete d;
-}
+RIFF::WAV::Properties::~Properties() = default;
 
 int RIFF::WAV::Properties::lengthInMilliseconds() const
 {

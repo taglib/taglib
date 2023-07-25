@@ -27,9 +27,8 @@
 
 using namespace TagLib;
 
-class StringListPrivate
+class StringList::StringListPrivate
 {
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,9 +56,18 @@ StringList StringList::split(const String &s, const String &pattern)
 
 StringList::StringList() = default;
 
-StringList::StringList(const StringList &l) : List<String>(l)
+StringList::StringList(const StringList &l) :
+  List<String>(l)
 {
+}
 
+StringList &StringList::operator=(const StringList &l)
+{
+  if(this == &l)
+    return *this;
+
+  List<String>::operator=(l);
+  return *this;
 }
 
 StringList::StringList(const String &s)
@@ -74,8 +82,7 @@ StringList::StringList(const ByteVectorList &bl, String::Type t)
   }
 }
 
-StringList::~StringList()
-= default;
+StringList::~StringList() = default;
 
 String StringList::toString(const String &separator) const
 {

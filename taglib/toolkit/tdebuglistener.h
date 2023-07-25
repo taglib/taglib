@@ -56,7 +56,7 @@ namespace TagLib
 
   private:
     class DebugListenerPrivate;
-    DebugListenerPrivate *d;
+    std::unique_ptr<DebugListenerPrivate> d;
   };
 
   /*!

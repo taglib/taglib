@@ -85,7 +85,7 @@ namespace TagLib {
 
     private:
       class ExtendedHeaderPrivate;
-      ExtendedHeaderPrivate *d;
+      std::unique_ptr<ExtendedHeaderPrivate> d;
     };
 
   }  // namespace ID3v2

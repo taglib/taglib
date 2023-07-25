@@ -150,7 +150,7 @@ namespace TagLib {
         void addItem(const String &name, const Item &value);
 
         class TagPrivate;
-        TagPrivate *d;
+        std::unique_ptr<TagPrivate> d;
     };
   }  // namespace MP4
 }  // namespace TagLib

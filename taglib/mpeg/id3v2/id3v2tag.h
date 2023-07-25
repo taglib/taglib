@@ -81,7 +81,7 @@ namespace TagLib {
 
     private:
       class Latin1StringHandlerPrivate;
-      Latin1StringHandlerPrivate *d;
+      std::unique_ptr<Latin1StringHandlerPrivate> d;
     };
 
     //! The main class in the ID3v2 implementation
@@ -392,7 +392,7 @@ namespace TagLib {
 
     private:
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
 
   }  // namespace ID3v2

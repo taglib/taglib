@@ -178,7 +178,7 @@ namespace TagLib {
       EventTimingCodesFrame(const ByteVector &data, Header *h);
 
       class EventTimingCodesFramePrivate;
-      EventTimingCodesFramePrivate *d;
+      std::unique_ptr<EventTimingCodesFramePrivate> d;
     };
 
   }  // namespace ID3v2

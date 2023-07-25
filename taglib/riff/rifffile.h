@@ -153,7 +153,7 @@ namespace TagLib {
       void updateGlobalSize();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace RIFF
 }  // namespace TagLib

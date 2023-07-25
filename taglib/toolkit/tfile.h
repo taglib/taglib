@@ -297,7 +297,7 @@ namespace TagLib {
 
   private:
     class FilePrivate;
-    FilePrivate *d;
+    std::unique_ptr<FilePrivate> d;
   };
 
 }  // namespace TagLib

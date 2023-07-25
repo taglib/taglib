@@ -164,7 +164,7 @@ namespace TagLib {
 
     private:
       class FooterPrivate;
-      FooterPrivate *d;
+      std::unique_ptr<FooterPrivate> d;
     };
 
   }  // namespace APE

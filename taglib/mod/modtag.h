@@ -182,7 +182,7 @@ namespace TagLib {
 
     private:
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
   }  // namespace Mod
 }  // namespace TagLib

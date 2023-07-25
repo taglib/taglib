@@ -95,7 +95,7 @@ bool TrueAudio::File::isSupported(IOStream *stream)
 
 TrueAudio::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -104,7 +104,7 @@ TrueAudio::File::File(FileName file, bool readProperties, Properties::ReadStyle)
 TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                       bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
@@ -112,7 +112,7 @@ TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 
 TrueAudio::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -121,16 +121,13 @@ TrueAudio::File::File(IOStream *stream, bool readProperties, Properties::ReadSty
 TrueAudio::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
                       bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-TrueAudio::File::~File()
-{
-  delete d;
-}
+TrueAudio::File::~File() = default;
 
 TagLib::Tag *TrueAudio::File::tag() const
 {

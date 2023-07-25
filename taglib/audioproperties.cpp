@@ -29,7 +29,6 @@ using namespace TagLib;
 
 class AudioProperties::AudioPropertiesPrivate
 {
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,8 +66,6 @@ int AudioProperties::sampleRate() const
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
 
-AudioProperties::AudioProperties(ReadStyle) :
-  d(nullptr)
+AudioProperties::AudioProperties(ReadStyle)
 {
-
 }

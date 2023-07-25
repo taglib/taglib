@@ -159,7 +159,7 @@ namespace TagLib {
       static FrameFactory factory;
 
       class FrameFactoryPrivate;
-      FrameFactoryPrivate *d;
+      std::unique_ptr<FrameFactoryPrivate> d;
     };
 
   }  // namespace ID3v2

@@ -108,7 +108,7 @@ namespace TagLib {
       void analyzeOld(File *file);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace APE
 }  // namespace TagLib

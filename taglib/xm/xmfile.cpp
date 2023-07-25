@@ -362,7 +362,7 @@ public:
 XM::File::File(FileName file, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(file),
-  d(new FilePrivate(propertiesStyle))
+  d(std::make_unique<FilePrivate>(propertiesStyle))
 {
   if(isOpen())
     read(readProperties);
@@ -371,16 +371,13 @@ XM::File::File(FileName file, bool readProperties,
 XM::File::File(IOStream *stream, bool readProperties,
                AudioProperties::ReadStyle propertiesStyle) :
   Mod::FileBase(stream),
-  d(new FilePrivate(propertiesStyle))
+  d(std::make_unique<FilePrivate>(propertiesStyle))
 {
   if(isOpen())
     read(readProperties);
 }
 
-XM::File::~File()
-{
-  delete d;
-}
+XM::File::~File() = default;
 
 Mod::Tag *XM::File::tag() const
 {

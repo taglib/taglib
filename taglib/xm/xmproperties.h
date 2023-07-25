@@ -71,7 +71,7 @@ namespace TagLib {
 
     private:
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace XM
 }  // namespace TagLib

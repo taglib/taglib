@@ -50,19 +50,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::Item::Item() :
-  d(new ItemPrivate())
+  d(std::make_unique<ItemPrivate>())
 {
 }
 
 APE::Item::Item(const String &key, const StringList &values) :
-  d(new ItemPrivate())
+  d(std::make_unique<ItemPrivate>())
 {
   d->key = key;
   d->text = values;
 }
 
 APE::Item::Item(const String &key, const ByteVector &value, bool binary) :
-  d(new ItemPrivate())
+  d(std::make_unique<ItemPrivate>())
 {
   d->key = key;
   if(binary) {
@@ -75,14 +75,11 @@ APE::Item::Item(const String &key, const ByteVector &value, bool binary) :
 }
 
 APE::Item::Item(const Item &item) :
-  d(new ItemPrivate(*item.d))
+  d(std::make_unique<ItemPrivate>(*item.d))
 {
 }
 
-APE::Item::~Item()
-{
-  delete d;
-}
+APE::Item::~Item() = default;
 
 Item &APE::Item::operator=(const Item &item)
 {

@@ -57,6 +57,14 @@
 
 using namespace TagLib;
 
+class FileRef::FileTypeResolver::FileTypeResolverPrivate
+{
+};
+
+class FileRef::StreamTypeResolver::StreamTypeResolverPrivate
+{
+};
+
 namespace
 {
   typedef List<const FileRef::FileTypeResolver *> ResolverList;

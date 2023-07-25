@@ -54,14 +54,11 @@ ByteVectorStream::ByteVectorStreamPrivate::ByteVectorStreamPrivate(const ByteVec
 ////////////////////////////////////////////////////////////////////////////////
 
 ByteVectorStream::ByteVectorStream(const ByteVector &data) :
-  d(new ByteVectorStreamPrivate(data))
+  d(std::make_unique<ByteVectorStreamPrivate>(data))
 {
 }
 
-ByteVectorStream::~ByteVectorStream()
-{
-  delete d;
-}
+ByteVectorStream::~ByteVectorStream() = default;
 
 FileName ByteVectorStream::name() const
 {

@@ -599,7 +599,7 @@ namespace TagLib {
 
   private:
     class ByteVectorPrivate;
-    ByteVectorPrivate *d;
+    std::unique_ptr<ByteVectorPrivate> d;
   };
 }  // namespace TagLib
 

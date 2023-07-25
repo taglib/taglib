@@ -223,7 +223,7 @@ namespace TagLib {
        */
       PropertyMap makeTMCLProperties() const;
       class TextIdentificationFramePrivate;
-      TextIdentificationFramePrivate *d;
+      std::unique_ptr<TextIdentificationFramePrivate> d;
     };
 
     /*!
@@ -257,6 +257,11 @@ namespace TagLib {
        * and \a values.
        */
       UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding = String::UTF8);
+
+      ~UserTextIdentificationFrame() override;
+
+      UserTextIdentificationFrame(const UserTextIdentificationFrame &) = delete;
+      UserTextIdentificationFrame &operator=(const UserTextIdentificationFrame &) = delete;
 
       String toString() const override;
 
@@ -304,7 +309,7 @@ namespace TagLib {
       void checkFields();
 
       class UserTextIdentificationFramePrivate;
-      UserTextIdentificationFramePrivate *d;
+      std::unique_ptr<UserTextIdentificationFramePrivate> d;
     };
 
   }  // namespace ID3v2

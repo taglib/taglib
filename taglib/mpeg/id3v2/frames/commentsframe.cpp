@@ -51,22 +51,19 @@ public:
 
 CommentsFrame::CommentsFrame(String::Type encoding) :
   Frame("COMM"),
-  d(new CommentsFramePrivate())
+  d(std::make_unique<CommentsFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 CommentsFrame::CommentsFrame(const ByteVector &data) :
   Frame(data),
-  d(new CommentsFramePrivate())
+  d(std::make_unique<CommentsFramePrivate>())
 {
   setData(data);
 }
 
-CommentsFrame::~CommentsFrame()
-{
-  delete d;
-}
+CommentsFrame::~CommentsFrame() = default;
 
 String CommentsFrame::toString() const
 {
@@ -191,7 +188,7 @@ ByteVector CommentsFrame::renderFields() const
 
 CommentsFrame::CommentsFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new CommentsFramePrivate())
+  d(std::make_unique<CommentsFramePrivate>())
 {
   parseFields(fieldData(data));
 }

@@ -45,6 +45,10 @@ public:
   FieldListMap fieldListMap;
 };
 
+class RIFF::Info::StringHandler::StringHandlerPrivate
+{
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,20 +72,17 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::Info::Tag::Tag(const ByteVector &data) :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
   parse(data);
 }
 
 RIFF::Info::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
-RIFF::Info::Tag::~Tag()
-{
-  delete d;
-}
+RIFF::Info::Tag::~Tag() = default;
 
 String RIFF::Info::Tag::title() const
 {

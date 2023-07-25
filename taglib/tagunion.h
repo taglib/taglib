@@ -93,7 +93,7 @@ namespace TagLib {
     TagUnion &operator=(const Tag &);
 
     class TagUnionPrivate;
-    TagUnionPrivate *d;
+    std::unique_ptr<TagUnionPrivate> d;
   };
 }  // namespace TagLib
 

@@ -72,7 +72,7 @@ namespace TagLib {
       UnknownFrame(const ByteVector &data, Header *h);
 
       class UnknownFramePrivate;
-      UnknownFramePrivate *d;
+      std::unique_ptr<UnknownFramePrivate> d;
     };
 
   }  // namespace ID3v2

@@ -140,7 +140,7 @@ namespace TagLib {
 
   private:
     class ByteVectorStreamPrivate;
-    ByteVectorStreamPrivate *d;
+    std::unique_ptr<ByteVectorStreamPrivate> d;
   };
 
 }  // namespace TagLib

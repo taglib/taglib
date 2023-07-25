@@ -79,15 +79,12 @@ public:
 
 MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file, atoms);
 }
 
-MP4::Properties::~Properties()
-{
-  delete d;
-}
+MP4::Properties::~Properties() = default;
 
 int
 MP4::Properties::channels() const

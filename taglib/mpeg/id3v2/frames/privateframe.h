@@ -103,7 +103,7 @@ namespace TagLib {
       PrivateFrame(const ByteVector &data, Header *h);
 
       class PrivateFramePrivate;
-      PrivateFramePrivate *d;
+      std::unique_ptr<PrivateFramePrivate> d;
     };
 
   }  // namespace ID3v2

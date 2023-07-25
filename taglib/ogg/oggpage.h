@@ -211,7 +211,7 @@ namespace TagLib {
 
     private:
       class PagePrivate;
-      PagePrivate *d;
+      std::unique_ptr<PagePrivate> d;
     };
   }  // namespace Ogg
 }  // namespace TagLib

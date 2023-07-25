@@ -277,7 +277,7 @@ namespace TagLib {
     private:
       class FramePrivate;
       friend class FramePrivate;
-      FramePrivate *d;
+      std::unique_ptr<FramePrivate> d;
     };
 
     //! ID3v2 frame header implementation
@@ -444,7 +444,7 @@ namespace TagLib {
 
     private:
       class HeaderPrivate;
-      HeaderPrivate *d;
+      std::unique_ptr<HeaderPrivate> d;
     };
 
   }  // namespace ID3v2

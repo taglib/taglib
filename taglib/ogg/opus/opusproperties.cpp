@@ -62,15 +62,12 @@ public:
 
 Opus::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-Opus::Properties::~Properties()
-{
-  delete d;
-}
+Opus::Properties::~Properties() = default;
 
 int Ogg::Opus::Properties::lengthInMilliseconds() const
 {

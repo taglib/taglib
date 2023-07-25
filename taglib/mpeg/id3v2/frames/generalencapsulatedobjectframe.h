@@ -172,7 +172,7 @@ namespace TagLib {
       GeneralEncapsulatedObjectFrame(const ByteVector &data, Header *h);
 
       class GeneralEncapsulatedObjectFramePrivate;
-      GeneralEncapsulatedObjectFramePrivate *d;
+      std::unique_ptr<GeneralEncapsulatedObjectFramePrivate> d;
     };
   }  // namespace ID3v2
 }  // namespace TagLib

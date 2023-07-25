@@ -85,7 +85,7 @@ namespace TagLib {
 
     private:
       class UrlLinkFramePrivate;
-      UrlLinkFramePrivate *d;
+      std::unique_ptr<UrlLinkFramePrivate> d;
     };
 
     //! ID3v2 User defined URL frame
@@ -182,7 +182,7 @@ namespace TagLib {
 
     private:
       class UserUrlLinkFramePrivate;
-      UserUrlLinkFramePrivate *d;
+      std::unique_ptr<UserUrlLinkFramePrivate> d;
     };
 
   }  // namespace ID3v2

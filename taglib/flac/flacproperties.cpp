@@ -58,15 +58,12 @@ public:
 
 FLAC::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(data, streamLength);
 }
 
-FLAC::Properties::~Properties()
-{
-  delete d;
-}
+FLAC::Properties::~Properties() = default;
 
 int FLAC::Properties::lengthInMilliseconds() const
 {

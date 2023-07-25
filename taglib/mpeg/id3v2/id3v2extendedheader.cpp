@@ -42,14 +42,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 ExtendedHeader::ExtendedHeader() :
-  d(new ExtendedHeaderPrivate())
+  d(std::make_unique<ExtendedHeaderPrivate>())
 {
 }
 
-ExtendedHeader::~ExtendedHeader()
-{
-  delete d;
-}
+ExtendedHeader::~ExtendedHeader() = default;
 
 unsigned int ExtendedHeader::size() const
 {

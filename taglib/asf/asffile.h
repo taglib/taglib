@@ -129,7 +129,7 @@ namespace TagLib {
       void read();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace ASF
 }  // namespace TagLib

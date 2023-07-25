@@ -148,7 +148,7 @@ namespace TagLib {
         friend class Properties;
 
         class FilePrivate;
-        FilePrivate *d;
+        std::unique_ptr<FilePrivate> d;
       };
     }  // namespace AIFF
   }  // namespace RIFF

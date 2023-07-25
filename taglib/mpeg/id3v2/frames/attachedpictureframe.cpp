@@ -50,21 +50,18 @@ public:
 
 AttachedPictureFrame::AttachedPictureFrame() :
   Frame("APIC"),
-  d(new AttachedPictureFramePrivate())
+  d(std::make_unique<AttachedPictureFramePrivate>())
 {
 }
 
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data) :
   Frame(data),
-  d(new AttachedPictureFramePrivate())
+  d(std::make_unique<AttachedPictureFramePrivate>())
 {
   setData(data);
 }
 
-AttachedPictureFrame::~AttachedPictureFrame()
-{
-  delete d;
-}
+AttachedPictureFrame::~AttachedPictureFrame() = default;
 
 String AttachedPictureFrame::toString() const
 {
@@ -173,7 +170,7 @@ ByteVector AttachedPictureFrame::renderFields() const
 
 AttachedPictureFrame::AttachedPictureFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new AttachedPictureFramePrivate())
+  d(std::make_unique<AttachedPictureFramePrivate>())
 {
   parseFields(fieldData(data));
 }

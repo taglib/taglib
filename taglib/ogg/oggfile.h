@@ -118,7 +118,7 @@ namespace TagLib {
       void writePacket(unsigned int i, const ByteVector &packet);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
 
   }  // namespace Ogg

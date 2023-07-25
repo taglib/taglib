@@ -308,7 +308,7 @@ namespace TagLib {
       void scan();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace FLAC
 }  // namespace TagLib

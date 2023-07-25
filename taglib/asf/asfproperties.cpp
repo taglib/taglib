@@ -58,14 +58,11 @@ public:
 
 ASF::Properties::Properties() :
   AudioProperties(AudioProperties::Average),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-ASF::Properties::~Properties()
-{
-  delete d;
-}
+ASF::Properties::~Properties() = default;
 
 int ASF::Properties::lengthInMilliseconds() const
 {

@@ -102,6 +102,10 @@ public:
   FrameList frameList;
 };
 
+class ID3v2::Latin1StringHandler::Latin1StringHandlerPrivate
+{
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,13 +124,13 @@ String Latin1StringHandler::parse(const ByteVector &data) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v2::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
   d->factory = FrameFactory::instance();
 }
 
 ID3v2::Tag::Tag(File *file, offset_t tagOffset, const FrameFactory *factory) :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
   d->factory = factory;
   d->file = file;
@@ -135,10 +139,7 @@ ID3v2::Tag::Tag(File *file, offset_t tagOffset, const FrameFactory *factory) :
   read();
 }
 
-ID3v2::Tag::~Tag()
-{
-  delete d;
-}
+ID3v2::Tag::~Tag() = default;
 
 String ID3v2::Tag::title() const
 {

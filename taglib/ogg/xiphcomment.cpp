@@ -62,20 +62,17 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::XiphComment::XiphComment() :
-  d(new XiphCommentPrivate())
+  d(std::make_unique<XiphCommentPrivate>())
 {
 }
 
 Ogg::XiphComment::XiphComment(const ByteVector &data) :
-  d(new XiphCommentPrivate())
+  d(std::make_unique<XiphCommentPrivate>())
 {
   parse(data);
 }
 
-Ogg::XiphComment::~XiphComment()
-{
-  delete d;
-}
+Ogg::XiphComment::~XiphComment() = default;
 
 String Ogg::XiphComment::title() const
 {

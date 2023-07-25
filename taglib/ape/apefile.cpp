@@ -105,7 +105,7 @@ bool APE::File::isSupported(IOStream *stream)
 
 APE::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -113,16 +113,13 @@ APE::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 APE::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-APE::File::~File()
-{
-  delete d;
-}
+APE::File::~File() = default;
 
 TagLib::Tag *APE::File::tag() const
 {

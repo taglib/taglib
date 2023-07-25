@@ -76,20 +76,17 @@ ByteVector APE::Footer::fileIdentifier()
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::Footer::Footer() :
-  d(new FooterPrivate())
+  d(std::make_unique<FooterPrivate>())
 {
 }
 
 APE::Footer::Footer(const ByteVector &data) :
-  d(new FooterPrivate())
+  d(std::make_unique<FooterPrivate>())
 {
   parse(data);
 }
 
-APE::Footer::~Footer()
-{
-  delete d;
-}
+APE::Footer::~Footer() = default;
 
 unsigned int APE::Footer::version() const
 {

@@ -112,7 +112,7 @@ namespace TagLib {
       unsigned int seekFinalIndex(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace WavPack
 }  // namespace TagLib

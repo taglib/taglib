@@ -126,7 +126,7 @@ namespace TagLib {
       PopularimeterFrame(const ByteVector &data, Header *h);
 
       class PopularimeterFramePrivate;
-      PopularimeterFramePrivate *d;
+      std::unique_ptr<PopularimeterFramePrivate> d;
     };
 
   }  // namespace ID3v2

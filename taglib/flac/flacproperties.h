@@ -101,7 +101,7 @@ namespace TagLib {
       void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace FLAC
 }  // namespace TagLib

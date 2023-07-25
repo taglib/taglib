@@ -42,20 +42,24 @@ public:
   StringList fieldList;
 };
 
+class UserTextIdentificationFrame::UserTextIdentificationFramePrivate
+{
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // TextIdentificationFrame public members
 ////////////////////////////////////////////////////////////////////////////////
 
 TextIdentificationFrame::TextIdentificationFrame(const ByteVector &type, String::Type encoding) :
   Frame(type),
-  d(new TextIdentificationFramePrivate())
+  d(std::make_unique<TextIdentificationFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data) :
   Frame(data),
-  d(new TextIdentificationFramePrivate())
+  d(std::make_unique<TextIdentificationFramePrivate>())
 {
   setData(data);
 }
@@ -89,10 +93,7 @@ TextIdentificationFrame *TextIdentificationFrame::createTMCLFrame(const Property
   return frame;
 }
 
-TextIdentificationFrame::~TextIdentificationFrame()
-{
-  delete d;
-}
+TextIdentificationFrame::~TextIdentificationFrame() = default;
 
 void TextIdentificationFrame::setText(const StringList &l)
 {
@@ -278,7 +279,7 @@ ByteVector TextIdentificationFrame::renderFields() const
 
 TextIdentificationFrame::TextIdentificationFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new TextIdentificationFramePrivate())
+  d(std::make_unique<TextIdentificationFramePrivate>())
 {
   parseFields(fieldData(data));
 }
@@ -336,9 +337,10 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
 // UserTextIdentificationFrame public members
 ////////////////////////////////////////////////////////////////////////////////
 
+UserTextIdentificationFrame::~UserTextIdentificationFrame() = default;
+
 UserTextIdentificationFrame::UserTextIdentificationFrame(String::Type encoding) :
-  TextIdentificationFrame("TXXX", encoding),
-  d(nullptr)
+  TextIdentificationFrame("TXXX", encoding)
 {
   StringList l;
   l.append(String());
@@ -354,8 +356,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const ByteVector &data)
 }
 
 UserTextIdentificationFrame::UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding) :
-    TextIdentificationFrame("TXXX", encoding),
-    d(nullptr)
+  TextIdentificationFrame("TXXX", encoding)
 {
   setDescription(description);
   setText(values);

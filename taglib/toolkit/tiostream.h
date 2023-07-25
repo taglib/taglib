@@ -162,7 +162,7 @@ namespace TagLib {
 
   private:
     class IOStreamPrivate;
-    IOStreamPrivate *d;
+    std::unique_ptr<IOStreamPrivate> d;
   };
 
 }  // namespace TagLib

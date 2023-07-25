@@ -71,15 +71,12 @@ public:
 
 WavPack::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file, streamLength);
 }
 
-WavPack::Properties::~Properties()
-{
-  delete d;
-}
+WavPack::Properties::~Properties() = default;
 
 int WavPack::Properties::lengthInMilliseconds() const
 {

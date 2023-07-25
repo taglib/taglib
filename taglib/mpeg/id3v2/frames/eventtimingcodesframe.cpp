@@ -47,21 +47,18 @@ public:
 
 EventTimingCodesFrame::EventTimingCodesFrame() :
   Frame("ETCO"),
-  d(new EventTimingCodesFramePrivate())
+  d(std::make_unique<EventTimingCodesFramePrivate>())
 {
 }
 
 EventTimingCodesFrame::EventTimingCodesFrame(const ByteVector &data) :
   Frame(data),
-  d(new EventTimingCodesFramePrivate())
+  d(std::make_unique<EventTimingCodesFramePrivate>())
 {
   setData(data);
 }
 
-EventTimingCodesFrame::~EventTimingCodesFrame()
-{
-  delete d;
-}
+EventTimingCodesFrame::~EventTimingCodesFrame() = default;
 
 String EventTimingCodesFrame::toString() const
 {
@@ -136,7 +133,7 @@ ByteVector EventTimingCodesFrame::renderFields() const
 
 EventTimingCodesFrame::EventTimingCodesFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new EventTimingCodesFramePrivate())
+  d(std::make_unique<EventTimingCodesFramePrivate>())
 {
   parseFields(fieldData(data));
 }

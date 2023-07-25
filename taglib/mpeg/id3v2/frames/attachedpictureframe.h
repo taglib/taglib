@@ -209,7 +209,7 @@ namespace TagLib {
       void parseFields(const ByteVector &data) override;
       ByteVector renderFields() const override;
       class AttachedPictureFramePrivate;
-      AttachedPictureFramePrivate *d;
+      std::unique_ptr<AttachedPictureFramePrivate> d;
 
     private:
       AttachedPictureFrame(const ByteVector &data, Header *h);

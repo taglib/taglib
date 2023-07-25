@@ -63,7 +63,7 @@ namespace TagLib {
 
     private:
       class MetadataBlockPrivate;
-      MetadataBlockPrivate *d;
+      std::unique_ptr<MetadataBlockPrivate> d;
     };
   }  // namespace FLAC
 }  // namespace TagLib

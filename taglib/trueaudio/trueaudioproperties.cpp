@@ -64,15 +64,12 @@ public:
 
 TrueAudio::Properties::Properties(const ByteVector &data, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(data, streamLength);
 }
 
-TrueAudio::Properties::~Properties()
-{
-  delete d;
-}
+TrueAudio::Properties::~Properties() = default;
 
 int TrueAudio::Properties::lengthInSeconds() const
 {

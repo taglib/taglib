@@ -91,7 +91,7 @@ namespace TagLib {
       void read(File *file, Atoms *atoms);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace MP4
 }  // namespace TagLib

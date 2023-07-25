@@ -41,15 +41,12 @@ public:
 
 PodcastFrame::PodcastFrame() :
   Frame("PCST"),
-  d(new PodcastFramePrivate())
+  d(std::make_unique<PodcastFramePrivate>())
 {
   d->fieldData = ByteVector(4, '\0');
 }
 
-PodcastFrame::~PodcastFrame()
-{
-  delete d;
-}
+PodcastFrame::~PodcastFrame() = default;
 
 String PodcastFrame::toString() const
 {
@@ -83,7 +80,7 @@ ByteVector PodcastFrame::renderFields() const
 
 PodcastFrame::PodcastFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new PodcastFramePrivate())
+  d(std::make_unique<PodcastFramePrivate>())
 {
   parseFields(fieldData(data));
 }

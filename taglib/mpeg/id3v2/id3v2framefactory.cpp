@@ -382,14 +382,11 @@ void FrameFactory::setDefaultTextEncoding(String::Type encoding)
 ////////////////////////////////////////////////////////////////////////////////
 
 FrameFactory::FrameFactory() :
-  d(new FrameFactoryPrivate())
+  d(std::make_unique<FrameFactoryPrivate>())
 {
 }
 
-FrameFactory::~FrameFactory()
-{
-  delete d;
-}
+FrameFactory::~FrameFactory() = default;
 
 namespace
 {

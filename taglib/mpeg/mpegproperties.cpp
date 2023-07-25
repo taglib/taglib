@@ -78,15 +78,12 @@ public:
 
 MPEG::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-MPEG::Properties::~Properties()
-{
-  delete d;
-}
+MPEG::Properties::~Properties() = default;
 
 int MPEG::Properties::lengthInMilliseconds() const
 {

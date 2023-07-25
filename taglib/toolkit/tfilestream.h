@@ -154,7 +154,7 @@ namespace TagLib {
 
   private:
     class FileStreamPrivate;
-    FileStreamPrivate *d;
+    std::unique_ptr<FileStreamPrivate> d;
   };
 
 }  // namespace TagLib

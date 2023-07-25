@@ -161,7 +161,7 @@ namespace TagLib {
       ByteVector xiphCommentData();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   } // namespace FLAC
   } // namespace Ogg

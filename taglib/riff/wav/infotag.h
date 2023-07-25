@@ -80,7 +80,7 @@ namespace TagLib {
 
     private:
       class StringHandlerPrivate;
-      StringHandlerPrivate *d;
+      std::unique_ptr<StringHandlerPrivate> d;
     };
 
     //! The main class in the ID3v2 implementation
@@ -190,7 +190,7 @@ namespace TagLib {
 
     private:
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
   }  // namespace Info
 }  // namespace RIFF

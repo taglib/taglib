@@ -94,12 +94,12 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 APE::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
 APE::Tag::Tag(TagLib::File *file, offset_t footerLocation) :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
   d->file = file;
   d->footerLocation = footerLocation;
@@ -107,10 +107,7 @@ APE::Tag::Tag(TagLib::File *file, offset_t footerLocation) :
   read();
 }
 
-APE::Tag::~Tag()
-{
-  delete d;
-}
+APE::Tag::~Tag() = default;
 
 ByteVector APE::Tag::fileIdentifier()
 {

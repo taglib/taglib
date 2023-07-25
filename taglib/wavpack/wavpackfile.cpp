@@ -93,7 +93,7 @@ bool WavPack::File::isSupported(IOStream *stream)
 
 WavPack::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -101,16 +101,13 @@ WavPack::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 WavPack::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-WavPack::File::~File()
-{
-  delete d;
-}
+WavPack::File::~File() = default;
 
 TagLib::Tag *WavPack::File::tag() const
 {

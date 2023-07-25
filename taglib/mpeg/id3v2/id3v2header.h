@@ -167,7 +167,7 @@ namespace TagLib {
 
     private:
       class HeaderPrivate;
-      HeaderPrivate *d;
+      std::unique_ptr<HeaderPrivate> d;
     };
 
   }  // namespace ID3v2

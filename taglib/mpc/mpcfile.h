@@ -224,7 +224,7 @@ namespace TagLib {
       void read(bool readProperties);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace MPC
 }  // namespace TagLib

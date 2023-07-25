@@ -109,7 +109,7 @@ namespace TagLib {
         void read(File *file);
 
         class PropertiesPrivate;
-        PropertiesPrivate *d;
+        std::unique_ptr<PropertiesPrivate> d;
       };
     }  // namespace WAV
   }  // namespace RIFF

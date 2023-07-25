@@ -53,21 +53,18 @@ public:
 
 RelativeVolumeFrame::RelativeVolumeFrame() :
   Frame("RVA2"),
-  d(new RelativeVolumeFramePrivate())
+  d(std::make_unique<RelativeVolumeFramePrivate>())
 {
 }
 
 RelativeVolumeFrame::RelativeVolumeFrame(const ByteVector &data) :
   Frame(data),
-  d(new RelativeVolumeFramePrivate())
+  d(std::make_unique<RelativeVolumeFramePrivate>())
 {
   setData(data);
 }
 
-RelativeVolumeFrame::~RelativeVolumeFrame()
-{
-  delete d;
-}
+RelativeVolumeFrame::~RelativeVolumeFrame() = default;
 
 String RelativeVolumeFrame::toString() const
 {
@@ -180,7 +177,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
 
 RelativeVolumeFrame::RelativeVolumeFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new RelativeVolumeFramePrivate())
+  d(std::make_unique<RelativeVolumeFramePrivate>())
 {
   parseFields(fieldData(data));
 }

@@ -38,6 +38,12 @@ namespace TagLib {
   namespace Mod {
     class TAGLIB_EXPORT FileBase : public TagLib::File
     {
+    public:
+      ~FileBase() override;
+
+      FileBase(const FileBase &) = delete;
+      FileBase& operator=(const FileBase &) = delete;
+
     protected:
       FileBase(FileName file);
       FileBase(IOStream *stream);
@@ -57,7 +63,7 @@ namespace TagLib {
       bool readU32B(unsigned long &number);
     private:
       class FileBasePrivate;
-      FileBasePrivate *d;
+      std::unique_ptr<FileBasePrivate> d;
     };
   }  // namespace Mod
 }  // namespace TagLib

@@ -47,21 +47,18 @@ public:
 
 PrivateFrame::PrivateFrame() :
   Frame("PRIV"),
-  d(new PrivateFramePrivate())
+  d(std::make_unique<PrivateFramePrivate>())
 {
 }
 
 PrivateFrame::PrivateFrame(const ByteVector &data) :
   Frame(data),
-  d(new PrivateFramePrivate())
+  d(std::make_unique<PrivateFramePrivate>())
 {
   Frame::setData(data);
 }
 
-PrivateFrame::~PrivateFrame()
-{
-  delete d;
-}
+PrivateFrame::~PrivateFrame() = default;
 
 String PrivateFrame::toString() const
 {
@@ -125,7 +122,7 @@ ByteVector PrivateFrame::renderFields() const
 
 PrivateFrame::PrivateFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new PrivateFramePrivate())
+  d(std::make_unique<PrivateFramePrivate>())
 {
   parseFields(fieldData(data));
 }

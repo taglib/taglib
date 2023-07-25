@@ -46,14 +46,11 @@ public:
 
 Mod::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
   AudioProperties(propertiesStyle),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-Mod::Properties::~Properties()
-{
-  delete d;
-}
+Mod::Properties::~Properties() = default;
 
 int Mod::Properties::bitrate() const
 {

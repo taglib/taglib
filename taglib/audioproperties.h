@@ -28,6 +28,8 @@
 
 #include "taglib_export.h"
 
+#include <memory>
+
 namespace TagLib {
 
   //! A simple, abstract interface to common audio properties
@@ -122,7 +124,7 @@ namespace TagLib {
 
   private:
     class AudioPropertiesPrivate;
-    AudioPropertiesPrivate *d;
+    std::unique_ptr<AudioPropertiesPrivate> d;
   };
 
 }  // namespace TagLib

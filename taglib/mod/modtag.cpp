@@ -34,22 +34,17 @@ using namespace Mod;
 class Mod::Tag::TagPrivate
 {
 public:
-  TagPrivate() = default;
-
   String title;
   String comment;
   String trackerName;
 };
 
 Mod::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
-Mod::Tag::~Tag()
-{
-  delete d;
-}
+Mod::Tag::~Tag() = default;
 
 String Mod::Tag::title() const
 {

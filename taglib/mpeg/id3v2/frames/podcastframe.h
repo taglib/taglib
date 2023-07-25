@@ -75,7 +75,7 @@ namespace TagLib {
       PodcastFrame(const ByteVector &data, Header *h);
 
       class PodcastFramePrivate;
-      PodcastFramePrivate *d;
+      std::unique_ptr<PodcastFramePrivate> d;
     };
 
   }  // namespace ID3v2

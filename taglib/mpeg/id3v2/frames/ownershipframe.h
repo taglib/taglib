@@ -144,7 +144,7 @@ namespace TagLib {
       OwnershipFrame(const ByteVector &data, Header *h);
 
       class OwnershipFramePrivate;
-      OwnershipFramePrivate *d;
+      std::unique_ptr<OwnershipFramePrivate> d;
     };
 
   }  // namespace ID3v2

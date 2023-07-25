@@ -52,21 +52,18 @@ public:
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame() :
   Frame("GEOB"),
-  d(new GeneralEncapsulatedObjectFramePrivate())
+  d(std::make_unique<GeneralEncapsulatedObjectFramePrivate>())
 {
 }
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame(const ByteVector &data) :
   Frame(data),
-  d(new GeneralEncapsulatedObjectFramePrivate())
+  d(std::make_unique<GeneralEncapsulatedObjectFramePrivate>())
 {
   setData(data);
 }
 
-GeneralEncapsulatedObjectFrame::~GeneralEncapsulatedObjectFrame()
-{
-  delete d;
-}
+GeneralEncapsulatedObjectFrame::~GeneralEncapsulatedObjectFrame() = default;
 
 String GeneralEncapsulatedObjectFrame::toString() const
 {
@@ -181,7 +178,7 @@ ByteVector GeneralEncapsulatedObjectFrame::renderFields() const
 
 GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new GeneralEncapsulatedObjectFramePrivate())
+  d(std::make_unique<GeneralEncapsulatedObjectFramePrivate>())
 {
   parseFields(fieldData(data));
 }

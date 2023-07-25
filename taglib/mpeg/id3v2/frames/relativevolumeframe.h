@@ -224,7 +224,7 @@ namespace TagLib {
       RelativeVolumeFrame(const ByteVector &data, Header *h);
 
       class RelativeVolumeFramePrivate;
-      RelativeVolumeFramePrivate *d;
+      std::unique_ptr<RelativeVolumeFramePrivate> d;
     };
 
   }  // namespace ID3v2

@@ -59,6 +59,8 @@ namespace TagLib {
      */
     ByteVectorList(const ByteVectorList &l);
 
+    ByteVectorList &operator=(const ByteVectorList &);
+
     /*!
      * Convert the ByteVectorList to a ByteVector separated by \a separator.  By
      * default a space is used.
@@ -76,7 +78,7 @@ namespace TagLib {
                                 int byteAlign = 1, int max = 0);
   private:
     class ByteVectorListPrivate;
-    ByteVectorListPrivate *d;
+    std::unique_ptr<ByteVectorListPrivate> d;
   };
 
 }  // namespace TagLib

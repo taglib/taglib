@@ -116,7 +116,7 @@ namespace TagLib {
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
     private:
       class FileTypeResolverPrivate;
-      FileTypeResolverPrivate *d;
+      std::unique_ptr<FileTypeResolverPrivate> d;
     };
 
     class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
@@ -137,7 +137,7 @@ namespace TagLib {
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
     private:
       class StreamTypeResolverPrivate;
-      StreamTypeResolverPrivate *d;
+      std::unique_ptr<StreamTypeResolverPrivate> d;
     };
 
     /*!

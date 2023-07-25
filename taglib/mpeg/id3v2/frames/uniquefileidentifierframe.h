@@ -115,7 +115,7 @@ namespace TagLib {
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);
 
       class UniqueFileIdentifierFramePrivate;
-      UniqueFileIdentifierFramePrivate *d;
+      std::unique_ptr<UniqueFileIdentifierFramePrivate> d;
     };
   }  // namespace ID3v2
 }  // namespace TagLib

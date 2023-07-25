@@ -194,7 +194,7 @@ namespace TagLib {
 
     private:
       class PicturePrivate;
-      PicturePrivate *d;
+      std::unique_ptr<PicturePrivate> d;
     };
 
     typedef List<Picture> PictureList;

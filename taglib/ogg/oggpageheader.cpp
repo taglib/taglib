@@ -68,16 +68,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::PageHeader::PageHeader(Ogg::File *file, offset_t pageOffset) :
-  d(new PageHeaderPrivate())
+  d(std::make_unique<PageHeaderPrivate>())
 {
   if(file && pageOffset >= 0)
     read(file, pageOffset);
 }
 
-Ogg::PageHeader::~PageHeader()
-{
-  delete d;
-}
+Ogg::PageHeader::~PageHeader() = default;
 
 bool Ogg::PageHeader::isValid() const
 {

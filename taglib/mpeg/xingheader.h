@@ -29,6 +29,8 @@
 #include "mpegheader.h"
 #include "taglib_export.h"
 
+#include <memory>
+
 namespace TagLib {
 
   class ByteVector;
@@ -112,7 +114,7 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
       class XingHeaderPrivate;
-      XingHeaderPrivate *d;
+      std::unique_ptr<XingHeaderPrivate> d;
     };
   }  // namespace MPEG
 }  // namespace TagLib

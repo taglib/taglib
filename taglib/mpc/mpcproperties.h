@@ -123,7 +123,7 @@ namespace TagLib {
       void readSV8(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace MPC
 }  // namespace TagLib

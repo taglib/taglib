@@ -60,6 +60,10 @@ public:
   unsigned char genre;
 };
 
+class ID3v1::StringHandler::StringHandlerPrivate
+{
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 // StringHandler implementation
 ////////////////////////////////////////////////////////////////////////////////
@@ -85,12 +89,12 @@ ByteVector ID3v1::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 ID3v1::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
 ID3v1::Tag::Tag(File *file, offset_t tagOffset) :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
   d->file = file;
   d->tagOffset = tagOffset;
@@ -98,10 +102,7 @@ ID3v1::Tag::Tag(File *file, offset_t tagOffset) :
   read();
 }
 
-ID3v1::Tag::~Tag()
-{
-  delete d;
-}
+ID3v1::Tag::~Tag() = default;
 
 ByteVector ID3v1::Tag::render() const
 {

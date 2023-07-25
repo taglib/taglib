@@ -70,7 +70,7 @@ public:
 
 MPC::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   ByteVector magic = file->readBlock(4);
   if(magic == "MPCK") {
@@ -83,10 +83,7 @@ MPC::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) 
   }
 }
 
-MPC::Properties::~Properties()
-{
-  delete d;
-}
+MPC::Properties::~Properties() = default;
 
 int MPC::Properties::lengthInMilliseconds() const
 {

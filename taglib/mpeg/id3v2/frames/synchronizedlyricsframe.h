@@ -225,7 +225,7 @@ namespace TagLib {
       SynchronizedLyricsFrame(const ByteVector &data, Header *h);
 
       class SynchronizedLyricsFramePrivate;
-      SynchronizedLyricsFramePrivate *d;
+      std::unique_ptr<SynchronizedLyricsFramePrivate> d;
     };
 
   }  // namespace ID3v2

@@ -205,7 +205,7 @@ namespace TagLib {
 
     private:
       class ItemPrivate;
-      ItemPrivate *d;
+      std::unique_ptr<ItemPrivate> d;
     };
   }  // namespace APE
 }  // namespace TagLib

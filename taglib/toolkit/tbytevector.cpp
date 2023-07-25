@@ -325,44 +325,41 @@ ByteVector ByteVector::fromFloat64BE(double value)
 ////////////////////////////////////////////////////////////////////////////////
 
 ByteVector::ByteVector() :
-  d(new ByteVectorPrivate(0, '\0'))
+  d(std::make_unique<ByteVectorPrivate>(0, '\0'))
 {
 }
 
 ByteVector::ByteVector(unsigned int size, char value) :
-  d(new ByteVectorPrivate(size, value))
+  d(std::make_unique<ByteVectorPrivate>(size, value))
 {
 }
 
 ByteVector::ByteVector(const ByteVector &v) :
-  d(new ByteVectorPrivate(*v.d, 0, v.d->length))
+  d(std::make_unique<ByteVectorPrivate>(*v.d, 0, v.d->length))
 {
 }
 
 ByteVector::ByteVector(const ByteVector &v, unsigned int offset, unsigned int length) :
-  d(new ByteVectorPrivate(*v.d, offset, length))
+  d(std::make_unique<ByteVectorPrivate>(*v.d, offset, length))
 {
 }
 
 ByteVector::ByteVector(char c) :
-  d(new ByteVectorPrivate(1, c))
+  d(std::make_unique<ByteVectorPrivate>(1, c))
 {
 }
 
 ByteVector::ByteVector(const char *data, unsigned int length) :
-  d(new ByteVectorPrivate(data, length))
+  d(std::make_unique<ByteVectorPrivate>(data, length))
 {
 }
 
 ByteVector::ByteVector(const char *data) :
-  d(new ByteVectorPrivate(data, static_cast<unsigned int>(::strlen(data))))
+  d(std::make_unique<ByteVectorPrivate>(data, static_cast<unsigned int>(::strlen(data))))
 {
 }
 
-ByteVector::~ByteVector()
-{
-  delete d;
-}
+ByteVector::~ByteVector() = default;
 
 ByteVector &ByteVector::setData(const char *s, unsigned int length)
 {

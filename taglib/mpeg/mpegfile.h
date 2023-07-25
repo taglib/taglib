@@ -327,7 +327,7 @@ namespace TagLib {
       offset_t findID3v2();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace MPEG
 }  // namespace TagLib

@@ -82,17 +82,14 @@ public:
 };
 
 TagUnion::TagUnion(Tag *first, Tag *second, Tag *third) :
-  d(new TagUnionPrivate())
+  d(std::make_unique<TagUnionPrivate>())
 {
   d->tags[0] = first;
   d->tags[1] = second;
   d->tags[2] = third;
 }
 
-TagUnion::~TagUnion()
-{
-  delete d;
-}
+TagUnion::~TagUnion() = default;
 
 Tag *TagUnion::operator[](int index) const
 {

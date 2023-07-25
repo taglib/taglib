@@ -172,7 +172,7 @@ namespace TagLib {
       CommentsFrame(const ByteVector &data, Header *h);
 
       class CommentsFramePrivate;
-      CommentsFramePrivate *d;
+      std::unique_ptr<CommentsFramePrivate> d;
     };
 
   }  // namespace ID3v2

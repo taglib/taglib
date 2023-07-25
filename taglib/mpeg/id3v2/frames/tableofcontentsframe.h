@@ -253,7 +253,7 @@ namespace TagLib {
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
 
       class TableOfContentsFramePrivate;
-      TableOfContentsFramePrivate *d;
+      std::unique_ptr<TableOfContentsFramePrivate> d;
     };
   }  // namespace ID3v2
 }  // namespace TagLib

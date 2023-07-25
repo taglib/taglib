@@ -60,14 +60,11 @@ public:
 
 XM::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
   AudioProperties(propertiesStyle),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-XM::Properties::~Properties()
-{
-  delete d;
-}
+XM::Properties::~Properties() = default;
 
 int XM::Properties::channels() const
 {
