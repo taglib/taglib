@@ -104,6 +104,9 @@ namespace TagLib {
 
       ~Tag() override;
 
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
+
       // Reimplementations
 
       String title() const override;
@@ -182,11 +185,7 @@ namespace TagLib {
        */
       void parse(const ByteVector &data);
 
-
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
       TagPrivate *d;
     };

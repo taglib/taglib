@@ -60,6 +60,9 @@ namespace TagLib {
        */
       ~OwnershipFrame() override;
 
+      OwnershipFrame(const OwnershipFrame &) = delete;
+      OwnershipFrame &operator=(const OwnershipFrame &) = delete;
+
       /*!
        * Returns the text of this popularimeter.
        *
@@ -139,8 +142,6 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       OwnershipFrame(const ByteVector &data, Header *h);
-      OwnershipFrame(const OwnershipFrame &) = delete;
-      OwnershipFrame &operator=(const OwnershipFrame &) = delete;
 
       class OwnershipFramePrivate;
       OwnershipFramePrivate *d;

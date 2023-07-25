@@ -1,4 +1,5 @@
 /***************************************************************************
+ *
     copyright            : (C) 2008 by Lukas Lalinsky
     email                : lalinsky@gmail.com
  ***************************************************************************/
@@ -60,6 +61,9 @@ namespace TagLib {
        */
       ~PopularimeterFrame() override;
 
+      PopularimeterFrame(const PopularimeterFrame &) = delete;
+      PopularimeterFrame &operator=(const PopularimeterFrame &) = delete;
+
       /*!
        * Returns the text of this popularimeter.
        *
@@ -120,8 +124,6 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       PopularimeterFrame(const ByteVector &data, Header *h);
-      PopularimeterFrame(const PopularimeterFrame &) = delete;
-      PopularimeterFrame &operator=(const PopularimeterFrame &) = delete;
 
       class PopularimeterFramePrivate;
       PopularimeterFramePrivate *d;

@@ -144,6 +144,9 @@ namespace TagLib {
        */
       ~TextIdentificationFrame() override;
 
+      TextIdentificationFrame(const TextIdentificationFrame &) = delete;
+      TextIdentificationFrame &operator=(const TextIdentificationFrame &) = delete;
+
       /*!
        * Text identification frames are a list of string fields.
        *
@@ -209,9 +212,6 @@ namespace TagLib {
       TextIdentificationFrame(const ByteVector &data, Header *h);
 
     private:
-      TextIdentificationFrame(const TextIdentificationFrame &) = delete;
-      TextIdentificationFrame &operator=(const TextIdentificationFrame &) = delete;
-
       /*!
        * Parses the special structure of a TIPL frame
        * Only the whitelisted roles "ARRANGER", "ENGINEER", "PRODUCER",

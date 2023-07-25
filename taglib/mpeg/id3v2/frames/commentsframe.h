@@ -61,6 +61,9 @@ namespace TagLib {
        */
       ~CommentsFrame() override;
 
+      CommentsFrame(const CommentsFrame &) = delete;
+      CommentsFrame &operator=(const CommentsFrame &) = delete;
+
       /*!
        * Returns the text of this comment.
        *
@@ -167,8 +170,6 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       CommentsFrame(const ByteVector &data, Header *h);
-      CommentsFrame(const CommentsFrame &) = delete;
-      CommentsFrame &operator=(const CommentsFrame &) = delete;
 
       class CommentsFramePrivate;
       CommentsFramePrivate *d;

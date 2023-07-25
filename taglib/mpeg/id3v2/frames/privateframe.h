@@ -58,6 +58,9 @@ namespace TagLib {
        */
       ~PrivateFrame() override;
 
+      PrivateFrame(const PrivateFrame &) = delete;
+      PrivateFrame &operator=(const PrivateFrame &) = delete;
+
       /*!
        * Returns the text of this private frame, currently just the owner.
        *
@@ -98,9 +101,6 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       PrivateFrame(const ByteVector &data, Header *h);
-
-      PrivateFrame(const PrivateFrame &) = delete;
-      PrivateFrame &operator=(const PrivateFrame &) = delete;
 
       class PrivateFramePrivate;
       PrivateFramePrivate *d;

@@ -65,6 +65,9 @@ namespace TagLib {
     class TAGLIB_EXPORT FrameFactory
     {
     public:
+      FrameFactory(const FrameFactory &) = delete;
+      FrameFactory &operator=(const FrameFactory &) = delete;
+
       static FrameFactory *instance();
 
       /*!
@@ -153,9 +156,6 @@ namespace TagLib {
                                  const Header *tagHeader) const;
 
     private:
-      FrameFactory(const FrameFactory &) = delete;
-      FrameFactory &operator=(const FrameFactory &) = delete;
-
       static FrameFactory factory;
 
       class FrameFactoryPrivate;

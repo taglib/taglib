@@ -37,6 +37,9 @@ namespace TagLib {
       Properties(AudioProperties::ReadStyle propertiesStyle);
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       int bitrate() const override;
       int sampleRate() const override;
       int channels() const override;
@@ -50,9 +53,6 @@ namespace TagLib {
       void setLengthInPatterns(unsigned char lengthInPatterns);
 
     private:
-      Properties(const Properties&) = delete;
-      Properties &operator=(const Properties&) = delete;
-
       class PropertiesPrivate;
       PropertiesPrivate *d;
     };

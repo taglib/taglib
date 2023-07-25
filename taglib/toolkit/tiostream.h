@@ -78,6 +78,9 @@ namespace TagLib {
      */
     virtual ~IOStream();
 
+    IOStream(const IOStream &) = delete;
+    IOStream &operator=(const IOStream &) = delete;
+
     /*!
      * Returns the stream name in the local file system encoding.
      */
@@ -158,9 +161,6 @@ namespace TagLib {
     virtual void truncate(offset_t length) = 0;
 
   private:
-    IOStream(const IOStream &) = delete;
-    IOStream &operator=(const IOStream &) = delete;
-
     class IOStreamPrivate;
     IOStreamPrivate *d;
   };

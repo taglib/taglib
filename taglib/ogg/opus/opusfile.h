@@ -81,6 +81,9 @@ namespace TagLib {
          */
         ~File() override;
 
+        File(const File &) = delete;
+        File &operator=(const File &) = delete;
+
         /*!
          * Returns the XiphComment for this file.  XiphComment implements the tag
          * interface, so this serves as the reimplementation of
@@ -123,9 +126,6 @@ namespace TagLib {
         static bool isSupported(IOStream *stream);
 
       private:
-        File(const File &) = delete;
-        File &operator=(const File &) = delete;
-
         void read(bool readProperties);
 
         class FilePrivate;

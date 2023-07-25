@@ -64,6 +64,9 @@ namespace TagLib {
      */
     virtual ~AudioProperties();
 
+    AudioProperties(const AudioProperties &) = delete;
+    AudioProperties &operator=(const AudioProperties &) = delete;
+
     /*!
       * Returns the length of the file in seconds.  The length is rounded down to
       * the nearest whole second.
@@ -118,9 +121,6 @@ namespace TagLib {
     AudioProperties(ReadStyle style);
 
   private:
-    AudioProperties(const AudioProperties &) = delete;
-    AudioProperties &operator=(const AudioProperties &) = delete;
-
     class AudioPropertiesPrivate;
     AudioPropertiesPrivate *d;
   };

@@ -59,6 +59,9 @@ namespace TagLib {
 
       virtual ~Page();
 
+      Page(const Page &) = delete;
+      Page &operator=(const Page &) = delete;
+
       /*!
        * Returns the page's position within the file (in bytes).
        */
@@ -207,9 +210,6 @@ namespace TagLib {
            bool containsLastPacket = false);
 
     private:
-      Page(const Page &) = delete;
-      Page &operator=(const Page &) = delete;
-
       class PagePrivate;
       PagePrivate *d;
     };

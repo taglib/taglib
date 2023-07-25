@@ -67,6 +67,9 @@ namespace TagLib {
        */
       ~TableOfContentsFrame() override;
 
+      TableOfContentsFrame(const TableOfContentsFrame &) = delete;
+      TableOfContentsFrame &operator=(const TableOfContentsFrame &) = delete;
+
       /*!
        * Returns the elementID of the frame. Element ID
        * is a null terminated string, however it's not human-readable.
@@ -248,8 +251,6 @@ namespace TagLib {
 
     private:
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
-      TableOfContentsFrame(const TableOfContentsFrame &) = delete;
-      TableOfContentsFrame &operator=(const TableOfContentsFrame &) = delete;
 
       class TableOfContentsFramePrivate;
       TableOfContentsFramePrivate *d;

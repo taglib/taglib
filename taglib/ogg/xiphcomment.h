@@ -85,6 +85,9 @@ namespace TagLib {
        */
       ~XiphComment() override;
 
+      XiphComment(const XiphComment &) = delete;
+      XiphComment &operator=(const XiphComment &) = delete;
+
       String title() const override;
       String artist() const override;
       String album() const override;
@@ -254,9 +257,6 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      XiphComment(const XiphComment &) = delete;
-      XiphComment &operator=(const XiphComment &) = delete;
-
       class XiphCommentPrivate;
       XiphCommentPrivate *d;
     };

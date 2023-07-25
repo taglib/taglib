@@ -74,6 +74,9 @@ namespace TagLib {
        */
       ~GeneralEncapsulatedObjectFrame() override;
 
+      GeneralEncapsulatedObjectFrame(const GeneralEncapsulatedObjectFrame &) = delete;
+      GeneralEncapsulatedObjectFrame &operator=(const GeneralEncapsulatedObjectFrame &) = delete;
+
       /*!
        * Returns a string containing the description, file name and mime-type
        */
@@ -167,8 +170,6 @@ namespace TagLib {
 
     private:
       GeneralEncapsulatedObjectFrame(const ByteVector &data, Header *h);
-      GeneralEncapsulatedObjectFrame(const GeneralEncapsulatedObjectFrame &) = delete;
-      GeneralEncapsulatedObjectFrame &operator=(const GeneralEncapsulatedObjectFrame &) = delete;
 
       class GeneralEncapsulatedObjectFramePrivate;
       GeneralEncapsulatedObjectFramePrivate *d;

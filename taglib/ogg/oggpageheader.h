@@ -59,6 +59,9 @@ namespace TagLib {
        */
       virtual ~PageHeader();
 
+      PageHeader(const PageHeader &) = delete;
+      PageHeader &operator=(const PageHeader &) = delete;
+
       /*!
        * Returns true if the header parsed properly and is valid.
        */
@@ -216,9 +219,6 @@ namespace TagLib {
       ByteVector render() const;
 
     private:
-      PageHeader(const PageHeader &) = delete;
-      PageHeader &operator=(const PageHeader &) = delete;
-
       void read(Ogg::File *file, offset_t pageOffset);
       ByteVector lacingValues() const;
 

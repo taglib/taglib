@@ -157,6 +157,9 @@ namespace TagLib {
        */
       ~Tag() override;
 
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
+
       // Reimplementations.
 
       String title() const override;
@@ -386,9 +389,6 @@ namespace TagLib {
       void downgradeFrames(FrameList *existingFrames, FrameList *newFrames) const;
 
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
       TagPrivate *d;
     };

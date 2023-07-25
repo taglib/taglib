@@ -62,6 +62,9 @@ namespace TagLib {
        */
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       /*!
        * Returns the length of the file in milliseconds.
        *
@@ -105,9 +108,6 @@ namespace TagLib {
       int version() const;
 
     private:
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
-
       void read(File *file, offset_t streamLength);
       unsigned int seekFinalIndex(File *file, offset_t streamLength);
 

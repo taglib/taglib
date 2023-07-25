@@ -58,6 +58,9 @@ namespace TagLib {
        */
       virtual ~ExtendedHeader();
 
+      ExtendedHeader(const ExtendedHeader &) = delete;
+      ExtendedHeader &operator=(const ExtendedHeader &) = delete;
+
       /*!
        * Returns the size of the extended header.  This is variable for the
        * extended header.
@@ -81,9 +84,6 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      ExtendedHeader(const ExtendedHeader &) = delete;
-      ExtendedHeader &operator=(const ExtendedHeader &) = delete;
-
       class ExtendedHeaderPrivate;
       ExtendedHeaderPrivate *d;
     };

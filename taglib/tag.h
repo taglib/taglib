@@ -52,6 +52,9 @@ namespace TagLib {
      */
     virtual ~Tag();
 
+    Tag(const Tag &) = delete;
+    Tag &operator=(const Tag &) = delete;
+
     /*!
      * Exports the tags of the file as dictionary mapping (human readable) tag
      * names (Strings) to StringLists of tag values.
@@ -187,9 +190,6 @@ namespace TagLib {
     Tag();
 
   private:
-    Tag(const Tag &) = delete;
-    Tag &operator=(const Tag &) = delete;
-
     class TagPrivate;
     TagPrivate *d;
   };

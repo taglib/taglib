@@ -73,6 +73,9 @@ namespace TagLib {
        */
       ~Tag() override;
 
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
+
       /*!
        * Renders the in memory values to a ByteVector suitable for writing to
        * the file.
@@ -196,9 +199,6 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
       TagPrivate *d;
     };

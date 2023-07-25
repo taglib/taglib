@@ -84,6 +84,9 @@ namespace TagLib {
        */
       virtual ~XingHeader();
 
+      XingHeader(const XingHeader &) = delete;
+      XingHeader &operator=(const XingHeader &) = delete;
+
       /*!
        * Returns true if the data was parsed properly and if there is a valid
        * Xing/VBRI header present.
@@ -106,9 +109,6 @@ namespace TagLib {
       HeaderType type() const;
 
     private:
-      XingHeader(const XingHeader &) = delete;
-      XingHeader &operator=(const XingHeader &) = delete;
-
       void parse(const ByteVector &data);
 
       class XingHeaderPrivate;

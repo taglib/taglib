@@ -48,6 +48,9 @@ namespace TagLib {
       Tag();
       ~Tag() override;
 
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
+
       /*!
        * Returns the track name; if no track name is present in the tag
        * String::null will be returned.
@@ -178,9 +181,6 @@ namespace TagLib {
       PropertyMap setProperties(const PropertyMap &) override;
 
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
       TagPrivate *d;
     };

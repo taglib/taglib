@@ -60,6 +60,9 @@ namespace TagLib {
        */
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       /*!
        * Returns the length of the file in seconds.  The length is rounded down to
        * the nearest whole second.
@@ -106,9 +109,6 @@ namespace TagLib {
       int ttaVersion() const;
 
     private:
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
-
       void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;

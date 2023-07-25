@@ -61,6 +61,9 @@ namespace TagLib {
          */
         ~Properties() override;
 
+        Properties(const Properties &) = delete;
+        Properties &operator=(const Properties &) = delete;
+
         /*!
          * Returns the length of the file in milliseconds.
          *
@@ -99,9 +102,6 @@ namespace TagLib {
         int opusVersion() const;
 
       private:
-        Properties(const Properties &) = delete;
-        Properties &operator=(const Properties &) = delete;
-
         void read(File *file);
 
         class PropertiesPrivate;
