@@ -36,7 +36,7 @@ namespace TagLib
     RefCounterPrivate() :
       refCount(1)
     {
-	}
+    }
 
     std::atomic_int refCount;
   };
