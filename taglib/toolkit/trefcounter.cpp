@@ -25,37 +25,7 @@
 
 #include "trefcounter.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#if defined(HAVE_GCC_ATOMIC)
-# define ATOMIC_INT int
-# define ATOMIC_INC(x) __sync_add_and_fetch(&(x), 1)
-# define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)
-#elif defined(HAVE_WIN_ATOMIC)
-# if !defined(NOMINMAX)
-#   define NOMINMAX
-# endif
-# include <windows.h>
-# define ATOMIC_INT long
-# define ATOMIC_INC(x) InterlockedIncrement(&x)
-# define ATOMIC_DEC(x) InterlockedDecrement(&x)
-#elif defined(HAVE_MAC_ATOMIC)
-# include <libkern/OSAtomic.h>
-# define ATOMIC_INT int32_t
-# define ATOMIC_INC(x) OSAtomicIncrement32Barrier(&x)
-# define ATOMIC_DEC(x) OSAtomicDecrement32Barrier(&x)
-#elif defined(HAVE_IA64_ATOMIC)
-# include <ia64intrin.h>
-# define ATOMIC_INT int
-# define ATOMIC_INC(x) __sync_add_and_fetch(&x, 1)
-# define ATOMIC_DEC(x) __sync_sub_and_fetch(&x, 1)
-#else
-# define ATOMIC_INT int
-# define ATOMIC_INC(x) (++x)
-# define ATOMIC_DEC(x) (--x)
-#endif
+#include <atomic>
 
 namespace TagLib
 {
@@ -64,9 +34,11 @@ namespace TagLib
   {
   public:
     RefCounterPrivate() :
-      refCount(1) {}
+      refCount(1)
+    {
+	}
 
-    volatile ATOMIC_INT refCount;
+    std::atomic_int refCount;
   };
 
   RefCounter::RefCounter() :
@@ -81,16 +53,16 @@ namespace TagLib
 
   void RefCounter::ref()
   {
-    ATOMIC_INC(d->refCount);
+    d->refCount.fetch_add(1);
   }
 
   bool RefCounter::deref()
   {
-    return (ATOMIC_DEC(d->refCount) == 0);
+    return d->refCount.fetch_sub(1) == 1;
   }
 
   int RefCounter::count() const
   {
-    return static_cast<int>(d->refCount);
+    return d->refCount.load();
   }
 }  // namespace TagLib
