@@ -34,53 +34,6 @@ if(NOT ${SIZEOF_DOUBLE} EQUAL 8)
   message(FATAL_ERROR "TagLib requires that double is 64-bit wide.")
 endif()
 
-# Determine which kind of atomic operations your compiler supports.
-
-check_cxx_source_compiles("
-    int main() {
-      volatile int x;
-      __sync_add_and_fetch(&x, 1);
-      int y = __sync_sub_and_fetch(&x, 1);
-      return 0;
-    }
-  " HAVE_GCC_ATOMIC)
-
-if(NOT HAVE_GCC_ATOMIC)
-  check_cxx_source_compiles("
-      #include <libkern/OSAtomic.h>
-      int main() {
-        volatile int32_t x;
-        OSAtomicIncrement32Barrier(&x);
-        int32_t y = OSAtomicDecrement32Barrier(&x);
-        return 0;
-      }
-    " HAVE_MAC_ATOMIC)
-
-  if(NOT HAVE_MAC_ATOMIC)
-    check_cxx_source_compiles("
-        #include <windows.h>
-        int main() {
-          volatile LONG x;
-          InterlockedIncrement(&x);
-          LONG y = InterlockedDecrement(&x);
-          return 0;
-        }
-      " HAVE_WIN_ATOMIC)
-
-    if(NOT HAVE_WIN_ATOMIC)
-      check_cxx_source_compiles("
-          #include <ia64intrin.h>
-          int main() {
-            volatile int x;
-            __sync_add_and_fetch(&x, 1);
-            int y = __sync_sub_and_fetch(&x, 1);
-            return 0;
-          }
-        " HAVE_IA64_ATOMIC)
-    endif()
-  endif()
-endif()
-
 # Determine which kind of byte swap functions your compiler supports.
 
 check_cxx_source_compiles("
