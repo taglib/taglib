@@ -10,10 +10,6 @@
 #cmakedefine   HAVE_MAC_BYTESWAP 1
 #cmakedefine   HAVE_OPENBSD_BYTESWAP 1
 
-/* Defined if your compiler supports some safer version of vsprintf */
-#cmakedefine   HAVE_VSNPRINTF 1
-#cmakedefine   HAVE_VSPRINTF_S 1
-
 /* Defined if your compiler supports ISO _strdup */
 #cmakedefine   HAVE_ISO_STRDUP 1
 

@@ -179,25 +179,7 @@ namespace TagLib
         char buf[BufferSize];
         int length;
 
-#if defined(HAVE_VSNPRINTF)
-
-        length = vsnprintf(buf, BufferSize, format, args);
-
-#elif defined(HAVE_VSPRINTF_S)
-
-        length = vsprintf_s(buf, format, args);
-
-#else
-
-        // The last resort. May cause a buffer overflow.
-
-        length = vsprintf(buf, format, args);
-        if(length >= BufferSize) {
-          debug("Utils::formatString() - Buffer overflow! Returning an empty string.");
-          length = -1;
-        }
-
-#endif
+        length = std::vsnprintf(buf, BufferSize, format, args);
 
         va_end(args);
 

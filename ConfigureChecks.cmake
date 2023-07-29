@@ -93,32 +93,6 @@ if(NOT HAVE_GCC_BYTESWAP)
   endif()
 endif()
 
-# Determine whether your compiler supports some safer version of vsprintf.
-
-check_cxx_source_compiles("
-  #include <cstdio>
-  #include <cstdarg>
-  int main() {
-    char buf[20];
-    va_list args;
-    vsnprintf(buf, 20, \"%d\", args);
-    return 0;
-  }
-" HAVE_VSNPRINTF)
-
-if(NOT HAVE_VSNPRINTF)
-  check_cxx_source_compiles("
-    #include <cstdio>
-    #include <cstdarg>
-    int main() {
-      char buf[20];
-      va_list args;
-      vsprintf_s(buf, \"%d\", args);
-      return 0;
-    }
-  " HAVE_VSPRINTF_S)
-endif()
-
 # Determine whether your compiler supports ISO _strdup.
 
 check_cxx_source_compiles("
