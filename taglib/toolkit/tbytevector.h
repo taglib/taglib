@@ -95,7 +95,7 @@ namespace TagLib {
     /*!
      * Destroys this ByteVector instance.
      */
-    virtual ~ByteVector();
+    ~ByteVector();
 
     /*!
      * Sets the data for the byte array using the first \a length bytes of \a data

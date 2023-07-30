@@ -76,7 +76,7 @@ namespace TagLib {
     /*!
      * Destroys this instance of the Map.
      */
-    virtual ~Map();
+    ~Map();
 
     /*!
      * Returns an STL style iterator to the beginning of the map.  See

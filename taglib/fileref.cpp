@@ -299,7 +299,7 @@ public:
     file(nullptr),
     stream(nullptr) {}
 
-  ~FileRefPrivate() override {
+  ~FileRefPrivate() {
     delete file;
     delete stream;
   }

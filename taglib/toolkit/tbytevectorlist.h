@@ -50,7 +50,7 @@ namespace TagLib {
     /*!
      * Destroys this ByteVectorList instance.
      */
-    ~ByteVectorList() override;
+    ~ByteVectorList();
 
     /*!
      * Make a shallow, implicitly shared, copy of \a l.  Because this is

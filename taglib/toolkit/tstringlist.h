@@ -74,7 +74,7 @@ namespace TagLib {
     /*!
      * Destroys this StringList instance.
      */
-    ~StringList() override;
+    ~StringList();
 
     /*!
      * Concatenate the list of strings into one string separated by \a separator.

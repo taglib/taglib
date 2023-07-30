@@ -69,7 +69,7 @@ template <class TP> class List<T>::ListPrivate<TP *>  : public ListPrivateBase
 public:
   ListPrivate() : ListPrivateBase() {}
   ListPrivate(const std::list<TP *> &l) : ListPrivateBase(), list(l) {}
-  ~ListPrivate() override {
+  ~ListPrivate() {
     clear();
   }
   void clear() {

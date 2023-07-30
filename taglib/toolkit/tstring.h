@@ -185,7 +185,7 @@ namespace TagLib {
     /*!
      * Destroys this String instance.
      */
-    virtual ~String();
+    ~String();
 
     /*!
      * Returns a deep copy of this String as an std::string.  The returned string

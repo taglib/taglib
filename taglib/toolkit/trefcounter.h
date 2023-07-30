@@ -43,7 +43,7 @@ namespace TagLib
   {
   public:
     RefCounter();
-    virtual ~RefCounter();
+    ~RefCounter();
 
     void ref();
     bool deref();
