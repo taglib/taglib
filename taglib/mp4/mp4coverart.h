@@ -48,7 +48,7 @@ namespace TagLib {
       };
 
       CoverArt(Format format, const ByteVector &data);
-      ~CoverArt();
+      virtual ~CoverArt();
 
       CoverArt(const CoverArt &item);
 

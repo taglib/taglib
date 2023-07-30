@@ -27,22 +27,40 @@
 
 using namespace TagLib;
 
-PropertyMap::PropertyMap() = default;
-
-PropertyMap::PropertyMap(const PropertyMap &m) = default;
-
-PropertyMap::PropertyMap(const SimplePropertyMap &m)
+class PropertyMap::PropertyMapPrivate
 {
-  for(auto it = m.begin(); it != m.end(); ++it){
-    String key = it->first.upper();
+public:
+    StringList unsupported;
+};
+
+PropertyMap::PropertyMap() :
+  d(new PropertyMapPrivate)
+{
+
+}
+
+PropertyMap::PropertyMap(const PropertyMap &m) :
+  SimplePropertyMap(m),
+  d(new PropertyMapPrivate)
+{
+  *d = *m.d;
+}
+
+PropertyMap::PropertyMap(const SimplePropertyMap &m) :
+  d(new PropertyMapPrivate)
+{
+  for(auto [key, value] : m) {
     if(!key.isEmpty())
-      insert(it->first, it->second);
+      insert(key.upper(), value);
     else
-      unsupported.append(it->first);
+      d->unsupported.append(key.upper());
   }
 }
 
-PropertyMap::~PropertyMap() = default;
+PropertyMap::~PropertyMap()
+{
+  delete d;
+}
 
 bool PropertyMap::insert(const String &key, const StringList &values)
 {
@@ -106,7 +124,7 @@ PropertyMap &PropertyMap::merge(const PropertyMap &other)
 {
   for(auto it = other.begin(); it != other.end(); ++it)
     insert(it->first, it->second);
-  unsupported.append(other.unsupported);
+  d->unsupported.append(other.d->unsupported);
   return *this;
 }
 
@@ -138,7 +156,7 @@ bool PropertyMap::operator==(const PropertyMap &other) const
     if( otherFind == other.end() || (otherFind->second != it->second) )
       return false;
   }
-  return unsupported == other.unsupported;
+  return d->unsupported == other.d->unsupported;
 }
 
 bool PropertyMap::operator!=(const PropertyMap &other) const
@@ -152,8 +170,8 @@ String PropertyMap::toString() const
 
   for(auto it = begin(); it != end(); ++it)
     ret += it->first+"="+it->second.toString(", ") + "\n";
-  if(!unsupported.isEmpty())
-    ret += "Unsupported Data: " + unsupported.toString(", ") + "\n";
+  if(!d->unsupported.isEmpty())
+    ret += "Unsupported Data: " + d->unsupported.toString(", ") + "\n";
   return ret;
 }
 
@@ -169,12 +187,14 @@ void PropertyMap::removeEmpty()
 
 StringList &PropertyMap::unsupportedData()
 {
-  return unsupported;
+  return d->unsupported;
 }
 
-const StringList &PropertyMap::unsupportedData() const
+PropertyMap &PropertyMap::operator=(const PropertyMap &other)
 {
-  return unsupported;
+  SimplePropertyMap::operator=(other);
+  *d = *other.d;
+  return *this;
 }
 
 #ifdef _MSC_VER

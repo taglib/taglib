@@ -160,6 +160,9 @@ namespace TagLib {
   private:
     IOStream(const IOStream &) = delete;
     IOStream &operator=(const IOStream &) = delete;
+
+    class IOStreamPrivate;
+    IOStreamPrivate *d;
   };
 
 }  // namespace TagLib

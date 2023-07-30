@@ -110,6 +110,9 @@ namespace TagLib {
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
+    private:
+      class FileTypeResolverPrivate;
+      FileTypeResolverPrivate *d;
     };
 
     class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
@@ -124,6 +127,9 @@ namespace TagLib {
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
+    private:
+      class StreamTypeResolverPrivate;
+      StreamTypeResolverPrivate *d;
     };
 
     /*!

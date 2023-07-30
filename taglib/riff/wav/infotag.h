@@ -61,7 +61,7 @@ namespace TagLib {
     {
     public:
       StringHandler();
-      ~StringHandler();
+      virtual ~StringHandler();
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
@@ -74,6 +74,10 @@ namespace TagLib {
        * assumes that \a s is an UTF-8 string.
        */
       virtual ByteVector render(const String &s) const;
+
+    private:
+      class StringHandlerPrivate;
+      StringHandlerPrivate *d;
     };
 
     //! The main class in the ID3v2 implementation

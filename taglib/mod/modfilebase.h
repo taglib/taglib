@@ -55,6 +55,9 @@ namespace TagLib {
       bool readU32L(unsigned long &number);
       bool readU16B(unsigned short &number);
       bool readU32B(unsigned long &number);
+    private:
+      class FileBasePrivate;
+      FileBasePrivate *d;
     };
   }  // namespace Mod
 }  // namespace TagLib

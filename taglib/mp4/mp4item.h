@@ -52,7 +52,7 @@ namespace TagLib {
        */
       void swap(Item &item);
 
-      ~Item();
+      virtual ~Item();
 
       Item(int value);
       Item(unsigned char value);

@@ -80,6 +80,10 @@ namespace TagLib {
        * ISO-8859-1.
        */
       virtual ByteVector render(const String &s) const;
+
+    private:
+      class StringHandlerPrivate;
+      StringHandlerPrivate *d;
     };
 
     //! The main class in the ID3v1 implementation

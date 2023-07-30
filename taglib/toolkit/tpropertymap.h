@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_PROPERTYMAP_H_
-#define TAGLIB_PROPERTYMAP_H_
+#ifndef TAGLIB_PROPERTYMAP_H
+#define TAGLIB_PROPERTYMAP_H
 
 #include "tmap.h"
 #include "tstringlist.h"
@@ -198,7 +198,7 @@ namespace TagLib {
      * If no defaultValue is specified, it returns an empty string list.
      */
     StringList value(const String &key,
-                           const StringList &defaultValue = StringList()) const;
+                     const StringList &defaultValue = StringList()) const;
 
     /*!
      * Returns a reference to the value associated with \a key.
@@ -235,9 +235,11 @@ namespace TagLib {
      * You can remove items from the returned list, which tells TagLib to remove
      * those unsupported elements if you call File::setProperties() with the
      * same PropertyMap as argument.
+     *
+     * \deprecated
      */
+    // TODO: Returning mutable references to internal data structures is a bad idea.
     StringList &unsupportedData();
-    const StringList &unsupportedData() const;
 
     /*!
      * Removes all entries which have an empty value list.
@@ -246,11 +248,12 @@ namespace TagLib {
 
     String toString() const;
 
+    PropertyMap &operator=(const PropertyMap &other);
+
   private:
-
-
-    StringList unsupported;
+    class PropertyMapPrivate;
+    PropertyMapPrivate *d;
   };
 
 }  // namespace TagLib
-#endif /* TAGLIB_PROPERTYMAP_H_ */
+#endif /* TAGLIB_PROPERTYMAP_H */
