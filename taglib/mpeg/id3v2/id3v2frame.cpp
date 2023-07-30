@@ -25,6 +25,7 @@
 
 #include "id3v2frame.h"
 
+#include <array>
 #include <bitset>
 
 #include "tdebug.h"
@@ -307,122 +308,119 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
 
 namespace
 {
-  const std::pair<const char *, const char *> frameTranslation[] = {
+  constexpr std::array frameTranslation {
     // Text information frames
-    std::make_pair("TALB", "ALBUM"),
-    std::make_pair("TBPM", "BPM"),
-    std::make_pair("TCOM", "COMPOSER"),
-    std::make_pair("TCON", "GENRE"),
-    std::make_pair("TCOP", "COPYRIGHT"),
-    std::make_pair("TDEN", "ENCODINGTIME"),
-    std::make_pair("TDLY", "PLAYLISTDELAY"),
-    std::make_pair("TDOR", "ORIGINALDATE"),
-    std::make_pair("TDRC", "DATE"),
-    // std::make_pair("TRDA", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
-    // std::make_pair("TDAT", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
-    // std::make_pair("TYER", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
-    // std::make_pair("TIME", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
-    std::make_pair("TDRL", "RELEASEDATE"),
-    std::make_pair("TDTG", "TAGGINGDATE"),
-    std::make_pair("TENC", "ENCODEDBY"),
-    std::make_pair("TEXT", "LYRICIST"),
-    std::make_pair("TFLT", "FILETYPE"),
-    //std::make_pair("TIPL", "INVOLVEDPEOPLE"), handled separately
-    std::make_pair("TIT1", "WORK"), // 'Work' in iTunes
-    std::make_pair("TIT2", "TITLE"),
-    std::make_pair("TIT3", "SUBTITLE"),
-    std::make_pair("TKEY", "INITIALKEY"),
-    std::make_pair("TLAN", "LANGUAGE"),
-    std::make_pair("TLEN", "LENGTH"),
-    //std::make_pair("TMCL", "MUSICIANCREDITS"), handled separately
-    std::make_pair("TMED", "MEDIA"),
-    std::make_pair("TMOO", "MOOD"),
-    std::make_pair("TOAL", "ORIGINALALBUM"),
-    std::make_pair("TOFN", "ORIGINALFILENAME"),
-    std::make_pair("TOLY", "ORIGINALLYRICIST"),
-    std::make_pair("TOPE", "ORIGINALARTIST"),
-    std::make_pair("TOWN", "OWNER"),
-    std::make_pair("TPE1", "ARTIST"),
-    std::make_pair("TPE2", "ALBUMARTIST"), // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
-    std::make_pair("TPE3", "CONDUCTOR"),
-    std::make_pair("TPE4", "REMIXER"), // could also be ARRANGER
-    std::make_pair("TPOS", "DISCNUMBER"),
-    std::make_pair("TPRO", "PRODUCEDNOTICE"),
-    std::make_pair("TPUB", "LABEL"),
-    std::make_pair("TRCK", "TRACKNUMBER"),
-    std::make_pair("TRSN", "RADIOSTATION"),
-    std::make_pair("TRSO", "RADIOSTATIONOWNER"),
-    std::make_pair("TSOA", "ALBUMSORT"),
-    std::make_pair("TSOC", "COMPOSERSORT"),
-    std::make_pair("TSOP", "ARTISTSORT"),
-    std::make_pair("TSOT", "TITLESORT"),
-    std::make_pair("TSO2", "ALBUMARTISTSORT"), // non-standard, used by iTunes
-    std::make_pair("TSRC", "ISRC"),
-    std::make_pair("TSSE", "ENCODING"),
-    std::make_pair("TSST", "DISCSUBTITLE"),
+    std::pair("TALB", "ALBUM"),
+    std::pair("TBPM", "BPM"),
+    std::pair("TCOM", "COMPOSER"),
+    std::pair("TCON", "GENRE"),
+    std::pair("TCOP", "COPYRIGHT"),
+    std::pair("TDEN", "ENCODINGTIME"),
+    std::pair("TDLY", "PLAYLISTDELAY"),
+    std::pair("TDOR", "ORIGINALDATE"),
+    std::pair("TDRC", "DATE"),
+    // std::pair("TRDA", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
+    // std::pair("TDAT", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
+    // std::pair("TYER", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
+    // std::pair("TIME", "DATE"), // id3 v2.3, replaced by TDRC in v2.4
+    std::pair("TDRL", "RELEASEDATE"),
+    std::pair("TDTG", "TAGGINGDATE"),
+    std::pair("TENC", "ENCODEDBY"),
+    std::pair("TEXT", "LYRICIST"),
+    std::pair("TFLT", "FILETYPE"),
+    // std::pair("TIPL", "INVOLVEDPEOPLE"), handled separately
+    std::pair("TIT1", "WORK"), // 'Work' in iTunes
+    std::pair("TIT2", "TITLE"),
+    std::pair("TIT3", "SUBTITLE"),
+    std::pair("TKEY", "INITIALKEY"),
+    std::pair("TLAN", "LANGUAGE"),
+    std::pair("TLEN", "LENGTH"),
+    // std::pair("TMCL", "MUSICIANCREDITS"), handled separately
+    std::pair("TMED", "MEDIA"),
+    std::pair("TMOO", "MOOD"),
+    std::pair("TOAL", "ORIGINALALBUM"),
+    std::pair("TOFN", "ORIGINALFILENAME"),
+    std::pair("TOLY", "ORIGINALLYRICIST"),
+    std::pair("TOPE", "ORIGINALARTIST"),
+    std::pair("TOWN", "OWNER"),
+    std::pair("TPE1", "ARTIST"),
+    std::pair("TPE2", "ALBUMARTIST"), // id3's spec says 'PERFORMER', but most programs use 'ALBUMARTIST'
+    std::pair("TPE3", "CONDUCTOR"),
+    std::pair("TPE4", "REMIXER"),     // could also be ARRANGER
+    std::pair("TPOS", "DISCNUMBER"),
+    std::pair("TPRO", "PRODUCEDNOTICE"),
+    std::pair("TPUB", "LABEL"),
+    std::pair("TRCK", "TRACKNUMBER"),
+    std::pair("TRSN", "RADIOSTATION"),
+    std::pair("TRSO", "RADIOSTATIONOWNER"),
+    std::pair("TSOA", "ALBUMSORT"),
+    std::pair("TSOC", "COMPOSERSORT"),
+    std::pair("TSOP", "ARTISTSORT"),
+    std::pair("TSOT", "TITLESORT"),
+    std::pair("TSO2", "ALBUMARTISTSORT"), // non-standard, used by iTunes
+    std::pair("TSRC", "ISRC"),
+    std::pair("TSSE", "ENCODING"),
+    std::pair("TSST", "DISCSUBTITLE"),
     // URL frames
-    std::make_pair("WCOP", "COPYRIGHTURL"),
-    std::make_pair("WOAF", "FILEWEBPAGE"),
-    std::make_pair("WOAR", "ARTISTWEBPAGE"),
-    std::make_pair("WOAS", "AUDIOSOURCEWEBPAGE"),
-    std::make_pair("WORS", "RADIOSTATIONWEBPAGE"),
-    std::make_pair("WPAY", "PAYMENTWEBPAGE"),
-    std::make_pair("WPUB", "PUBLISHERWEBPAGE"),
-    //std::make_pair("WXXX", "URL"), handled specially
+    std::pair("WCOP", "COPYRIGHTURL"),
+    std::pair("WOAF", "FILEWEBPAGE"),
+    std::pair("WOAR", "ARTISTWEBPAGE"),
+    std::pair("WOAS", "AUDIOSOURCEWEBPAGE"),
+    std::pair("WORS", "RADIOSTATIONWEBPAGE"),
+    std::pair("WPAY", "PAYMENTWEBPAGE"),
+    std::pair("WPUB", "PUBLISHERWEBPAGE"),
+    // std::pair("WXXX", "URL"), handled specially
     // Other frames
-    std::make_pair("COMM", "COMMENT"),
-    //std::make_pair("USLT", "LYRICS"), handled specially
+    std::pair("COMM", "COMMENT"),
+    // std::pair("USLT", "LYRICS"), handled specially
     // Apple iTunes proprietary frames
-    std::make_pair("PCST", "PODCAST"),
-    std::make_pair("TCAT", "PODCASTCATEGORY"),
-    std::make_pair("TDES", "PODCASTDESC"),
-    std::make_pair("TGID", "PODCASTID"),
-    std::make_pair("WFED", "PODCASTURL"),
-    std::make_pair("MVNM", "MOVEMENTNAME"),
-    std::make_pair("MVIN", "MOVEMENTNUMBER"),
-    std::make_pair("GRP1", "GROUPING"),
-    std::make_pair("TCMP", "COMPILATION"),
+    std::pair("PCST", "PODCAST"),
+    std::pair("TCAT", "PODCASTCATEGORY"),
+    std::pair("TDES", "PODCASTDESC"),
+    std::pair("TGID", "PODCASTID"),
+    std::pair("WFED", "PODCASTURL"),
+    std::pair("MVNM", "MOVEMENTNAME"),
+    std::pair("MVIN", "MOVEMENTNUMBER"),
+    std::pair("GRP1", "GROUPING"),
+    std::pair("TCMP", "COMPILATION"),
   };
-  const size_t frameTranslationSize = sizeof(frameTranslation) / sizeof(frameTranslation[0]);
 
-  const std::pair<const char *, const char *> txxxFrameTranslation[] = {
-    std::make_pair("MUSICBRAINZ ALBUM ID",         "MUSICBRAINZ_ALBUMID"),
-    std::make_pair("MUSICBRAINZ ARTIST ID",        "MUSICBRAINZ_ARTISTID"),
-    std::make_pair("MUSICBRAINZ ALBUM ARTIST ID",  "MUSICBRAINZ_ALBUMARTISTID"),
-    std::make_pair("MUSICBRAINZ ALBUM RELEASE COUNTRY", "RELEASECOUNTRY"),
-    std::make_pair("MUSICBRAINZ ALBUM STATUS",     "RELEASESTATUS"),
-    std::make_pair("MUSICBRAINZ ALBUM TYPE",       "RELEASETYPE"),
-    std::make_pair("MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID"),
-    std::make_pair("MUSICBRAINZ RELEASE TRACK ID", "MUSICBRAINZ_RELEASETRACKID"),
-    std::make_pair("MUSICBRAINZ WORK ID",          "MUSICBRAINZ_WORKID"),
-    std::make_pair("ACOUSTID ID",                  "ACOUSTID_ID"),
-    std::make_pair("ACOUSTID FINGERPRINT",         "ACOUSTID_FINGERPRINT"),
-    std::make_pair("MUSICIP PUID",                 "MUSICIP_PUID"),
+  constexpr std::array txxxFrameTranslation {
+    std::pair("MUSICBRAINZ ALBUM ID", "MUSICBRAINZ_ALBUMID"),
+    std::pair("MUSICBRAINZ ARTIST ID", "MUSICBRAINZ_ARTISTID"),
+    std::pair("MUSICBRAINZ ALBUM ARTIST ID", "MUSICBRAINZ_ALBUMARTISTID"),
+    std::pair("MUSICBRAINZ ALBUM RELEASE COUNTRY", "RELEASECOUNTRY"),
+    std::pair("MUSICBRAINZ ALBUM STATUS", "RELEASESTATUS"),
+    std::pair("MUSICBRAINZ ALBUM TYPE", "RELEASETYPE"),
+    std::pair("MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID"),
+    std::pair("MUSICBRAINZ RELEASE TRACK ID", "MUSICBRAINZ_RELEASETRACKID"),
+    std::pair("MUSICBRAINZ WORK ID", "MUSICBRAINZ_WORKID"),
+    std::pair("ACOUSTID ID", "ACOUSTID_ID"),
+    std::pair("ACOUSTID FINGERPRINT", "ACOUSTID_FINGERPRINT"),
+    std::pair("MUSICIP PUID", "MUSICIP_PUID"),
   };
-  const size_t txxxFrameTranslationSize = sizeof(txxxFrameTranslation) / sizeof(txxxFrameTranslation[0]);
 
   // list of deprecated frames and their successors
-  const std::pair<const char *, const char *> deprecatedFrames[] = {
-    std::make_pair("TRDA", "TDRC"), // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
-    std::make_pair("TDAT", "TDRC"), // 2.3 -> 2.4
-    std::make_pair("TYER", "TDRC"), // 2.3 -> 2.4
-    std::make_pair("TIME", "TDRC"), // 2.3 -> 2.4
+  constexpr std::array deprecatedFrames {
+    std::pair("TRDA", "TDRC"), // 2.3 -> 2.4 (http://en.wikipedia.org/wiki/ID3)
+    std::pair("TDAT", "TDRC"), // 2.3 -> 2.4
+    std::pair("TYER", "TDRC"), // 2.3 -> 2.4
+    std::pair("TIME", "TDRC"), // 2.3 -> 2.4
   };
-  const size_t deprecatedFramesSize = sizeof(deprecatedFrames) / sizeof(deprecatedFrames[0]);
 }  // namespace
 
 String Frame::frameIDToKey(const ByteVector &id)
 {
   ByteVector id24 = id;
-  for(size_t i = 0; i < deprecatedFramesSize; ++i) {
-    if(id24 == deprecatedFrames[i].first) {
-      id24 = deprecatedFrames[i].second;
+  for(const auto &[o, t] : deprecatedFrames) {
+    if(id24 == o) {
+      id24 = t;
       break;
     }
   }
-  for(size_t i = 0; i < frameTranslationSize; ++i) {
-    if(id24 == frameTranslation[i].first)
-      return frameTranslation[i].second;
+  for(const auto &[o, t] : frameTranslation) {
+    if(id24 == o)
+      return t;
   }
   return String();
 }
@@ -430,9 +428,9 @@ String Frame::frameIDToKey(const ByteVector &id)
 ByteVector Frame::keyToFrameID(const String &s)
 {
   const String key = s.upper();
-  for(size_t i = 0; i < frameTranslationSize; ++i) {
-    if(key == frameTranslation[i].second)
-      return frameTranslation[i].first;
+  for(const auto &[o, t] : frameTranslation) {
+    if(key == t)
+      return o;
   }
   return ByteVector();
 }
@@ -440,9 +438,9 @@ ByteVector Frame::keyToFrameID(const String &s)
 String Frame::txxxToKey(const String &description)
 {
   const String d = description.upper();
-  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-    if(d == txxxFrameTranslation[i].first)
-      return txxxFrameTranslation[i].second;
+  for(const auto &[o, t] : txxxFrameTranslation) {
+    if(d == o)
+      return t;
   }
   return d;
 }
@@ -450,9 +448,9 @@ String Frame::txxxToKey(const String &description)
 String Frame::keyToTXXX(const String &s)
 {
   const String key = s.upper();
-  for(size_t i = 0; i < txxxFrameTranslationSize; ++i) {
-    if(key == txxxFrameTranslation[i].second)
-      return txxxFrameTranslation[i].first;
+  for(const auto &[o, t] : txxxFrameTranslation) {
+    if(key == t)
+      return o;
   }
   return s;
 }

@@ -32,11 +32,13 @@
 
 using namespace TagLib;
 
-const char *const MP4::Atom::containers[11] = {
+namespace {
+  constexpr std::array containers {
     "moov", "udta", "mdia", "meta", "ilst",
     "stbl", "minf", "moof", "traf", "trak",
     "stsd"
-};
+  };
+} // namespace
 
 MP4::Atom::Atom(File *file)
   : offset(file->tell())
@@ -91,19 +93,17 @@ MP4::Atom::Atom(File *file)
     }
   }
 
-  for(int i = 0; i < numContainers; i++) {
-    if(name == containers[i]) {
+  for(auto c : containers) {
+    if(name == c) {
       if(name == "meta") {
         offset_t posAfterMeta = file->tell();
         ByteVector nextSize = file->readBlock(8).mid(4, 4);
-        static const char *const metaChildrenNames[] = {
-            "hdlr", "ilst", "mhdr", "ctry", "lang"
+        static constexpr std::array metaChildrenNames {
+          "hdlr", "ilst", "mhdr", "ctry", "lang"
         };
         bool metaIsFullAtom = true;
-        for(size_t j = 0;
-            j < sizeof(metaChildrenNames) / sizeof(metaChildrenNames[0]);
-            ++j) {
-          if(nextSize == metaChildrenNames[j]) {
+        for(auto child : metaChildrenNames) {
+          if(nextSize == child) {
             // meta is not a full atom (i.e. not followed by version, flags). It
             // is followed by the size and type of the first child atom.
             metaIsFullAtom = false;

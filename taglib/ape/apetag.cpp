@@ -43,6 +43,8 @@
 #include "apefooter.h"
 #include "apeitem.h"
 
+#include <array>
+
 using namespace TagLib;
 using namespace APE;
 
@@ -53,7 +55,7 @@ namespace
 
   bool isKeyValid(const ByteVector &key)
   {
-    const char *invalidKeys[] = { "ID3", "TAG", "OGGS", "MP+", nullptr };
+    static constexpr std::array invalidKeys { "ID3", "TAG", "OGGS", "MP+" };
 
     // only allow printable ASCII including space (32..126)
 
@@ -64,8 +66,8 @@ namespace
     }
 
     const String upperKey = String(key).upper();
-    for(size_t i = 0; invalidKeys[i] != nullptr; ++i) {
-      if(upperKey == invalidKeys[i])
+    for(auto k : invalidKeys) {
+      if(upperKey == k)
         return false;
     }
 
@@ -203,16 +205,15 @@ namespace
   // conversions of tag keys between what we use in PropertyMap and what's usual
   // for APE tags
   //                usual,         APE
-  const std::pair<const char *, const char *> keyConversions[] = {
-    std::make_pair("TRACKNUMBER", "TRACK"),
-    std::make_pair("DATE",        "YEAR"),
-    std::make_pair("ALBUMARTIST", "ALBUM ARTIST"),
-    std::make_pair("DISCNUMBER",  "DISC"),
-    std::make_pair("REMIXER",     "MIXARTIST"),
-    std::make_pair("RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS"),
-    std::make_pair("RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE"),
+  constexpr std::array keyConversions {
+    std::pair("TRACKNUMBER", "TRACK"),
+    std::pair("DATE", "YEAR"),
+    std::pair("ALBUMARTIST", "ALBUM ARTIST"),
+    std::pair("DISCNUMBER", "DISC"),
+    std::pair("REMIXER", "MIXARTIST"),
+    std::pair("RELEASESTATUS", "MUSICBRAINZ_ALBUMSTATUS"),
+    std::pair("RELEASETYPE", "MUSICBRAINZ_ALBUMTYPE"),
   };
-  const size_t keyConversionsSize = sizeof(keyConversions) / sizeof(keyConversions[0]);
 }  // namespace
 
 PropertyMap APE::Tag::properties() const
@@ -228,9 +229,9 @@ PropertyMap APE::Tag::properties() const
     }
     else {
       // Some tags need to be handled specially
-      for(size_t i = 0; i < keyConversionsSize; ++i) {
-        if(tagName == keyConversions[i].second)
-          tagName = keyConversions[i].first;
+      for(const auto &[k, t] : keyConversions) {
+        if(tagName == t)
+          tagName = k;
       }
       properties[tagName].append(it->second.toStringList());
     }
@@ -249,10 +250,10 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap properties(origProps); // make a local copy that can be modified
 
   // see comment in properties()
-  for(size_t i = 0; i < keyConversionsSize; ++i)
-    if(properties.contains(keyConversions[i].first)) {
-      properties.insert(keyConversions[i].second, properties[keyConversions[i].first]);
-      properties.erase(keyConversions[i].first);
+  for(const auto &[k, t] : keyConversions)
+    if(properties.contains(k)) {
+      properties.insert(t, properties[k]);
+      properties.erase(k);
     }
 
   // first check if tags need to be removed completely

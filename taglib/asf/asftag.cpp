@@ -26,6 +26,8 @@
 #include "asftag.h"
 #include "tpropertymap.h"
 
+#include <array>
+
 using namespace TagLib;
 
 class ASF::Tag::TagPrivate
@@ -210,60 +212,59 @@ bool ASF::Tag::isEmpty() const
 
 namespace
 {
-  const std::pair<const char *, const char *> keyTranslation[] = {
-    std::make_pair("WM/AlbumTitle", "ALBUM"),
-    std::make_pair("WM/AlbumArtist", "ALBUMARTIST"),
-    std::make_pair("WM/Composer", "COMPOSER"),
-    std::make_pair("WM/Writer", "LYRICIST"),
-    std::make_pair("WM/Conductor", "CONDUCTOR"),
-    std::make_pair("WM/ModifiedBy", "REMIXER"),
-    std::make_pair("WM/Year", "DATE"),
-    std::make_pair("WM/OriginalReleaseYear", "ORIGINALDATE"),
-    std::make_pair("WM/Producer", "PRODUCER"),
-    std::make_pair("WM/ContentGroupDescription", "WORK"),
-    std::make_pair("WM/SubTitle", "SUBTITLE"),
-    std::make_pair("WM/SetSubTitle", "DISCSUBTITLE"),
-    std::make_pair("WM/TrackNumber", "TRACKNUMBER"),
-    std::make_pair("WM/PartOfSet", "DISCNUMBER"),
-    std::make_pair("WM/Genre", "GENRE"),
-    std::make_pair("WM/BeatsPerMinute", "BPM"),
-    std::make_pair("WM/Mood", "MOOD"),
-    std::make_pair("WM/ISRC", "ISRC"),
-    std::make_pair("WM/Lyrics", "LYRICS"),
-    std::make_pair("WM/Media", "MEDIA"),
-    std::make_pair("WM/Publisher", "LABEL"),
-    std::make_pair("WM/CatalogNo", "CATALOGNUMBER"),
-    std::make_pair("WM/Barcode", "BARCODE"),
-    std::make_pair("WM/EncodedBy", "ENCODEDBY"),
-    std::make_pair("WM/AlbumSortOrder", "ALBUMSORT"),
-    std::make_pair("WM/AlbumArtistSortOrder", "ALBUMARTISTSORT"),
-    std::make_pair("WM/ArtistSortOrder", "ARTISTSORT"),
-    std::make_pair("WM/TitleSortOrder", "TITLESORT"),
-    std::make_pair("WM/Script", "SCRIPT"),
-    std::make_pair("WM/Language", "LANGUAGE"),
-    std::make_pair("WM/ARTISTS", "ARTISTS"),
-    std::make_pair("ASIN", "ASIN"),
-    std::make_pair("MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID"),
-    std::make_pair("MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID"),
-    std::make_pair("MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID"),
-    std::make_pair("MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"),
-    std::make_pair("MusicBrainz/Album Release Country", "RELEASECOUNTRY"),
-    std::make_pair("MusicBrainz/Album Status", "RELEASESTATUS"),
-    std::make_pair("MusicBrainz/Album Type", "RELEASETYPE"),
-    std::make_pair("MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"),
-    std::make_pair("MusicBrainz/Release Track Id", "MUSICBRAINZ_RELEASETRACKID"),
-    std::make_pair("MusicBrainz/Work Id", "MUSICBRAINZ_WORKID"),
-    std::make_pair("MusicIP/PUID", "MUSICIP_PUID"),
-    std::make_pair("Acoustid/Id", "ACOUSTID_ID"),
-    std::make_pair("Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT"),
+  constexpr std::array keyTranslation {
+    std::pair("WM/AlbumTitle", "ALBUM"),
+    std::pair("WM/AlbumArtist", "ALBUMARTIST"),
+    std::pair("WM/Composer", "COMPOSER"),
+    std::pair("WM/Writer", "LYRICIST"),
+    std::pair("WM/Conductor", "CONDUCTOR"),
+    std::pair("WM/ModifiedBy", "REMIXER"),
+    std::pair("WM/Year", "DATE"),
+    std::pair("WM/OriginalReleaseYear", "ORIGINALDATE"),
+    std::pair("WM/Producer", "PRODUCER"),
+    std::pair("WM/ContentGroupDescription", "WORK"),
+    std::pair("WM/SubTitle", "SUBTITLE"),
+    std::pair("WM/SetSubTitle", "DISCSUBTITLE"),
+    std::pair("WM/TrackNumber", "TRACKNUMBER"),
+    std::pair("WM/PartOfSet", "DISCNUMBER"),
+    std::pair("WM/Genre", "GENRE"),
+    std::pair("WM/BeatsPerMinute", "BPM"),
+    std::pair("WM/Mood", "MOOD"),
+    std::pair("WM/ISRC", "ISRC"),
+    std::pair("WM/Lyrics", "LYRICS"),
+    std::pair("WM/Media", "MEDIA"),
+    std::pair("WM/Publisher", "LABEL"),
+    std::pair("WM/CatalogNo", "CATALOGNUMBER"),
+    std::pair("WM/Barcode", "BARCODE"),
+    std::pair("WM/EncodedBy", "ENCODEDBY"),
+    std::pair("WM/AlbumSortOrder", "ALBUMSORT"),
+    std::pair("WM/AlbumArtistSortOrder", "ALBUMARTISTSORT"),
+    std::pair("WM/ArtistSortOrder", "ARTISTSORT"),
+    std::pair("WM/TitleSortOrder", "TITLESORT"),
+    std::pair("WM/Script", "SCRIPT"),
+    std::pair("WM/Language", "LANGUAGE"),
+    std::pair("WM/ARTISTS", "ARTISTS"),
+    std::pair("ASIN", "ASIN"),
+    std::pair("MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID"),
+    std::pair("MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID"),
+    std::pair("MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID"),
+    std::pair("MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"),
+    std::pair("MusicBrainz/Album Release Country", "RELEASECOUNTRY"),
+    std::pair("MusicBrainz/Album Status", "RELEASESTATUS"),
+    std::pair("MusicBrainz/Album Type", "RELEASETYPE"),
+    std::pair("MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"),
+    std::pair("MusicBrainz/Release Track Id", "MUSICBRAINZ_RELEASETRACKID"),
+    std::pair("MusicBrainz/Work Id", "MUSICBRAINZ_WORKID"),
+    std::pair("MusicIP/PUID", "MUSICIP_PUID"),
+    std::pair("Acoustid/Id", "ACOUSTID_ID"),
+    std::pair("Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT"),
   };
-  const size_t keyTranslationSize = sizeof(keyTranslation) / sizeof(keyTranslation[0]);
 
   String translateKey(const String &key)
   {
-    for(size_t i = 0; i < keyTranslationSize; ++i) {
-      if(key == keyTranslation[i].first)
-        return keyTranslation[i].second;
+    for(const auto &[k, t] : keyTranslation) {
+      if(key == k)
+        return t;
     }
 
     return String();
@@ -319,8 +320,8 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
 {
   static Map<String, String> reverseKeyMap;
   if(reverseKeyMap.isEmpty()) {
-    for(size_t i = 0; i < keyTranslationSize; i++) {
-      reverseKeyMap[keyTranslation[i].second] = keyTranslation[i].first;
+    for(const auto &[k, t] : keyTranslation) {
+      reverseKeyMap[t] = k;
     }
   }
 

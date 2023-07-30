@@ -25,11 +25,13 @@
 
 #include "id3v1genres.h"
 
+#include <array>
+
 using namespace TagLib;
 
 namespace
 {
-  const wchar_t *const genres[] = {
+  constexpr std::array genres {
     L"Blues",
     L"Classic Rock",
     L"Country",
@@ -223,14 +225,13 @@ namespace
     L"Garage Rock",
     L"Psybient"
   };
-  const int genresSize = sizeof(genres) / sizeof(genres[0]);
 }  // namespace
 
 StringList ID3v1::genreList()
 {
   StringList l;
-  for(int i = 0; i < genresSize; i++) {
-    l.append(genres[i]);
+  for(auto g : genres) {
+    l.append(g);
   }
 
   return l;
@@ -239,7 +240,7 @@ StringList ID3v1::genreList()
 ID3v1::GenreMap ID3v1::genreMap()
 {
   GenreMap m;
-  for(int i = 0; i < genresSize; i++) {
+  for(size_t i = 0; i < genres.size(); i++) {
     m.insert(genres[i], i);
   }
 
@@ -248,37 +249,32 @@ ID3v1::GenreMap ID3v1::genreMap()
 
 String ID3v1::genre(int i)
 {
-  if(i >= 0 && i < genresSize)
+  if(i >= 0 && i < genres.size())
     return String(genres[i]); // always make a copy
   return String();
 }
 
 int ID3v1::genreIndex(const String &name)
 {
-  for(int i = 0; i < genresSize; ++i) {
+  for(size_t i = 0; i < genres.size(); ++i) {
     if(name == genres[i])
-      return i;
+      return static_cast<int>(i);
   }
 
   // If the name was not found, try the names which have been changed
-  static const struct {
-    const wchar_t *genre;
-    int code;
-  } fixUpGenres[] = {
-    { L"Jazz+Funk", 29 },
-    { L"Folk/Rock", 81 },
-    { L"Bebob", 85 },
-    { L"Avantgarde", 90 },
-    { L"Dance Hall", 125 },
-    { L"Hardcore", 129 },
-    { L"BritPop", 132 },
-    { L"Negerpunk", 133 }
+  static constexpr std::array fixUpGenres {
+    std::pair(L"Jazz+Funk", 29),
+    std::pair(L"Folk/Rock", 81),
+    std::pair(L"Bebob", 85),
+    std::pair(L"Avantgarde", 90),
+    std::pair(L"Dance Hall", 125),
+    std::pair(L"Hardcore", 129),
+    std::pair(L"BritPop", 132),
+    std::pair(L"Negerpunk", 133),
   };
-  static const int fixUpGenresSize =
-      sizeof(fixUpGenres) / sizeof(fixUpGenres[0]);
-  for(int i = 0; i < fixUpGenresSize; ++i) {
-    if(name == fixUpGenres[i].genre)
-      return fixUpGenres[i].code;
+  for(const auto &[genre, code] : fixUpGenres) {
+    if(name == genre)
+      return code;
   }
 
   return 255;

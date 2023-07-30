@@ -29,6 +29,8 @@
 #include "tpropertymap.h"
 #include "id3v1genres.h"
 
+#include <array>
+
 using namespace TagLib;
 using namespace ID3v2;
 
@@ -125,22 +127,21 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 namespace
 {
   // array of allowed TIPL prefixes and their corresponding key value
-  const std::pair<const char *, const char *> involvedPeople[] = {
-      std::make_pair("ARRANGER", "ARRANGER"),
-      std::make_pair("ENGINEER", "ENGINEER"),
-      std::make_pair("PRODUCER", "PRODUCER"),
-      std::make_pair("DJ-MIX", "DJMIXER"),
-      std::make_pair("MIX", "MIXER"),
+  constexpr std::array involvedPeople {
+    std::pair("ARRANGER", "ARRANGER"),
+    std::pair("ENGINEER", "ENGINEER"),
+    std::pair("PRODUCER", "PRODUCER"),
+    std::pair("DJ-MIX", "DJMIXER"),
+    std::pair("MIX", "MIXER"),
   };
-  const size_t involvedPeopleSize = sizeof(involvedPeople) / sizeof(involvedPeople[0]);
 }  // namespace
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {
   static KeyConversionMap m;
   if(m.isEmpty()) {
-    for(size_t i = 0; i < involvedPeopleSize; ++i)
-      m.insert(involvedPeople[i].second, involvedPeople[i].first);
+    for(const auto &[o, t] : involvedPeople)
+      m.insert(t, o);
   }
   return m;
 }
@@ -293,9 +294,9 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   const StringList l = fieldList();
   for(auto it = l.begin(); it != l.end(); ++it) {
     bool found = false;
-    for(size_t i = 0; i < involvedPeopleSize; ++i)
-      if(*it == involvedPeople[i].first) {
-        map.insert(involvedPeople[i].second, (++it)->split(","));
+    for(const auto &[o, t] : involvedPeople)
+      if(*it == o) {
+        map.insert(t, (++it)->split(","));
         found = true;
         break;
       }

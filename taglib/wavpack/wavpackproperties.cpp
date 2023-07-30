@@ -35,6 +35,8 @@
 
 #include "wavpackfile.h"
 
+#include <array>
+
 // Implementation of this class is based on the information at:
 // http://www.wavpack.com/file_format.txt
 
@@ -149,9 +151,10 @@ unsigned int WavPack::Properties::sampleFrames() const
 
 namespace
 {
-  const unsigned int sampleRates[] = {
-     6000,  8000,  9600, 11025, 12000, 16000,  22050, 24000,
-    32000, 44100, 48000, 64000, 88200, 96000, 192000,     0 };
+  constexpr std::array sampleRates {
+    6000U, 8000U, 9600U, 11025U, 12000U, 16000U, 22050U, 24000U,
+    32000U, 44100U, 48000U, 64000U, 88200U, 96000U, 192000U, 0U
+  };
 
   /*!
    * Given a WavPack \a block (complete, but not including the 32-byte header),
