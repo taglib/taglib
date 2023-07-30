@@ -140,6 +140,9 @@ class TestSizes : public CppUnit::TestFixture
 public:
     void testSizes()
     {
+        // Class list was built by generating XML docs with Doxygen, and then running:
+        // $ grep kind=\"class\" index.xml | sed -E -e 's/(.*<name>|<\/name>.*)//g'
+
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::File));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::APE::Footer));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::APE::Item));
