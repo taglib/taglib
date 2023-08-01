@@ -281,10 +281,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(7), String(lf).size());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8), String(crlf).size());
 
-    CPPUNIT_ASSERT_EQUAL(L'\x0d', String(cr)[3]);
-    CPPUNIT_ASSERT_EQUAL(L'\x0a', String(lf)[3]);
-    CPPUNIT_ASSERT_EQUAL(L'\x0d', String(crlf)[3]);
-    CPPUNIT_ASSERT_EQUAL(L'\x0a', String(crlf)[4]);
+    CPPUNIT_ASSERT(L'\x0d' == String(cr)[3]);
+    CPPUNIT_ASSERT(L'\x0a' == String(lf)[3]);
+    CPPUNIT_ASSERT(L'\x0d' == String(crlf)[3]);
+    CPPUNIT_ASSERT(L'\x0a' == String(crlf)[4]);
   }
 
   void testUpper()
@@ -334,14 +334,14 @@ public:
     String::Iterator it1 = s1.begin();
     String::Iterator it2 = s2.begin();
 
-    CPPUNIT_ASSERT_EQUAL(L't', *it1);
-    CPPUNIT_ASSERT_EQUAL(L't', *it2);
+    CPPUNIT_ASSERT(L't' == *it1);
+    CPPUNIT_ASSERT(L't' == *it2);
 
     std::advance(it1, 4);
     std::advance(it2, 4);
     *it2 = L'I';
-    CPPUNIT_ASSERT_EQUAL(L'i', *it1);
-    CPPUNIT_ASSERT_EQUAL(L'I', *it2);
+    CPPUNIT_ASSERT(L'i' == *it1);
+    CPPUNIT_ASSERT(L'I' == *it2);
   }
 
   void testInvalidUTF8()
