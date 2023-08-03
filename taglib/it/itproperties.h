@@ -32,7 +32,6 @@
 namespace TagLib {
   namespace IT {
     class TAGLIB_EXPORT Properties : public AudioProperties {
-      friend class File;
     public:
       /*! Flag bits. */
       enum {

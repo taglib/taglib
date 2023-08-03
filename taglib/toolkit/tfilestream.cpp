@@ -58,7 +58,7 @@ namespace
 #endif
   }
 
-  FileHandle openFile(const int fileDescriptor, bool readOnly)
+  FileHandle openFile([[maybe_unused]] const int fileDescriptor, [[maybe_unused]] bool readOnly)
   {
     return InvalidFileHandle;
   }

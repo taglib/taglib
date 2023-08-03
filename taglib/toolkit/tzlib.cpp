@@ -50,7 +50,7 @@ bool zlib::isAvailable()
 #endif
 }
 
-ByteVector zlib::decompress(const ByteVector &data)
+ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
 {
 #ifdef HAVE_ZLIB
 
