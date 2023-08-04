@@ -334,16 +334,13 @@ ByteVector TableOfContentsFrame::renderFields() const
     flags += 1;
   data.append(flags);
   data.append(static_cast<char>(entryCount()));
-  auto it = d->childElements.cbegin();
-  while(it != d->childElements.cend()) {
-    data.append(*it);
+  for(const auto &element : d->childElements) {
+    data.append(element);
     data.append('\0');
-    it++;
   }
-  const FrameList l = d->embeddedFrameList;
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    (*it)->header()->setVersion(header()->version());
-    data.append((*it)->render());
+  for(const auto &frame : d->embeddedFrameList) {
+    frame->header()->setVersion(header()->version());
+    data.append(frame->render());
   }
 
   return data;
