@@ -208,7 +208,7 @@ long double toFloat80(const ByteVector &v, size_t offset)
   unsigned char bytes[10];
   ::memcpy(bytes, v.data() + offset, 10);
 
-  if(ENDIAN == Utils::LittleEndian) {
+  if constexpr(ENDIAN == Utils::LittleEndian) {
     swap(bytes[0], bytes[9]);
     swap(bytes[1], bytes[8]);
     swap(bytes[2], bytes[7]);
