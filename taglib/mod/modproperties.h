@@ -50,8 +50,6 @@ namespace TagLib {
       void setLengthInPatterns(unsigned char lengthInPatterns);
 
     private:
-      friend class File;
-
       Properties(const Properties&) = delete;
       Properties &operator=(const Properties&) = delete;
 
