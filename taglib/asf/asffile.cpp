@@ -51,15 +51,7 @@ public:
   class MetadataObject;
   class MetadataLibraryObject;
 
-  FilePrivate():
-    headerSize(0),
-    tag(nullptr),
-    properties(nullptr),
-    contentDescriptionObject(nullptr),
-    extendedContentDescriptionObject(nullptr),
-    headerExtensionObject(nullptr),
-    metadataObject(nullptr),
-    metadataLibraryObject(nullptr)
+  FilePrivate()
   {
     objects.setAutoDelete(true);
   }
@@ -73,18 +65,18 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  unsigned long long headerSize;
+  unsigned long long headerSize { 0 };
 
-  ASF::Tag *tag;
-  ASF::Properties *properties;
+  ASF::Tag *tag { nullptr };
+  ASF::Properties *properties { nullptr };
 
   List<BaseObject *> objects;
 
-  ContentDescriptionObject         *contentDescriptionObject;
-  ExtendedContentDescriptionObject *extendedContentDescriptionObject;
-  HeaderExtensionObject            *headerExtensionObject;
-  MetadataObject                   *metadataObject;
-  MetadataLibraryObject            *metadataLibraryObject;
+  ContentDescriptionObject *contentDescriptionObject { nullptr };
+  ExtendedContentDescriptionObject *extendedContentDescriptionObject { nullptr };
+  HeaderExtensionObject *headerExtensionObject { nullptr };
+  MetadataObject *metadataObject { nullptr };
+  MetadataLibraryObject *metadataLibraryObject { nullptr };
 };
 
 namespace

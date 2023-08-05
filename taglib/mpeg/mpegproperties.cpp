@@ -38,19 +38,7 @@ using namespace TagLib;
 class MPEG::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    xingHeader(nullptr),
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    layer(0),
-    version(Header::Version1),
-    channelMode(Header::Stereo),
-    protectionEnabled(false),
-    isCopyrighted(false),
-    isOriginal(false) {}
-
+  PropertiesPrivate() = default;
   ~PropertiesPrivate()
   {
     delete xingHeader;
@@ -59,17 +47,17 @@ public:
   PropertiesPrivate(const PropertiesPrivate &) = delete;
   PropertiesPrivate &operator=(const PropertiesPrivate &) = delete;
 
-  XingHeader *xingHeader;
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int layer;
-  Header::Version version;
-  Header::ChannelMode channelMode;
-  bool protectionEnabled;
-  bool isCopyrighted;
-  bool isOriginal;
+  XingHeader *xingHeader { nullptr };
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int layer { 0 };
+  Header::Version version { Header::Version1 };
+  Header::ChannelMode channelMode { Header::Stereo };
+  bool protectionEnabled { false };
+  bool isCopyrighted { false };
+  bool isOriginal { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

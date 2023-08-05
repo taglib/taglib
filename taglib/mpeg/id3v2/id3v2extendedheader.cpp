@@ -32,9 +32,7 @@ using namespace ID3v2;
 class ExtendedHeader::ExtendedHeaderPrivate
 {
 public:
-  ExtendedHeaderPrivate() : size(0) {}
-
-  unsigned int size;
+  unsigned int size { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

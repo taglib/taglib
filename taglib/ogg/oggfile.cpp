@@ -49,9 +49,7 @@ namespace
 class Ogg::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    firstPageHeader(nullptr),
-    lastPageHeader(nullptr)
+  FilePrivate()
   {
     pages.setAutoDelete(true);
   }
@@ -67,8 +65,8 @@ public:
 
   unsigned int streamSerialNumber;
   List<Page *> pages;
-  PageHeader *firstPageHeader;
-  PageHeader *lastPageHeader;
+  PageHeader *firstPageHeader { nullptr };
+  PageHeader *lastPageHeader { nullptr };
   Map<unsigned int, ByteVector> dirtyPackets;
 };
 

@@ -38,8 +38,7 @@ using namespace ID3v2;
 class UnsynchronizedLyricsFrame::UnsynchronizedLyricsFramePrivate
 {
 public:
-  UnsynchronizedLyricsFramePrivate() : textEncoding(String::Latin1) {}
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   ByteVector language;
   String description;
   String text;

@@ -35,20 +35,12 @@ using namespace TagLib;
 class FLAC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    bitsPerSample(0),
-    channels(0),
-    sampleFrames(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int bitsPerSample;
-  int channels;
-  unsigned long long sampleFrames;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int bitsPerSample { 0 };
+  int channels { 0 };
+  unsigned long long sampleFrames { 0 };
   ByteVector signature;
 };
 

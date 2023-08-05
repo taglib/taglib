@@ -36,15 +36,10 @@ using namespace TagLib;
 class MPEG::XingHeader::XingHeaderPrivate
 {
 public:
-  XingHeaderPrivate() :
-    frames(0),
-    size(0),
-    type(MPEG::XingHeader::Invalid) {}
+  unsigned int frames { 0 };
+  unsigned int size { 0 };
 
-  unsigned int frames;
-  unsigned int size;
-
-  MPEG::XingHeader::HeaderType type;
+  MPEG::XingHeader::HeaderType type { MPEG::XingHeader::Invalid };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

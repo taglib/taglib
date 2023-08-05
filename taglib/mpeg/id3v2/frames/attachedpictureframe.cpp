@@ -34,12 +34,9 @@ using namespace ID3v2;
 class AttachedPictureFrame::AttachedPictureFramePrivate
 {
 public:
-  AttachedPictureFramePrivate() : textEncoding(String::Latin1),
-                                  type(AttachedPictureFrame::Other) {}
-
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   String mimeType;
-  AttachedPictureFrame::Type type;
+  AttachedPictureFrame::Type type { AttachedPictureFrame::Other };
   String description;
   ByteVector data;
 };

@@ -37,24 +37,14 @@ using namespace TagLib;
 class Vorbis::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    vorbisVersion(0),
-    bitrateMaximum(0),
-    bitrateNominal(0),
-    bitrateMinimum(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int vorbisVersion;
-  int bitrateMaximum;
-  int bitrateNominal;
-  int bitrateMinimum;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int vorbisVersion { 0 };
+  int bitrateMaximum { 0 };
+  int bitrateNominal { 0 };
+  int bitrateMinimum { 0 };
 };
 
 namespace TagLib {

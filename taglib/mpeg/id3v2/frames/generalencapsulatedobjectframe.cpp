@@ -37,9 +37,7 @@ using namespace ID3v2;
 class GeneralEncapsulatedObjectFrame::GeneralEncapsulatedObjectFramePrivate
 {
 public:
-  GeneralEncapsulatedObjectFramePrivate() : textEncoding(String::Latin1) {}
-
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   String mimeType;
   String fileName;
   String description;

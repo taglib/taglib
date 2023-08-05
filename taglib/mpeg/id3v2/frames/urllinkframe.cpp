@@ -44,8 +44,7 @@ public:
 class UserUrlLinkFrame::UserUrlLinkFramePrivate
 {
 public:
-  UserUrlLinkFramePrivate() : textEncoding(String::Latin1) {}
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   String description;
 };
 

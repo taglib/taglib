@@ -32,21 +32,13 @@ using namespace TagLib;
 class FLAC::Picture::PicturePrivate
 {
 public:
-  PicturePrivate() :
-    type(FLAC::Picture::Other),
-    width(0),
-    height(0),
-    colorDepth(0),
-    numColors(0)
-    {}
-
-  Type type;
+  Type type { FLAC::Picture::Other };
   String mimeType;
   String description;
-  int width;
-  int height;
-  int colorDepth;
-  int numColors;
+  int width { 0 };
+  int height { 0 };
+  int colorDepth { 0 };
+  int numColors { 0 };
   ByteVector data;
 };
 

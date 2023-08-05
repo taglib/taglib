@@ -47,15 +47,7 @@ namespace
 class MPC::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    APELocation(-1),
-    APESize(0),
-    ID3v1Location(-1),
-    ID3v2Header(nullptr),
-    ID3v2Location(-1),
-    ID3v2Size(0),
-    properties(nullptr) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete ID3v2Header;
@@ -65,18 +57,18 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  offset_t APELocation;
-  long APESize;
+  offset_t APELocation { -1 };
+  long APESize { 0 };
 
-  offset_t ID3v1Location;
+  offset_t ID3v1Location { -1 };
 
-  ID3v2::Header *ID3v2Header;
-  offset_t ID3v2Location;
-  long ID3v2Size;
+  ID3v2::Header *ID3v2Header { nullptr };
+  offset_t ID3v2Location { -1 };
+  long ID3v2Size { 0 };
 
   TagUnion tag;
 
-  Properties *properties;
+  Properties *properties { nullptr };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

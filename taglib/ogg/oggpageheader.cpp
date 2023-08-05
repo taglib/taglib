@@ -38,29 +38,17 @@ using namespace TagLib;
 class Ogg::PageHeader::PageHeaderPrivate
 {
 public:
-  PageHeaderPrivate() :
-    isValid(false),
-    firstPacketContinued(false),
-    lastPacketCompleted(false),
-    firstPageOfStream(false),
-    lastPageOfStream(false),
-    absoluteGranularPosition(0),
-    streamSerialNumber(0),
-    pageSequenceNumber(-1),
-    size(0),
-    dataSize(0) {}
-
-  bool isValid;
+  bool isValid { false };
   List<int> packetSizes;
-  bool firstPacketContinued;
-  bool lastPacketCompleted;
-  bool firstPageOfStream;
-  bool lastPageOfStream;
-  long long absoluteGranularPosition;
-  unsigned int streamSerialNumber;
-  int pageSequenceNumber;
-  int size;
-  int dataSize;
+  bool firstPacketContinued { false };
+  bool lastPacketCompleted { false };
+  bool firstPageOfStream { false };
+  bool lastPageOfStream { false };
+  long long absoluteGranularPosition { 0 };
+  unsigned int streamSerialNumber { 0 };
+  int pageSequenceNumber { -1 };
+  int size { 0 };
+  int dataSize { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

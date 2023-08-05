@@ -39,15 +39,7 @@ using TagLib::FLAC::Properties;
 class Ogg::FLAC::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    comment(nullptr),
-    properties(nullptr),
-    streamStart(0),
-    streamLength(0),
-    scanned(false),
-    hasXiphComment(false),
-    commentPacket(0) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete comment;
@@ -57,17 +49,17 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  Ogg::XiphComment *comment;
+  Ogg::XiphComment *comment { nullptr };
 
-  Properties *properties;
+  Properties *properties { nullptr };
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
-  offset_t streamStart;
-  offset_t streamLength;
-  bool scanned;
+  offset_t streamStart { 0 };
+  offset_t streamLength { 0 };
+  bool scanned { false };
 
-  bool hasXiphComment;
-  int commentPacket;
+  bool hasXiphComment { false };
+  int commentPacket { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

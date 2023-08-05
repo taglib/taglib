@@ -129,16 +129,14 @@ namespace
 class FileStream::FileStreamPrivate
 {
 public:
-  FileStreamPrivate(const FileName &fileName)
-    : file(InvalidFileHandle)
-    , name(fileName)
-    , readOnly(true)
+  FileStreamPrivate(const FileName &fileName) :
+    name(fileName)
   {
   }
 
-  FileHandle file;
+  FileHandle file { InvalidFileHandle };
   FileNameHandle name;
-  bool readOnly;
+  bool readOnly { true };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

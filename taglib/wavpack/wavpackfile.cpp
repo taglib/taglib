@@ -51,12 +51,7 @@ namespace
 class WavPack::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    APELocation(-1),
-    APESize(0),
-    ID3v1Location(-1),
-    properties(nullptr) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete properties;
@@ -65,14 +60,14 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  offset_t APELocation;
-  long APESize;
+  offset_t APELocation { -1 };
+  long APESize { 0 };
 
-  offset_t ID3v1Location;
+  offset_t ID3v1Location { -1 };
 
   TagUnion tag;
 
-  Properties *properties;
+  Properties *properties { nullptr };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

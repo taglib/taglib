@@ -40,10 +40,7 @@ using namespace TagLib::Ogg;
 class Opus::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    comment(nullptr),
-    properties(nullptr) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete comment;
@@ -53,8 +50,8 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  Ogg::XiphComment *comment;
-  Properties *properties;
+  Ogg::XiphComment *comment { nullptr };
+  Properties *properties { nullptr };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

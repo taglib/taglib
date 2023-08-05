@@ -34,15 +34,11 @@ using namespace APE;
 class APE::Item::ItemPrivate
 {
 public:
-  ItemPrivate() :
-    type(Text),
-    readOnly(false) {}
-
-  Item::ItemTypes type;
+  Item::ItemTypes type { Text };
   String key;
   ByteVector value;
   StringList text;
-  bool readOnly;
+  bool readOnly { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -35,18 +35,15 @@ using namespace ID3v2;
 class TableOfContentsFrame::TableOfContentsFramePrivate
 {
 public:
-  TableOfContentsFramePrivate() :
-    tagHeader(nullptr),
-    isTopLevel(false),
-    isOrdered(false)
+  TableOfContentsFramePrivate()
   {
     embeddedFrameList.setAutoDelete(true);
   }
 
-  const ID3v2::Header *tagHeader;
+  const ID3v2::Header *tagHeader { nullptr };
   ByteVector elementID;
-  bool isTopLevel;
-  bool isOrdered;
+  bool isTopLevel { false };
+  bool isOrdered { false };
   ByteVectorList childElements;
   FrameListMap embeddedFrameListMap;
   FrameList embeddedFrameList;

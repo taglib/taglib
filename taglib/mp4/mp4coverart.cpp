@@ -32,10 +32,7 @@ using namespace TagLib;
 class MP4::CoverArt::CoverArtPrivate
 {
 public:
-  CoverArtPrivate() :
-    format(MP4::CoverArt::JPEG) {}
-
-  Format format;
+  Format format { MP4::CoverArt::JPEG };
   ByteVector data;
 };
 

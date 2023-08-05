@@ -37,11 +37,7 @@ using namespace TagLib;
 class RIFF::AIFF::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    properties(nullptr),
-    tag(nullptr),
-    hasID3v2(false) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete properties;
@@ -51,10 +47,10 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  Properties *properties;
-  ID3v2::Tag *tag;
+  Properties *properties { nullptr };
+  ID3v2::Tag *tag { nullptr };
 
-  bool hasID3v2;
+  bool hasID3v2 { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

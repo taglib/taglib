@@ -302,10 +302,7 @@ namespace
 class FileRef::FileRefPrivate
 {
 public:
-  FileRefPrivate() :
-    file(nullptr),
-    stream(nullptr) {}
-
+  FileRefPrivate() = default;
   ~FileRefPrivate()
   {
     delete file;
@@ -315,8 +312,8 @@ public:
   FileRefPrivate(const FileRefPrivate &) = delete;
   FileRefPrivate &operator=(const FileRefPrivate &) = delete;
 
-  File     *file;
-  IOStream *stream;
+  File *file { nullptr };
+  IOStream *stream { nullptr };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

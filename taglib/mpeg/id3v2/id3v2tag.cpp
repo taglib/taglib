@@ -70,12 +70,7 @@ namespace
 class ID3v2::Tag::TagPrivate
 {
 public:
-  TagPrivate() :
-    factory(nullptr),
-    file(nullptr),
-    tagOffset(0),
-    extendedHeader(nullptr),
-    footer(nullptr)
+  TagPrivate()
   {
     frameList.setAutoDelete(true);
   }
@@ -89,14 +84,14 @@ public:
   TagPrivate(const TagPrivate &) = delete;
   TagPrivate &operator=(const TagPrivate &) = delete;
 
-  const FrameFactory *factory;
+  const FrameFactory *factory { nullptr };
 
-  File *file;
-  offset_t tagOffset;
+  File *file { nullptr };
+  offset_t tagOffset { 0 };
 
   Header header;
-  ExtendedHeader *extendedHeader;
-  Footer *footer;
+  ExtendedHeader *extendedHeader { nullptr };
+  Footer *footer { nullptr };
 
   FrameListMap frameListMap;
   FrameList frameList;

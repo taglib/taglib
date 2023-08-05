@@ -33,9 +33,7 @@ using namespace TagLib;
 class FLAC::UnknownMetadataBlock::UnknownMetadataBlockPrivate
 {
 public:
-  UnknownMetadataBlockPrivate() : code(0) {}
-
-  int code;
+  int code { 0 };
   ByteVector data;
 };
 

@@ -70,8 +70,9 @@ class File::FilePrivate
 public:
   FilePrivate(IOStream *stream, bool owner) :
     stream(stream),
-    streamOwner(owner),
-    valid(true) {}
+    streamOwner(owner)
+  {
+  }
 
   ~FilePrivate()
   {
@@ -84,7 +85,7 @@ public:
 
   IOStream *stream;
   bool streamOwner;
-  bool valid;
+  bool valid { true };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

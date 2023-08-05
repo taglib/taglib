@@ -82,17 +82,12 @@ namespace TagLib {
        * The peak volume is described as a series of bits that is padded to fill
        * a block of bytes.  These two values should always be updated in tandem.
        */
-      struct PeakVolume
-      {
-        /*!
-         * Constructs an empty peak volume description.
-         */
-        PeakVolume() : bitsRepresentingPeak(0) {}
+      struct PeakVolume {
         /*!
          * The number of bits (in the range of 0 to 255) used to describe the
          * peak volume.
          */
-        unsigned char bitsRepresentingPeak;
+        unsigned char bitsRepresentingPeak { 0 };
         /*!
          * The array of bits (represented as a series of bytes) used to describe
          * the peak volume.

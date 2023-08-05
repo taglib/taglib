@@ -38,23 +38,15 @@ using namespace APE;
 class APE::Footer::FooterPrivate
 {
 public:
-  FooterPrivate() :
-    version(0),
-    footerPresent(true),
-    headerPresent(false),
-    isHeader(false),
-    itemCount(0),
-    tagSize(0) {}
+  unsigned int version { 0 };
 
-  unsigned int version;
+  bool footerPresent { true };
+  bool headerPresent { false };
 
-  bool footerPresent;
-  bool headerPresent;
+  bool isHeader { false };
 
-  bool isHeader;
-
-  unsigned int itemCount;
-  unsigned int tagSize;
+  unsigned int itemCount { 0 };
+  unsigned int tagSize { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -42,24 +42,14 @@ using namespace TagLib::Ogg;
 class Speex::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    bitrateNominal(0),
-    sampleRate(0),
-    channels(0),
-    speexVersion(0),
-    vbr(false),
-    mode(0) {}
-
-  int length;
-  int bitrate;
-  int bitrateNominal;
-  int sampleRate;
-  int channels;
-  int speexVersion;
-  bool vbr;
-  int mode;
+  int length { 0 };
+  int bitrate { 0 };
+  int bitrateNominal { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int speexVersion { 0 };
+  bool vbr { false };
+  int mode { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

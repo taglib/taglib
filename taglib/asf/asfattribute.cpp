@@ -37,17 +37,16 @@ class ASF::Attribute::AttributePrivate
 {
 public:
   AttributePrivate() :
-    pictureValue(ASF::Picture::fromInvalid()),
-    numericValue(0),
-    stream(0),
-    language(0) {}
+    pictureValue(ASF::Picture::fromInvalid())
+  {
+  }
   AttributeTypes type;
   String stringValue;
   ByteVector byteVectorValue;
   ASF::Picture pictureValue;
-  unsigned long long numericValue;
-  int stream;
-  int language;
+  unsigned long long numericValue { 0 };
+  int stream { 0 };
+  int language { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
