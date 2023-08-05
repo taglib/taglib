@@ -364,10 +364,8 @@ String UserTextIdentificationFrame::toString() const
 {
   // first entry is the description itself, drop from values list
   StringList l = fieldList();
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    l.erase(it);
-    break;
-  }
+  if(!l.isEmpty())
+    l.erase(l.begin());
   return "[" + description() + "] " + l.toString();
 }
 
