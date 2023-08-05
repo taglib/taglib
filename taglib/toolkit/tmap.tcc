@@ -189,6 +189,9 @@ T &Map<Key, T>::operator[](const Key &key)
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
 {
+  if (this == &m)
+    return *this;
+
   Map<Key, T>(m).swap(*this);
   return *this;
 }

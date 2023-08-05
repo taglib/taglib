@@ -64,7 +64,8 @@ namespace TagLib {
     };
 
     struct AtomData {
-      AtomData(AtomDataType type, ByteVector data) : type(type), locale(0), data(data) {}
+      AtomData(AtomDataType type, const ByteVector &data) :
+        type(type), locale(0), data(data) { }
       AtomDataType type;
       int locale;
       ByteVector data;

@@ -34,8 +34,6 @@ namespace TagLib {
 
   namespace FLAC {
 
-    class File;
-
     //! An implementation of audio property reading for FLAC
 
     /*!

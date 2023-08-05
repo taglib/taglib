@@ -44,7 +44,6 @@ namespace TagLib {
 
     class Header;
     class ExtendedHeader;
-    class Footer;
 
     typedef List<Frame *> FrameList;
     typedef Map<ByteVector, FrameList> FrameListMap;

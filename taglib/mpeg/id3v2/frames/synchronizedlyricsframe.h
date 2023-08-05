@@ -85,7 +85,8 @@ namespace TagLib {
        * Single entry of time stamp and lyrics text.
        */
       struct SynchedText {
-        SynchedText(unsigned int ms, String str) : time(ms), text(str) {}
+        SynchedText(unsigned int ms, const String &str) :
+          time(ms), text(str) { }
         unsigned int time;
         String text;
       };
