@@ -25,8 +25,9 @@
 
 #include "mpcproperties.h"
 
-#include "tstring.h"
 #include "tdebug.h"
+#include "tstring.h"
+#include <array>
 #include <bitset>
 #include <cmath>
 
@@ -184,7 +185,7 @@ namespace
 
   // This array looks weird, but the same as original MusePack code found at:
   // https://www.musepack.net/index.php?pg=src
-  const unsigned short sftable [8] = { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
+  constexpr std::array sftable { 44100, 48000, 37800, 32000, 0, 0, 0, 0 };
 }  // namespace
 
 void MPC::Properties::readSV8(File *file, offset_t streamLength)

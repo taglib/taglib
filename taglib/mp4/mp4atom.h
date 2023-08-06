@@ -25,21 +25,22 @@
 
 // This file is not part of the public API!
 
-#ifndef DO_NOT_DOCUMENT
-
 #ifndef TAGLIB_MP4ATOM_H
 #define TAGLIB_MP4ATOM_H
 
 #include "tfile.h"
 #include "tlist.h"
 
+#include <array>
+
+#ifndef DO_NOT_DOCUMENT
+
 namespace TagLib {
   namespace MP4 {
     class Atom;
     typedef TagLib::List<Atom *> AtomList;
 
-    enum AtomDataType
-    {
+    enum AtomDataType {
       TypeImplicit  = 0,  // for use with tags for which no type needs to be indicated because only one type is allowed
       TypeUTF8      = 1,  // without any count or null terminator
       TypeUTF16     = 2,  // also known as UTF-16BE
@@ -85,9 +86,6 @@ namespace TagLib {
       offset_t length;
       TagLib::ByteVector name;
       AtomList children;
-    private:
-      static const int numContainers = 11;
-      static const char *const containers[11];
     };
 
     //! Root-level atoms
@@ -100,8 +98,8 @@ namespace TagLib {
       AtomList path(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       AtomList atoms;
     };
-  }  // namespace MP4
-}  // namespace TagLib
+  } // namespace MP4
+} // namespace TagLib
 
 #endif
 
