@@ -97,19 +97,12 @@ MP4::Atom::Atom(File *file)
     if(name == c) {
       if(name == "meta") {
         offset_t posAfterMeta = file->tell();
-        ByteVector nextSize = file->readBlock(8).mid(4, 4);
         static constexpr std::array metaChildrenNames {
           "hdlr", "ilst", "mhdr", "ctry", "lang"
         };
-        bool metaIsFullAtom = true;
-        for(auto child : metaChildrenNames) {
-          if(nextSize == child) {
-            // meta is not a full atom (i.e. not followed by version, flags). It
-            // is followed by the size and type of the first child atom.
-            metaIsFullAtom = false;
-            break;
-          }
-        }
+        // meta is not a full atom (i.e. not followed by version, flags). It
+        // is followed by the size and type of the first child atom.
+        auto metaIsFullAtom = std::none_of(metaChildrenNames.begin(), metaChildrenNames.end(), [nextSize = file->readBlock(8).mid(4, 4)](const auto &child) { return nextSize == child; });
         // Only skip next four bytes, which contain version and flags, if meta
         // is a full atom.
         file->seek(posAfterMeta + (metaIsFullAtom ? 4 : 0));

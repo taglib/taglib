@@ -189,12 +189,7 @@ void Ogg::XiphComment::setTrack(unsigned int i)
 
 bool Ogg::XiphComment::isEmpty() const
 {
-  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
-    if(!(*it).second.isEmpty())
-      return false;
-  }
-
-  return true;
+  return std::all_of(d->fieldListMap.begin(), d->fieldListMap.end(), [](const auto &field) { return field.second.isEmpty(); });
 }
 
 unsigned int Ogg::XiphComment::fieldCount() const
@@ -261,12 +256,7 @@ bool Ogg::XiphComment::checkKey(const String &key)
 
   // A key may consist of ASCII 0x20 through 0x7D, 0x3D ('=') excluded.
 
-  for(String::ConstIterator it = key.begin(); it != key.end(); it++) {
-      if(*it < 0x20 || *it > 0x7D || *it == 0x3D)
-        return false;
-  }
-
-  return true;
+  return std::none_of(key.begin(), key.end(), [](auto c) { return c < 0x20 || c > 0x7D || c == 0x3D; });
 }
 
 String Ogg::XiphComment::vendorID() const
