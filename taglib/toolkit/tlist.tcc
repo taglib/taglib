@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include <algorithm>
-#include "trefcounter.h"
+#include <memory>
 
 namespace TagLib {
 
@@ -39,11 +39,10 @@ namespace TagLib {
 // A base for the generic and specialized private class types.  New
 // non-templatized members should be added here.
 
-class ListPrivateBase : public RefCounter
+class ListPrivateBase
 {
 public:
-  ListPrivateBase() : autoDelete(false) {}
-  bool autoDelete;
+  bool autoDelete{};
 };
 
 // A generic implementation
@@ -74,8 +73,8 @@ public:
   }
   void clear() {
     if(autoDelete) {
-      for(auto it = list.begin(); it != list.end(); ++it)
-        delete *it;
+      for(auto &m : list)
+        delete m;
     }
     list.clear();
   }
@@ -88,22 +87,17 @@ public:
 
 template <class T>
 List<T>::List() :
-  d(new ListPrivate<T>())
+  d(std::make_shared<ListPrivate<T>>())
 {
 }
 
 template <class T>
 List<T>::List(const List<T> &l) : d(l.d)
 {
-  d->ref();
 }
 
 template <class T>
-List<T>::~List()
-{
-  if(d->deref())
-    delete d;
-}
+List<T>::~List() = default;
 
 template <class T>
 typename List<T>::Iterator List<T>::begin()
@@ -297,11 +291,7 @@ const T &List<T>::operator[](unsigned int i) const
 }
 
 template <class T>
-List<T> &List<T>::operator=(const List<T> &l)
-{
-  List<T>(l).swap(*this);
-  return *this;
-}
+List<T> &List<T>::operator=(const List<T> &) = default;
 
 template <class T>
 void List<T>::swap(List<T> &l)
@@ -330,9 +320,8 @@ bool List<T>::operator!=(const List<T> &l) const
 template <class T>
 void List<T>::detach()
 {
-  if(d->count() > 1) {
-    d->deref();
-    d = new ListPrivate<T>(d->list);
+  if(d.use_count() > 1) {
+    d = std::make_shared<ListPrivate<T>>(d->list);
   }
 }
 

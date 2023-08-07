@@ -31,11 +31,10 @@
 
 #include <cstring>
 
+#include "tdebug.h"
 #include "tfile.h"
 #include "tfilestream.h"
 #include "tstring.h"
-#include "tdebug.h"
-#include "trefcounter.h"
 
 #include "asffile.h"
 #include "mpegfile.h"
@@ -292,14 +291,15 @@ namespace
   }
 }  // namespace
 
-class FileRef::FileRefPrivate : public RefCounter
+class FileRef::FileRefPrivate
 {
 public:
   FileRefPrivate() :
     file(nullptr),
     stream(nullptr) {}
 
-  ~FileRefPrivate() {
+  ~FileRefPrivate()
+  {
     delete file;
     delete stream;
   }
@@ -313,40 +313,32 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 FileRef::FileRef() :
-  d(new FileRefPrivate())
+  d(std::make_shared<FileRefPrivate>())
 {
 }
 
 FileRef::FileRef(FileName fileName, bool readAudioProperties,
                  AudioProperties::ReadStyle audioPropertiesStyle) :
-  d(new FileRefPrivate())
+  d(std::make_shared<FileRefPrivate>())
 {
   parse(fileName, readAudioProperties, audioPropertiesStyle);
 }
 
-FileRef::FileRef(IOStream* stream, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle) :
-  d(new FileRefPrivate())
+FileRef::FileRef(IOStream *stream, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle) :
+  d(std::make_shared<FileRefPrivate>())
 {
   parse(stream, readAudioProperties, audioPropertiesStyle);
 }
 
 FileRef::FileRef(File *file) :
-  d(new FileRefPrivate())
+  d(std::make_shared<FileRefPrivate>())
 {
   d->file = file;
 }
 
-FileRef::FileRef(const FileRef &ref) :
-  d(ref.d)
-{
-  d->ref();
-}
+FileRef::FileRef(const FileRef &ref) = default;
 
-FileRef::~FileRef()
-{
-  if(d->deref())
-    delete d;
-}
+FileRef::~FileRef() = default;
 
 Tag *FileRef::tag() const
 {

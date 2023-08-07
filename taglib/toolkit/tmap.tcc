@@ -23,8 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "trefcounter.h"
-
 namespace TagLib {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,37 +31,32 @@ namespace TagLib {
 
 template <class Key, class T>
 template <class KeyP, class TP>
-class Map<Key, T>::MapPrivate : public RefCounter
+class Map<Key, T>::MapPrivate
 {
 public:
-  MapPrivate() : RefCounter() {}
+  MapPrivate() = default;
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
-  MapPrivate(const std::map<class KeyP, class TP>& m) : RefCounter(), map(m) {}
+  MapPrivate(const std::map<class KeyP, class TP>& m) : map(m) {}
   std::map<class KeyP, class TP> map;
 #else
-  MapPrivate(const std::map<KeyP, TP>& m) : RefCounter(), map(m) {}
+  MapPrivate(const std::map<KeyP, TP>& m) : map(m) {}
   std::map<KeyP, TP> map;
 #endif
 };
 
 template <class Key, class T>
 Map<Key, T>::Map() :
-  d(new MapPrivate<Key, T>())
+  d(std::make_shared<MapPrivate<Key, T>>())
 {
 }
 
 template <class Key, class T>
 Map<Key, T>::Map(const Map<Key, T> &m) : d(m.d)
 {
-  d->ref();
 }
 
 template <class Key, class T>
-Map<Key, T>::~Map()
-{
-  if(d->deref())
-    delete(d);
-}
+Map<Key, T>::~Map() = default;
 
 template <class Key, class T>
 typename Map<Key, T>::Iterator Map<Key, T>::begin()
@@ -211,9 +204,8 @@ void Map<Key, T>::swap(Map<Key, T> &m)
 template <class Key, class T>
 void Map<Key, T>::detach()
 {
-  if(d->count() > 1) {
-    d->deref();
-    d = new MapPrivate<Key, T>(d->map);
+  if(d.use_count() > 1) {
+    d = std::make_shared<MapPrivate<Key, T>>(d->map);
   }
 }
 

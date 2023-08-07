@@ -304,7 +304,7 @@ namespace TagLib {
     void parse(IOStream *stream, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle);
 
     class FileRefPrivate;
-    FileRefPrivate *d;
+    std::shared_ptr<FileRefPrivate> d;
   };
 
 } // namespace TagLib

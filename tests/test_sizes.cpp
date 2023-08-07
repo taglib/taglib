@@ -105,7 +105,6 @@
 #include "tlist.h"
 #include "tmap.h"
 #include "tpropertymap.h"
-#include "trefcounter.h"
 #include "trueaudiofile.h"
 #include "trueaudioproperties.h"
 #include "tstring.h"
@@ -148,14 +147,14 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::APE::Item));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ASF::Attribute));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Attribute));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ASF::Picture));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Picture));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::AudioProperties));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::ByteVector));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::ByteVectorList));
+        CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::ByteVectorList));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ByteVectorStream));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::DebugListener));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::File));
@@ -164,7 +163,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::UnknownMetadataBlock));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FileRef));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileRef));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FileRef::FileTypeResolver));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileRef::StreamTypeResolver));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileStream));
@@ -200,19 +199,19 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::IOStream));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::IT::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::IT::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::List<int>));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MP4::CoverArt));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::List<int>));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::CoverArt));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MP4::Item));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Item));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MPEG::Header));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::Header));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MPEG::XingHeader));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Map<int, int>));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::Map<int, int>));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Mod::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::FileBase));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::Properties));
@@ -228,7 +227,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::Vorbis::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::Vorbis::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::XiphComment));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::PropertyMap));
+        CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::PropertyMap));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::RIFF::AIFF::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::AIFF::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::File));
@@ -238,8 +237,8 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::WAV::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::S3M::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::S3M::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::String));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::StringList));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::String));
+        CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::StringList));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::TrueAudio::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::TrueAudio::Properties));

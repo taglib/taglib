@@ -29,6 +29,7 @@
 #include "taglib.h"
 
 #include <list>
+#include <memory>
 
 namespace TagLib {
 
@@ -273,7 +274,7 @@ namespace TagLib {
   private:
 #ifndef DO_NOT_DOCUMENT
     template <class TP> class ListPrivate;
-    ListPrivate<T> *d;
+    std::shared_ptr<ListPrivate<T>> d;
 #endif
   };
 

@@ -32,7 +32,6 @@
 
 #include "tdebug.h"
 #include "tstringlist.h"
-#include "trefcounter.h"
 #include "tutils.h"
 
 namespace
@@ -137,20 +136,18 @@ namespace
 
 namespace TagLib {
 
-class String::StringPrivate : public RefCounter
-{
-public:
-  StringPrivate() = default;
+  class String::StringPrivate
+  {
+  public:
+    /*!
+     * Stores string in UTF-16. The byte order depends on the CPU endian.
+     */
+    TagLib::wstring data;
 
-  /*!
-   * Stores string in UTF-16. The byte order depends on the CPU endian.
-   */
-  TagLib::wstring data;
-
-  /*!
-   * This is only used to hold the the most recent value of toCString().
-   */
-  std::string cstring;
+    /*!
+     * This is only used to hold the the most recent value of toCString().
+     */
+    std::string cstring;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,18 +155,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 String::String() :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
 }
 
-String::String(const String &s) :
-  d(s.d)
-{
-  d->ref();
-}
+String::String(const String &s) = default;
 
 String::String(const std::string &s, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(t == Latin1)
     copyFromLatin1(d->data, s.c_str(), s.length());
@@ -181,7 +174,7 @@ String::String(const std::string &s, Type t) :
 }
 
 String::String(const wstring &s, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     // This looks ugly but needed for the compatibility with TagLib1.8.
@@ -199,7 +192,7 @@ String::String(const wstring &s, Type t) :
 }
 
 String::String(const wchar_t *s, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     // This looks ugly but needed for the compatibility with TagLib1.8.
@@ -217,7 +210,7 @@ String::String(const wchar_t *s, Type t) :
 }
 
 String::String(const char *s, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(t == Latin1)
     copyFromLatin1(d->data, s, ::strlen(s));
@@ -229,7 +222,7 @@ String::String(const char *s, Type t) :
 }
 
 String::String(wchar_t c, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE)
     copyFromUTF16(d->data, &c, 1, t);
@@ -239,7 +232,7 @@ String::String(wchar_t c, Type t) :
 }
 
 String::String(char c, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(t == Latin1)
     copyFromLatin1(d->data, &c, 1);
@@ -251,7 +244,7 @@ String::String(char c, Type t) :
 }
 
 String::String(const ByteVector &v, Type t) :
-  d(new StringPrivate())
+  d(std::make_shared<StringPrivate>())
 {
   if(v.isEmpty())
     return;
@@ -269,11 +262,7 @@ String::String(const ByteVector &v, Type t) :
 
 ////////////////////////////////////////////////////////////////////////////////
 
-String::~String()
-{
-  if(d->deref())
-    delete d;
-}
+String::~String() = default;
 
 std::string String::to8Bit(bool unicode) const
 {
@@ -696,7 +685,7 @@ bool String::operator<(const String &s) const
 
 void String::detach()
 {
-  if(d->count() > 1)
+  if(d.use_count() > 1)
     String(d->data.c_str()).swap(*this);
 }
 

@@ -53,7 +53,6 @@ set(tag_HDRS
   toolkit/tmap.h
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
-  toolkit/trefcounter.h
   toolkit/tdebuglistener.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
@@ -305,7 +304,6 @@ set(toolkit_SRCS
   toolkit/tfilestream.cpp
   toolkit/tdebug.cpp
   toolkit/tpropertymap.cpp
-  toolkit/trefcounter.cpp
   toolkit/tdebuglistener.cpp
   toolkit/tzlib.cpp
 )

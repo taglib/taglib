@@ -26,11 +26,10 @@
 #include "mp4coverart.h"
 #include "taglib.h"
 #include "tdebug.h"
-#include "trefcounter.h"
 
 using namespace TagLib;
 
-class MP4::CoverArt::CoverArtPrivate : public RefCounter
+class MP4::CoverArt::CoverArtPrivate
 {
 public:
   CoverArtPrivate() :
@@ -45,17 +44,13 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MP4::CoverArt::CoverArt(Format format, const ByteVector &data) :
-  d(new CoverArtPrivate())
+  d(std::make_shared<CoverArtPrivate>())
 {
   d->format = format;
   d->data = data;
 }
 
-MP4::CoverArt::CoverArt(const CoverArt &item) :
-  d(item.d)
-{
-  d->ref();
-}
+MP4::CoverArt::CoverArt(const CoverArt &item) = default;
 
 MP4::CoverArt &
 MP4::CoverArt::operator=(const CoverArt &item)
@@ -72,12 +67,7 @@ MP4::CoverArt::swap(CoverArt &item)
   swap(d, item.d);
 }
 
-MP4::CoverArt::~CoverArt()
-{
-  if(d->deref()) {
-    delete d;
-  }
-}
+MP4::CoverArt::~CoverArt() = default;
 
 MP4::CoverArt::Format
 MP4::CoverArt::format() const

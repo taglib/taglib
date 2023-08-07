@@ -26,10 +26,9 @@
 #include "mpegheader.h"
 
 #include "tbytevector.h"
-#include "tstring.h"
-#include "tfile.h"
 #include "tdebug.h"
-#include "trefcounter.h"
+#include "tfile.h"
+#include "tstring.h"
 
 #include "mpegutils.h"
 
@@ -37,7 +36,7 @@
 
 using namespace TagLib;
 
-class MPEG::Header::HeaderPrivate : public RefCounter
+class MPEG::Header::HeaderPrivate
 {
 public:
   HeaderPrivate() :
@@ -73,22 +72,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPEG::Header::Header(File *file, offset_t offset, bool checkLength) :
-  d(new HeaderPrivate())
+  d(std::make_shared<HeaderPrivate>())
 {
   parse(file, offset, checkLength);
 }
 
-MPEG::Header::Header(const Header &h) :
-  d(h.d)
-{
-  d->ref();
-}
+MPEG::Header::Header(const Header &h) = default;
 
-MPEG::Header::~Header()
-{
-  if(d->deref())
-    delete d;
-}
+MPEG::Header::~Header() = default;
 
 bool MPEG::Header::isValid() const
 {
@@ -155,11 +146,7 @@ MPEG::Header &MPEG::Header::operator=(const Header &h)
   if(&h == this)
     return *this;
 
-  if(d->deref())
-    delete d;
-
   d = h.d;
-  d->ref();
   return *this;
 }
 

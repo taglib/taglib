@@ -29,6 +29,8 @@
 #include "taglib.h"
 #include "taglib_export.h"
 
+#include <memory>
+
 namespace TagLib {
 
   class ByteVector;
@@ -164,7 +166,7 @@ namespace TagLib {
       void parse(File *file, offset_t offset, bool checkLength);
 
       class HeaderPrivate;
-      HeaderPrivate *d;
+      std::shared_ptr<HeaderPrivate> d;
     };
   }  // namespace MPEG
 }  // namespace TagLib
