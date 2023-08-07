@@ -88,7 +88,7 @@ namespace TagLib {
       /*!
        *
        */
-      void setData(const ByteVector &v);
+      void setData(const ByteVector &data);
 
     protected:
       // Reimplementations.

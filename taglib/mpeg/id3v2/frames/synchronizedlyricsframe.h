@@ -178,11 +178,11 @@ namespace TagLib {
       /*!
        * Set the language using the 3 byte language code from
        * <a href="http://en.wikipedia.org/wiki/ISO_639">ISO-639-2</a> to
-       * \a languageCode.
+       * \a languageEncoding.
        *
        * \see language()
        */
-      void setLanguage(const ByteVector &languageCode);
+      void setLanguage(const ByteVector &languageEncoding);
 
       /*!
        * Set the timestamp format.

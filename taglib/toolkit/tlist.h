@@ -114,9 +114,9 @@ namespace TagLib {
     ConstIterator cend() const;
 
     /*!
-     * Inserts a copy of \a value before \a it.
+     * Inserts a copy of \a item before \a it.
      */
-    Iterator insert(Iterator it, const T &value);
+    Iterator insert(Iterator it, const T &item);
 
     /*!
      * Inserts the \a value into the list.  This assumes that the list is

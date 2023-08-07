@@ -162,7 +162,7 @@ namespace TagLib {
        * \see mimeType()
        * \see setMimeType()
        */
-      void setObject(const ByteVector &object);
+      void setObject(const ByteVector &data);
 
     protected:
       void parseFields(const ByteVector &data) override;
