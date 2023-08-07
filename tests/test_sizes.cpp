@@ -105,7 +105,6 @@
 #include "tlist.h"
 #include "tmap.h"
 #include "tpropertymap.h"
-#include "trefcounter.h"
 #include "trueaudiofile.h"
 #include "trueaudioproperties.h"
 #include "tstring.h"
