@@ -64,6 +64,9 @@ namespace TagLib {
      */
     ~FileStream() override;
 
+    FileStream(const FileStream &) = delete;
+    FileStream &operator=(const FileStream &) = delete;
+
     /*!
      * Returns the file name in the local file system encoding.
      */
@@ -151,7 +154,7 @@ namespace TagLib {
 
   private:
     class FileStreamPrivate;
-    FileStreamPrivate *d;
+    std::unique_ptr<FileStreamPrivate> d;
   };
 
 }  // namespace TagLib

@@ -65,15 +65,12 @@ public:
 
 APE::Properties::Properties(File *file, offset_t streamLength, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file, streamLength);
 }
 
-APE::Properties::~Properties()
-{
-  delete d;
-}
+APE::Properties::~Properties() = default;
 
 int APE::Properties::lengthInMilliseconds() const
 {

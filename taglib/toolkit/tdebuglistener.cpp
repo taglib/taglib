@@ -65,6 +65,10 @@ namespace
 
 namespace TagLib
 {
+  class DebugListener::DebugListenerPrivate
+  {
+  };
+
   DebugListener *debugListener = &defaultListener;
 
   DebugListener::DebugListener() = default;

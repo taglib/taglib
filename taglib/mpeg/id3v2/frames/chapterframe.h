@@ -71,6 +71,9 @@ namespace TagLib {
        */
       ~ChapterFrame() override;
 
+      ChapterFrame(const ChapterFrame &) = delete;
+      ChapterFrame &operator=(const ChapterFrame &) = delete;
+
       /*!
        * Returns the element ID of the frame. Element ID
        * is a null terminated string, however it's not human-readable.
@@ -237,11 +240,9 @@ namespace TagLib {
 
     private:
       ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
-      ChapterFrame(const ChapterFrame &) = delete;
-      ChapterFrame &operator=(const ChapterFrame &) = delete;
 
       class ChapterFramePrivate;
-      ChapterFramePrivate *d;
+      std::unique_ptr<ChapterFramePrivate> d;
     };
   }  // namespace ID3v2
 }  // namespace TagLib

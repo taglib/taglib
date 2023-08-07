@@ -116,6 +116,9 @@ namespace TagLib {
        */
       ~RelativeVolumeFrame() override;
 
+      RelativeVolumeFrame(const RelativeVolumeFrame &) = delete;
+      RelativeVolumeFrame &operator=(const RelativeVolumeFrame &) = delete;
+
       /*!
        * Returns the frame's identification.
        *
@@ -219,11 +222,9 @@ namespace TagLib {
 
     private:
       RelativeVolumeFrame(const ByteVector &data, Header *h);
-      RelativeVolumeFrame(const RelativeVolumeFrame &) = delete;
-      RelativeVolumeFrame &operator=(const RelativeVolumeFrame &) = delete;
 
       class RelativeVolumeFramePrivate;
-      RelativeVolumeFramePrivate *d;
+      std::unique_ptr<RelativeVolumeFramePrivate> d;
     };
 
   }  // namespace ID3v2

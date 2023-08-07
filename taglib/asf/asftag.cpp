@@ -42,14 +42,11 @@ public:
 };
 
 ASF::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
-ASF::Tag::~Tag()
-{
-  delete d;
-}
+ASF::Tag::~Tag() = default;
 
 String ASF::Tag::title() const
 {

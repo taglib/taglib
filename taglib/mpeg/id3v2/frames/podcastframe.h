@@ -52,6 +52,9 @@ namespace TagLib {
        */
       ~PodcastFrame() override;
 
+      PodcastFrame(const PodcastFrame &) = delete;
+      PodcastFrame &operator=(const PodcastFrame &) = delete;
+
       /*!
        * Returns a null string.
        */
@@ -70,11 +73,9 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       PodcastFrame(const ByteVector &data, Header *h);
-      PodcastFrame(const PodcastFrame &) = delete;
-      PodcastFrame &operator=(const PodcastFrame &) = delete;
 
       class PodcastFramePrivate;
-      PodcastFramePrivate *d;
+      std::unique_ptr<PodcastFramePrivate> d;
     };
 
   }  // namespace ID3v2

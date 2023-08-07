@@ -90,6 +90,9 @@ namespace TagLib {
       Picture(const ByteVector &data);
       ~Picture() override;
 
+      Picture(const Picture &item) = delete;
+      Picture &operator=(const Picture &item) = delete;
+
       /*!
        * Returns the type of the image.
        */
@@ -190,11 +193,8 @@ namespace TagLib {
       bool parse(const ByteVector &rawData);
 
     private:
-      Picture(const Picture &item) = delete;
-      Picture &operator=(const Picture &item) = delete;
-
       class PicturePrivate;
-      PicturePrivate *d;
+      std::unique_ptr<PicturePrivate> d;
     };
 
     typedef List<Picture> PictureList;

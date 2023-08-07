@@ -60,6 +60,9 @@ namespace TagLib {
          */
         ~Properties() override;
 
+        Properties(const Properties &) = delete;
+        Properties &operator=(const Properties &) = delete;
+
         /*!
          * Returns the length of the file in milliseconds.
          *
@@ -103,13 +106,10 @@ namespace TagLib {
         int format() const;
 
       private:
-        Properties(const Properties &) = delete;
-        Properties &operator=(const Properties &) = delete;
-
         void read(File *file);
 
         class PropertiesPrivate;
-        PropertiesPrivate *d;
+        std::unique_ptr<PropertiesPrivate> d;
       };
     }  // namespace WAV
   }  // namespace RIFF

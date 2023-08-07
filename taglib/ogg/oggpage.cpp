@@ -120,14 +120,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Ogg::Page::Page(Ogg::File *file, offset_t pageOffset) :
-  d(new PagePrivate(file, pageOffset))
+  d(std::make_unique<PagePrivate>(file, pageOffset))
 {
 }
 
-Ogg::Page::~Page()
-{
-  delete d;
-}
+Ogg::Page::~Page() = default;
 
 offset_t Ogg::Page::fileOffset() const
 {
@@ -342,7 +339,7 @@ Ogg::Page::Page(const ByteVectorList &packets,
                 bool firstPacketContinued,
                 bool lastPacketCompleted,
                 bool containsLastPacket) :
-  d(new PagePrivate())
+  d(std::make_unique<PagePrivate>())
 {
   d->header.setFirstPageOfStream(pageNumber == 0 && !firstPacketContinued);
   d->header.setLastPageOfStream(containsLastPacket);

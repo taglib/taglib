@@ -62,6 +62,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   offset_t APELocation;
   long APESize;
 
@@ -95,7 +98,7 @@ bool MPC::File::isSupported(IOStream *stream)
 
 MPC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -103,16 +106,13 @@ MPC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 MPC::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-MPC::File::~File()
-{
-  delete d;
-}
+MPC::File::~File() = default;
 
 TagLib::Tag *MPC::File::tag() const
 {

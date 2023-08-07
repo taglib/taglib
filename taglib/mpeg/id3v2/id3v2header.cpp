@@ -79,20 +79,17 @@ ByteVector Header::fileIdentifier()
 ////////////////////////////////////////////////////////////////////////////////
 
 Header::Header() :
-  d(new HeaderPrivate())
+  d(std::make_unique<HeaderPrivate>())
 {
 }
 
 Header::Header(const ByteVector &data) :
-  d(new HeaderPrivate())
+  d(std::make_unique<HeaderPrivate>())
 {
   parse(data);
 }
 
-Header::~Header()
-{
-  delete d;
-}
+Header::~Header() = default;
 
 unsigned int Header::majorVersion() const
 {

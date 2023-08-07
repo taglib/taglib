@@ -126,6 +126,8 @@ namespace TagLib {
 
     PropertyMap(const PropertyMap &m);
 
+    PropertyMap &operator=(const PropertyMap &other);
+
     /*!
      * Creates a PropertyMap initialized from a SimplePropertyMap. Copies all
      * entries from \a m that have valid keys.
@@ -248,11 +250,9 @@ namespace TagLib {
 
     String toString() const;
 
-    PropertyMap &operator=(const PropertyMap &other);
-
   private:
     class PropertyMapPrivate;
-    PropertyMapPrivate *d;
+    std::unique_ptr<PropertyMapPrivate> d;
   };
 
 }  // namespace TagLib

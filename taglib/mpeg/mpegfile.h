@@ -119,6 +119,9 @@ namespace TagLib {
        */
       ~File() override;
 
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
+
       /*!
        * Returns a pointer to a tag that is the union of the ID3v2 and ID3v1
        * tags. The ID3v2 tag is given priority in reading the information -- if
@@ -320,14 +323,11 @@ namespace TagLib {
       static bool isSupported(IOStream *stream);
 
     private:
-      File(const File &) = delete;
-      File &operator=(const File &) = delete;
-
       void read(bool readProperties);
       offset_t findID3v2();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace MPEG
 }  // namespace TagLib

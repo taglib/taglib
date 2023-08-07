@@ -30,6 +30,12 @@
 using namespace TagLib;
 using namespace Mod;
 
+class Mod::FileBase::FileBasePrivate
+{
+};
+
+Mod::FileBase::~FileBase() = default;
+
 Mod::FileBase::FileBase(FileName file) : TagLib::File(file)
 {
 }

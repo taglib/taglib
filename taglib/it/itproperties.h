@@ -54,6 +54,9 @@ namespace TagLib {
       Properties(AudioProperties::ReadStyle propertiesStyle);
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       int channels() const override;
 
       unsigned short lengthInPatterns() const;
@@ -89,11 +92,8 @@ namespace TagLib {
       void setPitchWheelDepth(unsigned char pitchWheelDepth);
 
     private:
-      Properties(const Properties&) = delete;
-      Properties &operator=(const Properties&) = delete;
-
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace IT
 }  // namespace TagLib

@@ -53,22 +53,19 @@ public:
 
 SynchronizedLyricsFrame::SynchronizedLyricsFrame(String::Type encoding) :
   Frame("SYLT"),
-  d(new SynchronizedLyricsFramePrivate())
+  d(std::make_unique<SynchronizedLyricsFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 SynchronizedLyricsFrame::SynchronizedLyricsFrame(const ByteVector &data) :
   Frame(data),
-  d(new SynchronizedLyricsFramePrivate())
+  d(std::make_unique<SynchronizedLyricsFramePrivate>())
 {
   setData(data);
 }
 
-SynchronizedLyricsFrame::~SynchronizedLyricsFrame()
-{
-  delete d;
-}
+SynchronizedLyricsFrame::~SynchronizedLyricsFrame() = default;
 
 String SynchronizedLyricsFrame::toString() const
 {
@@ -234,7 +231,7 @@ ByteVector SynchronizedLyricsFrame::renderFields() const
 
 SynchronizedLyricsFrame::SynchronizedLyricsFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new SynchronizedLyricsFramePrivate())
+  d(std::make_unique<SynchronizedLyricsFramePrivate>())
 {
   parseFields(fieldData(data));
 }

@@ -33,10 +33,7 @@ class Footer::FooterPrivate
 {
 };
 
-Footer::Footer() :
-  d(nullptr)
-{
-}
+Footer::Footer() = default;
 
 Footer::~Footer() = default;
 

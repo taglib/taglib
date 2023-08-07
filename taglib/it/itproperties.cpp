@@ -70,14 +70,11 @@ public:
 
 IT::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
   AudioProperties(propertiesStyle),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-IT::Properties::~Properties()
-{
-  delete d;
-}
+IT::Properties::~Properties() = default;
 
 int IT::Properties::channels() const
 {

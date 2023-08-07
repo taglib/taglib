@@ -62,6 +62,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   const ID3v2::FrameFactory *ID3v2FrameFactory;
 
   offset_t ID3v2Location;
@@ -135,7 +138,7 @@ bool MPEG::File::isSupported(IOStream *stream)
 
 MPEG::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -144,7 +147,7 @@ MPEG::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
@@ -153,16 +156,13 @@ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 MPEG::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-MPEG::File::~File()
-{
-  delete d;
-}
+MPEG::File::~File() = default;
 
 TagLib::Tag *MPEG::File::tag() const
 {

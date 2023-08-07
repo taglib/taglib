@@ -45,6 +45,8 @@ namespace TagLib
   public:
     DebugListener();
     virtual ~DebugListener();
+    DebugListener(const DebugListener &) = delete;
+    DebugListener &operator=(const DebugListener &) = delete;
 
     /*!
      * When overridden in a derived class, redirects \a msg to your preferred
@@ -53,12 +55,8 @@ namespace TagLib
     virtual void printMessage(const String &msg) = 0;
 
   private:
-    // Noncopyable
-    DebugListener(const DebugListener &) = delete;
-    DebugListener &operator=(const DebugListener &) = delete;
-
     class DebugListenerPrivate;
-    DebugListenerPrivate *d;
+    std::unique_ptr<DebugListenerPrivate> d;
   };
 
   /*!

@@ -55,6 +55,9 @@ namespace TagLib {
        */
       ~UrlLinkFrame() override;
 
+      UrlLinkFrame(const UrlLinkFrame &) = delete;
+      UrlLinkFrame &operator=(const UrlLinkFrame &) = delete;
+
       /*!
        * Returns the URL.
        */
@@ -81,11 +84,8 @@ namespace TagLib {
       UrlLinkFrame(const ByteVector &data, Header *h);
 
     private:
-      UrlLinkFrame(const UrlLinkFrame &) = delete;
-      UrlLinkFrame &operator=(const UrlLinkFrame &) = delete;
-
       class UrlLinkFramePrivate;
-      UrlLinkFramePrivate *d;
+      std::unique_ptr<UrlLinkFramePrivate> d;
     };
 
     //! ID3v2 User defined URL frame
@@ -118,6 +118,9 @@ namespace TagLib {
        * Destroys this UserUrlLinkFrame instance.
        */
       ~UserUrlLinkFrame() override;
+
+      UserUrlLinkFrame(const UserUrlLinkFrame &) = delete;
+      UserUrlLinkFrame &operator=(const UserUrlLinkFrame &) = delete;
 
       // Reimplementations.
 
@@ -178,11 +181,8 @@ namespace TagLib {
       UserUrlLinkFrame(const ByteVector &data, Header *h);
 
     private:
-      UserUrlLinkFrame(const UserUrlLinkFrame &) = delete;
-      UserUrlLinkFrame &operator=(const UserUrlLinkFrame &) = delete;
-
       class UserUrlLinkFramePrivate;
-      UserUrlLinkFramePrivate *d;
+      std::unique_ptr<UserUrlLinkFramePrivate> d;
     };
 
   }  // namespace ID3v2

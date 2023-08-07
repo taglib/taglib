@@ -79,6 +79,9 @@ public:
       delete stream;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   IOStream *stream;
   bool streamOwner;
   bool valid;
@@ -89,19 +92,16 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 File::File(FileName fileName) :
-  d(new FilePrivate(new FileStream(fileName), true))
+  d(std::make_unique<FilePrivate>(new FileStream(fileName), true))
 {
 }
 
 File::File(IOStream *stream) :
-  d(new FilePrivate(stream, false))
+  d(std::make_unique<FilePrivate>(stream, false))
 {
 }
 
-File::~File()
-{
-  delete d;
-}
+File::~File() = default;
 
 FileName File::name() const
 {

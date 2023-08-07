@@ -85,6 +85,9 @@ namespace TagLib {
        */
       ~File() override;
 
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
+
       /*!
        * Returns a pointer to the MP4 tag of the file.
        *
@@ -153,7 +156,7 @@ namespace TagLib {
       void read(bool readProperties);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace MP4
 }  // namespace TagLib

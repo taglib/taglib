@@ -47,22 +47,19 @@ public:
 
 OwnershipFrame::OwnershipFrame(String::Type encoding) :
   Frame("OWNE"),
-  d(new OwnershipFramePrivate())
+  d(std::make_unique<OwnershipFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 OwnershipFrame::OwnershipFrame(const ByteVector &data) :
   Frame(data),
-  d(new OwnershipFramePrivate())
+  d(std::make_unique<OwnershipFramePrivate>())
 {
   setData(data);
 }
 
-OwnershipFrame::~OwnershipFrame()
-{
-  delete d;
-}
+OwnershipFrame::~OwnershipFrame() = default;
 
 String OwnershipFrame::toString() const
 {
@@ -170,7 +167,7 @@ ByteVector OwnershipFrame::renderFields() const
 
 OwnershipFrame::OwnershipFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new OwnershipFramePrivate())
+  d(std::make_unique<OwnershipFramePrivate>())
 {
   parseFields(fieldData(data));
 }

@@ -52,15 +52,12 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 MPEG::XingHeader::XingHeader(const ByteVector &data) :
-  d(new XingHeaderPrivate())
+  d(std::make_unique<XingHeaderPrivate>())
 {
   parse(data);
 }
 
-MPEG::XingHeader::~XingHeader()
-{
-  delete d;
-}
+MPEG::XingHeader::~XingHeader() = default;
 
 bool MPEG::XingHeader::isValid() const
 {

@@ -52,6 +52,9 @@ namespace TagLib {
     public:
       ~File() override;
 
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
+
       /*!
        * Returns the packet contents for the i-th packet (starting from zero)
        * in the Ogg bitstream.
@@ -103,9 +106,6 @@ namespace TagLib {
       File(IOStream *stream);
 
     private:
-      File(const File &) = delete;
-      File &operator=(const File &) = delete;
-
       /*!
        * Reads the pages from the beginning of the file until enough to compose
        * the requested packet.
@@ -118,7 +118,7 @@ namespace TagLib {
       void writePacket(unsigned int i, const ByteVector &packet);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
 
   }  // namespace Ogg

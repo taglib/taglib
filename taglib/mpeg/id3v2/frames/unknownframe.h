@@ -54,6 +54,9 @@ namespace TagLib {
       UnknownFrame(const ByteVector &data);
       ~UnknownFrame() override;
 
+      UnknownFrame(const UnknownFrame &) = delete;
+      UnknownFrame &operator=(const UnknownFrame &) = delete;
+
       String toString() const override;
 
       /*!
@@ -67,11 +70,9 @@ namespace TagLib {
 
     private:
       UnknownFrame(const ByteVector &data, Header *h);
-      UnknownFrame(const UnknownFrame &) = delete;
-      UnknownFrame &operator=(const UnknownFrame &) = delete;
 
       class UnknownFramePrivate;
-      UnknownFramePrivate *d;
+      std::unique_ptr<UnknownFramePrivate> d;
     };
 
   }  // namespace ID3v2

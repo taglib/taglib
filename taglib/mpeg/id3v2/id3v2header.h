@@ -64,6 +64,9 @@ namespace TagLib {
        */
       virtual ~Header();
 
+      Header(const Header &) = delete;
+      Header &operator=(const Header &) = delete;
+
       /*!
        * Returns the major version number.  (Note: This is the 4, not the 2 in
        * ID3v2.4.0.  The 2 is implied.)
@@ -163,11 +166,8 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      Header(const Header &) = delete;
-      Header &operator=(const Header &) = delete;
-
       class HeaderPrivate;
-      HeaderPrivate *d;
+      std::unique_ptr<HeaderPrivate> d;
     };
 
   }  // namespace ID3v2

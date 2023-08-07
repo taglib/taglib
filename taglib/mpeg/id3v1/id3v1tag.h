@@ -64,6 +64,9 @@ namespace TagLib {
 
       virtual ~StringHandler();
 
+      StringHandler(const StringHandler &) = delete;
+      StringHandler &operator=(const StringHandler &) = delete;
+
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.
@@ -83,7 +86,7 @@ namespace TagLib {
 
     private:
       class StringHandlerPrivate;
-      StringHandlerPrivate *d;
+      std::unique_ptr<StringHandlerPrivate> d;
     };
 
     //! The main class in the ID3v1 implementation
@@ -124,6 +127,9 @@ namespace TagLib {
        * Destroys this Tag instance.
        */
       ~Tag() override;
+
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
 
       /*!
        * Renders the in memory values to a ByteVector suitable for writing to
@@ -194,11 +200,8 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
   }  // namespace ID3v1
 }  // namespace TagLib

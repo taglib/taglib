@@ -109,6 +109,9 @@ namespace TagLib {
        */
       ~File() override;
 
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
+
       /*!
        * Returns the Tag for this file.  This will be an APE tag, an ID3v1 tag
        * or a combination of the two.
@@ -218,13 +221,10 @@ namespace TagLib {
       static bool isSupported(IOStream *stream);
 
     private:
-      File(const File &) = delete;
-      File &operator=(const File &) = delete;
-
       void read(bool readProperties);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace MPC
 }  // namespace TagLib

@@ -133,6 +133,9 @@ namespace TagLib {
        */
       ~EventTimingCodesFrame() override;
 
+      EventTimingCodesFrame(const EventTimingCodesFrame &) = delete;
+      EventTimingCodesFrame &operator=(const EventTimingCodesFrame &) = delete;
+
       /*!
        * Returns a null string.
        */
@@ -173,11 +176,9 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       EventTimingCodesFrame(const ByteVector &data, Header *h);
-      EventTimingCodesFrame(const EventTimingCodesFrame &) = delete;
-      EventTimingCodesFrame &operator=(const EventTimingCodesFrame &) = delete;
 
       class EventTimingCodesFramePrivate;
-      EventTimingCodesFramePrivate *d;
+      std::unique_ptr<EventTimingCodesFramePrivate> d;
     };
 
   }  // namespace ID3v2

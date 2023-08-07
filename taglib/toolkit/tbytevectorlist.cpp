@@ -27,9 +27,8 @@
 
 using namespace TagLib;
 
-class ByteVectorListPrivate
+class ByteVectorList::ByteVectorListPrivate
 {
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,12 +65,21 @@ ByteVectorList ByteVectorList::split(const ByteVector &v, const ByteVector &patt
 
 ByteVectorList::ByteVectorList() = default;
 
-ByteVectorList::ByteVectorList(const ByteVectorList &l) : List<ByteVector>(l)
-{
+ByteVectorList::~ByteVectorList() = default;
 
+ByteVectorList::ByteVectorList(const ByteVectorList &l) :
+  List<ByteVector>(l)
+{
 }
 
-ByteVectorList::~ByteVectorList() = default;
+ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
+{
+  if(this == &l)
+    return *this;
+
+  List<ByteVector>::operator=(l);
+  return *this;
+}
 
 ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {

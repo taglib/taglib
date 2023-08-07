@@ -51,22 +51,19 @@ public:
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(String::Type encoding) :
   Frame("USLT"),
-  d(new UnsynchronizedLyricsFramePrivate())
+  d(std::make_unique<UnsynchronizedLyricsFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data) :
   Frame(data),
-  d(new UnsynchronizedLyricsFramePrivate())
+  d(std::make_unique<UnsynchronizedLyricsFramePrivate>())
 {
   setData(data);
 }
 
-UnsynchronizedLyricsFrame::~UnsynchronizedLyricsFrame()
-{
-  delete d;
-}
+UnsynchronizedLyricsFrame::~UnsynchronizedLyricsFrame() = default;
 
 String UnsynchronizedLyricsFrame::toString() const
 {
@@ -192,7 +189,7 @@ ByteVector UnsynchronizedLyricsFrame::renderFields() const
 
 UnsynchronizedLyricsFrame::UnsynchronizedLyricsFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new UnsynchronizedLyricsFramePrivate())
+  d(std::make_unique<UnsynchronizedLyricsFramePrivate>())
 {
   parseFields(fieldData(data));
 }

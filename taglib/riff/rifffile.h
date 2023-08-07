@@ -51,6 +51,9 @@ namespace TagLib {
        */
       ~File() override;
 
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
+
     protected:
 
       enum Endianness { BigEndian, LittleEndian };
@@ -140,9 +143,6 @@ namespace TagLib {
       void removeChunk(const ByteVector &name);
 
     private:
-      File(const File &) = delete;
-      File &operator=(const File &) = delete;
-
       void read();
       void writeChunk(const ByteVector &name, const ByteVector &data,
                       offset_t offset, unsigned long replace = 0);
@@ -153,7 +153,7 @@ namespace TagLib {
       void updateGlobalSize();
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace RIFF
 }  // namespace TagLib

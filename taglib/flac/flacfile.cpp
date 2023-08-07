@@ -79,6 +79,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   offset_t ID3v2Location;
   long ID3v2OriginalSize;
@@ -114,7 +117,7 @@ bool FLAC::File::isSupported(IOStream *stream)
 
 FLAC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -123,7 +126,7 @@ FLAC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
@@ -132,16 +135,13 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
 FLAC::File::File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate(frameFactory))
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-FLAC::File::~File()
-{
-  delete d;
-}
+FLAC::File::~File() = default;
 
 TagLib::Tag *FLAC::File::tag() const
 {

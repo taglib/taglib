@@ -71,15 +71,12 @@ namespace TagLib {
 
 Vorbis::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-Vorbis::Properties::~Properties()
-{
-  delete d;
-}
+Vorbis::Properties::~Properties() = default;
 
 int Vorbis::Properties::lengthInMilliseconds() const
 {

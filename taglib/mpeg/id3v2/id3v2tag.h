@@ -70,6 +70,8 @@ namespace TagLib {
     public:
       Latin1StringHandler();
       virtual ~Latin1StringHandler();
+      Latin1StringHandler(const Latin1StringHandler &) = delete;
+      Latin1StringHandler &operator=(const Latin1StringHandler &) = delete;
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
@@ -79,7 +81,7 @@ namespace TagLib {
 
     private:
       class Latin1StringHandlerPrivate;
-      Latin1StringHandlerPrivate *d;
+      std::unique_ptr<Latin1StringHandlerPrivate> d;
     };
 
     //! The main class in the ID3v2 implementation
@@ -156,6 +158,9 @@ namespace TagLib {
        * Destroys this Tag instance.
        */
       ~Tag() override;
+
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
 
       // Reimplementations.
 
@@ -386,11 +391,8 @@ namespace TagLib {
       void downgradeFrames(FrameList *existingFrames, FrameList *newFrames) const;
 
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
 
   }  // namespace ID3v2

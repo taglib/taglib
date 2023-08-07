@@ -47,12 +47,12 @@ public:
 };
 
 MP4::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
 MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
   d->file = file;
   d->atoms = atoms;
@@ -116,10 +116,7 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
   }
 }
 
-MP4::Tag::~Tag()
-{
-  delete d;
-}
+MP4::Tag::~Tag() = default;
 
 MP4::AtomDataList
 MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)

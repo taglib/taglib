@@ -61,6 +61,9 @@ namespace TagLib {
        */
       ~UniqueFileIdentifierFrame() override;
 
+      UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &) = delete;
+      UniqueFileIdentifierFrame &operator=(const UniqueFileIdentifierFrame &) = delete;
+
       /*!
        * Returns the owner for the frame; essentially this is the key for
        * determining which identification scheme this key belongs to.  This
@@ -109,13 +112,10 @@ namespace TagLib {
       ByteVector renderFields() const override;
 
     private:
-      UniqueFileIdentifierFrame(const UniqueFileIdentifierFrame &) = delete;
-      UniqueFileIdentifierFrame &operator=(const UniqueFileIdentifierFrame &) = delete;
-
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);
 
       class UniqueFileIdentifierFramePrivate;
-      UniqueFileIdentifierFramePrivate *d;
+      std::unique_ptr<UniqueFileIdentifierFramePrivate> d;
     };
   }  // namespace ID3v2
 }  // namespace TagLib

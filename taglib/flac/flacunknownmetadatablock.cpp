@@ -40,16 +40,13 @@ public:
 };
 
 FLAC::UnknownMetadataBlock::UnknownMetadataBlock(int code, const ByteVector &data) :
-  d(new UnknownMetadataBlockPrivate())
+  d(std::make_unique<UnknownMetadataBlockPrivate>())
 {
   d->code = code;
   d->data = data;
 }
 
-FLAC::UnknownMetadataBlock::~UnknownMetadataBlock()
-{
-  delete d;
-}
+FLAC::UnknownMetadataBlock::~UnknownMetadataBlock() = default;
 
 int FLAC::UnknownMetadataBlock::code() const
 {

@@ -50,6 +50,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   Ogg::XiphComment *comment;
   Properties *properties;
 };
@@ -72,7 +75,7 @@ bool Ogg::Opus::File::isSupported(IOStream *stream)
 
 Opus::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   Ogg::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -80,16 +83,13 @@ Opus::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
 
 Opus::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   Ogg::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-Opus::File::~File()
-{
-  delete d;
-}
+Opus::File::~File() = default;
 
 Ogg::XiphComment *Opus::File::tag() const
 {

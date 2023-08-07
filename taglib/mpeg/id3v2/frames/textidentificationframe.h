@@ -144,6 +144,9 @@ namespace TagLib {
        */
       ~TextIdentificationFrame() override;
 
+      TextIdentificationFrame(const TextIdentificationFrame &) = delete;
+      TextIdentificationFrame &operator=(const TextIdentificationFrame &) = delete;
+
       /*!
        * Text identification frames are a list of string fields.
        *
@@ -209,9 +212,6 @@ namespace TagLib {
       TextIdentificationFrame(const ByteVector &data, Header *h);
 
     private:
-      TextIdentificationFrame(const TextIdentificationFrame &) = delete;
-      TextIdentificationFrame &operator=(const TextIdentificationFrame &) = delete;
-
       /*!
        * Parses the special structure of a TIPL frame
        * Only the whitelisted roles "ARRANGER", "ENGINEER", "PRODUCER",
@@ -223,7 +223,7 @@ namespace TagLib {
        */
       PropertyMap makeTMCLProperties() const;
       class TextIdentificationFramePrivate;
-      TextIdentificationFramePrivate *d;
+      std::unique_ptr<TextIdentificationFramePrivate> d;
     };
 
     /*!
@@ -257,6 +257,11 @@ namespace TagLib {
        * and \a values.
        */
       UserTextIdentificationFrame(const String &description, const StringList &values, String::Type encoding = String::UTF8);
+
+      ~UserTextIdentificationFrame() override;
+
+      UserTextIdentificationFrame(const UserTextIdentificationFrame &) = delete;
+      UserTextIdentificationFrame &operator=(const UserTextIdentificationFrame &) = delete;
 
       String toString() const override;
 
@@ -300,12 +305,11 @@ namespace TagLib {
     private:
       UserTextIdentificationFrame(const ByteVector &data, Header *h);
       UserTextIdentificationFrame(const TextIdentificationFrame &);
-      UserTextIdentificationFrame &operator=(const UserTextIdentificationFrame &);
 
       void checkFields();
 
       class UserTextIdentificationFramePrivate;
-      UserTextIdentificationFramePrivate *d;
+      std::unique_ptr<UserTextIdentificationFramePrivate> d;
     };
 
   }  // namespace ID3v2

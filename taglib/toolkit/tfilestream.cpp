@@ -145,8 +145,8 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FileStream::FileStream(FileName fileName, bool openReadOnly)
-  : d(new FileStreamPrivate(fileName))
+FileStream::FileStream(FileName fileName, bool openReadOnly) :
+  d(std::make_unique<FileStreamPrivate>(fileName))
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
@@ -166,8 +166,8 @@ FileStream::FileStream(FileName fileName, bool openReadOnly)
 # endif
 }
 
-FileStream::FileStream(int fileDescriptor, bool openReadOnly)
-  : d(new FileStreamPrivate(""))
+FileStream::FileStream(int fileDescriptor, bool openReadOnly) :
+  d(std::make_unique<FileStreamPrivate>(""))
 {
   // First try with read / write mode, if that fails, fall back to read only.
 
@@ -187,8 +187,6 @@ FileStream::~FileStream()
 {
   if(isOpen())
     closeFile(d->file);
-
-  delete d;
 }
 
 FileName FileStream::name() const

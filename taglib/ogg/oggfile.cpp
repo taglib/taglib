@@ -62,6 +62,9 @@ public:
     delete lastPageHeader;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   unsigned int streamSerialNumber;
   List<Page *> pages;
   PageHeader *firstPageHeader;
@@ -73,10 +76,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::File::~File()
-{
-  delete d;
-}
+Ogg::File::~File() = default;
 
 ByteVector Ogg::File::packet(unsigned int i)
 {
@@ -175,13 +175,13 @@ bool Ogg::File::save()
 
 Ogg::File::File(FileName file) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
 }
 
 Ogg::File::File(IOStream *stream) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
 }
 

@@ -47,6 +47,9 @@ namespace TagLib {
       Properties(AudioProperties::ReadStyle propertiesStyle);
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       int channels() const override;
 
       unsigned short lengthInPatterns() const;
@@ -76,11 +79,8 @@ namespace TagLib {
       void setBpmSpeed(unsigned char bpmSpeed);
 
     private:
-      Properties(const Properties&) = delete;
-      Properties &operator=(const Properties&) = delete;
-
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace S3M
 }  // namespace TagLib

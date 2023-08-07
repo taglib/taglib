@@ -55,6 +55,9 @@ namespace TagLib {
        */
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       /*!
        * Returns the length of the file in milliseconds.
        *
@@ -95,13 +98,10 @@ namespace TagLib {
       ByteVector signature() const;
 
     private:
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
-
       void read(const ByteVector &data, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace FLAC
 }  // namespace TagLib

@@ -64,14 +64,11 @@ public:
 
 S3M::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
   AudioProperties(propertiesStyle),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
 }
 
-S3M::Properties::~Properties()
-{
-  delete d;
-}
+S3M::Properties::~Properties() = default;
 
 int S3M::Properties::channels() const
 {

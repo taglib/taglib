@@ -72,6 +72,9 @@ namespace TagLib {
        */
       virtual ~Frame();
 
+      Frame(const Frame &) = delete;
+      Frame &operator=(const Frame &) = delete;
+
       /*!
        * Returns the Frame ID (Structure, <a href="id3v2-structure.html#4">4</a>)
        * (Frames, <a href="id3v2-frames.html#4">4</a>)
@@ -272,12 +275,9 @@ namespace TagLib {
           PropertyMap &tiplProperties, PropertyMap &tmclProperties);
 
     private:
-      Frame(const Frame &) = delete;
-      Frame &operator=(const Frame &) = delete;
-
       class FramePrivate;
       friend class FramePrivate;
-      FramePrivate *d;
+      std::unique_ptr<FramePrivate> d;
     };
 
     //! ID3v2 frame header implementation
@@ -310,6 +310,9 @@ namespace TagLib {
        * Destroys this Header instance.
        */
       virtual ~Header();
+
+      Header(const Header &) = delete;
+      Header &operator=(const Header &) = delete;
 
       /*!
        * Sets the data for the Header.  \a version should indicate the ID3v2
@@ -440,11 +443,8 @@ namespace TagLib {
       ByteVector render() const;
 
     private:
-      Header(const Header &) = delete;
-      Header &operator=(const Header &) = delete;
-
       class HeaderPrivate;
-      HeaderPrivate *d;
+      std::unique_ptr<HeaderPrivate> d;
     };
 
   }  // namespace ID3v2

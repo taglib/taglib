@@ -63,6 +63,9 @@ namespace TagLib {
       StringHandler();
       virtual ~StringHandler();
 
+      StringHandler(const StringHandler &) = delete;
+      StringHandler &operator=(const StringHandler &) = delete;
+
       /*!
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an UTF-8 character array.
@@ -77,7 +80,7 @@ namespace TagLib {
 
     private:
       class StringHandlerPrivate;
-      StringHandlerPrivate *d;
+      std::unique_ptr<StringHandlerPrivate> d;
     };
 
     //! The main class in the ID3v2 implementation
@@ -103,6 +106,9 @@ namespace TagLib {
       Tag(const ByteVector &data);
 
       ~Tag() override;
+
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
 
       // Reimplementations
 
@@ -182,13 +188,9 @@ namespace TagLib {
        */
       void parse(const ByteVector &data);
 
-
     private:
-      Tag(const Tag &) = delete;
-      Tag &operator=(const Tag &) = delete;
-
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
   }  // namespace Info
 }  // namespace RIFF

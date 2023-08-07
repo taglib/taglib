@@ -55,15 +55,12 @@ public:
 
 UrlLinkFrame::UrlLinkFrame(const ByteVector &data) :
   Frame(data),
-  d(new UrlLinkFramePrivate())
+  d(std::make_unique<UrlLinkFramePrivate>())
 {
   setData(data);
 }
 
-UrlLinkFrame::~UrlLinkFrame()
-{
-  delete d;
-}
+UrlLinkFrame::~UrlLinkFrame() = default;
 
 void UrlLinkFrame::setUrl(const String &s)
 {
@@ -113,7 +110,7 @@ ByteVector UrlLinkFrame::renderFields() const
 
 UrlLinkFrame::UrlLinkFrame(const ByteVector &data, Header *h) :
   Frame(h),
-  d(new UrlLinkFramePrivate())
+  d(std::make_unique<UrlLinkFramePrivate>())
 {
   parseFields(fieldData(data));
 }
@@ -124,22 +121,19 @@ UrlLinkFrame::UrlLinkFrame(const ByteVector &data, Header *h) :
 
 UserUrlLinkFrame::UserUrlLinkFrame(String::Type encoding) :
   UrlLinkFrame("WXXX"),
-  d(new UserUrlLinkFramePrivate())
+  d(std::make_unique<UserUrlLinkFramePrivate>())
 {
   d->textEncoding = encoding;
 }
 
 UserUrlLinkFrame::UserUrlLinkFrame(const ByteVector &data) :
   UrlLinkFrame(data),
-  d(new UserUrlLinkFramePrivate())
+  d(std::make_unique<UserUrlLinkFramePrivate>())
 {
   setData(data);
 }
 
-UserUrlLinkFrame::~UserUrlLinkFrame()
-{
-  delete d;
-}
+UserUrlLinkFrame::~UserUrlLinkFrame() = default;
 
 String UserUrlLinkFrame::toString() const
 {
@@ -240,7 +234,7 @@ ByteVector UserUrlLinkFrame::renderFields() const
 
 UserUrlLinkFrame::UserUrlLinkFrame(const ByteVector &data, Header *h) :
   UrlLinkFrame(data, h),
-  d(new UserUrlLinkFramePrivate())
+  d(std::make_unique<UserUrlLinkFramePrivate>())
 {
   parseFields(fieldData(data));
 }

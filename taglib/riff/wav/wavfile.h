@@ -95,6 +95,9 @@ namespace TagLib {
          */
         ~File() override;
 
+        File(const File &) = delete;
+        File &operator=(const File &) = delete;
+
         /*!
          * Returns the ID3v2 Tag for this file.
          *
@@ -192,16 +195,13 @@ namespace TagLib {
         static bool isSupported(IOStream *stream);
 
       private:
-        File(const File &) = delete;
-        File &operator=(const File &) = delete;
-
         void read(bool readProperties);
         void removeTagChunks(TagTypes tags);
 
         friend class Properties;
 
         class FilePrivate;
-        FilePrivate *d;
+        std::unique_ptr<FilePrivate> d;
       };
     }  // namespace WAV
   }  // namespace RIFF

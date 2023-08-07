@@ -53,6 +53,9 @@ namespace TagLib {
      */
     ~ByteVectorStream() override;
 
+    ByteVectorStream(const ByteVectorStream &) = delete;
+    ByteVectorStream &operator=(const ByteVectorStream &) = delete;
+
     /*!
      * Returns the file name in the local file system encoding.
      */
@@ -137,7 +140,7 @@ namespace TagLib {
 
   private:
     class ByteVectorStreamPrivate;
-    ByteVectorStreamPrivate *d;
+    std::unique_ptr<ByteVectorStreamPrivate> d;
   };
 
 }  // namespace TagLib

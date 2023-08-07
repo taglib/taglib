@@ -68,15 +68,12 @@ public:
 
 Speex::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-Speex::Properties::~Properties()
-{
-  delete d;
-}
+Speex::Properties::~Properties() = default;
 
 int Speex::Properties::lengthInMilliseconds() const
 {

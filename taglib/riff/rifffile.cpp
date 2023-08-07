@@ -64,10 +64,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::File::~File()
-{
-  delete d;
-}
+RIFF::File::~File() = default;
 
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
@@ -75,7 +72,7 @@ RIFF::File::~File()
 
 RIFF::File::File(FileName file, Endianness endianness) :
   TagLib::File(file),
-  d(new FilePrivate(endianness))
+  d(std::make_unique<FilePrivate>(endianness))
 {
   if(isOpen())
     read();
@@ -83,7 +80,7 @@ RIFF::File::File(FileName file, Endianness endianness) :
 
 RIFF::File::File(IOStream *stream, Endianness endianness) :
   TagLib::File(stream),
-  d(new FilePrivate(endianness))
+  d(std::make_unique<FilePrivate>(endianness))
 {
   if(isOpen())
     read();

@@ -79,6 +79,8 @@ namespace TagLib {
     public:
       Atom(File *file);
       ~Atom();
+      Atom(const Atom &) = delete;
+      Atom &operator=(const Atom &) = delete;
       Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       bool path(AtomList &path, const char *name1, const char *name2 = nullptr, const char *name3 = nullptr);
       AtomList findall(const char *name, bool recursive = false);
@@ -94,6 +96,8 @@ namespace TagLib {
     public:
       Atoms(File *file);
       ~Atoms();
+      Atoms(const Atoms &) = delete;
+      Atoms &operator=(const Atoms &) = delete;
       Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       AtomList path(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       AtomList atoms;

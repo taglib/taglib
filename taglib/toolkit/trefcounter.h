@@ -1,7 +1,7 @@
-/**************************************************************************
-    copyright            : (C) 2010 by Lukáš Lalinský
-    email                : lalinsky@gmail.com
- **************************************************************************/
+/***************************************************************************
+    copyright            : (C) 2013 by Tsuda Kageyu
+    email                : tsuda.kageyu@gmail.com
+ ***************************************************************************/
 
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
@@ -23,54 +23,41 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_FLACUNKNOWNMETADATABLOCK_H
-#define TAGLIB_FLACUNKNOWNMETADATABLOCK_H
+#ifndef TAGLIB_REFCOUNTER_H
+#define TAGLIB_REFCOUNTER_H
 
-#include "tlist.h"
-#include "tbytevector.h"
 #include "taglib_export.h"
-#include "flacmetadatablock.h"
+#include "taglib.h"
 
-namespace TagLib {
-  namespace FLAC {
-    class TAGLIB_EXPORT UnknownMetadataBlock : public MetadataBlock
-    {
-    public:
-      UnknownMetadataBlock(int blockType, const ByteVector &data);
-      ~UnknownMetadataBlock() override;
+#ifndef DO_NOT_DOCUMENT // Tell Doxygen to skip this class.
+/*!
+  * \internal
+  * This is just used as a base class for shared classes in TagLib.
+  *
+  * \warning This <b>is not</b> part of the TagLib public API!
+  */
+namespace TagLib
+{
 
-      UnknownMetadataBlock(const UnknownMetadataBlock &item) = delete;
-      UnknownMetadataBlock &operator=(const UnknownMetadataBlock &item) = delete;
+  class TAGLIB_EXPORT RefCounter
+  {
+  public:
+    RefCounter();
+    ~RefCounter();
 
-      /*!
-       * Returns the FLAC metadata block type.
-       */
-      int code() const override;
+    RefCounter(const RefCounter &) = delete;
+    RefCounter &operator=(const RefCounter &) = delete;
 
-      /*!
-       * Sets the FLAC metadata block type.
-       */
-      void setCode(int code);
+    void ref();
+    bool deref();
+    int count() const;
 
-      /*!
-       * Returns the FLAC metadata block type.
-       */
-      ByteVector data() const;
+  private:
+    class RefCounterPrivate;
+    RefCounterPrivate *d;
+  };
 
-      /*!
-       * Sets the FLAC metadata block type.
-       */
-      void setData(const ByteVector &data);
-
-      /*!
-       * Render the content of the block.
-       */
-      ByteVector render() const override;
-
-    private:
-      class UnknownMetadataBlockPrivate;
-      std::unique_ptr<UnknownMetadataBlockPrivate> d;
-    };
-  }  // namespace FLAC
 }  // namespace TagLib
+
+#endif // DO_NOT_DOCUMENT
 #endif

@@ -51,6 +51,9 @@ namespace TagLib {
 
     ~TagUnion() override;
 
+    TagUnion(const TagUnion &) = delete;
+    TagUnion &operator=(const TagUnion &) = delete;
+
     Tag *operator[](int index) const;
     Tag *tag(int index) const;
 
@@ -90,7 +93,7 @@ namespace TagLib {
     TagUnion &operator=(const Tag &);
 
     class TagUnionPrivate;
-    TagUnionPrivate *d;
+    std::unique_ptr<TagUnionPrivate> d;
   };
 }  // namespace TagLib
 

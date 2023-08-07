@@ -68,6 +68,9 @@ namespace TagLib {
        */
       ~File() override;
 
+      File(const File &) = delete;
+      File &operator=(const File &) = delete;
+
       Mod::Tag *tag() const override;
 
       /*!
@@ -96,13 +99,10 @@ namespace TagLib {
       bool save() override;
 
     private:
-      File(const File &) = delete;
-      File &operator=(const File &) = delete;
-
       void read(bool readProperties);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
   }  // namespace Mod
 }  // namespace TagLib

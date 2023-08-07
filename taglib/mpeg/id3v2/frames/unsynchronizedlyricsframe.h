@@ -59,6 +59,9 @@ namespace TagLib {
        */
       ~UnsynchronizedLyricsFrame() override;
 
+      UnsynchronizedLyricsFrame(const UnsynchronizedLyricsFrame &) = delete;
+      UnsynchronizedLyricsFrame &operator=(const UnsynchronizedLyricsFrame &) = delete;
+
       /*!
        * Returns the text of this unsynchronized lyrics frame.
        *
@@ -167,11 +170,9 @@ namespace TagLib {
        * The constructor used by the FrameFactory.
        */
       UnsynchronizedLyricsFrame(const ByteVector &data, Header *h);
-      UnsynchronizedLyricsFrame(const UnsynchronizedLyricsFrame &) = delete;
-      UnsynchronizedLyricsFrame &operator=(const UnsynchronizedLyricsFrame &) = delete;
 
       class UnsynchronizedLyricsFramePrivate;
-      UnsynchronizedLyricsFramePrivate *d;
+      std::unique_ptr<UnsynchronizedLyricsFramePrivate> d;
     };
 
   }  // namespace ID3v2

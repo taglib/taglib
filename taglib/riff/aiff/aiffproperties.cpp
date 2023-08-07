@@ -59,15 +59,12 @@ public:
 
 RIFF::AIFF::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
   read(file);
 }
 
-RIFF::AIFF::Properties::~Properties()
-{
-  delete d;
-}
+RIFF::AIFF::Properties::~Properties() = default;
 
 int RIFF::AIFF::Properties::lengthInMilliseconds() const
 {

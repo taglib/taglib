@@ -59,6 +59,9 @@ namespace TagLib {
        */
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       /*!
        * Returns the length of the file in milliseconds.
        *
@@ -116,14 +119,11 @@ namespace TagLib {
       int albumPeak() const;
 
     private:
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
-
       void readSV7(const ByteVector &data, offset_t streamLength);
       void readSV8(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace MPC
 }  // namespace TagLib

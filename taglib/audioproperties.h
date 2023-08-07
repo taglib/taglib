@@ -28,6 +28,8 @@
 
 #include "taglib_export.h"
 
+#include <memory>
+
 namespace TagLib {
 
   //! A simple, abstract interface to common audio properties
@@ -63,6 +65,9 @@ namespace TagLib {
      * Destroys this AudioProperties instance.
      */
     virtual ~AudioProperties();
+
+    AudioProperties(const AudioProperties &) = delete;
+    AudioProperties &operator=(const AudioProperties &) = delete;
 
     /*!
       * Returns the length of the file in seconds.  The length is rounded down to
@@ -118,11 +123,8 @@ namespace TagLib {
     AudioProperties(ReadStyle style);
 
   private:
-    AudioProperties(const AudioProperties &) = delete;
-    AudioProperties &operator=(const AudioProperties &) = delete;
-
     class AudioPropertiesPrivate;
-    AudioPropertiesPrivate *d;
+    std::unique_ptr<AudioPropertiesPrivate> d;
   };
 
 }  // namespace TagLib

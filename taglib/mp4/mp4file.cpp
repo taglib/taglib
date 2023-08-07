@@ -64,6 +64,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   MP4::Tag        *tag;
   MP4::Atoms      *atoms;
   MP4::Properties *properties;
@@ -87,7 +90,7 @@ bool MP4::File::isSupported(IOStream *stream)
 
 MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -95,16 +98,13 @@ MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) 
 
 MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-MP4::File::~File()
-{
-  delete d;
-}
+MP4::File::~File() = default;
 
 MP4::Tag *
 MP4::File::tag() const

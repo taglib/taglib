@@ -45,6 +45,8 @@ namespace TagLib {
         Tag();
         Tag(TagLib::File *file, Atoms *atoms);
         ~Tag() override;
+        Tag(const Tag &) = delete;
+        Tag &operator=(const Tag &) = delete;
         bool save();
 
         String title() const override;
@@ -148,7 +150,7 @@ namespace TagLib {
         void addItem(const String &name, const Item &value);
 
         class TagPrivate;
-        TagPrivate *d;
+        std::unique_ptr<TagPrivate> d;
     };
   }  // namespace MP4
 }  // namespace TagLib

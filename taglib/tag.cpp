@@ -31,7 +31,6 @@ using namespace TagLib;
 
 class Tag::TagPrivate
 {
-
 };
 
 Tag::Tag() = default;

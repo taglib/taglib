@@ -59,6 +59,9 @@ public:
     delete header;
   }
 
+  FramePrivate(const FramePrivate &) = delete;
+  FramePrivate &operator=(const FramePrivate &) = delete;
+
   Frame::Header *header;
 };
 
@@ -153,10 +156,7 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
   return new UserTextIdentificationFrame(keyToTXXX(key), values, String::UTF8);
 }
 
-Frame::~Frame()
-{
-  delete d;
-}
+Frame::~Frame() = default;
 
 ByteVector Frame::frameID() const
 {
@@ -196,13 +196,13 @@ ByteVector Frame::render() const
 ////////////////////////////////////////////////////////////////////////////////
 
 Frame::Frame(const ByteVector &data) :
-  d(new FramePrivate())
+  d(std::make_unique<FramePrivate>())
 {
   d->header = new Header(data);
 }
 
 Frame::Frame(Header *h) :
-  d(new FramePrivate())
+  d(std::make_unique<FramePrivate>())
 {
   d->header = h;
 }
@@ -539,15 +539,12 @@ unsigned int Frame::Header::size()
 }
 
 Frame::Header::Header(const ByteVector &data, unsigned int version) :
-  d(new HeaderPrivate())
+  d(std::make_unique<HeaderPrivate>())
 {
   setData(data, version);
 }
 
-Frame::Header::~Header()
-{
-  delete d;
-}
+Frame::Header::~Header() = default;
 
 void Frame::Header::setData(const ByteVector &data, unsigned int version)
 {

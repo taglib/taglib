@@ -49,6 +49,9 @@ namespace TagLib {
 
       ~Tag() override;
 
+      Tag(const Tag &) = delete;
+      Tag &operator=(const Tag &) = delete;
+
       /*!
        * Returns the track name.
        */
@@ -204,7 +207,7 @@ namespace TagLib {
     private:
 
       class TagPrivate;
-      TagPrivate *d;
+      std::unique_ptr<TagPrivate> d;
     };
   }  // namespace ASF
 }  // namespace TagLib

@@ -84,6 +84,9 @@ namespace TagLib {
      */
     virtual ~File();
 
+    File(const File &) = delete;
+    File &operator=(const File &) = delete;
+
     /*!
      * Returns the file name in the local file system encoding.
      */
@@ -293,11 +296,8 @@ namespace TagLib {
     static unsigned int bufferSize();
 
   private:
-    File(const File &) = delete;
-    File &operator=(const File &) = delete;
-
     class FilePrivate;
-    FilePrivate *d;
+    std::unique_ptr<FilePrivate> d;
   };
 
 }  // namespace TagLib

@@ -61,6 +61,9 @@ namespace TagLib {
        */
       ~Properties() override;
 
+      Properties(const Properties &) = delete;
+      Properties &operator=(const Properties &) = delete;
+
       /*!
        * Returns the length of the file in milliseconds.
        *
@@ -99,16 +102,13 @@ namespace TagLib {
       int version() const;
 
     private:
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
-
       void read(File *file, offset_t streamLength);
 
       void analyzeCurrent(File *file);
       void analyzeOld(File *file);
 
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
   }  // namespace APE
 }  // namespace TagLib

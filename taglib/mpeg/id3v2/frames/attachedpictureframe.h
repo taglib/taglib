@@ -113,6 +113,9 @@ namespace TagLib {
        */
       ~AttachedPictureFrame() override;
 
+      AttachedPictureFrame(const AttachedPictureFrame &) = delete;
+      AttachedPictureFrame &operator=(const AttachedPictureFrame &) = delete;
+
       /*!
        * Returns a string containing the description and mime-type
        */
@@ -206,13 +209,10 @@ namespace TagLib {
       void parseFields(const ByteVector &data) override;
       ByteVector renderFields() const override;
       class AttachedPictureFramePrivate;
-      AttachedPictureFramePrivate *d;
+      std::unique_ptr<AttachedPictureFramePrivate> d;
 
     private:
-      AttachedPictureFrame(const AttachedPictureFrame &) = delete;
-      AttachedPictureFrame &operator=(const AttachedPictureFrame &) = delete;
       AttachedPictureFrame(const ByteVector &data, Header *h);
-
     };
 
     //! support for ID3v2.2 PIC frames

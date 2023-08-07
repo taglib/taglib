@@ -191,8 +191,7 @@ MP4::Atoms::Atoms(File *file)
   }
 }
 
-MP4::Atoms::~Atoms()
-= default;
+MP4::Atoms::~Atoms() = default;
 
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)

@@ -55,6 +55,9 @@ public:
     delete properties;
   }
 
+  FilePrivate(const FilePrivate &) = delete;
+  FilePrivate &operator=(const FilePrivate &) = delete;
+
   Properties *properties;
   TagUnion tag;
 
@@ -80,7 +83,7 @@ bool RIFF::WAV::File::isSupported(IOStream *stream)
 
 RIFF::WAV::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
   RIFF::File(file, LittleEndian),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
@@ -88,16 +91,13 @@ RIFF::WAV::File::File(FileName file, bool readProperties, Properties::ReadStyle)
 
 RIFF::WAV::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
   RIFF::File(stream, LittleEndian),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>())
 {
   if(isOpen())
     read(readProperties);
 }
 
-RIFF::WAV::File::~File()
-{
-  delete d;
-}
+RIFF::WAV::File::~File() = default;
 
 ID3v2::Tag *RIFF::WAV::File::tag() const
 {
