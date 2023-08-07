@@ -125,21 +125,21 @@ namespace TagLib {
         void parseBool(const Atom *atom);
         void parseCovr(const Atom *atom);
 
-        ByteVector padIlst(const ByteVector &data, int length = -1) const;
-        ByteVector renderAtom(const ByteVector &name, const ByteVector &data) const;
-        ByteVector renderData(const ByteVector &name, int flags,
-                              const ByteVectorList &data) const;
-        ByteVector renderText(const ByteVector &name, const Item &item,
-                              int flags = TypeUTF8) const;
-        ByteVector renderFreeForm(const String &name, const Item &item) const;
-        ByteVector renderBool(const ByteVector &name, const Item &item) const;
-        ByteVector renderInt(const ByteVector &name, const Item &item) const;
-        ByteVector renderByte(const ByteVector &name, const Item &item) const;
-        ByteVector renderUInt(const ByteVector &name, const Item &item) const;
-        ByteVector renderLongLong(const ByteVector &name, const Item &item) const;
-        ByteVector renderIntPair(const ByteVector &name, const Item &item) const;
-        ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item) const;
-        ByteVector renderCovr(const ByteVector &name, const Item &item) const;
+        static ByteVector padIlst(const ByteVector &data, int length = -1);
+        static ByteVector renderAtom(const ByteVector &name, const ByteVector &data);
+        static ByteVector renderData(const ByteVector &name, int flags,
+                                     const ByteVectorList &data);
+        static ByteVector renderText(const ByteVector &name, const Item &item,
+                                     int flags = TypeUTF8);
+        static ByteVector renderFreeForm(const String &name, const Item &item);
+        static ByteVector renderBool(const ByteVector &name, const Item &item);
+        static ByteVector renderInt(const ByteVector &name, const Item &item);
+        static ByteVector renderByte(const ByteVector &name, const Item &item);
+        static ByteVector renderUInt(const ByteVector &name, const Item &item);
+        static ByteVector renderLongLong(const ByteVector &name, const Item &item);
+        static ByteVector renderIntPair(const ByteVector &name, const Item &item);
+        static ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item);
+        static ByteVector renderCovr(const ByteVector &name, const Item &item);
 
         void updateParents(const AtomList &path, offset_t delta, int ignore = 0);
         void updateOffsets(offset_t delta, offset_t offset);

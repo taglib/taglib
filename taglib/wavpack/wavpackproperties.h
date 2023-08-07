@@ -109,7 +109,7 @@ namespace TagLib {
 
     private:
       void read(File *file, offset_t streamLength);
-      unsigned int seekFinalIndex(File *file, offset_t streamLength);
+      static unsigned int seekFinalIndex(File *file, offset_t streamLength);
 
       class PropertiesPrivate;
       std::unique_ptr<PropertiesPrivate> d;

@@ -42,7 +42,7 @@ unsigned int Footer::size()
   return 10;
 }
 
-ByteVector Footer::render(const Header *header) const
+ByteVector Footer::render(const Header *header)
 {
   ByteVector headerData = header->render();
   headerData[0] = '3';

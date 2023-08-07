@@ -70,7 +70,7 @@ namespace TagLib {
       /*!
        * Renders the footer based on the data in \a header.
        */
-      ByteVector render(const Header *header) const;
+      static ByteVector render(const Header *header);
 
     private:
       class FooterPrivate;
