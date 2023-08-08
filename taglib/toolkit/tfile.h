@@ -66,8 +66,8 @@ namespace TagLib {
      * Specify which tags to strip either explicitly, or on save.
      */
     enum StripTags {
-      StripNone,  //<! Don't strip any tags
-      StripOthers //<! Strip all tags not explicitly referenced in method call
+      StripNone,  //!< Don't strip any tags
+      StripOthers //!< Strip all tags not explicitly referenced in method call
     };
 
     /*!
@@ -75,8 +75,8 @@ namespace TagLib {
      * types should be synchronized.
      */
     enum DuplicateTags {
-      Duplicate,     //<! Synchronize values between different tag types
-      DoNotDuplicate //<! Do not synchronize values between different tag types
+      Duplicate,     //!< Synchronize values between different tag types
+      DoNotDuplicate //!< Do not synchronize values between different tag types
     };
 
     /*!
