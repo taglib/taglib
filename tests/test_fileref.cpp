@@ -74,7 +74,7 @@ namespace
       return new MP4::File(s);
     }
   };
-}
+} // namespace
 
 class TestFileRef : public CppUnit::TestFixture
 {

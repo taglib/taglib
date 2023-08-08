@@ -120,7 +120,7 @@ namespace TagLib {
 
     return String(text);
   }
-}
+} // namespace TagLib
 
 #endif
 
