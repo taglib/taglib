@@ -61,9 +61,9 @@ PropertyMap Tag::properties() const
     map["COMMENT"].append(comment());
   if(!(genre().isEmpty()))
     map["GENRE"].append(genre());
-  if(!(year() == 0))
+  if(year() != 0)
     map["DATE"].append(String::number(year()));
-  if(!(track() == 0))
+  if(track() != 0)
     map["TRACKNUMBER"].append(String::number(track()));
   return map;
 }
