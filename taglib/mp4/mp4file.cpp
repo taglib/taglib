@@ -36,16 +36,7 @@ namespace
 {
   bool checkValid(const MP4::AtomList &list)
   {
-    for(auto it = list.begin(); it != list.end(); ++it) {
-
-      if((*it)->length == 0)
-        return false;
-
-      if(!checkValid((*it)->children))
-        return false;
-    }
-
-    return true;
+    return std::none_of(list.begin(), list.end(), [](const auto &a) { return a->length == 0 || !checkValid(a->children); });
   }
 }  // namespace
 

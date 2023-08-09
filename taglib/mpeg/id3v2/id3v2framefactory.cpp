@@ -147,11 +147,9 @@ std::pair<Frame::Header *, bool> FrameFactory::prepareFrameHeader(
   }
 #endif
 
-  for(auto it = frameID.cbegin(); it != frameID.cend(); it++) {
-    if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
-      delete header;
-      return {nullptr, false};
-    }
+  if(std::any_of(frameID.begin(), frameID.end(), [](auto c) { return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); })) {
+    delete header;
+    return { nullptr, false };
   }
 
   if(version > 3 && (tagHeader->unsynchronisation() || header->unsynchronisation())) {

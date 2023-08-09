@@ -65,13 +65,7 @@ namespace
         return false;
     }
 
-    const String upperKey = String(key).upper();
-    for(auto k : invalidKeys) {
-      if(upperKey == k)
-        return false;
-    }
-
-    return true;
+    return std::none_of(invalidKeys.begin(), invalidKeys.end(), [upperKey = String(key).upper()](auto k) { return upperKey == k; });
   }
 }  // namespace
 

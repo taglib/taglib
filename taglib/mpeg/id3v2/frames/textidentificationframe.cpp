@@ -294,14 +294,11 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   }
   const StringList l = fieldList();
   for(auto it = l.begin(); it != l.end(); ++it) {
-    bool found = false;
-    for(const auto &[o, t] : involvedPeople)
-      if(*it == o) {
-        map.insert(t, (++it)->split(","));
-        found = true;
-        break;
-      }
-    if(!found){
+    auto found = std::find_if(involvedPeople.begin(), involvedPeople.end(), [=](const auto &person) { return *it == person.first; });
+    if(found != involvedPeople.end()) {
+      map.insert(found->second, (++it)->split(","));
+    }
+    else {
       // invalid involved role -> mark whole frame as unsupported in order to be consistent with writing
       map.clear();
       map.unsupportedData().append(frameID());
