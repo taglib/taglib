@@ -29,11 +29,8 @@
 
 #include "trueaudioproperties.h"
 
-#include "tstring.h"
 #include "tdebug.h"
-#include <bitset>
-
-#include "trueaudiofile.h"
+#include "tstring.h"
 
 using namespace TagLib;
 

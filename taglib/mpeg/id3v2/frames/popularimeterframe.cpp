@@ -25,8 +25,6 @@
 
 #include "popularimeterframe.h"
 
-#include "tdebug.h"
-
 using namespace TagLib;
 using namespace ID3v2;
 

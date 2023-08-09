@@ -28,7 +28,7 @@
 #include "tbytevectorlist.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-#include <cstdio>
+
 #include <utility>
 
 using namespace TagLib;

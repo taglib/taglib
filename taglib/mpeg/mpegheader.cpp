@@ -28,7 +28,6 @@
 #include "tbytevector.h"
 #include "tdebug.h"
 #include "tfile.h"
-#include "tstring.h"
 
 #include "mpegutils.h"
 

@@ -25,9 +25,6 @@
 
 #include "infotag.h"
 
-#include "tdebug.h"
-#include "tfile.h"
-
 #include "riffutils.h"
 
 #include <utility>

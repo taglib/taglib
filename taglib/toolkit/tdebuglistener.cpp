@@ -26,7 +26,6 @@
 #include "tdebuglistener.h"
 
 #include <iostream>
-#include <bitset>
 
 #ifdef _WIN32
 # include <windows.h>

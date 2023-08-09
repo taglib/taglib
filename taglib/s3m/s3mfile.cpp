@@ -30,8 +30,6 @@
 #include "modfileprivate.h"
 #include "tpropertymap.h"
 
-#include <iostream>
-
 using namespace TagLib;
 using namespace S3M;
 

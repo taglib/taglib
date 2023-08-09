@@ -25,9 +25,6 @@
 
 #include "tableofcontentsframe.h"
 
-#include <utility>
-
-#include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tdebug.h"
 

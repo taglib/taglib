@@ -31,7 +31,6 @@
 #include "tpropertymap.h"
 
 #include <algorithm>
-#include <cstring>
 #include <utility>
 
 using namespace TagLib;

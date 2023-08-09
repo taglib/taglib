@@ -25,10 +25,6 @@
 
 #include "asfpicture.h"
 
-#include "taglib.h"
-#include "tdebug.h"
-
-#include "asfattribute.h"
 #include "asffile.h"
 #include "asfutils.h"
 

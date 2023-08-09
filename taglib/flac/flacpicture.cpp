@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 #include "flacpicture.h"
-#include "taglib.h"
 #include "tdebug.h"
 
 using namespace TagLib;

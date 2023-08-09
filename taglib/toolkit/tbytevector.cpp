@@ -28,13 +28,10 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <cstdio>
 #include <cstring>
 #include <iostream>
-#include <limits>
 
 #include "tdebug.h"
-#include "tstring.h"
 #include "tutils.h"
 
 // This is a bit ugly to keep writing over and over again.

@@ -25,12 +25,8 @@
 
 #include "tbytevectorstream.h"
 #include "tstring.h"
-#include "tdebug.h"
 
-#include <cstdio>
 #include <cstring>
-
-#include <cstdlib>
 
 using namespace TagLib;
 

@@ -25,7 +25,6 @@
 
 #include "id3v2header.h"
 
-#include <iostream>
 #include <bitset>
 
 #include "tstring.h"

@@ -27,12 +27,6 @@
 #include "tstringlist.h"
 #include "tpropertymap.h"
 
-#include "id3v1tag.h"
-#include "id3v2tag.h"
-#include "apetag.h"
-#include "xiphcomment.h"
-#include "infotag.h"
-
 #include <array>
 
 using namespace TagLib;

@@ -25,11 +25,10 @@
 
 #include "asffile.h"
 
-#include "tdebug.h"
-#include "tbytevectorlist.h"
-#include "tpropertymap.h"
-#include "tstring.h"
 #include "tagutils.h"
+#include "tbytevectorlist.h"
+#include "tdebug.h"
+#include "tpropertymap.h"
 
 #include "asftag.h"
 #include "asfproperties.h"

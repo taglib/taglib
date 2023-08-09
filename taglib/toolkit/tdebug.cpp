@@ -34,9 +34,7 @@
 #include "tdebuglistener.h"
 #include "tutils.h"
 
-#include <bitset>
-#include <cstdio>
-#include <cstdarg>
+#  include <bitset>
 
 namespace TagLib
 {

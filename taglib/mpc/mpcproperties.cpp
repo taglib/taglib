@@ -28,7 +28,6 @@
 #include "tdebug.h"
 #include "tstring.h"
 #include <array>
-#include <bitset>
 #include <cmath>
 
 #include "mpcfile.h"

@@ -24,8 +24,6 @@
  ***************************************************************************/
 
 #include "asfproperties.h"
-#include "tdebug.h"
-#include "tstring.h"
 
 using namespace TagLib;
 
