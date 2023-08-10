@@ -161,7 +161,7 @@ namespace TagLib {
       // Reimplementations.
 
       void setText(const String &s) override;
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the text encoding that will be used in rendering this frame.
@@ -173,7 +173,7 @@ namespace TagLib {
        * \see setTextEncoding()
        * \see render()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Sets the text encoding to be used when rendering this frame to
@@ -189,7 +189,7 @@ namespace TagLib {
       /*!
        * Returns a list of the strings in this frame.
        */
-      StringList fieldList() const;
+      [[nodiscard]] StringList fieldList() const;
 
       /*!
        * Returns a KeyConversionMap mapping a role as it would be  used in a PropertyMap
@@ -197,13 +197,13 @@ namespace TagLib {
        */
       static const KeyConversionMap &involvedPeopleMap();
 
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
     protected:
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
       /*!
        * The constructor used by the FrameFactory.
@@ -216,11 +216,11 @@ namespace TagLib {
        * Only the whitelisted roles "ARRANGER", "ENGINEER", "PRODUCER",
        * "DJMIXER" (ID3: "DJ-MIX") and "MIXER" (ID3: "MIX") are allowed.
        */
-      PropertyMap makeTIPLProperties() const;
+      [[nodiscard]] PropertyMap makeTIPLProperties() const;
       /*!
        * Parses the special structure of a TMCL frame.
        */
-      PropertyMap makeTMCLProperties() const;
+      [[nodiscard]] PropertyMap makeTMCLProperties() const;
       class TextIdentificationFramePrivate;
       std::unique_ptr<TextIdentificationFramePrivate> d;
     };
@@ -262,12 +262,12 @@ namespace TagLib {
       UserTextIdentificationFrame(const UserTextIdentificationFrame &) = delete;
       UserTextIdentificationFrame &operator=(const UserTextIdentificationFrame &) = delete;
 
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the description for this frame.
        */
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Sets the description of the frame to \a s.  \a s must be unique.  You can
@@ -276,7 +276,7 @@ namespace TagLib {
        */
       void setDescription(const String &s);
 
-      StringList fieldList() const;
+      [[nodiscard]] StringList fieldList() const;
       void setText(const String &text) override;
       void setText(const StringList &fields);
 
@@ -293,7 +293,7 @@ namespace TagLib {
        *   in the value list, in order to be compatible with TagLib which copies
        *   the description() into the fieldList().
        */
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
       /*!
        * Searches for the user defined text frame with the description \a description

@@ -90,13 +90,13 @@ namespace TagLib {
       /*!
        * Returns the key.
        */
-      String key() const;
+      [[nodiscard]] String key() const;
 
       /*!
        * Returns the binary value.
        * If the item type is not \a Binary, always returns an empty ByteVector.
        */
-      ByteVector binaryData() const;
+      [[nodiscard]] ByteVector binaryData() const;
 
      /*!
       * Set the binary value to \a value
@@ -106,7 +106,7 @@ namespace TagLib {
 
 #ifndef DO_NOT_DOCUMENT
       /* Remove in next binary incompatible release */
-      ByteVector value() const;
+      [[nodiscard]] ByteVector value() const;
 #endif
 
       /*!
@@ -146,30 +146,30 @@ namespace TagLib {
       /*!
        * Returns the size of the full item.
        */
-      int size() const;
+      [[nodiscard]] int size() const;
 
       /*!
        * Returns the value as a single string.  In case of multiple strings,
        * the first is returned.  If the data type is not \a Text, always returns
        * an empty String.
        */
-      String toString() const;
+      [[nodiscard]] String toString() const;
 
 #ifndef DO_NOT_DOCUMENT
       /* Remove in next binary incompatible release */
-      StringList toStringList() const;
+      [[nodiscard]] StringList toStringList() const;
 #endif
 
       /*!
        * Returns the list of text values.  If the data type is not \a Text, always
        * returns an empty StringList.
        */
-      StringList values() const;
+      [[nodiscard]] StringList values() const;
 
       /*!
        * Render the item to a ByteVector.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Parse the item from the ByteVector \a data.
@@ -184,7 +184,7 @@ namespace TagLib {
       /*!
        * Return true if the item is read-only.
        */
-      bool isReadOnly() const;
+      [[nodiscard]] bool isReadOnly() const;
 
       /*!
        * Sets the type of the item to \a val.
@@ -196,12 +196,12 @@ namespace TagLib {
       /*!
        * Returns the type of the item.
        */
-      ItemTypes type() const;
+      [[nodiscard]] ItemTypes type() const;
 
       /*!
        * Returns if the item has any real content.
        */
-      bool isEmpty() const;
+      [[nodiscard]] bool isEmpty() const;
 
     private:
       class ItemPrivate;

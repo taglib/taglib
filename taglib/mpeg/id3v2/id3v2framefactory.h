@@ -92,7 +92,7 @@ namespace TagLib {
        *
        * \see setDefaultTextEncoding()
        */
-      String::Type defaultTextEncoding() const;
+      [[nodiscard]] String::Type defaultTextEncoding() const;
 
       /*!
        * Set the default text encoding for all text frames that are created to

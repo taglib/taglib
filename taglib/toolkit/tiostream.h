@@ -43,9 +43,9 @@ namespace TagLib {
 
     operator const wchar_t *() const;
 
-    const std::wstring &wstr() const;
+    [[nodiscard]] const std::wstring &wstr() const;
 
-    String toString() const;
+    [[nodiscard]] String toString() const;
 
   private:
     const std::wstring m_wname;
@@ -84,7 +84,7 @@ namespace TagLib {
     /*!
      * Returns the stream name in the local file system encoding.
      */
-    virtual FileName name() const = 0;
+    [[nodiscard]] virtual FileName name() const = 0;
 
     /*!
      * Reads a block of size \a length at the current get pointer.
@@ -124,13 +124,13 @@ namespace TagLib {
     /*!
      * Returns true if the file is read only (or if the file can not be opened).
      */
-    virtual bool readOnly() const = 0;
+    [[nodiscard]] virtual bool readOnly() const = 0;
 
     /*!
      * Since the file can currently only be opened as an argument to the
      * constructor (sort-of by design), this returns if that open succeeded.
      */
-    virtual bool isOpen() const = 0;
+    [[nodiscard]] virtual bool isOpen() const = 0;
 
     /*!
      * Move the I/O pointer to \a offset in the stream from position \a p.  This
@@ -148,7 +148,7 @@ namespace TagLib {
     /*!
      * Returns the current offset within the stream.
      */
-    virtual offset_t tell() const = 0;
+    [[nodiscard]] virtual offset_t tell() const = 0;
 
     /*!
      * Returns the length of the stream.

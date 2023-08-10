@@ -78,7 +78,7 @@ namespace TagLib {
        * Renders the in memory values to a ByteVector suitable for writing to
        * the file.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Returns the string "APETAGEX" suitable for usage in locating the tag in a
@@ -88,13 +88,13 @@ namespace TagLib {
 
       // Reimplementations.
 
-      String title() const override;
-      String artist() const override;
-      String album() const override;
-      String comment() const override;
-      String genre() const override;
-      unsigned int year() const override;
-      unsigned int track() const override;
+      [[nodiscard]] String title() const override;
+      [[nodiscard]] String artist() const override;
+      [[nodiscard]] String album() const override;
+      [[nodiscard]] String comment() const override;
+      [[nodiscard]] String genre() const override;
+      [[nodiscard]] unsigned int year() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       void setTitle(const String &s) override;
       void setArtist(const String &s) override;
@@ -118,7 +118,7 @@ namespace TagLib {
        * TRACK to TRACKNUMBER, YEAR to DATE, and ALBUM ARTIST to ALBUMARTIST, respectively,
        * in order to be compliant with the names used in other formats.
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       void removeUnsupportedProperties(const StringList &properties) override;
 
@@ -138,7 +138,7 @@ namespace TagLib {
       /*!
        * Returns a pointer to the tag's footer.
        */
-      Footer *footer() const;
+      [[nodiscard]] Footer *footer() const;
 
       /*!
        * Returns a reference to the item list map.  This is an ItemListMap of
@@ -152,7 +152,7 @@ namespace TagLib {
        * \warning You should not modify this data structure directly, instead
        * use setItem() and removeItem().
        */
-      const ItemListMap &itemListMap() const;
+      [[nodiscard]] const ItemListMap &itemListMap() const;
 
       /*!
        * Removes the \a key item from the tag
@@ -182,7 +182,7 @@ namespace TagLib {
       /*!
        * Returns true if the tag does not contain any data.
        */
-      bool isEmpty() const override;
+      [[nodiscard]] bool isEmpty() const override;
 
     protected:
 

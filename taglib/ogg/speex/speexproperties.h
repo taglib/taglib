@@ -69,32 +69,32 @@ namespace TagLib {
          *
          * \see lengthInSeconds()
          */
-        int lengthInMilliseconds() const override;
+        [[nodiscard]] int lengthInMilliseconds() const override;
 
         /*!
          * Returns the average bit rate of the file in kb/s.
          */
-        int bitrate() const override;
+        [[nodiscard]] int bitrate() const override;
 
         /*!
          * Returns the nominal bit rate as read from the Speex header in kb/s.
          */
-        int bitrateNominal() const;
+        [[nodiscard]] int bitrateNominal() const;
 
         /*!
          * Returns the sample rate in Hz.
          */
-        int sampleRate() const override;
+        [[nodiscard]] int sampleRate() const override;
 
         /*!
          * Returns the number of audio channels.
          */
-        int channels() const override;
+        [[nodiscard]] int channels() const override;
 
         /*!
          * Returns the Speex version, currently "0" (as specified by the spec).
          */
-        int speexVersion() const;
+        [[nodiscard]] int speexVersion() const;
 
       private:
         void read(File *file);

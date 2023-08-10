@@ -80,21 +80,21 @@ namespace TagLib {
        *
        * \see setElementID()
        */
-      ByteVector elementID() const;
+      [[nodiscard]] ByteVector elementID() const;
 
       /*!
        * Returns time of chapter's start (in milliseconds).
        *
        * \see setStartTime()
        */
-      unsigned int startTime() const;
+      [[nodiscard]] unsigned int startTime() const;
 
       /*!
        * Returns time of chapter's end (in milliseconds).
        *
        * \see setEndTime()
        */
-      unsigned int endTime() const;
+      [[nodiscard]] unsigned int endTime() const;
 
       /*!
        * Returns zero based byte offset (count of bytes from the beginning
@@ -103,7 +103,7 @@ namespace TagLib {
        * \note If returned value is 0xFFFFFFFF, start time should be used instead.
        * \see setStartOffset()
        */
-      unsigned int startOffset() const;
+      [[nodiscard]] unsigned int startOffset() const;
 
       /*!
        * Returns zero based byte offset (count of bytes from the beginning
@@ -112,7 +112,7 @@ namespace TagLib {
        * \note If returned value is 0xFFFFFFFF, end time should be used instead.
        * \see setEndOffset()
        */
-      unsigned int endOffset() const;
+      [[nodiscard]] unsigned int endOffset() const;
 
       /*!
        * Sets the element ID of the frame to \a eID. If \a eID isn't
@@ -166,7 +166,7 @@ namespace TagLib {
        *
        * \see embeddedFrameList()
        */
-      const FrameListMap &embeddedFrameListMap() const;
+      [[nodiscard]] const FrameListMap &embeddedFrameListMap() const;
 
       /*!
        * Returns a reference to the embedded frame list.  This is an FrameList
@@ -179,7 +179,7 @@ namespace TagLib {
        * \warning You should not modify this data structure directly, instead
        * use addEmbeddedFrame() and removeEmbeddedFrame().
        */
-      const FrameList &embeddedFrameList() const;
+      [[nodiscard]] const FrameList &embeddedFrameList() const;
 
       /*!
        * Returns the embedded frame list for frames with the id \a frameID
@@ -192,7 +192,7 @@ namespace TagLib {
        *
        * \see embeddedFrameListMap()
        */
-      const FrameList &embeddedFrameList(const ByteVector &frameID) const;
+      [[nodiscard]] const FrameList &embeddedFrameList(const ByteVector &frameID) const;
 
       /*!
        * Add an embedded frame to the CHAP frame.  At this point the CHAP frame
@@ -221,9 +221,9 @@ namespace TagLib {
        */
       void removeEmbeddedFrames(const ByteVector &id);
 
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
       /*!
        * CHAP frames each have a unique element ID. This searches for a CHAP
@@ -236,7 +236,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);

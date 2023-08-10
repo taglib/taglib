@@ -69,12 +69,12 @@ namespace TagLib {
          *
          * \see lengthInSeconds()
          */
-        int lengthInMilliseconds() const override;
+        [[nodiscard]] int lengthInMilliseconds() const override;
 
         /*!
          * Returns the average bit rate of the file in kb/s.
          */
-        int bitrate() const override;
+        [[nodiscard]] int bitrate() const override;
 
         /*!
          * Returns the sample rate in Hz.
@@ -82,24 +82,24 @@ namespace TagLib {
          * \note Always returns 48000, because Opus can decode any stream at a
          * sample rate of 8, 12, 16, 24, or 48 kHz,
          */
-        int sampleRate() const override;
+        [[nodiscard]] int sampleRate() const override;
 
         /*!
          * Returns the number of audio channels.
          */
-        int channels() const override;
+        [[nodiscard]] int channels() const override;
 
         /*!
          * The Opus codec supports decoding at multiple sample rates, there is no
          * single sample rate of the encoded stream. This returns the sample rate
          * of the original audio stream.
          */
-        int inputSampleRate() const;
+        [[nodiscard]] int inputSampleRate() const;
 
         /*!
          * Returns the Opus version, in the range 0...255.
          */
-        int opusVersion() const;
+        [[nodiscard]] int opusVersion() const;
 
       private:
         void read(File *file);

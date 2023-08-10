@@ -66,18 +66,18 @@ namespace TagLib {
        *
        * \see text()
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * \return The owner of the private frame.
        * \note This should contain an email address or link to a website.
        */
-      String owner() const;
+      [[nodiscard]] String owner() const;
 
       /*!
        *
        */
-      ByteVector data() const;
+      [[nodiscard]] ByteVector data() const;
 
       /*!
        * Sets the owner of the frame to \a s.
@@ -94,7 +94,7 @@ namespace TagLib {
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

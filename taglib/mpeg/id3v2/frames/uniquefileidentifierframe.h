@@ -72,14 +72,14 @@ namespace TagLib {
        *
        * \see setOwner()
        */
-      String owner() const;
+      [[nodiscard]] String owner() const;
 
       /*!
        * Returns the unique identifier.  Though sometimes this is a text string
        * it also may be binary data and as much should be assumed when handling
        * it.
        */
-      ByteVector identifier() const;
+      [[nodiscard]] ByteVector identifier() const;
 
       /*!
        * Sets the owner of the identification scheme to \a s.
@@ -95,9 +95,9 @@ namespace TagLib {
        */
       void setIdentifier(const ByteVector &v);
 
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
       /*!
        * UFID frames each have a unique owner. This searches for a UFID
@@ -109,7 +109,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);

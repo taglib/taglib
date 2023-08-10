@@ -95,13 +95,13 @@ namespace TagLib {
          *
          * \see hasID3v2Tag()
          */
-        ID3v2::Tag *tag() const override;
+        [[nodiscard]] ID3v2::Tag *tag() const override;
 
         /*!
          * Implements the unified property interface -- export function.
          * This method forwards to ID3v2::Tag::properties().
          */
-        PropertyMap properties() const override;
+        [[nodiscard]] PropertyMap properties() const override;
 
         void removeUnsupportedProperties(const StringList &unsupported) override;
 
@@ -115,7 +115,7 @@ namespace TagLib {
          * Returns the AIFF::Properties for this file.  If no audio properties
          * were read then this will return a null pointer.
          */
-        Properties *audioProperties() const override;
+        [[nodiscard]] Properties *audioProperties() const override;
 
         /*!
          * Saves the file.
@@ -132,7 +132,7 @@ namespace TagLib {
          *
          * \see ID3v2Tag()
          */
-        bool hasID3v2Tag() const;
+        [[nodiscard]] bool hasID3v2Tag() const;
 
         /*!
          * Check if the given \a stream can be opened as an AIFF file.

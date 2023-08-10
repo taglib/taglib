@@ -75,11 +75,11 @@ public:
   void setChunkData(const ByteVector &name, const ByteVector &data) {
     RIFF::File::setChunkData(name, data);
   }
-  TagLib::Tag *tag() const override
+  [[nodiscard]] TagLib::Tag *tag() const override
   {
     return nullptr;
   }
-  TagLib::AudioProperties *audioProperties() const override
+  [[nodiscard]] TagLib::AudioProperties *audioProperties() const override
   {
     return nullptr;
   }

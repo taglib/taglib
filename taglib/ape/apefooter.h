@@ -67,22 +67,22 @@ namespace TagLib {
       /*!
        * Returns the version number.  (Note: This is the 1000 or 2000.)
        */
-      unsigned int version() const;
+      [[nodiscard]] unsigned int version() const;
 
       /*!
        * Returns true if a header is present in the tag.
        */
-      bool headerPresent() const;
+      [[nodiscard]] bool headerPresent() const;
 
       /*!
        * Returns true if a footer is present in the tag.
        */
-      bool footerPresent() const;
+      [[nodiscard]] bool footerPresent() const;
 
       /*!
        * Returns true this is actually the header.
        */
-      bool isHeader() const;
+      [[nodiscard]] bool isHeader() const;
 
       /*!
        * Sets whether the header should be rendered or not
@@ -92,7 +92,7 @@ namespace TagLib {
       /*!
        * Returns the number of items in the tag.
        */
-      unsigned int itemCount() const;
+      [[nodiscard]] unsigned int itemCount() const;
 
       /*!
        * Set the item count to \a s.
@@ -106,7 +106,7 @@ namespace TagLib {
        *
        * \see completeTagSize()
        */
-      unsigned int tagSize() const;
+      [[nodiscard]] unsigned int tagSize() const;
 
       /*!
        * Returns the tag size, including if present, the header
@@ -114,7 +114,7 @@ namespace TagLib {
        *
        * \see tagSize()
        */
-      unsigned int completeTagSize() const;
+      [[nodiscard]] unsigned int completeTagSize() const;
 
       /*!
        * Set the tag size to \a s.
@@ -142,13 +142,13 @@ namespace TagLib {
       /*!
        * Renders the footer back to binary format.
        */
-      ByteVector renderFooter() const;
+      [[nodiscard]] ByteVector renderFooter() const;
 
       /*!
        * Renders the header corresponding to the footer. If headerPresent is
        * set to false, it returns an empty ByteVector.
        */
-      ByteVector renderHeader() const;
+      [[nodiscard]] ByteVector renderHeader() const;
 
     protected:
       /*!
@@ -160,7 +160,7 @@ namespace TagLib {
       /*!
        * Called by renderFooter and renderHeader
        */
-      ByteVector render(bool isHeader) const;
+      [[nodiscard]] ByteVector render(bool isHeader) const;
 
     private:
       class FooterPrivate;

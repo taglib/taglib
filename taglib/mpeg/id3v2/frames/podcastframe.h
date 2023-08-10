@@ -58,15 +58,15 @@ namespace TagLib {
       /*!
        * Returns a null string.
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
     protected:
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

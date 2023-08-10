@@ -71,7 +71,7 @@ namespace TagLib {
        * Returns the major version number.  (Note: This is the 4, not the 2 in
        * ID3v2.4.0.  The 2 is implied.)
        */
-      unsigned int majorVersion() const;
+      [[nodiscard]] unsigned int majorVersion() const;
 
       /*!
        * Set the the major version number to \a version.  (Note: This is
@@ -88,27 +88,27 @@ namespace TagLib {
        * Returns the revision number.  (Note: This is the 0, not the 4 in
        * ID3v2.4.0.  The 2 is implied.)
        */
-      unsigned int revisionNumber() const;
+      [[nodiscard]] unsigned int revisionNumber() const;
 
       /*!
        * Returns true if unsynchronisation has been applied to all frames.
        */
-      bool unsynchronisation() const;
+      [[nodiscard]] bool unsynchronisation() const;
 
       /*!
        * Returns true if an extended header is present in the tag.
        */
-      bool extendedHeader() const;
+      [[nodiscard]] bool extendedHeader() const;
 
       /*!
        * Returns true if the experimental indicator flag is set.
        */
-      bool experimentalIndicator() const;
+      [[nodiscard]] bool experimentalIndicator() const;
 
       /*!
        * Returns true if a footer is present in the tag.
        */
-      bool footerPresent() const;
+      [[nodiscard]] bool footerPresent() const;
       /*!
        * Returns the tag size in bytes.  This is the size of the frame content.
        * The size of the \e entire tag will be this plus the header size (10
@@ -120,7 +120,7 @@ namespace TagLib {
        *
        * \see completeTagSize()
        */
-      unsigned int tagSize() const;
+      [[nodiscard]] unsigned int tagSize() const;
 
       /*!
        * Returns the tag size, including the header and, if present, the footer
@@ -128,7 +128,7 @@ namespace TagLib {
        *
        * \see tagSize()
        */
-      unsigned int completeTagSize() const;
+      [[nodiscard]] unsigned int completeTagSize() const;
 
       /*!
        * Set the tag size to \a s.
@@ -156,7 +156,7 @@ namespace TagLib {
       /*!
        * Renders the Header back to binary format.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
     protected:
       /*!

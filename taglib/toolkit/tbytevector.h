@@ -121,20 +121,20 @@ namespace TagLib {
     /*!
      * Returns a pointer to the internal data structure which may not be modified.
      */
-    const char *data() const;
+    [[nodiscard]] const char *data() const;
 
     /*!
      * Returns a byte vector made up of the bytes starting at \a index and
      * for \a length bytes.  If \a length is not specified it will return the bytes
      * from \a index to the end of the vector.
      */
-    ByteVector mid(unsigned int index, unsigned int length = 0xffffffff) const;
+    [[nodiscard]] ByteVector mid(unsigned int index, unsigned int length = 0xffffffff) const;
 
     /*!
      * This essentially performs the same as operator[](), but instead of causing
      * a runtime error if the index is out of bounds, it will return a null byte.
      */
-    char at(unsigned int index) const;
+    [[nodiscard]] char at(unsigned int index) const;
 
     /*!
      * Searches the ByteVector for \a pattern starting at \a offset and returns
@@ -142,7 +142,7 @@ namespace TagLib {
      * specified the pattern will only be matched if it starts on a byte divisible
      * by \a byteAlign (starting from \a offset).
      */
-    int find(const ByteVector &pattern, unsigned int offset = 0, int byteAlign = 1) const;
+    [[nodiscard]] int find(const ByteVector &pattern, unsigned int offset = 0, int byteAlign = 1) const;
 
     /*!
      * Searches the char for \a c starting at \a offset and returns
@@ -150,7 +150,7 @@ namespace TagLib {
      * specified the pattern will only be matched if it starts on a byte divisible
      * by \a byteAlign (starting from \a offset).
      */
-    int find(char c, unsigned int offset = 0, int byteAlign = 1) const;
+    [[nodiscard]] int find(char c, unsigned int offset = 0, int byteAlign = 1) const;
 
     /*!
      * Searches the ByteVector for \a pattern starting from either the end of the
@@ -158,7 +158,7 @@ namespace TagLib {
      * not found.  If \a byteAlign is specified the pattern will only be matched
      * if it starts on a byte divisible by \a byteAlign (starting from \a offset).
      */
-    int rfind(const ByteVector &pattern, unsigned int offset = 0, int byteAlign = 1) const;
+    [[nodiscard]] int rfind(const ByteVector &pattern, unsigned int offset = 0, int byteAlign = 1) const;
 
     /*!
      * Checks to see if the vector contains the \a pattern starting at position
@@ -167,18 +167,18 @@ namespace TagLib {
      * specify to only check for the first \a patternLength bytes of \a pattern with
      * the \a patternLength argument.
      */
-    bool containsAt(const ByteVector &pattern, unsigned int offset,
+    [[nodiscard]] bool containsAt(const ByteVector &pattern, unsigned int offset,
                     unsigned int patternOffset = 0, unsigned int patternLength = 0xffffffff) const;
 
     /*!
      * Returns true if the vector starts with \a pattern.
      */
-    bool startsWith(const ByteVector &pattern) const;
+    [[nodiscard]] bool startsWith(const ByteVector &pattern) const;
 
     /*!
      * Returns true if the vector ends with \a pattern.
      */
-    bool endsWith(const ByteVector &pattern) const;
+    [[nodiscard]] bool endsWith(const ByteVector &pattern) const;
 
     /*!
      * Replaces \a oldByte with \a newByte and returns a reference to the
@@ -202,7 +202,7 @@ namespace TagLib {
      * \note This will not match the complete pattern at the end of the string; use
      * endsWith() for that.
      */
-    int endsWithPartialMatch(const ByteVector &pattern) const;
+    [[nodiscard]] int endsWithPartialMatch(const ByteVector &pattern) const;
 
     /*!
      * Appends \a v to the end of the ByteVector.
@@ -222,7 +222,7 @@ namespace TagLib {
     /*!
      * Returns the size of the array.
      */
-    unsigned int size() const;
+    [[nodiscard]] unsigned int size() const;
 
     /*!
      * Resize the vector to \a size.  If the vector is currently less than
@@ -239,12 +239,12 @@ namespace TagLib {
     /*!
      * Returns a ConstIterator that points to the front of the vector.
      */
-    ConstIterator begin() const;
+    [[nodiscard]] ConstIterator begin() const;
 
     /*!
      * Returns a ConstIterator that points to the front of the vector.
      */
-    ConstIterator cbegin() const;
+    [[nodiscard]] ConstIterator cbegin() const;
 
     /*!
      * Returns an Iterator that points to the back of the vector.
@@ -254,12 +254,12 @@ namespace TagLib {
     /*!
      * Returns a ConstIterator that points to the back of the vector.
      */
-    ConstIterator end() const;
+    [[nodiscard]] ConstIterator end() const;
 
     /*!
      * Returns a ConstIterator that points to the back of the vector.
      */
-    ConstIterator cend() const;
+    [[nodiscard]] ConstIterator cend() const;
 
     /*!
      * Returns a ReverseIterator that points to the front of the vector.
@@ -269,7 +269,7 @@ namespace TagLib {
     /*!
      * Returns a ConstReverseIterator that points to the front of the vector.
      */
-    ConstReverseIterator rbegin() const;
+    [[nodiscard]] ConstReverseIterator rbegin() const;
 
     /*!
      * Returns a ReverseIterator that points to the back of the vector.
@@ -279,14 +279,14 @@ namespace TagLib {
     /*!
      * Returns a ConstReverseIterator that points to the back of the vector.
      */
-    ConstReverseIterator rend() const;
+    [[nodiscard]] ConstReverseIterator rend() const;
 
     /*!
      * Returns true if the ByteVector is empty.
      *
      * \see size()
      */
-    bool isEmpty() const;
+    [[nodiscard]] bool isEmpty() const;
 
     /*!
      * Converts the first 4 bytes of the vector to an unsigned integer.
@@ -298,7 +298,7 @@ namespace TagLib {
      *
      * \see fromUInt()
      */
-    unsigned int toUInt(bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] unsigned int toUInt(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the 4 bytes at \a offset of the vector to an unsigned integer.
@@ -310,7 +310,7 @@ namespace TagLib {
      *
      * \see fromUInt()
      */
-    unsigned int toUInt(unsigned int offset, bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] unsigned int toUInt(unsigned int offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the \a length bytes at \a offset of the vector to an unsigned
@@ -323,7 +323,7 @@ namespace TagLib {
      *
      * \see fromUInt()
      */
-    unsigned int toUInt(unsigned int offset, unsigned int length,
+    [[nodiscard]] unsigned int toUInt(unsigned int offset, unsigned int length,
                         bool mostSignificantByteFirst = true) const;
 
     /*!
@@ -335,7 +335,7 @@ namespace TagLib {
      *
      * \see fromShort()
      */
-    short toShort(bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] short toShort(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the 2 bytes at \a offset of the vector to a (signed) short.
@@ -346,7 +346,7 @@ namespace TagLib {
      *
      * \see fromShort()
      */
-    short toShort(unsigned int offset, bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] short toShort(unsigned int offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 2 bytes of the vector to a unsigned short.
@@ -357,7 +357,7 @@ namespace TagLib {
      *
      * \see fromShort()
      */
-    unsigned short toUShort(bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] unsigned short toUShort(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the 2 bytes at \a offset of the vector to a unsigned short.
@@ -368,7 +368,7 @@ namespace TagLib {
      *
      * \see fromShort()
      */
-    unsigned short toUShort(unsigned int offset, bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] unsigned short toUShort(unsigned int offset, bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the first 8 bytes of the vector to a (signed) long long.
@@ -380,7 +380,7 @@ namespace TagLib {
      *
      * \see fromUInt()
      */
-    long long toLongLong(bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] long long toLongLong(bool mostSignificantByteFirst = true) const;
 
     /*!
      * Converts the 8 bytes at \a offset of the vector to a (signed) long long.
@@ -392,31 +392,31 @@ namespace TagLib {
      *
      * \see fromUInt()
      */
-    long long toLongLong(unsigned int offset, bool mostSignificantByteFirst = true) const;
+    [[nodiscard]] long long toLongLong(unsigned int offset, bool mostSignificantByteFirst = true) const;
 
     /*
      * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
      * 32-bit little-endian floating point number.
      */
-    float toFloat32LE(size_t offset) const;
+    [[nodiscard]] float toFloat32LE(size_t offset) const;
 
     /*
      * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
      * 32-bit big-endian floating point number.
      */
-    float toFloat32BE(size_t offset) const;
+    [[nodiscard]] float toFloat32BE(size_t offset) const;
 
     /*
      * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
      * 64-bit little-endian floating point number.
      */
-    double toFloat64LE(size_t offset) const;
+    [[nodiscard]] double toFloat64LE(size_t offset) const;
 
     /*
      * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
      * 64-bit big-endian floating point number.
      */
-    double toFloat64BE(size_t offset) const;
+    [[nodiscard]] double toFloat64BE(size_t offset) const;
 
     /*
     * Converts the 10 bytes at \a offset of the vector to a long double as an
@@ -424,7 +424,7 @@ namespace TagLib {
     *
     * \note This may compromise the precision depends on the size of long double.
     */
-    long double toFloat80LE(size_t offset) const;
+    [[nodiscard]] long double toFloat80LE(size_t offset) const;
 
     /*
      * Converts the 10 bytes at \a offset of the vector to a long double as an
@@ -432,7 +432,7 @@ namespace TagLib {
      *
      * \note This may compromise the precision depends on the size of long double.
      */
-    long double toFloat80BE(size_t offset) const;
+    [[nodiscard]] long double toFloat80BE(size_t offset) const;
 
     /*!
      * Creates a 4 byte ByteVector based on \a value.  If
@@ -577,12 +577,12 @@ namespace TagLib {
     /*!
      * Returns a hex-encoded copy of the byte vector.
      */
-    ByteVector toHex() const;
+    [[nodiscard]] ByteVector toHex() const;
 
     /*!
      * Returns a base64 encoded copy of the byte vector
      */
-    ByteVector toBase64() const;
+    [[nodiscard]] ByteVector toBase64() const;
 
     /*!
      * Decodes the base64 encoded byte vector.

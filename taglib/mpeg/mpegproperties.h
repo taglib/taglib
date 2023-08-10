@@ -66,58 +66,58 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns a pointer to the Xing/VBRI header if one exists or null if no
        * Xing/VBRI header was found.
        */
-      const XingHeader *xingHeader() const;
+      [[nodiscard]] const XingHeader *xingHeader() const;
 
       /*!
        * Returns the MPEG Version of the file.
        */
-      Header::Version version() const;
+      [[nodiscard]] Header::Version version() const;
 
       /*!
        * Returns the layer version.  This will be between the values 1-3.
        */
-      int layer() const;
+      [[nodiscard]] int layer() const;
 
       /*!
        * Returns true if the MPEG protection bit is enabled.
        */
-      bool protectionEnabled() const;
+      [[nodiscard]] bool protectionEnabled() const;
 
       /*!
        * Returns the channel mode for this frame.
        */
-      Header::ChannelMode channelMode() const;
+      [[nodiscard]] Header::ChannelMode channelMode() const;
 
       /*!
        * Returns true if the copyrighted bit is set.
        */
-      bool isCopyrighted() const;
+      [[nodiscard]] bool isCopyrighted() const;
 
       /*!
        * Returns true if the "original" bit is set.
        */
-      bool isOriginal() const;
+      [[nodiscard]] bool isOriginal() const;
 
     private:
       void read(File *file);

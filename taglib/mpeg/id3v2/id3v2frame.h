@@ -79,12 +79,12 @@ namespace TagLib {
        * Returns the Frame ID (Structure, <a href="id3v2-structure.html#4">4</a>)
        * (Frames, <a href="id3v2-frames.html#4">4</a>)
        */
-      ByteVector frameID() const;
+      [[nodiscard]] ByteVector frameID() const;
 
       /*!
        * Returns the size of the frame.
        */
-      unsigned int size() const;
+      [[nodiscard]] unsigned int size() const;
 
       /*!
        * Returns the size of the frame header
@@ -115,12 +115,12 @@ namespace TagLib {
        * Subclasses must reimplement this method to provide a string
        * representation of the frame's data.
        */
-      virtual String toString() const = 0;
+      [[nodiscard]] virtual String toString() const = 0;
 
       /*!
        * Render the frame back to its binary format in a ByteVector.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Returns the text delimiter that is used between fields for the string
@@ -173,7 +173,7 @@ namespace TagLib {
       /*!
        * Returns a pointer to the frame header.
        */
-      Header *header() const;
+      [[nodiscard]] Header *header() const;
 
       /*!
        * Sets the header to \a h.  If \a deleteCurrent is true, this will free
@@ -201,14 +201,14 @@ namespace TagLib {
        * Render the field data back to a binary format in a ByteVector.  This
        * must be overridden by subclasses.
        */
-      virtual ByteVector renderFields() const = 0;
+      [[nodiscard]] virtual ByteVector renderFields() const = 0;
 
       /*!
        * Returns a ByteVector containing the field data given the frame data.
        * This correctly adjusts for the header size plus any additional frame
        * data that's specified in the frame header flags.
        */
-      ByteVector fieldData(const ByteVector &frameData) const;
+      [[nodiscard]] ByteVector fieldData(const ByteVector &frameData) const;
 
       /*!
        * Reads a String of type \a encoding from the ByteVector \a data.  If \a
@@ -225,7 +225,7 @@ namespace TagLib {
        * also checks the ID3v2 version and makes sure the encoding can be used
        * in the version specified by the frame's header.
        */
-      String::Type checkTextEncoding(const StringList &fields,
+      [[nodiscard]] String::Type checkTextEncoding(const StringList &fields,
                                      String::Type encoding) const;
 
 
@@ -234,7 +234,7 @@ namespace TagLib {
        * PropertyMap will be empty, and its unsupportedData() will contain this frame's
        * ID.
        */
-      virtual PropertyMap asProperties() const;
+      [[nodiscard]] virtual PropertyMap asProperties() const;
 
       /*!
        * Returns an appropriate ID3 frame ID for the given free-form tag key. This method
@@ -324,7 +324,7 @@ namespace TagLib {
        * Returns the Frame ID (Structure, <a href="id3v2-structure.html#4">4</a>)
        * (Frames, <a href="id3v2-frames.html#4">4</a>)
        */
-      ByteVector frameID() const;
+      [[nodiscard]] ByteVector frameID() const;
 
       /*!
        * Sets the frame's ID to \a id.  Only the first four bytes of \a id will
@@ -340,7 +340,7 @@ namespace TagLib {
        * Returns the size of the frame data portion, as set when setData() was
        * called or set explicitly via setFrameSize().
        */
-      unsigned int frameSize() const;
+      [[nodiscard]] unsigned int frameSize() const;
 
       /*!
        * Sets the size of the frame data portion.
@@ -351,7 +351,7 @@ namespace TagLib {
        * Returns the ID3v2 version of the header, as passed in from the
        * construction of the header or set via setVersion().
        */
-      unsigned int version() const;
+      [[nodiscard]] unsigned int version() const;
 
       /*!
        * Sets the ID3v2 version of the header, changing has impact on the
@@ -373,7 +373,7 @@ namespace TagLib {
        *
        * \see setTagAlterPreservation()
        */
-      bool tagAlterPreservation() const;
+      [[nodiscard]] bool tagAlterPreservation() const;
 
       /*!
        * Sets the flag for preservation of this frame if the tag is set.  If
@@ -393,54 +393,54 @@ namespace TagLib {
        *
        * \note This flag is currently ignored internally in TagLib.
        */
-      bool fileAlterPreservation() const;
+      [[nodiscard]] bool fileAlterPreservation() const;
 
       /*!
        * Returns true if the frame is meant to be read only.
        *
        * \note This flag is currently ignored internally in TagLib.
        */
-      bool readOnly() const;
+      [[nodiscard]] bool readOnly() const;
 
       /*!
        * Returns true if the flag for the grouping identity is set.
        *
        * \note This flag is currently ignored internally in TagLib.
        */
-      bool groupingIdentity() const;
+      [[nodiscard]] bool groupingIdentity() const;
 
       /*!
        * Returns true if compression is enabled for this frame.
        *
        * \note This flag is currently ignored internally in TagLib.
        */
-      bool compression() const;
+      [[nodiscard]] bool compression() const;
 
       /*!
        * Returns true if encryption is enabled for this frame.
        *
        * \note This flag is currently ignored internally in TagLib.
        */
-      bool encryption() const;
+      [[nodiscard]] bool encryption() const;
 
 #ifndef DO_NOT_DOCUMENT
-      bool unsycronisation() const;
+      [[nodiscard]] bool unsycronisation() const;
 #endif
 
       /*!
        * Returns true if unsynchronisation is enabled for this frame.
        */
-      bool unsynchronisation() const;
+      [[nodiscard]] bool unsynchronisation() const;
 
       /*!
        * Returns true if the flag for a data length indicator is set.
        */
-      bool dataLengthIndicator() const;
+      [[nodiscard]] bool dataLengthIndicator() const;
 
       /*!
        * Render the Header back to binary format in a ByteVector.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
     private:
       class HeaderPrivate;

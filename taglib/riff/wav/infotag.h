@@ -70,13 +70,13 @@ namespace TagLib {
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an UTF-8 character array.
        */
-      virtual String parse(const ByteVector &data) const;
+      [[nodiscard]] virtual String parse(const ByteVector &data) const;
 
       /*!
        * Encode a ByteVector with the data from \a s.  The default implementation
        * assumes that \a s is an UTF-8 string.
        */
-      virtual ByteVector render(const String &s) const;
+      [[nodiscard]] virtual ByteVector render(const String &s) const;
 
     private:
       class StringHandlerPrivate;
@@ -112,13 +112,13 @@ namespace TagLib {
 
       // Reimplementations
 
-      String title() const override;
-      String artist() const override;
-      String album() const override;
-      String comment() const override;
-      String genre() const override;
-      unsigned int year() const override;
-      unsigned int track() const override;
+      [[nodiscard]] String title() const override;
+      [[nodiscard]] String artist() const override;
+      [[nodiscard]] String album() const override;
+      [[nodiscard]] String comment() const override;
+      [[nodiscard]] String genre() const override;
+      [[nodiscard]] unsigned int year() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       void setTitle(const String &s) override;
       void setArtist(const String &s) override;
@@ -128,7 +128,7 @@ namespace TagLib {
       void setYear(unsigned int i) override;
       void setTrack(unsigned int i) override;
 
-      bool isEmpty() const override;
+      [[nodiscard]] bool isEmpty() const override;
 
       /*!
        * Returns a copy of the internal fields of the tag.  The returned map directly
@@ -140,12 +140,12 @@ namespace TagLib {
        * \see setFieldText()
        * \see removeField()
        */
-      FieldListMap fieldListMap() const;
+      [[nodiscard]] FieldListMap fieldListMap() const;
 
       /*
        * Gets the value of the field with the ID \a id.
        */
-      String fieldText(const ByteVector &id) const;
+      [[nodiscard]] String fieldText(const ByteVector &id) const;
 
       /*
         * Sets the value of the field with the ID \a id to \a s.
@@ -167,7 +167,7 @@ namespace TagLib {
        *
        * \note Returns empty ByteVector is the tag contains no fields.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Sets the string handler that decides how the text data will be

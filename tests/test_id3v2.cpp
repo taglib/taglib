@@ -64,9 +64,9 @@ class PublicFrame : public ID3v2::Frame
     String readStringField(const ByteVector &data, String::Type encoding,
                            int *position = nullptr)
       { return ID3v2::Frame::readStringField(data, encoding, position); }
-    String toString() const override { return String(); }
+    [[nodiscard]] String toString() const override { return String(); }
     void parseFields(const ByteVector &) override {}
-    ByteVector renderFields() const override { return ByteVector(); }
+    [[nodiscard]] ByteVector renderFields() const override { return ByteVector(); }
 };
 
 class TestID3v2 : public CppUnit::TestFixture

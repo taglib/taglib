@@ -63,39 +63,39 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the number of bits per audio sample as read from the FLAC
        * identification header.
        */
-      int bitsPerSample() const;
+      [[nodiscard]] int bitsPerSample() const;
 
       /*!
        * Return the number of sample frames.
        */
-      unsigned long long sampleFrames() const;
+      [[nodiscard]] unsigned long long sampleFrames() const;
 
       /*!
        * Returns the MD5 signature of the uncompressed audio stream as read
        * from the stream info header.
        */
-      ByteVector signature() const;
+      [[nodiscard]] ByteVector signature() const;
 
     private:
       void read(const ByteVector &data, offset_t streamLength);

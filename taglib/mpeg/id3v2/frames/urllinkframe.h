@@ -61,7 +61,7 @@ namespace TagLib {
       /*!
        * Returns the URL.
        */
-      virtual String url() const;
+      [[nodiscard]] virtual String url() const;
 
       /*!
        * Sets the URL to \a s.
@@ -71,12 +71,12 @@ namespace TagLib {
       // Reimplementations.
 
       void setText(const String &s) override;
-      String toString() const override;
-      PropertyMap asProperties() const override;
+      [[nodiscard]] String toString() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
       /*!
        * The constructor used by the FrameFactory.
@@ -124,7 +124,7 @@ namespace TagLib {
 
       // Reimplementations.
 
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the text encoding that will be used in rendering this frame.
@@ -134,7 +134,7 @@ namespace TagLib {
        * \see setTextEncoding()
        * \see render()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Sets the text encoding to be used when rendering this frame to
@@ -148,7 +148,7 @@ namespace TagLib {
       /*!
        * Returns the description for this frame.
        */
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Sets the description of the frame to \a s.  \a s must be unique.
@@ -163,7 +163,7 @@ namespace TagLib {
        *   characters), the returned map will contain an entry "WXXX/<description>"
        *   in its unsupportedData() list.
        */
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
       /*!
        * Searches for the user defined url frame with the description \a description
@@ -173,7 +173,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
       /*!
        * The constructor used by the FrameFactory.

@@ -68,14 +68,14 @@ namespace TagLib {
        *
        * \see text()
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the date purchased.
        *
        * \see setDatePurchased()
        */
-      String datePurchased() const;
+      [[nodiscard]] String datePurchased() const;
 
       /*!
        * Set the date purchased.
@@ -89,7 +89,7 @@ namespace TagLib {
        *
        * \see setPricePaid()
        */
-      String pricePaid() const;
+      [[nodiscard]] String pricePaid() const;
 
       /*!
        * Set the price paid.
@@ -103,7 +103,7 @@ namespace TagLib {
        *
        * \see setSeller()
        */
-      String seller() const;
+      [[nodiscard]] String seller() const;
 
       /*!
        * Set the seller.
@@ -120,7 +120,7 @@ namespace TagLib {
        * \see setTextEncoding()
        * \see render()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Sets the text encoding to be used when rendering this frame to
@@ -135,7 +135,7 @@ namespace TagLib {
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

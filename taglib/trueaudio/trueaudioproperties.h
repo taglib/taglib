@@ -69,44 +69,44 @@ namespace TagLib {
        *
        * \see lengthInMilliseconds()
        */
-      int lengthInSeconds() const override;
+      [[nodiscard]] int lengthInSeconds() const override;
 
       /*!
        * Returns the length of the file in milliseconds.
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the number of bits per audio sample.
        */
-      int bitsPerSample() const;
+      [[nodiscard]] int bitsPerSample() const;
 
       /*!
        * Returns the total number of sample frames
        */
-      unsigned int sampleFrames() const;
+      [[nodiscard]] unsigned int sampleFrames() const;
 
       /*!
        * Returns the major version number.
        */
-      int ttaVersion() const;
+      [[nodiscard]] int ttaVersion() const;
 
     private:
       void read(const ByteVector &data, offset_t streamLength);

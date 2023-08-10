@@ -75,7 +75,7 @@ namespace TagLib {
        *
        * \see setElementID()
        */
-      ByteVector elementID() const;
+      [[nodiscard]] ByteVector elementID() const;
 
       /*!
        * Returns true, if the frame is top-level (doesn't have
@@ -83,7 +83,7 @@ namespace TagLib {
        *
        * \see setIsTopLevel()
        */
-      bool isTopLevel() const;
+      [[nodiscard]] bool isTopLevel() const;
 
       /*!
        * Returns true, if the child elements list entries
@@ -91,7 +91,7 @@ namespace TagLib {
        *
        * \see setIsOrdered()
        */
-      bool isOrdered() const;
+      [[nodiscard]] bool isOrdered() const;
 
       /*!
        * Returns count of child elements of the frame. It always
@@ -99,14 +99,14 @@ namespace TagLib {
        *
        * \see childElements()
        */
-      unsigned int entryCount() const;
+      [[nodiscard]] unsigned int entryCount() const;
 
       /*!
        * Returns list of child elements of the frame.
        *
        * \see setChildElements()
        */
-      ByteVectorList childElements() const;
+      [[nodiscard]] ByteVectorList childElements() const;
 
       /*!
        * Sets the elementID of the frame to \a eID. If \a eID isn't
@@ -167,7 +167,7 @@ namespace TagLib {
        *
        * \see embeddedFrameList()
        */
-      const FrameListMap &embeddedFrameListMap() const;
+      [[nodiscard]] const FrameListMap &embeddedFrameListMap() const;
 
       /*!
        * Returns a reference to the embedded frame list.  This is an FrameList
@@ -180,7 +180,7 @@ namespace TagLib {
        * \warning You should not modify this data structure directly, instead
        * use addEmbeddedFrame() and removeEmbeddedFrame().
        */
-      const FrameList &embeddedFrameList() const;
+      [[nodiscard]] const FrameList &embeddedFrameList() const;
 
       /*!
        * Returns the embedded frame list for frames with the id \a frameID
@@ -193,7 +193,7 @@ namespace TagLib {
        *
        * \see embeddedFrameListMap()
        */
-      const FrameList &embeddedFrameList(const ByteVector &frameID) const;
+      [[nodiscard]] const FrameList &embeddedFrameList(const ByteVector &frameID) const;
 
       /*!
        * Add an embedded frame to the CTOC frame.  At this point the CTOC frame
@@ -222,9 +222,9 @@ namespace TagLib {
        */
       void removeEmbeddedFrames(const ByteVector &id);
 
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
       /*!
        * CTOC frames each have a unique element ID. This searches for a CTOC
@@ -246,7 +246,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);

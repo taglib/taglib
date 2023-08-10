@@ -57,23 +57,23 @@ namespace TagLib {
       Properties(const Properties &) = delete;
       Properties &operator=(const Properties &) = delete;
 
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
-      unsigned short lengthInPatterns() const;
-      bool stereo() const;
-      unsigned short instrumentCount() const;
-      unsigned short sampleCount() const;
-      unsigned short patternCount() const;
-      unsigned short version() const;
-      unsigned short compatibleVersion() const;
-      unsigned short flags() const;
-      unsigned short special() const;
-      unsigned char globalVolume() const;
-      unsigned char mixVolume() const;
-      unsigned char tempo() const;
-      unsigned char bpmSpeed() const;
-      unsigned char panningSeparation() const;
-      unsigned char pitchWheelDepth() const;
+      [[nodiscard]] unsigned short lengthInPatterns() const;
+      [[nodiscard]] bool stereo() const;
+      [[nodiscard]] unsigned short instrumentCount() const;
+      [[nodiscard]] unsigned short sampleCount() const;
+      [[nodiscard]] unsigned short patternCount() const;
+      [[nodiscard]] unsigned short version() const;
+      [[nodiscard]] unsigned short compatibleVersion() const;
+      [[nodiscard]] unsigned short flags() const;
+      [[nodiscard]] unsigned short special() const;
+      [[nodiscard]] unsigned char globalVolume() const;
+      [[nodiscard]] unsigned char mixVolume() const;
+      [[nodiscard]] unsigned char tempo() const;
+      [[nodiscard]] unsigned char bpmSpeed() const;
+      [[nodiscard]] unsigned char panningSeparation() const;
+      [[nodiscard]] unsigned char pitchWheelDepth() const;
 
       void setChannels(int channels);
       void setLengthInPatterns(unsigned short lengthInPatterns);

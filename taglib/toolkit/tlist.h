@@ -87,13 +87,13 @@ namespace TagLib {
      * Returns an STL style constant iterator to the beginning of the list.  See
      * std::list::iterator for the semantics.
      */
-    ConstIterator begin() const;
+    [[nodiscard]] ConstIterator begin() const;
 
     /*!
      * Returns an STL style constant iterator to the beginning of the list.  See
      * std::list::iterator for the semantics.
      */
-    ConstIterator cbegin() const;
+    [[nodiscard]] ConstIterator cbegin() const;
 
     /*!
      * Returns an STL style iterator to the end of the list.  See
@@ -105,13 +105,13 @@ namespace TagLib {
      * Returns an STL style constant iterator to the end of the list.  See
      * std::list::const_iterator for the semantics.
      */
-    ConstIterator end() const;
+    [[nodiscard]] ConstIterator end() const;
 
     /*!
      * Returns an STL style constant iterator to the end of the list.  See
      * std::list::const_iterator for the semantics.
      */
-    ConstIterator cend() const;
+    [[nodiscard]] ConstIterator cend() const;
 
     /*!
      * Inserts a copy of \a item before \a it.
@@ -162,14 +162,14 @@ namespace TagLib {
      *
      * \see isEmpty()
      */
-    unsigned int size() const;
+    [[nodiscard]] unsigned int size() const;
 
     /*!
      * Returns whether or not the list is empty.
      *
      * \see size()
      */
-    bool isEmpty() const;
+    [[nodiscard]] bool isEmpty() const;
 
     /*!
      * Find the first occurrence of \a value.
@@ -179,17 +179,17 @@ namespace TagLib {
     /*!
      * Find the first occurrence of \a value.
      */
-    ConstIterator find(const T &value) const;
+    [[nodiscard]] ConstIterator find(const T &value) const;
 
     /*!
      * Find the first occurrence of \a value.
      */
-    ConstIterator cfind(const T &value) const;
+    [[nodiscard]] ConstIterator cfind(const T &value) const;
 
     /*!
      * Returns true if the list contains \a value.
      */
-    bool contains(const T &value) const;
+    [[nodiscard]] bool contains(const T &value) const;
 
     /*!
      * Erase the item at \a it from the list.
@@ -199,7 +199,7 @@ namespace TagLib {
     /*!
      * Returns a reference to the first item in the list.
      */
-    const T &front() const;
+    [[nodiscard]] const T &front() const;
 
     /*!
      * Returns a reference to the first item in the list.
@@ -209,7 +209,7 @@ namespace TagLib {
     /*!
      * Returns a reference to the last item in the list.
      */
-    const T &back() const;
+    [[nodiscard]] const T &back() const;
 
     /*!
      * Returns a reference to the last item in the list.

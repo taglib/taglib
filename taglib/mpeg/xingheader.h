@@ -91,22 +91,22 @@ namespace TagLib {
        * Returns true if the data was parsed properly and if there is a valid
        * Xing/VBRI header present.
        */
-      bool isValid() const;
+      [[nodiscard]] bool isValid() const;
 
       /*!
        * Returns the total number of frames.
        */
-      unsigned int totalFrames() const;
+      [[nodiscard]] unsigned int totalFrames() const;
 
       /*!
        * Returns the total size of stream in bytes.
        */
-      unsigned int totalSize() const;
+      [[nodiscard]] unsigned int totalSize() const;
 
       /*!
        * Returns the type of the VBR header.
        */
-      HeaderType type() const;
+      [[nodiscard]] HeaderType type() const;
 
     private:
       void parse(const ByteVector &data);

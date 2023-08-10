@@ -114,14 +114,14 @@ namespace TagLib {
        * Returns the Tag for this file.  This will be an APE tag, an ID3v1 tag
        * or a combination of the two.
        */
-      TagLib::Tag *tag() const override;
+      [[nodiscard]] TagLib::Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
        * If the file contains both an APE and an ID3v1 tag, only the APE
        * tag  will be converted to the PropertyMap.
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       void removeUnsupportedProperties(const StringList &properties) override;
 
@@ -136,7 +136,7 @@ namespace TagLib {
        * Returns the MPC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      Properties *audioProperties() const override;
+      [[nodiscard]] Properties *audioProperties() const override;
 
       /*!
        * Saves the file.
@@ -200,14 +200,14 @@ namespace TagLib {
        *
        * \see ID3v1Tag()
        */
-      bool hasID3v1Tag() const;
+      [[nodiscard]] bool hasID3v1Tag() const;
 
       /*!
        * Returns whether or not the file on disk actually has an APE tag.
        *
        * \see APETag()
        */
-      bool hasAPETag() const;
+      [[nodiscard]] bool hasAPETag() const;
 
       /*!
        * Returns whether or not the given \a stream can be opened as an MPC

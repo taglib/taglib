@@ -100,7 +100,7 @@ class ASF::File::FilePrivate::BaseObject
 public:
   ByteVector data;
   virtual ~BaseObject() = default;
-  virtual ByteVector guid() const = 0;
+  [[nodiscard]] virtual ByteVector guid() const = 0;
   virtual void parse(ASF::File *file, unsigned int size);
   virtual ByteVector render(ASF::File *file);
 };
@@ -109,28 +109,28 @@ class ASF::File::FilePrivate::UnknownObject : public ASF::File::FilePrivate::Bas
 {
   ByteVector myGuid;
 public:
-  UnknownObject(const ByteVector &guid);
-  ByteVector guid() const override;
+  explicit UnknownObject(const ByteVector &guid);
+  [[nodiscard]] ByteVector guid() const override;
 };
 
 class ASF::File::FilePrivate::FilePropertiesObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
 };
 
 class ASF::File::FilePrivate::StreamPropertiesObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
 };
 
 class ASF::File::FilePrivate::ContentDescriptionObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
   ByteVector render(ASF::File *file) override;
 };
@@ -139,7 +139,7 @@ class ASF::File::FilePrivate::ExtendedContentDescriptionObject : public ASF::Fil
 {
 public:
   ByteVectorList attributeData;
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
   ByteVector render(ASF::File *file) override;
 };
@@ -148,7 +148,7 @@ class ASF::File::FilePrivate::MetadataObject : public ASF::File::FilePrivate::Ba
 {
 public:
   ByteVectorList attributeData;
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
   ByteVector render(ASF::File *file) override;
 };
@@ -157,7 +157,7 @@ class ASF::File::FilePrivate::MetadataLibraryObject : public ASF::File::FilePriv
 {
 public:
   ByteVectorList attributeData;
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
   ByteVector render(ASF::File *file) override;
 };
@@ -167,7 +167,7 @@ class ASF::File::FilePrivate::HeaderExtensionObject : public ASF::File::FilePriv
 public:
   List<ASF::File::FilePrivate::BaseObject *> objects;
   HeaderExtensionObject();
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
   ByteVector render(ASF::File *file) override;
 };
@@ -175,7 +175,7 @@ public:
 class ASF::File::FilePrivate::CodecListObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
-  ByteVector guid() const override;
+  [[nodiscard]] ByteVector guid() const override;
   void parse(ASF::File *file, unsigned int size) override;
 
 private:

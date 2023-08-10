@@ -55,20 +55,20 @@ namespace TagLib {
     TagUnion &operator=(const TagUnion &) = delete;
 
     Tag *operator[](int index) const;
-    Tag *tag(int index) const;
+    [[nodiscard]] Tag *tag(int index) const;
 
     void set(int index, Tag *tag);
 
-    PropertyMap properties() const override;
+    [[nodiscard]] PropertyMap properties() const override;
     void removeUnsupportedProperties(const StringList &unsupported) override;
 
-    String title() const override;
-    String artist() const override;
-    String album() const override;
-    String comment() const override;
-    String genre() const override;
-    unsigned int year() const override;
-    unsigned int track() const override;
+    [[nodiscard]] String title() const override;
+    [[nodiscard]] String artist() const override;
+    [[nodiscard]] String album() const override;
+    [[nodiscard]] String comment() const override;
+    [[nodiscard]] String genre() const override;
+    [[nodiscard]] unsigned int year() const override;
+    [[nodiscard]] unsigned int track() const override;
 
     void setTitle(const String &s) override;
     void setArtist(const String &s) override;
@@ -77,7 +77,7 @@ namespace TagLib {
     void setGenre(const String &s) override;
     void setYear(unsigned int i) override;
     void setTrack(unsigned int i) override;
-    bool isEmpty() const override;
+    [[nodiscard]] bool isEmpty() const override;
 
     template <class T> T *access(int index, bool create)
     {

@@ -45,7 +45,7 @@ namespace TagLib {
       /*!
        * Returns the FLAC metadata block type.
        */
-      int code() const override;
+      [[nodiscard]] int code() const override;
 
       /*!
        * Sets the FLAC metadata block type.
@@ -55,7 +55,7 @@ namespace TagLib {
       /*!
        * Returns the FLAC metadata block type.
        */
-      ByteVector data() const;
+      [[nodiscard]] ByteVector data() const;
 
       /*!
        * Sets the FLAC metadata block type.
@@ -65,7 +65,7 @@ namespace TagLib {
       /*!
        * Render the content of the block.
        */
-      ByteVector render() const override;
+      [[nodiscard]] ByteVector render() const override;
 
     private:
       class UnknownMetadataBlockPrivate;

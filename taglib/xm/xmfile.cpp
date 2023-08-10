@@ -82,7 +82,7 @@ public:
   /*!
    * Returns the number of bytes this reader would like to read.
    */
-  virtual unsigned int size() const = 0;
+  [[nodiscard]] virtual unsigned int size() const = 0;
 };
 
 class SkipReader : public Reader
@@ -99,7 +99,7 @@ public:
     return count;
   }
 
-  unsigned int size() const override
+  [[nodiscard]] unsigned int size() const override
   {
     return m_size;
   }
@@ -141,7 +141,7 @@ public:
     return count;
   }
 
-  unsigned int size() const override
+  [[nodiscard]] unsigned int size() const override
   {
     return m_size;
   }
@@ -163,7 +163,7 @@ public:
     return data.size();
   }
 
-  unsigned int size() const override
+  [[nodiscard]] unsigned int size() const override
   {
     return 1;
   }
@@ -195,7 +195,7 @@ public:
     return data.size();
   }
 
-  unsigned int size() const override
+  [[nodiscard]] unsigned int size() const override
   {
     return 2;
   }
@@ -216,7 +216,7 @@ public:
     return data.size();
   }
 
-  unsigned int size() const override
+  [[nodiscard]] unsigned int size() const override
   {
     return 4;
   }
@@ -313,7 +313,7 @@ public:
     return u32(number, true);
   }
 
-  unsigned int size() const override
+  [[nodiscard]] unsigned int size() const override
   {
     unsigned int size = 0;
     for(const auto &reader : m_readers) {

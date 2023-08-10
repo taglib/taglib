@@ -59,7 +59,7 @@ namespace TagLib {
     /*!
      * Returns the file name in the local file system encoding.
      */
-    FileName name() const override;
+    [[nodiscard]] FileName name() const override;
 
     /*!
      * Reads a block of size \a length at the current get pointer.
@@ -98,13 +98,13 @@ namespace TagLib {
     /*!
      * Returns true if the file is read only (or if the file can not be opened).
      */
-    bool readOnly() const override;
+    [[nodiscard]] bool readOnly() const override;
 
     /*!
      * Since the file can currently only be opened as an argument to the
      * constructor (sort-of by design), this returns if that open succeeded.
      */
-    bool isOpen() const override;
+    [[nodiscard]] bool isOpen() const override;
 
     /*!
      * Move the I/O pointer to \a offset in the file from position \a p.  This
@@ -122,7 +122,7 @@ namespace TagLib {
     /*!
      * Returns the current offset within the file.
      */
-    offset_t tell() const override;
+    [[nodiscard]] offset_t tell() const override;
 
     /*!
      * Returns the length of the file.

@@ -119,7 +119,7 @@ namespace TagLib {
       /*!
        * Returns a string containing the description and mime-type
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the text encoding used for the description.
@@ -127,7 +127,7 @@ namespace TagLib {
        * \see setTextEncoding()
        * \see description()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Set the text encoding used for the description.
@@ -140,7 +140,7 @@ namespace TagLib {
        * Returns the mime type of the image.  This should in most cases be
        * "image/png" or "image/jpeg".
        */
-      String mimeType() const;
+      [[nodiscard]] String mimeType() const;
 
       /*!
        * Sets the mime type of the image.  This should in most cases be
@@ -154,7 +154,7 @@ namespace TagLib {
        * \see Type
        * \see setType()
        */
-      Type type() const;
+      [[nodiscard]] Type type() const;
 
       /*!
        * Sets the type for the image.
@@ -172,7 +172,7 @@ namespace TagLib {
        * \see setTextEncoding()
        */
 
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Sets a textual description of the image to \a desc.
@@ -193,7 +193,7 @@ namespace TagLib {
        * \see setPicture()
        * \see mimeType()
        */
-      ByteVector picture() const;
+      [[nodiscard]] ByteVector picture() const;
 
       /*!
        * Sets the image data to \a p.  \a p should be of the type specified in
@@ -207,7 +207,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
       class AttachedPictureFramePrivate;
       std::unique_ptr<AttachedPictureFramePrivate> d;
 

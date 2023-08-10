@@ -88,13 +88,13 @@ namespace TagLib {
       XiphComment(const XiphComment &) = delete;
       XiphComment &operator=(const XiphComment &) = delete;
 
-      String title() const override;
-      String artist() const override;
-      String album() const override;
-      String comment() const override;
-      String genre() const override;
-      unsigned int year() const override;
-      unsigned int track() const override;
+      [[nodiscard]] String title() const override;
+      [[nodiscard]] String artist() const override;
+      [[nodiscard]] String album() const override;
+      [[nodiscard]] String comment() const override;
+      [[nodiscard]] String genre() const override;
+      [[nodiscard]] unsigned int year() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       void setTitle(const String &s) override;
       void setArtist(const String &s) override;
@@ -104,12 +104,12 @@ namespace TagLib {
       void setYear(unsigned int i) override;
       void setTrack(unsigned int i) override;
 
-      bool isEmpty() const override;
+      [[nodiscard]] bool isEmpty() const override;
 
       /*!
        * Returns the number of fields present in the comment.
        */
-      unsigned int fieldCount() const;
+      [[nodiscard]] unsigned int fieldCount() const;
 
       /*!
        * Returns a reference to the map of field lists.  Because Xiph comments
@@ -147,7 +147,7 @@ namespace TagLib {
        * \warning You should not modify this data structure directly, instead
        * use addField() and removeField().
        */
-      const FieldListMap &fieldListMap() const;
+      [[nodiscard]] const FieldListMap &fieldListMap() const;
 
       /*!
        * Implements the unified property interface -- export function.
@@ -156,7 +156,7 @@ namespace TagLib {
        * comment is nothing more than a map from tag names to list of values,
        * as is the dict interface).
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       /*!
        * Implements the unified property interface -- import function.
@@ -176,7 +176,7 @@ namespace TagLib {
        * Returns the vendor ID of the Ogg Vorbis encoder.  libvorbis 1.0 as the
        * most common case always returns "Xiph.Org libVorbis I 20020717".
        */
-      String vendorID() const;
+      [[nodiscard]] String vendorID() const;
 
       /*!
        * Add the field specified by \a key with the data \a value.  If \a replace
@@ -213,7 +213,7 @@ namespace TagLib {
        *
        * \note This is safer than checking for membership in the FieldListMap.
        */
-      bool contains(const String &key) const;
+      [[nodiscard]] bool contains(const String &key) const;
 
       /*!
        * Renders the comment to a ByteVector suitable for inserting into a file.
@@ -222,7 +222,7 @@ namespace TagLib {
        * be appended.  However some formats (notably FLAC) do not work with this
        * in place.
        */
-      ByteVector render(bool addFramingBit = true) const;
+      [[nodiscard]] ByteVector render(bool addFramingBit = true) const;
 
 
       /*!

@@ -160,19 +160,19 @@ namespace TagLib {
     /*!
      * Find the first occurrence of \a key.
      */
-    ConstIterator find(const String &key) const;
+    [[nodiscard]] ConstIterator find(const String &key) const;
 
     /*!
      * Returns true if the map contains values for \a key.
      */
-    bool contains(const String &key) const;
+    [[nodiscard]] bool contains(const String &key) const;
 
     /*!
      * Returns true if this map contains all keys of \a other
      * and the values coincide for that keys. Does not take
      * the unsupportedData list into account.
      */
-    bool contains(const PropertyMap &other) const;
+    [[nodiscard]] bool contains(const PropertyMap &other) const;
 
     /*!
      * Erase the \a key and its values from the map.
@@ -198,7 +198,7 @@ namespace TagLib {
      * If the map does not contain \a key, it returns defaultValue.
      * If no defaultValue is specified, it returns an empty string list.
      */
-    StringList value(const String &key,
+    [[nodiscard]] StringList value(const String &key,
                      const StringList &defaultValue = StringList()) const;
 
     /*!
@@ -247,7 +247,7 @@ namespace TagLib {
      */
     void removeEmpty();
 
-    String toString() const;
+    [[nodiscard]] String toString() const;
 
   private:
     class PropertyMapPrivate;

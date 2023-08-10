@@ -69,14 +69,14 @@ namespace TagLib {
        *
        * \see text()
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the email.
        *
        * \see setEmail()
        */
-      String email() const;
+      [[nodiscard]] String email() const;
 
       /*!
        * Set the email.
@@ -90,7 +90,7 @@ namespace TagLib {
        *
        * \see setRating()
        */
-      int rating() const;
+      [[nodiscard]] int rating() const;
 
       /*!
        * Set the rating.
@@ -104,7 +104,7 @@ namespace TagLib {
        *
        * \see setCounter()
        */
-      unsigned int counter() const;
+      [[nodiscard]] unsigned int counter() const;
 
       /*!
        * Set the counter.
@@ -117,7 +117,7 @@ namespace TagLib {
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

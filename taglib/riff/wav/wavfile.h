@@ -104,7 +104,7 @@ namespace TagLib {
          * \note This method does not return all the tags for this file for
          * backward compatibility.  Will be fixed in TagLib 2.0.
          */
-        ID3v2::Tag *tag() const override;
+        [[nodiscard]] ID3v2::Tag *tag() const override;
 
         /*!
          * Returns the ID3v2 Tag for this file.
@@ -115,7 +115,7 @@ namespace TagLib {
          *
          * \see hasID3v2Tag()
          */
-        ID3v2::Tag *ID3v2Tag() const;
+        [[nodiscard]] ID3v2::Tag *ID3v2Tag() const;
 
         /*!
          * Returns the RIFF INFO Tag for this file.
@@ -126,7 +126,7 @@ namespace TagLib {
          *
          * \see hasInfoTag()
          */
-        Info::Tag *InfoTag() const;
+        [[nodiscard]] Info::Tag *InfoTag() const;
 
         /*!
          * This will strip the tags that match the OR-ed together TagTypes from the
@@ -141,7 +141,7 @@ namespace TagLib {
          * Implements the unified property interface -- export function.
          * This method forwards to ID3v2::Tag::properties().
          */
-        PropertyMap properties() const override;
+        [[nodiscard]] PropertyMap properties() const override;
 
         void removeUnsupportedProperties(const StringList &unsupported) override;
 
@@ -155,7 +155,7 @@ namespace TagLib {
          * Returns the WAV::Properties for this file.  If no audio properties
          * were read then this will return a null pointer.
          */
-        Properties *audioProperties() const override;
+        [[nodiscard]] Properties *audioProperties() const override;
 
         /*!
          * Saves the file.
@@ -176,14 +176,14 @@ namespace TagLib {
          *
          * \see ID3v2Tag()
          */
-        bool hasID3v2Tag() const;
+        [[nodiscard]] bool hasID3v2Tag() const;
 
         /*!
          * Returns whether or not the file on disk actually has a RIFF INFO tag.
          *
          * \see InfoTag()
          */
-        bool hasInfoTag() const;
+        [[nodiscard]] bool hasInfoTag() const;
 
         /*!
          * Returns whether or not the given \a stream can be opened as a WAV

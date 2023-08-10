@@ -193,7 +193,7 @@ namespace TagLib {
      *
      * \see toCString()
      */
-    std::string to8Bit(bool unicode = false) const;
+    [[nodiscard]] std::string to8Bit(bool unicode = false) const;
 
     /*!
      * Returns a deep copy of this String as a wstring.  The returned string is
@@ -202,7 +202,7 @@ namespace TagLib {
      *
      * \see toCWString()
      */
-    wstring toWString() const;
+    [[nodiscard]] wstring toWString() const;
 
     /*!
      * Creates and returns a standard C-style (null-terminated) version of this
@@ -222,7 +222,7 @@ namespace TagLib {
      *
      * \see to8Bit()
      */
-    const char *toCString(bool unicode = false) const;
+    [[nodiscard]] const char *toCString(bool unicode = false) const;
 
     /*!
      * Returns a standard C-style (null-terminated) wide character version of
@@ -240,7 +240,7 @@ namespace TagLib {
      *
      * \see toWString()
      */
-    const wchar_t *toCWString() const;
+    [[nodiscard]] const wchar_t *toCWString() const;
 
     /*!
      * Returns an iterator pointing to the beginning of the string.
@@ -250,12 +250,12 @@ namespace TagLib {
     /*!
      * Returns a const iterator pointing to the beginning of the string.
      */
-    ConstIterator begin() const;
+    [[nodiscard]] ConstIterator begin() const;
 
     /*!
      * Returns a const iterator pointing to the beginning of the string.
      */
-    ConstIterator cbegin() const;
+    [[nodiscard]] ConstIterator cbegin() const;
 
     /*!
      * Returns an iterator pointing to the end of the string (the position
@@ -267,42 +267,42 @@ namespace TagLib {
      * Returns a const iterator pointing to the end of the string (the position
      * after the last character).
      */
-    ConstIterator end() const;
+    [[nodiscard]] ConstIterator end() const;
 
     /*!
      * Returns a const iterator pointing to the end of the string (the position
      * after the last character).
      */
-    ConstIterator cend() const;
+    [[nodiscard]] ConstIterator cend() const;
 
     /*!
      * Finds the first occurrence of pattern \a s in this string starting from
      * \a offset.  If the pattern is not found, -1 is returned.
      */
-    int find(const String &s, int offset = 0) const;
+    [[nodiscard]] int find(const String &s, int offset = 0) const;
 
     /*!
      * Finds the last occurrence of pattern \a s in this string, searched backwards,
      * either from the end of the string or starting from \a offset. If the pattern
      * is not found, -1 is returned.
      */
-    int rfind(const String &s, int offset = -1) const;
+    [[nodiscard]] int rfind(const String &s, int offset = -1) const;
 
     /*!
      * Splits the string on each occurrence of \a separator.
      */
-    StringList split(const String &separator = " ") const;
+    [[nodiscard]] StringList split(const String &separator = " ") const;
 
     /*!
      * Returns true if the strings starts with the substring \a s.
      */
-    bool startsWith(const String &s) const;
+    [[nodiscard]] bool startsWith(const String &s) const;
 
     /*!
      * Extract a substring from this string starting at \a position and
      * continuing for \a n characters.
      */
-    String substr(unsigned int position, unsigned int n = 0xffffffff) const;
+    [[nodiscard]] String substr(unsigned int position, unsigned int n = 0xffffffff) const;
 
     /*!
      * Append \a s to the current string and return a reference to the current
@@ -320,22 +320,22 @@ namespace TagLib {
      *
      * \warning This only works for the characters in US-ASCII, i.e. A-Z.
      */
-    String upper() const;
+    [[nodiscard]] String upper() const;
 
     /*!
      * Returns the size of the string.
      */
-    unsigned int size() const;
+    [[nodiscard]] unsigned int size() const;
 
     /*!
      * Returns the length of the string.  Equivalent to size().
      */
-    unsigned int length() const;
+    [[nodiscard]] unsigned int length() const;
 
     /*!
      * Returns true if the string is empty.
      */
-    bool isEmpty() const;
+    [[nodiscard]] bool isEmpty() const;
 
     /*!
      * Returns a ByteVector containing the string's data.  If \a t is Latin1 or
@@ -347,7 +347,7 @@ namespace TagLib {
      *
      * \note The returned data is not null terminated.
      */
-    ByteVector data(Type t) const;
+    [[nodiscard]] ByteVector data(Type t) const;
 
     /*!
      * Convert the string to an integer.
@@ -361,17 +361,17 @@ namespace TagLib {
     /*!
      * Returns a string with the leading and trailing whitespace stripped.
      */
-    String stripWhiteSpace() const;
+    [[nodiscard]] String stripWhiteSpace() const;
 
     /*!
      * Returns true if the file only uses characters required by Latin1.
      */
-    bool isLatin1() const;
+    [[nodiscard]] bool isLatin1() const;
 
     /*!
      * Returns true if the file only uses characters required by (7-bit) ASCII.
      */
-    bool isAscii() const;
+    [[nodiscard]] bool isAscii() const;
 
     /*!
      * Converts the base-10 integer \a n to a string.

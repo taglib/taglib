@@ -66,37 +66,37 @@ namespace TagLib {
          *
          * \see lengthInSeconds()
          */
-        int lengthInMilliseconds() const override;
+        [[nodiscard]] int lengthInMilliseconds() const override;
 
         /*!
          * Returns the average bit rate of the file in kb/s.
          */
-        int bitrate() const override;
+        [[nodiscard]] int bitrate() const override;
 
         /*!
          * Returns the sample rate in Hz.
          */
-        int sampleRate() const override;
+        [[nodiscard]] int sampleRate() const override;
 
         /*!
          * Returns the number of audio channels.
          */
-        int channels() const override;
+        [[nodiscard]] int channels() const override;
 
         /*!
          * Returns the number of bits per audio sample.
          */
-        int bitsPerSample() const;
+        [[nodiscard]] int bitsPerSample() const;
 
         /*!
          * Returns the number of sample frames
          */
-        unsigned int sampleFrames() const;
+        [[nodiscard]] unsigned int sampleFrames() const;
 
         /*!
          * Returns true if the file is in AIFF-C format, false if AIFF format.
          */
-        bool isAiffC() const;
+        [[nodiscard]] bool isAiffC() const;
 
         /*!
          * Returns the compression type of the AIFF-C file.  For example, "NONE" for
@@ -106,7 +106,7 @@ namespace TagLib {
          *
          * \see isAiffC()
          */
-        ByteVector compressionType() const;
+        [[nodiscard]] ByteVector compressionType() const;
 
         /*!
          * Returns the concrete compression name of the AIFF-C file.
@@ -115,7 +115,7 @@ namespace TagLib {
          *
          * \see isAiffC()
          */
-        String compressionName() const;
+        [[nodiscard]] String compressionName() const;
 
       private:
         void read(File *file);

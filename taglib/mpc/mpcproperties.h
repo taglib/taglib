@@ -67,56 +67,56 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the version of the bitstream (SV4-SV8)
        */
-      int mpcVersion() const;
+      [[nodiscard]] int mpcVersion() const;
 
-      unsigned int totalFrames() const;
-      unsigned int sampleFrames() const;
+      [[nodiscard]] unsigned int totalFrames() const;
+      [[nodiscard]] unsigned int sampleFrames() const;
 
       /*!
       * Returns the track gain as an integer value,
       * to convert to dB: trackGain in dB = 64.82 - (trackGain / 256)
       */
-      int trackGain() const;
+      [[nodiscard]] int trackGain() const;
 
       /*!
       * Returns the track peak as an integer value,
       * to convert to dB: trackPeak in dB = trackPeak / 256
       * to convert to floating [-1..1]: trackPeak = 10^(trackPeak / 256 / 20)/32768
       */
-      int trackPeak() const;
+      [[nodiscard]] int trackPeak() const;
 
       /*!
       * Returns the album gain as an integer value,
       * to convert to dB: albumGain in dB = 64.82 - (albumGain / 256)
       */
-      int albumGain() const;
+      [[nodiscard]] int albumGain() const;
 
       /*!
       * Returns the album peak as an integer value,
       * to convert to dB: albumPeak in dB = albumPeak / 256
       * to convert to floating [-1..1]: albumPeak = 10^(albumPeak / 256 / 20)/32768
       */
-      int albumPeak() const;
+      [[nodiscard]] int albumPeak() const;
 
     private:
       void readSV7(const ByteVector &data, offset_t streamLength);

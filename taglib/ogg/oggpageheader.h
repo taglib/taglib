@@ -65,7 +65,7 @@ namespace TagLib {
       /*!
        * Returns true if the header parsed properly and is valid.
        */
-      bool isValid() const;
+      [[nodiscard]] bool isValid() const;
 
       /*!
        * Ogg pages contain a list of packets (which are used by the contained
@@ -74,7 +74,7 @@ namespace TagLib {
        *
        * \see setPacketSizes()
        */
-      List<int> packetSizes() const;
+      [[nodiscard]] List<int> packetSizes() const;
 
       /*!
        * Sets the sizes of the packets in this page to \a sizes.  Internally this
@@ -92,7 +92,7 @@ namespace TagLib {
        * \see lastPacketCompleted()
        * \see setFirstPacketContinued()
        */
-      bool firstPacketContinued() const;
+      [[nodiscard]] bool firstPacketContinued() const;
 
       /*!
        * Sets the internal flag indicating if the first packet in this page is
@@ -109,7 +109,7 @@ namespace TagLib {
        * \see firstPacketContinued()
        * \see setLastPacketCompleted()
        */
-      bool lastPacketCompleted() const;
+      [[nodiscard]] bool lastPacketCompleted() const;
 
       /*!
        * Sets the internal flag indicating if the last packet in this page is
@@ -124,7 +124,7 @@ namespace TagLib {
        *
        * \see setFirstPageOfStream()
        */
-      bool firstPageOfStream() const;
+      [[nodiscard]] bool firstPageOfStream() const;
 
       /*!
        * Marks this page as the first page of the Ogg stream.
@@ -138,7 +138,7 @@ namespace TagLib {
        *
        * \see setLastPageOfStream()
        */
-      bool lastPageOfStream() const;
+      [[nodiscard]] bool lastPageOfStream() const;
 
       /*!
        * Marks this page as the last page of the Ogg stream.
@@ -154,7 +154,7 @@ namespace TagLib {
        *
        * \see setAbsoluteGranularPosition()
        */
-      long long absoluteGranularPosition() const;
+      [[nodiscard]] long long absoluteGranularPosition() const;
 
       /*!
        * A special value of containing the position of the packet to be
@@ -172,7 +172,7 @@ namespace TagLib {
        *
        * \see setStreamSerialNumber()
        */
-      unsigned int streamSerialNumber() const;
+      [[nodiscard]] unsigned int streamSerialNumber() const;
 
       /*!
        * Every Ogg logical stream is given a random serial number which is common
@@ -190,7 +190,7 @@ namespace TagLib {
        *
        * \see setPageSequenceNumber()
        */
-      int pageSequenceNumber() const;
+      [[nodiscard]] int pageSequenceNumber() const;
 
       /*!
        * Sets the page's position in the stream to \a sequenceNumber.
@@ -202,13 +202,13 @@ namespace TagLib {
       /*!
        * Returns the complete header size.
        */
-      int size() const;
+      [[nodiscard]] int size() const;
 
       /*!
        * Returns the size of the data portion of the page -- i.e. the size of the
        * page less the header size.
        */
-      int dataSize() const;
+      [[nodiscard]] int dataSize() const;
 
       /*!
        * Render the page header to binary data.
@@ -216,11 +216,11 @@ namespace TagLib {
        * \note The checksum -- bytes 22 - 25 -- will be left empty and must be
        * filled in when rendering the entire page.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
     private:
       void read(Ogg::File *file, offset_t pageOffset);
-      ByteVector lacingValues() const;
+      [[nodiscard]] ByteVector lacingValues() const;
 
       class PageHeaderPrivate;
       std::unique_ptr<PageHeaderPrivate> d;

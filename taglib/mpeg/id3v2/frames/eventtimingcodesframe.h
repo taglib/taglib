@@ -139,17 +139,17 @@ namespace TagLib {
       /*!
        * Returns a null string.
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the timestamp format.
        */
-      TimestampFormat timestampFormat() const;
+      [[nodiscard]] TimestampFormat timestampFormat() const;
 
       /*!
        * Returns the events with the time stamps.
        */
-      SynchedEventList synchedEvents() const;
+      [[nodiscard]] SynchedEventList synchedEvents() const;
 
       /*!
        * Set the timestamp format.
@@ -169,7 +169,7 @@ namespace TagLib {
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

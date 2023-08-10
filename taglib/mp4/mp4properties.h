@@ -55,37 +55,37 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the number of bits per audio sample.
        */
-      virtual int bitsPerSample() const;
+      [[nodiscard]] virtual int bitsPerSample() const;
 
       /*!
        * Returns whether or not the file is encrypted.
        */
-      bool isEncrypted() const;
+      [[nodiscard]] bool isEncrypted() const;
 
       /*!
        * Returns the codec used in the file.
        */
-      Codec codec() const;
+      [[nodiscard]] Codec codec() const;
 
     private:
       void read(File *file, Atoms *atoms);

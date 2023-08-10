@@ -72,13 +72,13 @@ namespace TagLib {
         File(const File &) = delete;
         File &operator=(const File &) = delete;
 
-        Mod::Tag *tag() const override;
+        [[nodiscard]] Mod::Tag *tag() const override;
 
         /*!
          * Implements the unified property interface -- export function.
          * Forwards to Mod::Tag::properties().
          */
-        PropertyMap properties() const override;
+        [[nodiscard]] PropertyMap properties() const override;
 
         /*!
          * Implements the unified property interface -- import function.
@@ -90,7 +90,7 @@ namespace TagLib {
          * Returns the XM::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */
-        XM::Properties *audioProperties() const override;
+        [[nodiscard]] XM::Properties *audioProperties() const override;
 
         /*!
          * Save the file.

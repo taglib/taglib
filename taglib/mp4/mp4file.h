@@ -98,12 +98,12 @@ namespace TagLib {
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        */
-      Tag *tag() const override;
+      [[nodiscard]] Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       /*!
        * Removes unsupported properties. Forwards to the actual Tag's
@@ -119,7 +119,7 @@ namespace TagLib {
       /*!
        * Returns the MP4 audio properties for this file.
        */
-      Properties *audioProperties() const override;
+      [[nodiscard]] Properties *audioProperties() const override;
 
       /*!
        * Save the file.
@@ -141,7 +141,7 @@ namespace TagLib {
        * Returns whether or not the file on disk actually has an MP4 tag, or the
        * file has a Metadata Item List (ilst) atom.
        */
-      bool hasMP4Tag() const;
+      [[nodiscard]] bool hasMP4Tag() const;
 
       /*!
        * Returns whether or not the given \a stream can be opened as an ASF

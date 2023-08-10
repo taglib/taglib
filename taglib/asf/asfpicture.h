@@ -125,7 +125,7 @@ namespace TagLib
       /*!
        * Returns true if Picture stores valid picture
        */
-      bool isValid() const;
+      [[nodiscard]] bool isValid() const;
 
       /*!
        * Returns the mime type of the image. This should in most cases be
@@ -134,7 +134,7 @@ namespace TagLib
        * \see picture()
        * \see setPicture(const ByteArray&)
        */
-      String mimeType() const;
+      [[nodiscard]] String mimeType() const;
 
       /*!
        * Sets the mime type of the image.  This should in most cases be
@@ -151,7 +151,7 @@ namespace TagLib
        * \see Type
        * \see setType()
        */
-      Type type() const;
+      [[nodiscard]] Type type() const;
 
       /*!
        * Sets the type for the image.
@@ -166,7 +166,7 @@ namespace TagLib
        *
        * \see setDescription()
        */
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Sets a textual description of the image to \a desc.
@@ -184,7 +184,7 @@ namespace TagLib
        * \see setPicture()
        * \see mimeType()
        */
-      ByteVector picture() const;
+      [[nodiscard]] ByteVector picture() const;
 
       /*!
        * Sets the image data to \a p.  \a p should be of the type specified in
@@ -199,12 +199,12 @@ namespace TagLib
       /*!
        * Returns picture as binary raw data \a value
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Returns picture as binary raw data \a value
        */
-      int dataSize() const;
+      [[nodiscard]] int dataSize() const;
 
 #ifndef DO_NOT_DOCUMENT
       /* THIS IS PRIVATE, DON'T TOUCH IT! */

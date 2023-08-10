@@ -110,7 +110,7 @@ namespace TagLib {
        * deleted.  Deletion will happen automatically when the FileRef passes
        * out of scope.
        */
-      virtual File *createFile(FileName fileName,
+      [[nodiscard]] virtual File *createFile(FileName fileName,
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
                                audioPropertiesStyle = AudioProperties::Average) const = 0;
@@ -203,13 +203,13 @@ namespace TagLib {
      *
      * \see File::tag()
      */
-    Tag *tag() const;
+    [[nodiscard]] Tag *tag() const;
 
     /*!
      * Returns the audio properties for this FileRef.  If no audio properties
      * were read then this will returns a null pointer.
      */
-    AudioProperties *audioProperties() const;
+    [[nodiscard]] AudioProperties *audioProperties() const;
 
     /*!
      * Returns a pointer to the file represented by this handler class.
@@ -226,7 +226,7 @@ namespace TagLib {
      * \warning This pointer will become invalid when this FileRef and all
      * copies pass out of scope.
      */
-    File *file() const;
+    [[nodiscard]] File *file() const;
 
     /*!
      * Saves the file.  Returns true on success.
@@ -268,7 +268,7 @@ namespace TagLib {
     /*!
      * Returns true if the file (and as such other pointers) are null.
      */
-    bool isNull() const;
+    [[nodiscard]] bool isNull() const;
 
     /*!
      * Assign the file pointed to by \a ref to this FileRef.

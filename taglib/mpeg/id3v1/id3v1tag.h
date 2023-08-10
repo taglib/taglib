@@ -71,7 +71,7 @@ namespace TagLib {
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.
        */
-      virtual String parse(const ByteVector &data) const;
+      [[nodiscard]] virtual String parse(const ByteVector &data) const;
 
       /*!
        * Encode a ByteVector with the data from \a s.  The default implementation
@@ -82,7 +82,7 @@ namespace TagLib {
        * instead do not write an ID3v1 tag in the case that the data is not
        * ISO-8859-1.
        */
-      virtual ByteVector render(const String &s) const;
+      [[nodiscard]] virtual ByteVector render(const String &s) const;
 
     private:
       class StringHandlerPrivate;
@@ -135,7 +135,7 @@ namespace TagLib {
        * Renders the in memory values to a ByteVector suitable for writing to
        * the file.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Returns the string "TAG" suitable for usage in locating the tag in a
@@ -145,13 +145,13 @@ namespace TagLib {
 
       // Reimplementations.
 
-      String title() const override;
-      String artist() const override;
-      String album() const override;
-      String comment() const override;
-      String genre() const override;
-      unsigned int year() const override;
-      unsigned int track() const override;
+      [[nodiscard]] String title() const override;
+      [[nodiscard]] String artist() const override;
+      [[nodiscard]] String album() const override;
+      [[nodiscard]] String comment() const override;
+      [[nodiscard]] String genre() const override;
+      [[nodiscard]] unsigned int year() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       void setTitle(const String &s) override;
       void setArtist(const String &s) override;
@@ -166,7 +166,7 @@ namespace TagLib {
        *
        * \note Normally 255 indicates that this tag contains no genre.
        */
-      unsigned int genreNumber() const;
+      [[nodiscard]] unsigned int genreNumber() const;
 
       /*!
        * Sets the genre in number to \a i.

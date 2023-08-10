@@ -96,7 +96,7 @@ namespace TagLib {
       /*!
        * Returns the type of the image.
        */
-      Type type() const;
+      [[nodiscard]] Type type() const;
 
       /*!
        * Sets the type of the image.
@@ -107,7 +107,7 @@ namespace TagLib {
        * Returns the mime type of the image.  This should in most cases be
        * "image/png" or "image/jpeg".
        */
-      String mimeType() const;
+      [[nodiscard]] String mimeType() const;
 
       /*!
        * Sets the mime type of the image.  This should in most cases be
@@ -119,7 +119,7 @@ namespace TagLib {
        * Returns a text description of the image.
        */
 
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Sets a textual description of the image to \a desc.
@@ -130,7 +130,7 @@ namespace TagLib {
       /*!
        * Returns the width of the image.
        */
-      int width() const;
+      [[nodiscard]] int width() const;
 
       /*!
        * Sets the width of the image.
@@ -140,7 +140,7 @@ namespace TagLib {
       /*!
        * Returns the height of the image.
        */
-      int height() const;
+      [[nodiscard]] int height() const;
 
       /*!
        * Sets the height of the image.
@@ -150,7 +150,7 @@ namespace TagLib {
       /*!
        * Returns the color depth (in bits-per-pixel) of the image.
        */
-      int colorDepth() const;
+      [[nodiscard]] int colorDepth() const;
 
       /*!
        * Sets the color depth (in bits-per-pixel) of the image.
@@ -160,7 +160,7 @@ namespace TagLib {
       /*!
        * Returns the number of colors used on the image..
        */
-      int numColors() const;
+      [[nodiscard]] int numColors() const;
 
       /*!
        * Sets the number of colors used on the image (for indexed images).
@@ -170,7 +170,7 @@ namespace TagLib {
       /*!
        * Returns the image data.
        */
-      ByteVector data() const;
+      [[nodiscard]] ByteVector data() const;
 
       /*!
        * Sets the image data.
@@ -180,12 +180,12 @@ namespace TagLib {
       /*!
        * Returns the FLAC metadata block type.
        */
-      int code() const override;
+      [[nodiscard]] int code() const override;
 
       /*!
        * Render the content to the FLAC picture block format.
        */
-      ByteVector render() const override;
+      [[nodiscard]] ByteVector render() const override;
 
       /*!
        * Parse the picture data in the FLAC picture block format.

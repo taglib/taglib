@@ -77,45 +77,45 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the Vorbis version, currently "0" (as specified by the spec).
        */
-      int vorbisVersion() const;
+      [[nodiscard]] int vorbisVersion() const;
 
       /*!
        * Returns the maximum bitrate as read from the Vorbis identification
        * header.
        */
-      int bitrateMaximum() const;
+      [[nodiscard]] int bitrateMaximum() const;
 
       /*!
        * Returns the nominal bitrate as read from the Vorbis identification
        * header.
        */
-      int bitrateNominal() const;
+      [[nodiscard]] int bitrateNominal() const;
 
       /*!
        * Returns the minimum bitrate as read from the Vorbis identification
        * header.
        */
-      int bitrateMinimum() const;
+      [[nodiscard]] int bitrateMinimum() const;
 
     private:
       void read(File *file);

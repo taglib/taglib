@@ -49,13 +49,13 @@ namespace TagLib {
         Tag &operator=(const Tag &) = delete;
         bool save();
 
-        String title() const override;
-        String artist() const override;
-        String album() const override;
-        String comment() const override;
-        String genre() const override;
-        unsigned int year() const override;
-        unsigned int track() const override;
+        [[nodiscard]] String title() const override;
+        [[nodiscard]] String artist() const override;
+        [[nodiscard]] String album() const override;
+        [[nodiscard]] String comment() const override;
+        [[nodiscard]] String genre() const override;
+        [[nodiscard]] unsigned int year() const override;
+        [[nodiscard]] unsigned int track() const override;
 
         void setTitle(const String &value) override;
         void setArtist(const String &value) override;
@@ -65,17 +65,17 @@ namespace TagLib {
         void setYear(unsigned int value) override;
         void setTrack(unsigned int value) override;
 
-        bool isEmpty() const override;
+        [[nodiscard]] bool isEmpty() const override;
 
         /*!
          * Returns a string-keyed map of the MP4::Items for this tag.
          */
-        const ItemMap &itemMap() const;
+        [[nodiscard]] const ItemMap &itemMap() const;
 
         /*!
          * \return The item, if any, corresponding to \a key.
          */
-        Item item(const String &key) const;
+        [[nodiscard]] Item item(const String &key) const;
 
         /*!
          * Sets the value of \a key to \a value, overwriting any previous value.
@@ -91,14 +91,14 @@ namespace TagLib {
         /*!
          * \return True if the tag contains an entry for \a key.
          */
-        bool contains(const String &key) const;
+        [[nodiscard]] bool contains(const String &key) const;
 
         /*!
          * Saves the associated file with the tag stripped.
          */
         bool strip();
 
-        PropertyMap properties() const override;
+        [[nodiscard]] PropertyMap properties() const override;
         void removeUnsupportedProperties(const StringList &props) override;
         PropertyMap setProperties(const PropertyMap &props) override;
 
@@ -125,21 +125,21 @@ namespace TagLib {
         void parseBool(const Atom *atom);
         void parseCovr(const Atom *atom);
 
-        ByteVector padIlst(const ByteVector &data, int length = -1) const;
-        ByteVector renderAtom(const ByteVector &name, const ByteVector &data) const;
-        ByteVector renderData(const ByteVector &name, int flags,
+        [[nodiscard]] ByteVector padIlst(const ByteVector &data, int length = -1) const;
+        [[nodiscard]] ByteVector renderAtom(const ByteVector &name, const ByteVector &data) const;
+        [[nodiscard]] ByteVector renderData(const ByteVector &name, int flags,
                               const ByteVectorList &data) const;
-        ByteVector renderText(const ByteVector &name, const Item &item,
+        [[nodiscard]] ByteVector renderText(const ByteVector &name, const Item &item,
                               int flags = TypeUTF8) const;
-        ByteVector renderFreeForm(const String &name, const Item &item) const;
-        ByteVector renderBool(const ByteVector &name, const Item &item) const;
-        ByteVector renderInt(const ByteVector &name, const Item &item) const;
-        ByteVector renderByte(const ByteVector &name, const Item &item) const;
-        ByteVector renderUInt(const ByteVector &name, const Item &item) const;
-        ByteVector renderLongLong(const ByteVector &name, const Item &item) const;
-        ByteVector renderIntPair(const ByteVector &name, const Item &item) const;
-        ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item) const;
-        ByteVector renderCovr(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderFreeForm(const String &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderBool(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderInt(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderByte(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderUInt(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderLongLong(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderIntPair(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item) const;
+        [[nodiscard]] ByteVector renderCovr(const ByteVector &name, const Item &item) const;
 
         void updateParents(const AtomList &path, offset_t delta, int ignore = 0);
         void updateOffsets(offset_t delta, offset_t offset);

@@ -57,16 +57,16 @@ namespace TagLib {
       UnknownFrame(const UnknownFrame &) = delete;
       UnknownFrame &operator=(const UnknownFrame &) = delete;
 
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the field data (everything but the header) for this frame.
        */
-      ByteVector data() const;
+      [[nodiscard]] ByteVector data() const;
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       UnknownFrame(const ByteVector &data, Header *h);

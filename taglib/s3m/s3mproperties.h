@@ -50,19 +50,19 @@ namespace TagLib {
       Properties(const Properties &) = delete;
       Properties &operator=(const Properties &) = delete;
 
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
-      unsigned short lengthInPatterns() const;
-      bool stereo() const;
-      unsigned short sampleCount() const;
-      unsigned short patternCount() const;
-      unsigned short flags() const;
-      unsigned short trackerVersion() const;
-      unsigned short fileFormatVersion() const;
-      unsigned char globalVolume() const;
-      unsigned char masterVolume() const;
-      unsigned char tempo() const;
-      unsigned char bpmSpeed() const;
+      [[nodiscard]] unsigned short lengthInPatterns() const;
+      [[nodiscard]] bool stereo() const;
+      [[nodiscard]] unsigned short sampleCount() const;
+      [[nodiscard]] unsigned short patternCount() const;
+      [[nodiscard]] unsigned short flags() const;
+      [[nodiscard]] unsigned short trackerVersion() const;
+      [[nodiscard]] unsigned short fileFormatVersion() const;
+      [[nodiscard]] unsigned char globalVolume() const;
+      [[nodiscard]] unsigned char masterVolume() const;
+      [[nodiscard]] unsigned char tempo() const;
+      [[nodiscard]] unsigned char bpmSpeed() const;
 
       void setChannels(int channels);
 

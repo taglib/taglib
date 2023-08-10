@@ -64,32 +64,32 @@ namespace TagLib {
       /*!
        * \return The size of the main RIFF chunk.
        */
-      unsigned int riffSize() const;
+      [[nodiscard]] unsigned int riffSize() const;
 
       /*!
        * \return The number of chunks in the file.
        */
-      unsigned int chunkCount() const;
+      [[nodiscard]] unsigned int chunkCount() const;
 
       /*!
        * \return The offset within the file for the selected chunk number.
        */
-      offset_t chunkOffset(unsigned int i) const;
+      [[nodiscard]] offset_t chunkOffset(unsigned int i) const;
 
       /*!
        * \return The size of the chunk data.
        */
-      unsigned int chunkDataSize(unsigned int i) const;
+      [[nodiscard]] unsigned int chunkDataSize(unsigned int i) const;
 
       /*!
        * \return The size of the padding after the chunk (can be either 0 or 1).
        */
-      unsigned int chunkPadding(unsigned int i) const;
+      [[nodiscard]] unsigned int chunkPadding(unsigned int i) const;
 
       /*!
        * \return The name of the specified chunk, for instance, "COMM" or "ID3 "
        */
-      ByteVector chunkName(unsigned int i) const;
+      [[nodiscard]] ByteVector chunkName(unsigned int i) const;
 
       /*!
        * Reads the chunk data from the file and returns it.

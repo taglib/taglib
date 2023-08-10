@@ -86,27 +86,27 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the number of bits per audio sample.
        */
-      int bitsPerSample() const;
+      [[nodiscard]] int bitsPerSample() const;
 
       /*!
        * Returns the codec used in the file.
@@ -114,7 +114,7 @@ namespace TagLib {
        * \see codecName()
        * \see codecDescription()
        */
-      Codec codec() const;
+      [[nodiscard]] Codec codec() const;
 
       /*!
        * Returns the concrete codec name, for example "Windows Media Audio 9.1"
@@ -123,7 +123,7 @@ namespace TagLib {
        * \see codec()
        * \see codecDescription()
        */
-      String codecName() const;
+      [[nodiscard]] String codecName() const;
 
       /*!
        * Returns the codec description, typically contains the encoder settings,
@@ -133,12 +133,12 @@ namespace TagLib {
        * \see codec()
        * \see codecName()
        */
-      String codecDescription() const;
+      [[nodiscard]] String codecDescription() const;
 
       /*!
        * Returns whether or not the file is encrypted.
        */
-      bool isEncrypted() const;
+      [[nodiscard]] bool isEncrypted() const;
 
 #ifndef DO_NOT_DOCUMENT
       void setLengthInMilliseconds(int value);

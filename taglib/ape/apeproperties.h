@@ -69,37 +69,37 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override;
+      [[nodiscard]] int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override;
+      [[nodiscard]] int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override;
+      [[nodiscard]] int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
       /*!
        * Returns the number of bits per audio sample.
        */
-      int bitsPerSample() const;
+      [[nodiscard]] int bitsPerSample() const;
 
       /*!
        * Returns the total number of audio samples in file.
        */
-      unsigned int sampleFrames() const;
+      [[nodiscard]] unsigned int sampleFrames() const;
 
       /*!
        * Returns APE version.
        */
-      int version() const;
+      [[nodiscard]] int version() const;
 
     private:
       void read(File *file, offset_t streamLength);

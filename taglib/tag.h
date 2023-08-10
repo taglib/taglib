@@ -61,7 +61,7 @@ namespace TagLib {
      * The default implementation in this class considers only the usual built-in
      * tags (artist, album, ...) and only one value per key.
      */
-    virtual PropertyMap properties() const;
+    [[nodiscard]] virtual PropertyMap properties() const;
 
     /*!
      * Removes unsupported properties, or a subset of them, from the tag.
@@ -82,42 +82,42 @@ namespace TagLib {
      * Returns the track name; if no track name is present in the tag
      * String::null will be returned.
      */
-    virtual String title() const = 0;
+    [[nodiscard]] virtual String title() const = 0;
 
     /*!
      * Returns the artist name; if no artist name is present in the tag
      * String::null will be returned.
      */
-    virtual String artist() const = 0;
+    [[nodiscard]] virtual String artist() const = 0;
 
     /*!
      * Returns the album name; if no album name is present in the tag
      * String::null will be returned.
      */
-    virtual String album() const = 0;
+    [[nodiscard]] virtual String album() const = 0;
 
     /*!
      * Returns the track comment; if no comment is present in the tag
      * String::null will be returned.
      */
-    virtual String comment() const = 0;
+    [[nodiscard]] virtual String comment() const = 0;
 
     /*!
      * Returns the genre name; if no genre is present in the tag String::null
      * will be returned.
      */
-    virtual String genre() const = 0;
+    [[nodiscard]] virtual String genre() const = 0;
 
     /*!
      * Returns the year; if there is no year set, this will return 0.
      */
-    virtual unsigned int year() const = 0;
+    [[nodiscard]] virtual unsigned int year() const = 0;
 
     /*!
      * Returns the track number; if there is no track number set, this will
      * return 0.
      */
-    virtual unsigned int track() const = 0;
+    [[nodiscard]] virtual unsigned int track() const = 0;
 
     /*!
      * Sets the title to \a s.  If \a s is String::null then this value will be
@@ -167,7 +167,7 @@ namespace TagLib {
      * reimplemented in subclasses that provide more than the basic tagging
      * abilities in this class.
      */
-    virtual bool isEmpty() const;
+    [[nodiscard]] virtual bool isEmpty() const;
 
     /*!
      * Copies the generic data from one tag to another.

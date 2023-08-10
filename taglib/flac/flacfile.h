@@ -140,7 +140,7 @@ namespace TagLib {
        * \see ID3v1Tag()
        * \see XiphComment()
        */
-      TagLib::Tag *tag() const override;
+      [[nodiscard]] TagLib::Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
@@ -148,7 +148,7 @@ namespace TagLib {
        * only the first one (in the order XiphComment, ID3v2, ID3v1) will be
        * converted to the PropertyMap.
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       void removeUnsupportedProperties(const StringList &) override;
 
@@ -165,7 +165,7 @@ namespace TagLib {
        * Returns the FLAC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      Properties *audioProperties() const override;
+      [[nodiscard]] Properties *audioProperties() const override;
 
       /*!
        * Save the file.  This will primarily save the XiphComment, but
@@ -277,21 +277,21 @@ namespace TagLib {
        *
        * \see xiphComment()
        */
-      bool hasXiphComment() const;
+      [[nodiscard]] bool hasXiphComment() const;
 
       /*!
        * Returns whether or not the file on disk actually has an ID3v1 tag.
        *
        * \see ID3v1Tag()
        */
-      bool hasID3v1Tag() const;
+      [[nodiscard]] bool hasID3v1Tag() const;
 
       /*!
        * Returns whether or not the file on disk actually has an ID3v2 tag.
        *
        * \see ID3v2Tag()
        */
-      bool hasID3v2Tag() const;
+      [[nodiscard]] bool hasID3v2Tag() const;
 
       /*!
        * Returns whether or not the given \a stream can be opened as a FLAC

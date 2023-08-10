@@ -120,7 +120,7 @@ namespace TagLib {
        *
        * \see description()
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the text encoding that will be used in rendering this frame.
@@ -130,7 +130,7 @@ namespace TagLib {
        * \see setTextEncoding()
        * \see render()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Returns the language encoding as a 3 byte encoding as specified by
@@ -140,17 +140,17 @@ namespace TagLib {
        *
        * \see setLanguage()
        */
-      ByteVector language() const;
+      [[nodiscard]] ByteVector language() const;
 
       /*!
        * Returns the timestamp format.
        */
-      TimestampFormat timestampFormat() const;
+      [[nodiscard]] TimestampFormat timestampFormat() const;
 
       /*!
        * Returns the type of text contained.
        */
-      Type type() const;
+      [[nodiscard]] Type type() const;
 
       /*!
        * Returns the description of this synchronized lyrics frame.
@@ -159,12 +159,12 @@ namespace TagLib {
        *
        * \see setDescription()
        */
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Returns the text with the time stamps.
        */
-      SynchedTextList synchedText() const;
+      [[nodiscard]] SynchedTextList synchedText() const;
 
       /*!
        * Sets the text encoding to be used when rendering this frame to
@@ -216,7 +216,7 @@ namespace TagLib {
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

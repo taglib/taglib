@@ -80,7 +80,7 @@ namespace TagLib {
       /*!
        * Returns a string containing the description, file name and mime-type
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the text encoding used for the description and file name.
@@ -89,7 +89,7 @@ namespace TagLib {
        * \see description()
        * \see fileName()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Set the text encoding used for the description and file name.
@@ -102,7 +102,7 @@ namespace TagLib {
       /*!
        * Returns the mime type of the object.
        */
-      String mimeType() const;
+      [[nodiscard]] String mimeType() const;
 
       /*!
        * Sets the mime type of the object.
@@ -114,7 +114,7 @@ namespace TagLib {
        *
        * \see setFileName()
        */
-      String fileName() const;
+      [[nodiscard]] String fileName() const;
 
       /*!
        * Sets the file name for the object.
@@ -131,7 +131,7 @@ namespace TagLib {
        * \see setTextEncoding()
        */
 
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Sets the content description of the object to \a desc.
@@ -152,7 +152,7 @@ namespace TagLib {
        * \see setObject()
        * \see mimeType()
        */
-      ByteVector object() const;
+      [[nodiscard]] ByteVector object() const;
 
       /*!
        * Sets the object data to \a data.  \a data should be of the type specified in
@@ -166,7 +166,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       GeneralEncapsulatedObjectFrame(const ByteVector &data, Header *h);

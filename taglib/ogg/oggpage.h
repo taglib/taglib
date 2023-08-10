@@ -65,13 +65,13 @@ namespace TagLib {
       /*!
        * Returns the page's position within the file (in bytes).
        */
-      offset_t fileOffset() const;
+      [[nodiscard]] offset_t fileOffset() const;
 
       /*!
        * Returns a pointer to the header for this page.  This pointer will become
        * invalid when the page is deleted.
        */
-      const PageHeader *header() const;
+      [[nodiscard]] const PageHeader *header() const;
 
       /*!
        * Returns the index of the page within the Ogg stream.  This helps make it
@@ -79,7 +79,7 @@ namespace TagLib {
        *
        * \see setPageSequenceNumber()
        */
-      int pageSequenceNumber() const;
+      [[nodiscard]] int pageSequenceNumber() const;
 
       /*!
        * Sets the page's position in the stream to \a sequenceNumber.
@@ -94,7 +94,7 @@ namespace TagLib {
        *
        * \see setFirstPacketIndex()
        */
-      int firstPacketIndex() const;
+      [[nodiscard]] int firstPacketIndex() const;
 
       /*!
        * Sets the index of the first packet in the page.
@@ -126,12 +126,12 @@ namespace TagLib {
        *
        * \see ContainsPacketFlags
        */
-      ContainsPacketFlags containsPacket(int index) const;
+      [[nodiscard]] ContainsPacketFlags containsPacket(int index) const;
 
       /*!
        * Returns the number of packets (whole or partial) in this page.
        */
-      unsigned int packetCount() const;
+      [[nodiscard]] unsigned int packetCount() const;
 
       /*!
        * Returns a list of the packets in this page.
@@ -139,14 +139,14 @@ namespace TagLib {
        * \note Either or both the first and last packets may be only partial.
        * \see PageHeader::firstPacketContinued()
        */
-      ByteVectorList packets() const;
+      [[nodiscard]] ByteVectorList packets() const;
 
       /*!
        * Returns the size of the page in bytes.
        */
-      int size() const;
+      [[nodiscard]] int size() const;
 
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Defines a strategy for pagination, or grouping pages into Ogg packets,

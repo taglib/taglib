@@ -119,12 +119,12 @@ namespace TagLib {
        *
        * \see identification()
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns a list of channels with information currently in the frame.
        */
-      List<ChannelType> channels() const;
+      [[nodiscard]] List<ChannelType> channels() const;
 
       /*!
        * Returns the relative volume adjustment "index".  As indicated by the
@@ -137,7 +137,7 @@ namespace TagLib {
        * \see setVolumeAdjustmentIndex()
        * \see volumeAdjustment()
        */
-      short volumeAdjustmentIndex(ChannelType type = MasterVolume) const;
+      [[nodiscard]] short volumeAdjustmentIndex(ChannelType type = MasterVolume) const;
 
       /*!
        * Set the volume adjustment to \a index.  As indicated by the ID3v2
@@ -164,7 +164,7 @@ namespace TagLib {
        * \see setVolumeAdjustment()
        * \see volumeAdjustmentIndex()
        */
-      float volumeAdjustment(ChannelType type = MasterVolume) const;
+      [[nodiscard]] float volumeAdjustment(ChannelType type = MasterVolume) const;
 
       /*!
        * Set the relative volume adjustment in decibels to \a adjustment.
@@ -188,7 +188,7 @@ namespace TagLib {
        *
        * \see setPeakVolume()
        */
-      PeakVolume peakVolume(ChannelType type = MasterVolume) const;
+      [[nodiscard]] PeakVolume peakVolume(ChannelType type = MasterVolume) const;
 
       /*!
        * Sets the peak volume to \a peak.
@@ -202,7 +202,7 @@ namespace TagLib {
       /*!
        * Returns the identification for this frame.
        */
-      String identification() const;
+      [[nodiscard]] String identification() const;
 
       /*!
        * Sets the identification of the frame to \a s. The string
@@ -213,7 +213,7 @@ namespace TagLib {
 
     protected:
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       RelativeVolumeFrame(const ByteVector &data, Header *h);

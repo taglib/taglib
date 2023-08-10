@@ -55,51 +55,51 @@ namespace TagLib {
       /*!
        * Returns the track name.
        */
-      String title() const override;
+      [[nodiscard]] String title() const override;
 
       /*!
        * Returns the artist name.
        */
-      String artist() const override;
+      [[nodiscard]] String artist() const override;
 
       /*!
        * Returns the album name; if no album name is present in the tag
        * String::null will be returned.
        */
-      String album() const override;
+      [[nodiscard]] String album() const override;
 
       /*!
        * Returns the track comment.
        */
-      String comment() const override;
+      [[nodiscard]] String comment() const override;
 
       /*!
        * Returns the genre name; if no genre is present in the tag String::null
        * will be returned.
        */
-      String genre() const override;
+      [[nodiscard]] String genre() const override;
 
       /*!
        * Returns the rating.
        */
-      virtual String rating() const;
+      [[nodiscard]] virtual String rating() const;
 
       /*!
        * Returns the genre name; if no genre is present in the tag String::null
        * will be returned.
        */
-      virtual String copyright() const;
+      [[nodiscard]] virtual String copyright() const;
 
       /*!
        * Returns the year; if there is no year set, this will return 0.
        */
-      unsigned int year() const override;
+      [[nodiscard]] unsigned int year() const override;
 
       /*!
        * Returns the track number; if there is no track number set, this will
        * return 0.
        */
-      unsigned int track() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       /*!
        * Sets the title to \a value.
@@ -152,7 +152,7 @@ namespace TagLib {
        * reimplemented in subclasses that provide more than the basic tagging
        * abilities in this class.
        */
-      bool isEmpty() const override;
+      [[nodiscard]] bool isEmpty() const override;
 
       /*!
        * \warning You should not modify this data structure directly, instead
@@ -165,12 +165,12 @@ namespace TagLib {
        * Returns a reference to the item list map.  This is an AttributeListMap of
        * all of the items in the tag.
        */
-      const AttributeListMap &attributeListMap() const;
+      [[nodiscard]] const AttributeListMap &attributeListMap() const;
 
       /*!
        * \return True if a value for \a key is currently set.
        */
-      bool contains(const String &key) const;
+      [[nodiscard]] bool contains(const String &key) const;
 
       /*!
        * Removes the \a key attribute from the tag
@@ -181,7 +181,7 @@ namespace TagLib {
        * \return The list of values for the key \a name, or an empty list if no
        * values have been set.
        */
-      AttributeList attribute(const String &name) const;
+      [[nodiscard]] AttributeList attribute(const String &name) const;
 
       /*!
        * Sets the \a name attribute to the value of \a attribute. If an attribute
@@ -200,7 +200,7 @@ namespace TagLib {
        */
       void addAttribute(const String &name, const Attribute &attribute);
 
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
       void removeUnsupportedProperties(const StringList &props) override;
       PropertyMap setProperties(const PropertyMap &props) override;
 

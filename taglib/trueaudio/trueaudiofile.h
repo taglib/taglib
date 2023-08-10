@@ -139,14 +139,14 @@ namespace TagLib {
       /*!
        * Returns the Tag for this file.
        */
-      TagLib::Tag *tag() const override;
+      [[nodiscard]] TagLib::Tag *tag() const override;
 
       /*!
        * Implements the unified property interface -- export function.
        * If the file contains both ID3v1 and v2 tags, only ID3v2 will be
        * converted to the PropertyMap.
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       /*!
        * Implements the unified property interface -- import function.
@@ -161,7 +161,7 @@ namespace TagLib {
        * Returns the TrueAudio::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
-      Properties *audioProperties() const override;
+      [[nodiscard]] Properties *audioProperties() const override;
 
       /*!
        * Saves the file.
@@ -221,14 +221,14 @@ namespace TagLib {
        *
        * \see ID3v1Tag()
        */
-      bool hasID3v1Tag() const;
+      [[nodiscard]] bool hasID3v1Tag() const;
 
       /*!
        * Returns whether or not the file on disk actually has an ID3v2 tag.
        *
        * \see ID3v2Tag()
        */
-      bool hasID3v2Tag() const;
+      [[nodiscard]] bool hasID3v2Tag() const;
 
       /*!
        * Returns whether or not the given \a stream can be opened as a TrueAudio

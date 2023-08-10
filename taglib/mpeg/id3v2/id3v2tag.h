@@ -76,7 +76,7 @@ namespace TagLib {
        * Decode a string from \a data.  The default implementation assumes that
        * \a data is an ISO-8859-1 (Latin1) character array.
        */
-      virtual String parse(const ByteVector &data) const;
+      [[nodiscard]] virtual String parse(const ByteVector &data) const;
 
     private:
       class Latin1StringHandlerPrivate;
@@ -163,13 +163,13 @@ namespace TagLib {
 
       // Reimplementations.
 
-      String title() const override;
-      String artist() const override;
-      String album() const override;
-      String comment() const override;
-      String genre() const override;
-      unsigned int year() const override;
-      unsigned int track() const override;
+      [[nodiscard]] String title() const override;
+      [[nodiscard]] String artist() const override;
+      [[nodiscard]] String album() const override;
+      [[nodiscard]] String comment() const override;
+      [[nodiscard]] String genre() const override;
+      [[nodiscard]] unsigned int year() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       void setTitle(const String &s) override;
       void setArtist(const String &s) override;
@@ -179,18 +179,18 @@ namespace TagLib {
       void setYear(unsigned int i) override;
       void setTrack(unsigned int i) override;
 
-      bool isEmpty() const override;
+      [[nodiscard]] bool isEmpty() const override;
 
       /*!
        * Returns a pointer to the tag's header.
        */
-      Header *header() const;
+      [[nodiscard]] Header *header() const;
 
       /*!
        * Returns a pointer to the tag's extended header or null if there is no
        * extended header.
        */
-      ExtendedHeader *extendedHeader() const;
+      [[nodiscard]] ExtendedHeader *extendedHeader() const;
 
       /*!
        * Returns a reference to the frame list map.  This is an FrameListMap of
@@ -226,7 +226,7 @@ namespace TagLib {
        *
        * \see frameList()
        */
-      const FrameListMap &frameListMap() const;
+      [[nodiscard]] const FrameListMap &frameListMap() const;
 
       /*!
        * Returns a reference to the frame list.  This is an FrameList of all of
@@ -238,7 +238,7 @@ namespace TagLib {
        * \warning You should not modify this data structure directly, instead
        * use addFrame() and removeFrame().
        */
-      const FrameList &frameList() const;
+      [[nodiscard]] const FrameList &frameList() const;
 
       /*!
        * Returns the frame list for frames with the id \a frameID or an empty
@@ -251,7 +251,7 @@ namespace TagLib {
        *
        * \see frameListMap()
        */
-      const FrameList &frameList(const ByteVector &frameID) const;
+      [[nodiscard]] const FrameList &frameList(const ByteVector &frameID) const;
 
       /*!
        * Add a frame to the tag.  At this point the tag takes ownership of
@@ -308,7 +308,7 @@ namespace TagLib {
        *  once, the description, separated by a "/".
        *
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       /*!
        * Removes unsupported frames given by \a properties. The elements of
@@ -332,7 +332,7 @@ namespace TagLib {
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
        */
-      ByteVector render() const;
+      [[nodiscard]] ByteVector render() const;
 
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
@@ -340,7 +340,7 @@ namespace TagLib {
        * The \a version parameter specifies whether ID3v2.4 (default) or ID3v2.3
        * should be used.
        */
-      ByteVector render(Version version) const;
+      [[nodiscard]] ByteVector render(Version version) const;
 
       /*!
        * Gets the current string handler that decides how the "Latin-1" data

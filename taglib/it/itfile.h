@@ -68,13 +68,13 @@ namespace TagLib {
         File(const File &) = delete;
         File &operator=(const File &) = delete;
 
-        Mod::Tag *tag() const override;
+        [[nodiscard]] Mod::Tag *tag() const override;
 
         /*!
          * Returns the IT::Properties for this file. If no audio properties
          * were read then this will return a null pointer.
          */
-        IT::Properties *audioProperties() const override;
+        [[nodiscard]] IT::Properties *audioProperties() const override;
 
         /*!
          * Save the file.

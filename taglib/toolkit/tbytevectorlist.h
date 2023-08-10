@@ -65,7 +65,7 @@ namespace TagLib {
      * Convert the ByteVectorList to a ByteVector separated by \a separator.  By
      * default a space is used.
      */
-    ByteVector toByteVector(const ByteVector &separator = " ") const;
+    [[nodiscard]] ByteVector toByteVector(const ByteVector &separator = " ") const;
 
     /*!
      * Splits the ByteVector \a v into several strings at \a pattern.  This will

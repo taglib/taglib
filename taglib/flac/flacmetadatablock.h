@@ -54,12 +54,12 @@ namespace TagLib {
       /*!
        * Returns the FLAC metadata block type.
        */
-      virtual int code() const = 0;
+      [[nodiscard]] virtual int code() const = 0;
 
       /*!
        * Render the content of the block.
        */
-      virtual ByteVector render() const = 0;
+      [[nodiscard]] virtual ByteVector render() const = 0;
 
     private:
       class MetadataBlockPrivate;

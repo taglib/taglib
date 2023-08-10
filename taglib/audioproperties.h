@@ -79,7 +79,7 @@ namespace TagLib {
       * \deprecated Use lengthInSeconds().
       */
     TAGLIB_DEPRECATED
-    virtual int length() const;
+    [[nodiscard]] virtual int length() const;
 
     /*!
      * Returns the length of the file in seconds.  The length is rounded down to
@@ -87,31 +87,31 @@ namespace TagLib {
      *
      * \see lengthInMilliseconds()
      */
-    virtual int lengthInSeconds() const;
+    [[nodiscard]] virtual int lengthInSeconds() const;
 
     /*!
      * Returns the length of the file in milliseconds.
      *
      * \see lengthInSeconds()
      */
-    virtual int lengthInMilliseconds() const;
+    [[nodiscard]] virtual int lengthInMilliseconds() const;
 
     /*!
      * Returns the most appropriate bit rate for the file in kb/s.  For constant
      * bitrate formats this is simply the bitrate of the file.  For variable
      * bitrate formats this is either the average or nominal bitrate.
      */
-    virtual int bitrate() const;
+    [[nodiscard]] virtual int bitrate() const;
 
     /*!
      * Returns the sample rate in Hz.
      */
-    virtual int sampleRate() const;
+    [[nodiscard]] virtual int sampleRate() const;
 
     /*!
      * Returns the number of audio channels.
      */
-    virtual int channels() const = 0;
+    [[nodiscard]] virtual int channels() const = 0;
 
   protected:
 

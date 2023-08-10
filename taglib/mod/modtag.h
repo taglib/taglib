@@ -55,39 +55,39 @@ namespace TagLib {
        * Returns the track name; if no track name is present in the tag
        * String::null will be returned.
        */
-      String title() const override;
+      [[nodiscard]] String title() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      String artist() const override;
+      [[nodiscard]] String artist() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      String album() const override;
+      [[nodiscard]] String album() const override;
 
       /*!
        * Returns the track comment derived from the instrument/sample/pattern
        * names; if no comment is present in the tag String::null will be
        * returned.
        */
-      String comment() const override;
+      [[nodiscard]] String comment() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns String::null.
        */
-      String genre() const override;
+      [[nodiscard]] String genre() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      unsigned int year() const override;
+      [[nodiscard]] unsigned int year() const override;
 
       /*!
        * Not supported by module files.  Therefore always returns 0.
        */
-      unsigned int track() const override;
+      [[nodiscard]] unsigned int track() const override;
 
       /*!
        * Returns the name of the tracker used to create/edit the module file.
@@ -96,7 +96,7 @@ namespace TagLib {
        * the file type.  Therefore only XM files might have an empty
        * (String::null) tracker name.
        */
-      String trackerName() const;
+      [[nodiscard]] String trackerName() const;
 
       /*!
        * Sets the title to \a title.  If \a title is String::null then this
@@ -168,7 +168,7 @@ namespace TagLib {
        * Implements the unified property interface -- export function.
        * Since the module tag is very limited, the exported map is as well.
        */
-      PropertyMap properties() const override;
+      [[nodiscard]] PropertyMap properties() const override;
 
       /*!
        * Implements the unified property interface -- import function.

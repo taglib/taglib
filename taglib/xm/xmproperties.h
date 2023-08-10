@@ -45,17 +45,17 @@ namespace TagLib {
       Properties(const Properties &) = delete;
       Properties &operator=(const Properties &) = delete;
 
-      int channels() const override;
+      [[nodiscard]] int channels() const override;
 
-      unsigned short lengthInPatterns() const;
-      unsigned short version() const;
-      unsigned short restartPosition() const;
-      unsigned short patternCount() const;
-      unsigned short instrumentCount() const;
-      unsigned int sampleCount() const;
-      unsigned short flags() const;
-      unsigned short tempo() const;
-      unsigned short bpmSpeed() const;
+      [[nodiscard]] unsigned short lengthInPatterns() const;
+      [[nodiscard]] unsigned short version() const;
+      [[nodiscard]] unsigned short restartPosition() const;
+      [[nodiscard]] unsigned short patternCount() const;
+      [[nodiscard]] unsigned short instrumentCount() const;
+      [[nodiscard]] unsigned int sampleCount() const;
+      [[nodiscard]] unsigned short flags() const;
+      [[nodiscard]] unsigned short tempo() const;
+      [[nodiscard]] unsigned short bpmSpeed() const;
 
       void setChannels(int channels);
 

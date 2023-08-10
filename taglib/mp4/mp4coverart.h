@@ -63,10 +63,10 @@ namespace TagLib {
       void swap(CoverArt &item);
 
       //! Format of the image
-      Format format() const;
+      [[nodiscard]] Format format() const;
 
       //! The image data
-      ByteVector data() const;
+      [[nodiscard]] ByteVector data() const;
 
     private:
       class CoverArtPrivate;

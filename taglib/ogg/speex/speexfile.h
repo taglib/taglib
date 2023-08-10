@@ -88,13 +88,13 @@ namespace TagLib {
          * interface, so this serves as the reimplementation of
          * TagLib::File::tag().
          */
-        Ogg::XiphComment *tag() const override;
+        [[nodiscard]] Ogg::XiphComment *tag() const override;
 
         /*!
          * Implements the unified property interface -- export function.
          * This forwards directly to XiphComment::properties().
          */
-        PropertyMap properties() const override;
+        [[nodiscard]] PropertyMap properties() const override;
 
         /*!
          * Implements the unified tag dictionary interface -- import function.
@@ -106,7 +106,7 @@ namespace TagLib {
          * Returns the Speex::Properties for this file.  If no audio properties
          * were read then this will return a null pointer.
          */
-        Properties *audioProperties() const override;
+        [[nodiscard]] Properties *audioProperties() const override;
 
         /*!
          * Save the file.

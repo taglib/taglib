@@ -106,7 +106,7 @@ namespace TagLib
       /*!
        * Construct an attribute as a copy of \a other.
        */
-      Attribute(const Attribute &other);
+      [[maybe_unused]] Attribute(const Attribute &other);
 
       /*!
        * Copies the contents of \a other into this item.
@@ -126,47 +126,47 @@ namespace TagLib
       /*!
        * Returns type of the value.
        */
-      AttributeTypes type() const;
+      [[nodiscard]] AttributeTypes type() const;
 
       /*!
        * Returns the BoolType \a value.
        */
-      unsigned short toBool() const;
+      [[nodiscard]] unsigned short toBool() const;
 
       /*!
        * Returns the WordType \a value.
        */
-      unsigned short toUShort() const;
+      [[nodiscard]] unsigned short toUShort() const;
 
       /*!
        * Returns the DWordType \a value.
        */
-      unsigned int toUInt() const;
+      [[nodiscard]] unsigned int toUInt() const;
 
       /*!
        * Returns the QWordType \a value.
        */
-      unsigned long long toULongLong() const;
+      [[nodiscard]] unsigned long long toULongLong() const;
 
       /*!
        * Returns the UnicodeType \a value.
        */
-      String toString() const;
+      [[nodiscard]] String toString() const;
 
       /*!
        * Returns the BytesType \a value.
        */
-      ByteVector toByteVector() const;
+      [[nodiscard]] ByteVector toByteVector() const;
 
       /*!
        * Returns the Picture \a value.
        */
-      Picture toPicture() const;
+      [[nodiscard]] Picture toPicture() const;
 
       /*!
        * Returns the language number, or 0 is no stream number was set.
        */
-      int language() const;
+      [[nodiscard]] int language() const;
 
       /*!
        * Sets the language number.
@@ -176,7 +176,7 @@ namespace TagLib
       /*!
        * Returns the stream number, or 0 is no stream number was set.
        */
-      int stream() const;
+      [[nodiscard]] int stream() const;
 
       /*!
        * Sets the stream number.
@@ -189,12 +189,12 @@ namespace TagLib
 #endif
 
       //! Returns the size of the stored data
-      int dataSize() const;
+      [[nodiscard]] int dataSize() const;
 
     private:
       friend class File;
 
-      ByteVector render(const String &name, int kind = 0) const;
+      [[nodiscard]] ByteVector render(const String &name, int kind = 0) const;
 
       class AttributePrivate;
       std::shared_ptr<AttributePrivate> d;

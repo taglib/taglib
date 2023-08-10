@@ -89,13 +89,13 @@ namespace TagLib {
      * Returns an STL style iterator to the beginning of the map.  See
      * std::map::const_iterator for the semantics.
      */
-    ConstIterator begin() const;
+    [[nodiscard]] ConstIterator begin() const;
 
     /*!
      * Returns an STL style iterator to the beginning of the map.  See
      * std::map::const_iterator for the semantics.
      */
-    ConstIterator cbegin() const;
+    [[nodiscard]] ConstIterator cbegin() const;
 
     /*!
      * Returns an STL style iterator to the end of the map.  See
@@ -107,13 +107,13 @@ namespace TagLib {
      * Returns an STL style iterator to the end of the map.  See
      * std::map::const_iterator for the semantics.
      */
-    ConstIterator end() const;
+    [[nodiscard]] ConstIterator end() const;
 
     /*!
      * Returns an STL style iterator to the end of the map.  See
      * std::map::const_iterator for the semantics.
      */
-    ConstIterator cend() const;
+    [[nodiscard]] ConstIterator cend() const;
 
     /*!
      * Inserts \a value under \a key in the map.  If a value for \a key already
@@ -132,14 +132,14 @@ namespace TagLib {
      *
      * \see isEmpty()
      */
-    unsigned int size() const;
+    [[nodiscard]] unsigned int size() const;
 
     /*!
      * Returns true if the map is empty.
      *
      * \see size()
      */
-    bool isEmpty() const;
+    [[nodiscard]] bool isEmpty() const;
 
     /*!
      * Find the first occurrence of \a key.
@@ -149,12 +149,12 @@ namespace TagLib {
     /*!
      * Find the first occurrence of \a key.
      */
-    ConstIterator find(const Key &key) const;
+    [[nodiscard]] ConstIterator find(const Key &key) const;
 
     /*!
      * Returns true if the map contains an instance of \a key.
      */
-    bool contains(const Key &key) const;
+    [[nodiscard]] bool contains(const Key &key) const;
 
     /*!
      * Erase the item at \a it from the list.
@@ -172,7 +172,7 @@ namespace TagLib {
      * If the map does not contain \a key, it returns defaultValue.
      * If no defaultValue is specified, it returns a default-constructed value.
      */
-    T value(const Key &key, const T &defaultValue = T()) const;
+    [[nodiscard]] T value(const Key &key, const T &defaultValue = T()) const;
 
     /*!
      * Returns a reference to the value associated with \a key.

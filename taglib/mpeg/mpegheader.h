@@ -73,7 +73,7 @@ namespace TagLib {
        * Returns true if the frame is at least an appropriate size and has
        * legal values.
        */
-      bool isValid() const;
+      [[nodiscard]] bool isValid() const;
 
       /*!
        * The MPEG Version.
@@ -90,32 +90,32 @@ namespace TagLib {
       /*!
        * Returns the MPEG Version of the header.
        */
-      Version version() const;
+      [[nodiscard]] Version version() const;
 
       /*!
        * Returns the layer version.  This will be between the values 1-3.
        */
-      int layer() const;
+      [[nodiscard]] int layer() const;
 
       /*!
        * Returns true if the MPEG protection bit is enabled.
        */
-      bool protectionEnabled() const;
+      [[nodiscard]] bool protectionEnabled() const;
 
       /*!
        * Returns the bitrate encoded in the header.
        */
-      int bitrate() const;
+      [[nodiscard]] int bitrate() const;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const;
+      [[nodiscard]] int sampleRate() const;
 
       /*!
        * Returns true if the frame is padded.
        */
-      bool isPadded() const;
+      [[nodiscard]] bool isPadded() const;
 
       /*!
        * There are a few combinations or one or two channel audio that are
@@ -135,27 +135,27 @@ namespace TagLib {
       /*!
        * Returns the channel mode for this frame.
        */
-      ChannelMode channelMode() const;
+      [[nodiscard]] ChannelMode channelMode() const;
 
       /*!
        * Returns true if the copyrighted bit is set.
        */
-      bool isCopyrighted() const;
+      [[nodiscard]] bool isCopyrighted() const;
 
       /*!
        * Returns true if the "original" bit is set.
        */
-      bool isOriginal() const;
+      [[nodiscard]] bool isOriginal() const;
 
       /*!
        * Returns the frame length in bytes.
        */
-      int frameLength() const;
+      [[nodiscard]] int frameLength() const;
 
       /*!
        * Returns the number of frames per sample.
        */
-      int samplesPerFrame() const;
+      [[nodiscard]] int samplesPerFrame() const;
 
       /*!
        * Makes a shallow copy of the header.

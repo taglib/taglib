@@ -69,7 +69,7 @@ namespace TagLib {
        *
        * \see text()
        */
-      String toString() const override;
+      [[nodiscard]] String toString() const override;
 
       /*!
        * Returns the language encoding as a 3 byte encoding as specified by
@@ -79,7 +79,7 @@ namespace TagLib {
        *
        * \see setLanguage()
        */
-      ByteVector language() const;
+      [[nodiscard]] ByteVector language() const;
 
       /*!
        * Returns the description of this comment.
@@ -88,14 +88,14 @@ namespace TagLib {
        *
        * \see setDescription()
        */
-      String description() const;
+      [[nodiscard]] String description() const;
 
       /*!
        * Returns the text of this comment.
        *
        * \see setText()
        */
-      String text() const;
+      [[nodiscard]] String text() const;
 
       /*!
        * Set the language using the 3 byte language code from
@@ -128,7 +128,7 @@ namespace TagLib {
        * \see setTextEncoding()
        * \see render()
        */
-      String::Type textEncoding() const;
+      [[nodiscard]] String::Type textEncoding() const;
 
       /*!
        * Sets the text encoding to be used when rendering this frame to
@@ -148,7 +148,7 @@ namespace TagLib {
        * - otherwise, the key will be "COMMENT:<description>"
        * - The single value will be the frame's text().
        */
-      PropertyMap asProperties() const override;
+      [[nodiscard]] PropertyMap asProperties() const override;
 
       /*!
        * Comments each have a unique description.  This searches for a comment
@@ -163,7 +163,7 @@ namespace TagLib {
       // Reimplementations.
 
       void parseFields(const ByteVector &data) override;
-      ByteVector renderFields() const override;
+      [[nodiscard]] ByteVector renderFields() const override;
 
     private:
       /*!

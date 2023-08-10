@@ -40,12 +40,12 @@ namespace TagLib {
       Properties(const Properties &) = delete;
       Properties &operator=(const Properties &) = delete;
 
-      int bitrate() const override;
-      int sampleRate() const override;
-      int channels() const override;
+      [[nodiscard]] int bitrate() const override;
+      [[nodiscard]] int sampleRate() const override;
+      [[nodiscard]] int channels() const override;
 
-      unsigned int instrumentCount() const;
-      unsigned char lengthInPatterns() const;
+      [[nodiscard]] unsigned int instrumentCount() const;
+      [[nodiscard]] unsigned char lengthInPatterns() const;
 
       void setChannels(int channels);
 

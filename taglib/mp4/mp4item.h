@@ -65,19 +65,19 @@ namespace TagLib {
       Item(const CoverArtList &value);
 
       void setAtomDataType(AtomDataType type);
-      AtomDataType atomDataType() const;
+      [[nodiscard]] AtomDataType atomDataType() const;
 
-      int toInt() const;
-      unsigned char toByte() const;
-      unsigned int toUInt() const;
-      long long toLongLong() const;
-      bool toBool() const;
-      IntPair toIntPair() const;
-      StringList toStringList() const;
-      ByteVectorList toByteVectorList() const;
-      CoverArtList toCoverArtList() const;
+      [[nodiscard]] int toInt() const;
+      [[nodiscard]] unsigned char toByte() const;
+      [[nodiscard]] unsigned int toUInt() const;
+      [[nodiscard]] long long toLongLong() const;
+      [[nodiscard]] bool toBool() const;
+      [[nodiscard]] IntPair toIntPair() const;
+      [[nodiscard]] StringList toStringList() const;
+      [[nodiscard]] ByteVectorList toByteVectorList() const;
+      [[nodiscard]] CoverArtList toCoverArtList() const;
 
-      bool isValid() const;
+      [[nodiscard]] bool isValid() const;
 
     private:
       class ItemPrivate;
