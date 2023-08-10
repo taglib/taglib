@@ -116,7 +116,7 @@ Latin1StringHandler::~Latin1StringHandler() = default;
 
 String Latin1StringHandler::parse(const ByteVector &data) const
 {
-  return String(data, String::Latin1);
+  return { data, String::Latin1 };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,21 +145,21 @@ String ID3v2::Tag::title() const
 {
   if(!d->frameListMap["TIT2"].isEmpty())
     return d->frameListMap["TIT2"].front()->toString();
-  return String();
+  return {};
 }
 
 String ID3v2::Tag::artist() const
 {
   if(!d->frameListMap["TPE1"].isEmpty())
     return d->frameListMap["TPE1"].front()->toString();
-  return String();
+  return {};
 }
 
 String ID3v2::Tag::album() const
 {
   if(!d->frameListMap["TALB"].isEmpty())
     return d->frameListMap["TALB"].front()->toString();
-  return String();
+  return {};
 }
 
 String ID3v2::Tag::comment() const
@@ -167,7 +167,7 @@ String ID3v2::Tag::comment() const
   const FrameList &comments = d->frameListMap["COMM"];
 
   if(comments.isEmpty())
-    return String();
+    return {};
 
   for(auto it = comments.begin(); it != comments.end(); ++it)
   {
@@ -189,13 +189,13 @@ String ID3v2::Tag::genre() const
   const FrameList &tconFrames = d->frameListMap["TCON"];
   if(tconFrames.isEmpty())
   {
-    return String();
+    return {};
   }
 
   auto f = dynamic_cast<TextIdentificationFrame *>(tconFrames.front());
   if(!f)
   {
-    return String();
+    return {};
   }
 
   // ID3v2.4 lists genres as the fields in its frames field list.  If the field
@@ -477,7 +477,7 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   // now create the "one key per frame" frames
   for(auto it = properties.cbegin(); it != properties.cend(); ++it)
     addFrame(Frame::createTextualFrame(it->first, it->second));
-  return PropertyMap(); // ID3 implements the complete PropertyMap interface, so an empty map is returned
+  return {}; // ID3 implements the complete PropertyMap interface, so an empty map is returned
 }
 
 ByteVector ID3v2::Tag::render() const

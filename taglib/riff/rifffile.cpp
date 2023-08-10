@@ -130,7 +130,7 @@ ByteVector RIFF::File::chunkName(unsigned int i) const
 {
   if(i >= d->chunks.size()) {
     debug("RIFF::File::chunkName() - Index out of range. Returning an empty vector.");
-    return ByteVector();
+    return {};
   }
 
   return d->chunks[i].name;
@@ -140,7 +140,7 @@ ByteVector RIFF::File::chunkData(unsigned int i)
 {
   if(i >= d->chunks.size()) {
     debug("RIFF::File::chunkData() - Index out of range. Returning an empty vector.");
-    return ByteVector();
+    return {};
   }
 
   seek(d->chunks[i].offset);

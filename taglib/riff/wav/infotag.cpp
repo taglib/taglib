@@ -59,7 +59,7 @@ StringHandler::~StringHandler() = default;
 
 String RIFF::Info::StringHandler::parse(const ByteVector &data) const
 {
-  return String(data, String::UTF8);
+  return { data, String::UTF8 };
 }
 
 ByteVector RIFF::Info::StringHandler::render(const String &s) const
@@ -173,8 +173,8 @@ FieldListMap RIFF::Info::Tag::fieldListMap() const
 String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 {
   if(d->fieldListMap.contains(id))
-    return String(d->fieldListMap[id]);
-  return String();
+    return d->fieldListMap[id];
+  return {};
 }
 
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
@@ -214,7 +214,7 @@ ByteVector RIFF::Info::Tag::render() const
   }
 
   if(data.size() == 4)
-    return ByteVector();
+    return {};
   return data;
 }
 

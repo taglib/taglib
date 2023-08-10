@@ -83,7 +83,7 @@ namespace TagLib
         if(size != data.size()) {
           data.resize(size);
         }
-        return String(data, String::UTF16LE);
+        return { data, String::UTF16LE };
       }
 
       inline ByteVector renderString(const String &str, bool includeLength = false)

@@ -68,7 +68,7 @@ unsigned int APE::Footer::size()
 
 ByteVector APE::Footer::fileIdentifier()
 {
-  return ByteVector("APETAGEX");
+  return "APETAGEX";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ ByteVector APE::Footer::renderFooter() const
 ByteVector APE::Footer::renderHeader() const
 {
   if(!d->headerPresent)
-    return ByteVector();
+    return {};
   return render(true);
 }
 

@@ -106,7 +106,7 @@ String Ogg::XiphComment::comment() const
     return value.toString();
   }
 
-  return String();
+  return {};
 }
 
 String Ogg::XiphComment::genre() const

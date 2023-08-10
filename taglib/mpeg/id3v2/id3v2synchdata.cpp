@@ -75,7 +75,7 @@ ByteVector SynchData::fromUInt(unsigned int value)
 ByteVector SynchData::decode(const ByteVector &data)
 {
   if (data.size() == 0) {
-    return ByteVector();
+    return {};
   }
 
   // We have this optimized method instead of using ByteVector::replace(),

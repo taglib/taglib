@@ -83,8 +83,8 @@ namespace
 ByteVector Frame::textDelimiter(String::Type t)
 {
   if(t == String::UTF16 || t == String::UTF16BE || t == String::UTF16LE)
-    return ByteVector(2, '\0');
-  return ByteVector(1, '\0');
+    return { 2, '\0' };
+  return { 1, '\0' };
 }
 
 const String Frame::instrumentPrefix("PERFORMER:");
@@ -157,7 +157,7 @@ ByteVector Frame::frameID() const
 {
   if(d->header)
     return d->header->frameID();
-  return ByteVector();
+  return {};
 }
 
 unsigned int Frame::size() const
@@ -240,7 +240,7 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
   if(zlib::isAvailable() && d->header->compression() && !d->header->encryption()) {
     if(frameData.size() <= frameDataOffset) {
       debug("Compressed frame doesn't have enough data to decode");
-      return ByteVector();
+      return {};
     }
 
     const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset));
@@ -266,7 +266,7 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   int end = data.find(delimiter, *position, delimiter.size());
 
   if(end < *position)
-    return String();
+    return {};
 
   String str;
   if(encoding == String::Latin1)
@@ -417,7 +417,7 @@ String Frame::frameIDToKey(const ByteVector &id)
     if(id24 == o)
       return t;
   }
-  return String();
+  return {};
 }
 
 ByteVector Frame::keyToFrameID(const String &s)
@@ -427,7 +427,7 @@ ByteVector Frame::keyToFrameID(const String &s)
     if(key == t)
       return o;
   }
-  return ByteVector();
+  return {};
 }
 
 String Frame::txxxToKey(const String &description)

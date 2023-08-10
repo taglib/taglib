@@ -126,7 +126,7 @@ void ASF::Picture::swap(Picture &other)
 ByteVector ASF::Picture::render() const
 {
   if(!isValid())
-    return ByteVector();
+    return {};
 
   return
     ByteVector(static_cast<char>(d->type)) +

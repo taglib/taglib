@@ -50,7 +50,7 @@ PodcastFrame::~PodcastFrame() = default;
 
 String PodcastFrame::toString() const
 {
-  return String();
+  return {};
 }
 
 PropertyMap PodcastFrame::asProperties() const

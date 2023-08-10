@@ -442,7 +442,7 @@ MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
   StringList header = StringList::split(name, ":");
   if(header.size() != 3) {
     debug("MP4: Invalid free-form item name \"" + name + "\"");
-    return ByteVector();
+    return {};
   }
   ByteVector data;
   data.append(renderAtom("mean", ByteVector::fromUInt(0) + header[1].data(String::UTF8)));
@@ -753,7 +753,7 @@ MP4::Tag::title() const
 {
   if(d->items.contains("\251nam"))
     return d->items["\251nam"].toStringList().toString(", ");
-  return String();
+  return {};
 }
 
 String
@@ -761,7 +761,7 @@ MP4::Tag::artist() const
 {
   if(d->items.contains("\251ART"))
     return d->items["\251ART"].toStringList().toString(", ");
-  return String();
+  return {};
 }
 
 String
@@ -769,7 +769,7 @@ MP4::Tag::album() const
 {
   if(d->items.contains("\251alb"))
     return d->items["\251alb"].toStringList().toString(", ");
-  return String();
+  return {};
 }
 
 String
@@ -777,7 +777,7 @@ MP4::Tag::comment() const
 {
   if(d->items.contains("\251cmt"))
     return d->items["\251cmt"].toStringList().toString(", ");
-  return String();
+  return {};
 }
 
 String
@@ -785,7 +785,7 @@ MP4::Tag::genre() const
 {
   if(d->items.contains("\251gen"))
     return d->items["\251gen"].toStringList().toString(", ");
-  return String();
+  return {};
 }
 
 unsigned int
@@ -977,7 +977,7 @@ namespace
         return t;
     }
 
-    return String();
+    return {};
   }
 }  // namespace
 

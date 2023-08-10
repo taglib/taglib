@@ -84,7 +84,7 @@ void UniqueFileIdentifierFrame::setIdentifier(const ByteVector &v)
 
 String UniqueFileIdentifierFrame::toString() const
 {
-  return String();
+  return {};
 }
 
 PropertyMap UniqueFileIdentifierFrame::asProperties() const

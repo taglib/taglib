@@ -115,7 +115,7 @@ PropertyMap TagUnion::properties() const
     }
   }
 
-  return PropertyMap();
+  return {};
 }
 
 void TagUnion::removeUnsupportedProperties(const StringList &unsupported)

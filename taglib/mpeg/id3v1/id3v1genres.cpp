@@ -250,8 +250,8 @@ ID3v1::GenreMap ID3v1::genreMap()
 String ID3v1::genre(int i)
 {
   if(i >= 0 && i < genres.size())
-    return String(genres[i]); // always make a copy
-  return String();
+    return genres[i]; // always make a copy
+  return {};
 }
 
 int ID3v1::genreIndex(const String &name)

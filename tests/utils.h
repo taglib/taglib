@@ -66,7 +66,7 @@ inline string copyFile(const string &filename, const string &ext)
   ifstream source(sourceFileName.c_str(), std::ios::binary);
   ofstream destination(testFileName, std::ios::binary);
   destination << source.rdbuf();
-  return string(testFileName);
+  return testFileName;
 }
 
 inline void deleteFile(const string &filename)
@@ -118,7 +118,7 @@ namespace TagLib {
         text[i] = chars[rand() % 53];
     }
 
-    return String(text);
+    return text;
   }
 } // namespace TagLib
 

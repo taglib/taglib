@@ -68,7 +68,7 @@ FileName ByteVectorStream::name() const
 ByteVector ByteVectorStream::readBlock(size_t length)
 {
   if(length == 0)
-    return ByteVector();
+    return {};
 
   ByteVector v = d->data.mid(static_cast<unsigned int>(d->position),
                              static_cast<unsigned int>(length));

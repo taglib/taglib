@@ -184,8 +184,8 @@ namespace TagLib
         va_end(args);
 
         if(length > 0)
-          return String(buf);
-        return String();
+          return buf;
+        return {};
       }
 
       /*!

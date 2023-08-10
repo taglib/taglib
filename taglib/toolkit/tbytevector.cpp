@@ -157,7 +157,7 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
   if(swap)
     value = Utils::byteSwap(value);
 
-  return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));
+  return { reinterpret_cast<const char *>(&value), sizeof(T) };
 }
 
 template <typename TFloat, typename TInt, Utils::ByteOrder ENDIAN>
@@ -192,7 +192,7 @@ ByteVector fromFloat(TFloat value)
   if(ENDIAN != Utils::systemByteOrder())
     tmp.i = Utils::byteSwap(tmp.i);
 
-  return ByteVector(reinterpret_cast<char *>(&tmp), sizeof(TInt));
+  return { reinterpret_cast<char *>(&tmp), sizeof(TInt) };
 }
 
 template <Utils::ByteOrder ENDIAN>
@@ -281,8 +281,8 @@ public:
 ByteVector ByteVector::fromCString(const char *s, unsigned int length)
 {
   if(length == 0xffffffff)
-    return ByteVector(s, static_cast<unsigned int>(::strlen(s)));
-  return ByteVector(s, length);
+    return { s, static_cast<unsigned int>(::strlen(s)) };
+  return { s, length };
 }
 
 ByteVector ByteVector::fromUInt(unsigned int value, bool mostSignificantByteFirst)
@@ -389,7 +389,7 @@ ByteVector ByteVector::mid(unsigned int index, unsigned int length) const
   index  = std::min(index, size());
   length = std::min(length, size() - index);
 
-  return ByteVector(*this, index, length);
+  return { *this, index, length };
 }
 
 char ByteVector::at(unsigned int index) const
@@ -906,7 +906,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
     output.resize(static_cast<unsigned int>(dst - reinterpret_cast<unsigned char*>(output.data())));
     return output;
   }
-  return ByteVector();
+  return {};
 }
 
 ByteVector ByteVector::toBase64() const
@@ -940,7 +940,7 @@ ByteVector ByteVector::toBase64() const
     }
     return output;
   }
-  return ByteVector();
+  return {};
 }
 
 

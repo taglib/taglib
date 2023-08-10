@@ -209,7 +209,7 @@ String APE::Item::toString() const
 {
   if(d->type == Text && !isEmpty())
     return d->text.front();
-  return String();
+  return {};
 }
 
 bool APE::Item::isEmpty() const

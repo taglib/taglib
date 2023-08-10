@@ -62,7 +62,7 @@ EventTimingCodesFrame::~EventTimingCodesFrame() = default;
 
 String EventTimingCodesFrame::toString() const
 {
-  return String();
+  return {};
 }
 
 EventTimingCodesFrame::TimestampFormat

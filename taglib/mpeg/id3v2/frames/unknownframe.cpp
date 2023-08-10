@@ -49,7 +49,7 @@ UnknownFrame::~UnknownFrame() = default;
 
 String UnknownFrame::toString() const
 {
-  return String();
+  return {};
 }
 
 ByteVector UnknownFrame::data() const

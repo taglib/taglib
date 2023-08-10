@@ -58,7 +58,7 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
 
   if(inflateInit(&stream) != Z_OK) {
     debug("zlib::decompress() - Failed to initialize zlib.");
-    return ByteVector();
+    return {};
   }
 
   ByteVector inData = data;
@@ -88,7 +88,7 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
         inflateEnd(&stream);
 
       debug("zlib::decompress() - Error reading compressed stream.");
-      return ByteVector();
+      return {};
     }
 
     outData.resize(outData.size() - stream.avail_out);

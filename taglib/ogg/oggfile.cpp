@@ -91,7 +91,7 @@ ByteVector Ogg::File::packet(unsigned int i)
 
   if(!readPages(i)) {
     debug("Ogg::File::packet() -- Could not find the requested packet.");
-    return ByteVector();
+    return {};
   }
 
   // Look for the first page in which the requested packet starts.

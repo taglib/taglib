@@ -93,7 +93,7 @@ ByteVector TagLib::Utils::readHeader(IOStream *stream, unsigned int length,
                                      bool skipID3v2, offset_t *headerOffset)
 {
   if(!stream || !stream->isOpen())
-    return ByteVector();
+    return {};
 
   const offset_t originalPosition = stream->tell();
   offset_t bufferOffset = 0;

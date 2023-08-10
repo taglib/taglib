@@ -53,12 +53,12 @@ String Mod::Tag::title() const
 
 String Mod::Tag::artist() const
 {
-  return String();
+  return {};
 }
 
 String Mod::Tag::album() const
 {
-  return String();
+  return {};
 }
 
 String Mod::Tag::comment() const
@@ -68,7 +68,7 @@ String Mod::Tag::comment() const
 
 String Mod::Tag::genre() const
 {
-  return String();
+  return {};
 }
 
 unsigned int Mod::Tag::year() const

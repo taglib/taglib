@@ -267,7 +267,7 @@ String::~String() = default;
 std::string String::to8Bit(bool unicode) const
 {
   const ByteVector v = data(unicode ? UTF8 : Latin1);
-  return std::string(v.data(), v.size());
+  return { v.data(), v.size() };
 }
 
 TagLib::wstring String::toWString() const
@@ -355,7 +355,7 @@ String String::substr(unsigned int position, unsigned int n) const
 {
   if(position == 0 && n >= size())
     return *this;
-  return String(d->data.substr(position, n));
+  return { d->data.substr(position, n) };
 }
 
 String &String::append(const String &s)
@@ -475,7 +475,7 @@ ByteVector String::data(Type t) const
   default:
     {
       debug("String::data() - Invalid Type value.");
-      return ByteVector();
+      return {};
     }
   }
 }
@@ -502,7 +502,7 @@ String String::stripWhiteSpace() const
 
   const size_t pos1 = d->data.find_first_not_of(WhiteSpaceChars);
   if(pos1 == std::wstring::npos)
-    return String();
+    return {};
 
   const size_t pos2 = d->data.find_last_not_of(WhiteSpaceChars);
   return substr(static_cast<unsigned int>(pos1), static_cast<unsigned int>(pos2 - pos1 + 1));

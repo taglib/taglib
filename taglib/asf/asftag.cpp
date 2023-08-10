@@ -62,7 +62,7 @@ String ASF::Tag::album() const
 {
   if(d->attributeListMap.contains("WM/AlbumTitle"))
     return d->attributeListMap["WM/AlbumTitle"][0].toString();
-  return String();
+  return {};
 }
 
 String ASF::Tag::copyright() const
@@ -104,7 +104,7 @@ String ASF::Tag::genre() const
 {
   if(d->attributeListMap.contains("WM/Genre"))
     return d->attributeListMap["WM/Genre"][0].toString();
-  return String();
+  return {};
 }
 
 void ASF::Tag::setTitle(const String &value)
@@ -264,7 +264,7 @@ namespace
         return t;
     }
 
-    return String();
+    return {};
   }
 }  // namespace
 
