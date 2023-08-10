@@ -37,23 +37,55 @@ using namespace TagLib;
 class PublicRIFF : public RIFF::File
 {
 public:
-  PublicRIFF(FileName file) : RIFF::File(file, BigEndian) {};
-  unsigned int riffSize() { return RIFF::File::riffSize(); };
-  unsigned int chunkCount() { return RIFF::File::chunkCount(); };
-  offset_t chunkOffset(unsigned int i) { return RIFF::File::chunkOffset(i); };
-  unsigned int chunkPadding(unsigned int i) { return RIFF::File::chunkPadding(i); };
-  unsigned int chunkDataSize(unsigned int i) { return RIFF::File::chunkDataSize(i); };
-  ByteVector chunkName(unsigned int i) { return RIFF::File::chunkName(i); };
-  ByteVector chunkData(unsigned int i) { return RIFF::File::chunkData(i); };
+  PublicRIFF(FileName file) : RIFF::File(file, BigEndian)
+  {
+  }
+  unsigned int riffSize()
+  {
+    return RIFF::File::riffSize();
+  }
+  unsigned int chunkCount()
+  {
+    return RIFF::File::chunkCount();
+  }
+  offset_t chunkOffset(unsigned int i)
+  {
+    return RIFF::File::chunkOffset(i);
+  }
+  unsigned int chunkPadding(unsigned int i)
+  {
+    return RIFF::File::chunkPadding(i);
+  }
+  unsigned int chunkDataSize(unsigned int i)
+  {
+    return RIFF::File::chunkDataSize(i);
+  }
+  ByteVector chunkName(unsigned int i)
+  {
+    return RIFF::File::chunkName(i);
+  }
+  ByteVector chunkData(unsigned int i)
+  {
+    return RIFF::File::chunkData(i);
+  }
   void setChunkData(unsigned int i, const ByteVector &data) {
     RIFF::File::setChunkData(i, data);
   }
   void setChunkData(const ByteVector &name, const ByteVector &data) {
     RIFF::File::setChunkData(name, data);
-  };
-  TagLib::Tag* tag() const override { return nullptr; };
-  TagLib::AudioProperties* audioProperties() const override { return nullptr;};
-  bool save() override { return false; };
+  }
+  TagLib::Tag *tag() const override
+  {
+    return nullptr;
+  }
+  TagLib::AudioProperties *audioProperties() const override
+  {
+    return nullptr;
+  }
+  bool save() override
+  {
+    return false;
+  }
   void removeChunk(unsigned int i) { RIFF::File::removeChunk(i); }
   void removeChunk(const ByteVector &name) { RIFF::File::removeChunk(name); }
 };
