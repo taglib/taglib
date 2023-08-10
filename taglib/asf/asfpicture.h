@@ -78,7 +78,7 @@ namespace TagLib
       /*!
        * Exchanges the content of the Picture by the content of \a other.
        */
-      void swap(Picture &other);
+      void swap(Picture &other) noexcept;
 
       /*!
        * Returns true if Picture stores valid picture

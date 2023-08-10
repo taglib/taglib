@@ -50,7 +50,7 @@ namespace TagLib {
       /*!
        * Exchanges the content of the Item by the content of \a item.
        */
-      void swap(Item &item);
+      void swap(Item &item) noexcept;
 
       virtual ~Item();
 

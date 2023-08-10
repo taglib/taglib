@@ -363,7 +363,7 @@ namespace TagLib {
     /*!
      * Exchanges the content of the FileRef by the content of \a ref.
      */
-    void swap(FileRef &ref);
+    void swap(FileRef &ref) noexcept;
 
     /*!
      * Returns true if this FileRef and \a ref point to the same File object.

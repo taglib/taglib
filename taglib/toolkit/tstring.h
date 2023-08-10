@@ -498,7 +498,7 @@ namespace TagLib {
     /*!
      * Exchanges the content of the String by the content of \a s.
      */
-    void swap(String &s);
+    void swap(String &s) noexcept;
 
     /*!
      * To be able to use this class in a Map, this operator needed to be

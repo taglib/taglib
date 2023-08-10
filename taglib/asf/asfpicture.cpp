@@ -107,7 +107,7 @@ int ASF::Picture::dataSize() const
 
 ASF::Picture &ASF::Picture::operator=(const ASF::Picture &) = default;
 
-void ASF::Picture::swap(Picture &other)
+void ASF::Picture::swap(Picture &other) noexcept
 {
   using std::swap;
 

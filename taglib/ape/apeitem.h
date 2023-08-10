@@ -85,7 +85,7 @@ namespace TagLib {
       /*!
        * Exchanges the content of this item by the content of \a item.
        */
-      void swap(Item &item);
+      void swap(Item &item) noexcept;
 
       /*!
        * Returns the key.

@@ -660,7 +660,7 @@ String &String::operator=(const ByteVector &v)
   return *this;
 }
 
-void String::swap(String &s)
+void String::swap(String &s) noexcept
 {
   using std::swap;
 

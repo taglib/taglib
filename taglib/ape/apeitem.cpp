@@ -85,7 +85,7 @@ Item &APE::Item::operator=(const Item &item)
   return *this;
 }
 
-void APE::Item::swap(Item &item)
+void APE::Item::swap(Item &item) noexcept
 {
   using std::swap;
 
