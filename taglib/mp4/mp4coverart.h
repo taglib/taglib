@@ -60,7 +60,7 @@ namespace TagLib {
       /*!
        * Exchanges the content of the CoverArt by the content of \a item.
        */
-      void swap(CoverArt &item);
+      void swap(CoverArt &item) noexcept;
 
       //! Format of the image
       Format format() const;

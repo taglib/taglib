@@ -111,7 +111,7 @@ ASF::Attribute::Attribute(bool value) :
 
 ASF::Attribute &ASF::Attribute::operator=(const ASF::Attribute &) = default;
 
-void ASF::Attribute::swap(Attribute &other)
+void ASF::Attribute::swap(Attribute &other) noexcept
 {
   using std::swap;
 

@@ -116,7 +116,7 @@ namespace TagLib
       /*!
        * Exchanges the content of the Attribute by the content of \a other.
        */
-      void swap(Attribute &other);
+      void swap(Attribute &other) noexcept;
 
       /*!
        * Destroys the attribute.
