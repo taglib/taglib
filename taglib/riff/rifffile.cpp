@@ -236,7 +236,7 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
   chunk.offset  = offset + 8;
   chunk.padding = data.size() % 2;
 
-  d->chunks.push_back(chunk);
+  d->chunks.push_back(std::move(chunk));
 
   // Update the global size.
 
@@ -338,7 +338,7 @@ void RIFF::File::read()
       }
     }
 
-    d->chunks.push_back(chunk);
+    d->chunks.push_back(std::move(chunk));
   }
 }
 
