@@ -30,6 +30,8 @@
 
 #include "riffutils.h"
 
+#include <utility>
+
 using namespace TagLib;
 using namespace RIFF::Info;
 
@@ -199,12 +201,12 @@ ByteVector RIFF::Info::Tag::render() const
 {
   ByteVector data("INFO");
 
-  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
-    ByteVector text = stringHandler->render(it->second);
+  for(const auto &[field, list] : std::as_const(d->fieldListMap)) {
+    ByteVector text = stringHandler->render(list);
     if(text.isEmpty())
       continue;
 
-    data.append(it->first);
+    data.append(field);
     data.append(ByteVector::fromUInt(text.size() + 1, false));
     data.append(text);
 

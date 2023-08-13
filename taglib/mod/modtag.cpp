@@ -28,6 +28,8 @@
 #include "tstringlist.h"
 #include "tpropertymap.h"
 
+#include <utility>
+
 using namespace TagLib;
 using namespace Mod;
 
@@ -156,11 +158,11 @@ PropertyMap Mod::Tag::setProperties(const PropertyMap &origProps)
 
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.
-  for(auto it = oneValueSet.cbegin(); it != oneValueSet.cend(); ++it) {
-    if(properties[*it].size() == 1)
-      properties.erase(*it);
+  for(const auto &entry : std::as_const(oneValueSet)) {
+    if(properties[entry].size() == 1)
+      properties.erase(entry);
     else
-      properties[*it].erase( properties[*it].begin() );
+      properties[entry].erase(properties[entry].begin());
   }
   return properties;
 }

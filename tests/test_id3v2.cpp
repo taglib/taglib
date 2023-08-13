@@ -1631,13 +1631,12 @@ public:
     CPPUNIT_ASSERT(f.isValid());
 
     ID3v2::Tag *tag = f.ID3v2Tag();
-    const ID3v2::FrameList &frames = tag->frameList();
-    CPPUNIT_ASSERT_EQUAL(130U, frames.size());
+    CPPUNIT_ASSERT_EQUAL(130U, tag->frameList().size());
     int i = 0;
-    for(auto it = frames.begin(); it != frames.end(); ++it, ++i) {
+    for(const auto &frame : tag->frameList()) {
       if(i > 0) {
-        CPPUNIT_ASSERT_EQUAL(ByteVector("CHAP"), (*it)->frameID());
-        auto chapFrame = dynamic_cast<const ID3v2::ChapterFrame *>(*it);
+        CPPUNIT_ASSERT_EQUAL(ByteVector("CHAP"), frame->frameID());
+        auto chapFrame = dynamic_cast<const ID3v2::ChapterFrame *>(frame);
         CPPUNIT_ASSERT_EQUAL(ByteVector("chapter") +
                              ByteVector(String::number(i - 1).toCString()),
                              chapFrame->elementID());
@@ -1654,8 +1653,8 @@ public:
                              tit2Frame->fieldList().front());
       }
       else {
-        CPPUNIT_ASSERT_EQUAL(ByteVector("CTOC"), (*it)->frameID());
-        auto ctocFrame = dynamic_cast<const ID3v2::TableOfContentsFrame *>(*it);
+        CPPUNIT_ASSERT_EQUAL(ByteVector("CTOC"), frame->frameID());
+        auto ctocFrame = dynamic_cast<const ID3v2::TableOfContentsFrame *>(frame);
         CPPUNIT_ASSERT_EQUAL(ByteVector("toc"), ctocFrame->elementID());
         CPPUNIT_ASSERT(!ctocFrame->isTopLevel());
         CPPUNIT_ASSERT(!ctocFrame->isOrdered());
@@ -1667,6 +1666,7 @@ public:
         CPPUNIT_ASSERT(tit2Frame);
         CPPUNIT_ASSERT_EQUAL(StringList("toplevel toc"), tit2Frame->fieldList());
       }
+      ++i;
     }
 
     CPPUNIT_ASSERT(!ID3v2::ChapterFrame::findByElementID(tag, "chap2"));

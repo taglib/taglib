@@ -50,6 +50,7 @@
 #include "frames/podcastframe.h"
 
 #include <array>
+#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -61,8 +62,7 @@ namespace
     StringList fields = frame->fieldList();
     StringList newfields;
 
-    for(auto it = fields.cbegin(); it != fields.cend(); ++it) {
-      String s = *it;
+    for(auto s : std::as_const(fields)) {
       int offset = 0;
       int end = 0;
 

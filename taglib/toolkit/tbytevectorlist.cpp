@@ -85,12 +85,9 @@ ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
 {
   ByteVector v;
 
-  auto it = begin();
-
-  while(it != end()) {
+  for(auto it = begin(); it != end(); ++it) {
     v.append(*it);
-    it++;
-    if(it != end())
+    if(std::next(it) != end())
       v.append(separator);
   }
 

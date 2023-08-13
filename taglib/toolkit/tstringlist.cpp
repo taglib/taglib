@@ -77,8 +77,8 @@ StringList::StringList(const String &s)
 
 StringList::StringList(const ByteVectorList &bl, String::Type t)
 {
-  for(auto i = bl.begin(); i != bl.end(); i++) {
-    append(String(*i, t));
+  for(const auto &byte : bl) {
+    append(String(byte, t));
   }
 }
 
@@ -88,13 +88,9 @@ String StringList::toString(const String &separator) const
 {
   String s;
 
-  auto it = begin();
-  auto itEnd = end();
-
-  while(it != itEnd) {
+  for(auto it = begin(); it != end(); ++it) {
     s += *it;
-    it++;
-    if(it != itEnd)
+    if(std::next(it) != end())
       s += separator;
   }
 

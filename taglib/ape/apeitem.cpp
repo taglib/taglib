@@ -28,6 +28,8 @@
 #include "tbytevectorlist.h"
 #include "tdebug.h"
 
+#include <utility>
+
 using namespace TagLib;
 using namespace APE;
 
@@ -174,12 +176,9 @@ int APE::Item::size() const
   switch(d->type) {
     case Text:
       if(!d->text.isEmpty()) {
-        auto it = d->text.cbegin();
-
-        result += it->data(String::UTF8).size();
-        it++;
-        for(; it != d->text.cend(); ++it)
-          result += 1 + it->data(String::UTF8).size();
+        for(const auto &t : std::as_const(d->text))
+          result += 1 + t.data(String::UTF8).size();
+        result -= 1;
       }
       break;
 
@@ -264,8 +263,7 @@ ByteVector APE::Item::render() const
     auto it = d->text.cbegin();
 
     value.append(it->data(String::UTF8));
-    it++;
-    for(; it != d->text.cend(); ++it) {
+    for(it = std::next(it); it != d->text.cend(); ++it) {
       value.append('\0');
       value.append(it->data(String::UTF8));
     }

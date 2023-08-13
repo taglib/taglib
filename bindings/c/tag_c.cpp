@@ -38,6 +38,7 @@
 #include "mp4file.h"
 #include "tag.h"
 #include <cstring>
+#include <utility>
 #include "id3v2framefactory.h"
 #include "tpropertymap.h"
 
@@ -259,8 +260,8 @@ void taglib_tag_free_strings()
   if(!stringManagementEnabled)
     return;
 
-  for(auto it = strings.cbegin(); it != strings.cend(); ++it)
-    free(*it);
+  for(auto &string : std::as_const(strings))
+    free(string);
   strings.clear();
 }
 

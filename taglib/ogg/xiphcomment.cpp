@@ -31,6 +31,8 @@
 #include "flacpicture.h"
 #include "tpropertymap.h"
 
+#include <utility>
+
 using namespace TagLib;
 
 namespace
@@ -196,8 +198,8 @@ unsigned int Ogg::XiphComment::fieldCount() const
 {
   unsigned int count = 0;
 
-  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
-    count += (*it).second.size();
+  for(const auto &[_, list] : std::as_const(d->fieldListMap))
+    count += list.size();
 
   count += d->pictureList.size();
 
@@ -218,31 +220,27 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
 {
   // check which keys are to be deleted
   StringList toRemove;
-  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it)
-    if (!properties.contains(it->first))
-      toRemove.append(it->first);
+  for(const auto &[field, _] : std::as_const(d->fieldListMap))
+    if(!properties.contains(field))
+      toRemove.append(field);
 
-  for(auto it = toRemove.cbegin(); it != toRemove.cend(); ++it)
-      removeFields(*it);
+  for(const auto &field : std::as_const(toRemove))
+    removeFields(field);
 
   // now go through keys in \a properties and check that the values match those in the xiph comment
   PropertyMap invalid;
-  for(auto it = properties.begin(); it != properties.end(); ++it)
-  {
-    if(!checkKey(it->first))
-      invalid.insert(it->first, it->second);
-    else if(!d->fieldListMap.contains(it->first) || !(it->second == d->fieldListMap[it->first])) {
-      const StringList &sl = it->second;
+  for(const auto &[key, sl] : properties) {
+    if(!checkKey(key))
+      invalid.insert(key, sl);
+    else if(!d->fieldListMap.contains(key) || !(sl == d->fieldListMap[key])) {
       if(sl.isEmpty())
         // zero size string list -> remove the tag with all values
-        removeFields(it->first);
+        removeFields(key);
       else {
         // replace all strings in the list for the tag
-        auto valueIterator = sl.begin();
-        addField(it->first, *valueIterator, true);
-        ++valueIterator;
-        for(; valueIterator != sl.end(); ++valueIterator)
-          addField(it->first, *valueIterator, false);
+        addField(key, *sl.begin(), true);
+        for(auto it = std::next(sl.begin()); it != sl.end(); ++it)
+          addField(key, *it, false);
       }
     }
   }
@@ -353,25 +351,20 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   // std::pair<String, StringList> where the first String is the field name and
   // the StringList is the values associated with that field.
 
-  for(auto it = d->fieldListMap.cbegin(); it != d->fieldListMap.cend(); ++it) {
-
+  for(const auto &[fieldName, values] : std::as_const(d->fieldListMap)) {
     // And now iterate over the values of the current list.
-
-    String fieldName = (*it).first;
-    const StringList values = (*it).second;
-
-    for(auto valuesIt = values.begin(); valuesIt != values.end(); ++valuesIt) {
+    for(const auto &value : values) {
       ByteVector fieldData = fieldName.data(String::UTF8);
       fieldData.append('=');
-      fieldData.append((*valuesIt).data(String::UTF8));
+      fieldData.append(value.data(String::UTF8));
 
       data.append(ByteVector::fromUInt(fieldData.size(), false));
       data.append(fieldData);
     }
   }
 
-  for(auto it = d->pictureList.cbegin(); it != d->pictureList.cend(); ++it) {
-    ByteVector picture = (*it)->render().toBase64();
+  for(const auto &p : std::as_const(d->pictureList)) {
+    ByteVector picture = p->render().toBase64();
     data.append(ByteVector::fromUInt(picture.size() + 23, false));
     data.append("METADATA_BLOCK_PICTURE=");
     data.append(picture);

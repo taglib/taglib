@@ -199,8 +199,8 @@ void Header::parse(const ByteVector &data)
     return;
   }
 
-  for(auto it = sizeData.begin(); it != sizeData.end(); it++) {
-    if(static_cast<unsigned char>(*it) >= 128) {
+  for(const auto &size : sizeData) {
+    if(static_cast<unsigned char>(size) >= 128) {
       d->tagSize = 0;
       debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
       return;

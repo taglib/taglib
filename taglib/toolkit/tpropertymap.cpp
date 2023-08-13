@@ -27,6 +27,8 @@
 
 using namespace TagLib;
 
+#include <utility>
+
 class PropertyMap::PropertyMapPrivate
 {
 public:
@@ -49,7 +51,7 @@ PropertyMap::PropertyMap(const PropertyMap &m) :
 PropertyMap::PropertyMap(const SimplePropertyMap &m) :
   d(std::make_unique<PropertyMapPrivate>())
 {
-  for(auto [key, value] : m) {
+  for(const auto &[key, value] : m) {
     if(!key.isEmpty())
       insert(key.upper(), value);
     else
@@ -106,15 +108,15 @@ PropertyMap &PropertyMap::erase(const String &key)
 
 PropertyMap &PropertyMap::erase(const PropertyMap &other)
 {
-  for(auto it = other.begin(); it != other.end(); ++it)
-    erase(it->first);
+  for(const auto &[property, _] : other)
+    erase(property);
   return *this;
 }
 
 PropertyMap &PropertyMap::merge(const PropertyMap &other)
 {
-  for(auto it = other.begin(); it != other.end(); ++it)
-    insert(it->first, it->second);
+  for(const auto &[property, value] : other)
+    insert(property, value);
   d->unsupported.append(other.d->unsupported);
   return *this;
 }
@@ -137,14 +139,14 @@ StringList &PropertyMap::operator[](const String &key)
 
 bool PropertyMap::operator==(const PropertyMap &other) const
 {
-  for(auto it = other.begin(); it != other.end(); ++it) {
-    auto thisFind = find(it->first);
-    if( thisFind == end() || (thisFind->second != it->second) )
+  for(const auto &[property, value] : other) {
+    auto thisFind = find(property);
+    if(thisFind == end() || (thisFind->second != value))
       return false;
   }
-  for(auto it = begin(); it != end(); ++it) {
-    auto otherFind = other.find(it->first);
-    if( otherFind == other.end() || (otherFind->second != it->second) )
+  for(const auto &[property, value] : *this) {
+    auto otherFind = other.find(property);
+    if(otherFind == other.end() || (otherFind->second != value))
       return false;
   }
   return d->unsupported == other.d->unsupported;
@@ -159,8 +161,8 @@ String PropertyMap::toString() const
 {
   String ret;
 
-  for(auto it = begin(); it != end(); ++it)
-    ret += it->first+"="+it->second.toString(", ") + "\n";
+  for(const auto &[property, value] : *this)
+    ret += property + "=" + value.toString(", ") + "\n";
   if(!d->unsupported.isEmpty())
     ret += "Unsupported Data: " + d->unsupported.toString(", ") + "\n";
   return ret;
@@ -169,9 +171,9 @@ String PropertyMap::toString() const
 void PropertyMap::removeEmpty()
 {
   PropertyMap m;
-  for(auto it = cbegin(); it != cend(); ++it) {
-    if(!it->second.isEmpty())
-      m.insert(it->first, it->second);
+  for(const auto &[property, value] : std::as_const(*this)) {
+    if(!value.isEmpty())
+      m.insert(property, value);
   }
   *this = m;
 }
