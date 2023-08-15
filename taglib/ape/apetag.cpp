@@ -58,14 +58,8 @@ namespace
     static constexpr std::array invalidKeys { "ID3", "TAG", "OGGS", "MP+" };
 
     // only allow printable ASCII including space (32..126)
-
-    for(auto it = key.begin(); it != key.end(); ++it) {
-      const int c = static_cast<unsigned char>(*it);
-      if(c < 32 || c > 126)
-        return false;
-    }
-
-    return std::none_of(invalidKeys.begin(), invalidKeys.end(), [upperKey = String(key).upper()](auto k) { return upperKey == k; });
+    return std::none_of(key.begin(), key.end(), [](unsigned char c) { return c < 32 || c > 126; })
+      && std::none_of(invalidKeys.begin(), invalidKeys.end(), [upperKey = String(key).upper()](auto k) { return upperKey == k; });
   }
 }  // namespace
 
