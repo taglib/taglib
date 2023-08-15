@@ -156,8 +156,8 @@ namespace TagLib {
   namespace Ogg {
     namespace Vorbis {
       using File = TagLib::Vorbis::File;
-    }
-  }
+    } // namespace Vorbis
+  } // namespace Ogg
 #endif
 
 }  // namespace TagLib
