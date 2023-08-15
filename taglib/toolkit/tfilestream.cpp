@@ -73,8 +73,7 @@ namespace
     DWORD length;
     if(ReadFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
       return static_cast<size_t>(length);
-    else
-      return 0;
+    return 0;
   }
 
   size_t writeFile(FileHandle file, const ByteVector &buffer)
@@ -82,8 +81,7 @@ namespace
     DWORD length;
     if(WriteFile(file, buffer.data(), static_cast<DWORD>(buffer.size()), &length, NULL))
       return static_cast<size_t>(length);
-    else
-      return 0;
+    return 0;
   }
 
 #else   // _WIN32
@@ -428,10 +426,9 @@ offset_t FileStream::tell() const
   if(SetFilePointerEx(d->file, zero, &position, FILE_CURRENT)) {
     return position.QuadPart;
   }
-  else {
-    debug("FileStream::tell() -- Failed to get the file pointer.");
-    return 0;
-  }
+
+  debug("FileStream::tell() -- Failed to get the file pointer.");
+  return 0;
 
 #else
 
@@ -454,10 +451,9 @@ offset_t FileStream::length()
   if(GetFileSizeEx(d->file, &fileSize)) {
     return fileSize.QuadPart;
   }
-  else {
-    debug("FileStream::length() -- Failed to get the file size.");
-    return 0;
-  }
+
+  debug("FileStream::length() -- Failed to get the file size.");
+  return 0;
 
 #else
 
