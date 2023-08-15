@@ -54,11 +54,11 @@ namespace TagLib {
     // Not all the specializations of Map can use the class keyword
     // (when T is not actually a class type), so don't apply this
     // generally.
-    typedef typename std::map<class Key, class T>::iterator Iterator;
-    typedef typename std::map<class Key, class T>::const_iterator ConstIterator;
+    using Iterator = typename std::map<class Key, class T>::iterator;
+    using ConstIterator = typename std::map<class Key, class T>::const_iterator;
 #else
-    typedef typename std::map<Key, T>::iterator Iterator;
-    typedef typename std::map<Key, T>::const_iterator ConstIterator;
+    using Iterator = typename std::map<Key, T>::iterator;
+    using ConstIterator = typename std::map<Key, T>::const_iterator;
 #endif
 #endif
 

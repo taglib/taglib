@@ -37,7 +37,7 @@
 
 namespace TagLib {
   namespace MP4 {
-    typedef TagLib::Map<String, Item> ItemMap;
+    using ItemMap = TagLib::Map<String, Item>;
 
     class TAGLIB_EXPORT Tag: public TagLib::Tag
     {

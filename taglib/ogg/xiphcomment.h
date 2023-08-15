@@ -50,7 +50,7 @@ namespace TagLib {
      *
      * \see XiphComment::fieldListMap()
      */
-    typedef Map<String, StringList> FieldListMap;
+    using FieldListMap = Map<String, StringList>;
 
     //! Ogg Vorbis comment implementation
 

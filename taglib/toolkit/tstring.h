@@ -86,8 +86,8 @@ namespace TagLib {
   public:
 
 #ifndef DO_NOT_DOCUMENT
-    typedef TagLib::wstring::iterator Iterator;
-    typedef TagLib::wstring::const_iterator ConstIterator;
+    using Iterator = TagLib::wstring::iterator;
+    using ConstIterator = TagLib::wstring::const_iterator;
 #endif
 
     /**

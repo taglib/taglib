@@ -51,7 +51,7 @@ namespace TagLib {
     const std::wstring m_wname;
   };
 #else
-  typedef const char *FileName;
+  using FileName = const char *;
 #endif
 
   //! An abstract class that provides operations on a sequence of bytes

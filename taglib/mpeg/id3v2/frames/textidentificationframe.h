@@ -36,7 +36,7 @@ namespace TagLib {
   namespace ID3v2 {
 
     class Tag;
-    typedef Map<String, String> KeyConversionMap;
+    using KeyConversionMap = Map<String, String>;
 
     //! An ID3v2 text identification frame implementation
 

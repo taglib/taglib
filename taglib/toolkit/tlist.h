@@ -55,8 +55,8 @@ namespace TagLib {
   {
   public:
 #ifndef DO_NOT_DOCUMENT
-    typedef typename std::list<T>::iterator Iterator;
-    typedef typename std::list<T>::const_iterator ConstIterator;
+    using Iterator = typename std::list<T>::iterator;
+    using ConstIterator = typename std::list<T>::const_iterator;
 #endif
 
     /*!

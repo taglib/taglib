@@ -41,7 +41,7 @@ namespace TagLib {
   namespace RIFF {
   namespace Info {
 
-    typedef Map<ByteVector, String> FieldListMap;
+    using FieldListMap = Map<ByteVector, String>;
 
     //! A abstraction for the string to data encoding in Info tags.
 
