@@ -183,6 +183,9 @@ StringList &PropertyMap::unsupportedData()
 
 PropertyMap &PropertyMap::operator=(const PropertyMap &other)
 {
+  if(this == &other)
+    return *this;
+
   SimplePropertyMap::operator=(other);
   *d = *other.d;
   return *this;
