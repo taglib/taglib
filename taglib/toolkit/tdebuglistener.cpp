@@ -44,10 +44,10 @@ namespace
 #ifdef _WIN32
 
       const wstring wstr = msg.toWString();
-      const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, NULL, 0, NULL, NULL);
+      const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
       if(len != 0) {
         std::vector<char> buf(len);
-        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &buf[0], len, NULL, NULL);
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &buf[0], len, nullptr, nullptr);
 
         std::cerr << std::string(&buf[0]);
       }
