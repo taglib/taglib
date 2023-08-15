@@ -47,7 +47,7 @@ namespace
 
     return wstr;
   }
-}
+} // namespace
 
 FileName::FileName(const wchar_t *name) :
   m_wname(name)
