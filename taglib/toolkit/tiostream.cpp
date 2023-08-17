@@ -59,10 +59,7 @@ FileName::FileName(const char *name) :
 {
 }
 
-FileName::FileName(const FileName &name) :
-  m_wname(name.m_wname)
-{
-}
+FileName::FileName(const FileName &name) = default;
 
 FileName::operator const wchar_t *() const
 {
