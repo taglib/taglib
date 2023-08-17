@@ -38,7 +38,7 @@ namespace
 {
   std::wstring ansiToUnicode(const char *str)
   {
-    const int len = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
+    const int len = MultiByteToWideChar(CP_ACP, 0, str, -1, nullptr, 0);
     if(len == 0)
       return std::wstring();
 

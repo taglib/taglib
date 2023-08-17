@@ -77,7 +77,7 @@ namespace
   {
 #ifdef _WIN32
     if(::wcslen(fileName) == 0)
-      return 0;
+      return nullptr;
 #else
     if(::strlen(fileName) == 0)
       return nullptr;
