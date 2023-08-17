@@ -37,8 +37,6 @@ namespace TagLib {
 
   namespace MPEG {
 
-    class File;
-
     //! An implementation of the Xing/VBRI headers
 
     /*!
