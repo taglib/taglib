@@ -24,8 +24,8 @@
  ***************************************************************************/
 
 #include "s3mfile.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
@@ -55,73 +55,61 @@ static const String commentAfter(
   "as multiline comments.\n"
   "---------------------------");
 
-class TestS3M : public CppUnit::TestFixture
+void testRead(FileName fileName, const String &title, const String &comment)
 {
-  CPPUNIT_TEST_SUITE(TestS3M);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testWriteTags);
-  CPPUNIT_TEST_SUITE_END();
+  S3M::File file(fileName);
 
-public:
-  void testReadTags()
+  ASSERT_TRUE(file.isValid());
+
+  S3M::Properties *p = file.audioProperties();
+  Mod::Tag *t        = file.tag();
+
+  ASSERT_NE(nullptr, p);
+  ASSERT_NE(nullptr, t);
+
+  ASSERT_EQ(0, p->lengthInSeconds());
+  ASSERT_EQ(0, p->bitrate());
+  ASSERT_EQ(0, p->sampleRate());
+  ASSERT_EQ(16, p->channels());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->lengthInPatterns());
+  ASSERT_FALSE(p->stereo());
+  ASSERT_EQ(static_cast<unsigned short>(5), p->sampleCount());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->patternCount());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->flags());
+  ASSERT_EQ(static_cast<unsigned short>(4896), p->trackerVersion());
+  ASSERT_EQ(static_cast<unsigned short>(2), p->fileFormatVersion());
+  ASSERT_EQ(static_cast<unsigned char>(64), p->globalVolume());
+  ASSERT_EQ(static_cast<unsigned char>(48), p->masterVolume());
+  ASSERT_EQ(static_cast<unsigned char>(125), p->tempo());
+  ASSERT_EQ(static_cast<unsigned char>(6), p->bpmSpeed());
+  ASSERT_EQ(title, t->title());
+  ASSERT_EQ(String(), t->artist());
+  ASSERT_EQ(String(), t->album());
+  ASSERT_EQ(comment, t->comment());
+  ASSERT_EQ(String(), t->genre());
+  ASSERT_EQ(0U, t->year());
+  ASSERT_EQ(0U, t->track());
+  ASSERT_EQ(String("ScreamTracker III"), t->trackerName());
+}
+
+TEST(S3M, testReadTags)
+{
+  testRead(TEST_FILE_PATH_C("test.s3m"), titleBefore, commentBefore);
+}
+
+TEST(S3M, testWriteTags)
+{
+  ScopedFileCopy copy("test", ".s3m");
   {
-    testRead(TEST_FILE_PATH_C("test.s3m"), titleBefore, commentBefore);
+    S3M::File file(copy.fileName().c_str());
+    ASSERT_NE(nullptr, file.tag());
+    file.tag()->setTitle(titleAfter);
+    file.tag()->setComment(newComment);
+    file.tag()->setTrackerName("won't be saved");
+    ASSERT_TRUE(file.save());
   }
-
-  void testWriteTags()
-  {
-    ScopedFileCopy copy("test", ".s3m");
-    {
-      S3M::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != nullptr);
-      file.tag()->setTitle(titleAfter);
-      file.tag()->setComment(newComment);
-      file.tag()->setTrackerName("won't be saved");
-      CPPUNIT_ASSERT(file.save());
-    }
-    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
-    CPPUNIT_ASSERT(fileEqual(
-      copy.fileName(),
-      TEST_FILE_PATH_C("changed.s3m")));
-  }
-
-private:
-  void testRead(FileName fileName, const String &title, const String &comment)
-  {
-    S3M::File file(fileName);
-
-    CPPUNIT_ASSERT(file.isValid());
-
-    S3M::Properties *p = file.audioProperties();
-    Mod::Tag *t = file.tag();
-
-    CPPUNIT_ASSERT(nullptr != p);
-    CPPUNIT_ASSERT(nullptr != t);
-
-    CPPUNIT_ASSERT_EQUAL( 0, p->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL( 0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, p->channels());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(false, p->stereo());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(5), p->sampleCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->patternCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->flags());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(4896), p->trackerVersion());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(2), p->fileFormatVersion());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(64), p->globalVolume());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(48), p->masterVolume());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(125), p->tempo());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(6), p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String("ScreamTracker III"), t->trackerName());
-  }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestS3M);
+  testRead(copy.fileName().c_str(), titleAfter, commentAfter);
+  ASSERT_TRUE(fileEqual(
+    copy.fileName(),
+    TEST_FILE_PATH_C("changed.s3m")));
+}

@@ -23,35 +23,34 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
-#include "tag.h"
-#include "fileref.h"
-#include "oggflacfile.h"
-#include "vorbisfile.h"
-#include "mpegfile.h"
-#include "mpcfile.h"
-#include "asffile.h"
-#include "speexfile.h"
-#include "flacfile.h"
-#include "trueaudiofile.h"
-#include "mp4file.h"
-#include "wavfile.h"
-#include "apefile.h"
 #include "aifffile.h"
-#include "wavpackfile.h"
+#include "apefile.h"
+#include "asffile.h"
+#include "fileref.h"
+#include "flacfile.h"
+#include "mp4file.h"
+#include "mpcfile.h"
+#include "mpegfile.h"
+#include "oggflacfile.h"
 #include "opusfile.h"
-#include "xmfile.h"
-#include "tfilestream.h"
+#include "speexfile.h"
+#include "tag.h"
 #include "tbytevectorstream.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "tfilestream.h"
+#include "trueaudiofile.h"
 #include "utils.h"
+#include "vorbisfile.h"
+#include "wavfile.h"
+#include "wavpackfile.h"
+#include "xmfile.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-namespace
-{
+namespace {
   class DummyResolver : public FileRef::FileTypeResolver
   {
   public:
@@ -76,342 +75,307 @@ namespace
   };
 } // namespace
 
-class TestFileRef : public CppUnit::TestFixture
+template <typename T>
+void fileRefSave(const string &filename, const string &ext)
 {
-  CPPUNIT_TEST_SUITE(TestFileRef);
-  CPPUNIT_TEST(testASF);
-  CPPUNIT_TEST(testMusepack);
-  CPPUNIT_TEST(testVorbis);
-  CPPUNIT_TEST(testSpeex);
-  CPPUNIT_TEST(testFLAC);
-  CPPUNIT_TEST(testMP3);
-  CPPUNIT_TEST(testOGA_FLAC);
-  CPPUNIT_TEST(testOGA_Vorbis);
-  CPPUNIT_TEST(testMP4_1);
-  CPPUNIT_TEST(testMP4_2);
-  CPPUNIT_TEST(testMP4_3);
-  CPPUNIT_TEST(testMP4_4);
-  CPPUNIT_TEST(testTrueAudio);
-  CPPUNIT_TEST(testAPE);
-  CPPUNIT_TEST(testWav);
-  CPPUNIT_TEST(testAIFF_1);
-  CPPUNIT_TEST(testAIFF_2);
-  CPPUNIT_TEST(testWavPack);
-  CPPUNIT_TEST(testOpus);
-  CPPUNIT_TEST(testUnsupported);
-  CPPUNIT_TEST(testCreate);
-  CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testDefaultFileExtensions);
-  CPPUNIT_TEST(testFileResolver);
-  CPPUNIT_TEST_SUITE_END();
+  ScopedFileCopy copy(filename, ext);
+  string newname = copy.fileName();
 
-public:
-
-  template <typename T>
-  void fileRefSave(const string &filename, const string &ext)
   {
-    ScopedFileCopy copy(filename, ext);
-    string newname = copy.fileName();
-
-    {
-      FileRef f(newname.c_str());
-      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
-      CPPUNIT_ASSERT(!f.isNull());
-      f.tag()->setArtist("test artist");
-      f.tag()->setTitle("test title");
-      f.tag()->setGenre("Test!");
-      f.tag()->setAlbum("albummmm");
-      f.tag()->setComment("a comment");
-      f.tag()->setTrack(5);
-      f.tag()->setYear(2020);
-      f.save();
-    }
-    {
-      FileRef f(newname.c_str());
-      CPPUNIT_ASSERT(!f.isNull());
-      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("test artist"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("test title"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("a comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(5));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2020));
-      f.tag()->setArtist("ttest artist");
-      f.tag()->setTitle("ytest title");
-      f.tag()->setGenre("uTest!");
-      f.tag()->setAlbum("ialbummmm");
-      f.tag()->setComment("another comment");
-      f.tag()->setTrack(7);
-      f.tag()->setYear(2080);
-      f.save();
-    }
-    {
-      FileRef f(newname.c_str());
-      CPPUNIT_ASSERT(!f.isNull());
-      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("another comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(7));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2080));
-    }
-
-    {
-      FileStream fs(newname.c_str());
-      FileRef f(&fs);
-      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
-      CPPUNIT_ASSERT(!f.isNull());
-      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("another comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(7));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2080));
-      f.tag()->setArtist("test artist");
-      f.tag()->setTitle("test title");
-      f.tag()->setGenre("Test!");
-      f.tag()->setAlbum("albummmm");
-      f.tag()->setComment("a comment");
-      f.tag()->setTrack(5);
-      f.tag()->setYear(2020);
-      f.save();
-    }
-
-    ByteVector fileContent;
-    {
-      FileStream fs(newname.c_str());
-      FileRef f(&fs);
-      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
-      CPPUNIT_ASSERT(!f.isNull());
-      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("test artist"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("test title"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("a comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(5));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2020));
-
-      fs.seek(0);
-      fileContent = fs.readBlock(fs.length());
-    }
-
-    {
-      ByteVectorStream bs(fileContent);
-      FileRef f(&bs);
-      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
-      CPPUNIT_ASSERT(!f.isNull());
-      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("test artist"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("test title"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("Test!"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("albummmm"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("a comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(5));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2020));
-      f.tag()->setArtist("ttest artist");
-      f.tag()->setTitle("ytest title");
-      f.tag()->setGenre("uTest!");
-      f.tag()->setAlbum("ialbummmm");
-      f.tag()->setComment("another comment");
-      f.tag()->setTrack(7);
-      f.tag()->setYear(2080);
-      f.save();
-
-      fileContent = *bs.data();
-    }
-    {
-      ByteVectorStream bs(fileContent);
-      FileRef f(&bs);
-      CPPUNIT_ASSERT(dynamic_cast<T*>(f.file()));
-      CPPUNIT_ASSERT(!f.isNull());
-      CPPUNIT_ASSERT_EQUAL(f.tag()->artist(), String("ttest artist"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->title(), String("ytest title"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->genre(), String("uTest!"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->album(), String("ialbummmm"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->comment(), String("another comment"));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->track(), static_cast<unsigned int>(7));
-      CPPUNIT_ASSERT_EQUAL(f.tag()->year(), static_cast<unsigned int>(2080));
-    }
+    FileRef f(newname.c_str());
+    ASSERT_TRUE(dynamic_cast<T *>(f.file()));
+    ASSERT_FALSE(f.isNull());
+    f.tag()->setArtist("test artist");
+    f.tag()->setTitle("test title");
+    f.tag()->setGenre("Test!");
+    f.tag()->setAlbum("albummmm");
+    f.tag()->setComment("a comment");
+    f.tag()->setTrack(5);
+    f.tag()->setYear(2020);
+    f.save();
+  }
+  {
+    FileRef f(newname.c_str());
+    ASSERT_FALSE(f.isNull());
+    ASSERT_EQ(f.tag()->artist(), String("test artist"));
+    ASSERT_EQ(f.tag()->title(), String("test title"));
+    ASSERT_EQ(f.tag()->genre(), String("Test!"));
+    ASSERT_EQ(f.tag()->album(), String("albummmm"));
+    ASSERT_EQ(f.tag()->comment(), String("a comment"));
+    ASSERT_EQ(f.tag()->track(), static_cast<unsigned int>(5));
+    ASSERT_EQ(f.tag()->year(), static_cast<unsigned int>(2020));
+    f.tag()->setArtist("ttest artist");
+    f.tag()->setTitle("ytest title");
+    f.tag()->setGenre("uTest!");
+    f.tag()->setAlbum("ialbummmm");
+    f.tag()->setComment("another comment");
+    f.tag()->setTrack(7);
+    f.tag()->setYear(2080);
+    f.save();
+  }
+  {
+    FileRef f(newname.c_str());
+    ASSERT_FALSE(f.isNull());
+    ASSERT_EQ(f.tag()->artist(), String("ttest artist"));
+    ASSERT_EQ(f.tag()->title(), String("ytest title"));
+    ASSERT_EQ(f.tag()->genre(), String("uTest!"));
+    ASSERT_EQ(f.tag()->album(), String("ialbummmm"));
+    ASSERT_EQ(f.tag()->comment(), String("another comment"));
+    ASSERT_EQ(f.tag()->track(), static_cast<unsigned int>(7));
+    ASSERT_EQ(f.tag()->year(), static_cast<unsigned int>(2080));
   }
 
-  void testMusepack()
   {
-    fileRefSave<MPC::File>("click", ".mpc");
+    FileStream fs(newname.c_str());
+    FileRef f(&fs);
+    ASSERT_TRUE(dynamic_cast<T *>(f.file()));
+    ASSERT_FALSE(f.isNull());
+    ASSERT_EQ(f.tag()->artist(), String("ttest artist"));
+    ASSERT_EQ(f.tag()->title(), String("ytest title"));
+    ASSERT_EQ(f.tag()->genre(), String("uTest!"));
+    ASSERT_EQ(f.tag()->album(), String("ialbummmm"));
+    ASSERT_EQ(f.tag()->comment(), String("another comment"));
+    ASSERT_EQ(f.tag()->track(), static_cast<unsigned int>(7));
+    ASSERT_EQ(f.tag()->year(), static_cast<unsigned int>(2080));
+    f.tag()->setArtist("test artist");
+    f.tag()->setTitle("test title");
+    f.tag()->setGenre("Test!");
+    f.tag()->setAlbum("albummmm");
+    f.tag()->setComment("a comment");
+    f.tag()->setTrack(5);
+    f.tag()->setYear(2020);
+    f.save();
   }
 
-  void testASF()
+  ByteVector fileContent;
   {
-    fileRefSave<ASF::File>("silence-1", ".wma");
+    FileStream fs(newname.c_str());
+    FileRef f(&fs);
+    ASSERT_TRUE(dynamic_cast<T *>(f.file()));
+    ASSERT_FALSE(f.isNull());
+    ASSERT_EQ(f.tag()->artist(), String("test artist"));
+    ASSERT_EQ(f.tag()->title(), String("test title"));
+    ASSERT_EQ(f.tag()->genre(), String("Test!"));
+    ASSERT_EQ(f.tag()->album(), String("albummmm"));
+    ASSERT_EQ(f.tag()->comment(), String("a comment"));
+    ASSERT_EQ(f.tag()->track(), static_cast<unsigned int>(5));
+    ASSERT_EQ(f.tag()->year(), static_cast<unsigned int>(2020));
+
+    fs.seek(0);
+    fileContent = fs.readBlock(fs.length());
   }
 
-  void testVorbis()
   {
-    fileRefSave<Ogg::Vorbis::File>("empty", ".ogg");
-  }
+    ByteVectorStream bs(fileContent);
+    FileRef f(&bs);
+    ASSERT_TRUE(dynamic_cast<T *>(f.file()));
+    ASSERT_FALSE(f.isNull());
+    ASSERT_EQ(f.tag()->artist(), String("test artist"));
+    ASSERT_EQ(f.tag()->title(), String("test title"));
+    ASSERT_EQ(f.tag()->genre(), String("Test!"));
+    ASSERT_EQ(f.tag()->album(), String("albummmm"));
+    ASSERT_EQ(f.tag()->comment(), String("a comment"));
+    ASSERT_EQ(f.tag()->track(), static_cast<unsigned int>(5));
+    ASSERT_EQ(f.tag()->year(), static_cast<unsigned int>(2020));
+    f.tag()->setArtist("ttest artist");
+    f.tag()->setTitle("ytest title");
+    f.tag()->setGenre("uTest!");
+    f.tag()->setAlbum("ialbummmm");
+    f.tag()->setComment("another comment");
+    f.tag()->setTrack(7);
+    f.tag()->setYear(2080);
+    f.save();
 
-  void testSpeex()
+    fileContent = *bs.data();
+  }
   {
-    fileRefSave<Ogg::Speex::File>("empty", ".spx");
+    ByteVectorStream bs(fileContent);
+    FileRef f(&bs);
+    ASSERT_TRUE(dynamic_cast<T *>(f.file()));
+    ASSERT_FALSE(f.isNull());
+    ASSERT_EQ(f.tag()->artist(), String("ttest artist"));
+    ASSERT_EQ(f.tag()->title(), String("ytest title"));
+    ASSERT_EQ(f.tag()->genre(), String("uTest!"));
+    ASSERT_EQ(f.tag()->album(), String("ialbummmm"));
+    ASSERT_EQ(f.tag()->comment(), String("another comment"));
+    ASSERT_EQ(f.tag()->track(), static_cast<unsigned int>(7));
+    ASSERT_EQ(f.tag()->year(), static_cast<unsigned int>(2080));
   }
+}
 
-  void testFLAC()
-  {
-    fileRefSave<FLAC::File>("no-tags", ".flac");
-  }
+TEST(FileRef, testMusepack)
+{
+  fileRefSave<MPC::File>("click", ".mpc");
+}
 
-  void testMP3()
-  {
-    fileRefSave<MPEG::File>("xing", ".mp3");
-  }
+TEST(FileRef, testASF)
+{
+  fileRefSave<ASF::File>("silence-1", ".wma");
+}
 
-  void testTrueAudio()
-  {
-    fileRefSave<TrueAudio::File>("empty", ".tta");
-  }
+TEST(FileRef, testVorbis)
+{
+  fileRefSave<Ogg::Vorbis::File>("empty", ".ogg");
+}
 
-  void testMP4_1()
-  {
-    fileRefSave<MP4::File>("has-tags", ".m4a");
-  }
+TEST(FileRef, testSpeex)
+{
+  fileRefSave<Ogg::Speex::File>("empty", ".spx");
+}
 
-  void testMP4_2()
-  {
-    fileRefSave<MP4::File>("no-tags", ".m4a");
-  }
+TEST(FileRef, testFLAC)
+{
+  fileRefSave<FLAC::File>("no-tags", ".flac");
+}
 
-  void testMP4_3()
-  {
-    fileRefSave<MP4::File>("no-tags", ".3g2");
-  }
+TEST(FileRef, testMP3)
+{
+  fileRefSave<MPEG::File>("xing", ".mp3");
+}
 
-  void testMP4_4()
-  {
-    fileRefSave<MP4::File>("blank_video", ".m4v");
-  }
+TEST(FileRef, testTrueAudio)
+{
+  fileRefSave<TrueAudio::File>("empty", ".tta");
+}
 
-  void testWav()
-  {
-    fileRefSave<RIFF::WAV::File>("empty", ".wav");
-  }
+TEST(FileRef, testMP4_1)
+{
+  fileRefSave<MP4::File>("has-tags", ".m4a");
+}
 
-  void testOGA_FLAC()
-  {
-    fileRefSave<Ogg::FLAC::File>("empty_flac", ".oga");
-  }
+TEST(FileRef, testMP4_2)
+{
+  fileRefSave<MP4::File>("no-tags", ".m4a");
+}
 
-  void testOGA_Vorbis()
-  {
-    fileRefSave<Ogg::Vorbis::File>("empty_vorbis", ".oga");
-  }
+TEST(FileRef, testMP4_3)
+{
+  fileRefSave<MP4::File>("no-tags", ".3g2");
+}
 
-  void testAPE()
-  {
-    fileRefSave<APE::File>("mac-399", ".ape");
-  }
+TEST(FileRef, testMP4_4)
+{
+  fileRefSave<MP4::File>("blank_video", ".m4v");
+}
 
-  void testAIFF_1()
-  {
-    fileRefSave<RIFF::AIFF::File>("empty", ".aiff");
-  }
+TEST(FileRef, testWav)
+{
+  fileRefSave<RIFF::WAV::File>("empty", ".wav");
+}
 
-  void testAIFF_2()
-  {
-    fileRefSave<RIFF::AIFF::File>("alaw", ".aifc");
-  }
+TEST(FileRef, testOGA_FLAC)
+{
+  fileRefSave<Ogg::FLAC::File>("empty_flac", ".oga");
+}
 
-  void testWavPack()
-  {
-    fileRefSave<WavPack::File>("click", ".wv");
-  }
+TEST(FileRef, testOGA_Vorbis)
+{
+  fileRefSave<Ogg::Vorbis::File>("empty_vorbis", ".oga");
+}
 
-  void testOpus()
-  {
-    fileRefSave<Ogg::Opus::File>("correctness_gain_silent_output", ".opus");
-  }
+TEST(FileRef, testAPE)
+{
+  fileRefSave<APE::File>("mac-399", ".ape");
+}
 
-  void testUnsupported()
-  {
-    FileRef f1(TEST_FILE_PATH_C("no-extension"));
-    CPPUNIT_ASSERT(f1.isNull());
+TEST(FileRef, testAIFF_1)
+{
+  fileRefSave<RIFF::AIFF::File>("empty", ".aiff");
+}
 
-    FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xx"));
-    CPPUNIT_ASSERT(f2.isNull());
-  }
+TEST(FileRef, testAIFF_2)
+{
+  fileRefSave<RIFF::AIFF::File>("alaw", ".aifc");
+}
 
-  void testCreate()
-  {
-    // This is deprecated. But worth it to test.
+TEST(FileRef, testWavPack)
+{
+  fileRefSave<WavPack::File>("click", ".wv");
+}
 
-    File *f = FileRef::create(TEST_FILE_PATH_C("empty_vorbis.oga"));
-    CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File*>(f));
-    delete f;
+TEST(FileRef, testOpus)
+{
+  fileRefSave<Ogg::Opus::File>("correctness_gain_silent_output", ".opus");
+}
 
-    f = FileRef::create(TEST_FILE_PATH_C("xing.mp3"));
-    CPPUNIT_ASSERT(dynamic_cast<MPEG::File*>(f));
-    delete f;
+TEST(FileRef, testUnsupported)
+{
+  FileRef f1(TEST_FILE_PATH_C("no-extension"));
+  ASSERT_TRUE(f1.isNull());
 
-    f = FileRef::create(TEST_FILE_PATH_C("test.xm"));
-    CPPUNIT_ASSERT(dynamic_cast<XM::File*>(f));
-    delete f;
-  }
+  FileRef f2(TEST_FILE_PATH_C("unsupported-extension.xx"));
+  ASSERT_TRUE(f2.isNull());
+}
 
-  void testAudioProperties()
+TEST(FileRef, testCreate)
+{
+  // This is deprecated. But worth it to test.
+
+  File *f = FileRef::create(TEST_FILE_PATH_C("empty_vorbis.oga"));
+  ASSERT_TRUE(dynamic_cast<Ogg::Vorbis::File *>(f));
+  delete f;
+
+  f = FileRef::create(TEST_FILE_PATH_C("xing.mp3"));
+  ASSERT_TRUE(dynamic_cast<MPEG::File *>(f));
+  delete f;
+
+  f = FileRef::create(TEST_FILE_PATH_C("test.xm"));
+  ASSERT_TRUE(dynamic_cast<XM::File *>(f));
+  delete f;
+}
+
+TEST(FileRef, testAudioProperties)
+{
+  FileRef f(TEST_FILE_PATH_C("xing.mp3"));
+  const AudioProperties *audioProperties = f.audioProperties();
+  ASSERT_EQ(2, audioProperties->lengthInSeconds());
+  ASSERT_EQ(2064, audioProperties->lengthInMilliseconds());
+}
+
+TEST(FileRef, testDefaultFileExtensions)
+{
+  const StringList extensions = FileRef::defaultFileExtensions();
+  ASSERT_TRUE(extensions.contains("mpc"));
+  ASSERT_TRUE(extensions.contains("wma"));
+  ASSERT_TRUE(extensions.contains("ogg"));
+  ASSERT_TRUE(extensions.contains("spx"));
+  ASSERT_TRUE(extensions.contains("flac"));
+  ASSERT_TRUE(extensions.contains("mp3"));
+  ASSERT_TRUE(extensions.contains("tta"));
+  ASSERT_TRUE(extensions.contains("m4a"));
+  ASSERT_TRUE(extensions.contains("3g2"));
+  ASSERT_TRUE(extensions.contains("m4v"));
+  ASSERT_TRUE(extensions.contains("wav"));
+  ASSERT_TRUE(extensions.contains("oga"));
+  ASSERT_TRUE(extensions.contains("ape"));
+  ASSERT_TRUE(extensions.contains("aiff"));
+  ASSERT_TRUE(extensions.contains("aifc"));
+  ASSERT_TRUE(extensions.contains("wv"));
+  ASSERT_TRUE(extensions.contains("opus"));
+  ASSERT_TRUE(extensions.contains("xm"));
+}
+
+TEST(FileRef, testFileResolver)
+{
   {
     FileRef f(TEST_FILE_PATH_C("xing.mp3"));
-    const AudioProperties *audioProperties = f.audioProperties();
-    CPPUNIT_ASSERT_EQUAL(2, audioProperties->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(2064, audioProperties->lengthInMilliseconds());
+    ASSERT_NE(nullptr, dynamic_cast<MPEG::File *>(f.file()));
   }
 
-  void testDefaultFileExtensions()
+  DummyResolver resolver;
+  FileRef::addFileTypeResolver(&resolver);
+
   {
-    const StringList extensions = FileRef::defaultFileExtensions();
-    CPPUNIT_ASSERT(extensions.contains("mpc"));
-    CPPUNIT_ASSERT(extensions.contains("wma"));
-    CPPUNIT_ASSERT(extensions.contains("ogg"));
-    CPPUNIT_ASSERT(extensions.contains("spx"));
-    CPPUNIT_ASSERT(extensions.contains("flac"));
-    CPPUNIT_ASSERT(extensions.contains("mp3"));
-    CPPUNIT_ASSERT(extensions.contains("tta"));
-    CPPUNIT_ASSERT(extensions.contains("m4a"));
-    CPPUNIT_ASSERT(extensions.contains("3g2"));
-    CPPUNIT_ASSERT(extensions.contains("m4v"));
-    CPPUNIT_ASSERT(extensions.contains("wav"));
-    CPPUNIT_ASSERT(extensions.contains("oga"));
-    CPPUNIT_ASSERT(extensions.contains("ape"));
-    CPPUNIT_ASSERT(extensions.contains("aiff"));
-    CPPUNIT_ASSERT(extensions.contains("aifc"));
-    CPPUNIT_ASSERT(extensions.contains("wv"));
-    CPPUNIT_ASSERT(extensions.contains("opus"));
-    CPPUNIT_ASSERT(extensions.contains("xm"));
+    FileRef f(TEST_FILE_PATH_C("xing.mp3"));
+    ASSERT_NE(nullptr, dynamic_cast<Ogg::Vorbis::File *>(f.file()));
   }
 
-  void testFileResolver()
+  DummyStreamResolver streamResolver;
+  FileRef::addFileTypeResolver(&streamResolver);
+
   {
-    {
-      FileRef f(TEST_FILE_PATH_C("xing.mp3"));
-      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()) != nullptr);
-    }
-
-    DummyResolver resolver;
-    FileRef::addFileTypeResolver(&resolver);
-
-    {
-      FileRef f(TEST_FILE_PATH_C("xing.mp3"));
-      CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != nullptr);
-    }
-
-    DummyStreamResolver streamResolver;
-    FileRef::addFileTypeResolver(&streamResolver);
-
-    {
-      FileStream s(TEST_FILE_PATH_C("xing.mp3"));
-      FileRef f(&s);
-      CPPUNIT_ASSERT(dynamic_cast<MP4::File *>(f.file()) != nullptr);
-    }
+    FileStream s(TEST_FILE_PATH_C("xing.mp3"));
+    FileRef f(&s);
+    ASSERT_NE(nullptr, dynamic_cast<MP4::File *>(f.file()));
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestFileRef);
+}

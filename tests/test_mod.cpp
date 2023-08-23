@@ -25,8 +25,8 @@
 
 #include "modfile.h"
 #include "tpropertymap.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
@@ -51,83 +51,70 @@ static const String commentAfter(
   "This line is ok.\n"
   "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
-class TestMod : public CppUnit::TestFixture
+static void testRead(FileName fileName, const String &title, const String &comment)
 {
-  CPPUNIT_TEST_SUITE(TestMod);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testWriteTags);
-  CPPUNIT_TEST(testPropertyInterface);
-  CPPUNIT_TEST_SUITE_END();
+  Mod::File file(fileName);
 
-public:
-  void testReadTags()
+  ASSERT_TRUE(file.isValid());
+
+  Mod::Properties *p = file.audioProperties();
+  Mod::Tag *t        = file.tag();
+
+  ASSERT_NE(nullptr, p);
+  ASSERT_NE(nullptr, t);
+
+  ASSERT_EQ(0, p->lengthInSeconds());
+  ASSERT_EQ(0, p->bitrate());
+  ASSERT_EQ(0, p->sampleRate());
+  ASSERT_EQ(8, p->channels());
+  ASSERT_EQ(31U, p->instrumentCount());
+  ASSERT_EQ(static_cast<unsigned char>(1), p->lengthInPatterns());
+  ASSERT_EQ(title, t->title());
+  ASSERT_EQ(String(), t->artist());
+  ASSERT_EQ(String(), t->album());
+  ASSERT_EQ(comment, t->comment());
+  ASSERT_EQ(String(), t->genre());
+  ASSERT_EQ(0U, t->year());
+  ASSERT_EQ(0U, t->track());
+  ASSERT_EQ(String("StarTrekker"), t->trackerName());
+}
+
+TEST(MOD, testReadTags)
+{
+  testRead(TEST_FILE_PATH_C("test.mod"), titleBefore, commentBefore);
+}
+
+TEST(MOD, testWriteTags)
+{
+  ScopedFileCopy copy("test", ".mod");
   {
-    testRead(TEST_FILE_PATH_C("test.mod"), titleBefore, commentBefore);
+    Mod::File file(copy.fileName().c_str());
+    ASSERT_NE(nullptr, file.tag());
+    file.tag()->setTitle(titleAfter);
+    file.tag()->setComment(newComment);
+    ASSERT_TRUE(file.save());
   }
+  testRead(copy.fileName().c_str(), titleAfter, commentAfter);
+  ASSERT_TRUE(fileEqual(
+    copy.fileName(),
+    TEST_FILE_PATH_C("changed.mod")));
+}
 
-  void testWriteTags()
-  {
-    ScopedFileCopy copy("test", ".mod");
-    {
-      Mod::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != nullptr);
-      file.tag()->setTitle(titleAfter);
-      file.tag()->setComment(newComment);
-      CPPUNIT_ASSERT(file.save());
-    }
-    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
-    CPPUNIT_ASSERT(fileEqual(
-      copy.fileName(),
-      TEST_FILE_PATH_C("changed.mod")));
-  }
+TEST(MOD, testPropertyInterface)
+{
+  Mod::Tag t;
+  PropertyMap properties;
+  properties["BLA"]    = String("bla");
+  properties["ARTIST"] = String("artist1");
+  properties["ARTIST"].append("artist2");
+  properties["TITLE"]     = String("title");
 
-  void testPropertyInterface()
-  {
-    Mod::Tag t;
-    PropertyMap properties;
-    properties["BLA"] = String("bla");
-    properties["ARTIST"] = String("artist1");
-    properties["ARTIST"].append("artist2");
-    properties["TITLE"] = String("title");
+  PropertyMap unsupported = t.setProperties(properties);
+  ASSERT_TRUE(unsupported.contains("BLA"));
+  ASSERT_TRUE(unsupported.contains("ARTIST"));
+  ASSERT_EQ(properties["ARTIST"], unsupported["ARTIST"]);
+  ASSERT_FALSE(unsupported.contains("TITLE"));
 
-    PropertyMap unsupported = t.setProperties(properties);
-    CPPUNIT_ASSERT(unsupported.contains("BLA"));
-    CPPUNIT_ASSERT(unsupported.contains("ARTIST"));
-    CPPUNIT_ASSERT_EQUAL(properties["ARTIST"], unsupported["ARTIST"]);
-    CPPUNIT_ASSERT(!unsupported.contains("TITLE"));
-
-    properties = t.properties();
-    CPPUNIT_ASSERT_EQUAL(StringList("title"), properties["TITLE"]);
-  }
-
-private:
-  void testRead(FileName fileName, const String &title, const String &comment)
-  {
-    Mod::File file(fileName);
-
-    CPPUNIT_ASSERT(file.isValid());
-
-    Mod::Properties *p = file.audioProperties();
-    Mod::Tag *t = file.tag();
-
-    CPPUNIT_ASSERT(nullptr != p);
-    CPPUNIT_ASSERT(nullptr != t);
-
-    CPPUNIT_ASSERT_EQUAL(0, p->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL(31U, p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(1), p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String("StarTrekker"), t->trackerName());
-  }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMod);
+  properties = t.properties();
+  ASSERT_EQ(StringList("title"), properties["TITLE"]);
+}

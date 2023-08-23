@@ -23,52 +23,41 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
 #include "infotag.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestInfoTag : public CppUnit::TestFixture
+TEST(Info, testTitle)
 {
-  CPPUNIT_TEST_SUITE(TestInfoTag);
-  CPPUNIT_TEST(testTitle);
-  CPPUNIT_TEST(testNumericFields);
-  CPPUNIT_TEST_SUITE_END();
+  RIFF::Info::Tag tag;
 
-public:
-  void testTitle()
-  {
-    RIFF::Info::Tag tag;
+  ASSERT_EQ(String(""), tag.title());
+  tag.setTitle("Test title 1");
+  tag.setFieldText("TEST", "Dummy Text");
 
-    CPPUNIT_ASSERT_EQUAL(String(""), tag.title());
-    tag.setTitle("Test title 1");
-    tag.setFieldText("TEST", "Dummy Text");
+  ASSERT_EQ(String("Test title 1"), tag.title());
 
-    CPPUNIT_ASSERT_EQUAL(String("Test title 1"), tag.title());
+  RIFF::Info::FieldListMap map = tag.fieldListMap();
+  ASSERT_EQ(String("Test title 1"), map["INAM"]);
+  ASSERT_EQ(String("Dummy Text"), map["TEST"]);
+}
 
-    RIFF::Info::FieldListMap map = tag.fieldListMap();
-    CPPUNIT_ASSERT_EQUAL(String("Test title 1"), map["INAM"]);
-    CPPUNIT_ASSERT_EQUAL(String("Dummy Text"), map["TEST"]);
-  }
+TEST(Info, testNumericFields)
+{
+  RIFF::Info::Tag tag;
 
-  void testNumericFields()
-  {
-    RIFF::Info::Tag tag;
+  ASSERT_EQ(static_cast<unsigned int>(0), tag.track());
+  tag.setTrack(1234);
+  ASSERT_EQ(static_cast<unsigned int>(1234), tag.track());
+  ASSERT_EQ(String("1234"), tag.fieldText("IPRT"));
 
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), tag.track());
-    tag.setTrack(1234);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1234), tag.track());
-    CPPUNIT_ASSERT_EQUAL(String("1234"), tag.fieldText("IPRT"));
-
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(0), tag.year());
-    tag.setYear(1234);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1234), tag.year());
-    CPPUNIT_ASSERT_EQUAL(String("1234"), tag.fieldText("ICRD"));
-  }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestInfoTag);
+  ASSERT_EQ(static_cast<unsigned int>(0), tag.year());
+  tag.setYear(1234);
+  ASSERT_EQ(static_cast<unsigned int>(1234), tag.year());
+  ASSERT_EQ(String("1234"), tag.fieldText("ICRD"));
+}

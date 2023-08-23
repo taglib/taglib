@@ -23,52 +23,39 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
-#include "tag.h"
 #include "mp4coverart.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "tag.h"
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestMP4CoverArt : public CppUnit::TestFixture
+TEST(MP4CoverArt, testSimple)
 {
-  CPPUNIT_TEST_SUITE(TestMP4CoverArt);
-  CPPUNIT_TEST(testSimple);
-  CPPUNIT_TEST(testList);
-  CPPUNIT_TEST_SUITE_END();
+  MP4::CoverArt c(MP4::CoverArt::PNG, "foo");
+  ASSERT_EQ(MP4::CoverArt::PNG, c.format());
+  ASSERT_EQ(ByteVector("foo"), c.data());
 
-public:
+  MP4::CoverArt c2(c);
+  ASSERT_EQ(MP4::CoverArt::PNG, c2.format());
+  ASSERT_EQ(ByteVector("foo"), c2.data());
 
-  void testSimple()
-  {
-    MP4::CoverArt c(MP4::CoverArt::PNG, "foo");
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, c.format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), c.data());
+  MP4::CoverArt c3 = c;
+  ASSERT_EQ(MP4::CoverArt::PNG, c3.format());
+  ASSERT_EQ(ByteVector("foo"), c3.data());
+}
 
-    MP4::CoverArt c2(c);
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, c2.format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), c2.data());
+TEST(MP4CoverArt, testList)
+{
+  MP4::CoverArtList l;
+  l.append(MP4::CoverArt(MP4::CoverArt::PNG, "foo"));
+  l.append(MP4::CoverArt(MP4::CoverArt::JPEG, "bar"));
 
-    MP4::CoverArt c3 = c;
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, c3.format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), c3.data());
-  }
-
-  void testList()
-  {
-    MP4::CoverArtList l;
-    l.append(MP4::CoverArt(MP4::CoverArt::PNG, "foo"));
-    l.append(MP4::CoverArt(MP4::CoverArt::JPEG, "bar"));
-
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::PNG, l[0].format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("foo"), l[0].data());
-    CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, l[1].format());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("bar"), l[1].data());
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMP4CoverArt);
+  ASSERT_EQ(MP4::CoverArt::PNG, l[0].format());
+  ASSERT_EQ(ByteVector("foo"), l[0].data());
+  ASSERT_EQ(MP4::CoverArt::JPEG, l[1].format());
+  ASSERT_EQ(ByteVector("bar"), l[1].data());
+}

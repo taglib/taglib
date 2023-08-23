@@ -23,41 +23,29 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
-#include "tag.h"
-#include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "flacunknownmetadatablock.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "tag.h"
+#include "tbytevectorlist.h"
+#include "tstringlist.h"
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestFLACUnknownMetadataBlock : public CppUnit::TestFixture
+TEST(FLACUnknownMetadataBlock, testAccessors)
 {
-  CPPUNIT_TEST_SUITE(TestFLACUnknownMetadataBlock);
-  CPPUNIT_TEST(testAccessors);
-  CPPUNIT_TEST_SUITE_END();
-
-public:
-
-  void testAccessors()
-  {
-    ByteVector data("abc\x01", 4);
-    FLAC::UnknownMetadataBlock block(42, data);
-    CPPUNIT_ASSERT_EQUAL(42, block.code());
-    CPPUNIT_ASSERT_EQUAL(data, block.data());
-    CPPUNIT_ASSERT_EQUAL(data, block.render());
-    ByteVector data2("xxx", 3);
-    block.setCode(13);
-    block.setData(data2);
-    CPPUNIT_ASSERT_EQUAL(13, block.code());
-    CPPUNIT_ASSERT_EQUAL(data2, block.data());
-    CPPUNIT_ASSERT_EQUAL(data2, block.render());
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestFLACUnknownMetadataBlock);
+  ByteVector data("abc\x01", 4);
+  FLAC::UnknownMetadataBlock block(42, data);
+  ASSERT_EQ(42, block.code());
+  ASSERT_EQ(data, block.data());
+  ASSERT_EQ(data, block.render());
+  ByteVector data2("xxx", 3);
+  block.setCode(13);
+  block.setData(data2);
+  ASSERT_EQ(13, block.code());
+  ASSERT_EQ(data2, block.data());
+  ASSERT_EQ(data2, block.render());
+}

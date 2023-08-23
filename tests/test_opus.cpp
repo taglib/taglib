@@ -23,115 +23,100 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
+#include "oggpageheader.h"
+#include "opusfile.h"
 #include "tag.h"
 #include "tbytevectorlist.h"
-#include "opusfile.h"
-#include "oggpageheader.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestOpus : public CppUnit::TestFixture
+TEST(Opus, testAudioProperties)
 {
-  CPPUNIT_TEST_SUITE(TestOpus);
-  CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testReadComments);
-  CPPUNIT_TEST(testWriteComments);
-  CPPUNIT_TEST(testSplitPackets);
-  CPPUNIT_TEST_SUITE_END();
+  Ogg::Opus::File f(TEST_FILE_PATH_C("correctness_gain_silent_output.opus"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(7, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(7737, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(36, f.audioProperties()->bitrate());
+  ASSERT_EQ(1, f.audioProperties()->channels());
+  ASSERT_EQ(48000, f.audioProperties()->sampleRate());
+  ASSERT_EQ(48000, f.audioProperties()->inputSampleRate());
+  ASSERT_EQ(1, f.audioProperties()->opusVersion());
+}
 
-public:
+TEST(Opus, testReadComments)
+{
+  Ogg::Opus::File f(TEST_FILE_PATH_C("correctness_gain_silent_output.opus"));
+  ASSERT_EQ(StringList("Xiph.Org Opus testvectormaker"), f.tag()->fieldListMap()["ENCODER"]);
+  ASSERT_TRUE(f.tag()->fieldListMap().contains("TESTDESCRIPTION"));
+  ASSERT_FALSE(f.tag()->fieldListMap().contains("ARTIST"));
+  ASSERT_EQ(String("libopus 0.9.11-66-g64c2dd7"), f.tag()->vendorID());
+}
 
-  void testAudioProperties()
+TEST(Opus, testWriteComments)
+{
+  ScopedFileCopy copy("correctness_gain_silent_output", ".opus");
+  string filename = copy.fileName();
+
   {
-    Ogg::Opus::File f(TEST_FILE_PATH_C("correctness_gain_silent_output.opus"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(7, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(7737, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(36, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->inputSampleRate());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->opusVersion());
+    Ogg::Opus::File f(filename.c_str());
+    f.tag()->setArtist("Your Tester");
+    f.save();
   }
-
-  void testReadComments()
   {
-    Ogg::Opus::File f(TEST_FILE_PATH_C("correctness_gain_silent_output.opus"));
-    CPPUNIT_ASSERT_EQUAL(StringList("Xiph.Org Opus testvectormaker"), f.tag()->fieldListMap()["ENCODER"]);
-    CPPUNIT_ASSERT(f.tag()->fieldListMap().contains("TESTDESCRIPTION"));
-    CPPUNIT_ASSERT(!f.tag()->fieldListMap().contains("ARTIST"));
-    CPPUNIT_ASSERT_EQUAL(String("libopus 0.9.11-66-g64c2dd7"), f.tag()->vendorID());
+    Ogg::Opus::File f(filename.c_str());
+    ASSERT_EQ(StringList("Xiph.Org Opus testvectormaker"), f.tag()->fieldListMap()["ENCODER"]);
+    ASSERT_TRUE(f.tag()->fieldListMap().contains("TESTDESCRIPTION"));
+    ASSERT_EQ(StringList("Your Tester"), f.tag()->fieldListMap()["ARTIST"]);
+    ASSERT_EQ(String("libopus 0.9.11-66-g64c2dd7"), f.tag()->vendorID());
   }
+}
 
-  void testWriteComments()
+TEST(Opus, testSplitPackets)
+{
+  ScopedFileCopy copy("correctness_gain_silent_output", ".opus");
+  string newname    = copy.fileName();
+
+  const String text = longText(128 * 1024, true);
+
   {
-    ScopedFileCopy copy("correctness_gain_silent_output", ".opus");
-    string filename = copy.fileName();
-
-    {
-      Ogg::Opus::File f(filename.c_str());
-      f.tag()->setArtist("Your Tester");
-      f.save();
-    }
-    {
-      Ogg::Opus::File f(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL(StringList("Xiph.Org Opus testvectormaker"), f.tag()->fieldListMap()["ENCODER"]);
-      CPPUNIT_ASSERT(f.tag()->fieldListMap().contains("TESTDESCRIPTION"));
-      CPPUNIT_ASSERT_EQUAL(StringList("Your Tester"), f.tag()->fieldListMap()["ARTIST"]);
-      CPPUNIT_ASSERT_EQUAL(String("libopus 0.9.11-66-g64c2dd7"), f.tag()->vendorID());
-    }
+    Ogg::Opus::File f(newname.c_str());
+    f.tag()->setTitle(text);
+    f.save();
   }
-
-  void testSplitPackets()
   {
-    ScopedFileCopy copy("correctness_gain_silent_output", ".opus");
-    string newname = copy.fileName();
+    Ogg::Opus::File f(newname.c_str());
+    ASSERT_TRUE(f.isValid());
+    ASSERT_EQ(static_cast<offset_t>(167534), f.length());
+    ASSERT_EQ(27, f.lastPageHeader()->pageSequenceNumber());
+    ASSERT_EQ(19U, f.packet(0).size());
+    ASSERT_EQ(131380U, f.packet(1).size());
+    ASSERT_EQ(5U, f.packet(2).size());
+    ASSERT_EQ(5U, f.packet(3).size());
+    ASSERT_EQ(text, f.tag()->title());
 
-    const String text = longText(128 * 1024, true);
+    ASSERT_TRUE(f.audioProperties());
+    ASSERT_EQ(7737, f.audioProperties()->lengthInMilliseconds());
 
-    {
-      Ogg::Opus::File f(newname.c_str());
-      f.tag()->setTitle(text);
-      f.save();
-    }
-    {
-      Ogg::Opus::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(167534), f.length());
-      CPPUNIT_ASSERT_EQUAL(27, f.lastPageHeader()->pageSequenceNumber());
-      CPPUNIT_ASSERT_EQUAL(19U, f.packet(0).size());
-      CPPUNIT_ASSERT_EQUAL(131380U, f.packet(1).size());
-      CPPUNIT_ASSERT_EQUAL(5U, f.packet(2).size());
-      CPPUNIT_ASSERT_EQUAL(5U, f.packet(3).size());
-      CPPUNIT_ASSERT_EQUAL(text, f.tag()->title());
-
-      CPPUNIT_ASSERT(f.audioProperties());
-      CPPUNIT_ASSERT_EQUAL(7737, f.audioProperties()->lengthInMilliseconds());
-
-      f.tag()->setTitle("ABCDE");
-      f.save();
-    }
-    {
-      Ogg::Opus::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(35521), f.length());
-      CPPUNIT_ASSERT_EQUAL(11, f.lastPageHeader()->pageSequenceNumber());
-      CPPUNIT_ASSERT_EQUAL(19U, f.packet(0).size());
-      CPPUNIT_ASSERT_EQUAL(313U, f.packet(1).size());
-      CPPUNIT_ASSERT_EQUAL(5U, f.packet(2).size());
-      CPPUNIT_ASSERT_EQUAL(5U, f.packet(3).size());
-      CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
-
-      CPPUNIT_ASSERT(f.audioProperties());
-      CPPUNIT_ASSERT_EQUAL(7737, f.audioProperties()->lengthInMilliseconds());
-    }
+    f.tag()->setTitle("ABCDE");
+    f.save();
   }
+  {
+    Ogg::Opus::File f(newname.c_str());
+    ASSERT_TRUE(f.isValid());
+    ASSERT_EQ(static_cast<offset_t>(35521), f.length());
+    ASSERT_EQ(11, f.lastPageHeader()->pageSequenceNumber());
+    ASSERT_EQ(19U, f.packet(0).size());
+    ASSERT_EQ(313U, f.packet(1).size());
+    ASSERT_EQ(5U, f.packet(2).size());
+    ASSERT_EQ(5U, f.packet(3).size());
+    ASSERT_EQ(String("ABCDE"), f.tag()->title());
 
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestOpus);
+    ASSERT_TRUE(f.audioProperties());
+    ASSERT_EQ(7737, f.audioProperties()->lengthInMilliseconds());
+  }
+}

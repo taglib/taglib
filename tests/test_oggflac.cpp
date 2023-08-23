@@ -23,100 +23,86 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
-#include "tag.h"
-#include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "oggfile.h"
 #include "oggflacfile.h"
 #include "oggpageheader.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "tag.h"
+#include "tbytevectorlist.h"
+#include "tstringlist.h"
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestOggFLAC : public CppUnit::TestFixture
+TEST(OggFLAC, testFramingBit)
 {
-  CPPUNIT_TEST_SUITE(TestOggFLAC);
-  CPPUNIT_TEST(testFramingBit);
-  CPPUNIT_TEST(testFuzzedFile);
-  CPPUNIT_TEST(testSplitPackets);
-  CPPUNIT_TEST_SUITE_END();
+  ScopedFileCopy copy("empty_flac", ".oga");
+  string newname = copy.fileName();
 
-public:
-
-  void testFramingBit()
   {
-    ScopedFileCopy copy("empty_flac", ".oga");
-    string newname = copy.fileName();
-
-    {
-      Ogg::FLAC::File f(newname.c_str());
-      f.tag()->setArtist("The Artist");
-      f.save();
-    }
-    {
-      Ogg::FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL(String("The Artist"), f.tag()->artist());
-
-      f.seek(0, File::End);
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(9134), f.tell());
-    }
+    Ogg::FLAC::File f(newname.c_str());
+    f.tag()->setArtist("The Artist");
+    f.save();
   }
-
-  void testFuzzedFile()
   {
-    Ogg::FLAC::File f(TEST_FILE_PATH_C("segfault.oga"));
-    CPPUNIT_ASSERT(!f.isValid());
-  }
+    Ogg::FLAC::File f(newname.c_str());
+    ASSERT_EQ(String("The Artist"), f.tag()->artist());
 
-  void testSplitPackets()
+    f.seek(0, File::End);
+    ASSERT_EQ(static_cast<offset_t>(9134), f.tell());
+  }
+}
+
+TEST(OggFLAC, testFuzzedFile)
+{
+  Ogg::FLAC::File f(TEST_FILE_PATH_C("segfault.oga"));
+  ASSERT_FALSE(f.isValid());
+}
+
+TEST(OggFLAC, testSplitPackets)
+{
+  ScopedFileCopy copy("empty_flac", ".oga");
+  string newname    = copy.fileName();
+
+  const String text = longText(128 * 1024, true);
+
   {
-    ScopedFileCopy copy("empty_flac", ".oga");
-    string newname = copy.fileName();
-
-    const String text = longText(128 * 1024, true);
-
-    {
-      Ogg::FLAC::File f(newname.c_str());
-      f.tag()->setTitle(text);
-      f.save();
-    }
-    {
-      Ogg::FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(141141), f.length());
-      CPPUNIT_ASSERT_EQUAL(21, f.lastPageHeader()->pageSequenceNumber());
-      CPPUNIT_ASSERT_EQUAL(51U, f.packet(0).size());
-      CPPUNIT_ASSERT_EQUAL(131126U, f.packet(1).size());
-      CPPUNIT_ASSERT_EQUAL(22U, f.packet(2).size());
-      CPPUNIT_ASSERT_EQUAL(8196U, f.packet(3).size());
-      CPPUNIT_ASSERT_EQUAL(text, f.tag()->title());
-
-      CPPUNIT_ASSERT(f.audioProperties());
-      CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());
-
-      f.tag()->setTitle("ABCDE");
-      f.save();
-    }
-    {
-      Ogg::FLAC::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(9128), f.length());
-      CPPUNIT_ASSERT_EQUAL(5, f.lastPageHeader()->pageSequenceNumber());
-      CPPUNIT_ASSERT_EQUAL(51U, f.packet(0).size());
-      CPPUNIT_ASSERT_EQUAL(59U, f.packet(1).size());
-      CPPUNIT_ASSERT_EQUAL(22U, f.packet(2).size());
-      CPPUNIT_ASSERT_EQUAL(8196U, f.packet(3).size());
-      CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
-
-      CPPUNIT_ASSERT(f.audioProperties());
-      CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());
-    }
+    Ogg::FLAC::File f(newname.c_str());
+    f.tag()->setTitle(text);
+    f.save();
   }
+  {
+    Ogg::FLAC::File f(newname.c_str());
+    ASSERT_TRUE(f.isValid());
+    ASSERT_EQ(static_cast<offset_t>(141141), f.length());
+    ASSERT_EQ(21, f.lastPageHeader()->pageSequenceNumber());
+    ASSERT_EQ(51U, f.packet(0).size());
+    ASSERT_EQ(131126U, f.packet(1).size());
+    ASSERT_EQ(22U, f.packet(2).size());
+    ASSERT_EQ(8196U, f.packet(3).size());
+    ASSERT_EQ(text, f.tag()->title());
 
-};
+    ASSERT_TRUE(f.audioProperties());
+    ASSERT_EQ(3705, f.audioProperties()->lengthInMilliseconds());
 
-CPPUNIT_TEST_SUITE_REGISTRATION(TestOggFLAC);
+    f.tag()->setTitle("ABCDE");
+    f.save();
+  }
+  {
+    Ogg::FLAC::File f(newname.c_str());
+    ASSERT_TRUE(f.isValid());
+    ASSERT_EQ(static_cast<offset_t>(9128), f.length());
+    ASSERT_EQ(5, f.lastPageHeader()->pageSequenceNumber());
+    ASSERT_EQ(51U, f.packet(0).size());
+    ASSERT_EQ(59U, f.packet(1).size());
+    ASSERT_EQ(22U, f.packet(2).size());
+    ASSERT_EQ(8196U, f.packet(3).size());
+    ASSERT_EQ(String("ABCDE"), f.tag()->title());
+
+    ASSERT_TRUE(f.audioProperties());
+    ASSERT_EQ(3705, f.audioProperties()->lengthInMilliseconds());
+  }
+}

@@ -43,9 +43,9 @@
 #include "fileref.h"
 #include "flacfile.h"
 #include "flacmetadatablock.h"
-#include "flacunknownmetadatablock.h"
 #include "flacpicture.h"
 #include "flacproperties.h"
+#include "flacunknownmetadatablock.h"
 #include "generalencapsulatedobjectframe.h"
 #include "id3v1genres.h"
 #include "id3v1tag.h"
@@ -125,134 +125,123 @@
 #include "xmproperties.h"
 
 #include <cstring>
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
 
-class TestSizes : public CppUnit::TestFixture
+static constexpr size_t classSize(int baseClasses, bool isVirtual)
 {
-    CPPUNIT_TEST_SUITE(TestSizes);
-    CPPUNIT_TEST(testSizes);
-    CPPUNIT_TEST_SUITE_END();
+  return sizeof(void *) * (baseClasses + static_cast<int>(isVirtual) + 1);
+}
 
-public:
-    void testSizes()
-    {
-        // Class list was built by generating XML docs with Doxygen, and then running:
-        // $ grep kind=\"class\" index.xml | sed -E -e 's/(.*<name>|<\/name>.*)//g'
+TEST(Sizes, testSizes)
+{
+  // Class list was built by generating XML docs with Doxygen, and then running:
+  // $ grep kind=\"class\" index.xml | sed -E -e 's/(.*<name>|<\/name>.*)//g'
 
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::APE::Footer));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::APE::Item));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Attribute));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Picture));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::AudioProperties));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::ByteVector));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::ByteVectorList));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ByteVectorStream));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::DebugListener));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FLAC::MetadataBlock));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Picture));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::UnknownMetadataBlock));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileRef));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FileRef::FileTypeResolver));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileRef::StreamTypeResolver));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileStream));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v1::StringHandler));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v1::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::AttachedPictureFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::AttachedPictureFrameV22));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::ChapterFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::CommentsFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::EventTimingCodesFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v2::ExtendedHeader));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v2::Footer));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v2::Frame));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v2::FrameFactory));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::GeneralEncapsulatedObjectFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v2::Header));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::ID3v2::Latin1StringHandler));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::OwnershipFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::PodcastFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::PopularimeterFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::PrivateFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::RelativeVolumeFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::SynchronizedLyricsFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::TableOfContentsFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::TextIdentificationFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::UniqueFileIdentifierFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::UnknownFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::UnsynchronizedLyricsFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ID3v2::UrlLinkFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::ID3v2::UserTextIdentificationFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::ID3v2::UserUrlLinkFrame));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::IOStream));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::IT::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::IT::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::List<int>));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::CoverArt));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Item));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::Header));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MPEG::XingHeader));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::Map<int, int>));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Mod::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::FileBase));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::FLAC::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::Opus::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::Opus::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Ogg::Page));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Ogg::PageHeader));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::Speex::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::Speex::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::Vorbis::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::Vorbis::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::XiphComment));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::PropertyMap));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::RIFF::AIFF::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::AIFF::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::RIFF::Info::StringHandler));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::Info::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::RIFF::WAV::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::WAV::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::S3M::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::S3M::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::String));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::StringList));
-        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Tag));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::TrueAudio::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::TrueAudio::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::WavPack::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::WavPack::Properties));
-        CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::XM::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::XM::Properties));
-    }
-
-private:
-    constexpr size_t classSize(int baseClasses, bool isVirtual)
-    {
-        return sizeof(void *) * (baseClasses + static_cast<int>(isVirtual) + 1);
-    }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestSizes);
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::APE::File));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::APE::Footer));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::APE::Item));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::APE::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::APE::Tag));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ASF::Attribute));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ASF::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ASF::Picture));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ASF::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ASF::Tag));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::AudioProperties));
+  ASSERT_EQ(classSize(0, false), sizeof(TagLib::ByteVector));
+  ASSERT_EQ(classSize(2, false), sizeof(TagLib::ByteVectorList));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ByteVectorStream));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::DebugListener));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FLAC::File));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::FLAC::MetadataBlock));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FLAC::Picture));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FLAC::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FLAC::UnknownMetadataBlock));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FileRef));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::FileRef::FileTypeResolver));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FileRef::StreamTypeResolver));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::FileStream));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v1::StringHandler));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v1::Tag));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::AttachedPictureFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::AttachedPictureFrameV22));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::ChapterFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::CommentsFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::EventTimingCodesFrame));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v2::ExtendedHeader));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v2::Footer));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v2::Frame));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v2::FrameFactory));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::GeneralEncapsulatedObjectFrame));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v2::Header));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::ID3v2::Latin1StringHandler));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::OwnershipFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::PodcastFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::PopularimeterFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::PrivateFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::RelativeVolumeFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::SynchronizedLyricsFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::TableOfContentsFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::Tag));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::TextIdentificationFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::UniqueFileIdentifierFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::UnknownFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::UnsynchronizedLyricsFrame));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::ID3v2::UrlLinkFrame));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::ID3v2::UserTextIdentificationFrame));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::ID3v2::UserUrlLinkFrame));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::IOStream));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::IT::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::IT::Properties));
+  ASSERT_EQ(classSize(1, false), sizeof(TagLib::List<int>));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MP4::CoverArt));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MP4::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MP4::Item));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MP4::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MP4::Tag));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MPC::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MPC::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MPEG::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MPEG::Header));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::MPEG::Properties));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::MPEG::XingHeader));
+  ASSERT_EQ(classSize(1, false), sizeof(TagLib::Map<int, int>));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::Mod::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Mod::FileBase));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Mod::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Mod::Tag));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::Ogg::FLAC::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Ogg::File));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::Ogg::Opus::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Ogg::Opus::Properties));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::Ogg::Page));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::Ogg::PageHeader));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::Ogg::Speex::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Ogg::Speex::Properties));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::Ogg::Vorbis::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Ogg::Vorbis::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::Ogg::XiphComment));
+  ASSERT_EQ(classSize(2, false), sizeof(TagLib::PropertyMap));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::RIFF::AIFF::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::RIFF::AIFF::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::RIFF::File));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::RIFF::Info::StringHandler));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::RIFF::Info::Tag));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::RIFF::WAV::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::RIFF::WAV::Properties));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::S3M::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::S3M::Properties));
+  ASSERT_EQ(classSize(1, false), sizeof(TagLib::String));
+  ASSERT_EQ(classSize(2, false), sizeof(TagLib::StringList));
+  ASSERT_EQ(classSize(0, true), sizeof(TagLib::Tag));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::TrueAudio::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::TrueAudio::Properties));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::WavPack::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::WavPack::Properties));
+  ASSERT_EQ(classSize(2, true), sizeof(TagLib::XM::File));
+  ASSERT_EQ(classSize(1, true), sizeof(TagLib::XM::Properties));
+}

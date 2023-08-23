@@ -23,171 +23,150 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
 #include "apetag.h"
 #include "id3v1tag.h"
-#include "tstringlist.h"
+#include "mpcfile.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
-#include "mpcfile.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "tstringlist.h"
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestMPC : public CppUnit::TestFixture
+TEST(MPC, testPropertiesSV8)
 {
-  CPPUNIT_TEST_SUITE(TestMPC);
-  CPPUNIT_TEST(testPropertiesSV8);
-  CPPUNIT_TEST(testPropertiesSV7);
-  CPPUNIT_TEST(testPropertiesSV5);
-  CPPUNIT_TEST(testPropertiesSV4);
-  CPPUNIT_TEST(testFuzzedFile1);
-  CPPUNIT_TEST(testFuzzedFile2);
-  CPPUNIT_TEST(testFuzzedFile3);
-  CPPUNIT_TEST(testFuzzedFile4);
-  CPPUNIT_TEST(testStripAndProperties);
-  CPPUNIT_TEST(testRepeatedSave);
-  CPPUNIT_TEST_SUITE_END();
+  MPC::File f(TEST_FILE_PATH_C("sv8_header.mpc"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(8, f.audioProperties()->mpcVersion());
+  ASSERT_EQ(1, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(1497, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(1, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(66014U, f.audioProperties()->sampleFrames());
+}
 
-public:
+TEST(MPC, testPropertiesSV7)
+{
+  MPC::File f(TEST_FILE_PATH_C("click.mpc"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(7, f.audioProperties()->mpcVersion());
+  ASSERT_EQ(0, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(40, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(318, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(1760U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(14221, f.audioProperties()->trackGain());
+  ASSERT_EQ(19848, f.audioProperties()->trackPeak());
+  ASSERT_EQ(14221, f.audioProperties()->albumGain());
+  ASSERT_EQ(19848, f.audioProperties()->albumPeak());
+}
 
-  void testPropertiesSV8()
+TEST(MPC, testPropertiesSV5)
+{
+  MPC::File f(TEST_FILE_PATH_C("sv5_header.mpc"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(5, f.audioProperties()->mpcVersion());
+  ASSERT_EQ(26, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(26371, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(0, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(1162944U, f.audioProperties()->sampleFrames());
+}
+
+TEST(MPC, testPropertiesSV4)
+{
+  MPC::File f(TEST_FILE_PATH_C("sv4_header.mpc"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(4, f.audioProperties()->mpcVersion());
+  ASSERT_EQ(26, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(26371, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(0, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(1162944U, f.audioProperties()->sampleFrames());
+}
+
+TEST(MPC, testFuzzedFile1)
+{
+  MPC::File f(TEST_FILE_PATH_C("zerodiv.mpc"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(MPC, testFuzzedFile2)
+{
+  MPC::File f(TEST_FILE_PATH_C("infloop.mpc"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(MPC, testFuzzedFile3)
+{
+  MPC::File f(TEST_FILE_PATH_C("segfault.mpc"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(MPC, testFuzzedFile4)
+{
+  MPC::File f(TEST_FILE_PATH_C("segfault2.mpc"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(MPC, testStripAndProperties)
+{
+  ScopedFileCopy copy("click", ".mpc");
+
   {
-    MPC::File f(TEST_FILE_PATH_C("sv8_header.mpc"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->mpcVersion());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(1497, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(66014U, f.audioProperties()->sampleFrames());
+    MPC::File f(copy.fileName().c_str());
+    f.APETag(true)->setTitle("APE");
+    f.ID3v1Tag(true)->setTitle("ID3v1");
+    f.save();
   }
-
-  void testPropertiesSV7()
   {
-    MPC::File f(TEST_FILE_PATH_C("click.mpc"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(7, f.audioProperties()->mpcVersion());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(40, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(318, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1760U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(14221, f.audioProperties()->trackGain());
-    CPPUNIT_ASSERT_EQUAL(19848, f.audioProperties()->trackPeak());
-    CPPUNIT_ASSERT_EQUAL(14221, f.audioProperties()->albumGain());
-    CPPUNIT_ASSERT_EQUAL(19848, f.audioProperties()->albumPeak());
+    MPC::File f(copy.fileName().c_str());
+    ASSERT_EQ(String("APE"), f.properties()["TITLE"].front());
+    f.strip(MPC::File::APE);
+    ASSERT_EQ(String("ID3v1"), f.properties()["TITLE"].front());
+    f.strip(MPC::File::ID3v1);
+    ASSERT_TRUE(f.properties().isEmpty());
+    f.save();
   }
-
-  void testPropertiesSV5()
   {
-    MPC::File f(TEST_FILE_PATH_C("sv5_header.mpc"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(5, f.audioProperties()->mpcVersion());
-    CPPUNIT_ASSERT_EQUAL(26, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(26371, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1162944U, f.audioProperties()->sampleFrames());
+    MPC::File f(copy.fileName().c_str());
+    ASSERT_FALSE(f.hasAPETag());
+    ASSERT_FALSE(f.hasID3v1Tag());
+    ASSERT_TRUE(f.properties()["TITLE"].isEmpty());
+    ASSERT_TRUE(f.properties().isEmpty());
   }
+}
 
-  void testPropertiesSV4()
+TEST(MPC, testRepeatedSave)
+{
+  ScopedFileCopy copy("click", ".mpc");
+
   {
-    MPC::File f(TEST_FILE_PATH_C("sv4_header.mpc"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->mpcVersion());
-    CPPUNIT_ASSERT_EQUAL(26, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(26371, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1162944U, f.audioProperties()->sampleFrames());
-  }
+    MPC::File f(copy.fileName().c_str());
+    ASSERT_FALSE(f.hasAPETag());
+    ASSERT_FALSE(f.hasID3v1Tag());
 
-  void testFuzzedFile1()
+    f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.save();
+
+    f.APETag()->setTitle("0");
+    f.save();
+
+    f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
+    f.save();
+  }
   {
-    MPC::File f(TEST_FILE_PATH_C("zerodiv.mpc"));
-    CPPUNIT_ASSERT(f.isValid());
+    MPC::File f(copy.fileName().c_str());
+    ASSERT_TRUE(f.hasAPETag());
+    ASSERT_TRUE(f.hasID3v1Tag());
   }
-
-  void testFuzzedFile2()
-  {
-    MPC::File f(TEST_FILE_PATH_C("infloop.mpc"));
-    CPPUNIT_ASSERT(f.isValid());
-  }
-
-  void testFuzzedFile3()
-  {
-    MPC::File f(TEST_FILE_PATH_C("segfault.mpc"));
-    CPPUNIT_ASSERT(f.isValid());
-  }
-
-  void testFuzzedFile4()
-  {
-    MPC::File f(TEST_FILE_PATH_C("segfault2.mpc"));
-    CPPUNIT_ASSERT(f.isValid());
-  }
-
-  void testStripAndProperties()
-  {
-    ScopedFileCopy copy("click", ".mpc");
-
-    {
-      MPC::File f(copy.fileName().c_str());
-      f.APETag(true)->setTitle("APE");
-      f.ID3v1Tag(true)->setTitle("ID3v1");
-      f.save();
-    }
-    {
-      MPC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
-      f.strip(MPC::File::APE);
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
-      f.strip(MPC::File::ID3v1);
-      CPPUNIT_ASSERT(f.properties().isEmpty());
-      f.save();
-    }
-    {
-      MPC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT(f.properties()["TITLE"].isEmpty());
-      CPPUNIT_ASSERT(f.properties().isEmpty());
-    }
-  }
-
-  void testRepeatedSave()
-  {
-    ScopedFileCopy copy("click", ".mpc");
-
-    {
-      MPC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-
-      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.save();
-
-      f.APETag()->setTitle("0");
-      f.save();
-
-      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
-      f.save();
-    }
-    {
-      MPC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasAPETag());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-    }
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestMPC);
+}

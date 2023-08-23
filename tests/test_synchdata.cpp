@@ -23,105 +23,84 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "id3v2synchdata.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
 
-class TestID3v2SynchData : public CppUnit::TestFixture
+TEST(SynchData, test1)
 {
-  CPPUNIT_TEST_SUITE(TestID3v2SynchData);
-  CPPUNIT_TEST(test1);
-  CPPUNIT_TEST(test2);
-  CPPUNIT_TEST(test3);
-  CPPUNIT_TEST(testToUIntBroken);
-  CPPUNIT_TEST(testToUIntBrokenAndTooLarge);
-  CPPUNIT_TEST(testDecode1);
-  CPPUNIT_TEST(testDecode2);
-  CPPUNIT_TEST(testDecode3);
-  CPPUNIT_TEST(testDecode4);
-  CPPUNIT_TEST_SUITE_END();
+  char data[] = { 0, 0, 0, 127 };
+  ByteVector v(data, 4);
 
-public:
+  ASSERT_EQ(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(127));
+  ASSERT_EQ(ID3v2::SynchData::fromUInt(127), v);
+}
 
-  void test1()
-  {
-    char data[] = { 0, 0, 0, 127 };
-    ByteVector v(data, 4);
+TEST(SynchData, test2)
+{
+  char data[] = { 0, 0, 1, 0 };
+  ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(127));
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(127), v);
-  }
+  ASSERT_EQ(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(128));
+  ASSERT_EQ(ID3v2::SynchData::fromUInt(128), v);
+}
 
-  void test2()
-  {
-    char data[] = { 0, 0, 1, 0 };
-    ByteVector v(data, 4);
+TEST(SynchData, test3)
+{
+  char data[] = { 0, 0, 1, 1 };
+  ByteVector v(data, 4);
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(128));
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(128), v);
-  }
+  ASSERT_EQ(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(129));
+  ASSERT_EQ(ID3v2::SynchData::fromUInt(129), v);
+}
 
-  void test3()
-  {
-    char data[] = { 0, 0, 1, 1 };
-    ByteVector v(data, 4);
+TEST(SynchData, testToUIntBroken)
+{
+  char data[]  = { 0, 0, 0, static_cast<char>(-1) };
+  char data2[] = { 0, 0, static_cast<char>(-1), static_cast<char>(-1) };
 
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::toUInt(v), static_cast<unsigned int>(129));
-    CPPUNIT_ASSERT_EQUAL(ID3v2::SynchData::fromUInt(129), v);
-  }
+  ASSERT_EQ(static_cast<unsigned int>(255), ID3v2::SynchData::toUInt(ByteVector(data, 4)));
+  ASSERT_EQ(static_cast<unsigned int>(65535), ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
+}
 
-  void testToUIntBroken()
-  {
-    char data[] = { 0, 0, 0, static_cast<char>(-1) };
-    char data2[] = { 0, 0, static_cast<char>(-1), static_cast<char>(-1) };
+TEST(SynchData, testToUIntBrokenAndTooLarge)
+{
+  char data[] = { 0, 0, 0, static_cast<char>(-1), 0 };
+  ByteVector v(data, 5);
 
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(255), ID3v2::SynchData::toUInt(ByteVector(data, 4)));
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(65535), ID3v2::SynchData::toUInt(ByteVector(data2, 4)));
-  }
+  ASSERT_EQ(static_cast<unsigned int>(255), ID3v2::SynchData::toUInt(v));
+}
 
-  void testToUIntBrokenAndTooLarge()
-  {
-    char data[] = { 0, 0, 0, static_cast<char>(-1), 0 };
-    ByteVector v(data, 5);
+TEST(SynchData, testDecode1)
+{
+  ByteVector a("\xff\x00\x00", 3);
+  a = ID3v2::SynchData::decode(a);
+  ASSERT_EQ(static_cast<unsigned int>(2), a.size());
+  ASSERT_EQ(ByteVector("\xff\x00", 2), a);
+}
 
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(255), ID3v2::SynchData::toUInt(v));
-  }
+TEST(SynchData, testDecode2)
+{
+  ByteVector a("\xff\x44", 2);
+  a = ID3v2::SynchData::decode(a);
+  ASSERT_EQ(static_cast<unsigned int>(2), a.size());
+  ASSERT_EQ(ByteVector("\xff\x44", 2), a);
+}
 
-  void testDecode1()
-  {
-    ByteVector a("\xff\x00\x00", 3);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x00", 2), a);
-  }
+TEST(SynchData, testDecode3)
+{
+  ByteVector a("\xff\xff\x00", 3);
+  a = ID3v2::SynchData::decode(a);
+  ASSERT_EQ(static_cast<unsigned int>(2), a.size());
+  ASSERT_EQ(ByteVector("\xff\xff", 2), a);
+}
 
-  void testDecode2()
-  {
-    ByteVector a("\xff\x44", 2);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\x44", 2), a);
-  }
-
-  void testDecode3()
-  {
-    ByteVector a("\xff\xff\x00", 3);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff", 2), a);
-  }
-
-  void testDecode4()
-  {
-    ByteVector a("\xff\xff\xff", 3);
-    a = ID3v2::SynchData::decode(a);
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), a.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xff\xff\xff", 3), a);
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v2SynchData);
+TEST(SynchData, testDecode4)
+{
+  ByteVector a("\xff\xff\xff", 3);
+  a = ID3v2::SynchData::decode(a);
+  ASSERT_EQ(static_cast<unsigned int>(3), a.size());
+  ASSERT_EQ(ByteVector("\xff\xff\xff", 3), a);
+}

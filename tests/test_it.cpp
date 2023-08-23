@@ -25,8 +25,8 @@
 
 #include "itfile.h"
 #include "tstringlist.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
@@ -67,73 +67,61 @@ static const String commentAfter(
   "This is because it is saved in the 'message' proportion of\n"
   "IT files.");
 
-class TestIT : public CppUnit::TestFixture
+static void testRead(FileName fileName, const String &title, const String &comment)
 {
-  CPPUNIT_TEST_SUITE(TestIT);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testWriteTags);
-  CPPUNIT_TEST_SUITE_END();
+  IT::File file(fileName);
 
-public:
-  void testReadTags()
+  ASSERT_TRUE(file.isValid());
+
+  IT::Properties *p = file.audioProperties();
+  Mod::Tag *t       = file.tag();
+
+  ASSERT_NE(nullptr, p);
+  ASSERT_NE(nullptr, t);
+
+  ASSERT_EQ(0, p->lengthInSeconds());
+  ASSERT_EQ(0, p->bitrate());
+  ASSERT_EQ(0, p->sampleRate());
+  ASSERT_EQ(64, p->channels());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->lengthInPatterns());
+  ASSERT_TRUE(p->stereo());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->instrumentCount());
+  ASSERT_EQ(static_cast<unsigned short>(5), p->sampleCount());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->patternCount());
+  ASSERT_EQ(static_cast<unsigned short>(535), p->version());
+  ASSERT_EQ(static_cast<unsigned short>(532), p->compatibleVersion());
+  ASSERT_EQ(static_cast<unsigned short>(9), p->flags());
+  ASSERT_EQ(static_cast<unsigned char>(128), p->globalVolume());
+  ASSERT_EQ(static_cast<unsigned char>(48), p->mixVolume());
+  ASSERT_EQ(static_cast<unsigned char>(125), p->tempo());
+  ASSERT_EQ(static_cast<unsigned char>(6), p->bpmSpeed());
+  ASSERT_EQ(static_cast<unsigned char>(128), p->panningSeparation());
+  ASSERT_EQ(static_cast<unsigned char>(0), p->pitchWheelDepth());
+  ASSERT_EQ(title, t->title());
+  ASSERT_EQ(String(), t->artist());
+  ASSERT_EQ(String(), t->album());
+  ASSERT_EQ(comment, t->comment());
+  ASSERT_EQ(String(), t->genre());
+  ASSERT_EQ(0U, t->year());
+  ASSERT_EQ(0U, t->track());
+  ASSERT_EQ(String("Impulse Tracker"), t->trackerName());
+}
+
+TEST(IT, testReadTagS)
+{
+  testRead(TEST_FILE_PATH_C("test.it"), titleBefore, commentBefore);
+}
+
+TEST(IT, testWriteTags)
+{
+  ScopedFileCopy copy("test", ".it");
   {
-    testRead(TEST_FILE_PATH_C("test.it"), titleBefore, commentBefore);
+    IT::File file(copy.fileName().c_str());
+    ASSERT_NE(nullptr, file.tag());
+    file.tag()->setTitle(titleAfter);
+    file.tag()->setComment(newComment);
+    file.tag()->setTrackerName("won't be saved");
+    ASSERT_TRUE(file.save());
   }
-
-  void testWriteTags()
-  {
-    ScopedFileCopy copy("test", ".it");
-    {
-      IT::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != nullptr);
-      file.tag()->setTitle(titleAfter);
-      file.tag()->setComment(newComment);
-      file.tag()->setTrackerName("won't be saved");
-      CPPUNIT_ASSERT(file.save());
-    }
-    testRead(copy.fileName().c_str(), titleAfter, commentAfter);
-  }
-
-private:
-  void testRead(FileName fileName, const String &title, const String &comment)
-  {
-    IT::File file(fileName);
-
-    CPPUNIT_ASSERT(file.isValid());
-
-    IT::Properties *p = file.audioProperties();
-    Mod::Tag *t = file.tag();
-
-    CPPUNIT_ASSERT(nullptr != p);
-    CPPUNIT_ASSERT(nullptr != t);
-
-    CPPUNIT_ASSERT_EQUAL( 0, p->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL( 0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(64, p->channels());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(true, p->stereo());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(5), p->sampleCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->patternCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(535), p->version());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(532), p->compatibleVersion());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(9), p->flags());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(128), p->globalVolume());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(48), p->mixVolume());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(125), p->tempo());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(6), p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(128), p->panningSeparation());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(0), p->pitchWheelDepth());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String("Impulse Tracker"), t->trackerName());
-  }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestIT);
+  testRead(copy.fileName().c_str(), titleAfter, commentAfter);
+}

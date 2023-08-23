@@ -23,161 +23,142 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
 #include "apetag.h"
 #include "id3v1tag.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
-#include "wavpackfile.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include "wavpackfile.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestWavPack : public CppUnit::TestFixture
+TEST(WavPack, testNoLengthProperties)
 {
-  CPPUNIT_TEST_SUITE(TestWavPack);
-  CPPUNIT_TEST(testNoLengthProperties);
-  CPPUNIT_TEST(testMultiChannelProperties);
-  CPPUNIT_TEST(testDsdStereoProperties);
-  CPPUNIT_TEST(testNonStandardRateProperties);
-  CPPUNIT_TEST(testTaggedProperties);
-  CPPUNIT_TEST(testFuzzedFile);
-  CPPUNIT_TEST(testStripAndProperties);
-  CPPUNIT_TEST(testRepeatedSave);
-  CPPUNIT_TEST_SUITE_END();
+  WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3705, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(1, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_TRUE(f.audioProperties()->isLossless());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(163392U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(1031, f.audioProperties()->version());
+}
 
-public:
+TEST(WavPack, testMultiChannelProperties)
+{
+  WavPack::File f(TEST_FILE_PATH_C("four_channels.wv"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3833, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(112, f.audioProperties()->bitrate());
+  ASSERT_EQ(4, f.audioProperties()->channels());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_FALSE(f.audioProperties()->isLossless());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(169031U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(1031, f.audioProperties()->version());
+}
 
-  void testNoLengthProperties()
+TEST(WavPack, testDsdStereoProperties)
+{
+  WavPack::File f(TEST_FILE_PATH_C("dsd_stereo.wv"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(0, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(200, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(2096, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(8, f.audioProperties()->bitsPerSample());
+  ASSERT_TRUE(f.audioProperties()->isLossless());
+  ASSERT_EQ(352800, f.audioProperties()->sampleRate());
+  ASSERT_EQ(70560U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(1040, f.audioProperties()->version());
+}
+
+TEST(WavPack, testNonStandardRateProperties)
+{
+  WavPack::File f(TEST_FILE_PATH_C("non_standard_rate.wv"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3675, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(0, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_TRUE(f.audioProperties()->isLossless());
+  ASSERT_EQ(1000, f.audioProperties()->sampleRate());
+  ASSERT_EQ(3675U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(1040, f.audioProperties()->version());
+}
+
+TEST(WavPack, testTaggedProperties)
+{
+  WavPack::File f(TEST_FILE_PATH_C("tagged.wv"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3550, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(172, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_FALSE(f.audioProperties()->isLossless());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(156556U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(1031, f.audioProperties()->version());
+}
+
+TEST(WavPack, testFuzzedFile)
+{
+  WavPack::File f(TEST_FILE_PATH_C("infloop.wv"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(WavPack, testStripAndProperties)
+{
+  ScopedFileCopy copy("click", ".wv");
+
   {
-    WavPack::File f(TEST_FILE_PATH_C("no_length.wv"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3705, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(true, f.audioProperties()->isLossless());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(163392U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(1031, f.audioProperties()->version());
+    WavPack::File f(copy.fileName().c_str());
+    f.APETag(true)->setTitle("APE");
+    f.ID3v1Tag(true)->setTitle("ID3v1");
+    f.save();
   }
-
-  void testMultiChannelProperties()
   {
-    WavPack::File f(TEST_FILE_PATH_C("four_channels.wv"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3833, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(112, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isLossless());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(169031U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(1031, f.audioProperties()->version());
+    WavPack::File f(copy.fileName().c_str());
+    ASSERT_EQ(String("APE"), f.properties()["TITLE"].front());
+    f.strip(WavPack::File::APE);
+    ASSERT_EQ(String("ID3v1"), f.properties()["TITLE"].front());
+    f.strip(WavPack::File::ID3v1);
+    ASSERT_TRUE(f.properties().isEmpty());
   }
+}
 
-  void testDsdStereoProperties()
+TEST(WavPack, testRepeatedSave)
+{
+  ScopedFileCopy copy("click", ".wv");
+
   {
-    WavPack::File f(TEST_FILE_PATH_C("dsd_stereo.wv"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(200, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(2096, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(true, f.audioProperties()->isLossless());
-    CPPUNIT_ASSERT_EQUAL(352800, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(70560U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(1040, f.audioProperties()->version());
-  }
+    WavPack::File f(copy.fileName().c_str());
+    ASSERT_FALSE(f.hasAPETag());
+    ASSERT_FALSE(f.hasID3v1Tag());
 
-  void testNonStandardRateProperties()
+    f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.save();
+
+    f.APETag()->setTitle("0");
+    f.save();
+
+    f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
+    f.save();
+  }
   {
-    WavPack::File f(TEST_FILE_PATH_C("non_standard_rate.wv"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3675, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(true, f.audioProperties()->isLossless());
-    CPPUNIT_ASSERT_EQUAL(1000, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(3675U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(1040, f.audioProperties()->version());
+    WavPack::File f(copy.fileName().c_str());
+    ASSERT_TRUE(f.hasAPETag());
+    ASSERT_TRUE(f.hasID3v1Tag());
   }
-
-  void testTaggedProperties()
-  {
-    WavPack::File f(TEST_FILE_PATH_C("tagged.wv"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(172, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isLossless());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(1031, f.audioProperties()->version());
-  }
-
-  void testFuzzedFile()
-  {
-    WavPack::File f(TEST_FILE_PATH_C("infloop.wv"));
-    CPPUNIT_ASSERT(f.isValid());
-  }
-
-  void testStripAndProperties()
-  {
-    ScopedFileCopy copy("click", ".wv");
-
-    {
-      WavPack::File f(copy.fileName().c_str());
-      f.APETag(true)->setTitle("APE");
-      f.ID3v1Tag(true)->setTitle("ID3v1");
-      f.save();
-    }
-    {
-      WavPack::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
-      f.strip(WavPack::File::APE);
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
-      f.strip(WavPack::File::ID3v1);
-      CPPUNIT_ASSERT(f.properties().isEmpty());
-    }
-  }
-
-  void testRepeatedSave()
-  {
-    ScopedFileCopy copy("click", ".wv");
-
-    {
-      WavPack::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-
-      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.save();
-
-      f.APETag()->setTitle("0");
-      f.save();
-
-      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
-      f.save();
-    }
-    {
-      WavPack::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasAPETag());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-    }
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestWavPack);
+}

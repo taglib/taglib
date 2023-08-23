@@ -23,80 +23,67 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "speexfile.h"
 #include "oggpageheader.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "speexfile.h"
 #include "utils.h"
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
 
-class TestSpeex : public CppUnit::TestFixture
+TEST(Speex, testAudioProperties)
 {
-  CPPUNIT_TEST_SUITE(TestSpeex);
-  CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testSplitPackets);
-  CPPUNIT_TEST_SUITE_END();
+  Ogg::Speex::File f(TEST_FILE_PATH_C("empty.spx"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3685, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(53, f.audioProperties()->bitrate());
+  ASSERT_EQ(-1, f.audioProperties()->bitrateNominal());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+}
 
-public:
+TEST(Speex, testSplitPackets)
+{
+  ScopedFileCopy copy("empty", ".spx");
+  string newname    = copy.fileName();
 
-  void testAudioProperties()
+  const String text = longText(128 * 1024, true);
+
   {
-    Ogg::Speex::File f(TEST_FILE_PATH_C("empty.spx"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(53, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(-1, f.audioProperties()->bitrateNominal());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    Ogg::Speex::File f(newname.c_str());
+    f.tag()->setTitle(text);
+    f.save();
   }
-
-  void testSplitPackets()
   {
-    ScopedFileCopy copy("empty", ".spx");
-    string newname = copy.fileName();
+    Ogg::Speex::File f(newname.c_str());
+    ASSERT_TRUE(f.isValid());
+    ASSERT_EQ(static_cast<offset_t>(156330), f.length());
+    ASSERT_EQ(23, f.lastPageHeader()->pageSequenceNumber());
+    ASSERT_EQ(80U, f.packet(0).size());
+    ASSERT_EQ(131116U, f.packet(1).size());
+    ASSERT_EQ(93U, f.packet(2).size());
+    ASSERT_EQ(93U, f.packet(3).size());
+    ASSERT_EQ(text, f.tag()->title());
 
-    const String text = longText(128 * 1024, true);
+    ASSERT_TRUE(f.audioProperties());
+    ASSERT_EQ(3685, f.audioProperties()->lengthInMilliseconds());
 
-    {
-      Ogg::Speex::File f(newname.c_str());
-      f.tag()->setTitle(text);
-      f.save();
-    }
-    {
-      Ogg::Speex::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(156330), f.length());
-      CPPUNIT_ASSERT_EQUAL(23, f.lastPageHeader()->pageSequenceNumber());
-      CPPUNIT_ASSERT_EQUAL(80U, f.packet(0).size());
-      CPPUNIT_ASSERT_EQUAL(131116U, f.packet(1).size());
-      CPPUNIT_ASSERT_EQUAL(93U, f.packet(2).size());
-      CPPUNIT_ASSERT_EQUAL(93U, f.packet(3).size());
-      CPPUNIT_ASSERT_EQUAL(text, f.tag()->title());
-
-      CPPUNIT_ASSERT(f.audioProperties());
-      CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
-
-      f.tag()->setTitle("ABCDE");
-      f.save();
-    }
-    {
-      Ogg::Speex::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(24317), f.length());
-      CPPUNIT_ASSERT_EQUAL(7, f.lastPageHeader()->pageSequenceNumber());
-      CPPUNIT_ASSERT_EQUAL(80U, f.packet(0).size());
-      CPPUNIT_ASSERT_EQUAL(49U, f.packet(1).size());
-      CPPUNIT_ASSERT_EQUAL(93U, f.packet(2).size());
-      CPPUNIT_ASSERT_EQUAL(93U, f.packet(3).size());
-      CPPUNIT_ASSERT_EQUAL(String("ABCDE"), f.tag()->title());
-
-      CPPUNIT_ASSERT(f.audioProperties());
-      CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
-    }
+    f.tag()->setTitle("ABCDE");
+    f.save();
   }
+  {
+    Ogg::Speex::File f(newname.c_str());
+    ASSERT_TRUE(f.isValid());
+    ASSERT_EQ(static_cast<offset_t>(24317), f.length());
+    ASSERT_EQ(7, f.lastPageHeader()->pageSequenceNumber());
+    ASSERT_EQ(80U, f.packet(0).size());
+    ASSERT_EQ(49U, f.packet(1).size());
+    ASSERT_EQ(93U, f.packet(2).size());
+    ASSERT_EQ(93U, f.packet(3).size());
+    ASSERT_EQ(String("ABCDE"), f.tag()->title());
 
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestSpeex);
+    ASSERT_TRUE(f.audioProperties());
+    ASSERT_EQ(3685, f.audioProperties()->lengthInMilliseconds());
+  }
+}

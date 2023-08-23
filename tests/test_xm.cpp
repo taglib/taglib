@@ -23,9 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "xmfile.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
+#include "xmfile.h"
+
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
@@ -103,118 +104,103 @@ static const String commentAfter(
   "also abused as\n"
   "comments.\n");
 
-class TestXM : public CppUnit::TestFixture
+void testRead(FileName fileName, const String &title,
+              const String &comment, const String &trackerName)
 {
-  CPPUNIT_TEST_SUITE(TestXM);
-  CPPUNIT_TEST(testReadTags);
-  CPPUNIT_TEST(testReadStrippedTags);
-  CPPUNIT_TEST(testWriteTagsShort);
-  CPPUNIT_TEST(testWriteTagsLong);
-  CPPUNIT_TEST_SUITE_END();
+  XM::File file(fileName);
 
-public:
-  void testReadTags()
+  ASSERT_TRUE(file.isValid());
+
+  XM::Properties *p = file.audioProperties();
+  Mod::Tag *t       = file.tag();
+
+  ASSERT_NE(nullptr, p);
+  ASSERT_NE(nullptr, t);
+
+  ASSERT_EQ(0, p->lengthInSeconds());
+  ASSERT_EQ(0, p->bitrate());
+  ASSERT_EQ(0, p->sampleRate());
+  ASSERT_EQ(8, p->channels());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->lengthInPatterns());
+  ASSERT_EQ(static_cast<unsigned short>(260), p->version());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->restartPosition());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->patternCount());
+  ASSERT_EQ(static_cast<unsigned short>(128), p->instrumentCount());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->flags());
+  ASSERT_EQ(static_cast<unsigned short>(6), p->tempo());
+  ASSERT_EQ(static_cast<unsigned short>(125), p->bpmSpeed());
+  ASSERT_EQ(title, t->title());
+  ASSERT_EQ(String(), t->artist());
+  ASSERT_EQ(String(), t->album());
+  ASSERT_EQ(comment, t->comment());
+  ASSERT_EQ(String(), t->genre());
+  ASSERT_EQ(0U, t->year());
+  ASSERT_EQ(0U, t->track());
+  ASSERT_EQ(trackerName, t->trackerName());
+}
+
+void testWriteTags(const String &comment)
+{
+  ScopedFileCopy copy("test", ".xm");
   {
-    testRead(TEST_FILE_PATH_C("test.xm"), titleBefore,
-             commentBefore, trackerNameBefore);
+    XM::File file(copy.fileName().c_str());
+    ASSERT_NE(nullptr, file.tag());
+    file.tag()->setTitle(titleAfter);
+    file.tag()->setComment(comment);
+    file.tag()->setTrackerName(trackerNameAfter);
+    ASSERT_TRUE(file.save());
   }
+  testRead(copy.fileName().c_str(), titleAfter,
+           commentAfter, trackerNameAfter);
+  ASSERT_TRUE(fileEqual(
+    copy.fileName(),
+    TEST_FILE_PATH_C("changed.xm")));
+}
+TEST(XM, testReadTags)
+{
+  testRead(TEST_FILE_PATH_C("test.xm"), titleBefore,
+           commentBefore, trackerNameBefore);
+}
 
-  void testReadStrippedTags()
-  {
-    XM::File file(TEST_FILE_PATH_C("stripped.xm"));
-    CPPUNIT_ASSERT(file.isValid());
+TEST(XM, testReadStrippedTags)
+{
+  XM::File file(TEST_FILE_PATH_C("stripped.xm"));
+  ASSERT_TRUE(file.isValid());
 
-    XM::Properties *p = file.audioProperties();
-    Mod::Tag *t = file.tag();
+  XM::Properties *p = file.audioProperties();
+  Mod::Tag *t       = file.tag();
 
-    CPPUNIT_ASSERT(nullptr != p);
-    CPPUNIT_ASSERT(nullptr != t);
+  ASSERT_NE(nullptr, p);
+  ASSERT_NE(nullptr, t);
 
-    CPPUNIT_ASSERT_EQUAL(0, p->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->version());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0) , p->restartPosition());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->patternCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->flags());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(6), p->tempo());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(125), p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(titleBefore, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(String(), t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(String(), t->trackerName());
-  }
+  ASSERT_EQ(0, p->lengthInSeconds());
+  ASSERT_EQ(0, p->bitrate());
+  ASSERT_EQ(0, p->sampleRate());
+  ASSERT_EQ(8, p->channels());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->lengthInPatterns());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->version());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->restartPosition());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->patternCount());
+  ASSERT_EQ(static_cast<unsigned short>(0), p->instrumentCount());
+  ASSERT_EQ(static_cast<unsigned short>(1), p->flags());
+  ASSERT_EQ(static_cast<unsigned short>(6), p->tempo());
+  ASSERT_EQ(static_cast<unsigned short>(125), p->bpmSpeed());
+  ASSERT_EQ(titleBefore, t->title());
+  ASSERT_EQ(String(), t->artist());
+  ASSERT_EQ(String(), t->album());
+  ASSERT_EQ(String(), t->comment());
+  ASSERT_EQ(String(), t->genre());
+  ASSERT_EQ(0U, t->year());
+  ASSERT_EQ(0U, t->track());
+  ASSERT_EQ(String(), t->trackerName());
+}
 
-  void testWriteTagsShort()
-  {
-    testWriteTags(newCommentShort);
-  }
+TEST(XM, testWriteTagsShort)
+{
+  testWriteTags(newCommentShort);
+}
 
-  void testWriteTagsLong()
-  {
-    testWriteTags(newCommentLong);
-  }
-
-private:
-  void testRead(FileName fileName, const String &title,
-                const String &comment, const String &trackerName)
-  {
-    XM::File file(fileName);
-
-    CPPUNIT_ASSERT(file.isValid());
-
-    XM::Properties *p = file.audioProperties();
-    Mod::Tag *t = file.tag();
-
-    CPPUNIT_ASSERT(nullptr != p);
-    CPPUNIT_ASSERT(nullptr != t);
-
-    CPPUNIT_ASSERT_EQUAL(0, p->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
-    CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(8, p->channels());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->lengthInPatterns());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(260), p->version());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0), p->restartPosition());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->patternCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(128), p->instrumentCount());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(1), p->flags());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(6), p->tempo());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(125), p->bpmSpeed());
-    CPPUNIT_ASSERT_EQUAL(title, t->title());
-    CPPUNIT_ASSERT_EQUAL(String(), t->artist());
-    CPPUNIT_ASSERT_EQUAL(String(), t->album());
-    CPPUNIT_ASSERT_EQUAL(comment, t->comment());
-    CPPUNIT_ASSERT_EQUAL(String(), t->genre());
-    CPPUNIT_ASSERT_EQUAL(0U, t->year());
-    CPPUNIT_ASSERT_EQUAL(0U, t->track());
-    CPPUNIT_ASSERT_EQUAL(trackerName, t->trackerName());
-  }
-
-  void testWriteTags(const String &comment)
-  {
-    ScopedFileCopy copy("test", ".xm");
-    {
-      XM::File file(copy.fileName().c_str());
-      CPPUNIT_ASSERT(file.tag() != nullptr);
-      file.tag()->setTitle(titleAfter);
-      file.tag()->setComment(comment);
-      file.tag()->setTrackerName(trackerNameAfter);
-      CPPUNIT_ASSERT(file.save());
-    }
-    testRead(copy.fileName().c_str(), titleAfter,
-             commentAfter, trackerNameAfter);
-    CPPUNIT_ASSERT(fileEqual(
-      copy.fileName(),
-      TEST_FILE_PATH_C("changed.xm")));
-  }
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestXM);
+TEST(XM, testWriteTagsLong)
+{
+  testWriteTags(newCommentLong);
+}

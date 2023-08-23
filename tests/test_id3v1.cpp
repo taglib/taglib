@@ -23,66 +23,52 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
-#include "tstring.h"
-#include "mpegfile.h"
-#include "id3v1tag.h"
 #include "id3v1genres.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "id3v1tag.h"
+#include "mpegfile.h"
+#include "tstring.h"
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestID3v1 : public CppUnit::TestFixture
+TEST(ID3v1, testStripWhiteSpace)
 {
-  CPPUNIT_TEST_SUITE(TestID3v1);
-  CPPUNIT_TEST(testStripWhiteSpace);
-  CPPUNIT_TEST(testGenres);
-  CPPUNIT_TEST(testRenamedGenres);
-  CPPUNIT_TEST_SUITE_END();
+  ScopedFileCopy copy("xing", ".mp3");
+  string newname = copy.fileName();
 
-public:
-
-  void testStripWhiteSpace()
   {
-    ScopedFileCopy copy("xing", ".mp3");
-    string newname = copy.fileName();
-
-    {
-      MPEG::File f(newname.c_str());
-      f.ID3v1Tag(true)->setArtist("Artist     ");
-      f.save();
-    }
-
-    {
-      MPEG::File f(newname.c_str());
-      CPPUNIT_ASSERT(f.ID3v1Tag(false));
-      CPPUNIT_ASSERT_EQUAL(String("Artist"), f.ID3v1Tag(false)->artist());
-    }
+    MPEG::File f(newname.c_str());
+    f.ID3v1Tag(true)->setArtist("Artist     ");
+    f.save();
   }
 
-  void testGenres()
   {
-    CPPUNIT_ASSERT_EQUAL(String("Darkwave"), ID3v1::genre(50));
-    CPPUNIT_ASSERT_EQUAL(100, ID3v1::genreIndex("Humour"));
-    CPPUNIT_ASSERT(ID3v1::genreList().contains("Heavy Metal"));
-    CPPUNIT_ASSERT_EQUAL(79, ID3v1::genreMap()["Hard Rock"]);
+    MPEG::File f(newname.c_str());
+    ASSERT_TRUE(f.ID3v1Tag(false));
+    ASSERT_EQ(String("Artist"), f.ID3v1Tag(false)->artist());
   }
+}
 
-  void testRenamedGenres()
-  {
-    CPPUNIT_ASSERT_EQUAL(String("Bebop"), ID3v1::genre(85));
-    CPPUNIT_ASSERT_EQUAL(85, ID3v1::genreIndex("Bebop"));
-    CPPUNIT_ASSERT_EQUAL(85, ID3v1::genreIndex("Bebob"));
+TEST(ID3v1, testGenres)
+{
+  ASSERT_EQ(String("Darkwave"), ID3v1::genre(50));
+  ASSERT_EQ(100, ID3v1::genreIndex("Humour"));
+  ASSERT_TRUE(ID3v1::genreList().contains("Heavy Metal"));
+  ASSERT_EQ(79, ID3v1::genreMap()["Hard Rock"]);
+}
 
-    ID3v1::Tag tag;
-    tag.setGenre("Hardcore");
-    CPPUNIT_ASSERT_EQUAL(String("Hardcore Techno"), tag.genre());
-    CPPUNIT_ASSERT_EQUAL(129U, tag.genreNumber());
-  }
+TEST(ID3v1, testRenamedGenres)
+{
+  ASSERT_EQ(String("Bebop"), ID3v1::genre(85));
+  ASSERT_EQ(85, ID3v1::genreIndex("Bebop"));
+  ASSERT_EQ(85, ID3v1::genreIndex("Bebob"));
 
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v1);
+  ID3v1::Tag tag;
+  tag.setGenre("Hardcore");
+  ASSERT_EQ(String("Hardcore Techno"), tag.genre());
+  ASSERT_EQ(129U, tag.genreNumber());
+}

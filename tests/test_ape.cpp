@@ -23,216 +23,196 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-#include <cstdio>
+#include "apefile.h"
 #include "apetag.h"
 #include "id3v1tag.h"
-#include "tstringlist.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
-#include "apefile.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include "tstringlist.h"
 #include "utils.h"
+#include <cstdio>
+#include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace TagLib;
 
-class TestAPE : public CppUnit::TestFixture
+TEST(Ape, testProperties399)
 {
-  CPPUNIT_TEST_SUITE(TestAPE);
-  CPPUNIT_TEST(testProperties399);
-  CPPUNIT_TEST(testProperties399Tagged);
-  CPPUNIT_TEST(testProperties399Id3v2);
-  CPPUNIT_TEST(testProperties396);
-  CPPUNIT_TEST(testProperties390);
-  CPPUNIT_TEST(testFuzzedFile1);
-  CPPUNIT_TEST(testFuzzedFile2);
-  CPPUNIT_TEST(testStripAndProperties);
-  CPPUNIT_TEST(testRepeatedSave);
-  CPPUNIT_TEST_SUITE_END();
+  APE::File f(TEST_FILE_PATH_C("mac-399.ape"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3550, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(192, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_EQ(156556U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(3990, f.audioProperties()->version());
+}
 
-public:
+TEST(Ape, testProperties399Tagged)
+{
+  APE::File f(TEST_FILE_PATH_C("mac-399-tagged.ape"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3550, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(192, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_EQ(156556U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(3990, f.audioProperties()->version());
+}
 
-  void testProperties399()
+TEST(Ape, testProperties399Id3v2)
+{
+  APE::File f(TEST_FILE_PATH_C("mac-399-id3v2.ape"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3550, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(192, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_EQ(156556U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(3990, f.audioProperties()->version());
+}
+
+TEST(Ape, testProperties396)
+{
+  APE::File f(TEST_FILE_PATH_C("mac-396.ape"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(3, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(3685, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(0, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_EQ(162496U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(3960, f.audioProperties()->version());
+}
+
+TEST(Ape, testProperties390)
+{
+  APE::File f(TEST_FILE_PATH_C("mac-390-hdr.ape"));
+  ASSERT_TRUE(f.audioProperties());
+  ASSERT_EQ(15, f.audioProperties()->lengthInSeconds());
+  ASSERT_EQ(15630, f.audioProperties()->lengthInMilliseconds());
+  ASSERT_EQ(0, f.audioProperties()->bitrate());
+  ASSERT_EQ(2, f.audioProperties()->channels());
+  ASSERT_EQ(44100, f.audioProperties()->sampleRate());
+  ASSERT_EQ(16, f.audioProperties()->bitsPerSample());
+  ASSERT_EQ(689262U, f.audioProperties()->sampleFrames());
+  ASSERT_EQ(3900, f.audioProperties()->version());
+}
+
+TEST(Ape, testFuzzedFile1)
+{
+  APE::File f(TEST_FILE_PATH_C("longloop.ape"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(Ape, testFuzzedFile2)
+{
+  APE::File f(TEST_FILE_PATH_C("zerodiv.ape"));
+  ASSERT_TRUE(f.isValid());
+}
+
+TEST(Ape, testStripAndProperties)
+{
+  ScopedFileCopy copy("mac-399", ".ape");
+
   {
-    APE::File f(TEST_FILE_PATH_C("mac-399.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3990, f.audioProperties()->version());
+    APE::File f(copy.fileName().c_str());
+    f.APETag(true)->setTitle("APE");
+    f.ID3v1Tag(true)->setTitle("ID3v1");
+    f.save();
   }
-
-  void testProperties399Tagged()
   {
-    APE::File f(TEST_FILE_PATH_C("mac-399-tagged.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3990, f.audioProperties()->version());
+    APE::File f(copy.fileName().c_str());
+    ASSERT_EQ(String("APE"), f.properties()["TITLE"].front());
+    f.strip(APE::File::APE);
+    ASSERT_EQ(String("ID3v1"), f.properties()["TITLE"].front());
+    f.strip(APE::File::ID3v1);
+    ASSERT_TRUE(f.properties().isEmpty());
   }
+}
 
-  void testProperties399Id3v2()
+TEST(Ape, testProperties)
+{
+  PropertyMap tags;
+  tags["ALBUM"]                      = StringList("Album");
+  tags["ALBUMARTIST"]                = StringList("Album Artist");
+  tags["ALBUMARTISTSORT"]            = StringList("Album Artist Sort");
+  tags["ALBUMSORT"]                  = StringList("Album Sort");
+  tags["ARTIST"]                     = StringList("Artist");
+  tags["ARTISTS"]                    = StringList("Artists");
+  tags["ARTISTSORT"]                 = StringList("Artist Sort");
+  tags["ASIN"]                       = StringList("ASIN");
+  tags["BARCODE"]                    = StringList("Barcode");
+  tags["CATALOGNUMBER"]              = StringList("Catalog Number 1").append("Catalog Number 2");
+  tags["COMMENT"]                    = StringList("Comment");
+  tags["DATE"]                       = StringList("2021-01-10");
+  tags["DISCNUMBER"]                 = StringList("3/5");
+  tags["GENRE"]                      = StringList("Genre");
+  tags["ISRC"]                       = StringList("UKAAA0500001");
+  tags["LABEL"]                      = StringList("Label 1").append("Label 2");
+  tags["MEDIA"]                      = StringList("Media");
+  tags["MUSICBRAINZ_ALBUMARTISTID"]  = StringList("MusicBrainz_AlbumartistID");
+  tags["MUSICBRAINZ_ALBUMID"]        = StringList("MusicBrainz_AlbumID");
+  tags["MUSICBRAINZ_ARTISTID"]       = StringList("MusicBrainz_ArtistID");
+  tags["MUSICBRAINZ_RELEASEGROUPID"] = StringList("MusicBrainz_ReleasegroupID");
+  tags["MUSICBRAINZ_RELEASETRACKID"] = StringList("MusicBrainz_ReleasetrackID");
+  tags["MUSICBRAINZ_TRACKID"]        = StringList("MusicBrainz_TrackID");
+  tags["ORIGINALDATE"]               = StringList("2021-01-09");
+  tags["RELEASECOUNTRY"]             = StringList("Release Country");
+  tags["RELEASESTATUS"]              = StringList("Release Status");
+  tags["RELEASETYPE"]                = StringList("Release Type");
+  tags["SCRIPT"]                     = StringList("Script");
+  tags["TITLE"]                      = StringList("Title");
+  tags["TRACKNUMBER"]                = StringList("2/3");
+
+  ScopedFileCopy copy("mac-399", ".ape");
   {
-    APE::File f(TEST_FILE_PATH_C("mac-399-id3v2.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3550, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(192, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(156556U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3990, f.audioProperties()->version());
+    APE::File f(copy.fileName().c_str());
+    PropertyMap properties = f.properties();
+    ASSERT_TRUE(properties.isEmpty());
+    f.setProperties(tags);
+    f.save();
   }
-
-  void testProperties396()
   {
-    APE::File f(TEST_FILE_PATH_C("mac-396.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(3685, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(162496U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3960, f.audioProperties()->version());
-  }
-
-  void testProperties390()
-  {
-    APE::File f(TEST_FILE_PATH_C("mac-390-hdr.ape"));
-    CPPUNIT_ASSERT(f.audioProperties());
-    CPPUNIT_ASSERT_EQUAL(15, f.audioProperties()->lengthInSeconds());
-    CPPUNIT_ASSERT_EQUAL(15630, f.audioProperties()->lengthInMilliseconds());
-    CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
-    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
-    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
-    CPPUNIT_ASSERT_EQUAL(689262U, f.audioProperties()->sampleFrames());
-    CPPUNIT_ASSERT_EQUAL(3900, f.audioProperties()->version());
-  }
-
-  void testFuzzedFile1()
-  {
-    APE::File f(TEST_FILE_PATH_C("longloop.ape"));
-    CPPUNIT_ASSERT(f.isValid());
-  }
-
-  void testFuzzedFile2()
-  {
-    APE::File f(TEST_FILE_PATH_C("zerodiv.ape"));
-    CPPUNIT_ASSERT(f.isValid());
-  }
-
-  void testStripAndProperties()
-  {
-    ScopedFileCopy copy("mac-399", ".ape");
-
-    {
-      APE::File f(copy.fileName().c_str());
-      f.APETag(true)->setTitle("APE");
-      f.ID3v1Tag(true)->setTitle("ID3v1");
-      f.save();
+    const APE::File f(copy.fileName().c_str());
+    PropertyMap properties = f.properties();
+    if(tags != properties) {
+      ASSERT_EQ(tags.toString(), properties.toString());
     }
-    {
-      APE::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
-      f.strip(APE::File::APE);
-      CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
-      f.strip(APE::File::ID3v1);
-      CPPUNIT_ASSERT(f.properties().isEmpty());
-    }
+    ASSERT_EQ(tags, properties);
   }
+}
 
-  void testProperties()
+TEST(Ape, testRepeatedSave)
+{
+  ScopedFileCopy copy("mac-399", ".ape");
+
   {
-    PropertyMap tags;
-    tags["ALBUM"] = StringList("Album");
-    tags["ALBUMARTIST"] = StringList("Album Artist");
-    tags["ALBUMARTISTSORT"] = StringList("Album Artist Sort");
-    tags["ALBUMSORT"] = StringList("Album Sort");
-    tags["ARTIST"] = StringList("Artist");
-    tags["ARTISTS"] = StringList("Artists");
-    tags["ARTISTSORT"] = StringList("Artist Sort");
-    tags["ASIN"] = StringList("ASIN");
-    tags["BARCODE"] = StringList("Barcode");
-    tags["CATALOGNUMBER"] = StringList("Catalog Number 1").append("Catalog Number 2");
-    tags["COMMENT"] = StringList("Comment");
-    tags["DATE"] = StringList("2021-01-10");
-    tags["DISCNUMBER"] = StringList("3/5");
-    tags["GENRE"] = StringList("Genre");
-    tags["ISRC"] = StringList("UKAAA0500001");
-    tags["LABEL"] = StringList("Label 1").append("Label 2");
-    tags["MEDIA"] = StringList("Media");
-    tags["MUSICBRAINZ_ALBUMARTISTID"] = StringList("MusicBrainz_AlbumartistID");
-    tags["MUSICBRAINZ_ALBUMID"] = StringList("MusicBrainz_AlbumID");
-    tags["MUSICBRAINZ_ARTISTID"] = StringList("MusicBrainz_ArtistID");
-    tags["MUSICBRAINZ_RELEASEGROUPID"] = StringList("MusicBrainz_ReleasegroupID");
-    tags["MUSICBRAINZ_RELEASETRACKID"] = StringList("MusicBrainz_ReleasetrackID");
-    tags["MUSICBRAINZ_TRACKID"] = StringList("MusicBrainz_TrackID");
-    tags["ORIGINALDATE"] = StringList("2021-01-09");
-    tags["RELEASECOUNTRY"] = StringList("Release Country");
-    tags["RELEASESTATUS"] = StringList("Release Status");
-    tags["RELEASETYPE"] = StringList("Release Type");
-    tags["SCRIPT"] = StringList("Script");
-    tags["TITLE"] = StringList("Title");
-    tags["TRACKNUMBER"] = StringList("2/3");
+    APE::File f(copy.fileName().c_str());
+    ASSERT_FALSE(f.hasAPETag());
+    ASSERT_FALSE(f.hasID3v1Tag());
 
-    ScopedFileCopy copy("mac-399", ".ape");
-    {
-      APE::File f(copy.fileName().c_str());
-      PropertyMap properties = f.properties();
-      CPPUNIT_ASSERT(properties.isEmpty());
-      f.setProperties(tags);
-      f.save();
-    }
-    {
-      const APE::File f(copy.fileName().c_str());
-      PropertyMap properties = f.properties();
-      if (tags != properties) {
-        CPPUNIT_ASSERT_EQUAL(tags.toString(), properties.toString());
-      }
-      CPPUNIT_ASSERT(tags == properties);
-    }
+    f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.save();
+
+    f.APETag()->setTitle("0");
+    f.save();
+
+    f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
+    f.save();
   }
-
-  void testRepeatedSave()
   {
-    ScopedFileCopy copy("mac-399", ".ape");
-
-    {
-      APE::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasAPETag());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-
-      f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.save();
-
-      f.APETag()->setTitle("0");
-      f.save();
-
-      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
-      f.save();
-    }
-    {
-      APE::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.hasAPETag());
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-    }
+    APE::File f(copy.fileName().c_str());
+    ASSERT_TRUE(f.hasAPETag());
+    ASSERT_TRUE(f.hasID3v1Tag());
   }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestAPE);
+}

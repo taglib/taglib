@@ -25,39 +25,26 @@
 
 #include "tbytevector.h"
 #include "tbytevectorlist.h"
-#include <cppunit/extensions/HelperMacros.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace TagLib;
 
-class TestByteVectorList : public CppUnit::TestFixture
+TEST(ByteVectorList, testSplitSingleChar)
 {
-  CPPUNIT_TEST_SUITE(TestByteVectorList);
-  CPPUNIT_TEST(testSplitSingleChar);
-  CPPUNIT_TEST(testSplitSingleChar_2);
-  CPPUNIT_TEST_SUITE_END();
+  ByteVector v("a b");
 
-public:
+  ByteVectorList l = ByteVectorList::split(v, " ");
+  ASSERT_EQ(static_cast<unsigned int>(2), l.size());
+  ASSERT_EQ(ByteVector("a"), l[0]);
+  ASSERT_EQ(ByteVector("b"), l[1]);
+}
 
-  void testSplitSingleChar()
-  {
-    ByteVector v("a b");
+TEST(ByteVectorList, testSplitSingleChar_2)
+{
+  ByteVector v("a");
 
-    ByteVectorList l = ByteVectorList::split(v, " ");
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), l.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("a"), l[0]);
-    CPPUNIT_ASSERT_EQUAL(ByteVector("b"), l[1]);
-  }
-
-  void testSplitSingleChar_2()
-  {
-    ByteVector v("a");
-
-    ByteVectorList l = ByteVectorList::split(v, " ");
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), l.size());
-    CPPUNIT_ASSERT_EQUAL(ByteVector("a"), l[0]);
-  }
-
-};
-
-CPPUNIT_TEST_SUITE_REGISTRATION(TestByteVectorList);
+  ByteVectorList l = ByteVectorList::split(v, " ");
+  ASSERT_EQ(static_cast<unsigned int>(1), l.size());
+  ASSERT_EQ(ByteVector("a"), l[0]);
+}

@@ -27,7 +27,6 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(test_runner_SRCS
-  main.cpp
   test_list.cpp
   test_map.cpp
   test_mpeg.cpp
@@ -69,10 +68,8 @@ SET(test_runner_SRCS
   test_sizes.cpp
 )
 
-INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})
-
 ADD_EXECUTABLE(test_runner ${test_runner_SRCS})
-TARGET_LINK_LIBRARIES(test_runner tag ${CPPUNIT_LIBRARIES})
+TARGET_LINK_LIBRARIES(test_runner tag GTest::gtest_main)
 
 ADD_TEST(test_runner test_runner)
 ADD_CUSTOM_TARGET(check COMMAND ${CMAKE_CTEST_COMMAND} -V
