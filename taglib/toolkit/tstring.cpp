@@ -75,24 +75,20 @@ namespace
 
   // Helper functions to read a UTF-16 character from an array.
   template <typename T>
-  unsigned short nextUTF16(const T **p);
-
-  template <>
-  unsigned short nextUTF16<wchar_t>(const wchar_t **p)
+  unsigned short nextUTF16(const T **p)
   {
-    return static_cast<unsigned short>(*(*p)++);
-  }
-
-  template <>
-  unsigned short nextUTF16<char>(const char **p)
-  {
-    union {
-      unsigned short w;
-      char c[2];
-    } u;
-    u.c[0] = *(*p)++;
-    u.c[1] = *(*p)++;
-    return u.w;
+    if constexpr(std::is_same_v<T, char>) {
+      union {
+        unsigned short w;
+        char c[2];
+      } u;
+      u.c[0] = *(*p)++;
+      u.c[1] = *(*p)++;
+      return u.w;
+    }
+    else if constexpr(std::is_same_v<T, wchar_t>) {
+      return static_cast<unsigned short>(*(*p)++);
+    }
   }
 
   // Converts a UTF-16 (with BOM), UTF-16LE or UTF16-BE string into
