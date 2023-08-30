@@ -51,14 +51,6 @@ public:
   {
   }
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   offset_t ID3v2Location { -1 };
   long ID3v2OriginalSize { 0 };
@@ -67,7 +59,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties { nullptr };
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +139,7 @@ PropertyMap TrueAudio::File::setProperties(const PropertyMap &properties)
 
 TrueAudio::Properties *TrueAudio::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool TrueAudio::File::save()
@@ -294,6 +286,6 @@ void TrueAudio::File::read(bool readProperties)
       seek(0);
     }
 
-    d->properties = new Properties(readBlock(TrueAudio::HeaderSize), streamLength);
+    d->properties = std::make_unique<Properties>(readBlock(TrueAudio::HeaderSize), streamLength);
   }
 }

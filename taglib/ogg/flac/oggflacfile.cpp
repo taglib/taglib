@@ -35,19 +35,9 @@ using TagLib::FLAC::Properties;
 class Ogg::FLAC::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete comment;
-    delete properties;
-  }
+  std::unique_ptr<Ogg::XiphComment> comment;
 
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
-  Ogg::XiphComment *comment { nullptr };
-
-  Properties *properties { nullptr };
+  std::unique_ptr<Properties> properties;
   ByteVector streamInfoData;
   ByteVector xiphCommentData;
   offset_t streamStart { 0 };
@@ -96,7 +86,7 @@ Ogg::FLAC::File::~File() = default;
 
 Ogg::XiphComment *Ogg::FLAC::File::tag() const
 {
-  return d->comment;
+  return d->comment.get();
 }
 
 PropertyMap Ogg::FLAC::File::properties() const
@@ -111,9 +101,8 @@ PropertyMap Ogg::FLAC::File::setProperties(const PropertyMap &properties)
 
 Properties *Ogg::FLAC::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
-
 
 bool Ogg::FLAC::File::save()
 {
@@ -174,13 +163,12 @@ void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle properties
 
 
   if(d->hasXiphComment)
-    d->comment = new Ogg::XiphComment(xiphCommentData());
+    d->comment = std::make_unique<Ogg::XiphComment>(xiphCommentData());
   else
-    d->comment = new Ogg::XiphComment();
-
+    d->comment = std::make_unique<Ogg::XiphComment>();
 
   if(readProperties)
-    d->properties = new Properties(streamInfoData(), streamLength(), propertiesStyle);
+    d->properties = std::make_unique<Properties>(streamInfoData(), streamLength(), propertiesStyle);
 }
 
 ByteVector Ogg::FLAC::File::streamInfoData()

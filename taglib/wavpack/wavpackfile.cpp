@@ -47,15 +47,6 @@ namespace
 class WavPack::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
   offset_t APELocation { -1 };
   long APESize { 0 };
 
@@ -63,7 +54,7 @@ public:
 
   TagUnion tag;
 
-  Properties *properties { nullptr };
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +116,7 @@ PropertyMap WavPack::File::setProperties(const PropertyMap &properties)
 
 WavPack::Properties *WavPack::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool WavPack::File::save()
@@ -271,6 +262,6 @@ void WavPack::File::read(bool readProperties)
     else
       streamLength = length();
 
-    d->properties = new Properties(this, streamLength);
+    d->properties = std::make_unique<Properties>(this, streamLength);
   }
 }

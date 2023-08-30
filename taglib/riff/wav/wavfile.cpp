@@ -41,16 +41,7 @@ namespace
 class RIFF::WAV::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
-  Properties *properties { nullptr };
+  std::unique_ptr<Properties> properties;
   TagUnion tag;
 
   bool hasID3v2 { false };
@@ -135,7 +126,7 @@ PropertyMap RIFF::WAV::File::setProperties(const PropertyMap &properties)
 
 RIFF::WAV::Properties *RIFF::WAV::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool RIFF::WAV::File::save()
@@ -227,7 +218,7 @@ void RIFF::WAV::File::read(bool readProperties)
     d->tag.set(InfoIndex, new RIFF::Info::Tag());
 
   if(readProperties)
-    d->properties = new Properties(this, Properties::Average);
+    d->properties = std::make_unique<Properties>(this, Properties::Average);
 }
 
 void RIFF::WAV::File::removeTagChunks(TagTypes tags)
