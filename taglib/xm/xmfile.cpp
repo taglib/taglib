@@ -226,17 +226,14 @@ public:
 class StructReader : public Reader
 {
 public:
-  StructReader()
-  {
-    m_readers.setAutoDelete(true);
-  }
+  StructReader() = default;
 
   /*!
    * Add a nested reader. This reader takes ownership.
    */
-  StructReader &reader(Reader *reader)
+  StructReader &reader(std::unique_ptr<Reader> reader)
   {
-    m_readers.append(reader);
+    m_readers.push_back(std::move(reader));
     return *this;
   }
 
@@ -245,7 +242,7 @@ public:
    */
   StructReader &skip(unsigned int size)
   {
-    m_readers.append(new SkipReader(size));
+    m_readers.push_back(std::make_unique<SkipReader>(size));
     return *this;
   }
 
@@ -254,7 +251,7 @@ public:
    */
   StructReader &string(String &string, unsigned int size)
   {
-    m_readers.append(new StringReader(string, size));
+    m_readers.push_back(std::make_unique<StringReader>(string, size));
     return *this;
   }
 
@@ -263,7 +260,7 @@ public:
    */
   StructReader &byte(unsigned char &byte)
   {
-    m_readers.append(new ByteReader(byte));
+    m_readers.push_back(std::make_unique<ByteReader>(byte));
     return *this;
   }
 
@@ -273,7 +270,7 @@ public:
    */
   StructReader &u16(unsigned short &number, bool bigEndian)
   {
-    m_readers.append(new U16Reader(number, bigEndian));
+    m_readers.push_back(std::make_unique<U16Reader>(number, bigEndian));
     return *this;
   }
 
@@ -299,7 +296,7 @@ public:
    */
   StructReader &u32(unsigned long &number, bool bigEndian)
   {
-    m_readers.append(new U32Reader(number, bigEndian));
+    m_readers.push_back(std::make_unique<U32Reader>(number, bigEndian));
     return *this;
   }
 
@@ -342,7 +339,7 @@ public:
   }
 
 private:
-  List<Reader*> m_readers;
+  std::list<std::unique_ptr<Reader>> m_readers;
 };
 
 } // namespace
