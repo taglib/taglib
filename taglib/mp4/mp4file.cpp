@@ -43,11 +43,7 @@ namespace
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    tag(nullptr),
-    atoms(nullptr),
-    properties(nullptr) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete atoms;
@@ -58,9 +54,9 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  MP4::Tag        *tag;
-  MP4::Atoms      *atoms;
-  MP4::Properties *properties;
+  MP4::Tag *tag { nullptr };
+  MP4::Atoms *atoms { nullptr };
+  MP4::Properties *properties { nullptr };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -37,8 +37,7 @@ using namespace ID3v2;
 class TextIdentificationFrame::TextIdentificationFramePrivate
 {
 public:
-  TextIdentificationFramePrivate() : textEncoding(String::Latin1) {}
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   StringList fieldList;
 };
 

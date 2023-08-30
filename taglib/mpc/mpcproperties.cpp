@@ -38,30 +38,17 @@ using namespace TagLib;
 class MPC::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    version(0),
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    totalFrames(0),
-    sampleFrames(0),
-    trackGain(0),
-    trackPeak(0),
-    albumGain(0),
-    albumPeak(0) {}
-
-  int version;
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  unsigned int totalFrames;
-  unsigned int sampleFrames;
-  int trackGain;
-  int trackPeak;
-  int albumGain;
-  int albumPeak;
+  int version { 0 };
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  unsigned int totalFrames { 0 };
+  unsigned int sampleFrames { 0 };
+  int trackGain { 0 };
+  int trackPeak { 0 };
+  int albumGain { 0 };
+  int albumPeak { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

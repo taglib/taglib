@@ -36,22 +36,17 @@ using namespace ID3v2;
 class ChapterFrame::ChapterFramePrivate
 {
 public:
-  ChapterFramePrivate() :
-    tagHeader(nullptr),
-    startTime(0),
-    endTime(0),
-    startOffset(0),
-    endOffset(0)
+  ChapterFramePrivate()
   {
     embeddedFrameList.setAutoDelete(true);
   }
 
-  const ID3v2::Header *tagHeader;
+  const ID3v2::Header *tagHeader { nullptr };
   ByteVector elementID;
-  unsigned int startTime;
-  unsigned int endTime;
-  unsigned int startOffset;
-  unsigned int endOffset;
+  unsigned int startTime { 0 };
+  unsigned int endTime { 0 };
+  unsigned int startOffset { 0 };
+  unsigned int endOffset { 0 };
   FrameListMap embeddedFrameListMap;
   FrameList embeddedFrameList;
 };

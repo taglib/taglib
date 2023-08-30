@@ -40,24 +40,15 @@ using namespace ID3v2;
 class Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() :
-    majorVersion(4),
-    revisionNumber(0),
-    unsynchronisation(false),
-    extendedHeader(false),
-    experimentalIndicator(false),
-    footerPresent(false),
-    tagSize(0) {}
+  unsigned int majorVersion { 4 };
+  unsigned int revisionNumber { 0 };
 
-  unsigned int majorVersion;
-  unsigned int revisionNumber;
+  bool unsynchronisation { false };
+  bool extendedHeader { false };
+  bool experimentalIndicator { false };
+  bool footerPresent { false };
 
-  bool unsynchronisation;
-  bool extendedHeader;
-  bool experimentalIndicator;
-  bool footerPresent;
-
-  unsigned int tagSize;
+  unsigned int tagSize { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -35,9 +35,7 @@ using namespace ID3v2;
 class EventTimingCodesFrame::EventTimingCodesFramePrivate
 {
 public:
-  EventTimingCodesFramePrivate() :
-    timestampFormat(EventTimingCodesFrame::AbsoluteMilliseconds) {}
-  EventTimingCodesFrame::TimestampFormat timestampFormat;
+  EventTimingCodesFrame::TimestampFormat timestampFormat { EventTimingCodesFrame::AbsoluteMilliseconds };
   EventTimingCodesFrame::SynchedEventList synchedEvents;
 };
 

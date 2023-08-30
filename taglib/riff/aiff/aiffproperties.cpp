@@ -33,24 +33,16 @@ using namespace TagLib;
 class RIFF::AIFF::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    bitsPerSample(0),
-    sampleFrames(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int bitsPerSample;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int bitsPerSample { 0 };
 
   ByteVector compressionType;
   String compressionName;
 
-  unsigned int sampleFrames;
+  unsigned int sampleFrames { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

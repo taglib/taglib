@@ -45,24 +45,14 @@ using namespace TagLib;
 class WavPack::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    sampleRate(0),
-    channels(0),
-    version(0),
-    bitsPerSample(0),
-    lossless(false),
-    sampleFrames(0) {}
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int version;
-  int bitsPerSample;
-  bool lossless;
-  unsigned int sampleFrames;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int version { 0 };
+  int bitsPerSample { 0 };
+  bool lossless { false };
+  unsigned int sampleFrames { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

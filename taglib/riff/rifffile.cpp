@@ -48,14 +48,14 @@ class RIFF::File::FilePrivate
 {
 public:
   FilePrivate(Endianness endianness) :
-    endianness(endianness),
-    size(0),
-    sizeOffset(0) {}
+    endianness(endianness)
+  {
+  }
 
   const Endianness endianness;
 
-  unsigned int size;
-  offset_t sizeOffset;
+  unsigned int size { 0 };
+  offset_t sizeOffset { 0 };
 
   std::vector<Chunk> chunks;
 };

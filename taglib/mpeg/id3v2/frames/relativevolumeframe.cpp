@@ -33,10 +33,8 @@ using namespace ID3v2;
 
 struct ChannelData
 {
-  ChannelData() : channelType(RelativeVolumeFrame::Other), volumeAdjustment(0) {}
-
-  RelativeVolumeFrame::ChannelType channelType;
-  short volumeAdjustment;
+  RelativeVolumeFrame::ChannelType channelType { RelativeVolumeFrame::Other };
+  short volumeAdjustment { 0 };
   RelativeVolumeFrame::PeakVolume peakVolume;
 };
 

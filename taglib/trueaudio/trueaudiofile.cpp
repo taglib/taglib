@@ -52,11 +52,9 @@ class TrueAudio::File::FilePrivate
 {
 public:
   FilePrivate(const ID3v2::FrameFactory *frameFactory = ID3v2::FrameFactory::instance()) :
-    ID3v2FrameFactory(frameFactory),
-    ID3v2Location(-1),
-    ID3v2OriginalSize(0),
-    ID3v1Location(-1),
-    properties(nullptr) {}
+    ID3v2FrameFactory(frameFactory)
+  {
+  }
 
   ~FilePrivate()
   {
@@ -67,14 +65,14 @@ public:
   FilePrivate &operator=(const FilePrivate &) = delete;
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  offset_t ID3v2Location;
-  long ID3v2OriginalSize;
+  offset_t ID3v2Location { -1 };
+  long ID3v2OriginalSize { 0 };
 
-  offset_t ID3v1Location;
+  offset_t ID3v1Location { -1 };
 
   TagUnion tag;
 
-  Properties *properties;
+  Properties *properties { nullptr };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

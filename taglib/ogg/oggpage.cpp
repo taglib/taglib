@@ -105,13 +105,14 @@ public:
   PagePrivate(File *f = nullptr, offset_t pageOffset = -1) :
     file(f),
     fileOffset(pageOffset),
-    header(f, pageOffset),
-    firstPacketIndex(-1) {}
+    header(f, pageOffset)
+  {
+  }
 
   File *file;
   offset_t fileOffset;
   PageHeader header;
-  int firstPacketIndex;
+  int firstPacketIndex { -1 };
   ByteVectorList packets;
 };
 

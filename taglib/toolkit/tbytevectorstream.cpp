@@ -40,12 +40,11 @@ public:
   ByteVectorStreamPrivate(const ByteVector &data);
 
   ByteVector data;
-  offset_t position;
+  offset_t position { 0 };
 };
 
 ByteVectorStream::ByteVectorStreamPrivate::ByteVectorStreamPrivate(const ByteVector &data) :
-  data(data),
-  position(0)
+  data(data)
 {
 }
 

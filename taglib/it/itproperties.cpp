@@ -32,40 +32,21 @@ using namespace IT;
 class IT::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    channels(0),
-    lengthInPatterns(0),
-    instrumentCount(0),
-    sampleCount(0),
-    patternCount(0),
-    version(0),
-    compatibleVersion(0),
-    flags(0),
-    special(0),
-    globalVolume(0),
-    mixVolume(0),
-    tempo(0),
-    bpmSpeed(0),
-    panningSeparation(0),
-    pitchWheelDepth(0)
-  {
-  }
-
-  int            channels;
-  unsigned short lengthInPatterns;
-  unsigned short instrumentCount;
-  unsigned short sampleCount;
-  unsigned short patternCount;
-  unsigned short version;
-  unsigned short compatibleVersion;
-  unsigned short flags;
-  unsigned short special;
-  unsigned char  globalVolume;
-  unsigned char  mixVolume;
-  unsigned char  tempo;
-  unsigned char  bpmSpeed;
-  unsigned char  panningSeparation;
-  unsigned char  pitchWheelDepth;
+  int channels { 0 };
+  unsigned short lengthInPatterns { 0 };
+  unsigned short instrumentCount { 0 };
+  unsigned short sampleCount { 0 };
+  unsigned short patternCount { 0 };
+  unsigned short version { 0 };
+  unsigned short compatibleVersion { 0 };
+  unsigned short flags { 0 };
+  unsigned short special { 0 };
+  unsigned char globalVolume { 0 };
+  unsigned char mixVolume { 0 };
+  unsigned char tempo { 0 };
+  unsigned char bpmSpeed { 0 };
+  unsigned char panningSeparation { 0 };
+  unsigned char pitchWheelDepth { 0 };
 };
 
 IT::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :

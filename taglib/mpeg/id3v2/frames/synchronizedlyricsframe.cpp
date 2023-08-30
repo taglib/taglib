@@ -35,14 +35,10 @@ using namespace ID3v2;
 class SynchronizedLyricsFrame::SynchronizedLyricsFramePrivate
 {
 public:
-  SynchronizedLyricsFramePrivate() :
-    textEncoding(String::Latin1),
-    timestampFormat(SynchronizedLyricsFrame::AbsoluteMilliseconds),
-    type(SynchronizedLyricsFrame::Lyrics) {}
-  String::Type textEncoding;
+  String::Type textEncoding { String::Latin1 };
   ByteVector language;
-  SynchronizedLyricsFrame::TimestampFormat timestampFormat;
-  SynchronizedLyricsFrame::Type type;
+  SynchronizedLyricsFrame::TimestampFormat timestampFormat { SynchronizedLyricsFrame::AbsoluteMilliseconds };
+  SynchronizedLyricsFrame::Type type { SynchronizedLyricsFrame::Lyrics };
   String description;
   SynchronizedLyricsFrame::SynchedTextList synchedText;
 };

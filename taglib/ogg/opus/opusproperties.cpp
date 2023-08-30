@@ -42,18 +42,11 @@ using namespace TagLib::Ogg;
 class Opus::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    length(0),
-    bitrate(0),
-    inputSampleRate(0),
-    channels(0),
-    opusVersion(0) {}
-
-  int length;
-  int bitrate;
-  int inputSampleRate;
-  int channels;
-  int opusVersion;
+  int length { 0 };
+  int bitrate { 0 };
+  int inputSampleRate { 0 };
+  int channels { 0 };
+  int opusVersion { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

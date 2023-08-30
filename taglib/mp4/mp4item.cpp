@@ -32,12 +32,8 @@ using namespace TagLib;
 class MP4::Item::ItemPrivate
 {
 public:
-  ItemPrivate() :
-    valid(true),
-    atomDataType(TypeUndefined) {}
-
-  bool valid;
-  AtomDataType atomDataType;
+  bool valid { true };
+  AtomDataType atomDataType { TypeUndefined };
   union {
     bool m_bool;
     int m_int;

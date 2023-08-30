@@ -50,10 +50,7 @@ using namespace ID3v2;
 class Frame::FramePrivate
 {
 public:
-  FramePrivate() :
-    header(nullptr)
-    {}
-
+  FramePrivate() = default;
   ~FramePrivate()
   {
     delete header;
@@ -62,7 +59,7 @@ public:
   FramePrivate(const FramePrivate &) = delete;
   FramePrivate &operator=(const FramePrivate &) = delete;
 
-  Frame::Header *header;
+  Frame::Header *header { nullptr };
 };
 
 namespace
@@ -174,7 +171,6 @@ void Frame::setData(const ByteVector &data)
 
 void Frame::setText(const String &)
 {
-
 }
 
 ByteVector Frame::render() const
@@ -486,33 +482,20 @@ void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFram
 class Frame::Header::HeaderPrivate
 {
 public:
-  HeaderPrivate() :
-    frameSize(0),
-    version(4),
-    tagAlterPreservation(false),
-    fileAlterPreservation(false),
-    readOnly(false),
-    groupingIdentity(false),
-    compression(false),
-    encryption(false),
-    unsynchronisation(false),
-    dataLengthIndicator(false)
-    {}
-
   ByteVector frameID;
-  unsigned int frameSize;
-  unsigned int version;
+  unsigned int frameSize { 0 };
+  unsigned int version { 4 };
 
   // flags
 
-  bool tagAlterPreservation;
-  bool fileAlterPreservation;
-  bool readOnly;
-  bool groupingIdentity;
-  bool compression;
-  bool encryption;
-  bool unsynchronisation;
-  bool dataLengthIndicator;
+  bool tagAlterPreservation { false };
+  bool fileAlterPreservation { false };
+  bool readOnly { false };
+  bool groupingIdentity { false };
+  bool compression { false };
+  bool encryption { false };
+  bool unsynchronisation { false };
+  bool dataLengthIndicator { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

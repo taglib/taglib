@@ -32,30 +32,16 @@ using namespace XM;
 class XM::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    lengthInPatterns(0),
-    channels(0),
-    version(0),
-    restartPosition(0),
-    patternCount(0),
-    instrumentCount(0),
-    sampleCount(0),
-    flags(0),
-    tempo(0),
-    bpmSpeed(0)
-  {
-  }
-
-  unsigned short lengthInPatterns;
-  int            channels;
-  unsigned short version;
-  unsigned short restartPosition;
-  unsigned short patternCount;
-  unsigned short instrumentCount;
-  unsigned int   sampleCount;
-  unsigned short flags;
-  unsigned short tempo;
-  unsigned short bpmSpeed;
+  unsigned short lengthInPatterns { 0 };
+  int channels { 0 };
+  unsigned short version { 0 };
+  unsigned short restartPosition { 0 };
+  unsigned short patternCount { 0 };
+  unsigned short instrumentCount { 0 };
+  unsigned int sampleCount { 0 };
+  unsigned short flags { 0 };
+  unsigned short tempo { 0 };
+  unsigned short bpmSpeed { 0 };
 };
 
 XM::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :

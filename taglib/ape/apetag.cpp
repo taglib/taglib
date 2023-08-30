@@ -66,12 +66,8 @@ namespace
 class APE::Tag::TagPrivate
 {
 public:
-  TagPrivate() :
-    file(nullptr),
-    footerLocation(0) {}
-
-  File *file;
-  offset_t footerLocation;
+  File *file { nullptr };
+  offset_t footerLocation { 0 };
 
   Footer footer;
   ItemListMap itemListMap;

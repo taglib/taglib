@@ -37,12 +37,8 @@ using namespace TagLib;
 class MP4::Tag::TagPrivate
 {
 public:
-  TagPrivate() :
-    file(nullptr),
-    atoms(nullptr) {}
-
-  TagLib::File *file;
-  Atoms *atoms;
+  TagLib::File *file { nullptr };
+  Atoms *atoms { nullptr };
   ItemMap items;
 };
 

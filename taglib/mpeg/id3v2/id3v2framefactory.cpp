@@ -93,12 +93,8 @@ namespace
 class FrameFactory::FrameFactoryPrivate
 {
 public:
-  FrameFactoryPrivate() :
-    defaultEncoding(String::Latin1),
-    useDefaultEncoding(false) {}
-
-  String::Type defaultEncoding;
-  bool useDefaultEncoding;
+  String::Type defaultEncoding { String::Latin1 };
+  bool useDefaultEncoding { false };
 
   template <class T> void setTextEncoding(T *frame)
   {

@@ -45,11 +45,7 @@ namespace
 class RIFF::WAV::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    properties(nullptr),
-    hasID3v2(false),
-    hasInfo(false) {}
-
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete properties;
@@ -58,11 +54,11 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
-  Properties *properties;
+  Properties *properties { nullptr };
   TagUnion tag;
 
-  bool hasID3v2;
-  bool hasInfo;
+  bool hasID3v2 { false };
+  bool hasInfo { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////

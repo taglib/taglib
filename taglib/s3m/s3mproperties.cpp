@@ -32,34 +32,18 @@ using namespace S3M;
 class S3M::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-    lengthInPatterns(0),
-    channels(0),
-    stereo(false),
-    sampleCount(0),
-    patternCount(0),
-    flags(0),
-    trackerVersion(0),
-    fileFormatVersion(0),
-    globalVolume(0),
-    masterVolume(0),
-    tempo(0),
-    bpmSpeed(0)
-  {
-  }
-
-  unsigned short lengthInPatterns;
-  int            channels;
-  bool           stereo;
-  unsigned short sampleCount;
-  unsigned short patternCount;
-  unsigned short flags;
-  unsigned short trackerVersion;
-  unsigned short fileFormatVersion;
-  unsigned char  globalVolume;
-  unsigned char  masterVolume;
-  unsigned char  tempo;
-  unsigned char  bpmSpeed;
+  unsigned short lengthInPatterns { 0 };
+  int channels { 0 };
+  bool stereo { false };
+  unsigned short sampleCount { 0 };
+  unsigned short patternCount { 0 };
+  unsigned short flags { 0 };
+  unsigned short trackerVersion { 0 };
+  unsigned short fileFormatVersion { 0 };
+  unsigned char globalVolume { 0 };
+  unsigned char masterVolume { 0 };
+  unsigned char tempo { 0 };
+  unsigned char bpmSpeed { 0 };
 };
 
 S3M::Properties::Properties(AudioProperties::ReadStyle propertiesStyle) :
