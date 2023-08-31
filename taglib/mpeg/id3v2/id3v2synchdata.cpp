@@ -74,7 +74,7 @@ ByteVector SynchData::fromUInt(unsigned int value)
 
 ByteVector SynchData::decode(const ByteVector &data)
 {
-  if (data.size() == 0) {
+  if(data.isEmpty()) {
     return ByteVector();
   }
 

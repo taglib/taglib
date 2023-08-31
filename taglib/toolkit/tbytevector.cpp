@@ -376,12 +376,12 @@ ByteVector &ByteVector::setData(const char *data)
 char *ByteVector::data()
 {
   detach();
-  return (size() > 0) ? (&(*d->data)[d->offset]) : nullptr;
+  return !isEmpty() ? (&(*d->data)[d->offset]) : nullptr;
 }
 
 const char *ByteVector::data() const
 {
-  return (size() > 0) ? (&(*d->data)[d->offset]) : nullptr;
+  return !isEmpty() ? (&(*d->data)[d->offset]) : nullptr;
 }
 
 ByteVector ByteVector::mid(unsigned int index, unsigned int length) const

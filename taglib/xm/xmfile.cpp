@@ -158,7 +158,7 @@ public:
   unsigned int read(TagLib::File &file, unsigned int limit) override
   {
     ByteVector data = file.readBlock(std::min(1U,limit));
-    if(data.size() > 0) {
+    if(!data.isEmpty()) {
       value = data[0];
     }
     return data.size();
