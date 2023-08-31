@@ -386,7 +386,7 @@ namespace TagLib {
        *
        * \see tagAlterPreservation()
        */
-      void setTagAlterPreservation(bool discard);
+      void setTagAlterPreservation(bool preserve);
 
       /*!
        * Returns true if the flag for file alter preservation is set.

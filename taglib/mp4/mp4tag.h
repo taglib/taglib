@@ -99,10 +99,10 @@ namespace TagLib {
         bool strip();
 
         PropertyMap properties() const override;
-        void removeUnsupportedProperties(const StringList& properties) override;
-        PropertyMap setProperties(const PropertyMap &properties) override;
+        void removeUnsupportedProperties(const StringList &props) override;
+        PropertyMap setProperties(const PropertyMap &props) override;
 
-    protected:
+      protected:
         /*!
          * Sets the value of \a key to \a value, overwriting any previous value.
          * If \a value is empty, the item is removed.

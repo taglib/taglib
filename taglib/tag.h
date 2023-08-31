@@ -71,12 +71,12 @@ namespace TagLib {
     virtual void removeUnsupportedProperties(const StringList& properties);
 
     /*!
-     * Sets the tags of this File to those specified in \a properties. This default
+     * Sets the tags of this File to those specified in \a origProps. This default
      * implementation sets only the tags for which setter methods exist in this class
      * (artist, album, ...), and only one value per key; the rest will be contained
      * in the returned PropertyMap.
      */
-    virtual PropertyMap setProperties(const PropertyMap &properties);
+    virtual PropertyMap setProperties(const PropertyMap &origProps);
 
     /*!
      * Returns the track name; if no track name is present in the tag

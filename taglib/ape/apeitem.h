@@ -187,11 +187,11 @@ namespace TagLib {
       bool isReadOnly() const;
 
       /*!
-       * Sets the type of the item to \a type.
+       * Sets the type of the item to \a val.
        *
        * \see ItemTypes
        */
-      void setType(ItemTypes type);
+      void setType(ItemTypes val);
 
       /*!
        * Returns the type of the item.

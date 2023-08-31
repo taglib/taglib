@@ -59,7 +59,7 @@ namespace TagLib {
       Item(unsigned int value);
       Item(long long value);
       Item(bool value);
-      Item(int first, int second);
+      Item(int value1, int value2);
       Item(const StringList &value);
       Item(const ByteVectorList &value);
       Item(const CoverArtList &value);

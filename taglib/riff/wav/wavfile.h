@@ -143,7 +143,7 @@ namespace TagLib {
          */
         PropertyMap properties() const override;
 
-        void removeUnsupportedProperties(const StringList &properties) override;
+        void removeUnsupportedProperties(const StringList &unsupported) override;
 
         /*!
          * Implements the unified property interface -- import function.

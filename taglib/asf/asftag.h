@@ -102,50 +102,50 @@ namespace TagLib {
       unsigned int track() const override;
 
       /*!
-       * Sets the title to \a s.
+       * Sets the title to \a value.
        */
-      void setTitle(const String &s) override;
+      void setTitle(const String &value) override;
 
       /*!
-       * Sets the artist to \a s.
+       * Sets the artist to \a value.
        */
-      void setArtist(const String &s) override;
+      void setArtist(const String &value) override;
 
       /*!
-       * Sets the album to \a s.  If \a s is String::null then this value will be
+       * Sets the album to \a value.  If \a value is String::null then this value will be
        * cleared.
        */
-      void setAlbum(const String &s) override;
+      void setAlbum(const String &value) override;
 
       /*!
-       * Sets the comment to \a s.
+       * Sets the comment to \a value.
        */
-      void setComment(const String &s) override;
+      void setComment(const String &value) override;
 
       /*!
-       * Sets the rating to \a s.
+       * Sets the rating to \a value.
        */
-      virtual void setRating(const String &s);
+      virtual void setRating(const String &value);
 
       /*!
-       * Sets the copyright to \a s.
+       * Sets the copyright to \a value.
        */
-      virtual void setCopyright(const String &s);
+      virtual void setCopyright(const String &value);
 
       /*!
-       * Sets the genre to \a s.
+       * Sets the genre to \a value.
        */
-      void setGenre(const String &s) override;
+      void setGenre(const String &value) override;
 
       /*!
-       * Sets the year to \a i.  If \a s is 0 then this value will be cleared.
+       * Sets the year to \a value.  If \a value is 0 then this value will be cleared.
        */
-      void setYear(unsigned int i) override;
+      void setYear(unsigned int value) override;
 
       /*!
-       * Sets the track to \a i.  If \a s is 0 then this value will be cleared.
+       * Sets the track to \a value.  If \a value is 0 then this value will be cleared.
        */
-      void setTrack(unsigned int i) override;
+      void setTrack(unsigned int value) override;
 
       /*!
        * Returns true if the tag does not contain any data.  This should be
@@ -168,14 +168,14 @@ namespace TagLib {
       const AttributeListMap &attributeListMap() const;
 
       /*!
-       * \return True if a value for \a attribute is currently set.
+       * \return True if a value for \a key is currently set.
        */
-      bool contains(const String &name) const;
+      bool contains(const String &key) const;
 
       /*!
        * Removes the \a key attribute from the tag
        */
-      void removeItem(const String &name);
+      void removeItem(const String &key);
 
       /*!
        * \return The list of values for the key \a name, or an empty list if no
@@ -184,8 +184,8 @@ namespace TagLib {
       AttributeList attribute(const String &name) const;
 
       /*!
-       * Sets the \a key attribute to the value of \a attribute. If an attribute
-       * with the \a key is already present, it will be replaced.
+       * Sets the \a name attribute to the value of \a attribute. If an attribute
+       * with the \a name is already present, it will be replaced.
        */
       void setAttribute(const String &name, const Attribute &attribute);
 
@@ -195,14 +195,14 @@ namespace TagLib {
       void setAttribute(const String &name, const AttributeList &values);
 
       /*!
-       * Sets the \a key attribute to the value of \a attribute. If an attribute
-       * with the \a key is already present, it will be added to the list.
+       * Sets the \a name attribute to the value of \a attribute. If an attribute
+       * with the \a name is already present, it will be added to the list.
        */
       void addAttribute(const String &name, const Attribute &attribute);
 
       PropertyMap properties() const override;
-      void removeUnsupportedProperties(const StringList& properties) override;
-      PropertyMap setProperties(const PropertyMap &properties) override;
+      void removeUnsupportedProperties(const StringList &props) override;
+      PropertyMap setProperties(const PropertyMap &props) override;
 
     private:
 
