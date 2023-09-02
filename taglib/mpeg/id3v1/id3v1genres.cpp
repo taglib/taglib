@@ -241,7 +241,7 @@ ID3v1::GenreMap ID3v1::genreMap()
 {
   GenreMap m;
   for(size_t i = 0; i < genres.size(); i++) {
-    m.insert(genres[i], i);
+    m.insert(genres[i], static_cast<int>(i));
   }
 
   return m;
