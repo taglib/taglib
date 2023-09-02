@@ -189,7 +189,8 @@ void Ogg::XiphComment::setTrack(unsigned int i)
 
 bool Ogg::XiphComment::isEmpty() const
 {
-  return std::all_of(d->fieldListMap.begin(), d->fieldListMap.end(), [](const auto &field) { return field.second.isEmpty(); });
+  return std::all_of(d->fieldListMap.cbegin(), d->fieldListMap.cend(),
+    [](const auto &field) { return field.second.isEmpty(); });
 }
 
 unsigned int Ogg::XiphComment::fieldCount() const
