@@ -15,8 +15,8 @@ namespace TagLib {
      * Used to specify which version of the ID3 standard to use when saving tags.
      */
     enum Version {
-      v3 = 3, //<! ID3v2.3
-      v4 = 4  //<! ID3v2.4
+      v3 = 3, //!< ID3v2.3
+      v4 = 4  //!< ID3v2.4
     };
   } // namespace ID3v2
 }  // namespace TagLib

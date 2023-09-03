@@ -135,8 +135,6 @@ namespace TagLib {
        *
        * \param data data of the frame (might be modified)
        * \param tagHeader the tag header
-       * \param header reference to frame header pointer, will be set to
-       *               nullptr if the frame is invalid
        * \return {header, ok}: header is a created frame header or nullptr
        *         if the frame is invalid; ok is true if the frame is supported.
        */

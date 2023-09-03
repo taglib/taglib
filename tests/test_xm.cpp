@@ -130,7 +130,7 @@ public:
     CPPUNIT_ASSERT(nullptr != p);
     CPPUNIT_ASSERT(nullptr != t);
 
-    CPPUNIT_ASSERT_EQUAL(0, p->length());
+    CPPUNIT_ASSERT_EQUAL(0, p->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
@@ -176,7 +176,7 @@ private:
     CPPUNIT_ASSERT(nullptr != p);
     CPPUNIT_ASSERT(nullptr != t);
 
-    CPPUNIT_ASSERT_EQUAL(0, p->length());
+    CPPUNIT_ASSERT_EQUAL(0, p->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(0, p->bitrate());
     CPPUNIT_ASSERT_EQUAL(0, p->sampleRate());
     CPPUNIT_ASSERT_EQUAL(8, p->channels());
