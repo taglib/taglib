@@ -135,7 +135,8 @@ MP4::Properties::read(File *file, Atoms *atoms)
   MP4::Atom *trak = nullptr;
   ByteVector data;
 
-  for(const auto &track : moov->findall("trak")) {
+  const MP4::AtomList trakList = moov->findall("trak");
+  for(const auto &track : trakList) {
     MP4::Atom *hdlr = track->find("mdia", "hdlr");
     if(!hdlr) {
       debug("MP4: Atom 'trak.mdia.hdlr' not found");

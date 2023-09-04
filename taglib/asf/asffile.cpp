@@ -565,7 +565,7 @@ bool ASF::File::save()
   d->metadataObject->attributeData.clear();
   d->metadataLibraryObject->attributeData.clear();
 
-  for(const auto &[name, attributes] : d->tag->attributeListMap()) {
+  for(const auto &[name, attributes] : std::as_const(d->tag->attributeListMap())) {
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 

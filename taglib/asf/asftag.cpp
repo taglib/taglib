@@ -323,7 +323,8 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
     }
   }
 
-  for(const auto &[prop, _] : properties()) {
+  const PropertyMap origProps = properties();
+  for(const auto &[prop, _] : origProps) {
     if(!props.contains(prop) || props[prop].isEmpty()) {
       if(prop == "TITLE") {
         d->title.clear();

@@ -201,7 +201,8 @@ namespace
 PropertyMap APE::Tag::properties() const
 {
   PropertyMap properties;
-  for(const auto &[tag, item] : itemListMap()) {
+  const auto &items = itemListMap();
+  for(const auto &[tag, item] : items) {
     String tagName = tag.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
@@ -239,7 +240,8 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
   // first check if tags need to be removed completely
   StringList toRemove;
-  for(const auto &[k, t] : itemListMap()) {
+  const auto &items = itemListMap();
+  for(const auto &[k, t] : items) {
     String key = k.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
     if(!key.isEmpty() && t.type() == APE::Item::Text && !properties.contains(key))

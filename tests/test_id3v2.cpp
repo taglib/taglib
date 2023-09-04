@@ -1631,9 +1631,10 @@ public:
     CPPUNIT_ASSERT(f.isValid());
 
     ID3v2::Tag *tag = f.ID3v2Tag();
-    CPPUNIT_ASSERT_EQUAL(130U, tag->frameList().size());
+    const ID3v2::FrameList &frames = tag->frameList();
+    CPPUNIT_ASSERT_EQUAL(130U, frames.size());
     int i = 0;
-    for(const auto &frame : tag->frameList()) {
+    for(const auto &frame : frames) {
       if(i > 0) {
         CPPUNIT_ASSERT_EQUAL(ByteVector("CHAP"), frame->frameID());
         auto chapFrame = dynamic_cast<const ID3v2::ChapterFrame *>(frame);

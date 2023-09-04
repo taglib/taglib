@@ -371,7 +371,7 @@ void ID3v2::Tag::removeFrame(Frame *frame, bool del)
 
 void ID3v2::Tag::removeFrames(const ByteVector &id)
 {
-  auto frames = d->frameListMap[id];
+  const FrameList frames = d->frameListMap[id];
   for(const auto &frame : frames)
     removeFrame(frame, true);
 }
@@ -379,7 +379,8 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-  for(const auto &frame : frameList()) {
+  const auto &frames = frameList();
+  for(const auto &frame : frames) {
     PropertyMap props = frame->asProperties();
     properties.merge(props);
   }
@@ -395,7 +396,8 @@ void ID3v2::Tag::removeUnsupportedProperties(const StringList &properties)
         continue; // invalid specification
       ByteVector id = frameID.data(String::Latin1);
       // delete all unknown frames of given type
-      for(const auto &frame : frameList(id))
+      const FrameList frames = frameList(id);
+      for(const auto &frame : frames)
         if(dynamic_cast<const UnknownFrame *>(frame) != nullptr)
           removeFrame(frame);
     }
@@ -434,7 +436,8 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap tiplProperties;
   PropertyMap tmclProperties;
   Frame::splitProperties(origProps, properties, tiplProperties, tmclProperties);
-  for(const auto &[tag, frames] : frameListMap()) {
+  const auto &map = frameListMap();
+  for(const auto &[tag, frames] : map) {
     for(const auto &frame : frames) {
       PropertyMap frameProperties = frame->asProperties();
       if(tag == "TIPL") {
@@ -497,13 +500,13 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   ID3v2::TextIdentificationFrame *frameTCON = nullptr;
 
   for(const auto &frame : std::as_const(d->frameList)) {
-      ByteVector frameID = frame->header()->frameID();
+    ByteVector frameID = frame->header()->frameID();
 
-      if(contains(unsupportedFrames, frameID)) {
+    if(contains(unsupportedFrames, frameID)) {
       debug("A frame that is not supported in ID3v2.3 \'" + String(frameID) +
             "\' has been discarded");
       continue;
-      }
+    }
 
     if(frameID == "TDOR")
       frameTDOR = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame);

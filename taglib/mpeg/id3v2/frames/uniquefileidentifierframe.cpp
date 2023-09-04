@@ -101,7 +101,8 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
 
 UniqueFileIdentifierFrame *UniqueFileIdentifierFrame::findByOwner(const ID3v2::Tag *tag, const String &o) // static
 {
-  for(const auto &comment : tag->frameList("UFID")) {
+  const ID3v2::FrameList comments = tag->frameList("UFID");
+  for(const auto &comment : comments) {
     auto frame = dynamic_cast<UniqueFileIdentifierFrame *>(comment);
     if(frame && frame->owner() == o)
       return frame;

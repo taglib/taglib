@@ -122,7 +122,8 @@ PropertyMap CommentsFrame::asProperties() const
 
 CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
-  for(const auto &comment : tag->frameList("COMM")) {
+  const ID3v2::FrameList comments = tag->frameList("COMM");
+  for(const auto &comment : comments) {
     auto frame = dynamic_cast<CommentsFrame *>(comment);
     if(frame && frame->description() == d)
       return frame;

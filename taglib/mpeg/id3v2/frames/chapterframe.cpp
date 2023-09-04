@@ -178,7 +178,8 @@ void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 
 void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 {
-  for(const auto &frame : d->embeddedFrameListMap[id])
+  const FrameList frames = d->embeddedFrameListMap[id];
+  for(const auto &frame : frames)
     removeEmbeddedFrame(frame, true);
 }
 
@@ -278,7 +279,8 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
-  for(const auto &frame : d->embeddedFrameList) {
+  const FrameList frames = d->embeddedFrameList;
+  for(const auto &frame : frames) {
     frame->header()->setVersion(header()->version());
     data.append(frame->render());
   }

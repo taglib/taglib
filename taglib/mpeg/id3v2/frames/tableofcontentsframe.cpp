@@ -208,7 +208,8 @@ void TableOfContentsFrame::removeEmbeddedFrame(Frame *frame, bool del)
 
 void TableOfContentsFrame::removeEmbeddedFrames(const ByteVector &id)
 {
-  for(const auto &frame : d->embeddedFrameListMap[id])
+  const FrameList frames = d->embeddedFrameListMap[id];
+  for(const auto &frame : frames)
     removeEmbeddedFrame(frame, true);
 }
 
@@ -244,7 +245,8 @@ PropertyMap TableOfContentsFrame::asProperties() const
 TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag,
                                                             const ByteVector &eID) // static
 {
-  for(const auto &table : tag->frameList("CTOC")) {
+  const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
+  for(const auto &table : tablesOfContents) {
     auto frame = dynamic_cast<TableOfContentsFrame *>(table);
     if(frame && frame->elementID() == eID)
       return frame;
@@ -255,7 +257,8 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
 
 TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) // static
 {
-  for(const auto &table : tag->frameList("CTOC")) {
+  const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
+  for(const auto &table : tablesOfContents) {
     auto frame = dynamic_cast<TableOfContentsFrame *>(table);
     if(frame && frame->isTopLevel())
       return frame;

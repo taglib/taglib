@@ -123,7 +123,8 @@ PropertyMap UnsynchronizedLyricsFrame::asProperties() const
 
 UnsynchronizedLyricsFrame *UnsynchronizedLyricsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
-  for(const auto &lyrics : tag->frameList("USLT")) {
+  const ID3v2::FrameList lyrics = tag->frameList("USLT");
+  for(const auto &lyrics : lyrics) {
     auto frame = dynamic_cast<UnsynchronizedLyricsFrame *>(lyrics);
     if(frame && frame->description() == d)
       return frame;

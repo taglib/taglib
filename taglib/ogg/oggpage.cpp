@@ -212,7 +212,8 @@ ByteVectorList Ogg::Page::packets() const
 
     d->file->seek(d->fileOffset + d->header.size());
 
-    for(const auto &size : d->header.packetSizes())
+    const List<int> packetSizes = d->header.packetSizes();
+    for(const auto &size : packetSizes)
       l.append(d->file->readBlock(size));
   }
   else

@@ -172,7 +172,8 @@ PropertyMap UserUrlLinkFrame::asProperties() const
 
 UserUrlLinkFrame *UserUrlLinkFrame::find(ID3v2::Tag *tag, const String &description) // static
 {
-  for(const auto &frame : tag->frameList("WXXX")) {
+  const FrameList frames = tag->frameList("WXXX");
+  for(const auto &frame : frames) {
     auto f = dynamic_cast<UserUrlLinkFrame *>(frame);
     if(f && f->description() == description)
       return f;

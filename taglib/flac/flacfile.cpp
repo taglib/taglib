@@ -206,9 +206,9 @@ bool FLAC::File::save()
 
   ByteVector data;
   for(const auto &block : std::as_const(d->blocks)) {
-    ByteVector blockData   = block->render();
+    ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0]         = block->code();
+    blockHeader[0] = block->code();
     data.append(blockHeader);
     data.append(blockData);
   }

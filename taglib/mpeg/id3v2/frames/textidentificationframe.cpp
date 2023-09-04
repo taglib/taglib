@@ -422,7 +422,8 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
 UserTextIdentificationFrame *UserTextIdentificationFrame::find(
   ID3v2::Tag *tag, const String &description) // static
 {
-  for(const auto &frame : tag->frameList("TXXX")) {
+  const FrameList frames = tag->frameList("TXXX");
+  for(const auto &frame : frames) {
     auto f = dynamic_cast<UserTextIdentificationFrame *>(frame);
     if(f && f->description() == description)
       return f;
