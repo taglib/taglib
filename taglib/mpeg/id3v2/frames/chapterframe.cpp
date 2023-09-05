@@ -279,8 +279,7 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
-  const FrameList frames = d->embeddedFrameList;
-  for(const auto &frame : frames) {
+  for(const auto &frame : std::as_const(d->embeddedFrameList)) {
     frame->header()->setVersion(header()->version());
     data.append(frame->render());
   }

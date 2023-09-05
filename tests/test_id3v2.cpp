@@ -25,6 +25,7 @@
 
 #include <string>
 #include <cstdio>
+#include <utility>
 #include "id3v2tag.h"
 #include "mpegfile.h"
 #include "id3v2frame.h"
@@ -1217,12 +1218,22 @@ public:
     frame8->setText("95c454a5-d7e0-4d8f-9900-db04aca98ab3");
     tag.addFrame(frame8);
 
+    auto frame9 = new ID3v2::UnknownFrame("WXYZ");
+    tag.addFrame(frame9);
+
+    auto frame10 = new ID3v2::CommentsFrame();
+    frame10->setDescription("iTunNORM");
+    frame10->setText("00002C3B");
+    frame10->setLanguage("eng");
+    tag.addFrame(frame10);
+
     PropertyMap properties = tag.properties();
 
-    CPPUNIT_ASSERT_EQUAL(3u, properties.unsupportedData().size());
+    CPPUNIT_ASSERT_EQUAL(4u, properties.unsupportedData().size());
     CPPUNIT_ASSERT(properties.unsupportedData().contains("TIPL"));
     CPPUNIT_ASSERT(properties.unsupportedData().contains("APIC"));
     CPPUNIT_ASSERT(properties.unsupportedData().contains("UFID/http://example.com"));
+    CPPUNIT_ASSERT(properties.unsupportedData().contains("UNKNOWN/WXYZ"));
 
     CPPUNIT_ASSERT(properties.contains("PERFORMER:VIOLIN"));
     CPPUNIT_ASSERT(properties.contains("PERFORMER:PIANO"));
@@ -1238,11 +1249,20 @@ public:
     CPPUNIT_ASSERT(properties.contains("MUSICBRAINZ_ALBUMID"));
     CPPUNIT_ASSERT_EQUAL(String("95c454a5-d7e0-4d8f-9900-db04aca98ab3"), properties["MUSICBRAINZ_ALBUMID"].front());
 
+    CPPUNIT_ASSERT(properties.contains("COMMENT:ITUNNORM"));
+    CPPUNIT_ASSERT_EQUAL(String("00002C3B"), properties["COMMENT:ITUNNORM"].front());
+
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(tag.frameList("APIC").isEmpty());
     CPPUNIT_ASSERT(tag.frameList("TIPL").isEmpty());
+    CPPUNIT_ASSERT(tag.frameList("WXYZ").isEmpty());
     CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::UniqueFileIdentifierFrame *>(nullptr), ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://example.com"));
+    CPPUNIT_ASSERT_EQUAL(frame1, ID3v2::UnsynchronizedLyricsFrame::findByDescription(&tag, "test"));
     CPPUNIT_ASSERT_EQUAL(frame6, ID3v2::UniqueFileIdentifierFrame::findByOwner(&tag, "http://musicbrainz.org"));
+    CPPUNIT_ASSERT_EQUAL(frame8, ID3v2::UserTextIdentificationFrame::find(&tag, "MusicBrainz Album Id"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::UserTextIdentificationFrame *>(nullptr), ID3v2::UserTextIdentificationFrame::find(&tag, "non existing"));
+    CPPUNIT_ASSERT_EQUAL(frame10, ID3v2::CommentsFrame::findByDescription(&tag, "iTunNORM"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::CommentsFrame *>(nullptr), ID3v2::CommentsFrame::findByDescription(&tag, "non existing"));
   }
 
   void testPropertiesMovement()
@@ -1631,10 +1651,9 @@ public:
     CPPUNIT_ASSERT(f.isValid());
 
     ID3v2::Tag *tag = f.ID3v2Tag();
-    const ID3v2::FrameList &frames = tag->frameList();
-    CPPUNIT_ASSERT_EQUAL(130U, frames.size());
+    CPPUNIT_ASSERT_EQUAL(130U, tag->frameList().size());
     int i = 0;
-    for(const auto &frame : frames) {
+    for(const auto &frame : std::as_const(tag->frameList())) {
       if(i > 0) {
         CPPUNIT_ASSERT_EQUAL(ByteVector("CHAP"), frame->frameID());
         auto chapFrame = dynamic_cast<const ID3v2::ChapterFrame *>(frame);
@@ -1676,6 +1695,11 @@ public:
     CPPUNIT_ASSERT(!ID3v2::TableOfContentsFrame::findTopLevel(tag));
     CPPUNIT_ASSERT(!ID3v2::TableOfContentsFrame::findByElementID(tag, "ctoc"));
     CPPUNIT_ASSERT(ID3v2::TableOfContentsFrame::findByElementID(tag, "toc"));
+
+    auto tocFrame = ID3v2::TableOfContentsFrame::findByElementID(tag, "toc");
+    CPPUNIT_ASSERT_EQUAL(1U, tocFrame->embeddedFrameList().size());
+    tocFrame->removeEmbeddedFrames("TIT2");
+    CPPUNIT_ASSERT(tocFrame->embeddedFrameList().isEmpty());
   }
 
 };

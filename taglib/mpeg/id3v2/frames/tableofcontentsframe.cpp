@@ -245,8 +245,7 @@ PropertyMap TableOfContentsFrame::asProperties() const
 TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *tag,
                                                             const ByteVector &eID) // static
 {
-  const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
-  for(const auto &table : tablesOfContents) {
+  for(const auto &table : std::as_const(tag->frameList("CTOC"))) {
     auto frame = dynamic_cast<TableOfContentsFrame *>(table);
     if(frame && frame->elementID() == eID)
       return frame;
@@ -257,8 +256,7 @@ TableOfContentsFrame *TableOfContentsFrame::findByElementID(const ID3v2::Tag *ta
 
 TableOfContentsFrame *TableOfContentsFrame::findTopLevel(const ID3v2::Tag *tag) // static
 {
-  const ID3v2::FrameList tablesOfContents = tag->frameList("CTOC");
-  for(const auto &table : tablesOfContents) {
+  for(const auto &table : std::as_const(tag->frameList("CTOC"))) {
     auto frame = dynamic_cast<TableOfContentsFrame *>(table);
     if(frame && frame->isTopLevel())
       return frame;

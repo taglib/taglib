@@ -379,8 +379,7 @@ void ID3v2::Tag::removeFrames(const ByteVector &id)
 PropertyMap ID3v2::Tag::properties() const
 {
   PropertyMap properties;
-  const auto &frames = frameList();
-  for(const auto &frame : frames) {
+  for(const auto &frame : std::as_const(frameList())) {
     PropertyMap props = frame->asProperties();
     properties.merge(props);
   }
@@ -436,8 +435,7 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap tiplProperties;
   PropertyMap tmclProperties;
   Frame::splitProperties(origProps, properties, tiplProperties, tmclProperties);
-  const auto &map = frameListMap();
-  for(const auto &[tag, frames] : map) {
+  for(const auto &[tag, frames] : std::as_const(frameListMap())) {
     for(const auto &frame : frames) {
       PropertyMap frameProperties = frame->asProperties();
       if(tag == "TIPL") {

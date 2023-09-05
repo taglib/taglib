@@ -30,6 +30,7 @@
 #include "id3v1genres.h"
 
 #include <array>
+#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -422,8 +423,7 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
 UserTextIdentificationFrame *UserTextIdentificationFrame::find(
   ID3v2::Tag *tag, const String &description) // static
 {
-  const FrameList frames = tag->frameList("TXXX");
-  for(const auto &frame : frames) {
+  for(const auto &frame : std::as_const(tag->frameList("TXXX"))) {
     auto f = dynamic_cast<UserTextIdentificationFrame *>(frame);
     if(f && f->description() == description)
       return f;
