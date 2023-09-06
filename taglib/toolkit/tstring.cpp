@@ -159,7 +159,7 @@ String::String() :
 {
 }
 
-String::String(const String &s) = default;
+String::String(const String &) = default;
 
 String::String(const std::string &s, Type t) :
   d(std::make_shared<StringPrivate>())
@@ -612,11 +612,7 @@ String &String::operator+=(char c)
   return *this;
 }
 
-String &String::operator=(const String &s)
-{
-  String(s).swap(*this);
-  return *this;
-}
+String &String::operator=(const String &) = default;
 
 String &String::operator=(const std::string &s)
 {

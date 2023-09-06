@@ -344,7 +344,7 @@ FileRef::FileRef(File *file) :
   d->file = file;
 }
 
-FileRef::FileRef(const FileRef &ref) = default;
+FileRef::FileRef(const FileRef &) = default;
 
 FileRef::~FileRef() = default;
 
@@ -430,11 +430,7 @@ bool FileRef::isNull() const
   return (!d->file || !d->file->isValid());
 }
 
-FileRef &FileRef::operator=(const FileRef &ref)
-{
-  FileRef(ref).swap(*this);
-  return *this;
-}
+FileRef &FileRef::operator=(const FileRef &) = default;
 
 void FileRef::swap(FileRef &ref)
 {

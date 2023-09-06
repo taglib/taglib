@@ -51,9 +51,7 @@ Map<Key, T>::Map() :
 }
 
 template <class Key, class T>
-Map<Key, T>::Map(const Map<Key, T> &m) : d(m.d)
-{
-}
+Map<Key, T>::Map(const Map<Key, T> &) = default;
 
 template <class Key, class T>
 Map<Key, T>::~Map() = default;
@@ -180,14 +178,7 @@ T &Map<Key, T>::operator[](const Key &key)
 }
 
 template <class Key, class T>
-Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &m)
-{
-  if (this == &m)
-    return *this;
-
-  Map<Key, T>(m).swap(*this);
-  return *this;
-}
+Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &) = default;
 
 template <class Key, class T>
 void Map<Key, T>::swap(Map<Key, T> &m)

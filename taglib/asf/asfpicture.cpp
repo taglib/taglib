@@ -54,8 +54,7 @@ ASF::Picture::Picture() :
   d->valid = true;
 }
 
-ASF::Picture::Picture(const Picture &other) = default;
-
+ASF::Picture::Picture(const Picture &) = default;
 ASF::Picture::~Picture() = default;
 
 bool ASF::Picture::isValid() const
@@ -110,11 +109,7 @@ int ASF::Picture::dataSize() const
     d->picture.size();
 }
 
-ASF::Picture& ASF::Picture::operator=(const ASF::Picture& other)
-{
-  Picture(other).swap(*this);
-  return *this;
-}
+ASF::Picture &ASF::Picture::operator=(const ASF::Picture &) = default;
 
 void ASF::Picture::swap(Picture &other)
 {
