@@ -239,8 +239,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
     }
   }
 
-  MP4::Atom *drms = atom->find("drms");
-  if(drms) {
+  if(atom->find("drms")) {
     d->encrypted = true;
   }
 }

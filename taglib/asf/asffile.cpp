@@ -641,7 +641,7 @@ void ASF::File::read()
       setValid(false);
       break;
     }
-    long size = static_cast<long>(readQWORD(this, &ok));
+    auto size = static_cast<long>(readQWORD(this, &ok));
     if(!ok) {
       setValid(false);
       break;

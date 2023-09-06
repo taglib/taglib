@@ -150,7 +150,7 @@ namespace
       tmp = b[0];
       size = (size << 7) | (tmp & 0x7F);
       sizeLength++;
-    } while((tmp & 0x80));
+    } while(tmp & 0x80);
     return size;
   }
 
@@ -288,13 +288,13 @@ void MPC::Properties::readSV7(const ByteVector &data, offset_t streamLength)
 
     // convert gain info
     if(d->trackGain != 0) {
-      int tmp = static_cast<int>((64.82 - static_cast<short>(d->trackGain) / 100.) * 256. + .5);
+      auto tmp = static_cast<int>((64.82 - static_cast<short>(d->trackGain) / 100.) * 256. + .5);
       if(tmp >= (1 << 16) || tmp < 0) tmp = 0;
       d->trackGain = tmp;
     }
 
     if(d->albumGain != 0) {
-      int tmp = static_cast<int>((64.82 - d->albumGain / 100.) * 256. + .5);
+      auto tmp = static_cast<int>((64.82 - d->albumGain / 100.) * 256. + .5);
       if(tmp >= (1 << 16) || tmp < 0) tmp = 0;
       d->albumGain = tmp;
     }

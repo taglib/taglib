@@ -230,8 +230,7 @@ namespace
   File* createInternal(FileName fileName, bool readAudioProperties,
                        AudioProperties::ReadStyle audioPropertiesStyle)
   {
-    File *file = detectByResolvers(fileName, readAudioProperties, audioPropertiesStyle);
-    if(file)
+    if(auto file = detectByResolvers(fileName, readAudioProperties, audioPropertiesStyle))
       return file;
 
 #ifdef _WIN32
@@ -254,7 +253,7 @@ namespace
       return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "OGA") {
       /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
-      File *file = new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
+      auto file = new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
       if(file->isValid())
         return file;
       delete file;
