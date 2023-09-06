@@ -309,7 +309,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
                           streamSerialNumber,
                           pageIndex,
                           continued,
-                          lastSplit && (lastPacketInList ? lastPacketCompleted : true),
+                          lastSplit && (!lastPacketInList || lastPacketCompleted),
                           lastSplit && (containsLastPacket && lastPacketInList)));
         pageIndex++;
         continued = true;

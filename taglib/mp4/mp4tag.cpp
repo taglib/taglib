@@ -231,7 +231,7 @@ MP4::Tag::parseBool(const MP4::Atom *atom)
 {
   ByteVectorList data = parseData(atom);
   if(!data.isEmpty()) {
-    bool value = data[0].size() ? data[0][0] != '\0' : false;
+    bool value = !data[0].isEmpty() && data[0][0] != '\0';
     addItem(atom->name, value);
   }
 }
