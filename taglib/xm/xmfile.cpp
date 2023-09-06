@@ -227,8 +227,6 @@ public:
 class StructReader : public Reader
 {
 public:
-  StructReader() = default;
-
   /*!
    * Add a nested reader. This reader takes ownership.
    */
