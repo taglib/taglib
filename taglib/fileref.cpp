@@ -68,8 +68,7 @@ class FileRef::StreamTypeResolver::StreamTypeResolverPrivate
 
 namespace
 {
-  typedef List<const FileRef::FileTypeResolver *> ResolverList;
-  ResolverList fileTypeResolvers;
+  List<const FileRef::FileTypeResolver *> fileTypeResolvers;
 
   // Detect the file type by user-defined resolvers.
 
