@@ -25,6 +25,8 @@
 
 #include "tableofcontentsframe.h"
 
+#include <utility>
+
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tdebug.h"
@@ -321,11 +323,11 @@ ByteVector TableOfContentsFrame::renderFields() const
     flags += 1;
   data.append(flags);
   data.append(static_cast<char>(entryCount()));
-  for(const auto &element : d->childElements) {
+  for(const auto &element : std::as_const(d->childElements)) {
     data.append(element);
     data.append('\0');
   }
-  for(const auto &frame : d->embeddedFrameList) {
+  for(const auto &frame : std::as_const(d->embeddedFrameList)) {
     frame->header()->setVersion(header()->version());
     data.append(frame->render());
   }

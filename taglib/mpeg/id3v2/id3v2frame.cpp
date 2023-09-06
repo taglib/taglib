@@ -69,7 +69,8 @@ namespace
     if(frameID.size() != 4)
       return false;
 
-    return std::none_of(frameID.begin(), frameID.end(), [](auto c) { return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); });
+    return std::none_of(frameID.begin(), frameID.end(),
+      [](auto c) { return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); });
   }
 }  // namespace
 

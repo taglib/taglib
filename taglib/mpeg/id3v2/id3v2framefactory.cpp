@@ -143,7 +143,8 @@ std::pair<Frame::Header *, bool> FrameFactory::prepareFrameHeader(
   }
 #endif
 
-  if(std::any_of(frameID.begin(), frameID.end(), [](auto c) { return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); })) {
+  if(std::any_of(frameID.cbegin(), frameID.cend(),
+      [](auto c) { return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); })) {
     delete header;
     return { nullptr, false };
   }

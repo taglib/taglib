@@ -103,7 +103,8 @@ MP4::Atom::Atom(File *file)
         };
         // meta is not a full atom (i.e. not followed by version, flags). It
         // is followed by the size and type of the first child atom.
-        auto metaIsFullAtom = std::none_of(metaChildrenNames.begin(), metaChildrenNames.end(), [nextSize = file->readBlock(8).mid(4, 4)](const auto &child) { return nextSize == child; });
+        auto metaIsFullAtom = std::none_of(metaChildrenNames.begin(), metaChildrenNames.end(),
+          [nextSize = file->readBlock(8).mid(4, 4)](const auto &child) { return nextSize == child; });
         // Only skip next four bytes, which contain version and flags, if meta
         // is a full atom.
         file->seek(posAfterMeta + (metaIsFullAtom ? 4 : 0));

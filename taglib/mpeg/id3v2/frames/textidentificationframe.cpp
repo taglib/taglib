@@ -294,7 +294,8 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   }
   const StringList l = fieldList();
   for(auto it = l.begin(); it != l.end(); ++it) {
-    auto found = std::find_if(involvedPeople.begin(), involvedPeople.end(), [=](const auto &person) { return *it == person.first; });
+    auto found = std::find_if(involvedPeople.begin(), involvedPeople.end(),
+      [=](const auto &person) { return *it == person.first; });
     if(found != involvedPeople.end()) {
       map.insert(found->second, (++it)->split(","));
     }
