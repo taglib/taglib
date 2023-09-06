@@ -315,7 +315,7 @@ void IT::File::read(bool)
     comment.append(sampleName);
   }
 
-  if(message.size() > 0)
+  if(!message.isEmpty())
     comment.append(message);
   d->tag.setComment(comment.toString("\n"));
   d->tag.setTrackerName("Impulse Tracker");
