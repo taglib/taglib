@@ -290,7 +290,7 @@ ByteVector Ogg::PageHeader::lacingValues() const
 
     data.resize(data.size() + (*it / 255), '\xff');
 
-    if(it != --d->packetSizes.cend() || d->lastPacketCompleted)
+    if(it != std::prev(d->packetSizes.cend()) || d->lastPacketCompleted)
       data.append(static_cast<unsigned char>(*it % 255));
   }
 

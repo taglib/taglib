@@ -30,8 +30,9 @@
 #include "modfileprivate.h"
 #include "tpropertymap.h"
 
-#include <cstring>
 #include <algorithm>
+#include <cstring>
+#include <utility>
 
 using namespace TagLib;
 using namespace XM;
@@ -319,9 +320,8 @@ public:
   unsigned int size() const override
   {
     unsigned int size = 0;
-    for(auto i = m_readers.begin();
-        i != m_readers.end(); ++ i) {
-      size += (*i)->size();
+    for(const auto &reader : m_readers) {
+      size += reader->size();
     }
     return size;
   }
@@ -329,9 +329,10 @@ public:
   unsigned int read(TagLib::File &file, unsigned int limit) override
   {
     unsigned int sumcount = 0;
-    for(auto i = m_readers.cbegin();
-        limit > 0 && i != m_readers.cend(); ++ i) {
-      unsigned int count = (*i)->read(file, limit);
+    for(const auto &reader : std::as_const(m_readers)) {
+      if(limit == 0)
+        break;
+      unsigned int count = reader->read(file, limit);
       limit    -= count;
       sumcount += count;
     }

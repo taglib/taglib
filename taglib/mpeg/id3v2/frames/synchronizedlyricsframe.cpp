@@ -29,6 +29,8 @@
 #include "tdebug.h"
 #include "tpropertymap.h"
 
+#include <utility>
+
 using namespace TagLib;
 using namespace ID3v2;
 
@@ -199,10 +201,8 @@ ByteVector SynchronizedLyricsFrame::renderFields() const
   String::Type encoding = d->textEncoding;
 
   encoding = checkTextEncoding(d->description, encoding);
-  for(auto it = d->synchedText.cbegin();
-      it != d->synchedText.cend();
-      ++it) {
-    encoding = checkTextEncoding(it->text, encoding);
+  for(const auto &frame : std::as_const(d->synchedText)) {
+    encoding = checkTextEncoding(frame.text, encoding);
   }
 
   v.append(static_cast<char>(encoding));
@@ -211,8 +211,7 @@ ByteVector SynchronizedLyricsFrame::renderFields() const
   v.append(static_cast<char>(d->type));
   v.append(d->description.data(encoding));
   v.append(textDelimiter(encoding));
-  for(auto it = d->synchedText.cbegin(); it != d->synchedText.cend(); ++it) {
-    const SynchedText &entry = *it;
+  for(const auto &entry : std::as_const(d->synchedText)) {
     v.append(entry.text.data(encoding));
     v.append(textDelimiter(encoding));
     v.append(ByteVector::fromUInt(entry.time));

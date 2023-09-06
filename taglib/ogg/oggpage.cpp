@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <array>
+#include <utility>
 
 #include "tstring.h"
 #include "tdebug.h"
@@ -92,8 +93,8 @@ unsigned int pageChecksum(const ByteVector &data)
   };
 
   unsigned int sum = 0;
-  for(auto it = data.begin(); it != data.end(); ++it)
-    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(*it)];
+  for(const auto &byte : data)
+    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(byte)];
   return sum;
 }
 
@@ -212,9 +213,8 @@ ByteVectorList Ogg::Page::packets() const
     d->file->seek(d->fileOffset + d->header.size());
 
     const List<int> packetSizes = d->header.packetSizes();
-
-    for(auto it = packetSizes.begin(); it != packetSizes.end(); ++it)
-      l.append(d->file->readBlock(*it));
+    for(const auto &size : packetSizes)
+      l.append(d->file->readBlock(size));
   }
   else
     debug("Ogg::Page::packets() -- attempting to read packets from an invalid page.");
@@ -242,8 +242,8 @@ ByteVector Ogg::Page::render() const
       debug("Ogg::Page::render() -- this page is empty!");
   }
   else {
-    for(auto it = d->packets.cbegin(); it != d->packets.cend(); ++it)
-      data.append(*it);
+    for(const auto &packet : std::as_const(d->packets))
+      data.append(packet);
   }
 
   // Compute and set the checksum for the Ogg page.  The checksum is taken over
@@ -274,8 +274,8 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
   if(strategy != Repaginate) {
 
     size_t tableSize = 0;
-    for(auto it = packets.begin(); it != packets.end(); ++it)
-      tableSize += it->size() / 255 + 1;
+    for(const auto &packet : packets)
+      tableSize += packet.size() / 255 + 1;
 
     if(tableSize > 255)
       strategy = Repaginate;
@@ -354,9 +354,9 @@ Ogg::Page::Page(const ByteVectorList &packets,
   ByteVector data;
   List<int> packetSizes;
 
-  for(auto it = packets.begin(); it != packets.end(); ++it) {
-    packetSizes.append((*it).size());
-    data.append(*it);
+  for(const auto &packet : packets) {
+    packetSizes.append(packet.size());
+    data.append(packet);
   }
   d->packets = packets;
   d->header.setPacketSizes(packetSizes);

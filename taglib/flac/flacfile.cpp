@@ -42,6 +42,8 @@
 #include "flacmetadatablock.h"
 #include "flacunknownmetadatablock.h"
 
+#include <utility>
+
 using namespace TagLib;
 
 namespace
@@ -203,10 +205,10 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(auto it = d->blocks.cbegin(); it != d->blocks.cend(); ++it) {
-    ByteVector blockData = (*it)->render();
+  for(const auto &block : std::as_const(d->blocks)) {
+    ByteVector blockData = block->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = (*it)->code();
+    blockHeader[0] = block->code();
     data.append(blockHeader);
     data.append(blockData);
   }
@@ -327,9 +329,8 @@ Ogg::XiphComment *FLAC::File::xiphComment(bool create)
 List<FLAC::Picture *> FLAC::File::pictureList()
 {
   List<Picture *> pictures;
-  for(auto it = d->blocks.cbegin(); it != d->blocks.cend(); ++it) {
-    auto picture = dynamic_cast<Picture *>(*it);
-    if(picture) {
+  for(const auto &block : std::as_const(d->blocks)) {
+    if(auto picture = dynamic_cast<Picture *>(block)) {
       pictures.append(picture);
     }
   }

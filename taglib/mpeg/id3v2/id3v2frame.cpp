@@ -283,8 +283,8 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
   if(encoding != String::Latin1)
     return encoding;
 
-  for(auto it = fields.begin(); it != fields.end(); ++it) {
-    if(!(*it).isLatin1()) {
+  for(const auto &field : fields) {
+    if(!field.isLatin1()) {
       if(header()->version() == 4) {
         debug("Frame::checkEncoding() -- Rendering using UTF8.");
         return String::UTF8;
@@ -465,13 +465,13 @@ void Frame::splitProperties(const PropertyMap &original, PropertyMap &singleFram
   singleFrameProperties.clear();
   tiplProperties.clear();
   tmclProperties.clear();
-  for(auto it = original.begin(); it != original.end(); ++it) {
-    if(TextIdentificationFrame::involvedPeopleMap().contains(it->first))
-      tiplProperties.insert(it->first, it->second);
-    else if(it->first.startsWith(TextIdentificationFrame::instrumentPrefix))
-      tmclProperties.insert(it->first, it->second);
+  for(const auto &[person, tag] : original) {
+    if(TextIdentificationFrame::involvedPeopleMap().contains(person))
+      tiplProperties.insert(person, tag);
+    else if(person.startsWith(TextIdentificationFrame::instrumentPrefix))
+      tmclProperties.insert(person, tag);
     else
-      singleFrameProperties.insert(it->first, it->second);
+      singleFrameProperties.insert(person, tag);
   }
 }
 

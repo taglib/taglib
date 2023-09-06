@@ -27,6 +27,7 @@
  ***************************************************************************/
 
 #include "unsynchronizedlyricsframe.h"
+#include <utility>
 #include "tbytevectorlist.h"
 #include "id3v2tag.h"
 #include "tdebug.h"
@@ -123,10 +124,8 @@ PropertyMap UnsynchronizedLyricsFrame::asProperties() const
 
 UnsynchronizedLyricsFrame *UnsynchronizedLyricsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
-  const ID3v2::FrameList lyrics = tag->frameList("USLT");
-
-  for(auto it = lyrics.begin(); it != lyrics.end(); ++it){
-    auto frame = dynamic_cast<UnsynchronizedLyricsFrame *>(*it);
+  for(const auto &lyrics : std::as_const(tag->frameList("USLT"))) {
+    auto frame = dynamic_cast<UnsynchronizedLyricsFrame *>(lyrics);
     if(frame && frame->description() == d)
       return frame;
   }

@@ -27,6 +27,7 @@
  ***************************************************************************/
 
 #include "urllinkframe.h"
+#include <utility>
 #include "id3v2tag.h"
 #include "tdebug.h"
 #include "tstringlist.h"
@@ -172,9 +173,8 @@ PropertyMap UserUrlLinkFrame::asProperties() const
 
 UserUrlLinkFrame *UserUrlLinkFrame::find(ID3v2::Tag *tag, const String &description) // static
 {
-  const FrameList l = tag->frameList("WXXX");
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    auto f = dynamic_cast<UserUrlLinkFrame *>(*it);
+  for(const auto &frame : std::as_const(tag->frameList("WXXX"))) {
+    auto f = dynamic_cast<UserUrlLinkFrame *>(frame);
     if(f && f->description() == description)
       return f;
   }

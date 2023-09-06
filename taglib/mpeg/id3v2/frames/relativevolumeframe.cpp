@@ -28,6 +28,8 @@
 #include "tdebug.h"
 #include "tmap.h"
 
+#include <utility>
+
 using namespace TagLib;
 using namespace ID3v2;
 
@@ -73,8 +75,8 @@ List<RelativeVolumeFrame::ChannelType> RelativeVolumeFrame::channels() const
 {
   List<ChannelType> l;
 
-  for(auto it = d->channels.cbegin(); it != d->channels.cend(); ++it)
-    l.append((*it).first);
+  for(const auto &[type, channel] : std::as_const(d->channels))
+    l.append(type);
 
   return l;
 }
@@ -156,10 +158,7 @@ ByteVector RelativeVolumeFrame::renderFields() const
   data.append(d->identification.data(String::Latin1));
   data.append(textDelimiter(String::Latin1));
 
-  for(auto it = d->channels.cbegin(); it != d->channels.cend(); ++it) {
-    ChannelType type = (*it).first;
-    const ChannelData &channel = (*it).second;
-
+  for(const auto &[type, channel] : std::as_const(d->channels)) {
     data.append(static_cast<char>(type));
     data.append(ByteVector::fromShort(channel.volumeAdjustment));
     data.append(static_cast<char>(channel.peakVolume.bitsRepresentingPeak));

@@ -26,6 +26,7 @@
 #include "mp4atom.h"
 
 #include <climits>
+#include <utility>
 
 #include "tdebug.h"
 #include "tstring.h"
@@ -131,9 +132,9 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
   if(name1 == nullptr) {
     return this;
   }
-  for(auto it = children.cbegin(); it != children.cend(); ++it) {
-    if((*it)->name == name1) {
-      return (*it)->find(name2, name3, name4);
+  for(const auto &child : std::as_const(children)) {
+    if(child->name == name1) {
+      return child->find(name2, name3, name4);
     }
   }
   return nullptr;
@@ -143,12 +144,12 @@ MP4::AtomList
 MP4::Atom::findall(const char *name, bool recursive)
 {
   MP4::AtomList result;
-  for(auto it = children.cbegin(); it != children.cend(); ++it) {
-    if((*it)->name == name) {
-      result.append(*it);
+  for(const auto &child : std::as_const(children)) {
+    if(child->name == name) {
+      result.append(child);
     }
     if(recursive) {
-      result.append((*it)->findall(name, recursive));
+      result.append(child->findall(name, recursive));
     }
   }
   return result;
@@ -161,9 +162,9 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
   if(name1 == nullptr) {
     return true;
   }
-  for(auto it = children.cbegin(); it != children.cend(); ++it) {
-    if((*it)->name == name1) {
-      return (*it)->path(path, name2, name3);
+  for(const auto &child : std::as_const(children)) {
+    if(child->name == name1) {
+      return child->path(path, name2, name3);
     }
   }
   return false;
@@ -189,9 +190,9 @@ MP4::Atoms::~Atoms() = default;
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)
 {
-  for(auto it = atoms.cbegin(); it != atoms.cend(); ++it) {
-    if((*it)->name == name1) {
-      return (*it)->find(name2, name3, name4);
+  for(const auto &atom : std::as_const(atoms)) {
+    if(atom->name == name1) {
+      return atom->find(name2, name3, name4);
     }
   }
   return nullptr;
@@ -201,9 +202,9 @@ MP4::AtomList
 MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const char *name4)
 {
   MP4::AtomList path;
-  for(auto it = atoms.cbegin(); it != atoms.cend(); ++it) {
-    if((*it)->name == name1) {
-      if(!(*it)->path(path, name2, name3, name4)) {
+  for(const auto &atom : std::as_const(atoms)) {
+    if(atom->name == name1) {
+      if(!atom->path(path, name2, name3, name4)) {
         path.clear();
       }
       return path;

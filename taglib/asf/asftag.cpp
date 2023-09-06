@@ -27,6 +27,7 @@
 #include "tpropertymap.h"
 
 #include <array>
+#include <utility>
 
 using namespace TagLib;
 
@@ -285,23 +286,23 @@ PropertyMap ASF::Tag::properties() const
     props["COMMENT"] = d->comment;
   }
 
-  for(auto it = d->attributeListMap.cbegin(); it != d->attributeListMap.cend(); ++it) {
-    const String key = translateKey(it->first);
+  for(const auto &[k, attributes] : std::as_const(d->attributeListMap)) {
+    const String key = translateKey(k);
     if(!key.isEmpty()) {
-      for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+      for(const auto &attribute : attributes) {
         if(key == "TRACKNUMBER") {
-          if(it2->type() == ASF::Attribute::DWordType)
-            props.insert(key, String::number(it2->toUInt()));
+          if(attribute.type() == ASF::Attribute::DWordType)
+            props.insert(key, String::number(attribute.toUInt()));
           else
-            props.insert(key, it2->toString());
+            props.insert(key, attribute.toString());
         }
         else {
-          props.insert(key, it2->toString());
+          props.insert(key, attribute.toString());
         }
       }
     }
     else {
-      props.unsupportedData().append(it->first);
+      props.unsupportedData().append(k);
     }
   }
   return props;
@@ -309,8 +310,8 @@ PropertyMap ASF::Tag::properties() const
 
 void ASF::Tag::removeUnsupportedProperties(const StringList &props)
 {
-  for(auto it = props.begin(); it != props.end(); ++it)
-    d->attributeListMap.erase(*it);
+  for(const auto &prop : props)
+    d->attributeListMap.erase(prop);
 }
 
 PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
@@ -323,51 +324,49 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   }
 
   const PropertyMap origProps = properties();
-  auto it = origProps.begin();
-  for(; it != origProps.end(); ++it) {
-    if(!props.contains(it->first) || props[it->first].isEmpty()) {
-      if(it->first == "TITLE") {
+  for(const auto &[prop, _] : origProps) {
+    if(!props.contains(prop) || props[prop].isEmpty()) {
+      if(prop == "TITLE") {
         d->title.clear();
       }
-      else if(it->first == "ARTIST") {
+      else if(prop == "ARTIST") {
         d->artist.clear();
       }
-      else if(it->first == "COMMENT") {
+      else if(prop == "COMMENT") {
         d->comment.clear();
       }
-      else if(it->first == "COPYRIGHT") {
+      else if(prop == "COPYRIGHT") {
         d->copyright.clear();
       }
       else {
-        d->attributeListMap.erase(reverseKeyMap[it->first]);
+        d->attributeListMap.erase(reverseKeyMap[prop]);
       }
     }
   }
 
   PropertyMap ignoredProps;
-  it = props.begin();
-  for(; it != props.end(); ++it) {
-    if(reverseKeyMap.contains(it->first)) {
-      String name = reverseKeyMap[it->first];
+  for(const auto &[prop, attributes] : props) {
+    if(reverseKeyMap.contains(prop)) {
+      String name = reverseKeyMap[prop];
       removeItem(name);
-      for(auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-        addAttribute(name, *it2);
+      for(const auto &attribute : attributes) {
+        addAttribute(name, attribute);
       }
     }
-    else if(it->first == "TITLE") {
-      d->title = it->second.toString();
+    else if(prop == "TITLE") {
+      d->title = attributes.toString();
     }
-    else if(it->first == "ARTIST") {
-      d->artist = it->second.toString();
+    else if(prop == "ARTIST") {
+      d->artist = attributes.toString();
     }
-    else if(it->first == "COMMENT") {
-      d->comment = it->second.toString();
+    else if(prop == "COMMENT") {
+      d->comment = attributes.toString();
     }
-    else if(it->first == "COPYRIGHT") {
-      d->copyright = it->second.toString();
+    else if(prop == "COPYRIGHT") {
+      d->copyright = attributes.toString();
     }
     else {
-      ignoredProps.insert(it->first, it->second);
+      ignoredProps.insert(prop, attributes);
     }
   }
 

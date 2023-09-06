@@ -35,6 +35,8 @@
 #include "asfproperties.h"
 #include "asfutils.h"
 
+#include <utility>
+
 using namespace TagLib;
 
 class ASF::File::FilePrivate
@@ -405,8 +407,8 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
 ByteVector ASF::File::FilePrivate::HeaderExtensionObject::render(ASF::File *file)
 {
   data.clear();
-  for(auto it = objects.cbegin(); it != objects.cend(); ++it) {
-    data.append((*it)->render(file));
+  for(const auto &object : std::as_const(objects)) {
+    data.append(object->render(file));
   }
   data = ByteVector("\x11\xD2\xD3\xAB\xBA\xA9\xcf\x11\x8E\xE6\x00\xC0\x0C\x20\x53\x65\x06\x00", 18) + ByteVector::fromUInt(data.size(), false) + data;
   return BaseObject::render(file);
@@ -563,19 +565,11 @@ bool ASF::File::save()
   d->metadataObject->attributeData.clear();
   d->metadataLibraryObject->attributeData.clear();
 
-  const AttributeListMap allAttributes = d->tag->attributeListMap();
-
-  for(auto it = allAttributes.begin(); it != allAttributes.end(); ++it) {
-
-    const String &name = it->first;
-    const AttributeList &attributes = it->second;
-
+  for(const auto &[name, attributes] : std::as_const(d->tag->attributeListMap())) {
     bool inExtendedContentDescriptionObject = false;
     bool inMetadataObject = false;
 
-    for(auto jt = attributes.begin(); jt != attributes.end(); ++jt) {
-
-      const Attribute &attribute = *jt;
+    for(const auto &attribute : attributes) {
       const bool largeValue = (attribute.dataSize() > 65535);
       const bool guid       = (attribute.type() == Attribute::GuidType);
 
@@ -594,8 +588,8 @@ bool ASF::File::save()
   }
 
   ByteVector data;
-  for(auto it = d->objects.cbegin(); it != d->objects.cend(); ++it) {
-    data.append((*it)->render(this));
+  for(const auto &object : std::as_const(d->objects)) {
+    data.append(object->render(this));
   }
 
   seek(16);

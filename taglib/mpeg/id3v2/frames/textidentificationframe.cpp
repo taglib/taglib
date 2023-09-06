@@ -30,6 +30,7 @@
 #include "id3v1genres.h"
 
 #include <array>
+#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -67,12 +68,12 @@ TextIdentificationFrame *TextIdentificationFrame::createTIPLFrame(const Property
 {
   auto frame = new TextIdentificationFrame("TIPL");
   StringList l;
-  for(auto it = properties.begin(); it != properties.end(); ++it){
-    const String role = involvedPeopleMap()[it->first];
+  for(const auto &[person, list] : properties) {
+    const String role = involvedPeopleMap()[person];
     if(role.isEmpty()) // should not happen
       continue;
     l.append(role);
-    l.append(it->second.toString(",")); // comma-separated list of names
+    l.append(list.toString(",")); // comma-separated list of names
   }
   frame->setText(l);
   return frame;
@@ -82,11 +83,11 @@ TextIdentificationFrame *TextIdentificationFrame::createTMCLFrame(const Property
 {
   auto frame = new TextIdentificationFrame("TMCL");
   StringList l;
-  for(auto it = properties.begin(); it != properties.end(); ++it){
-    if(!it->first.startsWith(instrumentPrefix)) // should not happen
+  for(const auto &[instrument, list] : properties) {
+    if(!instrument.startsWith(instrumentPrefix)) // should not happen
       continue;
-    l.append(it->first.substr(instrumentPrefix.size()));
-    l.append(it->second.toString(","));
+    l.append(instrument.substr(instrumentPrefix.size()));
+    l.append(list.toString(","));
   }
   frame->setText(l);
   return frame;
@@ -162,19 +163,19 @@ PropertyMap TextIdentificationFrame::asProperties() const
   if(tagName == "GENRE") {
     // Special case: Support ID3v1-style genre numbers. They are not officially supported in
     // ID3v2, however it seems that still a lot of programs use them.
-    for(auto it = values.begin(); it != values.end(); ++it) {
+    for(auto &value : values) {
       bool ok = false;
-      int test = it->toInt(&ok); // test if the genre value is an integer
+      int test = value.toInt(&ok); // test if the genre value is an integer
       if(ok)
-        *it = ID3v1::genre(test);
+        value = ID3v1::genre(test);
     }
   } else if(tagName == "DATE") {
-    for(auto it = values.begin(); it != values.end(); ++it) {
+    for(auto &value : values) {
       // ID3v2 specifies ISO8601 timestamps which contain a 'T' as separator between date and time.
       // Since this is unusual in other formats, the T is removed.
-      int tpos = it->find("T");
+      int tpos = value.find("T");
       if(tpos != -1)
-        (*it)[tpos] = ' ';
+        value[tpos] = ' ';
     }
   }
   PropertyMap ret;
@@ -414,18 +415,16 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
   PropertyMap map;
   String tagName = txxxToKey(description());
   const StringList v = fieldList();
-  for(auto it = v.begin(); it != v.end(); ++it)
-    if(it != v.begin())
-      map.insert(tagName, *it);
+  for(auto it = std::next(v.begin()); it != v.end(); ++it)
+    map.insert(tagName, *it);
   return map;
 }
 
 UserTextIdentificationFrame *UserTextIdentificationFrame::find(
   ID3v2::Tag *tag, const String &description) // static
 {
-  const FrameList l = tag->frameList("TXXX");
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    auto f = dynamic_cast<UserTextIdentificationFrame *>(*it);
+  for(const auto &frame : std::as_const(tag->frameList("TXXX"))) {
+    auto f = dynamic_cast<UserTextIdentificationFrame *>(frame);
     if(f && f->description() == description)
       return f;
   }

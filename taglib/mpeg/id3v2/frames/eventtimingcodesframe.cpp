@@ -29,6 +29,8 @@
 #include "tdebug.h"
 #include "tpropertymap.h"
 
+#include <utility>
+
 using namespace TagLib;
 using namespace ID3v2;
 
@@ -116,8 +118,7 @@ ByteVector EventTimingCodesFrame::renderFields() const
   ByteVector v;
 
   v.append(static_cast<char>(d->timestampFormat));
-  for(auto it = d->synchedEvents.cbegin(); it != d->synchedEvents.cend(); ++it) {
-    const SynchedEvent &entry = *it;
+  for(const auto &entry : std::as_const(d->synchedEvents)) {
     v.append(static_cast<char>(entry.type));
     v.append(ByteVector::fromUInt(entry.time));
   }

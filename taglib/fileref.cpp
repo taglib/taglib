@@ -30,6 +30,7 @@
 #include "fileref.h"
 
 #include <cstring>
+#include <utility>
 
 #include "tdebug.h"
 #include "tfile.h"
@@ -82,8 +83,8 @@ namespace
     if(::strlen(fileName) == 0)
       return nullptr;
 #endif
-    for(auto it = fileTypeResolvers.cbegin(); it != fileTypeResolvers.cend(); ++it) {
-      File *file = (*it)->createFile(fileName, readAudioProperties, audioPropertiesStyle);
+    for(const auto &resolver : std::as_const(fileTypeResolvers)) {
+      File *file = resolver->createFile(fileName, readAudioProperties, audioPropertiesStyle);
       if(file)
         return file;
     }
@@ -94,8 +95,8 @@ namespace
   File *detectByResolvers(IOStream* stream, bool readAudioProperties,
                           AudioProperties::ReadStyle audioPropertiesStyle)
   {
-    for(auto it = fileTypeResolvers.cbegin(); it != fileTypeResolvers.cend(); ++it) {
-      if(auto streamResolver = dynamic_cast<const FileRef::StreamTypeResolver*>(*it)) {
+    for(const auto &resolver : std::as_const(fileTypeResolvers)) {
+      if(auto streamResolver = dynamic_cast<const FileRef::StreamTypeResolver *>(resolver)) {
         if(File *file = streamResolver->createFileFromStream(
              stream, readAudioProperties, audioPropertiesStyle))
           return file;

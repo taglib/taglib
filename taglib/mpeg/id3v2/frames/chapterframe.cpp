@@ -26,9 +26,10 @@
 #include "chapterframe.h"
 
 #include "tbytevectorlist.h"
-#include "tpropertymap.h"
 #include "tdebug.h"
+#include "tpropertymap.h"
 #include <cstdio>
+#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -80,8 +81,8 @@ ChapterFrame::ChapterFrame(const ByteVector &elementID,
   d->startOffset = startOffset;
   d->endOffset = endOffset;
 
-  for(auto it = embeddedFrames.begin(); it != embeddedFrames.end(); ++it)
-    addEmbeddedFrame(*it);
+  for(const auto &frame : embeddedFrames)
+    addEmbeddedFrame(frame);
 }
 
 ChapterFrame::~ChapterFrame() = default;
@@ -177,9 +178,9 @@ void ChapterFrame::removeEmbeddedFrame(Frame *frame, bool del)
 
 void ChapterFrame::removeEmbeddedFrames(const ByteVector &id)
 {
-  const FrameList l = d->embeddedFrameListMap[id];
-  for(auto it = l.begin(); it != l.end(); ++it)
-    removeEmbeddedFrame(*it, true);
+  const FrameList frames = d->embeddedFrameListMap[id];
+  for(const auto &frame : frames)
+    removeEmbeddedFrame(frame, true);
 }
 
 String ChapterFrame::toString() const
@@ -196,8 +197,8 @@ String ChapterFrame::toString() const
 
   if(!d->embeddedFrameList.isEmpty()) {
     StringList frameIDs;
-    for(auto it = d->embeddedFrameList.cbegin(); it != d->embeddedFrameList.cend(); ++it)
-      frameIDs.append((*it)->frameID());
+    for(const auto &frame : std::as_const(d->embeddedFrameList))
+      frameIDs.append(frame->frameID());
     s += ", sub-frames: [ " + frameIDs.toString(", ") + " ]";
   }
 
@@ -215,13 +216,8 @@ PropertyMap ChapterFrame::asProperties() const
 
 ChapterFrame *ChapterFrame::findByElementID(const ID3v2::Tag *tag, const ByteVector &eID) // static
 {
-  ID3v2::FrameList comments = tag->frameList("CHAP");
-
-  for(auto it = comments.cbegin();
-      it != comments.cend();
-      ++it)
-  {
-    auto frame = dynamic_cast<ChapterFrame *>(*it);
+  for(const auto &comment : std::as_const(tag->frameList("CHAP"))) {
+    auto frame = dynamic_cast<ChapterFrame *>(comment);
     if(frame && frame->elementID() == eID)
       return frame;
   }
@@ -283,10 +279,9 @@ ByteVector ChapterFrame::renderFields() const
   data.append(ByteVector::fromUInt(d->endTime, true));
   data.append(ByteVector::fromUInt(d->startOffset, true));
   data.append(ByteVector::fromUInt(d->endOffset, true));
-  const FrameList l = d->embeddedFrameList;
-  for(auto it = l.begin(); it != l.end(); ++it) {
-    (*it)->header()->setVersion(header()->version());
-    data.append((*it)->render());
+  for(const auto &frame : std::as_const(d->embeddedFrameList)) {
+    frame->header()->setVersion(header()->version());
+    data.append(frame->render());
   }
 
   return data;

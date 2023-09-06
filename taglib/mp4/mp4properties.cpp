@@ -37,15 +37,15 @@ namespace
   long long calculateMdatLength(const MP4::AtomList &list)
   {
     long long totalLength = 0;
-    for(auto it = list.begin(); it != list.end(); ++it) {
-      offset_t length = (*it)->length;
+    for(const auto &atom : list) {
+      offset_t length = atom->length;
       if(length == 0)
         return 0; // for safety, see checkValid() in mp4file.cpp
 
-      if((*it)->name == "mdat")
+      if(atom->name == "mdat")
         totalLength += length;
 
-      totalLength += calculateMdatLength((*it)->children);
+      totalLength += calculateMdatLength(atom->children);
     }
 
     return totalLength;
@@ -136,13 +136,13 @@ MP4::Properties::read(File *file, Atoms *atoms)
   ByteVector data;
 
   const MP4::AtomList trakList = moov->findall("trak");
-  for(auto it = trakList.begin(); it != trakList.end(); ++it) {
-    trak = *it;
-    MP4::Atom *hdlr = trak->find("mdia", "hdlr");
+  for(const auto &track : trakList) {
+    MP4::Atom *hdlr = track->find("mdia", "hdlr");
     if(!hdlr) {
       debug("MP4: Atom 'trak.mdia.hdlr' not found");
       return;
     }
+    trak = track;
     file->seek(hdlr->offset);
     data = file->readBlock(hdlr->length);
     if(data.containsAt("soun", 16)) {

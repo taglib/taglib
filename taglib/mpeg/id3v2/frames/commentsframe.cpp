@@ -25,6 +25,8 @@
 
 #include "commentsframe.h"
 
+#include <utility>
+
 #include "tbytevectorlist.h"
 #include "id3v2tag.h"
 #include "tdebug.h"
@@ -122,11 +124,8 @@ PropertyMap CommentsFrame::asProperties() const
 
 CommentsFrame *CommentsFrame::findByDescription(const ID3v2::Tag *tag, const String &d) // static
 {
-  const ID3v2::FrameList comments = tag->frameList("COMM");
-
-  for(auto it = comments.begin(); it != comments.end(); ++it)
-  {
-    auto frame = dynamic_cast<CommentsFrame *>(*it);
+  for(const auto &comment : std::as_const(tag->frameList("COMM"))) {
+    auto frame = dynamic_cast<CommentsFrame *>(comment);
     if(frame && frame->description() == d)
       return frame;
   }

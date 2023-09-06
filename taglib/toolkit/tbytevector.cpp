@@ -451,10 +451,7 @@ ByteVector &ByteVector::replace(char oldByte, char newByte)
 {
   detach();
 
-  for(auto it = begin(); it != end(); ++it) {
-    if(*it == oldByte)
-      *it = newByte;
-  }
+  std::replace(this->begin(), this->end(), oldByte, newByte);
 
   return *this;
 }
@@ -965,7 +962,8 @@ void ByteVector::detach()
 
 std::ostream &operator<<(std::ostream &s, const TagLib::ByteVector &v)
 {
-  for(unsigned int i = 0; i < v.size(); i++)
-    s << v[i];
+  for(const auto &byte : v) {
+    s << byte;
+  }
   return s;
 }

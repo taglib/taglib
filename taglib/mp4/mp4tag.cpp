@@ -31,6 +31,7 @@
 #include "id3v1genres.h"
 
 #include <array>
+#include <utility>
 
 using namespace TagLib;
 
@@ -59,8 +60,7 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
     return;
   }
 
-  for(auto it = ilst->children.cbegin(); it != ilst->children.cend(); ++it) {
-    MP4::Atom *atom = *it;
+  for(const auto &atom : std::as_const(ilst->children)) {
     file->seek(atom->offset + 8);
     if(atom->name == "----") {
       parseFreeForm(atom);
@@ -161,8 +161,8 @@ MP4::Tag::parseData(const MP4::Atom *atom, int expectedFlags, bool freeForm)
 {
   const AtomDataList data = parseData2(atom, expectedFlags, freeForm);
   ByteVectorList result;
-  for(auto it = data.begin(); it != data.end(); ++it) {
-    result.append(it->data);
+  for(const auto &atom : data) {
+    result.append(atom.data);
   }
   return result;
 }
@@ -242,8 +242,8 @@ MP4::Tag::parseText(const MP4::Atom *atom, int expectedFlags)
   const ByteVectorList data = parseData(atom, expectedFlags);
   if(!data.isEmpty()) {
     StringList value;
-    for(auto it = data.begin(); it != data.end(); ++it) {
-      value.append(String(*it, String::UTF8));
+    for(const auto &byte : data) {
+      value.append(String(byte, String::UTF8));
     }
     addItem(atom->name, value);
   }
@@ -342,8 +342,8 @@ ByteVector
 MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data) const
 {
   ByteVector result;
-  for(auto it = data.begin(); it != data.end(); ++it) {
-    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + *it));
+  for(const auto &byte : data) {
+    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + byte));
   }
   return renderAtom(name, result);
 }
@@ -413,9 +413,9 @@ ByteVector
 MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags) const
 {
   ByteVectorList data;
-  const StringList value = item.toStringList();
-  for(auto it = value.begin(); it != value.end(); ++it) {
-    data.append(it->data(String::UTF8));
+  const StringList values = item.toStringList();
+  for(const auto &value : values) {
+    data.append(value.data(String::UTF8));
   }
   return renderData(name, flags, data);
 }
@@ -424,10 +424,10 @@ ByteVector
 MP4::Tag::renderCovr(const ByteVector &name, const MP4::Item &item) const
 {
   ByteVector data;
-  const MP4::CoverArtList value = item.toCoverArtList();
-  for(auto it = value.begin(); it != value.end(); ++it) {
-    data.append(renderAtom("data", ByteVector::fromUInt(it->format()) +
-                                   ByteVector(4, '\0') + it->data()));
+  const MP4::CoverArtList values = item.toCoverArtList();
+  for(const auto &value : values) {
+    data.append(renderAtom("data", ByteVector::fromUInt(value.format()) +
+                                   ByteVector(4, '\0') + value.data()));
   }
   return renderAtom(name, data);
 }
@@ -453,15 +453,17 @@ MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
     }
   }
   if(type == TypeUTF8) {
-    const StringList value = item.toStringList();
-    for(auto it = value.begin(); it != value.end(); ++it) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + it->data(String::UTF8)));
+    const StringList values = item.toStringList();
+    for(const auto &value : values) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) +
+                                     ByteVector(4, '\0') + value.data(String::UTF8)));
     }
   }
   else {
-    const ByteVectorList value = item.toByteVectorList();
-    for(auto it = value.begin(); it != value.end(); ++it) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) + ByteVector(4, '\0') + *it));
+    const ByteVectorList values = item.toByteVectorList();
+    for(const auto &value : values) {
+      data.append(renderAtom("data", ByteVector::fromUInt(type) +
+                                     ByteVector(4, '\0') + value));
     }
   }
   return renderAtom("----", data);
@@ -471,26 +473,24 @@ bool
 MP4::Tag::save()
 {
   ByteVector data;
-  for(auto it = d->items.cbegin(); it != d->items.cend(); ++it) {
-    const String name = it->first;
+  for(const auto &[name, item] : std::as_const(d->items)) {
     if(name.startsWith("----")) {
-      data.append(renderFreeForm(name, it->second));
+      data.append(renderFreeForm(name, item));
     }
     else if(name == "trkn") {
-      data.append(renderIntPair(name.data(String::Latin1), it->second));
+      data.append(renderIntPair(name.data(String::Latin1), item));
     }
     else if(name == "disk") {
-      data.append(renderIntPairNoTrailing(name.data(String::Latin1), it->second));
+      data.append(renderIntPairNoTrailing(name.data(String::Latin1), item));
     }
     else if(name == "cpil" || name == "pgap" || name == "pcst" || name == "hdvd" ||
             name == "shwm") {
-      data.append(renderBool(name.data(String::Latin1), it->second));
+      data.append(renderBool(name.data(String::Latin1), item));
     }
     else if(name == "tmpo" || name == "\251mvi" || name == "\251mvc") {
-      data.append(renderInt(name.data(String::Latin1), it->second));
+      data.append(renderInt(name.data(String::Latin1), item));
     }
-    else if (name == "rate") {
-      const MP4::Item& item = it->second;
+    else if(name == "rate") {
       StringList value = item.toStringList();
       if (value.isEmpty()) {
         data.append(renderInt(name.data(String::Latin1), item));
@@ -502,22 +502,22 @@ MP4::Tag::save()
     else if(name == "tvsn" || name == "tves" || name == "cnID" ||
             name == "sfID" || name == "atID" || name == "geID" ||
             name == "cmID") {
-      data.append(renderUInt(name.data(String::Latin1), it->second));
+      data.append(renderUInt(name.data(String::Latin1), item));
     }
     else if(name == "plID") {
-      data.append(renderLongLong(name.data(String::Latin1), it->second));
+      data.append(renderLongLong(name.data(String::Latin1), item));
     }
     else if(name == "stik" || name == "rtng" || name == "akID") {
-      data.append(renderByte(name.data(String::Latin1), it->second));
+      data.append(renderByte(name.data(String::Latin1), item));
     }
     else if(name == "covr") {
-      data.append(renderCovr(name.data(String::Latin1), it->second));
+      data.append(renderCovr(name.data(String::Latin1), item));
     }
     else if(name == "purl" || name == "egid") {
-      data.append(renderText(name.data(String::Latin1), it->second, TypeImplicit));
+      data.append(renderText(name.data(String::Latin1), item, TypeImplicit));
     }
     else if(name.size() == 4){
-      data.append(renderText(name.data(String::Latin1), it->second));
+      data.append(renderText(name.data(String::Latin1), item));
     }
     else {
       debug("MP4: Unknown item name \"" + name + "\"");
@@ -583,8 +583,7 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
   MP4::Atom *moov = d->atoms->find("moov");
   if(moov) {
     const MP4::AtomList stco = moov->findall("stco", true);
-    for(auto it = stco.begin(); it != stco.end(); ++it) {
-      MP4::Atom *atom = *it;
+    for(const auto &atom : stco) {
       if(atom->offset > offset) {
         atom->offset += delta;
       }
@@ -604,8 +603,7 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
     }
 
     const MP4::AtomList co64 = moov->findall("co64", true);
-    for(auto it = co64.begin(); it != co64.end(); ++it) {
-      MP4::Atom *atom = *it;
+    for(const auto &atom : co64) {
       if(atom->offset > offset) {
         atom->offset += delta;
       }
@@ -628,8 +626,7 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
   MP4::Atom *moof = d->atoms->find("moof");
   if(moof) {
     const MP4::AtomList tfhd = moof->findall("tfhd", true);
-    for(auto it = tfhd.begin(); it != tfhd.end(); ++it) {
-      MP4::Atom *atom = *it;
+    for(const auto &atom : tfhd) {
       if(atom->offset > offset) {
         atom->offset += delta;
       }
@@ -688,8 +685,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
 
   // check if there is an atom before 'ilst', and possibly use it as padding
   if(index != meta->children.cbegin()) {
-    auto prevIndex = index;
-    prevIndex--;
+    auto prevIndex = std::prev(index);
     MP4::Atom *prev = *prevIndex;
     if(prev->name == "free") {
       offset = prev->offset;
@@ -697,8 +693,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
     }
   }
   // check if there is an atom after 'ilst', and possibly use it as padding
-  auto nextIndex = index;
-  nextIndex++;
+  auto nextIndex = std::next(index);
   if(nextIndex != meta->children.cend()) {
     MP4::Atom *next = *nextIndex;
     if(next->name == "free") {
@@ -726,7 +721,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   }
   else {
     // Strip meta if data is empty, only the case when called from strip().
-    MP4::Atom *udta = *(--it);
+    MP4::Atom *udta = *std::prev(it);
     AtomList &udtaChildren = udta->children;
     auto metaIt = udtaChildren.find(meta);
     if(metaIt != udtaChildren.end()) {
@@ -980,31 +975,31 @@ namespace
 PropertyMap MP4::Tag::properties() const
 {
   PropertyMap props;
-  for(auto it = d->items.cbegin(); it != d->items.cend(); ++it) {
-    const String key = translateKey(it->first);
+  for(const auto &[k, t] : std::as_const(d->items)) {
+    const String key = translateKey(k);
     if(!key.isEmpty()) {
       if(key == "TRACKNUMBER" || key == "DISCNUMBER") {
-        MP4::Item::IntPair ip = it->second.toIntPair();
-        String value = String::number(ip.first);
-        if(ip.second) {
-          value += "/" + String::number(ip.second);
+        auto [vn, tn] = t.toIntPair();
+        String value  = String::number(vn);
+        if(tn) {
+          value += "/" + String::number(tn);
         }
         props[key] = value;
       }
       else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT" ||
               key == "TVEPISODE" || key == "TVSEASON") {
-        props[key] = String::number(it->second.toInt());
+        props[key] = String::number(t.toInt());
       }
       else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT" ||
               key == "GAPLESSPLAYBACK" || key == "PODCAST") {
-        props[key] = String::number(it->second.toBool());
+        props[key] = String::number(t.toBool());
       }
       else {
-        props[key] = it->second.toStringList();
+        props[key] = t.toStringList();
       }
     }
     else {
-      props.unsupportedData().append(it->first);
+      props.unsupportedData().append(k);
     }
   }
   return props;
@@ -1012,8 +1007,8 @@ PropertyMap MP4::Tag::properties() const
 
 void MP4::Tag::removeUnsupportedProperties(const StringList &props)
 {
-  for(auto it = props.begin(); it != props.end(); ++it)
-    d->items.erase(*it);
+  for(const auto &prop : props)
+    d->items.erase(prop);
 }
 
 PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
@@ -1026,18 +1021,18 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
   }
 
   const PropertyMap origProps = properties();
-  for(auto it = origProps.begin(); it != origProps.end(); ++it) {
-    if(!props.contains(it->first) || props[it->first].isEmpty()) {
-      d->items.erase(reverseKeyMap[it->first]);
+  for(const auto &[prop, _] : origProps) {
+    if(!props.contains(prop) || props[prop].isEmpty()) {
+      d->items.erase(reverseKeyMap[prop]);
     }
   }
 
   PropertyMap ignoredProps;
-  for(auto it = props.begin(); it != props.end(); ++it) {
-    if(reverseKeyMap.contains(it->first)) {
-      String name = reverseKeyMap[it->first];
-      if((it->first == "TRACKNUMBER" || it->first == "DISCNUMBER") && !it->second.isEmpty()) {
-        StringList parts = StringList::split(it->second.front(), "/");
+  for(const auto &[prop, val] : props) {
+    if(reverseKeyMap.contains(prop)) {
+      String name = reverseKeyMap[prop];
+      if((prop == "TRACKNUMBER" || prop == "DISCNUMBER") && !val.isEmpty()) {
+        StringList parts = StringList::split(val.front(), "/");
         if(!parts.isEmpty()) {
           int first = parts[0].toInt();
           int second = 0;
@@ -1047,24 +1042,24 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
           d->items[name] = MP4::Item(first, second);
         }
       }
-      else if((it->first == "BPM" || it->first == "MOVEMENTNUMBER" ||
-               it->first == "MOVEMENTCOUNT" || it->first == "TVEPISODE" ||
-               it->first == "TVSEASON") && !it->second.isEmpty()) {
-        int value = it->second.front().toInt();
+      else if((prop == "BPM" || prop == "MOVEMENTNUMBER" ||
+               prop == "MOVEMENTCOUNT" || prop == "TVEPISODE" ||
+               prop == "TVSEASON") && !val.isEmpty()) {
+        int value = val.front().toInt();
         d->items[name] = MP4::Item(value);
       }
-      else if((it->first == "COMPILATION" || it->first == "SHOWWORKMOVEMENT" ||
-               it->first == "GAPLESSPLAYBACK" || it->first == "PODCAST") &&
-              !it->second.isEmpty()) {
-        bool value = (it->second.front().toInt() != 0);
+      else if((prop == "COMPILATION" || prop == "SHOWWORKMOVEMENT" ||
+               prop == "GAPLESSPLAYBACK" || prop == "PODCAST") &&
+              !val.isEmpty()) {
+        bool value = (val.front().toInt() != 0);
         d->items[name] = MP4::Item(value);
       }
       else {
-        d->items[name] = it->second;
+        d->items[name] = val;
       }
     }
     else {
-      ignoredProps.insert(it->first, it->second);
+      ignoredProps.insert(prop, val);
     }
   }
 
