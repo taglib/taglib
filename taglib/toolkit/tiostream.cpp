@@ -43,7 +43,7 @@ namespace
       return std::wstring();
 
     std::wstring wstr(len - 1, L'\0');
-    MultiByteToWideChar(CP_ACP, 0, str, -1, &wstr[0], len);
+    MultiByteToWideChar(CP_ACP, 0, str, -1, wstr.data(), len);
 
     return wstr;
   }

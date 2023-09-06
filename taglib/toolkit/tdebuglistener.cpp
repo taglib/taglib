@@ -47,9 +47,9 @@ namespace
       const int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
       if(len != 0) {
         std::vector<char> buf(len);
-        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &buf[0], len, nullptr, nullptr);
+        WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, buf.data(), len, nullptr, nullptr);
 
-        std::cerr << std::string(&buf[0]);
+        std::cerr << std::string(buf.begin(), buf.end());
       }
 
 #else
