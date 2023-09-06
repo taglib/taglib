@@ -33,6 +33,8 @@
 #include "oggpage.h"
 #include "oggpageheader.h"
 
+#include <utility>
+
 using namespace TagLib;
 
 namespace
@@ -158,9 +160,8 @@ bool Ogg::File::save()
     return false;
   }
 
-  Map<unsigned int, ByteVector>::ConstIterator it;
-  for(it = d->dirtyPackets.cbegin(); it != d->dirtyPackets.cend(); ++it)
-    writePacket(it->first, it->second);
+  for(const auto &[i, packet] : std::as_const(d->dirtyPackets))
+    writePacket(i, packet);
 
   d->dirtyPackets.clear();
 
