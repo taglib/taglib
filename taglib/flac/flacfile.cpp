@@ -48,10 +48,6 @@ using namespace TagLib;
 
 namespace
 {
-  typedef List<FLAC::MetadataBlock *> BlockList;
-  typedef BlockList::Iterator BlockIterator;
-  typedef BlockList::ConstIterator BlockConstIterator;
-
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
 
   const long MinPaddingLength = 4096;
@@ -87,7 +83,7 @@ public:
 
   Properties *properties { nullptr };
   ByteVector xiphCommentData;
-  BlockList blocks;
+  List<FLAC::MetadataBlock *> blocks;
 
   offset_t flacStart { 0 };
   offset_t streamStart { 0 };

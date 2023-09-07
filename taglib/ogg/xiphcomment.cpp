@@ -35,16 +35,6 @@
 
 using namespace TagLib;
 
-namespace
-{
-  typedef Ogg::FieldListMap::Iterator FieldIterator;
-  typedef Ogg::FieldListMap::ConstIterator FieldConstIterator;
-
-  typedef List<FLAC::Picture *> PictureList;
-  typedef PictureList::Iterator PictureIterator;
-  typedef PictureList::ConstIterator PictureConstIterator;
-} // namespace
-
 class Ogg::XiphComment::XiphCommentPrivate
 {
 public:
@@ -56,7 +46,7 @@ public:
   FieldListMap fieldListMap;
   String vendorID;
   String commentField;
-  PictureList pictureList;
+  List<FLAC::Picture *> pictureList;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
