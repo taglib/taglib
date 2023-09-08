@@ -33,6 +33,8 @@
 #include "xiphcomment.h"
 #include "infotag.h"
 
+#include <array>
+
 using namespace TagLib;
 
 #define stringUnion(method)                                          \
@@ -64,29 +66,23 @@ using namespace TagLib;
 class TagUnion::TagUnionPrivate
 {
 public:
-  TagUnionPrivate() : tags(3, static_cast<Tag *>(nullptr))
-  {
-  }
-
+  TagUnionPrivate() = default;
   ~TagUnionPrivate()
   {
-    delete tags[0];
-    delete tags[1];
-    delete tags[2];
+    for(auto &tag : tags)
+      delete tag;
   }
 
   TagUnionPrivate(const TagUnionPrivate &) = delete;
   TagUnionPrivate &operator=(const TagUnionPrivate &) = delete;
 
-  std::vector<Tag *> tags;
+  std::array<Tag *, 3> tags { nullptr, nullptr, nullptr };
 };
 
 TagUnion::TagUnion(Tag *first, Tag *second, Tag *third) :
   d(std::make_unique<TagUnionPrivate>())
 {
-  d->tags[0] = first;
-  d->tags[1] = second;
-  d->tags[2] = third;
+  d->tags = { first, second, third };
 }
 
 TagUnion::~TagUnion() = default;
@@ -109,9 +105,9 @@ void TagUnion::set(int index, Tag *tag)
 
 PropertyMap TagUnion::properties() const
 {
-  for(size_t i = 0; i < 3; ++i) {
-    if(d->tags[i] && !d->tags[i]->isEmpty()) {
-      return d->tags[i]->properties();
+  for(const auto &tag : d->tags) {
+    if(tag && !tag->isEmpty()) {
+      return tag->properties();
     }
   }
 
@@ -120,9 +116,9 @@ PropertyMap TagUnion::properties() const
 
 void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
 {
-  for(size_t i = 0; i < 3; ++i) {
-    if(d->tags[i]) {
-      d->tags[i]->removeUnsupportedProperties(unsupported);
+  for(const auto &tag : d->tags) {
+    if(tag) {
+      tag->removeUnsupportedProperties(unsupported);
     }
   }
 }
@@ -199,12 +195,5 @@ void TagUnion::setTrack(unsigned int i)
 
 bool TagUnion::isEmpty() const
 {
-  if(d->tags[0] && !d->tags[0]->isEmpty())
-    return false;
-  if(d->tags[1] && !d->tags[1]->isEmpty())
-    return false;
-  if(d->tags[2] && !d->tags[2]->isEmpty())
-    return false;
-
-  return true;
+  return std::none_of(d->tags.begin(), d->tags.end(), [](auto t) { return t && !t->isEmpty(); });
 }
