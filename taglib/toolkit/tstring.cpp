@@ -27,7 +27,7 @@
 
 #include <cerrno>
 #include <climits>
-#include <utf8-cpp/checked.h>
+#include <utf8.h>
 
 #include "tdebug.h"
 #include "tstringlist.h"

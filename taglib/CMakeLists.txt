@@ -24,7 +24,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/it
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
-  ${taglib_SOURCE_DIR}/3rdparty
 )
 
 if(ZLIB_FOUND)
@@ -333,6 +332,8 @@ set(tag_LIB_SRCS
 )
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+
+target_link_libraries(tag $<$<TARGET_EXISTS:utf8::cpp>:utf8::cpp>)
 
 if(HAVE_ZLIB AND NOT HAVE_ZLIB_SOURCE)
   target_link_libraries(tag ${ZLIB_LIBRARIES})

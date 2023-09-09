@@ -147,6 +147,21 @@ endif()
 
 configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h")
 
+find_package(utf8cpp QUIET)
+if(NOT utf8cpp_FOUND)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/utfcpp/CMakeLists.txt)
+    add_subdirectory("3rdparty/utfcpp")
+    message(STATUS "Using utfcpp from ${utf8cpp_SOURCE_DIR}")
+  else()
+    message(FATAL_ERROR
+      "utfcpp not found. Either install package (probably utfcpp, utf8cpp, or libutfcpp-dev) "
+      "or fetch the git submodule using\n"
+      "git submodule update --init")
+  endif()
+else()
+  message(STATUS "Using utfcpp ${utf8cpp_VERSION} from ${utf8cpp_CONFIG}")
+endif()
+
 add_subdirectory(taglib)
 
 if(BUILD_BINDINGS)
