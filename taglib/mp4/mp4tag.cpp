@@ -122,14 +122,14 @@ MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
   int i = 0;
   unsigned int pos = 0;
   while(pos < data.size()) {
-    const int length = static_cast<int>(data.toUInt(pos));
+    const auto length = static_cast<int>(data.toUInt(pos));
     if(length < 12) {
       debug("MP4: Too short atom");
       return result;
     }
 
     const ByteVector name = data.mid(pos + 4, 4);
-    const int flags = static_cast<int>(data.toUInt(pos + 8));
+    const auto flags = static_cast<int>(data.toUInt(pos + 8));
     if(freeForm && i < 2) {
       if(i == 0 && name != "mean") {
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"mean\"");

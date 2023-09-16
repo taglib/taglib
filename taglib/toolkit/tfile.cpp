@@ -124,7 +124,6 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // The position in the file that the current buffer starts at.
 
   offset_t bufferOffset = fromOffset;
-  ByteVector buffer;
 
   // These variables are used to keep track of a partial match that happens at
   // the end of a buffer.
@@ -159,7 +158,7 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
   // then check for "before".  The order is important because it gives priority
   // to "real" matches.
 
-  for(buffer = readBlock(bufferSize()); buffer.size() > 0; buffer = readBlock(bufferSize())) {
+  for(auto buffer = readBlock(bufferSize()); !buffer.isEmpty(); buffer = readBlock(bufferSize())) {
 
     // (1) previous partial match
 
