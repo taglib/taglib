@@ -27,7 +27,6 @@
 
 #include <cerrno>
 #include <climits>
-
 #include <utf8-cpp/checked.h>
 
 #include "tdebug.h"

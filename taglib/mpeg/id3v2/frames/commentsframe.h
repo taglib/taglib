@@ -26,8 +26,8 @@
 #ifndef TAGLIB_COMMENTSFRAME_H
 #define TAGLIB_COMMENTSFRAME_H
 
-#include "id3v2frame.h"
 #include "taglib_export.h"
+#include "id3v2frame.h"
 
 namespace TagLib {
 

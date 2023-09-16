@@ -29,13 +29,13 @@
 
 #include "trueaudiofile.h"
 
-#include "tagunion.h"
-#include "tagutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-
+#include "tagunion.h"
+#include "tagutils.h"
 #include "id3v1tag.h"
 #include "id3v2tag.h"
+
 using namespace TagLib;
 
 namespace

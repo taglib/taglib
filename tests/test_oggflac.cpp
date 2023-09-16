@@ -25,9 +25,10 @@
 
 #include <string>
 #include <cstdio>
-#include "tag.h"
+
 #include "tstringlist.h"
 #include "tbytevectorlist.h"
+#include "tag.h"
 #include "oggfile.h"
 #include "oggflacfile.h"
 #include "oggpageheader.h"

@@ -26,8 +26,8 @@
 #ifndef TAGLIB_SYNCHRONIZEDLYRICSFRAME_H
 #define TAGLIB_SYNCHRONIZEDLYRICSFRAME_H
 
-#include "id3v2frame.h"
 #include "tlist.h"
+#include "id3v2frame.h"
 
 namespace TagLib {
 

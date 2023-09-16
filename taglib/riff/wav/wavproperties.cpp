@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "wavproperties.h"
+
 #include "tdebug.h"
 #include "wavfile.h"
 

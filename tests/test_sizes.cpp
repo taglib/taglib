@@ -23,6 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <cstring>
+
 #include "aifffile.h"
 #include "aiffproperties.h"
 #include "apefile.h"
@@ -124,7 +126,6 @@
 #include "xmfile.h"
 #include "xmproperties.h"
 
-#include <cstring>
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;

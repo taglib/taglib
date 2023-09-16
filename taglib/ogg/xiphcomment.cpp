@@ -25,11 +25,10 @@
 
 #include "xiphcomment.h"
 
-#include "tdebug.h"
-
-#include "tpropertymap.h"
-
 #include <utility>
+
+#include "tdebug.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 

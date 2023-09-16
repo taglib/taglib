@@ -25,11 +25,10 @@
 
 #include "mpcfile.h"
 
-#include "tagunion.h"
-#include "tagutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-
+#include "tagunion.h"
+#include "tagutils.h"
 #include "id3v1tag.h"
 #include "id3v2header.h"
 #include "apetag.h"

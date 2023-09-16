@@ -28,10 +28,11 @@
  ***************************************************************************/
 
 #include "apeproperties.h"
+
+#include "tdebug.h"
 #include "apefile.h"
 #include "apefooter.h"
 #include "apetag.h"
-#include "tdebug.h"
 
 using namespace TagLib;
 

@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "id3v2extendedheader.h"
+
 #include "id3v2synchdata.h"
 
 using namespace TagLib;

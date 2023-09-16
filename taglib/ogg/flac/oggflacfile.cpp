@@ -25,9 +25,9 @@
 
 #include "oggflacfile.h"
 
-#include "tagutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
+#include "tagutils.h"
 
 using namespace TagLib;
 using TagLib::FLAC::Properties;

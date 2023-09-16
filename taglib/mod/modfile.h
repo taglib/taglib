@@ -27,8 +27,8 @@
 #define TAGLIB_MODFILE_H
 
 #include "tfile.h"
-#include "audioproperties.h"
 #include "taglib_export.h"
+#include "audioproperties.h"
 #include "modfilebase.h"
 #include "modtag.h"
 #include "modproperties.h"

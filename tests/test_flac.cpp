@@ -25,16 +25,17 @@
 
 #include <string>
 #include <cstdio>
-#include "tag.h"
+
 #include "tstringlist.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
+#include "tag.h"
 #include "flacfile.h"
 #include "xiphcomment.h"
 #include "id3v1tag.h"
 #include "id3v2tag.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "plainfile.h"
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

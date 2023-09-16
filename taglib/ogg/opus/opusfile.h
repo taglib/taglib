@@ -32,7 +32,6 @@
 
 #include "oggfile.h"
 #include "xiphcomment.h"
-
 #include "opusproperties.h"
 
 namespace TagLib {

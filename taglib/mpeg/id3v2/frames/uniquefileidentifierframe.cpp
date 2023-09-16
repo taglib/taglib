@@ -30,7 +30,6 @@
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tdebug.h"
-
 #include "id3v2tag.h"
 
 using namespace TagLib;

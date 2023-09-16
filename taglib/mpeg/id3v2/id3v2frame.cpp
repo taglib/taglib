@@ -31,11 +31,9 @@
 #include "tdebug.h"
 #include "tstringlist.h"
 #include "tzlib.h"
-
+#include "tpropertymap.h"
 #include "id3v2tag.h"
 #include "id3v2synchdata.h"
-
-#include "tpropertymap.h"
 #include "frames/textidentificationframe.h"
 #include "frames/urllinkframe.h"
 #include "frames/unsynchronizedlyricsframe.h"

@@ -25,17 +25,16 @@
 #include <iostream>
 #include <iomanip>
 #include <cstring>
-
 #include <cstdio>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <cstdlib>
 
 #include "tlist.h"
-#include "fileref.h"
 #include "tfile.h"
-#include "tag.h"
 #include "tpropertymap.h"
+#include "fileref.h"
+#include "tag.h"
 
 using namespace std;
 

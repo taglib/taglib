@@ -24,10 +24,11 @@
  ***************************************************************************/
 
 #include "tag.h"
-#include "tstringlist.h"
-#include "tpropertymap.h"
 
 #include <utility>
+
+#include "tstringlist.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 

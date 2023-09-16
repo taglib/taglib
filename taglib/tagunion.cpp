@@ -24,10 +24,11 @@
  ***************************************************************************/
 
 #include "tagunion.h"
-#include "tstringlist.h"
-#include "tpropertymap.h"
 
 #include <array>
+
+#include "tstringlist.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 

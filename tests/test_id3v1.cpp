@@ -25,6 +25,7 @@
 
 #include <string>
 #include <cstdio>
+
 #include "tstring.h"
 #include "mpegfile.h"
 #include "id3v1tag.h"

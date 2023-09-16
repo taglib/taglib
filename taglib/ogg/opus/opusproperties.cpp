@@ -31,9 +31,7 @@
 
 #include "tstring.h"
 #include "tdebug.h"
-
 #include "oggpageheader.h"
-
 #include "opusfile.h"
 
 using namespace TagLib;

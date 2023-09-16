@@ -23,7 +23,6 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "id3v2synchdata.h"
 #include <cppunit/extensions/HelperMacros.h>
 

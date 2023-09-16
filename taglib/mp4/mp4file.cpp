@@ -25,9 +25,9 @@
 
 #include "mp4file.h"
 
-#include "tagutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
+#include "tagutils.h"
 
 using namespace TagLib;
 

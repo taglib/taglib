@@ -26,6 +26,10 @@
 #include <string>
 #include <cstdio>
 #include <utility>
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tzlib.h"
 #include "id3v2tag.h"
 #include "mpegfile.h"
 #include "id3v2frame.h"
@@ -46,11 +50,8 @@
 #include "commentsframe.h"
 #include "podcastframe.h"
 #include "privateframe.h"
-#include "tdebug.h"
-#include "tpropertymap.h"
-#include "tzlib.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "plainfile.h"
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

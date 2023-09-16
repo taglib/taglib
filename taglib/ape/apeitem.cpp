@@ -25,9 +25,9 @@
 
 #include "apeitem.h"
 
-#include "tdebug.h"
-
 #include <utility>
+
+#include "tdebug.h"
 
 using namespace TagLib;
 using namespace APE;

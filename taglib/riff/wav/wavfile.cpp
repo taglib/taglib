@@ -25,10 +25,9 @@
 
 #include "wavfile.h"
 
-#include "tagutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-
+#include "tagutils.h"
 #include "infotag.h"
 #include "tagunion.h"
 

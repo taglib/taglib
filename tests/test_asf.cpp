@@ -25,10 +25,11 @@
 
 #include <string>
 #include <cstdio>
-#include "tag.h"
+
 #include "tstringlist.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
+#include "tag.h"
 #include "asffile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"

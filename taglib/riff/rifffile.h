@@ -26,8 +26,8 @@
 #ifndef TAGLIB_RIFFFILE_H
 #define TAGLIB_RIFFFILE_H
 
-#include "taglib_export.h"
 #include "tfile.h"
+#include "taglib_export.h"
 
 namespace TagLib {
 

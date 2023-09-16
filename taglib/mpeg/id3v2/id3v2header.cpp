@@ -29,7 +29,6 @@
 
 #include "tstring.h"
 #include "tdebug.h"
-
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
 

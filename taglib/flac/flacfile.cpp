@@ -25,20 +25,18 @@
 
 #include "flacfile.h"
 
-#include "tagunion.h"
-#include "tagutils.h"
+#include <utility>
+
 #include "tdebug.h"
 #include "tpropertymap.h"
-
+#include "tagunion.h"
+#include "tagutils.h"
 #include "id3v2tag.h"
 #include "id3v1tag.h"
 #include "xiphcomment.h"
-
 #include "flacpicture.h"
 #include "flacmetadatablock.h"
 #include "flacunknownmetadatablock.h"
-
-#include <utility>
 
 using namespace TagLib;
 

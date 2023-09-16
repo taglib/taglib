@@ -26,7 +26,6 @@
 #include "mpegproperties.h"
 
 #include "tdebug.h"
-
 #include "mpegfile.h"
 #include "xingheader.h"
 #include "apetag.h"

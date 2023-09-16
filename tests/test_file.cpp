@@ -24,8 +24,8 @@
  ***************************************************************************/
 
 #include "tfile.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "plainfile.h"
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace TagLib;

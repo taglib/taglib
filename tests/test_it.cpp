@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "itfile.h"
 #include "tstringlist.h"
+#include "itfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

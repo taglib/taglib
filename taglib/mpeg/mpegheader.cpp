@@ -25,13 +25,12 @@
 
 #include "mpegheader.h"
 
+#include <array>
+
 #include "tbytevector.h"
 #include "tdebug.h"
 #include "tfile.h"
-
 #include "mpegutils.h"
-
-#include <array>
 
 using namespace TagLib;
 

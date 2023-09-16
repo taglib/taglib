@@ -24,10 +24,11 @@
  ***************************************************************************/
 
 #include "asftag.h"
-#include "tpropertymap.h"
 
 #include <array>
 #include <utility>
+
+#include "tpropertymap.h"
 
 using namespace TagLib;
 

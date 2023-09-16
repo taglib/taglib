@@ -33,13 +33,12 @@
 
 #include "apefile.h"
 
+#include "tdebug.h"
+#include "tpropertymap.h"
 #include "id3v1tag.h"
 #include "id3v2header.h"
 #include "tagunion.h"
 #include "tagutils.h"
-#include "tdebug.h"
-#include "tpropertymap.h"
-
 #include "apetag.h"
 #include "apefooter.h"
 

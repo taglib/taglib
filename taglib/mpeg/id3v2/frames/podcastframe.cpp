@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "podcastframe.h"
+
 #include "tpropertymap.h"
 
 using namespace TagLib;

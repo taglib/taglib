@@ -29,7 +29,6 @@
 #include "taglib_export.h"
 #include "oggfile.h"
 #include "xiphcomment.h"
-
 #include "vorbisproperties.h"
 
 namespace TagLib {

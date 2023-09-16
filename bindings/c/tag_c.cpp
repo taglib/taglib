@@ -19,13 +19,18 @@
  *   USA                                                                   *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include  "config.h"
-#endif
+#include "tag_c.h"
 
 #include <cstdlib>
-#include "fileref.h"
+#include <cstring>
+#include <utility>
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 #include "tfile.h"
+#include "tpropertymap.h"
+#include "fileref.h"
 #include "asffile.h"
 #include "vorbisfile.h"
 #include "mpegfile.h"
@@ -37,12 +42,7 @@
 #include "trueaudiofile.h"
 #include "mp4file.h"
 #include "tag.h"
-#include <cstring>
-#include <utility>
 #include "id3v2framefactory.h"
-#include "tpropertymap.h"
-
-#include "tag_c.h"
 
 using namespace TagLib;
 

@@ -27,7 +27,6 @@
 
 #include "tdebug.h"
 #include "tfile.h"
-
 #include "id3v1genres.h"
 
 using namespace TagLib;

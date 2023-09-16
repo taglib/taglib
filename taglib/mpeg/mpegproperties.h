@@ -28,7 +28,6 @@
 
 #include "taglib_export.h"
 #include "audioproperties.h"
-
 #include "mpegheader.h"
 
 namespace TagLib {

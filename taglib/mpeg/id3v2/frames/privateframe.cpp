@@ -27,8 +27,8 @@
 #include "privateframe.h"
 
 #include "tbytevectorlist.h"
-#include "id3v2tag.h"
 #include "tdebug.h"
+#include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;

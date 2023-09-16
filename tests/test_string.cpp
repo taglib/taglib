@@ -23,8 +23,9 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tstring.h"
 #include <cstring>
+
+#include "tstring.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;

@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "tdebug.h"
-
 #include "riffutils.h"
 
 using namespace TagLib;

@@ -29,11 +29,10 @@
 
 #include "wavpackfile.h"
 
-#include "tagunion.h"
-#include "tagutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-
+#include "tagunion.h"
+#include "tagutils.h"
 #include "apefooter.h"
 #include "apetag.h"
 #include "id3v1tag.h"

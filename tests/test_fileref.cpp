@@ -25,6 +25,9 @@
 
 #include <string>
 #include <cstdio>
+
+#include "tfilestream.h"
+#include "tbytevectorstream.h"
 #include "tag.h"
 #include "fileref.h"
 #include "oggflacfile.h"
@@ -42,8 +45,6 @@
 #include "wavpackfile.h"
 #include "opusfile.h"
 #include "xmfile.h"
-#include "tfilestream.h"
-#include "tbytevectorstream.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

@@ -29,7 +29,6 @@
 
 #include "tdebug.h"
 #include "tstring.h"
-
 #include "oggfile.h"
 
 using namespace TagLib;

@@ -32,6 +32,8 @@
 #include <cstring>
 #include <utility>
 
+#include "tfilestream.h"
+#include "tdebug.h"
 #include "aifffile.h"
 #include "apefile.h"
 #include "asffile.h"
@@ -45,8 +47,6 @@
 #include "opusfile.h"
 #include "s3mfile.h"
 #include "speexfile.h"
-#include "tdebug.h"
-#include "tfilestream.h"
 #include "trueaudiofile.h"
 #include "vorbisfile.h"
 #include "wavfile.h"

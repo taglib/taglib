@@ -25,8 +25,9 @@
 
 #include <string>
 #include <cstdio>
-#include "tag.h"
+
 #include "tbytevectorlist.h"
+#include "tag.h"
 #include "rifffile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
