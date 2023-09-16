@@ -167,8 +167,11 @@ void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
 
   // Now update the internal offsets
 
-  for(++it; it != d->chunks.end(); ++it)
+  it = std::next(it);
+  while(it != d->chunks.end()) {
     it->offset += static_cast<int>(diff);
+    ++it;
+  }
 
   // Update the global size.
 
@@ -254,8 +257,10 @@ void RIFF::File::removeChunk(unsigned int i)
   removeBlock(it->offset - 8, removeSize);
   it = d->chunks.erase(it);
 
-  for(; it != d->chunks.end(); ++it)
+  while(it != d->chunks.end()) {
     it->offset -= removeSize;
+    ++it;
+  }
 
   // Update the global size.
 

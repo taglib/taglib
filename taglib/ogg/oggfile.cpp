@@ -269,8 +269,8 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
   // Write the pages.
 
   ByteVector data;
-  for(it = pages.begin(); it != pages.end(); ++it)
-    data.append((*it)->render());
+  for(const auto &page : pages)
+    data.append(page->render());
 
   const offset_t originalOffset = firstPage->fileOffset();
   const offset_t originalLength = lastPage->fileOffset() + lastPage->size() - originalOffset;
