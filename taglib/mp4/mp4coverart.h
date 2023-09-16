@@ -73,7 +73,7 @@ namespace TagLib {
       std::shared_ptr<CoverArtPrivate> d;
     };
 
-    typedef List<CoverArt> CoverArtList;
+    using CoverArtList = List<CoverArt>;
   }  // namespace MP4
 }  // namespace TagLib
 #endif

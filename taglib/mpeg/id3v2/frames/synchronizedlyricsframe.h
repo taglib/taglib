@@ -94,7 +94,7 @@ namespace TagLib {
       /*!
        * List of synchronized lyrics.
        */
-      typedef TagLib::List<SynchedText> SynchedTextList;
+      using SynchedTextList = TagLib::List<SynchedText>;
 
       /*!
        * Construct an empty synchronized lyrics frame that will use the text

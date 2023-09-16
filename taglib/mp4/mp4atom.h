@@ -38,7 +38,7 @@
 namespace TagLib {
   namespace MP4 {
     class Atom;
-    typedef TagLib::List<Atom *> AtomList;
+    using AtomList = TagLib::List<Atom *>;
 
     enum AtomDataType {
       TypeImplicit  = 0,  // for use with tags for which no type needs to be indicated because only one type is allowed
@@ -72,7 +72,7 @@ namespace TagLib {
       ByteVector data;
     };
 
-    typedef TagLib::List<AtomData> AtomDataList;
+    using AtomDataList = TagLib::List<AtomData>;
 
     class TAGLIB_EXPORT Atom
     {

@@ -36,7 +36,7 @@ extern template class TAGLIB_EXPORT TagLib::Map<TagLib::String, TagLib::StringLi
 
 namespace TagLib {
 
-  typedef Map<String,StringList> SimplePropertyMap;
+  using SimplePropertyMap = Map<String, StringList>;
 
   //! A map for format-independent <key,valuelist> tag representations.
 
@@ -118,9 +118,8 @@ namespace TagLib {
   class TAGLIB_EXPORT PropertyMap: public SimplePropertyMap
   {
   public:
-
-    typedef SimplePropertyMap::Iterator Iterator;
-    typedef SimplePropertyMap::ConstIterator ConstIterator;
+    using Iterator = SimplePropertyMap::Iterator;
+    using ConstIterator = SimplePropertyMap::ConstIterator;
 
     PropertyMap();
 

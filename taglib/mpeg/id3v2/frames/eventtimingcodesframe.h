@@ -116,7 +116,7 @@ namespace TagLib {
       /*!
        * List of synchronized events.
        */
-      typedef TagLib::List<SynchedEvent> SynchedEventList;
+      using SynchedEventList = TagLib::List<SynchedEvent>;
 
       /*!
        * Construct an empty event timing codes frame.

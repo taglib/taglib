@@ -152,7 +152,11 @@ namespace TagLib {
 #ifdef DOXYGEN
   }
 #else
-  namespace Ogg { namespace Vorbis { typedef TagLib::Vorbis::File File; } }
+  namespace Ogg {
+    namespace Vorbis {
+      using File = TagLib::Vorbis::File;
+    }
+  }
 #endif
 
 }  // namespace TagLib

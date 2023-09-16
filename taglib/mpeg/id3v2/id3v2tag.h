@@ -44,8 +44,8 @@ namespace TagLib {
     class Header;
     class ExtendedHeader;
 
-    typedef List<Frame *> FrameList;
-    typedef Map<ByteVector, FrameList> FrameListMap;
+    using FrameList = List<Frame *>;
+    using FrameListMap = Map<ByteVector, FrameList>;
 
     //! An abstraction for the ISO-8859-1 string to data encoding in ID3v2 tags.
 

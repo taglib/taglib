@@ -36,8 +36,8 @@ namespace TagLib {
 
   namespace ASF {
 
-    typedef List<Attribute> AttributeList;
-    typedef Map<String, AttributeList> AttributeListMap;
+    using AttributeList = List<Attribute>;
+    using AttributeListMap = Map<String, AttributeList>;
 
     class TAGLIB_EXPORT Tag : public TagLib::Tag {
 

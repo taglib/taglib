@@ -136,7 +136,11 @@ namespace TagLib {
 #ifdef DOXYGEN
   }
 #else
-  namespace Ogg { namespace Vorbis { typedef TagLib::Vorbis::Properties Properties; } }
+  namespace Ogg {
+    namespace Vorbis {
+      using Properties = TagLib::Vorbis::Properties;
+    }
+  }
 #endif
 
 }  // namespace TagLib

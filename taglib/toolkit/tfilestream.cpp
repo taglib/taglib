@@ -43,8 +43,8 @@ namespace
 
   // Uses Win32 native API instead of POSIX API to reduce the resource consumption.
 
-  typedef FileName FileNameHandle;
-  typedef HANDLE FileHandle;
+  using FileNameHandle = FileName;
+  using FileHandle = HANDLE;
 
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
@@ -93,7 +93,7 @@ namespace
     operator FileName () const { return c_str(); }
   };
 
-  typedef FILE* FileHandle;
+  using FileHandle = FILE *;
 
   const FileHandle InvalidFileHandle = nullptr;
 

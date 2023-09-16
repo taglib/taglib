@@ -197,7 +197,7 @@ namespace TagLib {
       std::unique_ptr<PicturePrivate> d;
     };
 
-    typedef List<Picture> PictureList;
+    using PictureList = List<Picture>;
   }  // namespace FLAC
 }  // namespace TagLib
 #endif
