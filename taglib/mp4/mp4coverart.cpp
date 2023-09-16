@@ -45,14 +45,8 @@ MP4::CoverArt::CoverArt(Format format, const ByteVector &data) :
   d->data = data;
 }
 
-MP4::CoverArt::CoverArt(const CoverArt &item) = default;
-
-MP4::CoverArt &
-MP4::CoverArt::operator=(const CoverArt &item)
-{
-  CoverArt(item).swap(*this);
-  return *this;
-}
+MP4::CoverArt::CoverArt(const CoverArt &) = default;
+MP4::CoverArt &MP4::CoverArt::operator=(const CoverArt &) = default;
 
 void
 MP4::CoverArt::swap(CoverArt &item)

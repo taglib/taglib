@@ -94,9 +94,7 @@ List<T>::List() :
 }
 
 template <class T>
-List<T>::List(const List<T> &l) : d(l.d)
-{
-}
+List<T>::List(const List<T> &) = default;
 
 template <class T>
 List<T>::~List() = default;
