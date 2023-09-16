@@ -32,31 +32,37 @@
 
 using namespace TagLib;
 
-#define stringUnion(method)                                          \
-  if(tag(0) && !tag(0)->method().isEmpty())                          \
-    return tag(0)->method();                                         \
-  if(tag(1) && !tag(1)->method().isEmpty())                          \
-    return tag(1)->method();                                         \
-  if(tag(2) && !tag(2)->method().isEmpty())                          \
-    return tag(2)->method();                                         \
-  return String();                                                   \
+#define stringUnion(method)                                               \
+  do {                                                                    \
+    if(tag(0) && !tag(0)->method().isEmpty())                             \
+      return tag(0)->method();                                            \
+    if(tag(1) && !tag(1)->method().isEmpty())                             \
+      return tag(1)->method();                                            \
+    if(tag(2) && !tag(2)->method().isEmpty())                             \
+      return tag(2)->method();                                            \
+    return String();                                                      \
+  } while(0)
 
-#define numberUnion(method)                                          \
-  if(tag(0) && tag(0)->method() > 0)                                 \
-    return tag(0)->method();                                         \
-  if(tag(1) && tag(1)->method() > 0)                                 \
-    return tag(1)->method();                                         \
-  if(tag(2) && tag(2)->method() > 0)                                 \
-    return tag(2)->method();                                         \
-  return 0
+#define numberUnion(method)                                               \
+  do {                                                                    \
+    if(tag(0) && tag(0)->method() > 0)                                    \
+      return tag(0)->method();                                            \
+    if(tag(1) && tag(1)->method() > 0)                                    \
+      return tag(1)->method();                                            \
+    if(tag(2) && tag(2)->method() > 0)                                    \
+      return tag(2)->method();                                            \
+    return 0;                                                             \
+  } while(0)
 
-#define setUnion(method, value)                                      \
-  if(tag(0))                                                         \
-    tag(0)->set##method(value);                                      \
-  if(tag(1))                                                         \
-    tag(1)->set##method(value);                                      \
-  if(tag(2))                                                         \
-    tag(2)->set##method(value);                                      \
+#define setUnion(method, value)                                           \
+  do {                                                                    \
+    if(tag(0))                                                            \
+      tag(0)->set##method(value);                                         \
+    if(tag(1))                                                            \
+      tag(1)->set##method(value);                                         \
+    if(tag(2))                                                            \
+      tag(2)->set##method(value);                                         \
+  } while(0)
 
 class TagUnion::TagUnionPrivate
 {
