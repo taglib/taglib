@@ -24,14 +24,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/s3m
   ${CMAKE_CURRENT_SOURCE_DIR}/it
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
-  ${taglib_SOURCE_DIR}/3rdparty
 )
-
-if(ZLIB_FOUND)
-  include_directories(${ZLIB_INCLUDE_DIR})
-elseif(HAVE_ZLIB_SOURCE)
-  include_directories(${ZLIB_SOURCE})
-endif()
 
 set(tag_HDRS
   tag.h
@@ -308,23 +301,11 @@ set(toolkit_SRCS
   toolkit/tzlib.cpp
 )
 
-if(HAVE_ZLIB_SOURCE)
-  set(zlib_SRCS
-    ${ZLIB_SOURCE}/adler32.c
-    ${ZLIB_SOURCE}/crc32.c
-    ${ZLIB_SOURCE}/inffast.c
-    ${ZLIB_SOURCE}/inflate.c
-    ${ZLIB_SOURCE}/inftrees.c
-    ${ZLIB_SOURCE}/zutil.c
-  )
-endif()
-
 set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${zlib_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
@@ -334,9 +315,8 @@ set(tag_LIB_SRCS
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
-if(HAVE_ZLIB AND NOT HAVE_ZLIB_SOURCE)
-  target_link_libraries(tag ${ZLIB_LIBRARIES})
-endif()
+target_link_libraries(tag $<$<TARGET_EXISTS:utf8::cpp>:utf8::cpp>)
+target_link_libraries(tag $<$<TARGET_EXISTS:ZLIB::ZLIB>:ZLIB::ZLIB>)
 
 set_target_properties(tag PROPERTIES
   VERSION ${TAGLIB_SOVERSION_MAJOR}.${TAGLIB_SOVERSION_MINOR}.${TAGLIB_SOVERSION_PATCH}

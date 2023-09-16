@@ -1,0 +1,3 @@
+[submodule "3rdparty/utfcpp"]
+	path = 3rdparty/utfcpp
+	url = https://github.com/nemtrif/utfcpp.git

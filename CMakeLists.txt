@@ -104,22 +104,8 @@ include(ConfigureChecks.cmake)
 option(WITH_ZLIB "Build with ZLIB" ON)
 
 if(WITH_ZLIB)
-  if(NOT ZLIB_SOURCE)
-    find_package(ZLIB)
-    if(ZLIB_FOUND)
-      set(HAVE_ZLIB 1)
-      set(ZLIB_LIBRARIES_FLAGS -lz)
-    else()
-      set(HAVE_ZLIB 0)
-    endif()
-  endif()
-
-  if(NOT HAVE_ZLIB AND ZLIB_SOURCE)
-    set(HAVE_ZLIB 1)
-    set(HAVE_ZLIB_SOURCE 1)
-  endif()
-else()
-  set(HAVE_ZLIB 0)
+  find_package("ZLIB")
+  set(HAVE_ZLIB ZLIB_FOUND)
 endif()
 
 if(NOT WIN32)
@@ -146,6 +132,21 @@ if(TRACE_IN_RELEASE)
 endif()
 
 configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h")
+
+find_package(utf8cpp QUIET)
+if(NOT utf8cpp_FOUND)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/utfcpp/CMakeLists.txt)
+    add_subdirectory("3rdparty/utfcpp")
+    message(STATUS "Using utfcpp from ${utf8cpp_SOURCE_DIR}")
+  else()
+    message(FATAL_ERROR
+      "utfcpp not found. Either install package (probably utfcpp, utf8cpp, or libutfcpp-dev) "
+      "or fetch the git submodule using\n"
+      "git submodule update --init")
+  endif()
+else()
+  message(STATUS "Using utfcpp ${utf8cpp_VERSION} from ${utf8cpp_CONFIG}")
+endif()
 
 add_subdirectory(taglib)
 

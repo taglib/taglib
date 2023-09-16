@@ -19,15 +19,15 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Ubuntu
-      run: sudo apt install -y libcppunit-dev zlib1g-dev
+      run: sudo apt install -y libcppunit-dev libutfcpp-dev zlib1g-dev
       if: matrix.os == 'ubuntu-latest'
 
     - name: Set up macOS
-      run: brew install cppunit
+      run: brew install cppunit utf8cpp
       if: matrix.os == 'macos-latest'
 
     - name: Set up Windows
-      run: vcpkg install cppunit --triplet x64-windows
+      run: vcpkg install cppunit utfcpp zlib --triplet x64-windows
       if: matrix.os == 'windows-latest'
 
     - name: Configure
@@ -50,5 +50,7 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: |
         $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\cppunit_x64-windows\bin;$PWD\taglib\Release"
+        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\utfcpp_x64-windows\bin;$PWD\taglib\Release"
+        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\zlib_x64-windows\bin;$PWD\taglib\Release"
         ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
       if: matrix.os == 'windows-latest'
