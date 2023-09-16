@@ -26,10 +26,10 @@
 #ifndef TAGLIB_MPEGHEADER_H
 #define TAGLIB_MPEGHEADER_H
 
+#include <memory>
+
 #include "taglib.h"
 #include "taglib_export.h"
-
-#include <memory>
 
 namespace TagLib {
 

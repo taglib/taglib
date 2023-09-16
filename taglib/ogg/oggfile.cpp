@@ -25,15 +25,12 @@
 
 #include "oggfile.h"
 
-#include "tbytevectorlist.h"
-#include "tmap.h"
-#include "tstring.h"
-#include "tdebug.h"
+#include <utility>
 
+#include "tdebug.h"
+#include "tmap.h"
 #include "oggpage.h"
 #include "oggpageheader.h"
-
-#include <utility>
 
 using namespace TagLib;
 

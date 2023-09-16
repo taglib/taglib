@@ -25,17 +25,15 @@
 
 #include "asffile.h"
 
-#include "tdebug.h"
-#include "tbytevectorlist.h"
-#include "tpropertymap.h"
-#include "tstring.h"
-#include "tagutils.h"
+#include <utility>
 
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "tbytevectorlist.h"
+#include "tagutils.h"
 #include "asftag.h"
 #include "asfproperties.h"
 #include "asfutils.h"
-
-#include <utility>
 
 using namespace TagLib;
 

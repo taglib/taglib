@@ -25,7 +25,6 @@
 
 #include "asfattribute.h"
 
-#include "taglib.h"
 #include "tdebug.h"
 
 #include "asffile.h"

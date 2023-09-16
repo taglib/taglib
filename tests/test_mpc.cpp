@@ -25,11 +25,12 @@
 
 #include <string>
 #include <cstdio>
-#include "apetag.h"
-#include "id3v1tag.h"
+
 #include "tstringlist.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
+#include "apetag.h"
+#include "id3v1tag.h"
 #include "mpcfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"

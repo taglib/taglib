@@ -27,9 +27,7 @@
 
 #include "tstring.h"
 #include "tdebug.h"
-
 #include "oggpageheader.h"
-
 #include "vorbisfile.h"
 
 using namespace TagLib;

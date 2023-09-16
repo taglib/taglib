@@ -30,12 +30,11 @@
 #include "wavpackproperties.h"
 
 #include <cstdint>
+#include <array>
+
 #include "tstring.h"
 #include "tdebug.h"
-
 #include "wavpackfile.h"
-
-#include <array>
 
 // Implementation of this class is based on the information at:
 // http://www.wavpack.com/file_format.txt

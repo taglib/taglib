@@ -25,11 +25,11 @@
 
 #include "chapterframe.h"
 
+#include <utility>
+
 #include "tbytevectorlist.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-#include <cstdio>
-#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;

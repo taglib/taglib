@@ -25,13 +25,9 @@
 
 #include "oggflacfile.h"
 
-#include "tbytevector.h"
-#include "tstring.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "tagutils.h"
-
-#include "xiphcomment.h"
 
 using namespace TagLib;
 using TagLib::FLAC::Properties;

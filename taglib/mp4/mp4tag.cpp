@@ -24,14 +24,14 @@
  ***************************************************************************/
 
 #include "mp4tag.h"
-#include "tdebug.h"
-#include "tstring.h"
-#include "tpropertymap.h"
-#include "mp4atom.h"
-#include "id3v1genres.h"
 
 #include <array>
 #include <utility>
+
+#include "tdebug.h"
+#include "tpropertymap.h"
+#include "id3v1genres.h"
+#include "mp4atom.h"
 
 using namespace TagLib;
 

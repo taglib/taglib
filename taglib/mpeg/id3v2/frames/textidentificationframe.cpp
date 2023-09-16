@@ -24,13 +24,13 @@
  ***************************************************************************/
 
 #include "textidentificationframe.h"
-#include "tbytevectorlist.h"
-#include "id3v2tag.h"
-#include "tpropertymap.h"
-#include "id3v1genres.h"
 
 #include <array>
 #include <utility>
+
+#include "tpropertymap.h"
+#include "id3v1genres.h"
+#include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;

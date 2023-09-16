@@ -25,14 +25,13 @@
 
 #include "xmfile.h"
 
+#include <algorithm>
+#include <utility>
+
 #include "tstringlist.h"
 #include "tdebug.h"
-#include "modfileprivate.h"
 #include "tpropertymap.h"
-
-#include <algorithm>
-#include <cstring>
-#include <utility>
+#include "modfileprivate.h"
 
 using namespace TagLib;
 using namespace XM;

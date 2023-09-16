@@ -29,7 +29,6 @@
 #include <utility>
 
 #include "tdebug.h"
-#include "tstring.h"
 
 using namespace TagLib;
 

@@ -25,13 +25,14 @@
 
 #include <string>
 #include <cstdio>
-#include "tag.h"
+
 #include "tstringlist.h"
 #include "tbytevectorlist.h"
 #include "tpropertymap.h"
+#include "tdebug.h"
+#include "tag.h"
 #include "apefile.h"
 #include "apetag.h"
-#include "tdebug.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

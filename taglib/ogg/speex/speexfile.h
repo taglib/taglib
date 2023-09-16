@@ -32,7 +32,6 @@
 
 #include "oggfile.h"
 #include "xiphcomment.h"
-
 #include "speexproperties.h"
 
 namespace TagLib {

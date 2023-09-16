@@ -29,8 +29,6 @@
 #include "tstring.h"
 #include "tdebug.h"
 
-#include "mpegfile.h"
-
 using namespace TagLib;
 
 class MPEG::XingHeader::XingHeaderPrivate

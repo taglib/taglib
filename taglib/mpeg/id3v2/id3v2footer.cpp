@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "id3v2footer.h"
+
 #include "id3v2header.h"
 
 using namespace TagLib;

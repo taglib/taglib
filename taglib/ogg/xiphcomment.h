@@ -26,14 +26,14 @@
 #ifndef TAGLIB_VORBISCOMMENT_H
 #define TAGLIB_VORBISCOMMENT_H
 
-#include "tag.h"
 #include "tlist.h"
 #include "tmap.h"
 #include "tstring.h"
 #include "tstringlist.h"
 #include "tbytevector.h"
-#include "flacpicture.h"
 #include "taglib_export.h"
+#include "tag.h"
+#include "flacpicture.h"
 
 #ifdef _MSC_VER
 // Explained at end of tpropertymap.cpp

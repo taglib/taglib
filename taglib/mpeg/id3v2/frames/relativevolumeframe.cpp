@@ -25,10 +25,9 @@
 
 #include "relativevolumeframe.h"
 
-#include "tdebug.h"
-#include "tmap.h"
-
 #include <utility>
+
+#include "tmap.h"
 
 using namespace TagLib;
 using namespace ID3v2;

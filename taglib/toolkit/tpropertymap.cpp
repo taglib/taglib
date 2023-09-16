@@ -25,9 +25,9 @@
 
 #include "tpropertymap.h"
 
-using namespace TagLib;
-
 #include <utility>
+
+using namespace TagLib;
 
 class PropertyMap::PropertyMapPrivate
 {

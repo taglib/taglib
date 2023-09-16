@@ -25,15 +25,16 @@
 
 #include <string>
 #include <cstdio>
-#include "tag.h"
-#include "mp4tag.h"
+
 #include "tbytevectorlist.h"
 #include "tbytevectorstream.h"
 #include "tpropertymap.h"
+#include "tag.h"
+#include "mp4tag.h"
 #include "mp4atom.h"
 #include "mp4file.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "plainfile.h"
+#include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;

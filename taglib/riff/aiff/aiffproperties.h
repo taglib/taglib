@@ -26,8 +26,8 @@
 #ifndef TAGLIB_AIFFPROPERTIES_H
 #define TAGLIB_AIFFPROPERTIES_H
 
-#include "audioproperties.h"
 #include "tstring.h"
+#include "audioproperties.h"
 
 namespace TagLib {
 

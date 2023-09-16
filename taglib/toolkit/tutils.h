@@ -30,6 +30,10 @@
 
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -45,9 +49,6 @@
 #endif
 
 #include "tstring.h"
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
 
 namespace TagLib
 {

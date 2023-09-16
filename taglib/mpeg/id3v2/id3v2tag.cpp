@@ -28,17 +28,14 @@
 #include <algorithm>
 #include <utility>
 
-#include "tfile.h"
-#include "tbytevector.h"
-#include "tpropertymap.h"
 #include "tdebug.h"
-
+#include "tfile.h"
+#include "tpropertymap.h"
 #include "id3v2header.h"
 #include "id3v2extendedheader.h"
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
 #include "id3v1genres.h"
-
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
 #include "frames/urllinkframe.h"

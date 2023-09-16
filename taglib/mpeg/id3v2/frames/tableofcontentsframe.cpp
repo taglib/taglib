@@ -27,11 +27,8 @@
 
 #include <utility>
 
-#include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tdebug.h"
-
-#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;

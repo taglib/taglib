@@ -25,12 +25,9 @@
 
 #include "infotag.h"
 
-#include "tdebug.h"
-#include "tfile.h"
+#include <utility>
 
 #include "riffutils.h"
-
-#include <utility>
 
 using namespace TagLib;
 using namespace RIFF::Info;

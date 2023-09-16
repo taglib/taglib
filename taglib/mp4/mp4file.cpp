@@ -26,7 +26,6 @@
 #include "mp4file.h"
 
 #include "tdebug.h"
-#include "tstring.h"
 #include "tpropertymap.h"
 #include "tagutils.h"
 

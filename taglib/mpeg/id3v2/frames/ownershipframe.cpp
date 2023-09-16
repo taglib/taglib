@@ -25,7 +25,6 @@
 
 #include "ownershipframe.h"
 
-#include "tdebug.h"
 #include "tstringlist.h"
 #include "id3v2tag.h"
 

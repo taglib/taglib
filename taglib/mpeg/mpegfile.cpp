@@ -25,18 +25,16 @@
 
 #include "mpegfile.h"
 
-#include "tagunion.h"
-#include "tagutils.h"
-#include "id3v2tag.h"
-#include "id3v2header.h"
-#include "id3v1tag.h"
+#include "tdebug.h"
+#include "tpropertymap.h"
 #include "apefooter.h"
 #include "apetag.h"
-#include "tdebug.h"
-
+#include "id3v1tag.h"
+#include "id3v2tag.h"
+#include "tagunion.h"
+#include "tagutils.h"
 #include "mpegheader.h"
 #include "mpegutils.h"
-#include "tpropertymap.h"
 
 using namespace TagLib;
 

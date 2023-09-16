@@ -23,9 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "modfilebase.h"
-#include "tdebug.h"
 
 using namespace TagLib;
 using namespace Mod;

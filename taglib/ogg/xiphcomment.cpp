@@ -25,13 +25,10 @@
 
 #include "xiphcomment.h"
 
-#include "tbytevector.h"
-#include "tdebug.h"
-
-#include "flacpicture.h"
-#include "tpropertymap.h"
-
 #include <utility>
+
+#include "tdebug.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 

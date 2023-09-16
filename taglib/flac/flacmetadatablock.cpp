@@ -24,8 +24,6 @@
  ***************************************************************************/
 
 #include "flacmetadatablock.h"
-#include "taglib.h"
-#include "tdebug.h"
 
 using namespace TagLib;
 

@@ -26,12 +26,12 @@
 #ifndef TAGLIB_STRING_H
 #define TAGLIB_STRING_H
 
-#include "taglib_export.h"
-#include "taglib.h"
-#include "tbytevector.h"
-
 #include <iostream>
 #include <string>
+
+#include "tbytevector.h"
+#include "taglib_export.h"
+#include "taglib.h"
 
 /*!
  * \relates TagLib::String

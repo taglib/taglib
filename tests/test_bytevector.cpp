@@ -25,6 +25,7 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+
 #include "tbytevector.h"
 #include "tbytevectorlist.h"
 #include <cppunit/extensions/HelperMacros.h>

@@ -29,7 +29,6 @@
 
 #include "speexfile.h"
 
-#include "tstring.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "tagutils.h"

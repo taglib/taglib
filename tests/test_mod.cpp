@@ -23,8 +23,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "modfile.h"
 #include "tpropertymap.h"
+#include "modfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

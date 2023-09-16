@@ -25,12 +25,11 @@
 
 #include "mpcproperties.h"
 
-#include "tdebug.h"
-#include "tstring.h"
 #include <array>
-#include <bitset>
 #include <cmath>
 
+#include "tdebug.h"
+#include "tstring.h"
 #include "mpcfile.h"
 
 using namespace TagLib;

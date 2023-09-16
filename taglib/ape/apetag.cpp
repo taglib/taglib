@@ -33,18 +33,14 @@
 
 #include "apetag.h"
 
-#include "tfile.h"
-#include "tstring.h"
-#include "tmap.h"
-#include "tpropertymap.h"
-#include "tdebug.h"
-#include "tutils.h"
-
-#include "apefooter.h"
-#include "apeitem.h"
-
 #include <array>
 #include <utility>
+
+#include "tdebug.h"
+#include "tfile.h"
+#include "tpropertymap.h"
+#include "apefooter.h"
+#include "apeitem.h"
 
 using namespace TagLib;
 using namespace APE;

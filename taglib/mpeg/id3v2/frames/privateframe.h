@@ -27,8 +27,8 @@
 #ifndef TAGLIB_PRIVATEFRAME_H
 #define TAGLIB_PRIVATEFRAME_H
 
-#include "id3v2frame.h"
 #include "taglib_export.h"
+#include "id3v2frame.h"
 
 namespace TagLib {
 

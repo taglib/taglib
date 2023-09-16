@@ -26,16 +26,12 @@
 #include <cstdlib>
 
 #include "tbytevector.h"
-
 #include "mpegfile.h"
-
 #include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "id3v2header.h"
 #include "commentsframe.h"
-
 #include "id3v1tag.h"
-
 #include "apetag.h"
 
 using namespace std;

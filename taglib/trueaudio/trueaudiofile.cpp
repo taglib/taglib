@@ -29,17 +29,12 @@
 
 #include "trueaudiofile.h"
 
-#include "tbytevector.h"
-#include "tstring.h"
 #include "tdebug.h"
-#include "tagunion.h"
-#include "tstringlist.h"
 #include "tpropertymap.h"
+#include "tagunion.h"
 #include "tagutils.h"
-
 #include "id3v1tag.h"
 #include "id3v2tag.h"
-#include "id3v2header.h"
 
 using namespace TagLib;
 

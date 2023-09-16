@@ -26,10 +26,9 @@
 #ifndef TAGLIB_TABLEOFCONTENTSFRAME
 #define TAGLIB_TABLEOFCONTENTSFRAME
 
+#include "tbytevectorlist.h"
 #include "id3v2tag.h"
 #include "id3v2frame.h"
-
-#include "tbytevectorlist.h"
 
 namespace TagLib {
 

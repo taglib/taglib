@@ -24,8 +24,6 @@
  ***************************************************************************/
 
 #include "tfilestream.h"
-#include "tstring.h"
-#include "tdebug.h"
 
 #ifdef _WIN32
 # include <windows.h>
@@ -33,6 +31,9 @@
 # include <cstdio>
 # include <unistd.h>
 #endif
+
+#include "tstring.h"
+#include "tdebug.h"
 
 using namespace TagLib;
 

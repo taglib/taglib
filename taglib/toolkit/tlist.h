@@ -26,10 +26,10 @@
 #ifndef TAGLIB_LIST_H
 #define TAGLIB_LIST_H
 
-#include "taglib.h"
-
 #include <list>
 #include <memory>
+
+#include "taglib.h"
 
 namespace TagLib {
 

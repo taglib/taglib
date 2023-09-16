@@ -25,13 +25,9 @@
 
 #include "wavfile.h"
 
-#include "tbytevector.h"
 #include "tdebug.h"
-#include "tstringlist.h"
 #include "tpropertymap.h"
 #include "tagutils.h"
-
-#include "id3v2tag.h"
 #include "infotag.h"
 #include "tagunion.h"
 

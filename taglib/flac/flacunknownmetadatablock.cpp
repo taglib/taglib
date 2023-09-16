@@ -24,9 +24,6 @@
  ***************************************************************************/
 
 #include "flacunknownmetadatablock.h"
-#include "taglib.h"
-#include "tdebug.h"
-#include "tstring.h"
 
 using namespace TagLib;
 

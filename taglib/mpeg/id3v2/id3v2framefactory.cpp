@@ -25,12 +25,13 @@
 
 #include "id3v2framefactory.h"
 
+#include <array>
+#include <utility>
+
 #include "tdebug.h"
 #include "tzlib.h"
-
 #include "id3v2synchdata.h"
 #include "id3v1genres.h"
-
 #include "frames/attachedpictureframe.h"
 #include "frames/commentsframe.h"
 #include "frames/relativevolumeframe.h"
@@ -48,9 +49,6 @@
 #include "frames/chapterframe.h"
 #include "frames/tableofcontentsframe.h"
 #include "frames/podcastframe.h"
-
-#include <array>
-#include <utility>
 
 using namespace TagLib;
 using namespace ID3v2;

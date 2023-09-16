@@ -26,8 +26,8 @@
 #ifndef TAGLIB_UNKNOWNFRAME_H
 #define TAGLIB_UNKNOWNFRAME_H
 
-#include "id3v2frame.h"
 #include "taglib_export.h"
+#include "id3v2frame.h"
 
 namespace TagLib {
 

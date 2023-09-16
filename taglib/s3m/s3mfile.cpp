@@ -25,12 +25,11 @@
 
 
 #include "s3mfile.h"
+
 #include "tstringlist.h"
 #include "tdebug.h"
-#include "modfileprivate.h"
 #include "tpropertymap.h"
-
-#include <iostream>
+#include "modfileprivate.h"
 
 using namespace TagLib;
 using namespace S3M;

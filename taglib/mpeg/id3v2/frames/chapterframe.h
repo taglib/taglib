@@ -26,9 +26,9 @@
 #ifndef TAGLIB_CHAPTERFRAME
 #define TAGLIB_CHAPTERFRAME
 
+#include "taglib_export.h"
 #include "id3v2tag.h"
 #include "id3v2frame.h"
-#include "taglib_export.h"
 
 namespace TagLib {
 

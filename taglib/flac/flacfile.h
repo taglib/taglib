@@ -26,11 +26,10 @@
 #ifndef TAGLIB_FLACFILE_H
 #define TAGLIB_FLACFILE_H
 
-#include "taglib_export.h"
 #include "tfile.h"
 #include "tlist.h"
+#include "taglib_export.h"
 #include "tag.h"
-
 #include "flacpicture.h"
 #include "flacproperties.h"
 

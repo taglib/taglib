@@ -23,12 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-
 #include "modtag.h"
-#include "tstringlist.h"
-#include "tpropertymap.h"
 
 #include <utility>
+
+#include "tstringlist.h"
+#include "tpropertymap.h"
 
 using namespace TagLib;
 using namespace Mod;

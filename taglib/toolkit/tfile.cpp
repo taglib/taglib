@@ -24,17 +24,16 @@
  ***************************************************************************/
 
 #include "tfile.h"
+
 #include "tfilestream.h"
-#include "tstring.h"
-#include "tdebug.h"
 #include "tpropertymap.h"
+#include "tstring.h"
 
 #ifdef _WIN32
 # include <windows.h>
 # include <io.h>
 #else
-# include <cstdio>
-# include <unistd.h>
+#  include <unistd.h>
 #endif
 
 #ifndef R_OK
@@ -44,24 +43,7 @@
 # define W_OK 2
 #endif
 
-#include "asffile.h"
-#include "mpegfile.h"
-#include "vorbisfile.h"
-#include "flacfile.h"
-#include "oggflacfile.h"
-#include "mpcfile.h"
-#include "mp4file.h"
 #include "wavpackfile.h"
-#include "speexfile.h"
-#include "opusfile.h"
-#include "trueaudiofile.h"
-#include "aifffile.h"
-#include "wavfile.h"
-#include "apefile.h"
-#include "modfile.h"
-#include "s3mfile.h"
-#include "itfile.h"
-#include "xmfile.h"
 
 using namespace TagLib;
 
