@@ -5,6 +5,8 @@ set(tag_HDR_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
   ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/frames
   ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1
+  ${CMAKE_CURRENT_SOURCE_DIR}/matroska
+  ${CMAKE_CURRENT_SOURCE_DIR}/matroska/ebml
 )
 if(WITH_ASF)
   set(tag_HDR_DIRS ${tag_HDR_DIRS}
@@ -66,7 +68,7 @@ if(WITH_SHORTEN)
 endif()
 include_directories(${tag_HDR_DIRS})
 
-set(tag_HDRS
+set(tag_PUBLIC_HDRS
   tag.h
   fileref.h
   audioproperties.h
@@ -90,6 +92,9 @@ set(tag_HDRS
   toolkit/tpropertymap.h
   toolkit/tdebuglistener.h
   toolkit/tversionnumber.h
+  matroska/matroskafile.h
+  matroska/matroskatag.h
+  matroska/matroskasimpletag.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
@@ -220,6 +225,34 @@ if(WITH_SHORTEN)
     shorten/shortentag.h
   )
 endif()
+
+set(tag_PRIVATE_HDRS
+  matroska/ebml/ebmlelement.h
+  matroska/ebml/ebmlmasterelement.h
+  matroska/ebml/ebmlmksegment.h
+  matroska/ebml/ebmlmktags.h
+  matroska/ebml/ebmlstringelement.h
+  matroska/ebml/ebmluintelement.h
+  matroska/ebml/ebmlutils.h
+)
+
+set(tag_HDRS ${tag_PUBLIC_HDRS} ${tag_PRIVATE_HDRS})
+
+set(matroska_SRCS
+  matroska/matroskafile.cpp
+  matroska/matroskasimpletag.cpp
+  matroska/matroskatag.cpp
+)
+
+set(ebml_SRCS
+  matroska/ebml/ebmlelement.cpp
+  matroska/ebml/ebmlmasterelement.cpp
+  matroska/ebml/ebmlmksegment.cpp
+  matroska/ebml/ebmlmktags.cpp
+  matroska/ebml/ebmlstringelement.cpp
+  matroska/ebml/ebmluintelement.cpp
+  matroska/ebml/ebmlutils.cpp
+)
 
 set(mpeg_SRCS
   mpeg/mpegfile.cpp
@@ -429,7 +462,7 @@ set(toolkit_SRCS
 )
 
 set(tag_LIB_SRCS
-  ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
+  ${matroska_SRCS} ${ebml_SRCS} ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
@@ -458,8 +491,13 @@ set_target_properties(tag PROPERTIES
   SOVERSION ${TAGLIB_SOVERSION_MAJOR}
   INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
   DEFINE_SYMBOL MAKE_TAGLIB_LIB
+<<<<<<< HEAD
   INTERFACE_LINK_LIBRARIES "${ZLIB_INTERFACE_LINK_LIBRARIES}"
   PUBLIC_HEADER "${tag_HDRS}"
+=======
+  LINK_INTERFACE_LIBRARIES ""
+  PUBLIC_HEADER "${tag_PUBLIC_HDRS}"
+>>>>>>> 770c1012 (Initial matroska support)
 )
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(tag PUBLIC TAGLIB_STATIC)
