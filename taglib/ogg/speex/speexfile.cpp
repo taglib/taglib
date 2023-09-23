@@ -123,7 +123,7 @@ void Speex::File::read(bool readProperties)
 
   ByteVector commentHeaderData = packet(1);
 
-  d->comment                   = std::make_unique<Ogg::XiphComment>(commentHeaderData);
+  d->comment = std::make_unique<Ogg::XiphComment>(commentHeaderData);
 
   if(readProperties)
     d->properties = std::make_unique<Properties>(this);
