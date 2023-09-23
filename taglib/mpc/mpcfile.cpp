@@ -44,28 +44,18 @@ namespace
 class MPC::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete ID3v2Header;
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
   offset_t APELocation { -1 };
   long APESize { 0 };
 
   offset_t ID3v1Location { -1 };
 
-  ID3v2::Header *ID3v2Header { nullptr };
+  std::unique_ptr<ID3v2::Header> ID3v2Header;
   offset_t ID3v2Location { -1 };
   long ID3v2Size { 0 };
 
   TagUnion tag;
 
-  Properties *properties { nullptr };
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +118,7 @@ PropertyMap MPC::File::setProperties(const PropertyMap &properties)
 
 MPC::Properties *MPC::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool MPC::File::save()
@@ -240,7 +230,6 @@ void MPC::File::strip(int tags)
     APETag(true);
 
   if(tags & ID3v2) {
-    delete d->ID3v2Header;
     d->ID3v2Header = nullptr;
   }
 }
@@ -267,7 +256,7 @@ void MPC::File::read(bool readProperties)
 
   if(d->ID3v2Location >= 0) {
     seek(d->ID3v2Location);
-    d->ID3v2Header = new ID3v2::Header(readBlock(ID3v2::Header::size()));
+    d->ID3v2Header = std::make_unique<ID3v2::Header>(readBlock(ID3v2::Header::size()));
     d->ID3v2Size = d->ID3v2Header->completeTagSize();
   }
 
@@ -312,6 +301,6 @@ void MPC::File::read(bool readProperties)
       seek(0);
     }
 
-    d->properties = new Properties(this, streamLength);
+    d->properties = std::make_unique<Properties>(this, streamLength);
   }
 }

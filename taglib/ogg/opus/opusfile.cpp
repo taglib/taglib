@@ -39,18 +39,8 @@ using namespace TagLib::Ogg;
 class Opus::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete comment;
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
-  Ogg::XiphComment *comment { nullptr };
-  Properties *properties { nullptr };
+  std::unique_ptr<Ogg::XiphComment> comment;
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +79,7 @@ Opus::File::~File() = default;
 
 Ogg::XiphComment *Opus::File::tag() const
 {
-  return d->comment;
+  return d->comment.get();
 }
 
 PropertyMap Opus::File::properties() const
@@ -104,13 +94,13 @@ PropertyMap Opus::File::setProperties(const PropertyMap &properties)
 
 Opus::Properties *Opus::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool Opus::File::save()
 {
   if(!d->comment)
-    d->comment = new Ogg::XiphComment();
+    d->comment = std::make_unique<Ogg::XiphComment>();
 
   setPacket(1, ByteVector("OpusTags", 8) + d->comment->render(false));
 
@@ -139,8 +129,8 @@ void Opus::File::read(bool readProperties)
     return;
   }
 
-  d->comment = new Ogg::XiphComment(commentHeaderData.mid(8));
+  d->comment = std::make_unique<Ogg::XiphComment>(commentHeaderData.mid(8));
 
   if(readProperties)
-    d->properties = new Properties(this);
+    d->properties = std::make_unique<Properties>(this);
 }

@@ -34,18 +34,8 @@ using namespace TagLib;
 class Vorbis::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete comment;
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
-  Ogg::XiphComment *comment { nullptr };
-  Properties *properties { nullptr };
+  std::unique_ptr<Ogg::XiphComment> comment;
+  std::unique_ptr<Properties> properties;
 };
 
 namespace TagLib {
@@ -92,7 +82,7 @@ Vorbis::File::~File() = default;
 
 Ogg::XiphComment *Vorbis::File::tag() const
 {
-  return d->comment;
+  return d->comment.get();
 }
 
 PropertyMap Vorbis::File::properties() const
@@ -107,7 +97,7 @@ PropertyMap Vorbis::File::setProperties(const PropertyMap &properties)
 
 Vorbis::Properties *Vorbis::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool Vorbis::File::save()
@@ -115,7 +105,7 @@ bool Vorbis::File::save()
   ByteVector v(vorbisCommentHeaderID);
 
   if(!d->comment)
-    d->comment = new Ogg::XiphComment();
+    d->comment = std::make_unique<Ogg::XiphComment>();
   v.append(d->comment->render());
 
   setPacket(1, v);
@@ -137,8 +127,8 @@ void Vorbis::File::read(bool readProperties)
     return;
   }
 
-  d->comment = new Ogg::XiphComment(commentHeaderData.mid(7));
+  d->comment = std::make_unique<Ogg::XiphComment>(commentHeaderData.mid(7));
 
   if(readProperties)
-    d->properties = new Properties(this);
+    d->properties = std::make_unique<Properties>(this);
 }

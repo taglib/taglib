@@ -73,23 +73,14 @@ public:
     frameList.setAutoDelete(true);
   }
 
-  ~TagPrivate()
-  {
-    delete extendedHeader;
-    delete footer;
-  }
-
-  TagPrivate(const TagPrivate &) = delete;
-  TagPrivate &operator=(const TagPrivate &) = delete;
-
   const FrameFactory *factory { nullptr };
 
   File *file { nullptr };
   offset_t tagOffset { 0 };
 
   Header header;
-  ExtendedHeader *extendedHeader { nullptr };
-  Footer *footer { nullptr };
+  std::unique_ptr<ExtendedHeader> extendedHeader;
+  std::unique_ptr<Footer> footer;
 
   FrameListMap frameListMap;
   FrameList frameList;
@@ -327,7 +318,7 @@ Header *ID3v2::Tag::header() const
 
 ExtendedHeader *ID3v2::Tag::extendedHeader() const
 {
-  return d->extendedHeader;
+  return d->extendedHeader.get();
 }
 
 const FrameListMap &ID3v2::Tag::frameListMap() const
@@ -755,7 +746,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
 
   if(d->header.extendedHeader()) {
     if(!d->extendedHeader)
-      d->extendedHeader = new ExtendedHeader();
+      d->extendedHeader = std::make_unique<ExtendedHeader>();
     d->extendedHeader->setData(data);
     if(d->extendedHeader->size() <= data.size()) {
       frameDataPosition += d->extendedHeader->size();

@@ -34,18 +34,8 @@ using namespace TagLib;
 class RIFF::AIFF::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete properties;
-    delete tag;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
-  Properties *properties { nullptr };
-  ID3v2::Tag *tag { nullptr };
+  std::unique_ptr<Properties> properties;
+  std::unique_ptr<ID3v2::Tag> tag;
 
   bool hasID3v2 { false };
 };
@@ -86,7 +76,7 @@ RIFF::AIFF::File::~File() = default;
 
 ID3v2::Tag *RIFF::AIFF::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 PropertyMap RIFF::AIFF::File::properties() const
@@ -106,7 +96,7 @@ PropertyMap RIFF::AIFF::File::setProperties(const PropertyMap &properties)
 
 RIFF::AIFF::Properties *RIFF::AIFF::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool RIFF::AIFF::File::save()
@@ -155,7 +145,7 @@ void RIFF::AIFF::File::read(bool readProperties)
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag) {
-        d->tag = new ID3v2::Tag(this, chunkOffset(i));
+        d->tag = std::make_unique<ID3v2::Tag>(this, chunkOffset(i));
         d->hasID3v2 = true;
       }
       else {
@@ -165,8 +155,8 @@ void RIFF::AIFF::File::read(bool readProperties)
   }
 
   if(!d->tag)
-    d->tag = new ID3v2::Tag();
+    d->tag = std::make_unique<ID3v2::Tag>();
 
   if(readProperties)
-    d->properties = new Properties(this, Properties::Average);
+    d->properties = std::make_unique<Properties>(this, Properties::Average);
 }

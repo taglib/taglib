@@ -43,20 +43,9 @@ namespace
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete atoms;
-    delete tag;
-    delete properties;
-  }
-
-  FilePrivate(const FilePrivate &) = delete;
-  FilePrivate &operator=(const FilePrivate &) = delete;
-
-  MP4::Tag *tag { nullptr };
-  MP4::Atoms *atoms { nullptr };
-  MP4::Properties *properties { nullptr };
+  std::unique_ptr<MP4::Tag> tag;
+  std::unique_ptr<MP4::Atoms> atoms;
+  std::unique_ptr<MP4::Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,10 +82,9 @@ MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyl
 
 MP4::File::~File() = default;
 
-MP4::Tag *
-MP4::File::tag() const
+MP4::Tag *MP4::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 PropertyMap MP4::File::properties() const
@@ -114,10 +102,9 @@ PropertyMap MP4::File::setProperties(const PropertyMap &properties)
   return d->tag->setProperties(properties);
 }
 
-MP4::Properties *
-MP4::File::audioProperties() const
+MP4::Properties *MP4::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 void
@@ -126,7 +113,7 @@ MP4::File::read(bool readProperties)
   if(!isValid())
     return;
 
-  d->atoms = new Atoms(this);
+  d->atoms = std::make_unique<Atoms>(this);
   if(!checkValid(d->atoms->atoms)) {
     setValid(false);
     return;
@@ -138,9 +125,9 @@ MP4::File::read(bool readProperties)
     return;
   }
 
-  d->tag = new Tag(this, d->atoms);
+  d->tag = std::make_unique<Tag>(this, d->atoms.get());
   if(readProperties) {
-    d->properties = new Properties(this, d->atoms);
+    d->properties = std::make_unique<Properties>(this, d->atoms.get());
   }
 }
 

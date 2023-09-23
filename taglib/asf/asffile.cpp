@@ -56,19 +56,15 @@ public:
     objects.setAutoDelete(true);
   }
 
-  ~FilePrivate()
-  {
-    delete tag;
-    delete properties;
-  }
+  ~FilePrivate() = default;
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
   unsigned long long headerSize { 0 };
 
-  ASF::Tag *tag { nullptr };
-  ASF::Properties *properties { nullptr };
+  std::unique_ptr<ASF::Tag> tag;
+  std::unique_ptr<ASF::Properties> properties;
 
   List<BaseObject *> objects;
 
@@ -503,7 +499,7 @@ ASF::File::~File() = default;
 
 ASF::Tag *ASF::File::tag() const
 {
-  return d->tag;
+  return d->tag.get();
 }
 
 PropertyMap ASF::File::properties() const
@@ -523,7 +519,7 @@ PropertyMap ASF::File::setProperties(const PropertyMap &properties)
 
 ASF::Properties *ASF::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool ASF::File::save()
@@ -617,8 +613,8 @@ void ASF::File::read()
     return;
   }
 
-  d->tag = new ASF::Tag();
-  d->properties = new ASF::Properties();
+  d->tag = std::make_unique<ASF::Tag>();
+  d->properties = std::make_unique<ASF::Properties>();
 
   bool ok;
   d->headerSize = readQWORD(this, &ok);
