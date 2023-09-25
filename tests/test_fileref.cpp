@@ -45,6 +45,7 @@
 #include "wavpackfile.h"
 #include "opusfile.h"
 #include "xmfile.h"
+#include "dsffile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -99,6 +100,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testAIFF_2);
   CPPUNIT_TEST(testWavPack);
   CPPUNIT_TEST(testOpus);
+  CPPUNIT_TEST(testDSF);
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST(testCreate);
   CPPUNIT_TEST(testAudioProperties);
@@ -331,6 +333,11 @@ public:
     fileRefSave<Ogg::Opus::File>("correctness_gain_silent_output", ".opus");
   }
 
+  void testDSF()
+  {
+    fileRefSave<DSF::File>("empty10ms",".dsf");
+  }
+
   void testUnsupported()
   {
     FileRef f1(TEST_FILE_PATH_C("no-extension"));
@@ -386,6 +393,7 @@ public:
     CPPUNIT_ASSERT(extensions.contains("wv"));
     CPPUNIT_ASSERT(extensions.contains("opus"));
     CPPUNIT_ASSERT(extensions.contains("xm"));
+    CPPUNIT_ASSERT(extensions.contains("dsf"));
   }
 
   void testFileResolver()
