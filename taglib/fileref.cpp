@@ -52,6 +52,7 @@
 #include "wavfile.h"
 #include "wavpackfile.h"
 #include "xmfile.h"
+#include "dsffile.h"
 
 using namespace TagLib;
 
@@ -164,6 +165,8 @@ namespace
       file = new IT::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "XM")
       file = new XM::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "DSF")
+      file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // if file is not valid, leave it to content-based detection.
 
@@ -211,6 +214,8 @@ namespace
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(APE::File::isSupported(stream))
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(DSF::File::isSupported(stream))
+      file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // isSupported() only does a quick check, so double check the file here.
 
@@ -290,6 +295,8 @@ namespace
       return new IT::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "XM")
       return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "DSF")
+      return new DSF::File(fileName, readAudioProperties, audioPropertiesStyle);
 
     return nullptr;
   }
@@ -417,6 +424,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("s3m");
   l.append("it");
   l.append("xm");
+  l.append("dsf");
 
   return l;
 }

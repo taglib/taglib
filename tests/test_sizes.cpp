@@ -41,6 +41,8 @@
 #include "audioproperties.h"
 #include "chapterframe.h"
 #include "commentsframe.h"
+#include "dsffile.h"
+#include "dsfproperties.h"
 #include "eventtimingcodesframe.h"
 #include "fileref.h"
 #include "flacfile.h"
@@ -159,6 +161,8 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ByteVectorStream));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::DebugListener));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::File));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSF::File));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSF::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FLAC::MetadataBlock));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Picture));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Properties));
