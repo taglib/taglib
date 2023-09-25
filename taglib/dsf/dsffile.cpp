@@ -36,12 +36,18 @@ using namespace TagLib;
 class DSF::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
+  FilePrivate(ID3v2::FrameFactory *frameFactory)
+        : ID3v2FrameFactory(frameFactory ? frameFactory
+                                         : ID3v2::FrameFactory::instance())
+  {
+  }
+
   ~FilePrivate() = default;
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
+  const ID3v2::FrameFactory *ID3v2FrameFactory;
   long long fileSize = 0;
   long long metadataOffset = 0;
   std::unique_ptr<Properties> properties;
@@ -56,18 +62,20 @@ bool DSF::File::isSupported(IOStream *stream)
 }
 
 DSF::File::File(FileName file, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
+                AudioProperties::ReadStyle propertiesStyle,
+                ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(propertiesStyle);
 }
 
 DSF::File::File(IOStream *stream, bool readProperties,
-               AudioProperties::ReadStyle propertiesStyle) :
+                AudioProperties::ReadStyle propertiesStyle,
+                ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(propertiesStyle);
@@ -97,6 +105,11 @@ DSF::Properties *DSF::File::audioProperties() const
 
 bool DSF::File::save()
 {
+  return save(ID3v2::v4);
+}
+
+bool DSF::File::save(ID3v2::Version version)
+{
   if(readOnly()) {
     debug("DSF::File::save() - Cannot save to a read only file.");
     return false;
@@ -123,7 +136,7 @@ bool DSF::File::save()
     truncate(newFileSize);
   }
   else {
-    ByteVector tagData = d->tag->render();
+    ByteVector tagData = d->tag->render(version);
 
     long long newMetadataOffset = d->metadataOffset ? d->metadataOffset : d->fileSize;
     long long newFileSize = newMetadataOffset + tagData.size();
@@ -164,19 +177,19 @@ void DSF::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  long long chunkSize = readBlock(8).toLongLong(false);
+  long long dsdHeaderSize = readBlock(8).toLongLong(false);
 
   // Integrity check
-  if(chunkSize != 28) {
-    debug("DSF::File::read() -- File is corrupted, wrong chunk size");
+  if(dsdHeaderSize != 28) {
+    debug("DSF::File::read() -- File is corrupted, wrong DSD header size");
     setValid(false);
     return;
   }
 
   d->fileSize = readBlock(8).toLongLong(false);
 
-  // File is malformed or corrupted
-  if(d->fileSize != length()) {
+  // File is malformed or corrupted, allow trailing garbage
+  if(d->fileSize > length()) {
     debug("DSF::File::read() -- File is corrupted wrong length");
     setValid(false);
     return;
@@ -199,9 +212,14 @@ void DSF::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  chunkSize = readBlock(8).toLongLong(false);
+  long long fmtHeaderSize = readBlock(8).toLongLong(false);
+  if(fmtHeaderSize != 52) {
+    debug("DSF::File::read() -- File is corrupted, wrong FMT header size");
+    setValid(false);
+    return;
+  }
 
-  d->properties = std::make_unique<Properties>(readBlock(chunkSize), propertiesStyle);
+  d->properties = std::make_unique<Properties>(readBlock(fmtHeaderSize), propertiesStyle);
 
   // Skip the data chunk
 
@@ -209,5 +227,6 @@ void DSF::File::read(AudioProperties::ReadStyle propertiesStyle)
   if(d->metadataOffset == 0)
     d->tag = std::make_unique<ID3v2::Tag>();
   else
-    d->tag = std::make_unique<ID3v2::Tag>(this, d->metadataOffset);
+    d->tag = std::make_unique<ID3v2::Tag>(this, d->metadataOffset,
+                                          d->ID3v2FrameFactory);
 }

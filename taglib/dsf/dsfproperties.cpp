@@ -117,17 +117,18 @@ int DSF::Properties::blockSizePerChannel() const
 
 void DSF::Properties::read(const ByteVector &data)
 {
-  d->formatVersion         = data.toUInt(0U,false);
-  d->formatID              = data.toUInt(4U,false);
-  d->channelType           = data.toUInt(8U,false);
-  d->channelNum            = data.toUInt(12U,false);
-  d->samplingFrequency     = data.toUInt(16U,false);
-  d->bitsPerSample         = data.toUInt(20U,false);
-  d->sampleCount           = data.toLongLong(24U,false);
-  d->blockSizePerChannel   = data.toUInt(32U,false);
+  d->formatVersion = data.toUInt(0U,false);
+  d->formatID = data.toUInt(4U,false);
+  d->channelType = data.toUInt(8U,false);
+  d->channelNum = data.toUInt(12U,false);
+  d->samplingFrequency = data.toUInt(16U,false);
+  d->bitsPerSample = data.toUInt(20U,false);
+  d->sampleCount = data.toLongLong(24U,false);
+  d->blockSizePerChannel = data.toUInt(32U,false);
 
-  d->bitrate
-  = static_cast<unsigned int>((d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0 + 0.5);
-  d->length
-  = d->samplingFrequency > 0 ? static_cast<unsigned int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5) : 0;
+  d->bitrate = static_cast<unsigned int>(
+      (d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0 + 0.5);
+  d->length = d->samplingFrequency > 0
+      ? static_cast<unsigned int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5)
+      : 0;
 }

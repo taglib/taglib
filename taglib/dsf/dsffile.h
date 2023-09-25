@@ -45,10 +45,14 @@ namespace TagLib {
          * \note In the current implementation, both \a readProperties and
          * \a propertiesStyle are ignored.  The audio properties are always
          * read.
+         *
+         * If this file contains and ID3v2 tag the frames will be created using
+         * \a frameFactory (default if null).
          */
         File(FileName file, bool readProperties = true,
              AudioProperties::ReadStyle propertiesStyle =
-             AudioProperties::Average);
+             AudioProperties::Average,
+             ID3v2::FrameFactory *frameFactory = nullptr);
 
         /*!
          * Constructs a DSD stream file from \a stream.
@@ -57,18 +61,25 @@ namespace TagLib {
          * \a propertiesStyle are ignored.  The audio properties are always
          * read.
          *
+         * If this file contains and ID3v2 tag the frames will be created using
+         * \a frameFactory (default if null).
+         *
          * \note TagLib will *not* take ownership of the stream, the caller is
          * responsible for deleting it after the File object.
          */
         File(IOStream *stream, bool readProperties = true,
              AudioProperties::ReadStyle propertiesStyle =
-             AudioProperties::Average);
+             AudioProperties::Average,
+             ID3v2::FrameFactory *frameFactory = nullptr);
 
         /*!
          * Destroys this instance of the File.
          */
         ~File() override;
 
+        /*!
+         * Returns the ID3v2 Tag for this file.
+         */
         ID3v2::Tag *tag() const override;
 
         /*!
@@ -91,19 +102,26 @@ namespace TagLib {
 
         /*!
          * Save the file.
-		 *
+         *
          * This returns true if the save was successful.
          */
         bool save() override;
 
-      /*!
-       * Returns whether or not the given \a stream can be opened as a DSF
-       * file.
-       *
-       * \note This method is designed to do a quick check.  The result may
-       * not necessarily be correct.
-       */
-      static bool isSupported(IOStream *stream);
+        /*!
+         * Save the file.
+         *
+         * \a version specifies the ID3v2 version to be used for writing tags.
+         */
+        bool save(ID3v2::Version version);
+
+        /*!
+         * Returns whether or not the given \a stream can be opened as a DSF
+         * file.
+         *
+         * \note This method is designed to do a quick check.  The result may
+         * not necessarily be correct.
+         */
+        static bool isSupported(IOStream *stream);
 
       private:
         void read(AudioProperties::ReadStyle propertiesStyle);
