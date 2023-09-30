@@ -14,11 +14,11 @@ if /i "%1#" == "--cflags#"  goto doit
 if /i "%1#" == "--version#" goto doit
 if /i "%1#" == "--prefix#"  goto doit
 
-echo "usage: %0 [OPTIONS]"
-echo	[--libs]
-echo	[--cflags]
-echo	[--version]
-echo	[--prefix]
+echo usage: %0 [OPTIONS]
+echo [--libs]
+echo [--cflags]
+echo [--version]
+echo [--prefix]
 goto theend
 
   *
@@ -33,4 +33,3 @@ if /i "%1#" == "--version#" echo ${TAGLIB_LIB_VERSION_STRING}
 if /i "%1#" == "--prefix#"  echo ${CMAKE_INSTALL_PREFIX}
 
 :theend
-

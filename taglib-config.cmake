@@ -2,16 +2,16 @@
 
 usage()
 {
-	echo "usage: $0 [OPTIONS]"
+  echo "usage: $0 [OPTIONS]"
 cat << EOH
 
 options:
-	[--libs]
-	[--cflags]
-	[--version]
-	[--prefix]
+  [--libs]
+  [--cflags]
+  [--version]
+  [--prefix]
 EOH
-	exit 1;
+  exit 1
 }
 
 # Looks useless as it is, but could be replaced with a "pcfiledir" by Buildroot.
@@ -39,22 +39,22 @@ while test $# -gt 0
 do
   case $1 in
     --libs)
-	  flags="$flags -L$libdir -ltag @ZLIB_LIBRARIES_FLAGS@"
-	  ;;
+      flags="$flags -L$libdir -ltag @ZLIB_LIBRARIES_FLAGS@"
+      ;;
     --cflags)
-	  flags="$flags -I$includedir -I$includedir/taglib"
-	  ;;
+      flags="$flags -I$includedir -I$includedir/taglib"
+      ;;
     --version)
-	  echo @TAGLIB_LIB_VERSION_STRING@
-	  ;;
+      echo @TAGLIB_LIB_VERSION_STRING@
+      ;;
     --prefix)
-	  echo ${prefix:-@CMAKE_INSTALL_PREFIX@}
-	  ;;
-	*)
-	  echo "$0: unknown option $1"
-	  echo
-	  usage
-	  ;;
+      echo ${prefix:-@CMAKE_INSTALL_PREFIX@}
+      ;;
+    *)
+      echo "$0: unknown option $1"
+      echo
+      usage
+      ;;
   esac
   shift
 done
