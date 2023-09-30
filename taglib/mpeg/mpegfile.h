@@ -74,7 +74,8 @@ namespace TagLib {
        * Constructs an MPEG file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
        *
-       * \note In the current implementation, \a propertiesStyle is ignored.
+       * If \a propertiesStyle is not Fast, the file will be scanned
+       * completely if no ID3v2 tag or MPEG sync code is found at the start.
        *
        * \deprecated This constructor will be dropped in favor of the one below
        * in a future version.
@@ -89,7 +90,8 @@ namespace TagLib {
        * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
        *
-       * \note In the current implementation, \a propertiesStyle is ignored.
+       * If \a propertiesStyle is not Fast, the file will be scanned
+       * completely if no ID3v2 tag or MPEG sync code is found at the start.
        */
       // BIC: merge with the above constructor, kept for source compatibility
       File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -106,7 +108,8 @@ namespace TagLib {
        * If this file contains and ID3v2 tag the frames will be created using
        * \a frameFactory.
        *
-       * \note In the current implementation, \a propertiesStyle is ignored.
+       * If \a propertiesStyle is not Fast, the file will be scanned
+       * completely if no ID3v2 tag or MPEG sync code is found at the start.
        */
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
@@ -321,8 +324,8 @@ namespace TagLib {
       static bool isSupported(IOStream *stream);
 
     private:
-      void read(bool readProperties);
-      offset_t findID3v2();
+      void read(bool readProperties, Properties::ReadStyle readStyle);
+      offset_t findID3v2(Properties::ReadStyle readStyle);
 
       class FilePrivate;
       std::unique_ptr<FilePrivate> d;

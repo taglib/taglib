@@ -68,6 +68,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyAPE);
   CPPUNIT_TEST(testIgnoreGarbage);
   CPPUNIT_TEST(testExtendedHeader);
+  CPPUNIT_TEST(testReadStyleFast);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -537,6 +538,45 @@ public:
       CPPUNIT_ASSERT_EQUAL(3U, tag->track());
       CPPUNIT_ASSERT_EQUAL(String("2013"),
                            f.properties().value("ORIGINALDATE").front());
+    }
+  }
+
+  void testReadStyleFast()
+  {
+    const ScopedFileCopy copy("lame_cbr", ".mp3");
+    {
+      MPEG::File f(copy.fileName().c_str(), true, MPEG::Properties::Fast);
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(1887, f.audioProperties()->lengthInSeconds());
+      CPPUNIT_ASSERT_EQUAL(1887164, f.audioProperties()->lengthInMilliseconds());
+      CPPUNIT_ASSERT_EQUAL(64, f.audioProperties()->bitrate());
+      CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+      CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String(""), f.ID3v2Tag()->title());
+      PropertyMap properties = f.properties();
+      CPPUNIT_ASSERT_EQUAL(String("-1.020000 dB"), properties.value("REPLAYGAIN_TRACK_GAIN").front());
+      CPPUNIT_ASSERT_EQUAL(String("0.920032"), properties.value("REPLAYGAIN_TRACK_PEAK").front());
+      properties["TITLE"] = String("A Title");
+      properties["Artist"] = String("An Artist");
+      f.setProperties(properties);
+      f.save();
+    }
+    {
+      MPEG::File f(copy.fileName().c_str(), true, MPEG::Properties::Fast);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String("A Title"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("An Artist"), f.ID3v2Tag()->artist());
+    }
+    {
+      MPEG::File f(TEST_FILE_PATH_C("garbage.mp3"), true, MPEG::Properties::Fast);
+      CPPUNIT_ASSERT(f.isValid());
+      // Garbage prevents detection of ID3v2 with fast read style
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2255), f.firstFrameOffset());
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(6015), f.lastFrameOffset());
     }
   }
 
