@@ -23,7 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <taglib.h>
+#include "taglib.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace TagLib;
@@ -31,53 +31,46 @@ using namespace TagLib;
 class TestTagLib : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestTagLib);
-  CPPUNIT_TEST(testAtLeastVersionActualVersion);
-  CPPUNIT_TEST(testAtLeastVersionMajorMinor);
-  CPPUNIT_TEST(testAtLeastVersionMajorMinorPatch);
+  CPPUNIT_TEST(testVersionNumber);
+  CPPUNIT_TEST(testRuntimeVersion);
   CPPUNIT_TEST_SUITE_END();
 
 public:
 
-  void testAtLeastVersionActualVersion()
+  void testVersionNumber()
   {
-    int actualMajor = TAGLIB_MAJOR_VERSION;
-    int actualMinor = TAGLIB_MINOR_VERSION;
-    int actualPatch = TAGLIB_PATCH_VERSION;
-
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(actualMajor, actualMinor));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(actualMajor, actualMinor, actualPatch));
+    VersionNumber v210(2, 1, 0);
+    VersionNumber v211(2, 1, 1);
+    VersionNumber v220(2, 2, 0);
+    VersionNumber v300(3, 0, 0);
+    CPPUNIT_ASSERT_EQUAL(0x020100U, v210.combinedVersion());
+    CPPUNIT_ASSERT_EQUAL(2U, v210.majorVersion());
+    CPPUNIT_ASSERT_EQUAL(1U, v210.minorVersion());
+    CPPUNIT_ASSERT_EQUAL(0U, v210.patchVersion());
+    CPPUNIT_ASSERT(v210 == VersionNumber(2, 1));
+    CPPUNIT_ASSERT(!(v210 == v211));
+    CPPUNIT_ASSERT(v210 != v211);
+    CPPUNIT_ASSERT(!(v210 != v210));
+    CPPUNIT_ASSERT(v210 < v211);
+    CPPUNIT_ASSERT(!(v220 < v210));
+    CPPUNIT_ASSERT(v220 > v211);
+    CPPUNIT_ASSERT(!(v210 > v211));
+    CPPUNIT_ASSERT(v210 <= v210);
+    CPPUNIT_ASSERT(v210 <= v300);
+    CPPUNIT_ASSERT(!(v300 <= v220));
+    CPPUNIT_ASSERT(v210 >= v210);
+    CPPUNIT_ASSERT(v220 >= v210);
+    CPPUNIT_ASSERT(!(v210 >= v300));
   }
 
-  void testAtLeastVersionMajorMinor()
+  void testRuntimeVersion()
   {
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(0, 9));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 9));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 10));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 11));
-
-    // the following may need to be adjusted in the future :)
-    CPPUNIT_ASSERT(!isTagLibVersionAtLeast(3, 0));
-    CPPUNIT_ASSERT(!isTagLibVersionAtLeast(3, 7));
-  }
-
-  void testAtLeastVersionMajorMinorPatch()
-  {
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(0, 9, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(0, 9, 999));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(0, 9, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 0, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 9, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 9, 1));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 10, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 10, 999));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 11, 0));
-    CPPUNIT_ASSERT(isTagLibVersionAtLeast(1, 11, 1));
-
-    // the following may need to be adjusted in the future :)
-    CPPUNIT_ASSERT(!isTagLibVersionAtLeast(2, 99, 0));
-    CPPUNIT_ASSERT(!isTagLibVersionAtLeast(3, 0, 0));
-    CPPUNIT_ASSERT(!isTagLibVersionAtLeast(3, 50, 0));
+    CPPUNIT_ASSERT(runtimeVersion() >= VersionNumber(
+      TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION));
+    CPPUNIT_ASSERT(runtimeVersion() >= VersionNumber(
+      TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION));
+    CPPUNIT_ASSERT(runtimeVersion() == VersionNumber(
+      TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION));
   }
 
 };

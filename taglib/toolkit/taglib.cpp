@@ -25,19 +25,7 @@
 
 #include "taglib.h"
 
-#include "tutils.h"
-
-bool TagLib::isTagLibVersionAtLeast(int major, int minor)
+TagLib::VersionNumber TagLib::runtimeVersion()
 {
-  return isTagLibVersionAtLeast(major, minor, 0);
-}
-
-bool TagLib::isTagLibVersionAtLeast(int major, int minor, int patch)
-{
-  int actualMajor = TAGLIB_MAJOR_VERSION;
-  int actualMinor = TAGLIB_MINOR_VERSION;
-  int actualPatch = TAGLIB_PATCH_VERSION;
-
-  return TagLib::Utils::compareVersions(major, minor, patch,
-                                        actualMajor, actualMinor, actualPatch) <= 0;
+  return VersionNumber(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION);
 }

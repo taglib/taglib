@@ -30,7 +30,6 @@ INCLUDE_DIRECTORIES(
 SET(test_runner_SRCS
   main.cpp
   test_taglib.cpp
-  test_utils.cpp
   test_list.cpp
   test_map.cpp
   test_mpeg.cpp

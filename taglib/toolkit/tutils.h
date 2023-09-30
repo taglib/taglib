@@ -164,35 +164,6 @@ namespace TagLib
       }
 
       /*!
-       * Compares two int values and returns the sign of the difference
-       * between them.
-       */
-      inline int compareInts(int a, int b)
-      {
-          if(a < b) return -1;
-          if(a > b) return 1;
-          return 0;
-      }
-
-      /*!
-       * Compares two versions. Returns a negative number if the first version
-       * is smaller than the second one, returns zero if the versions are
-       * equal, or returns a strictly positive result if the first version is
-       * greater than the second one.
-       */
-      inline int compareVersions(int major1, int minor1, int patch1,
-                                 int major2, int minor2, int patch2)
-      {
-          int majorComparisonResult = compareInts(major1, major2);
-          if (majorComparisonResult != 0) return majorComparisonResult;
-
-          int minorComparisonResult = compareInts(minor1, minor2);
-          if (minorComparisonResult != 0) return minorComparisonResult;
-
-          return compareInts(patch1, patch2);
-      }
-
-      /*!
        * Returns a formatted string just like standard sprintf(), but makes use of
        * safer functions such as snprintf() if available.
        */
