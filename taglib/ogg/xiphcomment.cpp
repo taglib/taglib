@@ -322,7 +322,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
   ByteVector data;
 
   // Add the vendor ID length and the vendor ID.  It's important to use the
-  // length of the data(String::UTF8) rather than the length of the the string
+  // length of the data(String::UTF8) rather than the length of the string
   // since this is UTF8 text and there may be more characters in the data than
   // in the UTF16 string.
 
@@ -335,7 +335,7 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 
   data.append(ByteVector::fromUInt(fieldCount(), false));
 
-  // Iterate over the the field lists.  Our iterator returns a
+  // Iterate over the field lists.  Our iterator returns a
   // std::pair<String, StringList> where the first String is the field name and
   // the StringList is the values associated with that field.
 

@@ -244,7 +244,7 @@ void IT::File::read(bool)
     // I don't count disabled and muted channels.
     // But this always gives 64 channels for all my files anyway.
     // Strangely VLC does report other values. I wonder how VLC
-    // gets it's values.
+    // gets its values.
     if(static_cast<unsigned char>(pannings[i]) < 128 && volumes[i] > 0)
         ++channels;
   }

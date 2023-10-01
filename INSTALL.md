@@ -83,8 +83,8 @@ Useful configuration options used with CMake (GUI and/or command line):
   | `WITH_ZLIB=`            | Whether to build with ZLib |
   | `ZLIB_ROOT=`            | Where to find ZLib's root directory. Assumes parent of: `\include` and `\lib.`|
   | `ZLIB_INCLUDE_DIR=`     | Where to find ZLib's Include directory.|
-  | `ZLIB_LIBRARY=`         | Where to find ZLib's Library.
-  | `ZLIB_SOURCE=`          | Where to find ZLib's Source Code. Alternative to `ZLIB_INCLUDE_DIR` and `ZLIB_LIBRARY`.
+  | `ZLIB_LIBRARY=`         | Where to find ZLib's Library.|
+  | `ZLIB_SOURCE=`          | Where to find ZLib's Source Code. Alternative to `ZLIB_INCLUDE_DIR` and `ZLIB_LIBRARY`.|
   | `CMAKE_INSTALL_PREFIX=` | Where to install Taglib. |
   | `CMAKE_BUILD_TYPE=`     | Release, Debug, etc ... (Not available in MSVC) |
 
@@ -129,7 +129,7 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
       1. Open MSVS.
       2. Open taglib solution.
       3. Set build type to: Release (look in the tool bars)
-      2. Hit F7 to build the solution. (project)
+      4. Hit F7 to build the solution. (project)
     * MinGW:
 
           C:\GitRoot\taglib> gmake

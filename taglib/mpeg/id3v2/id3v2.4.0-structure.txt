@@ -87,9 +87,9 @@ Abstract
    meet new meta information needs that might arise. To achieve that
    ID3v2 is constructed as a container for several information blocks,
    called frames, whose format need not be known to the software that
-   encounters them. At the start of every frame is an unique and
+   encounters them. At the start of every frame is a unique and
    predefined identifier, a size descriptor that allows software to skip
-   unknown frames and a flags field. The flags describes encoding
+   unknown frames and a flags field. The flags describe encoding
    details and if the frame should remain in the tag, should it be
    unknown to the software, if the file is altered.
 
@@ -143,14 +143,14 @@ Abstract
 
    a - Unsynchronisation
 
-     Bit 7 in the 'ID3v2 flags' indicates whether or not
+     Bit 7 in the 'ID3v2 flags' indicates whether
      unsynchronisation is applied on all frames (see section 6.1 for
      details); a set bit indicates usage.
 
 
    b - Extended header
 
-     The second bit (bit 6) indicates whether or not the header is
+     The second bit (bit 6) indicates whether the header is
      followed by an extended header. The extended header is described in
      section 3.2. A set bit indicates the presence of an extended
      header.
@@ -411,7 +411,7 @@ Abstract
    byte indicates that extra information is added to the header. These
    fields of extra information is ordered as the flags that indicates
    them. The flags field is defined as follows (l and o left out because
-   ther resemblence to one and zero):
+   of their resemblance to one and zero):
 
      %0abc0000 %0h00kmnp
 
@@ -464,7 +464,7 @@ Abstract
 
    h - Grouping identity
 
-      This flag indicates whether or not this frame belongs in a group
+      This flag indicates whether this frame belongs in a group
       with other frames. If set, a group identifier byte is added to the
       frame. Every frame with the same group identifier belongs to the
       same group.
@@ -475,7 +475,7 @@ Abstract
 
    k - Compression
 
-      This flag indicates whether or not the frame is compressed.
+      This flag indicates whether the frame is compressed.
       A 'Data Length Indicator' byte MUST be included in the frame.
 
       0     Frame is not compressed.
@@ -486,7 +486,7 @@ Abstract
 
    m - Encryption
    
-      This flag indicates whether or not the frame is encrypted. If set,
+      This flag indicates whether the frame is encrypted. If set,
       one byte indicating with which method it was encrypted will be
       added to the frame. See description of the ENCR frame for more
       information about encryption method registration. Encryption
@@ -499,7 +499,7 @@ Abstract
 
    n - Unsynchronisation
 
-      This flag indicates whether or not unsynchronisation was applied
+      This flag indicates whether unsynchronisation was applied
       to this frame. See section 6 for details on unsynchronisation.
       If this flag is set all data from the end of this header to the
       end of this frame has been unsynchronised. Although desirable, the
@@ -513,7 +513,7 @@ Abstract
 
       This flag indicates that a data length indicator has been added to
       the frame. The data length indicator is the value one would write
-      as the 'Frame length' if all of the frame format flags were
+      as the 'Frame length' if all the frame format flags were
       zeroed, represented as a 32 bit synchsafe integer.
 
       0      There is no Data Length Indicator.
@@ -725,8 +725,8 @@ Abstract
    Written by
 
      Martin Nilsson
-     Rydsvägen 246 C. 30
-     SE-584 34 Linköping
+     Rydsvï¿½gen 246 C. 30
+     SE-584 34 Linkï¿½ping
      Sweden
 
      Email: nilsson@id3.org
