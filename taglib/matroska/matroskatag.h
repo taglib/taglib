@@ -22,11 +22,13 @@
 #define HAS_MATROSKATAG_H
 
 #include <memory>
+#include <algorithm>
+#include <utility>
 
 #include "tag.h"
 #include "tstring.h"
 #include "tlist.h"
-//#include "matroskasimpletag.h
+#include "matroskafile.h"
 
 namespace TagLib {
   namespace Matroska {
@@ -35,38 +37,81 @@ namespace TagLib {
     class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
     public:
-      enum TargetTypeValue {
-        None = 0,
-        Shot = 10,
-        Subtrack = 20,
-        Track = 30,
-        Part = 40,
-        Album = 50,
-        Edition = 60,
-        Collection = 70
-      };
       Tag();
       ~Tag() override;
       void addSimpleTag(SimpleTag *tag);
       void removeSimpleTag(SimpleTag *tag);
+      void clearSimpleTags();
       const SimpleTagsList& simpleTagsList() const;
-      String title() const override { return ""; }
-      String artist() const override { return ""; }
-      String album() const override { return ""; }
-      String comment() const override { return ""; }
-      String genre() const override { return ""; }
-      unsigned int year() const override { return 0; }
-      unsigned int track() const override { return 0; }
-      void setTitle(const String &s) override {}
-      void setArtist(const String &s) override {}
-      void setAlbum(const String &s) override {}
-      void setComment(const String &s) override {}
-      void setGenre(const String &s) override {}
-      void setYear(unsigned int i) override {}
-      void setTrack(unsigned int i) override {}
-      bool isEmpty() const override { return false; }
+      String title() const override;
+      String artist() const override;
+      String album() const override;
+      String comment() const override;
+      String genre() const override;
+      unsigned int year() const override;
+      unsigned int track() const override;
+      void setTitle(const String &s);
+      void setArtist(const String &s);
+      void setAlbum(const String &s);
+      void setComment(const String &s);
+      void setGenre(const String &s);
+      void setYear(unsigned int i);
+      void setTrack(unsigned int i);
+      bool isEmpty() const;
+      PropertyMap properties() const override;
+      PropertyMap setProperties(const PropertyMap &propertyMap) override;
+      template <typename T>
+      int removeSimpleTags(T&& p)
+      {
+        auto &list = simpleTagsListPrivate();
+        int numRemoved = 0;
+        for (auto it = list.begin(); it != list.end();) {
+          it = std::find_if(it, list.end(), std::forward<T>(p));
+          if (it != list.end()) {
+            delete *it;
+            *it = nullptr;
+            it = list.erase(it);
+            numRemoved++;
+          }
+        }
+        return numRemoved;
+      }
+
+      template<typename T>
+      SimpleTagsList findSimpleTags(T&& p)
+      {
+        auto &list = simpleTagsListPrivate();
+        for (auto it = list.begin(); it != list.end();) {
+          it = std::find_if(it, list.end(), std::forward<T>(p));
+          if (it != list.end()) {
+            list.append(*it);
+            ++it;
+          }
+        }
+        return list;
+      }
+      template<typename T>
+      const Matroska::SimpleTag* findSimpleTag(T&& p) const
+      {
+        auto &list = simpleTagsListPrivate();
+        auto it = std::find_if(list.begin(), list.end(), std::forward<T>(p));
+        return it != list.end() ? *it : nullptr;
+      }
+      template <typename T>
+      Matroska::SimpleTag* findSimpleTag(T&&p)
+      {
+        return const_cast<Matroska::SimpleTag*>(
+          const_cast<const Matroska::Tag*>(this)->findSimpleTag(std::forward<T>(p))
+        );
+      }
 
     private:
+      friend class Matroska::File;
+      ByteVector render();
+      SimpleTagsList& simpleTagsListPrivate();
+      const SimpleTagsList& simpleTagsListPrivate() const;
+      bool setTag(const String &key, const String &value);
+      const String* getTag(const String &key) const;
       class TagPrivate;
       std::unique_ptr<TagPrivate> d;
     };

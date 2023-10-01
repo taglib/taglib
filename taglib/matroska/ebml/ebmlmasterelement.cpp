@@ -45,3 +45,15 @@ bool EBML::MasterElement::read(File &file)
   }
   return file.tell() == maxOffset;
 }
+
+ByteVector EBML::MasterElement::render()
+{
+  ByteVector buffer = renderId();
+  ByteVector data;
+  for (auto element : elements)
+    data.append(element->render());
+  dataSize = data.size();
+  buffer.append(renderVINT(dataSize, 0));
+  buffer.append(data);
+  return buffer;
+}

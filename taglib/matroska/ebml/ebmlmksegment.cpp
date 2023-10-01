@@ -24,6 +24,7 @@
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "tutils.h"
+#include "tbytevector.h"
 #include "tdebug.h"
 
 using namespace TagLib;
@@ -36,13 +37,21 @@ EBML::MkSegment::~MkSegment()
 bool EBML::MkSegment::read(File &file)
 {
   offset_t maxOffset = file.tell() + dataSize;
-  tags = static_cast<MkTags*>(findElement(file, EBML_ID_MK_TAGS, maxOffset));
-  if (tags && !tags->read(file))
-    return false;
+  tags = static_cast<MkTags*>(findElement(file, ElementIDs::MkTags, maxOffset));
+  if (tags) {
+    offset_t tagsHeadSize = tags->headSize();
+    tagsOffset = file.tell() - tagsHeadSize;
+    tagsOriginalSize = tagsHeadSize + tags->getDataSize();
+    if (!tags->read(file))
+      return false;
+  }
   return true;
 }
 
-Matroska::Tag* EBML::MkSegment::parseTag()
+std::tuple<Matroska::Tag*, offset_t, offset_t> EBML::MkSegment::parseTag()
 {
-  return tags ? tags->parse() : nullptr;
+  if (tags)
+    return {tags->parse(), tagsOffset, tagsOriginalSize};
+  else
+    return {nullptr, 0, 0};
 }

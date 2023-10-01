@@ -32,9 +32,19 @@ namespace TagLib {
     class TAGLIB_EXPORT SimpleTag
     {
     public:
+      enum TargetTypeValue {
+        None = 0,
+        Shot = 10,
+        Subtrack = 20,
+        Track = 30,
+        Part = 40,
+        Album = 50,
+        Edition = 60,
+        Collection = 70
+      };
       const String& name() const;
-      Tag::TargetTypeValue targetTypeValue() const;
-      void setTargetTypeValue(Tag::TargetTypeValue targetTypeValue);
+      TargetTypeValue targetTypeValue() const;
+      void setTargetTypeValue(TargetTypeValue targetTypeValue);
       void setName(const String &name);
       virtual ~SimpleTag();
 
@@ -43,13 +53,13 @@ namespace TagLib {
       std::unique_ptr<SimpleTagPrivate> d;
 
     protected:
-      SimpleTag(Tag::TargetTypeValue targetTypeValue);
+      SimpleTag();
     };
 
     class TAGLIB_EXPORT SimpleTagString : public SimpleTag
     {
     public:
-      SimpleTagString(Tag::TargetTypeValue targetTypeValue);
+      SimpleTagString();
       ~SimpleTagString() override;
       const String& value() const;
       void setValue(const String &value);
@@ -62,7 +72,7 @@ namespace TagLib {
     class TAGLIB_EXPORT SimpleTagBinary : public SimpleTag
     {
     public:
-      SimpleTagBinary(Tag::TargetTypeValue targetTypeValue);
+      SimpleTagBinary();
       ~SimpleTagBinary() override;
       const ByteVector& value() const;
       void setValue(const ByteVector &value);

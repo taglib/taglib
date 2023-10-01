@@ -23,7 +23,8 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "tfile.h"
-#include "ebmlutils.h"
+#include "tutils.h"
+//#include "ebmlutils.h"
 #include "taglib.h"
 
 namespace TagLib {
@@ -31,6 +32,7 @@ namespace TagLib {
     class Element
     {
     public:
+      using Id = unsigned int;
       Element(Id id, int sizeLength, offset_t dataSize)
       : id(id), sizeLength(sizeLength), dataSize(dataSize)
       {}
@@ -42,15 +44,32 @@ namespace TagLib {
       }
       void skipData(File &file);
       Id getId() const { return id; }
+      offset_t headSize() const;
       int getSizeLength() const { return sizeLength; }
       int64_t getDataSize() const { return dataSize; }
+      ByteVector renderId();
+      virtual ByteVector render();
       static Element* factory(File &file);
+      static Id readId(File &file);
 
     protected:
       Id id;
       int sizeLength;
       offset_t dataSize;
     };
+
+    namespace ElementIDs {
+      inline constexpr Element::Id EBMLHeader           = 0x1A45DFA3;
+      inline constexpr Element::Id MkSegment            = 0x18538067;
+      inline constexpr Element::Id MkTags               = 0x1254C367;
+      inline constexpr Element::Id MkTag                = 0x7373;
+      inline constexpr Element::Id MkTagTargets         = 0x63C0;
+      inline constexpr Element::Id MkTagTargetTypeValue = 0x68CA;
+      inline constexpr Element::Id MkSimpleTag          = 0x67C8;
+      inline constexpr Element::Id MkTagName            = 0x45A3;
+      inline constexpr Element::Id MkTagLanguage        = 0x447A;
+      inline constexpr Element::Id MkTagString          = 0x4487;
+    }
   }
 }
 

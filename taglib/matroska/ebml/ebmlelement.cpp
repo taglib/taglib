@@ -29,6 +29,8 @@
 #include "tdebug.h"
 #include "tutils.h"
 
+#include <cstdint>
+
 using namespace TagLib;
 
 EBML::Element* EBML::Element::factory(File &file)
@@ -47,28 +49,28 @@ EBML::Element* EBML::Element::factory(File &file)
 
   // Return the subclass
   switch(id) {
-    case EBML_ID_HEAD:
+    case ElementIDs::EBMLHeader:
       return new Element(id, sizeLength, dataSize);
     
-    case EBML_ID_MK_SEGMENT:
+    case ElementIDs::MkSegment:
       return new MkSegment(sizeLength, dataSize);
 
-    case EBML_ID_MK_TAGS:
+    case ElementIDs::MkTags:
       return new MkTags(sizeLength, dataSize);
 
-    case EBML_ID_MK_TAG:
-    case EBML_ID_MK_TAG_TARGETS:
-    case EBML_ID_MK_SIMPLE_TAG:
+    case ElementIDs::MkTag:
+    case ElementIDs::MkTagTargets:
+    case ElementIDs::MkSimpleTag:
       return new MasterElement(id, sizeLength, dataSize);
 
-    case EBML_ID_MK_TAG_NAME:
-    case EBML_ID_MK_TAG_STRING:
+    case ElementIDs::MkTagName:
+    case ElementIDs::MkTagString:
       return new UTF8StringElement(id, sizeLength, dataSize);
 
-    case EBML_ID_MK_TAG_LANGUAGE:
+    case ElementIDs::MkTagLanguage:
       return new Latin1StringElement(id, sizeLength, dataSize);
 
-    case EBML_ID_MK_TARGET_TYPE_VALUE:
+    case ElementIDs::MkTagTargetTypeValue:
       return new UIntElement(id, sizeLength, dataSize);
 
     default:
@@ -78,7 +80,45 @@ EBML::Element* EBML::Element::factory(File &file)
   return nullptr;
 }
 
+EBML::Element::Id EBML::Element::readId(File &file)
+{
+  auto buffer = file.readBlock(1);
+  if (buffer.size() != 1) {
+    debug("Failed to read VINT size");
+    return 0;
+  }
+  unsigned int nb_bytes = VINTSizeLength<4>(*buffer.begin());
+  if (!nb_bytes)
+    return 0;
+  if (nb_bytes > 1)
+    buffer.append(file.readBlock(nb_bytes - 1));
+  if (buffer.size() != nb_bytes) {
+    debug("Failed to read VINT data");
+    return 0;
+  }
+  return buffer.toUInt(true);
+}
+
 void EBML::Element::skipData(File &file) 
 {
   file.seek(dataSize, File::Position::Current);
+}
+
+offset_t EBML::Element::headSize() const
+{ 
+  return EBML::idSize(id) + sizeLength;
+}
+
+ByteVector EBML::Element::render()
+{
+  ByteVector buffer = renderId();
+  buffer.append(renderVINT(0, 0));
+  return buffer;
+}
+
+ByteVector EBML::Element::renderId()
+{
+  int numBytes = idSize(id);
+  id = Utils::byteSwap(id);
+  return ByteVector((char*) &id + (4 - numBytes), numBytes);
 }

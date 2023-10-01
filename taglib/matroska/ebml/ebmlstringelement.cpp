@@ -23,6 +23,7 @@
 #include "tstring.h"
 #include "tbytevector.h"
 #include "tdebug.h"
+#include <string>
 
 using namespace TagLib;
 
@@ -45,3 +46,16 @@ bool EBML::StringElement<t>::read(TagLib::File &file)
 }
 template bool EBML::StringElement<String::UTF8>::read(TagLib::File &file);
 template bool EBML::StringElement<String::Latin1>::read(TagLib::File &file);
+
+template<String::Type t>
+ByteVector EBML::StringElement<t>::render()
+{
+  ByteVector buffer = renderId();
+  std::string string = value.to8Bit(t == String::UTF8);
+  dataSize = string.size();
+  buffer.append(renderVINT(dataSize, 0));
+  buffer.append(ByteVector(string.data(), dataSize));
+  return buffer;
+}
+template ByteVector EBML::StringElement<String::UTF8>::render();
+template ByteVector EBML::StringElement<String::Latin1>::render();

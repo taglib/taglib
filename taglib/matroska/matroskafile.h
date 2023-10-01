@@ -34,16 +34,19 @@
 namespace TagLib {
   namespace Matroska {
     class Properties;
+    class Tag;
     class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
       File(FileName file, bool readProperties = true);
+      File(IOStream *stream, bool readProperties = true);
       ~File() override;
       File(const File &) = delete;
       File &operator=(const File &) = delete;
       AudioProperties *audioProperties() const override { return nullptr; }
       TagLib::Tag *tag() const override;
-      bool save() override { return false; }
+      Matroska::Tag *tag(bool create) const;
+      bool save() override;
       //PropertyMap properties() const override { return PropertyMap(); }
       //void removeUnsupportedProperties(const StringList &properties) override { }
     private:

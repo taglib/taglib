@@ -37,7 +37,7 @@ Matroska::Tag* EBML::MkTags::parse()
 
   // Loop through each <Tag> element
   for (auto tagsChild : elements) {
-    if (tagsChild->getId() != EBML_ID_MK_TAG)
+    if (tagsChild->getId() != ElementIDs::MkTag)
       continue;
     auto tag = static_cast<MasterElement*>(tagsChild);
     List<MasterElement*> simpleTags;
@@ -46,20 +46,20 @@ Matroska::Tag* EBML::MkTags::parse()
     // Identify the <Targets> element and the <SimpleTag> elements
     for (auto tagChild : *tag) {
       Id tagChildId = tagChild->getId();
-      if (!targets && tagChildId == EBML_ID_MK_TAG_TARGETS)
+      if (!targets && tagChildId == ElementIDs::MkTagTargets)
         targets = static_cast<MasterElement*>(tagChild);
-      else if (tagChildId == EBML_ID_MK_SIMPLE_TAG)
+      else if (tagChildId == ElementIDs::MkSimpleTag)
         simpleTags.append(static_cast<MasterElement*>(tagChild));
     }
 
     // Parse the <Targets> element
-    Matroska::Tag::TargetTypeValue targetTypeValue = Matroska::Tag::TargetTypeValue::None;
+    Matroska::SimpleTag::TargetTypeValue targetTypeValue = Matroska::SimpleTag::TargetTypeValue::None;
     if (targets) {
       for (auto targetsChild : *targets) {
         Id id = targetsChild->getId();
-        if (id == EBML_ID_MK_TARGET_TYPE_VALUE
-            && targetTypeValue == Matroska::Tag::TargetTypeValue::None) {
-          targetTypeValue = static_cast<Matroska::Tag::TargetTypeValue>(
+        if (id == ElementIDs::MkTagTargetTypeValue
+            && targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) {
+          targetTypeValue = static_cast<Matroska::SimpleTag::TargetTypeValue>(
             static_cast<UIntElement*>(targetsChild)->getValue()
           );            
         }
@@ -74,9 +74,9 @@ Matroska::Tag* EBML::MkTags::parse()
 
       for (auto simpleTagChild : *simpleTag) {
         Id id = simpleTagChild->getId();
-        if (id == EBML_ID_MK_TAG_NAME && !tagName)
+        if (id == ElementIDs::MkTagName && !tagName)
           tagName = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
-        else if (id == EBML_ID_MK_TAG_STRING && !tagValueString)
+        else if (id == ElementIDs::MkTagString && !tagValueString)
           tagValueString = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
       }
       if (!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
@@ -85,12 +85,14 @@ Matroska::Tag* EBML::MkTags::parse()
       // Create a Simple Tag object and add it to the Tag object
       Matroska::SimpleTag *sTag = nullptr;
       if (tagValueString) {
-        auto sTagString = new Matroska::SimpleTagString(targetTypeValue);
+        auto sTagString = new Matroska::SimpleTagString();
+        sTagString->setTargetTypeValue(targetTypeValue);
         sTagString->setValue(*tagValueString);
         sTag = sTagString;
       }
       else if (tagValueBinary) {
-        auto sTagBinary = new Matroska::SimpleTagBinary(targetTypeValue);
+        auto sTagBinary = new Matroska::SimpleTagBinary();
+        sTagBinary->setTargetTypeValue(targetTypeValue);
         sTagBinary->setValue(*tagValueBinary);
         sTag = sTagBinary;
       }

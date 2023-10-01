@@ -20,6 +20,7 @@
 
 #include "ebmlmasterelement.h"
 #include "taglib.h"
+#include <tuple>
 
 #ifndef TAGLIB_EBMLMKSEGMENT_H
 #define TAGLIB_EBMLMKSEGMENT_H
@@ -36,14 +37,16 @@ namespace TagLib {
     {
     public:
       MkSegment(int sizeLength, offset_t dataSize)
-      : MasterElement(EBML_ID_MK_SEGMENT, sizeLength, dataSize)
+      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize)
       {}
       ~MkSegment() override;
       bool read(File &file) override;
-      Matroska::Tag* parseTag();
+      std::tuple<Matroska::Tag*, offset_t, offset_t> parseTag();
 
     private:
       MkTags *tags = nullptr;
+      offset_t tagsOffset = 0;
+      offset_t tagsOriginalSize = 0;
 
     };
   }

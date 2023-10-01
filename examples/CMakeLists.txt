@@ -44,6 +44,11 @@ target_link_libraries(strip-id3v1 tag)
 add_executable(matroskareader matroskareader.cpp)
 target_link_libraries(matroskareader tag)
 
+########### next target ###############
+
+add_executable(matroskawriter matroskawriter.cpp)
+target_link_libraries(matroskawriter tag)
+
 install(TARGETS tagreader tagreader_c tagwriter framelist strip-id3v1
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
