@@ -29,13 +29,7 @@
 
 using namespace TagLib;
 
-namespace TagLib::EBML {
-  template<int maxSizeLength>
-  unsigned int getNumBytes(uint8_t firstByte);
-}
-
-
-EBML::Element* EBML::findElement(File &file, EBML::Id id, offset_t maxOffset)
+EBML::Element* EBML::findElement(File &file, EBML::Element::Id id, offset_t maxOffset)
 {
   Element *element = nullptr;
   while (file.tell() < maxOffset) {
@@ -54,46 +48,6 @@ EBML::Element* EBML::findNextElement(File &file, offset_t maxOffset)
   return file.tell() < maxOffset ? Element::factory(file) : nullptr;
 }
 
-template<int maxSizeLength>
-unsigned int EBML::getNumBytes(uint8_t firstByte)
-{
-  static_assert(maxSizeLength >= 1 && maxSizeLength <= 8);
-  if (!firstByte) {
-    debug("VINT with greater than 8 bytes not allowed");
-    return 0;
-  }
-  uint8_t mask = 0b10000000;
-  unsigned int numBytes = 1;
-  while (!(mask & firstByte)) {
-    numBytes++;
-    mask >>= 1;
-  }
-  if (numBytes > maxSizeLength) {
-    debug(Utils::formatString("VINT size length exceeds %i bytes", maxSizeLength));
-    return 0;
-  }
-  return numBytes;
-}
-
-EBML::Id EBML::readId(File &file)
-{
-  auto buffer = file.readBlock(1);
-  if (buffer.size() != 1) {
-    debug("Failed to read VINT size");
-    return 0;
-  }
-  unsigned int nb_bytes = getNumBytes<4>(*buffer.begin());
-  if (!nb_bytes)
-    return 0;
-  if (nb_bytes > 1)
-    buffer.append(file.readBlock(nb_bytes - 1));
-  if (buffer.size() != nb_bytes) {
-    debug("Failed to read VINT data");
-    return 0;
-  }
-  return buffer.toUInt(true);
-}
-
 template<typename T>
 std::pair<int, T> EBML::readVINT(File &file)
 {
@@ -103,7 +57,7 @@ std::pair<int, T> EBML::readVINT(File &file)
     debug("Failed to read VINT size");
     return {0, 0};
   }
-  unsigned int nb_bytes = getNumBytes<8>(*buffer.begin());
+  unsigned int nb_bytes = VINTSizeLength<8>(*buffer.begin());
   if (!nb_bytes)
     return {0, 0};
 
@@ -124,7 +78,7 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
   if (buffer.isEmpty())
     return {0, 0};
 
-  unsigned int numBytes = getNumBytes<8>(*buffer.begin());
+  unsigned int numBytes = VINTSizeLength<8>(*buffer.begin());
   if (!numBytes)
     return {0, 0};
 
@@ -135,4 +89,14 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
 namespace TagLib::EBML {
   template std::pair<int, offset_t> parseVINT<offset_t>(const ByteVector &buffer);
   template std::pair<int, uint64_t> parseVINT<uint64_t>(const ByteVector &buffer);
+}
+
+ByteVector EBML::renderVINT(uint64_t number, int minSizeLength)
+{
+  int numBytes = std::max(minSizeLength, minSize(number));
+  number |= (1ULL << (numBytes * 7));
+  static const auto byteOrder = Utils::systemByteOrder();
+  if (byteOrder == Utils::LittleEndian)
+    number = Utils::byteSwap(static_cast<unsigned long long>(number));
+  return ByteVector((char*) &number + (sizeof(number) - numBytes), numBytes); 
 }

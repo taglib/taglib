@@ -36,7 +36,10 @@ namespace TagLib {
     {
     public:
       MkTags(int sizeLength, offset_t dataSize)
-      : MasterElement(EBML_ID_MK_TAGS, sizeLength, dataSize)
+      : MasterElement(ElementIDs::MkTags, sizeLength, dataSize)
+      {}
+      MkTags()
+      : MasterElement(ElementIDs::MkTags, 0, 0)
       {}
       //virtual void read(File &file) override;
       Matroska::Tag* parse();

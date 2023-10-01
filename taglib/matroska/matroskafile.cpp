@@ -44,6 +44,11 @@ public:
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
   Matroska::Tag *tag = nullptr;
+  offset_t tagsOffset = 0;
+  offset_t tagsOriginalSize = 0;
+  offset_t segmentSizeOffset = 0;
+  offset_t segmentSizeLength = 0;
+  offset_t segmentDataSize = 0;
 
   //Properties *properties = nullptr;
 };
@@ -59,11 +64,33 @@ Matroska::File::File(FileName file, bool readProperties)
   }
   read(readProperties);
 }
+Matroska::File::File(IOStream *stream, bool readProperties)
+: TagLib::File(stream),
+  d(std::make_unique<FilePrivate>())
+{
+  if (!isOpen()) {
+    debug("Failed to open matroska file");
+    setValid(false);
+    return;
+  }
+  read(readProperties);
+}
 Matroska::File::~File() = default;
 
 TagLib::Tag* Matroska::File::tag() const
 {
-  return d->tag;
+  return tag(true);
+}
+
+Matroska::Tag* Matroska::File::tag(bool create) const
+{
+  if (d->tag)
+    return d->tag;
+  else {
+    if (create)
+      d->tag = new Matroska::Tag();
+    return d->tag;
+  }
 }
 
 void Matroska::File::read(bool readProperties)
@@ -72,27 +99,55 @@ void Matroska::File::read(bool readProperties)
 
   // Find the EBML Header
   std::unique_ptr<EBML::Element> head(EBML::Element::factory(*this));
-  if (!head || head->getId() != EBML_ID_HEAD) {
+  if (!head || head->getId() != EBML::ElementIDs::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
     return;
   }
   head->skipData(*this);
 
-  // Find the Matroska segment
+  // Find the Matroska segment in the file
   std::unique_ptr<EBML::MkSegment> segment(
-    static_cast<EBML::MkSegment*>(EBML::findElement(*this, EBML_ID_MK_SEGMENT, fileLength - tell()))
+    static_cast<EBML::MkSegment*>(
+      EBML::findElement(*this, EBML::ElementIDs::MkSegment, fileLength - tell())
+    )
   );
   if (!segment) {
     debug("Failed to find Matroska segment");
     setValid(false);
     return;
   }
+  d->segmentSizeLength = segment->getSizeLength();
+  d->segmentSizeOffset = tell() - d->segmentSizeLength;
+  d->segmentDataSize = segment->getDataSize();
+
+  // Read the segment into memory from file
   if (!segment->read(*this)) {
     debug("Failed to read segment");
     setValid(false);
     return;
   }
-  d->tag = segment->parseTag();
 
+  // Parse the tag
+  const auto& [tag, tagsOffset, tagsOriginalSize] = segment->parseTag();
+  d->tag = tag;
+  d->tagsOffset = tagsOffset;
+  d->tagsOriginalSize = tagsOriginalSize;
+
+}
+
+bool Matroska::File::save()
+{
+  if (d->tag) {
+    ByteVector tag = d->tag->render();
+    if (!d->tagsOriginalSize) {
+      d->tagsOffset = d->segmentSizeOffset + d->segmentSizeLength + d->segmentDataSize;
+    }
+    insert(tag, d->tagsOffset, d->tagsOriginalSize);
+    d->segmentDataSize += (tag.size() - d->tagsOriginalSize);
+    auto segmentDataSizeBuffer = EBML::renderVINT(d->segmentDataSize, d->segmentSizeLength);
+    insert(segmentDataSizeBuffer, d->segmentSizeOffset, d->segmentSizeLength);
+
+  }
+  return true;
 }

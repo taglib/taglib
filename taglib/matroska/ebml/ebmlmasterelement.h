@@ -22,8 +22,9 @@
 #define TAGLIB_EBMLMASTERELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include "ebmlelement.h"
 #include "ebmlutils.h"
+#include "ebmlelement.h"
+#include "tbytevector.h"
 #include "tlist.h"
 #include "taglib.h"
 
@@ -35,9 +36,14 @@ namespace TagLib {
       MasterElement(Id id, int sizeLength, offset_t dataSize)
       : Element(id, sizeLength, dataSize)
       {}
+      MasterElement(Id id)
+      : Element(id, 0, 0)
+      {}
       ~MasterElement() override;
       virtual bool isMaster() const override { return true; }
       virtual bool read(File &file) override;
+      ByteVector render() override;
+      void appendElement(Element *element) { elements.append(element); }
       List<Element*>::Iterator begin () { return elements.begin(); }
       List<Element*>::Iterator end () { return elements.end(); }
       List<Element*>::ConstIterator cbegin () const { return elements.cbegin(); }

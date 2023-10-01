@@ -33,11 +33,20 @@ bool EBML::UIntElement::read(TagLib::File &file)
     debug("Failed to read EBML Uint element");
     return false;
   }
-  const auto& [sizeLength, value] = parseVINT<uint64_t>(buffer);
-  if (!sizeLength) {
-    debug("Failed to parse VINT");
-    return false;
-  }
-  this->value = value;
+  value = buffer.toLongLong(true);
   return true;
+}
+
+ByteVector EBML::UIntElement::render()
+{
+  ByteVector buffer = renderId();
+  dataSize = minSize(value);
+  buffer.append(renderVINT(dataSize, 0));
+  uint64_t value = this->value;
+  static const auto byteOrder = Utils::systemByteOrder(); 
+  if (byteOrder == Utils::LittleEndian)
+    value = Utils::byteSwap((unsigned long long) value);
+
+  buffer.append(ByteVector((char*) &value + (sizeof(value) - dataSize), dataSize));
+  return buffer;
 }

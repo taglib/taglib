@@ -25,6 +25,7 @@
 #include <cstdint>
 #include "ebmlelement.h"
 #include "ebmlutils.h"
+#include "tbytevector.h"
 #include "tstring.h"
 
 namespace TagLib {
@@ -37,10 +38,13 @@ namespace TagLib {
       StringElement(Id id, int sizeLength, offset_t dataSize)
       : Element(id, sizeLength, dataSize)
       {}
+      StringElement(Id id)
+      : Element(id, 0, 0)
+      {}
       const String& getValue() const { return value; }
       void setValue(const String &value) { this->value = value; }
-      //template<String::Type t>
       bool read(File &file) override;
+      ByteVector render() override;
 
     private:
       String value;
