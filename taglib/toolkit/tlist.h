@@ -27,6 +27,7 @@
 #define TAGLIB_LIST_H
 
 #include <list>
+#include <initializer_list>
 #include <memory>
 
 #include "taglib.h"
@@ -70,6 +71,11 @@ namespace TagLib {
      * pass-by-value usage.
      */
     List(const List<T> &l);
+
+    /*!
+     * Construct a List with the contents of the braced initiliazer list
+     */
+    List(std::initializer_list<T> init);
 
     /*!
      * Destroys this List instance.  If auto deletion is enabled and this list
@@ -246,6 +252,13 @@ namespace TagLib {
      * pass-by-value usage.
      */
     List<T> &operator=(const List<T> &l);
+
+    /*!
+     * Replace the contents of the list with those of the braced initializer list.
+     *
+     * If auto deletion is enabled and the list contains a pointer type, the members are also deleted
+     */
+    List<T> &operator=(std::initializer_list<T> init);
 
     /*!
      * Exchanges the content of this list by the content of \a l.
