@@ -1,6 +1,9 @@
 /***************************************************************************
-    copyright           : (C) 2020 by Kevin Andre
-    email               : hyperquantum@gmail.com
+    copyright            : (C) 2020 by Kevin Andre
+    email                : hyperquantum@gmail.com
+
+    copyright            : (C) 2023 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,6 +26,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tversionnumber.h"
+#include "tstring.h"
 #include "taglib.h"
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -61,6 +66,7 @@ public:
     CPPUNIT_ASSERT(v210 >= v210);
     CPPUNIT_ASSERT(v220 >= v210);
     CPPUNIT_ASSERT(!(v210 >= v300));
+    CPPUNIT_ASSERT_EQUAL(String("2.1.0"), v210.toString());
   }
 
   void testRuntimeVersion()

@@ -29,7 +29,6 @@ INCLUDE_DIRECTORIES(
 
 SET(test_runner_SRCS
   main.cpp
-  test_taglib.cpp
   test_list.cpp
   test_map.cpp
   test_mpeg.cpp
@@ -70,6 +69,7 @@ SET(test_runner_SRCS
   test_speex.cpp
   test_dsf.cpp
   test_sizes.cpp
+  test_versionnumber.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

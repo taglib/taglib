@@ -1,6 +1,9 @@
 /***************************************************************************
     copyright            : (C) 2020 by Kevin Andre
     email                : hyperquantum@gmail.com
+
+    copyright            : (C) 2023 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,9 +26,29 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "tversionnumber.h"
+
+#include "tstring.h"
 #include "taglib.h"
 
-TagLib::VersionNumber TagLib::runtimeVersion()
+using namespace TagLib;
+
+////////////////////////////////////////////////////////////////////////////////
+// public methods
+////////////////////////////////////////////////////////////////////////////////
+
+String VersionNumber::toString() const
+{
+  return String::number(majorVersion()) + '.' +
+         String::number(minorVersion()) + '.' +
+         String::number(patchVersion());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// related functions
+////////////////////////////////////////////////////////////////////////////////
+
+VersionNumber TagLib::runtimeVersion()
 {
   return VersionNumber(TAGLIB_MAJOR_VERSION, TAGLIB_MINOR_VERSION, TAGLIB_PATCH_VERSION);
 }

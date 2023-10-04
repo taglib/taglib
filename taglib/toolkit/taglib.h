@@ -27,7 +27,6 @@
 #define TAGLIB_H
 
 #include "taglib_config.h"
-#include "taglib_export.h"
 
 #define TAGLIB_MAJOR_VERSION 2
 #define TAGLIB_MINOR_VERSION 0
@@ -83,102 +82,6 @@ namespace TagLib {
    * so I'm providing something here that should be constant.
    */
   using wstring = std::basic_string<wchar_t>;
-
-  /*!
-   * Version number with major, minor and patch segments.
-   */
-  class VersionNumber {
-  public:
-    /*!
-     * Constructs a version number from \a major, \a minor and \a patch segments.
-     */
-    constexpr VersionNumber(unsigned int major, unsigned int minor,
-                            unsigned int patch = 0)
-      : m_combined(((major & 0xff) << 16) | ((minor & 0xff) << 8)
-                  | (patch & 0xff)) {
-    }
-
-    /*!
-     * Returns the version as an unsigned integer in the form
-     * (major version << 16) | (minor version << 8) | (patch version),
-     * e.g. 0x020100 for version 2.1.0.
-     */
-    constexpr unsigned int combinedVersion() const {
-      return m_combined;
-    }
-
-    /*!
-     * Returns the major version, e.g. 2
-     */
-    constexpr unsigned int majorVersion() const {
-      return (m_combined & 0xff0000) >> 16;
-    }
-
-    /*!
-     * Returns the minor version, e.g. 1
-     */
-    constexpr unsigned int minorVersion() const {
-      return (m_combined & 0xff00) >> 8;
-    }
-
-    /*!
-     * Returns the patch version, e.g. 0
-     */
-    constexpr unsigned int patchVersion() const {
-      return m_combined & 0xff;
-    }
-
-    /*!
-     * Returns true if this version is equal to \a rhs.
-     */
-    constexpr bool operator==(const VersionNumber &rhs) const {
-      return m_combined == rhs.m_combined;
-    }
-
-    /*!
-     * Returns true if this version is not equal to \a rhs.
-     */
-    constexpr bool operator!=(const VersionNumber &rhs) const {
-      return m_combined != rhs.m_combined;
-    }
-
-    /*!
-     * Returns true if this version is less than \a rhs.
-     */
-    constexpr bool operator<(const VersionNumber &rhs) const {
-      return m_combined < rhs.m_combined;
-    }
-
-    /*!
-     * Returns true if this version is greater than \a rhs.
-     */
-    constexpr bool operator>(const VersionNumber &rhs) const {
-      return m_combined > rhs.m_combined;
-    }
-
-    /*!
-     * Returns true if this version is less or equal than \a rhs.
-     */
-    constexpr bool operator<=(const VersionNumber &rhs) const {
-      return m_combined <= rhs.m_combined;
-    }
-
-    /*!
-     * Returns true if this version is greater or equal than \a rhs.
-     */
-    constexpr bool operator>=(const VersionNumber &rhs) const {
-      return m_combined >= rhs.m_combined;
-    }
-
-  private:
-    unsigned int m_combined;
-  };
-
-  /*!
-   * Returns the version number of TagLib in use at runtime.
-   * This does not need not be the version the application was compiled with.
-   */
-  TAGLIB_EXPORT VersionNumber runtimeVersion();
 }  // namespace TagLib
 
 /*!
