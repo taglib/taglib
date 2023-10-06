@@ -69,6 +69,7 @@ SET(test_runner_SRCS
   test_speex.cpp
   test_dsf.cpp
   test_sizes.cpp
+  test_versionnumber.cpp
 )
 
 INCLUDE_DIRECTORIES(${CPPUNIT_INCLUDE_DIR})

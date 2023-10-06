@@ -48,6 +48,7 @@ set(tag_HDRS
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
   toolkit/tdebuglistener.h
+  toolkit/tversionnumber.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
@@ -307,6 +308,7 @@ set(toolkit_SRCS
   toolkit/tpropertymap.cpp
   toolkit/tdebuglistener.cpp
   toolkit/tzlib.cpp
+  toolkit/tversionnumber.cpp
 )
 
 set(tag_LIB_SRCS
