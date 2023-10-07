@@ -29,10 +29,10 @@
 #include "tstring.h"
 #include "tlist.h"
 #include "matroskafile.h"
+#include "matroskasimpletag.h"
 
 namespace TagLib {
   namespace Matroska {
-    class SimpleTag;
     using SimpleTagsList = List<SimpleTag*>;
     class TAGLIB_EXPORT Tag : public TagLib::Tag
     {
@@ -50,14 +50,14 @@ namespace TagLib {
       String genre() const override;
       unsigned int year() const override;
       unsigned int track() const override;
-      void setTitle(const String &s);
-      void setArtist(const String &s);
-      void setAlbum(const String &s);
-      void setComment(const String &s);
-      void setGenre(const String &s);
-      void setYear(unsigned int i);
-      void setTrack(unsigned int i);
-      bool isEmpty() const;
+      void setTitle(const String &s) override;
+      void setArtist(const String &s) override;
+      void setAlbum(const String &s) override;
+      void setComment(const String &s) override;
+      void setGenre(const String &s) override;
+      void setYear(unsigned int i) override;
+      void setTrack(unsigned int i) override;
+      bool isEmpty() const override;
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
       template <typename T>
