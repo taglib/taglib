@@ -193,7 +193,7 @@ Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &) = default;
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(std::initializer_list<std::pair<const Key, T>> init)
 {
-  d->map = init;
+  Map(init).swap(*this);
   return *this;
 }
 
