@@ -37,9 +37,13 @@ public:
   MapPrivate() = default;
 #ifdef WANT_CLASS_INSTANTIATION_OF_MAP
   MapPrivate(const std::map<class KeyP, class TP>& m) : map(m) {}
+  MapPrivate(std::initializer_list<std::pair<const class KeyP, class TP>> init) : map(init) {}
+
   std::map<class KeyP, class TP> map;
 #else
   MapPrivate(const std::map<KeyP, TP>& m) : map(m) {}
+  MapPrivate(std::initializer_list<std::pair<const KeyP, TP>> init) : map(init) {}
+
   std::map<KeyP, TP> map;
 #endif
 };
@@ -52,6 +56,12 @@ Map<Key, T>::Map() :
 
 template <class Key, class T>
 Map<Key, T>::Map(const Map<Key, T> &) = default;
+
+template <class Key, class T>
+Map<Key, T>::Map(std::initializer_list<std::pair<const Key, T>> init) :
+  d(std::make_shared<MapPrivate<Key, T>>(init))
+{
+}
 
 template <class Key, class T>
 Map<Key, T>::~Map() = default;
@@ -179,6 +189,13 @@ T &Map<Key, T>::operator[](const Key &key)
 
 template <class Key, class T>
 Map<Key, T> &Map<Key, T>::operator=(const Map<Key, T> &) = default;
+
+template <class Key, class T>
+Map<Key, T> &Map<Key, T>::operator=(std::initializer_list<std::pair<const Key, T>> init)
+{
+  Map(init).swap(*this);
+  return *this;
+}
 
 template <class Key, class T>
 void Map<Key, T>::swap(Map<Key, T> &m)
