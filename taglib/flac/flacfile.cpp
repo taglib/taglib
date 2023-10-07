@@ -140,6 +140,71 @@ PropertyMap FLAC::File::setProperties(const PropertyMap &properties)
   return xiphComment(true)->setProperties(properties);
 }
 
+StringList FLAC::File::complexPropertyKeys() const
+{
+  StringList keys = TagLib::File::complexPropertyKeys();
+  if(!keys.contains("PICTURE")) {
+    for(const auto &block : std::as_const(d->blocks)) {
+      if(dynamic_cast<Picture *>(block) != nullptr) {
+        keys.append("PICTURE");
+        break;
+      }
+    }
+  }
+  return keys;
+}
+
+List<VariantMap> FLAC::File::complexProperties(const String &key) const
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    List<VariantMap> properties;
+    for(const auto &block : std::as_const(d->blocks)) {
+      if(auto picture = dynamic_cast<Picture *>(block)) {
+        VariantMap property;
+        property.insert("data", picture->data());
+        property.insert("mimeType", picture->mimeType());
+        property.insert("description", picture->description());
+        property.insert("pictureType",
+          FLAC::Picture::typeToString(picture->type()));
+        property.insert("width", picture->width());
+        property.insert("height", picture->height());
+        property.insert("numColors", picture->numColors());
+        property.insert("colorDepth", picture->colorDepth());
+        properties.append(property);
+      }
+    }
+    return properties;
+  }
+  return TagLib::File::complexProperties(key);
+}
+
+bool FLAC::File::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    removePictures();
+
+    for(auto property : value) {
+      FLAC::Picture *picture = new FLAC::Picture;
+      picture->setData(property.value("data").value<ByteVector>());
+      picture->setMimeType(property.value("mimeType").value<String>());
+      picture->setDescription(property.value("description").value<String>());
+      picture->setType(FLAC::Picture::typeFromString(
+        property.value("pictureType").value<String>()));
+      picture->setWidth(property.value("width").value<int>());
+      picture->setHeight(property.value("height").value<int>());
+      picture->setNumColors(property.value("numColors").value<int>());
+      picture->setColorDepth(property.value("colorDepth").value<int>());
+      addPicture(picture);
+    }
+  }
+  else {
+    return TagLib::File::setComplexProperties(key, value);
+  }
+  return true;
+}
+
 FLAC::Properties *FLAC::File::audioProperties() const
 {
   return d->properties.get();

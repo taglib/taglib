@@ -37,6 +37,8 @@
 #include "id3v2footer.h"
 #include "id3v2synchdata.h"
 #include "id3v1genres.h"
+#include "frames/attachedpictureframe.h"
+#include "frames/generalencapsulatedobjectframe.h"
 #include "frames/textidentificationframe.h"
 #include "frames/commentsframe.h"
 #include "frames/urllinkframe.h"
@@ -449,6 +451,84 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   for(const auto &[tag, frames] : std::as_const(properties))
       addFrame(Frame::createTextualFrame(tag, frames));
   return PropertyMap(); // ID3 implements the complete PropertyMap interface, so an empty map is returned
+}
+
+StringList ID3v2::Tag::complexPropertyKeys() const
+{
+  StringList keys;
+  if(d->frameListMap.contains("APIC")) {
+    keys.append("PICTURE");
+  }
+  if(d->frameListMap.contains("GEOB")) {
+    keys.append("GENERALOBJECT");
+  }
+  return keys;
+}
+
+List<VariantMap> ID3v2::Tag::complexProperties(const String &key) const
+{
+  List<VariantMap> properties;
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    const FrameList pictures = d->frameListMap.value("APIC");
+    for(const Frame *frame : pictures) {
+      auto picture = static_cast<const AttachedPictureFrame *>(frame);
+      VariantMap property;
+      property.insert("data", picture->picture());
+      property.insert("mimeType", picture->mimeType());
+      property.insert("description", picture->description());
+      property.insert("pictureType",
+        AttachedPictureFrame::typeToString(picture->type()));
+      properties.append(property);
+    }
+  }
+  else if(uppercaseKey == "GENERALOBJECT") {
+    const FrameList geobs = d->frameListMap.value("GEOB");
+    for(const Frame *frame : geobs) {
+      auto geob = static_cast<const GeneralEncapsulatedObjectFrame *>(frame);
+      VariantMap property;
+      property.insert("data", geob->object());
+      property.insert("mimeType", geob->mimeType());
+      property.insert("description", geob->description());
+      property.insert("fileName", geob->fileName());
+      properties.append(property);
+    }
+  }
+  return properties;
+}
+
+bool ID3v2::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    removeFrames("APIC");
+
+    for(auto property : value) {
+      auto picture = new AttachedPictureFrame;
+      picture->setPicture(property.value("data").value<ByteVector>());
+      picture->setMimeType(property.value("mimeType").value<String>());
+      picture->setDescription(property.value("description").value<String>());
+      picture->setType(AttachedPictureFrame::typeFromString(
+        property.value("pictureType").value<String>()));
+      addFrame(picture);
+    }
+  }
+  else if(uppercaseKey == "GENERALOBJECT") {
+    removeFrames("GEOB");
+
+    for(auto property : value) {
+      auto geob = new GeneralEncapsulatedObjectFrame;
+      geob->setObject(property.value("data").value<ByteVector>());
+      geob->setMimeType(property.value("mimeType").value<String>());
+      geob->setDescription(property.value("description").value<String>());
+      geob->setFileName(property.value("fileName").value<String>());
+      addFrame(geob);
+    }
+  }
+  else {
+    return false;
+  }
+  return true;
 }
 
 ByteVector ID3v2::Tag::render() const

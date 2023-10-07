@@ -162,6 +162,23 @@ namespace TagLib {
       PropertyMap setProperties(const PropertyMap &) override;
 
       /*!
+       * Returns ["PICTURE"] if any picture is stored in METADATA_BLOCK_PICTURE.
+       */
+      StringList complexPropertyKeys() const override;
+
+      /*!
+       * Get the pictures stored in METADATA_BLOCK_PICTURE as complex properties
+       * for \a key "PICTURE".
+       */
+      List<VariantMap> complexProperties(const String &key) const override;
+
+      /*!
+       * Set the complex properties \a value as pictures in METADATA_BLOCK_PICTURE
+       * for \a key "PICTURE".
+       */
+      bool setComplexProperties(const String &key, const List<VariantMap> &value) override;
+
+      /*!
        * Returns the FLAC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */

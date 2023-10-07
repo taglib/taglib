@@ -62,6 +62,10 @@ namespace TagLib {
     PropertyMap properties() const override;
     void removeUnsupportedProperties(const StringList &unsupported) override;
 
+    StringList complexPropertyKeys() const override;
+    List<VariantMap> complexProperties(const String &key) const override;
+    bool setComplexProperties(const String &key, const List<VariantMap> &value) override;
+
     String title() const override;
     String artist() const override;
     String album() const override;

@@ -124,6 +124,45 @@ void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
   }
 }
 
+StringList TagUnion::complexPropertyKeys() const
+{
+  for(const auto &tag : d->tags) {
+    if(tag) {
+      const StringList keys = tag->complexPropertyKeys();
+      if(!keys.isEmpty()) {
+        return keys;
+      }
+    }
+  }
+  return StringList();
+}
+
+List<VariantMap> TagUnion::complexProperties(const String &key) const
+{
+  for(const auto &tag : d->tags) {
+    if(tag) {
+      const List<VariantMap> props = tag->complexProperties(key);
+      if(!props.isEmpty()) {
+        return props;
+      }
+    }
+  }
+  return List<VariantMap>();
+}
+
+bool TagUnion::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  bool combinedResult = false;
+  for(const auto &tag : d->tags) {
+    if(tag) {
+      if(tag->setComplexProperties(key, value)) {
+        combinedResult = true;
+      }
+    }
+  }
+  return combinedResult;
+}
+
 String TagUnion::title() const
 {
   stringUnion(title);

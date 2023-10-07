@@ -47,6 +47,7 @@ set(tag_HDRS
   toolkit/tfilestream.h
   toolkit/tmap.h
   toolkit/tmap.tcc
+  toolkit/tpicturetype.h
   toolkit/tpropertymap.h
   toolkit/tdebuglistener.h
   toolkit/tversionnumber.h
@@ -307,6 +308,7 @@ set(toolkit_SRCS
   toolkit/tfile.cpp
   toolkit/tfilestream.cpp
   toolkit/tdebug.cpp
+  toolkit/tpicturetype.cpp
   toolkit/tpropertymap.cpp
   toolkit/tdebuglistener.cpp
   toolkit/tzlib.cpp

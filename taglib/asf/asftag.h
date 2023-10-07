@@ -204,6 +204,10 @@ namespace TagLib {
       void removeUnsupportedProperties(const StringList &props) override;
       PropertyMap setProperties(const PropertyMap &props) override;
 
+      StringList complexPropertyKeys() const override;
+      List<VariantMap> complexProperties(const String &key) const override;
+      bool setComplexProperties(const String &key, const List<VariantMap> &value) override;
+
     private:
 
       class TagPrivate;

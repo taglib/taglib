@@ -134,6 +134,28 @@ namespace TagLib {
     virtual PropertyMap setProperties(const PropertyMap &properties);
 
     /*!
+     * Get the keys of complex properties, i.e. properties which cannot be
+     * represented simply by a string.
+     * The default implementation calls Tag::complexPropertyKeys().
+     * \see Tag::complexPropertyKeys()
+     */
+    virtual StringList complexPropertyKeys() const;
+
+    /*!
+     * Get the complex properties for a given \a key.
+     * The default implementation calls Tag::complexProperties().
+     * \see Tag::complexProperties()
+     */
+    virtual List<VariantMap> complexProperties(const String &key) const;
+
+    /*!
+     * Set all complex properties for \a key using the variant maps \a value.
+     * The default implementation calls Tag::setComplexProperties().
+     * \see Tag::setComplexProperties()
+     */
+    virtual bool setComplexProperties(const String &key, const List<VariantMap> &value);
+
+    /*!
      * Returns a pointer to this file's audio properties.  This should be
      * reimplemented in the concrete subclasses.  If no audio properties were
      * read then this will return a null pointer.
