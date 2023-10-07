@@ -53,6 +53,7 @@ template <class TP> class List<T>::ListPrivate  : public ListPrivateBase
 public:
   using ListPrivateBase::ListPrivateBase;
   ListPrivate(const std::list<TP> &l) : list(l) {}
+  ListPrivate(std::initializer_list<TP> init) : list(init) {}
   void clear() {
     list.clear();
   }
@@ -68,6 +69,7 @@ template <class TP> class List<T>::ListPrivate<TP *> : public ListPrivateBase
 public:
   using ListPrivateBase::ListPrivateBase;
   ListPrivate(const std::list<TP *> &l) : list(l) {}
+  ListPrivate(std::initializer_list<TP *> init) : list(init) {}
   ~ListPrivate() {
     clear();
   }
@@ -95,6 +97,12 @@ List<T>::List() :
 
 template <class T>
 List<T>::List(const List<T> &) = default;
+
+template <class T>
+List<T>::List(std::initializer_list<T> init) :
+  d(std::make_shared<ListPrivate<T>>(init))
+{
+}
 
 template <class T>
 List<T>::~List() = default;
@@ -292,6 +300,15 @@ const T &List<T>::operator[](unsigned int i) const
 
 template <class T>
 List<T> &List<T>::operator=(const List<T> &) = default;
+
+template <class T>
+List<T> &List<T>::operator=(std::initializer_list<T> init)
+{
+  bool autoDelete = d->autoDelete;
+  List(init).swap(*this);
+  setAutoDelete(autoDelete);
+  return *this;
+}
 
 template <class T>
 void List<T>::swap(List<T> &l)

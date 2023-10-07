@@ -34,6 +34,7 @@ class TestList : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestList);
   CPPUNIT_TEST(testAppend);
   CPPUNIT_TEST(testDetach);
+  CPPUNIT_TEST(bracedInit);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -69,6 +70,56 @@ public:
     *it = 33;
     CPPUNIT_ASSERT_EQUAL(3,  l1[2]);
     CPPUNIT_ASSERT_EQUAL(33, l2[2]);
+  }
+
+  void bracedInit()
+  {
+    List<int> l1 {
+      1,
+      2,
+      3
+    };
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(l1.size()));
+    CPPUNIT_ASSERT_EQUAL(1, l1[0]);
+    CPPUNIT_ASSERT_EQUAL(2, l1[1]);
+    CPPUNIT_ASSERT_EQUAL(3, l1[2]);
+
+    List<int*> l2 {
+      new int(1),
+      new int(2),
+      new int(3)
+    };
+    l2.setAutoDelete(true);
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(l2.size()));
+    CPPUNIT_ASSERT_EQUAL(1, *l2[0]);
+    CPPUNIT_ASSERT_EQUAL(2, *l2[1]);
+    CPPUNIT_ASSERT_EQUAL(3, *l2[2]);
+
+    List<int> l3 = {
+      1,
+      2,
+      3
+    };
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(l3.size()));
+    CPPUNIT_ASSERT_EQUAL(1, l3[0]);
+    CPPUNIT_ASSERT_EQUAL(2, l3[1]);
+    CPPUNIT_ASSERT_EQUAL(3, l3[2]);
+
+    List<int*> l4 = {
+      new int(1),
+      new int(2),
+      new int(3)
+    };
+    l4.setAutoDelete(true);
+    l4 = {
+      new int(4),
+      new int(5),
+      new int(6)
+    };
+    CPPUNIT_ASSERT_EQUAL(3, static_cast<int>(l4.size()));
+    CPPUNIT_ASSERT_EQUAL(4, *l4[0]);
+    CPPUNIT_ASSERT_EQUAL(5, *l4[1]);
+    CPPUNIT_ASSERT_EQUAL(6, *l4[2]);
   }
 
 };
