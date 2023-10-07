@@ -305,7 +305,7 @@ template <class T>
 List<T> &List<T>::operator=(std::initializer_list<T> init)
 {
   bool autoDelete = d->autoDelete;
-  d = std::make_shared<ListPrivate<T>>(init);
+  List(init).swap(*this);
   setAutoDelete(autoDelete);
   return *this;
 }
