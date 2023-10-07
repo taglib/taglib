@@ -205,6 +205,18 @@ void Map<Key, T>::swap(Map<Key, T> &m)
   swap(d, m.d);
 }
 
+template <class Key, class T>
+bool Map<Key, T>::operator==(const Map<Key, T> &m) const
+{
+  return d->map == m.d->map;
+}
+
+template <class Key, class T>
+bool Map<Key, T>::operator!=(const Map<Key, T> &m) const
+{
+  return d->map != m.d->map;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

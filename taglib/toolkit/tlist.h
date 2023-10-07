@@ -73,7 +73,7 @@ namespace TagLib {
     List(const List<T> &l);
 
     /*!
-     * Construct a List with the contents of the braced initiliazer list
+     * Construct a List with the contents of the braced initializer list.
      */
     List(std::initializer_list<T> init);
 

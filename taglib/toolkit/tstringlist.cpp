@@ -61,12 +61,23 @@ StringList::StringList(const StringList &l) :
 {
 }
 
+StringList::StringList(std::initializer_list<String> init) :
+  List<String>(init)
+{
+}
+
 StringList &StringList::operator=(const StringList &l)
 {
   if(this == &l)
     return *this;
 
   List<String>::operator=(l);
+  return *this;
+}
+
+StringList &StringList::operator=(std::initializer_list<String> init)
+{
+  List<String>::operator=(init);
   return *this;
 }
 

@@ -59,7 +59,13 @@ namespace TagLib {
      */
     ByteVectorList(const ByteVectorList &l);
 
+    /*!
+     * Construct a ByteVectorList with the contents of the braced initializer list.
+     */
+    ByteVectorList(std::initializer_list<ByteVector> init);
+
     ByteVectorList &operator=(const ByteVectorList &);
+    ByteVectorList &operator=(std::initializer_list<ByteVector> init);
 
     /*!
      * Convert the ByteVectorList to a ByteVector separated by \a separator.  By
@@ -82,5 +88,11 @@ namespace TagLib {
   };
 
 }  // namespace TagLib
+
+/*!
+ * \related TagLib::ByteVectorList
+ * Send the ByteVectorList to an output stream.
+ */
+std::ostream TAGLIB_EXPORT &operator<<(std::ostream &s, const TagLib::ByteVectorList &l);
 
 #endif

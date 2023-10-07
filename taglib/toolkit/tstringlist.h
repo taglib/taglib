@@ -58,7 +58,13 @@ namespace TagLib {
      */
     StringList(const StringList &l);
 
+    /*!
+     * Construct a StringList with the contents of the braced initializer list.
+     */
+    StringList(std::initializer_list<String> init);
+
     StringList &operator=(const StringList &);
+    StringList &operator=(std::initializer_list<String> init);
 
     /*!
      * Constructs a StringList with \a s as a member.

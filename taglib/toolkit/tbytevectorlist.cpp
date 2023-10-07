@@ -72,12 +72,23 @@ ByteVectorList::ByteVectorList(const ByteVectorList &l) :
 {
 }
 
+ByteVectorList::ByteVectorList(std::initializer_list<ByteVector> init) :
+  List<ByteVector>(init)
+{
+}
+
 ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
 {
   if(this == &l)
     return *this;
 
   List<ByteVector>::operator=(l);
+  return *this;
+}
+
+ByteVectorList &ByteVectorList::operator=(std::initializer_list<ByteVector> init)
+{
+  List<ByteVector>::operator=(init);
   return *this;
 }
 
@@ -92,4 +103,19 @@ ByteVector ByteVectorList::toByteVector(const ByteVector &separator) const
   }
 
   return v;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// related functions
+////////////////////////////////////////////////////////////////////////////////
+
+std::ostream &operator<<(std::ostream &s, const ByteVectorList &l)
+{
+  for(auto it = l.begin(); it != l.end(); ++it) {
+    if(it != l.begin()) {
+      s << ' ';
+    }
+    s << *it;
+  }
+  return s;
 }

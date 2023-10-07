@@ -212,6 +212,17 @@ namespace TagLib {
      */
     void swap(Map<Key, T> &m);
 
+    /*!
+     * Compares this map with \a m and returns true if all of the elements are
+     * the same.
+     */
+    bool operator==(const Map<Key, T> &m) const;
+
+    /*!
+     * Compares this map with \a m and returns true if the maps differ.
+     */
+    bool operator!=(const Map<Key, T> &m) const;
+
   protected:
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
