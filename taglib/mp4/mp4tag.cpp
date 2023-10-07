@@ -32,6 +32,7 @@
 #include "tpropertymap.h"
 #include "id3v1genres.h"
 #include "mp4atom.h"
+#include "mp4coverart.h"
 
 using namespace TagLib;
 
@@ -1064,6 +1065,78 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
   }
 
   return ignoredProps;
+}
+
+StringList MP4::Tag::complexPropertyKeys() const
+{
+  StringList keys;
+  if(d->items.contains("covr")) {
+    keys.append("PICTURE");
+  }
+  return keys;
+}
+
+List<VariantMap> MP4::Tag::complexProperties(const String &key) const
+{
+  List<VariantMap> properties;
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    const CoverArtList pictures = d->items.value("covr").toCoverArtList();
+    for(const CoverArt &picture : pictures) {
+      String mimeType = "image/";
+      switch(picture.format()) {
+      case CoverArt::BMP:
+        mimeType.append("bmp");
+        break;
+      case CoverArt::JPEG:
+        mimeType.append("jpeg");
+        break;
+      case CoverArt::GIF:
+        mimeType.append("gif");
+        break;
+      case CoverArt::PNG:
+        mimeType.append("png");
+        break;
+      case CoverArt::Unknown:
+        break;
+      }
+
+      VariantMap property;
+      property.insert("data", picture.data());
+      property.insert("mimeType", mimeType);
+      properties.append(property);
+    }
+  }
+  return properties;
+}
+
+bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    CoverArtList pictures;
+    for(auto property : value) {
+      String mimeType = property.value("mimeType").value<String>();
+      CoverArt::Format format;
+      if(mimeType == "image/bmp") {
+        format = CoverArt::BMP;
+      } else if(mimeType == "image/png") {
+        format = CoverArt::PNG;
+      } else if(mimeType == "image/gif") {
+        format = CoverArt::GIF;
+      } else if(mimeType == "image/jpeg") {
+        format = CoverArt::JPEG;
+      } else {
+        format = CoverArt::Unknown;
+      }
+      pictures.append(CoverArt(format, property.value("data").value<ByteVector>()));
+    }
+    d->items["covr"] = pictures;
+  }
+  else {
+    return false;
+  }
+  return true;
 }
 
 void MP4::Tag::addItem(const String &name, const Item &value)

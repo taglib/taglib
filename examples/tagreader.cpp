@@ -27,6 +27,8 @@
 #include <cstdio>
 
 #include "tpropertymap.h"
+#include "tstringlist.h"
+#include "tvariant.h"
 #include "fileref.h"
 #include "tag.h"
 
@@ -65,10 +67,39 @@ int main(int argc, char *argv[])
       cout << "-- TAG (properties) --" << endl;
       for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
         for(auto j = i->second.begin(); j != i->second.end(); ++j) {
-          cout << left << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
+          cout << left << std::setfill(' ') << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
         }
       }
 
+      TagLib::StringList names = f.file()->complexPropertyKeys();
+      for(const auto &name : names) {
+        const auto& properties = f.file()->complexProperties(name);
+        for(const auto &property : properties) {
+          cout << name << ":" << endl;
+          for(const auto &[key, value] : property) {
+            cout << "  " << left << std::setfill(' ') << std::setw(11) << key << " - ";
+            if(value.type() == TagLib::Variant::ByteVector) {
+              cout << "(" << value.value<TagLib::ByteVector>().size() << " bytes)" << endl;
+              /* The picture could be extracted using:
+              ofstream picture;
+              TagLib::String fn(argv[i]);
+              int slashPos = fn.rfind('/');
+              int dotPos = fn.rfind('.');
+              if(slashPos >= 0 && dotPos > slashPos) {
+                fn = fn.substr(slashPos + 1, dotPos - slashPos - 1);
+              }
+              fn += ".jpg";
+              picture.open(fn.toCString(), ios_base::out | ios_base::binary);
+              picture << value.value<TagLib::ByteVector>();
+              picture.close();
+              */
+            }
+            else {
+              cout << value << endl;
+            }
+          }
+        }
+      }
     }
 
     if(!f.isNull() && f.audioProperties()) {

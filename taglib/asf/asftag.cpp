@@ -29,6 +29,8 @@
 #include <utility>
 
 #include "tpropertymap.h"
+#include "asfattribute.h"
+#include "asfpicture.h"
 
 using namespace TagLib;
 
@@ -372,4 +374,55 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   }
 
   return ignoredProps;
+}
+
+StringList ASF::Tag::complexPropertyKeys() const
+{
+  StringList keys;
+  if(d->attributeListMap.contains("WM/Picture")) {
+    keys.append("PICTURE");
+  }
+  return keys;
+}
+
+List<VariantMap> ASF::Tag::complexProperties(const String &key) const
+{
+  List<VariantMap> properties;
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    const AttributeList pictures = d->attributeListMap.value("WM/Picture");
+    for(const Attribute &attribute : pictures) {
+      ASF::Picture picture = attribute.toPicture();
+      VariantMap property;
+      property.insert("data", picture.picture());
+      property.insert("mimeType", picture.mimeType());
+      property.insert("description", picture.description());
+      property.insert("pictureType",
+        ASF::Picture::typeToString(picture.type()));
+      properties.append(property);
+    }
+  }
+  return properties;
+}
+
+bool ASF::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    removeItem("WM/Picture");;
+
+    for(auto property : value) {
+      ASF::Picture picture;
+      picture.setPicture(property.value("data").value<ByteVector>());
+      picture.setMimeType(property.value("mimeType").value<String>());
+      picture.setDescription(property.value("description").value<String>());
+      picture.setType(ASF::Picture::typeFromString(
+        property.value("pictureType").value<String>()));
+      addAttribute("WM/Picture", Attribute(picture));
+    }
+  }
+  else {
+    return false;
+  }
+  return true;
 }

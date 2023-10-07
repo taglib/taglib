@@ -130,6 +130,10 @@ namespace TagLib {
        */
       PropertyMap setProperties(const PropertyMap &) override;
 
+      StringList complexPropertyKeys() const override;
+      List<VariantMap> complexProperties(const String &key) const override;
+      bool setComplexProperties(const String &key, const List<VariantMap> &value) override;
+
       /*!
        * Check if the given String is a valid APE tag key.
        */

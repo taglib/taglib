@@ -106,6 +106,21 @@ PropertyMap File::setProperties(const PropertyMap &properties)
   return tag()->setProperties(properties);
 }
 
+StringList File::complexPropertyKeys() const
+{
+  return tag()->complexPropertyKeys();
+}
+
+List<VariantMap> File::complexProperties(const String &key) const
+{
+  return tag()->complexProperties(key);
+}
+
+bool File::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  return tag()->setComplexProperties(key, value);
+}
+
 ByteVector File::readBlock(size_t length)
 {
   return d->stream->readBlock(length);

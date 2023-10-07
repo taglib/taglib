@@ -235,6 +235,63 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
   return invalid;
 }
 
+StringList Ogg::XiphComment::complexPropertyKeys() const
+{
+  StringList keys;
+  if(!d->pictureList.isEmpty()) {
+    keys.append("PICTURE");
+  }
+  return keys;
+}
+
+List<VariantMap> Ogg::XiphComment::complexProperties(const String &key) const
+{
+  List<VariantMap> properties;
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    for(const FLAC::Picture *picture : std::as_const(d->pictureList)) {
+      VariantMap property;
+      property.insert("data", picture->data());
+      property.insert("mimeType", picture->mimeType());
+      property.insert("description", picture->description());
+      property.insert("pictureType",
+        FLAC::Picture::typeToString(picture->type()));
+      property.insert("width", picture->width());
+      property.insert("height", picture->height());
+      property.insert("numColors", picture->numColors());
+      property.insert("colorDepth", picture->colorDepth());
+      properties.append(property);
+    }
+  }
+  return properties;
+}
+
+bool Ogg::XiphComment::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    removeAllPictures();
+
+    for(auto property : value) {
+      FLAC::Picture *picture = new FLAC::Picture;
+      picture->setData(property.value("data").value<ByteVector>());
+      picture->setMimeType(property.value("mimeType").value<String>());
+      picture->setDescription(property.value("description").value<String>());
+      picture->setType(FLAC::Picture::typeFromString(
+        property.value("pictureType").value<String>()));
+      picture->setWidth(property.value("width").value<int>());
+      picture->setHeight(property.value("height").value<int>());
+      picture->setNumColors(property.value("numColors").value<int>());
+      picture->setColorDepth(property.value("colorDepth").value<int>());
+      addPicture(picture);
+    }
+  }
+  else {
+    return false;
+  }
+  return true;
+}
+
 bool Ogg::XiphComment::checkKey(const String &key)
 {
   if(key.size() < 1)

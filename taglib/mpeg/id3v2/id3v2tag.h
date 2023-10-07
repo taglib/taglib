@@ -329,6 +329,10 @@ namespace TagLib {
        */
       PropertyMap setProperties(const PropertyMap &) override;
 
+      StringList complexPropertyKeys() const override;
+      List<VariantMap> complexProperties(const String &key) const override;
+      bool setComplexProperties(const String &key, const List<VariantMap> &value) override;
+
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
        */

@@ -146,6 +146,21 @@ PropertyMap Tag::setProperties(const PropertyMap &origProps)
   return properties;
 }
 
+StringList Tag::complexPropertyKeys() const
+{
+  return StringList();
+}
+
+List<VariantMap> Tag::complexProperties(const String &) const
+{
+  return {};
+}
+
+bool Tag::setComplexProperties(const String &, const List<VariantMap> &)
+{
+  return false;
+}
+
 void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
 {
   if(overwrite) {

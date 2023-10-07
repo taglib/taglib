@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
@@ -33,6 +35,7 @@
 #include "tlist.h"
 #include "tfile.h"
 #include "tpropertymap.h"
+#include "tvariant.h"
 #include "fileref.h"
 #include "tag.h"
 
@@ -69,6 +72,7 @@ void usage()
   cout << "  -R <tagname> <tagvalue>"   << endl;
   cout << "  -I <tagname> <tagvalue>"   << endl;
   cout << "  -D <tagname>"   << endl;
+  cout << "  -p <picturefile> <description> (\"\" \"\" to remove)" << endl;
   cout << endl;
 
   exit(1);
@@ -109,12 +113,14 @@ int main(int argc, char *argv[])
   if(fileList.isEmpty())
     usage();
 
-  for(int i = 1; i < argc - 1; i += 2) {
+  int i = 1;
+  while(i < argc - 1) {
 
     if(isArgument(argv[i]) && i + 1 < argc && !isArgument(argv[i + 1])) {
 
       char field = argv[i][1];
       TagLib::String value = argv[i + 1];
+      int numArgsConsumed = 2;
 
       TagLib::List<TagLib::FileRef>::ConstIterator it;
       for(it = fileList.cbegin(); it != fileList.cend(); ++it) {
@@ -153,7 +159,7 @@ int main(int argc, char *argv[])
             else {
               map.insert(value, TagLib::String(argv[i + 2]));
             }
-            ++i;
+            numArgsConsumed = 3;
             checkForRejectedProperties((*it).file()->setProperties(map));
           }
           else {
@@ -166,11 +172,49 @@ int main(int argc, char *argv[])
           checkForRejectedProperties((*it).file()->setProperties(map));
           break;
         }
+        case 'p': {
+          if(i + 2 < argc) {
+            numArgsConsumed = 3;
+            if(!value.isEmpty()) {
+              if(!isFile(value.toCString())) {
+                cout << value.toCString() << " not found." << endl;
+                return 1;
+              }
+              ifstream picture;
+              picture.open(value.toCString());
+              stringstream buffer;
+              buffer << picture.rdbuf();
+              picture.close();
+              TagLib::String buf(buffer.str());
+              TagLib::ByteVector data(buf.data(TagLib::String::Latin1));
+              TagLib::String mimeType = data.startsWith("\x89PNG\x0d\x0a\x1a\x0a")
+                ? "image/png" : "image/jpeg";
+              TagLib::String description(argv[i + 2]);
+              it->file()->setComplexProperties("PICTURE", {
+                {
+                  {"data", data},
+                  {"pictureType", "Front Cover"},
+                  {"mimeType", mimeType},
+                  {"description", description}
+                }
+              });
+            }
+            else {
+              // empty value, remove pictures
+              it->file()->setComplexProperties("PICTURE", {});
+            }
+          }
+          else {
+            usage();
+          }
+          break;
+        }
         default:
           usage();
           break;
         }
       }
+      i += numArgsConsumed;
     }
     else
       usage();

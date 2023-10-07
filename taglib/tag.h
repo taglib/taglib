@@ -28,6 +28,8 @@
 
 #include "taglib_export.h"
 #include "tstring.h"
+#include "tlist.h"
+#include "tvariant.h"
 
 namespace TagLib {
 
@@ -77,6 +79,49 @@ namespace TagLib {
      * in the returned PropertyMap.
      */
     virtual PropertyMap setProperties(const PropertyMap &origProps);
+
+    /*!
+     * Get the keys of complex properties, i.e. properties which cannot be
+     * represented simply by a string.
+     * Because such properties might be expensive to fetch, there are separate
+     * operations to get the available keys - which is expected to be cheap -
+     * and getting and setting the property values.
+     * The default implementation returns only an empty list.  Reimplementations
+     * should provide "PICTURE" if embedded cover art is present, and optionally
+     * support other properties.
+     */
+    virtual StringList complexPropertyKeys() const;
+
+    /*!
+     * Get the complex properties for a given \a key.
+     * In order to be flexible for different metadata formats, the properties
+     * are represented as variant maps.  Despite this dynamic nature, some
+     * degree of standardization should be achieved between formats:
+     *
+     * - PICTURE
+     *   - data: ByteVector with picture data
+     *   - description: String with description
+     *   - pictureType: String with type as specified for ID3v2,
+     *     e.g. "Front Cover", "Back Cover", "Band"
+     *   - mimeType: String with image format, e.g. "image/jpeg"
+     *   - optionally more information found in the tag, such as
+     *     "width", "height", "numColors", "colorDepth" int values
+     *     in FLAC pictures
+     * - GENERALOBJECT
+     *   - data: ByteVector with object data
+     *   - description: String with description
+     *   - fileName: String with file name
+     *   - mimeType: String with MIME type
+     *   - this is currently only implemented for ID3v2 GEOB frames
+     */
+    virtual List<VariantMap> complexProperties(const String &key) const;
+
+    /*!
+     * Set all complex properties for a given \a key using variant maps as
+     * \a value with the same format as returned by complexProperties().
+     * An empty list as \a value to removes all complex properties for \a key.
+     */
+    virtual bool setComplexProperties(const String &key, const List<VariantMap> &value);
 
     /*!
      * Returns the track name; if no track name is present in the tag

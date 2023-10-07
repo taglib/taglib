@@ -50,6 +50,9 @@ namespace
   const unsigned int MinKeyLength = 2;
   const unsigned int MaxKeyLength = 255;
 
+  const String FRONT_COVER("COVER ART (FRONT)");
+  const String BACK_COVER("COVER ART (BACK)");
+
   bool isKeyValid(const ByteVector &key)
   {
     static constexpr std::array invalidKeys { "ID3", "TAG", "OGGS", "MP+" };
@@ -263,6 +266,96 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
     }
   }
   return invalid;
+}
+
+StringList APE::Tag::complexPropertyKeys() const
+{
+  StringList keys;
+  if(d->itemListMap.contains(FRONT_COVER) ||
+     d->itemListMap.contains(BACK_COVER)) {
+    keys.append("PICTURE");
+  }
+  return keys;
+}
+
+List<VariantMap> APE::Tag::complexProperties(const String &key) const
+{
+  List<VariantMap> properties;
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    const StringList itemNames = StringList(FRONT_COVER).append(BACK_COVER);
+    for(const auto &itemName: itemNames) {
+      if(d->itemListMap.contains(itemName)) {
+        Item picture = d->itemListMap.value(itemName);
+        if(picture.type() == Item::Binary) {
+          ByteVector data = picture.binaryData();
+          // Do not search for a description if the first byte could start JPG or PNG
+          // data.
+          int index = data.isEmpty() || data.at(0) == '\xff' || data.at(0) == '\x89'
+              ? -1 : data.find('\0');
+          String description;
+          if(index >= 0) {
+            description = String(data.mid(0, index), String::UTF8);
+            data = data.mid(index + 1);
+          }
+
+          VariantMap property;
+          property.insert("data", data);
+          if(!description.isEmpty()) {
+            property.insert("description", description);
+          }
+          property.insert("pictureType",
+            itemName == BACK_COVER ? "Back Cover" : "Front Cover");
+          properties.append(property);
+        }
+      }
+    }
+  }
+  return properties;
+}
+
+bool APE::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
+    removeItem(FRONT_COVER);
+    removeItem(BACK_COVER);
+
+    auto frontItems = List<Item>();
+    auto backItems = List<Item>();
+    for(auto property : value) {
+      ByteVector data = property.value("description").value<String>().data(String::UTF8)
+                        .append('\0')
+                        .append(property.value("data").value<ByteVector>());
+      String pictureType = property.value("pictureType").value<String>();
+      Item item;
+      item.setType(Item::Binary);
+      item.setBinaryData(data);
+      if(pictureType == "Back Cover") {
+        item.setKey(BACK_COVER);
+        backItems.append(item);
+      }
+      else if(pictureType == "Front Cover") {
+        item.setKey(FRONT_COVER);
+        // prioritize pictures with correct type
+        frontItems.prepend(item);
+      }
+      else {
+        item.setKey(FRONT_COVER);
+        frontItems.append(item);
+      }
+    }
+    if(!frontItems.isEmpty()) {
+      setItem(FRONT_COVER, frontItems.front());
+    }
+    if(!backItems.isEmpty()) {
+      setItem(BACK_COVER, backItems.front());
+    }
+  }
+  else {
+    return false;
+  }
+  return true;
 }
 
 bool APE::Tag::checkKey(const String &key)
