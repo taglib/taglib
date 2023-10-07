@@ -803,8 +803,9 @@ public:
                                  "\x00\x00"
                                  "\x00\x00\x00\x00", 14);
     const ID3v2::Header header;
-    CPPUNIT_ASSERT(dynamic_cast<ID3v2::PodcastFrame *>(
-                     factory->createFrame(data, &header)));
+    ID3v2::Frame *frame = factory->createFrame(data, &header);
+    CPPUNIT_ASSERT(dynamic_cast<ID3v2::PodcastFrame *>(frame));
+    delete frame;
   }
 
   void testRenderPodcastFrame()
