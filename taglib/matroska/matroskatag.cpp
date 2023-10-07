@@ -284,7 +284,10 @@ namespace
 
 bool Matroska::Tag::setTag(const String &key, const String &value)
 {
-  const auto& [name, targetTypeValue] = Matroska::Utils::translateKey(key);
+  const auto pair = Matroska::Utils::translateKey(key);
+  // Workaround Clang issue - no lambda capture of structured bindings
+  const String &name = pair.first;
+  auto targetTypeValue = pair.second;
   if (name.isEmpty())
     return false;
   removeSimpleTags(
@@ -305,7 +308,10 @@ bool Matroska::Tag::setTag(const String &key, const String &value)
 
 const String* Matroska::Tag::getTag(const String &key) const
 {
-  const auto& [name, targetTypeValue] = Matroska::Utils::translateKey(key);
+  const auto pair = Matroska::Utils::translateKey(key);
+  // Workaround Clang issue - no lambda capture of structured bindings
+  const String &name = pair.first;
+  auto targetTypeValue = pair.second;
   if (name.isEmpty())
     return nullptr;
   auto tag = dynamic_cast<const Matroska::SimpleTagString*>(
