@@ -65,16 +65,16 @@ Tested with:
 
 Requirements:
 * Tool chain, build environment, whatever ya want to call it ...
-     Installed and working.
-* CMake program. (Available at: www.cmake.org)
-     Installed and working.
+  Installed and working.
+* CMake program (available at: www.cmake.org).
+  Installed and working.
 
 Optional:
-*  Zlib library.
-     Available in some tool chains, not all.
-     Search the web, take your choice.
+* Zlib library.
+  Available in some tool chains, not all.
+  Search the web, take your choice.
 
-Useful configuration options used with CMake (GUI and/or command line):
+  Useful configuration options used with CMake (GUI and/or command line):
   Any of the `ZLIB_` variables may be used at the command line, `ZLIB_ROOT` is only
   available on the command line.
 
@@ -83,8 +83,8 @@ Useful configuration options used with CMake (GUI and/or command line):
   | `WITH_ZLIB=`            | Whether to build with ZLib |
   | `ZLIB_ROOT=`            | Where to find ZLib's root directory. Assumes parent of: `\include` and `\lib.`|
   | `ZLIB_INCLUDE_DIR=`     | Where to find ZLib's Include directory.|
-  | `ZLIB_LIBRARY=`         | Where to find ZLib's Library.
-  | `ZLIB_SOURCE=`          | Where to find ZLib's Source Code. Alternative to `ZLIB_INCLUDE_DIR` and `ZLIB_LIBRARY`.
+  | `ZLIB_LIBRARY=`         | Where to find ZLib's Library.|
+  | `ZLIB_SOURCE=`          | Where to find ZLib's Source Code. Alternative to `ZLIB_INCLUDE_DIR` and `ZLIB_LIBRARY`.|
   | `CMAKE_INSTALL_PREFIX=` | Where to install Taglib. |
   | `CMAKE_BUILD_TYPE=`     | Release, Debug, etc ... (Not available in MSVC) |
 
@@ -128,8 +128,8 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
       OR in the MSVS GUI:
       1. Open MSVS.
       2. Open taglib solution.
-      3. Set build type to: Release (look in the tool bars)
-      2. Hit F7 to build the solution. (project)
+      3. Set build type to: Release (look in the toolbars)
+      4. Hit F7 to build the solution. (project)
     * MinGW:
 
           C:\GitRoot\taglib> gmake
@@ -137,8 +137,6 @@ The easiest way is at the command prompt (Visual C++ command prompt for MSVS use
       OR (Depending on MinGW install)
 
           C:\GitRoot\taglib> mingw32-make
-
-
 
 3.  **Install the project**
 

@@ -193,7 +193,7 @@ Frame *FrameFactory::createFrame(const ByteVector &data, Frame::Header *header,
   ByteVector frameID = header->frameID();
 
   // This is where things get necessarily nasty.  Here we determine which
-  // Frame subclass (or if none is found simply an Frame) based
+  // Frame subclass (or if none is found simply a Frame) based
   // on the frame ID.  Since there are a lot of possibilities, that means
   // a lot of if blocks.
 
@@ -488,7 +488,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
       return false;
     }
 
-    // ID3v2.2 only used 3 bytes for the frame ID, so we need to convert all of
+    // ID3v2.2 only used 3 bytes for the frame ID, so we need to convert all
     // the frames to their 4 byte ID3v2.4 equivalent.
 
     for(const auto &[o, t] : frameConversion2) {

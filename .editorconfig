@@ -12,7 +12,7 @@ insert_final_newline = true
 indent_style = space
 indent_size = 2
 
-# Trim traling whitespaces
+# Trim trailing whitespaces
 [*.{h,cpp,tcc,cmake,yml}]
 trim_trailing_whitespace = true
 

@@ -143,7 +143,7 @@ Frame *Frame::createTextualFrame(const String &key, const StringList &values) //
     frame->setText(values.front());
     return frame;
   }
-  // if non of the above cases apply, we use a TXXX frame with the key as description
+  // if none of the above cases apply, we use a TXXX frame with the key as description
   return new UserTextIdentificationFrame(keyToTXXX(key), values, String::UTF8);
 }
 

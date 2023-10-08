@@ -226,7 +226,7 @@ TagLib 1.8 (Sep 6, 2012)
 
  * Added support for OWNE ID3 frames.
  * Changed key validation in the new PropertyMap API.
- * ID3v1::Tag::setStringHandler will no londer delete the previous handler,
+ * ID3v1::Tag::setStringHandler will no longer delete the previous handler,
    the caller is responsible for this.
  * File objects will also no longer delete the passed IOStream objects. It
    should be done in the caller code after the File object is no longer
@@ -369,7 +369,7 @@ TagLib 1.6 (Sep 13, 2009)
    and in String::operator+=. (BUG:169389)
  * Added support for PRIV ID3v2 frames.
  * Empty ID3v2 genres are no longer treated as numeric ID3v1 genres.
- * Added support for the POPM (rating/playcount) ID3v2 frame.
+ * Added support for the POPM (rating/play count) ID3v2 frame.
  * Generic RIFF file format support:
    * Support for AIFF files with ID3v2 tags.
    * Support for WAV files with ID3v2 tags.

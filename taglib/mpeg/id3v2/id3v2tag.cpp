@@ -182,7 +182,7 @@ String ID3v2::Tag::genre() const
 
   // ID3v2.4 lists genres as the fields in its frames field list.  If the field
   // is simply a number it can be assumed that it is an ID3v1 genre number.
-  // Here was assume that if an ID3v1 string is present that it should be
+  // Here was assumed that if an ID3v1 string is present then it should be
   // appended to the genre string.  Multiple fields will be appended as the
   // string is built.
 

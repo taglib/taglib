@@ -57,8 +57,8 @@ extern "C" {
  *******************************************************************************/
 
 /*
- * These are used for type provide some type safety to the C API (as opposed to
- * using void *, but pointers to them are simply cast to the corresponding C++
+ * These are used to give the C API some type safety (as opposed to
+ * using void * ), but pointers to them are simply cast to the corresponding C++
  * types in the implementation.
  */
 
