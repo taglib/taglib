@@ -105,7 +105,7 @@ option(WITH_ZLIB "Build with ZLIB" ON)
 
 if(WITH_ZLIB)
   find_package("ZLIB")
-  set(HAVE_ZLIB ZLIB_FOUND)
+  set(HAVE_ZLIB ${ZLIB_FOUND})
 endif()
 
 if(NOT WIN32)
