@@ -71,6 +71,8 @@ Matroska::Tag* EBML::MkTags::parse()
       const String *tagName = nullptr;
       const String *tagValueString = nullptr;
       const ByteVector *tagValueBinary = nullptr;
+      const String *language = nullptr;
+      bool defaultLanguageFlag = true;
 
       for (auto simpleTagChild : *simpleTag) {
         Id id = simpleTagChild->getId();
@@ -78,6 +80,10 @@ Matroska::Tag* EBML::MkTags::parse()
           tagName = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
         else if (id == ElementIDs::MkTagString && !tagValueString)
           tagValueString = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
+        else if (id == ElementIDs::MkTagsTagLanguage && !language)
+          language = &(static_cast<Latin1StringElement*>(simpleTagChild)->getValue());
+        else if (id == ElementIDs::MkTagsLanguageDefault)
+          defaultLanguageFlag = static_cast<UIntElement*>(simpleTagChild)->getValue() ? true : false;
       }
       if (!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
         continue;
@@ -97,6 +103,9 @@ Matroska::Tag* EBML::MkTags::parse()
         sTag = sTagBinary;
       }
       sTag->setName(*tagName);
+      if (language)
+        sTag->setLanguage(*language);
+      sTag->setDefaultLanguageFlag(defaultLanguageFlag);
       mTag->addSimpleTag(sTag);
     }
   }
