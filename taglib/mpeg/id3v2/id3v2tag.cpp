@@ -26,6 +26,7 @@
 #include "id3v2tag.h"
 
 #include <algorithm>
+#include <array>
 #include <utility>
 
 #include "tdebug.h"
@@ -53,16 +54,6 @@ namespace
 
   const long MinPaddingSize = 1024;
   const long MaxPaddingSize = 1024 * 1024;
-
-  bool contains(const char **a, const ByteVector &v)
-  {
-    for(int i = 0; a[i]; i++)
-    {
-      if(v == a[i])
-        return true;
-    }
-    return false;
-  }
 }  // namespace
 
 class ID3v2::Tag::TagPrivate
@@ -468,15 +459,15 @@ ByteVector ID3v2::Tag::render() const
 void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
 {
 #ifdef NO_ITUNES_HACKS
-  static const char *unsupportedFrames[] = {
+  static constexpr std::array unsupportedFrames {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
-    "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP", 0
+    "TMOO", "TPRO", "TSOA", "TSOT", "TSST", "TSOP"
   };
 #else
   // iTunes writes and reads TSOA, TSOT, TSOP to ID3v2.3.
-  static const char *unsupportedFrames[] = {
+  static constexpr std::array unsupportedFrames {
     "ASPI", "EQU2", "RVA2", "SEEK", "SIGN", "TDRL", "TDTG",
-    "TMOO", "TPRO", "TSST", nullptr
+    "TMOO", "TPRO", "TSST"
   };
 #endif
   ID3v2::TextIdentificationFrame *frameTDOR = nullptr;
@@ -488,7 +479,7 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   for(const auto &frame : std::as_const(d->frameList)) {
     ByteVector frameID = frame->header()->frameID();
 
-    if(contains(unsupportedFrames, frameID)) {
+    if(std::any_of(unsupportedFrames.begin(), unsupportedFrames.end(), [&frameID](auto m){ return frameID == m; })) {
       debug("A frame that is not supported in ID3v2.3 \'" + String(frameID) +
             "\' has been discarded");
       continue;
