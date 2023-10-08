@@ -31,6 +31,8 @@ class Matroska::SimpleTag::SimpleTagPrivate
     SimpleTagPrivate() = default;
     SimpleTag::TargetTypeValue targetTypeValue = TargetTypeValue::None;
     String name;
+    String language;
+    bool defaultLanguageFlag = true;
 
 };
 
@@ -71,6 +73,26 @@ void Matroska::SimpleTag::setTargetTypeValue(TargetTypeValue targetTypeValue)
 const String& Matroska::SimpleTag::name() const
 {
   return d->name;
+}
+
+const String& Matroska::SimpleTag::language() const
+{
+  return d->language;
+}
+
+void Matroska::SimpleTag::setLanguage(const String &language)
+{
+  d->language = language;
+}
+
+bool Matroska::SimpleTag::defaultLanguageFlag() const
+{
+  return d->defaultLanguageFlag;
+}
+
+void Matroska::SimpleTag::setDefaultLanguageFlag(bool flag)
+{
+  d->defaultLanguageFlag = flag;
 }
 
 void Matroska::SimpleTag::setName(const String &name)

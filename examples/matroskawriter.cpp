@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
   simpleTag->setName("Test Name 1");
   simpleTag->setTargetTypeValue(TagLib::Matroska::SimpleTag::TargetTypeValue::Track);
   simpleTag->setValue("Test Value 1");
+  simpleTag->setLanguage("en");
   tag->addSimpleTag(simpleTag);
 
   simpleTag = new TagLib::Matroska::SimpleTagString();

@@ -59,16 +59,18 @@ namespace TagLib {
     };
 
     namespace ElementIDs {
-      inline constexpr Element::Id EBMLHeader           = 0x1A45DFA3;
-      inline constexpr Element::Id MkSegment            = 0x18538067;
-      inline constexpr Element::Id MkTags               = 0x1254C367;
-      inline constexpr Element::Id MkTag                = 0x7373;
-      inline constexpr Element::Id MkTagTargets         = 0x63C0;
-      inline constexpr Element::Id MkTagTargetTypeValue = 0x68CA;
-      inline constexpr Element::Id MkSimpleTag          = 0x67C8;
-      inline constexpr Element::Id MkTagName            = 0x45A3;
-      inline constexpr Element::Id MkTagLanguage        = 0x447A;
-      inline constexpr Element::Id MkTagString          = 0x4487;
+      inline constexpr Element::Id EBMLHeader            = 0x1A45DFA3;
+      inline constexpr Element::Id MkSegment             = 0x18538067;
+      inline constexpr Element::Id MkTags                = 0x1254C367;
+      inline constexpr Element::Id MkTag                 = 0x7373;
+      inline constexpr Element::Id MkTagTargets          = 0x63C0;
+      inline constexpr Element::Id MkTagTargetTypeValue  = 0x68CA;
+      inline constexpr Element::Id MkSimpleTag           = 0x67C8;
+      inline constexpr Element::Id MkTagName             = 0x45A3;
+      inline constexpr Element::Id MkTagLanguage         = 0x447A;
+      inline constexpr Element::Id MkTagString           = 0x4487;
+      inline constexpr Element::Id MkTagsTagLanguage     = 0x447A;
+      inline constexpr Element::Id MkTagsLanguageDefault = 0x4484;
     }
   }
 }

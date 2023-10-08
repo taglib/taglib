@@ -44,8 +44,12 @@ namespace TagLib {
       };
       const String& name() const;
       TargetTypeValue targetTypeValue() const;
-      void setTargetTypeValue(TargetTypeValue targetTypeValue);
+      const String& language() const;
+      bool defaultLanguageFlag() const;
       void setName(const String &name);
+      void setTargetTypeValue(TargetTypeValue targetTypeValue);
+      void setLanguage(const String &language);
+      void setDefaultLanguageFlag(bool flag);
       virtual ~SimpleTag();
 
     private:

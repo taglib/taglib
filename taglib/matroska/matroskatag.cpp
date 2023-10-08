@@ -210,7 +210,7 @@ ByteVector Matroska::Tag::render()
     auto targetTypeValue = frontTag->targetTypeValue();
     auto tag = new EBML::MasterElement(EBML::ElementIDs::MkTag);
 
-    // Build <Tag Targets element>
+    // Build <Tag Targets> element
     auto targets = new EBML::MasterElement(EBML::ElementIDs::MkTagTargets);
     if (targetTypeValue != Matroska::SimpleTag::TargetTypeValue::None) {
       auto element = new EBML::UIntElement(EBML::ElementIDs::MkTagTargetTypeValue);
@@ -226,6 +226,7 @@ ByteVector Matroska::Tag::render()
       tagName->setValue(simpleTag->name());
       t->appendElement(tagName);
 
+      // Tag Value
       Matroska::SimpleTagString *tStr = nullptr;
       Matroska::SimpleTagBinary *tBin = nullptr;
       if((tStr = dynamic_cast<Matroska::SimpleTagString*>(simpleTag))) {
@@ -237,7 +238,17 @@ ByteVector Matroska::Tag::render()
         // Todo
       }
 
-      // Todo: language
+      // Language
+      auto language = new EBML::Latin1StringElement(EBML::ElementIDs::MkTagsTagLanguage);
+      const String &lang = simpleTag->language();
+      language->setValue(!lang.isEmpty() ? lang : "und");
+      t->appendElement(language);
+
+      // Default language flag
+      auto dlf = new EBML::UIntElement(EBML::ElementIDs::MkTagsLanguageDefault);
+      dlf->setValue(simpleTag->defaultLanguageFlag() ? 1 : 0);
+      t->appendElement(dlf);
+
       tag->appendElement(t);
     }
     tags.appendElement(tag);
