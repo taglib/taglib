@@ -292,7 +292,17 @@ ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
   return fromNumber<unsigned short>(value, mostSignificantByteFirst);
 }
 
+ByteVector ByteVector::fromUShort(unsigned short value, bool mostSignificantByteFirst)
+{
+  return fromNumber<unsigned short>(value, mostSignificantByteFirst);
+}
+
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)
+{
+  return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
+}
+
+ByteVector ByteVector::fromULongLong(unsigned long long value, bool mostSignificantByteFirst)
 {
   return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
 }
@@ -689,6 +699,16 @@ long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 }
 
 long long ByteVector::toLongLong(unsigned int offset, bool mostSignificantByteFirst) const
+{
+  return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
+}
+
+unsigned long long ByteVector::toULongLong(bool mostSignificantByteFirst) const
+{
+  return toNumber<unsigned long long>(*this, 0, mostSignificantByteFirst);
+}
+
+unsigned long long ByteVector::toULongLong(unsigned int offset, bool mostSignificantByteFirst) const
 {
   return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
 }

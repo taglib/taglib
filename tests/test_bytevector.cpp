@@ -189,6 +189,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(0x01ff), data.toShort(5U, false));
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(0xff), data.toShort(13U));
     CPPUNIT_ASSERT_EQUAL(static_cast<short>(0xff), data.toShort(13U, false));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromShort(0x00ff), ByteVector("\x00\xff", 2));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromShort(0x00ff, false), ByteVector("\xff\x00", 2));
 
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0x00ff), data.toUShort());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0xff00), data.toUShort(false));
@@ -196,6 +198,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0x01ff), data.toUShort(5U, false));
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0xff), data.toUShort(13U));
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned short>(0xff), data.toUShort(13U, false));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromUShort(0xff00), ByteVector("\xff\x00", 2));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromUShort(0xff00, false), ByteVector("\x00\xff", 2));
 
     CPPUNIT_ASSERT_EQUAL(0x00ff01ffU, data.toUInt());
     CPPUNIT_ASSERT_EQUAL(0xff01ff00U, data.toUInt(false));
@@ -210,6 +214,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(0xff01ffU, data.toUInt(5U, 3U, false));
     CPPUNIT_ASSERT_EQUAL(0x00ffU, data.toUInt(12U, 3U));
     CPPUNIT_ASSERT_EQUAL(0xff00U, data.toUInt(12U, 3U, false));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromUInt(0xff00ff00), ByteVector("\xff\x00\xff\x00", 4));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromUInt(0xff00ff00, false), ByteVector("\x00\xff\x00\xff", 4));
 
     CPPUNIT_ASSERT_EQUAL(static_cast<long long>(0x00ff01ff00ff01ffULL), data.toLongLong());
     CPPUNIT_ASSERT_EQUAL(static_cast<long long>(0xff01ff00ff01ff00ULL), data.toLongLong(false));
@@ -217,7 +223,20 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<long long>(0x00ff01ff00ff01ffULL), data.toLongLong(5U, false));
     CPPUNIT_ASSERT_EQUAL(static_cast<long long>(0x00ffU), data.toLongLong(12U));
     CPPUNIT_ASSERT_EQUAL(static_cast<long long>(0xff00U), data.toLongLong(12U, false));
-}
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromLongLong(0x00ff01ff00ff01ff), ByteVector("\x00\xff\x01\xff\x00\xff\x01\xff", 8));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromLongLong(0x00ff01ff00ff01ff, false), ByteVector("\xff\x01\xff\x00\xff\x01\xff\x00", 8));
+
+    const ByteVector data2("\xff\x01\xff\x00\xff\x01\xff\x00\xff\x01\xff\x00\xff\x01", 14);
+    CPPUNIT_ASSERT_EQUAL(0xff01ff00ff01ff00ULL, data2.toULongLong());
+    CPPUNIT_ASSERT_EQUAL(0x00ff01ff00ff01ffULL, data2.toULongLong(false));
+    CPPUNIT_ASSERT_EQUAL(0x01ff00ff01ff00ffULL, data2.toULongLong(5U));
+    CPPUNIT_ASSERT_EQUAL(0xff00ff01ff00ff01ULL, data2.toULongLong(5U, false));
+    CPPUNIT_ASSERT_EQUAL(0xff01ULL, data2.toULongLong(12U));
+    CPPUNIT_ASSERT_EQUAL(0x01ffULL, data2.toULongLong(12U, false));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromULongLong(0xff01ff00ff01ff00ULL), ByteVector("\xff\x01\xff\x00\xff\x01\xff\x00", 8));
+    CPPUNIT_ASSERT_EQUAL(ByteVector::fromULongLong(0xff01ff00ff01ff00ULL, false), ByteVector("\x00\xff\x01\xff\x00\xff\x01\xff", 8));
+  }
+
 
   void testFloatingPointConversion()
   {
