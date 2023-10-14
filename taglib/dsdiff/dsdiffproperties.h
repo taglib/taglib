@@ -55,28 +55,24 @@ namespace TagLib {
       /*!
        * Destroys this DSDIFF::Properties instance.
        */
-      virtual ~Properties();
+      ~Properties() override;
 
       // Reimplementations.
 
-      virtual int length() const;
-      virtual int lengthInSeconds() const;
-      virtual int lengthInMilliseconds() const;
-      virtual int bitrate() const;
-      virtual int sampleRate() const;
-      virtual int channels() const;
+      int lengthInSeconds() const override;
+      int lengthInMilliseconds() const override;
+      int bitrate() const override;
+      int sampleRate() const override;
+      int channels() const override;
 
       int bitsPerSample() const;
       long long sampleCount() const;
 
     private:
-      Properties(const Properties &);
-      Properties &operator=(const Properties &);
-
       class PropertiesPrivate;
-      PropertiesPrivate *d;
+      std::unique_ptr<PropertiesPrivate> d;
     };
-  }
-}
+  }  // namespace DSDIFF
+}  // namespace TagLib
 
 #endif

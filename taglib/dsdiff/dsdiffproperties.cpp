@@ -1,6 +1,6 @@
 /***************************************************************************
- copyright            : (C) 2016 by Damien Plisson, Audirvana
- email                : damien78@audirvana.com
+    copyright            : (C) 2016 by Damien Plisson, Audirvana
+    email                : damien78@audirvana.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,32 +23,22 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "dsdiffproperties.h"
+
 #include "tstring.h"
 #include "tdebug.h"
-
-#include "dsdiffproperties.h"
 
 using namespace TagLib;
 
 class DSDIFF::Properties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate() :
-  length(0),
-  bitrate(0),
-  sampleRate(0),
-  channels(0),
-  sampleWidth(0),
-  sampleCount(0)
-  {
-  }
-
-  int length;
-  int bitrate;
-  int sampleRate;
-  int channels;
-  int sampleWidth;
-  unsigned long long sampleCount;
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int channels { 0 };
+  int sampleWidth { 0 };
+  unsigned long long sampleCount { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,27 +51,19 @@ DSDIFF::Properties::Properties(const unsigned int sampleRate,
                                const int bitrate,
                                ReadStyle style) :
   AudioProperties(style),
-  d(new PropertiesPrivate())
+  d(std::make_unique<PropertiesPrivate>())
 {
-  d->channels    = channels;
+  d->channels = channels;
   d->sampleCount = samplesCount;
   d->sampleWidth = 1;
-  d->sampleRate  = sampleRate;
-  d->bitrate     = bitrate;
-  d->length      = d->sampleRate > 0
+  d->sampleRate = sampleRate;
+  d->bitrate = bitrate;
+  d->length = d->sampleRate > 0
     ? static_cast<int>((d->sampleCount * 1000.0) / d->sampleRate + 0.5)
     : 0;
 }
 
-DSDIFF::Properties::~Properties()
-{
-  delete d;
-}
-
-int DSDIFF::Properties::length() const
-{
-  return lengthInSeconds();
-}
+DSDIFF::Properties::~Properties() = default;
 
 int DSDIFF::Properties::lengthInSeconds() const
 {

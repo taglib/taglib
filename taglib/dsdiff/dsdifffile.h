@@ -1,6 +1,6 @@
 /***************************************************************************
- copyright            : (C) 2016 by Damien Plisson, Audirvana
- email                : damien78@audirvana.com
+    copyright            : (C) 2016 by Damien Plisson, Audirvana
+    email                : damien78@audirvana.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -70,25 +70,32 @@ namespace TagLib {
         //! Empty set.  Matches no tag types.
         NoTags  = 0x0000,
         //! Matches DIIN tags.
-        DIIN   = 0x0002,
-        //! Matches ID3v1 tags.
+        DIIN    = 0x0001,
+        //! Matches ID3v2 tags.
         ID3v2   = 0x0002,
         //! Matches all tag types.
         AllTags = 0xffff
       };
 
       /*!
-       * Constructs an DSDIFF file from \a file.  If \a readProperties is true
+       * Constructs a DSDIFF file from \a file.  If \a readProperties is true
        * the file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * If this file contains and ID3v2 tag the frames will be created using
+       * \a frameFactory (default if null).
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
        * Constructs an DSDIFF file from \a stream.  If \a readProperties is true
        * the file's audio properties will also be read.
+       *
+       * If this file contains and ID3v2 tag the frames will be created using
+       * \a frameFactory (default if null).
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
@@ -96,7 +103,8 @@ namespace TagLib {
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
        * Destroys this instance of the File.
@@ -223,12 +231,10 @@ namespace TagLib {
       File(IOStream *stream, Endianness endianness);
 
     private:
-      File(const File &) = delete;
-      File &operator=(const File &) = delete;
-
       void removeRootChunk(const ByteVector &id);
-      void removeRootChunk(unsigned int chunk);
-      void removeChildChunk(unsigned int i, unsigned int chunk);
+      void removeRootChunk(unsigned int i);
+      void removeChildChunk(const ByteVector &id, unsigned int childChunkNum);
+      void removeChildChunk(unsigned int i, unsigned int childChunkNum);
 
       /*!
        * Sets the data for the the specified chunk at root level to \a data.
@@ -277,9 +283,9 @@ namespace TagLib {
                       unsigned int leadingPadding = 0);
 
       class FilePrivate;
-      FilePrivate *d;
+      std::unique_ptr<FilePrivate> d;
     };
-  }
-}
+  }  // namespace DSDIFF
+}  // namespace TagLib
 
 #endif
