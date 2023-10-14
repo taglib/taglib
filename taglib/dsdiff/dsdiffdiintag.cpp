@@ -1,6 +1,6 @@
 /***************************************************************************
- copyright            : (C) 2016 by Damien Plisson, Audirvana
- email                : damien78@audirvana.com
+    copyright            : (C) 2016 by Damien Plisson, Audirvana
+    email                : damien78@audirvana.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -24,9 +24,12 @@
  ***************************************************************************/
 
 #include "dsdiffdiintag.h"
-#include "tdebug.h"
+
+#include <utility>
+
 #include "tstringlist.h"
 #include "tpropertymap.h"
+#include "tdebug.h"
 
 using namespace TagLib;
 using namespace DSDIFF::DIIN;
@@ -34,23 +37,16 @@ using namespace DSDIFF::DIIN;
 class DSDIFF::DIIN::Tag::TagPrivate
 {
 public:
-  TagPrivate()
-  {
-  }
-
   String title;
   String artist;
 };
 
 DSDIFF::DIIN::Tag::Tag() :
-  d(new TagPrivate())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
-DSDIFF::DIIN::Tag::~Tag()
-{
-  delete d;
-}
+DSDIFF::DIIN::Tag::~Tag() = default;
 
 String DSDIFF::DIIN::Tag::title() const
 {
@@ -89,18 +85,12 @@ unsigned int DSDIFF::DIIN::Tag::track() const
 
 void DSDIFF::DIIN::Tag::setTitle(const String &title)
 {
-  if(title.isEmpty())
-    d->title = String();
-  else
-    d->title = title;
+  d->title = title;
 }
 
 void DSDIFF::DIIN::Tag::setArtist(const String &artist)
 {
-  if(artist.isEmpty())
-    d->artist = String();
-  else
-    d->artist = artist;
+  d->artist = artist;
 }
 
 void DSDIFF::DIIN::Tag::setAlbum(const String &)
@@ -146,22 +136,21 @@ PropertyMap DSDIFF::DIIN::Tag::setProperties(const PropertyMap &origProps)
     d->title = properties["TITLE"].front();
     oneValueSet.append("TITLE");
   } else
-    d->title = String();
+    d->title.clear();
 
   if(properties.contains("ARTIST")) {
     d->artist = properties["ARTIST"].front();
     oneValueSet.append("ARTIST");
   } else
-    d->artist = String();
+    d->artist.clear();
 
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.
-  for(StringList::Iterator it = oneValueSet.begin(); it != oneValueSet.end(); ++it) {
-    if(properties[*it].size() == 1)
-      properties.erase(*it);
+  for(const auto &entry : std::as_const(oneValueSet)) {
+    if(properties[entry].size() == 1)
+      properties.erase(entry);
     else
-      properties[*it].erase(properties[*it].begin());
+      properties[entry].erase(properties[entry].begin());
   }
-
   return properties;
 }

@@ -1,6 +1,6 @@
 /***************************************************************************
- copyright            : (C) 2016 by Damien Plisson, Audirvana
- email                : damien78@audirvana.com
+    copyright            : (C) 2016 by Damien Plisson, Audirvana
+    email                : damien78@audirvana.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,17 +23,18 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "tbytevector.h"
-#include "tdebug.h"
-#include "id3v2tag.h"
-#include "tstringlist.h"
-#include "tpropertymap.h"
-#include "tagutils.h"
-
-#include "tagunion.h"
 #include "dsdifffile.h"
 
 #include <array>
+#include <memory>
+
+#include "tbytevector.h"
+#include "tstringlist.h"
+#include "tpropertymap.h"
+#include "tdebug.h"
+#include "id3v2tag.h"
+#include "tagutils.h"
+#include "tagunion.h"
 
 using namespace TagLib;
 
@@ -51,7 +52,7 @@ namespace
 
   int chunkIndex(const ChunkList &chunks, const ByteVector &id)
   {
-    for(int i = 0; i < chunks.size(); i++) {
+    for(size_t i = 0; i < chunks.size(); i++) {
       if(chunks[i].name == id)
         return i;
     }
@@ -85,50 +86,40 @@ namespace
 class DSDIFF::File::FilePrivate
 {
 public:
-  FilePrivate() :
-    endianness(BigEndian),
-    size(0),
-    isID3InPropChunk(false),
-    duplicateID3V2chunkIndex(-1),
-    properties(0),
-    id3v2TagChunkID("ID3 "),
-    hasID3v2(false),
-    hasDiin(false)
+  FilePrivate(ID3v2::FrameFactory *frameFactory)
+        : ID3v2FrameFactory(frameFactory ? frameFactory
+                                         : ID3v2::FrameFactory::instance())
   {
-    childChunkIndex[ID3v2Index] = -1;
-    childChunkIndex[DIINIndex] = -1;
   }
 
-  ~FilePrivate()
-  {
-    delete properties;
-  }
+  ~FilePrivate() = default;
 
-  Endianness endianness;
+  const ID3v2::FrameFactory *ID3v2FrameFactory;
+  Endianness endianness { BigEndian };
   ByteVector type;
-  unsigned long long size;
+  unsigned long long size { 0 };
   ByteVector format;
   ChunkList chunks;
   std::array<ChunkList, 2> childChunks;
-  std::array<int, 2> childChunkIndex;
+  std::array<int, 2> childChunkIndex { -1, -1 };
   /*
    * Two possibilities can be found: ID3V2 chunk inside PROP chunk or at root level
    */
-  bool isID3InPropChunk;
+  bool isID3InPropChunk { false };
   /*
    * ID3 chunks are present. This is then the index of the one in PROP chunk that
    * will be removed upon next save to remove duplicates.
    */
-  int duplicateID3V2chunkIndex;
+  int duplicateID3V2chunkIndex { -1 };
 
-  Properties *properties;
+  std::unique_ptr<Properties> properties;
 
   TagUnion tag;
 
-  ByteVector id3v2TagChunkID;
+  ByteVector id3v2TagChunkID { "ID3 " };
 
-  bool hasID3v2;
-  bool hasDiin;
+  bool hasID3v2 { false };
+  bool hasDiin { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,10 +128,9 @@ public:
 
 bool DSDIFF::File::isSupported(IOStream *stream)
 {
-    // A DSDIFF file has to start with "FRM8????????DSD ".
-
-    const ByteVector id = Utils::readHeader(stream, 16, false);
-    return (id.startsWith("FRM8") && id.containsAt("DSD ", 12));
+  // A DSDIFF file has to start with "FRM8????????DSD ".
+  const ByteVector id = Utils::readHeader(stream, 16, false);
+  return (id.startsWith("FRM8") && id.containsAt("DSD ", 12));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,29 +138,26 @@ bool DSDIFF::File::isSupported(IOStream *stream)
 ////////////////////////////////////////////////////////////////////////////////
 
 DSDIFF::File::File(FileName file, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) :
+                   Properties::ReadStyle propertiesStyle,
+                   ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
-  d->endianness = BigEndian;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
 DSDIFF::File::File(IOStream *stream, bool readProperties,
-                   Properties::ReadStyle propertiesStyle) :
+                   Properties::ReadStyle propertiesStyle,
+                   ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream),
-  d(new FilePrivate())
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
-  d->endianness = BigEndian;
   if(isOpen())
     read(readProperties, propertiesStyle);
 }
 
-DSDIFF::File::~File()
-{
-  delete d;
-}
+DSDIFF::File::~File() = default;
 
 TagLib::Tag *DSDIFF::File::tag() const
 {
@@ -199,32 +186,22 @@ bool DSDIFF::File::hasDIINTag() const
 
 PropertyMap DSDIFF::File::properties() const
 {
-  if(d->hasID3v2)
-    return d->tag.access<ID3v2::Tag>(ID3v2Index, false)->properties();
-
-  if(d->hasDiin)
-    return d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false)->properties();
-
-  return PropertyMap();
+  return d->tag.properties();
 }
 
 void DSDIFF::File::removeUnsupportedProperties(const StringList &unsupported)
 {
-  if(d->hasID3v2)
-    d->tag.access<ID3v2::Tag>(ID3v2Index, false)->removeUnsupportedProperties(unsupported);
-
-  if(d->hasDiin)
-    d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false)->removeUnsupportedProperties(unsupported);
+  d->tag.removeUnsupportedProperties(unsupported);
 }
 
 PropertyMap DSDIFF::File::setProperties(const PropertyMap &properties)
 {
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, true)->setProperties(properties);
+  return ID3v2Tag(true)->setProperties(properties);
 }
 
 DSDIFF::Properties *DSDIFF::File::audioProperties() const
 {
-  return d->properties;
+  return d->properties.get();
 }
 
 bool DSDIFF::File::save()
@@ -244,16 +221,14 @@ bool DSDIFF::File::save(int tags, StripTags strip, ID3v2::Version version)
     return false;
   }
 
-  // TODO: Should duplicate be supported?
-
   if(strip == StripOthers)
     File::strip(~tags);
 
   // First: save ID3V2 chunk
 
-  ID3v2::Tag *id3v2Tag = d->tag.access<ID3v2::Tag>(ID3v2Index, false);
+  ID3v2::Tag *id3v2Tag = ID3v2Tag();
 
-  if(tags & ID3v2 && id3v2Tag) {
+  if((tags & ID3v2) && id3v2Tag) {
     if(d->isID3InPropChunk) {
       if(!id3v2Tag->isEmpty()) {
         setChildChunkData(d->id3v2TagChunkID, id3v2Tag->render(version), PROPChunk);
@@ -280,9 +255,9 @@ bool DSDIFF::File::save(int tags, StripTags strip, ID3v2::Version version)
 
   // Second: save the DIIN chunk
 
-  DSDIFF::DIIN::Tag *diinTag = d->tag.access<DSDIFF::DIIN::Tag>(DIINIndex, false);
+  DSDIFF::DIIN::Tag *diinTag = DIINTag();
 
-  if(tags & DIIN && diinTag) {
+  if((tags & DIIN) && diinTag) {
     if(!diinTag->title().isEmpty()) {
       ByteVector diinTitle;
       diinTitle.append(ByteVector::fromUInt(diinTag->title().size(), d->endianness == BigEndian));
@@ -303,7 +278,7 @@ bool DSDIFF::File::save(int tags, StripTags strip, ID3v2::Version version)
   }
 
   // Third: remove the duplicate ID3V2 chunk (inside PROP chunk) if any
-  if(d->duplicateID3V2chunkIndex>=0) {
+  if(d->duplicateID3V2chunkIndex >= 0) {
     setChildChunkData(d->duplicateID3V2chunkIndex, ByteVector(), PROPChunk);
     d->duplicateID3V2chunkIndex = -1;
   }
@@ -316,14 +291,21 @@ void DSDIFF::File::strip(int tags)
   if(tags & ID3v2) {
     removeRootChunk("ID3 ");
     removeRootChunk("id3 ");
+    removeChildChunk("ID3 ", PROPChunk);
+    removeChildChunk("id3 ", PROPChunk);
     d->hasID3v2 = false;
     d->tag.set(ID3v2Index, new ID3v2::Tag);
-
-    /// TODO: needs to also account for ID3v2 tags under the PROP chunk
+    d->duplicateID3V2chunkIndex = -1;
+    d->isID3InPropChunk = false;
+    d->id3v2TagChunkID.setData("ID3 ");
   }
   if(tags & DIIN) {
-    removeRootChunk("DITI");
-    removeRootChunk("DIAR");
+    removeChildChunk("DITI", DIINChunk);
+    removeChildChunk("DIAR", DIINChunk);
+    if(d->childChunks[DIINIndex].size() == 0) {
+      removeRootChunk("DIIN");
+    }
+
     d->hasDiin = false;
     d->tag.set(DIINIndex, new DIIN::Tag);
   }
@@ -344,11 +326,13 @@ void DSDIFF::File::removeRootChunk(unsigned int i)
 
     // Update the internal offsets
 
-    for(unsigned long r = i + 1; r < d->chunks.size(); r++)
-      d->chunks[r].offset = d->chunks[r - 1].offset + 12
-        + d->chunks[r - 1].size + d->chunks[r - 1].padding;
-
     d->chunks.erase(d->chunks.begin() + i);
+    for(int &cci : d->childChunkIndex) {
+      if(cci > static_cast<int>(i)) {
+        --cci;
+      }
+    }
+    updateRootChunksStructure(i);
 }
 
 void DSDIFF::File::removeRootChunk(const ByteVector &id)
@@ -410,10 +394,11 @@ void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &da
   insert(ByteVector::fromLongLong(d->size, d->endianness == BigEndian), 4, 8);
 
   // Now add the chunk to the file
+  const unsigned long long fileLength = length();
   writeChunk(name,
              data,
              offset,
-             std::max<unsigned long long>(0, length() - offset),
+             fileLength > offset ? fileLength - offset : 0,
              (offset & 1) ? 1 : 0);
 
   Chunk64 chunk;
@@ -450,19 +435,23 @@ void DSDIFF::File::removeChildChunk(unsigned int i, unsigned int childChunkNum)
 
     if((i + 1) < childChunks.size()) {
       childChunks[i + 1].offset = childChunks[i].offset;
-      i++;
-      for(i++; i < childChunks.size(); i++)
-        childChunks[i].offset = childChunks[i - 1].offset + 12
-          + childChunks[i - 1].size + childChunks[i - 1].padding;
+      for(unsigned int c = i + 2; c < childChunks.size(); ++c)
+        childChunks[c].offset = childChunks[c - 1].offset + 12
+          + childChunks[c - 1].size + childChunks[c - 1].padding;
     }
 
     // And for root chunks
 
-    for(i = d->childChunkIndex[childChunkNum] + 1; i < d->chunks.size(); i++)
-      d->chunks[i].offset = d->chunks[i - 1].offset + 12
-        + d->chunks[i - 1].size + d->chunks[i - 1].padding;
-
     childChunks.erase(childChunks.begin() + i);
+    updateRootChunksStructure(d->childChunkIndex[childChunkNum] + 1);
+}
+
+void DSDIFF::File::removeChildChunk(const ByteVector &id, unsigned int childChunkNum)
+{
+  int i = chunkIndex(d->childChunks[childChunkNum], id);
+
+  if(i >= 0)
+    removeChildChunk(i, childChunkNum);
 }
 
 void DSDIFF::File::setChildChunkData(unsigned int i,
@@ -517,16 +506,9 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
 {
   ChunkList &childChunks = d->childChunks[childChunkNum];
 
-  if(childChunks.size() == 0) {
-    debug("DSDIFF::File::setChildChunkData - No valid chunks found.");
+  if(int i = chunkIndex(childChunks, name); i >= 0) {
+    setChildChunkData(i, data, childChunkNum);
     return;
-  }
-
-  for(unsigned int i = 0; i < childChunks.size(); i++) {
-    if(childChunks[i].name == name) {
-      setChildChunkData(i, data, childChunkNum);
-      return;
-    }
   }
 
   // Do not attempt to remove a non existing chunk
@@ -536,8 +518,30 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
 
   // Couldn't find an existing chunk, so let's create a new one.
 
-  unsigned int i = childChunks.size() - 1;
-  unsigned long offset = childChunks[i].offset + childChunks[i].size + childChunks[i].padding;
+  unsigned long long offset = 0;
+  if(childChunks.size() > 0) {
+    unsigned int i = childChunks.size() - 1;
+    offset = childChunks[i].offset + childChunks[i].size + childChunks[i].padding;
+  }
+  else if(childChunkNum == DIINChunk) {
+    int i = d->childChunkIndex[DIINChunk];
+    if(i < 0) {
+      setRootChunkData("DIIN", ByteVector());
+      const int lastChunkIndex = d->chunks.size() - 1;
+      if(lastChunkIndex >= 0 && d->chunks[lastChunkIndex].name == "DIIN") {
+        i = lastChunkIndex;
+        d->childChunkIndex[DIINChunk] = lastChunkIndex;
+        d->hasDiin = true;
+      }
+    }
+    if(i >= 0) {
+      offset = d->chunks[i].offset; // 12 is already added in setRootChunkData()
+    }
+  }
+  if(offset == 0) {
+    debug("DSDIFF::File::setChildChunkData - No valid chunks found.");
+    return;
+  }
 
   // First we update the global size
 
@@ -559,7 +563,7 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
     nextRootChunkIdx = d->chunks[d->childChunkIndex[childChunkNum] + 1].offset - 12;
 
   writeChunk(name, data, offset,
-             std::max<unsigned long long>(0, nextRootChunkIdx - offset),
+             nextRootChunkIdx > offset ? nextRootChunkIdx - offset : 0,
              (offset & 1) ? 1 : 0);
 
   // For root chunks
@@ -581,7 +585,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
     d->chunks[i].offset = d->chunks[i - 1].offset + 12
       + d->chunks[i - 1].size + d->chunks[i - 1].padding;
 
-  // Update childchunks structure as well
+  // Update child chunks structure as well
 
   if(d->childChunkIndex[PROPChunk] >= static_cast<int>(startingChunk)) {
     ChunkList &childChunksToUpdate = d->childChunks[PROPChunk];
@@ -606,7 +610,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
 
 void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
-  bool bigEndian = (d->endianness == BigEndian);
+  bool bigEndian = d->endianness == BigEndian;
 
   d->type = readBlock(4);
   d->size = readBlock(8).toLongLong(bigEndian);
@@ -824,8 +828,8 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
 
   // Read properties
 
-  unsigned int sampleRate=0;
-  unsigned short channels=0;
+  unsigned int sampleRate = 0;
+  unsigned short channels = 0;
 
   for(unsigned int i = 0; i < d->childChunks[PROPChunk].size(); i++) {
     if(d->childChunks[PROPChunk][i].name == "ID3 " ||
@@ -896,11 +900,8 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
     if(lengthDSDSamplesTimeChannels > 0)
       bitrate = (audioDataSizeinBytes * 8 * sampleRate) / lengthDSDSamplesTimeChannels / 1000;
 
-    d->properties = new Properties(sampleRate,
-                                   channels,
-                                   lengthDSDSamplesTimeChannels,
-                                   bitrate,
-                                   propertiesStyle);
+    d->properties = std::make_unique<Properties>(sampleRate, channels,
+      lengthDSDSamplesTimeChannels, bitrate, propertiesStyle);
   }
 
   if(!ID3v2Tag()) {

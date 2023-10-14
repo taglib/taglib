@@ -1,6 +1,6 @@
 /***************************************************************************
- copyright            : (C) 2016 by Damien Plisson, Audirvana
- email                : damien78@audirvana.com
+    copyright            : (C) 2016 by Damien Plisson, Audirvana
+    email                : damien78@audirvana.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -136,14 +136,11 @@ namespace TagLib {
         PropertyMap setProperties(const PropertyMap &) override;
 
       private:
-        Tag(const Tag &) = delete;
-        Tag &operator=(const Tag &) = delete;
-
         class TagPrivate;
-        TagPrivate *d;
+        std::unique_ptr<TagPrivate> d;
       };
-    }
-  }
-}
+    }  // namespace DIIN
+  }  // namespace DSDIFF
+}  // namespace TagLib
 
 #endif
