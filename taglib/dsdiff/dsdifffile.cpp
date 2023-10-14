@@ -54,7 +54,7 @@ namespace
   {
     for(size_t i = 0; i < chunks.size(); i++) {
       if(chunks[i].name == id)
-        return i;
+        return static_cast<int>(i);
     }
 
     return -1;
@@ -361,7 +361,7 @@ void DSDIFF::File::setRootChunkData(unsigned int i, const ByteVector &data)
   writeChunk(d->chunks[i].name,
              data,
              d->chunks[i].offset - 12,
-             d->chunks[i].size + d->chunks[i].padding + 12);
+             static_cast<unsigned long>(d->chunks[i].size + d->chunks[i].padding + 12));
 
   d->chunks[i].size = data.size();
   d->chunks[i].padding = (data.size() & 0x01) ? 1 : 0;
@@ -386,8 +386,8 @@ void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &da
   }
 
   // Couldn't find an existing chunk, so let's create a new one.
-  i = d->chunks.size() - 1;
-  unsigned long offset = d->chunks[i].offset + d->chunks[i].size + d->chunks[i].padding;
+  i = static_cast<int>(d->chunks.size()) - 1;
+  unsigned long long offset = d->chunks[i].offset + d->chunks[i].size + d->chunks[i].padding;
 
   // First we update the global size
   d->size += (offset & 1) + ((data.size() + 1) & ~1) + 12;
@@ -398,7 +398,7 @@ void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &da
   writeChunk(name,
              data,
              offset,
-             fileLength > offset ? fileLength - offset : 0,
+             static_cast<unsigned long>(fileLength > offset ? fileLength - offset : 0),
              (offset & 1) ? 1 : 0);
 
   Chunk64 chunk;
@@ -485,7 +485,7 @@ void DSDIFF::File::setChildChunkData(unsigned int i,
   writeChunk(childChunks[i].name,
              data,
              childChunks[i].offset - 12,
-             childChunks[i].size + childChunks[i].padding + 12);
+             static_cast<unsigned long>(childChunks[i].size + childChunks[i].padding + 12));
 
   childChunks[i].size = data.size();
   childChunks[i].padding = (data.size() & 0x01) ? 1 : 0;
@@ -520,14 +520,14 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
 
   unsigned long long offset = 0;
   if(childChunks.size() > 0) {
-    unsigned int i = childChunks.size() - 1;
+    size_t i = childChunks.size() - 1;
     offset = childChunks[i].offset + childChunks[i].size + childChunks[i].padding;
   }
   else if(childChunkNum == DIINChunk) {
     int i = d->childChunkIndex[DIINChunk];
     if(i < 0) {
       setRootChunkData("DIIN", ByteVector());
-      const int lastChunkIndex = d->chunks.size() - 1;
+      const int lastChunkIndex = static_cast<int>(d->chunks.size()) - 1;
       if(lastChunkIndex >= 0 && d->chunks[lastChunkIndex].name == "DIIN") {
         i = lastChunkIndex;
         d->childChunkIndex[DIINChunk] = lastChunkIndex;
@@ -563,7 +563,8 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
     nextRootChunkIdx = d->chunks[d->childChunkIndex[childChunkNum] + 1].offset - 12;
 
   writeChunk(name, data, offset,
-             nextRootChunkIdx > offset ? nextRootChunkIdx - offset : 0,
+             static_cast<unsigned long>(
+                nextRootChunkIdx > offset ? nextRootChunkIdx - offset : 0),
              (offset & 1) ? 1 : 0);
 
   // For root chunks
@@ -646,7 +647,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
     // Check padding
 
     chunk.padding = 0;
-    long uPosNotPadded = tell();
+    offset_t uPosNotPadded = tell();
     if((uPosNotPadded & 0x01) != 0) {
       ByteVector iByte = readBlock(1);
       if((iByte.size() != 1) || (iByte[0] != 0))
@@ -707,7 +708,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
         seek(dstChunkSize, Current);
 
         // Check padding
-        long uPosNotPadded = tell();
+        offset_t uPosNotPadded = tell();
         if((uPosNotPadded & 0x01) != 0) {
           ByteVector iByte = readBlock(1);
           if((iByte.size() != 1) || (iByte[0] != 0))
@@ -748,7 +749,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
 
         // Check padding
         chunk.padding = 0;
-        long uPosNotPadded = tell();
+        offset_t uPosNotPadded = tell();
         if((uPosNotPadded & 0x01) != 0) {
           ByteVector iByte = readBlock(1);
           if((iByte.size() != 1) || (iByte[0] != 0))
@@ -796,7 +797,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
         // Check padding
 
         chunk.padding = 0;
-        long uPosNotPadded = tell();
+        offset_t uPosNotPadded = tell();
 
         if((uPosNotPadded & 0x01) != 0) {
           ByteVector iByte = readBlock(1);
@@ -898,7 +899,8 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
     }
     int bitrate = 0;
     if(lengthDSDSamplesTimeChannels > 0)
-      bitrate = (audioDataSizeinBytes * 8 * sampleRate) / lengthDSDSamplesTimeChannels / 1000;
+      bitrate = static_cast<int>(
+        (audioDataSizeinBytes * 8 * sampleRate) / lengthDSDSamplesTimeChannels / 1000);
 
     d->properties = std::make_unique<Properties>(sampleRate, channels,
       lengthDSDSamplesTimeChannels, bitrate, propertiesStyle);
