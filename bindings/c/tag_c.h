@@ -320,7 +320,7 @@ TAGLIB_C_EXPORT char** taglib_property_keys(TagLib_File *file);
  * Get value(s) of property \a prop.
  *
  * \return NULL terminated array of C-strings (char *), only NULL if empty.
-   It must be freed by the client using taglib_property_free().
+ * It must be freed by the client using taglib_property_free().
  */
 TAGLIB_C_EXPORT char** taglib_property_get(TagLib_File *file, const char *prop);
 
@@ -328,6 +328,238 @@ TAGLIB_C_EXPORT char** taglib_property_get(TagLib_File *file, const char *prop);
  * Frees the NULL terminated array \a props and the C-strings it contains.
  */
 TAGLIB_C_EXPORT void taglib_property_free(char **props);
+
+/******************************************************************************
+ * Complex Properties API
+ ******************************************************************************/
+
+/*!
+ * Types which can be stored in a TagLib_Variant.
+ *
+ * \related TagLib::Variant::Type
+ * These correspond to TagLib::Variant::Type, but ByteVectorList, VariantList,
+ * VariantMap are not supported and will be returned as their string
+ * representation.
+ */
+typedef enum {
+  TagLib_Variant_Void,
+  TagLib_Variant_Bool,
+  TagLib_Variant_Int,
+  TagLib_Variant_UInt,
+  TagLib_Variant_LongLong,
+  TagLib_Variant_ULongLong,
+  TagLib_Variant_Double,
+  TagLib_Variant_String,
+  TagLib_Variant_StringList,
+  TagLib_Variant_ByteVector
+} TagLib_Variant_Type;
+
+/*!
+ * Discriminated union used in complex property attributes.
+ *
+ * \e type must be set according to the \e value union used.
+ * \e size is only required for TagLib_Variant_ByteVector and must contain
+ * the number of bytes.
+ *
+ * \related TagLib::Variant.
+ */
+typedef struct {
+  TagLib_Variant_Type type;
+  unsigned int size;
+  union {
+    char *stringValue;
+    char *byteVectorValue;
+    char **stringListValue;
+    BOOL boolValue;
+    int intValue;
+    unsigned int uIntValue;
+    long long longLongValue;
+    unsigned long long uLongLongValue;
+    double doubleValue;
+  } value;
+} TagLib_Variant;
+
+/*!
+ * Attribute of a complex property.
+ * Complex properties consist of a NULL-terminated array of pointers to
+ * this structure with \e key and \e value.
+ */
+typedef struct {
+  char *key;
+  TagLib_Variant value;
+} TagLib_Complex_Property_Attribute;
+
+/*!
+ * Picture data extracted from a complex property by the convenience function
+ * taglib_picture_from_complex_property().
+ */
+typedef struct {
+  char *mimeType;
+  char *description;
+  char *pictureType;
+  char *data;
+  unsigned int size;
+} TagLib_Complex_Property_Picture_Data;
+
+/*!
+ * Declare complex property attributes to set a picture.
+ * Can be used to define a variable \a var which can be used with
+ * taglib_complex_property_set() and a "PICTURE" key to set an
+ * embedded picture with the picture data \a dat of size \a siz
+ * and description \a desc, mime type \a mime and picture type
+ * \a typ (size is unsigned int, the other input parameters char *).
+ */
+#define TAGLIB_COMPLEX_PROPERTY_PICTURE(var, dat, siz, desc, mime, typ)   \
+const TagLib_Complex_Property_Attribute            \
+var##Attrs[] = {                                   \
+  {                                                \
+    (char *)"data",                                \
+    {                                              \
+      TagLib_Variant_ByteVector,                   \
+      (siz),                                       \
+      {                                            \
+        (char *)(dat)                              \
+      }                                            \
+    }                                              \
+  },                                               \
+  {                                                \
+    (char *)"mimeType",                            \
+    {                                              \
+      TagLib_Variant_String,                       \
+      0U,                                          \
+      {                                            \
+        (char *)(mime)                             \
+      }                                            \
+    }                                              \
+  },                                               \
+  {                                                \
+    (char *)"description",                         \
+    {                                              \
+      TagLib_Variant_String,                       \
+      0U,                                          \
+      {                                            \
+        (char *)(desc)                             \
+      }                                            \
+    }                                              \
+  },                                               \
+  {                                                \
+    (char *)"pictureType",                         \
+    {                                              \
+      TagLib_Variant_String,                       \
+      0U,                                          \
+      {                                            \
+        (char *)(typ)                              \
+      }                                            \
+    }                                              \
+  }                                                \
+};                                                 \
+const TagLib_Complex_Property_Attribute *var[] = { \
+  &var##Attrs[0], &var##Attrs[1], &var##Attrs[2],  \
+  &var##Attrs[3], NULL                             \
+}
+
+/*!
+ * Sets the complex property \a key with \a value.  Use \a value = NULL to
+ * remove the property, otherwise it will be replaced with the NULL
+ * terminated array of attributes in \a value.
+ *
+ * A picture can be set with the TAGLIB_COMPLEX_PROPERTY_PICTURE macro:
+ *
+ * \code {.c}
+ * TagLib_File *file = taglib_file_new("myfile.mp3");
+ * FILE *fh = fopen("mypicture.jpg", "rb");
+ * if(fh) {
+ *   fseek(fh, 0L, SEEK_END);
+ *   long size = ftell(fh);
+ *   fseek(fh, 0L, SEEK_SET);
+ *   char *data = (char *)malloc(size);
+ *   fread(data, size, 1, fh);
+ *   TAGLIB_COMPLEX_PROPERTY_PICTURE(props, data, size, "Written by TagLib",
+ *                                   "image/jpeg", "Front Cover");
+ *   taglib_complex_property_set(file, "PICTURE", props);
+ *   taglib_file_save(file);
+ *   free(data);
+ *   fclose(fh);
+ * }
+ * \endcode
+ */
+TAGLIB_C_EXPORT BOOL taglib_complex_property_set(
+  TagLib_File *file, const char *key,
+  const TagLib_Complex_Property_Attribute **value);
+
+/*!
+ * Appends \a value to the complex property \a key (sets it if non-existing).
+ * Use \a value = NULL to remove all values associated with the \a key.
+ */
+TAGLIB_C_EXPORT BOOL taglib_complex_property_set_append(
+  TagLib_File *file, const char *key,
+  const TagLib_Complex_Property_Attribute **value);
+
+/*!
+ * Get the keys of the complex properties.
+ *
+ * \return NULL terminated array of C-strings (char *), only NULL if empty.
+ * It must be freed by the client using taglib_complex_property_free_keys().
+ */
+TAGLIB_C_EXPORT char** taglib_complex_property_keys(TagLib_File *file);
+
+/*!
+ * Get value(s) of complex property \a key.
+ *
+ * \return NULL terminated array of property values, which are themselves an
+ * array of property attributes, only NULL if empty.
+ * It must be freed by the client using taglib_complex_property_free().
+ */
+TAGLIB_C_EXPORT TagLib_Complex_Property_Attribute*** taglib_complex_property_get(
+  TagLib_File *file, const char *key);
+
+/*!
+ * Extract the complex property values of a picture.
+ *
+ * This function can be used to get the data from a "PICTURE" complex property
+ * without having to traverse the whole variant map. A picture can be
+ * retrieved like this:
+ *
+ * \code {.c}
+ * TagLib_File *file = taglib_file_new("myfile.mp3");
+ * TagLib_Complex_Property_Attribute*** properties =
+ *   taglib_complex_property_get(file, "PICTURE");
+ * TagLib_Complex_Property_Picture_Data picture;
+ * taglib_picture_from_complex_property(properties, &picture);
+ * // Do something with picture.mimeType, picture.description,
+ * // picture.pictureType, picture.data, picture.size, e.g. extract it.
+ * FILE *fh = fopen("mypicture.jpg", "wb");
+ * if(fh) {
+ *   fwrite(picture.data, picture.size, 1, fh);
+ *   fclose(fh);
+ * }
+ * taglib_complex_property_free(properties);
+ * \endcode
+ *
+ * Note that the data in \a picture contains pointers to data in \a properties,
+ * i.e. it only lives as long as the properties, until they are freed with
+ * taglib_complex_property_free().
+ * If you want to access multiple pictures or additional properties of FLAC
+ * pictures ("width", "height", "numColors", "colorDepth" int values), you
+ * have to traverse the \a properties yourself.
+ */
+TAGLIB_C_EXPORT void taglib_picture_from_complex_property(
+  TagLib_Complex_Property_Attribute*** properties,
+  TagLib_Complex_Property_Picture_Data *picture);
+
+/*!
+ * Frees the NULL terminated array \a keys (as returned by
+ * taglib_complex_property_keys()) and the C-strings it contains.
+ */
+TAGLIB_C_EXPORT void taglib_complex_property_free_keys(char **keys);
+
+/*!
+ * Frees the NULL terminated array \a props of property attribute arrays
+ * (as returned by taglib_complex_property_get()) and the data such as
+ * C-strings and byte vectors contained in these attributes.
+ */
+TAGLIB_C_EXPORT void taglib_complex_property_free(
+  TagLib_Complex_Property_Attribute ***props);
 
 #ifdef __cplusplus
 }

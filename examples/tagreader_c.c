@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
   TagLib_Tag *tag;
   const TagLib_AudioProperties *properties;
   char **propertiesMap;
+  char **complexKeys;
 
   taglib_set_strings_unicode(1);
 
@@ -54,6 +55,7 @@ int main(int argc, char *argv[])
     tag = taglib_file_tag(file);
     properties = taglib_file_audioproperties(file);
     propertiesMap = taglib_property_keys(file);
+    complexKeys = taglib_complex_property_keys(file);
 
     if(tag != NULL) {
       printf("-- TAG (basic) --\n");
@@ -89,6 +91,73 @@ int main(int argc, char *argv[])
         taglib_property_free(propertyValues);
         ++keyPtr;
       }
+    }
+
+    if(complexKeys != NULL) {
+      char **keyPtr = complexKeys;
+      while(*keyPtr) {
+        TagLib_Complex_Property_Attribute*** properties =
+          taglib_complex_property_get(file, *keyPtr);
+        printf("%s:\n", *keyPtr);
+        if(properties != NULL) {
+          TagLib_Complex_Property_Attribute*** propPtr = properties;
+          while(*propPtr) {
+            TagLib_Complex_Property_Attribute** attrPtr = *propPtr;
+            while(*attrPtr) {
+              TagLib_Complex_Property_Attribute *attr = *attrPtr;
+              TagLib_Variant_Type type = attr->value.type;
+              printf("  %-11s - ", attr->key);
+              switch(type) {
+              case TagLib_Variant_Void:
+                printf("null\n");
+                break;
+              case TagLib_Variant_Bool:
+                printf("%s\n", attr->value.value.boolValue ? "true" : "false");
+                break;
+              case TagLib_Variant_Int:
+                printf("%d\n", attr->value.value.intValue);
+                break;
+              case TagLib_Variant_UInt:
+                printf("%u\n", attr->value.value.uIntValue);
+                break;
+              case TagLib_Variant_LongLong:
+                printf("%lld\n", attr->value.value.longLongValue);
+                break;
+              case TagLib_Variant_ULongLong:
+                printf("%llu\n", attr->value.value.uLongLongValue);
+                break;
+              case TagLib_Variant_Double:
+                printf("%f\n", attr->value.value.doubleValue);
+                break;
+              case TagLib_Variant_String:
+                printf("%s\n", attr->value.value.stringValue);
+                break;
+              case TagLib_Variant_StringList:
+                if(attr->value.value.stringListValue) {
+                  char **strs = attr->value.value.stringListValue;
+                  char **s = strs;
+                  while(*s) {
+                    if(s != strs) {
+                      printf(" ");
+                    }
+                    printf("%s", *s++);
+                  }
+                }
+                printf("\n");
+                break;
+              case TagLib_Variant_ByteVector:
+                printf("(%u bytes)\n", attr->value.size);
+                break;
+              }
+              ++attrPtr;
+            }
+            ++propPtr;
+          }
+          taglib_complex_property_free(properties);
+        }
+        ++keyPtr;
+      }
+      taglib_complex_property_free_keys(complexKeys);
     }
 
     if(properties != NULL) {
