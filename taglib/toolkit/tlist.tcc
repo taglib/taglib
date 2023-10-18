@@ -330,6 +330,21 @@ bool List<T>::operator!=(const List<T> &l) const
   return d->list != l.d->list;
 }
 
+template <class T>
+void List<T>::sort()
+{
+  detach();
+  d->list.sort();
+}
+
+template <class T>
+template <class Compare>
+void List<T>::sort(Compare&& comp)
+{
+  detach();
+  d->list.sort(std::forward<Compare>(comp));
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////

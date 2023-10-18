@@ -35,6 +35,7 @@ class TestList : public CppUnit::TestFixture
   CPPUNIT_TEST(testAppend);
   CPPUNIT_TEST(testDetach);
   CPPUNIT_TEST(bracedInit);
+  CPPUNIT_TEST(testSort);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -120,6 +121,29 @@ public:
     CPPUNIT_ASSERT_EQUAL(4, *l4[0]);
     CPPUNIT_ASSERT_EQUAL(5, *l4[1]);
     CPPUNIT_ASSERT_EQUAL(6, *l4[2]);
+  }
+
+  void testSort()
+  {
+    List<int> list1 {
+      3,
+      2,
+      1
+    };
+    list1.sort();
+    CPPUNIT_ASSERT_EQUAL(list1[0], 1);
+    CPPUNIT_ASSERT_EQUAL(list1[1], 2);
+    CPPUNIT_ASSERT_EQUAL(list1[2], 3);
+
+    List<int> list2 {
+      1,
+      2,
+      3
+    };
+    list2.sort([](const auto &a, const auto &b) { return a > b; });
+    CPPUNIT_ASSERT_EQUAL(list2[0], 3);
+    CPPUNIT_ASSERT_EQUAL(list2[1], 2);
+    CPPUNIT_ASSERT_EQUAL(list2[2], 1);
   }
 
 };
