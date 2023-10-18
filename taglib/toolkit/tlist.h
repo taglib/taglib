@@ -282,7 +282,7 @@ namespace TagLib {
     void sort();
 
     /*!
-     * Sorts this list in ascending order using using the comparison
+     * Sorts this list in ascending order using the comparison
      * function object \a comp which returns true if the first argument is
      * less than the second.
      */
