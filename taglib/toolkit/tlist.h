@@ -277,7 +277,7 @@ namespace TagLib {
     bool operator!=(const List<T> &l) const;
 
     /*!
-     * Sorts this list in ascending order using operator< of T
+     * Sorts this list in ascending order using operator< of T.
      */
     void sort();
 
