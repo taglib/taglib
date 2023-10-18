@@ -276,6 +276,19 @@ namespace TagLib {
      */
     bool operator!=(const List<T> &l) const;
 
+    /*!
+     * Sorts this list in ascending order using operator< of T.
+     */
+    void sort();
+
+    /*!
+     * Sorts this list in ascending order using the comparison
+     * function object \a comp which returns true if the first argument is
+     * less than the second.
+     */
+    template<class Compare>
+    void sort(Compare&& comp);
+
   protected:
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
