@@ -2,40 +2,42 @@
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskasimpletag.h"
+#include "matroskaattachments.h"
+#include "matroskaattachedfile.h"
 #include "tstring.h"
 #include "tutils.h"
 #include "tbytevector.h"
 #define GREEN_TEXT(s) "[1;32m" s "[0m"
-#define PRINT_PRETTY(label, value) printf("" GREEN_TEXT(label) ": %s\n", value)
+#define PRINT_PRETTY(label, value) printf("  " GREEN_TEXT(label) ": %s\n", value)
 
 int main(int argc, char *argv[])
 {
-  if (argc != 2) {
+  if(argc != 2) {
     printf("Usage: matroskareader FILE\n");
     return 1;
   }
   TagLib::Matroska::File file(argv[1]);
-  if (!file.isValid()) {
+  if(!file.isValid()) {
     printf("File is not valid\n");
     return 1;
   }
   auto tag = dynamic_cast<TagLib::Matroska::Tag*>(file.tag());
-  if (!tag) {
+  if(!tag) {
     printf("File has no tag\n");
     return 0;
   }
 
   const TagLib::Matroska::SimpleTagsList &list = tag->simpleTagsList();
-  printf("Found %i tags:\n\n", list.size());
+  printf("Found %u tag(s):\n", list.size());
   
-  for (TagLib::Matroska::SimpleTag *t : list) {
+  for(TagLib::Matroska::SimpleTag *t : list) {
     PRINT_PRETTY("Tag Name", t->name().toCString(true));
 
     TagLib::Matroska::SimpleTagString *tString = nullptr;
     TagLib::Matroska::SimpleTagBinary *tBinary = nullptr;
-    if ((tString = dynamic_cast<TagLib::Matroska::SimpleTagString*>(t)))
+    if((tString = dynamic_cast<TagLib::Matroska::SimpleTagString*>(t)))
       PRINT_PRETTY("Tag Value", tString->value().toCString(true));
-    else if ((tBinary = dynamic_cast<TagLib::Matroska::SimpleTagBinary*>(t)))
+    else if((tBinary = dynamic_cast<TagLib::Matroska::SimpleTagBinary*>(t)))
       PRINT_PRETTY("Tag Value", 
         TagLib::Utils::formatString("Binary with size %i", tBinary->value().size()).toCString(false)
       );
@@ -49,6 +51,27 @@ int main(int argc, char *argv[])
 
     printf("\n");
   }
+
+  TagLib::Matroska::Attachments *attachments = file.attachments();
+  if(attachments) {
+    const TagLib::Matroska::Attachments::AttachedFileList &list = attachments->attachedFileList();
+    printf("Found %u attachment(s)\n", list.size());
+    for(auto attachedFile : list) {
+      PRINT_PRETTY("Filename", attachedFile->fileName().toCString(true));
+      const TagLib::String &description = attachedFile->description();
+      PRINT_PRETTY("Description", !description.isEmpty() ? description.toCString(true) : "None");
+      const TagLib::String &mediaType = attachedFile->mediaType();
+      PRINT_PRETTY("Media Type", !mediaType.isEmpty() ? mediaType.toCString(false) : "None");
+      PRINT_PRETTY("Data Size",
+        TagLib::Utils::formatString("%u byte(s)",attachedFile->data().size()).toCString(false)
+      );
+      PRINT_PRETTY("UID",
+        TagLib::Utils::formatString("%llu",attachedFile->uid()).toCString(false)
+      );
+    }
+  }
+  else
+    printf("File has no attachments\n");
 
   return 0;
 }

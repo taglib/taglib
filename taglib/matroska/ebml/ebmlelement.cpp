@@ -20,8 +20,10 @@
 
 #include "ebmlelement.h"
 #include "ebmlmasterelement.h"
+#include "ebmlbinaryelement.h"
 #include "ebmlmksegment.h"
 #include "ebmlmktags.h"
+#include "ebmlmkattachments.h"
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlutils.h"
@@ -36,15 +38,16 @@ using namespace TagLib;
 EBML::Element* EBML::Element::factory(File &file)
 {
   // Get the element ID
+  offset_t offset = file.tell();
   Id id = readId(file);
-  if (!id) {
+  if(!id) {
     debug("Failed to parse EMBL ElementID");
     return nullptr;
   }
 
   // Get the size length and data length
   const auto& [sizeLength, dataSize] = readVINT<offset_t>(file);
-  if (!sizeLength)
+  if(!sizeLength)
     return nullptr;
 
   // Return the subclass
@@ -53,25 +56,36 @@ EBML::Element* EBML::Element::factory(File &file)
       return new Element(id, sizeLength, dataSize);
     
     case ElementIDs::MkSegment:
-      return new MkSegment(sizeLength, dataSize);
+      return new MkSegment(sizeLength, dataSize, offset);
 
     case ElementIDs::MkTags:
-      return new MkTags(sizeLength, dataSize);
+      return new MkTags(sizeLength, dataSize, offset);
+
+    case ElementIDs::MkAttachments:
+      return new MkAttachments(sizeLength, dataSize, offset);
 
     case ElementIDs::MkTag:
     case ElementIDs::MkTagTargets:
     case ElementIDs::MkSimpleTag:
-      return new MasterElement(id, sizeLength, dataSize);
+    case ElementIDs::MkAttachedFile:
+      return new MasterElement(id, sizeLength, dataSize, offset);
 
     case ElementIDs::MkTagName:
     case ElementIDs::MkTagString:
+    case ElementIDs::MkAttachedFileName:
+    case ElementIDs::MkAttachedFileDescription:
       return new UTF8StringElement(id, sizeLength, dataSize);
 
     case ElementIDs::MkTagLanguage:
+    case ElementIDs::MkAttachedFileMediaType:
       return new Latin1StringElement(id, sizeLength, dataSize);
 
     case ElementIDs::MkTagTargetTypeValue:
+    case ElementIDs::MkAttachedFileUID:
       return new UIntElement(id, sizeLength, dataSize);
+
+    case ElementIDs::MkAttachedFileData:
+      return new BinaryElement(id, sizeLength, dataSize);
 
     default:
       return new Element(id, sizeLength, dataSize);
@@ -83,16 +97,16 @@ EBML::Element* EBML::Element::factory(File &file)
 EBML::Element::Id EBML::Element::readId(File &file)
 {
   auto buffer = file.readBlock(1);
-  if (buffer.size() != 1) {
+  if(buffer.size() != 1) {
     debug("Failed to read VINT size");
     return 0;
   }
   unsigned int nb_bytes = VINTSizeLength<4>(*buffer.begin());
-  if (!nb_bytes)
+  if(!nb_bytes)
     return 0;
-  if (nb_bytes > 1)
+  if(nb_bytes > 1)
     buffer.append(file.readBlock(nb_bytes - 1));
-  if (buffer.size() != nb_bytes) {
+  if(buffer.size() != nb_bytes) {
     debug("Failed to read VINT data");
     return 0;
   }

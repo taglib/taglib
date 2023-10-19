@@ -38,13 +38,13 @@ namespace TagLib {
       UIntElement(Id id)
       : UIntElement(id, 0, 0)
       {}
-      unsigned int getValue() const { return value; }
-      void setValue(unsigned int value) { this->value = value; }
+      unsigned long long getValue() const { return value; }
+      void setValue(unsigned long long value) { this->value = value; }
       bool read(File &file) override;
       ByteVector render() override;
 
     private:
-      uint64_t value = 0;
+      unsigned long long value = 0;
 
     //protected:
 

@@ -18,40 +18,43 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-#include <tuple>
+#ifndef HAS_MATROSKAATTACHMENTS_H
+#define HAS_MATROSKAATTACHMENTS_H
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
-#ifndef DO_NOT_DOCUMENT
+#include <memory>
+#include "taglib_export.h"
+#include "tlist.h"
+#include "matroskaelement.h"
+
 
 namespace TagLib {
-  namespace Matroska {
-    class Tag;
-    class Attachments;
-  }
   namespace EBML {
-    class MkTags;
     class MkAttachments;
-    class MkSegment : public MasterElement
+  }
+  namespace Matroska {
+    class AttachedFile;
+    class File;
+    class TAGLIB_EXPORT Attachments : private Element
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
-      {}
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
+      using AttachedFileList = List<AttachedFile*>;
+      Attachments();
+      virtual ~Attachments();
+
+    void addAttachedFile(AttachedFile *file);
+    void removeAttachedFile(AttachedFile *file);
+    void clear();
+    const AttachedFileList& attachedFileList() const;
+    ByteVector render() override;
 
     private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
+      friend class EBML::MkAttachments;
+      friend class Matroska::File;
+      class AttachmentsPrivate;
+      std::unique_ptr<AttachmentsPrivate> d;
 
     };
   }
 }
 
-#endif
 #endif

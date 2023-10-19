@@ -20,6 +20,7 @@
 
 #include "matroskafile.h"
 #include "matroskatag.h"
+#include "matroskaattachments.h"
 #include "ebmlutils.h"
 #include "ebmlelement.h"
 #include "ebmlmksegment.h"
@@ -28,6 +29,8 @@
 #include "tutils.h"
 
 #include <memory>
+#include <algorithm>
+#include <vector>
 
 using namespace TagLib;
 
@@ -35,29 +38,27 @@ class Matroska::File::FilePrivate
 {
 public:
   FilePrivate() {}
-
   ~FilePrivate()
   {
     delete tag;
+    delete attachments;
   }
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
   Matroska::Tag *tag = nullptr;
-  offset_t tagsOffset = 0;
-  offset_t tagsOriginalSize = 0;
+  Matroska::Attachments *attachments = nullptr;
   offset_t segmentSizeOffset = 0;
   offset_t segmentSizeLength = 0;
   offset_t segmentDataSize = 0;
 
-  //Properties *properties = nullptr;
 };
 
 Matroska::File::File(FileName file, bool readProperties)
 : TagLib::File(file),
   d(std::make_unique<FilePrivate>())
 {
-  if (!isOpen()) {
+  if(!isOpen()) {
     debug("Failed to open matroska file");
     setValid(false);
     return;
@@ -68,7 +69,7 @@ Matroska::File::File(IOStream *stream, bool readProperties)
 : TagLib::File(stream),
   d(std::make_unique<FilePrivate>())
 {
-  if (!isOpen()) {
+  if(!isOpen()) {
     debug("Failed to open matroska file");
     setValid(false);
     return;
@@ -84,12 +85,23 @@ TagLib::Tag* Matroska::File::tag() const
 
 Matroska::Tag* Matroska::File::tag(bool create) const
 {
-  if (d->tag)
+  if(d->tag)
     return d->tag;
   else {
-    if (create)
+    if(create)
       d->tag = new Matroska::Tag();
     return d->tag;
+  }
+}
+
+Matroska::Attachments* Matroska::File::attachments(bool create) const
+{
+  if(d->attachments)
+    return d->attachments;
+  else {
+    if(create)
+      d->attachments = new Attachments();
+    return d->attachments;
   }
 }
 
@@ -99,7 +111,7 @@ void Matroska::File::read(bool readProperties)
 
   // Find the EBML Header
   std::unique_ptr<EBML::Element> head(EBML::Element::factory(*this));
-  if (!head || head->getId() != EBML::ElementIDs::EBMLHeader) {
+  if(!head || head->getId() != EBML::ElementIDs::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
     return;
@@ -112,7 +124,7 @@ void Matroska::File::read(bool readProperties)
       EBML::findElement(*this, EBML::ElementIDs::MkSegment, fileLength - tell())
     )
   );
-  if (!segment) {
+  if(!segment) {
     debug("Failed to find Matroska segment");
     setValid(false);
     return;
@@ -122,32 +134,103 @@ void Matroska::File::read(bool readProperties)
   d->segmentDataSize = segment->getDataSize();
 
   // Read the segment into memory from file
-  if (!segment->read(*this)) {
+  if(!segment->read(*this)) {
     debug("Failed to read segment");
     setValid(false);
     return;
   }
 
   // Parse the tag
-  const auto& [tag, tagsOffset, tagsOriginalSize] = segment->parseTag();
-  d->tag = tag;
-  d->tagsOffset = tagsOffset;
-  d->tagsOriginalSize = tagsOriginalSize;
+  d->tag = segment->parseTag();
 
+  // Parse the attachments
+  d->attachments = segment->parseAttachments();
+
+  setValid(true);
 }
 
 bool Matroska::File::save()
 {
-  if (d->tag) {
+  std::vector<Element*> renderListExisting;
+  std::vector<Element*> renderListNew;
+  offset_t newSegmentDataSize = d->segmentDataSize;
+
+
+  if(d->tag) {
+    if(d->tag->size())
+      renderListExisting.push_back(d->tag);
+    else
+      renderListNew.push_back(d->tag);
+  }
+
+  if(d->attachments) {
+    //d->attachments->setOffset(d->tag->offset());
+    //renderListExisting.push_back(d->attachments);
+    if(d->attachments->size())
+      renderListExisting.push_back(d->attachments);
+    else
+      renderListNew.push_back(d->attachments);
+
+      
+  }
+
+
+  // Render from end to beginning so we don't have to shift
+  // the file offsets
+  std::sort(renderListExisting.begin(),
+    renderListExisting.end(),
+    [](auto a, auto b) { return a->offset() > b->offset(); }
+  );
+
+  // Overwrite existing elements
+  for(auto element : renderListExisting) {
+    offset_t offset = element->offset();
+    offset_t originalSize = element->size();
+    ByteVector data = element->render();
+    insert(data, offset, originalSize);
+    newSegmentDataSize += (data.size() - originalSize);
+  }
+
+  // Add new elements to the end of file
+  for(auto element : renderListNew) {
+    offset_t offset = length();
+    ByteVector data = element->render();
+    insert(data, offset, 0);
+    newSegmentDataSize += data.size();
+  }
+
+  // Write the new segment data size
+  if(newSegmentDataSize != d->segmentDataSize) {
+    auto segmentDataSizeBuffer = EBML::renderVINT(newSegmentDataSize, d->segmentSizeLength);
+    insert(segmentDataSizeBuffer, d->segmentSizeOffset, d->segmentSizeLength);
+    d->segmentDataSize = newSegmentDataSize;
+  }
+
+/*
+  auto&& renderElements [&d->segmentDataSize](Element *element) {
+    auto offset = element->offset();
+    if(!offset)
+  }
+  
+  if(d->tag) {
     ByteVector tag = d->tag->render();
-    if (!d->tagsOriginalSize) {
-      d->tagsOffset = d->segmentSizeOffset + d->segmentSizeLength + d->segmentDataSize;
+    auto tagsOriginalSize = d->tag->size();
+    auto tagsOffset = d->tag->offset();
+    
+    if(!tagsOriginalSize) {
+      tagsOffset = d->segmentSizeOffset + d->segmentSizeLength + d->segmentDataSize;
     }
-    insert(tag, d->tagsOffset, d->tagsOriginalSize);
-    d->segmentDataSize += (tag.size() - d->tagsOriginalSize);
+    insert(tag, tagsOffset, tagsOriginalSize);
+    d->segmentDataSize += (tag.size() - tagsOriginalSize);
     auto segmentDataSizeBuffer = EBML::renderVINT(d->segmentDataSize, d->segmentSizeLength);
     insert(segmentDataSizeBuffer, d->segmentSizeOffset, d->segmentSizeLength);
-
   }
+  */
+  /*
+  if(d->attachments) {
+    ByteVector attachments = d->attachments->render();
+  }
+  */
+
   return true;
 }

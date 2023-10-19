@@ -35,6 +35,7 @@ namespace TagLib {
   namespace Matroska {
     class Properties;
     class Tag;
+    class Attachments;
     class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
@@ -45,6 +46,7 @@ namespace TagLib {
       File &operator=(const File &) = delete;
       AudioProperties *audioProperties() const override { return nullptr; }
       TagLib::Tag *tag() const override;
+      Attachments* attachments(bool create = false) const;
       Matroska::Tag *tag(bool create) const;
       bool save() override;
       //PropertyMap properties() const override { return PropertyMap(); }

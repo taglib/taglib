@@ -35,11 +35,11 @@ namespace TagLib {
     class MkTags : public MasterElement
     {
     public:
-      MkTags(int sizeLength, offset_t dataSize)
-      : MasterElement(ElementIDs::MkTags, sizeLength, dataSize)
+      MkTags(int sizeLength, offset_t dataSize, offset_t offset)
+      : MasterElement(ElementIDs::MkTags, sizeLength, dataSize, offset)
       {}
       MkTags()
-      : MasterElement(ElementIDs::MkTags, 0, 0)
+      : MasterElement(ElementIDs::MkTags, 0, 0, 0)
       {}
       //virtual void read(File &file) override;
       Matroska::Tag* parse();

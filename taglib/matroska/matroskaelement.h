@@ -18,40 +18,34 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-#include <tuple>
+#ifndef HAS_MATROSKAELEMENT_H
+#define HAS_MATROSKAELEMENT_H
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
-#ifndef DO_NOT_DOCUMENT
+#include <memory>
+#include "taglib_export.h"
+#include "tutils.h"
+#include "tbytevector.h"
+
 
 namespace TagLib {
   namespace Matroska {
-    class Tag;
-    class Attachments;
-  }
-  namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSegment : public MasterElement
+    class TAGLIB_EXPORT Element
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
-      {}
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
+      Element();
+      virtual ~Element();
+      virtual ByteVector render() = 0;
+      offset_t size() const;
+      offset_t offset() const;
+      void setOffset(offset_t offset);
+      void setSize(offset_t size);
 
     private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
+      class ElementPrivate;
+      std::unique_ptr<ElementPrivate> e;
 
     };
   }
 }
 
-#endif
-#endif
+ #endif

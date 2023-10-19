@@ -18,37 +18,34 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-#include <tuple>
-
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
+#ifndef TAGLIB_EBMLBINARYELEMENT_H
+#define TAGLIB_EBMLBINARYELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
+#include <cstdint>
+#include "ebmlelement.h"
+#include "ebmlutils.h"
+#include "tbytevector.h"
+
 namespace TagLib {
-  namespace Matroska {
-    class Tag;
-    class Attachments;
-  }
+  class File;
   namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSegment : public MasterElement
+    class BinaryElement : public Element
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
+      BinaryElement(Id id, int sizeLength, offset_t dataSize)
+      : Element(id, sizeLength, dataSize)
       {}
-      ~MkSegment() override;
+      BinaryElement(Id id)
+      : Element(id, 0, 0)
+      {}
+      const ByteVector& getValue() const { return value; }
+      void setValue(const ByteVector &value) { this->value = value; }
       bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
+      ByteVector render() override;
 
     private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-
+      ByteVector value;
     };
   }
 }

@@ -31,15 +31,15 @@ template<String::Type t>
 bool EBML::StringElement<t>::read(TagLib::File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
-  if (buffer.size() != dataSize) {
+  if(buffer.size() != dataSize) {
     debug("Failed to read string");
     return false;
   }
 
   // The EBML strings aren't supposed to be null-terminated,
-  // but we'll check for it and stip the null terminator if found
+  // but we'll check for it and strip the null terminator if found
   int nullByte = buffer.find('\0');
-  if (nullByte >= 0)
+  if(nullByte >= 0)
     buffer = ByteVector(buffer.data(), nullByte);
   value = String(buffer, t);
   return true;

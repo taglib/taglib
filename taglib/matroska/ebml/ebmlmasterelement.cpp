@@ -30,7 +30,7 @@ using namespace TagLib;
 
 EBML::MasterElement::~MasterElement()
 {
-  for (auto element : elements)
+  for(auto element : elements)
     delete element;
 }
 
@@ -38,8 +38,8 @@ bool EBML::MasterElement::read(File &file)
 {
   offset_t maxOffset = file.tell() + dataSize;
   Element *element = nullptr;
-  while ((element = findNextElement(file, maxOffset))) {
-    if (!element->read(file))
+  while((element = findNextElement(file, maxOffset))) {
+    if(!element->read(file))
       return false;
     elements.append(element);
   }
@@ -50,7 +50,7 @@ ByteVector EBML::MasterElement::render()
 {
   ByteVector buffer = renderId();
   ByteVector data;
-  for (auto element : elements)
+  for(auto element : elements)
     data.append(element->render());
   dataSize = data.size();
   buffer.append(renderVINT(dataSize, 0));

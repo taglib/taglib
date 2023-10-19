@@ -18,40 +18,29 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-#include <tuple>
+#include "ebmlbinaryelement.h"
+#include "tfile.h"
+#include "tbytevector.h"
+#include "tdebug.h"
+#include <string>
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
-#ifndef DO_NOT_DOCUMENT
+using namespace TagLib;
 
-namespace TagLib {
-  namespace Matroska {
-    class Tag;
-    class Attachments;
+bool EBML::BinaryElement::read(TagLib::File &file)
+{
+  value = file.readBlock(dataSize);
+  if(value.size() != dataSize) {
+    debug("Failed to read binary element");
+    return false;
   }
-  namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSegment : public MasterElement
-    {
-    public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
-      {}
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
-
-    private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-
-    };
-  }
+  return true;
 }
 
-#endif
-#endif
+ByteVector EBML::BinaryElement::render()
+{
+  ByteVector buffer = renderId();
+  dataSize = value.size();
+  buffer.append(renderVINT(dataSize, 0));
+  buffer.append(value);
+  return buffer;
+}

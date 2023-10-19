@@ -18,6 +18,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <random>
 #include "ebmlutils.h"
 #include "ebmlelement.h"
 #include "tbytevector.h"
@@ -32,9 +33,9 @@ using namespace TagLib;
 EBML::Element* EBML::findElement(File &file, EBML::Element::Id id, offset_t maxOffset)
 {
   Element *element = nullptr;
-  while (file.tell() < maxOffset) {
+  while(file.tell() < maxOffset) {
     element = Element::factory(file);
-    if (!element || element->getId() == id)
+    if(!element || element->getId() == id)
       return element;
     element->skipData(file);
     delete element;
@@ -53,15 +54,15 @@ std::pair<int, T> EBML::readVINT(File &file)
 {
   static_assert(sizeof(T) == 8);
   auto buffer = file.readBlock(1);
-  if (buffer.size() != 1) {
+  if(buffer.size() != 1) {
     debug("Failed to read VINT size");
     return {0, 0};
   }
   unsigned int nb_bytes = VINTSizeLength<8>(*buffer.begin());
-  if (!nb_bytes)
+  if(!nb_bytes)
     return {0, 0};
 
-  if (nb_bytes > 1)
+  if(nb_bytes > 1)
     buffer.append(file.readBlock(nb_bytes - 1));
   int bits_to_shift = (sizeof(T) * 8) - (7 * nb_bytes);
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
@@ -75,11 +76,11 @@ namespace TagLib::EBML {
 template<typename T>
 std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
 {
-  if (buffer.isEmpty())
+  if(buffer.isEmpty())
     return {0, 0};
 
   unsigned int numBytes = VINTSizeLength<8>(*buffer.begin());
-  if (!numBytes)
+  if(!numBytes)
     return {0, 0};
 
   int bits_to_shift = (sizeof(T) * 8) - (7 * numBytes);
@@ -96,7 +97,15 @@ ByteVector EBML::renderVINT(uint64_t number, int minSizeLength)
   int numBytes = std::max(minSizeLength, minSize(number));
   number |= (1ULL << (numBytes * 7));
   static const auto byteOrder = Utils::systemByteOrder();
-  if (byteOrder == Utils::LittleEndian)
+  if(byteOrder == Utils::LittleEndian)
     number = Utils::byteSwap(static_cast<unsigned long long>(number));
   return ByteVector((char*) &number + (sizeof(number) - numBytes), numBytes); 
+}
+
+unsigned long long EBML::randomUID()
+{
+  static std::random_device device;  
+  static std::mt19937 generator(device());
+  static std::uniform_int_distribution<unsigned long long> distribution;
+  return distribution(generator);
 }

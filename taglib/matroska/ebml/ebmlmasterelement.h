@@ -33,15 +33,16 @@ namespace TagLib {
     class MasterElement : public Element
     {
     public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize)
-      : Element(id, sizeLength, dataSize)
+      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset)
+      : Element(id, sizeLength, dataSize), offset(offset)
       {}
       MasterElement(Id id)
-      : Element(id, 0, 0)
+      : Element(id, 0, 0), offset(0)
       {}
       ~MasterElement() override;
-      virtual bool isMaster() const override { return true; }
-      virtual bool read(File &file) override;
+      offset_t getOffset() const { return offset; }
+      offset_t getSize() const { return headSize() + dataSize; }
+      bool read(File &file) override;
       ByteVector render() override;
       void appendElement(Element *element) { elements.append(element); }
       List<Element*>::Iterator begin () { return elements.begin(); }
@@ -50,6 +51,7 @@ namespace TagLib {
       List<Element*>::ConstIterator cend () const { return elements.cend(); }
 
     protected:
+      offset_t offset;
       List<Element*> elements;
     };
     

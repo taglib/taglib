@@ -29,22 +29,42 @@ using namespace TagLib;
 bool EBML::UIntElement::read(TagLib::File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
-  if (buffer.size() != dataSize) {
+  if(buffer.size() != dataSize) {
     debug("Failed to read EBML Uint element");
     return false;
   }
-  value = buffer.toLongLong(true);
+  value = buffer.toULongLong(true);
   return true;
 }
 
 ByteVector EBML::UIntElement::render()
 {
+  int dataSize = 0;
+  if(value <= 0xFFull)
+    dataSize = 1;
+  else if(value <= 0xFFFFull)
+    dataSize = 2;
+  else if(value <= 0xFFFFFFull)
+    dataSize = 3;
+  else if(value <= 0xFFFFFFFFull)
+    dataSize = 4;
+  else if(value <= 0xFFFFFFFFFFull)
+    dataSize = 5;
+  else if(value <= 0xFFFFFFFFFFFFull)
+    dataSize = 6;
+  else if(value <= 0xFFFFFFFFFFFFFFull)
+    dataSize = 7;
+  else if(value <= 0xFFFFFFFFFFFFFFFFull)
+    dataSize = 8;
+
   ByteVector buffer = renderId();
-  dataSize = minSize(value);
+  //dataSize = minSize(value);
   buffer.append(renderVINT(dataSize, 0));
-  uint64_t value = this->value;
+  unsigned long long value = this->value;
+  //debug(Utils::formatString("Writing %llu", value));
+
   static const auto byteOrder = Utils::systemByteOrder(); 
-  if (byteOrder == Utils::LittleEndian)
+  if(byteOrder == Utils::LittleEndian)
     value = Utils::byteSwap((unsigned long long) value);
 
   buffer.append(ByteVector((char*) &value + (sizeof(value) - dataSize), dataSize));

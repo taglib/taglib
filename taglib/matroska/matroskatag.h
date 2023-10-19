@@ -29,12 +29,17 @@
 #include "tstring.h"
 #include "tlist.h"
 #include "matroskafile.h"
+#include "matroskaelement.h"
 #include "matroskasimpletag.h"
 
 namespace TagLib {
+  namespace EBML {
+    class MkTags;
+  }
+
   namespace Matroska {
     using SimpleTagsList = List<SimpleTag*>;
-    class TAGLIB_EXPORT Tag : public TagLib::Tag
+    class TAGLIB_EXPORT Tag : public TagLib::Tag, private Element
     {
     public:
       Tag();
@@ -58,6 +63,7 @@ namespace TagLib {
       void setYear(unsigned int i) override;
       void setTrack(unsigned int i) override;
       bool isEmpty() const override;
+      ByteVector render() override;
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
       template <typename T>
@@ -65,9 +71,9 @@ namespace TagLib {
       {
         auto &list = simpleTagsListPrivate();
         int numRemoved = 0;
-        for (auto it = list.begin(); it != list.end();) {
+        for(auto it = list.begin(); it != list.end();) {
           it = std::find_if(it, list.end(), std::forward<T>(p));
-          if (it != list.end()) {
+          if(it != list.end()) {
             delete *it;
             *it = nullptr;
             it = list.erase(it);
@@ -81,15 +87,16 @@ namespace TagLib {
       SimpleTagsList findSimpleTags(T&& p)
       {
         auto &list = simpleTagsListPrivate();
-        for (auto it = list.begin(); it != list.end();) {
+        for(auto it = list.begin(); it != list.end();) {
           it = std::find_if(it, list.end(), std::forward<T>(p));
-          if (it != list.end()) {
+          if(it != list.end()) {
             list.append(*it);
             ++it;
           }
         }
         return list;
       }
+
       template<typename T>
       const Matroska::SimpleTag* findSimpleTag(T&& p) const
       {
@@ -97,6 +104,7 @@ namespace TagLib {
         auto it = std::find_if(list.begin(), list.end(), std::forward<T>(p));
         return it != list.end() ? *it : nullptr;
       }
+
       template <typename T>
       Matroska::SimpleTag* findSimpleTag(T&&p)
       {
@@ -107,7 +115,7 @@ namespace TagLib {
 
     private:
       friend class Matroska::File;
-      ByteVector render();
+      friend class EBML::MkTags;
       SimpleTagsList& simpleTagsListPrivate();
       const SimpleTagsList& simpleTagsListPrivate() const;
       bool setTag(const String &key, const String &value);

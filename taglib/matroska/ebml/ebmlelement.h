@@ -24,7 +24,6 @@
 
 #include "tfile.h"
 #include "tutils.h"
-//#include "ebmlutils.h"
 #include "taglib.h"
 
 namespace TagLib {
@@ -37,7 +36,6 @@ namespace TagLib {
       : id(id), sizeLength(sizeLength), dataSize(dataSize)
       {}
       virtual ~Element() = default;
-      virtual bool isMaster() const { return false; }
       virtual bool read(File &file) {
         skipData(file);
         return true;
@@ -59,22 +57,29 @@ namespace TagLib {
     };
 
     namespace ElementIDs {
-      inline constexpr Element::Id EBMLHeader            = 0x1A45DFA3;
-      inline constexpr Element::Id MkSegment             = 0x18538067;
-      inline constexpr Element::Id MkTags                = 0x1254C367;
-      inline constexpr Element::Id MkTag                 = 0x7373;
-      inline constexpr Element::Id MkTagTargets          = 0x63C0;
-      inline constexpr Element::Id MkTagTargetTypeValue  = 0x68CA;
-      inline constexpr Element::Id MkSimpleTag           = 0x67C8;
-      inline constexpr Element::Id MkTagName             = 0x45A3;
-      inline constexpr Element::Id MkTagLanguage         = 0x447A;
-      inline constexpr Element::Id MkTagString           = 0x4487;
-      inline constexpr Element::Id MkTagsTagLanguage     = 0x447A;
-      inline constexpr Element::Id MkTagsLanguageDefault = 0x4484;
+      inline constexpr Element::Id EBMLHeader                = 0x1A45DFA3;
+      inline constexpr Element::Id MkSegment                 = 0x18538067;
+      inline constexpr Element::Id MkTags                    = 0x1254C367;
+      inline constexpr Element::Id MkTag                     = 0x7373;
+      inline constexpr Element::Id MkTagTargets              = 0x63C0;
+      inline constexpr Element::Id MkTagTargetTypeValue      = 0x68CA;
+      inline constexpr Element::Id MkSimpleTag               = 0x67C8;
+      inline constexpr Element::Id MkTagName                 = 0x45A3;
+      inline constexpr Element::Id MkTagLanguage             = 0x447A;
+      inline constexpr Element::Id MkTagString               = 0x4487;
+      inline constexpr Element::Id MkTagsTagLanguage         = 0x447A;
+      inline constexpr Element::Id MkTagsLanguageDefault     = 0x4484;
+      inline constexpr Element::Id MkAttachments             = 0x1941A469;
+      inline constexpr Element::Id MkAttachedFile            = 0x61A7;
+      inline constexpr Element::Id MkAttachedFileDescription = 0x467E;
+      inline constexpr Element::Id MkAttachedFileName        = 0x466E;
+      inline constexpr Element::Id MkAttachedFileMediaType   = 0x4660;
+      inline constexpr Element::Id MkAttachedFileData        = 0x465C;
+      inline constexpr Element::Id MkAttachedFileUID         = 0x46AE;
+
     }
   }
 }
-
 
 #endif
 #endif

@@ -34,30 +34,32 @@ using namespace TagLib;
 Matroska::Tag* EBML::MkTags::parse()
 {
   auto mTag = new Matroska::Tag();
+  mTag->setOffset(offset);
+  mTag->setSize(getSize());
 
   // Loop through each <Tag> element
-  for (auto tagsChild : elements) {
-    if (tagsChild->getId() != ElementIDs::MkTag)
+  for(auto tagsChild : elements) {
+    if(tagsChild->getId() != ElementIDs::MkTag)
       continue;
     auto tag = static_cast<MasterElement*>(tagsChild);
     List<MasterElement*> simpleTags;
     MasterElement *targets = nullptr;
 
     // Identify the <Targets> element and the <SimpleTag> elements
-    for (auto tagChild : *tag) {
+    for(auto tagChild : *tag) {
       Id tagChildId = tagChild->getId();
-      if (!targets && tagChildId == ElementIDs::MkTagTargets)
+      if(!targets && tagChildId == ElementIDs::MkTagTargets)
         targets = static_cast<MasterElement*>(tagChild);
-      else if (tagChildId == ElementIDs::MkSimpleTag)
+      else if(tagChildId == ElementIDs::MkSimpleTag)
         simpleTags.append(static_cast<MasterElement*>(tagChild));
     }
 
     // Parse the <Targets> element
     Matroska::SimpleTag::TargetTypeValue targetTypeValue = Matroska::SimpleTag::TargetTypeValue::None;
-    if (targets) {
-      for (auto targetsChild : *targets) {
+    if(targets) {
+      for(auto targetsChild : *targets) {
         Id id = targetsChild->getId();
-        if (id == ElementIDs::MkTagTargetTypeValue
+        if(id == ElementIDs::MkTagTargetTypeValue
             && targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) {
           targetTypeValue = static_cast<Matroska::SimpleTag::TargetTypeValue>(
             static_cast<UIntElement*>(targetsChild)->getValue()
@@ -67,43 +69,43 @@ Matroska::Tag* EBML::MkTags::parse()
     }
 
     // Parse each <SimpleTag>
-    for (auto simpleTag : simpleTags) {
+    for(auto simpleTag : simpleTags) {
       const String *tagName = nullptr;
       const String *tagValueString = nullptr;
       const ByteVector *tagValueBinary = nullptr;
       const String *language = nullptr;
       bool defaultLanguageFlag = true;
 
-      for (auto simpleTagChild : *simpleTag) {
+      for(auto simpleTagChild : *simpleTag) {
         Id id = simpleTagChild->getId();
-        if (id == ElementIDs::MkTagName && !tagName)
+        if(id == ElementIDs::MkTagName && !tagName)
           tagName = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
-        else if (id == ElementIDs::MkTagString && !tagValueString)
+        else if(id == ElementIDs::MkTagString && !tagValueString)
           tagValueString = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
-        else if (id == ElementIDs::MkTagsTagLanguage && !language)
+        else if(id == ElementIDs::MkTagsTagLanguage && !language)
           language = &(static_cast<Latin1StringElement*>(simpleTagChild)->getValue());
-        else if (id == ElementIDs::MkTagsLanguageDefault)
+        else if(id == ElementIDs::MkTagsLanguageDefault)
           defaultLanguageFlag = static_cast<UIntElement*>(simpleTagChild)->getValue() ? true : false;
       }
-      if (!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
+      if(!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
         continue;
 
       // Create a Simple Tag object and add it to the Tag object
       Matroska::SimpleTag *sTag = nullptr;
-      if (tagValueString) {
+      if(tagValueString) {
         auto sTagString = new Matroska::SimpleTagString();
         sTagString->setTargetTypeValue(targetTypeValue);
         sTagString->setValue(*tagValueString);
         sTag = sTagString;
       }
-      else if (tagValueBinary) {
+      else if(tagValueBinary) {
         auto sTagBinary = new Matroska::SimpleTagBinary();
         sTagBinary->setTargetTypeValue(targetTypeValue);
         sTagBinary->setValue(*tagValueBinary);
         sTag = sTagBinary;
       }
       sTag->setName(*tagName);
-      if (language)
+      if(language)
         sTag->setLanguage(*language);
       sTag->setDefaultLanguageFlag(defaultLanguageFlag);
       mTag->addSimpleTag(sTag);

@@ -52,24 +52,23 @@ namespace TagLib {
     constexpr unsigned int VINTSizeLength(uint8_t firstByte)
     {
       static_assert(maxSizeLength >= 1 && maxSizeLength <= 8);
-      if (!firstByte) {
+      if(!firstByte) {
         debug("VINT with greater than 8 bytes not allowed");
         return 0;
       }
       uint8_t mask = 0b10000000;
       unsigned int numBytes = 1;
-      while (!(mask & firstByte)) {
+      while(!(mask & firstByte)) {
         numBytes++;
         mask >>= 1;
       }
-      if (numBytes > maxSizeLength) {
+      if(numBytes > maxSizeLength) {
         debug(Utils::formatString("VINT size length exceeds %i bytes", maxSizeLength));
         return 0;
       }
       return numBytes;
     }
 
-    //Id readId(File &file);
     template<typename T>
     std::pair<int, T> readVINT(File &file);
     template<typename T>
@@ -77,18 +76,19 @@ namespace TagLib {
     Element* findElement(File &file, Element::Id id, offset_t maxLength);
     Element* findNextElement(File &file, offset_t maxOffset);
     ByteVector renderVINT(uint64_t number, int minSizeLength);
+    unsigned long long randomUID();
 
     constexpr int minSize(uint64_t data)
     {
-      if (data <= 0x7Fu)
+      if(data <= 0x7Fu)
         return 1;
-      else if (data <= 0x3FFFu)
+      else if(data <= 0x3FFFu)
         return 2;
-      else if (data <= 0x1FFFFFu)
+      else if(data <= 0x1FFFFFu)
         return 3;
-      else if (data <= 0xFFFFFFFu)
+      else if(data <= 0xFFFFFFFu)
         return 4;
-      else if (data <= 0x7FFFFFFFFu)
+      else if(data <= 0x7FFFFFFFFu)
         return 5;
       else
         return 0;
@@ -96,11 +96,11 @@ namespace TagLib {
 
     constexpr int idSize(Element::Id id)
     {
-      if (id <= 0xFF)
+      if(id <= 0xFF)
         return 1;
-      else if (id <= 0xFFFF)
+      else if(id <= 0xFFFF)
         return 2;
-      else if (id <= 0xFFFFFF)
+      else if(id <= 0xFFFFFF)
         return 3;
       else
         return 4;

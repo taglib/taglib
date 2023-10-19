@@ -19,39 +19,31 @@
  ***************************************************************************/
 
 #include "ebmlmasterelement.h"
+#include "ebmlutils.h"
 #include "taglib.h"
-#include <tuple>
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
+#ifndef TAGLIB_EBMLMKATTACHMENTS_H
+#define TAGLIB_EBMLMKATTACHMENTS_H
 #ifndef DO_NOT_DOCUMENT
 
 namespace TagLib {
   namespace Matroska {
-    class Tag;
     class Attachments;
   }
   namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSegment : public MasterElement
+    class MkAttachments : public MasterElement
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
+      MkAttachments(int sizeLength, offset_t dataSize, offset_t offset)
+      : MasterElement(ElementIDs::MkAttachments, sizeLength, dataSize, offset)
       {}
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
-
-    private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
+      MkAttachments()
+      : MasterElement(ElementIDs::MkAttachments, 0, 0, 0)
+      {}
+      Matroska::Attachments* parse();
 
     };
   }
 }
-
 #endif
 #endif
