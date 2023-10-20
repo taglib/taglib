@@ -419,6 +419,8 @@ public:
       FileRef f(&s);
       CPPUNIT_ASSERT(dynamic_cast<MP4::File *>(f.file()) != nullptr);
     }
+
+    FileRef::clearFileTypeResolvers();
   }
 
 };

@@ -49,8 +49,9 @@ jobs:
     - name: Test Windows
       working-directory: ${{github.workspace}}/build
       run: |
-        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\cppunit_x64-windows\bin;$PWD\taglib\Release"
-        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\utfcpp_x64-windows\bin;$PWD\taglib\Release"
-        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\zlib_x64-windows\bin;$PWD\taglib\Release"
+        $env:Path += ";$PWD\taglib\Release;$PWD\bindings\c\Release"
+        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\cppunit_x64-windows\bin"
+        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\utfcpp_x64-windows\bin"
+        $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\zlib_x64-windows\bin"
         ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
       if: matrix.os == 'windows-latest'
