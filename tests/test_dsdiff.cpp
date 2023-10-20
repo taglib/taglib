@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "tbytevectorlist.h"
+#include "tpropertymap.h"
 #include "dsdifffile.h"
 #include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
@@ -41,6 +42,7 @@ class TestDSDIFF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveID3v23);
   CPPUNIT_TEST(testStrip);
   CPPUNIT_TEST(testRepeatedSave);
+  CPPUNIT_TEST(testId3InProp);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -230,6 +232,110 @@ public:
     const ByteVector dsfData = PlainFile(TEST_FILE_PATH_C("empty10ms.dff")).readAll();
     const ByteVector fileData = PlainFile(newname.c_str()).readAll();
     CPPUNIT_ASSERT(dsfData == fileData);
+  }
+
+  void testId3InProp()
+  {
+    PropertyMap props;
+    props["ALBUM"] = StringList("Album");
+    props["ALBUMARTIST"] = StringList("Album Artist");
+    props["ARTIST"] = StringList("Artist");
+    props["COMMENT"] = StringList("Comment");
+    props["DATE"] = StringList("2023-10-20");
+    props["DISCNUMBER"] = StringList("1/2");
+    props["GENRE"] = StringList("Genre");
+    props["TITLE"] = StringList("Title");
+    props["TRACKNUMBER"] = StringList("2/3");
+
+    ScopedFileCopy copy("empty10ms", ".dff");
+    string newname = copy.fileName();
+
+    {
+      PlainFile id3PropFile(newname.c_str());
+      id3PropFile.insert("\x28", 0x0b, 1); // modify FRM8 length
+      id3PropFile.insert("\x6c", 0x2b, 1); // modify PROP length
+      // insert ID3 chunk into PROP
+      id3PropFile.insert(ByteVector(
+        "ID3 \x00\x00\x00\x00\x00\x00\x00\x16ID3\x04\x00\x00\x00\x00\x00\x0c"
+        "TIT2\x00\x00\x00\x02\x00\x00\x00X", 34), 0x76, 0);
+    }
+    {
+      DSDIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT_EQUAL(String("X"), f.tag()->title());
+      f.setProperties(props);
+      f.DIINTag(true)->setArtist("DIINArtist");
+      f.save();
+    }
+    {
+      DSDIFF::File f(newname.c_str());
+      ID3v2::Tag *tag = f.ID3v2Tag();
+      CPPUNIT_ASSERT(tag);
+      CPPUNIT_ASSERT_EQUAL(String("Title"), tag->title());
+      CPPUNIT_ASSERT_EQUAL(String("Artist"), tag->artist());
+      CPPUNIT_ASSERT_EQUAL(String("Album"), tag->album());
+      PropertyMap properties = f.properties();
+      if (props != properties) {
+        CPPUNIT_ASSERT_EQUAL(props.toString(), properties.toString());
+      }
+      CPPUNIT_ASSERT(props == properties);
+      CPPUNIT_ASSERT_EQUAL(String("DIINArtist"), f.DIINTag()->artist());
+      f.strip();
+    }
+    {
+      // Check if file without tags is same as original empty file
+      const ByteVector dsfData = PlainFile(TEST_FILE_PATH_C("empty10ms.dff")).readAll();
+      const ByteVector fileData = PlainFile(newname.c_str()).readAll();
+      CPPUNIT_ASSERT(dsfData == fileData);
+    }
+  }
+
+  void testSaveDiin()
+  {
+    ScopedFileCopy copy("empty10ms", ".dff");
+    string newname = copy.fileName();
+
+    {
+      DSDIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasDIINTag());
+
+      DSDIFF::DIIN::Tag *tag = f.DIINTag(true);
+      CPPUNIT_ASSERT(tag);
+      tag->setArtist("DIIN Artist");
+      tag->setTitle("DIIN Title");
+      tag->setAlbum("not supported");
+      f.save();
+    }
+    {
+      DSDIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasDIINTag());
+
+      DSDIFF::DIIN::Tag *tag = f.DIINTag(false);
+      CPPUNIT_ASSERT(tag);
+      CPPUNIT_ASSERT_EQUAL(String("DIIN Artist"), tag->artist());
+      CPPUNIT_ASSERT_EQUAL(String("DIIN Title"), tag->title());
+      CPPUNIT_ASSERT_EQUAL(String(), tag->album());
+      CPPUNIT_ASSERT_EQUAL(String(), tag->comment());
+      CPPUNIT_ASSERT_EQUAL(String(), tag->genre());
+      CPPUNIT_ASSERT_EQUAL(0U, tag->year());
+      CPPUNIT_ASSERT_EQUAL(0U, tag->track());
+
+      PropertyMap properties = f.properties();
+      CPPUNIT_ASSERT_EQUAL(2U, properties.size());
+      CPPUNIT_ASSERT_EQUAL(StringList("DIIN Artist"), properties.value("ARTIST"));
+      CPPUNIT_ASSERT_EQUAL(StringList("DIIN Title"), properties.value("TITLE"));
+
+      tag->setArtist("");
+      tag->setTitle("");
+      f.save();
+    }
+    {
+      DSDIFF::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasDIINTag());
+    }
   }
 };
 
