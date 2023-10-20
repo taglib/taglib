@@ -248,6 +248,11 @@ namespace TagLib {
     static const FileTypeResolver *addFileTypeResolver(const FileTypeResolver *resolver);
 
     /*!
+     * Remove all resolvers added by addFileTypeResolver().
+     */
+    static void clearFileTypeResolvers();
+
+    /*!
      * As is mentioned elsewhere in this class's documentation, the default file
      * type resolution code provided by TagLib only works by comparing file
      * extensions.
