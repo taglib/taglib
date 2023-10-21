@@ -98,11 +98,11 @@ int main(int argc, char *argv[])
       while(*keyPtr) {
         TagLib_Complex_Property_Attribute*** properties =
           taglib_complex_property_get(file, *keyPtr);
-        printf("%s:\n", *keyPtr);
         if(properties != NULL) {
           TagLib_Complex_Property_Attribute*** propPtr = properties;
           while(*propPtr) {
             TagLib_Complex_Property_Attribute** attrPtr = *propPtr;
+            printf("%s:\n", *keyPtr);
             while(*attrPtr) {
               TagLib_Complex_Property_Attribute *attr = *attrPtr;
               TagLib_Variant_Type type = attr->value.type;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
                 printf("%f\n", attr->value.value.doubleValue);
                 break;
               case TagLib_Variant_String:
-                printf("%s\n", attr->value.value.stringValue);
+                printf("\"%s\"\n", attr->value.value.stringValue);
                 break;
               case TagLib_Variant_StringList:
                 if(attr->value.value.stringListValue) {

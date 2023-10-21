@@ -56,18 +56,19 @@ int main(int argc, char *argv[])
       cout << "genre   - \"" << tag->genre()   << "\"" << endl;
 
       TagLib::PropertyMap tags = f.properties();
-
-      unsigned int longest = 0;
-      for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
-        if (i->first.size() > longest) {
-          longest = i->first.size();
+      if(!tags.isEmpty()) {
+        unsigned int longest = 0;
+        for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
+          if (i->first.size() > longest) {
+            longest = i->first.size();
+          }
         }
-      }
 
-      cout << "-- TAG (properties) --" << endl;
-      for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
-        for(auto j = i->second.begin(); j != i->second.end(); ++j) {
-          cout << left << std::setfill(' ') << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
+        cout << "-- TAG (properties) --" << endl;
+        for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
+          for(auto j = i->second.begin(); j != i->second.end(); ++j) {
+            cout << left << std::setfill(' ') << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
+          }
         }
       }
 
@@ -113,7 +114,7 @@ int main(int argc, char *argv[])
       cout << "bitrate     - " << properties->bitrate() << endl;
       cout << "sample rate - " << properties->sampleRate() << endl;
       cout << "channels    - " << properties->channels() << endl;
-      cout << "length      - " << minutes << ":" << setfill('0') << setw(2) << seconds << endl;
+      cout << "length      - " << minutes << ":" << setfill('0') << setw(2) << right << seconds << endl;
     }
   }
   return 0;
