@@ -39,6 +39,7 @@
 #include "asffile.h"
 #include "flacfile.h"
 #include "itfile.h"
+#include "matroskafile.h"
 #include "modfile.h"
 #include "mp4file.h"
 #include "mpcfile.h"
@@ -167,6 +168,8 @@ namespace
       file = new XM::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "DSF")
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "MKA" || ext == "MKV" || ext == "WEBM")
+      file = new Matroska::File(stream, readAudioProperties);
 
     // if file is not valid, leave it to content-based detection.
 
