@@ -92,67 +92,79 @@ void taglib_free(void* pointer)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// TagLib::File wrapper
+// TagLib::FileRef wrapper
 ////////////////////////////////////////////////////////////////////////////////
 
 TagLib_File *taglib_file_new(const char *filename)
 {
-  return reinterpret_cast<TagLib_File *>(FileRef::create(filename));
+  return reinterpret_cast<TagLib_File *>(new FileRef(filename));
 }
 
 TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
 {
+  File *file = NULL;
   switch(type) {
   case TagLib_File_MPEG:
-    return reinterpret_cast<TagLib_File *>(new MPEG::File(filename));
+    file = new MPEG::File(filename);
+      break;
   case TagLib_File_OggVorbis:
-    return reinterpret_cast<TagLib_File *>(new Ogg::Vorbis::File(filename));
+    file = new Ogg::Vorbis::File(filename);
+    break;
   case TagLib_File_FLAC:
-    return reinterpret_cast<TagLib_File *>(new FLAC::File(filename));
+    file = new FLAC::File(filename);
+    break;
   case TagLib_File_MPC:
-    return reinterpret_cast<TagLib_File *>(new MPC::File(filename));
+    file = new MPC::File(filename);
+    break;
   case TagLib_File_OggFlac:
-    return reinterpret_cast<TagLib_File *>(new Ogg::FLAC::File(filename));
+    file = new Ogg::FLAC::File(filename);
+    break;
   case TagLib_File_WavPack:
-    return reinterpret_cast<TagLib_File *>(new WavPack::File(filename));
+    file = new WavPack::File(filename);
+    break;
   case TagLib_File_Speex:
-    return reinterpret_cast<TagLib_File *>(new Ogg::Speex::File(filename));
+    file = new Ogg::Speex::File(filename);
+    break;
   case TagLib_File_TrueAudio:
-    return reinterpret_cast<TagLib_File *>(new TrueAudio::File(filename));
+    file = new TrueAudio::File(filename);
+    break;
   case TagLib_File_MP4:
-    return reinterpret_cast<TagLib_File *>(new MP4::File(filename));
+    file = new MP4::File(filename);
+    break;
   case TagLib_File_ASF:
-    return reinterpret_cast<TagLib_File *>(new ASF::File(filename));
+    file = new ASF::File(filename);
+    break;
   default:
-    return 0;
+    break;
   }
+  return file ? reinterpret_cast<TagLib_File *>(new FileRef(file)) : NULL;
 }
 
 void taglib_file_free(TagLib_File *file)
 {
-  delete reinterpret_cast<File *>(file);
+  delete reinterpret_cast<FileRef *>(file);
 }
 
 BOOL taglib_file_is_valid(const TagLib_File *file)
 {
-  return reinterpret_cast<const File *>(file)->isValid();
+  return !reinterpret_cast<const FileRef *>(file)->isNull();
 }
 
 TagLib_Tag *taglib_file_tag(const TagLib_File *file)
 {
-  auto f = reinterpret_cast<const File *>(file);
+  auto f = reinterpret_cast<const FileRef *>(file);
   return reinterpret_cast<TagLib_Tag *>(f->tag());
 }
 
 const TagLib_AudioProperties *taglib_file_audioproperties(const TagLib_File *file)
 {
-  auto f = reinterpret_cast<const File *>(file);
+  auto f = reinterpret_cast<const FileRef *>(file);
   return reinterpret_cast<const TagLib_AudioProperties *>(f->audioProperties());
 }
 
 BOOL taglib_file_save(TagLib_File *file)
 {
-  return reinterpret_cast<File *>(file)->save();
+  return reinterpret_cast<FileRef *>(file)->save();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,7 +342,7 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
   if(file == NULL || prop == NULL)
     return;
 
-  auto tfile = reinterpret_cast<File *>(file);
+  auto tfile = reinterpret_cast<FileRef *>(file);
   PropertyMap map = tfile->tag()->properties();
 
   if(value) {
@@ -371,7 +383,7 @@ char** taglib_property_keys(TagLib_File *file)
   if(file == NULL)
     return NULL;
 
-  const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
+  const PropertyMap map = reinterpret_cast<const FileRef *>(file)->properties();
   if(map.isEmpty())
     return NULL;
 
@@ -391,7 +403,7 @@ char **taglib_property_get(TagLib_File *file, const char *prop)
   if(file == NULL || prop == NULL)
     return NULL;
 
-  const PropertyMap map = reinterpret_cast<const File *>(file)->properties();
+  const PropertyMap map = reinterpret_cast<const FileRef *>(file)->properties();
 
   auto property = map.find(prop);
   if(property == map.end())
@@ -434,7 +446,7 @@ bool _taglib_complex_property_set(
   if(file == NULL || key == NULL)
     return false;
 
-  auto tfile = reinterpret_cast<File *>(file);
+  auto tfile = reinterpret_cast<FileRef *>(file);
 
   if(value == NULL) {
     return tfile->setComplexProperties(key, {});
@@ -516,7 +528,7 @@ char** taglib_complex_property_keys(TagLib_File *file)
     return NULL;
   }
 
-  const StringList strs = reinterpret_cast<const File *>(file)->complexPropertyKeys();
+  const StringList strs = reinterpret_cast<const FileRef *>(file)->complexPropertyKeys();
   if(strs.isEmpty()) {
     return NULL;
   }
@@ -539,7 +551,7 @@ TagLib_Complex_Property_Attribute*** taglib_complex_property_get(
     return NULL;
   }
 
-  const auto variantMaps = reinterpret_cast<const File *>(file)->complexProperties(key);
+  const auto variantMaps = reinterpret_cast<const FileRef *>(file)->complexProperties(key);
   if(variantMaps.isEmpty()) {
     return NULL;
   }
