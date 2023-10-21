@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
       cout << "track   - \"" << tag->track()   << "\"" << endl;
       cout << "genre   - \"" << tag->genre()   << "\"" << endl;
 
-      TagLib::PropertyMap tags = f.file()->properties();
+      TagLib::PropertyMap tags = f.properties();
 
       unsigned int longest = 0;
       for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
         }
       }
 
-      TagLib::StringList names = f.file()->complexPropertyKeys();
+      TagLib::StringList names = f.complexPropertyKeys();
       for(const auto &name : names) {
-        const auto& properties = f.file()->complexProperties(name);
+        const auto& properties = f.complexProperties(name);
         for(const auto &property : properties) {
           cout << name << ":" << endl;
           for(const auto &[key, value] : property) {

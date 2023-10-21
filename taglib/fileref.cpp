@@ -33,6 +33,9 @@
 #include <utility>
 
 #include "tfilestream.h"
+#include "tpropertymap.h"
+#include "tstringlist.h"
+#include "tvariant.h"
 #include "tdebug.h"
 #include "aifffile.h"
 #include "apefile.h"
@@ -322,6 +325,20 @@ public:
   FileRefPrivate(const FileRefPrivate &) = delete;
   FileRefPrivate &operator=(const FileRefPrivate &) = delete;
 
+  bool isNull() const
+  {
+    return !file || !file->isValid();
+  }
+
+  bool isNullWithDebugMessage(const String &methodName) const
+  {
+    if(isNull()) {
+      debug("FileRef::" + methodName + "() - Called without a valid file.");
+      return true;
+    }
+    return false;
+  }
+
   File *file { nullptr };
   IOStream *stream { nullptr };
 };
@@ -360,17 +377,63 @@ FileRef::~FileRef() = default;
 
 Tag *FileRef::tag() const
 {
-  if(isNull()) {
-    debug("FileRef::tag() - Called without a valid file.");
+  if(d->isNullWithDebugMessage(__func__)) {
     return nullptr;
   }
   return d->file->tag();
 }
 
+PropertyMap FileRef::properties() const
+{
+  if(d->isNullWithDebugMessage(__func__)) {
+    return PropertyMap();
+  }
+  return d->file->properties();
+}
+
+void FileRef::removeUnsupportedProperties(const StringList& properties)
+{
+  if(d->isNullWithDebugMessage(__func__)) {
+    return;
+  }
+  return d->file->removeUnsupportedProperties(properties);
+}
+
+PropertyMap FileRef::setProperties(const PropertyMap &properties)
+{
+  if(d->isNullWithDebugMessage(__func__)) {
+    return PropertyMap();
+  }
+  return d->file->setProperties(properties);
+}
+
+StringList FileRef::complexPropertyKeys() const
+{
+  if(d->isNullWithDebugMessage(__func__)) {
+    return StringList();
+  }
+  return d->file->complexPropertyKeys();
+}
+
+List<VariantMap> FileRef::complexProperties(const String &key) const
+{
+  if(d->isNullWithDebugMessage(__func__)) {
+    return List<VariantMap>();
+  }
+  return d->file->complexProperties(key);
+}
+
+bool FileRef::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  if(d->isNullWithDebugMessage(__func__)) {
+    return false;
+  }
+  return d->file->setComplexProperties(key, value);
+}
+
 AudioProperties *FileRef::audioProperties() const
 {
-  if(isNull()) {
-    debug("FileRef::audioProperties() - Called without a valid file.");
+  if(d->isNullWithDebugMessage(__func__)) {
     return nullptr;
   }
   return d->file->audioProperties();
@@ -383,8 +446,7 @@ File *FileRef::file() const
 
 bool FileRef::save()
 {
-  if(isNull()) {
-    debug("FileRef::save() - Called without a valid file.");
+  if(d->isNullWithDebugMessage(__func__)) {
     return false;
   }
   return d->file->save();
@@ -445,7 +507,7 @@ StringList FileRef::defaultFileExtensions()
 
 bool FileRef::isNull() const
 {
-  return (!d->file || !d->file->isValid());
+  return d->isNull();
 }
 
 FileRef &FileRef::operator=(const FileRef &) = default;

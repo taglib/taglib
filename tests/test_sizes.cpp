@@ -172,7 +172,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::UnknownMetadataBlock));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::File));
-        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileRef));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::FileRef));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FileRef::FileTypeResolver));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileRef::StreamTypeResolver));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FileStream));

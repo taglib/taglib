@@ -119,7 +119,7 @@ namespace TagLib {
     /*!
      * Set all complex properties for a given \a key using variant maps as
      * \a value with the same format as returned by complexProperties().
-     * An empty list as \a value to removes all complex properties for \a key.
+     * An empty list as \a value removes all complex properties for \a key.
      */
     virtual bool setComplexProperties(const String &key, const List<VariantMap> &value);
 
