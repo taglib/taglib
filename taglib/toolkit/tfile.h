@@ -122,7 +122,7 @@ namespace TagLib {
      * Sets the tags of this File to those specified in \a properties. Calls the
      * according specialization method in the subclasses of File to do the translation
      * into the format-specific details.
-     * If some value(s) could not be written imported to the specific metadata format,
+     * If some value(s) could not be written to the specific metadata format,
      * the returned PropertyMap will contain those value(s). Otherwise it will be empty,
      * indicating that no problems occurred.
      * With file types that support several tag formats (for instance, MP3 files can have

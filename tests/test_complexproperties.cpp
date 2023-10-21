@@ -88,8 +88,8 @@ public:
     if(zlib::isAvailable()) {
       FileRef f(TEST_FILE_PATH_C("compressed_id3_frame.mp3"), false);
       CPPUNIT_ASSERT_EQUAL(StringList(PICTURE_KEY),
-        f.file()->complexPropertyKeys());
-      auto pictures = f.file()->complexProperties(PICTURE_KEY);
+        f.complexPropertyKeys());
+      auto pictures = f.complexProperties(PICTURE_KEY);
       CPPUNIT_ASSERT_EQUAL(1U, pictures.size());
       auto picture = pictures.front();
       CPPUNIT_ASSERT_EQUAL(86414U,
@@ -131,8 +131,8 @@ public:
 
     FileRef f(TEST_FILE_PATH_C("has-tags.m4a"), false);
     CPPUNIT_ASSERT_EQUAL(StringList(PICTURE_KEY),
-      f.file()->complexPropertyKeys());
-    auto pictures = f.file()->complexProperties(PICTURE_KEY);
+      f.complexPropertyKeys());
+    auto pictures = f.complexProperties(PICTURE_KEY);
     CPPUNIT_ASSERT_EQUAL(2U, pictures.size());
     auto picture = pictures.front();
     CPPUNIT_ASSERT_EQUAL(expectedData1,
@@ -150,8 +150,8 @@ public:
   {
     FileRef f(TEST_FILE_PATH_C("lowercase-fields.ogg"), false);
     CPPUNIT_ASSERT_EQUAL(StringList(PICTURE_KEY),
-      f.file()->complexPropertyKeys());
-    auto pictures = f.file()->complexProperties(PICTURE_KEY);
+      f.complexPropertyKeys());
+    auto pictures = f.complexProperties(PICTURE_KEY);
     CPPUNIT_ASSERT_EQUAL(1U, pictures.size());
     auto picture = pictures.front();
     CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"),
@@ -243,19 +243,19 @@ public:
 
     {
       FileRef f(copy.fileName().c_str(), false);
-      CPPUNIT_ASSERT(f.file()->complexPropertyKeys().isEmpty());
-      f.file()->setComplexProperties(PICTURE_KEY, {TEST_PICTURE, picture2});
-      f.file()->setComplexProperties(GEOB_KEY, {geob1, geob2});
-      f.file()->save();
+      CPPUNIT_ASSERT(f.complexPropertyKeys().isEmpty());
+      f.setComplexProperties(PICTURE_KEY, {TEST_PICTURE, picture2});
+      f.setComplexProperties(GEOB_KEY, {geob1, geob2});
+      f.save();
     }
     {
       FileRef f(copy.fileName().c_str(), false);
       CPPUNIT_ASSERT_EQUAL(StringList({PICTURE_KEY, GEOB_KEY}),
-        f.file()->complexPropertyKeys());
+        f.complexPropertyKeys());
       CPPUNIT_ASSERT(List<VariantMap>({TEST_PICTURE, picture2}) ==
-        f.file()->complexProperties(PICTURE_KEY));
+        f.complexProperties(PICTURE_KEY));
       CPPUNIT_ASSERT(List<VariantMap>({geob1, geob2}) ==
-        f.file()->complexProperties(GEOB_KEY));
+        f.complexProperties(GEOB_KEY));
     }
   }
 

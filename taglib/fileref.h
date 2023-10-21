@@ -190,7 +190,7 @@ namespace TagLib {
     /*!
      * Destroys this FileRef instance.
      */
-    virtual ~FileRef();
+    ~FileRef();
 
     /*!
      * Returns a pointer to represented file's tag.
@@ -204,6 +204,84 @@ namespace TagLib {
      * \see File::tag()
      */
     Tag *tag() const;
+
+    /*!
+     * Exports the tags of the file as dictionary mapping (human readable) tag
+     * names (uppercase Strings) to StringLists of tag values. Calls this
+     * method on the wrapped File instance.
+     * For each metadata object of the file that could not be parsed into the PropertyMap
+     * format, the returned map's unsupportedData() list will contain one entry identifying
+     * that object (e.g. the frame type for ID3v2 tags). Use removeUnsupportedProperties()
+     * to remove (a subset of) them.
+     * For files that contain more than one tag (e.g. an MP3 with both an ID3v1 and an ID3v2
+     * tag) only the most "modern" one will be exported (ID3v2 in this case).
+     */
+    PropertyMap properties() const;
+
+    /*!
+     * Removes unsupported properties, or a subset of them, from the file's metadata.
+     * The parameter \a properties must contain only entries from
+     * properties().unsupportedData().
+     */
+    void removeUnsupportedProperties(const StringList& properties);
+
+    /*!
+     * Sets the tags of the wrapped File to those specified in \a properties.
+     * If some value(s) could not be written to the specific metadata format,
+     * the returned PropertyMap will contain those value(s). Otherwise it will be empty,
+     * indicating that no problems occurred.
+     * With file types that support several tag formats (for instance, MP3 files can have
+     * ID3v1, ID3v2, and APEv2 tags), this function will create the most appropriate one
+     * (ID3v2 for MP3 files). Older formats will be updated as well, if they exist, but won't
+     * be taken into account for the return value of this function.
+     * See the documentation of the subclass implementations for detailed descriptions.
+     */
+    PropertyMap setProperties(const PropertyMap &properties);
+
+    /*!
+     * Get the keys of complex properties, i.e. properties which cannot be
+     * represented simply by a string.
+     * Because such properties might be expensive to fetch, there are separate
+     * operations to get the available keys - which is expected to be cheap -
+     * and getting and setting the property values.
+     * Calls the method on the wrapped File, which collects the keys from one
+     * or more of its tags.
+     */
+    StringList complexPropertyKeys() const;
+
+    /*!
+     * Get the complex properties for a given \a key.
+     * In order to be flexible for different metadata formats, the properties
+     * are represented as variant maps.  Despite this dynamic nature, some
+     * degree of standardization should be achieved between formats:
+     *
+     * - PICTURE
+     *   - data: ByteVector with picture data
+     *   - description: String with description
+     *   - pictureType: String with type as specified for ID3v2,
+     *     e.g. "Front Cover", "Back Cover", "Band"
+     *   - mimeType: String with image format, e.g. "image/jpeg"
+     *   - optionally more information found in the tag, such as
+     *     "width", "height", "numColors", "colorDepth" int values
+     *     in FLAC pictures
+     * - GENERALOBJECT
+     *   - data: ByteVector with object data
+     *   - description: String with description
+     *   - fileName: String with file name
+     *   - mimeType: String with MIME type
+     *   - this is currently only implemented for ID3v2 GEOB frames
+     *
+     * Calls the method on the wrapped File, which gets the properties from one
+     * or more of its tags.
+     */
+    List<VariantMap> complexProperties(const String &key) const;
+
+    /*!
+     * Set all complex properties for a given \a key using variant maps as
+     * \a value with the same format as returned by complexProperties().
+     * An empty list as \a value removes all complex properties for \a key.
+     */
+    bool setComplexProperties(const String &key, const List<VariantMap> &value);
 
     /*!
      * Returns the audio properties for this FileRef.  If no audio properties
