@@ -53,6 +53,7 @@
 #include "wavpackfile.h"
 #include "xmfile.h"
 #include "dsffile.h"
+#include "dsdifffile.h"
 
 using namespace TagLib;
 
@@ -167,6 +168,8 @@ namespace
       file = new XM::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "DSF")
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "DFF" || ext == "DSDIFF")
+      file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // if file is not valid, leave it to content-based detection.
 
@@ -216,6 +219,8 @@ namespace
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(DSF::File::isSupported(stream))
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(DSDIFF::File::isSupported(stream))
+      file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // isSupported() only does a quick check, so double check the file here.
 
@@ -297,6 +302,8 @@ namespace
       return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
     if(ext == "DSF")
       return new DSF::File(fileName, readAudioProperties, audioPropertiesStyle);
+    if(ext == "DFF" || ext == "DSDIFF")
+      return new DSDIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
 
     return nullptr;
   }
@@ -430,6 +437,8 @@ StringList FileRef::defaultFileExtensions()
   l.append("it");
   l.append("xm");
   l.append("dsf");
+  l.append("dff");
+  l.append("dsdiff"); // alias for "dff"
 
   return l;
 }
