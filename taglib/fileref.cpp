@@ -138,6 +138,14 @@ namespace
       file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGG")
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "OGA") {
+      /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
+      file = new Ogg::FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file->isValid()) {
+        delete file;
+        file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
+      }
+    }
     else if(ext == "FLAC")
       file = new FLAC::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     else if(ext == "MPC")
@@ -236,80 +244,6 @@ namespace
     return nullptr;
   }
 
-  // Internal function that supports FileRef::create().
-  // This looks redundant, but necessary in order not to change the previous
-  // behavior of FileRef::create().
-
-  File* createInternal(FileName fileName, bool readAudioProperties,
-                       AudioProperties::ReadStyle audioPropertiesStyle)
-  {
-    if(auto file = detectByResolvers(fileName, readAudioProperties, audioPropertiesStyle))
-      return file;
-
-#ifdef _WIN32
-    const String s = fileName.toString();
-#else
-    const String s(fileName);
-#endif
-
-    String ext;
-    const int pos = s.rfind(".");
-    if(pos != -1)
-      ext = s.substr(pos + 1).upper();
-
-    if(ext.isEmpty())
-      return nullptr;
-
-    if(ext == "MP3")
-      return new MPEG::File(fileName, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
-    if(ext == "OGG")
-      return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "OGA") {
-      /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
-      auto file = new Ogg::FLAC::File(fileName, readAudioProperties, audioPropertiesStyle);
-      if(file->isValid())
-        return file;
-      delete file;
-      return new Ogg::Vorbis::File(fileName, readAudioProperties, audioPropertiesStyle);
-    }
-    if(ext == "FLAC")
-      return new FLAC::File(fileName, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
-    if(ext == "MPC")
-      return new MPC::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "WV")
-      return new WavPack::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "SPX")
-      return new Ogg::Speex::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "OPUS")
-      return new Ogg::Opus::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "TTA")
-      return new TrueAudio::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V")
-      return new MP4::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "WMA" || ext == "ASF")
-      return new ASF::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
-      return new RIFF::AIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "WAV")
-      return new RIFF::WAV::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "APE")
-      return new APE::File(fileName, readAudioProperties, audioPropertiesStyle);
-    // module, nst and wow are possible but uncommon extensions
-    if(ext == "MOD" || ext == "MODULE" || ext == "NST" || ext == "WOW")
-      return new Mod::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "S3M")
-      return new S3M::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "IT")
-      return new IT::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "XM")
-      return new XM::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "DSF")
-      return new DSF::File(fileName, readAudioProperties, audioPropertiesStyle);
-    if(ext == "DFF" || ext == "DSDIFF")
-      return new DSDIFF::File(fileName, readAudioProperties, audioPropertiesStyle);
-
-    return nullptr;
-  }
 }  // namespace
 
 class FileRef::FileRefPrivate
@@ -527,12 +461,6 @@ bool FileRef::operator==(const FileRef &ref) const
 bool FileRef::operator!=(const FileRef &ref) const
 {
   return (ref.d->file != d->file);
-}
-
-File *FileRef::create(FileName fileName, bool readAudioProperties,
-                      AudioProperties::ReadStyle audioPropertiesStyle) // static
-{
-  return createInternal(fileName, readAudioProperties, audioPropertiesStyle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

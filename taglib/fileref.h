@@ -63,7 +63,7 @@ namespace TagLib {
   //! A class for pluggable file type resolution.
 
   /*!
-   * This class is used to add extend TagLib's very basic file name based file
+   * This class is used to extend TagLib's very basic file name based file
    * type resolution.
    *
    * This can be accomplished with:
@@ -104,7 +104,7 @@ namespace TagLib {
       /*!
        * This method must be overridden to provide an additional file type
        * resolver.  If the resolver is able to determine the file type it should
-       * return a valid File object; if not it should return 0.
+       * return a valid File object; if not it should return nullptr.
        *
        * \note The created file is then owned by the FileRef and should not be
        * deleted.  Deletion will happen automatically when the FileRef passes
@@ -373,22 +373,6 @@ namespace TagLib {
      * object.
      */
     bool operator!=(const FileRef &ref) const;
-
-    /*!
-     * A simple implementation of file type guessing.  If \a readAudioProperties
-     * is true then the audio properties will be read using
-     * \a audioPropertiesStyle.  If \a readAudioProperties is false then
-     * \a audioPropertiesStyle will be ignored.
-     *
-     * \note You generally shouldn't use this method, but instead the constructor
-     * directly.
-     *
-     * \deprecated Use FileRef(FileName, bool, AudioProperties::ReadStyle).
-     */
-     // Kept because it is used for the C bindings
-    static File *create(FileName fileName,
-                        bool readAudioProperties = true,
-                        AudioProperties::ReadStyle audioPropertiesStyle = AudioProperties::Average);
 
   private:
     void parse(FileName fileName, bool readAudioProperties, AudioProperties::ReadStyle audioPropertiesStyle);
