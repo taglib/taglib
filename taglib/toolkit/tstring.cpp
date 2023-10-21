@@ -706,6 +706,6 @@ TagLib::String operator+(const TagLib::String &s1, const char *s2)
 
 std::ostream &operator<<(std::ostream &s, const TagLib::String &str)
 {
-  s << str.to8Bit();
+  s << str.to8Bit(true);
   return s;
 }

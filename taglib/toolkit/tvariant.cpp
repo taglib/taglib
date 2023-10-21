@@ -116,7 +116,7 @@ public:
   void operator()(const TagLib::String &v)
   {
     s << '"';
-    for (char c : v.to8Bit()) {
+    for (char c : v.to8Bit(true)) {
       if(c == '"') {
         s << "\\\"";
       }
