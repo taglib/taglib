@@ -25,6 +25,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/it
   ${CMAKE_CURRENT_SOURCE_DIR}/xm
   ${CMAKE_CURRENT_SOURCE_DIR}/dsf
+  ${CMAKE_CURRENT_SOURCE_DIR}/dsdiff
 )
 
 set(tag_HDRS
@@ -137,6 +138,9 @@ set(tag_HDRS
   xm/xmproperties.h
   dsf/dsffile.h
   dsf/dsfproperties.h
+  dsdiff/dsdifffile.h
+  dsdiff/dsdiffproperties.h
+  dsdiff/dsdiffdiintag.h
 )
 
 set(mpeg_SRCS
@@ -297,6 +301,12 @@ set(dsf_SRCS
   dsf/dsfproperties.cpp
 )
 
+set(dsdiff_SRCS
+  dsdiff/dsdifffile.cpp
+  dsdiff/dsdiffproperties.cpp
+  dsdiff/dsdiffdiintag.cpp
+)
+
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
@@ -320,7 +330,7 @@ set(tag_LIB_SRCS
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${dsf_SRCS}
+  ${dsf_SRCS} ${dsdiff_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp

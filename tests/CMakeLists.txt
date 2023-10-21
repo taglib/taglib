@@ -26,6 +26,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/it
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/xm
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/dsf
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/dsdiff
 )
 
 SET(test_runner_SRCS
@@ -71,6 +72,7 @@ SET(test_runner_SRCS
   test_opus.cpp
   test_speex.cpp
   test_dsf.cpp
+  test_dsdiff.cpp
   test_sizes.cpp
   test_versionnumber.cpp
   test_tag_c.cpp

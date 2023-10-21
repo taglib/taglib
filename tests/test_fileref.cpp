@@ -46,6 +46,7 @@
 #include "opusfile.h"
 #include "xmfile.h"
 #include "dsffile.h"
+#include "dsdifffile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -101,6 +102,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testWavPack);
   CPPUNIT_TEST(testOpus);
   CPPUNIT_TEST(testDSF);
+  CPPUNIT_TEST(testDSDIFF);
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST(testCreate);
   CPPUNIT_TEST(testAudioProperties);
@@ -338,6 +340,11 @@ public:
     fileRefSave<DSF::File>("empty10ms",".dsf");
   }
 
+  void testDSDIFF()
+  {
+    fileRefSave<DSDIFF::File>("empty10ms",".dff");
+  }
+
   void testUnsupported()
   {
     FileRef f1(TEST_FILE_PATH_C("no-extension"));
@@ -394,6 +401,8 @@ public:
     CPPUNIT_ASSERT(extensions.contains("opus"));
     CPPUNIT_ASSERT(extensions.contains("xm"));
     CPPUNIT_ASSERT(extensions.contains("dsf"));
+    CPPUNIT_ASSERT(extensions.contains("dff"));
+    CPPUNIT_ASSERT(extensions.contains("dsdiff"));
   }
 
   void testFileResolver()
