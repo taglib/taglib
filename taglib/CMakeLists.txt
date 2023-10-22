@@ -230,15 +230,19 @@ if(WITH_SHORTEN)
 endif()
 
 set(tag_PRIVATE_HDRS
+  matroska/matroskaseekhead.h
+  matroska/matroskasegment.h
   matroska/ebml/ebmlbinaryelement.h
   matroska/ebml/ebmlelement.h
   matroska/ebml/ebmlmasterelement.h
   matroska/ebml/ebmlmkattachments.h
+  matroska/ebml/ebmlmkseekhead.h
   matroska/ebml/ebmlmksegment.h
   matroska/ebml/ebmlmktags.h
   matroska/ebml/ebmlstringelement.h
   matroska/ebml/ebmluintelement.h
   matroska/ebml/ebmlutils.h
+  matroska/ebml/ebmlvoidelement.h
 )
 
 set(tag_HDRS ${tag_PUBLIC_HDRS} ${tag_PRIVATE_HDRS})
@@ -248,6 +252,8 @@ set(matroska_SRCS
   matroska/matroskaattachments.cpp
   matroska/matroskaelement.cpp
   matroska/matroskafile.cpp
+  matroska/matroskaseekhead.cpp
+  matroska/matroskasegment.cpp
   matroska/matroskasimpletag.cpp
   matroska/matroskatag.cpp
 )
@@ -257,11 +263,13 @@ set(ebml_SRCS
   matroska/ebml/ebmlelement.cpp
   matroska/ebml/ebmlmasterelement.cpp
   matroska/ebml/ebmlmkattachments.cpp
+  matroska/ebml/ebmlmkseekhead.cpp
   matroska/ebml/ebmlmksegment.cpp
   matroska/ebml/ebmlmktags.cpp
   matroska/ebml/ebmlstringelement.cpp
   matroska/ebml/ebmluintelement.cpp
   matroska/ebml/ebmlutils.cpp
+  matroska/ebml/ebmlvoidelement.cpp
 )
 
 set(mpeg_SRCS

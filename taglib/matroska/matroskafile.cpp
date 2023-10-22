@@ -21,6 +21,8 @@
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskaattachments.h"
+#include "matroskaseekhead.h"
+#include "matroskasegment.h"
 #include "ebmlutils.h"
 #include "ebmlelement.h"
 #include "ebmlmksegment.h"
@@ -42,16 +44,15 @@ public:
   {
     delete tag;
     delete attachments;
+    delete seekHead;
   }
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
   Matroska::Tag *tag = nullptr;
-  Matroska::Attachments *attachments = nullptr;
-  offset_t segmentSizeOffset = 0;
-  offset_t segmentSizeLength = 0;
-  offset_t segmentDataSize = 0;
-
+  Attachments *attachments = nullptr;
+  SeekHead *seekHead = nullptr;
+  Segment *segment = nullptr;
 };
 
 Matroska::File::File(FileName file, bool readProperties)
@@ -65,6 +66,7 @@ Matroska::File::File(FileName file, bool readProperties)
   }
   read(readProperties);
 }
+
 Matroska::File::File(IOStream *stream, bool readProperties)
 : TagLib::File(stream),
   d(std::make_unique<FilePrivate>())
@@ -76,6 +78,7 @@ Matroska::File::File(IOStream *stream, bool readProperties)
   }
   read(readProperties);
 }
+
 Matroska::File::~File() = default;
 
 TagLib::Tag* Matroska::File::tag() const
@@ -129,9 +132,6 @@ void Matroska::File::read(bool readProperties)
     setValid(false);
     return;
   }
-  d->segmentSizeLength = segment->getSizeLength();
-  d->segmentSizeOffset = tell() - d->segmentSizeLength;
-  d->segmentDataSize = segment->getDataSize();
 
   // Read the segment into memory from file
   if(!segment->read(*this)) {
@@ -139,11 +139,11 @@ void Matroska::File::read(bool readProperties)
     setValid(false);
     return;
   }
-
-  // Parse the tag
+  
+  // Parse the elements
+  d->segment = segment->parseSegment();
+  d->seekHead = segment->parseSeekHead();
   d->tag = segment->parseTag();
-
-  // Parse the attachments
   d->attachments = segment->parseAttachments();
 
   setValid(true);
@@ -151,86 +151,82 @@ void Matroska::File::read(bool readProperties)
 
 bool Matroska::File::save()
 {
-  std::vector<Element*> renderListExisting;
-  std::vector<Element*> renderListNew;
-  offset_t newSegmentDataSize = d->segmentDataSize;
-
-
-  if(d->tag) {
-    if(d->tag->size())
-      renderListExisting.push_back(d->tag);
-    else
-      renderListNew.push_back(d->tag);
+  if(readOnly()) {
+    debug("Matroska::File::save() -- File is read only.");
+    return false;
+  }
+  if(!isValid()) {
+    debug("Matroska::File::save() -- File is not valid.");
+    return false;
   }
 
-  if(d->attachments) {
-    //d->attachments->setOffset(d->tag->offset());
-    //renderListExisting.push_back(d->attachments);
-    if(d->attachments->size())
-      renderListExisting.push_back(d->attachments);
-    else
-      renderListNew.push_back(d->attachments);
+  List<Element*> renderList;
+  List<Element*> newElements;
 
-      
-  }
+  // List of all possible elements we can write
+  List<Element*> elements {
+    d->attachments,
+    d->tag
+  };
 
-
-  // Render from end to beginning so we don't have to shift
-  // the file offsets
-  std::sort(renderListExisting.begin(),
-    renderListExisting.end(),
-    [](auto a, auto b) { return a->offset() > b->offset(); }
-  );
-
-  // Overwrite existing elements
-  for(auto element : renderListExisting) {
-    offset_t offset = element->offset();
-    offset_t originalSize = element->size();
-    ByteVector data = element->render();
-    insert(data, offset, originalSize);
-    newSegmentDataSize += (data.size() - originalSize);
-  }
-
-  // Add new elements to the end of file
-  for(auto element : renderListNew) {
-    offset_t offset = length();
-    ByteVector data = element->render();
-    insert(data, offset, 0);
-    newSegmentDataSize += data.size();
-  }
-
-  // Write the new segment data size
-  if(newSegmentDataSize != d->segmentDataSize) {
-    auto segmentDataSizeBuffer = EBML::renderVINT(newSegmentDataSize, d->segmentSizeLength);
-    insert(segmentDataSizeBuffer, d->segmentSizeOffset, d->segmentSizeLength);
-    d->segmentDataSize = newSegmentDataSize;
-  }
-
-/*
-  auto&& renderElements [&d->segmentDataSize](Element *element) {
-    auto offset = element->offset();
-    if(!offset)
-  }
-  
-  if(d->tag) {
-    ByteVector tag = d->tag->render();
-    auto tagsOriginalSize = d->tag->size();
-    auto tagsOffset = d->tag->offset();
-    
-    if(!tagsOriginalSize) {
-      tagsOffset = d->segmentSizeOffset + d->segmentSizeLength + d->segmentDataSize;
+ /* Build render list. New elements will be added
+  * to the end of the file. For new elements,
+  * the order is from least likely to change,
+  * to most likely to change:
+  *   1. Bookmarks (todo)
+  *   2. Attachments
+  *   3. Tags
+  */
+  for (auto element : elements) {
+    if (!element)
+      continue;
+    if (element->size())
+      renderList.append(element);
+    else {
+      element->setOffset(length());
+      newElements.append(element);
     }
-    insert(tag, tagsOffset, tagsOriginalSize);
-    d->segmentDataSize += (tag.size() - tagsOriginalSize);
-    auto segmentDataSizeBuffer = EBML::renderVINT(d->segmentDataSize, d->segmentSizeLength);
-    insert(segmentDataSizeBuffer, d->segmentSizeOffset, d->segmentSizeLength);
   }
-  */
-  /*
-  if(d->attachments) {
-    ByteVector attachments = d->attachments->render();
+  if (renderList.isEmpty())
+    return true;
+
+  auto sortAscending = [](const auto a, const auto b) { return a->offset() < b->offset(); };
+  renderList.sort(sortAscending);
+  renderList.append(newElements);
+
+  // Add our new elements to the Seek Head (if the file has one)
+  if (d->seekHead) {
+    auto segmentDataOffset = d->segment->dataOffset();
+    for (auto element : newElements)
+      d->seekHead->addEntry(element->id(), element->offset() - segmentDataOffset);
+    d->seekHead->sort();
   }
-  */
+
+  // Set up listeners, add seek head and segment length to the end
+  for(auto it = renderList.begin(); it != renderList.end(); ++it) {
+    for (auto it2 = std::next(it); it2 != renderList.end(); ++it2)
+      (*it)->addSizeListener(*it2);
+    if (d->seekHead)
+      (*it)->addSizeListener(d->seekHead);
+    (*it)->addSizeListener(d->segment);
+  }
+  if(d->seekHead) {
+    d->seekHead->addSizeListeners(renderList);
+    renderList.append(d->seekHead);
+  }
+  d->segment->addSizeListeners(renderList);
+  renderList.append(d->segment);
+
+  // Render the elements
+  for(auto element : renderList) {
+    if (!element->render())
+      return false;
+  }
+
+  // Write out to file
+  renderList.sort(sortAscending);
+  for(auto element : renderList)
+    element->write(*this);
 
   return true;
 }

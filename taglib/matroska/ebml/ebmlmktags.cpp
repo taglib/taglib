@@ -36,6 +36,7 @@ Matroska::Tag* EBML::MkTags::parse()
   auto mTag = new Matroska::Tag();
   mTag->setOffset(offset);
   mTag->setSize(getSize());
+  mTag->setID(id);
 
   // Loop through each <Tag> element
   for(auto tagsChild : elements) {

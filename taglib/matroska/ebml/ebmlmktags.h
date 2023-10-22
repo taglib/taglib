@@ -41,7 +41,7 @@ namespace TagLib {
       MkTags()
       : MasterElement(ElementIDs::MkTags, 0, 0, 0)
       {}
-      //virtual void read(File &file) override;
+
       Matroska::Tag* parse();
 
     };

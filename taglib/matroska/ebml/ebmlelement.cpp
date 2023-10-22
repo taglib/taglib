@@ -19,8 +19,10 @@
  ***************************************************************************/
 
 #include "ebmlelement.h"
+#include "ebmlvoidelement.h"
 #include "ebmlmasterelement.h"
 #include "ebmlbinaryelement.h"
+#include "ebmlmkseekhead.h"
 #include "ebmlmksegment.h"
 #include "ebmlmktags.h"
 #include "ebmlmkattachments.h"
@@ -68,6 +70,7 @@ EBML::Element* EBML::Element::factory(File &file)
     case ElementIDs::MkTagTargets:
     case ElementIDs::MkSimpleTag:
     case ElementIDs::MkAttachedFile:
+    case ElementIDs::MkSeek:
       return new MasterElement(id, sizeLength, dataSize, offset);
 
     case ElementIDs::MkTagName:
@@ -82,10 +85,18 @@ EBML::Element* EBML::Element::factory(File &file)
 
     case ElementIDs::MkTagTargetTypeValue:
     case ElementIDs::MkAttachedFileUID:
+    case ElementIDs::MkSeekPosition:
       return new UIntElement(id, sizeLength, dataSize);
 
     case ElementIDs::MkAttachedFileData:
+    case ElementIDs::MkSeekID:
       return new BinaryElement(id, sizeLength, dataSize);
+    
+    case ElementIDs::MkSeekHead:
+      return new MkSeekHead(sizeLength, dataSize, offset);
+
+    case ElementIDs::VoidElement:
+      return new VoidElement(sizeLength, dataSize);
 
     default:
       return new Element(id, sizeLength, dataSize);

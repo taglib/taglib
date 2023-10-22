@@ -58,10 +58,8 @@ ByteVector EBML::UIntElement::render()
     dataSize = 8;
 
   ByteVector buffer = renderId();
-  //dataSize = minSize(value);
   buffer.append(renderVINT(dataSize, 0));
   unsigned long long value = this->value;
-  //debug(Utils::formatString("Writing %llu", value));
 
   static const auto byteOrder = Utils::systemByteOrder(); 
   if(byteOrder == Utils::LittleEndian)

@@ -18,52 +18,32 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMASTERELEMENT_H
-#define TAGLIB_EBMLMASTERELEMENT_H
-#ifndef DO_NOT_DOCUMENT
-
-#include "ebmlutils.h"
-#include "ebmlelement.h"
-#include "tbytevector.h"
-#include "tlist.h"
+#include "ebmlmasterelement.h"
 #include "taglib.h"
 
+#ifndef TAGLIB_EBMLMKSEEKHEAD_H
+#define TAGLIB_EBMLMKSEEKHEAD_H
+#ifndef DO_NOT_DOCUMENT
+
 namespace TagLib {
+  namespace Matroska {
+    class SeekHead;
+  }
   namespace EBML {
-    class MasterElement : public Element
+    class MkSeekHead : public MasterElement
     {
     public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset)
-      : Element(id, sizeLength, dataSize), offset(offset)
+      MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset)
+      : MasterElement(ElementIDs::MkSeekHead, sizeLength, dataSize, offset)
       {}
-      MasterElement(Id id)
-      : Element(id, 0, 0), offset(0)
+      MkSeekHead()
+      : MasterElement(ElementIDs::MkSeekHead, 0, 0, 0)
       {}
-      ~MasterElement() override;
-      offset_t getOffset() const { return offset; }
-      bool read(File &file) override;
-      ByteVector render() override;
-      void appendElement(Element *element) { elements.append(element); }
-      List<Element*>::Iterator begin () { return elements.begin(); }
-      List<Element*>::Iterator end () { return elements.end(); }
-      List<Element*>::ConstIterator cbegin () const { return elements.cbegin(); }
-      List<Element*>::ConstIterator cend () const { return elements.cend(); }
-      offset_t getPadding() const { return padding; }
-      void setPadding(offset_t padding) { this->padding = padding; }
-      offset_t getMinRenderSize() const { return minRenderSize; }
-      void setMinRenderSize(offset_t minRenderSize) { this->minRenderSize = minRenderSize; }
 
+      Matroska::SeekHead* parse();
 
-    protected:
-      offset_t offset;
-      offset_t padding = 0;
-      offset_t minRenderSize = 0;
-      List<Element*> elements;
     };
-    
   }
 }
-
-
 #endif
 #endif

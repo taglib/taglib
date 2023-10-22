@@ -19,11 +19,11 @@ public:
   AttachmentsPrivate(const AttachmentsPrivate &) = delete;
   AttachmentsPrivate &operator=(const AttachmentsPrivate &) = delete;
   List<AttachedFile*> files;
-
 };
 
 Matroska::Attachments::Attachments()
-: d(std::make_unique<AttachmentsPrivate>())
+: Element(ElementIDs::MkAttachments),
+  d(std::make_unique<AttachmentsPrivate>())
 {
   d->files.setAutoDelete(true);
 }
@@ -53,7 +53,7 @@ const Matroska::Attachments::AttachedFileList& Matroska::Attachments::attachedFi
   return d->files;
 }
 
-ByteVector Matroska::Attachments::render()
+bool Matroska::Attachments::render()
 {
   EBML::MkAttachments attachments;
   for(const auto attachedFile : d->files) {
@@ -93,5 +93,14 @@ ByteVector Matroska::Attachments::render()
     attachments.appendElement(attachedFileElement);
   }
 
-  return attachments.render();
+  auto beforeSize = size();
+  auto data = attachments.render();
+  auto afterSize = data.size();
+  if (beforeSize != afterSize) {
+    if (!emitSizeChanged(afterSize - beforeSize))
+      return false;
+  }
+  setData(data);
+  return true;
 }
+

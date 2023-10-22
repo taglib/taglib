@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -18,52 +18,39 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMASTERELEMENT_H
-#define TAGLIB_EBMLMASTERELEMENT_H
+#ifndef TAGLIB_EBMLVOIDELEMENT_H
+#define TAGLIB_EBMLVOIDELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include "ebmlutils.h"
+#include <cstdint>
 #include "ebmlelement.h"
-#include "tbytevector.h"
-#include "tlist.h"
-#include "taglib.h"
+#include "tutils.h"
 
 namespace TagLib {
+  class File;
+
   namespace EBML {
-    class MasterElement : public Element
+    inline constexpr offset_t MIN_VOID_ELEMENT_SIZE = 2;
+    class VoidElement : public Element
     {
     public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset)
-      : Element(id, sizeLength, dataSize), offset(offset)
+      VoidElement(int sizeLength, offset_t dataSize)
+      : Element(ElementIDs::VoidElement, sizeLength, dataSize)
       {}
-      MasterElement(Id id)
-      : Element(id, 0, 0), offset(0)
+      VoidElement()
+      : Element(ElementIDs::VoidElement, 0, 0)
       {}
-      ~MasterElement() override;
-      offset_t getOffset() const { return offset; }
-      bool read(File &file) override;
       ByteVector render() override;
-      void appendElement(Element *element) { elements.append(element); }
-      List<Element*>::Iterator begin () { return elements.begin(); }
-      List<Element*>::Iterator end () { return elements.end(); }
-      List<Element*>::ConstIterator cbegin () const { return elements.cbegin(); }
-      List<Element*>::ConstIterator cend () const { return elements.cend(); }
-      offset_t getPadding() const { return padding; }
-      void setPadding(offset_t padding) { this->padding = padding; }
-      offset_t getMinRenderSize() const { return minRenderSize; }
-      void setMinRenderSize(offset_t minRenderSize) { this->minRenderSize = minRenderSize; }
+      offset_t getTargetSize() const;
+      void setTargetSize(offset_t targetSize);
+      static ByteVector renderSize(offset_t size);
 
+    private:
+      offset_t targetSize = MIN_VOID_ELEMENT_SIZE;
 
-    protected:
-      offset_t offset;
-      offset_t padding = 0;
-      offset_t minRenderSize = 0;
-      List<Element*> elements;
     };
-    
   }
 }
-
 
 #endif
 #endif

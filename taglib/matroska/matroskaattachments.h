@@ -28,13 +28,17 @@
 
 
 namespace TagLib {
+  class File;
   namespace EBML {
     class MkAttachments;
   }
   namespace Matroska {
     class AttachedFile;
     class File;
-    class TAGLIB_EXPORT Attachments : private Element
+    class TAGLIB_EXPORT Attachments
+#ifndef DO_NOT_DOCUMENT
+    : private Element
+#endif
     {
     public:
       using AttachedFileList = List<AttachedFile*>;
@@ -45,7 +49,7 @@ namespace TagLib {
     void removeAttachedFile(AttachedFile *file);
     void clear();
     const AttachedFileList& attachedFileList() const;
-    ByteVector render() override;
+    bool render() override;
 
     private:
       friend class EBML::MkAttachments;

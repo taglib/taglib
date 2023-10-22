@@ -33,13 +33,17 @@
 #include "matroskasimpletag.h"
 
 namespace TagLib {
+  class File;
   namespace EBML {
     class MkTags;
   }
 
   namespace Matroska {
     using SimpleTagsList = List<SimpleTag*>;
-    class TAGLIB_EXPORT Tag : public TagLib::Tag, private Element
+    class TAGLIB_EXPORT Tag : public TagLib::Tag
+#ifndef DO_NOT_DOCUMENT
+    , private Element
+#endif
     {
     public:
       Tag();
@@ -63,7 +67,7 @@ namespace TagLib {
       void setYear(unsigned int i) override;
       void setTrack(unsigned int i) override;
       bool isEmpty() const override;
-      ByteVector render() override;
+      bool render() override;
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
       template <typename T>

@@ -18,52 +18,28 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMASTERELEMENT_H
-#define TAGLIB_EBMLMASTERELEMENT_H
-#ifndef DO_NOT_DOCUMENT
-
+#include "matroskasegment.h"
 #include "ebmlutils.h"
-#include "ebmlelement.h"
-#include "tbytevector.h"
-#include "tlist.h"
-#include "taglib.h"
 
-namespace TagLib {
-  namespace EBML {
-    class MasterElement : public Element
-    {
-    public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset)
-      : Element(id, sizeLength, dataSize), offset(offset)
-      {}
-      MasterElement(Id id)
-      : Element(id, 0, 0), offset(0)
-      {}
-      ~MasterElement() override;
-      offset_t getOffset() const { return offset; }
-      bool read(File &file) override;
-      ByteVector render() override;
-      void appendElement(Element *element) { elements.append(element); }
-      List<Element*>::Iterator begin () { return elements.begin(); }
-      List<Element*>::Iterator end () { return elements.end(); }
-      List<Element*>::ConstIterator cbegin () const { return elements.cbegin(); }
-      List<Element*>::ConstIterator cend () const { return elements.cend(); }
-      offset_t getPadding() const { return padding; }
-      void setPadding(offset_t padding) { this->padding = padding; }
-      offset_t getMinRenderSize() const { return minRenderSize; }
-      void setMinRenderSize(offset_t minRenderSize) { this->minRenderSize = minRenderSize; }
+using namespace TagLib;
 
-
-    protected:
-      offset_t offset;
-      offset_t padding = 0;
-      offset_t minRenderSize = 0;
-      List<Element*> elements;
-    };
-    
+bool Matroska::Segment::render()
+{
+  auto data = EBML::renderVINT(dataSize, sizeLength);
+  if (data.size() != sizeLength) {
+    sizeLength = 8;
+    if (!emitSizeChanged(sizeLength - data.size()))
+      return false;
+    data = EBML::renderVINT(dataSize, sizeLength);
+    if (data.size() != sizeLength)
+      return false;
   }
+  setData(data);
+  return true;
 }
 
-
-#endif
-#endif
+bool Matroska::Segment::sizeChanged(Element &caller, offset_t delta)
+{
+  dataSize += delta;
+  return true;
+} 

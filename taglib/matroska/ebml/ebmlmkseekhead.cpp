@@ -18,47 +18,42 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-#include <tuple>
+#include "ebmlmkseekhead.h"
+#include "matroskaseekhead.h"
+#include "ebmluintelement.h"
+#include "ebmlbinaryelement.h"
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
-#ifndef DO_NOT_DOCUMENT
+using namespace TagLib;
 
-namespace TagLib {
-  namespace Matroska {
-    class Tag;
-    class Attachments;
-    class SeekHead;
-    class Segment;
+Matroska::SeekHead* EBML::MkSeekHead::parse()
+{
+  auto seekHead = new Matroska::SeekHead();
+  seekHead->setOffset(offset);
+  seekHead->setSize(getSize() + padding);
+
+  for(auto element : elements) {
+    if(element->getId() != ElementIDs::MkSeek)
+      continue;
+    auto seekElement = static_cast<MasterElement*>(element);
+    Matroska::Element::ID entryId = 0;
+    offset_t offset = 0;
+    for(auto seekElementChild : *seekElement) {
+      Id id = seekElementChild->getId();
+      if(id == ElementIDs::MkSeekID && !entryId) {
+        auto data = static_cast<BinaryElement*>(seekElementChild)->getValue();
+        if(data.size() == 4)
+          entryId = data.toUInt(true);
+      }
+      else if(id == ElementIDs::MkSeekPosition && !offset)
+        offset = static_cast<UIntElement*>(seekElementChild)->getValue();
+    }
+    if(entryId && offset)
+      seekHead->addEntry(entryId, offset);
+    else {
+      delete seekHead;
+      return nullptr;
+    }
   }
-  namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSeekHead;
-    class MkSegment : public MasterElement
-    {
-    public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
-      {}
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
-      Matroska::SeekHead* parseSeekHead();
-      Matroska::Segment* parseSegment();
 
-    private:
-      offset_t dataOffset = 0;
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-      MkSeekHead *seekHead = nullptr;
-
-    };
-  }
+  return seekHead;
 }
-
-#endif
-#endif

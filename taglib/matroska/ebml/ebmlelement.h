@@ -43,6 +43,7 @@ namespace TagLib {
       void skipData(File &file);
       Id getId() const { return id; }
       offset_t headSize() const;
+      offset_t getSize() const { return headSize() + dataSize; }
       int getSizeLength() const { return sizeLength; }
       int64_t getDataSize() const { return dataSize; }
       ByteVector renderId();
@@ -58,6 +59,7 @@ namespace TagLib {
 
     namespace ElementIDs {
       inline constexpr Element::Id EBMLHeader                = 0x1A45DFA3;
+      inline constexpr Element::Id VoidElement               = 0xEC;
       inline constexpr Element::Id MkSegment                 = 0x18538067;
       inline constexpr Element::Id MkTags                    = 0x1254C367;
       inline constexpr Element::Id MkTag                     = 0x7373;
@@ -76,6 +78,10 @@ namespace TagLib {
       inline constexpr Element::Id MkAttachedFileMediaType   = 0x4660;
       inline constexpr Element::Id MkAttachedFileData        = 0x465C;
       inline constexpr Element::Id MkAttachedFileUID         = 0x46AE;
+      inline constexpr Element::Id MkSeekHead                = 0x114D9B74;
+      inline constexpr Element::Id MkSeek                    = 0x4DBB;
+      inline constexpr Element::Id MkSeekID                  = 0x53AB;
+      inline constexpr Element::Id MkSeekPosition            = 0x53AC;
 
     }
   }

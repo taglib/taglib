@@ -20,32 +20,60 @@
 
 #ifndef HAS_MATROSKAELEMENT_H
 #define HAS_MATROSKAELEMENT_H
+#ifndef DO_NOT_DOCUMENT
 
 #include <memory>
 #include "taglib_export.h"
 #include "tutils.h"
 #include "tbytevector.h"
+#include "tlist.h"
 
 
 namespace TagLib {
+  class File;
   namespace Matroska {
     class TAGLIB_EXPORT Element
     {
     public:
-      Element();
+      using ID = unsigned int;
+      Element(ID id);
       virtual ~Element();
-      virtual ByteVector render() = 0;
+
       offset_t size() const;
       offset_t offset() const;
+      ID id() const;
       void setOffset(offset_t offset);
+      void adjustOffset(offset_t delta);
       void setSize(offset_t size);
+      void setID(ID id);
+      //virtual ByteVector render() = 0;
+      virtual bool render() = 0;
+      void setData(const ByteVector &data);
+      const ByteVector& data() const;
+      virtual void write(TagLib::File &file);
+      void addSizeListener(Element *element);
+      void addSizeListeners(const List<Element*> &elements);
+      void addOffsetListener(Element *element);
+      void addOffsetListeners(const List<Element*> &elements);
+      //virtual void updatePosition(Element &caller, offset_t delta) = 0;
+      bool emitSizeChanged(offset_t delta);
+      bool emitOffsetChanged(offset_t delta);
+      virtual bool offsetChanged(Element &caller, offset_t delta);
+      virtual bool sizeChanged(Element &caller, offset_t delta);
 
     private:
       class ElementPrivate;
       std::unique_ptr<ElementPrivate> e;
 
     };
+    namespace ElementIDs {
+      inline constexpr Element::ID MkTags        = 0x1254C367;
+      inline constexpr Element::ID MkAttachments = 0x1941A469;
+      inline constexpr Element::ID MkSeekHead    = 0x114D9B74;
+      inline constexpr Element::ID MkSegment     = 0x18538067;
+    }
   }
 }
 
- #endif
+#endif
+#endif

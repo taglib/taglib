@@ -18,52 +18,43 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMASTERELEMENT_H
-#define TAGLIB_EBMLMASTERELEMENT_H
-#ifndef DO_NOT_DOCUMENT
-
+#include "ebmlvoidelement.h"
 #include "ebmlutils.h"
-#include "ebmlelement.h"
 #include "tbytevector.h"
-#include "tlist.h"
-#include "taglib.h"
+#include "tdebug.h"
 
-namespace TagLib {
-  namespace EBML {
-    class MasterElement : public Element
-    {
-    public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset)
-      : Element(id, sizeLength, dataSize), offset(offset)
-      {}
-      MasterElement(Id id)
-      : Element(id, 0, 0), offset(0)
-      {}
-      ~MasterElement() override;
-      offset_t getOffset() const { return offset; }
-      bool read(File &file) override;
-      ByteVector render() override;
-      void appendElement(Element *element) { elements.append(element); }
-      List<Element*>::Iterator begin () { return elements.begin(); }
-      List<Element*>::Iterator end () { return elements.end(); }
-      List<Element*>::ConstIterator cbegin () const { return elements.cbegin(); }
-      List<Element*>::ConstIterator cend () const { return elements.cend(); }
-      offset_t getPadding() const { return padding; }
-      void setPadding(offset_t padding) { this->padding = padding; }
-      offset_t getMinRenderSize() const { return minRenderSize; }
-      void setMinRenderSize(offset_t minRenderSize) { this->minRenderSize = minRenderSize; }
+#include <algorithm>
 
+using namespace TagLib;
 
-    protected:
-      offset_t offset;
-      offset_t padding = 0;
-      offset_t minRenderSize = 0;
-      List<Element*> elements;
-    };
-    
-  }
+ByteVector EBML::VoidElement::render()
+{
+  offset_t bytesNeeded = targetSize;
+  ByteVector buffer = renderId();
+  bytesNeeded -= buffer.size();
+  sizeLength = std::min(bytesNeeded, static_cast<offset_t>(8));
+  bytesNeeded -= sizeLength;
+  dataSize = bytesNeeded;
+  buffer.append(renderVINT(dataSize, sizeLength));
+  if (dataSize)
+    buffer.append(ByteVector(dataSize, 0));
+
+  return buffer;
 }
 
+offset_t EBML::VoidElement::getTargetSize() const
+{
+  return targetSize;
+}
 
-#endif
-#endif
+void EBML::VoidElement::setTargetSize(offset_t targetSize)
+{
+  this->targetSize = std::max(targetSize, MIN_VOID_ELEMENT_SIZE);
+}
+
+ByteVector EBML::VoidElement::renderSize(offset_t targetSize)
+{
+  VoidElement element;
+  element.setTargetSize(targetSize);
+  return element.render();
+}

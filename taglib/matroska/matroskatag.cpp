@@ -50,11 +50,13 @@ class Matroska::Tag::TagPrivate
     TagPrivate() = default;
     ~TagPrivate() = default;
     List<SimpleTag*> tags;
+    ByteVector data;
 
 };
 
 Matroska::Tag::Tag()
 : TagLib::Tag(),
+  Element(ElementIDs::MkTags),
   d(std::make_unique<TagPrivate>())
 {
   d->tags.setAutoDelete(true);
@@ -183,7 +185,7 @@ bool Matroska::Tag::isEmpty() const
   return d->tags.isEmpty();
 }
 
-ByteVector Matroska::Tag::render()
+bool Matroska::Tag::render()
 {
   EBML::MkTags tags;
   List<List<SimpleTag*>*> targetList;
@@ -256,7 +258,15 @@ ByteVector Matroska::Tag::render()
     tags.appendElement(tag);
   }
 
-  return tags.render();
+  auto data = tags.render();
+  auto beforeSize = size();
+  auto afterSize = data.size();
+  if (afterSize != beforeSize) {
+    if (!emitSizeChanged(afterSize - beforeSize))
+      return false;
+  }
+  setData(data);
+  return true;
 }
 
 namespace

@@ -21,10 +21,13 @@
 #include "ebmlmksegment.h"
 #include "ebmlmktags.h"
 #include "ebmlmkattachments.h"
+#include "ebmlmkseekhead.h"
 #include "ebmlutils.h"
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskaattachments.h"
+#include "matroskaseekhead.h"
+#include "matroskasegment.h"
 #include "tutils.h"
 #include "tbytevector.h"
 #include "tdebug.h"
@@ -35,16 +38,24 @@ EBML::MkSegment::~MkSegment()
 {
   delete tags;
   delete attachments;
+  delete seekHead;
 }
 
 bool EBML::MkSegment::read(File &file)
 {
   offset_t maxOffset = file.tell() + dataSize;
   EBML::Element *element = nullptr;
-
+  int i = 0;
+  int seekHeadIndex = -1;
   while((element = findNextElement(file, maxOffset))) {
     Id id = element->getId();
-    if(id == ElementIDs::MkTags) {
+    if(id == ElementIDs::MkSeekHead) {
+      seekHeadIndex = i;
+      seekHead = static_cast<MkSeekHead*>(element);
+      if(!seekHead->read(file))
+        return false;
+    }
+    else if(id == ElementIDs::MkTags) {
       tags = static_cast<MkTags*>(element);
       if(!tags->read(file))
         return false;
@@ -55,9 +66,15 @@ bool EBML::MkSegment::read(File &file)
         return false;
     }
     else {
+      if(id == ElementIDs::VoidElement
+         && seekHead 
+         && seekHeadIndex == (i - 1))
+        seekHead->setPadding(element->getSize());
+
       element->skipData(file);
       delete element;
     }
+    i++;
   }
   return true;
 }
@@ -70,4 +87,14 @@ Matroska::Tag* EBML::MkSegment::parseTag()
 Matroska::Attachments* EBML::MkSegment::parseAttachments()
 {
   return attachments ? attachments->parse() : nullptr;
+}
+
+Matroska::SeekHead* EBML::MkSegment::parseSeekHead()
+{
+  return seekHead ? seekHead->parse() : nullptr;
+}
+
+Matroska::Segment* EBML::MkSegment::parseSegment()
+{
+  return new Matroska::Segment(sizeLength, dataSize, offset + idSize(id));
 }
