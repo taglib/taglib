@@ -30,15 +30,54 @@
 #include "tag_c.h"
 #include "tbytevector.h"
 #include "tstring.h"
+#include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace TagLib;
 
+namespace {
+
+void propertiesToMap(
+  TagLib_File *file,
+  std::unordered_map<std::string, std::list<std::string>> &propertyMap)
+{
+  if(char **keys = taglib_property_keys(file)) {
+    char **keyPtr = keys;
+    while(*keyPtr) {
+      char **values = taglib_property_get(file, *keyPtr);
+      char **valuePtr = values;
+      std::list<std::string> valueList;
+      while(*valuePtr) {
+        valueList.push_back(*valuePtr++);
+      }
+      taglib_property_free(values);
+      propertyMap[*keyPtr++] = valueList;
+    }
+    taglib_property_free(keys);
+  }
+}
+
+void complexPropertyKeysToList(
+  TagLib_File *file,
+  std::list<std::string> &keyList)
+{
+  if(char **complexKeys = taglib_complex_property_keys(file)) {
+    char **complexKeyPtr = complexKeys;
+    while(*complexKeyPtr) {
+      keyList.push_back(*complexKeyPtr++);
+    }
+    taglib_complex_property_free_keys(complexKeys);
+  }
+}
+
+}  // namespace
+
 class TestTagC : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestTagC);
   CPPUNIT_TEST(testMp3);
+  CPPUNIT_TEST(testStream);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -89,21 +128,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(2U, taglib_tag_track(tag));
       CPPUNIT_ASSERT_EQUAL(2023U, taglib_tag_year(tag));
 
-      char **keys = taglib_property_keys(file);
-      CPPUNIT_ASSERT(keys);
       std::unordered_map<std::string, std::list<std::string>> propertyMap;
-      char **keyPtr = keys;
-      while(*keyPtr) {
-        char **values = taglib_property_get(file, *keyPtr);
-        char **valuePtr = values;
-        std::list<std::string> valueList;
-        while(*valuePtr) {
-          valueList.push_back(*valuePtr++);
-        }
-        taglib_property_free(values);
-        propertyMap[*keyPtr++] = valueList;
-      }
-      taglib_property_free(keys);
+      propertiesToMap(file, propertyMap);
       const std::unordered_map<std::string, std::list<std::string>> expected {
         {"TRACKNUMBER"s, {"2"s}},
         {"TITLE"s, {"Title"s}},
@@ -117,14 +143,8 @@ public:
       };
       CPPUNIT_ASSERT(expected == propertyMap);
 
-      char **complexKeys = taglib_complex_property_keys(file);
-      CPPUNIT_ASSERT(complexKeys);
       std::list<std::string> keyList;
-      char **complexKeyPtr = complexKeys;
-      while(*complexKeyPtr) {
-        keyList.push_back(*complexKeyPtr++);
-      }
-      taglib_complex_property_free_keys(complexKeys);
+      complexPropertyKeysToList(file, keyList);
       CPPUNIT_ASSERT(std::list{"PICTURE"s} == keyList);
 
       TagLib_Complex_Property_Attribute*** properties =
@@ -139,6 +159,75 @@ public:
       taglib_complex_property_free(properties);
 
       taglib_file_free(file);
+    }
+
+    taglib_tag_free_strings();
+  }
+
+  void testStream()
+  {
+    // Only fetch the beginning of a FLAC file
+    const ByteVector data = PlainFile(TEST_FILE_PATH_C("silence-44-s.flac"))
+      .readBlock(4200);
+
+    {
+      TagLib_IOStream *stream = taglib_memory_iostream_new(data.data(), data.size());
+      TagLib_File *file = taglib_file_new_iostream(stream);
+      CPPUNIT_ASSERT(taglib_file_is_valid(file));
+      const TagLib_AudioProperties *audioProperties = taglib_file_audioproperties(file);
+      CPPUNIT_ASSERT_EQUAL(2, taglib_audioproperties_channels(audioProperties));
+      CPPUNIT_ASSERT_EQUAL(3, taglib_audioproperties_length(audioProperties));
+      CPPUNIT_ASSERT_EQUAL(44100, taglib_audioproperties_samplerate(audioProperties));
+
+      TagLib_Tag *tag = taglib_file_tag(file);
+      CPPUNIT_ASSERT_EQUAL("Quod Libet Test Data"s, std::string(taglib_tag_album(tag)));
+      CPPUNIT_ASSERT_EQUAL("piman jzig"s, std::string(taglib_tag_artist(tag)));
+      CPPUNIT_ASSERT_EQUAL("Silence"s, std::string(taglib_tag_genre(tag)));
+      CPPUNIT_ASSERT_EQUAL(""s, std::string(taglib_tag_comment(tag)));
+      CPPUNIT_ASSERT_EQUAL("Silence"s, std::string(taglib_tag_title(tag)));
+      CPPUNIT_ASSERT_EQUAL(2U, taglib_tag_track(tag));
+      CPPUNIT_ASSERT_EQUAL(2004U, taglib_tag_year(tag));
+
+      std::unordered_map<std::string, std::list<std::string>> propertyMap;
+      propertiesToMap(file, propertyMap);
+      const std::unordered_map<std::string, std::list<std::string>> expected {
+        {"TRACKNUMBER"s, {"02/10"s}},
+        {"TITLE"s, {"Silence"s}},
+        {"GENRE"s, {"Silence"s}},
+        {"DATE"s, {"2004"s}},
+        {"ARTIST"s, {"piman"s, "jzig"s}},
+        {"ALBUM"s, {"Quod Libet Test Data"s}}
+      };
+      CPPUNIT_ASSERT(expected == propertyMap);
+
+      std::list<std::string> keyList;
+      complexPropertyKeysToList(file, keyList);
+      CPPUNIT_ASSERT(std::list{"PICTURE"s} == keyList);
+
+      TagLib_Complex_Property_Attribute*** properties =
+        taglib_complex_property_get(file, "PICTURE");
+      TagLib_Complex_Property_Picture_Data picture;
+      taglib_picture_from_complex_property(properties, &picture);
+      ByteVector expectedData(
+        "\x89PNG\x0d\x0a\x1a\x0a\x00\x00\x00\x0dIHDR"
+        "\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90\x77\x53"
+        "\xde\x00\x00\x00\x09pHYs\x00\x00\x0b\x13\x00\x00\x0b"
+        "\x13\x01\x00\x9a\x9c\x18\x00\x00\x00\x07\x74\x49\x4d\x45\x07\xd6"
+        "\x0b\x1c\x0a\x36\x06\x08\x44\x3d\x32\x00\x00\x00\x1dtEXt"
+        "Comment\0Created"
+        " with The GIMP\xef\x64"
+        "\x25\x6e\x00\x00\x00\x0cIDAT\x08\xd7\x63\xf8\xff\xff"
+        "\x3f\x00\x05\xfe\x02\xfe\xdc\xcc\x59\xe7\x00\x00\x00\x00IEND"
+        "\xae\x42\x60\x82", 150);
+      CPPUNIT_ASSERT_EQUAL("image/png"s, std::string(picture.mimeType));
+      CPPUNIT_ASSERT_EQUAL("A pixel."s, std::string(picture.description));
+      CPPUNIT_ASSERT_EQUAL("Front Cover"s, std::string(picture.pictureType));
+      CPPUNIT_ASSERT_EQUAL(expectedData, ByteVector(picture.data, 150));
+      CPPUNIT_ASSERT_EQUAL(150U, picture.size);
+      taglib_complex_property_free(properties);
+
+      taglib_file_free(file);
+      taglib_iostream_free(stream);
     }
 
     taglib_tag_free_strings();
