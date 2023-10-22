@@ -68,6 +68,7 @@ extern "C" {
 typedef struct { int dummy; } TagLib_File;
 typedef struct { int dummy; } TagLib_Tag;
 typedef struct { int dummy; } TagLib_AudioProperties;
+typedef struct { int dummy; } TagLib_IOStream;
 
 /*!
  * By default all strings coming into or out of TagLib's C API are in UTF8.
@@ -88,6 +89,22 @@ TAGLIB_C_EXPORT void taglib_set_string_management_enabled(BOOL management);
  * Explicitly free a string returned from TagLib
  */
 TAGLIB_C_EXPORT void taglib_free(void* pointer);
+
+/*******************************************************************************
+ * Stream API
+ ******************************************************************************/
+
+/*!
+ * Creates a byte vector stream from \a size bytes of \a data.
+ * Such a stream can be used with taglib_file_new_iostream() to create a file
+ * from memory.
+ */
+TAGLIB_C_EXPORT TagLib_IOStream *taglib_memory_iostream_new(const char *data, unsigned int size);
+
+/*!
+ * Frees and closes the stream.
+ */
+TAGLIB_C_EXPORT void taglib_iostream_free(TagLib_IOStream *stream);
 
 /*******************************************************************************
  * File API
@@ -120,6 +137,16 @@ TAGLIB_C_EXPORT TagLib_File *taglib_file_new(const char *filename);
  * the type, it will use the one specified by \a type.
  */
 TAGLIB_C_EXPORT TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type);
+
+/*!
+ * Creates a TagLib file from a \a stream.
+ * A byte vector stream can be used to read a file from memory and write to
+ * memory, e.g. when fetching network data.
+ * The stream has to be created using taglib_memory_iostream_new() and shall be
+ * freed using taglib_iostream_free() \e after this file is freed with
+ * taglib_file_free().
+ */
+TAGLIB_C_EXPORT TagLib_File *taglib_file_new_iostream(TagLib_IOStream *stream);
 
 /*!
  * Frees and closes the file.

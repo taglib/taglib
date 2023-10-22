@@ -31,6 +31,8 @@
 #endif
 #include "tstringlist.h"
 #include "tbytevectorlist.h"
+#include "tbytevectorstream.h"
+#include "tiostream.h"
 #include "tfile.h"
 #include "tpropertymap.h"
 #include "fileref.h"
@@ -92,6 +94,21 @@ void taglib_free(void* pointer)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// TagLib::IOStream wrapper
+////////////////////////////////////////////////////////////////////////////////
+
+TagLib_IOStream *taglib_memory_iostream_new(const char *data, unsigned int size)
+{
+  return reinterpret_cast<TagLib_IOStream *>(
+    new ByteVectorStream(ByteVector(data, size)));
+}
+
+void taglib_iostream_free(TagLib_IOStream *stream)
+{
+  delete reinterpret_cast<IOStream *>(stream);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // TagLib::FileRef wrapper
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +155,12 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     break;
   }
   return file ? reinterpret_cast<TagLib_File *>(new FileRef(file)) : NULL;
+}
+
+TagLib_File *taglib_file_new_iostream(TagLib_IOStream *stream)
+{
+  return reinterpret_cast<TagLib_File *>(
+    new FileRef(reinterpret_cast<IOStream *>(stream)));
 }
 
 void taglib_file_free(TagLib_File *file)
