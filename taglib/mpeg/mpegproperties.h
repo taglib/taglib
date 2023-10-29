@@ -110,6 +110,16 @@ namespace TagLib {
       Header::ChannelMode channelMode() const;
 
       /*!
+       * Returns the MPEG-4 channel configuration.
+       */
+      Header::ChannelConfiguration channelConfiguration() const;
+
+      /*!
+       * Returns true for an Audio Data Transport Stream (ADTS), usually AAC.
+       */
+      bool isADTS() const;
+
+      /*!
        * Returns true if the copyrighted bit is set.
        */
       bool isCopyrighted() const;
@@ -120,7 +130,7 @@ namespace TagLib {
       bool isOriginal() const;
 
     private:
-      void read(File *file);
+      void read(File *file, ReadStyle readStyle);
 
       class PropertiesPrivate;
       std::unique_ptr<PropertiesPrivate> d;

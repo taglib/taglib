@@ -25,6 +25,7 @@
 
 #include <string>
 #include <cstdio>
+#include <array>
 
 #include "tstring.h"
 #include "tpropertymap.h"
@@ -49,6 +50,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testAudioPropertiesXingHeaderVBR);
   CPPUNIT_TEST(testAudioPropertiesVBRIHeader);
   CPPUNIT_TEST(testAudioPropertiesNoVBRHeaders);
+  CPPUNIT_TEST(testAudioPropertiesADTS);
   CPPUNIT_TEST(testSkipInvalidFrames1);
   CPPUNIT_TEST(testSkipInvalidFrames2);
   CPPUNIT_TEST(testSkipInvalidFrames3);
@@ -83,6 +85,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::Xing, f.audioProperties()->xingHeader()->type());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
   }
 
   void testAudioPropertiesXingHeaderVBR()
@@ -95,6 +98,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::Xing, f.audioProperties()->xingHeader()->type());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
   }
 
   void testAudioPropertiesVBRIHeader()
@@ -107,6 +111,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(MPEG::XingHeader::VBRI, f.audioProperties()->xingHeader()->type());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
   }
 
   void testAudioPropertiesNoVBRHeaders()
@@ -119,12 +124,44 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
 
     const offset_t last = f.lastFrameOffset();
     const MPEG::Header lastHeader(&f, last, false);
 
     CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(28213), last);
     CPPUNIT_ASSERT_EQUAL(209, lastHeader.frameLength());
+  }
+
+  void testAudioPropertiesADTS()
+  {
+    const std::array readStyles = {
+      MPEG::Properties::Fast,
+      MPEG::Properties::Average,
+      MPEG::Properties::Accurate
+    };
+    for(auto readStyle : readStyles) {
+      MPEG::File f(TEST_FILE_PATH_C("empty1s.aac"), true, readStyle);
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(readStyle == MPEG::Properties::Fast ? 0 : 1,
+        f.audioProperties()->lengthInSeconds());
+      CPPUNIT_ASSERT_EQUAL(readStyle == MPEG::Properties::Fast ? 0 : 1176,
+        f.audioProperties()->lengthInMilliseconds());
+      CPPUNIT_ASSERT_EQUAL(readStyle == MPEG::Properties::Fast ? 0 : 1,
+        f.audioProperties()->bitrate());
+      CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+      CPPUNIT_ASSERT_EQUAL(MPEG::Header::FrontCenter,
+        f.audioProperties()->channelConfiguration());
+      CPPUNIT_ASSERT_EQUAL(11025, f.audioProperties()->sampleRate());
+      CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
+      CPPUNIT_ASSERT(f.audioProperties()->isADTS());
+
+      const offset_t last = f.lastFrameOffset();
+      const MPEG::Header lastHeader(&f, last, false);
+
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(136), last);
+      CPPUNIT_ASSERT_EQUAL(11, lastHeader.frameLength());
+    }
   }
 
   void testSkipInvalidFrames1()
@@ -137,6 +174,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
   }
 
   void testSkipInvalidFrames2()
@@ -149,6 +187,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
   }
 
   void testSkipInvalidFrames3()
@@ -161,6 +200,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT(!f.audioProperties()->xingHeader());
+    CPPUNIT_ASSERT(!f.audioProperties()->isADTS());
   }
 
   void testVersion2DurationWithXingHeader()

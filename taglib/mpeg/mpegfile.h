@@ -70,11 +70,6 @@ namespace TagLib {
         AllTags = 0xffff
       };
 
-      enum ContainerFormat {
-        MPEG = 0,
-        ADTS = 1,
-      };
-
       /*!
        * Constructs an MPEG file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read.
@@ -119,37 +114,6 @@ namespace TagLib {
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
-
-      /*!
-       * Constructs an MPEG file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read.
-       *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
-       *
-       * \note In the current implementation, \a propertiesStyle is ignored.
-       */
-      // BIC: merge with the above constructor
-      File(FileName file, ID3v2::FrameFactory *frameFactory,
-           bool readProperties,
-           Properties::ReadStyle propertiesStyle, ContainerFormat format = MPEG);
-
-      /*!
-       * Constructs an MPEG file from \a stream.  If \a readProperties is true the
-       * file's audio properties will also be read.
-       *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
-       *
-       * If this file contains and ID3v2 tag the frames will be created using
-       * \a frameFactory.
-       *
-       * \note In the current implementation, \a propertiesStyle is ignored.
-       */
-      // BIC: merge with the above constructor
-      File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
-           bool readProperties,
-           Properties::ReadStyle propertiesStyle, ContainerFormat format = MPEG);
 
       /*!
        * Destroys this instance of the File.
@@ -358,8 +322,6 @@ namespace TagLib {
        * not necessarily be correct.
        */
       static bool isSupported(IOStream *stream);
-
-      ContainerFormat containerFormat() const;
 
     private:
       void read(bool readProperties, Properties::ReadStyle readStyle);

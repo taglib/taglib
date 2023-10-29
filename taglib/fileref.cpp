@@ -134,10 +134,8 @@ namespace
 
     File *file = nullptr;
 
-    if(ext == "MP3")
-      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle, TagLib::MPEG::File::MPEG);
-    else if(ext == "AAC")
-      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle, MPEG::File::ADTS);
+    if(ext == "MP3" || ext == "AAC")
+      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGG")
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGA") {
@@ -203,7 +201,7 @@ namespace
     File *file = nullptr;
 
     if(MPEG::File::isSupported(stream))
-      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle, TagLib::MPEG::File::MPEG);
+      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     else if(Ogg::Vorbis::File::isSupported(stream))
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(Ogg::FLAC::File::isSupported(stream))

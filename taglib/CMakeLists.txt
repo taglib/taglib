@@ -56,7 +56,6 @@ set(tag_HDRS
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
   mpeg/xingheader.h
-  mpeg/adtsheader.h
   mpeg/id3v1/id3v1tag.h
   mpeg/id3v1/id3v1genres.h
   mpeg/id3v2/id3v2.h
@@ -149,7 +148,6 @@ set(mpeg_SRCS
   mpeg/mpegproperties.cpp
   mpeg/mpegheader.cpp
   mpeg/xingheader.cpp
-  mpeg/adtsheader.cpp
 )
 
 set(id3v1_SRCS
