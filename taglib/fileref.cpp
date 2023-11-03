@@ -134,7 +134,7 @@ namespace
 
     File *file = nullptr;
 
-    if(ext == "MP3" || ext == "AAC")
+    if(ext == "MP3" || ext == "MP2" || ext == "AAC")
       file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGG")
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
@@ -406,6 +406,7 @@ StringList FileRef::defaultFileExtensions()
   l.append("oga");
   l.append("opus");
   l.append("mp3");
+  l.append("mp2");
   l.append("mpc");
   l.append("wv");
   l.append("spx");
