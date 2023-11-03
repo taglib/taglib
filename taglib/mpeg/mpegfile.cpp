@@ -479,7 +479,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle readStyle)
   }
 
   if(readProperties)
-    d->properties = std::make_unique<Properties>(this);
+    d->properties = std::make_unique<Properties>(this, readStyle);
 
   // Make sure that we have our default tag types available.
 

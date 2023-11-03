@@ -84,7 +84,9 @@ namespace TagLib {
         //! MPEG Version 2
         Version2 = 1,
         //! MPEG Version 2.5
-        Version2_5 = 2
+        Version2_5 = 2,
+        //! MPEG Version 4
+        Version4 = 3
       };
 
       /*!
@@ -136,6 +138,31 @@ namespace TagLib {
        * Returns the channel mode for this frame.
        */
       ChannelMode channelMode() const;
+
+      /*!
+       * MPEG-4 channel configuration.
+       */
+      enum ChannelConfiguration {
+        Custom = 0,
+        FrontCenter = 1,
+        FrontLeftRight = 2,
+        FrontCenterLeftRight = 3,
+        FrontCenterLeftRightBackCenter = 4,
+        FrontCenterLeftRightBackLeftRight = 5,
+        FrontCenterLeftRightBackLeftRightLFE = 6,
+        FrontCenterLeftRightSideLeftRightBackLeftRightLFE = 7
+      };
+
+      /*!
+       * Returns the MPEG-4 channel configuration.
+       */
+      ChannelConfiguration channelConfiguration() const;
+
+      /*!
+       * Returns true if this is the header of an Audio Data Transport Stream
+       * (ADTS), usually AAC.
+       */
+      bool isADTS() const;
 
       /*!
        * Returns true if the copyrighted bit is set.
