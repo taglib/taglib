@@ -59,6 +59,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST(testPCMWithFactChunk);
   CPPUNIT_TEST(testWaveFormatExtensible);
+  CPPUNIT_TEST(testInvalidChunk);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -383,6 +384,23 @@ public:
     CPPUNIT_ASSERT_EQUAL(8, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(23493U, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->format());
+  }
+
+  void testInvalidChunk()
+  {
+    ScopedFileCopy copy("invalid-chunk", ".wav");
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->lengthInSeconds());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      f.ID3v2Tag()->setTitle("Title");
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+    }
   }
 
 };
