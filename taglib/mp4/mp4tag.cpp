@@ -70,10 +70,11 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
       parseIntPair(atom);
     }
     else if(atom->name == "cpil" || atom->name == "pgap" || atom->name == "pcst" ||
-            atom->name == "hdvd" || atom->name == "shwm") {
+            atom->name == "shwm") {
       parseBool(atom);
     }
-    else if(atom->name == "tmpo" || atom->name == "\251mvi" || atom->name == "\251mvc") {
+    else if(atom->name == "tmpo" || atom->name == "\251mvi" || atom->name == "\251mvc" ||
+            atom->name == "hdvd") {
       parseInt(atom);
     }
     else if(atom->name == "rate") {
@@ -484,11 +485,12 @@ MP4::Tag::save()
     else if(name == "disk") {
       data.append(renderIntPairNoTrailing(name.data(String::Latin1), item));
     }
-    else if(name == "cpil" || name == "pgap" || name == "pcst" || name == "hdvd" ||
+    else if(name == "cpil" || name == "pgap" || name == "pcst" ||
             name == "shwm") {
       data.append(renderBool(name.data(String::Latin1), item));
     }
-    else if(name == "tmpo" || name == "\251mvi" || name == "\251mvc") {
+    else if(name == "tmpo" || name == "\251mvi" || name == "\251mvc" ||
+            name == "hdvd") {
       data.append(renderInt(name.data(String::Latin1), item));
     }
     else if(name == "rate") {
