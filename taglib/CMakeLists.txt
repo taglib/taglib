@@ -343,16 +343,6 @@ add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 target_link_libraries(tag $<$<TARGET_EXISTS:utf8::cpp>:utf8::cpp>)
 target_link_libraries(tag $<$<TARGET_EXISTS:ZLIB::ZLIB>:ZLIB::ZLIB>)
 
-# Homebrew utf8cpp 4.0.1 seems to have issues. utf8.h is not found because
-# imported target utf8::cpp does not exist. The imported target utf8cpp::utf8cpp
-# includes non-existent path /usr/local/include/utf8cpp and cannot be used.
-# Therefore the following (temporary) hack is used to find the utf8cpp includes.
-if(APPLE)
-  if(EXISTS /usr/local/include/utf8.h)
-    include_directories(/usr/local/include)
-  endif()
-endif()
-
 set_target_properties(tag PROPERTIES
   VERSION ${TAGLIB_SOVERSION_MAJOR}.${TAGLIB_SOVERSION_MINOR}.${TAGLIB_SOVERSION_PATCH}
   SOVERSION ${TAGLIB_SOVERSION_MAJOR}

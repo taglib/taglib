@@ -23,7 +23,9 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
 
     - name: Set up macOS
-      run: brew install cppunit utf8cpp
+      run: |
+        brew update
+        brew install cppunit utf8cpp
       if: matrix.os == 'macos-latest'
 
     - name: Set up Windows
