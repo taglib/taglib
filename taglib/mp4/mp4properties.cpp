@@ -184,6 +184,17 @@ MP4::Properties::read(File *file, Atoms *atoms)
     unit   = data.toUInt(20U);
     length = data.toUInt(24U);
   }
+  if(length == 0) {
+    // No length found in the media header (mdhd), try the movie header (mvhd)
+    if(MP4::Atom *mvhd = moov->find("mvhd")) {
+      file->seek(mvhd->offset);
+      data = file->readBlock(mvhd->length);
+      if(data.size() >= 24 + 4) {
+        unit   = data.toUInt(20U);
+        length = data.toUInt(24U);
+      }
+    }
+  }
   if(unit > 0 && length > 0)
     d->length = static_cast<int>(length * 1000.0 / unit + 0.5);
 

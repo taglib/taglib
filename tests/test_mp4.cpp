@@ -47,6 +47,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesAACWithoutBitrate);
   CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testPropertiesALACWithoutBitrate);
+  CPPUNIT_TEST(testPropertiesAACWithoutLength);
   CPPUNIT_TEST(testPropertiesM4V);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
@@ -142,6 +143,28 @@ public:
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
     CPPUNIT_ASSERT_EQUAL(MP4::Properties::ALAC, f.audioProperties()->codec());
+  }
+
+  void testPropertiesAACWithoutLength()
+  {
+    ByteVector m4aData = PlainFile(TEST_FILE_PATH_C("no-tags.m4a")).readAll();
+    CPPUNIT_ASSERT_EQUAL(2898U, m4aData.size());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("mdhd"), m4aData.mid(1749, 4));
+    // Set the length to zero
+    for (int offset = 1769; offset < 1773; ++offset) {
+      m4aData[offset] = 0;
+    }
+    ByteVectorStream m4aStream(m4aData);
+    MP4::File f(&m4aStream);
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(3707, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(3, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::Properties::AAC, f.audioProperties()->codec());
   }
 
   void testPropertiesM4V()
