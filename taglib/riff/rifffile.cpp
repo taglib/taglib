@@ -361,6 +361,9 @@ void RIFF::File::writeChunk(const ByteVector &name, const ByteVector &data,
 
 void RIFF::File::updateGlobalSize()
 {
+  if(d->chunks.empty())
+    return;
+
   const Chunk first = d->chunks.front();
   const Chunk last  = d->chunks.back();
   d->size = static_cast<unsigned int>(last.offset + last.size + last.padding - first.offset + 12);
