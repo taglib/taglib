@@ -41,6 +41,15 @@ namespace
 class RIFF::WAV::File::FilePrivate
 {
 public:
+  FilePrivate(ID3v2::FrameFactory *frameFactory)
+        : ID3v2FrameFactory(frameFactory ? frameFactory
+                                         : ID3v2::FrameFactory::instance())
+  {
+  }
+
+  ~FilePrivate() = default;
+
+  const ID3v2::FrameFactory *ID3v2FrameFactory;
   std::unique_ptr<Properties> properties;
   TagUnion tag;
 
@@ -64,17 +73,19 @@ bool RIFF::WAV::File::isSupported(IOStream *stream)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+RIFF::WAV::File::File(FileName file, bool readProperties, Properties::ReadStyle,
+                      ID3v2::FrameFactory *frameFactory) :
   RIFF::File(file, LittleEndian),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-RIFF::WAV::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
+RIFF::WAV::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle,
+                      ID3v2::FrameFactory *frameFactory) :
   RIFF::File(stream, LittleEndian),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(frameFactory))
 {
   if(isOpen())
     read(readProperties);
@@ -190,7 +201,8 @@ void RIFF::WAV::File::read(bool readProperties)
     const ByteVector name = chunkName(i);
     if(name == "ID3 " || name == "id3 ") {
       if(!d->tag[ID3v2Index]) {
-        d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i)));
+        d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i),
+                                              d->ID3v2FrameFactory));
         d->hasID3v2 = true;
       }
       else {
