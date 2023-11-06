@@ -126,6 +126,7 @@ set(tag_HDRS
   mp4/mp4item.h
   mp4/mp4properties.h
   mp4/mp4coverart.h
+  mp4/mp4itemfactory.h
   mod/modfilebase.h
   mod/modfile.h
   mod/modtag.h
@@ -221,6 +222,7 @@ set(mp4_SRCS
   mp4/mp4item.cpp
   mp4/mp4properties.cpp
   mp4/mp4coverart.cpp
+  mp4/mp4itemfactory.cpp
 )
 
 set(ape_SRCS

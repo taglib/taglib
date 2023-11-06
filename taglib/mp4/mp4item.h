@@ -83,6 +83,8 @@ namespace TagLib {
       class ItemPrivate;
       std::shared_ptr<ItemPrivate> d;
     };
+
+    using ItemMap = TagLib::Map<String, Item>;
   }  // namespace MP4
 }  // namespace TagLib
 #endif

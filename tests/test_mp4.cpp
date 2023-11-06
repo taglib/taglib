@@ -33,6 +33,7 @@
 #include "mp4tag.h"
 #include "mp4atom.h"
 #include "mp4file.h"
+#include "mp4itemfactory.h"
 #include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -69,6 +70,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyValuesRemoveItems);
   CPPUNIT_TEST(testRemoveMetadata);
   CPPUNIT_TEST(testNonFullMetaAtom);
+  CPPUNIT_TEST(testItemFactory);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -733,6 +735,81 @@ public:
       PropertyMap properties = f.properties();
       CPPUNIT_ASSERT_EQUAL(StringList("Test Artist!!!!"), properties["ARTIST"]);
       CPPUNIT_ASSERT_EQUAL(StringList("FAAC 1.24"), properties["ENCODEDBY"]);
+    }
+  }
+
+  void testItemFactory()
+  {
+    class CustomItemFactory : public MP4::ItemFactory {
+    protected:
+      NameHandlerMap nameHandlerMap() const override
+      {
+        return MP4::ItemFactory::nameHandlerMap()
+          .insert("tsti", ItemHandlerType::Int)
+          .insert("tstt", ItemHandlerType::Text);
+      }
+    };
+
+    CustomItemFactory factory;
+
+    ScopedFileCopy copy("no-tags", ".m4a");
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasMP4Tag());
+      MP4::Tag *tag = f.tag();
+      tag->setItem("tsti", MP4::Item(123));
+      tag->setItem("tstt", MP4::Item(StringList("Test text")));
+      f.save();
+    }
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+      MP4::Tag *tag = f.tag();
+      // Without a custom item factory, only custom text atoms with four
+      // letter names are possible.
+      MP4::Item item = tag->item("tsti");
+      CPPUNIT_ASSERT(!item.isValid());
+      CPPUNIT_ASSERT(item.toInt() != 123);
+      item = tag->item("tstt");
+      CPPUNIT_ASSERT(item.isValid());
+      CPPUNIT_ASSERT_EQUAL(StringList("Test text"), item.toStringList());
+      f.strip();
+    }
+    {
+      MP4::File f(copy.fileName().c_str(),
+                  true, MP4::Properties::Average, &factory);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasMP4Tag());
+      MP4::Tag *tag = f.tag();
+      tag->setItem("tsti", MP4::Item(123));
+      tag->setItem("tstt", MP4::Item(StringList("Test text")));
+      tag->setItem("trkn", MP4::Item(2, 10));
+      tag->setItem("rate", MP4::Item(80));
+      tag->setItem("plID", MP4::Item(1540934238LL));
+      tag->setItem("rtng", MP4::Item(static_cast<unsigned char>(2)));
+      f.save();
+    }
+    {
+      MP4::File f(copy.fileName().c_str(),
+                  true, MP4::Properties::Average, &factory);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+      MP4::Tag *tag = f.tag();
+      MP4::Item item = tag->item("tsti");
+      CPPUNIT_ASSERT(item.isValid());
+      CPPUNIT_ASSERT_EQUAL(123, item.toInt());
+      item = tag->item("tstt");
+      CPPUNIT_ASSERT(item.isValid());
+      CPPUNIT_ASSERT_EQUAL(StringList("Test text"), item.toStringList());
+      item = tag->item("trkn");
+      CPPUNIT_ASSERT(item.isValid());
+      CPPUNIT_ASSERT_EQUAL(2, item.toIntPair().first);
+      CPPUNIT_ASSERT_EQUAL(10, item.toIntPair().second);
+      CPPUNIT_ASSERT_EQUAL(80, tag->item("rate").toInt());
+      CPPUNIT_ASSERT_EQUAL(1540934238LL, tag->item("plID").toLongLong());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(2), tag->item("rtng").toByte());
     }
   }
 };
