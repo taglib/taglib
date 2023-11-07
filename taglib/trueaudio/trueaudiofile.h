@@ -91,7 +91,7 @@ namespace TagLib {
        * Constructs a TrueAudio file from \a file.  If \a readProperties is true
        * the file's audio properties will also be read.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
+       * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -119,7 +119,7 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
+       * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.

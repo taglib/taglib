@@ -75,7 +75,7 @@ namespace TagLib {
          *
          * \note In the current implementation, \a propertiesStyle is ignored.
          *
-         * If this file contains and ID3v2 tag the frames will be created using
+         * If this file contains an ID3v2 tag, the frames will be created using
          * \a frameFactory (default if null).
          */
         File(FileName file, bool readProperties = true,
@@ -91,7 +91,7 @@ namespace TagLib {
          *
          * \note In the current implementation, \a propertiesStyle is ignored.
          *
-         * If this file contains and ID3v2 tag the frames will be created using
+         * If this file contains an ID3v2 tag, the frames will be created using
          * \a frameFactory (default if null).
          */
         File(IOStream *stream, bool readProperties = true,
