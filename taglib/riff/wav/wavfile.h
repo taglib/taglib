@@ -74,9 +74,13 @@ namespace TagLib {
          * file's audio properties will also be read.
          *
          * \note In the current implementation, \a propertiesStyle is ignored.
+         *
+         * If this file contains an ID3v2 tag, the frames will be created using
+         * \a frameFactory (default if null).
          */
         File(FileName file, bool readProperties = true,
-             Properties::ReadStyle propertiesStyle = Properties::Average);
+             Properties::ReadStyle propertiesStyle = Properties::Average,
+             ID3v2::FrameFactory *frameFactory = nullptr);
 
         /*!
          * Constructs a WAV file from \a stream.  If \a readProperties is true the
@@ -86,9 +90,13 @@ namespace TagLib {
          * responsible for deleting it after the File object.
          *
          * \note In the current implementation, \a propertiesStyle is ignored.
+         *
+         * If this file contains an ID3v2 tag, the frames will be created using
+         * \a frameFactory (default if null).
          */
         File(IOStream *stream, bool readProperties = true,
-             Properties::ReadStyle propertiesStyle = Properties::Average);
+             Properties::ReadStyle propertiesStyle = Properties::Average,
+             ID3v2::FrameFactory *frameFactory = nullptr);
 
         /*!
          * Destroys this instance of the File.

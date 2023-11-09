@@ -46,7 +46,7 @@ namespace TagLib {
          * \a propertiesStyle are ignored.  The audio properties are always
          * read.
          *
-         * If this file contains and ID3v2 tag the frames will be created using
+         * If this file contains an ID3v2 tag, the frames will be created using
          * \a frameFactory (default if null).
          */
         File(FileName file, bool readProperties = true,
@@ -61,7 +61,7 @@ namespace TagLib {
          * \a propertiesStyle are ignored.  The audio properties are always
          * read.
          *
-         * If this file contains and ID3v2 tag the frames will be created using
+         * If this file contains an ID3v2 tag, the frames will be created using
          * \a frameFactory (default if null).
          *
          * \note TagLib will *not* take ownership of the stream, the caller is

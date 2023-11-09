@@ -812,7 +812,8 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
     }
     else if(d->chunks[i].name == "ID3 " || d->chunks[i].name == "id3 ") {
       d->id3v2TagChunkID = d->chunks[i].name;
-      d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->chunks[i].offset));
+      d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->chunks[i].offset,
+                                            d->ID3v2FrameFactory));
       d->isID3InPropChunk = false;
       d->hasID3v2 = true;
     }
@@ -841,7 +842,8 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
         continue;
       }
       d->id3v2TagChunkID = d->childChunks[PROPChunk][i].name;
-      d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->childChunks[PROPChunk][i].offset));
+      d->tag.set(ID3v2Index, new ID3v2::Tag(this, d->childChunks[PROPChunk][i].offset,
+                                            d->ID3v2FrameFactory));
       d->isID3InPropChunk = true;
       d->hasID3v2 = true;
     }

@@ -83,7 +83,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
+       * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory (default if null).
        */
       File(FileName file, bool readProperties = true,
@@ -94,7 +94,7 @@ namespace TagLib {
        * Constructs an DSDIFF file from \a stream.  If \a readProperties is true
        * the file's audio properties will also be read.
        *
-       * If this file contains and ID3v2 tag the frames will be created using
+       * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory (default if null).
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
