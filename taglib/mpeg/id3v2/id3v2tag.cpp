@@ -472,26 +472,28 @@ List<VariantMap> ID3v2::Tag::complexProperties(const String &key) const
   if(uppercaseKey == "PICTURE") {
     const FrameList pictures = d->frameListMap.value("APIC");
     for(const Frame *frame : pictures) {
-      auto picture = static_cast<const AttachedPictureFrame *>(frame);
-      VariantMap property;
-      property.insert("data", picture->picture());
-      property.insert("mimeType", picture->mimeType());
-      property.insert("description", picture->description());
-      property.insert("pictureType",
-        AttachedPictureFrame::typeToString(picture->type()));
-      properties.append(property);
+      if(auto picture = dynamic_cast<const AttachedPictureFrame *>(frame)) {
+        VariantMap property;
+        property.insert("data", picture->picture());
+        property.insert("mimeType", picture->mimeType());
+        property.insert("description", picture->description());
+        property.insert("pictureType",
+          AttachedPictureFrame::typeToString(picture->type()));
+        properties.append(property);
+      }
     }
   }
   else if(uppercaseKey == "GENERALOBJECT") {
     const FrameList geobs = d->frameListMap.value("GEOB");
     for(const Frame *frame : geobs) {
-      auto geob = static_cast<const GeneralEncapsulatedObjectFrame *>(frame);
-      VariantMap property;
-      property.insert("data", geob->object());
-      property.insert("mimeType", geob->mimeType());
-      property.insert("description", geob->description());
-      property.insert("fileName", geob->fileName());
-      properties.append(property);
+      if(auto geob = dynamic_cast<const GeneralEncapsulatedObjectFrame *>(frame)) {
+        VariantMap property;
+        property.insert("data", geob->object());
+        property.insert("mimeType", geob->mimeType());
+        property.insert("description", geob->description());
+        property.insert("fileName", geob->fileName());
+        properties.append(property);
+      }
     }
   }
   return properties;
