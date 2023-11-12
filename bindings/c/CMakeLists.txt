@@ -20,7 +20,11 @@ set(tag_c_HDRS tag_c.h)
 
 add_library(tag_c tag_c.cpp ${tag_c_HDRS})
 
-target_link_libraries(tag_c tag)
+target_include_directories(tag_c INTERFACE
+  $<INSTALL_INTERFACE:include/taglib>
+)
+
+target_link_libraries(tag_c PRIVATE tag)
 set_target_properties(tag_c PROPERTIES
   PUBLIC_HEADER "${tag_c_HDRS}"
   DEFINE_SYMBOL MAKE_TAGLIB_LIB
@@ -60,6 +64,7 @@ set_target_properties(tag_c PROPERTIES
   INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
 )
 install(TARGETS tag_c
+  EXPORT taglibTargets
   FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

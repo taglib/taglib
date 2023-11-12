@@ -340,15 +340,22 @@ set(tag_LIB_SRCS
 
 add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
-target_link_libraries(tag $<$<TARGET_EXISTS:utf8::cpp>:utf8::cpp>)
-target_link_libraries(tag $<$<TARGET_EXISTS:ZLIB::ZLIB>:ZLIB::ZLIB>)
+target_include_directories(tag INTERFACE
+  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/taglib>
+)
+
+target_link_libraries(tag
+  PRIVATE $<$<TARGET_EXISTS:utf8::cpp>:utf8::cpp>
+          $<$<TARGET_EXISTS:ZLIB::ZLIB>:ZLIB::ZLIB>
+)
 
 set_target_properties(tag PROPERTIES
   VERSION ${TAGLIB_SOVERSION_MAJOR}.${TAGLIB_SOVERSION_MINOR}.${TAGLIB_SOVERSION_PATCH}
   SOVERSION ${TAGLIB_SOVERSION_MAJOR}
   INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}
   DEFINE_SYMBOL MAKE_TAGLIB_LIB
-  LINK_INTERFACE_LIBRARIES ""
+  INTERFACE_LINK_LIBRARIES "${ZLIB_INTERFACE_LINK_LIBRARIES}"
   PUBLIC_HEADER "${tag_HDRS}"
 )
 if(VISIBILITY_HIDDEN)
@@ -366,9 +373,33 @@ if(BUILD_FRAMEWORK)
 endif()
 
 install(TARGETS tag
+  EXPORT taglibTargets
   FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/taglib
+)
+
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/taglib-config.cmake.in"
+  "${PROJECT_BINARY_DIR}/taglib-config.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib
+)
+
+write_basic_package_version_file(
+  "${PROJECT_BINARY_DIR}/taglib-config-version.cmake"
+  VERSION "${TAGLIB_LIB_VERSION_STRING}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+install(EXPORT taglibTargets
+  FILE taglib-targets.cmake
+  NAMESPACE TagLib::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib
+)
+
+install(FILES "${PROJECT_BINARY_DIR}/taglib-config.cmake"
+              "${PROJECT_BINARY_DIR}/taglib-config-version.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib
 )

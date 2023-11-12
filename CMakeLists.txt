@@ -8,6 +8,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 include(CTest)
 include(FeatureSummary)
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if(APPLE)
@@ -108,6 +109,10 @@ if(WITH_ZLIB)
   set(HAVE_ZLIB ${ZLIB_FOUND})
   if(ZLIB_FOUND)
     set(ZLIB_LIBRARIES_FLAGS -lz)
+    if(NOT BUILD_SHARED_LIBS)
+      # When linking TagLib statically, zlib has to be linked explicitly.
+      set(ZLIB_INTERFACE_LINK_LIBRARIES ZLIB::ZLIB)
+    endif()
   endif()
 endif()
 
