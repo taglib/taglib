@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/taglib-targets.cmake")
+
+set(TAGLIB_FOUND ${TagLib_FOUND})
+set(TAGLIB_VERSION ${TagLib_VERSION})
+
+check_required_components("TagLib")
+
+if(NOT TARGET TagLib::TagLib)
+  add_library(TagLib::TagLib ALIAS TagLib::tag)
+endif()
