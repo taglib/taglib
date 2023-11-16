@@ -336,6 +336,11 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
     // consistent. Otherwise, we assume that either or both of the frames are
     // broken.
 
+    // A frame length of 0 is probably invalid and would pass the test below
+    // because nextData would be the same as data.
+    if(d->frameLength == 0)
+      return;
+
     file->seek(offset + d->frameLength);
     const ByteVector nextData = file->readBlock(4);
 
