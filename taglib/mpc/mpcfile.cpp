@@ -65,9 +65,9 @@ public:
 bool MPC::File::isSupported(IOStream *stream)
 {
   // A newer MPC file has to start with "MPCK" or "MP+", but older files don't
-  // have keys to do a quick check.
+  // have keys to do a quick check. An ID3v2 tag may precede.
 
-  const ByteVector id = Utils::readHeader(stream, 4, false);
+  const ByteVector id = Utils::readHeader(stream, 4, true);
   return (id == "MPCK" || id.startsWith("MP+"));
 }
 
