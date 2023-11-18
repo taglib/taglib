@@ -166,7 +166,7 @@ TagLib::Tag *DSDIFF::File::tag() const
 
 ID3v2::Tag *DSDIFF::File::ID3v2Tag(bool create) const
 {
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(ID3v2Index, create, d->ID3v2FrameFactory);
 }
 
 bool DSDIFF::File::hasID3v2Tag() const
@@ -294,7 +294,7 @@ void DSDIFF::File::strip(int tags)
     removeChildChunk("ID3 ", PROPChunk);
     removeChildChunk("id3 ", PROPChunk);
     d->hasID3v2 = false;
-    d->tag.set(ID3v2Index, new ID3v2::Tag);
+    d->tag.set(ID3v2Index, new ID3v2::Tag(nullptr, 0, d->ID3v2FrameFactory));
     d->duplicateID3V2chunkIndex = -1;
     d->isID3InPropChunk = false;
     d->id3v2TagChunkID.setData("ID3 ");
@@ -909,7 +909,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
   }
 
   if(!ID3v2Tag()) {
-    d->tag.access<ID3v2::Tag>(ID3v2Index, true);
+    d->tag.access<ID3v2::Tag>(ID3v2Index, true, d->ID3v2FrameFactory);
     // By default, ID3 chunk is at root level
     d->isID3InPropChunk = false;
     d->hasID3v2 = false;

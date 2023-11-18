@@ -297,7 +297,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
 
 ID3v2::Tag *MPEG::File::ID3v2Tag(bool create)
 {
-  return d->tag.access<ID3v2::Tag>(ID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(ID3v2Index, create, d->ID3v2FrameFactory);
 }
 
 ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)

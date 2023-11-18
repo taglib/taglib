@@ -360,7 +360,8 @@ bool FLAC::File::save()
 
 ID3v2::Tag *FLAC::File::ID3v2Tag(bool create)
 {
-  return d->tag.access<ID3v2::Tag>(FlacID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(FlacID3v2Index, create,
+                                   d->ID3v2FrameFactory);
 }
 
 ID3v1::Tag *FLAC::File::ID3v1Tag(bool create)

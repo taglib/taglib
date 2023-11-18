@@ -167,7 +167,7 @@ void RIFF::AIFF::File::read(bool readProperties)
   }
 
   if(!d->tag)
-    d->tag = std::make_unique<ID3v2::Tag>();
+    d->tag = std::make_unique<ID3v2::Tag>(nullptr, 0, d->ID3v2FrameFactory);
 
   if(readProperties)
     d->properties = std::make_unique<Properties>(this, Properties::Average);
