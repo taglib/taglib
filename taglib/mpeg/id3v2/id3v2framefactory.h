@@ -50,10 +50,11 @@ namespace TagLib {
      * factory to be the default factory in ID3v2::Tag constructor you can
      * implement behavior that will allow for new ID3v2::Frame subclasses (also
      * provided by you) to be used.
+     * See \c testFrameFactory() in \e tests/test_mpeg.cpp for an example.
      *
      * This implements both <i>abstract factory</i> and <i>singleton</i> patterns
      * of which more information is available on the web and in software design
-     * textbooks (Notably <i>Design Patters</i>).
+     * textbooks (Notably <i>Design Patterns</i>).
      *
      * \note You do not need to use this factory to create new frames to add to
      * an ID3v2::Tag.  You can instantiate frame subclasses directly (with new)
@@ -75,6 +76,14 @@ namespace TagLib {
        * ID3v2::Header instance.
        */
       virtual Frame *createFrame(const ByteVector &data, const Header *tagHeader) const;
+
+      /*!
+       * Creates a textual frame which corresponds to a single key in the
+       * PropertyMap interface.  TIPL and TMCL do not belong to this category
+       * and are thus handled explicitly in the Frame class.
+       */
+      virtual Frame *createFrameForProperty(
+        const String &key, const StringList &values) const;
 
       /*!
        * After a tag has been read, this tries to rebuild some of them
@@ -104,6 +113,18 @@ namespace TagLib {
        * \see defaultTextEncoding()
        */
       void setDefaultTextEncoding(String::Type encoding);
+
+      /*!
+       * Returns true if defaultTextEncoding() is used.
+       * The default text encoding is used when setDefaultTextEncoding() has
+       * been called.  In this case, reimplementations of FrameFactory should
+       * use defaultTextEncoding() on the frames (having a text encoding field)
+       * they create.
+       *
+       * \see defaultTextEncoding()
+       * \see setDefaultTextEncoding()
+       */
+      bool isUsingDefaultTextEncoding() const;
 
     protected:
       /*!

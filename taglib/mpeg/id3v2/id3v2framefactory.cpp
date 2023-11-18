@@ -370,6 +370,11 @@ void FrameFactory::setDefaultTextEncoding(String::Type encoding)
   d->defaultEncoding = encoding;
 }
 
+bool FrameFactory::isUsingDefaultTextEncoding() const
+{
+  return d->useDefaultEncoding;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
@@ -537,4 +542,55 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
   }
 
   return true;
+}
+
+Frame *FrameFactory::createFrameForProperty(const String &key, const StringList &values) const
+{
+  // check if the key is contained in the key<=>frameID mapping
+  ByteVector frameID = Frame::keyToFrameID(key);
+  if(!frameID.isEmpty()) {
+    // Apple proprietary WFED (Podcast URL), MVNM (Movement Name), MVIN (Movement Number), GRP1 (Grouping) are in fact text frames.
+    if(frameID[0] == 'T' || frameID == "WFED" || frameID == "MVNM" || frameID == "MVIN" || frameID == "GRP1"){ // text frame
+      auto frame = new TextIdentificationFrame(frameID, String::UTF8);
+      frame->setText(values);
+      return frame;
+    } if((frameID[0] == 'W') && (values.size() == 1)){  // URL frame (not WXXX); support only one value
+        auto frame = new UrlLinkFrame(frameID);
+        frame->setUrl(values.front());
+        return frame;
+    } if(frameID == "PCST") {
+      return new PodcastFrame();
+    }
+  }
+  if(key == "MUSICBRAINZ_TRACKID" && values.size() == 1) {
+    auto frame = new UniqueFileIdentifierFrame("http://musicbrainz.org", values.front().data(String::UTF8));
+    return frame;
+  }
+  // now we check if it's one of the "special" cases:
+  // -LYRICS: depending on the number of values, use USLT or TXXX (with description=LYRICS)
+  if((key == "LYRICS" || key.startsWith(Frame::lyricsPrefix)) && values.size() == 1){
+    auto frame = new UnsynchronizedLyricsFrame(String::UTF8);
+    frame->setDescription(key == "LYRICS" ? key : key.substr(Frame::lyricsPrefix.size()));
+    frame->setText(values.front());
+    return frame;
+  }
+  // -URL: depending on the number of values, use WXXX or TXXX (with description=URL)
+  if((key == "URL" || key.startsWith(Frame::urlPrefix)) && values.size() == 1){
+    auto frame = new UserUrlLinkFrame(String::UTF8);
+    frame->setDescription(key == "URL" ? key : key.substr(Frame::urlPrefix.size()));
+    frame->setUrl(values.front());
+    return frame;
+  }
+  // -COMMENT: depending on the number of values, use COMM or TXXX (with description=COMMENT)
+  if((key == "COMMENT" || key.startsWith(Frame::commentPrefix)) && values.size() == 1){
+    auto frame = new CommentsFrame(String::UTF8);
+    if (key != "COMMENT"){
+      frame->setDescription(key.substr(Frame::commentPrefix.size()));
+    }
+    frame->setText(values.front());
+    return frame;
+  }
+  // if none of the above cases apply, we use a TXXX frame with the key as description
+  return new UserTextIdentificationFrame(
+    UserTextIdentificationFrame::keyToTXXX(key), values, String::UTF8);
 }
