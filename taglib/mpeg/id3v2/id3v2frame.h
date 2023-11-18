@@ -54,18 +54,9 @@ namespace TagLib {
     class TAGLIB_EXPORT Frame
     {
       friend class Tag;
-      friend class FrameFactory;
-      friend class TableOfContentsFrame;
-      friend class ChapterFrame;
 
     public:
-
-      /*!
-       * Creates a textual frame which corresponds to a single key in the PropertyMap
-       * interface. These are all (User)TextIdentificationFrames except TIPL and TMCL,
-       * all (User)URLLinkFrames, CommentsFrames, and UnsynchronizedLyricsFrame.
-       */
-      static Frame *createTextualFrame(const String &key, const StringList &values);
+      class Header;
 
       /*!
        * Destroys this Frame instance.
@@ -123,10 +114,27 @@ namespace TagLib {
       ByteVector render() const;
 
       /*!
+       * Returns a pointer to the frame header.
+       */
+      Header *header() const;
+
+      /*!
        * Returns the text delimiter that is used between fields for the string
        * type \a t.
        */
       static ByteVector textDelimiter(String::Type t);
+
+      /*!
+       * Returns an appropriate ID3 frame ID for the given free-form tag key. This method
+       * will return an empty ByteVector if no specialized translation is found.
+       */
+      static ByteVector keyToFrameID(const String &);
+
+      /*!
+       * Returns a free-form tag name for the given ID3 frame ID. Note that this does not work
+       * for general frame IDs such as TXXX or WXXX; in such a case an empty string is returned.
+       */
+      static String frameIDToKey(const ByteVector &);
 
       /*!
        * The string with which an instrument name is prefixed to build a key in a PropertyMap;
@@ -151,8 +159,6 @@ namespace TagLib {
       static const String urlPrefix;
 
     protected:
-      class Header;
-
       /*!
        * Constructs an ID3v2 frame using \a data to read the header information.
        * All other processing of \a data should be handled in a subclass.
@@ -169,11 +175,6 @@ namespace TagLib {
        * header will be deleted when the frame is destroyed.
        */
       Frame(Header *h);
-
-      /*!
-       * Returns a pointer to the frame header.
-       */
-      Header *header() const;
 
       /*!
        * Sets the header to \a h.  If \a deleteCurrent is true, this will free
@@ -235,28 +236,6 @@ namespace TagLib {
        * ID.
        */
       virtual PropertyMap asProperties() const;
-
-      /*!
-       * Returns an appropriate ID3 frame ID for the given free-form tag key. This method
-       * will return an empty ByteVector if no specialized translation is found.
-       */
-      static ByteVector keyToFrameID(const String &);
-
-      /*!
-       * Returns a free-form tag name for the given ID3 frame ID. Note that this does not work
-       * for general frame IDs such as TXXX or WXXX; in such a case an empty string is returned.
-       */
-      static String frameIDToKey(const ByteVector &);
-
-      /*!
-       * Returns an appropriate TXXX frame description for the given free-form tag key.
-       */
-      static String keyToTXXX(const String &);
-
-      /*!
-       * Returns a free-form tag name for the given ID3 frame description.
-       */
-      static String txxxToKey(const String &);
 
       /*!
        * This helper function splits the PropertyMap \a original into three ProperytMaps

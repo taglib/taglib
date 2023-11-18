@@ -135,6 +135,21 @@ namespace
     std::pair("DJ-MIX", "DJMIXER"),
     std::pair("MIX", "MIXER"),
   };
+
+  constexpr std::array txxxFrameTranslation {
+    std::pair("MUSICBRAINZ ALBUM ID", "MUSICBRAINZ_ALBUMID"),
+    std::pair("MUSICBRAINZ ARTIST ID", "MUSICBRAINZ_ARTISTID"),
+    std::pair("MUSICBRAINZ ALBUM ARTIST ID", "MUSICBRAINZ_ALBUMARTISTID"),
+    std::pair("MUSICBRAINZ ALBUM RELEASE COUNTRY", "RELEASECOUNTRY"),
+    std::pair("MUSICBRAINZ ALBUM STATUS", "RELEASESTATUS"),
+    std::pair("MUSICBRAINZ ALBUM TYPE", "RELEASETYPE"),
+    std::pair("MUSICBRAINZ RELEASE GROUP ID", "MUSICBRAINZ_RELEASEGROUPID"),
+    std::pair("MUSICBRAINZ RELEASE TRACK ID", "MUSICBRAINZ_RELEASETRACKID"),
+    std::pair("MUSICBRAINZ WORK ID", "MUSICBRAINZ_WORKID"),
+    std::pair("ACOUSTID ID", "ACOUSTID_ID"),
+    std::pair("ACOUSTID FINGERPRINT", "ACOUSTID_FINGERPRINT"),
+    std::pair("MUSICIP PUID", "MUSICIP_PUID"),
+  };
 }  // namespace
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
@@ -430,6 +445,26 @@ UserTextIdentificationFrame *UserTextIdentificationFrame::find(
       return f;
   }
   return nullptr;
+}
+
+String UserTextIdentificationFrame::txxxToKey(const String &description)
+{
+  const String d = description.upper();
+  for(const auto &[o, t] : txxxFrameTranslation) {
+    if(d == o)
+      return t;
+  }
+  return d;
+}
+
+String UserTextIdentificationFrame::keyToTXXX(const String &s)
+{
+  const String key = s.upper();
+  for(const auto &[o, t] : txxxFrameTranslation) {
+    if(key == t)
+      return o;
+  }
+  return s;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

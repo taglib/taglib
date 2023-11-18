@@ -443,13 +443,13 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   // now create remaining frames:
   // start with the involved people list (TIPL)
   if(!tiplProperties.isEmpty())
-      addFrame(TextIdentificationFrame::createTIPLFrame(tiplProperties));
+    addFrame(TextIdentificationFrame::createTIPLFrame(tiplProperties));
   // proceed with the musician credit list (TMCL)
   if(!tmclProperties.isEmpty())
-      addFrame(TextIdentificationFrame::createTMCLFrame(tmclProperties));
+    addFrame(TextIdentificationFrame::createTMCLFrame(tmclProperties));
   // now create the "one key per frame" frames
   for(const auto &[tag, frames] : std::as_const(properties))
-      addFrame(Frame::createTextualFrame(tag, frames));
+    addFrame(d->factory->createFrameForProperty(tag, frames));
   return PropertyMap(); // ID3 implements the complete PropertyMap interface, so an empty map is returned
 }
 

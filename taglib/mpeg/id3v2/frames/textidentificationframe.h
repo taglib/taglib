@@ -301,6 +301,16 @@ namespace TagLib {
        */
       static UserTextIdentificationFrame *find(Tag *tag, const String &description);
 
+      /*!
+       * Returns an appropriate TXXX frame description for the given free-form tag key.
+       */
+      static String keyToTXXX(const String &);
+
+      /*!
+       * Returns a free-form tag name for the given ID3 frame description.
+       */
+      static String txxxToKey(const String &);
+
     private:
       UserTextIdentificationFrame(const ByteVector &data, Header *h);
       UserTextIdentificationFrame(const TextIdentificationFrame &);
