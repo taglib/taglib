@@ -217,7 +217,8 @@ ID3v1::Tag *TrueAudio::File::ID3v1Tag(bool create)
 
 ID3v2::Tag *TrueAudio::File::ID3v2Tag(bool create)
 {
-  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, create);
+  return d->tag.access<ID3v2::Tag>(TrueAudioID3v2Index, create,
+                                   d->ID3v2FrameFactory);
 }
 
 void TrueAudio::File::strip(int tags)

@@ -113,7 +113,7 @@ void RIFF::WAV::File::strip(TagTypes tags)
   removeTagChunks(tags);
 
   if(tags & ID3v2)
-    d->tag.set(ID3v2Index, new ID3v2::Tag());
+    d->tag.set(ID3v2Index, new ID3v2::Tag(nullptr, 0, d->ID3v2FrameFactory));
 
   if(tags & Info)
     d->tag.set(InfoIndex, new RIFF::Info::Tag());
@@ -224,7 +224,7 @@ void RIFF::WAV::File::read(bool readProperties)
   }
 
   if(!d->tag[ID3v2Index])
-    d->tag.set(ID3v2Index, new ID3v2::Tag());
+    d->tag.set(ID3v2Index, new ID3v2::Tag(nullptr, 0, d->ID3v2FrameFactory));
 
   if(!d->tag[InfoIndex])
     d->tag.set(InfoIndex, new RIFF::Info::Tag());

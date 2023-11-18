@@ -92,6 +92,15 @@ namespace TagLib {
       return static_cast<T *>(tag(index));
     }
 
+    template <class T, class F> T *access(int index, bool create, const F *factory)
+    {
+      if(!create || tag(index))
+        return static_cast<T *>(tag(index));
+
+      set(index, new T(nullptr, 0, factory));
+      return static_cast<T *>(tag(index));
+    }
+
   private:
     TagUnion(const Tag &);
     TagUnion &operator=(const Tag &);
