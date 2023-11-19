@@ -748,6 +748,12 @@ public:
           .insert("tsti", ItemHandlerType::Int)
           .insert("tstt", ItemHandlerType::Text);
       }
+
+      Map<ByteVector, String> namePropertyMap() const override
+      {
+        return MP4::ItemFactory::namePropertyMap()
+          .insert("tsti", "TESTINTEGER");
+      }
     };
 
     CustomItemFactory factory;
@@ -810,6 +816,24 @@ public:
       CPPUNIT_ASSERT_EQUAL(80, tag->item("rate").toInt());
       CPPUNIT_ASSERT_EQUAL(1540934238LL, tag->item("plID").toLongLong());
       CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(2), tag->item("rtng").toByte());
+      PropertyMap properties = tag->properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("123"), properties.value("TESTINTEGER"));
+      CPPUNIT_ASSERT_EQUAL(StringList("2/10"), properties.value("TRACKNUMBER"));
+      properties["TESTINTEGER"] = StringList("456");
+      tag->setProperties(properties);
+      f.save();
+    }
+    {
+      MP4::File f(copy.fileName().c_str(),
+                  true, MP4::Properties::Average, &factory);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasMP4Tag());
+      MP4::Tag *tag = f.tag();
+      MP4::Item item = tag->item("tsti");
+      CPPUNIT_ASSERT(item.isValid());
+      CPPUNIT_ASSERT_EQUAL(456, item.toInt());
+      PropertyMap properties = tag->properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("456"), properties.value("TESTINTEGER"));
     }
   }
 };

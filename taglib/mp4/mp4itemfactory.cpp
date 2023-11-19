@@ -25,6 +25,8 @@
 
 #include "mp4itemfactory.h"
 
+#include <utility>
+
 #include "tbytevector.h"
 #include "tdebug.h"
 
@@ -37,6 +39,8 @@ class ItemFactory::ItemFactoryPrivate
 {
 public:
   NameHandlerMap handlerTypeForName;
+  Map<ByteVector, String> propertyKeyForName;
+  Map<String, ByteVector> nameForPropertyKey;
 };
 
 ItemFactory ItemFactory::factory;
@@ -48,52 +52,6 @@ ItemFactory ItemFactory::factory;
 ItemFactory *ItemFactory::instance()
 {
   return &factory;
-}
-
-ItemFactory::NameHandlerMap ItemFactory::nameHandlerMap() const
-{
-  return {
-    {"----", ItemHandlerType::FreeForm},
-    {"trkn", ItemHandlerType::IntPair},
-    {"disk", ItemHandlerType::IntPairNoTrailing},
-    {"cpil", ItemHandlerType::Bool},
-    {"pgap", ItemHandlerType::Bool},
-    {"pcst", ItemHandlerType::Bool},
-    {"shwm", ItemHandlerType::Bool},
-    {"tmpo", ItemHandlerType::Int},
-    {"\251mvi", ItemHandlerType::Int},
-    {"\251mvc", ItemHandlerType::Int},
-    {"hdvd", ItemHandlerType::Int},
-    {"rate", ItemHandlerType::TextOrInt},
-    {"tvsn", ItemHandlerType::UInt},
-    {"tves", ItemHandlerType::UInt},
-    {"cnID", ItemHandlerType::UInt},
-    {"sfID", ItemHandlerType::UInt},
-    {"atID", ItemHandlerType::UInt},
-    {"geID", ItemHandlerType::UInt},
-    {"cmID", ItemHandlerType::UInt},
-    {"plID", ItemHandlerType::LongLong},
-    {"stik", ItemHandlerType::Byte},
-    {"rtng", ItemHandlerType::Byte},
-    {"akID", ItemHandlerType::Byte},
-    {"gnre", ItemHandlerType::Gnre},
-    {"covr", ItemHandlerType::Covr},
-    {"purl", ItemHandlerType::TextImplicit},
-    {"egid", ItemHandlerType::TextImplicit},
-  };
-}
-
-ItemFactory::ItemHandlerType ItemFactory::handlerTypeForName(
-  const ByteVector &name) const
-{
-  if(d->handlerTypeForName.isEmpty()) {
-    d->handlerTypeForName = nameHandlerMap();
-  }
-  auto type = d->handlerTypeForName.value(name, ItemHandlerType::Unknown);
-  if (type == ItemHandlerType::Unknown && name.size() == 4) {
-    type = ItemHandlerType::Text;
-  }
-  return type;
 }
 
 std::pair<String, Item> ItemFactory::parseItem(
@@ -176,6 +134,126 @@ ByteVector ItemFactory::renderItem(
   return ByteVector();
 }
 
+std::pair<ByteVector, Item> ItemFactory::itemFromProperty(
+  const String &key, const StringList &values) const
+{
+  ByteVector name = nameForPropertyKey(key);
+  if(!name.isEmpty()) {
+    if(values.isEmpty()) {
+      return {name, values};
+    }
+    auto handlerType = name.startsWith("----")
+      ? ItemHandlerType::FreeForm
+      : handlerTypeForName(name);
+    switch(handlerType) {
+    case ItemHandlerType::IntPair:
+    case ItemHandlerType::IntPairNoTrailing:
+      if(StringList parts = StringList::split(values.front(), "/");
+         !parts.isEmpty()) {
+        int first = parts[0].toInt();
+        int second = 0;
+        if(parts.size() > 1) {
+          second = parts[1].toInt();
+        }
+        return {name, Item(first, second)};
+      }
+      break;
+    case ItemHandlerType::Int:
+    case ItemHandlerType::Gnre:
+      return {name, Item(values.front().toInt())};
+    case ItemHandlerType::UInt:
+      return {name, Item(static_cast<unsigned int>(values.front().toInt()))};
+    case ItemHandlerType::LongLong:
+      return {name, Item(static_cast<long long>(values.front().toInt()))};
+    case ItemHandlerType::Byte:
+      return {name, Item(static_cast<unsigned char>(values.front().toInt()))};
+    case ItemHandlerType::Bool:
+      return {name, Item(values.front().toInt() != 0)};
+    case ItemHandlerType::FreeForm:
+    case ItemHandlerType::TextOrInt:
+    case ItemHandlerType::TextImplicit:
+    case ItemHandlerType::Text:
+      return {name, values};
+
+    case ItemHandlerType::Covr:
+      debug("MP4: Invalid item \"" + name + "\" for property");
+      break;
+    case ItemHandlerType::Unknown:
+      debug("MP4: Unknown item name \"" + name + "\" for property");
+      break;
+    }
+  }
+  return {name, Item()};
+}
+
+std::pair<String, StringList> ItemFactory::itemToProperty(
+  const ByteVector &itemName, const Item &item) const
+{
+  const String key = propertyKeyForName(itemName);
+  if(!key.isEmpty()) {
+    auto handlerType = itemName.startsWith("----")
+      ? ItemHandlerType::FreeForm
+      : handlerTypeForName(itemName);
+    switch(handlerType) {
+    case ItemHandlerType::IntPair:
+    case ItemHandlerType::IntPairNoTrailing:
+    {
+      auto [vn, tn] = item.toIntPair();
+      String value  = String::number(vn);
+      if(tn) {
+        value += "/" + String::number(tn);
+      }
+      return {key, value};
+    }
+    case ItemHandlerType::Int:
+    case ItemHandlerType::Gnre:
+      return {key, String::number(item.toInt())};
+    case ItemHandlerType::UInt:
+      return {key, String::number(item.toUInt())};
+    case ItemHandlerType::LongLong:
+      return {key, String::number(item.toLongLong())};
+    case ItemHandlerType::Byte:
+      return {key, String::number(item.toByte())};
+    case ItemHandlerType::Bool:
+      return {key, String::number(item.toBool())};
+    case ItemHandlerType::FreeForm:
+    case ItemHandlerType::TextOrInt:
+    case ItemHandlerType::TextImplicit:
+    case ItemHandlerType::Text:
+      return {key, item.toStringList()};
+
+    case ItemHandlerType::Covr:
+      debug("MP4: Invalid item \"" + itemName + "\" for property");
+      break;
+    case ItemHandlerType::Unknown:
+      debug("MP4: Unknown item name \"" + itemName + "\" for property");
+      break;
+    }
+  }
+  return {String(), StringList()};
+}
+
+String ItemFactory::propertyKeyForName(const ByteVector &name) const
+{
+  if(d->propertyKeyForName.isEmpty()) {
+    d->propertyKeyForName = namePropertyMap();
+  }
+  return d->propertyKeyForName.value(name);
+}
+
+ByteVector ItemFactory::nameForPropertyKey(const String &key) const
+{
+  if(d->nameForPropertyKey.isEmpty()) {
+    if(d->propertyKeyForName.isEmpty()) {
+      d->propertyKeyForName = namePropertyMap();
+    }
+    for(const auto &[k, t] : std::as_const(d->propertyKeyForName)) {
+      d->nameForPropertyKey[t] = k;
+    }
+  }
+  return d->nameForPropertyKey.value(key);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,6 +264,127 @@ ItemFactory::ItemFactory() :
 }
 
 ItemFactory::~ItemFactory() = default;
+
+ItemFactory::NameHandlerMap ItemFactory::nameHandlerMap() const
+{
+  return {
+    {"----", ItemHandlerType::FreeForm},
+    {"trkn", ItemHandlerType::IntPair},
+    {"disk", ItemHandlerType::IntPairNoTrailing},
+    {"cpil", ItemHandlerType::Bool},
+    {"pgap", ItemHandlerType::Bool},
+    {"pcst", ItemHandlerType::Bool},
+    {"shwm", ItemHandlerType::Bool},
+    {"tmpo", ItemHandlerType::Int},
+    {"\251mvi", ItemHandlerType::Int},
+    {"\251mvc", ItemHandlerType::Int},
+    {"hdvd", ItemHandlerType::Int},
+    {"rate", ItemHandlerType::TextOrInt},
+    {"tvsn", ItemHandlerType::UInt},
+    {"tves", ItemHandlerType::UInt},
+    {"cnID", ItemHandlerType::UInt},
+    {"sfID", ItemHandlerType::UInt},
+    {"atID", ItemHandlerType::UInt},
+    {"geID", ItemHandlerType::UInt},
+    {"cmID", ItemHandlerType::UInt},
+    {"plID", ItemHandlerType::LongLong},
+    {"stik", ItemHandlerType::Byte},
+    {"rtng", ItemHandlerType::Byte},
+    {"akID", ItemHandlerType::Byte},
+    {"gnre", ItemHandlerType::Gnre},
+    {"covr", ItemHandlerType::Covr},
+    {"purl", ItemHandlerType::TextImplicit},
+    {"egid", ItemHandlerType::TextImplicit},
+  };
+}
+
+ItemFactory::ItemHandlerType ItemFactory::handlerTypeForName(
+  const ByteVector &name) const
+{
+  if(d->handlerTypeForName.isEmpty()) {
+    d->handlerTypeForName = nameHandlerMap();
+  }
+  auto type = d->handlerTypeForName.value(name, ItemHandlerType::Unknown);
+  if (type == ItemHandlerType::Unknown && name.size() == 4) {
+    type = ItemHandlerType::Text;
+  }
+  return type;
+}
+
+Map<ByteVector, String> ItemFactory::namePropertyMap() const
+{
+  return {
+    {"\251nam", "TITLE"},
+    {"\251ART", "ARTIST"},
+    {"\251alb", "ALBUM"},
+    {"\251cmt", "COMMENT"},
+    {"\251gen", "GENRE"},
+    {"\251day", "DATE"},
+    {"\251wrt", "COMPOSER"},
+    {"\251grp", "GROUPING"},
+    {"aART", "ALBUMARTIST"},
+    {"trkn", "TRACKNUMBER"},
+    {"disk", "DISCNUMBER"},
+    {"cpil", "COMPILATION"},
+    {"tmpo", "BPM"},
+    {"cprt", "COPYRIGHT"},
+    {"\251lyr", "LYRICS"},
+    {"\251too", "ENCODEDBY"},
+    {"soal", "ALBUMSORT"},
+    {"soaa", "ALBUMARTISTSORT"},
+    {"soar", "ARTISTSORT"},
+    {"sonm", "TITLESORT"},
+    {"soco", "COMPOSERSORT"},
+    {"sosn", "SHOWSORT"},
+    {"shwm", "SHOWWORKMOVEMENT"},
+    {"pgap", "GAPLESSPLAYBACK"},
+    {"pcst", "PODCAST"},
+    {"catg", "PODCASTCATEGORY"},
+    {"desc", "PODCASTDESC"},
+    {"egid", "PODCASTID"},
+    {"purl", "PODCASTURL"},
+    {"tves", "TVEPISODE"},
+    {"tven", "TVEPISODEID"},
+    {"tvnn", "TVNETWORK"},
+    {"tvsn", "TVSEASON"},
+    {"tvsh", "TVSHOW"},
+    {"\251wrk", "WORK"},
+    {"\251mvn", "MOVEMENTNAME"},
+    {"\251mvi", "MOVEMENTNUMBER"},
+    {"\251mvc", "MOVEMENTCOUNT"},
+    {"----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID"},
+    {"----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID"},
+    {"----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID"},
+    {"----:com.apple.iTunes:MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"},
+    {"----:com.apple.iTunes:MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"},
+    {"----:com.apple.iTunes:MusicBrainz Release Track Id", "MUSICBRAINZ_RELEASETRACKID"},
+    {"----:com.apple.iTunes:MusicBrainz Work Id", "MUSICBRAINZ_WORKID"},
+    {"----:com.apple.iTunes:MusicBrainz Album Release Country", "RELEASECOUNTRY"},
+    {"----:com.apple.iTunes:MusicBrainz Album Status", "RELEASESTATUS"},
+    {"----:com.apple.iTunes:MusicBrainz Album Type", "RELEASETYPE"},
+    {"----:com.apple.iTunes:ARTISTS", "ARTISTS"},
+    {"----:com.apple.iTunes:originaldate", "ORIGINALDATE"},
+    {"----:com.apple.iTunes:ASIN", "ASIN"},
+    {"----:com.apple.iTunes:LABEL", "LABEL"},
+    {"----:com.apple.iTunes:LYRICIST", "LYRICIST"},
+    {"----:com.apple.iTunes:CONDUCTOR", "CONDUCTOR"},
+    {"----:com.apple.iTunes:REMIXER", "REMIXER"},
+    {"----:com.apple.iTunes:ENGINEER", "ENGINEER"},
+    {"----:com.apple.iTunes:PRODUCER", "PRODUCER"},
+    {"----:com.apple.iTunes:DJMIXER", "DJMIXER"},
+    {"----:com.apple.iTunes:MIXER", "MIXER"},
+    {"----:com.apple.iTunes:SUBTITLE", "SUBTITLE"},
+    {"----:com.apple.iTunes:DISCSUBTITLE", "DISCSUBTITLE"},
+    {"----:com.apple.iTunes:MOOD", "MOOD"},
+    {"----:com.apple.iTunes:ISRC", "ISRC"},
+    {"----:com.apple.iTunes:CATALOGNUMBER", "CATALOGNUMBER"},
+    {"----:com.apple.iTunes:BARCODE", "BARCODE"},
+    {"----:com.apple.iTunes:SCRIPT", "SCRIPT"},
+    {"----:com.apple.iTunes:LANGUAGE", "LANGUAGE"},
+    {"----:com.apple.iTunes:LICENSE", "LICENSE"},
+    {"----:com.apple.iTunes:MEDIA", "MEDIA"}
+  };
+}
 
 MP4::AtomDataList ItemFactory::parseData2(
   const MP4::Atom *atom, const ByteVector &data, int expectedFlags,

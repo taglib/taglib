@@ -469,116 +469,13 @@ bool MP4::Tag::contains(const String &key) const
   return d->items.contains(key);
 }
 
-namespace
-{
-  constexpr std::array keyTranslation {
-    std::pair("\251nam", "TITLE"),
-    std::pair("\251ART", "ARTIST"),
-    std::pair("\251alb", "ALBUM"),
-    std::pair("\251cmt", "COMMENT"),
-    std::pair("\251gen", "GENRE"),
-    std::pair("\251day", "DATE"),
-    std::pair("\251wrt", "COMPOSER"),
-    std::pair("\251grp", "GROUPING"),
-    std::pair("aART", "ALBUMARTIST"),
-    std::pair("trkn", "TRACKNUMBER"),
-    std::pair("disk", "DISCNUMBER"),
-    std::pair("cpil", "COMPILATION"),
-    std::pair("tmpo", "BPM"),
-    std::pair("cprt", "COPYRIGHT"),
-    std::pair("\251lyr", "LYRICS"),
-    std::pair("\251too", "ENCODEDBY"),
-    std::pair("soal", "ALBUMSORT"),
-    std::pair("soaa", "ALBUMARTISTSORT"),
-    std::pair("soar", "ARTISTSORT"),
-    std::pair("sonm", "TITLESORT"),
-    std::pair("soco", "COMPOSERSORT"),
-    std::pair("sosn", "SHOWSORT"),
-    std::pair("shwm", "SHOWWORKMOVEMENT"),
-    std::pair("pgap", "GAPLESSPLAYBACK"),
-    std::pair("pcst", "PODCAST"),
-    std::pair("catg", "PODCASTCATEGORY"),
-    std::pair("desc", "PODCASTDESC"),
-    std::pair("egid", "PODCASTID"),
-    std::pair("purl", "PODCASTURL"),
-    std::pair("tves", "TVEPISODE"),
-    std::pair("tven", "TVEPISODEID"),
-    std::pair("tvnn", "TVNETWORK"),
-    std::pair("tvsn", "TVSEASON"),
-    std::pair("tvsh", "TVSHOW"),
-    std::pair("\251wrk", "WORK"),
-    std::pair("\251mvn", "MOVEMENTNAME"),
-    std::pair("\251mvi", "MOVEMENTNUMBER"),
-    std::pair("\251mvc", "MOVEMENTCOUNT"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Release Track Id", "MUSICBRAINZ_RELEASETRACKID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Work Id", "MUSICBRAINZ_WORKID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Release Country", "RELEASECOUNTRY"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Status", "RELEASESTATUS"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Type", "RELEASETYPE"),
-    std::pair("----:com.apple.iTunes:ARTISTS", "ARTISTS"),
-    std::pair("----:com.apple.iTunes:originaldate", "ORIGINALDATE"),
-    std::pair("----:com.apple.iTunes:ASIN", "ASIN"),
-    std::pair("----:com.apple.iTunes:LABEL", "LABEL"),
-    std::pair("----:com.apple.iTunes:LYRICIST", "LYRICIST"),
-    std::pair("----:com.apple.iTunes:CONDUCTOR", "CONDUCTOR"),
-    std::pair("----:com.apple.iTunes:REMIXER", "REMIXER"),
-    std::pair("----:com.apple.iTunes:ENGINEER", "ENGINEER"),
-    std::pair("----:com.apple.iTunes:PRODUCER", "PRODUCER"),
-    std::pair("----:com.apple.iTunes:DJMIXER", "DJMIXER"),
-    std::pair("----:com.apple.iTunes:MIXER", "MIXER"),
-    std::pair("----:com.apple.iTunes:SUBTITLE", "SUBTITLE"),
-    std::pair("----:com.apple.iTunes:DISCSUBTITLE", "DISCSUBTITLE"),
-    std::pair("----:com.apple.iTunes:MOOD", "MOOD"),
-    std::pair("----:com.apple.iTunes:ISRC", "ISRC"),
-    std::pair("----:com.apple.iTunes:CATALOGNUMBER", "CATALOGNUMBER"),
-    std::pair("----:com.apple.iTunes:BARCODE", "BARCODE"),
-    std::pair("----:com.apple.iTunes:SCRIPT", "SCRIPT"),
-    std::pair("----:com.apple.iTunes:LANGUAGE", "LANGUAGE"),
-    std::pair("----:com.apple.iTunes:LICENSE", "LICENSE"),
-    std::pair("----:com.apple.iTunes:MEDIA", "MEDIA"),
-  };
-
-  String translateKey(const String &key)
-  {
-    for(const auto &[k, t] : keyTranslation) {
-      if(key == k)
-        return t;
-    }
-
-    return String();
-  }
-}  // namespace
-
 PropertyMap MP4::Tag::properties() const
 {
   PropertyMap props;
   for(const auto &[k, t] : std::as_const(d->items)) {
-    const String key = translateKey(k);
+    auto [key, value] = d->factory->itemToProperty(k.data(String::Latin1), t);
     if(!key.isEmpty()) {
-      if(key == "TRACKNUMBER" || key == "DISCNUMBER") {
-        auto [vn, tn] = t.toIntPair();
-        String value  = String::number(vn);
-        if(tn) {
-          value += "/" + String::number(tn);
-        }
-        props[key] = value;
-      }
-      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT" ||
-              key == "TVEPISODE" || key == "TVSEASON") {
-        props[key] = String::number(t.toInt());
-      }
-      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT" ||
-              key == "GAPLESSPLAYBACK" || key == "PODCAST") {
-        props[key] = String::number(t.toBool());
-      }
-      else {
-        props[key] = t.toStringList();
-      }
+      props[key] = value;
     }
     else {
       props.unsupportedData().append(k);
@@ -595,50 +492,18 @@ void MP4::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
 {
-  static Map<String, String> reverseKeyMap;
-  if(reverseKeyMap.isEmpty()) {
-    for(const auto &[k, t] : keyTranslation) {
-      reverseKeyMap[t] = k;
-    }
-  }
-
   const PropertyMap origProps = properties();
   for(const auto &[prop, _] : origProps) {
     if(!props.contains(prop) || props[prop].isEmpty()) {
-      d->items.erase(reverseKeyMap[prop]);
+      d->items.erase(d->factory->nameForPropertyKey(prop));
     }
   }
 
   PropertyMap ignoredProps;
   for(const auto &[prop, val] : props) {
-    if(reverseKeyMap.contains(prop)) {
-      String name = reverseKeyMap[prop];
-      if((prop == "TRACKNUMBER" || prop == "DISCNUMBER") && !val.isEmpty()) {
-        StringList parts = StringList::split(val.front(), "/");
-        if(!parts.isEmpty()) {
-          int first = parts[0].toInt();
-          int second = 0;
-          if(parts.size() > 1) {
-            second = parts[1].toInt();
-          }
-          d->items[name] = MP4::Item(first, second);
-        }
-      }
-      else if((prop == "BPM" || prop == "MOVEMENTNUMBER" ||
-               prop == "MOVEMENTCOUNT" || prop == "TVEPISODE" ||
-               prop == "TVSEASON") && !val.isEmpty()) {
-        int value = val.front().toInt();
-        d->items[name] = MP4::Item(value);
-      }
-      else if((prop == "COMPILATION" || prop == "SHOWWORKMOVEMENT" ||
-               prop == "GAPLESSPLAYBACK" || prop == "PODCAST") &&
-              !val.isEmpty()) {
-        bool value = (val.front().toInt() != 0);
-        d->items[name] = MP4::Item(value);
-      }
-      else {
-        d->items[name] = val;
-      }
+    auto [name, item] = d->factory->itemFromProperty(prop, val);
+    if(item.isValid()) {
+      d->items[name] = item;
     }
     else {
       ignoredProps.insert(prop, val);

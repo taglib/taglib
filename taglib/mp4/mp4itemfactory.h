@@ -62,6 +62,9 @@ namespace TagLib {
      *   }
      * };
      * \endcode
+     *
+     * If the custom item shall also be accessible via a property,
+     * namePropertyMap() can be overridden in the same way.
      */
     class TAGLIB_EXPORT ItemFactory
     {
@@ -87,6 +90,39 @@ namespace TagLib {
        */
       virtual ByteVector renderItem(
         const String &itemName, const Item &item) const;
+
+      /*!
+       * Create an MP4 item from a property with \a key and \a values.
+       * If the property is not supported, an invalid item is returned.
+       * The default implementation uses the map returned by namePropertyMap().
+       */
+      virtual std::pair<ByteVector, Item> itemFromProperty(
+        const String &key, const StringList &values) const;
+
+      /*!
+       * Get an MP4 item as a property.
+       * If no property exists for \a itemName, an empty string is returned as
+       * the property key.
+       * The default implementation uses the map returned by namePropertyMap().
+       */
+      virtual std::pair<String, StringList> itemToProperty(
+        const ByteVector &itemName, const Item &item) const;
+
+      /*!
+       * Returns property key for atom \a name, empty if no property exists for
+       * this atom.
+       * The default method looks up the map created by namePropertyMap() and
+       * should be enough for most uses.
+       */
+      virtual String propertyKeyForName(const ByteVector &name) const;
+
+      /*!
+       * Returns atom name for property \a key, empty if no property is
+       * supported for this key.
+       * The default method uses the reverse mapping of propertyKeyForName()
+       * and should be enough for most uses.
+       */
+      virtual ByteVector nameForPropertyKey(const String &key) const;
 
     protected:
       /*!
@@ -139,6 +175,15 @@ namespace TagLib {
        * should be enough for most uses.
        */
       virtual ItemHandlerType handlerTypeForName(const ByteVector &name) const;
+
+      /*!
+       * Returns mapping between atom names and property keys.
+       * This method is called once by propertyKeyForName() to initialize its
+       * internal cache.
+       * To add support for a new atom with a property, it is sufficient in most
+       * cases to just reimplement this method and add new entries.
+       */
+      virtual Map<ByteVector, String> namePropertyMap() const;
 
       // Functions used by parseItem() to create items from atom data.
       static MP4::AtomDataList parseData2(
