@@ -29,6 +29,8 @@
 #include "tpropertymap.h"
 #include "tagutils.h"
 
+#include "mp4itemfactory.h"
+
 using namespace TagLib;
 
 namespace
@@ -43,6 +45,15 @@ namespace
 class MP4::File::FilePrivate
 {
 public:
+  FilePrivate(MP4::ItemFactory *mp4ItemFactory)
+        : itemFactory(mp4ItemFactory ? mp4ItemFactory
+                                     : MP4::ItemFactory::instance())
+  {
+  }
+
+  ~FilePrivate() = default;
+
+  const ItemFactory *itemFactory;
   std::unique_ptr<MP4::Tag> tag;
   std::unique_ptr<MP4::Atoms> atoms;
   std::unique_ptr<MP4::Properties> properties;
@@ -64,17 +75,19 @@ bool MP4::File::isSupported(IOStream *stream)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle) :
+MP4::File::File(FileName file, bool readProperties, AudioProperties::ReadStyle,
+                ItemFactory *itemFactory) :
   TagLib::File(file),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(itemFactory))
 {
   if(isOpen())
     read(readProperties);
 }
 
-MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle) :
+MP4::File::File(IOStream *stream, bool readProperties, AudioProperties::ReadStyle,
+                ItemFactory *itemFactory) :
   TagLib::File(stream),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(itemFactory))
 {
   if(isOpen())
     read(readProperties);
@@ -125,7 +138,7 @@ MP4::File::read(bool readProperties)
     return;
   }
 
-  d->tag = std::make_unique<Tag>(this, d->atoms.get());
+  d->tag = std::make_unique<Tag>(this, d->atoms.get(), d->itemFactory);
   if(readProperties) {
     d->properties = std::make_unique<Properties>(this, d->atoms.get());
   }

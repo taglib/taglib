@@ -37,13 +37,15 @@
 
 namespace TagLib {
   namespace MP4 {
-    using ItemMap = TagLib::Map<String, Item>;
+
+    class ItemFactory;
 
     class TAGLIB_EXPORT Tag: public TagLib::Tag
     {
     public:
         Tag();
-        Tag(TagLib::File *file, Atoms *atoms);
+        Tag(TagLib::File *file, Atoms *atoms,
+            const ItemFactory *factory = nullptr);
         ~Tag() override;
         Tag(const Tag &) = delete;
         Tag &operator=(const Tag &) = delete;
@@ -114,36 +116,9 @@ namespace TagLib {
         void setTextItem(const String &key, const String &value);
 
     private:
-        AtomDataList parseData2(const Atom *atom, int expectedFlags = -1,
-                                bool freeForm = false);
-        ByteVectorList parseData(const Atom *atom, int expectedFlags = -1,
-                                 bool freeForm = false);
-        void parseText(const Atom *atom, int expectedFlags = 1);
-        void parseFreeForm(const Atom *atom);
-        void parseInt(const Atom *atom);
-        void parseByte(const Atom *atom);
-        void parseUInt(const Atom *atom);
-        void parseLongLong(const Atom *atom);
-        void parseGnre(const Atom *atom);
-        void parseIntPair(const Atom *atom);
-        void parseBool(const Atom *atom);
-        void parseCovr(const Atom *atom);
-
         ByteVector padIlst(const ByteVector &data, int length = -1) const;
         ByteVector renderAtom(const ByteVector &name, const ByteVector &data) const;
-        ByteVector renderData(const ByteVector &name, int flags,
-                              const ByteVectorList &data) const;
-        ByteVector renderText(const ByteVector &name, const Item &item,
-                              int flags = TypeUTF8) const;
-        ByteVector renderFreeForm(const String &name, const Item &item) const;
-        ByteVector renderBool(const ByteVector &name, const Item &item) const;
-        ByteVector renderInt(const ByteVector &name, const Item &item) const;
-        ByteVector renderByte(const ByteVector &name, const Item &item) const;
-        ByteVector renderUInt(const ByteVector &name, const Item &item) const;
-        ByteVector renderLongLong(const ByteVector &name, const Item &item) const;
-        ByteVector renderIntPair(const ByteVector &name, const Item &item) const;
-        ByteVector renderIntPairNoTrailing(const ByteVector &name, const Item &item) const;
-        ByteVector renderCovr(const ByteVector &name, const Item &item) const;
+
 
         void updateParents(const AtomList &path, offset_t delta, int ignore = 0);
         void updateOffsets(offset_t delta, offset_t offset);

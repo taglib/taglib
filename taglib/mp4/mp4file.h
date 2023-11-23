@@ -36,6 +36,8 @@ namespace TagLib {
   //! An implementation of MP4 (AAC, ALAC, ...) metadata
   namespace MP4 {
     class Atoms;
+    class ItemFactory;
+
 
     /*!
      * This implements and provides an interface for MP4 files to the
@@ -64,9 +66,12 @@ namespace TagLib {
        * file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * The items will be created using \a itemFactory (default if null).
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+           Properties::ReadStyle audioPropertiesStyle = Properties::Average,
+           ItemFactory *itemFactory = nullptr);
 
       /*!
        * Constructs an MP4 file from \a stream.  If \a readProperties is true the
@@ -76,9 +81,12 @@ namespace TagLib {
        * responsible for deleting it after the File object.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * The items will be created using \a itemFactory (default if null).
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle audioPropertiesStyle = Properties::Average);
+           Properties::ReadStyle audioPropertiesStyle = Properties::Average,
+           ItemFactory *itemFactory = nullptr);
 
       /*!
        * Destroys this instance of the File.

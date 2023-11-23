@@ -30,7 +30,7 @@
 
 #include "tdebug.h"
 #include "tpropertymap.h"
-#include "id3v1genres.h"
+#include "mp4itemfactory.h"
 #include "mp4atom.h"
 #include "mp4coverart.h"
 
@@ -39,18 +39,28 @@ using namespace TagLib;
 class MP4::Tag::TagPrivate
 {
 public:
+  TagPrivate(const ItemFactory *itemFactory) :
+    factory(itemFactory ? itemFactory
+                        : ItemFactory::instance())
+  {
+  }
+
+  ~TagPrivate() = default;
+
+  const ItemFactory *factory;
   TagLib::File *file { nullptr };
   Atoms *atoms { nullptr };
   ItemMap items;
 };
 
 MP4::Tag::Tag() :
-  d(std::make_unique<TagPrivate>())
+  d(std::make_unique<TagPrivate>(ItemFactory::instance()))
 {
 }
 
-MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
-  d(std::make_unique<TagPrivate>())
+MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
+              const MP4::ItemFactory *factory) :
+  d(std::make_unique<TagPrivate>(factory))
 {
   d->file = file;
   d->atoms = atoms;
@@ -63,267 +73,15 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms) :
 
   for(const auto &atom : std::as_const(ilst->children)) {
     file->seek(atom->offset + 8);
-    if(atom->name == "----") {
-      parseFreeForm(atom);
-    }
-    else if(atom->name == "trkn" || atom->name == "disk") {
-      parseIntPair(atom);
-    }
-    else if(atom->name == "cpil" || atom->name == "pgap" || atom->name == "pcst" ||
-            atom->name == "shwm") {
-      parseBool(atom);
-    }
-    else if(atom->name == "tmpo" || atom->name == "\251mvi" || atom->name == "\251mvc" ||
-            atom->name == "hdvd") {
-      parseInt(atom);
-    }
-    else if(atom->name == "rate") {
-      AtomDataList data = parseData2(atom);
-      if(!data.isEmpty()) {
-        AtomData val = data[0];
-        if (val.type == TypeUTF8) {
-          addItem(atom->name, StringList(String(val.data, String::UTF8)));
-        } else {
-          addItem(atom->name, static_cast<int>(val.data.toShort()));
-        }
-      }
-    }
-    else if(atom->name == "tvsn" || atom->name == "tves" || atom->name == "cnID" ||
-            atom->name == "sfID" || atom->name == "atID" || atom->name == "geID" ||
-            atom->name == "cmID") {
-      parseUInt(atom);
-    }
-    else if(atom->name == "plID") {
-      parseLongLong(atom);
-    }
-    else if(atom->name == "stik" || atom->name == "rtng" || atom->name == "akID") {
-      parseByte(atom);
-    }
-    else if(atom->name == "gnre") {
-      parseGnre(atom);
-    }
-    else if(atom->name == "covr") {
-      parseCovr(atom);
-    }
-    else if(atom->name == "purl" || atom->name == "egid") {
-      parseText(atom, -1);
-    }
-    else {
-      parseText(atom);
+    ByteVector data = d->file->readBlock(atom->length - 8);
+    const auto &[name, item] = d->factory->parseItem(atom, data);
+    if (item.isValid()) {
+      addItem(name, item);
     }
   }
 }
 
 MP4::Tag::~Tag() = default;
-
-MP4::AtomDataList
-MP4::Tag::parseData2(const MP4::Atom *atom, int expectedFlags, bool freeForm)
-{
-  AtomDataList result;
-  ByteVector data = d->file->readBlock(atom->length - 8);
-  int i = 0;
-  unsigned int pos = 0;
-  while(pos < data.size()) {
-    const auto length = static_cast<int>(data.toUInt(pos));
-    if(length < 12) {
-      debug("MP4: Too short atom");
-      return result;
-    }
-
-    const ByteVector name = data.mid(pos + 4, 4);
-    const auto flags = static_cast<int>(data.toUInt(pos + 8));
-    if(freeForm && i < 2) {
-      if(i == 0 && name != "mean") {
-        debug("MP4: Unexpected atom \"" + name + "\", expecting \"mean\"");
-        return result;
-      }
-      if(i == 1 && name != "name") {
-        debug("MP4: Unexpected atom \"" + name + "\", expecting \"name\"");
-        return result;
-      }
-      result.append(AtomData(static_cast<AtomDataType>(flags), data.mid(pos + 12, length - 12)));
-    }
-    else {
-      if(name != "data") {
-        debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
-        return result;
-      }
-      if(expectedFlags == -1 || flags == expectedFlags) {
-        result.append(AtomData(static_cast<AtomDataType>(flags), data.mid(pos + 16, length - 16)));
-      }
-    }
-    pos += length;
-    i++;
-  }
-  return result;
-}
-
-ByteVectorList
-MP4::Tag::parseData(const MP4::Atom *atom, int expectedFlags, bool freeForm)
-{
-  const AtomDataList data = parseData2(atom, expectedFlags, freeForm);
-  ByteVectorList result;
-  for(const auto &atom : data) {
-    result.append(atom.data);
-  }
-  return result;
-}
-
-void
-MP4::Tag::parseInt(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    addItem(atom->name, static_cast<int>(data[0].toShort()));
-  }
-}
-
-void
-MP4::Tag::parseUInt(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    addItem(atom->name, data[0].toUInt());
-  }
-}
-
-void
-MP4::Tag::parseLongLong(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    addItem(atom->name, data[0].toLongLong());
-  }
-}
-
-void
-MP4::Tag::parseByte(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    addItem(atom->name, static_cast<unsigned char>(data[0].at(0)));
-  }
-}
-
-void
-MP4::Tag::parseGnre(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    int idx = static_cast<int>(data[0].toShort());
-    if(idx > 0) {
-      addItem("\251gen", StringList(ID3v1::genre(idx - 1)));
-    }
-  }
-}
-
-void
-MP4::Tag::parseIntPair(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    const int a = data[0].toShort(2U);
-    const int b = data[0].toShort(4U);
-    addItem(atom->name, MP4::Item(a, b));
-  }
-}
-
-void
-MP4::Tag::parseBool(const MP4::Atom *atom)
-{
-  ByteVectorList data = parseData(atom);
-  if(!data.isEmpty()) {
-    bool value = !data[0].isEmpty() && data[0][0] != '\0';
-    addItem(atom->name, value);
-  }
-}
-
-void
-MP4::Tag::parseText(const MP4::Atom *atom, int expectedFlags)
-{
-  const ByteVectorList data = parseData(atom, expectedFlags);
-  if(!data.isEmpty()) {
-    StringList value;
-    for(const auto &byte : data) {
-      value.append(String(byte, String::UTF8));
-    }
-    addItem(atom->name, value);
-  }
-}
-
-void
-MP4::Tag::parseFreeForm(const MP4::Atom *atom)
-{
-  const AtomDataList data = parseData2(atom, -1, true);
-  if(data.size() > 2) {
-    auto itBegin = data.begin();
-
-    String name = "----:";
-    name += String((itBegin++)->data, String::UTF8);  // data[0].data
-    name += ':';
-    name += String((itBegin++)->data, String::UTF8);  // data[1].data
-
-    AtomDataType type = itBegin->type; // data[2].type
-
-    for(auto it = itBegin; it != data.end(); ++it) {
-      if(it->type != type) {
-        debug("MP4: We currently don't support values with multiple types");
-        break;
-      }
-    }
-    if(type == TypeUTF8) {
-      StringList value;
-      for(auto it = itBegin; it != data.end(); ++it) {
-        value.append(String(it->data, String::UTF8));
-      }
-      Item item(value);
-      item.setAtomDataType(type);
-      addItem(name, item);
-    }
-    else {
-      ByteVectorList value;
-      for(auto it = itBegin; it != data.end(); ++it) {
-        value.append(it->data);
-      }
-      Item item(value);
-      item.setAtomDataType(type);
-      addItem(name, item);
-    }
-  }
-}
-
-void
-MP4::Tag::parseCovr(const MP4::Atom *atom)
-{
-  MP4::CoverArtList value;
-  ByteVector data = d->file->readBlock(atom->length - 8);
-  unsigned int pos = 0;
-  while(pos < data.size()) {
-    const int length = static_cast<int>(data.toUInt(pos));
-    if(length < 12) {
-      debug("MP4: Too short atom");
-      break;
-    }
-
-    const ByteVector name = data.mid(pos + 4, 4);
-    const int flags = static_cast<int>(data.toUInt(pos + 8));
-    if(name != "data") {
-      debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
-      break;
-    }
-    if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP ||
-       flags == TypeGIF || flags == TypeImplicit) {
-      value.append(MP4::CoverArt(static_cast<MP4::CoverArt::Format>(flags),
-                                 data.mid(pos + 16, length - 16)));
-    }
-    else {
-      debug("MP4: Unknown covr format " + String::number(flags));
-    }
-    pos += length;
-  }
-  if(!value.isEmpty())
-    addItem(atom->name, value);
-}
 
 ByteVector
 MP4::Tag::padIlst(const ByteVector &data, int length) const
@@ -340,191 +98,12 @@ MP4::Tag::renderAtom(const ByteVector &name, const ByteVector &data) const
   return ByteVector::fromUInt(data.size() + 8) + name + data;
 }
 
-ByteVector
-MP4::Tag::renderData(const ByteVector &name, int flags, const ByteVectorList &data) const
-{
-  ByteVector result;
-  for(const auto &byte : data) {
-    result.append(renderAtom("data", ByteVector::fromUInt(flags) + ByteVector(4, '\0') + byte));
-  }
-  return renderAtom(name, result);
-}
-
-ByteVector
-MP4::Tag::renderBool(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector(1, item.toBool() ? '\1' : '\0'));
-  return renderData(name, TypeInteger, data);
-}
-
-ByteVector
-MP4::Tag::renderInt(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector::fromShort(item.toInt()));
-  return renderData(name, TypeInteger, data);
-}
-
-ByteVector
-MP4::Tag::renderUInt(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector::fromUInt(item.toUInt()));
-  return renderData(name, TypeInteger, data);
-}
-
-ByteVector
-MP4::Tag::renderLongLong(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector::fromLongLong(item.toLongLong()));
-  return renderData(name, TypeInteger, data);
-}
-
-ByteVector
-MP4::Tag::renderByte(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector(1, item.toByte()));
-  return renderData(name, TypeInteger, data);
-}
-
-ByteVector
-MP4::Tag::renderIntPair(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector(2, '\0') +
-              ByteVector::fromShort(item.toIntPair().first) +
-              ByteVector::fromShort(item.toIntPair().second) +
-              ByteVector(2, '\0'));
-  return renderData(name, TypeImplicit, data);
-}
-
-ByteVector
-MP4::Tag::renderIntPairNoTrailing(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVectorList data;
-  data.append(ByteVector(2, '\0') +
-              ByteVector::fromShort(item.toIntPair().first) +
-              ByteVector::fromShort(item.toIntPair().second));
-  return renderData(name, TypeImplicit, data);
-}
-
-ByteVector
-MP4::Tag::renderText(const ByteVector &name, const MP4::Item &item, int flags) const
-{
-  ByteVectorList data;
-  const StringList values = item.toStringList();
-  for(const auto &value : values) {
-    data.append(value.data(String::UTF8));
-  }
-  return renderData(name, flags, data);
-}
-
-ByteVector
-MP4::Tag::renderCovr(const ByteVector &name, const MP4::Item &item) const
-{
-  ByteVector data;
-  const MP4::CoverArtList values = item.toCoverArtList();
-  for(const auto &value : values) {
-    data.append(renderAtom("data", ByteVector::fromUInt(value.format()) +
-                                   ByteVector(4, '\0') + value.data()));
-  }
-  return renderAtom(name, data);
-}
-
-ByteVector
-MP4::Tag::renderFreeForm(const String &name, const MP4::Item &item) const
-{
-  StringList header = StringList::split(name, ":");
-  if(header.size() != 3) {
-    debug("MP4: Invalid free-form item name \"" + name + "\"");
-    return ByteVector();
-  }
-  ByteVector data;
-  data.append(renderAtom("mean", ByteVector::fromUInt(0) + header[1].data(String::UTF8)));
-  data.append(renderAtom("name", ByteVector::fromUInt(0) + header[2].data(String::UTF8)));
-  AtomDataType type = item.atomDataType();
-  if(type == TypeUndefined) {
-    if(!item.toStringList().isEmpty()) {
-      type = TypeUTF8;
-    }
-    else {
-      type = TypeImplicit;
-    }
-  }
-  if(type == TypeUTF8) {
-    const StringList values = item.toStringList();
-    for(const auto &value : values) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) +
-                                     ByteVector(4, '\0') + value.data(String::UTF8)));
-    }
-  }
-  else {
-    const ByteVectorList values = item.toByteVectorList();
-    for(const auto &value : values) {
-      data.append(renderAtom("data", ByteVector::fromUInt(type) +
-                                     ByteVector(4, '\0') + value));
-    }
-  }
-  return renderAtom("----", data);
-}
-
 bool
 MP4::Tag::save()
 {
   ByteVector data;
   for(const auto &[name, item] : std::as_const(d->items)) {
-    if(name.startsWith("----")) {
-      data.append(renderFreeForm(name, item));
-    }
-    else if(name == "trkn") {
-      data.append(renderIntPair(name.data(String::Latin1), item));
-    }
-    else if(name == "disk") {
-      data.append(renderIntPairNoTrailing(name.data(String::Latin1), item));
-    }
-    else if(name == "cpil" || name == "pgap" || name == "pcst" ||
-            name == "shwm") {
-      data.append(renderBool(name.data(String::Latin1), item));
-    }
-    else if(name == "tmpo" || name == "\251mvi" || name == "\251mvc" ||
-            name == "hdvd") {
-      data.append(renderInt(name.data(String::Latin1), item));
-    }
-    else if(name == "rate") {
-      StringList value = item.toStringList();
-      if (value.isEmpty()) {
-        data.append(renderInt(name.data(String::Latin1), item));
-      }
-      else {
-        data.append(renderText(name.data(String::Latin1), item));
-      }
-    }
-    else if(name == "tvsn" || name == "tves" || name == "cnID" ||
-            name == "sfID" || name == "atID" || name == "geID" ||
-            name == "cmID") {
-      data.append(renderUInt(name.data(String::Latin1), item));
-    }
-    else if(name == "plID") {
-      data.append(renderLongLong(name.data(String::Latin1), item));
-    }
-    else if(name == "stik" || name == "rtng" || name == "akID") {
-      data.append(renderByte(name.data(String::Latin1), item));
-    }
-    else if(name == "covr") {
-      data.append(renderCovr(name.data(String::Latin1), item));
-    }
-    else if(name == "purl" || name == "egid") {
-      data.append(renderText(name.data(String::Latin1), item, TypeImplicit));
-    }
-    else if(name.size() == 4){
-      data.append(renderText(name.data(String::Latin1), item));
-    }
-    else {
-      debug("MP4: Unknown item name \"" + name + "\"");
-    }
+    data.append(d->factory->renderItem(name, item));
   }
   data = renderAtom("ilst", data);
 
@@ -890,116 +469,13 @@ bool MP4::Tag::contains(const String &key) const
   return d->items.contains(key);
 }
 
-namespace
-{
-  constexpr std::array keyTranslation {
-    std::pair("\251nam", "TITLE"),
-    std::pair("\251ART", "ARTIST"),
-    std::pair("\251alb", "ALBUM"),
-    std::pair("\251cmt", "COMMENT"),
-    std::pair("\251gen", "GENRE"),
-    std::pair("\251day", "DATE"),
-    std::pair("\251wrt", "COMPOSER"),
-    std::pair("\251grp", "GROUPING"),
-    std::pair("aART", "ALBUMARTIST"),
-    std::pair("trkn", "TRACKNUMBER"),
-    std::pair("disk", "DISCNUMBER"),
-    std::pair("cpil", "COMPILATION"),
-    std::pair("tmpo", "BPM"),
-    std::pair("cprt", "COPYRIGHT"),
-    std::pair("\251lyr", "LYRICS"),
-    std::pair("\251too", "ENCODEDBY"),
-    std::pair("soal", "ALBUMSORT"),
-    std::pair("soaa", "ALBUMARTISTSORT"),
-    std::pair("soar", "ARTISTSORT"),
-    std::pair("sonm", "TITLESORT"),
-    std::pair("soco", "COMPOSERSORT"),
-    std::pair("sosn", "SHOWSORT"),
-    std::pair("shwm", "SHOWWORKMOVEMENT"),
-    std::pair("pgap", "GAPLESSPLAYBACK"),
-    std::pair("pcst", "PODCAST"),
-    std::pair("catg", "PODCASTCATEGORY"),
-    std::pair("desc", "PODCASTDESC"),
-    std::pair("egid", "PODCASTID"),
-    std::pair("purl", "PODCASTURL"),
-    std::pair("tves", "TVEPISODE"),
-    std::pair("tven", "TVEPISODEID"),
-    std::pair("tvnn", "TVNETWORK"),
-    std::pair("tvsn", "TVSEASON"),
-    std::pair("tvsh", "TVSHOW"),
-    std::pair("\251wrk", "WORK"),
-    std::pair("\251mvn", "MOVEMENTNAME"),
-    std::pair("\251mvi", "MOVEMENTNUMBER"),
-    std::pair("\251mvc", "MOVEMENTCOUNT"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Release Track Id", "MUSICBRAINZ_RELEASETRACKID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Work Id", "MUSICBRAINZ_WORKID"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Release Country", "RELEASECOUNTRY"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Status", "RELEASESTATUS"),
-    std::pair("----:com.apple.iTunes:MusicBrainz Album Type", "RELEASETYPE"),
-    std::pair("----:com.apple.iTunes:ARTISTS", "ARTISTS"),
-    std::pair("----:com.apple.iTunes:originaldate", "ORIGINALDATE"),
-    std::pair("----:com.apple.iTunes:ASIN", "ASIN"),
-    std::pair("----:com.apple.iTunes:LABEL", "LABEL"),
-    std::pair("----:com.apple.iTunes:LYRICIST", "LYRICIST"),
-    std::pair("----:com.apple.iTunes:CONDUCTOR", "CONDUCTOR"),
-    std::pair("----:com.apple.iTunes:REMIXER", "REMIXER"),
-    std::pair("----:com.apple.iTunes:ENGINEER", "ENGINEER"),
-    std::pair("----:com.apple.iTunes:PRODUCER", "PRODUCER"),
-    std::pair("----:com.apple.iTunes:DJMIXER", "DJMIXER"),
-    std::pair("----:com.apple.iTunes:MIXER", "MIXER"),
-    std::pair("----:com.apple.iTunes:SUBTITLE", "SUBTITLE"),
-    std::pair("----:com.apple.iTunes:DISCSUBTITLE", "DISCSUBTITLE"),
-    std::pair("----:com.apple.iTunes:MOOD", "MOOD"),
-    std::pair("----:com.apple.iTunes:ISRC", "ISRC"),
-    std::pair("----:com.apple.iTunes:CATALOGNUMBER", "CATALOGNUMBER"),
-    std::pair("----:com.apple.iTunes:BARCODE", "BARCODE"),
-    std::pair("----:com.apple.iTunes:SCRIPT", "SCRIPT"),
-    std::pair("----:com.apple.iTunes:LANGUAGE", "LANGUAGE"),
-    std::pair("----:com.apple.iTunes:LICENSE", "LICENSE"),
-    std::pair("----:com.apple.iTunes:MEDIA", "MEDIA"),
-  };
-
-  String translateKey(const String &key)
-  {
-    for(const auto &[k, t] : keyTranslation) {
-      if(key == k)
-        return t;
-    }
-
-    return String();
-  }
-}  // namespace
-
 PropertyMap MP4::Tag::properties() const
 {
   PropertyMap props;
   for(const auto &[k, t] : std::as_const(d->items)) {
-    const String key = translateKey(k);
+    auto [key, value] = d->factory->itemToProperty(k.data(String::Latin1), t);
     if(!key.isEmpty()) {
-      if(key == "TRACKNUMBER" || key == "DISCNUMBER") {
-        auto [vn, tn] = t.toIntPair();
-        String value  = String::number(vn);
-        if(tn) {
-          value += "/" + String::number(tn);
-        }
-        props[key] = value;
-      }
-      else if(key == "BPM" || key == "MOVEMENTNUMBER" || key == "MOVEMENTCOUNT" ||
-              key == "TVEPISODE" || key == "TVSEASON") {
-        props[key] = String::number(t.toInt());
-      }
-      else if(key == "COMPILATION" || key == "SHOWWORKMOVEMENT" ||
-              key == "GAPLESSPLAYBACK" || key == "PODCAST") {
-        props[key] = String::number(t.toBool());
-      }
-      else {
-        props[key] = t.toStringList();
-      }
+      props[key] = value;
     }
     else {
       props.unsupportedData().append(k);
@@ -1016,50 +492,18 @@ void MP4::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
 {
-  static Map<String, String> reverseKeyMap;
-  if(reverseKeyMap.isEmpty()) {
-    for(const auto &[k, t] : keyTranslation) {
-      reverseKeyMap[t] = k;
-    }
-  }
-
   const PropertyMap origProps = properties();
   for(const auto &[prop, _] : origProps) {
     if(!props.contains(prop) || props[prop].isEmpty()) {
-      d->items.erase(reverseKeyMap[prop]);
+      d->items.erase(d->factory->nameForPropertyKey(prop));
     }
   }
 
   PropertyMap ignoredProps;
   for(const auto &[prop, val] : props) {
-    if(reverseKeyMap.contains(prop)) {
-      String name = reverseKeyMap[prop];
-      if((prop == "TRACKNUMBER" || prop == "DISCNUMBER") && !val.isEmpty()) {
-        StringList parts = StringList::split(val.front(), "/");
-        if(!parts.isEmpty()) {
-          int first = parts[0].toInt();
-          int second = 0;
-          if(parts.size() > 1) {
-            second = parts[1].toInt();
-          }
-          d->items[name] = MP4::Item(first, second);
-        }
-      }
-      else if((prop == "BPM" || prop == "MOVEMENTNUMBER" ||
-               prop == "MOVEMENTCOUNT" || prop == "TVEPISODE" ||
-               prop == "TVSEASON") && !val.isEmpty()) {
-        int value = val.front().toInt();
-        d->items[name] = MP4::Item(value);
-      }
-      else if((prop == "COMPILATION" || prop == "SHOWWORKMOVEMENT" ||
-               prop == "GAPLESSPLAYBACK" || prop == "PODCAST") &&
-              !val.isEmpty()) {
-        bool value = (val.front().toInt() != 0);
-        d->items[name] = MP4::Item(value);
-      }
-      else {
-        d->items[name] = val;
-      }
+    auto [name, item] = d->factory->itemFromProperty(prop, val);
+    if(item.isValid()) {
+      d->items[name] = item;
     }
     else {
       ignoredProps.insert(prop, val);
