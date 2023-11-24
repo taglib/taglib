@@ -290,7 +290,7 @@ public:
         return static_cast<const RIFF::WAV::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-          return static_cast<RIFF::WAV::File &>(f).tag();
+          return static_cast<RIFF::WAV::File &>(f).ID3v2Tag();
       },
       [](File &f) {
         static_cast<RIFF::WAV::File &>(f).strip();
