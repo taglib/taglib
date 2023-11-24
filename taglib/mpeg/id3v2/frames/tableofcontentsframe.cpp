@@ -50,30 +50,6 @@ public:
   FrameList embeddedFrameList;
 };
 
-namespace {
-
-  // These functions are needed to try to aim for backward compatibility with
-  // an API that previously (unreasonably) required null bytes to be appended
-  // at the end of identifiers explicitly by the API user.
-
-  // BIC: remove these
-
-  ByteVector &strip(ByteVector &b)
-  {
-    if(b.endsWith('\0'))
-      b.resize(b.size() - 1);
-    return b;
-  }
-
-  ByteVectorList &strip(ByteVectorList &l)
-  {
-    for(auto &v : l) {
-      strip(v);
-    }
-    return l;
-  }
-}  // namespace
-
 ////////////////////////////////////////////////////////////////////////////////
 // public methods
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,7 +69,6 @@ TableOfContentsFrame::TableOfContentsFrame(const ByteVector &elementID,
   d(std::make_unique<TableOfContentsFramePrivate>())
 {
   d->elementID = elementID;
-  strip(d->elementID);
   d->childElements = children;
 
   for(const auto &frame : embeddedFrames)
@@ -130,7 +105,6 @@ ByteVectorList TableOfContentsFrame::childElements() const
 void TableOfContentsFrame::setElementID(const ByteVector &eID)
 {
   d->elementID = eID;
-  strip(d->elementID);
 }
 
 void TableOfContentsFrame::setIsTopLevel(const bool &t)
@@ -146,13 +120,11 @@ void TableOfContentsFrame::setIsOrdered(const bool &o)
 void TableOfContentsFrame::setChildElements(const ByteVectorList &l)
 {
   d->childElements = l;
-  strip(d->childElements);
 }
 
 void TableOfContentsFrame::addChildElement(const ByteVector &cE)
 {
   d->childElements.append(cE);
-  strip(d->childElements);
 }
 
 void TableOfContentsFrame::removeChildElement(const ByteVector &cE)

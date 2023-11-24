@@ -1533,11 +1533,11 @@ public:
   {
     ID3v2::Header header;
     ID3v2::TableOfContentsFrame f(&header, "CTOC");
-    f.setElementID(ByteVector("\x54\x00", 2));
+    f.setElementID("T");
     f.setIsTopLevel(false);
     f.setIsOrdered(true);
-    f.addChildElement(ByteVector("\x43\x00", 2));
-    f.addChildElement(ByteVector("\x44\x00", 2));
+    f.addChildElement("C");
+    f.addChildElement("D");
     auto eF = new ID3v2::TextIdentificationFrame("TIT2");
     eF->setText("TC1");
     f.addEmbeddedFrame(eF);
