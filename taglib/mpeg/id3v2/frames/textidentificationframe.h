@@ -276,7 +276,6 @@ namespace TagLib {
        */
       void setDescription(const String &s);
 
-      StringList fieldList() const;
       void setText(const String &text) override;
       void setText(const StringList &fields);
 
