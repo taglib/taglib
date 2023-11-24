@@ -76,6 +76,11 @@ String GeneralEncapsulatedObjectFrame::toString() const
   return text;
 }
 
+StringList GeneralEncapsulatedObjectFrame::toStringList() const
+{
+  return {d->description, d->fileName, d->mimeType};
+}
+
 String::Type GeneralEncapsulatedObjectFrame::textEncoding() const
 {
   return d->textEncoding;

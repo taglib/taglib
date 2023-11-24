@@ -66,6 +66,11 @@ String AttachedPictureFrame::toString() const
   return d->description.isEmpty() ? s : d->description + " " + s;
 }
 
+StringList AttachedPictureFrame::toStringList() const
+{
+  return {d->description, d->mimeType};
+}
+
 String::Type AttachedPictureFrame::textEncoding() const
 {
   return d->textEncoding;

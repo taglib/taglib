@@ -103,31 +103,31 @@ ByteVector APE::Tag::fileIdentifier()
 String APE::Tag::title() const
 {
   Item value = d->itemListMap.value("TITLE");
-  return value.isEmpty() ? String() : value.values().toString();
+  return value.isEmpty() ? String() : joinTagValues(value.values());
 }
 
 String APE::Tag::artist() const
 {
   Item value = d->itemListMap.value("ARTIST");
-  return value.isEmpty() ? String() : value.values().toString();
+  return value.isEmpty() ? String() : joinTagValues(value.values());
 }
 
 String APE::Tag::album() const
 {
   Item value = d->itemListMap.value("ALBUM");
-  return value.isEmpty() ? String() : value.values().toString();
+  return value.isEmpty() ? String() : joinTagValues(value.values());
 }
 
 String APE::Tag::comment() const
 {
   Item value = d->itemListMap.value("COMMENT");
-  return value.isEmpty() ? String() : value.values().toString();
+  return value.isEmpty() ? String() : joinTagValues(value.values());
 }
 
 String APE::Tag::genre() const
 {
   Item value = d->itemListMap.value("GENRE");
-  return value.isEmpty() ? String() : value.values().toString();
+  return value.isEmpty() ? String() : joinTagValues(value.values());
 }
 
 unsigned int APE::Tag::year() const

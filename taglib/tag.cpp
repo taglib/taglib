@@ -189,3 +189,8 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
       target->setTrack(source->track());
   }
 }
+
+String Tag::joinTagValues(const StringList &l)
+{
+  return l.toString(" / ");
+}

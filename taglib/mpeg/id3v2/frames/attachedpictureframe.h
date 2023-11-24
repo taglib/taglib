@@ -80,6 +80,11 @@ namespace TagLib {
       String toString() const override;
 
       /*!
+       * Returns a string list containing the description and mime-type.
+       */
+      StringList toStringList() const override;
+
+      /*!
        * Returns the text encoding used for the description.
        *
        * \see setTextEncoding()

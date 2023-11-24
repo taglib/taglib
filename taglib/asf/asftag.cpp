@@ -34,6 +34,18 @@
 
 using namespace TagLib;
 
+namespace
+{
+  StringList attributeListToStringList(const ASF::AttributeList &attributes)
+  {
+    StringList strs;
+    for(const auto &attribute : attributes) {
+      strs.append(attribute.toString());
+    }
+    return strs;
+  }
+}  // namespace
+
 class ASF::Tag::TagPrivate
 {
 public:
@@ -65,7 +77,8 @@ String ASF::Tag::artist() const
 String ASF::Tag::album() const
 {
   if(d->attributeListMap.contains("WM/AlbumTitle"))
-    return d->attributeListMap["WM/AlbumTitle"][0].toString();
+    return joinTagValues(
+      attributeListToStringList(d->attributeListMap.value("WM/AlbumTitle")));
   return String();
 }
 
@@ -107,7 +120,8 @@ unsigned int ASF::Tag::track() const
 String ASF::Tag::genre() const
 {
   if(d->attributeListMap.contains("WM/Genre"))
-    return d->attributeListMap["WM/Genre"][0].toString();
+    return joinTagValues(
+      attributeListToStringList(d->attributeListMap.value("WM/Genre")));
   return String();
 }
 

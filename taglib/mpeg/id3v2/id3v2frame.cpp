@@ -122,6 +122,11 @@ void Frame::setText(const String &)
 {
 }
 
+StringList Frame::toStringList() const
+{
+  return toString();
+}
+
 ByteVector Frame::render() const
 {
   ByteVector fieldData = renderFields();

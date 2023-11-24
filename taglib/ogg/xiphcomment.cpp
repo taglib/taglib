@@ -66,19 +66,19 @@ Ogg::XiphComment::~XiphComment() = default;
 String Ogg::XiphComment::title() const
 {
   StringList value = d->fieldListMap.value("TITLE");
-  return value.isEmpty() ? String() : value.toString();
+  return value.isEmpty() ? String() : joinTagValues(value);
 }
 
 String Ogg::XiphComment::artist() const
 {
   StringList value = d->fieldListMap.value("ARTIST");
-  return value.isEmpty() ? String() : value.toString();
+  return value.isEmpty() ? String() : joinTagValues(value);
 }
 
 String Ogg::XiphComment::album() const
 {
   StringList value = d->fieldListMap.value("ALBUM");
-  return value.isEmpty() ? String() : value.toString();
+  return value.isEmpty() ? String() : joinTagValues(value);
 }
 
 String Ogg::XiphComment::comment() const
@@ -86,13 +86,13 @@ String Ogg::XiphComment::comment() const
   StringList value = d->fieldListMap.value("DESCRIPTION");
   if(!value.isEmpty()) {
     d->commentField = "DESCRIPTION";
-    return value.toString();
+    return joinTagValues(value);
   }
 
   value = d->fieldListMap.value("COMMENT");
   if(!value.isEmpty()) {
     d->commentField = "COMMENT";
-    return value.toString();
+    return joinTagValues(value);
   }
 
   return String();
@@ -101,7 +101,7 @@ String Ogg::XiphComment::comment() const
 String Ogg::XiphComment::genre() const
 {
   StringList value = d->fieldListMap.value("GENRE");
-  return value.isEmpty() ? String() : value.toString();
+  return value.isEmpty() ? String() : joinTagValues(value);
 }
 
 unsigned int Ogg::XiphComment::year() const

@@ -64,11 +64,16 @@ namespace TagLib {
       OwnershipFrame &operator=(const OwnershipFrame &) = delete;
 
       /*!
-       * Returns the text of this popularimeter.
+       * Returns price paid, date purchased and seller.
        *
        * \see text()
        */
       String toString() const override;
+
+      /*!
+       * Returns price paid, date purchased and seller.
+       */
+      StringList toStringList() const override;
 
       /*!
        * Returns the date purchased.
