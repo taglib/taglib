@@ -107,12 +107,10 @@ namespace TagLib {
         File &operator=(const File &) = delete;
 
         /*!
-         * Returns the ID3v2 Tag for this file.
-         *
-         * \note This method does not return all the tags for this file for
-         * backward compatibility.  Will be fixed in TagLib 2.0.
+         * Returns the tag for this file.  This will be an RIFF INFO tag, an
+         * ID3v2 tag or a combination of the two.
          */
-        ID3v2::Tag *tag() const override;
+        TagLib::Tag *tag() const override;
 
         /*!
          * Returns the ID3v2 Tag for this file.

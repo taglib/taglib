@@ -93,9 +93,9 @@ RIFF::WAV::File::File(IOStream *stream, bool readProperties, Properties::ReadSty
 
 RIFF::WAV::File::~File() = default;
 
-ID3v2::Tag *RIFF::WAV::File::tag() const
+TagLib::Tag *RIFF::WAV::File::tag() const
 {
-  return ID3v2Tag();
+  return &d->tag;
 }
 
 ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
