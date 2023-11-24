@@ -391,13 +391,6 @@ String UserTextIdentificationFrame::description() const
     : String();
 }
 
-StringList UserTextIdentificationFrame::fieldList() const
-{
-  // TODO: remove this function
-
-  return TextIdentificationFrame::fieldList();
-}
-
 void UserTextIdentificationFrame::setText(const String &text)
 {
   if(description().isEmpty())
