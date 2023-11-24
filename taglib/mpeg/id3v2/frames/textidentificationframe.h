@@ -162,6 +162,7 @@ namespace TagLib {
 
       void setText(const String &s) override;
       String toString() const override;
+      StringList toStringList() const override;
 
       /*!
        * Returns the text encoding that will be used in rendering this frame.

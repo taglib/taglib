@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "popularimeterframe.h"
+#include "tstringlist.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -58,6 +59,11 @@ PopularimeterFrame::~PopularimeterFrame() = default;
 String PopularimeterFrame::toString() const
 {
   return d->email + " rating=" + String::number(d->rating) + " counter=" + String::number(d->counter);
+}
+
+StringList PopularimeterFrame::toStringList() const
+{
+  return {d->email, String::number(d->rating), String::number(d->counter)};
 }
 
 String PopularimeterFrame::email() const

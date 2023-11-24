@@ -72,6 +72,11 @@ namespace TagLib {
       String toString() const override;
 
       /*!
+       * Returns email, rating and counter.
+       */
+      StringList toStringList() const override;
+
+      /*!
        * Returns the email.
        *
        * \see setEmail()

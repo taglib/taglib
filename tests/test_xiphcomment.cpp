@@ -144,15 +144,15 @@ public:
     f.tag()->addField("TITLE", "Title3", false);
     f.tag()->addField("artist", "Artist1");
     f.tag()->addField("ARTIST", "Artist2", false);
-    CPPUNIT_ASSERT_EQUAL(String("Title1 Title1 Title2 Title3"), f.tag()->title());
-    CPPUNIT_ASSERT_EQUAL(String("Artist1 Artist2"), f.tag()->artist());
+    CPPUNIT_ASSERT_EQUAL(String("Title1 / Title1 / Title2 / Title3"), f.tag()->title());
+    CPPUNIT_ASSERT_EQUAL(String("Artist1 / Artist2"), f.tag()->artist());
 
     f.tag()->removeFields("title", "Title1");
-    CPPUNIT_ASSERT_EQUAL(String("Title2 Title3"), f.tag()->title());
-    CPPUNIT_ASSERT_EQUAL(String("Artist1 Artist2"), f.tag()->artist());
+    CPPUNIT_ASSERT_EQUAL(String("Title2 / Title3"), f.tag()->title());
+    CPPUNIT_ASSERT_EQUAL(String("Artist1 / Artist2"), f.tag()->artist());
 
     f.tag()->removeFields("Artist");
-    CPPUNIT_ASSERT_EQUAL(String("Title2 Title3"), f.tag()->title());
+    CPPUNIT_ASSERT_EQUAL(String("Title2 / Title3"), f.tag()->title());
     CPPUNIT_ASSERT(f.tag()->artist().isEmpty());
 
     f.tag()->removeAllFields();

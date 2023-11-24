@@ -957,7 +957,7 @@ public:
 
     ID3v2::Tag tag;
     tag.addFrame(frame);
-    CPPUNIT_ASSERT_EQUAL(String("Disco Eurodisco"), tag.genre());
+    CPPUNIT_ASSERT_EQUAL(String("Disco / Eurodisco"), tag.genre());
   }
 
   void testUpdateGenre23_3()
@@ -980,7 +980,7 @@ public:
 
     ID3v2::Tag tag;
     tag.addFrame(frame);
-    CPPUNIT_ASSERT_EQUAL(String("Metal Black Metal Viking Metal"), tag.genre());
+    CPPUNIT_ASSERT_EQUAL(String("Metal / Black Metal / Viking Metal"), tag.genre());
   }
 
   void testUpdateGenre24()
@@ -1000,7 +1000,7 @@ public:
 
     ID3v2::Tag tag;
     tag.addFrame(frame);
-    CPPUNIT_ASSERT_EQUAL(String("R&B Eurodisco"), tag.genre());
+    CPPUNIT_ASSERT_EQUAL(String("R&B / Eurodisco"), tag.genre());
   }
 
   void testUpdateDate22()

@@ -227,6 +227,14 @@ namespace TagLib {
      */
     static void duplicate(const Tag *source, Tag *target, bool overwrite = true);
 
+    /*!
+     * Join the \a values of a tag to a single string separated by " / ".
+     * If the tag implementation can have multiple values for a basic tag
+     * (e.g. artist), they can be combined to a single string for the basic
+     * tag getters (e.g. artist()).
+     */
+    static String joinTagValues(const StringList &values);
+
   protected:
     /*!
      * Construct a Tag.  This is protected since tags should only be instantiated

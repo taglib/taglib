@@ -65,6 +65,11 @@ String OwnershipFrame::toString() const
   return "pricePaid=" + d->pricePaid + " datePurchased=" + d->datePurchased + " seller=" + d->seller;
 }
 
+StringList OwnershipFrame::toStringList() const
+{
+  return {d->pricePaid, d->datePurchased, d->seller};
+}
+
 String OwnershipFrame::pricePaid() const
 {
   return d->pricePaid;

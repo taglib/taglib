@@ -110,6 +110,11 @@ String TextIdentificationFrame::toString() const
   return d->fieldList.toString();
 }
 
+StringList TextIdentificationFrame::toStringList() const
+{
+  return d->fieldList;
+}
+
 StringList TextIdentificationFrame::fieldList() const
 {
   return d->fieldList;

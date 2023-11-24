@@ -109,6 +109,14 @@ namespace TagLib {
       virtual String toString() const = 0;
 
       /*!
+       * This returns the textual representation of the data in the frame.
+       * Subclasses can reimplement this method to provide a string list
+       * representation of the frame's data.  The default implementation
+       * returns the single string representation from toString().
+       */
+      virtual StringList toStringList() const;
+
+      /*!
        * Render the frame back to its binary format in a ByteVector.
        */
       ByteVector render() const;

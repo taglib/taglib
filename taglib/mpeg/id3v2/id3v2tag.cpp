@@ -121,21 +121,21 @@ ID3v2::Tag::~Tag() = default;
 String ID3v2::Tag::title() const
 {
   if(!d->frameListMap["TIT2"].isEmpty())
-    return d->frameListMap["TIT2"].front()->toString();
+    return joinTagValues(d->frameListMap["TIT2"].front()->toStringList());
   return String();
 }
 
 String ID3v2::Tag::artist() const
 {
   if(!d->frameListMap["TPE1"].isEmpty())
-    return d->frameListMap["TPE1"].front()->toString();
+    return joinTagValues(d->frameListMap["TPE1"].front()->toStringList());
   return String();
 }
 
 String ID3v2::Tag::album() const
 {
   if(!d->frameListMap["TALB"].isEmpty())
-    return d->frameListMap["TALB"].front()->toString();
+    return joinTagValues(d->frameListMap["TALB"].front()->toStringList());
   return String();
 }
 
@@ -157,10 +157,6 @@ String ID3v2::Tag::comment() const
 
 String ID3v2::Tag::genre() const
 {
-  // TODO: In the next major version (TagLib 2.0) a list of multiple genres
-  // should be separated by " / " instead of " ".  For the moment to keep
-  // the behavior the same as released versions it is being left with " ".
-
   const FrameList &tconFrames = d->frameListMap["TCON"];
   if(tconFrames.isEmpty())
   {
@@ -196,7 +192,7 @@ String ID3v2::Tag::genre() const
       genres.append(field);
   }
 
-  return genres.toString();
+  return joinTagValues(genres);
 }
 
 unsigned int ID3v2::Tag::year() const
