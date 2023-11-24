@@ -209,7 +209,7 @@ PropertyMap ChapterFrame::asProperties() const
 {
   PropertyMap map;
 
-  map.unsupportedData().append(frameID() + String("/") + d->elementID);
+  map.addUnsupportedData(frameID() + String("/") + d->elementID);
 
   return map;
 }

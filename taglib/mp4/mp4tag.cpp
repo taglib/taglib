@@ -478,7 +478,7 @@ PropertyMap MP4::Tag::properties() const
       props[key] = value;
     }
     else {
-      props.unsupportedData().append(k);
+      props.addUnsupportedData(k);
     }
   }
   return props;
