@@ -236,11 +236,15 @@ namespace TagLib {
      * You can remove items from the returned list, which tells TagLib to remove
      * those unsupported elements if you call File::setProperties() with the
      * same PropertyMap as argument.
-     *
-     * \deprecated
      */
-    // TODO: Returning mutable references to internal data structures is a bad idea.
-    StringList &unsupportedData();
+    const StringList &unsupportedData() const;
+
+    /*!
+     * Add property \a key to list of unsupported data.
+     *
+     * \see unsupportedData()
+     */
+    void addUnsupportedData(const String &key);
 
     /*!
      * Removes all entries which have an empty value list.

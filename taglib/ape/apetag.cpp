@@ -207,7 +207,7 @@ PropertyMap APE::Tag::properties() const
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
     if(item.type() != Item::Text || tagName.isEmpty()) {
-      properties.unsupportedData().append(tag);
+      properties.addUnsupportedData(tag);
     }
     else {
       // Some tags need to be handled specially

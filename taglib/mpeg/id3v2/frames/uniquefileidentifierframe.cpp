@@ -95,7 +95,7 @@ PropertyMap UniqueFileIdentifierFrame::asProperties() const
     map.insert("MUSICBRAINZ_TRACKID", String(d->identifier));
   }
   else {
-    map.unsupportedData().append(frameID() + String("/") + d->owner);
+    map.addUnsupportedData(frameID() + String("/") + d->owner);
   }
   return map;
 }

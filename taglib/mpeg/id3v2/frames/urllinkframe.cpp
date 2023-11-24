@@ -90,7 +90,7 @@ PropertyMap UrlLinkFrame::asProperties() const
   PropertyMap map;
   if(key.isEmpty())
     // unknown W*** frame - this normally shouldn't happen
-    map.unsupportedData().append(frameID());
+    map.addUnsupportedData(frameID());
   else
     map.insert(key, url());
   return map;

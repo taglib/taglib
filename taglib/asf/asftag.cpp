@@ -305,7 +305,7 @@ PropertyMap ASF::Tag::properties() const
       }
     }
     else {
-      props.unsupportedData().append(k);
+      props.addUnsupportedData(k);
     }
   }
   return props;

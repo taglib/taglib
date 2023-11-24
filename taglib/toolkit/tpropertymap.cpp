@@ -179,9 +179,14 @@ void PropertyMap::removeEmpty()
   *this = m;
 }
 
-StringList &PropertyMap::unsupportedData()
+const StringList &PropertyMap::unsupportedData() const
 {
   return d->unsupported;
+}
+
+void PropertyMap::addUnsupportedData(const String &key)
+{
+  d->unsupported.append(key);
 }
 
 PropertyMap &PropertyMap::operator=(const PropertyMap &other)
