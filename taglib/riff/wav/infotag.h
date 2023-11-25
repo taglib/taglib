@@ -130,6 +130,10 @@ namespace TagLib {
 
       bool isEmpty() const override;
 
+      PropertyMap properties() const override;
+      void removeUnsupportedProperties(const StringList &props) override;
+      PropertyMap setProperties(const PropertyMap &props) override;
+
       /*!
        * Returns a copy of the internal fields of the tag.  The returned map directly
        * reflects the contents of the "INFO" chunk.

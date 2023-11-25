@@ -60,6 +60,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testPCMWithFactChunk);
   CPPUNIT_TEST(testWaveFormatExtensible);
   CPPUNIT_TEST(testInvalidChunk);
+  CPPUNIT_TEST(testRIFFInfoProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -400,6 +401,84 @@ public:
     {
       RIFF::WAV::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
+    }
+  }
+
+  void testRIFFInfoProperties()
+  {
+    PropertyMap tags;
+    tags["ALBUM"] = StringList("Album");
+    tags["ARRANGER"] = StringList("Arranger");
+    tags["ARTIST"] = StringList("Artist");
+    tags["ARTISTWEBPAGE"] = StringList("Artist Webpage");
+    tags["BPM"] = StringList("123");
+    tags["COMMENT"] = StringList("Comment");
+    tags["COMPOSER"] = StringList("Composer");
+    tags["COPYRIGHT"] = StringList("2023 Copyright");
+    tags["DATE"] = StringList("2023");
+    tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
+    tags["ENCODEDBY"] = StringList("Encoded by");
+    tags["ENCODING"] = StringList("Encoding");
+    tags["ENCODINGTIME"] = StringList("2023-11-25 15:42:39");
+    tags["GENRE"] = StringList("Genre");
+    tags["ISRC"] = StringList("UKAAA0500001");
+    tags["LABEL"] = StringList("Label");
+    tags["LANGUAGE"] = StringList("eng");
+    tags["LYRICIST"] = StringList("Lyricist");
+    tags["MEDIA"] = StringList("Media");
+    tags["PERFORMER"] = StringList("Performer");
+    tags["RELEASECOUNTRY"] = StringList("Release Country");
+    tags["REMIXER"] = StringList("Remixer");
+    tags["TITLE"] = StringList("Title");
+    tags["TRACKNUMBER"] = StringList("2/4");
+
+    ScopedFileCopy copy("empty", ".wav");
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      RIFF::Info::Tag *infoTag = f.InfoTag();
+      CPPUNIT_ASSERT(infoTag->isEmpty());
+      PropertyMap properties = infoTag->properties();
+      CPPUNIT_ASSERT(properties.isEmpty());
+      infoTag->setProperties(tags);
+      f.save();
+    }
+    {
+      const RIFF::WAV::File f(copy.fileName().c_str());
+      RIFF::Info::Tag *infoTag = f.InfoTag();
+      CPPUNIT_ASSERT(!infoTag->isEmpty());
+      PropertyMap properties = infoTag->properties();
+      if (tags != properties) {
+        CPPUNIT_ASSERT_EQUAL(tags.toString(), properties.toString());
+      }
+      CPPUNIT_ASSERT(tags == properties);
+
+      const RIFF::Info::FieldListMap expectedFields = {
+        {"IPRD", "Album"},
+        {"IENG", "Arranger"},
+        {"IART", "Artist"},
+        {"IBSU", "Artist Webpage"},
+        {"IBPM", "123"},
+        {"ICMT", "Comment"},
+        {"IMUS", "Composer"},
+        {"ICOP", "2023 Copyright"},
+        {"ICRD", "2023"},
+        {"PRT1", "Disc Subtitle"},
+        {"ITCH", "Encoded by"},
+        {"ISFT", "Encoding"},
+        {"IDIT", "2023-11-25 15:42:39"},
+        {"IGNR", "Genre"},
+        {"ISRC", "UKAAA0500001"},
+        {"IPUB", "Label"},
+        {"ILNG", "eng"},
+        {"IWRI", "Lyricist"},
+        {"IMED", "Media"},
+        {"ISTR", "Performer"},
+        {"ICNT", "Release Country"},
+        {"IEDT", "Remixer"},
+        {"INAM", "Title"},
+        {"IPRT", "2/4"}
+      };
+      CPPUNIT_ASSERT(expectedFields == infoTag->fieldListMap());
     }
   }
 
