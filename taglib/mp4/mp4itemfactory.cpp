@@ -352,6 +352,7 @@ Map<ByteVector, String> ItemFactory::namePropertyMap() const
     {"\251mvn", "MOVEMENTNAME"},
     {"\251mvi", "MOVEMENTNUMBER"},
     {"\251mvc", "MOVEMENTCOUNT"},
+    {"ownr", "OWNER"},
     {"----:com.apple.iTunes:MusicBrainz Track Id", "MUSICBRAINZ_TRACKID"},
     {"----:com.apple.iTunes:MusicBrainz Artist Id", "MUSICBRAINZ_ARTISTID"},
     {"----:com.apple.iTunes:MusicBrainz Album Id", "MUSICBRAINZ_ALBUMID"},

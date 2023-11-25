@@ -504,6 +504,7 @@ public:
     tags["MUSICBRAINZ_TRACKID"] = StringList("MusicBrainz_TrackID");
     tags["MUSICBRAINZ_WORKID"] = StringList("MusicBrainz_WorkID");
     tags["ORIGINALDATE"] = StringList("2021-01-03 13:52:19");
+    tags["OWNER"] = StringList("Owner");
     tags["PODCAST"] = StringList("1");
     tags["PODCASTCATEGORY"] = StringList("Podcast Category");
     tags["PODCASTDESC"] = StringList("Podcast Description");
