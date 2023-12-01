@@ -121,6 +121,10 @@ namespace TagLib {
 
     /*!
      * Inserts a copy of \a item before \a it.
+     *
+     * \note This method cannot detach because \a it is tied to the internal
+     * list.  Do not make an implicitly shared copy of this list between
+     * getting the iterator and calling this method!
      */
     Iterator insert(Iterator it, const T &item);
 
@@ -199,6 +203,10 @@ namespace TagLib {
 
     /*!
      * Erase the item at \a it from the list.
+     *
+     * \note This method cannot detach because \a it is tied to the internal
+     * list.  Do not make an implicitly shared copy of this list between
+     * getting the iterator and calling this method!
      */
     Iterator erase(Iterator it);
 
@@ -231,6 +239,11 @@ namespace TagLib {
      * compilers should now support this.
      */
     void setAutoDelete(bool autoDelete);
+
+    /*!
+     * Returns true is auto-deletion is enabled.
+     */
+    bool autoDelete() const;
 
     /*!
      * Returns a reference to item \a i in the list.
@@ -293,7 +306,7 @@ namespace TagLib {
     /*
      * If this List is being shared via implicit sharing, do a deep copy of the
      * data and separate from the shared members.  This should be called by all
-     * non-const subclass members.
+     * non-const subclass members without Iterator parameters.
      */
     void detach();
 

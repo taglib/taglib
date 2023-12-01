@@ -164,12 +164,16 @@ namespace TagLib {
     bool contains(const Key &key) const;
 
     /*!
-     * Erase the item at \a it from the list.
+     * Erase the item at \a it from the map.
+     *
+     * \note This method cannot detach because \a it is tied to the internal
+     * map.  Do not make an implicitly shared copy of this map between
+     * getting the iterator and calling this method!
      */
     Map<Key, T> &erase(Iterator it);
 
     /*!
-     * Erase the item with \a key from the list.
+     * Erase the item with \a key from the map.
      */
     Map<Key, T> &erase(const Key &key);
 
@@ -225,9 +229,9 @@ namespace TagLib {
 
   protected:
     /*
-     * If this List is being shared via implicit sharing, do a deep copy of the
+     * If this Map is being shared via implicit sharing, do a deep copy of the
      * data and separate from the shared members.  This should be called by all
-     * non-const subclass members.
+     * non-const subclass members without Iterator parameters.
      */
     void detach();
 
