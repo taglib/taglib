@@ -60,17 +60,36 @@ public:
 
   void testDetach()
   {
-    List<int> l1;
-    l1.append(1);
-    l1.append(2);
-    l1.append(3);
-    l1.append(4);
+    {
+      List<int> l1;
+      l1.append(1);
+      l1.append(2);
+      l1.append(3);
+      l1.append(4);
 
-    List<int> l2 = l1;
-    auto it = l2.find(3);
-    *it = 33;
-    CPPUNIT_ASSERT_EQUAL(3,  l1[2]);
-    CPPUNIT_ASSERT_EQUAL(33, l2[2]);
+      List<int> l2 = l1;
+      auto it = l2.find(3);
+      *it = 33;
+      CPPUNIT_ASSERT_EQUAL(3,  l1[2]);
+      CPPUNIT_ASSERT_EQUAL(33, l2[2]);
+    }
+    {
+      List<int *> l1;
+      List<int *> l2 = l1;
+      CPPUNIT_ASSERT(!l1.autoDelete());
+      CPPUNIT_ASSERT(!l2.autoDelete());
+      l2.setAutoDelete(true);
+      CPPUNIT_ASSERT(!l1.autoDelete());
+      CPPUNIT_ASSERT(l2.autoDelete());
+    }
+    {
+      List<int> l1;
+      List<int> l2 = l1;
+      l1.insert(l1.begin(), 1);
+      CPPUNIT_ASSERT(!l1.isEmpty());
+      CPPUNIT_ASSERT_EQUAL(1, l1.front());
+      CPPUNIT_ASSERT(l2.isEmpty());
+    }
   }
 
   void bracedInit()

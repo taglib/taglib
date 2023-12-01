@@ -148,7 +148,6 @@ bool Map<Key, T>::contains(const Key &key) const
 template <class Key, class T>
 Map<Key, T> &Map<Key,T>::erase(Iterator it)
 {
-  detach();
   d->map.erase(it);
   return *this;
 }

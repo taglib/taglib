@@ -148,7 +148,6 @@ typename List<T>::ConstIterator List<T>::cend() const
 template <class T>
 typename List<T>::Iterator List<T>::insert(Iterator it, const T &item)
 {
-  detach();
   return d->list.insert(it, item);
 }
 
@@ -270,7 +269,14 @@ const T &List<T>::back() const
 template <class T>
 void List<T>::setAutoDelete(bool autoDelete)
 {
+  detach();
   d->autoDelete = autoDelete;
+}
+
+template <class T>
+bool List<T>::autoDelete() const
+{
+  return d->autoDelete;
 }
 
 template <class T>
