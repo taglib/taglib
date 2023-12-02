@@ -141,8 +141,8 @@ void Speex::Properties::read(File *file)
 
   // vbr;                    /**< 1 for a VBR encoding, 0 otherwise */
   d->vbr = data.toUInt(pos, false) == 1;
-  pos += 4;
 
+  // pos += 4;
   // frames_per_packet;      /**< Number of frames stored per Ogg packet */
   // unsigned int framesPerPacket = data.mid(pos, 4).toUInt(false);
 

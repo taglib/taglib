@@ -122,13 +122,13 @@ void Opus::Properties::read(File *file)
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)
   d->inputSampleRate = data.toUInt(pos, false);
-  pos += 4;
+  // pos += 4;
 
   // *Output Gain* (16 bits, signed, little endian)
-  pos += 2;
+  // pos += 2;
 
   // *Channel Mapping Family* (8 bits, unsigned)
-  pos += 1;
+  // pos += 1;
 
   const Ogg::PageHeader *first = file->firstPageHeader();
   const Ogg::PageHeader *last  = file->lastPageHeader();
