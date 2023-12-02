@@ -221,7 +221,6 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
       }
 
       const unsigned short flags = data.toUShort(pos, true);
-      pos += 2;
 
       d->sampleRate = sftable[(flags >> 13) & 0x07];
       d->channels   = ((flags >> 4) & 0x0F) + 1;

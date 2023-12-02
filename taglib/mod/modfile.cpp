@@ -160,25 +160,30 @@ void Mod::File::read(bool)
   seek(0);
   READ_STRING(d->tag.setTitle, 20);
 
+  offset_t pos = 20;
   StringList comment;
   for(unsigned int i = 0; i < instruments; ++ i) {
     READ_STRING_AS(instrumentName, 22);
-    // value in words, * 2 (<< 1) for bytes:
-    READ_U16B_AS(sampleLength);
+    // skip unused data
+    pos += 22 + 2 + 1 + 1 + 2 + 2;
+    seek(pos);
 
-    READ_BYTE_AS(fineTuneByte);
-    int fineTune = fineTuneByte & 0xF;
-    // > 7 means negative value
-    if(fineTune > 7) fineTune -= 16;
+    // // value in words, * 2 (<< 1) for bytes:
+    // READ_U16B_AS(sampleLength);
 
-    READ_BYTE_AS(volume);
-    if(volume > 64) volume = 64;
-    // volume in decibels: 20 * log10(volume / 64)
+    // READ_BYTE_AS(fineTuneByte);
+    // int fineTune = fineTuneByte & 0xF;
+    // // > 7 means negative value
+    // if(fineTune > 7) fineTune -= 16;
 
-    // value in words, * 2 (<< 1) for bytes:
-    READ_U16B_AS(repeatStart);
-    // value in words, * 2 (<< 1) for bytes:
-    READ_U16B_AS(repatLength);
+    // READ_BYTE_AS(volume);
+    // if(volume > 64) volume = 64;
+    // // volume in decibels: 20 * log10(volume / 64)
+
+    // // value in words, * 2 (<< 1) for bytes:
+    // READ_U16B_AS(repeatStart);
+    // // value in words, * 2 (<< 1) for bytes:
+    // READ_U16B_AS(repeatLength);
 
     comment.append(instrumentName);
   }

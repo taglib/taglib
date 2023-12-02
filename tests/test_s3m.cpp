@@ -23,6 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <cassert>
 #include "s3mfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -97,6 +98,7 @@ private:
 
     CPPUNIT_ASSERT(nullptr != p);
     CPPUNIT_ASSERT(nullptr != t);
+    assert(p != nullptr); // to silence the clang analyzer
 
     CPPUNIT_ASSERT_EQUAL( 0, p->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL( 0, p->bitrate());

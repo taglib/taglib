@@ -584,85 +584,91 @@ TagLib_Complex_Property_Attribute*** taglib_complex_property_get(
   TagLib_Complex_Property_Attribute ***propPtr = props;
 
   for(const auto &variantMap : variantMaps) {
-    TagLib_Complex_Property_Attribute **attrs = static_cast<TagLib_Complex_Property_Attribute **>(
-      malloc(sizeof(TagLib_Complex_Property_Attribute *) * (variantMap.size() + 1)));
-    TagLib_Complex_Property_Attribute *attr = static_cast<TagLib_Complex_Property_Attribute *>(
-      malloc(sizeof(TagLib_Complex_Property_Attribute) * variantMap.size()));
-    TagLib_Complex_Property_Attribute **attrPtr = attrs;
-    for (const auto &[k, v] : variantMap) {
-      attr->key = stringToCharArray(k);
-      attr->value.size = 0;
-      switch(v.type()) {
-      case Variant::Void:
-        attr->value.type = TagLib_Variant_Void;
-        attr->value.value.stringValue = NULL;
-        break;
-      case Variant::Bool:
-        attr->value.type = TagLib_Variant_Bool;
-        attr->value.value.boolValue = v.value<bool>();
-        break;
-      case Variant::Int:
-        attr->value.type = TagLib_Variant_Int;
-        attr->value.value.intValue = v.value<int>();
-        break;
-      case Variant::UInt:
-        attr->value.type = TagLib_Variant_UInt;
-        attr->value.value.uIntValue = v.value<unsigned int>();
-        break;
-      case Variant::LongLong:
-        attr->value.type = TagLib_Variant_LongLong;
-        attr->value.value.longLongValue = v.value<long long>();
-        break;
-      case Variant::ULongLong:
-        attr->value.type = TagLib_Variant_ULongLong;
-        attr->value.value.uLongLongValue = v.value<unsigned long long>();
-        break;
-      case Variant::Double:
-        attr->value.type = TagLib_Variant_Double;
-        attr->value.value.doubleValue = v.value<double>();
-        break;
-      case Variant::String: {
-        attr->value.type = TagLib_Variant_String;
-        auto str = v.value<String>();
-        attr->value.value.stringValue = stringToCharArray(str);
-        attr->value.size = str.size();
-        break;
-      }
-      case Variant::StringList: {
-        attr->value.type = TagLib_Variant_StringList;
-        StringList strs = v.value<StringList>();
-        auto strPtr = static_cast<char **>(malloc(sizeof(char *) * (strs.size() + 1)));
-        attr->value.value.stringListValue = strPtr;
-        attr->value.size = strs.size();
-        for(const auto &str : strs) {
-          *strPtr++ = stringToCharArray(str);
+    if(!variantMap.isEmpty()) {
+      TagLib_Complex_Property_Attribute **attrs = static_cast<TagLib_Complex_Property_Attribute **>(
+        malloc(sizeof(TagLib_Complex_Property_Attribute *) * (variantMap.size() + 1)));
+      TagLib_Complex_Property_Attribute *attr = static_cast<TagLib_Complex_Property_Attribute *>(
+        malloc(sizeof(TagLib_Complex_Property_Attribute) * variantMap.size()));
+      TagLib_Complex_Property_Attribute **attrPtr = attrs;
+      // The next assignment is redundant to silence the clang analyzer,
+      // it is done at the end of the loop, which must be entered because
+      // variantMap is not empty.
+      *attrPtr = attr;
+      for(const auto &[k, v] : variantMap) {
+        attr->key = stringToCharArray(k);
+        attr->value.size = 0;
+        switch(v.type()) {
+        case Variant::Void:
+          attr->value.type = TagLib_Variant_Void;
+          attr->value.value.stringValue = NULL;
+          break;
+        case Variant::Bool:
+          attr->value.type = TagLib_Variant_Bool;
+          attr->value.value.boolValue = v.value<bool>();
+          break;
+        case Variant::Int:
+          attr->value.type = TagLib_Variant_Int;
+          attr->value.value.intValue = v.value<int>();
+          break;
+        case Variant::UInt:
+          attr->value.type = TagLib_Variant_UInt;
+          attr->value.value.uIntValue = v.value<unsigned int>();
+          break;
+        case Variant::LongLong:
+          attr->value.type = TagLib_Variant_LongLong;
+          attr->value.value.longLongValue = v.value<long long>();
+          break;
+        case Variant::ULongLong:
+          attr->value.type = TagLib_Variant_ULongLong;
+          attr->value.value.uLongLongValue = v.value<unsigned long long>();
+          break;
+        case Variant::Double:
+          attr->value.type = TagLib_Variant_Double;
+          attr->value.value.doubleValue = v.value<double>();
+          break;
+        case Variant::String: {
+          attr->value.type = TagLib_Variant_String;
+          auto str = v.value<String>();
+          attr->value.value.stringValue = stringToCharArray(str);
+          attr->value.size = str.size();
+          break;
         }
-        *strPtr = NULL;
-        break;
+        case Variant::StringList: {
+          attr->value.type = TagLib_Variant_StringList;
+          StringList strs = v.value<StringList>();
+          auto strPtr = static_cast<char **>(malloc(sizeof(char *) * (strs.size() + 1)));
+          attr->value.value.stringListValue = strPtr;
+          attr->value.size = strs.size();
+          for(const auto &str : strs) {
+            *strPtr++ = stringToCharArray(str);
+          }
+          *strPtr = NULL;
+          break;
+        }
+        case Variant::ByteVector: {
+          attr->value.type = TagLib_Variant_ByteVector;
+          const ByteVector data = v.value<ByteVector>();
+          auto bytePtr = static_cast<char *>(malloc(data.size()));
+          attr->value.value.byteVectorValue = bytePtr;
+          attr->value.size = data.size();
+          ::memcpy(bytePtr, data.data(), data.size());
+          break;
+        }
+        case Variant::ByteVectorList:
+        case Variant::VariantList:
+        case Variant::VariantMap: {
+          attr->value.type = TagLib_Variant_String;
+          std::stringstream ss;
+          ss << v;
+          attr->value.value.stringValue = stringToCharArray(ss.str());
+          break;
+        }
+        }
+        *attrPtr++ = attr++;
       }
-      case Variant::ByteVector: {
-        attr->value.type = TagLib_Variant_ByteVector;
-        const ByteVector data = v.value<ByteVector>();
-        auto bytePtr = static_cast<char *>(malloc(data.size()));
-        attr->value.value.byteVectorValue = bytePtr;
-        attr->value.size = data.size();
-        ::memcpy(bytePtr, data.data(), data.size());
-        break;
-      }
-      case Variant::ByteVectorList:
-      case Variant::VariantList:
-      case Variant::VariantMap: {
-        attr->value.type = TagLib_Variant_String;
-        std::stringstream ss;
-        ss << v;
-        attr->value.value.stringValue = stringToCharArray(ss.str());
-        break;
-      }
-      }
-      *attrPtr++ = attr++;
+      *attrPtr = NULL;
+      *propPtr++ = attrs;
     }
-    *attrPtr++ = NULL;
-    *propPtr++ = attrs;
   }
   *propPtr = NULL;
   return props;

@@ -145,7 +145,6 @@ void Vorbis::Properties::read(File *file)
   pos += 4;
 
   d->bitrateMinimum = data.toUInt(pos, false);
-  pos += 4;
 
   // Find the length of the file.  See http://wiki.xiph.org/VorbisStreamLength/
   // for my notes on the topic.
