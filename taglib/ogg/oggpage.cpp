@@ -26,6 +26,7 @@
 #include "oggpage.h"
 
 #include <algorithm>
+#include <numeric>
 #include <array>
 #include <utility>
 
@@ -91,10 +92,10 @@ unsigned int pageChecksum(const ByteVector &data)
     0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
   };
 
-  unsigned int sum = 0;
-  for(const auto &byte : data)
-    sum = (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ static_cast<unsigned char>(byte)];
-  return sum;
+  return std::accumulate(data.cbegin(), data.cend(), 0U,
+      [](unsigned int sum, unsigned char byte) {
+    return (sum << 8) ^ crcTable[((sum >> 24) & 0xff) ^ byte];
+  });
 }
 
 }  // namespace
@@ -212,8 +213,8 @@ ByteVectorList Ogg::Page::packets() const
     d->file->seek(d->fileOffset + d->header.size());
 
     const List<int> packetSizes = d->header.packetSizes();
-    for(const auto &size : packetSizes)
-      l.append(d->file->readBlock(size));
+    for(const auto &sz : packetSizes)
+      l.append(d->file->readBlock(sz));
   }
   else
     debug("Ogg::Page::packets() -- attempting to read packets from an invalid page.");
@@ -272,9 +273,10 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 
   if(strategy != Repaginate) {
 
-    size_t tableSize = 0;
-    for(const auto &packet : packets)
-      tableSize += packet.size() / 255 + 1;
+    size_t tableSize = std::accumulate(packets.cbegin(), packets.cend(), 0,
+        [](size_t acc, const ByteVector &packet) {
+      return acc + packet.size() / 255 + 1;
+    });
 
     if(tableSize > 255)
       strategy = Repaginate;

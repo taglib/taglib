@@ -131,7 +131,7 @@ std::pair<Frame::Header *, bool> FrameFactory::prepareFrameHeader(
   }
 
 #ifndef NO_ITUNES_HACKS
-  if(version == 3 && frameID.size() == 4 && frameID[3] == '\0') {
+  if(version == 3 && frameID[3] == '\0') {
     // iTunes v2.3 tags store v2.2 frames - convert now
     frameID = frameID.mid(0, 3);
     header->setFrameID(frameID);

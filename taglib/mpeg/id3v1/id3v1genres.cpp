@@ -272,8 +272,8 @@ int ID3v1::genreIndex(const String &name)
     std::pair(L"BritPop", 132),
     std::pair(L"Negerpunk", 133),
   };
-  for(const auto &[genre, code] : fixUpGenres) {
-    if(name == genre)
+  for(const auto &[genreName, code] : fixUpGenres) {
+    if(name == genreName)
       return code;
   }
 

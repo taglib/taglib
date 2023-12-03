@@ -714,7 +714,7 @@ public:
       CPPUNIT_ASSERT(f.tag()->isEmpty());
       CPPUNIT_ASSERT(fileEqual(
         copy.fileName(),
-        TEST_FILE_PATH_C("no-tags.m4a")));
+        testFilePath("no-tags.m4a")));
     }
   }
 

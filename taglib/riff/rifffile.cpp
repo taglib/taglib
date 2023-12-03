@@ -297,21 +297,21 @@ void RIFF::File::read()
   while(offset + 8 <= length()) {
 
     seek(offset);
-    const ByteVector   chunkName = readBlock(4);
+    const ByteVector   chnkName = readBlock(4);
     const unsigned int chunkSize = readBlock(4).toUInt(bigEndian);
 
-    if(!isValidChunkName(chunkName)) {
-      debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
+    if(!isValidChunkName(chnkName)) {
+      debug("RIFF::File::read() -- Chunk '" + chnkName + "' has invalid ID");
       break;
     }
 
     if(static_cast<long long>(offset) + 8 + chunkSize > length()) {
-      debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
+      debug("RIFF::File::read() -- Chunk '" + chnkName + "' has invalid size (larger than the file size)");
       break;
     }
 
     Chunk chunk;
-    chunk.name    = chunkName;
+    chunk.name    = chnkName;
     chunk.size    = chunkSize;
     chunk.offset  = offset + 8;
     chunk.padding = 0;

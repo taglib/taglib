@@ -25,6 +25,7 @@
 
 #include "flacfile.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "tdebug.h"
@@ -144,11 +145,11 @@ StringList FLAC::File::complexPropertyKeys() const
 {
   StringList keys = TagLib::File::complexPropertyKeys();
   if(!keys.contains("PICTURE")) {
-    for(const auto &block : std::as_const(d->blocks)) {
-      if(dynamic_cast<Picture *>(block) != nullptr) {
-        keys.append("PICTURE");
-        break;
-      }
+    if(std::any_of(d->blocks.cbegin(), d->blocks.cend(),
+        [](MetadataBlock *block) {
+      return dynamic_cast<Picture *>(block) != nullptr;
+    })) {
+      keys.append("PICTURE");
     }
   }
   return keys;
@@ -158,7 +159,7 @@ List<VariantMap> FLAC::File::complexProperties(const String &key) const
 {
   const String uppercaseKey = key.upper();
   if(uppercaseKey == "PICTURE") {
-    List<VariantMap> properties;
+    List<VariantMap> props;
     for(const auto &block : std::as_const(d->blocks)) {
       if(auto picture = dynamic_cast<Picture *>(block)) {
         VariantMap property;
@@ -171,10 +172,10 @@ List<VariantMap> FLAC::File::complexProperties(const String &key) const
         property.insert("height", picture->height());
         property.insert("numColors", picture->numColors());
         property.insert("colorDepth", picture->colorDepth());
-        properties.append(property);
+        props.append(property);
       }
     }
-    return properties;
+    return props;
   }
   return TagLib::File::complexProperties(key);
 }

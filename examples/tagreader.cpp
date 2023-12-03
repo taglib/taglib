@@ -58,16 +58,16 @@ int main(int argc, char *argv[])
       TagLib::PropertyMap tags = f.properties();
       if(!tags.isEmpty()) {
         unsigned int longest = 0;
-        for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
-          if (i->first.size() > longest) {
-            longest = i->first.size();
+        for(auto j = tags.cbegin(); j != tags.cend(); ++j) {
+          if (j->first.size() > longest) {
+            longest = j->first.size();
           }
         }
 
         cout << "-- TAG (properties) --" << endl;
-        for(auto i = tags.cbegin(); i != tags.cend(); ++i) {
-          for(auto j = i->second.begin(); j != i->second.end(); ++j) {
-            cout << left << std::setfill(' ') << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
+        for(auto j = tags.cbegin(); j != tags.cend(); ++j) {
+          for(auto k = j->second.begin(); k != j->second.end(); ++k) {
+            cout << left << std::setfill(' ') << std::setw(longest) << j->first << " - " << '"' << *k << '"' << endl;
           }
         }
       }

@@ -135,23 +135,23 @@ PropertyMap Mod::Tag::properties() const
 
 PropertyMap Mod::Tag::setProperties(const PropertyMap &origProps)
 {
-  PropertyMap properties(origProps);
-  properties.removeEmpty();
+  PropertyMap props(origProps);
+  props.removeEmpty();
   StringList oneValueSet;
-  if(properties.contains("TITLE")) {
-    d->title = properties["TITLE"].front();
+  if(props.contains("TITLE")) {
+    d->title = props["TITLE"].front();
     oneValueSet.append("TITLE");
   } else
     d->title.clear();
 
-  if(properties.contains("COMMENT")) {
-    d->comment = properties["COMMENT"].front();
+  if(props.contains("COMMENT")) {
+    d->comment = props["COMMENT"].front();
     oneValueSet.append("COMMENT");
   } else
     d->comment.clear();
 
-  if(properties.contains("TRACKERNAME")) {
-    d->trackerName = properties["TRACKERNAME"].front();
+  if(props.contains("TRACKERNAME")) {
+    d->trackerName = props["TRACKERNAME"].front();
     oneValueSet.append("TRACKERNAME");
   } else
     d->trackerName.clear();
@@ -159,10 +159,10 @@ PropertyMap Mod::Tag::setProperties(const PropertyMap &origProps)
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.
   for(const auto &entry : std::as_const(oneValueSet)) {
-    if(properties[entry].size() == 1)
-      properties.erase(entry);
+    if(props[entry].size() == 1)
+      props.erase(entry);
     else
-      properties[entry].erase(properties[entry].begin());
+      props[entry].erase(props[entry].begin());
   }
-  return properties;
+  return props;
 }

@@ -308,14 +308,16 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
 
     // Samples per frame
 
-    static constexpr std::array samplesPerFrame {
+    static constexpr std::array samplesPerFrameForLayer {
       // MPEG1, 2/2.5
       std::pair(384, 384),   // Layer I
       std::pair(1152, 1152), // Layer II
       std::pair(1152, 576),  // Layer III
     };
 
-    d->samplesPerFrame = versionIndex ? samplesPerFrame[layerIndex].second : samplesPerFrame[layerIndex].first;
+    d->samplesPerFrame = versionIndex
+      ? samplesPerFrameForLayer[layerIndex].second
+      : samplesPerFrameForLayer[layerIndex].first;
 
     // Calculate the frame length
 

@@ -132,12 +132,9 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
   if(name1 == nullptr) {
     return this;
   }
-  for(const auto &child : std::as_const(children)) {
-    if(child->name == name1) {
-      return child->find(name2, name3, name4);
-    }
-  }
-  return nullptr;
+  auto it = std::find_if(children.cbegin(), children.cend(),
+      [&name1](Atom *child) { return child->name == name1; });
+  return it != children.cend() ? (*it)->find(name2, name3, name4) : nullptr;
 }
 
 MP4::AtomList
@@ -162,12 +159,9 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
   if(name1 == nullptr) {
     return true;
   }
-  for(const auto &child : std::as_const(children)) {
-    if(child->name == name1) {
-      return child->path(path, name2, name3);
-    }
-  }
-  return false;
+  auto it = std::find_if(children.cbegin(), children.cend(),
+      [&name1](Atom *child) { return child->name == name1; });
+  return it != children.cend() ? (*it)->path(path, name2, name3) : false;
 }
 
 MP4::Atoms::Atoms(File *file)
@@ -190,25 +184,22 @@ MP4::Atoms::~Atoms() = default;
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)
 {
-  for(const auto &atom : std::as_const(atoms)) {
-    if(atom->name == name1) {
-      return atom->find(name2, name3, name4);
-    }
-  }
-  return nullptr;
+  auto it = std::find_if(atoms.cbegin(), atoms.cend(),
+      [&name1](Atom *atom) { return atom->name == name1; });
+  return it != atoms.cend() ? (*it)->find(name2, name3, name4) : nullptr;
 }
 
 MP4::AtomList
 MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const char *name4)
 {
   MP4::AtomList path;
-  for(const auto &atom : std::as_const(atoms)) {
-    if(atom->name == name1) {
-      if(!atom->path(path, name2, name3, name4)) {
-        path.clear();
-      }
-      return path;
+  auto it = std::find_if(atoms.cbegin(), atoms.cend(),
+      [&name1](Atom *atom) { return atom->name == name1; });
+  if(it != atoms.cend()) {
+    if(!(*it)->path(path, name2, name3, name4)) {
+      path.clear();
     }
+    return path;
   }
   return path;
 }

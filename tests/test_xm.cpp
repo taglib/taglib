@@ -216,7 +216,7 @@ private:
              commentAfter, trackerNameAfter);
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
-      TEST_FILE_PATH_C("changed.xm")));
+      testFilePath("changed.xm")));
   }
 };
 

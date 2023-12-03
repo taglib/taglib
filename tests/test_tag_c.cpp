@@ -108,6 +108,7 @@ public:
       taglib_property_set_append(file, "COMPOSER", "Composer 2");
       taglib_property_set(file, "ALBUMARTIST", "Album Artist");
 
+      // cppcheck-suppress cstyleCast
       TAGLIB_COMPLEX_PROPERTY_PICTURE(props, "JPEG Data", 9, "Written by TagLib",
                                       "image/jpeg", "Front Cover");
       taglib_complex_property_set(file, "PICTURE", props);

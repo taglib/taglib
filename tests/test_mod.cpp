@@ -79,7 +79,7 @@ public:
     testRead(copy.fileName().c_str(), titleAfter, commentAfter);
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
-      TEST_FILE_PATH_C("changed.mod")));
+      testFilePath("changed.mod")));
   }
 
   void testPropertyInterface()

@@ -197,9 +197,9 @@ ASF::AttributeList ASF::Tag::attribute(const String &name) const
 
 void ASF::Tag::setAttribute(const String &name, const Attribute &attribute)
 {
-  AttributeList value;
-  value.append(attribute);
-  d->attributeListMap.insert(name, value);
+  AttributeList val;
+  val.append(attribute);
+  d->attributeListMap.insert(name, val);
 }
 
 void ASF::Tag::setAttribute(const String &name, const AttributeList &values)
@@ -313,15 +313,15 @@ PropertyMap ASF::Tag::properties() const
   for(const auto &[k, attributes] : std::as_const(d->attributeListMap)) {
     const String key = translateKey(k);
     if(!key.isEmpty()) {
-      for(const auto &attribute : attributes) {
+      for(const auto &attr : attributes) {
         if(key == "TRACKNUMBER") {
-          if(attribute.type() == ASF::Attribute::DWordType)
-            props.insert(key, String::number(attribute.toUInt()));
+          if(attr.type() == ASF::Attribute::DWordType)
+            props.insert(key, String::number(attr.toUInt()));
           else
-            props.insert(key, attribute.toString());
+            props.insert(key, attr.toString());
         }
         else {
-          props.insert(key, attribute.toString());
+          props.insert(key, attr.toString());
         }
       }
     }
@@ -373,8 +373,8 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
     if(reverseKeyMap.contains(prop)) {
       String name = reverseKeyMap[prop];
       removeItem(name);
-      for(const auto &attribute : attributes) {
-        addAttribute(name, attribute);
+      for(const auto &attr : attributes) {
+        addAttribute(name, attr);
       }
     }
     else if(prop == "TITLE") {
@@ -408,22 +408,22 @@ StringList ASF::Tag::complexPropertyKeys() const
 
 List<VariantMap> ASF::Tag::complexProperties(const String &key) const
 {
-  List<VariantMap> properties;
+  List<VariantMap> props;
   const String uppercaseKey = key.upper();
   if(uppercaseKey == "PICTURE") {
     const AttributeList pictures = d->attributeListMap.value("WM/Picture");
-    for(const Attribute &attribute : pictures) {
-      ASF::Picture picture = attribute.toPicture();
+    for(const Attribute &attr : pictures) {
+      ASF::Picture picture = attr.toPicture();
       VariantMap property;
       property.insert("data", picture.picture());
       property.insert("mimeType", picture.mimeType());
       property.insert("description", picture.description());
       property.insert("pictureType",
         ASF::Picture::typeToString(picture.type()));
-      properties.append(property);
+      props.append(property);
     }
   }
-  return properties;
+  return props;
 }
 
 bool ASF::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)

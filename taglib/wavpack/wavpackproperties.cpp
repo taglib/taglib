@@ -249,10 +249,10 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
     }
 
     const unsigned int blockSize = data.toUInt(4, false);
-    const unsigned int sampleFrames  = data.toUInt(12, false);
+    const unsigned int smplFrames  = data.toUInt(12, false);
     const unsigned int blockSamples = data.toUInt(20, false);
     const unsigned int flags = data.toUInt(24, false);
-    unsigned int sampleRate = sampleRates[(flags & SRATE_MASK) >> SRATE_LSB];
+    unsigned int smplRate = sampleRates[(flags & SRATE_MASK) >> SRATE_LSB];
 
     if(!blockSamples) {        // ignore blocks with no samples
       offset += blockSize + 8;
@@ -267,7 +267,7 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
     // For non-standard sample rates or DSD audio files, we must read and parse the block
     // to actually determine the sample rate.
 
-    if(!sampleRate || (flags & DSD_FLAG)) {
+    if(!smplRate || (flags & DSD_FLAG)) {
       const unsigned int adjustedBlockSize = blockSize - 24;
       const ByteVector block = file->readBlock(adjustedBlockSize);
 
@@ -276,11 +276,11 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
         break;
       }
 
-      if(!sampleRate)
-        sampleRate = static_cast<unsigned int>(getNonStandardRate(block));
+      if(!smplRate)
+        smplRate = static_cast<unsigned int>(getNonStandardRate(block));
 
-      if(sampleRate && (flags & DSD_FLAG))
-        sampleRate <<= getDsdRateShifter(block);
+      if(smplRate && (flags & DSD_FLAG))
+        smplRate <<= getDsdRateShifter(block);
     }
 
     if(flags & INITIAL_BLOCK) {
@@ -289,9 +289,9 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
         break;
 
       d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB);
-      d->sampleRate    = static_cast<int>(sampleRate);
+      d->sampleRate    = static_cast<int>(smplRate);
       d->lossless      = !(flags & HYBRID_FLAG);
-      d->sampleFrames  = sampleFrames;
+      d->sampleFrames  = smplFrames;
     }
 
     d->channels += (flags & MONO_FLAG) ? 1 : 2;
@@ -331,11 +331,11 @@ unsigned int WavPack::Properties::seekFinalIndex(File *file, offset_t streamLeng
     const unsigned int blockIndex   = data.toUInt(16, false);
     const unsigned int blockSamples = data.toUInt(20, false);
     const unsigned int flags        = data.toUInt(24, false);
-    const int version               = data.toShort(8, false);
+    const int vers                  = data.toShort(8, false);
 
     // try not to trigger on a spurious "wvpk" in WavPack binary block data
 
-    if(version < MIN_STREAM_VERS || version > MAX_STREAM_VERS || (blockSize & 1) ||
+    if(vers < MIN_STREAM_VERS || vers > MAX_STREAM_VERS || (blockSize & 1) ||
       blockSize < 24 || blockSize >= 1048576 || blockSamples > 131072)
         continue;
 

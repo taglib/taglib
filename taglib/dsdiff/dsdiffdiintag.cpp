@@ -128,18 +128,18 @@ PropertyMap DSDIFF::DIIN::Tag::properties() const
 
 PropertyMap DSDIFF::DIIN::Tag::setProperties(const PropertyMap &origProps)
 {
-  PropertyMap properties(origProps);
-  properties.removeEmpty();
+  PropertyMap props(origProps);
+  props.removeEmpty();
   StringList oneValueSet;
 
-  if(properties.contains("TITLE")) {
-    d->title = properties["TITLE"].front();
+  if(props.contains("TITLE")) {
+    d->title = props["TITLE"].front();
     oneValueSet.append("TITLE");
   } else
     d->title.clear();
 
-  if(properties.contains("ARTIST")) {
-    d->artist = properties["ARTIST"].front();
+  if(props.contains("ARTIST")) {
+    d->artist = props["ARTIST"].front();
     oneValueSet.append("ARTIST");
   } else
     d->artist.clear();
@@ -147,10 +147,10 @@ PropertyMap DSDIFF::DIIN::Tag::setProperties(const PropertyMap &origProps)
   // for each tag that has been set above, remove the first entry in the corresponding
   // value list. The others will be returned as unsupported by this format.
   for(const auto &entry : std::as_const(oneValueSet)) {
-    if(properties[entry].size() == 1)
-      properties.erase(entry);
+    if(props[entry].size() == 1)
+      props.erase(entry);
     else
-      properties[entry].erase(properties[entry].begin());
+      props[entry].erase(props[entry].begin());
   }
-  return properties;
+  return props;
 }
