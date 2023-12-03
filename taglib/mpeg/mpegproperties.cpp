@@ -165,7 +165,7 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
     d->bitrate = static_cast<int>(d->xingHeader->totalSize() * 8.0 / length + 0.5);
   }
   else {
-    int bitrate = firstHeader.bitrate();
+    int bitRate = firstHeader.bitrate();
     if(firstHeader.isADTS()) {
       // ADTS is probably VBR, so to get the real length, we would have to go
       // through all frames, count the frames in numFrames and sum their
@@ -180,7 +180,7 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
       // for 10 frames and then calculate the length from the estimated bitrate
       // and the stream length.
       if(readStyle == Fast) {
-        bitrate = 0;
+        bitRate = 0;
         d->length = 0;
       }
       else {
@@ -210,7 +210,7 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
             lastBytesPerFrame = bytesPerFrame;
           }
         }
-        bitrate = firstHeader.samplesPerFrame() != 0
+        bitRate = firstHeader.samplesPerFrame() != 0
           ? static_cast<int>((bytesPerFrame * 8 * firstHeader.sampleRate())
                              / 1000 / firstHeader.samplesPerFrame())
           : 0;
@@ -222,10 +222,10 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
 
       // TODO: Make this more robust with audio property detection for VBR without a
       // Xing header.
-      bitrate = firstHeader.bitrate();
+      bitRate = firstHeader.bitrate();
     }
-    if(bitrate > 0) {
-      d->bitrate = bitrate;
+    if(bitRate > 0) {
+      d->bitrate = bitRate;
 
       // Look for the last MPEG audio frame to calculate the stream length.
 

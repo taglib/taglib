@@ -83,7 +83,7 @@ public:
     testRead(copy.fileName().c_str(), titleAfter, commentAfter);
     CPPUNIT_ASSERT(fileEqual(
       copy.fileName(),
-      TEST_FILE_PATH_C("changed.s3m")));
+      testFilePath("changed.s3m")));
   }
 
 private:

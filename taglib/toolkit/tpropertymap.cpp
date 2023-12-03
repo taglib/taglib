@@ -51,9 +51,9 @@ PropertyMap::PropertyMap(const PropertyMap &m) :
 PropertyMap::PropertyMap(const SimplePropertyMap &m) :
   d(std::make_unique<PropertyMapPrivate>())
 {
-  for(const auto &[key, value] : m) {
+  for(const auto &[key, val] : m) {
     if(!key.isEmpty())
-      insert(key.upper(), value);
+      insert(key.upper(), val);
     else
       d->unsupported.append(key.upper());
   }
@@ -116,8 +116,8 @@ PropertyMap &PropertyMap::erase(const PropertyMap &other)
 
 PropertyMap &PropertyMap::merge(const PropertyMap &other)
 {
-  for(const auto &[property, value] : other)
-    insert(property, value);
+  for(const auto &[property, val] : other)
+    insert(property, val);
   d->unsupported.append(other.d->unsupported);
   return *this;
 }
@@ -140,14 +140,14 @@ StringList &PropertyMap::operator[](const String &key)
 
 bool PropertyMap::operator==(const PropertyMap &other) const
 {
-  for(const auto &[property, value] : other) {
+  for(const auto &[property, val] : other) {
     auto thisFind = find(property);
-    if(thisFind == end() || (thisFind->second != value))
+    if(thisFind == end() || (thisFind->second != val))
       return false;
   }
-  for(const auto &[property, value] : *this) {
+  for(const auto &[property, val] : *this) {
     auto otherFind = other.find(property);
-    if(otherFind == other.end() || (otherFind->second != value))
+    if(otherFind == other.end() || (otherFind->second != val))
       return false;
   }
   return d->unsupported == other.d->unsupported;
@@ -162,8 +162,8 @@ String PropertyMap::toString() const
 {
   String ret;
 
-  for(const auto &[property, value] : *this)
-    ret += property + "=" + value.toString(", ") + "\n";
+  for(const auto &[property, val] : *this)
+    ret += property + "=" + val.toString(", ") + "\n";
   if(!d->unsupported.isEmpty())
     ret += "Unsupported Data: " + d->unsupported.toString(", ") + "\n";
   return ret;
@@ -172,9 +172,9 @@ String PropertyMap::toString() const
 void PropertyMap::removeEmpty()
 {
   PropertyMap m;
-  for(const auto &[property, value] : std::as_const(*this)) {
-    if(!value.isEmpty())
-      m.insert(property, value);
+  for(const auto &[property, val] : std::as_const(*this)) {
+    if(!val.isEmpty())
+      m.insert(property, val);
   }
   *this = m;
 }

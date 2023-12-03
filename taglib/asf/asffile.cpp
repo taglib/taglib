@@ -369,8 +369,8 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
   long long dataSize = readDWORD(file);
   long long dataPos = 0;
   while(dataPos < dataSize) {
-    ByteVector guid = file->readBlock(16);
-    if(guid.size() != 16) {
+    ByteVector uid = file->readBlock(16);
+    if(uid.size() != 16) {
       file->setValid(false);
       break;
     }
@@ -381,16 +381,16 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
       break;
     }
     BaseObject *obj;
-    if(guid == metadataGuid) {
+    if(uid == metadataGuid) {
       file->d->metadataObject = new MetadataObject();
       obj = file->d->metadataObject;
     }
-    else if(guid == metadataLibraryGuid) {
+    else if(uid == metadataLibraryGuid) {
       file->d->metadataLibraryObject = new MetadataLibraryObject();
       obj = file->d->metadataLibraryObject;
     }
     else {
-      obj = new UnknownObject(guid);
+      obj = new UnknownObject(uid);
     }
     obj->parse(file, static_cast<unsigned int>(size));
     objects.append(obj);

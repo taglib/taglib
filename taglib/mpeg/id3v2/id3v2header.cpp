@@ -25,6 +25,7 @@
 
 #include "id3v2header.h"
 
+#include <algorithm>
 #include <bitset>
 
 #include "tstring.h"
@@ -197,12 +198,11 @@ void Header::parse(const ByteVector &data)
     return;
   }
 
-  for(const auto &size : sizeData) {
-    if(static_cast<unsigned char>(size) >= 128) {
-      d->tagSize = 0;
-      debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
-      return;
-    }
+  if(std::any_of(sizeData.cbegin(), sizeData.cend(),
+      [](unsigned char size) { return size >= 128; })) {
+    d->tagSize = 0;
+    debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
+    return;
   }
 
   // The first three bytes, data[0..2], are the File Identifier, "ID3". (structure 3.1 "file identifier")

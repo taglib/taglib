@@ -70,7 +70,7 @@ public:
   TagUnionPrivate() = default;
   ~TagUnionPrivate()
   {
-    for(auto &tag : tags)
+    for(Tag *tag : tags)
       delete tag;
   }
 
@@ -106,29 +106,26 @@ void TagUnion::set(int index, Tag *tag)
 
 PropertyMap TagUnion::properties() const
 {
-  for(const auto &tag : d->tags) {
-    if(tag && !tag->isEmpty()) {
-      return tag->properties();
-    }
-  }
-
-  return PropertyMap();
+  auto it = std::find_if(d->tags.cbegin(), d->tags.cend(), [](Tag *t) {
+    return t && !t->isEmpty();
+  });
+  return it != d->tags.cend() ? (*it)->properties() : PropertyMap();
 }
 
 void TagUnion::removeUnsupportedProperties(const StringList &unsupported)
 {
-  for(const auto &tag : d->tags) {
-    if(tag) {
-      tag->removeUnsupportedProperties(unsupported);
+  for(const auto &t : d->tags) {
+    if(t) {
+      t->removeUnsupportedProperties(unsupported);
     }
   }
 }
 
 StringList TagUnion::complexPropertyKeys() const
 {
-  for(const auto &tag : d->tags) {
-    if(tag) {
-      const StringList keys = tag->complexPropertyKeys();
+  for(const auto &t : d->tags) {
+    if(t) {
+      const StringList keys = t->complexPropertyKeys();
       if(!keys.isEmpty()) {
         return keys;
       }
@@ -139,9 +136,9 @@ StringList TagUnion::complexPropertyKeys() const
 
 List<VariantMap> TagUnion::complexProperties(const String &key) const
 {
-  for(const auto &tag : d->tags) {
-    if(tag) {
-      const List<VariantMap> props = tag->complexProperties(key);
+  for(const auto &t : d->tags) {
+    if(t) {
+      const List<VariantMap> props = t->complexProperties(key);
       if(!props.isEmpty()) {
         return props;
       }
@@ -153,9 +150,9 @@ List<VariantMap> TagUnion::complexProperties(const String &key) const
 bool TagUnion::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
   bool combinedResult = false;
-  for(const auto &tag : d->tags) {
-    if(tag) {
-      if(tag->setComplexProperties(key, value)) {
+  for(const auto &t : d->tags) {
+    if(t) {
+      if(t->setComplexProperties(key, value)) {
         combinedResult = true;
       }
     }

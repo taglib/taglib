@@ -115,21 +115,21 @@ void APE::Properties::read(File *file, offset_t streamLength)
 {
   // First, we assume that the file pointer is set at the first descriptor.
   offset_t offset = file->tell();
-  int version = headerVersion(file->readBlock(6));
+  int vers = headerVersion(file->readBlock(6));
 
   // Next, we look for the descriptor.
-  if(version < 0) {
+  if(vers < 0) {
     offset = file->find("MAC ", offset);
     file->seek(offset);
-    version = headerVersion(file->readBlock(6));
+    vers = headerVersion(file->readBlock(6));
   }
 
-  if(version < 0) {
+  if(vers < 0) {
     debug("APE::Properties::read() -- APE descriptor not found");
     return;
   }
 
-  d->version = version;
+  d->version = vers;
 
   if(d->version >= 3980)
     analyzeCurrent(file);

@@ -199,10 +199,10 @@ namespace
 PropertyMap RIFF::Info::Tag::properties() const
 {
   PropertyMap props;
-  for(const auto &[id, value] : std::as_const(d->fieldListMap)) {
+  for(const auto &[id, val] : std::as_const(d->fieldListMap)) {
     String key = propertyKeyForId.value(id);
     if(!key.isEmpty()) {
-      props[key].append(value);
+      props[key].append(val);
     }
     else {
       props.addUnsupportedData(key);
@@ -234,13 +234,13 @@ PropertyMap RIFF::Info::Tag::setProperties(const PropertyMap &props)
   }
 
   PropertyMap ignoredProps;
-  for(const auto &[key, value] : props) {
+  for(const auto &[key, val] : props) {
     ByteVector id = idForPropertyKey.value(key);
-    if(!id.isEmpty() && !value.isEmpty()) {
-      d->fieldListMap[id] = value.front();
+    if(!id.isEmpty() && !val.isEmpty()) {
+      d->fieldListMap[id] = val.front();
     }
     else {
-      ignoredProps.insert(key, value);
+      ignoredProps.insert(key, val);
     }
   }
   return ignoredProps;

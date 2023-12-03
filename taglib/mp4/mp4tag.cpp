@@ -74,9 +74,9 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
   for(const auto &atom : std::as_const(ilst->children)) {
     file->seek(atom->offset + 8);
     ByteVector data = d->file->readBlock(atom->length - 8);
-    const auto &[name, item] = d->factory->parseItem(atom, data);
-    if (item.isValid()) {
-      addItem(name, item);
+    const auto &[name, itm] = d->factory->parseItem(atom, data);
+    if (itm.isValid()) {
+      addItem(name, itm);
     }
   }
 }
@@ -102,8 +102,8 @@ bool
 MP4::Tag::save()
 {
   ByteVector data;
-  for(const auto &[name, item] : std::as_const(d->items)) {
-    data.append(d->factory->renderItem(name, item));
+  for(const auto &[name, itm] : std::as_const(d->items)) {
+    data.append(d->factory->renderItem(name, itm));
   }
   data = renderAtom("ilst", data);
 
@@ -473,9 +473,9 @@ PropertyMap MP4::Tag::properties() const
 {
   PropertyMap props;
   for(const auto &[k, t] : std::as_const(d->items)) {
-    auto [key, value] = d->factory->itemToProperty(k.data(String::Latin1), t);
+    auto [key, val] = d->factory->itemToProperty(k.data(String::Latin1), t);
     if(!key.isEmpty()) {
-      props[key] = value;
+      props[key] = val;
     }
     else {
       props.addUnsupportedData(k);
@@ -501,9 +501,9 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
 
   PropertyMap ignoredProps;
   for(const auto &[prop, val] : props) {
-    auto [name, item] = d->factory->itemFromProperty(prop, val);
-    if(item.isValid()) {
-      d->items[name] = item;
+    auto [name, itm] = d->factory->itemFromProperty(prop, val);
+    if(itm.isValid()) {
+      d->items[name] = itm;
     }
     else {
       ignoredProps.insert(prop, val);
@@ -524,7 +524,7 @@ StringList MP4::Tag::complexPropertyKeys() const
 
 List<VariantMap> MP4::Tag::complexProperties(const String &key) const
 {
-  List<VariantMap> properties;
+  List<VariantMap> props;
   const String uppercaseKey = key.upper();
   if(uppercaseKey == "PICTURE") {
     const CoverArtList pictures = d->items.value("covr").toCoverArtList();
@@ -550,10 +550,10 @@ List<VariantMap> MP4::Tag::complexProperties(const String &key) const
       VariantMap property;
       property.insert("data", picture.data());
       property.insert("mimeType", mimeType);
-      properties.append(property);
+      props.append(property);
     }
   }
-  return properties;
+  return props;
 }
 
 bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)

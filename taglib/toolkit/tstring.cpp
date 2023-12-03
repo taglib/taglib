@@ -482,14 +482,14 @@ ByteVector String::data(Type t) const
 
 int String::toInt(bool *ok) const
 {
-  const wchar_t *begin = d->data.c_str();
-  wchar_t *end;
+  const wchar_t *beginPtr = d->data.c_str();
+  wchar_t *endPtr;
   errno = 0;
-  const long value = ::wcstol(begin, &end, 10);
+  const long value = ::wcstol(beginPtr, &endPtr, 10);
 
   // Has wcstol() consumed the entire string and not overflowed?
   if(ok) {
-    *ok = (errno == 0 && end > begin && *end == L'\0');
+    *ok = (errno == 0 && endPtr > beginPtr && *endPtr == L'\0');
     *ok = (*ok && value > INT_MIN && value < INT_MAX);
   }
 

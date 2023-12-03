@@ -102,44 +102,44 @@ ByteVector APE::Tag::fileIdentifier()
 
 String APE::Tag::title() const
 {
-  Item value = d->itemListMap.value("TITLE");
-  return value.isEmpty() ? String() : joinTagValues(value.values());
+  Item val = d->itemListMap.value("TITLE");
+  return val.isEmpty() ? String() : joinTagValues(val.values());
 }
 
 String APE::Tag::artist() const
 {
-  Item value = d->itemListMap.value("ARTIST");
-  return value.isEmpty() ? String() : joinTagValues(value.values());
+  Item val = d->itemListMap.value("ARTIST");
+  return val.isEmpty() ? String() : joinTagValues(val.values());
 }
 
 String APE::Tag::album() const
 {
-  Item value = d->itemListMap.value("ALBUM");
-  return value.isEmpty() ? String() : joinTagValues(value.values());
+  Item val = d->itemListMap.value("ALBUM");
+  return val.isEmpty() ? String() : joinTagValues(val.values());
 }
 
 String APE::Tag::comment() const
 {
-  Item value = d->itemListMap.value("COMMENT");
-  return value.isEmpty() ? String() : joinTagValues(value.values());
+  Item val = d->itemListMap.value("COMMENT");
+  return val.isEmpty() ? String() : joinTagValues(val.values());
 }
 
 String APE::Tag::genre() const
 {
-  Item value = d->itemListMap.value("GENRE");
-  return value.isEmpty() ? String() : joinTagValues(value.values());
+  Item val = d->itemListMap.value("GENRE");
+  return val.isEmpty() ? String() : joinTagValues(val.values());
 }
 
 unsigned int APE::Tag::year() const
 {
-  Item value = d->itemListMap.value("YEAR");
-  return value.isEmpty() ? 0 : value.toString().toInt();
+  Item val = d->itemListMap.value("YEAR");
+  return val.isEmpty() ? 0 : val.toString().toInt();
 }
 
 unsigned int APE::Tag::track() const
 {
-  Item value = d->itemListMap.value("TRACK");
-  return value.isEmpty() ? 0 : value.toString().toInt();
+  Item val = d->itemListMap.value("TRACK");
+  return val.isEmpty() ? 0 : val.toString().toInt();
 }
 
 void APE::Tag::setTitle(const String &s)
@@ -229,13 +229,13 @@ void APE::Tag::removeUnsupportedProperties(const StringList &properties)
 
 PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 {
-  PropertyMap properties(origProps); // make a local copy that can be modified
+  PropertyMap props(origProps); // make a local copy that can be modified
 
   // see comment in properties()
   for(const auto &[k, t] : keyConversions)
-    if(properties.contains(k)) {
-      properties.insert(t, properties[k]);
-      properties.erase(k);
+    if(props.contains(k)) {
+      props.insert(t, props[k]);
+      props.erase(k);
     }
 
   // first check if tags need to be removed completely
@@ -243,7 +243,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   for(const auto &[k, t] : std::as_const(itemListMap())) {
     String key = k.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
-    if(!key.isEmpty() && t.type() == APE::Item::Text && !properties.contains(key))
+    if(!key.isEmpty() && t.type() == APE::Item::Text && !props.contains(key))
       toRemove.append(k);
   }
 
@@ -252,15 +252,15 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
 
   // now sync in the "forward direction"
   PropertyMap invalid;
-  for(const auto &[tagName, value] : std::as_const(properties)) {
+  for(const auto &[tagName, val] : std::as_const(props)) {
     if(!checkKey(tagName))
-      invalid.insert(tagName, value);
-    else if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == value)) {
-      if(value.isEmpty())
+      invalid.insert(tagName, val);
+    else if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == val)) {
+      if(val.isEmpty())
         removeItem(tagName);
       else {
-        addValue(tagName, *value.begin(), true);
-        for(auto it = std::next(value.begin()); it != value.end(); ++it)
+        addValue(tagName, *val.begin(), true);
+        for(auto it = std::next(val.begin()); it != val.end(); ++it)
           addValue(tagName, *it, false);
       }
     }
@@ -280,7 +280,7 @@ StringList APE::Tag::complexPropertyKeys() const
 
 List<VariantMap> APE::Tag::complexProperties(const String &key) const
 {
-  List<VariantMap> properties;
+  List<VariantMap> props;
   const String uppercaseKey = key.upper();
   if(uppercaseKey == "PICTURE") {
     const StringList itemNames = StringList(FRONT_COVER).append(BACK_COVER);
@@ -306,12 +306,12 @@ List<VariantMap> APE::Tag::complexProperties(const String &key) const
           }
           property.insert("pictureType",
             itemName == BACK_COVER ? "Back Cover" : "Front Cover");
-          properties.append(property);
+          props.append(property);
         }
       }
     }
   }
-  return properties;
+  return props;
 }
 
 bool APE::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)

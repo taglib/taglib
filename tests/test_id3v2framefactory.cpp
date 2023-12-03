@@ -74,9 +74,8 @@ namespace
     }
 
   private:
-    CustomFrame(const ByteVector &data, Header *h) : Frame(h) {
-      parseFields(fieldData(data));
-    }
+    CustomFrame(const ByteVector &data, Header *h)
+      : Frame(h), m_value(fieldData(data).toUInt()) {}
     unsigned int m_value;
   };
 

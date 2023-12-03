@@ -65,34 +65,34 @@ Ogg::XiphComment::~XiphComment() = default;
 
 String Ogg::XiphComment::title() const
 {
-  StringList value = d->fieldListMap.value("TITLE");
-  return value.isEmpty() ? String() : joinTagValues(value);
+  StringList val = d->fieldListMap.value("TITLE");
+  return val.isEmpty() ? String() : joinTagValues(val);
 }
 
 String Ogg::XiphComment::artist() const
 {
-  StringList value = d->fieldListMap.value("ARTIST");
-  return value.isEmpty() ? String() : joinTagValues(value);
+  StringList val = d->fieldListMap.value("ARTIST");
+  return val.isEmpty() ? String() : joinTagValues(val);
 }
 
 String Ogg::XiphComment::album() const
 {
-  StringList value = d->fieldListMap.value("ALBUM");
-  return value.isEmpty() ? String() : joinTagValues(value);
+  StringList val = d->fieldListMap.value("ALBUM");
+  return val.isEmpty() ? String() : joinTagValues(val);
 }
 
 String Ogg::XiphComment::comment() const
 {
-  StringList value = d->fieldListMap.value("DESCRIPTION");
-  if(!value.isEmpty()) {
+  StringList val = d->fieldListMap.value("DESCRIPTION");
+  if(!val.isEmpty()) {
     d->commentField = "DESCRIPTION";
-    return joinTagValues(value);
+    return joinTagValues(val);
   }
 
-  value = d->fieldListMap.value("COMMENT");
-  if(!value.isEmpty()) {
+  val = d->fieldListMap.value("COMMENT");
+  if(!val.isEmpty()) {
     d->commentField = "COMMENT";
-    return joinTagValues(value);
+    return joinTagValues(val);
   }
 
   return String();
@@ -100,29 +100,29 @@ String Ogg::XiphComment::comment() const
 
 String Ogg::XiphComment::genre() const
 {
-  StringList value = d->fieldListMap.value("GENRE");
-  return value.isEmpty() ? String() : joinTagValues(value);
+  StringList val = d->fieldListMap.value("GENRE");
+  return val.isEmpty() ? String() : joinTagValues(val);
 }
 
 unsigned int Ogg::XiphComment::year() const
 {
-  StringList value = d->fieldListMap.value("DATE");
-  if(!value.isEmpty())
-    return value.front().toInt();
-  value = d->fieldListMap.value("YEAR");
-  if(!value.isEmpty())
-    return value.front().toInt();
+  StringList val = d->fieldListMap.value("DATE");
+  if(!val.isEmpty())
+    return val.front().toInt();
+  val = d->fieldListMap.value("YEAR");
+  if(!val.isEmpty())
+    return val.front().toInt();
   return 0;
 }
 
 unsigned int Ogg::XiphComment::track() const
 {
-  StringList value = d->fieldListMap.value("TRACKNUMBER");
-  if(!value.isEmpty())
-    return value.front().toInt();
-  value = d->fieldListMap.value("TRACKNUM");
-  if(!value.isEmpty())
-    return value.front().toInt();
+  StringList val = d->fieldListMap.value("TRACKNUMBER");
+  if(!val.isEmpty())
+    return val.front().toInt();
+  val = d->fieldListMap.value("TRACKNUM");
+  if(!val.isEmpty())
+    return val.front().toInt();
   return 0;
 }
 
@@ -246,7 +246,7 @@ StringList Ogg::XiphComment::complexPropertyKeys() const
 
 List<VariantMap> Ogg::XiphComment::complexProperties(const String &key) const
 {
-  List<VariantMap> properties;
+  List<VariantMap> props;
   const String uppercaseKey = key.upper();
   if(uppercaseKey == "PICTURE") {
     for(const FLAC::Picture *picture : std::as_const(d->pictureList)) {
@@ -260,10 +260,10 @@ List<VariantMap> Ogg::XiphComment::complexProperties(const String &key) const
       property.insert("height", picture->height());
       property.insert("numColors", picture->numColors());
       property.insert("colorDepth", picture->colorDepth());
-      properties.append(property);
+      props.append(property);
     }
   }
-  return properties;
+  return props;
 }
 
 bool Ogg::XiphComment::setComplexProperties(const String &key, const List<VariantMap> &value)
@@ -398,10 +398,10 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 
   for(const auto &[fieldName, values] : std::as_const(d->fieldListMap)) {
     // And now iterate over the values of the current list.
-    for(const auto &value : values) {
+    for(const auto &val : values) {
       ByteVector fieldData = fieldName.data(String::UTF8);
       fieldData.append('=');
-      fieldData.append(value.data(String::UTF8));
+      fieldData.append(val.data(String::UTF8));
 
       data.append(ByteVector::fromUInt(fieldData.size(), false));
       data.append(fieldData);

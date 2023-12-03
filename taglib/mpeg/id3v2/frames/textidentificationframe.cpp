@@ -340,13 +340,15 @@ PropertyMap TextIdentificationFrame::makeTMCLProperties() const
   const StringList l = fieldList();
   for(auto it = l.begin(); it != l.end(); ++it) {
     String instrument = it->upper();
-    if(instrument.isEmpty()) {
+    // ++it == l.end() is not possible with size check above,
+    // verified to silence cppcheck.
+    if(instrument.isEmpty() || ++it == l.end()) {
       // instrument is not a valid key -> frame unsupported
       map.clear();
       map.addUnsupportedData(frameID());
       return map;
     }
-    map.insert(L"PERFORMER:" + instrument, (++it)->split(","));
+    map.insert(L"PERFORMER:" + instrument, it->split(","));
   }
   return map;
 }
