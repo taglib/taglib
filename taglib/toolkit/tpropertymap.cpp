@@ -205,5 +205,9 @@ PropertyMap &PropertyMap::operator=(const PropertyMap &other)
 // Ogg::FieldListMap is used because this will instantiate the same template
 // Map<String, StringList>. Therefore this template is instantiated here
 // and declared extern in the headers using it.
-template class TagLib::Map<TagLib::String, TagLib::StringList>;
+// Suppress warning "needs to have dll-interface to be used by clients",
+// in the template, TAGLIB_EXPORT cannot be used on the members, therefore
+// the private implemenation is exported too, but not accessible by clients.
+#pragma warning(suppress: 4251)
+template class TAGLIB_EXPORT TagLib::Map<TagLib::String, TagLib::StringList>;
 #endif
