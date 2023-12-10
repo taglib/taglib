@@ -410,10 +410,6 @@ namespace TagLib {
        */
       bool encryption() const;
 
-#ifndef DO_NOT_DOCUMENT
-      bool unsycronisation() const;
-#endif
-
       /*!
        * Returns true if unsynchronisation is enabled for this frame.
        */

@@ -639,11 +639,6 @@ bool Frame::Header::encryption() const
   return d->encryption;
 }
 
-bool Frame::Header::unsycronisation() const
-{
-  return unsynchronisation();
-}
-
 bool Frame::Header::unsynchronisation() const
 {
   return d->unsynchronisation;
