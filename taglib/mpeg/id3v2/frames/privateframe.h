@@ -75,7 +75,7 @@ namespace TagLib {
       String owner() const;
 
       /*!
-       *
+       * Returns the private data.
        */
       ByteVector data() const;
 
@@ -86,7 +86,7 @@ namespace TagLib {
       void setOwner(const String &s);
 
       /*!
-       *
+       * Sets the private \a data.
        */
       void setData(const ByteVector &data);
 
