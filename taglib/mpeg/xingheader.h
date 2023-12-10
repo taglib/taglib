@@ -112,6 +112,7 @@ namespace TagLib {
       void parse(const ByteVector &data);
 
       class XingHeaderPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<XingHeaderPrivate> d;
     };
   }  // namespace MPEG

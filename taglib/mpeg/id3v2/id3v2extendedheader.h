@@ -85,6 +85,7 @@ namespace TagLib {
 
     private:
       class ExtendedHeaderPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<ExtendedHeaderPrivate> d;
     };
 

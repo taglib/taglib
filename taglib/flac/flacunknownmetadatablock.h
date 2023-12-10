@@ -69,6 +69,7 @@ namespace TagLib {
 
     private:
       class UnknownMetadataBlockPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<UnknownMetadataBlockPrivate> d;
     };
   }  // namespace FLAC

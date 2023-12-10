@@ -85,6 +85,7 @@ namespace TagLib {
 
     private:
       class UrlLinkFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<UrlLinkFramePrivate> d;
     };
 
@@ -182,6 +183,7 @@ namespace TagLib {
 
     private:
       class UserUrlLinkFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<UserUrlLinkFramePrivate> d;
     };
 

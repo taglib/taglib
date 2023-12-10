@@ -242,6 +242,7 @@ namespace TagLib {
       ChapterFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
 
       class ChapterFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<ChapterFramePrivate> d;
     };
   }  // namespace ID3v2

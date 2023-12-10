@@ -172,6 +172,7 @@ namespace TagLib {
       void parseFields(const ByteVector &data) override;
       ByteVector renderFields() const override;
       class AttachedPictureFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AttachedPictureFramePrivate> d;
 
     private:

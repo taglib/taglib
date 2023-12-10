@@ -247,6 +247,7 @@ namespace TagLib {
       static ItemFactory factory;
 
       class ItemFactoryPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<ItemFactoryPrivate> d;
     };
 

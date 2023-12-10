@@ -103,6 +103,7 @@ namespace TagLib {
       PrivateFrame(const ByteVector &data, Header *h);
 
       class PrivateFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<PrivateFramePrivate> d;
     };
 

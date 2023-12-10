@@ -172,6 +172,7 @@ namespace TagLib {
       UnsynchronizedLyricsFrame(const ByteVector &data, Header *h);
 
       class UnsynchronizedLyricsFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<UnsynchronizedLyricsFramePrivate> d;
     };
 

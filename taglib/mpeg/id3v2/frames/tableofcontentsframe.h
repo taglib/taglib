@@ -251,6 +251,7 @@ namespace TagLib {
       TableOfContentsFrame(const ID3v2::Header *tagHeader, const ByteVector &data, Header *h);
 
       class TableOfContentsFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<TableOfContentsFramePrivate> d;
     };
   }  // namespace ID3v2

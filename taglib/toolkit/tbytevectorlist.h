@@ -38,18 +38,20 @@ namespace TagLib {
    * A List specialization with some handy features useful for ByteVectors.
    */
 
-  class TAGLIB_EXPORT ByteVectorList : public List<ByteVector>
+  class ByteVectorList : public List<ByteVector>
   {
   public:
 
     /*!
      * Construct an empty ByteVectorList.
      */
+    TAGLIB_EXPORT
     ByteVectorList();
 
     /*!
      * Destroys this ByteVectorList instance.
      */
+    TAGLIB_EXPORT
     ~ByteVectorList();
 
     /*!
@@ -57,20 +59,25 @@ namespace TagLib {
      * implicitly shared, this method is lightweight and suitable for
      * pass-by-value usage.
      */
+    TAGLIB_EXPORT
     ByteVectorList(const ByteVectorList &l);
 
     /*!
      * Construct a ByteVectorList with the contents of the braced initializer list.
      */
+    TAGLIB_EXPORT
     ByteVectorList(std::initializer_list<ByteVector> init);
 
+    TAGLIB_EXPORT
     ByteVectorList &operator=(const ByteVectorList &);
+    TAGLIB_EXPORT
     ByteVectorList &operator=(std::initializer_list<ByteVector> init);
 
     /*!
      * Convert the ByteVectorList to a ByteVector separated by \a separator.  By
      * default a space is used.
      */
+    TAGLIB_EXPORT
     ByteVector toByteVector(const ByteVector &separator = " ") const;
 
     /*!
@@ -80,6 +87,7 @@ namespace TagLib {
      * is 2 then a maximum of 1 match will be found and the vector will be split
      * on that match.
      */
+    TAGLIB_EXPORT
     static ByteVectorList split(const ByteVector &v, const ByteVector &pattern,
                                 int byteAlign = 1, int max = 0);
   private:

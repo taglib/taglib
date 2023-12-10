@@ -219,6 +219,7 @@ namespace TagLib {
       RelativeVolumeFrame(const ByteVector &data, Header *h);
 
       class RelativeVolumeFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<RelativeVolumeFramePrivate> d;
     };
 

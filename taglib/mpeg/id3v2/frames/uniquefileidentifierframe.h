@@ -115,6 +115,7 @@ namespace TagLib {
       UniqueFileIdentifierFrame(const ByteVector &data, Header *h);
 
       class UniqueFileIdentifierFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<UniqueFileIdentifierFramePrivate> d;
     };
   }  // namespace ID3v2

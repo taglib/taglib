@@ -94,6 +94,7 @@ namespace TagLib {
 
     private:
       class AtomPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AtomPrivate> d;
     };
 
@@ -112,6 +113,7 @@ namespace TagLib {
 
     private:
       class AtomsPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AtomsPrivate> d;
     };
   } // namespace MP4

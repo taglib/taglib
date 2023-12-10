@@ -137,6 +137,7 @@ namespace TagLib {
 
       private:
         class TagPrivate;
+        TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
         std::unique_ptr<TagPrivate> d;
       };
     }  // namespace DIIN

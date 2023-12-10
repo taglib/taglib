@@ -172,6 +172,7 @@ namespace TagLib
 
       private:
         class PicturePrivate;
+        TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
         std::shared_ptr<PicturePrivate> d;
       };
   }  // namespace ASF
