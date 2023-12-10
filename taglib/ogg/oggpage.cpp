@@ -273,7 +273,8 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 
   if(strategy != Repaginate) {
 
-    size_t tableSize = std::accumulate(packets.cbegin(), packets.cend(), 0,
+    size_t tableSize = std::accumulate(packets.cbegin(), packets.cend(),
+        static_cast<size_t>(0),
         [](size_t acc, const ByteVector &packet) {
       return acc + packet.size() / 255 + 1;
     });
