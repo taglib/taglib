@@ -193,6 +193,7 @@ namespace TagLib {
       void parse(File *file, offset_t offset, bool checkLength);
 
       class HeaderPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::shared_ptr<HeaderPrivate> d;
     };
   }  // namespace MPEG

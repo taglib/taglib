@@ -223,6 +223,7 @@ namespace TagLib {
       ByteVector lacingValues() const;
 
       class PageHeaderPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<PageHeaderPrivate> d;
     };
 

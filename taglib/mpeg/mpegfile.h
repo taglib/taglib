@@ -328,6 +328,7 @@ namespace TagLib {
       offset_t findID3v2(Properties::ReadStyle readStyle);
 
       class FilePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<FilePrivate> d;
     };
   }  // namespace MPEG

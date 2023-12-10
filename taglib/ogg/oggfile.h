@@ -118,6 +118,7 @@ namespace TagLib {
       void writePacket(unsigned int i, const ByteVector &packet);
 
       class FilePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<FilePrivate> d;
     };
 

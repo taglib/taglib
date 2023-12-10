@@ -48,6 +48,7 @@ namespace TagLib {
     String toString() const;
 
   private:
+    TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     const std::wstring m_wname;
   };
 #else
@@ -162,6 +163,7 @@ namespace TagLib {
 
   private:
     class IOStreamPrivate;
+    TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     std::unique_ptr<IOStreamPrivate> d;
   };
 

@@ -178,6 +178,7 @@ namespace TagLib {
       EventTimingCodesFrame(const ByteVector &data, Header *h);
 
       class EventTimingCodesFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<EventTimingCodesFramePrivate> d;
     };
 

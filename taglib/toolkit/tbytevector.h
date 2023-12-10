@@ -644,6 +644,7 @@ namespace TagLib {
 
   private:
     class ByteVectorPrivate;
+    TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     std::unique_ptr<ByteVectorPrivate> d;
   };
 }  // namespace TagLib

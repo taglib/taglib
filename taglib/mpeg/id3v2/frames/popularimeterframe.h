@@ -131,6 +131,7 @@ namespace TagLib {
       PopularimeterFrame(const ByteVector &data, Header *h);
 
       class PopularimeterFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<PopularimeterFramePrivate> d;
     };
 

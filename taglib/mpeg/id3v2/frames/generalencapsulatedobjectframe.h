@@ -177,6 +177,7 @@ namespace TagLib {
       GeneralEncapsulatedObjectFrame(const ByteVector &data, Header *h);
 
       class GeneralEncapsulatedObjectFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<GeneralEncapsulatedObjectFramePrivate> d;
     };
   }  // namespace ID3v2

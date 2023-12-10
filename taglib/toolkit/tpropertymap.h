@@ -115,16 +115,19 @@ namespace TagLib {
    *
    */
 
-  class TAGLIB_EXPORT PropertyMap: public SimplePropertyMap
+  class PropertyMap: public SimplePropertyMap
   {
   public:
     using Iterator = SimplePropertyMap::Iterator;
     using ConstIterator = SimplePropertyMap::ConstIterator;
 
+    TAGLIB_EXPORT
     PropertyMap();
 
+    TAGLIB_EXPORT
     PropertyMap(const PropertyMap &m);
 
+    TAGLIB_EXPORT
     PropertyMap &operator=(const PropertyMap &other);
 
     /*!
@@ -132,8 +135,10 @@ namespace TagLib {
      * entries from \a m that have valid keys.
      * Invalid keys will be appended to the unsupportedData() list.
      */
+    TAGLIB_EXPORT
     PropertyMap(const SimplePropertyMap &m);
 
+    TAGLIB_EXPORT
     ~PropertyMap();
 
     /*!
@@ -142,6 +147,7 @@ namespace TagLib {
      * The returned value indicates success, i.e. whether \a key is a
      * valid key.
      */
+    TAGLIB_EXPORT
     bool insert(const String &key, const StringList &values);
 
     /*!
@@ -150,21 +156,25 @@ namespace TagLib {
      * The returned value indicates success, i.e. whether \a key is a
      * valid key.
      */
+    TAGLIB_EXPORT
     bool replace(const String &key, const StringList &values);
 
     /*!
      * Find the first occurrence of \a key.
      */
+    TAGLIB_EXPORT
     Iterator find(const String &key);
 
     /*!
      * Find the first occurrence of \a key.
      */
+    TAGLIB_EXPORT
     ConstIterator find(const String &key) const;
 
     /*!
      * Returns true if the map contains values for \a key.
      */
+    TAGLIB_EXPORT
     bool contains(const String &key) const;
 
     /*!
@@ -172,16 +182,19 @@ namespace TagLib {
      * and the values coincide for that keys. Does not take
      * the unsupportedData list into account.
      */
+    TAGLIB_EXPORT
     bool contains(const PropertyMap &other) const;
 
     /*!
      * Erase the \a key and its values from the map.
      */
+    TAGLIB_EXPORT
     PropertyMap &erase(const String &key);
 
     /*!
      * Erases from this map all keys that appear in \a other.
      */
+    TAGLIB_EXPORT
     PropertyMap &erase(const PropertyMap &other);
 
     /*!
@@ -190,6 +203,7 @@ namespace TagLib {
      * are appended to that of the first.
      * The unsupportedData() lists are concatenated as well.
      */
+    TAGLIB_EXPORT
     PropertyMap &merge(const PropertyMap &other);
 
     /*!
@@ -198,6 +212,7 @@ namespace TagLib {
      * If the map does not contain \a key, it returns defaultValue.
      * If no defaultValue is specified, it returns an empty string list.
      */
+    TAGLIB_EXPORT
     StringList value(const String &key,
                      const StringList &defaultValue = StringList()) const;
 
@@ -207,6 +222,7 @@ namespace TagLib {
      * \note: If \a key is not contained in the map, an empty
      * StringList is returned without error.
      */
+    TAGLIB_EXPORT
     const StringList &operator[](const String &key) const;
 
     /*!
@@ -216,16 +232,19 @@ namespace TagLib {
      * StringList is returned. You can also directly add entries
      * by using this function as an lvalue.
      */
+    TAGLIB_EXPORT
     StringList &operator[](const String &key);
 
     /*!
      * Returns true if and only if \a other has the same contents as this map.
      */
+    TAGLIB_EXPORT
     bool operator==(const PropertyMap &other) const;
 
     /*!
      * Returns false if and only \a other has the same contents as this map.
      */
+    TAGLIB_EXPORT
     bool operator!=(const PropertyMap &other) const;
 
     /*!
@@ -237,6 +256,7 @@ namespace TagLib {
      * those unsupported elements if you call File::setProperties() with the
      * same PropertyMap as argument.
      */
+    TAGLIB_EXPORT
     const StringList &unsupportedData() const;
 
     /*!
@@ -244,13 +264,16 @@ namespace TagLib {
      *
      * \see unsupportedData()
      */
+    TAGLIB_EXPORT
     void addUnsupportedData(const String &key);
 
     /*!
      * Removes all entries which have an empty value list.
      */
+    TAGLIB_EXPORT
     void removeEmpty();
 
+    TAGLIB_EXPORT
     String toString() const;
 
   private:

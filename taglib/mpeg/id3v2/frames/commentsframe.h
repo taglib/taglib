@@ -172,6 +172,7 @@ namespace TagLib {
       CommentsFrame(const ByteVector &data, Header *h);
 
       class CommentsFramePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<CommentsFramePrivate> d;
     };
 
