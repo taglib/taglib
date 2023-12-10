@@ -215,7 +215,7 @@ PropertyMap APE::Tag::properties() const
         if(tagName == t)
           tagName = k;
       }
-      properties[tagName].append(item.toStringList());
+      properties[tagName].append(item.values());
     }
   }
   return properties;
