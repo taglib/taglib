@@ -523,6 +523,11 @@ String String::number(int n) // static
   return Utils::formatString("%d", n);
 }
 
+String String::fromLongLong(long long n) // static
+{
+  return Utils::formatString("%lld", n);
+}
+
 wchar_t &String::operator[](int i)
 {
   detach();

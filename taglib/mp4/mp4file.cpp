@@ -33,44 +33,6 @@
 
 using namespace TagLib;
 
-namespace
-{
-  bool checkValid(const MP4::AtomList &list)
-  {
-    return std::none_of(list.begin(), list.end(),
-      [](const auto &a) { return a->length == 0 || !checkValid(a->children); });
-  }
-
-  bool checkRootLevelAtoms(MP4::AtomList &list)
-  {
-    bool moovValid = false;
-    for(auto it = list.begin(); it != list.end(); ++it) {
-      bool invalid = (*it)->length == 0 || !checkValid((*it)->children);
-      if(!moovValid && !invalid && (*it)->name == "moov") {
-        moovValid = true;
-      }
-      if(invalid) {
-        if(moovValid && (*it)->name != "moof") {
-          // Only the root level atoms "moov" and (if present) "moof" are
-          // modified.  If they are valid, ignore following invalid root level
-          // atoms as trailing garbage.
-          while(it != list.end()) {
-            delete *it;
-            it = list.erase(it);
-          }
-          return true;
-        }
-        else {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-}  // namespace
-
 class MP4::File::FilePrivate
 {
 public:
@@ -156,7 +118,7 @@ MP4::File::read(bool readProperties)
     return;
 
   d->atoms = std::make_unique<Atoms>(this);
-  if(!checkRootLevelAtoms(d->atoms->atoms)) {
+  if(!d->atoms->checkRootLevelAtoms()) {
     setValid(false);
     return;
   }

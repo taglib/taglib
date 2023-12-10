@@ -379,6 +379,11 @@ namespace TagLib {
     static String number(int n);
 
     /*!
+     * Converts the base-10 integer \a n to a string.
+     */
+    static String fromLongLong(long long n);
+
+    /*!
      * Returns a reference to the character at position \a i.
      */
     wchar_t &operator[](int i);
