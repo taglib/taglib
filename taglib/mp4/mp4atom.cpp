@@ -40,62 +40,72 @@ namespace {
   };
 } // namespace
 
-MP4::Atom::Atom(File *file)
-  : offset(file->tell())
+class MP4::Atom::AtomPrivate
 {
-  children.setAutoDelete(true);
+public:
+  explicit AtomPrivate(offset_t ofs) : offset(ofs) {}
+  offset_t offset;
+  offset_t length { 0 };
+  TagLib::ByteVector name;
+  AtomList children;
+};
+
+MP4::Atom::Atom(File *file)
+  : d(std::make_unique<AtomPrivate>(file->tell()))
+{
+  d->children.setAutoDelete(true);
 
   ByteVector header = file->readBlock(8);
   if(header.size() != 8) {
     // The atom header must be 8 bytes long, otherwise there is either
     // trailing garbage or the file is truncated
     debug("MP4: Couldn't read 8 bytes of data for atom header");
-    length = 0;
+    d->length = 0;
     file->seek(0, File::End);
     return;
   }
 
-  length = header.toUInt();
+  d->length = header.toUInt();
 
-  if(length == 0) {
+  if(d->length == 0) {
     // The last atom which extends to the end of the file.
-    length = file->length() - offset;
+    d->length = file->length() - d->offset;
   }
-  else if(length == 1) {
+  else if(d->length == 1) {
     // The atom has a 64-bit length.
     const long long longLength = file->readBlock(8).toLongLong();
     if(longLength <= LONG_MAX) {
       // The actual length fits in long. That's always the case if long is 64-bit.
-      length = static_cast<long>(longLength);
+      d->length = static_cast<long>(longLength);
     }
     else {
       debug("MP4: 64-bit atoms are not supported");
-      length = 0;
+      d->length = 0;
       file->seek(0, File::End);
       return;
     }
   }
 
-  if(length < 8 || length > file->length() - offset) {
+  if(d->length < 8 || d->length > file->length() - d->offset) {
     debug("MP4: Invalid atom size");
-    length = 0;
+    d->length = 0;
     file->seek(0, File::End);
     return;
   }
 
-  name = header.mid(4, 4);
+  d->name = header.mid(4, 4);
   for(int i = 0; i < 4; ++i) {
-    const char ch = name.at(i);
+    const char ch = d->name.at(i);
     if((ch < ' ' || ch > '~') && ch != '\251') {
       debug("MP4: Invalid atom type");
-      length = 0;
+      d->length = 0;
       file->seek(0, File::End);
     }
   }
 
   for(auto c : containers) {
-    if(name == c) {
-      if(name == "meta") {
+    if(d->name == c) {
+      if(d->name == "meta") {
         offset_t posAfterMeta = file->tell();
         static constexpr std::array metaChildrenNames {
           "hdlr", "ilst", "mhdr", "ctry", "lang"
@@ -108,20 +118,20 @@ MP4::Atom::Atom(File *file)
         // is a full atom.
         file->seek(posAfterMeta + (metaIsFullAtom ? 4 : 0));
       }
-      else if(name == "stsd") {
+      else if(d->name == "stsd") {
         file->seek(8, File::Current);
       }
-      while(file->tell() < offset + length) {
+      while(file->tell() < d->offset + d->length) {
         auto child = new MP4::Atom(file);
-        children.append(child);
-        if(child->length == 0)
+        d->children.append(child);
+        if(child->d->length == 0)
           return;
       }
       return;
     }
   }
 
-  file->seek(offset + length);
+  file->seek(d->offset + d->length);
 }
 
 MP4::Atom::~Atom() = default;
@@ -132,17 +142,17 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
   if(name1 == nullptr) {
     return this;
   }
-  auto it = std::find_if(children.cbegin(), children.cend(),
-      [&name1](Atom *child) { return child->name == name1; });
-  return it != children.cend() ? (*it)->find(name2, name3, name4) : nullptr;
+  auto it = std::find_if(d->children.cbegin(), d->children.cend(),
+      [&name1](Atom *child) { return child->d->name == name1; });
+  return it != d->children.cend() ? (*it)->find(name2, name3, name4) : nullptr;
 }
 
 MP4::AtomList
 MP4::Atom::findall(const char *name, bool recursive)
 {
   MP4::AtomList result;
-  for(const auto &child : std::as_const(children)) {
-    if(child->name == name) {
+  for(const auto &child : std::as_const(d->children)) {
+    if(child->d->name == name) {
       result.append(child);
     }
     if(recursive) {
@@ -159,22 +169,70 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
   if(name1 == nullptr) {
     return true;
   }
-  auto it = std::find_if(children.cbegin(), children.cend(),
-      [&name1](Atom *child) { return child->name == name1; });
-  return it != children.cend() ? (*it)->path(path, name2, name3) : false;
+  auto it = std::find_if(d->children.cbegin(), d->children.cend(),
+      [&name1](Atom *child) { return child->d->name == name1; });
+  return it != d->children.cend() ? (*it)->path(path, name2, name3) : false;
 }
 
-MP4::Atoms::Atoms(File *file)
+void MP4::Atom::addToOffset(offset_t delta)
 {
-  atoms.setAutoDelete(true);
+  d->offset += delta;
+}
+
+void MP4::Atom::prependChild(Atom *atom)
+{
+  d->children.prepend(atom);
+}
+
+bool MP4::Atom::removeChild(Atom *meta)
+{
+  auto it = d->children.find(meta);
+  if(it != d->children.end()) {
+    d->children.erase(it);
+    return true;
+  }
+  return false;
+}
+
+offset_t MP4::Atom::offset() const
+{
+  return d->offset;
+}
+
+offset_t MP4::Atom::length() const
+{
+  return d->length;
+}
+
+const ByteVector &MP4::Atom::name() const
+{
+  return d->name;
+}
+
+const MP4::AtomList &MP4::Atom::children() const
+{
+  return d->children;
+}
+
+
+class MP4::Atoms::AtomsPrivate
+{
+public:
+  AtomList atoms;
+};
+
+MP4::Atoms::Atoms(File *file) :
+  d(std::make_unique<AtomsPrivate>())
+{
+  d->atoms.setAutoDelete(true);
 
   file->seek(0, File::End);
   offset_t end = file->tell();
   file->seek(0);
   while(file->tell() + 8 <= end) {
     auto atom = new MP4::Atom(file);
-    atoms.append(atom);
-    if (atom->length == 0)
+    d->atoms.append(atom);
+    if (atom->length() == 0)
       break;
   }
 }
@@ -184,18 +242,18 @@ MP4::Atoms::~Atoms() = default;
 MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4)
 {
-  auto it = std::find_if(atoms.cbegin(), atoms.cend(),
-      [&name1](Atom *atom) { return atom->name == name1; });
-  return it != atoms.cend() ? (*it)->find(name2, name3, name4) : nullptr;
+  auto it = std::find_if(d->atoms.cbegin(), d->atoms.cend(),
+      [&name1](Atom *atom) { return atom->name() == name1; });
+  return it != d->atoms.cend() ? (*it)->find(name2, name3, name4) : nullptr;
 }
 
 MP4::AtomList
 MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const char *name4)
 {
   MP4::AtomList path;
-  auto it = std::find_if(atoms.cbegin(), atoms.cend(),
-      [&name1](Atom *atom) { return atom->name == name1; });
-  if(it != atoms.cend()) {
+  auto it = std::find_if(d->atoms.cbegin(), d->atoms.cend(),
+      [&name1](Atom *atom) { return atom->name() == name1; });
+  if(it != d->atoms.cend()) {
     if(!(*it)->path(path, name2, name3, name4)) {
       path.clear();
     }
@@ -203,3 +261,45 @@ MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const 
   }
   return path;
 }
+
+namespace
+{
+  bool checkValid(const MP4::AtomList &list)
+  {
+    return std::none_of(list.begin(), list.end(),
+      [](const auto &a) { return a->length() == 0 || !checkValid(a->children()); });
+  }
+}  // namespace
+
+bool MP4::Atoms::checkRootLevelAtoms()
+{
+  bool moovValid = false;
+  for(auto it = d->atoms.begin(); it != d->atoms.end(); ++it) {
+      bool invalid = (*it)->length() == 0 || !checkValid((*it)->children());
+      if(!moovValid && !invalid && (*it)->name() == "moov") {
+      moovValid = true;
+      }
+      if(invalid) {
+      if(moovValid && (*it)->name() != "moof") {
+          // Only the root level atoms "moov" and (if present) "moof" are
+          // modified.  If they are valid, ignore following invalid root level
+          // atoms as trailing garbage.
+          while(it != d->atoms.end()) {
+          delete *it;
+          it = d->atoms.erase(it);
+          }
+          return true;
+      }
+      else {
+          return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+const MP4::AtomList &MP4::Atoms::atoms() const
+{
+  return d->atoms;
+};

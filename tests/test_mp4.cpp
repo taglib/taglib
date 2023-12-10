@@ -238,8 +238,8 @@ public:
 
       MP4::Atoms a(&f);
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
-      f.seek(stco->offset + 12);
-      ByteVector data = f.readBlock(stco->length - 12);
+      f.seek(stco->offset() + 12);
+      ByteVector data = f.readBlock(stco->length() - 12);
       unsigned int count = data.mid(0, 4).toUInt();
       int pos = 4;
       while (count--) {
@@ -257,8 +257,8 @@ public:
 
       MP4::Atoms a(&f);
       MP4::Atom *stco = a.find("moov")->findall("stco", true)[0];
-      f.seek(stco->offset + 12);
-      ByteVector data = f.readBlock(stco->length - 12);
+      f.seek(stco->offset() + 12);
+      ByteVector data = f.readBlock(stco->length() - 12);
       unsigned int count = data.mid(0, 4).toUInt();
       int pos = 4, i = 0;
       while (count--) {
@@ -323,8 +323,8 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, f.tag()->itemMap()["cpil"].toBool());
 
       MP4::Atoms atoms(&f);
-      MP4::Atom *moov = atoms.atoms[0];
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(77), moov->length);
+      MP4::Atom *moov = atoms.atoms()[0];
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(77), moov->length());
 
       f.tag()->setItem("pgap", true);
       f.save();
@@ -335,9 +335,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, f.tag()->item("pgap").toBool());
 
       MP4::Atoms atoms(&f);
-      MP4::Atom *moov = atoms.atoms[0];
+      MP4::Atom *moov = atoms.atoms()[0];
       // original size + 'pgap' size + padding
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(77 + 25 + 974), moov->length);
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(77 + 25 + 974), moov->length());
     }
   }
 

@@ -84,10 +84,17 @@ namespace TagLib {
       Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       bool path(AtomList &path, const char *name1, const char *name2 = nullptr, const char *name3 = nullptr);
       AtomList findall(const char *name, bool recursive = false);
-      offset_t offset;
-      offset_t length;
-      TagLib::ByteVector name;
-      AtomList children;
+      void addToOffset(offset_t delta);
+      void prependChild(Atom *atom);
+      bool removeChild(Atom *meta);
+      offset_t offset() const;
+      offset_t length() const;
+      const ByteVector &name() const;
+      const AtomList &children() const;
+
+    private:
+      class AtomPrivate;
+      std::unique_ptr<AtomPrivate> d;
     };
 
     //! Root-level atoms
@@ -100,7 +107,12 @@ namespace TagLib {
       Atoms &operator=(const Atoms &) = delete;
       Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       AtomList path(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
-      AtomList atoms;
+      bool checkRootLevelAtoms();
+      const AtomList &atoms() const;
+
+    private:
+      class AtomsPrivate;
+      std::unique_ptr<AtomsPrivate> d;
     };
   } // namespace MP4
 } // namespace TagLib
