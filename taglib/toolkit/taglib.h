@@ -95,7 +95,7 @@ namespace TagLib {
  * - A clean, high level, C++ API to handling audio meta data.
  * - Format specific APIs for advanced API users.
  * - ID3v1, ID3v2, APE, FLAC, Xiph, iTunes-style MP4 and WMA tag formats.
- * - MP3, MPC, FLAC, MP4, ASF, AIFF, WAV, TrueAudio, WavPack, Ogg FLAC, Ogg Vorbis, Speex and Opus file formats.
+ * - MP3, MPC, FLAC, MP4, ASF, AIFF, WAV, DSF, DFF, TrueAudio, WavPack, Ogg FLAC, Ogg Vorbis, Speex and Opus file formats.
  * - Basic audio file properties such as length, sample rate, etc.
  * - Long term binary and source compatibility.
  * - Extensible design, notably the ability to add other formats or extend current formats as a library user.
@@ -126,9 +126,13 @@ namespace TagLib {
  * Please see the <a href="http://taglib.org/">TagLib website</a> for the latest
  * downloads.
  *
- * TagLib can be built using the CMake build system. TagLib installs a taglib-config and pkg-config file to
+ * TagLib can be built using the CMake build system. TagLib installs a CMake
+ * configuration and a taglib-config and pkg-config file to
  * make it easier to integrate into various build systems.  Note that TagLib's include install directory \e must
  * be included in the header include path. Simply adding <taglib/tag.h> will \e not work.
+ *
+ * Detailed instructions about building TagLib itself and building with TagLib
+ * can be found in <a href="https://github.com/taglib/taglib/blob/master/INSTALL.md">INSTALL.md</a>
  *
  * \section start Getting Started
  *
@@ -146,8 +150,7 @@ namespace TagLib {
  *
  * Here's a very simple example with TagLib:
  *
- * \code
- *
+ * \code {.cpp}
  * TagLib::FileRef f("Latex Solar Beef.mp3");
  * TagLib::String artist = f.tag()->artist(); // artist == "Frank Zappa"
  *
@@ -159,10 +162,63 @@ namespace TagLib {
  *
  * g.tag()->setTrack(1);
  * g.save();
- *
  * \endcode
  *
- * More examples can be found in the \e examples directory of the source distribution.
+ * If the basic tag interface, which provides methods like
+ * \link TagLib::Tag::title() title() \endlink,
+ * \link TagLib::Tag::artist() artist() \endlink,
+ * \link TagLib::Tag::album() album() \endlink,
+ * \link TagLib::Tag::comment() comment() \endlink,
+ * \link TagLib::Tag::genre() genre() \endlink,
+ * \link TagLib::Tag::year() year() \endlink,
+ * \link TagLib::Tag::track() track() \endlink
+ * and the corresponding setters, is not enough, the
+ * \link TagLib::PropertyMap PropertyMap \endlink interface
+ * offers a flexible abstraction for textual metadata.
+ * See \ref p_propertymapping for details about the mapping of tags to properties.
+ *
+ * \code {.cpp}
+ * TagLib::PropertyMap props = f.properties();
+ * TagLib::StringList artists = props["ARTIST"];
+ * artists.append("Jim Pons");
+ * props["ARTIST"] = artists;
+ * f.setProperties(props);
+ * f.save();
+ * \endcode
+ *
+ * An additional \link FileRef::complexProperties() abstraction \endlink is
+ * provided to handle complex (i.e. non textual) properties.
+ *
+ * \code {.cpp}
+ * TagLib::ByteVector data = ...;
+ * f.setComplexProperties("PICTURE", {
+ *   {
+ *     {"data", data},
+ *     {"pictureType", "Front Cover"},
+ *     {"mimeType", "image/jpeg"}
+ *   }
+ * });
+ * \endcode
+ *
+ * Finally, for full control, there are specific types for all supported metadata formats.
+ *
+ * \code {.cpp}
+ * if(auto file = dynamic_cast<TagLib::MPEG::File *>(f.file())) {
+ *   if(auto id3v2Tag = file->ID3v2Tag()) {
+ *     auto frames = id3v2Tag->frameList("SYLT");
+ *     if(!frames.isEmpty()) {
+ *       if(auto syltFrame = dynamic_cast<TagLib::ID3v2::SynchronizedLyricsFrame *>(
+ *           frames.front())) {
+ *         auto text = syltFrame->synchedText();
+ *         // ...
+ *       }
+ *     }
+ *   }
+ * }
+ * \endcode
+ *
+ * More examples can be found in the <a href="https://github.com/taglib/taglib/tree/master/examples">
+ * examples</a> directory of the source distribution.
  *
  * \section Contact
  *

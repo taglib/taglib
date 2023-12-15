@@ -1,0 +1,112 @@
+/*!
+\page p_propertymapping Mapping of Properties to Various Formats
+
+- If no mapping is given for an %ID3v2 tag, a TXXX frame will be used with the
+  key as a description.
+- Vorbis Comments are not included in the table because they use the names from
+  the *Key* column.
+- %APE tags will also use these keys unless another name can be found in its column.
+
+| Key                        | %ID3v2 | %RIFF | %MP4                                                     | %APE                    | %ASF                              |
+| -------------------------- | ------ | ----- | -------------------------------------------------------- | ----------------------- | --------------------------------- |
+| ACOUSTID_FINGERPRINT       |        |       |                                                          |                         | Acoustid/Fingerprint              |
+| ACOUSTID_ID                |        |       |                                                          |                         | Acoustid/Id                       |
+| ALBUM                      | TALB   | IPRD  | &copy;alb                                                |                         | WM/AlbumTitle                     |
+| ALBUMARTIST                | TPE2   |       | aART                                                     | ALBUM ARTIST            | WM/AlbumArtist                    |
+| ALBUMARTISTSORT            | TSO2   |       | soaa                                                     |                         | WM/AlbumArtistSortOrder           |
+| ALBUMSORT                  | TSOA   |       | soal                                                     |                         | WM/AlbumSortOrder                 |
+| ARRANGER                   |        | IENG  |                                                          |                         |                                   |
+| ARTIST                     | TPE1   | IART  | &copy;ART                                                |                         |                                   |
+| ARTISTS                    |        |       | \----:com.apple.iTunes:ARTISTS                           |                         | WM/ARTISTS                        |
+| ARTISTSORT                 | TSOP   |       | soar                                                     |                         | WM/ArtistSortOrder                |
+| ARTISTWEBPAGE              | WOAR   | IBSU  |                                                          |                         | WM/AuthorURL                      |
+| ASIN                       |        |       | \----:com.apple.iTunes:ASIN                              |                         |                                   |
+| AUDIOSOURCEWEBPAGE         | WOAS   |       |                                                          |                         | ASIN                              |
+| BARCODE                    |        |       | \----:com.apple.iTunes:BARCODE                           |                         | WM/Barcode                        |
+| BPM                        | TBPM   | IBPM  | tmpo                                                     |                         | WM/BeatsPerMinute                 |
+| CATALOGNUMBER              |        |       | \----:com.apple.iTunes:CATALOGNUMBER                     |                         | WM/CatalogNo                      |
+| COMMENT                    | COMM   | ICMT  | &copy;cmt                                                |                         |                                   |
+| COMPILATION                | TCMP   |       | cpil                                                     |                         |                                   |
+| COMPOSER                   | TCOM   | IMUS  | &copy;wrt                                                |                         | WM/Composer                       |
+| COMPOSERSORT               | TSOC   |       | soco                                                     |                         |                                   |
+| CONDUCTOR                  | TPE3   |       | \----:com.apple.iTunes:CONDUCTOR                         |                         | WM/Conductor                      |
+| COPYRIGHT                  | TCOP   | ICOP  | cprt                                                     |                         |                                   |
+| COPYRIGHTURL               | WCOP   |       |                                                          |                         |                                   |
+| DATE                       | TDRC   | ICRD  | &copy;day                                                | YEAR                    | WM/Year                           |
+| DISCNUMBER                 | TPOS   |       | disk                                                     | DISC                    | WM/PartOfSet                      |
+| DISCSUBTITLE               | TSST   | PRT1  | \----:com.apple.iTunes:DISCSUBTITLE                      |                         | WM/SetSubTitle                    |
+| DJMIXER                    |        |       | \----:com.apple.iTunes:DJMIXER                           |                         |                                   |
+| ENCODEDBY                  | TENC   | ITCH  | &copy;too                                                |                         | WM/EncodedBy                      |
+| ENCODING                   | TSSE   | ISFT  |                                                          |                         | WM/EncodingSettings               |
+| ENCODINGTIME               | TDEN   | IDIT  |                                                          |                         |                                   |
+| ENGINEER                   |        |       | \----:com.apple.iTunes:ENGINEER                          |                         |                                   |
+| FILETYPE                   | TFLT   |       |                                                          |                         |                                   |
+| FILEWEBPAGE                | WOAF   |       |                                                          |                         |                                   |
+| GAPLESSPLAYBACK            |        |       | pgap                                                     |                         |                                   |
+| GENRE                      | TCON   | IGNR  | &copy;gen                                                |                         | WM/Genre                          |
+| GROUPING                   | GRP1   |       | &copy;grp                                                |                         |                                   |
+| INITIALKEY                 | TKEY   |       |                                                          |                         | WM/InitialKey                     |
+| INVOLVEDPEOPLE             | TIPL   |       |                                                          |                         |                                   |
+| ISRC                       | TSRC   | ISRC  | \----:com.apple.iTunes:ISRC                              |                         | WM/ISRC                           |
+| LABEL                      | TPUB   | IPUB  | \----:com.apple.iTunes:LABEL                             |                         | WM/Publisher                      |
+| LANGUAGE                   | TLAN   | ILNG  | \----:com.apple.iTunes:LANGUAGE                          |                         | WM/Language                       |
+| LENGTH                     | TLEN   |       | \----:com.apple.iTunes:LYRICIST                          |                         |                                   |
+| LICENSE                    |        |       | \----:com.apple.iTunes:LICENSE                           |                         |                                   |
+| LYRICIST                   | TEXT   | IWRI  |                                                          |                         | WM/Writer                         |
+| LYRICS                     | USLT   |       | &copy;lyr                                                |                         | WM/Lyrics                         |
+| MEDIA                      | TMED   | IMED  | \----:com.apple.iTunes:MEDIA                             |                         | WM/Media                          |
+| MIXER                      |        |       | \----:com.apple.iTunes:MIXER                             |                         |                                   |
+| MOOD                       | TMOO   |       | \----:com.apple.iTunes:MOOD                              |                         | WM/Mood                           |
+| MOVEMENTCOUNT              |        |       | &copy;mvc                                                |                         |                                   |
+| MOVEMENTNAME               | MVNM   |       | &copy;mvn                                                |                         |                                   |
+| MOVEMENTNUMBER             | MVIN   |       | &copy;mvi                                                |                         |                                   |
+| MUSICBRAINZ_ALBUMID        |        |       | \----:com.apple.iTunes:MusicBrainz Album Id              |                         | MusicBrainz/Album Id              |
+| MUSICBRAINZ_ALBUMARTISTID  |        |       | \----:com.apple.iTunes:MusicBrainz Album Artist Id       |                         | MusicBrainz/Album Artist Id       |
+| MUSICBRAINZ_ARTISTID       |        |       | \----:com.apple.iTunes:MusicBrainz Artist Id             |                         | MusicBrainz/Artist Id             |
+| MUSICBRAINZ_RELEASEGROUPID |        |       | \----:com.apple.iTunes:MusicBrainz Release Group Id      |                         | MusicBrainz/Release Group Id      |
+| MUSICBRAINZ_RELEASETRACKID |        |       | \----:com.apple.iTunes:MusicBrainz Release Track Id      |                         | MusicBrainz/Release Track Id      |
+| MUSICBRAINZ_TRACKID        |        |       | \----:com.apple.iTunes:MusicBrainz Track Id              |                         | MusicBrainz/Track Id              |
+| MUSICBRAINZ_WORKID         |        |       | \----:com.apple.iTunes:MusicBrainz Work Id               |                         | MusicBrainz/Work Id               |
+| MUSICIANCREDITS            | TMCL   |       |                                                          |                         |                                   |
+| MUSICIP_PUID               |        |       |                                                          |                         | MusicIP/PUID                      |
+| ORIGINALALBUM              | TOAL   |       |                                                          |                         | WM/OriginalAlbumTitle             |
+| ORIGINALARTIST             | TOPE   |       |                                                          |                         | WM/OriginalArtist                 |
+| ORIGINALDATE               | TDOR   |       | \----:com.apple.iTunes:ORIGINALDATE                      |                         | WM/OriginalReleaseYear            |
+| ORIGINALFILENAME           | TOFN   |       |                                                          |                         | WM/OriginalFilename               |
+| ORIGINALLYRICIST           | TOLY   |       |                                                          |                         | WM/OriginalLyricist               |
+| OWNER                      | TOWN   |       | ownr                                                     |                         |                                   |
+| PAYMENTWEBPAGE             | WPAY   |       |                                                          |                         |                                   |
+| PERFORMER                  |        | ISTR  |                                                          |                         |                                   |
+| PLAYLISTDELAY              | TDLY   |       |                                                          |                         |                                   |
+| PODCAST                    | PCST   |       | pcst                                                     |                         |                                   |
+| PODCASTCATEGORY            | TCAT   |       | catg                                                     |                         |                                   |
+| PODCASTDESC                | TDES   |       | desc                                                     |                         |                                   |
+| PODCASTID                  | TGID   |       | egid                                                     |                         |                                   |
+| PODCASTURL                 | WFED   |       | purl                                                     |                         |                                   |
+| PRODUCEDNOTICE             | TPRO   |       |                                                          |                         |                                   |
+| PRODUCER                   |        |       | \----:com.apple.iTunes:PRODUCER                          |                         | WM/Producer                       |
+| PUBLISHERWEBPAGE           | WPUB   |       |                                                          |                         |                                   |
+| RADIOSTATION               | TRSN   |       |                                                          |                         |                                   |
+| RADIOSTATIONOWNER          | TRSO   |       |                                                          |                         |                                   |
+| RADIOSTATIONWEBPAGE        | WORS   |       |                                                          |                         |                                   |
+| RELEASECOUNTRY             |        | ICNT  | \----:com.apple.iTunes:MusicBrainz Album Release Country |                         | MusicBrainz/Album Release Country |
+| RELEASEDATE                | TDRL   |       | \----:com.apple.iTunes:RELEASEDATE                       |                         |                                   |
+| RELEASESTATUS              |        |       | \----:com.apple.iTunes:MusicBrainz Album Status          | MUSICBRAINZ_ALBUMSTATUS | MusicBrainz/Album Status          |
+| RELEASETYPE                |        |       | \----:com.apple.iTunes:MusicBrainz Album Type            | MUSICBRAINZ_ALBUMTYPE   | MusicBrainz/Album Type            |
+| REMIXER                    | TPE4   | IEDT  | \----:com.apple.iTunes:REMIXER                           | MIXARTIST               | WM/ModifiedBy                     |
+| SCRIPT                     |        |       | \----:com.apple.iTunes:SCRIPT                            |                         | WM/Script                         |
+| SHOWSORT                   |        |       | sosn                                                     |                         |                                   |
+| SHOWWORKMOVEMENT           |        |       | shwm                                                     |                         |                                   |
+| SUBTITLE                   | TIT3   |       | \----:com.apple.iTunes:SUBTITLE                          |                         | WM/SubTitle                       |
+| TAGGINGDATE                | TDTG   |       |                                                          |                         |                                   |
+| TITLE                      | TIT2   | INAM  | &copy;nam                                                |                         |                                   |
+| TITLESORT                  | TSOT   |       | sonm                                                     |                         | WM/TitleSortOrder                 |
+| TRACKNUMBER                | TRCK   | IPRT  | trkn                                                     | TRACK                   | WM/TrackNumber                    |
+| TVEPISODE                  |        |       | tves                                                     |                         |                                   |
+| TVEPISODEID                |        |       | tven                                                     |                         |                                   |
+| TVNETWORK                  |        |       | tvnn                                                     |                         |                                   |
+| TVSEASON                   |        |       | tvsn                                                     |                         |                                   |
+| TVSHOW                     |        |       | tvsh                                                     |                         |                                   |
+| URL                        | WXXX   |       |                                                          |                         |                                   |
+| WORK                       | TIT1   |       | &copy;wrk                                                |                         | WM/ContentGroupDescription        |
+*/

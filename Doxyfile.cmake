@@ -122,7 +122,8 @@ INPUT                  = @CMAKE_SOURCE_DIR@/taglib
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.h \
                          *.hh \
-                         *.H
+                         *.H \
+                         *.dox
 RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
