@@ -46,6 +46,9 @@ namespace TagLib {
    * and a nonempty list of corresponding values, each value being an arbitrary
    * unicode String.
    *
+   * See \ref p_propertymapping for the mapping of the different formats to
+   * properties.
+   *
    * Note that most metadata formats pose additional conditions on the tag keys. The
    * most popular ones (Vorbis, APE, ID3v2) should support all ASCII only words of
    * length between 2 and 16.
