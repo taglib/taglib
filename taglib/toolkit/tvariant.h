@@ -174,7 +174,7 @@ namespace TagLib {
     Variant &operator=(const Variant &v);
 
   private:
-    friend std::ostream& ::operator<<(std::ostream &s, const TagLib::Variant &v);
+    friend TAGLIB_EXPORT std::ostream& ::operator<<(std::ostream &s, const TagLib::Variant &v);
     class VariantPrivate;
     TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     std::shared_ptr<VariantPrivate> d;
