@@ -65,7 +65,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(66014U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(66014UL, f.audioProperties()->sampleFrames());
   }
 
   void testPropertiesSV7()
@@ -78,7 +78,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(318, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1760U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1760UL, f.audioProperties()->sampleFrames());
     CPPUNIT_ASSERT_EQUAL(14221, f.audioProperties()->trackGain());
     CPPUNIT_ASSERT_EQUAL(19848, f.audioProperties()->trackPeak());
     CPPUNIT_ASSERT_EQUAL(14221, f.audioProperties()->albumGain());
@@ -95,7 +95,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1162944U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1162944UL, f.audioProperties()->sampleFrames());
   }
 
   void testPropertiesSV4()
@@ -108,7 +108,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT_EQUAL(1162944U, f.audioProperties()->sampleFrames());
+    CPPUNIT_ASSERT_EQUAL(1162944UL, f.audioProperties()->sampleFrames());
   }
 
   void testFuzzedFile1()
