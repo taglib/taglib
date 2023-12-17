@@ -97,7 +97,7 @@ public:
   ByteVector data;
   virtual ~BaseObject() = default;
   virtual ByteVector guid() const = 0;
-  virtual void parse(ASF::File *file, unsigned int size);
+  virtual void parse(ASF::File *file, long long size);
   virtual ByteVector render(ASF::File *file);
 };
 
@@ -113,21 +113,21 @@ class ASF::File::FilePrivate::FilePropertiesObject : public ASF::File::FilePriva
 {
 public:
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
 };
 
 class ASF::File::FilePrivate::StreamPropertiesObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
 };
 
 class ASF::File::FilePrivate::ContentDescriptionObject : public ASF::File::FilePrivate::BaseObject
 {
 public:
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
   ByteVector render(ASF::File *file) override;
 };
 
@@ -136,7 +136,7 @@ class ASF::File::FilePrivate::ExtendedContentDescriptionObject : public ASF::Fil
 public:
   ByteVectorList attributeData;
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
   ByteVector render(ASF::File *file) override;
 };
 
@@ -145,7 +145,7 @@ class ASF::File::FilePrivate::MetadataObject : public ASF::File::FilePrivate::Ba
 public:
   ByteVectorList attributeData;
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
   ByteVector render(ASF::File *file) override;
 };
 
@@ -154,7 +154,7 @@ class ASF::File::FilePrivate::MetadataLibraryObject : public ASF::File::FilePriv
 public:
   ByteVectorList attributeData;
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
   ByteVector render(ASF::File *file) override;
 };
 
@@ -164,7 +164,7 @@ public:
   List<ASF::File::FilePrivate::BaseObject *> objects;
   HeaderExtensionObject();
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
   ByteVector render(ASF::File *file) override;
 };
 
@@ -172,7 +172,7 @@ class ASF::File::FilePrivate::CodecListObject : public ASF::File::FilePrivate::B
 {
 public:
   ByteVector guid() const override;
-  void parse(ASF::File *file, unsigned int size) override;
+  void parse(ASF::File *file, long long size) override;
 
 private:
   enum CodecType
@@ -183,10 +183,10 @@ private:
   };
 };
 
-void ASF::File::FilePrivate::BaseObject::parse(ASF::File *file, unsigned int size)
+void ASF::File::FilePrivate::BaseObject::parse(ASF::File *file, long long size)
 {
   data.clear();
-  if(size > 24 && size <= static_cast<unsigned int>(file->length()))
+  if(size > 24 && size <= file->length())
     data = file->readBlock(size - 24);
   else
     data = ByteVector();
@@ -211,7 +211,7 @@ ByteVector ASF::File::FilePrivate::FilePropertiesObject::guid() const
   return filePropertiesGuid;
 }
 
-void ASF::File::FilePrivate::FilePropertiesObject::parse(ASF::File *file, unsigned int size)
+void ASF::File::FilePrivate::FilePropertiesObject::parse(ASF::File *file, long long size)
 {
   BaseObject::parse(file, size);
   if(data.size() < 64) {
@@ -229,7 +229,7 @@ ByteVector ASF::File::FilePrivate::StreamPropertiesObject::guid() const
   return streamPropertiesGuid;
 }
 
-void ASF::File::FilePrivate::StreamPropertiesObject::parse(ASF::File *file, unsigned int size)
+void ASF::File::FilePrivate::StreamPropertiesObject::parse(ASF::File *file, long long size)
 {
   BaseObject::parse(file, size);
   if(data.size() < 70) {
@@ -249,7 +249,7 @@ ByteVector ASF::File::FilePrivate::ContentDescriptionObject::guid() const
   return contentDescriptionGuid;
 }
 
-void ASF::File::FilePrivate::ContentDescriptionObject::parse(ASF::File *file, unsigned int /*size*/)
+void ASF::File::FilePrivate::ContentDescriptionObject::parse(ASF::File *file, long long /*size*/)
 {
   const int titleLength     = readWORD(file);
   const int artistLength    = readWORD(file);
@@ -289,7 +289,7 @@ ByteVector ASF::File::FilePrivate::ExtendedContentDescriptionObject::guid() cons
   return extendedContentDescriptionGuid;
 }
 
-void ASF::File::FilePrivate::ExtendedContentDescriptionObject::parse(ASF::File *file, unsigned int /*size*/)
+void ASF::File::FilePrivate::ExtendedContentDescriptionObject::parse(ASF::File *file, long long /*size*/)
 {
   int count = readWORD(file);
   while(count--) {
@@ -312,7 +312,7 @@ ByteVector ASF::File::FilePrivate::MetadataObject::guid() const
   return metadataGuid;
 }
 
-void ASF::File::FilePrivate::MetadataObject::parse(ASF::File *file, unsigned int /*size*/)
+void ASF::File::FilePrivate::MetadataObject::parse(ASF::File *file, long long /*size*/)
 {
   int count = readWORD(file);
   while(count--) {
@@ -335,7 +335,7 @@ ByteVector ASF::File::FilePrivate::MetadataLibraryObject::guid() const
   return metadataLibraryGuid;
 }
 
-void ASF::File::FilePrivate::MetadataLibraryObject::parse(ASF::File *file, unsigned int /*size*/)
+void ASF::File::FilePrivate::MetadataLibraryObject::parse(ASF::File *file, long long /*size*/)
 {
   int count = readWORD(file);
   while(count--) {
@@ -363,7 +363,7 @@ ByteVector ASF::File::FilePrivate::HeaderExtensionObject::guid() const
   return headerExtensionGuid;
 }
 
-void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsigned int /*size*/)
+void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, long long /*size*/)
 {
   file->seek(18, File::Current);
   long long dataSize = readDWORD(file);
@@ -392,7 +392,7 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, unsig
     else {
       obj = new UnknownObject(uid);
     }
-    obj->parse(file, static_cast<unsigned int>(size));
+    obj->parse(file, size);
     objects.append(obj);
     dataPos += size;
   }
@@ -413,7 +413,7 @@ ByteVector ASF::File::FilePrivate::CodecListObject::guid() const
   return codecListGuid;
 }
 
-void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, unsigned int size)
+void ASF::File::FilePrivate::CodecListObject::parse(ASF::File *file, long long size)
 {
   BaseObject::parse(file, size);
   if(data.size() <= 20) {
@@ -637,7 +637,7 @@ void ASF::File::read()
       setValid(false);
       break;
     }
-    auto size = static_cast<long>(readQWORD(this, &ok));
+    auto size = readQWORD(this, &ok);
     if(!ok) {
       setValid(false);
       break;
