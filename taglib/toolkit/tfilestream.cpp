@@ -28,6 +28,7 @@
 #ifdef _WIN32
 # include <windows.h>
 #else
+# include <climits>
 # include <cstdio>
 # include <unistd.h>
 #endif
@@ -326,7 +327,8 @@ void FileStream::removeBlock(offset_t start, size_t length)
 
   ByteVector buffer(bufferLength);
 
-  for(unsigned int bytesRead = -1; bytesRead != 0;) {
+  unsigned int bytesRead = UINT_MAX;
+  while(bytesRead != 0) {
     seek(readPosition);
     bytesRead = static_cast<unsigned int>(readFile(d->file, buffer));
     readPosition += bytesRead;
