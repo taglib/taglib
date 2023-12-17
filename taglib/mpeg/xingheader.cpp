@@ -80,7 +80,7 @@ void MPEG::XingHeader::parse(const ByteVector &data)
 {
   // Look for a Xing header.
 
-  long offset = data.find("Xing");
+  auto offset = data.find("Xing");
   if(offset < 0)
     offset = data.find("Info");
 
