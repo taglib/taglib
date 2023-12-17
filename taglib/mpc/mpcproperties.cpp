@@ -43,7 +43,7 @@ public:
   int sampleRate { 0 };
   int channels { 0 };
   unsigned int totalFrames { 0 };
-  unsigned int sampleFrames { 0 };
+  unsigned long sampleFrames { 0 };
   int trackGain { 0 };
   int trackPeak { 0 };
   int albumGain { 0 };
@@ -101,7 +101,7 @@ unsigned int MPC::Properties::totalFrames() const
   return d->totalFrames;
 }
 
-unsigned int MPC::Properties::sampleFrames() const
+unsigned long MPC::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }
@@ -225,7 +225,7 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
       d->sampleRate = sftable[(flags >> 13) & 0x07];
       d->channels   = ((flags >> 4) & 0x0F) + 1;
 
-      const unsigned int frameCount = d->sampleFrames - begSilence;
+      const auto frameCount = d->sampleFrames - begSilence;
       if(frameCount > 0 && d->sampleRate > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
         d->length  = static_cast<int>(length + 0.5);
