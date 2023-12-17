@@ -133,12 +133,19 @@ void TextIdentificationFrame::setTextEncoding(String::Type encoding)
 namespace
 {
   // array of allowed TIPL prefixes and their corresponding key value
+  struct iPeople : public std::pair<const char*, const char*> {
+    using std::pair<const char*, const char*>::pair;
+    bool operator==(String s) const
+    {
+      return s == first;
+    }
+  };
   constexpr std::array involvedPeople {
-    std::pair("ARRANGER", "ARRANGER"),
-    std::pair("ENGINEER", "ENGINEER"),
-    std::pair("PRODUCER", "PRODUCER"),
-    std::pair("DJ-MIX", "DJMIXER"),
-    std::pair("MIX", "MIXER"),
+    iPeople("ARRANGER", "ARRANGER"),
+    iPeople("ENGINEER", "ENGINEER"),
+    iPeople("PRODUCER", "PRODUCER"),
+    iPeople("DJ-MIX", "DJMIXER"),
+    iPeople("MIX", "MIXER"),
   };
 
   constexpr std::array txxxFrameTranslation {
@@ -314,8 +321,7 @@ PropertyMap TextIdentificationFrame::makeTIPLProperties() const
   }
   const StringList l = fieldList();
   for(auto it = l.begin(); it != l.end(); ++it) {
-    auto found = std::find_if(involvedPeople.begin(), involvedPeople.end(),
-      [=](const auto &person) { return *it == person.first; });
+    auto found = std::find(involvedPeople.begin(), involvedPeople.end(), *it);
     if(found != involvedPeople.end()) {
       map.insert(found->second, (++it)->split(","));
     }
