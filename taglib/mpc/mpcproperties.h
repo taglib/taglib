@@ -90,7 +90,7 @@ namespace TagLib {
       int mpcVersion() const;
 
       unsigned int totalFrames() const;
-      unsigned int sampleFrames() const;
+      unsigned long sampleFrames() const;
 
       /*!
       * Returns the track gain as an integer value,
