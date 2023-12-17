@@ -251,7 +251,7 @@ int ASF::Attribute::dataSize() const
     if(d->pictureValue.isValid()) {
       return d->pictureValue.dataSize();
     }
-    break;
+    return d->byteVectorValue.size();
   case GuidType:
     return d->byteVectorValue.size();
   }
@@ -291,6 +291,9 @@ ByteVector ASF::Attribute::render(const String &name, int kind) const
   case BytesType:
     if(d->pictureValue.isValid()) {
       data.append(d->pictureValue.render());
+    }
+    else {
+      data.append(d->byteVectorValue);
     }
     break;
   case GuidType:
