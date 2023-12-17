@@ -77,7 +77,7 @@ void Mod::FileBase::writeU16L(unsigned short number)
 
 void Mod::FileBase::writeU32L(unsigned long number)
 {
-  writeBlock(ByteVector::fromUInt(number, false));
+  writeBlock(ByteVector::fromUInt(static_cast<unsigned int>(number), false));
 }
 
 void Mod::FileBase::writeU16B(unsigned short number)
@@ -87,7 +87,7 @@ void Mod::FileBase::writeU16B(unsigned short number)
 
 void Mod::FileBase::writeU32B(unsigned long number)
 {
-  writeBlock(ByteVector::fromUInt(number, true));
+  writeBlock(ByteVector::fromUInt(static_cast<unsigned int>(number), true));
 }
 
 bool Mod::FileBase::readByte(unsigned char &byte)
