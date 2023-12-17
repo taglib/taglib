@@ -207,7 +207,7 @@ ByteVector APE::Footer::render(bool isHeader) const
   flags[30] = false; // footer is always present
   flags[29] = isHeader;
 
-  v.append(ByteVector::fromUInt(flags.to_ulong(), false));
+  v.append(ByteVector::fromUInt(static_cast<unsigned int>(flags.to_ulong()), false));
 
   // add the reserved 64bit
 
