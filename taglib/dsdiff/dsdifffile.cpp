@@ -66,7 +66,7 @@ namespace
       return false;
 
     for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || name[i] > 127)
+      if(name[i] < 32 /*|| name[i] > 127*/)
         return false;
     }
 
