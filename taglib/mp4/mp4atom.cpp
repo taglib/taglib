@@ -302,4 +302,4 @@ bool MP4::Atoms::checkRootLevelAtoms()
 const MP4::AtomList &MP4::Atoms::atoms() const
 {
   return d->atoms;
-};
+}
