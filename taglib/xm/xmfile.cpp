@@ -443,7 +443,7 @@ bool XM::File::save()
       return false;
 
     seek(pos + 4);
-    const unsigned int len = std::min(22UL, instrumentHeaderSize - 4U);
+    const auto len = std::min(22UL, instrumentHeaderSize - 4);
     if(i >= lines.size())
       writeString(String(), len);
     else
@@ -474,7 +474,7 @@ bool XM::File::save()
 
         if(sampleHeaderSize > 18U) {
           seek(pos + 18);
-          const unsigned int sz = std::min(sampleHeaderSize - 18U, 22UL);
+          const auto sz = std::min(sampleHeaderSize - 18, 22UL);
           if(sampleNameIndex >= lines.size())
             writeString(String(), sz);
           else
@@ -528,8 +528,8 @@ void XM::File::read(bool)
         .u16L(tempo)
         .u16L(bpmSpeed);
 
-  unsigned int count = header.read(*this, headerSize - 4U);
-  unsigned int size = std::min(headerSize - 4U, static_cast<unsigned long>(header.size()));
+  unsigned int count = header.read(*this, static_cast<unsigned int>(headerSize - 4));
+  unsigned int size = std::min(static_cast<unsigned int>(headerSize - 4), header.size());
 
   READ_ASSERT(count == size);
 
@@ -555,7 +555,7 @@ void XM::File::read(bool)
     StructReader pattern;
     pattern.byte(packingType).u16L(rowCount).u16L(dataSize);
 
-    unsigned int ptCnt = pattern.read(*this, patternHeaderLength - 4U);
+    unsigned int ptCnt = pattern.read(*this, static_cast<unsigned int>(patternHeaderLength - 4));
     READ_ASSERT(ptCnt == std::min(patternHeaderLength - 4U,
                                   static_cast<unsigned long>(pattern.size())));
 
@@ -579,7 +579,7 @@ void XM::File::read(bool)
     instrument.string(instrumentName, 22).byte(instrumentType).u16L(sampleCount);
 
     // 4 for instrumentHeaderSize
-    unsigned int inCnt = 4 + instrument.read(*this, instrumentHeaderSize - 4U);
+    unsigned int inCnt = 4 + instrument.read(*this, static_cast<unsigned int>(instrumentHeaderSize - 4));
     READ_ASSERT(inCnt == std::min(instrumentHeaderSize,
                                   static_cast<unsigned long>(instrument.size() + 4)));
 
@@ -615,7 +615,7 @@ void XM::File::read(bool)
               .byte(compression)
               .string(sampleName, 22);
 
-        unsigned int smCnt = sample.read(*this, sampleHeaderSize);
+        unsigned int smCnt = sample.read(*this, static_cast<unsigned int>(sampleHeaderSize));
         READ_ASSERT(smCnt == std::min(sampleHeaderSize,
                                       static_cast<unsigned long>(sample.size())));
         // skip unhandled header proportion:
