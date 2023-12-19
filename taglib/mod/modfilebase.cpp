@@ -45,7 +45,7 @@ Mod::FileBase::FileBase(IOStream *stream) : TagLib::File(stream)
 void Mod::FileBase::writeString(const String &s, unsigned long size, char padding)
 {
   ByteVector data(s.data(String::Latin1));
-  data.resize(size, padding);
+  data.resize(static_cast<unsigned int>(size), padding);
   writeBlock(data);
 }
 
