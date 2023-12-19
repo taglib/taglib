@@ -417,7 +417,7 @@ bool XM::File::save()
   if(!readU16L(patternCount) || !readU16L(instrumentCount))
     return false;
 
-  long pos = 60 + headerSize; // should be long long in taglib2.
+  offset_t pos = 60 + headerSize;
 
   // need to read patterns again in order to seek to the instruments:
   for(unsigned short i = 0; i < patternCount; ++ i) {
