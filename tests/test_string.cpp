@@ -26,6 +26,7 @@
 #include <cstring>
 
 #include "tstring.h"
+#include "tutils.h"
 #include <cppunit/extensions/HelperMacros.h>
 
 using namespace std;
@@ -96,19 +97,23 @@ public:
     String unicode3(L"\u65E5\u672C\u8A9E");
     CPPUNIT_ASSERT(*(unicode3.toCWString() + 1) == L'\u672C');
 
-    String unicode4(L"\u65e5\u672c\u8a9e", String::UTF16BE);
+    const wchar_t wcSystemOrder[] = {L'\u65E5', L'\u672C', L'\u8A9E', 0};
+    const wchar_t wcSwappedOrder[] = {L'\uE565', L'\u2C67', L'\u9E8A', 0};
+    const std::wstring wsSystemOrder = L"\u65e5\u672c\u8a9e";
+    const std::wstring wsSwappedOrder = L"\ue565\u2c67\u9e8a";
+    const bool isLe = Utils::systemByteOrder() == Utils::LittleEndian;
+
+    String unicode4(isLe ? wcSwappedOrder : wcSystemOrder, String::UTF16BE);
     CPPUNIT_ASSERT(unicode4[1] == L'\u672c');
 
-    String unicode5(L"\u65e5\u672c\u8a9e", String::UTF16LE);
-    CPPUNIT_ASSERT(unicode5[1] == L'\u2c67');
+    String unicode5(isLe ? wcSystemOrder : wcSwappedOrder, String::UTF16LE);
+    CPPUNIT_ASSERT(unicode5[1] == L'\u672c');
 
-    std::wstring stduni = L"\u65e5\u672c\u8a9e";
-
-    String unicode6(stduni, String::UTF16BE);
+    String unicode6(isLe ? wsSwappedOrder : wsSystemOrder, String::UTF16BE);
     CPPUNIT_ASSERT(unicode6[1] == L'\u672c');
 
-    String unicode7(stduni, String::UTF16LE);
-    CPPUNIT_ASSERT(unicode7[1] == L'\u2c67');
+    String unicode7(isLe ? wsSystemOrder : wsSwappedOrder, String::UTF16LE);
+    CPPUNIT_ASSERT(unicode7[1] == L'\u672c');
 
     CPPUNIT_ASSERT(String("  foo  ").stripWhiteSpace() == String("foo"));
     CPPUNIT_ASSERT(String("foo    ").stripWhiteSpace() == String("foo"));

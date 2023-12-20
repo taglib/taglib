@@ -203,14 +203,14 @@ namespace TagLib
       /*!
        * Returns the byte order of the system.
        */
-      inline ByteOrder systemByteOrder()
+      constexpr ByteOrder systemByteOrder()
       {
-        union {
+        constexpr union IntCharUnion {
           int  i;
           char c;
-        } u;
+          constexpr IntCharUnion(int j) : i(j) {}
+        } u{1};
 
-        u.i = 1;
         if(u.c == 1)
           return LittleEndian;
         return BigEndian;

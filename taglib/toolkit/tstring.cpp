@@ -38,11 +38,10 @@ namespace
   using namespace TagLib;
 
   // Returns the native format of std::wstring.
-  String::Type wcharByteOrder()
+  constexpr String::Type wcharByteOrder()
   {
-    if(Utils::systemByteOrder() == Utils::LittleEndian)
-      return String::UTF16LE;
-    return String::UTF16BE;
+    return Utils::systemByteOrder() == Utils::LittleEndian ? String::UTF16LE
+                                                           : String::UTF16BE;
   }
 
   // Converts a Latin-1 string into UTF-16(without BOM/CPU byte order)
@@ -172,17 +171,15 @@ String::String(const std::string &s, Type t) :
   }
 }
 
+String::String(const wstring &s) :
+ String(s, wcharByteOrder())
+{
+}
+
 String::String(const wstring &s, Type t) :
   d(std::make_shared<StringPrivate>())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
-    // This looks ugly but needed for the compatibility with TagLib1.8.
-    // Should be removed in TabLib2.0.
-    if (t == UTF16BE)
-      t = wcharByteOrder();
-    else if (t == UTF16LE)
-      t = (wcharByteOrder() == UTF16LE ? UTF16BE : UTF16LE);
-
     copyFromUTF16(d->data, s.c_str(), s.length(), t);
   }
   else {
@@ -190,17 +187,15 @@ String::String(const wstring &s, Type t) :
   }
 }
 
+String::String(const wchar_t *s) :
+  String(s, wcharByteOrder())
+{
+}
+
 String::String(const wchar_t *s, Type t) :
   d(std::make_shared<StringPrivate>())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
-    // This looks ugly but needed for the compatibility with TagLib1.8.
-    // Should be removed in TabLib2.0.
-    if (t == UTF16BE)
-      t = wcharByteOrder();
-    else if (t == UTF16LE)
-      t = (wcharByteOrder() == UTF16LE ? UTF16BE : UTF16LE);
-
     copyFromUTF16(d->data, s, ::wcslen(s), t);
   }
   else {
