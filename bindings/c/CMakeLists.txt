@@ -14,6 +14,17 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/trueaudio
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/aiff
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/wav
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ape
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/it
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mod
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/s3m
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/xm
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/opus
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsf
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsdiff
 )
 
 set(tag_c_HDRS tag_c.h)
