@@ -135,7 +135,7 @@ namespace
     File *file = nullptr;
 
     if(ext == "MP3" || ext == "MP2" || ext == "AAC")
-      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
+      file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGG")
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGA") {
@@ -147,7 +147,7 @@ namespace
       }
     }
     else if(ext == "FLAC")
-      file = new FLAC::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
+      file = new FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "MPC")
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "WV")
@@ -201,13 +201,13 @@ namespace
     File *file = nullptr;
 
     if(MPEG::File::isSupported(stream))
-      file = new MPEG::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
+      file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(Ogg::Vorbis::File::isSupported(stream))
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(Ogg::FLAC::File::isSupported(stream))
       file = new Ogg::FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(FLAC::File::isSupported(stream))
-      file = new FLAC::File(stream, ID3v2::FrameFactory::instance(), readAudioProperties, audioPropertiesStyle);
+      file = new FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(MPC::File::isSupported(stream))
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(WavPack::File::isSupported(stream))

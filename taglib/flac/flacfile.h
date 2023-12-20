@@ -88,11 +88,12 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        *
-       * \deprecated This constructor will be dropped in favor of the one below
-       * in a future version.
+       * If this file contains an ID3v2 tag, the frames will be created using
+       * \a frameFactory (default if null).
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
        * Constructs an FLAC file from \a file.  If \a readProperties is true the
@@ -103,10 +104,26 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
-      // BIC: merge with the above constructor, kept for source compatibility
+      TAGLIB_DEPRECATED
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
+
+      /*!
+       * Constructs a FLAC file from \a stream.  If \a readProperties is true the
+       * file's audio properties will also be read.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
+       *
+       * If this file contains an ID3v2 tag, the frames will be created using
+       * \a frameFactory (default if null).
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
+       */
+      File(IOStream *stream, bool readProperties = true,
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
        * Constructs a FLAC file from \a stream.  If \a readProperties is true the
@@ -120,6 +137,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
+      TAGLIB_DEPRECATED
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);

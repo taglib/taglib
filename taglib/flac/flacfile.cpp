@@ -93,9 +93,12 @@ bool FLAC::File::isSupported(IOStream *stream)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-FLAC::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+FLAC::File::File(FileName file, bool readProperties,
+                 Properties::ReadStyle,
+                 ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties);
@@ -105,6 +108,17 @@ FLAC::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle) :
   TagLib::File(file),
   d(std::make_unique<FilePrivate>(frameFactory))
+{
+  if(isOpen())
+    read(readProperties);
+}
+
+FLAC::File::File(IOStream *stream, bool readProperties,
+                 Properties::ReadStyle,
+                 ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(stream),
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties);

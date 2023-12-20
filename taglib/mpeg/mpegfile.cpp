@@ -25,6 +25,7 @@
 
 #include "mpegfile.h"
 
+#include "id3v2framefactory.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "apefooter.h"
@@ -122,9 +123,12 @@ bool MPEG::File::isSupported(IOStream *stream)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MPEG::File::File(FileName file, bool readProperties, Properties::ReadStyle readStyle) :
+MPEG::File::File(FileName file, bool readProperties,
+                 Properties::ReadStyle readStyle,
+                 ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties, readStyle);
@@ -134,6 +138,17 @@ MPEG::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
                  bool readProperties, Properties::ReadStyle readStyle) :
   TagLib::File(file),
   d(std::make_unique<FilePrivate>(frameFactory))
+{
+  if(isOpen())
+    read(readProperties, readStyle);
+}
+
+MPEG::File::File(IOStream *stream, bool readProperties,
+                 Properties::ReadStyle readStyle,
+                 ID3v2::FrameFactory *frameFactory) :
+  TagLib::File(stream),
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties, readStyle);
