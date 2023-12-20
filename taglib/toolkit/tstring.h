@@ -139,22 +139,24 @@ namespace TagLib {
     String(const std::string &s, Type t = Latin1);
 
     /*!
-     * Makes a deep copy of the data in \a s.
-     *
-     * /note If \a t is UTF16LE, the byte order of \a s will be swapped regardless
-     * of the CPU byte order.  If UTF16BE, it will not be swapped.  This behavior
-     * will be changed in TagLib2.0.
+     * Makes a deep copy of the data in \a s, which are in CPU byte order.
      */
-    String(const wstring &s, Type t = UTF16BE);
+    String(const wstring &s);
 
     /*!
-     * Makes a deep copy of the data in \a s.
-     *
-     * /note If \a t is UTF16LE, the byte order of \a s will be swapped regardless
-     * of the CPU byte order.  If UTF16BE, it will not be swapped.  This behavior
-     * will be changed in TagLib2.0.
+     * Makes a deep copy of the data in \a s, which are in byte order \a t.
      */
-    String(const wchar_t *s, Type t = UTF16BE);
+    String(const wstring &s, Type t);
+
+    /*!
+     * Makes a deep copy of the data in \a s, which are in CPU byte order.
+     */
+    String(const wchar_t *s);
+
+    /*!
+     * Makes a deep copy of the data in \a s, which are in byte order \a t.
+     */
+    String(const wchar_t *s, Type t);
 
     /*!
      * Makes a deep copy of the data in \a c.
