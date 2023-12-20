@@ -30,6 +30,7 @@
 #ifndef TAGLIB_TRUEAUDIOFILE_H
 #define TAGLIB_TRUEAUDIOFILE_H
 
+#include "taglib.h"
 #include "tfile.h"
 #include "trueaudioproperties.h"
 
@@ -82,10 +83,14 @@ namespace TagLib {
        * Constructs a TrueAudio file from \a file.  If \a readProperties is true
        * the file's audio properties will also be read.
        *
+       * If this file contains an ID3v2 tag, the frames will be created using
+       * \a frameFactory (default if null).
+       *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
        * Constructs a TrueAudio file from \a file.  If \a readProperties is true
@@ -96,6 +101,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
+      TAGLIB_DEPRECATED
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
@@ -107,10 +113,14 @@ namespace TagLib {
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
        *
+       * If this file contains an ID3v2 tag, the frames will be created using
+       * \a frameFactory.
+       *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle propertiesStyle = Properties::Average,
+           ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
        * Constructs a TrueAudio file from \a stream.  If \a readProperties is true
@@ -124,6 +134,7 @@ namespace TagLib {
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
        */
+      TAGLIB_DEPRECATED
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);

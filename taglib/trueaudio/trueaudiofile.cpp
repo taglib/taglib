@@ -78,9 +78,12 @@ bool TrueAudio::File::isSupported(IOStream *stream)
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-TrueAudio::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+TrueAudio::File::File(FileName file, bool readProperties,
+                      Properties::ReadStyle,
+                      ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties);
@@ -95,9 +98,12 @@ TrueAudio::File::File(FileName file, ID3v2::FrameFactory *frameFactory,
     read(readProperties);
 }
 
-TrueAudio::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
+TrueAudio::File::File(IOStream *stream, bool readProperties,
+                      Properties::ReadStyle,
+                      ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(
+    frameFactory ? frameFactory : ID3v2::FrameFactory::instance()))
 {
   if(isOpen())
     read(readProperties);

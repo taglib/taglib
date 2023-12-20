@@ -26,11 +26,14 @@
 #include <functional>
 #include <memory>
 
+#include "flacproperties.h"
+#include "mpegproperties.h"
 #include "tbytevector.h"
 #include "tpropertymap.h"
 #include "mpegfile.h"
 #include "flacfile.h"
 #include "trueaudiofile.h"
+#include "trueaudioproperties.h"
 #include "wavfile.h"
 #include "aifffile.h"
 #include "dsffile.h"
@@ -211,7 +214,8 @@ public:
         return new MPEG::File(fileName);
       },
       [](const char *fileName, ID3v2::FrameFactory *factory) {
-        return new MPEG::File(fileName, factory);
+        return new MPEG::File(fileName, true, MPEG::Properties::Average,
+          factory);
       },
       [](const File &f) {
         return static_cast<const MPEG::File &>(f).hasID3v2Tag();
@@ -234,7 +238,8 @@ public:
         return new FLAC::File(fileName);
       },
       [](const char *fileName, ID3v2::FrameFactory *factory) {
-        return new FLAC::File(fileName, factory);
+        return new FLAC::File(fileName, true, FLAC::Properties::Average,
+          factory);
       },
       [](const File &f) {
         return static_cast<const FLAC::File &>(f).hasID3v2Tag();
@@ -258,7 +263,8 @@ public:
         return new TrueAudio::File(fileName);
       },
       [](const char *fileName, ID3v2::FrameFactory *factory) {
-        return new TrueAudio::File(fileName, factory);
+        return new TrueAudio::File(fileName, true,
+          TrueAudio::Properties::Average, factory);
       },
       [](const File &f) {
         return static_cast<const TrueAudio::File &>(f).hasID3v2Tag();
