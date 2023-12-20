@@ -120,7 +120,17 @@ typedef enum {
   TagLib_File_Speex,
   TagLib_File_TrueAudio,
   TagLib_File_MP4,
-  TagLib_File_ASF
+  TagLib_File_ASF,
+  TagLib_File_AIFF,
+  TagLib_File_WAV,
+  TagLib_File_APE,
+  TagLib_File_IT,
+  TagLib_File_Mod,
+  TagLib_File_S3M,
+  TagLib_File_XM,
+  TagLib_File_Opus,
+  TagLib_File_DSF,
+  TagLib_File_DSDIFF
 } TagLib_File_Type;
 
 /*!

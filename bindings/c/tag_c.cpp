@@ -46,6 +46,16 @@
 #include "speexfile.h"
 #include "trueaudiofile.h"
 #include "mp4file.h"
+#include "aifffile.h"
+#include "wavfile.h"
+#include "apefile.h"
+#include "itfile.h"
+#include "modfile.h"
+#include "s3mfile.h"
+#include "xmfile.h"
+#include "opusfile.h"
+#include "dsffile.h"
+#include "dsdifffile.h"
 #include "tag.h"
 #include "id3v2framefactory.h"
 
@@ -150,6 +160,36 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     break;
   case TagLib_File_ASF:
     file = new ASF::File(filename);
+    break;
+  case TagLib_File_AIFF:
+    file = new RIFF::AIFF::File(filename);
+    break;
+  case TagLib_File_WAV:
+    file = new RIFF::WAV::File(filename);
+    break;
+  case TagLib_File_APE:
+    file = new APE::File(filename);
+    break;
+  case TagLib_File_IT:
+    file = new IT::File(filename);
+    break;
+  case TagLib_File_Mod:
+    file = new Mod::File(filename);
+    break;
+  case TagLib_File_S3M:
+    file = new S3M::File(filename);
+    break;
+  case TagLib_File_XM:
+    file = new XM::File(filename);
+    break;
+  case TagLib_File_Opus:
+    file = new Ogg::Opus::File(filename);
+    break;
+  case TagLib_File_DSF:
+    file = new DSF::File(filename);
+    break;
+  case TagLib_File_DSDIFF:
+    file = new DSDIFF::File(filename);
     break;
   default:
     break;
