@@ -81,7 +81,7 @@ namespace
     PROPChunk = 0,
     DIINChunk = 1
   };
-}
+} // namespace
 
 class DSDIFF::File::FilePrivate
 {
