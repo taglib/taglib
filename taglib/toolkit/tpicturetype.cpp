@@ -65,7 +65,7 @@ String Utils::pictureTypeToString(int type)
   return "";
 }
 
-int Utils::pictureTypeFromString(String str)
+int Utils::pictureTypeFromString(const String& str)
 {
   for(int i = 0; i < static_cast<int>(std::size(typeStrs)); ++i) {
     if(str == typeStrs[i]) {

@@ -93,7 +93,7 @@ enum name {                                                   \
 static TagLib::String typeToString(name type) {               \
   return TagLib::Utils::pictureTypeToString(type);            \
 }                                                             \
-static name typeFromString(TagLib::String str) {              \
+static name typeFromString(const TagLib::String &str) {       \
   return static_cast<name>(                                   \
     TagLib::Utils::pictureTypeFromString(str));               \
 }
@@ -112,7 +112,7 @@ namespace TagLib {
     /*!
      * Get picture type from string representation.
      */
-    int TAGLIB_EXPORT pictureTypeFromString(String str);
+    int TAGLIB_EXPORT pictureTypeFromString(const String& str);
 
   }  // namespace Utils
 }  // namespace TagLib
