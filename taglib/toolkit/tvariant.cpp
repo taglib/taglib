@@ -196,7 +196,7 @@ class Variant::VariantPrivate
 {
 public:
   VariantPrivate() = default;
-  VariantPrivate(const StdVariantType &v) : data(v) {}
+  VariantPrivate(StdVariantType v) : data(std::move(v)) {}
   StdVariantType data;
 };
 
