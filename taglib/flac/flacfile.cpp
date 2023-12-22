@@ -200,8 +200,8 @@ bool FLAC::File::setComplexProperties(const String &key, const List<VariantMap> 
   if(uppercaseKey == "PICTURE") {
     removePictures();
 
-    for(auto property : value) {
-      FLAC::Picture *picture = new FLAC::Picture;
+    for(const auto &property : value) {
+      auto picture = new FLAC::Picture;
       picture->setData(property.value("data").value<ByteVector>());
       picture->setMimeType(property.value("mimeType").value<String>());
       picture->setDescription(property.value("description").value<String>());
