@@ -302,7 +302,7 @@ void DSDIFF::File::strip(int tags)
   if(tags & DIIN) {
     removeChildChunk("DITI", DIINChunk);
     removeChildChunk("DIAR", DIINChunk);
-    if(d->childChunks[DIINIndex].size() == 0) {
+    if(d->childChunks[DIINIndex].empty()) {
       removeRootChunk("DIIN");
     }
 
@@ -373,7 +373,7 @@ void DSDIFF::File::setRootChunkData(unsigned int i, const ByteVector &data)
 
 void DSDIFF::File::setRootChunkData(const ByteVector &name, const ByteVector &data)
 {
-  if(d->chunks.size() == 0) {
+  if(d->chunks.empty()) {
     debug("DSDIFF::File::setRootChunkData('" + name + "') - No valid chunks found.");
     return;
   }
@@ -519,7 +519,7 @@ void DSDIFF::File::setChildChunkData(const ByteVector &name,
   // Couldn't find an existing chunk, so let's create a new one.
 
   unsigned long long offset = 0;
-  if(childChunks.size() > 0) {
+  if(!childChunks.empty()) {
     size_t i = childChunks.size() - 1;
     offset = childChunks[i].offset + childChunks[i].size + childChunks[i].padding;
   }
@@ -590,7 +590,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
 
   if(d->childChunkIndex[PROPChunk] >= static_cast<int>(startingChunk)) {
     ChunkList &childChunksToUpdate = d->childChunks[PROPChunk];
-    if(childChunksToUpdate.size() > 0) {
+    if(!childChunksToUpdate.empty()) {
       childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[PROPChunk]].offset + 12;
       for(unsigned int i = 1; i < childChunksToUpdate.size(); i++)
         childChunksToUpdate[i].offset = childChunksToUpdate[i - 1].offset + 12
@@ -600,7 +600,7 @@ void DSDIFF::File::updateRootChunksStructure(unsigned int startingChunk)
   }
   if(d->childChunkIndex[DIINChunk] >= static_cast<int>(startingChunk)) {
     ChunkList &childChunksToUpdate = d->childChunks[DIINChunk];
-    if(childChunksToUpdate.size() > 0) {
+    if(!childChunksToUpdate.empty()) {
       childChunksToUpdate[0].offset = d->chunks[d->childChunkIndex[DIINChunk]].offset + 12;
       for(unsigned int i = 1; i < childChunksToUpdate.size(); i++)
         childChunksToUpdate[i].offset = childChunksToUpdate[i - 1].offset + 12
