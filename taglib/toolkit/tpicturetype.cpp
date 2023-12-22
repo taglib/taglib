@@ -31,7 +31,7 @@ using namespace TagLib;
 
 namespace {
 
-  static const char *const typeStrs[] = {
+  constexpr const char *typeStrs[] = {
     "Other",
     "File Icon",
     "Other File Icon",
@@ -52,7 +52,7 @@ namespace {
     "Coloured Fish",
     "Illustration",
     "Band Logo",
-    "Publisher Logo"
+    "Publisher Logo",
   };
 
 }  // namespace
