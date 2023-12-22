@@ -501,7 +501,7 @@ bool ID3v2::Tag::setComplexProperties(const String &key, const List<VariantMap> 
   if(uppercaseKey == "PICTURE") {
     removeFrames("APIC");
 
-    for(auto property : value) {
+    for(const auto &property : value) {
       auto picture = new AttachedPictureFrame;
       picture->setPicture(property.value("data").value<ByteVector>());
       picture->setMimeType(property.value("mimeType").value<String>());
@@ -514,7 +514,7 @@ bool ID3v2::Tag::setComplexProperties(const String &key, const List<VariantMap> 
   else if(uppercaseKey == "GENERALOBJECT") {
     removeFrames("GEOB");
 
-    for(auto property : value) {
+    for(const auto &property : value) {
       auto geob = new GeneralEncapsulatedObjectFrame;
       geob->setObject(property.value("data").value<ByteVector>());
       geob->setMimeType(property.value("mimeType").value<String>());

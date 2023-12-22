@@ -432,7 +432,7 @@ bool ASF::Tag::setComplexProperties(const String &key, const List<VariantMap> &v
   if(uppercaseKey == "PICTURE") {
     removeItem("WM/Picture");
 
-    for(auto property : value) {
+    for(const auto &property : value) {
       ASF::Picture picture;
       picture.setPicture(property.value("data").value<ByteVector>());
       picture.setMimeType(property.value("mimeType").value<String>());

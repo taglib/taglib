@@ -323,11 +323,11 @@ bool APE::Tag::setComplexProperties(const String &key, const List<VariantMap> &v
 
     auto frontItems = List<Item>();
     auto backItems = List<Item>();
-    for(auto property : value) {
-      ByteVector data = property.value("description").value<String>().data(String::UTF8)
+    for(const auto &property : value) {
+      auto data = property.value("description").value<String>().data(String::UTF8)
                         .append('\0')
                         .append(property.value("data").value<ByteVector>());
-      String pictureType = property.value("pictureType").value<String>();
+      auto pictureType = property.value("pictureType").value<String>();
       Item item;
       item.setType(Item::Binary);
       item.setBinaryData(data);

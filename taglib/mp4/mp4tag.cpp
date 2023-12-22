@@ -558,8 +558,8 @@ bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &v
   const String uppercaseKey = key.upper();
   if(uppercaseKey == "PICTURE") {
     CoverArtList pictures;
-    for(auto property : value) {
-      String mimeType = property.value("mimeType").value<String>();
+    for(const auto &property : value) {
+      auto mimeType = property.value("mimeType").value<String>();
       CoverArt::Format format;
       if(mimeType == "image/bmp") {
         format = CoverArt::BMP;
