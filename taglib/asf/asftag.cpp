@@ -259,6 +259,8 @@ namespace
     std::pair("WM/Barcode", "BARCODE"),
     std::pair("WM/EncodedBy", "ENCODEDBY"),
     std::pair("WM/EncodingSettings", "ENCODING"),
+    std::pair("WM/EncodingTime", "ENCODINGTIME"),
+    std::pair("WM/AudioFileURL", "FILEWEBPAGE"),
     std::pair("WM/AlbumSortOrder", "ALBUMSORT"),
     std::pair("WM/AlbumArtistSortOrder", "ALBUMARTISTSORT"),
     std::pair("WM/ArtistSortOrder", "ARTISTSORT"),

@@ -80,6 +80,8 @@ TagLib 2.0 (Jan 24, 2024)
    - The stream operator for String uses UTF-8 instead of ISO-8859-1 encoding.
    - MP4 property ORIGINALDATE is mapped to "----:com.apple.iTunes:ORIGINALDATE"
      instead of "----:com.apple.iTunes:originaldate".
+   - MP4 property ENCODEDBY is mapped to "©enc" instead of "©too", which is now
+     mapped to ENCODING.
  * Unified interface for complex properties like pictures.
  * Simplified the unified properties interface by providing its methods on
    FileRef.
@@ -97,8 +99,9 @@ TagLib 2.0 (Jan 24, 2024)
  * Build system: Fixed PackageConfig to support both relative and absolute paths.
  * Build system: utf8cpp is no longer included, it can be provided via a system
    package or a Git submodule.
- * ASF: Support additional properties ARTISTWEBPAGE, ENCODING, INITIALKEY,
-   ORIGINALALBUM, ORIGINALARTIST, ORIGINALFILENAME, ORIGINALLYRICIST.
+ * ASF: Support additional properties ARTISTWEBPAGE, ENCODING, ENCODINGTIME,
+   FILEWEBPAGE, INITIALKEY, ORIGINALALBUM, ORIGINALARTIST, ORIGINALFILENAME,
+   ORIGINALLYRICIST.
  * ID3v2: Fixed extensibility of FrameFactory, use it also for WAV and AIFF
    files.
  * MP4: Support additional properties OWNER, RELEASEDATE.

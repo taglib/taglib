@@ -36,12 +36,12 @@
 | DISCNUMBER                 | TPOS   |       | disk                                                     | DISC                    | WM/PartOfSet                      |
 | DISCSUBTITLE               | TSST   | PRT1  | \----:com.apple.iTunes:DISCSUBTITLE                      |                         | WM/SetSubTitle                    |
 | DJMIXER                    |        |       | \----:com.apple.iTunes:DJMIXER                           |                         |                                   |
-| ENCODEDBY                  | TENC   | ITCH  | &copy;too                                                |                         | WM/EncodedBy                      |
-| ENCODING                   | TSSE   | ISFT  |                                                          |                         | WM/EncodingSettings               |
-| ENCODINGTIME               | TDEN   | IDIT  |                                                          |                         |                                   |
+| ENCODEDBY                  | TENC   | ITCH  | &copy;enc                                                |                         | WM/EncodedBy                      |
+| ENCODING                   | TSSE   | ISFT  | &copy;too                                                |                         | WM/EncodingSettings               |
+| ENCODINGTIME               | TDEN   | IDIT  |                                                          |                         | WM/EncodingTime                   |
 | ENGINEER                   |        |       | \----:com.apple.iTunes:ENGINEER                          |                         |                                   |
 | FILETYPE                   | TFLT   |       |                                                          |                         |                                   |
-| FILEWEBPAGE                | WOAF   |       |                                                          |                         |                                   |
+| FILEWEBPAGE                | WOAF   |       |                                                          |                         | WM/AudioFileURL                   |
 | GAPLESSPLAYBACK            |        |       | pgap                                                     |                         |                                   |
 | GENRE                      | TCON   | IGNR  | &copy;gen                                                |                         | WM/Genre                          |
 | GROUPING                   | GRP1   |       | &copy;grp                                                |                         |                                   |
@@ -50,9 +50,9 @@
 | ISRC                       | TSRC   | ISRC  | \----:com.apple.iTunes:ISRC                              |                         | WM/ISRC                           |
 | LABEL                      | TPUB   | IPUB  | \----:com.apple.iTunes:LABEL                             |                         | WM/Publisher                      |
 | LANGUAGE                   | TLAN   | ILNG  | \----:com.apple.iTunes:LANGUAGE                          |                         | WM/Language                       |
-| LENGTH                     | TLEN   |       | \----:com.apple.iTunes:LYRICIST                          |                         |                                   |
+| LENGTH                     | TLEN   |       |                                                          |                         |                                   |
 | LICENSE                    |        |       | \----:com.apple.iTunes:LICENSE                           |                         |                                   |
-| LYRICIST                   | TEXT   | IWRI  |                                                          |                         | WM/Writer                         |
+| LYRICIST                   | TEXT   | IWRI  | \----:com.apple.iTunes:LYRICIST                          |                         | WM/Writer                         |
 | LYRICS                     | USLT   |       | &copy;lyr                                                |                         | WM/Lyrics                         |
 | MEDIA                      | TMED   | IMED  | \----:com.apple.iTunes:MEDIA                             |                         | WM/Media                          |
 | MIXER                      |        |       | \----:com.apple.iTunes:MIXER                             |                         |                                   |

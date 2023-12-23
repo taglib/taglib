@@ -480,6 +480,7 @@ public:
     tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
     tags["DJMIXER"] = StringList("DJ Mixer");
     tags["ENCODEDBY"] = StringList("Encoded by");
+    tags["ENCODING"] = StringList("Encoding");
     tags["ENGINEER"] = StringList("Engineer");
     tags["GAPLESSPLAYBACK"] = StringList("1");
     tags["GENRE"] = StringList("Genre");
@@ -732,7 +733,7 @@ public:
 
       PropertyMap properties = f.properties();
       CPPUNIT_ASSERT_EQUAL(StringList("Test Artist!!!!"), properties["ARTIST"]);
-      CPPUNIT_ASSERT_EQUAL(StringList("FAAC 1.24"), properties["ENCODEDBY"]);
+      CPPUNIT_ASSERT_EQUAL(StringList("FAAC 1.24"), properties["ENCODING"]);
     }
   }
 
