@@ -331,6 +331,8 @@ public:
     tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
     tags["ENCODEDBY"] = StringList("Encoded by");
     tags["ENCODING"] = StringList("Encoding");
+    tags["ENCODINGTIME"] = StringList("2021-01-03 11:52:19");
+    tags["FILEWEBPAGE"] = StringList("File Webpage");
     tags["GENRE"] = StringList("Genre");
     tags["WORK"] = StringList("Grouping");
     tags["INITIALKEY"] = StringList("Initial Key");
