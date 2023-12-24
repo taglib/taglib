@@ -44,6 +44,9 @@ if(PLATFORM_WINRT)
   add_definitions(-DPLATFORM_WINRT)
 endif()
 
+set(TAGLIB_INSTALL_SUFFIX "" CACHE STRING
+  "Suffix added to installed files (include directory, libraries, .pc)")
+
 add_definitions(-DHAVE_CONFIG_H)
 set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
 
@@ -111,12 +114,14 @@ endif()
 
 if(NOT WIN32)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib-config" @ONLY)
-  install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config" DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config" DESTINATION "${CMAKE_INSTALL_BINDIR}"
+          RENAME "taglib${TAGLIB_INSTALL_SUFFIX}-config")
 endif()
 
 if(WIN32)
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib-config.cmd.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd")
-  install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd" DESTINATION "${CMAKE_INSTALL_BINDIR}")
+  install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/taglib-config.cmd" DESTINATION "${CMAKE_INSTALL_BINDIR}"
+          RENAME "taglib${TAGLIB_INSTALL_SUFFIX}-config.cmd")
 endif()
 
 if(NOT BUILD_FRAMEWORK)
@@ -131,7 +136,8 @@ if(NOT BUILD_FRAMEWORK)
     set(CMAKE_PC_LIBDIR "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
   endif()
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/taglib.pc.cmake" "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc" @ONLY)
-  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/taglib.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+          RENAME "taglib${TAGLIB_INSTALL_SUFFIX}.pc")
 endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

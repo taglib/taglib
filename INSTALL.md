@@ -26,21 +26,29 @@ generic help on running CMake.
 These are the most important build options. For details, have a look into the
 CMakeLists.txt file.
 
-| Option                  | Description                                |
-| ----------------------- | ------------------------------------------ |
-| `BUILD_SHARED_LIBS`     | Build shared libraries                     |
-| `CMAKE_BUILD_TYPE`      | Debug, Release, RelWithDebInfo, MinSizeRel |
-| `BUILD_EXAMPLES`        | Build examples                             |
-| `BUILD_BINDINGS`        | Build C bindings                           |
-| `BUILD_TESTING`         | Build unit tests                           |
-| `TRACE_IN_RELEASE`      | Enable debug output in release builds      |
-| `WITH_ZLIB`             | Whether to build with ZLib (default ON)    |
-| `ZLIB_ROOT`             | Where to find ZLib's root directory        |
-| `ZLIB_INCLUDE_DIR`      | Where to find ZLib's include directory     |
-| `ZLIB_LIBRARY`          | Where to find ZLib's library               |
-| `CMAKE_INSTALL_PREFIX`  | Where to install Taglib                    |
-| `ENABLE_STATIC_RUNTIME` | Link with MSVC runtime statically          |
-| `BUILD_FRAMEWORK`       | Build a macOS framework                    |
+| Option                  | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| `BUILD_SHARED_LIBS`     | Build shared libraries                             |
+| `CMAKE_BUILD_TYPE`      | Debug, Release, RelWithDebInfo, MinSizeRel         |
+| `BUILD_EXAMPLES`        | Build examples                                     |
+| `BUILD_BINDINGS`        | Build C bindings                                   |
+| `BUILD_TESTING`         | Build unit tests                                   |
+| `TRACE_IN_RELEASE`      | Enable debug output in release builds              |
+| `WITH_ZLIB`             | Whether to build with ZLib (default ON)            |
+| `ZLIB_ROOT`             | Where to find ZLib's root directory                |
+| `ZLIB_INCLUDE_DIR`      | Where to find ZLib's include directory             |
+| `ZLIB_LIBRARY`          | Where to find ZLib's library                       |
+| `CMAKE_INSTALL_PREFIX`  | Where to install Taglib                            |
+| `TAGLIB_INSTALL_SUFFIX` | Suffix added to installed libraries, includes, ... |
+| `ENABLE_STATIC_RUNTIME` | Link with MSVC runtime statically                  |
+| `BUILD_FRAMEWORK`       | Build a macOS framework                            |
+
+If you want to install TagLib 2 alongside TagLib 1, you can use
+`-DTAGLIB_INSTALL_SUFFIX=-2` and make sure that `BUILD_EXAMPLES` is not `ON`
+for both versions. The installed files will then include bin/taglib-2-config,
+include/taglib-2, cmake/taglib-2, pkgconfig/taglib-2.pc,
+pkgconfig/taglib_c-2.pc and the libraries have a suffix "-2".
+
 
 ## Dependencies
 

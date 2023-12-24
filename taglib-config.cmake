@@ -39,10 +39,10 @@ while test $# -gt 0
 do
   case $1 in
     --libs)
-      flags="$flags -L$libdir -ltag @ZLIB_LIBRARIES_FLAGS@"
+      flags="$flags -L$libdir -ltag@TAGLIB_INSTALL_SUFFIX@ @ZLIB_LIBRARIES_FLAGS@"
       ;;
     --cflags)
-      flags="$flags -I$includedir -I$includedir/taglib"
+      flags="$flags -I$includedir -I$includedir/taglib@TAGLIB_INSTALL_SUFFIX@"
       ;;
     --version)
       echo @TAGLIB_LIB_VERSION_STRING@

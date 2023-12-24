@@ -344,7 +344,7 @@ add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
 
 target_include_directories(tag INTERFACE
   $<INSTALL_INTERFACE:include>
-  $<INSTALL_INTERFACE:include/taglib>
+  $<INSTALL_INTERFACE:include/taglib${TAGLIB_INSTALL_SUFFIX}>
 )
 
 target_link_libraries(tag
@@ -375,19 +375,28 @@ if(BUILD_FRAMEWORK)
       )
 endif()
 
+if(TAGLIB_INSTALL_SUFFIX)
+  if(BUILD_SHARED_LIBS)
+    set(TAGLIB_LIBRARY_SUFFIX "${TAGLIB_INSTALL_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  else()
+    set(TAGLIB_LIBRARY_SUFFIX "${TAGLIB_INSTALL_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+  endif()
+  set_target_properties(tag PROPERTIES SUFFIX ${TAGLIB_LIBRARY_SUFFIX})
+endif()
+
 install(TARGETS tag
   EXPORT taglibTargets
   FRAMEWORK DESTINATION ${FRAMEWORK_INSTALL_DIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/taglib
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/taglib${TAGLIB_INSTALL_SUFFIX}
 )
 
 configure_package_config_file(
   "${PROJECT_SOURCE_DIR}/taglib-config.cmake.in"
   "${PROJECT_BINARY_DIR}/taglib-config.cmake"
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib${TAGLIB_INSTALL_SUFFIX}
 )
 
 write_basic_package_version_file(
@@ -399,10 +408,10 @@ write_basic_package_version_file(
 install(EXPORT taglibTargets
   FILE taglib-targets.cmake
   NAMESPACE TagLib::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib${TAGLIB_INSTALL_SUFFIX}
 )
 
 install(FILES "${PROJECT_BINARY_DIR}/taglib-config.cmake"
               "${PROJECT_BINARY_DIR}/taglib-config-version.cmake"
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/taglib${TAGLIB_INSTALL_SUFFIX}
 )
