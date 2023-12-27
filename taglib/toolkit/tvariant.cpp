@@ -70,125 +70,131 @@ T getVariantValue(StdVariantType *v, bool *ok)
   return {};
 }
 
-// Visitor to print a possibly recursive Variant to an ostream.
+void printStringToStream(std::ostream &s, const String &v)
+{
+  s << '"';
+  for(char c : v.to8Bit(true)) {
+    if(c == '"') {
+      s << "\\\"";
+    }
+    else {
+      s << c;
+    }
+  }
+  s << '"';
+}
+
+void printByteVectorToStream(std::ostream &s, const String &v)
+{
+  s << '"';
+  for(char c : v) {
+    s << "\\x" << std::setfill('0') << std::setw(2) << std::right << std::hex
+      << (static_cast<int>(c) & 0xff);
+  }
+  s << std::dec << '"';
+}
+
+// Print a possibly recursive Variant to an ostream.
 // The representation is JSON with hex strings for ByteVector.
-class OStreamVisitor {
-public:
-  OStreamVisitor(std::ostream &os) : s(os)
-  {
-  }
-
-  void operator()(std::monostate v)
-  {
+void printVariantToStream(std::ostream &s, const StdVariantType &v)
+{
+  switch (v.index()) {
+  case Variant::Void:
     s << "null";
-  }
-
-  void operator()(bool v)
-  {
-    s << (v ? "true" : "false");
-  }
-
-  void operator()(int v)
-  {
-    s << v;
-  }
-
-  void operator()(unsigned int v)
-  {
-    s << v;
-  }
-
-  void operator()(long long v)
-  {
-    s << v;
-  }
-
-  void operator()(unsigned long long v)
-  {
-    s << v;
-  }
-
-  void operator()(double v)
-  {
-    s << v;
-  }
-
-  void operator()(const TagLib::String &v)
-  {
-    s << '"';
-    for (char c : v.to8Bit(true)) {
-      if(c == '"') {
-        s << "\\\"";
-      }
-      else {
-        s << c;
-      }
+    break;
+  case Variant::Bool:
+    if(const auto valPtr = std::get_if<Variant::Bool>(&v)) {
+      s << (*valPtr ? "true" : "false");
     }
-    s << '"';
-  }
-
-  void operator()(const TagLib::StringList &v)
-  {
-    s << '[';
-    for(auto it = v.cbegin(); it != v.cend(); ++it) {
-      if(it != v.cbegin()) {
-        s << ", ";
+    break;
+  case Variant::Int:
+    if(const auto valPtr = std::get_if<Variant::Int>(&v)) {
+      s << *valPtr;
+    }
+    break;
+  case Variant::UInt:
+    if(const auto valPtr = std::get_if<Variant::UInt>(&v)) {
+      s << *valPtr;
+    }
+    break;
+  case Variant::LongLong:
+    if(const auto valPtr = std::get_if<Variant::LongLong>(&v)) {
+      s << *valPtr;
+    }
+    break;
+  case Variant::ULongLong:
+    if(const auto valPtr = std::get_if<Variant::ULongLong>(&v)) {
+      s << *valPtr;
+    }
+    break;
+  case Variant::Double:
+    if(const auto valPtr = std::get_if<Variant::Double>(&v)) {
+      s << *valPtr;
+    }
+    break;
+  case Variant::String:
+    if(const auto valPtr = std::get_if<Variant::String>(&v)) {
+      printStringToStream(s, *valPtr);
+    }
+    break;
+  case Variant::StringList:
+    if(const auto valPtr = std::get_if<Variant::StringList>(&v)) {
+      const auto v = *valPtr;
+      s << '[';
+      for(auto it = valPtr->cbegin(); it != valPtr->cend(); ++it) {
+        if(it != valPtr->cbegin()) {
+          s << ", ";
+        }
+        printStringToStream(s, *it);
       }
-      operator()(*it);
+      s << ']';
     }
-    s << ']';
-  }
-
-  void operator()(const TagLib::ByteVector &v)
-  {
-    s << '"';
-    for(char c : v) {
-      s << "\\x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-        << (static_cast<int>(c) & 0xff);
+    break;
+  case Variant::ByteVector:
+    if(const auto valPtr = std::get_if<Variant::ByteVector>(&v)) {
+      printByteVectorToStream(s, *valPtr);
     }
-    s << std::dec << '"';
-  }
-
-  void operator()(const TagLib::ByteVectorList &v)
-  {
-    s << '[';
-    for(auto it = v.cbegin(); it != v.cend(); ++it) {
-      if(it != v.cbegin()) {
-        s << ", ";
+    break;
+  case Variant::ByteVectorList:
+    if(const auto valPtr = std::get_if<Variant::ByteVectorList>(&v)) {
+      s << '[';
+      for(auto it = valPtr->cbegin(); it != valPtr->cend(); ++it) {
+        if(it != valPtr->cbegin()) {
+          s << ", ";
+        }
+        printByteVectorToStream(s, *it);
       }
-      operator()(*it);
+      s << ']';
     }
-    s << ']';
-  }
-
-  void operator()(const List<TagLib::Variant> &v) {
-    s << '[';
-    for(auto it = v.cbegin(); it != v.cend(); ++it) {
-      if(it != v.cbegin()) {
-        s << ", ";
+    break;
+  case Variant::VariantList:
+    if(const auto valPtr = std::get_if<Variant::VariantList>(&v)) {
+      s << '[';
+      for(auto it = valPtr->cbegin(); it != valPtr->cend(); ++it) {
+        if(it != valPtr->cbegin()) {
+          s << ", ";
+        }
+        s << *it;
       }
-      s << *it;
+      s << ']';
     }
-    s << ']';
-  }
-
-  void operator()(const Map<TagLib::String, TagLib::Variant> &v)
-  {
-    s << '{';
-    for(auto it = v.cbegin(); it != v.cend(); ++it) {
-      if(it != v.cbegin()) {
-        s << ", ";
+    break;
+  case Variant::VariantMap:
+    if(const auto valPtr = std::get_if<Variant::VariantMap>(&v)) {
+      s << '{';
+      for(auto it = valPtr->cbegin(); it != valPtr->cend(); ++it) {
+        if(it != valPtr->cbegin()) {
+          s << ", ";
+        }
+        printStringToStream(s, it->first);
+        s << ": ";
+        s << it->second;
       }
-      operator()(it->first);
-      s << ": ";
-      s << it->second;
+      s << '}';
     }
-    s << '}';
+    break;
   }
-
-private:
-  std::ostream &s;
-};
+}
 
 } // namespace
 
@@ -386,6 +392,6 @@ Variant &Variant::operator=(const Variant &) = default;
 
 std::ostream &operator<<(std::ostream &s, const TagLib::Variant &v)
 {
-  std::visit(OStreamVisitor(s), v.d->data);
+  printVariantToStream(s, v.d->data);
   return s;
 }
