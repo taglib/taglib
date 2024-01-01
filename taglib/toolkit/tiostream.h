@@ -94,7 +94,7 @@ namespace TagLib {
 
     /*!
      * Attempts to write the block \a data at the current get pointer.  If the
-     * file is currently only opened read only -- i.e. readOnly() returns true --
+     * file is currently only opened read only -- i.e. readOnly() returns \c true --
      * this attempts to reopen the file in read/write mode.
      *
      * \note This should be used instead of using the streaming output operator
@@ -123,7 +123,7 @@ namespace TagLib {
     virtual void removeBlock(offset_t start = 0, size_t length = 0) = 0;
 
     /*!
-     * Returns true if the file is read only (or if the file can not be opened).
+     * Returns \c true if the file is read only (or if the file can not be opened).
      */
     virtual bool readOnly() const = 0;
 

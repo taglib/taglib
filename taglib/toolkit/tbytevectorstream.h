@@ -43,8 +43,7 @@ namespace TagLib {
   {
   public:
     /*!
-     * Construct a File object and opens the \a file.  \a file should be a
-     * be a C-string in the local file system encoding.
+     * Construct a ByteVectorStream from the bytes in \a data.
      */
     ByteVectorStream(const ByteVector &data);
 
@@ -57,7 +56,7 @@ namespace TagLib {
     ByteVectorStream &operator=(const ByteVectorStream &) = delete;
 
     /*!
-     * Returns the file name in the local file system encoding.
+     * Returns an empty string.
      */
     FileName name() const override;
 
@@ -67,9 +66,7 @@ namespace TagLib {
     ByteVector readBlock(size_t length) override;
 
     /*!
-     * Attempts to write the block \a data at the current get pointer.  If the
-     * file is currently only opened read only -- i.e. readOnly() returns true --
-     * this attempts to reopen the file in read/write mode.
+     * Writes the block \a data at the current get pointer.
      *
      * \note This should be used instead of using the streaming output operator
      * for a ByteVector.  And even this function is significantly slower than
@@ -96,13 +93,12 @@ namespace TagLib {
     void removeBlock(offset_t start = 0, size_t length = 0) override;
 
     /*!
-     * Returns true if the file is read only (or if the file can not be opened).
+     * Returns \c false.
      */
     bool readOnly() const override;
 
     /*!
-     * Since the file can currently only be opened as an argument to the
-     * constructor (sort-of by design), this returns if that open succeeded.
+     * Returns \c true.
      */
     bool isOpen() const override;
 
@@ -115,7 +111,7 @@ namespace TagLib {
     void seek(offset_t offset, Position p = Beginning) override;
 
     /*!
-     * Reset the end-of-file and error flags on the file.
+     * Does nothing.
      */
     void clear() override;
 

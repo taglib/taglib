@@ -50,7 +50,7 @@ namespace TagLib
     class TAGLIB_EXPORT Picture {
     public:
 
-      /*!
+      /*
        * This describes the function or content of the picture.
        */
       DECLARE_PICTURE_TYPE_ENUM(Type)
@@ -76,12 +76,12 @@ namespace TagLib
       Picture& operator=(const Picture& other);
 
       /*!
-       * Exchanges the content of the Picture by the content of \a other.
+       * Exchanges the content of the Picture with the content of \a other.
        */
       void swap(Picture &other) noexcept;
 
       /*!
-       * Returns true if Picture stores valid picture
+       * Returns \c true if Picture stores valid picture
        */
       bool isValid() const;
 
@@ -136,7 +136,7 @@ namespace TagLib
       /*!
        * Returns the image data as a ByteVector.
        *
-       * \note ByteVector has a data() method that returns a const char * which
+       * \note ByteVector has a data() method that returns a <tt>const char *</tt> which
        * should make it easy to export this data to external programs.
        *
        * \see setPicture()

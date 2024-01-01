@@ -35,11 +35,12 @@
 
 namespace TagLib {
   namespace FLAC {
+    //! FLAC picture
     class TAGLIB_EXPORT Picture : public MetadataBlock
     {
     public:
 
-      /*!
+      /*
        * This describes the function or content of the picture.
        */
       DECLARE_PICTURE_TYPE_ENUM(Type)

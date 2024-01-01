@@ -38,7 +38,7 @@ namespace TagLib {
     //! An implementation of WAV metadata
 
     /*!
-     * This is implementation of WAV metadata.
+     * this is an implementation of WAV metadata.
      *
      * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
      * chunk as well as properties from the file.
@@ -70,7 +70,7 @@ namespace TagLib {
         };
 
         /*!
-         * Constructs a WAV file from \a file.  If \a readProperties is true the
+         * Constructs a WAV file from \a file.  If \a readProperties is \c true the
          * file's audio properties will also be read.
          *
          * \note In the current implementation, \a propertiesStyle is ignored.
@@ -83,7 +83,7 @@ namespace TagLib {
              ID3v2::FrameFactory *frameFactory = nullptr);
 
         /*!
-         * Constructs a WAV file from \a stream.  If \a readProperties is true the
+         * Constructs a WAV file from \a stream.  If \a readProperties is \c true the
          * file's audio properties will also be read.
          *
          * \note TagLib will *not* take ownership of the stream, the caller is
@@ -136,7 +136,7 @@ namespace TagLib {
 
         /*!
          * This will strip the tags that match the OR-ed together TagTypes from the
-         * file.  By default it strips all tags.  It returns true if the tags are
+         * file.  By default it strips all tags.  It returns \c true if the tags are
          * successfully stripped.
          *
          * \note This will update the file immediately.

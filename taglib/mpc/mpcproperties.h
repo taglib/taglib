@@ -50,7 +50,7 @@ namespace TagLib {
     public:
       /*!
        * Create an instance of MPC::Properties with the data read directly
-       * from a MPC::File.
+       * from an MPC::File.
        */
       Properties(File *file, offset_t streamLength, ReadStyle style = Average);
 

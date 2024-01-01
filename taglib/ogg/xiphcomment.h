@@ -184,7 +184,7 @@ namespace TagLib {
 
       /*!
        * Add the field specified by \a key with the data \a value.  If \a replace
-       * is true, then all of the other fields with the same key will be removed
+       * is \c true, then all of the other fields with the same key will be removed
        * first.
        *
        * If the field value is empty, the field will be removed.
@@ -213,7 +213,7 @@ namespace TagLib {
       void removeAllFields();
 
       /*!
-       * Returns true if the field is contained within the comment.
+       * Returns \c true if the field is contained within the comment.
        *
        * \note This is safer than checking for membership in the FieldListMap.
        */
@@ -222,7 +222,7 @@ namespace TagLib {
       /*!
        * Renders the comment to a ByteVector suitable for inserting into a file.
        *
-       * If \a addFramingBit is true the standard Vorbis comment framing bit will
+       * If \a addFramingBit is \c true the standard Vorbis comment framing bit will
        * be appended.  However some formats (notably FLAC) do not work with this
        * in place.
        */
@@ -235,8 +235,8 @@ namespace TagLib {
       List<FLAC::Picture *> pictureList();
 
       /*!
-       * Removes an picture. If \a del is true the picture's memory
-       * will be freed; if it is false, it must be deleted by the user.
+       * Removes an picture. If \a del is \c true the picture's memory
+       * will be freed; if it is \c false, it must be deleted by the user.
        */
       void removePicture(FLAC::Picture *picture, bool del = true);
 

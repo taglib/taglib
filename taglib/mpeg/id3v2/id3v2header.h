@@ -42,7 +42,8 @@ namespace TagLib {
      * the ID3v2 standard.  The API is based on the properties of ID3v2 headers
      * specified there.  If any of the terms used in this documentation are
      * unclear please check the specification in the linked section.
-     * (Structure, <a href="id3v2-structure.html#3.1">3.1</a>)
+     * (<a href="https://github.com/taglib/taglib/blob/master/taglib/mpeg/id3v2/id3v2.4.0-structure.txt">
+     * id3v2.4.0-structure.txt</a>, 3.1)
      */
 
     class TAGLIB_EXPORT Header
@@ -91,22 +92,22 @@ namespace TagLib {
       unsigned int revisionNumber() const;
 
       /*!
-       * Returns true if unsynchronisation has been applied to all frames.
+       * Returns \c true if unsynchronisation has been applied to all frames.
        */
       bool unsynchronisation() const;
 
       /*!
-       * Returns true if an extended header is present in the tag.
+       * Returns \c true if an extended header is present in the tag.
        */
       bool extendedHeader() const;
 
       /*!
-       * Returns true if the experimental indicator flag is set.
+       * Returns \c true if the experimental indicator flag is set.
        */
       bool experimentalIndicator() const;
 
       /*!
-       * Returns true if a footer is present in the tag.
+       * Returns \c true if a footer is present in the tag.
        */
       bool footerPresent() const;
       /*!

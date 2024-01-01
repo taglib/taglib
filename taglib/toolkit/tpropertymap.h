@@ -38,7 +38,7 @@ namespace TagLib {
 
   using SimplePropertyMap = Map<String, StringList>;
 
-  //! A map for format-independent <key,valuelist> tag representations.
+  //! A map for format-independent <key,values> tag representations.
 
   /*!
    * This map implements a generic representation of textual audio metadata
@@ -175,13 +175,13 @@ namespace TagLib {
     ConstIterator find(const String &key) const;
 
     /*!
-     * Returns true if the map contains values for \a key.
+     * Returns \c true if the map contains values for \a key.
      */
     TAGLIB_EXPORT
     bool contains(const String &key) const;
 
     /*!
-     * Returns true if this map contains all keys of \a other
+     * Returns \c true if this map contains all keys of \a other
      * and the values coincide for that keys. Does not take
      * the unsupportedData list into account.
      */
@@ -212,8 +212,8 @@ namespace TagLib {
     /*!
      * Returns the value associated with \a key.
      *
-     * If the map does not contain \a key, it returns defaultValue.
-     * If no defaultValue is specified, it returns an empty string list.
+     * If the map does not contain \a key, it returns \a defaultValue.
+     * If no \a defaultValue is specified, it returns an empty string list.
      */
     TAGLIB_EXPORT
     StringList value(const String &key,
@@ -222,7 +222,7 @@ namespace TagLib {
     /*!
      * Returns a reference to the value associated with \a key.
      *
-     * \note: If \a key is not contained in the map, an empty
+     * \note If \a key is not contained in the map, an empty
      * StringList is returned without error.
      */
     TAGLIB_EXPORT
@@ -231,7 +231,7 @@ namespace TagLib {
     /*!
      * Returns a reference to the value associated with \a key.
      *
-     * \note: If \a key is not contained in the map, an empty
+     * \note If \a key is not contained in the map, an empty
      * StringList is returned. You can also directly add entries
      * by using this function as an lvalue.
      */
@@ -239,25 +239,26 @@ namespace TagLib {
     StringList &operator[](const String &key);
 
     /*!
-     * Returns true if and only if \a other has the same contents as this map.
+     * Returns \c true if and only if \a other has the same contents as this map.
      */
     TAGLIB_EXPORT
     bool operator==(const PropertyMap &other) const;
 
     /*!
-     * Returns false if and only \a other has the same contents as this map.
+     * Returns \c false if and only if \a other has the same contents as this map.
      */
     TAGLIB_EXPORT
     bool operator!=(const PropertyMap &other) const;
 
     /*!
-     * If a PropertyMap is read from a File object using File::properties(),
+     * If a PropertyMap is read from a File object using File::properties()
+     * (or a FileRef object using FileRef::properties()),
      * the StringList returned from this function will represent metadata
      * that could not be parsed into the PropertyMap representation. This could
      * be e.g. binary data, unknown ID3 frames, etc.
-     * You can remove items from the returned list, which tells TagLib to remove
-     * those unsupported elements if you call File::setProperties() with the
-     * same PropertyMap as argument.
+     *
+     * \see File::removeUnsupportedProperties(),
+     *      FileRef::removeUnsupportedProperties()
      */
     TAGLIB_EXPORT
     const StringList &unsupportedData() const;

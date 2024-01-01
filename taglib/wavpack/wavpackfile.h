@@ -44,7 +44,7 @@ namespace TagLib {
   //! An implementation of WavPack metadata
 
   /*!
-   * This is implementation of WavPack metadata.
+   * this is an implementation of WavPack metadata.
    *
    * This supports ID3v1 and APE (v1 and v2) style comments as well as reading stream
    * properties from the file.
@@ -80,17 +80,17 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs a WavPack file from \a file.  If \a readProperties is true the
+       * Constructs a WavPack file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored
+       * \c false, \a propertiesStyle is ignored
        */
       File(FileName file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs an WavPack file from \a file.  If \a readProperties is true the
+       * Constructs an WavPack file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * \c false, \a propertiesStyle is ignored.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
        * responsible for deleting it after the File object.
@@ -137,22 +137,22 @@ namespace TagLib {
       /*!
        * Saves the file.
        *
-       * This returns true if the save was successful.
+       * This returns \c true if the save was successful.
        */
       bool save() override;
 
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid ID3v1 tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid ID3v1 tag.  If \a create is \c true it will create
        * an ID3v1 tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file
        * on disk actually has an ID3v1 tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the WavPack::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *
@@ -163,15 +163,15 @@ namespace TagLib {
       /*!
        * Returns a pointer to the APE tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid APE tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid APE tag.  If \a create is \c true it will create
        * an APE tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an APE tag.  Use hasAPETag() to check if the file
        * on disk actually has an APE tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the WavPack::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *

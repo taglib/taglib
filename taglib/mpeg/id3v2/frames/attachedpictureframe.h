@@ -50,7 +50,7 @@ namespace TagLib {
 
     public:
 
-      /*!
+      /*
        * This describes the function or content of the picture.
        */
       DECLARE_PICTURE_TYPE_ENUM(Type)
@@ -67,7 +67,7 @@ namespace TagLib {
       explicit AttachedPictureFrame(const ByteVector &data);
 
       /*!
-       * Destroys the AttahcedPictureFrame instance.
+       * Destroys the AttachedPictureFrame instance.
        */
       ~AttachedPictureFrame() override;
 
@@ -150,7 +150,7 @@ namespace TagLib {
       /*!
        * Returns the image data as a ByteVector.
        *
-       * \note ByteVector has a data() method that returns a const char * which
+       * \note ByteVector has a data() method that returns a <tt>const char *</tt> which
        * should make it easy to export this data to external programs.
        *
        * \see setPicture()

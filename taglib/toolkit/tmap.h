@@ -88,37 +88,37 @@ namespace TagLib {
 
     /*!
      * Returns an STL style iterator to the beginning of the map.  See
-     * std::map::iterator for the semantics.
+     * \c std::map::iterator for the semantics.
      */
     Iterator begin();
 
     /*!
      * Returns an STL style iterator to the beginning of the map.  See
-     * std::map::const_iterator for the semantics.
+     * \c std::map::const_iterator for the semantics.
      */
     ConstIterator begin() const;
 
     /*!
      * Returns an STL style iterator to the beginning of the map.  See
-     * std::map::const_iterator for the semantics.
+     * \c std::map::const_iterator for the semantics.
      */
     ConstIterator cbegin() const;
 
     /*!
      * Returns an STL style iterator to the end of the map.  See
-     * std::map::iterator for the semantics.
+     * \c std::map::iterator for the semantics.
      */
     Iterator end();
 
     /*!
      * Returns an STL style iterator to the end of the map.  See
-     * std::map::const_iterator for the semantics.
+     * \c std::map::const_iterator for the semantics.
      */
     ConstIterator end() const;
 
     /*!
      * Returns an STL style iterator to the end of the map.  See
-     * std::map::const_iterator for the semantics.
+     * \c std::map::const_iterator for the semantics.
      */
     ConstIterator cend() const;
 
@@ -129,7 +129,7 @@ namespace TagLib {
     Map<Key, T> &insert(const Key &key, const T &value);
 
     /*!
-     * Removes all of the elements from elements from the map.  This however
+     * Removes all of the elements from the map.  This however
      * will not delete pointers if the mapped type is a pointer type.
      */
     Map<Key, T> &clear();
@@ -142,7 +142,7 @@ namespace TagLib {
     unsigned int size() const;
 
     /*!
-     * Returns true if the map is empty.
+     * Returns \c true if the map is empty.
      *
      * \see size()
      */
@@ -159,7 +159,7 @@ namespace TagLib {
     ConstIterator find(const Key &key) const;
 
     /*!
-     * Returns true if the map contains an instance of \a key.
+     * Returns \c true if the map contains an item for \a key.
      */
     bool contains(const Key &key) const;
 
@@ -180,8 +180,8 @@ namespace TagLib {
     /*!
      * Returns the value associated with \a key.
      *
-     * If the map does not contain \a key, it returns defaultValue.
-     * If no defaultValue is specified, it returns a default-constructed value.
+     * If the map does not contain \a key, it returns \a defaultValue.
+     * If no \a defaultValue is specified, it returns a default-constructed value.
      */
     T value(const Key &key, const T &defaultValue = T()) const;
 
@@ -212,23 +212,23 @@ namespace TagLib {
     Map<Key, T> &operator=(std::initializer_list<std::pair<const Key, T>> init);
 
     /*!
-     * Exchanges the content of this map by the content of \a m.
+     * Exchanges the content of this map with the content of \a m.
      */
     void swap(Map<Key, T> &m) noexcept;
 
     /*!
-     * Compares this map with \a m and returns true if all of the elements are
+     * Compares this map with \a m and returns \c true if all of the elements are
      * the same.
      */
     bool operator==(const Map<Key, T> &m) const;
 
     /*!
-     * Compares this map with \a m and returns true if the maps differ.
+     * Compares this map with \a m and returns \c true if the maps differ.
      */
     bool operator!=(const Map<Key, T> &m) const;
 
   protected:
-    /*
+    /*!
      * If this Map is being shared via implicit sharing, do a deep copy of the
      * data and separate from the shared members.  This should be called by all
      * non-const subclass members without Iterator parameters.

@@ -119,7 +119,7 @@ namespace TagLib {
        * given name already exists it will be overwritten, otherwise it will be
        * created after the existing chunks.
        *
-       * \note If \a alwaysCreate is true, a new chunk is created regardless of
+       * \note If \a alwaysCreate is \c true, a new chunk is created regardless of
        * whether or not the chunk \a name exists. It should only be used for
        * "LIST" chunks.
        *

@@ -127,7 +127,7 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   d->textEncoding = static_cast<String::Type>(data[0]);
   pos += 1;
 
-  // Read the price paid this is a null terminate string
+  // Read the price paid, this is a null terminated string
   d->pricePaid = readStringField(data, String::Latin1, &pos);
 
   // If we don't have at least 8 bytes left then don't parse the rest of the

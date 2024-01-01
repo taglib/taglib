@@ -137,7 +137,7 @@ namespace TagLib {
       EventTimingCodesFrame &operator=(const EventTimingCodesFrame &) = delete;
 
       /*!
-       * Returns a null string.
+       * Returns an empty string.
        */
       String toString() const override;
 

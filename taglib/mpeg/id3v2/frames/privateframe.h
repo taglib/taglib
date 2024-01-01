@@ -34,7 +34,7 @@ namespace TagLib {
 
   namespace ID3v2 {
 
-    //! An implementation of ID3v2 privateframe
+    //! An implementation of ID3v2 private frame
 
     class TAGLIB_EXPORT PrivateFrame : public Frame
     {

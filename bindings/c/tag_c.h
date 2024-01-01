@@ -164,7 +164,7 @@ TAGLIB_C_EXPORT TagLib_File *taglib_file_new_iostream(TagLib_IOStream *stream);
 TAGLIB_C_EXPORT void taglib_file_free(TagLib_File *file);
 
 /*!
- * Returns true if the file is open and readable and valid information for
+ * Returns \c true if the file is open and readable and valid information for
  * the Tag and / or AudioProperties was found.
  */
 

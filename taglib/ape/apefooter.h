@@ -70,17 +70,17 @@ namespace TagLib {
       unsigned int version() const;
 
       /*!
-       * Returns true if a header is present in the tag.
+       * Returns \c true if a header is present in the tag.
        */
       bool headerPresent() const;
 
       /*!
-       * Returns true if a footer is present in the tag.
+       * Returns \c true if a footer is present in the tag.
        */
       bool footerPresent() const;
 
       /*!
-       * Returns true this is actually the header.
+       * Returns \c true this is actually the header.
        */
       bool isHeader() const;
 
@@ -145,8 +145,8 @@ namespace TagLib {
       ByteVector renderFooter() const;
 
       /*!
-       * Renders the header corresponding to the footer. If headerPresent is
-       * set to false, it returns an empty ByteVector.
+       * Renders the header corresponding to the footer. If headerPresent() is
+       * \c false, it returns an empty ByteVector.
        */
       ByteVector renderHeader() const;
 

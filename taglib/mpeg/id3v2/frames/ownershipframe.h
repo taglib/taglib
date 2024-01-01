@@ -51,7 +51,7 @@ namespace TagLib {
       explicit OwnershipFrame(String::Type encoding = String::Latin1);
 
       /*!
-       * Construct a ownership based on the data in \a data.
+       * Construct an ownership frame based on the data in \a data.
        */
       explicit OwnershipFrame(const ByteVector &data);
 

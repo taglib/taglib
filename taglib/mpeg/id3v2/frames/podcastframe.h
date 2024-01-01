@@ -56,7 +56,7 @@ namespace TagLib {
       PodcastFrame &operator=(const PodcastFrame &) = delete;
 
       /*!
-       * Returns a null string.
+       * Returns an empty string.
        */
       String toString() const override;
 

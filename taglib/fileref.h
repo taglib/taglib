@@ -60,34 +60,12 @@ namespace TagLib {
   {
   public:
 
-  //! A class for pluggable file type resolution.
+    //! A class for pluggable file type resolution.
 
-  /*!
-   * This class is used to extend TagLib's very basic file name based file
-   * type resolution.
-   *
-   * This can be accomplished with:
-   *
-   * \code
-   *
-   * class MyFileTypeResolver : FileTypeResolver
-   * {
-   *   TagLib::File *createFile(TagLib::FileName *fileName, bool, AudioProperties::ReadStyle) const
-   *   {
-   *     if(someCheckForAnMP3File(fileName))
-   *       return new TagLib::MPEG::File(fileName);
-   *     return 0;
-   *   }
-   * }
-   *
-   * FileRef::addFileTypeResolver(new MyFileTypeResolver);
-   *
-   * \endcode
-   *
-   * Naturally a less contrived example would be slightly more complex.  This
-   * can be used to plug in mime-type detection systems or to add new file types
-   * to TagLib.
-   */
+    /*!
+     * %File type resolver, better implement StreamTypeResolver in order to
+     * support both file and stream resolution.
+     */
 
     class TAGLIB_EXPORT FileTypeResolver
     {
@@ -120,6 +98,44 @@ namespace TagLib {
       std::unique_ptr<FileTypeResolverPrivate> d;
     };
 
+    //! A class for pluggable stream type resolution.
+
+    /*!
+     * This class is used to extend TagLib's very basic file name based file
+     * type resolution.
+     *
+     * This can be accomplished with:
+     *
+     * \code
+     *
+     * class MyStreamTypeResolver : StreamTypeResolver
+     * {
+     *   TagLib::File *createFile(TagLib::FileName *fileName, bool readProps,
+     *                     AudioProperties::ReadStyle readStyle) const override
+     *   {
+     *     if(someCheckForAnMP3File(fileName))
+     *       return new TagLib::MPEG::File(fileName, readProps, readStyle);
+     *     return nullptr;
+     *   }
+     *
+     *   TagLib::File *createFileFromStream(TagLib::IOStream *s, bool readProps,
+     *                     AudioProperties::ReadStyle readStyle) const override
+     *   {
+     *     if(someCheckForAnMP3Stream(s))
+     *       return new TagLib::MPEG::File(s, readProps, readStyle);
+     *     return nullptr;
+     *   }
+     * }
+     *
+     * FileRef::addFileTypeResolver(new MyStreamTypeResolver);
+     *
+     * \endcode
+     *
+     * Naturally a less contrived example would be slightly more complex.  This
+     * can be used to plug in mime-type detection systems or to add new file types
+     * to TagLib.
+     */
+
     class TAGLIB_EXPORT StreamTypeResolver : public FileTypeResolver
     {
     public:
@@ -132,6 +148,17 @@ namespace TagLib {
       StreamTypeResolver(const StreamTypeResolver &) = delete;
       StreamTypeResolver &operator=(const StreamTypeResolver &) = delete;
 
+      /*!
+       * This method must be overridden to provide an additional stream type
+       * resolver.  If the resolver is able to determine the file type it should
+       * return a valid File object; if not it should return nullptr.
+       *
+       * \note The created file is then owned by the FileRef and should not be
+       * deleted.  Deletion will happen automatically when the FileRef passes
+       * out of scope.
+       *
+       * \see createFile()
+       */
       virtual File *createFileFromStream(IOStream *stream,
                                bool readAudioProperties = true,
                                AudioProperties::ReadStyle
@@ -148,9 +175,9 @@ namespace TagLib {
     FileRef();
 
     /*!
-     * Create a FileRef from \a fileName.  If \a readAudioProperties is true then
+     * Create a FileRef from \a fileName.  If \a readAudioProperties is \c true then
      * the audio properties will be read using \a audioPropertiesStyle.  If
-     * \a readAudioProperties is false then \a audioPropertiesStyle will be
+     * \a readAudioProperties is \c false then \a audioPropertiesStyle will be
      * ignored.
      *
      * Also see the note in the class documentation about why you may not want to
@@ -163,8 +190,8 @@ namespace TagLib {
 
     /*!
      * Construct a FileRef from an opened \a IOStream.  If \a readAudioProperties
-     * is true then the audio properties will be read using \a audioPropertiesStyle.
-     * If \a readAudioProperties is false then \a audioPropertiesStyle will be
+     * is \c true then the audio properties will be read using \a audioPropertiesStyle.
+     * If \a readAudioProperties is \c false then \a audioPropertiesStyle will be
      * ignored.
      *
      * Also see the note in the class documentation about why you may not want to
@@ -287,7 +314,7 @@ namespace TagLib {
 
     /*!
      * Returns the audio properties for this FileRef.  If no audio properties
-     * were read then this will returns a null pointer.
+     * were read then this will return a null pointer.
      */
     AudioProperties *audioProperties() const;
 
@@ -309,7 +336,7 @@ namespace TagLib {
     File *file() const;
 
     /*!
-     * Saves the file.  Returns true on success.
+     * Saves the file.  Returns \c true on success.
      */
     bool save();
 
@@ -351,7 +378,7 @@ namespace TagLib {
     static StringList defaultFileExtensions();
 
     /*!
-     * Returns true if the file (and as such other pointers) are null.
+     * Returns \c true if the file (and as such other pointers) are null.
      */
     bool isNull() const;
 
@@ -361,17 +388,17 @@ namespace TagLib {
     FileRef &operator=(const FileRef &ref);
 
     /*!
-     * Exchanges the content of the FileRef by the content of \a ref.
+     * Exchanges the content of the FileRef with the content of \a ref.
      */
     void swap(FileRef &ref) noexcept;
 
     /*!
-     * Returns true if this FileRef and \a ref point to the same File object.
+     * Returns \c true if this FileRef and \a ref point to the same File object.
      */
     bool operator==(const FileRef &ref) const;
 
     /*!
-     * Returns true if this FileRef and \a ref do not point to the same File
+     * Returns \c true if this FileRef and \a ref do not point to the same File
      * object.
      */
     bool operator!=(const FileRef &ref) const;

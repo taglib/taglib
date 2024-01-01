@@ -47,8 +47,9 @@ namespace TagLib {
     {
       /*!
        * This returns the unsigned integer value of \a data where \a data is a
-       * ByteVector that contains a \e synchsafe integer (Structure,
-       * <a href="id3v2-structure.html#6.2">6.2</a>).  The default \a length of
+       * ByteVector that contains a \e synchsafe integer
+       * (<a href="https://github.com/taglib/taglib/blob/master/taglib/mpeg/id3v2/id3v2.4.0-structure.txt">
+       * id3v2.4.0-structure.txt</a>, 6.2).  The default \a length of
        * 4 is used if another value is not specified.
        */
       TAGLIB_EXPORT unsigned int toUInt(const ByteVector &data);

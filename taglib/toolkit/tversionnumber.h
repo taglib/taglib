@@ -35,9 +35,8 @@ namespace TagLib {
 
   class String;
 
-  /*!
-   * Version number with major, minor and patch segments.
-   */
+  //! Version number with major, minor and patch segments.
+
   class TAGLIB_EXPORT VersionNumber {
   public:
     /*!
@@ -80,42 +79,42 @@ namespace TagLib {
     }
 
     /*!
-     * Returns true if this version is equal to \a rhs.
+     * Returns \c true if this version is equal to \a rhs.
      */
     constexpr bool operator==(const VersionNumber &rhs) const {
       return m_combined == rhs.m_combined;
     }
 
     /*!
-     * Returns true if this version is not equal to \a rhs.
+     * Returns \c true if this version is not equal to \a rhs.
      */
     constexpr bool operator!=(const VersionNumber &rhs) const {
       return m_combined != rhs.m_combined;
     }
 
     /*!
-     * Returns true if this version is less than \a rhs.
+     * Returns \c true if this version is less than \a rhs.
      */
     constexpr bool operator<(const VersionNumber &rhs) const {
       return m_combined < rhs.m_combined;
     }
 
     /*!
-     * Returns true if this version is greater than \a rhs.
+     * Returns \c true if this version is greater than \a rhs.
      */
     constexpr bool operator>(const VersionNumber &rhs) const {
       return m_combined > rhs.m_combined;
     }
 
     /*!
-     * Returns true if this version is less or equal than \a rhs.
+     * Returns \c true if this version is less or equal than \a rhs.
      */
     constexpr bool operator<=(const VersionNumber &rhs) const {
       return m_combined <= rhs.m_combined;
     }
 
     /*!
-     * Returns true if this version is greater or equal than \a rhs.
+     * Returns \c true if this version is greater or equal than \a rhs.
      */
     constexpr bool operator>=(const VersionNumber &rhs) const {
       return m_combined >= rhs.m_combined;

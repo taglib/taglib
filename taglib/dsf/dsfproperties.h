@@ -34,6 +34,7 @@
 
 namespace TagLib {
   namespace DSF {
+    //! An implementation of audio properties for DSF
     class TAGLIB_EXPORT Properties : public AudioProperties {
     public:
       Properties(const ByteVector &data, ReadStyle style);

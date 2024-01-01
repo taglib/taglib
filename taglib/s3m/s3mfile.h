@@ -35,7 +35,22 @@
 
 namespace TagLib {
 
+  //! An implementation of ScreamTracker III metadata
+
+  /*!
+   * this is an implementation of ScreamTracker III metadata.
+   */
+
   namespace S3M {
+
+    //! An implementation of TagLib::File with S3M specific methods
+
+    /*!
+     * This implements and provides an interface for S3M files to the
+     * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
+     * the abstract TagLib::File API as well as providing some additional
+     * information specific to S3M files.
+     */
 
     class TAGLIB_EXPORT File : public Mod::FileBase {
       public:

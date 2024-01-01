@@ -94,7 +94,7 @@ namespace TagLib {
         unsigned int sampleFrames() const;
 
         /*!
-         * Returns true if the file is in AIFF-C format, false if AIFF format.
+         * Returns \c true if the file is in AIFF-C format, \c false if AIFF format.
          */
         bool isAiffC() const;
 

@@ -88,18 +88,18 @@ namespace TagLib {
 
     /*!
      * This is the main class in the ID3v2 implementation.  It serves two
-     * functions.  This first, as is obvious from the public API, is to provide a
+     * functions.  The first, as is obvious from the public API, is to provide a
      * container for the other ID3v2 related classes.  In addition, through the
      * read() and parse() protected methods, it provides the most basic level of
      * parsing.  In these methods the ID3v2 tag is extracted from the file and
      * split into data components.
      *
      * ID3v2 tags have several parts, TagLib attempts to provide an interface
-     * for them all.  header(), footer() and extendedHeader() correspond to those
+     * for them all.  header() and extendedHeader() correspond to those
      * data structures in the ID3v2 standard and the APIs for the classes that
      * they return attempt to reflect this.
      *
-     * Also ID3v2 tags are built up from a list of frames, which are in turn
+     * Also ID3v2 tags are built up from a list of frames, which
      * have a header and a list of fields.  TagLib provides two ways of accessing
      * the list of frames that are in a given ID3v2 tag.  The first is simply
      * via the frameList() method.  This is just a list of pointers to the frames.
@@ -126,7 +126,7 @@ namespace TagLib {
      * with said spec (which is distributed with the TagLib sources).  TagLib
      * tries to do most of the work, but with a little luck, you can still
      * convince it to generate invalid ID3v2 tags.  The APIs for ID3v2 assume a
-     * working knowledge of ID3v2 structure.  You're been warned.
+     * working knowledge of ID3v2 structure.  You've been warned.
      */
 
     class TAGLIB_EXPORT Tag : public TagLib::Tag
@@ -194,7 +194,7 @@ namespace TagLib {
       ExtendedHeader *extendedHeader() const;
 
       /*!
-       * Returns a reference to the frame list map.  This is an FrameListMap of
+       * Returns a reference to the frame list map.  This is a FrameListMap of
        * all of the frames in the tag.
        *
        * This is the most convenient structure for accessing the tag's frames.
@@ -230,10 +230,10 @@ namespace TagLib {
       const FrameListMap &frameListMap() const;
 
       /*!
-       * Returns a reference to the frame list.  This is an FrameList of all of
+       * Returns a reference to the frame list.  This is a FrameList of all of
        * the frames in the tag in the order that they were parsed.
        *
-       * This can be useful if for example you want iterate over the tag's frames
+       * This can be useful if for example you want to iterate over the tag's frames
        * in the order that they occur in the tag.
        *
        * \warning You should not modify this data structure directly, instead
@@ -264,8 +264,8 @@ namespace TagLib {
       void addFrame(Frame *frame);
 
       /*!
-       * Remove a frame from the tag.  If \a del is true the frame's memory
-       * will be freed; if it is false, it must be deleted by the user.
+       * Remove a frame from the tag.  If \a del is \c true the frame's memory
+       * will be freed; if it is \c false, it must be deleted by the user.
        *
        * \note Using this method will invalidate any pointers on the list
        * returned by frameList()

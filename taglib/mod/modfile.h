@@ -34,7 +34,24 @@
 #include "modproperties.h"
 
 namespace TagLib {
+
+  //! An implementation of Protracker metadata
+
+  /*!
+   * this is an implementation of Protracker metadata.
+   */
+
   namespace Mod {
+
+    //! An implementation of TagLib::File with Mod specific methods
+
+    /*!
+     * This implements and provides an interface for Mod files to the
+     * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
+     * the abstract TagLib::File API as well as providing some additional
+     * information specific to Mod files.
+     */
+
     class TAGLIB_EXPORT File : public TagLib::Mod::FileBase
     {
     public:
