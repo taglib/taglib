@@ -85,7 +85,7 @@ namespace TagLib {
       /*!
        * Returns the size of the frame header
        */
-      unsigned int headerSize();
+      unsigned int headerSize() const;
 
       /*!
        * Sets the data that will be used as the frame.  Since the length is not
@@ -360,7 +360,7 @@ namespace TagLib {
       /*!
        * Returns the size of the frame header in bytes.
        */
-      unsigned int size();
+      unsigned int size() const;
 
       /*!
        * Returns \c true if the flag for tag alter preservation is set.
