@@ -92,7 +92,7 @@ const String Frame::urlPrefix("URL:");
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned int Frame::headerSize()
+unsigned int Frame::headerSize() const
 {
   return d->header->size();
 }
@@ -421,7 +421,7 @@ public:
 // public members (Frame::Header)
 ////////////////////////////////////////////////////////////////////////////////
 
-unsigned int Frame::Header::size()
+unsigned int Frame::Header::size() const
 {
   switch(d->version) {
   case 0:
