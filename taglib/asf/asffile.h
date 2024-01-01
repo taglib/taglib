@@ -35,6 +35,8 @@
 namespace TagLib {
   //! An implementation of ASF (WMA) metadata
   namespace ASF {
+    //! An implementation of TagLib::File with ASF specific methods
+
     /*!
      * This implements and provides an interface for ASF files to the
      * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
@@ -112,7 +114,7 @@ namespace TagLib {
       /*!
        * Save the file.
        *
-       * This returns true if the save was successful.
+       * This returns \c true if the save was successful.
        */
       bool save() override;
 

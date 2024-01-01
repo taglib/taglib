@@ -57,7 +57,7 @@ namespace TagLib {
        * \a startTime, end time \a endTime, start offset \a startOffset,
        * end offset \a endOffset and optionally a list of embedded frames,
        * whose ownership will then be taken over by this Frame, in
-       * \a embeddedFrames;
+       * \a embeddedFrames.
        *
        * All times are in milliseconds.
        */
@@ -153,7 +153,7 @@ namespace TagLib {
       void setEndOffset(const unsigned int &eO);
 
       /*!
-       * Returns a reference to the frame list map.  This is an FrameListMap of
+       * Returns a reference to the frame list map.  This is a FrameListMap of
        * all of the frames embedded in the CHAP frame.
        *
        * This is the most convenient structure for accessing the CHAP frame's
@@ -169,11 +169,11 @@ namespace TagLib {
       const FrameListMap &embeddedFrameListMap() const;
 
       /*!
-       * Returns a reference to the embedded frame list.  This is an FrameList
+       * Returns a reference to the embedded frame list.  This is a FrameList
        * of all of the frames embedded in the CHAP frame in the order that they
        * were parsed.
        *
-       * This can be useful if for example you want iterate over the CHAP frame's
+       * This can be useful if for example you want to iterate over the CHAP frame's
        * embedded frames in the order that they occur in the CHAP frame.
        *
        * \warning You should not modify this data structure directly, instead
@@ -204,8 +204,8 @@ namespace TagLib {
       void addEmbeddedFrame(Frame *frame);
 
       /*!
-       * Remove an embedded frame from the CHAP frame.  If \a del is true the frame's
-       * memory will be freed; if it is false, it must be deleted by the user.
+       * Remove an embedded frame from the CHAP frame.  If \a del is \c true the frame's
+       * memory will be freed; if it is \c false, it must be deleted by the user.
        *
        * \note Using this method will invalidate any pointers on the list
        * returned by embeddedFrameList()

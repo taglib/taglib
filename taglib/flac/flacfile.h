@@ -43,7 +43,7 @@ namespace TagLib {
   //! An implementation of FLAC metadata
 
   /*!
-   * This is implementation of FLAC metadata for non-Ogg FLAC files.  At some
+   * this is an implementation of FLAC metadata for non-Ogg FLAC files.  At some
    * point when Ogg / FLAC is more common there will be a similar implementation
    * under the Ogg hierarchy.
    *
@@ -83,7 +83,7 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs a FLAC file from \a file.  If \a readProperties is true the
+       * Constructs a FLAC file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -96,13 +96,15 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs an FLAC file from \a file.  If \a readProperties is true the
+       * Constructs an FLAC file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * \deprecated Use the constructor above.
        */
       TAGLIB_DEPRECATED
       File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -110,7 +112,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs a FLAC file from \a stream.  If \a readProperties is true the
+       * Constructs a FLAC file from \a stream.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -126,7 +128,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs a FLAC file from \a stream.  If \a readProperties is true the
+       * Constructs a FLAC file from \a stream.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -136,6 +138,8 @@ namespace TagLib {
        * \a frameFactory.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * \deprecated Use the constructor above.
        */
       TAGLIB_DEPRECATED
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
@@ -207,22 +211,22 @@ namespace TagLib {
        * will also keep any old ID3-tags up to date. If the file
        * has no XiphComment, one will be constructed from the ID3-tags.
        *
-       * This returns true if the save was successful.
+       * This returns \c true if the save was successful.
        */
       bool save() override;
 
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
        *
-       * If \a create is false (the default) this returns a null pointer
-       * if there is no valid ID3v2 tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this returns a null pointer
+       * if there is no valid ID3v2 tag.  If \a create is \c true it will create
        * an ID3v2 tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an ID3v2 tag.  Use hasID3v2Tag() to check if the file
        * on disk actually has an ID3v2 tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *
@@ -233,15 +237,15 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this returns a null pointer
-       * if there is no valid APE tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this returns a null pointer
+       * if there is no valid APE tag.  If \a create is \c true it will create
        * an APE tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file
        * on disk actually has an ID3v1 tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *
@@ -252,8 +256,8 @@ namespace TagLib {
       /*!
        * Returns a pointer to the XiphComment for the file.
        *
-       * If \a create is false (the default) this returns a null pointer
-       * if there is no valid XiphComment.  If \a create is true it will create
+       * If \a create is \c false (the default) this returns a null pointer
+       * if there is no valid XiphComment.  If \a create is \c true it will create
        * a XiphComment if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
@@ -274,8 +278,8 @@ namespace TagLib {
       List<Picture *> pictureList();
 
       /*!
-       * Removes an attached picture. If \a del is true the picture's memory
-       * will be freed; if it is false, it must be deleted by the user.
+       * Removes an attached picture. If \a del is \c true the picture's memory
+       * will be freed; if it is \c false, it must be deleted by the user.
        */
       void removePicture(Picture *picture, bool del = true);
 

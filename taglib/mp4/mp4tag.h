@@ -40,6 +40,7 @@ namespace TagLib {
 
     class ItemFactory;
 
+    //! An MP4 tag implementation
     class TAGLIB_EXPORT Tag: public TagLib::Tag
     {
     public:
@@ -91,7 +92,7 @@ namespace TagLib {
         void removeItem(const String &key);
 
         /*!
-         * \return True if the tag contains an entry for \a key.
+         * \return \c true if the tag contains an entry for \a key.
          */
         bool contains(const String &key) const;
 

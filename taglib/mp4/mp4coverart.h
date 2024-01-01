@@ -33,6 +33,7 @@
 
 namespace TagLib {
   namespace MP4 {
+    //! MP4 picture
     class TAGLIB_EXPORT CoverArt
     {
     public:
@@ -58,7 +59,7 @@ namespace TagLib {
       CoverArt &operator=(const CoverArt &item);
 
       /*!
-       * Exchanges the content of the CoverArt by the content of \a item.
+       * Exchanges the content of the CoverArt with the content of \a item.
        */
       void swap(CoverArt &item) noexcept;
 

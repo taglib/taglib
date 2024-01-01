@@ -38,9 +38,9 @@ namespace TagLib {
   //! A byte vector
 
   /*!
-   * This class provides a byte vector with some methods that are useful for
-   * tagging purposes.  Many of the search functions are tailored to what is
-   * useful for finding tag related patterns in a data array.
+   * This class provides an implicitly shared byte vector with some methods that
+   * are useful for tagging purposes.  Many of the search functions are tailored
+   * to what is useful for finding tag related patterns in a data array.
    */
 
   class TAGLIB_EXPORT ByteVector
@@ -171,12 +171,12 @@ namespace TagLib {
                     unsigned int patternOffset = 0, unsigned int patternLength = 0xffffffff) const;
 
     /*!
-     * Returns true if the vector starts with \a pattern.
+     * Returns \c true if the vector starts with \a pattern.
      */
     bool startsWith(const ByteVector &pattern) const;
 
     /*!
-     * Returns true if the vector ends with \a pattern.
+     * Returns \c true if the vector ends with \a pattern.
      */
     bool endsWith(const ByteVector &pattern) const;
 
@@ -282,7 +282,7 @@ namespace TagLib {
     ConstReverseIterator rend() const;
 
     /*!
-     * Returns true if the ByteVector is empty.
+     * Returns \c true if the ByteVector is empty.
      *
      * \see size()
      */
@@ -291,9 +291,9 @@ namespace TagLib {
     /*!
      * Converts the first 4 bytes of the vector to an unsigned integer.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
+     * \c true then $00 $00 $00 $01 == 0x00000001 == 1, if \c false, $01 00 00 00 ==
      * 0x01000000 == 1.
      *
      * \see fromUInt()
@@ -303,9 +303,9 @@ namespace TagLib {
     /*!
      * Converts the 4 bytes at \a offset of the vector to an unsigned integer.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
+     * \c true then $00 $00 $00 $01 == 0x00000001 == 1, if \c false, $01 00 00 00 ==
      * 0x01000000 == 1.
      *
      * \see fromUInt()
@@ -316,9 +316,9 @@ namespace TagLib {
      * Converts the \a length bytes at \a offset of the vector to an unsigned
      * integer. If \a length is larger than 4, the excess is ignored.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $00 $00 $01 == 0x00000001 == 1, if false, $01 00 00 00 ==
+     * \c true then $00 $00 $00 $01 == 0x00000001 == 1, if \c false, $01 00 00 00 ==
      * 0x01000000 == 1.
      *
      * \see fromUInt()
@@ -329,9 +329,9 @@ namespace TagLib {
     /*!
      * Converts the first 2 bytes of the vector to a (signed) short.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
+     * \c true then $00 $01 == 0x0001 == 1, if \c false, $01 00 == 0x01000000 == 1.
      *
      * \see fromShort()
      */
@@ -340,9 +340,9 @@ namespace TagLib {
     /*!
      * Converts the 2 bytes at \a offset of the vector to a (signed) short.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
+     * \c true then $00 $01 == 0x0001 == 1, if \c false, $01 00 == 0x01000000 == 1.
      *
      * \see fromShort()
      */
@@ -351,9 +351,9 @@ namespace TagLib {
     /*!
      * Converts the first 2 bytes of the vector to an unsigned short.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
+     * \c true then $00 $01 == 0x0001 == 1, if \c false, $01 00 == 0x01000000 == 1.
      *
      * \see fromUShort()
      */
@@ -362,9 +362,9 @@ namespace TagLib {
     /*!
      * Converts the 2 bytes at \a offset of the vector to an unsigned short.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 $01 == 0x0001 == 1, if false, $01 00 == 0x01000000 == 1.
+     * \c true then $00 $01 == 0x0001 == 1, if \c false, $01 00 == 0x01000000 == 1.
      *
      * \see fromUShort()
      */
@@ -373,10 +373,10 @@ namespace TagLib {
     /*!
      * Converts the first 8 bytes of the vector to a (signed) long long.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
-     * if false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
+     * \c true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
+     * if \c false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
      * \see fromLongLong()
      */
@@ -385,10 +385,10 @@ namespace TagLib {
     /*!
      * Converts the 8 bytes at \a offset of the vector to a (signed) long long.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
-     * if false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
+     * \c true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
+     * if \c false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
      * \see fromLongLong()
      */
@@ -397,10 +397,10 @@ namespace TagLib {
     /*!
      * Converts the first 8 bytes of the vector to an unsigned long long.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
-     * if false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
+     * \c true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
+     * if \c false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
      * \see fromULongLong()
      */
@@ -409,48 +409,56 @@ namespace TagLib {
     /*!
      * Converts the 8 bytes at \a offset of the vector to an unsigned long long.
      *
-     * If \a mostSignificantByteFirst is true this will operate left to right
+     * If \a mostSignificantByteFirst is \c true this will operate left to right
      * evaluating the integer.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
-     * if false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
+     * \c true then $00 00 00 00 00 00 00 01 == 0x0000000000000001 == 1,
+     * if \c false, $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
      * \see fromULongLong()
      */
     unsigned long long toULongLong(unsigned int offset, bool mostSignificantByteFirst = true) const;
 
-    /*
+    /*!
      * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
      * 32-bit little-endian floating point number.
+     *
+     * \see fromFloat32LE()
      */
     float toFloat32LE(size_t offset) const;
 
-    /*
+    /*!
      * Converts the 4 bytes at \a offset of the vector to a float as an IEEE754
      * 32-bit big-endian floating point number.
+     *
+     * \see fromFloat32BE()
      */
     float toFloat32BE(size_t offset) const;
 
-    /*
+    /*!
      * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
      * 64-bit little-endian floating point number.
+     *
+     * \see fromFloat64LE()
      */
     double toFloat64LE(size_t offset) const;
 
-    /*
+    /*!
      * Converts the 8 bytes at \a offset of the vector to a double as an IEEE754
      * 64-bit big-endian floating point number.
+     *
+     * \see fromFloat64BE()
      */
     double toFloat64BE(size_t offset) const;
 
-    /*
-    * Converts the 10 bytes at \a offset of the vector to a long double as an
-    * IEEE754 80-bit little-endian floating point number.
-    *
-    * \note This may compromise the precision depends on the size of long double.
-    */
+    /*!
+     * Converts the 10 bytes at \a offset of the vector to a long double as an
+     * IEEE754 80-bit little-endian floating point number.
+     *
+     * \note This may compromise the precision depends on the size of long double.
+     */
     long double toFloat80LE(size_t offset) const;
 
-    /*
+    /*!
      * Converts the 10 bytes at \a offset of the vector to a long double as an
      * IEEE754 80-bit big-endian floating point number.
      *
@@ -460,9 +468,9 @@ namespace TagLib {
 
     /*!
      * Creates a 4 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 01 == 0x00000001 == 1, if false, $01 00 00 00 ==
+     * \c true then $00 00 00 01 == 0x00000001 == 1, if \c false, $01 00 00 00 ==
      * 0x01000000 == 1.
      *
      * \see toUInt()
@@ -471,9 +479,9 @@ namespace TagLib {
 
     /*!
      * Creates a 2 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 01 == 0x0001 == 1, if false, $01 00 == 0x0100 == 1.
+     * \c true then $00 01 == 0x0001 == 1, if \c false, $01 00 == 0x0100 == 1.
      *
      * \see toShort()
      */
@@ -481,9 +489,9 @@ namespace TagLib {
 
     /*!
      * Creates a 2 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 01 == 0x0001 == 1, if false, $01 00 == 0x0100 == 1.
+     * \c true then $00 01 == 0x0001 == 1, if \c false, $01 00 == 0x0100 == 1.
      *
      * \see toUShort()
      */
@@ -491,9 +499,9 @@ namespace TagLib {
 
     /*!
      * Creates a 8 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 01 == 0x0000000000000001 == 1, if false,
+     * \c true then $00 00 00 01 == 0x0000000000000001 == 1, if \c false,
      * $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
      * \see toLongLong()
@@ -502,9 +510,9 @@ namespace TagLib {
 
     /*!
      * Creates a 8 byte ByteVector based on \a value.  If
-     * \a mostSignificantByteFirst is true, then this will operate left to right
+     * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
-     * true then $00 00 00 01 == 0x0000000000000001 == 1, if false,
+     * \c true then $00 00 00 01 == 0x0000000000000001 == 1, if \c false,
      * $01 00 00 00 00 00 00 00 == 0x0100000000000000 == 1.
      *
      * \see toULongLong()
@@ -515,7 +523,7 @@ namespace TagLib {
      * Creates a 4 byte ByteVector based on \a value as an IEEE754 32-bit
      * little-endian floating point number.
      *
-     * \see fromFloat32BE()
+     * \see toFloat32LE()
      */
     static ByteVector fromFloat32LE(float value);
 
@@ -523,7 +531,7 @@ namespace TagLib {
      * Creates a 4 byte ByteVector based on \a value as an IEEE754 32-bit
      * big-endian floating point number.
      *
-     * \see fromFloat32LE()
+     * \see toFloat32BE()
      */
     static ByteVector fromFloat32BE(float value);
 
@@ -531,7 +539,7 @@ namespace TagLib {
      * Creates a 8 byte ByteVector based on \a value as an IEEE754 64-bit
      * little-endian floating point number.
      *
-     * \see fromFloat64BE()
+     * \see toFloat64LE()
      */
     static ByteVector fromFloat64LE(double value);
 
@@ -539,7 +547,7 @@ namespace TagLib {
      * Creates a 8 byte ByteVector based on \a value as an IEEE754 64-bit
      * big-endian floating point number.
      *
-     * \see fromFloat64LE()
+     * \see toFloat64BE()
      */
     static ByteVector fromFloat64BE(double value);
 
@@ -559,36 +567,36 @@ namespace TagLib {
     char &operator[](int index);
 
     /*!
-     * Returns true if this ByteVector and \a v are equal.
+     * Returns \c true if this ByteVector and \a v are equal.
      */
     bool operator==(const ByteVector &v) const;
 
     /*!
-     * Returns true if this ByteVector and \a v are not equal.
+     * Returns \c true if this ByteVector and \a v are not equal.
      */
     bool operator!=(const ByteVector &v) const;
 
     /*!
-     * Returns true if this ByteVector and the null terminated C string \a s
+     * Returns \c true if this ByteVector and the null terminated C string \a s
      * contain the same data.
      */
     bool operator==(const char *s) const;
 
     /*!
-     * Returns true if this ByteVector and the null terminated C string \a s
+     * Returns \c true if this ByteVector and the null terminated C string \a s
      * do not contain the same data.
      */
     bool operator!=(const char *s) const;
 
     /*!
-     * Returns true if this ByteVector is less than \a v.  The value of the
+     * Returns \c true if this ByteVector is less than \a v.  The value of the
      * vectors is determined by evaluating the character from left to right, and
      * in the event one vector is a superset of the other, the size is used.
      */
     bool operator<(const ByteVector &v) const;
 
     /*!
-     * Returns true if this ByteVector is greater than \a v.
+     * Returns \c true if this ByteVector is greater than \a v.
      */
     bool operator>(const ByteVector &v) const;
 
@@ -615,7 +623,7 @@ namespace TagLib {
     ByteVector &operator=(const char *data);
 
     /*!
-     * Exchanges the content of the ByteVector by the content of \a v.
+     * Exchanges the content of the ByteVector with the content of \a v.
      */
     void swap(ByteVector &v) noexcept;
 
@@ -626,16 +634,20 @@ namespace TagLib {
 
     /*!
      * Returns a base64 encoded copy of the byte vector
+     *
+     * \see fromBase64()
      */
     ByteVector toBase64() const;
 
     /*!
      * Decodes the base64 encoded byte vector.
+     *
+     * \see toBase64()
      */
     static ByteVector fromBase64(const ByteVector &);
 
   protected:
-    /*
+    /*!
      * If this ByteVector is being shared via implicit sharing, do a deep copy
      * of the data and separate from the shared members.  This should be called
      * by all non-const subclass members.

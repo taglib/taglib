@@ -56,7 +56,7 @@ ByteVectorStream::~ByteVectorStream() = default;
 
 FileName ByteVectorStream::name() const
 {
-  return ""; // XXX do we need a name?
+  return "";
 }
 
 ByteVector ByteVectorStream::readBlock(size_t length)

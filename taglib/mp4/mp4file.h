@@ -38,6 +38,7 @@ namespace TagLib {
     class Atoms;
     class ItemFactory;
 
+    //! An implementation of TagLib::File with MP4 specific methods
 
     /*!
      * This implements and provides an interface for MP4 files to the
@@ -62,7 +63,7 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs an MP4 file from \a file.  If \a readProperties is true the
+       * Constructs an MP4 file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -74,7 +75,7 @@ namespace TagLib {
            ItemFactory *itemFactory = nullptr);
 
       /*!
-       * Constructs an MP4 file from \a stream.  If \a readProperties is true the
+       * Constructs an MP4 file from \a stream.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -132,13 +133,13 @@ namespace TagLib {
       /*!
        * Save the file.
        *
-       * This returns true if the save was successful.
+       * This returns \c true if the save was successful.
        */
       bool save() override;
 
       /*!
        * This will strip the tags that match the OR-ed together TagTypes from the
-       * file.  By default it strips all tags.  It returns true if the tags are
+       * file.  By default it strips all tags.  It returns \c true if the tags are
        * successfully stripped.
        *
        * \note This will update the file immediately.

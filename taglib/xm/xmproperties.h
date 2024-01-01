@@ -32,6 +32,7 @@
 
 namespace TagLib {
   namespace XM {
+    //! An implementation of audio property reading for XM
     class TAGLIB_EXPORT Properties : public AudioProperties {
     public:
       /*! Flag bits. */

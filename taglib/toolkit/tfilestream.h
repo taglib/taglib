@@ -37,25 +37,19 @@ namespace TagLib {
   class Tag;
   class AudioProperties;
 
-  //! A file class with some useful methods for tag manipulation
-
-  /*!
-   * This class is a basic file class with some methods that are particularly
-   * useful for tag editors.  It has methods to take advantage of
-   * ByteVector and a binary search method for finding patterns in a file.
-   */
+  //! I/O stream with data from a file.
 
   class TAGLIB_EXPORT FileStream : public IOStream
   {
   public:
     /*!
-     * Construct a File object and opens the \a file.  \a file should be a
-     * be a C-string in the local file system encoding.
+     * Construct a FileStream object and opens the \a file.  \a file should be a
+     * C-string in the local file system encoding.
      */
     FileStream(FileName file, bool openReadOnly = false);
 
     /*!
-     * Construct a File object and opens the \a file using file descriptor.
+     * Construct a FileStream object using an existing \a fileDescriptor.
      */
     FileStream(int fileDescriptor, bool openReadOnly = false);
 
@@ -79,7 +73,7 @@ namespace TagLib {
 
     /*!
      * Attempts to write the block \a data at the current get pointer.  If the
-     * file is currently only opened read only -- i.e. readOnly() returns true --
+     * file is currently only opened read only -- i.e. readOnly() returns \c true --
      * this attempts to reopen the file in read/write mode.
      *
      * \note This should be used instead of using the streaming output operator
@@ -107,7 +101,7 @@ namespace TagLib {
     void removeBlock(offset_t start = 0, size_t length = 0) override;
 
     /*!
-     * Returns true if the file is read only (or if the file can not be opened).
+     * Returns \c true if the file is read only (or if the file can not be opened).
      */
     bool readOnly() const override;
 

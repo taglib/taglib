@@ -151,7 +151,7 @@ namespace TagLib {
       /*!
        * Returns the object data as a ByteVector.
        *
-       * \note ByteVector has a data() method that returns a const char * which
+       * \note ByteVector has a data() method that returns a <tt>const char *</tt> which
        * should make it easy to export this data to external programs.
        *
        * \see setObject()

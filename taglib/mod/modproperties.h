@@ -31,6 +31,7 @@
 
 namespace TagLib {
   namespace Mod {
+    //! An implementation of audio property reading for Mod
     class TAGLIB_EXPORT Properties : public AudioProperties
     {
     public:

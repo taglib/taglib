@@ -33,7 +33,9 @@
 
 namespace TagLib {
 
-  //! A simple, generic interface to common audio meta data fields
+  class PropertyMap;
+
+  //! A simple, generic interface to common audio meta data fields.
 
   /*!
    * This is an attempt to abstract away the difference in the meta data formats
@@ -42,8 +44,6 @@ namespace TagLib {
    * for most applications.  This is meant to compliment the generic APIs found
    * in TagLib::AudioProperties, TagLib::File and TagLib::FileRef.
    */
-
-  class PropertyMap;
 
   class TAGLIB_EXPORT Tag
   {
@@ -125,30 +125,30 @@ namespace TagLib {
 
     /*!
      * Returns the track name; if no track name is present in the tag
-     * String::null will be returned.
+     * an empty string will be returned.
      */
     virtual String title() const = 0;
 
     /*!
      * Returns the artist name; if no artist name is present in the tag
-     * String::null will be returned.
+     * an empty string will be returned.
      */
     virtual String artist() const = 0;
 
     /*!
      * Returns the album name; if no album name is present in the tag
-     * String::null will be returned.
+     * an empty string will be returned.
      */
     virtual String album() const = 0;
 
     /*!
      * Returns the track comment; if no comment is present in the tag
-     * String::null will be returned.
+     * an empty string will be returned.
      */
     virtual String comment() const = 0;
 
     /*!
-     * Returns the genre name; if no genre is present in the tag String::null
+     * Returns the genre name; if no genre is present in the tag an empty string
      * will be returned.
      */
     virtual String genre() const = 0;
@@ -165,31 +165,31 @@ namespace TagLib {
     virtual unsigned int track() const = 0;
 
     /*!
-     * Sets the title to \a s.  If \a s is String::null then this value will be
+     * Sets the title to \a s.  If \a s is an empty string then this value will be
      * cleared.
      */
     virtual void setTitle(const String &s) = 0;
 
     /*!
-     * Sets the artist to \a s.  If \a s is String::null then this value will be
+     * Sets the artist to \a s.  If \a s is an empty string then this value will be
      * cleared.
      */
     virtual void setArtist(const String &s) = 0;
 
     /*!
-     * Sets the album to \a s.  If \a s is String::null then this value will be
+     * Sets the album to \a s.  If \a s is an empty string then this value will be
      * cleared.
      */
     virtual void setAlbum(const String &s) = 0;
 
     /*!
-     * Sets the comment to \a s.  If \a s is String::null then this value will be
+     * Sets the comment to \a s.  If \a s is an empty string then this value will be
      * cleared.
      */
     virtual void setComment(const String &s) = 0;
 
     /*!
-     * Sets the genre to \a s.  If \a s is String::null then this value will be
+     * Sets the genre to \a s.  If \a s is an empty string then this value will be
      * cleared.  For tag formats that use a fixed set of genres, the appropriate
      * value will be selected based on a string comparison.  A list of available
      * genres for those formats should be available in that type's
@@ -208,7 +208,7 @@ namespace TagLib {
     virtual void setTrack(unsigned int i) = 0;
 
     /*!
-     * Returns true if the tag does not contain any data.  This should be
+     * Returns \c true if the tag does not contain any data.  This should be
      * reimplemented in subclasses that provide more than the basic tagging
      * abilities in this class.
      */
@@ -222,8 +222,8 @@ namespace TagLib {
      * set, this will not modify or copy that.  This just copies using the API
      * in this class.
      *
-     * If \a overwrite is true then the values will be unconditionally copied.
-     * If false only empty values will be overwritten.
+     * If \a overwrite is \c true then the values will be unconditionally copied.
+     * If \c false only empty values will be overwritten.
      */
     static void duplicate(const Tag *source, Tag *target, bool overwrite = true);
 

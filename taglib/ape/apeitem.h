@@ -63,7 +63,7 @@ namespace TagLib {
 
       /*!
        * Constructs an item with \a key and \a value.
-       * If \a binary is true a Binary item will be created, otherwise \a value will be interpreted as text
+       * If \a binary is \c true a Binary item will be created, otherwise \a value will be interpreted as text
        */
       Item(const String &key, const ByteVector &value, bool binary);
 
@@ -83,7 +83,7 @@ namespace TagLib {
       Item &operator=(const Item &item);
 
       /*!
-       * Exchanges the content of this item by the content of \a item.
+       * Exchanges the content of this item with the content of \a item.
        */
       void swap(Item &item) noexcept;
 
@@ -172,7 +172,7 @@ namespace TagLib {
       void setReadOnly(bool readOnly);
 
       /*!
-       * Return true if the item is read-only.
+       * Return \c true if the item is read-only.
        */
       bool isReadOnly() const;
 
@@ -189,7 +189,7 @@ namespace TagLib {
       ItemTypes type() const;
 
       /*!
-       * Returns if the item has any real content.
+       * Returns \c false if the item has any real content.
        */
       bool isEmpty() const;
 

@@ -37,13 +37,13 @@ namespace TagLib {
 
   class File;
 
-  //! A RIFF INFO tag implementation.
   namespace RIFF {
+  //! A RIFF INFO tag implementation.
   namespace Info {
 
     using FieldListMap = Map<ByteVector, String>;
 
-    //! A abstraction for the string to data encoding in Info tags.
+    //! An abstraction for the string to data encoding in Info tags.
 
     /*!
      * RIFF INFO tag has no clear definitions about character encodings.
@@ -84,7 +84,7 @@ namespace TagLib {
       std::unique_ptr<StringHandlerPrivate> d;
     };
 
-    //! The main class in the ID3v2 implementation
+    //! The main class in the INFO tag implementation
 
     /*!
      * This is the main class in the INFO tag implementation.  RIFF INFO tag is a
@@ -147,22 +147,22 @@ namespace TagLib {
        */
       FieldListMap fieldListMap() const;
 
-      /*
+      /*!
        * Gets the value of the field with the ID \a id.
        */
       String fieldText(const ByteVector &id) const;
 
-      /*
-        * Sets the value of the field with the ID \a id to \a s.
-        * If the field does not exist, it is created.
-        * If \s is empty, the field is removed.
-        *
-        * \note fieldId must be four-byte long pure ASCII string.  This function
-        * performs nothing if fieldId is invalid.
-        */
+      /*!
+       * Sets the value of the field with the ID \a id to \a s.
+       * If the field does not exist, it is created.
+       * If \a s is empty, the field is removed.
+       *
+       * \note fieldId must be four-byte long pure ASCII string.  This function
+       * performs nothing if fieldId is invalid.
+       */
       void setFieldText(const ByteVector &id, const String &s);
 
-      /*
+      /*!
        * Removes the field with the ID \a id.
        */
       void removeField(const ByteVector &id);

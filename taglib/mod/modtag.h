@@ -30,6 +30,9 @@
 
 namespace TagLib {
   namespace Mod {
+
+    //! A module file tag implementation
+
     /*!
      * Tags for module files (Mod, S3M, IT, XM).
      *
@@ -53,29 +56,29 @@ namespace TagLib {
 
       /*!
        * Returns the track name; if no track name is present in the tag
-       * String::null will be returned.
+       * an empty string will be returned.
        */
       String title() const override;
 
       /*!
-       * Not supported by module files.  Therefore always returns String::null.
+       * Not supported by module files.  Therefore always returns an empty string.
        */
       String artist() const override;
 
       /*!
-       * Not supported by module files.  Therefore always returns String::null.
+       * Not supported by module files.  Therefore always returns an empty string.
        */
       String album() const override;
 
       /*!
        * Returns the track comment derived from the instrument/sample/pattern
-       * names; if no comment is present in the tag String::null will be
+       * names; if no comment is present in the tag an empty string will be
        * returned.
        */
       String comment() const override;
 
       /*!
-       * Not supported by module files.  Therefore always returns String::null.
+       * Not supported by module files.  Therefore always returns an empty string.
        */
       String genre() const override;
 
@@ -94,12 +97,12 @@ namespace TagLib {
        * Only XM files store this tag to the file as such, for other formats
        * (Mod, S3M, IT) this is derived from the file type or the flavour of
        * the file type.  Therefore only XM files might have an empty
-       * (String::null) tracker name.
+       * tracker name.
        */
       String trackerName() const;
 
       /*!
-       * Sets the title to \a title.  If \a title is String::null then this
+       * Sets the title to \a title.  If \a title is an empty string then this
        * value will be cleared.
        *
        * The length limits per file type are (1 character = 1 byte):
@@ -119,7 +122,7 @@ namespace TagLib {
       void setAlbum(const String &album) override;
 
       /*!
-       * Sets the comment to \a comment.  If \a comment is String::null then
+       * Sets the comment to \a comment.  If \a comment is an empty string then
        * this value will be cleared.
        *
        * Note that module file formats don't actually support a comment tag.
@@ -154,7 +157,7 @@ namespace TagLib {
 
       /*!
        * Sets the tracker name to \a trackerName.  If \a trackerName is
-       * String::null then this value will be cleared.
+       * an empty string then this value will be cleared.
        *
        * Note that only XM files support this tag.  Setting the
        * tracker name for other module file formats will be ignored.

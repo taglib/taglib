@@ -78,7 +78,7 @@ namespace TagLib {
       ByteVector elementID() const;
 
       /*!
-       * Returns true, if the frame is top-level (doesn't have
+       * Returns \c true, if the frame is top-level (doesn't have
        * any parent CTOC frame).
        *
        * \see setIsTopLevel()
@@ -86,7 +86,7 @@ namespace TagLib {
       bool isTopLevel() const;
 
       /*!
-       * Returns true, if the child elements list entries
+       * Returns \c true, if the child elements list entries
        * are ordered.
        *
        * \see setIsOrdered()
@@ -153,7 +153,7 @@ namespace TagLib {
       void removeChildElement(const ByteVector &cE);
 
       /*!
-       * Returns a reference to the frame list map.  This is an FrameListMap of
+       * Returns a reference to the frame list map.  This is a FrameListMap of
        * all of the frames embedded in the CTOC frame.
        *
        * This is the most convenient structure for accessing the CTOC frame's
@@ -169,11 +169,11 @@ namespace TagLib {
       const FrameListMap &embeddedFrameListMap() const;
 
       /*!
-       * Returns a reference to the embedded frame list.  This is an FrameList
+       * Returns a reference to the embedded frame list.  This is a FrameList
        * of all of the frames embedded in the CTOC frame in the order that they
        * were parsed.
        *
-       * This can be useful if for example you want iterate over the CTOC frame's
+       * This can be useful if for example you want to iterate over the CTOC frame's
        * embedded frames in the order that they occur in the CTOC frame.
        *
        * \warning You should not modify this data structure directly, instead
@@ -204,8 +204,8 @@ namespace TagLib {
       void addEmbeddedFrame(Frame *frame);
 
       /*!
-       * Remove an embedded frame from the CTOC frame.  If \a del is true the frame's
-       * memory will be freed; if it is false, it must be deleted by the user.
+       * Remove an embedded frame from the CTOC frame.  If \a del is \c true the frame's
+       * memory will be freed; if it is \c false, it must be deleted by the user.
        *
        * \note Using this method will invalidate any pointers on the list
        * returned by embeddedFrameList()

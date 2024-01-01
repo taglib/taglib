@@ -32,6 +32,7 @@
 
 namespace TagLib {
   namespace MP4 {
+    //! MP4 item
     class TAGLIB_EXPORT Item
     {
     public:
@@ -48,7 +49,7 @@ namespace TagLib {
       Item &operator=(const Item &item);
 
       /*!
-       * Exchanges the content of the Item by the content of \a item.
+       * Exchanges the content of the Item with the content of \a item.
        */
       void swap(Item &item) noexcept;
 

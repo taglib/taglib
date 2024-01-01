@@ -40,7 +40,7 @@ namespace TagLib {
   //! An implementation of Ogg FLAC metadata
 
   /*!
-   * This is implementation of FLAC metadata for Ogg FLAC files.  For "pure"
+   * this is an implementation of FLAC metadata for Ogg FLAC files.  For "pure"
    * FLAC files look under the FLAC hierarchy.
    *
    * Unlike "pure" FLAC-files, Ogg FLAC only supports Xiph-comments,
@@ -63,7 +63,7 @@ namespace TagLib {
     {
     public:
       /*!
-       * Constructs an Ogg/FLAC file from \a file.  If \a readProperties is true
+       * Constructs an Ogg/FLAC file from \a file.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -72,7 +72,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs an Ogg/FLAC file from \a stream.  If \a readProperties is true
+       * Constructs an Ogg/FLAC file from \a stream.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -98,7 +98,7 @@ namespace TagLib {
        * the file on disk has a XiphComment.  Use hasXiphComment() to check if
        * the file on disk actually has a XiphComment.
        *
-       * \note The Tag <b>is still</b> owned by the FLAC::File and should not be
+       * \note The Tag <b>is still</b> owned by the Ogg::FLAC::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *
@@ -128,7 +128,7 @@ namespace TagLib {
 
       /*!
        * Save the file.  This will primarily save and update the XiphComment.
-       * Returns true if the save is successful.
+       * Returns \c true if the save is successful.
        */
       bool save() override;
 

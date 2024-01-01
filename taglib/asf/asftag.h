@@ -39,6 +39,8 @@ namespace TagLib {
     using AttributeList = List<Attribute>;
     using AttributeListMap = Map<String, AttributeList>;
 
+    //! An implementation of ASF (WMA) tags
+
     class TAGLIB_EXPORT Tag : public TagLib::Tag {
 
       friend class File;
@@ -64,7 +66,7 @@ namespace TagLib {
 
       /*!
        * Returns the album name; if no album name is present in the tag
-       * String::null will be returned.
+       * an empty string will be returned.
        */
       String album() const override;
 
@@ -74,7 +76,7 @@ namespace TagLib {
       String comment() const override;
 
       /*!
-       * Returns the genre name; if no genre is present in the tag String::null
+       * Returns the genre name; if no genre is present in the tag an empty string
        * will be returned.
        */
       String genre() const override;
@@ -85,7 +87,7 @@ namespace TagLib {
       virtual String rating() const;
 
       /*!
-       * Returns the genre name; if no genre is present in the tag String::null
+       * Returns the genre name; if no genre is present in the tag an empty string
        * will be returned.
        */
       virtual String copyright() const;
@@ -112,7 +114,7 @@ namespace TagLib {
       void setArtist(const String &value) override;
 
       /*!
-       * Sets the album to \a value.  If \a value is String::null then this value will be
+       * Sets the album to \a value.  If \a value is an empty string then this value will be
        * cleared.
        */
       void setAlbum(const String &value) override;
@@ -148,7 +150,7 @@ namespace TagLib {
       void setTrack(unsigned int value) override;
 
       /*!
-       * Returns true if the tag does not contain any data.  This should be
+       * Returns \c true if the tag does not contain any data.  This should be
        * reimplemented in subclasses that provide more than the basic tagging
        * abilities in this class.
        */
@@ -168,7 +170,7 @@ namespace TagLib {
       const AttributeListMap &attributeListMap() const;
 
       /*!
-       * \return True if a value for \a key is currently set.
+       * \return \c true if a value for \a key is currently set.
        */
       bool contains(const String &key) const;
 

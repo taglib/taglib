@@ -35,7 +35,22 @@
 
 namespace TagLib {
 
+  //! An implementation of Extended Module metadata
+
+  /*!
+   * this is an implementation of Extended Module metadata.
+   */
+
   namespace XM {
+
+    //! An implementation of TagLib::File with XM specific methods
+
+    /*!
+     * This implements and provides an interface for XM files to the
+     * TagLib::Tag and TagLib::AudioProperties interfaces by way of implementing
+     * the abstract TagLib::File API as well as providing some additional
+     * information specific to XM files.
+     */
 
     class TAGLIB_EXPORT File : public Mod::FileBase {
       public:

@@ -38,8 +38,8 @@ namespace TagLib {
   //! A list of strings
 
   /*!
-   * This is a specialization of the List class with some members convention for
-   * string operations.
+   * This is a specialization of the List class with some convenience members
+   * for string operations.
    */
 
   class StringList : public List<String>

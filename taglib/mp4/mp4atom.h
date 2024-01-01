@@ -33,12 +33,8 @@
 #include "tfile.h"
 #include "tlist.h"
 
-#ifndef DO_NOT_DOCUMENT
-
 namespace TagLib {
   namespace MP4 {
-    class Atom;
-    using AtomList = TagLib::List<Atom *>;
 
     enum AtomDataType {
       TypeImplicit  = 0,  // for use with tags for which no type needs to be indicated because only one type is allowed
@@ -64,6 +60,7 @@ namespace TagLib {
       TypeUndefined = 255 // undefined
     };
 
+#ifndef DO_NOT_DOCUMENT
     struct AtomData {
       AtomData(AtomDataType type, const ByteVector &data) :
         type(type), data(data) { }
@@ -72,6 +69,8 @@ namespace TagLib {
       ByteVector data;
     };
 
+    class Atom;
+    using AtomList = TagLib::List<Atom *>;
     using AtomDataList = TagLib::List<AtomData>;
 
     class TAGLIB_EXPORT Atom
@@ -116,9 +115,8 @@ namespace TagLib {
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AtomsPrivate> d;
     };
+#endif  // DO_NOT_DOCUMENT
   } // namespace MP4
 } // namespace TagLib
-
-#endif
 
 #endif

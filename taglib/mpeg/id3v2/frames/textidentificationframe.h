@@ -59,7 +59,7 @@ namespace TagLib {
      *   <li><b>TDTG</b> Tagging time</li>
      *   <li><b>TENC</b> Encoded by</li>
      *   <li><b>TEXT</b> Lyricist/Text writer</li>
-     *   <li><b>TFLT</b> File type</li>
+     *   <li><b>TFLT</b> %File type</li>
      *   <li><b>TIPL</b> Involved people list</li>
      *   <li><b>TIT1</b> Content group description</li>
      *   <li><b>TIT2</b> Title/songname/content description</li>
@@ -74,7 +74,7 @@ namespace TagLib {
      *   <li><b>TOFN</b> Original filename</li>
      *   <li><b>TOLY</b> Original lyricist(s)/text writer(s)</li>
      *   <li><b>TOPE</b> Original artist(s)/performer(s)</li>
-     *   <li><b>TOWN</b> File owner/licensee</li>
+     *   <li><b>TOWN</b> %File owner/licensee</li>
      *   <li><b>TPE1</b> Lead performer(s)/Soloist(s)</li>
      *   <li><b>TPE2</b> Band/orchestra/accompaniment</li>
      *   <li><b>TPE3</b> Conductor/performer refinement</li>

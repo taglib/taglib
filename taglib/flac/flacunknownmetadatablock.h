@@ -33,6 +33,7 @@
 
 namespace TagLib {
   namespace FLAC {
+    //! Unknown FLAC metadata block
     class TAGLIB_EXPORT UnknownMetadataBlock : public MetadataBlock
     {
     public:

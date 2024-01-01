@@ -174,7 +174,7 @@ namespace TagLib {
        * Pack \a packets into Ogg pages using the \a strategy for pagination.
        * The page number indicator inside of the rendered packets will start
        * with \a firstPage and be incremented for each page rendered.
-       * \a containsLastPacket should be set to true if \a packets contains the
+       * \a containsLastPacket should be set to \c true if \a packets contains the
        * last page in the stream and will set the appropriate flag in the last
        * rendered Ogg page's header.  \a streamSerialNumber should be set to
        * the serial number for this stream.

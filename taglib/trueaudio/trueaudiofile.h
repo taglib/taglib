@@ -44,7 +44,7 @@ namespace TagLib {
   //! An implementation of TrueAudio metadata
 
   /*!
-   * This is implementation of TrueAudio metadata.
+   * this is an implementation of TrueAudio metadata.
    *
    * This supports ID3v1 and ID3v2 tags as well as reading stream
    * properties from the file.
@@ -80,7 +80,7 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs a TrueAudio file from \a file.  If \a readProperties is true
+       * Constructs a TrueAudio file from \a file.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
@@ -93,13 +93,15 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs a TrueAudio file from \a file.  If \a readProperties is true
+       * Constructs a TrueAudio file from \a file.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * \deprecated Use the constructor above.
        */
       TAGLIB_DEPRECATED
       File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -107,7 +109,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs a TrueAudio file from \a stream.  If \a readProperties is true
+       * Constructs a TrueAudio file from \a stream.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -123,7 +125,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs a TrueAudio file from \a stream.  If \a readProperties is true
+       * Constructs a TrueAudio file from \a stream.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -133,6 +135,8 @@ namespace TagLib {
        * \a frameFactory.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * \deprecated Use the constructor above.
        */
       TAGLIB_DEPRECATED
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
@@ -182,15 +186,15 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid ID3v1 tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid ID3v1 tag.  If \a create is \c true it will create
        * an ID3v1 tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file
        * on disk actually has an ID3v1 tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the TrueAudio::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *
@@ -201,15 +205,15 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid ID3v2 tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid ID3v2 tag.  If \a create is \c true it will create
        * an ID3v2 tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an ID3v2 tag.  Use hasID3v2Tag() to check if the file
        * on disk actually has an ID3v2 tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the TrueAudio::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *

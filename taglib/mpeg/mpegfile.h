@@ -71,7 +71,7 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs an MPEG file from \a file.  If \a readProperties is true the
+       * Constructs an MPEG file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * If \a propertiesStyle is not Fast, the file will be scanned
@@ -85,7 +85,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs an MPEG file from \a file.  If \a readProperties is true the
+       * Constructs an MPEG file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
@@ -93,6 +93,8 @@ namespace TagLib {
        *
        * If \a propertiesStyle is not Fast, the file will be scanned
        * completely if no ID3v2 tag or MPEG sync code is found at the start.
+       *
+       * \deprecated Use the constructor above.
        */
       TAGLIB_DEPRECATED
       File(FileName file, ID3v2::FrameFactory *frameFactory,
@@ -100,7 +102,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs an MPEG file from \a stream.  If \a readProperties is true the
+       * Constructs an MPEG file from \a stream.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -120,7 +122,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs an MPEG file from \a stream.  If \a readProperties is true the
+       * Constructs an MPEG file from \a stream.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -131,6 +133,8 @@ namespace TagLib {
        *
        * If \a propertiesStyle is not Fast, the file will be scanned
        * completely if no ID3v2 tag or MPEG sync code is found at the start.
+       *
+       * \deprecated Use the constructor above.
        */
       TAGLIB_DEPRECATED
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
@@ -192,7 +196,7 @@ namespace TagLib {
 
       /*!
        * Save the file.  If at least one tag -- ID3v1 or ID3v2 -- exists this
-       * will duplicate its content into the other tag.  This returns true
+       * will duplicate its content into the other tag.  This returns \c true
        * if saving was successful.
        *
        * If neither exists or if both tags are empty, this will strip the tags
@@ -217,7 +221,7 @@ namespace TagLib {
        * \a version specifies the ID3v2 version to be used for writing tags.  By
        * default, the latest standard, ID3v2.4 is used.
        *
-       * If \a duplicate is set to DuplicateTags and at least one tag -- ID3v1
+       * If \a duplicate is set to Duplicate and at least one tag -- ID3v1
        * or ID3v2 -- exists this will duplicate its content into the other tag.
        */
       bool save(int tags, StripTags strip = StripOthers,
@@ -227,8 +231,8 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v2 tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid ID3v2 tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid ID3v2 tag.  If \a create is \c true it will create
        * an ID3v2 tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
@@ -246,8 +250,8 @@ namespace TagLib {
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid ID3v1 tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid ID3v1 tag.  If \a create is \c true it will create
        * an ID3v1 tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
@@ -265,8 +269,8 @@ namespace TagLib {
       /*!
        * Returns a pointer to the APE tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid APE tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid APE tag.  If \a create is \c true it will create
        * an APE tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
@@ -283,10 +287,10 @@ namespace TagLib {
 
       /*!
        * This will strip the tags that match the OR-ed together TagTypes from the
-       * file.  By default it strips all tags.  It returns true if the tags are
+       * file.  By default it strips all tags.  It returns \c true if the tags are
        * successfully stripped.
        *
-       * If \a freeMemory is true the ID3 and APE tags will be deleted and
+       * If \a freeMemory is \c true the ID3 and APE tags will be deleted and
        * pointers to them will be invalidated.
        *
        * \note This will update the file immediately.
@@ -300,13 +304,13 @@ namespace TagLib {
 
       /*!
        * Returns the position in the file of the next MPEG frame,
-       * using the current position as start
+       * using the current position as start.
        */
       offset_t nextFrameOffset(offset_t position);
 
       /*!
        * Returns the position in the file of the previous MPEG frame,
-       * using the current position as start
+       * using the current position as start.
        */
       offset_t previousFrameOffset(offset_t position);
 

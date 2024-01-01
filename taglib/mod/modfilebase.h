@@ -36,6 +36,7 @@
 
 namespace TagLib {
   namespace Mod {
+    //! Base class for module files
     class TAGLIB_EXPORT FileBase : public TagLib::File
     {
     public:

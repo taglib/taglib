@@ -36,20 +36,21 @@ namespace TagLib {
   //! An implementation of DSDIFF metadata
 
   /*!
-   * This is implementation of DSDIFF metadata.
+   * This is an implementation of DSDIFF metadata.
    *
    * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
    * chunk as well as properties from the file.
-   * Description of the DSDIFF format is available
-   * at http://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf
-   * DSDIFF standard does not explicitly specify the ID3V2 chunk
-   * It can be found at the root level, but also sometimes inside the PROP chunk
-   * In addition, title and artist info are stored as part of the standard
+   * Description of the DSDIFF format is available at
+   * <a href="https://dsd-guide.com/sites/default/files/white-papers/DSDIFF_1.5_Spec.pdf">
+   * DSDIFF_1.5_Spec.pdf</a>.
+   * The DSDIFF standard does not explicitly specify the ID3 chunk.
+   * It can be found at the root level, but also sometimes inside the PROP chunk.
+   * In addition, title and artist info are stored as part of the standard.
    */
 
   namespace DSDIFF {
 
-    //! An implementation of TagLib::File with DSDIFF specific methods
+    //! An implementation of TagLib::File with DSDIFF specific methods.
 
     /*!
      * This implements and provides an interface for DSDIFF files to the
@@ -78,7 +79,7 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs a DSDIFF file from \a file.  If \a readProperties is true
+       * Constructs a DSDIFF file from \a file.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -91,7 +92,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs an DSDIFF file from \a stream.  If \a readProperties is true
+       * Constructs an DSDIFF file from \a stream.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
@@ -168,7 +169,7 @@ namespace TagLib {
 
       /*!
        * Save the file.  If at least one tag -- ID3v1 or DIIN -- exists this
-       * will duplicate its content into the other tag.  This returns true
+       * will duplicate its content into the other tag.  This returns \c true
        * if saving was successful.
        *
        * If neither exists or if both tags are empty, this will strip the tags
@@ -177,7 +178,7 @@ namespace TagLib {
        * This is the same as calling save(AllTags);
        *
        * If you would like more granular control over the content of the tags,
-       * with the concession of generality, use paramaterized save call below.
+       * with the concession of generality, use parameterized save call below.
        *
        * \see save(int tags)
        */
@@ -193,7 +194,7 @@ namespace TagLib {
 
       /*!
        * This will strip the tags that match the OR-ed together TagTypes from the
-       * file.  By default it strips all tags.  It returns true if the tags are
+       * file.  By default it strips all tags.  It returns \c true if the tags are
        * successfully stripped.
        *
        * \note This will update the file immediately.

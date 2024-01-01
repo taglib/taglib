@@ -164,7 +164,7 @@ namespace TagLib {
 
     /*!
      * Save the file and its associated tags.  This should be reimplemented in
-     * the concrete subclasses.  Returns true if the save succeeds.
+     * the concrete subclasses.  Returns \c true if the save succeeds.
      *
      * \warning On UNIX multiple processes are able to write to the same file at
      * the same time.  This can result in serious file corruption.  If you are
@@ -181,7 +181,7 @@ namespace TagLib {
 
     /*!
      * Attempts to write the block \a data at the current get pointer.  If the
-     * file is currently only opened read only -- i.e. readOnly() returns true --
+     * file is currently only opened read only -- i.e. readOnly() returns \c true --
      * this attempts to reopen the file in read/write mode.
      *
      * \note This should be used instead of using the streaming output operator
@@ -241,7 +241,7 @@ namespace TagLib {
     void removeBlock(offset_t start = 0, size_t length = 0);
 
     /*!
-     * Returns true if the file is read only (or if the file can not be opened).
+     * Returns \c true if the file is read only (or if the file can not be opened).
      */
     bool readOnly() const;
 
@@ -252,7 +252,7 @@ namespace TagLib {
     bool isOpen() const;
 
     /*!
-     * Returns true if the file is open and readable.
+     * Returns \c true if the file is open and readable.
      */
     bool isValid() const;
 
@@ -282,7 +282,7 @@ namespace TagLib {
   protected:
     /*!
      * Construct a File object and opens the \a file.  \a file should be a
-     * be a C-string in the local file system encoding.
+     * C-string in the local file system encoding.
      *
      * \note Constructor is protected since this class should only be
      * instantiated through subclasses.

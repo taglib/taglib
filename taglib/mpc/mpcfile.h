@@ -42,7 +42,7 @@ namespace TagLib {
   //! An implementation of MPC metadata
 
   /*!
-   * This is implementation of MPC metadata.
+   * this is an implementation of MPC metadata.
    *
    * This supports ID3v1 and APE (v1 and v2) style comments as well as reading stream
    * properties from the file. ID3v2 tags are invalid in MPC-files, but will be skipped
@@ -82,7 +82,7 @@ namespace TagLib {
       };
 
       /*!
-       * Constructs an MPC file from \a file.  If \a readProperties is true the
+       * Constructs an MPC file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note In the current implementation, \a propertiesStyle is ignored.
@@ -91,7 +91,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs an MPC file from \a stream.  If \a readProperties is true the
+       * Constructs an MPC file from \a stream.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * \note TagLib will *not* take ownership of the stream, the caller is
@@ -141,22 +141,22 @@ namespace TagLib {
       /*!
        * Saves the file.
        *
-       * This returns true if the save was successful.
+       * This returns \c true if the save was successful.
        */
       bool save() override;
 
       /*!
        * Returns a pointer to the ID3v1 tag of the file.
        *
-       * If \a create is false (the default) this returns a null pointer
-       * if there is no valid APE tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this returns a null pointer
+       * if there is no valid APE tag.  If \a create is \c true it will create
        * an APE tag if one does not exist and returns a valid pointer.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an ID3v1 tag.  Use hasID3v1Tag() to check if the file
        * on disk actually has an ID3v1 tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the MPC::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *
@@ -167,8 +167,8 @@ namespace TagLib {
       /*!
        * Returns a pointer to the APE tag of the file.
        *
-       * If \a create is false (the default) this may return a null pointer
-       * if there is no valid APE tag.  If \a create is true it will create
+       * If \a create is \c false (the default) this may return a null pointer
+       * if there is no valid APE tag.  If \a create is \c true it will create
        * an APE tag if one does not exist and returns a valid pointer.  If
        * there already be an ID3v1 tag, the new APE tag will be placed before it.
        *
@@ -176,7 +176,7 @@ namespace TagLib {
        * file on disk has an APE tag.  Use hasAPETag() to check if the file
        * on disk actually has an APE tag.
        *
-       * \note The Tag <b>is still</b> owned by the MPEG::File and should not be
+       * \note The Tag <b>is still</b> owned by the MPC::File and should not be
        * deleted by the user.  It will be deleted when the file (object) is
        * destroyed.
        *

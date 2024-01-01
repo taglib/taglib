@@ -69,16 +69,16 @@ namespace TagLib {
   /*!
    * This is an implicitly shared \e wide string.  For storage it uses
    * TagLib::wstring, but as this is an <i>implementation detail</i> this of
-   * course could change.  Strings are stored internally as UTF-16(without BOM/
-   * CPU byte order)
+   * course could change.  Strings are stored internally as UTF-16 (without
+   * BOM/CPU byte order)
    *
    * The use of implicit sharing means that copying a string is cheap, the only
    * \e cost comes into play when the copy is modified.  Prior to that the string
    * just has a pointer to the data of the \e parent String.  This also makes
    * this class suitable as a function return type.
    *
-   * In addition to adding implicit sharing, this class keeps track of four
-   * possible encodings, which are the four supported by the ID3v2 standard.
+   * In addition to adding implicit sharing, this class keeps track of
+   * possible encodings, which are those supported by the ID3v2 standard.
    */
 
   class TAGLIB_EXPORT String
@@ -92,6 +92,7 @@ namespace TagLib {
 
     /**
      * The four types of string encodings supported by the ID3v2 specification.
+     * (plus UTF16LE).
      * ID3v1 is assumed to be Latin1 and Ogg Vorbis comments use UTF8.
      */
     enum Type {
@@ -190,8 +191,8 @@ namespace TagLib {
     ~String();
 
     /*!
-     * Returns a deep copy of this String as an std::string.  The returned string
-     * is encoded in UTF8 if \a unicode is true, otherwise Latin1.
+     * Returns a deep copy of this String as an \c std::string.  The returned string
+     * is encoded in UTF8 if \a unicode is \c true, otherwise Latin1.
      *
      * \see toCString()
      */
@@ -199,7 +200,7 @@ namespace TagLib {
 
     /*!
      * Returns a deep copy of this String as a wstring.  The returned string is
-     * encoded in UTF-16 (without BOM/CPU byte order), not UTF-32 even if wchar_t
+     * encoded in UTF-16 (without BOM/CPU byte order), not UTF-32 even if \c wchar_t
      * is 32-bit wide.
      *
      * \see toCWString()
@@ -208,7 +209,7 @@ namespace TagLib {
 
     /*!
      * Creates and returns a standard C-style (null-terminated) version of this
-     * String.  The returned string is encoded in UTF8 if \a unicode is true,
+     * String.  The returned string is encoded in UTF8 if \a unicode is \c true,
      * otherwise Latin1.
      *
      * The returned string is still owned by this String and should not be deleted
@@ -229,7 +230,7 @@ namespace TagLib {
     /*!
      * Returns a standard C-style (null-terminated) wide character version of
      * this String.  The returned string is encoded in UTF-16 (without BOM/CPU byte
-     * order), not UTF-32 even if wchar_t is 32-bit wide.
+     * order), not UTF-32 even if \c wchar_t is 32-bit wide.
      *
      * The returned string is still owned by this String and should not be deleted
      * by the user.
@@ -296,7 +297,7 @@ namespace TagLib {
     StringList split(const String &separator = " ") const;
 
     /*!
-     * Returns true if the strings starts with the substring \a s.
+     * Returns \c true if the strings starts with the substring \a s.
      */
     bool startsWith(const String &s) const;
 
@@ -335,7 +336,7 @@ namespace TagLib {
     unsigned int length() const;
 
     /*!
-     * Returns true if the string is empty.
+     * Returns \c true if the string is empty.
      */
     bool isEmpty() const;
 
@@ -355,7 +356,7 @@ namespace TagLib {
      * Convert the string to an integer.
      *
      * If the conversion was successful, it sets the value of \a *ok to
-     * true and returns the integer. Otherwise it sets \a *ok to false
+     * \c true and returns the integer. Otherwise it sets \a *ok to \c false
      * and the result is undefined.
      */
     int toInt(bool *ok = nullptr) const;
@@ -366,12 +367,12 @@ namespace TagLib {
     String stripWhiteSpace() const;
 
     /*!
-     * Returns true if the file only uses characters required by Latin1.
+     * Returns \c true if the file only uses characters required by Latin1.
      */
     bool isLatin1() const;
 
     /*!
-     * Returns true if the file only uses characters required by (7-bit) ASCII.
+     * Returns \c true if the file only uses characters required by (7-bit) ASCII.
      */
     bool isAscii() const;
 
@@ -397,37 +398,37 @@ namespace TagLib {
 
     /*!
      * Compares each character of the String with each character of \a s and
-     * returns true if the strings match.
+     * returns \c true if the strings match.
      */
     bool operator==(const String &s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
-     * returns false if the strings match.
+     * returns \c false if the strings match.
      */
     bool operator!=(const String &s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
-     * returns true if the strings match.
+     * returns \c true if the strings match.
      */
     bool operator==(const char *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
-     * returns false if the strings match.
+     * returns \c false if the strings match.
      */
     bool operator!=(const char *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
-     * returns true if the strings match.
+     * returns \c true if the strings match.
      */
     bool operator==(const wchar_t *s) const;
 
     /*!
      * Compares each character of the String with each character of \a s and
-     * returns false if the strings match.
+     * returns \c false if the strings match.
      */
     bool operator!=(const wchar_t *s) const;
 
@@ -498,13 +499,13 @@ namespace TagLib {
     String &operator=(const ByteVector &v);
 
     /*!
-     * Exchanges the content of the String by the content of \a s.
+     * Exchanges the content of the String with the content of \a s.
      */
     void swap(String &s) noexcept;
 
     /*!
      * To be able to use this class in a Map, this operator needed to be
-     * implemented.  Returns true if \a s is less than this string in a byte-wise
+     * implemented.  Returns \c true if \a s is less than this string in a byte-wise
      * comparison.
      */
     bool operator<(const String &s) const;

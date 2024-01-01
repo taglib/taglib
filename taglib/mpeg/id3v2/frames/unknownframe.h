@@ -37,7 +37,7 @@ namespace TagLib {
 
     /*!
      * This class represents a frame type not known (or more often simply
-     * unimplemented) in TagLib.  This is here provide a basic API for
+     * unimplemented) in TagLib.  This is here to provide a basic API for
      * manipulating the binary data of unknown frames and to provide a means
      * of rendering such \e unknown frames.
      *

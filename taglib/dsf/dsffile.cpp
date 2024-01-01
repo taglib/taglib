@@ -31,8 +31,6 @@
 
 using namespace TagLib;
 
-// The DSF specification is located at http://dsd-guide.com/sites/default/files/white-papers/DSFFileFormatSpec_E.pdf
-
 class DSF::File::FilePrivate
 {
 public:

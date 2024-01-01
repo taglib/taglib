@@ -50,6 +50,8 @@ namespace TagLib {
   class ByteVector;
   class ByteVectorList;
 
+  //! An implicitly shared discriminated union.
+
   /*!
    * This is an implicitly shared discriminated union.
    *
@@ -65,19 +67,19 @@ namespace TagLib {
     // The number and order of these types must correspond to the template
     // parameters for StdVariantType in tvariant.cpp!
     enum Type {
-      Void,
-      Bool,
-      Int,
-      UInt,
-      LongLong,
-      ULongLong,
-      Double,
-      String,
-      StringList,
-      ByteVector,
-      ByteVectorList,
-      VariantList,
-      VariantMap
+      Void,           //!< variant is empty
+      Bool,           //!< \c bool
+      Int,            //!< \c int
+      UInt,           //!< <tt>unsigned int</tt>
+      LongLong,       //!< <tt>long long</tt>
+      ULongLong,      //!< <tt>unsigned long long</tt>
+      Double,         //!< \c double
+      String,         //!< String
+      StringList,     //!< StringList
+      ByteVector,     //!< ByteVector
+      ByteVectorList, //!< ByteVectorList
+      VariantList,    //!< \link TagLib::VariantList VariantList \endlink
+      VariantMap      //!< \link TagLib::VariantMap VariantMap \endlink
     };
 
     /*!
@@ -85,11 +87,7 @@ namespace TagLib {
      */
     Variant();
 
-    /*!
-     * Constructs a Variant from an integer value.
-     */
     Variant(int val);
-
     Variant(unsigned int val);
     Variant(long long val);
     Variant(unsigned long long val);
@@ -121,49 +119,60 @@ namespace TagLib {
     Type type() const;
 
     /*!
-     * Returns true if the Variant is empty.
+     * Returns \c true if the Variant is empty.
      */
     bool isEmpty() const;
 
     /*!
-     * Extracts an integer value from the Variant.
-     * If \a ok is passed, its boolean variable will be set to true if the
+     * Extracts a value from the Variant.
+     * If \a ok is passed, its boolean variable will be set to \c true if the
      * Variant contains the correct type, and the returned value is the value
-     * of the Variant.  Otherwise, the \a ok variable is set to false and
+     * of the Variant.  Otherwise, the \a ok variable is set to \c false and
      * a dummy default value is returned.
      */
     int toInt(bool *ok = nullptr) const;
 
+    //! \copydoc toInt()
     unsigned int toUInt(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     long long toLongLong(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     unsigned long long toULongLong(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     bool toBool(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     double toDouble(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     TagLib::String toString(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     TagLib::StringList toStringList(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     TagLib::ByteVector toByteVector(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     TagLib::ByteVectorList toByteVectorList(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     TagLib::List<TagLib::Variant> toList(bool *ok = nullptr) const;
+    //! \copydoc toInt()
     TagLib::Map<TagLib::String, TagLib::Variant> toMap(bool *ok = nullptr) const;
 
     /*!
      * Extracts value of type \a T from the Variant.
-     * If \a ok is passed, its boolean variable will be set to true if the
+     * If \a ok is passed, its boolean variable will be set to \c true if the
      * Variant contains the correct type, and the returned value is the value
-     * of the Variant.  Otherwise, the \a ok variable is set to false and
+     * of the Variant.  Otherwise, the \a ok variable is set to \c false and
      * a dummy default value is returned.
      */
     template<typename T>
     T value(bool *ok = nullptr) const;
 
     /*!
-     * Returns true it the Variant and \a v are of the same type and contain the
+     * Returns \c true it the Variant and \a v are of the same type and contain the
      * same value.
      */
     bool operator==(const Variant &v) const;
 
     /*!
-     * Returns true it the Variant and \a v  differ in type or value.
+     * Returns \c true it the Variant and \a v  differ in type or value.
      */
     bool operator!=(const Variant &v) const;
 
