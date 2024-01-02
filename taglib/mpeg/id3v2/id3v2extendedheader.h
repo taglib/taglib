@@ -57,7 +57,7 @@ namespace TagLib {
       /*!
        * Destroys the extended header.
        */
-      virtual ~ExtendedHeader();
+      ~ExtendedHeader();
 
       ExtendedHeader(const ExtendedHeader &) = delete;
       ExtendedHeader &operator=(const ExtendedHeader &) = delete;

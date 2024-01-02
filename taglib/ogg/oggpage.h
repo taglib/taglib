@@ -57,7 +57,7 @@ namespace TagLib {
        */
       Page(File *file, offset_t pageOffset);
 
-      virtual ~Page();
+      ~Page();
 
       Page(const Page &) = delete;
       Page &operator=(const Page &) = delete;

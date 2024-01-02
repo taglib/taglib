@@ -53,7 +53,7 @@ namespace TagLib {
        */
       void swap(Item &item) noexcept;
 
-      virtual ~Item();
+      ~Item();
 
       Item(int value);
       Item(unsigned char value);

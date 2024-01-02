@@ -68,7 +68,7 @@ namespace TagLib
       /*!
        * Destroys the picture.
        */
-      virtual ~Picture();
+      ~Picture();
 
       /*!
        * Copies the contents of \a other into this picture.

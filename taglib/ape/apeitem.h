@@ -75,7 +75,7 @@ namespace TagLib {
       /*!
        * Destroys the item.
        */
-      virtual ~Item();
+      ~Item();
 
       /*!
        * Copies the contents of \a item into this item.

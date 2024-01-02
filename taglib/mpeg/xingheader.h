@@ -82,7 +82,7 @@ namespace TagLib {
       /*!
        * Destroy this XingHeader instance.
        */
-      virtual ~XingHeader();
+      ~XingHeader();
 
       XingHeader(const XingHeader &) = delete;
       XingHeader &operator=(const XingHeader &) = delete;

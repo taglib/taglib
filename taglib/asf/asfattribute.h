@@ -123,7 +123,7 @@ namespace TagLib
       /*!
        * Destroys the attribute.
        */
-      virtual ~Attribute();
+      ~Attribute();
 
       /*!
        * Returns the type of the value.
