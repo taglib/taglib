@@ -74,6 +74,7 @@
 #include "mp4coverart.h"
 #include "mp4file.h"
 #include "mp4item.h"
+#include "mp4itemfactory.h"
 #include "mp4properties.h"
 #include "mp4tag.h"
 #include "mpcfile.h"
@@ -162,6 +163,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::ByteVectorList));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ByteVectorStream));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::DebugListener));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSDIFF::DIIN::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSDIFF::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSDIFF::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::File));
@@ -212,6 +214,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::CoverArt));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Item));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MP4::ItemFactory));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::File));
@@ -255,6 +258,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::WavPack::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::XM::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::XM::Properties));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::Variant));
     }
 
 private:
