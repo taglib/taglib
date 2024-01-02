@@ -139,7 +139,6 @@ void printVariantToStream(std::ostream &s, const StdVariantType &v)
     break;
   case Variant::StringList:
     if(const auto valPtr = std::get_if<Variant::StringList>(&v)) {
-      const auto v = *valPtr;
       s << '[';
       for(auto it = valPtr->cbegin(); it != valPtr->cend(); ++it) {
         if(it != valPtr->cbegin()) {
