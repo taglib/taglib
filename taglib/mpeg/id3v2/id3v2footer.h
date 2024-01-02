@@ -57,7 +57,7 @@ namespace TagLib {
       /*!
        * Destroys the footer.
        */
-      virtual ~Footer();
+      ~Footer();
 
       Footer(const Footer &) = delete;
       Footer &operator=(const Footer &) = delete;

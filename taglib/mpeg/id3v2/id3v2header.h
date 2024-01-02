@@ -62,7 +62,7 @@ namespace TagLib {
       /*!
        * Destroys the header.
        */
-      virtual ~Header();
+      ~Header();
 
       Header(const Header &) = delete;
       Header &operator=(const Header &) = delete;

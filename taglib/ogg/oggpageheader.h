@@ -57,7 +57,7 @@ namespace TagLib {
       /*!
        * Deletes this instance of the PageHeader.
        */
-      virtual ~PageHeader();
+      ~PageHeader();
 
       PageHeader(const PageHeader &) = delete;
       PageHeader &operator=(const PageHeader &) = delete;

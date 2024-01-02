@@ -67,7 +67,7 @@ namespace TagLib {
       /*!
        * Destroys this Header instance.
        */
-      virtual ~Header();
+      ~Header();
 
       /*!
        * Returns true if the frame is at least an appropriate size and has
