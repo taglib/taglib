@@ -92,7 +92,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs an DSDIFF file from \a stream.  If \a readProperties is \c true
+       * Constructs a DSDIFF file from \a stream.  If \a readProperties is \c true
        * the file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
@@ -238,7 +238,7 @@ namespace TagLib {
       void removeChildChunk(unsigned int i, unsigned int childChunkNum);
 
       /*!
-       * Sets the data for the the specified chunk at root level to \a data.
+       * Sets the data for the specified chunk at root level to \a data.
        *
        * \warning This will update the file immediately.
        */
@@ -255,7 +255,7 @@ namespace TagLib {
       void setRootChunkData(const ByteVector &name, const ByteVector &data);
 
       /*!
-       * Sets the data for the the specified child chunk to \a data.
+       * Sets the data for the specified child chunk to \a data.
        *
        * If data is null, then remove the chunk
        *
@@ -267,7 +267,7 @@ namespace TagLib {
       /*!
        * Sets the data for the child chunk \a name to \a data.  If a chunk with
        * the given name already exists it will be overwritten, otherwise it will
-       * be created after the existing chunks inside child chunk.
+       * be created after the existing chunks inside the child chunk.
        *
        * If data is null, then remove the chunks with \a name name
        *

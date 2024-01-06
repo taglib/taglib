@@ -94,8 +94,8 @@ namespace TagLib {
       bool isOrdered() const;
 
       /*!
-       * Returns count of child elements of the frame. It always
-       * corresponds to size of child elements list.
+       * Returns the count of child elements of the frame. It always
+       * corresponds to the size of the child elements list.
        *
        * \see childElements()
        */
@@ -139,7 +139,7 @@ namespace TagLib {
       void setChildElements(const ByteVectorList &l);
 
       /*!
-       * Adds \a cE to list of child elements of the frame.
+       * Adds \a cE to the list of child elements of the frame.
        *
        * \see childElements()
        */
@@ -237,7 +237,7 @@ namespace TagLib {
       /*!
        * CTOC frames each contain a flag that indicates, if CTOC frame is top-level (there isn't
        * any frame, which contains this frame in its child elements list). Only a single frame
-       * within tag can be top-level. This searches for a top-level CTOC frame.
+       * within the tag can be top-level. This searches for a top-level CTOC frame.
        *
        * \see isTopLevel()
        */

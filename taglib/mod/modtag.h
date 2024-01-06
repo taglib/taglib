@@ -131,7 +131,7 @@ namespace TagLib {
        * module file is fixed to the number of instruments/patterns/samples.
        *
        * Also note that the instrument/pattern/sample name length is limited
-       * an thus the line length in comments are limited. Too big comments
+       * and thus the line length in comments are limited. Too big comments
        * will be truncated.
        *
        * The line length limits per file type are (1 character = 1 byte):

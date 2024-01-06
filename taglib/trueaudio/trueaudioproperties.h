@@ -42,7 +42,7 @@ namespace TagLib {
     //! An implementation of audio property reading for TrueAudio
 
     /*!
-     * This reads the data from an TrueAudio stream found in the AudioProperties
+     * This reads the data from a TrueAudio stream found in the AudioProperties
      * API.
      */
 

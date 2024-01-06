@@ -35,10 +35,10 @@ namespace TagLib {
 
   class PropertyMap;
 
-  //! A simple, generic interface to common audio meta data fields.
+  //! A simple, generic interface to common audio metadata fields.
 
   /*!
-   * This is an attempt to abstract away the difference in the meta data formats
+   * This is an attempt to abstract away the difference in the metadata formats
    * of various audio codecs and tagging schemes.  As such it is generally a
    * subset of what is available in the specific formats but should be suitable
    * for most applications.  This is meant to compliment the generic APIs found
@@ -217,7 +217,7 @@ namespace TagLib {
     /*!
      * Copies the generic data from one tag to another.
      *
-     * \note This will no affect any of the lower level details of the tag.  For
+     * \note This will not affect any of the lower level details of the tag.  For
      * instance if any of the tag type specific data (maybe a URL for a band) is
      * set, this will not modify or copy that.  This just copies using the API
      * in this class.

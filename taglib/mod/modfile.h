@@ -38,7 +38,7 @@ namespace TagLib {
   //! An implementation of Protracker metadata
 
   /*!
-   * this is an implementation of Protracker metadata.
+   * This is an implementation of Protracker metadata.
    */
 
   namespace Mod {

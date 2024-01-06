@@ -45,7 +45,7 @@ namespace TagLib {
     //! An implementation of audio property reading for WavPack
 
     /*!
-     * This reads the data from an WavPack stream found in the AudioProperties
+     * This reads the data from a WavPack stream found in the AudioProperties
      * API.
      */
 
@@ -103,7 +103,7 @@ namespace TagLib {
       unsigned int sampleFrames() const;
 
       /*!
-       * Returns WavPack version.
+       * Returns the WavPack version.
        */
       int version() const;
 

@@ -38,7 +38,7 @@ namespace TagLib {
     public:
 
       /*!
-       * Audio codec types can be used in ASF file.
+       * Audio codec types which can be used in ASF files.
        */
       enum Codec
       {

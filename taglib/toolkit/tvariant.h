@@ -166,13 +166,13 @@ namespace TagLib {
     T value(bool *ok = nullptr) const;
 
     /*!
-     * Returns \c true it the Variant and \a v are of the same type and contain the
+     * Returns \c true if the Variant and \a v are of the same type and contain the
      * same value.
      */
     bool operator==(const Variant &v) const;
 
     /*!
-     * Returns \c true it the Variant and \a v  differ in type or value.
+     * Returns \c true if the Variant and \a v  differ in type or value.
      */
     bool operator!=(const Variant &v) const;
 

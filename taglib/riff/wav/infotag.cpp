@@ -260,7 +260,7 @@ String RIFF::Info::Tag::fieldText(const ByteVector &id) const
 
 void RIFF::Info::Tag::setFieldText(const ByteVector &id, const String &s)
 {
-  // id must be four-byte long pure ascii string.
+  // id must be a four-byte long pure ascii string.
   if(!isValidChunkName(id))
     return;
 

@@ -37,7 +37,7 @@ namespace TagLib {
     //! An implementation of audio property reading for FLAC
 
     /*!
-     * This reads the data from an FLAC stream found in the AudioProperties
+     * This reads the data from a FLAC stream found in the AudioProperties
      * API.
      */
 

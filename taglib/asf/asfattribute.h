@@ -126,7 +126,7 @@ namespace TagLib
       virtual ~Attribute();
 
       /*!
-       * Returns type of the value.
+       * Returns the type of the value.
        */
       AttributeTypes type() const;
 

@@ -235,7 +235,7 @@ namespace TagLib {
       List<FLAC::Picture *> pictureList();
 
       /*!
-       * Removes an picture. If \a del is \c true the picture's memory
+       * Removes a picture. If \a del is \c true the picture's memory
        * will be freed; if it is \c false, it must be deleted by the user.
        */
       void removePicture(FLAC::Picture *picture, bool del = true);

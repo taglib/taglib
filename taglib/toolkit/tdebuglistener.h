@@ -63,7 +63,7 @@ namespace TagLib
   /*!
    * Sets the listener that decides how the debug messages are redirected.
    * If the parameter \a listener is null, the previous listener is released
-   * and default stderr listener is restored.
+   * and the default stderr listener is restored.
    *
    * \note The caller is responsible for deleting the previous listener
    * as needed after it is released.

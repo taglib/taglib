@@ -37,7 +37,7 @@ namespace TagLib {
     //! An implementation of audio property reading for DSDIFF
 
     /*!
-     * This reads the data from an DSDIFF stream found in the AudioProperties
+     * This reads the data from a DSDIFF stream found in the AudioProperties
      * API.
      */
 

@@ -48,7 +48,7 @@ namespace TagLib {
   //! An implementation of APE metadata
 
   /*!
-   * this is an implementation of APE metadata.
+   * This is an implementation of APE metadata.
    *
    * This supports ID3v1 and APE (v1 and v2) style comments as well as reading stream
    * properties from the file.

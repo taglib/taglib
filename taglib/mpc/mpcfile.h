@@ -42,7 +42,7 @@ namespace TagLib {
   //! An implementation of MPC metadata
 
   /*!
-   * this is an implementation of MPC metadata.
+   * This is an implementation of MPC metadata.
    *
    * This supports ID3v1 and APE (v1 and v2) style comments as well as reading stream
    * properties from the file. ID3v2 tags are invalid in MPC-files, but will be skipped
@@ -170,7 +170,7 @@ namespace TagLib {
        * If \a create is \c false (the default) this may return a null pointer
        * if there is no valid APE tag.  If \a create is \c true it will create
        * an APE tag if one does not exist and returns a valid pointer.  If
-       * there already be an ID3v1 tag, the new APE tag will be placed before it.
+       * there already is an ID3v1 tag, the new APE tag will be placed before it.
        *
        * \note This may return a valid pointer regardless of whether or not the
        * file on disk has an APE tag.  Use hasAPETag() to check if the file

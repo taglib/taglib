@@ -44,7 +44,7 @@ namespace TagLib {
   //! An implementation of WavPack metadata
 
   /*!
-   * this is an implementation of WavPack metadata.
+   * This is an implementation of WavPack metadata.
    *
    * This supports ID3v1 and APE (v1 and v2) style comments as well as reading stream
    * properties from the file.
@@ -88,7 +88,7 @@ namespace TagLib {
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
-       * Constructs an WavPack file from \a file.  If \a readProperties is \c true the
+       * Constructs a WavPack file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * \c false, \a propertiesStyle is ignored.
        *

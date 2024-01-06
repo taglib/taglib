@@ -37,7 +37,7 @@ namespace TagLib {
     //! An implementation of AIFF metadata
 
     /*!
-     * this is an implementation of AIFF metadata.
+     * This is an implementation of AIFF metadata.
      *
      * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
      * chunk as well as properties from the file.

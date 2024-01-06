@@ -38,7 +38,7 @@ namespace TagLib {
   //! An implementation of Extended Module metadata
 
   /*!
-   * this is an implementation of Extended Module metadata.
+   * This is an implementation of Extended Module metadata.
    */
 
   namespace XM {

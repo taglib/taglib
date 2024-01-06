@@ -43,7 +43,7 @@ namespace TagLib {
   {
   public:
     /*!
-     * Construct a FileStream object and opens the \a file.  \a file should be a
+     * Construct a FileStream object and open the \a file.  \a file should be a
      * C-string in the local file system encoding.
      */
     FileStream(FileName file, bool openReadOnly = false);

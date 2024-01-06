@@ -38,7 +38,7 @@ namespace TagLib {
   //! An implementation of ScreamTracker III metadata
 
   /*!
-   * this is an implementation of ScreamTracker III metadata.
+   * This is an implementation of ScreamTracker III metadata.
    */
 
   namespace S3M {

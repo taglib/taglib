@@ -97,7 +97,7 @@ namespace TagLib {
      */
     enum Type {
       /*!
-       * IS08859-1, or <i>Latin1</i> encoding.  8 bit characters.
+       * ISO-8859-1, or <i>Latin1</i> encoding.  8 bit characters.
        */
       Latin1 = 0,
       /*!
@@ -199,7 +199,7 @@ namespace TagLib {
     std::string to8Bit(bool unicode = false) const;
 
     /*!
-     * Returns a deep copy of this String as a wstring.  The returned string is
+     * Returns a deep copy of this String as a \c wstring.  The returned string is
      * encoded in UTF-16 (without BOM/CPU byte order), not UTF-32 even if \c wchar_t
      * is 32-bit wide.
      *
@@ -297,7 +297,7 @@ namespace TagLib {
     StringList split(const String &separator = " ") const;
 
     /*!
-     * Returns \c true if the strings starts with the substring \a s.
+     * Returns \c true if the string starts with the substring \a s.
      */
     bool startsWith(const String &s) const;
 
