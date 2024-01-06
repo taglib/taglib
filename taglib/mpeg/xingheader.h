@@ -74,7 +74,7 @@ namespace TagLib {
       };
 
       /*!
-       * Parses an Xing/VBRI header based on \a data which contains the entire
+       * Parses a Xing/VBRI header based on \a data which contains the entire
        * first MPEG frame.
        */
       XingHeader(const ByteVector &data);

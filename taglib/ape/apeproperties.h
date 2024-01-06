@@ -97,7 +97,7 @@ namespace TagLib {
       unsigned int sampleFrames() const;
 
       /*!
-       * Returns APE version.
+       * Returns the APE version.
        */
       int version() const;
 

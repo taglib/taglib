@@ -89,10 +89,10 @@ namespace TagLib {
  *
  * \section intro Introduction
  *
- * TagLib is a library for reading and editing audio meta data, commonly known as \e tags.
+ * TagLib is a library for reading and editing audio metadata, commonly known as \e tags.
  *
  * Features:
- * - A clean, high level, C++ API to handling audio meta data.
+ * - A clean, high level, C++ API for handling audio metadata.
  * - Format specific APIs for advanced API users.
  * - ID3v1, ID3v2, APE, FLAC, Xiph, iTunes-style MP4 and WMA tag formats.
  * - MP3, MPC, FLAC, MP4, ASF, AIFF, WAV, DSF, DFF, TrueAudio, WavPack, Ogg FLAC, Ogg Vorbis, Speex and Opus file formats.
@@ -114,7 +114,7 @@ namespace TagLib {
  *
  * \section commercial Usage in Commercial Applications
  *
- * TagLib's licenses \e do allow usage within propriety (\e closed) applications, however TagLib is \e not
+ * TagLib's licenses \e do allow usage within proprietary (\e closed) applications, however TagLib is \e not
  * public domain.  Please note the requirements of the LGPL or MPL, and adhere to at least one of them.
  * In simple terms, you must at a minimum note your usage of TagLib, note the licensing terms of TagLib and
  * if you make changes to TagLib publish them.  Please review the licenses above before using TagLib in your

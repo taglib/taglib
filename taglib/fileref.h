@@ -222,7 +222,7 @@ namespace TagLib {
     ~FileRef();
 
     /*!
-     * Returns a pointer to represented file's tag.
+     * Returns a pointer to the represented file's tag.
      *
      * \warning This pointer will become invalid when this FileRef and all
      * copies pass out of scope.

@@ -40,7 +40,7 @@ namespace TagLib {
   //! An implementation of DSF metadata
 
   /*!
-   * this is an implementation of DSF metadata using an ID3v2 tag inside the
+   * This is an implementation of DSF metadata using an ID3v2 tag inside the
    * metadata chunk.
    * The DSF specification is located at
    * http://dsd-guide.com/sites/default/files/white-papers/DSFFileFormatSpec_E.pdf

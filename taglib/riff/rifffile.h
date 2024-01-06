@@ -35,7 +35,7 @@ namespace TagLib {
 
   namespace RIFF {
 
-    //! An RIFF file class with some useful methods specific to RIFF
+    //! A RIFF file class with some useful methods specific to RIFF
 
     /*!
      * This implements the generic TagLib::File API and additionally provides

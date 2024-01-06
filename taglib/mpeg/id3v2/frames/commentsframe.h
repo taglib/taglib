@@ -153,7 +153,7 @@ namespace TagLib {
       /*!
        * Comments each have a unique description.  This searches for a comment
        * frame with the description \a d and returns a pointer to it.  If no
-       * frame is found that matches the given description null is returned.
+       * frame is found that matches the given description, null is returned.
        *
        * \see description()
        */

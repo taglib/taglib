@@ -102,7 +102,7 @@ namespace TagLib {
       Tag();
 
       /*!
-       * Constructs an INFO tag read from \a data which is contents of "LIST" chunk.
+       * Constructs an INFO tag read from \a data which is the contents of the "LIST" chunk.
        */
       Tag(const ByteVector &data);
 
@@ -157,7 +157,7 @@ namespace TagLib {
        * If the field does not exist, it is created.
        * If \a s is empty, the field is removed.
        *
-       * \note fieldId must be four-byte long pure ASCII string.  This function
+       * \note fieldId must be a four-byte long pure ASCII string.  This function
        * performs nothing if fieldId is invalid.
        */
       void setFieldText(const ByteVector &id, const String &s);
@@ -170,7 +170,7 @@ namespace TagLib {
       /*!
        * Render the tag back to binary data, suitable to be written to disk.
        *
-       * \note Returns empty ByteVector is the tag contains no fields.
+       * \note Returns an empty ByteVector if the tag contains no fields.
        */
       ByteVector render() const;
 
@@ -189,7 +189,7 @@ namespace TagLib {
 
     protected:
       /*!
-       * Pareses the body of the tag in \a data.
+       * Parses the body of the tag in \a data.
        */
       void parse(const ByteVector &data);
 

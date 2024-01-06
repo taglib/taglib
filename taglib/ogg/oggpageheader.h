@@ -69,7 +69,7 @@ namespace TagLib {
 
       /*!
        * Ogg pages contain a list of packets (which are used by the contained
-       * codecs).  The sizes of these pages is encoded in the page header.  This
+       * codecs).  The sizes of these pages are encoded in the page header.  This
        * returns a list of the packet sizes in bytes.
        *
        * \see setPacketSizes()
@@ -87,7 +87,7 @@ namespace TagLib {
       /*!
        * Some packets can be <i>continued</i> across multiple pages.  If the
        * first packet in the current page is a continuation this will return
-       * \c true.  If this is page starts with a new packet this will return \c false.
+       * \c true.  If this page starts with a new packet this will return \c false.
        *
        * \see lastPacketCompleted()
        * \see setFirstPacketContinued()

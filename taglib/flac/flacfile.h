@@ -43,7 +43,7 @@ namespace TagLib {
   //! An implementation of FLAC metadata
 
   /*!
-   * this is an implementation of FLAC metadata for non-Ogg FLAC files.  At some
+   * This is an implementation of FLAC metadata for non-Ogg FLAC files.  At some
    * point when Ogg / FLAC is more common there will be a similar implementation
    * under the Ogg hierarchy.
    *
@@ -96,7 +96,7 @@ namespace TagLib {
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
-       * Constructs an FLAC file from \a file.  If \a readProperties is \c true the
+       * Constructs a FLAC file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
        * If this file contains an ID3v2 tag, the frames will be created using

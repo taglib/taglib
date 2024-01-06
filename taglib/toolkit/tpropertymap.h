@@ -182,7 +182,7 @@ namespace TagLib {
 
     /*!
      * Returns \c true if this map contains all keys of \a other
-     * and the values coincide for that keys. Does not take
+     * and the values coincide for those keys. Does not take
      * the unsupportedData list into account.
      */
     TAGLIB_EXPORT

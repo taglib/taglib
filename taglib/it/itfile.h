@@ -34,7 +34,7 @@ namespace TagLib {
   //! An implementation of Impulse Tracker metadata
 
   /*!
-   * this is an implementation of Impulse Tracker metadata.
+   * This is an implementation of Impulse Tracker metadata.
    */
 
   namespace IT {
@@ -51,7 +51,7 @@ namespace TagLib {
     class TAGLIB_EXPORT File : public Mod::FileBase {
       public:
         /*!
-         * Constructs a Impulse Tracker file from \a file.
+         * Constructs an Impulse Tracker file from \a file.
          *
          * \note In the current implementation, both \a readProperties and
          * \a propertiesStyle are ignored.  The audio properties are always
@@ -62,7 +62,7 @@ namespace TagLib {
              AudioProperties::Average);
 
         /*!
-         * Constructs a Impulse Tracker file from \a stream.
+         * Constructs an Impulse Tracker file from \a stream.
          *
          * \note In the current implementation, both \a readProperties and
          * \a propertiesStyle are ignored.  The audio properties are always

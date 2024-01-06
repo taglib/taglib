@@ -196,7 +196,7 @@ namespace TagLib {
        */
       void read();
       /*!
-       * Pareses the body of the tag in \a data.
+       * Parses the body of the tag in \a data.
        */
       void parse(const ByteVector &data);
 

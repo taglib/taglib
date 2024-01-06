@@ -46,7 +46,7 @@ namespace TagLib {
      *
      * In most Xiph.org formats the comments are found in the first few packets,
      * this however is a reasonably complete implementation of Ogg pages that
-     * could potentially be useful for non-meta data purposes.
+     * could potentially be useful for non-metadata purposes.
      */
 
     class TAGLIB_EXPORT Page
@@ -105,7 +105,7 @@ namespace TagLib {
 
       /*!
        * When checking to see if a page contains a given packet this set of flags
-       * represents the possible values for that packets status in the page.
+       * represents the possible values for that packet's status in the page.
        *
        * \see containsPacket()
        */

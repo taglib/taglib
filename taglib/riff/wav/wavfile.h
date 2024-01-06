@@ -38,7 +38,7 @@ namespace TagLib {
     //! An implementation of WAV metadata
 
     /*!
-     * this is an implementation of WAV metadata.
+     * This is an implementation of WAV metadata.
      *
      * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
      * chunk as well as properties from the file.
@@ -107,7 +107,7 @@ namespace TagLib {
         File &operator=(const File &) = delete;
 
         /*!
-         * Returns the tag for this file.  This will be an RIFF INFO tag, an
+         * Returns the tag for this file.  This will be a RIFF INFO tag, an
          * ID3v2 tag or a combination of the two.
          */
         TagLib::Tag *tag() const override;

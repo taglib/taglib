@@ -87,8 +87,8 @@ namespace TagLib {
       virtual String rating() const;
 
       /*!
-       * Returns the genre name; if no genre is present in the tag an empty string
-       * will be returned.
+       * Returns the copyright information; if no copyright information is
+       * present in the tag an empty string will be returned.
        */
       virtual String copyright() const;
 

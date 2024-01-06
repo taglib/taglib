@@ -44,7 +44,7 @@ namespace TagLib {
   //! An implementation of TrueAudio metadata
 
   /*!
-   * this is an implementation of TrueAudio metadata.
+   * This is an implementation of TrueAudio metadata.
    *
    * This supports ID3v1 and ID3v2 tags as well as reading stream
    * properties from the file.

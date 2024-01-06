@@ -40,7 +40,7 @@ namespace TagLib {
   //! An implementation of Ogg FLAC metadata
 
   /*!
-   * this is an implementation of FLAC metadata for Ogg FLAC files.  For "pure"
+   * This is an implementation of FLAC metadata for Ogg FLAC files.  For "pure"
    * FLAC files look under the FLAC hierarchy.
    *
    * Unlike "pure" FLAC-files, Ogg FLAC only supports Xiph-comments,

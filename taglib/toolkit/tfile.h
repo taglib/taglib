@@ -281,7 +281,7 @@ namespace TagLib {
 
   protected:
     /*!
-     * Construct a File object and opens the \a file.  \a file should be a
+     * Construct a File object and open the \a file.  \a file should be a
      * C-string in the local file system encoding.
      *
      * \note Constructor is protected since this class should only be

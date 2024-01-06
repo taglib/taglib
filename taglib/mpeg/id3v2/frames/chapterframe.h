@@ -100,7 +100,7 @@ namespace TagLib {
        * Returns zero based byte offset (count of bytes from the beginning
        * of the audio file) of chapter's start.
        *
-       * \note If returned value is 0xFFFFFFFF, start time should be used instead.
+       * \note If the returned value is 0xFFFFFFFF, start time should be used instead.
        * \see setStartOffset()
        */
       unsigned int startOffset() const;
@@ -109,7 +109,7 @@ namespace TagLib {
        * Returns zero based byte offset (count of bytes from the beginning
        * of the audio file) of chapter's end.
        *
-       * \note If returned value is 0xFFFFFFFF, end time should be used instead.
+       * \note If the returned value is 0xFFFFFFFF, end time should be used instead.
        * \see setEndOffset()
        */
       unsigned int endOffset() const;

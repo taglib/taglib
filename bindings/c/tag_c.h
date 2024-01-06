@@ -232,12 +232,12 @@ TAGLIB_C_EXPORT char *taglib_tag_comment(const TagLib_Tag *tag);
 TAGLIB_C_EXPORT char *taglib_tag_genre(const TagLib_Tag *tag);
 
 /*!
- * Returns the tag's year or 0 if year is not set.
+ * Returns the tag's year or 0 if the year is not set.
  */
 TAGLIB_C_EXPORT unsigned int taglib_tag_year(const TagLib_Tag *tag);
 
 /*!
- * Returns the tag's track number or 0 if track number is not set.
+ * Returns the tag's track number or 0 if the track number is not set.
  */
 TAGLIB_C_EXPORT unsigned int taglib_tag_track(const TagLib_Tag *tag);
 

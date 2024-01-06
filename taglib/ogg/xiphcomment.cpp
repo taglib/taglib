@@ -215,7 +215,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
   for(const auto &field : std::as_const(toRemove))
     removeFields(field);
 
-  // now go through keys in \a properties and check that the values match those in the xiph comment
+  // now go through keys in \a properties and check that the values match those in the Xiph comment
   PropertyMap invalid;
   for(const auto &[key, sl] : properties) {
     if(!checkKey(key))

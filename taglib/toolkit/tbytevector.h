@@ -454,7 +454,7 @@ namespace TagLib {
      * Converts the 10 bytes at \a offset of the vector to a long double as an
      * IEEE754 80-bit little-endian floating point number.
      *
-     * \note This may compromise the precision depends on the size of long double.
+     * \note This may compromise the precision depending on the size of long double.
      */
     long double toFloat80LE(size_t offset) const;
 
@@ -462,7 +462,7 @@ namespace TagLib {
      * Converts the 10 bytes at \a offset of the vector to a long double as an
      * IEEE754 80-bit big-endian floating point number.
      *
-     * \note This may compromise the precision depends on the size of long double.
+     * \note This may compromise the precision depending on the size of long double.
      */
     long double toFloat80BE(size_t offset) const;
 
@@ -498,7 +498,7 @@ namespace TagLib {
     static ByteVector fromUShort(unsigned short value, bool mostSignificantByteFirst = true);
 
     /*!
-     * Creates a 8 byte ByteVector based on \a value.  If
+     * Creates an 8 byte ByteVector based on \a value.  If
      * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
      * \c true then $00 00 00 01 == 0x0000000000000001 == 1, if \c false,
@@ -509,7 +509,7 @@ namespace TagLib {
     static ByteVector fromLongLong(long long value, bool mostSignificantByteFirst = true);
 
     /*!
-     * Creates a 8 byte ByteVector based on \a value.  If
+     * Creates an 8 byte ByteVector based on \a value.  If
      * \a mostSignificantByteFirst is \c true, then this will operate left to right
      * in building the ByteVector.  For example if \a mostSignificantByteFirst is
      * \c true then $00 00 00 01 == 0x0000000000000001 == 1, if \c false,
@@ -536,7 +536,7 @@ namespace TagLib {
     static ByteVector fromFloat32BE(float value);
 
     /*!
-     * Creates a 8 byte ByteVector based on \a value as an IEEE754 64-bit
+     * Creates an 8 byte ByteVector based on \a value as an IEEE754 64-bit
      * little-endian floating point number.
      *
      * \see toFloat64LE()
@@ -544,7 +544,7 @@ namespace TagLib {
     static ByteVector fromFloat64LE(double value);
 
     /*!
-     * Creates a 8 byte ByteVector based on \a value as an IEEE754 64-bit
+     * Creates an 8 byte ByteVector based on \a value as an IEEE754 64-bit
      * big-endian floating point number.
      *
      * \see toFloat64BE()
