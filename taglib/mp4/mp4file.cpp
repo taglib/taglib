@@ -152,7 +152,7 @@ MP4::File::save()
 }
 
 bool
-MP4::File::strip(int tags)
+MP4::File::strip(int tags) const
 {
   if(readOnly()) {
     debug("MP4::File::strip() - Cannot strip tags from a read only file.");

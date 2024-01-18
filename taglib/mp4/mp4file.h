@@ -144,7 +144,7 @@ namespace TagLib {
        *
        * \note This will update the file immediately.
        */
-      bool strip(int tags = AllTags);
+      bool strip(int tags = AllTags) const;
 
       /*!
        * Returns whether or not the file on disk actually has an MP4 tag, or the

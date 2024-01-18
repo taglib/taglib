@@ -232,7 +232,7 @@ namespace TagLib {
       /*!
        * Returns a list of pictures attached to the xiph comment.
        */
-      List<FLAC::Picture *> pictureList();
+      List<FLAC::Picture *> pictureList() const;
 
       /*!
        * Removes a picture. If \a del is \c true the picture's memory

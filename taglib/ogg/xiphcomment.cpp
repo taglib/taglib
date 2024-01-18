@@ -369,7 +369,7 @@ void Ogg::XiphComment::addPicture(FLAC::Picture * picture)
   d->pictureList.append(picture);
 }
 
-List<FLAC::Picture *> Ogg::XiphComment::pictureList()
+List<FLAC::Picture *> Ogg::XiphComment::pictureList() const
 {
   return d->pictureList;
 }

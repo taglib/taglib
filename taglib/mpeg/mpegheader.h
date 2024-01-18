@@ -204,7 +204,7 @@ namespace TagLib {
       Header &operator=(const Header &h);
 
     private:
-      void parse(File *file, offset_t offset, bool checkLength);
+      void parse(File *file, offset_t offset, bool checkLength) const;
 
       class HeaderPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
