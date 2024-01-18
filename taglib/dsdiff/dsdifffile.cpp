@@ -48,7 +48,7 @@ namespace
     char padding;
   };
 
-  typedef std::vector<Chunk64> ChunkList;
+  using ChunkList = std::vector<Chunk64>;
 
   int chunkIndex(const ChunkList &chunks, const ByteVector &id)
   {
