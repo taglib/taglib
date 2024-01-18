@@ -39,9 +39,9 @@
 #endif
 
 #if defined(HAVE_MSC_BYTESWAP)
-# include "stdlib.h"
+# include <stdlib.h>
 #elif defined(HAVE_GLIBC_BYTESWAP)
-# include "byteswap.h"
+# include <byteswap.h>
 #elif defined(HAVE_MAC_BYTESWAP)
 # include <libkern/OSByteOrder.h>
 #elif defined(HAVE_OPENBSD_BYTESWAP)
