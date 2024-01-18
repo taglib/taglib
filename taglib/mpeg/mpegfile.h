@@ -74,14 +74,14 @@ namespace TagLib {
        * Constructs an MPEG file from \a file.  If \a readProperties is \c true the
        * file's audio properties will also be read.
        *
-       * If \a propertiesStyle is not Fast, the file will be scanned
+       * If \a readStyle is not Fast, the file will be scanned
        * completely if no ID3v2 tag or MPEG sync code is found at the start.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory (default if null).
        */
       File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average,
+           Properties::ReadStyle readStyle = Properties::Average,
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
@@ -91,7 +91,7 @@ namespace TagLib {
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
-       * If \a propertiesStyle is not Fast, the file will be scanned
+       * If \a readStyle is not Fast, the file will be scanned
        * completely if no ID3v2 tag or MPEG sync code is found at the start.
        *
        * \deprecated Use the constructor above.
@@ -99,7 +99,7 @@ namespace TagLib {
       TAGLIB_DEPRECATED
       File(FileName file, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle readStyle = Properties::Average);
 
       /*!
        * Constructs an MPEG file from \a stream.  If \a readProperties is \c true the
@@ -111,14 +111,14 @@ namespace TagLib {
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
-       * If \a propertiesStyle is not Fast, the file will be scanned
+       * If \a readStyle is not Fast, the file will be scanned
        * completely if no ID3v2 tag or MPEG sync code is found at the start.
        *
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory (default if null).
        */
       File(IOStream *stream, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average,
+           Properties::ReadStyle readStyle = Properties::Average,
            ID3v2::FrameFactory *frameFactory = nullptr);
 
       /*!
@@ -131,7 +131,7 @@ namespace TagLib {
        * If this file contains an ID3v2 tag, the frames will be created using
        * \a frameFactory.
        *
-       * If \a propertiesStyle is not Fast, the file will be scanned
+       * If \a readStyle is not Fast, the file will be scanned
        * completely if no ID3v2 tag or MPEG sync code is found at the start.
        *
        * \deprecated Use the constructor above.
@@ -139,7 +139,7 @@ namespace TagLib {
       TAGLIB_DEPRECATED
       File(IOStream *stream, ID3v2::FrameFactory *frameFactory,
            bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+           Properties::ReadStyle readStyle = Properties::Average);
 
       /*!
        * Destroys this instance of the File.

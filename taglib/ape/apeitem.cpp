@@ -141,10 +141,10 @@ void APE::Item::setValue(const String &value)
   d->value.clear();
 }
 
-void APE::Item::setValues(const StringList &value)
+void APE::Item::setValues(const StringList &values)
 {
   d->type = Text;
-  d->text = value;
+  d->text = values;
   d->value.clear();
 }
 

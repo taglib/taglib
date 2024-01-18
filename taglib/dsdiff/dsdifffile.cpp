@@ -189,9 +189,9 @@ PropertyMap DSDIFF::File::properties() const
   return d->tag.properties();
 }
 
-void DSDIFF::File::removeUnsupportedProperties(const StringList &unsupported)
+void DSDIFF::File::removeUnsupportedProperties(const StringList &properties)
 {
-  d->tag.removeUnsupportedProperties(unsupported);
+  d->tag.removeUnsupportedProperties(properties);
 }
 
 PropertyMap DSDIFF::File::setProperties(const PropertyMap &properties)
