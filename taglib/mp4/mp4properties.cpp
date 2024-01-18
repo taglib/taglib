@@ -138,7 +138,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
 
   const MP4::AtomList trakList = moov->findall("trak");
   for(const auto &track : trakList) {
-    MP4::Atom *hdlr = track->find("mdia", "hdlr");
+    const MP4::Atom *hdlr = track->find("mdia", "hdlr");
     if(!hdlr) {
       debug("MP4: Atom 'trak.mdia.hdlr' not found");
       return;
@@ -156,7 +156,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
     return;
   }
 
-  MP4::Atom *mdhd = trak->find("mdia", "mdhd");
+  const MP4::Atom *mdhd = trak->find("mdia", "mdhd");
   if(!mdhd) {
     debug("MP4: Atom 'trak.mdia.mdhd' not found");
     return;
@@ -186,7 +186,7 @@ MP4::Properties::read(File *file, Atoms *atoms)
   }
   if(length == 0) {
     // No length found in the media header (mdhd), try the movie header (mvhd)
-    if(MP4::Atom *mvhd = moov->find("mvhd")) {
+    if(const MP4::Atom *mvhd = moov->find("mvhd")) {
       file->seek(mvhd->offset());
       data = file->readBlock(mvhd->length());
       if(data.size() >= 24 + 4) {
