@@ -106,7 +106,7 @@ void TagUnion::set(int index, Tag *tag)
 
 PropertyMap TagUnion::properties() const
 {
-  auto it = std::find_if(d->tags.cbegin(), d->tags.cend(), [](Tag *t) {
+  auto it = std::find_if(d->tags.cbegin(), d->tags.cend(), [](const Tag *t) {
     return t && !t->isEmpty();
   });
   return it != d->tags.cend() ? (*it)->properties() : PropertyMap();

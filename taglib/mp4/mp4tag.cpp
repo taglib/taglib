@@ -65,7 +65,7 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
   d->file = file;
   d->atoms = atoms;
 
-  MP4::Atom *ilst = atoms->find("moov", "udta", "meta", "ilst");
+  const MP4::Atom *ilst = atoms->find("moov", "udta", "meta", "ilst");
   if(!ilst) {
     //debug("Atom moov.udta.meta.ilst not found.");
     return;
@@ -268,7 +268,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   // check if there is an atom before 'ilst', and possibly use it as padding
   if(index != meta->children().cbegin()) {
     auto prevIndex = std::prev(index);
-    MP4::Atom *prev = *prevIndex;
+    const MP4::Atom *prev = *prevIndex;
     if(prev->name() == "free") {
       offset = prev->offset();
       length += prev->length();
@@ -277,7 +277,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   // check if there is an atom after 'ilst', and possibly use it as padding
   auto nextIndex = std::next(index);
   if(nextIndex != meta->children().cend()) {
-    MP4::Atom *next = *nextIndex;
+    const MP4::Atom *next = *nextIndex;
     if(next->name() == "free") {
       length += next->length();
     }
