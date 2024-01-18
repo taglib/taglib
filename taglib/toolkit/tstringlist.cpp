@@ -59,6 +59,7 @@ StringList::StringList() = default;
 StringList::StringList(const StringList &l) :
   List<String>(l)
 {
+  *d = *l.d;
 }
 
 StringList::StringList(std::initializer_list<String> init) :
@@ -72,6 +73,7 @@ StringList &StringList::operator=(const StringList &l)
     return *this;
 
   List<String>::operator=(l);
+  *d = *l.d;
   return *this;
 }
 

@@ -70,6 +70,7 @@ ByteVectorList::~ByteVectorList() = default;
 ByteVectorList::ByteVectorList(const ByteVectorList &l) :
   List<ByteVector>(l)
 {
+  *d = *l.d;
 }
 
 ByteVectorList::ByteVectorList(std::initializer_list<ByteVector> init) :
@@ -83,6 +84,7 @@ ByteVectorList &ByteVectorList::operator=(const ByteVectorList &l)
     return *this;
 
   List<ByteVector>::operator=(l);
+  *d = *l.d;
   return *this;
 }
 
