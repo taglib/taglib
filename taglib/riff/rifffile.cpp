@@ -49,7 +49,7 @@ public:
   {
   }
 
-  const Endianness endianness;
+  Endianness endianness;
 
   unsigned int size { 0 };
   offset_t sizeOffset { 0 };
