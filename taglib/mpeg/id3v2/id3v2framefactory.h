@@ -137,7 +137,7 @@ namespace TagLib {
       /*!
        * Destroys the frame factory.
        */
-      virtual ~FrameFactory();
+      ~FrameFactory();
 
       /*!
        * This method checks for compliance to the current ID3v2 standard (2.4)

@@ -158,7 +158,7 @@ namespace TagLib {
       /*!
        * Destroys the frame factory.
        */
-      virtual ~ItemFactory();
+      ~ItemFactory();
 
       /*!
        * Returns mapping between atom names and handler types.
