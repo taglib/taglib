@@ -240,7 +240,6 @@ int ASF::Attribute::dataSize() const
   case WordType:
     return 2;
   case BoolType:
-    return 4;
   case DWordType:
     return 4;
   case QWordType:
