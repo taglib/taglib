@@ -247,10 +247,10 @@ ID3v1::GenreMap ID3v1::genreMap()
   return m;
 }
 
-String ID3v1::genre(int i)
+String ID3v1::genre(int index)
 {
-  if(i >= 0 && static_cast<size_t>(i) < genres.size())
-    return String(genres[i]); // always make a copy
+  if(index >= 0 && static_cast<size_t>(index) < genres.size())
+    return String(genres[index]); // always make a copy
   return String();
 }
 

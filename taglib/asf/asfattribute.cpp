@@ -162,30 +162,30 @@ ASF::Picture ASF::Attribute::toPicture() const
   return d->pictureValue;
 }
 
-String ASF::Attribute::parse(ASF::File &f, int kind)
+String ASF::Attribute::parse(ASF::File &file, int kind)
 {
   unsigned int size, nameLength;
   String name;
   d->pictureValue = Picture::fromInvalid();
   // extended content descriptor
   if(kind == 0) {
-    nameLength = readWORD(&f);
-    name = readString(&f, nameLength);
-    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&f));
-    size = readWORD(&f);
+    nameLength = readWORD(&file);
+    name = readString(&file, nameLength);
+    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&file));
+    size = readWORD(&file);
   }
   // metadata & metadata library
   else {
-    int temp = readWORD(&f);
+    int temp = readWORD(&file);
     // metadata library
     if(kind == 2) {
       d->language = temp;
     }
-    d->stream = readWORD(&f);
-    nameLength = readWORD(&f);
-    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&f));
-    size = readDWORD(&f);
-    name = readString(&f, nameLength);
+    d->stream = readWORD(&file);
+    nameLength = readWORD(&file);
+    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&file));
+    size = readDWORD(&file);
+    name = readString(&file, nameLength);
   }
 
   if(kind != 2 && size > 65535) {
@@ -194,33 +194,33 @@ String ASF::Attribute::parse(ASF::File &f, int kind)
 
   switch(d->type) {
   case WordType:
-    d->numericValue = readWORD(&f);
+    d->numericValue = readWORD(&file);
     break;
 
   case BoolType:
     if(kind == 0) {
-      d->numericValue = (readDWORD(&f) != 0);
+      d->numericValue = (readDWORD(&file) != 0);
     }
     else {
-      d->numericValue = (readWORD(&f) != 0);
+      d->numericValue = (readWORD(&file) != 0);
     }
     break;
 
   case DWordType:
-    d->numericValue = readDWORD(&f);
+    d->numericValue = readDWORD(&file);
     break;
 
   case QWordType:
-    d->numericValue = readQWORD(&f);
+    d->numericValue = readQWORD(&file);
     break;
 
   case UnicodeType:
-    d->stringValue = readString(&f, size);
+    d->stringValue = readString(&file, size);
     break;
 
   case BytesType:
   case GuidType:
-    d->byteVectorValue = f.readBlock(size);
+    d->byteVectorValue = file.readBlock(size);
     break;
   }
 

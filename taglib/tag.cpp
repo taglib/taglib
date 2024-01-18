@@ -190,7 +190,7 @@ void Tag::duplicate(const Tag *source, Tag *target, bool overwrite) // static
   }
 }
 
-String Tag::joinTagValues(const StringList &l)
+String Tag::joinTagValues(const StringList &values)
 {
-  return l.toString(" / ");
+  return values.toString(" / ");
 }
