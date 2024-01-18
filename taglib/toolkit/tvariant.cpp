@@ -87,9 +87,9 @@ void printStringToStream(std::ostream &s, const String &v)
 void printByteVectorToStream(std::ostream &s, const String &v)
 {
   s << '"';
-  for(char c : v) {
+  for(int c : v) {
     s << "\\x" << std::setfill('0') << std::setw(2) << std::right << std::hex
-      << (static_cast<int>(c) & 0xff);
+      << (c & 0xff);
   }
   s << std::dec << '"';
 }
