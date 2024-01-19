@@ -96,40 +96,38 @@ ByteVector ItemFactory::renderItem(
   if(itemName.startsWith("----")) {
     return renderFreeForm(itemName, item);
   }
-  else {
-    const ByteVector name = itemName.data(String::Latin1);
-    auto handlerType = handlerTypeForName(name);
-    switch(handlerType) {
-    case ItemHandlerType::Unknown:
-      debug("MP4: Unknown item name \"" + name + "\"");
-      break;
-    case ItemHandlerType::FreeForm:
-      return renderFreeForm(name, item);
-    case ItemHandlerType::IntPair:
-      return renderIntPair(name, item);
-    case ItemHandlerType::IntPairNoTrailing:
-      return renderIntPairNoTrailing(name, item);
-    case ItemHandlerType::Bool:
-      return renderBool(name, item);
-    case ItemHandlerType::Int:
-      return renderInt(name, item);
-    case ItemHandlerType::TextOrInt:
-      return renderTextOrInt(name, item);
-    case ItemHandlerType::UInt:
-      return renderUInt(name, item);
-    case ItemHandlerType::LongLong:
-      return renderLongLong(name, item);
-    case ItemHandlerType::Byte:
-      return renderByte(name, item);
-    case ItemHandlerType::Gnre:
-      return renderInt(name, item);
-    case ItemHandlerType::Covr:
-      return renderCovr(name, item);
-    case ItemHandlerType::TextImplicit:
-      return renderText(name, item, TypeImplicit);
-    case ItemHandlerType::Text:
-      return renderText(name, item);
-    }
+  const ByteVector name = itemName.data(String::Latin1);
+  auto handlerType = handlerTypeForName(name);
+  switch(handlerType) {
+  case ItemHandlerType::Unknown:
+    debug("MP4: Unknown item name \"" + name + "\"");
+    break;
+  case ItemHandlerType::FreeForm:
+    return renderFreeForm(name, item);
+  case ItemHandlerType::IntPair:
+    return renderIntPair(name, item);
+  case ItemHandlerType::IntPairNoTrailing:
+    return renderIntPairNoTrailing(name, item);
+  case ItemHandlerType::Bool:
+    return renderBool(name, item);
+  case ItemHandlerType::Int:
+    return renderInt(name, item);
+  case ItemHandlerType::TextOrInt:
+    return renderTextOrInt(name, item);
+  case ItemHandlerType::UInt:
+    return renderUInt(name, item);
+  case ItemHandlerType::LongLong:
+    return renderLongLong(name, item);
+  case ItemHandlerType::Byte:
+    return renderByte(name, item);
+  case ItemHandlerType::Gnre:
+    return renderInt(name, item);
+  case ItemHandlerType::Covr:
+    return renderCovr(name, item);
+  case ItemHandlerType::TextImplicit:
+    return renderText(name, item, TypeImplicit);
+  case ItemHandlerType::Text:
+    return renderText(name, item);
   }
   return ByteVector();
 }
@@ -582,17 +580,15 @@ std::pair<String, Item> ItemFactory::parseFreeForm(
       item.setAtomDataType(type);
       return {name, item};
     }
-    else {
-      ByteVectorList value;
-      for(auto it = itBegin; it != data.end(); ++it) {
-        value.append(it->data);
-      }
-      Item item(value);
-      item.setAtomDataType(type);
-      return {name, item};
+    ByteVectorList value;
+    for(auto it = itBegin; it != data.end(); ++it) {
+      value.append(it->data);
     }
+    Item item(value);
+    item.setAtomDataType(type);
+    return { name, item };
   }
-  return {atom->name(), Item()};
+  return { atom->name(), Item() };
 }
 
 std::pair<String, Item> ItemFactory::parseCovr(

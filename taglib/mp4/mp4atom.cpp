@@ -279,7 +279,10 @@ bool MP4::Atoms::checkRootLevelAtoms()
       if(!moovValid && !invalid && (*it)->name() == "moov") {
       moovValid = true;
       }
-      if(invalid) {
+
+      if(!invalid)
+        return false;
+
       if(moovValid && (*it)->name() != "moof") {
           // Only the root level atoms "moov" and (if present) "moof" are
           // modified.  If they are valid, ignore following invalid root level
@@ -290,12 +293,7 @@ bool MP4::Atoms::checkRootLevelAtoms()
           }
           return true;
       }
-      else {
-          return false;
-      }
-    }
   }
-
   return true;
 }
 
