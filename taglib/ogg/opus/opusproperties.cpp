@@ -141,7 +141,7 @@ void Opus::Properties::read(File *file)
       const long long frameCount = (end - start - preSkip);
 
       if(frameCount > 0) {
-        const double length = frameCount * 1000.0 / 48000.0;
+        const auto length = static_cast<double>(frameCount) * 1000.0 / 48000.0;
         offset_t fileLengthWithoutOverhead = file->length();
         // Ignore the two mandatory header packets, see "3. Packet Organization"
         // in https://tools.ietf.org/html/rfc7845.html

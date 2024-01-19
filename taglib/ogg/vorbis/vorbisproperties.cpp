@@ -160,7 +160,7 @@ void Vorbis::Properties::read(File *file)
       const long long frameCount = end - start;
 
       if(frameCount > 0) {
-        const double length = frameCount * 1000.0 / d->sampleRate;
+        const auto length = static_cast<double>(frameCount) * 1000.0 / d->sampleRate;
         offset_t fileLengthWithoutOverhead = file->length();
         // Ignore the three initial header packets, see "1.3.1. Decode Setup" in
         // https://xiph.org/vorbis/doc/Vorbis_I_spec.html
