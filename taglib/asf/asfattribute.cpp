@@ -39,7 +39,7 @@ public:
     pictureValue(ASF::Picture::fromInvalid())
   {
   }
-  AttributeTypes type;
+  AttributeTypes type { UnicodeType };
   String stringValue;
   ByteVector byteVectorValue;
   ASF::Picture pictureValue;
