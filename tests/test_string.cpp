@@ -84,8 +84,7 @@ public:
     String latin = "Jos\xe9 Carlos";
     CPPUNIT_ASSERT(strcmp(latin.toCString(true), "José Carlos") == 0);
 
-    String c;
-    c = "1";
+    String c = "1";
     CPPUNIT_ASSERT(c == L"1");
 
     c = L'\u4E00';
