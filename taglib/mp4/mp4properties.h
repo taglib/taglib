@@ -88,7 +88,7 @@ namespace TagLib {
       Codec codec() const;
 
     private:
-      void read(File *file, Atoms *atoms);
+      void read(File *file, const Atoms *atoms);
 
       class PropertiesPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE

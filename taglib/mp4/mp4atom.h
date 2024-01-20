@@ -82,7 +82,7 @@ namespace TagLib {
       Atom &operator=(const Atom &) = delete;
       Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
       bool path(AtomList &path, const char *name1, const char *name2 = nullptr, const char *name3 = nullptr);
-      AtomList findall(const char *name, bool recursive = false);
+      AtomList findall(const char *name, bool recursive = false) const;
       void addToOffset(offset_t delta);
       void prependChild(Atom *atom);
       bool removeChild(Atom *meta);
@@ -105,8 +105,8 @@ namespace TagLib {
       ~Atoms();
       Atoms(const Atoms &) = delete;
       Atoms &operator=(const Atoms &) = delete;
-      Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
-      AtomList path(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr);
+      Atom *find(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr) const;
+      AtomList path(const char *name1, const char *name2 = nullptr, const char *name3 = nullptr, const char *name4 = nullptr) const;
       bool checkRootLevelAtoms();
       const AtomList &atoms() const;
 

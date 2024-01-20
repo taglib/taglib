@@ -39,7 +39,7 @@ using namespace TagLib;
 namespace {
 
 void propertiesToMap(
-  TagLib_File *file,
+  const TagLib_File *file,
   std::unordered_map<std::string, std::list<std::string>> &propertyMap)
 {
   if(char **keys = taglib_property_keys(file)) {
@@ -59,7 +59,7 @@ void propertiesToMap(
 }
 
 void complexPropertyKeysToList(
-  TagLib_File *file,
+  const TagLib_File *file,
   std::list<std::string> &keyList)
 {
   if(char **complexKeys = taglib_complex_property_keys(file)) {

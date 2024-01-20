@@ -41,27 +41,27 @@ public:
   PublicRIFF(FileName file) : RIFF::File(file, BigEndian)
   {
   }
-  unsigned int riffSize()
+  unsigned int riffSize() const
   {
     return RIFF::File::riffSize();
   }
-  unsigned int chunkCount()
+  unsigned int chunkCount() const
   {
     return RIFF::File::chunkCount();
   }
-  offset_t chunkOffset(unsigned int i)
+  offset_t chunkOffset(unsigned int i) const
   {
     return RIFF::File::chunkOffset(i);
   }
-  unsigned int chunkPadding(unsigned int i)
+  unsigned int chunkPadding(unsigned int i) const
   {
     return RIFF::File::chunkPadding(i);
   }
-  unsigned int chunkDataSize(unsigned int i)
+  unsigned int chunkDataSize(unsigned int i) const
   {
     return RIFF::File::chunkDataSize(i);
   }
-  ByteVector chunkName(unsigned int i)
+  ByteVector chunkName(unsigned int i) const
   {
     return RIFF::File::chunkName(i);
   }
