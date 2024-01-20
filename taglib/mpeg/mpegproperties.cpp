@@ -210,7 +210,7 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
           }
         }
         bitRate = firstHeader.samplesPerFrame() != 0
-          ? static_cast<int>((bytesPerFrame * 8 * firstHeader.sampleRate())
+          ? static_cast<int>(bytesPerFrame * 8 * firstHeader.sampleRate()
                              / 1000 / firstHeader.samplesPerFrame())
           : 0;
       }

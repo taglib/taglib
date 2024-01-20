@@ -52,7 +52,7 @@ bool Ogg::Speex::File::isSupported(IOStream *stream)
   // A Speex file has IDs "OggS" and "Speex   " somewhere.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
-  return (buffer.find("OggS") >= 0 && buffer.find("Speex   ") >= 0);
+  return buffer.find("OggS") >= 0 && buffer.find("Speex   ") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -357,7 +357,7 @@ bool FileStream::readOnly() const
 
 bool FileStream::isOpen() const
 {
-  return (d->file != InvalidFileHandle);
+  return d->file != InvalidFileHandle;
 }
 
 void FileStream::seek(offset_t offset, Position p)

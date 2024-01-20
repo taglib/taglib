@@ -154,7 +154,7 @@ void APE::Properties::analyzeCurrent(File *file)
   }
 
   if(const unsigned int descriptorBytes = descriptor.toUInt(0, false);
-     (descriptorBytes - 52) > 0)
+     descriptorBytes - 52 > 0)
     file->seek(descriptorBytes - 52, File::Current);
 
   // Read the header

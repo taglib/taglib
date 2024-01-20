@@ -75,7 +75,7 @@ bool APE::File::isSupported(IOStream *stream)
   // An APE file has an ID "MAC " somewhere. An ID3v2 tag may precede.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), true);
-  return (buffer.find("MAC ") >= 0);
+  return buffer.find("MAC ") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ bool APE::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->APESize;
 
     d->APESize = data.size();
   }
@@ -224,12 +224,12 @@ void APE::File::strip(int tags)
 
 bool APE::File::hasAPETag() const
 {
-  return (d->APELocation >= 0);
+  return d->APELocation >= 0;
 }
 
 bool APE::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,7 +283,7 @@ void APE::File::read(bool readProperties)
 
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2Size);
-      streamLength -= (d->ID3v2Location + d->ID3v2Size);
+      streamLength -= d->ID3v2Location + d->ID3v2Size;
     }
     else {
       seek(0);

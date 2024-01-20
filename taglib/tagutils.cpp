@@ -45,7 +45,7 @@ offset_t Utils::findID3v1(File *file)
     const offset_t p = file->tell() + 3;
 
     if(const TagLib::ByteVector data = file->readBlock(8);
-       data.containsAt(ID3v1::Tag::fileIdentifier(), 3) && (data != APE::Tag::fileIdentifier()))
+       data.containsAt(ID3v1::Tag::fileIdentifier(), 3) && data != APE::Tag::fileIdentifier())
       return p;
   } else {
     file->seek(-128, File::End);

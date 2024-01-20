@@ -241,7 +241,7 @@ void APE::Item::parse(const ByteVector &data)
 ByteVector APE::Item::render() const
 {
   ByteVector data;
-  unsigned int flags = ((d->readOnly) ? 1 : 0) | (d->type << 1);
+  unsigned int flags = (d->readOnly ? 1 : 0) | (d->type << 1);
   ByteVector val;
 
   if(isEmpty())

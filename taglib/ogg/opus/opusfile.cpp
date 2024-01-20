@@ -52,7 +52,7 @@ bool Ogg::Opus::File::isSupported(IOStream *stream)
   // An Opus file has IDs "OggS" and "OpusHead" somewhere.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
-  return (buffer.find("OggS") >= 0 && buffer.find("OpusHead") >= 0);
+  return buffer.find("OggS") >= 0 && buffer.find("OpusHead") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

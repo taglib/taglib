@@ -553,7 +553,7 @@ Frame *FrameFactory::createFrameForProperty(const String &key, const StringList 
       auto frame = new TextIdentificationFrame(frameID, String::UTF8);
       frame->setText(values);
       return frame;
-    } if((frameID[0] == 'W') && (values.size() == 1)){  // URL frame (not WXXX); support only one value
+    } if(frameID[0] == 'W' && values.size() == 1){  // URL frame (not WXXX); support only one value
         auto frame = new UrlLinkFrame(frameID);
         frame->setUrl(values.front());
         return frame;

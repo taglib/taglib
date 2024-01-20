@@ -68,7 +68,7 @@ bool MPC::File::isSupported(IOStream *stream)
   // have keys to do a quick check. An ID3v2 tag may precede.
 
   const ByteVector id = Utils::readHeader(stream, 4, true);
-  return (id == "MPCK" || id.startsWith("MP+"));
+  return id == "MPCK" || id.startsWith("MP+");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ bool MPC::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->APESize;
 
     d->APESize = data.size();
   }
@@ -236,12 +236,12 @@ void MPC::File::strip(int tags)
 
 bool MPC::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool MPC::File::hasAPETag() const
 {
-  return (d->APELocation >= 0);
+  return d->APELocation >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ void MPC::File::read(bool readProperties)
 
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2Size);
-      streamLength -= (d->ID3v2Location + d->ID3v2Size);
+      streamLength -= d->ID3v2Location + d->ID3v2Size;
     }
     else {
       seek(0);

@@ -456,12 +456,12 @@ void FileRef::swap(FileRef &ref) noexcept
 
 bool FileRef::operator==(const FileRef &ref) const
 {
-  return (ref.d->file == d->file);
+  return ref.d->file == d->file;
 }
 
 bool FileRef::operator!=(const FileRef &ref) const
 {
-  return (ref.d->file != d->file);
+  return ref.d->file != d->file;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

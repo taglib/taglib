@@ -127,7 +127,7 @@ void DSF::Properties::read(const ByteVector &data)
   d->blockSizePerChannel = data.toUInt(32U,false);
 
   d->bitrate = static_cast<unsigned int>(
-      (d->samplingFrequency * d->bitsPerSample * d->channelNum) / 1000.0 + 0.5);
+      d->samplingFrequency * d->bitsPerSample * d->channelNum / 1000.0 + 0.5);
   d->length = d->samplingFrequency > 0
       ? static_cast<unsigned int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5)
       : 0;

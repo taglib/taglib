@@ -44,10 +44,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DSDIFF::Properties::Properties(const unsigned int sampleRate,
-                               const unsigned short channels,
-                               const unsigned long long samplesCount,
-                               const int bitrate,
+DSDIFF::Properties::Properties(unsigned int sampleRate,
+                               unsigned short channels,
+                               unsigned long long samplesCount,
+                               int bitrate,
                                ReadStyle style) :
   AudioProperties(style),
   d(std::make_unique<PropertiesPrivate>())
@@ -58,7 +58,7 @@ DSDIFF::Properties::Properties(const unsigned int sampleRate,
   d->sampleRate = sampleRate;
   d->bitrate = bitrate;
   d->length = d->sampleRate > 0
-    ? static_cast<int>((d->sampleCount * 1000.0) / d->sampleRate + 0.5)
+    ? static_cast<int>(d->sampleCount * 1000.0 / d->sampleRate + 0.5)
     : 0;
 }
 

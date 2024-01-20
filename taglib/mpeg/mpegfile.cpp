@@ -238,10 +238,10 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
       insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
       if(d->APELocation >= 0)
-        d->APELocation += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+        d->APELocation += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
 
       if(d->ID3v1Location >= 0)
-        d->ID3v1Location += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+        d->ID3v1Location += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
 
       d->ID3v2OriginalSize = data.size();
     }
@@ -294,7 +294,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
       insert(data, d->APELocation, d->APEOriginalSize);
 
       if(d->ID3v1Location >= 0)
-        d->ID3v1Location += (static_cast<long>(data.size()) - d->APEOriginalSize);
+        d->ID3v1Location += static_cast<long>(data.size()) - d->APEOriginalSize;
 
       d->APEOriginalSize = data.size();
     }
@@ -445,17 +445,17 @@ offset_t MPEG::File::lastFrameOffset()
 
 bool MPEG::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool MPEG::File::hasID3v2Tag() const
 {
-  return (d->ID3v2Location >= 0);
+  return d->ID3v2Location >= 0;
 }
 
 bool MPEG::File::hasAPETag() const
 {
-  return (d->APELocation >= 0);
+  return d->APELocation >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

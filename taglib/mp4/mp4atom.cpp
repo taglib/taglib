@@ -271,28 +271,25 @@ namespace
   }
 }  // namespace
 
-bool MP4::Atoms::checkRootLevelAtoms()
-{
+bool MP4::Atoms::checkRootLevelAtoms() {
   bool moovValid = false;
   for(auto it = d->atoms.begin(); it != d->atoms.end(); ++it) {
-      bool invalid = (*it)->length() == 0 || !checkValid((*it)->children());
-      if(!moovValid && !invalid && (*it)->name() == "moov") {
+    bool invalid = (*it)->length() == 0 || !checkValid((*it)->children());
+    if(!moovValid && !invalid && (*it)->name() == "moov") {
       moovValid = true;
-      }
-      if(invalid) {
+    }
+    if(invalid) {
       if(moovValid && (*it)->name() != "moof") {
-          // Only the root level atoms "moov" and (if present) "moof" are
-          // modified.  If they are valid, ignore following invalid root level
-          // atoms as trailing garbage.
-          while(it != d->atoms.end()) {
+        // Only the root level atoms "moov" and (if present) "moof" are
+        // modified.  If they are valid, ignore following invalid root level
+        // atoms as trailing garbage.
+        while(it != d->atoms.end()) {
           delete *it;
           it = d->atoms.erase(it);
-          }
-          return true;
+        }
+        return true;
       }
-      else {
-          return false;
-      }
+      return false;
     }
   }
 

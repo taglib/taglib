@@ -117,7 +117,7 @@ namespace
       length--;
     }
     else {
-      swap = (t != wcharByteOrder());
+      swap = t != wcharByteOrder();
     }
 
     data.resize(length);
@@ -483,8 +483,8 @@ int String::toInt(bool *ok) const
 
   // Has wcstol() consumed the entire string and not overflowed?
   if(ok) {
-    *ok = (errno == 0 && endPtr > beginPtr && *endPtr == L'\0');
-    *ok = (*ok && value > INT_MIN && value < INT_MAX);
+    *ok = errno == 0 && endPtr > beginPtr && *endPtr == L'\0';
+    *ok = *ok && value > INT_MIN && value < INT_MAX;
   }
 
   return static_cast<int>(value);
@@ -535,7 +535,7 @@ const wchar_t &String::operator[](int i) const
 
 bool String::operator==(const String &s) const
 {
-  return (d == s.d || d->data == s.d->data);
+  return d == s.d || d->data == s.d->data;
 }
 
 bool String::operator!=(const String &s) const
@@ -561,7 +561,7 @@ bool String::operator!=(const char *s) const
 
 bool String::operator==(const wchar_t *s) const
 {
-  return (d->data == s);
+  return d->data == s;
 }
 
 bool String::operator!=(const wchar_t *s) const
@@ -663,7 +663,7 @@ void String::swap(String &s) noexcept
 
 bool String::operator<(const String &s) const
 {
-  return (d->data < s.d->data);
+  return d->data < s.d->data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

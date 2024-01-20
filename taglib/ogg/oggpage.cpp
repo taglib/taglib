@@ -293,16 +293,16 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
 
     for(auto it = packets.begin(); it != packets.end(); ++it) {
 
-      const bool lastPacketInList = (it == --packets.end());
+      const bool lastPacketInList = it == --packets.end();
 
       // mark very first packet?
 
-      bool continued = (firstPacketContinued && it == packets.begin());
+      bool continued = firstPacketContinued && it == packets.begin();
       unsigned int pos = 0;
 
       while(pos < it->size()) {
 
-        const bool lastSplit = (pos + SplitSize >= it->size());
+        const bool lastSplit = pos + SplitSize >= it->size();
 
         ByteVectorList packetList;
         packetList.append(it->mid(pos, SplitSize));

@@ -71,7 +71,7 @@ bool TrueAudio::File::isSupported(IOStream *stream)
   // A TrueAudio file has to start with "TTA". An ID3v2 tag may precede.
 
   const ByteVector id = Utils::readHeader(stream, 3, true);
-  return (id == "TTA");
+  return id == "TTA";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +168,7 @@ bool TrueAudio::File::save()
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
 
     d->ID3v2OriginalSize = data.size();
   }
@@ -241,12 +241,12 @@ void TrueAudio::File::strip(int tags)
 
 bool TrueAudio::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool TrueAudio::File::hasID3v2Tag() const
 {
-  return (d->ID3v2Location >= 0);
+  return d->ID3v2Location >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -287,7 +287,7 @@ void TrueAudio::File::read(bool readProperties)
 
     if(d->ID3v2Location >= 0) {
       seek(d->ID3v2Location + d->ID3v2OriginalSize);
-      streamLength -= (d->ID3v2Location + d->ID3v2OriginalSize);
+      streamLength -= d->ID3v2Location + d->ID3v2OriginalSize;
     }
     else {
       seek(0);

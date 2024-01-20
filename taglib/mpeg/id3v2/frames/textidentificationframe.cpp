@@ -287,7 +287,7 @@ ByteVector TextIdentificationFrame::renderFields() const
     if(it != d->fieldList.cbegin())
       v.append(textDelimiter(encoding));
 
-    v.append((*it).data(encoding));
+    v.append(it->data(encoding));
   }
 
   return v;

@@ -183,10 +183,10 @@ public:
       Vorbis::File f(newname.c_str());
       List<FLAC::Picture *> lst = f.tag()->pictureList();
       CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), lst.size());
-      CPPUNIT_ASSERT_EQUAL(static_cast<int>(5), lst[0]->width());
-      CPPUNIT_ASSERT_EQUAL(static_cast<int>(6), lst[0]->height());
-      CPPUNIT_ASSERT_EQUAL(static_cast<int>(16), lst[0]->colorDepth());
-      CPPUNIT_ASSERT_EQUAL(static_cast<int>(7), lst[0]->numColors());
+      CPPUNIT_ASSERT_EQUAL(5, lst[0]->width());
+      CPPUNIT_ASSERT_EQUAL(6, lst[0]->height());
+      CPPUNIT_ASSERT_EQUAL(16, lst[0]->colorDepth());
+      CPPUNIT_ASSERT_EQUAL(7, lst[0]->numColors());
       CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
       CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
       CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());

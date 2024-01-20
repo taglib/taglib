@@ -286,7 +286,7 @@ ByteVector Ogg::PageHeader::lacingValues() const
     // these values is a byte.  A value of less than 255 (0xff) indicates the end
     // of the packet.
 
-    data.resize(data.size() + (*it / 255), '\xff');
+    data.resize(data.size() + *it / 255, '\xff');
 
     if(it != std::prev(d->packetSizes.cend()) || d->lastPacketCompleted)
       data.append(static_cast<unsigned char>(*it % 255));

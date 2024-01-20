@@ -154,7 +154,7 @@ unsigned int ASF::Attribute::toUInt() const
 
 unsigned long long ASF::Attribute::toULongLong() const
 {
-  return static_cast<unsigned long long>(d->numericValue);
+  return d->numericValue;
 }
 
 ASF::Picture ASF::Attribute::toPicture() const
@@ -199,10 +199,10 @@ String ASF::Attribute::parse(ASF::File &file, int kind)
 
   case BoolType:
     if(kind == 0) {
-      d->numericValue = (readDWORD(&file) != 0);
+      d->numericValue = readDWORD(&file) != 0;
     }
     else {
-      d->numericValue = (readWORD(&file) != 0);
+      d->numericValue = readWORD(&file) != 0;
     }
     break;
 

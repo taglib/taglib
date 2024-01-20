@@ -128,7 +128,7 @@ PropertyMap Mod::Tag::properties() const
   PropertyMap properties;
   properties["TITLE"] = d->title;
   properties["COMMENT"] = d->comment;
-  if(!(d->trackerName.isEmpty()))
+  if(!d->trackerName.isEmpty())
     properties["TRACKERNAME"] = d->trackerName;
   return properties;
 }

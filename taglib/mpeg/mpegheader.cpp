@@ -210,7 +210,7 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
     }
   }
 
-  d->protectionEnabled = (static_cast<unsigned char>(data[1] & 0x01) == 0);
+  d->protectionEnabled = static_cast<unsigned char>(data[1] & 0x01) == 0;
 
   if(isADTS()) {
     static constexpr std::array sampleRates {
@@ -262,8 +262,8 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
       },
     };
 
-    const int versionIndex = (d->version == Version1) ? 0 : 1;
-    const int layerIndex   = (d->layer > 0) ? d->layer - 1 : 0;
+    const int versionIndex = d->version == Version1 ? 0 : 1;
+    const int layerIndex   = d->layer > 0 ? d->layer - 1 : 0;
 
     // The bitrate index is encoded as the first 4 bits of the 3rd byte,
     // i.e. 1111xxxx
@@ -300,9 +300,9 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
 
     // TODO: Add mode extension for completeness
 
-    d->isOriginal    = ((static_cast<unsigned char>(data[3]) & 0x04) != 0);
-    d->isCopyrighted = ((static_cast<unsigned char>(data[3]) & 0x08) != 0);
-    d->isPadded      = ((static_cast<unsigned char>(data[2]) & 0x02) != 0);
+    d->isOriginal    = (static_cast<unsigned char>(data[3]) & 0x04) != 0;
+    d->isCopyrighted = (static_cast<unsigned char>(data[3]) & 0x08) != 0;
+    d->isPadded      = (static_cast<unsigned char>(data[2]) & 0x02) != 0;
 
     // Samples per frame
 
