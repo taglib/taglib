@@ -130,7 +130,7 @@ public:
     }
     {
       DSDIFF::File f2(newname.c_str());
-      CPPUNIT_ASSERT_EQUAL((unsigned int)3, f2.ID3v2Tag()->header()->majorVersion());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(3), f2.ID3v2Tag()->header()->majorVersion());
       CPPUNIT_ASSERT_EQUAL(String("Artist A"), f2.tag()->artist());
       CPPUNIT_ASSERT_EQUAL(xxx, f2.tag()->title());
     }
