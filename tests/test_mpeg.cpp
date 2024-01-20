@@ -562,23 +562,21 @@ public:
   void testExtendedHeader()
   {
     const ScopedFileCopy copy("extended-header", ".mp3");
-    {
-      MPEG::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(f.hasID3v2Tag());
-      ID3v2::Tag *tag = f.ID3v2Tag();
-      ID3v2::ExtendedHeader *ext = tag->extendedHeader();
-      CPPUNIT_ASSERT(ext);
-      CPPUNIT_ASSERT_EQUAL(12U, ext->size());
-      CPPUNIT_ASSERT_EQUAL(String("Druids"), tag->title());
-      CPPUNIT_ASSERT_EQUAL(String("Excelsis"), tag->artist());
-      CPPUNIT_ASSERT_EQUAL(String("Vo Chrieger U Drache"), tag->album());
-      CPPUNIT_ASSERT_EQUAL(2013U, tag->year());
-      CPPUNIT_ASSERT_EQUAL(String("Folk/Power Metal"), tag->genre());
-      CPPUNIT_ASSERT_EQUAL(3U, tag->track());
-      CPPUNIT_ASSERT_EQUAL(String("2013"),
-                           f.properties().value("ORIGINALDATE").front());
-    }
+    MPEG::File f(copy.fileName().c_str());
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.hasID3v2Tag());
+    ID3v2::Tag *tag = f.ID3v2Tag();
+    ID3v2::ExtendedHeader *ext = tag->extendedHeader();
+    CPPUNIT_ASSERT(ext);
+    CPPUNIT_ASSERT_EQUAL(12U, ext->size());
+    CPPUNIT_ASSERT_EQUAL(String("Druids"), tag->title());
+    CPPUNIT_ASSERT_EQUAL(String("Excelsis"), tag->artist());
+    CPPUNIT_ASSERT_EQUAL(String("Vo Chrieger U Drache"), tag->album());
+    CPPUNIT_ASSERT_EQUAL(2013U, tag->year());
+    CPPUNIT_ASSERT_EQUAL(String("Folk/Power Metal"), tag->genre());
+    CPPUNIT_ASSERT_EQUAL(3U, tag->track());
+    CPPUNIT_ASSERT_EQUAL(String("2013"),
+                         f.properties().value("ORIGINALDATE").front());
   }
 
   void testReadStyleFast()

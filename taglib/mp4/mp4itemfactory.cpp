@@ -57,8 +57,7 @@ ItemFactory *ItemFactory::instance()
 std::pair<String, Item> ItemFactory::parseItem(
   const Atom *atom, const ByteVector &data) const
 {
-  auto handlerType = handlerTypeForName(atom->name());
-  switch(handlerType) {
+  switch(handlerTypeForName(atom->name())) {
   case ItemHandlerType::Unknown:
     break;
   case ItemHandlerType::FreeForm:
@@ -98,8 +97,7 @@ ByteVector ItemFactory::renderItem(
   }
   else {
     const ByteVector name = itemName.data(String::Latin1);
-    auto handlerType = handlerTypeForName(name);
-    switch(handlerType) {
+    switch(handlerTypeForName(name)) {
     case ItemHandlerType::Unknown:
       debug("MP4: Unknown item name \"" + name + "\"");
       break;
@@ -142,10 +140,9 @@ std::pair<ByteVector, Item> ItemFactory::itemFromProperty(
     if(values.isEmpty()) {
       return {name, values};
     }
-    auto handlerType = name.startsWith("----")
-      ? ItemHandlerType::FreeForm
-      : handlerTypeForName(name);
-    switch(handlerType) {
+    switch(name.startsWith("----")
+           ? ItemHandlerType::FreeForm
+           : handlerTypeForName(name)) {
     case ItemHandlerType::IntPair:
     case ItemHandlerType::IntPairNoTrailing:
       if(StringList parts = StringList::split(values.front(), "/");
@@ -190,10 +187,9 @@ std::pair<String, StringList> ItemFactory::itemToProperty(
   const ByteVector &itemName, const Item &item) const
 {
   if(const String key = propertyKeyForName(itemName); !key.isEmpty()) {
-    auto handlerType = itemName.startsWith("----")
-      ? ItemHandlerType::FreeForm
-      : handlerTypeForName(itemName);
-    switch(handlerType) {
+    switch(itemName.startsWith("----")
+           ? ItemHandlerType::FreeForm
+           : handlerTypeForName(itemName)) {
     case ItemHandlerType::IntPair:
     case ItemHandlerType::IntPairNoTrailing:
     {

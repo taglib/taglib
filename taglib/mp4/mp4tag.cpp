@@ -162,8 +162,7 @@ MP4::Tag::updateParents(const AtomList &path, offset_t delta, int ignore)
 void
 MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
 {
-  MP4::Atom *moov = d->atoms->find("moov");
-  if(moov) {
+  if(MP4::Atom *moov = d->atoms->find("moov")) {
     const MP4::AtomList stco = moov->findall("stco", true);
     for(const auto &atom : stco) {
       if(atom->offset() > offset) {
@@ -205,8 +204,7 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
     }
   }
 
-  MP4::Atom *moof = d->atoms->find("moof");
-  if(moof) {
+  if(MP4::Atom *moof = d->atoms->find("moof")) {
     const MP4::AtomList tfhd = moof->findall("tfhd", true);
     for(const auto &atom : tfhd) {
       if(atom->offset() > offset) {

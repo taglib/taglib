@@ -1107,10 +1107,8 @@ public:
           PlainFile(newname.c_str()).readBlock(expectedId3v23Data.size());
       CPPUNIT_ASSERT_EQUAL(expectedId3v23Data, actualId3v23Data);
     }
-
-    ScopedFileCopy rareFramesCopy("rare_frames", ".mp3");
-
     {
+      ScopedFileCopy rareFramesCopy("rare_frames", ".mp3");
       MPEG::File f(rareFramesCopy.fileName().c_str());
       f.save(MPEG::File::AllTags, File::StripOthers, ID3v2::v3);
       f.seek(f.find("TCON") + 11);

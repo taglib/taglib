@@ -66,11 +66,10 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
   stream.avail_in = static_cast<uInt>(inData.size());
   stream.next_in  = reinterpret_cast<Bytef *>(inData.data());
 
-  const unsigned int chunkSize = 1024;
-
   ByteVector outData;
 
   do {
+    constexpr unsigned int chunkSize = 1024;
     const size_t offset = outData.size();
     outData.resize(outData.size() + chunkSize);
 
