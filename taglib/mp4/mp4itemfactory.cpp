@@ -97,35 +97,35 @@ ByteVector ItemFactory::renderItem(
   }
   const ByteVector name = itemName.data(String::Latin1);
   switch(handlerTypeForName(name)) {
-    case ItemHandlerType::Unknown:
-      debug("MP4: Unknown item name \"" + name + "\"");
-      break;
-    case ItemHandlerType::FreeForm:
-      return renderFreeForm(name, item);
-    case ItemHandlerType::IntPair:
-      return renderIntPair(name, item);
-    case ItemHandlerType::IntPairNoTrailing:
-      return renderIntPairNoTrailing(name, item);
-    case ItemHandlerType::Bool:
-      return renderBool(name, item);
-    case ItemHandlerType::Int:
-      return renderInt(name, item);
-    case ItemHandlerType::TextOrInt:
-      return renderTextOrInt(name, item);
-    case ItemHandlerType::UInt:
-      return renderUInt(name, item);
-    case ItemHandlerType::LongLong:
-      return renderLongLong(name, item);
-    case ItemHandlerType::Byte:
-      return renderByte(name, item);
-    case ItemHandlerType::Gnre:
-      return renderInt(name, item);
-    case ItemHandlerType::Covr:
-      return renderCovr(name, item);
-    case ItemHandlerType::TextImplicit:
-      return renderText(name, item, TypeImplicit);
-    case ItemHandlerType::Text:
-      return renderText(name, item);
+  case ItemHandlerType::Unknown:
+    debug("MP4: Unknown item name \"" + name + "\"");
+    break;
+  case ItemHandlerType::FreeForm:
+    return renderFreeForm(name, item);
+  case ItemHandlerType::IntPair:
+    return renderIntPair(name, item);
+  case ItemHandlerType::IntPairNoTrailing:
+    return renderIntPairNoTrailing(name, item);
+  case ItemHandlerType::Bool:
+    return renderBool(name, item);
+  case ItemHandlerType::Int:
+    return renderInt(name, item);
+  case ItemHandlerType::TextOrInt:
+    return renderTextOrInt(name, item);
+  case ItemHandlerType::UInt:
+    return renderUInt(name, item);
+  case ItemHandlerType::LongLong:
+    return renderLongLong(name, item);
+  case ItemHandlerType::Byte:
+    return renderByte(name, item);
+  case ItemHandlerType::Gnre:
+    return renderInt(name, item);
+  case ItemHandlerType::Covr:
+    return renderCovr(name, item);
+  case ItemHandlerType::TextImplicit:
+    return renderText(name, item, TypeImplicit);
+  case ItemHandlerType::Text:
+    return renderText(name, item);
   }
   return ByteVector();
 }

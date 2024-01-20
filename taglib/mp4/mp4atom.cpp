@@ -279,17 +279,17 @@ bool MP4::Atoms::checkRootLevelAtoms() {
       moovValid = true;
     }
     if(invalid) {
-      if(moovValid && (*it)->name() != "moof") {
-        // Only the root level atoms "moov" and (if present) "moof" are
-        // modified.  If they are valid, ignore following invalid root level
-        // atoms as trailing garbage.
-        while(it != d->atoms.end()) {
-          delete *it;
-          it = d->atoms.erase(it);
-        }
-        return true;
+      if(!moovValid || (*it)->name() == "moof")
+        return false;
+
+      // Only the root level atoms "moov" and (if present) "moof" are
+      // modified.  If they are valid, ignore following invalid root level
+      // atoms as trailing garbage.
+      while(it != d->atoms.end()) {
+        delete *it;
+        it = d->atoms.erase(it);
       }
-      return false;
+      return true;
     }
   }
 
