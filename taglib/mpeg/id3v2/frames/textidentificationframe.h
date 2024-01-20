@@ -300,7 +300,7 @@ namespace TagLib {
        * Searches for the user defined text frame with the description \a description
        * in \a tag.  This returns null if no matching frames were found.
        */
-      static UserTextIdentificationFrame *find(Tag *tag, const String &description);
+      static UserTextIdentificationFrame *find(const Tag *tag, const String &description);
 
       /*!
        * Returns an appropriate TXXX frame description for the given free-form tag key.

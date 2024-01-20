@@ -441,7 +441,7 @@ void taglib_property_set_append(TagLib_File *f, const char *prop, const char *va
   _taglib_property_set(f, prop, value, true);
 }
 
-char** taglib_property_keys(TagLib_File *file)
+char** taglib_property_keys(const TagLib_File *file)
 {
   if(file == NULL)
     return NULL;
@@ -461,7 +461,7 @@ char** taglib_property_keys(TagLib_File *file)
   return props;
 }
 
-char **taglib_property_get(TagLib_File *file, const char *prop)
+char **taglib_property_get(const TagLib_File *file, const char *prop)
 {
   if(file == NULL || prop == NULL)
     return NULL;
@@ -585,7 +585,7 @@ BOOL taglib_complex_property_set_append(
   return _taglib_complex_property_set(file, key, value, true);
 }
 
-char** taglib_complex_property_keys(TagLib_File *file)
+char** taglib_complex_property_keys(const TagLib_File *file)
 {
   if(file == NULL) {
     return NULL;
@@ -608,7 +608,7 @@ char** taglib_complex_property_keys(TagLib_File *file)
 }
 
 TagLib_Complex_Property_Attribute*** taglib_complex_property_get(
-  TagLib_File *file, const char *key)
+  const TagLib_File *file, const char *key)
 {
   if(file == NULL || key == NULL) {
     return NULL;

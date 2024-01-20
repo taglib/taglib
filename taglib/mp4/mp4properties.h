@@ -44,7 +44,7 @@ namespace TagLib {
         ALAC
       };
 
-      Properties(File *file, Atoms *atoms, ReadStyle style = Average);
+      Properties(File *file, const Atoms *atoms, ReadStyle style = Average);
       ~Properties() override;
 
       Properties(const Properties &) = delete;

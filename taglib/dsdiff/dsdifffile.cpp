@@ -86,7 +86,7 @@ namespace
 class DSDIFF::File::FilePrivate
 {
 public:
-  FilePrivate(ID3v2::FrameFactory *frameFactory)
+  FilePrivate(const ID3v2::FrameFactory *frameFactory)
         : ID3v2FrameFactory(frameFactory ? frameFactory
                                          : ID3v2::FrameFactory::instance())
   {

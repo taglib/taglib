@@ -36,7 +36,7 @@ using namespace TagLib;
 class MP4::File::FilePrivate
 {
 public:
-  FilePrivate(MP4::ItemFactory *mp4ItemFactory)
+  FilePrivate(const MP4::ItemFactory *mp4ItemFactory)
         : itemFactory(mp4ItemFactory ? mp4ItemFactory
                                      : MP4::ItemFactory::instance())
   {
