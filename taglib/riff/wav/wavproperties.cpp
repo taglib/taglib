@@ -112,8 +112,7 @@ void RIFF::WAV::Properties::read(File *file)
   unsigned int totalSamples = 0;
 
   for(unsigned int i = 0; i < file->chunkCount(); ++i) {
-    const ByteVector name = file->chunkName(i);
-    if(name == "fmt ") {
+    if(const ByteVector name = file->chunkName(i); name == "fmt ") {
       if(data.isEmpty())
         data = file->chunkData(i);
       else
@@ -172,8 +171,7 @@ void RIFF::WAV::Properties::read(File *file)
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
   else {
-    const unsigned int byteRate = data.toUInt(8, false);
-    if(byteRate > 0) {
+    if(const unsigned int byteRate = data.toUInt(8, false); byteRate > 0) {
       d->length  = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
       d->bitrate = static_cast<int>(byteRate * 8.0 / 1000.0 + 0.5);
     }

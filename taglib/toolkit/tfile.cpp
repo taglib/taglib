@@ -178,16 +178,16 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
     // (1) previous partial match
 
     if(previousPartialMatch >= 0 && static_cast<int>(bufferSize()) > previousPartialMatch) {
-      const int patternOffset = (bufferSize() - previousPartialMatch);
-      if(buffer.containsAt(pattern, 0, patternOffset)) {
+      if(const int patternOffset = (bufferSize() - previousPartialMatch);
+         buffer.containsAt(pattern, 0, patternOffset)) {
         seek(originalPosition);
         return bufferOffset - bufferSize() + previousPartialMatch;
       }
     }
 
     if(!before.isEmpty() && beforePreviousPartialMatch >= 0 && static_cast<int>(bufferSize()) > beforePreviousPartialMatch) {
-      const int beforeOffset = (bufferSize() - beforePreviousPartialMatch);
-      if(buffer.containsAt(before, 0, beforeOffset)) {
+      if(const int beforeOffset = (bufferSize() - beforePreviousPartialMatch);
+         buffer.containsAt(before, 0, beforeOffset)) {
         seek(originalPosition);
         return -1;
       }
@@ -277,8 +277,7 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
     // (2) pattern contained in current buffer
 
-    const long location = buffer.rfind(pattern);
-    if(location >= 0) {
+    if(const long location = buffer.rfind(pattern); location >= 0) {
       seek(originalPosition);
       return bufferOffset + location;
     }

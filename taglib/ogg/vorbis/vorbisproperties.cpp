@@ -157,9 +157,7 @@ void Vorbis::Properties::read(File *file)
     const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0 && d->sampleRate > 0) {
-      const long long frameCount = end - start;
-
-      if(frameCount > 0) {
+      if(const long long frameCount = end - start; frameCount > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
         offset_t fileLengthWithoutOverhead = file->length();
         // Ignore the three initial header packets, see "1.3.1. Decode Setup" in

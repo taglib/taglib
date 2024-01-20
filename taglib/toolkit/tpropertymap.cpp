@@ -141,13 +141,13 @@ StringList &PropertyMap::operator[](const String &key)
 bool PropertyMap::operator==(const PropertyMap &other) const
 {
   for(const auto &[property, val] : other) {
-    auto thisFind = find(property);
-    if(thisFind == end() || (thisFind->second != val))
+    if(auto thisFind = find(property);
+       thisFind == end() || (thisFind->second != val))
       return false;
   }
   for(const auto &[property, val] : *this) {
-    auto otherFind = other.find(property);
-    if(otherFind == other.end() || (otherFind->second != val))
+    if(auto otherFind = other.find(property);
+       otherFind == other.end() || (otherFind->second != val))
       return false;
   }
   return d->unsupported == other.d->unsupported;

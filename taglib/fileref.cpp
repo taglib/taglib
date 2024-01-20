@@ -119,8 +119,7 @@ namespace
 #endif
 
     String ext;
-    const int pos = s.rfind(".");
-    if(pos != -1)
+    if(const int pos = s.rfind("."); pos != -1)
       ext = s.substr(pos + 1).upper();
 
     // If this list is updated, the method defaultFileExtensions() should also be

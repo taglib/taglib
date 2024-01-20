@@ -48,8 +48,7 @@ int findChar(
   const TIterator dataBegin, const TIterator dataEnd,
   char c, unsigned int offset, int byteAlign)
 {
-  const size_t dataSize = dataEnd - dataBegin;
-  if(offset + 1 > dataSize)
+  if(const size_t dataSize = dataEnd - dataBegin; offset + 1 > dataSize)
     return -1;
 
   // n % 0 is invalid
@@ -782,8 +781,8 @@ bool ByteVector::operator!=(const char *s) const
 
 bool ByteVector::operator<(const ByteVector &v) const
 {
-  const int result = ::memcmp(data(), v.data(), std::min(size(), v.size()));
-  if(result != 0)
+  if(const int result = ::memcmp(data(), v.data(), std::min(size(), v.size()));
+     result != 0)
     return result < 0;
   return size() < v.size();
 }

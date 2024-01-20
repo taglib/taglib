@@ -153,8 +153,7 @@ bool RIFF::AIFF::File::hasID3v2Tag() const
 void RIFF::AIFF::File::read(bool readProperties)
 {
   for(unsigned int i = 0; i < chunkCount(); ++i) {
-    const ByteVector name = chunkName(i);
-    if(name == "ID3 " || name == "id3 ") {
+    if(const ByteVector name = chunkName(i); name == "ID3 " || name == "id3 ") {
       if(!d->tag) {
         d->tag = std::make_unique<ID3v2::Tag>(this, chunkOffset(i),
                                               d->ID3v2FrameFactory);

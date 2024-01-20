@@ -216,10 +216,9 @@ void ID3v1::Tag::read()
   if(d->file && d->file->isValid()) {
     d->file->seek(d->tagOffset);
     // read the tag -- always 128 bytes
-    const ByteVector data = d->file->readBlock(128);
-
     // some initial sanity checking
-    if(data.size() == 128 && data.startsWith("TAG"))
+    if(const ByteVector data = d->file->readBlock(128);
+       data.size() == 128 && data.startsWith("TAG"))
       parse(data);
     else
       debug("ID3v1 tag is not valid or could not be read at the specified offset.");

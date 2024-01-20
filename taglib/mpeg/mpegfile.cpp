@@ -107,8 +107,7 @@ bool MPEG::File::isSupported(IOStream *stream)
 
   for(unsigned int i = 0; i < buffer.size() - 1; ++i) {
     if(isFrameSync(buffer, i)) {
-      const Header header(&file, headerOffset + i, true);
-      if(header.isValid()) {
+      if(const Header header(&file, headerOffset + i, true); header.isValid()) {
         stream->seek(originalPosition);
         return true;
       }
@@ -387,8 +386,7 @@ offset_t MPEG::File::nextFrameOffset(offset_t position)
       frameSyncBytes[0] = frameSyncBytes[1];
       frameSyncBytes[1] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
-        const Header header(this, position + i - 1, true);
-        if(header.isValid())
+        if(const Header header(this, position + i - 1, true); header.isValid())
           return position + i - 1;
       }
     }
@@ -412,8 +410,7 @@ offset_t MPEG::File::previousFrameOffset(offset_t position)
       frameSyncBytes[1] = frameSyncBytes[0];
       frameSyncBytes[0] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
-        const Header header(this, position + i, true);
-        if(header.isValid())
+        if(const Header header(this, position + i, true); header.isValid())
           return position + i + header.frameLength();
       }
     }
@@ -518,8 +515,7 @@ offset_t MPEG::File::findID3v2(Properties::ReadStyle readStyle)
   if(readStyle == Properties::Fast)
     return -1;
 
-  const Header firstHeader(this, 0, true);
-  if(firstHeader.isValid())
+  if(const Header firstHeader(this, 0, true); firstHeader.isValid())
     return -1;
 
   // Look for an ID3v2 tag until reaching the first valid MPEG frame.
@@ -538,8 +534,7 @@ offset_t MPEG::File::findID3v2(Properties::ReadStyle readStyle)
       frameSyncBytes[0] = frameSyncBytes[1];
       frameSyncBytes[1] = buffer[i];
       if(isFrameSync(frameSyncBytes)) {
-        const Header header(this, position + i - 1, true);
-        if(header.isValid())
+        if(const Header header(this, position + i - 1, true); header.isValid())
           return -1;
       }
 

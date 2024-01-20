@@ -203,10 +203,10 @@ PropertyMap APE::Tag::properties() const
 {
   PropertyMap properties;
   for(const auto &[tag, item] : std::as_const(itemListMap())) {
-    String tagName = tag.upper();
     // if the item is Binary or Locator, or if the key is an invalid string,
     // add to unsupportedData
-    if(item.type() != Item::Text || tagName.isEmpty()) {
+    if(String tagName = tag.upper();
+       item.type() != Item::Text || tagName.isEmpty()) {
       properties.addUnsupportedData(tag);
     }
     else {
@@ -241,9 +241,9 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   // first check if tags need to be removed completely
   StringList toRemove;
   for(const auto &[k, t] : std::as_const(itemListMap())) {
-    String key = k.upper();
     // only remove if a) key is valid, b) type is text, c) key not contained in new properties
-    if(!key.isEmpty() && t.type() == APE::Item::Text && !props.contains(key))
+    if(String key = k.upper();
+       !key.isEmpty() && t.type() == APE::Item::Text && !props.contains(key))
       toRemove.append(k);
   }
 
@@ -281,13 +281,12 @@ StringList APE::Tag::complexPropertyKeys() const
 List<VariantMap> APE::Tag::complexProperties(const String &key) const
 {
   List<VariantMap> props;
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     const StringList itemNames = StringList(FRONT_COVER).append(BACK_COVER);
     for(const auto &itemName: itemNames) {
       if(d->itemListMap.contains(itemName)) {
-        Item picture = d->itemListMap.value(itemName);
-        if(picture.type() == Item::Binary) {
+        if(Item picture = d->itemListMap.value(itemName);
+           picture.type() == Item::Binary) {
           ByteVector data = picture.binaryData();
           // Do not search for a description if the first byte could start JPG or PNG
           // data.
@@ -316,8 +315,7 @@ List<VariantMap> APE::Tag::complexProperties(const String &key) const
 
 bool APE::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     removeItem(FRONT_COVER);
     removeItem(BACK_COVER);
 

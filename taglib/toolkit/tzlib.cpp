@@ -77,9 +77,8 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
     stream.avail_out = static_cast<uInt>(chunkSize);
     stream.next_out  = reinterpret_cast<Bytef *>(outData.data() + offset);
 
-    const int result = inflate(&stream, Z_NO_FLUSH);
-
-    if(result == Z_STREAM_ERROR ||
+    if(const int result = inflate(&stream, Z_NO_FLUSH);
+       result == Z_STREAM_ERROR ||
        result == Z_NEED_DICT ||
        result == Z_DATA_ERROR ||
        result == Z_MEM_ERROR)

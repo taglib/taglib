@@ -43,9 +43,9 @@ offset_t Utils::findID3v1(File *file)
   if (file->length() >= 131) {
     file->seek(-131, File::End);
     const offset_t p = file->tell() + 3;
-    const TagLib::ByteVector data = file->readBlock(8);
 
-    if(data.containsAt(ID3v1::Tag::fileIdentifier(), 3) && (data != APE::Tag::fileIdentifier()))
+    if(const TagLib::ByteVector data = file->readBlock(8);
+       data.containsAt(ID3v1::Tag::fileIdentifier(), 3) && (data != APE::Tag::fileIdentifier()))
       return p;
   } else {
     file->seek(-128, File::End);
@@ -100,8 +100,8 @@ ByteVector TagLib::Utils::readHeader(IOStream *stream, unsigned int length,
 
   if(skipID3v2) {
     stream->seek(0);
-    const ByteVector data = stream->readBlock(ID3v2::Header::size());
-    if(data.startsWith(ID3v2::Header::fileIdentifier()))
+    if(const ByteVector data = stream->readBlock(ID3v2::Header::size());
+       data.startsWith(ID3v2::Header::fileIdentifier()))
       bufferOffset = ID3v2::Header(data).completeTagSize();
   }
 

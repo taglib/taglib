@@ -181,9 +181,8 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
 
   // Set the MPEG layer
 
-  const int layerBits = (static_cast<unsigned char>(data[1]) >> 1) & 0x03;
-
-  if(layerBits == 1)
+  if(const int layerBits = (static_cast<unsigned char>(data[1]) >> 1) & 0x03;
+     layerBits == 1)
     d->layer = 3;
   else if(layerBits == 2)
     d->layer = 2;
@@ -234,9 +233,8 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
     d->isCopyrighted = (static_cast<unsigned char>(data[3]) & 0x04) != 0;
 
     // Calculate the frame length
-    const ByteVector frameLengthData = file->readBlock(2);
-
-    if(frameLengthData.size() >= 2) {
+    if(const ByteVector frameLengthData = file->readBlock(2);
+       frameLengthData.size() >= 2) {
       d->frameLength = (static_cast<unsigned char>(data[3]) & 0x3) << 11 |
                        (static_cast<unsigned char>(frameLengthData[0]) << 3) |
                        (static_cast<unsigned char>(frameLengthData[1]) >> 5);
@@ -352,9 +350,9 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
     constexpr unsigned int HeaderMask = 0xfffe0c00;
 
     const unsigned int header     = data.toUInt(0, true)     & HeaderMask;
-    const unsigned int nextHeader = nextData.toUInt(0, true) & HeaderMask;
 
-    if(header != nextHeader)
+    if(const unsigned int nextHeader = nextData.toUInt(0, true) & HeaderMask;
+       header != nextHeader)
       return;
   }
 

@@ -198,8 +198,7 @@ bool RIFF::WAV::File::hasInfoTag() const
 void RIFF::WAV::File::read(bool readProperties)
 {
   for(unsigned int i = 0; i < chunkCount(); ++i) {
-    const ByteVector name = chunkName(i);
-    if(name == "ID3 " || name == "id3 ") {
+    if(const ByteVector name = chunkName(i); name == "ID3 " || name == "id3 ") {
       if(!d->tag[ID3v2Index]) {
         d->tag.set(ID3v2Index, new ID3v2::Tag(this, chunkOffset(i),
                                               d->ID3v2FrameFactory));
@@ -210,8 +209,7 @@ void RIFF::WAV::File::read(bool readProperties)
       }
     }
     else if(name == "LIST") {
-      const ByteVector data = chunkData(i);
-      if(data.startsWith("INFO")) {
+      if(const ByteVector data = chunkData(i); data.startsWith("INFO")) {
         if(!d->tag[InfoIndex]) {
           d->tag.set(InfoIndex, new RIFF::Info::Tag(data));
           d->hasInfo = true;

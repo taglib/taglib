@@ -547,8 +547,7 @@ bool FrameFactory::updateFrame(Frame::Header *header) const
 Frame *FrameFactory::createFrameForProperty(const String &key, const StringList &values) const
 {
   // check if the key is contained in the key<=>frameID mapping
-  ByteVector frameID = Frame::keyToFrameID(key);
-  if(!frameID.isEmpty()) {
+  if(ByteVector frameID = Frame::keyToFrameID(key); !frameID.isEmpty()) {
     // Apple proprietary WFED (Podcast URL), MVNM (Movement Name), MVIN (Movement Number), GRP1 (Grouping) are in fact text frames.
     if(frameID[0] == 'T' || frameID == "WFED" || frameID == "MVNM" || frameID == "MVIN" || frameID == "GRP1"){ // text frame
       auto frame = new TextIdentificationFrame(frameID, String::UTF8);
