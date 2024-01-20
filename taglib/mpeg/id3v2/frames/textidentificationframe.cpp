@@ -241,7 +241,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
   // type is the same specified for this frame
 
   unsigned short firstBom = 0;
-  for(auto it = l.begin(); it != l.end(); it++) {
+  for(auto it = l.begin(); it != l.end(); ++it) {
     if(!it->isEmpty() || (it == l.begin() && frameID() == "TXXX")) {
       if(d->textEncoding == String::Latin1) {
         d->fieldList.append(Tag::latin1StringHandler()->parse(*it));
@@ -278,7 +278,7 @@ ByteVector TextIdentificationFrame::renderFields() const
 
   v.append(static_cast<char>(encoding));
 
-  for(auto it = d->fieldList.cbegin(); it != d->fieldList.cend(); it++) {
+  for(auto it = d->fieldList.cbegin(); it != d->fieldList.cend(); ++it) {
 
     // Since the field list is null delimited, if this is not the first
     // element in the list, append the appropriate delimiter for this

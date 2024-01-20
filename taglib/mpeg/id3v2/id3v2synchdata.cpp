@@ -90,7 +90,7 @@ ByteVector SynchData::decode(const ByteVector &data)
     *dst++ = *src++;
 
     if(*(src - 1) == '\xff' && *src == '\x00')
-      src++;
+      ++src;
   }
 
   if(src < data.end())
