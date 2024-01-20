@@ -95,9 +95,8 @@ ByteVector ItemFactory::renderItem(
   if(itemName.startsWith("----")) {
     return renderFreeForm(itemName, item);
   }
-  else {
-    const ByteVector name = itemName.data(String::Latin1);
-    switch(handlerTypeForName(name)) {
+  const ByteVector name = itemName.data(String::Latin1);
+  switch(handlerTypeForName(name)) {
     case ItemHandlerType::Unknown:
       debug("MP4: Unknown item name \"" + name + "\"");
       break;
@@ -127,7 +126,6 @@ ByteVector ItemFactory::renderItem(
       return renderText(name, item, TypeImplicit);
     case ItemHandlerType::Text:
       return renderText(name, item);
-    }
   }
   return ByteVector();
 }
@@ -573,15 +571,13 @@ std::pair<String, Item> ItemFactory::parseFreeForm(
       item.setAtomDataType(type);
       return {name, item};
     }
-    else {
-      ByteVectorList value;
-      for(auto it = itBegin; it != data.end(); ++it) {
-        value.append(it->data);
-      }
-      Item item(value);
-      item.setAtomDataType(type);
-      return {name, item};
+    ByteVectorList value;
+    for(auto it = itBegin; it != data.end(); ++it) {
+      value.append(it->data);
     }
+    Item item(value);
+    item.setAtomDataType(type);
+    return {name, item};
   }
   return {atom->name(), Item()};
 }

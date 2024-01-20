@@ -300,7 +300,7 @@ bool ID3v2::Tag::isEmpty() const
 
 Header *ID3v2::Tag::header() const
 {
-  return &(d->header);
+  return &d->header;
 }
 
 ExtendedHeader *ID3v2::Tag::extendedHeader() const

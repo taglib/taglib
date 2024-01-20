@@ -63,7 +63,7 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
 
   ByteVector inData = data;
 
-  stream.avail_in = static_cast<uInt>(inData.size());
+  stream.avail_in = inData.size();
   stream.next_in  = reinterpret_cast<Bytef *>(inData.data());
 
   ByteVector outData;

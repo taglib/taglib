@@ -54,7 +54,7 @@ MPEG::XingHeader::~XingHeader() = default;
 
 bool MPEG::XingHeader::isValid() const
 {
-  return (d->type != Invalid && d->frames > 0 && d->size > 0);
+  return d->type != Invalid && d->frames > 0 && d->size > 0;
 }
 
 unsigned int MPEG::XingHeader::totalFrames() const

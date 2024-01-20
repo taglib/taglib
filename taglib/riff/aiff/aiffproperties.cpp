@@ -90,7 +90,7 @@ unsigned int RIFF::AIFF::Properties::sampleFrames() const
 
 bool RIFF::AIFF::Properties::isAiffC() const
 {
-  return (!d->compressionType.isEmpty());
+  return !d->compressionType.isEmpty();
 }
 
 ByteVector RIFF::AIFF::Properties::compressionType() const

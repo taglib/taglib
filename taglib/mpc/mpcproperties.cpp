@@ -162,7 +162,7 @@ namespace
     do {
       tmp = data[pos++];
       size = (size << 7) | (tmp & 0x7F);
-    } while((tmp & 0x80) && (pos < data.size()));
+    } while((tmp & 0x80) && pos < data.size());
     return size;
   }
 

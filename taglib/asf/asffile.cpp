@@ -472,7 +472,7 @@ bool ASF::File::isSupported(IOStream *stream)
   // An ASF file has to start with the designated GUID.
 
   const ByteVector id = Utils::readHeader(stream, 16, false);
-  return (id == headerGuid);
+  return id == headerGuid;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -564,8 +564,8 @@ bool ASF::File::save()
     bool inMetadataObject = false;
 
     for(const auto &attribute : attributes) {
-      const bool largeValue = (attribute.dataSize() > 65535);
-      const bool guid       = (attribute.type() == Attribute::GuidType);
+      const bool largeValue = attribute.dataSize() > 65535;
+      const bool guid       = attribute.type() == Attribute::GuidType;
 
       if(!inExtendedContentDescriptionObject && !guid && !largeValue && attribute.language() == 0 && attribute.stream() == 0) {
         d->extendedContentDescriptionObject->attributeData.append(attribute.render(name));
@@ -681,6 +681,5 @@ void ASF::File::read()
   if(!filePropertiesObject || !streamPropertiesObject) {
     debug("ASF::File::read(): Missing mandatory header objects.");
     setValid(false);
-    return;
   }
 }

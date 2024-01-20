@@ -42,27 +42,27 @@ Tag::~Tag() = default;
 
 bool Tag::isEmpty() const
 {
-  return (title().isEmpty() &&
-          artist().isEmpty() &&
-          album().isEmpty() &&
-          comment().isEmpty() &&
-          genre().isEmpty() &&
-          year() == 0 &&
-          track() == 0);
+  return title().isEmpty() &&
+         artist().isEmpty() &&
+         album().isEmpty() &&
+         comment().isEmpty() &&
+         genre().isEmpty() &&
+         year() == 0 &&
+         track() == 0;
 }
 
 PropertyMap Tag::properties() const
 {
   PropertyMap map;
-  if(!(title().isEmpty()))
+  if(!title().isEmpty())
     map["TITLE"].append(title());
-  if(!(artist().isEmpty()))
+  if(!artist().isEmpty())
     map["ARTIST"].append(artist());
-  if(!(album().isEmpty()))
+  if(!album().isEmpty())
     map["ALBUM"].append(album());
-  if(!(comment().isEmpty()))
+  if(!comment().isEmpty())
     map["COMMENT"].append(comment());
-  if(!(genre().isEmpty()))
+  if(!genre().isEmpty())
     map["GENRE"].append(genre());
   if(year() != 0)
     map["DATE"].append(String::number(year()));

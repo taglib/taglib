@@ -281,7 +281,7 @@ void RIFF::File::removeChunk(const ByteVector &name)
 
 void RIFF::File::read()
 {
-  const bool bigEndian = (d->endianness == BigEndian);
+  const bool bigEndian = d->endianness == BigEndian;
 
   offset_t offset = tell();
 

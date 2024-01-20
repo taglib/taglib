@@ -375,7 +375,7 @@ TagLib::Map<TagLib::String, TagLib::Variant> Variant::toMap(bool *ok) const
 
 bool Variant::operator==(const Variant &v) const
 {
-  return (d == v.d || d->data == v.d->data);
+  return d == v.d || d->data == v.d->data;
 }
 
 bool Variant::operator!=(const Variant &v) const

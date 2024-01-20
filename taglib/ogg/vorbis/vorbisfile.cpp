@@ -55,7 +55,7 @@ bool Vorbis::File::isSupported(IOStream *stream)
   // An Ogg Vorbis file has IDs "OggS" and "\x01vorbis" somewhere.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), false);
-  return (buffer.find("OggS") >= 0 && buffer.find("\x01vorbis") >= 0);
+  return buffer.find("OggS") >= 0 && buffer.find("\x01vorbis") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -174,5 +174,5 @@ MP4::File::strip(int tags)
 bool
 MP4::File::hasMP4Tag() const
 {
-  return (d->atoms->find("moov", "udta", "meta", "ilst") != nullptr);
+  return d->atoms->find("moov", "udta", "meta", "ilst") != nullptr;
 }

@@ -63,7 +63,7 @@ public:
 
     Map<String, int> m2 = m1;
     auto it = m2.find("bob");
-    (*it).second = 99;
+    it->second = 99;
     CPPUNIT_ASSERT_EQUAL(9,  m1["bob"]);
     CPPUNIT_ASSERT_EQUAL(99, m2["bob"]);
   }

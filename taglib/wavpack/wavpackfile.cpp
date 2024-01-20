@@ -66,7 +66,7 @@ bool WavPack::File::isSupported(IOStream *stream)
   // A WavPack file has to start with "wvpk".
 
   const ByteVector id = Utils::readHeader(stream, 4, false);
-  return (id == "wvpk");
+  return id == "wvpk";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ bool WavPack::File::save()
     insert(data, d->APELocation, d->APESize);
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->APESize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->APESize;
 
     d->APESize = data.size();
   }
@@ -215,12 +215,12 @@ void WavPack::File::strip(int tags)
 
 bool WavPack::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool WavPack::File::hasAPETag() const
 {
-  return (d->APELocation >= 0);
+  return d->APELocation >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

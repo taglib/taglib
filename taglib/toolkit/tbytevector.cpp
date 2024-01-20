@@ -129,8 +129,8 @@ T toNumber(const ByteVector &v, size_t offset, size_t length, bool mostSignifica
 template <class T>
 T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 {
-  const bool isBigEndian = (Utils::systemByteOrder() == Utils::BigEndian);
-  const bool swap = (mostSignificantByteFirst != isBigEndian);
+  const bool isBigEndian = Utils::systemByteOrder() == Utils::BigEndian;
+  const bool swap = mostSignificantByteFirst != isBigEndian;
 
   if(offset + sizeof(T) > v.size())
     return toNumber<T>(v, offset, v.size() - offset, mostSignificantByteFirst);
@@ -147,7 +147,7 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
 template <class T>
 ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
-  const bool isBigEndian = (Utils::systemByteOrder() == Utils::BigEndian);
+  const bool isBigEndian = Utils::systemByteOrder() == Utils::BigEndian;
 
   if(mostSignificantByteFirst != isBigEndian)
     value = Utils::byteSwap(value);
@@ -381,12 +381,12 @@ ByteVector &ByteVector::setData(const char *data)
 char *ByteVector::data()
 {
   detach();
-  return !isEmpty() ? (&(*d->data)[d->offset]) : nullptr;
+  return !isEmpty() ? &(*d->data)[d->offset] : nullptr;
 }
 
 const char *ByteVector::data() const
 {
-  return !isEmpty() ? (&(*d->data)[d->offset]) : nullptr;
+  return !isEmpty() ? &(*d->data)[d->offset] : nullptr;
 }
 
 ByteVector ByteVector::mid(unsigned int index, unsigned int length) const
@@ -399,7 +399,7 @@ ByteVector ByteVector::mid(unsigned int index, unsigned int length) const
 
 char ByteVector::at(unsigned int index) const
 {
-  return (index < size()) ? (*d->data)[d->offset + index] : 0;
+  return index < size() ? (*d->data)[d->offset + index] : 0;
 }
 
 int ByteVector::find(const ByteVector &pattern, unsigned int offset, int byteAlign) const
@@ -439,7 +439,7 @@ bool ByteVector::containsAt(const ByteVector &pattern, unsigned int offset, unsi
   if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)
     return false;
 
-  return (::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0);
+  return ::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0;
 }
 
 bool ByteVector::startsWith(const ByteVector &pattern) const
@@ -653,7 +653,7 @@ ByteVector::ConstReverseIterator ByteVector::rend() const
 
 bool ByteVector::isEmpty() const
 {
-  return (d->length == 0);
+  return d->length == 0;
 }
 
 unsigned int ByteVector::toUInt(bool mostSignificantByteFirst) const
@@ -757,7 +757,7 @@ bool ByteVector::operator==(const ByteVector &v) const
   if(size() != v.size())
     return false;
 
-  return (::memcmp(data(), v.data(), size()) == 0);
+  return ::memcmp(data(), v.data(), size()) == 0;
 }
 
 bool ByteVector::operator!=(const ByteVector &v) const
@@ -770,7 +770,7 @@ bool ByteVector::operator==(const char *s) const
   if(size() != ::strlen(s))
     return false;
 
-  return (::memcmp(data(), s, size()) == 0);
+  return ::memcmp(data(), s, size()) == 0;
 }
 
 bool ByteVector::operator!=(const char *s) const
@@ -788,7 +788,7 @@ bool ByteVector::operator<(const ByteVector &v) const
 
 bool ByteVector::operator>(const ByteVector &v) const
 {
-  return (v < *this);
+  return v < *this;
 }
 
 ByteVector ByteVector::operator+(const ByteVector &v) const
@@ -833,7 +833,7 @@ ByteVector ByteVector::toHex() const
   for(unsigned int i = 0; i < size(); i++) {
     unsigned char c = data()[i];
     *p++ = hexTable[(c >> 4) & 0x0F];
-    *p++ = hexTable[(c     ) & 0x0F];
+    *p++ = hexTable[ c       & 0x0F];
   }
 
   return encoded;

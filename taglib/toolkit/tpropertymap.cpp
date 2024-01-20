@@ -142,12 +142,12 @@ bool PropertyMap::operator==(const PropertyMap &other) const
 {
   for(const auto &[property, val] : other) {
     if(auto thisFind = find(property);
-       thisFind == end() || (thisFind->second != val))
+       thisFind == end() || thisFind->second != val)
       return false;
   }
   for(const auto &[property, val] : *this) {
     if(auto otherFind = other.find(property);
-       otherFind == other.end() || (otherFind->second != val))
+       otherFind == other.end() || otherFind->second != val)
       return false;
   }
   return d->unsupported == other.d->unsupported;

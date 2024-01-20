@@ -58,7 +58,7 @@ bool RIFF::AIFF::File::isSupported(IOStream *stream)
   // An AIFF file has to start with "FORM????AIFF" or "FORM????AIFC".
 
   const ByteVector id = Utils::readHeader(stream, 12, false);
-  return (id.startsWith("FORM") && (id.containsAt("AIFF", 8) || id.containsAt("AIFC", 8)));
+  return id.startsWith("FORM") && (id.containsAt("AIFF", 8) || id.containsAt("AIFC", 8));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

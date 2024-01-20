@@ -86,7 +86,7 @@ bool FLAC::File::isSupported(IOStream *stream)
   // A FLAC file has an ID "fLaC" somewhere. An ID3v2 tag may precede.
 
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), true);
-  return (buffer.find("fLaC") >= 0);
+  return buffer.find("fLaC") >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -301,10 +301,10 @@ bool FLAC::File::save()
 
   insert(data, d->flacStart, originalLength);
 
-  d->streamStart += (static_cast<long>(data.size()) - originalLength);
+  d->streamStart += static_cast<long>(data.size()) - originalLength;
 
   if(d->ID3v1Location >= 0)
-    d->ID3v1Location += (static_cast<long>(data.size()) - originalLength);
+    d->ID3v1Location += static_cast<long>(data.size()) - originalLength;
 
   // Update ID3 tags
 
@@ -318,11 +318,11 @@ bool FLAC::File::save()
     data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
 
-    d->flacStart   += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
-    d->streamStart += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+    d->flacStart   += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
+    d->streamStart += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
 
     if(d->ID3v1Location >= 0)
-      d->ID3v1Location += (static_cast<long>(data.size()) - d->ID3v2OriginalSize);
+      d->ID3v1Location += static_cast<long>(data.size()) - d->ID3v2OriginalSize;
 
     d->ID3v2OriginalSize = data.size();
   }
@@ -447,12 +447,12 @@ bool FLAC::File::hasXiphComment() const
 
 bool FLAC::File::hasID3v1Tag() const
 {
-  return (d->ID3v1Location >= 0);
+  return d->ID3v1Location >= 0;
 }
 
 bool FLAC::File::hasID3v2Tag() const
 {
-  return (d->ID3v2Location >= 0);
+  return d->ID3v2Location >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
