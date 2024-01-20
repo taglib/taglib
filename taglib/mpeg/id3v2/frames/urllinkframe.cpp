@@ -173,7 +173,7 @@ PropertyMap UserUrlLinkFrame::asProperties() const
   return map;
 }
 
-UserUrlLinkFrame *UserUrlLinkFrame::find(ID3v2::Tag *tag, const String &description) // static
+UserUrlLinkFrame *UserUrlLinkFrame::find(const ID3v2::Tag *tag, const String &description) // static
 {
   for(const auto &frame : std::as_const(tag->frameList("WXXX"))) {
     auto f = dynamic_cast<UserUrlLinkFrame *>(frame);

@@ -143,7 +143,7 @@ MP4::Atom::find(const char *name1, const char *name2, const char *name3, const c
     return this;
   }
   auto it = std::find_if(d->children.cbegin(), d->children.cend(),
-      [&name1](Atom *child) { return child->d->name == name1; });
+      [&name1](const Atom *child) { return child->d->name == name1; });
   return it != d->children.cend() ? (*it)->find(name2, name3, name4) : nullptr;
 }
 
@@ -170,7 +170,7 @@ MP4::Atom::path(MP4::AtomList &path, const char *name1, const char *name2, const
     return true;
   }
   auto it = std::find_if(d->children.cbegin(), d->children.cend(),
-      [&name1](Atom *child) { return child->d->name == name1; });
+      [&name1](const Atom *child) { return child->d->name == name1; });
   return it != d->children.cend() ? (*it)->path(path, name2, name3) : false;
 }
 
@@ -243,7 +243,7 @@ MP4::Atom *
 MP4::Atoms::find(const char *name1, const char *name2, const char *name3, const char *name4) const
 {
   auto it = std::find_if(d->atoms.cbegin(), d->atoms.cend(),
-      [&name1](Atom *atom) { return atom->name() == name1; });
+      [&name1](const Atom *atom) { return atom->name() == name1; });
   return it != d->atoms.cend() ? (*it)->find(name2, name3, name4) : nullptr;
 }
 
@@ -252,7 +252,7 @@ MP4::Atoms::path(const char *name1, const char *name2, const char *name3, const 
 {
   MP4::AtomList path;
   auto it = std::find_if(d->atoms.cbegin(), d->atoms.cend(),
-      [&name1](Atom *atom) { return atom->name() == name1; });
+      [&name1](const Atom *atom) { return atom->name() == name1; });
   if(it != d->atoms.cend()) {
     if(!(*it)->path(path, name2, name3, name4)) {
       path.clear();

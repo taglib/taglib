@@ -437,7 +437,7 @@ PropertyMap UserTextIdentificationFrame::asProperties() const
 }
 
 UserTextIdentificationFrame *UserTextIdentificationFrame::find(
-  ID3v2::Tag *tag, const String &description) // static
+  const ID3v2::Tag *tag, const String &description) // static
 {
   for(const auto &frame : std::as_const(tag->frameList("TXXX"))) {
     auto f = dynamic_cast<UserTextIdentificationFrame *>(frame);

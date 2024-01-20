@@ -69,7 +69,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MP4::Properties::Properties(File *file, MP4::Atoms *atoms, ReadStyle style) :
+MP4::Properties::Properties(File *file, const MP4::Atoms *atoms, ReadStyle style) :
   AudioProperties(style),
   d(std::make_unique<PropertiesPrivate>())
 {

@@ -354,7 +354,7 @@ TAGLIB_C_EXPORT void taglib_property_set_append(TagLib_File *file, const char *p
  * \return NULL terminated array of C-strings (char *), only NULL if empty.
  * It must be freed by the client using taglib_property_free().
  */
-TAGLIB_C_EXPORT char** taglib_property_keys(TagLib_File *file);
+TAGLIB_C_EXPORT char** taglib_property_keys(const TagLib_File *file);
 
 /*!
  * Get value(s) of property \a prop.
@@ -362,7 +362,7 @@ TAGLIB_C_EXPORT char** taglib_property_keys(TagLib_File *file);
  * \return NULL terminated array of C-strings (char *), only NULL if empty.
  * It must be freed by the client using taglib_property_free().
  */
-TAGLIB_C_EXPORT char** taglib_property_get(TagLib_File *file, const char *prop);
+TAGLIB_C_EXPORT char** taglib_property_get(const TagLib_File *file, const char *prop);
 
 /*!
  * Frees the NULL terminated array \a props and the C-strings it contains.
@@ -541,7 +541,7 @@ TAGLIB_C_EXPORT BOOL taglib_complex_property_set_append(
  * \return NULL terminated array of C-strings (char *), only NULL if empty.
  * It must be freed by the client using taglib_complex_property_free_keys().
  */
-TAGLIB_C_EXPORT char** taglib_complex_property_keys(TagLib_File *file);
+TAGLIB_C_EXPORT char** taglib_complex_property_keys(const TagLib_File *file);
 
 /*!
  * Get value(s) of complex property \a key.
@@ -551,7 +551,7 @@ TAGLIB_C_EXPORT char** taglib_complex_property_keys(TagLib_File *file);
  * It must be freed by the client using taglib_complex_property_free().
  */
 TAGLIB_C_EXPORT TagLib_Complex_Property_Attribute*** taglib_complex_property_get(
-  TagLib_File *file, const char *key);
+  const TagLib_File *file, const char *key);
 
 /*!
  * Extract the complex property values of a picture.
