@@ -41,6 +41,36 @@
 using namespace std;
 using namespace TagLib;
 
+namespace
+{
+
+  class CustomItemFactory : public MP4::ItemFactory {
+  public:
+    CustomItemFactory(const CustomItemFactory &) = delete;
+    CustomItemFactory &operator=(const CustomItemFactory &) = delete;
+    static CustomItemFactory *instance() { return &factory; }
+  protected:
+    CustomItemFactory() = default;
+    ~CustomItemFactory() = default;
+    NameHandlerMap nameHandlerMap() const override
+    {
+      return MP4::ItemFactory::nameHandlerMap()
+        .insert("tsti", ItemHandlerType::Int)
+        .insert("tstt", ItemHandlerType::Text);
+    }
+
+    Map<ByteVector, String> namePropertyMap() const override
+    {
+      return MP4::ItemFactory::namePropertyMap()
+        .insert("tsti", "TESTINTEGER");
+    }
+  private:
+    static CustomItemFactory factory;
+  };
+
+  CustomItemFactory CustomItemFactory::factory;
+}  // namespace
+
 class TestMP4 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMP4);
@@ -739,24 +769,6 @@ public:
 
   void testItemFactory()
   {
-    class CustomItemFactory : public MP4::ItemFactory {
-    protected:
-      NameHandlerMap nameHandlerMap() const override
-      {
-        return MP4::ItemFactory::nameHandlerMap()
-          .insert("tsti", ItemHandlerType::Int)
-          .insert("tstt", ItemHandlerType::Text);
-      }
-
-      Map<ByteVector, String> namePropertyMap() const override
-      {
-        return MP4::ItemFactory::namePropertyMap()
-          .insert("tsti", "TESTINTEGER");
-      }
-    };
-
-    CustomItemFactory factory;
-
     ScopedFileCopy copy("no-tags", ".m4a");
     {
       MP4::File f(copy.fileName().c_str());
@@ -784,7 +796,7 @@ public:
     }
     {
       MP4::File f(copy.fileName().c_str(),
-                  true, MP4::Properties::Average, &factory);
+                  true, MP4::Properties::Average, CustomItemFactory::instance());
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(!f.hasMP4Tag());
       MP4::Tag *tag = f.tag();
@@ -798,7 +810,7 @@ public:
     }
     {
       MP4::File f(copy.fileName().c_str(),
-                  true, MP4::Properties::Average, &factory);
+                  true, MP4::Properties::Average, CustomItemFactory::instance());
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(f.hasMP4Tag());
       MP4::Tag *tag = f.tag();
@@ -824,7 +836,7 @@ public:
     }
     {
       MP4::File f(copy.fileName().c_str(),
-                  true, MP4::Properties::Average, &factory);
+                  true, MP4::Properties::Average, CustomItemFactory::instance());
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(f.hasMP4Tag());
       MP4::Tag *tag = f.tag();

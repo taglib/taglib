@@ -85,6 +85,9 @@ namespace
   // Example for frame factory with support for CustomFrame.
   class CustomFrameFactory : public ID3v2::FrameFactory {
   public:
+    CustomFrameFactory(const CustomFrameFactory &) = delete;
+    CustomFrameFactory &operator=(const CustomFrameFactory &) = delete;
+    static CustomFrameFactory *instance() { return &factory; }
     ID3v2::Frame *createFrameForProperty(
         const String &key, const StringList &values) const override {
       if(key == "CUSTOM") {
@@ -94,6 +97,8 @@ namespace
     }
 
   protected:
+    CustomFrameFactory() = default;
+    ~CustomFrameFactory() = default;
     ID3v2::Frame *createFrame(const ByteVector &data, ID3v2::Frame::Header *header,
                         const ID3v2::Header *tagHeader) const override {
       if(header->frameID() == "CUST") {
@@ -101,8 +106,12 @@ namespace
       }
       return ID3v2::FrameFactory::createFrame(data, header, tagHeader);
     }
+
+  private:
+    static CustomFrameFactory factory;
   };
 
+  CustomFrameFactory CustomFrameFactory::factory;
 }  // namespace
 
 class TestId3v2FrameFactory : public CppUnit::TestFixture
@@ -127,8 +136,6 @@ public:
     function<ID3v2::Tag *(File &)> getID3v2Tag,
     function<bool(File &)> stripAllTags)
   {
-    CustomFrameFactory factory;
-
     {
       auto f = std::unique_ptr<File>(createFileWithDefaultFactory(fileName));
       CPPUNIT_ASSERT(f->isValid());
@@ -161,7 +168,7 @@ public:
       CPPUNIT_ASSERT(!dynamic_cast<CustomFrame *>(frames.front()));
     }
     {
-      auto f = std::unique_ptr<File>(createFileWithFactory(fileName, &factory));
+      auto f = std::unique_ptr<File>(createFileWithFactory(fileName, CustomFrameFactory::instance()));
       CPPUNIT_ASSERT(f->isValid());
       CPPUNIT_ASSERT(hasID3v2Tag(*f));
       ID3v2::Tag *tag = getID3v2Tag(*f);
@@ -180,7 +187,7 @@ public:
       stripAllTags(*f);
     }
     {
-      auto f = std::unique_ptr<File>(createFileWithFactory(fileName, &factory));
+      auto f = std::unique_ptr<File>(createFileWithFactory(fileName, CustomFrameFactory::instance()));
       CPPUNIT_ASSERT(f->isValid());
       CPPUNIT_ASSERT(!hasID3v2Tag(*f));
       ID3v2::Tag *tag = getID3v2Tag(*f);
@@ -191,7 +198,7 @@ public:
       f->save();
     }
     {
-      auto f = std::unique_ptr<File>(createFileWithFactory(fileName, &factory));
+      auto f = std::unique_ptr<File>(createFileWithFactory(fileName, CustomFrameFactory::instance()));
       CPPUNIT_ASSERT(f->isValid());
       CPPUNIT_ASSERT(hasID3v2Tag(*f));
       ID3v2::Tag *tag = getID3v2Tag(*f);
