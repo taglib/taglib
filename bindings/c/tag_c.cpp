@@ -431,14 +431,14 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
 
 }  // namespace
 
-void taglib_property_set(TagLib_File *f, const char *prop, const char *value)
+void taglib_property_set(TagLib_File *file, const char *prop, const char *value)
 {
-  _taglib_property_set(f, prop, value, false);
+  _taglib_property_set(file, prop, value, false);
 }
 
-void taglib_property_set_append(TagLib_File *f, const char *prop, const char *value)
+void taglib_property_set_append(TagLib_File *file, const char *prop, const char *value)
 {
-  _taglib_property_set(f, prop, value, true);
+  _taglib_property_set(file, prop, value, true);
 }
 
 char** taglib_property_keys(const TagLib_File *file)

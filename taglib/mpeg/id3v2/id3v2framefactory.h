@@ -73,10 +73,10 @@ namespace TagLib {
       static FrameFactory *instance();
 
       /*!
-       * Create a frame based on \a data.  \a tagHeader should be a valid
+       * Create a frame based on \a origData.  \a tagHeader should be a valid
        * ID3v2::Header instance.
        */
-      virtual Frame *createFrame(const ByteVector &data, const Header *tagHeader) const;
+      virtual Frame *createFrame(const ByteVector &origData, const Header *tagHeader) const;
 
       /*!
        * Creates a textual frame which corresponds to a single key in the

@@ -95,9 +95,9 @@ String OwnershipFrame::seller() const
   return d->seller;
 }
 
-void OwnershipFrame::setSeller(const String &s)
+void OwnershipFrame::setSeller(const String &seller)
 {
-  d->seller = s;
+  d->seller = seller;
 }
 
 String::Type OwnershipFrame::textEncoding() const
