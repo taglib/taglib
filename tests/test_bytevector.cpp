@@ -240,7 +240,7 @@ public:
 
   void testFloatingPointConversion()
   {
-    const double Tolerance = 1.0e-7;
+    constexpr double Tolerance = 1.0e-7;
 
     const ByteVector pi32le("\xdb\x0f\x49\x40", 4);
     CPPUNIT_ASSERT(std::abs(pi32le.toFloat32LE(0) - M_PI) < Tolerance);

@@ -36,7 +36,7 @@ namespace TagLib {
 
     class File;
 
-    static const unsigned int HeaderSize = 8 * 7;
+    static constexpr unsigned int HeaderSize = 8 * 7;
 
     //! An implementation of audio property reading for MPC
 

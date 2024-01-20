@@ -349,7 +349,7 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
     if(nextData.size() < 4)
       return;
 
-    const unsigned int HeaderMask = 0xfffe0c00;
+    constexpr unsigned int HeaderMask = 0xfffe0c00;
 
     const unsigned int header     = data.toUInt(0, true)     & HeaderMask;
     const unsigned int nextHeader = nextData.toUInt(0, true) & HeaderMask;

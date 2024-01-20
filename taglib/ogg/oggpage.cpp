@@ -267,7 +267,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
   // SplitSize must be a multiple of 255 in order to get the lacing values right
   // create pages of about 8KB each
 
-  static const unsigned int SplitSize = 32 * 255;
+  static constexpr unsigned int SplitSize = 32 * 255;
 
   // Force repagination if the segment table will exceed the size limit.
 

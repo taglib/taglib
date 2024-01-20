@@ -135,7 +135,7 @@ public:
 
   void testAudioPropertiesADTS()
   {
-    const std::array readStyles = {
+    constexpr std::array readStyles = {
       MPEG::Properties::Fast,
       MPEG::Properties::Average,
       MPEG::Properties::Accurate

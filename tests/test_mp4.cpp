@@ -636,9 +636,9 @@ public:
     const String testComment("Comment");
     const String testGenre("Genre");
     const String nullString;
-    const unsigned int testYear = 2020;
-    const unsigned int testTrack = 1;
-    const unsigned int zeroUInt = 0;
+    constexpr unsigned int testYear = 2020;
+    constexpr unsigned int testTrack = 1;
+    constexpr unsigned int zeroUInt = 0;
 
     tag->setTitle(testTitle);
     CPPUNIT_ASSERT_EQUAL(testTitle, tag->title());
