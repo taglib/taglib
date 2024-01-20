@@ -225,8 +225,8 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
       d->sampleRate = sftable[(flags >> 13) & 0x07];
       d->channels   = ((flags >> 4) & 0x0F) + 1;
 
-      const auto frameCount = d->sampleFrames - begSilence;
-      if(frameCount > 0 && d->sampleRate > 0) {
+      if(const auto frameCount = d->sampleFrames - begSilence;
+         frameCount > 0 && d->sampleRate > 0) {
         const double length = frameCount * 1000.0 / d->sampleRate;
         d->length  = static_cast<int>(length + 0.5);
         d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
@@ -243,8 +243,7 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
 
       readRG = true;
 
-      const int replayGainVersion = data[0];
-      if(replayGainVersion == 1) {
+      if(const int replayGainVersion = data[0]; replayGainVersion == 1) {
         d->trackGain = data.toShort(1, true);
         d->trackPeak = data.toShort(3, true);
         d->albumGain = data.toShort(5, true);

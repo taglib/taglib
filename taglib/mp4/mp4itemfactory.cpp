@@ -189,8 +189,7 @@ std::pair<ByteVector, Item> ItemFactory::itemFromProperty(
 std::pair<String, StringList> ItemFactory::itemToProperty(
   const ByteVector &itemName, const Item &item) const
 {
-  const String key = propertyKeyForName(itemName);
-  if(!key.isEmpty()) {
+  if(const String key = propertyKeyForName(itemName); !key.isEmpty()) {
     auto handlerType = itemName.startsWith("----")
       ? ItemHandlerType::FreeForm
       : handlerTypeForName(itemName);
@@ -458,8 +457,7 @@ std::pair<String, Item> ItemFactory::parseInt(
 std::pair<String, Item> ItemFactory::parseTextOrInt(
   const MP4::Atom *atom, const ByteVector &bytes)
 {
-  AtomDataList data = parseData2(atom, bytes);
-  if(!data.isEmpty()) {
+  if(AtomDataList data = parseData2(atom, bytes); !data.isEmpty()) {
     AtomData val = data[0];
     return {
       atom->name(),
@@ -503,8 +501,7 @@ std::pair<String, Item> ItemFactory::parseByte(
 std::pair<String, Item> ItemFactory::parseGnre(
   const MP4::Atom *atom, const ByteVector &bytes)
 {
-  ByteVectorList data = parseData(atom, bytes);
-  if(!data.isEmpty()) {
+  if(ByteVectorList data = parseData(atom, bytes); !data.isEmpty()) {
     int idx = static_cast<int>(data[0].toShort());
     if(idx > 0) {
       return {
@@ -519,8 +516,7 @@ std::pair<String, Item> ItemFactory::parseGnre(
 std::pair<String, Item> ItemFactory::parseIntPair(
   const MP4::Atom *atom, const ByteVector &bytes)
 {
-  ByteVectorList data = parseData(atom, bytes);
-  if(!data.isEmpty()) {
+  if(ByteVectorList data = parseData(atom, bytes); !data.isEmpty()) {
     const int a = data[0].toShort(2U);
     const int b = data[0].toShort(4U);
     return {atom->name(), Item(a, b)};
@@ -531,8 +527,7 @@ std::pair<String, Item> ItemFactory::parseIntPair(
 std::pair<String, Item> ItemFactory::parseBool(
   const MP4::Atom *atom, const ByteVector &bytes)
 {
-  ByteVectorList data = parseData(atom, bytes);
-  if(!data.isEmpty()) {
+  if(ByteVectorList data = parseData(atom, bytes); !data.isEmpty()) {
     bool value = !data[0].isEmpty() && data[0][0] != '\0';
     return {atom->name(), Item(value)};
   }
@@ -542,8 +537,8 @@ std::pair<String, Item> ItemFactory::parseBool(
 std::pair<String, Item> ItemFactory::parseText(
   const MP4::Atom *atom, const ByteVector &bytes, int expectedFlags)
 {
-  const ByteVectorList data = parseData(atom, bytes, expectedFlags);
-  if(!data.isEmpty()) {
+  if(const ByteVectorList data = parseData(atom, bytes, expectedFlags);
+     !data.isEmpty()) {
     StringList value;
     for(const auto &byte : data) {
       value.append(String(byte, String::UTF8));
@@ -556,8 +551,8 @@ std::pair<String, Item> ItemFactory::parseText(
 std::pair<String, Item> ItemFactory::parseFreeForm(
   const MP4::Atom *atom, const ByteVector &bytes)
 {
-  const AtomDataList data = parseData2(atom, bytes, -1, true);
-  if(data.size() > 2) {
+  if(const AtomDataList data = parseData2(atom, bytes, -1, true);
+     data.size() > 2) {
     auto itBegin = data.begin();
 
     String name = "----:";

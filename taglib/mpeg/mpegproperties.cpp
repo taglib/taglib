@@ -229,15 +229,15 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
 
       // Look for the last MPEG audio frame to calculate the stream length.
 
-      const offset_t lastFrameOffset = file->lastFrameOffset();
-      if(lastFrameOffset < 0) {
+      if(const offset_t lastFrameOffset = file->lastFrameOffset();
+         lastFrameOffset < 0) {
         debug("MPEG::Properties::read() -- Could not find an MPEG frame in the stream.");
       }
       else
       {
         const Header lastHeader(file, lastFrameOffset, false);
-        const offset_t streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
-        if (streamLength > 0)
+        if(const offset_t streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
+           streamLength > 0)
           d->length = static_cast<int>(streamLength * 8.0 / d->bitrate + 0.5);
       }
     }

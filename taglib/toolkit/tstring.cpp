@@ -105,8 +105,7 @@ namespace
         return;
       }
 
-      const unsigned short bom = nextUTF16(&s);
-      if(bom == 0xfeff)
+      if(const unsigned short bom = nextUTF16(&s); bom == 0xfeff)
         swap = false; // Same as CPU endian. No need to swap bytes.
       else if(bom == 0xfffe)
         swap = true;  // Not same as CPU endian. Need to swap bytes.

@@ -73,8 +73,8 @@ MP4::Atom::Atom(File *file)
   }
   else if(d->length == 1) {
     // The atom has a 64-bit length.
-    const long long longLength = file->readBlock(8).toLongLong();
-    if(longLength <= LONG_MAX) {
+    if(const long long longLength = file->readBlock(8).toLongLong();
+       longLength <= LONG_MAX) {
       // The actual length fits in long. That's always the case if long is 64-bit.
       d->length = static_cast<long>(longLength);
     }
@@ -95,8 +95,7 @@ MP4::Atom::Atom(File *file)
 
   d->name = header.mid(4, 4);
   for(int i = 0; i < 4; ++i) {
-    const char ch = d->name.at(i);
-    if((ch < ' ' || ch > '~') && ch != '\251') {
+    if(const char ch = d->name.at(i); (ch < ' ' || ch > '~') && ch != '\251') {
       debug("MP4: Invalid atom type");
       d->length = 0;
       file->seek(0, File::End);

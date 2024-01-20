@@ -138,9 +138,7 @@ void Opus::Properties::read(File *file)
     const long long end   = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0) {
-      const long long frameCount = (end - start - preSkip);
-
-      if(frameCount > 0) {
+      if(const long long frameCount = (end - start - preSkip); frameCount > 0) {
         const double length = frameCount * 1000.0 / 48000.0;
         offset_t fileLengthWithoutOverhead = file->length();
         // Ignore the two mandatory header packets, see "3. Packet Organization"

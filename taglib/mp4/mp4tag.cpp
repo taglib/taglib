@@ -74,8 +74,8 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
   for(const auto &atom : ilst->children()) {
     file->seek(atom->offset() + 8);
     ByteVector data = d->file->readBlock(atom->length() - 8);
-    const auto &[name, itm] = d->factory->parseItem(atom, data);
-    if (itm.isValid()) {
+    if(const auto &[name, itm] = d->factory->parseItem(atom, data);
+       itm.isValid()) {
       addItem(name, itm);
     }
   }
@@ -214,8 +214,8 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
       }
       d->file->seek(atom->offset() + 9);
       ByteVector data = d->file->readBlock(atom->length() - 9);
-      const unsigned int flags = data.toUInt(0, 3, true);
-      if(flags & 1) {
+      if(const unsigned int flags = data.toUInt(0, 3, true);
+         flags & 1) {
         long long o = data.toLongLong(7U);
         if(o > offset) {
           o += delta;
@@ -268,8 +268,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   // check if there is an atom before 'ilst', and possibly use it as padding
   if(index != meta->children().cbegin()) {
     auto prevIndex = std::prev(index);
-    const MP4::Atom *prev = *prevIndex;
-    if(prev->name() == "free") {
+    if(const MP4::Atom *prev = *prevIndex; prev->name() == "free") {
       offset = prev->offset();
       length += prev->length();
     }
@@ -277,8 +276,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   // check if there is an atom after 'ilst', and possibly use it as padding
   auto nextIndex = std::next(index);
   if(nextIndex != meta->children().cend()) {
-    const MP4::Atom *next = *nextIndex;
-    if(next->name() == "free") {
+    if(const MP4::Atom *next = *nextIndex; next->name() == "free") {
       length += next->length();
     }
   }
@@ -303,8 +301,7 @@ MP4::Tag::saveExisting(ByteVector data, const AtomList &path)
   }
   else {
     // Strip meta if data is empty, only the case when called from strip().
-    MP4::Atom *udta = *std::prev(it);
-    if(udta->removeChild(meta)) {
+    if(MP4::Atom *udta = *std::prev(it); udta->removeChild(meta)) {
       offset = meta->offset();
       delta = - meta->length();
       d->file->removeBlock(meta->offset(), meta->length());
@@ -470,8 +467,8 @@ PropertyMap MP4::Tag::properties() const
 {
   PropertyMap props;
   for(const auto &[k, t] : std::as_const(d->items)) {
-    auto [key, val] = d->factory->itemToProperty(k.data(String::Latin1), t);
-    if(!key.isEmpty()) {
+    if(auto [key, val] = d->factory->itemToProperty(k.data(String::Latin1), t);
+       !key.isEmpty()) {
       props[key] = val;
     }
     else {
@@ -498,8 +495,8 @@ PropertyMap MP4::Tag::setProperties(const PropertyMap &props)
 
   PropertyMap ignoredProps;
   for(const auto &[prop, val] : props) {
-    auto [name, itm] = d->factory->itemFromProperty(prop, val);
-    if(itm.isValid()) {
+    if(auto [name, itm] = d->factory->itemFromProperty(prop, val);
+       itm.isValid()) {
       d->items[name] = itm;
     }
     else {
@@ -522,8 +519,7 @@ StringList MP4::Tag::complexPropertyKeys() const
 List<VariantMap> MP4::Tag::complexProperties(const String &key) const
 {
   List<VariantMap> props;
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     const CoverArtList pictures = d->items.value("covr").toCoverArtList();
     for(const CoverArt &picture : pictures) {
       String mimeType = "image/";
@@ -555,8 +551,7 @@ List<VariantMap> MP4::Tag::complexProperties(const String &key) const
 
 bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     CoverArtList pictures;
     for(const auto &property : value) {
       auto mimeType = property.value("mimeType").value<String>();

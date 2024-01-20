@@ -247,8 +247,7 @@ StringList Ogg::XiphComment::complexPropertyKeys() const
 List<VariantMap> Ogg::XiphComment::complexProperties(const String &key) const
 {
   List<VariantMap> props;
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     for(const FLAC::Picture *picture : std::as_const(d->pictureList)) {
       VariantMap property;
       property.insert("data", picture->data());
@@ -268,8 +267,7 @@ List<VariantMap> Ogg::XiphComment::complexProperties(const String &key) const
 
 bool Ogg::XiphComment::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     removeAllPictures();
 
     for(const auto &property : value) {
@@ -495,8 +493,7 @@ void Ogg::XiphComment::parse(const ByteVector &data)
 
         // Decode FLAC Picture
 
-        auto picture = new FLAC::Picture();
-        if(picture->parse(picturedata)) {
+        if(auto picture = new FLAC::Picture(); picture->parse(picturedata)) {
           d->pictureList.append(picture);
         }
         else {

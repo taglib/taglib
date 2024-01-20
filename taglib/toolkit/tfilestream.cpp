@@ -203,8 +203,8 @@ ByteVector FileStream::readBlock(size_t length)
     return ByteVector();
 
   if(length > bufferSize()) {
-    const auto streamLength = static_cast<size_t>(FileStream::length());
-    if(length > streamLength) {
+    if(const auto streamLength = static_cast<size_t>(FileStream::length());
+       length > streamLength) {
       length = streamLength;
     }
   }
@@ -491,8 +491,7 @@ void FileStream::truncate(offset_t length)
 #else
 
   fflush(d->file);
-  const int error = ftruncate(fileno(d->file), length);
-  if(error != 0)
+  if(const int error = ftruncate(fileno(d->file), length); error != 0)
     debug("FileStream::truncate() -- Couldn't truncate the file.");
 
 #endif

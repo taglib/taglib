@@ -200,8 +200,7 @@ PropertyMap RIFF::Info::Tag::properties() const
 {
   PropertyMap props;
   for(const auto &[id, val] : std::as_const(d->fieldListMap)) {
-    String key = propertyKeyForId.value(id);
-    if(!key.isEmpty()) {
+    if(String key = propertyKeyForId.value(id); !key.isEmpty()) {
       props[key].append(val);
     }
     else {
@@ -235,8 +234,8 @@ PropertyMap RIFF::Info::Tag::setProperties(const PropertyMap &props)
 
   PropertyMap ignoredProps;
   for(const auto &[key, val] : props) {
-    ByteVector id = idForPropertyKey.value(key);
-    if(!id.isEmpty() && !val.isEmpty()) {
+    if(ByteVector id = idForPropertyKey.value(key);
+       !id.isEmpty() && !val.isEmpty()) {
       d->fieldListMap[id] = val.front();
     }
     else {
@@ -319,8 +318,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
     if(size > data.size() - p - 8)
       break;
 
-    const ByteVector id = data.mid(p, 4);
-    if(isValidChunkName(id)) {
+    if(const ByteVector id = data.mid(p, 4); isValidChunkName(id)) {
       const String text = stringHandler->parse(data.mid(p + 8, size));
       d->fieldListMap[id] = text;
     }

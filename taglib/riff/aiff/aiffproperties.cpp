@@ -112,8 +112,7 @@ void RIFF::AIFF::Properties::read(File *file)
   ByteVector data;
   unsigned int streamLength = 0;
   for(unsigned int i = 0; i < file->chunkCount(); i++) {
-    const ByteVector name = file->chunkName(i);
-    if(name == "COMM") {
+    if(const ByteVector name = file->chunkName(i); name == "COMM") {
       if(data.isEmpty())
         data = file->chunkData(i);
       else

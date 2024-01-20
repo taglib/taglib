@@ -191,8 +191,8 @@ namespace
       // if we got DSD block, return the specified rate shift amount
 
       if(id == ID_DSD_BLOCK && (metaId & ID_UNIQUE) == ID_DSD_BLOCK && metaBc > 0) {
-        const auto rateShift = static_cast<unsigned char>(block[index]);
-        if(rateShift <= 31)
+        if(const auto rateShift = static_cast<unsigned char>(block[index]);
+           rateShift <= 31)
           return rateShift;
       }
 

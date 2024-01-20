@@ -468,8 +468,7 @@ bool XM::File::save()
     for(unsigned short j = 0; j < sampleCount; ++ j) {
       if(sampleHeaderSize > 4U) {
         seek(pos);
-        unsigned long sampleLength = 0;
-        if(!readU32L(sampleLength))
+        if(unsigned long sampleLength = 0; !readU32L(sampleLength))
           return false;
 
         if(sampleHeaderSize > 18U) {

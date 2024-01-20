@@ -231,9 +231,7 @@ void ID3v2::Tag::setComment(const String &s)
     return;
   }
 
-  const FrameList &comments = d->frameListMap["COMM"];
-
-  if(!comments.isEmpty()) {
+  if(const FrameList &comments = d->frameListMap["COMM"]; !comments.isEmpty()) {
     for(const auto &commFrame : comments) {
       auto frame = dynamic_cast<CommentsFrame *>(commFrame);
       if(frame && frame->description().isEmpty()) {
@@ -464,8 +462,7 @@ StringList ID3v2::Tag::complexPropertyKeys() const
 List<VariantMap> ID3v2::Tag::complexProperties(const String &key) const
 {
   List<VariantMap> props;
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     const FrameList pictures = d->frameListMap.value("APIC");
     for(const Frame *frame : pictures) {
       if(auto picture = dynamic_cast<const AttachedPictureFrame *>(frame)) {
@@ -497,8 +494,7 @@ List<VariantMap> ID3v2::Tag::complexProperties(const String &key) const
 
 bool ID3v2::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
-  const String uppercaseKey = key.upper();
-  if(uppercaseKey == "PICTURE") {
+  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
     removeFrames("APIC");
 
     for(const auto &property : value) {
@@ -590,8 +586,7 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   }
 
   if(frameTDRC) {
-    String content = frameTDRC->toString();
-    if(content.size() >= 4) {
+    if(String content = frameTDRC->toString(); content.size() >= 4) {
       auto frameTYER = new ID3v2::TextIdentificationFrame("TYER", String::Latin1);
       frameTYER->setText(content.substr(0, 4));
       frames->append(frameTYER);
@@ -647,8 +642,8 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     // genre number exists can be finally added as a refinement.
     for(const auto &genre : genres) {
       bool ok = false;
-      int number = genre.toInt(&ok);
-      if((ok && number >= 0 && number <= 255) || genre == "RX" || genre == "CR")
+      if(int number = genre.toInt(&ok);
+         (ok && number >= 0 && number <= 255) || genre == "RX" || genre == "CR")
         combined += '(' + genre + ')';
       else if(hasMultipleGenres && (number = ID3v1::genreIndex(genre)) != 255)
         combined += '(' + String::number(number) + ')';

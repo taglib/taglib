@@ -269,10 +269,9 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
 
   // Renumber the following pages if the pages have been split or merged.
 
-  const int numberOfNewPages
-    = pages.back()->pageSequenceNumber() - lastPage->pageSequenceNumber();
-
-  if(numberOfNewPages != 0) {
+  if(const int numberOfNewPages
+      = pages.back()->pageSequenceNumber() - lastPage->pageSequenceNumber();
+     numberOfNewPages != 0) {
     offset_t pageOffset = originalOffset + data.size();
 
     while(true) {
