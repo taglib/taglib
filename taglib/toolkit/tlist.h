@@ -30,8 +30,6 @@
 #include <initializer_list>
 #include <memory>
 
-#include "taglib.h"
-
 namespace TagLib {
 
   //! A generic, implicitly shared list.

@@ -31,8 +31,6 @@
 #include <initializer_list>
 #include <utility>
 
-#include "taglib.h"
-
 namespace TagLib {
 
   //! A generic, implicitly shared map.

@@ -28,7 +28,6 @@
 
 #include "tag.h"
 #include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "oggfile.h"
 #include "vorbisfile.h"

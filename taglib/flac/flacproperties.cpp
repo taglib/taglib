@@ -28,8 +28,6 @@
 #include "tstring.h"
 #include "tdebug.h"
 
-#include "flacfile.h"
-
 using namespace TagLib;
 
 class FLAC::Properties::PropertiesPrivate

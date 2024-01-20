@@ -43,8 +43,6 @@
 # define W_OK 2
 #endif
 
-#include "wavpackfile.h"
-
 using namespace TagLib;
 
 class File::FilePrivate

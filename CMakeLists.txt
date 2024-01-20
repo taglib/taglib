@@ -148,8 +148,6 @@ if(TRACE_IN_RELEASE)
   set(TRACE_IN_RELEASE TRUE)
 endif()
 
-configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h")
-
 find_package(utf8cpp QUIET)
 if(NOT utf8cpp_FOUND)
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/utfcpp/CMakeLists.txt)

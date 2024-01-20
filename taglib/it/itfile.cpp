@@ -27,7 +27,6 @@
 
 #include "tstringlist.h"
 #include "tdebug.h"
-#include "tpropertymap.h"
 #include "modfileprivate.h"
 
 using namespace TagLib;

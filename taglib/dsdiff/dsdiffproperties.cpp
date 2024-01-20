@@ -26,7 +26,6 @@
 #include "dsdiffproperties.h"
 
 #include "tstring.h"
-#include "tdebug.h"
 
 using namespace TagLib;
 

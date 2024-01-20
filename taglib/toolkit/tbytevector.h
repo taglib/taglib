@@ -26,7 +26,6 @@
 #ifndef TAGLIB_BYTEVECTOR_H
 #define TAGLIB_BYTEVECTOR_H
 
-#include <iostream>
 #include <memory>
 #include <vector>
 

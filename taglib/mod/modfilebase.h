@@ -28,11 +28,8 @@
 
 #include "taglib.h"
 #include "tfile.h"
-#include "tstring.h"
 #include "tlist.h"
 #include "taglib_export.h"
-
-#include <algorithm>
 
 namespace TagLib {
   namespace Mod {

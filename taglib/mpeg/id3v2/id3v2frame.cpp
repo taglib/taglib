@@ -35,12 +35,7 @@
 #include "id3v2tag.h"
 #include "id3v2synchdata.h"
 #include "frames/textidentificationframe.h"
-#include "frames/urllinkframe.h"
-#include "frames/unsynchronizedlyricsframe.h"
-#include "frames/commentsframe.h"
-#include "frames/uniquefileidentifierframe.h"
 #include "frames/unknownframe.h"
-#include "frames/podcastframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;

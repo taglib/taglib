@@ -27,7 +27,6 @@
 #include <cstdio>
 
 #include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "tpropertymap.h"
 #include "tag.h"
 #include "flacfile.h"
