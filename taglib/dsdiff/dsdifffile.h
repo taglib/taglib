@@ -228,9 +228,6 @@ namespace TagLib {
     protected:
       enum Endianness { BigEndian, LittleEndian };
 
-      File(FileName file, Endianness endianness);
-      File(IOStream *stream, Endianness endianness);
-
     private:
       void removeRootChunk(const ByteVector &id);
       void removeRootChunk(unsigned int i);

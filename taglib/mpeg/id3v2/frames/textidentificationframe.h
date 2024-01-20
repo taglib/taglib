@@ -314,7 +314,6 @@ namespace TagLib {
 
     private:
       UserTextIdentificationFrame(const ByteVector &data, Header *h);
-      UserTextIdentificationFrame(const TextIdentificationFrame &);
 
       void checkFields();
 
