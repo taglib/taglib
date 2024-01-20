@@ -125,7 +125,7 @@ MP4::Properties::codec() const
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-MP4::Properties::read(File *file, Atoms *atoms)
+MP4::Properties::read(File *file, const Atoms *atoms)
 {
   MP4::Atom *moov = atoms->find("moov");
   if(!moov) {
