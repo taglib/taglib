@@ -27,7 +27,7 @@ These are the most important build options. For details, have a look into the
 CMakeLists.txt file.
 
 | Option                  | Description                                        |
-| ----------------------- | -------------------------------------------------- |
+|-------------------------|----------------------------------------------------|
 | `BUILD_SHARED_LIBS`     | Build shared libraries                             |
 | `CMAKE_BUILD_TYPE`      | Debug, Release, RelWithDebInfo, MinSizeRel         |
 | `BUILD_EXAMPLES`        | Build examples                                     |
