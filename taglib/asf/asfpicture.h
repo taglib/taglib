@@ -30,7 +30,6 @@
 #include "tbytevector.h"
 #include "tpicturetype.h"
 #include "taglib_export.h"
-#include "attachedpictureframe.h"
 
 namespace TagLib
 {

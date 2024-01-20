@@ -27,9 +27,7 @@
 #include <cstdio>
 
 #include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "tpropertymap.h"
-#include "tdebug.h"
 #include "tag.h"
 #include "apefile.h"
 #include "apetag.h"

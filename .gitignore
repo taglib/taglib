@@ -22,7 +22,6 @@ CMakeLists.txt.user*
 /tests/test_runner
 /tests/Testing
 /taglib/libtag.a
-/taglib_config.h
 /taglib-config
 /bindings/c/libtag_c.a
 /bindings/c/taglib_c.pc

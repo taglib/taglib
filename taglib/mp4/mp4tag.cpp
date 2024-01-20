@@ -25,7 +25,6 @@
 
 #include "mp4tag.h"
 
-#include <array>
 #include <utility>
 
 #include "tdebug.h"

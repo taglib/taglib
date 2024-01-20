@@ -28,8 +28,6 @@
 #ifndef TAGLIB_MP4ATOM_H
 #define TAGLIB_MP4ATOM_H
 
-#include <array>
-
 #include "tfile.h"
 #include "tlist.h"
 

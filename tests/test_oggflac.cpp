@@ -27,7 +27,6 @@
 #include <cstdio>
 
 #include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "tag.h"
 #include "oggfile.h"
 #include "oggflacfile.h"

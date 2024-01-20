@@ -28,7 +28,6 @@
 
 #include "tmap.h"
 #include "tstring.h"
-#include "tstringlist.h"
 #include "tbytevector.h"
 #include "taglib_export.h"
 #include "tag.h"

@@ -26,7 +26,6 @@
 #ifndef TAGLIB_FLACMETADATABLOCK_H
 #define TAGLIB_FLACMETADATABLOCK_H
 
-#include "tlist.h"
 #include "tbytevector.h"
 #include "taglib_export.h"
 

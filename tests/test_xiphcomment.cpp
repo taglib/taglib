@@ -27,7 +27,6 @@
 #include <cstdio>
 
 #include "tpropertymap.h"
-#include "tdebug.h"
 #include "xiphcomment.h"
 #include "vorbisfile.h"
 #include <cppunit/extensions/HelperMacros.h>

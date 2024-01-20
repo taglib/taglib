@@ -30,7 +30,6 @@
 # include "config.h"
 #endif
 #include "tstringlist.h"
-#include "tbytevectorlist.h"
 #include "tbytevectorstream.h"
 #include "tiostream.h"
 #include "tfile.h"

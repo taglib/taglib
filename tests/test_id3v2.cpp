@@ -27,7 +27,6 @@
 #include <utility>
 #include <cassert>
 
-#include "tdebug.h"
 #include "tpropertymap.h"
 #include "tzlib.h"
 #include "id3v2tag.h"

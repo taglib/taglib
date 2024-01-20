@@ -26,7 +26,6 @@
 #ifndef TAGLIB_MP4TAG_H
 #define TAGLIB_MP4TAG_H
 
-#include "tbytevectorlist.h"
 #include "tfile.h"
 #include "tmap.h"
 #include "tstringlist.h"

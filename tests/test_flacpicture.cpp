@@ -30,7 +30,6 @@
 #include "tbytevectorlist.h"
 #include "tag.h"
 #include "flacfile.h"
-#include "flacmetadatablock.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

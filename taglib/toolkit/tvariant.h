@@ -26,9 +26,6 @@
 #ifndef TAGLIB_VARIANT_H
 #define TAGLIB_VARIANT_H
 
-#include <memory.h>
-#include <iostream>
-
 #include "tlist.h"
 #include "tmap.h"
 #include "taglib_export.h"
