@@ -255,7 +255,7 @@ PropertyMap APE::Tag::setProperties(const PropertyMap &origProps)
   for(const auto &[tagName, val] : std::as_const(props)) {
     if(!checkKey(tagName))
       invalid.insert(tagName, val);
-    else if(!(itemListMap().contains(tagName)) || !(itemListMap()[tagName].values() == val)) {
+    else if(!itemListMap().contains(tagName) || itemListMap()[tagName].values() != val) {
       if(val.isEmpty())
         removeItem(tagName);
       else {

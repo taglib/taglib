@@ -72,7 +72,7 @@ namespace
         bool ok;
         int number = genreCode.toInt(&ok);
         if((ok && number >= 0 && number <= 255 &&
-            !(ID3v1::genre(number) == s)) ||
+            ID3v1::genre(number) != s) ||
            genreCode == "RX" || genreCode == "CR")
           newfields.append(genreCode);
       }
