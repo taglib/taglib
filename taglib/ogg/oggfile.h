@@ -23,12 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifndef TAGLIB_OGGFILE_H
+#define TAGLIB_OGGFILE_H
+
 #include "tfile.h"
 #include "tbytevectorlist.h"
 #include "taglib_export.h"
-
-#ifndef TAGLIB_OGGFILE_H
-#define TAGLIB_OGGFILE_H
 
 namespace TagLib {
 
