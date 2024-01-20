@@ -47,8 +47,8 @@ using namespace APE;
 
 namespace
 {
-  const unsigned int MinKeyLength = 2;
-  const unsigned int MaxKeyLength = 255;
+  constexpr unsigned int MinKeyLength = 2;
+  constexpr unsigned int MaxKeyLength = 255;
 
   const String FRONT_COVER("COVER ART (FRONT)");
   const String BACK_COVER("COVER ART (BACK)");

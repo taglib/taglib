@@ -45,10 +45,10 @@ namespace
 {
   enum { FlacXiphIndex = 0, FlacID3v2Index = 1, FlacID3v1Index = 2 };
 
-  const long MinPaddingLength = 4096;
-  const long MaxPaddingLegnth = 1024 * 1024;
+  constexpr long MinPaddingLength = 4096;
+  constexpr long MaxPaddingLegnth = 1024 * 1024;
 
-  const char LastBlockFlag = '\x80';
+  constexpr char LastBlockFlag = '\x80';
 }  // namespace
 
 class FLAC::File::FilePrivate

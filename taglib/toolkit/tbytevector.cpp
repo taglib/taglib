@@ -827,7 +827,7 @@ void ByteVector::swap(ByteVector &v) noexcept
 
 ByteVector ByteVector::toHex() const
 {
-  static const char hexTable[17] = "0123456789abcdef";
+  static constexpr char hexTable[17] = "0123456789abcdef";
 
   ByteVector encoded(size() * 2);
   char *p = encoded.data();
@@ -925,7 +925,7 @@ ByteVector ByteVector::fromBase64(const ByteVector & input)
 
 ByteVector ByteVector::toBase64() const
 {
-  static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   if(!isEmpty()) {
     unsigned int len = size();
     ByteVector output(4 * ((len - 1) / 3 + 1)); // note roundup

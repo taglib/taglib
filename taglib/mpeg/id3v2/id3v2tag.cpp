@@ -54,8 +54,8 @@ namespace
   const ID3v2::Latin1StringHandler defaultStringHandler;
   const ID3v2::Latin1StringHandler *stringHandler = &defaultStringHandler;
 
-  const long MinPaddingSize = 1024;
-  const long MaxPaddingSize = 1024 * 1024;
+  constexpr long MinPaddingSize = 1024;
+  constexpr long MaxPaddingSize = 1024 * 1024;
 }  // namespace
 
 class ID3v2::Tag::TagPrivate
