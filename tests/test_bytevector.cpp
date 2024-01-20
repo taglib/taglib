@@ -405,8 +405,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(ByteVector("taglib"), v1);
     CPPUNIT_ASSERT_EQUAL(ByteVector("tAglIb"), v2);
 
-    ByteVector v3;
-    v3 = ByteVector("0123456789").mid(3, 4);
+    ByteVector v3 = ByteVector("0123456789").mid(3, 4);
 
     it1 = v3.begin();
     it2 = v3.end() - 1;
