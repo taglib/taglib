@@ -148,9 +148,8 @@ template <class T>
 ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 {
   const bool isBigEndian = (Utils::systemByteOrder() == Utils::BigEndian);
-  const bool swap = (mostSignificantByteFirst != isBigEndian);
 
-  if(swap)
+  if(mostSignificantByteFirst != isBigEndian)
     value = Utils::byteSwap(value);
 
   return ByteVector(reinterpret_cast<const char *>(&value), sizeof(T));

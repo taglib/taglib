@@ -303,8 +303,7 @@ void MPC::Properties::readSV7(const ByteVector &data, offset_t streamLength)
     if (d->albumPeak != 0)
       d->albumPeak = static_cast<int>(log10(static_cast<double>(d->albumPeak)) * 20 * 256 + .5);
 
-    bool trueGapless = (gapless >> 31) & 0x0001;
-    if(trueGapless) {
+    if((gapless >> 31) & 0x0001) {
       unsigned int lastFrameSamples = (gapless >> 20) & 0x07FF;
       d->sampleFrames = d->totalFrames * 1152 - lastFrameSamples;
     }

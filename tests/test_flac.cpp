@@ -445,24 +445,20 @@ public:
   void testSaveID3v1()
   {
     ScopedFileCopy copy("no-tags", ".flac");
+    FLAC::File f(copy.fileName().c_str());
+    CPPUNIT_ASSERT(!f.hasID3v1Tag());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4692), f.length());
 
-    ByteVector audioStream;
-    {
-      FLAC::File f(copy.fileName().c_str());
-      CPPUNIT_ASSERT(!f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4692), f.length());
+    f.seek(0x0100);
+    ByteVector audioStream = f.readBlock(4436);
 
-      f.seek(0x0100);
-      audioStream = f.readBlock(4436);
+    f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+    f.save();
+    CPPUNIT_ASSERT(f.hasID3v1Tag());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4820), f.length());
 
-      f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
-      f.save();
-      CPPUNIT_ASSERT(f.hasID3v1Tag());
-      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(4820), f.length());
-
-      f.seek(0x0100);
-      CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
-    }
+    f.seek(0x0100);
+    CPPUNIT_ASSERT_EQUAL(audioStream, f.readBlock(4436));
   }
 
   void testUpdateID3v2()

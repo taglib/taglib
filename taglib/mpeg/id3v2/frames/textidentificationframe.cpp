@@ -173,9 +173,9 @@ PropertyMap TextIdentificationFrame::asProperties() const
     return makeTIPLProperties();
   if(frameID() == "TMCL")
     return makeTMCLProperties();
-  PropertyMap map;
   String tagName = frameIDToKey(frameID());
   if(tagName.isEmpty()) {
+    PropertyMap map;
     map.addUnsupportedData(frameID());
     return map;
   }
