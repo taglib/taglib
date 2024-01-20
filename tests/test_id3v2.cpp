@@ -293,13 +293,13 @@ public:
   void testParseAPICv22()
   {
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("PIC"
-                                 "\x00\x00\x08"
-                                 "\x00"
-                                 "JPG"
-                                 "\x01"
-                                 "d\x00"
-                                 "\x00", 14);
+    auto data = ByteVector("PIC"
+                           "\x00\x00\x08"
+                           "\x00"
+                           "JPG"
+                           "\x01"
+                           "d\x00"
+                           "\x00", 14);
     ID3v2::Header header;
     header.setMajorVersion(2);
     auto frame =
@@ -337,13 +337,13 @@ public:
   void testDontRender22()
   {
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("FOO"
-                                 "\x00\x00\x08"
-                                 "\x00"
-                                 "JPG"
-                                 "\x01"
-                                 "d\x00"
-                                 "\x00", 14);
+    auto data = ByteVector("FOO"
+                           "\x00\x00\x08"
+                           "\x00"
+                           "JPG"
+                           "\x01"
+                           "d\x00"
+                           "\x00", 14);
     ID3v2::Header header;
     header.setMajorVersion(2);
     auto frame =
@@ -798,10 +798,10 @@ public:
   void testParsePodcastFrame()
   {
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("PCST"
-                                 "\x00\x00\x00\x04"
-                                 "\x00\x00"
-                                 "\x00\x00\x00\x00", 14);
+    auto data = ByteVector("PCST"
+                           "\x00\x00\x00\x04"
+                           "\x00\x00"
+                           "\x00\x00\x00\x00", 14);
     const ID3v2::Header header;
     ID3v2::Frame *frame = factory->createFrame(data, &header);
     CPPUNIT_ASSERT(dynamic_cast<ID3v2::PodcastFrame *>(frame));
@@ -921,11 +921,11 @@ public:
   {
     // "Refinement" is the same as the ID3v1 genre - duplicate
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("TCON"                 // Frame ID
-                                 "\x00\x00\x00\x10"     // Frame size
-                                 "\x00\x00"             // Frame flags
-                                 "\x00"                 // Encoding
-                                 "(22)Death Metal", 26);     // Text
+    auto data = ByteVector("TCON"                 // Frame ID
+                           "\x00\x00\x00\x10"     // Frame size
+                           "\x00\x00"             // Frame flags
+                           "\x00"                 // Encoding
+                           "(22)Death Metal", 26);     // Text
     ID3v2::Header header;
     header.setMajorVersion(3);
     auto frame =
@@ -942,11 +942,11 @@ public:
   {
     // "Refinement" is different from the ID3v1 genre
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("TCON"                 // Frame ID
-                                 "\x00\x00\x00\x0d"     // Frame size
-                                 "\x00\x00"             // Frame flags
-                                 "\x00"                 // Encoding
-                                 "(4)Eurodisco", 23);   // Text
+    auto data = ByteVector("TCON"                 // Frame ID
+                           "\x00\x00\x00\x0d"     // Frame size
+                           "\x00\x00"             // Frame flags
+                           "\x00"                 // Encoding
+                           "(4)Eurodisco", 23);   // Text
     ID3v2::Header header;
     header.setMajorVersion(3);
     auto frame =
@@ -964,11 +964,11 @@ public:
   {
     // Multiple references and a refinement
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("TCON"                 // Frame ID
-                                 "\x00\x00\x00\x15"     // Frame size
-                                 "\x00\x00"             // Frame flags
-                                 "\x00"                 // Encoding
-                                 "(9)(138)Viking Metal", 31);   // Text
+    auto data = ByteVector("TCON"                 // Frame ID
+                           "\x00\x00\x00\x15"     // Frame size
+                           "\x00\x00"             // Frame flags
+                           "\x00"                 // Encoding
+                           "(9)(138)Viking Metal", 31);   // Text
     ID3v2::Header header;
     header.setMajorVersion(3);
     auto frame =
@@ -986,11 +986,11 @@ public:
   void testUpdateGenre24()
   {
     ID3v2::FrameFactory *factory = ID3v2::FrameFactory::instance();
-    ByteVector data = ByteVector("TCON"                   // Frame ID
-                                 "\x00\x00\x00\x0D"       // Frame size
-                                 "\x00\x00"               // Frame flags
-                                 "\0"                   // Encoding
-                                 "14\0Eurodisco", 23);     // Text
+    auto data = ByteVector("TCON"                   // Frame ID
+                           "\x00\x00\x00\x0D"       // Frame size
+                           "\x00\x00"               // Frame flags
+                           "\0"                   // Encoding
+                           "14\0Eurodisco", 23);     // Text
     ID3v2::Header header;
     auto frame =
       dynamic_cast<TagLib::ID3v2::TextIdentificationFrame*>(factory->createFrame(data, &header));
@@ -1121,7 +1121,7 @@ public:
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("APIC"));
 
     if(zlib::isAvailable()) {
-      ID3v2::AttachedPictureFrame *frame
+      auto frame
         = dynamic_cast<TagLib::ID3v2::AttachedPictureFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
       CPPUNIT_ASSERT(frame);
       assert(frame != nullptr); // to silence the clang analyzer
@@ -1134,7 +1134,7 @@ public:
       // Skip the test if ZLIB is not installed.
       // The message "Compressed frames are currently not supported." will be displayed.
 
-      ID3v2::UnknownFrame *frame
+      auto frame
         = dynamic_cast<TagLib::ID3v2::UnknownFrame*>(f.ID3v2Tag()->frameListMap()["APIC"].front());
       CPPUNIT_ASSERT(frame);
     }
@@ -1144,8 +1144,8 @@ public:
   {
     MPEG::File f(TEST_FILE_PATH_C("w000.mp3"), false);
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("W000"));
-    ID3v2::UrlLinkFrame *frame =
-    dynamic_cast<TagLib::ID3v2::UrlLinkFrame*>(f.ID3v2Tag()->frameListMap()["W000"].front());
+    auto frame =
+      dynamic_cast<TagLib::ID3v2::UrlLinkFrame*>(f.ID3v2Tag()->frameListMap()["W000"].front());
     CPPUNIT_ASSERT(frame);
     assert(frame != nullptr); // to silence the clang analyzer
     CPPUNIT_ASSERT_EQUAL(String("lukas.lalinsky@example.com____"), frame->url());
@@ -1386,7 +1386,7 @@ public:
   {
     ID3v2::Header header;
 
-    ByteVector chapterData =
+    auto chapterData =
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
                  "\x00\x00"                 // Frame flags
@@ -1395,7 +1395,7 @@ public:
                  "\x00\x00\x00\x05"         // End time
                  "\x00\x00\x00\x02"         // Start offset
                  "\x00\x00\x00\x03", 28);   // End offset
-    ByteVector embeddedFrameData =
+    auto embeddedFrameData =
       ByteVector("TIT2"                     // Embedded frame ID
                  "\x00\x00\x00\x04"         // Embedded frame size
                  "\x00\x00"                 // Embedded frame flags
@@ -1436,7 +1436,7 @@ public:
     eF->setText("CH1");
     f1.addEmbeddedFrame(eF);
 
-    ByteVector expected =
+    auto expected =
       ByteVector("CHAP"                     // Frame ID
                  "\x00\x00\x00\x20"         // Frame size
                  "\x00\x00"                 // Frame flags

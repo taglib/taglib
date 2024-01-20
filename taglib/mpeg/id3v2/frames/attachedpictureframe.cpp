@@ -192,7 +192,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
 
   int pos = 1;
 
-  String fixedString = String(data.mid(pos, 3), String::Latin1);
+  auto fixedString = String(data.mid(pos, 3), String::Latin1);
   pos += 3;
   // convert fixed string image type to mime string
   if (fixedString.upper() == "JPG") {

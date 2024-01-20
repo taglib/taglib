@@ -420,7 +420,7 @@ public:
 
   void testResize()
   {
-    ByteVector a = ByteVector("0123456789");
+    auto a = ByteVector("0123456789");
     ByteVector b = a.mid(3, 4);
     b.resize(6, 'A');
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(6), b.size());
