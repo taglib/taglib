@@ -89,10 +89,10 @@ public:
   void testPropertyInterface2()
   {
     APE::Tag tag;
-    APE::Item item1 = APE::Item("TRACK", String("17"));
+    APE::Item item1("TRACK", String("17"));
     tag.setItem("TRACK", item1);
 
-    APE::Item item2 = APE::Item();
+    APE::Item item2;
     item2.setType(APE::Item::Binary);
     ByteVector binaryData1("first");
     item2.setBinaryData(binaryData1);
@@ -117,7 +117,7 @@ public:
     tag.removeUnsupportedProperties(properties.unsupportedData());
     CPPUNIT_ASSERT(!tag.itemListMap().contains("TESTBINARY"));
 
-    APE::Item item3 = APE::Item("TRACKNUMBER", String("29"));
+    APE::Item item3("TRACKNUMBER", String("29"));
     tag.setItem("TRACKNUMBER", item3);
     properties = tag.properties();
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), properties["TRACKNUMBER"].size());
@@ -151,7 +151,7 @@ public:
 
   void testTextBinary()
   {
-    APE::Item item = APE::Item("DUMMY", String("Test Text"));
+    APE::Item item("DUMMY", String("Test Text"));
     CPPUNIT_ASSERT_EQUAL(String("Test Text"), item.toString());
     CPPUNIT_ASSERT_EQUAL(ByteVector(), item.binaryData());
 
