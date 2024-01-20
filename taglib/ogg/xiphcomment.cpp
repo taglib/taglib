@@ -220,7 +220,7 @@ PropertyMap Ogg::XiphComment::setProperties(const PropertyMap &properties)
   for(const auto &[key, sl] : properties) {
     if(!checkKey(key))
       invalid.insert(key, sl);
-    else if(!d->fieldListMap.contains(key) || !(sl == d->fieldListMap[key])) {
+    else if(!d->fieldListMap.contains(key) || sl != d->fieldListMap[key]) {
       if(sl.isEmpty())
         // zero size string list -> remove the tag with all values
         removeFields(key);
