@@ -30,6 +30,10 @@
 #include "taglib_export.h"
 #include "taglib.h"
 
+#ifdef _WIN32
+#include <string>
+#endif
+
 namespace TagLib {
 
 #ifdef _WIN32

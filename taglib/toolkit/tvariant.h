@@ -26,6 +26,8 @@
 #ifndef TAGLIB_VARIANT_H
 #define TAGLIB_VARIANT_H
 
+#include <iosfwd>
+
 #include "tlist.h"
 #include "tmap.h"
 #include "taglib_export.h"

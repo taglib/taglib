@@ -30,6 +30,7 @@
 #include "tstring.h"
 #include "tlist.h"
 #include "tmap.h"
+#include "taglib.h"
 #include "taglib_export.h"
 #include "tag.h"
 #include "id3v2.h"

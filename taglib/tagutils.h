@@ -31,6 +31,7 @@
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
 #include "tbytevector.h"
+#include "taglib.h"
 
 namespace TagLib {
 
