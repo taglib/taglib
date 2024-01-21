@@ -28,6 +28,8 @@
 
 #include <bitset>
 
+#include "taglib.h"
+
 using namespace TagLib;
 using namespace APE;
 

@@ -28,8 +28,8 @@
 
 #include <memory>
 #include <vector>
+#include <iosfwd>
 
-#include "taglib.h"
 #include "taglib_export.h"
 
 namespace TagLib {

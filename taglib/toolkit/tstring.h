@@ -30,7 +30,6 @@
 
 #include "tbytevector.h"
 #include "taglib_export.h"
-#include "taglib.h"
 
 /*!
  * \relates TagLib::String
@@ -67,7 +66,7 @@ namespace TagLib {
 
   /*!
    * This is an implicitly shared \e wide string.  For storage it uses
-   * TagLib::wstring, but as this is an <i>implementation detail</i> this of
+   * std::wstring, but as this is an <i>implementation detail</i> this of
    * course could change.  Strings are stored internally as UTF-16 (without
    * BOM/CPU byte order)
    *
@@ -85,8 +84,8 @@ namespace TagLib {
   public:
 
 #ifndef DO_NOT_DOCUMENT
-    using Iterator = TagLib::wstring::iterator;
-    using ConstIterator = TagLib::wstring::const_iterator;
+    using Iterator = std::wstring::iterator;
+    using ConstIterator = std::wstring::const_iterator;
 #endif
 
     /**
@@ -141,12 +140,12 @@ namespace TagLib {
     /*!
      * Makes a deep copy of the data in \a s, which are in CPU byte order.
      */
-    String(const wstring &s);
+    String(const std::wstring &s);
 
     /*!
      * Makes a deep copy of the data in \a s, which are in byte order \a t.
      */
-    String(const wstring &s, Type t);
+    String(const std::wstring &s, Type t);
 
     /*!
      * Makes a deep copy of the data in \a s, which are in CPU byte order.
@@ -204,7 +203,7 @@ namespace TagLib {
      *
      * \see toCWString()
      */
-    wstring toWString() const;
+    std::wstring toWString() const;
 
     /*!
      * Creates and returns a standard C-style (null-terminated) version of this
@@ -470,7 +469,7 @@ namespace TagLib {
     /*!
      * Performs a deep copy of the data in \a s.
      */
-    String &operator=(const wstring &s);
+    String &operator=(const std::wstring &s);
 
     /*!
      * Performs a deep copy of the data in \a s.

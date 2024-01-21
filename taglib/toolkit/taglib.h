@@ -42,8 +42,6 @@
 #include <sys/types.h>
 #endif
 
-#include <string>
-
 //! A namespace for all TagLib related classes and functions
 
 /*!
@@ -58,15 +56,6 @@ namespace TagLib {
 
   class String;
 
-  // These integer types are deprecated. Do not use them.
-
-  using wchar = wchar_t; // Assumed to be sufficient to store a UTF-16 char.
-  using uchar = unsigned char;
-  using ushort = unsigned short;
-  using uint = unsigned int;
-  using ulong = unsigned long;
-  using ulonglong = unsigned long long;
-
   // Offset or length type for I/O streams.
   // In Win32, always 64bit. Otherwise, equivalent to off_t.
 #ifdef _WIN32
@@ -75,11 +64,6 @@ namespace TagLib {
   using offset_t = off_t;
 #endif
 
-  /*!
-   * Unfortunately \c std::wstring isn't defined on some systems, (i.e. GCC < 3)
-   * so I'm providing something here that should be constant.
-   */
-  using wstring = std::basic_string<wchar_t>;
 }  // namespace TagLib
 
 /*!

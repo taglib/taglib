@@ -27,6 +27,7 @@
 
 #include <cerrno>
 #include <climits>
+#include <iostream>
 #include <utf8.h>
 
 #include "tdebug.h"
@@ -139,7 +140,7 @@ namespace TagLib {
     /*!
      * Stores string in UTF-16. The byte order depends on the CPU endian.
      */
-    TagLib::wstring data;
+    std::wstring data;
 
     /*!
      * This is only used to hold the most recent value of toCString().
@@ -170,19 +171,19 @@ String::String(const std::string &s, Type t) :
   }
 }
 
-String::String(const wstring &s) :
+String::String(const std::wstring &s) :
  String(s, wcharByteOrder())
 {
 }
 
-String::String(const wstring &s, Type t) :
+String::String(const std::wstring &s, Type t) :
   d(std::make_shared<StringPrivate>())
 {
   if(t == UTF16 || t == UTF16BE || t == UTF16LE) {
     copyFromUTF16(d->data, s.c_str(), s.length(), t);
   }
   else {
-    debug("String::String() -- TagLib::wstring should not contain Latin1 or UTF-8.");
+    debug("String::String() -- std::wstring should not contain Latin1 or UTF-8.");
   }
 }
 
@@ -263,7 +264,7 @@ std::string String::to8Bit(bool unicode) const
   return std::string(v.data(), v.size());
 }
 
-TagLib::wstring String::toWString() const
+std::wstring String::toWString() const
 {
   return d->data;
 }
@@ -618,7 +619,7 @@ String &String::operator=(const std::string &s)
   return *this;
 }
 
-String &String::operator=(const wstring &s)
+String &String::operator=(const std::wstring &s)
 {
   String(s).swap(*this);
   return *this;

@@ -28,6 +28,7 @@
 
 #include "tlist.h"
 #include "tbytevector.h"
+#include "taglib.h"
 #include "taglib_export.h"
 
 namespace TagLib {
