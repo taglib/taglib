@@ -225,13 +225,13 @@ public:
           factory);
       },
       [](const File &f) {
-        return static_cast<const MPEG::File &>(f).hasID3v2Tag();
+        return dynamic_cast<const MPEG::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-        return static_cast<MPEG::File &>(f).ID3v2Tag(true);
+        return dynamic_cast<MPEG::File &>(f).ID3v2Tag(true);
       },
       [](File &f) {
-        return static_cast<MPEG::File &>(f).strip();
+        return dynamic_cast<MPEG::File &>(f).strip();
       }
     );
   }
@@ -249,13 +249,13 @@ public:
           factory);
       },
       [](const File &f) {
-        return static_cast<const FLAC::File &>(f).hasID3v2Tag();
+        return dynamic_cast<const FLAC::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-        return static_cast<FLAC::File &>(f).ID3v2Tag(true);
+        return dynamic_cast<FLAC::File &>(f).ID3v2Tag(true);
       },
       [](File &f) {
-        static_cast<FLAC::File &>(f).strip();
+        dynamic_cast<FLAC::File &>(f).strip();
         return f.save();
       }
     );
@@ -274,13 +274,13 @@ public:
           TrueAudio::Properties::Average, factory);
       },
       [](const File &f) {
-        return static_cast<const TrueAudio::File &>(f).hasID3v2Tag();
+        return dynamic_cast<const TrueAudio::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-        return static_cast<TrueAudio::File &>(f).ID3v2Tag(true);
+        return dynamic_cast<TrueAudio::File &>(f).ID3v2Tag(true);
       },
       [](File &f) {
-        static_cast<TrueAudio::File &>(f).strip();
+        dynamic_cast<TrueAudio::File &>(f).strip();
         return f.save();
       }
     );
@@ -299,13 +299,13 @@ public:
               fileName, true, RIFF::WAV::Properties::Average, factory);
       },
       [](const File &f) {
-        return static_cast<const RIFF::WAV::File &>(f).hasID3v2Tag();
+          return dynamic_cast<const RIFF::WAV::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-          return static_cast<RIFF::WAV::File &>(f).ID3v2Tag();
+          return dynamic_cast<RIFF::WAV::File &>(f).ID3v2Tag();
       },
       [](File &f) {
-        static_cast<RIFF::WAV::File &>(f).strip();
+        dynamic_cast<RIFF::WAV::File &>(f).strip();
         return true;
       }
     );
@@ -324,10 +324,10 @@ public:
               fileName, true, RIFF::AIFF::Properties::Average, factory);
       },
       [](const File &f) {
-        return static_cast<const RIFF::AIFF::File &>(f).hasID3v2Tag();
+        return dynamic_cast<const RIFF::AIFF::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-        return static_cast<RIFF::AIFF::File &>(f).tag();
+        return dynamic_cast<RIFF::AIFF::File &>(f).tag();
       },
       [](File &f) {
           f.setProperties({});
@@ -352,7 +352,7 @@ public:
         return !f.tag()->isEmpty();
       },
       [](File &f) {
-        return static_cast<DSF::File &>(f).tag();
+        return dynamic_cast<DSF::File &>(f).tag();
       },
       [](File &f) {
         f.setProperties({});
@@ -374,13 +374,13 @@ public:
               fileName, true, DSDIFF::Properties::Average, factory);
       },
       [](const File &f) {
-        return static_cast<const DSDIFF::File &>(f).hasID3v2Tag();
+        return dynamic_cast<const DSDIFF::File &>(f).hasID3v2Tag();
       },
       [](File &f) {
-        return static_cast<DSDIFF::File &>(f).ID3v2Tag(true);
+        return dynamic_cast<DSDIFF::File &>(f).ID3v2Tag(true);
       },
       [](File &f) {
-        static_cast<DSDIFF::File &>(f).strip();
+        dynamic_cast<DSDIFF::File &>(f).strip();
         return true;
       }
     );
