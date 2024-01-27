@@ -49,6 +49,10 @@ namespace
 
   const FileHandle InvalidFileHandle = INVALID_HANDLE_VALUE;
 
+  const std::wstring LongLocalPathPrefix = L"\\\\?\\";
+  const std::wstring UNCPathPrefix = L"\\\\";
+  const std::wstring LongUNCPathPrefix = L"\\\\?\\UNC\\";
+
   FileHandle openFile(const FileName &path, bool readOnly)
   {
     const DWORD access = readOnly ? GENERIC_READ : (GENERIC_READ | GENERIC_WRITE);
@@ -56,7 +60,25 @@ namespace
 #if defined (PLATFORM_WINRT)
     return CreateFile2(path.wstr().c_str(), access, FILE_SHARE_READ, OPEN_EXISTING, nullptr);
 #else
-    return CreateFileW(path.wstr().c_str(), access, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+    std::wstring fixed_path;
+    if (path.wstr().length() > MAX_PATH && path.wstr().compare(0, LongLocalPathPrefix.length(), LongLocalPathPrefix) != 0 && path.wstr().compare(0, LongUNCPathPrefix.length(), LongUNCPathPrefix) != 0)
+    {
+      if (path.wstr().compare(0, UNCPathPrefix.length(), UNCPathPrefix) == 0)
+      {
+        fixed_path.append(LongUNCPathPrefix);
+        fixed_path.append(path.wstr().substr(2));
+      }
+      else
+      {
+        fixed_path.append(LongLocalPathPrefix);
+        fixed_path.append(path.wstr());
+      }
+    }
+    else
+    {
+      fixed_path = path.wstr();
+    }
+    return CreateFileW(fixed_path.c_str(), access, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 #endif
   }
 
