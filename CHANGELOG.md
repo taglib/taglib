@@ -1,8 +1,10 @@
 TagLib 2.0 (Jan 24, 2024)
 =========================
 
- * New major version, binary incompatible, but source-compatible with the
-   latest 1.x release if no deprecated features are used.
+ * New major version, binary incompatible, but mostly source-compatible
+   with the latest 1.x release if no deprecated features are used.
+   Simple applications should build without changes, more complex
+   applications (e.g. extending classes of TagLib) will have to be adapted.
  * Requires a C++17 compiler and uses features of C++17.
  * Major code cleanup, fixed warnings issued by compilers and static analyzers.
  * Made methods virtual which should have been virtual but could not be
