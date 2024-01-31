@@ -25,6 +25,7 @@
 
 #include "xiphcomment.h"
 
+#include <numeric>
 #include <utility>
 
 #include "tdebug.h"
@@ -184,14 +185,8 @@ bool Ogg::XiphComment::isEmpty() const
 
 unsigned int Ogg::XiphComment::fieldCount() const
 {
-  unsigned int count = 0;
-
-  for(const auto &[_, list] : std::as_const(d->fieldListMap))
-    count += list.size();
-
-  count += d->pictureList.size();
-
-  return count;
+  auto f = [](unsigned int c, const auto &p) { return c + p.second.size(); };
+  return std::accumulate(d->fieldListMap.cbegin(), d->fieldListMap.cend(), d->pictureList.size(), f);
 }
 
 const Ogg::FieldListMap &Ogg::XiphComment::fieldListMap() const
