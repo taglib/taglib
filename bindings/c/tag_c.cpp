@@ -66,6 +66,8 @@ namespace
   bool unicodeStrings = true;
   bool stringManagementEnabled = true;
 
+  const StringList defaultFileExtensions = FileRef::defaultFileExtensions();
+
   char *stringToCharArray(const String &s)
   {
     const std::string str = s.to8Bit(unicodeStrings);
@@ -368,6 +370,16 @@ int taglib_audioproperties_channels(const TagLib_AudioProperties *audioPropertie
 {
   auto p = reinterpret_cast<const AudioProperties *>(audioProperties);
   return p->channels();
+}
+
+const char **taglib_default_file_extensions(unsigned int *size)
+{
+  *size = defaultFileExtensions.size();
+  const char** dest = (const char**)malloc(*size * sizeof(char*));
+  for(unsigned int i = 0; i < *size; ++i) {
+      dest[i] = defaultFileExtensions[i].toCString();
+  }
+  return dest;
 }
 
 void taglib_id3v2_set_default_text_encoding(TagLib_ID3v2_Encoding encoding)
