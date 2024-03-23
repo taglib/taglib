@@ -143,7 +143,7 @@ namespace TagLib {
       /*!
        * Destroys this StreamTypeResolver instance.
        */
-      ~StreamTypeResolver() override = 0;
+      virtual ~StreamTypeResolver() override = 0; // virtual is needed by SWIG
 
       StreamTypeResolver(const StreamTypeResolver &) = delete;
       StreamTypeResolver &operator=(const StreamTypeResolver &) = delete;
