@@ -69,3 +69,13 @@ MP4::CoverArt::data() const
 {
   return d->data;
 }
+
+bool MP4::CoverArt::operator==(const CoverArt &other) const
+{
+  return format() == other.format() && data() == other.data();
+}
+
+bool MP4::CoverArt::operator!=(const CoverArt &other) const
+{
+  return !(*this == other);
+}
