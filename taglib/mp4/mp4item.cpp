@@ -30,6 +30,7 @@ using namespace TagLib;
 class MP4::Item::ItemPrivate
 {
 public:
+  Type type;
   bool valid { true };
   AtomDataType atomDataType { TypeUndefined };
   union {
@@ -48,6 +49,7 @@ public:
 MP4::Item::Item() :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::Void;
   d->valid = false;
 }
 
@@ -67,36 +69,42 @@ MP4::Item::~Item() = default;
 MP4::Item::Item(bool value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::Bool;
   d->m_bool = value;
 }
 
 MP4::Item::Item(int value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::Int;
   d->m_int = value;
 }
 
 MP4::Item::Item(unsigned char value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::Byte;
   d->m_byte = value;
 }
 
 MP4::Item::Item(unsigned int value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::UInt;
   d->m_uint = value;
 }
 
 MP4::Item::Item(long long value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::LongLong;
   d->m_longlong = value;
 }
 
 MP4::Item::Item(int value1, int value2) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::IntPair;
   d->m_intPair.first = value1;
   d->m_intPair.second = value2;
 }
@@ -104,18 +112,21 @@ MP4::Item::Item(int value1, int value2) :
 MP4::Item::Item(const ByteVectorList &value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::ByteVectorList;
   d->m_byteVectorList = value;
 }
 
 MP4::Item::Item(const StringList &value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::StringList;
   d->m_stringList = value;
 }
 
 MP4::Item::Item(const MP4::CoverArtList &value) :
   d(std::make_shared<ItemPrivate>())
 {
+  d->type = Type::CoverArtList;
   d->m_coverArtList = value;
 }
 
@@ -187,4 +198,48 @@ bool
 MP4::Item::isValid() const
 {
   return d->valid;
+}
+
+MP4::Item::Type MP4::Item::type() const
+{
+  return d->type;
+}
+
+bool MP4::Item::operator==(const Item &other) const
+{
+  if(isValid() && other.isValid() &&
+     type() == other.type() &&
+     atomDataType() == other.atomDataType()) {
+    switch(type()) {
+    case Type::Void:
+      return true;
+    case Type::Bool:
+      return toBool() == other.toBool();
+    case Type::Int:
+      return toInt() == other.toInt();
+    case Type::IntPair: {
+      const auto lhs = toIntPair();
+      const auto rhs = other.toIntPair();
+      return lhs.first == rhs.first && lhs.second == rhs.second;
+    }
+    case Type::Byte:
+      return toByte() == other.toByte();
+    case Type::UInt:
+      return toUInt() == other.toUInt();
+    case Type::LongLong:
+      return toLongLong() == other.toLongLong();
+    case Type::StringList:
+      return toStringList() == other.toStringList();
+    case Type::ByteVectorList:
+      return toByteVectorList() == other.toByteVectorList();
+    case Type::CoverArtList:
+      return toCoverArtList() == other.toCoverArtList();
+    }
+  }
+  return false;
+}
+
+bool MP4::Item::operator!=(const Item &other) const
+{
+  return !(*this == other);
 }

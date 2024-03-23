@@ -69,6 +69,17 @@ namespace TagLib {
       //! The image data
       ByteVector data() const;
 
+      /*!
+       * Returns \c true if the CoverArt and \a other are of the same format and
+       * contain the same data.
+       */
+      bool operator==(const CoverArt &other) const;
+
+      /*!
+       * Returns \c true if the CoverArt and \a other  differ in format or data.
+       */
+      bool operator!=(const CoverArt &other) const;
+
     private:
       class CoverArtPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
