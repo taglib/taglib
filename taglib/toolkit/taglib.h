@@ -60,7 +60,7 @@ namespace TagLib {
   // In Win32, always 64bit. Otherwise, equivalent to off_t.
 #ifdef _WIN32
   using offset_t = long long;
-#else
+#elif !defined(__illumos__)
   using offset_t = off_t;
 #endif
 
