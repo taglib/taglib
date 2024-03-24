@@ -20,7 +20,7 @@ if(NOT ${SIZEOF_LONGLONG} EQUAL 8)
 endif()
 
 check_type_size("wchar_t" SIZEOF_WCHAR_T)
-if(${SIZEOF_WCHAR_T} LESS 2)
+if(NOT ${SIZEOF_WCHAR_T} GREATER 1)
   message(FATAL_ERROR "TagLib requires that wchar_t is sufficient to store a UTF-16 char.")
 endif()
 
