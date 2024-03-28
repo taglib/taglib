@@ -410,14 +410,14 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
   if(value) {
     auto property = map.find(prop);
     if(property == map.end()) {
-      map.insert(prop, StringList(value));
+      map.insert(prop, StringList(String(value, String::UTF8)));
     }
     else {
       if(append) {
-        property->second.append(value);
+        property->second.append(String(value, String::UTF8));
       }
       else {
-        property->second = StringList(value);
+        property->second = StringList(String(value, String::UTF8));
       }
     }
   }
@@ -440,15 +440,23 @@ void taglib_property_set_append(TagLib_File *file, const char *prop, const char 
   _taglib_property_set(file, prop, value, true);
 }
 
+const TagLib_Strings EMPTY_STRINGS = { 0, NULL };
+
 char** taglib_property_keys(const TagLib_File *file)
 {
+  TagLib_Strings s = taglib_property_keys_strings(file);
+  return s.value;
+}
+
+TagLib_Strings taglib_property_keys_strings(const TagLib_File *file) {
   if(file == NULL)
-    return NULL;
+    return EMPTY_STRINGS;
 
   const PropertyMap map = reinterpret_cast<const FileRef *>(file)->properties();
   if(map.isEmpty())
-    return NULL;
+    return EMPTY_STRINGS;
 
+  unsigned int count = map.size();
   auto props = static_cast<char **>(malloc(sizeof(char *) * (map.size() + 1)));
   char **pp = props;
 
@@ -457,20 +465,28 @@ char** taglib_property_keys(const TagLib_File *file)
   }
   *pp = NULL;
 
-  return props;
+  TagLib_Strings result = { count,  props };
+  return result;
 }
 
 char **taglib_property_get(const TagLib_File *file, const char *prop)
 {
+  TagLib_Strings s = taglib_property_get_strings(file, prop);
+  return s.value;
+}
+
+TagLib_Strings taglib_property_get_strings(const TagLib_File *file, const char *prop)
+{
   if(file == NULL || prop == NULL)
-    return NULL;
+    return EMPTY_STRINGS;
 
   const PropertyMap map = reinterpret_cast<const FileRef *>(file)->properties();
 
   auto property = map.find(prop);
   if(property == map.end())
-    return NULL;
+    return EMPTY_STRINGS;
 
+  unsigned int count = property->second.size();
   auto props = static_cast<char **>(malloc(sizeof(char *) * (property->second.size() + 1)));
   char **pp = props;
 
@@ -479,7 +495,8 @@ char **taglib_property_get(const TagLib_File *file, const char *prop)
   }
   *pp = NULL;
 
-  return props;
+  TagLib_Strings result = { count,  props };
+  return result;
 }
 
 void taglib_property_free(char **props)
