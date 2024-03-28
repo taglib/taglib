@@ -356,6 +356,19 @@ TAGLIB_C_EXPORT void taglib_property_set_append(TagLib_File *file, const char *p
  */
 TAGLIB_C_EXPORT char** taglib_property_keys(const TagLib_File *file);
 
+typedef struct {
+  unsigned int len;
+  char **value;
+} TagLib_Strings;
+
+/*!
+ * Get the keys of the property map.
+ * 
+ * It same as taglib_property_keys, but the return value with lenth, for Rust convert it to UTF8 String.
+ * It must be freed by the client using taglib_property_free().
+ */
+TAGLIB_C_EXPORT TagLib_Strings taglib_property_keys_strings(const TagLib_File *file);
+
 /*!
  * Get value(s) of property \a prop.
  *
@@ -363,6 +376,14 @@ TAGLIB_C_EXPORT char** taglib_property_keys(const TagLib_File *file);
  * It must be freed by the client using taglib_property_free().
  */
 TAGLIB_C_EXPORT char** taglib_property_get(const TagLib_File *file, const char *prop);
+
+/*!
+ * Get value(s) of property \a prop.
+ * 
+ * It same as taglib_property_get, but the return value with lenth, for Rust convert it to UTF8 String.
+ * It must be freed by the client using taglib_property_free().
+ */
+TAGLIB_C_EXPORT TagLib_Strings taglib_property_get_strings(const TagLib_File *file, const char *prop);
 
 /*!
  * Frees the NULL terminated array \a props and the C-strings it contains.
