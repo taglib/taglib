@@ -410,14 +410,14 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
   if(value) {
     auto property = map.find(prop);
     if(property == map.end()) {
-      map.insert(prop, StringList(value));
+      map.insert(prop, StringList(charArrayToString(value)));
     }
     else {
       if(append) {
-        property->second.append(value);
+        property->second.append(charArrayToString(value));
       }
       else {
-        property->second = StringList(value);
+        property->second = StringList(charArrayToString(value));
       }
     }
   }
@@ -542,14 +542,14 @@ bool _taglib_complex_property_set(
       map.insert(attrKey, attr->value.value.doubleValue);
       break;
     case TagLib_Variant_String:
-      map.insert(attrKey, attr->value.value.stringValue);
+      map.insert(attrKey, charArrayToString(attr->value.value.stringValue));
       break;
     case TagLib_Variant_StringList: {
       StringList strs;
       if(attr->value.value.stringListValue) {
         char **s = attr->value.value.stringListValue;;
         while(*s) {
-          strs.append(*s++);
+          strs.append(charArrayToString(*s++));
         }
       }
       map.insert(attrKey, strs);
