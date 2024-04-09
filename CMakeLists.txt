@@ -93,7 +93,7 @@ endif()
 # Patch version: increase it for bug fix releases.
 set(TAGLIB_SOVERSION_MAJOR 2)
 set(TAGLIB_SOVERSION_MINOR 0)
-set(TAGLIB_SOVERSION_PATCH 0)
+set(TAGLIB_SOVERSION_PATCH 1)
 
 include(ConfigureChecks.cmake)
 
