@@ -71,6 +71,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testIgnoreGarbage);
   CPPUNIT_TEST(testExtendedHeader);
   CPPUNIT_TEST(testReadStyleFast);
+  CPPUNIT_TEST(testID3v22Properties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -616,6 +617,56 @@ public:
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(2255), f.firstFrameOffset());
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(6015), f.lastFrameOffset());
     }
+  }
+
+  void testID3v22Properties()
+  {
+    ScopedFileCopy copy("itunes10", ".mp3");
+
+    MPEG::File f(copy.fileName().c_str());
+    PropertyMap expectedProperties(SimplePropertyMap{
+      {"ALBUM", {"Album"}},
+      {"ALBUMARTIST", {"Album Artist"}},
+      {"ALBUMARTISTSORT", {"Sort Album Artist"}},
+      {"ALBUMSORT", {"Sort Album"}},
+      {"ARTIST", {"Artist"}},
+      {"ARTISTSORT", {"Sort Artist"}},
+      {"BPM", {"180"}},
+      {"COMMENT", {"Comments"}},
+      {"COMMENT:ITUNPGAP", {"1"}},
+      {"COMPILATION", {"1"}},
+      {"COMPOSER", {"Composer"}},
+      {"COMPOSERSORT", {"Sort Composer"}},
+      {"DATE", {"2011"}},
+      {"DISCNUMBER", {"1/2"}},
+      {"GENRE", {"Heavy Metal"}},
+      {"LYRICS", {"Lyrics"}},
+      {"SUBTITLE", {"Description"}},
+      {"TITLE", {"iTunes10MP3"}},
+      {"TITLESORT", {"Sort Name"}},
+      {"TRACKNUMBER", {"1/10"}},
+      {"WORK", {"Grouping"}}
+    });
+    expectedProperties.addUnsupportedData("APIC");
+    expectedProperties.addUnsupportedData("UNKNOWN/RVA");
+
+    PropertyMap properties = f.properties();
+    if (expectedProperties != properties) {
+      CPPUNIT_ASSERT_EQUAL(expectedProperties.toString(), properties.toString());
+    }
+    CPPUNIT_ASSERT(expectedProperties == properties);
+
+    const String PICTURE_KEY("PICTURE");
+    CPPUNIT_ASSERT_EQUAL(StringList(PICTURE_KEY), f.complexPropertyKeys());
+    auto pictures = f.complexProperties(PICTURE_KEY);
+    CPPUNIT_ASSERT_EQUAL(1U, pictures.size());
+    auto picture = pictures.front();
+    CPPUNIT_ASSERT_EQUAL(String("image/png"), picture.value("mimeType").toString());
+    CPPUNIT_ASSERT(picture.value("description").toString().isEmpty());
+    CPPUNIT_ASSERT_EQUAL(String("Other"), picture.value("pictureType").toString());
+    auto data = picture.value("data").toByteVector();
+    CPPUNIT_ASSERT(data.startsWith("\x89PNG\x0d\x0a\x1a\x0a"));
+    CPPUNIT_ASSERT_EQUAL(2315U, data.size());
   }
 
 };

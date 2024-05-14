@@ -843,8 +843,10 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       break;
     }
 
-    Frame *frame = d->factory->createFrame(data.mid(frameDataPosition),
-                                           &d->header);
+    const ByteVector origData = data.mid(frameDataPosition);
+    const Header *tagHeader = &d->header;
+    unsigned int headerVersion = tagHeader->majorVersion();
+    Frame *frame = d->factory->createFrame(origData, tagHeader);
 
     if(!frame)
       return;
@@ -856,7 +858,15 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       return;
     }
 
-    frameDataPosition += frame->size() + frame->headerSize();
+    if(frame->header()->version() == headerVersion) {
+      frameDataPosition += frame->size() + frame->headerSize();
+    } else {
+      // The frame was converted to another version, e.g. from 2.2 to 2.4.
+      // We must advance the frame data position according to the original
+      // frame, not the converted frame because its header size might differ.
+      Frame::Header origHeader(origData, headerVersion);
+      frameDataPosition += origHeader.frameSize() + origHeader.size();
+    }
     addFrame(frame);
   }
 
