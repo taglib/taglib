@@ -124,8 +124,6 @@ MP4::Atom::Atom(File *file)
     }
   }
 
-  debug("MP4: Skipping atom '" + d->name + "'");
-
   file->seek(d->offset + d->length);
 }
 
