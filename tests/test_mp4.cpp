@@ -857,6 +857,14 @@ public:
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
       CPPUNIT_ASSERT_EQUAL(32000, f.audioProperties()->sampleRate());
+      f.tag()->setTitle("TITLE");
+      f.save();
+    }
+    {
+        MP4::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        CPPUNIT_ASSERT(f.hasMP4Tag());
+        CPPUNIT_ASSERT_EQUAL(String("TITLE"), f.tag()->title());
     }
   }
 };
