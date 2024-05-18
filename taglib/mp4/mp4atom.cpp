@@ -95,13 +95,6 @@ MP4::Atom::Atom(File *file)
   }
 
   d->name = header.mid(4, 4);
-  for(int i = 0; i < 4; ++i) {
-    if(const char ch = d->name.at(i); (ch < ' ' || ch > '~') && ch != '\251') {
-      debug("MP4: Invalid atom type");
-      d->length = 0;
-      file->seek(0, File::End);
-    }
-  }
 
   for(auto c : containers) {
     if(d->name == c) {

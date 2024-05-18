@@ -101,6 +101,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRemoveMetadata);
   CPPUNIT_TEST(testNonFullMetaAtom);
   CPPUNIT_TEST(testItemFactory);
+  CPPUNIT_TEST(testNonPrintableAtom);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -845,6 +846,25 @@ public:
       CPPUNIT_ASSERT_EQUAL(456, item.toInt());
       PropertyMap properties = tag->properties();
       CPPUNIT_ASSERT_EQUAL(StringList("456"), properties.value("TESTINTEGER"));
+    }
+  }
+
+  void testNonPrintableAtom()
+  {
+    ScopedFileCopy copy("nonprintable-atom-type", ".m4a");
+    {
+      MP4::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+      CPPUNIT_ASSERT_EQUAL(32000, f.audioProperties()->sampleRate());
+      f.tag()->setTitle("TITLE");
+      f.save();
+    }
+    {
+        MP4::File f(copy.fileName().c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        CPPUNIT_ASSERT(f.hasMP4Tag());
+        CPPUNIT_ASSERT_EQUAL(String("TITLE"), f.tag()->title());
     }
   }
 };
