@@ -48,10 +48,11 @@ bool isArgument(const char *s)
 
 bool isFile(const char *s)
 {
-  struct stat st;
 #ifdef _WIN32
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG));
+  struct _stat64 st;
+  return ::_stat64(s, &st) == 0 && (st.st_mode & S_IFREG);
 #else
+  struct stat st;
   return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG | S_IFLNK));
 #endif
 }
@@ -180,7 +181,7 @@ int main(int argc, char *argv[])
                 return 1;
               }
               ifstream picture;
-              picture.open(value.toCString());
+              picture.open(value.toCString(), ios::in | ios::binary);
               stringstream buffer;
               buffer << picture.rdbuf();
               picture.close();
