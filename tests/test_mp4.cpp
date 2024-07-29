@@ -442,6 +442,7 @@ public:
     tags["BPM"] = StringList("123");
     tags["ARTIST"] = StringList("Foo Bar");
     tags["COMPILATION"] = StringList("1");
+    tags["REMIXEDBY"] = StringList("Remixed by");
     f.setProperties(tags);
 
     tags = f.properties();
@@ -467,6 +468,11 @@ public:
     CPPUNIT_ASSERT(f.tag()->contains("cpil"));
     CPPUNIT_ASSERT_EQUAL(true, f.tag()->item("cpil").toBool());
     CPPUNIT_ASSERT_EQUAL(StringList("1"), tags["COMPILATION"]);
+
+    CPPUNIT_ASSERT(f.tag()->contains("----:com.apple.iTunes:REMIXEDBY"));
+    CPPUNIT_ASSERT_EQUAL(StringList("Remixed by"),
+      f.tag()->item("----:com.apple.iTunes:REMIXEDBY").toStringList());
+    CPPUNIT_ASSERT_EQUAL(StringList("Remixed by"), tags["REMIXEDBY"]);
 
     tags["COMPILATION"] = StringList("0");
     f.setProperties(tags);

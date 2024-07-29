@@ -35,6 +35,12 @@
 using namespace TagLib;
 using namespace MP4;
 
+namespace {
+
+constexpr char freeFormPrefix[] = "----:com.apple.iTunes:";
+
+}  // namespace
+
 class ItemFactory::ItemFactoryPrivate
 {
 public:
@@ -231,7 +237,11 @@ String ItemFactory::propertyKeyForName(const ByteVector &name) const
   if(d->propertyKeyForName.isEmpty()) {
     d->propertyKeyForName = namePropertyMap();
   }
-  return d->propertyKeyForName.value(name);
+  String key = d->propertyKeyForName.value(name);
+  if(key.isEmpty() && name.startsWith(freeFormPrefix)) {
+    key = name.mid(std::size(freeFormPrefix) - 1);
+  }
+  return key;
 }
 
 ByteVector ItemFactory::nameForPropertyKey(const String &key) const
@@ -244,7 +254,14 @@ ByteVector ItemFactory::nameForPropertyKey(const String &key) const
       d->nameForPropertyKey[t] = k;
     }
   }
-  return d->nameForPropertyKey.value(key);
+  ByteVector name = d->nameForPropertyKey.value(key);
+  if(name.isEmpty() && !key.isEmpty()) {
+    const auto &firstChar = key[0];
+    if(firstChar >= 'A' && firstChar <= 'Z') {
+      name = (freeFormPrefix + key).data(String::UTF8);
+    }
+  }
+  return name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
