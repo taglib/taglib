@@ -39,8 +39,6 @@
 #include "fileref.h"
 #include "tag.h"
 
-using namespace std;
-
 bool isArgument(const char *s)
 {
   return strlen(s) == 2 && s[0] == '-';
@@ -59,22 +57,22 @@ bool isFile(const char *s)
 
 void usage()
 {
-  cout << endl;
-  cout << "Usage: tagwriter <fields> <files>" << endl;
-  cout << endl;
-  cout << "Where the valid fields are:" << endl;
-  cout << "  -t <title>"   << endl;
-  cout << "  -a <artist>"  << endl;
-  cout << "  -A <album>"   << endl;
-  cout << "  -c <comment>" << endl;
-  cout << "  -g <genre>"   << endl;
-  cout << "  -y <year>"    << endl;
-  cout << "  -T <track>"   << endl;
-  cout << "  -R <tagname> <tagvalue>"   << endl;
-  cout << "  -I <tagname> <tagvalue>"   << endl;
-  cout << "  -D <tagname>"   << endl;
-  cout << "  -p <picturefile> <description> (\"\" \"\" to remove)" << endl;
-  cout << endl;
+  std::cout << std::endl;
+  std::cout << "Usage: tagwriter <fields> <files>" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Where the valid fields are:" << std::endl;
+  std::cout << "  -t <title>"   << std::endl;
+  std::cout << "  -a <artist>"  << std::endl;
+  std::cout << "  -A <album>"   << std::endl;
+  std::cout << "  -c <comment>" << std::endl;
+  std::cout << "  -g <genre>"   << std::endl;
+  std::cout << "  -y <year>"    << std::endl;
+  std::cout << "  -T <track>"   << std::endl;
+  std::cout << "  -R <tagname> <tagvalue>"   << std::endl;
+  std::cout << "  -I <tagname> <tagvalue>"   << std::endl;
+  std::cout << "  -D <tagname>"   << std::endl;
+  std::cout << "  -p <picturefile> <description> (\"\" \"\" to remove)" << std::endl;
+  std::cout << std::endl;
 
   exit(1);
 }
@@ -88,10 +86,10 @@ void checkForRejectedProperties(const TagLib::PropertyMap &tags)
         longest = i->first.size();
       }
     }
-    cout << "-- rejected TAGs (properties) --" << endl;
+    std::cout << "-- rejected TAGs (properties) --" << std::endl;
     for(auto i = tags.begin(); i != tags.end(); ++i) {
       for(auto j = i->second.begin(); j != i->second.end(); ++j) {
-        cout << left << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
+        std::cout << std::left << std::setw(longest) << i->first << " - " << '"' << *j << '"' << std::endl;
       }
     }
   }
@@ -177,12 +175,12 @@ int main(int argc, char *argv[])
             numArgsConsumed = 3;
             if(!value.isEmpty()) {
               if(!isFile(value.toCString())) {
-                cout << value.toCString() << " not found." << endl;
+                std::cout << value.toCString() << " not found." << std::endl;
                 return 1;
               }
-              ifstream picture;
-              picture.open(value.toCString(), ios::in | ios::binary);
-              stringstream buffer;
+              std::ifstream picture;
+              picture.open(value.toCString(), std::ios::in | std::ios::binary);
+              std::stringstream buffer;
               buffer << picture.rdbuf();
               picture.close();
               TagLib::String buf(buffer.str());

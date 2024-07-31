@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
                 fn = fn.substr(slashPos + 1, dotPos - slashPos - 1);
               }
               fn += ".jpg";
-              picture.open(fn.toCString(), ios_base::out | ios_base::binary);
+              picture.open(fn.toCString(), std::ios_base::out | std::ios_base::binary);
               picture << value.value<TagLib::ByteVector>();
               picture.close();
               */
