@@ -347,7 +347,7 @@ target_include_directories(tag INTERFACE
 )
 
 target_link_libraries(tag
-  PRIVATE $<$<TARGET_EXISTS:utf8::cpp>:utf8::cpp>
+  PRIVATE $<IF:$<TARGET_EXISTS:utf8::cpp>,utf8::cpp,$<$<TARGET_EXISTS:utf8cpp>:utf8cpp>>
           $<$<TARGET_EXISTS:ZLIB::ZLIB>:ZLIB::ZLIB>
 )
 
