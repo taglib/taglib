@@ -315,6 +315,13 @@ TAGLIB_C_EXPORT int taglib_audioproperties_samplerate(const TagLib_AudioProperti
  */
 TAGLIB_C_EXPORT int taglib_audioproperties_channels(const TagLib_AudioProperties *audioProperties);
 
+/*!
+ * Returns the list of file extensions that are used by default.
+ *
+ * \note This array of strings should be freed using taglib_free().
+ */
+TAGLIB_C_EXPORT const char **taglib_default_file_extensions(unsigned int *size);
+
 /*******************************************************************************
  * Special convenience ID3v2 functions
  *******************************************************************************/
