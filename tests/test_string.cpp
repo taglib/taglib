@@ -23,9 +23,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <string>
 #include <cstring>
 
 #include "tstring.h"
+#include "tstringlist.h"
+#include "tbytevector.h"
 #include "tutils.h"
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -54,6 +57,7 @@ class TestString : public CppUnit::TestFixture
   CPPUNIT_TEST(testEncodeNonBMP);
   CPPUNIT_TEST(testIterator);
   CPPUNIT_TEST(testInvalidUTF8);
+  CPPUNIT_TEST(testEmpty);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -368,6 +372,80 @@ public:
 
     CPPUNIT_ASSERT(String(ByteVector("\xED\xA0\x80\xED\xB0\x80"), String::UTF8).isEmpty());
     CPPUNIT_ASSERT(String(ByteVector("\xED\xB0\x80\xED\xA0\x80"), String::UTF8).isEmpty());
+  }
+
+  void testEmpty()
+  {
+    const String empty;
+    const String notEmpty("A");
+    String mutEmpty;
+
+    CPPUNIT_ASSERT_EQUAL(empty, String(""));
+    CPPUNIT_ASSERT_EQUAL(empty, String(std::wstring()));
+    CPPUNIT_ASSERT_EQUAL(empty, String(static_cast<const wchar_t *>(nullptr)));
+    CPPUNIT_ASSERT(empty != String('\0'));
+    CPPUNIT_ASSERT_EQUAL(empty, String(L'\0'));
+    CPPUNIT_ASSERT_EQUAL(empty, String(static_cast<const char *>(nullptr)));
+    CPPUNIT_ASSERT_EQUAL(empty, String(ByteVector()));
+    CPPUNIT_ASSERT_EQUAL(empty.to8Bit(), std::string());
+    CPPUNIT_ASSERT_EQUAL(empty.toWString(), std::wstring());
+    CPPUNIT_ASSERT_EQUAL(::strlen(empty.toCString()), (size_t)0);
+    CPPUNIT_ASSERT_EQUAL(::wcslen(empty.toCWString()), (size_t)0);
+    CPPUNIT_ASSERT(empty.begin() == empty.end());
+    CPPUNIT_ASSERT(empty.cbegin() == empty.cend());
+    CPPUNIT_ASSERT(mutEmpty.begin() == mutEmpty.end());
+    CPPUNIT_ASSERT_EQUAL(empty.find(mutEmpty), 0);
+    CPPUNIT_ASSERT_EQUAL(empty.find(notEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(notEmpty.find(empty), 0);
+    CPPUNIT_ASSERT_EQUAL(empty.rfind(mutEmpty), 0);
+    CPPUNIT_ASSERT_EQUAL(empty.rfind(notEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(notEmpty.rfind(empty), 1);
+    CPPUNIT_ASSERT_EQUAL(empty.split(), StringList(empty));
+    CPPUNIT_ASSERT_EQUAL(empty.startsWith(mutEmpty), true);
+    CPPUNIT_ASSERT_EQUAL(empty.startsWith(notEmpty), false);
+    CPPUNIT_ASSERT_EQUAL(notEmpty.startsWith(empty), true);
+    CPPUNIT_ASSERT_EQUAL(empty.substr(0), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.append(empty), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.append(notEmpty), notEmpty);
+    mutEmpty.clear();
+    CPPUNIT_ASSERT_EQUAL(mutEmpty, empty);
+    CPPUNIT_ASSERT_EQUAL(String(notEmpty).append(empty), notEmpty);
+    CPPUNIT_ASSERT_EQUAL(empty.upper(), empty);
+    CPPUNIT_ASSERT_EQUAL(empty.size(), 0U);
+    CPPUNIT_ASSERT_EQUAL(empty.length(), 0U);
+    CPPUNIT_ASSERT_EQUAL(empty.isEmpty(), true);
+    CPPUNIT_ASSERT_EQUAL(empty.data(String::Latin1), ByteVector());
+    CPPUNIT_ASSERT_EQUAL(empty.data(String::UTF16LE), ByteVector());
+    bool ok;
+    empty.toInt(&ok);
+    CPPUNIT_ASSERT(!ok);
+    CPPUNIT_ASSERT_EQUAL(empty.stripWhiteSpace(), empty);
+    CPPUNIT_ASSERT_EQUAL(empty.isLatin1(), true);
+    CPPUNIT_ASSERT_EQUAL(empty.isAscii(), true);
+    CPPUNIT_ASSERT(empty == mutEmpty);
+    CPPUNIT_ASSERT(empty != notEmpty);
+    CPPUNIT_ASSERT(empty == "");
+    CPPUNIT_ASSERT(empty != " ");
+    CPPUNIT_ASSERT(empty == L"");
+    CPPUNIT_ASSERT(empty != L" ");
+    CPPUNIT_ASSERT(empty == static_cast<const char *>(nullptr));
+    CPPUNIT_ASSERT(!(empty != static_cast<const char *>(nullptr)));
+    CPPUNIT_ASSERT(empty == static_cast<const wchar_t *>(nullptr));
+    CPPUNIT_ASSERT(!(empty != static_cast<const wchar_t *>(nullptr)));
+    CPPUNIT_ASSERT_EQUAL(mutEmpty += empty, empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty += notEmpty, notEmpty);
+    mutEmpty.clear();
+    CPPUNIT_ASSERT_EQUAL(mutEmpty += static_cast<const char *>(nullptr), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty += static_cast<const wchar_t *>(nullptr), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty = static_cast<const char *>(nullptr), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty = static_cast<const wchar_t *>(nullptr), empty);
+    String tmp;
+    mutEmpty.swap(tmp);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty, empty);
+    CPPUNIT_ASSERT_EQUAL(empty < notEmpty, true);
+    CPPUNIT_ASSERT_EQUAL(empty + mutEmpty, empty);
+    CPPUNIT_ASSERT_EQUAL(empty + notEmpty, notEmpty);
+    CPPUNIT_ASSERT_EQUAL(empty + static_cast<const char *>(nullptr), empty);
   }
 
 };

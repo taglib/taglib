@@ -158,7 +158,7 @@ ByteVector fromNumber(T value, bool mostSignificantByteFirst)
 template <typename TFloat, typename TInt, Utils::ByteOrder ENDIAN>
 TFloat toFloat(const ByteVector &v, size_t offset)
 {
-  if(offset > v.size() - sizeof(TInt)) {
+  if(offset + sizeof(TInt) > v.size()) {
     debug("toFloat() - offset is out of range. Returning 0.");
     return 0.0;
   }
@@ -195,7 +195,7 @@ long double toFloat80(const ByteVector &v, size_t offset)
 {
   using std::swap;
 
-  if(offset > v.size() - 10) {
+  if(offset + 10 > v.size()) {
     debug("toFloat80() - offset is out of range. Returning 0.");
     return 0.0;
   }
@@ -360,7 +360,7 @@ ByteVector::ByteVector(const char *data, unsigned int length) :
 }
 
 ByteVector::ByteVector(const char *data) :
-  d(std::make_unique<ByteVectorPrivate>(data, static_cast<unsigned int>(::strlen(data))))
+  d(std::make_unique<ByteVectorPrivate>(data, data ? static_cast<unsigned int>(::strlen(data)) : 0))
 {
 }
 
@@ -767,6 +767,9 @@ bool ByteVector::operator!=(const ByteVector &v) const
 
 bool ByteVector::operator==(const char *s) const
 {
+  if(!s)
+    return isEmpty();
+
   if(size() != ::strlen(s))
     return false;
 

@@ -23,6 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <cstring>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -53,6 +54,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testAppend1);
   CPPUNIT_TEST(testAppend2);
   CPPUNIT_TEST(testBase64);
+  CPPUNIT_TEST(testEmpty);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -610,6 +612,94 @@ public:
       CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(invalid));
     }
 
+  }
+
+  void testEmpty()
+  {
+    const ByteVector empty;
+    const ByteVector notEmpty("A");
+    ByteVector mutEmpty;
+
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector(""));
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector("", 0));
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector(0U));
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector(empty, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector(notEmpty, 1, 0));
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector(static_cast<const char *>(nullptr)));
+    CPPUNIT_ASSERT_EQUAL(empty, ByteVector(static_cast<const char *>(nullptr), 0));
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.setData("", 0), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.setData(""), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.setData(nullptr, 0), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.setData(nullptr), empty);
+    CPPUNIT_ASSERT(!empty.data());
+    CPPUNIT_ASSERT(!mutEmpty.data());
+    CPPUNIT_ASSERT_EQUAL(empty.mid(0), empty);
+    CPPUNIT_ASSERT_EQUAL(empty.at(0), '\0');
+    // Note that the behavior of ByteVector::find() with an empty pattern is
+    // not consistent with String::find() and std::string::find().
+    CPPUNIT_ASSERT_EQUAL(empty.find(mutEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(empty.find(notEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(notEmpty.find(empty), -1);
+    CPPUNIT_ASSERT_EQUAL(empty.find('\0'), -1);
+    CPPUNIT_ASSERT_EQUAL(empty.rfind(mutEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(empty.rfind(notEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(notEmpty.rfind(empty), -1);
+    CPPUNIT_ASSERT_EQUAL(empty.containsAt(mutEmpty, 0), false);
+    CPPUNIT_ASSERT_EQUAL(empty.startsWith(mutEmpty), false);
+    CPPUNIT_ASSERT_EQUAL(empty.startsWith(notEmpty), false);
+    CPPUNIT_ASSERT_EQUAL(notEmpty.startsWith(empty), false);
+    CPPUNIT_ASSERT_EQUAL(empty.endsWith(mutEmpty), false);
+    CPPUNIT_ASSERT_EQUAL(empty.endsWithPartialMatch(mutEmpty), -1);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.replace('a', 'b'), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.replace("abc", ""), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.append(empty), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.append(notEmpty), notEmpty);
+    mutEmpty.clear();
+    CPPUNIT_ASSERT_EQUAL(mutEmpty, empty);
+    CPPUNIT_ASSERT_EQUAL(ByteVector(notEmpty).append(empty), notEmpty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.append('A'), notEmpty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty.resize(0), empty);
+    CPPUNIT_ASSERT_EQUAL(empty.size(), 0U);
+    CPPUNIT_ASSERT(empty.begin() == empty.end());
+    CPPUNIT_ASSERT(empty.cbegin() == empty.cend());
+    CPPUNIT_ASSERT(empty.rbegin() == empty.rend());
+    CPPUNIT_ASSERT(mutEmpty.begin() == mutEmpty.end());
+    CPPUNIT_ASSERT(mutEmpty.rbegin() == mutEmpty.rend());
+    CPPUNIT_ASSERT(empty.isEmpty());
+    CPPUNIT_ASSERT_EQUAL(empty.toUInt(), 0U);
+    CPPUNIT_ASSERT_EQUAL(empty.toUInt(0, true), 0U);
+    CPPUNIT_ASSERT_EQUAL(empty.toUInt(0, 0, true), 0U);
+    CPPUNIT_ASSERT_EQUAL(empty.toShort(), static_cast<short>(0));
+    CPPUNIT_ASSERT_EQUAL(empty.toShort(0, true), static_cast<short>(0));
+    CPPUNIT_ASSERT_EQUAL(empty.toUShort(), static_cast<unsigned short>(0));
+    CPPUNIT_ASSERT_EQUAL(empty.toUShort(0, true), static_cast<unsigned short>(0));
+    CPPUNIT_ASSERT_EQUAL(empty.toLongLong(), 0LL);
+    CPPUNIT_ASSERT_EQUAL(empty.toLongLong(0, true), 0LL);
+    CPPUNIT_ASSERT_EQUAL(empty.toULongLong(), 0ULL);
+    CPPUNIT_ASSERT_EQUAL(empty.toULongLong(0, true), 0ULL);
+    CPPUNIT_ASSERT_EQUAL(empty.toFloat32LE(0), 0.f);
+    CPPUNIT_ASSERT_EQUAL(empty.toFloat32BE(0), 0.f);
+    CPPUNIT_ASSERT_EQUAL(empty.toFloat64LE(0), 0.);
+    CPPUNIT_ASSERT_EQUAL(empty.toFloat64BE(0), 0.);
+    CPPUNIT_ASSERT_EQUAL(empty.toFloat80LE(0), 0.l);
+    CPPUNIT_ASSERT_EQUAL(empty.toFloat80BE(0), 0.l);
+    CPPUNIT_ASSERT(empty == mutEmpty);
+    CPPUNIT_ASSERT(empty != notEmpty);
+    CPPUNIT_ASSERT(empty == "");
+    CPPUNIT_ASSERT(empty != " ");
+    CPPUNIT_ASSERT(empty == static_cast<const char *>(nullptr));
+    CPPUNIT_ASSERT(!(empty != static_cast<const char *>(nullptr)));
+    CPPUNIT_ASSERT(empty < notEmpty);
+    CPPUNIT_ASSERT(!(empty > notEmpty));
+    CPPUNIT_ASSERT_EQUAL(empty + mutEmpty, empty);
+    CPPUNIT_ASSERT_EQUAL(empty + notEmpty, notEmpty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty = static_cast<const char *>(nullptr), empty);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty = notEmpty, notEmpty);
+    ByteVector tmp;
+    mutEmpty.swap(tmp);
+    CPPUNIT_ASSERT_EQUAL(mutEmpty, empty);
+    CPPUNIT_ASSERT_EQUAL(empty.toHex(), empty);
+    CPPUNIT_ASSERT_EQUAL(empty.toBase64(), empty);
   }
 
 };
