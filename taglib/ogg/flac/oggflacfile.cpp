@@ -113,6 +113,17 @@ bool Ogg::FLAC::File::save()
   // Put the size in the first 32 bit (I assume no more than 24 bit are used)
 
   ByteVector v = ByteVector::fromUInt(d->xiphCommentData.size());
+  if(v[0] != 0) {
+    // Block size uses more than 24 bits, try again with pictures removed.
+    d->comment->removeAllPictures();
+    d->xiphCommentData = d->comment->render(false);
+    v = ByteVector::fromUInt(d->xiphCommentData.size());
+    if(v[0] != 0) {
+      debug("Ogg::FLAC::File::save() -- Invalid, metadata block is too large.");
+      return false;
+    }
+    debug("Ogg::FLAC::File::save() -- Metadata block is too large, pictures removed.");
+  }
 
   // Set the type of the metadata-block to be a Xiph / Vorbis comment
 
