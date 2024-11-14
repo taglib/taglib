@@ -265,12 +265,19 @@ bool FLAC::File::save()
   // Render data for the metadata blocks
 
   ByteVector data;
-  for(const auto &block : std::as_const(d->blocks)) {
-    ByteVector blockData = block->render();
+  for(auto it = d->blocks.begin(); it != d->blocks.end();) {
+    ByteVector blockData = (*it)->render();
     ByteVector blockHeader = ByteVector::fromUInt(blockData.size());
-    blockHeader[0] = block->code();
+    if(blockHeader[0] != 0) {
+      debug("FLAC::File::save() -- Removing too large block.");
+      delete *it;
+      it = d->blocks.erase(it);
+      continue;
+    }
+    blockHeader[0] = (*it)->code();
     data.append(blockHeader);
     data.append(blockData);
+    ++it;
   }
 
   // Compute the amount of padding, and append that to data.
