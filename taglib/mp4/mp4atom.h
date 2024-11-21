@@ -60,8 +60,8 @@ namespace TagLib {
 
 #ifndef DO_NOT_DOCUMENT
     struct AtomData {
-      AtomData(AtomDataType type, const ByteVector &data) :
-        type(type), data(data) { }
+      AtomData(AtomDataType ptype, const ByteVector &pdata) :
+        type(ptype), data(pdata) { }
       AtomDataType type;
       int locale { 0 };
       ByteVector data;
