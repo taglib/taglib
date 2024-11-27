@@ -208,13 +208,14 @@ FileName FileStream::name() const
 
 ByteVector FileStream::readBlock(size_t length)
 {
+  ByteVector buffer;
   if(!isOpen()) {
     debug("FileStream::readBlock() -- invalid file.");
-    return ByteVector();
+    return buffer;
   }
 
   if(length == 0)
-    return ByteVector();
+    return buffer;
 
   if(length > bufferSize()) {
     if(const auto streamLength = static_cast<size_t>(FileStream::length());
@@ -223,7 +224,7 @@ ByteVector FileStream::readBlock(size_t length)
     }
   }
 
-  ByteVector buffer(static_cast<unsigned int>(length));
+  buffer = ByteVector(static_cast<unsigned int>(length));
 
   const size_t count = readFile(d->file, buffer);
   buffer.resize(static_cast<unsigned int>(count));

@@ -286,6 +286,7 @@ void Frame::parse(const ByteVector &data)
 
 ByteVector Frame::fieldData(const ByteVector &frameData) const
 {
+  ByteVector outData;
   unsigned int headerSize = d->header->size();
 
   unsigned int frameDataOffset = headerSize;
@@ -299,10 +300,10 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
   if(zlib::isAvailable() && d->header->compression() && !d->header->encryption()) {
     if(frameData.size() <= frameDataOffset) {
       debug("Compressed frame doesn't have enough data to decode");
-      return ByteVector();
+      return outData;
     }
 
-    const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset));
+    outData = zlib::decompress(frameData.mid(frameDataOffset));
     if(!outData.isEmpty() && frameDataLength != outData.size()) {
       debug("frameDataLength does not match the data length returned by zlib");
     }
@@ -310,11 +311,13 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     return outData;
   }
 
-  return frameData.mid(frameDataOffset, frameDataLength);
+  outData = frameData.mid(frameDataOffset, frameDataLength);
+  return outData;
 }
 
 String Frame::readStringField(const ByteVector &data, String::Type encoding, int *position)
 {
+  String str;
   int start = 0;
 
   if(!position)
@@ -325,9 +328,8 @@ String Frame::readStringField(const ByteVector &data, String::Type encoding, int
   int end = data.find(delimiter, *position, delimiter.size());
 
   if(end < *position)
-    return String();
+    return str;
 
-  String str;
   if(encoding == String::Latin1)
     str = Tag::latin1StringHandler()->parse(data.mid(*position, end - *position));
   else
@@ -362,13 +364,12 @@ String::Type Frame::checkTextEncoding(const StringList &fields, String::Type enc
 
 PropertyMap Frame::asProperties() const
 {
+  PropertyMap m;
   if(dynamic_cast< const UnknownFrame *>(this)) {
-    PropertyMap m;
     m.addUnsupportedData("UNKNOWN/" + frameID());
     return m;
   }
   const ByteVector &id = frameID();
-  PropertyMap m;
   m.addUnsupportedData(id);
   return m;
 }
