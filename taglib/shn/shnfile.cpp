@@ -448,7 +448,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 //  auto chunkSize = read_uint_big32(header_bytes, 4);
 
   const auto chunkData = header_bytes + 8;
-  const auto size = header_size - 8;
+  const uintptr_t size = header_size - 8;
 
   // WAVE
   if(chunkID == 'RIFF') {
