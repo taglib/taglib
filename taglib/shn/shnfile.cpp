@@ -226,19 +226,22 @@ namespace {
     if constexpr (std::is_same_v<T, uint16_t>) {
       if(big != system_big)
         value = Utils::byteSwap(static_cast<unsigned short>(value));
+      return value;
     }
     else if constexpr (std::is_same_v<T, uint32_t>) {
       if(big != system_big)
         value = Utils::byteSwap(static_cast<unsigned int>(value));
+      return value;
     }
     else if constexpr (std::is_same_v<T, uint64_t>) {
       if(big != system_big)
         value = Utils::byteSwap(static_cast<unsigned long long>(value));
+      return value;
     }
     else
       static_assert(false, "Invalid typename T");
 
-    return value;
+    return 0;
   }
 
   uint64_t read_uint_big64(void *p, uintptr_t n) noexcept
