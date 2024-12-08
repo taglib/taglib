@@ -55,6 +55,7 @@
 #include "opusfile.h"
 #include "dsffile.h"
 #include "dsdifffile.h"
+#include "shnfile.h"
 #include "tag.h"
 #include "id3v2framefactory.h"
 
@@ -189,6 +190,9 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     break;
   case TagLib_File_DSDIFF:
     file = new DSDIFF::File(filename);
+    break;
+  case TagLib_File_SHN:
+    file = new SHN::File(filename);
     break;
   default:
     break;
