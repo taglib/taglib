@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 #include <cmath>
-#include <type_traits>
 
 #include "shnfile.h"
 #include "shnutils.h"
@@ -214,87 +213,6 @@ namespace {
       return true;
     }
   };
-
-// MARK: Unsigned Integer Reading
-
-#if 0
-  // Utils::byteSwap() is overloaded for unsigned short, unsigned int, and unsigned long long
-  // Even though uint64_t and unsigned long long are typically the same size they aren't the
-  // same type which means for template purposes std::is_same_v<T, uint64_t> is false
-  template <typename T, typename = std::enable_if<std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>>>
-  T read_uint(void *p, uintptr_t n, bool big) noexcept
-  {
-    T value = *reinterpret_cast<T *>(reinterpret_cast<uintptr_t>(p) + n);
-
-    auto system_big = Utils::systemByteOrder() == Utils::BigEndian;
-    if(big != system_big)
-      value = Utils::byteSwap(value);
-    return value;
-  }
-#endif
-
-  uint64_t read_uint64(void *p, uintptr_t n, bool big) noexcept
-  {
-    static_assert(sizeof(uint64_t) == sizeof(unsigned long long), "uint64_t and unsigned long long have different sizes");
-    unsigned long long value = *reinterpret_cast<uint64_t *>(reinterpret_cast<uintptr_t>(p) + n);
-
-    auto system_big = Utils::systemByteOrder() == Utils::BigEndian;
-    if(big != system_big)
-      value = Utils::byteSwap(value);
-    return static_cast<uint64_t>(value);
-  }
-
-  uint32_t read_uint32(void *p, uintptr_t n, bool big) noexcept
-  {
-    static_assert(sizeof(uint32_t) == sizeof(unsigned int), "uint32_t and unsigned int have different sizes");
-    unsigned int value = *reinterpret_cast<uint32_t *>(reinterpret_cast<uintptr_t>(p) + n);
-
-    auto system_big = Utils::systemByteOrder() == Utils::BigEndian;
-    if(big != system_big)
-      value = Utils::byteSwap(value);
-    return static_cast<uint32_t>(value);
-  }
-
-  uint16_t read_uint16(void *p, uintptr_t n, bool big) noexcept
-  {
-    static_assert(sizeof(uint16_t) == sizeof(unsigned short), "uint16_t and unsigned short have different sizes");
-    unsigned short value = *reinterpret_cast<uint16_t *>(reinterpret_cast<uintptr_t>(p) + n);
-
-    auto system_big = Utils::systemByteOrder() == Utils::BigEndian;
-    if(big != system_big)
-      value = Utils::byteSwap(value);
-    return static_cast<uint16_t>(value);
-  }
-
-  uint64_t read_uint64_big(void *p, uintptr_t n) noexcept
-    {
-//      return read_uint<uint64_t>(p, n, true);
-      return read_uint64(p, n, true);
-    }
-
-  uint32_t read_uint32_big(void *p, uintptr_t n) noexcept
-  {
-//    return read_uint<uint32_t>(p, n, true);
-    return read_uint32(p, n, true);
-  }
-
-  uint32_t read_uint32_little(void *p, uintptr_t n) noexcept
-  {
-//    return read_uint<uint32_t>(p, n, false);
-    return read_uint32(p, n, false);
-  }
-
-  uint16_t read_uint16_big(void *p, uintptr_t n) noexcept
-  {
-//    return read_uint<uint16_t>(p, n, true);
-    return read_uint16(p, n, true);
-  }
-
-  uint16_t read_uint16_little(void *p, uintptr_t n) noexcept
-  {
-//    return read_uint<uint16_t>(p, n, false);
-    return read_uint16(p, n, false);
-  }
 } // namespace
 
 class SHN::File::FilePrivate
@@ -472,7 +390,10 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  uint8_t header_bytes [header_size];
+  ByteVector header{};
+  header.resize(header_size);
+
+  auto iter = header.begin();
   for(int32_t i = 0; i < header_size; ++i) {
     int32_t byte;
     if(!input.uvar_get(byte, VERBATIM_BYTE_SIZE)) {
@@ -481,22 +402,21 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       return;
     }
 
-    header_bytes[i] = static_cast<uint8_t>(byte);
+    *iter++ = static_cast<uint8_t>(byte);
   }
 
-  // header_bytes is at least CANONICAL_HEADER_SIZE (44) bytes in size
+  // header is at least CANONICAL_HEADER_SIZE (44) bytes in size
 
-  auto chunkID = read_uint32_big(header_bytes, 0);
-//  auto chunkSize = read_uint32_big(header_bytes, 4);
+  auto chunkID = header.toUInt(0, true);
+//  auto chunkSize = header.toUInt(4, true);
 
-  const auto chunkData = header_bytes + 8;
-  const uintptr_t size = header_size - 8;
+  const auto chunkData = ByteVector(header, 8, header.size() - 8);
 
   // WAVE
   if(chunkID == 0x52494646 /*'RIFF'*/) {
-    uintptr_t offset = 0;
+    unsigned int offset = 0;
 
-    chunkID = read_uint32_big(chunkData, offset);
+    chunkID = chunkData.toUInt(offset, true);
     offset += 4;
     if(chunkID != 0x57415645 /*'WAVE'*/) {
       debug("SHN::File::read() -- Missing 'WAVE' in 'RIFF' chunk.");
@@ -508,11 +428,11 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     uint32_t dataChunkSize = 0;
     uint16_t blockAlign = 0;
 
-    while(offset < size) {
-      chunkID = read_uint32_big(chunkData, offset);
+    while(offset < chunkData.size()) {
+      chunkID = chunkData.toUInt(offset, true);
       offset += 4;
 
-      auto chunkSize = read_uint32_little(chunkData, offset);
+      auto chunkSize = chunkData.toUInt(offset, false);
       offset += 4;
 
       switch(chunkID) {
@@ -524,7 +444,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto format_tag = read_uint16_little(chunkData, offset);
+          auto format_tag = chunkData.toUShort(offset, false);
           offset += 2;
           if(format_tag != WAVE_FORMAT_PCM) {
             debug("SHN::File::read() -- Unsupported WAVE format tag.");
@@ -532,21 +452,21 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto channels = read_uint16_little(chunkData, offset);
+          auto channels = chunkData.toUShort(offset, false);
           offset += 2;
           if(props.channel_count != channels)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'fmt ' chunk.");
 
-          props.sample_rate = static_cast<int>(read_uint32_little(chunkData, offset));
+          props.sample_rate = static_cast<int>(chunkData.toUInt(offset, false));
           offset += 4;
 
           // Skip average bytes per second
           offset += 4;
 
-          blockAlign = read_uint16_little(chunkData, offset);
+          blockAlign = chunkData.toUShort(offset, false);
           offset += 2;
 
-          props.bits_per_sample = static_cast<int>(read_uint16_little(chunkData, offset));
+          props.bits_per_sample = static_cast<int>(chunkData.toUShort(offset, false));
           offset += 2;
 
           if(chunkSize > 16)
@@ -574,9 +494,9 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   }
   // AIFF
   else if(chunkID == 0x464f524d /*'FORM'*/) {
-    uintptr_t offset = 0;
+    unsigned int offset = 0;
 
-    auto chunkID = read_uint32_big(chunkData, offset);
+    chunkID = chunkData.toUInt(offset, true);
     offset += 4;
     if(chunkID != 0x41494646 /*'AIFF'*/ && chunkID != 0x41494643 /*'AIFC'*/) {
       debug("SHN::File::read() -- Missing 'AIFF' or 'AIFC' in 'FORM' chunk.");
@@ -588,11 +508,11 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 //      props.big_endian = true;
 
     auto sawCommonChunk = false;
-    while(offset < size) {
-      chunkID = read_uint32_big(chunkData, offset);
+    while(offset < chunkData.size()) {
+      chunkID = chunkData.toUInt(offset, true);
       offset += 4;
 
-      auto chunkSize = read_uint32_big(chunkData, offset);
+      auto chunkSize = chunkData.toUInt(offset, true);
       offset += 4;
 
       // All chunks must have an even length but the pad byte is not included in ckSize
@@ -607,19 +527,19 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto channels = read_uint16_big(chunkData, offset);
+          auto channels = chunkData.toUShort(offset, true);
           offset += 2;
           if(props.channel_count != channels)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'COMM' chunk.");
 
-          props.sample_frames = static_cast<unsigned long>(read_uint32_big(chunkData, offset));
+          props.sample_frames = static_cast<unsigned long>(chunkData.toUInt(offset, true));
           offset += 4;
 
-          props.bits_per_sample = static_cast<int>(read_uint16_big(chunkData, offset));
+          props.bits_per_sample = static_cast<int>(chunkData.toUShort(offset, true));
           offset += 2;
 
           // sample rate is IEEE 754 80-bit extended float (16-bit exponent, 1-bit integer part, 63-bit fraction)
-          auto exp = static_cast<int16_t>(read_uint16_big(chunkData, offset)) - 16383 - 63;
+          auto exp = static_cast<int16_t>(chunkData.toUShort(offset, true)) - 16383 - 63;
           offset += 2;
           if(exp < -63 || exp > 63) {
             debug("SHN::File::read() -- exp out of range.");
@@ -627,7 +547,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto frac = read_uint64_big(chunkData, offset);
+          auto frac = chunkData.toULongLong(offset, true);
           offset += 8;
           if(exp >= 0)
             props.sample_rate = static_cast<int>(frac << exp);
