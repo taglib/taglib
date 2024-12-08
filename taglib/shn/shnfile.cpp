@@ -70,7 +70,9 @@ namespace {
 // MARK: Variable-Length Input
 
   /// Variable-length input using Golomb-Rice coding
-  class vario_input {
+  class VariableLengthInput {
+
+    static constexpr auto kBufferSize = 512;
 
   public:
 
@@ -86,61 +88,42 @@ namespace {
       0x1fffffff, 0x3fffffff, 0x7fffffff, 0xffffffff
     };
 
-    /// Creates a new `vario_input` object with an internal buffer of the specified size
-    /// - warning: Sizes other than `512` will break seeking
-    vario_input(File *file, size_t size = 512) noexcept
-    : file_{file}, size_{size}
+    /// Creates a new `VariableLengthInput` object
+    VariableLengthInput(File *file)
+    : file{file}, buffer{}
     {
-      byte_buffer_ = new (std::nothrow) uint8_t [size_];
-      byte_buffer_position_ = byte_buffer_;
     }
 
-    ~vario_input()
-    {
-      delete [] byte_buffer_;
-    }
+    ~VariableLengthInput() = default;
 
-    vario_input() = delete;
-    vario_input(const vario_input&) = delete;
-    vario_input(vario_input&&) = delete;
-    vario_input& operator=(const vario_input&) = delete;
-    vario_input& operator=(vario_input&&) = delete;
+    VariableLengthInput() = delete;
+    VariableLengthInput(const VariableLengthInput&) = delete;
+    VariableLengthInput(VariableLengthInput&&) = delete;
+    VariableLengthInput& operator=(const VariableLengthInput&) = delete;
+    VariableLengthInput& operator=(VariableLengthInput&&) = delete;
 
-    explicit operator bool() const noexcept
+    bool getRiceGolombCode(int32_t& i32, int k)
     {
-      return byte_buffer_ != nullptr;
-    }
-
-    /// Reads a single unsigned value from the specified bin
-    bool uvar_get(int32_t& i32, size_t bin)
-    {
-      if(bits_available_ == 0) {
-        if(!word_get(bit_buffer_))
-          return false;
-        bits_available_ = 32;
-      }
+      if(bitsAvailable == 0 && !refillBitBuffer())
+        return false;
 
       int32_t result;
-      for(result = 0; !(bit_buffer_ & (1L << --bits_available_)); ++result) {
-        if(bits_available_ == 0) {
-          if(!word_get(bit_buffer_))
-            return false;
-          bits_available_ = 32;
-        }
+      for(result = 0; !(bitBuffer & (1L << --bitsAvailable)); ++result) {
+        if(bitsAvailable == 0 && !refillBitBuffer())
+          return false;
       }
 
-      while(bin != 0) {
-        if(bits_available_ >= bin) {
-          result = (result << bin) | static_cast<int32_t>((bit_buffer_ >> (bits_available_ - bin)) & sMaskTable[bin]);
-          bits_available_ -= bin;
-          bin = 0;
+      while(k != 0) {
+        if(bitsAvailable >= k) {
+          result = (result << k) | static_cast<int32_t>((bitBuffer >> (bitsAvailable - k)) & sMaskTable[k]);
+          bitsAvailable -= k;
+          k = 0;
         }
         else {
-          result = (result << bits_available_) | static_cast<int32_t>(bit_buffer_ & sMaskTable[bits_available_]);
-          bin -= bits_available_;
-          if(!word_get(bit_buffer_))
+          result = (result << bitsAvailable) | static_cast<int32_t>(bitBuffer & sMaskTable[bitsAvailable]);
+          k -= bitsAvailable;
+          if(!refillBitBuffer())
             return false;
-          bits_available_ = 32;
         }
       }
 
@@ -148,67 +131,45 @@ namespace {
       return true;
     }
 
-    /// Reads the unsigned Golomb-Rice code
-    bool ulong_get(uint32_t& ui32)
+    bool getUInt(uint32_t& ui32, int version, int k)
     {
-      int32_t bitcount;
-      if(!uvar_get(bitcount, ULONGSIZE))
+      if(version > 0 && !getRiceGolombCode(k, ULONGSIZE))
         return false;
 
       int32_t i32;
-      if(!uvar_get(i32, static_cast<uint32_t>(bitcount)))
+      if(!getRiceGolombCode(i32, k))
         return false;
-
       ui32 = static_cast<uint32_t>(i32);
       return true;
-    }
-
-    bool uint_get(uint32_t& ui32, int version, size_t bin)
-    {
-      if(version == 0) {
-        int32_t i32;
-        if(!uvar_get(i32, bin))
-          return false;
-        ui32 = static_cast<uint32_t>(i32);
-        return true;
-      }
-      else
-        return ulong_get(ui32);
     }
 
   private:
 
     /// Input stream
-    File *file_ { nullptr };
-    /// Size of `byte_buffer_` in bytes
-    size_t size_ { 0 };
+    File *file { nullptr };
     /// Byte buffer
-    uint8_t *byte_buffer_ { nullptr };
-    /// Current position in `byte_buffer_`
-    uint8_t *byte_buffer_position_ { nullptr };
-    /// Bytes available in `byte_buffer_`
-    size_t bytes_available_ { 0 };
+    ByteVector buffer;
+    /// Current position in buffer
+    unsigned int bufferPosition { 0 };
     /// Bit buffer
-    uint32_t bit_buffer_ { 0 };
-    /// Bits available in `bit_buffer_`
-    size_t bits_available_ { 0 };
+    uint32_t bitBuffer { 0 };
+    /// Bits available in `bitBuffer`
+    int bitsAvailable { 0 };
 
-    /// Reads a single `uint32_t` from the byte buffer, refilling if necessary
-    bool word_get(uint32_t& ui32)
+    /// Refills `bitBuffer` with a single `uint32_t` from `buffer`, refilling `buffer` if necessary
+    bool refillBitBuffer()
     {
-      if(bytes_available_ < 4) {
-        auto block = file_->readBlock(size_);
+      if(buffer.size() - bufferPosition < 4) {
+        auto block = file->readBlock(kBufferSize);
         if(block.size() < 4)
           return false;
-        memcpy(byte_buffer_, block.data(), block.size());
-        bytes_available_ += block.size();
-        byte_buffer_position_ = byte_buffer_;
+        buffer = block;
+        bufferPosition = 0;
       }
 
-      ui32 = static_cast<uint32_t>((static_cast<int32_t>(byte_buffer_position_[0]) << 24) | (static_cast<int32_t>(byte_buffer_position_[1]) << 16) | (static_cast<int32_t>(byte_buffer_position_[2]) << 8) | static_cast<int32_t>(byte_buffer_position_[3]));
-
-      byte_buffer_position_ += 4;
-      bytes_available_ -= 4;
+      bitBuffer = buffer.toUInt(bufferPosition, true);
+      bufferPosition += 4;
+      bitsAvailable = 32;
 
       return true;
     }
@@ -311,63 +272,58 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   props.version = version;
 
   // Set up variable length input
-  vario_input input{this, 512};
-  if(!input) {
-    debug("SHN::File::read() -- Unable to allocate variable-length input.");
-    setValid(false);
-    return;
-  }
+  VariableLengthInput input{this};
 
   // Read internal file type
-  uint32_t ftype;
-  if(!input.uint_get(ftype, version, TYPESIZE)) {
+  uint32_t internalFileType;
+  if(!input.getUInt(internalFileType, version, TYPESIZE)) {
     debug("SHN::File::read() -- Unable to read internal file type.");
     setValid(false);
     return;
   }
-  props.internal_file_type = static_cast<int>(ftype);
+  props.internal_file_type = static_cast<int>(internalFileType);
 
   // Read number of channels
-  uint32_t nchan = 0;
-  if(!input.uint_get(nchan, version, CHANSIZE) || nchan == 0 || nchan > MAX_CHANNELS) {
+  uint32_t channelCount = 0;
+  if(!input.getUInt(channelCount, version, CHANSIZE) || channelCount == 0 || channelCount > MAX_CHANNELS) {
     debug("SHN::File::read() -- Invalid or unsupported channel count.");
     setValid(false);
     return;
   }
-  props.channel_count = static_cast<int>(nchan);
+  props.channel_count = static_cast<int>(channelCount);
 
   // Read blocksize if version > 0
   if(version > 0) {
     uint32_t blocksize = 0;
-    if(!input.uint_get(blocksize, version, static_cast<size_t>(std::log2(DEFAULT_BLOCK_SIZE))) || blocksize == 0 || blocksize > MAX_BLOCKSIZE) {
+    if(!input.getUInt(blocksize, version, static_cast<size_t>(std::log2(DEFAULT_BLOCK_SIZE))) || blocksize == 0 || blocksize > MAX_BLOCKSIZE) {
       debug("SHN::File::read() -- Invalid or unsupported block size.");
       setValid(false);
       return;
     }
 
     uint32_t maxnlpc = 0;
-    if(!input.uint_get(maxnlpc, version, LPCQSIZE) /*|| maxnlpc > 1024*/) {
+    if(!input.getUInt(maxnlpc, version, LPCQSIZE) /*|| maxnlpc > 1024*/) {
       debug("SHN::File::read() -- Invalid maxnlpc.");
       setValid(false);
       return;
     }
 
     uint32_t nmean = 0;
-    if(!input.uint_get(nmean, version, 0) /*|| nmean > 32768*/) {
+    if(!input.getUInt(nmean, version, 0) /*|| nmean > 32768*/) {
       debug("SHN::File::read() -- Invalid nmean.");
       setValid(false);
       return;
     }
 
     uint32_t nskip;
-    if(!input.uint_get(nskip, version, NSKIPSIZE)) {
+    if(!input.getUInt(nskip, version, NSKIPSIZE)) {
       setValid(false);
       return;
     }
 
     for(uint32_t i = 0; i < nskip; ++i) {
       uint32_t dummy;
-      if(!input.uint_get(dummy, version, XBYTESIZE)) {
+      if(!input.getUInt(dummy, version, XBYTESIZE)) {
         setValid(false);
         return;
       }
@@ -377,14 +333,14 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Parse the WAVE or AIFF header in the verbatim section
 
   int32_t fn;
-  if(!input.uvar_get(fn, FNSIZE) || fn != FN_VERBATIM) {
+  if(!input.getRiceGolombCode(fn, FNSIZE) || fn != FN_VERBATIM) {
     debug("SHN::File::read() -- Missing initial verbatim section.");
     setValid(false);
     return;
   }
 
   int32_t header_size;
-  if(!input.uvar_get(header_size, VERBATIM_CKSIZE_SIZE) || header_size < CANONICAL_HEADER_SIZE || header_size > VERBATIM_CHUNK_MAX) {
+  if(!input.getRiceGolombCode(header_size, VERBATIM_CKSIZE_SIZE) || header_size < CANONICAL_HEADER_SIZE || header_size > VERBATIM_CHUNK_MAX) {
     debug("SHN::File::read() -- Incorrect header size.");
     setValid(false);
     return;
@@ -395,7 +351,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   auto iter = header.begin();
   for(int32_t i = 0; i < header_size; ++i) {
     int32_t byte;
-    if(!input.uvar_get(byte, VERBATIM_BYTE_SIZE)) {
+    if(!input.getRiceGolombCode(byte, VERBATIM_BYTE_SIZE)) {
       debug("SHN::File::read() -- Unable to read header.");
       setValid(false);
       return;
@@ -467,9 +423,6 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
           props.bits_per_sample = static_cast<int>(chunkData.toUShort(offset, false));
           offset += 2;
-
-          if(chunkSize > 16)
-            debug("SHN::File::read() -- Extra bytes in 'fmt ' chunk not parsed.");
 
           sawFormatChunk = true;
 
@@ -552,9 +505,6 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             props.sample_rate = static_cast<int>(frac << exp);
           else
             props.sample_rate = static_cast<int>((frac + (static_cast<uint64_t>(1) << (-exp - 1))) >> -exp);
-
-          if(chunkSize > 18)
-            debug("SHN::File::read() -- Extra bytes in 'COMM' chunk not parsed.");
 
           sawCommonChunk = true;
 
