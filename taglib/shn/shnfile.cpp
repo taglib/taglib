@@ -23,6 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include <cmath>
 #include <type_traits>
 
 #include "shnfile.h"
@@ -378,7 +379,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Read blocksize if version > 0
   if(version > 0) {
     uint32_t blocksize = 0;
-    if(!input.uint_get(blocksize, version, static_cast<size_t>(log2(DEFAULT_BLOCK_SIZE))) || blocksize == 0 || blocksize > MAX_BLOCKSIZE) {
+    if(!input.uint_get(blocksize, version, static_cast<size_t>(std::log2(DEFAULT_BLOCK_SIZE))) || blocksize == 0 || blocksize > MAX_BLOCKSIZE) {
       debug("SHN::File::read() -- Invalid or unsupported block size.");
       setValid(false);
       return;
