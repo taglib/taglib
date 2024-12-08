@@ -390,8 +390,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  ByteVector header{};
-  header.resize(header_size);
+  ByteVector header(header_size, 0);
 
   auto iter = header.begin();
   for(int32_t i = 0; i < header_size; ++i) {
