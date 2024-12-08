@@ -223,8 +223,20 @@ namespace {
     T value = *reinterpret_cast<T *>(reinterpret_cast<uintptr_t>(p) + n);
 
     auto system_big = Utils::systemByteOrder() == Utils::BigEndian;
-    if(big != system_big)
-      value = Utils::byteSwap(value);
+    if constexpr (std::is_same_v<T, uint16_t>) {
+      if(big != system_big)
+        value = Utils::byteSwap(static_cast<unsigned short>(value));
+    }
+    else if constexpr (std::is_same_v<T, uint32_t>) {
+      if(big != system_big)
+        value = Utils::byteSwap(static_cast<unsigned int>(value));
+    }
+    else if constexpr (std::is_same_v<T, uint64_t>) {
+      if(big != system_big)
+        value = Utils::byteSwap(static_cast<unsigned long long>(value));
+    }
+    else
+      static_assert(false, "Invalid typename T");
 
     return value;
   }
