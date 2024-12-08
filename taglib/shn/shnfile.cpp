@@ -463,12 +463,12 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   const uintptr_t size = header_size - 8;
 
   // WAVE
-  if(chunkID == 'RIFF') {
+  if(chunkID == 0x52494646 /*'RIFF'*/) {
     uintptr_t offset = 0;
 
     chunkID = read_uint_big32(chunkData, offset);
     offset += 4;
-    if(chunkID != 'WAVE') {
+    if(chunkID != 0x57415645 /*'WAVE'*/) {
       debug("SHN::File::read() -- Missing 'WAVE' in 'RIFF' chunk.");
       setValid(false);
       return;
@@ -486,7 +486,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       offset += 4;
 
       switch(chunkID) {
-        case 'fmt ':
+        case 0x666d7420 /*'fmt '*/:
         {
           if(chunkSize < 16) {
             debug("SHN::File::read() -- 'fmt ' chunk is too small.");
@@ -527,7 +527,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           break;
         }
 
-        case 'data':
+        case 0x64617461 /*'data'*/:
           dataChunkSize = chunkSize;
           break;
       }
@@ -543,18 +543,18 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       props.sample_frames = static_cast<unsigned long>(dataChunkSize / blockAlign);
   }
   // AIFF
-  else if(chunkID == 'FORM') {
+  else if(chunkID == 0x464f524d /*'FORM'*/) {
     uintptr_t offset = 0;
 
     auto chunkID = read_uint_big32(chunkData, offset);
     offset += 4;
-    if(chunkID != 'AIFF' && chunkID != 'AIFC') {
+    if(chunkID != 0x41494646 /*'AIFF'*/ && chunkID != 0x41494643 /*'AIFC'*/) {
       debug("SHN::File::read() -- Missing 'AIFF' or 'AIFC' in 'FORM' chunk.");
       setValid(false);
       return;
     }
 
-//    if(chunkID == 'AIFC')
+//    if(chunkID == 0x41494643 /*'AIFC'*/)
 //      props.big_endian = true;
 
     auto sawCommonChunk = false;
@@ -569,7 +569,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       chunkSize += (chunkSize & 1);
 
       switch(chunkID) {
-        case 'COMM':
+        case 0x434f4d4d /*'COMM'*/:
         {
           if(chunkSize < 18) {
             debug("SHN::File::read() -- 'COMM' chunk is too small.");
