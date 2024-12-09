@@ -656,6 +656,13 @@ bool ByteVector::isEmpty() const
   return d->length == 0;
 }
 
+// Sanity checks
+static_assert(sizeof(unsigned short) == sizeof(uint16_t), "unsigned short and uint16_t are different sizes");
+static_assert(sizeof(unsigned int) == sizeof(uint32_t), "unsigned int and uint32_t are different sizes");
+static_assert(sizeof(unsigned long long) == sizeof(uint64_t), "unsigned long long and uint64_t are different sizes");
+static_assert(sizeof(float) == sizeof(uint32_t), "float and uint32_t are different sizes");
+static_assert(sizeof(double) == sizeof(uint64_t), "double and uint64_t are different sizes");
+
 unsigned int ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
   return toNumber<uint32_t>(*this, 0, mostSignificantByteFirst);
