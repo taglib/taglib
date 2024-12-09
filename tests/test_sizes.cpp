@@ -92,6 +92,9 @@
 #include "rifffile.h"
 #include "s3mfile.h"
 #include "s3mproperties.h"
+#include "shnfile.h"
+#include "shnproperties.h"
+#include "shntag.h"
 #include "speexfile.h"
 #include "speexproperties.h"
 #include "synchronizedlyricsframe.h"
@@ -245,6 +248,9 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::WAV::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::S3M::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::S3M::Properties));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::SHN::File));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::SHN::Properties));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::SHN::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::String));
         CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::StringList));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Tag));
