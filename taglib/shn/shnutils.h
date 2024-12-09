@@ -26,6 +26,10 @@
 #ifndef TAGLIB_SHNUTILS_H
 #define TAGLIB_SHNUTILS_H
 
+// THIS FILE IS NOT A PART OF THE TAGLIB API
+
+#ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
+
 namespace TagLib {
   namespace SHN {
 
@@ -41,5 +45,7 @@ namespace TagLib {
     };
   } // namespace SHN
 } // namespace TagLib
+
+#endif
 
 #endif
