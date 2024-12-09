@@ -42,9 +42,9 @@ public:
   int version { 0 };
   int internalFileType { 0 };
   int channelCount { 0 };
-  unsigned long sampleFrames { 0 };
   int sampleRate { 0 };
   int bitsPerSample { 0 };
+  unsigned long sampleFrames { 0 };
 
   // Computed
   int bitrate { 0 };
@@ -57,11 +57,11 @@ SHN::Properties::Properties(const PropertyValues *values, ReadStyle style) :
 {
   if(values) {
     d->version = values->version;
-    d->internalFileType = values->internal_file_type;
-    d->channelCount = values->channel_count;
-    d->sampleRate = values->sample_rate;
-    d->bitsPerSample = values->bits_per_sample;
-    d->sampleFrames = values->sample_frames;
+    d->internalFileType = values->internalFileType;
+    d->channelCount = values->channelCount;
+    d->sampleRate = values->sampleRate;
+    d->bitsPerSample = values->bitsPerSample;
+    d->sampleFrames = values->sampleFrames;
 
     d->bitrate = static_cast<int>(d->sampleRate * d->bitsPerSample * d->channelCount / 1000.0 + 0.5);
     if(d->sampleRate > 0)

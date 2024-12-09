@@ -33,11 +33,11 @@ namespace TagLib {
     struct PropertyValues
     {
       int version { 0 };
-      int internal_file_type { 0 };
-      int channel_count { 0 };
-      int sample_rate { 0 };
-      int bits_per_sample { 0 };
-      unsigned long sample_frames { 0 };
+      int internalFileType { 0 };
+      int channelCount { 0 };
+      int sampleRate { 0 };
+      int bitsPerSample { 0 };
+      unsigned long sampleFrames { 0 };
     };
   } // namespace SHN
 } // namespace TagLib
