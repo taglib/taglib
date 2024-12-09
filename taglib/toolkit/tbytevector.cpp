@@ -186,11 +186,11 @@ TFloat toFloat(const ByteVector &v, size_t offset)
   ::memcpy(&tmp, v.data() + offset, sizeof(TInt));
 
   if(ENDIAN != Utils::systemByteOrder()) {
-    if constexpr (sizeof(T) == 2)
+    if constexpr (sizeof(TInt) == 2)
       tmp.i = Utils::byteSwap(static_cast<uint16_t>(tmp.i));
-    else if constexpr (sizeof(T) == 4)
+    else if constexpr (sizeof(TInt) == 4)
       tmp.i = Utils::byteSwap(static_cast<uint32_t>(tmp.i));
-    else if constexpr (sizeof(T) == 8)
+    else if constexpr (sizeof(TInt) == 8)
       tmp.i = Utils::byteSwap(static_cast<uint64_t>(tmp.i));
     else
       static_assert(false, "Byte swap requested for type with invalid size");
@@ -209,11 +209,11 @@ ByteVector fromFloat(TFloat value)
   tmp.f = value;
 
   if(ENDIAN != Utils::systemByteOrder()) {
-    if constexpr (sizeof(T) == 2)
+    if constexpr (sizeof(TInt) == 2)
       tmp.i = Utils::byteSwap(static_cast<uint16_t>(tmp.i));
-    else if constexpr (sizeof(T) == 4)
+    else if constexpr (sizeof(TInt) == 4)
       tmp.i = Utils::byteSwap(static_cast<uint32_t>(tmp.i));
-    else if constexpr (sizeof(T) == 8)
+    else if constexpr (sizeof(TInt) == 8)
       tmp.i = Utils::byteSwap(static_cast<uint64_t>(tmp.i));
     else
       static_assert(false, "Byte swap requested for type with invalid size");
