@@ -30,6 +30,7 @@
 
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
+#include <cstdint>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -60,7 +61,7 @@ namespace TagLib
       /*!
        * Reverses the order of bytes in a 16-bit integer.
        */
-      inline unsigned short byteSwap(unsigned short x)
+      inline uint16_t byteSwap(uint16_t x)
       {
 #if defined(HAVE_GCC_BYTESWAP)
 
@@ -92,7 +93,7 @@ namespace TagLib
       /*!
        * Reverses the order of bytes in a 32-bit integer.
        */
-      inline unsigned int byteSwap(unsigned int x)
+      inline uint32_t byteSwap(uint32_t x)
       {
 #if defined(HAVE_GCC_BYTESWAP)
 
@@ -127,7 +128,7 @@ namespace TagLib
       /*!
        * Reverses the order of bytes in a 64-bit integer.
        */
-      inline unsigned long long byteSwap(unsigned long long x)
+      inline uint64_t byteSwap(uint64_t x)
       {
 #if defined(HAVE_GCC_BYTESWAP)
 

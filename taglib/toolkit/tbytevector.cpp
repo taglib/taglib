@@ -282,47 +282,47 @@ ByteVector ByteVector::fromCString(const char *s, unsigned int length)
 
 ByteVector ByteVector::fromUInt(unsigned int value, bool mostSignificantByteFirst)
 {
-  return fromNumber<unsigned int>(value, mostSignificantByteFirst);
+  return fromNumber<uint32_t>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromShort(short value, bool mostSignificantByteFirst)
 {
-  return fromNumber<unsigned short>(value, mostSignificantByteFirst);
+  return fromNumber<uint16_t>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromUShort(unsigned short value, bool mostSignificantByteFirst)
 {
-  return fromNumber<unsigned short>(value, mostSignificantByteFirst);
+  return fromNumber<uint16_t>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromLongLong(long long value, bool mostSignificantByteFirst)
 {
-  return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
+  return fromNumber<uint64_t>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromULongLong(unsigned long long value, bool mostSignificantByteFirst)
 {
-  return fromNumber<unsigned long long>(value, mostSignificantByteFirst);
+  return fromNumber<uint64_t>(value, mostSignificantByteFirst);
 }
 
 ByteVector ByteVector::fromFloat32LE(float value)
 {
-  return fromFloat<float, unsigned int, Utils::LittleEndian>(value);
+  return fromFloat<float, uint32_t, Utils::LittleEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat32BE(float value)
 {
-  return fromFloat<float, unsigned int, Utils::BigEndian>(value);
+  return fromFloat<float, uint32_t, Utils::BigEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat64LE(double value)
 {
-  return fromFloat<double, unsigned long long, Utils::LittleEndian>(value);
+  return fromFloat<double, uint64_t, Utils::LittleEndian>(value);
 }
 
 ByteVector ByteVector::fromFloat64BE(double value)
 {
-  return fromFloat<double, unsigned long long, Utils::BigEndian>(value);
+  return fromFloat<double, uint64_t, Utils::BigEndian>(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -656,79 +656,86 @@ bool ByteVector::isEmpty() const
   return d->length == 0;
 }
 
+// Sanity checks
+static_assert(sizeof(unsigned short) == sizeof(uint16_t), "unsigned short and uint16_t are different sizes");
+static_assert(sizeof(unsigned int) == sizeof(uint32_t), "unsigned int and uint32_t are different sizes");
+static_assert(sizeof(unsigned long long) == sizeof(uint64_t), "unsigned long long and uint64_t are different sizes");
+static_assert(sizeof(float) == sizeof(uint32_t), "float and uint32_t are different sizes");
+static_assert(sizeof(double) == sizeof(uint64_t), "double and uint64_t are different sizes");
+
 unsigned int ByteVector::toUInt(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned int>(*this, 0, mostSignificantByteFirst);
+  return toNumber<uint32_t>(*this, 0, mostSignificantByteFirst);
 }
 
 unsigned int ByteVector::toUInt(unsigned int offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned int>(*this, offset, mostSignificantByteFirst);
+  return toNumber<uint32_t>(*this, offset, mostSignificantByteFirst);
 }
 
 unsigned int ByteVector::toUInt(unsigned int offset, unsigned int length, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned int>(*this, offset, length, mostSignificantByteFirst);
+  return toNumber<uint32_t>(*this, offset, length, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
+  return toNumber<uint16_t>(*this, 0, mostSignificantByteFirst);
 }
 
 short ByteVector::toShort(unsigned int offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
+  return toNumber<uint16_t>(*this, offset, mostSignificantByteFirst);
 }
 
 unsigned short ByteVector::toUShort(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, 0, mostSignificantByteFirst);
+  return toNumber<uint16_t>(*this, 0, mostSignificantByteFirst);
 }
 
 unsigned short ByteVector::toUShort(unsigned int offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned short>(*this, offset, mostSignificantByteFirst);
+  return toNumber<uint16_t>(*this, offset, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, 0, mostSignificantByteFirst);
+  return toNumber<uint64_t>(*this, 0, mostSignificantByteFirst);
 }
 
 long long ByteVector::toLongLong(unsigned int offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
+  return toNumber<uint64_t>(*this, offset, mostSignificantByteFirst);
 }
 
 unsigned long long ByteVector::toULongLong(bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, 0, mostSignificantByteFirst);
+  return toNumber<uint64_t>(*this, 0, mostSignificantByteFirst);
 }
 
 unsigned long long ByteVector::toULongLong(unsigned int offset, bool mostSignificantByteFirst) const
 {
-  return toNumber<unsigned long long>(*this, offset, mostSignificantByteFirst);
+  return toNumber<uint64_t>(*this, offset, mostSignificantByteFirst);
 }
 
 float ByteVector::toFloat32LE(size_t offset) const
 {
-  return toFloat<float, unsigned int, Utils::LittleEndian>(*this, offset);
+  return toFloat<float, uint32_t, Utils::LittleEndian>(*this, offset);
 }
 
 float ByteVector::toFloat32BE(size_t offset) const
 {
-  return toFloat<float, unsigned int, Utils::BigEndian>(*this, offset);
+  return toFloat<float, uint32_t, Utils::BigEndian>(*this, offset);
 }
 
 double ByteVector::toFloat64LE(size_t offset) const
 {
-  return toFloat<double, unsigned long long, Utils::LittleEndian>(*this, offset);
+  return toFloat<double, uint64_t, Utils::LittleEndian>(*this, offset);
 }
 
 double ByteVector::toFloat64BE(size_t offset) const
 {
-  return toFloat<double, unsigned long long, Utils::BigEndian>(*this, offset);
+  return toFloat<double, uint64_t, Utils::BigEndian>(*this, offset);
 }
 
 long double ByteVector::toFloat80LE(size_t offset) const
