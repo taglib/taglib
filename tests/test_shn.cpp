@@ -31,7 +31,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->shortenVersion());
-    CPPUNIT_ASSERT_EQUAL(5, f.audioProperties()->internalFileType());
+    CPPUNIT_ASSERT_EQUAL(5, f.audioProperties()->fileType());
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned long>(88200), f.audioProperties()->sampleFrames());
   }

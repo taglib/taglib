@@ -33,7 +33,7 @@ namespace TagLib {
     struct PropertyValues
     {
       int version { 0 };
-      int internalFileType { 0 };
+      int fileType { 0 };
       int channelCount { 0 };
       int sampleRate { 0 };
       int bitsPerSample { 0 };

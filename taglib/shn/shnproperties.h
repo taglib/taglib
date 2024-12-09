@@ -52,8 +52,8 @@ namespace TagLib {
 
       //! Returns the Shorten file version (1-3).
       int shortenVersion() const;
-      //! Returns the Shorten internal file type.
-      int internalFileType() const;
+      //! Returns the Shorten file type.
+      int fileType() const;
       int bitsPerSample() const;
       unsigned long sampleFrames() const;
 

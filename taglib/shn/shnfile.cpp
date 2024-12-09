@@ -275,14 +275,14 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Set up variable length input
   VariableLengthInput input{this};
 
-  // Read internal file type
-  uint32_t internalFileType;
-  if(!input.getUInt(internalFileType, version, fileTypeCodeSize)) {
-    debug("SHN::File::read() -- Unable to read internal file type.");
+  // Read file type
+  uint32_t fileType;
+  if(!input.getUInt(fileType, version, fileTypeCodeSize)) {
+    debug("SHN::File::read() -- Unable to read file type.");
     setValid(false);
     return;
   }
-  props.internalFileType = static_cast<int>(internalFileType);
+  props.fileType = static_cast<int>(fileType);
 
   // Read number of channels
   uint32_t channelCount = 0;

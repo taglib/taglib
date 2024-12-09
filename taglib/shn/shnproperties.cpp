@@ -40,7 +40,7 @@ public:
   PropertiesPrivate &operator=(const PropertiesPrivate &) = delete;
 
   int version { 0 };
-  int internalFileType { 0 };
+  int fileType { 0 };
   int channelCount { 0 };
   int sampleRate { 0 };
   int bitsPerSample { 0 };
@@ -57,7 +57,7 @@ SHN::Properties::Properties(const PropertyValues *values, ReadStyle style) :
 {
   if(values) {
     d->version = values->version;
-    d->internalFileType = values->internalFileType;
+    d->fileType = values->fileType;
     d->channelCount = values->channelCount;
     d->sampleRate = values->sampleRate;
     d->bitsPerSample = values->bitsPerSample;
@@ -96,9 +96,9 @@ int SHN::Properties::shortenVersion() const
   return d->version;
 }
 
-int SHN::Properties::internalFileType() const
+int SHN::Properties::fileType() const
 {
-  return d->internalFileType;
+  return d->fileType;
 }
 
 int SHN::Properties::bitsPerSample() const
