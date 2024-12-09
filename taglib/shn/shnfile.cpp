@@ -39,33 +39,33 @@ namespace {
 
 // MARK: Constants
 
-  const auto MIN_SUPPORTED_VERSION  { 1 };
-  const auto MAX_SUPPORTED_VERSION  { 3 };
+  constexpr auto minSupportedVersion        = 1;
+  constexpr auto maxSupportedVersion        = 3;
 
-  const auto DEFAULT_BLOCK_SIZE     { 256 };
+  constexpr auto defaultBlockSize           = 256;
 
-  const auto CHANSIZE               { 0 };
+  constexpr auto channelCountCodeSize       = 0;
 
-  const auto FNSIZE                 { 2 };
-  const auto FN_VERBATIM            { 9 };
+  constexpr auto functionCodeSize           = 2;
+  constexpr auto functionVerbatim           = 9;
 
-  const auto VERBATIM_CKSIZE_SIZE   { 5 };
-  const auto VERBATIM_BYTE_SIZE     { 8 };
-  const auto VERBATIM_CHUNK_MAX     { 256 };
+  constexpr auto verbatimChunkSizeCodeSize  = 5;
+  constexpr auto verbatimByteCodeSize       = 8;
+  constexpr auto verbatimChunkMaxSize       = 256;
 
-  const auto ULONGSIZE              { 2 };
-  const auto NSKIPSIZE              { 1 };
-  const auto LPCQSIZE               { 2 };
-  const auto XBYTESIZE              { 7 };
+  constexpr auto uInt32CodeSize             = 2;
+  constexpr auto skipBytesCodeSize          = 1;
+  constexpr auto lpcqCodeSize               = 2;
+  constexpr auto extraByteCodeSize          = 7;
 
-  const auto TYPESIZE               { 4 };
+  constexpr auto fileTypeSize               = 4;
 
-  const auto MAX_CHANNELS           { 8 };
-  const auto MAX_BLOCKSIZE          { 65535 };
+  constexpr auto maxChannelCount            = 8;
+  constexpr auto maxBlocksize               = 65535;
 
-  const auto CANONICAL_HEADER_SIZE  { 44 };
+  constexpr auto canonicalHeaderSize        = 44;
 
-  const auto WAVE_FORMAT_PCM        { 0x0001 };
+  constexpr auto waveFormatPCMTag           = 0x0001;
 
 // MARK: Variable-Length Input
 
@@ -89,8 +89,9 @@ namespace {
     };
 
     /// Creates a new `VariableLengthInput` object
-    VariableLengthInput(File *file)
-    : file{file}, buffer{}
+    VariableLengthInput(File *file) :
+      file{file},
+      buffer{}
     {
     }
 
@@ -133,7 +134,7 @@ namespace {
 
     bool getUInt(uint32_t& ui32, int version, int k)
     {
-      if(version > 0 && !getRiceGolombCode(k, ULONGSIZE))
+      if(version > 0 && !getRiceGolombCode(k, uInt32CodeSize))
         return false;
 
       int32_t i32;
@@ -264,7 +265,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   // Read file version
   auto version = readBlock(1).toUInt();
-  if(version < MIN_SUPPORTED_VERSION || version > MAX_SUPPORTED_VERSION) {
+  if(version < minSupportedVersion || version > maxSupportedVersion) {
     debug("SHN::File::read() -- Unsupported version.");
     setValid(false);
     return;
@@ -276,7 +277,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   // Read internal file type
   uint32_t internalFileType;
-  if(!input.getUInt(internalFileType, version, TYPESIZE)) {
+  if(!input.getUInt(internalFileType, version, fileTypeSize)) {
     debug("SHN::File::read() -- Unable to read internal file type.");
     setValid(false);
     return;
@@ -285,7 +286,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   // Read number of channels
   uint32_t channelCount = 0;
-  if(!input.getUInt(channelCount, version, CHANSIZE) || channelCount == 0 || channelCount > MAX_CHANNELS) {
+  if(!input.getUInt(channelCount, version, channelCountCodeSize) || channelCount == 0 || channelCount > maxChannelCount) {
     debug("SHN::File::read() -- Invalid or unsupported channel count.");
     setValid(false);
     return;
@@ -295,15 +296,15 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Read blocksize if version > 0
   if(version > 0) {
     uint32_t blocksize = 0;
-    if(!input.getUInt(blocksize, version, static_cast<size_t>(std::log2(DEFAULT_BLOCK_SIZE))) || blocksize == 0 || blocksize > MAX_BLOCKSIZE) {
+    if(!input.getUInt(blocksize, version, static_cast<size_t>(std::log2(defaultBlockSize))) || blocksize == 0 || blocksize > maxBlocksize) {
       debug("SHN::File::read() -- Invalid or unsupported block size.");
       setValid(false);
       return;
     }
 
     uint32_t maxnlpc = 0;
-    if(!input.getUInt(maxnlpc, version, LPCQSIZE) /*|| maxnlpc > 1024*/) {
-      debug("SHN::File::read() -- Invalid maxnlpc.");
+    if(!input.getUInt(maxnlpc, version, lpcqCodeSize) /*|| maxnlpc > 1024*/) {
+      debug("SHN::File::read() -- Invalid maximum nlpc.");
       setValid(false);
       return;
     }
@@ -315,15 +316,15 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       return;
     }
 
-    uint32_t nskip;
-    if(!input.getUInt(nskip, version, NSKIPSIZE)) {
+    uint32_t skipCount;
+    if(!input.getUInt(skipCount, version, skipBytesCodeSize)) {
       setValid(false);
       return;
     }
 
-    for(uint32_t i = 0; i < nskip; ++i) {
+    for(uint32_t i = 0; i < skipCount; ++i) {
       uint32_t dummy;
-      if(!input.getUInt(dummy, version, XBYTESIZE)) {
+      if(!input.getUInt(dummy, version, extraByteCodeSize)) {
         setValid(false);
         return;
       }
@@ -332,15 +333,15 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   // Parse the WAVE or AIFF header in the verbatim section
 
-  int32_t fn;
-  if(!input.getRiceGolombCode(fn, FNSIZE) || fn != FN_VERBATIM) {
+  int32_t function;
+  if(!input.getRiceGolombCode(function, functionCodeSize) || function != functionVerbatim) {
     debug("SHN::File::read() -- Missing initial verbatim section.");
     setValid(false);
     return;
   }
 
   int32_t header_size;
-  if(!input.getRiceGolombCode(header_size, VERBATIM_CKSIZE_SIZE) || header_size < CANONICAL_HEADER_SIZE || header_size > VERBATIM_CHUNK_MAX) {
+  if(!input.getRiceGolombCode(header_size, verbatimChunkSizeCodeSize) || header_size < canonicalHeaderSize || header_size > verbatimChunkMaxSize) {
     debug("SHN::File::read() -- Incorrect header size.");
     setValid(false);
     return;
@@ -351,7 +352,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   auto iter = header.begin();
   for(int32_t i = 0; i < header_size; ++i) {
     int32_t byte;
-    if(!input.getRiceGolombCode(byte, VERBATIM_BYTE_SIZE)) {
+    if(!input.getRiceGolombCode(byte, verbatimByteCodeSize)) {
       debug("SHN::File::read() -- Unable to read header.");
       setValid(false);
       return;
@@ -360,7 +361,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     *iter++ = static_cast<uint8_t>(byte);
   }
 
-  // header is at least CANONICAL_HEADER_SIZE (44) bytes in size
+  // header is at least canonicalHeaderSize (44) bytes in size
 
   auto chunkID = header.toUInt(0, true);
 //  auto chunkSize = header.toUInt(4, true);
@@ -399,17 +400,17 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto format_tag = chunkData.toUShort(offset, false);
+          auto formatTag = chunkData.toUShort(offset, false);
           offset += 2;
-          if(format_tag != WAVE_FORMAT_PCM) {
+          if(formatTag != waveFormatPCMTag) {
             debug("SHN::File::read() -- Unsupported WAVE format tag.");
             setValid(false);
             return;
           }
 
-          auto channels = chunkData.toUShort(offset, false);
+          auto channelCount = chunkData.toUShort(offset, false);
           offset += 2;
-          if(props.channelCount != channels)
+          if(props.channelCount != channelCount)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'fmt ' chunk.");
 
           props.sampleRate = static_cast<int>(chunkData.toUInt(offset, false));
@@ -479,9 +480,9 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto channels = chunkData.toUShort(offset, true);
+          auto channelCount = chunkData.toUShort(offset, true);
           offset += 2;
-          if(props.channelCount != channels)
+          if(props.channelCount != channelCount)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'COMM' chunk.");
 
           props.sampleFrames = static_cast<unsigned long>(chunkData.toUInt(offset, true));

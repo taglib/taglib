@@ -34,7 +34,7 @@ class SHN::Tag::TagPrivate
 };
 
 SHN::Tag::Tag() :
-d(std::make_unique<TagPrivate>())
+  d(std::make_unique<TagPrivate>())
 {
 }
 
