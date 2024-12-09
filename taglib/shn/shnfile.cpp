@@ -58,7 +58,7 @@ namespace {
   constexpr auto lpcqCodeSize               = 2;
   constexpr auto extraByteCodeSize          = 7;
 
-  constexpr auto fileTypeSize               = 4;
+  constexpr auto fileTypeCodeSize           = 4;
 
   constexpr auto maxChannelCount            = 8;
   constexpr auto maxBlocksize               = 65535;
@@ -277,7 +277,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   // Read internal file type
   uint32_t internalFileType;
-  if(!input.getUInt(internalFileType, version, fileTypeSize)) {
+  if(!input.getUInt(internalFileType, version, fileTypeCodeSize)) {
     debug("SHN::File::read() -- Unable to read internal file type.");
     setValid(false);
     return;
