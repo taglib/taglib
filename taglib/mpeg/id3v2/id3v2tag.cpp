@@ -56,6 +56,28 @@ namespace
 
   constexpr long MinPaddingSize = 1024;
   constexpr long MaxPaddingSize = 1024 * 1024;
+
+  /*!
+   * Downgrade ID3v2.4 text \a encoding to value supported by ID3v2.3.
+   */
+  String::Type downgradeTextEncoding(String::Type encoding)
+  {
+    return encoding == String::Latin1 ? String::Latin1 : String::UTF16;
+  }
+
+  /*!
+   * Downgrade ID3v2.4 text encoding to value supported by ID3v2.3.
+   * \param frame1 first contributing ID3v2.4 frame, can be null
+   * \param frame2 second contributing ID3v2.4 frame, can be null
+   * \return ID3v2.3 encoding suitable for both contributing source frames.
+   */
+  String::Type downgradeTextEncoding(ID3v2::TextIdentificationFrame *frame1,
+                                     ID3v2::TextIdentificationFrame *frame2)
+  {
+    return (!frame1 || frame1->textEncoding() == String::Latin1) &&
+           (!frame2 || frame2->textEncoding() == String::Latin1)
+       ? String::Latin1 : String::UTF16;
+  }
 }  // namespace
 
 class ID3v2::Tag::TagPrivate
@@ -578,7 +600,8 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     String content = frameTDOR->toString();
 
     if(content.size() >= 4) {
-      auto frameTORY = new ID3v2::TextIdentificationFrame("TORY", String::Latin1);
+      auto frameTORY = new ID3v2::TextIdentificationFrame(
+        "TORY", downgradeTextEncoding(frameTDOR->textEncoding()));
       frameTORY->setText(content.substr(0, 4));
       frames->append(frameTORY);
       newFrames->append(frameTORY);
@@ -587,17 +610,20 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
 
   if(frameTDRC) {
     if(String content = frameTDRC->toString(); content.size() >= 4) {
-      auto frameTYER = new ID3v2::TextIdentificationFrame("TYER", String::Latin1);
+      auto frameTYER = new ID3v2::TextIdentificationFrame(
+        "TYER", downgradeTextEncoding(frameTDRC->textEncoding()));
       frameTYER->setText(content.substr(0, 4));
       frames->append(frameTYER);
       newFrames->append(frameTYER);
       if(content.size() >= 10 && content[4] == '-' && content[7] == '-') {
-        auto frameTDAT = new ID3v2::TextIdentificationFrame("TDAT", String::Latin1);
+        auto frameTDAT = new ID3v2::TextIdentificationFrame(
+          "TDAT", downgradeTextEncoding(frameTDRC->textEncoding()));
         frameTDAT->setText(content.substr(8, 2) + content.substr(5, 2));
         frames->append(frameTDAT);
         newFrames->append(frameTDAT);
         if(content.size() >= 16 && content[10] == 'T' && content[13] == ':') {
-          auto frameTIME = new ID3v2::TextIdentificationFrame("TIME", String::Latin1);
+          auto frameTIME = new ID3v2::TextIdentificationFrame(
+            "TIME", downgradeTextEncoding(frameTDRC->textEncoding()));
           frameTIME->setText(content.substr(11, 2) + content.substr(14, 2));
           frames->append(frameTIME);
           newFrames->append(frameTIME);
@@ -607,7 +633,8 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
   }
 
   if(frameTIPL || frameTMCL) {
-    auto frameIPLS = new ID3v2::TextIdentificationFrame("IPLS", String::Latin1);
+    auto frameIPLS = new ID3v2::TextIdentificationFrame(
+      "IPLS", downgradeTextEncoding(frameTIPL, frameTMCL));
 
     StringList people;
 
@@ -653,7 +680,8 @@ void ID3v2::Tag::downgradeFrames(FrameList *frames, FrameList *newFrames) const
     if(!genreText.isEmpty())
       combined += genreText;
 
-    frameTCON = new ID3v2::TextIdentificationFrame("TCON", String::Latin1);
+    frameTCON = new ID3v2::TextIdentificationFrame(
+      "TCON", downgradeTextEncoding(frameTCON->textEncoding()));
     frameTCON->setText(combined);
     frames->append(frameTCON);
     newFrames->append(frameTCON);
