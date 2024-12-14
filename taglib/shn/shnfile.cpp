@@ -40,33 +40,33 @@ namespace {
 
 // MARK: Constants
 
-  constexpr auto minSupportedVersion        = 1;
-  constexpr auto maxSupportedVersion        = 3;
+  constexpr int minSupportedVersion         = 1;
+  constexpr int maxSupportedVersion         = 3;
 
-  constexpr auto defaultBlockSize           = 256;
+  constexpr int defaultBlockSize            = 256;
 
-  constexpr auto channelCountCodeSize       = 0;
+  constexpr int32_t channelCountCodeSize    = 0;
 
-  constexpr auto functionCodeSize           = 2;
-  constexpr auto functionVerbatim           = 9;
+  constexpr int functionCodeSize            = 2;
+  constexpr int32_t functionVerbatim        = 9;
 
-  constexpr auto verbatimChunkSizeCodeSize  = 5;
-  constexpr auto verbatimByteCodeSize       = 8;
-  constexpr auto verbatimChunkMaxSize       = 256;
+  constexpr int verbatimChunkSizeCodeSize   = 5;
+  constexpr int verbatimByteCodeSize        = 8;
+  constexpr int verbatimChunkMaxSize        = 256;
 
-  constexpr auto uInt32CodeSize             = 2;
-  constexpr auto skipBytesCodeSize          = 1;
-  constexpr auto lpcqCodeSize               = 2;
-  constexpr auto extraByteCodeSize          = 7;
+  constexpr int uInt32CodeSize              = 2;
+  constexpr int32_t skipBytesCodeSize       = 1;
+  constexpr int32_t lpcqCodeSize            = 2;
+  constexpr int32_t extraByteCodeSize       = 7;
 
-  constexpr auto fileTypeCodeSize           = 4;
+  constexpr int32_t fileTypeCodeSize        = 4;
 
-  constexpr auto maxChannelCount            = 8;
-  constexpr auto maxBlocksize               = 65535;
+  constexpr uint32_t maxChannelCount        = 8;
+  constexpr uint32_t maxBlockSize           = 65535;
 
-  constexpr auto canonicalHeaderSize        = 44;
+  constexpr int32_t canonicalHeaderSize     = 44;
 
-  constexpr auto waveFormatPCMTag           = 0x0001;
+  constexpr unsigned short waveFormatPCMTag = 0x0001;
 
 // MARK: Variable-Length Input
 
@@ -85,7 +85,7 @@ namespace {
     VariableLengthInput &operator=(VariableLengthInput &&) = delete;
 
     bool getRiceGolombCode(int32_t &i32, int k);
-    bool getUInt(uint32_t &ui32, int version, int k);
+    bool getUInt(uint32_t &ui32, int version, int32_t k);
 
   private:
     //! Refills \c bitBuffer with a single \c uint32_t from \c buffer,
@@ -147,7 +147,7 @@ namespace {
     return true;
   }
 
-  bool VariableLengthInput::getUInt(uint32_t &ui32, int version, int k)
+  bool VariableLengthInput::getUInt(uint32_t &ui32, int version, int32_t k)
   {
     if(version > 0 && !getRiceGolombCode(k, uInt32CodeSize))
       return false;
@@ -265,7 +265,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   PropertyValues props{};
 
   // Read file version
-  auto version = readBlock(1).toUInt();
+  int version = readBlock(1).toUInt();
   if(version < minSupportedVersion || version > maxSupportedVersion) {
     debug("SHN::File::read() -- Unsupported version.");
     setValid(false);
@@ -299,7 +299,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   if(version > 0) {
     uint32_t blockSize = 0;
     if(!input.getUInt(blockSize, version,
-                      static_cast<size_t>(std::log2(defaultBlockSize))) ||
+                      static_cast<int32_t>(std::log2(defaultBlockSize))) ||
        blockSize == 0 || blockSize > maxBlockSize) {
       debug("SHN::File::read() -- Invalid or unsupported block size.");
       setValid(false);
