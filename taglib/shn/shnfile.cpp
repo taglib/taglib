@@ -23,9 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#include "shnfile.h"
+
 #include <cmath>
 
-#include "shnfile.h"
 #include "shnutils.h"
 
 #include "tdebug.h"
@@ -69,14 +70,43 @@ namespace {
 
 // MARK: Variable-Length Input
 
-  /// Variable-length input using Golomb-Rice coding
+  //! Variable-length input using Golomb-Rice coding.
   class VariableLengthInput {
-
-    static constexpr auto kBufferSize = 512;
-
   public:
+    //! Creates a new \c VariableLengthInput object.
+    VariableLengthInput(File *file) : file(file) {}
 
-    static constexpr uint32_t sMaskTable [] = {
+    ~VariableLengthInput() = default;
+
+    VariableLengthInput() = delete;
+    VariableLengthInput(const VariableLengthInput &) = delete;
+    VariableLengthInput(VariableLengthInput &&) = delete;
+    VariableLengthInput &operator=(const VariableLengthInput &) = delete;
+    VariableLengthInput &operator=(VariableLengthInput &&) = delete;
+
+    bool getRiceGolombCode(int32_t &i32, int k);
+    bool getUInt(uint32_t &ui32, int version, int k);
+
+  private:
+    //! Refills \c bitBuffer with a single \c uint32_t from \c buffer,
+    //! refilling \c buffer if necessary.
+    bool refillBitBuffer();
+
+    //! Input stream
+    File *file { nullptr };
+    //! Byte buffer
+    ByteVector buffer;
+    //! Current position in buffer
+    unsigned int bufferPosition { 0 };
+    //! Bit buffer
+    uint32_t bitBuffer { 0 };
+    //! Bits available in \c bitBuffer, 0..32
+    int bitsAvailable { 0 };
+  };
+
+  bool VariableLengthInput::getRiceGolombCode(int32_t &i32, int k)
+  {
+    static constexpr uint32_t sMaskTable[] = {
       0x0,
       0x1,        0x3,        0x7,        0xf,
       0x1f,       0x3f,       0x7f,       0xff,
@@ -88,93 +118,64 @@ namespace {
       0x1fffffff, 0x3fffffff, 0x7fffffff, 0xffffffff
     };
 
-    /// Creates a new `VariableLengthInput` object
-    VariableLengthInput(File *file) :
-      file{file},
-      buffer{}
-    {
-    }
+    if(bitsAvailable == 0 && !refillBitBuffer())
+      return false;
 
-    ~VariableLengthInput() = default;
-
-    VariableLengthInput() = delete;
-    VariableLengthInput(const VariableLengthInput&) = delete;
-    VariableLengthInput(VariableLengthInput&&) = delete;
-    VariableLengthInput& operator=(const VariableLengthInput&) = delete;
-    VariableLengthInput& operator=(VariableLengthInput&&) = delete;
-
-    bool getRiceGolombCode(int32_t& i32, int k)
-    {
+    int32_t result;
+    for(result = 0; !(bitBuffer & (1L << --bitsAvailable)); ++result) {
       if(bitsAvailable == 0 && !refillBitBuffer())
         return false;
+    }
 
-      int32_t result;
-      for(result = 0; !(bitBuffer & (1L << --bitsAvailable)); ++result) {
-        if(bitsAvailable == 0 && !refillBitBuffer())
+    while(k != 0) {
+      if(bitsAvailable >= k) {
+        result = (result << k) | static_cast<int32_t>(
+          (bitBuffer >> (bitsAvailable - k)) & sMaskTable[k]);
+        bitsAvailable -= k;
+        k = 0;
+      }
+      else {
+        result = (result << bitsAvailable) | static_cast<int32_t>(
+          bitBuffer & sMaskTable[bitsAvailable]);
+        k -= bitsAvailable;
+        if(!refillBitBuffer())
           return false;
       }
-
-      while(k != 0) {
-        if(bitsAvailable >= k) {
-          result = (result << k) | static_cast<int32_t>((bitBuffer >> (bitsAvailable - k)) & sMaskTable[k]);
-          bitsAvailable -= k;
-          k = 0;
-        }
-        else {
-          result = (result << bitsAvailable) | static_cast<int32_t>(bitBuffer & sMaskTable[bitsAvailable]);
-          k -= bitsAvailable;
-          if(!refillBitBuffer())
-            return false;
-        }
-      }
-
-      i32 = result;
-      return true;
     }
 
-    bool getUInt(uint32_t& ui32, int version, int k)
-    {
-      if(version > 0 && !getRiceGolombCode(k, uInt32CodeSize))
+    i32 = result;
+    return true;
+  }
+
+  bool VariableLengthInput::getUInt(uint32_t &ui32, int version, int k)
+  {
+    if(version > 0 && !getRiceGolombCode(k, uInt32CodeSize))
+      return false;
+
+    int32_t i32;
+    if(!getRiceGolombCode(i32, k))
+      return false;
+    ui32 = static_cast<uint32_t>(i32);
+    return true;
+  }
+
+  bool VariableLengthInput::refillBitBuffer()
+  {
+    if(buffer.size() - bufferPosition < 4) {
+      static constexpr size_t bufferSize = 512;
+      auto block = file->readBlock(bufferSize);
+      if(block.size() < 4)
         return false;
-
-      int32_t i32;
-      if(!getRiceGolombCode(i32, k))
-        return false;
-      ui32 = static_cast<uint32_t>(i32);
-      return true;
+      buffer = block;
+      bufferPosition = 0;
     }
 
-  private:
+    bitBuffer = buffer.toUInt(bufferPosition, true);
+    bufferPosition += 4;
+    bitsAvailable = 32;
 
-    /// Input stream
-    File *file { nullptr };
-    /// Byte buffer
-    ByteVector buffer;
-    /// Current position in buffer
-    unsigned int bufferPosition { 0 };
-    /// Bit buffer
-    uint32_t bitBuffer { 0 };
-    /// Bits available in `bitBuffer`
-    int bitsAvailable { 0 };
-
-    /// Refills `bitBuffer` with a single `uint32_t` from `buffer`, refilling `buffer` if necessary
-    bool refillBitBuffer()
-    {
-      if(buffer.size() - bufferPosition < 4) {
-        auto block = file->readBlock(kBufferSize);
-        if(block.size() < 4)
-          return false;
-        buffer = block;
-        bufferPosition = 0;
-      }
-
-      bitBuffer = buffer.toUInt(bufferPosition, true);
-      bufferPosition += 4;
-      bitsAvailable = 32;
-
-      return true;
-    }
-  };
+    return true;
+  }
 } // namespace
 
 class SHN::File::FilePrivate
@@ -273,7 +274,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   props.version = version;
 
   // Set up variable length input
-  VariableLengthInput input{this};
+  VariableLengthInput input(this);
 
   // Read file type
   uint32_t fileType;
@@ -286,17 +287,20 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   // Read number of channels
   uint32_t channelCount = 0;
-  if(!input.getUInt(channelCount, version, channelCountCodeSize) || channelCount == 0 || channelCount > maxChannelCount) {
+  if(!input.getUInt(channelCount, version, channelCountCodeSize) ||
+     channelCount == 0 || channelCount > maxChannelCount) {
     debug("SHN::File::read() -- Invalid or unsupported channel count.");
     setValid(false);
     return;
   }
   props.channelCount = static_cast<int>(channelCount);
 
-  // Read blocksize if version > 0
+  // Read block size if version > 0
   if(version > 0) {
-    uint32_t blocksize = 0;
-    if(!input.getUInt(blocksize, version, static_cast<size_t>(std::log2(defaultBlockSize))) || blocksize == 0 || blocksize > maxBlocksize) {
+    uint32_t blockSize = 0;
+    if(!input.getUInt(blockSize, version,
+                      static_cast<size_t>(std::log2(defaultBlockSize))) ||
+       blockSize == 0 || blockSize > maxBlockSize) {
       debug("SHN::File::read() -- Invalid or unsupported block size.");
       setValid(false);
       return;
@@ -334,14 +338,16 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Parse the WAVE or AIFF header in the verbatim section
 
   int32_t function;
-  if(!input.getRiceGolombCode(function, functionCodeSize) || function != functionVerbatim) {
+  if(!input.getRiceGolombCode(function, functionCodeSize) ||
+     function != functionVerbatim) {
     debug("SHN::File::read() -- Missing initial verbatim section.");
     setValid(false);
     return;
   }
 
   int32_t header_size;
-  if(!input.getRiceGolombCode(header_size, verbatimChunkSizeCodeSize) || header_size < canonicalHeaderSize || header_size > verbatimChunkMaxSize) {
+  if(!input.getRiceGolombCode(header_size, verbatimChunkSizeCodeSize) ||
+     header_size < canonicalHeaderSize || header_size > verbatimChunkMaxSize) {
     debug("SHN::File::read() -- Incorrect header size.");
     setValid(false);
     return;
@@ -349,7 +355,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
 
   ByteVector header(header_size, 0);
 
-  auto iter = header.begin();
+  auto it = header.begin();
   for(int32_t i = 0; i < header_size; ++i) {
     int32_t byte;
     if(!input.getRiceGolombCode(byte, verbatimByteCodeSize)) {
@@ -358,7 +364,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       return;
     }
 
-    *iter++ = static_cast<uint8_t>(byte);
+    *it++ = static_cast<uint8_t>(byte);
   }
 
   // header is at least canonicalHeaderSize (44) bytes in size
@@ -468,7 +474,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
       auto chunkSize = chunkData.toUInt(offset, true);
       offset += 4;
 
-      // All chunks must have an even length but the pad byte is not included in ckSize
+      // All chunks must have an even length but the pad byte is not included in chunkSize
       chunkSize += (chunkSize & 1);
 
       switch(chunkID) {
@@ -491,7 +497,8 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           props.bitsPerSample = static_cast<int>(chunkData.toUShort(offset, true));
           offset += 2;
 
-          // sample rate is IEEE 754 80-bit extended float (16-bit exponent, 1-bit integer part, 63-bit fraction)
+          // sample rate is IEEE 754 80-bit extended float
+          // (16-bit exponent, 1-bit integer part, 63-bit fraction)
           auto exp = static_cast<int16_t>(chunkData.toUShort(offset, true)) - 16383 - 63;
           offset += 2;
           if(exp < -63 || exp > 63) {
@@ -505,7 +512,8 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           if(exp >= 0)
             props.sampleRate = static_cast<int>(frac << exp);
           else
-            props.sampleRate = static_cast<int>((frac + (static_cast<uint64_t>(1) << (-exp - 1))) >> -exp);
+            props.sampleRate = static_cast<int>(
+              (frac + (static_cast<uint64_t>(1) << (-exp - 1))) >> -exp);
 
           sawCommonChunk = true;
 
