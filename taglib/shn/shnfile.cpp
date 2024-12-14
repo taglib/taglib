@@ -408,9 +408,9 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto channelCount = chunkData.toUShort(offset, false);
+          auto fmtChannelCount = chunkData.toUShort(offset, false);
           offset += 2;
-          if(props.channelCount != channelCount)
+          if(props.channelCount != fmtChannelCount)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'fmt ' chunk.");
 
           props.sampleRate = static_cast<int>(chunkData.toUInt(offset, false));
@@ -480,9 +480,9 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto channelCount = chunkData.toUShort(offset, true);
+          auto commChannelCount = chunkData.toUShort(offset, true);
           offset += 2;
-          if(props.channelCount != channelCount)
+          if(props.channelCount != commChannelCount)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'COMM' chunk.");
 
           props.sampleFrames = static_cast<unsigned long>(chunkData.toUInt(offset, true));
