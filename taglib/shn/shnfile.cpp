@@ -43,30 +43,28 @@ namespace {
   constexpr int minSupportedVersion         = 1;
   constexpr int maxSupportedVersion         = 3;
 
-  constexpr int defaultBlockSize            = 256;
-
+  // Possible values of k
   constexpr int32_t channelCountCodeSize    = 0;
-
-  constexpr int functionCodeSize            = 2;
-  constexpr int32_t functionVerbatim        = 9;
-
-  constexpr int verbatimChunkSizeCodeSize   = 5;
-  constexpr int verbatimByteCodeSize        = 8;
-  constexpr int verbatimChunkMaxSize        = 256;
-
-  constexpr int uInt32CodeSize              = 2;
+  constexpr int32_t functionCodeSize        = 2;
+  constexpr int32_t verbatimChunkSizeCodeSize   = 5;
+  constexpr int32_t verbatimByteCodeSize    = 8;
+  constexpr int32_t uInt32CodeSize          = 2;
   constexpr int32_t skipBytesCodeSize       = 1;
   constexpr int32_t lpcqCodeSize            = 2;
   constexpr int32_t extraByteCodeSize       = 7;
-
   constexpr int32_t fileTypeCodeSize        = 4;
 
-  constexpr uint32_t maxChannelCount        = 8;
-  constexpr uint32_t maxBlockSize           = 65535;
+  constexpr int32_t functionVerbatim        = 9;
 
   constexpr int32_t canonicalHeaderSize     = 44;
+  constexpr int32_t verbatimChunkMaxSize    = 256;
 
-  constexpr unsigned short waveFormatPCMTag = 0x0001;
+  constexpr uint32_t maxChannelCount        = 8;
+
+  constexpr uint32_t defaultBlockSize       = 256;
+  constexpr uint32_t maxBlockSize           = 65535;
+
+  constexpr int waveFormatPCMTag            = 0x0001;
 
 // MARK: Variable-Length Input
 
@@ -104,7 +102,7 @@ namespace {
     int bitsAvailable { 0 };
   };
 
-  bool VariableLengthInput::getRiceGolombCode(int32_t &i32, int k)
+  bool VariableLengthInput::getRiceGolombCode(int32_t &i32, int32_t k)
   {
     static constexpr uint32_t sMaskTable[] = {
       0x0,
@@ -406,7 +404,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto formatTag = chunkData.toUShort(offset, false);
+          int formatTag = chunkData.toUShort(offset, false);
           offset += 2;
           if(formatTag != waveFormatPCMTag) {
             debug("SHN::File::read() -- Unsupported WAVE format tag.");
@@ -414,7 +412,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto fmtChannelCount = chunkData.toUShort(offset, false);
+          int fmtChannelCount = chunkData.toUShort(offset, false);
           offset += 2;
           if(props.channelCount != fmtChannelCount)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'fmt ' chunk.");
@@ -486,7 +484,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
             return;
           }
 
-          auto commChannelCount = chunkData.toUShort(offset, true);
+          int commChannelCount = chunkData.toUShort(offset, true);
           offset += 2;
           if(props.channelCount != commChannelCount)
             debug("SHN::File::read() -- Channel count mismatch between Shorten and 'COMM' chunk.");
