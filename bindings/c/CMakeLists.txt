@@ -25,6 +25,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/opus
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsf
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsdiff
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/shn
 )
 
 set(tag_c_HDRS tag_c.h)
