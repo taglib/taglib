@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright           : (C) 2020-2024 Stephen F. Booth
-    email               : me@sbooth.org
+ copyright           : (C) 2020-2024 Stephen F. Booth
+ email               : me@sbooth.org
  ***************************************************************************/
 
 /***************************************************************************
@@ -23,52 +23,29 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_SHNPROPERTIES_H
-#define TAGLIB_SHNPROPERTIES_H
+#ifndef TAGLIB_SHORTENUTILS_H
+#define TAGLIB_SHORTENUTILS_H
 
-#include <memory>
+// THIS FILE IS NOT A PART OF THE TAGLIB API
 
-#include "taglib_export.h"
-#include "audioproperties.h"
+#ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
 namespace TagLib {
-  namespace SHN {
+  namespace Shorten {
 
-    struct PropertyValues;
-
-    //! An implementation of audio properties for Shorten
-    class TAGLIB_EXPORT Properties : public AudioProperties {
-    public:
-      Properties(const PropertyValues *values, ReadStyle style = Average);
-      ~Properties() override;
-
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
-
-      int lengthInMilliseconds() const override;
-      int bitrate() const override;
-      int sampleRate() const override;
-      int channels() const override;
-
-      //! Returns the Shorten file version (1-3).
-      int shortenVersion() const;
-      //! Returns the file type (0-9).
-      //! 0 = 8-bit µ-law,
-      //! 1 = signed 8-bit PCM, 2 = unsigned 8-bit PCM,
-      //! 3 = signed big-endian 16-bit PCM, 4 = unsigned big-endian 16-bit PCM,
-      //! 5 = signed little-endian 16-bit PCM, 6 = unsigned little-endian 16-bit PCM,
-      //! 7 = 8-bit ITU-T G.711 µ-law, 8 = 8-bit µ-law,
-      //! 9 = 8-bit A-law, 10 = 8-bit ITU-T G.711 A-law
-      int fileType() const;
-      int bitsPerSample() const;
-      unsigned long sampleFrames() const;
-
-    private:
-      class PropertiesPrivate;
-      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
-      std::unique_ptr<PropertiesPrivate> d;
+    /// Values shared with \c Shorten::Properties by \c Shorten::File
+    struct PropertyValues
+    {
+      int version { 0 };
+      int fileType { 0 };
+      int channelCount { 0 };
+      int sampleRate { 0 };
+      int bitsPerSample { 0 };
+      unsigned long sampleFrames { 0 };
     };
-  }  // namespace SHN
-}  // namespace TagLib
+  } // namespace Shorten
+} // namespace TagLib
+
+#endif
 
 #endif

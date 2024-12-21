@@ -24,13 +24,13 @@
  ***************************************************************************/
 
 
-#include "shnproperties.h"
+#include "shortenproperties.h"
 
-#include "shnutils.h"
+#include "shortenutils.h"
 
 using namespace TagLib;
 
-class SHN::Properties::PropertiesPrivate
+class Shorten::Properties::PropertiesPrivate
 {
 public:
   PropertiesPrivate() = default;
@@ -51,7 +51,7 @@ public:
   int length { 0 };
 };
 
-SHN::Properties::Properties(const PropertyValues *values, ReadStyle style) :
+Shorten::Properties::Properties(const PropertyValues *values, ReadStyle style) :
   AudioProperties(style),
   d(std::make_unique<PropertiesPrivate>())
 {
@@ -69,44 +69,44 @@ SHN::Properties::Properties(const PropertyValues *values, ReadStyle style) :
   }
 }
 
-SHN::Properties::~Properties() = default;
+Shorten::Properties::~Properties() = default;
 
-int SHN::Properties::lengthInMilliseconds() const
+int Shorten::Properties::lengthInMilliseconds() const
 {
   return d->length;
 }
 
-int SHN::Properties::bitrate() const
+int Shorten::Properties::bitrate() const
 {
   return d->bitrate;
 }
 
-int SHN::Properties::sampleRate() const
+int Shorten::Properties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int SHN::Properties::channels() const
+int Shorten::Properties::channels() const
 {
   return d->channelCount;
 }
 
-int SHN::Properties::shortenVersion() const
+int Shorten::Properties::shortenVersion() const
 {
   return d->version;
 }
 
-int SHN::Properties::fileType() const
+int Shorten::Properties::fileType() const
 {
   return d->fileType;
 }
 
-int SHN::Properties::bitsPerSample() const
+int Shorten::Properties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-unsigned long SHN::Properties::sampleFrames() const
+unsigned long Shorten::Properties::sampleFrames() const
 {
   return d->sampleFrames;
 }

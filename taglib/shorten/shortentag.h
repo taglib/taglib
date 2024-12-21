@@ -23,13 +23,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_SHNTAG_H
-#define TAGLIB_SHNTAG_H
+#ifndef TAGLIB_SHORTENTAG_H
+#define TAGLIB_SHORTENTAG_H
 
 #include "tag.h"
 
 namespace TagLib {
-  namespace SHN {
+  namespace Shorten {
 
     //! A Shorten file tag implementation
 
@@ -133,7 +133,7 @@ namespace TagLib {
       std::unique_ptr<TagPrivate> d;
     };
 
-  }  // namespace SHN
+  }  // namespace Shorten
 }  // namespace TagLib
 
 #endif

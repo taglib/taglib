@@ -23,92 +23,92 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "shntag.h"
+#include "shortentag.h"
 
 #include "tpropertymap.h"
 
 using namespace TagLib;
 
-class SHN::Tag::TagPrivate
+class Shorten::Tag::TagPrivate
 {
 };
 
-SHN::Tag::Tag() :
+Shorten::Tag::Tag() :
   d(std::make_unique<TagPrivate>())
 {
 }
 
-SHN::Tag::~Tag() = default;
+Shorten::Tag::~Tag() = default;
 
-String SHN::Tag::title() const
+String Shorten::Tag::title() const
 {
   return String();
 }
 
-String SHN::Tag::artist() const
+String Shorten::Tag::artist() const
 {
   return String();
 }
 
-String SHN::Tag::album() const
+String Shorten::Tag::album() const
 {
   return String();
 }
 
-String SHN::Tag::comment() const
+String Shorten::Tag::comment() const
 {
   return String();
 }
 
-String SHN::Tag::genre() const
+String Shorten::Tag::genre() const
 {
   return String();
 }
 
-unsigned int SHN::Tag::year() const
+unsigned int Shorten::Tag::year() const
 {
   return 0;
 }
 
-unsigned int SHN::Tag::track() const
+unsigned int Shorten::Tag::track() const
 {
   return 0;
 }
 
-void SHN::Tag::setTitle(const String &)
+void Shorten::Tag::setTitle(const String &)
 {
 }
 
-void SHN::Tag::setArtist(const String &)
+void Shorten::Tag::setArtist(const String &)
 {
 }
 
-void SHN::Tag::setAlbum(const String &)
+void Shorten::Tag::setAlbum(const String &)
 {
 }
 
-void SHN::Tag::setComment(const String &)
+void Shorten::Tag::setComment(const String &)
 {
 }
 
-void SHN::Tag::setGenre(const String &)
+void Shorten::Tag::setGenre(const String &)
 {
 }
 
-void SHN::Tag::setYear(unsigned int)
+void Shorten::Tag::setYear(unsigned int)
 {
 }
 
-void SHN::Tag::setTrack(unsigned int)
+void Shorten::Tag::setTrack(unsigned int)
 {
 }
 
-PropertyMap SHN::Tag::properties() const
+PropertyMap Shorten::Tag::properties() const
 {
   return PropertyMap{};
 }
 
-PropertyMap SHN::Tag::setProperties(const PropertyMap &origProps)
+PropertyMap Shorten::Tag::setProperties(const PropertyMap &origProps)
 {
   return PropertyMap{origProps};
 }

@@ -23,11 +23,11 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "shnfile.h"
+#include "shortenfile.h"
 
 #include <cmath>
 
-#include "shnutils.h"
+#include "shortenutils.h"
 
 #include "tdebug.h"
 #include "tutils.h"
@@ -176,7 +176,7 @@ namespace {
   }
 } // namespace
 
-class SHN::File::FilePrivate
+class Shorten::File::FilePrivate
 {
 public:
   FilePrivate() = default;
@@ -189,14 +189,14 @@ public:
   std::unique_ptr<Tag> tag;
 };
 
-bool SHN::File::isSupported(IOStream *stream)
+bool Shorten::File::isSupported(IOStream *stream)
 {
   // A Shorten file has to start with "ajkg"
   const ByteVector id = Utils::readHeader(stream, 4, false);
   return id.startsWith("ajkg");
 }
 
-SHN::File::File(FileName file, bool readProperties,
+Shorten::File::File(FileName file, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(file),
   d(std::make_unique<FilePrivate>())
@@ -205,7 +205,7 @@ SHN::File::File(FileName file, bool readProperties,
     read(propertiesStyle);
 }
 
-SHN::File::File(IOStream *stream, bool readProperties,
+Shorten::File::File(IOStream *stream, bool readProperties,
                 AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(stream),
   d(std::make_unique<FilePrivate>())
@@ -214,40 +214,40 @@ SHN::File::File(IOStream *stream, bool readProperties,
     read(propertiesStyle);
 }
 
-SHN::File::~File() = default;
+Shorten::File::~File() = default;
 
-SHN::Tag *SHN::File::tag() const
+Shorten::Tag *Shorten::File::tag() const
 {
   return d->tag.get();
 }
 
-PropertyMap SHN::File::properties() const
+PropertyMap Shorten::File::properties() const
 {
   return d->tag->properties();
 }
 
-PropertyMap SHN::File::setProperties(const PropertyMap &properties)
+PropertyMap Shorten::File::setProperties(const PropertyMap &properties)
 {
   return d->tag->setProperties(properties);
 }
 
-SHN::Properties *SHN::File::audioProperties() const
+Shorten::Properties *Shorten::File::audioProperties() const
 {
   return d->properties.get();
 }
 
-bool SHN::File::save()
+bool Shorten::File::save()
 {
   if(readOnly()) {
-    debug("SHN::File::save() - Cannot save to a read only file.");
+    debug("Shorten::File::save() - Cannot save to a read only file.");
     return false;
   }
 
-  debug("SHN::File::save() - Saving not supported.");
+  debug("Shorten::File::save() - Saving not supported.");
   return false;
 }
 
-void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
+void Shorten::File::read(AudioProperties::ReadStyle propertiesStyle)
 {
   if(!isOpen())
     return;
@@ -255,7 +255,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Read magic number
   auto magic = readBlock(4);
   if(magic != "ajkg") {
-    debug("SHN::File::read() -- Not a Shorten file.");
+    debug("Shorten::File::read() -- Not a Shorten file.");
     setValid(false);
     return;
   }
@@ -265,7 +265,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Read file version
   int version = readBlock(1).toUInt();
   if(version < minSupportedVersion || version > maxSupportedVersion) {
-    debug("SHN::File::read() -- Unsupported version.");
+    debug("Shorten::File::read() -- Unsupported version.");
     setValid(false);
     return;
   }
@@ -277,7 +277,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   // Read file type
   uint32_t fileType;
   if(!input.getUInt(fileType, version, fileTypeCodeSize)) {
-    debug("SHN::File::read() -- Unable to read file type.");
+    debug("Shorten::File::read() -- Unable to read file type.");
     setValid(false);
     return;
   }
@@ -287,7 +287,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   uint32_t channelCount = 0;
   if(!input.getUInt(channelCount, version, channelCountCodeSize) ||
      channelCount == 0 || channelCount > maxChannelCount) {
-    debug("SHN::File::read() -- Invalid or unsupported channel count.");
+    debug("Shorten::File::read() -- Invalid or unsupported channel count.");
     setValid(false);
     return;
   }
@@ -299,21 +299,21 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     if(!input.getUInt(blockSize, version,
                       static_cast<int32_t>(std::log2(defaultBlockSize))) ||
        blockSize == 0 || blockSize > maxBlockSize) {
-      debug("SHN::File::read() -- Invalid or unsupported block size.");
+      debug("Shorten::File::read() -- Invalid or unsupported block size.");
       setValid(false);
       return;
     }
 
     uint32_t maxnlpc = 0;
     if(!input.getUInt(maxnlpc, version, lpcqCodeSize) /*|| maxnlpc > 1024*/) {
-      debug("SHN::File::read() -- Invalid maximum nlpc.");
+      debug("Shorten::File::read() -- Invalid maximum nlpc.");
       setValid(false);
       return;
     }
 
     uint32_t nmean = 0;
     if(!input.getUInt(nmean, version, 0) /*|| nmean > 32768*/) {
-      debug("SHN::File::read() -- Invalid nmean.");
+      debug("Shorten::File::read() -- Invalid nmean.");
       setValid(false);
       return;
     }
@@ -338,7 +338,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   int32_t function;
   if(!input.getRiceGolombCode(function, functionCodeSize) ||
      function != functionVerbatim) {
-    debug("SHN::File::read() -- Missing initial verbatim section.");
+    debug("Shorten::File::read() -- Missing initial verbatim section.");
     setValid(false);
     return;
   }
@@ -346,7 +346,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   int32_t header_size;
   if(!input.getRiceGolombCode(header_size, verbatimChunkSizeCodeSize) ||
      header_size < canonicalHeaderSize || header_size > verbatimChunkMaxSize) {
-    debug("SHN::File::read() -- Incorrect header size.");
+    debug("Shorten::File::read() -- Incorrect header size.");
     setValid(false);
     return;
   }
@@ -357,7 +357,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
   for(int32_t i = 0; i < header_size; ++i) {
     int32_t byte;
     if(!input.getRiceGolombCode(byte, verbatimByteCodeSize)) {
-      debug("SHN::File::read() -- Unable to read header.");
+      debug("Shorten::File::read() -- Unable to read header.");
       setValid(false);
       return;
     }
@@ -379,7 +379,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     chunkID = chunkData.toUInt(offset, true);
     offset += 4;
     if(chunkID != 0x57415645 /*'WAVE'*/) {
-      debug("SHN::File::read() -- Missing 'WAVE' in 'RIFF' chunk.");
+      debug("Shorten::File::read() -- Missing 'WAVE' in 'RIFF' chunk.");
       setValid(false);
       return;
     }
@@ -399,7 +399,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
         case 0x666d7420 /*'fmt '*/:
         {
           if(chunkSize < 16) {
-            debug("SHN::File::read() -- 'fmt ' chunk is too small.");
+            debug("Shorten::File::read() -- 'fmt ' chunk is too small.");
             setValid(false);
             return;
           }
@@ -407,7 +407,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           int formatTag = chunkData.toUShort(offset, false);
           offset += 2;
           if(formatTag != waveFormatPCMTag) {
-            debug("SHN::File::read() -- Unsupported WAVE format tag.");
+            debug("Shorten::File::read() -- Unsupported WAVE format tag.");
             setValid(false);
             return;
           }
@@ -415,7 +415,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           int fmtChannelCount = chunkData.toUShort(offset, false);
           offset += 2;
           if(props.channelCount != fmtChannelCount)
-            debug("SHN::File::read() -- Channel count mismatch between Shorten and 'fmt ' chunk.");
+            debug("Shorten::File::read() -- Channel count mismatch between Shorten and 'fmt ' chunk.");
 
           props.sampleRate = static_cast<int>(chunkData.toUInt(offset, false));
           offset += 4;
@@ -441,7 +441,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     }
 
     if(!sawFormatChunk) {
-      debug("SHN::File::read() -- Missing 'fmt ' chunk.");
+      debug("Shorten::File::read() -- Missing 'fmt ' chunk.");
       setValid(false);
       return;
     }
@@ -456,7 +456,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     chunkID = chunkData.toUInt(offset, true);
     offset += 4;
     if(chunkID != 0x41494646 /*'AIFF'*/ && chunkID != 0x41494643 /*'AIFC'*/) {
-      debug("SHN::File::read() -- Missing 'AIFF' or 'AIFC' in 'FORM' chunk.");
+      debug("Shorten::File::read() -- Missing 'AIFF' or 'AIFC' in 'FORM' chunk.");
       setValid(false);
       return;
     }
@@ -479,7 +479,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
         case 0x434f4d4d /*'COMM'*/:
         {
           if(chunkSize < 18) {
-            debug("SHN::File::read() -- 'COMM' chunk is too small.");
+            debug("Shorten::File::read() -- 'COMM' chunk is too small.");
             setValid(false);
             return;
           }
@@ -487,7 +487,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           int commChannelCount = chunkData.toUShort(offset, true);
           offset += 2;
           if(props.channelCount != commChannelCount)
-            debug("SHN::File::read() -- Channel count mismatch between Shorten and 'COMM' chunk.");
+            debug("Shorten::File::read() -- Channel count mismatch between Shorten and 'COMM' chunk.");
 
           props.sampleFrames = static_cast<unsigned long>(chunkData.toUInt(offset, true));
           offset += 4;
@@ -500,7 +500,7 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
           auto exp = static_cast<int16_t>(chunkData.toUShort(offset, true)) - 16383 - 63;
           offset += 2;
           if(exp < -63 || exp > 63) {
-            debug("SHN::File::read() -- exp out of range.");
+            debug("Shorten::File::read() -- exp out of range.");
             setValid(false);
             return;
           }
@@ -526,13 +526,13 @@ void SHN::File::read(AudioProperties::ReadStyle propertiesStyle)
     }
 
     if(!sawCommonChunk) {
-      debug("SHN::File::read() -- Missing 'COMM' chunk");
+      debug("Shorten::File::read() -- Missing 'COMM' chunk");
       setValid(false);
       return;
     }
   }
   else {
-    debug("SHN::File::read() -- Unsupported data format.");
+    debug("Shorten::File::read() -- Unsupported data format.");
     setValid(false);
     return;
   }

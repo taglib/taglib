@@ -57,7 +57,7 @@
 #include "xmfile.h"
 #include "dsffile.h"
 #include "dsdifffile.h"
-#include "shnfile.h"
+#include "shortenfile.h"
 
 using namespace TagLib;
 
@@ -182,7 +182,7 @@ namespace
     else if(ext == "DFF" || ext == "DSDIFF")
       file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "SHN")
-      file = new SHN::File(stream, readAudioProperties, audioPropertiesStyle);
+      file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // if file is not valid, leave it to content-based detection.
 
@@ -234,8 +234,8 @@ namespace
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(DSDIFF::File::isSupported(stream))
       file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(SHN::File::isSupported(stream))
-      file = new SHN::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(Shorten::File::isSupported(stream))
+      file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
 
     // isSupported() only does a quick check, so double check the file here.
 

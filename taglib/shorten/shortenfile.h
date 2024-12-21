@@ -23,16 +23,16 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_SHNFILE_H
-#define TAGLIB_SHNFILE_H
+#ifndef TAGLIB_SHORTENFILE_H
+#define TAGLIB_SHORTENFILE_H
 
 #include <memory>
 
 #include "taglib_export.h"
 #include "tfile.h"
 
-#include "shnproperties.h"
-#include "shntag.h"
+#include "shortenproperties.h"
+#include "shortentag.h"
 
 namespace TagLib {
 
@@ -42,7 +42,7 @@ namespace TagLib {
    * This is an implementation of Shorten metadata.
    */
 
-  namespace SHN {
+  namespace Shorten {
 
     //! An implementation of \c TagLib::File with Shorten specific methods
 
@@ -134,7 +134,7 @@ namespace TagLib {
         TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
         std::unique_ptr<FilePrivate> d;
     };
-  }  // namespace SHN
+  }  // namespace Shorten
 }  // namespace TagLib
 
 #endif
