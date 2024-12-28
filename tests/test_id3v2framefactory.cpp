@@ -23,21 +23,35 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <functional>
 #include <memory>
 
+#ifdef WITH_VORBIS
 #include "flacproperties.h"
+#endif
 #include "mpegproperties.h"
 #include "tbytevector.h"
 #include "tpropertymap.h"
 #include "mpegfile.h"
+#ifdef WITH_VORBIS
 #include "flacfile.h"
+#endif
+#ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
 #include "trueaudioproperties.h"
+#endif
+#ifdef WITH_RIFF
 #include "wavfile.h"
 #include "aifffile.h"
+#endif
+#ifdef WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
+#endif
 #include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "id3v2framefactory.h"
@@ -118,12 +132,20 @@ class TestId3v2FrameFactory : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestId3v2FrameFactory);
   CPPUNIT_TEST(testMPEG);
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testFLAC);
+#endif
+#ifdef WITH_TRUEAUDIO
   CPPUNIT_TEST(testTrueAudio);
+#endif
+#ifdef WITH_RIFF
   CPPUNIT_TEST(testWAV);
   CPPUNIT_TEST(testAIFF);
+#endif
+#ifdef WITH_DSF
   CPPUNIT_TEST(testDSF);
   CPPUNIT_TEST(testDSDIFF);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -236,6 +258,7 @@ public:
     );
   }
 
+#ifdef WITH_VORBIS
   void testFLAC()
   {
     ScopedFileCopy copy("no-tags", ".flac");
@@ -260,7 +283,9 @@ public:
       }
     );
   }
+#endif
 
+#ifdef WITH_TRUEAUDIO
   void testTrueAudio()
   {
     ScopedFileCopy copy("empty", ".tta");
@@ -285,7 +310,9 @@ public:
       }
     );
   }
+#endif
 
+#ifdef WITH_RIFF
   void testWAV()
   {
     ScopedFileCopy copy("empty", ".wav");
@@ -335,7 +362,9 @@ public:
       }
     );
   }
+#endif
 
+#ifdef WITH_DSF
   void testDSF()
   {
     ScopedFileCopy copy("empty10ms", ".dsf");
@@ -385,6 +414,7 @@ public:
       }
     );
   }
+#endif
 
 };
 

@@ -23,6 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string>
 #include <cstdio>
 
@@ -30,23 +34,49 @@
 #include "tbytevectorstream.h"
 #include "tag.h"
 #include "fileref.h"
+#ifdef WITH_VORBIS
 #include "oggflacfile.h"
 #include "vorbisfile.h"
+#endif
 #include "mpegfile.h"
+#ifdef WITH_APE
 #include "mpcfile.h"
+#endif
+#ifdef WITH_ASF
 #include "asffile.h"
+#endif
+#ifdef WITH_VORBIS
 #include "speexfile.h"
 #include "flacfile.h"
+#endif
+#ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
+#endif
+#ifdef WITH_MP4
 #include "mp4file.h"
+#endif
+#ifdef WITH_RIFF
 #include "wavfile.h"
+#endif
+#ifdef WITH_APE
 #include "apefile.h"
+#endif
+#ifdef WITH_RIFF
 #include "aifffile.h"
+#endif
+#ifdef WITH_APE
 #include "wavpackfile.h"
+#endif
+#ifdef WITH_VORBIS
 #include "opusfile.h"
+#endif
+#ifdef WITH_MOD
 #include "xmfile.h"
+#endif
+#ifdef WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
+#endif
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -55,6 +85,7 @@ using namespace TagLib;
 
 namespace
 {
+#ifdef WITH_VORBIS
   class DummyResolver : public FileRef::FileTypeResolver
   {
   public:
@@ -63,7 +94,9 @@ namespace
       return new Ogg::Vorbis::File(fileName);
     }
   };
+#endif
 
+#ifdef WITH_MP4
   class DummyStreamResolver : public FileRef::StreamTypeResolver
   {
   public:
@@ -77,32 +110,55 @@ namespace
       return new MP4::File(s);
     }
   };
+#endif
 } // namespace
 
 class TestFileRef : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestFileRef);
+#ifdef WITH_ASF
   CPPUNIT_TEST(testASF);
+#endif
+#ifdef WITH_APE
   CPPUNIT_TEST(testMusepack);
+#endif
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testVorbis);
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
+#endif
   CPPUNIT_TEST(testMP3);
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testOGA_FLAC);
   CPPUNIT_TEST(testOGA_Vorbis);
+#endif
+#ifdef WITH_MP4
   CPPUNIT_TEST(testMP4_1);
   CPPUNIT_TEST(testMP4_2);
   CPPUNIT_TEST(testMP4_3);
   CPPUNIT_TEST(testMP4_4);
+#endif
+#ifdef WITH_TRUEAUDIO
   CPPUNIT_TEST(testTrueAudio);
+#endif
+#ifdef WITH_APE
   CPPUNIT_TEST(testAPE);
+#endif
+#ifdef WITH_RIFF
   CPPUNIT_TEST(testWav);
   CPPUNIT_TEST(testAIFF_1);
   CPPUNIT_TEST(testAIFF_2);
+#endif
+#ifdef WITH_APE
   CPPUNIT_TEST(testWavPack);
+#endif
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testOpus);
+#endif
+#ifdef WITH_DSF
   CPPUNIT_TEST(testDSF);
   CPPUNIT_TEST(testDSDIFF);
+#endif
   CPPUNIT_TEST(testUnsupported);
   CPPUNIT_TEST(testAudioProperties);
   CPPUNIT_TEST(testDefaultFileExtensions);
@@ -239,16 +295,21 @@ public:
     }
   }
 
+#ifdef WITH_APE
   void testMusepack()
   {
     fileRefSave<MPC::File>("click", ".mpc");
   }
+#endif
 
+#ifdef WITH_ASF
   void testASF()
   {
     fileRefSave<ASF::File>("silence-1", ".wma");
   }
+#endif
 
+#ifdef WITH_VORBIS
   void testVorbis()
   {
     fileRefSave<Ogg::Vorbis::File>("empty", ".ogg");
@@ -263,17 +324,21 @@ public:
   {
     fileRefSave<FLAC::File>("no-tags", ".flac");
   }
+#endif
 
   void testMP3()
   {
     fileRefSave<MPEG::File>("xing", ".mp3");
   }
 
+#ifdef WITH_TRUEAUDIO
   void testTrueAudio()
   {
     fileRefSave<TrueAudio::File>("empty", ".tta");
   }
+#endif
 
+#ifdef WITH_MP4
   void testMP4_1()
   {
     fileRefSave<MP4::File>("has-tags", ".m4a");
@@ -293,12 +358,16 @@ public:
   {
     fileRefSave<MP4::File>("blank_video", ".m4v");
   }
+#endif
 
+#ifdef WITH_RIFF
   void testWav()
   {
     fileRefSave<RIFF::WAV::File>("empty", ".wav");
   }
+#endif
 
+#ifdef WITH_VORBIS
   void testOGA_FLAC()
   {
     fileRefSave<Ogg::FLAC::File>("empty_flac", ".oga");
@@ -308,12 +377,16 @@ public:
   {
     fileRefSave<Ogg::Vorbis::File>("empty_vorbis", ".oga");
   }
+#endif
 
+#ifdef WITH_APE
   void testAPE()
   {
     fileRefSave<APE::File>("mac-399", ".ape");
   }
+#endif
 
+#ifdef WITH_RIFF
   void testAIFF_1()
   {
     fileRefSave<RIFF::AIFF::File>("empty", ".aiff");
@@ -323,17 +396,23 @@ public:
   {
     fileRefSave<RIFF::AIFF::File>("alaw", ".aifc");
   }
+#endif
 
+#ifdef WITH_APE
   void testWavPack()
   {
     fileRefSave<WavPack::File>("click", ".wv");
   }
+#endif
 
+#ifdef WITH_VORBIS
   void testOpus()
   {
     fileRefSave<Ogg::Opus::File>("correctness_gain_silent_output", ".opus");
   }
+#endif
 
+#ifdef WITH_DSF
   void testDSF()
   {
     fileRefSave<DSF::File>("empty10ms",".dsf");
@@ -343,6 +422,7 @@ public:
   {
     fileRefSave<DSDIFF::File>("empty10ms",".dff");
   }
+#endif
 
   void testUnsupported()
   {
@@ -364,28 +444,56 @@ public:
   void testDefaultFileExtensions()
   {
     const StringList extensions = FileRef::defaultFileExtensions();
+#ifdef WITH_APE
     CPPUNIT_ASSERT(extensions.contains("mpc"));
+#endif
+#ifdef WITH_ASF
     CPPUNIT_ASSERT(extensions.contains("wma"));
+#endif
+#ifdef WITH_VORBIS
     CPPUNIT_ASSERT(extensions.contains("ogg"));
     CPPUNIT_ASSERT(extensions.contains("spx"));
     CPPUNIT_ASSERT(extensions.contains("flac"));
+#endif
     CPPUNIT_ASSERT(extensions.contains("mp3"));
+#ifdef WITH_TRUEAUDIO
     CPPUNIT_ASSERT(extensions.contains("tta"));
+#endif
+#ifdef WITH_MP4
     CPPUNIT_ASSERT(extensions.contains("m4a"));
     CPPUNIT_ASSERT(extensions.contains("3g2"));
     CPPUNIT_ASSERT(extensions.contains("m4v"));
+#endif
+#ifdef WITH_RIFF
     CPPUNIT_ASSERT(extensions.contains("wav"));
+#endif
+#ifdef WITH_VORBIS
     CPPUNIT_ASSERT(extensions.contains("oga"));
+#endif
+#ifdef WITH_APE
     CPPUNIT_ASSERT(extensions.contains("ape"));
+#endif
+#ifdef WITH_RIFF
     CPPUNIT_ASSERT(extensions.contains("aiff"));
     CPPUNIT_ASSERT(extensions.contains("aifc"));
+#endif
+#ifdef WITH_APE
     CPPUNIT_ASSERT(extensions.contains("wv"));
+#endif
+#ifdef WITH_VORBIS
     CPPUNIT_ASSERT(extensions.contains("opus"));
+#endif
+#ifdef WITH_MOD
     CPPUNIT_ASSERT(extensions.contains("xm"));
+#endif
+#ifdef WITH_DSF
     CPPUNIT_ASSERT(extensions.contains("dsf"));
     CPPUNIT_ASSERT(extensions.contains("dff"));
     CPPUNIT_ASSERT(extensions.contains("dsdiff"));
+#endif
+#ifdef WITH_SHORTEN
     CPPUNIT_ASSERT(extensions.contains("shn"));
+#endif
   }
 
   void testFileResolver()
@@ -395,6 +503,7 @@ public:
       CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()) != nullptr);
     }
 
+#ifdef WITH_VORBIS
     DummyResolver resolver;
     FileRef::addFileTypeResolver(&resolver);
 
@@ -402,7 +511,9 @@ public:
       FileRef f(TEST_FILE_PATH_C("xing.mp3"));
       CPPUNIT_ASSERT(dynamic_cast<Ogg::Vorbis::File *>(f.file()) != nullptr);
     }
+#endif
 
+#ifdef WITH_MP4
     DummyStreamResolver streamResolver;
     FileRef::addFileTypeResolver(&streamResolver);
 
@@ -411,6 +522,7 @@ public:
       FileRef f(&s);
       CPPUNIT_ASSERT(dynamic_cast<MP4::File *>(f.file()) != nullptr);
     }
+#endif
 
     FileRef::clearFileTypeResolvers();
   }

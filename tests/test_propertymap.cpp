@@ -23,15 +23,29 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "tpropertymap.h"
 #include "tag.h"
+#ifdef WITH_APE
 #include "apetag.h"
+#endif
+#ifdef WITH_ASF
 #include "asftag.h"
+#endif
 #include "id3v1tag.h"
 #include "id3v2tag.h"
+#ifdef WITH_RIFF
 #include "infotag.h"
+#endif
+#ifdef WITH_MP4
 #include "mp4tag.h"
+#endif
+#ifdef WITH_VORBIS
 #include "xiphcomment.h"
+#endif
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -41,13 +55,23 @@ class TestPropertyMap : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPropertyMap);
   CPPUNIT_TEST(testInvalidKeys);
+#ifdef WITH_APE
   CPPUNIT_TEST(testGetSetApe);
+#endif
+#ifdef WITH_ASF
   CPPUNIT_TEST(testGetSetAsf);
+#endif
   CPPUNIT_TEST(testGetSetId3v1);
   CPPUNIT_TEST(testGetSetId3v2);
+#ifdef WITH_RIFF
   CPPUNIT_TEST(testGetSetInfo);
+#endif
+#ifdef WITH_MP4
   CPPUNIT_TEST(testGetSetMp4);
+#endif
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testGetSetXiphComment);
+#endif
   CPPUNIT_TEST(testGetSet);
   CPPUNIT_TEST_SUITE_END();
 
@@ -141,30 +165,40 @@ public:
     tagGetSet<ID3v2::Tag>();
   }
 
+#ifdef WITH_VORBIS
   void testGetSetXiphComment()
   {
     tagGetSet<Ogg::XiphComment>();
   }
+#endif
 
+#ifdef WITH_APE
   void testGetSetApe()
   {
     tagGetSet<APE::Tag>();
   }
+#endif
 
+#ifdef WITH_ASF
   void testGetSetAsf()
   {
     tagGetSet<ASF::Tag>();
   }
+#endif
 
+#ifdef WITH_MP4
   void testGetSetMp4()
   {
     tagGetSet<MP4::Tag>();
   }
+#endif
 
+#ifdef WITH_RIFF
   void testGetSetInfo()
   {
     tagGetSet<RIFF::Info::Tag>();
   }
+#endif
 
   void testGetSet()
   {

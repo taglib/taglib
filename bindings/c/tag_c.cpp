@@ -35,27 +35,53 @@
 #include "tfile.h"
 #include "tpropertymap.h"
 #include "fileref.h"
+#ifdef WITH_ASF
 #include "asffile.h"
+#endif
+#ifdef WITH_VORBIS
 #include "vorbisfile.h"
+#endif
 #include "mpegfile.h"
+#ifdef WITH_VORBIS
 #include "flacfile.h"
 #include "oggflacfile.h"
+#endif
+#ifdef WITH_APE
 #include "mpcfile.h"
 #include "wavpackfile.h"
+#endif
+#ifdef WITH_VORBIS
 #include "speexfile.h"
+#endif
+#ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
+#endif
+#ifdef WITH_MP4
 #include "mp4file.h"
+#endif
+#ifdef WITH_RIFF
 #include "aifffile.h"
 #include "wavfile.h"
+#endif
+#ifdef WITH_APE
 #include "apefile.h"
+#endif
+#ifdef WITH_MOD
 #include "itfile.h"
 #include "modfile.h"
 #include "s3mfile.h"
 #include "xmfile.h"
+#endif
+#ifdef WITH_VORBIS
 #include "opusfile.h"
+#endif
+#ifdef WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
+#endif
+#ifdef WITH_SHORTEN
 #include "shortenfile.h"
+#endif
 #include "tag.h"
 #include "id3v2framefactory.h"
 
@@ -134,42 +160,63 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   case TagLib_File_MPEG:
     file = new MPEG::File(filename);
       break;
+#ifdef WITH_VORBIS
   case TagLib_File_OggVorbis:
     file = new Ogg::Vorbis::File(filename);
     break;
   case TagLib_File_FLAC:
     file = new FLAC::File(filename);
     break;
+#endif
+#ifdef WITH_APE
   case TagLib_File_MPC:
     file = new MPC::File(filename);
     break;
+#endif
+#ifdef WITH_VORBIS
   case TagLib_File_OggFlac:
     file = new Ogg::FLAC::File(filename);
     break;
+#endif
+#ifdef WITH_APE
   case TagLib_File_WavPack:
     file = new WavPack::File(filename);
     break;
+#endif
+#ifdef WITH_VORBIS
   case TagLib_File_Speex:
     file = new Ogg::Speex::File(filename);
     break;
+#endif
+#ifdef WITH_TRUEAUDIO
   case TagLib_File_TrueAudio:
     file = new TrueAudio::File(filename);
     break;
+#endif
+#ifdef WITH_MP4
   case TagLib_File_MP4:
     file = new MP4::File(filename);
     break;
+#endif
+#ifdef WITH_ASF
   case TagLib_File_ASF:
     file = new ASF::File(filename);
     break;
+#endif
+#ifdef WITH_RIFF
   case TagLib_File_AIFF:
     file = new RIFF::AIFF::File(filename);
     break;
   case TagLib_File_WAV:
     file = new RIFF::WAV::File(filename);
     break;
+#endif
+#ifdef WITH_APE
   case TagLib_File_APE:
     file = new APE::File(filename);
     break;
+#endif
+#ifdef WITH_MOD
   case TagLib_File_IT:
     file = new IT::File(filename);
     break;
@@ -182,18 +229,25 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   case TagLib_File_XM:
     file = new XM::File(filename);
     break;
+#endif
+#ifdef WITH_VORBIS
   case TagLib_File_Opus:
     file = new Ogg::Opus::File(filename);
     break;
+#endif
+#ifdef WITH_DSF
   case TagLib_File_DSF:
     file = new DSF::File(filename);
     break;
   case TagLib_File_DSDIFF:
     file = new DSDIFF::File(filename);
     break;
+#endif
+#ifdef WITH_SHORTEN
   case TagLib_File_SHORTEN:
     file = new Shorten::File(filename);
     break;
+#endif
   default:
     break;
   }

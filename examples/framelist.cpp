@@ -22,6 +22,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <iostream>
 #include <cstdlib>
 
@@ -32,7 +36,9 @@
 #include "id3v2header.h"
 #include "commentsframe.h"
 #include "id3v1tag.h"
+#ifdef WITH_APE
 #include "apetag.h"
+#endif
 
 using namespace TagLib;
 
@@ -90,6 +96,7 @@ int main(int argc, char *argv[])
     else
       std::cout << "file does not have a valid id3v1 tag" << std::endl;
 
+#ifdef WITH_APE
     APE::Tag *ape = f.APETag();
 
     std::cout << std::endl << "APE" << std::endl;
@@ -106,6 +113,7 @@ int main(int argc, char *argv[])
     }
     else
       std::cout << "file does not have a valid APE tag" << std::endl;
+#endif
 
     std::cout << std::endl;
   }
