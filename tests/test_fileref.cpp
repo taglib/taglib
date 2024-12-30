@@ -385,6 +385,7 @@ public:
     CPPUNIT_ASSERT(extensions.contains("dsf"));
     CPPUNIT_ASSERT(extensions.contains("dff"));
     CPPUNIT_ASSERT(extensions.contains("dsdiff"));
+    CPPUNIT_ASSERT(extensions.contains("shn"));
   }
 
   void testFileResolver()
