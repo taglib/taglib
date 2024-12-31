@@ -23,17 +23,33 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef WITH_ASF
 #include "asfpicture.h"
+#endif
+#ifdef WITH_VORBIS
 #include "flacpicture.h"
 #include "flacfile.h"
+#endif
 #include "tbytevector.h"
 #include "tvariant.h"
 #include "tzlib.h"
 #include "fileref.h"
+#ifdef WITH_APE
 #include "apetag.h"
+#endif
+#ifdef WITH_ASF
 #include "asftag.h"
+#endif
+#ifdef WITH_MP4
 #include "mp4tag.h"
+#endif
+#ifdef WITH_VORBIS
 #include "xiphcomment.h"
+#endif
 #include "id3v1tag.h"
 #include "id3v2tag.h"
 #include "attachedpictureframe.h"
@@ -69,16 +85,28 @@ class TestComplexProperties : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestComplexProperties);
   CPPUNIT_TEST(testReadMp3Picture);
+#ifdef WITH_MP4
   CPPUNIT_TEST(testReadM4aPicture);
+#endif
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testReadOggPicture);
   CPPUNIT_TEST(testReadWriteFlacPicture);
   CPPUNIT_TEST(testReadWriteMultipleProperties);
+#endif
   CPPUNIT_TEST(testSetGetId3Geob);
   CPPUNIT_TEST(testSetGetId3Picture);
+#ifdef WITH_APE
   CPPUNIT_TEST(testSetGetApePicture);
+#endif
+#ifdef WITH_ASF
   CPPUNIT_TEST(testSetGetAsfPicture);
+#endif
+#ifdef WITH_MP4
   CPPUNIT_TEST(testSetGetMp4Picture);
+#endif
+#ifdef WITH_VORBIS
   CPPUNIT_TEST(testSetGetXiphPicture);
+#endif
   CPPUNIT_TEST(testNonExistent);
   CPPUNIT_TEST_SUITE_END();
 
@@ -103,6 +131,7 @@ public:
     }
   }
 
+#ifdef WITH_MP4
   void testReadM4aPicture()
   {
     const ByteVector expectedData1(
@@ -145,7 +174,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"),
       picture.value("mimeType").value<String>());
   }
+#endif
 
+#ifdef WITH_VORBIS
   void testReadOggPicture()
   {
     FileRef f(TEST_FILE_PATH_C("lowercase-fields.ogg"), false);
@@ -217,6 +248,7 @@ public:
       CPPUNIT_ASSERT(f.pictureList().isEmpty());
     }
   }
+#endif
 
   void testReadWriteMultipleProperties()
   {
@@ -311,6 +343,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FrontCover, frame->type());
   }
 
+#ifdef WITH_APE
   void testSetGetApePicture()
   {
     const String FRONT_COVER("COVER ART (FRONT)");
@@ -326,7 +359,9 @@ public:
       .append(picture.value("data").value<ByteVector>()),
       item.binaryData());
   }
+#endif
 
+#ifdef WITH_ASF
   void testSetGetAsfPicture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -344,7 +379,9 @@ public:
       asfPicture.description());
     CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, asfPicture.type());
   }
+#endif
 
+#ifdef WITH_MP4
   void testSetGetMp4Picture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -360,7 +397,9 @@ public:
       covr.data());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, covr.format());
   }
+#endif
 
+#ifdef WITH_VORBIS
   void testSetGetXiphPicture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -386,6 +425,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, pic->width());
     CPPUNIT_ASSERT_EQUAL(1, pic->height());
   }
+#endif
 
   void testNonExistent()
   {

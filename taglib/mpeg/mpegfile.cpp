@@ -28,8 +28,10 @@
 #include "id3v2framefactory.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
+#ifdef WITH_APE
 #include "apefooter.h"
 #include "apetag.h"
+#endif
 #include "id3v1tag.h"
 #include "id3v2tag.h"
 #include "tagunion.h"
@@ -277,6 +279,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
     }
   }
 
+#ifdef WITH_APE
   if(APE & tags) {
 
     if(APETag() && !APETag()->isEmpty()) {
@@ -305,6 +308,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
       File::strip(APE, false);
     }
   }
+#endif
 
   return true;
 }
@@ -319,10 +323,12 @@ ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
   return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
+#ifdef WITH_APE
 APE::Tag *MPEG::File::APETag(bool create)
 {
   return d->tag.access<APE::Tag>(APEIndex, create);
 }
+#endif
 
 bool MPEG::File::strip(int tags, bool freeMemory)
 {
@@ -480,6 +486,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle readStyle)
   if(d->ID3v1Location >= 0)
     d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
 
+#ifdef WITH_APE
   // Look for an APE tag
 
   d->APELocation = Utils::findAPE(this, d->ID3v1Location);
@@ -489,6 +496,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle readStyle)
     d->APEOriginalSize = APETag()->footer()->completeTagSize();
     d->APELocation = d->APELocation + APE::Footer::size() - d->APEOriginalSize;
   }
+#endif
 
   if(readProperties)
     d->properties = std::make_unique<Properties>(this, readStyle);

@@ -97,6 +97,16 @@ set(TAGLIB_SOVERSION_PATCH 2)
 
 include(ConfigureChecks.cmake)
 
+option(WITH_APE "Build with APE, MPC, WavPack" ON)
+option(WITH_ASF "Build with ASF" ON)
+option(WITH_DSF "Build with DSF" ON)
+option(WITH_MOD "Build with Tracker modules" ON)
+option(WITH_MP4 "Build with MP4" ON)
+option(WITH_RIFF "Build with AIFF, RIFF, WAV" ON)
+option(WITH_SHORTEN "Build with Shorten" ON)
+option(WITH_TRUEAUDIO "Build with TrueAudio" ON)
+option(WITH_VORBIS "Build with Vorbis, FLAC, Ogg, Opus" ON)
+
 # Determine whether zlib is installed.
 option(WITH_ZLIB "Build with ZLIB" ON)
 

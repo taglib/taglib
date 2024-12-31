@@ -23,35 +23,49 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cstring>
 
+#ifdef WITH_RIFF
 #include "aifffile.h"
 #include "aiffproperties.h"
+#endif
+#ifdef WITH_APE
 #include "apefile.h"
 #include "apefooter.h"
 #include "apeitem.h"
 #include "apeproperties.h"
 #include "apetag.h"
+#endif
+#ifdef WITH_ASF
 #include "asfattribute.h"
 #include "asffile.h"
 #include "asfpicture.h"
 #include "asfproperties.h"
 #include "asftag.h"
+#endif
 #include "attachedpictureframe.h"
 #include "audioproperties.h"
 #include "chapterframe.h"
 #include "commentsframe.h"
+#ifdef WITH_DSF
 #include "dsffile.h"
 #include "dsfproperties.h"
 #include "dsdifffile.h"
 #include "dsdiffproperties.h"
+#endif
 #include "eventtimingcodesframe.h"
 #include "fileref.h"
+#ifdef WITH_VORBIS
 #include "flacfile.h"
 #include "flacmetadatablock.h"
 #include "flacunknownmetadatablock.h"
 #include "flacpicture.h"
 #include "flacproperties.h"
+#endif
 #include "generalencapsulatedobjectframe.h"
 #include "id3v1tag.h"
 #include "id3v2extendedheader.h"
@@ -60,43 +74,61 @@
 #include "id3v2framefactory.h"
 #include "id3v2header.h"
 #include "id3v2tag.h"
+#ifdef WITH_RIFF
 #include "infotag.h"
+#endif
+#ifdef WITH_MOD
 #include "itfile.h"
 #include "itproperties.h"
 #include "modfile.h"
 #include "modfilebase.h"
 #include "modproperties.h"
 #include "modtag.h"
+#endif
+#ifdef WITH_MP4
 #include "mp4coverart.h"
 #include "mp4file.h"
 #include "mp4item.h"
 #include "mp4itemfactory.h"
 #include "mp4properties.h"
 #include "mp4tag.h"
+#endif
+#ifdef WITH_APE
 #include "mpcfile.h"
 #include "mpcproperties.h"
+#endif
 #include "mpegfile.h"
 #include "mpegheader.h"
 #include "mpegproperties.h"
+#ifdef WITH_VORBIS
 #include "oggfile.h"
 #include "oggflacfile.h"
 #include "oggpage.h"
 #include "oggpageheader.h"
 #include "opusfile.h"
 #include "opusproperties.h"
+#endif
 #include "ownershipframe.h"
 #include "podcastframe.h"
 #include "popularimeterframe.h"
 #include "privateframe.h"
 #include "relativevolumeframe.h"
+#ifdef WITH_RIFF
 #include "rifffile.h"
+#endif
+#ifdef WITH_MOD
 #include "s3mfile.h"
 #include "s3mproperties.h"
+#endif
+#ifdef WITH_SHORTEN
 #include "shortenfile.h"
 #include "shortenproperties.h"
 #include "shortentag.h"
+#endif
+#ifdef WITH_VORBIS
 #include "speexfile.h"
 #include "speexproperties.h"
+#endif
 #include "synchronizedlyricsframe.h"
 #include "tableofcontentsframe.h"
 #include "tag.h"
@@ -111,24 +143,38 @@
 #include "tlist.h"
 #include "tmap.h"
 #include "tpropertymap.h"
+#ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
 #include "trueaudioproperties.h"
+#endif
 #include "tstring.h"
 #include "tstringlist.h"
 #include "uniquefileidentifierframe.h"
 #include "unknownframe.h"
 #include "unsynchronizedlyricsframe.h"
 #include "urllinkframe.h"
+#ifdef WITH_VORBIS
 #include "vorbisfile.h"
 #include "vorbisproperties.h"
+#endif
+#ifdef WITH_RIFF
 #include "wavfile.h"
+#endif
+#ifdef WITH_APE
 #include "wavpackfile.h"
 #include "wavpackproperties.h"
+#endif
+#ifdef WITH_RIFF
 #include "wavproperties.h"
+#endif
 #include "xingheader.h"
+#ifdef WITH_VORBIS
 #include "xiphcomment.h"
+#endif
+#ifdef WITH_MOD
 #include "xmfile.h"
 #include "xmproperties.h"
+#endif
 
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -147,31 +193,43 @@ public:
         // Class list was built by generating XML docs with Doxygen, and then running:
         // $ grep kind=\"class\" index.xml | sed -E -e 's/(.*<name>|<\/name>.*)//g'
 
+#ifdef WITH_APE
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::File));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::APE::Footer));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::APE::Item));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::APE::Tag));
+#endif
+#ifdef WITH_ASF
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::ASF::Attribute));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::ASF::Picture));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ASF::Tag));
+#endif
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::AudioProperties));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::ByteVector));
         CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::ByteVectorList));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ByteVectorStream));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::DebugListener));
+#ifdef WITH_DSF
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSDIFF::DIIN::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSDIFF::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSDIFF::Properties));
+#endif
+#ifdef WITH_VORBIS
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::File));
+#endif
+#ifdef WITH_DSF
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSF::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DSF::Properties));
+#endif
+#ifdef WITH_VORBIS
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FLAC::MetadataBlock));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Picture));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::FLAC::UnknownMetadataBlock));
+#endif
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::FileRef));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::FileRef::FileTypeResolver));
@@ -207,26 +265,35 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::ID3v2::UserTextIdentificationFrame));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::ID3v2::UserUrlLinkFrame));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::IOStream));
+#ifdef WITH_MOD
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::IT::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::IT::Properties));
+#endif
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::List<int>));
+#ifdef WITH_MP4
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::MP4::CoverArt));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::MP4::Item));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::MP4::ItemFactory));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MP4::Tag));
+#endif
+#ifdef WITH_APE
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPC::Properties));
+#endif
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::MPEG::Header));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::MPEG::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::MPEG::XingHeader));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::Map<int, int>));
+#ifdef WITH_MOD
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Mod::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::FileBase));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Mod::Tag));
+#endif
+#ifdef WITH_VORBIS
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::FLAC::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::File));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::Opus::File));
@@ -238,7 +305,9 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::Ogg::Vorbis::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::Vorbis::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Ogg::XiphComment));
+#endif
         CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::PropertyMap));
+#ifdef WITH_RIFF
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::RIFF::AIFF::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::AIFF::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::File));
@@ -246,21 +315,32 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::Info::Tag));
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::RIFF::WAV::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::RIFF::WAV::Properties));
+#endif
+#ifdef WITH_MOD
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::S3M::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::S3M::Properties));
+#endif
+#ifdef WITH_SHORTEN
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Shorten::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Shorten::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Shorten::Tag));
+#endif
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::String));
         CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::StringList));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Tag));
+#ifdef WITH_TRUEAUDIO
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::TrueAudio::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::TrueAudio::Properties));
+#endif
+#ifdef WITH_APE
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::WavPack::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::WavPack::Properties));
+#endif
+#ifdef WITH_MOD
         CPPUNIT_ASSERT_EQUAL(classSize(2, true), sizeof(TagLib::XM::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::XM::Properties));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::Variant));
+#endif
     }
 
 private:

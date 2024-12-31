@@ -23,6 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string>
 #include <cstdio>
 #include <array>
@@ -32,7 +36,9 @@
 #include "mpegfile.h"
 #include "id3v2tag.h"
 #include "id3v1tag.h"
+#ifdef WITH_APE
 #include "apetag.h"
+#endif
 #include "mpegproperties.h"
 #include "xingheader.h"
 #include "mpegheader.h"
@@ -67,7 +73,9 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testRepeatedSave3);
   CPPUNIT_TEST(testEmptyID3v2);
   CPPUNIT_TEST(testEmptyID3v1);
+#ifdef WITH_APE
   CPPUNIT_TEST(testEmptyAPE);
+#endif
   CPPUNIT_TEST(testIgnoreGarbage);
   CPPUNIT_TEST(testExtendedHeader);
   CPPUNIT_TEST(testReadStyleFast);
@@ -304,7 +312,9 @@ public:
     {
       MPEG::File f(copy.fileName().c_str());
       f.ID3v2Tag(true)->setTitle("ID3v2");
+#ifdef WITH_APE
       f.APETag(true)->setTitle("APE");
+#endif
       f.ID3v1Tag(true)->setTitle("ID3v1");
       f.save();
     }
@@ -312,8 +322,10 @@ public:
       MPEG::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT_EQUAL(String("ID3v2"), f.properties()["TITLE"].front());
       f.strip(MPEG::File::ID3v2);
+#ifdef WITH_APE
       CPPUNIT_ASSERT_EQUAL(String("APE"), f.properties()["TITLE"].front());
       f.strip(MPEG::File::APE);
+#endif
       CPPUNIT_ASSERT_EQUAL(String("ID3v1"), f.properties()["TITLE"].front());
       f.strip(MPEG::File::ID3v1);
       CPPUNIT_ASSERT(f.properties().isEmpty());
@@ -464,17 +476,23 @@ public:
       CPPUNIT_ASSERT(!f.hasAPETag());
       CPPUNIT_ASSERT(!f.hasID3v1Tag());
 
+#ifdef WITH_APE
       f.APETag(true)->setTitle("01234 56789 ABCDE FGHIJ");
       f.save();
       f.APETag()->setTitle("0");
       f.save();
+#endif
       f.ID3v1Tag(true)->setTitle("01234 56789 ABCDE FGHIJ");
+#ifdef WITH_APE
       f.APETag()->setTitle("01234 56789 ABCDE FGHIJ 01234 56789 ABCDE FGHIJ 01234 56789");
+#endif
       f.save();
     }
     {
       MPEG::File f(copy.fileName().c_str());
+#ifdef WITH_APE
       CPPUNIT_ASSERT(f.hasAPETag());
+#endif
       CPPUNIT_ASSERT(f.hasID3v1Tag());
     }
   }
@@ -519,6 +537,7 @@ public:
     }
   }
 
+#ifdef WITH_APE
   void testEmptyAPE()
   {
     ScopedFileCopy copy("xing", ".mp3");
@@ -538,6 +557,7 @@ public:
       CPPUNIT_ASSERT(!f.hasAPETag());
     }
   }
+#endif
 
   void testIgnoreGarbage()
   {

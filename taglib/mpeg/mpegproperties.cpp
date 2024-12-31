@@ -25,10 +25,16 @@
 
 #include "mpegproperties.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "tdebug.h"
 #include "mpegfile.h"
 #include "xingheader.h"
+#ifdef WITH_APE
 #include "apetag.h"
+#endif
 
 using namespace TagLib;
 

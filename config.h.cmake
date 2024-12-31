@@ -21,4 +21,14 @@
 
 #cmakedefine TESTS_DIR "@TESTS_DIR@"
 
+#cmakedefine WITH_APE 1
+#cmakedefine WITH_ASF 1
+#cmakedefine WITH_DSF 1
+#cmakedefine WITH_MOD 1
+#cmakedefine WITH_MP4 1
+#cmakedefine WITH_RIFF 1
+#cmakedefine WITH_SHORTEN 1
+#cmakedefine WITH_TRUEAUDIO 1
+#cmakedefine WITH_VORBIS 1
+
 #endif
