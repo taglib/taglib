@@ -1,48 +1,36 @@
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(tag_HDR_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/toolkit
+  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg
+  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
+  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/frames
+  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1
 )
 if(WITH_ASF)
   set(tag_HDR_DIRS ${tag_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/asf
   )
 endif()
-set(tag_HDR_DIRS ${tag_HDR_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg
-)
 if(WITH_VORBIS)
   set(tag_HDR_DIRS ${tag_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/flac
     ${CMAKE_CURRENT_SOURCE_DIR}/flac
-  )
-endif()
-if(WITH_APE)
-  set(tag_HDR_DIRS ${tag_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/mpc
-  )
-endif()
-if(WITH_MP4)
-  set(tag_HDR_DIRS ${tag_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/mp4
-  )
-endif()
-if(WITH_VORBIS)
-  set(tag_HDR_DIRS ${tag_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/vorbis
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/speex
     ${CMAKE_CURRENT_SOURCE_DIR}/ogg/opus
   )
 endif()
-set(tag_HDR_DIRS ${tag_HDR_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v2/frames
-  ${CMAKE_CURRENT_SOURCE_DIR}/mpeg/id3v1
-)
 if(WITH_APE)
   set(tag_HDR_DIRS ${tag_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/mpc
     ${CMAKE_CURRENT_SOURCE_DIR}/ape
     ${CMAKE_CURRENT_SOURCE_DIR}/wavpack
+  )
+endif()
+if(WITH_MP4)
+  set(tag_HDR_DIRS ${tag_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/mp4
   )
 endif()
 if(WITH_TRUEAUDIO)
@@ -105,8 +93,6 @@ set(tag_HDRS
   mpeg/mpegproperties.h
   mpeg/mpegheader.h
   mpeg/xingheader.h
-)
-set(tag_HDRS ${tag_HDRS}
   mpeg/id3v1/id3v1tag.h
   mpeg/id3v1/id3v1genres.h
   mpeg/id3v2/id3v2.h
@@ -300,6 +286,16 @@ if(WITH_VORBIS)
   set(oggflacs_SRCS
     ogg/flac/oggflacfile.cpp
   )
+
+  set(speex_SRCS
+    ogg/speex/speexfile.cpp
+    ogg/speex/speexproperties.cpp
+  )
+
+  set(opus_SRCS
+    ogg/opus/opusfile.cpp
+    ogg/opus/opusproperties.cpp
+  )
 endif()
 
 if(WITH_APE)
@@ -307,21 +303,7 @@ if(WITH_APE)
     mpc/mpcfile.cpp
     mpc/mpcproperties.cpp
   )
-endif()
 
-if(WITH_MP4)
-  set(mp4_SRCS
-    mp4/mp4file.cpp
-    mp4/mp4atom.cpp
-    mp4/mp4tag.cpp
-    mp4/mp4item.cpp
-    mp4/mp4properties.cpp
-    mp4/mp4coverart.cpp
-    mp4/mp4itemfactory.cpp
-  )
-endif()
-
-if(WITH_APE)
   set(ape_SRCS
     ape/apetag.cpp
     ape/apefooter.cpp
@@ -336,15 +318,15 @@ if(WITH_APE)
   )
 endif()
 
-if(WITH_VORBIS)
-  set(speex_SRCS
-    ogg/speex/speexfile.cpp
-    ogg/speex/speexproperties.cpp
-  )
-
-  set(opus_SRCS
-    ogg/opus/opusfile.cpp
-    ogg/opus/opusproperties.cpp
+if(WITH_MP4)
+  set(mp4_SRCS
+    mp4/mp4file.cpp
+    mp4/mp4atom.cpp
+    mp4/mp4tag.cpp
+    mp4/mp4item.cpp
+    mp4/mp4properties.cpp
+    mp4/mp4coverart.cpp
+    mp4/mp4itemfactory.cpp
   )
 endif()
 

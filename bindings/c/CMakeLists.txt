@@ -1,45 +1,35 @@
 set(tag_c_HDR_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/toolkit
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2/frames
 )
 if(WITH_ASF)
   set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/asf
   )
 endif()
-set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg
-)
 if(WITH_VORBIS)
   set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/vorbis
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/flac
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/flac
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/opus
   )
 endif()
 if(WITH_APE)
   set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpc
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ape
   )
 endif()
 if(WITH_MP4)
   set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mp4
-  )
-endif()
-set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2/frames
-)
-if(WITH_APE)
-  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
-  )
-endif()
-if(WITH_VORBIS)
-  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex
   )
 endif()
 if(WITH_TRUEAUDIO)
@@ -54,22 +44,12 @@ if(WITH_RIFF)
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/wav
   )
 endif()
-if(WITH_APE)
-  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ape
-  )
-endif()
 if(WITH_MOD)
   set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/it
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mod
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/s3m
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/xm
-  )
-endif()
-if(WITH_VORBIS)
-  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/opus
   )
 endif()
 if(WITH_DSF)

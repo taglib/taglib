@@ -30,14 +30,15 @@
 #include <functional>
 #include <memory>
 
-#ifdef WITH_VORBIS
-#include "flacproperties.h"
-#endif
 #include "mpegproperties.h"
 #include "tbytevector.h"
 #include "tpropertymap.h"
 #include "mpegfile.h"
+#include "id3v2tag.h"
+#include "id3v2frame.h"
+#include "id3v2framefactory.h"
 #ifdef WITH_VORBIS
+#include "flacproperties.h"
 #include "flacfile.h"
 #endif
 #ifdef WITH_TRUEAUDIO
@@ -52,9 +53,6 @@
 #include "dsffile.h"
 #include "dsdifffile.h"
 #endif
-#include "id3v2tag.h"
-#include "id3v2frame.h"
-#include "id3v2framefactory.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 

@@ -2,18 +2,6 @@ SET(test_HDR_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
   ${CMAKE_CURRENT_SOURCE_DIR}/../bindings/c
-)
-IF(WITH_APE)
-  SET(test_HDR_DIRS ${test_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
-  )
-ENDIF()
-IF(WITH_ASF)
-  SET(test_HDR_DIRS ${test_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/asf
-  )
-ENDIF()
-SET(test_HDR_DIRS ${test_HDR_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2/frames
@@ -21,7 +9,14 @@ SET(test_HDR_DIRS ${test_HDR_DIRS}
 )
 IF(WITH_APE)
   SET(test_HDR_DIRS ${test_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpc
+    ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/wavpack
+  )
+ENDIF()
+IF(WITH_ASF)
+  SET(test_HDR_DIRS ${test_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/asf
   )
 ENDIF()
 IF(WITH_MP4)
@@ -51,11 +46,6 @@ IF(WITH_VORBIS)
     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/flac
   )
 ENDIF()
-IF(WITH_APE)
-  SET(test_HDR_DIRS ${test_HDR_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/wavpack
-  )
-ENDIF()
 IF(WITH_MOD)
   SET(test_HDR_DIRS ${test_HDR_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mod
@@ -83,13 +73,6 @@ SET(test_runner_SRCS
   test_map.cpp
   test_mpeg.cpp
   test_synchdata.cpp
-)
-IF(WITH_TRUEAUDIO)
-  SET(test_runner_SRCS ${test_runner_SRCS}
-    test_trueaudio.cpp
-  )
-ENDIF()
-SET(test_runner_SRCS ${test_runner_SRCS}
   test_bytevector.cpp
   test_bytevectorlist.cpp
   test_bytevectorstream.cpp
@@ -99,47 +82,43 @@ SET(test_runner_SRCS ${test_runner_SRCS}
   test_complexproperties.cpp
   test_file.cpp
   test_fileref.cpp
-)
-SET(test_runner_SRCS ${test_runner_SRCS}
   test_id3v1.cpp
   test_id3v2.cpp
   test_id3v2framefactory.cpp
+  test_sizes.cpp
+  test_versionnumber.cpp
 )
+IF(WITH_TRUEAUDIO)
+  SET(test_runner_SRCS ${test_runner_SRCS}
+    test_trueaudio.cpp
+  )
+ENDIF()
 IF(WITH_VORBIS)
   SET(test_runner_SRCS ${test_runner_SRCS}
     test_xiphcomment.cpp
+    test_ogg.cpp
+    test_oggflac.cpp
+    test_flac.cpp
+    test_flacpicture.cpp
+    test_flacunknownmetadatablock.cpp
+    test_opus.cpp
+    test_speex.cpp
   )
 ENDIF()
 IF(WITH_RIFF)
   SET(test_runner_SRCS ${test_runner_SRCS}
     test_aiff.cpp
     test_riff.cpp
-  )
-ENDIF()
-IF(WITH_VORBIS)
-  SET(test_runner_SRCS ${test_runner_SRCS}
-    test_ogg.cpp
-    test_oggflac.cpp
-    test_flac.cpp
-    test_flacpicture.cpp
-    test_flacunknownmetadatablock.cpp
+    test_wav.cpp
+    test_info.cpp
   )
 ENDIF()
 if(WITH_APE)
   SET(test_runner_SRCS ${test_runner_SRCS}
     test_ape.cpp
     test_apetag.cpp
-  )
-ENDIF()
-IF(WITH_RIFF)
-  SET(test_runner_SRCS ${test_runner_SRCS}
-    test_wav.cpp
-    test_info.cpp
-  )
-ENDIF()
-IF(WITH_APE)
-  SET(test_runner_SRCS ${test_runner_SRCS}
     test_wavpack.cpp
+    test_mpc.cpp
   )
 ENDIF()
 IF(WITH_MP4)
@@ -154,23 +133,12 @@ IF(WITH_ASF)
     test_asf.cpp
   )
 ENDIF()
-  IF(WITH_MOD)
+IF(WITH_MOD)
   SET(test_runner_SRCS ${test_runner_SRCS}
     test_mod.cpp
     test_s3m.cpp
     test_it.cpp
     test_xm.cpp
-  )
-ENDIF()
-IF(WITH_APE)
-  SET(test_runner_SRCS ${test_runner_SRCS}
-    test_mpc.cpp
-  )
-ENDIF()
-IF(WITH_VORBIS)
-  SET(test_runner_SRCS ${test_runner_SRCS}
-    test_opus.cpp
-    test_speex.cpp
   )
 ENDIF()
 IF(WITH_DSF)
@@ -184,10 +152,6 @@ IF(WITH_SHORTEN)
     test_shorten.cpp
   )
 ENDIF()
-SET(test_runner_SRCS ${test_runner_SRCS}
-  test_sizes.cpp
-  test_versionnumber.cpp
-)
 IF(BUILD_BINDINGS)
   SET(test_runner_SRCS ${test_runner_SRCS}
     test_tag_c.cpp

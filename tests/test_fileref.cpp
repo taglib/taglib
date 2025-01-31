@@ -34,20 +34,21 @@
 #include "tbytevectorstream.h"
 #include "tag.h"
 #include "fileref.h"
+#include "mpegfile.h"
 #ifdef WITH_VORBIS
 #include "oggflacfile.h"
 #include "vorbisfile.h"
+#include "speexfile.h"
+#include "flacfile.h"
+#include "opusfile.h"
 #endif
-#include "mpegfile.h"
 #ifdef WITH_APE
 #include "mpcfile.h"
+#include "apefile.h"
+#include "wavpackfile.h"
 #endif
 #ifdef WITH_ASF
 #include "asffile.h"
-#endif
-#ifdef WITH_VORBIS
-#include "speexfile.h"
-#include "flacfile.h"
 #endif
 #ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
@@ -57,18 +58,7 @@
 #endif
 #ifdef WITH_RIFF
 #include "wavfile.h"
-#endif
-#ifdef WITH_APE
-#include "apefile.h"
-#endif
-#ifdef WITH_RIFF
 #include "aifffile.h"
-#endif
-#ifdef WITH_APE
-#include "wavpackfile.h"
-#endif
-#ifdef WITH_VORBIS
-#include "opusfile.h"
 #endif
 #ifdef WITH_MOD
 #include "xmfile.h"
@@ -116,21 +106,26 @@ namespace
 class TestFileRef : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestFileRef);
+  CPPUNIT_TEST(testMP3);
+  CPPUNIT_TEST(testUnsupported);
+  CPPUNIT_TEST(testAudioProperties);
+  CPPUNIT_TEST(testDefaultFileExtensions);
+  CPPUNIT_TEST(testFileResolver);
 #ifdef WITH_ASF
   CPPUNIT_TEST(testASF);
 #endif
 #ifdef WITH_APE
   CPPUNIT_TEST(testMusepack);
+  CPPUNIT_TEST(testAPE);
+  CPPUNIT_TEST(testWavPack);
 #endif
 #ifdef WITH_VORBIS
   CPPUNIT_TEST(testVorbis);
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
-#endif
-  CPPUNIT_TEST(testMP3);
-#ifdef WITH_VORBIS
   CPPUNIT_TEST(testOGA_FLAC);
   CPPUNIT_TEST(testOGA_Vorbis);
+  CPPUNIT_TEST(testOpus);
 #endif
 #ifdef WITH_MP4
   CPPUNIT_TEST(testMP4_1);
@@ -141,28 +136,15 @@ class TestFileRef : public CppUnit::TestFixture
 #ifdef WITH_TRUEAUDIO
   CPPUNIT_TEST(testTrueAudio);
 #endif
-#ifdef WITH_APE
-  CPPUNIT_TEST(testAPE);
-#endif
 #ifdef WITH_RIFF
   CPPUNIT_TEST(testWav);
   CPPUNIT_TEST(testAIFF_1);
   CPPUNIT_TEST(testAIFF_2);
 #endif
-#ifdef WITH_APE
-  CPPUNIT_TEST(testWavPack);
-#endif
-#ifdef WITH_VORBIS
-  CPPUNIT_TEST(testOpus);
-#endif
 #ifdef WITH_DSF
   CPPUNIT_TEST(testDSF);
   CPPUNIT_TEST(testDSDIFF);
 #endif
-  CPPUNIT_TEST(testUnsupported);
-  CPPUNIT_TEST(testAudioProperties);
-  CPPUNIT_TEST(testDefaultFileExtensions);
-  CPPUNIT_TEST(testFileResolver);
   CPPUNIT_TEST_SUITE_END();
 
 public:

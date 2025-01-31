@@ -41,53 +41,37 @@
 #include "tstringlist.h"
 #include "tvariant.h"
 #include "tdebug.h"
+#include "mpegfile.h"
 #ifdef WITH_RIFF
 #include "aifffile.h"
+#include "wavfile.h"
 #endif
 #ifdef WITH_APE
 #include "apefile.h"
+#include "mpcfile.h"
+#include "wavpackfile.h"
 #endif
 #ifdef WITH_ASF
 #include "asffile.h"
 #endif
 #ifdef WITH_VORBIS
 #include "flacfile.h"
-#endif
-#ifdef WITH_MOD
-#include "itfile.h"
-#include "modfile.h"
-#endif
-#ifdef WITH_MP4
-#include "mp4file.h"
-#endif
-#ifdef WITH_APE
-#include "mpcfile.h"
-#endif
-#include "mpegfile.h"
-#ifdef WITH_VORBIS
+#include "speexfile.h"
+#include "vorbisfile.h"
 #include "oggflacfile.h"
 #include "opusfile.h"
 #endif
 #ifdef WITH_MOD
+#include "itfile.h"
+#include "modfile.h"
+#include "xmfile.h"
 #include "s3mfile.h"
 #endif
-#ifdef WITH_VORBIS
-#include "speexfile.h"
+#ifdef WITH_MP4
+#include "mp4file.h"
 #endif
 #ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
-#endif
-#ifdef WITH_VORBIS
-#include "vorbisfile.h"
-#endif
-#ifdef WITH_RIFF
-#include "wavfile.h"
-#endif
-#ifdef WITH_APE
-#include "wavpackfile.h"
-#endif
-#ifdef WITH_MOD
-#include "xmfile.h"
 #endif
 #ifdef WITH_DSF
 #include "dsffile.h"
@@ -187,18 +171,18 @@ namespace
     }
     else if(ext == "FLAC")
       file = new FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "SPX")
+      file = new Ogg::Speex::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "OPUS")
+      file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_APE
     else if(ext == "MPC")
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "WV")
       file = new WavPack::File(stream, readAudioProperties, audioPropertiesStyle);
-#endif
-#ifdef WITH_VORBIS
-    else if(ext == "SPX")
-      file = new Ogg::Speex::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "OPUS")
-      file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "APE")
+      file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_TRUEAUDIO
     else if(ext == "TTA")
@@ -217,10 +201,6 @@ namespace
       file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "WAV")
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
-#endif
-#ifdef WITH_APE
-    else if(ext == "APE")
-      file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_MOD
     // module, nst and wow are possible but uncommon extensions
@@ -271,18 +251,18 @@ namespace
       file = new Ogg::FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(FLAC::File::isSupported(stream))
       file = new FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(Ogg::Speex::File::isSupported(stream))
+      file = new Ogg::Speex::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(Ogg::Opus::File::isSupported(stream))
+      file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_APE
     else if(MPC::File::isSupported(stream))
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(WavPack::File::isSupported(stream))
       file = new WavPack::File(stream, readAudioProperties, audioPropertiesStyle);
-#endif
-#ifdef WITH_VORBIS
-    else if(Ogg::Speex::File::isSupported(stream))
-      file = new Ogg::Speex::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(Ogg::Opus::File::isSupported(stream))
-      file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(APE::File::isSupported(stream))
+      file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_TRUEAUDIO
     else if(TrueAudio::File::isSupported(stream))
@@ -301,10 +281,6 @@ namespace
       file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(RIFF::WAV::File::isSupported(stream))
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
-#endif
-#ifdef WITH_APE
-    else if(APE::File::isSupported(stream))
-      file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef WITH_DSF
     else if(DSF::File::isSupported(stream))
@@ -485,25 +461,24 @@ StringList FileRef::defaultFileExtensions()
 {
   StringList l;
 
+  l.append("mp3");
+  l.append("mp2");
+  l.append("aac");
 #ifdef WITH_VORBIS
   l.append("ogg");
   l.append("flac");
   l.append("oga");
   l.append("opus");
+  l.append("spx");
 #endif
-  l.append("mp3");
-  l.append("mp2");
 #ifdef WITH_APE
   l.append("mpc");
   l.append("wv");
-#endif
-#ifdef WITH_VORBIS
-  l.append("spx");
+  l.append("ape");
 #endif
 #ifdef WITH_TRUEAUDIO
   l.append("tta");
 #endif
-  l.append("aac");
 #ifdef WITH_MP4
   l.append("m4a");
   l.append("m4r");
@@ -523,9 +498,6 @@ StringList FileRef::defaultFileExtensions()
   l.append("afc");
   l.append("aifc");
   l.append("wav");
-#endif
-#ifdef WITH_APE
-  l.append("ape");
 #endif
 #ifdef WITH_MOD
   l.append("mod");

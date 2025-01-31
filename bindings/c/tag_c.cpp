@@ -35,23 +35,22 @@
 #include "tfile.h"
 #include "tpropertymap.h"
 #include "fileref.h"
+#include "mpegfile.h"
+#include "tag.h"
+#include "id3v2framefactory.h"
 #ifdef WITH_ASF
 #include "asffile.h"
 #endif
 #ifdef WITH_VORBIS
 #include "vorbisfile.h"
-#endif
-#include "mpegfile.h"
-#ifdef WITH_VORBIS
 #include "flacfile.h"
 #include "oggflacfile.h"
+#include "speexfile.h"
+#include "opusfile.h"
 #endif
 #ifdef WITH_APE
 #include "mpcfile.h"
 #include "wavpackfile.h"
-#endif
-#ifdef WITH_VORBIS
-#include "speexfile.h"
 #endif
 #ifdef WITH_TRUEAUDIO
 #include "trueaudiofile.h"
@@ -72,9 +71,6 @@
 #include "s3mfile.h"
 #include "xmfile.h"
 #endif
-#ifdef WITH_VORBIS
-#include "opusfile.h"
-#endif
 #ifdef WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
@@ -82,8 +78,6 @@
 #ifdef WITH_SHORTEN
 #include "shortenfile.h"
 #endif
-#include "tag.h"
-#include "id3v2framefactory.h"
 
 using namespace TagLib;
 
@@ -167,25 +161,25 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   case TagLib_File_FLAC:
     file = new FLAC::File(filename);
     break;
+  case TagLib_File_OggFlac:
+    file = new Ogg::FLAC::File(filename);
+    break;
+  case TagLib_File_Speex:
+    file = new Ogg::Speex::File(filename);
+    break;
+  case TagLib_File_Opus:
+    file = new Ogg::Opus::File(filename);
+    break;
 #endif
 #ifdef WITH_APE
   case TagLib_File_MPC:
     file = new MPC::File(filename);
     break;
-#endif
-#ifdef WITH_VORBIS
-  case TagLib_File_OggFlac:
-    file = new Ogg::FLAC::File(filename);
-    break;
-#endif
-#ifdef WITH_APE
   case TagLib_File_WavPack:
     file = new WavPack::File(filename);
     break;
-#endif
-#ifdef WITH_VORBIS
-  case TagLib_File_Speex:
-    file = new Ogg::Speex::File(filename);
+  case TagLib_File_APE:
+    file = new APE::File(filename);
     break;
 #endif
 #ifdef WITH_TRUEAUDIO
@@ -211,11 +205,6 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     file = new RIFF::WAV::File(filename);
     break;
 #endif
-#ifdef WITH_APE
-  case TagLib_File_APE:
-    file = new APE::File(filename);
-    break;
-#endif
 #ifdef WITH_MOD
   case TagLib_File_IT:
     file = new IT::File(filename);
@@ -228,11 +217,6 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
     break;
   case TagLib_File_XM:
     file = new XM::File(filename);
-    break;
-#endif
-#ifdef WITH_VORBIS
-  case TagLib_File_Opus:
-    file = new Ogg::Opus::File(filename);
     break;
 #endif
 #ifdef WITH_DSF

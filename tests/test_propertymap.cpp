@@ -29,14 +29,14 @@
 
 #include "tpropertymap.h"
 #include "tag.h"
+#include "id3v1tag.h"
+#include "id3v2tag.h"
 #ifdef WITH_APE
 #include "apetag.h"
 #endif
 #ifdef WITH_ASF
 #include "asftag.h"
 #endif
-#include "id3v1tag.h"
-#include "id3v2tag.h"
 #ifdef WITH_RIFF
 #include "infotag.h"
 #endif
@@ -55,14 +55,15 @@ class TestPropertyMap : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestPropertyMap);
   CPPUNIT_TEST(testInvalidKeys);
+  CPPUNIT_TEST(testGetSetId3v1);
+  CPPUNIT_TEST(testGetSetId3v2);
+  CPPUNIT_TEST(testGetSet);
 #ifdef WITH_APE
   CPPUNIT_TEST(testGetSetApe);
 #endif
 #ifdef WITH_ASF
   CPPUNIT_TEST(testGetSetAsf);
 #endif
-  CPPUNIT_TEST(testGetSetId3v1);
-  CPPUNIT_TEST(testGetSetId3v2);
 #ifdef WITH_RIFF
   CPPUNIT_TEST(testGetSetInfo);
 #endif
@@ -72,7 +73,6 @@ class TestPropertyMap : public CppUnit::TestFixture
 #ifdef WITH_VORBIS
   CPPUNIT_TEST(testGetSetXiphComment);
 #endif
-  CPPUNIT_TEST(testGetSet);
   CPPUNIT_TEST_SUITE_END();
 
 public:

@@ -27,33 +27,29 @@
 #include "config.h"
 #endif
 
-#ifdef WITH_ASF
-#include "asfpicture.h"
-#endif
-#ifdef WITH_VORBIS
-#include "flacpicture.h"
-#include "flacfile.h"
-#endif
 #include "tbytevector.h"
 #include "tvariant.h"
 #include "tzlib.h"
 #include "fileref.h"
-#ifdef WITH_APE
-#include "apetag.h"
-#endif
-#ifdef WITH_ASF
-#include "asftag.h"
-#endif
-#ifdef WITH_MP4
-#include "mp4tag.h"
-#endif
-#ifdef WITH_VORBIS
-#include "xiphcomment.h"
-#endif
 #include "id3v1tag.h"
 #include "id3v2tag.h"
 #include "attachedpictureframe.h"
 #include "generalencapsulatedobjectframe.h"
+#ifdef WITH_ASF
+#include "asfpicture.h"
+#include "asftag.h"
+#endif
+#ifdef WITH_VORBIS
+#include "flacpicture.h"
+#include "flacfile.h"
+#include "xiphcomment.h"
+#endif
+#ifdef WITH_APE
+#include "apetag.h"
+#endif
+#ifdef WITH_MP4
+#include "mp4tag.h"
+#endif
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -85,29 +81,25 @@ class TestComplexProperties : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestComplexProperties);
   CPPUNIT_TEST(testReadMp3Picture);
+  CPPUNIT_TEST(testSetGetId3Geob);
+  CPPUNIT_TEST(testSetGetId3Picture);
+  CPPUNIT_TEST(testNonExistent);
 #ifdef WITH_MP4
   CPPUNIT_TEST(testReadM4aPicture);
+  CPPUNIT_TEST(testSetGetMp4Picture);
 #endif
 #ifdef WITH_VORBIS
   CPPUNIT_TEST(testReadOggPicture);
   CPPUNIT_TEST(testReadWriteFlacPicture);
   CPPUNIT_TEST(testReadWriteMultipleProperties);
+  CPPUNIT_TEST(testSetGetXiphPicture);
 #endif
-  CPPUNIT_TEST(testSetGetId3Geob);
-  CPPUNIT_TEST(testSetGetId3Picture);
 #ifdef WITH_APE
   CPPUNIT_TEST(testSetGetApePicture);
 #endif
 #ifdef WITH_ASF
   CPPUNIT_TEST(testSetGetAsfPicture);
 #endif
-#ifdef WITH_MP4
-  CPPUNIT_TEST(testSetGetMp4Picture);
-#endif
-#ifdef WITH_VORBIS
-  CPPUNIT_TEST(testSetGetXiphPicture);
-#endif
-  CPPUNIT_TEST(testNonExistent);
   CPPUNIT_TEST_SUITE_END();
 
 public:
