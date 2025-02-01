@@ -26,10 +26,6 @@
 #ifndef TAGLIB_MPEGFILE_H
 #define TAGLIB_MPEGFILE_H
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "tfile.h"
 #include "taglib_export.h"
 #include "tag.h"
@@ -270,7 +266,6 @@ namespace TagLib {
        */
       ID3v1::Tag *ID3v1Tag(bool create = false);
 
-#ifdef WITH_APE
       /*!
        * Returns a pointer to the APE tag of the file.
        *
@@ -289,7 +284,6 @@ namespace TagLib {
        * \see hasAPETag()
        */
       APE::Tag *APETag(bool create = false);
-#endif
 
       /*!
        * This will strip the tags that match the OR-ed together TagTypes from the

@@ -25,6 +25,10 @@
 
 #include "mpegfile.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "id3v2framefactory.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
@@ -323,12 +327,14 @@ ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
   return d->tag.access<ID3v1::Tag>(ID3v1Index, create);
 }
 
-#ifdef WITH_APE
 APE::Tag *MPEG::File::APETag(bool create)
 {
+#ifdef WITH_APE
   return d->tag.access<APE::Tag>(APEIndex, create);
-}
+#else
+  return nullptr;
 #endif
+}
 
 bool MPEG::File::strip(int tags, bool freeMemory)
 {
