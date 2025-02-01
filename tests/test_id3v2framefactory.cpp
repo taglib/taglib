@@ -23,13 +23,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <functional>
 #include <memory>
 
+#include "taglib_config.h"
 #include "mpegproperties.h"
 #include "tbytevector.h"
 #include "tpropertymap.h"
@@ -37,19 +34,19 @@
 #include "id3v2tag.h"
 #include "id3v2frame.h"
 #include "id3v2framefactory.h"
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
 #include "flacproperties.h"
 #include "flacfile.h"
 #endif
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
 #include "trueaudiofile.h"
 #include "trueaudioproperties.h"
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
 #include "wavfile.h"
 #include "aifffile.h"
 #endif
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
 #endif
@@ -130,17 +127,17 @@ class TestId3v2FrameFactory : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestId3v2FrameFactory);
   CPPUNIT_TEST(testMPEG);
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   CPPUNIT_TEST(testFLAC);
 #endif
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
   CPPUNIT_TEST(testTrueAudio);
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
   CPPUNIT_TEST(testWAV);
   CPPUNIT_TEST(testAIFF);
 #endif
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
   CPPUNIT_TEST(testDSF);
   CPPUNIT_TEST(testDSDIFF);
 #endif
@@ -256,7 +253,7 @@ public:
     );
   }
 
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   void testFLAC()
   {
     ScopedFileCopy copy("no-tags", ".flac");
@@ -283,7 +280,7 @@ public:
   }
 #endif
 
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
   void testTrueAudio()
   {
     ScopedFileCopy copy("empty", ".tta");
@@ -310,7 +307,7 @@ public:
   }
 #endif
 
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
   void testWAV()
   {
     ScopedFileCopy copy("empty", ".wav");
@@ -362,7 +359,7 @@ public:
   }
 #endif
 
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
   void testDSF()
   {
     ScopedFileCopy copy("empty10ms", ".dsf");

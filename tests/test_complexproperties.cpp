@@ -23,10 +23,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include "taglib_config.h"
 #include "tbytevector.h"
 #include "tvariant.h"
 #include "tzlib.h"
@@ -35,19 +32,19 @@
 #include "id3v2tag.h"
 #include "attachedpictureframe.h"
 #include "generalencapsulatedobjectframe.h"
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
 #include "asfpicture.h"
 #include "asftag.h"
 #endif
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
 #include "flacpicture.h"
 #include "flacfile.h"
 #include "xiphcomment.h"
 #endif
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
 #include "apetag.h"
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
 #include "mp4tag.h"
 #endif
 #include <cppunit/extensions/HelperMacros.h>
@@ -84,20 +81,20 @@ class TestComplexProperties : public CppUnit::TestFixture
   CPPUNIT_TEST(testSetGetId3Geob);
   CPPUNIT_TEST(testSetGetId3Picture);
   CPPUNIT_TEST(testNonExistent);
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
   CPPUNIT_TEST(testReadM4aPicture);
   CPPUNIT_TEST(testSetGetMp4Picture);
 #endif
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   CPPUNIT_TEST(testReadOggPicture);
   CPPUNIT_TEST(testReadWriteFlacPicture);
   CPPUNIT_TEST(testReadWriteMultipleProperties);
   CPPUNIT_TEST(testSetGetXiphPicture);
 #endif
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   CPPUNIT_TEST(testSetGetApePicture);
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
   CPPUNIT_TEST(testSetGetAsfPicture);
 #endif
   CPPUNIT_TEST_SUITE_END();
@@ -123,7 +120,7 @@ public:
     }
   }
 
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
   void testReadM4aPicture()
   {
     const ByteVector expectedData1(
@@ -168,7 +165,7 @@ public:
   }
 #endif
 
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   void testReadOggPicture()
   {
     FileRef f(TEST_FILE_PATH_C("lowercase-fields.ogg"), false);
@@ -335,7 +332,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FrontCover, frame->type());
   }
 
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   void testSetGetApePicture()
   {
     const String FRONT_COVER("COVER ART (FRONT)");
@@ -353,7 +350,7 @@ public:
   }
 #endif
 
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
   void testSetGetAsfPicture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -373,7 +370,7 @@ public:
   }
 #endif
 
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
   void testSetGetMp4Picture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -391,7 +388,7 @@ public:
   }
 #endif
 
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   void testSetGetXiphPicture()
   {
     VariantMap picture(TEST_PICTURE);

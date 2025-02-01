@@ -25,15 +25,12 @@
 
 #include "tagutils.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include "taglib_config.h"
 #include "tfile.h"
 
 #include "id3v1tag.h"
 #include "id3v2header.h"
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
 #include "apetag.h"
 #endif
 
@@ -52,7 +49,7 @@ offset_t Utils::findID3v1(File *file)
 
     if(const TagLib::ByteVector data = file->readBlock(8);
        data.containsAt(ID3v1::Tag::fileIdentifier(), 3) &&
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
        data != APE::Tag::fileIdentifier()
 #else
        data != ByteVector::fromCString("APETAGEX")
@@ -96,7 +93,7 @@ offset_t Utils::findAPE(File *file, offset_t id3v1Location)
   const offset_t p = file->tell();
 
   if(file->readBlock(8) ==
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
      APE::Tag::fileIdentifier()
 #else
      ByteVector::fromCString("APETAGEX")

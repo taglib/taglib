@@ -29,55 +29,52 @@
 
 #include "fileref.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <cstring>
 #include <utility>
 
+#include "taglib_config.h"
 #include "tfilestream.h"
 #include "tpropertymap.h"
 #include "tstringlist.h"
 #include "tvariant.h"
 #include "tdebug.h"
 #include "mpegfile.h"
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
 #include "aifffile.h"
 #include "wavfile.h"
 #endif
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
 #include "apefile.h"
 #include "mpcfile.h"
 #include "wavpackfile.h"
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
 #include "asffile.h"
 #endif
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
 #include "flacfile.h"
 #include "speexfile.h"
 #include "vorbisfile.h"
 #include "oggflacfile.h"
 #include "opusfile.h"
 #endif
-#ifdef WITH_MOD
+#ifdef TAGLIB_WITH_MOD
 #include "itfile.h"
 #include "modfile.h"
 #include "xmfile.h"
 #include "s3mfile.h"
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
 #include "mp4file.h"
 #endif
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
 #include "trueaudiofile.h"
 #endif
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
 #endif
-#ifdef WITH_SHORTEN
+#ifdef TAGLIB_WITH_SHORTEN
 #include "shortenfile.h"
 #endif
 
@@ -158,7 +155,7 @@ namespace
 
     if(ext == "MP3" || ext == "MP2" || ext == "AAC")
       file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
     else if(ext == "OGG")
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "OGA") {
@@ -176,7 +173,7 @@ namespace
     else if(ext == "OPUS")
       file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
     else if(ext == "MPC")
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "WV")
@@ -184,25 +181,25 @@ namespace
     else if(ext == "APE")
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
     else if(ext == "TTA")
       file = new TrueAudio::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
     else if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V")
       file = new MP4::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
     else if(ext == "WMA" || ext == "ASF")
       file = new ASF::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
     else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
       file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "WAV")
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_MOD
+#ifdef TAGLIB_WITH_MOD
     // module, nst and wow are possible but uncommon extensions
     else if(ext == "MOD" || ext == "MODULE" || ext == "NST" || ext == "WOW")
       file = new Mod::File(stream, readAudioProperties, audioPropertiesStyle);
@@ -213,13 +210,13 @@ namespace
     else if(ext == "XM")
       file = new XM::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
     else if(ext == "DSF")
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(ext == "DFF" || ext == "DSDIFF")
       file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_SHORTEN
+#ifdef TAGLIB_WITH_SHORTEN
     else if(ext == "SHN")
       file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
@@ -244,7 +241,7 @@ namespace
 
     if(MPEG::File::isSupported(stream))
       file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
     else if(Ogg::Vorbis::File::isSupported(stream))
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(Ogg::FLAC::File::isSupported(stream))
@@ -256,7 +253,7 @@ namespace
     else if(Ogg::Opus::File::isSupported(stream))
       file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
     else if(MPC::File::isSupported(stream))
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(WavPack::File::isSupported(stream))
@@ -264,31 +261,31 @@ namespace
     else if(APE::File::isSupported(stream))
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
     else if(TrueAudio::File::isSupported(stream))
       file = new TrueAudio::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
     else if(MP4::File::isSupported(stream))
       file = new MP4::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
     else if(ASF::File::isSupported(stream))
       file = new ASF::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
     else if(RIFF::AIFF::File::isSupported(stream))
       file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(RIFF::WAV::File::isSupported(stream))
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
     else if(DSF::File::isSupported(stream))
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
     else if(DSDIFF::File::isSupported(stream))
       file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
-#ifdef WITH_SHORTEN
+#ifdef TAGLIB_WITH_SHORTEN
     else if(Shorten::File::isSupported(stream))
       file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
@@ -464,22 +461,22 @@ StringList FileRef::defaultFileExtensions()
   l.append("mp3");
   l.append("mp2");
   l.append("aac");
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   l.append("ogg");
   l.append("flac");
   l.append("oga");
   l.append("opus");
   l.append("spx");
 #endif
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   l.append("mpc");
   l.append("wv");
   l.append("ape");
 #endif
-#ifdef WITH_TRUEAUDIO
+#ifdef TAGLIB_WITH_TRUEAUDIO
   l.append("tta");
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
   l.append("m4a");
   l.append("m4r");
   l.append("m4b");
@@ -488,18 +485,18 @@ StringList FileRef::defaultFileExtensions()
   l.append("mp4");
   l.append("m4v");
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
   l.append("wma");
   l.append("asf");
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
   l.append("aif");
   l.append("aiff");
   l.append("afc");
   l.append("aifc");
   l.append("wav");
 #endif
-#ifdef WITH_MOD
+#ifdef TAGLIB_WITH_MOD
   l.append("mod");
   l.append("module"); // alias for "mod"
   l.append("nst"); // alias for "mod"
@@ -508,12 +505,12 @@ StringList FileRef::defaultFileExtensions()
   l.append("it");
   l.append("xm");
 #endif
-#ifdef WITH_DSF
+#ifdef TAGLIB_WITH_DSF
   l.append("dsf");
   l.append("dff");
   l.append("dsdiff"); // alias for "dff"
 #endif
-#ifdef WITH_SHORTEN
+#ifdef TAGLIB_WITH_SHORTEN
   l.append("shn");
 #endif
 

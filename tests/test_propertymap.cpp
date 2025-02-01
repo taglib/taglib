@@ -23,27 +23,24 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include "taglib_config.h"
 #include "tpropertymap.h"
 #include "tag.h"
 #include "id3v1tag.h"
 #include "id3v2tag.h"
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
 #include "apetag.h"
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
 #include "asftag.h"
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
 #include "infotag.h"
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
 #include "mp4tag.h"
 #endif
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
 #include "xiphcomment.h"
 #endif
 #include <cppunit/extensions/HelperMacros.h>
@@ -58,19 +55,19 @@ class TestPropertyMap : public CppUnit::TestFixture
   CPPUNIT_TEST(testGetSetId3v1);
   CPPUNIT_TEST(testGetSetId3v2);
   CPPUNIT_TEST(testGetSet);
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   CPPUNIT_TEST(testGetSetApe);
 #endif
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
   CPPUNIT_TEST(testGetSetAsf);
 #endif
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
   CPPUNIT_TEST(testGetSetInfo);
 #endif
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
   CPPUNIT_TEST(testGetSetMp4);
 #endif
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   CPPUNIT_TEST(testGetSetXiphComment);
 #endif
   CPPUNIT_TEST_SUITE_END();
@@ -165,35 +162,35 @@ public:
     tagGetSet<ID3v2::Tag>();
   }
 
-#ifdef WITH_VORBIS
+#ifdef TAGLIB_WITH_VORBIS
   void testGetSetXiphComment()
   {
     tagGetSet<Ogg::XiphComment>();
   }
 #endif
 
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   void testGetSetApe()
   {
     tagGetSet<APE::Tag>();
   }
 #endif
 
-#ifdef WITH_ASF
+#ifdef TAGLIB_WITH_ASF
   void testGetSetAsf()
   {
     tagGetSet<ASF::Tag>();
   }
 #endif
 
-#ifdef WITH_MP4
+#ifdef TAGLIB_WITH_MP4
   void testGetSetMp4()
   {
     tagGetSet<MP4::Tag>();
   }
 #endif
 
-#ifdef WITH_RIFF
+#ifdef TAGLIB_WITH_RIFF
   void testGetSetInfo()
   {
     tagGetSet<RIFF::Info::Tag>();

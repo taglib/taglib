@@ -25,14 +25,11 @@
 
 #include "mpegfile.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include "taglib_config.h"
 #include "id3v2framefactory.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
 #include "apefooter.h"
 #include "apetag.h"
 #endif
@@ -283,7 +280,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
     }
   }
 
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   if(APE & tags) {
 
     if(APETag() && !APETag()->isEmpty()) {
@@ -329,7 +326,7 @@ ID3v1::Tag *MPEG::File::ID3v1Tag(bool create)
 
 APE::Tag *MPEG::File::APETag(bool create)
 {
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   return d->tag.access<APE::Tag>(APEIndex, create);
 #else
   return nullptr;
@@ -492,7 +489,7 @@ void MPEG::File::read(bool readProperties, Properties::ReadStyle readStyle)
   if(d->ID3v1Location >= 0)
     d->tag.set(ID3v1Index, new ID3v1::Tag(this, d->ID3v1Location));
 
-#ifdef WITH_APE
+#ifdef TAGLIB_WITH_APE
   // Look for an APE tag
 
   d->APELocation = Utils::findAPE(this, d->ID3v1Location);
