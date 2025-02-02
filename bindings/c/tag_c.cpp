@@ -29,6 +29,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
 #include "taglib_config.h"
 #include "tstringlist.h"
 #include "tbytevectorstream.h"
