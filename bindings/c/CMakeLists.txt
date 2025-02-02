@@ -1,32 +1,69 @@
-include_directories(
+set(tag_c_HDR_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/toolkit
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/asf
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/vorbis
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/flac
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/flac
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpc
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mp4
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2
   ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpeg/id3v2/frames
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/trueaudio
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/aiff
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/wav
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ape
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/it
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mod
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/s3m
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/xm
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/opus
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsf
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsdiff
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/shorten
 )
+if(WITH_ASF)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/asf
+  )
+endif()
+if(WITH_VORBIS)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/vorbis
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/flac
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/flac
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/speex
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ogg/opus
+  )
+endif()
+if(WITH_APE)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mpc
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/wavpack
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/ape
+  )
+endif()
+if(WITH_MP4)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mp4
+  )
+endif()
+if(WITH_TRUEAUDIO)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/trueaudio
+  )
+endif()
+if(WITH_RIFF)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/aiff
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/riff/wav
+  )
+endif()
+if(WITH_MOD)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/it
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/mod
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/s3m
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/xm
+  )
+endif()
+if(WITH_DSF)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsf
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/dsdiff
+  )
+endif()
+if(WITH_SHORTEN)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/shorten
+  )
+endif()
+include_directories(${tag_c_HDR_DIRS})
 
 set(tag_c_HDRS tag_c.h)
 

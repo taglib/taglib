@@ -49,6 +49,30 @@ for both versions. The installed files will then include bin/taglib-2-config,
 include/taglib-2, cmake/taglib-2, pkgconfig/taglib-2.pc,
 pkgconfig/taglib_c-2.pc and the libraries have a suffix "-2".
 
+### Compile Time Configuration of Supported Formats
+
+To reduce the size of the library, it is possible to switch off supported file
+formats. By default, all formats are enabled. Support for MPEG files (MP3, AAC)
+and ID3 tags cannot be disabled. The following CMake options are available:
+
+| Option                  | Description                                        |
+|-------------------------|----------------------------------------------------|
+| `WITH_APE`              | Build with APE, MPC, WavPack (default ON)          |
+| `WITH_ASF`              | Build with ASF (default ON)                        |
+| `WITH_DSF`              | Build with DSF (default ON)                        |
+| `WITH_MOD`              | Build with Tracker modules (default ON)            |
+| `WITH_MP4`              | Build with MP4 (default ON)                        |
+| `WITH_RIFF`             | Build with AIFF, RIFF, WAV (default ON)            |
+| `WITH_SHORTEN`          | Build with Shorten (default ON)                    |
+| `WITH_TRUEAUDIO`        | Build with TrueAudio (default ON)                  |
+| `WITH_VORBIS`           | Build with Vorbis, FLAC, Ogg, Opus (default ON)    |
+
+Note that disabling formats will remove exported symbols from the library and
+thus break binary compatibility. These options should therefore only be used
+if the library is built specifically for a certain project. The public header
+files still contain the full API, if you use TagLib with a reduced set of
+formats, you can include taglib_config.h and use its definitions (prefixed with
+`TAGLIB_`, e.g. `TAGLIB_WITH_APE`), as it is done in examples/framelist.cpp.
 
 ## Dependencies
 

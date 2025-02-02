@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <list>
 
+#include "taglib_config.h"
 #include "tag_c.h"
 #include "tbytevector.h"
 #include "tstring.h"
@@ -77,7 +78,9 @@ class TestTagC : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestTagC);
   CPPUNIT_TEST(testMp3);
+#ifdef TAGLIB_WITH_VORBIS
   CPPUNIT_TEST(testStream);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -165,6 +168,7 @@ public:
     taglib_tag_free_strings();
   }
 
+#ifdef TAGLIB_WITH_VORBIS
   void testStream()
   {
     // Only fetch the beginning of a FLAC file
@@ -233,6 +237,7 @@ public:
 
     taglib_tag_free_strings();
   }
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestTagC);

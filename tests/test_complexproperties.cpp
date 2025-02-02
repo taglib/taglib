@@ -23,21 +23,30 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "asfpicture.h"
-#include "flacpicture.h"
-#include "flacfile.h"
+#include "taglib_config.h"
 #include "tbytevector.h"
 #include "tvariant.h"
 #include "tzlib.h"
 #include "fileref.h"
-#include "apetag.h"
-#include "asftag.h"
-#include "mp4tag.h"
-#include "xiphcomment.h"
 #include "id3v1tag.h"
 #include "id3v2tag.h"
 #include "attachedpictureframe.h"
 #include "generalencapsulatedobjectframe.h"
+#ifdef TAGLIB_WITH_ASF
+#include "asfpicture.h"
+#include "asftag.h"
+#endif
+#ifdef TAGLIB_WITH_VORBIS
+#include "flacpicture.h"
+#include "flacfile.h"
+#include "xiphcomment.h"
+#endif
+#ifdef TAGLIB_WITH_APE
+#include "apetag.h"
+#endif
+#ifdef TAGLIB_WITH_MP4
+#include "mp4tag.h"
+#endif
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -69,17 +78,25 @@ class TestComplexProperties : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestComplexProperties);
   CPPUNIT_TEST(testReadMp3Picture);
+  CPPUNIT_TEST(testSetGetId3Geob);
+  CPPUNIT_TEST(testSetGetId3Picture);
+  CPPUNIT_TEST(testNonExistent);
+#ifdef TAGLIB_WITH_MP4
   CPPUNIT_TEST(testReadM4aPicture);
+  CPPUNIT_TEST(testSetGetMp4Picture);
+#endif
+#ifdef TAGLIB_WITH_VORBIS
   CPPUNIT_TEST(testReadOggPicture);
   CPPUNIT_TEST(testReadWriteFlacPicture);
   CPPUNIT_TEST(testReadWriteMultipleProperties);
-  CPPUNIT_TEST(testSetGetId3Geob);
-  CPPUNIT_TEST(testSetGetId3Picture);
-  CPPUNIT_TEST(testSetGetApePicture);
-  CPPUNIT_TEST(testSetGetAsfPicture);
-  CPPUNIT_TEST(testSetGetMp4Picture);
   CPPUNIT_TEST(testSetGetXiphPicture);
-  CPPUNIT_TEST(testNonExistent);
+#endif
+#ifdef TAGLIB_WITH_APE
+  CPPUNIT_TEST(testSetGetApePicture);
+#endif
+#ifdef TAGLIB_WITH_ASF
+  CPPUNIT_TEST(testSetGetAsfPicture);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -103,6 +120,7 @@ public:
     }
   }
 
+#ifdef TAGLIB_WITH_MP4
   void testReadM4aPicture()
   {
     const ByteVector expectedData1(
@@ -145,7 +163,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("image/jpeg"),
       picture.value("mimeType").value<String>());
   }
+#endif
 
+#ifdef TAGLIB_WITH_VORBIS
   void testReadOggPicture()
   {
     FileRef f(TEST_FILE_PATH_C("lowercase-fields.ogg"), false);
@@ -217,6 +237,7 @@ public:
       CPPUNIT_ASSERT(f.pictureList().isEmpty());
     }
   }
+#endif
 
   void testReadWriteMultipleProperties()
   {
@@ -311,6 +332,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::FrontCover, frame->type());
   }
 
+#ifdef TAGLIB_WITH_APE
   void testSetGetApePicture()
   {
     const String FRONT_COVER("COVER ART (FRONT)");
@@ -326,7 +348,9 @@ public:
       .append(picture.value("data").value<ByteVector>()),
       item.binaryData());
   }
+#endif
 
+#ifdef TAGLIB_WITH_ASF
   void testSetGetAsfPicture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -344,7 +368,9 @@ public:
       asfPicture.description());
     CPPUNIT_ASSERT_EQUAL(ASF::Picture::FrontCover, asfPicture.type());
   }
+#endif
 
+#ifdef TAGLIB_WITH_MP4
   void testSetGetMp4Picture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -360,7 +386,9 @@ public:
       covr.data());
     CPPUNIT_ASSERT_EQUAL(MP4::CoverArt::JPEG, covr.format());
   }
+#endif
 
+#ifdef TAGLIB_WITH_VORBIS
   void testSetGetXiphPicture()
   {
     VariantMap picture(TEST_PICTURE);
@@ -386,6 +414,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, pic->width());
     CPPUNIT_ASSERT_EQUAL(1, pic->height());
   }
+#endif
 
   void testNonExistent()
   {
