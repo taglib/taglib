@@ -54,12 +54,14 @@ inline string copyFile(const string &filename, const string &ext)
 {
   char testFileName[1024];
 
-#ifdef _WIN32
+#ifdef TESTS_TMPDIR
+  snprintf(testFileName, sizeof(testFileName), "%s/taglib-test%s", TESTS_TMPDIR, ext.c_str());
+#elif defined _WIN32
   char tempDir[MAX_PATH + 1];
   GetTempPathA(sizeof(tempDir), tempDir);
   wsprintfA(testFileName, "%s\\taglib-test%s", tempDir, ext.c_str());
 #else
-  snprintf(testFileName, sizeof(testFileName), "/%s/taglib-test%s", P_tmpdir, ext.c_str());
+  snprintf(testFileName, sizeof(testFileName), "%s/taglib-test%s", P_tmpdir, ext.c_str());
 #endif
 
   string sourceFileName = testFilePath(filename) + ext;

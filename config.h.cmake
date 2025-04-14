@@ -20,5 +20,6 @@
 #cmakedefine   TRACE_IN_RELEASE 1
 
 #cmakedefine TESTS_DIR "@TESTS_DIR@"
+#cmakedefine TESTS_TMPDIR "@TESTS_TMPDIR@"
 
 #endif
