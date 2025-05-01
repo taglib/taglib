@@ -48,7 +48,10 @@ set(TAGLIB_INSTALL_SUFFIX "" CACHE STRING
   "Suffix added to installed files (include directory, libraries, .pc)")
 
 add_definitions(-DHAVE_CONFIG_H)
-set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
+set(TESTS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests/" CACHE STRING
+  "Tests directory, is path to unit test data when 'data' is appended")
+set(TESTS_TMPDIR "" CACHE STRING
+  "Directory for temporary files created during unit tests, system tmpdir is used if undefined")
 
 if(CMAKE_C_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")

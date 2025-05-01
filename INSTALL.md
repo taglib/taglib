@@ -42,6 +42,9 @@ CMakeLists.txt file.
 | `TAGLIB_INSTALL_SUFFIX` | Suffix added to installed libraries, includes, ... |
 | `ENABLE_STATIC_RUNTIME` | Link with MSVC runtime statically                  |
 | `BUILD_FRAMEWORK`       | Build a macOS framework                            |
+| `TESTS_DIR`             | Where to find unit test data (with data appended)  |
+| `TESTS_TMPDIR`          | Where to create temporary files in unit tests      |
+
 
 If you want to install TagLib 2 alongside TagLib 1, you can use
 `-DTAGLIB_INSTALL_SUFFIX=-2` and make sure that `BUILD_EXAMPLES` is not `ON`
@@ -461,4 +464,55 @@ cmake --build build_mingw --config Release
 
 PATH=$PATH:$TAGLIB_PREFIX/bin
   build_mingw/tagreader /path/to/audio-file
+```
+
+## Android
+
+### Using vcpkg
+
+The bash script below can be used to build TagLib for Android using vcpkg.
+It must be started in the parent folder of the taglib source folder and will
+build in a folder _android_build_ and install into _android_pkg_.
+The package and the unit tests are then transferred to an Android device
+and the unit tests are run on the device.
+
+Note that `TESTS_TMPDIR` is set because there is no system-wide temporary folder
+on Android. `TESTS_DIR` is set to run the tests on the target.
+
+```
+# You may have to adapt the NDK and vcpkg paths and the ABI/triplet.
+
+export ANDROID_NDK_HOME=$HOME/Development/android-sdk/ndk/23.1.7779620
+export VCPKG_ROOT=$HOME/Development/vcpkg
+PATH=$PATH:$VCPKG_ROOT
+
+# armeabi-v7a/arm-android or arm64-v8a/arm64-android or x86/x86-android or x86_64/x64-android
+android_abi=armeabi-v7a
+vcpkg_target_triplet=arm-android
+
+vcpkg_toolchain_file=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+android_toolchain_file=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+
+vcpkg install --triplet $vcpkg_target_triplet utfcpp zlib cppunit
+
+cmake -B android_build -S taglib \
+  -DCMAKE_TOOLCHAIN_FILE=$vcpkg_toolchain_file \
+  -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$android_toolchain_file \
+  -DVCPKG_TARGET_TRIPLET=$vcpkg_target_triplet \
+  -DANDROID_ABI=$android_abi \
+  -GNinja -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
+  -DVISIBILITY_HIDDEN=ON -DENABLE_CCACHE=ON -DBUILD_EXAMPLES=ON -DBUILD_TESTING=ON \
+  -DTESTS_DIR=/data/local/tmp/tests/ -DTESTS_TMPDIR=/data/local/tmp
+cmake --build android_build --config Release
+cmake --install android_build --config Release --prefix android_pkg --strip
+cp -a android_build/tests/test_runner android_pkg/bin/
+
+if hash adb 2>/dev/null; then
+  adb push android_pkg /data/local/tmp/
+  adb push android_build/tests/test_runner /data/local/tmp/tests/test_runner
+  adb push taglib/tests/data /data/local/tmp/tests/
+  adb shell "env LD_LIBRARY_PATH=/data/local/tmp/android_pkg/lib /data/local/tmp/tests/test_runner"
+  # You could also try an example binary:
+  # adb shell "env LD_LIBRARY_PATH=/data/local/tmp/android_pkg/lib /data/local/tmp/android_pkg/bin/tagreader  '/sdcard/Music/Some Album/A Track.mp3'"
+fi
 ```
