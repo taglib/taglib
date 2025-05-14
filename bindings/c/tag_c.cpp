@@ -260,7 +260,6 @@ TagLib_File *taglib_file_new_type_wchar(const wchar_t *filename, TagLib_File_Typ
 }
 #endif
 
-
 TagLib_File *taglib_file_new_iostream(TagLib_IOStream *stream)
 {
   return reinterpret_cast<TagLib_File *>(
