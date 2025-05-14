@@ -150,7 +150,7 @@ TagLib_File *taglib_file_new(const char *filename)
 }
 
 #ifdef _WIN32
-TagLib_File *taglib_file_new_wchar(const wchar_t *filename) 
+TagLib_File *taglib_file_new_wchar(const wchar_t *filename)
 {
   return reinterpret_cast<TagLib_File *>(new FileRef(filename));
 }
