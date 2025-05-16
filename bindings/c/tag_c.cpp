@@ -149,7 +149,15 @@ TagLib_File *taglib_file_new(const char *filename)
   return reinterpret_cast<TagLib_File *>(new FileRef(filename));
 }
 
-TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
+#ifdef _WIN32
+TagLib_File *taglib_file_new_wchar(const wchar_t *filename)
+{
+  return reinterpret_cast<TagLib_File *>(new FileRef(filename));
+}
+#endif
+
+template<typename T>
+TagLib_File *taglib_file_new_type_any_char(const T *filename, TagLib_File_Type type)
 {
   File *file = NULL;
   switch(type) {
@@ -239,6 +247,18 @@ TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
   }
   return file ? reinterpret_cast<TagLib_File *>(new FileRef(file)) : NULL;
 }
+
+TagLib_File *taglib_file_new_type(const char *filename, TagLib_File_Type type)
+{
+  return taglib_file_new_type_any_char(filename, type);
+}
+
+#ifdef _WIN32
+TagLib_File *taglib_file_new_type_wchar(const wchar_t *filename, TagLib_File_Type type)
+{
+  return taglib_file_new_type_any_char(filename, type);
+}
+#endif
 
 TagLib_File *taglib_file_new_iostream(TagLib_IOStream *stream)
 {
