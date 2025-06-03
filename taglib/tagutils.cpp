@@ -107,8 +107,9 @@ offset_t Utils::findAPE(File *file, offset_t id3v1Location)
 ByteVector TagLib::Utils::readHeader(IOStream *stream, unsigned int length,
                                      bool skipID3v2, offset_t *headerOffset)
 {
+  ByteVector header;
   if(!stream || !stream->isOpen())
-    return ByteVector();
+    return header;
 
   const offset_t originalPosition = stream->tell();
   offset_t bufferOffset = 0;
@@ -121,7 +122,7 @@ ByteVector TagLib::Utils::readHeader(IOStream *stream, unsigned int length,
   }
 
   stream->seek(bufferOffset);
-  const ByteVector header = stream->readBlock(length);
+  header = stream->readBlock(length);
   stream->seek(originalPosition);
 
   if(headerOffset)
