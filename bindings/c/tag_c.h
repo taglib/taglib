@@ -43,6 +43,7 @@ extern "C" {
 #define TAGLIB_C_EXPORT
 #endif
 
+#include <wchar.h>
 #ifdef _MSC_VER
 /* minwindef.h contains typedef int BOOL */
 #include <windows.h>
