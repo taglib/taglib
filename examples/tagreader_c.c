@@ -22,10 +22,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "tag_c.h"
+
 #include <stdio.h>
 #include <string.h>
-
-#include "tag_c.h"
 
 #ifndef FALSE
 #define FALSE 0
