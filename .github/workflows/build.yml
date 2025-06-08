@@ -9,10 +9,14 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest, windows-2025]
         include:
           - os: windows-latest
             cmake_extra_args: '-DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"'
+          - os: windows-2025
+            cmake_extra_args: '-G "MinGW Makefiles" -DCPPUNIT_INCLUDE_DIR="$env:GITHUB_WORKSPACE/pkg/usr/local/include" -DCPPUNIT_LIBRARIES="$($env:GITHUB_WORKSPACE -replace "\\", "/")/pkg/usr/local/lib/libcppunit.dll.a" -DCPPUNIT_INSTALLED_VERSION="1.15.1"'
+    # The windows-2025 runner is used for MinGW.
+    name: ${{ matrix.os == 'windows-2025' && 'mingw' || matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
@@ -32,6 +36,24 @@ jobs:
       run: vcpkg install cppunit utfcpp zlib --triplet x64-windows
       if: matrix.os == 'windows-latest'
 
+    - name: Set up MinGW
+      shell: bash
+      run: |
+        # Fetch utf8cpp, build cppunit
+        git submodule update --init
+        # Fails with fatal error: cppunit/config-auto.h: No such file or directory
+        # vcpkg install cppunit utfcpp zlib --triplet x64-mingw-dynamic
+        # Probably not working with CMake and MinGW, so we have to build it ourselves.
+        curl -sL "https://dev-www.libreoffice.org/src/cppunit-1.15.1.tar.gz" | tar xz
+        mkdir -p build_cppunit
+        (cd build_cppunit && MAKE=mingw32-make ../cppunit-1.15.1/configure \
+         --enable-shared=yes --enable-static=no \
+         --disable-dependency-tracking --disable-doxygen)
+        find build_cppunit -name Makefile -exec sed -i 's/\($[({]SHELL[)}]\)/"\1"/' {} \;
+        sed -i 's/^\(SUBDIRS.*\) examples\(.*\)$/\1\2/' build_cppunit/Makefile
+        (cd build_cppunit && mingw32-make -j$(nproc) install DESTDIR=$(cd .. && pwd)/pkg)
+      if: matrix.os == 'windows-2025'
+
     - name: Configure
       run: >
         cmake -B${{github.workspace}}/build
@@ -41,12 +63,12 @@ jobs:
         ${{ matrix.cmake_extra_args }}
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel
 
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
-      if: matrix.os != 'windows-latest'
+      if: matrix.os != 'windows-latest' && matrix.os != 'windows-2025'
 
     - name: Test Windows
       working-directory: ${{github.workspace}}/build
@@ -57,3 +79,10 @@ jobs:
         $env:Path += ";$env:VCPKG_INSTALLATION_ROOT\packages\zlib_x64-windows\bin"
         ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
       if: matrix.os == 'windows-latest'
+
+    - name: Test MinGW
+      working-directory: ${{github.workspace}}/build
+      run: |
+        $env:Path += ";$PWD/taglib;$PWD/bindings/c;${{github.workspace}}/pkg/usr/local/bin"
+        ctest -C ${{env.BUILD_TYPE}} -V --no-tests=error
+      if: matrix.os == 'windows-2025'
