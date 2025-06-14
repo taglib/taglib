@@ -1265,6 +1265,38 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::UserTextIdentificationFrame *>(nullptr), ID3v2::UserTextIdentificationFrame::find(&tag, "non existing"));
     CPPUNIT_ASSERT_EQUAL(frame10, ID3v2::CommentsFrame::findByDescription(&tag, "iTunNORM"));
     CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::CommentsFrame *>(nullptr), ID3v2::CommentsFrame::findByDescription(&tag, "non existing"));
+
+    // Check if the allowed TIPL keys are correctly mapped to properties.
+    // These are the keys used by MusicBrainz: arranger, engineer, producer, DJ-mix, mix.
+    // See https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html.
+    // MusicBrainz Picard uses lowercase keys whereas TagLib used uppercase keys.
+    auto frame11 = new ID3v2::TextIdentificationFrame("TIPL");
+    StringList tiplData;
+    tiplData.append("arranger");
+    tiplData.append("an arranger");
+    tiplData.append("ENGINEER");
+    tiplData.append("an engineer");
+    tiplData.append("producer");
+    tiplData.append("a producer");
+    tiplData.append("DJ-mix");
+    tiplData.append("a DJ mixer");
+    tiplData.append("mix");
+    tiplData.append("a mixer");
+    frame11->setText(tiplData);
+    tag.addFrame(frame11);
+
+    properties = tag.properties();
+    CPPUNIT_ASSERT_EQUAL(0u, properties.unsupportedData().size());
+    CPPUNIT_ASSERT(properties.contains("ARRANGER"));
+    CPPUNIT_ASSERT(properties.contains("ENGINEER"));
+    CPPUNIT_ASSERT(properties.contains("PRODUCER"));
+    CPPUNIT_ASSERT(properties.contains("DJMIXER"));
+    CPPUNIT_ASSERT(properties.contains("MIXER"));
+    CPPUNIT_ASSERT_EQUAL(String("an arranger"), properties["ARRANGER"].front());
+    CPPUNIT_ASSERT_EQUAL(String("an engineer"), properties["ENGINEER"].front());
+    CPPUNIT_ASSERT_EQUAL(String("a producer"), properties["PRODUCER"].front());
+    CPPUNIT_ASSERT_EQUAL(String("a DJ mixer"), properties["DJMIXER"].front());
+    CPPUNIT_ASSERT_EQUAL(String("a mixer"), properties["MIXER"].front());
   }
 
   void testPropertiesMovement()
