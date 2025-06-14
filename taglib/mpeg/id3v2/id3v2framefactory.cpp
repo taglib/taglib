@@ -357,6 +357,49 @@ void FrameFactory::rebuildAggregateFrames(ID3v2::Tag *tag) const
       }
     }
   }
+  if(tag->header()->majorVersion() < 4 &&
+     tag->frameList("TIPL").size() == 1 &&
+     tag->frameList("TMCL").size() == 0)
+  {
+    // FrameFactory::updateFrame() has mapped IPLS (ID3v2.3)/ IPL (ID3v2.2)
+    // to TIPL (ID3v2.4). However, the musicians should be rather in TMCL.
+    // Move all involvement/involvee pairs which are not supported by the
+    // TIPL property map interface to a TMCL frame.
+    if(auto tipl =
+           dynamic_cast<TextIdentificationFrame *>(tag->frameList("TIPL").front())) {
+      if(StringList tiplValues = tipl->toStringList(); tiplValues.size() % 2 == 0) {
+        static StringList tiplKeys;
+        if(tiplKeys.isEmpty()) {
+          for(const auto &kv : TextIdentificationFrame::involvedPeopleMap()) {
+            tiplKeys.append(kv.second);
+          }
+        }
+        StringList tmclValues;
+        for(auto it = tiplValues.begin(); it != tiplValues.end();) {
+          const String involvement = *it;
+          if(!tiplKeys.contains(involvement.upper())) {
+            tmclValues.append(involvement);
+            it = tiplValues.erase(it);
+            tmclValues.append(*it);
+            it = tiplValues.erase(it);
+          } else {
+            ++it;
+            ++it;
+          }
+        }
+        if(!tmclValues.isEmpty()) {
+          auto tmcl = new TextIdentificationFrame("TMCL");
+          tmcl->setText(tmclValues);
+          tag->addFrame(tmcl);
+          if(!tiplValues.isEmpty()) {
+            tipl->setText(tiplValues);
+          } else {
+            tag->removeFrame(tipl);
+          }
+        }
+      }
+    }
+  }
 }
 
 String::Type FrameFactory::defaultTextEncoding() const
