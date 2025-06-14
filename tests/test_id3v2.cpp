@@ -1035,7 +1035,7 @@ public:
       tf->setText(StringList().append("Guitar").append("Artist 1").append("Drums").append("Artist 2"));
       foo.ID3v2Tag()->addFrame(tf);
       tf = new ID3v2::TextIdentificationFrame("TIPL", String::Latin1);
-      tf->setText(StringList().append("Producer").append("Artist 3").append("Mastering").append("Artist 4"));
+      tf->setText(StringList().append("Producer").append("Artist 3").append("Engineer").append("Artist 4"));
       foo.ID3v2Tag()->addFrame(tf);
       tf = new ID3v2::TextIdentificationFrame("TCON", String::Latin1);
       tf->setText(StringList().append("51").append("Noise").append("Power Noise"));
@@ -1062,15 +1062,18 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("2012-04-17T12:01"), tf->fieldList().front());
       tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TIPL").front());
       CPPUNIT_ASSERT(tf);
-      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(8), tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), tf->fieldList().size());
+      CPPUNIT_ASSERT_EQUAL(String("Producer"), tf->fieldList()[0]);
+      CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[1]);
+      CPPUNIT_ASSERT_EQUAL(String("Engineer"), tf->fieldList()[2]);
+      CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[3]);
+      tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TMCL").front());
+      CPPUNIT_ASSERT(tf);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(4), tf->fieldList().size());
       CPPUNIT_ASSERT_EQUAL(String("Guitar"), tf->fieldList()[0]);
       CPPUNIT_ASSERT_EQUAL(String("Artist 1"), tf->fieldList()[1]);
       CPPUNIT_ASSERT_EQUAL(String("Drums"), tf->fieldList()[2]);
       CPPUNIT_ASSERT_EQUAL(String("Artist 2"), tf->fieldList()[3]);
-      CPPUNIT_ASSERT_EQUAL(String("Producer"), tf->fieldList()[4]);
-      CPPUNIT_ASSERT_EQUAL(String("Artist 3"), tf->fieldList()[5]);
-      CPPUNIT_ASSERT_EQUAL(String("Mastering"), tf->fieldList()[6]);
-      CPPUNIT_ASSERT_EQUAL(String("Artist 4"), tf->fieldList()[7]);
       tf = dynamic_cast<ID3v2::TextIdentificationFrame *>(bar.ID3v2Tag()->frameList("TCON").front());
       CPPUNIT_ASSERT(tf);
       CPPUNIT_ASSERT_EQUAL(3U, tf->fieldList().size());
@@ -1090,7 +1093,7 @@ public:
     }
     {
       const ByteVector expectedId3v23Data(
-            "ID3" "\x03\x00\x00\x00\x00\x09\x49"
+            "ID3" "\x03\x00\x00\x00\x00\x09\x48"
             "TSOA" "\x00\x00\x00\x01\x00\x00\x00"
             "TSOT" "\x00\x00\x00\x01\x00\x00\x00"
             "TSOP" "\x00\x00\x00\x01\x00\x00\x00"
@@ -1098,10 +1101,10 @@ public:
             "TYER" "\x00\x00\x00\x05\x00\x00\x00" "2012"
             "TDAT" "\x00\x00\x00\x05\x00\x00\x00" "1704"
             "TIME" "\x00\x00\x00\x05\x00\x00\x00" "1201"
-            "IPLS" "\x00\x00\x00\x44\x00\x00\x00" "Guitar" "\x00"
+            "IPLS" "\x00\x00\x00\x43\x00\x00\x00" "Guitar" "\x00"
             "Artist 1" "\x00" "Drums" "\x00" "Artist 2" "\x00" "Producer" "\x00"
-            "Artist 3" "\x00" "Mastering" "\x00" "Artist 4"
-            "TCON" "\x00\x00\x00\x14\x00\x00\x00" "(51)(39)Power Noise", 211);
+            "Artist 3" "\x00" "Engineer" "\x00" "Artist 4"
+            "TCON" "\x00\x00\x00\x14\x00\x00\x00" "(51)(39)Power Noise", 210);
       const ByteVector actualId3v23Data =
           PlainFile(newname.c_str()).readBlock(expectedId3v23Data.size());
       CPPUNIT_ASSERT_EQUAL(expectedId3v23Data, actualId3v23Data);
