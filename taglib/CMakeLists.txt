@@ -461,6 +461,9 @@ set_target_properties(tag PROPERTIES
   INTERFACE_LINK_LIBRARIES "${ZLIB_INTERFACE_LINK_LIBRARIES}"
   PUBLIC_HEADER "${tag_HDRS}"
 )
+if(NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(tag PUBLIC TAGLIB_STATIC)
+endif()
 if(VISIBILITY_HIDDEN)
   set_target_properties(tag PROPERTIES C_VISIBILITY_PRESET hidden)
   set_target_properties(tag PROPERTIES CXX_VISIBILITY_PRESET hidden)
