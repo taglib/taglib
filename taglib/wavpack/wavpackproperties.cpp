@@ -288,7 +288,7 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
       if(d->version < MIN_STREAM_VERS || d->version > MAX_STREAM_VERS)
         break;
 
-      d->bitsPerSample = ((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB);
+      d->bitsPerSample = static_cast<int>(((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB));
       d->sampleRate    = static_cast<int>(smplRate);
       d->lossless      = !(flags & HYBRID_FLAG);
       d->sampleFrames  = smplFrames;
@@ -308,7 +308,7 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+    d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
   }
 }
 

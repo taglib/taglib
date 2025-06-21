@@ -274,7 +274,7 @@ bool FLAC::File::save()
       it = d->blocks.erase(it);
       continue;
     }
-    blockHeader[0] = (*it)->code();
+    blockHeader[0] = static_cast<char>((*it)->code());
     data.append(blockHeader);
     data.append(blockData);
     ++it;

@@ -90,7 +90,7 @@ namespace TagLib
       {
         ByteVector data = str.data(String::UTF16LE) + ByteVector::fromShort(0, false);
         if(includeLength) {
-          data = ByteVector::fromShort(data.size(), false) + data;
+          data = ByteVector::fromShort(static_cast<short>(data.size()), false) + data;
         }
         return data;
       }

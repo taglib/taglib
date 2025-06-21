@@ -560,7 +560,7 @@ public:
     // reverse
     {
       for(int i = 0; i < 256; i++){
-        all[i]=static_cast<unsigned char>(255)-i;
+        all[i]=static_cast<unsigned char>(255 - i);
         }
       ByteVector b64 = all.toBase64();
       ByteVector original = ByteVector::fromBase64(b64);

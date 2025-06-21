@@ -400,7 +400,7 @@ Map<ByteVector, String> ItemFactory::namePropertyMap() const
 }
 
 MP4::AtomDataList ItemFactory::parseData2(
-  const MP4::Atom *atom, const ByteVector &data, int expectedFlags,
+  const MP4::Atom *, const ByteVector &data, int expectedFlags,
   bool freeForm)
 {
   AtomDataList result;
@@ -663,7 +663,7 @@ ByteVector ItemFactory::renderInt(
   const ByteVector &name, const MP4::Item &item)
 {
   ByteVectorList data;
-  data.append(ByteVector::fromShort(item.toInt()));
+  data.append(ByteVector::fromShort(static_cast<short>(item.toInt())));
   return renderData(name, TypeInteger, data);
 }
 
@@ -703,8 +703,8 @@ ByteVector ItemFactory::renderIntPair(
 {
   ByteVectorList data;
   data.append(ByteVector(2, '\0') +
-              ByteVector::fromShort(item.toIntPair().first) +
-              ByteVector::fromShort(item.toIntPair().second) +
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().first)) +
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().second)) +
               ByteVector(2, '\0'));
   return renderData(name, TypeImplicit, data);
 }
@@ -714,8 +714,8 @@ ByteVector ItemFactory::renderIntPairNoTrailing(
 {
   ByteVectorList data;
   data.append(ByteVector(2, '\0') +
-              ByteVector::fromShort(item.toIntPair().first) +
-              ByteVector::fromShort(item.toIntPair().second));
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().first)) +
+              ByteVector::fromShort(static_cast<short>(item.toIntPair().second)));
   return renderData(name, TypeImplicit, data);
 }
 

@@ -221,7 +221,8 @@ void ASF::File::FilePrivate::FilePropertiesObject::parse(ASF::File *file, long l
 
   const long long duration = data.toLongLong(40, false);
   const long long preroll  = data.toLongLong(56, false);
-  file->d->properties->setLengthInMilliseconds(static_cast<int>(duration / 10000.0 - preroll + 0.5));
+  file->d->properties->setLengthInMilliseconds(
+    static_cast<int>(static_cast<double>(duration) / 10000.0 - static_cast<double>(preroll) + 0.5));
 }
 
 ByteVector ASF::File::FilePrivate::StreamPropertiesObject::guid() const
@@ -271,11 +272,11 @@ ByteVector ASF::File::FilePrivate::ContentDescriptionObject::render(ASF::File *f
   const ByteVector v4 = renderString(file->d->tag->comment());
   const ByteVector v5 = renderString(file->d->tag->rating());
   data.clear();
-  data.append(ByteVector::fromShort(v1.size(), false));
-  data.append(ByteVector::fromShort(v2.size(), false));
-  data.append(ByteVector::fromShort(v3.size(), false));
-  data.append(ByteVector::fromShort(v4.size(), false));
-  data.append(ByteVector::fromShort(v5.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v1.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v2.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v3.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v4.size()), false));
+  data.append(ByteVector::fromShort(static_cast<short>(v5.size()), false));
   data.append(v1);
   data.append(v2);
   data.append(v3);
@@ -302,7 +303,7 @@ void ASF::File::FilePrivate::ExtendedContentDescriptionObject::parse(ASF::File *
 ByteVector ASF::File::FilePrivate::ExtendedContentDescriptionObject::render(ASF::File *file)
 {
   data.clear();
-  data.append(ByteVector::fromShort(attributeData.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(attributeData.size()), false));
   data.append(attributeData.toByteVector(""));
   return BaseObject::render(file);
 }
@@ -325,7 +326,7 @@ void ASF::File::FilePrivate::MetadataObject::parse(ASF::File *file, long long /*
 ByteVector ASF::File::FilePrivate::MetadataObject::render(ASF::File *file)
 {
   data.clear();
-  data.append(ByteVector::fromShort(attributeData.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(attributeData.size()), false));
   data.append(attributeData.toByteVector(""));
   return BaseObject::render(file);
 }
@@ -348,7 +349,7 @@ void ASF::File::FilePrivate::MetadataLibraryObject::parse(ASF::File *file, long 
 ByteVector ASF::File::FilePrivate::MetadataLibraryObject::render(ASF::File *file)
 {
   data.clear();
-  data.append(ByteVector::fromShort(attributeData.size(), false));
+  data.append(ByteVector::fromShort(static_cast<short>(attributeData.size()), false));
   data.append(attributeData.toByteVector(""));
   return BaseObject::render(file);
 }

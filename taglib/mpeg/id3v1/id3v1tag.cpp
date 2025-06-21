@@ -176,7 +176,7 @@ void ID3v1::Tag::setComment(const String &s)
 
 void ID3v1::Tag::setGenre(const String &s)
 {
-  d->genre = ID3v1::genreIndex(s);
+  d->genre = static_cast<unsigned char>(ID3v1::genreIndex(s));
 }
 
 void ID3v1::Tag::setYear(unsigned int i)
@@ -186,7 +186,7 @@ void ID3v1::Tag::setYear(unsigned int i)
 
 void ID3v1::Tag::setTrack(unsigned int i)
 {
-  d->track = i < 256 ? i : 0;
+  d->track = static_cast<unsigned char>(i < 256 ? i : 0);
 }
 
 unsigned int ID3v1::Tag::genreNumber() const
@@ -196,7 +196,7 @@ unsigned int ID3v1::Tag::genreNumber() const
 
 void ID3v1::Tag::setGenreNumber(unsigned int i)
 {
-  d->genre = i < 256 ? i : 255;
+  d->genre = static_cast<unsigned char>(i < 256 ? i : 255);
 }
 
 void ID3v1::Tag::setStringHandler(const StringHandler *handler)
