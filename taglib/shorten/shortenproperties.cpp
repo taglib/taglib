@@ -65,7 +65,7 @@ Shorten::Properties::Properties(const PropertyValues *values, ReadStyle style) :
 
     d->bitrate = static_cast<int>(d->sampleRate * d->bitsPerSample * d->channelCount / 1000.0 + 0.5);
     if(d->sampleRate > 0)
-      d->length = static_cast<int>(d->sampleFrames * 1000.0 / d->sampleRate + 0.5);
+      d->length = static_cast<int>(static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate + 0.5);
   }
 }
 

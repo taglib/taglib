@@ -59,7 +59,7 @@ bool DSF::File::isSupported(IOStream *stream)
   return id.startsWith("DSD ");
 }
 
-DSF::File::File(FileName file, bool readProperties,
+DSF::File::File(FileName file, bool,
                 AudioProperties::ReadStyle propertiesStyle,
                 ID3v2::FrameFactory *frameFactory) :
   TagLib::File(file),
@@ -69,7 +69,7 @@ DSF::File::File(FileName file, bool readProperties,
     read(propertiesStyle);
 }
 
-DSF::File::File(IOStream *stream, bool readProperties,
+DSF::File::File(IOStream *stream, bool,
                 AudioProperties::ReadStyle propertiesStyle,
                 ID3v2::FrameFactory *frameFactory) :
   TagLib::File(stream),

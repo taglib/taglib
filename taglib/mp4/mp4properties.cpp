@@ -196,7 +196,7 @@ MP4::Properties::read(File *file, const Atoms *atoms)
     }
   }
   if(unit > 0 && length > 0)
-    d->length = static_cast<int>(length * 1000.0 / unit + 0.5);
+    d->length = static_cast<int>(static_cast<double>(length) * 1000.0 / static_cast<double>(unit) + 0.5);
 
   MP4::Atom *atom = trak->find("mdia", "minf", "stbl", "stsd");
   if(!atom) {

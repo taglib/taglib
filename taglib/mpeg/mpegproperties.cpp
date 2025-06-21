@@ -240,7 +240,7 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
         const Header lastHeader(file, lastFrameOffset, false);
         if(const offset_t streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
            streamLength > 0)
-          d->length = static_cast<int>(streamLength * 8.0 / d->bitrate + 0.5);
+          d->length = static_cast<int>(static_cast<double>(streamLength) * 8.0 / d->bitrate + 0.5);
       }
     }
   }

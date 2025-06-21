@@ -196,7 +196,7 @@ bool Shorten::File::isSupported(IOStream *stream)
   return id.startsWith("ajkg");
 }
 
-Shorten::File::File(FileName file, bool readProperties,
+Shorten::File::File(FileName file, bool,
                 AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(file),
   d(std::make_unique<FilePrivate>())
@@ -205,7 +205,7 @@ Shorten::File::File(FileName file, bool readProperties,
     read(propertiesStyle);
 }
 
-Shorten::File::File(IOStream *stream, bool readProperties,
+Shorten::File::File(IOStream *stream, bool,
                 AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(stream),
   d(std::make_unique<FilePrivate>())

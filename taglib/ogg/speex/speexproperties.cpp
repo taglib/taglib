@@ -163,7 +163,7 @@ void Speex::Properties::read(File *file)
           fileLengthWithoutOverhead -= file->packet(i).size();
         }
         d->length  = static_cast<int>(length + 0.5);
-        d->bitrate = static_cast<int>(fileLengthWithoutOverhead * 8.0 / length + 0.5);
+        d->bitrate = static_cast<int>(static_cast<double>(fileLengthWithoutOverhead) * 8.0 / length + 0.5);
       }
     }
     else {

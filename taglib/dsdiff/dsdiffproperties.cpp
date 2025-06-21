@@ -58,7 +58,7 @@ DSDIFF::Properties::Properties(unsigned int sampleRate,
   d->sampleRate = sampleRate;
   d->bitrate = bitrate;
   d->length = d->sampleRate > 0
-    ? static_cast<int>(d->sampleCount * 1000.0 / d->sampleRate + 0.5)
+    ? static_cast<int>(static_cast<double>(d->sampleCount) * 1000.0 / d->sampleRate + 0.5)
     : 0;
 }
 

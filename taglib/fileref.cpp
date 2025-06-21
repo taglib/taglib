@@ -321,7 +321,7 @@ public:
     return !file || !file->isValid();
   }
 
-  bool isNullWithDebugMessage(const String &methodName) const
+  bool isNullWithDebugMessage([[maybe_unused]] const String &methodName) const
   {
     if(isNull()) {
       debug("FileRef::" + methodName + "() - Called without a valid file.");
