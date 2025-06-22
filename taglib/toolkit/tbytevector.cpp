@@ -237,7 +237,7 @@ long double toFloat80(const ByteVector &v, size_t offset)
       debug("toFloat80() - can't handle the infinity or NaN. Returning 0.");
       return 0.0;
     }
-    val = ::ldexp(static_cast<long double>(fraction), exponent - 16383 - 63);
+    val = ::ldexpl(static_cast<long double>(fraction), exponent - 16383 - 63);
   }
 
   if(negative)
