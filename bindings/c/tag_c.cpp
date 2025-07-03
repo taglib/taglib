@@ -469,12 +469,13 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
     return;
 
   auto tfile = reinterpret_cast<FileRef *>(file);
+  auto propStr = charArrayToString(prop);
   PropertyMap map = tfile->tag()->properties();
 
   if(value) {
-    auto property = map.find(prop);
+    auto property = map.find(propStr);
     if(property == map.end()) {
-      map.insert(prop, StringList(charArrayToString(value)));
+      map.insert(propStr, StringList(charArrayToString(value)));
     }
     else {
       if(append) {
@@ -486,7 +487,7 @@ void _taglib_property_set(TagLib_File *file, const char* prop, const char* value
     }
   }
   else {
-    map.erase(prop);
+    map.erase(propStr);
   }
 
   tfile->setProperties(map);
@@ -531,7 +532,7 @@ char **taglib_property_get(const TagLib_File *file, const char *prop)
 
   const PropertyMap map = reinterpret_cast<const FileRef *>(file)->properties();
 
-  auto property = map.find(prop);
+  auto property = map.find(charArrayToString(prop));
   if(property == map.end())
     return NULL;
 
@@ -573,16 +574,17 @@ bool _taglib_complex_property_set(
     return false;
 
   auto tfile = reinterpret_cast<FileRef *>(file);
+  auto keyStr = charArrayToString(key);
 
   if(value == NULL) {
-    return tfile->setComplexProperties(key, {});
+    return tfile->setComplexProperties(keyStr, {});
   }
 
   VariantMap map;
   const TagLib_Complex_Property_Attribute** attrPtr = value;
   while(*attrPtr) {
     const TagLib_Complex_Property_Attribute *attr = *attrPtr;
-    String attrKey(attr->key);
+    auto attrKey = charArrayToString(attr->key);
     switch(attr->value.type) {
     case TagLib_Variant_Void:
       map.insert(attrKey, Variant());
@@ -627,8 +629,8 @@ bool _taglib_complex_property_set(
     ++attrPtr;
   }
 
-  return append ? tfile->setComplexProperties(key, tfile->complexProperties(key).append(map))
-                : tfile->setComplexProperties(key, {map});
+  return append ? tfile->setComplexProperties(keyStr, tfile->complexProperties(keyStr).append(map))
+                : tfile->setComplexProperties(keyStr, {map});
 }
 
 }  // namespace
@@ -676,7 +678,7 @@ TagLib_Complex_Property_Attribute*** taglib_complex_property_get(
     return NULL;
   }
 
-  const auto variantMaps = reinterpret_cast<const FileRef *>(file)->complexProperties(key);
+  const auto variantMaps = reinterpret_cast<const FileRef *>(file)->complexProperties(charArrayToString(key));
   if(variantMaps.isEmpty()) {
     return NULL;
   }

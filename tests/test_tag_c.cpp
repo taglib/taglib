@@ -110,6 +110,7 @@ public:
       taglib_property_set(file, "COMPOSER", "Composer 1");
       taglib_property_set_append(file, "COMPOSER", "Composer 2");
       taglib_property_set(file, "ALBUMARTIST", "Album Artist");
+      taglib_property_set(file, "COMMENT:\xE2\x80\xBB", "Comment (with description)");
 
       // cppcheck-suppress cstyleCast
       TAGLIB_COMPLEX_PROPERTY_PICTURE(props, "JPEG Data", 9, "Written by TagLib",
@@ -141,6 +142,7 @@ public:
         {"DATE"s, {"2023"s}},
         {"COMPOSER"s, {"Composer 1"s, "Composer 2"s}},
         {"COMMENT"s, {"Comment"s}},
+        {"COMMENT:\xE2\x80\xBB"s, {"Comment (with description)"s}},
         {"ARTIST"s, {"Artist"s}},
         {"ALBUMARTIST"s, {"Album Artist"s}},
         {"ALBUM"s, {"Album"s}}
