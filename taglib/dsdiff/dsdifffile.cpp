@@ -65,12 +65,8 @@ namespace
     if(name.size() != 4)
       return false;
 
-    for(int i = 0; i < 4; i++) {
-      if(name[i] < 32 || name[i] > 126)
-        return false;
-    }
-
-    return true;
+    return std::none_of(name.cbegin(), name.cend(),
+                        [](unsigned char c) { return c < 32 || c > 126; });
   }
 
   enum {
