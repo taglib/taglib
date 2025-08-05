@@ -6,6 +6,7 @@
 #cmakedefine TAGLIB_WITH_APE 1
 #cmakedefine TAGLIB_WITH_ASF 1
 #cmakedefine TAGLIB_WITH_DSF 1
+#cmakedefine TAGLIB_WITH_MATROSKA 1
 #cmakedefine TAGLIB_WITH_MOD 1
 #cmakedefine TAGLIB_WITH_MP4 1
 #cmakedefine TAGLIB_WITH_RIFF 1

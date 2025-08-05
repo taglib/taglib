@@ -59,11 +59,10 @@ ByteVector EBML::UIntElement::render()
 
   ByteVector buffer = renderId();
   buffer.append(renderVINT(dataSize, 0));
-  unsigned long long value = this->value;
-
-  static const auto byteOrder = Utils::systemByteOrder(); 
-  if(byteOrder == Utils::LittleEndian)
-    value = Utils::byteSwap((unsigned long long) value);
+  uint64_t value = this->value;
+  static const auto byteOrder = Utils::systemByteOrder();
+  if (byteOrder == Utils::LittleEndian)
+    value = Utils::byteSwap(value);
 
   buffer.append(ByteVector((char*) &value + (sizeof(value) - dataSize), dataSize));
   return buffer;

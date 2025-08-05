@@ -97,14 +97,14 @@ ByteVector EBML::renderVINT(uint64_t number, int minSizeLength)
   int numBytes = std::max(minSizeLength, minSize(number));
   number |= (1ULL << (numBytes * 7));
   static const auto byteOrder = Utils::systemByteOrder();
-  if(byteOrder == Utils::LittleEndian)
-    number = Utils::byteSwap(static_cast<unsigned long long>(number));
-  return ByteVector((char*) &number + (sizeof(number) - numBytes), numBytes); 
+  if (byteOrder == Utils::LittleEndian)
+    number = Utils::byteSwap(number);
+  return ByteVector((char*) &number + (sizeof(number) - numBytes), numBytes);
 }
 
 unsigned long long EBML::randomUID()
 {
-  static std::random_device device;  
+  static std::random_device device;
   static std::mt19937 generator(device());
   static std::uniform_int_distribution<unsigned long long> distribution;
   return distribution(generator);

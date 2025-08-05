@@ -24,6 +24,7 @@
 
 #include <memory>
 #include "taglib_export.h"
+#include "taglib.h"
 #include "tutils.h"
 #include "tbytevector.h"
 #include "tlist.h"

@@ -38,7 +38,6 @@
 #include "tstringlist.h"
 #include "tvariant.h"
 #include "tdebug.h"
-#include "matroskafile.h"
 #include "mpegfile.h"
 #ifdef TAGLIB_WITH_RIFF
 #include "aifffile.h"
@@ -77,6 +76,9 @@
 #endif
 #ifdef TAGLIB_WITH_SHORTEN
 #include "shortenfile.h"
+#endif
+#ifdef TAGLIB_WITH_MATROSKA
+#include "matroskafile.h"
 #endif
 
 using namespace TagLib;
@@ -221,8 +223,10 @@ namespace
     else if(ext == "SHN")
       file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
+#ifdef TAGLIB_WITH_MATROSKA
     else if(ext == "MKA" || ext == "MKV" || ext == "WEBM")
       file = new Matroska::File(stream, readAudioProperties);
+#endif
 
     // if file is not valid, leave it to content-based detection.
 
