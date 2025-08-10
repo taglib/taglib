@@ -55,8 +55,8 @@ namespace TagLib {
       friend class EBML::MkAttachments;
       friend class Matroska::File;
       class AttachmentsPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AttachmentsPrivate> d;
-
     };
   }
 }

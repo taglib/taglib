@@ -64,7 +64,7 @@ std::pair<int, T> EBML::readVINT(File &file)
 
   if(nb_bytes > 1)
     buffer.append(file.readBlock(nb_bytes - 1));
-  int bits_to_shift = (sizeof(T) * 8) - (7 * nb_bytes);
+  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - (7 * nb_bytes);
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
   return { nb_bytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
@@ -83,7 +83,7 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
   if(!numBytes)
     return {0, 0};
 
-  int bits_to_shift = (sizeof(T) * 8) - (7 * numBytes);
+  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - (7 * numBytes);
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
   return { numBytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }

@@ -63,6 +63,12 @@ if(WITH_SHORTEN)
     ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/shorten
   )
 endif()
+if(WITH_MATROSKA)
+  set(tag_c_HDR_DIRS ${tag_c_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/matroska
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../taglib/matroska/ebml
+  )
+endif()
 include_directories(${tag_c_HDR_DIRS})
 
 set(tag_c_HDRS tag_c.h)

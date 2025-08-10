@@ -54,7 +54,7 @@ ByteVector EBML::StringElement<t>::render()
   std::string string = value.to8Bit(t == String::UTF8);
   dataSize = string.size();
   buffer.append(renderVINT(dataSize, 0));
-  buffer.append(ByteVector(string.data(), dataSize));
+  buffer.append(ByteVector(string.data(), static_cast<unsigned int>(dataSize)));
   return buffer;
 }
 template ByteVector EBML::StringElement<String::UTF8>::render();

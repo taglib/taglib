@@ -24,6 +24,7 @@
 #include "taglib_export.h"
 #include "tfile.h"
 #include "tag.h"
+#include "matroskaproperties.h"
 
 
 namespace TagLib {
@@ -34,8 +35,10 @@ namespace TagLib {
     class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
-      File(FileName file, bool readProperties = true);
-      File(IOStream *stream, bool readProperties = true);
+      File(FileName file, bool readProperties = true,
+           Properties::ReadStyle readStyle = Properties::Average);
+      File(IOStream *stream, bool readProperties = true,
+           Properties::ReadStyle readStyle = Properties::Average);
       ~File() override;
       File(const File &) = delete;
       File &operator=(const File &) = delete;
@@ -46,19 +49,23 @@ namespace TagLib {
       bool save() override;
       //PropertyMap properties() const override { return PropertyMap(); }
       //void removeUnsupportedProperties(const StringList &properties) override { }
-    private:
-      void read(bool readProperties);
-      class FilePrivate;
-      std::unique_ptr<FilePrivate> d;
 
+      /*!
+       * Returns whether or not the given \a stream can be opened as a Matroska
+       * file.
+       *
+       * \note This method is designed to do a quick check.  The result may
+       * not necessarily be correct.
+       */
+      static bool isSupported(IOStream *stream);
+
+    private:
+      void read(bool readProperties, Properties::ReadStyle readStyle);
+      class FilePrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
+      std::unique_ptr<FilePrivate> d;
     };
   }
 }
-
-
-
-
-
-
 
  #endif

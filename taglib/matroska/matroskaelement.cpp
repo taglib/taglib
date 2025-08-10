@@ -141,7 +141,7 @@ bool Matroska::Element::sizeChanged(Element &caller, offset_t delta)
   return true;
 }
 
-bool Matroska::Element::offsetChanged(Element &caller, offset_t delta)
+bool Matroska::Element::offsetChanged(Element &, offset_t)
 {
   // Most elements don't need to handle this
   return true;

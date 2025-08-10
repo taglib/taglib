@@ -132,7 +132,8 @@ typedef enum {
   TagLib_File_Opus,
   TagLib_File_DSF,
   TagLib_File_DSDIFF,
-  TagLib_File_SHORTEN
+  TagLib_File_SHORTEN,
+  TagLib_File_MATROSKA
 } TagLib_File_Type;
 
 /*!

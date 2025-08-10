@@ -64,8 +64,8 @@ namespace TagLib {
 
     private:
       class ElementPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<ElementPrivate> e;
-
     };
     namespace ElementIDs {
       inline constexpr Element::ID MkTags        = 0x1254C367;

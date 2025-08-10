@@ -51,11 +51,9 @@ namespace TagLib {
       Matroska::Segment* parseSegment();
 
     private:
-      offset_t dataOffset = 0;
       MkTags *tags = nullptr;
       MkAttachments *attachments = nullptr;
       MkSeekHead *seekHead = nullptr;
-
     };
   }
 }

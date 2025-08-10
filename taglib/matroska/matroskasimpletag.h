@@ -54,6 +54,7 @@ namespace TagLib {
 
     private:
       class SimpleTagPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<SimpleTagPrivate> d;
 
     protected:
@@ -70,6 +71,7 @@ namespace TagLib {
 
     private:
       class SimpleTagStringPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<SimpleTagStringPrivate> dd;
     };
 
@@ -83,6 +85,7 @@ namespace TagLib {
 
     private:
       class SimpleTagBinaryPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<SimpleTagBinaryPrivate> dd;
     };
 

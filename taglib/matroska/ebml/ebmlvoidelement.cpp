@@ -32,12 +32,12 @@ ByteVector EBML::VoidElement::render()
   offset_t bytesNeeded = targetSize;
   ByteVector buffer = renderId();
   bytesNeeded -= buffer.size();
-  sizeLength = std::min(bytesNeeded, static_cast<offset_t>(8));
+  sizeLength = static_cast<int>(std::min(bytesNeeded, static_cast<offset_t>(8)));
   bytesNeeded -= sizeLength;
   dataSize = bytesNeeded;
   buffer.append(renderVINT(dataSize, sizeLength));
   if (dataSize)
-    buffer.append(ByteVector(dataSize, 0));
+    buffer.append(ByteVector(static_cast<unsigned int>(dataSize), 0));
 
   return buffer;
 }

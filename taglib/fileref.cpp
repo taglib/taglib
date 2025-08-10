@@ -296,6 +296,10 @@ namespace
     else if(Shorten::File::isSupported(stream))
       file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
+#ifdef TAGLIB_WITH_MATROSKA
+    else if(Matroska::File::isSupported(stream))
+      file = new Matroska::File(stream, readAudioProperties, audioPropertiesStyle);
+#endif
 
     // isSupported() only does a quick check, so double check the file here.
 
@@ -519,6 +523,11 @@ StringList FileRef::defaultFileExtensions()
 #endif
 #ifdef TAGLIB_WITH_SHORTEN
   l.append("shn");
+#endif
+#ifdef TAGLIB_WITH_MATROSKA
+  l.append("mkv");
+  l.append("mka");
+  l.append("webm");
 #endif
 
   return l;

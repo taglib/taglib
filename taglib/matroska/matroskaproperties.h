@@ -27,25 +27,17 @@
 
 namespace TagLib {
 
-  namespace MPEG {
+  namespace Matroska {
 
     class File;
 
-    //! An implementation of audio property reading for MP3
-
-    /*!
-     * This reads the data from an MPEG Layer III stream found in the
-     * AudioProperties API.
-     */
-
+    //! An implementation of Matroska audio properties
     class TAGLIB_EXPORT Properties : public AudioProperties
     {
     public:
 
-      /*!
-       * Destroys this MPEG Properties instance.
-       */
-      ~Properties() override {}
+      Properties(File *file, ReadStyle style = Average);
+      ~Properties() override;
 
       Properties(const Properties &) = delete;
       Properties &operator=(const Properties &) = delete;
@@ -55,29 +47,31 @@ namespace TagLib {
        *
        * \see lengthInSeconds()
        */
-      int lengthInMilliseconds() const override {}
+      int lengthInMilliseconds() const override;
 
       /*!
        * Returns the average bit rate of the file in kb/s.
        */
-      int bitrate() const override {}
+      int bitrate() const override;
 
       /*!
        * Returns the sample rate in Hz.
        */
-      int sampleRate() const override {}
+      int sampleRate() const override;
 
       /*!
        * Returns the number of audio channels.
        */
-      int channels() const override {}
+      int channels() const override;
 
     private:
+      void read(File *file);
 
       class PropertiesPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<PropertiesPrivate> d;
     };
-  }  // namespace MPEG
+  }  // namespace Matroska
 }  // namespace TagLib
 
 #endif

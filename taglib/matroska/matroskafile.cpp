@@ -55,7 +55,22 @@ public:
   Segment *segment = nullptr;
 };
 
-Matroska::File::File(FileName file, bool readProperties)
+////////////////////////////////////////////////////////////////////////////////
+// static members
+////////////////////////////////////////////////////////////////////////////////
+
+bool Matroska::File::isSupported(IOStream *)
+{
+  // TODO implement
+  return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
+
+Matroska::File::File(FileName file, bool readProperties,
+                     Properties::ReadStyle readStyle)
 : TagLib::File(file),
   d(std::make_unique<FilePrivate>())
 {
@@ -64,10 +79,11 @@ Matroska::File::File(FileName file, bool readProperties)
     setValid(false);
     return;
   }
-  read(readProperties);
+  read(readProperties, readStyle);
 }
 
-Matroska::File::File(IOStream *stream, bool readProperties)
+Matroska::File::File(IOStream *stream, bool readProperties,
+                     Properties::ReadStyle readStyle)
 : TagLib::File(stream),
   d(std::make_unique<FilePrivate>())
 {
@@ -76,7 +92,7 @@ Matroska::File::File(IOStream *stream, bool readProperties)
     setValid(false);
     return;
   }
-  read(readProperties);
+  read(readProperties, readStyle);
 }
 
 Matroska::File::~File() = default;
@@ -108,7 +124,7 @@ Matroska::Attachments* Matroska::File::attachments(bool create) const
   }
 }
 
-void Matroska::File::read(bool readProperties)
+void Matroska::File::read(bool, Properties::ReadStyle)
 {
   offset_t fileLength = length();
 
@@ -139,7 +155,7 @@ void Matroska::File::read(bool readProperties)
     setValid(false);
     return;
   }
-  
+
   // Parse the elements
   d->segment = segment->parseSegment();
   d->seekHead = segment->parseSeekHead();

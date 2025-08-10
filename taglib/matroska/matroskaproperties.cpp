@@ -1,4 +1,9 @@
 /***************************************************************************
+    copyright            : (C) 2025 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
+ ***************************************************************************/
+
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -18,40 +23,54 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKAATTACHEDFILE_H
-#define HAS_MATROSKAATTACHEDFILE_H
+#include "matroskaproperties.h"
 
-#include "taglib_export.h"
+using namespace TagLib;
 
+class Matroska::Properties::PropertiesPrivate
+{
+public:
+  int length { 0 };
+  int bitrate { 0 };
+  int sampleRate { 0 };
+  int bitsPerSample { 0 };
+  int channels { 0 };
+};
 
-namespace TagLib {
-  class String;
-  class ByteVector;
-  namespace Matroska {
-    class TAGLIB_EXPORT AttachedFile
-    {
-    public:
-      using UID = unsigned long long;
-      AttachedFile();
-      ~AttachedFile();
-
-      void setFileName(const String &fileName);
-      const String& fileName() const;
-      void setDescription(const String &description);
-      const String& description() const;
-      void setMediaType(const String &mediaType);
-      const String& mediaType() const;
-      void setData(const ByteVector &data);
-      const ByteVector& data() const;
-      void setUID(UID uid);
-      UID uid() const;
-
-    private:
-      class AttachedFilePrivate;
-      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
-      std::unique_ptr<AttachedFilePrivate> d;
-    };
-  }
+Matroska::Properties::Properties(File *file, ReadStyle style) :
+  AudioProperties(style),
+  d(std::make_unique<PropertiesPrivate>())
+{
+  read(file);
 }
 
-#endif
+Matroska::Properties::~Properties() = default;
+
+int Matroska::Properties::lengthInMilliseconds() const
+{
+  return d->length;
+}
+
+int Matroska::Properties::bitrate() const
+{
+  return d->bitrate;
+}
+
+int Matroska::Properties::sampleRate() const
+{
+  return d->sampleRate;
+}
+
+int Matroska::Properties::channels() const
+{
+  return d->channels;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
+void Matroska::Properties::read(File *file)
+{
+  // TODO implement.
+}
