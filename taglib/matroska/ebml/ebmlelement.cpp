@@ -37,7 +37,7 @@
 
 using namespace TagLib;
 
-EBML::Element* EBML::Element::factory(File &file)
+EBML::Element *EBML::Element::factory(File &file)
 {
   // Get the element ID
   offset_t offset = file.tell();
@@ -48,61 +48,59 @@ EBML::Element* EBML::Element::factory(File &file)
   }
 
   // Get the size length and data length
-  const auto& [sizeLength, dataSize] = readVINT<offset_t>(file);
+  const auto &[sizeLength, dataSize] = readVINT<offset_t>(file);
   if(!sizeLength)
     return nullptr;
 
   // Return the subclass
   switch(id) {
-    case ElementIDs::EBMLHeader:
-      return new Element(id, sizeLength, dataSize);
-    
-    case ElementIDs::MkSegment:
-      return new MkSegment(sizeLength, dataSize, offset);
+  case ElementIDs::EBMLHeader:
+    return new Element(id, sizeLength, dataSize);
 
-    case ElementIDs::MkTags:
-      return new MkTags(sizeLength, dataSize, offset);
+  case ElementIDs::MkSegment:
+    return new MkSegment(sizeLength, dataSize, offset);
 
-    case ElementIDs::MkAttachments:
-      return new MkAttachments(sizeLength, dataSize, offset);
+  case ElementIDs::MkTags:
+    return new MkTags(sizeLength, dataSize, offset);
 
-    case ElementIDs::MkTag:
-    case ElementIDs::MkTagTargets:
-    case ElementIDs::MkSimpleTag:
-    case ElementIDs::MkAttachedFile:
-    case ElementIDs::MkSeek:
-      return new MasterElement(id, sizeLength, dataSize, offset);
+  case ElementIDs::MkAttachments:
+    return new MkAttachments(sizeLength, dataSize, offset);
 
-    case ElementIDs::MkTagName:
-    case ElementIDs::MkTagString:
-    case ElementIDs::MkAttachedFileName:
-    case ElementIDs::MkAttachedFileDescription:
-      return new UTF8StringElement(id, sizeLength, dataSize);
+  case ElementIDs::MkTag:
+  case ElementIDs::MkTagTargets:
+  case ElementIDs::MkSimpleTag:
+  case ElementIDs::MkAttachedFile:
+  case ElementIDs::MkSeek:
+    return new MasterElement(id, sizeLength, dataSize, offset);
 
-    case ElementIDs::MkTagLanguage:
-    case ElementIDs::MkAttachedFileMediaType:
-      return new Latin1StringElement(id, sizeLength, dataSize);
+  case ElementIDs::MkTagName:
+  case ElementIDs::MkTagString:
+  case ElementIDs::MkAttachedFileName:
+  case ElementIDs::MkAttachedFileDescription:
+    return new UTF8StringElement(id, sizeLength, dataSize);
 
-    case ElementIDs::MkTagTargetTypeValue:
-    case ElementIDs::MkAttachedFileUID:
-    case ElementIDs::MkSeekPosition:
-      return new UIntElement(id, sizeLength, dataSize);
+  case ElementIDs::MkTagLanguage:
+  case ElementIDs::MkAttachedFileMediaType:
+    return new Latin1StringElement(id, sizeLength, dataSize);
 
-    case ElementIDs::MkAttachedFileData:
-    case ElementIDs::MkSeekID:
-      return new BinaryElement(id, sizeLength, dataSize);
-    
-    case ElementIDs::MkSeekHead:
-      return new MkSeekHead(sizeLength, dataSize, offset);
+  case ElementIDs::MkTagTargetTypeValue:
+  case ElementIDs::MkAttachedFileUID:
+  case ElementIDs::MkSeekPosition:
+    return new UIntElement(id, sizeLength, dataSize);
 
-    case ElementIDs::VoidElement:
-      return new VoidElement(sizeLength, dataSize);
+  case ElementIDs::MkAttachedFileData:
+  case ElementIDs::MkSeekID:
+    return new BinaryElement(id, sizeLength, dataSize);
 
-    default:
-      return new Element(id, sizeLength, dataSize);
+  case ElementIDs::MkSeekHead:
+    return new MkSeekHead(sizeLength, dataSize, offset);
+
+  case ElementIDs::VoidElement:
+    return new VoidElement(sizeLength, dataSize);
+
+  default:
+    return new Element(id, sizeLength, dataSize);
   }
-
-  return nullptr;
 }
 
 EBML::Element::Id EBML::Element::readId(File &file)
@@ -124,14 +122,14 @@ EBML::Element::Id EBML::Element::readId(File &file)
   return buffer.toUInt(true);
 }
 
-void EBML::Element::skipData(File &file) 
+void EBML::Element::skipData(File &file)
 {
   file.seek(dataSize, File::Position::Current);
 }
 
 offset_t EBML::Element::headSize() const
-{ 
-  return EBML::idSize(id) + sizeLength;
+{
+  return idSize(id) + sizeLength;
 }
 
 ByteVector EBML::Element::render()
@@ -141,9 +139,10 @@ ByteVector EBML::Element::render()
   return buffer;
 }
 
-ByteVector EBML::Element::renderId()
+ByteVector EBML::Element::renderId() const
 {
   int numBytes = idSize(id);
-  id = Utils::byteSwap(id);
-  return ByteVector((char*) &id + (4 - numBytes), numBytes);
+  static const auto byteOrder = Utils::systemByteOrder();
+  uint32_t data = byteOrder == Utils::LittleEndian ? Utils::byteSwap(id) : id;
+  return ByteVector(reinterpret_cast<char *>(&data) + (4 - numBytes), numBytes);
 }

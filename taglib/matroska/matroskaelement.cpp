@@ -28,7 +28,7 @@ using namespace TagLib;
 class Matroska::Element::ElementPrivate
 {
 public:
-  ElementPrivate() {}
+  ElementPrivate() = default;
   ~ElementPrivate() = default;
   ElementPrivate(const ElementPrivate &) = delete;
   ElementPrivate &operator=(const ElementPrivate &) = delete;
@@ -36,13 +36,12 @@ public:
   offset_t offset = 0;
   ID id = 0;
   ByteVector data;
-  List<Element*> sizeListeners;
-  List<Element*> offsetListeners;
-
+  List<Element *> sizeListeners;
+  List<Element *> offsetListeners;
 };
 
-Matroska::Element::Element(ID id)
-: e(std::make_unique<ElementPrivate>())
+Matroska::Element::Element(ID id) :
+  e(std::make_unique<ElementPrivate>())
 {
   e->id = id;
 }
@@ -63,11 +62,10 @@ void Matroska::Element::setData(const ByteVector &data)
   e->data = data;
 }
 
-const ByteVector& Matroska::Element::data() const
+const ByteVector &Matroska::Element::data() const
 {
   return e->data;
 }
-
 
 void Matroska::Element::setOffset(offset_t offset)
 {
@@ -94,7 +92,7 @@ void Matroska::Element::addSizeListener(Element *element)
   e->sizeListeners.append(element);
 }
 
-void Matroska::Element::addSizeListeners(const List<Element*> &elements)
+void Matroska::Element::addSizeListeners(const List<Element *> &elements)
 {
   e->sizeListeners.append(elements);
 }
@@ -104,7 +102,7 @@ void Matroska::Element::addOffsetListener(Element *element)
   e->offsetListeners.append(element);
 }
 
-void Matroska::Element::addOffsetListeners(const List<Element*> &elements)
+void Matroska::Element::addOffsetListeners(const List<Element *> &elements)
 {
   e->offsetListeners.append(elements);
 }
@@ -117,7 +115,7 @@ void Matroska::Element::setID(ID id)
 bool Matroska::Element::emitSizeChanged(offset_t delta)
 {
   for(auto element : e->sizeListeners) {
-    if (!element->sizeChanged(*this, delta))
+    if(!element->sizeChanged(*this, delta))
       return false;
   }
   return true;
@@ -134,7 +132,7 @@ bool Matroska::Element::emitOffsetChanged(offset_t delta)
 
 bool Matroska::Element::sizeChanged(Element &caller, offset_t delta)
 {
-  if (caller.offset() < e->offset) {
+  if(caller.offset() < e->offset) {
     e->offset += delta;
     //return emitOffsetChanged(delta);
   }
@@ -147,7 +145,7 @@ bool Matroska::Element::offsetChanged(Element &, offset_t)
   return true;
 }
 
-void Matroska::Element::write(TagLib::File &file)
+void Matroska::Element::write(File &file)
 {
   file.insert(e->data, e->offset, e->size);
   e->size = e->data.size();

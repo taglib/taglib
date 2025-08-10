@@ -22,26 +22,27 @@
 #define TAGLIB_EBMLSTRINGELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include <cstdint>
 #include "ebmlelement.h"
-#include "ebmlutils.h"
 #include "tbytevector.h"
 #include "tstring.h"
 
 namespace TagLib {
   class File;
   namespace EBML {
-    template<String::Type t>
+    template <String::Type t>
     class StringElement : public Element
     {
     public:
-      StringElement(Id id, int sizeLength, offset_t dataSize)
-      : Element(id, sizeLength, dataSize)
-      {}
-      StringElement(Id id)
-      : Element(id, 0, 0)
-      {}
-      const String& getValue() const { return value; }
+      StringElement(Id id, int sizeLength, offset_t dataSize) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
+
+      explicit StringElement(Id id) :
+        Element(id, 0, 0)
+      {
+      }
+      const String &getValue() const { return value; }
       void setValue(const String &value) { this->value = value; }
       bool read(File &file) override;
       ByteVector render() override;

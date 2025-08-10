@@ -26,7 +26,6 @@
 #include "tlist.h"
 #include "matroskaelement.h"
 
-
 namespace TagLib {
   class File;
   namespace EBML {
@@ -37,23 +36,23 @@ namespace TagLib {
     class File;
     class TAGLIB_EXPORT Attachments
 #ifndef DO_NOT_DOCUMENT
-    : private Element
+      : private Element
 #endif
     {
     public:
-      using AttachedFileList = List<AttachedFile*>;
+      using AttachedFileList = List<AttachedFile *>;
       Attachments();
       virtual ~Attachments();
 
-    void addAttachedFile(AttachedFile *file);
-    void removeAttachedFile(AttachedFile *file);
-    void clear();
-    const AttachedFileList& attachedFileList() const;
-    bool render() override;
+      void addAttachedFile(AttachedFile *file);
+      void removeAttachedFile(AttachedFile *file);
+      void clear();
+      const AttachedFileList &attachedFileList() const;
+      bool render() override;
 
     private:
       friend class EBML::MkAttachments;
-      friend class Matroska::File;
+      friend class File;
       class AttachmentsPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AttachmentsPrivate> d;

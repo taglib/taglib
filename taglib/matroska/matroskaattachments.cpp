@@ -14,15 +14,15 @@ using namespace TagLib;
 class Matroska::Attachments::AttachmentsPrivate
 {
 public:
-  AttachmentsPrivate() {}
+  AttachmentsPrivate() = default;
   ~AttachmentsPrivate() = default;
   AttachmentsPrivate(const AttachmentsPrivate &) = delete;
   AttachmentsPrivate &operator=(const AttachmentsPrivate &) = delete;
-  List<AttachedFile*> files;
+  List<AttachedFile *> files;
 };
 
-Matroska::Attachments::Attachments()
-: Element(ElementIDs::MkAttachments),
+Matroska::Attachments::Attachments() :
+  Element(ElementIDs::MkAttachments),
   d(std::make_unique<AttachmentsPrivate>())
 {
   d->files.setAutoDelete(true);
@@ -48,7 +48,7 @@ void Matroska::Attachments::clear()
   d->files.clear();
 }
 
-const Matroska::Attachments::AttachedFileList& Matroska::Attachments::attachedFileList() const
+const Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFileList() const
 {
   return d->files;
 }
@@ -96,11 +96,10 @@ bool Matroska::Attachments::render()
   auto beforeSize = size();
   auto data = attachments.render();
   auto afterSize = data.size();
-  if (beforeSize != afterSize) {
-    if (!emitSizeChanged(afterSize - beforeSize))
+  if(beforeSize != afterSize) {
+    if(!emitSizeChanged(afterSize - beforeSize))
       return false;
   }
   setData(data);
   return true;
 }
-

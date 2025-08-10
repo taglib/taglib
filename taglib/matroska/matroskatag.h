@@ -39,7 +39,7 @@ namespace TagLib {
   }
 
   namespace Matroska {
-    using SimpleTagsList = List<SimpleTag*>;
+    using SimpleTagsList = List<SimpleTag *>;
     class TAGLIB_EXPORT Tag : public TagLib::Tag
 #ifndef DO_NOT_DOCUMENT
     , private Element
@@ -51,7 +51,7 @@ namespace TagLib {
       void addSimpleTag(SimpleTag *tag);
       void removeSimpleTag(SimpleTag *tag);
       void clearSimpleTags();
-      const SimpleTagsList& simpleTagsList() const;
+      const SimpleTagsList &simpleTagsList() const;
       String title() const override;
       String artist() const override;
       String album() const override;
@@ -71,7 +71,7 @@ namespace TagLib {
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
       template <typename T>
-      int removeSimpleTags(T&& p)
+      int removeSimpleTags(T &&p)
       {
         auto &list = simpleTagsListPrivate();
         int numRemoved = 0;
@@ -87,8 +87,8 @@ namespace TagLib {
         return numRemoved;
       }
 
-      template<typename T>
-      SimpleTagsList findSimpleTags(T&& p)
+      template <typename T>
+      SimpleTagsList findSimpleTags(T &&p)
       {
         auto &list = simpleTagsListPrivate();
         for(auto it = list.begin(); it != list.end();) {
@@ -101,8 +101,8 @@ namespace TagLib {
         return list;
       }
 
-      template<typename T>
-      const Matroska::SimpleTag* findSimpleTag(T&& p) const
+      template <typename T>
+      const SimpleTag *findSimpleTag(T &&p) const
       {
         auto &list = simpleTagsListPrivate();
         auto it = std::find_if(list.begin(), list.end(), std::forward<T>(p));
@@ -110,20 +110,20 @@ namespace TagLib {
       }
 
       template <typename T>
-      Matroska::SimpleTag* findSimpleTag(T&&p)
+      SimpleTag *findSimpleTag(T &&p)
       {
-        return const_cast<Matroska::SimpleTag*>(
-          const_cast<const Matroska::Tag*>(this)->findSimpleTag(std::forward<T>(p))
+        return const_cast<SimpleTag *>(
+          const_cast<const Tag *>(this)->findSimpleTag(std::forward<T>(p))
         );
       }
 
     private:
-      friend class Matroska::File;
+      friend class File;
       friend class EBML::MkTags;
-      SimpleTagsList& simpleTagsListPrivate();
-      const SimpleTagsList& simpleTagsListPrivate() const;
+      SimpleTagsList &simpleTagsListPrivate();
+      const SimpleTagsList &simpleTagsListPrivate() const;
       bool setTag(const String &key, const String &value);
-      const String* getTag(const String &key) const;
+      const String *getTag(const String &key) const;
       class TagPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<TagPrivate> d;

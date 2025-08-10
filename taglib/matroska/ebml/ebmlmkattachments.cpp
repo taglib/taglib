@@ -24,12 +24,10 @@
 #include "ebmlbinaryelement.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
-#include "tdebug.h"
-#include "tutils.h"
 
 using namespace TagLib;
 
-Matroska::Attachments* EBML::MkAttachments::parse()
+Matroska::Attachments *EBML::MkAttachments::parse()
 {
   auto attachments = new Matroska::Attachments();
   attachments->setOffset(offset);
@@ -44,19 +42,19 @@ Matroska::Attachments* EBML::MkAttachments::parse()
     const String *mediaType = nullptr;
     const ByteVector *data = nullptr;
     Matroska::AttachedFile::UID uid = 0;
-    auto attachedFile = static_cast<MasterElement*>(element);
+    auto attachedFile = static_cast<MasterElement *>(element);
     for(auto attachedFileChild : *attachedFile) {
       Id id = attachedFileChild->getId();
       if(id == ElementIDs::MkAttachedFileName)
-        filename = &(static_cast<UTF8StringElement*>(attachedFileChild)->getValue());
+        filename = &(static_cast<UTF8StringElement *>(attachedFileChild)->getValue());
       else if(id == ElementIDs::MkAttachedFileData)
-        data = &(static_cast<BinaryElement*>(attachedFileChild)->getValue());
+        data = &(static_cast<BinaryElement *>(attachedFileChild)->getValue());
       else if(id == ElementIDs::MkAttachedFileDescription)
-        description = &(static_cast<UTF8StringElement*>(attachedFileChild)->getValue());
+        description = &(static_cast<UTF8StringElement *>(attachedFileChild)->getValue());
       else if(id == ElementIDs::MkAttachedFileMediaType)
-        mediaType = &(static_cast<Latin1StringElement*>(attachedFileChild)->getValue());
+        mediaType = &(static_cast<Latin1StringElement *>(attachedFileChild)->getValue());
       else if(id == ElementIDs::MkAttachedFileUID)
-        uid = static_cast<UIntElement*>(attachedFileChild)->getValue();
+        uid = static_cast<UIntElement *>(attachedFileChild)->getValue();
     }
     if(!(filename && data))
       continue;
@@ -70,7 +68,7 @@ Matroska::Attachments* EBML::MkAttachments::parse()
       file->setMediaType(*mediaType);
     if(uid)
       file->setUID(uid);
-    
+
     attachments->addAttachedFile(file);
   }
   return attachments;

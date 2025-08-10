@@ -1,4 +1,4 @@
- /***************************************************************************
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -22,9 +22,7 @@
 #define TAGLIB_EBMLVOIDELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include <cstdint>
 #include "ebmlelement.h"
-#include "tutils.h"
 
 namespace TagLib {
   class File;
@@ -34,20 +32,19 @@ namespace TagLib {
     class VoidElement : public Element
     {
     public:
-      VoidElement(int sizeLength, offset_t dataSize)
-      : Element(ElementIDs::VoidElement, sizeLength, dataSize)
+      VoidElement(int sizeLength, offset_t dataSize) :
+        Element(ElementIDs::VoidElement, sizeLength, dataSize)
       {}
-      VoidElement()
-      : Element(ElementIDs::VoidElement, 0, 0)
+      VoidElement() :
+        Element(ElementIDs::VoidElement, 0, 0)
       {}
       ByteVector render() override;
       offset_t getTargetSize() const;
       void setTargetSize(offset_t targetSize);
-      static ByteVector renderSize(offset_t size);
+      static ByteVector renderSize(offset_t targetSize);
 
     private:
       offset_t targetSize = MIN_VOID_ELEMENT_SIZE;
-
     };
   }
 }

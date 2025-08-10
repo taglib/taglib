@@ -27,38 +27,33 @@ using namespace TagLib;
 
 class Matroska::SimpleTag::SimpleTagPrivate
 {
-  public:
-    SimpleTagPrivate() = default;
-    SimpleTag::TargetTypeValue targetTypeValue = TargetTypeValue::None;
-    String name;
-    String language;
-    bool defaultLanguageFlag = true;
-
+public:
+  SimpleTagPrivate() = default;
+  TargetTypeValue targetTypeValue = None;
+  String name;
+  String language;
+  bool defaultLanguageFlag = true;
 };
 
 class Matroska::SimpleTagString::SimpleTagStringPrivate
 {
-  public:
-    SimpleTagStringPrivate() = default;
-    String value;
-
+public:
+  SimpleTagStringPrivate() = default;
+  String value;
 };
 
 class Matroska::SimpleTagBinary::SimpleTagBinaryPrivate
 {
-  public:
-    SimpleTagBinaryPrivate() = default;
-    ByteVector value;
-
+public:
+  SimpleTagBinaryPrivate() = default;
+  ByteVector value;
 };
 
-Matroska::SimpleTag::SimpleTag()
-: d(std::make_unique<SimpleTagPrivate>())
+Matroska::SimpleTag::SimpleTag() :
+  d(std::make_unique<SimpleTagPrivate>())
 {
-
 }
 Matroska::SimpleTag::~SimpleTag() = default;
-
 
 Matroska::SimpleTag::TargetTypeValue Matroska::SimpleTag::targetTypeValue() const
 {
@@ -70,12 +65,12 @@ void Matroska::SimpleTag::setTargetTypeValue(TargetTypeValue targetTypeValue)
   d->targetTypeValue = targetTypeValue;
 }
 
-const String& Matroska::SimpleTag::name() const
+const String &Matroska::SimpleTag::name() const
 {
   return d->name;
 }
 
-const String& Matroska::SimpleTag::language() const
+const String &Matroska::SimpleTag::language() const
 {
   return d->language;
 }
@@ -100,15 +95,13 @@ void Matroska::SimpleTag::setName(const String &name)
   d->name = name;
 }
 
-Matroska::SimpleTagString::SimpleTagString()
-: Matroska::SimpleTag(),
+Matroska::SimpleTagString::SimpleTagString() :
   dd(std::make_unique<SimpleTagStringPrivate>())
 {
-
 }
 Matroska::SimpleTagString::~SimpleTagString() = default;
 
-const String& Matroska::SimpleTagString::value() const
+const String &Matroska::SimpleTagString::value() const
 {
   return dd->value;
 }
@@ -118,15 +111,13 @@ void Matroska::SimpleTagString::setValue(const String &value)
   dd->value = value;
 }
 
-Matroska::SimpleTagBinary::SimpleTagBinary()
-: Matroska::SimpleTag(),
+Matroska::SimpleTagBinary::SimpleTagBinary() :
   dd(std::make_unique<SimpleTagBinaryPrivate>())
 {
-
 }
 Matroska::SimpleTagBinary::~SimpleTagBinary() = default;
 
-const ByteVector& Matroska::SimpleTagBinary::value() const
+const ByteVector &Matroska::SimpleTagBinary::value() const
 {
   return dd->value;
 }

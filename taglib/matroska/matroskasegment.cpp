@@ -26,12 +26,12 @@ using namespace TagLib;
 bool Matroska::Segment::render()
 {
   auto data = EBML::renderVINT(dataSize, static_cast<int>(sizeLength));
-  if (data.size() != sizeLength) {
+  if(data.size() != sizeLength) {
     sizeLength = 8;
-    if (!emitSizeChanged(sizeLength - data.size()))
+    if(!emitSizeChanged(sizeLength - data.size()))
       return false;
     data = EBML::renderVINT(dataSize, static_cast<int>(sizeLength));
-    if (data.size() != sizeLength)
+    if(data.size() != sizeLength)
       return false;
   }
   setData(data);

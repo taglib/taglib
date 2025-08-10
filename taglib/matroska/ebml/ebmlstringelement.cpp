@@ -19,16 +19,17 @@
  ***************************************************************************/
 
 #include "ebmlstringelement.h"
+#include <string>
 #include "tfile.h"
 #include "tstring.h"
 #include "tbytevector.h"
 #include "tdebug.h"
-#include <string>
+#include "ebmlutils.h"
 
 using namespace TagLib;
 
-template<String::Type t>
-bool EBML::StringElement<t>::read(TagLib::File &file)
+template <String::Type t>
+bool EBML::StringElement<t>::read(File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
   if(buffer.size() != dataSize) {
@@ -44,10 +45,10 @@ bool EBML::StringElement<t>::read(TagLib::File &file)
   value = String(buffer, t);
   return true;
 }
-template bool EBML::StringElement<String::UTF8>::read(TagLib::File &file);
-template bool EBML::StringElement<String::Latin1>::read(TagLib::File &file);
+template bool EBML::StringElement<String::UTF8>::read(File &file);
+template bool EBML::StringElement<String::Latin1>::read(File &file);
 
-template<String::Type t>
+template <String::Type t>
 ByteVector EBML::StringElement<t>::render()
 {
   ByteVector buffer = renderId();

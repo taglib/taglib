@@ -70,7 +70,7 @@ int Matroska::Properties::channels() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Matroska::Properties::read(File *file)
+void Matroska::Properties::read(File *)
 {
   // TODO implement.
 }

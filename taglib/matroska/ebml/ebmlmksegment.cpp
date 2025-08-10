@@ -28,9 +28,6 @@
 #include "matroskaattachments.h"
 #include "matroskaseekhead.h"
 #include "matroskasegment.h"
-#include "tutils.h"
-#include "tbytevector.h"
-#include "tdebug.h"
 
 using namespace TagLib;
 
@@ -44,31 +41,31 @@ EBML::MkSegment::~MkSegment()
 bool EBML::MkSegment::read(File &file)
 {
   offset_t maxOffset = file.tell() + dataSize;
-  EBML::Element *element = nullptr;
+  Element *element = nullptr;
   int i = 0;
   int seekHeadIndex = -1;
   while((element = findNextElement(file, maxOffset))) {
     Id id = element->getId();
     if(id == ElementIDs::MkSeekHead) {
       seekHeadIndex = i;
-      seekHead = static_cast<MkSeekHead*>(element);
+      seekHead = static_cast<MkSeekHead *>(element);
       if(!seekHead->read(file))
         return false;
     }
     else if(id == ElementIDs::MkTags) {
-      tags = static_cast<MkTags*>(element);
+      tags = static_cast<MkTags *>(element);
       if(!tags->read(file))
         return false;
     }
     else if(id == ElementIDs::MkAttachments) {
-      attachments = static_cast<MkAttachments*>(element);
+      attachments = static_cast<MkAttachments *>(element);
       if(!attachments->read(file))
         return false;
     }
     else {
       if(id == ElementIDs::VoidElement
-         && seekHead 
-         && seekHeadIndex == (i - 1))
+         && seekHead
+         && seekHeadIndex == i - 1)
         seekHead->setPadding(element->getSize());
 
       element->skipData(file);
@@ -79,22 +76,22 @@ bool EBML::MkSegment::read(File &file)
   return true;
 }
 
-Matroska::Tag* EBML::MkSegment::parseTag()
+Matroska::Tag *EBML::MkSegment::parseTag()
 {
   return tags ? tags->parse() : nullptr;
 }
 
-Matroska::Attachments* EBML::MkSegment::parseAttachments()
+Matroska::Attachments *EBML::MkSegment::parseAttachments()
 {
   return attachments ? attachments->parse() : nullptr;
 }
 
-Matroska::SeekHead* EBML::MkSegment::parseSeekHead()
+Matroska::SeekHead *EBML::MkSegment::parseSeekHead()
 {
   return seekHead ? seekHead->parse() : nullptr;
 }
 
-Matroska::Segment* EBML::MkSegment::parseSegment()
+Matroska::Segment *EBML::MkSegment::parseSegment()
 {
   return new Matroska::Segment(sizeLength, dataSize, offset + idSize(id));
 }

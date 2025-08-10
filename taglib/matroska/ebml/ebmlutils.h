@@ -23,32 +23,18 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include <utility>
-#include <cstdint>
 #include "taglib.h"
 #include "tutils.h"
 #include "tdebug.h"
 #include "ebmlelement.h"
 #include "tbytevector.h"
 
-/*
-#define EBMLHeader           0x1A45DFA3
-#define MkSegment     0x18538067 
-#define MkTags        0x1254C367
-#define MkTag         0x7373
-#define MkTagTargets 0x63C0
-#define MkTagTargetTypeValue 0x68CA
-#define MkSimpleTag  0x67C8
-#define MkTagName 0x45A3
-#define MkTagLanguage 0x447A
-#define MkTagString 0x4487
-*/
-
 namespace TagLib {
   class File;
   class ByteVector;
 
   namespace EBML {
-    template<int maxSizeLength>
+    template <int maxSizeLength>
     constexpr unsigned int VINTSizeLength(uint8_t firstByte)
     {
       static_assert(maxSizeLength >= 1 && maxSizeLength <= 8);
@@ -69,12 +55,12 @@ namespace TagLib {
       return numBytes;
     }
 
-    template<typename T>
+    template <typename T>
     std::pair<int, T> readVINT(File &file);
-    template<typename T>
+    template <typename T>
     std::pair<int, T> parseVINT(const ByteVector &buffer);
-    Element* findElement(File &file, Element::Id id, offset_t maxLength);
-    Element* findNextElement(File &file, offset_t maxOffset);
+    Element *findElement(File &file, Element::Id id, offset_t maxOffset);
+    Element *findNextElement(File &file, offset_t maxOffset);
     ByteVector renderVINT(uint64_t number, int minSizeLength);
     unsigned long long randomUID();
 

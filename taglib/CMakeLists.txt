@@ -228,21 +228,21 @@ if(WITH_SHORTEN)
 endif()
 if(WITH_MATROSKA)
   set(tag_HDRS ${tag_HDRS}
-    matroska/matroskafile.h
-    matroska/matroskatag.h
-    matroska/matroskasimpletag.h
     matroska/matroskaattachedfile.h
     matroska/matroskaattachments.h
-    matroska/matroskafile.h
-    matroska/matroskatag.h
-    matroska/matroskasimpletag.h
+    matroska/matroskacues.h
     matroska/matroskaelement.h
+    matroska/matroskafile.h
+    matroska/matroskaproperties.h
     matroska/matroskaseekhead.h
     matroska/matroskasegment.h
+    matroska/matroskasimpletag.h
+    matroska/matroskatag.h
     matroska/ebml/ebmlbinaryelement.h
     matroska/ebml/ebmlelement.h
     matroska/ebml/ebmlmasterelement.h
     matroska/ebml/ebmlmkattachments.h
+    matroska/ebml/ebmlmkcues.h
     matroska/ebml/ebmlmkseekhead.h
     matroska/ebml/ebmlmksegment.h
     matroska/ebml/ebmlmktags.h
@@ -446,8 +446,10 @@ if(WITH_MATROSKA)
   set(matroska_SRCS
     matroska/matroskaattachedfile.cpp
     matroska/matroskaattachments.cpp
+    matroska/matroskacues.cpp
     matroska/matroskaelement.cpp
     matroska/matroskafile.cpp
+    matroska/matroskaproperties.cpp
     matroska/matroskaseekhead.cpp
     matroska/matroskasegment.cpp
     matroska/matroskasimpletag.cpp
@@ -459,6 +461,7 @@ if(WITH_MATROSKA)
     matroska/ebml/ebmlelement.cpp
     matroska/ebml/ebmlmasterelement.cpp
     matroska/ebml/ebmlmkattachments.cpp
+    matroska/ebml/ebmlmkcues.cpp
     matroska/ebml/ebmlmkseekhead.cpp
     matroska/ebml/ebmlmksegment.cpp
     matroska/ebml/ebmlmktags.cpp

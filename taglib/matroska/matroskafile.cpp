@@ -28,10 +28,8 @@
 #include "ebmlmksegment.h"
 #include "tlist.h"
 #include "tdebug.h"
-#include "tutils.h"
 
 #include <memory>
-#include <algorithm>
 #include <vector>
 
 using namespace TagLib;
@@ -39,7 +37,7 @@ using namespace TagLib;
 class Matroska::File::FilePrivate
 {
 public:
-  FilePrivate() {}
+  FilePrivate() = default;
   ~FilePrivate()
   {
     delete tag;
@@ -49,7 +47,7 @@ public:
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
-  Matroska::Tag *tag = nullptr;
+  Tag *tag = nullptr;
   Attachments *attachments = nullptr;
   SeekHead *seekHead = nullptr;
   Segment *segment = nullptr;
@@ -70,8 +68,8 @@ bool Matroska::File::isSupported(IOStream *)
 ////////////////////////////////////////////////////////////////////////////////
 
 Matroska::File::File(FileName file, bool readProperties,
-                     Properties::ReadStyle readStyle)
-: TagLib::File(file),
+                     Properties::ReadStyle readStyle) :
+  TagLib::File(file),
   d(std::make_unique<FilePrivate>())
 {
   if(!isOpen()) {
@@ -83,8 +81,8 @@ Matroska::File::File(FileName file, bool readProperties,
 }
 
 Matroska::File::File(IOStream *stream, bool readProperties,
-                     Properties::ReadStyle readStyle)
-: TagLib::File(stream),
+                     Properties::ReadStyle readStyle) :
+  TagLib::File(stream),
   d(std::make_unique<FilePrivate>())
 {
   if(!isOpen()) {
@@ -97,23 +95,23 @@ Matroska::File::File(IOStream *stream, bool readProperties,
 
 Matroska::File::~File() = default;
 
-TagLib::Tag* Matroska::File::tag() const
+Tag *Matroska::File::tag() const
 {
   return tag(true);
 }
 
-Matroska::Tag* Matroska::File::tag(bool create) const
+Matroska::Tag *Matroska::File::tag(bool create) const
 {
   if(d->tag)
     return d->tag;
   else {
     if(create)
-      d->tag = new Matroska::Tag();
+      d->tag = new Tag();
     return d->tag;
   }
 }
 
-Matroska::Attachments* Matroska::File::attachments(bool create) const
+Matroska::Attachments *Matroska::File::attachments(bool create) const
 {
   if(d->attachments)
     return d->attachments;
@@ -139,7 +137,7 @@ void Matroska::File::read(bool, Properties::ReadStyle)
 
   // Find the Matroska segment in the file
   std::unique_ptr<EBML::MkSegment> segment(
-    static_cast<EBML::MkSegment*>(
+    static_cast<EBML::MkSegment *>(
       EBML::findElement(*this, EBML::ElementIDs::MkSegment, fileLength - tell())
     )
   );
@@ -176,34 +174,34 @@ bool Matroska::File::save()
     return false;
   }
 
-  List<Element*> renderList;
-  List<Element*> newElements;
+  List<Element *> renderList;
+  List<Element *> newElements;
 
   // List of all possible elements we can write
-  List<Element*> elements {
+  List<Element *> elements {
     d->attachments,
     d->tag
   };
 
- /* Build render list. New elements will be added
-  * to the end of the file. For new elements,
-  * the order is from least likely to change,
-  * to most likely to change:
-  *   1. Bookmarks (todo)
-  *   2. Attachments
-  *   3. Tags
-  */
-  for (auto element : elements) {
-    if (!element)
+  /* Build render list. New elements will be added
+   * to the end of the file. For new elements,
+   * the order is from least likely to change,
+   * to most likely to change:
+   *   1. Bookmarks (todo)
+   *   2. Attachments
+   *   3. Tags
+   */
+  for(auto element : elements) {
+    if(!element)
       continue;
-    if (element->size())
+    if(element->size())
       renderList.append(element);
     else {
       element->setOffset(length());
       newElements.append(element);
     }
   }
-  if (renderList.isEmpty())
+  if(renderList.isEmpty())
     return true;
 
   auto sortAscending = [](const auto a, const auto b) { return a->offset() < b->offset(); };
@@ -211,18 +209,18 @@ bool Matroska::File::save()
   renderList.append(newElements);
 
   // Add our new elements to the Seek Head (if the file has one)
-  if (d->seekHead) {
+  if(d->seekHead) {
     auto segmentDataOffset = d->segment->dataOffset();
-    for (auto element : newElements)
+    for(auto element : newElements)
       d->seekHead->addEntry(element->id(), element->offset() - segmentDataOffset);
     d->seekHead->sort();
   }
 
   // Set up listeners, add seek head and segment length to the end
   for(auto it = renderList.begin(); it != renderList.end(); ++it) {
-    for (auto it2 = std::next(it); it2 != renderList.end(); ++it2)
+    for(auto it2 = std::next(it); it2 != renderList.end(); ++it2)
       (*it)->addSizeListener(*it2);
-    if (d->seekHead)
+    if(d->seekHead)
       (*it)->addSizeListener(d->seekHead);
     (*it)->addSizeListener(d->segment);
   }
@@ -235,7 +233,7 @@ bool Matroska::File::save()
 
   // Render the elements
   for(auto element : renderList) {
-    if (!element->render())
+    if(!element->render())
       return false;
   }
 

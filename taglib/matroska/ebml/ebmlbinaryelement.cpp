@@ -19,14 +19,11 @@
  ***************************************************************************/
 
 #include "ebmlbinaryelement.h"
-#include "tfile.h"
-#include "tbytevector.h"
-#include "tdebug.h"
-#include <string>
+#include "ebmlutils.h"
 
 using namespace TagLib;
 
-bool EBML::BinaryElement::read(TagLib::File &file)
+bool EBML::BinaryElement::read(File &file)
 {
   value = file.readBlock(dataSize);
   if(value.size() != dataSize) {

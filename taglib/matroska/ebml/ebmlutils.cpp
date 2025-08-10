@@ -30,7 +30,7 @@
 
 using namespace TagLib;
 
-EBML::Element* EBML::findElement(File &file, EBML::Element::Id id, offset_t maxOffset)
+EBML::Element *EBML::findElement(File &file, Element::Id id, offset_t maxOffset)
 {
   Element *element = nullptr;
   while(file.tell() < maxOffset) {
@@ -44,12 +44,12 @@ EBML::Element* EBML::findElement(File &file, EBML::Element::Id id, offset_t maxO
   return element;
 }
 
-EBML::Element* EBML::findNextElement(File &file, offset_t maxOffset)
+EBML::Element *EBML::findNextElement(File &file, offset_t maxOffset)
 {
   return file.tell() < maxOffset ? Element::factory(file) : nullptr;
 }
 
-template<typename T>
+template <typename T>
 std::pair<int, T> EBML::readVINT(File &file)
 {
   static_assert(sizeof(T) == 8);
@@ -64,7 +64,7 @@ std::pair<int, T> EBML::readVINT(File &file)
 
   if(nb_bytes > 1)
     buffer.append(file.readBlock(nb_bytes - 1));
-  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - (7 * nb_bytes);
+  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - 7 * nb_bytes;
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
   return { nb_bytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
@@ -73,7 +73,7 @@ namespace TagLib::EBML {
   template std::pair<int, uint64_t> readVINT<uint64_t>(File &file);
 }
 
-template<typename T>
+template <typename T>
 std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
 {
   if(buffer.isEmpty())
@@ -83,7 +83,7 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
   if(!numBytes)
     return {0, 0};
 
-  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - (7 * numBytes);
+  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - 7 * numBytes;
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
   return { numBytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
@@ -95,11 +95,11 @@ namespace TagLib::EBML {
 ByteVector EBML::renderVINT(uint64_t number, int minSizeLength)
 {
   int numBytes = std::max(minSizeLength, minSize(number));
-  number |= (1ULL << (numBytes * 7));
+  number |= 1ULL << (numBytes * 7);
   static const auto byteOrder = Utils::systemByteOrder();
-  if (byteOrder == Utils::LittleEndian)
+  if(byteOrder == Utils::LittleEndian)
     number = Utils::byteSwap(number);
-  return ByteVector((char*) &number + (sizeof(number) - numBytes), numBytes);
+  return ByteVector(reinterpret_cast<char *>(&number) + (sizeof(number) - numBytes), numBytes);
 }
 
 unsigned long long EBML::randomUID()

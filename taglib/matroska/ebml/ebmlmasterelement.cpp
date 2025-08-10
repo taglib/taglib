@@ -21,11 +21,7 @@
 #include "ebmlmasterelement.h"
 #include "ebmlvoidelement.h"
 #include "ebmlutils.h"
-#include "matroskafile.h"
-
 #include "tfile.h"
-#include "tdebug.h"
-#include "tutils.h"
 
 using namespace TagLib;
 
@@ -56,9 +52,9 @@ ByteVector EBML::MasterElement::render()
   dataSize = data.size();
   buffer.append(renderVINT(dataSize, 0));
   buffer.append(data);
-  if (minRenderSize) {
+  if(minRenderSize) {
     auto bufferSize = buffer.size();
-    if(minRenderSize >= (bufferSize + MIN_VOID_ELEMENT_SIZE))
+    if(minRenderSize >= bufferSize + MIN_VOID_ELEMENT_SIZE)
       buffer.append(VoidElement::renderSize(minRenderSize - bufferSize));
   }
   return buffer;

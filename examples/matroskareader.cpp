@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 
   const TagLib::Matroska::SimpleTagsList &list = tag->simpleTagsList();
   printf("Found %u tag(s):\n", list.size());
-  
+
   for(TagLib::Matroska::SimpleTag *t : list) {
     PRINT_PRETTY("Tag Name", t->name().toCString(true));
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     if((tString = dynamic_cast<TagLib::Matroska::SimpleTagString*>(t)))
       PRINT_PRETTY("Tag Value", tString->value().toCString(true));
     else if((tBinary = dynamic_cast<TagLib::Matroska::SimpleTagBinary*>(t)))
-      PRINT_PRETTY("Tag Value", 
+      PRINT_PRETTY("Tag Value",
         TagLib::Utils::formatString("Binary with size %i", tBinary->value().size()).toCString(false)
       );
 

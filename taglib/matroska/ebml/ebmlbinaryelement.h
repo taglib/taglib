@@ -22,10 +22,7 @@
 #define TAGLIB_EBMLBINARYELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include <cstdint>
 #include "ebmlelement.h"
-#include "ebmlutils.h"
-#include "tbytevector.h"
 
 namespace TagLib {
   class File;
@@ -33,13 +30,16 @@ namespace TagLib {
     class BinaryElement : public Element
     {
     public:
-      BinaryElement(Id id, int sizeLength, offset_t dataSize)
-      : Element(id, sizeLength, dataSize)
-      {}
-      BinaryElement(Id id)
-      : Element(id, 0, 0)
-      {}
-      const ByteVector& getValue() const { return value; }
+      BinaryElement(Id id, int sizeLength, offset_t dataSize) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
+
+      explicit BinaryElement(Id id) :
+        Element(id, 0, 0)
+      {
+      }
+      const ByteVector &getValue() const { return value; }
       void setValue(const ByteVector &value) { this->value = value; }
       bool read(File &file) override;
       ByteVector render() override;

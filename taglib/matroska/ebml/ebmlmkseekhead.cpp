@@ -25,7 +25,7 @@
 
 using namespace TagLib;
 
-Matroska::SeekHead* EBML::MkSeekHead::parse()
+Matroska::SeekHead *EBML::MkSeekHead::parse()
 {
   auto seekHead = new Matroska::SeekHead();
   seekHead->setOffset(offset);
@@ -34,18 +34,18 @@ Matroska::SeekHead* EBML::MkSeekHead::parse()
   for(auto element : elements) {
     if(element->getId() != ElementIDs::MkSeek)
       continue;
-    auto seekElement = static_cast<MasterElement*>(element);
+    auto seekElement = static_cast<MasterElement *>(element);
     Matroska::Element::ID entryId = 0;
     offset_t offset = 0;
     for(auto seekElementChild : *seekElement) {
       Id id = seekElementChild->getId();
       if(id == ElementIDs::MkSeekID && !entryId) {
-        auto data = static_cast<BinaryElement*>(seekElementChild)->getValue();
+        auto data = static_cast<BinaryElement *>(seekElementChild)->getValue();
         if(data.size() == 4)
           entryId = data.toUInt(true);
       }
       else if(id == ElementIDs::MkSeekPosition && !offset)
-        offset = static_cast<UIntElement*>(seekElementChild)->getValue();
+        offset = static_cast<UIntElement *>(seekElementChild)->getValue();
     }
     if(entryId && offset)
       seekHead->addEntry(entryId, offset);

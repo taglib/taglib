@@ -42,9 +42,9 @@ namespace TagLib {
         Edition = 60,
         Collection = 70
       };
-      const String& name() const;
+      const String &name() const;
       TargetTypeValue targetTypeValue() const;
-      const String& language() const;
+      const String &language() const;
       bool defaultLanguageFlag() const;
       void setName(const String &name);
       void setTargetTypeValue(TargetTypeValue targetTypeValue);
@@ -66,7 +66,7 @@ namespace TagLib {
     public:
       SimpleTagString();
       ~SimpleTagString() override;
-      const String& value() const;
+      const String &value() const;
       void setValue(const String &value);
 
     private:
@@ -80,7 +80,7 @@ namespace TagLib {
     public:
       SimpleTagBinary();
       ~SimpleTagBinary() override;
-      const ByteVector& value() const;
+      const ByteVector &value() const;
       void setValue(const ByteVector &value);
 
     private:

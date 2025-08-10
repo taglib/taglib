@@ -21,7 +21,6 @@
 #include "ebmlvoidelement.h"
 #include "ebmlutils.h"
 #include "tbytevector.h"
-#include "tdebug.h"
 
 #include <algorithm>
 
@@ -36,7 +35,7 @@ ByteVector EBML::VoidElement::render()
   bytesNeeded -= sizeLength;
   dataSize = bytesNeeded;
   buffer.append(renderVINT(dataSize, sizeLength));
-  if (dataSize)
+  if(dataSize)
     buffer.append(ByteVector(static_cast<unsigned int>(dataSize), 0));
 
   return buffer;

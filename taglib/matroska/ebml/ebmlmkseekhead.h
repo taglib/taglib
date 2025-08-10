@@ -18,12 +18,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-
 #ifndef TAGLIB_EBMLMKSEEKHEAD_H
 #define TAGLIB_EBMLMKSEEKHEAD_H
 #ifndef DO_NOT_DOCUMENT
+
+#include "ebmlmasterelement.h"
+#include "taglib.h"
 
 namespace TagLib {
   namespace Matroska {
@@ -33,17 +33,19 @@ namespace TagLib {
     class MkSeekHead : public MasterElement
     {
     public:
-      MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSeekHead, sizeLength, dataSize, offset)
-      {}
-      MkSeekHead()
-      : MasterElement(ElementIDs::MkSeekHead, 0, 0, 0)
-      {}
+      MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(ElementIDs::MkSeekHead, sizeLength, dataSize, offset)
+      {
+      }
+      MkSeekHead() :
+        MasterElement(ElementIDs::MkSeekHead, 0, 0, 0)
+      {
+      }
 
-      Matroska::SeekHead* parse();
-
+      Matroska::SeekHead *parse();
     };
   }
 }
+
 #endif
 #endif

@@ -18,13 +18,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "ebmlutils.h"
-#include "taglib.h"
-
 #ifndef TAGLIB_EBMLMKTAGS_H
 #define TAGLIB_EBMLMKTAGS_H
 #ifndef DO_NOT_DOCUMENT
+
+#include "ebmlmasterelement.h"
+#include "ebmlutils.h"
+#include "taglib.h"
 
 namespace TagLib {
   namespace Matroska {
@@ -35,17 +35,19 @@ namespace TagLib {
     class MkTags : public MasterElement
     {
     public:
-      MkTags(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkTags, sizeLength, dataSize, offset)
-      {}
-      MkTags()
-      : MasterElement(ElementIDs::MkTags, 0, 0, 0)
-      {}
+      MkTags(int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(ElementIDs::MkTags, sizeLength, dataSize, offset)
+      {
+      }
+      MkTags() :
+        MasterElement(ElementIDs::MkTags, 0, 0, 0)
+      {
+      }
 
-      Matroska::Tag* parse();
-
+      Matroska::Tag *parse();
     };
   }
 }
+
 #endif
 #endif

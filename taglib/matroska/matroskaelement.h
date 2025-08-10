@@ -25,10 +25,8 @@
 #include <memory>
 #include "taglib_export.h"
 #include "taglib.h"
-#include "tutils.h"
 #include "tbytevector.h"
 #include "tlist.h"
-
 
 namespace TagLib {
   class File;
@@ -37,7 +35,7 @@ namespace TagLib {
     {
     public:
       using ID = unsigned int;
-      Element(ID id);
+      explicit Element(ID id);
       virtual ~Element();
 
       offset_t size() const;
@@ -50,12 +48,12 @@ namespace TagLib {
       //virtual ByteVector render() = 0;
       virtual bool render() = 0;
       void setData(const ByteVector &data);
-      const ByteVector& data() const;
+      const ByteVector &data() const;
       virtual void write(TagLib::File &file);
       void addSizeListener(Element *element);
-      void addSizeListeners(const List<Element*> &elements);
+      void addSizeListeners(const List<Element *> &elements);
       void addOffsetListener(Element *element);
-      void addOffsetListeners(const List<Element*> &elements);
+      void addOffsetListeners(const List<Element *> &elements);
       //virtual void updatePosition(Element &caller, offset_t delta) = 0;
       bool emitSizeChanged(offset_t delta);
       bool emitOffsetChanged(offset_t delta);
@@ -72,6 +70,7 @@ namespace TagLib {
       inline constexpr Element::ID MkAttachments = 0x1941A469;
       inline constexpr Element::ID MkSeekHead    = 0x114D9B74;
       inline constexpr Element::ID MkSegment     = 0x18538067;
+      inline constexpr Element::ID MkCues        = 0x1C53BB6B;
     }
   }
 }

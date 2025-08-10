@@ -24,7 +24,6 @@
 
 #include "matroskaelement.h"
 #include "tbytevector.h"
-#include "tutils.h"
 #include "tlist.h"
 
 namespace TagLib {
@@ -33,9 +32,9 @@ namespace TagLib {
     class SeekHead : public Element
     {
     public:
-      SeekHead() : Element(ElementIDs::MkSeekHead) {};
-      virtual ~SeekHead() {};
-      void addEntry(Element &element);
+      SeekHead() : Element(ElementIDs::MkSeekHead) {}
+      ~SeekHead() override = default;
+      void addEntry(const Element &element);
       void addEntry(ID id, offset_t offset);
       bool render() override;
       void write(TagLib::File &file) override;

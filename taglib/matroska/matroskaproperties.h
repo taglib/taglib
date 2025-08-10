@@ -24,54 +24,49 @@
 #include "taglib_export.h"
 #include "audioproperties.h"
 
+namespace TagLib::Matroska {
 
-namespace TagLib {
+  class File;
 
-  namespace Matroska {
+  //! An implementation of Matroska audio properties
+  class TAGLIB_EXPORT Properties : public AudioProperties
+  {
+  public:
+    explicit Properties(File *file, ReadStyle style = Average);
+    ~Properties() override;
 
-    class File;
+    Properties(const Properties &) = delete;
+    Properties &operator=(const Properties &) = delete;
 
-    //! An implementation of Matroska audio properties
-    class TAGLIB_EXPORT Properties : public AudioProperties
-    {
-    public:
+    /*!
+     * Returns the length of the file in milliseconds.
+     *
+     * \see lengthInSeconds()
+     */
+    int lengthInMilliseconds() const override;
 
-      Properties(File *file, ReadStyle style = Average);
-      ~Properties() override;
+    /*!
+     * Returns the average bit rate of the file in kb/s.
+     */
+    int bitrate() const override;
 
-      Properties(const Properties &) = delete;
-      Properties &operator=(const Properties &) = delete;
+    /*!
+     * Returns the sample rate in Hz.
+     */
+    int sampleRate() const override;
 
-      /*!
-       * Returns the length of the file in milliseconds.
-       *
-       * \see lengthInSeconds()
-       */
-      int lengthInMilliseconds() const override;
+    /*!
+     * Returns the number of audio channels.
+     */
+    int channels() const override;
 
-      /*!
-       * Returns the average bit rate of the file in kb/s.
-       */
-      int bitrate() const override;
+  private:
+    void read(File *file);
 
-      /*!
-       * Returns the sample rate in Hz.
-       */
-      int sampleRate() const override;
-
-      /*!
-       * Returns the number of audio channels.
-       */
-      int channels() const override;
-
-    private:
-      void read(File *file);
-
-      class PropertiesPrivate;
-      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
-      std::unique_ptr<PropertiesPrivate> d;
-    };
-  }  // namespace Matroska
-}  // namespace TagLib
+    class PropertiesPrivate;
+    TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
+    std::unique_ptr<PropertiesPrivate> d;
+  };
+}
 
 #endif

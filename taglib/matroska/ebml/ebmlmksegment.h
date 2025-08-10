@@ -18,13 +18,12 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "taglib.h"
-#include <tuple>
-
 #ifndef TAGLIB_EBMLMKSEGMENT_H
 #define TAGLIB_EBMLMKSEGMENT_H
 #ifndef DO_NOT_DOCUMENT
+
+#include "ebmlmasterelement.h"
+#include "taglib.h"
 
 namespace TagLib {
   namespace Matroska {
@@ -40,15 +39,16 @@ namespace TagLib {
     class MkSegment : public MasterElement
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
-      {}
+      MkSegment(int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
+      {
+      }
       ~MkSegment() override;
       bool read(File &file) override;
-      Matroska::Tag* parseTag();
-      Matroska::Attachments* parseAttachments();
-      Matroska::SeekHead* parseSeekHead();
-      Matroska::Segment* parseSegment();
+      Matroska::Tag *parseTag();
+      Matroska::Attachments *parseAttachments();
+      Matroska::SeekHead *parseSeekHead();
+      Matroska::Segment *parseSegment();
 
     private:
       MkTags *tags = nullptr;

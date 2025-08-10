@@ -23,7 +23,6 @@
 
 #include "taglib_export.h"
 
-
 namespace TagLib {
   class String;
   class ByteVector;
@@ -36,13 +35,13 @@ namespace TagLib {
       ~AttachedFile();
 
       void setFileName(const String &fileName);
-      const String& fileName() const;
+      const String &fileName() const;
       void setDescription(const String &description);
-      const String& description() const;
+      const String &description() const;
       void setMediaType(const String &mediaType);
-      const String& mediaType() const;
+      const String &mediaType() const;
       void setData(const ByteVector &data);
-      const ByteVector& data() const;
+      const ByteVector &data() const;
       void setUID(UID uid);
       UID uid() const;
 

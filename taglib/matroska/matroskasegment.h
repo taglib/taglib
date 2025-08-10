@@ -23,30 +23,29 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "matroskaelement.h"
-#include "tutils.h"
 
-namespace TagLib {
-  namespace Matroska {
-    class Segment : public Element
+namespace TagLib::Matroska {
+  class Segment : public Element
+  {
+  public:
+    Segment(offset_t sizeLength, offset_t dataSize, offset_t lengthOffset) :
+      Element(ElementIDs::MkSegment), sizeLength(sizeLength), dataSize(dataSize)
     {
-    public:
-      Segment(offset_t sizeLength, offset_t dataSize, offset_t lengthOffset) 
-      : Element(ElementIDs::MkSegment), sizeLength(sizeLength), dataSize(dataSize)
-      {
-        setOffset(lengthOffset);
-        setSize(sizeLength);
-      }
-      virtual ~Segment() = default;
-      bool render() override;
-      bool sizeChanged(Element &caller, offset_t delta) override;
-      offset_t dataOffset() const { return offset() + sizeLength; }
-    
-    private:
-      offset_t sizeLength;
-      offset_t dataSize;
-    };
-  }
+      setOffset(lengthOffset);
+      setSize(sizeLength);
+    }
+
+    ~Segment() override = default;
+    bool render() override;
+    bool sizeChanged(Element &caller, offset_t delta) override;
+    offset_t dataOffset() const { return offset() + sizeLength; }
+
+  private:
+    offset_t sizeLength;
+    offset_t dataSize;
+  };
 }
+
 
 #endif
 #endif

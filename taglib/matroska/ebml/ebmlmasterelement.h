@@ -22,48 +22,46 @@
 #define TAGLIB_EBMLMASTERELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include "ebmlutils.h"
 #include "ebmlelement.h"
 #include "tbytevector.h"
 #include "tlist.h"
 #include "taglib.h"
 
-namespace TagLib {
-  namespace EBML {
-    class MasterElement : public Element
+namespace TagLib::EBML {
+  class MasterElement : public Element
+  {
+  public:
+    MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset) :
+      Element(id, sizeLength, dataSize), offset(offset)
     {
-    public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset)
-      : Element(id, sizeLength, dataSize), offset(offset)
-      {}
-      MasterElement(Id id)
-      : Element(id, 0, 0), offset(0)
-      {}
-      ~MasterElement() override;
-      offset_t getOffset() const { return offset; }
-      bool read(File &file) override;
-      ByteVector render() override;
-      void appendElement(Element *element) { elements.append(element); }
-      List<Element*>::Iterator begin () { return elements.begin(); }
-      List<Element*>::Iterator end () { return elements.end(); }
-      List<Element*>::ConstIterator cbegin () const { return elements.cbegin(); }
-      List<Element*>::ConstIterator cend () const { return elements.cend(); }
-      offset_t getPadding() const { return padding; }
-      void setPadding(offset_t padding) { this->padding = padding; }
-      offset_t getMinRenderSize() const { return minRenderSize; }
-      void setMinRenderSize(offset_t minRenderSize) { this->minRenderSize = minRenderSize; }
+    }
 
+    explicit MasterElement(Id id) :
+      Element(id, 0, 0), offset(0)
+    {
+    }
+    ~MasterElement() override;
+    offset_t getOffset() const { return offset; }
+    bool read(File &file) override;
+    ByteVector render() override;
+    void appendElement(Element *element) { elements.append(element); }
+    List<Element *>::Iterator begin() { return elements.begin(); }
+    List<Element *>::Iterator end() { return elements.end(); }
+    List<Element *>::ConstIterator cbegin() const { return elements.cbegin(); }
+    List<Element *>::ConstIterator cend() const { return elements.cend(); }
+    offset_t getPadding() const { return padding; }
+    void setPadding(offset_t padding) { this->padding = padding; }
+    offset_t getMinRenderSize() const { return minRenderSize; }
+    void setMinRenderSize(offset_t minRenderSize) { this->minRenderSize = minRenderSize; }
 
-    protected:
-      offset_t offset;
-      offset_t padding = 0;
-      offset_t minRenderSize = 0;
-      List<Element*> elements;
-    };
-    
-  }
+  protected:
+    offset_t offset;
+    offset_t padding = 0;
+    offset_t minRenderSize = 0;
+    List<Element *> elements;
+  };
+
 }
-
 
 #endif
 #endif

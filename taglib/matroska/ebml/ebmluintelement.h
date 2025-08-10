@@ -22,7 +22,6 @@
 #define TAGLIB_EBMLUINTELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include <cstdint>
 #include "ebmlelement.h"
 
 namespace TagLib {
@@ -32,12 +31,15 @@ namespace TagLib {
     class UIntElement : public Element
     {
     public:
-      UIntElement(Id id, int sizeLength, offset_t dataSize)
-      : Element(id, sizeLength, dataSize)
-      {}
-      UIntElement(Id id)
-      : UIntElement(id, 0, 0)
-      {}
+      UIntElement(Id id, int sizeLength, offset_t dataSize) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
+
+      explicit UIntElement(Id id) :
+        UIntElement(id, 0, 0)
+      {
+      }
       unsigned long long getValue() const { return value; }
       void setValue(unsigned long long value) { this->value = value; }
       bool read(File &file) override;
@@ -45,10 +47,6 @@ namespace TagLib {
 
     private:
       unsigned long long value = 0;
-
-    //protected:
-
-
     };
   }
 }

@@ -21,17 +21,13 @@
 #include "ebmlmktags.h"
 #include "ebmluintelement.h"
 #include "ebmlstringelement.h"
-#include "ebmlutils.h"
-#include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskasimpletag.h"
 #include "tlist.h"
-#include "tdebug.h"
-#include "tutils.h"
 
 using namespace TagLib;
 
-Matroska::Tag* EBML::MkTags::parse()
+Matroska::Tag *EBML::MkTags::parse()
 {
   auto mTag = new Matroska::Tag();
   mTag->setOffset(offset);
@@ -42,17 +38,17 @@ Matroska::Tag* EBML::MkTags::parse()
   for(auto tagsChild : elements) {
     if(tagsChild->getId() != ElementIDs::MkTag)
       continue;
-    auto tag = static_cast<MasterElement*>(tagsChild);
-    List<MasterElement*> simpleTags;
+    auto tag = static_cast<MasterElement *>(tagsChild);
+    List<MasterElement *> simpleTags;
     MasterElement *targets = nullptr;
 
     // Identify the <Targets> element and the <SimpleTag> elements
     for(auto tagChild : *tag) {
       Id tagChildId = tagChild->getId();
       if(!targets && tagChildId == ElementIDs::MkTagTargets)
-        targets = static_cast<MasterElement*>(tagChild);
+        targets = static_cast<MasterElement *>(tagChild);
       else if(tagChildId == ElementIDs::MkSimpleTag)
-        simpleTags.append(static_cast<MasterElement*>(tagChild));
+        simpleTags.append(static_cast<MasterElement *>(tagChild));
     }
 
     // Parse the <Targets> element
@@ -63,8 +59,8 @@ Matroska::Tag* EBML::MkTags::parse()
         if(id == ElementIDs::MkTagTargetTypeValue
             && targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) {
           targetTypeValue = static_cast<Matroska::SimpleTag::TargetTypeValue>(
-            static_cast<UIntElement*>(targetsChild)->getValue()
-          );            
+            static_cast<UIntElement *>(targetsChild)->getValue()
+          );
         }
       }
     }
@@ -80,13 +76,14 @@ Matroska::Tag* EBML::MkTags::parse()
       for(auto simpleTagChild : *simpleTag) {
         Id id = simpleTagChild->getId();
         if(id == ElementIDs::MkTagName && !tagName)
-          tagName = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
+          tagName = &(static_cast<UTF8StringElement *>(simpleTagChild)->getValue());
         else if(id == ElementIDs::MkTagString && !tagValueString)
-          tagValueString = &(static_cast<UTF8StringElement*>(simpleTagChild)->getValue());
+          tagValueString = &(static_cast<UTF8StringElement *>(simpleTagChild)->getValue());
+        // TODO implement binary
         else if(id == ElementIDs::MkTagsTagLanguage && !language)
-          language = &(static_cast<Latin1StringElement*>(simpleTagChild)->getValue());
+          language = &(static_cast<Latin1StringElement *>(simpleTagChild)->getValue());
         else if(id == ElementIDs::MkTagsLanguageDefault)
-          defaultLanguageFlag = static_cast<UIntElement*>(simpleTagChild)->getValue() ? true : false;
+          defaultLanguageFlag = static_cast<UIntElement *>(simpleTagChild)->getValue() ? true : false;
       }
       if(!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
         continue;

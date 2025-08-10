@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "matroskatag.h"
+#include <algorithm>
+#include <array>
+#include <tuple>
 #include "matroskasimpletag.h"
 #include "ebmlmasterelement.h"
 #include "ebmlstringelement.h"
@@ -27,35 +30,24 @@
 #include "ebmlutils.h"
 #include "tpropertymap.h"
 #include "tlist.h"
-#include "tdebug.h"
-
-#include <algorithm>
-#include <array>
-#include <tuple>
 
 using namespace TagLib;
 
-namespace TagLib {
-  namespace Matroska {
-    namespace Utils {
-      std::pair<String, Matroska::SimpleTag::TargetTypeValue> translateKey(const String &key);
-      String translateTag(const String &name, Matroska::SimpleTag::TargetTypeValue targetTypeValue);
-    }
-  }
+namespace TagLib::Matroska::Utils {
+  std::pair<String, SimpleTag::TargetTypeValue> translateKey(const String &key);
+  String translateTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue);
 }
 
-class Matroska::Tag::TagPrivate 
+class Matroska::Tag::TagPrivate
 {
-  public:
-    TagPrivate() = default;
-    ~TagPrivate() = default;
-    List<SimpleTag*> tags;
-    ByteVector data;
-
+public:
+  TagPrivate() = default;
+  ~TagPrivate() = default;
+  List<SimpleTag *> tags;
+  ByteVector data;
 };
 
-Matroska::Tag::Tag()
-: TagLib::Tag(),
+Matroska::Tag::Tag() :
   Element(ElementIDs::MkTags),
   d(std::make_unique<TagPrivate>())
 {
@@ -82,17 +74,17 @@ void Matroska::Tag::clearSimpleTags()
   d->tags.clear();
 }
 
-const Matroska::SimpleTagsList& Matroska::Tag::simpleTagsList() const
+const Matroska::SimpleTagsList &Matroska::Tag::simpleTagsList() const
 {
   return d->tags;
 }
 
-Matroska::SimpleTagsList& Matroska::Tag::simpleTagsListPrivate()
+Matroska::SimpleTagsList &Matroska::Tag::simpleTagsListPrivate()
 {
   return d->tags;
 }
 
-const Matroska::SimpleTagsList& Matroska::Tag::simpleTagsListPrivate() const
+const Matroska::SimpleTagsList &Matroska::Tag::simpleTagsListPrivate() const
 {
   return d->tags;
 }
@@ -135,31 +127,31 @@ void Matroska::Tag::setTrack(unsigned int i)
 String Matroska::Tag::title() const
 {
   const auto value = getTag("TITLE");
-  return value ? *value : String(); 
+  return value ? *value : String();
 }
 
 String Matroska::Tag::artist() const
 {
   const auto value = getTag("ARTIST");
-  return value ? *value : String(); 
+  return value ? *value : String();
 }
 
 String Matroska::Tag::album() const
 {
   const auto value = getTag("ALBUM");
-  return value ? *value : String(); 
+  return value ? *value : String();
 }
 
 String Matroska::Tag::comment() const
-{ 
+{
   const auto value = getTag("COMMENT");
-  return value ? *value : String(); 
+  return value ? *value : String();
 }
 
 String Matroska::Tag::genre() const
 {
   const auto value = getTag("GENRE");
-  return value ? *value : String(); 
+  return value ? *value : String();
 }
 
 unsigned int Matroska::Tag::year() const
@@ -188,7 +180,7 @@ bool Matroska::Tag::isEmpty() const
 bool Matroska::Tag::render()
 {
   EBML::MkTags tags;
-  List<List<SimpleTag*>*> targetList;
+  List<List<SimpleTag *> *> targetList;
   targetList.setAutoDelete(true);
 
   // Build target-based list
@@ -202,7 +194,7 @@ bool Matroska::Tag::render()
       }
     );
     if(it == targetList.end()) {
-      auto list = new List<SimpleTag*>();
+      auto list = new List<SimpleTag *>();
       list->append(tag);
       targetList.append(list);
     }
@@ -216,7 +208,7 @@ bool Matroska::Tag::render()
 
     // Build <Tag Targets> element
     auto targets = new EBML::MasterElement(EBML::ElementIDs::MkTagTargets);
-    if(targetTypeValue != Matroska::SimpleTag::TargetTypeValue::None) {
+    if(targetTypeValue != SimpleTag::TargetTypeValue::None) {
       auto element = new EBML::UIntElement(EBML::ElementIDs::MkTagTargetTypeValue);
       element->setValue(static_cast<unsigned int>(targetTypeValue));
       targets->appendElement(element);
@@ -231,14 +223,14 @@ bool Matroska::Tag::render()
       t->appendElement(tagName);
 
       // Tag Value
-      Matroska::SimpleTagString *tStr = nullptr;
-      Matroska::SimpleTagBinary *tBin = nullptr;
-      if((tStr = dynamic_cast<Matroska::SimpleTagString*>(simpleTag))) {
+      SimpleTagString *tStr = nullptr;
+      SimpleTagBinary *tBin = nullptr;
+      if((tStr = dynamic_cast<SimpleTagString *>(simpleTag))) {
         auto tagValue = new EBML::UTF8StringElement(EBML::ElementIDs::MkTagString);
         tagValue->setValue(tStr->value());
         t->appendElement(tagValue);
       }
-      else if((tBin = dynamic_cast<Matroska::SimpleTagBinary*>(simpleTag))) {
+      else if((tBin = dynamic_cast<Matroska::SimpleTagBinary *>(simpleTag))) {
         // Todo
       }
 
@@ -261,8 +253,8 @@ bool Matroska::Tag::render()
   auto data = tags.render();
   auto beforeSize = size();
   auto afterSize = data.size();
-  if (afterSize != beforeSize) {
-    if (!emitSizeChanged(afterSize - beforeSize))
+  if(afterSize != beforeSize) {
+    if(!emitSizeChanged(afterSize - beforeSize))
       return false;
   }
   setData(data);
@@ -307,20 +299,20 @@ namespace
 
 bool Matroska::Tag::setTag(const String &key, const String &value)
 {
-  const auto pair = Matroska::Utils::translateKey(key);
+  const auto pair = Utils::translateKey(key);
   // Workaround Clang issue - no lambda capture of structured bindings
   const String &name = pair.first;
   auto targetTypeValue = pair.second;
   if(name.isEmpty())
     return false;
   removeSimpleTags(
-    [&name, targetTypeValue] (auto t) { 
-      return t->name() == name 
+    [&name, targetTypeValue] (auto t) {
+      return t->name() == name
              && t->targetTypeValue() == targetTypeValue;
     }
   );
   if(!value.isEmpty()) {
-    auto t = new Matroska::SimpleTagString();
+    auto t = new SimpleTagString();
     t->setTargetTypeValue(targetTypeValue);
     t->setName(name);
     t->setValue(value);
@@ -329,15 +321,15 @@ bool Matroska::Tag::setTag(const String &key, const String &value)
   return true;
 }
 
-const String* Matroska::Tag::getTag(const String &key) const
+const String *Matroska::Tag::getTag(const String &key) const
 {
-  const auto pair = Matroska::Utils::translateKey(key);
+  const auto pair = Utils::translateKey(key);
   // Workaround Clang issue - no lambda capture of structured bindings
   const String &name = pair.first;
   auto targetTypeValue = pair.second;
   if(name.isEmpty())
     return nullptr;
-  auto tag = dynamic_cast<const Matroska::SimpleTagString*>(
+  auto tag = dynamic_cast<const SimpleTagString *>(
     findSimpleTag(
       [&name, targetTypeValue] (auto t) {
         return t->name() == name
@@ -351,16 +343,16 @@ const String* Matroska::Tag::getTag(const String &key) const
 std::pair<String, Matroska::SimpleTag::TargetTypeValue> Matroska::Utils::translateKey(const String &key)
 {
   auto it = std::find_if(simpleTagsTranslation.cbegin(),
-    simpleTagsTranslation.cend(), 
+    simpleTagsTranslation.cend(),
     [&key](const auto &t) { return key == std::get<0>(t); }
   );
   if(it != simpleTagsTranslation.end())
     return { std::get<1>(*it), std::get<2>(*it) };
   else
-    return { String(), Matroska::SimpleTag::TargetTypeValue::None };
+    return { String(), SimpleTag::TargetTypeValue::None };
 }
 
-String Matroska::Utils::translateTag(const String &name, Matroska::SimpleTag::TargetTypeValue targetTypeValue)
+String Matroska::Utils::translateTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue)
 {
   auto it = std::find_if(simpleTagsTranslation.cbegin(),
     simpleTagsTranslation.cend(),
@@ -375,7 +367,7 @@ String Matroska::Utils::translateTag(const String &name, Matroska::SimpleTag::Ta
 PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 {
   PropertyMap unsupportedProperties;
-  for(const auto& [key, value] : propertyMap) {
+  for(const auto &[key, value] : propertyMap) {
     if(!setTag(key, value.toString()))
       unsupportedProperties[key] = value;
   }
@@ -385,10 +377,10 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 PropertyMap Matroska::Tag::properties() const
 {
   PropertyMap properties;
-  Matroska::SimpleTagString *tStr = nullptr;
+  SimpleTagString *tStr = nullptr;
   for(auto simpleTag : d->tags) {
-    if((tStr = dynamic_cast<Matroska::SimpleTagString*>(simpleTag))) {
-      String key = Matroska::Utils::translateTag(tStr->name(), tStr->targetTypeValue());
+    if((tStr = dynamic_cast<SimpleTagString *>(simpleTag))) {
+      String key = Utils::translateTag(tStr->name(), tStr->targetTypeValue());
       if(!key.isEmpty() && !properties.contains(key))
         properties[key] = tStr->value();
     }

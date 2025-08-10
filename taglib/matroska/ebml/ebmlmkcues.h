@@ -18,13 +18,13 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "ebmlmasterelement.h"
-#include "ebmlutils.h"
-#include "taglib.h"
-
 #ifndef TAGLIB_EBMLMKCUES_H
 #define TAGLIB_EBMLMKCUES_H
 #ifndef DO_NOT_DOCUMENT
+
+#include "ebmlmasterelement.h"
+#include "ebmlutils.h"
+#include "taglib.h"
 
 namespace TagLib {
   namespace Matroska {
@@ -35,17 +35,19 @@ namespace TagLib {
     class MkCues : public MasterElement
     {
     public:
-      MkCues(int sizeLength, offset_t dataSize, offset_t offset)
-      : MasterElement(ElementIDs::MkCues, sizeLength, dataSize, offset)
-      {}
-      MkCues()
-      : MasterElement(ElementIDs::MkCues, 0, 0, 0)
-      {}
+      MkCues(int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(ElementIDs::MkCues, sizeLength, dataSize, offset)
+      {
+      }
+      MkCues() :
+        MasterElement(ElementIDs::MkCues, 0, 0, 0)
+      {
+      }
 
-      Matroska::Cues* parse();
-
+      Matroska::Cues *parse();
     };
   }
 }
+
 #endif
 #endif

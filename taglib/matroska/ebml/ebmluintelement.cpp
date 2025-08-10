@@ -26,7 +26,7 @@
 
 using namespace TagLib;
 
-bool EBML::UIntElement::read(TagLib::File &file)
+bool EBML::UIntElement::read(File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
   if(buffer.size() != dataSize) {
@@ -61,9 +61,9 @@ ByteVector EBML::UIntElement::render()
   buffer.append(renderVINT(dataSize, 0));
   uint64_t value = this->value;
   static const auto byteOrder = Utils::systemByteOrder();
-  if (byteOrder == Utils::LittleEndian)
+  if(byteOrder == Utils::LittleEndian)
     value = Utils::byteSwap(value);
 
-  buffer.append(ByteVector((char*) &value + (sizeof(value) - dataSize), dataSize));
+  buffer.append(ByteVector(reinterpret_cast<char *>(&value) + (sizeof(value) - dataSize), dataSize));
   return buffer;
 }

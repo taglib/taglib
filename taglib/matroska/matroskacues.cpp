@@ -29,8 +29,8 @@
 
 using namespace TagLib;
 
-Matroska::Cues::Cues()
-: Element(ElementIDs::MkCues)
+Matroska::Cues::Cues() :
+  Element(ElementIDs::MkCues)
 {
   cuePoints.setAutoDelete(true);
 }
@@ -38,21 +38,21 @@ Matroska::Cues::Cues()
 ByteVector Matroska::Cues::renderInternal()
 {
   EBML::MkCues cues;
-  for (auto &cuePoint : cuePoints) {
+  for(auto &cuePoint : cuePoints) {
     auto cuePointElement = new EBML::MasterElement(EBML::ElementIDs::MkCuePoint);
     auto timestamp = new EBML::UIntElement(EBML::ElementIDs::MkCueTime);
     timestamp->setValue(cuePoint->getTime());
     cuePointElement->appendElement(timestamp);
 
     auto trackList = cuePoint->cueTrackList();
-    for (auto &cueTrack : trackList) {
+    for(auto &cueTrack : trackList) {
       auto cueTrackElement = new EBML::MasterElement(EBML::ElementIDs::MkCueTrackPositions);
-      
+
       // Track number
       auto trackNumber = new EBML::UIntElement(EBML::ElementIDs::MkCueTrack);
       trackNumber->setValue(cueTrack->getTrackNumber());
       cueTrackElement->appendElement(trackNumber);
-      
+
       // Cluster position
       auto clusterPosition = new EBML::UIntElement(EBML::ElementIDs::MkCueClusterPosition);
       clusterPosition->setValue(cueTrack->getClusterPosition());
@@ -60,12 +60,11 @@ ByteVector Matroska::Cues::renderInternal()
 
       // Todo - other elements
 
-
       // Reference times
       auto referenceTimes = cueTrack->referenceTimes();
-      if (!referenceTimes.isEmpty()) {
+      if(!referenceTimes.isEmpty()) {
         auto cueReference = new EBML::MasterElement(EBML::ElementIDs::MkCueReference);
-        for (auto reference : referenceTimes) {
+        for(auto reference : referenceTimes) {
           auto refTime = new EBML::UIntElement(EBML::ElementIDs::MkCueRefTime);
           refTime->setValue(reference);
           cueReference->appendElement(refTime);
@@ -80,11 +79,10 @@ ByteVector Matroska::Cues::renderInternal()
 
 bool Matroska::Cues::render()
 {
-  if (!needsRender)
+  if(!needsRender)
     return true;
 
-
-  setData(cues.render());
+  setData(renderInternal());
   needsRender = false;
   return true;
 }
@@ -92,15 +90,15 @@ bool Matroska::Cues::render()
 bool Matroska::Cues::sizeChanged(Element &caller, offset_t delta)
 {
   offset_t offset = caller.offset();
-  for (auto cuePoint : cuePoints)
+  for(auto cuePoint : cuePoints)
     needsRender |= cuePoint->adjustOffset(offset, delta);
   return true;
 }
 
 bool Matroska::Cues::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
-  for (const auto cuePoint : cuePoints) {
-    if (!cuePoint->isValid(file, segmentDataOffset))
+  for(const auto cuePoint : cuePoints) {
+    if(!cuePoint->isValid(file, segmentDataOffset))
       return false;
   }
   return true;
@@ -113,8 +111,8 @@ Matroska::CuePoint::CuePoint()
 
 bool Matroska::CuePoint::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
-  for (const auto track : cueTracks) {
-    if (!track->isValid(file, segmentDataOffset))
+  for(const auto track : cueTracks) {
+    if(!track->isValid(file, segmentDataOffset))
       return false;
   }
   return true;
@@ -123,7 +121,7 @@ bool Matroska::CuePoint::isValid(TagLib::File &file, offset_t segmentDataOffset)
 bool Matroska::CuePoint::adjustOffset(offset_t offset, offset_t delta)
 {
   bool ret = false;
-  for (auto cueTrack : cueTracks)
+  for(auto cueTrack : cueTracks)
     ret |= cueTrack->adjustOffset(offset, delta);
 
   return ret;
@@ -131,22 +129,22 @@ bool Matroska::CuePoint::adjustOffset(offset_t offset, offset_t delta)
 
 bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
-  if (!trackNumber) {
+  if(!trackNumber) {
     debug("Cue track number not set");
     return false;
   }
-  if (!clusterPosition) {
+  if(!clusterPosition) {
     debug("Cue track cluster position not set");
     return false;
   }
   file.seek(segmentDataOffset + clusterPosition);
-  if (EBML::Element::readId(file) != EBML::ElementIDs::MkCluster) {
+  if(EBML::Element::readId(file) != EBML::ElementIDs::MkCluster) {
     debug("No cluster found at position");
     return false;
   }
-  if (codecState) {
+  if(codecState) {
     file.seek(segmentDataOffset + codecState);
-    if (EBML::Element::readId(file) != EBML::ElementIDs::MkCodecState) {
+    if(EBML::Element::readId(file) != EBML::ElementIDs::MkCodecState) {
       debug("No codec state found at position");
       return false;
     }
@@ -154,8 +152,7 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
   return true;
 }
 
-bool Matroska::CueTrack::adjustOffset(offset_t offset, offset_t delta)
+bool Matroska::CueTrack::adjustOffset(offset_t, offset_t)
 {
   return false;
 }
-

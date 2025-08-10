@@ -18,19 +18,16 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
- #include "matroskaseekhead.h"
- #include "ebmlmkseekhead.h"
- #include "ebmlbinaryelement.h"
- #include "ebmluintelement.h"
- #include "ebmlmasterelement.h"
+#include "matroskaseekhead.h"
+#include "ebmlmkseekhead.h"
+#include "ebmlbinaryelement.h"
+#include "ebmluintelement.h"
+#include "ebmlmasterelement.h"
+#include "tdebug.h"
 
- #include "tdebug.h"
- #include "tfile.h"
- #include "tutils.h"
+using namespace TagLib;
 
- using namespace TagLib;
-
-void Matroska::SeekHead::addEntry(Element &element)
+void Matroska::SeekHead::addEntry(const Element &element)
 {
   entries.append({element.id(), element.offset()});
   debug("adding to seekhead");
@@ -48,7 +45,7 @@ ByteVector Matroska::SeekHead::renderInternal()
   auto beforeSize = size();
   EBML::MkSeekHead seekHead;
   seekHead.setMinRenderSize(beforeSize);
-  for(const auto& [id, position] : entries) {
+  for(const auto &[id, position] : entries) {
     auto seekElement = new EBML::MasterElement(EBML::ElementIDs::MkSeek);
     auto idElement = new EBML::BinaryElement(EBML::ElementIDs::MkSeekID);
     idElement->setValue(ByteVector::fromUInt(id, true));
@@ -65,17 +62,17 @@ ByteVector Matroska::SeekHead::renderInternal()
 
 bool Matroska::SeekHead::render()
 {
-  if (!needsRender)
+  if(!needsRender)
     return true;
 
   auto beforeSize = size();
   auto data = renderInternal();
   needsRender = false;
   auto afterSize = data.size();
-  if (afterSize != beforeSize) {
+  if(afterSize != beforeSize) {
     return false;
-    // To do, handle expansion of seek head
-    if (!emitSizeChanged(afterSize - beforeSize))
+    // TODO handle expansion of seek head
+    if(!emitSizeChanged(afterSize - beforeSize))
       return false;
   }
 
@@ -83,9 +80,9 @@ bool Matroska::SeekHead::render()
   return true;
 }
 
-void Matroska::SeekHead::write(TagLib::File &file)
+void Matroska::SeekHead::write(File &file)
 {
-  if (!data().isEmpty())
+  if(!data().isEmpty())
     Element::write(file);
 }
 
@@ -97,19 +94,19 @@ void Matroska::SeekHead::sort()
 bool Matroska::SeekHead::sizeChanged(Element &caller, offset_t delta)
 {
   ID callerID = caller.id();
-  if (callerID == ElementIDs::MkSegment) {
+  if(callerID == ElementIDs::MkSegment) {
     adjustOffset(delta);
     return true;
   }
   else {
     offset_t offset = caller.offset();
     auto it = entries.begin();
-    while (it != entries.end()) {
+    while(it != entries.end()) {
       it = std::find_if(it,
         entries.end(),
         [offset](const auto a){ return a.second > offset; }
       );
-      if (it != entries.end()) {
+      if(it != entries.end()) {
         it->second += delta;
         needsRender = true;
         ++it;
@@ -117,5 +114,4 @@ bool Matroska::SeekHead::sizeChanged(Element &caller, offset_t delta)
     }
     return true;
   }
-  return false;
 }
