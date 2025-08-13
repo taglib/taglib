@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "ebmlmktags.h"
+#include "ebmlbinaryelement.h"
 #include "ebmluintelement.h"
 #include "ebmlstringelement.h"
 #include "matroskatag.h"
@@ -79,7 +80,8 @@ Matroska::Tag *EBML::MkTags::parse()
           tagName = &(static_cast<UTF8StringElement *>(simpleTagChild)->getValue());
         else if(id == ElementIDs::MkTagString && !tagValueString)
           tagValueString = &(static_cast<UTF8StringElement *>(simpleTagChild)->getValue());
-        // TODO implement binary
+        else if(id == ElementIDs::MkTagBinary && !tagValueBinary)
+          tagValueBinary = &(static_cast<BinaryElement *>(simpleTagChild)->getValue());
         else if(id == ElementIDs::MkTagsTagLanguage && !language)
           language = &(static_cast<Latin1StringElement *>(simpleTagChild)->getValue());
         else if(id == ElementIDs::MkTagsLanguageDefault)
@@ -96,7 +98,7 @@ Matroska::Tag *EBML::MkTags::parse()
         sTagString->setValue(*tagValueString);
         sTag = sTagString;
       }
-      else if(tagValueBinary) {
+      else { // tagValueBinary must be non null
         auto sTagBinary = new Matroska::SimpleTagBinary();
         sTagBinary->setTargetTypeValue(targetTypeValue);
         sTagBinary->setValue(*tagValueBinary);

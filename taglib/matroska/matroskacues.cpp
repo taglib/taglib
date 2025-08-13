@@ -154,5 +154,6 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
 
 bool Matroska::CueTrack::adjustOffset(offset_t, offset_t)
 {
+  // TODO implement
   return false;
 }

@@ -48,12 +48,15 @@ namespace TagLib {
       void removeAttachedFile(AttachedFile *file);
       void clear();
       const AttachedFileList &attachedFileList() const;
-      bool render() override;
 
     private:
       friend class EBML::MkAttachments;
       friend class File;
       class AttachmentsPrivate;
+
+      // private Element implementation
+      bool render() override;
+
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AttachmentsPrivate> d;
     };

@@ -46,6 +46,5 @@ namespace TagLib::Matroska {
   };
 }
 
-
 #endif
 #endif

@@ -28,6 +28,7 @@
 #include "ebmlmksegment.h"
 #include "tlist.h"
 #include "tdebug.h"
+#include "tagutils.h"
 
 #include <memory>
 #include <vector>
@@ -57,10 +58,10 @@ public:
 // static members
 ////////////////////////////////////////////////////////////////////////////////
 
-bool Matroska::File::isSupported(IOStream *)
+bool Matroska::File::isSupported(IOStream *stream)
 {
-  // TODO implement
-  return false;
+  const ByteVector id = Utils::readHeader(stream, 4, false);
+  return id.startsWith("\x1A\x45\xDF\xA3");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

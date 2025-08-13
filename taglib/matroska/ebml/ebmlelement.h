@@ -69,6 +69,7 @@ namespace TagLib::EBML {
     inline constexpr Element::Id MkSimpleTag               = 0x67C8;
     inline constexpr Element::Id MkTagName                 = 0x45A3;
     inline constexpr Element::Id MkTagLanguage             = 0x447A;
+    inline constexpr Element::Id MkTagBinary               = 0x4485;
     inline constexpr Element::Id MkTagString               = 0x4487;
     inline constexpr Element::Id MkTagsTagLanguage         = 0x447A;
     inline constexpr Element::Id MkTagsLanguageDefault     = 0x4484;

@@ -18,12 +18,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKATAG_H
-#define HAS_MATROSKATAG_H
+#ifndef TAGLIB_MATROSKATAG_H
+#define TAGLIB_MATROSKATAG_H
 
 #include <memory>
-#include <algorithm>
-#include <utility>
 
 #include "tag.h"
 #include "tstring.h"
@@ -48,10 +46,6 @@ namespace TagLib {
     public:
       Tag();
       ~Tag() override;
-      void addSimpleTag(SimpleTag *tag);
-      void removeSimpleTag(SimpleTag *tag);
-      void clearSimpleTags();
-      const SimpleTagsList &simpleTagsList() const;
       String title() const override;
       String artist() const override;
       String album() const override;
@@ -67,64 +61,22 @@ namespace TagLib {
       void setYear(unsigned int i) override;
       void setTrack(unsigned int i) override;
       bool isEmpty() const override;
-      bool render() override;
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
-      template <typename T>
-      int removeSimpleTags(T &&p)
-      {
-        auto &list = simpleTagsListPrivate();
-        int numRemoved = 0;
-        for(auto it = list.begin(); it != list.end();) {
-          it = std::find_if(it, list.end(), std::forward<T>(p));
-          if(it != list.end()) {
-            delete *it;
-            *it = nullptr;
-            it = list.erase(it);
-            numRemoved++;
-          }
-        }
-        return numRemoved;
-      }
 
-      template <typename T>
-      SimpleTagsList findSimpleTags(T &&p)
-      {
-        auto &list = simpleTagsListPrivate();
-        for(auto it = list.begin(); it != list.end();) {
-          it = std::find_if(it, list.end(), std::forward<T>(p));
-          if(it != list.end()) {
-            list.append(*it);
-            ++it;
-          }
-        }
-        return list;
-      }
-
-      template <typename T>
-      const SimpleTag *findSimpleTag(T &&p) const
-      {
-        auto &list = simpleTagsListPrivate();
-        auto it = std::find_if(list.begin(), list.end(), std::forward<T>(p));
-        return it != list.end() ? *it : nullptr;
-      }
-
-      template <typename T>
-      SimpleTag *findSimpleTag(T &&p)
-      {
-        return const_cast<SimpleTag *>(
-          const_cast<const Tag *>(this)->findSimpleTag(std::forward<T>(p))
-        );
-      }
+      void addSimpleTag(SimpleTag *tag);
+      void removeSimpleTag(SimpleTag *tag);
+      void clearSimpleTags();
+      const SimpleTagsList &simpleTagsList() const;
 
     private:
       friend class File;
       friend class EBML::MkTags;
-      SimpleTagsList &simpleTagsListPrivate();
-      const SimpleTagsList &simpleTagsListPrivate() const;
-      bool setTag(const String &key, const String &value);
-      const String *getTag(const String &key) const;
       class TagPrivate;
+
+      // private Element implementation
+      bool render() override;
+
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<TagPrivate> d;
     };
