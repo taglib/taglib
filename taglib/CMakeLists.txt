@@ -245,9 +245,12 @@ if(WITH_MATROSKA)
     matroska/ebml/ebmlmkcues.h
     matroska/ebml/ebmlmkseekhead.h
     matroska/ebml/ebmlmksegment.h
+    matroska/ebml/ebmlmkinfo.h
+    matroska/ebml/ebmlmktracks.h
     matroska/ebml/ebmlmktags.h
     matroska/ebml/ebmlstringelement.h
     matroska/ebml/ebmluintelement.h
+    matroska/ebml/ebmlfloatelement.h
     matroska/ebml/ebmlutils.h
     matroska/ebml/ebmlvoidelement.h
   )
@@ -464,9 +467,12 @@ if(WITH_MATROSKA)
     matroska/ebml/ebmlmkcues.cpp
     matroska/ebml/ebmlmkseekhead.cpp
     matroska/ebml/ebmlmksegment.cpp
+    matroska/ebml/ebmlmkinfo.cpp
+    matroska/ebml/ebmlmktracks.cpp
     matroska/ebml/ebmlmktags.cpp
     matroska/ebml/ebmlstringelement.cpp
     matroska/ebml/ebmluintelement.cpp
+    matroska/ebml/ebmlfloatelement.cpp
     matroska/ebml/ebmlutils.cpp
     matroska/ebml/ebmlvoidelement.cpp
   )

@@ -44,6 +44,7 @@ public:
     delete tag;
     delete attachments;
     delete seekHead;
+    delete segment;
   }
 
   FilePrivate(const FilePrivate &) = delete;
@@ -52,6 +53,7 @@ public:
   Attachments *attachments = nullptr;
   SeekHead *seekHead = nullptr;
   Segment *segment = nullptr;
+  std::unique_ptr<Properties> properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,6 +98,11 @@ Matroska::File::File(IOStream *stream, bool readProperties,
 
 Matroska::File::~File() = default;
 
+AudioProperties *Matroska::File::audioProperties() const
+{
+  return d->properties.get();
+}
+
 Tag *Matroska::File::tag() const
 {
   return tag(true);
@@ -123,7 +130,7 @@ Matroska::Attachments *Matroska::File::attachments(bool create) const
   }
 }
 
-void Matroska::File::read(bool, Properties::ReadStyle)
+void Matroska::File::read(bool readProperties, Properties::ReadStyle)
 {
   offset_t fileLength = length();
 
@@ -162,6 +169,12 @@ void Matroska::File::read(bool, Properties::ReadStyle)
   d->attachments = segment->parseAttachments();
 
   setValid(true);
+
+  if(readProperties) {
+    d->properties = std::make_unique<Properties>(this);
+    segment->parseInfo(d->properties.get());
+    segment->parseTracks(d->properties.get());
+  }
 }
 
 bool Matroska::File::save()

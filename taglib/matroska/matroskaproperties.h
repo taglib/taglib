@@ -1,4 +1,9 @@
 /***************************************************************************
+    copyright            : (C) 2025 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
+ ***************************************************************************/
+
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -24,15 +29,25 @@
 #include "taglib_export.h"
 #include "audioproperties.h"
 
+namespace TagLib::EBML {
+  class MkTracks;
+  class MkInfo;
+}
 namespace TagLib::Matroska {
-
   class File;
 
   //! An implementation of Matroska audio properties
   class TAGLIB_EXPORT Properties : public AudioProperties
   {
   public:
+    /*!
+     * Creates an instance of Matroska::Properties.
+     */
     explicit Properties(File *file, ReadStyle style = Average);
+
+    /*!
+     * Destroys this Matroska::Properties instance.
+     */
     ~Properties() override;
 
     Properties(const Properties &) = delete;
@@ -60,10 +75,29 @@ namespace TagLib::Matroska {
      */
     int channels() const override;
 
-  private:
-    void read(File *file);
+    /*!
+     * Returns the number of bits per audio sample.
+     */
+    int bitsPerSample() const;
 
+    /*!
+     * Returns the concrete codec name, for example "A_MPEG/L3"
+     * used in the file if available, otherwise an empty string.
+     */
+    String codecName() const;
+
+  private:
     class PropertiesPrivate;
+    friend class EBML::MkInfo;
+    friend class EBML::MkTracks;
+
+    void setLengthInMilliseconds(int length);
+    void setBitrate(int bitrate);
+    void setSampleRate(int sampleRate);
+    void setChannels(int channels);
+    void setBitsPerSample(int bitsPerSample);
+    void setCodecName(const String &codecName);
+
     TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     std::unique_ptr<PropertiesPrivate> d;
   };

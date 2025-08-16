@@ -1,4 +1,9 @@
 /***************************************************************************
+    copyright            : (C) 2025 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
+ ***************************************************************************/
+
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -18,51 +23,31 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
-#ifndef DO_NOT_DOCUMENT
-
-#include "ebmlmasterelement.h"
 #include "ebmlmkinfo.h"
-#include "ebmlmktracks.h"
-#include "taglib.h"
+#include "ebmlstringelement.h"
+#include "ebmluintelement.h"
+#include "ebmlfloatelement.h"
+#include "matroskaproperties.h"
 
-namespace TagLib {
-  namespace Matroska {
-    class Tag;
-    class Attachments;
-    class SeekHead;
-    class Segment;
-  }
-  namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSeekHead;
-    class MkSegment : public MasterElement
-    {
-    public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
-      {
-      }
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag *parseTag();
-      Matroska::Attachments *parseAttachments();
-      Matroska::SeekHead *parseSeekHead();
-      Matroska::Segment *parseSegment();
-      void parseInfo(Matroska::Properties *properties);
-      void parseTracks(Matroska::Properties *properties);
+using namespace TagLib;
 
-    private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-      MkSeekHead *seekHead = nullptr;
-      MkInfo *info = nullptr;
-      MkTracks *tracks = nullptr;
-    };
+void EBML::MkInfo::parse(Matroska::Properties *properties)
+{
+  if(!properties)
+    return;
+
+  unsigned long long timestampScale = 1000000;
+  double duration = 0.0;
+  for(auto element : elements) {
+    Id id = element->getId();
+    if (id == ElementIDs::MkTimestampScale) {
+      timestampScale = static_cast<UIntElement *>(element)->getValue();
+    }
+    else if (id == ElementIDs::MkDuration) {
+      duration = static_cast<FloatElement *>(element)->getValueAsDouble();
+    }
   }
+
+  properties->setLengthInMilliseconds(
+    static_cast<int>(duration * static_cast<double>(timestampScale) / 1000000.0));
 }
-
-#endif
-#endif

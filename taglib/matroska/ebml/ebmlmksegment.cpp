@@ -22,6 +22,8 @@
 #include "ebmlmktags.h"
 #include "ebmlmkattachments.h"
 #include "ebmlmkseekhead.h"
+#include "ebmlmkinfo.h"
+#include "ebmlmktracks.h"
 #include "ebmlutils.h"
 #include "matroskafile.h"
 #include "matroskatag.h"
@@ -36,6 +38,8 @@ EBML::MkSegment::~MkSegment()
   delete tags;
   delete attachments;
   delete seekHead;
+  delete info;
+  delete tracks;
 }
 
 bool EBML::MkSegment::read(File &file)
@@ -50,6 +54,16 @@ bool EBML::MkSegment::read(File &file)
       seekHeadIndex = i;
       seekHead = static_cast<MkSeekHead *>(element);
       if(!seekHead->read(file))
+        return false;
+    }
+    else if(id == ElementIDs::MkInfo) {
+      info = static_cast<MkInfo *>(element);
+      if(!info->read(file))
+        return false;
+    }
+    else if(id == ElementIDs::MkTracks) {
+      tracks = static_cast<MkTracks *>(element);
+      if(!tracks->read(file))
         return false;
     }
     else if(id == ElementIDs::MkTags) {
@@ -94,4 +108,18 @@ Matroska::SeekHead *EBML::MkSegment::parseSeekHead()
 Matroska::Segment *EBML::MkSegment::parseSegment()
 {
   return new Matroska::Segment(sizeLength, dataSize, offset + idSize(id));
+}
+
+void EBML::MkSegment::parseInfo(Matroska::Properties *properties)
+{
+  if(info) {
+    info->parse(properties);
+  }
+}
+
+void EBML::MkSegment::parseTracks(Matroska::Properties *properties)
+{
+  if (tracks) {
+    tracks->parse(properties);
+  }
 }

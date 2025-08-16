@@ -40,7 +40,7 @@ namespace TagLib::Matroska {
     ~File() override;
     File(const File &) = delete;
     File &operator=(const File &) = delete;
-    AudioProperties *audioProperties() const override { return nullptr; }
+    AudioProperties *audioProperties() const override;
     TagLib::Tag *tag() const override;
     Attachments *attachments(bool create = false) const;
     Tag *tag(bool create) const;
@@ -60,6 +60,7 @@ namespace TagLib::Matroska {
   private:
     void read(bool readProperties, Properties::ReadStyle readStyle);
     class FilePrivate;
+    friend class Properties;
     TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     std::unique_ptr<FilePrivate> d;
   };

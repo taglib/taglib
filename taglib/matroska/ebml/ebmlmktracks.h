@@ -1,4 +1,9 @@
 /***************************************************************************
+    copyright            : (C) 2025 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
+ ***************************************************************************/
+
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -18,48 +23,31 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
+#ifndef TAGLIB_EBMLMKTRACKS_H
+#define TAGLIB_EBMLMKTRACKS_H
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlmasterelement.h"
-#include "ebmlmkinfo.h"
-#include "ebmlmktracks.h"
+#include "ebmlutils.h"
 #include "taglib.h"
 
 namespace TagLib {
   namespace Matroska {
-    class Tag;
-    class Attachments;
-    class SeekHead;
-    class Segment;
+    class Properties;
   }
   namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSeekHead;
-    class MkSegment : public MasterElement
+    class MkTracks : public MasterElement
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
+      MkTracks(int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(ElementIDs::MkTracks, sizeLength, dataSize, offset)
       {
       }
-      ~MkSegment() override;
-      bool read(File &file) override;
-      Matroska::Tag *parseTag();
-      Matroska::Attachments *parseAttachments();
-      Matroska::SeekHead *parseSeekHead();
-      Matroska::Segment *parseSegment();
-      void parseInfo(Matroska::Properties *properties);
-      void parseTracks(Matroska::Properties *properties);
-
-    private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-      MkSeekHead *seekHead = nullptr;
-      MkInfo *info = nullptr;
-      MkTracks *tracks = nullptr;
+      MkTracks() :
+        MasterElement(ElementIDs::MkTracks, 0, 0, 0)
+      {
+      }
+      void parse(Matroska::Properties *properties);
     };
   }
 }

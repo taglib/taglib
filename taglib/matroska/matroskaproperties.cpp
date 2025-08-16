@@ -25,23 +25,36 @@
 
 #include "matroskaproperties.h"
 
+#include "matroskafile.h"
+
 using namespace TagLib;
 
 class Matroska::Properties::PropertiesPrivate
 {
 public:
+  explicit PropertiesPrivate(File *file) : file(file) {}
+  ~PropertiesPrivate() = default;
+
+  PropertiesPrivate(const PropertiesPrivate &) = delete;
+  PropertiesPrivate &operator=(const PropertiesPrivate &) = delete;
+
+  File *file;
+  String codecName;
   int length { 0 };
-  int bitrate { 0 };
+  int bitrate { -1 };
   int sampleRate { 0 };
-  int bitsPerSample { 0 };
   int channels { 0 };
+  int bitsPerSample { 0 };
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
 Matroska::Properties::Properties(File *file, ReadStyle style) :
   AudioProperties(style),
-  d(std::make_unique<PropertiesPrivate>())
+  d(std::make_unique<PropertiesPrivate>(file))
 {
-  read(file);
 }
 
 Matroska::Properties::~Properties() = default;
@@ -53,6 +66,9 @@ int Matroska::Properties::lengthInMilliseconds() const
 
 int Matroska::Properties::bitrate() const
 {
+  if (d->bitrate == -1) {
+    d->bitrate = d->length != 0 ? static_cast<int>(d->file->length() * 8 / d->length) : 0;
+  }
   return d->bitrate;
 }
 
@@ -66,11 +82,46 @@ int Matroska::Properties::channels() const
   return d->channels;
 }
 
+int Matroska::Properties::bitsPerSample() const
+{
+  return d->bitsPerSample;
+}
+
+String Matroska::Properties::codecName() const
+{
+  return d->codecName;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void Matroska::Properties::read(File *)
+void Matroska::Properties::setLengthInMilliseconds(int length)
 {
-  // TODO implement.
+  d->length = length;
+}
+
+void Matroska::Properties::setBitrate(int bitrate)
+{
+  d->bitrate = bitrate;
+}
+
+void Matroska::Properties::setSampleRate(int sampleRate)
+{
+  d->sampleRate = sampleRate;
+}
+
+void Matroska::Properties::setChannels(int channels)
+{
+  d->channels = channels;
+}
+
+void Matroska::Properties::setBitsPerSample(int bitsPerSample)
+{
+  d->bitsPerSample = bitsPerSample;
+}
+
+void Matroska::Properties::setCodecName(const String &codecName)
+{
+  d->codecName = codecName;
 }

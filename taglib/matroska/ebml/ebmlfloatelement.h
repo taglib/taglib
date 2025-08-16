@@ -1,4 +1,9 @@
 /***************************************************************************
+    copyright            : (C) 2025 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
+ ***************************************************************************/
+
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -18,48 +23,39 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_EBMLMKSEGMENT_H
-#define TAGLIB_EBMLMKSEGMENT_H
+#ifndef TAGLIB_EBMLFLOATELEMENT_H
+#define TAGLIB_EBMLFLOATELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
-#include "ebmlmasterelement.h"
-#include "ebmlmkinfo.h"
-#include "ebmlmktracks.h"
-#include "taglib.h"
+#include <variant>
+#include "ebmlelement.h"
 
 namespace TagLib {
-  namespace Matroska {
-    class Tag;
-    class Attachments;
-    class SeekHead;
-    class Segment;
-  }
+  class File;
+
   namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSeekHead;
-    class MkSegment : public MasterElement
+    class FloatElement : public Element
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
+      using FloatVariantType = std::variant<std::monostate, float, double>;
+
+      FloatElement(Id id, int sizeLength, offset_t dataSize) :
+        Element(id, sizeLength, dataSize)
       {
       }
-      ~MkSegment() override;
+
+      explicit FloatElement(Id id) :
+        FloatElement(id, 0, 0)
+      {
+      }
+      FloatVariantType getValue() const { return value; }
+      double getValueAsDouble(double defaultValue = 0.0) const;
+      void setValue(FloatVariantType val) { value = val; }
       bool read(File &file) override;
-      Matroska::Tag *parseTag();
-      Matroska::Attachments *parseAttachments();
-      Matroska::SeekHead *parseSeekHead();
-      Matroska::Segment *parseSegment();
-      void parseInfo(Matroska::Properties *properties);
-      void parseTracks(Matroska::Properties *properties);
+      ByteVector render() override;
 
     private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-      MkSeekHead *seekHead = nullptr;
-      MkInfo *info = nullptr;
-      MkTracks *tracks = nullptr;
+      FloatVariantType value;
     };
   }
 }

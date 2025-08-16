@@ -22,10 +22,12 @@
 #include "ebmlvoidelement.h"
 #include "ebmlmasterelement.h"
 #include "ebmlbinaryelement.h"
+#include "ebmlfloatelement.h"
 #include "ebmlmkseekhead.h"
 #include "ebmlmksegment.h"
 #include "ebmlmktags.h"
 #include "ebmlmkattachments.h"
+#include "ebmlmktracks.h"
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlutils.h"
@@ -60,6 +62,12 @@ EBML::Element *EBML::Element::factory(File &file)
   case ElementIDs::MkSegment:
     return new MkSegment(sizeLength, dataSize, offset);
 
+  case ElementIDs::MkInfo:
+    return new MkInfo(sizeLength, dataSize, offset);
+
+  case ElementIDs::MkTracks:
+    return new MkTracks(sizeLength, dataSize, offset);
+
   case ElementIDs::MkTags:
     return new MkTags(sizeLength, dataSize, offset);
 
@@ -71,6 +79,8 @@ EBML::Element *EBML::Element::factory(File &file)
   case ElementIDs::MkSimpleTag:
   case ElementIDs::MkAttachedFile:
   case ElementIDs::MkSeek:
+  case ElementIDs::MkTrackEntry:
+  case ElementIDs::MkAudio:
     return new MasterElement(id, sizeLength, dataSize, offset);
 
   case ElementIDs::MkTagName:
@@ -81,16 +91,24 @@ EBML::Element *EBML::Element::factory(File &file)
 
   case ElementIDs::MkTagLanguage:
   case ElementIDs::MkAttachedFileMediaType:
+  case ElementIDs::MkCodecID:
     return new Latin1StringElement(id, sizeLength, dataSize);
 
   case ElementIDs::MkTagTargetTypeValue:
   case ElementIDs::MkAttachedFileUID:
   case ElementIDs::MkSeekPosition:
+  case ElementIDs::MkTimestampScale:
+  case ElementIDs::MkBitDepth:
+  case ElementIDs::MkChannels:
     return new UIntElement(id, sizeLength, dataSize);
 
   case ElementIDs::MkAttachedFileData:
   case ElementIDs::MkSeekID:
     return new BinaryElement(id, sizeLength, dataSize);
+
+  case ElementIDs::MkDuration:
+  case ElementIDs::MkSamplingFrequency:
+    return new FloatElement(id, sizeLength, dataSize);
 
   case ElementIDs::MkSeekHead:
     return new MkSeekHead(sizeLength, dataSize, offset);

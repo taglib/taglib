@@ -25,9 +25,9 @@
 
 using namespace TagLib;
 
-Matroska::SeekHead *EBML::MkSeekHead::parse()
+std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse()
 {
-  auto seekHead = new Matroska::SeekHead();
+  auto seekHead = std::make_unique<Matroska::SeekHead>();
   seekHead->setOffset(offset);
   seekHead->setSize(getSize() + padding);
 
@@ -50,7 +50,7 @@ Matroska::SeekHead *EBML::MkSeekHead::parse()
     if(entryId && offset)
       seekHead->addEntry(entryId, offset);
     else {
-      delete seekHead;
+      seekHead.reset();
       return nullptr;
     }
   }

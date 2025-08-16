@@ -98,6 +98,16 @@ namespace TagLib::EBML {
     inline constexpr Element::Id MkCueCodecState           = 0xEA;
     inline constexpr Element::Id MkCueReference            = 0xDB;
     inline constexpr Element::Id MkCueRefTime              = 0x96;
+    inline constexpr Element::Id MkInfo                    = 0x1549A966;
+    inline constexpr Element::Id MkTimestampScale          = 0x2AD7B1;
+    inline constexpr Element::Id MkDuration                = 0x4489;
+    inline constexpr Element::Id MkTracks                  = 0x1654AE6B;
+    inline constexpr Element::Id MkTrackEntry              = 0xAE;
+    inline constexpr Element::Id MkCodecID                 = 0x86;
+    inline constexpr Element::Id MkAudio                   = 0xE1;
+    inline constexpr Element::Id MkSamplingFrequency       = 0xB5;
+    inline constexpr Element::Id MkBitDepth                = 0x6264;
+    inline constexpr Element::Id MkChannels                = 0x9F;
   }
 }
 
