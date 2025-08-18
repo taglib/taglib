@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Set up Ubuntu
       run: sudo apt install -y libcppunit-dev libutfcpp-dev zlib1g-dev
