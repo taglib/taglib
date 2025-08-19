@@ -33,81 +33,73 @@
 
 using namespace TagLib;
 
-EBML::MkSegment::~MkSegment()
-{
-  delete tags;
-  delete attachments;
-  delete seekHead;
-  delete info;
-  delete tracks;
-}
+EBML::MkSegment::~MkSegment() = default;
 
 bool EBML::MkSegment::read(File &file)
 {
   offset_t maxOffset = file.tell() + dataSize;
-  Element *element = nullptr;
+  std::unique_ptr<Element> element;
   int i = 0;
   int seekHeadIndex = -1;
   while((element = findNextElement(file, maxOffset))) {
     Id id = element->getId();
-    if(id == ElementIDs::MkSeekHead) {
+    if(id == Id::MkSeekHead) {
       seekHeadIndex = i;
-      seekHead = static_cast<MkSeekHead *>(element);
+      seekHead = element_cast<Id::MkSeekHead>(std::move(element));
       if(!seekHead->read(file))
         return false;
     }
-    else if(id == ElementIDs::MkInfo) {
-      info = static_cast<MkInfo *>(element);
+    else if(id == Id::MkInfo) {
+      info = element_cast<Id::MkInfo>(std::move(element));
       if(!info->read(file))
         return false;
     }
-    else if(id == ElementIDs::MkTracks) {
-      tracks = static_cast<MkTracks *>(element);
+    else if(id == Id::MkTracks) {
+      tracks = element_cast<Id::MkTracks>(std::move(element));
       if(!tracks->read(file))
         return false;
     }
-    else if(id == ElementIDs::MkTags) {
-      tags = static_cast<MkTags *>(element);
+    else if(id == Id::MkTags) {
+      tags = element_cast<Id::MkTags>(std::move(element));
       if(!tags->read(file))
         return false;
     }
-    else if(id == ElementIDs::MkAttachments) {
-      attachments = static_cast<MkAttachments *>(element);
+    else if(id == Id::MkAttachments) {
+      attachments = element_cast<Id::MkAttachments>(std::move(element));
       if(!attachments->read(file))
         return false;
     }
     else {
-      if(id == ElementIDs::VoidElement
+      if(id == Id::VoidElement
          && seekHead
          && seekHeadIndex == i - 1)
         seekHead->setPadding(element->getSize());
 
       element->skipData(file);
-      delete element;
     }
     i++;
   }
   return true;
 }
 
-Matroska::Tag *EBML::MkSegment::parseTag()
+std::unique_ptr<Matroska::Tag> EBML::MkSegment::parseTag()
 {
   return tags ? tags->parse() : nullptr;
 }
 
-Matroska::Attachments *EBML::MkSegment::parseAttachments()
+std::unique_ptr<Matroska::Attachments> EBML::MkSegment::parseAttachments()
 {
   return attachments ? attachments->parse() : nullptr;
 }
 
-Matroska::SeekHead *EBML::MkSegment::parseSeekHead()
+std::unique_ptr<Matroska::SeekHead> EBML::MkSegment::parseSeekHead()
 {
   return seekHead ? seekHead->parse() : nullptr;
 }
 
-Matroska::Segment *EBML::MkSegment::parseSegment()
+std::unique_ptr<Matroska::Segment> EBML::MkSegment::parseSegment()
 {
-  return new Matroska::Segment(sizeLength, dataSize, offset + idSize(id));
+  return std::make_unique<Matroska::Segment>(sizeLength, dataSize, offset + idSize(id));
 }
 
 void EBML::MkSegment::parseInfo(Matroska::Properties *properties)

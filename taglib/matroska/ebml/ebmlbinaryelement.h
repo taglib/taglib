@@ -34,6 +34,10 @@ namespace TagLib {
         Element(id, sizeLength, dataSize)
       {
       }
+      BinaryElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
 
       explicit BinaryElement(Id id) :
         Element(id, 0, 0)

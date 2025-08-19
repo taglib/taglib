@@ -35,14 +35,18 @@ namespace TagLib {
     {
     public:
       MkAttachments(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkAttachments, sizeLength, dataSize, offset)
+        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset)
+      {
+      }
+      MkAttachments(Id, int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset)
       {
       }
       MkAttachments() :
-        MasterElement(ElementIDs::MkAttachments, 0, 0, 0)
+        MasterElement(Id::MkAttachments, 0, 0, 0)
       {
       }
-      Matroska::Attachments *parse();
+      std::unique_ptr<Matroska::Attachments> parse();
     };
   }
 }

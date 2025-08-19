@@ -27,14 +27,14 @@
 
 using namespace TagLib;
 
-Matroska::Attachments *EBML::MkAttachments::parse()
+std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse()
 {
-  auto attachments = new Matroska::Attachments();
+  auto attachments = std::make_unique<Matroska::Attachments>();
   attachments->setOffset(offset);
   attachments->setSize(getSize());
 
-  for(auto element : elements) {
-    if(element->getId() != ElementIDs::MkAttachedFile)
+  for(const auto &element : elements) {
+    if(element->getId() != Id::MkAttachedFile)
       continue;
 
     const String *filename = nullptr;
@@ -42,19 +42,19 @@ Matroska::Attachments *EBML::MkAttachments::parse()
     const String *mediaType = nullptr;
     const ByteVector *data = nullptr;
     Matroska::AttachedFile::UID uid = 0;
-    auto attachedFile = static_cast<MasterElement *>(element);
-    for(auto attachedFileChild : *attachedFile) {
+    auto attachedFile = element_cast<Id::MkAttachedFile>(element);
+    for(const auto &attachedFileChild : *attachedFile) {
       Id id = attachedFileChild->getId();
-      if(id == ElementIDs::MkAttachedFileName)
-        filename = &(static_cast<UTF8StringElement *>(attachedFileChild)->getValue());
-      else if(id == ElementIDs::MkAttachedFileData)
-        data = &(static_cast<BinaryElement *>(attachedFileChild)->getValue());
-      else if(id == ElementIDs::MkAttachedFileDescription)
-        description = &(static_cast<UTF8StringElement *>(attachedFileChild)->getValue());
-      else if(id == ElementIDs::MkAttachedFileMediaType)
-        mediaType = &(static_cast<Latin1StringElement *>(attachedFileChild)->getValue());
-      else if(id == ElementIDs::MkAttachedFileUID)
-        uid = static_cast<UIntElement *>(attachedFileChild)->getValue();
+      if(id == Id::MkAttachedFileName)
+        filename = &(element_cast<Id::MkAttachedFileName>(attachedFileChild)->getValue());
+      else if(id == Id::MkAttachedFileData)
+        data = &(element_cast<Id::MkAttachedFileData>(attachedFileChild)->getValue());
+      else if(id == Id::MkAttachedFileDescription)
+        description = &(element_cast<Id::MkAttachedFileDescription>(attachedFileChild)->getValue());
+      else if(id == Id::MkAttachedFileMediaType)
+        mediaType = &(element_cast<Id::MkAttachedFileMediaType>(attachedFileChild)->getValue());
+      else if(id == Id::MkAttachedFileUID)
+        uid = element_cast<Id::MkAttachedFileUID>(attachedFileChild)->getValue();
     }
     if(!(filename && data))
       continue;

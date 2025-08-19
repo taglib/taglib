@@ -95,7 +95,7 @@ public:
 };
 
 Matroska::Tag::Tag() :
-  Element(ElementIDs::MkTags),
+  Element(static_cast<ID>(EBML::Element::Id::MkTags)),
   d(std::make_unique<TagPrivate>())
 {
   d->tags.setAutoDelete(true);
@@ -241,52 +241,52 @@ bool Matroska::Tag::render()
   for(auto list : targetList) {
     auto frontTag = list->front();
     auto targetTypeValue = frontTag->targetTypeValue();
-    auto tag = new EBML::MasterElement(EBML::ElementIDs::MkTag);
+    auto tag = EBML::make_unique_element<EBML::Element::Id::MkTag>();
 
     // Build <Tag Targets> element
-    auto targets = new EBML::MasterElement(EBML::ElementIDs::MkTagTargets);
+    auto targets = EBML::make_unique_element<EBML::Element::Id::MkTagTargets>();
     if(targetTypeValue != SimpleTag::TargetTypeValue::None) {
-      auto element = new EBML::UIntElement(EBML::ElementIDs::MkTagTargetTypeValue);
+      auto element = EBML::make_unique_element<EBML::Element::Id::MkTagTargetTypeValue>();
       element->setValue(static_cast<unsigned int>(targetTypeValue));
-      targets->appendElement(element);
+      targets->appendElement(std::move(element));
     }
-    tag->appendElement(targets);
+    tag->appendElement(std::move(targets));
 
     // Build <Simple Tag> element
     for(auto simpleTag : *list) {
-      auto t = new EBML::MasterElement(EBML::ElementIDs::MkSimpleTag);
-      auto tagName = new EBML::UTF8StringElement(EBML::ElementIDs::MkTagName);
+      auto t = EBML::make_unique_element<EBML::Element::Id::MkSimpleTag>();
+      auto tagName = EBML::make_unique_element<EBML::Element::Id::MkTagName>();
       tagName->setValue(simpleTag->name());
-      t->appendElement(tagName);
+      t->appendElement(std::move(tagName));
 
       // Tag Value
       SimpleTagString *tStr = nullptr;
       SimpleTagBinary *tBin = nullptr;
       if((tStr = dynamic_cast<SimpleTagString *>(simpleTag))) {
-        auto tagValue = new EBML::UTF8StringElement(EBML::ElementIDs::MkTagString);
+        auto tagValue = EBML::make_unique_element<EBML::Element::Id::MkTagString>();
         tagValue->setValue(tStr->value());
-        t->appendElement(tagValue);
+        t->appendElement(std::move(tagValue));
       }
       else if((tBin = dynamic_cast<SimpleTagBinary *>(simpleTag))) {
-        auto tagValue = new EBML::BinaryElement(EBML::ElementIDs::MkTagBinary);
+        auto tagValue = EBML::make_unique_element<EBML::Element::Id::MkTagBinary>();
         tagValue->setValue(tBin->value());
-        t->appendElement(tagValue);
+        t->appendElement(std::move(tagValue));
       }
 
       // Language
-      auto language = new EBML::Latin1StringElement(EBML::ElementIDs::MkTagsTagLanguage);
+      auto language = EBML::make_unique_element<EBML::Element::Id::MkTagsTagLanguage>();
       const String &lang = simpleTag->language();
       language->setValue(!lang.isEmpty() ? lang : "und");
-      t->appendElement(language);
+      t->appendElement(std::move(language));
 
       // Default language flag
-      auto dlf = new EBML::UIntElement(EBML::ElementIDs::MkTagsLanguageDefault);
+      auto dlf = EBML::make_unique_element<EBML::Element::Id::MkTagsLanguageDefault>();
       dlf->setValue(simpleTag->defaultLanguageFlag() ? 1 : 0);
-      t->appendElement(dlf);
+      t->appendElement(std::move(dlf));
 
-      tag->appendElement(t);
+      tag->appendElement(std::move(t));
     }
-    tags.appendElement(tag);
+    tags.appendElement(std::move(tag));
   }
 
   auto data = tags.render();

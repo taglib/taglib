@@ -36,29 +36,29 @@ void EBML::MkTracks::parse(Matroska::Properties *properties)
   if(!properties)
     return;
 
-  for(auto element : elements) {
-    if(element->getId() != ElementIDs::MkTrackEntry)
+  for(const auto &element : elements) {
+    if(element->getId() != Id::MkTrackEntry)
       continue;
 
     String codecId;
     double samplingFrequency = 0.0;
     unsigned long long bitDepth = 0;
     unsigned long long channels = 0;
-    auto trackEntry = static_cast<MasterElement *>(element);
-    for(auto trackEntryChild : *trackEntry) {
+    auto trackEntry = element_cast<Id::MkTrackEntry>(element);
+    for(const auto &trackEntryChild : *trackEntry) {
       Id trackEntryChildId = trackEntryChild->getId();
-      if(trackEntryChildId == ElementIDs::MkCodecID)
-        codecId = static_cast<Latin1StringElement *>(trackEntryChild)->getValue();
-      else if(trackEntryChildId == ElementIDs::MkAudio) {
-        auto audio = static_cast<MasterElement *>(trackEntryChild);
-        for(auto audioChild : *audio) {
+      if(trackEntryChildId == Id::MkCodecID)
+        codecId = element_cast<Id::MkCodecID>(trackEntryChild)->getValue();
+      else if(trackEntryChildId == Id::MkAudio) {
+        auto audio = element_cast<Id::MkAudio>(trackEntryChild);
+        for(const auto &audioChild : *audio) {
           Id audioChildId = audioChild->getId();
-          if(audioChildId == ElementIDs::MkSamplingFrequency)
-            samplingFrequency = static_cast<FloatElement *>(audioChild)->getValueAsDouble();
-          else if(audioChildId == ElementIDs::MkBitDepth)
-            bitDepth = static_cast<UIntElement *>(audioChild)->getValue();
-          else if(audioChildId == ElementIDs::MkChannels)
-            channels = static_cast<UIntElement *>(audioChild)->getValue();
+          if(audioChildId == Id::MkSamplingFrequency)
+            samplingFrequency = element_cast<Id::MkSamplingFrequency>(audioChild)->getValueAsDouble();
+          else if(audioChildId == Id::MkBitDepth)
+            bitDepth = element_cast<Id::MkBitDepth>(audioChild)->getValue();
+          else if(audioChildId == Id::MkChannels)
+            channels = element_cast<Id::MkChannels>(audioChild)->getValue();
         }
       }
     }

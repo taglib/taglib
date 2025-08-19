@@ -31,21 +31,21 @@ std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse()
   seekHead->setOffset(offset);
   seekHead->setSize(getSize() + padding);
 
-  for(auto element : elements) {
-    if(element->getId() != ElementIDs::MkSeek)
+  for(const auto &element : elements) {
+    if(element->getId() != Id::MkSeek)
       continue;
-    auto seekElement = static_cast<MasterElement *>(element);
+    auto seekElement = element_cast<Id::MkSeek>(element);
     Matroska::Element::ID entryId = 0;
     offset_t offset = 0;
-    for(auto seekElementChild : *seekElement) {
+    for(const auto &seekElementChild : *seekElement) {
       Id id = seekElementChild->getId();
-      if(id == ElementIDs::MkSeekID && !entryId) {
-        auto data = static_cast<BinaryElement *>(seekElementChild)->getValue();
+      if(id == Id::MkSeekID && !entryId) {
+        auto data = element_cast<Id::MkSeekID>(seekElementChild)->getValue();
         if(data.size() == 4)
           entryId = data.toUInt(true);
       }
-      else if(id == ElementIDs::MkSeekPosition && !offset)
-        offset = static_cast<UIntElement *>(seekElementChild)->getValue();
+      else if(id == Id::MkSeekPosition && !offset)
+        offset = element_cast<Id::MkSeekPosition>(seekElementChild)->getValue();
     }
     if(entryId && offset)
       seekHead->addEntry(entryId, offset);

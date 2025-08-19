@@ -59,8 +59,8 @@ namespace TagLib {
     std::pair<int, T> readVINT(File &file);
     template <typename T>
     std::pair<int, T> parseVINT(const ByteVector &buffer);
-    Element *findElement(File &file, Element::Id id, offset_t maxOffset);
-    Element *findNextElement(File &file, offset_t maxOffset);
+    std::unique_ptr<Element> findElement(File &file, Element::Id id, offset_t maxOffset);
+    std::unique_ptr<Element> findNextElement(File &file, offset_t maxOffset);
     ByteVector renderVINT(uint64_t number, int minSizeLength);
     unsigned long long randomUID();
 
@@ -82,11 +82,12 @@ namespace TagLib {
 
     constexpr int idSize(Element::Id id)
     {
-      if(id <= 0xFF)
+      auto uintId = static_cast<unsigned int>(id);
+      if(uintId <= 0xFF)
         return 1;
-      else if(id <= 0xFFFF)
+      else if(uintId <= 0xFFFF)
         return 2;
-      else if(id <= 0xFFFFFF)
+      else if(uintId <= 0xFFFFFF)
         return 3;
       else
         return 4;

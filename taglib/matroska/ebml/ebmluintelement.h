@@ -35,6 +35,10 @@ namespace TagLib {
         Element(id, sizeLength, dataSize)
       {
       }
+      UIntElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
 
       explicit UIntElement(Id id) :
         UIntElement(id, 0, 0)

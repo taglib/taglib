@@ -29,48 +29,48 @@ Matroska::Cues *EBML::MkCues::parse()
   auto cues = new Matroska::Cues();
   cues->setOffset(offset);
   cues->setSize(getSize());
-  cues->setID(id);
+  cues->setID(static_cast<Matroska::Element::ID>(id));
 
-  for(auto cuesChild : elements) {
-    if(cuesChild->getId() != ElementIDs::MkCuePoint)
+  for(const auto &cuesChild : elements) {
+    if(cuesChild->getId() != Id::MkCuePoint)
       continue;
-    auto cuePointElement = static_cast<MasterElement *>(cuesChild);
-    auto cuePoint = new Matroska::CuePoint();
+    auto cuePointElement = element_cast<Id::MkCuePoint>(cuesChild);
+    auto cuePoint = std::make_unique<Matroska::CuePoint>();
 
-    for(auto cuePointChild : *cuePointElement) {
+    for(const auto &cuePointChild : *cuePointElement) {
       Id id = cuePointChild->getId();
-      if(id == ElementIDs::MkCueTime)
-        cuePoint->setTime(static_cast<UIntElement *>(cuePointChild)->getValue());
-      else if(id == ElementIDs::MkCueTrackPositions) {
-        auto cueTrack = new Matroska::CueTrack();
-        auto cueTrackElement = static_cast<MasterElement *>(cuePointChild);
-        for(auto cueTrackChild : *cueTrackElement) {
+      if(id == Id::MkCueTime)
+        cuePoint->setTime(element_cast<Id::MkCueTime>(cuePointChild)->getValue());
+      else if(id == Id::MkCueTrackPositions) {
+        auto cueTrack = std::make_unique<Matroska::CueTrack>();
+        auto cueTrackElement = element_cast<Id::MkCueTrackPositions>(cuePointChild);
+        for(const auto &cueTrackChild : *cueTrackElement) {
           Id trackId = cueTrackChild->getId();
-          if(trackId == ElementIDs::MkCueTrack)
-            cueTrack->setTrackNumber(static_cast<UIntElement *>(cueTrackChild)->getValue());
-          else if(trackId == ElementIDs::MkCueClusterPosition)
-            cueTrack->setClusterPosition(static_cast<UIntElement *>(cueTrackChild)->getValue());
-          else if(trackId == ElementIDs::MkCueRelativePosition)
-            cueTrack->setRelativePosition(static_cast<UIntElement *>(cueTrackChild)->getValue());
-          else if(trackId == ElementIDs::MkCueDuration)
-            cueTrack->setDuration(static_cast<UIntElement *>(cueTrackChild)->getValue());
-          else if(trackId == ElementIDs::MkCueBlockNumber)
-            cueTrack->setBlockNumber(static_cast<UIntElement *>(cueTrackChild)->getValue());
-          else if(trackId == ElementIDs::MkCueCodecState)
-            cueTrack->setCodecState(static_cast<UIntElement *>(cueTrackChild)->getValue());
-          else if(trackId == ElementIDs::MkCueReference) {
-            auto cueReference = static_cast<MasterElement *>(cueTrackChild);
-            for(auto cueReferenceChild : *cueReference) {
-              if(cueReferenceChild->getId() != ElementIDs::MkCueReference)
+          if(trackId == Id::MkCueTrack)
+            cueTrack->setTrackNumber(element_cast<Id::MkCueTrack>(cueTrackChild)->getValue());
+          else if(trackId == Id::MkCueClusterPosition)
+            cueTrack->setClusterPosition(element_cast<Id::MkCueClusterPosition>(cueTrackChild)->getValue());
+          else if(trackId == Id::MkCueRelativePosition)
+            cueTrack->setRelativePosition(element_cast<Id::MkCueRelativePosition>(cueTrackChild)->getValue());
+          else if(trackId == Id::MkCueDuration)
+            cueTrack->setDuration(element_cast<Id::MkCueDuration>(cueTrackChild)->getValue());
+          else if(trackId == Id::MkCueBlockNumber)
+            cueTrack->setBlockNumber(element_cast<Id::MkCueBlockNumber>(cueTrackChild)->getValue());
+          else if(trackId == Id::MkCueCodecState)
+            cueTrack->setCodecState(element_cast<Id::MkCueCodecState>(cueTrackChild)->getValue());
+          else if(trackId == Id::MkCueReference) {
+            auto cueReference = element_cast<Id::MkCueReference>(cueTrackChild);
+            for(const auto &cueReferenceChild : *cueReference) {
+              if(cueReferenceChild->getId() != Id::MkCueRefTime)
                 continue;
-              cueTrack->addReferenceTime(static_cast<UIntElement *>(cueReferenceChild)->getValue());
+              cueTrack->addReferenceTime(element_cast<Id::MkCueRefTime>(cueReferenceChild)->getValue());
             }
           }
         }
-        cuePoint->addCueTrack(cueTrack);
+        cuePoint->addCueTrack(std::move(cueTrack));
       }
     }
-    cues->addCuePoint(cuePoint);
+    cues->addCuePoint(std::move(cuePoint));
   }
   return cues;
 }

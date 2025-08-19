@@ -30,21 +30,20 @@
 
 using namespace TagLib;
 
-EBML::Element *EBML::findElement(File &file, Element::Id id, offset_t maxOffset)
+std::unique_ptr<EBML::Element> EBML::findElement(File &file, Element::Id id, offset_t maxOffset)
 {
-  Element *element = nullptr;
+  std::unique_ptr<Element> element;
   while(file.tell() < maxOffset) {
     element = Element::factory(file);
     if(!element || element->getId() == id)
       return element;
     element->skipData(file);
-    delete element;
-    element = nullptr;
+    element.reset();
   }
   return element;
 }
 
-EBML::Element *EBML::findNextElement(File &file, offset_t maxOffset)
+std::unique_ptr<EBML::Element> EBML::findNextElement(File &file, offset_t maxOffset)
 {
   return file.tell() < maxOffset ? Element::factory(file) : nullptr;
 }

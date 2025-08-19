@@ -28,39 +28,39 @@
 
 using namespace TagLib;
 
-Matroska::Tag *EBML::MkTags::parse()
+std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
 {
-  auto mTag = new Matroska::Tag();
+  auto mTag = std::make_unique<Matroska::Tag>();
   mTag->setOffset(offset);
   mTag->setSize(getSize());
-  mTag->setID(id);
+  mTag->setID(static_cast<Matroska::Element::ID>(id));
 
   // Loop through each <Tag> element
-  for(auto tagsChild : elements) {
-    if(tagsChild->getId() != ElementIDs::MkTag)
+  for(const auto &tagsChild : elements) {
+    if(tagsChild->getId() != Id::MkTag)
       continue;
-    auto tag = static_cast<MasterElement *>(tagsChild);
-    List<MasterElement *> simpleTags;
-    MasterElement *targets = nullptr;
+    auto tag = element_cast<Id::MkTag>(tagsChild);
+    List<const MasterElement *> simpleTags;
+    const MasterElement *targets = nullptr;
 
     // Identify the <Targets> element and the <SimpleTag> elements
-    for(auto tagChild : *tag) {
+    for(const auto &tagChild : *tag) {
       Id tagChildId = tagChild->getId();
-      if(!targets && tagChildId == ElementIDs::MkTagTargets)
-        targets = static_cast<MasterElement *>(tagChild);
-      else if(tagChildId == ElementIDs::MkSimpleTag)
-        simpleTags.append(static_cast<MasterElement *>(tagChild));
+      if(!targets && tagChildId == Id::MkTagTargets)
+        targets = element_cast<Id::MkTagTargets>(tagChild);
+      else if(tagChildId == Id::MkSimpleTag)
+        simpleTags.append(element_cast<Id::MkSimpleTag>(tagChild));
     }
 
     // Parse the <Targets> element
     Matroska::SimpleTag::TargetTypeValue targetTypeValue = Matroska::SimpleTag::TargetTypeValue::None;
     if(targets) {
-      for(auto targetsChild : *targets) {
+      for(const auto &targetsChild : *targets) {
         Id id = targetsChild->getId();
-        if(id == ElementIDs::MkTagTargetTypeValue
+        if(id == Id::MkTagTargetTypeValue
             && targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) {
           targetTypeValue = static_cast<Matroska::SimpleTag::TargetTypeValue>(
-            static_cast<UIntElement *>(targetsChild)->getValue()
+            element_cast<Id::MkTagTargetTypeValue>(targetsChild)->getValue()
           );
         }
       }
@@ -74,18 +74,18 @@ Matroska::Tag *EBML::MkTags::parse()
       const String *language = nullptr;
       bool defaultLanguageFlag = true;
 
-      for(auto simpleTagChild : *simpleTag) {
+      for(const auto &simpleTagChild : *simpleTag) {
         Id id = simpleTagChild->getId();
-        if(id == ElementIDs::MkTagName && !tagName)
-          tagName = &(static_cast<UTF8StringElement *>(simpleTagChild)->getValue());
-        else if(id == ElementIDs::MkTagString && !tagValueString)
-          tagValueString = &(static_cast<UTF8StringElement *>(simpleTagChild)->getValue());
-        else if(id == ElementIDs::MkTagBinary && !tagValueBinary)
-          tagValueBinary = &(static_cast<BinaryElement *>(simpleTagChild)->getValue());
-        else if(id == ElementIDs::MkTagsTagLanguage && !language)
-          language = &(static_cast<Latin1StringElement *>(simpleTagChild)->getValue());
-        else if(id == ElementIDs::MkTagsLanguageDefault)
-          defaultLanguageFlag = static_cast<UIntElement *>(simpleTagChild)->getValue() ? true : false;
+        if(id == Id::MkTagName && !tagName)
+          tagName = &(element_cast<Id::MkTagName>(simpleTagChild)->getValue());
+        else if(id == Id::MkTagString && !tagValueString)
+          tagValueString = &(element_cast<Id::MkTagString>(simpleTagChild)->getValue());
+        else if(id == Id::MkTagBinary && !tagValueBinary)
+          tagValueBinary = &(element_cast<Id::MkTagBinary>(simpleTagChild)->getValue());
+        else if(id == Id::MkTagsTagLanguage && !language)
+          language = &(element_cast<Id::MkTagsTagLanguage>(simpleTagChild)->getValue());
+        else if(id == Id::MkTagsLanguageDefault)
+          defaultLanguageFlag = element_cast<Id::MkTagsLanguageDefault>(simpleTagChild)->getValue() ? true : false;
       }
       if(!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
         continue;

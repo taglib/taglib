@@ -32,7 +32,7 @@ namespace TagLib {
     class SeekHead : public Element
     {
     public:
-      SeekHead() : Element(ElementIDs::MkSeekHead) {}
+      SeekHead();
       ~SeekHead() override = default;
       void addEntry(const Element &element);
       void addEntry(ID id, offset_t offset);

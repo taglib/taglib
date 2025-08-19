@@ -34,15 +34,19 @@ namespace TagLib {
     {
     public:
       MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkSeekHead, sizeLength, dataSize, offset)
+        MasterElement(Id::MkSeekHead, sizeLength, dataSize, offset)
+      {
+      }
+      MkSeekHead(Id, int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(Id::MkSeekHead, sizeLength, dataSize, offset)
       {
       }
       MkSeekHead() :
-        MasterElement(ElementIDs::MkSeekHead, 0, 0, 0)
+        MasterElement(Id::MkSeekHead, 0, 0, 0)
       {
       }
 
-      Matroska::SeekHead *parse();
+      std::unique_ptr<Matroska::SeekHead> parse();
     };
   }
 }

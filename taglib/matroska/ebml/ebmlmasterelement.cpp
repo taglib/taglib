@@ -25,20 +25,21 @@
 
 using namespace TagLib;
 
-EBML::MasterElement::~MasterElement()
+EBML::MasterElement::~MasterElement() = default;
+
+void EBML::MasterElement::appendElement(std::unique_ptr<Element>&& element)
 {
-  for(auto element : elements)
-    delete element;
+  elements.push_back(std::move(element));
 }
 
 bool EBML::MasterElement::read(File &file)
 {
   offset_t maxOffset = file.tell() + dataSize;
-  Element *element = nullptr;
+  std::unique_ptr<Element> element;
   while((element = findNextElement(file, maxOffset))) {
     if(!element->read(file))
       return false;
-    elements.append(element);
+    elements.push_back(std::move(element));
   }
   return file.tell() == maxOffset;
 }
@@ -47,7 +48,7 @@ ByteVector EBML::MasterElement::render()
 {
   ByteVector buffer = renderId();
   ByteVector data;
-  for(auto element : elements)
+  for(const auto &element : elements)
     data.append(element->render());
   dataSize = data.size();
   buffer.append(renderVINT(dataSize, 0));

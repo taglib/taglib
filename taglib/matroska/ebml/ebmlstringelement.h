@@ -37,6 +37,10 @@ namespace TagLib {
         Element(id, sizeLength, dataSize)
       {
       }
+      StringElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
 
       explicit StringElement(Id id) :
         Element(id, 0, 0)

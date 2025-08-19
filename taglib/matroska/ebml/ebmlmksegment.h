@@ -23,6 +23,9 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlmasterelement.h"
+#include "ebmlmktags.h"
+#include "ebmlmkattachments.h"
+#include "ebmlmkseekhead.h"
 #include "ebmlmkinfo.h"
 #include "ebmlmktracks.h"
 #include "taglib.h"
@@ -35,31 +38,32 @@ namespace TagLib {
     class Segment;
   }
   namespace EBML {
-    class MkTags;
-    class MkAttachments;
-    class MkSeekHead;
     class MkSegment : public MasterElement
     {
     public:
       MkSegment(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkSegment, sizeLength, dataSize, offset)
+        MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
+      {
+      }
+      MkSegment(Id, int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
       {
       }
       ~MkSegment() override;
       bool read(File &file) override;
-      Matroska::Tag *parseTag();
-      Matroska::Attachments *parseAttachments();
-      Matroska::SeekHead *parseSeekHead();
-      Matroska::Segment *parseSegment();
+      std::unique_ptr<Matroska::Tag> parseTag();
+      std::unique_ptr<Matroska::Attachments> parseAttachments();
+      std::unique_ptr<Matroska::SeekHead> parseSeekHead();
+      std::unique_ptr<Matroska::Segment> parseSegment();
       void parseInfo(Matroska::Properties *properties);
       void parseTracks(Matroska::Properties *properties);
 
     private:
-      MkTags *tags = nullptr;
-      MkAttachments *attachments = nullptr;
-      MkSeekHead *seekHead = nullptr;
-      MkInfo *info = nullptr;
-      MkTracks *tracks = nullptr;
+      std::unique_ptr<MkTags> tags;
+      std::unique_ptr<MkAttachments> attachments;
+      std::unique_ptr<MkSeekHead> seekHead;
+      std::unique_ptr<MkInfo> info;
+      std::unique_ptr<MkTracks> tracks;
     };
   }
 }

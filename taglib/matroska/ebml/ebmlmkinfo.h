@@ -40,11 +40,15 @@ namespace TagLib {
     {
     public:
       MkInfo(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkInfo, sizeLength, dataSize, offset)
+        MasterElement(Id::MkInfo, sizeLength, dataSize, offset)
+      {
+      }
+      MkInfo(Id, int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(Id::MkInfo, sizeLength, dataSize, offset)
       {
       }
       MkInfo() :
-        MasterElement(ElementIDs::MkInfo, 0, 0, 0)
+        MasterElement(Id::MkInfo, 0, 0, 0)
       {
       }
       void parse(Matroska::Properties * properties);

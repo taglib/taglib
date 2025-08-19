@@ -27,6 +27,11 @@
 
 using namespace TagLib;
 
+Matroska::SeekHead::SeekHead() :
+  Element(static_cast<ID>(EBML::Element::Id::MkSeekHead))
+{
+}
+
 void Matroska::SeekHead::addEntry(const Element &element)
 {
   entries.append({element.id(), element.offset()});
@@ -46,16 +51,16 @@ ByteVector Matroska::SeekHead::renderInternal()
   EBML::MkSeekHead seekHead;
   seekHead.setMinRenderSize(beforeSize);
   for(const auto &[id, position] : entries) {
-    auto seekElement = new EBML::MasterElement(EBML::ElementIDs::MkSeek);
-    auto idElement = new EBML::BinaryElement(EBML::ElementIDs::MkSeekID);
+    auto seekElement = EBML::make_unique_element<EBML::Element::Id::MkSeek>();
+    auto idElement = EBML::make_unique_element<EBML::Element::Id::MkSeekID>();
     idElement->setValue(ByteVector::fromUInt(id, true));
-    seekElement->appendElement(idElement);
+    seekElement->appendElement(std::move(idElement));
 
-    auto positionElement = new EBML::UIntElement(EBML::ElementIDs::MkSeekPosition);
+    auto positionElement = EBML::make_unique_element<EBML::Element::Id::MkSeekPosition>();
     positionElement->setValue(static_cast<unsigned long long>(position));
-    seekElement->appendElement(positionElement);
+    seekElement->appendElement(std::move(positionElement));
 
-    seekHead.appendElement(seekElement);
+    seekHead.appendElement(std::move(seekElement));
   }
   return seekHead.render();
 }
@@ -94,7 +99,7 @@ void Matroska::SeekHead::sort()
 bool Matroska::SeekHead::sizeChanged(Element &caller, offset_t delta)
 {
   ID callerID = caller.id();
-  if(callerID == ElementIDs::MkSegment) {
+  if(callerID == static_cast<ID>(EBML::Element::Id::MkSegment)) {
     adjustOffset(delta);
     return true;
   }

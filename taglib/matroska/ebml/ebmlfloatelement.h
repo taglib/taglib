@@ -43,6 +43,10 @@ namespace TagLib {
         Element(id, sizeLength, dataSize)
       {
       }
+      FloatElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
+        Element(id, sizeLength, dataSize)
+      {
+      }
 
       explicit FloatElement(Id id) :
         FloatElement(id, 0, 0)

@@ -36,15 +36,19 @@ namespace TagLib {
     {
     public:
       MkTags(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkTags, sizeLength, dataSize, offset)
+        MasterElement(Id::MkTags, sizeLength, dataSize, offset)
+      {
+      }
+      MkTags(Id, int sizeLength, offset_t dataSize, offset_t offset) :
+        MasterElement(Id::MkTags, sizeLength, dataSize, offset)
       {
       }
       MkTags() :
-        MasterElement(ElementIDs::MkTags, 0, 0, 0)
+        MasterElement(Id::MkTags, 0, 0, 0)
       {
       }
 
-      Matroska::Tag *parse();
+      std::unique_ptr<Matroska::Tag> parse();
     };
   }
 }

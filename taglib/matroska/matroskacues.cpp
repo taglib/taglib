@@ -30,48 +30,47 @@
 using namespace TagLib;
 
 Matroska::Cues::Cues() :
-  Element(ElementIDs::MkCues)
+  Element(static_cast<ID>(EBML::Element::Id::MkCues))
 {
-  cuePoints.setAutoDelete(true);
 }
 
 ByteVector Matroska::Cues::renderInternal()
 {
   EBML::MkCues cues;
-  for(auto &cuePoint : cuePoints) {
-    auto cuePointElement = new EBML::MasterElement(EBML::ElementIDs::MkCuePoint);
-    auto timestamp = new EBML::UIntElement(EBML::ElementIDs::MkCueTime);
+  for(const auto &cuePoint : cuePoints) {
+    auto cuePointElement = EBML::make_unique_element<EBML::Element::Id::MkCuePoint>();
+    auto timestamp = EBML::make_unique_element<EBML::Element::Id::MkCueTime>();
     timestamp->setValue(cuePoint->getTime());
-    cuePointElement->appendElement(timestamp);
+    cuePointElement->appendElement(std::move(timestamp));
 
-    auto trackList = cuePoint->cueTrackList();
-    for(auto &cueTrack : trackList) {
-      auto cueTrackElement = new EBML::MasterElement(EBML::ElementIDs::MkCueTrackPositions);
+    const auto &trackList = cuePoint->cueTrackList();
+    for(const auto &cueTrack : trackList) {
+      auto cueTrackElement = EBML::make_unique_element<EBML::Element::Id::MkCueTrackPositions>();
 
       // Track number
-      auto trackNumber = new EBML::UIntElement(EBML::ElementIDs::MkCueTrack);
+      auto trackNumber = EBML::make_unique_element<EBML::Element::Id::MkCueTrack>();
       trackNumber->setValue(cueTrack->getTrackNumber());
-      cueTrackElement->appendElement(trackNumber);
+      cueTrackElement->appendElement(std::move(trackNumber));
 
       // Cluster position
-      auto clusterPosition = new EBML::UIntElement(EBML::ElementIDs::MkCueClusterPosition);
+      auto clusterPosition = EBML::make_unique_element<EBML::Element::Id::MkCueClusterPosition>();
       clusterPosition->setValue(cueTrack->getClusterPosition());
-      cueTrackElement->appendElement(clusterPosition);
+      cueTrackElement->appendElement(std::move(clusterPosition));
 
       // Todo - other elements
 
       // Reference times
       auto referenceTimes = cueTrack->referenceTimes();
       if(!referenceTimes.isEmpty()) {
-        auto cueReference = new EBML::MasterElement(EBML::ElementIDs::MkCueReference);
+        auto cueReference = EBML::make_unique_element<EBML::Element::Id::MkCueReference>();
         for(auto reference : referenceTimes) {
-          auto refTime = new EBML::UIntElement(EBML::ElementIDs::MkCueRefTime);
+          auto refTime = EBML::make_unique_element<EBML::Element::Id::MkCueRefTime>();
           refTime->setValue(reference);
-          cueReference->appendElement(refTime);
+          cueReference->appendElement(std::move(refTime));
         }
-        cueTrackElement->appendElement(cueReference);
+        cueTrackElement->appendElement(std::move(cueReference));
       }
-      cuePointElement->appendElement(cueTrackElement);
+      cuePointElement->appendElement(std::move(cueTrackElement));
     }
   }
   return cues.render();
@@ -90,38 +89,47 @@ bool Matroska::Cues::render()
 bool Matroska::Cues::sizeChanged(Element &caller, offset_t delta)
 {
   offset_t offset = caller.offset();
-  for(auto cuePoint : cuePoints)
+  for(auto &cuePoint : cuePoints)
     needsRender |= cuePoint->adjustOffset(offset, delta);
   return true;
 }
 
 bool Matroska::Cues::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
-  for(const auto cuePoint : cuePoints) {
+  for(const auto &cuePoint : cuePoints) {
     if(!cuePoint->isValid(file, segmentDataOffset))
       return false;
   }
   return true;
 }
 
+void Matroska::Cues::addCuePoint(std::unique_ptr<CuePoint> &&cuePoint)
+{
+  cuePoints.push_back(std::move(cuePoint));
+}
+
 Matroska::CuePoint::CuePoint()
 {
-  cueTracks.setAutoDelete(true);
 }
 
 bool Matroska::CuePoint::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
-  for(const auto track : cueTracks) {
+  for(const auto &track : cueTracks) {
     if(!track->isValid(file, segmentDataOffset))
       return false;
   }
   return true;
 }
 
+void Matroska::CuePoint::addCueTrack(std::unique_ptr<CueTrack> &&cueTrack)
+{
+  cueTracks.push_back(std::move(cueTrack));
+}
+
 bool Matroska::CuePoint::adjustOffset(offset_t offset, offset_t delta)
 {
   bool ret = false;
-  for(auto cueTrack : cueTracks)
+  for(auto &cueTrack : cueTracks)
     ret |= cueTrack->adjustOffset(offset, delta);
 
   return ret;
@@ -138,13 +146,13 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
     return false;
   }
   file.seek(segmentDataOffset + clusterPosition);
-  if(EBML::Element::readId(file) != EBML::ElementIDs::MkCluster) {
+  if(EBML::Element::readId(file) != static_cast<unsigned int>(EBML::Element::Id::MkCluster)) {
     debug("No cluster found at position");
     return false;
   }
   if(codecState) {
     file.seek(segmentDataOffset + codecState);
-    if(EBML::Element::readId(file) != EBML::ElementIDs::MkCodecState) {
+    if(EBML::Element::readId(file) != static_cast<unsigned int>(EBML::Element::Id::MkCodecState)) {
       debug("No codec state found at position");
       return false;
     }

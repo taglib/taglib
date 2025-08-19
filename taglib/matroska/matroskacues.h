@@ -37,12 +37,12 @@ namespace TagLib {
     class Cues : public Element
     {
     public:
-      using CuePointList = List<CuePoint *>;
+      using CuePointList = std::list<std::unique_ptr<CuePoint>>;
       Cues();
       ~Cues() override = default;
       bool isValid(File &file, offset_t segmentDataOffset) const;
-      void addCuePoint(CuePoint *cuePoint) { cuePoints.append(cuePoint); }
-      CuePointList cuePointList() { return cuePoints; }
+      void addCuePoint(std::unique_ptr<CuePoint> &&cuePoint);
+      const CuePointList &cuePointList() { return cuePoints; }
       bool sizeChanged(Element &caller, offset_t delta) override;
       bool render() override;
 
@@ -51,19 +51,19 @@ namespace TagLib {
       ByteVector renderInternal();
       bool needsRender = false;
 
-      List<CuePoint *> cuePoints;
+      CuePointList cuePoints;
     };
 
     class CuePoint
     {
     public:
-      using CueTrackList = List<CueTrack *>;
+      using CueTrackList = std::list<std::unique_ptr<CueTrack>>;
       using Time = unsigned long long;
       CuePoint();
       ~CuePoint() = default;
       bool isValid(File &file, offset_t segmentDataOffset) const;
-      void addCueTrack(CueTrack *cueTrack) { cueTracks.append(cueTrack); }
-      CueTrackList cueTrackList() const { return cueTracks; }
+      void addCueTrack(std::unique_ptr<CueTrack> &&cueTrack);
+      const CueTrackList &cueTrackList() const { return cueTracks; }
       void setTime(Time time) { this->time = time; }
       Time getTime() const { return time; }
       bool adjustOffset(offset_t offset, offset_t delta);
@@ -93,7 +93,7 @@ namespace TagLib {
       void setDuration(unsigned long long duration) { this->duration = duration; }
       unsigned long long getDuration() const { return duration; }
       void addReferenceTime(unsigned long long refTime) { refTimes.append(refTime); }
-      ReferenceTimeList referenceTimes() const { return refTimes; }
+      const ReferenceTimeList &referenceTimes() const { return refTimes; }
       bool adjustOffset(offset_t offset, offset_t delta);
 
     private:

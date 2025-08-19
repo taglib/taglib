@@ -39,20 +39,15 @@ class Matroska::File::FilePrivate
 {
 public:
   FilePrivate() = default;
-  ~FilePrivate()
-  {
-    delete tag;
-    delete attachments;
-    delete seekHead;
-    delete segment;
-  }
+  ~FilePrivate() = default;
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
-  Tag *tag = nullptr;
-  Attachments *attachments = nullptr;
-  SeekHead *seekHead = nullptr;
-  Segment *segment = nullptr;
+
+  std::unique_ptr<Tag> tag;
+  std::unique_ptr<Attachments> attachments;
+  std::unique_ptr<SeekHead> seekHead;
+  std::unique_ptr<Segment> segment;
   std::unique_ptr<Properties> properties;
 };
 
@@ -110,24 +105,16 @@ Tag *Matroska::File::tag() const
 
 Matroska::Tag *Matroska::File::tag(bool create) const
 {
-  if(d->tag)
-    return d->tag;
-  else {
-    if(create)
-      d->tag = new Tag();
-    return d->tag;
-  }
+  if(!d->tag && create)
+    d->tag = std::make_unique<Tag>();
+  return d->tag.get();
 }
 
 Matroska::Attachments *Matroska::File::attachments(bool create) const
 {
-  if(d->attachments)
-    return d->attachments;
-  else {
-    if(create)
-      d->attachments = new Attachments();
-    return d->attachments;
-  }
+  if(!d->attachments && create)
+    d->attachments = std::make_unique<Attachments>();
+  return d->attachments.get();
 }
 
 void Matroska::File::read(bool readProperties, Properties::ReadStyle)
@@ -136,7 +123,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle)
 
   // Find the EBML Header
   std::unique_ptr<EBML::Element> head(EBML::Element::factory(*this));
-  if(!head || head->getId() != EBML::ElementIDs::EBMLHeader) {
+  if(!head || head->getId() != EBML::Element::Id::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
     return;
@@ -145,8 +132,8 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle)
 
   // Find the Matroska segment in the file
   std::unique_ptr<EBML::MkSegment> segment(
-    static_cast<EBML::MkSegment *>(
-      EBML::findElement(*this, EBML::ElementIDs::MkSegment, fileLength - tell())
+    EBML::element_cast<EBML::Element::Id::MkSegment>(
+      EBML::findElement(*this, EBML::Element::Id::MkSegment, fileLength - tell())
     )
   );
   if(!segment) {
@@ -193,8 +180,8 @@ bool Matroska::File::save()
 
   // List of all possible elements we can write
   List<Element *> elements {
-    d->attachments,
-    d->tag
+    d->attachments.get(),
+    d->tag.get()
   };
 
   /* Build render list. New elements will be added
@@ -235,15 +222,15 @@ bool Matroska::File::save()
     for(auto it2 = std::next(it); it2 != renderList.end(); ++it2)
       (*it)->addSizeListener(*it2);
     if(d->seekHead)
-      (*it)->addSizeListener(d->seekHead);
-    (*it)->addSizeListener(d->segment);
+      (*it)->addSizeListener(d->seekHead.get());
+    (*it)->addSizeListener(d->segment.get());
   }
   if(d->seekHead) {
     d->seekHead->addSizeListeners(renderList);
-    renderList.append(d->seekHead);
+    renderList.append(d->seekHead.get());
   }
   d->segment->addSizeListeners(renderList);
-  renderList.append(d->segment);
+  renderList.append(d->segment.get());
 
   // Render the elements
   for(auto element : renderList) {

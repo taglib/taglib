@@ -39,12 +39,15 @@
 
 using namespace TagLib;
 
-EBML::Element *EBML::Element::factory(File &file)
+#define RETURN_ELEMENT_FOR_CASE(eid) \
+  case (eid): return make_unique_element<eid>(id, sizeLength, dataSize, offset)
+
+std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
 {
   // Get the element ID
   offset_t offset = file.tell();
-  Id id = readId(file);
-  if(!id) {
+  unsigned int uintId = readId(file);
+  if(!uintId) {
     debug("Failed to parse EMBL ElementID");
     return nullptr;
   }
@@ -55,73 +58,62 @@ EBML::Element *EBML::Element::factory(File &file)
     return nullptr;
 
   // Return the subclass
+  // The enum switch without default will give us a warning if an ID is missing
+  auto id = static_cast<Id>(uintId);
   switch(id) {
-  case ElementIDs::EBMLHeader:
-    return new Element(id, sizeLength, dataSize);
-
-  case ElementIDs::MkSegment:
-    return new MkSegment(sizeLength, dataSize, offset);
-
-  case ElementIDs::MkInfo:
-    return new MkInfo(sizeLength, dataSize, offset);
-
-  case ElementIDs::MkTracks:
-    return new MkTracks(sizeLength, dataSize, offset);
-
-  case ElementIDs::MkTags:
-    return new MkTags(sizeLength, dataSize, offset);
-
-  case ElementIDs::MkAttachments:
-    return new MkAttachments(sizeLength, dataSize, offset);
-
-  case ElementIDs::MkTag:
-  case ElementIDs::MkTagTargets:
-  case ElementIDs::MkSimpleTag:
-  case ElementIDs::MkAttachedFile:
-  case ElementIDs::MkSeek:
-  case ElementIDs::MkTrackEntry:
-  case ElementIDs::MkAudio:
-    return new MasterElement(id, sizeLength, dataSize, offset);
-
-  case ElementIDs::MkTagName:
-  case ElementIDs::MkTagString:
-  case ElementIDs::MkAttachedFileName:
-  case ElementIDs::MkAttachedFileDescription:
-    return new UTF8StringElement(id, sizeLength, dataSize);
-
-  case ElementIDs::MkTagLanguage:
-  case ElementIDs::MkAttachedFileMediaType:
-  case ElementIDs::MkCodecID:
-    return new Latin1StringElement(id, sizeLength, dataSize);
-
-  case ElementIDs::MkTagTargetTypeValue:
-  case ElementIDs::MkAttachedFileUID:
-  case ElementIDs::MkSeekPosition:
-  case ElementIDs::MkTimestampScale:
-  case ElementIDs::MkBitDepth:
-  case ElementIDs::MkChannels:
-    return new UIntElement(id, sizeLength, dataSize);
-
-  case ElementIDs::MkAttachedFileData:
-  case ElementIDs::MkSeekID:
-    return new BinaryElement(id, sizeLength, dataSize);
-
-  case ElementIDs::MkDuration:
-  case ElementIDs::MkSamplingFrequency:
-    return new FloatElement(id, sizeLength, dataSize);
-
-  case ElementIDs::MkSeekHead:
-    return new MkSeekHead(sizeLength, dataSize, offset);
-
-  case ElementIDs::VoidElement:
-    return new VoidElement(sizeLength, dataSize);
-
-  default:
-    return new Element(id, sizeLength, dataSize);
+    RETURN_ELEMENT_FOR_CASE(Id::EBMLHeader);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSegment);
+    RETURN_ELEMENT_FOR_CASE(Id::MkInfo);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTracks);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTags);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachments);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTag);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagTargets);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSimpleTag);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFile);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSeek);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTrackEntry);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAudio);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagName);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagString);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileName);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileDescription);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagLanguage);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileMediaType);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCodecID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagTargetTypeValue);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagsLanguageDefault);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileUID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSeekPosition);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTimestampScale);
+    RETURN_ELEMENT_FOR_CASE(Id::MkBitDepth);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChannels);
+    RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileData);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSeekID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkDuration);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSamplingFrequency);
+    RETURN_ELEMENT_FOR_CASE(Id::MkSeekHead);
+    RETURN_ELEMENT_FOR_CASE(Id::VoidElement);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCluster);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCodecState);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagBinary);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCues);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCuePoint);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueTime);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueTrackPositions);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueTrack);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueClusterPosition);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueRelativePosition);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueDuration);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueBlockNumber);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueCodecState);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueReference);
+    RETURN_ELEMENT_FOR_CASE(Id::MkCueRefTime);
   }
+  return std::make_unique<Element>(id, sizeLength, dataSize);
 }
 
-EBML::Element::Id EBML::Element::readId(File &file)
+unsigned int EBML::Element::readId(File &file)
 {
   auto buffer = file.readBlock(1);
   if(buffer.size() != 1) {
@@ -161,6 +153,7 @@ ByteVector EBML::Element::renderId() const
 {
   int numBytes = idSize(id);
   static const auto byteOrder = Utils::systemByteOrder();
-  uint32_t data = byteOrder == Utils::LittleEndian ? Utils::byteSwap(id) : id;
+  auto uintId = static_cast<uint32_t>(id);
+  uint32_t data = byteOrder == Utils::LittleEndian ? Utils::byteSwap(uintId) : uintId;
   return ByteVector(reinterpret_cast<char *>(&data) + (4 - numBytes), numBytes);
 }

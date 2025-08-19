@@ -65,13 +65,6 @@ namespace TagLib {
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<ElementPrivate> e;
     };
-    namespace ElementIDs {
-      inline constexpr Element::ID MkTags        = 0x1254C367;
-      inline constexpr Element::ID MkAttachments = 0x1941A469;
-      inline constexpr Element::ID MkSeekHead    = 0x114D9B74;
-      inline constexpr Element::ID MkSegment     = 0x18538067;
-      inline constexpr Element::ID MkCues        = 0x1C53BB6B;
-    }
   }
 }
 

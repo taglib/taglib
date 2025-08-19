@@ -1,5 +1,5 @@
-#include <memory>
 #include "matroskaattachments.h"
+#include <memory>
 #include "matroskaattachedfile.h"
 #include "ebmlmkattachments.h"
 #include "ebmlmasterelement.h"
@@ -22,7 +22,7 @@ public:
 };
 
 Matroska::Attachments::Attachments() :
-  Element(ElementIDs::MkAttachments),
+  Element(static_cast<ID>(EBML::Element::Id::MkAttachments)),
   d(std::make_unique<AttachmentsPrivate>())
 {
   d->files.setAutoDelete(true);
@@ -57,40 +57,40 @@ bool Matroska::Attachments::render()
 {
   EBML::MkAttachments attachments;
   for(const auto attachedFile : d->files) {
-    auto attachedFileElement = new EBML::MasterElement(EBML::ElementIDs::MkAttachedFile);
+    auto attachedFileElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFile>();
 
     // Filename
-    auto fileNameElement = new EBML::UTF8StringElement(EBML::ElementIDs::MkAttachedFileName);
+    auto fileNameElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileName>();
     fileNameElement->setValue(attachedFile->fileName());
-    attachedFileElement->appendElement(fileNameElement);
+    attachedFileElement->appendElement(std::move(fileNameElement));
 
     // Media/MIME type
-    auto mediaTypeElement = new EBML::Latin1StringElement(EBML::ElementIDs::MkAttachedFileMediaType);
+    auto mediaTypeElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileMediaType>();
     mediaTypeElement->setValue(attachedFile->mediaType());
-    attachedFileElement->appendElement(mediaTypeElement);
+    attachedFileElement->appendElement(std::move(mediaTypeElement));
 
     // Description
     const String &description = attachedFile->description();
     if(!description.isEmpty()) {
-      auto descriptionElement = new EBML::UTF8StringElement(EBML::ElementIDs::MkAttachedFileDescription);
+      auto descriptionElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileDescription>();
       descriptionElement->setValue(description);
-      attachedFileElement->appendElement(descriptionElement);
+      attachedFileElement->appendElement(std::move(descriptionElement));
     }
 
     // Data
-    auto dataElement = new EBML::BinaryElement(EBML::ElementIDs::MkAttachedFileData);
+    auto dataElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileData>();
     dataElement->setValue(attachedFile->data());
-    attachedFileElement->appendElement(dataElement);
+    attachedFileElement->appendElement(std::move(dataElement));
 
     // UID
-    auto uidElement = new EBML::UIntElement(EBML::ElementIDs::MkAttachedFileUID);
+    auto uidElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileUID>();
     AttachedFile::UID uid = attachedFile->uid();
     if(!uid)
       uid = EBML::randomUID();
     uidElement->setValue(uid);
-    attachedFileElement->appendElement(uidElement);
+    attachedFileElement->appendElement(std::move(uidElement));
 
-    attachments.appendElement(attachedFileElement);
+    attachments.appendElement(std::move(attachedFileElement));
   }
 
   auto beforeSize = size();

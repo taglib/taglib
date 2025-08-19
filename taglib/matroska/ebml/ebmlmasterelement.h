@@ -44,11 +44,13 @@ namespace TagLib::EBML {
     offset_t getOffset() const { return offset; }
     bool read(File &file) override;
     ByteVector render() override;
-    void appendElement(Element *element) { elements.append(element); }
-    List<Element *>::Iterator begin() { return elements.begin(); }
-    List<Element *>::Iterator end() { return elements.end(); }
-    List<Element *>::ConstIterator cbegin() const { return elements.cbegin(); }
-    List<Element *>::ConstIterator cend() const { return elements.cend(); }
+    void appendElement(std::unique_ptr<Element> &&element);
+    std::list<std::unique_ptr<Element>>::iterator begin() { return elements.begin(); }
+    std::list<std::unique_ptr<Element>>::iterator end() { return elements.end(); }
+    std::list<std::unique_ptr<Element>>::const_iterator begin() const { return elements.begin(); }
+    std::list<std::unique_ptr<Element>>::const_iterator end() const { return elements.end(); }
+    std::list<std::unique_ptr<Element>>::const_iterator cbegin() const { return elements.cbegin(); }
+    std::list<std::unique_ptr<Element>>::const_iterator cend() const { return elements.cend(); }
     offset_t getPadding() const { return padding; }
     void setPadding(offset_t padding) { this->padding = padding; }
     offset_t getMinRenderSize() const { return minRenderSize; }
@@ -58,7 +60,7 @@ namespace TagLib::EBML {
     offset_t offset;
     offset_t padding = 0;
     offset_t minRenderSize = 0;
-    List<Element *> elements;
+    std::list<std::unique_ptr<Element>> elements;
   };
 
 }

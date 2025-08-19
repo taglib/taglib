@@ -23,6 +23,14 @@
 
 using namespace TagLib;
 
+Matroska::Segment::Segment(offset_t sizeLength, offset_t dataSize, offset_t lengthOffset) :
+  Element(static_cast<ID>(EBML::Element::Id::MkSegment)),
+  sizeLength(sizeLength), dataSize(dataSize)
+{
+  setOffset(lengthOffset);
+  setSize(sizeLength);
+}
+
 bool Matroska::Segment::render()
 {
   auto data = EBML::renderVINT(dataSize, static_cast<int>(sizeLength));

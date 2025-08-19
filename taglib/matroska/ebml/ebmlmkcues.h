@@ -36,11 +36,11 @@ namespace TagLib {
     {
     public:
       MkCues(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(ElementIDs::MkCues, sizeLength, dataSize, offset)
+        MasterElement(Id::MkCues, sizeLength, dataSize, offset)
       {
       }
       MkCues() :
-        MasterElement(ElementIDs::MkCues, 0, 0, 0)
+        MasterElement(Id::MkCues, 0, 0, 0)
       {
       }
 

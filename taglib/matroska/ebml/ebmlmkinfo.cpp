@@ -38,13 +38,13 @@ void EBML::MkInfo::parse(Matroska::Properties *properties)
 
   unsigned long long timestampScale = 1000000;
   double duration = 0.0;
-  for(auto element : elements) {
+  for(const auto &element : elements) {
     Id id = element->getId();
-    if (id == ElementIDs::MkTimestampScale) {
-      timestampScale = static_cast<UIntElement *>(element)->getValue();
+    if (id == Id::MkTimestampScale) {
+      timestampScale = element_cast<Id::MkTimestampScale>(element)->getValue();
     }
-    else if (id == ElementIDs::MkDuration) {
-      duration = static_cast<FloatElement *>(element)->getValueAsDouble();
+    else if (id == Id::MkDuration) {
+      duration = element_cast<Id::MkDuration>(element)->getValueAsDouble();
     }
   }
 

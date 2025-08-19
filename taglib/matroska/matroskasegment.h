@@ -28,13 +28,7 @@ namespace TagLib::Matroska {
   class Segment : public Element
   {
   public:
-    Segment(offset_t sizeLength, offset_t dataSize, offset_t lengthOffset) :
-      Element(ElementIDs::MkSegment), sizeLength(sizeLength), dataSize(dataSize)
-    {
-      setOffset(lengthOffset);
-      setSize(sizeLength);
-    }
-
+    Segment(offset_t sizeLength, offset_t dataSize, offset_t lengthOffset);
     ~Segment() override = default;
     bool render() override;
     bool sizeChanged(Element &caller, offset_t delta) override;

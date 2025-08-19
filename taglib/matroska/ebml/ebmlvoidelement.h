@@ -33,10 +33,13 @@ namespace TagLib {
     {
     public:
       VoidElement(int sizeLength, offset_t dataSize) :
-        Element(ElementIDs::VoidElement, sizeLength, dataSize)
+        Element(Id::VoidElement, sizeLength, dataSize)
+      {}
+      VoidElement(Id, int sizeLength, offset_t dataSize, offset_t) :
+        Element(Id::VoidElement, sizeLength, dataSize)
       {}
       VoidElement() :
-        Element(ElementIDs::VoidElement, 0, 0)
+        Element(Id::VoidElement, 0, 0)
       {}
       ByteVector render() override;
       offset_t getTargetSize() const;
