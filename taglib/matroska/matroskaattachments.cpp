@@ -53,6 +53,11 @@ const Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFi
   return d->files;
 }
 
+Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFiles()
+{
+  return d->files;
+}
+
 bool Matroska::Attachments::render()
 {
   EBML::MkAttachments attachments;

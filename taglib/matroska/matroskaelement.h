@@ -18,8 +18,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKAELEMENT_H
-#define HAS_MATROSKAELEMENT_H
+#ifndef TAGLIB_MATROSKAELEMENT_H
+#define TAGLIB_MATROSKAELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
 #include <memory>

@@ -18,8 +18,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKAATTACHMENTS_H
-#define HAS_MATROSKAATTACHMENTS_H
+#ifndef TAGLIB_MATROSKAATTACHMENTS_H
+#define TAGLIB_MATROSKAATTACHMENTS_H
 
 #include <memory>
 #include "taglib_export.h"
@@ -56,6 +56,7 @@ namespace TagLib {
 
       // private Element implementation
       bool render() override;
+      AttachedFileList &attachedFiles();
 
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AttachmentsPrivate> d;

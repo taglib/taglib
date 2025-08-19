@@ -18,8 +18,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKACUES_H
-#define HAS_MATROSKACUES_H
+#ifndef TAGLIB_MATROSKACUES_H
+#define TAGLIB_MATROSKACUES_H
 #ifndef DO_NOT_DOCUMENT
 
 #include "tlist.h"

@@ -21,6 +21,7 @@
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskaattachments.h"
+#include "matroskaattachedfile.h"
 #include "matroskaseekhead.h"
 #include "matroskasegment.h"
 #include "ebmlutils.h"
@@ -29,9 +30,9 @@
 #include "tlist.h"
 #include "tdebug.h"
 #include "tagutils.h"
+#include "tpropertymap.h"
 
 #include <memory>
-#include <vector>
 
 using namespace TagLib;
 
@@ -108,6 +109,132 @@ Matroska::Tag *Matroska::File::tag(bool create) const
   if(!d->tag && create)
     d->tag = std::make_unique<Tag>();
   return d->tag.get();
+}
+
+PropertyMap Matroska::File::properties() const
+{
+  return d->tag ? d->tag->properties() : PropertyMap();
+}
+
+void Matroska::File::removeUnsupportedProperties(const StringList &properties)
+{
+  if(d->tag) {
+    d->tag->removeUnsupportedProperties(properties);
+  }
+}
+
+PropertyMap Matroska::File::setProperties(const PropertyMap &properties)
+{
+  if(!d->tag) {
+    d->tag = std::make_unique<Tag>();
+  }
+  return d->tag->setProperties(properties);
+}
+
+namespace {
+
+  String keyForAttachedFile(const Matroska::AttachedFile *attachedFile)
+  {
+    if(!attachedFile) {
+      return {};
+    }
+    if(attachedFile->mediaType().startsWith("image/")) {
+      return "PICTURE";
+    }
+    if(!attachedFile->mediaType().isEmpty()) {
+      return attachedFile->mediaType();
+    }
+    if(!attachedFile->fileName().isEmpty()) {
+      return attachedFile->fileName();
+    }
+    return String::fromLongLong(attachedFile->uid());
+  }
+
+  unsigned long long stringToULongLong(const String &str, bool *ok)
+  {
+    const wchar_t *beginPtr = str.toCWString();
+    wchar_t *endPtr;
+    errno = 0;
+    const unsigned long long value = ::wcstoull(beginPtr, &endPtr, 10);
+    if(ok) {
+      *ok = errno == 0 && endPtr > beginPtr && *endPtr == L'\0';
+    }
+    return value;
+  }
+
+}
+
+StringList Matroska::File::complexPropertyKeys() const
+{
+  StringList keys = TagLib::File::complexPropertyKeys();
+  if(d->attachments) {
+    const auto &attachedFiles = d->attachments->attachedFileList();
+    for(const auto &attachedFile : attachedFiles) {
+      String key = keyForAttachedFile(attachedFile);
+      if(!key.isEmpty() && !keys.contains(key)) {
+        keys.append(key);
+      }
+    }
+  }
+  return keys;
+}
+
+List<VariantMap> Matroska::File::complexProperties(const String &key) const
+{
+  List<VariantMap> props = TagLib::File::complexProperties(key);
+  if(d->attachments) {
+    const auto &attachedFiles = d->attachments->attachedFileList();
+    for(const auto &attachedFile : attachedFiles) {
+      if(keyForAttachedFile(attachedFile) == key) {
+        VariantMap property;
+        property.insert("data", attachedFile->data());
+        property.insert("mimeType", attachedFile->mediaType());
+        property.insert("description", attachedFile->description());
+        property.insert("fileName", attachedFile->fileName());
+        property.insert("uid", attachedFile->uid());
+        props.append(property);
+      }
+    }
+  }
+  return props;
+}
+
+bool Matroska::File::setComplexProperties(const String &key, const List<VariantMap> &value)
+{
+  if(TagLib::File::setComplexProperties(key, value)) {
+    return true;
+  }
+
+  attachments(true)->clear();
+  for(const auto &property : value) {
+    auto mimeType = property.value("mimeType").value<String>();
+    auto data = property.value("data").value<ByteVector>();
+    auto fileName = property.value("fileName").value<String>();
+    auto uid = property.value("uid").value<unsigned long long>();
+    bool ok;
+    unsigned long long uidKey;
+    if(key.upper() == "PICTURE" && !mimeType.startsWith("image/")) {
+      mimeType = data.startsWith("\x89PNG\x0d\x0a\x1a\x0a")
+                ? "image/png" : "image/jpeg";
+    }
+    else if(mimeType.isEmpty() && key.find("/") != -1) {
+      mimeType = key;
+    }
+    else if(fileName.isEmpty() && key.find(".") != -1) {
+      fileName = key;
+    }
+    else if(!uid && ((uidKey = stringToULongLong(key, &ok))) && ok) {
+      uid = uidKey;
+    }
+    auto attachedFile = new AttachedFile;
+    attachedFile->setData(data);
+    attachedFile->setMediaType(mimeType);
+    attachedFile->setDescription(property.value("description").value<String>());
+    attachedFile->setFileName(fileName);
+    attachedFile->setUID(uid);
+    d->attachments->addAttachedFile(attachedFile);
+  }
+  return true;
 }
 
 Matroska::Attachments *Matroska::File::attachments(bool create) const

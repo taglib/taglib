@@ -63,6 +63,30 @@ namespace TagLib {
       bool isEmpty() const override;
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
+      void removeUnsupportedProperties(const StringList& properties) override;
+
+      /*!
+       * Returns the names of the binary simple tags.
+       */
+      StringList complexPropertyKeys() const override;
+
+      /*!
+       * Get the binary simple tags as maps with keys "data", "name",
+       * "targetTypeValue", "language", "defaultLanguage".
+       * The attached files such as pictures with key "PICTURE" are available
+       * with Matroska::File::complexProperties().
+       */
+      List<VariantMap> complexProperties(const String& key) const override;
+
+      /*!
+       * Set the binary simple tags as maps with keys "data", "name",
+       * "targetTypeValue", "language", "defaultLanguage".
+       * The attached files such as pictures with key "PICTURE" can be set
+       * with Matroska::File::setComplexProperties().
+       *
+       * Returns \c true if \c key can be stored as binary simple tags.
+       */
+      bool setComplexProperties(const String& key, const List<VariantMap>& value) override;
 
       void addSimpleTag(SimpleTag *tag);
       void removeSimpleTag(SimpleTag *tag);

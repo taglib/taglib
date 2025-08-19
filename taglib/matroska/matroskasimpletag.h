@@ -18,8 +18,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKASIMPLETAG_H
-#define HAS_MATROSKASIMPLETAG_H
+#ifndef TAGLIB_MATROSKASIMPLETAG_H
+#define TAGLIB_MATROSKASIMPLETAG_H
 
 #include <memory>
 #include "tag.h"

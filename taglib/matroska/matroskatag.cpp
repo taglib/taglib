@@ -430,6 +430,73 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
   return unsupportedProperties;
 }
 
+void Matroska::Tag::removeUnsupportedProperties(const StringList& properties)
+{
+  d->removeSimpleTags(
+    [&properties](const SimpleTag* t) {
+      return properties.contains(t->name());
+    }
+  );
+}
+
+StringList Matroska::Tag::complexPropertyKeys() const
+{
+  StringList keys;
+  for(const SimpleTag *t : std::as_const(d->tags)) {
+    if(auto tBinary = dynamic_cast<const SimpleTagBinary*>(t)) {
+      keys.append(tBinary->name());
+    }
+  }
+  return keys;
+}
+
+List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
+{
+  List<VariantMap> props;
+  if(key.upper() != "PICTURE") { // Pictures are handled at the file level
+    for(const SimpleTag *t : std::as_const(d->tags)) {
+      if(auto tBinary = dynamic_cast<const SimpleTagBinary*>(t)) {
+        VariantMap property;
+        property.insert("data", tBinary->value());
+        property.insert("name", tBinary->name());
+        property.insert("targetTypeValue", tBinary->targetTypeValue());
+        property.insert("language", tBinary->language());
+        property.insert("defaultLanguage", tBinary->defaultLanguageFlag());
+        props.append(property);
+      }
+    }
+  }
+  return TagLib::Tag::complexProperties(key);
+}
+
+bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMap>& value)
+{
+  if(key.upper() == "PICTURE") {
+    // Pictures are handled at the file level
+    return false;
+  }
+  d->removeSimpleTags(
+    [&key](const SimpleTag* t) {
+      return t->name() == key && dynamic_cast<const SimpleTagBinary*>(t) != nullptr;
+    }
+  );
+  bool result = false;
+  for(const auto &property : value) {
+    if(property.value("name").value<String>() == key && property.contains("data")) {
+      auto *t = new SimpleTagBinary;
+      t->setTargetTypeValue(static_cast<SimpleTag::TargetTypeValue>(
+        property.value("targetTypeValue", 0).value<int>()));
+      t->setName(key);
+      t->setValue(property.value("data").value<ByteVector>());
+      t->setLanguage(property.value("language").value<String>());
+      t->setDefaultLanguageFlag(property.value("defaultLanguage", true).value<bool>());
+      d->tags.append(t);
+      result = true;
+    }
+  }
+  return result;
+}
+
 PropertyMap Matroska::Tag::properties() const
 {
   PropertyMap properties;

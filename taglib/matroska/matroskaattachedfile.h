@@ -18,8 +18,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef HAS_MATROSKAATTACHEDFILE_H
-#define HAS_MATROSKAATTACHEDFILE_H
+#ifndef TAGLIB_MATROSKAATTACHEDFILE_H
+#define TAGLIB_MATROSKAATTACHEDFILE_H
 
 #include "taglib_export.h"
 
