@@ -56,17 +56,17 @@ int main(int argc, char *argv[])
   if(attachments) {
     const TagLib::Matroska::Attachments::AttachedFileList &list = attachments->attachedFileList();
     printf("Found %u attachment(s)\n", list.size());
-    for(auto attachedFile : list) {
-      PRINT_PRETTY("Filename", attachedFile->fileName().toCString(true));
-      const TagLib::String &description = attachedFile->description();
+    for(const auto &attachedFile : list) {
+      PRINT_PRETTY("Filename", attachedFile.fileName().toCString(true));
+      const TagLib::String &description = attachedFile.description();
       PRINT_PRETTY("Description", !description.isEmpty() ? description.toCString(true) : "None");
-      const TagLib::String &mediaType = attachedFile->mediaType();
+      const TagLib::String &mediaType = attachedFile.mediaType();
       PRINT_PRETTY("Media Type", !mediaType.isEmpty() ? mediaType.toCString(false) : "None");
       PRINT_PRETTY("Data Size",
-        TagLib::Utils::formatString("%u byte(s)",attachedFile->data().size()).toCString(false)
+        TagLib::Utils::formatString("%u byte(s)",attachedFile.data().size()).toCString(false)
       );
       PRINT_PRETTY("UID",
-        TagLib::Utils::formatString("%llu",attachedFile->uid()).toCString(false)
+        TagLib::Utils::formatString("%llu",attachedFile.uid()).toCString(false)
       );
     }
   }

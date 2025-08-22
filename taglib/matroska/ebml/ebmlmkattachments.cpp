@@ -59,15 +59,15 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse()
     if(!(filename && data))
       continue;
 
-    auto file = new Matroska::AttachedFile();
-    file->setFileName(*filename);
-    file->setData(*data);
+    Matroska::AttachedFile file;
+    file.setFileName(*filename);
+    file.setData(*data);
     if(description)
-      file->setDescription(*description);
+      file.setDescription(*description);
     if(mediaType)
-      file->setMediaType(*mediaType);
+      file.setMediaType(*mediaType);
     if(uid)
-      file->setUID(uid);
+      file.setUID(uid);
 
     attachments->addAttachedFile(file);
   }

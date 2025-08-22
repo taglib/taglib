@@ -133,21 +133,18 @@ PropertyMap Matroska::File::setProperties(const PropertyMap &properties)
 
 namespace {
 
-  String keyForAttachedFile(const Matroska::AttachedFile *attachedFile)
+  String keyForAttachedFile(const Matroska::AttachedFile &attachedFile)
   {
-    if(!attachedFile) {
-      return {};
-    }
-    if(attachedFile->mediaType().startsWith("image/")) {
+    if(attachedFile.mediaType().startsWith("image/")) {
       return "PICTURE";
     }
-    if(!attachedFile->mediaType().isEmpty()) {
-      return attachedFile->mediaType();
+    if(!attachedFile.mediaType().isEmpty()) {
+      return attachedFile.mediaType();
     }
-    if(!attachedFile->fileName().isEmpty()) {
-      return attachedFile->fileName();
+    if(!attachedFile.fileName().isEmpty()) {
+      return attachedFile.fileName();
     }
-    return String::fromLongLong(attachedFile->uid());
+    return String::fromLongLong(attachedFile.uid());
   }
 
   unsigned long long stringToULongLong(const String &str, bool *ok)
@@ -187,11 +184,11 @@ List<VariantMap> Matroska::File::complexProperties(const String &key) const
     for(const auto &attachedFile : attachedFiles) {
       if(keyForAttachedFile(attachedFile) == key) {
         VariantMap property;
-        property.insert("data", attachedFile->data());
-        property.insert("mimeType", attachedFile->mediaType());
-        property.insert("description", attachedFile->description());
-        property.insert("fileName", attachedFile->fileName());
-        property.insert("uid", attachedFile->uid());
+        property.insert("data", attachedFile.data());
+        property.insert("mimeType", attachedFile.mediaType());
+        property.insert("description", attachedFile.description());
+        property.insert("fileName", attachedFile.fileName());
+        property.insert("uid", attachedFile.uid());
         props.append(property);
       }
     }
@@ -226,12 +223,12 @@ bool Matroska::File::setComplexProperties(const String &key, const List<VariantM
     else if(!uid && ((uidKey = stringToULongLong(key, &ok))) && ok) {
       uid = uidKey;
     }
-    auto attachedFile = new AttachedFile;
-    attachedFile->setData(data);
-    attachedFile->setMediaType(mimeType);
-    attachedFile->setDescription(property.value("description").value<String>());
-    attachedFile->setFileName(fileName);
-    attachedFile->setUID(uid);
+    AttachedFile attachedFile;
+    attachedFile.setData(data);
+    attachedFile.setMediaType(mimeType);
+    attachedFile.setDescription(property.value("description").value<String>());
+    attachedFile.setFileName(fileName);
+    attachedFile.setUID(uid);
     d->attachments->addAttachedFile(attachedFile);
   }
   return true;

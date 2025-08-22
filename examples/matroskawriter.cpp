@@ -41,11 +41,11 @@ int main(int argc, char *argv[])
   TagLib::FileStream image(argv[2]);
   auto data = image.readBlock(image.length());
   auto attachments = file.attachments(true);
-  auto attachedFile = new TagLib::Matroska::AttachedFile();
-  attachedFile->setFileName("cover.jpg");
-  attachedFile->setMediaType("image/jpeg");
-  attachedFile->setData(data);
-  //attachedFile->setUID(5081000385627515072ull);
+  TagLib::Matroska::AttachedFile attachedFile;
+  attachedFile.setFileName("cover.jpg");
+  attachedFile.setMediaType("image/jpeg");
+  attachedFile.setData(data);
+  //attachedFile.setUID(5081000385627515072ull);
   attachments->addAttachedFile(attachedFile);
 
   file.save();

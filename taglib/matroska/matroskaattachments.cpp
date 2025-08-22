@@ -1,3 +1,23 @@
+/***************************************************************************
+*   This library is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU Lesser General Public License version   *
+ *   2.1 as published by the Free Software Foundation.                     *
+ *                                                                         *
+ *   This library is distributed in the hope that it will be useful, but   *
+ *   WITHOUT ANY WARRANTY; without even the implied warranty of            *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     *
+ *   Lesser General Public License for more details.                       *
+ *                                                                         *
+ *   You should have received a copy of the GNU Lesser General Public      *
+ *   License along with this library; if not, write to the Free Software   *
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
+ *   02110-1301  USA                                                       *
+ *                                                                         *
+ *   Alternatively, this file is available under the Mozilla Public        *
+ *   License Version 1.1.  You may obtain a copy of the License at         *
+ *   http://www.mozilla.org/MPL/                                           *
+ ***************************************************************************/
+
 #include "matroskaattachments.h"
 #include <memory>
 #include "matroskaattachedfile.h"
@@ -18,27 +38,33 @@ public:
   ~AttachmentsPrivate() = default;
   AttachmentsPrivate(const AttachmentsPrivate &) = delete;
   AttachmentsPrivate &operator=(const AttachmentsPrivate &) = delete;
-  List<AttachedFile *> files;
+  AttachedFileList files;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
 Matroska::Attachments::Attachments() :
   Element(static_cast<ID>(EBML::Element::Id::MkAttachments)),
   d(std::make_unique<AttachmentsPrivate>())
 {
-  d->files.setAutoDelete(true);
 }
+
 Matroska::Attachments::~Attachments() = default;
 
-void Matroska::Attachments::addAttachedFile(AttachedFile *file)
+void Matroska::Attachments::addAttachedFile(const AttachedFile& file)
 {
   d->files.append(file);
 }
 
-void Matroska::Attachments::removeAttachedFile(AttachedFile *file)
+void Matroska::Attachments::removeAttachedFile(unsigned long long uid)
 {
-  auto it = d->files.find(file);
+  auto it = std::find_if(d->files.begin(), d->files.end(),
+    [uid](const AttachedFile& file) {
+      return file.uid() == uid;
+    });
   if(it != d->files.end()) {
-    delete *it;
     d->files.erase(it);
   }
 }
@@ -53,6 +79,10 @@ const Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFi
   return d->files;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
 Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFiles()
 {
   return d->files;
@@ -61,21 +91,21 @@ Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFiles()
 bool Matroska::Attachments::render()
 {
   EBML::MkAttachments attachments;
-  for(const auto attachedFile : d->files) {
+  for(const auto &attachedFile : std::as_const(d->files)) {
     auto attachedFileElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFile>();
 
     // Filename
     auto fileNameElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileName>();
-    fileNameElement->setValue(attachedFile->fileName());
+    fileNameElement->setValue(attachedFile.fileName());
     attachedFileElement->appendElement(std::move(fileNameElement));
 
     // Media/MIME type
     auto mediaTypeElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileMediaType>();
-    mediaTypeElement->setValue(attachedFile->mediaType());
+    mediaTypeElement->setValue(attachedFile.mediaType());
     attachedFileElement->appendElement(std::move(mediaTypeElement));
 
     // Description
-    const String &description = attachedFile->description();
+    const String &description = attachedFile.description();
     if(!description.isEmpty()) {
       auto descriptionElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileDescription>();
       descriptionElement->setValue(description);
@@ -84,12 +114,12 @@ bool Matroska::Attachments::render()
 
     // Data
     auto dataElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileData>();
-    dataElement->setValue(attachedFile->data());
+    dataElement->setValue(attachedFile.data());
     attachedFileElement->appendElement(std::move(dataElement));
 
     // UID
     auto uidElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileUID>();
-    AttachedFile::UID uid = attachedFile->uid();
+    AttachedFile::UID uid = attachedFile.uid();
     if(!uid)
       uid = EBML::randomUID();
     uidElement->setValue(uid);

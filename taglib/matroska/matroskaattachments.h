@@ -34,19 +34,31 @@ namespace TagLib {
   namespace Matroska {
     class AttachedFile;
     class File;
+
+    //! Collection of attached files.
     class TAGLIB_EXPORT Attachments
 #ifndef DO_NOT_DOCUMENT
       : private Element
 #endif
     {
     public:
-      using AttachedFileList = List<AttachedFile *>;
+      using AttachedFileList = List<AttachedFile>;
+      //! Construct attachments.
       Attachments();
-      virtual ~Attachments();
 
-      void addAttachedFile(AttachedFile *file);
-      void removeAttachedFile(AttachedFile *file);
+      //! Destroy attachements.
+      ~Attachments();
+
+      //! Add an attached file.
+      void addAttachedFile(const AttachedFile &file);
+
+      //! Remove an attached file.
+      void removeAttachedFile(unsigned long long uid);
+
+      //! Remove an attached file.
       void clear();
+
+      //! Get list of all attached files.
       const AttachedFileList &attachedFileList() const;
 
     private:
