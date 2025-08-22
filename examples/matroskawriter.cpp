@@ -22,18 +22,13 @@ int main(int argc, char *argv[])
   auto tag = file.tag(true);
   tag->clearSimpleTags();
 
-  auto simpleTag = new TagLib::Matroska::SimpleTagString();
-  simpleTag->setName("Test Name 1");
-  simpleTag->setTargetTypeValue(TagLib::Matroska::SimpleTag::TargetTypeValue::Track);
-  simpleTag->setValue("Test Value 1");
-  simpleTag->setLanguage("en");
-  tag->addSimpleTag(simpleTag);
+  tag->addSimpleTag(TagLib::Matroska::SimpleTag(
+    "Test Name 1", TagLib::String("Test Value 1"),
+    TagLib::Matroska::SimpleTag::TargetTypeValue::Track, "en"));
 
-  simpleTag = new TagLib::Matroska::SimpleTagString();
-  simpleTag->setName("Test Name 2");
-  simpleTag->setTargetTypeValue(TagLib::Matroska::SimpleTag::TargetTypeValue::Album);
-  simpleTag->setValue("Test Value 2");
-  tag->addSimpleTag(simpleTag);
+  tag->addSimpleTag(TagLib::Matroska::SimpleTag(
+    "Test Name 2", TagLib::String("Test Value 2"),
+    TagLib::Matroska::SimpleTag::TargetTypeValue::Album));
   tag->setTitle("Test title");
   tag->setArtist("Test artist");
   tag->setYear(1969);

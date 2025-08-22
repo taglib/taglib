@@ -68,47 +68,33 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
 
     // Parse each <SimpleTag>
     for(auto simpleTag : simpleTags) {
-      const String *tagName = nullptr;
       const String *tagValueString = nullptr;
       const ByteVector *tagValueBinary = nullptr;
-      const String *language = nullptr;
+      String tagName;
+      String language;
       bool defaultLanguageFlag = true;
 
       for(const auto &simpleTagChild : *simpleTag) {
         Id id = simpleTagChild->getId();
-        if(id == Id::MkTagName && !tagName)
-          tagName = &(element_cast<Id::MkTagName>(simpleTagChild)->getValue());
+        if(id == Id::MkTagName && tagName.isEmpty())
+          tagName = element_cast<Id::MkTagName>(simpleTagChild)->getValue();
         else if(id == Id::MkTagString && !tagValueString)
           tagValueString = &(element_cast<Id::MkTagString>(simpleTagChild)->getValue());
         else if(id == Id::MkTagBinary && !tagValueBinary)
           tagValueBinary = &(element_cast<Id::MkTagBinary>(simpleTagChild)->getValue());
-        else if(id == Id::MkTagsTagLanguage && !language)
-          language = &(element_cast<Id::MkTagsTagLanguage>(simpleTagChild)->getValue());
+        else if(id == Id::MkTagsTagLanguage && language.isEmpty())
+          language = element_cast<Id::MkTagsTagLanguage>(simpleTagChild)->getValue();
         else if(id == Id::MkTagsLanguageDefault)
           defaultLanguageFlag = element_cast<Id::MkTagsLanguageDefault>(simpleTagChild)->getValue() ? true : false;
       }
-      if(!tagName || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
+      if(tagName.isEmpty() || (tagValueString && tagValueBinary) || (!tagValueString && !tagValueBinary))
         continue;
 
-      // Create a Simple Tag object and add it to the Tag object
-      Matroska::SimpleTag *sTag = nullptr;
-      if(tagValueString) {
-        auto sTagString = new Matroska::SimpleTagString();
-        sTagString->setTargetTypeValue(targetTypeValue);
-        sTagString->setValue(*tagValueString);
-        sTag = sTagString;
-      }
-      else { // tagValueBinary must be non null
-        auto sTagBinary = new Matroska::SimpleTagBinary();
-        sTagBinary->setTargetTypeValue(targetTypeValue);
-        sTagBinary->setValue(*tagValueBinary);
-        sTag = sTagBinary;
-      }
-      sTag->setName(*tagName);
-      if(language)
-        sTag->setLanguage(*language);
-      sTag->setDefaultLanguageFlag(defaultLanguageFlag);
-      mTag->addSimpleTag(sTag);
+      mTag->addSimpleTag(tagValueString
+        ? Matroska::SimpleTag(tagName, *tagValueString,
+                             targetTypeValue, language, defaultLanguageFlag)
+        : Matroska::SimpleTag(tagName, *tagValueBinary,
+                             targetTypeValue, language, defaultLanguageFlag));
     }
   }
   return mTag;

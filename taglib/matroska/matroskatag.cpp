@@ -41,7 +41,7 @@ public:
   ~TagPrivate() = default;
 
   bool setTag(const String &key, const String &value);
-  const String *getTag(const String &key) const;
+  String getTag(const String &key) const;
 
   template <typename T>
   int removeSimpleTags(T &&p)
@@ -51,8 +51,6 @@ public:
     for(auto it = list.begin(); it != list.end();) {
       it = std::find_if(it, list.end(), std::forward<T>(p));
       if(it != list.end()) {
-        delete *it;
-        *it = nullptr;
         it = list.erase(it);
         numRemoved++;
       }
@@ -74,23 +72,7 @@ public:
     return list;
   }
 
-  template <typename T>
-  const SimpleTag *findSimpleTag(T &&p) const
-  {
-    auto &list = tags;
-    auto it = std::find_if(list.begin(), list.end(), std::forward<T>(p));
-    return it != list.end() ? *it : nullptr;
-  }
-
-  template <typename T>
-  SimpleTag *findSimpleTag(T &&p)
-  {
-    return const_cast<SimpleTag *>(
-      const_cast<const TagPrivate *>(this)->findSimpleTag(std::forward<T>(p))
-    );
-  }
-
-  List<SimpleTag *> tags;
+  SimpleTagsList tags;
   ByteVector data;
 };
 
@@ -98,20 +80,24 @@ Matroska::Tag::Tag() :
   Element(static_cast<ID>(EBML::Element::Id::MkTags)),
   d(std::make_unique<TagPrivate>())
 {
-  d->tags.setAutoDelete(true);
 }
+
 Matroska::Tag::~Tag() = default;
 
-void Matroska::Tag::addSimpleTag(SimpleTag *tag)
+void Matroska::Tag::addSimpleTag(const SimpleTag &tag)
 {
   d->tags.append(tag);
 }
 
-void Matroska::Tag::removeSimpleTag(SimpleTag *tag)
+void Matroska::Tag::removeSimpleTag(const String &name,
+  SimpleTag::TargetTypeValue targetTypeValue)
 {
-  auto it = d->tags.find(tag);
+  auto it = std::find_if(d->tags.begin(), d->tags.end(),
+    [&name, targetTypeValue](const SimpleTag &t) {
+        return t.name() == name && t.targetTypeValue() == targetTypeValue;
+    }
+  );
   if(it != d->tags.end()) {
-    delete *it;
     d->tags.erase(it);
   }
 }
@@ -163,49 +149,44 @@ void Matroska::Tag::setTrack(unsigned int i)
 
 String Matroska::Tag::title() const
 {
-  const auto value = d->getTag("TITLE");
-  return value ? *value : String();
+  return d->getTag("TITLE");
 }
 
 String Matroska::Tag::artist() const
 {
-  const auto value = d->getTag("ARTIST");
-  return value ? *value : String();
+  return d->getTag("ARTIST");
 }
 
 String Matroska::Tag::album() const
 {
-  const auto value = d->getTag("ALBUM");
-  return value ? *value : String();
+  return d->getTag("ALBUM");
 }
 
 String Matroska::Tag::comment() const
 {
-  const auto value = d->getTag("COMMENT");
-  return value ? *value : String();
+  return d->getTag("COMMENT");
 }
 
 String Matroska::Tag::genre() const
 {
-  const auto value = d->getTag("GENRE");
-  return value ? *value : String();
+  return d->getTag("GENRE");
 }
 
 unsigned int Matroska::Tag::year() const
 {
   auto value = d->getTag("DATE");
-  if(!value)
+  if(value.isEmpty())
     return 0;
-  auto list = value->split("-");
+  auto list = value.split("-");
   return static_cast<unsigned int>(list.front().toInt());
 }
 
 unsigned int Matroska::Tag::track() const
 {
   auto value = d->getTag("TRACKNUMBER");
-  if(!value)
+  if(value.isEmpty())
     return 0;
-  auto list = value->split("-");
+  auto list = value.split("-");
   return static_cast<unsigned int>(list.front().toInt());
 }
 
@@ -217,30 +198,29 @@ bool Matroska::Tag::isEmpty() const
 bool Matroska::Tag::render()
 {
   EBML::MkTags tags;
-  List<List<SimpleTag *> *> targetList;
-  targetList.setAutoDelete(true);
+  List<SimpleTagsList> targetList;
 
   // Build target-based list
-  for(auto tag : d->tags) {
-    auto targetTypeValue = tag->targetTypeValue();
+  for(const auto &tag : std::as_const(d->tags)) {
+    auto targetTypeValue = tag.targetTypeValue();
     auto it = std::find_if(targetList.begin(),
       targetList.end(),
-      [&](auto list) {
-        const auto *simpleTag = list->front();
-        return simpleTag->targetTypeValue() == targetTypeValue;
+      [&](const auto &list) {
+        const auto &simpleTag = list.front();
+        return simpleTag.targetTypeValue() == targetTypeValue;
       }
     );
     if(it == targetList.end()) {
-      auto list = new List<SimpleTag *>();
-      list->append(tag);
+      SimpleTagsList list;
+      list.append(tag);
       targetList.append(list);
     }
     else
-      (*it)->append(tag);
+      it->append(tag);
   }
-  for(auto list : targetList) {
-    auto frontTag = list->front();
-    auto targetTypeValue = frontTag->targetTypeValue();
+  for(const auto &list : targetList) {
+    const auto &frontTag = list.front();
+    auto targetTypeValue = frontTag.targetTypeValue();
     auto tag = EBML::make_unique_element<EBML::Element::Id::MkTag>();
 
     // Build <Tag Targets> element
@@ -253,35 +233,33 @@ bool Matroska::Tag::render()
     tag->appendElement(std::move(targets));
 
     // Build <Simple Tag> element
-    for(auto simpleTag : *list) {
+    for(const auto &simpleTag : list) {
       auto t = EBML::make_unique_element<EBML::Element::Id::MkSimpleTag>();
       auto tagName = EBML::make_unique_element<EBML::Element::Id::MkTagName>();
-      tagName->setValue(simpleTag->name());
+      tagName->setValue(simpleTag.name());
       t->appendElement(std::move(tagName));
 
       // Tag Value
-      SimpleTagString *tStr = nullptr;
-      SimpleTagBinary *tBin = nullptr;
-      if((tStr = dynamic_cast<SimpleTagString *>(simpleTag))) {
+      if(simpleTag.type() == SimpleTag::StringType) {
         auto tagValue = EBML::make_unique_element<EBML::Element::Id::MkTagString>();
-        tagValue->setValue(tStr->value());
+        tagValue->setValue(simpleTag.toString());
         t->appendElement(std::move(tagValue));
       }
-      else if((tBin = dynamic_cast<SimpleTagBinary *>(simpleTag))) {
+      else if(simpleTag.type() == SimpleTag::BinaryType) {
         auto tagValue = EBML::make_unique_element<EBML::Element::Id::MkTagBinary>();
-        tagValue->setValue(tBin->value());
+        tagValue->setValue(simpleTag.toByteVector());
         t->appendElement(std::move(tagValue));
       }
 
       // Language
       auto language = EBML::make_unique_element<EBML::Element::Id::MkTagsTagLanguage>();
-      const String &lang = simpleTag->language();
+      const String &lang = simpleTag.language();
       language->setValue(!lang.isEmpty() ? lang : "und");
       t->appendElement(std::move(language));
 
       // Default language flag
       auto dlf = EBML::make_unique_element<EBML::Element::Id::MkTagsLanguageDefault>();
-      dlf->setValue(simpleTag->defaultLanguageFlag() ? 1 : 0);
+      dlf->setValue(simpleTag.defaultLanguageFlag() ? 1 : 0);
       t->appendElement(std::move(dlf));
 
       tag->appendElement(std::move(t));
@@ -302,51 +280,62 @@ bool Matroska::Tag::render()
 
 namespace
 {
-  // PropertyMap key, Tag name, Target type value
+  // PropertyMap key, Tag name, Target type value, strict
   // If the key is the same as the name and the target type value is Track,
   // no translation is needed because this is the default mapping.
-  // Therefore, keys like TITLE, ARTIST, GENRE, COMMENT, etc. are omitted.
+  // Therefore, keys like TITLE, ARTIST, GENRE, COMMENT, etc. are omitted
+  // unless they shall have priority over higher level tags with the same name
+  // when no target type value is given. The strict boolean marks
+  // entries which shall not be mapped without correct target type value.
   // For offical tags, see https://www.matroska.org/technical/tagging.html
   constexpr std::array simpleTagsTranslation {
-    std::tuple("ALBUM", "TITLE", Matroska::SimpleTag::TargetTypeValue::Album),
-    std::tuple("ALBUMARTIST", "ARTIST", Matroska::SimpleTag::TargetTypeValue::Album),
-    std::tuple("TRACKNUMBER", "PART_NUMBER", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("TRACKTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("DISCNUMBER", "PART_NUMBER", Matroska::SimpleTag::TargetTypeValue::Part),
-    std::tuple("DISCTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Part),
-    std::tuple("DATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Album),
+    std::tuple("TITLE", "TITLE", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ALBUM", "TITLE", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("ARTIST", "ARTIST", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ALBUMARTIST", "ARTIST", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("TRACKNUMBER", "PART_NUMBER", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("DISCNUMBER", "PART_NUMBER", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("TRACKTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("DISCTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("DATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Album, false),
     // Todo - original date
-    std::tuple("ALBUMSORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Album),
-    std::tuple("ALBUMARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Album),
-    std::tuple("ENCODEDBY", "ENCODED_BY", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("MEDIA", "ORIGINAL_MEDIA_TYPE", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("LABEL", "LABEL_CODE", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("CATALOGNUMBER", "CATALOG_NUMBER", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("DJMIXER", "MIXED_BY", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("REMIXER", "REMIXED_BY", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("INITIALKEY", "INITIAL_KEY", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("RELEASEDATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("ENCODINGTIME", "DATE_ENCODED", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("TAGGINGDATE", "DATE_TAGGED", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("ENCODEDBY", "ENCODER", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("ENCODING", "ENCODER_SETTINGS", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("OWNER", "PURCHASE_OWNER", Matroska::SimpleTag::TargetTypeValue::Track),
-    std::tuple("MUSICBRAINZ_ALBUMARTISTID", "MUSICBRAINZ_ALBUMARTISTID", Matroska::SimpleTag::TargetTypeValue::Album),
-    std::tuple("MUSICBRAINZ_ALBUMID", "MUSICBRAINZ_ALBUMID", Matroska::SimpleTag::TargetTypeValue::Album),
-    std::tuple("MUSICBRAINZ_RELEASEGROUPID", "MUSICBRAINZ_RELEASEGROUPID", Matroska::SimpleTag::TargetTypeValue::Album),
+    std::tuple("TITLESORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ALBUMSORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("ARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ALBUMARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("ENCODEDBY", "ENCODED_BY", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("MEDIA", "ORIGINAL_MEDIA_TYPE", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("LABEL", "LABEL_CODE", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("CATALOGNUMBER", "CATALOG_NUMBER", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("DJMIXER", "MIXED_BY", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("REMIXER", "REMIXED_BY", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("INITIALKEY", "INITIAL_KEY", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("RELEASEDATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ENCODINGTIME", "DATE_ENCODED", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("TAGGINGDATE", "DATE_TAGGED", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ENCODEDBY", "ENCODER", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("ENCODING", "ENCODER_SETTINGS", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("OWNER", "PURCHASE_OWNER", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("REPLAYGAIN_TRACK_GAIN", "REPLAYGAIN_GAIN", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("REPLAYGAIN_ALBUM_GAIN", "REPLAYGAIN_GAIN", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("REPLAYGAIN_TRACK_PEAK", "REPLAYGAIN_PEAK", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("REPLAYGAIN_ALBUM_PEAK", "REPLAYGAIN_PEAK", Matroska::SimpleTag::TargetTypeValue::Album, true),
+    std::tuple("MUSICBRAINZ_ALBUMARTISTID", "MUSICBRAINZ_ALBUMARTISTID", Matroska::SimpleTag::TargetTypeValue::Album, false),
+    std::tuple("MUSICBRAINZ_ALBUMID", "MUSICBRAINZ_ALBUMID", Matroska::SimpleTag::TargetTypeValue::Album, false),
+    std::tuple("MUSICBRAINZ_RELEASEGROUPID", "MUSICBRAINZ_RELEASEGROUPID", Matroska::SimpleTag::TargetTypeValue::Album, false),
   };
 
-  std::pair<String, Matroska::SimpleTag::TargetTypeValue> translateKey(const String &key)
+  std::tuple<String, Matroska::SimpleTag::TargetTypeValue, bool> translateKey(const String &key)
   {
     auto it = std::find_if(simpleTagsTranslation.cbegin(),
       simpleTagsTranslation.cend(),
       [&key](const auto &t) { return key == std::get<0>(t); }
     );
     if(it != simpleTagsTranslation.end())
-      return { std::get<1>(*it), std::get<2>(*it) };
+      return { std::get<1>(*it), std::get<2>(*it), std::get<3>(*it) };
     if (!key.isEmpty() && !key.startsWith("_"))
-      return { key, Matroska::SimpleTag::TargetTypeValue::Track };
-    return { String(), Matroska::SimpleTag::TargetTypeValue::None };
+      return { key, Matroska::SimpleTag::TargetTypeValue::Track, false };
+    return { String(), Matroska::SimpleTag::TargetTypeValue::None, false };
   }
 
   String translateTag(const String &name, Matroska::SimpleTag::TargetTypeValue targetTypeValue)
@@ -355,12 +344,16 @@ namespace
       simpleTagsTranslation.cend(),
       [&name, targetTypeValue](const auto &t) {
         return name == std::get<1>(t)
-               && targetTypeValue == std::get<2>(t);
+               && (targetTypeValue == std::get<2>(t) ||
+                   (targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None
+                     && !std::get<3>(t)));
       }
     );
     return it != simpleTagsTranslation.end()
       ? String(std::get<0>(*it), String::UTF8)
-      : targetTypeValue == Matroska::SimpleTag::TargetTypeValue::Track && !name.startsWith("_")
+      : (targetTypeValue == Matroska::SimpleTag::TargetTypeValue::Track ||
+         targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) &&
+           !name.startsWith("_")
       ? name
         : String();
   }
@@ -368,59 +361,65 @@ namespace
 
 bool Matroska::Tag::TagPrivate::setTag(const String &key, const String &value)
 {
-  const auto pair = translateKey(key);
+  const auto tpl = translateKey(key);
   // Workaround Clang issue - no lambda capture of structured bindings
-  const String &name = pair.first;
-  auto targetTypeValue = pair.second;
+  const String &name = std::get<0>(tpl);
+  auto targetTypeValue = std::get<1>(tpl);
   if(name.isEmpty())
     return false;
   removeSimpleTags(
-    [&name, targetTypeValue] (auto t) {
-      return t->name() == name
-             && t->targetTypeValue() == targetTypeValue;
+    [&name, targetTypeValue] (const auto &t) {
+      return t.name() == name
+             && t.targetTypeValue() == targetTypeValue;
     }
   );
   if(!value.isEmpty()) {
-    auto t = new SimpleTagString();
-    t->setTargetTypeValue(targetTypeValue);
-    t->setName(name);
-    t->setValue(value);
-    tags.append(t);
+    tags.append(SimpleTag(name, value, targetTypeValue));
   }
   return true;
 }
 
-const String *Matroska::Tag::TagPrivate::getTag(const String &key) const
+String Matroska::Tag::TagPrivate::getTag(const String &key) const
 {
-  const auto pair = translateKey(key);
+  const auto tpl = translateKey(key);
   // Workaround Clang issue - no lambda capture of structured bindings
-  const String &name = pair.first;
-  auto targetTypeValue = pair.second;
+  const String &name = std::get<0>(tpl);
+  auto targetTypeValue = std::get<1>(tpl);
+  bool strict = std::get<2>(tpl);
   if(name.isEmpty())
-    return nullptr;
-  auto tag = dynamic_cast<const SimpleTagString *>(
-    findSimpleTag(
-      [&name, targetTypeValue] (auto t) {
-        return t->name() == name
-               && t->targetTypeValue() == targetTypeValue;
-      }
-    )
+    return {};
+  auto it = std::find_if(tags.begin(), tags.end(),
+    [&name, targetTypeValue, strict] (const SimpleTag &t) {
+      return t.name() == name
+        && t.type() == SimpleTag::StringType
+        && (t.targetTypeValue() == targetTypeValue ||
+            (t.targetTypeValue() == SimpleTag::TargetTypeValue::None && !strict));
+    }
   );
-  return tag ? &tag->value() : nullptr;
+  return it != tags.end() ? it->toString() : String();
 }
 
 PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 {
+  // Remove all simple tags which would be returned in properties()
+  for(auto it = d->tags.begin(); it != d->tags.end();) {
+    String key;
+    if(it->type() == SimpleTag::StringType &&
+       !(key = translateTag(it->name(), it->targetTypeValue())).isEmpty()) {
+      it = d->tags.erase(it);
+    }
+    else {
+      ++it;
+    }
+  }
+
+  // Add the new properties
   PropertyMap unsupportedProperties;
   for(const auto &[key, values] : propertyMap) {
     for(const auto &value : values) {
-      if(auto [name, targetTypeValue] = translateKey(key);
+      if(auto [name, targetTypeValue, _] = translateKey(key);
          !name.isEmpty()) {
-        auto t = new SimpleTagString();
-        t->setTargetTypeValue(targetTypeValue);
-        t->setName(name);
-        t->setValue(value);
-        d->tags.append(t);
+        d->tags.append(SimpleTag(name, value, targetTypeValue));
       }
       else {
         unsupportedProperties[key] = values;
@@ -433,8 +432,8 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 void Matroska::Tag::removeUnsupportedProperties(const StringList& properties)
 {
   d->removeSimpleTags(
-    [&properties](const SimpleTag* t) {
-      return properties.contains(t->name());
+    [&properties](const SimpleTag &t) {
+      return properties.contains(t.name());
     }
   );
 }
@@ -442,9 +441,9 @@ void Matroska::Tag::removeUnsupportedProperties(const StringList& properties)
 StringList Matroska::Tag::complexPropertyKeys() const
 {
   StringList keys;
-  for(const SimpleTag *t : std::as_const(d->tags)) {
-    if(auto tBinary = dynamic_cast<const SimpleTagBinary*>(t)) {
-      keys.append(tBinary->name());
+  for(const SimpleTag &t : std::as_const(d->tags)) {
+    if(t.type() == SimpleTag::BinaryType) {
+      keys.append(t.name());
     }
   }
   return keys;
@@ -454,19 +453,19 @@ List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
 {
   List<VariantMap> props;
   if(key.upper() != "PICTURE") { // Pictures are handled at the file level
-    for(const SimpleTag *t : std::as_const(d->tags)) {
-      if(auto tBinary = dynamic_cast<const SimpleTagBinary*>(t)) {
+    for(const SimpleTag &t : std::as_const(d->tags)) {
+      if(t.type() == SimpleTag::BinaryType) {
         VariantMap property;
-        property.insert("data", tBinary->value());
-        property.insert("name", tBinary->name());
-        property.insert("targetTypeValue", tBinary->targetTypeValue());
-        property.insert("language", tBinary->language());
-        property.insert("defaultLanguage", tBinary->defaultLanguageFlag());
+        property.insert("data", t.toByteVector());
+        property.insert("name", t.name());
+        property.insert("targetTypeValue", t.targetTypeValue());
+        property.insert("language", t.language());
+        property.insert("defaultLanguage", t.defaultLanguageFlag());
         props.append(property);
       }
     }
   }
-  return TagLib::Tag::complexProperties(key);
+  return props;
 }
 
 bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMap>& value)
@@ -476,21 +475,20 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
     return false;
   }
   d->removeSimpleTags(
-    [&key](const SimpleTag* t) {
-      return t->name() == key && dynamic_cast<const SimpleTagBinary*>(t) != nullptr;
+    [&key](const SimpleTag &t) {
+      return t.name() == key && t.type() == SimpleTag::BinaryType;
     }
   );
   bool result = false;
   for(const auto &property : value) {
     if(property.value("name").value<String>() == key && property.contains("data")) {
-      auto *t = new SimpleTagBinary;
-      t->setTargetTypeValue(static_cast<SimpleTag::TargetTypeValue>(
-        property.value("targetTypeValue", 0).value<int>()));
-      t->setName(key);
-      t->setValue(property.value("data").value<ByteVector>());
-      t->setLanguage(property.value("language").value<String>());
-      t->setDefaultLanguageFlag(property.value("defaultLanguage", true).value<bool>());
-      d->tags.append(t);
+      d->tags.append(SimpleTag(
+        key,
+        property.value("data").value<ByteVector>(),
+        static_cast<SimpleTag::TargetTypeValue>(
+          property.value("targetTypeValue", 0).value<int>()),
+        property.value("language").value<String>(),
+        property.value("defaultLanguage", true).value<bool>()));
       result = true;
     }
   }
@@ -500,12 +498,13 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
 PropertyMap Matroska::Tag::properties() const
 {
   PropertyMap properties;
-  SimpleTagString *tStr = nullptr;
-  for(auto simpleTag : std::as_const(d->tags)) {
-    if((tStr = dynamic_cast<SimpleTagString *>(simpleTag))) {
-      String key = translateTag(tStr->name(), tStr->targetTypeValue());
+  for(const auto &simpleTag : std::as_const(d->tags)) {
+    if(simpleTag.type() == SimpleTag::StringType) {
+      String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
       if(!key.isEmpty())
-        properties[key].append(tStr->value());
+        properties[key].append(simpleTag.toString());
+      else
+        properties.addUnsupportedData(simpleTag.name());
     }
   }
   return properties;

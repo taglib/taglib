@@ -30,23 +30,21 @@ int main(int argc, char *argv[])
   const TagLib::Matroska::SimpleTagsList &list = tag->simpleTagsList();
   printf("Found %u tag(s):\n", list.size());
 
-  for(TagLib::Matroska::SimpleTag *t : list) {
-    PRINT_PRETTY("Tag Name", t->name().toCString(true));
+  for(const TagLib::Matroska::SimpleTag &t : list) {
+    PRINT_PRETTY("Tag Name", t.name().toCString(true));
 
-    TagLib::Matroska::SimpleTagString *tString = nullptr;
-    TagLib::Matroska::SimpleTagBinary *tBinary = nullptr;
-    if((tString = dynamic_cast<TagLib::Matroska::SimpleTagString*>(t)))
-      PRINT_PRETTY("Tag Value", tString->value().toCString(true));
-    else if((tBinary = dynamic_cast<TagLib::Matroska::SimpleTagBinary*>(t)))
+    if(t.type() == TagLib::Matroska::SimpleTag::StringType)
+      PRINT_PRETTY("Tag Value", t.toString().toCString(true));
+    else if(t.type() == TagLib::Matroska::SimpleTag::BinaryType)
       PRINT_PRETTY("Tag Value",
-        TagLib::Utils::formatString("Binary with size %i", tBinary->value().size()).toCString(false)
+        TagLib::Utils::formatString("Binary with size %i", t.toByteVector().size()).toCString(false)
       );
 
-    auto targetTypeValue = static_cast<unsigned int>(t->targetTypeValue());
+    auto targetTypeValue = static_cast<unsigned int>(t.targetTypeValue());
     PRINT_PRETTY("Target Type Value",
       targetTypeValue == 0 ? "None" : TagLib::Utils::formatString("%i", targetTypeValue).toCString(false)
     );
-    const TagLib::String &language = t->language();
+    const TagLib::String &language = t.language();
     PRINT_PRETTY("Language", !language.isEmpty() ? language.toCString(false) : "Not set");
 
     printf("\n");

@@ -23,70 +23,116 @@
 
 #include <memory>
 #include "tag.h"
-//#include "matroskatag.h"
 
 namespace TagLib {
   class String;
   class ByteVector;
   namespace Matroska {
+    //! Attribute of Matroska metadata.
     class TAGLIB_EXPORT SimpleTag
     {
     public:
+      //! Specifies the level of other elements the tag value applies to.
       enum TargetTypeValue {
-        None = 0,
-        Shot = 10,
-        Subtrack = 20,
-        Track = 30,
-        Part = 40,
-        Album = 50,
-        Edition = 60,
-        Collection = 70
+        None = 0,       //!< Empty or omitted, everything in the segment
+        Shot = 10,      //!< Shot
+        Subtrack = 20,  //!< Subtrack / movement / scene
+        Track = 30,     //!< Track / song / chapter
+        Part = 40,      //!< Part / session
+        Album = 50,     //!< Album / opera / concert / movie / episode
+        Edition = 60,   //!< Edition / issue / volume / opus / season / sequel
+        Collection = 70 //!< Collection
       };
+
+      //! The types the value can have.
+      enum ValueType {
+        StringType = 0, //!< Item contains text information coded in UTF-8
+        BinaryType = 1  //!< Item contains binary information
+      };
+
+      /*!
+       * Construct a string simple tag.
+       */
+      SimpleTag(const String &name, const String &value,
+                TargetTypeValue targetTypeValue = None,
+                const String &language = String(), bool defaultLanguage = true);
+
+      /*!
+       * Construct a binary simple tag.
+       */
+      SimpleTag(const String &name, const ByteVector &value,
+        TargetTypeValue targetTypeValue = None,
+        const String &language = String(), bool defaultLanguage = true);
+
+      /*!
+       * Construct a simple tag as a copy of \a other.
+       */
+      SimpleTag(const SimpleTag &other);
+
+      /*!
+       * Construct a simple tag moving from \a other.
+       */
+      SimpleTag(SimpleTag &&other) noexcept;
+
+      /*!
+       * Destroys this simple tag.
+       */
+      ~SimpleTag();
+
+      /*!
+       * Copies the contents of \a other into this item.
+       */
+      SimpleTag &operator=(const SimpleTag &other);
+
+      /*!
+       * Moves the contents of \a other into this item.
+       */
+      SimpleTag &operator=(SimpleTag &&other);
+
+      /*!
+       * Exchanges the content of the simple tag with the content of \a other.
+       */
+      void swap(SimpleTag &other) noexcept;
+
+      /*!
+       * Returns the name of the simple tag.
+       */
       const String &name() const;
+
+      /*!
+       * Returns the logical level of the target.
+       */
       TargetTypeValue targetTypeValue() const;
+
+      /*!
+       * Returns the language of the tag.
+       */
       const String &language() const;
+
+      /*!
+       * Returns if this is the default/original language to use for the tag.
+       */
       bool defaultLanguageFlag() const;
-      void setName(const String &name);
-      void setTargetTypeValue(TargetTypeValue targetTypeValue);
-      void setLanguage(const String &language);
-      void setDefaultLanguageFlag(bool flag);
-      virtual ~SimpleTag();
+
+      /*!
+       * Returns the type of the value.
+       */
+      ValueType type() const;
+
+      /*!
+       * Returns the StringType value.
+       */
+      String toString() const;
+
+      /*!
+       * Returns the BinaryType value.
+       */
+      ByteVector toByteVector() const;
 
     private:
       class SimpleTagPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<SimpleTagPrivate> d;
-
-    protected:
-      SimpleTag();
-    };
-
-    class TAGLIB_EXPORT SimpleTagString : public SimpleTag
-    {
-    public:
-      SimpleTagString();
-      ~SimpleTagString() override;
-      const String &value() const;
-      void setValue(const String &value);
-
-    private:
-      class SimpleTagStringPrivate;
-      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
-      std::unique_ptr<SimpleTagStringPrivate> dd;
-    };
-
-    class TAGLIB_EXPORT SimpleTagBinary : public SimpleTag
-    {
-    public:
-      SimpleTagBinary();
-      ~SimpleTagBinary() override;
-      const ByteVector &value() const;
-      void setValue(const ByteVector &value);
-
-    private:
-      class SimpleTagBinaryPrivate;
-      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
-      std::unique_ptr<SimpleTagBinaryPrivate> dd;
     };
 
   }

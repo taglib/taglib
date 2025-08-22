@@ -37,7 +37,7 @@ namespace TagLib {
   }
 
   namespace Matroska {
-    using SimpleTagsList = List<SimpleTag *>;
+    using SimpleTagsList = List<SimpleTag>;
     class TAGLIB_EXPORT Tag : public TagLib::Tag
 #ifndef DO_NOT_DOCUMENT
     , private Element
@@ -76,7 +76,7 @@ namespace TagLib {
        * The attached files such as pictures with key "PICTURE" are available
        * with Matroska::File::complexProperties().
        */
-      List<VariantMap> complexProperties(const String& key) const override;
+      List<VariantMap> complexProperties(const String &key) const override;
 
       /*!
        * Set the binary simple tags as maps with keys "data", "name",
@@ -88,8 +88,8 @@ namespace TagLib {
        */
       bool setComplexProperties(const String& key, const List<VariantMap>& value) override;
 
-      void addSimpleTag(SimpleTag *tag);
-      void removeSimpleTag(SimpleTag *tag);
+      void addSimpleTag(const SimpleTag &tag);
+      void removeSimpleTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue);
       void clearSimpleTags();
       const SimpleTagsList &simpleTagsList() const;
 
