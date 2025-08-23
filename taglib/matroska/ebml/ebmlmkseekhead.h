@@ -46,7 +46,7 @@ namespace TagLib {
       {
       }
 
-      std::unique_ptr<Matroska::SeekHead> parse();
+      std::unique_ptr<Matroska::SeekHead> parse(offset_t segmentDataOffset);
     };
   }
 }

@@ -26,6 +26,7 @@
 #include "ebmlmktags.h"
 #include "ebmlmkattachments.h"
 #include "ebmlmkseekhead.h"
+#include "ebmlmkcues.h"
 #include "ebmlmkinfo.h"
 #include "ebmlmktracks.h"
 #include "taglib.h"
@@ -50,10 +51,12 @@ namespace TagLib {
       {
       }
       ~MkSegment() override;
+      offset_t segmentDataOffset() const;
       bool read(File &file) override;
       std::unique_ptr<Matroska::Tag> parseTag();
       std::unique_ptr<Matroska::Attachments> parseAttachments();
       std::unique_ptr<Matroska::SeekHead> parseSeekHead();
+      std::unique_ptr<Matroska::Cues> parseCues();
       std::unique_ptr<Matroska::Segment> parseSegment();
       void parseInfo(Matroska::Properties *properties);
       void parseTracks(Matroska::Properties *properties);
@@ -62,6 +65,7 @@ namespace TagLib {
       std::unique_ptr<MkTags> tags;
       std::unique_ptr<MkAttachments> attachments;
       std::unique_ptr<MkSeekHead> seekHead;
+      std::unique_ptr<MkCues> cues;
       std::unique_ptr<MkInfo> info;
       std::unique_ptr<MkTracks> tracks;
     };

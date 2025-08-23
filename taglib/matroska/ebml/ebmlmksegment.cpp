@@ -28,12 +28,18 @@
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskaattachments.h"
+#include "matroskacues.h"
 #include "matroskaseekhead.h"
 #include "matroskasegment.h"
 
 using namespace TagLib;
 
 EBML::MkSegment::~MkSegment() = default;
+
+offset_t EBML::MkSegment::segmentDataOffset() const
+{
+  return offset + idSize(id) + sizeLength;
+}
 
 bool EBML::MkSegment::read(File &file)
 {
@@ -47,6 +53,11 @@ bool EBML::MkSegment::read(File &file)
       seekHeadIndex = i;
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
       if(!seekHead->read(file))
+        return false;
+    }
+    else if(id == Id::MkCues) {
+      cues = element_cast<Id::MkCues>(std::move(element));
+      if(!cues->read(file))
         return false;
     }
     else if(id == Id::MkInfo) {
@@ -94,7 +105,12 @@ std::unique_ptr<Matroska::Attachments> EBML::MkSegment::parseAttachments()
 
 std::unique_ptr<Matroska::SeekHead> EBML::MkSegment::parseSeekHead()
 {
-  return seekHead ? seekHead->parse() : nullptr;
+  return seekHead ? seekHead->parse(segmentDataOffset()) : nullptr;
+}
+
+std::unique_ptr<Matroska::Cues> EBML::MkSegment::parseCues()
+{
+  return cues ? cues->parse(segmentDataOffset()) : nullptr;
 }
 
 std::unique_ptr<Matroska::Segment> EBML::MkSegment::parseSegment()

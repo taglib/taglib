@@ -130,6 +130,7 @@ namespace TagLib::EBML {
   class MkTags;
   class MkAttachments;
   class MkSeekHead;
+  class MkCues;
   class VoidElement;
 
   template <String::Type t>
@@ -157,7 +158,7 @@ namespace TagLib::EBML {
   template <> struct GetElementTypeById<Element::Id::MkCueTrackPositions> { using type = MasterElement; };
   template <> struct GetElementTypeById<Element::Id::MkCueReference> { using type = MasterElement; };
   template <> struct GetElementTypeById<Element::Id::MkCluster> { using type = MasterElement; };
-  template <> struct GetElementTypeById<Element::Id::MkCues> { using type = MasterElement; };
+  template <> struct GetElementTypeById<Element::Id::MkCues> { using type = MkCues; };
   template <> struct GetElementTypeById<Element::Id::MkTagName> { using type = UTF8StringElement; };
   template <> struct GetElementTypeById<Element::Id::MkTagString> { using type = UTF8StringElement; };
   template <> struct GetElementTypeById<Element::Id::MkAttachedFileName> { using type = UTF8StringElement; };

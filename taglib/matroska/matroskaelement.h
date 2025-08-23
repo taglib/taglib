@@ -45,8 +45,9 @@ namespace TagLib {
       void adjustOffset(offset_t delta);
       void setSize(offset_t size);
       void setID(ID id);
-      //virtual ByteVector render() = 0;
-      virtual bool render() = 0;
+      virtual bool render();
+      void setNeedsRender(bool needsRender);
+      bool needsRender() const;
       void setData(const ByteVector &data);
       const ByteVector &data() const;
       virtual void write(TagLib::File &file);
@@ -60,7 +61,12 @@ namespace TagLib {
       virtual bool offsetChanged(Element &caller, offset_t delta);
       virtual bool sizeChanged(Element &caller, offset_t delta);
 
+    protected:
+      offset_t sizeRenderedOrWritten() const;
+
     private:
+      virtual ByteVector renderInternal() = 0;
+
       class ElementPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<ElementPrivate> e;

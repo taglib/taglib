@@ -87,6 +87,7 @@ Matroska::Tag::~Tag() = default;
 void Matroska::Tag::addSimpleTag(const SimpleTag &tag)
 {
   d->tags.append(tag);
+  setNeedsRender(true);
 }
 
 void Matroska::Tag::removeSimpleTag(const String &name,
@@ -99,12 +100,14 @@ void Matroska::Tag::removeSimpleTag(const String &name,
   );
   if(it != d->tags.end()) {
     d->tags.erase(it);
+    setNeedsRender(true);
   }
 }
 
 void Matroska::Tag::clearSimpleTags()
 {
   d->tags.clear();
+  setNeedsRender(true);
 }
 
 const Matroska::SimpleTagsList &Matroska::Tag::simpleTagsList() const
@@ -139,12 +142,12 @@ void Matroska::Tag::setGenre(const String &s)
 
 void Matroska::Tag::setYear(unsigned int i)
 {
-  d->setTag("DATE", String::number(i));
+  d->setTag("DATE", i != 0 ? String::number(i) : String());
 }
 
 void Matroska::Tag::setTrack(unsigned int i)
 {
-  d->setTag("TRACKNUMBER", String::number(i));
+  d->setTag("TRACKNUMBER", i != 0 ? String::number(i) : String());
 }
 
 String Matroska::Tag::title() const
@@ -195,8 +198,13 @@ bool Matroska::Tag::isEmpty() const
   return d->tags.isEmpty();
 }
 
-bool Matroska::Tag::render()
+ByteVector Matroska::Tag::renderInternal()
 {
+  if(d->tags.isEmpty()) {
+    // Avoid writing a Tags element without Tag element.
+    return {};
+  }
+
   EBML::MkTags tags;
   List<SimpleTagsList> targetList;
 
@@ -266,16 +274,7 @@ bool Matroska::Tag::render()
     }
     tags.appendElement(std::move(tag));
   }
-
-  auto data = tags.render();
-  auto beforeSize = size();
-  auto afterSize = data.size();
-  if(afterSize != beforeSize) {
-    if(!emitSizeChanged(afterSize - beforeSize))
-      return false;
-  }
-  setData(data);
-  return true;
+  return tags.render();
 }
 
 namespace
@@ -421,6 +420,7 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
     if(it->type() == SimpleTag::StringType &&
        !(key = translateTag(it->name(), it->targetTypeValue())).isEmpty()) {
       it = d->tags.erase(it);
+      setNeedsRender(true);
     }
     else {
       ++it;
@@ -434,6 +434,7 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
       if(auto [name, targetTypeValue, _] = translateKey(key);
          !name.isEmpty()) {
         d->tags.append(SimpleTag(name, value, targetTypeValue));
+        setNeedsRender(true);
       }
       else {
         unsupportedProperties[key] = values;
@@ -529,6 +530,7 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
                     targetTypeValue, language, defaultLanguage)
         : SimpleTag(key, property.value("value").value<String>(),
                     targetTypeValue, language, defaultLanguage));
+      setNeedsRender(true);
       result = true;
     }
   }

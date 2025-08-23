@@ -29,14 +29,18 @@
 
 using namespace TagLib;
 
-Matroska::Cues::Cues() :
-  Element(static_cast<ID>(EBML::Element::Id::MkCues))
+Matroska::Cues::Cues(offset_t segmentDataOffset) :
+  Element(static_cast<ID>(EBML::Element::Id::MkCues)),
+  segmentDataOffset(segmentDataOffset)
 {
+  setNeedsRender(false);
 }
 
 ByteVector Matroska::Cues::renderInternal()
 {
+  auto beforeSize = sizeRenderedOrWritten();
   EBML::MkCues cues;
+  cues.setMinRenderSize(beforeSize);
   for(const auto &cuePoint : cuePoints) {
     auto cuePointElement = EBML::make_unique_element<EBML::Element::Id::MkCuePoint>();
     auto timestamp = EBML::make_unique_element<EBML::Element::Id::MkCueTime>();
@@ -57,7 +61,33 @@ ByteVector Matroska::Cues::renderInternal()
       clusterPosition->setValue(cueTrack->getClusterPosition());
       cueTrackElement->appendElement(std::move(clusterPosition));
 
-      // Todo - other elements
+      // Relative position, optional
+      if(cueTrack->getRelativePosition().has_value()) {
+        auto relativePosition = EBML::make_unique_element<EBML::Element::Id::MkCueRelativePosition>();
+        relativePosition->setValue(cueTrack->getRelativePosition().value());
+        cueTrackElement->appendElement(std::move(relativePosition));
+      }
+
+      // Duration, optional
+      if(cueTrack->getDuration().has_value()) {
+        auto duration = EBML::make_unique_element<EBML::Element::Id::MkCueDuration>();
+        duration->setValue(cueTrack->getDuration().value());
+        cueTrackElement->appendElement(std::move(duration));
+      }
+
+      // Block number, optional
+      if(cueTrack->getBlockNumber().has_value()) {
+        auto blockNumber = EBML::make_unique_element<EBML::Element::Id::MkCueBlockNumber>();
+        blockNumber->setValue(cueTrack->getBlockNumber().value());
+        cueTrackElement->appendElement(std::move(blockNumber));
+      }
+
+      // Codec state, not in version 1
+      if(cueTrack->getCodecState().has_value()) {
+        auto codecState = EBML::make_unique_element<EBML::Element::Id::MkCueCodecState>();
+        codecState->setValue(cueTrack->getCodecState().value());
+        cueTrackElement->appendElement(std::move(codecState));
+      }
 
       // Reference times
       auto referenceTimes = cueTrack->referenceTimes();
@@ -72,29 +102,33 @@ ByteVector Matroska::Cues::renderInternal()
       }
       cuePointElement->appendElement(std::move(cueTrackElement));
     }
+    cues.appendElement(std::move(cuePointElement));
   }
   return cues.render();
 }
 
-bool Matroska::Cues::render()
+void Matroska::Cues::write(TagLib::File& file)
 {
-  if(!needsRender)
-    return true;
-
-  setData(renderInternal());
-  needsRender = false;
-  return true;
+  if(!data().isEmpty())
+    Element::write(file);
 }
 
 bool Matroska::Cues::sizeChanged(Element &caller, offset_t delta)
 {
-  offset_t offset = caller.offset();
-  for(auto &cuePoint : cuePoints)
-    needsRender |= cuePoint->adjustOffset(offset, delta);
+  // Adjust own offset
+  if(!Element::sizeChanged(caller, delta))
+    return false;
+
+  offset_t offset = caller.offset() - segmentDataOffset;
+  for(auto &cuePoint : cuePoints) {
+    if(cuePoint->adjustOffset(offset, delta)) {
+      setNeedsRender(true);
+    }
+  }
   return true;
 }
 
-bool Matroska::Cues::isValid(TagLib::File &file, offset_t segmentDataOffset) const
+bool Matroska::Cues::isValid(TagLib::File &file) const
 {
   for(const auto &cuePoint : cuePoints) {
     if(!cuePoint->isValid(file, segmentDataOffset))
@@ -150,8 +184,8 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
     debug("No cluster found at position");
     return false;
   }
-  if(codecState) {
-    file.seek(segmentDataOffset + codecState);
+  if(codecState.has_value() && codecState.value() != 0) {
+    file.seek(segmentDataOffset + codecState.value());
     if(EBML::Element::readId(file) != static_cast<unsigned int>(EBML::Element::Id::MkCodecState)) {
       debug("No codec state found at position");
       return false;
@@ -160,8 +194,18 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
   return true;
 }
 
-bool Matroska::CueTrack::adjustOffset(offset_t, offset_t)
+bool Matroska::CueTrack::adjustOffset(offset_t offset, offset_t delta)
 {
-  // TODO implement
-  return false;
+  bool ret = false;
+  if(clusterPosition > offset) {
+    clusterPosition += delta;
+    ret = true;
+  }
+  offset_t codecStateValue;
+  if(codecState.has_value() && (codecStateValue = codecState.value()) != 0 &&
+     codecStateValue > offset) {
+    codecState = codecStateValue + delta;
+    ret = true;
+  }
+  return ret;
 }

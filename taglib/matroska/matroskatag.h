@@ -99,7 +99,7 @@ namespace TagLib {
       class TagPrivate;
 
       // private Element implementation
-      bool render() override;
+      ByteVector renderInternal() override;
 
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<TagPrivate> d;

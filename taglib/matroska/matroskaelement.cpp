@@ -38,6 +38,10 @@ public:
   ByteVector data;
   List<Element *> sizeListeners;
   List<Element *> offsetListeners;
+  // The default write() implementation will delete an unrendered element,
+  // therefore rendering is required by default and needs to be explicitly set
+  // using setNeedsRender(false) together with overriding the write() method.
+  bool needsRender = true;
 };
 
 Matroska::Element::Element(ID id) :
@@ -112,6 +116,35 @@ void Matroska::Element::setID(ID id)
   e->id = id;
 }
 
+bool Matroska::Element::render()
+{
+  if(!needsRender())
+    return true;
+
+  auto beforeSize = sizeRenderedOrWritten();
+  auto data = renderInternal();
+  setNeedsRender(false);
+  auto afterSize = data.size();
+  if(afterSize != beforeSize) {
+    if(!emitSizeChanged(afterSize - beforeSize)) {
+      return false;
+    }
+  }
+
+  setData(data);
+  return true;
+}
+
+void Matroska::Element::setNeedsRender(bool needsRender)
+{
+  e->needsRender = needsRender;
+}
+
+bool Matroska::Element::needsRender() const
+{
+  return e->needsRender;
+}
+
 bool Matroska::Element::emitSizeChanged(offset_t delta)
 {
   for(auto element : e->sizeListeners) {
@@ -132,11 +165,20 @@ bool Matroska::Element::emitOffsetChanged(offset_t delta)
 
 bool Matroska::Element::sizeChanged(Element &caller, offset_t delta)
 {
-  if(caller.offset() < e->offset) {
+  // The equal case is needed when multiple new elements are added
+  // (e.g. Attachments and Tags), they will start with the same offset
+  // are updated via size change handling.
+  if(caller.offset() <= e->offset && caller.id() != e->id) {
     e->offset += delta;
     //return emitOffsetChanged(delta);
   }
   return true;
+}
+
+offset_t Matroska::Element::sizeRenderedOrWritten() const
+{
+  offset_t dataSize = e->data.size();
+  return dataSize != 0 ? dataSize : e->size;
 }
 
 bool Matroska::Element::offsetChanged(Element &, offset_t)

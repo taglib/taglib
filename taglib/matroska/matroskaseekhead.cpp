@@ -27,27 +27,42 @@
 
 using namespace TagLib;
 
-Matroska::SeekHead::SeekHead() :
-  Element(static_cast<ID>(EBML::Element::Id::MkSeekHead))
+Matroska::SeekHead::SeekHead(offset_t segmentDataOffset) :
+  Element(static_cast<ID>(EBML::Element::Id::MkSeekHead)),
+  segmentDataOffset(segmentDataOffset)
 {
+  setNeedsRender(false);
+}
+
+bool Matroska::SeekHead::isValid(TagLib::File& file) const
+{
+  bool result = true;
+  for(const auto &[id, offset] : entries) {
+    file.seek(segmentDataOffset + offset);
+    if(EBML::Element::readId(file) != id) {
+      debug(Utils::formatString("No ID %x found at seek position", id));
+      result = false;
+    }
+  }
+  return result;
 }
 
 void Matroska::SeekHead::addEntry(const Element &element)
 {
   entries.append({element.id(), element.offset()});
   debug("adding to seekhead");
-  needsRender = true;
+  setNeedsRender(true);
 }
 
 void Matroska::SeekHead::addEntry(ID id, offset_t offset)
 {
   entries.append({id, offset});
-  needsRender = true;
+  setNeedsRender(true);
 }
 
 ByteVector Matroska::SeekHead::renderInternal()
 {
-  auto beforeSize = size();
+  auto beforeSize = sizeRenderedOrWritten();
   EBML::MkSeekHead seekHead;
   seekHead.setMinRenderSize(beforeSize);
   for(const auto &[id, position] : entries) {
@@ -63,26 +78,6 @@ ByteVector Matroska::SeekHead::renderInternal()
     seekHead.appendElement(std::move(seekElement));
   }
   return seekHead.render();
-}
-
-bool Matroska::SeekHead::render()
-{
-  if(!needsRender)
-    return true;
-
-  auto beforeSize = size();
-  auto data = renderInternal();
-  needsRender = false;
-  auto afterSize = data.size();
-  if(afterSize != beforeSize) {
-    return false;
-    // TODO handle expansion of seek head
-    if(!emitSizeChanged(afterSize - beforeSize))
-      return false;
-  }
-
-  setData(data);
-  return true;
 }
 
 void Matroska::SeekHead::write(File &file)
@@ -104,17 +99,31 @@ bool Matroska::SeekHead::sizeChanged(Element &caller, offset_t delta)
     return true;
   }
   else {
-    offset_t offset = caller.offset();
+    // The equal case is needed when multiple new elements are added
+    // (e.g. Attachments and Tags), they will start with the same offset
+    // and are updated via size change handling.
+    offset_t offset = caller.offset() - segmentDataOffset;
     auto it = entries.begin();
     while(it != entries.end()) {
       it = std::find_if(it,
         entries.end(),
-        [offset](const auto a){ return a.second > offset; }
+        [offset, callerID](const auto &a) {
+          return a.second >= offset && a.first != callerID;
+        }
       );
       if(it != entries.end()) {
         it->second += delta;
-        needsRender = true;
+        setNeedsRender(true);
         ++it;
+      }
+    }
+
+    if(caller.data().isEmpty() && caller.size() + delta == 0) {
+      // The caller element is removed, remove it from the seek head.
+      it = std::find_if(entries.begin(), entries.end(),
+        [callerID](const auto &a){ return a.first == callerID; });
+      if(it != entries.end()) {
+        entries.erase(it);
       }
     }
     return true;

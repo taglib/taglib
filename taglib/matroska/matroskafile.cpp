@@ -23,6 +23,7 @@
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
 #include "matroskaseekhead.h"
+#include "matroskacues.h"
 #include "matroskasegment.h"
 #include "ebmlutils.h"
 #include "ebmlelement.h"
@@ -48,6 +49,7 @@ public:
   std::unique_ptr<Tag> tag;
   std::unique_ptr<Attachments> attachments;
   std::unique_ptr<SeekHead> seekHead;
+  std::unique_ptr<Cues> cues;
   std::unique_ptr<Segment> segment;
   std::unique_ptr<Properties> properties;
 };
@@ -260,7 +262,7 @@ Matroska::Attachments *Matroska::File::attachments(bool create) const
   return d->attachments.get();
 }
 
-void Matroska::File::read(bool readProperties, Properties::ReadStyle)
+void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 {
   offset_t fileLength = length();
 
@@ -295,16 +297,23 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle)
   // Parse the elements
   d->segment = segment->parseSegment();
   d->seekHead = segment->parseSeekHead();
+  d->cues = segment->parseCues();
   d->tag = segment->parseTag();
   d->attachments = segment->parseAttachments();
-
-  setValid(true);
 
   if(readProperties) {
     d->properties = std::make_unique<Properties>(this);
     segment->parseInfo(d->properties.get());
     segment->parseTracks(d->properties.get());
   }
+
+  if(readStyle == AudioProperties::Accurate &&
+     ((d->seekHead && !d->seekHead->isValid(*this)) ||
+      (d->cues && !d->cues->isValid(*this)))) {
+    setValid(false);
+    return;
+  }
+  setValid(true);
 }
 
 bool Matroska::File::save()
@@ -316,6 +325,19 @@ bool Matroska::File::save()
   if(!isValid()) {
     debug("Matroska::File::save() -- File is not valid.");
     return false;
+  }
+
+  // Do not create new attachments or tags and corresponding seek head entries
+  // if only empty objects were created.
+  if(d->attachments && d->attachments->attachedFileList().isEmpty() &&
+     d->attachments->size() == 0 && d->attachments->offset() == 0 &&
+     d->attachments->data().isEmpty()) {
+    d->attachments.reset();
+  }
+  if(d->tag && d->tag->isEmpty() &&
+     d->tag->size() == 0 && d->tag->offset() == 0 &&
+     d->tag->data().isEmpty()) {
+    d->tag.reset();
   }
 
   List<Element *> renderList;
@@ -345,7 +367,7 @@ bool Matroska::File::save()
       newElements.append(element);
     }
   }
-  if(renderList.isEmpty())
+  if(renderList.isEmpty() && newElements.isEmpty())
     return true;
 
   auto sortAscending = [](const auto a, const auto b) { return a->offset() < b->offset(); };
@@ -364,21 +386,45 @@ bool Matroska::File::save()
   for(auto it = renderList.begin(); it != renderList.end(); ++it) {
     for(auto it2 = std::next(it); it2 != renderList.end(); ++it2)
       (*it)->addSizeListener(*it2);
+    if(d->cues)
+      (*it)->addSizeListener(d->cues.get());
     if(d->seekHead)
       (*it)->addSizeListener(d->seekHead.get());
     (*it)->addSizeListener(d->segment.get());
   }
+  if(d->cues) {
+    renderList.append(d->cues.get());
+    d->cues->addSizeListeners(renderList);
+    if(d->seekHead) {
+      d->cues->addSizeListener(d->seekHead.get());
+    }
+    d->cues->addSizeListener(d->segment.get());
+  }
   if(d->seekHead) {
-    d->seekHead->addSizeListeners(renderList);
     renderList.append(d->seekHead.get());
+    d->seekHead->addSizeListeners(renderList);
+    d->seekHead->addSizeListener(d->segment.get());
   }
   d->segment->addSizeListeners(renderList);
   renderList.append(d->segment.get());
 
-  // Render the elements
-  for(auto element : renderList) {
-    if(!element->render())
-      return false;
+  // Render the elements.
+  // Because size changes of elements can cause segment offset updates and
+  // size changes in other elements, we might need multiple rounds until no more
+  // element needs rendering.
+  int renderRound = 0;
+  bool rendering = true;
+  while(rendering && renderRound < 5) {
+    rendering = false;
+    for(auto element : renderList) {
+      if(element->needsRender()) {
+        rendering = true;
+        if(!element->render()) {
+          return false;
+        }
+      }
+    }
+    ++renderRound;
   }
 
   // Write out to file

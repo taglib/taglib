@@ -35,6 +35,8 @@ namespace TagLib::Matroska {
     offset_t dataOffset() const { return offset() + sizeLength; }
 
   private:
+    ByteVector renderInternal() override;
+
     offset_t sizeLength;
     offset_t dataSize;
   };

@@ -41,7 +41,8 @@ namespace TagLib::Matroska {
      * Constructs a Matroska file from \a file.  If \a readProperties is \c true the
      * file's audio properties will also be read.
      *
-     * The \a readStyle parameter is currently unused.
+     * If \a readStyle is \c Accurate all seek head and cues segment positions
+     * are verified for the isValid() state of the file.
      */
     explicit File(FileName file, bool readProperties = true,
                   Properties::ReadStyle readStyle = Properties::Average);
@@ -50,7 +51,8 @@ namespace TagLib::Matroska {
      * Constructs a Matroska file from \a stream.  If \a readProperties is \c true the
      * file's audio properties will also be read.
      *
-     * The \a readStyle parameter is currently unused.
+     * If \a readStyle is \c Accurate all seek head and cues segment positions
+     * are verified for the isValid() state of the file.
      */
     explicit File(IOStream *stream, bool readProperties = true,
                   Properties::ReadStyle readStyle = Properties::Average);

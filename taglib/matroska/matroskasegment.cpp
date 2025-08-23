@@ -31,17 +31,27 @@ Matroska::Segment::Segment(offset_t sizeLength, offset_t dataSize, offset_t leng
   setSize(sizeLength);
 }
 
+ByteVector Matroska::Segment::renderInternal()
+{
+  return EBML::renderVINT(dataSize, static_cast<int>(sizeLength));
+}
+
 bool Matroska::Segment::render()
 {
-  auto data = EBML::renderVINT(dataSize, static_cast<int>(sizeLength));
-  if(data.size() != sizeLength) {
+  auto beforeSize = sizeLength;
+  auto data = renderInternal();
+  setNeedsRender(false);
+  auto afterSize = data.size();
+  if(afterSize != beforeSize) {
     sizeLength = 8;
-    if(!emitSizeChanged(sizeLength - data.size()))
+    data = renderInternal();
+    setNeedsRender(false);
+    afterSize = data.size();
+    if(!emitSizeChanged(afterSize - beforeSize)) {
       return false;
-    data = EBML::renderVINT(dataSize, static_cast<int>(sizeLength));
-    if(data.size() != sizeLength)
-      return false;
+    }
   }
+
   setData(data);
   return true;
 }
@@ -49,5 +59,6 @@ bool Matroska::Segment::render()
 bool Matroska::Segment::sizeChanged(Element &, offset_t delta)
 {
   dataSize += delta;
+  setNeedsRender(true);
   return true;
 }

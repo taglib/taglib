@@ -47,7 +47,7 @@ namespace TagLib {
       Attachments();
 
       //! Destroy attachements.
-      ~Attachments();
+      virtual ~Attachments();
 
       //! Add an attached file.
       void addAttachedFile(const AttachedFile &file);
@@ -67,7 +67,7 @@ namespace TagLib {
       class AttachmentsPrivate;
 
       // private Element implementation
-      bool render() override;
+      ByteVector renderInternal() override;
       AttachedFileList &attachedFiles();
 
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE

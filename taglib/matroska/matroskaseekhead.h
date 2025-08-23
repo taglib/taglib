@@ -32,20 +32,20 @@ namespace TagLib {
     class SeekHead : public Element
     {
     public:
-      SeekHead();
+      explicit SeekHead(offset_t segmentDataOffset);
       ~SeekHead() override = default;
+      bool isValid(TagLib::File &file) const;
       void addEntry(const Element &element);
       void addEntry(ID id, offset_t offset);
-      bool render() override;
       void write(TagLib::File &file) override;
       void sort();
       //bool offsetChanged(Element &caller, offset_t delta) override;
       bool sizeChanged(Element &caller, offset_t delta) override;
 
     private:
-      ByteVector renderInternal();
+      ByteVector renderInternal() override;
       List<std::pair<unsigned int, offset_t>> entries;
-      bool needsRender = false;
+      const offset_t segmentDataOffset;
     };
   }
 }

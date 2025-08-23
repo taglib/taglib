@@ -56,6 +56,7 @@ Matroska::Attachments::~Attachments() = default;
 void Matroska::Attachments::addAttachedFile(const AttachedFile& file)
 {
   d->files.append(file);
+  setNeedsRender(true);
 }
 
 void Matroska::Attachments::removeAttachedFile(unsigned long long uid)
@@ -66,12 +67,14 @@ void Matroska::Attachments::removeAttachedFile(unsigned long long uid)
     });
   if(it != d->files.end()) {
     d->files.erase(it);
+    setNeedsRender(true);
   }
 }
 
 void Matroska::Attachments::clear()
 {
   d->files.clear();
+  setNeedsRender(true);
 }
 
 const Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFileList() const
@@ -85,11 +88,17 @@ const Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFi
 
 Matroska::Attachments::AttachedFileList &Matroska::Attachments::attachedFiles()
 {
+  setNeedsRender(true);
   return d->files;
 }
 
-bool Matroska::Attachments::render()
+ByteVector Matroska::Attachments::renderInternal()
 {
+  if(d->files.isEmpty()) {
+    // Avoid writing an Attachments element without AttachedFile element.
+    return {};
+  }
+
   EBML::MkAttachments attachments;
   for(const auto &attachedFile : std::as_const(d->files)) {
     auto attachedFileElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFile>();
@@ -127,14 +136,5 @@ bool Matroska::Attachments::render()
 
     attachments.appendElement(std::move(attachedFileElement));
   }
-
-  auto beforeSize = size();
-  auto data = attachments.render();
-  auto afterSize = data.size();
-  if(beforeSize != afterSize) {
-    if(!emitSizeChanged(afterSize - beforeSize))
-      return false;
-  }
-  setData(data);
-  return true;
+  return attachments.render();
 }
