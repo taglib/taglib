@@ -333,7 +333,7 @@ namespace
     );
     if(it != simpleTagsTranslation.end())
       return { std::get<1>(*it), std::get<2>(*it), std::get<3>(*it) };
-    if (!key.isEmpty() && !key.startsWith("_"))
+    if (!key.isEmpty())
       return { key, Matroska::SimpleTag::TargetTypeValue::Track, false };
     return { String(), Matroska::SimpleTag::TargetTypeValue::None, false };
   }
@@ -352,8 +352,7 @@ namespace
     return it != simpleTagsTranslation.end()
       ? String(std::get<0>(*it), String::UTF8)
       : (targetTypeValue == Matroska::SimpleTag::TargetTypeValue::Track ||
-         targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) &&
-           !name.startsWith("_")
+         targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None)
       ? name
         : String();
   }
@@ -399,6 +398,21 @@ String Matroska::Tag::TagPrivate::getTag(const String &key) const
   return it != tags.end() ? it->toString() : String();
 }
 
+PropertyMap Matroska::Tag::properties() const
+{
+  PropertyMap properties;
+  for(const auto &simpleTag : std::as_const(d->tags)) {
+    if(simpleTag.type() == SimpleTag::StringType) {
+      String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
+      if(!key.isEmpty())
+        properties[key].append(simpleTag.toString());
+      else
+        properties.addUnsupportedData(simpleTag.name());
+    }
+  }
+  return properties;
+}
+
 PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 {
   // Remove all simple tags which would be returned in properties()
@@ -442,7 +456,8 @@ StringList Matroska::Tag::complexPropertyKeys() const
 {
   StringList keys;
   for(const SimpleTag &t : std::as_const(d->tags)) {
-    if(t.type() == SimpleTag::BinaryType) {
+    if(t.type() != SimpleTag::StringType ||
+       translateTag(t.name(), t.targetTypeValue()).isEmpty()) {
       keys.append(t.name());
     }
   }
@@ -454,9 +469,16 @@ List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
   List<VariantMap> props;
   if(key.upper() != "PICTURE") { // Pictures are handled at the file level
     for(const SimpleTag &t : std::as_const(d->tags)) {
-      if(t.type() == SimpleTag::BinaryType) {
+      if(t.name() == key &&
+         (t.type() != SimpleTag::StringType ||
+          translateTag(t.name(), t.targetTypeValue()).isEmpty())) {
         VariantMap property;
-        property.insert("data", t.toByteVector());
+        if(t.type() != SimpleTag::StringType) {
+          property.insert("data", t.toByteVector());
+        }
+        else {
+          property.insert("value", t.toString());
+        }
         property.insert("name", t.name());
         property.insert("targetTypeValue", t.targetTypeValue());
         property.insert("language", t.language());
@@ -476,36 +498,39 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
   }
   d->removeSimpleTags(
     [&key](const SimpleTag &t) {
-      return t.name() == key && t.type() == SimpleTag::BinaryType;
+      return t.name() == key &&
+        (t.type() != SimpleTag::StringType ||
+         translateTag(t.name(), t.targetTypeValue()).isEmpty());
     }
   );
   bool result = false;
   for(const auto &property : value) {
-    if(property.value("name").value<String>() == key && property.contains("data")) {
-      d->tags.append(SimpleTag(
-        key,
-        property.value("data").value<ByteVector>(),
-        static_cast<SimpleTag::TargetTypeValue>(
-          property.value("targetTypeValue", 0).value<int>()),
-        property.value("language").value<String>(),
-        property.value("defaultLanguage", true).value<bool>()));
+    if(property.value("name").value<String>() == key &&
+       (property.contains("data") || property.contains("value") )) {
+      SimpleTag::TargetTypeValue targetTypeValue;
+      Variant targetTypeValueVar = property.value("targetTypeValue", 0);
+      switch(targetTypeValueVar.type()) {
+      case Variant::UInt:
+        targetTypeValue = static_cast<SimpleTag::TargetTypeValue>(targetTypeValueVar.value<unsigned int>());
+        break;
+      case Variant::LongLong:
+        targetTypeValue = static_cast<SimpleTag::TargetTypeValue>(targetTypeValueVar.value<long long>());
+        break;
+      case Variant::ULongLong:
+        targetTypeValue = static_cast<SimpleTag::TargetTypeValue>(targetTypeValueVar.value<unsigned long long>());
+        break;
+      default:
+        targetTypeValue = static_cast<SimpleTag::TargetTypeValue>(targetTypeValueVar.value<int>());
+      }
+      auto language = property.value("language").value<String>();
+      bool defaultLanguage = property.value("defaultLanguage", true).value<bool>();
+      d->tags.append(property.contains("data")
+        ? SimpleTag(key, property.value("data").value<ByteVector>(),
+                    targetTypeValue, language, defaultLanguage)
+        : SimpleTag(key, property.value("value").value<String>(),
+                    targetTypeValue, language, defaultLanguage));
       result = true;
     }
   }
   return result;
-}
-
-PropertyMap Matroska::Tag::properties() const
-{
-  PropertyMap properties;
-  for(const auto &simpleTag : std::as_const(d->tags)) {
-    if(simpleTag.type() == SimpleTag::StringType) {
-      String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
-      if(!key.isEmpty())
-        properties[key].append(simpleTag.toString());
-      else
-        properties.addUnsupportedData(simpleTag.name());
-    }
-  }
-  return properties;
 }

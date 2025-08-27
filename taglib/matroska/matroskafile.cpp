@@ -138,25 +138,23 @@ namespace {
     if(attachedFile.mediaType().startsWith("image/")) {
       return "PICTURE";
     }
-    if(!attachedFile.mediaType().isEmpty()) {
-      return attachedFile.mediaType();
-    }
     if(!attachedFile.fileName().isEmpty()) {
       return attachedFile.fileName();
     }
-    return String::fromLongLong(attachedFile.uid());
+    if(!attachedFile.mediaType().isEmpty()) {
+      return attachedFile.mediaType();
+    }
+    return String::fromULongLong(attachedFile.uid());
   }
 
-  unsigned long long stringToULongLong(const String &str, bool *ok)
+  bool keyMatchesAttachedFile(const String &key, const Matroska::AttachedFile &attachedFile)
   {
-    const wchar_t *beginPtr = str.toCWString();
-    wchar_t *endPtr;
-    errno = 0;
-    const unsigned long long value = ::wcstoull(beginPtr, &endPtr, 10);
-    if(ok) {
-      *ok = errno == 0 && endPtr > beginPtr && *endPtr == L'\0';
-    }
-    return value;
+    return !key.isEmpty() && (
+      (key == "PICTURE" && attachedFile.mediaType().startsWith("image/")) ||
+      key == attachedFile.fileName() ||
+      key == attachedFile.mediaType() ||
+      key == String::fromULongLong(attachedFile.uid())
+    );
   }
 
 }
@@ -182,7 +180,7 @@ List<VariantMap> Matroska::File::complexProperties(const String &key) const
   if(d->attachments) {
     const auto &attachedFiles = d->attachments->attachedFileList();
     for(const auto &attachedFile : attachedFiles) {
-      if(keyForAttachedFile(attachedFile) == key) {
+      if(keyMatchesAttachedFile(key, attachedFile)) {
         VariantMap property;
         property.insert("data", attachedFile.data());
         property.insert("mimeType", attachedFile.mediaType());
@@ -202,8 +200,19 @@ bool Matroska::File::setComplexProperties(const String &key, const List<VariantM
     return true;
   }
 
-  attachments(true)->clear();
+  List<AttachedFile> &files = attachments(true)->attachedFiles();
+  for(auto it = files.begin(); it != files.end();) {
+    if(keyMatchesAttachedFile(key, *it)) {
+      it = files.erase(it);
+    }
+    else {
+      ++it;
+    }
+  }
+
   for(const auto &property : value) {
+    if(property.isEmpty())
+      continue;
     auto mimeType = property.value("mimeType").value<String>();
     auto data = property.value("data").value<ByteVector>();
     auto fileName = property.value("fileName").value<String>();
@@ -220,16 +229,26 @@ bool Matroska::File::setComplexProperties(const String &key, const List<VariantM
     else if(fileName.isEmpty() && key.find(".") != -1) {
       fileName = key;
     }
-    else if(!uid && ((uidKey = stringToULongLong(key, &ok))) && ok) {
+    else if(!uid && ((uidKey = key.toULongLong(&ok))) && ok) {
       uid = uidKey;
     }
-    AttachedFile attachedFile;
-    attachedFile.setData(data);
-    attachedFile.setMediaType(mimeType);
-    attachedFile.setDescription(property.value("description").value<String>());
-    attachedFile.setFileName(fileName);
-    attachedFile.setUID(uid);
-    d->attachments->addAttachedFile(attachedFile);
+    if(fileName.isEmpty() && !mimeType.isEmpty()) {
+      int slashPos = mimeType.rfind('/');
+      String ext = mimeType.substr(slashPos + 1);
+      if(ext == "jpeg") {
+        ext = "jpg";
+      }
+      fileName = "attachment." + ext;
+    }
+    if(!mimeType.isEmpty() && !fileName.isEmpty()) {
+      AttachedFile attachedFile;
+      attachedFile.setData(data);
+      attachedFile.setMediaType(mimeType);
+      attachedFile.setDescription(property.value("description").value<String>());
+      attachedFile.setFileName(fileName);
+      attachedFile.setUID(uid);
+      d->attachments->addAttachedFile(attachedFile);
+    }
   }
   return true;
 }
