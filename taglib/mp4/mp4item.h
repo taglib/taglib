@@ -29,6 +29,7 @@
 #include "tstringlist.h"
 #include "taglib_export.h"
 #include "mp4coverart.h"
+#include "mp4stem.h"
 
 namespace TagLib {
   namespace MP4 {
@@ -49,7 +50,8 @@ namespace TagLib {
         LongLong,
         StringList,
         ByteVectorList,
-        CoverArtList
+        CoverArtList,
+        Stem,
       };
 
       struct IntPair {
@@ -80,6 +82,7 @@ namespace TagLib {
       Item(const StringList &value);
       Item(const ByteVectorList &value);
       Item(const CoverArtList &value);
+      Item(const Stem &value);
 
       void setAtomDataType(AtomDataType type);
       AtomDataType atomDataType() const;
@@ -93,6 +96,7 @@ namespace TagLib {
       StringList toStringList() const;
       ByteVectorList toByteVectorList() const;
       CoverArtList toCoverArtList() const;
+      Stem toStem() const;
 
       bool isValid() const;
 

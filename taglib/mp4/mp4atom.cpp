@@ -37,7 +37,7 @@ namespace {
   constexpr std::array containers {
     "moov", "udta", "mdia", "meta", "ilst",
     "stbl", "minf", "moof", "traf", "trak",
-    "stsd"
+    "stsd", "stem"
   };
 } // namespace
 
@@ -85,6 +85,11 @@ MP4::Atom::Atom(File *file)
   }
 
   d->name = header.mid(4, 4);
+
+  if(d->name == "stem") {
+    file->seek(d->length - 8, File::Current);
+    return;        
+  }
 
   for(auto c : containers) {
     if(d->name == c) {

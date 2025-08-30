@@ -194,6 +194,7 @@ if(WITH_MP4)
     mp4/mp4item.h
     mp4/mp4properties.h
     mp4/mp4coverart.h
+    mp4/mp4stem.h
     mp4/mp4itemfactory.h
   )
 endif()
@@ -369,6 +370,7 @@ if(WITH_MP4)
     mp4/mp4item.cpp
     mp4/mp4properties.cpp
     mp4/mp4coverart.cpp
+    mp4/mp4stem.cpp
     mp4/mp4itemfactory.cpp
   )
 endif()
