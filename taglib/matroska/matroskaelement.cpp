@@ -37,7 +37,6 @@ public:
   ID id = 0;
   ByteVector data;
   List<Element *> sizeListeners;
-  List<Element *> offsetListeners;
   // The default write() implementation will delete an unrendered element,
   // therefore rendering is required by default and needs to be explicitly set
   // using setNeedsRender(false) together with overriding the write() method.
@@ -101,16 +100,6 @@ void Matroska::Element::addSizeListeners(const List<Element *> &elements)
   e->sizeListeners.append(elements);
 }
 
-void Matroska::Element::addOffsetListener(Element *element)
-{
-  e->offsetListeners.append(element);
-}
-
-void Matroska::Element::addOffsetListeners(const List<Element *> &elements)
-{
-  e->offsetListeners.append(elements);
-}
-
 void Matroska::Element::setID(ID id)
 {
   e->id = id;
@@ -154,15 +143,6 @@ bool Matroska::Element::emitSizeChanged(offset_t delta)
   return true;
 }
 
-bool Matroska::Element::emitOffsetChanged(offset_t delta)
-{
-  for(auto element : e->offsetListeners) {
-    if(!element->offsetChanged(*this, delta))
-      return false;
-  }
-  return true;
-}
-
 bool Matroska::Element::sizeChanged(Element &caller, offset_t delta)
 {
   // The equal case is needed when multiple new elements are added
@@ -170,7 +150,6 @@ bool Matroska::Element::sizeChanged(Element &caller, offset_t delta)
   // are updated via size change handling.
   if(caller.offset() <= e->offset && caller.id() != e->id) {
     e->offset += delta;
-    //return emitOffsetChanged(delta);
   }
   return true;
 }
@@ -179,12 +158,6 @@ offset_t Matroska::Element::sizeRenderedOrWritten() const
 {
   offset_t dataSize = e->data.size();
   return dataSize != 0 ? dataSize : e->size;
-}
-
-bool Matroska::Element::offsetChanged(Element &, offset_t)
-{
-  // Most elements don't need to handle this
-  return true;
 }
 
 void Matroska::Element::write(File &file)

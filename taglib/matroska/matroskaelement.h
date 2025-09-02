@@ -53,12 +53,7 @@ namespace TagLib {
       virtual void write(TagLib::File &file);
       void addSizeListener(Element *element);
       void addSizeListeners(const List<Element *> &elements);
-      void addOffsetListener(Element *element);
-      void addOffsetListeners(const List<Element *> &elements);
-      //virtual void updatePosition(Element &caller, offset_t delta) = 0;
       bool emitSizeChanged(offset_t delta);
-      bool emitOffsetChanged(offset_t delta);
-      virtual bool offsetChanged(Element &caller, offset_t delta);
       virtual bool sizeChanged(Element &caller, offset_t delta);
 
     protected:

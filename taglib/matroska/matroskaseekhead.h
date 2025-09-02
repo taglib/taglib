@@ -39,7 +39,6 @@ namespace TagLib {
       void addEntry(ID id, offset_t offset);
       void write(TagLib::File &file) override;
       void sort();
-      //bool offsetChanged(Element &caller, offset_t delta) override;
       bool sizeChanged(Element &caller, offset_t delta) override;
 
     private:
