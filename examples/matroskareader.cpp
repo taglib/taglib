@@ -44,6 +44,11 @@ int main(int argc, char *argv[])
     PRINT_PRETTY("Target Type Value",
       targetTypeValue == 0 ? "None" : TagLib::Utils::formatString("%i", targetTypeValue).toCString(false)
     );
+    if(auto trackUid = t.trackUid()) {
+      PRINT_PRETTY("Track UID",
+        TagLib::Utils::formatString("%llu",trackUid).toCString(false)
+      );
+    }
     const TagLib::String &language = t.language();
     PRINT_PRETTY("Language", !language.isEmpty() ? language.toCString(false) : "Not set");
 

@@ -40,6 +40,7 @@ namespace TagLib::EBML {
       MkTag                     = 0x7373,
       MkTagTargets              = 0x63C0,
       MkTagTargetTypeValue      = 0x68CA,
+      MkTagTrackUID             = 0x63C5,
       MkSimpleTag               = 0x67C8,
       MkTagName                 = 0x45A3,
       MkTagLanguage             = 0x447A,
@@ -168,6 +169,7 @@ namespace TagLib::EBML {
   template <> struct GetElementTypeById<Element::Id::MkAttachedFileMediaType> { using type = Latin1StringElement; };
   template <> struct GetElementTypeById<Element::Id::MkCodecID> { using type = Latin1StringElement; };
   template <> struct GetElementTypeById<Element::Id::MkTagTargetTypeValue> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkTagTrackUID> { using type = UIntElement; };
   template <> struct GetElementTypeById<Element::Id::MkAttachedFileUID> { using type = UIntElement; };
   template <> struct GetElementTypeById<Element::Id::MkSeekPosition> { using type = UIntElement; };
   template <> struct GetElementTypeById<Element::Id::MkTimestampScale> { using type = UIntElement; };

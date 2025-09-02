@@ -89,7 +89,8 @@ namespace TagLib {
       bool setComplexProperties(const String& key, const List<VariantMap>& value) override;
 
       void addSimpleTag(const SimpleTag &tag);
-      void removeSimpleTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue);
+      void removeSimpleTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue,
+                           unsigned long long trackUid = 0);
       void clearSimpleTags();
       const SimpleTagsList &simpleTagsList() const;
 

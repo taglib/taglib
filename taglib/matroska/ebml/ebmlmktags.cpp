@@ -54,6 +54,7 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
 
     // Parse the <Targets> element
     Matroska::SimpleTag::TargetTypeValue targetTypeValue = Matroska::SimpleTag::TargetTypeValue::None;
+    unsigned long long trackUid = 0;
     if(targets) {
       for(const auto &targetsChild : *targets) {
         Id id = targetsChild->getId();
@@ -62,6 +63,9 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
           targetTypeValue = static_cast<Matroska::SimpleTag::TargetTypeValue>(
             element_cast<Id::MkTagTargetTypeValue>(targetsChild)->getValue()
           );
+        }
+        else if(id == Id::MkTagTrackUID) {
+          trackUid = element_cast<Id::MkTagTrackUID>(targetsChild)->getValue();
         }
       }
     }
@@ -92,9 +96,11 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
 
       mTag->addSimpleTag(tagValueString
         ? Matroska::SimpleTag(tagName, *tagValueString,
-                             targetTypeValue, language, defaultLanguageFlag)
+                             targetTypeValue, language, defaultLanguageFlag,
+                             trackUid)
         : Matroska::SimpleTag(tagName, *tagValueBinary,
-                             targetTypeValue, language, defaultLanguageFlag));
+                             targetTypeValue, language, defaultLanguageFlag,
+                             trackUid));
     }
   }
   return mTag;

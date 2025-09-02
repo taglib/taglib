@@ -92,11 +92,13 @@ void Matroska::Tag::addSimpleTag(const SimpleTag &tag)
 }
 
 void Matroska::Tag::removeSimpleTag(const String &name,
-  SimpleTag::TargetTypeValue targetTypeValue)
+  SimpleTag::TargetTypeValue targetTypeValue,
+  unsigned long long trackUid)
 {
   auto it = std::find_if(d->tags.begin(), d->tags.end(),
-    [&name, targetTypeValue](const SimpleTag &t) {
-        return t.name() == name && t.targetTypeValue() == targetTypeValue;
+    [&name, targetTypeValue, trackUid](const SimpleTag &t) {
+        return t.name() == name && t.targetTypeValue() == targetTypeValue &&
+               t.trackUid() == trackUid;
     }
   );
   if(it != d->tags.end()) {
@@ -221,11 +223,13 @@ ByteVector Matroska::Tag::renderInternal()
   // Build target-based list
   for(const auto &tag : std::as_const(d->tags)) {
     auto targetTypeValue = tag.targetTypeValue();
+    auto trackUid = tag.trackUid();
     auto it = std::find_if(targetList.begin(),
       targetList.end(),
       [&](const auto &list) {
         const auto &simpleTag = list.front();
-        return simpleTag.targetTypeValue() == targetTypeValue;
+        return simpleTag.targetTypeValue() == targetTypeValue &&
+               simpleTag.trackUid() == trackUid;
       }
     );
     if(it == targetList.end()) {
@@ -239,6 +243,7 @@ ByteVector Matroska::Tag::renderInternal()
   for(const auto &list : targetList) {
     const auto &frontTag = list.front();
     auto targetTypeValue = frontTag.targetTypeValue();
+    auto trackUid = frontTag.trackUid();
     auto tag = EBML::make_unique_element<EBML::Element::Id::MkTag>();
 
     // Build <Tag Targets> element
@@ -246,6 +251,11 @@ ByteVector Matroska::Tag::renderInternal()
     if(targetTypeValue != SimpleTag::TargetTypeValue::None) {
       auto element = EBML::make_unique_element<EBML::Element::Id::MkTagTargetTypeValue>();
       element->setValue(static_cast<unsigned int>(targetTypeValue));
+      targets->appendElement(std::move(element));
+    }
+    if(trackUid != 0) {
+      auto element = EBML::make_unique_element<EBML::Element::Id::MkTagTrackUID>();
+      element->setValue(trackUid);
       targets->appendElement(std::move(element));
     }
     tag->appendElement(std::move(targets));
@@ -401,7 +411,8 @@ String Matroska::Tag::TagPrivate::getTag(const String &key) const
       return t.name() == name
         && t.type() == SimpleTag::StringType
         && (t.targetTypeValue() == targetTypeValue ||
-            (t.targetTypeValue() == SimpleTag::TargetTypeValue::None && !strict));
+            (t.targetTypeValue() == SimpleTag::TargetTypeValue::None && !strict))
+        && t.trackUid() == 0;
     }
   );
   return it != tags.end() ? it->toString() : String();
@@ -411,7 +422,7 @@ PropertyMap Matroska::Tag::properties() const
 {
   PropertyMap properties;
   for(const auto &simpleTag : std::as_const(d->tags)) {
-    if(simpleTag.type() == SimpleTag::StringType) {
+    if(simpleTag.type() == SimpleTag::StringType && simpleTag.trackUid() == 0) {
       String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
       if(!key.isEmpty())
         properties[key].append(simpleTag.toString());
@@ -428,6 +439,7 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
   for(auto it = d->tags.begin(); it != d->tags.end();) {
     String key;
     if(it->type() == SimpleTag::StringType &&
+       it->trackUid() == 0 &&
        !(key = translateTag(it->name(), it->targetTypeValue())).isEmpty()) {
       it = d->tags.erase(it);
       setNeedsRender(true);
@@ -468,6 +480,7 @@ StringList Matroska::Tag::complexPropertyKeys() const
   StringList keys;
   for(const SimpleTag &t : std::as_const(d->tags)) {
     if(t.type() != SimpleTag::StringType ||
+       t.trackUid() != 0 ||
        translateTag(t.name(), t.targetTypeValue()).isEmpty()) {
       keys.append(t.name());
     }
@@ -482,6 +495,7 @@ List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
     for(const SimpleTag &t : std::as_const(d->tags)) {
       if(t.name() == key &&
          (t.type() != SimpleTag::StringType ||
+          t.trackUid() != 0 ||
           translateTag(t.name(), t.targetTypeValue()).isEmpty())) {
         VariantMap property;
         if(t.type() != SimpleTag::StringType) {
@@ -491,7 +505,12 @@ List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
           property.insert("value", t.toString());
         }
         property.insert("name", t.name());
-        property.insert("targetTypeValue", t.targetTypeValue());
+        if(t.targetTypeValue() != SimpleTag::TargetTypeValue::None) {
+          property.insert("targetTypeValue", t.targetTypeValue());
+        }
+        if(t.trackUid()) {
+          property.insert("trackUid", t.trackUid());
+        }
         property.insert("language", t.language());
         property.insert("defaultLanguage", t.defaultLanguageFlag());
         props.append(property);
@@ -511,6 +530,7 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
     [&key](const SimpleTag &t) {
       return t.name() == key &&
         (t.type() != SimpleTag::StringType ||
+         t.trackUid() != 0 ||
          translateTag(t.name(), t.targetTypeValue()).isEmpty());
     }
   );
@@ -535,11 +555,12 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
       }
       auto language = property.value("language").value<String>();
       bool defaultLanguage = property.value("defaultLanguage", true).value<bool>();
+      auto trackUid = property.value("trackUid", 0ULL).value<unsigned long long>();
       d->tags.append(property.contains("data")
         ? SimpleTag(key, property.value("data").value<ByteVector>(),
-                    targetTypeValue, language, defaultLanguage)
+                    targetTypeValue, language, defaultLanguage, trackUid)
         : SimpleTag(key, property.value("value").value<String>(),
-                    targetTypeValue, language, defaultLanguage));
+                    targetTypeValue, language, defaultLanguage, trackUid));
       setNeedsRender(true);
       result = true;
     }

@@ -55,14 +55,16 @@ namespace TagLib {
        */
       SimpleTag(const String &name, const String &value,
                 TargetTypeValue targetTypeValue = None,
-                const String &language = String(), bool defaultLanguage = true);
+                const String &language = String(), bool defaultLanguage = true,
+                unsigned long long trackUid = 0);
 
       /*!
        * Construct a binary simple tag.
        */
       SimpleTag(const String &name, const ByteVector &value,
         TargetTypeValue targetTypeValue = None,
-        const String &language = String(), bool defaultLanguage = true);
+        const String &language = String(), bool defaultLanguage = true,
+        unsigned long long trackUid = 0);
 
       /*!
        * Construct a simple tag as a copy of \a other.
@@ -113,6 +115,12 @@ namespace TagLib {
        * Returns if this is the default/original language to use for the tag.
        */
       bool defaultLanguageFlag() const;
+
+      /*!
+       * Returns the UID that identifies the track that the tags belong to,
+       * zero if not defined, the tag applies to all tracks
+       */
+      unsigned long long trackUid() const;
 
       /*!
        * Returns the type of the value.

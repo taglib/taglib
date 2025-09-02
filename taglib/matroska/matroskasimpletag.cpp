@@ -30,16 +30,19 @@ class Matroska::SimpleTag::SimpleTagPrivate
 {
 public:
   explicit SimpleTagPrivate(const String &name, const String& value,
-  TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage) :
-    value(value), name(name), language(language),
+    TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
+    unsigned long long trackUid) :
+    value(value), name(name), language(language), trackUid(trackUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
   explicit SimpleTagPrivate(const String &name, const ByteVector& value,
-    TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage) :
-    value(value), name(name), language(language),
+    TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
+    unsigned long long trackUid) :
+    value(value), name(name), language(language), trackUid(trackUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
   const std::variant<String, ByteVector> value;
   const String name;
   const String language;
+  const unsigned long long trackUid;
   const TargetTypeValue targetTypeValue;
   const bool defaultLanguageFlag;
 };
@@ -49,16 +52,20 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 Matroska::SimpleTag::SimpleTag(const String &name, const String &value,
-                               TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage) :
+                               TargetTypeValue targetTypeValue,
+                               const String &language, bool defaultLanguage,
+                               unsigned long long trackUid) :
   d(std::make_unique<SimpleTagPrivate>(name, value, targetTypeValue,
-    language, defaultLanguage))
+    language, defaultLanguage, trackUid))
 {
 }
 
 Matroska::SimpleTag::SimpleTag(const String &name, const ByteVector &value,
-  TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage) :
+                               TargetTypeValue targetTypeValue,
+                               const String &language, bool defaultLanguage,
+                               unsigned long long trackUid) :
   d(std::make_unique<SimpleTagPrivate>(name, value, targetTypeValue,
-    language, defaultLanguage))
+    language, defaultLanguage, trackUid))
 {
 }
 
@@ -104,6 +111,11 @@ const String &Matroska::SimpleTag::language() const
 bool Matroska::SimpleTag::defaultLanguageFlag() const
 {
   return d->defaultLanguageFlag;
+}
+
+unsigned long long Matroska::SimpleTag::trackUid() const
+{
+  return d->trackUid;
 }
 
 Matroska::SimpleTag::ValueType Matroska::SimpleTag::type() const
