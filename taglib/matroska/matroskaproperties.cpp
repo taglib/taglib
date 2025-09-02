@@ -40,6 +40,7 @@ public:
 
   File *file;
   String codecName;
+  String title;
   int length { 0 };
   int bitrate { -1 };
   int sampleRate { 0 };
@@ -92,6 +93,11 @@ String Matroska::Properties::codecName() const
   return d->codecName;
 }
 
+String Matroska::Properties::title() const
+{
+  return d->title;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,4 +130,9 @@ void Matroska::Properties::setBitsPerSample(int bitsPerSample)
 void Matroska::Properties::setCodecName(const String &codecName)
 {
   d->codecName = codecName;
+}
+
+void Matroska::Properties::setTitle(const String& title)
+{
+  d->title = title;
 }

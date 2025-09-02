@@ -108,8 +108,12 @@ Tag *Matroska::File::tag() const
 
 Matroska::Tag *Matroska::File::tag(bool create) const
 {
-  if(!d->tag && create)
+  if(!d->tag && create) {
     d->tag = std::make_unique<Tag>();
+    if(d->properties) {
+      d->tag->setSegmentTitle(d->properties->title());
+    }
+  }
   return d->tag.get();
 }
 
@@ -305,6 +309,9 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
     d->properties = std::make_unique<Properties>(this);
     segment->parseInfo(d->properties.get());
     segment->parseTracks(d->properties.get());
+    if(d->tag) {
+      d->tag->setSegmentTitle(d->properties->title());
+    }
   }
 
   if(readStyle == AudioProperties::Accurate &&

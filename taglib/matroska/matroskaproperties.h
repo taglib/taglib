@@ -86,6 +86,13 @@ namespace TagLib::Matroska {
      */
     String codecName() const;
 
+    /*!
+     * Returns the general name of the segment.
+     * Some applications store the title of the file here, but players should
+     * prioritize the tag title over the segment title.
+     */
+    String title() const;
+
   private:
     class PropertiesPrivate;
     friend class EBML::MkInfo;
@@ -97,6 +104,7 @@ namespace TagLib::Matroska {
     void setChannels(int channels);
     void setBitsPerSample(int bitsPerSample);
     void setCodecName(const String &codecName);
+    void setTitle(const String &title);
 
     TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
     std::unique_ptr<PropertiesPrivate> d;

@@ -38,6 +38,7 @@ void EBML::MkInfo::parse(Matroska::Properties *properties)
 
   unsigned long long timestampScale = 1000000;
   double duration = 0.0;
+  String title;
   for(const auto &element : elements) {
     Id id = element->getId();
     if (id == Id::MkTimestampScale) {
@@ -46,8 +47,12 @@ void EBML::MkInfo::parse(Matroska::Properties *properties)
     else if (id == Id::MkDuration) {
       duration = element_cast<Id::MkDuration>(element)->getValueAsDouble();
     }
+    else if (id == Id::MkTitle) {
+      title = element_cast<Id::MkTitle>(element)->getValue();
+    }
   }
 
   properties->setLengthInMilliseconds(
     static_cast<int>(duration * static_cast<double>(timestampScale) / 1000000.0));
+  properties->setTitle(title);
 }

@@ -75,6 +75,7 @@ namespace TagLib::EBML {
       MkInfo                    = 0x1549A966,
       MkTimestampScale          = 0x2AD7B1,
       MkDuration                = 0x4489,
+      MkTitle                   = 0x7BA9,
       MkTracks                  = 0x1654AE6B,
       MkTrackEntry              = 0xAE,
       MkCodecID                 = 0x86,
@@ -186,6 +187,7 @@ namespace TagLib::EBML {
   template <> struct GetElementTypeById<Element::Id::MkTagBinary> { using type = BinaryElement; };
   template <> struct GetElementTypeById<Element::Id::MkCodecState> { using type = BinaryElement; };
   template <> struct GetElementTypeById<Element::Id::MkDuration> { using type = FloatElement; };
+  template <> struct GetElementTypeById<Element::Id::MkTitle> { using type = UTF8StringElement; };
   template <> struct GetElementTypeById<Element::Id::MkSamplingFrequency> { using type = FloatElement; };
   template <> struct GetElementTypeById<Element::Id::MkSeekHead> { using type = MkSeekHead; };
   template <> struct GetElementTypeById<Element::Id::VoidElement> { using type = VoidElement; };

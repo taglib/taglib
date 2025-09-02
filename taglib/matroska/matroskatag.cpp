@@ -74,6 +74,7 @@ public:
 
   SimpleTagsList tags;
   ByteVector data;
+  String segmentTitle;
 };
 
 Matroska::Tag::Tag() :
@@ -115,6 +116,11 @@ const Matroska::SimpleTagsList &Matroska::Tag::simpleTagsList() const
   return d->tags;
 }
 
+void Matroska::Tag::setSegmentTitle(const String& title)
+{
+  d->segmentTitle = title;
+}
+
 void Matroska::Tag::setTitle(const String &s)
 {
   d->setTag("TITLE", s);
@@ -152,7 +158,11 @@ void Matroska::Tag::setTrack(unsigned int i)
 
 String Matroska::Tag::title() const
 {
-  return d->getTag("TITLE");
+  String s = d->getTag("TITLE");
+  if(s.isEmpty()) {
+    return d->segmentTitle;
+  }
+  return s;
 }
 
 String Matroska::Tag::artist() const

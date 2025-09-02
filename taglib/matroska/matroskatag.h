@@ -98,6 +98,8 @@ namespace TagLib {
       friend class EBML::MkTags;
       class TagPrivate;
 
+      void setSegmentTitle(const String &title);
+
       // private Element implementation
       ByteVector renderInternal() override;
 

@@ -91,6 +91,7 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
     RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileData);
     RETURN_ELEMENT_FOR_CASE(Id::MkSeekID);
     RETURN_ELEMENT_FOR_CASE(Id::MkDuration);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTitle);
     RETURN_ELEMENT_FOR_CASE(Id::MkSamplingFrequency);
     RETURN_ELEMENT_FOR_CASE(Id::MkSeekHead);
     RETURN_ELEMENT_FOR_CASE(Id::VoidElement);
