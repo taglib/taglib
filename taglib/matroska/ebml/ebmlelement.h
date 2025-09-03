@@ -34,6 +34,8 @@ namespace TagLib::EBML {
     enum class Id : unsigned int
     {
       EBMLHeader                = 0x1A45DFA3,
+      DocType                   = 0x4282,
+      DocTypeVersion            = 0x4287,
       VoidElement               = 0xEC,
       MkSegment                 = 0x18538067,
       MkTags                    = 0x1254C367,
@@ -143,7 +145,9 @@ namespace TagLib::EBML {
   template <Element::Id ID>
   struct GetElementTypeById;
 
-  template <> struct GetElementTypeById<Element::Id::EBMLHeader> { using type = Element; };
+  template <> struct GetElementTypeById<Element::Id::EBMLHeader> { using type = MasterElement; };
+  template <> struct GetElementTypeById<Element::Id::DocType> { using type = Latin1StringElement; };
+  template <> struct GetElementTypeById<Element::Id::DocTypeVersion> { using type = UIntElement; };
   template <> struct GetElementTypeById<Element::Id::MkSegment> { using type = MkSegment; };
   template <> struct GetElementTypeById<Element::Id::MkInfo> { using type = MkInfo; };
   template <> struct GetElementTypeById<Element::Id::MkTracks> { using type = MkTracks; };

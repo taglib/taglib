@@ -81,6 +81,16 @@ namespace TagLib::Matroska {
     int bitsPerSample() const;
 
     /*!
+     * Returns the EBML doc type, "matroska" or "webm".
+     */
+    String docType() const;
+
+    /*!
+     * Returns the EBML doc type version, typical values are 2 or 4.
+     */
+    int docTypeVersion() const;
+
+    /*!
      * Returns the concrete codec name, for example "A_MPEG/L3"
      * used in the file if available, otherwise an empty string.
      */
@@ -97,12 +107,14 @@ namespace TagLib::Matroska {
     class PropertiesPrivate;
     friend class EBML::MkInfo;
     friend class EBML::MkTracks;
+    friend class File;
 
     void setLengthInMilliseconds(int length);
-    void setBitrate(int bitrate);
     void setSampleRate(int sampleRate);
     void setChannels(int channels);
     void setBitsPerSample(int bitsPerSample);
+    void setDocType(const String &docType);
+    void setDocTypeVersion(int docTypeVersion);
     void setCodecName(const String &codecName);
     void setTitle(const String &title);
 

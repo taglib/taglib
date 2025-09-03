@@ -27,6 +27,8 @@
 #include "matroskasegment.h"
 #include "ebmlutils.h"
 #include "ebmlelement.h"
+#include "ebmlstringelement.h"
+#include "ebmluintelement.h"
 #include "ebmlmksegment.h"
 #include "tlist.h"
 #include "tdebug.h"
@@ -96,7 +98,7 @@ Matroska::File::File(IOStream *stream, bool readProperties,
 
 Matroska::File::~File() = default;
 
-AudioProperties *Matroska::File::audioProperties() const
+Matroska::Properties *Matroska::File::audioProperties() const
 {
   return d->properties.get();
 }
@@ -271,13 +273,19 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   offset_t fileLength = length();
 
   // Find the EBML Header
-  std::unique_ptr<EBML::Element> head(EBML::Element::factory(*this));
+  auto head = EBML::element_cast<EBML::Element::Id::EBMLHeader>(
+    EBML::Element::factory(*this));
   if(!head || head->getId() != EBML::Element::Id::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
     return;
   }
-  head->skipData(*this);
+  if(readProperties) {
+    head->read(*this);
+  }
+  else {
+    head->skipData(*this);
+  }
 
   // Find the Matroska segment in the file
   std::unique_ptr<EBML::MkSegment> segment(
@@ -307,6 +315,19 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
   if(readProperties) {
     d->properties = std::make_unique<Properties>(this);
+
+    for(const auto &element : *head) {
+      auto id = element->getId();
+      if (id == EBML::Element::Id::DocType) {
+        d->properties->setDocType(
+          EBML::element_cast<EBML::Element::Id::DocType>(element)->getValue());
+      }
+      else if (id == EBML::Element::Id::DocTypeVersion) {
+        d->properties->setDocTypeVersion(static_cast<int>(
+          EBML::element_cast<EBML::Element::Id::DocTypeVersion>(element)->getValue()));
+      }
+    }
+
     segment->parseInfo(d->properties.get());
     segment->parseTracks(d->properties.get());
     if(d->tag) {

@@ -76,5 +76,15 @@ int main(int argc, char *argv[])
   else
     printf("File has no attachments\n");
 
+  if(auto properties = dynamic_cast<const TagLib::Matroska::Properties *>(file.audioProperties())) {
+    printf("Properties:\n");
+    PRINT_PRETTY("Doc Type", properties->docType().toCString(false));
+    PRINT_PRETTY("Doc Type Version", TagLib::String::number(properties->docTypeVersion()).toCString(false));
+    PRINT_PRETTY("Codec Name", properties->codecName().toCString(true));
+    PRINT_PRETTY("Bitrate", TagLib::String::number(properties->bitrate()).toCString(false));
+    PRINT_PRETTY("Sample Rate", TagLib::String::number(properties->sampleRate()).toCString(false));
+    PRINT_PRETTY("Channels", TagLib::String::number(properties->channels()).toCString(false));
+    PRINT_PRETTY("Length [ms]", TagLib::String::number(properties->lengthInMilliseconds()).toCString(false));
+  }
   return 0;
 }

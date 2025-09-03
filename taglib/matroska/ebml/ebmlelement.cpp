@@ -62,6 +62,8 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
   auto id = static_cast<Id>(uintId);
   switch(id) {
     RETURN_ELEMENT_FOR_CASE(Id::EBMLHeader);
+    RETURN_ELEMENT_FOR_CASE(Id::DocType);
+    RETURN_ELEMENT_FOR_CASE(Id::DocTypeVersion);
     RETURN_ELEMENT_FOR_CASE(Id::MkSegment);
     RETURN_ELEMENT_FOR_CASE(Id::MkInfo);
     RETURN_ELEMENT_FOR_CASE(Id::MkTracks);

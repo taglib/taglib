@@ -134,7 +134,7 @@ namespace TagLib::Matroska {
      * Returns the Matroska::Properties for this file.  If no audio properties
      * were read then this will return a null pointer.
      */
-    AudioProperties *audioProperties() const override;
+    Properties *audioProperties() const override;
 
     /*!
      * Save the file.

@@ -41,6 +41,8 @@ public:
   File *file;
   String codecName;
   String title;
+  String docType;
+  int docTypeVersion { 0 };
   int length { 0 };
   int bitrate { -1 };
   int sampleRate { 0 };
@@ -88,6 +90,16 @@ int Matroska::Properties::bitsPerSample() const
   return d->bitsPerSample;
 }
 
+String Matroska::Properties::docType() const
+{
+  return d->docType;
+}
+
+int Matroska::Properties::docTypeVersion() const
+{
+  return d->docTypeVersion;
+}
+
 String Matroska::Properties::codecName() const
 {
   return d->codecName;
@@ -107,11 +119,6 @@ void Matroska::Properties::setLengthInMilliseconds(int length)
   d->length = length;
 }
 
-void Matroska::Properties::setBitrate(int bitrate)
-{
-  d->bitrate = bitrate;
-}
-
 void Matroska::Properties::setSampleRate(int sampleRate)
 {
   d->sampleRate = sampleRate;
@@ -125,6 +132,16 @@ void Matroska::Properties::setChannels(int channels)
 void Matroska::Properties::setBitsPerSample(int bitsPerSample)
 {
   d->bitsPerSample = bitsPerSample;
+}
+
+void Matroska::Properties::setDocType(const String &docType)
+{
+  d->docType = docType;
+}
+
+void Matroska::Properties::setDocTypeVersion(int docTypeVersion)
+{
+  d->docTypeVersion = docTypeVersion;
 }
 
 void Matroska::Properties::setCodecName(const String &codecName)
