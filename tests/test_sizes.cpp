@@ -156,6 +156,9 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "matroskaattachedfile.h"
+#include "matroskaattachments.h"
+
 using namespace std;
 using namespace TagLib;
 
@@ -306,8 +309,11 @@ public:
 #ifdef TAGLIB_WITH_MATROSKA
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Matroska::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Matroska::Properties));
-        // TODO move non pimpl fields into private class.
-        // CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Matroska::Tag));
+        CPPUNIT_ASSERT_EQUAL(classSize(3, true), sizeof(TagLib::Matroska::Tag));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Matroska::Element));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Matroska::Attachments));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::SimpleTag));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::AttachedFile));
 #endif
     }
 
