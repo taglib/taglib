@@ -99,6 +99,7 @@ namespace TagLib {
       friend class EBML::MkTags;
       class TagPrivate;
 
+      bool setTag(const String &key, const String &value);
       void setSegmentTitle(const String &title);
 
       // private Element implementation

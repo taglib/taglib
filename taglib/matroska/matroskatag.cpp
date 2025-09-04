@@ -123,39 +123,48 @@ void Matroska::Tag::setSegmentTitle(const String& title)
   d->segmentTitle = title;
 }
 
+bool Matroska::Tag::setTag(const String &key, const String &value)
+{
+  bool found = d->setTag(key, value);
+  if(found) {
+    setNeedsRender(true);
+  }
+  return found;
+}
+
 void Matroska::Tag::setTitle(const String &s)
 {
-  d->setTag("TITLE", s);
+  setTag("TITLE", s);
 }
 
 void Matroska::Tag::setArtist(const String &s)
 {
-  d->setTag("ARTIST", s);
+  setTag("ARTIST", s);
 }
 
 void Matroska::Tag::setAlbum(const String &s)
 {
-  d->setTag("ALBUM", s);
+  setTag("ALBUM", s);
 }
 
 void Matroska::Tag::setComment(const String &s)
 {
-  d->setTag("COMMENT", s);
+  setTag("COMMENT", s);
 }
 
 void Matroska::Tag::setGenre(const String &s)
 {
-  d->setTag("GENRE", s);
+  setTag("GENRE", s);
 }
 
 void Matroska::Tag::setYear(unsigned int i)
 {
-  d->setTag("DATE", i != 0 ? String::number(i) : String());
+  setTag("DATE", i != 0 ? String::number(i) : String());
 }
 
 void Matroska::Tag::setTrack(unsigned int i)
 {
-  d->setTag("TRACKNUMBER", i != 0 ? String::number(i) : String());
+  setTag("TRACKNUMBER", i != 0 ? String::number(i) : String());
 }
 
 String Matroska::Tag::title() const
@@ -468,11 +477,12 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 
 void Matroska::Tag::removeUnsupportedProperties(const StringList& properties)
 {
-  d->removeSimpleTags(
-    [&properties](const SimpleTag &t) {
-      return properties.contains(t.name());
-    }
-  );
+  if(d->removeSimpleTags(
+     [&properties](const SimpleTag& t) {
+         return properties.contains(t.name());
+       }) > 0) {
+    setNeedsRender(true);
+  }
 }
 
 StringList Matroska::Tag::complexPropertyKeys() const
@@ -526,14 +536,15 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
     // Pictures are handled at the file level
     return false;
   }
-  d->removeSimpleTags(
-    [&key](const SimpleTag &t) {
-      return t.name() == key &&
-        (t.type() != SimpleTag::StringType ||
-         t.trackUid() != 0 ||
-         translateTag(t.name(), t.targetTypeValue()).isEmpty());
-    }
-  );
+  if(d->removeSimpleTags(
+       [&key](const SimpleTag &t) {
+         return t.name() == key &&
+           (t.type() != SimpleTag::StringType ||
+            t.trackUid() != 0 ||
+            translateTag(t.name(), t.targetTypeValue()).isEmpty());
+       }) > 0) {
+    setNeedsRender(true);
+  }
   bool result = false;
   for(const auto &property : value) {
     if(property.value("name").value<String>() == key &&
