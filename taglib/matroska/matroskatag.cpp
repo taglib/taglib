@@ -331,7 +331,6 @@ namespace
     std::tuple("ALBUMSORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Album, true),
     std::tuple("ARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("ALBUMARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Album, true),
-    std::tuple("ENCODEDBY", "ENCODED_BY", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("MEDIA", "ORIGINAL_MEDIA_TYPE", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("LABEL", "LABEL_CODE", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("CATALOGNUMBER", "CATALOG_NUMBER", Matroska::SimpleTag::TargetTypeValue::Track, false),
