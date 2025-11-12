@@ -4,6 +4,8 @@
 #include "matroskasimpletag.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
+#include "matroskachapters.h"
+#include "matroskachapteredition.h"
 #include "tstring.h"
 #include "tutils.h"
 #include "tbytevector.h"
@@ -66,15 +68,47 @@ int main(int argc, char *argv[])
       const TagLib::String &mediaType = attachedFile.mediaType();
       PRINT_PRETTY("Media Type", !mediaType.isEmpty() ? mediaType.toCString(false) : "None");
       PRINT_PRETTY("Data Size",
-        TagLib::Utils::formatString("%u byte(s)",attachedFile.data().size()).toCString(false)
+        TagLib::Utils::formatString("%u byte(s)", attachedFile.data().size()).toCString(false)
       );
       PRINT_PRETTY("UID",
-        TagLib::Utils::formatString("%llu",attachedFile.uid()).toCString(false)
+        TagLib::Utils::formatString("%llu", attachedFile.uid()).toCString(false)
       );
     }
   }
   else
     printf("File has no attachments\n");
+
+  TagLib::Matroska::Chapters *chapters = file.chapters();
+  if(chapters) {
+    printf("Chapters:\n");
+    const TagLib::Matroska::Chapters::ChapterEditionList &editions = chapters->chapterEditionList();
+    for(const auto &edition : editions) {
+      if(edition.uid()) {
+        PRINT_PRETTY("Edition UID", TagLib::Utils::formatString("%llu", edition.uid())
+          .toCString(false));
+      }
+      PRINT_PRETTY("Edition Flags", TagLib::Utils::formatString("default=%d, ordered=%d",
+        edition.isDefault(), edition.isOrdered())
+        .toCString(false));
+      printf("\n");
+      for(const auto &chapter : edition.chapterList()) {
+        PRINT_PRETTY("Chapter UID", TagLib::Utils::formatString("%llu", chapter.uid())
+          .toCString(false));
+        PRINT_PRETTY("Chapter flags", TagLib::Utils::formatString("hidden=%d", chapter.isHidden())
+          .toCString(false));
+        PRINT_PRETTY("Start-End", TagLib::Utils::formatString("%llu-%llu",
+          chapter.timeStart(), chapter.timeEnd()).toCString(false));
+        for(const auto &display : chapter.displayList()) {
+          PRINT_PRETTY("Display", display.string().toCString(false));
+          PRINT_PRETTY("Language", !display.language().isEmpty()
+            ? display.language().toCString(false) : "Not set");
+        }
+        printf("\n");
+      }
+    }
+  }
+  else
+    printf("File has no chapters\n");
 
   if(auto properties = dynamic_cast<const TagLib::Matroska::Properties *>(file.audioProperties())) {
     printf("Properties:\n");

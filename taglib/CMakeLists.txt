@@ -230,6 +230,9 @@ if(WITH_MATROSKA)
   set(tag_HDRS ${tag_HDRS}
     matroska/matroskaattachedfile.h
     matroska/matroskaattachments.h
+    matroska/matroskachapter.h
+    matroska/matroskachapteredition.h
+    matroska/matroskachapters.h
     matroska/matroskacues.h
     matroska/matroskaelement.h
     matroska/matroskafile.h
@@ -242,6 +245,7 @@ if(WITH_MATROSKA)
     matroska/ebml/ebmlelement.h
     matroska/ebml/ebmlmasterelement.h
     matroska/ebml/ebmlmkattachments.h
+    matroska/ebml/ebmlmkchapters.h
     matroska/ebml/ebmlmkcues.h
     matroska/ebml/ebmlmkseekhead.h
     matroska/ebml/ebmlmksegment.h
@@ -449,6 +453,9 @@ if(WITH_MATROSKA)
   set(matroska_SRCS
     matroska/matroskaattachedfile.cpp
     matroska/matroskaattachments.cpp
+    matroska/matroskachapter.cpp
+    matroska/matroskachapteredition.cpp
+    matroska/matroskachapters.cpp
     matroska/matroskacues.cpp
     matroska/matroskaelement.cpp
     matroska/matroskafile.cpp
@@ -464,6 +471,7 @@ if(WITH_MATROSKA)
     matroska/ebml/ebmlelement.cpp
     matroska/ebml/ebmlmasterelement.cpp
     matroska/ebml/ebmlmkattachments.cpp
+    matroska/ebml/ebmlmkchapters.cpp
     matroska/ebml/ebmlmkcues.cpp
     matroska/ebml/ebmlmkseekhead.cpp
     matroska/ebml/ebmlmksegment.cpp

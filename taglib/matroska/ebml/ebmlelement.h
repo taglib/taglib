@@ -86,6 +86,19 @@ namespace TagLib::EBML {
       MkSamplingFrequency       = 0xB5,
       MkBitDepth                = 0x6264,
       MkChannels                = 0x9F,
+      MkChapters                = 0x1043A770,
+      MkEditionEntry            = 0x45B9,
+      MkEditionUID              = 0x45BC,
+      MkEditionFlagDefault      = 0x45DB,
+      MkEditionFlagOrdered      = 0x45DD,
+      MkChapterAtom             = 0xB6,
+      MkChapterUID              = 0x73C4,
+      MkChapterTimeStart        = 0x91,
+      MkChapterTimeEnd          = 0x92,
+      MkChapterFlagHidden       = 0x98,
+      MkChapterDisplay          = 0x80,
+      MkChapString              = 0x85,
+      MkChapLanguage            = 0x437C,
     };
 
     Element(Id id, int sizeLength, offset_t dataSize) :
@@ -134,6 +147,7 @@ namespace TagLib::EBML {
   class MkTags;
   class MkAttachments;
   class MkSeekHead;
+  class MkChapters;
   class MkCues;
   class VoidElement;
 
@@ -196,6 +210,19 @@ namespace TagLib::EBML {
   template <> struct GetElementTypeById<Element::Id::MkTitle> { using type = UTF8StringElement; };
   template <> struct GetElementTypeById<Element::Id::MkSamplingFrequency> { using type = FloatElement; };
   template <> struct GetElementTypeById<Element::Id::MkSeekHead> { using type = MkSeekHead; };
+  template <> struct GetElementTypeById<Element::Id::MkChapters> { using type = MkChapters; };
+  template <> struct GetElementTypeById<Element::Id::MkEditionEntry> { using type = MasterElement; };
+  template <> struct GetElementTypeById<Element::Id::MkEditionUID> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkEditionFlagDefault> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkEditionFlagOrdered> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapterAtom> { using type = MasterElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapterUID> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapterTimeStart> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapterTimeEnd> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapterFlagHidden> { using type = UIntElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapterDisplay> { using type = MasterElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapString> { using type = UTF8StringElement; };
+  template <> struct GetElementTypeById<Element::Id::MkChapLanguage> { using type = Latin1StringElement; };
   template <> struct GetElementTypeById<Element::Id::VoidElement> { using type = VoidElement; };
 
   template <Element::Id ID, typename T=typename GetElementTypeById<ID>::type>

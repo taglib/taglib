@@ -22,6 +22,9 @@
 #include "matroskatag.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
+#include "matroskachapter.h"
+#include "matroskachapteredition.h"
+#include "matroskachapters.h"
 #include "matroskaseekhead.h"
 #include "matroskacues.h"
 #include "matroskasegment.h"
@@ -50,6 +53,7 @@ public:
 
   std::unique_ptr<Tag> tag;
   std::unique_ptr<Attachments> attachments;
+  std::unique_ptr<Chapters> chapters;
   std::unique_ptr<SeekHead> seekHead;
   std::unique_ptr<Cues> cues;
   std::unique_ptr<Segment> segment;
@@ -179,12 +183,64 @@ StringList Matroska::File::complexPropertyKeys() const
       }
     }
   }
+  if(d->chapters && !d->chapters->chapterEditionList().isEmpty()) {
+    keys.append("CHAPTERS");
+  }
   return keys;
 }
 
 List<VariantMap> Matroska::File::complexProperties(const String &key) const
 {
   List<VariantMap> props = TagLib::File::complexProperties(key);
+  if(key.upper() == "CHAPTERS") {
+    if(d->chapters) {
+      for(const auto &edition : d->chapters->chapterEditionList()) {
+        VariantMap property;
+        if(auto uid = edition.uid()) {
+          property.insert("uid", uid);
+        }
+        if(auto isDefault = edition.isDefault()) {
+          property.insert("isDefault", isDefault);
+        }
+        if(auto isOrdered = edition.isOrdered()) {
+          property.insert("isOrdered", isOrdered);
+        }
+        if(auto chapters = edition.chapterList(); !chapters.isEmpty()) {
+          VariantList chaps;
+          for(const auto &chapter : chapters) {
+            VariantMap chap;
+            if(auto uid = chapter.uid()) {
+              chap.insert("uid", uid);
+            }
+            if(auto isHidden = chapter.isHidden()) {
+              chap.insert("isHidden", isHidden);
+            }
+            chap.insert("timeStart", chapter.timeStart());
+            if(auto timeEnd = chapter.timeEnd()) {
+              chap.insert("timeEnd", timeEnd);
+            }
+            if(auto displays = chapter.displayList(); !displays.isEmpty()) {
+              VariantList disps;
+              for(const auto &display : displays) {
+                VariantMap disp;
+                if(auto str = display.string(); !str.isEmpty()) {
+                  disp.insert("string", str);
+                }
+                if(auto language = display.language(); !language.isEmpty()) {
+                  disp.insert("language", language);
+                }
+                disps.append(disp);
+              }
+              chap.insert("displays", disps);
+            }
+            chaps.append(chap);
+          }
+          property.insert("chapters", chaps);
+        }
+        props.append(property);
+      }
+    }
+  }
   if(d->attachments) {
     const auto &attachedFiles = d->attachments->attachedFileList();
     for(const auto &attachedFile : attachedFiles) {
@@ -205,6 +261,37 @@ List<VariantMap> Matroska::File::complexProperties(const String &key) const
 bool Matroska::File::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
   if(TagLib::File::setComplexProperties(key, value)) {
+    return true;
+  }
+
+  if(key.upper() == "CHAPTERS") {
+    chapters(true)->clear();
+    for(const auto &ed : value) {
+      List<Chapter> editionChapters;
+      const auto chaps = ed.value("chapters").toList();
+      for(const auto &chapVar : chaps) {
+        auto chap = chapVar.toMap();
+        const auto disps = chap.value("displays").toList();
+        List<Chapter::Display> chapterDisplays;
+        for(const auto &dispVar : disps) {
+          auto disp = dispVar.toMap();
+          chapterDisplays.append(Chapter::Display(
+            disp.value("string").toString(),
+            disp.value("language").toString()));
+        }
+        editionChapters.append(Chapter(
+          chap.value("timeStart").toULongLong(),
+          chap.value("timeEnd").toULongLong(),
+          chapterDisplays,
+          chap.value("uid", 0ULL).toULongLong(),
+          chap.value("isHidden", false).toBool()));
+      }
+      d->chapters->addChapterEdition(ChapterEdition(
+        editionChapters,
+        ed.value("isDefault", false).toBool(),
+        ed.value("isOrdered", false).toBool(),
+        ed.value("uid", 0ULL).toULongLong()));
+    }
     return true;
   }
 
@@ -268,6 +355,13 @@ Matroska::Attachments *Matroska::File::attachments(bool create) const
   return d->attachments.get();
 }
 
+Matroska::Chapters *Matroska::File::chapters(bool create) const
+{
+  if(!d->chapters && create)
+    d->chapters = std::make_unique<Chapters>();
+  return d->chapters.get();
+}
+
 void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 {
   offset_t fileLength = length();
@@ -312,6 +406,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   d->cues = segment->parseCues();
   d->tag = segment->parseTag();
   d->attachments = segment->parseAttachments();
+  d->chapters = segment->parseChapters();
 
   if(readProperties) {
     d->properties = std::make_unique<Properties>(this);
@@ -355,8 +450,13 @@ bool Matroska::File::save()
     return false;
   }
 
-  // Do not create new attachments or tags and corresponding seek head entries
-  // if only empty objects were created.
+  // Do not create new attachments, chapters or tags and corresponding
+  // seek head entries if only empty objects were created.
+  if(d->chapters && d->chapters->chapterEditionList().isEmpty() &&
+     d->chapters->size() == 0 && d->chapters->offset() == 0 &&
+     d->chapters->data().isEmpty()) {
+    d->chapters.reset();
+  }
   if(d->attachments && d->attachments->attachedFileList().isEmpty() &&
      d->attachments->size() == 0 && d->attachments->offset() == 0 &&
      d->attachments->data().isEmpty()) {
@@ -373,6 +473,7 @@ bool Matroska::File::save()
 
   // List of all possible elements we can write
   List<Element *> elements {
+    d->chapters.get(),
     d->attachments.get(),
     d->tag.get()
   };
@@ -381,7 +482,7 @@ bool Matroska::File::save()
    * to the end of the file. For new elements,
    * the order is from least likely to change,
    * to most likely to change:
-   *   1. Bookmarks (todo)
+   *   1. Chapters
    *   2. Attachments
    *   3. Tags
    */

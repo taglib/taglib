@@ -19,15 +19,11 @@
  ***************************************************************************/
 
 #include "ebmlmksegment.h"
-#include "ebmlmktags.h"
-#include "ebmlmkattachments.h"
-#include "ebmlmkseekhead.h"
-#include "ebmlmkinfo.h"
-#include "ebmlmktracks.h"
 #include "ebmlutils.h"
 #include "matroskafile.h"
 #include "matroskatag.h"
 #include "matroskaattachments.h"
+#include "matroskachapters.h"
 #include "matroskacues.h"
 #include "matroskaseekhead.h"
 #include "matroskasegment.h"
@@ -80,6 +76,11 @@ bool EBML::MkSegment::read(File &file)
       if(!attachments->read(file))
         return false;
     }
+    else if(id == Id::MkChapters) {
+      chapters = element_cast<Id::MkChapters>(std::move(element));
+      if(!chapters->read(file))
+        return false;
+    }
     else {
       if(id == Id::VoidElement
          && seekHead
@@ -101,6 +102,11 @@ std::unique_ptr<Matroska::Tag> EBML::MkSegment::parseTag()
 std::unique_ptr<Matroska::Attachments> EBML::MkSegment::parseAttachments()
 {
   return attachments ? attachments->parse() : nullptr;
+}
+
+std::unique_ptr<Matroska::Chapters> EBML::MkSegment::parseChapters()
+{
+  return chapters ? chapters->parse() : nullptr;
 }
 
 std::unique_ptr<Matroska::SeekHead> EBML::MkSegment::parseSeekHead()

@@ -27,6 +27,7 @@
 #include "ebmlmksegment.h"
 #include "ebmlmktags.h"
 #include "ebmlmkattachments.h"
+#include "ebmlmkchapters.h"
 #include "ebmlmktracks.h"
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
@@ -113,6 +114,19 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
     RETURN_ELEMENT_FOR_CASE(Id::MkCueCodecState);
     RETURN_ELEMENT_FOR_CASE(Id::MkCueReference);
     RETURN_ELEMENT_FOR_CASE(Id::MkCueRefTime);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapters);
+    RETURN_ELEMENT_FOR_CASE(Id::MkEditionEntry);
+    RETURN_ELEMENT_FOR_CASE(Id::MkEditionUID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkEditionFlagDefault);
+    RETURN_ELEMENT_FOR_CASE(Id::MkEditionFlagOrdered);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapterAtom);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapterUID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapterTimeStart);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapterTimeEnd);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapterFlagHidden);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapterDisplay);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapString);
+    RETURN_ELEMENT_FOR_CASE(Id::MkChapLanguage);
   }
   return std::make_unique<Element>(id, sizeLength, dataSize);
 }

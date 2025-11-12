@@ -30,6 +30,7 @@ namespace TagLib::Matroska {
   class Properties;
   class Tag;
   class Attachments;
+  class Chapters;
 
   /*!
    * Implementation of TagLib::File for Matroska.
@@ -143,7 +144,25 @@ namespace TagLib::Matroska {
      */
     bool save() override;
 
+    /*!
+     * Returns a pointer to the attachments of the file.
+     *
+     * If \a create is \c false this may return a null pointer if there are no
+     * attachments.
+     * If \a create is \c true it will create attachments if none exist and
+     * returns a valid pointer.
+     */
     Attachments *attachments(bool create = false) const;
+
+    /*!
+     * Returns a pointer to the chapters of the file.
+     *
+     * If \a create is \c false this may return a null pointer if there are no
+     * chapters.
+     * If \a create is \c true it will create chapters if none exist and
+     * returns a valid pointer.
+     */
+    Chapters *chapters(bool create = false) const;
 
     /*!
      * Returns whether or not the given \a stream can be opened as a Matroska

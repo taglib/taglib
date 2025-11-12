@@ -130,6 +130,9 @@
 #include "matroskatag.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
+#include "matroskachapter.h"
+#include "matroskachapteredition.h"
+#include "matroskachapters.h"
 #include "matroskasimpletag.h"
 #include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
@@ -152,6 +155,7 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testComplexProperties);
   CPPUNIT_TEST(testOpenInvalid);
   CPPUNIT_TEST(testSegmentSizeChange);
+  CPPUNIT_TEST(testChapters);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -993,6 +997,208 @@ public:
       CPPUNIT_ASSERT(f.tag(false));
       CPPUNIT_ASSERT(!f.attachments(false));
     }
+  }
+
+  void testChapters()
+  {
+    const Matroska::ChapterEdition edition1(
+      List{
+        Matroska::Chapter(
+          0, 40000,
+          List{
+            Matroska::Chapter::Display("Chapter 1", "eng")},
+          1, false),
+        Matroska::Chapter(
+          40000, 80000,
+          List{
+            Matroska::Chapter::Display("Chapter 2", "eng"),
+            Matroska::Chapter::Display("Kapitel 2", "deu"),
+          },
+          2),
+        Matroska::Chapter(
+          80000, 120000,
+          List{
+            Matroska::Chapter::Display("Chapter 3", "und")},
+          3, true)
+      },
+      true, false);
+    const VariantMap chapterEdition1 {
+            {"chapters",
+              VariantList{
+                VariantMap{
+                  {"displays", VariantList{
+                    VariantMap{{"language", "eng"}, {"string", "Chapter 1"}}}},
+                  {"timeEnd", 40000ULL},
+                  {"timeStart", 0ULL},
+                  {"uid", 1ULL}
+                },
+                VariantMap{
+                  {"displays", VariantList{
+                    VariantMap{{"language", "eng"}, {"string", "Chapter 2"}},
+                    VariantMap{{"language", "deu"}, {"string", "Kapitel 2"}}}},
+                  {"timeEnd", 80000ULL},
+                  {"timeStart", 40000ULL},
+                  {"uid", 2ULL}
+                },
+                VariantMap{
+                    {
+                      "displays", VariantList{
+                        VariantMap{{"language", "und"}, {"string", "Chapter 3"}}}
+                    },
+                  {"isHidden", true},
+                  {"timeEnd", 120000ULL},
+                  {"timeStart", 80000ULL},
+                  {"uid", 3ULL}
+                }
+              }
+            },
+          {"isDefault", true}
+    };
+    const VariantMap chapterEdition2 {
+      {"chapters",
+        VariantList{
+          VariantMap{
+            {"displays", VariantList{
+              VariantMap{{"string", "Chapter A"}}}},
+            {"timeStart", 10000ULL},
+            {"uid", 1234567890ULL}
+          },
+        }
+      },
+      {"isOrdered", true},
+      {"uid", 321ULL}
+    };
+
+    ScopedFileCopy copy("tags-before-cues", ".mkv");
+    string newname = copy.fileName();
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT(!f.attachments(false));
+      CPPUNIT_ASSERT(!f.chapters(false));
+      CPPUNIT_ASSERT_EQUAL(StringList({"DURATION"}), f.complexPropertyKeys());
+      CPPUNIT_ASSERT(f.complexProperties("CHAPTERS").isEmpty());
+
+      f.chapters(true)->addChapterEdition(edition1);
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT(!f.attachments(false));
+      auto chapters = f.chapters(false);
+      CPPUNIT_ASSERT(chapters);
+      CPPUNIT_ASSERT_EQUAL(StringList({"DURATION", "CHAPTERS"}), f.complexPropertyKeys());
+      auto chaptersProperties = f.complexProperties("CHAPTERS");
+      CPPUNIT_ASSERT_EQUAL(1U, chaptersProperties.size());
+      CPPUNIT_ASSERT_EQUAL(chapterEdition1, chaptersProperties.front());
+
+      CPPUNIT_ASSERT_EQUAL(1U, chapters->chapterEditionList().size());
+      const auto &edition = chapters->chapterEditionList().front();
+      CPPUNIT_ASSERT_EQUAL(true, edition.isDefault());
+      CPPUNIT_ASSERT_EQUAL(false, edition.isOrdered());
+      CPPUNIT_ASSERT_EQUAL(0ULL, edition.uid());
+      const auto &chapterAtoms = edition.chapterList();
+      CPPUNIT_ASSERT_EQUAL(3U, chapterAtoms.size());
+      CPPUNIT_ASSERT_EQUAL(1ULL, chapterAtoms[0].uid());
+      CPPUNIT_ASSERT_EQUAL(false, chapterAtoms[0].isHidden());
+      CPPUNIT_ASSERT_EQUAL(0ULL, chapterAtoms[0].timeStart());
+      CPPUNIT_ASSERT_EQUAL(40000ULL, chapterAtoms[0].timeEnd());
+      CPPUNIT_ASSERT_EQUAL(1U, chapterAtoms[0].displayList().size());
+      CPPUNIT_ASSERT_EQUAL(String("Chapter 1"), chapterAtoms[0].displayList()[0].string());
+      CPPUNIT_ASSERT_EQUAL(String("eng"), chapterAtoms[0].displayList()[0].language());
+      CPPUNIT_ASSERT_EQUAL(2ULL, chapterAtoms[1].uid());
+      CPPUNIT_ASSERT_EQUAL(false, chapterAtoms[1].isHidden());
+      CPPUNIT_ASSERT_EQUAL(40000ULL, chapterAtoms[1].timeStart());
+      CPPUNIT_ASSERT_EQUAL(80000ULL, chapterAtoms[1].timeEnd());
+      CPPUNIT_ASSERT_EQUAL(2U, chapterAtoms[1].displayList().size());
+      CPPUNIT_ASSERT_EQUAL(String("Chapter 2"), chapterAtoms[1].displayList()[0].string());
+      CPPUNIT_ASSERT_EQUAL(String("eng"), chapterAtoms[1].displayList()[0].language());
+      CPPUNIT_ASSERT_EQUAL(String("Kapitel 2"), chapterAtoms[1].displayList()[1].string());
+      CPPUNIT_ASSERT_EQUAL(String("deu"), chapterAtoms[1].displayList()[1].language());
+      CPPUNIT_ASSERT_EQUAL(3ULL, chapterAtoms[2].uid());
+      CPPUNIT_ASSERT_EQUAL(true, chapterAtoms[2].isHidden());
+      CPPUNIT_ASSERT_EQUAL(80000ULL, chapterAtoms[2].timeStart());
+      CPPUNIT_ASSERT_EQUAL(120000ULL, chapterAtoms[2].timeEnd());
+      CPPUNIT_ASSERT_EQUAL(1U, chapterAtoms[2].displayList().size());
+      CPPUNIT_ASSERT_EQUAL(String("Chapter 3"), chapterAtoms[2].displayList()[0].string());
+      CPPUNIT_ASSERT_EQUAL(String("und"), chapterAtoms[2].displayList()[0].language());
+
+      CPPUNIT_ASSERT(f.setComplexProperties("CHAPTERS", {chapterEdition2}));
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT(!f.attachments(false));
+      auto chapters = f.chapters(false);
+      CPPUNIT_ASSERT(chapters);
+      CPPUNIT_ASSERT_EQUAL(StringList({"DURATION", "CHAPTERS"}), f.complexPropertyKeys());
+      auto chaptersProperties = f.complexProperties("CHAPTERS");
+      CPPUNIT_ASSERT_EQUAL(1U, chaptersProperties.size());
+      CPPUNIT_ASSERT_EQUAL(chapterEdition2, chaptersProperties.front());
+
+      CPPUNIT_ASSERT_EQUAL(1U, chapters->chapterEditionList().size());
+      const auto &edition = chapters->chapterEditionList().front();
+      CPPUNIT_ASSERT_EQUAL(false, edition.isDefault());
+      CPPUNIT_ASSERT_EQUAL(true, edition.isOrdered());
+      CPPUNIT_ASSERT_EQUAL(321ULL, edition.uid());
+      const auto &chapterAtoms = edition.chapterList();
+      CPPUNIT_ASSERT_EQUAL(1U, chapterAtoms.size());
+      CPPUNIT_ASSERT_EQUAL(1234567890ULL, chapterAtoms[0].uid());
+      CPPUNIT_ASSERT_EQUAL(false, chapterAtoms[0].isHidden());
+      CPPUNIT_ASSERT_EQUAL(10000ULL, chapterAtoms[0].timeStart());
+      CPPUNIT_ASSERT_EQUAL(0ULL, chapterAtoms[0].timeEnd());
+      CPPUNIT_ASSERT_EQUAL(1U, chapterAtoms[0].displayList().size());
+      CPPUNIT_ASSERT_EQUAL(String("Chapter A"), chapterAtoms[0].displayList()[0].string());
+      CPPUNIT_ASSERT_EQUAL(String(), chapterAtoms[0].displayList()[0].language());
+
+      const Matroska::ChapterEdition edition2 = chapters->chapterEditionList().front();
+      chapters->removeChapterEdition(321ULL);
+      chapters->addChapterEdition(edition1);
+      chapters->addChapterEdition(edition2);
+
+      Matroska::AttachedFile attachedFile;
+      attachedFile.setFileName("folder.png");
+      attachedFile.setMediaType("image/png");
+      attachedFile.setDescription("Cover");
+      attachedFile.setData(ByteVector("PNG data"));
+      attachedFile.setUID(1763187649ULL);
+      f.attachments(true)->addAttachedFile(attachedFile);
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT(f.attachments(false));
+      CPPUNIT_ASSERT(f.chapters(false));
+
+      CPPUNIT_ASSERT_EQUAL(StringList({"DURATION", "PICTURE", "CHAPTERS"}),
+        f.complexPropertyKeys());
+      auto chaptersProperties = f.complexProperties("CHAPTERS");
+      CPPUNIT_ASSERT_EQUAL(2U, chaptersProperties.size());
+      CPPUNIT_ASSERT_EQUAL(chapterEdition1, chaptersProperties.front());
+      CPPUNIT_ASSERT_EQUAL(chapterEdition2, chaptersProperties.back());
+
+      f.attachments()->clear();
+      f.chapters()->clear();
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT(!f.attachments(false));
+    }
+
+    // Check if file with initial tags is same as original file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("tags-before-cues.mkv")).readAll();
+    const ByteVector fileData = PlainFile(newname.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
   }
 
 };
