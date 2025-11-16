@@ -22,11 +22,13 @@
 #define TAGLIB_MATROSKASIMPLETAG_H
 
 #include <memory>
-#include "tag.h"
+
+#include "tstring.h"
 
 namespace TagLib {
   class String;
   class ByteVector;
+
   namespace Matroska {
     //! Attribute of Matroska metadata.
     class TAGLIB_EXPORT SimpleTag
@@ -89,7 +91,7 @@ namespace TagLib {
       /*!
        * Moves the contents of \a other into this item.
        */
-      SimpleTag &operator=(SimpleTag &&other);
+      SimpleTag &operator=(SimpleTag &&other) noexcept;
 
       /*!
        * Exchanges the content of the simple tag with the content of \a other.

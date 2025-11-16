@@ -23,32 +23,25 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlmasterelement.h"
-#include "ebmlutils.h"
 #include "taglib.h"
 
 namespace TagLib {
   namespace Matroska {
     class Cues;
   }
-  //class Matroska::Tag;
+
   namespace EBML {
     class MkCues : public MasterElement
     {
     public:
       MkCues(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkCues, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkCues, sizeLength, dataSize, offset) {}
       MkCues(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkCues, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkCues, sizeLength, dataSize, offset) {}
       MkCues() :
-        MasterElement(Id::MkCues, 0, 0, 0)
-      {
-      }
+        MasterElement(Id::MkCues, 0, 0, 0) {}
 
-      std::unique_ptr<Matroska::Cues> parse(offset_t segmentDataOffset);
+      std::unique_ptr<Matroska::Cues> parse(offset_t segmentDataOffset) const;
     };
   }
 }

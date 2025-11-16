@@ -31,7 +31,7 @@
 
 using namespace TagLib;
 
-void EBML::MkTracks::parse(Matroska::Properties *properties)
+void EBML::MkTracks::parse(Matroska::Properties *properties) const
 {
   if(!properties)
     return;
@@ -44,16 +44,14 @@ void EBML::MkTracks::parse(Matroska::Properties *properties)
     double samplingFrequency = 0.0;
     unsigned long long bitDepth = 0;
     unsigned long long channels = 0;
-    auto trackEntry = element_cast<Id::MkTrackEntry>(element);
+    const auto trackEntry = element_cast<Id::MkTrackEntry>(element);
     for(const auto &trackEntryChild : *trackEntry) {
-      Id trackEntryChildId = trackEntryChild->getId();
-      if(trackEntryChildId == Id::MkCodecID)
+      if(const Id trackEntryChildId = trackEntryChild->getId(); trackEntryChildId == Id::MkCodecID)
         codecId = element_cast<Id::MkCodecID>(trackEntryChild)->getValue();
       else if(trackEntryChildId == Id::MkAudio) {
-        auto audio = element_cast<Id::MkAudio>(trackEntryChild);
+        const auto audio = element_cast<Id::MkAudio>(trackEntryChild);
         for(const auto &audioChild : *audio) {
-          Id audioChildId = audioChild->getId();
-          if(audioChildId == Id::MkSamplingFrequency)
+          if(const Id audioChildId = audioChild->getId(); audioChildId == Id::MkSamplingFrequency)
             samplingFrequency = element_cast<Id::MkSamplingFrequency>(audioChild)->getValueAsDouble();
           else if(audioChildId == Id::MkBitDepth)
             bitDepth = element_cast<Id::MkBitDepth>(audioChild)->getValue();

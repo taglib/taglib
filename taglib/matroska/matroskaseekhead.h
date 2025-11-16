@@ -23,17 +23,19 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "matroskaelement.h"
-#include "tbytevector.h"
 #include "tlist.h"
 
 namespace TagLib {
   class File;
+  class ByteVector;
+
   namespace Matroska {
     class SeekHead : public Element
     {
     public:
       explicit SeekHead(offset_t segmentDataOffset);
       ~SeekHead() override = default;
+
       bool isValid(TagLib::File &file) const;
       void addEntry(const Element &element);
       void addEntry(ID id, offset_t offset);

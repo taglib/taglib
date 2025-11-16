@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "matroskafile.h"
+#include <memory>
 #include "matroskatag.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
@@ -37,8 +38,6 @@
 #include "tdebug.h"
 #include "tagutils.h"
 #include "tpropertymap.h"
-
-#include <memory>
 
 using namespace TagLib;
 
@@ -177,8 +176,8 @@ StringList Matroska::File::complexPropertyKeys() const
   if(d->attachments) {
     const auto &attachedFiles = d->attachments->attachedFileList();
     for(const auto &attachedFile : attachedFiles) {
-      String key = keyForAttachedFile(attachedFile);
-      if(!key.isEmpty() && !keys.contains(key)) {
+      if(String key = keyForAttachedFile(attachedFile);
+         !key.isEmpty() && !keys.contains(key)) {
         keys.append(key);
       }
     }
@@ -196,27 +195,27 @@ List<VariantMap> Matroska::File::complexProperties(const String &key) const
     if(d->chapters) {
       for(const auto &edition : d->chapters->chapterEditionList()) {
         VariantMap property;
-        if(auto uid = edition.uid()) {
+        if(const auto uid = edition.uid()) {
           property.insert("uid", uid);
         }
-        if(auto isDefault = edition.isDefault()) {
+        if(const auto isDefault = edition.isDefault()) {
           property.insert("isDefault", isDefault);
         }
-        if(auto isOrdered = edition.isOrdered()) {
+        if(const auto isOrdered = edition.isOrdered()) {
           property.insert("isOrdered", isOrdered);
         }
         if(auto chapters = edition.chapterList(); !chapters.isEmpty()) {
           VariantList chaps;
           for(const auto &chapter : chapters) {
             VariantMap chap;
-            if(auto uid = chapter.uid()) {
+            if(const auto uid = chapter.uid()) {
               chap.insert("uid", uid);
             }
-            if(auto isHidden = chapter.isHidden()) {
+            if(const auto isHidden = chapter.isHidden()) {
               chap.insert("isHidden", isHidden);
             }
             chap.insert("timeStart", chapter.timeStart());
-            if(auto timeEnd = chapter.timeEnd()) {
+            if(const auto timeEnd = chapter.timeEnd()) {
               chap.insert("timeEnd", timeEnd);
             }
             if(auto displays = chapter.displayList(); !displays.isEmpty()) {
@@ -313,7 +312,6 @@ bool Matroska::File::setComplexProperties(const String &key, const List<VariantM
     auto fileName = property.value("fileName").value<String>();
     auto uid = property.value("uid").value<unsigned long long>();
     bool ok;
-    unsigned long long uidKey;
     if(key.upper() == "PICTURE" && !mimeType.startsWith("image/")) {
       mimeType = data.startsWith("\x89PNG\x0d\x0a\x1a\x0a")
                 ? "image/png" : "image/jpeg";
@@ -324,11 +322,12 @@ bool Matroska::File::setComplexProperties(const String &key, const List<VariantM
     else if(fileName.isEmpty() && key.find(".") != -1) {
       fileName = key;
     }
-    else if(!uid && ((uidKey = key.toULongLong(&ok))) && ok) {
+    else if(unsigned long long uidKey;
+            !uid && ((uidKey = key.toULongLong(&ok))) && ok) {
       uid = uidKey;
     }
     if(fileName.isEmpty() && !mimeType.isEmpty()) {
-      int slashPos = mimeType.rfind('/');
+      const int slashPos = mimeType.rfind('/');
       String ext = mimeType.substr(slashPos + 1);
       if(ext == "jpeg") {
         ext = "jpg";
@@ -364,10 +363,10 @@ Matroska::Chapters *Matroska::File::chapters(bool create) const
 
 void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 {
-  offset_t fileLength = length();
+  const offset_t fileLength = length();
 
   // Find the EBML Header
-  auto head = EBML::element_cast<EBML::Element::Id::EBMLHeader>(
+  const auto head = EBML::element_cast<EBML::Element::Id::EBMLHeader>(
     EBML::Element::factory(*this));
   if(!head || head->getId() != EBML::Element::Id::EBMLHeader) {
     debug("Failed to find EBML head");
@@ -382,7 +381,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   }
 
   // Find the Matroska segment in the file
-  std::unique_ptr<EBML::MkSegment> segment(
+  const std::unique_ptr<EBML::MkSegment> segment(
     EBML::element_cast<EBML::Element::Id::MkSegment>(
       EBML::findElement(*this, EBML::Element::Id::MkSegment, fileLength - tell())
     )
@@ -412,12 +411,11 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
     d->properties = std::make_unique<Properties>(this);
 
     for(const auto &element : *head) {
-      auto id = element->getId();
-      if (id == EBML::Element::Id::DocType) {
+      if(const auto id = element->getId(); id == EBML::Element::Id::DocType) {
         d->properties->setDocType(
           EBML::element_cast<EBML::Element::Id::DocType>(element)->getValue());
       }
-      else if (id == EBML::Element::Id::DocTypeVersion) {
+      else if(id == EBML::Element::Id::DocTypeVersion) {
         d->properties->setDocTypeVersion(static_cast<int>(
           EBML::element_cast<EBML::Element::Id::DocTypeVersion>(element)->getValue()));
       }
@@ -505,8 +503,8 @@ bool Matroska::File::save()
 
   // Add our new elements to the Seek Head (if the file has one)
   if(d->seekHead) {
-    auto segmentDataOffset = d->segment->dataOffset();
-    for(auto element : newElements)
+    const auto segmentDataOffset = d->segment->dataOffset();
+    for(const auto element : newElements)
       d->seekHead->addEntry(element->id(), element->offset() - segmentDataOffset);
     d->seekHead->sort();
   }
@@ -545,7 +543,7 @@ bool Matroska::File::save()
   bool rendering = true;
   while(rendering && renderRound < 5) {
     rendering = false;
-    for(auto element : renderList) {
+    for(const auto element : renderList) {
       if(element->needsRender()) {
         rendering = true;
         if(!element->render()) {
@@ -558,7 +556,7 @@ bool Matroska::File::save()
 
   // Write out to file
   renderList.sort(sortAscending);
-  for(auto element : renderList)
+  for(const auto element : renderList)
     element->write(*this);
 
   return true;

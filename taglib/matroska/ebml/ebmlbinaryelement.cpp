@@ -20,6 +20,7 @@
 
 #include "ebmlbinaryelement.h"
 #include "ebmlutils.h"
+#include "tfile.h"
 
 using namespace TagLib;
 

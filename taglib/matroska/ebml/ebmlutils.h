@@ -27,7 +27,6 @@
 #include "tutils.h"
 #include "tdebug.h"
 #include "ebmlelement.h"
-#include "tbytevector.h"
 
 namespace TagLib {
   class File;
@@ -68,29 +67,27 @@ namespace TagLib {
     {
       if(data <= 0x7Fu)
         return 1;
-      else if(data <= 0x3FFFu)
+      if(data <= 0x3FFFu)
         return 2;
-      else if(data <= 0x1FFFFFu)
+      if(data <= 0x1FFFFFu)
         return 3;
-      else if(data <= 0xFFFFFFFu)
+      if(data <= 0xFFFFFFFu)
         return 4;
-      else if(data <= 0x7FFFFFFFFu)
+      if(data <= 0x7FFFFFFFFu)
         return 5;
-      else
-        return 0;
+      return 0;
     }
 
     constexpr int idSize(Element::Id id)
     {
-      auto uintId = static_cast<unsigned int>(id);
+      const auto uintId = static_cast<unsigned int>(id);
       if(uintId <= 0xFF)
         return 1;
-      else if(uintId <= 0xFFFF)
+      if(uintId <= 0xFFFF)
         return 2;
-      else if(uintId <= 0xFFFFFF)
+      if(uintId <= 0xFFFFFF)
         return 3;
-      else
-        return 4;
+      return 4;
     }
   }
 }

@@ -27,7 +27,7 @@
 
 using namespace TagLib;
 
-std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse()
+std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
 {
   auto attachments = std::make_unique<Matroska::Attachments>();
   attachments->setOffset(offset);
@@ -42,17 +42,16 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse()
     const String *mediaType = nullptr;
     const ByteVector *data = nullptr;
     Matroska::AttachedFile::UID uid = 0;
-    auto attachedFile = element_cast<Id::MkAttachedFile>(element);
+    const auto attachedFile = element_cast<Id::MkAttachedFile>(element);
     for(const auto &attachedFileChild : *attachedFile) {
-      Id id = attachedFileChild->getId();
-      if(id == Id::MkAttachedFileName)
-        filename = &(element_cast<Id::MkAttachedFileName>(attachedFileChild)->getValue());
+      if(const Id id = attachedFileChild->getId(); id == Id::MkAttachedFileName)
+        filename = &element_cast<Id::MkAttachedFileName>(attachedFileChild)->getValue();
       else if(id == Id::MkAttachedFileData)
-        data = &(element_cast<Id::MkAttachedFileData>(attachedFileChild)->getValue());
+        data = &element_cast<Id::MkAttachedFileData>(attachedFileChild)->getValue();
       else if(id == Id::MkAttachedFileDescription)
-        description = &(element_cast<Id::MkAttachedFileDescription>(attachedFileChild)->getValue());
+        description = &element_cast<Id::MkAttachedFileDescription>(attachedFileChild)->getValue();
       else if(id == Id::MkAttachedFileMediaType)
-        mediaType = &(element_cast<Id::MkAttachedFileMediaType>(attachedFileChild)->getValue());
+        mediaType = &element_cast<Id::MkAttachedFileMediaType>(attachedFileChild)->getValue();
       else if(id == Id::MkAttachedFileUID)
         uid = element_cast<Id::MkAttachedFileUID>(attachedFileChild)->getValue();
     }

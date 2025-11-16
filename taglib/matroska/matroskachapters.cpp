@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 #include "matroskachapters.h"
-#include <memory>
 #include "matroskachapteredition.h"
 #include "ebmlstringelement.h"
 #include "ebmlbinaryelement.h"
@@ -58,7 +57,7 @@ Matroska::Chapters::Chapters() :
 
 Matroska::Chapters::~Chapters() = default;
 
-void Matroska::Chapters::addChapterEdition(const ChapterEdition& edition)
+void Matroska::Chapters::addChapterEdition(const ChapterEdition &edition)
 {
   d->editions.append(edition);
   setNeedsRender(true);
@@ -66,8 +65,8 @@ void Matroska::Chapters::addChapterEdition(const ChapterEdition& edition)
 
 void Matroska::Chapters::removeChapterEdition(unsigned long long uid)
 {
-  auto it = std::find_if(d->editions.begin(), d->editions.end(),
-    [uid](const ChapterEdition& file) {
+  const auto it = std::find_if(d->editions.begin(), d->editions.end(),
+    [uid](const ChapterEdition &file) {
       return file.uid() == uid;
     });
   if(it != d->editions.end()) {
@@ -101,7 +100,7 @@ ByteVector Matroska::Chapters::renderInternal()
   for(const auto &chapterEdition : std::as_const(d->editions)) {
     auto chapterEditionElement = EBML::make_unique_element<EBML::Element::Id::MkEditionEntry>();
 
-    if(auto uid = chapterEdition.uid()) {
+    if(const auto uid = chapterEdition.uid()) {
       auto uidElement = EBML::make_unique_element<EBML::Element::Id::MkEditionUID>();
       uidElement->setValue(uid);
       chapterEditionElement->appendElement(std::move(uidElement));
@@ -117,7 +116,7 @@ ByteVector Matroska::Chapters::renderInternal()
       auto chapterElement = EBML::make_unique_element<EBML::Element::Id::MkChapterAtom>();
 
       auto cuidElement = EBML::make_unique_element<EBML::Element::Id::MkChapterUID>();
-      auto cuid = chapter.uid();
+      const auto cuid = chapter.uid();
       cuidElement->setValue(cuid ? cuid : EBML::randomUID());
       chapterElement->appendElement(std::move(cuidElement));
       auto timeStartElement = EBML::make_unique_element<EBML::Element::Id::MkChapterTimeStart>();
@@ -130,7 +129,7 @@ ByteVector Matroska::Chapters::renderInternal()
       hiddenElement->setValue(chapter.isHidden());
       chapterElement->appendElement(std::move(hiddenElement));
 
-      for(const auto& display : chapter.displayList()) {
+      for(const auto &display : chapter.displayList()) {
         auto displayElement = EBML::make_unique_element<EBML::Element::Id::MkChapterDisplay>();
 
         auto stringElement = EBML::make_unique_element<EBML::Element::Id::MkChapString>();

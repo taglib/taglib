@@ -23,6 +23,8 @@
 #include "ebmlbinaryelement.h"
 #include "ebmluintelement.h"
 #include "ebmlmasterelement.h"
+#include "tfile.h"
+#include "tutils.h"
 #include "tdebug.h"
 
 using namespace TagLib;
@@ -34,7 +36,7 @@ Matroska::SeekHead::SeekHead(offset_t segmentDataOffset) :
   setNeedsRender(false);
 }
 
-bool Matroska::SeekHead::isValid(TagLib::File& file) const
+bool Matroska::SeekHead::isValid(TagLib::File &file) const
 {
   bool result = true;
   for(const auto &[id, offset] : entries) {
@@ -62,7 +64,7 @@ void Matroska::SeekHead::addEntry(ID id, offset_t offset)
 
 ByteVector Matroska::SeekHead::renderInternal()
 {
-  auto beforeSize = sizeRenderedOrWritten();
+  const auto beforeSize = sizeRenderedOrWritten();
   EBML::MkSeekHead seekHead;
   seekHead.setMinRenderSize(beforeSize);
   for(const auto &[id, position] : entries) {
@@ -98,34 +100,32 @@ bool Matroska::SeekHead::sizeChanged(Element &caller, offset_t delta)
     adjustOffset(delta);
     return true;
   }
-  else {
-    // The equal case is needed when multiple new elements are added
-    // (e.g. Attachments and Tags), they will start with the same offset
-    // and are updated via size change handling.
-    offset_t offset = caller.offset() - segmentDataOffset;
-    auto it = entries.begin();
-    while(it != entries.end()) {
-      it = std::find_if(it,
-        entries.end(),
-        [offset, callerID](const auto &a) {
-          return a.second >= offset && a.first != callerID;
-        }
-      );
-      if(it != entries.end()) {
-        it->second += delta;
-        setNeedsRender(true);
-        ++it;
+  // The equal case is needed when multiple new elements are added
+  // (e.g. Attachments and Tags), they will start with the same offset
+  // and are updated via size change handling.
+  offset_t offset = caller.offset() - segmentDataOffset;
+  auto it = entries.begin();
+  while(it != entries.end()) {
+    it = std::find_if(it,
+      entries.end(),
+      [offset, callerID](const auto &a) {
+        return a.second >= offset && a.first != callerID;
       }
+    );
+    if(it != entries.end()) {
+      it->second += delta;
+      setNeedsRender(true);
+      ++it;
     }
-
-    if(caller.data().isEmpty() && caller.size() + delta == 0) {
-      // The caller element is removed, remove it from the seek head.
-      it = std::find_if(entries.begin(), entries.end(),
-        [callerID](const auto &a){ return a.first == callerID; });
-      if(it != entries.end()) {
-        entries.erase(it);
-      }
-    }
-    return true;
   }
+
+  if(caller.data().isEmpty() && caller.size() + delta == 0) {
+    // The caller element is removed, remove it from the seek head.
+    it = std::find_if(entries.begin(), entries.end(),
+      [callerID](const auto &a){ return a.first == callerID; });
+    if(it != entries.end()) {
+      entries.erase(it);
+    }
+  }
+  return true;
 }

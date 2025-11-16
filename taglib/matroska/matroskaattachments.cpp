@@ -1,5 +1,5 @@
 /***************************************************************************
-*   This library is free software; you can redistribute it and/or modify  *
+ *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
@@ -19,13 +19,13 @@
  ***************************************************************************/
 
 #include "matroskaattachments.h"
-#include <memory>
 #include "matroskaattachedfile.h"
 #include "ebmlmkattachments.h"
 #include "ebmlmasterelement.h"
 #include "ebmlstringelement.h"
 #include "ebmlbinaryelement.h"
 #include "ebmluintelement.h"
+#include "ebmlutils.h"
 #include "tlist.h"
 #include "tbytevector.h"
 
@@ -53,7 +53,7 @@ Matroska::Attachments::Attachments() :
 
 Matroska::Attachments::~Attachments() = default;
 
-void Matroska::Attachments::addAttachedFile(const AttachedFile& file)
+void Matroska::Attachments::addAttachedFile(const AttachedFile &file)
 {
   d->files.append(file);
   setNeedsRender(true);
@@ -61,8 +61,8 @@ void Matroska::Attachments::addAttachedFile(const AttachedFile& file)
 
 void Matroska::Attachments::removeAttachedFile(unsigned long long uid)
 {
-  auto it = std::find_if(d->files.begin(), d->files.end(),
-    [uid](const AttachedFile& file) {
+  const auto it = std::find_if(d->files.begin(), d->files.end(),
+    [uid](const AttachedFile &file) {
       return file.uid() == uid;
     });
   if(it != d->files.end()) {
@@ -109,14 +109,15 @@ ByteVector Matroska::Attachments::renderInternal()
     attachedFileElement->appendElement(std::move(fileNameElement));
 
     // Media/MIME type
-    auto mediaTypeElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileMediaType>();
+    auto mediaTypeElement =
+      EBML::make_unique_element<EBML::Element::Id::MkAttachedFileMediaType>();
     mediaTypeElement->setValue(attachedFile.mediaType());
     attachedFileElement->appendElement(std::move(mediaTypeElement));
 
     // Description
-    const String &description = attachedFile.description();
-    if(!description.isEmpty()) {
-      auto descriptionElement = EBML::make_unique_element<EBML::Element::Id::MkAttachedFileDescription>();
+    if(const String &description = attachedFile.description(); !description.isEmpty()) {
+      auto descriptionElement =
+        EBML::make_unique_element<EBML::Element::Id::MkAttachedFileDescription>();
       descriptionElement->setValue(description);
       attachedFileElement->appendElement(std::move(descriptionElement));
     }

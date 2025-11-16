@@ -21,15 +21,13 @@
 #include "ebmlstringelement.h"
 #include <string>
 #include "tfile.h"
-#include "tstring.h"
 #include "tbytevector.h"
 #include "tdebug.h"
 #include "ebmlutils.h"
 
 using namespace TagLib;
 
-template <String::Type t>
-bool EBML::StringElement<t>::read(File &file)
+bool EBML::StringElement::read(File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
   if(buffer.size() != dataSize) {
@@ -39,24 +37,18 @@ bool EBML::StringElement<t>::read(File &file)
 
   // The EBML strings aren't supposed to be null-terminated,
   // but we'll check for it and strip the null terminator if found
-  int nullByte = buffer.find('\0');
-  if(nullByte >= 0)
+  if(const int nullByte = buffer.find('\0'); nullByte >= 0)
     buffer = ByteVector(buffer.data(), nullByte);
-  value = String(buffer, t);
+  value = String(buffer, encoding);
   return true;
 }
-template bool EBML::StringElement<String::UTF8>::read(File &file);
-template bool EBML::StringElement<String::Latin1>::read(File &file);
 
-template <String::Type t>
-ByteVector EBML::StringElement<t>::render()
+ByteVector EBML::StringElement::render()
 {
   ByteVector buffer = renderId();
-  std::string string = value.to8Bit(t == String::UTF8);
+  const std::string string = value.to8Bit(encoding == String::UTF8);
   dataSize = string.size();
   buffer.append(renderVINT(dataSize, 0));
   buffer.append(ByteVector(string.data(), static_cast<unsigned int>(dataSize)));
   return buffer;
 }
-template ByteVector EBML::StringElement<String::UTF8>::render();
-template ByteVector EBML::StringElement<String::Latin1>::render();

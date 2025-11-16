@@ -24,7 +24,7 @@
 
 using namespace TagLib;
 
-std::unique_ptr<Matroska::Cues> EBML::MkCues::parse(offset_t segmentDataOffset)
+std::unique_ptr<Matroska::Cues> EBML::MkCues::parse(offset_t segmentDataOffset) const
 {
   auto cues = std::make_unique<Matroska::Cues>(segmentDataOffset);
   cues->setOffset(offset);
@@ -34,19 +34,17 @@ std::unique_ptr<Matroska::Cues> EBML::MkCues::parse(offset_t segmentDataOffset)
   for(const auto &cuesChild : elements) {
     if(cuesChild->getId() != Id::MkCuePoint)
       continue;
-    auto cuePointElement = element_cast<Id::MkCuePoint>(cuesChild);
+    const auto cuePointElement = element_cast<Id::MkCuePoint>(cuesChild);
     auto cuePoint = std::make_unique<Matroska::CuePoint>();
 
     for(const auto &cuePointChild : *cuePointElement) {
-      Id id = cuePointChild->getId();
-      if(id == Id::MkCueTime)
+      if(const Id id = cuePointChild->getId(); id == Id::MkCueTime)
         cuePoint->setTime(element_cast<Id::MkCueTime>(cuePointChild)->getValue());
       else if(id == Id::MkCueTrackPositions) {
         auto cueTrack = std::make_unique<Matroska::CueTrack>();
-        auto cueTrackElement = element_cast<Id::MkCueTrackPositions>(cuePointChild);
+        const auto cueTrackElement = element_cast<Id::MkCueTrackPositions>(cuePointChild);
         for(const auto &cueTrackChild : *cueTrackElement) {
-          Id trackId = cueTrackChild->getId();
-          if(trackId == Id::MkCueTrack)
+          if(const Id trackId = cueTrackChild->getId(); trackId == Id::MkCueTrack)
             cueTrack->setTrackNumber(element_cast<Id::MkCueTrack>(cueTrackChild)->getValue());
           else if(trackId == Id::MkCueClusterPosition)
             cueTrack->setClusterPosition(element_cast<Id::MkCueClusterPosition>(cueTrackChild)->getValue());
@@ -59,7 +57,7 @@ std::unique_ptr<Matroska::Cues> EBML::MkCues::parse(offset_t segmentDataOffset)
           else if(trackId == Id::MkCueCodecState)
             cueTrack->setCodecState(element_cast<Id::MkCueCodecState>(cueTrackChild)->getValue());
           else if(trackId == Id::MkCueReference) {
-            auto cueReference = element_cast<Id::MkCueReference>(cueTrackChild);
+            const auto cueReference = element_cast<Id::MkCueReference>(cueTrackChild);
             for(const auto &cueReferenceChild : *cueReference) {
               if(cueReferenceChild->getId() != Id::MkCueRefTime)
                 continue;

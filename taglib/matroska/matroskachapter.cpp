@@ -4,7 +4,7 @@
  ***************************************************************************/
 
 /***************************************************************************
-*   This library is free software; you can redistribute it and/or modify  *
+ *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
@@ -109,7 +109,7 @@ bool Matroska::Chapter::isHidden() const
   return d->hidden;
 }
 
-const List<Matroska::Chapter::Display>& Matroska::Chapter::displayList() const
+const List<Matroska::Chapter::Display> &Matroska::Chapter::displayList() const
 {
   return d->displayList;
 }
@@ -130,13 +130,14 @@ Matroska::Chapter::Display::Display(Display &&other) noexcept = default;
 
 Matroska::Chapter::Display::~Display() = default;
 
-Matroska::Chapter::Display& Matroska::Chapter::Display::operator=(const Display &other)
+Matroska::Chapter::Display &Matroska::Chapter::Display::operator=(const Display &other)
 {
   Display(other).swap(*this);
   return *this;
 }
 
-Matroska::Chapter::Display& Matroska::Chapter::Display::operator=(Display &&other) noexcept = default;
+Matroska::Chapter::Display &Matroska::Chapter::Display::operator=(
+  Display &&other) noexcept = default;
 
 void Matroska::Chapter::Display::swap(Display &other) noexcept
 {
@@ -145,12 +146,12 @@ void Matroska::Chapter::Display::swap(Display &other) noexcept
   swap(d, other.d);
 }
 
-const String& Matroska::Chapter::Display::string() const
+const String &Matroska::Chapter::Display::string() const
 {
   return d->string;
 }
 
-const String& Matroska::Chapter::Display::language() const
+const String &Matroska::Chapter::Display::language() const
 {
   return d->language;
 }

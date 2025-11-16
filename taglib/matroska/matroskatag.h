@@ -24,27 +24,33 @@
 #include <memory>
 
 #include "tag.h"
-#include "tstring.h"
 #include "tlist.h"
-#include "matroskafile.h"
 #include "matroskaelement.h"
 #include "matroskasimpletag.h"
 
 namespace TagLib {
   class File;
+
   namespace EBML {
     class MkTags;
   }
 
   namespace Matroska {
+    //! List of tag attributes.
     using SimpleTagsList = List<SimpleTag>;
+
+    //! Matroska tag implementation.
     class TAGLIB_EXPORT Tag : public TagLib::Tag
 #ifndef DO_NOT_DOCUMENT
     , private Element
 #endif
     {
     public:
+      /*!
+       * Constructs a Matroska tag.
+       */
       Tag();
+
       ~Tag() override;
       String title() const override;
       String artist() const override;
@@ -63,7 +69,7 @@ namespace TagLib {
       bool isEmpty() const override;
       PropertyMap properties() const override;
       PropertyMap setProperties(const PropertyMap &propertyMap) override;
-      void removeUnsupportedProperties(const StringList& properties) override;
+      void removeUnsupportedProperties(const StringList &properties) override;
 
       /*!
        * Returns the names of the binary simple tags.
@@ -86,12 +92,27 @@ namespace TagLib {
        *
        * Returns \c true if \c key can be stored as binary simple tags.
        */
-      bool setComplexProperties(const String& key, const List<VariantMap>& value) override;
+      bool setComplexProperties(const String &key, const List<VariantMap> &value) override;
 
+      /*!
+       * Add a tag attribute.
+       */
       void addSimpleTag(const SimpleTag &tag);
+
+      /*!
+       * Remove a tag attribute.
+       */
       void removeSimpleTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue,
                            unsigned long long trackUid = 0);
+
+      /*!
+       * Remove all tag attributes.
+       */
       void clearSimpleTags();
+
+      /*!
+       * Get list of all tag attributes.
+       */
       const SimpleTagsList &simpleTagsList() const;
 
     private:

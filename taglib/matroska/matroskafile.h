@@ -23,11 +23,9 @@
 
 #include "taglib_export.h"
 #include "tfile.h"
-#include "tag.h"
 #include "matroskaproperties.h"
 
 namespace TagLib::Matroska {
-  class Properties;
   class Tag;
   class Attachments;
   class Chapters;

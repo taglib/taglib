@@ -32,20 +32,14 @@ namespace TagLib {
     {
     public:
       UIntElement(Id id, int sizeLength, offset_t dataSize) :
-        Element(id, sizeLength, dataSize)
-      {
-      }
+        Element(id, sizeLength, dataSize) {}
       UIntElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        Element(id, sizeLength, dataSize)
-      {
-      }
-
+        Element(id, sizeLength, dataSize) {}
       explicit UIntElement(Id id) :
-        UIntElement(id, 0, 0)
-      {
-      }
+        UIntElement(id, 0, 0) {}
+
       unsigned long long getValue() const { return value; }
-      void setValue(unsigned long long value) { this->value = value; }
+      void setValue(unsigned long long val) { value = val; }
       bool read(File &file) override;
       ByteVector render() override;
 

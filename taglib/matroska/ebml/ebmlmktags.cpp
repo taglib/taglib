@@ -28,7 +28,7 @@
 
 using namespace TagLib;
 
-std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
+std::unique_ptr<Matroska::Tag> EBML::MkTags::parse() const
 {
   auto mTag = std::make_unique<Matroska::Tag>();
   mTag->setOffset(offset);
@@ -39,14 +39,13 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
   for(const auto &tagsChild : elements) {
     if(tagsChild->getId() != Id::MkTag)
       continue;
-    auto tag = element_cast<Id::MkTag>(tagsChild);
+    const auto tag = element_cast<Id::MkTag>(tagsChild);
     List<const MasterElement *> simpleTags;
     const MasterElement *targets = nullptr;
 
     // Identify the <Targets> element and the <SimpleTag> elements
     for(const auto &tagChild : *tag) {
-      Id tagChildId = tagChild->getId();
-      if(!targets && tagChildId == Id::MkTagTargets)
+      if(const Id tagChildId = tagChild->getId(); !targets && tagChildId == Id::MkTagTargets)
         targets = element_cast<Id::MkTagTargets>(tagChild);
       else if(tagChildId == Id::MkSimpleTag)
         simpleTags.append(element_cast<Id::MkSimpleTag>(tagChild));
@@ -57,8 +56,7 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
     unsigned long long trackUid = 0;
     if(targets) {
       for(const auto &targetsChild : *targets) {
-        Id id = targetsChild->getId();
-        if(id == Id::MkTagTargetTypeValue
+        if(const Id id = targetsChild->getId(); id == Id::MkTagTargetTypeValue
             && targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None) {
           targetTypeValue = static_cast<Matroska::SimpleTag::TargetTypeValue>(
             element_cast<Id::MkTagTargetTypeValue>(targetsChild)->getValue()
@@ -71,7 +69,7 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
     }
 
     // Parse each <SimpleTag>
-    for(auto simpleTag : simpleTags) {
+    for(const auto simpleTag : simpleTags) {
       const String *tagValueString = nullptr;
       const ByteVector *tagValueBinary = nullptr;
       String tagName;
@@ -79,13 +77,12 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse()
       bool defaultLanguageFlag = true;
 
       for(const auto &simpleTagChild : *simpleTag) {
-        Id id = simpleTagChild->getId();
-        if(id == Id::MkTagName && tagName.isEmpty())
+        if(const Id id = simpleTagChild->getId(); id == Id::MkTagName && tagName.isEmpty())
           tagName = element_cast<Id::MkTagName>(simpleTagChild)->getValue();
         else if(id == Id::MkTagString && !tagValueString)
-          tagValueString = &(element_cast<Id::MkTagString>(simpleTagChild)->getValue());
+          tagValueString = &element_cast<Id::MkTagString>(simpleTagChild)->getValue();
         else if(id == Id::MkTagBinary && !tagValueBinary)
-          tagValueBinary = &(element_cast<Id::MkTagBinary>(simpleTagChild)->getValue());
+          tagValueBinary = &element_cast<Id::MkTagBinary>(simpleTagChild)->getValue();
         else if(id == Id::MkTagsTagLanguage && language.isEmpty())
           language = element_cast<Id::MkTagsTagLanguage>(simpleTagChild)->getValue();
         else if(id == Id::MkTagsLanguageDefault)

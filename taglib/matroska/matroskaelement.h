@@ -25,11 +25,12 @@
 #include <memory>
 #include "taglib_export.h"
 #include "taglib.h"
-#include "tbytevector.h"
 #include "tlist.h"
 
 namespace TagLib {
   class File;
+  class ByteVector;
+
   namespace Matroska {
     class TAGLIB_EXPORT Element
     {

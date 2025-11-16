@@ -25,7 +25,7 @@
 
 using namespace TagLib;
 
-std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse(offset_t segmentDataOffset)
+std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse(offset_t segmentDataOffset) const
 {
   auto seekHead = std::make_unique<Matroska::SeekHead>(segmentDataOffset);
   seekHead->setOffset(offset);
@@ -34,14 +34,13 @@ std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse(offset_t segmentData
   for(const auto &element : elements) {
     if(element->getId() != Id::MkSeek)
       continue;
-    auto seekElement = element_cast<Id::MkSeek>(element);
+    const auto seekElement = element_cast<Id::MkSeek>(element);
     Matroska::Element::ID entryId = 0;
     offset_t offset = 0;
     for(const auto &seekElementChild : *seekElement) {
-      Id id = seekElementChild->getId();
-      if(id == Id::MkSeekID && !entryId) {
-        auto data = element_cast<Id::MkSeekID>(seekElementChild)->getValue();
-        if(data.size() == 4)
+      if(const Id id = seekElementChild->getId(); id == Id::MkSeekID && !entryId) {
+        if(auto data = element_cast<Id::MkSeekID>(seekElementChild)->getValue();
+           data.size() == 4)
           entryId = data.toUInt(true);
       }
       else if(id == Id::MkSeekPosition && !offset)

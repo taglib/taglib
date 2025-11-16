@@ -49,20 +49,19 @@ namespace TagLib {
       {
       }
       MkSegment(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkSegment, sizeLength, dataSize, offset) {}
       ~MkSegment() override;
+
       offset_t segmentDataOffset() const;
       bool read(File &file) override;
-      std::unique_ptr<Matroska::Tag> parseTag();
-      std::unique_ptr<Matroska::Attachments> parseAttachments();
-      std::unique_ptr<Matroska::Chapters> parseChapters();
-      std::unique_ptr<Matroska::SeekHead> parseSeekHead();
-      std::unique_ptr<Matroska::Cues> parseCues();
-      std::unique_ptr<Matroska::Segment> parseSegment();
-      void parseInfo(Matroska::Properties *properties);
-      void parseTracks(Matroska::Properties *properties);
+      std::unique_ptr<Matroska::Tag> parseTag() const;
+      std::unique_ptr<Matroska::Attachments> parseAttachments() const;
+      std::unique_ptr<Matroska::Chapters> parseChapters() const;
+      std::unique_ptr<Matroska::SeekHead> parseSeekHead() const;
+      std::unique_ptr<Matroska::Cues> parseCues() const;
+      std::unique_ptr<Matroska::Segment> parseSegment() const;
+      void parseInfo(Matroska::Properties *properties) const;
+      void parseTracks(Matroska::Properties *properties) const;
 
     private:
       std::unique_ptr<MkTags> tags;

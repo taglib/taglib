@@ -33,6 +33,7 @@
 
 namespace TagLib {
   class File;
+
   namespace EBML {
     class MkChapters;
   }
@@ -47,7 +48,9 @@ namespace TagLib {
 #endif
     {
     public:
+      //! List of chapter editions.
       using ChapterEditionList = List<ChapterEdition>;
+
       //! Construct chapters.
       Chapters();
 

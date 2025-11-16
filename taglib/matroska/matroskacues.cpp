@@ -38,7 +38,7 @@ Matroska::Cues::Cues(offset_t segmentDataOffset) :
 
 ByteVector Matroska::Cues::renderInternal()
 {
-  auto beforeSize = sizeRenderedOrWritten();
+  const auto beforeSize = sizeRenderedOrWritten();
   EBML::MkCues cues;
   cues.setMinRenderSize(beforeSize);
   for(const auto &cuePoint : cuePoints) {
@@ -90,10 +90,9 @@ ByteVector Matroska::Cues::renderInternal()
       }
 
       // Reference times
-      auto referenceTimes = cueTrack->referenceTimes();
-      if(!referenceTimes.isEmpty()) {
+      if(auto referenceTimes = cueTrack->referenceTimes(); !referenceTimes.isEmpty()) {
         auto cueReference = EBML::make_unique_element<EBML::Element::Id::MkCueReference>();
-        for(auto reference : referenceTimes) {
+        for(const auto reference : referenceTimes) {
           auto refTime = EBML::make_unique_element<EBML::Element::Id::MkCueRefTime>();
           refTime->setValue(reference);
           cueReference->appendElement(std::move(refTime));
@@ -107,7 +106,7 @@ ByteVector Matroska::Cues::renderInternal()
   return cues.render();
 }
 
-void Matroska::Cues::write(TagLib::File& file)
+void Matroska::Cues::write(TagLib::File &file)
 {
   if(!data().isEmpty())
     Element::write(file);
@@ -119,8 +118,8 @@ bool Matroska::Cues::sizeChanged(Element &caller, offset_t delta)
   if(!Element::sizeChanged(caller, delta))
     return false;
 
-  offset_t offset = caller.offset() - segmentDataOffset;
-  for(auto &cuePoint : cuePoints) {
+  const offset_t offset = caller.offset() - segmentDataOffset;
+  for(const auto &cuePoint : cuePoints) {
     if(cuePoint->adjustOffset(offset, delta)) {
       setNeedsRender(true);
     }
@@ -142,9 +141,7 @@ void Matroska::Cues::addCuePoint(std::unique_ptr<CuePoint> &&cuePoint)
   cuePoints.push_back(std::move(cuePoint));
 }
 
-Matroska::CuePoint::CuePoint()
-{
-}
+Matroska::CuePoint::CuePoint() = default;
 
 bool Matroska::CuePoint::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
@@ -163,7 +160,7 @@ void Matroska::CuePoint::addCueTrack(std::unique_ptr<CueTrack> &&cueTrack)
 bool Matroska::CuePoint::adjustOffset(offset_t offset, offset_t delta)
 {
   bool ret = false;
-  for(auto &cueTrack : cueTracks)
+  for(const auto &cueTrack : cueTracks)
     ret |= cueTrack->adjustOffset(offset, delta);
 
   return ret;
@@ -201,8 +198,8 @@ bool Matroska::CueTrack::adjustOffset(offset_t offset, offset_t delta)
     clusterPosition += delta;
     ret = true;
   }
-  offset_t codecStateValue;
-  if(codecState.has_value() && (codecStateValue = codecState.value()) != 0 &&
+  if(offset_t codecStateValue;
+     codecState.has_value() && (codecStateValue = codecState.value()) != 0 &&
      codecStateValue > offset) {
     codecState = codecStateValue + delta;
     ret = true;

@@ -31,7 +31,7 @@
 
 using namespace TagLib;
 
-void EBML::MkInfo::parse(Matroska::Properties *properties)
+void EBML::MkInfo::parse(Matroska::Properties *properties) const
 {
   if(!properties)
     return;
@@ -40,14 +40,13 @@ void EBML::MkInfo::parse(Matroska::Properties *properties)
   double duration = 0.0;
   String title;
   for(const auto &element : elements) {
-    Id id = element->getId();
-    if (id == Id::MkTimestampScale) {
+    if(const Id id = element->getId(); id == Id::MkTimestampScale) {
       timestampScale = element_cast<Id::MkTimestampScale>(element)->getValue();
     }
-    else if (id == Id::MkDuration) {
+    else if(id == Id::MkDuration) {
       duration = element_cast<Id::MkDuration>(element)->getValueAsDouble();
     }
-    else if (id == Id::MkTitle) {
+    else if(id == Id::MkTitle) {
       title = element_cast<Id::MkTitle>(element)->getValue();
     }
   }

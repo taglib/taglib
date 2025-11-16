@@ -31,7 +31,7 @@
 
 using namespace TagLib;
 
-std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse()
+std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse() const
 {
   auto chapters = std::make_unique<Matroska::Chapters>();
   chapters->setOffset(offset);
@@ -45,10 +45,9 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse()
     Matroska::ChapterEdition::UID editionUid = 0;
     bool editionIsDefault = false;
     bool editionIsOrdered = false;
-    auto edition = element_cast<Id::MkEditionEntry>(element);
+    const auto edition = element_cast<Id::MkEditionEntry>(element);
     for(const auto &editionChild : *edition) {
-      Id id = editionChild->getId();
-      if(id == Id::MkEditionUID)
+      if(const Id id = editionChild->getId(); id == Id::MkEditionUID)
         editionUid = element_cast<Id::MkEditionUID>(editionChild)->getValue();
       else if(id == Id::MkEditionFlagDefault)
         editionIsDefault = element_cast<Id::MkEditionFlagDefault>(editionChild)->getValue() != 0;
@@ -60,10 +59,9 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse()
         Matroska::Chapter::Time chapterTimeEnd = 0;
         List<Matroska::Chapter::Display> chapterDisplays;
         bool chapterHidden = false;
-        auto chapterAtom = element_cast<Id::MkChapterAtom>(editionChild);
+        const auto chapterAtom = element_cast<Id::MkChapterAtom>(editionChild);
         for(const auto &chapterChild : *chapterAtom) {
-          Id cid = chapterChild->getId();
-          if(cid == Id::MkChapterUID)
+          if(const Id cid = chapterChild->getId(); cid == Id::MkChapterUID)
             chapterUid = element_cast<Id::MkChapterUID>(chapterChild)->getValue();
           else if(cid == Id::MkChapterTimeStart)
             chapterTimeStart = element_cast<Id::MkChapterTimeStart>(chapterChild)->getValue();
@@ -72,12 +70,11 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse()
           else if(cid == Id::MkChapterFlagHidden)
             chapterHidden = element_cast<Id::MkChapterFlagHidden>(chapterChild)->getValue() != 0;
           else if(cid == Id::MkChapterDisplay) {
-            auto display = element_cast<Id::MkChapterDisplay>(chapterChild);
+            const auto display = element_cast<Id::MkChapterDisplay>(chapterChild);
             String displayString;
             String displayLanguage;
             for(const auto &displayChild : *display) {
-              Id did = displayChild->getId();
-              if(did == Id::MkChapString)
+              if(const Id did = displayChild->getId(); did == Id::MkChapString)
                 displayString = element_cast<Id::MkChapString>(displayChild)->getValue();
               else if(did == Id::MkChapLanguage)
                 displayLanguage = element_cast<Id::MkChapLanguage>(displayChild)->getValue();

@@ -44,7 +44,7 @@ double EBML::FloatElement::getValueAsDouble(double defaultValue) const
 
 bool EBML::FloatElement::read(File &file)
 {
-  ByteVector buffer = file.readBlock(dataSize);
+  const ByteVector buffer = file.readBlock(dataSize);
   if(buffer.size() != dataSize) {
     debug("Failed to read EBML Float element");
     return false;

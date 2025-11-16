@@ -29,6 +29,7 @@
 
 namespace TagLib {
   class File;
+
   namespace EBML {
     class MkCues;
   }
@@ -36,6 +37,7 @@ namespace TagLib {
   namespace Matroska {
     class CuePoint;
     class CueTrack;
+
     class Cues : public Element
     {
     public:
@@ -66,7 +68,7 @@ namespace TagLib {
       bool isValid(TagLib::File &file, offset_t segmentDataOffset) const;
       void addCueTrack(std::unique_ptr<CueTrack> &&cueTrack);
       const CueTrackList &cueTrackList() const { return cueTracks; }
-      void setTime(Time time) { this->time = time; }
+      void setTime(Time timestamp) { time = timestamp; }
       Time getTime() const { return time; }
       bool adjustOffset(offset_t offset, offset_t delta);
 
@@ -82,17 +84,17 @@ namespace TagLib {
       CueTrack() = default;
       ~CueTrack() = default;
       bool isValid(TagLib::File &file, offset_t segmentDataOffset) const;
-      void setTrackNumber(unsigned long long trackNumber) { this->trackNumber = trackNumber; }
+      void setTrackNumber(unsigned long long trackNr) { trackNumber = trackNr; }
       unsigned long long getTrackNumber() const { return trackNumber; }
-      void setClusterPosition(offset_t clusterPosition) { this->clusterPosition = clusterPosition; }
+      void setClusterPosition(offset_t clusterPos) { clusterPosition = clusterPos; }
       offset_t getClusterPosition() const { return clusterPosition; }
-      void setRelativePosition(std::optional<offset_t> relativePosition) { this->relativePosition = relativePosition; }
+      void setRelativePosition(std::optional<offset_t> relativePos) { relativePosition = relativePos; }
       std::optional<offset_t> getRelativePosition() const { return relativePosition; }
-      void setCodecState(std::optional<offset_t> codecState) { this->codecState = codecState; }
+      void setCodecState(std::optional<offset_t> codecStatePos) { codecState = codecStatePos; }
       std::optional<offset_t> getCodecState() const { return codecState; }
-      void setBlockNumber(std::optional<unsigned long long> blockNumber) { this->blockNumber = blockNumber; }
+      void setBlockNumber(std::optional<unsigned long long> blockNr) { blockNumber = blockNr; }
       std::optional<unsigned long long> getBlockNumber() const { return blockNumber; }
-      void setDuration(std::optional<unsigned long long> duration) { this->duration = duration; }
+      void setDuration(std::optional<unsigned long long> segmentTicks) { duration = segmentTicks; }
       std::optional<unsigned long long> getDuration() const { return duration; }
       void addReferenceTime(unsigned long long refTime) { refTimes.append(refTime); }
       const ReferenceTimeList &referenceTimes() const { return refTimes; }

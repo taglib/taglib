@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <array>
 #include <tuple>
-#include "matroskasimpletag.h"
 #include "ebmlmasterelement.h"
 #include "ebmlstringelement.h"
 #include "ebmlbinaryelement.h"
@@ -30,7 +29,6 @@
 #include "ebmluintelement.h"
 #include "ebmlutils.h"
 #include "tpropertymap.h"
-#include "tlist.h"
 
 using namespace TagLib;
 
@@ -95,7 +93,7 @@ void Matroska::Tag::removeSimpleTag(const String &name,
   SimpleTag::TargetTypeValue targetTypeValue,
   unsigned long long trackUid)
 {
-  auto it = std::find_if(d->tags.begin(), d->tags.end(),
+  const auto it = std::find_if(d->tags.begin(), d->tags.end(),
     [&name, targetTypeValue, trackUid](const SimpleTag &t) {
         return t.name() == name && t.targetTypeValue() == targetTypeValue &&
                t.trackUid() == trackUid;
@@ -118,14 +116,14 @@ const Matroska::SimpleTagsList &Matroska::Tag::simpleTagsList() const
   return d->tags;
 }
 
-void Matroska::Tag::setSegmentTitle(const String& title)
+void Matroska::Tag::setSegmentTitle(const String &title)
 {
   d->segmentTitle = title;
 }
 
 bool Matroska::Tag::setTag(const String &key, const String &value)
 {
-  bool found = d->setTag(key, value);
+  const bool found = d->setTag(key, value);
   if(found) {
     setNeedsRender(true);
   }
@@ -198,7 +196,7 @@ String Matroska::Tag::genre() const
 
 unsigned int Matroska::Tag::year() const
 {
-  auto value = d->getTag("DATE");
+  const auto value = d->getTag("DATE");
   if(value.isEmpty())
     return 0;
   auto list = value.split("-");
@@ -207,7 +205,7 @@ unsigned int Matroska::Tag::year() const
 
 unsigned int Matroska::Tag::track() const
 {
-  auto value = d->getTag("TRACKNUMBER");
+  const auto value = d->getTag("TRACKNUMBER");
   if(value.isEmpty())
     return 0;
   auto list = value.split("-");
@@ -251,8 +249,8 @@ ByteVector Matroska::Tag::renderInternal()
   }
   for(const auto &list : targetList) {
     const auto &frontTag = list.front();
-    auto targetTypeValue = frontTag.targetTypeValue();
-    auto trackUid = frontTag.trackUid();
+    const auto targetTypeValue = frontTag.targetTypeValue();
+    const auto trackUid = frontTag.trackUid();
     auto tag = EBML::make_unique_element<EBML::Element::Id::MkTag>();
 
     // Build <Tag Targets> element
@@ -326,7 +324,6 @@ namespace
     std::tuple("TRACKTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("DISCTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Album, true),
     std::tuple("DATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Album, false),
-    // Todo - original date
     std::tuple("TITLESORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("ALBUMSORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Album, true),
     std::tuple("ARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
@@ -360,14 +357,14 @@ namespace
     );
     if(it != simpleTagsTranslation.end())
       return { std::get<1>(*it), std::get<2>(*it), std::get<3>(*it) };
-    if (!key.isEmpty())
+    if(!key.isEmpty())
       return { key, Matroska::SimpleTag::TargetTypeValue::Track, false };
     return { String(), Matroska::SimpleTag::TargetTypeValue::None, false };
   }
 
   String translateTag(const String &name, Matroska::SimpleTag::TargetTypeValue targetTypeValue)
   {
-    auto it = std::find_if(simpleTagsTranslation.cbegin(),
+    const auto it = std::find_if(simpleTagsTranslation.cbegin(),
       simpleTagsTranslation.cend(),
       [&name, targetTypeValue](const auto &t) {
         return name == std::get<1>(t)
@@ -378,8 +375,8 @@ namespace
     );
     return it != simpleTagsTranslation.end()
       ? String(std::get<0>(*it), String::UTF8)
-      : (targetTypeValue == Matroska::SimpleTag::TargetTypeValue::Track ||
-         targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None)
+      : targetTypeValue == Matroska::SimpleTag::TargetTypeValue::Track ||
+        targetTypeValue == Matroska::SimpleTag::TargetTypeValue::None
       ? name
         : String();
   }
@@ -414,7 +411,7 @@ String Matroska::Tag::TagPrivate::getTag(const String &key) const
   bool strict = std::get<2>(tpl);
   if(name.isEmpty())
     return {};
-  auto it = std::find_if(tags.begin(), tags.end(),
+  const auto it = std::find_if(tags.begin(), tags.end(),
     [&name, targetTypeValue, strict] (const SimpleTag &t) {
       return t.name() == name
         && t.type() == SimpleTag::StringType
@@ -431,8 +428,8 @@ PropertyMap Matroska::Tag::properties() const
   PropertyMap properties;
   for(const auto &simpleTag : std::as_const(d->tags)) {
     if(simpleTag.type() == SimpleTag::StringType && simpleTag.trackUid() == 0) {
-      String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
-      if(!key.isEmpty())
+      if(String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
+         !key.isEmpty())
         properties[key].append(simpleTag.toString());
       else
         properties.addUnsupportedData(simpleTag.name());
@@ -445,10 +442,9 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
 {
   // Remove all simple tags which would be returned in properties()
   for(auto it = d->tags.begin(); it != d->tags.end();) {
-    String key;
     if(it->type() == SimpleTag::StringType &&
        it->trackUid() == 0 &&
-       !(key = translateTag(it->name(), it->targetTypeValue())).isEmpty()) {
+       !translateTag(it->name(), it->targetTypeValue()).isEmpty()) {
       it = d->tags.erase(it);
       setNeedsRender(true);
     }
@@ -474,10 +470,10 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
   return unsupportedProperties;
 }
 
-void Matroska::Tag::removeUnsupportedProperties(const StringList& properties)
+void Matroska::Tag::removeUnsupportedProperties(const StringList &properties)
 {
   if(d->removeSimpleTags(
-     [&properties](const SimpleTag& t) {
+     [&properties](const SimpleTag &t) {
          return properties.contains(t.name());
        }) > 0) {
     setNeedsRender(true);
@@ -497,7 +493,7 @@ StringList Matroska::Tag::complexPropertyKeys() const
   return keys;
 }
 
-List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
+List<VariantMap> Matroska::Tag::complexProperties(const String &key) const
 {
   List<VariantMap> props;
   if(key.upper() != "PICTURE") { // Pictures are handled at the file level
@@ -529,7 +525,7 @@ List<VariantMap> Matroska::Tag::complexProperties(const String& key) const
   return props;
 }
 
-bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMap>& value)
+bool Matroska::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
   if(key.upper() == "PICTURE") {
     // Pictures are handled at the file level
@@ -549,8 +545,8 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
     if(property.value("name").value<String>() == key &&
        (property.contains("data") || property.contains("value") )) {
       SimpleTag::TargetTypeValue targetTypeValue;
-      Variant targetTypeValueVar = property.value("targetTypeValue", 0);
-      switch(targetTypeValueVar.type()) {
+      switch(Variant targetTypeValueVar = property.value("targetTypeValue", 0);
+             targetTypeValueVar.type()) {
       case Variant::UInt:
         targetTypeValue = static_cast<SimpleTag::TargetTypeValue>(targetTypeValueVar.value<unsigned int>());
         break;
@@ -564,8 +560,8 @@ bool Matroska::Tag::setComplexProperties(const String& key, const List<VariantMa
         targetTypeValue = static_cast<SimpleTag::TargetTypeValue>(targetTypeValueVar.value<int>());
       }
       auto language = property.value("language").value<String>();
-      bool defaultLanguage = property.value("defaultLanguage", true).value<bool>();
-      auto trackUid = property.value("trackUid", 0ULL).value<unsigned long long>();
+      const bool defaultLanguage = property.value("defaultLanguage", true).value<bool>();
+      const auto trackUid = property.value("trackUid", 0ULL).value<unsigned long long>();
       d->tags.append(property.contains("data")
         ? SimpleTag(key, property.value("data").value<ByteVector>(),
                     targetTypeValue, language, defaultLanguage, trackUid)

@@ -36,8 +36,6 @@
 #include "tdebug.h"
 #include "tutils.h"
 
-#include <cstdint>
-
 using namespace TagLib;
 
 #define RETURN_ELEMENT_FOR_CASE(eid) \
@@ -46,7 +44,7 @@ using namespace TagLib;
 std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
 {
   // Get the element ID
-  offset_t offset = file.tell();
+  const offset_t offset = file.tell();
   unsigned int uintId = readId(file);
   if(!uintId) {
     debug("Failed to parse EMBL ElementID");
@@ -138,12 +136,12 @@ unsigned int EBML::Element::readId(File &file)
     debug("Failed to read VINT size");
     return 0;
   }
-  unsigned int nb_bytes = VINTSizeLength<4>(*buffer.begin());
-  if(!nb_bytes)
+  const unsigned int numBytes = VINTSizeLength<4>(*buffer.begin());
+  if(!numBytes)
     return 0;
-  if(nb_bytes > 1)
-    buffer.append(file.readBlock(nb_bytes - 1));
-  if(buffer.size() != nb_bytes) {
+  if(numBytes > 1)
+    buffer.append(file.readBlock(numBytes - 1));
+  if(buffer.size() != numBytes) {
     debug("Failed to read VINT data");
     return 0;
   }
@@ -169,9 +167,9 @@ ByteVector EBML::Element::render()
 
 ByteVector EBML::Element::renderId() const
 {
-  int numBytes = idSize(id);
+  const int numBytes = idSize(id);
   static const auto byteOrder = Utils::systemByteOrder();
-  auto uintId = static_cast<uint32_t>(id);
+  const auto uintId = static_cast<uint32_t>(id);
   uint32_t data = byteOrder == Utils::LittleEndian ? Utils::byteSwap(uintId) : uintId;
   return ByteVector(reinterpret_cast<char *>(&data) + (4 - numBytes), numBytes);
 }

@@ -1,5 +1,5 @@
 /***************************************************************************
-*   This library is free software; you can redistribute it and/or modify  *
+ *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
@@ -50,11 +50,11 @@ Matroska::AttachedFile::AttachedFile(const AttachedFile &other) :
 {
 }
 
-Matroska::AttachedFile::AttachedFile(AttachedFile&& other) noexcept = default;
+Matroska::AttachedFile::AttachedFile(AttachedFile &&other) noexcept = default;
 
 Matroska::AttachedFile::~AttachedFile() = default;
 
-Matroska::AttachedFile &Matroska::AttachedFile::operator=(AttachedFile &&other) = default;
+Matroska::AttachedFile &Matroska::AttachedFile::operator=(AttachedFile &&other) noexcept = default;
 
 Matroska::AttachedFile &Matroska::AttachedFile::operator=(const AttachedFile &other)
 {

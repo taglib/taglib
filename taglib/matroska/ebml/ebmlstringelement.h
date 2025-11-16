@@ -23,40 +23,48 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlelement.h"
-#include "tbytevector.h"
 #include "tstring.h"
 
 namespace TagLib {
   class File;
+  class ByteVector;
+
   namespace EBML {
-    template <String::Type t>
     class StringElement : public Element
     {
     public:
-      StringElement(Id id, int sizeLength, offset_t dataSize) :
-        Element(id, sizeLength, dataSize)
-      {
-      }
-      StringElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        Element(id, sizeLength, dataSize)
-      {
-      }
+      StringElement(String::Type stringEncoding, Id id, int sizeLength, offset_t dataSize) :
+        Element(id, sizeLength, dataSize), encoding(stringEncoding) {}
 
-      explicit StringElement(Id id) :
-        Element(id, 0, 0)
-      {
-      }
       const String &getValue() const { return value; }
-      void setValue(const String &value) { this->value = value; }
+      void setValue(const String &val) { value = val; }
       bool read(File &file) override;
       ByteVector render() override;
 
     private:
       String value;
+      String::Type encoding;
     };
 
-    using UTF8StringElement = StringElement<String::UTF8>;
-    using Latin1StringElement = StringElement<String::Latin1>;
+    class UTF8StringElement : public StringElement {
+    public:
+      UTF8StringElement(Id id, int sizeLength, offset_t dataSize) :
+        StringElement(String::UTF8, id, sizeLength, dataSize) {}
+      UTF8StringElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
+        UTF8StringElement(id, sizeLength, dataSize) {}
+      explicit UTF8StringElement(Id id) :
+        UTF8StringElement(id, 0, 0) {}
+    };
+
+    class Latin1StringElement : public StringElement {
+    public:
+      Latin1StringElement(Id id, int sizeLength, offset_t dataSize) :
+        StringElement(String::Latin1, id, sizeLength, dataSize) {}
+      Latin1StringElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
+        Latin1StringElement(id, sizeLength, dataSize) {}
+      explicit Latin1StringElement(Id id) :
+        Latin1StringElement(id, 0, 0) {}
+    };
   }
 }
 

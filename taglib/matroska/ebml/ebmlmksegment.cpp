@@ -39,13 +39,12 @@ offset_t EBML::MkSegment::segmentDataOffset() const
 
 bool EBML::MkSegment::read(File &file)
 {
-  offset_t maxOffset = file.tell() + dataSize;
+  const offset_t maxOffset = file.tell() + dataSize;
   std::unique_ptr<Element> element;
   int i = 0;
   int seekHeadIndex = -1;
   while((element = findNextElement(file, maxOffset))) {
-    Id id = element->getId();
-    if(id == Id::MkSeekHead) {
+    if(const Id id = element->getId(); id == Id::MkSeekHead) {
       seekHeadIndex = i;
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
       if(!seekHead->read(file))
@@ -94,46 +93,46 @@ bool EBML::MkSegment::read(File &file)
   return true;
 }
 
-std::unique_ptr<Matroska::Tag> EBML::MkSegment::parseTag()
+std::unique_ptr<Matroska::Tag> EBML::MkSegment::parseTag() const
 {
   return tags ? tags->parse() : nullptr;
 }
 
-std::unique_ptr<Matroska::Attachments> EBML::MkSegment::parseAttachments()
+std::unique_ptr<Matroska::Attachments> EBML::MkSegment::parseAttachments() const
 {
   return attachments ? attachments->parse() : nullptr;
 }
 
-std::unique_ptr<Matroska::Chapters> EBML::MkSegment::parseChapters()
+std::unique_ptr<Matroska::Chapters> EBML::MkSegment::parseChapters() const
 {
   return chapters ? chapters->parse() : nullptr;
 }
 
-std::unique_ptr<Matroska::SeekHead> EBML::MkSegment::parseSeekHead()
+std::unique_ptr<Matroska::SeekHead> EBML::MkSegment::parseSeekHead() const
 {
   return seekHead ? seekHead->parse(segmentDataOffset()) : nullptr;
 }
 
-std::unique_ptr<Matroska::Cues> EBML::MkSegment::parseCues()
+std::unique_ptr<Matroska::Cues> EBML::MkSegment::parseCues() const
 {
   return cues ? cues->parse(segmentDataOffset()) : nullptr;
 }
 
-std::unique_ptr<Matroska::Segment> EBML::MkSegment::parseSegment()
+std::unique_ptr<Matroska::Segment> EBML::MkSegment::parseSegment() const
 {
   return std::make_unique<Matroska::Segment>(sizeLength, dataSize, offset + idSize(id));
 }
 
-void EBML::MkSegment::parseInfo(Matroska::Properties *properties)
+void EBML::MkSegment::parseInfo(Matroska::Properties *properties) const
 {
   if(info) {
     info->parse(properties);
   }
 }
 
-void EBML::MkSegment::parseTracks(Matroska::Properties *properties)
+void EBML::MkSegment::parseTracks(Matroska::Properties *properties) const
 {
-  if (tracks) {
+  if(tracks) {
     tracks->parse(properties);
   }
 }

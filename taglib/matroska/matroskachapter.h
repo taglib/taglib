@@ -31,18 +31,22 @@
 #include "tlist.h"
 
 namespace TagLib {
+  class String;
+  class ByteVector;
+
   namespace EBML {
     class MkChapters;
   }
 
-  class String;
-  class ByteVector;
   namespace Matroska {
     //! Matroska chapter.
     class TAGLIB_EXPORT Chapter
     {
     public:
+      //! Unique identifier.
       using UID = unsigned long long;
+
+      //! Timestamp in nanoseconds.
       using Time = unsigned long long;
 
       /*!

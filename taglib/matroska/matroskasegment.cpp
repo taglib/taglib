@@ -38,11 +38,10 @@ ByteVector Matroska::Segment::renderInternal()
 
 bool Matroska::Segment::render()
 {
-  auto beforeSize = sizeLength;
+  const auto beforeSize = sizeLength;
   auto data = renderInternal();
   setNeedsRender(false);
-  auto afterSize = data.size();
-  if(afterSize != beforeSize) {
+  if(auto afterSize = data.size(); afterSize != beforeSize) {
     sizeLength = 8;
     data = renderInternal();
     setNeedsRender(false);

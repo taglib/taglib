@@ -42,11 +42,13 @@ namespace TagLib {
 #endif
     {
     public:
+      //! List of attached files.
       using AttachedFileList = List<AttachedFile>;
+
       //! Construct attachments.
       Attachments();
 
-      //! Destroy attachements.
+      //! Destroy attachments.
       virtual ~Attachments();
 
       //! Add an attached file.
@@ -55,7 +57,7 @@ namespace TagLib {
       //! Remove an attached file.
       void removeAttachedFile(unsigned long long uid);
 
-      //! Remove an attached file.
+      //! Remove all attached files.
       void clear();
 
       //! Get list of all attached files.

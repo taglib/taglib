@@ -18,15 +18,10 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <random>
 #include "ebmlutils.h"
-#include "ebmlelement.h"
+#include <random>
 #include "tbytevector.h"
 #include "matroskafile.h"
-
-#include "tdebug.h"
-#include "tutils.h"
-#include "taglib.h"
 
 using namespace TagLib;
 
@@ -63,8 +58,8 @@ std::pair<int, T> EBML::readVINT(File &file)
 
   if(nb_bytes > 1)
     buffer.append(file.readBlock(nb_bytes - 1));
-  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - 7 * nb_bytes;
-  offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
+  const int bitsToShift = static_cast<int>(sizeof(T) * 8) - 7 * nb_bytes;
+  offset_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
   return { nb_bytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
 namespace TagLib::EBML {
@@ -82,8 +77,8 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
   if(!numBytes)
     return {0, 0};
 
-  int bits_to_shift = static_cast<int>(sizeof(T) * 8) - 7 * numBytes;
-  offset_t mask = 0xFFFFFFFFFFFFFFFF >> bits_to_shift;
+  const int bitsToShift = static_cast<int>(sizeof(T) * 8) - 7 * numBytes;
+  offset_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
   return { numBytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
 namespace TagLib::EBML {
@@ -93,7 +88,7 @@ namespace TagLib::EBML {
 
 ByteVector EBML::renderVINT(uint64_t number, int minSizeLength)
 {
-  int numBytes = std::max(minSizeLength, minSize(number));
+  const int numBytes = std::max(minSizeLength, minSize(number));
   number |= 1ULL << (numBytes * 7);
   static const auto byteOrder = Utils::systemByteOrder();
   if(byteOrder == Utils::LittleEndian)

@@ -32,7 +32,12 @@ namespace TagLib {
     class TAGLIB_EXPORT AttachedFile
     {
     public:
+      //! Unique identifier.
       using UID = unsigned long long;
+
+      /*!
+       * Construct an attached file.
+       */
       AttachedFile();
 
       /*!
@@ -58,7 +63,7 @@ namespace TagLib {
       /*!
        * Moves the contents of \a other into this object.
        */
-      AttachedFile &operator=(AttachedFile &&other);
+      AttachedFile &operator=(AttachedFile &&other) noexcept;
 
       /*!
        * Exchanges the content of the object with the content of \a other.

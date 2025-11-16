@@ -21,7 +21,6 @@
 #include "matroskasimpletag.h"
 #include <variant>
 #include "matroskatag.h"
-#include "tstring.h"
 #include "tbytevector.h"
 
 using namespace TagLib;
@@ -29,16 +28,17 @@ using namespace TagLib;
 class Matroska::SimpleTag::SimpleTagPrivate
 {
 public:
-  explicit SimpleTagPrivate(const String &name, const String& value,
+  explicit SimpleTagPrivate(const String &name, const String &value,
     TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
     unsigned long long trackUid) :
     value(value), name(name), language(language), trackUid(trackUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
-  explicit SimpleTagPrivate(const String &name, const ByteVector& value,
+  explicit SimpleTagPrivate(const String &name, const ByteVector &value,
     TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
     unsigned long long trackUid) :
     value(value), name(name), language(language), trackUid(trackUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
+
   const std::variant<String, ByteVector> value;
   const String name;
   const String language;
@@ -74,11 +74,11 @@ Matroska::SimpleTag::SimpleTag(const SimpleTag &other) :
 {
 }
 
-Matroska::SimpleTag::SimpleTag(SimpleTag&& other) noexcept = default;
+Matroska::SimpleTag::SimpleTag(SimpleTag &&other) noexcept = default;
 
 Matroska::SimpleTag::~SimpleTag() = default;
 
-Matroska::SimpleTag &Matroska::SimpleTag::operator=(SimpleTag &&other) = default;
+Matroska::SimpleTag &Matroska::SimpleTag::operator=(SimpleTag &&other) noexcept = default;
 
 Matroska::SimpleTag &Matroska::SimpleTag::operator=(const SimpleTag &other)
 {

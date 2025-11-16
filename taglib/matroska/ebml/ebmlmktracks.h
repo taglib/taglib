@@ -28,7 +28,6 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlmasterelement.h"
-#include "ebmlutils.h"
 #include "taglib.h"
 
 namespace TagLib {
@@ -40,18 +39,13 @@ namespace TagLib {
     {
     public:
       MkTracks(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkTracks, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkTracks, sizeLength, dataSize, offset) {}
       MkTracks(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkTracks, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkTracks, sizeLength, dataSize, offset) {}
       MkTracks() :
-        MasterElement(Id::MkTracks, 0, 0, 0)
-      {
-      }
-      void parse(Matroska::Properties *properties);
+        MasterElement(Id::MkTracks, 0, 0, 0) {}
+
+      void parse(Matroska::Properties *properties) const;
     };
   }
 }

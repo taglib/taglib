@@ -4,7 +4,7 @@
  ***************************************************************************/
 
 /***************************************************************************
-*   This library is free software; you can redistribute it and/or modify  *
+ *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
  *                                                                         *
@@ -61,11 +61,12 @@ Matroska::ChapterEdition::ChapterEdition(const ChapterEdition &other) :
 {
 }
 
-Matroska::ChapterEdition::ChapterEdition(ChapterEdition&& other) noexcept = default;
+Matroska::ChapterEdition::ChapterEdition(ChapterEdition &&other) noexcept = default;
 
 Matroska::ChapterEdition::~ChapterEdition() = default;
 
-Matroska::ChapterEdition &Matroska::ChapterEdition::operator=(ChapterEdition &&other) = default;
+Matroska::ChapterEdition &Matroska::ChapterEdition::operator=(
+  ChapterEdition &&other) noexcept = default;
 
 Matroska::ChapterEdition &Matroska::ChapterEdition::operator=(const ChapterEdition &other)
 {

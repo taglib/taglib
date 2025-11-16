@@ -19,10 +19,9 @@
  ***************************************************************************/
 
 #include "ebmlvoidelement.h"
+#include <algorithm>
 #include "ebmlutils.h"
 #include "tbytevector.h"
-
-#include <algorithm>
 
 using namespace TagLib;
 
@@ -46,9 +45,9 @@ offset_t EBML::VoidElement::getTargetSize() const
   return targetSize;
 }
 
-void EBML::VoidElement::setTargetSize(offset_t targetSize)
+void EBML::VoidElement::setTargetSize(offset_t size)
 {
-  this->targetSize = std::max(targetSize, MIN_VOID_ELEMENT_SIZE);
+  this->targetSize = std::max(size, MIN_VOID_ELEMENT_SIZE);
 }
 
 ByteVector EBML::VoidElement::renderSize(offset_t targetSize)

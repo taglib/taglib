@@ -17,8 +17,9 @@
  *   License Version 1.1.  You may obtain a copy of the License at         *
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
-#include <memory>
+
 #include "matroskaelement.h"
+#include <memory>
 #include "tlist.h"
 #include "tfile.h"
 #include "tbytevector.h"
@@ -48,6 +49,7 @@ Matroska::Element::Element(ID id) :
 {
   e->id = id;
 }
+
 Matroska::Element::~Element() = default;
 
 offset_t Matroska::Element::size() const
@@ -110,11 +112,10 @@ bool Matroska::Element::render()
   if(!needsRender())
     return true;
 
-  auto beforeSize = sizeRenderedOrWritten();
-  auto data = renderInternal();
+  const auto beforeSize = sizeRenderedOrWritten();
+  const auto data = renderInternal();
   setNeedsRender(false);
-  auto afterSize = data.size();
-  if(afterSize != beforeSize) {
+  if(const auto afterSize = data.size(); afterSize != beforeSize) {
     if(!emitSizeChanged(afterSize - beforeSize)) {
       return false;
     }
@@ -136,7 +137,7 @@ bool Matroska::Element::needsRender() const
 
 bool Matroska::Element::emitSizeChanged(offset_t delta)
 {
-  for(auto element : e->sizeListeners) {
+  for(const auto element : e->sizeListeners) {
     if(!element->sizeChanged(*this, delta))
       return false;
   }
@@ -156,7 +157,7 @@ bool Matroska::Element::sizeChanged(Element &caller, offset_t delta)
 
 offset_t Matroska::Element::sizeRenderedOrWritten() const
 {
-  offset_t dataSize = e->data.size();
+  const offset_t dataSize = e->data.size();
   return dataSize != 0 ? dataSize : e->size;
 }
 

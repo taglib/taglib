@@ -31,11 +31,13 @@
 namespace TagLib {
   class String;
   class ByteVector;
+
   namespace Matroska {
     //! Edition of chapters.
     class TAGLIB_EXPORT ChapterEdition
     {
     public:
+      //! Unique identifier.
       using UID = unsigned long long;
 
       /*!
@@ -67,7 +69,7 @@ namespace TagLib {
       /*!
        * Moves the contents of \a other into this object.
        */
-      ChapterEdition &operator=(ChapterEdition &&other);
+      ChapterEdition &operator=(ChapterEdition &&other) noexcept;
 
       /*!
        * Exchanges the content of the object with the content of \a other.

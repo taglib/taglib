@@ -1002,7 +1002,7 @@ public:
   void testChapters()
   {
     const Matroska::ChapterEdition edition1(
-      List{
+      List<Matroska::Chapter>{
         Matroska::Chapter(
           0, 40000,
           List{

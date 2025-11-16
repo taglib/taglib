@@ -23,7 +23,6 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlmasterelement.h"
-#include "ebmlutils.h"
 #include "taglib.h"
 
 namespace TagLib {
@@ -35,18 +34,13 @@ namespace TagLib {
     {
     public:
       MkAttachments(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset) {}
       MkAttachments(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset)
-      {
-      }
+        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset) {}
       MkAttachments() :
-        MasterElement(Id::MkAttachments, 0, 0, 0)
-      {
-      }
-      std::unique_ptr<Matroska::Attachments> parse();
+        MasterElement(Id::MkAttachments, 0, 0, 0) {}
+
+      std::unique_ptr<Matroska::Attachments> parse() const;
     };
   }
 }

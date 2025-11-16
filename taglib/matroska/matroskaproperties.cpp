@@ -69,7 +69,7 @@ int Matroska::Properties::lengthInMilliseconds() const
 
 int Matroska::Properties::bitrate() const
 {
-  if (d->bitrate == -1) {
+  if(d->bitrate == -1) {
     d->bitrate = d->length != 0 ? static_cast<int>(d->file->length() * 8 / d->length) : 0;
   }
   return d->bitrate;
@@ -149,7 +149,7 @@ void Matroska::Properties::setCodecName(const String &codecName)
   d->codecName = codecName;
 }
 
-void Matroska::Properties::setTitle(const String& title)
+void Matroska::Properties::setTitle(const String &title)
 {
   d->title = title;
 }
