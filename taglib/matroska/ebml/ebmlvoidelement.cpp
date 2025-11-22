@@ -25,6 +25,21 @@
 
 using namespace TagLib;
 
+EBML::VoidElement::VoidElement(int sizeLength, offset_t dataSize):
+  Element(Id::VoidElement, sizeLength, dataSize)
+{
+}
+
+EBML::VoidElement::VoidElement(Id, int sizeLength, offset_t dataSize, offset_t):
+  Element(Id::VoidElement, sizeLength, dataSize)
+{
+}
+
+EBML::VoidElement::VoidElement():
+  Element(Id::VoidElement, 0, 0)
+{
+}
+
 ByteVector EBML::VoidElement::render()
 {
   offset_t bytesNeeded = targetSize;

@@ -36,6 +36,8 @@ Matroska::Cues::Cues(offset_t segmentDataOffset) :
   setNeedsRender(false);
 }
 
+Matroska::Cues::~Cues() = default;
+
 ByteVector Matroska::Cues::renderInternal()
 {
   const auto beforeSize = sizeRenderedOrWritten();
@@ -141,7 +143,14 @@ void Matroska::Cues::addCuePoint(std::unique_ptr<CuePoint> &&cuePoint)
   cuePoints.push_back(std::move(cuePoint));
 }
 
+const Matroska::Cues::CuePointList &Matroska::Cues::cuePointList()
+{
+  return cuePoints;
+}
+
 Matroska::CuePoint::CuePoint() = default;
+
+Matroska::CuePoint::~CuePoint() = default;
 
 bool Matroska::CuePoint::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
@@ -157,6 +166,21 @@ void Matroska::CuePoint::addCueTrack(std::unique_ptr<CueTrack> &&cueTrack)
   cueTracks.push_back(std::move(cueTrack));
 }
 
+const Matroska::CuePoint::CueTrackList &Matroska::CuePoint::cueTrackList() const
+{
+  return cueTracks;
+}
+
+void Matroska::CuePoint::setTime(Time timestamp)
+{
+  time = timestamp;
+}
+
+Matroska::CuePoint::Time Matroska::CuePoint::getTime() const
+{
+  return time;
+}
+
 bool Matroska::CuePoint::adjustOffset(offset_t offset, offset_t delta)
 {
   bool ret = false;
@@ -165,6 +189,10 @@ bool Matroska::CuePoint::adjustOffset(offset_t offset, offset_t delta)
 
   return ret;
 }
+
+Matroska::CueTrack::CueTrack() = default;
+
+Matroska::CueTrack::~CueTrack() = default;
 
 bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset) const
 {
@@ -189,6 +217,76 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
     }
   }
   return true;
+}
+
+void Matroska::CueTrack::setTrackNumber(unsigned long long trackNr)
+{
+  trackNumber = trackNr;
+}
+
+unsigned long long Matroska::CueTrack::getTrackNumber() const
+{
+  return trackNumber;
+}
+
+void Matroska::CueTrack::setClusterPosition(offset_t clusterPos)
+{
+  clusterPosition = clusterPos;
+}
+
+offset_t Matroska::CueTrack::getClusterPosition() const
+{
+  return clusterPosition;
+}
+
+void Matroska::CueTrack::setRelativePosition(std::optional<offset_t> relativePos)
+{
+  relativePosition = relativePos;
+}
+
+std::optional<offset_t> Matroska::CueTrack::getRelativePosition() const
+{
+  return relativePosition;
+}
+
+void Matroska::CueTrack::setCodecState(std::optional<offset_t> codecStatePos)
+{
+  codecState = codecStatePos;
+}
+
+std::optional<offset_t> Matroska::CueTrack::getCodecState() const
+{
+  return codecState;
+}
+
+void Matroska::CueTrack::setBlockNumber(std::optional<unsigned long long> blockNr)
+{
+  blockNumber = blockNr;
+}
+
+std::optional<unsigned long long> Matroska::CueTrack::getBlockNumber() const
+{
+  return blockNumber;
+}
+
+void Matroska::CueTrack::setDuration(std::optional<unsigned long long> segmentTicks)
+{
+  duration = segmentTicks;
+}
+
+std::optional<unsigned long long> Matroska::CueTrack::getDuration() const
+{
+  return duration;
+}
+
+void Matroska::CueTrack::addReferenceTime(unsigned long long refTime)
+{
+  refTimes.append(refTime);
+}
+
+const Matroska::CueTrack::ReferenceTimeList &Matroska::CueTrack::referenceTimes() const
+{
+  return refTimes;
 }
 
 bool Matroska::CueTrack::adjustOffset(offset_t offset, offset_t delta)

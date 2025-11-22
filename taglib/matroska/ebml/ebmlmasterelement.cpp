@@ -25,11 +25,76 @@
 
 using namespace TagLib;
 
+EBML::MasterElement::MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset):
+  Element(id, sizeLength, dataSize), offset(offset)
+{
+}
+
+EBML::MasterElement::MasterElement(Id id):
+  Element(id, 0, 0), offset(0)
+{
+}
+
 EBML::MasterElement::~MasterElement() = default;
+
+offset_t EBML::MasterElement::getOffset() const
+{
+  return offset;
+}
 
 void EBML::MasterElement::appendElement(std::unique_ptr<Element> &&element)
 {
   elements.push_back(std::move(element));
+}
+
+std::list<std::unique_ptr<EBML::Element>>::iterator EBML::MasterElement::begin()
+{
+  return elements.begin();
+}
+
+std::list<std::unique_ptr<EBML::Element>>::iterator EBML::MasterElement::end()
+{
+  return elements.end();
+}
+
+std::list<std::unique_ptr<EBML::Element>>::const_iterator EBML::MasterElement::begin() const
+{
+  return elements.begin();
+}
+
+std::list<std::unique_ptr<EBML::Element>>::const_iterator EBML::MasterElement::end() const
+{
+  return elements.end();
+}
+
+std::list<std::unique_ptr<EBML::Element>>::const_iterator EBML::MasterElement::cbegin() const
+{
+  return elements.cbegin();
+}
+
+std::list<std::unique_ptr<EBML::Element>>::const_iterator EBML::MasterElement::cend() const
+{
+  return elements.cend();
+}
+
+offset_t EBML::MasterElement::getPadding() const
+{
+  return padding;
+}
+
+void EBML::MasterElement::setPadding(offset_t numBytes)
+{
+  padding = numBytes;
+}
+
+offset_t EBML::MasterElement::getMinRenderSize() const
+{
+  return minRenderSize;
+}
+
+void EBML::MasterElement::setMinRenderSize(offset_t minimumSize)
+{
+  minRenderSize = minimumSize;
 }
 
 bool EBML::MasterElement::read(File &file)

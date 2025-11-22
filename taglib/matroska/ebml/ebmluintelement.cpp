@@ -22,9 +22,35 @@
 #include "ebmlutils.h"
 #include "tbytevector.h"
 #include "tfile.h"
+#include "tutils.h"
 #include "tdebug.h"
 
 using namespace TagLib;
+
+EBML::UIntElement::UIntElement(Id id, int sizeLength, offset_t dataSize):
+  Element(id, sizeLength, dataSize)
+{
+}
+
+EBML::UIntElement::UIntElement(Id id, int sizeLength, offset_t dataSize, offset_t):
+  Element(id, sizeLength, dataSize)
+{
+}
+
+EBML::UIntElement::UIntElement(Id id):
+  UIntElement(id, 0, 0)
+{
+}
+
+unsigned long long EBML::UIntElement::getValue() const
+{
+  return value;
+}
+
+void EBML::UIntElement::setValue(unsigned long long val)
+{
+  value = val;
+}
 
 bool EBML::UIntElement::read(File &file)
 {

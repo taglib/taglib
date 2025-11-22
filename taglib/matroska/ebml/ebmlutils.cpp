@@ -22,6 +22,8 @@
 #include <random>
 #include "tbytevector.h"
 #include "matroskafile.h"
+#include "tutils.h"
+#include "tdebug.h"
 
 using namespace TagLib;
 
@@ -43,6 +45,32 @@ std::unique_ptr<EBML::Element> EBML::findNextElement(File &file, offset_t maxOff
   return file.tell() < maxOffset ? Element::factory(file) : nullptr;
 }
 
+template <int maxSizeLength>
+unsigned int EBML::VINTSizeLength(uint8_t firstByte)
+{
+  static_assert(maxSizeLength >= 1 && maxSizeLength <= 8);
+  if(!firstByte) {
+    debug("VINT with greater than 8 bytes not allowed");
+    return 0;
+  }
+  uint8_t mask = 0b10000000;
+  unsigned int numBytes = 1;
+  while(!(mask & firstByte)) {
+    numBytes++;
+    mask >>= 1;
+  }
+  if(numBytes > maxSizeLength) {
+    debug(Utils::formatString("VINT size length exceeds %i bytes", maxSizeLength));
+    return 0;
+  }
+  return numBytes;
+}
+
+namespace TagLib::EBML {
+  template unsigned int VINTSizeLength<4>(uint8_t firstByte);
+  template unsigned int VINTSizeLength<8>(uint8_t firstByte);
+}
+
 template <typename T>
 std::pair<int, T> EBML::readVINT(File &file)
 {
@@ -62,6 +90,7 @@ std::pair<int, T> EBML::readVINT(File &file)
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
   return { nb_bytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
+
 namespace TagLib::EBML {
   template std::pair<int, offset_t> readVINT<offset_t>(File &file);
   template std::pair<int, uint64_t> readVINT<uint64_t>(File &file);
@@ -81,6 +110,7 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
   offset_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
   return { numBytes, static_cast<T>(buffer.toLongLong(true)) & mask };
 }
+
 namespace TagLib::EBML {
   template std::pair<int, offset_t> parseVINT<offset_t>(const ByteVector &buffer);
   template std::pair<int, uint64_t> parseVINT<uint64_t>(const ByteVector &buffer);

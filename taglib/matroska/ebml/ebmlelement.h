@@ -106,22 +106,17 @@ namespace TagLib
         MkChapLanguage            = 0x437C,
       };
 
-      Element(Id id, int sizeLength, offset_t dataSize) :
-        id(id), sizeLength(sizeLength), dataSize(dataSize) {}
-      Element(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        id(id), sizeLength(sizeLength), dataSize(dataSize) {}
-      virtual ~Element() = default;
-      virtual bool read(File &file)
-      {
-        skipData(file);
-        return true;
-      }
+      Element(Id id, int sizeLength, offset_t dataSize);
+      Element(Id id, int sizeLength, offset_t dataSize, offset_t);
+      virtual ~Element();
+
+      virtual bool read(File &file);
       void skipData(File &file);
-      Id getId() const { return id; }
+      Id getId() const;
       offset_t headSize() const;
-      offset_t getSize() const { return headSize() + dataSize; }
-      int getSizeLength() const { return sizeLength; }
-      int64_t getDataSize() const { return dataSize; }
+      offset_t getSize() const;
+      int getSizeLength() const;
+      int64_t getDataSize() const;
       ByteVector renderId() const;
       virtual ByteVector render();
       static std::unique_ptr<Element> factory(File &file);

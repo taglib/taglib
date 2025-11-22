@@ -34,7 +34,7 @@ namespace TagLib {
     {
     public:
       explicit SeekHead(offset_t segmentDataOffset);
-      ~SeekHead() override = default;
+      ~SeekHead() override;
 
       bool isValid(TagLib::File &file) const;
       void addEntry(const Element &element);

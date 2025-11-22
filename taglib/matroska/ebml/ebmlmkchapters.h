@@ -34,16 +34,14 @@ namespace TagLib {
   namespace Matroska {
     class Chapters;
   }
+
   namespace EBML {
     class MkChapters : public MasterElement
     {
     public:
-      MkChapters(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkChapters, sizeLength, dataSize, offset) {}
-      MkChapters(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkChapters, sizeLength, dataSize, offset) {}
-      MkChapters() :
-        MasterElement(Id::MkChapters, 0, 0, 0) {}
+      MkChapters(int sizeLength, offset_t dataSize, offset_t offset);
+      MkChapters(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkChapters();
 
       std::unique_ptr<Matroska::Chapters> parse() const;
     };

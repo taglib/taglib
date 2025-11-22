@@ -40,16 +40,13 @@ namespace TagLib {
     class SeekHead;
     class Segment;
   }
+
   namespace EBML {
     class MkSegment : public MasterElement
     {
     public:
-      MkSegment(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
-      {
-      }
-      MkSegment(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkSegment, sizeLength, dataSize, offset) {}
+      MkSegment(int sizeLength, offset_t dataSize, offset_t offset);
+      MkSegment(Id, int sizeLength, offset_t dataSize, offset_t offset);
       ~MkSegment() override;
 
       offset_t segmentDataOffset() const;

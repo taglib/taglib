@@ -27,6 +27,21 @@
 
 using namespace TagLib;
 
+EBML::MkAttachments::MkAttachments(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkAttachments, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkAttachments::MkAttachments(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkAttachments, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkAttachments::MkAttachments():
+  MasterElement(Id::MkAttachments, 0, 0, 0)
+{
+}
+
 std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
 {
   auto attachments = std::make_unique<Matroska::Attachments>();

@@ -34,12 +34,9 @@ namespace TagLib {
     class MkCues : public MasterElement
     {
     public:
-      MkCues(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkCues, sizeLength, dataSize, offset) {}
-      MkCues(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkCues, sizeLength, dataSize, offset) {}
-      MkCues() :
-        MasterElement(Id::MkCues, 0, 0, 0) {}
+      MkCues(int sizeLength, offset_t dataSize, offset_t offset);
+      MkCues(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkCues();
 
       std::unique_ptr<Matroska::Cues> parse(offset_t segmentDataOffset) const;
     };

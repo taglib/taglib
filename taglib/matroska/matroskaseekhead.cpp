@@ -36,6 +36,8 @@ Matroska::SeekHead::SeekHead(offset_t segmentDataOffset) :
   setNeedsRender(false);
 }
 
+Matroska::SeekHead::~SeekHead() = default;
+
 bool Matroska::SeekHead::isValid(TagLib::File &file) const
 {
   bool result = true;

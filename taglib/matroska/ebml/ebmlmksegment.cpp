@@ -30,6 +30,16 @@
 
 using namespace TagLib;
 
+EBML::MkSegment::MkSegment(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkSegment::MkSegment(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
+{
+}
+
 EBML::MkSegment::~MkSegment() = default;
 
 offset_t EBML::MkSegment::segmentDataOffset() const

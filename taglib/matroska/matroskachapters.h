@@ -37,6 +37,7 @@ namespace TagLib {
   namespace EBML {
     class MkChapters;
   }
+
   namespace Matroska {
     class ChapterEdition;
     class File;

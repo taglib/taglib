@@ -24,6 +24,21 @@
 
 using namespace TagLib;
 
+EBML::MkCues::MkCues(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkCues, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkCues::MkCues(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkCues, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkCues::MkCues():
+  MasterElement(Id::MkCues, 0, 0, 0)
+{
+}
+
 std::unique_ptr<Matroska::Cues> EBML::MkCues::parse(offset_t segmentDataOffset) const
 {
   auto cues = std::make_unique<Matroska::Cues>(segmentDataOffset);

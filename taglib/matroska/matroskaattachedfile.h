@@ -27,6 +27,7 @@
 namespace TagLib {
   class String;
   class ByteVector;
+
   namespace Matroska {
     //! Attached file embedded into a Matroska file.
     class TAGLIB_EXPORT AttachedFile

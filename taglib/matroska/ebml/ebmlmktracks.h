@@ -34,16 +34,14 @@ namespace TagLib {
   namespace Matroska {
     class Properties;
   }
+
   namespace EBML {
     class MkTracks : public MasterElement
     {
     public:
-      MkTracks(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkTracks, sizeLength, dataSize, offset) {}
-      MkTracks(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkTracks, sizeLength, dataSize, offset) {}
-      MkTracks() :
-        MasterElement(Id::MkTracks, 0, 0, 0) {}
+      MkTracks(int sizeLength, offset_t dataSize, offset_t offset);
+      MkTracks(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkTracks();
 
       void parse(Matroska::Properties *properties) const;
     };

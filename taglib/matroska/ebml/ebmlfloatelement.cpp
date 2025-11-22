@@ -31,6 +31,24 @@
 
 using namespace TagLib;
 
+EBML::FloatElement::FloatElement(Id id, int sizeLength, offset_t dataSize):
+  Element(id, sizeLength, dataSize)
+{
+}
+
+EBML::FloatElement::FloatElement(Id id, int sizeLength, offset_t dataSize, offset_t):
+  Element(id, sizeLength, dataSize)
+{
+}
+
+EBML::FloatElement::FloatElement(Id id):
+  FloatElement(id, 0, 0)
+{
+}
+
+EBML::FloatElement::FloatVariantType EBML::FloatElement::getValue() const
+{ return value; }
+
 double EBML::FloatElement::getValueAsDouble(double defaultValue) const
 {
   if(std::holds_alternative<double>(value)) {
@@ -40,6 +58,11 @@ double EBML::FloatElement::getValueAsDouble(double defaultValue) const
     return std::get<float>(value);
   }
   return defaultValue;
+}
+
+void EBML::FloatElement::setValue(FloatVariantType val)
+{
+  value = val;
 }
 
 bool EBML::FloatElement::read(File &file)

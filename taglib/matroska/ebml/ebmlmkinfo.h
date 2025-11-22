@@ -34,16 +34,14 @@ namespace TagLib {
   namespace Matroska {
     class Properties;
   }
+
   namespace EBML {
     class MkInfo : public MasterElement
     {
     public:
-      MkInfo(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkInfo, sizeLength, dataSize, offset) {}
-      MkInfo(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkInfo, sizeLength, dataSize, offset) {}
-      MkInfo() :
-        MasterElement(Id::MkInfo, 0, 0, 0) {}
+      MkInfo(int sizeLength, offset_t dataSize, offset_t offset);
+      MkInfo(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkInfo();
 
       void parse(Matroska::Properties * properties) const;
     };

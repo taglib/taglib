@@ -29,16 +29,14 @@ namespace TagLib {
   namespace Matroska {
     class SeekHead;
   }
+
   namespace EBML {
     class MkSeekHead : public MasterElement
     {
     public:
-      MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkSeekHead, sizeLength, dataSize, offset) {}
-      MkSeekHead(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkSeekHead, sizeLength, dataSize, offset) {}
-      MkSeekHead() :
-        MasterElement(Id::MkSeekHead, 0, 0, 0) {}
+      MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset);
+      MkSeekHead(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkSeekHead();
 
       std::unique_ptr<Matroska::SeekHead> parse(offset_t segmentDataOffset) const;
     };

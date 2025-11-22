@@ -21,8 +21,34 @@
 #include "ebmlbinaryelement.h"
 #include "ebmlutils.h"
 #include "tfile.h"
+#include "tdebug.h"
 
 using namespace TagLib;
+
+EBML::BinaryElement::BinaryElement(Id id, int sizeLength, offset_t dataSize):
+  Element(id, sizeLength, dataSize)
+{
+}
+
+EBML::BinaryElement::BinaryElement(Id id, int sizeLength, offset_t dataSize, offset_t):
+  Element(id, sizeLength, dataSize)
+{
+}
+
+EBML::BinaryElement::BinaryElement(Id id):
+  Element(id, 0, 0)
+{
+}
+
+const ByteVector& EBML::BinaryElement::getValue() const
+{
+  return value;
+}
+
+void EBML::BinaryElement::setValue(const ByteVector& val)
+{
+  value = val;
+}
 
 bool EBML::BinaryElement::read(File &file)
 {

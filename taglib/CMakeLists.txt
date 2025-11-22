@@ -72,6 +72,7 @@ if(WITH_MATROSKA)
 endif()
 include_directories(${tag_HDR_DIRS})
 
+set(tag_PRIVATE_HDRS)
 set(tag_HDRS
   tag.h
   fileref.h
@@ -233,14 +234,13 @@ if(WITH_MATROSKA)
     matroska/matroskachapter.h
     matroska/matroskachapteredition.h
     matroska/matroskachapters.h
-    matroska/matroskacues.h
     matroska/matroskaelement.h
     matroska/matroskafile.h
     matroska/matroskaproperties.h
-    matroska/matroskaseekhead.h
-    matroska/matroskasegment.h
     matroska/matroskasimpletag.h
     matroska/matroskatag.h
+  )
+  set(tag_PRIVATE_HDRS ${tag_PRIVATE_HDRS}
     matroska/ebml/ebmlbinaryelement.h
     matroska/ebml/ebmlelement.h
     matroska/ebml/ebmlmasterelement.h
@@ -257,6 +257,9 @@ if(WITH_MATROSKA)
     matroska/ebml/ebmlfloatelement.h
     matroska/ebml/ebmlutils.h
     matroska/ebml/ebmlvoidelement.h
+    matroska/matroskacues.h
+    matroska/matroskaseekhead.h
+    matroska/matroskasegment.h
   )
 endif()
 
@@ -517,7 +520,7 @@ set(tag_LIB_SRCS
   tagutils.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+add_library(tag ${tag_LIB_SRCS} ${tag_HDRS} ${tag_PRIVATE_HDRS})
 
 target_include_directories(tag INTERFACE
   $<INSTALL_INTERFACE:include>

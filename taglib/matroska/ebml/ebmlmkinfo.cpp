@@ -31,6 +31,21 @@
 
 using namespace TagLib;
 
+EBML::MkInfo::MkInfo(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkInfo, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkInfo::MkInfo(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkInfo, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkInfo::MkInfo():
+  MasterElement(Id::MkInfo, 0, 0, 0)
+{
+}
+
 void EBML::MkInfo::parse(Matroska::Properties *properties) const
 {
   if(!properties)

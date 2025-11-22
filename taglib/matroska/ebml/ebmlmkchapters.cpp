@@ -31,6 +31,21 @@
 
 using namespace TagLib;
 
+EBML::MkChapters::MkChapters(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkChapters, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkChapters::MkChapters(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkChapters, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkChapters::MkChapters():
+  MasterElement(Id::MkChapters, 0, 0, 0)
+{
+}
+
 std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse() const
 {
   auto chapters = std::make_unique<Matroska::Chapters>();

@@ -28,6 +28,21 @@
 
 using namespace TagLib;
 
+EBML::MkTags::MkTags(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkTags, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkTags::MkTags(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkTags, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkTags::MkTags():
+  MasterElement(Id::MkTags, 0, 0, 0)
+{
+}
+
 std::unique_ptr<Matroska::Tag> EBML::MkTags::parse() const
 {
   auto mTag = std::make_unique<Matroska::Tag>();

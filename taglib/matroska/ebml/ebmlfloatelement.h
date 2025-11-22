@@ -39,16 +39,13 @@ namespace TagLib {
     public:
       using FloatVariantType = std::variant<std::monostate, float, double>;
 
-      FloatElement(Id id, int sizeLength, offset_t dataSize) :
-        Element(id, sizeLength, dataSize) {}
-      FloatElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        Element(id, sizeLength, dataSize) {}
-      explicit FloatElement(Id id) :
-        FloatElement(id, 0, 0) {}
+      FloatElement(Id id, int sizeLength, offset_t dataSize);
+      FloatElement(Id id, int sizeLength, offset_t dataSize, offset_t);
+      explicit FloatElement(Id id);
 
-      FloatVariantType getValue() const { return value; }
+      FloatVariantType getValue() const;
       double getValueAsDouble(double defaultValue = 0.0) const;
-      void setValue(FloatVariantType val) { value = val; }
+      void setValue(FloatVariantType val);
       bool read(File &file) override;
       ByteVector render() override;
 

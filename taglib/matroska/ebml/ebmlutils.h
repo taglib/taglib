@@ -24,8 +24,6 @@
 
 #include <utility>
 #include "taglib.h"
-#include "tutils.h"
-#include "tdebug.h"
 #include "ebmlelement.h"
 
 namespace TagLib {
@@ -33,34 +31,20 @@ namespace TagLib {
   class ByteVector;
 
   namespace EBML {
+    std::unique_ptr<Element> findElement(File &file, Element::Id id, offset_t maxOffset);
+    std::unique_ptr<Element> findNextElement(File &file, offset_t maxOffset);
+
     template <int maxSizeLength>
-    constexpr unsigned int VINTSizeLength(uint8_t firstByte)
-    {
-      static_assert(maxSizeLength >= 1 && maxSizeLength <= 8);
-      if(!firstByte) {
-        debug("VINT with greater than 8 bytes not allowed");
-        return 0;
-      }
-      uint8_t mask = 0b10000000;
-      unsigned int numBytes = 1;
-      while(!(mask & firstByte)) {
-        numBytes++;
-        mask >>= 1;
-      }
-      if(numBytes > maxSizeLength) {
-        debug(Utils::formatString("VINT size length exceeds %i bytes", maxSizeLength));
-        return 0;
-      }
-      return numBytes;
-    }
+    unsigned int VINTSizeLength(uint8_t firstByte);
 
     template <typename T>
     std::pair<int, T> readVINT(File &file);
+
     template <typename T>
     std::pair<int, T> parseVINT(const ByteVector &buffer);
-    std::unique_ptr<Element> findElement(File &file, Element::Id id, offset_t maxOffset);
-    std::unique_ptr<Element> findNextElement(File &file, offset_t maxOffset);
+
     ByteVector renderVINT(uint64_t number, int minSizeLength);
+
     unsigned long long randomUID();
 
     constexpr int minSize(uint64_t data)

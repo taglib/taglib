@@ -148,14 +148,52 @@ unsigned int EBML::Element::readId(File &file)
   return buffer.toUInt(true);
 }
 
+EBML::Element::Element(Id id, int sizeLength, offset_t dataSize):
+  id(id), sizeLength(sizeLength), dataSize(dataSize)
+{
+}
+
+EBML::Element::Element(Id id, int sizeLength, offset_t dataSize, offset_t):
+  id(id), sizeLength(sizeLength), dataSize(dataSize)
+{
+}
+
+EBML::Element::~Element() = default;
+
+bool EBML::Element::read(File& file)
+{
+  skipData(file);
+  return true;
+}
+
 void EBML::Element::skipData(File &file)
 {
   file.seek(dataSize, File::Position::Current);
 }
 
+EBML::Element::Id EBML::Element::getId() const
+{
+  return id;
+}
+
 offset_t EBML::Element::headSize() const
 {
   return idSize(id) + sizeLength;
+}
+
+offset_t EBML::Element::getSize() const
+{
+  return headSize() + dataSize;
+}
+
+int EBML::Element::getSizeLength() const
+{
+  return sizeLength;
+}
+
+int64_t EBML::Element::getDataSize() const
+{
+  return dataSize;
 }
 
 ByteVector EBML::Element::render()

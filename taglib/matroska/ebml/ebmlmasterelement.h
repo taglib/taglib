@@ -22,9 +22,10 @@
 #define TAGLIB_EBMLMASTERELEMENT_H
 #ifndef DO_NOT_DOCUMENT
 
+#include <list>
+
 #include "ebmlelement.h"
 #include "taglib.h"
-#include "tlist.h"
 
 namespace TagLib
 {
@@ -34,26 +35,24 @@ namespace TagLib
     class MasterElement : public Element
     {
     public:
-      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset) :
-        Element(id, sizeLength, dataSize), offset(offset) {}
-      explicit MasterElement(Id id) :
-        Element(id, 0, 0), offset(0) {}
+      MasterElement(Id id, int sizeLength, offset_t dataSize, offset_t offset);
+      explicit MasterElement(Id id);
       ~MasterElement() override;
 
-      offset_t getOffset() const { return offset; }
+      offset_t getOffset() const;
       bool read(File &file) override;
       ByteVector render() override;
       void appendElement(std::unique_ptr<Element> &&element);
-      std::list<std::unique_ptr<Element>>::iterator begin() { return elements.begin(); }
-      std::list<std::unique_ptr<Element>>::iterator end() { return elements.end(); }
-      std::list<std::unique_ptr<Element>>::const_iterator begin() const { return elements.begin(); }
-      std::list<std::unique_ptr<Element>>::const_iterator end() const { return elements.end(); }
-      std::list<std::unique_ptr<Element>>::const_iterator cbegin() const { return elements.cbegin(); }
-      std::list<std::unique_ptr<Element>>::const_iterator cend() const { return elements.cend(); }
-      offset_t getPadding() const { return padding; }
-      void setPadding(offset_t numBytes) { padding = numBytes; }
-      offset_t getMinRenderSize() const { return minRenderSize; }
-      void setMinRenderSize(offset_t minimumSize) { minRenderSize = minimumSize; }
+      std::list<std::unique_ptr<Element>>::iterator begin();
+      std::list<std::unique_ptr<Element>>::iterator end();
+      std::list<std::unique_ptr<Element>>::const_iterator begin() const;
+      std::list<std::unique_ptr<Element>>::const_iterator end() const;
+      std::list<std::unique_ptr<Element>>::const_iterator cbegin() const;
+      std::list<std::unique_ptr<Element>>::const_iterator cend() const;
+      offset_t getPadding() const;
+      void setPadding(offset_t numBytes);
+      offset_t getMinRenderSize() const;
+      void setMinRenderSize(offset_t minimumSize);
 
     protected:
       offset_t offset;

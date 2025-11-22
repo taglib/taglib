@@ -31,15 +31,12 @@ namespace TagLib {
     class UIntElement : public Element
     {
     public:
-      UIntElement(Id id, int sizeLength, offset_t dataSize) :
-        Element(id, sizeLength, dataSize) {}
-      UIntElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        Element(id, sizeLength, dataSize) {}
-      explicit UIntElement(Id id) :
-        UIntElement(id, 0, 0) {}
+      UIntElement(Id id, int sizeLength, offset_t dataSize);
+      UIntElement(Id id, int sizeLength, offset_t dataSize, offset_t);
+      explicit UIntElement(Id id);
 
-      unsigned long long getValue() const { return value; }
-      void setValue(unsigned long long val) { value = val; }
+      unsigned long long getValue() const;
+      void setValue(unsigned long long val);
       bool read(File &file) override;
       ByteVector render() override;
 

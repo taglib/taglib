@@ -149,16 +149,16 @@
 #include "trueaudioproperties.h"
 #endif
 #ifdef TAGLIB_WITH_MATROSKA
+#include "matroskaattachedfile.h"
+#include "matroskaattachments.h"
+#include "matroskachapteredition.h"
+#include "matroskachapters.h"
 #include "matroskafile.h"
 #include "matroskaproperties.h"
 #include "matroskatag.h"
 #endif
 
 #include <cppunit/extensions/HelperMacros.h>
-
-#include "matroskaattachedfile.h"
-#include "matroskaattachments.h"
-#include "matroskachapters.h"
 
 using namespace std;
 using namespace TagLib;
@@ -314,6 +314,9 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::Matroska::Element));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Matroska::Attachments));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::Matroska::Chapters));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::ChapterEdition));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::Chapter));
+        CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::Chapter::Display));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::SimpleTag));
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::Matroska::AttachedFile));
 #endif

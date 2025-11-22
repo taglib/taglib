@@ -33,6 +33,7 @@ namespace TagLib::EBML {
   class MkTracks;
   class MkInfo;
 }
+
 namespace TagLib::Matroska {
   class File;
 

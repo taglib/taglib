@@ -33,11 +33,10 @@ namespace TagLib {
     class StringElement : public Element
     {
     public:
-      StringElement(String::Type stringEncoding, Id id, int sizeLength, offset_t dataSize) :
-        Element(id, sizeLength, dataSize), encoding(stringEncoding) {}
+      StringElement(String::Type stringEncoding, Id id, int sizeLength, offset_t dataSize);
 
-      const String &getValue() const { return value; }
-      void setValue(const String &val) { value = val; }
+      const String &getValue() const;
+      void setValue(const String &val);
       bool read(File &file) override;
       ByteVector render() override;
 
@@ -48,22 +47,16 @@ namespace TagLib {
 
     class UTF8StringElement : public StringElement {
     public:
-      UTF8StringElement(Id id, int sizeLength, offset_t dataSize) :
-        StringElement(String::UTF8, id, sizeLength, dataSize) {}
-      UTF8StringElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        UTF8StringElement(id, sizeLength, dataSize) {}
-      explicit UTF8StringElement(Id id) :
-        UTF8StringElement(id, 0, 0) {}
+      UTF8StringElement(Id id, int sizeLength, offset_t dataSize);
+      UTF8StringElement(Id id, int sizeLength, offset_t dataSize, offset_t);
+      explicit UTF8StringElement(Id id);
     };
 
     class Latin1StringElement : public StringElement {
     public:
-      Latin1StringElement(Id id, int sizeLength, offset_t dataSize) :
-        StringElement(String::Latin1, id, sizeLength, dataSize) {}
-      Latin1StringElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        Latin1StringElement(id, sizeLength, dataSize) {}
-      explicit Latin1StringElement(Id id) :
-        Latin1StringElement(id, 0, 0) {}
+      Latin1StringElement(Id id, int sizeLength, offset_t dataSize);
+      Latin1StringElement(Id id, int sizeLength, offset_t dataSize, offset_t);
+      explicit Latin1StringElement(Id id);
     };
   }
 }

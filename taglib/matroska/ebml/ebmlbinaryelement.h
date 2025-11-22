@@ -27,19 +27,17 @@
 
 namespace TagLib {
   class File;
+
   namespace EBML {
     class BinaryElement : public Element
     {
     public:
-      BinaryElement(Id id, int sizeLength, offset_t dataSize) :
-        Element(id, sizeLength, dataSize) {}
-      BinaryElement(Id id, int sizeLength, offset_t dataSize, offset_t) :
-        Element(id, sizeLength, dataSize) {}
-      explicit BinaryElement(Id id) :
-        Element(id, 0, 0) {}
+      BinaryElement(Id id, int sizeLength, offset_t dataSize);
+      BinaryElement(Id id, int sizeLength, offset_t dataSize, offset_t);
+      explicit BinaryElement(Id id);
 
-      const ByteVector &getValue() const { return value; }
-      void setValue(const ByteVector &val) { value = val; }
+      const ByteVector &getValue() const;
+      void setValue(const ByteVector &val);
       bool read(File &file) override;
       ByteVector render() override;
 

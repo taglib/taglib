@@ -28,9 +28,11 @@
 
 namespace TagLib {
   class File;
+
   namespace EBML {
     class MkAttachments;
   }
+
   namespace Matroska {
     class AttachedFile;
     class File;

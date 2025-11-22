@@ -29,10 +29,10 @@ namespace TagLib::Matroska {
   {
   public:
     Segment(offset_t sizeLength, offset_t dataSize, offset_t lengthOffset);
-    ~Segment() override = default;
+    ~Segment() override;
     bool render() override;
     bool sizeChanged(Element &caller, offset_t delta) override;
-    offset_t dataOffset() const { return offset() + sizeLength; }
+    offset_t dataOffset() const;
 
   private:
     ByteVector renderInternal() override;

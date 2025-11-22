@@ -20,6 +20,7 @@
 
 #include "matroskasegment.h"
 #include "ebmlutils.h"
+#include "tbytevector.h"
 
 using namespace TagLib;
 
@@ -30,6 +31,8 @@ Matroska::Segment::Segment(offset_t sizeLength, offset_t dataSize, offset_t leng
   setOffset(lengthOffset);
   setSize(sizeLength);
 }
+
+Matroska::Segment::~Segment() = default;
 
 ByteVector Matroska::Segment::renderInternal()
 {
@@ -60,4 +63,9 @@ bool Matroska::Segment::sizeChanged(Element &, offset_t delta)
   dataSize += delta;
   setNeedsRender(true);
   return true;
+}
+
+offset_t Matroska::Segment::dataOffset() const
+{
+  return offset() + sizeLength;
 }

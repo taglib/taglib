@@ -29,16 +29,14 @@ namespace TagLib {
   namespace Matroska {
     class Attachments;
   }
+
   namespace EBML {
     class MkAttachments : public MasterElement
     {
     public:
-      MkAttachments(int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset) {}
-      MkAttachments(Id, int sizeLength, offset_t dataSize, offset_t offset) :
-        MasterElement(Id::MkAttachments, sizeLength, dataSize, offset) {}
-      MkAttachments() :
-        MasterElement(Id::MkAttachments, 0, 0, 0) {}
+      MkAttachments(int sizeLength, offset_t dataSize, offset_t offset);
+      MkAttachments(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkAttachments();
 
       std::unique_ptr<Matroska::Attachments> parse() const;
     };

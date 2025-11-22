@@ -31,6 +31,21 @@
 
 using namespace TagLib;
 
+EBML::MkTracks::MkTracks(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkTracks, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkTracks::MkTracks(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkTracks, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkTracks::MkTracks():
+  MasterElement(Id::MkTracks, 0, 0, 0)
+{
+}
+
 void EBML::MkTracks::parse(Matroska::Properties *properties) const
 {
   if(!properties)

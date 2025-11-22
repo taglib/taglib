@@ -27,6 +27,22 @@
 
 using namespace TagLib;
 
+EBML::StringElement::StringElement(
+  String::Type stringEncoding, Id id, int sizeLength, offset_t dataSize):
+  Element(id, sizeLength, dataSize), encoding(stringEncoding)
+{
+}
+
+const String& EBML::StringElement::getValue() const
+{
+  return value;
+}
+
+void EBML::StringElement::setValue(const String& val)
+{
+  value = val;
+}
+
 bool EBML::StringElement::read(File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
@@ -51,4 +67,34 @@ ByteVector EBML::StringElement::render()
   buffer.append(renderVINT(dataSize, 0));
   buffer.append(ByteVector(string.data(), static_cast<unsigned int>(dataSize)));
   return buffer;
+}
+
+EBML::UTF8StringElement::UTF8StringElement(Id id, int sizeLength, offset_t dataSize):
+  StringElement(String::UTF8, id, sizeLength, dataSize)
+{
+}
+
+EBML::UTF8StringElement::UTF8StringElement(Id id, int sizeLength, offset_t dataSize, offset_t):
+  UTF8StringElement(id, sizeLength, dataSize)
+{
+}
+
+EBML::UTF8StringElement::UTF8StringElement(Id id):
+  UTF8StringElement(id, 0, 0)
+{
+}
+
+EBML::Latin1StringElement::Latin1StringElement(Id id, int sizeLength, offset_t dataSize):
+  StringElement(String::Latin1, id, sizeLength, dataSize)
+{
+}
+
+EBML::Latin1StringElement::Latin1StringElement(Id id, int sizeLength, offset_t dataSize, offset_t):
+  Latin1StringElement(id, sizeLength, dataSize)
+{
+}
+
+EBML::Latin1StringElement::Latin1StringElement(Id id):
+  Latin1StringElement(id, 0, 0)
+{
 }

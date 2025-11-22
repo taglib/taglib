@@ -25,6 +25,21 @@
 
 using namespace TagLib;
 
+EBML::MkSeekHead::MkSeekHead(int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkSeekHead, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkSeekHead::MkSeekHead(Id, int sizeLength, offset_t dataSize, offset_t offset):
+  MasterElement(Id::MkSeekHead, sizeLength, dataSize, offset)
+{
+}
+
+EBML::MkSeekHead::MkSeekHead():
+  MasterElement(Id::MkSeekHead, 0, 0, 0)
+{
+}
+
 std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse(offset_t segmentDataOffset) const
 {
   auto seekHead = std::make_unique<Matroska::SeekHead>(segmentDataOffset);
