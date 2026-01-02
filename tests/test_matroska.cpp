@@ -104,7 +104,7 @@
  *
  * - Set simple tag with target type in a Matroska file:
  *       examples/tagwriter -C PART_NUMBER \
- *           name=PART_NUMBER,targetTypeValue=20,value=2 file.mka
+ *           'name=PART_NUMBER,targetTypeValue=20,value="2"' file.mka
  *
  * - Set simple tag with binary value in a Matroska file:
  *       examples/tagwriter -C BINARY \
@@ -219,22 +219,21 @@ public:
       auto tag = f.tag(true);
       CPPUNIT_ASSERT(tag->isEmpty());
       tag->addSimpleTag(Matroska::SimpleTag(
-        "Test Name 1", String("Test Value 1"),
-        Matroska::SimpleTag::TargetTypeValue::Track, "en"));
-      tag->addSimpleTag(Matroska::SimpleTag(
         "Test Name 2", String("Test Value 2"),
         Matroska::SimpleTag::TargetTypeValue::Album));
+      tag->insertSimpleTag(0, Matroska::SimpleTag(
+        "Test Name 1", String("Test Value 1"),
+        Matroska::SimpleTag::TargetTypeValue::Track, "en"));
+      tag->insertSimpleTag(1, Matroska::SimpleTag(
+        "Test Name 3", String("Test Value 3")));
+      tag->removeSimpleTag(1);
       tag->setTitle("Test title");
       tag->setArtist("Test artist");
       tag->setYear(1969);
       auto attachments = f.attachments(true);
-      Matroska::AttachedFile attachedFile;
-      attachedFile.setFileName("cover.jpg");
-      attachedFile.setMediaType("image/jpeg");
-      attachedFile.setDescription("Cover");
-      attachedFile.setData(ByteVector("JPEG data"));
-      attachedFile.setUID(5081000385627515072ULL);
-      attachments->addAttachedFile(attachedFile);
+      attachments->addAttachedFile(Matroska::AttachedFile(
+        "JPEG data", "cover.jpg", "image/jpeg", 5081000385627515072ULL,
+        "Cover"));
       CPPUNIT_ASSERT(f.save());
     }
     {
@@ -285,17 +284,17 @@ public:
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[2].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[3].language());
-      CPPUNIT_ASSERT_EQUAL(String("Test Name 2"), simpleTags[3].name());
-      CPPUNIT_ASSERT_EQUAL(String("Test Value 2"), simpleTags[3].toString());
+      CPPUNIT_ASSERT_EQUAL(String("DATE_RECORDED"), simpleTags[3].name());
+      CPPUNIT_ASSERT_EQUAL(String("1969"), simpleTags[3].toString());
       CPPUNIT_ASSERT_EQUAL(ByteVector(), simpleTags[3].toByteVector());
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[3].defaultLanguageFlag());
-      CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Album, simpleTags[3].targetTypeValue());
+      CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[3].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].trackUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[3].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[4].language());
-      CPPUNIT_ASSERT_EQUAL(String("DATE_RELEASED"), simpleTags[4].name());
-      CPPUNIT_ASSERT_EQUAL(String("1969"), simpleTags[4].toString());
+      CPPUNIT_ASSERT_EQUAL(String("Test Name 2"), simpleTags[4].name());
+      CPPUNIT_ASSERT_EQUAL(String("Test Value 2"), simpleTags[4].toString());
       CPPUNIT_ASSERT_EQUAL(ByteVector(), simpleTags[4].toByteVector());
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[4].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Album, simpleTags[4].targetTypeValue());
@@ -383,7 +382,8 @@ public:
       Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(!f.tag(false));
-      f.attachments(true)->addAttachedFile(Matroska::AttachedFile());
+      f.attachments(true)->addAttachedFile(Matroska::AttachedFile(
+        ByteVector(), "", ""));
       CPPUNIT_ASSERT(f.save());
     }
     {
@@ -487,7 +487,7 @@ public:
 
     PropertyMap initialProps;
     initialProps["ARTIST"] = StringList("Actors");
-    initialProps["DATE"] = StringList("2023");
+    initialProps["RELEASEDATE"] = StringList("2023");
     initialProps["DESCRIPTION"] = StringList("Description");
     initialProps["DIRECTOR"] = StringList("Director");
     initialProps["ENCODEDBY"] = StringList("Lavf59.27.100");
@@ -562,7 +562,6 @@ public:
 
       CPPUNIT_ASSERT_EQUAL(String("handbrake"), tag->title());
       CPPUNIT_ASSERT_EQUAL(String("Actors"), tag->artist());
-      CPPUNIT_ASSERT_EQUAL(2023U, tag->year());
       CPPUNIT_ASSERT_EQUAL(String(""), tag->album());
       CPPUNIT_ASSERT_EQUAL(String(""), tag->comment());
       CPPUNIT_ASSERT_EQUAL(String("Genre"), tag->genre());
@@ -695,15 +694,14 @@ public:
       }
       const StringList expectedSimpleTagNames {
         "BINARY", "TITLE", "ARTIST", "ARTISTSORT", "TITLESORT",
-        "DATE_RELEASED", "PART_NUMBER", "TOTAL_PARTS",
-        "MUSICBRAINZ_ALBUMARTISTID", "MUSICBRAINZ_ALBUMID",
-        "MUSICBRAINZ_RELEASEGROUPID", "ARTIST", "ARTISTS", "ARTISTSORT",
+        "PART_NUMBER", "TOTAL_PARTS", "MUSICBRAINZ_ALBUMARTISTID", "MUSICBRAINZ_ALBUMID",
+        "MUSICBRAINZ_RELEASEGROUPID", "DATE_RELEASED", "ARTIST", "ARTISTS", "ARTISTSORT",
         "ASIN", "BARCODE", "CATALOG_NUMBER", "CATALOG_NUMBER", "COMMENT",
-        "MIXED_BY", "ENCODER", "ENCODER_SETTINGS", "DATE_ENCODED", "GENRE",
-        "INITIAL_KEY", "ISRC", "LABEL_CODE", "LABEL_CODE",
+        "DATE_RECORDED", "MIXED_BY", "ENCODER", "ENCODER_SETTINGS", "DATE_ENCODED",
+        "GENRE", "INITIAL_KEY", "ISRC", "LABEL_CODE", "LABEL_CODE",
         "ORIGINAL_MEDIA_TYPE", "MUSICBRAINZ_ARTISTID",
         "MUSICBRAINZ_RELEASETRACKID", "MUSICBRAINZ_TRACKID", "ORIGINALDATE",
-        "PURCHASE_OWNER", "RELEASECOUNTRY", "DATE_RELEASED", "RELEASESTATUS",
+        "PURCHASE_OWNER", "RELEASECOUNTRY", "RELEASESTATUS",
         "RELEASETYPE", "REMIXED_BY", "SCRIPT", "DATE_TAGGED", "TITLE",
         "PART_NUMBER", "TOTAL_PARTS"
       };
@@ -960,14 +958,10 @@ public:
       CPPUNIT_ASSERT(f.tag(false));
       CPPUNIT_ASSERT(!f.attachments(false));
       auto attachments = f.attachments(true);
-      Matroska::AttachedFile attachedFile;
-      attachedFile.setFileName("cover.jpg");
-      attachedFile.setMediaType("image/jpeg");
-      attachedFile.setDescription("Cover");
       // Large enough for emitSizeChanged() from Matroska::Segment::render()
-      attachedFile.setData(ByteVector(20000, 'x'));
-      attachedFile.setUID(5081000385627515072ULL);
-      attachments->addAttachedFile(attachedFile);
+      attachments->addAttachedFile(Matroska::AttachedFile(
+        ByteVector(20000, 'x'), "cover.jpg", "image/jpeg",
+        5081000385627515072ULL, "Cover"));
       CPPUNIT_ASSERT(f.save());
     }
     {
@@ -979,11 +973,11 @@ public:
       CPPUNIT_ASSERT(attachments);
       CPPUNIT_ASSERT(PropertyMap(SimplePropertyMap{
         {"ARTIST", {"Actors"}},
-        {"DATE", {"2023"}},
         {"DESCRIPTION", {"Description"}},
         {"DIRECTOR", {"Director"}},
         {"ENCODEDBY", {"Lavf59.27.100"}},
         {"GENRE", {"Genre"}},
+        {"RELEASEDATE", {"2023"}},
         {"SUMMARY", {"Comment"}},
         {"SYNOPSIS", {"Plot"}}
       }) == tag->properties());
@@ -1161,13 +1155,9 @@ public:
       chapters->addChapterEdition(edition1);
       chapters->addChapterEdition(edition2);
 
-      Matroska::AttachedFile attachedFile;
-      attachedFile.setFileName("folder.png");
-      attachedFile.setMediaType("image/png");
-      attachedFile.setDescription("Cover");
-      attachedFile.setData(ByteVector("PNG data"));
-      attachedFile.setUID(1763187649ULL);
-      f.attachments(true)->addAttachedFile(attachedFile);
+      f.attachments(true)->addAttachedFile(Matroska::AttachedFile(
+        ByteVector("PNG data"), "folder.png", "image/png", 1763187649ULL,
+        "Cover"));
       CPPUNIT_ASSERT(f.save());
     }
     {

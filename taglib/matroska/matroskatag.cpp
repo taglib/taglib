@@ -89,6 +89,35 @@ void Matroska::Tag::addSimpleTag(const SimpleTag &tag)
   setNeedsRender(true);
 }
 
+void Matroska::Tag::addSimpleTags(const SimpleTagsList& simpleTags)
+{
+  d->tags.append(simpleTags);
+  setNeedsRender(true);
+}
+
+void Matroska::Tag::insertSimpleTag(unsigned int index, const SimpleTag &tag)
+{
+  if(index < d->tags.size()) {
+    auto it = d->tags.begin();
+    std::advance(it, index);
+    d->tags.insert(it, tag);
+  }
+  else {
+    d->tags.append(tag);
+  }
+  setNeedsRender(true);
+}
+
+void Matroska::Tag::removeSimpleTag(unsigned int index)
+{
+  if(index < d->tags.size()) {
+    auto it = d->tags.begin();
+    std::advance(it, index);
+    d->tags.erase(it);
+    setNeedsRender(true);
+  }
+}
+
 void Matroska::Tag::removeSimpleTag(const String &name,
   SimpleTag::TargetTypeValue targetTypeValue,
   unsigned long long trackUid)
@@ -323,7 +352,7 @@ namespace
     std::tuple("DISCNUMBER", "PART_NUMBER", Matroska::SimpleTag::TargetTypeValue::Album, true),
     std::tuple("TRACKTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("DISCTOTAL", "TOTAL_PARTS", Matroska::SimpleTag::TargetTypeValue::Album, true),
-    std::tuple("DATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Album, false),
+    std::tuple("DATE", "DATE_RECORDED", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("TITLESORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("ALBUMSORT", "TITLESORT", Matroska::SimpleTag::TargetTypeValue::Album, true),
     std::tuple("ARTISTSORT", "ARTISTSORT", Matroska::SimpleTag::TargetTypeValue::Track, false),
@@ -334,7 +363,7 @@ namespace
     std::tuple("DJMIXER", "MIXED_BY", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("REMIXER", "REMIXED_BY", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("INITIALKEY", "INITIAL_KEY", Matroska::SimpleTag::TargetTypeValue::Track, false),
-    std::tuple("RELEASEDATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Track, false),
+    std::tuple("RELEASEDATE", "DATE_RELEASED", Matroska::SimpleTag::TargetTypeValue::Album, false),
     std::tuple("ENCODINGTIME", "DATE_ENCODED", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("TAGGINGDATE", "DATE_TAGGED", Matroska::SimpleTag::TargetTypeValue::Track, false),
     std::tuple("ENCODEDBY", "ENCODER", Matroska::SimpleTag::TargetTypeValue::Track, false),

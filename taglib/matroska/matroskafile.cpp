@@ -335,13 +335,9 @@ bool Matroska::File::setComplexProperties(const String &key, const List<VariantM
       fileName = "attachment." + ext;
     }
     if(!mimeType.isEmpty() && !fileName.isEmpty()) {
-      AttachedFile attachedFile;
-      attachedFile.setData(data);
-      attachedFile.setMediaType(mimeType);
-      attachedFile.setDescription(property.value("description").value<String>());
-      attachedFile.setFileName(fileName);
-      attachedFile.setUID(uid);
-      d->attachments->addAttachedFile(attachedFile);
+      d->attachments->addAttachedFile(AttachedFile(
+        data, fileName, mimeType, uid,
+        property.value("description").value<String>()));
     }
   }
   return true;

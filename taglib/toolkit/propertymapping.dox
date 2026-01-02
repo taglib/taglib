@@ -34,7 +34,7 @@
 | CONDUCTOR                  | TPE3   |       | \----:com.apple.iTunes:CONDUCTOR                         |                         | WM/Conductor                      |                               |
 | COPYRIGHT                  | TCOP   | ICOP  | cprt                                                     |                         |                                   |                               |
 | COPYRIGHTURL               | WCOP   |       |                                                          |                         |                                   |                               |
-| DATE                       | TDRC   | ICRD  | &copy;day                                                | YEAR                    | WM/Year                           | DATE_RELEASED/50              |
+| DATE                       | TDRC   | ICRD  | &copy;day                                                | YEAR                    | WM/Year                           | DATE_RECORDED/30              |
 | DISCNUMBER                 | TPOS   |       | disk                                                     | DISC                    | WM/PartOfSet                      | PART_NUMBER/50                |
 | DISCSUBTITLE               | TSST   | PRT1  | \----:com.apple.iTunes:DISCSUBTITLE                      |                         | WM/SetSubTitle                    |                               |
 | DISCTOTAL                  |        |       |                                                          |                         |                                   | TOTAL_PARTS/50                |

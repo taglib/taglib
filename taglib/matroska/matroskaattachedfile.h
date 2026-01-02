@@ -22,6 +22,7 @@
 #define TAGLIB_MATROSKAATTACHEDFILE_H
 
 #include <memory>
+#include "tstring.h"
 #include "taglib_export.h"
 
 namespace TagLib {
@@ -39,7 +40,9 @@ namespace TagLib {
       /*!
        * Construct an attached file.
        */
-      AttachedFile();
+      AttachedFile(const ByteVector &data, const String &fileName,
+                   const String &mediaType, UID uid = 0,
+                   const String &description = String());
 
       /*!
        * Construct an attached file as a copy of \a other.
@@ -72,19 +75,9 @@ namespace TagLib {
       void swap(AttachedFile &other) noexcept;
 
       /*!
-       * Set the \a fileName of the attached file.
-       */
-      void setFileName(const String &fileName);
-
-      /*!
        * Returns the filename of the attached file.
        */
       const String &fileName() const;
-
-      /*!
-       * Set a human-friendly \a description for the attached file.
-       */
-      void setDescription(const String &description);
 
       /*!
        * Returns the human-friendly description for the attached file.
@@ -92,29 +85,14 @@ namespace TagLib {
       const String &description() const;
 
       /*!
-       * Set the \a mediaType of the attached file.
-       */
-      void setMediaType(const String &mediaType);
-
-      /*!
        * Returns the media type of the attached file.
        */
       const String &mediaType() const;
 
       /*!
-       * Set the data of the attached file.
-       */
-      void setData(const ByteVector &data);
-
-      /*!
        * Returns the data of the attached file.
        */
       const ByteVector &data() const;
-
-      /*!
-       * Set the \a uid representing the file, as random as possible.
-       */
-      void setUID(UID uid);
 
       /*!
        * Returns the UID of the attached file.

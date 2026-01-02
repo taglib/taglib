@@ -73,17 +73,9 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
     if(!(filename && data))
       continue;
 
-    Matroska::AttachedFile file;
-    file.setFileName(*filename);
-    file.setData(*data);
-    if(description)
-      file.setDescription(*description);
-    if(mediaType)
-      file.setMediaType(*mediaType);
-    if(uid)
-      file.setUID(uid);
-
-    attachments->addAttachedFile(file);
+    attachments->addAttachedFile(Matroska::AttachedFile(
+      *data, *filename, mediaType ? *mediaType : String(),
+      uid, description ? *description : String()));
   }
   return attachments;
 }

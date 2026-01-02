@@ -100,6 +100,21 @@ namespace TagLib {
       void addSimpleTag(const SimpleTag &tag);
 
       /*!
+       * Add multiple tag attributes.
+       */
+      void addSimpleTags(const SimpleTagsList &simpleTags);
+
+      /*!
+       * Insert a tag attribute at position \a index.
+       */
+      void insertSimpleTag(unsigned int index, const SimpleTag &tag);
+
+      /*!
+       * Remove a tag attribute at position \a index.
+       */
+      void removeSimpleTag(unsigned int index);
+
+      /*!
        * Remove a tag attribute.
        */
       void removeSimpleTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue,

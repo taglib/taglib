@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "matroskaattachedfile.h"
-#include "tstring.h"
 #include "tbytevector.h"
 
 using namespace TagLib;
@@ -27,7 +26,10 @@ using namespace TagLib;
 class Matroska::AttachedFile::AttachedFilePrivate
 {
 public:
-  AttachedFilePrivate() = default;
+  AttachedFilePrivate(const ByteVector &data, const String &fileName,
+    const String &mediaType, UID uid, const String &description) :
+    fileName(fileName), description(description), mediaType(mediaType),
+    data(data), uid(uid) {}
   ~AttachedFilePrivate() = default;
   String fileName;
   String description;
@@ -40,8 +42,10 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-Matroska::AttachedFile::AttachedFile() :
-  d(std::make_unique<AttachedFilePrivate>())
+Matroska::AttachedFile::AttachedFile(const ByteVector &data,
+  const String &fileName, const String &mediaType, UID uid,
+  const String &description) :
+  d(std::make_unique<AttachedFilePrivate>(data, fileName, mediaType, uid, description))
 {
 }
 
@@ -69,19 +73,9 @@ void Matroska::AttachedFile::swap(AttachedFile &other) noexcept
   swap(d, other.d);
 }
 
-void Matroska::AttachedFile::setFileName(const String &fileName)
-{
-  d->fileName = fileName;
-}
-
 const String &Matroska::AttachedFile::fileName() const
 {
   return d->fileName;
-}
-
-void Matroska::AttachedFile::setDescription(const String &description)
-{
-  d->description = description;
 }
 
 const String &Matroska::AttachedFile::description() const
@@ -89,29 +83,14 @@ const String &Matroska::AttachedFile::description() const
   return d->description;
 }
 
-void Matroska::AttachedFile::setMediaType(const String &mediaType)
-{
-  d->mediaType = mediaType;
-}
-
 const String &Matroska::AttachedFile::mediaType() const
 {
   return d->mediaType;
 }
 
-void Matroska::AttachedFile::setData(const ByteVector &data)
-{
-  d->data = data;
-}
-
 const ByteVector &Matroska::AttachedFile::data() const
 {
   return d->data;
-}
-
-void Matroska::AttachedFile::setUID(UID uid)
-{
-  d->uid = uid;
 }
 
 Matroska::AttachedFile::UID Matroska::AttachedFile::uid() const

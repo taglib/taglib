@@ -28,12 +28,12 @@ using namespace TagLib;
 class Matroska::SimpleTag::SimpleTagPrivate
 {
 public:
-  explicit SimpleTagPrivate(const String &name, const String &value,
+  SimpleTagPrivate(const String &name, const String &value,
     TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
     unsigned long long trackUid) :
     value(value), name(name), language(language), trackUid(trackUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
-  explicit SimpleTagPrivate(const String &name, const ByteVector &value,
+  SimpleTagPrivate(const String &name, const ByteVector &value,
     TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
     unsigned long long trackUid) :
     value(value), name(name), language(language), trackUid(trackUid),
