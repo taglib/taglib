@@ -71,33 +71,25 @@ namespace TagLib::EBML {
   template unsigned int VINTSizeLength<8>(uint8_t firstByte);
 }
 
-template <typename T>
-std::pair<int, T> EBML::readVINT(File &file)
+std::pair<unsigned int, uint64_t> EBML::readVINT(File &file)
 {
-  static_assert(sizeof(T) == 8);
   auto buffer = file.readBlock(1);
   if(buffer.size() != 1) {
     debug("Failed to read VINT size");
     return {0, 0};
   }
-  unsigned int nb_bytes = VINTSizeLength<8>(*buffer.begin());
-  if(!nb_bytes)
+  unsigned int numBytes = VINTSizeLength<8>(*buffer.begin());
+  if(!numBytes)
     return {0, 0};
 
-  if(nb_bytes > 1)
-    buffer.append(file.readBlock(nb_bytes - 1));
-  const int bitsToShift = static_cast<int>(sizeof(T) * 8) - 7 * nb_bytes;
-  offset_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
-  return { nb_bytes, static_cast<T>(buffer.toLongLong(true)) & mask };
+  if(numBytes > 1)
+    buffer.append(file.readBlock(numBytes - 1));
+  const int bitsToShift = static_cast<int>(sizeof(uint64_t) * 8) - 7 * numBytes;
+  const uint64_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
+  return { numBytes, buffer.toULongLong(true) & mask };
 }
 
-namespace TagLib::EBML {
-  template std::pair<int, offset_t> readVINT<offset_t>(File &file);
-  template std::pair<int, uint64_t> readVINT<uint64_t>(File &file);
-}
-
-template <typename T>
-std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
+std::pair<unsigned int, uint64_t> EBML::parseVINT(const ByteVector &buffer)
 {
   if(buffer.isEmpty())
     return {0, 0};
@@ -106,14 +98,9 @@ std::pair<int, T> EBML::parseVINT(const ByteVector &buffer)
   if(!numBytes)
     return {0, 0};
 
-  const int bitsToShift = static_cast<int>(sizeof(T) * 8) - 7 * numBytes;
-  offset_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
-  return { numBytes, static_cast<T>(buffer.toLongLong(true)) & mask };
-}
-
-namespace TagLib::EBML {
-  template std::pair<int, offset_t> parseVINT<offset_t>(const ByteVector &buffer);
-  template std::pair<int, uint64_t> parseVINT<uint64_t>(const ByteVector &buffer);
+  const int bitsToShift = static_cast<int>(sizeof(uint64_t) * 8) - 7 * numBytes;
+  const uint64_t mask = 0xFFFFFFFFFFFFFFFF >> bitsToShift;
+  return { numBytes, buffer.toULongLong(true) & mask };
 }
 
 ByteVector EBML::renderVINT(uint64_t number, int minSizeLength)

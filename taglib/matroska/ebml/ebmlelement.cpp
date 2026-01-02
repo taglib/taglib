@@ -52,7 +52,7 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
   }
 
   // Get the size length and data length
-  const auto &[sizeLength, dataSize] = readVINT<offset_t>(file);
+  const auto &[sizeLength, dataSize] = readVINT(file);
   if(!sizeLength)
     return nullptr;
 

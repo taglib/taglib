@@ -126,7 +126,8 @@ Matroska::SimpleTag::ValueType Matroska::SimpleTag::type() const
 String Matroska::SimpleTag::toString() const
 {
   if(std::holds_alternative<String>(d->value)) {
-    return std::get<String>(d->value);
+    // get_if() used instead of get() to support restricted compilers
+    return *std::get_if<String>(&d->value);
   }
   return {};
 }
@@ -134,7 +135,8 @@ String Matroska::SimpleTag::toString() const
 ByteVector Matroska::SimpleTag::toByteVector() const
 {
   if(std::holds_alternative<ByteVector>(d->value)) {
-    return std::get<ByteVector>(d->value);
+    // get_if() used instead of get() to support restricted compilers
+    return *std::get_if<ByteVector>(&d->value);
   }
   return {};
 }

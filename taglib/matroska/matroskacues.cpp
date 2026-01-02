@@ -66,28 +66,32 @@ ByteVector Matroska::Cues::renderInternal()
       // Relative position, optional
       if(cueTrack->getRelativePosition().has_value()) {
         auto relativePosition = EBML::make_unique_element<EBML::Element::Id::MkCueRelativePosition>();
-        relativePosition->setValue(cueTrack->getRelativePosition().value());
+        // operator*() used instead of value() to support restricted compilers
+        relativePosition->setValue(*cueTrack->getRelativePosition());
         cueTrackElement->appendElement(std::move(relativePosition));
       }
 
       // Duration, optional
       if(cueTrack->getDuration().has_value()) {
         auto duration = EBML::make_unique_element<EBML::Element::Id::MkCueDuration>();
-        duration->setValue(cueTrack->getDuration().value());
+        // operator*() used instead of value() to support restricted compilers
+        duration->setValue(*cueTrack->getDuration());
         cueTrackElement->appendElement(std::move(duration));
       }
 
       // Block number, optional
       if(cueTrack->getBlockNumber().has_value()) {
         auto blockNumber = EBML::make_unique_element<EBML::Element::Id::MkCueBlockNumber>();
-        blockNumber->setValue(cueTrack->getBlockNumber().value());
+        // operator*() used instead of value() to support restricted compilers
+        blockNumber->setValue(*cueTrack->getBlockNumber());
         cueTrackElement->appendElement(std::move(blockNumber));
       }
 
       // Codec state, not in version 1
       if(cueTrack->getCodecState().has_value()) {
         auto codecState = EBML::make_unique_element<EBML::Element::Id::MkCueCodecState>();
-        codecState->setValue(cueTrack->getCodecState().value());
+        // operator*() used instead of value() to support restricted compilers
+        codecState->setValue(*cueTrack->getCodecState());
         cueTrackElement->appendElement(std::move(codecState));
       }
 
@@ -209,8 +213,9 @@ bool Matroska::CueTrack::isValid(TagLib::File &file, offset_t segmentDataOffset)
     debug("No cluster found at position");
     return false;
   }
-  if(codecState.has_value() && codecState.value() != 0) {
-    file.seek(segmentDataOffset + codecState.value());
+  if(codecState.has_value() && *codecState != 0) {
+    // operator*() used instead of value() to support restricted compilers
+    file.seek(segmentDataOffset + *codecState);
     if(EBML::Element::readId(file) != static_cast<unsigned int>(EBML::Element::Id::MkCodecState)) {
       debug("No codec state found at position");
       return false;
@@ -296,8 +301,9 @@ bool Matroska::CueTrack::adjustOffset(offset_t offset, offset_t delta)
     clusterPosition += delta;
     ret = true;
   }
+  // operator*() used instead of value() to support restricted compilers
   if(offset_t codecStateValue;
-     codecState.has_value() && (codecStateValue = codecState.value()) != 0 &&
+     codecState.has_value() && (codecStateValue = *codecState) != 0 &&
      codecStateValue > offset) {
     codecState = codecStateValue + delta;
     ret = true;

@@ -37,11 +37,9 @@ namespace TagLib {
     template <int maxSizeLength>
     unsigned int VINTSizeLength(uint8_t firstByte);
 
-    template <typename T>
-    std::pair<int, T> readVINT(File &file);
+    std::pair<unsigned int, uint64_t> readVINT(File &file);
 
-    template <typename T>
-    std::pair<int, T> parseVINT(const ByteVector &buffer);
+    std::pair<unsigned int, uint64_t> parseVINT(const ByteVector &buffer);
 
     ByteVector renderVINT(uint64_t number, int minSizeLength);
 

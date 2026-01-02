@@ -52,10 +52,12 @@ EBML::FloatElement::FloatVariantType EBML::FloatElement::getValue() const
 double EBML::FloatElement::getValueAsDouble(double defaultValue) const
 {
   if(std::holds_alternative<double>(value)) {
-    return std::get<double>(value);
+    // get_if() used instead of get() to support restricted compilers
+    return *std::get_if<double>(&value);
   }
   if(std::holds_alternative<float>(value)) {
-    return std::get<float>(value);
+    // get_if() used instead of get() to support restricted compilers
+    return *std::get_if<float>(&value);
   }
   return defaultValue;
 }
@@ -93,10 +95,12 @@ ByteVector EBML::FloatElement::render()
 {
   ByteVector data;
   if(std::holds_alternative<double>(value)) {
-    data = ByteVector::fromFloat64BE(std::get<double>(value));
+    // get_if() used instead of get() to support restricted compilers
+    data = ByteVector::fromFloat64BE(*std::get_if<double>(&value));
   }
   else if(std::holds_alternative<float>(value)) {
-    data = ByteVector::fromFloat32BE(std::get<float>(value));
+    // get_if() used instead of get() to support restricted compilers
+    data = ByteVector::fromFloat32BE(*std::get_if<float>(&value));
   }
   ByteVector buffer = renderId();
   buffer.append(renderVINT(data.size(), 0));
