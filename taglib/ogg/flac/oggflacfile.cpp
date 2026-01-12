@@ -107,6 +107,11 @@ Properties *Ogg::FLAC::File::audioProperties() const
 
 bool Ogg::FLAC::File::save()
 {
+  if (d->commentPacket == 0) {
+    debug("Ogg::FLAC::File::save() -- Invalid, file has no Vorbis comment metadata block.");
+    return false;
+  }
+
   d->xiphCommentData = d->comment->render(false);
 
   // Create FLAC metadata-block:
