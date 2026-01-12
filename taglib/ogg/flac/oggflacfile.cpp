@@ -290,13 +290,28 @@ void Ogg::FLAC::File::scan()
     if(blockType == 1) {
       // debug("Ogg::FLAC::File::scan() -- Padding found");
     }
+    else if(blockType == 2) {
+      // debug("Ogg::FLAC::File::scan() -- Application block found");
+    }
+    else if(blockType == 3) {
+      // debug("Ogg::FLAC::File::scan() -- Seek table found");
+    }
     else if(blockType == 4) {
       // debug("Ogg::FLAC::File::scan() -- Vorbis-comments found");
       d->xiphCommentData = metadataHeader.mid(4, length);
       d->hasXiphComment = true;
       d->commentPacket = ipacket;
     }
-    else if(blockType > 5) {
+    else if(blockType == 5) {
+      // debug("Ogg::FLAC::File::scan() -- Cuesheet found");
+    }
+    else if(blockType == 6) {
+      // debug("Ogg::FLAC::File::scan() -- Picture found");
+    }
+    else if(blockType == 127) {
+      debug("Ogg::FLAC::File::scan() -- Forbidden block type found");
+    }
+    else if(blockType > 6) {
       debug("Ogg::FLAC::File::scan() -- Unknown metadata block");
     }
   }
