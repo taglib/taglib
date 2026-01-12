@@ -46,6 +46,7 @@ public:
 
   bool hasXiphComment { false };
   int commentPacket { 0 };
+  int lastHeaderPacket { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,6 +129,12 @@ bool Ogg::FLAC::File::save()
   // Set the type of the metadata-block to be a Xiph / Vorbis comment
 
   v[0] = 4;
+
+  // If the comment block is the last one, set the corresponding bit
+
+  if (d->commentPacket == d->lastHeaderPacket) {
+    v[0] = static_cast<char>(0x84);
+  }
 
   // Append the comment-data after the 32 bit header
 
@@ -282,6 +289,12 @@ void Ogg::FLAC::File::scan()
       return;
     }
 
+    if(((header[0] & 0xff) == 0xff) && ((header[1] & 0xff) == 0xf8)) {
+      ipacket--;
+      debug("Ogg::FLAC::File::scan() -- Found frame sync marker, possibly missing last block marker");
+      break;
+    }
+
     blockType = header[0] & 0x7f;
     lastBlock = (header[0] & 0x80) != 0;
     length = header.toUInt(1, 3, true);
@@ -315,6 +328,7 @@ void Ogg::FLAC::File::scan()
       debug("Ogg::FLAC::File::scan() -- Unknown metadata block");
     }
   }
+  d->lastHeaderPacket = ipacket;
 
   // End of metadata, now comes the datastream
   d->streamStart = overhead;
