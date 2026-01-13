@@ -191,12 +191,15 @@ bool Ogg::File::readPages(unsigned int i)
       const Page *page = d->pages.back();
       packetIndex = nextPacketIndex(page);
       offset = page->fileOffset() + page->size();
+
+      // Enough pages have been fetched.
+      if(packetIndex > i) {
+        return true;
+      }
+      else if(page->header()->lastPageOfStream()) {
+        return false;
+      }
     }
-
-    // Enough pages have been fetched.
-
-    if(packetIndex > i)
-      return true;
 
     // Read the next page and add it to the page list.
 
@@ -208,9 +211,6 @@ bool Ogg::File::readPages(unsigned int i)
 
     nextPage->setFirstPacketIndex(packetIndex);
     d->pages.append(nextPage);
-
-    if(nextPage->header()->lastPageOfStream())
-      return false;
   }
 }
 
