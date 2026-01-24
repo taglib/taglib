@@ -64,8 +64,15 @@ if(WITH_SHORTEN)
     ${CMAKE_CURRENT_SOURCE_DIR}/shorten
   )
 endif()
+if(WITH_MATROSKA)
+  set(tag_HDR_DIRS ${tag_HDR_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/matroska
+    ${CMAKE_CURRENT_SOURCE_DIR}/matroska/ebml
+  )
+endif()
 include_directories(${tag_HDR_DIRS})
 
+set(tag_PRIVATE_HDRS)
 set(tag_HDRS
   tag.h
   fileref.h
@@ -218,6 +225,41 @@ if(WITH_SHORTEN)
     shorten/shortenfile.h
     shorten/shortenproperties.h
     shorten/shortentag.h
+  )
+endif()
+if(WITH_MATROSKA)
+  set(tag_HDRS ${tag_HDRS}
+    matroska/matroskaattachedfile.h
+    matroska/matroskaattachments.h
+    matroska/matroskachapter.h
+    matroska/matroskachapteredition.h
+    matroska/matroskachapters.h
+    matroska/matroskaelement.h
+    matroska/matroskafile.h
+    matroska/matroskaproperties.h
+    matroska/matroskasimpletag.h
+    matroska/matroskatag.h
+  )
+  set(tag_PRIVATE_HDRS ${tag_PRIVATE_HDRS}
+    matroska/ebml/ebmlbinaryelement.h
+    matroska/ebml/ebmlelement.h
+    matroska/ebml/ebmlmasterelement.h
+    matroska/ebml/ebmlmkattachments.h
+    matroska/ebml/ebmlmkchapters.h
+    matroska/ebml/ebmlmkcues.h
+    matroska/ebml/ebmlmkseekhead.h
+    matroska/ebml/ebmlmksegment.h
+    matroska/ebml/ebmlmkinfo.h
+    matroska/ebml/ebmlmktracks.h
+    matroska/ebml/ebmlmktags.h
+    matroska/ebml/ebmlstringelement.h
+    matroska/ebml/ebmluintelement.h
+    matroska/ebml/ebmlfloatelement.h
+    matroska/ebml/ebmlutils.h
+    matroska/ebml/ebmlvoidelement.h
+    matroska/matroskacues.h
+    matroska/matroskaseekhead.h
+    matroska/matroskasegment.h
   )
 endif()
 
@@ -410,6 +452,43 @@ if(WITH_SHORTEN)
   )
 endif()
 
+if(WITH_MATROSKA)
+  set(matroska_SRCS
+    matroska/matroskaattachedfile.cpp
+    matroska/matroskaattachments.cpp
+    matroska/matroskachapter.cpp
+    matroska/matroskachapteredition.cpp
+    matroska/matroskachapters.cpp
+    matroska/matroskacues.cpp
+    matroska/matroskaelement.cpp
+    matroska/matroskafile.cpp
+    matroska/matroskaproperties.cpp
+    matroska/matroskaseekhead.cpp
+    matroska/matroskasegment.cpp
+    matroska/matroskasimpletag.cpp
+    matroska/matroskatag.cpp
+  )
+
+  set(ebml_SRCS
+    matroska/ebml/ebmlbinaryelement.cpp
+    matroska/ebml/ebmlelement.cpp
+    matroska/ebml/ebmlmasterelement.cpp
+    matroska/ebml/ebmlmkattachments.cpp
+    matroska/ebml/ebmlmkchapters.cpp
+    matroska/ebml/ebmlmkcues.cpp
+    matroska/ebml/ebmlmkseekhead.cpp
+    matroska/ebml/ebmlmksegment.cpp
+    matroska/ebml/ebmlmkinfo.cpp
+    matroska/ebml/ebmlmktracks.cpp
+    matroska/ebml/ebmlmktags.cpp
+    matroska/ebml/ebmlstringelement.cpp
+    matroska/ebml/ebmluintelement.cpp
+    matroska/ebml/ebmlfloatelement.cpp
+    matroska/ebml/ebmlutils.cpp
+    matroska/ebml/ebmlvoidelement.cpp
+  )
+endif()
+
 set(toolkit_SRCS
   toolkit/tstring.cpp
   toolkit/tstringlist.cpp
@@ -433,7 +512,7 @@ set(tag_LIB_SRCS
   ${vorbis_SRCS} ${oggflacs_SRCS} ${mpc_SRCS} ${ape_SRCS} ${toolkit_SRCS} ${flacs_SRCS}
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
-  ${dsf_SRCS} ${dsdiff_SRCS} ${shorten_SRCS}
+  ${dsf_SRCS} ${dsdiff_SRCS} ${shorten_SRCS} ${matroska_SRCS} ${ebml_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp
@@ -441,7 +520,7 @@ set(tag_LIB_SRCS
   tagutils.cpp
 )
 
-add_library(tag ${tag_LIB_SRCS} ${tag_HDRS})
+add_library(tag ${tag_LIB_SRCS} ${tag_HDRS} ${tag_PRIVATE_HDRS})
 
 target_include_directories(tag INTERFACE
   $<INSTALL_INTERFACE:include>

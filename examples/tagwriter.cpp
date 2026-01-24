@@ -71,6 +71,7 @@ void usage()
   std::cout << "  -R <tagname> <tagvalue>"   << std::endl;
   std::cout << "  -I <tagname> <tagvalue>"   << std::endl;
   std::cout << "  -D <tagname>"   << std::endl;
+  std::cout << "  -C <complex-property-key> <key1=val1,key2=val2,...>" << std::endl;
   std::cout << "  -p <picturefile> <description> (\"\" \"\" to remove)" << std::endl;
   std::cout << std::endl;
 
@@ -93,6 +94,102 @@ void checkForRejectedProperties(const TagLib::PropertyMap &tags)
       }
     }
   }
+}
+
+/*!
+ * Create a list of variant maps from a string.
+ * The shorthand syntax in the string is kept simple, but should be sufficient
+ * for testing. Multiple maps are separated by ';', values within a map are
+ * assigned with key=value and separated by a ','. Types are detected, use
+ * double quotes to force a string. A ByteVector can be constructed from the
+ * contents of a file, the path is given after "file://". There is no escape
+ * character, use hex codes for ',' (\x2C) or ';' (\x3B).
+ */
+TagLib::List<TagLib::VariantMap> parseComplexPropertyValues(const TagLib::String &str)
+{
+  if(str.isEmpty() || str == "\"\"" || str == "''") {
+    return {};
+  }
+  TagLib::List<TagLib::VariantMap> values;
+  const auto valueStrs = str.split(";");
+  for(const auto &valueStr : valueStrs) {
+    TagLib::VariantMap value;
+    const auto keyValStrs = valueStr.split(",");
+    for(const auto &keyValStr : keyValStrs) {
+      if(int equalPos = keyValStr.find('='); equalPos != -1) {
+        TagLib::String key = keyValStr.substr(0, equalPos);
+        TagLib::String valStr = keyValStr.substr(equalPos + 1);
+        bool hasDot = false;
+        bool hasNonNumeric = false;
+        bool hasSign = false;
+        for(auto it = valStr.cbegin(); it != valStr.cend(); ++it) {
+          if(it == valStr.cbegin() && (*it == '-' || *it == '+')) {
+            hasSign = true;
+          }
+          else if(*it == '.') {
+            hasDot = true;
+          }
+          else if(*it < '0' || *it > '9') {
+            hasNonNumeric = true;
+          }
+        }
+        TagLib::Variant val;
+        if(valStr == "null") {
+          // keep empty variant
+        }
+        else if(valStr == "true" || valStr == "false") {
+          val = TagLib::Variant(valStr == "true");
+        }
+        else if(!hasNonNumeric && hasDot) {
+          val = TagLib::Variant(std::stod(valStr.to8Bit()));
+        }
+        else if(!hasNonNumeric && hasSign) {
+          val = valStr.toLongLong(nullptr);
+        }
+        else if(!hasNonNumeric) {
+          val = valStr.toULongLong(nullptr);
+        }
+        else if(valStr.startsWith("file://")) {
+          auto filePath = valStr.substr(7 );
+          if(isFile(filePath.toCString())) {
+            std::ifstream fs;
+            fs.open(filePath.toCString(), std::ios::in | std::ios::binary);
+            std::stringstream buffer;
+            buffer << fs.rdbuf();
+            fs.close();
+            TagLib::String buf(buffer.str());
+            val = TagLib::Variant(buf.data(TagLib::String::Latin1));
+          }
+          else {
+            std::cout << filePath.toCString() << " not found." << std::endl;
+            val = TagLib::Variant(TagLib::ByteVector());
+          }
+        }
+        else {
+          int len = valStr.size();
+          if(len >= 2 && valStr[0] == '"' && valStr[len - 1] == '"') {
+            valStr = valStr.substr(1, len - 2);
+          }
+          int hexPos = 0;
+          while((hexPos = valStr.find("\\x", hexPos)) != -1) {
+            char ch;
+            bool ok;
+            if(static_cast<int>(valStr.length()) < hexPos + 4 ||
+               (ch = static_cast<char>(
+                 valStr.substr(hexPos + 2, 2).toLongLong(&ok, 16)), !ok)) {
+              break;
+            }
+            valStr = valStr.substr(0, hexPos) + ch + valStr.substr(hexPos + 4);
+            ++hexPos;
+          }
+          val = TagLib::Variant(valStr);
+        }
+        value.insert(key, val);
+      }
+    }
+    values.append(value);
+  }
+  return values;
 }
 
 int main(int argc, char *argv[])
@@ -168,6 +265,19 @@ int main(int argc, char *argv[])
           TagLib::PropertyMap map = f.properties();
           map.erase(value);
           checkForRejectedProperties(f.setProperties(map));
+          break;
+        }
+        case 'C': {
+          if(i + 2 < argc) {
+            numArgsConsumed = 3;
+            if(!value.isEmpty()) {
+              TagLib::List<TagLib::VariantMap> values = parseComplexPropertyValues(argv[i + 2]);
+              f.setComplexProperties(value, values);
+            }
+          }
+          else {
+            usage();
+          }
           break;
         }
         case 'p': {

@@ -473,6 +473,11 @@ public:
 #ifdef TAGLIB_WITH_SHORTEN
     CPPUNIT_ASSERT(extensions.contains("shn"));
 #endif
+#ifdef TAGLIB_WITH_MATROSKA
+    CPPUNIT_ASSERT(extensions.contains("mkv"));
+    CPPUNIT_ASSERT(extensions.contains("mka"));
+    CPPUNIT_ASSERT(extensions.contains("webm"));
+#endif
   }
 
   void testFileResolver()

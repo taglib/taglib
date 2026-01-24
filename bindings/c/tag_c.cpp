@@ -80,6 +80,9 @@
 #ifdef TAGLIB_WITH_SHORTEN
 #include "shortenfile.h"
 #endif
+#ifdef TAGLIB_WITH_MATROSKA
+#include "matroskafile.h"
+#endif
 
 using namespace TagLib;
 
@@ -240,6 +243,11 @@ TagLib_File *taglib_file_new_type_any_char(const T *filename, TagLib_File_Type t
 #ifdef TAGLIB_WITH_SHORTEN
   case TagLib_File_SHORTEN:
     file = new Shorten::File(filename);
+    break;
+#endif
+#ifdef TAGLIB_WITH_MATROSKA
+  case TagLib_File_MATROSKA:
+    file = new Matroska::File(filename);
     break;
 #endif
   default:

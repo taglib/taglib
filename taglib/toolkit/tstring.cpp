@@ -495,6 +495,30 @@ int String::toInt(bool *ok) const
   return static_cast<int>(value);
 }
 
+long long String::toLongLong(bool *ok, int base) const
+{
+  const wchar_t *beginPtr = d->data.c_str();
+  wchar_t *endPtr;
+  errno = 0;
+  const long long value = ::wcstoll(beginPtr, &endPtr, base);
+  if(ok) {
+    *ok = errno == 0 && endPtr > beginPtr && *endPtr == L'\0';
+  }
+  return value;
+}
+
+unsigned long long String::toULongLong(bool *ok, int base) const
+{
+  const wchar_t *beginPtr = d->data.c_str();
+  wchar_t *endPtr;
+  errno = 0;
+  const unsigned long long value = ::wcstoull(beginPtr, &endPtr, base);
+  if(ok) {
+    *ok = errno == 0 && endPtr > beginPtr && *endPtr == L'\0';
+  }
+  return value;
+}
+
 String String::stripWhiteSpace() const
 {
   static const wchar_t *WhiteSpaceChars = L"\t\n\f\r ";
@@ -523,6 +547,11 @@ String String::number(int n) // static
 }
 
 String String::fromLongLong(long long n) // static
+{
+  return std::to_string(n);
+}
+
+String String::fromULongLong(unsigned long long n) // static
 {
   return std::to_string(n);
 }

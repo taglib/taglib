@@ -2,6 +2,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/toolkit
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/ape
+  ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/matroska
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v1
   ${CMAKE_CURRENT_SOURCE_DIR}/../taglib/mpeg/id3v2
@@ -37,6 +38,18 @@ target_link_libraries(framelist tag)
 
 add_executable(strip-id3v1 strip-id3v1.cpp)
 target_link_libraries(strip-id3v1 tag)
+
+if(WITH_MATROSKA)
+  ########### next target ###############
+
+  add_executable(matroskareader matroskareader.cpp)
+  target_link_libraries(matroskareader tag)
+
+  ########### next target ###############
+
+  add_executable(matroskawriter matroskawriter.cpp)
+  target_link_libraries(matroskawriter tag)
+endif()
 
 install(TARGETS tagreader tagreader_c tagwriter framelist strip-id3v1
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
