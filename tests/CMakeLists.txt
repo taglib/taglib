@@ -131,6 +131,7 @@ IF(WITH_MP4)
     test_mp4.cpp
     test_mp4item.cpp
     test_mp4coverart.cpp
+    test_mp4stem.cpp
   )
 ENDIF()
 IF(WITH_ASF)

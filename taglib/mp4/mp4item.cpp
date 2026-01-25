@@ -44,6 +44,7 @@ public:
   StringList m_stringList;
   ByteVectorList m_byteVectorList;
   MP4::CoverArtList m_coverArtList;
+  MP4::Stem m_stem;
 };
 
 MP4::Item::Item() :
@@ -130,6 +131,13 @@ MP4::Item::Item(const MP4::CoverArtList &value) :
   d->m_coverArtList = value;
 }
 
+MP4::Item::Item(const MP4::Stem &value) :
+  d(std::make_shared<ItemPrivate>())
+{
+  d->type = Type::Stem;
+  d->m_stem = value;
+}
+
 void MP4::Item::setAtomDataType(MP4::AtomDataType type)
 {
   d->atomDataType = type;
@@ -194,6 +202,12 @@ MP4::Item::toCoverArtList() const
   return d->m_coverArtList;
 }
 
+MP4::Stem
+MP4::Item::toStem() const
+{
+  return d->m_stem;
+}
+
 bool
 MP4::Item::isValid() const
 {
@@ -234,6 +248,8 @@ bool MP4::Item::operator==(const Item &other) const
       return toByteVectorList() == other.toByteVectorList();
     case Type::CoverArtList:
       return toCoverArtList() == other.toCoverArtList();
+    case Type::Stem:
+      return toStem() == other.toStem();
     }
   }
   return false;

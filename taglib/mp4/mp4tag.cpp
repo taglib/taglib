@@ -32,6 +32,7 @@
 #include "mp4itemfactory.h"
 #include "mp4atom.h"
 #include "mp4coverart.h"
+#include "mp4stem.h"
 
 using namespace TagLib;
 
@@ -65,15 +66,22 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
   d->atoms = atoms;
 
   const MP4::Atom *ilst = atoms->find("moov", "udta", "meta", "ilst");
-  if(!ilst) {
-    //debug("Atom moov.udta.meta.ilst not found.");
-    return;
+  if(ilst) {
+    for(const auto &atom : ilst->children()) {
+      file->seek(atom->offset() + 8);
+      ByteVector data = d->file->readBlock(atom->length() - 8);
+      if(const auto &[name, itm] = d->factory->parseItem(atom, data);
+        itm.isValid()) {
+        addItem(name, itm);
+      }
+    }
   }
 
-  for(const auto &atom : ilst->children()) {
-    file->seek(atom->offset() + 8);
-    ByteVector data = d->file->readBlock(atom->length() - 8);
-    if(const auto &[name, itm] = d->factory->parseItem(atom, data);
+  const MP4::Atom *stem = atoms->find("moov", "udta", "stem");
+  if(stem) {
+    file->seek(stem->offset() + 8);
+    ByteVector data = d->file->readBlock(stem->length() - 8);
+    if(const auto &[name, itm] = d->factory->parseItem(stem, data);
        itm.isValid()) {
       addItem(name, itm);
     }
@@ -100,18 +108,33 @@ MP4::Tag::renderAtom(const ByteVector &name, const ByteVector &data) const
 bool
 MP4::Tag::save()
 {
-  ByteVector data;
+  ByteVector ilstData, stemData;
   for(const auto &[name, itm] : std::as_const(d->items)) {
-    data.append(d->factory->renderItem(name, itm));
+    if(name == "stem"){
+      stemData.append(d->factory->renderItem(name, itm));
+    } else {
+      ilstData.append(d->factory->renderItem(name, itm));
+    }
   }
-  data = renderAtom("ilst", data);
+  ilstData = renderAtom("ilst", ilstData);
 
   AtomList path = d->atoms->path("moov", "udta", "meta", "ilst");
   if(path.size() == 4) {
-    saveExisting(data, path);
+    saveExisting(ilstData, path);
   }
   else {
-    saveNew(data);
+    ByteVector metaData = renderAtom("meta", ByteVector(4, '\0') +
+                      renderAtom("hdlr", ByteVector(8, '\0') + ByteVector("mdirappl") +
+                                ByteVector(9, '\0')) +
+                      ilstData + padIlst(ilstData));
+    saveNew(metaData);
+  }
+
+  path = d->atoms->path("moov", "udta", "stem");
+  if(path.size() == 3) {
+    saveExisting(stemData, path);
+  } else if (!stemData.isEmpty()) {
+    saveNew(stemData);
   }
 
   return true;
@@ -124,6 +147,11 @@ MP4::Tag::strip()
 
   AtomList path = d->atoms->path("moov", "udta", "meta", "ilst");
   if(path.size() == 4) {
+    saveExisting(ByteVector(), path);
+  }
+
+  path = d->atoms->path("moov", "udta", "stem");
+  if(path.size() == 3) {
     saveExisting(ByteVector(), path);
   }
 
@@ -227,11 +255,6 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
 void
 MP4::Tag::saveNew(ByteVector data)
 {
-  data = renderAtom("meta", ByteVector(4, '\0') +
-                    renderAtom("hdlr", ByteVector(8, '\0') + ByteVector("mdirappl") +
-                               ByteVector(9, '\0')) +
-                    data + padIlst(data));
-
   AtomList path = d->atoms->path("moov", "udta");
   if(path.size() != 2) {
     path = d->atoms->path("moov");
@@ -510,13 +533,17 @@ StringList MP4::Tag::complexPropertyKeys() const
   if(d->items.contains("covr")) {
     keys.append("PICTURE");
   }
+  if(d->items.contains("stem")) {
+    keys.append("STEM");
+  }
   return keys;
 }
 
 List<VariantMap> MP4::Tag::complexProperties(const String &key) const
 {
   List<VariantMap> props;
-  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
     const CoverArtList pictures = d->items.value("covr").toCoverArtList();
     for(const CoverArt &picture : pictures) {
       String mimeType = "image/";
@@ -543,12 +570,20 @@ List<VariantMap> MP4::Tag::complexProperties(const String &key) const
       props.append(property);
     }
   }
+  else if(uppercaseKey == "STEM" && d->items.contains("stem")) {
+    const Stem stem = d->items.value("stem").toStem();
+
+    VariantMap property;
+    property.insert("manifest", stem.data());
+    props.append(property);
+  }
   return props;
 }
 
 bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
-  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
     CoverArtList pictures;
     for(const auto &property : value) {
       auto mimeType = property.value("mimeType").value<String>();
@@ -567,6 +602,13 @@ bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &v
       pictures.append(CoverArt(format, property.value("data").value<ByteVector>()));
     }
     d->items["covr"] = pictures;
+  }
+  else if(uppercaseKey == "STEM") {
+    if (!value.isEmpty()) {
+      d->items["stem"] = Stem(value.front().value("manifest").value<ByteVector>());
+    } else {
+      d->items.erase("stem");
+    }
   }
   else {
     return false;

@@ -142,6 +142,7 @@ namespace TagLib {
         Byte,
         Gnre,
         Covr,
+        Stem,
         TextImplicit,
         Text
       };
@@ -214,6 +215,8 @@ namespace TagLib {
         const MP4::Atom *atom, const ByteVector &bytes);
       static std::pair<String, Item> parseCovr(
         const MP4::Atom *atom, const ByteVector &data);
+      static std::pair<String, Item> parseStem(
+        const MP4::Atom *atom, const ByteVector &data);
 
       // Functions used by renderItem() to render atom data for items.
       static ByteVector renderAtom(
@@ -241,6 +244,8 @@ namespace TagLib {
       static ByteVector renderIntPairNoTrailing(
         const ByteVector &name, const MP4::Item &item);
       static ByteVector renderCovr(
+        const ByteVector &name, const MP4::Item &item);
+      static ByteVector renderStem(
         const ByteVector &name, const MP4::Item &item);
 
     private:
