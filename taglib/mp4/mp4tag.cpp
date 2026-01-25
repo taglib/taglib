@@ -108,33 +108,33 @@ MP4::Tag::renderAtom(const ByteVector &name, const ByteVector &data) const
 bool
 MP4::Tag::save()
 {
-  ByteVector ilstAtom, stemAtom;
+  ByteVector ilstData, stemData;
   for(const auto &[name, itm] : std::as_const(d->items)) {
     if(name == "stem"){
-      stemAtom.append(d->factory->renderItem(name, itm));
+      stemData.append(d->factory->renderItem(name, itm));
     } else {
-      ilstAtom.append(d->factory->renderItem(name, itm));
+      ilstData.append(d->factory->renderItem(name, itm));
     }
   }
-  ilstAtom = renderAtom("ilst", ilstAtom);
+  ilstData = renderAtom("ilst", ilstData);
 
   AtomList path = d->atoms->path("moov", "udta", "meta", "ilst");
   if(path.size() == 4) {
-    saveExisting(ilstAtom, path);
+    saveExisting(ilstData, path);
   }
   else {
     ByteVector metaData = renderAtom("meta", ByteVector(4, '\0') +
                       renderAtom("hdlr", ByteVector(8, '\0') + ByteVector("mdirappl") +
                                 ByteVector(9, '\0')) +
-                      ilstAtom + padIlst(ilstAtom));
+                      ilstData + padIlst(ilstData));
     saveNew(metaData);
   }
 
   path = d->atoms->path("moov", "udta", "stem");
   if(path.size() == 3) {
-    saveExisting(stemAtom, path);
-  } else if (!stemAtom.isEmpty()) {
-    saveNew(stemAtom);
+    saveExisting(stemData, path);
+  } else if (!stemData.isEmpty()) {
+    saveNew(stemData);
   }
 
   return true;
@@ -255,7 +255,6 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
 void
 MP4::Tag::saveNew(ByteVector data)
 {
-
   AtomList path = d->atoms->path("moov", "udta");
   if(path.size() != 2) {
     path = d->atoms->path("moov");

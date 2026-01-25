@@ -26,57 +26,53 @@
 #ifndef TAGLIB_MP4STEM_H
 #define TAGLIB_MP4STEM_H
 
-#include "tlist.h"
 #include "tbytevector.h"
 #include "taglib_export.h"
-#include "mp4atom.h"
 
-namespace TagLib {
-  namespace MP4 {
-    //! STEM
-    class StemPrivate
-    {
-    public:
-      ByteVector data;
-    };
+namespace TagLib::MP4 {
+  //! STEM
+  class StemPrivate
+  {
+  public:
+    ByteVector data;
+  };
 
-    class TAGLIB_EXPORT Stem
-    {
-    public:
-      Stem();
-      Stem(const ByteVector &data);
-      ~Stem();
+  class TAGLIB_EXPORT Stem
+  {
+  public:
+    Stem();
+    explicit Stem(const ByteVector &data);
+    ~Stem();
 
-      Stem(const Stem &item);
+    Stem(const Stem &item);
 
-      /*!
-       * Copies the contents of \a item into this Stem.
-       */
-      Stem &operator=(const Stem &item);
+    /*!
+     * Copies the contents of \a item into this Stem.
+     */
+    Stem &operator=(const Stem &item);
 
-      /*!
-       * Exchanges the content of the Stem with the content of \a item.
-       */
-      void swap(Stem &item) noexcept;
+    /*!
+     * Exchanges the content of the Stem with the content of \a item.
+     */
+    void swap(Stem &item) noexcept;
 
-      //! The image data
-      ByteVector data() const;
+    //! The Stem data
+    ByteVector data() const;
 
-      /*!
-       * Returns \c true if the Stem and \a other are of the same format and
-       * contain the same data.
-       */
-      bool operator==(const Stem &other) const;
+    /*!
+     * Returns \c true if the Stem and \a other contain the same data.
+     */
+    bool operator==(const Stem &other) const;
 
-      /*!
-       * Returns \c true if the Stem and \a other  differ in format or data.
-       */
-      bool operator!=(const Stem &other) const;
+    /*!
+     * Returns \c true if the Stem and \a other have different data.
+     */
+    bool operator!=(const Stem &other) const;
 
-    private:
-      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
-      std::shared_ptr<StemPrivate> d;
-    };
-  }  // namespace MP4
-}  // namespace TagLib
+  private:
+    TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
+    std::shared_ptr<StemPrivate> d;
+  };
+} // namespace TagLib::MP4
+
 #endif

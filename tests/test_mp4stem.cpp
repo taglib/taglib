@@ -24,7 +24,6 @@
  ***************************************************************************/
 
 #include <string>
-#include <cstdio>
 
 #include "tag.h"
 #include "mp4file.h"
@@ -47,7 +46,7 @@ class TestMP4Stem : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  void createTestFile(ScopedFileCopy& copy){
+  static void createTestFile(ScopedFileCopy &copy){
     MP4::File f(copy.fileName().c_str());
     CPPUNIT_ASSERT(!f.hasMP4Tag());
     auto &tag = *f.tag();
@@ -55,6 +54,7 @@ protected:
     CPPUNIT_ASSERT(tag.setComplexProperties(STEM_KEY, List<VariantMap>({{{"manifest", ByteVector("{some text data}")}}})));
     f.save();
   }
+
 public:
 
   void testCreate()
