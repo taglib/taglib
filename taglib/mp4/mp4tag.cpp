@@ -74,12 +74,8 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
         itm.isValid()) {
         addItem(name, itm);
       }
-    }    
-  } 
-  // else {
-  //   //debug("Atom moov.udta.meta.ilst not found.");
-  // }
-
+    }
+  }
 
   const MP4::Atom *stem = atoms->find("moov", "udta", "stem");
   if(stem) {
@@ -89,8 +85,6 @@ MP4::Tag::Tag(TagLib::File *file, MP4::Atoms *atoms,
        itm.isValid()) {
       addItem(name, itm);
     }
-  } else {
-    //debug("Atom moov.udta.stem not found.");
   }
 }
 
@@ -116,7 +110,7 @@ MP4::Tag::save()
 {
   ByteVector ilstAtom, stemAtom;
   for(const auto &[name, itm] : std::as_const(d->items)) {
-    if (name == "stem"){
+    if(name == "stem"){
       stemAtom.append(d->factory->renderItem(name, itm));
     } else {
       ilstAtom.append(d->factory->renderItem(name, itm));
@@ -135,7 +129,7 @@ MP4::Tag::save()
                       ilstAtom + padIlst(ilstAtom));
     saveNew(metaData);
   }
-  
+
   path = d->atoms->path("moov", "udta", "stem");
   if(path.size() == 3) {
     saveExisting(stemAtom, path);
@@ -549,7 +543,8 @@ StringList MP4::Tag::complexPropertyKeys() const
 List<VariantMap> MP4::Tag::complexProperties(const String &key) const
 {
   List<VariantMap> props;
-  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
     const CoverArtList pictures = d->items.value("covr").toCoverArtList();
     for(const CoverArt &picture : pictures) {
       String mimeType = "image/";
@@ -576,8 +571,8 @@ List<VariantMap> MP4::Tag::complexProperties(const String &key) const
       props.append(property);
     }
   }
-  else if(const String uppercaseKey = key.upper(); uppercaseKey == "STEM" && d->items.contains("stem")) {
-    const Stem stem = d->items.value("stem").toStem();  
+  else if(uppercaseKey == "STEM" && d->items.contains("stem")) {
+    const Stem stem = d->items.value("stem").toStem();
 
     VariantMap property;
     property.insert("manifest", stem.data());
@@ -588,7 +583,8 @@ List<VariantMap> MP4::Tag::complexProperties(const String &key) const
 
 bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &value)
 {
-  if(const String uppercaseKey = key.upper(); uppercaseKey == "PICTURE") {
+  const String uppercaseKey = key.upper();
+  if(uppercaseKey == "PICTURE") {
     CoverArtList pictures;
     for(const auto &property : value) {
       auto mimeType = property.value("mimeType").value<String>();
@@ -608,7 +604,7 @@ bool MP4::Tag::setComplexProperties(const String &key, const List<VariantMap> &v
     }
     d->items["covr"] = pictures;
   }
-  else if(const String uppercaseKey = key.upper(); uppercaseKey == "STEM") {    
+  else if(uppercaseKey == "STEM") {
     if (!value.isEmpty()) {
       d->items["stem"] = Stem(value.front().value("manifest").value<ByteVector>());
     } else {

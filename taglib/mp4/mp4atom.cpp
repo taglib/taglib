@@ -88,7 +88,7 @@ MP4::Atom::Atom(File *file)
 
   if(d->name == "stem") {
     file->seek(d->length - 8, File::Current);
-    return;        
+    return;
   }
 
   for(auto c : containers) {

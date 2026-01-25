@@ -1,6 +1,6 @@
 /***************************************************************************
-    copyright           : (C) 2009 by Lukas Lalinsky
-    email               : lukas@oxygene.sk
+    copyright            : (C) 2026 by Antoine Colombier
+    email                : antoine@mixxx.org
  ***************************************************************************/
 
 /***************************************************************************
@@ -34,6 +34,10 @@
 using namespace std;
 using namespace TagLib;
 
+namespace {
+const String STEM_KEY("STEM");
+}
+
 class TestMP4Stem : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMP4Stem);
@@ -46,9 +50,9 @@ protected:
   void createTestFile(ScopedFileCopy& copy){
     MP4::File f(copy.fileName().c_str());
     CPPUNIT_ASSERT(!f.hasMP4Tag());
-    auto& tag = *f.tag();
-    CPPUNIT_ASSERT_EQUAL(0U, tag.complexProperties("STEM").size());
-    CPPUNIT_ASSERT(tag.setComplexProperties("STEM", List<VariantMap>({{{"manifest", ByteVector("{some text data}")}}})));
+    auto &tag = *f.tag();
+    CPPUNIT_ASSERT_EQUAL(0U, tag.complexProperties(STEM_KEY).size());
+    CPPUNIT_ASSERT(tag.setComplexProperties(STEM_KEY, List<VariantMap>({{{"manifest", ByteVector("{some text data}")}}})));
     f.save();
   }
 public:
@@ -61,9 +65,9 @@ public:
     // Assert whether the newly created stem content is as expected
     {
       MP4::File f(copy.fileName().c_str());
-      auto& tag = *f.tag();
+      auto &tag = *f.tag();
       CPPUNIT_ASSERT(f.hasMP4Tag());
-      auto stems = tag.complexProperties("STEM");
+      auto stems = tag.complexProperties(STEM_KEY);
       CPPUNIT_ASSERT_EQUAL(1U, stems.size());
       CPPUNIT_ASSERT(stems.front().contains("manifest"));
       CPPUNIT_ASSERT_EQUAL(Variant(ByteVector("{some text data}")), stems.front().find("manifest")->second);
@@ -74,9 +78,9 @@ public:
   {
     ScopedFileCopy copy("no-tags", ".m4a");
     createTestFile(copy);
-      
+
     // Prepare so large test data, to ensure that free padding is correctly used
-    char* buffer = new char[1025]{'X'};
+    char *buffer = new char[1025]{'X'};
     buffer[1024] = '\0';
     String artist(buffer);
     std::memset(buffer, 'Y', 1024);
@@ -85,7 +89,7 @@ public:
     ByteVector newStem(buffer);
     delete [] buffer;
 
-    // Update tags and stems to force atom offset recalculation 
+    // Update tags and stems to force atom offset recalculation
     {
       MP4::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.setComplexProperties("PICTURE", List<VariantMap>({
@@ -96,7 +100,7 @@ public:
           {"description", String("Test")}
         }
       })));
-      CPPUNIT_ASSERT(f.tag()->setComplexProperties("STEM", List<VariantMap>({{{"manifest", newStem}}})));
+      CPPUNIT_ASSERT(f.tag()->setComplexProperties(STEM_KEY, List<VariantMap>({{{"manifest", newStem}}})));
       f.tag()->setArtist(artist);
       f.tag()->setTitle(title);
       f.save();
@@ -106,7 +110,7 @@ public:
       MP4::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.hasMP4Tag());
 
-      auto stems = f.tag()->complexProperties("STEM");
+      auto stems = f.tag()->complexProperties(STEM_KEY);
       CPPUNIT_ASSERT_EQUAL(1U, stems.size());
       CPPUNIT_ASSERT(stems.front().contains("manifest"));
       CPPUNIT_ASSERT_EQUAL(Variant(newStem), stems.front().find("manifest")->second);
@@ -130,17 +134,17 @@ public:
     ScopedFileCopy copy("no-tags", ".m4a");
     createTestFile(copy);
 
-    // Remove the stem 
+    // Remove the stem
     {
       MP4::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.hasMP4Tag());
-      CPPUNIT_ASSERT(f.tag()->setComplexProperties("STEM", List<VariantMap>()));
+      CPPUNIT_ASSERT(f.tag()->setComplexProperties(STEM_KEY, List<VariantMap>()));
       f.save();
     }
     {
       MP4::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasMP4Tag());
-      CPPUNIT_ASSERT(!f.tag()->complexPropertyKeys().contains("STEM"));
+      CPPUNIT_ASSERT(!f.tag()->complexPropertyKeys().contains(STEM_KEY));
     }
   }
 

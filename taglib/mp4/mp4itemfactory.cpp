@@ -180,10 +180,9 @@ std::pair<ByteVector, Item> ItemFactory::itemFromProperty(
     case ItemHandlerType::Text:
       return {name, values};
     case ItemHandlerType::Covr:
+    case ItemHandlerType::Stem:
       debug("MP4: Invalid item \"" + name + "\" for property");
       break;
-    case ItemHandlerType::Stem:
-      return {name, Item(values.front())};
     case ItemHandlerType::Unknown:
       debug("MP4: Unknown item name \"" + name + "\" for property");
       break;
