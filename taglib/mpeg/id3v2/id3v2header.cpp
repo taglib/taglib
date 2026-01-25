@@ -207,6 +207,13 @@ void Header::parse(const ByteVector &data)
 
   // The first three bytes, data[0..2], are the File Identifier, "ID3". (structure 3.1 "file identifier")
 
+  // 3.1 states: "Version or revision will never be $FF."
+  if(static_cast<unsigned char>(data[3]) == 0xFF || static_cast<unsigned char>(data[4]) == 0xFF) {
+    d->tagSize = 0;
+    debug("TagLib::ID3v2::Header::parse() - The version or revision in the id3v2 header was 0xFF.");
+    return;
+  }
+
   // Read the version number from the fourth and fifth bytes.
   d->majorVersion = data[3];   // (structure 3.1 "major version")
   d->revisionNumber = data[4]; // (structure 3.1 "revision number")
