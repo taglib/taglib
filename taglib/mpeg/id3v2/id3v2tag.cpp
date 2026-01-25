@@ -794,11 +794,11 @@ void ID3v2::Tag::read()
   d->file->seek(d->tagOffset);
   d->header.setData(d->file->readBlock(Header::size()));
 
-  // If the tag size is greater than the file size the tag is
-  // invalid.
+  // If the tag size is greater than the remaining file size from the current
+  // position, the tag is invalid.
 
-  if(d->header.tagSize() > d->file->length()) {
-    debug("ID3v2::Tag::read() - tag size greater than file size");
+  if(d->header.tagSize() > d->file->length() - d->tagOffset - Header::size()) {
+    debug("ID3v2::Tag::read() - tag size greater than remaining file size");
     d->header.setTagSize(0);
   }
 
