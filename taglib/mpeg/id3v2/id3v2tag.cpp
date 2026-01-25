@@ -794,6 +794,14 @@ void ID3v2::Tag::read()
   d->file->seek(d->tagOffset);
   d->header.setData(d->file->readBlock(Header::size()));
 
+  // If the tag size is greater than the file size the tag is
+  // invalid.
+
+  if(d->header.tagSize() > d->file->length()) {
+    debug("ID3v2::Tag::read() - tag size greater than file size");
+    d->header.setTagSize(0);
+  }
+
   // If the tag size is 0, then this is an invalid tag (tags must contain at
   // least one frame)
 
