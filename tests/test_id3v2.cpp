@@ -1746,7 +1746,7 @@ public:
     CPPUNIT_ASSERT(f.isValid());
 
     ID3v2::Tag *tag = f.ID3v2Tag();
-    CPPUNIT_ASSERT_EQUAL(tag->header()->tagSize(), 0);
+    CPPUNIT_ASSERT_EQUAL(tag->header()->tagSize(), static_cast<unsigned int>(0));
   }
 
 };
