@@ -139,6 +139,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyFrame);
   CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testParseTOCFrameWithManyChildren);
+  CPPUNIT_TEST(testInvalidID3v2Version);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1737,6 +1738,15 @@ public:
     CPPUNIT_ASSERT_EQUAL(1U, tocFrame->embeddedFrameList().size());
     tocFrame->removeEmbeddedFrames("TIT2");
     CPPUNIT_ASSERT(tocFrame->embeddedFrameList().isEmpty());
+  }
+
+  void testInvalidID3v2Version()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("id3v2-invalid-version.mp3"));
+    CPPUNIT_ASSERT(f.isValid());
+
+    ID3v2::Tag *tag = f.ID3v2Tag();
+    CPPUNIT_ASSERT(tag->header()->tagSize() == 0);
   }
 
 };
