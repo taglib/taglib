@@ -296,9 +296,9 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     frameDataOffset += 4;
   }
   if(frameDataOffset + frameDataLength > frameData.size()) {
-       debug("Invalid frame data length");
-       return ByteVector();
-    }
+    debug("Invalid frame data length");
+    return ByteVector();
+  }
 
   if(zlib::isAvailable() && d->header->compression() && !d->header->encryption()) {
     if(frameData.size() <= frameDataOffset) {
