@@ -201,7 +201,7 @@ void Header::parse(const ByteVector &data)
   if(std::any_of(sizeData.cbegin(), sizeData.cend(),
       [](unsigned char size) { return size >= 128; })) {
     d->tagSize = 0;
-    debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the id3v2 header was greater than the allowed 128.");
+    debug("TagLib::ID3v2::Header::parse() - One of the size bytes in the ID3v2 header was greater than the allowed 128.");
     return;
   }
 
@@ -210,7 +210,7 @@ void Header::parse(const ByteVector &data)
   // 3.1 states: "Version or revision will never be $FF."
   if(static_cast<unsigned char>(data[3]) == 0xFF || static_cast<unsigned char>(data[4]) == 0xFF) {
     d->tagSize = 0;
-    debug("TagLib::ID3v2::Header::parse() - The version or revision in the id3v2 header was 0xFF.");
+    debug("TagLib::ID3v2::Header::parse() - The version or revision in the ID3v2 header was 0xFF.");
     return;
   }
 
