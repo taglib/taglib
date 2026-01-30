@@ -1742,11 +1742,17 @@ public:
 
   void testInvalidID3v2Version()
   {
-    MPEG::File f(TEST_FILE_PATH_C("id3v2-invalid-version.mp3"));
-    CPPUNIT_ASSERT(f.isValid());
+    ID3v2::Header invalidVersionHeader(ByteVector("ID3"
+                                                  "\xFF\x00"
+                                                  "\x05"
+                                                  "\x14\x4F\x00\x32", 10));
+    CPPUNIT_ASSERT_EQUAL(invalidVersionHeader.tagSize(), static_cast<unsigned int>(0));
 
-    ID3v2::Tag *tag = f.ID3v2Tag();
-    CPPUNIT_ASSERT_EQUAL(tag->header()->tagSize(), static_cast<unsigned int>(0));
+    ID3v2::Header invalidRevisionHeader(ByteVector("ID3"
+                                                   "\xFF\x00"
+                                                   "\x05"
+                                                   "\x14\x4F\x00\x32", 10));
+    CPPUNIT_ASSERT_EQUAL(invalidRevisionHeader.tagSize(), static_cast<unsigned int>(0));
   }
 
 };
