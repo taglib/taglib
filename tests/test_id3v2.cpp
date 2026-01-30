@@ -233,13 +233,13 @@ public:
     f.setData(multiBomBeData);
     CPPUNIT_ASSERT_EQUAL(String("Foo Bar"), f.toString());
 
-    ByteVector singleBomLeData("TPE1\x00\x00\x00\x13\x00\x00\x01\xff\xfe"
+    ByteVector singleBomLeData("TPE1\x00\x00\x00\x11\x00\x00\x01\xff\xfe"
                                "F\0o\0o\0\0\0"
                                "B\0a\0r\0", 27);
     f.setData(singleBomLeData);
     CPPUNIT_ASSERT_EQUAL(String("Foo Bar"), f.toString());
 
-    ByteVector singleBomBeData("TPE1\x00\x00\x00\x13\x00\x00\x01\xfe\xff"
+    ByteVector singleBomBeData("TPE1\x00\x00\x00\x11\x00\x00\x01\xfe\xff"
                                "\0F\0o\0o\0\0"
                                "\0B\0a\0r", 27);
     f.setData(singleBomBeData);
@@ -280,7 +280,7 @@ public:
   void testParseAPIC_UTF16_BOM()
   {
     ID3v2::AttachedPictureFrame f(ByteVector(
-      "\x41\x50\x49\x43\x00\x02\x0c\x59\x00\x00\x01\x69\x6d\x61\x67\x65"
+      "\x41\x50\x49\x43\x00\x00\x00\x26\x00\x00\x01\x69\x6d\x61\x67\x65"
       "\x2f\x6a\x70\x65\x67\x00\x00\xfe\xff\x00\x63\x00\x6f\x00\x76\x00"
       "\x65\x00\x72\x00\x2e\x00\x6a\x00\x70\x00\x67\x00\x00\xff\xd8\xff",
       16 * 3));
@@ -667,7 +667,7 @@ public:
   {
     ID3v2::SynchronizedLyricsFrame f(
       ByteVector("SYLT"                      // Frame ID
-                 "\x00\x00\x00\x21"          // Frame size
+                 "\x00\x00\x00\x1e"          // Frame size
                  "\x00\x00"                  // Frame flags
                  "\x00"                      // Text encoding
                  "eng"                       // Language
@@ -1423,7 +1423,7 @@ public:
 
     auto chapterData =
       ByteVector("CHAP"                     // Frame ID
-                 "\x00\x00\x00\x20"         // Frame size
+                 "\x00\x00\x00\x12"         // Frame size
                  "\x00\x00"                 // Frame flags
                  "\x43\x00"                 // Element ID ("C")
                  "\x00\x00\x00\x03"         // Start time
@@ -1446,7 +1446,10 @@ public:
     CPPUNIT_ASSERT(static_cast<unsigned int>(0x03) == f1.endOffset());
     CPPUNIT_ASSERT(static_cast<unsigned int>(0x00) == f1.embeddedFrameList().size());
 
-    ID3v2::ChapterFrame f2(&header, chapterData + embeddedFrameData);
+    auto chapWithTit2Data = chapterData + embeddedFrameData;
+    // Adapt the frame size for the added embedded frame data.
+    chapWithTit2Data[7] = static_cast<char>(chapterData[7] + embeddedFrameData.size());
+    ID3v2::ChapterFrame f2(&header, chapWithTit2Data);
 
     CPPUNIT_ASSERT_EQUAL(ByteVector("C"), f2.elementID());
     CPPUNIT_ASSERT(static_cast<unsigned int>(0x03) == f2.startTime());

@@ -295,7 +295,10 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     frameDataLength = SynchData::toUInt(frameData.mid(headerSize, 4));
     frameDataOffset += 4;
   }
-  if(frameDataOffset + frameDataLength > frameData.size()) {
+  if(frameData.size() >= headerSize &&
+     frameDataOffset + frameDataLength > frameData.size()) {
+    // The first check is needed because some "dual purpose" frame constructors
+    // call this method with only the frame ID, i.e. without a complete header.
     debug("Invalid frame data length");
     return ByteVector();
   }
