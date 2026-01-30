@@ -1749,7 +1749,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(invalidVersionHeader.tagSize(), static_cast<unsigned int>(0));
 
     ID3v2::Header invalidRevisionHeader(ByteVector("ID3"
-                                                   "\xFF\x00"
+                                                   "\x04\xFF"
                                                    "\x05"
                                                    "\x14\x4F\x00\x32", 10));
     CPPUNIT_ASSERT_EQUAL(invalidRevisionHeader.tagSize(), static_cast<unsigned int>(0));
