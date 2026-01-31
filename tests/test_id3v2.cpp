@@ -139,6 +139,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyFrame);
   CPPUNIT_TEST(testDuplicateTags);
   CPPUNIT_TEST(testParseTOCFrameWithManyChildren);
+  CPPUNIT_TEST(testInvalidID3v2Version);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1737,6 +1738,21 @@ public:
     CPPUNIT_ASSERT_EQUAL(1U, tocFrame->embeddedFrameList().size());
     tocFrame->removeEmbeddedFrames("TIT2");
     CPPUNIT_ASSERT(tocFrame->embeddedFrameList().isEmpty());
+  }
+
+  void testInvalidID3v2Version()
+  {
+    ID3v2::Header invalidVersionHeader(ByteVector("ID3"
+                                                  "\xFF\x00"
+                                                  "\x05"
+                                                  "\x14\x4F\x00\x32", 10));
+    CPPUNIT_ASSERT_EQUAL(invalidVersionHeader.tagSize(), 0U);
+
+    ID3v2::Header invalidRevisionHeader(ByteVector("ID3"
+                                                   "\x04\xFF"
+                                                   "\x05"
+                                                   "\x14\x4F\x00\x32", 10));
+    CPPUNIT_ASSERT_EQUAL(invalidRevisionHeader.tagSize(), 0U);
   }
 
 };
