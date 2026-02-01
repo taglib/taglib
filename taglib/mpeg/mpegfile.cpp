@@ -40,6 +40,8 @@
 #include "mpegheader.h"
 #include "mpegutils.h"
 
+#include <algorithm>
+
 using namespace TagLib;
 
 namespace
@@ -234,8 +236,7 @@ bool MPEG::File::save(int tags, StripTags strip, ID3v2::Version version, Duplica
 
       // ID3v2 tag is not empty. Update the old one or create a new one.
 
-      if(d->ID3v2Location < 0)
-        d->ID3v2Location = 0;
+      d->ID3v2Location = std::max<TagLib::offset_t>(d->ID3v2Location, 0);
 
       const ByteVector data = ID3v2Tag()->render(version);
       insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
