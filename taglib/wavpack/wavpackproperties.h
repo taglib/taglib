@@ -97,6 +97,11 @@ namespace TagLib {
       bool isLossless() const;
 
       /*!
+       * Returns whether or not the file is DSD (not PCM)
+       */
+      bool isDsd() const;
+
+      /*!
        * Returns the total number of audio samples in file.
        */
       unsigned int sampleFrames() const;

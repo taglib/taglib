@@ -51,6 +51,7 @@ public:
   int version { 0 };
   int bitsPerSample { 0 };
   bool lossless { false };
+  bool dsd { false };
   unsigned int sampleFrames { 0 };
 };
 
@@ -100,6 +101,11 @@ int WavPack::Properties::bitsPerSample() const
 bool WavPack::Properties::isLossless() const
 {
   return d->lossless;
+}
+
+bool WavPack::Properties::isDsd() const
+{
+  return d->dsd;
 }
 
 unsigned int WavPack::Properties::sampleFrames() const
@@ -291,6 +297,7 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
       d->bitsPerSample = static_cast<int>(((flags & BYTES_STORED) + 1) * 8 - ((flags & SHIFT_MASK) >> SHIFT_LSB));
       d->sampleRate    = static_cast<int>(smplRate);
       d->lossless      = !(flags & HYBRID_FLAG);
+      d->dsd           = (flags & DSD_FLAG) != 0;
       d->sampleFrames  = smplFrames;
     }
 
