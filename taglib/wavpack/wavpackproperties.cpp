@@ -260,14 +260,14 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
     const unsigned int flags = data.toUInt(24, false);
     unsigned int smplRate = sampleRates[(flags & SRATE_MASK) >> SRATE_LSB];
 
-    if(!blockSamples) {        // ignore blocks with no samples
-      offset += blockSize + 8;
-      continue;
-    }
-
     if(blockSize < 24 || blockSize > 1048576) {
       debug("WavPack::Properties::read() -- Invalid block header found.");
       break;
+    }
+
+    if(!blockSamples) {        // ignore blocks with no samples
+      offset += blockSize + 8;
+      continue;
     }
 
     // For non-standard sample rates or DSD audio files, we must read and parse the block
