@@ -449,10 +449,12 @@ UserTextIdentificationFrame *UserTextIdentificationFrame::find(
 
 String UserTextIdentificationFrame::txxxToKey(const String &description)
 {
-  const String d = description.upper();
+  String d = description.upper();
   for(const auto &[o, t] : txxxFrameTranslation) {
-    if(d == o)
-      return t;
+    if(d == o) {
+      d = t;
+      break;
+    }
   }
   return d;
 }
