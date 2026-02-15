@@ -29,6 +29,7 @@
 
 #include "tpropertymap.h"
 #include "tdebug.h"
+#include "unknownframe.h"
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -269,7 +270,7 @@ void TableOfContentsFrame::parseFields(const ByteVector &data)
       return;
 
     // Checks to make sure that frame parsed correctly.
-    if(frame->size() <= 0) {
+    if(frame->size() <= 0 || dynamic_cast<UnknownFrame *>(frame)) {
       delete frame;
       return;
     }
