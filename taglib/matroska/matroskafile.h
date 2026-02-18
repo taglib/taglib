@@ -25,10 +25,13 @@
 #include "tfile.h"
 #include "matroskaproperties.h"
 
+//! An implementation of Matroska metadata
 namespace TagLib::Matroska {
   class Tag;
   class Attachments;
   class Chapters;
+
+  //! An implementation of TagLib::File with Matroska specific methods
 
   /*!
    * Implementation of TagLib::File for Matroska.

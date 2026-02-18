@@ -12,7 +12,7 @@ include(CMakePackageConfigHelpers)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if(APPLE)
-  option(BUILD_FRAMEWORK "Build an OS X framework" OFF)
+  option(BUILD_FRAMEWORK "Build a macOS framework" OFF)
   if(BUILD_FRAMEWORK)
     set(BUILD_SHARED_LIBS ON)
     #set(CMAKE_MACOSX_RPATH 1)

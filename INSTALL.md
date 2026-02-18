@@ -63,13 +63,13 @@ and ID3 tags cannot be disabled. The following CMake options are available:
 | `WITH_APE`              | Build with APE, MPC, WavPack (default ON)          |
 | `WITH_ASF`              | Build with ASF (default ON)                        |
 | `WITH_DSF`              | Build with DSF (default ON)                        |
-| `WITH_MATROSKA`         | Build with Matroska (default ON)                   |
+| `WITH_MATROSKA`         | Build with Matroska, WebM (default ON)             |
 | `WITH_MOD`              | Build with Tracker modules (default ON)            |
 | `WITH_MP4`              | Build with MP4 (default ON)                        |
 | `WITH_RIFF`             | Build with AIFF, RIFF, WAV (default ON)            |
 | `WITH_SHORTEN`          | Build with Shorten (default ON)                    |
 | `WITH_TRUEAUDIO`        | Build with TrueAudio (default ON)                  |
-| `WITH_VORBIS`           | Build with Vorbis, FLAC, Ogg, Opus (default ON)    |
+| `WITH_VORBIS`           | Build with FLAC, Ogg, Opus, Speex (default ON)     |
 
 Note that disabling formats will remove exported symbols from the library and
 thus break binary compatibility. These options should therefore only be used
