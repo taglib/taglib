@@ -48,6 +48,9 @@ namespace TagLib
         MkTagTargets              = 0x63C0,
         MkTagTargetTypeValue      = 0x68CA,
         MkTagTrackUID             = 0x63C5,
+        MkTagEditionUID           = 0x63C9,
+        MkTagChapterUID           = 0x63C4,
+        MkTagAttachmentUID        = 0x63C6,
         MkSimpleTag               = 0x67C8,
         MkTagName                 = 0x45A3,
         MkTagLanguage             = 0x447A,
@@ -181,6 +184,9 @@ namespace TagLib
     template <> struct GetElementTypeById<Element::Id::MkCodecID> { using type = Latin1StringElement; };
     template <> struct GetElementTypeById<Element::Id::MkTagTargetTypeValue> { using type = UIntElement; };
     template <> struct GetElementTypeById<Element::Id::MkTagTrackUID> { using type = UIntElement; };
+    template <> struct GetElementTypeById<Element::Id::MkTagEditionUID> { using type = UIntElement; };
+    template <> struct GetElementTypeById<Element::Id::MkTagChapterUID> { using type = UIntElement; };
+    template <> struct GetElementTypeById<Element::Id::MkTagAttachmentUID> { using type = UIntElement; };
     template <> struct GetElementTypeById<Element::Id::MkAttachedFileUID> { using type = UIntElement; };
     template <> struct GetElementTypeById<Element::Id::MkSeekPosition> { using type = UIntElement; };
     template <> struct GetElementTypeById<Element::Id::MkTimestampScale> { using type = UIntElement; };

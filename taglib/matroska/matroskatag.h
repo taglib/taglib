@@ -121,6 +121,14 @@ namespace TagLib {
                            unsigned long long trackUid = 0);
 
       /*!
+       * Remove a tag attribute.
+       */
+      // BIC: Merge with the method above
+      void removeSimpleTag(const String &name, SimpleTag::TargetTypeValue targetTypeValue,
+                           unsigned long long trackUid, unsigned long long editionUid,
+                           unsigned long long chapterUid = 0, unsigned long long attachmentUid = 0);
+
+      /*!
        * Remove all tag attributes.
        */
       void clearSimpleTags();

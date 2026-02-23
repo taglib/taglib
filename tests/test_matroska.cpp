@@ -220,7 +220,8 @@ public:
       CPPUNIT_ASSERT(tag->isEmpty());
       tag->addSimpleTag(Matroska::SimpleTag(
         "Test Name 2", String("Test Value 2"),
-        Matroska::SimpleTag::TargetTypeValue::Album));
+        Matroska::SimpleTag::TargetTypeValue::Album,
+        {}, true, 0x72ac, 0xed17, 0xca97, 0xa7ac));
       tag->insertSimpleTag(0, Matroska::SimpleTag(
         "Test Name 1", String("Test Value 1"),
         Matroska::SimpleTag::TargetTypeValue::Track, "en"));
@@ -263,6 +264,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[0].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[0].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[0].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[1].language());
@@ -272,6 +276,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[1].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[1].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[1].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[2].language());
@@ -281,6 +288,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[2].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[2].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[2].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[3].language());
@@ -290,6 +300,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[3].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[3].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[3].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[4].language());
@@ -298,7 +311,10 @@ public:
       CPPUNIT_ASSERT_EQUAL(ByteVector(), simpleTags[4].toByteVector());
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[4].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Album, simpleTags[4].targetTypeValue());
-      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[4].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0x72acULL, simpleTags[4].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0xed17ULL, simpleTags[4].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0xca97ULL, simpleTags[4].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0xa7acULL, simpleTags[4].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[4].type());
 
       const auto &attachedFiles = attachments->attachedFileList();
@@ -315,7 +331,6 @@ public:
       expectedProps["DATE"] = StringList("1969");
       expectedProps["TEST NAME 1"] = StringList("Test Value 1");
       expectedProps["TITLE"] = StringList("Test title");
-      expectedProps.addUnsupportedData("Test Name 2");
       auto props = f.properties();
       if (expectedProps != props) {
         CPPUNIT_ASSERT_EQUAL(expectedProps.toString(), props.toString());
@@ -341,6 +356,10 @@ public:
             {"name", "Test Name 2"},
             {"value", "Test Value 2"},
             {"targetTypeValue", 50},
+            {"trackUid", 0x72acULL},
+            {"editionUid", 0xed17ULL},
+            {"chapterUid", 0xca97ULL},
+            {"attachmentUid", 0xa7acULL},
           };
       auto complexProps = f.complexProperties("Test Name 2");
       CPPUNIT_ASSERT(List<VariantMap>({expectedComplexProps}) == complexProps);
@@ -577,6 +596,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[0].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::None, simpleTags[0].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(9584013959154292683ULL, simpleTags[0].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[0].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[0].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[1].language());
@@ -586,6 +608,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[1].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[1].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[1].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[1].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[2].language());
@@ -595,6 +620,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[2].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[2].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[2].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[2].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[3].language());
@@ -604,6 +632,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[3].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[3].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[3].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[3].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[4].language());
@@ -613,6 +644,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[4].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[4].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[4].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[4].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[4].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[4].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[4].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[5].language());
@@ -622,6 +656,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[5].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[5].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[5].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[5].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[5].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[5].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[5].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[6].language());
@@ -631,6 +668,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[6].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[6].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[6].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[6].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[6].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[6].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[6].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[7].language());
@@ -640,6 +680,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[7].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[7].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[7].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[7].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[7].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[7].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[7].type());
 
       CPPUNIT_ASSERT_EQUAL(String("und"), simpleTags[8].language());
@@ -649,6 +692,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(true, simpleTags[8].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Album, simpleTags[8].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[8].trackUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[8].editionUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[8].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(0ULL, simpleTags[8].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[8].type());
 
       auto props = f.properties();
@@ -817,6 +863,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(trackUidTag.value("name").value<String>(), simpleTags[0].name());
       CPPUNIT_ASSERT_EQUAL(trackUidTag.value("defaultLanguage").value<bool>(), simpleTags[0].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(trackUidTag.value("trackUid").value<unsigned long long>(), simpleTags[0].trackUid());
+      CPPUNIT_ASSERT_EQUAL(trackUidTag.value("editionUid").value<unsigned long long>(), simpleTags[0].editionUid());
+      CPPUNIT_ASSERT_EQUAL(trackUidTag.value("chapterUid").value<unsigned long long>(), simpleTags[0].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(trackUidTag.value("attachmentUid").value<unsigned long long>(), simpleTags[0].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::None, simpleTags[0].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(ByteVector(), simpleTags[0].toByteVector());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[0].type());
@@ -844,6 +893,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(trackUidTag.value("name").value<String>(), simpleTags[0].name());
       CPPUNIT_ASSERT_EQUAL(trackUidTag.value("defaultLanguage").value<bool>(), simpleTags[0].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(trackUidTag.value("trackUid").value<unsigned long long>(), simpleTags[0].trackUid());
+      CPPUNIT_ASSERT_EQUAL(trackUidTag.value("editionUid").value<unsigned long long>(), simpleTags[0].editionUid());
+      CPPUNIT_ASSERT_EQUAL(trackUidTag.value("chapterUid").value<unsigned long long>(), simpleTags[0].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(trackUidTag.value("attachmentUid").value<unsigned long long>(), simpleTags[0].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::None, simpleTags[0].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(ByteVector(), simpleTags[0].toByteVector());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[0].type());
@@ -853,6 +905,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(targetTypeTag.value("name").value<String>(), simpleTags[1].name());
       CPPUNIT_ASSERT_EQUAL(targetTypeTag.value("defaultLanguage").value<bool>(), simpleTags[1].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(targetTypeTag.value("trackUid").value<unsigned long long>(), simpleTags[1].trackUid());
+      CPPUNIT_ASSERT_EQUAL(targetTypeTag.value("editionUid").value<unsigned long long>(), simpleTags[1].editionUid());
+      CPPUNIT_ASSERT_EQUAL(targetTypeTag.value("chapterUid").value<unsigned long long>(), simpleTags[1].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(targetTypeTag.value("attachmentUid").value<unsigned long long>(), simpleTags[1].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Subtrack, simpleTags[1].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(ByteVector(), simpleTags[1].toByteVector());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::StringType, simpleTags[1].type());
@@ -862,6 +917,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(binaryTag.value("name").value<String>(), simpleTags[2].name());
       CPPUNIT_ASSERT_EQUAL(binaryTag.value("defaultLanguage").value<bool>(), simpleTags[2].defaultLanguageFlag());
       CPPUNIT_ASSERT_EQUAL(binaryTag.value("trackUid").value<unsigned long long>(), simpleTags[2].trackUid());
+      CPPUNIT_ASSERT_EQUAL(binaryTag.value("editionUid").value<unsigned long long>(), simpleTags[2].editionUid());
+      CPPUNIT_ASSERT_EQUAL(binaryTag.value("chapterUid").value<unsigned long long>(), simpleTags[2].chapterUid());
+      CPPUNIT_ASSERT_EQUAL(binaryTag.value("attachmentUid").value<unsigned long long>(), simpleTags[2].attachmentUid());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::TargetTypeValue::Track, simpleTags[2].targetTypeValue());
       CPPUNIT_ASSERT_EQUAL(String(), simpleTags[2].toString());
       CPPUNIT_ASSERT_EQUAL(Matroska::SimpleTag::ValueType::BinaryType, simpleTags[2].type());
