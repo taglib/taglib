@@ -51,6 +51,21 @@ int main(int argc, char *argv[])
         TagLib::Utils::formatString("%llu",trackUid).toCString(false)
       );
     }
+    if(auto editionUid = t.editionUid()) {
+      PRINT_PRETTY("Edition UID",
+        TagLib::Utils::formatString("%llu",editionUid).toCString(false)
+      );
+    }
+    if(auto chapterUid = t.chapterUid()) {
+      PRINT_PRETTY("Chapter UID",
+        TagLib::Utils::formatString("%llu",chapterUid).toCString(false)
+      );
+    }
+    if(auto attachmentUid = t.attachmentUid()) {
+      PRINT_PRETTY("Attachment UID",
+        TagLib::Utils::formatString("%llu",attachmentUid).toCString(false)
+      );
+    }
     const TagLib::String &language = t.language();
     PRINT_PRETTY("Language", !language.isEmpty() ? language.toCString(false) : "Not set");
 

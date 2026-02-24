@@ -30,19 +30,26 @@ class Matroska::SimpleTag::SimpleTagPrivate
 public:
   SimpleTagPrivate(const String &name, const String &value,
     TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
-    unsigned long long trackUid) :
+    unsigned long long trackUid, unsigned long long editionUid,
+    unsigned long long chapterUid, unsigned long long attachmentUid) :
     value(value), name(name), language(language), trackUid(trackUid),
+    editionUid(editionUid), chapterUid(chapterUid), attachmentUid(attachmentUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
   SimpleTagPrivate(const String &name, const ByteVector &value,
     TargetTypeValue targetTypeValue, const String &language, bool defaultLanguage,
-    unsigned long long trackUid) :
+    unsigned long long trackUid, unsigned long long editionUid,
+    unsigned long long chapterUid, unsigned long long attachmentUid) :
     value(value), name(name), language(language), trackUid(trackUid),
+    editionUid(editionUid), chapterUid(chapterUid), attachmentUid(attachmentUid),
     targetTypeValue(targetTypeValue), defaultLanguageFlag(defaultLanguage) {}
 
   const std::variant<String, ByteVector> value;
   const String name;
   const String language;
   const unsigned long long trackUid;
+  const unsigned long long editionUid;
+  const unsigned long long chapterUid;
+  const unsigned long long attachmentUid;
   const TargetTypeValue targetTypeValue;
   const bool defaultLanguageFlag;
 };
@@ -56,7 +63,19 @@ Matroska::SimpleTag::SimpleTag(const String &name, const String &value,
                                const String &language, bool defaultLanguage,
                                unsigned long long trackUid) :
   d(std::make_unique<SimpleTagPrivate>(name, value, targetTypeValue,
-    language, defaultLanguage, trackUid))
+    language, defaultLanguage, trackUid, 0, 0, 0))
+{
+}
+
+Matroska::SimpleTag::SimpleTag(const String &name, const String &value,
+                               TargetTypeValue targetTypeValue,
+                               const String &language, bool defaultLanguage,
+                               unsigned long long trackUid,
+                               unsigned long long editionUid,
+                               unsigned long long chapterUid,
+                               unsigned long long attachmentUid) :
+  d(std::make_unique<SimpleTagPrivate>(name, value, targetTypeValue,
+    language, defaultLanguage, trackUid, editionUid, chapterUid, attachmentUid))
 {
 }
 
@@ -65,7 +84,19 @@ Matroska::SimpleTag::SimpleTag(const String &name, const ByteVector &value,
                                const String &language, bool defaultLanguage,
                                unsigned long long trackUid) :
   d(std::make_unique<SimpleTagPrivate>(name, value, targetTypeValue,
-    language, defaultLanguage, trackUid))
+    language, defaultLanguage, trackUid, 0, 0, 0))
+{
+}
+
+Matroska::SimpleTag::SimpleTag(const String &name, const ByteVector &value,
+                               TargetTypeValue targetTypeValue,
+                               const String &language, bool defaultLanguage,
+                               unsigned long long trackUid,
+                               unsigned long long editionUid,
+                               unsigned long long chapterUid,
+                               unsigned long long attachmentUid) :
+  d(std::make_unique<SimpleTagPrivate>(name, value, targetTypeValue,
+    language, defaultLanguage, trackUid, editionUid, chapterUid, attachmentUid))
 {
 }
 
@@ -116,6 +147,21 @@ bool Matroska::SimpleTag::defaultLanguageFlag() const
 unsigned long long Matroska::SimpleTag::trackUid() const
 {
   return d->trackUid;
+}
+
+unsigned long long Matroska::SimpleTag::editionUid() const
+{
+  return d->editionUid;
+}
+
+unsigned long long Matroska::SimpleTag::chapterUid() const
+{
+  return d->chapterUid;
+}
+
+unsigned long long Matroska::SimpleTag::attachmentUid() const
+{
+  return d->attachmentUid;
 }
 
 Matroska::SimpleTag::ValueType Matroska::SimpleTag::type() const

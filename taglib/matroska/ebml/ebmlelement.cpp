@@ -84,6 +84,9 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
     RETURN_ELEMENT_FOR_CASE(Id::MkCodecID);
     RETURN_ELEMENT_FOR_CASE(Id::MkTagTargetTypeValue);
     RETURN_ELEMENT_FOR_CASE(Id::MkTagTrackUID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagEditionUID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagChapterUID);
+    RETURN_ELEMENT_FOR_CASE(Id::MkTagAttachmentUID);
     RETURN_ELEMENT_FOR_CASE(Id::MkTagsLanguageDefault);
     RETURN_ELEMENT_FOR_CASE(Id::MkAttachedFileUID);
     RETURN_ELEMENT_FOR_CASE(Id::MkSeekPosition);

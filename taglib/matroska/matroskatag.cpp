@@ -122,10 +122,20 @@ void Matroska::Tag::removeSimpleTag(const String &name,
   SimpleTag::TargetTypeValue targetTypeValue,
   unsigned long long trackUid)
 {
+  removeSimpleTag(name, targetTypeValue, trackUid, 0, 0, 0);
+}
+
+void Matroska::Tag::removeSimpleTag(const String& name,
+  SimpleTag::TargetTypeValue targetTypeValue,
+  unsigned long long trackUid, unsigned long long editionUid,
+  unsigned long long chapterUid, unsigned long long attachmentUid)
+{
   const auto it = std::find_if(d->tags.begin(), d->tags.end(),
-    [&name, targetTypeValue, trackUid](const SimpleTag &t) {
+    [&name, targetTypeValue, trackUid, editionUid, chapterUid, attachmentUid](
+      const SimpleTag &t) {
         return t.name() == name && t.targetTypeValue() == targetTypeValue &&
-               t.trackUid() == trackUid;
+               t.trackUid() == trackUid && t.editionUid() == editionUid &&
+               t.chapterUid() == chapterUid && t.attachmentUid() == attachmentUid;
     }
   );
   if(it != d->tags.end()) {
@@ -260,12 +270,18 @@ ByteVector Matroska::Tag::renderInternal()
   for(const auto &tag : std::as_const(d->tags)) {
     auto targetTypeValue = tag.targetTypeValue();
     auto trackUid = tag.trackUid();
+    auto editionUid = tag.editionUid();
+    auto chapterUid = tag.chapterUid();
+    auto attachmentUid = tag.attachmentUid();
     auto it = std::find_if(targetList.begin(),
       targetList.end(),
       [&](const auto &list) {
         const auto &simpleTag = list.front();
         return simpleTag.targetTypeValue() == targetTypeValue &&
-               simpleTag.trackUid() == trackUid;
+               simpleTag.trackUid() == trackUid &&
+               simpleTag.editionUid() == editionUid &&
+               simpleTag.chapterUid() == chapterUid &&
+               simpleTag.attachmentUid() == attachmentUid;
       }
     );
     if(it == targetList.end()) {
@@ -280,6 +296,9 @@ ByteVector Matroska::Tag::renderInternal()
     const auto &frontTag = list.front();
     const auto targetTypeValue = frontTag.targetTypeValue();
     const auto trackUid = frontTag.trackUid();
+    const auto editionUid = frontTag.editionUid();
+    const auto chapterUid = frontTag.chapterUid();
+    const auto attachmentUid = frontTag.attachmentUid();
     auto tag = EBML::make_unique_element<EBML::Element::Id::MkTag>();
 
     // Build <Tag Targets> element
@@ -292,6 +311,21 @@ ByteVector Matroska::Tag::renderInternal()
     if(trackUid != 0) {
       auto element = EBML::make_unique_element<EBML::Element::Id::MkTagTrackUID>();
       element->setValue(trackUid);
+      targets->appendElement(std::move(element));
+    }
+    if(editionUid != 0) {
+      auto element = EBML::make_unique_element<EBML::Element::Id::MkTagEditionUID>();
+      element->setValue(editionUid);
+      targets->appendElement(std::move(element));
+    }
+    if(chapterUid != 0) {
+      auto element = EBML::make_unique_element<EBML::Element::Id::MkTagChapterUID>();
+      element->setValue(chapterUid);
+      targets->appendElement(std::move(element));
+    }
+    if(attachmentUid != 0) {
+      auto element = EBML::make_unique_element<EBML::Element::Id::MkTagAttachmentUID>();
+      element->setValue(attachmentUid);
       targets->appendElement(std::move(element));
     }
     tag->appendElement(std::move(targets));
@@ -446,7 +480,8 @@ String Matroska::Tag::TagPrivate::getTag(const String &key) const
         && t.type() == SimpleTag::StringType
         && (t.targetTypeValue() == targetTypeValue ||
             (t.targetTypeValue() == SimpleTag::TargetTypeValue::None && !strict))
-        && t.trackUid() == 0;
+        && t.trackUid() == 0 && t.editionUid() == 0 && t.chapterUid() == 0
+        && t.attachmentUid() == 0;
     }
   );
   return it != tags.end() ? it->toString() : String();
@@ -456,7 +491,9 @@ PropertyMap Matroska::Tag::properties() const
 {
   PropertyMap properties;
   for(const auto &simpleTag : std::as_const(d->tags)) {
-    if(simpleTag.type() == SimpleTag::StringType && simpleTag.trackUid() == 0) {
+    if(simpleTag.type() == SimpleTag::StringType && simpleTag.trackUid() == 0 &&
+       simpleTag.editionUid() == 0 && simpleTag.chapterUid() == 0 &&
+       simpleTag.attachmentUid() == 0) {
       if(String key = translateTag(simpleTag.name(), simpleTag.targetTypeValue());
          !key.isEmpty())
         properties[key].append(simpleTag.toString());
@@ -472,7 +509,8 @@ PropertyMap Matroska::Tag::setProperties(const PropertyMap &propertyMap)
   // Remove all simple tags which would be returned in properties()
   for(auto it = d->tags.begin(); it != d->tags.end();) {
     if(it->type() == SimpleTag::StringType &&
-       it->trackUid() == 0 &&
+       it->trackUid() == 0 && it->editionUid() == 0 &&
+       it->chapterUid() == 0 && it->attachmentUid() == 0 &&
        !translateTag(it->name(), it->targetTypeValue()).isEmpty()) {
       it = d->tags.erase(it);
       setNeedsRender(true);
@@ -514,7 +552,8 @@ StringList Matroska::Tag::complexPropertyKeys() const
   StringList keys;
   for(const SimpleTag &t : std::as_const(d->tags)) {
     if(t.type() != SimpleTag::StringType ||
-       t.trackUid() != 0 ||
+       t.trackUid() != 0 || t.editionUid() != 0 ||
+       t.chapterUid() != 0 || t.attachmentUid() != 0 ||
        translateTag(t.name(), t.targetTypeValue()).isEmpty()) {
       keys.append(t.name());
     }
@@ -529,7 +568,8 @@ List<VariantMap> Matroska::Tag::complexProperties(const String &key) const
     for(const SimpleTag &t : std::as_const(d->tags)) {
       if(t.name() == key &&
          (t.type() != SimpleTag::StringType ||
-          t.trackUid() != 0 ||
+          t.trackUid() != 0 || t.editionUid() != 0 ||
+          t.chapterUid() != 0 || t.attachmentUid() != 0 ||
           translateTag(t.name(), t.targetTypeValue()).isEmpty())) {
         VariantMap property;
         if(t.type() != SimpleTag::StringType) {
@@ -544,6 +584,15 @@ List<VariantMap> Matroska::Tag::complexProperties(const String &key) const
         }
         if(t.trackUid()) {
           property.insert("trackUid", t.trackUid());
+        }
+        if(t.editionUid()) {
+          property.insert("editionUid", t.editionUid());
+        }
+        if(t.chapterUid()) {
+          property.insert("chapterUid", t.chapterUid());
+        }
+        if(t.attachmentUid()) {
+          property.insert("attachmentUid", t.attachmentUid());
         }
         property.insert("language", t.language());
         property.insert("defaultLanguage", t.defaultLanguageFlag());
@@ -564,7 +613,8 @@ bool Matroska::Tag::setComplexProperties(const String &key, const List<VariantMa
        [&key](const SimpleTag &t) {
          return t.name() == key &&
            (t.type() != SimpleTag::StringType ||
-            t.trackUid() != 0 ||
+            t.trackUid() != 0 || t.editionUid() != 0 ||
+            t.chapterUid() != 0 || t.attachmentUid() != 0 ||
             translateTag(t.name(), t.targetTypeValue()).isEmpty());
        }) > 0) {
     setNeedsRender(true);
@@ -591,11 +641,16 @@ bool Matroska::Tag::setComplexProperties(const String &key, const List<VariantMa
       auto language = property.value("language").value<String>();
       const bool defaultLanguage = property.value("defaultLanguage", true).value<bool>();
       const auto trackUid = property.value("trackUid", 0ULL).value<unsigned long long>();
+      const auto editionUid = property.value("editionUid", 0ULL).value<unsigned long long>();
+      const auto chapterUid = property.value("chapterUid", 0ULL).value<unsigned long long>();
+      const auto attachmentUid = property.value("attachmentUid", 0ULL).value<unsigned long long>();
       d->tags.append(property.contains("data")
         ? SimpleTag(key, property.value("data").value<ByteVector>(),
-                    targetTypeValue, language, defaultLanguage, trackUid)
+                    targetTypeValue, language, defaultLanguage, trackUid,
+                    editionUid, chapterUid, attachmentUid)
         : SimpleTag(key, property.value("value").value<String>(),
-                    targetTypeValue, language, defaultLanguage, trackUid));
+                    targetTypeValue, language, defaultLanguage, trackUid,
+                    editionUid, chapterUid, attachmentUid));
       setNeedsRender(true);
       result = true;
     }

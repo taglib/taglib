@@ -61,12 +61,28 @@ namespace TagLib {
                 unsigned long long trackUid = 0);
 
       /*!
+       * Construct a string simple tag.
+       */
+      // BIC: merge with constructor above
+      SimpleTag(const String& name, const String& value, TargetTypeValue targetTypeValue, const String& language,
+                bool defaultLanguage, unsigned long long trackUid, unsigned long long editionUid,
+                unsigned long long chapterUid = 0, unsigned long long attachmentUid = 0);
+
+      /*!
        * Construct a binary simple tag.
        */
       SimpleTag(const String &name, const ByteVector &value,
         TargetTypeValue targetTypeValue = None,
         const String &language = String(), bool defaultLanguage = true,
         unsigned long long trackUid = 0);
+
+      /*!
+       * Construct a binary simple tag.
+       */
+      // BIC: merge with constructor above
+      SimpleTag(const String& name, const ByteVector& value, TargetTypeValue targetTypeValue, const String& language,
+                bool defaultLanguage, unsigned long long trackUid, unsigned long long editionUid,
+                unsigned long long chapterUid = 0, unsigned long long attachmentUid = 0);
 
       /*!
        * Construct a simple tag as a copy of \a other.
@@ -123,6 +139,24 @@ namespace TagLib {
        * zero if not defined, the tag applies to all tracks
        */
       unsigned long long trackUid() const;
+
+      /*!
+       * Returns the UID that identifies the edition that the tags belong to,
+       * zero if not defined, the tag applies to all editions
+       */
+      unsigned long long editionUid() const;
+
+      /*!
+       * Returns the UID that identifies the chapter that the tags belong to,
+       * zero if not defined, the tag applies to all chapters
+       */
+      unsigned long long chapterUid() const;
+
+      /*!
+       * Returns the UID that identifies the attachment that the tags belong to,
+       * zero if not defined, the tag applies to all attachments
+       */
+      unsigned long long attachmentUid() const;
 
       /*!
        * Returns the type of the value.
