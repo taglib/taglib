@@ -103,7 +103,7 @@ bool MPEG::File::isSupported(IOStream *stream)
   const ByteVector buffer = Utils::readHeader(stream, bufferSize(), true, &headerOffset);
 
   if(buffer.isEmpty())
-      return false;
+	  return false;
 
   const offset_t originalPosition = stream->tell();
   AdapterFile file(stream);
@@ -447,6 +447,9 @@ offset_t MPEG::File::lastFrameOffset()
   else if(hasID3v1Tag())
     position = d->ID3v1Location - 1;
   else
+    position = length();
+
+  if (position > length()) //if the file is incomplete
     position = length();
 
   return previousFrameOffset(position);
