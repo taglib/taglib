@@ -1,3 +1,8 @@
+TagLib 2.2.1 (Mar 7, 2026)
+==========================
+
+ * Support edition, chapter and attachment UIDs in Matroska simple tags.
+
 TagLib 2.2 (Feb 18, 2026)
 =========================
 
