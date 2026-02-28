@@ -95,6 +95,10 @@ namespace
 {
   List<const FileRef::FileTypeResolver *> fileTypeResolvers;
 
+  // Forward declaration so detectByExtension() can call detectByContent().
+  File *detectByContent(IOStream *stream, bool readAudioProperties,
+                        AudioProperties::ReadStyle audioPropertiesStyle);
+
   // Detect the file type by user-defined resolvers.
 
   File *detectByResolvers(FileName fileName, bool readAudioProperties,
@@ -156,51 +160,82 @@ namespace
 
     File *file = nullptr;
 
-    if(ext == "MP3" || ext == "MP2" || ext == "AAC")
+    // assume true for formats without isSupported().
+    bool supported = true;
+
+    if(ext == "MP3" || ext == "MP2" || ext == "AAC") {
       file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = MPEG::File::isSupported(stream);
+    }
 #ifdef TAGLIB_WITH_VORBIS
-    else if(ext == "OGG")
+    else if(ext == "OGG") {
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = Ogg::Vorbis::File::isSupported(stream);
+    }
     else if(ext == "OGA") {
       /* .oga can be any audio in the Ogg container. First try FLAC, then Vorbis. */
       file = new Ogg::FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = Ogg::FLAC::File::isSupported(stream);
       if(!file->isValid()) {
         delete file;
         file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
+        supported = Ogg::Vorbis::File::isSupported(stream);
       }
     }
-    else if(ext == "FLAC")
+    else if(ext == "FLAC") {
       file = new FLAC::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "SPX")
+      supported = FLAC::File::isSupported(stream);
+    }
+    else if(ext == "SPX") {
       file = new Ogg::Speex::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "OPUS")
+      supported = Ogg::Speex::File::isSupported(stream);
+    }
+    else if(ext == "OPUS") {
       file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = Ogg::Opus::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_APE
-    else if(ext == "MPC")
+    else if(ext == "MPC") {
       file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "WV")
+      supported = MPC::File::isSupported(stream);
+    }
+    else if(ext == "WV") {
       file = new WavPack::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "APE")
+      supported = WavPack::File::isSupported(stream);
+    }
+    else if(ext == "APE") {
       file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = APE::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_TRUEAUDIO
-    else if(ext == "TTA")
+    else if(ext == "TTA") {
       file = new TrueAudio::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = TrueAudio::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_MP4
-    else if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V")
+    else if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V") {
       file = new MP4::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = MP4::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_ASF
-    else if(ext == "WMA" || ext == "ASF")
+    else if(ext == "WMA" || ext == "ASF") {
       file = new ASF::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = ASF::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_RIFF
-    else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
+    else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC") {
       file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "WAV")
+      supported = RIFF::AIFF::File::isSupported(stream);
+    }
+    else if(ext == "WAV") {
       file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = RIFF::WAV::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_MOD
     // module, nst and wow are possible but uncommon extensions
@@ -214,26 +249,48 @@ namespace
       file = new XM::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef TAGLIB_WITH_DSF
-    else if(ext == "DSF")
+    else if(ext == "DSF") {
       file = new DSF::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "DFF" || ext == "DSDIFF")
+      supported = DSF::File::isSupported(stream);
+    }
+    else if(ext == "DFF" || ext == "DSDIFF") {
       file = new DSDIFF::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = DSDIFF::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_SHORTEN
-    else if(ext == "SHN")
+    else if(ext == "SHN") {
       file = new Shorten::File(stream, readAudioProperties, audioPropertiesStyle);
+      supported = Shorten::File::isSupported(stream);
+    }
 #endif
 #ifdef TAGLIB_WITH_MATROSKA
-    else if(ext == "MKA" || ext == "MKV" || ext == "WEBM")
+    else if(ext == "MKA" || ext == "MKV" || ext == "WEBM") {
       file = new Matroska::File(stream, readAudioProperties);
+      supported = Matroska::File::isSupported(stream);
+    }
 #endif
 
     // if file is not valid, leave it to content-based detection.
 
     if(file) {
-      if(file->isValid())
-        return file;
-      delete file;
+      if(!file->isValid()) {
+        delete file;
+        return nullptr;
+      }
+
+      if(!supported) {
+        stream->seek(0);
+        File *contentFile = detectByContent(stream, readAudioProperties,
+                                            audioPropertiesStyle);
+        if(contentFile) {
+          delete file;
+          return contentFile;
+        }
+        // Content detection has failed. Trust the parser that said isValid.
+      }
+
+      return file;
     }
 
     return nullptr;
