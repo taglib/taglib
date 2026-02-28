@@ -551,10 +551,11 @@ StringList Matroska::Tag::complexPropertyKeys() const
 {
   StringList keys;
   for(const SimpleTag &t : std::as_const(d->tags)) {
-    if(t.type() != SimpleTag::StringType ||
-       t.trackUid() != 0 || t.editionUid() != 0 ||
-       t.chapterUid() != 0 || t.attachmentUid() != 0 ||
-       translateTag(t.name(), t.targetTypeValue()).isEmpty()) {
+    if((t.type() != SimpleTag::StringType ||
+        t.trackUid() != 0 || t.editionUid() != 0 ||
+        t.chapterUid() != 0 || t.attachmentUid() != 0 ||
+        translateTag(t.name(), t.targetTypeValue()).isEmpty()) &&
+       !keys.contains(t.name())) {
       keys.append(t.name());
     }
   }
