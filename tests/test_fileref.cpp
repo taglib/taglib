@@ -120,6 +120,7 @@ class TestFileRef : public CppUnit::TestFixture
   CPPUNIT_TEST(testVorbis);
   CPPUNIT_TEST(testSpeex);
   CPPUNIT_TEST(testFLAC);
+  CPPUNIT_TEST(testFLACWithMPEGSyncBytes);
   CPPUNIT_TEST(testOGA_FLAC);
   CPPUNIT_TEST(testOGA_Vorbis);
   CPPUNIT_TEST(testOpus);
@@ -302,6 +303,14 @@ public:
   void testFLAC()
   {
     fileRefSave<FLAC::File>("no-tags", ".flac");
+  }
+
+  void testFLACWithMPEGSyncBytes()
+  {
+    FileStream fs(TEST_FILE_PATH_C("mp3-flac.flac"));
+    FileRef f(&fs);
+    CPPUNIT_ASSERT(!f.isNull());
+    CPPUNIT_ASSERT(dynamic_cast<FLAC::File *>(f.file()) != nullptr);
   }
 #endif
 
