@@ -87,6 +87,7 @@ SET(test_runner_SRCS
   test_complexproperties.cpp
   test_file.cpp
   test_fileref.cpp
+  test_fileref_detect.cpp
   test_id3v1.cpp
   test_id3v2.cpp
   test_id3v2framefactory.cpp
