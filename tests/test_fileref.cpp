@@ -308,7 +308,10 @@ public:
   void testFLACWithMPEGSyncBytes()
   {
     FileStream fs(TEST_FILE_PATH_C("mp3-flac.flac"));
-    FileRef f(&fs);
+    CPPUNIT_ASSERT(fs.isOpen());
+    ByteVector data = fs.readBlock(fs.length());
+    ByteVectorStream bvs(data);
+    FileRef f(&bvs);
     CPPUNIT_ASSERT(!f.isNull());
     CPPUNIT_ASSERT(dynamic_cast<FLAC::File *>(f.file()) != nullptr);
   }
