@@ -101,6 +101,12 @@ namespace TagLib {
          */
         int opusVersion() const;
 
+        /*!
+         * Returns the output gain as an integer value,
+         * to convert to dB, divide by 256.
+         */
+        int outputGain() const;
+
       private:
         void read(File *file);
 

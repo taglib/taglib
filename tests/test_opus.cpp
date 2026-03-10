@@ -58,6 +58,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->inputSampleRate());
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->opusVersion());
+    CPPUNIT_ASSERT_EQUAL(-17920, f.audioProperties()->outputGain());
   }
 
   void testReadComments()
