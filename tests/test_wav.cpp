@@ -61,6 +61,10 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testWaveFormatExtensible);
   CPPUNIT_TEST(testInvalidChunk);
   CPPUNIT_TEST(testRIFFInfoProperties);
+  CPPUNIT_TEST(testBEXTTag);
+  CPPUNIT_TEST(testBEXTTagWithOtherTags);
+  CPPUNIT_TEST(testiXMLTag);
+  CPPUNIT_TEST(testiXMLTagWithOtherTags);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -479,6 +483,122 @@ public:
         {"IPRT", "2/4"}
       };
       CPPUNIT_ASSERT(expectedFields == infoTag->fieldListMap());
+    }
+  }
+
+  void testBEXTTag()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasBEXTTag());
+      CPPUNIT_ASSERT(f.BEXTData().isEmpty());
+
+      f.setBEXTData(ByteVector("test bext data"));
+      f.save();
+      CPPUNIT_ASSERT(f.hasBEXTTag());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("test bext data"), f.BEXTData());
+
+      f.setBEXTData(ByteVector());
+      f.save();
+      CPPUNIT_ASSERT(!f.hasBEXTTag());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasBEXTTag());
+      CPPUNIT_ASSERT(f.BEXTData().isEmpty());
+    }
+  }
+
+  void testBEXTTagWithOtherTags()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.InfoTag()->setTitle("INFO Title");
+      f.setBEXTData(ByteVector("bext payload"));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasInfoTag());
+      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("INFO Title"), f.InfoTag()->title());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("bext payload"), f.BEXTData());
+    }
+  }
+
+  void testiXMLTag()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasiXMLTag());
+      CPPUNIT_ASSERT(f.iXMLData().isEmpty());
+
+      f.setiXMLData("<BWFXML><IXML_VERSION>1.0</IXML_VERSION></BWFXML>");
+      f.save();
+      CPPUNIT_ASSERT(f.hasiXMLTag());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasiXMLTag());
+      CPPUNIT_ASSERT_EQUAL(
+        String("<BWFXML><IXML_VERSION>1.0</IXML_VERSION></BWFXML>"),
+        f.iXMLData());
+
+      f.setiXMLData(String());
+      f.save();
+      CPPUNIT_ASSERT(!f.hasiXMLTag());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasiXMLTag());
+      CPPUNIT_ASSERT(f.iXMLData().isEmpty());
+    }
+  }
+
+  void testiXMLTagWithOtherTags()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.setiXMLData("<BWFXML><SCENE>1</SCENE></BWFXML>");
+      f.setBEXTData(ByteVector("bext data"));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasiXMLTag());
+      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(
+        String("<BWFXML><SCENE>1</SCENE></BWFXML>"),
+        f.iXMLData());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("bext data"), f.BEXTData());
     }
   }
 

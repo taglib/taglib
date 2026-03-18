@@ -55,6 +55,11 @@ public:
 
   bool hasID3v2 { false };
   bool hasInfo { false };
+  bool hasiXML { false };
+  bool hasBEXT { false };
+
+  String iXMLData;
+  ByteVector bextData;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +111,26 @@ ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
 RIFF::Info::Tag *RIFF::WAV::File::InfoTag() const
 {
   return d->tag.access<RIFF::Info::Tag>(InfoIndex, false);
+}
+
+String RIFF::WAV::File::iXMLData() const
+{
+  return d->iXMLData;
+}
+
+void RIFF::WAV::File::setiXMLData(const String &data)
+{
+  d->iXMLData = data;
+}
+
+ByteVector RIFF::WAV::File::BEXTData() const
+{
+  return d->bextData;
+}
+
+void RIFF::WAV::File::setBEXTData(const ByteVector &data)
+{
+  d->bextData = data;
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)
@@ -160,6 +185,26 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
   if(strip == StripOthers)
     File::strip(static_cast<TagTypes>(AllTags & ~tags));
 
+  if(!d->bextData.isEmpty()) {
+    removeChunk("bext");
+    setChunkData("bext", d->bextData);
+    d->hasBEXT = true;
+  }
+  else if(d->hasBEXT) {
+    removeChunk("bext");
+    d->hasBEXT = false;
+  }
+
+  if(!d->iXMLData.isEmpty()) {
+    removeChunk("iXML");
+    setChunkData("iXML", d->iXMLData.data(String::UTF8));
+    d->hasiXML = true;
+  }
+  else if(d->hasiXML) {
+    removeChunk("iXML");
+    d->hasiXML = false;
+  }
+
   if(tags & ID3v2) {
     removeTagChunks(ID3v2);
 
@@ -191,6 +236,16 @@ bool RIFF::WAV::File::hasInfoTag() const
   return d->hasInfo;
 }
 
+bool RIFF::WAV::File::hasiXMLTag() const
+{
+  return d->hasiXML;
+}
+
+bool RIFF::WAV::File::hasBEXTTag() const
+{
+  return d->hasBEXT;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,6 +273,14 @@ void RIFF::WAV::File::read(bool readProperties)
           debug("RIFF::WAV::File::read() - Duplicate INFO tag found.");
         }
       }
+    }
+    else if(name == "iXML") {
+      d->hasiXML = true;
+      d->iXMLData = String(chunkData(i));
+    }
+    else if(name == "bext") {
+      d->hasBEXT = true;
+      d->bextData = chunkData(i);
     }
   }
 
