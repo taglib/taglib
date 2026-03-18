@@ -48,7 +48,6 @@ CMakeLists.txt.user*
 taglib.h.stamp
 taglib.xcodeproj
 CMakeScripts
-/.clang-format
 /compile_commands.json
 /build/
 .clangd
