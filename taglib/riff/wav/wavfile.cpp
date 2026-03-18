@@ -57,6 +57,9 @@ public:
   bool hasInfo { false };
   bool hasiXML { false };
   bool hasBEXT { false };
+
+  String iXMLData;
+  ByteVector bextData;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,6 +111,26 @@ ID3v2::Tag *RIFF::WAV::File::ID3v2Tag() const
 RIFF::Info::Tag *RIFF::WAV::File::InfoTag() const
 {
   return d->tag.access<RIFF::Info::Tag>(InfoIndex, false);
+}
+
+String RIFF::WAV::File::iXMLData() const
+{
+  return d->iXMLData;
+}
+
+void RIFF::WAV::File::setiXMLData(const String &data)
+{
+  d->iXMLData = data;
+}
+
+ByteVector RIFF::WAV::File::BEXTData() const
+{
+  return d->bextData;
+}
+
+void RIFF::WAV::File::setBEXTData(const ByteVector &data)
+{
+  d->bextData = data;
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)
@@ -162,9 +185,9 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
   if(strip == StripOthers)
     File::strip(static_cast<TagTypes>(AllTags & ~tags));
 
-  if(!bextTag.isEmpty()) {
+  if(!d->bextData.isEmpty()) {
     removeChunk("bext");
-    setChunkData("bext", bextTag);
+    setChunkData("bext", d->bextData);
     d->hasBEXT = true;
   }
   else if(d->hasBEXT) {
@@ -172,9 +195,9 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
     d->hasBEXT = false;
   }
 
-  if(!iXMLTag.isEmpty()) {
+  if(!d->iXMLData.isEmpty()) {
     removeChunk("iXML");
-    setChunkData("iXML", iXMLTag.data(String::UTF8));
+    setChunkData("iXML", d->iXMLData.data(String::UTF8));
     d->hasiXML = true;
   }
   else if(d->hasiXML) {
@@ -253,11 +276,11 @@ void RIFF::WAV::File::read(bool readProperties)
     }
     else if(name == "iXML") {
       d->hasiXML = true;
-      iXMLTag = String(chunkData(i));
+      d->iXMLData = String(chunkData(i));
     }
     else if(name == "bext") {
       d->hasBEXT = true;
-      bextTag = chunkData(i);
+      d->bextData = chunkData(i);
     }
   }
 

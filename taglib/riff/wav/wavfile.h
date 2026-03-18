@@ -135,22 +135,40 @@ namespace TagLib {
         Info::Tag *InfoTag() const;
 
         /*!
-         * Raw iXML chunk data as a String.
+         * Returns the raw iXML chunk data as a String.
          * Empty if no iXML chunk is present.
-         * Set this to write/update an iXML chunk on save; clear to remove it.
          *
+         * \see setiXMLData()
          * \see hasiXMLTag()
          */
-        String iXMLTag;
+        String iXMLData() const;
 
         /*!
-         * Raw BEXT (Broadcast Audio Extension) chunk data as a ByteVector.
-         * Empty if no BEXT chunk is present.
-         * Set this to write/update a BEXT chunk on save; clear to remove it.
+         * Sets the iXML chunk data.  Pass an empty string to remove the
+         * iXML chunk on save.
          *
+         * \see iXMLData()
+         * \see hasiXMLTag()
+         */
+        void setiXMLData(const String &data);
+
+        /*!
+         * Returns the raw BEXT (Broadcast Audio Extension) chunk data
+         * as a ByteVector.  Empty if no BEXT chunk is present.
+         *
+         * \see setBEXTData()
          * \see hasBEXTTag()
          */
-        ByteVector bextTag;
+        ByteVector BEXTData() const;
+
+        /*!
+         * Sets the BEXT chunk data.  Pass an empty ByteVector to remove
+         * the BEXT chunk on save.
+         *
+         * \see BEXTData()
+         * \see hasBEXTTag()
+         */
+        void setBEXTData(const ByteVector &data);
 
         /*!
          * This will strip the tags that match the OR-ed together TagTypes from the
