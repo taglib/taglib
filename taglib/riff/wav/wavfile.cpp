@@ -55,6 +55,8 @@ public:
 
   bool hasID3v2 { false };
   bool hasInfo { false };
+  bool hasiXML { false };
+  bool hasBEXT { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -160,6 +162,26 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
   if(strip == StripOthers)
     File::strip(static_cast<TagTypes>(AllTags & ~tags));
 
+  if(!bextTag.isEmpty()) {
+    removeChunk("bext");
+    setChunkData("bext", bextTag);
+    d->hasBEXT = true;
+  }
+  else if(d->hasBEXT) {
+    removeChunk("bext");
+    d->hasBEXT = false;
+  }
+
+  if(!iXMLTag.isEmpty()) {
+    removeChunk("iXML");
+    setChunkData("iXML", iXMLTag.data(String::UTF8));
+    d->hasiXML = true;
+  }
+  else if(d->hasiXML) {
+    removeChunk("iXML");
+    d->hasiXML = false;
+  }
+
   if(tags & ID3v2) {
     removeTagChunks(ID3v2);
 
@@ -191,6 +213,16 @@ bool RIFF::WAV::File::hasInfoTag() const
   return d->hasInfo;
 }
 
+bool RIFF::WAV::File::hasiXMLTag() const
+{
+  return d->hasiXML;
+}
+
+bool RIFF::WAV::File::hasBEXTTag() const
+{
+  return d->hasBEXT;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,6 +250,14 @@ void RIFF::WAV::File::read(bool readProperties)
           debug("RIFF::WAV::File::read() - Duplicate INFO tag found.");
         }
       }
+    }
+    else if(name == "iXML") {
+      d->hasiXML = true;
+      iXMLTag = String(chunkData(i));
+    }
+    else if(name == "bext") {
+      d->hasBEXT = true;
+      bextTag = chunkData(i);
     }
   }
 
