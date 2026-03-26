@@ -120,11 +120,13 @@
  * - some error cases because they never occur with the unit tests.
  */
 
-#include <string>
 #include <cstdio>
+#include <string>
+#include <vector>
 
 #include "tbytevectorlist.h"
 #include "tbytevectorstream.h"
+#include "tfilestream.h"
 #include "tpropertymap.h"
 #include "matroskafile.h"
 #include "matroskatag.h"
@@ -141,12 +143,114 @@
 using namespace std;
 using namespace TagLib;
 
+class RangeRestrictedFileStream : public IOStream
+{
+public:
+  explicit RangeRestrictedFileStream(const char *fileName) :
+    m_stream(fileName, true)
+  {
+  }
+
+  void allowRead(offset_t begin, offset_t end)
+  {
+    m_allowedReads.push_back({begin, end});
+  }
+
+  FileName name() const override
+  {
+    return m_stream.name();
+  }
+
+  ByteVector readBlock(size_t length) override
+  {
+    const offset_t begin = m_stream.tell();
+    const offset_t end = begin + static_cast<offset_t>(length);
+    if(length != 0 && !isReadAllowed(begin, end)) {
+      return ByteVector();
+    }
+    return m_stream.readBlock(length);
+  }
+
+  void writeBlock(const ByteVector &data) override
+  {
+    m_stream.writeBlock(data);
+  }
+
+  void insert(const ByteVector &data, offset_t start, size_t replace) override
+  {
+    m_stream.insert(data, start, replace);
+  }
+
+  void removeBlock(offset_t start, size_t length) override
+  {
+    m_stream.removeBlock(start, length);
+  }
+
+  bool readOnly() const override
+  {
+    return m_stream.readOnly();
+  }
+
+  bool isOpen() const override
+  {
+    return m_stream.isOpen();
+  }
+
+  void seek(offset_t offset, Position p = Beginning) override
+  {
+    m_stream.seek(offset, p);
+  }
+
+  void clear() override
+  {
+    m_stream.clear();
+  }
+
+  offset_t tell() const override
+  {
+    return m_stream.tell();
+  }
+
+  offset_t length() override
+  {
+    return m_stream.length();
+  }
+
+  void truncate(offset_t length) override
+  {
+    m_stream.truncate(length);
+  }
+
+private:
+  struct ReadRange
+  {
+    offset_t begin;
+    offset_t end;
+  };
+
+  bool isReadAllowed(offset_t begin, offset_t end) const
+  {
+    for(const auto &range : m_allowedReads) {
+      if(range.begin <= begin && end <= range.end) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  FileStream m_stream;
+  vector<ReadRange> m_allowedReads;
+};
+
 class TestMatroska : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestMatroska);
   CPPUNIT_TEST(testPropertiesMka);
   CPPUNIT_TEST(testPropertiesMkv);
   CPPUNIT_TEST(testPropertiesWebm);
+  CPPUNIT_TEST(testFastReadWithoutTags);
+  CPPUNIT_TEST(testFastReadWithLateTags);
+  CPPUNIT_TEST(testFastReadPreservesAttachmentsChaptersOnSave);
   CPPUNIT_TEST(testSimpleTagsAndAttachments);
   CPPUNIT_TEST(testAddRemoveTagsAttachments);
   CPPUNIT_TEST(testTagsWebm);
@@ -205,6 +309,83 @@ public:
 
     Matroska::File noProps(TEST_FILE_PATH_C("no-tags.webm"), false);
     CPPUNIT_ASSERT(!noProps.audioProperties());
+  }
+
+  void testFastReadWithoutTags()
+  {
+    RangeRestrictedFileStream stream(TEST_FILE_PATH_C("no-tags.mka"));
+    CPPUNIT_ASSERT(stream.isOpen());
+    stream.allowRead(0, 512);
+
+    Matroska::File f(&stream, true, AudioProperties::Fast);
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(444, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(223, f.audioProperties()->bitrate());
+    CPPUNIT_ASSERT_EQUAL(String("A_MPEG/L3"), f.audioProperties()->codecName());
+    CPPUNIT_ASSERT(!f.tag(false));
+  }
+
+  void testFastReadWithLateTags()
+  {
+    RangeRestrictedFileStream stream(TEST_FILE_PATH_C("tags-before-cues.mkv"));
+    CPPUNIT_ASSERT(stream.isOpen());
+    stream.allowRead(0, 512);
+    stream.allowRead(2800, 3300);
+
+    Matroska::File f(&stream, true, AudioProperties::Fast);
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(120, f.audioProperties()->lengthInMilliseconds());
+    auto tag = f.tag(false);
+    CPPUNIT_ASSERT(tag);
+    CPPUNIT_ASSERT_EQUAL(String("handbrake"), tag->title());
+  }
+
+  void testFastReadPreservesAttachmentsChaptersOnSave()
+  {
+    ScopedFileCopy copy("tags-before-cues", ".mkv");
+    const string newname = copy.fileName();
+    const List<Matroska::Chapter> chapterList{
+      Matroska::Chapter(
+        0ULL, 40000ULL,
+        List<Matroska::Chapter::Display>{Matroska::Chapter::Display("Fast Chapter", "eng")},
+        77ULL, false)
+    };
+    const Matroska::ChapterEdition edition(chapterList, true, false, 88ULL);
+
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.attachments(true)->addAttachedFile(Matroska::AttachedFile(
+        ByteVector("PNG data"), "folder.png", "image/png", 1763187649ULL,
+        "Cover"));
+      f.chapters(true)->addChapterEdition(edition);
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Fast);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT_EQUAL(StringList({"DURATION", "PICTURE", "CHAPTERS"}),
+                           f.complexPropertyKeys());
+      CPPUNIT_ASSERT(f.attachments(false));
+      CPPUNIT_ASSERT(f.chapters(false));
+      f.tag()->setComment("Fast path comment");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT_EQUAL(String("Fast path comment"), f.tag()->comment());
+      auto attachments = f.attachments(false);
+      CPPUNIT_ASSERT(attachments);
+      CPPUNIT_ASSERT_EQUAL(1U, attachments->attachedFileList().size());
+      auto chapters = f.chapters(false);
+      CPPUNIT_ASSERT(chapters);
+      CPPUNIT_ASSERT_EQUAL(1U, chapters->chapterEditionList().size());
+    }
   }
 
   void testSimpleTagsAndAttachments()
