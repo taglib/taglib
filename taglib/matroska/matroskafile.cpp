@@ -389,6 +389,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   }
 
   // Read the segment into memory from file
+  d->segment = segment->parseSegment();
   if(!segment->read(*this)) {
     debug("Failed to read segment");
     setValid(false);
@@ -396,7 +397,6 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   }
 
   // Parse the elements
-  d->segment = segment->parseSegment();
   d->seekHead = segment->parseSeekHead();
   d->cues = segment->parseCues();
   d->tag = segment->parseTag();

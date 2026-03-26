@@ -30,6 +30,32 @@
 
 using namespace TagLib;
 
+namespace {
+
+template <EBML::Element::Id Id, typename ElementType>
+std::unique_ptr<ElementType> readElementAt(File &file,
+                                           offset_t offset,
+                                           offset_t maxOffset)
+{
+  if(offset < 0 || offset >= maxOffset) {
+    return nullptr;
+  }
+
+  file.seek(offset);
+  auto element = EBML::Element::factory(file);
+  if(!element || element->getId() != Id) {
+    return nullptr;
+  }
+
+  auto typed = EBML::element_cast<Id>(std::move(element));
+  if(!typed || !typed->read(file)) {
+    return nullptr;
+  }
+  return typed;
+}
+
+} // namespace
+
 EBML::MkSegment::MkSegment(int sizeLength, offset_t dataSize, offset_t offset):
   MasterElement(Id::MkSegment, sizeLength, dataSize, offset)
 {
@@ -51,14 +77,55 @@ bool EBML::MkSegment::read(File &file)
 {
   const offset_t maxOffset = file.tell() + dataSize;
   std::unique_ptr<Element> element;
-  int i = 0;
-  int seekHeadIndex = -1;
   while((element = findNextElement(file, maxOffset))) {
     if(const Id id = element->getId(); id == Id::MkSeekHead) {
-      seekHeadIndex = i;
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
       if(!seekHead->read(file))
         return false;
+      // We have a seek head, let's use it for faster access to the other elements
+      if(const auto elementAfterSeekHead = findNextElement(file, maxOffset);
+         elementAfterSeekHead && elementAfterSeekHead->getId() == Id::VoidElement)
+        seekHead->setPadding(elementAfterSeekHead->getSize());
+      const offset_t segDataOffset = segmentDataOffset();
+      const auto matroskaSeekHead = parseSeekHead();
+      for(const auto &[idValue, relativeOffset] : matroskaSeekHead->entryList()) {
+        const offset_t absoluteOffset = segDataOffset + relativeOffset;
+        switch(static_cast<Id>(idValue)) {
+        case Id::MkCues:
+          if(!((cues = readElementAt<Id::MkCues, MkCues>(
+            file, absoluteOffset, maxOffset))))
+            return false;
+          break;
+        case Id::MkInfo:
+          if(!((info = readElementAt<Id::MkInfo, MkInfo>(
+            file, absoluteOffset, maxOffset))))
+            return false;
+          break;
+        case Id::MkTracks:
+          if(!((tracks = readElementAt<Id::MkTracks, MkTracks>(
+            file, absoluteOffset, maxOffset))))
+            return false;
+          break;
+        case Id::MkTags:
+          if(!((tags = readElementAt<Id::MkTags, MkTags>(
+            file, absoluteOffset, maxOffset))))
+            return false;
+          break;
+        case Id::MkAttachments:
+          if(!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
+            file, absoluteOffset, maxOffset))))
+            return false;
+          break;
+        case Id::MkChapters:
+          if(!((chapters = readElementAt<Id::MkChapters, MkChapters>(
+            file, absoluteOffset, maxOffset))))
+            return false;
+          break;
+        default:
+          break;
+        }
+      }
+      return true;
     }
     else if(id == Id::MkCues) {
       cues = element_cast<Id::MkCues>(std::move(element));
@@ -91,14 +158,8 @@ bool EBML::MkSegment::read(File &file)
         return false;
     }
     else {
-      if(id == Id::VoidElement
-         && seekHead
-         && seekHeadIndex == i - 1)
-        seekHead->setPadding(element->getSize());
-
       element->skipData(file);
     }
-    i++;
   }
   return true;
 }
