@@ -239,7 +239,7 @@ void MPEG::Header::parse(File *file, offset_t offset, bool checkLength)
                        (static_cast<unsigned char>(frameLengthData[0]) << 3) |
                        (static_cast<unsigned char>(frameLengthData[1]) >> 5);
 
-      d->bitrate = static_cast<int>(d->frameLength * d->sampleRate / 1024.0 + 0.5) * 8 / 1024;
+      d->bitrate = static_cast<int>(d->frameLength * d->sampleRate / 1024.0 + 0.5) * 8 / 1000;
     }
   }
   else {
