@@ -45,6 +45,7 @@ public:
   int inputSampleRate { 0 };
   int channels { 0 };
   int opusVersion { 0 };
+  int outputGain { 0 };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -93,6 +94,11 @@ int Opus::Properties::opusVersion() const
   return d->opusVersion;
 }
 
+int Opus::Properties::outputGain() const
+{
+  return d->outputGain;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,9 +128,10 @@ void Opus::Properties::read(File *file)
 
   // *Input Sample Rate* (32 bits, unsigned, little endian)
   d->inputSampleRate = data.toUInt(pos, false);
-  // pos += 4;
+  pos += 4;
 
   // *Output Gain* (16 bits, signed, little endian)
+  d->outputGain = data.toShort(pos, false);
   // pos += 2;
 
   // *Channel Mapping Family* (8 bits, unsigned)
