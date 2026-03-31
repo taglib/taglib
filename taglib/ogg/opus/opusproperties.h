@@ -80,7 +80,7 @@ namespace TagLib {
          * Returns the sample rate in Hz.
          *
          * \note Always returns 48000, because Opus can decode any stream at a
-         * sample rate of 8, 12, 16, 24, or 48 kHz,
+         * sample rate of 8, 12, 16, 24, or 48 kHz.
          */
         int sampleRate() const override;
 
@@ -100,6 +100,13 @@ namespace TagLib {
          * Returns the Opus version, in the range 0...255.
          */
         int opusVersion() const;
+
+        /*!
+         * Returns the output gain in signed Q7.8 fixed-point format.
+         *
+         * To convert the value to dB, divide it by 256.0.
+         */
+        int outputGain() const;
 
       private:
         void read(File *file);
