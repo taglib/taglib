@@ -298,7 +298,7 @@ void RIFF::File::read()
 
     seek(offset);
     const ByteVector   chnkName = readBlock(4);
-    const unsigned int chunkSize = readBlock(4).toUInt(bigEndian);
+    unsigned int chunkSize = readBlock(4).toUInt(bigEndian);
 
     if(!isValidChunkName(chnkName)) {
       debug("RIFF::File::read() -- Chunk '" + chnkName + "' has invalid ID");
@@ -306,8 +306,12 @@ void RIFF::File::read()
     }
 
     if(static_cast<long long>(offset) + 8 + chunkSize > length()) {
-      debug("RIFF::File::read() -- Chunk '" + chnkName + "' has invalid size (larger than the file size)");
-      break;
+      // Clamp to available bytes rather than rejecting the chunk outright.
+      // Some encoders write a correct data chunk but with a slightly too-large
+      // declared size, or place the data chunk outside the declared RIFF boundary.
+      // Lenient parsers (ffmpeg, QuickTime) handle this by clamping; we do the same.
+      debug("RIFF::File::read() -- Chunk '" + chnkName + "' is truncated; clamping size to available bytes.");
+      chunkSize = static_cast<unsigned int>(length() - offset - 8);
     }
 
     Chunk chunk;
