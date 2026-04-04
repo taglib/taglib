@@ -494,29 +494,34 @@ public:
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(!f.hasBEXTTag());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
       CPPUNIT_ASSERT(f.BEXTData().isEmpty());
 
       f.setBEXTData(ByteVector("test bext data"));
       f.save();
-      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT(f.hasBEXTData());
     }
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT(f.hasBEXTData());
       CPPUNIT_ASSERT_EQUAL(ByteVector("test bext data"), f.BEXTData());
 
       f.setBEXTData(ByteVector());
       f.save();
-      CPPUNIT_ASSERT(!f.hasBEXTTag());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
     }
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(!f.hasBEXTTag());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
       CPPUNIT_ASSERT(f.BEXTData().isEmpty());
     }
+
+    // Check if file without BEXT is same as original empty file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("empty.wav")).readAll();
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
   }
 
   void testBEXTTagWithOtherTags()
@@ -535,7 +540,7 @@ public:
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT(f.hasInfoTag());
-      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT(f.hasBEXTData());
       CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(String("INFO Title"), f.InfoTag()->title());
       CPPUNIT_ASSERT_EQUAL(ByteVector("bext payload"), f.BEXTData());
@@ -550,31 +555,36 @@ public:
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(!f.hasiXMLTag());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
       CPPUNIT_ASSERT(f.iXMLData().isEmpty());
 
       f.setiXMLData("<BWFXML><IXML_VERSION>1.0</IXML_VERSION></BWFXML>");
       f.save();
-      CPPUNIT_ASSERT(f.hasiXMLTag());
+      CPPUNIT_ASSERT(f.hasiXMLData());
     }
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(f.hasiXMLTag());
+      CPPUNIT_ASSERT(f.hasiXMLData());
       CPPUNIT_ASSERT_EQUAL(
         String("<BWFXML><IXML_VERSION>1.0</IXML_VERSION></BWFXML>"),
         f.iXMLData());
 
       f.setiXMLData(String());
       f.save();
-      CPPUNIT_ASSERT(!f.hasiXMLTag());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
     }
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
-      CPPUNIT_ASSERT(!f.hasiXMLTag());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
       CPPUNIT_ASSERT(f.iXMLData().isEmpty());
     }
+
+    // Check if file without iXML is same as original empty file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("empty.wav")).readAll();
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
   }
 
   void testiXMLTagWithOtherTags()
@@ -592,14 +602,33 @@ public:
     {
       RIFF::WAV::File f(filename.c_str());
       CPPUNIT_ASSERT(f.hasID3v2Tag());
-      CPPUNIT_ASSERT(f.hasiXMLTag());
-      CPPUNIT_ASSERT(f.hasBEXTTag());
+      CPPUNIT_ASSERT(f.hasiXMLData());
+      CPPUNIT_ASSERT(f.hasBEXTData());
       CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
       CPPUNIT_ASSERT_EQUAL(
         String("<BWFXML><SCENE>1</SCENE></BWFXML>"),
         f.iXMLData());
       CPPUNIT_ASSERT_EQUAL(ByteVector("bext data"), f.BEXTData());
+
+      f.setiXMLData(String());
+      f.setBEXTData(ByteVector());
+      f.strip();
+      CPPUNIT_ASSERT(f.save());
     }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      CPPUNIT_ASSERT(f.iXMLData().isEmpty());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
+      CPPUNIT_ASSERT(f.BEXTData().isEmpty());
+    }
+
+    // Check if file without tags is same as original empty file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("empty.wav")).readAll();
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
   }
 
 };

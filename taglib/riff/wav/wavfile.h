@@ -139,7 +139,7 @@ namespace TagLib {
          * Empty if no iXML chunk is present.
          *
          * \see setiXMLData()
-         * \see hasiXMLTag()
+         * \see hasiXMLData()
          */
         String iXMLData() const;
 
@@ -148,7 +148,7 @@ namespace TagLib {
          * iXML chunk on save.
          *
          * \see iXMLData()
-         * \see hasiXMLTag()
+         * \see hasiXMLData()
          */
         void setiXMLData(const String &data);
 
@@ -157,7 +157,7 @@ namespace TagLib {
          * as a ByteVector.  Empty if no BEXT chunk is present.
          *
          * \see setBEXTData()
-         * \see hasBEXTTag()
+         * \see hasBEXTData()
          */
         ByteVector BEXTData() const;
 
@@ -166,7 +166,7 @@ namespace TagLib {
          * the BEXT chunk on save.
          *
          * \see BEXTData()
-         * \see hasBEXTTag()
+         * \see hasBEXTData()
          */
         void setBEXTData(const ByteVector &data);
 
@@ -232,14 +232,14 @@ namespace TagLib {
          *
          * \see iXMLTag
          */
-        bool hasiXMLTag() const;
+        bool hasiXMLData() const;
 
         /*!
          * Returns whether or not the file on disk actually has a BEXT chunk.
          *
          * \see bextTag
          */
-        bool hasBEXTTag() const;
+        bool hasBEXTData() const;
 
         /*!
          * Returns whether or not the given \a stream can be opened as a WAV

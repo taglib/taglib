@@ -236,12 +236,12 @@ bool RIFF::WAV::File::hasInfoTag() const
   return d->hasInfo;
 }
 
-bool RIFF::WAV::File::hasiXMLTag() const
+bool RIFF::WAV::File::hasiXMLData() const
 {
   return d->hasiXML;
 }
 
-bool RIFF::WAV::File::hasBEXTTag() const
+bool RIFF::WAV::File::hasBEXTData() const
 {
   return d->hasBEXT;
 }
