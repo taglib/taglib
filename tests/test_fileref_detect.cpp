@@ -167,6 +167,7 @@ class TestFileRefDetectByContent : public CppUnit::TestFixture
   CPPUNIT_TEST(testSilence44SFlac);
   CPPUNIT_TEST(testSinewaveFlac);
   CPPUNIT_TEST(testZeroSizedPaddingFlac);
+  CPPUNIT_TEST(testFLACWithMPEGSyncBytes);
   // Ogg::Speex::File
   CPPUNIT_TEST(testEmptySpx);
   // Ogg::Opus::File
@@ -325,6 +326,9 @@ public:
   void testSinewaveFlac() { detectByContent<FLAC::File>("sinewave.flac"); }
   void testZeroSizedPaddingFlac() {
     detectByContent<FLAC::File>("zero-sized-padding.flac");
+  }
+  void testFLACWithMPEGSyncBytes() {
+    detectByContent<FLAC::File>("mpeg-sync-flac.flac");
   }
 
   // -- Ogg::Speex::File --
