@@ -320,7 +320,7 @@ public:
     {
       FileStream stream(copy.fileName().c_str());
       stream.seek(0, IOStream::End);
-      constexpr char garbage[] = "12345678";
+      constexpr char garbage[] = "\r2345678";
       stream.writeBlock(ByteVector(garbage, sizeof(garbage) - 1));
       stream.seek(0);
       contentsBeforeModification = stream.readBlock(stream.length());
