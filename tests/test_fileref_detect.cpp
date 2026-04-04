@@ -22,27 +22,22 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include <string>
-
+#include "taglib_config.h"
+#include "tfilestream.h"
+#include "tbytevectorstream.h"
 #include "fileref.h"
 #include "mpegfile.h"
-#include "taglib_config.h"
-#include "tbytevectorstream.h"
-#include "tfilestream.h"
-
 #ifdef TAGLIB_WITH_VORBIS
 #include "flacfile.h"
 #include "oggflacfile.h"
 #include "opusfile.h"
 #include "speexfile.h"
 #include "vorbisfile.h"
-
 #endif
 #ifdef TAGLIB_WITH_APE
 #include "apefile.h"
 #include "mpcfile.h"
 #include "wavpackfile.h"
-
 #endif
 #ifdef TAGLIB_WITH_ASF
 #include "asffile.h"
@@ -56,12 +51,10 @@
 #ifdef TAGLIB_WITH_RIFF
 #include "aifffile.h"
 #include "wavfile.h"
-
 #endif
 #ifdef TAGLIB_WITH_DSF
 #include "dsdifffile.h"
 #include "dsffile.h"
-
 #endif
 #ifdef TAGLIB_WITH_SHORTEN
 #include "shortenfile.h"
@@ -69,10 +62,9 @@
 #ifdef TAGLIB_WITH_MATROSKA
 #include "matroskafile.h"
 #endif
-#include "utils.h"
 #include <cppunit/extensions/HelperMacros.h>
+#include "utils.h"
 
-using namespace std;
 using namespace TagLib;
 
 // Files not covered by detection tests and the reason why:
@@ -115,147 +107,14 @@ using namespace TagLib;
 // RIFF::AIFF::File::isSupported() returns false:
 //   excessive_alloc.aif
 
-class TestFileRefDetectByContent : public CppUnit::TestFixture {
-  CPPUNIT_TEST_SUITE(TestFileRefDetectByContent);
+namespace {
 
-  // MPEG (always available)
-  CPPUNIT_TEST(test_ape_id3v1_mp3);
-  CPPUNIT_TEST(test_ape_id3v2_mp3);
-  CPPUNIT_TEST(test_ape_mp3);
-  CPPUNIT_TEST(test_bladeenc_mp3);
-  CPPUNIT_TEST(test_empty1s_aac);
-  CPPUNIT_TEST(test_id3v22_tda_mp3);
-  CPPUNIT_TEST(test_invalid_frames1_mp3);
-  CPPUNIT_TEST(test_invalid_frames2_mp3);
-  CPPUNIT_TEST(test_invalid_frames3_mp3);
-  CPPUNIT_TEST(test_itunes10_mp3);
-  CPPUNIT_TEST(test_lame_cbr_mp3);
-  CPPUNIT_TEST(test_lame_vbr_mp3);
-  CPPUNIT_TEST(test_mpeg2_mp3);
-  CPPUNIT_TEST(test_rare_frames_mp3);
-  CPPUNIT_TEST(test_toc_many_children_mp3);
-  CPPUNIT_TEST(test_xing_mp3);
-
-#ifdef TAGLIB_WITH_VORBIS
-  // Ogg::Vorbis::File
-  CPPUNIT_TEST(test_empty_ogg);
-  CPPUNIT_TEST(test_empty_vorbis_oga);
-  CPPUNIT_TEST(test_lowercase_fields_ogg);
-  CPPUNIT_TEST(test_test_ogg);
-  // Ogg::FLAC::File
-  CPPUNIT_TEST(test_empty_flac_oga);
-  // FLAC::File
-  CPPUNIT_TEST(test_empty_seektable_flac);
-  CPPUNIT_TEST(test_multiple_vc_flac);
-  CPPUNIT_TEST(test_no_tags_flac);
-  CPPUNIT_TEST(test_silence_44_s_flac);
-  CPPUNIT_TEST(test_sinewave_flac);
-  CPPUNIT_TEST(test_zero_sized_padding_flac);
-  // Ogg::Speex::File
-  CPPUNIT_TEST(test_empty_spx);
-  // Ogg::Opus::File
-  CPPUNIT_TEST(test_correctness_gain_silent_output_opus);
-  // Corrupt files: isSupported() returns true but isValid() returns false
-  CPPUNIT_TEST(testNull_segfault_oga);
-#endif
-
-#ifdef TAGLIB_WITH_APE
-  // MPC::File
-  CPPUNIT_TEST(test_click_mpc);
-  CPPUNIT_TEST(test_infloop_mpc);
-  CPPUNIT_TEST(test_segfault_mpc);
-  CPPUNIT_TEST(test_segfault2_mpc);
-  CPPUNIT_TEST(test_sv8_header_mpc);
-  CPPUNIT_TEST(test_zerodiv_mpc);
-  // WavPack::File
-  CPPUNIT_TEST(test_click_wv);
-  CPPUNIT_TEST(test_dsd_stereo_wv);
-  CPPUNIT_TEST(test_four_channels_wv);
-  CPPUNIT_TEST(test_infloop_wv);
-  CPPUNIT_TEST(test_no_length_wv);
-  CPPUNIT_TEST(test_non_standard_rate_wv);
-  CPPUNIT_TEST(test_tagged_wv);
-  // APE::File
-  CPPUNIT_TEST(test_longloop_ape);
-  CPPUNIT_TEST(test_mac_390_hdr_ape);
-  CPPUNIT_TEST(test_mac_396_ape);
-  CPPUNIT_TEST(test_mac_399_id3v2_ape);
-  CPPUNIT_TEST(test_mac_399_tagged_ape);
-  CPPUNIT_TEST(test_mac_399_ape);
-  CPPUNIT_TEST(test_zerodiv_ape);
-#endif
-
-#ifdef TAGLIB_WITH_TRUEAUDIO
-  CPPUNIT_TEST(test_empty_tta);
-  CPPUNIT_TEST(test_tagged_tta);
-#endif
-
-#ifdef TAGLIB_WITH_MP4
-  CPPUNIT_TEST(test_blank_video_m4v);
-  CPPUNIT_TEST(test_covr_junk_m4a);
-  CPPUNIT_TEST(test_empty_alac_m4a);
-  CPPUNIT_TEST(test_gnre_m4a);
-  CPPUNIT_TEST(test_has_tags_m4a);
-  CPPUNIT_TEST(test_ilst_is_last_m4a);
-  CPPUNIT_TEST(test_infloop_m4a);
-  CPPUNIT_TEST(test_no_tags_3g2);
-  CPPUNIT_TEST(test_no_tags_m4a);
-  CPPUNIT_TEST(test_non_full_meta_m4a);
-  CPPUNIT_TEST(test_nonprintable_atom_type_m4a);
-  CPPUNIT_TEST(test_zero_length_mdat_m4a);
-#endif
-
-#ifdef TAGLIB_WITH_ASF
-  CPPUNIT_TEST(test_lossless_wma);
-  CPPUNIT_TEST(test_silence_1_wma);
-#endif
-
-#ifdef TAGLIB_WITH_RIFF
-  // RIFF::AIFF::File
-  CPPUNIT_TEST(test_alaw_aifc);
-  CPPUNIT_TEST(test_duplicate_id3v2_aiff);
-  CPPUNIT_TEST(test_empty_aiff);
-  CPPUNIT_TEST(test_noise_aif);
-  CPPUNIT_TEST(test_noise_odd_aif);
-  CPPUNIT_TEST(test_segfault_aif);
-  // RIFF::WAV::File
-  CPPUNIT_TEST(test_alaw_wav);
-  CPPUNIT_TEST(test_duplicate_tags_wav);
-  CPPUNIT_TEST(test_empty_wav);
-  CPPUNIT_TEST(test_float64_wav);
-  CPPUNIT_TEST(test_infloop_wav);
-  CPPUNIT_TEST(test_invalid_chunk_wav);
-  CPPUNIT_TEST(test_pcm_with_fact_chunk_wav);
-  CPPUNIT_TEST(test_segfault_wav);
-  CPPUNIT_TEST(test_uint8we_wav);
-  CPPUNIT_TEST(test_zero_size_chunk_wav);
-#endif
-
-#ifdef TAGLIB_WITH_DSF
-  CPPUNIT_TEST(test_empty10ms_dsf);
-  CPPUNIT_TEST(test_empty10ms_dff);
-#endif
-
-#ifdef TAGLIB_WITH_SHORTEN
-  CPPUNIT_TEST(test_2sec_silence_shn);
-#endif
-
-#ifdef TAGLIB_WITH_MATROSKA
-  CPPUNIT_TEST(test_no_tags_mka);
-  CPPUNIT_TEST(test_no_tags_webm);
-  CPPUNIT_TEST(test_optimized_mkv);
-  CPPUNIT_TEST(test_tags_before_cues_mkv);
-#endif
-
-  CPPUNIT_TEST_SUITE_END();
-
-public:
   template <typename T> void detectByContent(const char *testFile) {
     FileStream fs(TEST_FILE_PATH_C(testFile));
     CPPUNIT_ASSERT(fs.isOpen());
-    ByteVector data = fs.readBlock(fs.length());
+    const ByteVector data = fs.readBlock(fs.length());
     ByteVectorStream bvs(data);
-    FileRef f(&bvs);
+    const FileRef f(&bvs);
     CPPUNIT_ASSERT(!f.isNull());
     CPPUNIT_ASSERT(dynamic_cast<T *>(f.file()) != nullptr);
   }
@@ -263,218 +122,356 @@ public:
   void detectNullByContent(const char *testFile) {
     FileStream fs(TEST_FILE_PATH_C(testFile));
     CPPUNIT_ASSERT(fs.isOpen());
-    ByteVector data = fs.readBlock(fs.length());
+    const ByteVector data = fs.readBlock(fs.length());
     ByteVectorStream bvs(data);
-    FileRef f(&bvs);
+    const FileRef f(&bvs);
     CPPUNIT_ASSERT(f.isNull());
   }
 
+} // namespace
+
+class TestFileRefDetectByContent : public CppUnit::TestFixture
+{
+  CPPUNIT_TEST_SUITE(TestFileRefDetectByContent);
+
+  // MPEG (always available)
+  CPPUNIT_TEST(testApeId3v1Mp3);
+  CPPUNIT_TEST(testApeId3v2Mp3);
+  CPPUNIT_TEST(testApeMp3);
+  CPPUNIT_TEST(testBladeencMp3);
+  CPPUNIT_TEST(testEmpty1sAac);
+  CPPUNIT_TEST(testId3v22TdaMp3);
+  CPPUNIT_TEST(testInvalidFrames1Mp3);
+  CPPUNIT_TEST(testInvalidFrames2Mp3);
+  CPPUNIT_TEST(testInvalidFrames3Mp3);
+  CPPUNIT_TEST(testItunes10Mp3);
+  CPPUNIT_TEST(testLameCbrMp3);
+  CPPUNIT_TEST(testLameVbrMp3);
+  CPPUNIT_TEST(testMpeg2Mp3);
+  CPPUNIT_TEST(testRareFramesMp3);
+  CPPUNIT_TEST(testTocManyChildrenMp3);
+  CPPUNIT_TEST(testXingMp3);
+
+#ifdef TAGLIB_WITH_VORBIS
+  // Ogg::Vorbis::File
+  CPPUNIT_TEST(testEmptyOgg);
+  CPPUNIT_TEST(testEmptyVorbisOga);
+  CPPUNIT_TEST(testLowercaseFieldsOgg);
+  CPPUNIT_TEST(testTestOgg);
+  // Ogg::FLAC::File
+  CPPUNIT_TEST(testEmptyFlacOga);
+  // FLAC::File
+  CPPUNIT_TEST(testEmptySeektableFlac);
+  CPPUNIT_TEST(testMultipleVcFlac);
+  CPPUNIT_TEST(testNoTagsFlac);
+  CPPUNIT_TEST(testSilence44SFlac);
+  CPPUNIT_TEST(testSinewaveFlac);
+  CPPUNIT_TEST(testZeroSizedPaddingFlac);
+  // Ogg::Speex::File
+  CPPUNIT_TEST(testEmptySpx);
+  // Ogg::Opus::File
+  CPPUNIT_TEST(testCorrectnessGainSilentOutputOpus);
+  // Corrupt files: isSupported() returns true but isValid() returns false
+  CPPUNIT_TEST(testNullSegfaultOga);
+#endif
+
+#ifdef TAGLIB_WITH_APE
+  // MPC::File
+  CPPUNIT_TEST(testClickMpc);
+  CPPUNIT_TEST(testInfloopMpc);
+  CPPUNIT_TEST(testSegfaultMpc);
+  CPPUNIT_TEST(testSegfault2Mpc);
+  CPPUNIT_TEST(testSv8HeaderMpc);
+  CPPUNIT_TEST(testZerodivMpc);
+  // WavPack::File
+  CPPUNIT_TEST(testClickWv);
+  CPPUNIT_TEST(testDsdStereoWv);
+  CPPUNIT_TEST(testFourChannelsWv);
+  CPPUNIT_TEST(testInfloopWv);
+  CPPUNIT_TEST(testNoLengthWv);
+  CPPUNIT_TEST(testNonStandardRateWv);
+  CPPUNIT_TEST(testTaggedWv);
+  // APE::File
+  CPPUNIT_TEST(testLongloopApe);
+  CPPUNIT_TEST(testMac390HdrApe);
+  CPPUNIT_TEST(testMac396Ape);
+  CPPUNIT_TEST(testMac399Id3v2Ape);
+  CPPUNIT_TEST(testMac399TaggedApe);
+  CPPUNIT_TEST(testMac399Ape);
+  CPPUNIT_TEST(testZerodivApe);
+#endif
+
+#ifdef TAGLIB_WITH_TRUEAUDIO
+  CPPUNIT_TEST(testEmptyTta);
+  CPPUNIT_TEST(testTaggedTta);
+#endif
+
+#ifdef TAGLIB_WITH_MP4
+  CPPUNIT_TEST(testBlankVideoM4v);
+  CPPUNIT_TEST(testCovrJunkM4a);
+  CPPUNIT_TEST(testEmptyAlacM4a);
+  CPPUNIT_TEST(testGnreM4a);
+  CPPUNIT_TEST(testHasTagsM4a);
+  CPPUNIT_TEST(testIlstIsLastM4a);
+  CPPUNIT_TEST(testInfloopM4a);
+  CPPUNIT_TEST(testNoTags3g2);
+  CPPUNIT_TEST(testNoTagsM4a);
+  CPPUNIT_TEST(testNonFullMetaM4a);
+  CPPUNIT_TEST(testNonprintableAtomTypeM4a);
+  CPPUNIT_TEST(testZeroLengthMdatM4a);
+#endif
+
+#ifdef TAGLIB_WITH_ASF
+  CPPUNIT_TEST(testLosslessWma);
+  CPPUNIT_TEST(testSilence1Wma);
+#endif
+
+#ifdef TAGLIB_WITH_RIFF
+  // RIFF::AIFF::File
+  CPPUNIT_TEST(testAlawAifc);
+  CPPUNIT_TEST(testDuplicateId3v2Aiff);
+  CPPUNIT_TEST(testEmptyAiff);
+  CPPUNIT_TEST(testNoiseAif);
+  CPPUNIT_TEST(testNoiseOddAif);
+  CPPUNIT_TEST(testSegfaultAif);
+  // RIFF::WAV::File
+  CPPUNIT_TEST(testAlawWav);
+  CPPUNIT_TEST(testDuplicateTagsWav);
+  CPPUNIT_TEST(testEmptyWav);
+  CPPUNIT_TEST(testFloat64Wav);
+  CPPUNIT_TEST(testInfloopWav);
+  CPPUNIT_TEST(testInvalidChunkWav);
+  CPPUNIT_TEST(testPcmWithFactChunkWav);
+  CPPUNIT_TEST(testSegfaultWav);
+  CPPUNIT_TEST(testUint8weWav);
+  CPPUNIT_TEST(testZeroSizeChunkWav);
+#endif
+
+#ifdef TAGLIB_WITH_DSF
+  CPPUNIT_TEST(testEmpty10msDsf);
+  CPPUNIT_TEST(testEmpty10msDff);
+#endif
+
+#ifdef TAGLIB_WITH_SHORTEN
+  CPPUNIT_TEST(test2SecSilenceShn);
+#endif
+
+#ifdef TAGLIB_WITH_MATROSKA
+  CPPUNIT_TEST(testNoTagsMka);
+  CPPUNIT_TEST(testNoTagsWebm);
+  CPPUNIT_TEST(testOptimizedMkv);
+  CPPUNIT_TEST(testTagsBeforeCuesMkv);
+#endif
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
   // -- MPEG::File (always available) --
 
-  void test_ape_id3v1_mp3() { detectByContent<MPEG::File>("ape-id3v1.mp3"); }
-  void test_ape_id3v2_mp3() { detectByContent<MPEG::File>("ape-id3v2.mp3"); }
-  void test_ape_mp3() { detectByContent<MPEG::File>("ape.mp3"); }
-  void test_bladeenc_mp3() { detectByContent<MPEG::File>("bladeenc.mp3"); }
-  void test_empty1s_aac() { detectByContent<MPEG::File>("empty1s.aac"); }
-  void test_id3v22_tda_mp3() { detectByContent<MPEG::File>("id3v22-tda.mp3"); }
-  void test_invalid_frames1_mp3() {
+  void testApeId3v1Mp3() { detectByContent<MPEG::File>("ape-id3v1.mp3"); }
+  void testApeId3v2Mp3() { detectByContent<MPEG::File>("ape-id3v2.mp3"); }
+  void testApeMp3() { detectByContent<MPEG::File>("ape.mp3"); }
+  void testBladeencMp3() { detectByContent<MPEG::File>("bladeenc.mp3"); }
+  void testEmpty1sAac() { detectByContent<MPEG::File>("empty1s.aac"); }
+  void testId3v22TdaMp3() { detectByContent<MPEG::File>("id3v22-tda.mp3"); }
+  void testInvalidFrames1Mp3() {
     detectByContent<MPEG::File>("invalid-frames1.mp3");
   }
-  void test_invalid_frames2_mp3() {
+  void testInvalidFrames2Mp3() {
     detectByContent<MPEG::File>("invalid-frames2.mp3");
   }
-  void test_invalid_frames3_mp3() {
+  void testInvalidFrames3Mp3() {
     detectByContent<MPEG::File>("invalid-frames3.mp3");
   }
-  void test_itunes10_mp3() { detectByContent<MPEG::File>("itunes10.mp3"); }
-  void test_lame_cbr_mp3() { detectByContent<MPEG::File>("lame_cbr.mp3"); }
-  void test_lame_vbr_mp3() { detectByContent<MPEG::File>("lame_vbr.mp3"); }
-  void test_mpeg2_mp3() { detectByContent<MPEG::File>("mpeg2.mp3"); }
-  void test_rare_frames_mp3() {
+  void testItunes10Mp3() { detectByContent<MPEG::File>("itunes10.mp3"); }
+  void testLameCbrMp3() { detectByContent<MPEG::File>("lame_cbr.mp3"); }
+  void testLameVbrMp3() { detectByContent<MPEG::File>("lame_vbr.mp3"); }
+  void testMpeg2Mp3() { detectByContent<MPEG::File>("mpeg2.mp3"); }
+  void testRareFramesMp3() {
     detectByContent<MPEG::File>("rare_frames.mp3");
   }
-  void test_toc_many_children_mp3() {
+  void testTocManyChildrenMp3() {
     detectByContent<MPEG::File>("toc_many_children.mp3");
   }
-  void test_xing_mp3() { detectByContent<MPEG::File>("xing.mp3"); }
+  void testXingMp3() { detectByContent<MPEG::File>("xing.mp3"); }
 
 #ifdef TAGLIB_WITH_VORBIS
   // -- Ogg::Vorbis::File --
-  void test_empty_ogg() { detectByContent<Ogg::Vorbis::File>("empty.ogg"); }
-  void test_empty_vorbis_oga() {
+  void testEmptyOgg() { detectByContent<Ogg::Vorbis::File>("empty.ogg"); }
+  void testEmptyVorbisOga() {
     detectByContent<Ogg::Vorbis::File>("empty_vorbis.oga");
   }
-  void test_lowercase_fields_ogg() {
+  void testLowercaseFieldsOgg() {
     detectByContent<Ogg::Vorbis::File>("lowercase-fields.ogg");
   }
-  void test_test_ogg() { detectByContent<Ogg::Vorbis::File>("test.ogg"); }
+  void testTestOgg() { detectByContent<Ogg::Vorbis::File>("test.ogg"); }
 
   // -- Ogg::FLAC::File --
-  void test_empty_flac_oga() {
+  void testEmptyFlacOga() {
     detectByContent<Ogg::FLAC::File>("empty_flac.oga");
   }
 
   // -- FLAC::File --
-  void test_empty_seektable_flac() {
+  void testEmptySeektableFlac() {
     detectByContent<FLAC::File>("empty-seektable.flac");
   }
-  void test_multiple_vc_flac() {
+  void testMultipleVcFlac() {
     detectByContent<FLAC::File>("multiple-vc.flac");
   }
-  void test_no_tags_flac() { detectByContent<FLAC::File>("no-tags.flac"); }
-  void test_silence_44_s_flac() {
+  void testNoTagsFlac() { detectByContent<FLAC::File>("no-tags.flac"); }
+  void testSilence44SFlac() {
     detectByContent<FLAC::File>("silence-44-s.flac");
   }
-  void test_sinewave_flac() { detectByContent<FLAC::File>("sinewave.flac"); }
-  void test_zero_sized_padding_flac() {
+  void testSinewaveFlac() { detectByContent<FLAC::File>("sinewave.flac"); }
+  void testZeroSizedPaddingFlac() {
     detectByContent<FLAC::File>("zero-sized-padding.flac");
   }
 
   // -- Ogg::Speex::File --
-  void test_empty_spx() { detectByContent<Ogg::Speex::File>("empty.spx"); }
+  void testEmptySpx() { detectByContent<Ogg::Speex::File>("empty.spx"); }
 
   // -- Ogg::Opus::File --
-  void test_correctness_gain_silent_output_opus() {
+  void testCorrectnessGainSilentOutputOpus() {
     detectByContent<Ogg::Opus::File>("correctness_gain_silent_output.opus");
   }
 
   // segfault.oga: Ogg::FLAC::File::isSupported() returns true (valid Ogg
   // container with a fLaC marker), but the FLAC metadata header inside is
   // corrupt so Ogg::FLAC::File::isValid() returns false.
-  void testNull_segfault_oga() { detectNullByContent("segfault.oga"); }
+  void testNullSegfaultOga() { detectNullByContent("segfault.oga"); }
 #endif
 
 #ifdef TAGLIB_WITH_APE
   // -- MPC::File --
-  void test_click_mpc() { detectByContent<MPC::File>("click.mpc"); }
-  void test_infloop_mpc() { detectByContent<MPC::File>("infloop.mpc"); }
-  void test_segfault_mpc() { detectByContent<MPC::File>("segfault.mpc"); }
-  void test_segfault2_mpc() { detectByContent<MPC::File>("segfault2.mpc"); }
-  void test_sv8_header_mpc() { detectByContent<MPC::File>("sv8_header.mpc"); }
-  void test_zerodiv_mpc() { detectByContent<MPC::File>("zerodiv.mpc"); }
+  void testClickMpc() { detectByContent<MPC::File>("click.mpc"); }
+  void testInfloopMpc() { detectByContent<MPC::File>("infloop.mpc"); }
+  void testSegfaultMpc() { detectByContent<MPC::File>("segfault.mpc"); }
+  void testSegfault2Mpc() { detectByContent<MPC::File>("segfault2.mpc"); }
+  void testSv8HeaderMpc() { detectByContent<MPC::File>("sv8_header.mpc"); }
+  void testZerodivMpc() { detectByContent<MPC::File>("zerodiv.mpc"); }
 
   // -- WavPack::File --
-  void test_click_wv() { detectByContent<WavPack::File>("click.wv"); }
-  void test_dsd_stereo_wv() { detectByContent<WavPack::File>("dsd_stereo.wv"); }
-  void test_four_channels_wv() {
+  void testClickWv() { detectByContent<WavPack::File>("click.wv"); }
+  void testDsdStereoWv() { detectByContent<WavPack::File>("dsd_stereo.wv"); }
+  void testFourChannelsWv() {
     detectByContent<WavPack::File>("four_channels.wv");
   }
-  void test_infloop_wv() { detectByContent<WavPack::File>("infloop.wv"); }
-  void test_no_length_wv() { detectByContent<WavPack::File>("no_length.wv"); }
-  void test_non_standard_rate_wv() {
+  void testInfloopWv() { detectByContent<WavPack::File>("infloop.wv"); }
+  void testNoLengthWv() { detectByContent<WavPack::File>("no_length.wv"); }
+  void testNonStandardRateWv() {
     detectByContent<WavPack::File>("non_standard_rate.wv");
   }
-  void test_tagged_wv() { detectByContent<WavPack::File>("tagged.wv"); }
+  void testTaggedWv() { detectByContent<WavPack::File>("tagged.wv"); }
 
   // -- APE::File --
-  void test_longloop_ape() { detectByContent<APE::File>("longloop.ape"); }
-  void test_mac_390_hdr_ape() { detectByContent<APE::File>("mac-390-hdr.ape"); }
-  void test_mac_396_ape() { detectByContent<APE::File>("mac-396.ape"); }
-  void test_mac_399_id3v2_ape() {
+  void testLongloopApe() { detectByContent<APE::File>("longloop.ape"); }
+  void testMac390HdrApe() { detectByContent<APE::File>("mac-390-hdr.ape"); }
+  void testMac396Ape() { detectByContent<APE::File>("mac-396.ape"); }
+  void testMac399Id3v2Ape() {
     detectByContent<APE::File>("mac-399-id3v2.ape");
   }
-  void test_mac_399_tagged_ape() {
+  void testMac399TaggedApe() {
     detectByContent<APE::File>("mac-399-tagged.ape");
   }
-  void test_mac_399_ape() { detectByContent<APE::File>("mac-399.ape"); }
-  void test_zerodiv_ape() { detectByContent<APE::File>("zerodiv.ape"); }
+  void testMac399Ape() { detectByContent<APE::File>("mac-399.ape"); }
+  void testZerodivApe() { detectByContent<APE::File>("zerodiv.ape"); }
 #endif
 
 #ifdef TAGLIB_WITH_TRUEAUDIO
   // -- TrueAudio::File --
-  void test_empty_tta() { detectByContent<TrueAudio::File>("empty.tta"); }
-  void test_tagged_tta() { detectByContent<TrueAudio::File>("tagged.tta"); }
+  void testEmptyTta() { detectByContent<TrueAudio::File>("empty.tta"); }
+  void testTaggedTta() { detectByContent<TrueAudio::File>("tagged.tta"); }
 #endif
 
 #ifdef TAGLIB_WITH_MP4
   // -- MP4::File --
-  void test_blank_video_m4v() { detectByContent<MP4::File>("blank_video.m4v"); }
-  void test_covr_junk_m4a() { detectByContent<MP4::File>("covr-junk.m4a"); }
-  void test_empty_alac_m4a() { detectByContent<MP4::File>("empty_alac.m4a"); }
-  void test_gnre_m4a() { detectByContent<MP4::File>("gnre.m4a"); }
-  void test_has_tags_m4a() { detectByContent<MP4::File>("has-tags.m4a"); }
-  void test_ilst_is_last_m4a() {
+  void testBlankVideoM4v() { detectByContent<MP4::File>("blank_video.m4v"); }
+  void testCovrJunkM4a() { detectByContent<MP4::File>("covr-junk.m4a"); }
+  void testEmptyAlacM4a() { detectByContent<MP4::File>("empty_alac.m4a"); }
+  void testGnreM4a() { detectByContent<MP4::File>("gnre.m4a"); }
+  void testHasTagsM4a() { detectByContent<MP4::File>("has-tags.m4a"); }
+  void testIlstIsLastM4a() {
     detectByContent<MP4::File>("ilst-is-last.m4a");
   }
-  void test_infloop_m4a() { detectByContent<MP4::File>("infloop.m4a"); }
-  void test_no_tags_3g2() { detectByContent<MP4::File>("no-tags.3g2"); }
-  void test_no_tags_m4a() { detectByContent<MP4::File>("no-tags.m4a"); }
-  void test_non_full_meta_m4a() {
+  void testInfloopM4a() { detectByContent<MP4::File>("infloop.m4a"); }
+  void testNoTags3g2() { detectByContent<MP4::File>("no-tags.3g2"); }
+  void testNoTagsM4a() { detectByContent<MP4::File>("no-tags.m4a"); }
+  void testNonFullMetaM4a() {
     detectByContent<MP4::File>("non-full-meta.m4a");
   }
-  void test_nonprintable_atom_type_m4a() {
+  void testNonprintableAtomTypeM4a() {
     detectByContent<MP4::File>("nonprintable-atom-type.m4a");
   }
-  void test_zero_length_mdat_m4a() {
+  void testZeroLengthMdatM4a() {
     detectByContent<MP4::File>("zero-length-mdat.m4a");
   }
 #endif
 
 #ifdef TAGLIB_WITH_ASF
   // -- ASF::File --
-  void test_lossless_wma() { detectByContent<ASF::File>("lossless.wma"); }
-  void test_silence_1_wma() { detectByContent<ASF::File>("silence-1.wma"); }
+  void testLosslessWma() { detectByContent<ASF::File>("lossless.wma"); }
+  void testSilence1Wma() { detectByContent<ASF::File>("silence-1.wma"); }
 #endif
 
 #ifdef TAGLIB_WITH_RIFF
   // -- RIFF::AIFF::File --
-  void test_alaw_aifc() { detectByContent<RIFF::AIFF::File>("alaw.aifc"); }
-  void test_duplicate_id3v2_aiff() {
+  void testAlawAifc() { detectByContent<RIFF::AIFF::File>("alaw.aifc"); }
+  void testDuplicateId3v2Aiff() {
     detectByContent<RIFF::AIFF::File>("duplicate_id3v2.aiff");
   }
-  void test_empty_aiff() { detectByContent<RIFF::AIFF::File>("empty.aiff"); }
-  void test_noise_aif() { detectByContent<RIFF::AIFF::File>("noise.aif"); }
-  void test_noise_odd_aif() {
+  void testEmptyAiff() { detectByContent<RIFF::AIFF::File>("empty.aiff"); }
+  void testNoiseAif() { detectByContent<RIFF::AIFF::File>("noise.aif"); }
+  void testNoiseOddAif() {
     detectByContent<RIFF::AIFF::File>("noise_odd.aif");
   }
-  void test_segfault_aif() {
+  void testSegfaultAif() {
     detectByContent<RIFF::AIFF::File>("segfault.aif");
   }
 
   // -- RIFF::WAV::File --
-  void test_alaw_wav() { detectByContent<RIFF::WAV::File>("alaw.wav"); }
-  void test_duplicate_tags_wav() {
+  void testAlawWav() { detectByContent<RIFF::WAV::File>("alaw.wav"); }
+  void testDuplicateTagsWav() {
     detectByContent<RIFF::WAV::File>("duplicate_tags.wav");
   }
-  void test_empty_wav() { detectByContent<RIFF::WAV::File>("empty.wav"); }
-  void test_float64_wav() { detectByContent<RIFF::WAV::File>("float64.wav"); }
-  void test_infloop_wav() { detectByContent<RIFF::WAV::File>("infloop.wav"); }
-  void test_invalid_chunk_wav() {
+  void testEmptyWav() { detectByContent<RIFF::WAV::File>("empty.wav"); }
+  void testFloat64Wav() { detectByContent<RIFF::WAV::File>("float64.wav"); }
+  void testInfloopWav() { detectByContent<RIFF::WAV::File>("infloop.wav"); }
+  void testInvalidChunkWav() {
     detectByContent<RIFF::WAV::File>("invalid-chunk.wav");
   }
-  void test_pcm_with_fact_chunk_wav() {
+  void testPcmWithFactChunkWav() {
     detectByContent<RIFF::WAV::File>("pcm_with_fact_chunk.wav");
   }
-  void test_segfault_wav() { detectByContent<RIFF::WAV::File>("segfault.wav"); }
-  void test_uint8we_wav() { detectByContent<RIFF::WAV::File>("uint8we.wav"); }
-  void test_zero_size_chunk_wav() {
+  void testSegfaultWav() { detectByContent<RIFF::WAV::File>("segfault.wav"); }
+  void testUint8weWav() { detectByContent<RIFF::WAV::File>("uint8we.wav"); }
+  void testZeroSizeChunkWav() {
     detectByContent<RIFF::WAV::File>("zero-size-chunk.wav");
   }
 #endif
 
 #ifdef TAGLIB_WITH_DSF
   // -- DSF::File --
-  void test_empty10ms_dsf() { detectByContent<DSF::File>("empty10ms.dsf"); }
+  void testEmpty10msDsf() { detectByContent<DSF::File>("empty10ms.dsf"); }
 
   // -- DSDIFF::File --
-  void test_empty10ms_dff() { detectByContent<DSDIFF::File>("empty10ms.dff"); }
+  void testEmpty10msDff() { detectByContent<DSDIFF::File>("empty10ms.dff"); }
 #endif
 
 #ifdef TAGLIB_WITH_SHORTEN
   // -- Shorten::File --
-  void test_2sec_silence_shn() {
+  void test2SecSilenceShn() {
     detectByContent<Shorten::File>("2sec-silence.shn");
   }
 #endif
 
 #ifdef TAGLIB_WITH_MATROSKA
   // -- Matroska::File --
-  void test_no_tags_mka() { detectByContent<Matroska::File>("no-tags.mka"); }
-  void test_no_tags_webm() { detectByContent<Matroska::File>("no-tags.webm"); }
-  void test_optimized_mkv() {
+  void testNoTagsMka() { detectByContent<Matroska::File>("no-tags.mka"); }
+  void testNoTagsWebm() { detectByContent<Matroska::File>("no-tags.webm"); }
+  void testOptimizedMkv() {
     detectByContent<Matroska::File>("optimized.mkv");
   }
-  void test_tags_before_cues_mkv() {
+  void testTagsBeforeCuesMkv() {
     detectByContent<Matroska::File>("tags-before-cues.mkv");
   }
 #endif
