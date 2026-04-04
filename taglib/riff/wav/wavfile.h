@@ -135,6 +135,42 @@ namespace TagLib {
         Info::Tag *InfoTag() const;
 
         /*!
+         * Returns the raw iXML chunk data as a String.
+         * Empty if no iXML chunk is present.
+         *
+         * \see setiXMLData()
+         * \see hasiXMLData()
+         */
+        String iXMLData() const;
+
+        /*!
+         * Sets the iXML chunk data.  Pass an empty string to remove the
+         * iXML chunk on save.
+         *
+         * \see iXMLData()
+         * \see hasiXMLData()
+         */
+        void setiXMLData(const String &data);
+
+        /*!
+         * Returns the raw BEXT (Broadcast Audio Extension) chunk data
+         * as a ByteVector.  Empty if no BEXT chunk is present.
+         *
+         * \see setBEXTData()
+         * \see hasBEXTData()
+         */
+        ByteVector BEXTData() const;
+
+        /*!
+         * Sets the BEXT chunk data.  Pass an empty ByteVector to remove
+         * the BEXT chunk on save.
+         *
+         * \see BEXTData()
+         * \see hasBEXTData()
+         */
+        void setBEXTData(const ByteVector &data);
+
+        /*!
          * This will strip the tags that match the OR-ed together TagTypes from the
          * file.  By default it strips all tags.  It returns \c true if the tags are
          * successfully stripped.
@@ -190,6 +226,20 @@ namespace TagLib {
          * \see InfoTag()
          */
         bool hasInfoTag() const;
+
+        /*!
+         * Returns whether or not the file on disk actually has an iXML chunk.
+         *
+         * \see iXMLTag
+         */
+        bool hasiXMLData() const;
+
+        /*!
+         * Returns whether or not the file on disk actually has a BEXT chunk.
+         *
+         * \see bextTag
+         */
+        bool hasBEXTData() const;
 
         /*!
          * Returns whether or not the given \a stream can be opened as a WAV
