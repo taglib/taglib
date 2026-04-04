@@ -176,6 +176,8 @@ namespace TagLib::Matroska {
 
   private:
     void read(bool readProperties, Properties::ReadStyle readStyle);
+    bool ensureFullyParsed() const;
+    bool ensureTagResolved() const;
     class FilePrivate;
     friend class Properties;
     TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE

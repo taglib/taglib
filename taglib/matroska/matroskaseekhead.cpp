@@ -64,6 +64,11 @@ void Matroska::SeekHead::addEntry(ID id, offset_t offset)
   setNeedsRender(true);
 }
 
+const List<std::pair<unsigned int, offset_t>> &Matroska::SeekHead::entryList() const
+{
+  return entries;
+}
+
 ByteVector Matroska::SeekHead::renderInternal()
 {
   const auto beforeSize = sizeRenderedOrWritten();
