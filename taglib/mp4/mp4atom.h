@@ -89,6 +89,9 @@ namespace TagLib {
       const ByteVector &name() const;
       const AtomList &children() const;
 
+    protected:
+      Atom(File *file, int depth);
+
     private:
       class AtomPrivate;
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
