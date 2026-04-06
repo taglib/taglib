@@ -21,6 +21,7 @@
 #include "ebmlmasterelement.h"
 #include "ebmlvoidelement.h"
 #include "ebmlutils.h"
+#include "tdebug.h"
 #include "tfile.h"
 
 using namespace TagLib;
@@ -97,16 +98,32 @@ void EBML::MasterElement::setMinRenderSize(offset_t minimumSize)
   minRenderSize = minimumSize;
 }
 
-bool EBML::MasterElement::read(File &file)
+bool EBML::MasterElement::read(File &file, int depth)
 {
+  static constexpr int MAX_EBML_DEPTH = 64;
+  if(depth > MAX_EBML_DEPTH) {
+    debug("EBML: Maximum nesting depth exceeded");
+    return false;
+  }
   const offset_t maxOffset = file.tell() + dataSize;
   std::unique_ptr<Element> element;
   while((element = findNextElement(file, maxOffset))) {
-    if(!element->read(file))
-      return false;
+    if(auto master = dynamic_cast<MasterElement *>(element.get())) {
+      if(!master->read(file, depth + 1))
+        return false;
+    }
+    else {
+      if(!element->read(file))
+        return false;
+    }
     elements.push_back(std::move(element));
   }
   return file.tell() == maxOffset;
+}
+
+bool EBML::MasterElement::read(File &file)
+{
+  return read(file, 0);
 }
 
 ByteVector EBML::MasterElement::render()
