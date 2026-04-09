@@ -104,6 +104,11 @@ namespace {
 
   bool VariableLengthInput::getRiceGolombCode(int32_t &i32, int32_t k)
   {
+    // k must be in [0, 31]: values outside this range would cause shift-by-32
+    // (UB for int32_t) or negative shifts, and are invalid for this format.
+    if(k < 0 || k > 31)
+      return false;
+
     static constexpr uint32_t sMaskTable[] = {
       0x0,
       0x1,        0x3,        0x7,        0xf,
