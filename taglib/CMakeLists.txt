@@ -196,6 +196,8 @@ if(WITH_MP4)
     mp4/mp4coverart.h
     mp4/mp4stem.h
     mp4/mp4itemfactory.h
+    mp4/mp4chapterlist.h
+    mp4/mp4qtchapterlist.h
   )
 endif()
 if(WITH_MOD)
@@ -372,6 +374,8 @@ if(WITH_MP4)
     mp4/mp4coverart.cpp
     mp4/mp4stem.cpp
     mp4/mp4itemfactory.cpp
+    mp4/mp4chapterlist.cpp
+    mp4/mp4qtchapterlist.cpp
   )
 endif()
 
