@@ -55,6 +55,8 @@ namespace TagLib
       void setMinRenderSize(offset_t minimumSize);
 
     protected:
+      bool read(File &file, int depth);
+
       offset_t offset;
       offset_t padding = 0;
       offset_t minRenderSize = 0;

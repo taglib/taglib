@@ -51,7 +51,7 @@ public:
   AtomList children;
 };
 
-MP4::Atom::Atom(File *file)
+MP4::Atom::Atom(File *file, int depth)
   : d(std::make_unique<AtomPrivate>(file->tell()))
 {
   d->children.setAutoDelete(true);
@@ -109,8 +109,13 @@ MP4::Atom::Atom(File *file)
       else if(d->name == "stsd") {
         file->seek(8, File::Current);
       }
+      static constexpr int MAX_MP4_ATOM_DEPTH = 64;
+      if(depth > MAX_MP4_ATOM_DEPTH) {
+        debug("MP4: Maximum nesting depth exceeded");
+        return;
+      }
       while(file->tell() < d->offset + d->length) {
-        auto child = new MP4::Atom(file);
+        auto child = new MP4::Atom(file, depth + 1);
         d->children.append(child);
         if(child->d->length == 0)
           return;
@@ -120,6 +125,11 @@ MP4::Atom::Atom(File *file)
   }
 
   file->seek(d->offset + d->length);
+}
+
+MP4::Atom::Atom(File *file)
+  : Atom(file, 0)
+{
 }
 
 MP4::Atom::~Atom() = default;
