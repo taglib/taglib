@@ -36,6 +36,8 @@
 #include "id3v1tag.h"
 #include "id3v2tag.h"
 
+#include <algorithm>
+
 using namespace TagLib;
 
 namespace
@@ -161,8 +163,7 @@ bool TrueAudio::File::save()
 
     // ID3v2 tag is not empty. Update the old one or create a new one.
 
-    if(d->ID3v2Location < 0)
-      d->ID3v2Location = 0;
+    d->ID3v2Location = std::max<TagLib::offset_t>(d->ID3v2Location, 0);
 
     const ByteVector data = ID3v2Tag()->render();
     insert(data, d->ID3v2Location, d->ID3v2OriginalSize);
