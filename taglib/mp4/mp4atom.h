@@ -35,27 +35,48 @@ namespace TagLib {
   namespace MP4 {
 
     enum AtomDataType {
-      TypeImplicit  = 0,  // for use with tags for which no type needs to be indicated because only one type is allowed
-      TypeUTF8      = 1,  // without any count or null terminator
-      TypeUTF16     = 2,  // also known as UTF-16BE
-      TypeSJIS      = 3,  // deprecated unless it is needed for special Japanese characters
-      TypeHTML      = 6,  // the HTML file header specifies which HTML version
-      TypeXML       = 7,  // the XML header must identify the DTD or schemas
-      TypeUUID      = 8,  // also known as GUID; stored as 16 bytes in binary (valid as an ID)
-      TypeISRC      = 9,  // stored as UTF-8 text (valid as an ID)
-      TypeMI3P      = 10, // stored as UTF-8 text (valid as an ID)
-      TypeGIF       = 12, // (deprecated) a GIF image
-      TypeJPEG      = 13, // a JPEG image
-      TypePNG       = 14, // a PNG image
-      TypeURL       = 15, // absolute, in UTF-8 characters
-      TypeDuration  = 16, // in milliseconds, 32-bit integer
-      TypeDateTime  = 17, // in UTC, counting seconds since midnight, January 1, 1904; 32 or 64-bits
-      TypeGenred    = 18, // a list of enumerated values
-      TypeInteger   = 21, // a signed big-endian integer with length one of { 1,2,3,4,8 } bytes
-      TypeRIAAPA    = 24, // RIAA parental advisory; { -1=no, 1=yes, 0=unspecified }, 8-bit integer
-      TypeUPC       = 25, // Universal Product Code, in text UTF-8 format (valid as an ID)
-      TypeBMP       = 27, // Windows bitmap image
-      TypeUndefined = 255 // undefined
+      //! For use with tags for which no type needs to be indicated because only one type is allowed
+      TypeImplicit  = 0,
+      //! Without any count or null terminator
+      TypeUTF8      = 1,
+      //! Also known as UTF-16BE
+      TypeUTF16     = 2,
+      //! Deprecated unless it is needed for special Japanese characters
+      TypeSJIS      = 3,
+      //! The HTML file header specifies which HTML version
+      TypeHTML      = 6,
+      //! The XML header must identify the DTD or schemas
+      TypeXML       = 7,
+      //! Also known as GUID; stored as 16 bytes in binary (valid as an ID)
+      TypeUUID      = 8,
+      //! Stored as UTF-8 text (valid as an ID)
+      TypeISRC      = 9,
+      //! Stored as UTF-8 text (valid as an ID)
+      TypeMI3P      = 10,
+      //! (Deprecated) A GIF image
+      TypeGIF       = 12,
+      //! A JPEG image
+      TypeJPEG      = 13,
+      //! A PNG image
+      TypePNG       = 14,
+      //! Absolute, in UTF-8 characters
+      TypeURL       = 15,
+      //! In milliseconds, 32-bit integer
+      TypeDuration  = 16,
+      //! In UTC, counting seconds since midnight, January 1, 1904; 32 or 64-bits
+      TypeDateTime  = 17,
+      //! A list of enumerated values
+      TypeGenred    = 18,
+      //! A signed big-endian integer with length one of { 1,2,3,4,8 } bytes
+      TypeInteger   = 21,
+      //! RIAA parental advisory; { -1=no, 1=yes, 0=unspecified }, 8-bit integer
+      TypeRIAAPA    = 24,
+      //! Universal Product Code, in text UTF-8 format (valid as an ID)
+      TypeUPC       = 25,
+      //! Windows bitmap image
+      TypeBMP       = 27,
+      //! Undefined
+      TypeUndefined = 255
     };
 
 #ifndef DO_NOT_DOCUMENT

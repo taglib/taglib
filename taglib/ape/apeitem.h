@@ -172,7 +172,7 @@ namespace TagLib {
       void setReadOnly(bool readOnly);
 
       /*!
-       * Return \c true if the item is read-only.
+       * Returns \c true if the item is read-only.
        */
       bool isReadOnly() const;
 

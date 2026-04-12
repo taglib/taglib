@@ -45,52 +45,53 @@ namespace TagLib {
      * identification frames.  There are a number of variations on this.  Those
      * enumerated in the ID3v2.4 standard are:
      *
-     * <ul>
-     *   <li><b>TALB</b> Album/Movie/Show title</li>
-     *   <li><b>TBPM</b> BPM (beats per minute)</li>
-     *   <li><b>TCOM</b> Composer</li>
-     *   <li><b>TCON</b> Content type</li>
-     *   <li><b>TCOP</b> Copyright message</li>
-     *   <li><b>TDEN</b> Encoding time</li>
-     *   <li><b>TDLY</b> Playlist delay</li>
-     *   <li><b>TDOR</b> Original release time</li>
-     *   <li><b>TDRC</b> Recording time</li>
-     *   <li><b>TDRL</b> Release time</li>
-     *   <li><b>TDTG</b> Tagging time</li>
-     *   <li><b>TENC</b> Encoded by</li>
-     *   <li><b>TEXT</b> Lyricist/Text writer</li>
-     *   <li><b>TFLT</b> %File type</li>
-     *   <li><b>TIPL</b> Involved people list</li>
-     *   <li><b>TIT1</b> Content group description</li>
-     *   <li><b>TIT2</b> Title/songname/content description</li>
-     *   <li><b>TIT3</b> Subtitle/Description refinement</li>
-     *   <li><b>TKEY</b> Initial key</li>
-     *   <li><b>TLAN</b> Language(s)</li>
-     *   <li><b>TLEN</b> Length</li>
-     *   <li><b>TMCL</b> Musician credits list</li>
-     *   <li><b>TMED</b> Media type</li>
-     *   <li><b>TMOO</b> Mood</li>
-     *   <li><b>TOAL</b> Original album/movie/show title</li>
-     *   <li><b>TOFN</b> Original filename</li>
-     *   <li><b>TOLY</b> Original lyricist(s)/text writer(s)</li>
-     *   <li><b>TOPE</b> Original artist(s)/performer(s)</li>
-     *   <li><b>TOWN</b> %File owner/licensee</li>
-     *   <li><b>TPE1</b> Lead performer(s)/Soloist(s)</li>
-     *   <li><b>TPE2</b> Band/orchestra/accompaniment</li>
-     *   <li><b>TPE3</b> Conductor/performer refinement</li>
-     *   <li><b>TPE4</b> Interpreted, remixed, or otherwise modified by</li>
-     *   <li><b>TPOS</b> Part of a set</li>
-     *   <li><b>TPRO</b> Produced notice</li>
-     *   <li><b>TPUB</b> Publisher</li>
-     *   <li><b>TRCK</b> Track number/Position in set</li>
-     *   <li><b>TRSN</b> Internet radio station name</li>
-     *   <li><b>TRSO</b> Internet radio station owner</li>
-     *   <li><b>TSOA</b> Album sort order</li>
-     *   <li><b>TSOP</b> Performer sort order</li>
-     *   <li><b>TSOT</b> Title sort order</li>
-     *   <li><b>TSRC</b> ISRC (international standard recording code)</li>
-     *   <li><b>TSSE</b> Software/Hardware and settings used for encoding</li>
-     *   <li><b>TSST</b> Set subtitle</li>
+     * %Frame | Description
+     * :----: | :-----------------------------------------------
+     *  TALB  | Album/Movie/Show title
+     *  TBPM  | BPM (beats per minute)
+     *  TCOM  | Composer
+     *  TCON  | Content type
+     *  TCOP  | Copyright message
+     *  TDEN  | Encoding time
+     *  TDLY  | Playlist delay
+     *  TDOR  | Original release time
+     *  TDRC  | Recording time
+     *  TDRL  | Release time
+     *  TDTG  | Tagging time
+     *  TENC  | Encoded by
+     *  TEXT  | Lyricist/Text writer
+     *  TFLT  | %File type
+     *  TIPL  | Involved people list
+     *  TIT1  | Content group description
+     *  TIT2  | Title/songname/content description
+     *  TIT3  | Subtitle/Description refinement
+     *  TKEY  | Initial key
+     *  TLAN  | Language(s)
+     *  TLEN  | Length
+     *  TMCL  | Musician credits list
+     *  TMED  | Media type
+     *  TMOO  | Mood
+     *  TOAL  | Original album/movie/show title
+     *  TOFN  | Original filename
+     *  TOLY  | Original lyricist(s)/text writer(s)
+     *  TOPE  | Original artist(s)/performer(s)
+     *  TOWN  | %File owner/licensee
+     *  TPE1  | Lead performer(s)/Soloist(s)
+     *  TPE2  | Band/orchestra/accompaniment
+     *  TPE3  | Conductor/performer refinement
+     *  TPE4  | Interpreted, remixed, or otherwise modified by
+     *  TPOS  | Part of a set
+     *  TPRO  | Produced notice
+     *  TPUB  | Publisher
+     *  TRCK  | Track number/Position in set
+     *  TRSN  | Internet radio station name
+     *  TRSO  | Internet radio station owner
+     *  TSOA  | Album sort order
+     *  TSOP  | Performer sort order
+     *  TSOT  | Title sort order
+     *  TSRC  | ISRC (international standard recording code)
+     *  TSSE  | Software/Hardware and settings used for encoding
+     *  TSST  | Set subtitle
      * </ul>
      *
      * The ID3v2 Frames document gives a description of each of these formats
