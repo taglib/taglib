@@ -93,28 +93,32 @@ namespace TagLib {
       unsigned long sampleFrames() const;
 
       /*!
-      * Returns the track gain as an integer value,
-      * to convert to dB: trackGain in dB = 64.82 - (trackGain / 256)
+      * Returns the track gain as an integer value.
+      *
+      * To convert to dB: trackGain in dB = 64.82 - (trackGain / 256)
       */
       int trackGain() const;
 
       /*!
-      * Returns the track peak as an integer value,
-      * to convert to dB: trackPeak in dB = trackPeak / 256
-      * to convert to floating [-1..1]: trackPeak = 10^(trackPeak / 256 / 20)/32768
+      * Returns the track peak as an integer value.
+      *
+      * To convert to dB: trackPeak in dB = trackPeak / 256 \n
+      * To convert to floating [-1..1]: trackPeak = 10^(trackPeak / 256 / 20)/32768
       */
       int trackPeak() const;
 
       /*!
-      * Returns the album gain as an integer value,
-      * to convert to dB: albumGain in dB = 64.82 - (albumGain / 256)
+      * Returns the album gain as an integer value.
+      *
+      * To convert to dB: albumGain in dB = 64.82 - (albumGain / 256)
       */
       int albumGain() const;
 
       /*!
-      * Returns the album peak as an integer value,
-      * to convert to dB: albumPeak in dB = albumPeak / 256
-      * to convert to floating [-1..1]: albumPeak = 10^(albumPeak / 256 / 20)/32768
+      * Returns the album peak as an integer value.
+      *
+      * To convert to dB: albumPeak in dB = albumPeak / 256 \n
+      * To convert to floating [-1..1]: albumPeak = 10^(albumPeak / 256 / 20)/32768
       */
       int albumPeak() const;
 
