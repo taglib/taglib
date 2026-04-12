@@ -58,7 +58,9 @@ namespace TagLib {
       };
 
       /*!
-       * Event types defined in id3v2.4.0-frames.txt 4.5. Event timing codes.
+       * Event types defined in
+       * <a href="https://github.com/taglib/taglib/blob/master/taglib/mpeg/id3v2/id3v2.4.0-frames.txt">
+       * id3v2.4.0-frames.txt</a> 4.5. Event timing codes.
        */
       enum EventType {
         Padding                = 0x00,
