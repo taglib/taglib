@@ -75,15 +75,22 @@ offset_t EBML::MkSegment::segmentDataOffset() const
 
 bool EBML::MkSegment::read(File &file)
 {
-  const offset_t maxOffset = file.tell() + dataSize;
+  return readLimited(file, dataSize);
+}
+
+bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
+{
+  const offset_t filePos = file.tell();
+  const offset_t maxOffset = filePos + dataSize;
+  const offset_t maxScanOffset = filePos + std::min(scanLimit, dataSize);
   std::unique_ptr<Element> element;
-  while((element = findNextElement(file, maxOffset))) {
+  while((element = findNextElement(file, maxScanOffset))) {
     if(const Id id = element->getId(); id == Id::MkSeekHead) {
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
       if(!seekHead->read(file))
         return false;
       // We have a seek head, let's use it for faster access to the other elements
-      if(const auto elementAfterSeekHead = findNextElement(file, maxOffset);
+      if(const auto elementAfterSeekHead = findNextElement(file, maxScanOffset);
          elementAfterSeekHead && elementAfterSeekHead->getId() == Id::VoidElement)
         seekHead->setPadding(elementAfterSeekHead->getSize());
       const offset_t segDataOffset = segmentDataOffset();
