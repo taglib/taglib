@@ -52,13 +52,20 @@ namespace TagLib {
 
       //! Returns the Shorten file version (1-3).
       int shortenVersion() const;
-      //! Returns the file type (0-9).
-      //! 0 = 8-bit µ-law,
-      //! 1 = signed 8-bit PCM, 2 = unsigned 8-bit PCM,
-      //! 3 = signed big-endian 16-bit PCM, 4 = unsigned big-endian 16-bit PCM,
-      //! 5 = signed little-endian 16-bit PCM, 6 = unsigned little-endian 16-bit PCM,
-      //! 7 = 8-bit ITU-T G.711 µ-law, 8 = 8-bit µ-law,
-      //! 9 = 8-bit A-law, 10 = 8-bit ITU-T G.711 A-law
+      //! Returns the file type (0-10).
+      //! Value | %File type
+      //! :---: | :--------------------------------
+      //!   0   | 8-bit µ-law
+      //!   1   | signed 8-bit PCM
+      //!   2   | unsigned 8-bit PCM
+      //!   3   | signed big-endian 16-bit PCM
+      //!   4   | unsigned big-endian 16-bit PCM
+      //!   5   | signed little-endian 16-bit PCM
+      //!   6   | unsigned little-endian 16-bit PCM
+      //!   7   | 8-bit ITU-T G.711 µ-law
+      //!   8   | 8-bit µ-law
+      //!   9   | 8-bit A-law
+      //!   10  | 8-bit ITU-T G.711 A-law
       int fileType() const;
       int bitsPerSample() const;
       unsigned long sampleFrames() const;

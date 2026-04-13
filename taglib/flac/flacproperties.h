@@ -87,7 +87,7 @@ namespace TagLib {
       int bitsPerSample() const;
 
       /*!
-       * Return the number of sample frames.
+       * Returns the number of sample frames.
        */
       unsigned long long sampleFrames() const;
 
