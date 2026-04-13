@@ -54,7 +54,6 @@ bool Matroska::SeekHead::isValid(TagLib::File &file) const
 void Matroska::SeekHead::addEntry(const Element &element)
 {
   entries.append({element.id(), element.offset()});
-  debug("adding to seekhead");
   setNeedsRender(true);
 }
 
@@ -62,6 +61,11 @@ void Matroska::SeekHead::addEntry(ID id, offset_t offset)
 {
   entries.append({id, offset});
   setNeedsRender(true);
+}
+
+const List<std::pair<unsigned int, offset_t>> &Matroska::SeekHead::entryList() const
+{
+  return entries;
 }
 
 ByteVector Matroska::SeekHead::renderInternal()

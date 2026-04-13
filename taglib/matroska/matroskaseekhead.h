@@ -39,6 +39,7 @@ namespace TagLib {
       bool isValid(TagLib::File &file) const;
       void addEntry(const Element &element);
       void addEntry(ID id, offset_t offset);
+      const List<std::pair<unsigned int, offset_t>> &entryList() const;
       void write(TagLib::File &file) override;
       void sort();
       bool sizeChanged(Element &caller, offset_t delta) override;

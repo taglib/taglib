@@ -225,7 +225,7 @@ namespace
 #endif
 #ifdef TAGLIB_WITH_MATROSKA
     else if(ext == "MKA" || ext == "MKV" || ext == "WEBM")
-      file = new Matroska::File(stream, readAudioProperties);
+      file = new Matroska::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 
     // if file is not valid, leave it to content-based detection.
