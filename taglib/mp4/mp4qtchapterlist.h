@@ -57,6 +57,14 @@ namespace TagLib {
       static ChapterList read(const char *path);
 
       /*!
+       * Reads chapter markers from the QuickTime chapter track in the
+       * already-opened \a file.  Avoids a second open when the caller
+       * already has the file open.
+       * Returns an empty list if the file has no chapter track.
+       */
+      static ChapterList read(MP4::File *file);
+
+      /*!
        * Writes chapter markers as a QuickTime chapter track to the MP4
        * file at \a path, replacing any existing chapter track.  The
        * file's duration is read internally from the movie header.
@@ -65,11 +73,25 @@ namespace TagLib {
       static bool write(const char *path, const ChapterList &chapters);
 
       /*!
+       * Writes chapter markers as a QuickTime chapter track to the
+       * already-opened \a file, replacing any existing chapter track.
+       * Returns \c true on success.
+       */
+      static bool write(MP4::File *file, const ChapterList &chapters);
+
+      /*!
        * Removes the QuickTime chapter track and its \c tref/chap
        * reference from the MP4 file at \a path.
        * Returns \c true on success, or if no chapter track exists.
        */
       static bool remove(const char *path);
+
+      /*!
+       * Removes the QuickTime chapter track and its \c tref/chap
+       * reference from the already-opened \a file.
+       * Returns \c true on success, or if no chapter track exists.
+       */
+      static bool remove(MP4::File *file);
     };
 
   }  // namespace MP4

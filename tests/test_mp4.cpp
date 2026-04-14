@@ -115,6 +115,8 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListOverwrite);
   CPPUNIT_TEST(testQTChapterListTimestampPrecision);
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
+  CPPUNIT_TEST(testChapterListFileAPI);
+  CPPUNIT_TEST(testQTChapterListFileAPI);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1311,6 +1313,109 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title);
       CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title);
       CPPUNIT_ASSERT_EQUAL(String("Three"), chapters[2].title);
+    }
+  }
+  void testChapterListFileAPI()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // Write chapters via the file-based API
+    {
+      MP4::File file(filename.c_str(), false);
+      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
+
+      MP4::ChapterList chapters;
+      MP4::Chapter ch1;
+      ch1.startTime = 0;
+      ch1.title = "Alpha";
+      chapters.append(ch1);
+
+      MP4::Chapter ch2;
+      ch2.startTime = 200000000LL;  // 20 seconds
+      ch2.title = "Beta";
+      chapters.append(ch2);
+
+      CPPUNIT_ASSERT(MP4::MP4ChapterList::write(&file, chapters));
+    }
+
+    // Read back via the file-based API
+    {
+      MP4::File file(filename.c_str(), false);
+      CPPUNIT_ASSERT(file.isOpen() && file.isValid());
+
+      MP4::ChapterList chapters = MP4::MP4ChapterList::read(&file);
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
+      CPPUNIT_ASSERT_EQUAL(String("Alpha"), chapters[0].title);
+      CPPUNIT_ASSERT_EQUAL(200000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(String("Beta"), chapters[1].title);
+    }
+
+    // Remove via the file-based API
+    {
+      MP4::File file(filename.c_str(), false);
+      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
+
+      CPPUNIT_ASSERT(MP4::MP4ChapterList::remove(&file));
+    }
+
+    // Verify removed
+    {
+      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
+      CPPUNIT_ASSERT(chapters.isEmpty());
+    }
+  }
+
+  void testQTChapterListFileAPI()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // Write chapters via the file-based API
+    {
+      MP4::File file(filename.c_str(), false);
+      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
+
+      MP4::ChapterList chapters;
+      MP4::Chapter ch1;
+      ch1.startTime = 0;
+      ch1.title = "Alpha";
+      chapters.append(ch1);
+
+      MP4::Chapter ch2;
+      ch2.startTime = 200000000LL;  // 20 seconds
+      ch2.title = "Beta";
+      chapters.append(ch2);
+
+      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(&file, chapters));
+    }
+
+    // Read back via the file-based API
+    {
+      MP4::File file(filename.c_str(), false);
+      CPPUNIT_ASSERT(file.isOpen() && file.isValid());
+
+      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(&file);
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
+      CPPUNIT_ASSERT_EQUAL(String("Alpha"), chapters[0].title);
+      CPPUNIT_ASSERT_EQUAL(200000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(String("Beta"), chapters[1].title);
+    }
+
+    // Remove via the file-based API
+    {
+      MP4::File file(filename.c_str(), false);
+      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
+
+      CPPUNIT_ASSERT(MP4::MP4QTChapterList::remove(&file));
+    }
+
+    // Verify removed
+    {
+      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      CPPUNIT_ASSERT(chapters.isEmpty());
     }
   }
 };
