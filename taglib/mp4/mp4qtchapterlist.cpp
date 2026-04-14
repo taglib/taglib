@@ -950,23 +950,29 @@ MP4::MP4QTChapterList::read(const char *path)
   if(!file.isOpen() || !file.isValid())
     return ChapterList();
 
-  Atoms atoms(&file);
+  return read(&file);
+}
 
-  TrackInfo audio = findAudioTrack(&file, &atoms);
+MP4::ChapterList
+MP4::MP4QTChapterList::read(MP4::File *file)
+{
+  Atoms atoms(file);
+
+  TrackInfo audio = findAudioTrack(file, &atoms);
   if(!audio.trak)
     return ChapterList();
 
-  Atom *chapterTrak = findChapterTrak(&file, &atoms, audio.trak);
+  Atom *chapterTrak = findChapterTrak(file, &atoms, audio.trak);
   if(!chapterTrak)
     return ChapterList();
 
-  ChapterTrackInfo trackInfo = readChapterTrackInfo(&file, chapterTrak);
+  ChapterTrackInfo trackInfo = readChapterTrackInfo(file, chapterTrak);
   if(trackInfo.timescale == 0)
     return ChapterList();
 
-  std::vector<SttsEntry> sttsEntries = readStts(&file, chapterTrak);
-  SampleSizeInfo sizeInfo = readStsz(&file, chapterTrak);
-  std::vector<unsigned int> offsets = resolveSampleOffsets(&file, chapterTrak, sizeInfo);
+  std::vector<SttsEntry> sttsEntries = readStts(file, chapterTrak);
+  SampleSizeInfo sizeInfo = readStsz(file, chapterTrak);
+  std::vector<unsigned int> offsets = resolveSampleOffsets(file, chapterTrak, sizeInfo);
 
   if(offsets.empty())
     return ChapterList();
@@ -984,7 +990,7 @@ MP4::MP4QTChapterList::read(const char *path)
       if(sampleSize == 0 && sampleIndex < sizeInfo.perSampleSizes.size())
         sampleSize = sizeInfo.perSampleSizes[sampleIndex];
 
-      String title = readTextSample(&file, offsets[sampleIndex], sampleSize);
+      String title = readTextSample(file, offsets[sampleIndex], sampleSize);
 
       long long startTime100ns = static_cast<long long>(
         static_cast<double>(currentTime) * 10000000.0 /
@@ -1021,24 +1027,33 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
     return false;
   }
 
+  return write(&file, chapters);
+}
+
+bool
+MP4::MP4QTChapterList::write(MP4::File *file, const ChapterList &chapters)
+{
+  // Writing an empty list is equivalent to removing the chapter track.
+  if(chapters.isEmpty())
+    return remove(file);
+
   // ---- Phase 1: Parse and gather info ----
 
-  Atoms atoms(&file);
-
+  Atoms atoms(file);
   Atom *moov = atoms.find("moov");
   if(!moov) {
     debug("MP4QTChapterList::write() -- No moov atom found");
     return false;
   }
 
-  MovieInfo movieInfo = readMovieInfo(&file, &atoms);
+  MovieInfo movieInfo = readMovieInfo(file, &atoms);
   if(movieInfo.durationMs <= 0) {
     debug("MP4QTChapterList::write() -- Could not determine file duration");
     return false;
   }
   long long durationMs = movieInfo.durationMs;
 
-  TrackInfo audio = findAudioTrack(&file, &atoms);
+  TrackInfo audio = findAudioTrack(file, &atoms);
   if(!audio.trak) {
     debug("MP4QTChapterList::write() -- No audio track found");
     return false;
@@ -1052,7 +1067,7 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
   // Optional second parse -- only constructed when replacing existing chapters.
   std::unique_ptr<Atoms> cleanAtoms;
 
-  Atom *existingChapter = findChapterTrak(&file, &atoms, audio.trak);
+  Atom *existingChapter = findChapterTrak(file, &atoms, audio.trak);
   if(existingChapter) {
     // Remove chapter trak FIRST (higher offset in file).
     offset_t chapterOff = existingChapter->offset();
@@ -1062,17 +1077,17 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
     moov->removeChild(existingChapter);
     delete existingChapter;
 
-    file.removeBlock(chapterOff, chapterLen);
+    file->removeBlock(chapterOff, chapterLen);
 
     AtomList moovPath = atoms.path("moov");
-    updateParentSizes(&file, moovPath, -chapterLen);
-    updateChunkOffsets(&file, &atoms, -chapterLen, chapterOff);
+    updateParentSizes(file, moovPath, -chapterLen);
+    updateChunkOffsets(file, &atoms, -chapterLen, chapterOff);
 
     // Remove tref from audio trak (lower offset, still valid).
-    removeAudioTref(&file, &atoms, audio.trak);
+    removeAudioTref(file, &atoms, audio.trak);
 
     // Re-parse to get clean state after removals.
-    cleanAtoms = std::make_unique<Atoms>(&file);
+    cleanAtoms = std::make_unique<Atoms>(file);
     activeAtoms = cleanAtoms.get();
 
     moov = activeAtoms->find("moov");
@@ -1080,7 +1095,7 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
       debug("MP4QTChapterList::write() -- moov disappeared after cleanup");
       return false;
     }
-    audio = findAudioTrack(&file, activeAtoms);
+    audio = findAudioTrack(file, activeAtoms);
     if(!audio.trak) {
       debug("MP4QTChapterList::write() -- No audio track after cleanup");
       return false;
@@ -1100,7 +1115,7 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
     workingChapters.prepend(dummy);
   }
 
-  unsigned int nextId = getNextTrackId(&file, activeAtoms);
+  unsigned int nextId = getNextTrackId(file, activeAtoms);
   unsigned int chapterTrackId = nextId > 0 ? nextId : audio.trackId + 1;
   constexpr unsigned int timescale = 1000;
   std::vector<unsigned int> sampleSizes = calculateSampleSizes(workingChapters);
@@ -1114,7 +1129,7 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
     movieInfo.duration);
   offset_t totalInsert = static_cast<offset_t>(trefAtom.size() + trakMeasure.size());
   // Text samples go inside an mdat atom at EOF.  stco offsets point past the 8-byte mdat header.
-  offset_t textDataOffset = file.length() + totalInsert + 8;
+  offset_t textDataOffset = file->length() + totalInsert + 8;
 
   // Build final trak with correct stco offsets pointing to where text data will land.
   ByteVector trakAtom = buildChapterTrak(
@@ -1129,22 +1144,22 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
   // tref is logically inside audio trak; chapter trak is logically after it.
   offset_t insertOffset = audio.trak->offset() + audio.trak->length();
 
-  file.insert(combinedPayload, insertOffset, 0);
+  file->insert(combinedPayload, insertOffset, 0);
 
   // Fix audio trak size on disk -- only tref goes inside
-  file.seek(audio.trak->offset());
-  unsigned int audioTrakSize = file.readBlock(4).toUInt();
+  file->seek(audio.trak->offset());
+  unsigned int audioTrakSize = file->readBlock(4).toUInt();
   unsigned int newAudioTrakSize = static_cast<unsigned int>(audioTrakSize + trefAtom.size());
-  file.seek(audio.trak->offset());
-  file.writeBlock(ByteVector::fromUInt(newAudioTrakSize));
+  file->seek(audio.trak->offset());
+  file->writeBlock(ByteVector::fromUInt(newAudioTrakSize));
 
   // Fix moov size -- both tref and chapter trak are inside moov
   AtomList moovPath = activeAtoms->path("moov");
-  updateParentSizes(&file, moovPath, combinedPayload.size());
+  updateParentSizes(file, moovPath, combinedPayload.size());
 
   // Fix existing chunk offsets -- only the ORIGINAL atom tree is iterated,
   // so the new chapter trak's stco (which already has correct offsets) is untouched.
-  updateChunkOffsets(&file, activeAtoms, combinedPayload.size(), insertOffset);
+  updateChunkOffsets(file, activeAtoms, combinedPayload.size(), insertOffset);
 
   // ---- Phase 4: Append text samples in mdat at EOF ----
 
@@ -1155,15 +1170,15 @@ MP4::MP4QTChapterList::write(const char *path, const ChapterList &chapters)
   // Wrap text samples in an mdat atom so players can find them.
   ByteVector mdatAtom = renderAtom("mdat", textSamples);
 
-  file.seek(0, TagLib::File::End);
-  file.writeBlock(mdatAtom);
+  file->seek(0, TagLib::File::End);
+  file->writeBlock(mdatAtom);
 
   // ---- Phase 5: Update mvhd next_track_ID ----
   // mvhd is before insertOffset, so its offset is unchanged.
 
-  unsigned int currentNextId = getNextTrackId(&file, activeAtoms);
+  unsigned int currentNextId = getNextTrackId(file, activeAtoms);
   if(chapterTrackId >= currentNextId) {
-    setNextTrackId(&file, activeAtoms, chapterTrackId + 1);
+    setNextTrackId(file, activeAtoms, chapterTrackId + 1);
   }
 
   return true;
@@ -1178,13 +1193,19 @@ MP4::MP4QTChapterList::remove(const char *path)
     return false;
   }
 
-  Atoms atoms(&file);
+  return remove(&file);
+}
 
-  TrackInfo audio = findAudioTrack(&file, &atoms);
+bool
+MP4::MP4QTChapterList::remove(MP4::File *file)
+{
+  Atoms atoms(file);
+
+  TrackInfo audio = findAudioTrack(file, &atoms);
   if(!audio.trak)
     return true;  // No audio track -- nothing to do
 
-  Atom *chapterTrak = findChapterTrak(&file, &atoms, audio.trak);
+  Atom *chapterTrak = findChapterTrak(file, &atoms, audio.trak);
   if(!chapterTrak)
     return true;  // No chapter track -- nothing to do
 
@@ -1200,14 +1221,14 @@ MP4::MP4QTChapterList::remove(const char *path)
   moov->removeChild(chapterTrak);
   delete chapterTrak;
 
-  file.removeBlock(chapterOff, chapterLen);
+  file->removeBlock(chapterOff, chapterLen);
 
   AtomList moovPath = atoms.path("moov");
-  updateParentSizes(&file, moovPath, -chapterLen);
-  updateChunkOffsets(&file, &atoms, -chapterLen, chapterOff);
+  updateParentSizes(file, moovPath, -chapterLen);
+  updateChunkOffsets(file, &atoms, -chapterLen, chapterOff);
 
   // Remove tref from audio trak (lower offset, still valid after chapter trak removal).
-  removeAudioTref(&file, &atoms, audio.trak);
+  removeAudioTref(file, &atoms, audio.trak);
 
   return true;
 }

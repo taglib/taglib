@@ -34,9 +34,6 @@ using namespace TagLib;
 
 namespace
 {
-  // Nero chpl version 1 header: version(1) + flags(3) + reserved(4) + count(1) = 9 bytes
-  constexpr int chplHeaderSize = 9;
-
   ByteVector renderAtom(const ByteVector &name, const ByteVector &data)
   {
     return ByteVector::fromUInt(static_cast<unsigned int>(data.size() + 8)) + name + data;
@@ -171,7 +168,8 @@ namespace
   {
     MP4::ChapterList chapters;
 
-    if(data.size() < static_cast<unsigned int>(chplHeaderSize))
+    // Minimum: version(1) + flags(3) + count(1) = 5 bytes (version 0 layout)
+    if(data.size() < 5)
       return chapters;
 
     unsigned int pos = 0;
@@ -225,15 +223,21 @@ MP4::MP4ChapterList::read(const char *path)
     return ChapterList();
   }
 
-  Atoms atoms(&file);
+  return read(&file);
+}
+
+MP4::ChapterList
+MP4::MP4ChapterList::read(MP4::File *file)
+{
+  Atoms atoms(file);
 
   Atom *chpl = atoms.find("moov", "udta", "chpl");
   if(!chpl)
     return ChapterList();
 
   // Read the atom content (skip 8-byte atom header)
-  file.seek(chpl->offset() + 8);
-  ByteVector data = file.readBlock(chpl->length() - 8);
+  file->seek(chpl->offset() + 8);
+  ByteVector data = file->readBlock(chpl->length() - 8);
 
   return parseChplData(data);
 }
@@ -247,7 +251,13 @@ MP4::MP4ChapterList::write(const char *path, const ChapterList &chapters)
     return false;
   }
 
-  Atoms atoms(&file);
+  return write(&file, chapters);
+}
+
+bool
+MP4::MP4ChapterList::write(MP4::File *file, const ChapterList &chapters)
+{
+  Atoms atoms(file);
 
   if(!atoms.find("moov")) {
     debug("MP4ChapterList::write() -- No moov atom found");
@@ -265,13 +275,13 @@ MP4::MP4ChapterList::write(const char *path, const ChapterList &chapters)
     offset_t oldLength = existingChpl->length();
     offset_t delta = static_cast<offset_t>(chplAtom.size()) - oldLength;
 
-    file.insert(chplAtom, offset, oldLength);
+    file->insert(chplAtom, offset, oldLength);
 
     if(delta != 0) {
       // Update parent sizes: moov and udta
       AtomList parentPath = atoms.path("moov", "udta", "chpl");
-      updateParentSizes(&file, parentPath, delta, 1);  // ignore chpl itself
-      updateChunkOffsets(&file, &atoms, delta, offset);
+      updateParentSizes(file, parentPath, delta, 1);  // ignore chpl itself
+      updateChunkOffsets(file, &atoms, delta, offset);
     }
   }
   else {
@@ -281,10 +291,10 @@ MP4::MP4ChapterList::write(const char *path, const ChapterList &chapters)
     if(udtaPath.size() == 2) {
       // udta exists -- insert chpl at the beginning of udta's content
       offset_t insertOffset = udtaPath.back()->offset() + 8;
-      file.insert(chplAtom, insertOffset, 0);
+      file->insert(chplAtom, insertOffset, 0);
 
-      updateParentSizes(&file, udtaPath, chplAtom.size());
-      updateChunkOffsets(&file, &atoms, chplAtom.size(), insertOffset);
+      updateParentSizes(file, udtaPath, chplAtom.size());
+      updateChunkOffsets(file, &atoms, chplAtom.size(), insertOffset);
     }
     else {
       // No udta -- insert udta + chpl at the beginning of moov's content
@@ -297,10 +307,10 @@ MP4::MP4ChapterList::write(const char *path, const ChapterList &chapters)
       }
 
       offset_t insertOffset = moovPath.back()->offset() + 8;
-      file.insert(udtaAtom, insertOffset, 0);
+      file->insert(udtaAtom, insertOffset, 0);
 
-      updateParentSizes(&file, moovPath, udtaAtom.size());
-      updateChunkOffsets(&file, &atoms, udtaAtom.size(), insertOffset);
+      updateParentSizes(file, moovPath, udtaAtom.size());
+      updateChunkOffsets(file, &atoms, udtaAtom.size(), insertOffset);
     }
   }
 
@@ -316,7 +326,13 @@ MP4::MP4ChapterList::remove(const char *path)
     return false;
   }
 
-  Atoms atoms(&file);
+  return remove(&file);
+}
+
+bool
+MP4::MP4ChapterList::remove(MP4::File *file)
+{
+  Atoms atoms(file);
 
   Atom *chpl = atoms.find("moov", "udta", "chpl");
   if(!chpl) {
@@ -327,12 +343,12 @@ MP4::MP4ChapterList::remove(const char *path)
   offset_t offset = chpl->offset();
   offset_t length = chpl->length();
 
-  file.removeBlock(offset, length);
+  file->removeBlock(offset, length);
 
   // Update parent sizes with negative delta
   AtomList parentPath = atoms.path("moov", "udta", "chpl");
-  updateParentSizes(&file, parentPath, -length, 1);  // ignore chpl itself
-  updateChunkOffsets(&file, &atoms, -length, offset);
+  updateParentSizes(file, parentPath, -length, 1);  // ignore chpl itself
+  updateChunkOffsets(file, &atoms, -length, offset);
 
   return true;
 }
