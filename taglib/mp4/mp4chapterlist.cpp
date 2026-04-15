@@ -149,8 +149,8 @@ namespace
       if(i++ >= count)
         break;
 
-      // Start time: 8 bytes big-endian
-      data.append(ByteVector::fromLongLong(ch.startTime));
+      // Start time: 8 bytes big-endian, on-disk format is 100-nanosecond units
+      data.append(ByteVector::fromLongLong(ch.startTime * 10000LL));
 
       // Title: 1-byte length + UTF-8 bytes (max 255 bytes)
       ByteVector titleBytes = ch.title.data(String::UTF8);
@@ -188,7 +188,7 @@ namespace
     unsigned int count = static_cast<unsigned char>(data[pos++]);
 
     for(unsigned int i = 0; i < count && pos + 9 <= data.size(); ++i) {
-      long long startTime = data.toLongLong(pos);
+      long long startTime100ns = data.toLongLong(pos);
       pos += 8;
 
       unsigned int titleLen = static_cast<unsigned char>(data[pos++]);
@@ -200,7 +200,7 @@ namespace
       }
 
       MP4::Chapter ch;
-      ch.startTime = startTime;
+      ch.startTime = startTime100ns / 10000LL;
       ch.title = title;
       chapters.append(ch);
     }

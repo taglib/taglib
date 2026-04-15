@@ -446,9 +446,9 @@ namespace
       return ByteVector();
 
     // Convert 100-ns units to timescale units
-    auto toTimescale = [timescale](long long time100ns) -> unsigned int {
+    auto toTimescale = [timescale](long long timeMs) -> unsigned int {
       return static_cast<unsigned int>(
-        static_cast<double>(time100ns) * static_cast<double>(timescale) / 10000000.0 + 0.5);
+        static_cast<double>(timeMs) * static_cast<double>(timescale) / 1000.0 + 0.5);
     };
 
     unsigned int totalDuration = static_cast<unsigned int>(
@@ -992,12 +992,12 @@ MP4::MP4QTChapterList::read(MP4::File *file)
 
       String title = readTextSample(file, offsets[sampleIndex], sampleSize);
 
-      long long startTime100ns = static_cast<long long>(
-        static_cast<double>(currentTime) * 10000000.0 /
+      long long startTimeMs = static_cast<long long>(
+        static_cast<double>(currentTime) * 1000.0 /
         static_cast<double>(trackInfo.timescale) + 0.5);
 
       Chapter ch;
-      ch.startTime = startTime100ns;
+      ch.startTime = startTimeMs;
       ch.title = title;
       chapters.append(ch);
 

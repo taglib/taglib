@@ -37,7 +37,7 @@ namespace TagLib {
      * A single Nero-style chapter marker.
      */
     struct TAGLIB_EXPORT Chapter {
-      long long startTime;  //!< Start time in 100-nanosecond units
+      long long startTime;  //!< Start time in milliseconds
       String title;
     };
 
