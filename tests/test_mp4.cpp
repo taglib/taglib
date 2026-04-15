@@ -908,12 +908,12 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 300000000LL;  // 30 seconds in 100ns units
+      ch2.startTime = 30000LL;  // 30 seconds in ms
       ch2.title = "Main Content";
       chapters.append(ch2);
 
       MP4::Chapter ch3;
-      ch3.startTime = 600000000LL;  // 60 seconds
+      ch3.startTime = 60000LL;  // 60 seconds in ms
       ch3.title = "Conclusion";
       chapters.append(ch3);
 
@@ -926,9 +926,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
       CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Introduction"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(300000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[1].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Main Content"), chapters[1].title);
-      CPPUNIT_ASSERT_EQUAL(600000000LL, chapters[2].startTime);
+      CPPUNIT_ASSERT_EQUAL(60000LL, chapters[2].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Conclusion"), chapters[2].title);
     }
 
@@ -1009,7 +1009,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 100000000LL;  // 10 seconds
+      ch2.startTime = 10000LL;  // 10 seconds in ms
       ch2.title = "Verse";
       chapters.append(ch2);
 
@@ -1065,12 +1065,12 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 150000000LL;  // 15 seconds
+      ch2.startTime = 15000LL;  // 15 seconds in ms
       ch2.title = "Verse";
       chapters.append(ch2);
 
       MP4::Chapter ch3;
-      ch3.startTime = 300000000LL;  // 30 seconds
+      ch3.startTime = 30000LL;  // 30 seconds in ms
       ch3.title = "Outro";
       chapters.append(ch3);
 
@@ -1083,9 +1083,9 @@ public:
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
       CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(150000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(15000LL, chapters[1].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title);
-      CPPUNIT_ASSERT_EQUAL(300000000LL, chapters[2].startTime);
+      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[2].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Outro"), chapters[2].title);
     }
   }
@@ -1104,7 +1104,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 100000000LL;  // 10 seconds
+      ch2.startTime = 10000LL;  // 10 seconds in ms
       ch2.title = "Chapter 2";
       chapters.append(ch2);
 
@@ -1153,7 +1153,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 100000000LL;  // 10 seconds
+      ch2.startTime = 10000LL;  // 10 seconds in ms
       ch2.title = "Verse";
       chapters.append(ch2);
 
@@ -1203,7 +1203,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 50000000LL;  // 5 seconds
+      ch2.startTime = 5000LL;  // 5 seconds in ms
       ch2.title = "Old2";
       chapters.append(ch2);
 
@@ -1225,12 +1225,12 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 100000000LL;  // 10 seconds
+      ch2.startTime = 10000LL;  // 10 seconds in ms
       ch2.title = "New2";
       chapters.append(ch2);
 
       MP4::Chapter ch3;
-      ch3.startTime = 200000000LL;  // 20 seconds
+      ch3.startTime = 20000LL;  // 20 seconds in ms
       ch3.title = "New3";
       chapters.append(ch3);
 
@@ -1261,7 +1261,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 15000000LL;  // 1.5 seconds in 100ns units
+      ch2.startTime = 1500LL;  // 1.5 seconds in ms
       ch2.title = "Precise";
       chapters.append(ch2);
 
@@ -1273,7 +1273,7 @@ public:
       MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
       CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
       CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(15000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(1500LL, chapters[1].startTime);
     }
   }
 
@@ -1286,17 +1286,17 @@ public:
     {
       MP4::ChapterList chapters;
       MP4::Chapter ch1;
-      ch1.startTime = 100000000LL;  // 10 seconds
+      ch1.startTime = 10000LL;  // 10 seconds in ms
       ch1.title = "One";
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 200000000LL;  // 20 seconds
+      ch2.startTime = 20000LL;  // 20 seconds in ms
       ch2.title = "Two";
       chapters.append(ch2);
 
       MP4::Chapter ch3;
-      ch3.startTime = 300000000LL;  // 30 seconds
+      ch3.startTime = 30000LL;  // 30 seconds in ms
       ch3.title = "Three";
       chapters.append(ch3);
 
@@ -1307,9 +1307,9 @@ public:
     {
       MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(100000000LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(200000000LL, chapters[1].startTime);
-      CPPUNIT_ASSERT_EQUAL(300000000LL, chapters[2].startTime);
+      CPPUNIT_ASSERT_EQUAL(10000LL, chapters[0].startTime);
+      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[2].startTime);
       CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title);
       CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title);
       CPPUNIT_ASSERT_EQUAL(String("Three"), chapters[2].title);
@@ -1332,7 +1332,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 200000000LL;  // 20 seconds
+      ch2.startTime = 20000LL;  // 20 seconds in ms
       ch2.title = "Beta";
       chapters.append(ch2);
 
@@ -1348,7 +1348,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
       CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Alpha"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(200000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Beta"), chapters[1].title);
     }
 
@@ -1384,7 +1384,7 @@ public:
       chapters.append(ch1);
 
       MP4::Chapter ch2;
-      ch2.startTime = 200000000LL;  // 20 seconds
+      ch2.startTime = 20000LL;  // 20 seconds in ms
       ch2.title = "Beta";
       chapters.append(ch2);
 
@@ -1400,7 +1400,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
       CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Alpha"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(200000000LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime);
       CPPUNIT_ASSERT_EQUAL(String("Beta"), chapters[1].title);
     }
 
