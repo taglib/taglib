@@ -121,9 +121,11 @@ std::pair<Frame::Header *, bool> FrameFactory::prepareFrameHeader(
 
   // A quick sanity check -- make sure that the frameID is 4 uppercase Latin1
   // characters.  Also make sure that there is data in the frame.
+  // A frame size of zero is invalid, but tolerated here to later only drop the
+  // frame but not the whole tag.
 
   if(frameID.size() != (version < 3U ? 3U : 4U) ||
-     header->frameSize() <= static_cast<unsigned int>(header->dataLengthIndicator() ? 4 : 0) ||
+     header->frameSize() < static_cast<unsigned int>(header->dataLengthIndicator() ? 4 : 0) ||
      header->frameSize() > data.size())
   {
     delete header;

@@ -879,13 +879,6 @@ void ID3v2::Tag::parse(const ByteVector &origData)
     if(!frame)
       return;
 
-    // Checks to make sure that frame parsed correctly.
-
-    if(frame->size() <= 0) {
-      delete frame;
-      return;
-    }
-
     if(frame->header()->version() == headerVersion) {
       frameDataPosition += frame->size() + frame->headerSize();
     } else {
@@ -895,7 +888,14 @@ void ID3v2::Tag::parse(const ByteVector &origData)
       Frame::Header origHeader(origData, headerVersion);
       frameDataPosition += origHeader.frameSize() + origHeader.size();
     }
-    addFrame(frame);
+
+    if(frame->size() > 0) {
+      addFrame(frame);
+    } else {
+      // A frame with size 0 is invalid, drop it. "A frame must be at least 1
+      // byte big" (id3v2.4.0-structure.txt - 4, id3v2.3.0.txt - 3.3).
+      delete frame;
+    }
   }
 
   d->factory->rebuildAggregateFrames(this);
