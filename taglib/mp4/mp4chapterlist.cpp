@@ -83,7 +83,8 @@ namespace
         unsigned int count = data.toUInt();
         file->seek(atom->offset() + 16);
         unsigned int pos = 4;
-        while(count--) {
+        const unsigned int maxPos = data.size() - 4;
+        while(count-- && pos <= maxPos) {
           auto o = static_cast<offset_t>(data.toUInt(pos));
           if(o > offset)
             o += delta;
@@ -101,7 +102,8 @@ namespace
         unsigned int count = data.toUInt();
         file->seek(atom->offset() + 16);
         unsigned int pos = 4;
-        while(count--) {
+        const unsigned int maxPos = data.size() - 8;
+        while(count-- && pos <= maxPos) {
           long long o = data.toLongLong(pos);
           if(o > offset)
             o += delta;
