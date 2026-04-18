@@ -46,8 +46,8 @@ public:
   FilePrivate &operator=(const FilePrivate &) = delete;
 
   const ID3v2::FrameFactory *ID3v2FrameFactory;
-  long long fileSize = 0;
-  long long metadataOffset = 0;
+  unsigned long long fileSize = 0;
+  unsigned long long metadataOffset = 0;
   std::unique_ptr<Properties> properties;
   std::unique_ptr<ID3v2::Tag> tag;
 };
@@ -116,17 +116,17 @@ bool DSF::File::save(ID3v2::Version version)
   // Three things must be updated: the file size, the tag data, and the metadata offset
 
   if(d->tag->isEmpty()) {
-    long long newFileSize = d->metadataOffset ? d->metadataOffset : d->fileSize;
+    unsigned long long newFileSize = d->metadataOffset ? d->metadataOffset : d->fileSize;
 
     // Update the file size
     if(d->fileSize != newFileSize) {
-      insert(ByteVector::fromLongLong(newFileSize, false), 12, 8);
+      insert(ByteVector::fromULongLong(newFileSize, false), 12, 8);
       d->fileSize = newFileSize;
     }
 
     // Update the metadata offset to 0 since there is no longer a tag
     if(d->metadataOffset) {
-      insert(ByteVector::fromLongLong(0ULL, false), 20, 8);
+      insert(ByteVector::fromULongLong(0ULL, false), 20, 8);
       d->metadataOffset = 0;
     }
 
@@ -136,19 +136,19 @@ bool DSF::File::save(ID3v2::Version version)
   else {
     ByteVector tagData = d->tag->render(version);
 
-    long long newMetadataOffset = d->metadataOffset ? d->metadataOffset : d->fileSize;
-    long long newFileSize = newMetadataOffset + tagData.size();
-    long long oldTagSize = d->fileSize - newMetadataOffset;
+    unsigned long long newMetadataOffset = d->metadataOffset ? d->metadataOffset : d->fileSize;
+    unsigned long long newFileSize = newMetadataOffset + tagData.size();
+    unsigned long long oldTagSize = d->fileSize - newMetadataOffset;
 
     // Update the file size
     if(d->fileSize != newFileSize) {
-      insert(ByteVector::fromLongLong(newFileSize, false), 12, 8);
+      insert(ByteVector::fromULongLong(newFileSize, false), 12, 8);
       d->fileSize = newFileSize;
     }
 
     // Update the metadata offset
     if(d->metadataOffset != newMetadataOffset) {
-      insert(ByteVector::fromLongLong(newMetadataOffset, false), 20, 8);
+      insert(ByteVector::fromULongLong(newMetadataOffset, false), 20, 8);
       d->metadataOffset = newMetadataOffset;
     }
 
@@ -175,7 +175,7 @@ void DSF::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  long long dsdHeaderSize = readBlock(8).toLongLong(false);
+  unsigned long long dsdHeaderSize = readBlock(8).toULongLong(false);
 
   // Integrity check
   if(dsdHeaderSize != 28) {
@@ -184,16 +184,16 @@ void DSF::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  d->fileSize = readBlock(8).toLongLong(false);
+  d->fileSize = readBlock(8).toULongLong(false);
 
   // File is malformed or corrupted, allow trailing garbage
-  if(d->fileSize > length()) {
+  if(d->fileSize > static_cast<unsigned long long>(length())) {
     debug("DSF::File::read() -- File is corrupted wrong length");
     setValid(false);
     return;
   }
 
-  d->metadataOffset = readBlock(8).toLongLong(false);
+  d->metadataOffset = readBlock(8).toULongLong(false);
 
   // File is malformed or corrupted
   if(d->metadataOffset > d->fileSize) {
@@ -210,7 +210,7 @@ void DSF::File::read(AudioProperties::ReadStyle propertiesStyle)
     return;
   }
 
-  long long fmtHeaderSize = readBlock(8).toLongLong(false);
+  unsigned long long fmtHeaderSize = readBlock(8).toULongLong(false);
   if(fmtHeaderSize != 52) {
     debug("DSF::File::read() -- File is corrupted, wrong FMT header size");
     setValid(false);
