@@ -25,52 +25,25 @@
 #ifndef TAGLIB_MP4CHAPTERLIST_H
 #define TAGLIB_MP4CHAPTERLIST_H
 
-#include "tlist.h"
-#include "tstring.h"
-#include "taglib_export.h"
-#include "mp4file.h"
+#include "mp4chapterholder.h"
 
 namespace TagLib {
+  class File;
   namespace MP4 {
-
-    /*!
-     * A single Nero-style chapter marker.
-     */
-    struct TAGLIB_EXPORT Chapter {
-      long long startTime;  //!< Start time in milliseconds
-      String title;
-    };
-
-    using ChapterList = List<Chapter>;
 
     /*!
      * Reads, writes, and removes Nero-style chapter markers (chpl atom)
      * from MP4 files.  Operates independently of MP4::Tag -- the chpl atom
      * lives at moov/udta/chpl, a sibling of the metadata ilst path.
      */
-    class TAGLIB_EXPORT MP4ChapterList
+    class NeroChapterList : public ChapterHolder
     {
     public:
       /*!
-       * Reads chapter markers from the MP4 file at \a path.
-       * Returns an empty list if the file has no chpl atom.
-       */
-      static ChapterList read(const char *path);
-
-      /*!
        * Reads chapter markers from the already-opened \a file.
-       * Avoids a second open when the caller already has the file open.
-       * Returns an empty list if the file has no chpl atom.
+       * Returns \c false if the file has no chpl atom.
        */
-      static ChapterList read(MP4::File *file);
-
-      /*!
-       * Writes chapter markers to the MP4 file at \a path,
-       * replacing any existing chpl atom.  The chapter count is
-       * capped at 255 (Nero format limit).
-       * Returns \c true on success.
-       */
-      static bool write(const char *path, const ChapterList &chapters);
+      bool read(TagLib::File *file);
 
       /*!
        * Writes chapter markers to the already-opened \a file,
@@ -78,19 +51,13 @@ namespace TagLib {
        * The chapter count is capped at 255 (Nero format limit).
        * Returns \c true on success.
        */
-      static bool write(MP4::File *file, const ChapterList &chapters);
-
-      /*!
-       * Removes the chpl atom from the MP4 file at \a path.
-       * Returns \c true on success, or if no chpl atom exists.
-       */
-      static bool remove(const char *path);
+      bool write(TagLib::File *file);
 
       /*!
        * Removes the chpl atom from the already-opened \a file.
        * Returns \c true on success, or if no chpl atom exists.
        */
-      static bool remove(MP4::File *file);
+      bool remove(TagLib::File *file);
     };
 
   }  // namespace MP4

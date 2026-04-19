@@ -22,7 +22,7 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "mp4chapterlist.h"
+#include "mp4nerochapterlist.h"
 
 #include <algorithm>
 
@@ -36,7 +36,7 @@ namespace
 {
   ByteVector renderAtom(const ByteVector &name, const ByteVector &data)
   {
-    return ByteVector::fromUInt(static_cast<unsigned int>(data.size() + 8)) + name + data;
+    return ByteVector::fromUInt(data.size() + 8) + name + data;
   }
 
   // Update parent atom sizes along a path when child size changes by delta.
@@ -52,11 +52,10 @@ namespace
 
     for(auto it = path.begin(); it != itEnd; ++it) {
       file->seek((*it)->offset());
-      long size = file->readBlock(4).toUInt();
-      if(size == 1) {
+      if(const long size = file->readBlock(4).toUInt(); size == 1) {
         // 64-bit size
         file->seek(4, TagLib::File::Current);
-        long long longSize = file->readBlock(8).toLongLong();
+        const long long longSize = file->readBlock(8).toLongLong();
         file->seek((*it)->offset() + 8);
         file->writeBlock(ByteVector::fromLongLong(longSize + delta));
       }
@@ -70,10 +69,10 @@ namespace
 
   // Update stco/co64/tfhd chunk offsets when file content shifts.
   // Mirrors MP4::Tag::updateOffsets().
-  void updateChunkOffsets(TagLib::File *file, MP4::Atoms *atoms,
+  void updateChunkOffsets(TagLib::File *file, const MP4::Atoms *atoms,
                           offset_t delta, offset_t offset)
   {
-    if(MP4::Atom *moov = atoms->find("moov")) {
+    if(const MP4::Atom *moov = atoms->find("moov")) {
       const MP4::AtomList stco = moov->findall("stco", true);
       for(const auto &atom : stco) {
         if(atom->offset() > offset)
@@ -113,7 +112,7 @@ namespace
       }
     }
 
-    if(MP4::Atom *moof = atoms->find("moof")) {
+    if(const MP4::Atom *moof = atoms->find("moof")) {
       const MP4::AtomList tfhd = moof->findall("tfhd", true);
       for(const auto &atom : tfhd) {
         if(atom->offset() > offset)
@@ -135,7 +134,7 @@ namespace
   // Build the binary payload for a chpl atom (version 1).
   ByteVector renderChplData(const MP4::ChapterList &chapters)
   {
-    unsigned int count = std::min(static_cast<unsigned int>(chapters.size()), 255U);
+    const unsigned int count = std::min(chapters.size(), 255U);
 
     ByteVector data;
     // Version (1 byte) + flags (3 bytes) + reserved (4 bytes)
@@ -152,11 +151,11 @@ namespace
         break;
 
       // Start time: 8 bytes big-endian, on-disk format is 100-nanosecond units
-      data.append(ByteVector::fromLongLong(ch.startTime * 10000LL));
+      data.append(ByteVector::fromLongLong(ch.startTime() * 10000LL));
 
       // Title: 1-byte length + UTF-8 bytes (max 255 bytes)
-      ByteVector titleBytes = ch.title.data(String::UTF8);
-      unsigned int titleLen = std::min(static_cast<unsigned int>(titleBytes.size()), 255U);
+      ByteVector titleBytes = ch.title().data(String::UTF8);
+      const unsigned int titleLen = std::min(titleBytes.size(), 255U);
       data.append(static_cast<char>(titleLen & 0xFF));
       if(titleLen > 0)
         data.append(titleBytes.mid(0, titleLen));
@@ -175,7 +174,7 @@ namespace
       return chapters;
 
     unsigned int pos = 0;
-    unsigned char version = static_cast<unsigned char>(data[pos++]);
+    const auto version = static_cast<unsigned char>(data[pos++]);
 
     // Skip flags (3 bytes)
     pos += 3;
@@ -187,13 +186,13 @@ namespace
     if(pos >= data.size())
       return chapters;
 
-    unsigned int count = static_cast<unsigned char>(data[pos++]);
+    const unsigned int count = static_cast<unsigned char>(data[pos++]);
 
     for(unsigned int i = 0; i < count && pos + 9 <= data.size(); ++i) {
-      long long startTime100ns = data.toLongLong(pos);
+      const long long startTime100ns = data.toLongLong(pos);
       pos += 8;
 
-      unsigned int titleLen = static_cast<unsigned char>(data[pos++]);
+      const unsigned int titleLen = static_cast<unsigned char>(data[pos++]);
 
       String title;
       if(titleLen > 0 && pos + titleLen <= data.size()) {
@@ -201,10 +200,7 @@ namespace
         pos += titleLen;
       }
 
-      MP4::Chapter ch;
-      ch.startTime = startTime100ns / 10000LL;
-      ch.title = title;
-      chapters.append(ch);
+      chapters.append(MP4::Chapter(title, startTime100ns / 10000LL));
     }
 
     return chapters;
@@ -216,83 +212,61 @@ namespace
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-MP4::ChapterList
-MP4::MP4ChapterList::read(const char *path)
+bool MP4::NeroChapterList::read(TagLib::File *file)
 {
-  MP4::File file(path, false);
-  if(!file.isOpen() || !file.isValid()) {
-    debug("MP4ChapterList::read() -- Could not open file");
-    return ChapterList();
+  const Atoms atoms(file);
+
+  const Atom *chpl = atoms.find("moov", "udta", "chpl");
+  modified = false;
+  chapterList.clear();
+  if(chpl) {
+    // Read the atom content (skip 8-byte atom header)
+    file->seek(chpl->offset() + 8);
+    const ByteVector data = file->readBlock(chpl->length() - 8);
+
+    chapterList = parseChplData(data);
+    return true;
   }
-
-  return read(&file);
+  return false;
 }
 
-MP4::ChapterList
-MP4::MP4ChapterList::read(MP4::File *file)
+bool MP4::NeroChapterList::write(TagLib::File *file)
 {
-  Atoms atoms(file);
+  // Writing an empty list is equivalent to removing the chapters.
+  if(chapterList.isEmpty())
+    return remove(file);
 
-  Atom *chpl = atoms.find("moov", "udta", "chpl");
-  if(!chpl)
-    return ChapterList();
-
-  // Read the atom content (skip 8-byte atom header)
-  file->seek(chpl->offset() + 8);
-  ByteVector data = file->readBlock(chpl->length() - 8);
-
-  return parseChplData(data);
-}
-
-bool
-MP4::MP4ChapterList::write(const char *path, const ChapterList &chapters)
-{
-  MP4::File file(path, false);
-  if(!file.isOpen() || !file.isValid() || file.readOnly()) {
-    debug("MP4ChapterList::write() -- Could not open file for writing");
-    return false;
-  }
-
-  return write(&file, chapters);
-}
-
-bool
-MP4::MP4ChapterList::write(MP4::File *file, const ChapterList &chapters)
-{
-  Atoms atoms(file);
+  const Atoms atoms(file);
 
   if(!atoms.find("moov")) {
     debug("MP4ChapterList::write() -- No moov atom found");
     return false;
   }
 
-  ByteVector chplPayload = renderChplData(chapters);
-  ByteVector chplAtom = renderAtom("chpl", chplPayload);
+  const ByteVector chplPayload = renderChplData(chapterList);
+  const ByteVector chplAtom = renderAtom("chpl", chplPayload);
 
-  Atom *existingChpl = atoms.find("moov", "udta", "chpl");
-
-  if(existingChpl) {
+  if(const Atom *existingChpl = atoms.find("moov", "udta", "chpl")) {
     // Replace existing chpl atom
-    offset_t offset = existingChpl->offset();
-    offset_t oldLength = existingChpl->length();
-    offset_t delta = static_cast<offset_t>(chplAtom.size()) - oldLength;
+    const offset_t offset = existingChpl->offset();
+    const offset_t oldLength = existingChpl->length();
+    const offset_t delta = static_cast<offset_t>(chplAtom.size()) - oldLength;
 
     file->insert(chplAtom, offset, oldLength);
 
     if(delta != 0) {
       // Update parent sizes: moov and udta
-      AtomList parentPath = atoms.path("moov", "udta", "chpl");
+      const AtomList parentPath = atoms.path("moov", "udta", "chpl");
       updateParentSizes(file, parentPath, delta, 1);  // ignore chpl itself
       updateChunkOffsets(file, &atoms, delta, offset);
     }
   }
   else {
     // Need to insert a new chpl atom
-    AtomList udtaPath = atoms.path("moov", "udta");
 
-    if(udtaPath.size() == 2) {
+    if(AtomList udtaPath = atoms.path("moov", "udta"); udtaPath.size() == 2) {
       // udta exists -- insert chpl at the beginning of udta's content
-      offset_t insertOffset = udtaPath.back()->offset() + 8;
+      const offset_t insertOffset = udtaPath.back()->offset() + 8;
       file->insert(chplAtom, insertOffset, 0);
 
       updateParentSizes(file, udtaPath, chplAtom.size());
@@ -300,7 +274,7 @@ MP4::MP4ChapterList::write(MP4::File *file, const ChapterList &chapters)
     }
     else {
       // No udta -- insert udta + chpl at the beginning of moov's content
-      ByteVector udtaAtom = renderAtom("udta", chplAtom);
+      const ByteVector udtaAtom = renderAtom("udta", chplAtom);
 
       AtomList moovPath = atoms.path("moov");
       if(moovPath.isEmpty()) {
@@ -308,7 +282,7 @@ MP4::MP4ChapterList::write(MP4::File *file, const ChapterList &chapters)
         return false;
       }
 
-      offset_t insertOffset = moovPath.back()->offset() + 8;
+      const offset_t insertOffset = moovPath.back()->offset() + 8;
       file->insert(udtaAtom, insertOffset, 0);
 
       updateParentSizes(file, moovPath, udtaAtom.size());
@@ -316,39 +290,29 @@ MP4::MP4ChapterList::write(MP4::File *file, const ChapterList &chapters)
     }
   }
 
+  modified = false;
   return true;
 }
 
-bool
-MP4::MP4ChapterList::remove(const char *path)
+bool MP4::NeroChapterList::remove(TagLib::File *file)
 {
-  MP4::File file(path, false);
-  if(!file.isOpen() || !file.isValid() || file.readOnly()) {
-    debug("MP4ChapterList::remove() -- Could not open file for writing");
-    return false;
-  }
+  const Atoms atoms(file);
+  chapterList.clear();
+  modified = false;
 
-  return remove(&file);
-}
-
-bool
-MP4::MP4ChapterList::remove(MP4::File *file)
-{
-  Atoms atoms(file);
-
-  Atom *chpl = atoms.find("moov", "udta", "chpl");
+  const Atom *chpl = atoms.find("moov", "udta", "chpl");
   if(!chpl) {
     // No chpl atom -- nothing to remove
     return true;
   }
 
-  offset_t offset = chpl->offset();
-  offset_t length = chpl->length();
+  const offset_t offset = chpl->offset();
+  const offset_t length = chpl->length();
 
   file->removeBlock(offset, length);
 
   // Update parent sizes with negative delta
-  AtomList parentPath = atoms.path("moov", "udta", "chpl");
+  const AtomList parentPath = atoms.path("moov", "udta", "chpl");
   updateParentSizes(file, parentPath, -length, 1);  // ignore chpl itself
   updateChunkOffsets(file, &atoms, -length, offset);
 
