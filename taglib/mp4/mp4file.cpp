@@ -30,6 +30,8 @@
 #include "tagutils.h"
 
 #include "mp4itemfactory.h"
+#include "mp4nerochapterlist.h"
+#include "mp4qtchapterlist.h"
 
 using namespace TagLib;
 
@@ -48,6 +50,8 @@ public:
   std::unique_ptr<MP4::Tag> tag;
   std::unique_ptr<MP4::Atoms> atoms;
   std::unique_ptr<MP4::Properties> properties;
+  std::unique_ptr<MP4::NeroChapterList> neroChapterList;
+  std::unique_ptr<MP4::QtChapterList> qtChapterList;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +115,26 @@ MP4::Properties *MP4::File::audioProperties() const
   return d->properties.get();
 }
 
+MP4::ChapterList MP4::File::neroChapters()
+{
+  return getChaptersLazy(d->neroChapterList, this);
+}
+
+void MP4::File::setNeroChapters(const ChapterList& chapters)
+{
+  setChaptersLazy(d->neroChapterList, chapters);
+}
+
+MP4::ChapterList MP4::File::qtChapters()
+{
+  return getChaptersLazy(d->qtChapterList, this);
+}
+
+void MP4::File::setQtChapters(const ChapterList& chapters)
+{
+  setChaptersLazy(d->qtChapterList, chapters);
+}
+
 void
 MP4::File::read(bool readProperties)
 {
@@ -148,7 +172,9 @@ MP4::File::save()
     return false;
   }
 
-  return d->tag->save();
+  return d->tag->save() &&
+    saveChaptersIfModified(d->neroChapterList, this) &&
+    saveChaptersIfModified(d->qtChapterList, this);
 }
 
 bool
