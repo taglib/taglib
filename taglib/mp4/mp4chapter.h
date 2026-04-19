@@ -22,55 +22,75 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_MP4QTCHAPTERLIST_H
-#define TAGLIB_MP4QTCHAPTERLIST_H
+#ifndef TAGLIB_MP4CHAPTER_H
+#define TAGLIB_MP4CHAPTER_H
 
-#include "mp4chapterholder.h"
+#include <memory>
+#include "taglib_export.h"
+#include "tlist.h"
 
 namespace TagLib {
-  class File;
+  class String;
   namespace MP4 {
 
     /*!
-     * Reads, writes, and removes QuickTime-style chapter tracks from MP4
-     * files.  A QT chapter track is a disabled text track (\c hdlr type
-     * \c "text") referenced by a \c chap track-reference in the audio
-     * track's \c tref box.  This format is understood by QuickTime,
-     * iTunes, Final Cut, Logic, DaVinci Resolve, Twisted Wave, and most
-     * other Apple/macOS software.
-     *
-     * The existing \c MP4ChapterList class handles Nero-style \c chpl
-     * atoms, which are a different (and less widely supported) chapter
-     * format.
-     *
-     * Chapter times use the same 100-nanosecond unit convention as
-     * \c MP4ChapterList so that existing \c Chapter / \c ChapterList
-     * types can be shared.
+     * A single Nero-style chapter marker.
      */
-    class QtChapterList : public ChapterHolder
-    {
+    class TAGLIB_EXPORT Chapter {
     public:
       /*!
-       * Reads chapter markers from the QuickTime chapter track in the
-       * already-opened \a file.
-       * Returns \c false if the file has no chapter track.
+       * Construct a chapter.
        */
-      bool read(TagLib::File *file);
+      Chapter(const String &title, long long startTime);
 
       /*!
-       * Writes chapter markers as a QuickTime chapter track to the
-       * already-opened \a file, replacing any existing chapter track.
-       * Returns \c true on success.
+       * Construct a chapter as a copy of \a other.
        */
-      bool write(TagLib::File *file);
+      Chapter(const Chapter &other);
 
       /*!
-       * Removes the QuickTime chapter track and its \c tref/chap
-       * reference from the already-opened \a file.
-       * Returns \c true on success, or if no chapter track exists.
+       * Construct a chapter moving from \a other.
        */
-      bool remove(TagLib::File *file);
+      Chapter(Chapter &&other) noexcept;
+
+      /*!
+       * Destroys this chapter.
+       */
+      ~Chapter();
+
+      /*!
+       * Copies the contents of \a other into this object.
+       */
+      Chapter &operator=(const Chapter &other);
+
+      /*!
+       * Moves the contents of \a other into this object.
+       */
+      Chapter &operator=(Chapter &&other) noexcept;
+
+      /*!
+       * Exchanges the content of the object with the content of \a other.
+       */
+      void swap(Chapter &other) noexcept;
+
+      /*!
+       * Returns the title representing the chapter.
+       */
+      const String &title() const;
+
+      /*!
+       * Returns the start time in milliseconds.
+       */
+      long long startTime() const;
+
+    private:
+      class ChapterPrivate;
+      TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
+      std::unique_ptr<ChapterPrivate> d;
     };
+
+    //! List of chapters.
+    using ChapterList = List<Chapter>;
 
   }  // namespace MP4
 }  // namespace TagLib

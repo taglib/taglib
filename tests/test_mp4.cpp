@@ -34,8 +34,6 @@
 #include "mp4atom.h"
 #include "mp4file.h"
 #include "mp4itemfactory.h"
-#include "mp4chapterlist.h"
-#include "mp4qtchapterlist.h"
 #include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -115,8 +113,6 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListOverwrite);
   CPPUNIT_TEST(testQTChapterListTimestampPrecision);
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
-  CPPUNIT_TEST(testChapterListFileAPI);
-  CPPUNIT_TEST(testQTChapterListFileAPI);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -888,6 +884,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(String("TITLE"), f.tag()->title());
     }
   }
+
   void testChapterListWrite()
   {
     ScopedFileCopy copy("no-tags", ".m4a");
@@ -895,59 +892,47 @@ public:
 
     // File should have no chapters initially
     {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.neroChapters();
       CPPUNIT_ASSERT(chapters.isEmpty());
     }
 
     // Write chapters
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Introduction";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 30000LL;  // 30 seconds in ms
-      ch2.title = "Main Content";
-      chapters.append(ch2);
-
-      MP4::Chapter ch3;
-      ch3.startTime = 60000LL;  // 60 seconds in ms
-      ch3.title = "Conclusion";
-      chapters.append(ch3);
-
-      CPPUNIT_ASSERT(MP4::MP4ChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter("Introduction", 0),
+        MP4::Chapter("Main Content", 30000LL),
+        MP4::Chapter("Conclusion", 60000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Read back and verify
     {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.neroChapters();
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Introduction"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[1].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Main Content"), chapters[1].title);
-      CPPUNIT_ASSERT_EQUAL(60000LL, chapters[2].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Conclusion"), chapters[2].title);
-    }
+      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Introduction"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[1].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Main Content"), chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(60000LL, chapters[2].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Conclusion"), chapters[2].title());
 
-    // Overwrite with different chapters
-    {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Part One";
-      chapters.append(ch1);
-
-      CPPUNIT_ASSERT(MP4::MP4ChapterList::write(filename.c_str(), chapters));
+      // Overwrite with different chapters
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter("Part One", 0)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify overwrite
     {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.neroChapters();
       CPPUNIT_ASSERT_EQUAL(1U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(String("Part One"), chapters[0].title);
+      CPPUNIT_ASSERT_EQUAL(String("Part One"), chapters[0].title());
     }
   }
 
@@ -958,32 +943,34 @@ public:
 
     // Write chapters
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Chapter 1";
-      chapters.append(ch1);
-
-      CPPUNIT_ASSERT(MP4::MP4ChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter("Chapter 1", 0)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify written
     {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.neroChapters();
       CPPUNIT_ASSERT_EQUAL(1U, chapters.size());
-    }
 
-    // Remove chapters
-    CPPUNIT_ASSERT(MP4::MP4ChapterList::remove(filename.c_str()));
+      // Remove chapters
+      f.setNeroChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
 
     // Verify removed
     {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.neroChapters();
       CPPUNIT_ASSERT(chapters.isEmpty());
-    }
 
-    // Remove from file with no chapters should also succeed
-    CPPUNIT_ASSERT(MP4::MP4ChapterList::remove(filename.c_str()));
+      // Remove from file with no chapters should also succeed
+      f.setNeroChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
   }
 
   void testChapterListWithExistingTags()
@@ -998,51 +985,47 @@ public:
       CPPUNIT_ASSERT(f.isValid());
       originalArtist = f.tag()->artist();
       CPPUNIT_ASSERT(!originalArtist.isEmpty());
-    }
 
-    // Write chapters
-    {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Intro";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 10000LL;  // 10 seconds in ms
-      ch2.title = "Verse";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4ChapterList::write(filename.c_str(), chapters));
+      // Write chapters
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter("Intro", 0),
+        MP4::Chapter("Verse", 10000LL)});
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify chapters are written AND existing tags are preserved
     {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title);
-
       MP4::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
+      MP4::ChapterList chapters = f.neroChapters();
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title());
       CPPUNIT_ASSERT_EQUAL(originalArtist, f.tag()->artist());
+
+      // Remove chapters and verify tags still survive
+      f.setNeroChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
     }
 
-    // Remove chapters and verify tags still survive
-    CPPUNIT_ASSERT(MP4::MP4ChapterList::remove(filename.c_str()));
     {
       MP4::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT_EQUAL(originalArtist, f.tag()->artist());
+      CPPUNIT_ASSERT(f.neroChapters().isEmpty());
     }
   }
 
   void testChapterListReadEmpty()
   {
     // Reading from a file with no chpl atom should return empty list
-    MP4::ChapterList chapters = MP4::MP4ChapterList::read(
-      TEST_FILE_PATH_C("no-tags.m4a"));
-    CPPUNIT_ASSERT(chapters.isEmpty());
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.neroChapters().isEmpty());
+    }
   }
 
   void testQTChapterListWrite()
@@ -1052,41 +1035,33 @@ public:
 
     // File should have no QT chapters initially
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT(chapters.isEmpty());
     }
 
     // Write chapters (times in 100-nanosecond units)
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Intro";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 15000LL;  // 15 seconds in ms
-      ch2.title = "Verse";
-      chapters.append(ch2);
-
-      MP4::Chapter ch3;
-      ch3.startTime = 30000LL;  // 30 seconds in ms
-      ch3.title = "Outro";
-      chapters.append(ch3);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Intro", 0),
+        MP4::Chapter("Verse", 15000LL),
+        MP4::Chapter("Outro", 30000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Read back and verify
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(15000LL, chapters[1].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title);
-      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[2].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Outro"), chapters[2].title);
+      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(15000LL, chapters[1].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[2].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Outro"), chapters[2].title());
     }
   }
 
@@ -1097,37 +1072,35 @@ public:
 
     // Write chapters first
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Chapter 1";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 10000LL;  // 10 seconds in ms
-      ch2.title = "Chapter 2";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Chapter 1", 0),
+        MP4::Chapter("Chapter 2", 10000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify written
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
-    }
 
-    // Remove chapters
-    CPPUNIT_ASSERT(MP4::MP4QTChapterList::remove(filename.c_str()));
+      // Remove chapters
+      f.setQtChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
 
     // Verify removed
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT(chapters.isEmpty());
-    }
 
-    // Remove from file with no chapters should also succeed
-    CPPUNIT_ASSERT(MP4::MP4QTChapterList::remove(filename.c_str()));
+      // Remove from file with no chapters should also succeed
+      f.setQtChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
   }
 
   void testQTChapterListWithExistingTags()
@@ -1142,51 +1115,49 @@ public:
       CPPUNIT_ASSERT(f.isValid());
       originalArtist = f.tag()->artist();
       CPPUNIT_ASSERT(!originalArtist.isEmpty());
-    }
 
-    // Write chapters
-    {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Intro";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 10000LL;  // 10 seconds in ms
-      ch2.title = "Verse";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      // Write chapters
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Intro", 0),
+        MP4::Chapter("Verse", 10000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify chapters are written AND existing tags are preserved
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
-      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title);
-
       MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(String("Intro"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("Verse"), chapters[1].title());
+
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT_EQUAL(originalArtist, f.tag()->artist());
+
+      // Remove chapters and verify tags still survive
+      f.setQtChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
     }
 
-    // Remove chapters and verify tags still survive
-    CPPUNIT_ASSERT(MP4::MP4QTChapterList::remove(filename.c_str()));
     {
       MP4::File f(filename.c_str());
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT_EQUAL(originalArtist, f.tag()->artist());
+      CPPUNIT_ASSERT(f.qtChapters().isEmpty());
     }
   }
 
   void testQTChapterListReadEmpty()
   {
     // Reading from a file with no chapter track should return empty list
-    MP4::ChapterList chapters = MP4::MP4QTChapterList::read(
-      TEST_FILE_PATH_C("no-tags.m4a"));
-    CPPUNIT_ASSERT(chapters.isEmpty());
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.qtChapters().isEmpty());
+    }
   }
 
   void testQTChapterListOverwrite()
@@ -1196,54 +1167,40 @@ public:
 
     // Write initial chapters
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Old1";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 5000LL;  // 5 seconds in ms
-      ch2.title = "Old2";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Old1", 0),
+        MP4::Chapter("Old2", 5000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify initial
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
     }
 
     // Overwrite with different chapters
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "New1";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 10000LL;  // 10 seconds in ms
-      ch2.title = "New2";
-      chapters.append(ch2);
-
-      MP4::Chapter ch3;
-      ch3.startTime = 20000LL;  // 20 seconds in ms
-      ch3.title = "New3";
-      chapters.append(ch3);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("New1", 0),
+        MP4::Chapter("New2", 10000LL),
+        MP4::Chapter("New3", 20000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Verify overwrite
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(String("New1"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(String("New2"), chapters[1].title);
-      CPPUNIT_ASSERT_EQUAL(String("New3"), chapters[2].title);
+      CPPUNIT_ASSERT_EQUAL(String("New1"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("New2"), chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(String("New3"), chapters[2].title());
     }
   }
 
@@ -1254,26 +1211,21 @@ public:
 
     // Write chapters at precise times
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Start";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 1500LL;  // 1.5 seconds in ms
-      ch2.title = "Precise";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Start", 0),
+        MP4::Chapter("Precise", 1500LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Read back and verify timestamps
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(1500LL, chapters[1].startTime);
+      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(1500LL, chapters[1].startTime());
     }
   }
 
@@ -1284,140 +1236,29 @@ public:
 
     // Write chapters where first chapter is NOT at time 0
     {
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 10000LL;  // 10 seconds in ms
-      ch1.title = "One";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 20000LL;  // 20 seconds in ms
-      ch2.title = "Two";
-      chapters.append(ch2);
-
-      MP4::Chapter ch3;
-      ch3.startTime = 30000LL;  // 30 seconds in ms
-      ch3.title = "Three";
-      chapters.append(ch3);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(filename.c_str(), chapters));
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("One", 10000LL),
+        MP4::Chapter("Two", 20000LL),
+        MP4::Chapter("Three", 30000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
     }
 
     // Read back -- dummy chapter at time 0 should be stripped
     {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
       CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(10000LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime);
-      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[2].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title);
-      CPPUNIT_ASSERT_EQUAL(String("Three"), chapters[2].title);
-    }
-  }
-  void testChapterListFileAPI()
-  {
-    ScopedFileCopy copy("no-tags", ".m4a");
-    string filename = copy.fileName();
-
-    // Write chapters via the file-based API
-    {
-      MP4::File file(filename.c_str(), false);
-      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
-
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Alpha";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 20000LL;  // 20 seconds in ms
-      ch2.title = "Beta";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4ChapterList::write(&file, chapters));
-    }
-
-    // Read back via the file-based API
-    {
-      MP4::File file(filename.c_str(), false);
-      CPPUNIT_ASSERT(file.isOpen() && file.isValid());
-
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(&file);
-      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Alpha"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Beta"), chapters[1].title);
-    }
-
-    // Remove via the file-based API
-    {
-      MP4::File file(filename.c_str(), false);
-      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
-
-      CPPUNIT_ASSERT(MP4::MP4ChapterList::remove(&file));
-    }
-
-    // Verify removed
-    {
-      MP4::ChapterList chapters = MP4::MP4ChapterList::read(filename.c_str());
-      CPPUNIT_ASSERT(chapters.isEmpty());
+      CPPUNIT_ASSERT_EQUAL(10000LL, chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime());
+      CPPUNIT_ASSERT_EQUAL(30000LL, chapters[2].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(String("Three"), chapters[2].title());
     }
   }
 
-  void testQTChapterListFileAPI()
-  {
-    ScopedFileCopy copy("no-tags", ".m4a");
-    string filename = copy.fileName();
-
-    // Write chapters via the file-based API
-    {
-      MP4::File file(filename.c_str(), false);
-      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
-
-      MP4::ChapterList chapters;
-      MP4::Chapter ch1;
-      ch1.startTime = 0;
-      ch1.title = "Alpha";
-      chapters.append(ch1);
-
-      MP4::Chapter ch2;
-      ch2.startTime = 20000LL;  // 20 seconds in ms
-      ch2.title = "Beta";
-      chapters.append(ch2);
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::write(&file, chapters));
-    }
-
-    // Read back via the file-based API
-    {
-      MP4::File file(filename.c_str(), false);
-      CPPUNIT_ASSERT(file.isOpen() && file.isValid());
-
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(&file);
-      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
-      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Alpha"), chapters[0].title);
-      CPPUNIT_ASSERT_EQUAL(20000LL, chapters[1].startTime);
-      CPPUNIT_ASSERT_EQUAL(String("Beta"), chapters[1].title);
-    }
-
-    // Remove via the file-based API
-    {
-      MP4::File file(filename.c_str(), false);
-      CPPUNIT_ASSERT(file.isOpen() && file.isValid() && !file.readOnly());
-
-      CPPUNIT_ASSERT(MP4::MP4QTChapterList::remove(&file));
-    }
-
-    // Verify removed
-    {
-      MP4::ChapterList chapters = MP4::MP4QTChapterList::read(filename.c_str());
-      CPPUNIT_ASSERT(chapters.isEmpty());
-    }
-  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMP4);
