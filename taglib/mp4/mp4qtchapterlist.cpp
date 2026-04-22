@@ -935,6 +935,66 @@ namespace
     }
   }
 
+  // Removes the QT chapter trak, the tref from the audio track, and the orphaned
+  // mdat atom that holds the chapter text samples.
+  //
+  // The chapter mdat was appended at EOF by write().  Its location is derived
+  // from the chapter track's stco entry before the track is deleted.  Both the
+  // chapter trak and tref live inside moov, which precedes the mdat, so removing
+  // them shifts the mdat by -(chapterLen + trefLen).
+  void removeQTChapterTrack(TagLib::File *file, const MP4::Atoms *atoms,
+                             MP4::Atom *moov, MP4::Atom *chapterTrak,
+                             const MP4::Atom *audioTrak)
+  {
+    // Read the first stco chunk offset BEFORE deleting the trak: the chapter
+    // mdat data starts at stco[0], so the mdat atom header is 8 bytes earlier.
+    offset_t chapterMdatOffset = -1;
+    {
+      const std::vector<unsigned int> stco = readStco(file, chapterTrak);
+      if(!stco.empty() && stco[0] >= 8)
+        chapterMdatOffset = static_cast<offset_t>(stco[0]) - 8;
+    }
+
+    // Record tref length BEFORE removeAudioTref so we can adjust the mdat offset.
+    offset_t trefLen = 0;
+    for(const auto &child : audioTrak->children()) {
+      if(child->name() == "tref") {
+        trefLen = child->length();
+        break;
+      }
+    }
+
+    // Remove chapter trak FIRST (higher offset in file).
+    const offset_t chapterOff = chapterTrak->offset();
+    const offset_t chapterLen = chapterTrak->length();
+
+    // Remove from in-memory tree so updateChunkOffsets skips its stco.
+    moov->removeChild(chapterTrak);
+    delete chapterTrak;
+
+    file->removeBlock(chapterOff, chapterLen);
+
+    const MP4::AtomList moovPath = atoms->path("moov");
+    updateParentSizes(file, moovPath, -chapterLen);
+    updateChunkOffsets(file, atoms, -chapterLen, chapterOff);
+
+    // Remove tref from audio trak (lower offset, still valid after chapter trak removal).
+    removeAudioTref(file, atoms, audioTrak);
+
+    // Remove the orphaned chapter mdat.  Both removals above are inside moov,
+    // which precedes the mdat at EOF, so adjust the stored offset accordingly.
+    if(chapterMdatOffset >= 0) {
+      const offset_t adjustedOffset = chapterMdatOffset - chapterLen - trefLen;
+      file->seek(adjustedOffset);
+      const ByteVector header = file->readBlock(8);
+      if(header.size() == 8 && header.mid(4, 4) == "mdat") {
+        const offset_t mdatSize = header.toUInt();
+        if(mdatSize >= 8)
+          file->removeBlock(adjustedOffset, mdatSize);
+      }
+    }
+  }
+
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1040,22 +1100,7 @@ bool MP4::QtChapterList::write(TagLib::File *file)
   std::unique_ptr<Atoms> cleanAtoms;
 
   if(Atom *existingChapter = findChapterTrak(file, &atoms, audio.trak)) {
-    // Remove chapter trak FIRST (higher offset in file).
-    const offset_t chapterOff = existingChapter->offset();
-    const offset_t chapterLen = existingChapter->length();
-
-    // Remove from in-memory tree so updateChunkOffsets skips its stco.
-    moov->removeChild(existingChapter);
-    delete existingChapter;
-
-    file->removeBlock(chapterOff, chapterLen);
-
-    const AtomList moovPath = atoms.path("moov");
-    updateParentSizes(file, moovPath, -chapterLen);
-    updateChunkOffsets(file, &atoms, -chapterLen, chapterOff);
-
-    // Remove tref from audio trak (lower offset, still valid).
-    removeAudioTref(file, &atoms, audio.trak);
+    removeQTChapterTrack(file, &atoms, moov, existingChapter, audio.trak);
 
     // Re-parse to get clean state after removals.
     cleanAtoms = std::make_unique<Atoms>(file);
@@ -1171,22 +1216,6 @@ bool MP4::QtChapterList::remove(TagLib::File *file)
   if(!moov)
     return false;
 
-  // Remove chapter trak FIRST (higher offset in file).
-  const offset_t chapterOff = chapterTrak->offset();
-  const offset_t chapterLen = chapterTrak->length();
-
-  // Remove from in-memory tree so updateChunkOffsets skips its stco.
-  moov->removeChild(chapterTrak);
-  delete chapterTrak;
-
-  file->removeBlock(chapterOff, chapterLen);
-
-  const AtomList moovPath = atoms.path("moov");
-  updateParentSizes(file, moovPath, -chapterLen);
-  updateChunkOffsets(file, &atoms, -chapterLen, chapterOff);
-
-  // Remove tref from audio trak (lower offset, still valid after chapter trak removal).
-  removeAudioTref(file, &atoms, audio.trak);
-
+  removeQTChapterTrack(file, &atoms, moov, chapterTrak, audio.trak);
   return true;
 }
